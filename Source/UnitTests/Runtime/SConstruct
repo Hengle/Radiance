@@ -1,0 +1,28 @@
+# UnitTests/Runtime/SConstruct
+# Builds runtime library unit tests
+# Copyright (c) 2010 Sunside Inc., All Rights Reserved
+# Author: Joe Riedel
+# See Radiance/LICENSE for licensing terms.
+
+Import('radvars')
+Import('variant_dir')
+Import('radiance_runtime')
+Import('boost_threads')
+(build, source) = radvars
+x = build.exeBuilder('runtime_unittests', build, source, '.', variant_dir, 'CON')
+	
+###################################
+
+x.add('UnitTests.cpp')
+x.add('StringTest.cpp')
+x.add('ReflectMap.cpp')
+x.add('ReflectTest.cpp')
+x.add('FileTest.cpp')
+x.add('SIMDTest.cpp')
+x.add(radiance_runtime, type='lib')
+x.add(boost_threads, type='lib')
+
+###################################
+
+x.create()
+

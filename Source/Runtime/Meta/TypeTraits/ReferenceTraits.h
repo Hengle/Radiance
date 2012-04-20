@@ -1,0 +1,46 @@
+// ReferenceTraits.h
+// Copyright (c) 2010 Sunside Inc., All Rights Reserved
+// Author: Mike Songy
+// See Radiance/LICENSE for licensing terms.
+
+#pragma once
+
+#include "../IntegralConstant.h"
+
+
+namespace meta {
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// meta::IsReference<T>
+//////////////////////////////////////////////////////////////////////////////////////////
+
+template <typename T>
+struct IsReference
+: public FalseType
+{
+};
+
+template <typename T>
+struct IsReference<T &>
+: public TrueType
+{
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// meta::RemoveReference<T>
+//////////////////////////////////////////////////////////////////////////////////////////
+
+template <typename T>
+struct RemoveReference
+{
+	typedef T Type;
+};
+
+template <typename T>
+struct RemoveReference<T &>
+{
+	typedef T Type;
+};
+
+} // meta
+

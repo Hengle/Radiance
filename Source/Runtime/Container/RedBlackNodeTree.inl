@@ -1,0 +1,270 @@
+// RedBlackNodeTree.inl
+// Copyright (c) 2010 Sunside Inc., All Rights Reserved
+// Author: Joe Riedel
+// See Radiance/LICENSE for licensing terms.
+
+
+namespace container {
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// container::RedBlackNodeTree
+//////////////////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// RedBlackNodeTree::Insert()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+template<typename _COMPARE_PREDICATE>
+inline void RedBlackNodeTree::Insert(Node* x,_COMPARE_PREDICATE& compare)
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+
+	RAD_ASSERT(x);
+	RAD_ASSERT(x != m_NIL);
+
+	RAD_ASSERT(x->m_magicID == Node::MAGIC_ID);
+	RAD_ASSERT(!x->m_inTree);
+
+	InsertFixUp(x,compare);
+	PrivateInsert(x);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// LWRedBlackNodeTree::Resort()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+template<typename _COMPARE_PREDICATE>
+inline void RedBlackNodeTree::Resort(Node* x,_COMPARE_PREDICATE& compare)
+{
+	Remove(x);
+	Insert(x, compare);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// RedBlackNodeTree::InsertFixUp()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+template<typename _COMPARE_PREDICATE>
+void RedBlackNodeTree::InsertFixUp(Node* z,_COMPARE_PREDICATE& compare)
+{
+	RAD_ASSERT(z);
+	RAD_ASSERT(z->m_magicID == Node::MAGIC_ID);
+	RAD_ASSERT(!z->m_inTree);
+
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+
+
+	typename _COMPARE_PREDICATE::Adapter0RetType arg0;
+	typename _COMPARE_PREDICATE::Adapter1RetType arg1 = compare.arg1Adapter(z);
+
+	Node* y = m_root;
+	Node* x = m_root->m_leftChild;
+
+	z->m_leftChild = z->m_rightChild = m_NIL;
+
+	while (x != m_NIL)
+	{
+		y = x;
+
+		arg0 = compare.arg0Adapter(x);
+
+		if (compare(arg0,arg1) > 0)
+		{
+			x = x->m_leftChild;
+		}
+		else	//  x <= z
+		{
+			x = x->m_rightChild;
+		}
+	}
+
+	z->m_parent = y;
+
+	if (y == m_root)
+	{
+		y->m_leftChild = z;
+	}
+	else
+	{
+		arg0 = compare.arg0Adapter(y);
+
+		if (compare(arg0,arg1) > 0)
+		{
+			RAD_ASSERT(y != m_NIL);
+
+			y->m_leftChild = z;
+		}
+		else	// y <= z
+		{
+			y->m_rightChild = z;
+		}
+	}
+
+	RAD_ASSERT(m_root == &m_rootStorage);
+	RAD_ASSERT(m_NIL == &m_nilStorage);
+
+	RAD_ASSERT_MSG(!m_NIL->m_red,"RedBlackNodeTree::InsertFixUp :: sentinel is red!");
+	RAD_ASSERT_MSG(!m_root->m_red,"RedBlackNodeTree::InsertFixUp :: root is red!");
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// RedBlackNodeTree::Find()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+template <typename _SORT_VALUE,class _COMPARE_PREDICATE>
+RedBlackNodeTree::Node* RedBlackNodeTree::Find(const _SORT_VALUE& findValue,_COMPARE_PREDICATE& compare) const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+
+
+	Node* n = m_root->m_leftChild;
+
+	while (n != m_NIL)
+	{
+		SReg comparision = compare(compare.arg0Adapter(findValue),compare.arg1Adapter(n));
+
+		if (comparision < 0)
+		{
+			n = n->LeftChild();
+		}
+		else if (comparision > 0)
+		{
+			n = n->RightChild();
+		}
+		else
+		{
+			RAD_ASSERT(n->m_magicID == Node::MAGIC_ID);
+			RAD_ASSERT(n->m_inTree == this);
+
+			return n;
+		}
+	}
+
+	return NULL;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// RedBlackNodeTree::Next()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline RedBlackNodeTree::Node* RedBlackNodeTree::Next(const Node* node) const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+
+	return Successor(node);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// RedBlackNodeTree::Previous()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline RedBlackNodeTree::Node* RedBlackNodeTree::Previous(const Node* node) const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+
+	return Predecessor(node);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// RedBlackNodeTree::IsEmpty()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline bool RedBlackNodeTree::IsEmpty() const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+
+	return (m_size == 0);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// RedBlackNodeTree::Root()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline RedBlackNodeTree::Node* RedBlackNodeTree::Root() const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+
+	return m_root->m_leftChild;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// RedBlackNodeTree::NIL()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline const RedBlackNodeTree::Node* RedBlackNodeTree::NIL() const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+
+	return m_NIL;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// RedBlackNodeTree::Size()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline UReg RedBlackNodeTree::Size() const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+
+	return m_size;
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// RedBlackNodeTree::Node
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// RedBlackNodeTree::Node::LeftChild()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline RedBlackNodeTree::Node* RedBlackNodeTree::Node::LeftChild() const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+	RAD_ASSERT(m_inTree);
+
+	return m_leftChild;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// RedBlackNodeTree::Node::RightChild()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline RedBlackNodeTree::Node* RedBlackNodeTree::Node::RightChild() const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+	RAD_ASSERT(m_inTree);
+
+	return m_rightChild;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// RedBlackNodeTree::Node::Parent()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline RedBlackNodeTree::Node* RedBlackNodeTree::Node::Parent() const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+	RAD_ASSERT(m_inTree);
+
+	return m_parent;
+}
+
+} // container
+

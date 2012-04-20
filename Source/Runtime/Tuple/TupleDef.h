@@ -1,0 +1,31 @@
+// TupleDef.h
+// Copyright (c) 2010 Sunside Inc., All Rights Reserved
+// Author: Mike Songy
+// See Radiance/LICENSE for licensing terms.
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Tuple<TTail, THead>
+//////////////////////////////////////////////////////////////////////////////////////////
+
+template <typename TTail, typename THead>
+class Tuple;
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// TupleTraits<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
+//////////////////////////////////////////////////////////////////////////////////////////
+
+template <
+	typename T0 = void,
+	typename T1 = void,
+	typename T2 = void,
+	typename T3 = void,
+	typename T4 = void,
+	typename T5 = void,
+	typename T6 = void,
+	typename T7 = void,
+	typename T8 = void,
+	typename T9 = void
+>
+struct TupleTraits;
+
+

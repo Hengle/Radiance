@@ -1,0 +1,9 @@
+# Runtime/AudioCodec/SConstruct
+# Copyright (c) 2010 Sunside Inc., All Rights Reserved
+# Author: Joe Riedel
+# See Radiance/LICENSE for licensing terms.
+
+Import('x')
+
+x.add("Vorbis.cpp")
+x.add("Wave.cpp")

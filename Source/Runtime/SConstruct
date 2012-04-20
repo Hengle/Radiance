@@ -1,0 +1,76 @@
+# Runtime/SConstruct
+# Builds runtime library
+# Copyright (c) 2010 Sunside Inc., All Rights Reserved
+# Author: Joe Riedel
+# See Radiance/LICENSE for licensing terms.
+
+Import('radvars')
+Import('variant_dir')
+(build, source) = radvars
+
+x = build.libBuilder('Runtime', build, source, '.', variant_dir)
+build.backend.addDefine(x.source, 'RADRT_OPT_EXPORT')
+
+# add freetype include path
+build.backend.addIncludePath(x.source, [build.absPath('./Extern/freetype-2.4.4/include')])
+# add ogg/vorbis
+build.backend.addIncludePath(x.source, [build.absPath('./Extern/libogg-1.2.2/include')])
+build.backend.addIncludePath(x.source, [build.absPath('./Extern/libvorbis-1.3.2/include')])
+
+###############################################################################
+# Source
+###############################################################################
+
+x.add('Runtime.cpp')
+x.add('Base/Assert.cpp')
+x.add('Base/Event.cpp')
+x.add('Base/Memory.cpp')
+x.add('Base/MemoryPool.cpp')
+x.add('Base/Utils.cpp')
+x.add('Base/SharedLibrary.cpp')
+x.add('Base/Zone.cpp')
+x.add('Base/CPUCount.cpp')
+x.add('Base/SIMD.cpp')
+x.add('Base/SIMD_ref.cpp')
+x.add('Base/SIMD_sse2.cpp')
+x.add('Stream/Stream.cpp')
+x.add('Stream/MemoryStream.cpp')
+x.add('String/String.cpp')
+x.add('Endian/Endian.cpp')
+x.add('Time/Time.cpp')
+x.add('File/File.cpp')
+x.add('File/FileStream.cpp')
+x.add('Font/Font.cpp')
+x.add('Thread/Locks.cpp')
+
+x.add('AudioCodec', type='dir')
+x.add('Container', type='dir')
+x.add('DataCodec', type='dir')
+x.add('ImageCodec', type='dir')
+x.add('Interface', type='dir')
+x.add('Math', type='dir')
+x.add('Reflect', type='dir')
+
+if build.win():
+	x.add('Win/WinThread.cpp')
+	x.add('Win/WinFile.cpp')
+	x.add('Win/WinCrashReporter.cpp')
+
+if build.pthreads():
+	x.add('Posix/PosixThread.cpp')
+
+if build.pfiles():
+	x.add('Posix/PosixFile.cpp')
+	if build.osx() or build.ios():
+		x.add('Posix/PosixFadvise.cpp')
+	else:
+		x.add('Posix/PosixAIO.cpp')
+
+###############################################################################
+# Library
+###############################################################################
+
+radiance_runtime = x.create()
+Export('radiance_runtime')
+
+

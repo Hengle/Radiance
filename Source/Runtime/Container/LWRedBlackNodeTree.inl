@@ -1,0 +1,270 @@
+// LWRedBlackNodeTree.inl
+// Copyright (c) 2010 Sunside Inc., All Rights Reserved
+// Author: Joe Riedel
+// See Radiance/LICENSE for licensing terms.
+
+
+namespace container {
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// container::LWRedBlackNodeTree
+//////////////////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// LWRedBlackNodeTree::Insert()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+template<typename _COMPARE_PREDICATE>
+inline void LWRedBlackNodeTree::Insert(Node* x,_COMPARE_PREDICATE& compare)
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+
+	RAD_ASSERT(x);
+	RAD_ASSERT(x != m_NIL);
+
+	RAD_ASSERT(x->m_magicID == Node::MAGIC_ID);
+	RAD_ASSERT(!x->m_inTree);
+
+	InsertFixUp(x,compare);
+	PrivateInsert(x);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// LWRedBlackNodeTree::Resort()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+template<typename _COMPARE_PREDICATE>
+inline void LWRedBlackNodeTree::Resort(Node* x,_COMPARE_PREDICATE& compare)
+{
+	Remove(x);
+	Insert(x, compare);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// LWRedBlackNodeTree::InsertFixUp()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+template<typename _COMPARE_PREDICATE>
+void LWRedBlackNodeTree::InsertFixUp(Node* z,_COMPARE_PREDICATE& compare)
+{
+	RAD_ASSERT(z);
+	RAD_ASSERT(z->m_magicID == Node::MAGIC_ID);
+	RAD_ASSERT(!z->m_inTree);
+
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+
+
+	typename _COMPARE_PREDICATE::Adapter0RetType arg0;
+	typename _COMPARE_PREDICATE::Adapter1RetType arg1 = compare.arg1Adapter(z);
+
+	Node* y = m_root;
+	Node* x = m_root->m_leftChild;
+
+	z->m_leftChild = z->m_rightChild = m_NIL;
+
+	while (x != m_NIL)
+	{
+		y = x;
+
+		arg0 = compare.arg0Adapter(x);
+
+		if (compare(arg0,arg1) > 0)
+		{
+			x = x->m_leftChild;
+		}
+		else	//  x <= z
+		{
+			x = x->m_rightChild;
+		}
+	}
+
+	z->m_parent = y;
+
+	if (y == m_root)
+	{
+		y->m_leftChild = z;
+	}
+	else
+	{
+		arg0 = compare.arg0Adapter(y);
+
+		if (compare(arg0,arg1) > 0)
+		{
+			RAD_ASSERT(y != m_NIL);
+
+			y->m_leftChild = z;
+		}
+		else	// y <= z
+		{
+			y->m_rightChild = z;
+		}
+	}
+
+	RAD_ASSERT(m_root == &m_rootStorage);
+	RAD_ASSERT(m_NIL == &m_nilStorage);
+
+	RAD_ASSERT_MSG(!m_NIL->m_red,"LWRedBlackNodeTree::InsertFixUp :: sentinel is red!");
+	RAD_ASSERT_MSG(!m_root->m_red,"LWRedBlackNodeTree::InsertFixUp :: root is red!");
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// LWRedBlackNodeTree::Find()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+template <typename _SORT_VALUE,class _COMPARE_PREDICATE>
+LWRedBlackNodeTree::Node* LWRedBlackNodeTree::Find(const _SORT_VALUE& findValue,_COMPARE_PREDICATE& compare) const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+
+
+	Node* n = m_root->m_leftChild;
+
+	while (n != m_NIL)
+	{
+		SReg comparision = compare(compare.arg0Adapter(findValue),compare.arg1Adapter(n));
+
+		if (comparision < 0)
+		{
+			n = n->LeftChild();
+		}
+		else if (comparision > 0)
+		{
+			n = n->RightChild();
+		}
+		else
+		{
+			RAD_ASSERT(n->m_magicID == Node::MAGIC_ID);
+			RAD_ASSERT(n->m_inTree == this);
+
+			return n;
+		}
+	}
+
+	return NULL;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// LWRedBlackNodeTree::Next()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline LWRedBlackNodeTree::Node* LWRedBlackNodeTree::Next(const Node* node) const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+
+	return Successor(node);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// LWRedBlackNodeTree::Previous()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline LWRedBlackNodeTree::Node* LWRedBlackNodeTree::Previous(const Node* node) const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+
+	return Predecessor(node);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// LWRedBlackNodeTree::IsEmpty()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline bool LWRedBlackNodeTree::IsEmpty() const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+
+	return (m_size == 0);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// LWRedBlackNodeTree::Root()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline LWRedBlackNodeTree::Node* LWRedBlackNodeTree::Root() const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+
+	return m_root->m_leftChild;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// LWRedBlackNodeTree::NIL()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline const LWRedBlackNodeTree::Node* LWRedBlackNodeTree::NIL() const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+
+	return m_NIL;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// LWRedBlackNodeTree::Size()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline UReg LWRedBlackNodeTree::Size() const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+
+	return m_size;
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// LWRedBlackNodeTree::Node
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// LWRedBlackNodeTree::Node::LeftChild()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline LWRedBlackNodeTree::Node* LWRedBlackNodeTree::Node::LeftChild() const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+	RAD_ASSERT(m_inTree);
+
+	return m_leftChild;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// LWRedBlackNodeTree::Node::RightChild()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline LWRedBlackNodeTree::Node* LWRedBlackNodeTree::Node::RightChild() const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+	RAD_ASSERT(m_inTree);
+
+	return m_rightChild;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// LWRedBlackNodeTree::Node::Parent()
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline LWRedBlackNodeTree::Node* LWRedBlackNodeTree::Node::Parent() const
+{
+	RAD_ASSERT(m_magicID == MAGIC_ID);
+	RAD_ASSERT(m_inTree);
+
+	return m_parent;
+}
+
+} // container
+

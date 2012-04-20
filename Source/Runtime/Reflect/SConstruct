@@ -1,0 +1,11 @@
+# Runtime/Reflect/SConstruct
+# Copyright (c) 2010 Sunside Inc., All Rights Reserved
+# Author: Joe Riedel
+# See Radiance/LICENSE for licensing terms.
+
+Import('x')
+
+x.add('Reflect.cpp')
+x.add('ReflectMap.cpp')
+x.add('RTLInteropMap.cpp')
+x.add('Private/ReflectPrivate.cpp')
