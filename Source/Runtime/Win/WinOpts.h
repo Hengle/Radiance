@@ -26,7 +26,12 @@
 	#endif
 
 	#define RAD_STDEXT stdext
-	#define RAD_OPT_VISUAL_C_2005
+
+	#if _MSC_VER >= 1600
+		#define RAD_OPT_VISUAL_C_2010
+	#else
+		#define RAD_OPT_VISUAL_C_2005
+	#endif
 
 	//#define _CRT_SECURE_NO_DEPRECATE
 	//#define _CRT_NONSTDC_NO_DEPRECATE

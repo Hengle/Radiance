@@ -15,11 +15,14 @@ RADREFLECT_TYPE(RADRT_API, "bool*", bool*)
 RADREFLECT_TYPE(RADRT_API, "const bool*", const bool*)
 RADREFLECT_TYPE(RADRT_API, "char", char)
 RADREFLECT_TYPE(RADRT_API, "char*", char*)
-RADREFLECT_TYPE(RADRT_API, "wchar_t", wchar_t)
-RADREFLECT_TYPE(RADRT_API, "wchar_t*", wchar_t*)
 RADREFLECT_TYPE(RADRT_API, "const char*", const char*)
 RADREFLECT_TYPE(RADRT_API, "const void*", const void*)
+
+#if defined(RAD_NATIVE_WCHAR_T_DEFINED)
+RADREFLECT_TYPE(RADRT_API, "wchar_t", wchar_t)
+RADREFLECT_TYPE(RADRT_API, "wchar_t*", wchar_t*)
 RADREFLECT_TYPE(RADRT_API, "const wchar_t*", const wchar_t*)
+#endif
 
 RADREFLECT_TYPE(RADRT_API, "S8", S8)
 RADREFLECT_TYPE(RADRT_API, "S8*", S8*)

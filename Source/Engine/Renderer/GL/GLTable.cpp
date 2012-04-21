@@ -939,8 +939,10 @@ bool GLTable::CheckErrors(const char *file, const char *function, int line)
 
 void GLTable::ClearErrors()
 {
-	while (glGetError() != GL_NO_ERROR)
+	int c = 0;
+	while (glGetError() != GL_NO_ERROR && (c<64))
 	{
+		++c;
 	}
 }
 

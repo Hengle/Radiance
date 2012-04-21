@@ -7,6 +7,7 @@
 #include "../Runtime.h"
 #include "../Base/CPUCount.h"
 #include <stdio.h>
+#include "WinHeaders.h"
 #include "../PushSystemMacros.h"
 
 #include <vector>

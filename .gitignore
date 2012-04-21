@@ -4,6 +4,8 @@
 *.suo
 *.ncb
 *.vcproj.*.user
+*.vcxproj.user
+*.sdf
 *~
 BuildLog.htm
 *.idb

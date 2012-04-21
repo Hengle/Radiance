@@ -133,10 +133,10 @@ if switches == None:
 			action='count',
 			help='verbose build output')
 			
-		AddOption('--2005Exp',
-			dest='VS_2005_EXP',
+		AddOption('--VSExp',
+			dest='VS_EXP',
 			action='count',
-			help='Select VS 2005 Express')
+			help='Select VS Express Edition (2010)')
 			
 	# endif - architecture == None
 			
@@ -278,8 +278,8 @@ if switches == None:
 				return 'ios'
 			return None
 			
-		def VS2005Exp(self):
-			x = safeGetInt('VS_2005_EXP')
+		def VSExp(self):
+			x = safeGetInt('VS_EXP')
 			if x > 0: return True
 			return False
 			
@@ -321,15 +321,16 @@ if switches == None:
 	
 build  = BuildTarget(switches, variant_override)
 
-if switches.VS2005Exp():
-	source = switches.setupEnv(Environment(MSVS_VERSION='8.0Exp'), build)
-else:
-	source = switches.setupEnv(Environment(MSVS_VERSION='8.0'), build)
+if build.win():
+	if switches.VSExp():
+		source = switches.setupEnv(Environment(MSVC_VERSION='10.0Exp', TARGET_ARCH='x86'), build)
+	else:
+		source = switches.setupEnv(Environment(MSVC_VERSION='10.0', TARGET_ARCH='x86'), build)
 
 # add global include directories
 build.backend.addIncludePath(source, 
 	[
-		build.absPath('./Extern/boost/1.38.0'), 
+		build.absPath('./Extern/boost/1.49.0'), 
 		build.absPath('./Source')
 	])
 
