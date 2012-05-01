@@ -14,14 +14,12 @@ class Engine;
 
 namespace asset {
 
-class RADENG_CLASS MaterialParser : public pkg::Sink<MaterialParser>
-{
+class RADENG_CLASS MaterialParser : public pkg::Sink<MaterialParser> {
 public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
+	enum {
 		SinkStage = pkg::SS_Parser,
 		AssetType = AT_Material
 	};
@@ -37,7 +35,7 @@ public:
 
 protected:
 
-	int Process(
+	virtual int Process(
 		const xtime::TimeSlice &time,
 		Engine &engine,
 		const pkg::Asset::Ref &asset,
@@ -73,14 +71,12 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS MaterialLoader : public pkg::Sink<MaterialLoader>
-{
+class RADENG_CLASS MaterialLoader : public pkg::Sink<MaterialLoader> {
 public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
+	enum {
 		SinkStage = pkg::SS_Load,
 		AssetType = AT_Material
 	};
@@ -99,7 +95,7 @@ public:
 
 protected:
 
-	int Process(
+	virtual int Process(
 		const xtime::TimeSlice &time,
 		Engine &engine,
 		const pkg::Asset::Ref &asset,
@@ -111,8 +107,7 @@ private:
 	void Unload();
 	void Cancel();
 
-	enum
-	{
+	enum {
 		Unloaded = -1,
 		Info = -2,
 		Parsed = -3,

@@ -44,7 +44,7 @@ protected:
 	RAD_DECLARE_GET(header, const audio_codec::SoundHeader*) { return m_data.bytes ? &m_header : 0; }
 	RAD_DECLARE_GET(data, const void*) { return m_data.cvoid; }
 
-	int Process(
+	virtual int Process(
 		const xtime::TimeSlice &time,
 		Engine &engine,
 		const pkg::Asset::Ref &asset,

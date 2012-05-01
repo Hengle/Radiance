@@ -37,7 +37,7 @@ protected:
 
 	RAD_DECLARE_GET(file, const file::HFile&) { return m_file; }
 	
-	int Process(
+	virtual int Process(
 		const xtime::TimeSlice &time,
 		Engine &engine,
 		const pkg::Asset::Ref &asset,

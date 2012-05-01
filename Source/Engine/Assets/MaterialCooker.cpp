@@ -66,7 +66,11 @@ CookStatus MaterialCooker::Status(int flags, int allflags)
 
 int MaterialCooker::Compile(int flags, int allflags)
 {
-	int r = asset->Process(xtime::TimeSlice::Infinite, flags|P_Parse|P_TargetDefault|P_NoDefaultMedia);
+	int r = asset->Process(
+		xtime::TimeSlice::Infinite, 
+		flags|P_Parse|P_TargetDefault|P_NoDefaultMedia
+	);
+
 	if (r != SR_Success)
 		return r;
 

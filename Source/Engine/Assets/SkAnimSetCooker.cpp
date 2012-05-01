@@ -107,7 +107,11 @@ int SkAnimSetCooker::Compile(int flags, int allflags)
 	CompareCachedFileTimeKey(flags, "Source.File");
 	CheckRebuildFiles(flags, allflags);
 
-	int r = asset->Process(xtime::TimeSlice::Infinite, flags|P_Load|P_TargetDefault);
+	int r = asset->Process(
+		xtime::TimeSlice::Infinite, 
+		flags|P_Load|P_TargetDefault
+	);
+
 	if (r < SR_Success)
 		return r;
 

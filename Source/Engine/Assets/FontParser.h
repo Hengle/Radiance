@@ -36,7 +36,7 @@ public:
 
 protected:
 
-	int Process(
+	virtual int Process(
 		const xtime::TimeSlice &time,
 		Engine &engine,
 		const pkg::Asset::Ref &asset,

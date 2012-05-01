@@ -18,6 +18,7 @@
 #include "MeshMaterialLoader.h"
 #include "FontParser.h"
 #include "TypefaceParser.h"
+#include "StringTableParser.h"
 
 #if defined(RAD_OPT_TOOLS)
 #include "MapParser.h"
@@ -71,6 +72,7 @@ RADENG_API void RADENG_CALL RegisterParsers(Engine &engine)
 	MusicParser::Register(engine);
 	FontParser::Register(engine);
 	TypefaceParser::Register(engine);
+	StringTableParser::Register(engine);
 	RB_RegisterParsers(engine);
 }
 

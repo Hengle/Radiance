@@ -102,6 +102,7 @@ def pctools(x):
 	x.add('Assets/SkAnimSetCooker.cpp')
 	x.add('Assets/SkAnimStatesCooker.cpp')
 	x.add('Assets/SoundCooker.cpp')
+	x.add('Assets/StringTableCooker.cpp')
 	editor(x)
 	
 def tools(x):
@@ -135,6 +136,7 @@ def assets(x):
 	x.add('Assets/SkModelParser.cpp')
 	x.add('Assets/SoundParser.cpp')
 	x.add('Assets/SoundLoader.cpp')
+	x.add('Assets/StringTableParser.cpp')
 	x.add('Assets/TextureParser.cpp')
 	x.add('Assets/TypefaceParser.cpp')
 	
@@ -176,6 +178,7 @@ x.add('SCC/SCC.cpp')
 x.add('SkAnim/SkAnim.cpp')
 x.add('SkAnim/SkControllers.cpp')
 x.add('Sound.cpp')
+x.add('StringTable.cpp')
 x.add('World/BSPFile.cpp')
 x.add('World/Entity.cpp')
 x.add('World/EntityPhysics.cpp')

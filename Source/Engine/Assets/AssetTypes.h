@@ -28,6 +28,7 @@ enum Type
 	AT_Music,
 	AT_Font,
 	AT_Typeface,
+	AT_StringTable,
 	AT_Max
 };
 
@@ -64,7 +65,8 @@ const char *s_strings[asset::AT_Max] =
 	"Sound",
 	"Music",
 	"Font",
-	"Typeface"
+	"Typeface",
+	"StringTable"
 };
 }
 

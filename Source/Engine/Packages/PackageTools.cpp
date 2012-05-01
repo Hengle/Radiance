@@ -182,18 +182,14 @@ KeyVal::Ref Package::Entry::FindKey(const char *path, int &plat) const
 		String x = sPath + "." + PlatformNameForFlags(plat);
 		KeyVal::Map::const_iterator it = m_keys.find(x);
 		if (it != m_keys.end())
-		{
 			return it->second;
-		}
 		
 		plat = 0;
 	}
 
 	KeyVal::Map::const_iterator it = m_keys.find(sPath);
 	if (it != m_keys.end())
-	{
 		return it->second;
-	}
 
 	return KeyVal::Ref();
 }

@@ -1,5 +1,5 @@
-// MaterialCooker.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
+// StringTableCooker.h
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
@@ -13,25 +13,24 @@ class Engine;
 
 namespace asset {
 
-class RADENG_CLASS MaterialCooker : public pkg::Cooker {
+class RADENG_CLASS StringTableCooker : public pkg::Cooker {
 public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
+	enum {
 		AssetType = AT_Material
 	};
 
-	MaterialCooker();
-	virtual ~MaterialCooker();
+	StringTableCooker();
+	virtual ~StringTableCooker();
 
 	virtual pkg::CookStatus Status(int flags, int allflags);
 	virtual int Compile(int flags, int allflags);
 
 private:
 
-	int MatchTargetKeys(int flags, int allflags);
+	pkg::CookStatus CheckRebuild(int flags, int allflags);
 };
 
 } // asset
