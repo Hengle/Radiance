@@ -14,9 +14,13 @@ MeshThumb::MeshThumb(ContentBrowserView &view) : ContentAssetThumb(view)
 {
 }
 
-void MeshThumb::OpenEditor(const pkg::Package::Entry::Ref &entry)
+void MeshThumb::OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable, bool modal)
 {
-	MeshEditorWindow::LaunchEditor(entry->id);
+	// TODO: Change legacy viewers over to EditorWindow subclasses
+	// and use EditorWindow::CreateDialog for modal cases
+
+	if (!modal)
+		MeshEditorWindow::LaunchEditor(entry->id);
 }
 
 void MeshThumb::New(ContentBrowserView &view)

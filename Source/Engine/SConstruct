@@ -37,13 +37,15 @@ def editor(x):
 		
 	def editors():
 		map_editor()
+		x.moc('Tools/Editor/EditorWindow')
 		x.moc('Tools/Editor/EditorMeshEditorWindow')
 		x.moc('Tools/Editor/EditorSkModelEditorWindow')
+		x.moc('Tools/Editor/EditorStringTableEditorWindow')
 		
 	def content_browser():
 		x.moc('Tools/Editor/ContentBrowser/EditorContentChoosePackageDialog')
 		x.moc('Tools/Editor/ContentBrowser/EditorContentBrowserView')
-		x.moc('Tools/Editor/ContentBrowser/EditorContentBrowser')
+		x.moc('Tools/Editor/ContentBrowser/EditorContentBrowserWindow')
 		x.moc('Tools/Editor/ContentBrowser/EditorContentBrowserTree')
 		x.moc('Tools/Editor/ContentBrowser/EditorContentBrowserModel')
 		x.add('Tools/Editor/ContentBrowser/EditorContentBrowserViewSort.cpp')
@@ -57,6 +59,7 @@ def editor(x):
 		x.moc('Tools/Editor/ContentBrowser/EditorMaterialThumb')
 		x.moc('Tools/Editor/ContentBrowser/EditorMeshThumb')
 		x.moc('Tools/Editor/ContentBrowser/EditorSkModelThumb')
+		x.moc('Tools/Editor/ContentBrowser/EditorStringTableThumb')
 		x.add('Tools/Editor/ContentBrowser/EditorSoundThumb.cpp')
 		x.add('Tools/Editor/ContentBrowser/EditorMusicThumb.cpp')
 	
@@ -75,6 +78,9 @@ def editor(x):
 	x.moc('Tools/Editor/EditorGLWidget')
 	x.moc('Tools/Editor/EditorLineEditDialog')
 	x.moc('Tools/Editor/EditorSearchLineWidget')
+	x.moc('Tools/Editor/EditorStringTableWidget')
+	x.moc('Tools/Editor/EditorStringTableWidgetItemModel')
+	x.moc('Tools/Editor/EditorTextEditorDialog')
 	x.moc('Tools/Editor/EditorLogWindow')
 	x.moc('Tools/Editor/EditorMainWindow')
 	x.moc('Tools/Editor/EditorPIEWidget')

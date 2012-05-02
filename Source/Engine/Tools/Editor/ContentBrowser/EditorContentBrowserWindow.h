@@ -1,4 +1,4 @@
-// EditorContentBrowser.h
+// EditorContentBrowserWindow.h
 // Copyright (c) 2010 Sunside Inc., All Rights Reserved
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
@@ -24,22 +24,15 @@ class ContentBrowserTree;
 class ContentBrowserView;
 class ContentPropertyGrid;
 
-class RADENG_CLASS ContentBrowser : public QDialog
+class RADENG_CLASS ContentBrowserWindow : public QDialog
 {
 	Q_OBJECT
 public:
 
 	typedef ContentBrowserView::SelSet SelSet;
 
-	enum Style
-	{
-		S_Dialog,
-		S_Window,
-		S_Widget
-	};
-
-	ContentBrowser(
-        Style style,
+	ContentBrowserWindow(
+        WidgetStyle style,
         bool editable,
         bool multiSelect,
 		QWidget *parent = 0
@@ -48,9 +41,9 @@ public:
 	void UpdateFilter(bool redraw=true);
 	bool FilterContent(const pkg::IdVec &ids);
 
-	RAD_DECLARE_READONLY_PROPERTY(ContentBrowser, selection, const SelSet&);
-	RAD_DECLARE_READONLY_PROPERTY(ContentBrowser, view, ContentBrowserView*);
-	RAD_DECLARE_READONLY_PROPERTY(ContentBrowser, typeFilter, asset::TypeBits*);
+	RAD_DECLARE_READONLY_PROPERTY(ContentBrowserWindow, selection, const SelSet&);
+	RAD_DECLARE_READONLY_PROPERTY(ContentBrowserWindow, view, ContentBrowserView*);
+	RAD_DECLARE_READONLY_PROPERTY(ContentBrowserWindow, typeFilter, asset::TypeBits*);
 
 	static void NotifyAddRemovePackages();
 	static void NotifyAddRemoveContent(const pkg::IdVec &added, const pkg::IdVec &removed);
@@ -70,18 +63,19 @@ private slots:
 	void DeletePackage();
 	void OnCloneSelection(const SelSet &sel);
 	void OnMoveSelection(const SelSet &sel);
+	void OnViewItemDoubleClicked(int id, bool &openEditor);
 
 private:
 
 	RAD_DECLARE_GET(selection, const SelSet&) { return m_view->selection; }
 	RAD_DECLARE_GET(view, ContentBrowserView*) { return m_view; }
-	RAD_DECLARE_GET(typeFilter, asset::TypeBits*) { return &const_cast<ContentBrowser*>(this)->m_types; }
+	RAD_DECLARE_GET(typeFilter, asset::TypeBits*) { return &const_cast<ContentBrowserWindow*>(this)->m_types; }
 
 	virtual void keyPressEvent(QKeyEvent *e);
 	pkg::IdVec CreateAsset(asset::Type type, const pkg::Package::Ref &pkg, pkg::IdVec &sel);
 	pkg::IdVec GenericImportAssetFiles(asset::Type type, const pkg::Package::Ref &pkg, pkg::IdVec &sel);
 	
-	Style m_style;
+	WidgetStyle          m_style;
 	ContentBrowserView  *m_view;
 	ContentBrowserTree  *m_tree;
 	ContentPropertyGrid *m_grid;

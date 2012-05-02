@@ -3,7 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
-#include "EditorContentBrowser.h"
+#include "EditorContentBrowserWindow.h"
 #include "EditorContentBrowserView.h"
 #include "EditorContentBrowserModel.h"
 #include "../EditorSearchLineWidget.h"
@@ -52,9 +52,9 @@ void CreateSkModelThumb(ContentBrowserView &view);
 void CreateMeshThumb(ContentBrowserView &view);
 void CreateSoundThumb(ContentBrowserView &view);
 void CreateMusicThumb(ContentBrowserView &view);
+void CreateStringTableThumb(ContentBrowserView &view);
 
-void CreateThumbs(ContentBrowserView &view)
-{
+void CreateThumbs(ContentBrowserView &view) {
 	CreateTextureThumb(view);
 	CreateMapThumb(view);
 	CreateMaterialThumb(view);
@@ -62,13 +62,16 @@ void CreateThumbs(ContentBrowserView &view)
 	CreateMeshThumb(view);
 	CreateSoundThumb(view);
 	CreateMusicThumb(view);
+	CreateStringTableThumb(view);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 ContentAssetThumb::ContentAssetThumb(ContentBrowserView &view)
-: m_view(&view), m_menu(0)
+: m_view(&view), m_editable(true), m_modal(false)
 {
+	m_menu[0] = 0;
+	m_menu[1] = 0;
 }
 
 void ContentAssetThumb::ThumbChanged()
@@ -81,10 +84,11 @@ void ContentAssetThumb::Register(Ref &self, asset::Type type)
 	m_view->RegisterThumb(self, type);
 }
 
-PopupMenu *ContentAssetThumb::CreateMenu()
+PopupMenu *ContentAssetThumb::CreateMenu(bool mutableMenu)
 {
-	RAD_ASSERT(!m_menu);
-	return (m_menu = new PopupMenu(m_view));
+	int idx = mutableMenu ? 0 : 1;
+	RAD_ASSERT(!m_menu[idx]);
+	return (m_menu[idx] = new PopupMenu(m_view));
 }
 
 void ContentAssetThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, int &h)
@@ -98,14 +102,18 @@ bool ContentAssetThumb::Render(const pkg::Package::Entry::Ref &entry, int x, int
 	return false;
 }
 
-void ContentAssetThumb::OpenEditor(const pkg::Package::Entry::Ref &entry)
+void ContentAssetThumb::OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable, bool modal)
 {
 }
 
-void ContentAssetThumb::RightClick(const pkg::Package::Entry::Ref &entry, QMouseEvent *e)
+void ContentAssetThumb::RightClick(const pkg::Package::Entry::Ref &entry, QMouseEvent *e, bool editable, bool modal)
 {
 	m_item = entry;
-	PopupMenu *m = menu;
+	m_editable = editable;
+	m_modal = modal;
+	PopupMenu *m = Menu(editable);
+	if (!m && editable)
+		m = Menu(false); // try readonly menu
 	if (m)
 		m->Exec(e->globalPos());
 	m_item.reset();
@@ -229,6 +237,7 @@ void ContentBrowserView::Tick(float dt)
 ContentBrowserView::ContentBrowserView(
 	bool vscroll,
 	bool editable,
+	bool modal,
 	SelMode selMode,
 	QWidget *parent,
 	Qt::WindowFlags f
@@ -237,6 +246,7 @@ ContentBrowserView::ContentBrowserView(
 QWidget(parent, f),
 m_vscroll(vscroll),
 m_editable(editable),
+m_modal(modal),
 m_font("Courier New"),
 m_hoverId(-1),
 m_selMode(selMode),
@@ -587,7 +597,7 @@ void ContentBrowserView::DeleteSelection()
 	}
 
 	Packages()->SavePackages(pkgs);
-	ContentBrowser::NotifyAddRemoveContent(pkg::IdVec(), vec);
+	ContentBrowserWindow::NotifyAddRemoveContent(pkg::IdVec(), vec);
 }
 
 void ContentBrowserView::CloneSelection()
@@ -947,7 +957,7 @@ void ContentBrowserView::OnMousePressEvent(QMouseEvent *e)
 		{
 			ContentAssetThumb *thumb = ThumbForType(asset->type);
 			if (thumb)
-				thumb->RightClick(asset, e);
+				thumb->RightClick(asset, e, m_editable, m_modal);
 		}
 	}
 }
@@ -956,17 +966,18 @@ void ContentBrowserView::OnMouseReleaseEvent(QMouseEvent *e)
 {
 }
 
-void ContentBrowserView::OnMouseDoubleClickEvent(QMouseEvent *e)
-{
+void ContentBrowserView::OnMouseDoubleClickEvent(QMouseEvent *e) {
 	int id = HitTestId(e->x(), e->y());
-	if (id != -1)
-	{
-		pkg::Package::Entry::Ref asset = Packages()->FindEntry(id);
-		if (asset)
-		{
-			ContentAssetThumb *thumb = ThumbForType(asset->type);
-			if (thumb)
-				thumb->OpenEditor(asset);
+	if (id != -1) {
+		bool openEditor = true;
+		emit OnItemDoubleClicked(id, openEditor);
+		if (openEditor) {
+			pkg::Package::Entry::Ref asset = Packages()->FindEntry(id);
+			if (asset) {
+				ContentAssetThumb *thumb = ThumbForType(asset->type);
+				if (thumb)
+					thumb->OpenEditor(asset, m_editable, m_modal);
+			}
 		}
 	}
 }

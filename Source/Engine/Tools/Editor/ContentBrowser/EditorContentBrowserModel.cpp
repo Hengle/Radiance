@@ -4,7 +4,7 @@
 // See Radiance/LICENSE for licensing terms.
 
 #include "EditorContentBrowserModel.h"
-#include "EditorContentBrowser.h"
+#include "EditorContentBrowserWindow.h"
 #include "../EditorUtils.h"
 #include <QtGui/QMessageBox>
 
@@ -25,7 +25,8 @@ const wchar_t *s_typeIcons[asset::AT_Max] =
 	L"Editor/sound_small.png",
 	L"Editor/music_small.png",
 	L"Editor/font_small.png",
-	L"Editor/typeface_small.png"
+	L"Editor/typeface_small.png",
+	L"Editor/stringtable_small.png"
 };
 
 } // namespace
@@ -140,7 +141,7 @@ bool ContentBrowserModel::setData(const QModelIndex &index, const QVariant &valu
 			}
 			else
 			{
-				ContentBrowser::NotifyAddRemovePackages();
+				ContentBrowserWindow::NotifyAddRemovePackages();
 			}
 		}
 		else if (IsAsset(index))
@@ -163,7 +164,7 @@ bool ContentBrowserModel::setData(const QModelIndex &index, const QVariant &valu
 			{
 				ContentChange::Vec changed;
 				changed.push_back(ContentChange(asset));
-				ContentBrowser::NotifyContentChanged(changed);
+				ContentBrowserWindow::NotifyContentChanged(changed);
 				emit dataChanged(index, index);
 			}
 		}

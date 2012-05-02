@@ -1,5 +1,5 @@
-// EditorMapThumb.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
+// EditorStringTableThumb.h
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
@@ -11,26 +11,16 @@
 namespace tools {
 namespace editor {
 
-class MapThumb : public ContentAssetThumb
+class StringTableThumb : public ContentAssetThumb
 {
 	Q_OBJECT
 public:
-	MapThumb(ContentBrowserView &view);
+	StringTableThumb(ContentBrowserView &view);
 	virtual void OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable, bool modal);
 	static void New(ContentBrowserView &view);
-
-private slots:
-
-	void Play();
-
-private:
-
-	void Play(const pkg::Package::Entry::Ref &entry);
-
 };
 
 } // editor
 } // tools
 
 #include <Runtime/PopPack.h>
-

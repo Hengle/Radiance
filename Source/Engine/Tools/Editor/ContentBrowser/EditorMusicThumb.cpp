@@ -15,7 +15,7 @@ MusicThumb::MusicThumb(ContentBrowserView &view) : ContentAssetThumb(view)
 {
 }
 
-void MusicThumb::OpenEditor(const pkg::Package::Entry::Ref &entry)
+void MusicThumb::OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable, bool modal)
 {
 	if (m_sound && m_sound->asset->id == entry->id)
 	{

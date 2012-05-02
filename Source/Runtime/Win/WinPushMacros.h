@@ -16,6 +16,7 @@
 #pragma push_macro("Yield")
 #pragma push_macro("MessageBox")
 #pragma push_macro("CreateDirectory")
+#pragma push_macro("CreateDialog")
 #pragma push_macro("DeleteFile")
 #pragma push_macro("max")
 #pragma push_macro("min")
@@ -24,6 +25,7 @@
 #undef Yield
 #undef MessageBox
 #undef CreateDirectory
+#undef CreateDialog
 #undef DeleteFile
 #undef min
 #undef max

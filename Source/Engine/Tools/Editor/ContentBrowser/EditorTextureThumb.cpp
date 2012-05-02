@@ -361,7 +361,7 @@ bool TextureThumb::Render(const pkg::Package::Entry::Ref &asset, int x, int y, i
 	return true;
 }
 
-void TextureThumb::OpenEditor(const pkg::Package::Entry::Ref &asset)
+void TextureThumb::OpenEditor(const pkg::Package::Entry::Ref &asset, bool editable, bool modal)
 {
 }
 

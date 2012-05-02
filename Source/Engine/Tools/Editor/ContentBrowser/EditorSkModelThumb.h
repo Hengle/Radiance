@@ -16,7 +16,7 @@ class SkModelThumb : public ContentAssetThumb
 	Q_OBJECT
 public:
 	SkModelThumb(ContentBrowserView &view);
-	virtual void OpenEditor(const pkg::Package::Entry::Ref &entry);
+	virtual void OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable, bool modal);
 	static void New(ContentBrowserView &view);
 };
 

@@ -2693,6 +2693,38 @@
 						>
 					</File>
 					<File
+						RelativePath="..\Engine\Tools\Editor\EditorStringTableEditorWindow.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\Engine\Tools\Editor\EditorStringTableEditorWindow.h"
+						>
+					</File>
+					<File
+						RelativePath="..\Engine\Tools\Editor\EditorStringTableWidget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\Engine\Tools\Editor\EditorStringTableWidget.h"
+						>
+					</File>
+					<File
+						RelativePath="..\Engine\Tools\Editor\EditorStringTableWidgetItemModel.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\Engine\Tools\Editor\EditorStringTableWidgetItemModel.h"
+						>
+					</File>
+					<File
+						RelativePath="..\Engine\Tools\Editor\EditorTextEditorDialog.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\Engine\Tools\Editor\EditorTextEditorDialog.h"
+						>
+					</File>
+					<File
 						RelativePath="..\Engine\Tools\Editor\EditorTickState.cpp"
 						>
 					</File>
@@ -2710,6 +2742,18 @@
 					</File>
 					<File
 						RelativePath="..\Engine\Tools\Editor\EditorUtils.h"
+						>
+					</File>
+					<File
+						RelativePath="..\Engine\Tools\Editor\EditorWindow.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\Engine\Tools\Editor\EditorWindow.h"
+						>
+					</File>
+					<File
+						RelativePath="..\Engine\Tools\Editor\EditorWindow.inl"
 						>
 					</File>
 					<File
@@ -2804,14 +2848,6 @@
 						Name="ContentBrowser"
 						>
 						<File
-							RelativePath="..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowser.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowser.h"
-							>
-						</File>
-						<File
 							RelativePath="..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserDef.h"
 							>
 						</File>
@@ -2845,6 +2881,14 @@
 						</File>
 						<File
 							RelativePath="..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserViewSort.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserWindow.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserWindow.h"
 							>
 						</File>
 						<File
@@ -2945,6 +2989,14 @@
 						</File>
 						<File
 							RelativePath="..\Engine\Tools\Editor\ContentBrowser\EditorSoundThumb.h"
+							>
+						</File>
+						<File
+							RelativePath="..\Engine\Tools\Editor\ContentBrowser\EditorStringTableThumb.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\Engine\Tools\Editor\ContentBrowser\EditorStringTableThumb.h"
 							>
 						</File>
 						<File

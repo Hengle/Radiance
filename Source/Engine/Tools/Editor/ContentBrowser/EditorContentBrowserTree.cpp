@@ -5,7 +5,7 @@
 
 #include "EditorContentBrowserTree.h"
 #include "EditorContentBrowserModel.h"
-#include "EditorContentBrowser.h"
+#include "EditorContentBrowserWindow.h"
 #include "../EditorUtils.h"
 
 #include <QtGui/QTreeView>
@@ -334,7 +334,7 @@ void ContentBrowserTree::Delete(const pkg::PackageVec &pkgs, const pkg::IdVec &i
 	}
 
 	if (!ids.empty())
-		ContentBrowser::NotifyAddRemoveContent(pkg::IdVec(), ids);
+		ContentBrowserWindow::NotifyAddRemoveContent(pkg::IdVec(), ids);
 
 	for (pkg::PackageVec::const_iterator it = pkgs.begin(); it != pkgs.end(); ++it)
 	{
@@ -342,7 +342,7 @@ void ContentBrowserTree::Delete(const pkg::PackageVec &pkgs, const pkg::IdVec &i
 	}
 
 	if (!pkgs.empty())
-		ContentBrowser::NotifyAddRemovePackages();
+		ContentBrowserWindow::NotifyAddRemovePackages();
 }
 
 void ContentBrowserTree::selectionChanged(const QItemSelection&, const QItemSelection&)

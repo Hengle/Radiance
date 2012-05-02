@@ -15,7 +15,7 @@
 #include "EditorUtils.h"
 #include "EditorGLWidget.h"
 #include "EditorCookerDialog.h"
-#include "ContentBrowser/EditorContentBrowser.h"
+#include "ContentBrowser/EditorContentBrowserWindow.h"
 #include "ContentBrowser/EditorContentBrowserView.h"
 #include "PropertyGrid/EditorPropertyGrid.h"
 #include "../../App.h"
@@ -203,7 +203,7 @@ void MainWindow::PostLoad()
 	QApplication::restoreOverrideCursor();
 	UnbindGL();
 
-	m_contentBrowser = new (ZEditor) ContentBrowser(ContentBrowser::S_Widget, true, true);
+	m_contentBrowser = new (ZEditor) ContentBrowserWindow(WS_Widget, true, true);
 	setCentralWidget(m_contentBrowser);
 	
 	m_app->EditorStart();

@@ -49,41 +49,32 @@ int StringTableParser::Load(
 	int flags
 ) {
 
-	const String *s = asset->entry->KeyValue<String>("Source.File", P_TARGET_FLAGS(flags));
+	const String *s = asset->entry->KeyValue<String>("Source.Root", P_TARGET_FLAGS(flags));
 	if (!s)
 		return pkg::SR_MetaError;
 
-	file::HStreamInputBuffer buf;
-	int media = file::AllMedia;
-	int r = engine.sys->files->OpenFileStream(
-		string::Widen(s->c_str()).c_str(),
-		media,
-		buf,
-		file::HIONotify()
-	);
+	wchar_t path[256];
+	wchar_t native[256];
+	string::cpy(path, L"9:/");
+	string::cat(path, engine.sys->files->hddRoot.get());
+	string::cat(path, L"/");
+	string::cat(path, string::Widen(s->c_str()).c_str());
+	if (!file::ExpandToNativePath(path, native, 256))
+		return SR_ErrorGeneric;
 
-	if (r != SR_Success)
-		return r;
+	int r = StringTable::Load(asset->path, native, m_stringTable);
 
-	m_stringTable = StringTable::Load(buf->buffer, asset->path);
+	if ((flags&P_Create) && (r == file::ErrorFileNotFound)) // this is OK for this asset just make a new table.
+		m_stringTable = StringTable::New();
+
 	if (!m_stringTable)
-		return SR_CorruptFile;
+		return r;
 
 	return SR_Success;
 }
 #endif
 
 #if defined(RAD_OPT_PC_TOOLS)
-// pkg::Document interface
-int StringTableParser::Create(
-	Engine &engine,
-	const pkg::Asset::Ref &asset,
-	int flags
-) {
-	m_stringTable = StringTable::New();
-	m_buf.Close();
-	return pkg::SR_Success;
-}
 
 int StringTableParser::Save(
 	Engine &engine,
@@ -93,11 +84,20 @@ int StringTableParser::Save(
 	if (!m_stringTable || (asset->type != AT_StringTable))
 		return SR_ErrorGeneric;
 
-	const String *s = asset->entry->KeyValue<String>("Source.File", P_TARGET_FLAGS(flags));
+	const String *s = asset->entry->KeyValue<String>("Source.Root", P_TARGET_FLAGS(flags));
 	if (!s)
 		return SR_MetaError;
 
-	if (!m_stringTable->SaveText(asset->path, s->c_str()))
+	wchar_t path[256];
+	wchar_t native[256];
+	string::cpy(path, L"9:/");
+	string::cat(path, engine.sys->files->hddRoot.get());
+	string::cat(path, L"/");
+	string::cat(path, string::Widen(s->c_str()).c_str());
+	if (!file::ExpandToNativePath(path, native, 256))
+		return SR_ErrorGeneric;
+
+	if (!m_stringTable->SaveText(asset->path, native))
 		return SR_IOError;
 
 	return SR_Success;

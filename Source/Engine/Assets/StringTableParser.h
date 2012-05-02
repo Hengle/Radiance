@@ -16,9 +16,6 @@ class Engine;
 namespace asset {
 
 class RADENG_CLASS StringTableParser : public pkg::Sink<StringTableParser> 
-#if defined(RAD_OPT_PC_TOOLS)
-	, public pkg::Document 
-#endif 
 {
 public:
 
@@ -37,11 +34,6 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(StringTableParser, stringTable, const StringTable*);
 
 #if defined(RAD_OPT_PC_TOOLS)
-	virtual int Create(
-		Engine &engine,
-		const pkg::Asset::Ref &asset,
-		int flags
-	);
 	virtual int Save(
 		Engine &engine,
 		const pkg::Asset::Ref &asset,

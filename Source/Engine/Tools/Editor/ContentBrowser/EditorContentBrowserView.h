@@ -35,7 +35,7 @@ namespace editor {
 
 class GLWidget;
 class ContentBrowserViewThread;
-class ContentBrowser;
+class ContentBrowserWindow;
 class ContentBrowserView;
 class PopupMenu;
 class SearchLineWidget;
@@ -52,8 +52,8 @@ public:
 	virtual ~ContentAssetThumb() {}
 	virtual void Dimensions(const pkg::Package::Entry::Ref &entry, int &w, int &h);
 	virtual bool Render(const pkg::Package::Entry::Ref &entry, int x, int y, int w, int h);
-	virtual void OpenEditor(const pkg::Package::Entry::Ref &entry);
-	virtual void RightClick(const pkg::Package::Entry::Ref &entry, QMouseEvent *e);
+	virtual void OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable, bool modal);
+	virtual void RightClick(const pkg::Package::Entry::Ref &entry, QMouseEvent *e, bool editable, bool modal);
 	virtual void Begin();
 	virtual void End();
 	virtual void NotifyAddRemovePackages();
@@ -63,15 +63,19 @@ public:
 	ContentBrowserView &View() const;
 	void ThumbChanged();
 protected:
-	RAD_DECLARE_READONLY_PROPERTY(ContentAssetThumb, menu, PopupMenu*);
 	RAD_DECLARE_READONLY_PROPERTY(ContentAssetThumb, clickedItem, pkg::Package::Entry::Ref);
 	void Register(Ref &self, asset::Type type);
-	PopupMenu *CreateMenu();
+	PopupMenu *CreateMenu(bool mutableMenu);
+	PopupMenu *Menu(bool mutableMenu) { return m_menu[mutableMenu ? 0 : 1]; }
+	void ItemMode(bool &editable, bool &modal) {
+		editable = m_editable;
+		modal = m_modal;
+	}
 private:
 	RAD_DECLARE_GET(clickedItem, pkg::Package::Entry::Ref) { return m_item; }
-	RAD_DECLARE_GET(menu, PopupMenu*) { return m_menu; }
 	pkg::Package::Entry::Ref m_item;
-	PopupMenu *m_menu;
+	bool m_editable, m_modal;
+	PopupMenu *m_menu[2];
 	ContentBrowserView *m_view;
 };
 
@@ -161,6 +165,7 @@ public:
 	ContentBrowserView(
 		bool vscroll = true,
 		bool editable = true,
+		bool modal = false,
 		SelMode selMode = SelMulti,
 		QWidget *parent = 0,
 		Qt::WindowFlags f = 0
@@ -199,6 +204,7 @@ signals:
 
 	void OnCloneSelection(const SelSet &sel);
 	void OnMoveSelection(const SelSet &sel);
+	void OnItemDoubleClicked(int id, bool &openEditor);
 
 public slots:
 
@@ -228,7 +234,7 @@ private slots:
 private:
 
 	friend class ContentAssetThumb;
-	friend class ContentBrowser;
+	friend class ContentBrowserWindow;
 	friend class ContentBrowserViewThread;
 
 	static void NotifyAddRemovePackages();
@@ -296,6 +302,7 @@ private:
 	int m_step;
 	bool m_vscroll;
 	bool m_editable;
+	bool m_modal;
 	bool m_loadedIcons;
 	bool m_inTick;
 	bool m_tickRedraw;

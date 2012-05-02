@@ -14,9 +14,13 @@ SkModelThumb::SkModelThumb(ContentBrowserView &view) : ContentAssetThumb(view)
 {
 }
 
-void SkModelThumb::OpenEditor(const pkg::Package::Entry::Ref &entry)
+void SkModelThumb::OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable, bool modal)
 {
-	SkModelEditorWindow::LaunchEditor(entry->id);
+	// TODO: Change legacy viewers over to EditorWindow subclasses
+	// and use EditorWindow::CreateDialog for modal cases
+
+	if (!modal)
+		SkModelEditorWindow::LaunchEditor(entry->id);
 }
 
 void SkModelThumb::New(ContentBrowserView &view)

@@ -4,7 +4,7 @@
 // See Radiance/LICENSE for licensing terms.
 
 #include "EditorContentImportFieldWidget.h"
-#include "EditorContentBrowser.h"
+#include "EditorContentBrowserWindow.h"
 #include "../EditorUtils.h"
 #include "../EditorMainWindow.h"
 #include "../../../Assets/AssetTypes.h"
@@ -45,7 +45,7 @@ void ContentImportFieldWidget::SetPath(const QString &path)
 
 void ContentImportFieldWidget::BrowseClicked()
 {
-	ContentBrowser b(ContentBrowser::S_Dialog, false, false, m_edit);
+	ContentBrowserWindow b(WS_Dialog, false, false, m_edit);
 	asset::TypeBits *typeFilter = b.typeFilter;
 
 	PercentSize(b, *MainWindow::Get(), 0.85f, 0.80f);
@@ -81,7 +81,7 @@ void ContentImportFieldWidget::BrowseClicked()
 
 	if (b.exec())
 	{
-		const ContentBrowser::SelSet &sel = b.selection;
+		const ContentBrowserWindow::SelSet &sel = b.selection;
 		if (!sel.empty())
 		{
 			pkg::Package::Entry::Ref ref = Packages()->FindEntry(*sel.begin());

@@ -16,7 +16,7 @@ class SoundThumb : public ContentAssetThumb
 {
 public:
 	SoundThumb(ContentBrowserView &view);
-	virtual void OpenEditor(const pkg::Package::Entry::Ref &entry);
+	virtual void OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable, bool modal);
 	virtual void NotifyAddRemovePackages();
 	virtual void NotifyAddRemoveContent(const pkg::IdVec &added, const pkg::IdVec &removed);
 	virtual void NotifyContentChanged(const ContentChange::Vec &changed);

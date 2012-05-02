@@ -17,6 +17,7 @@
 #pragma pop_macro("Yield")
 #pragma pop_macro("MessageBox")
 #pragma pop_macro("CreateDirectory")
+#pragma pop_macro("CreateDialog")
 #pragma pop_macro("DeleteFile")
 #pragma pop_macro("max")
 #pragma pop_macro("min")

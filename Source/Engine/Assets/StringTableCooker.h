@@ -19,7 +19,7 @@ public:
 	static void Register(Engine &engine);
 
 	enum {
-		AssetType = AT_Material
+		AssetType = AT_StringTable
 	};
 
 	StringTableCooker();

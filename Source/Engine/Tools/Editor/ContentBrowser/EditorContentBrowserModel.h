@@ -17,7 +17,7 @@
 namespace tools {
 namespace editor {
 
-class ContentBrowser;
+class ContentBrowserWindow;
 class RADENG_CLASS ContentBrowserModel : public QAbstractItemModel
 {
 	Q_OBJECT
@@ -50,7 +50,7 @@ public:
 
 private:
 
-	friend class ContentBrowser;
+	friend class ContentBrowserWindow;
 
 	static void NotifyAddRemovePackages();
 	static void NotifyAddRemoveContent(const pkg::IdVec &added, const pkg::IdVec &removed);

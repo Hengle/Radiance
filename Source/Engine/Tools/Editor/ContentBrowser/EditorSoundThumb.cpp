@@ -15,7 +15,7 @@ SoundThumb::SoundThumb(ContentBrowserView &view) : ContentAssetThumb(view)
 {
 }
 
-void SoundThumb::OpenEditor(const pkg::Package::Entry::Ref &entry)
+void SoundThumb::OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable, bool modal)
 {
 	if (m_sound && m_sound->asset->id == entry->id)
 	{ // restart sound.

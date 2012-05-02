@@ -6,7 +6,7 @@
 #include "EditorContentPropertyGrid.h"
 #include "EditorContentProperties.h"
 #include "../PropertyGrid/EditorPropertyGrid.h"
-#include "EditorContentBrowser.h"
+#include "EditorContentBrowserWindow.h"
 #include "../EditorEventRegistry.h"
 #include "../EditorComboCheckBox.h"
 #include "../../../Packages/Packages.h"
@@ -126,7 +126,7 @@ void ContentPropertyGrid::PropertyChanged(
 	
 	ContentChange::Vec changed;
 	changed.push_back(ContentChange(entry, key));
-	ContentBrowser::NotifyContentChanged(changed);
+	ContentBrowserWindow::NotifyContentChanged(changed);
 
 	s_inPropChange = false;
 

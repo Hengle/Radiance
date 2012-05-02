@@ -3,7 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
-#include "EditorContentBrowser.h"
+#include "EditorContentBrowserWindow.h"
 #include "EditorContentBrowserTree.h"
 #include "EditorContentBrowserView.h"
 #include "EditorContentBrowserModel.h"
@@ -28,18 +28,18 @@
 namespace tools {
 namespace editor {
 
-ContentBrowser::ContentBrowser(
-	Style style, 
+ContentBrowserWindow::ContentBrowserWindow(
+	WidgetStyle style, 
 	bool editable, 
 	bool multiSelect,
 	QWidget *parent
-) : QDialog(parent, (style==S_Window) ? Qt::Window : (style==S_Dialog) ? Qt::Dialog : Qt::Widget),
+) : QDialog(parent, WindowTypeForStyle(style)),
 m_delButton(0), m_editable(editable), m_style(style)
 {
 	setWindowTitle("Content Browser");
 	m_types.set();
 
-	if (style != S_Widget)
+	if (style != WS_Widget)
 	{
 		setWindowFlags(
 			Qt::Window|
@@ -55,24 +55,24 @@ m_delButton(0), m_editable(editable), m_style(style)
 	right = (int)(this->width()*0.75f);
 	left  = this->width() - right;
 
-	QWidget *w = new QWidget(this);
-	QGridLayout *l = new QGridLayout(w);
+	QWidget *w = new (ZEditor) QWidget(this);
+	QGridLayout *l = new (ZEditor) QGridLayout(w);
 
-	QSplitter *s = new QSplitter(w);
+	QSplitter *s = new (ZEditor) QSplitter(w);
 	s->setOpaqueResize(false);
 	s->setOrientation(Qt::Vertical);
 
 	{
-		QWidget *w = new QWidget();
-		QGridLayout *l = new QGridLayout(w);
+		QWidget *w = new (ZEditor) QWidget();
+		QGridLayout *l = new (ZEditor) QGridLayout(w);
 
-		QPushButton *b = new QPushButton(LoadIcon(L"Editor/add2_small.png"), "Add Package");
+		QPushButton *b = new (ZEditor) QPushButton(LoadIcon(L"Editor/add2_small.png"), "Add Package");
 		b->setEnabled(editable);
 		l->addWidget(b, 0, 0);
-		l->addItem(new QSpacerItem(0, 0), 0, 1);
+		l->addItem(new (ZEditor) QSpacerItem(0, 0), 0, 1);
 		l->setColumnStretch(1, 1);
 		RAD_VERIFY(connect(b, SIGNAL(clicked()), SLOT(AddPackage())));
-		b = new QPushButton(LoadIcon(L"Editor/delete2_small.png"), "Delete Package(s)");
+		b = new (ZEditor) QPushButton(LoadIcon(L"Editor/delete2_small.png"), "Delete Package(s)");
 		b->setEnabled(editable);
 		RAD_VERIFY(connect(b, SIGNAL(clicked()), SLOT(DeletePackage())));
 		m_delButton = b;
@@ -80,7 +80,7 @@ m_delButton(0), m_editable(editable), m_style(style)
 		l->addWidget(b, 1, 0);
 		l->addItem(new QSpacerItem(0, 0), 1, 1);
 		
-		m_tree = new ContentBrowserTree(
+		m_tree = new (ZEditor) ContentBrowserTree(
 			editable,
 			multiSelect,
 			true
@@ -96,7 +96,7 @@ m_delButton(0), m_editable(editable), m_style(style)
 		s->addWidget(w);
 	}
 
-	m_grid = new ContentPropertyGrid(pkg::P_AllTargets, editable);
+	m_grid = new (ZEditor) ContentPropertyGrid(pkg::P_AllTargets, editable);
 	m_grid->resize(left, m_grid->height());
 	m_grid->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 	s->addWidget(m_grid);
@@ -104,15 +104,16 @@ m_delButton(0), m_editable(editable), m_style(style)
 
 	w = s;
 
-	l = new QGridLayout(this);
-	s = new QSplitter(this);
+	l = new (ZEditor) QGridLayout(this);
+	s = new (ZEditor) QSplitter(this);
 	s->setOpaqueResize(false);
 
 	s->addWidget(w);
 
-	m_view = new ContentBrowserView(
+	m_view = new (ZEditor) ContentBrowserView(
 		true,
 		editable,
+		(style == WS_Dialog),
 		multiSelect ? ContentBrowserView::SelMulti : ContentBrowserView::SelSingle
 	);
 
@@ -124,23 +125,25 @@ m_delButton(0), m_editable(editable), m_style(style)
 
 	m_okButton = 0;
 
-	if (style == S_Dialog)
+	if (style == WS_Dialog)
 	{
-		QGridLayout *bL = new QGridLayout(); // for buttons
-		bL->addItem(new QSpacerItem(0, 0), 0, 0);
+		QGridLayout *bL = new (ZEditor) QGridLayout(); // for buttons
+		bL->addItem(new (ZEditor) QSpacerItem(0, 0), 0, 0);
 		bL->setColumnStretch(0, 1);
-		QPushButton *b = new QPushButton("OK");
+		QPushButton *b = new (ZEditor) QPushButton("OK");
 		b->setEnabled(false);
 		m_okButton = b;
 		bL->addWidget(b, 0, 1);
 		RAD_VERIFY(connect(b, SIGNAL(clicked()), SLOT(accept())));
-		b = new QPushButton("Cancel");
+		b = new (ZEditor) QPushButton("Cancel");
 		bL->addWidget(b, 0, 2);
 		RAD_VERIFY(connect(b, SIGNAL(clicked()), SLOT(reject())));
-		bL->addItem(new QSpacerItem(0, 0), 0, 3);
+		bL->addItem(new (ZEditor) QSpacerItem(0, 0), 0, 3);
 		bL->setColumnStretch(3, 1);
 
 		l->addLayout(bL, 1, 0);
+
+		RAD_VERIFY(connect(m_view, SIGNAL(OnItemDoubleClicked(int, bool&)), SLOT(OnViewItemDoubleClicked(int, bool&))));
 	}
 
 	RAD_VERIFY(connect(m_tree, SIGNAL(OnSelectionChanged()), SLOT(OnTreeSelectionChanged())));
@@ -151,12 +154,12 @@ m_delButton(0), m_editable(editable), m_style(style)
 	m_view->BuildAssetList();
 }
 
-void ContentBrowser::OnTreeSelectionChanged()
+void ContentBrowserWindow::OnTreeSelectionChanged()
 {
 	UpdateFilter(true);
 }
 
-void ContentBrowser::UpdateFilter(bool redraw)
+void ContentBrowserWindow::UpdateFilter(bool redraw)
 {
 	ContentBrowserView::Filter *f = m_view->filter;
 
@@ -171,7 +174,7 @@ void ContentBrowser::UpdateFilter(bool redraw)
 	m_delButton->setEnabled(!f->pkgs.empty() && m_editable);
 }
 
-void ContentBrowser::OnViewSelectionChanged(
+void ContentBrowserWindow::OnViewSelectionChanged(
 	const SelSet &sel,   // what was selected (if any) 
 	const SelSet &unsel, // what was deselected
 	const SelSet &total  // total selection
@@ -191,7 +194,7 @@ void ContentBrowser::OnViewSelectionChanged(
 		m_okButton->setEnabled(!total.empty());
 }
 
-pkg::IdVec ContentBrowser::CreateAsset(asset::Type type, const pkg::Package::Ref &pkg, pkg::IdVec &sel)
+pkg::IdVec ContentBrowserWindow::CreateAsset(asset::Type type, const pkg::Package::Ref &pkg, pkg::IdVec &sel)
 {
 	if (type == asset::AT_Texture)
 		return content_property_details::CreateTextures(this, pkg, sel);
@@ -246,7 +249,7 @@ pkg::IdVec ContentBrowser::CreateAsset(asset::Type type, const pkg::Package::Ref
 	return ids;
 }
 
-pkg::IdVec ContentBrowser::GenericImportAssetFiles(asset::Type type, const pkg::Package::Ref &pkg, pkg::IdVec &sel)
+pkg::IdVec ContentBrowserWindow::GenericImportAssetFiles(asset::Type type, const pkg::Package::Ref &pkg, pkg::IdVec &sel)
 {
 	pkg::IdVec ids;
 	QFileDialog fd(this);
@@ -436,7 +439,7 @@ pkg::IdVec ContentBrowser::GenericImportAssetFiles(asset::Type type, const pkg::
 	return ids;
 }
 
-void ContentBrowser::TreeItemDoubleClicked(const QModelIndex &index)
+void ContentBrowserWindow::TreeItemDoubleClicked(const QModelIndex &index)
 {
 	if (!m_tree->Model()->IsPackageType(index))
 		return;
@@ -459,7 +462,7 @@ void ContentBrowser::TreeItemDoubleClicked(const QModelIndex &index)
 	}
 }
 
-void ContentBrowser::AddPackage()
+void ContentBrowserWindow::AddPackage()
 {
 	LineEditDialog d("New Package", "Name", "[Enter Name]", this);
 
@@ -487,12 +490,12 @@ void ContentBrowser::AddPackage()
 	}
 }
 
-void ContentBrowser::DeletePackage()
+void ContentBrowserWindow::DeletePackage()
 {
 	m_tree->DeleteSelection();
 }
 
-void ContentBrowser::OnCloneSelection(const SelSet &sel)
+void ContentBrowserWindow::OnCloneSelection(const SelSet &sel)
 {
 	ContentChoosePackageDialog d("Clone Selection", "Destination Package:", m_clonePkgName, this);
 
@@ -539,7 +542,7 @@ void ContentBrowser::OnCloneSelection(const SelSet &sel)
 	}
 }
 
-void ContentBrowser::OnMoveSelection(const SelSet &sel)
+void ContentBrowserWindow::OnMoveSelection(const SelSet &sel)
 {
 	ContentChoosePackageDialog d("Move Selection", "Destination Package:", m_clonePkgName, this);
 
@@ -601,7 +604,12 @@ void ContentBrowser::OnMoveSelection(const SelSet &sel)
 	}
 }
 
-bool ContentBrowser::FilterContent(const pkg::IdVec &ids)
+void ContentBrowserWindow::OnViewItemDoubleClicked(int id, bool &openEditor) {
+	openEditor = false;
+	accept();
+}
+
+bool ContentBrowserWindow::FilterContent(const pkg::IdVec &ids)
 {
 	if (ids.empty())
 		return false;
@@ -640,25 +648,25 @@ bool ContentBrowser::FilterContent(const pkg::IdVec &ids)
 	return m_tree->SetSelection(pkg, type);
 }
 
-void ContentBrowser::keyPressEvent(QKeyEvent *e)
+void ContentBrowserWindow::keyPressEvent(QKeyEvent *e)
 {
-	if (m_style == S_Dialog || e->key() != Qt::Key_Escape)
+	if (m_style == WS_Dialog || e->key() != Qt::Key_Escape)
 		QDialog::keyPressEvent(e);
 }
 
-void ContentBrowser::NotifyAddRemovePackages()
+void ContentBrowserWindow::NotifyAddRemovePackages()
 {
 	ContentBrowserModel::NotifyAddRemovePackages();
 	ContentBrowserView::NotifyAddRemovePackages();
 }
 
-void ContentBrowser::NotifyAddRemoveContent(const pkg::IdVec &added, const pkg::IdVec &removed)
+void ContentBrowserWindow::NotifyAddRemoveContent(const pkg::IdVec &added, const pkg::IdVec &removed)
 {
 	ContentBrowserModel::NotifyAddRemoveContent(added, removed);
 	ContentBrowserView::NotifyAddRemoveContent(added, removed);
 }
 
-void ContentBrowser::NotifyContentChanged(const ContentChange::Vec &changed)
+void ContentBrowserWindow::NotifyContentChanged(const ContentChange::Vec &changed)
 {
 	pkg::IdVec ids;
 	foreach(const ContentChange &c, changed)
@@ -673,4 +681,4 @@ void ContentBrowser::NotifyContentChanged(const ContentChange::Vec &changed)
 } // editor
 } // tools
 
-#include "moc_EditorContentBrowser.cc"
+#include "moc_EditorContentBrowserWindow.cc"

@@ -15,13 +15,14 @@ namespace editor {
 
 MapThumb::MapThumb(ContentBrowserView &view) : ContentAssetThumb(view)
 {
-	PopupMenu *m = CreateMenu();
+	PopupMenu *m = CreateMenu(false);
 	m->AddItem("Play", this, SLOT(Play()));
 }
 
-void MapThumb::OpenEditor(const pkg::Package::Entry::Ref &entry)
+void MapThumb::OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable, bool modal)
 {
-	Play(entry);
+	if (editable && !modal)
+		Play(entry);
 }
 
 void MapThumb::New(ContentBrowserView &view)

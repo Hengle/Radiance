@@ -160,6 +160,7 @@ enum PFlags
 
 #if defined(RAD_OPT_TOOLS)
 
+	RAD_FLAG(P_Create),        /*!< Allows asset object data to be created/initialized if it doesn't exist */
 	RAD_FLAG(P_TargetDefault), /*!< When specified #P_TARGET_FLAGS(flags) will no longer specify a target if one is not provided.
                                     This will force sinks and cookers to load generic meta-data for an asset.
                                */

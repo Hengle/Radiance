@@ -281,26 +281,6 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-//! Document Asset Sink
-class Document {
-public:
-	virtual ~Document() {}
-
-	virtual int Create(
-		Engine &engine,
-		const AssetRef &asset,
-		int flags
-	) = 0;
-
-	virtual int Save(
-		Engine &engine,
-		const AssetRef &asset,
-		int flags
-	) = 0;
-};
-
-///////////////////////////////////////////////////////////////////////////////
-
 class BinFile
 {
 public:

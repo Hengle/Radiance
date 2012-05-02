@@ -10,11 +10,14 @@
 	#include "COut.h"
 	#include "Lua/LuaRuntime.h"
 	#include <Runtime/Stream.h>
+	#include <Runtime/Stream/STLStream.h>
 	#include <Runtime/EndianStream.h>
 	#include <Runtime/Container/ZoneVector.h>
+	#include <Runtime/FileDef.h>
 	#include <fstream>
 
 	#define THIS "@this"
+	#define LANG "@lang"
 
 #endif
 
@@ -41,6 +44,18 @@ const char *StringTable::Langs[] = {
 	StringTable::RU,
 	StringTable::JP,
 	StringTable::CH,
+	0
+};
+
+const char *StringTable::LangTitles[] = {
+	"English",
+	"French",
+	"Italian",
+	"German",
+	"Spanish",
+	"Russian",
+	"Japanese",
+	"Chinese",
 	0
 };
 
@@ -84,9 +99,9 @@ const String *StringTable::Find(const char *id, LangId lang) const {
 
 #if defined(RAD_OPT_TOOLS)
 
-StringTable::Ref StringTable::Load(stream::IInputBuffer &ib, const char *path) {
+int StringTable::Load(const char *name, const wchar_t *root, StringTable::Ref &_r, int *_loadMask) {
 
-	Ref r(new (ZEngine) StringTable());
+	StringTable::Ref r(new (ZEngine) StringTable());
 
 	lua::State::Ref L(new (ZEngine) lua::State("StringTable"));
 
@@ -100,16 +115,57 @@ StringTable::Ref StringTable::Load(stream::IInputBuffer &ib, const char *path) {
 	lua_setfield(L->L, LUA_REGISTRYINDEX, THIS);
 
 	typedef lua::StreamLoader<8*Kilo, lua::StackMemTag> Loader;
-	stream::InputStream is(ib);
 
-	Loader loader(is);
-	
-	if (lua_load(L->L, &Loader::Read, &loader, path)) {
-		COut(C_Error) << "StringTable::Load(parse): " << lua_tostring(L->L, -1) << std::endl;
-		r.reset();
+	int loadMask = 0;
+	if (_loadMask)
+		*_loadMask = 0;
+
+	for (int i = 0; i < LangId_MAX; ++i) {
+
+		WString wpath;
+
+		wpath.format(L"%s.%s", root, string::Widen(StringTable::Langs[i]).c_str());
+
+		String spath(string::Shorten(wpath.c_str()));
+
+		std::fstream f;
+
+		f.open(spath.c_str(), std::ios_base::in);
+		if (f.fail())
+			continue;
+
+		lua_pushinteger(L->L, i);
+		lua_setfield(L->L, LUA_REGISTRYINDEX, LANG);
+
+		typedef stream::basic_istream_adapter<char> InputStream;
+		InputStream is(f);
+
+		Loader loader(is);
+		
+		if (lua_load(L->L, &Loader::Read, &loader, spath.c_str())) {
+			COut(C_Error) << "StringTable::Load(parse): " << lua_tostring(L->L, -1) << std::endl;
+			r.reset();
+			return pkg::SR_ScriptError;
+		}
+
+		if (lua_pcall(L->L, 0, 0, 0))
+		{
+			COut(C_Error) << "StringTable::Load(run): " << lua_tostring(L->L, -1) << std::endl;
+			r.reset();
+			return pkg::SR_ScriptError;
+		}
+
+		loadMask |= (1<<i);
 	}
 
-	return r;
+	if (!loadMask)
+		return file::ErrorFileNotFound;
+
+	_r = r;
+	if (_loadMask)
+		*_loadMask = loadMask;
+
+	return pkg::SR_Success;
 }
 
 int StringTable::lua_Compile(lua_State *L) {
@@ -120,31 +176,19 @@ int StringTable::lua_Compile(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, THIS);
 	StringTable *table = reinterpret_cast<StringTable*>(lua_touserdata(L, -1));
 	lua_pop(L, 1);
+	
+	lua_getfield(L, LUA_REGISTRYINDEX, LANG);
+	int langId = (int)lua_tointeger(L, -1);
+	lua_pop(L, 1);
 
 	for (lua::Variant::Map::const_iterator it = strings.begin(); it != strings.end(); ++it) {
 		const String &name = it->first;
 
-		Entry e;
+		const String *value = static_cast<const String*>(it->second);
+		if (!value)
+			luaL_error(L, "StringTable::lua_Compile(): expected string value for string '%s' language '%s'", name.c_str(), StringTable::Langs[langId]);
 
-		const lua::Variant::Map *langs = static_cast<const lua::Variant::Map*>(it->second);
-		if (!langs)
-			luaL_error(L, "StringTable::lua_Compile(): expected language table for string '%s'", name.c_str());
-
-		for (lua::Variant::Map::const_iterator lit = langs->begin(); lit != langs->end(); ++lit) {
-			const String &lang = lit->first;
-
-			const String *value = static_cast<const String*>(lit->second);
-			if (!value)
-				luaL_error(L, "StringTable::lua_Compile(): expected string value for string '%s' language '%s'", name.c_str());
-
-			int langId = Map(lang.c_str());
-			if (langId == -1)
-				luaL_error(L, "StringTable::lua_Compile(): '%s' is not a valid language, string '%s'", lang.c_str(), name.c_str());
-
-			e.strings[(LangId)langId] = *value;
-		}
-
-		table->m_entries[name] = e;
+		table->SetString(name.c_str(), (LangId)langId, value->c_str());
 	}
 
 	return 0;
@@ -158,7 +202,7 @@ void StringTable::SetString(const char *id, LangId lang, const char *value) {
 
 	Entry::Map::iterator it = m_entries.find(sid);
 
-	if (value && value[0]) {
+	if (value) {
 		String sval(value);
 		if (it == m_entries.end()) {
 			Entry e;
@@ -172,38 +216,102 @@ void StringTable::SetString(const char *id, LangId lang, const char *value) {
 	}
 }
 
-bool StringTable::SaveText(const char *name, const char *path) const {
-	std::fstream f;
+bool StringTable::ChangeId(const char *src, const char *dst) {
+	
+	RAD_ASSERT(src);
+	RAD_ASSERT(dst);
 
-	f.open(path, std::ios_base::out|std::ios_base::trunc);
-	if (f.bad())
+	String ssrc(src);
+
+	Entry::Map::iterator it = m_entries.find(ssrc);
+	if (it == m_entries.end())
 		return false;
 
-	f << "-- " << name << std::endl;
-	f << "-- Radiance String Table" << std::endl << std::endl;
+	String sdst(dst);
+	if (m_entries.find(sdst) != m_entries.end())
+		return false; // collision.
 
-	f << "local table = {" << std::endl;
+	Entry e;
+	e.strings.swap(it->second.strings);
 
-	for (Entry::Map::const_iterator it = m_entries.begin(); it != m_entries.begin(); ++it) {
-		if (it != m_entries.begin())
-			f << "," << std::endl;
+	m_entries.erase(it);
+	m_entries[sdst] = e;
 
-		const String &name = it->first;
-		f << "\t[\"" << name.c_str() << "\"] = {" << std::endl;
+	return true;
+}
 
-		for (Entry::Strings::const_iterator strings = it->second.strings.begin(); strings != it->second.strings.end(); ++strings) {
-			RAD_ASSERT(strings->first >= 0 && strings->first < LangId_MAX);
-			if (strings != it->second.strings.begin())
+void StringTable::DeleteId(const char *id) {
+	RAD_ASSERT(id);
+	String sid(id);
+	m_entries.erase(sid);
+}
+
+bool StringTable::CreateId(const char *id) {
+	RAD_ASSERT(id);
+	String sid(id);
+	Entry e;
+	return m_entries.insert(Entry::Map::value_type(sid, e)).second;
+}
+
+bool StringTable::SaveText(const char *name, const wchar_t *path, int saveMask) const {
+
+	for (int i = 0; i < LangId_MAX; ++i) {
+
+		if (!(saveMask&(1<<i)))
+			continue;
+
+		WString wpath;
+		wpath.format(L"%s.%s", path, string::Widen(StringTable::Langs[i]).c_str());
+
+		String spath(string::Shorten(wpath.c_str()));
+
+		std::fstream f;
+
+		f.open(spath.c_str(), std::ios_base::out|std::ios_base::trunc);
+		if (f.fail())
+			return false;
+
+		f << "-- " << name << "." << StringTable::Langs[i] << std::endl;
+		f << "-- Radiance String Table" << std::endl << std::endl;
+
+		f << "local table = {" << std::endl;
+
+		int c = 0;
+
+		for (Entry::Map::const_iterator it = m_entries.begin(); it != m_entries.end(); ++it) {
+
+			Entry::Strings::const_iterator string = it->second.strings.find((LangId)i);
+			
+			if (c)
 				f << "," << std::endl;
-			f << "\t" << StringTable::Langs[strings->first] << " = \"" << strings->second.c_str() << "\"";
+
+			const String &name = it->first;
+			
+			f << "\t[\"" << name.c_str() << "\"] = \"";
+
+			if (string != it->second.strings.end()) {
+				const String &val = string->second;
+				String mod;
+
+				for (String::const_iterator x = val.begin(); x != val.end(); ++x) {
+					if (*x == '\\') {
+						mod += "\\\\";
+					} else {
+						mod += *x;
+					}
+				}
+
+				f << mod;
+			}
+			f << "\"";
+
+			++c;
 		}
 
-		f << "\t}";
+		f << std::endl << "}" << std::endl << std::endl << "Compile(table)" << std::endl;
+		f << std::flush;
+		f.close();
 	}
-
-	f << std::endl << "}" << std::endl << std::endl << "Compile(table)" << std::endl;
-	f << std::flush;
-	f.close();
 
 	return true;
 }

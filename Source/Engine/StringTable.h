@@ -36,6 +36,18 @@ public:
 		LangId_First = LangId_EN
 	};
 
+	enum {
+		RAD_FLAG(LangFlag_EN),
+		RAD_FLAG(LangFlag_FR),
+		RAD_FLAG(LangFlag_IT),
+		RAD_FLAG(LangFlag_GR),
+		RAD_FLAG(LangFlag_SP),
+		RAD_FLAG(LangFlag_RU),
+		RAD_FLAG(LangFlag_JP),
+		RAD_FLAG(LangFlag_CH),
+		LangFlag_ALL = 0xffffffff
+	};
+
 	static const char *EN;
 	static const char *FR;
 	static const char *IT;
@@ -45,6 +57,7 @@ public:
 	static const char *JP;
 	static const char *CH;
 	static const char *Langs[];
+	static const char *LangTitles[];
 
 	static int Map(const char *lang);
 	
@@ -64,21 +77,30 @@ public:
 	//! Returns pkg::SR_* codes.
 	static int Load(const void *data, AddrSize len, Ref &r);
 
+	RAD_DECLARE_READONLY_PROPERTY(StringTable, entries, const Entry::Map*);
+
 #if defined(RAD_OPT_TOOLS)
 
 	static Ref New();
 
 	//! Loads string table text data.
-	static Ref Load(stream::IInputBuffer &ib, const char *path);
+	static int Load(const char *name, const wchar_t *root, Ref &r, int *loadMask = 0);
 
 	void SetString(const char *id, LangId lang, const char *value);
+	bool ChangeId(const char *src, const char *dst);
+	void DeleteId(const char *id);
+	bool CreateId(const char *id);
 
-	bool SaveText(const char *name, const char *path) const;
+	bool SaveText(const char *name, const wchar_t *root, int saveMask=LangFlag_ALL) const;
 	bool SaveBin(stream::IOutputBuffer &ob) const;
 
 #endif
 
 private:
+
+	RAD_DECLARE_GET(entries, const Entry::Map*) { 
+		return &m_entries; 
+	}
 
 #if defined(RAD_OPT_TOOLS)
 	static int lua_Compile(lua_State *L);

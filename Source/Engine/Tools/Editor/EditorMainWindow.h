@@ -24,7 +24,7 @@ namespace editor {
 
 class LogWindow;
 class ZoneViewWindow;
-class ContentBrowser;
+class ContentBrowserWindow;
 
 class RADENG_CLASS MainWindow : public QMainWindow
 {
@@ -53,7 +53,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(MainWindow, mdiArea, QMdiArea*);
 	RAD_DECLARE_READONLY_PROPERTY(MainWindow, userPrefs, QSettings*);
 	RAD_DECLARE_READONLY_PROPERTY(MainWindow, soundContext, SoundContext*);
-	RAD_DECLARE_READONLY_PROPERTY(MainWindow, contentBrowser, ContentBrowser*);
+	RAD_DECLARE_READONLY_PROPERTY(MainWindow, contentBrowser, ContentBrowserWindow*);
 	RAD_DECLARE_READONLY_PROPERTY(MainWindow, logWinShowHideAction, QAction*);
 	RAD_DECLARE_READONLY_PROPERTY(MainWindow, zoneWinShowHideAction, QAction*);
 
@@ -87,7 +87,7 @@ private:
 	RAD_DECLARE_SET(tickEnabled, bool) { m_tickEnabled = value; }
 	RAD_DECLARE_GET(userPrefs, QSettings*) { return &m_userSettings; }
 	RAD_DECLARE_GET(glBase, QGLWidget*) { return m_glBase; }
-	RAD_DECLARE_GET(contentBrowser, ContentBrowser*) { return m_contentBrowser; }
+	RAD_DECLARE_GET(contentBrowser, ContentBrowserWindow*) { return m_contentBrowser; }
 	RAD_DECLARE_GET(logWinShowHideAction, QAction*) { return m_logWinShowHide; }
 	RAD_DECLARE_GET(zoneWinShowHideAction, QAction*) { return m_zoneWinShowHide; }
 	RAD_DECLARE_GET(soundContext, SoundContext*) { return m_sound.get(); }
@@ -102,7 +102,7 @@ private:
 	SoundContextRef m_sound;
 	LogWindow *m_logWin;
 	ZoneViewWindow *m_zoneWin;
-	ContentBrowser *m_contentBrowser;
+	ContentBrowserWindow *m_contentBrowser;
 	QAction *m_logWinShowHide;
 	QAction *m_zoneWinShowHide;
 	::App *m_app;
