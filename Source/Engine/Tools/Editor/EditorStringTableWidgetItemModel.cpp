@@ -155,6 +155,7 @@ void StringTableItemModel::DeleteItem(const QModelIndex &index) {
 	if (index.row() < (int)m_stringVec.size()) {
 		beginRemoveRows(QModelIndex(), index.row(), index.row());
 		m_stringTable.DeleteId(m_stringVec[index.row()]->first.c_str());
+		m_stringVec.erase(m_stringVec.begin()+index.row());
 		endRemoveRows();
 	}
 }

@@ -247,7 +247,9 @@ void StringTableWidget::OnDeleteClicked() {
 	QModelIndexList mapped;
 
 	foreach (QModelIndex index, sel) {
-		mapped.push_back(m_sortModel->mapFromSource(index));
+		if (index.column() == 0) {
+			mapped.push_back(m_sortModel->mapToSource(index));
+		}
 	}
 
 	if (mapped.size() > 1) {
