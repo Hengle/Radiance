@@ -16,8 +16,7 @@ RAD_ZONE_DEC(RADRT_API, ZFont);
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class RADRT_CLASS Bitmap : public boost::noncopyable
-{
+class RADRT_CLASS Bitmap : public boost::noncopyable {
 public:
 
 	RAD_DECLARE_READONLY_PROPERTY(Bitmap, height, int);
@@ -42,8 +41,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class RADRT_CLASS Metrics : public boost::noncopyable
-{
+class RADRT_CLASS Metrics : public boost::noncopyable {
 public:
 
 	RAD_DECLARE_READONLY_PROPERTY(Metrics, width, float);
@@ -80,8 +78,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class RADRT_CLASS Glyph : public boost::noncopyable
-{
+class RADRT_CLASS Glyph : public boost::noncopyable {
 public:
 
 	bool Render();
@@ -117,8 +114,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class RADRT_CLASS UserGlyph : public Glyph
-{
+class RADRT_CLASS UserGlyph : public Glyph {
 public:
 
 	void Release();
@@ -134,8 +130,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class RADRT_CLASS Font : public boost::noncopyable
-{
+class RADRT_CLASS Font : public boost::noncopyable {
 public:
 
 	Font();
@@ -144,17 +139,17 @@ public:
 	// NOTE: Caller must keep the data around, it is not copied by the font object.
 	bool Create(const void *data, AddrSize size);
 	void Destroy();
-	int GlyphIndex(wchar_t character) const;
+	int GlyphIndex(U32 utf32Char) const;
 	void SetTransform(float *_2x2, float *translate2d);
 	bool SetPointSize(int width, int height, int horzDPI, int vertDPI);
 	bool SetPixelSize(int width, int height);
 	bool LoadGlyphFromIndex(int index);
-	bool LoadGlyphFromChar(wchar_t character);
-	float Kerning(wchar_t charLeft, wchar_t charRight);
+	bool LoadGlyphFromChar(U32 utf32Char);
+	float Kerning(U32 utf32Left, U32 utf32Right);
 	float Kerning(int glyphLeft, int glyphRight);
 
 	void StringDimensions(
-		const wchar_t *string, 
+		const char *utf8String, 
 		float &width, 
 		float &height, 
 		bool kern,
@@ -182,8 +177,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class RAD_NOVTABLE IGlyphPage
-{
+class RAD_NOVTABLE IGlyphPage {
 public:
 	typedef IGlyphPageRef Ref;
 	virtual ~IGlyphPage() {}
@@ -193,8 +187,7 @@ public:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class RAD_NOVTABLE IGlyphPageFactory
-{
+class RAD_NOVTABLE IGlyphPageFactory {
 public:
 	typedef IGlyphPageFactoryRef Ref;
 	virtual ~IGlyphPageFactory() {}
@@ -203,29 +196,24 @@ public:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class RADRT_CLASS GlyphCache : public boost::noncopyable
-{
+class RADRT_CLASS GlyphCache : public boost::noncopyable {
 public:
 
-	struct Rect
-	{
+	struct Rect {
 		float x1, y1;
 		float x2, y2;
 	};
 
-	struct Metrics
-	{
+	struct Metrics {
 		Rect bitmap; // Positions in the glyphPage.
 		Rect draw; // Pen position. Draw origin is Upper Left Relative.
 	};
 
-	enum
-	{
+	enum {
 		MaxBatchSize = 256
 	};
 
-	struct Batch
-	{
+	struct Batch {
 		boost::array<Metrics*, MaxBatchSize> chars;
 		IGlyphPage *page;
 		int numChars;
@@ -268,17 +256,18 @@ public:
 	void Clear();
 	
 	Batch *BeginStringBatch(
-		const wchar_t *str, 
+		const char *utf8String, 
 		float orgX, 
 		float orgY, 
 		bool kerning, 
 		float kerningScale = 1.0f
 	);
+
 	Batch *NextStringBatch();
 	void EndStringBatch();
 
 	void StringDimensions(
-		const wchar_t *string, 
+		const char *utf8String, 
 		float &width, 
 		float &height, 
 		bool kern,
@@ -304,14 +293,12 @@ private:
 	struct Page;
 	struct CharItem;
 
-	enum
-	{
+	enum {
 		CellBorder = 1,
 		CharMapSize = 256
 	};
 
-	struct Cell
-	{
+	struct Cell {
 		int x, y; // in cells not pixels.
 		int bmWidth;
 		int bmHeight;
@@ -320,18 +307,16 @@ private:
 		CharItem *item;
 	};
 
-	struct CharDraw
-	{
+	struct CharDraw {
 		Metrics metrics;
 		CharItem *item;
 		CharDraw *next;
-		wchar_t ch;
-		int    glyph;
-		bool    drawn;
+		U32 ch;
+		int glyph;
+		bool drawn;
 	};
 
-	struct CharItem
-	{
+	struct CharItem {
 		Cell    *cell;
 		float    bearingX;
 		float    bearingY;
@@ -340,18 +325,19 @@ private:
 		bool     locked;
 	};
 
-	struct CharBank
-	{
+	struct CharBank {
 		boost::array<CharItem, CharMapSize> items;
 	};
 
-	struct CharMap
-	{
+	struct CharMap2 {
 		boost::array<CharBank*, CharMapSize> banks;
 	};
 
-	struct Page
-	{
+	struct CharMap {
+		boost::array<CharMap2*, CharMapSize> banks;
+	};
+
+	struct Page {
 		IGlyphPage::Ref page;
 		Page *prev, *next;
 		Cell *free;
@@ -364,7 +350,7 @@ private:
 	};
 
 	bool CreatePage();
-	CharItem *CacheChar(wchar_t ch, int glyph);
+	CharItem *CacheChar(U32 ch, int glyph);
 	bool Evict();
 	CharDraw *Precache();
 	void SetupBatch();
@@ -399,6 +385,7 @@ private:
 	float m_tallest;
 	float m_kernScale;
 	ObjectPool<CharBank> m_bankPool;
+	ObjectPool<CharMap2> m_charMapPool;
 	ObjectPool<Page> m_pagePool;
 	ObjectPool<CharDraw> m_drawPool;
 	MemoryPool m_cellPool;

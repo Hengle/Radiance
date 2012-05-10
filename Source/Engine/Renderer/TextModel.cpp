@@ -15,8 +15,7 @@
 
 namespace {
 
-enum
-{
+enum {
 	PageSize = 256
 };
 
@@ -105,7 +104,7 @@ void TextModel::SetText(
 }
 
 void TextModel::SetText(
-	const wchar_t *str, 
+	const char *utf8String, 
 	float x,
 	float y,
 	float z,
@@ -115,7 +114,7 @@ void TextModel::SetText(
 	float scaleY
 )
 {
-	String s(str, x, y, z, kern, kernScale, scaleX, scaleY);
+	String s(utf8String, x, y, z, kern, kernScale, scaleX, scaleY);
 	BuildTextVerts(&s, 1);
 }
 
@@ -132,9 +131,9 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings)
 		int len = 0;
 		for (int i = 0; i < numStrings ; ++i)
 		{
-			if (!strings[i].str)
+			if (!strings[i].utf8String)
 				continue;
-			len += (int)::string::len(strings[i].str);
+			len += (int)::string::len(strings[i].utf8String);
 		}
 
 		if (len < 1)
@@ -159,11 +158,11 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings)
 		for (int i = 0; i < numStrings ; ++i)
 		{
 			const String &string = strings[i];
-			if (!string.str || string.str[0] == L'\0')
+			if (!string.utf8String || string.utf8String[0] == 0)
 				continue;
 
 			font::GlyphCache::Batch *b = cache.BeginStringBatch(
-				string.str, 
+				string.utf8String, 
 				string.x, 
 				string.y, 
 				string.kern, 

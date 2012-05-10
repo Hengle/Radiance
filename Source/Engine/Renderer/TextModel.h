@@ -30,7 +30,7 @@ public:
 
 		String() {}
 		String(
-			const wchar_t *str, 
+			const char *utf8String, 
 			float x = 0.0f, 
 			float y = 0.0f, 
 			float z = 0.0f, 
@@ -40,7 +40,7 @@ public:
 			float scaleY = 1.0f
 		)
 		{
-			this->str       = str;
+			this->utf8String = utf8String;
 			this->x         = x;
 			this->y         = y;
 			this->z         = z;
@@ -50,7 +50,8 @@ public:
 			this->scaleY    = scaleY;
 		}
 
-		void SetText(const wchar_t *str, 
+		void SetText(
+			const char *utf8String, 
 			float x, 
 			float y, 
 			float z,
@@ -60,7 +61,7 @@ public:
 			float scaleY = 1.0f
 		)
 		{
-			this->str       = str;
+			this->utf8String = utf8String;
 			this->x         = x;
 			this->y         = y;
 			this->z         = z;
@@ -70,7 +71,7 @@ public:
 			this->scaleY    = scaleY;
 		}
 
-		const wchar_t *str;
+		const char *utf8String;
 		float x, y ,z;
 		bool kern;
 		float kernScale;
@@ -102,7 +103,7 @@ public:
 	);
 
 	void SetText(
-		const wchar_t *str, 
+		const char *utf8String, 
 		float x = 0.0f, 
 		float y = 0.0f, 
 		float z = 0.0f, 

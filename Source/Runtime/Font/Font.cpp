@@ -7,6 +7,7 @@
 #include "Font.h"
 #include "../Thread/Interlocked.h"
 #include "../Base/ObjectPool.h"
+#include "../String/StringBase.h"
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
 #include <algorithm>
@@ -29,8 +30,7 @@ namespace font {
 RAD_ZONE_DEF(RADRT_API, ZFont, "Font", ZRuntime);
 
 // private
-namespace
-{
+namespace {
 	typedef boost::mutex Mutex;
 	typedef boost::lock_guard<Mutex> Lock;
 
@@ -41,33 +41,28 @@ namespace
 	thread::Interlocked<int> s_libRefs;
 	ThreadSafeObjectPool<UserGlyph> s_glyphPool;
 
-	void *Allocate(FT_Memory memory, long size)
-	{
+	void *Allocate(FT_Memory memory, long size) {
 		return safe_zone_malloc(ZFont, size);
 	}
 
-	void Free(FT_Memory memory, void *block)
-	{
+	void Free(FT_Memory memory, void *block) {
 		zone_free(block);
 	}
 
-	void *Realloc(FT_Memory memory, long cur_size, long new_size, void *block)
-	{
+	void *Realloc(FT_Memory memory, long cur_size, long new_size, void *block) {
 		return safe_zone_realloc(ZFont, block, new_size);
 	}
 
-	void InitMemory()
-	{
+	void InitMemory() {
 		s_mem.user = 0;
 		s_mem.alloc = Allocate;
 		s_mem.free = Free;
 		s_mem.realloc = Realloc;
 	}
 
-	FT_Library RefLib()
-	{
-		if (++s_libRefs == 1)
-		{
+	FT_Library RefLib() {
+
+		if (++s_libRefs == 1) {
 			InitMemory();
 			s_glyphPool.Create(ZFont, "free-type glyph pool", 32);
 			Lock L(s_mutex);
@@ -75,12 +70,11 @@ namespace
 			FT_Add_Default_Modules(s_lib);
 		}
 		return s_lib;
+
 	}
 
-	void ReleaseLib()
-	{
-		if (--s_libRefs == 0)
-		{
+	void ReleaseLib() {
+		if (--s_libRefs == 0) {
 			s_glyphPool.Destroy();
 			Lock L(s_mutex);
 			FT_Done_Library(s_lib);
@@ -90,83 +84,70 @@ namespace
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-int Bitmap::RAD_IMPLEMENT_GET(height)
-{
+int Bitmap::RAD_IMPLEMENT_GET(height) {
 	RAD_ASSERT(m_bitmap);
 	return m_bitmap->rows;
 }
 
-int Bitmap::RAD_IMPLEMENT_GET(width)
-{
+int Bitmap::RAD_IMPLEMENT_GET(width) {
 	RAD_ASSERT(m_bitmap);
 	return m_bitmap->width;
 }
 
-AddrSize Bitmap::RAD_IMPLEMENT_GET(pitch)
-{
+AddrSize Bitmap::RAD_IMPLEMENT_GET(pitch) {
 	RAD_ASSERT(m_bitmap);
 	return (AddrSize)m_bitmap->pitch;
 }
 
-const U8* Bitmap::RAD_IMPLEMENT_GET(data)
-{
+const U8* Bitmap::RAD_IMPLEMENT_GET(data) {
 	RAD_ASSERT(m_bitmap);
 	return m_bitmap->buffer;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-void Metrics::Copy(const FT_Glyph_Metrics_ *metrics)
-{
+void Metrics::Copy(const FT_Glyph_Metrics_ *metrics) {
 	BOOST_STATIC_ASSERT(sizeof(FT_Glyph_Metrics_)  == SizeofMetrics);
 	RAD_ASSERT(metrics);
 	memcpy(m_metrics, metrics, SizeofMetrics);
 }
 
-float Metrics::RAD_IMPLEMENT_GET(width)
-{
+float Metrics::RAD_IMPLEMENT_GET(width) {
 	RAD_ASSERT(m_metrics);
 	return FT_FIXED_TO_FLOAT(((FT_Glyph_Metrics*)m_metrics)->width);
 }
 
-float Metrics::RAD_IMPLEMENT_GET(height)
-{
+float Metrics::RAD_IMPLEMENT_GET(height) {
 	RAD_ASSERT(m_metrics);
 	return FT_FIXED_TO_FLOAT(((FT_Glyph_Metrics*)m_metrics)->height);
 }
 
-float Metrics::RAD_IMPLEMENT_GET(horzBearingX)
-{
+float Metrics::RAD_IMPLEMENT_GET(horzBearingX) {
 	RAD_ASSERT(m_metrics);
 	return FT_FIXED_TO_FLOAT(((FT_Glyph_Metrics*)m_metrics)->horiBearingX);
 }
 
-float Metrics::RAD_IMPLEMENT_GET(horzBearingY)
-{
+float Metrics::RAD_IMPLEMENT_GET(horzBearingY) {
 	RAD_ASSERT(m_metrics);
 	return FT_FIXED_TO_FLOAT(((FT_Glyph_Metrics*)m_metrics)->horiBearingY);
 }
 
-float Metrics::RAD_IMPLEMENT_GET(horzAdvance)
-{
+float Metrics::RAD_IMPLEMENT_GET(horzAdvance) {
 	RAD_ASSERT(m_metrics);
 	return FT_FIXED_TO_FLOAT(((FT_Glyph_Metrics*)m_metrics)->horiAdvance);
 }
 
-float Metrics::RAD_IMPLEMENT_GET(vertBearingX)
-{
+float Metrics::RAD_IMPLEMENT_GET(vertBearingX) {
 	RAD_ASSERT(m_metrics);
 	return FT_FIXED_TO_FLOAT(((FT_Glyph_Metrics*)m_metrics)->vertBearingX);
 }
 
-float Metrics::RAD_IMPLEMENT_GET(vertBearingY)
-{
+float Metrics::RAD_IMPLEMENT_GET(vertBearingY) {
 	RAD_ASSERT(m_metrics);
 	return FT_FIXED_TO_FLOAT(((FT_Glyph_Metrics*)m_metrics)->vertBearingY);
 }
 
-float Metrics::RAD_IMPLEMENT_GET(vertAdvance)
-{
+float Metrics::RAD_IMPLEMENT_GET(vertAdvance) {
 	RAD_ASSERT(m_metrics);
 	return FT_FIXED_TO_FLOAT(((FT_Glyph_Metrics*)m_metrics)->vertAdvance);
 }
@@ -174,9 +155,9 @@ float Metrics::RAD_IMPLEMENT_GET(vertAdvance)
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void Glyph::Setup(FT_GlyphRec_ *glyph,
-			FT_GlyphSlotRec_ *slot,
-			const FT_Glyph_Metrics_ *metrics)
-{
+	FT_GlyphSlotRec_ *slot,
+	const FT_Glyph_Metrics_ *metrics
+) {
 	RAD_ASSERT(glyph||slot);
 	RAD_ASSERT(metrics);
 	m_glyph = glyph;
@@ -184,43 +165,31 @@ void Glyph::Setup(FT_GlyphRec_ *glyph,
 	m_metrics.Copy(metrics);
 }
 
-int Glyph::RAD_IMPLEMENT_GET(left)
-{
-	if (m_slot)
-	{
+int Glyph::RAD_IMPLEMENT_GET(left) {
+	if (m_slot) {
 		RAD_ASSERT(m_slot->format == FT_GLYPH_FORMAT_BITMAP);
 		return m_slot->bitmap_left;
-	}
-	else
-	{
+	} else {
 		RAD_ASSERT(m_glyph && m_glyph->format == FT_GLYPH_FORMAT_BITMAP);
 		return ((const FT_BitmapGlyph)m_glyph)->left;
 	}
 }
 
-int Glyph::RAD_IMPLEMENT_GET(top)
-{
-	if (m_slot)
-	{
+int Glyph::RAD_IMPLEMENT_GET(top) {
+	if (m_slot)	{
 		RAD_ASSERT(m_slot->format == FT_GLYPH_FORMAT_BITMAP);
 		return m_slot->bitmap_top;
-	}
-	else
-	{
+	} else {
 		RAD_ASSERT(m_glyph && m_glyph->format == FT_GLYPH_FORMAT_BITMAP);
 		return ((const FT_BitmapGlyph)m_glyph)->top;
 	}
 }
 
-const Bitmap *Glyph::RAD_IMPLEMENT_GET(bitmap)
-{
-	if (m_slot)
-	{
+const Bitmap *Glyph::RAD_IMPLEMENT_GET(bitmap) {
+	if (m_slot) {
 		RAD_ASSERT(m_slot->format == FT_GLYPH_FORMAT_BITMAP);
 		m_bitmap.m_bitmap = &m_slot->bitmap;
-	}
-	else
-	{
+	} else {
 		RAD_ASSERT(m_glyph && m_glyph->format == FT_GLYPH_FORMAT_BITMAP);
 		m_bitmap.m_bitmap = &reinterpret_cast<const FT_BitmapGlyph>(const_cast<const FT_Glyph>(m_glyph))->bitmap;
 	}
@@ -228,28 +197,21 @@ const Bitmap *Glyph::RAD_IMPLEMENT_GET(bitmap)
 	return &m_bitmap;
 }
 
-const Metrics *Glyph::RAD_IMPLEMENT_GET(metrics)
-{
+const Metrics *Glyph::RAD_IMPLEMENT_GET(metrics) {
 	RAD_ASSERT(m_glyph||m_slot);
 	return &m_metrics;
 }
 
-bool Glyph::Render()
-{
-	if (m_slot)
-	{
-		if (m_slot->format != FT_GLYPH_FORMAT_BITMAP)
-		{
+bool Glyph::Render() {
+	if (m_slot) {
+		if (m_slot->format != FT_GLYPH_FORMAT_BITMAP) {
 			Lock L(s_mutex);
 			if (FT_Render_Glyph(m_slot, FT_RENDER_MODE_NORMAL) != 0)
 				return false;
 		}
-	}
-	else
-	{
+	} else {
 		RAD_ASSERT(m_glyph);
-		if (m_glyph->format != FT_GLYPH_FORMAT_BITMAP)
-		{
+		if (m_glyph->format != FT_GLYPH_FORMAT_BITMAP) {
 			Lock L(s_mutex);
 			if (FT_Glyph_To_Bitmap(&m_glyph, FT_RENDER_MODE_NORMAL, 0, 1) != 0)
 				return false;
@@ -260,10 +222,8 @@ bool Glyph::Render()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-void UserGlyph::Release()
-{
-	if (m_glyph)
-	{
+void UserGlyph::Release() {
+	if (m_glyph) {
 		{
 			Lock L(s_mutex);
 			FT_Done_Glyph(m_glyph);
@@ -275,8 +235,7 @@ void UserGlyph::Release()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-bool Font::Create(const void *data, AddrSize size)
-{
+bool Font::Create(const void *data, AddrSize size) {
 	m_lib = RefLib();
 	int error;
 	{
@@ -290,30 +249,25 @@ bool Font::Create(const void *data, AddrSize size)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-void Font::Destroy()
-{
-	if (m_face)
-	{
+void Font::Destroy() {
+	if (m_face) {
 		Lock L(s_mutex);
 		FT_Done_Face(m_face);
 		m_face = 0;
 	}
-	if (m_lib)
-	{
+	if (m_lib) {
 		ReleaseLib();
 		m_lib = 0;
 	}
 }
 
-int Font::GlyphIndex(wchar_t character) const
-{
+int Font::GlyphIndex(U32 utf32Char) const {
 	RAD_ASSERT(m_face);
 	Lock L(s_mutex);
-	return (int)FT_Get_Char_Index(m_face, character);
+	return (int)FT_Get_Char_Index(m_face, utf32Char);
 }
 
-void Font::SetTransform(float *_2x2, float *translate2d)
-{
+void Font::SetTransform(float *_2x2, float *translate2d) {
 	RAD_ASSERT(m_face);
 	FT_Matrix m;
 	FT_Vector d;
@@ -330,28 +284,31 @@ void Font::SetTransform(float *_2x2, float *translate2d)
 	FT_Set_Transform(m_face, &m, &d);
 }
 
-bool Font::SetPointSize(int width, int height, int horzDPI, int vertDPI)
-{
-	if (!width) width = height;
-	if (!height) height = width;
+bool Font::SetPointSize(int width, int height, int horzDPI, int vertDPI) {
+	if (!width) 
+		width = height;
+	if (!height)
+		height = width;
 	RAD_ASSERT(width||height);
 
-	if (!horzDPI) horzDPI = 72;
-	if (!vertDPI) vertDPI = 72;
+	if (!horzDPI) 
+		horzDPI = 72;
+	if (!vertDPI) 
+		vertDPI = 72;
 	width  = (int)(((float)width / (float)horzDPI) * 72.0f);
 	height = (int)(((float)height / (float)vertDPI) * 72.0f);
 	
 	return SetPixelSize(width, height);
 }
 
-bool Font::SetPixelSize(int width, int height)
-{
+bool Font::SetPixelSize(int width, int height) {
 	RAD_ASSERT(m_face);
-	if (!width) width = height;
-	if (!height) height = width;
+	if (!width) 
+		width = height;
+	if (!height) 
+		height = width;
 	RAD_ASSERT(width||height);
-	if (width != m_width || height != m_height)
-	{
+	if (width != m_width || height != m_height) {
 		m_width = width;
 		m_height = height;
 		Lock L(s_mutex);
@@ -360,8 +317,7 @@ bool Font::SetPixelSize(int width, int height)
 	return true;
 }
 
-bool Font::LoadGlyphFromIndex(int index)
-{
+bool Font::LoadGlyphFromIndex(int index) {
 	RAD_ASSERT(m_face);
 	int error;
 	
@@ -375,8 +331,7 @@ bool Font::LoadGlyphFromIndex(int index)
 	return error == 0;
 }
 
-bool Font::LoadGlyphFromChar(wchar_t character)
-{
+bool Font::LoadGlyphFromChar(U32 character) {
 	RAD_ASSERT(m_face);
 	int error;
 	
@@ -391,8 +346,7 @@ bool Font::LoadGlyphFromChar(wchar_t character)
 	return error == 0;
 }
 
-UserGlyph *Font::CopyGlyph() const
-{
+UserGlyph *Font::CopyGlyph() const {
 	RAD_ASSERT(m_face);
 	int error;
 	FT_Glyph copy;
@@ -404,8 +358,7 @@ UserGlyph *Font::CopyGlyph() const
 
 	UserGlyph *user = 0;
 
-	if (!error)
-	{
+	if (!error) {
 		user = s_glyphPool.SafeConstruct();
 		user->Setup(copy, 0, &m_face->glyph->metrics);
 	}
@@ -413,19 +366,16 @@ UserGlyph *Font::CopyGlyph() const
 	return user;
 }
 
-Glyph *Font::RAD_IMPLEMENT_GET(glyph)
-{
+Glyph *Font::RAD_IMPLEMENT_GET(glyph) {
 	RAD_ASSERT(m_face);
 	return const_cast<Glyph*>(&m_glyph);
 }
 
-float Font::Kerning(wchar_t left, wchar_t right)
-{
-	return Kerning(GlyphIndex(left), GlyphIndex(right));
+float Font::Kerning(U32 utf32Left, U32 utf32Right) {
+	return Kerning(GlyphIndex(utf32Left), GlyphIndex(utf32Right));
 }
 
-float Font::Kerning(int glyphLeft, int glyphRight)
-{
+float Font::Kerning(int glyphLeft, int glyphRight) {
 	FT_Vector kern;
 	Lock L(s_mutex);
 	FT_Get_Kerning(m_face, glyphLeft, glyphRight, FT_KERNING_DEFAULT, &kern);
@@ -433,42 +383,41 @@ float Font::Kerning(int glyphLeft, int glyphRight)
 }
 
 void Font::StringDimensions(
-		const wchar_t *string, 
+		const char *utf8String, 
 		float &width, 
 		float &height, 
 		bool kern,
-		float kernScale)
-{
-	RAD_ASSERT(string);
+		float kernScale
+) {
+	RAD_ASSERT(utf8String);
+	RAD_ASSERT(utf8::is_valid(utf8String, utf8String+string::len(utf8String)));
+
 	width = 0;
 	height = 0;
 
-	wchar_t last = 0;
+	U32 last = 0;
 
-	while (*string)
-	{
-		if (LoadGlyphFromChar(*string))
-		{
+	while (*utf8String) {
+		U32 cp = utf8::unchecked::next(utf8String);
+
+		if (LoadGlyphFromChar(cp)) {
 			width += glyph->metrics->horzAdvance;
 			height = std::max<float>(height, glyph->metrics->height);
 			
 			if (kern && last)
-				width += Kerning(last, *string) * kernScale;
+				width += Kerning(last, cp) * kernScale;
 		}
 
-		last = *string;
-		++string;
+		last = cp;
 	}
 }
 
-float Font::RAD_IMPLEMENT_GET(ascenderPixels)
-{
+float Font::RAD_IMPLEMENT_GET(ascenderPixels) {
 	RAD_ASSERT(m_face);
 	return floorf(0.5f + ((float)m_face->ascender) * m_face->size->metrics.y_ppem / m_face->units_per_EM);
 }
 
-float Font::RAD_IMPLEMENT_GET(descenderPixels)
-{
+float Font::RAD_IMPLEMENT_GET(descenderPixels) {
 	RAD_ASSERT(m_face);
 	return floorf(0.5f + ((float)m_face->descender) * m_face->size->metrics.y_ppem / m_face->units_per_EM);
 }
@@ -486,8 +435,7 @@ m_cellsPerPage(0),
 m_maxPages(0),
 m_numPages(0),
 m_font(0),
-m_pages(0)
-{
+m_pages(0) {
 }
 
 GlyphCache::GlyphCache(
@@ -503,8 +451,7 @@ GlyphCache::GlyphCache(
 	int maxPages,
 	const IGlyphPageFactory::Ref &pageFactory,
 	bool allowEvict
-)
-{
+) {
 	Create(
 		font, 
 		fontWidth, 
@@ -521,8 +468,7 @@ GlyphCache::GlyphCache(
 	);
 }
 
-GlyphCache::~GlyphCache()
-{
+GlyphCache::~GlyphCache() {
 	Destroy();
 }
 
@@ -538,8 +484,7 @@ void GlyphCache::Create(Font &font,
 	int maxPages, 
 	const IGlyphPageFactory::Ref &pageFactory,
 	bool allowEvict
-)
-{
+) {
 	RAD_ASSERT(fontWidth || fontHeight);
 	RAD_ASSERT(maxPages > 0);
 	RAD_DEBUG_ONLY(m_inDraw = false);
@@ -554,8 +499,7 @@ void GlyphCache::Create(Font &font,
 	if (!fontHeight)
 		fontHeight = fontWidth;
 
-	if (fontSizeMode == Points)
-	{
+	if (fontSizeMode == Points) {
 		if (!fontHorzDPI)
 			fontHorzDPI = 72;
 		if (!fontVertDPI)
@@ -579,6 +523,7 @@ void GlyphCache::Create(Font &font,
 	m_numPages = 0;
 
 	m_bankPool.Create(ZFont, "glyph-cache-ch-bnk-pool", 32);
+	m_charMapPool.Create(ZFont, "glyph-cache-ch-map-pool", 32);
 	m_pagePool.Create(ZFont, "glyph-cache-page-pool", 8);
 	m_drawPool.Create(ZFont, "glyph-cache-draw-pool", MaxBatchSize);
 	m_cellPool.Create(ZFont, "glyph-cache-cell-pool", sizeof(Cell) * m_cellsPerPage, 1);
@@ -586,13 +531,11 @@ void GlyphCache::Create(Font &font,
 	for (int i = 0; i < initialPages; ++i)
 		CreatePage();
 
-	memset(&m_charMap.banks[0], 0, sizeof(CharBank*) * CharMapSize);
+	memset(&m_charMap.banks[0], 0, sizeof(CharMap2*) * CharMapSize);
 }
 
-void GlyphCache::Destroy()
-{
-	for (Page *page = m_pages; page;)
-	{
+void GlyphCache::Destroy() {
+	for (Page *page = m_pages; page;) {
 		Page *next = page->next;
 		m_pagePool.Destroy(page);
 		page = next;
@@ -602,11 +545,14 @@ void GlyphCache::Destroy()
 	m_numPages = 0;
 	m_active = 0;
 
-	for (int i = 0; i < CharMapSize; ++i)
-	{
-		if (m_charMap.banks[i])
-		{
-			m_bankPool.Destroy(m_charMap.banks[i]);
+	for (int i = 0; i < CharMapSize; ++i) {
+		if (m_charMap.banks[i]) {
+			CharMap2 *m2 = m_charMap.banks[i];
+			for (int k = 0; k < CharMapSize; ++k) {
+				if (m2->banks[k])
+					m_bankPool.Destroy(m2->banks[k]);
+			}
+			m_charMapPool.Destroy(m2);
 			m_charMap.banks[i] = 0;
 		}
 	}
@@ -621,19 +567,20 @@ void GlyphCache::Destroy()
 	m_pageFactory.reset();
 }
 
-void GlyphCache::Clear()
-{
-	for (int i = 0; i < CharMapSize; ++i)
-	{
-		if (m_charMap.banks[i])
-		{
-			m_bankPool.Destroy(m_charMap.banks[i]);
+void GlyphCache::Clear() {
+	for (int i = 0; i < CharMapSize; ++i) {
+		if (m_charMap.banks[i]) {
+			CharMap2 *m2 = m_charMap.banks[i];
+			for (int k = 0; k < CharMapSize; ++k) {
+				if (m2->banks[k])
+					m_bankPool.Destroy(m2->banks[k]);
+			}
+			m_charMapPool.Destroy(m2);
 			m_charMap.banks[i] = 0;
 		}
 	}
 
-	for (Page *page = m_pages; page;)
-	{
+	for (Page *page = m_pages; page;) {
 		Page *next = page->next;
 		m_pagePool.Destroy(page);
 		page = next;
@@ -648,22 +595,10 @@ void GlyphCache::Clear()
 	m_batch.numChars = 0;
 }
 
-bool GlyphCache::RAD_IMPLEMENT_GET(allowEvict)
-{
-	return m_allowEvict;
-}
-
-void GlyphCache::RAD_IMPLEMENT_SET(allowEvict) (bool b)
-{
-	m_allowEvict = b;
-}
-
-void GlyphCache::SetupBatch()
-{
+void GlyphCache::SetupBatch() {
 	m_batch.numChars = 0;
 
-	if (!m_active)
-	{
+	if (!m_active) {
 		m_precacheStart = Precache();
 		if (!m_precacheStart)
 			return; // nothing to do.
@@ -672,14 +607,11 @@ void GlyphCache::SetupBatch()
 		RAD_ASSERT(m_active);
 	}
 	
-	while (m_active && m_batch.numChars == 0)
-	{
+	while (m_active && m_batch.numChars == 0) {
 		m_batch.page = m_active->page.get();
 		// there is an active page (i.e. a batch overflow or page switch occured).
-		for (CharDraw *draw = m_precacheStart; draw && draw->item; draw = draw->next)
-		{
-			if (!draw->drawn && draw->item->cell->page == m_active)
-			{
+		for (CharDraw *draw = m_precacheStart; draw && draw->item; draw = draw->next) {
+			if (!draw->drawn && draw->item->cell->page == m_active) {
 				draw->drawn = true;
 				m_batch.chars[m_batch.numChars++] = &draw->metrics;
 				if (m_batch.numChars == MaxBatchSize)
@@ -692,8 +624,7 @@ void GlyphCache::SetupBatch()
 	}
 }
 
-GlyphCache::CharDraw *GlyphCache::Precache()
-{
+GlyphCache::CharDraw *GlyphCache::Precache() {
 	RAD_ASSERT(m_inDraw);
 
 	CharDraw *draw = 0;
@@ -705,15 +636,12 @@ GlyphCache::CharDraw *GlyphCache::Precache()
 	for (Page *page = m_pages; page; page = page->next)
 		page->mark = false;
 
-	if (m_drawStart)
-	{
+	if (m_drawStart) {
 		RAD_ASSERT(m_drawStart->item);
 		
 		// unlock all rendered chars
-		for (draw = m_drawList; draw != m_drawStart; draw = draw->next)
-		{
-			if (draw->item)
-			{
+		for (draw = m_drawList; draw != m_drawStart; draw = draw->next) {
+			if (draw->item) {
 				draw->item->locked = false;
 				draw->item = 0;
 			}
@@ -723,9 +651,7 @@ GlyphCache::CharDraw *GlyphCache::Precache()
 		m_drawStart->item = 0;
 		draw = m_drawStart->next;
 		lastGlyph = m_drawStart->glyph;
-	}
-	else
-	{
+	} else {
 		draw = m_drawList;
 	}
 
@@ -736,16 +662,13 @@ GlyphCache::CharDraw *GlyphCache::Precache()
 
 	CharDraw *firstDraw = draw;
 
-	while (draw)
-	{
+	while (draw) {
 		draw->drawn = false;
 		draw->glyph = m_font->GlyphIndex(draw->ch);
 		draw->item = CacheChar(draw->ch, draw->glyph);
 
-		if (!draw->item)
-		{
-			if (!m_allowEvict || !Evict())
-			{
+		if (!draw->item) {
+			if (!m_allowEvict || !Evict()) {
 				// unable to evict anything from the cache. we're done here.
 				// this is an error.
 				RAD_ASSERT_MSG(cached, "Font page overflow.");
@@ -781,10 +704,8 @@ GlyphCache::CharDraw *GlyphCache::Precache()
 		++cached;
 	}
 
-	for (Page *page = m_pages; page; page = page->next)
-	{
-		if (page->locked) 
-		{
+	for (Page *page = m_pages; page; page = page->next) {
+		if (page->locked)  {
 			page->page->Unlock();
 			page->locked = false;
 		}
@@ -793,9 +714,15 @@ GlyphCache::CharDraw *GlyphCache::Precache()
 	return (cached > 0) ? firstDraw : 0;
 }
 
-GlyphCache::Batch *GlyphCache::BeginStringBatch(const wchar_t *str, float orgX, float orgY, bool kerning, float kerningScale)
-{
-	RAD_ASSERT(str);
+GlyphCache::Batch *GlyphCache::BeginStringBatch(
+	const char *utf8String, 
+	float orgX, 
+	float orgY,
+	bool kerning, 
+	float kerningScale
+) {
+	RAD_ASSERT(utf8String);
+	RAD_ASSERT(utf8::is_valid(utf8String, utf8String+string::len(utf8String)));
 	RAD_ASSERT(!m_inDraw);
 	RAD_DEBUG_ONLY(m_inDraw=true);
 
@@ -814,12 +741,13 @@ GlyphCache::Batch *GlyphCache::BeginStringBatch(const wchar_t *str, float orgX, 
 
 	m_tallest = m_font->ascenderPixels;
 
-	for (AddrSize ofs = 0; str[ofs] != L'\0'; ++ofs)
-	{
+	// Load glyph indices for all strings.
+	while (*utf8String) {
+		U32 cp = utf8::unchecked::next(utf8String);
 		CharDraw *draw = m_drawPool.SafeConstruct();
 		draw->item = 0;
 		draw->next = 0;
-		draw->ch = str[ofs];
+		draw->ch = cp;
 		draw->glyph = m_font->GlyphIndex(draw->ch);
 		if (!m_drawList)
 			m_drawList = draw;
@@ -834,22 +762,19 @@ GlyphCache::Batch *GlyphCache::BeginStringBatch(const wchar_t *str, float orgX, 
 	return (m_batch.numChars > 0 ) ? &m_batch : 0;
 }
 
-GlyphCache::Batch *GlyphCache::NextStringBatch()
-{
+GlyphCache::Batch *GlyphCache::NextStringBatch() {
 	SetupBatch();
 	return (m_batch.numChars > 0 ) ? &m_batch : 0;
 }
 
-void GlyphCache::EndStringBatch()
-{
+void GlyphCache::EndStringBatch() {
 	RAD_DEBUG_ONLY(m_inDraw=false);
 	m_active = 0;
 	m_drawStart = 0;
 	m_precacheStart = 0;
 	m_batch.numChars = 0;
 
-	while (m_drawList)
-	{
+	while (m_drawList) {
 		CharDraw *next = m_drawList->next;
 		m_drawPool.Destroy(m_drawList);
 		m_drawList = next;
@@ -857,20 +782,21 @@ void GlyphCache::EndStringBatch()
 }
 
 void GlyphCache::StringDimensions(
-		const wchar_t *string, 
+		const char *utf8String, 
 		float &width, 
 		float &height, 
 		bool kern,
-		float kernScale)
-{
+		float kernScale
+) {
+	RAD_ASSERT(utf8String);
+	RAD_ASSERT(utf8::is_valid(utf8String, utf8String+string::len(utf8String)));
+
 	width = 0;
 	height = 0;
 
-	Batch *batch = BeginStringBatch(string, 0.0f, 0.0f, kern, kernScale);
-	while (batch)
-	{
-		for (int i = 0; i < batch->numChars; ++i)
-		{
+	Batch *batch = BeginStringBatch(utf8String, 0.0f, 0.0f, kern, kernScale);
+	while (batch) {
+		for (int i = 0; i < batch->numChars; ++i) {
 			Metrics *m = batch->chars[i];
 			height = std::max(m->draw.y2, height);
 			width  = std::max(m->draw.x2, width);
@@ -881,8 +807,7 @@ void GlyphCache::StringDimensions(
 	EndStringBatch();
 }
 
-bool GlyphCache::CreatePage()
-{
+bool GlyphCache::CreatePage() {
 	IGlyphPage::Ref glyphPage = m_pageFactory->AllocatePage(m_pageWidth, m_pageHeight);
 	if (!glyphPage)
 		return false;
@@ -897,8 +822,7 @@ bool GlyphCache::CreatePage()
 	page->stride = 0;
 	page->cells = (Cell*)m_cellPool.SafeGetChunk();
 	
-	for (int i = 0; i < m_cellsPerPage; ++i)
-	{
+	for (int i = 0; i < m_cellsPerPage; ++i) {
 		AddToList(&page->cells[i], &page->free);
 		page->cells[i].page = page;
 		page->cells[i].item = 0;
@@ -907,10 +831,8 @@ bool GlyphCache::CreatePage()
 	int numHCells = m_pageWidth / m_cellWidth;
 	int numVCells = m_pageHeight / m_cellHeight;
 
-	for (int y = 0; y < numVCells; ++y)
-	{
-		for (int x = 0; x < numHCells; ++x)
-		{
+	for (int y = 0; y < numVCells; ++y) {
+		for (int x = 0; x < numHCells; ++x) {
 			Cell *cell = &page->cells[y*numHCells+x];
 			cell->x = x;
 			cell->y = y;
@@ -925,36 +847,40 @@ bool GlyphCache::CreatePage()
 	return true;
 }
 
-GlyphCache::CharItem *GlyphCache::CacheChar(wchar_t ch, int glyph)
-{
-	int idx0 = (ch & 0xFF00) >> 8;
-	int idx1 = (ch & 0xFF);
+GlyphCache::CharItem *GlyphCache::CacheChar(U32 ch, int glyph) {
+	int idx0 = (ch & 0xFF0000) >> 16;
+	int idx1 = (ch & 0xFF00) >> 8;
+	int idx2 = (ch & 0xFF);
 
-	if (!m_charMap.banks[idx0])
-	{
-		m_charMap.banks[idx0] = m_bankPool.SafeConstruct();
-		memset(&m_charMap.banks[idx0]->items[0], 0, sizeof(CharItem) * CharMapSize);
+	CharMap2 *m2 = m_charMap.banks[idx0];
+	if (!m2) {
+		m2 = m_charMapPool.SafeConstruct();
+		m_charMap.banks[idx0] = m2;
+		memset(&m2->banks[0], 0, sizeof(CharBank*) * CharMapSize);
 	}
 
-	CharBank *bank = m_charMap.banks[idx0];
-	if (!bank->items[idx1].cell)
-	{
+	CharBank *bank = m2->banks[idx1];
+
+	if (!bank) {
+		bank = m_bankPool.SafeConstruct();
+		m2->banks[idx1] = bank;
+		memset(&bank->items[0], 0, sizeof(CharItem) * CharMapSize);
+	}
+
+	if (!bank->items[idx2].cell) {
 		m_font->LoadGlyphFromIndex(glyph);
 
-		for (;;)
-		{
+		for (;;) {
 			// character has not been cached.
 			Page *page;
-			for (page = m_pages; page; page = page->next)
-			{
-				if (page->free)
-				{
+			for (page = m_pages; page; page = page->next) {
+				if (page->free) {
 					Cell *cell = page->free;
 					MoveToList(&page->free, cell, &page->used);
 					// NOTE: SetupBatch() calls Precache() which loads the glyph
 					// into the font object before this is called.
 					UploadGlyph(cell);
-					cell->item = &bank->items[idx1];
+					cell->item = &bank->items[idx2];
 
 					cell->item->cell = cell;
 					
@@ -962,7 +888,15 @@ GlyphCache::CharItem *GlyphCache::CacheChar(wchar_t ch, int glyph)
 					cell->item->bearingX = m_font->glyph->metrics->horzBearingX;
 					cell->item->bearingY = m_font->glyph->metrics->horzBearingY;
 					cell->item->advance  = m_font->glyph->metrics->horzAdvance;
-					RAD_DEBUG_ONLY(cell->item->ch = ch);
+#if defined(RAD_OPT_DEBUG)
+#if defined(RAD_OPT_4BYTE_WCHAR)
+					cell->item->ch = (wchar_t)ch;
+#else
+					char utf8[4];
+					utf8::unchecked::utf32to8(&ch, (&ch)+1, utf8);
+					utf8::unchecked::utf8to16(utf8, utf8+1, (U16*)&cell->item->ch);
+#endif
+#endif
 					break;
 				}
 			}
@@ -975,18 +909,14 @@ GlyphCache::CharItem *GlyphCache::CacheChar(wchar_t ch, int glyph)
 		}
 	}
 	
-	return (bank->items[idx1].cell) ? &bank->items[idx1] : 0;
+	return (bank->items[idx2].cell) ? &bank->items[idx2] : 0;
 }
 
-bool GlyphCache::Evict()
-{
-	for (Page *page = m_pages; page; page = page->next)
-	{
+bool GlyphCache::Evict() {
+	for (Page *page = m_pages; page; page = page->next) {
 		RAD_ASSERT(!page->free);
-		for (Cell *cell = page->used; cell; cell = cell->next)
-		{
-			if (!cell->item->locked) // not being used, we can free this slot.
-			{
+		for (Cell *cell = page->used; cell; cell = cell->next) {
+			if (!cell->item->locked) { // not being used, we can free this slot.
 				MoveToList(&page->used, cell, &page->free);
 				cell->item->cell = 0;
 				cell->item = 0;
@@ -998,15 +928,13 @@ bool GlyphCache::Evict()
 	return false;
 }
 
-void GlyphCache::UploadGlyph(Cell *cell)
-{
+void GlyphCache::UploadGlyph(Cell *cell) {
 	RAD_ASSERT(cell);
 	Page *page = cell->page;
 	RAD_ASSERT(page);
 	RAD_ASSERT(page->page);
 
-	if (!page->locked)
-	{
+	if (!page->locked) {
 		page->data = page->page->Lock(page->stride);
 		page->locked = true;
 	}
@@ -1014,8 +942,7 @@ void GlyphCache::UploadGlyph(Cell *cell)
 	U8 *dst = (U8*)page->data;
 	AddrSize dstPitch = page->stride;
 
-	if (m_font->glyph->Render())
-	{
+	if (m_font->glyph->Render()) {
 		const Bitmap *bitmap = m_font->glyph->bitmap;
 		cell->bmWidth = bitmap->width;
 		cell->bmHeight = bitmap->height;
@@ -1028,14 +955,12 @@ void GlyphCache::UploadGlyph(Cell *cell)
 		dst = dst + (y * dstPitch + x);
 
 		// set top border.
-		for (int i = 0; i < CellBorder;  ++i)
-		{
+		for (int i = 0; i < CellBorder;  ++i) {
 			memset(dst, 0, m_cellWidth);
 			dst += dstPitch;
 		}
 		
-		for (int y = 0; y < cell->bmHeight; ++y)
-		{
+		for (int y = 0; y < cell->bmHeight; ++y) {
 			for (int i = 0; i < CellBorder; ++i)
 				dst[i] = 0;
 			
@@ -1049,16 +974,13 @@ void GlyphCache::UploadGlyph(Cell *cell)
 		}
 
 		// set bottom border.
-		for (int i = 0; i < CellBorder;  ++i)
-		{
+		for (int i = 0; i < CellBorder;  ++i) {
 			memset(dst, 0, m_cellWidth);
 			dst += dstPitch;
 		}
 	}
-	else
-	{
-		for (int i = 0; i < m_cellHeight; ++i)
-		{
+	else {
+		for (int i = 0; i < m_cellHeight; ++i) {
 			memset(dst, 0, m_cellWidth);
 			dst += dstPitch;
 		}

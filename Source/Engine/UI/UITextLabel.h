@@ -26,7 +26,7 @@ public:
 	);
 
 	void SetText(
-		const wchar_t *str, 
+		const char *utf8String, 
 		float x = 0.0f, 
 		float y = 0.0f, 
 		float z = 0.0f, 
@@ -67,7 +67,7 @@ private:
 
 	void SetText(
 		lua_State *L,
-		const wchar_t *str, 
+		const char *utf8String, 
 		float x = 0.0f, 
 		float y = 0.0f, 
 		float z = 0.0f, 

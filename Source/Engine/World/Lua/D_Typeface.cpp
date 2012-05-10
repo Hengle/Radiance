@@ -52,7 +52,7 @@ int D_Typeface::lua_StringDimensions(lua_State *L)
 	);
 
 	self->typeface->font->StringDimensions(
-		string::Widen(luaL_checkstring(L, 2)).c_str(),
+		luaL_checkstring(L, 2),
 		w,
 		h,
 		kern,

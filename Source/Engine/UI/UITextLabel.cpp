@@ -28,7 +28,7 @@ void TextLabel::SetText(
 }
 
 void TextLabel::SetText(
-	const wchar_t *str, 
+	const char *utf8String, 
 	float x,
 	float y, 
 	float z,
@@ -40,7 +40,7 @@ void TextLabel::SetText(
 {
 	SetText(
 		0,
-		str,
+		utf8String,
 		x,
 		y,
 		z,
@@ -74,7 +74,7 @@ void TextLabel::SetText(
 
 void TextLabel::SetText(
 	lua_State *L,
-	const wchar_t *str, 
+	const char *utf8String, 
 	float x,
 	float y, 
 	float z,
@@ -89,7 +89,7 @@ void TextLabel::SetText(
 	if (m_textModel)
 	{
 		m_textModel->SetText(
-			str,
+			utf8String,
 			x,
 			y,
 			z,
@@ -234,7 +234,7 @@ int TextLabel::lua_SetText(lua_State *L)
 		sy = (float)luaL_checknumber(L, 8);
 
 	w->SetText(
-		string::Widen(string).c_str(),
+		string,
 		x,
 		y,
 		0.f,
