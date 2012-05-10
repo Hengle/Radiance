@@ -12,6 +12,7 @@
 #include <Engine/Input.h>
 #include <Engine/Persistence.h>
 #include <Engine/Renderer/PC/RBackend.h>
+#include <Engine/StringTable.h>
 
 #if defined(RAD_OPT_DEBUG)
 #include <Runtime/File.h>
@@ -104,6 +105,41 @@ bool s_postQuit = false;
 bool s_editor = false;
 #endif
 
+}
+
+StringTable::LangId __DefaultLanguage() {
+	LANGID winId = GetUserDefaultUILanguage();
+	StringTable::LangId id;
+
+	switch (winId&0xff) {
+	case LANG_CHINESE:
+		id = StringTable::LangId_CH;
+		break;
+	case LANG_FRENCH:
+		id = StringTable::LangId_FR;
+		break;
+	case LANG_GERMAN:
+		id = StringTable::LangId_GR;
+		break;
+	case LANG_ITALIAN:
+		id = StringTable::LangId_IT;
+		break;
+	case LANG_JAPANESE:
+		id = StringTable::LangId_JP;
+		break;
+	case LANG_RUSSIAN:
+	case LANG_UKRAINIAN:
+		id = StringTable::LangId_RU;
+		break;
+	case LANG_SPANISH:
+		id = StringTable::LangId_SP;
+		break;
+	default:
+		id = StringTable::LangId_EN;
+		break;
+	}
+
+	return id;
 }
 
 void __PostQuit()

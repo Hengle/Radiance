@@ -41,6 +41,22 @@ Game::~Game()
 {
 }
 
+bool Game::LoadEntry() {
+	m_stringTable = App::Get()->engine->sys->packages->Resolve("UI/Globals", pkg::Z_Engine);
+	if (!m_stringTable)
+		return true; // doesn't exists that's ok
+	if (m_stringTable->type != asset::AT_StringTable)
+		return false;
+	int r = m_stringTable->Process(
+		xtime::TimeSlice::Infinite,
+		pkg::P_Load
+	);
+	if (r != pkg::SR_Success)
+		return false;
+	m_stringTableParser = asset::StringTableParser::Cast(m_stringTable);
+	return m_stringTableParser;
+}
+
 void Game::SetViewport(int x, int y, int w, int h)
 {
 	m_vp[0] = x;

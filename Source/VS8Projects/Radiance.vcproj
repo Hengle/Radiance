@@ -1008,6 +1008,26 @@
 						RelativePath="..\Runtime\String\StringDef.h"
 						>
 					</File>
+					<File
+						RelativePath="..\Runtime\String\utf8.h"
+						>
+					</File>
+					<Filter
+						Name="utf8"
+						>
+						<File
+							RelativePath="..\Runtime\String\utf8\checked.h"
+							>
+						</File>
+						<File
+							RelativePath="..\Runtime\String\utf8\core.h"
+							>
+						</File>
+						<File
+							RelativePath="..\Runtime\String\utf8\unchecked.h"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="Tuple"

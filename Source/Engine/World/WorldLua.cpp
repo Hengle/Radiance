@@ -26,6 +26,7 @@
 #include "Lua/D_Mesh.h"
 #include "../Sound.h"
 #include "../Persistence.h"
+#include "../StringTable.h"
 #include <Lua/lualib.h>
 #include <Lua/lgc.h>
 #include <Lua/lstate.h>
@@ -37,6 +38,8 @@
 #if defined(RAD_OPT_IOS)
 bool __IOS_IPhone();
 #endif
+
+StringTable::LangId __DefaultLanguage();
 
 namespace world {
 
@@ -172,6 +175,8 @@ bool WorldLua::Init()
 	luaL_Reg systemCalls [] =
 	{
 		{ "Platform", lua_System_Platform },
+		{ "DefaultLanguage", lua_System_DefaultLanguage },
+		{ "GetLangString", lua_System_GetLangString },
 		{ 0, 0 }
 	};
 
@@ -674,6 +679,32 @@ int WorldLua::lua_System_Platform(lua_State *L)
 #endif
 
 	return 1;
+}
+
+int WorldLua::lua_System_DefaultLanguage(lua_State *L) {
+	lua_pushinteger(L, (int)__DefaultLanguage());
+	return 1;
+}
+
+int WorldLua::lua_System_GetLangString(lua_State *L) {
+	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
+	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
+
+	const StringTable *stringTable = self->m_world->game->stringTable;
+
+	if (stringTable) {
+		const char *id = luaL_checkstring(L, 1);
+		int lang = (int)luaL_checkinteger(L, 2);
+		if (lang < StringTable::LangId_EN || lang >= StringTable::LangId_MAX)
+			luaL_error(L, "System.GetLangString() invalid language id %d", lang);
+		const String *s = stringTable->Find(id, (StringTable::LangId)lang);
+		if (s) {
+			lua_pushstring(L, s->c_str());
+			return 1;
+		}
+	}
+
+	return 0;
 }
 
 int WorldLua::lua_SysCalls_CreatePrecacheTask(lua_State *L)

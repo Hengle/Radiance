@@ -12,6 +12,7 @@
 #include "../World/Event.h"
 #include "../World/World.h"
 #include "../Packages/PackagesDef.h"
+#include "../Assets/StringTableParser.h"
 #include "GameNetwork.h"
 #include <Runtime/TimeDef.h>
 #include <Runtime/Container/ZoneDeque.h>
@@ -52,7 +53,7 @@ public:
 	Game();
 	virtual ~Game();
 
-	virtual bool LoadEntry() { return true; }
+	virtual bool LoadEntry();
 
 #if defined(RAD_OPT_PC_TOOLS)
 	void Tick(float dt, IToolsCallbacks *cb);
@@ -96,6 +97,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Game, saveGame, const Persistence::Ref&);
 	RAD_DECLARE_READONLY_PROPERTY(Game, numSavedGameConflicts, int);
 	RAD_DECLARE_READONLY_PROPERTY(Game, gameNetwork, gn::GameNetwork *);
+	RAD_DECLARE_READONLY_PROPERTY(Game, stringTable, const StringTable*);
 	RAD_DECLARE_PROPERTY(Game, cloudStorage, bool, bool);
 
 #if defined(RAD_OPT_PC_TOOLS)
@@ -156,15 +158,47 @@ private:
 
 	TouchState *UpdateState(const InputEvent &e, InputState &is);
 
-	RAD_DECLARE_GET(state, Tickable::Ref) { return m_tickable.state; }
-	RAD_DECLARE_GET(world, ::world::World::Ref) { return (m_slot && m_slot->active) ? m_slot->active->world : ::world::World::Ref(); }
-	RAD_DECLARE_GET(inputState, const InputState*) { return &m_inputState; }
-	RAD_DECLARE_GET(session, const Persistence::Ref&) { return m_session; }
-	RAD_DECLARE_GET(saveGame, const Persistence::Ref&) { return m_saveGame; }
-	RAD_DECLARE_GET(numSavedGameConflicts, int) { return (int)m_cloudVersions.size(); }
-	RAD_DECLARE_GET(cloudStorage, bool) { return m_cloudStorage; }
-	RAD_DECLARE_SET(cloudStorage, bool) { m_cloudStorage = value; }
-	RAD_DECLARE_GET(gameNetwork, gn::GameNetwork*) { return m_gameNetwork.get(); }
+	RAD_DECLARE_GET(state, Tickable::Ref) { 
+		return m_tickable.state; 
+	}
+	
+	RAD_DECLARE_GET(world, ::world::World::Ref) { 
+		return (m_slot && m_slot->active) ? m_slot->active->world : ::world::World::Ref(); 
+	}
+	
+	RAD_DECLARE_GET(inputState, const InputState*) { 
+		return &m_inputState; 
+	}
+	
+	RAD_DECLARE_GET(session, const Persistence::Ref&) { 
+		return m_session; 
+	}
+	
+	RAD_DECLARE_GET(saveGame, const Persistence::Ref&) { 
+		return m_saveGame; 
+	}
+	
+	RAD_DECLARE_GET(numSavedGameConflicts, int) { 
+		return (int)m_cloudVersions.size(); 
+	}
+
+	RAD_DECLARE_GET(cloudStorage, bool) { 
+		return m_cloudStorage; 
+	}
+	
+	RAD_DECLARE_SET(cloudStorage, bool) { 
+		m_cloudStorage = value; 
+	}
+
+	RAD_DECLARE_GET(gameNetwork, gn::GameNetwork*) { 
+		return m_gameNetwork.get(); 
+	}
+
+	RAD_DECLARE_GET(stringTable, const StringTable*) {
+		if (m_stringTableParser)
+			return m_stringTableParser->stringTable;
+		return 0;
+	}
 
 #if defined(RAD_OPT_PC_TOOLS)
 	RAD_DECLARE_GET(toolsCallback, IToolsCallbacks*) { return m_toolsCallback; }
@@ -178,6 +212,8 @@ private:
 	MapSlot *m_slot;
 	MapSlot::Map m_maps;
 	String m_saveGameName;
+	pkg::Asset::Ref m_stringTable;
+	asset::StringTableParser::Ref m_stringTableParser;
 	Persistence::Ref m_session;
 	Persistence::Ref m_saveGame;
 	CloudFile::Ref m_cloudFile;

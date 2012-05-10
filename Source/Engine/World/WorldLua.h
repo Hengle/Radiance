@@ -116,6 +116,8 @@ private:
 
 	// ----------- Native Calls -----------
 	static int lua_System_Platform(lua_State *L);
+	static int lua_System_DefaultLanguage(lua_State *L);
+	static int lua_System_GetLangString(lua_State *L);
 	static int lua_SysCalls_CreatePrecacheTask(lua_State *L);
 	static int lua_CreateSpawnTask(lua_State *L);
 	static int lua_CreateTempSpawnTask(lua_State *L);

@@ -15,6 +15,7 @@
 #include <wchar.h>
 #include <wctype.h>
 #include <algorithm>
+#include "utf8.h"
 
 #if defined(RAD_OPT_APPLE)
 	#include "../Utils.h"
@@ -22,6 +23,64 @@
 
 
 namespace string {
+
+//! Returns number of bytes needed to store the specified widestring in an mbstring.
+inline size_t my_wcstombslen(const wchar_t *src, size_t numChars) {
+	char bytes[4];
+	size_t len = 0;
+	while (numChars-- > 0) {
+#if defined(RAD_OPT_4BYTE_WCHAR)
+		BOOST_STATIC_ASSERT(sizeof(wchar_t) == 4);
+		char *end = utf8::unchecked::utf32to8(src, src+1, bytes);
+#else
+		BOOST_STATIC_ASSERT(sizeof(wchar_t) == 2);
+		char *end = utf8::unchecked::utf16to8(src, src+1, bytes);
+#endif
+		len += (end-bytes);
+	}
+
+	return len;
+}
+
+//! Converts wchar_t string to UTF8 string.
+inline void my_wcstombs(const wchar_t *src, size_t numChars, char *dst) {
+#if defined(RAD_OPT_4BYTE_WCHAR)
+	BOOST_STATIC_ASSERT(sizeof(wchar_t) == 4);
+	utf8::unchecked::utf32to8(src, src+numChars, dst);
+#else
+	BOOST_STATIC_ASSERT(sizeof(wchar_t) == 2);
+	utf8::unchecked::utf16to8(src, src+numChars, dst);
+#endif
+}
+
+//! Returns number of bytes needed to store the specified widestring in an mbstring.
+inline size_t my_mbstowcslen(const char *src, size_t numChars) {
+	wchar_t bytes[4];
+	size_t len = 0;
+	while (numChars-- > 0) {
+#if defined(RAD_OPT_4BYTE_WCHAR)
+		BOOST_STATIC_ASSERT(sizeof(wchar_t) == 4);
+		wchar_t *end = utf8::unchecked::utf8to32(src, src+1, bytes);
+#else
+		BOOST_STATIC_ASSERT(sizeof(wchar_t) == 2);
+		wchar_t *end = utf8::unchecked::utf8to16(src, src+1, bytes);
+#endif
+		len += (end-bytes);
+	}
+
+	return len;
+}
+
+//! Converts wchar_t string to UTF8 string.
+inline void my_mbstowcs(const char *src, size_t numChars, wchar_t *dst) {
+#if defined(RAD_OPT_4BYTE_WCHAR)
+	BOOST_STATIC_ASSERT(sizeof(wchar_t) == 4);
+	utf8::unchecked::utf8to32(src, src+numChars, dst);
+#else
+	BOOST_STATIC_ASSERT(sizeof(wchar_t) == 2);
+	utf8::unchecked::utf8to16(src, src+numChars, dst);
+#endif
+}
 
 template<>
 inline bool isspace<char>(char c)

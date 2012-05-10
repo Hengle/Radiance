@@ -86,7 +86,6 @@ const String *StringTable::Find(const char *id, LangId lang) const {
 
 	const StringTable::Entry *entry = Find(id);
 	if (entry) {
-		RAD_ASSERT(lang);
 		Entry::Strings::const_iterator it = entry->strings.find(lang);
 		if (it != entry->strings.end()) {
 			if (!it->second.empty())

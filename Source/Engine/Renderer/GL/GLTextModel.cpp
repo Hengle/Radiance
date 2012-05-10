@@ -59,7 +59,10 @@ struct GlyphPage : public font::IGlyphPage
 			data
 		);
 #if defined(DUMP_FONT_PAGE)
-		FILE *fp = fopen("fontpage.raw", "wb");
+		static int s_num = 1;
+		char buff[256];
+		sprintf(buff, "fontpage_%d.raw", s_num++);
+		FILE *fp = fopen(buff, "wb");
 		fwrite(data, 1, width*height, fp);
 		fclose(fp);
 #endif

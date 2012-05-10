@@ -6,7 +6,6 @@
 #include "../StringBase.h"
 #include "../PushPack.h"
 
-
 namespace string {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -884,10 +883,10 @@ string_base<wchar_t, wchar_t, A>()
 {
 #define CAWARN_DISABLE 6309 6387
 #include <Runtime/PushCAWarnings.h>
-	size_t size = ::mbstowcs(NULL, str.c_str(), str.length() + 1) + 1;
+	size_t size = my_mbstowcslen(str.c_str(), str.length() + 1) + 1;
 #include <Runtime/PopCAWarnings.h>
 	wchar_t* buff = this->allocate(size);
-	::mbstowcs(buff, str.c_str(), size);
+	my_mbstowcs(str.c_str(), str.length() + 1, buff);
 	string_base<wchar_t, wchar_t, A>::operator=(buff);
 	this->deallocate(buff, size);
 }
@@ -897,9 +896,9 @@ template<typename OtherA>
 inline wstring<A>::wstring(const std::basic_string<char, std::char_traits<char>, OtherA> &str) :
 string_base<wchar_t, wchar_t, A>()
 {
-	size_t size = ::mbstowcs(NULL, str.c_str(), str.length() + 1) + 1;
+	size_t size = my_mbstowcslen(str.c_str(), str.length() + 1) + 1;
 	wchar_t* buff = this->allocate(size);
-	::mbstowcs(buff, str.c_str(), size);
+	my_mbstowcs(str.c_str(), str.length() + 1, buff);
 	string_base<wchar_t, wchar_t, A>::operator=(buff);
 	this->deallocate(buff, size);
 }

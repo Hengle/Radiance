@@ -927,7 +927,7 @@ bool GlyphCache::CreatePage()
 
 GlyphCache::CharItem *GlyphCache::CacheChar(wchar_t ch, int glyph)
 {
-	int idx0 = (ch & 0xFF00) >> 16;
+	int idx0 = (ch & 0xFF00) >> 8;
 	int idx1 = (ch & 0xFF);
 
 	if (!m_charMap.banks[idx0])
