@@ -33,7 +33,7 @@ int StringTableCooker::Compile(int flags, int allflags) {
 	// Make sure these are updated.
 	CompareVersion(flags);
 	CompareModifiedTime(flags);
-	CompareCachedFileTimeKey(flags, "Source.File");
+	CompareCachedFileTimeKey(flags, "Source.Root");
 
 	int r = asset->Process(
 		xtime::TimeSlice::Infinite,
@@ -47,7 +47,7 @@ int StringTableCooker::Compile(int flags, int allflags) {
 	if (!parser)
 		return SR_ParseError;
 
-	const String *s = asset->entry->KeyValue<String>("Source.File", flags);
+	const String *s = asset->entry->KeyValue<String>("Source.Root", flags);
 	if (!s)
 		return SR_MetaError;
 
@@ -67,7 +67,7 @@ int StringTableCooker::Compile(int flags, int allflags) {
 CookStatus StringTableCooker::CheckRebuild(int flags, int allflags) {
 	if (CompareVersion(flags) ||
 		CompareModifiedTime(flags) ||
-		CompareCachedFileTimeKey(flags, "Source.File"))
+		CompareCachedFileTimeKey(flags, "Source.Root"))
 		return CS_NeedRebuild;
 	return CS_UpToDate;
 }
