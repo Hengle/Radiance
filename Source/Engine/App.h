@@ -9,6 +9,7 @@
 #include "Types.h"
 #include "Engine.h"
 #include "Tickable.h"
+#include "StringTable.h"
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/TimeDef.h>
 
@@ -30,6 +31,7 @@ public:
 	static App *Get();
 	static void DestroyInstance();
 	static void DumpMemStats(int level);
+	static StringTable::LangId LoadLangId(int *enabledLangMask = 0);
 
 	virtual bool PreInit();
 	virtual bool Initialize();
@@ -61,6 +63,8 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(App, allowMultipleInstances, bool);
 	RAD_DECLARE_READONLY_PROPERTY(App, state, Tickable::Ref);
 	RAD_DECLARE_READONLY_PROPERTY(App, time, float);
+	RAD_DECLARE_READONLY_PROPERTY(App, langId, StringTable::LangId);
+	RAD_DECLARE_READONLY_PROPERTY(App, systemLangId, StringTable::LangId);
 	RAD_DECLARE_PROPERTY(App, exit, bool, bool);
 
 #if defined(RAD_OPT_PC_TOOLS)
@@ -83,10 +87,28 @@ protected:
 	virtual RAD_DECLARE_GET(website, const wchar_t*) = 0;
 	virtual RAD_DECLARE_GET(allowMultipleInstances, bool) = 0;
 	virtual RAD_DECLARE_GET(flurryAPIKey, const char *) = 0;
-	RAD_DECLARE_GET(exit, bool) { return m_exit; }
-	RAD_DECLARE_SET(exit, bool) { m_exit = value; }
-	RAD_DECLARE_GET(state, Tickable::Ref) { return m_tickable.state; }
-	RAD_DECLARE_GET(time, float) { return m_time; }
+	
+	RAD_DECLARE_GET(exit, bool) { 
+		return m_exit; 
+	}
+
+	RAD_DECLARE_SET(exit, bool) { 
+		m_exit = value; 
+	}
+
+	RAD_DECLARE_GET(state, Tickable::Ref) { 
+		return m_tickable.state; 
+	}
+
+	RAD_DECLARE_GET(time, float) { 
+		return m_time; 
+	}
+
+	RAD_DECLARE_GET(langId, StringTable::LangId) {
+		return m_langId;
+	}
+
+	RAD_DECLARE_GET(systemLangId, StringTable::LangId);
 
 #if defined(RAD_OPT_PC_TOOLS)
 	virtual RAD_DECLARE_GET(wantEditor, bool) = 0;
@@ -97,7 +119,9 @@ private:
 
 	static App *New(); // implemented by game project.
 
-	RAD_DECLARE_GET(engine, Engine*) { return m_e; }
+	RAD_DECLARE_GET(engine, Engine*) { 
+		return m_e; 
+	}
 
 #if defined(RAD_OPT_PC_TOOLS)
 	bool m_editor;
@@ -114,6 +138,7 @@ private:
 	TickQueue<App> m_tickable;
 	xtime::TimeVal m_ticks;
 	int m_frameHistoryIdx;
+	StringTable::LangId m_langId;
 	FloatVec m_frameHistory;
 
 	static App *s_instance;

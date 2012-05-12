@@ -5,8 +5,13 @@
 // See Radiance/LICENSE for licensing terms.
 
 #include "App.h"
+#include "Engine.h"
 #include "SkAnim/SkAnim.h"
+#include "Utils/Tokenizer.h"
+#include <Runtime/File.h>
 #include <Runtime/Time.h>
+
+StringTable::LangId __SystemLanguage();
 
 //#define FRAME_SMOOTH
 #if defined(FRAME_SMOOTH)
@@ -15,22 +20,23 @@ enum { FrameHistorySize = 15 };
 
 App *App::s_instance = 0;
 
-App *App::Get()
-{
+App *App::Get() {
 	if (!s_instance)
 		s_instance = New();
 	return s_instance;
 }
 
-void App::DestroyInstance()
-{
+void App::DestroyInstance() {
 	if (s_instance)
 		delete s_instance;
 	s_instance = 0;
 }
 
-void App::DumpMemStats(int level)
-{
+StringTable::LangId App::RAD_IMPLEMENT_GET(systemLangId) {
+	return __SystemLanguage();
+}
+
+void App::DumpMemStats(int level) {
 	SizeBuffer buf;
 	
 	COut(level) << "MemStats: " << std::endl;
@@ -68,7 +74,8 @@ App::App() :
 m_ticks(0),
 m_exit(false),
 m_time(0.f),
-m_frameHistoryIdx(0)
+m_frameHistoryIdx(0),
+m_langId(StringTable::LangId_EN)
 #if defined(RAD_OPT_PC_TOOLS)
 ,m_editor(false)
 #endif
@@ -79,35 +86,103 @@ m_frameHistoryIdx(0)
 #endif
 }
 
-App::~App()
-{
+App::~App() {
 	if (m_e)
 		delete m_e;
 }
 
-bool App::PreInit()
-{
-	return engine->PreInit();
+bool App::PreInit() {
+	if (!engine->PreInit())
+		return false;
+	m_langId = LoadLangId();
+	return true;
 }
 
-bool App::Initialize()
-{
+StringTable::LangId App::LoadLangId(int *enabledLangMask) {
+
+	const StringTable::LangId ErrLang = StringTable::LangId_EN;
+	if (enabledLangMask)
+		*enabledLangMask = StringTable::LangFlag_EN;
+
+	wchar_t nativePath[file::MaxFilePathLen+1];
+	file::ExpandToNativePath(L"9:/languages.txt", nativePath, file::MaxFilePathLen+1);
+	FILE *fp = file::wfopen(nativePath, L"rb");
+	if (!fp)
+		return ErrLang;
+	fseek(fp, 0, SEEK_END);
+	size_t size = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+	void *data = safe_zone_malloc(ZEngine, size);
+	if (fread(data, 1, size, fp) != size) {
+		fclose(fp);
+		zone_free(data);
+		return ErrLang;
+	}
+	fclose(fp);
+
+	Tokenizer script;
+	script.InitParsing((const char *)data, (int)size);
+	zone_free(data);
+
+	int validLangBits = StringTable::LangFlag_EN;
+	StringTable::LangId defaultLang = StringTable::LangId_EN;
+
+	String token;
+	while (script.GetToken(token)) {
+		if (token == "DEFAULT") {
+			if (!script.IsNextToken("="))
+				return ErrLang;
+			if (!script.GetToken(token))
+				return ErrLang;
+			token = token.lower();
+			int id = StringTable::Map(token.c_str());
+			if (id != -1)
+				defaultLang = (StringTable::LangId)id;
+		} else if (token == "FORCE") {
+			if (!script.IsNextToken("="))
+				return ErrLang;
+			if (!script.GetToken(token))
+				return ErrLang;
+			token = token.lower();
+			int id = StringTable::Map(token.c_str());
+			if (id != -1) {
+				if (enabledLangMask) // make sure to set this
+					*enabledLangMask = validLangBits;
+				return (StringTable::LangId)id;
+			}
+		} else {
+			token = token.lower();
+			int id = StringTable::Map(token.c_str());
+			if (id != -1)
+				validLangBits |= (1<<id);
+		}
+	}
+
+	// If our system language isn't an enabled language then
+	// use our default language
+	StringTable::LangId langId = __SystemLanguage();
+	if (!((1<<langId) & validLangBits))
+		langId = defaultLang;
+
+	if (enabledLangMask)
+		*enabledLangMask = validLangBits;
+
+	return langId;
+}
+
+bool App::Initialize() {
 	return engine->Initialize();
 }
 
-void App::Finalize()
-{
+void App::Finalize() {
 	engine->Finalize();
 }
 
-void App::Run()
-{ // called to startup game
+void App::Run() { // called to startup game
 }
 
-float App::Tick()
-{
-	if (m_ticks == 0)
-	{
+float App::Tick() {
+	if (m_ticks == 0) {
 		m_ticks = xtime::ReadMilliseconds();
 	}
 
@@ -116,8 +191,7 @@ float App::Tick()
 		return 0.0f;
 
 	float elapsed = xtime::Constants<float>::MilliToSecond(float(ticks-m_ticks));
-	if (elapsed > 0)
-	{
+	if (elapsed > 0) {
 		if (elapsed > 1.f)
 			elapsed = 0.01f; // assume a hickup (load pause etc).
 		elapsed = CalcDt(elapsed);
@@ -132,13 +206,11 @@ float App::Tick()
 	return elapsed;
 }
 
-void App::ClearFrameHistory()
-{
+void App::ClearFrameHistory() {
 	m_frameHistory.clear();
 }
 
-float App::CalcDt(float dt)
-{
+float App::CalcDt(float dt) {
 #if defined(FRAME_SMOOTH)
 	if (m_frameHistoryIdx >= (int)m_frameHistory.size())
 		m_frameHistory.push_back(dt);
@@ -159,18 +231,15 @@ float App::CalcDt(float dt)
 #endif
 }
 
-void App::Push(const Tickable::Ref &state)
-{
+void App::Push(const Tickable::Ref &state) {
 	m_tickable.Push(state);
 }
 
-void App::Pop()
-{
+void App::Pop() {
 	m_tickable.Pop();
 }
 
-void App::DoTickable(float elapsed)
-{
+void App::DoTickable(float elapsed) {
 	m_tickable.Tick(*this, elapsed, xtime::TimeSlice::Infinite, 0);
 }
 

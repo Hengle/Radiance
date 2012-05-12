@@ -65,32 +65,34 @@ m_closeWhenFinished(false)
 		CenterWidget(*this, *parent);
 	}
 
-	m_sigMap = new QSignalMapper(this);
-	QVBoxLayout *vbox = new QVBoxLayout(this);
+	m_sigMap = new (ZEditor) QSignalMapper(this);
+	QVBoxLayout *vbox = new (ZEditor) QVBoxLayout(this);
 
-	m_textArea = new QPlainTextEdit(this);
+	m_textArea = new (ZEditor) QPlainTextEdit(this);
 	m_textArea->setUndoRedoEnabled(false);
 	m_textArea->setLineWrapMode(QPlainTextEdit::NoWrap);
 	m_textArea->setReadOnly(true);
 	vbox->addWidget(m_textArea);
 
 	MainWindow *mainWin = MainWindow::Get();
-	QHBoxLayout *hbox = new QHBoxLayout();
+	QHBoxLayout *hbox = new (ZEditor) QHBoxLayout();
 	vbox->addLayout(hbox);
 
-	QVBoxLayout *vGroupBox = new QVBoxLayout();
+	QVBoxLayout *vGroupBox = new (ZEditor) QVBoxLayout();
 
-	QGroupBox *targetGroup = new QGroupBox("Targets");
-	QGridLayout *grid = new QGridLayout(targetGroup);
+	QGroupBox *targetGroup = new (ZEditor) QGroupBox("Targets");
+	QGridLayout *grid = new (ZEditor) QGridLayout(targetGroup);
 	vGroupBox->addWidget(targetGroup);
 	
-	QGroupBox *compressionGroup = new QGroupBox("Compression");
-	QGridLayout *compressionGroupLayout = new QGridLayout(compressionGroup);
+	QGroupBox *compressionGroup = new (ZEditor) QGroupBox("Compression");
+	QGridLayout *compressionGroupLayout = new (ZEditor) QGridLayout(compressionGroup);
 	m_compression = new QSlider(Qt::Horizontal);
 	m_compression->setTickInterval(1);
 	m_compression->setTickPosition(QSlider::TicksBelow);
 	m_compression->setRange(data_codec::zlib::NoCompression, data_codec::zlib::BestCompression);
-	m_compression->setValue(mainWin->userPrefs->value("cook/compression", data_codec::zlib::BestCompression).toInt());
+	//m_compression->setValue(mainWin->userPrefs->value("cook/compression", data_codec::zlib::BestCompression).toInt());
+	m_compression->setValue(data_codec::zlib::NoCompression);
+	m_compression->setEnabled(false);
 	RAD_VERIFY(connect(m_compression, SIGNAL(valueChanged(int)), SLOT(CompressionChanged(int))));
 	compressionGroupLayout->addWidget(m_compression, 0, 0, 1, 3);
 	compressionGroupLayout->addWidget(new QLabel("None"), 1, 0);
@@ -109,7 +111,7 @@ m_closeWhenFinished(false)
 	{
 		QString name(pkg::PlatformNameForFlags(i));
 
-		QCheckBox *check = new QCheckBox(name);
+		QCheckBox *check = new (ZEditor) QCheckBox(name);
 		
 		bool checked = mainWin->userPrefs->value("cook/" + name, true).toBool();
 		check->setCheckState(checked ? Qt::Checked : Qt::Unchecked);
@@ -128,11 +130,11 @@ m_closeWhenFinished(false)
 
 	RAD_VERIFY(connect(m_sigMap, SIGNAL(mapped(int)), SLOT(OnCheckBoxChanged(int))));
 
-	QVBoxLayout *buttonLayout = new QVBoxLayout();
+	QVBoxLayout *buttonLayout = new (ZEditor) QVBoxLayout();
 	hbox->addLayout(buttonLayout);
 	hbox->setStretch(0, 1);
 
-	m_clean = new QCheckBox("Clean");
+	m_clean = new (ZEditor) QCheckBox("Clean");
 	m_clean->setChecked(
 		mainWin->userPrefs->value("cook/clean", true).toBool() ?
 		Qt::Checked :
@@ -141,7 +143,7 @@ m_closeWhenFinished(false)
 	RAD_VERIFY(connect(m_clean, SIGNAL(stateChanged(int)), SLOT(CleanChecked(int))));
 	buttonLayout->addWidget(m_clean);
 	
-	m_scriptsOnly = new QCheckBox("Scripts Only");
+	m_scriptsOnly = new (ZEditor) QCheckBox("Scripts Only");
 	m_scriptsOnly->setChecked(
 		mainWin->userPrefs->value("cook/scriptsOnly", false).toBool() ?
 		Qt::Checked :
@@ -162,7 +164,7 @@ m_closeWhenFinished(false)
 		m_scriptsOnly->setEnabled(false);
 	}
 	
-	m_cook = new QPushButton("Cook...");
+	m_cook = new (ZEditor) QPushButton("Cook...");
 	m_cook->resize(30, 20);
 	m_cook->setEnabled(m_platforms != 0);
 	RAD_VERIFY(connect(m_cook, SIGNAL(clicked()), SLOT(CookClicked())));
@@ -269,6 +271,17 @@ void CookerDialog::CookClicked()
 		}
 	}
 
+	int enabledLangMask;
+	App::LoadLangId(&enabledLangMask);
+	if (enabledLangMask == 0) {
+		QMessageBox::critical(
+			this,
+			"Error",
+			"languages.txt doesn't contain any valid languages!"
+		);
+		return;
+	}
+
 	m_textArea->clear();
 	m_cook->setText("Cancel...");
 
@@ -281,7 +294,8 @@ void CookerDialog::CookClicked()
 	m_thread = new CookThread(
 		m_glw,
 		roots, 
-		flags, 
+		flags,
+		enabledLangMask,
 		m_compression->value(),
 		*m_oStream
 	);
@@ -404,12 +418,14 @@ CookThread::CookThread(
 	GLWidget *glw,
 	const pkg::PackageMan::StringVec &roots,
 	int plats,
+	int languages,
 	int compression,
 	std::ostream &cout
 ) : 
 m_glw(glw),
 m_roots(roots), 
 m_plats(plats), 
+m_languages(languages),
 m_compression(compression),
 m_cout(&cout)
 {
@@ -423,7 +439,7 @@ void CookThread::Cancel()
 void CookThread::run()
 {
 	m_glw->bindGL(true);
-	App::Get()->engine->sys->packages->Cook(m_roots, m_plats, m_compression, *m_cout);
+	App::Get()->engine->sys->packages->Cook(m_roots, m_plats, m_languages, m_compression, *m_cout);
 	m_glw->unbindGL();
 	emit Finished();
 }

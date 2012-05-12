@@ -35,6 +35,7 @@ public:
 		GLWidget *glw,
 		const pkg::PackageMan::StringVec &roots,
 		int plats, 
+		int languages,
 		int compression,
 		std::ostream &cout
 	);
@@ -55,6 +56,7 @@ private:
 	std::ostream *m_cout;
 	GLWidget *m_glw;
 	int m_plats;
+	int m_languages;
 	int m_compression;
 };
 

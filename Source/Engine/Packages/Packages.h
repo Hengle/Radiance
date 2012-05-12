@@ -313,7 +313,7 @@ public:
 	typedef CookerRef Ref;
 	typedef zone_vector<Ref, ZPackagesT>::type Vec;
 
-	Cooker(int version) : m_version(version) {}
+	Cooker(int version) : m_version(version), m_languages(0) {}
 	virtual ~Cooker() {}
 
 	virtual CookStatus Status(int flags, int allflags) = 0;
@@ -361,11 +361,14 @@ protected:
 	int CompareVersion(int target, bool updateIfNewer=true);
 	int CompareModifiedTime(int target, bool updateIfNewer=true);
 	int CompareCachedFileTime(int target, const char *key, const char *path, bool updateIfNewer=true);
-	int CompareCachedFileTimeKey(int target, const char *key, bool updateIfNewer=true);
+	int CompareCachedFileTimeKey(int target, const char *key, const char *localized = 0, bool updateIfNewer=true);
+	int CompareCachedStringKey(int target, const char *key);
+	int CompareCachedLocalizeKey(int target, const char *key);
 	bool ModifiedTime(int target, xtime::TimeDate &td) const;
 	bool TimeForKey(int target, const char *key, xtime::TimeDate &td) const;
 
 	static String TargetPath(int target);
+	static String LocalizedString(int languages);
 	
 	RAD_DECLARE_READONLY_PROPERTY(Cooker, engine, Engine*);
 	RAD_DECLARE_READONLY_PROPERTY(Cooker, cout, std::ostream&);
@@ -374,6 +377,7 @@ protected:
 	RAD_DECLARE_READONLY_PROPERTY(Cooker, assetName, const char*);
 	RAD_DECLARE_READONLY_PROPERTY(Cooker, globals, world::Keys*);
 	RAD_DECLARE_READONLY_PROPERTY(Cooker, version, int);
+	RAD_DECLARE_READONLY_PROPERTY(Cooker, languages, int);
 
 private:
 
@@ -386,6 +390,9 @@ private:
 	RAD_DECLARE_GET(assetName, const char*) { return m_assetName.c_str(); }
 	RAD_DECLARE_GET(globals, world::Keys*) { return m_globals->keys; }
 	RAD_DECLARE_GET(version, int) { return m_version; }
+	RAD_DECLARE_GET(languages, int) {
+		return m_languages;
+	}
 
 	WString TagPath(int pflags);
 
@@ -415,6 +422,7 @@ private:
 	String m_assetName;
 	asset::Type m_type;
 	Persistence::Ref m_globals;
+	int m_languages;
 	int m_version;
 	bool m_cooking;
 };
@@ -840,6 +848,7 @@ public:
 	int Cook(
 		const StringVec &roots,
 		int flags,
+		int languages,
 		int compression,
 		std::ostream &out
 	);
@@ -1004,6 +1013,7 @@ private:
 		typedef boost::shared_ptr<CookState> Ref;
 		CookerMap cookers;
 		std::ostream *cout;
+		int languages;
 	};
 
 	struct CookPackage

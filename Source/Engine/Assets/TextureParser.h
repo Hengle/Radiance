@@ -8,6 +8,7 @@
 #include "AssetTypes.h"
 #include "../Packages/Packages.h"
 #include "../FileSystem/FileSystem.h"
+#include "../StringTable.h"
 #include <Runtime/ImageCodec/ImageCodec.h>
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/PushPack.h>
@@ -22,36 +23,32 @@ namespace pvrtexlib {
 
 namespace asset {
 
-struct TextureTag
-{
-	enum
-	{
+struct TextureTag {
+	enum {
 		RAD_FLAG(WrapS),
 		RAD_FLAG(WrapT),
 		RAD_FLAG(WrapR),
 		RAD_FLAG(Mipmap),
-		RAD_FLAG(Filter)
+		RAD_FLAG(Filter),
+		RAD_FLAG(Localized)
 	};
 
 	U8 flags;
 };
 
-class RADENG_CLASS TextureParser : public pkg::Sink<TextureParser>
-{
+class RADENG_CLASS TextureParser : public pkg::Sink<TextureParser> {
 public:
 
 	static void Register(Engine &engine);
 
-	enum 
-	{ 
+	enum  { 
 		SinkStage = pkg::SS_Parser,
 		AssetType = AT_Texture
 	};
 
 	typedef boost::shared_ptr<TextureParser> Ref;
 
-	struct Header
-	{
+	struct Header {
 		UReg format;
 		int width;
 		int height;
@@ -62,6 +59,10 @@ public:
 	virtual ~TextureParser();
 
 	const image_codec::Image *Image(int idx) const;
+
+#if defined(RAD_OPT_TOOLS)
+	RAD_DECLARE_PROPERTY(TextureParser, langId, StringTable::LangId, StringTable::LangId);
+#endif
 
 	RAD_DECLARE_READONLY_PROPERTY(TextureParser, numImages, int);
 	RAD_DECLARE_READONLY_PROPERTY(TextureParser, imgValid, bool);
@@ -80,8 +81,7 @@ protected:
 
 private:
 
-	enum
-	{
+	enum {
 		S_None,
 		S_Loading,
 		S_Parsing,
@@ -158,11 +158,33 @@ private:
 		int flags
 	);
 
-	RAD_DECLARE_GET(numImages, int) { return (int)m_images.size(); }
-	RAD_DECLARE_GET(header, const Header *) { return &m_header; }
-	RAD_DECLARE_GET(imgValid, bool) { return m_state == S_Done; }
-	RAD_DECLARE_GET(headerValid, bool) { return m_state == S_Done || m_state == S_Header; }
-	RAD_DECLARE_GET(tag, const TextureTag*) { return &m_tag; }
+	RAD_DECLARE_GET(numImages, int) { 
+		return (int)m_images.size(); 
+	}
+
+	RAD_DECLARE_GET(header, const Header *) { 
+		return &m_header; 
+	}
+
+	RAD_DECLARE_GET(imgValid, bool) { 
+		return m_state == S_Done; 
+	}
+
+	RAD_DECLARE_GET(headerValid, bool) { 
+		return m_state == S_Done || m_state == S_Header; 
+	}
+
+	RAD_DECLARE_GET(tag, const TextureTag*) { 
+		return &m_tag; 
+	}
+
+	RAD_DECLARE_GET(langId, StringTable::LangId) {
+		return m_langId;
+	}
+
+	RAD_DECLARE_SET(langId, StringTable::LangId) {
+		m_langId = value;
+	}
 
 	typedef zone_vector<image_codec::Image::Ref, ZEngineT>::type ImageVec;
 	typedef zone_vector<file::HBufferedAsyncIO, ZEngineT>::type IOVec;
@@ -174,6 +196,7 @@ private:
 #if defined(RAD_OPT_TOOLS)
 	IOVec m_bufs;
 	pkg::Cooker::Ref m_cooker;
+	StringTable::LangId m_langId;
 #endif
 	file::HBufferedAsyncIO m_buf;
 	TextureTag m_tag;

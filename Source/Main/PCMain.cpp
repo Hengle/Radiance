@@ -107,7 +107,7 @@ bool s_editor = false;
 
 }
 
-StringTable::LangId __DefaultLanguage() {
+StringTable::LangId __SystemLanguage() {
 	LANGID winId = GetUserDefaultUILanguage();
 	StringTable::LangId id;
 

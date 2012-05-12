@@ -21,6 +21,7 @@
 // a game. PVRTexLib, DDS, JPEG, TGA loading is only part of development/tools builds of the engine.
 
 #include "TextureParser.h"
+#include "../App.h"
 #include "../Engine.h"
 #include <Runtime/File.h>
 
@@ -49,16 +50,16 @@ using namespace pkg;
 namespace asset {
 
 TextureParser::TextureParser()
-: m_state(S_None), m_load(false)
-{
+: m_state(S_None), m_load(false) {
+#if defined(RAD_OPT_TOOLS)
+	m_langId = App::Get()->langId;
+#endif
 }
 
-TextureParser::~TextureParser()
-{
+TextureParser::~TextureParser() {
 }
 
-const image_codec::Image *TextureParser::Image(int idx) const 
-{
+const image_codec::Image *TextureParser::Image(int idx) const  {
 	return m_images[idx].get();
 }
 
@@ -67,10 +68,8 @@ int TextureParser::Process(
 	Engine &engine,
 	const AssetRef &asset,
 	int flags
-)
-{
-	if (flags&(P_Unload|P_Trim))
-	{
+) {
+	if (flags&(P_Unload|P_Trim)) {
 		if (flags&P_Unload)
 			m_load = false;
 		m_state = headerValid ? S_Header : S_None;
@@ -85,8 +84,7 @@ int TextureParser::Process(
 		return SR_Success;
 	}
 
-	if ((flags&P_Cancel))
-	{
+	if ((flags&P_Cancel)) {
 		m_images.clear();
 		STLContainerShrinkToSize(m_images);
 #if defined(RAD_OPT_TOOLS)
@@ -109,8 +107,7 @@ int TextureParser::Process(
 	if (m_state < 0)
 		return m_state; // error code
 
-	if (m_state == S_Header)
-	{
+	if (m_state == S_Header) {
 		m_buf.Close();
 		m_images.clear();
 #if defined(RAD_OPT_TOOLS)
@@ -122,10 +119,8 @@ int TextureParser::Process(
 	int r = SR_Success;
 
 #if defined(RAD_OPT_TOOLS)
-	if (!asset->cooked && ((flags&(P_Info|P_Parse|P_Unformatted)) || !(flags&P_FastPath)))
-	{
-		switch (m_state)
-		{
+	if (!asset->cooked && ((flags&(P_Info|P_Parse|P_Unformatted)) || !(flags&P_FastPath))) {
+		switch (m_state) {
 		case S_None:
 			r = Load(engine, time, asset, flags);
 			break;
@@ -143,8 +138,7 @@ int TextureParser::Process(
 		r = LoadCooked(engine, time, asset, flags);
 	}
 
-	if (r < 0)
-	{
+	if (r < 0) {
 		m_state = r;
 	}
 
@@ -158,39 +152,61 @@ int TextureParser::LoadCooked(
 	const xtime::TimeSlice &time,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
+) {
 	if (m_state == S_Done)
 		return SR_Success;
 
-	if (m_state == S_None)
-	{
+	if (m_state == S_None) {
+
 #if defined(RAD_OPT_TOOLS)
-		if (!asset->cooked)
-		{
+		if (!asset->cooked) {
+
 			m_cooker = asset->AllocateIntermediateCooker();
+
 			CookStatus status = m_cooker->Status(0, P_TARGET_FLAGS(flags));
 
 			if (status == CS_Ignore)
 				return SR_CompilerError;
 
-			if (status == CS_NeedRebuild)
-			{
+			if (status == CS_NeedRebuild) {
 				COut(C_Info) << asset->path.get() << " is out of date, rebuilding..." << std::endl;
 				int r = m_cooker->Cook(0, P_TARGET_FLAGS(flags));
 				if (r != SR_Success)
 					return r;
 			}
-			else
-			{
+			else {
 				COut(C_Info) << asset->path.get() << " is up to date, using cache." << std::endl;
 			}
 
+			// Load TAG
+
+			file::HBufferedAsyncIO buf;
+			int media = file::AllMedia;
+			int r = m_cooker->LoadTag(
+				0,
+				media,
+				buf,
+				file::HIONotify()
+			);
+			if (r < SR_Success)
+				return r;
+			buf->WaitForCompletion();
+			const asset::TextureTag *tag = (const asset::TextureTag*)buf->data->ptr.get();
+			m_tag = *tag;
+
+			// Load Texture
+
 			WString path(string::Widen(asset->path));
+
+			if ((m_tag.flags&TextureTag::Localized) && (m_langId != StringTable::LangId_EN)) {
+				path += L"_";
+				path += string::Widen(StringTable::Langs[m_langId]);
+			}
+
 			path += L".bin";
 
-			int media = file::AllMedia;
-			int r = m_cooker->LoadFile( // load cooked data.
+			media = file::AllMedia;
+			r = m_cooker->LoadFile( // load cooked data.
 				path.c_str(),
 				0,
 				media,
@@ -203,9 +219,20 @@ int TextureParser::LoadCooked(
 		}
 		else {
 #endif
+		const asset::TextureTag *tag = (const asset::TextureTag*)asset->entry->TagData(P_TARGET_FLAGS(flags));
+		if (!tag)
+			return SR_MetaError;
+		m_tag = *tag;
+
 		// load file...
 		WString path(L"Cooked/");
 		path += string::Widen(asset->path);
+
+		if ((m_tag.flags&TextureTag::Localized) && (m_langId != StringTable::LangId_EN)) {
+			path += L"_";
+			path += string::Widen(StringTable::Langs[m_langId]);
+		}
+
 		path += L".bin";
 
 		int media = file::AllMedia;
@@ -229,8 +256,7 @@ int TextureParser::LoadCooked(
 	}
 
 	RAD_ASSERT(m_buf);
-	if (m_buf->result == file::Pending)
-	{
+	if (m_buf->result == file::Pending) {
 		if (time.infinite)
 			m_buf->WaitForCompletion();
 		else
@@ -239,33 +265,6 @@ int TextureParser::LoadCooked(
 
 	if (m_buf->result < file::Success)
 		return m_buf->result;
-
-#if defined(RAD_OPT_TOOLS)
-	if (!asset->cooked)
-	{
-		file::HBufferedAsyncIO buf;
-		int media = file::AllMedia;
-		int r = m_cooker->LoadTag(
-			0,
-			media,
-			buf,
-			file::HIONotify()
-		);
-		if (r < SR_Success)
-			return r;
-		buf->WaitForCompletion();
-		const asset::TextureTag *tag = (const asset::TextureTag*)buf->data->ptr.get();
-		m_tag = *tag;
-	}
-	else {
-#endif
-	const asset::TextureTag *tag = (const asset::TextureTag*)asset->entry->TagData(P_TARGET_FLAGS(flags));
-	if (!tag)
-		return SR_MetaError;
-	m_tag = *tag;
-#if defined(RAD_OPT_TOOLS)
-	}
-#endif
 
 	const AddrSize size = m_buf->data->size.get();
 	const void *data = m_buf->data->ptr.get();
@@ -276,8 +275,7 @@ int TextureParser::LoadCooked(
 	bytes += sizeof(U32);
 
 	m_images.reserve(numImages);
-	for (U32 i = 0; i < numImages; ++i)
-	{
+	for (U32 i = 0; i < numImages; ++i) {
 		image_codec::Image::Ref img(new (ZEngine) image_codec::Image(r::ZTextures));
 
 		U32 format, bpp, numFrames;
@@ -293,8 +291,7 @@ int TextureParser::LoadCooked(
 		img->bpp = bpp;
 		img->AllocateFrames(numFrames);
 
-		for (UReg f = 0; f < img->frameCount; ++f)
-		{
+		for (UReg f = 0; f < img->frameCount; ++f) {
 			image_codec::Frame &frame = img->frames[f];
 			CHECK_SIZE(sizeof(U32));
 			img->AllocateMipmaps(f, *reinterpret_cast<const U32*>(bytes));
@@ -305,8 +302,7 @@ int TextureParser::LoadCooked(
 			frame.flags |= image_codec::SharedFrameFlagRef;
 			bytes += sizeof(U32);
 
-			for (UReg m = 0; m < frame.mipCount; ++m)
-			{
+			for (UReg m = 0; m < frame.mipCount; ++m) {
 				image_codec::Mipmap &mip = frame.mipmaps[m];
 
 				CHECK_SIZE(sizeof(U32));
@@ -348,26 +344,38 @@ int TextureParser::Load(
 	const xtime::TimeSlice &time,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
+) {
 	const String *name = asset->entry->KeyValue<String>("Source.File", P_TARGET_FLAGS(flags));
 
 	if (!name)
-	{
 		return pkg::SR_MetaError;
-	}
 
 	WString wname(string::Widen(name->c_str()));
 
+	const bool *localized = asset->entry->KeyValue<bool>("Localized", P_TARGET_FLAGS(flags));
+	if (!localized)
+		return pkg::SR_MetaError;
+
+	if (*localized && (m_langId != StringTable::LangId_EN)) {
+		// create localized file path.
+		wchar_t ext[file::MaxFilePathLen+1];
+		wchar_t path[file::MaxFilePathLen+1];
+
+		file::FileExt(wname.c_str(), ext, file::MaxFilePathLen+1);
+		file::SetFileExt(wname.c_str(), 0, path, file::MaxFilePathLen+1);
+	
+		wname = path;
+		wname += L"_";
+		wname += string::Widen(StringTable::Langs[m_langId]);
+		wname += ext;
+	}
+
 	int media = file::AllMedia;
 
-	if (!(flags&P_NoDefaultMedia))
-	{
-		if (wname.empty() || !engine.sys->files->FileExists(wname.c_str(), media))
-		{
+	if (!(flags&P_NoDefaultMedia)) {
+		if (wname.empty() || !engine.sys->files->FileExists(wname.c_str(), media)) {
 			wname = L"Textures/Missing_Texture.tga";
-			if (!engine.sys->files->FileExists(wname.c_str(), media))
-			{
+			if (!engine.sys->files->FileExists(wname.c_str(), media)) {
 				return pkg::SR_MissingFile;
 			}
 		}
@@ -376,14 +384,11 @@ int TextureParser::Load(
 	m_fmt = Format(wname.c_str());
 
 	if (m_fmt < 0)
-	{
 		return pkg::SR_InvalidFormat;
-	}
 
 	int r;
 
-	if (flags&P_Info) // read enough to parse header
-	{
+	if (flags&P_Info) { // read enough to parse header
 		file::HFile file;
 		file::HBufferedAsyncIO buf;
 
@@ -395,8 +400,7 @@ int TextureParser::Load(
 		);
 
 		RAD_ASSERT(r <= file::Success);
-		if (r == file::Success)
-		{
+		if (r == file::Success) {
 			buf = engine.sys->files->SafeCreateBufferedIO(Kilo);
 			r = file->Read(buf, 0, Kilo, file::HIONotify());
 			m_bufs.push_back(buf);
@@ -406,8 +410,7 @@ int TextureParser::Load(
 	{
 		wchar_t base[file::MaxFilePathLen+1];
 		file::FileBaseName(wname.c_str(), base, file::MaxFilePathLen+1);
-		if (base[0] == L'+')
-		{ // bundle, load all frames simultaneously
+		if (base[0] == L'+') { // bundle, load all frames simultaneously
 			wchar_t ext[file::MaxFilePathLen+1];
 			wchar_t path[file::MaxFilePathLen+1];
 
@@ -435,15 +438,13 @@ int TextureParser::Load(
 
 				if (r < file::Success)
 					break;
-//				COut(C_Debug) << "Loading: " << string::Shorten(x) << std::endl;
 				m_bufs.push_back(buf);
 			}
 
 			if (!m_bufs.empty() && (r == file::ErrorFileNotFound))
 				r = file::Pending;
 		}
-		else
-		{
+		else {
 			file::HBufferedAsyncIO buf;
 			r = engine.sys->files->LoadFile(
 				wname.c_str(), 
@@ -455,16 +456,14 @@ int TextureParser::Load(
 		}
 	}
 
-	if (r < file::Success)
-	{
+	if (r < file::Success) {
 		m_bufs.clear();
 		return r;
 	}
 
 	m_state = S_Loading;
 	
-	if (time.remaining)
-	{
+	if (time.remaining) {
 		r = Loading(engine, time, asset, flags);
 	}
 
@@ -476,26 +475,20 @@ int TextureParser::Loading(
 	const xtime::TimeSlice &time,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
-	for (IOVec::const_iterator it = m_bufs.begin(); it != m_bufs.end(); ++it)
-	{
+) {
+	for (IOVec::const_iterator it = m_bufs.begin(); it != m_bufs.end(); ++it) {
 		const file::HBufferedAsyncIO &buf = *it;
 
-		if (buf->result == file::Pending)
-		{
-			if (time.infinite)
-			{
+		if (buf->result == file::Pending) {
+			if (time.infinite) {
 				buf->WaitForCompletion();
 			}
-			else
-			{
+			else {
 				return SR_Pending;
 			}
 		}
 
-		if (buf->result < file::Success)
-		{
+		if (buf->result < file::Success) {
 			return buf->result;
 		}
 	}
@@ -509,8 +502,7 @@ int TextureParser::Parsing(
 	const xtime::TimeSlice &time,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
+) {
 	RAD_ASSERT(m_fmt >= 0);
 
 	if (m_bufs.empty())
@@ -518,12 +510,10 @@ int TextureParser::Parsing(
 
 	int r = SR_InvalidFormat;
 
-	if (flags&P_Info)
-	{
+	if (flags&P_Info) {
 		image_codec::Image::Ref img(new (ZEngine) image_codec::Image(r::ZTextures));
 
-		switch (m_fmt)
-		{
+		switch (m_fmt) {
 		case F_Tga:
 			r = image_codec::tga::DecodeHeader(
 				m_bufs[0]->data->ptr,
@@ -556,16 +546,12 @@ int TextureParser::Parsing(
 
 		if (r == SR_Success)
 			m_images.push_back(img);
-	}
-	else
-	{
-		for (IOVec::iterator it = m_bufs.begin(); it != m_bufs.end(); ++it)
-		{
+	} else {
+		for (IOVec::iterator it = m_bufs.begin(); it != m_bufs.end(); ++it) {
 			file::HBufferedAsyncIO &buf = *it;
 			image_codec::Image::Ref img(new (ZEngine) image_codec::Image(r::ZTextures));
 
-			switch (m_fmt)
-			{
+			switch (m_fmt) {
 			case F_Tga:
 				r = image_codec::tga::Decode(
 					buf->data->ptr,
@@ -606,29 +592,23 @@ int TextureParser::Parsing(
 		}
 	}
 
-	if (r == SR_Success)
-	{
+	if (r == SR_Success) {
 		ImageVec::const_iterator it;
-		for (it = m_images.begin(); it != m_images.end(); ++it)
-		{
+		for (it = m_images.begin(); it != m_images.end(); ++it) {
 			const image_codec::Image::Ref &img = *it;
 			if (img->frameCount < 1)
 				break;
 			UReg i;
-			for (i = 0; i < img->frameCount; ++i)
-			{
+			for (i = 0; i < img->frameCount; ++i) {
 				if (img->frames[i].mipCount < 1)
 					break;
-				if (i == 0 && it == m_images.begin())
-				{
+				if (i == 0 && it == m_images.begin()) {
 					// copy to header.
 					m_header.format = img->format;
 					m_header.width = (int)img->frames[i].mipmaps[0].width;
 					m_header.height = (int)img->frames[i].mipmaps[0].height;
 					m_header.numMips = (int)img->frames[i].mipCount;
-				}
-				else
-				{
+				} else {
 					if (img->frames[i].mipmaps[0].width != m_header.width)
 						break;
 					if (img->frames[i].mipmaps[0].height != m_header.height)
@@ -642,12 +622,9 @@ int TextureParser::Parsing(
 		if (it != m_images.end())
 			r = SR_InvalidFormat;
 
-		if (r == SR_Success)
-		{
-			if (flags&(P_Load|P_Parse))
-			{
-				if (!(flags&P_Unformatted))
-				{
+		if (r == SR_Success) {
+			if (flags&(P_Load|P_Parse)) {
+				if (!(flags&P_Unformatted)) {
 					TextureTag tag;
 					tag.flags = 0;
 
@@ -677,22 +654,17 @@ int TextureParser::Parsing(
 					tag.flags |= *b ? TextureTag::Filter : 0;
 					
 					// Test wrap/mipmap contraints on IOS.
-					if (tag.flags&(TextureTag::WrapS|TextureTag::WrapT|TextureTag::WrapR|TextureTag::Mipmap))
-					{
-						for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it)
-						{
+					if (tag.flags&(TextureTag::WrapS|TextureTag::WrapT|TextureTag::WrapR|TextureTag::Mipmap)) {
+						for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it) {
 							image_codec::Image::Ref &image = *it;
 
 							UReg f;
-							for (f = 0; f < image->frameCount; ++f)
-							{
+							for (f = 0; f < image->frameCount; ++f) {
 								const image_codec::Frame &frame = image->frames[f];
 								
-								if (frame.mipCount > 0)
-								{
+								if (frame.mipCount > 0) {
 									const image_codec::Mipmap &mip = frame.mipmaps[0];
-									if ((PowerOf2(mip.width) != mip.width) || (PowerOf2(mip.height) != mip.height))
-									{
+									if ((PowerOf2(mip.width) != mip.width) || (PowerOf2(mip.height) != mip.height)) {
 										COut(C_Warn) << "Error (iOS Target): " << asset->path.get() << " is not a power of 2 but is flagged for mipmap/wrap." << std::endl;
 										return SR_MetaError;
 									}
@@ -702,29 +674,23 @@ int TextureParser::Parsing(
 					}
 				}
 
-				if (flags&P_TargetIOS)
-				{
+				if (flags&P_TargetIOS) {
 					bool warn = false;
 
-					for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it)
-					{
+					for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it) {
 						image_codec::Image::Ref &img = *it;
 
-						if (img->format == image_codec::Format_RGB888)
-						{
-							if (!warn)
-							{
+						if (img->format == image_codec::Format_RGB888) {
+							if (!warn) {
 								warn = true;
 								COut(C_Warn) << "Converting: " << asset->path.get() << " expanding RGB texture to RGBA for iOS target." << std::endl;
 								
 								m_header.format = image_codec::Format_RGBA8888;
 							}
 
-							for (UReg i = 0; i < img->frameCount; ++i)
-							{
+							for (UReg i = 0; i < img->frameCount; ++i) {
 								image_codec::Frame &sf = img->frames[i];
-								for (UReg k = 0; k < sf.mipCount; ++k)
-								{
+								for (UReg k = 0; k < sf.mipCount; ++k) {
 									image_codec::Mipmap &sm = sf.mipmaps[k];
 
 									U8 *data = (U8*)safe_zone_malloc(image_codec::ZImageCodec, sm.width*sm.height*4);
@@ -750,8 +716,7 @@ int TextureParser::Parsing(
 				flags
 			);
 
-			if (r == SR_Success)
-			{
+			if (r == SR_Success) {
 				r = Mipmap(
 					engine,
 					time,
@@ -760,8 +725,7 @@ int TextureParser::Parsing(
 				);
 			}
 			
-			if (r == SR_Success)
-			{
+			if (r == SR_Success) {
 				r = Compress(
 					engine,
 					time,
@@ -777,8 +741,7 @@ int TextureParser::Parsing(
 
 	m_bufs.clear(); // release file data.
 
-	if (r < 0)
-	{
+	if (r < 0) {
 		m_images.clear();
 		STLContainerShrinkToSize(m_images);
 	}
@@ -786,28 +749,23 @@ int TextureParser::Parsing(
 	return r;
 }
 
-int TextureParser::Format(const wchar_t *name)
-{
+int TextureParser::Format(const wchar_t *name) {
 	wchar_t ext[file::MaxFilePathLen+1];
 	file::FileExt(name, ext, file::MaxFilePathLen+1);
 
-	if (!string::icmp(ext, L".tga"))
-	{
+	if (!string::icmp(ext, L".tga")) {
 		return F_Tga;
 	}
 
-	if (!string::icmp(ext, L".dds"))
-	{
+	if (!string::icmp(ext, L".dds")) {
 		return F_Dds;
 	}
 
-	if (!string::icmp(ext, L".png"))
-	{
+	if (!string::icmp(ext, L".png")) {
 		return F_Png;
 	}
 
-	if (!string::icmp(ext, L".bmp"))
-	{
+	if (!string::icmp(ext, L".bmp")) {
 		return F_Bmp;
 	}
 
@@ -819,11 +777,8 @@ int TextureParser::Resize(
 	const xtime::TimeSlice &time,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
-	if ((flags&P_Unformatted) ||
-		(RAD_IMAGECODEC_FAMILY(m_header.format) == image_codec::DDSFamily))
-	{
+) {
+	if ((flags&P_Unformatted) || (RAD_IMAGECODEC_FAMILY(m_header.format) == image_codec::DDSFamily)) {
 		return SR_Success;
 	}
 
@@ -832,8 +787,7 @@ int TextureParser::Resize(
 	if (!b)
 		return SR_MetaError;
 
-	if (*b)
-	{
+	if (*b) {
 		const int *w = asset->entry->KeyValue<int>("Resize.Width", P_TARGET_FLAGS(flags));
 		const int *h = asset->entry->KeyValue<int>("Resize.Height", P_TARGET_FLAGS(flags));
 
@@ -841,13 +795,10 @@ int TextureParser::Resize(
 			return SR_MetaError;
 
 		if (*w != m_header.width || 
-			*h != m_header.height)
-		{
+			*h != m_header.height) {
 			// format supports resize?
-			if (RAD_IMAGECODEC_FAMILY(m_header.format) != image_codec::DDSFamily)
-			{
-				if (flags&(P_Load|P_Parse))
-				{
+			if (RAD_IMAGECODEC_FAMILY(m_header.format) != image_codec::DDSFamily) {
+				if (flags&(P_Load|P_Parse)) {
 					GLenum internal, format, type;
 					r::GLImageFormat(m_header.format, internal, format, type, GL_ALPHA);
 
@@ -862,8 +813,7 @@ int TextureParser::Resize(
 						m_images[0]->bpp
 					);
 
-					for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it)
-					{
+					for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it) {
 						image_codec::Image::Ref &img = *it;
 						image_codec::Image src;
 						src.Swap(*img);
@@ -872,8 +822,7 @@ int TextureParser::Resize(
 						img->bpp = src.bpp;
 						img->AllocateFrames(src.frameCount);
 
-						for (UReg i = 0; i < src.frameCount; ++i)
-						{
+						for (UReg i = 0; i < src.frameCount; ++i) {
 							img->AllocateMipmaps(i, 1);
 							img->AllocateMipmap(i, 0, (UReg)*w, (UReg)*h, (*w)*src.bpp, (*w)*(*h)*src.bpp);
 
@@ -918,12 +867,10 @@ int TextureParser::Mipmap(
 	const xtime::TimeSlice &time,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
+) {
 
 	if ((flags&P_Unformatted) ||
-		(RAD_IMAGECODEC_FAMILY(m_header.format) == image_codec::DDSFamily))
-	{
+		(RAD_IMAGECODEC_FAMILY(m_header.format) == image_codec::DDSFamily)) {
 		return SR_Success;
 	}
 
@@ -949,14 +896,12 @@ int TextureParser::Mipmap(
 	if (compressed)
 		return SR_Success; // PVRTexLib generates mipmaps
 		
-	if (*b)
-	{
+	if (*b) {
 		int w = m_header.width;
 		int h = m_header.height;
 		UReg numMips = 1;
 
-		while (w > MinMipSize || h > MinMipSize)
-		{
+		while (w > MinMipSize || h > MinMipSize) {
 			if (w > MinMipSize)
 				w >>= 1;
 			if (h > MinMipSize)
@@ -974,8 +919,7 @@ int TextureParser::Mipmap(
 		if (!(flags&(P_Load|P_Parse)))
 			return SR_Success;
 
-		if (numMips > 1)
-		{
+		if (numMips > 1) {
 			GLenum internal, format, type;
 			r::GLImageFormat(m_header.format, internal, format, type, GL_ALPHA);
 
@@ -990,8 +934,7 @@ int TextureParser::Mipmap(
 				m_images[0]->bpp
 			);
 			
-			for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it)
-			{
+			for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it) {
 				image_codec::Image::Ref &img = *it;
 				image_codec::Image src;
 				src.Swap(*img);
@@ -1000,33 +943,27 @@ int TextureParser::Mipmap(
 				img->format = src.format;
 				img->AllocateFrames(src.frameCount);
 
-				for (UReg i = 0; i < src.frameCount; ++i)
-				{
+				for (UReg i = 0; i < src.frameCount; ++i) {
 					w = m_header.width;
 					h = m_header.height;
 
 					if (src.frames[i].mipCount < 1 ||
 						src.frames[i].mipmaps[0].width != (UReg)w ||
-						src.frames[i].mipmaps[0].height != (UReg)h)
-					{
+						src.frames[i].mipmaps[0].height != (UReg)h) {
 						return SR_InvalidFormat;
 					}
 
 					img->AllocateMipmaps(i, numMips);
-					for (UReg m = 0; m < numMips; ++m)
-					{
+					for (UReg m = 0; m < numMips; ++m) {
 						img->AllocateMipmap(i, m, w, h, w*src.bpp, w*h*src.bpp);
 						
-						if (w == m_header.width && h == m_header.height)
-						{
+						if (w == m_header.width && h == m_header.height) {
 							memcpy(
 								img->frames[i].mipmaps[m].data,
 								src.frames[i].mipmaps[0].data,
 								w*h*src.bpp
 							);
-						}
-						else
-						{
+						} else {
 							gluScaleImage(
 								format,
 								(GLint)m_header.width,
@@ -1069,13 +1006,11 @@ int TextureParser::Compress(
 	const xtime::TimeSlice &time,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
+) {
 #if defined(RAD_OPT_PC_TOOLS)
 	if ((flags&P_Unformatted) || 
 		(m_header.format != image_codec::Format_RGB888 &&
-		 m_header.format != image_codec::Format_RGBA8888))
-	{
+		 m_header.format != image_codec::Format_RGBA8888)) {
 		return SR_Success;
 	}
 
@@ -1089,16 +1024,13 @@ int TextureParser::Compress(
 		return SR_Success;
 	
 	if (!IsPowerOf2(m_header.width) || 
-		!IsPowerOf2(m_header.height))
-	{
+		!IsPowerOf2(m_header.height)) {
 		COut(C_Error) << "Error: " << asset->path.get() << " is flagged for DXT/PVR compression but is not a power of two. " << std::endl;
 		return SR_MetaError;
 	}
 	
-	if (m_header.width != m_header.height)
-	{
-		if (flags&(P_TargetIOS))
-		{
+	if (m_header.width != m_header.height) {
+		if (flags&(P_TargetIOS)) {
 			COut(C_Error) << "Error: " << asset->path.get() << " is flagged for DXT/PVR compression but is not square. " << std::endl;
 			return SR_MetaError;
 		}
@@ -1111,13 +1043,11 @@ int TextureParser::Compress(
 	
 	int numMips = 1;
 	
-	if (*b)
-	{
+	if (*b) {
 		int w = m_header.width;
 		int h = m_header.height;
 		
-		while (w > MinMipSize || h > MinMipSize)
-		{
+		while (w > MinMipSize || h > MinMipSize) {
 			if (w > MinMipSize)
 				w >>= 1;
 			if (h > MinMipSize)
@@ -1138,48 +1068,36 @@ int TextureParser::Compress(
 			return SR_InvalidFormat;
 		const image_codec::Image::Ref &img = m_images[0];
 
-		if (flags&P_TargetIOS)
-		{	
+		if (flags&P_TargetIOS) {	
 			if (*s == "DXT1/PVR2" ||
 				*s == "DXT3/PVR2" ||
-				*s == "DXT5/PVR2")
-			{
+				*s == "DXT5/PVR2") {
 				twiddle = true;
 				pvrFormat = OGL_PVRTC2;
 				format = (img->bpp==4) ? image_codec::dds::Format_PVR2A : image_codec::dds::Format_PVR2;
-			}
-			else
-			{
+			} else {
 				twiddle = true;
 				pvrFormat = OGL_PVRTC4;
 				format = (img->bpp==4) ? image_codec::dds::Format_PVR4A : image_codec::dds::Format_PVR4;
 			}
-		}
-		else
-		{
+		} else {
 #if !defined(RAD_OPT_WIN)
 			COut(C_Warn) << "Warning: " << asset->path.get() << " is flagged for DXT compression but a compressor is not available on this platform. Compression setting ignored." << std::endl;
 			return SR_Success;
 #endif
 
 			if (*s == "DXT1/PVR2" ||
-				*s == "DXT1/PVR4")
-			{
+				*s == "DXT1/PVR4") {
 #if defined(RAD_OPT_WIN)
 				pvrFormat = D3D_DXT1;
 #endif
 				format = img->bpp==4 ? image_codec::dds::Format_DXT1A : image_codec::dds::Format_DXT1;
-			}
-			else if (*s == "DXT3/PVR2" ||
-					 *s == "DXT3/PVR4")
-			{
+			} else if (*s == "DXT3/PVR2" || *s == "DXT3/PVR4") {
 #if defined(RAD_OPT_WIN)
 				pvrFormat = D3D_DXT3;
 #endif
 				format = image_codec::dds::Format_DXT3;
-			}
-			else
-			{
+			} else {
 #if defined(RAD_OPT_WIN)
 				pvrFormat = D3D_DXT5;
 #endif
@@ -1195,8 +1113,7 @@ int TextureParser::Compress(
 
 	U8 *temp = 0;
 
-	for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it)
-	{
+	for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it) {
 		image_codec::Image::Ref &img = *it;
 		image_codec::Image src;
 		src.Swap(*img);
@@ -1204,15 +1121,13 @@ int TextureParser::Compress(
 		img->format = format;
 		
 		img->AllocateFrames(src.frameCount);
-		for (UReg i = 0; i < src.frameCount; ++i)
-		{
+		for (UReg i = 0; i < src.frameCount; ++i) {
 			const image_codec::Frame &sf = src.frames[i];
 			if (sf.mipCount < 1)
 				continue;
 			const image_codec::Mipmap &sm = sf.mipmaps[0];
 
-			switch (format)
-			{
+			switch (format) {
 			case image_codec::dds::Format_DXT1:
 			case image_codec::dds::Format_DXT1A:
 			case image_codec::dds::Format_DXT3:
@@ -1226,8 +1141,7 @@ int TextureParser::Compress(
 						temp = (U8*)safe_zone_malloc(image_codec::ZImageCodec, sm.width*sm.height*4);
 
 					U8 *data = (U8*)sm.data;
-					if (src.bpp != 4)
-					{
+					if (src.bpp != 4) {
 						image_codec::ConvertPixelData(
 							sm.data, 
 							sm.dataSize, 
@@ -1239,8 +1153,7 @@ int TextureParser::Compress(
 						data = temp;
 					}
 
-					PVRTRY
-					{
+					PVRTRY {
 						PVRTextureUtilities u;
 						CPVRTexture pvrSrc(
 							(unsigned int)sm.width,
@@ -1259,8 +1172,7 @@ int TextureParser::Compress(
 							data
 						);
 
-						if (numMips > 1)
-						{
+						if (numMips > 1) {
 							CPVRTextureHeader pvrMip(pvrSrc.getHeader());
 							pvrMip.setMipMapCount(numMips-1);
 							u.ProcessRawPVR(pvrSrc, pvrMip);
@@ -1270,16 +1182,14 @@ int TextureParser::Compress(
 						pvrDst.setPixelType(pvrFormat);
 
 						u.CompressPVR(pvrSrc, pvrDst, 0);
-						if (ExtractPVR(engine, i, pvrDst, *img) != SR_Success)
-						{
+						if (ExtractPVR(engine, i, pvrDst, *img) != SR_Success) {
 							if (temp)
 								zone_free(temp);
 							COut(C_Error) << "PVRTexLib compression failure: failed to extract PVR texture data!" << std::endl;
 							return SR_CompilerError;
 						}
 					}
-					PVRCATCH(e)
-					{
+					PVRCATCH(e) {
 						if (temp)
 							zone_free(temp);
 						COut(C_Error) << "PVRTexLib exception: " << e.what() << std::endl;
@@ -1293,10 +1203,8 @@ int TextureParser::Compress(
 		AddrSize srcSize=0;
 		AddrSize dstSize=0;
 
-		for (UReg i = 0; i < src.frameCount; ++i)
-		{
-			for (UReg m = 0; m < src.frames[i].mipCount; ++m)
-			{
+		for (UReg i = 0; i < src.frameCount; ++i) {
+			for (UReg m = 0; m < src.frames[i].mipCount; ++m) {
 				srcSize += src.frames[i].mipmaps[m].dataSize;
 				dstSize += img->frames[i].mipmaps[m].dataSize;
 			}
@@ -1339,8 +1247,7 @@ int TextureParser::ExtractPVR(
 	int frame,
 	CPVRTexture &src,
 	image_codec::Image &img
-)
-{
+) {
 	const U8 *data = (const U8*)src.getData().getData();
 	AddrSize len = (AddrSize)src.getData().getDataSize();
 
@@ -1352,8 +1259,7 @@ int TextureParser::ExtractPVR(
 		UReg format=0;
 
 		// What format?
-		switch (src.getPixelType())
-		{
+		switch (src.getPixelType()) {
 			case PVR_MGLPVR2:
 			case PVR_OGLPVR2:
 				format = (hasAlpha) ? image_codec::dds::Format_PVR2A : image_codec::dds::Format_PVR2;
@@ -1384,14 +1290,12 @@ int TextureParser::ExtractPVR(
 	UReg w = (UReg)src.getWidth();
 	UReg h = (UReg)src.getHeight();
 	
-	for (UReg m = 0; m < numMips; ++m)
-	{
+	for (UReg m = 0; m < numMips; ++m) {
 		image_codec::Mipmap &mip = img.frames[frame].mipmaps[m];
 		AddrSize blockSize = 0;
 		
 		// What format?
-		switch (src.getPixelType())
-		{
+		switch (src.getPixelType()) {
 			case PVR_MGLPVR2:
 			case PVR_OGLPVR2:
 				blockSize = std::max<AddrSize>(w/8,2)*std::max<AddrSize>(h/4,2)*8;
@@ -1424,8 +1328,7 @@ int TextureParser::ExtractPVR(
 
 #endif // defined(RAD_OPT_TOOLS)
 
-void TextureParser::Register(Engine &engine)
-{
+void TextureParser::Register(Engine &engine) {
 	static pkg::Binding::Ref r = engine.sys->packages->Bind<TextureParser>();
 }
 

@@ -158,22 +158,45 @@ bool PackageMan::MakeBuildDirs(int flags, std::ostream &out)
 int PackageMan::Cook(
 	const StringVec &roots,
 	int flags,
+	int languages,
 	int compression,
 	std::ostream &out
 )
 {
 	bool scriptsOnly = (flags&P_ScriptsOnly) ? true : false;
 
-	if (!MakeBuildDirs(flags, out))
-	{
+	if (!languages) {
+		out << "ERROR: no valid languages specified." << std::endl;
+		return SR_ErrorGeneric;
+	}
+
+	if (!MakeBuildDirs(flags, out)) {
 		out << "ERROR: failed to create output directories!" << std::endl;
 		return SR_ErrorGeneric;
+	}
+
+	{ // show languages
+		bool sep = false;
+
+		out << "Languages: ";
+		for (int i = StringTable::LangId_EN; i < StringTable::LangId_MAX; ++i) {
+			if (!((1<<i)&languages))
+				continue;
+			if (sep) {
+				sep = false;
+				out << ", ";
+			}
+			out << String(StringTable::Langs[i]).upper();
+			sep = true;
+		}
+		out << std::endl;
 	}
 
 	xtime::TimeVal startTime = xtime::ReadMilliseconds();
 
 	m_cookState.reset(new (ZPackages) CookState());
 	m_cookState->cout = &out;
+	m_cookState->languages = languages;
 
 	int r = SR_Success;
 	int ptargets = P_TARGET_FLAGS(flags);
@@ -266,7 +289,6 @@ int PackageMan::CookPlat(
 		if (!cooker)
 			return SR_ErrorGeneric; 
 		
-
 		CookStatus status = cooker->Status(flags, allflags);
 		if (status == CS_NeedRebuild)
 		{
@@ -961,6 +983,7 @@ Cooker::Ref PackageMan::CookerForAsset(const Asset::Ref &asset)
 	// We cache alot of this information because the
 	// asset may get free'd during cook.
 	cooker->m_cout = m_cookState->cout;
+	cooker->m_languages = m_cookState->languages;
 	cooker->m_asset = asset;
 	cooker->m_pkgMan = this;
 	cooker->m_assetPath = asset->path.get();
@@ -1026,6 +1049,7 @@ Cooker::Ref PackageMan::AllocateIntermediateCooker(const Asset::Ref &_asset)
 	Cooker::Ref cooker(it->second->New());
 
 	cooker->m_cout = &COut(C_Info);
+	cooker->m_languages = (1<<(App::Get()->langId.get()));
 	cooker->m_asset = asset;
 	cooker->m_pkgMan = this;
 	cooker->m_assetPath = asset->path.get();
@@ -1536,12 +1560,115 @@ int Cooker::CompareCachedFileTime(int target, const char *key, const char *path,
 	return c;
 }
 
-int Cooker::CompareCachedFileTimeKey(int target, const char *key, bool updateIfNewer)
+int Cooker::CompareCachedFileTimeKey(int target, const char *key, const char *localized, bool updateIfNewer)
 {
+	RAD_ASSERT(key);
+
 	const String *s = asset->entry->KeyValue<String>(key, target);
-	if (!s)
+	if (!s) {
+		cout.get() << "WARNING: Cooker(" << asset->path.get() << ") is asking for key '" << key << "' which does not exist or is not a string in target '" << target << "'" << std::endl;
 		return -1; // always older (error condition)
-	return CompareCachedFileTime(target, key, s->c_str(), updateIfNewer);
+	}
+
+	if (!localized)
+		return CompareCachedFileTime(target, key, s->c_str(), updateIfNewer);
+
+	String sKey(key);
+	String sPath(*s);
+	WString wsBasePath(sPath);
+
+	// create localized file path.
+	wchar_t ext[file::MaxFilePathLen+1];
+	wchar_t path[file::MaxFilePathLen+1];
+
+	file::FileExt(wsBasePath.c_str(), ext, file::MaxFilePathLen+1);
+	file::SetFileExt(wsBasePath.c_str(), 0, path, file::MaxFilePathLen+1);
+
+	String sExt(string::Shorten(ext));
+	String sBasePath(string::Shorten(path));
+
+	int r = 0;
+
+	for (int i = StringTable::LangId_EN; i < StringTable::LangId_MAX; ++i) {
+		if (!((1<<i)&languages))
+			continue;
+
+		String x, k;
+
+		if (i != StringTable::LangId_EN) {
+			x = sBasePath;
+			x += "_";
+			x += StringTable::Langs[i];
+			x += sExt;
+			k = sKey;
+			k += "_cookerLang_";
+			k += StringTable::Langs[i];
+		} else {
+			x = sPath;
+			k = sKey;
+		}
+
+		// don't early out here just record the newest value. we need to cache all file times for all versions.
+		int z = CompareCachedFileTime(target, k.c_str(), x.c_str(), updateIfNewer);
+		r = ((r<z)&&(r!=0)) ? r : z;
+	}
+
+	int lr = CompareCachedLocalizeKey(target, localized);
+	return ((r<lr)&&(r!=0)) ? r : lr;
+}
+
+int Cooker::CompareCachedStringKey(int target, const char *key) {
+	RAD_ASSERT(key);
+
+	const String *s = asset->entry->KeyValue<String>(key, target);
+	if (!s) {
+		cout.get() << "WARNING: Cooker(" << asset->path.get() << ") is asking for key '" << key << "' which does not exist or is not a string in target '" << target << "'" << std::endl;
+		return -1; // key is missing!
+	}
+	
+	String skey(TargetPath(target)+key);
+
+	world::Keys::Pairs::const_iterator it = globals->pairs.find(skey);
+	if (it != globals->pairs.end()) {
+		if (it->second != *s) {
+			globals->pairs[skey] = *s;
+			return -1; // changed!
+		}
+	} else {
+		globals->pairs[skey] = *s;
+		return -1; // doesn't exist!
+	}
+
+	return 0;
+}
+
+int Cooker::CompareCachedLocalizeKey(int target, const char *key) {
+	RAD_ASSERT(key);
+
+	const bool *b = asset->entry->KeyValue<bool>(key, target);
+	if (!b) {
+		cout.get() << "WARNING: Cooker(" << asset->path.get() << ") is asking for key '" << key << "' which does not exist or is not a bool in target '" << target << "'" << std::endl;
+		return -1; // key is missing!
+	}
+
+	if (!(*b))
+		return 0; // not localized ignore it.
+
+	String localizedString = LocalizedString(languages);
+	String skey(TargetPath(target)+"__cookerLocalizedVersion");
+	world::Keys::Pairs::const_iterator it = globals->pairs.find(skey);
+
+	if (it != globals->pairs.end()) {
+		if (it->second != localizedString) {
+			globals->pairs[skey] = localizedString;
+			return -1; // changed!
+		}
+	} else {
+		globals->pairs[skey] = localizedString;
+		return -1; // doesn't exist!
+	}
+
+	return 0; // same languages
 }
 
 bool Cooker::ModifiedTime(int target, xtime::TimeDate &td) const
@@ -1566,6 +1693,24 @@ String Cooker::TargetPath(int target)
 	if (!sz)
 		return String("Generic/");
 	return String(sz)+"/";
+}
+
+String Cooker::LocalizedString(int languages) {
+	String s;
+	bool sep = false;
+
+	for (int i = StringTable::LangId_EN; i < StringTable::LangId_MAX; ++i) {
+		if (!((1<<i)&languages))
+			continue;
+		if (sep) {
+			sep = false;
+			s += ";";
+		}
+		s += String(StringTable::Langs[i]).upper();
+		sep = true;
+	}
+
+	return s;
 }
 
 } // pkg

@@ -39,8 +39,6 @@
 bool __IOS_IPhone();
 #endif
 
-StringTable::LangId __DefaultLanguage();
-
 namespace world {
 
 namespace {
@@ -175,7 +173,7 @@ bool WorldLua::Init()
 	luaL_Reg systemCalls [] =
 	{
 		{ "Platform", lua_System_Platform },
-		{ "DefaultLanguage", lua_System_DefaultLanguage },
+		{ "SystemLanguage", lua_System_SystemLanguage },
 		{ "GetLangString", lua_System_GetLangString },
 		{ 0, 0 }
 	};
@@ -681,8 +679,8 @@ int WorldLua::lua_System_Platform(lua_State *L)
 	return 1;
 }
 
-int WorldLua::lua_System_DefaultLanguage(lua_State *L) {
-	lua_pushinteger(L, (int)__DefaultLanguage());
+int WorldLua::lua_System_SystemLanguage(lua_State *L) {
+	lua_pushinteger(L, (int)App::Get()->langId.get());
 	return 1;
 }
 
