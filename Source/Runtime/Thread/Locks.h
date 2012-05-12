@@ -199,6 +199,39 @@ public:
     }
 };
 
+///////////////////////////////////////////////////////////////////////////////
+// no concept in boost for a optionally scoped guards
+///////////////////////////////////////////////////////////////////////////////
+
+template <typename Mutex>
+class scoped_lock_guard {
+private:
+    Mutex* m;
+    explicit scoped_lock_guard(lock_guard&);
+    scoped_lock_guard& operator=(outer_lock_guard&);
+
+public:
+	scoped_lock_guard() : m(0) {}
+
+    ~scoped_lock_guard()
+    {
+		if (m)
+			m->unlock();
+    }
+
+	void lock(Mutex &_m)
+	{
+		adopt(_m);
+		_m.lock();
+	}
+
+	void adopt(Mutex &_m)
+	{
+		m = &_m;
+	}
+};
+
+
 } // thread
 
 #include "Locks.inl"

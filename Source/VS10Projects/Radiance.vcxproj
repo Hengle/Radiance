@@ -62,6 +62,7 @@
   <ItemGroup>
     <None Include="..\..\build_msvc10.py" />
     <None Include="..\Runtime\SConstruct" />
+    <None Include="..\Runtime\String\String.inl" />
     <None Include="..\Runtime\Win\WinThread.inl" />
     <None Include="..\Runtime\Base\Event.inl" />
     <None Include="..\Runtime\Base\MemoryPool.inl" />
@@ -100,7 +101,7 @@
     <None Include="..\Runtime\Stream\MemoryStream.inl" />
     <None Include="..\Runtime\Stream\STLStream.inl" />
     <None Include="..\Runtime\Stream\Stream.inl" />
-    <None Include="..\Runtime\String\String.inl" />
+    <None Include="..\Runtime\String\String2.inl" />
     <None Include="..\Runtime\String\StringBase.inl" />
     <None Include="..\Runtime\Tuple\MakeTuple.inl" />
     <None Include="..\Runtime\Tuple\Tuple.inl" />
@@ -220,6 +221,13 @@
     <ClInclude Include="..\Runtime\String.h" />
     <ClInclude Include="..\Runtime\StringBase.h" />
     <ClInclude Include="..\Runtime\StringDef.h" />
+    <ClInclude Include="..\Runtime\String\String.h" />
+    <ClInclude Include="..\Runtime\String\StringDef.h" />
+    <ClInclude Include="..\Runtime\String\StringDetails.h" />
+    <ClInclude Include="..\Runtime\String\utf8.h" />
+    <ClInclude Include="..\Runtime\String\utf8\checked.h" />
+    <ClInclude Include="..\Runtime\String\utf8\core.h" />
+    <ClInclude Include="..\Runtime\String\utf8\unchecked.h" />
     <ClInclude Include="..\Runtime\Thread.h" />
     <ClInclude Include="..\Runtime\ThreadDef.h" />
     <ClInclude Include="..\Runtime\Time.h" />
@@ -346,9 +354,9 @@
     <ClInclude Include="..\Runtime\Stream\StreamDef.h" />
     <ClInclude Include="..\Runtime\String\IntString.h" />
     <ClInclude Include="..\Runtime\String\IntStringBase.h" />
-    <ClInclude Include="..\Runtime\String\String.h" />
+    <ClInclude Include="..\Runtime\String\String2.h" />
     <ClInclude Include="..\Runtime\String\StringBase.h" />
-    <ClInclude Include="..\Runtime\String\StringDef.h" />
+    <ClInclude Include="..\Runtime\String\String2Def.h" />
     <ClInclude Include="..\Runtime\Tuple\MakeTuple.h" />
     <ClInclude Include="..\Runtime\Tuple\Tuple.h" />
     <ClInclude Include="..\Runtime\Tuple\TupleDef.h" />
@@ -718,6 +726,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Runtime\Runtime.cpp" />
+    <ClCompile Include="..\Runtime\String\String.cpp" />
     <ClCompile Include="..\Runtime\Win\WinCrashReporter.cpp" />
     <ClCompile Include="..\Runtime\Win\WinFile.cpp" />
     <ClCompile Include="..\Runtime\Win\WinThread.cpp" />
@@ -743,7 +752,7 @@
     <ClCompile Include="..\Runtime\Reflect\Private\ReflectPrivate.cpp" />
     <ClCompile Include="..\Runtime\Stream\MemoryStream.cpp" />
     <ClCompile Include="..\Runtime\Stream\Stream.cpp" />
-    <ClCompile Include="..\Runtime\String\String.cpp" />
+    <ClCompile Include="..\Runtime\String\String2.cpp" />
     <ClCompile Include="..\Runtime\DataCodec\Lmp.cpp" />
     <ClCompile Include="..\Runtime\DataCodec\ZLib.cpp" />
     <ClCompile Include="..\Runtime\DataCodec\zlib123\adler32.cpp" />
