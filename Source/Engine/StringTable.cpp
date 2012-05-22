@@ -324,8 +324,15 @@ bool StringTable::SaveBin(stream::IOutputBuffer &ob) const {
 	// count the number of strings.
 	U32 numStrings = 0;
 	for (Entry::Map::const_iterator it = m_entries.begin(); it != m_entries.end(); ++it) {
-		if (!it->second.strings.empty())
-			++numStrings;
+		if (!it->second.strings.empty()) {
+			// Only count non-blank strings.
+			for (Entry::Strings::const_iterator x = it->second.strings.begin(); x != it->second.strings.end(); ++x) {
+				if (!x->second.empty()) {
+					++numStrings;
+					break;
+				}
+			}
+		}
 	}
 
 	if (!os.Write(numStrings))
@@ -345,18 +352,20 @@ bool StringTable::SaveBin(stream::IOutputBuffer &ob) const {
 		for (int i = 0; i < LangId_MAX; ++i) {
 			Entry::Strings::const_iterator x = e.strings.find((LangId)i);
 			if (x != e.strings.end()) {
-				langMask |= (1<<i);
-				strings[i] = x->second;
+				if (!x->second.empty()) {
+					langMask |= (1<<i);
+					strings[i] = x->second;
+				}
 			}
 		}
 
 		if (!langMask)
-			return false; // consistency failure.
+			continue; // all blanks or no valid languages.
 
 		if (!os.Write(langMask))
 			return false;
 
-		if (!os.Write((U16)name.length()))
+		if (!os.Write((U16)(name.length()+1)))
 			return false;
 
 		if (os.Write(name.c_str(), (stream::SPos)(name.length()+1), 0) != (stream::SPos)(name.length()+1))
@@ -396,7 +405,7 @@ int StringTable::Load(const void *data, AddrSize len, Ref &_r) {
 
 	CHECK_SIZE(sizeof(U32));
 	U32 numStrings = *reinterpret_cast<const U32*>(bytes);
-	bytes += 32;
+	bytes += sizeof(U32);
 
 	Ref r(New());
 
@@ -405,24 +414,24 @@ int StringTable::Load(const void *data, AddrSize len, Ref &_r) {
 		U16 langMask = *reinterpret_cast<const U16*>(bytes);
 		bytes += sizeof(U16);
 
-		U16 len = *reinterpret_cast<const U16*>(bytes);
+		U16 size = *reinterpret_cast<const U16*>(bytes);
 		bytes += sizeof(U16);
-		CHECK_SIZE(len);
+		CHECK_SIZE(size);
 
 		const char *id = reinterpret_cast<const char *>(bytes);
-		bytes += len;
+		bytes += size;
 
 		Entry e;
 		
 		for (int k = 0; k < LangId_MAX; ++k) {
 			if (langMask & (1<<k)) {
 				CHECK_SIZE(sizeof(U16));
-				len = *reinterpret_cast<const U16*>(bytes);
+				size = *reinterpret_cast<const U16*>(bytes);
 				bytes += sizeof(U16);
-				CHECK_SIZE(len);
+				CHECK_SIZE(size);
 				const char *sz = reinterpret_cast<const char*>(bytes);
 				e.strings[(LangId)k] = String(sz);
-				bytes += len;
+				bytes += size;
 			}
 		}
 

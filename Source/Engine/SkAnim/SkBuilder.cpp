@@ -788,6 +788,8 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 			return false;
 		if (!os.Write((U16)at[i].totalTags))
 			return false;
+		if (!os.Write((U16)0))
+			return false; // padd bytes.
 	}
 
 	// Write table indexes.

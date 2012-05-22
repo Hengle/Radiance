@@ -178,6 +178,7 @@ private:
 		return &m_tag; 
 	}
 
+#if defined(RAD_OPT_TOOLS)
 	RAD_DECLARE_GET(langId, StringTable::LangId) {
 		return m_langId;
 	}
@@ -185,7 +186,8 @@ private:
 	RAD_DECLARE_SET(langId, StringTable::LangId) {
 		m_langId = value;
 	}
-
+#endif
+	
 	typedef zone_vector<image_codec::Image::Ref, ZEngineT>::type ImageVec;
 	typedef zone_vector<file::HBufferedAsyncIO, ZEngineT>::type IOVec;
 

@@ -652,8 +652,6 @@
 		339E0BB7138DD6CE004B5DC9 /* D_Sound.h in Headers */ = {isa = PBXBuildFile; fileRef = 339E0BB5138DD6CE004B5DC9 /* D_Sound.h */; };
 		339E0BC0138DD98E004B5DC9 /* T_SoundPrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339E0BBE138DD98E004B5DC9 /* T_SoundPrecache.cpp */; };
 		339E0BC1138DD98E004B5DC9 /* T_SoundPrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 339E0BBF138DD98E004B5DC9 /* T_SoundPrecache.h */; };
-		33A8B623156ABC5200A639BB /* StringTableCooker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33A8B61F156ABC5200A639BB /* StringTableCooker.cpp */; };
-		33A8B624156ABC5200A639BB /* StringTableCooker.h in Headers */ = {isa = PBXBuildFile; fileRef = 33A8B620156ABC5200A639BB /* StringTableCooker.h */; };
 		33A8B625156ABC5200A639BB /* StringTableParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33A8B621156ABC5200A639BB /* StringTableParser.cpp */; };
 		33A8B626156ABC5200A639BB /* StringTableParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 33A8B622156ABC5200A639BB /* StringTableParser.h */; };
 		33A8B62A156ABC7100A639BB /* StringTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33A8B628156ABC7100A639BB /* StringTable.cpp */; };
@@ -1445,8 +1443,6 @@
 		339E0BB5138DD6CE004B5DC9 /* D_Sound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = D_Sound.h; sourceTree = "<group>"; };
 		339E0BBE138DD98E004B5DC9 /* T_SoundPrecache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = T_SoundPrecache.cpp; sourceTree = "<group>"; };
 		339E0BBF138DD98E004B5DC9 /* T_SoundPrecache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = T_SoundPrecache.h; sourceTree = "<group>"; };
-		33A8B61F156ABC5200A639BB /* StringTableCooker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringTableCooker.cpp; sourceTree = "<group>"; };
-		33A8B620156ABC5200A639BB /* StringTableCooker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringTableCooker.h; sourceTree = "<group>"; };
 		33A8B621156ABC5200A639BB /* StringTableParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringTableParser.cpp; sourceTree = "<group>"; };
 		33A8B622156ABC5200A639BB /* StringTableParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringTableParser.h; sourceTree = "<group>"; };
 		33A8B628156ABC7100A639BB /* StringTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringTable.cpp; sourceTree = "<group>"; };
@@ -1658,8 +1654,6 @@
 				339E09721389BFD5004B5DC9 /* SoundLoader.h */,
 				339E09731389BFD5004B5DC9 /* SoundParser.cpp */,
 				339E09741389BFD5004B5DC9 /* SoundParser.h */,
-				33A8B61F156ABC5200A639BB /* StringTableCooker.cpp */,
-				33A8B620156ABC5200A639BB /* StringTableCooker.h */,
 				33A8B621156ABC5200A639BB /* StringTableParser.cpp */,
 				33A8B622156ABC5200A639BB /* StringTableParser.h */,
 				332EEDC712A1CFBE004F29C0 /* TextureParser.cpp */,
@@ -3237,7 +3231,6 @@
 				33246767150DAF35009F3901 /* GameNetwork.h in Headers */,
 				33246768150DAF35009F3901 /* GameNetworkDef.h in Headers */,
 				3324676C150DB4D6009F3901 /* IOSGameCenter.h in Headers */,
-				33A8B624156ABC5200A639BB /* StringTableCooker.h in Headers */,
 				33A8B626156ABC5200A639BB /* StringTableParser.h in Headers */,
 				33A8B62B156ABC7100A639BB /* StringTable.h in Headers */,
 			);
@@ -3568,7 +3561,6 @@
 				33030F3314D971A700DECD5E /* SIMD_neon.cpp in Sources */,
 				33246766150DAF35009F3901 /* GameNetwork.cpp in Sources */,
 				3324676D150DB4D6009F3901 /* IOSGameCenter.mm in Sources */,
-				33A8B623156ABC5200A639BB /* StringTableCooker.cpp in Sources */,
 				33A8B625156ABC5200A639BB /* StringTableParser.cpp in Sources */,
 				33A8B62A156ABC7100A639BB /* StringTable.cpp in Sources */,
 				3322C150156BA17B006E4E7A /* IOSMacLangPrefs.mm in Sources */,

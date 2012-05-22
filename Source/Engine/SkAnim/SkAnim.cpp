@@ -801,6 +801,7 @@ int DSka::Parse(const void *data, AddrSize len)
 		CHECK_SIZE(sizeof(U16));
 		m.numTags = *reinterpret_cast<const U16*>(bytes);
 		bytes += sizeof(U16);
+		bytes += sizeof(U16); // padd bytes.
 	}
 
 	for (U16 i = 0; i < numAnims; ++i)

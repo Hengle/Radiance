@@ -12,7 +12,7 @@ using namespace pkg;
 
 namespace asset {
 
-SkAnimSetCooker::SkAnimSetCooker() : Cooker(3)
+SkAnimSetCooker::SkAnimSetCooker() : Cooker(4)
 {
 }
 

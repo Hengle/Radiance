@@ -51,8 +51,10 @@ bool Game::LoadEntry() {
 		xtime::TimeSlice::Infinite,
 		pkg::P_Load
 	);
-	if (r != pkg::SR_Success)
+	if (r != pkg::SR_Success) {
+		COut(C_Error) << "Failed to load UI/Globals string table, code " << r << std::endl;
 		return false;
+	}
 	m_stringTableParser = asset::StringTableParser::Cast(m_stringTable);
 	return m_stringTableParser;
 }
