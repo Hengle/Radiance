@@ -359,14 +359,14 @@ bool StringTable::SaveBin(stream::IOutputBuffer &ob) const {
 		if (!os.Write((U16)name.length()))
 			return false;
 
-		if (os.Write(name.c_str(), (stream::SPos)name.length(), 0) != (stream::SPos)name.length())
+		if (os.Write(name.c_str(), (stream::SPos)(name.length()+1), 0) != (stream::SPos)(name.length()+1))
 			return false;
 
 		for (int i = 0; i < LangId_MAX; ++i) {
 			if (langMask & (1<<i)) {
-				if (!os.Write((U16)strings[i].length()))
+				if (!os.Write((U16)(strings[i].length()+1)))
 					return false;
-				if (os.Write(strings[i].c_str(), (stream::SPos)strings[i].length(), 0) != (stream::SPos)strings[i].length())
+				if (os.Write(strings[i].c_str(), (stream::SPos)(strings[i].length()+1), 0) != (stream::SPos)(strings[i].length()+1))
 					return false;
 			}
 		}
@@ -410,6 +410,7 @@ int StringTable::Load(const void *data, AddrSize len, Ref &_r) {
 		CHECK_SIZE(len);
 
 		const char *id = reinterpret_cast<const char *>(bytes);
+		bytes += len;
 
 		Entry e;
 		
