@@ -310,7 +310,7 @@ typedef wstring<> WString;
 String Shorten(const wchar_t *str);
 WString Widen(const char *str);
 
-#if defined(RAD_OPT_WCHAR_4)
+#if defined(RAD_OPT_4BYTE_WCHAR)
 inline U16 Shorten(wchar_t c)
 {
 	RAD_ASSERT(c<=0xffff);

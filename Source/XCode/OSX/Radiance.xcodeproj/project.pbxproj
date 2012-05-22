@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		3310C9A7156B8DAF001AA756 /* StringTableCooker.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = StringTableCooker.cpp; sourceTree = "<group>"; };
+		3310C9A8156B8DAF001AA756 /* StringTableCooker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StringTableCooker.h; sourceTree = "<group>"; };
+		3310C9A9156B8DAF001AA756 /* StringTableParser.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = StringTableParser.cpp; sourceTree = "<group>"; };
+		3310C9AA156B8DAF001AA756 /* StringTableParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StringTableParser.h; sourceTree = "<group>"; };
+		3310C9AB156B8DC9001AA756 /* StringTable.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = StringTable.cpp; sourceTree = "<group>"; };
+		3310C9AC156B8DC9001AA756 /* StringTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StringTable.h; sourceTree = "<group>"; };
+		3310C9AD156B8DFE001AA756 /* SDLMain.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SDLMain.mm; sourceTree = "<group>"; };
+		3322C14C156B9FBA006E4E7A /* IOSMacLangPrefs.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = IOSMacLangPrefs.mm; sourceTree = "<group>"; };
+		3322C14D156BA021006E4E7A /* SystemLanguage.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SystemLanguage.cpp; sourceTree = "<group>"; };
 		332C41F2132ACE7300E10CA2 /* BSPFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BSPFile.cpp; sourceTree = "<group>"; };
 		332C41F3132ACE7300E10CA2 /* BSPFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BSPFile.h; sourceTree = "<group>"; };
 		332C41F4132ACE7300E10CA2 /* Tokenizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tokenizer.cpp; sourceTree = "<group>"; };
@@ -322,7 +331,6 @@
 		332C4362132ACE7F00E10CA2 /* PCMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PCMain.cpp; sourceTree = "<group>"; };
 		332C4363132ACE7F00E10CA2 /* SConstruct */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SConstruct; sourceTree = "<group>"; };
 		332C4364132ACE7F00E10CA2 /* SDLMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDLMain.h; sourceTree = "<group>"; };
-		332C4365132ACE7F00E10CA2 /* SDLMain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDLMain.m; sourceTree = "<group>"; };
 		332C4367132ACE8400E10CA2 /* .cdtproject */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = .cdtproject; sourceTree = "<group>"; };
 		332C4368132ACE8400E10CA2 /* .cproject */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = .cproject; sourceTree = "<group>"; };
 		332C4369132ACE8400E10CA2 /* .project */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = .project; sourceTree = "<group>"; };
@@ -844,18 +852,14 @@
 		332C4597132ACE9300E10CA2 /* StringTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringTest.cpp; sourceTree = "<group>"; };
 		332C4598132ACE9300E10CA2 /* UnitTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UnitTests.cpp; sourceTree = "<group>"; };
 		332C4599132ACE9300E10CA2 /* UTCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UTCommon.h; sourceTree = "<group>"; };
-		332C459A132ACEAF00E10CA2 /* AUTHORS */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = AUTHORS; path = ../../../AUTHORS; sourceTree = SOURCE_ROOT; };
 		332C459B132ACEAF00E10CA2 /* backend.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = backend.py; path = ../../../backend.py; sourceTree = SOURCE_ROOT; };
 		332C459C132ACEAF00E10CA2 /* boost.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = boost.py; path = ../../../boost.py; sourceTree = SOURCE_ROOT; };
 		332C459D132ACEAF00E10CA2 /* build_gcc.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = build_gcc.py; path = ../../../build_gcc.py; sourceTree = SOURCE_ROOT; };
 		332C459E132ACEAF00E10CA2 /* build_msvc8.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = build_msvc8.py; path = ../../../build_msvc8.py; sourceTree = SOURCE_ROOT; };
 		332C459F132ACEAF00E10CA2 /* build.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = build.py; path = ../../../build.py; sourceTree = SOURCE_ROOT; };
 		332C45A0132ACEAF00E10CA2 /* glsl-optimizer.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = "glsl-optimizer.py"; path = "../../../glsl-optimizer.py"; sourceTree = SOURCE_ROOT; };
-		332C45A1132ACEAF00E10CA2 /* HOW TO CONTRIBUTE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "HOW TO CONTRIBUTE"; path = "../../../HOW TO CONTRIBUTE"; sourceTree = SOURCE_ROOT; };
-		332C45A2132ACEAF00E10CA2 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE; path = ../../../LICENSE; sourceTree = SOURCE_ROOT; };
 		332C45A3132ACEAF00E10CA2 /* lua.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = lua.py; path = ../../../lua.py; sourceTree = SOURCE_ROOT; };
 		332C45A4132ACEAF00E10CA2 /* osxbundle.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = osxbundle.py; path = ../../../osxbundle.py; sourceTree = SOURCE_ROOT; };
-		332C45A5132ACEAF00E10CA2 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README; path = ../../../README; sourceTree = SOURCE_ROOT; };
 		332C45A6132ACEAF00E10CA2 /* SConscript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = SConscript; path = ../../../SConscript; sourceTree = SOURCE_ROOT; };
 		332C45A7132ACEAF00E10CA2 /* SConstruct */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = SConstruct; path = ../../../SConstruct; sourceTree = SOURCE_ROOT; };
 		332C45A8132ACEAF00E10CA2 /* sxs configuration issues.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "sxs configuration issues.txt"; path = "../../../sxs configuration issues.txt"; sourceTree = SOURCE_ROOT; };
@@ -932,7 +936,6 @@
 		08FB7794FE84155DC02AAC07 /* Radiance */ = {
 			isa = PBXGroup;
 			children = (
-				332C459A132ACEAF00E10CA2 /* AUTHORS */,
 				332C459B132ACEAF00E10CA2 /* backend.py */,
 				332C459C132ACEAF00E10CA2 /* boost.py */,
 				332C459D132ACEAF00E10CA2 /* build_gcc.py */,
@@ -940,11 +943,8 @@
 				332C459F132ACEAF00E10CA2 /* build.py */,
 				335AFB82136F4A28007C6377 /* freetype.py */,
 				332C45A0132ACEAF00E10CA2 /* glsl-optimizer.py */,
-				332C45A1132ACEAF00E10CA2 /* HOW TO CONTRIBUTE */,
-				332C45A2132ACEAF00E10CA2 /* LICENSE */,
 				332C45A3132ACEAF00E10CA2 /* lua.py */,
 				332C45A4132ACEAF00E10CA2 /* osxbundle.py */,
-				332C45A5132ACEAF00E10CA2 /* README */,
 				332C45A6132ACEAF00E10CA2 /* SConscript */,
 				332C45A7132ACEAF00E10CA2 /* SConstruct */,
 				332C45A8132ACEAF00E10CA2 /* sxs configuration issues.txt */,
@@ -1007,6 +1007,8 @@
 				339E00F11389BEE9004B5DC9 /* Sound.cpp */,
 				339E00F21389BEE9004B5DC9 /* Sound.h */,
 				339E00F31389BEE9004B5DC9 /* SoundDef.h */,
+				3310C9AB156B8DC9001AA756 /* StringTable.cpp */,
+				3310C9AC156B8DC9001AA756 /* StringTable.h */,
 				332C4293132ACE7A00E10CA2 /* SyncDispachFunctor.h */,
 				332C4294132ACE7A00E10CA2 /* SyncDispatch.cpp */,
 				332C4295132ACE7A00E10CA2 /* SyncDispatch.h */,
@@ -1076,6 +1078,10 @@
 				339E00ED1389BEC7004B5DC9 /* SoundLoader.h */,
 				339E00EE1389BEC7004B5DC9 /* SoundParser.cpp */,
 				339E00EF1389BEC7004B5DC9 /* SoundParser.h */,
+				3310C9A7156B8DAF001AA756 /* StringTableCooker.cpp */,
+				3310C9A8156B8DAF001AA756 /* StringTableCooker.h */,
+				3310C9A9156B8DAF001AA756 /* StringTableParser.cpp */,
+				3310C9AA156B8DAF001AA756 /* StringTableParser.h */,
 				332C4215132ACE7900E10CA2 /* TextureCooker.cpp */,
 				332C4216132ACE7900E10CA2 /* TextureCooker.h */,
 				332C4217132ACE7900E10CA2 /* TextureParser.cpp */,
@@ -1561,11 +1567,13 @@
 		332C4360132ACE7F00E10CA2 /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				3322C14D156BA021006E4E7A /* SystemLanguage.cpp */,
+				3322C14C156B9FBA006E4E7A /* IOSMacLangPrefs.mm */,
 				332C4361132ACE7F00E10CA2 /* IOSMain.mm */,
 				332C4362132ACE7F00E10CA2 /* PCMain.cpp */,
 				332C4363132ACE7F00E10CA2 /* SConstruct */,
 				332C4364132ACE7F00E10CA2 /* SDLMain.h */,
-				332C4365132ACE7F00E10CA2 /* SDLMain.m */,
+				3310C9AD156B8DFE001AA756 /* SDLMain.mm */,
 			);
 			name = Main;
 			path = ../../Main;

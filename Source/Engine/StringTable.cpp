@@ -123,7 +123,7 @@ int StringTable::Load(const char *name, const wchar_t *root, StringTable::Ref &_
 
 		WString wpath;
 
-		wpath.format(L"%s.%s", root, string::Widen(StringTable::Langs[i]).c_str());
+		wpath.format(L"%ls.%ls", root, string::Widen(StringTable::Langs[i]).c_str());
 
 		String spath(string::Shorten(wpath.c_str()));
 
@@ -260,7 +260,7 @@ bool StringTable::SaveText(const char *name, const wchar_t *path, int saveMask) 
 			continue;
 
 		WString wpath;
-		wpath.format(L"%s.%s", path, string::Widen(StringTable::Langs[i]).c_str());
+		wpath.format(L"%ls.%ls", path, string::Widen(StringTable::Langs[i]).c_str());
 
 		String spath(string::Shorten(wpath.c_str()));
 

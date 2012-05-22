@@ -4,6 +4,8 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#if defined(RAD_OPT_PC)
+
 #include <Runtime/Base.h>
 #include <Runtime/String.h>
 #include <Runtime/Thread.h>
@@ -13,6 +15,7 @@
 #include <Engine/Persistence.h>
 #include <Engine/Renderer/PC/RBackend.h>
 #include <Engine/StringTable.h>
+#include <Runtime/StringBase.h>
 
 #if defined(RAD_OPT_DEBUG)
 #include <Runtime/File.h>
@@ -105,41 +108,6 @@ bool s_postQuit = false;
 bool s_editor = false;
 #endif
 
-}
-
-StringTable::LangId __SystemLanguage() {
-	LANGID winId = GetUserDefaultUILanguage();
-	StringTable::LangId id;
-
-	switch (winId&0xff) {
-	case LANG_CHINESE:
-		id = StringTable::LangId_CH;
-		break;
-	case LANG_FRENCH:
-		id = StringTable::LangId_FR;
-		break;
-	case LANG_GERMAN:
-		id = StringTable::LangId_GR;
-		break;
-	case LANG_ITALIAN:
-		id = StringTable::LangId_IT;
-		break;
-	case LANG_JAPANESE:
-		id = StringTable::LangId_JP;
-		break;
-	case LANG_RUSSIAN:
-	case LANG_UKRAINIAN:
-		id = StringTable::LangId_RU;
-		break;
-	case LANG_SPANISH:
-		id = StringTable::LangId_SP;
-		break;
-	default:
-		id = StringTable::LangId_EN;
-		break;
-	}
-
-	return id;
 }
 
 void __PostQuit()
@@ -429,7 +397,7 @@ int __Argc() { return s_argc; }
 const char **__Argv() { return s_argv; }
 
 #if defined(RAD_OPT_APPLE)
-extern "C" int __HasQt()
+int __HasQt()
 {
 #if defined(RAD_OPT_PC_TOOLS)
 	return 1;
@@ -529,4 +497,6 @@ extern "C" int main(int argc, char *argv[])
 	rt::Finalize();
 	return 0;
 }
+
+#endif
 

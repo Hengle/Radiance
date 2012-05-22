@@ -27,13 +27,16 @@ if build.pc():
 	z = x.add('PCMain.cpp')
 
 if build.osx(): #OSX always launches via SDL
-	x.add('SDLMain.m')
+	x.add('SDLMain.mm')
+	x.add('IOSMacLangPrefs.mm')
 	
 if build.ios():
 	if build.switches.ios_simulator():
 		build.backend.addCCFlag(x.source, ['-fobjc-abi-version=2', '-fobjc-legacy-dispatch'])
 	build.backend.addCCFlag(x.source, ['-fpascal-strings'])
 	x.add('IOSMain.mm')
+	
+x.add('SystemLanguage.cpp')
 	
 ###############################################################################
 # Export

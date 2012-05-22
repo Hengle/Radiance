@@ -3,8 +3,6 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
-#pragma once
-
 #include "EditorTextEditorDialog.h"
 #include <QtGui/QTextEdit>
 

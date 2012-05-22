@@ -5,10 +5,13 @@
     Feel free to customize this file to suit your needs
 */
 
+#if defined(RAD_OPT_PC)
+
 #include <SDL/SDL.h>
 #include "SDLMain.h"
-#include <sys/param.h> /* for MAXPATHLEN */
-#include <unistd.h>
+#include <sys/param.h>
+#include <string>
+#include <vector>
 
 /* For some reaon, Apple removed setAppleMenu from the headers in 10.4,
  but the method still is there and works. To avoid warnings, we declare
@@ -30,9 +33,9 @@ typedef struct CPSProcessSerNum
 	UInt32		hi;
 } CPSProcessSerNum;
 
-extern OSErr	CPSGetCurrentProcess( CPSProcessSerNum *psn);
-extern OSErr 	CPSEnableForegroundOperation( CPSProcessSerNum *psn, UInt32 _arg2, UInt32 _arg3, UInt32 _arg4, UInt32 _arg5);
-extern OSErr	CPSSetFrontProcess( CPSProcessSerNum *psn);
+extern "C" OSErr	CPSGetCurrentProcess( CPSProcessSerNum *psn);
+extern "C" OSErr 	CPSEnableForegroundOperation( CPSProcessSerNum *psn, UInt32 _arg2, UInt32 _arg3, UInt32 _arg4, UInt32 _arg5);
+extern "C" OSErr	CPSSetFrontProcess( CPSProcessSerNum *psn);
 
 #endif /* SDL_USE_CPS */
 
@@ -393,7 +396,7 @@ void setwd(const char *exe)
 }
 
 /* Main entry point to executable - should *not* be SDL_main! */
-int main (int argc, char **argv)
+extern "C" int main (int argc, char **argv)
 {
     /* Copy the arguments into a global variable */
     /* This is passed if we are launched by double-clicking */
@@ -421,3 +424,4 @@ int main (int argc, char **argv)
     return 0;
 }
 
+#endif

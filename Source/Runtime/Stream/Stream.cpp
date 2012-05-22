@@ -22,8 +22,14 @@ RADRT_API bool RADRT_CALL CalcSeekPos(Seek seekType, SPos dstOfs, SPos curPos, S
 	switch (seekType)
 	{
 	//case StreamBegin: *newOfs = dstOfs; break;
-	case StreamCur: dstOfs += curPos; break;
-	case StreamEnd: if (size < dstOfs) return false; dstOfs = size - dstOfs; break;
+	case StreamCur: 
+		dstOfs += curPos; 
+		break;
+	case StreamEnd: 
+		if (size < dstOfs) 
+			return false; 
+		dstOfs = size - dstOfs; 
+		break;
 	}
 
 	*newOfs = dstOfs;
@@ -142,7 +148,7 @@ bool OutputStream::WriteStringHelper<wchar_t>::Write(OutputStream &stream, const
 	if (!stream.Write(numChars, errorCode)) return false;
 
 #if defined(RAD_OPT_4BYTE_WCHAR)
-	U16 *p = stack_alloc(numChars*2);
+	U16 *p = (U16*)stack_alloc(numChars*2);
 	{
 		U16 *w = p;
 		for (const wchar_t *x = str; *x; ++x)
