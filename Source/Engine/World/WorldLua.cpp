@@ -175,6 +175,7 @@ bool WorldLua::Init()
 		{ "Platform", lua_System_Platform },
 		{ "SystemLanguage", lua_System_SystemLanguage },
 		{ "GetLangString", lua_System_GetLangString },
+		{ "LaunchURL", lua_System_LaunchURL },
 		{ 0, 0 }
 	};
 
@@ -702,6 +703,12 @@ int WorldLua::lua_System_GetLangString(lua_State *L) {
 		}
 	}
 
+	return 0;
+}
+
+int WorldLua::lua_System_LaunchURL(lua_State *L) {
+	const char *sz = luaL_checkstring(L, 1);
+	App::Get()->LaunchURL(sz);
 	return 0;
 }
 

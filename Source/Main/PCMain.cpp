@@ -35,6 +35,7 @@
 #undef MessageBox
 
 #if defined(RAD_OPT_WIN)
+#include <Shellapi.h>
 #if !defined(RAD_TARGET_GOLDEN)
 #include <VLD/vld.h> // VLD only in non-golden builds.
 #endif
@@ -142,6 +143,12 @@ bool CloudStorage::StartDownloadingLatestVersion(const char *name)
 CloudFile::Status CloudStorage::FileStatus(const char *name)
 {
 	return CloudFile::Ready;
+}
+
+void NativeApp::LaunchURL(const char *sz) {
+#if defined(RAD_OPT_WIN)
+	ShellExecuteA(0, "open", sz, 0, 0, SW_SHOWNORMAL);
+#endif
 }
 
 #if defined(RAD_OPT_PC_TOOLS)
