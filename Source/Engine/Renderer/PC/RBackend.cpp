@@ -322,7 +322,6 @@ bool RBackend::CheckCaps()
 		gl.ARB_vertex_program &&
 		gl.ARB_texture_compression &&
 		gl.EXT_texture_compression_s3tc &&
-		gl.ARB_imaging &&
 		gl.ARB_multitexture &&
 		gl.SGIS_generate_mipmap &&
 		gl.ARB_texture_non_power_of_two;

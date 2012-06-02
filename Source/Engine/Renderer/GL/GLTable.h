@@ -249,10 +249,7 @@ struct RADENG_CLASS GLTable
 	bool EXT_compiled_vertex_array;
 	PFNGLLOCKARRAYSEXTPROC LockArraysEXT;
 	PFNGLUNLOCKARRAYSEXTPROC UnlockArraysEXT;
-	
-	bool ARB_imaging;
-	PFNGLBLENDEQUATIONPROC BlendEquation;
-	
+		
 	bool ARB_occlusion_query;
 	PFNGLGENQUERIESARBPROC GenQueriesARB;
 	PFNGLDELETEQUERIESARBPROC DeleteQueriesARB;

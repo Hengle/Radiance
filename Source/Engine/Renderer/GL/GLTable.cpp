@@ -186,7 +186,6 @@ void GLTable::Reset()
 	EXT_texture_compression_s3tc = false;
 	ARB_multitexture = false;
 	EXT_compiled_vertex_array = false;
-	ARB_imaging = false;
 	ARB_occlusion_query = false;
 	ARB_vertex_program = false;
 	ARB_fragment_program = false;
@@ -297,7 +296,6 @@ void GLTable::Reset()
 	MultiTexCoord2fvARB = 0;
 	LockArraysEXT = 0;
 	UnlockArraysEXT = 0;
-	BlendEquation = 0;
 	TexImage3D = 0;
 	TexSubImage3D = 0;
 	GenQueriesARB = 0;
@@ -523,10 +521,6 @@ void GLTable::Load()
 	BEGIN(EXT_compiled_vertex_array)
 		L(PFNGLLOCKARRAYSEXTPROC, LockArraysEXT);
 		L(PFNGLUNLOCKARRAYSEXTPROC, UnlockArraysEXT);
-	END
-
-	BEGIN(ARB_imaging)
-		L(PFNGLBLENDEQUATIONPROC, BlendEquation);
 	END
 
 	BEGIN(ARB_occlusion_query)
