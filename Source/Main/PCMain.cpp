@@ -145,9 +145,15 @@ CloudFile::Status CloudStorage::FileStatus(const char *name)
 	return CloudFile::Ready;
 }
 
+#if defined(RAD_OPT_APPLE)
+void __OSX_LaunchURL(const char *sz);
+#endif
+
 void NativeApp::LaunchURL(const char *sz) {
 #if defined(RAD_OPT_WIN)
 	ShellExecuteA(0, "open", sz, 0, 0, SW_SHOWNORMAL);
+#elif defined(RAD_OPT_APPLE)
+	__OSX_LaunchURL(sz);
 #endif
 }
 

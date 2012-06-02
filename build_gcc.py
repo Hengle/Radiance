@@ -177,7 +177,7 @@ class GCC4(Backend):
 		if self.build.pthreads(): 
 			self.addLib(env, 'pthread')
 		if self.build.osx():
-			env.AppendUnique(FRAMEWORKS=['Carbon', 'System', 'CoreFoundation'])
+			env.AppendUnique(FRAMEWORKS=['Carbon', 'System', 'CoreFoundation', 'AppKit'])
 		if self.build.ios():
 			env.AppendUnique(FRAMEWORKS=['Foundation', 'UIKit', 'OpenGLES', 'QuartzCore'])
 		if self.build.switches.ios_device():
