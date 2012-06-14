@@ -453,7 +453,7 @@ void PakSearch::Initialize(PakList *pakList, const HFileSystem &fs, int media)
 	m_media = media;
 }
 
-bool PakSearch::OpenSearch(const wchar_t *path, const wchar_t *extIncludingPeriod)
+bool PakSearch::OpenSearch(const char *path, const char *extIncludingPeriod)
 {
 	if (m_paks->size() > 0)
 	{
@@ -472,7 +472,7 @@ bool PakSearch::OpenSearch(const wchar_t *path, const wchar_t *extIncludingPerio
 	return false;
 }
 
-bool PakSearch::NextFile(::string::WString &outFilename)
+bool PakSearch::NextFile(String &outFilename)
 {
 	RAD_ASSERT(m_search);
 	for (;;)
@@ -482,7 +482,7 @@ next_file:
 		{
 			for (PakList::iterator it = m_last; it != m_paks->end(); ++it)
 			{
-				m_search = (*it)->OpenSearch(m_path.c_str(), m_ext.c_str());
+				m_search = (*it)->OpenSearch(m_path.c_str, m_ext.c_str);
 				if (m_search)
 				{
 					m_last = (it+1);
@@ -498,7 +498,7 @@ next_file:
 			{
 				// do we need to check any other media (MOD / HDD / CDDVD will override
 				// a pak).
-				if (!m_fs->FileExists(outFilename.c_str(), int(m_media & ~Paks)))
+				if (!m_fs->FileExists(outFilename.c_str, int(m_media & ~Paks)))
 				{
 					break;
 				}
@@ -524,14 +524,14 @@ DiskSearch::DiskSearch() : AtomicRefCount(1)
 {
 }
 
-bool DiskSearch::OpenSearch(const wchar_t* path, const wchar_t* extIncludingPeriod)
+bool DiskSearch::OpenSearch(const char* path, const char* extIncludingPeriod)
 {
 	return m_search.Open(path, extIncludingPeriod, SearchFlags(FileNames|Recursive));
 }
 
-bool DiskSearch::NextFile(::string::WString &outFilename)
+bool DiskSearch::NextFile(String &outFilename)
 {
-	wchar_t buffer[MaxFilePathLen+1];
+	char buffer[MaxFilePathLen+1];
 	if (m_search.NextFile(buffer, MaxFilePathLen+1))
 	{
 		outFilename = buffer;
@@ -564,7 +564,7 @@ void CSearch::Initialize(PakList *pakList, const HFileSystem &fs, int media)
 	m_media = media;
 }
 
-bool CSearch::OpenSearch(const wchar_t *path, const wchar_t *extIncludingPeriod)
+bool CSearch::OpenSearch(const char *path, const char *extIncludingPeriod)
 {
 	RAD_ASSERT(path);
 	RAD_ASSERT(extIncludingPeriod);
@@ -596,7 +596,7 @@ bool CSearch::OpenSearch(const wchar_t *path, const wchar_t *extIncludingPeriod)
 	return false;
 }
 
-bool CSearch::NextFile(::string::WString &outFilename)
+bool CSearch::NextFile(String &outFilename)
 {
 	for (;;)
 	{
@@ -618,12 +618,12 @@ bool CSearch::NextFile(::string::WString &outFilename)
 			// MOD shadows the HDD & CDDVD
 			if ((m_curMedia == HDD || m_curMedia == CDDVD) && (m_media & Mod))
 			{
-				if (!m_fs->FileExists(outFilename.c_str(), Mod)) break;
+				if (!m_fs->FileExists(outFilename.c_str, Mod)) break;
 			}
 			// HDD shadows CDDVD
 			else if (m_curMedia == CDDVD && (m_media & HDD))
 			{
-				if (!m_fs->FileExists(outFilename.c_str(), HDD)) break;
+				if (!m_fs->FileExists(outFilename.c_str, HDD)) break;
 			}
 			else
 			{
@@ -662,8 +662,8 @@ bool CSearch::MediaSearch()
 	FileSystem *fs = InterfaceComponent<FileSystem>(m_fs);
 	if (m_curMedia == Mod)
 	{
-		::string::WString path;
-		if (m_path.length() > 0)
+		String path;
+		if (!m_path.empty)
 			path = fs->m_modPathSlash + m_path;
 		else
 			path = fs->m_modPath;
@@ -675,7 +675,7 @@ bool CSearch::MediaSearch()
 			return false;
 		}
 		ds->m_fs = m_fs;
-		if (ds->OpenSearch(path.c_str(), m_ext.c_str()))
+		if (ds->OpenSearch(path.c_str, m_ext.c_str))
 		{
 			m_search = ds;
 			return true;
@@ -684,8 +684,8 @@ bool CSearch::MediaSearch()
 	}
 	else if (m_curMedia == HDD)
 	{
-		::string::WString path;
-		if (m_path.length() > 0)
+		String path;
+		if (!m_path.empty)
 			path = fs->m_hddPathSlash + m_path;
 		else
 			path = fs->m_hddPath;
@@ -693,7 +693,7 @@ bool CSearch::MediaSearch()
 		DiskSearch* ds = fs->m_diskSearchPool.Construct();
 		RAD_OUT_OF_MEM(ds);
 		ds->m_fs = m_fs;
-		if (ds->OpenSearch(path.c_str(), m_ext.c_str()))
+		if (ds->OpenSearch(path.c_str, m_ext.c_str))
 		{
 			m_search = ds;
 			return true;
@@ -702,8 +702,8 @@ bool CSearch::MediaSearch()
 	}
 	else if(m_curMedia == CDDVD)
 	{
-		::string::WString path;
-		if (m_path.length() > 0)
+		String path;
+		if (!m_path.empty)
 			path = fs->m_cddvdPathSlash + m_path;
 		else
 			path = fs->m_cddvdPath;
@@ -711,7 +711,7 @@ bool CSearch::MediaSearch()
 		DiskSearch* ds = fs->m_diskSearchPool.Construct();
 		RAD_OUT_OF_MEM(ds);
 		ds->m_fs = m_fs;
-		if (ds->OpenSearch(path.c_str(), m_ext.c_str()))
+		if (ds->OpenSearch(path.c_str, m_ext.c_str))
 		{
 			m_search = ds;
 			return true;
@@ -723,7 +723,7 @@ bool CSearch::MediaSearch()
 		PakSearch* ps = fs->m_pakSearchPool.Construct();
 		RAD_OUT_OF_MEM(ps);
 		ps->Initialize(m_paks, m_fs, m_media);
-		if (ps->OpenSearch(m_path.c_str(), m_ext.c_str()))
+		if (ps->OpenSearch(m_path.c_str, m_ext.c_str))
 		{
 			m_search = ps;
 			return true;
@@ -772,15 +772,15 @@ void FileSystem::Initialize(int enabledMedia, U32 version)
 
 	if (m_enabledMedia & HDD)
 	{
-		m_maxSectorSize = (FPos)std::max(m_maxSectorSize, file::DeviceSectorSize(m_hddPath.c_str(), 0));
+		m_maxSectorSize = (FPos)std::max(m_maxSectorSize, file::DeviceSectorSize(m_hddPath.c_str, 0));
 	}
 	if (m_enabledMedia & CDDVD)
 	{
-		m_maxSectorSize = (FPos)std::max(m_maxSectorSize, file::DeviceSectorSize(m_cddvdPath.c_str(), 0));
+		m_maxSectorSize = (FPos)std::max(m_maxSectorSize, file::DeviceSectorSize(m_cddvdPath.c_str, 0));
 	}
 	if (m_enabledMedia & Mod)
 	{
-		m_maxSectorSize = (FPos)std::max(m_maxSectorSize, file::DeviceSectorSize(m_modPath.c_str(), 0));
+		m_maxSectorSize = (FPos)std::max(m_maxSectorSize, file::DeviceSectorSize(m_modPath.c_str, 0));
 	}
 
 	m_streamInputBufferPool.Create(
@@ -860,17 +860,17 @@ HPakFile FileSystem::Pak(int num)
 	return m_paks[num];
 }
 
-HSearch FileSystem::OpenSearch(const wchar_t *path, const wchar_t *extIncludingPeriod, int media)
+HSearch FileSystem::OpenSearch(const char *path, const char *extIncludingPeriod, int media)
 {
 	AssertInit();
 	Reference(); // making a search object references us.
 	CSearch *search = m_searchPool.Construct();
 	RAD_OUT_OF_MEM(search);
-	::string::WString str;
+	String str;
 	FixupPath(path, str);
-	::string::WString ext = ::string::WString(extIncludingPeriod).lower();
+	String ext = String(extIncludingPeriod).lower();
 	search->Initialize(&m_paks, this, int(media & m_enabledMedia));
-	if (search->OpenSearch(str.c_str(), ext.c_str()))
+	if (search->OpenSearch(str.c_str, ext.c_str))
 	{
 		return search;
 	}
@@ -968,10 +968,10 @@ HStreamInputBuffer FileSystem::CreateStreamBuffer(
 	return ib;
 }
 
-int FileSystem::FileExists(const wchar_t* filename, int media)
+int FileSystem::FileExists(const char* filename, int media)
 {
 	AssertInit();
-	::string::WString path;
+	String path;
 	FixupPath(filename, path);
 
 	int found = 0;
@@ -980,7 +980,7 @@ int FileSystem::FileExists(const wchar_t* filename, int media)
 	// try loading from Mod?
 	if (media & Mod)
 	{
-		if (file::FileExists((m_modPathSlash + path).c_str(), 0))
+		if (file::FileExists((m_modPathSlash + path).c_str, 0))
 		{
 			found |= Mod;
 		}
@@ -988,7 +988,7 @@ int FileSystem::FileExists(const wchar_t* filename, int media)
 	// try loading from HDD?
 	if (media & HDD)
 	{
-		if (file::FileExists((m_hddPathSlash + path).c_str(), 0))
+		if (file::FileExists((m_hddPathSlash + path).c_str, 0))
 		{
 			found |= HDD;
 		}
@@ -997,7 +997,7 @@ int FileSystem::FileExists(const wchar_t* filename, int media)
 	// try loading from CDDVD?
 	if (media & CDDVD)
 	{
-		if (file::FileExists((m_cddvdPathSlash + path).c_str(), 0))
+		if (file::FileExists((m_cddvdPathSlash + path).c_str, 0))
 		{
 			found |= CDDVD;
 		}
@@ -1009,7 +1009,7 @@ int FileSystem::FileExists(const wchar_t* filename, int media)
 		// go in reverse order so paks added last get checked first.
 		for (size_t i = m_paks.size(); i > 0; --i)
 		{
-			if (m_paks[i-1]->FileExists(path.c_str())) 
+			if (m_paks[i-1]->FileExists(path.c_str)) 
 			{
 				found |= Paks;
 				break;
@@ -1020,10 +1020,10 @@ int FileSystem::FileExists(const wchar_t* filename, int media)
 	return found;
 }
 
-int FileSystem::DeleteFile(const wchar_t *filename, int media)
+int FileSystem::DeleteFile(const char *filename, int media)
 {
 	AssertInit();
-	::string::WString path;
+	String path;
 	FixupPath(filename, path);
 
 	int deleted = 0;
@@ -1032,7 +1032,7 @@ int FileSystem::DeleteFile(const wchar_t *filename, int media)
 	// try loading from Mod?
 	if (media & Mod)
 	{
-		if (file::DeleteFile((m_modPathSlash + path).c_str(), 0))
+		if (file::DeleteFile((m_modPathSlash + path).c_str, 0))
 		{
 			deleted |= Mod;
 		}
@@ -1040,7 +1040,7 @@ int FileSystem::DeleteFile(const wchar_t *filename, int media)
 	// try loading from HDD?
 	if (media & HDD)
 	{
-		if (file::DeleteFile((m_hddPathSlash + path).c_str(), 0))
+		if (file::DeleteFile((m_hddPathSlash + path).c_str, 0))
 		{
 			deleted |= HDD;
 		}
@@ -1049,11 +1049,11 @@ int FileSystem::DeleteFile(const wchar_t *filename, int media)
 	return deleted;
 }
 
-bool FileSystem::FileSize(const wchar_t *filename, int media, file::FPos &size)
+bool FileSystem::FileSize(const char *filename, int media, file::FPos &size)
 {
 	AssertInit();
 	RAD_ASSERT(size);
-	::string::WString path;
+	String path;
 	FixupPath(filename, path);
 
 	media = media & m_enabledMedia;
@@ -1062,7 +1062,7 @@ bool FileSystem::FileSize(const wchar_t *filename, int media, file::FPos &size)
 	if (media & Mod)
 	{
 		file::File file;
-		if (file.Open((m_modPathSlash + path).c_str(), OpenExisting,
+		if (file.Open((m_modPathSlash + path).c_str, OpenExisting,
 			AccessRead, ShareMode(ShareRead|ShareWrite|ShareTemporary),
 			FileOptions(0), 0) == Success)
 		{
@@ -1074,7 +1074,7 @@ bool FileSystem::FileSize(const wchar_t *filename, int media, file::FPos &size)
 	if (media & HDD)
 	{
 		file::File file;
-		if (file.Open((m_hddPathSlash + path).c_str(), OpenExisting,
+		if (file.Open((m_hddPathSlash + path).c_str, OpenExisting,
 			AccessRead, ShareMode(ShareRead|ShareWrite|ShareTemporary),
 			FileOptions(0), 0) == Success)
 		{
@@ -1087,7 +1087,7 @@ bool FileSystem::FileSize(const wchar_t *filename, int media, file::FPos &size)
 	if (media & CDDVD)
 	{
 		file::File file;
-		if (file.Open((m_cddvdPathSlash + path).c_str(), OpenExisting,
+		if (file.Open((m_cddvdPathSlash + path).c_str, OpenExisting,
 			AccessRead, ShareMode(ShareRead|ShareWrite|ShareTemporary),
 			FileOptions(0), 0) == Success)
 		{
@@ -1102,7 +1102,7 @@ bool FileSystem::FileSize(const wchar_t *filename, int media, file::FPos &size)
 		// go in reverse order so paks added last get checked first.
 		for (size_t i = m_paks.size(); i > 0; --i)
 		{
-			if (m_paks[i-1]->FileSize(path.c_str(), size)) return true;
+			if (m_paks[i-1]->FileSize(path.c_str, size)) return true;
 		}
 	}
 
@@ -1110,7 +1110,7 @@ bool FileSystem::FileSize(const wchar_t *filename, int media, file::FPos &size)
 }
 
 Result FileSystem::LoadFile(
-	const wchar_t *filename, 
+	const char *filename, 
 	int &media, 
 	HBufferedAsyncIO& hAsyncIO, 
 	const HIONotify &ioComplete,
@@ -1136,7 +1136,7 @@ Result FileSystem::LoadFile(
 }
 
 Result FileSystem::OpenFile(
-	const wchar_t *filename, 
+	const char *filename, 
 	int media, 
 	HFile &hFile, 
 	const HIONotify &ioComplete,
@@ -1145,7 +1145,7 @@ Result FileSystem::OpenFile(
 {
 	AssertInit();
 	RAD_ASSERT(filename);
-	::string::WString path;
+	String path;
 
 	media = media & m_enabledMedia;
 	Result r = ErrorFileNotFound;
@@ -1157,18 +1157,18 @@ Result FileSystem::OpenFile(
 		// try loading from Mod?
 		if (media & Mod)
 		{
-			r = OpenDiskFile(m_modPathSlash.c_str(), path.c_str(), Mod, hFile, ioComplete);
+			r = OpenDiskFile(m_modPathSlash.c_str, path.c_str, Mod, hFile, ioComplete);
 		}
 		// try loading from HDD?
 		if (Success != r && (media & HDD))
 		{
-			r = OpenDiskFile(m_hddPathSlash.c_str(), path.c_str(), HDD, hFile, ioComplete);
+			r = OpenDiskFile(m_hddPathSlash.c_str, path.c_str, HDD, hFile, ioComplete);
 		}
 		// HDD not enabled or doesn't exist.
 		// try loading from CDDVD?
 		if (Success != r && (media & CDDVD))
 		{
-			r = OpenDiskFile(m_cddvdPathSlash.c_str(), path.c_str(), CDDVD, hFile, ioComplete);
+			r = OpenDiskFile(m_cddvdPathSlash.c_str, path.c_str, CDDVD, hFile, ioComplete);
 		}
 		// HDD and CDDVD failed or not enabled, try paks.
 		// try loading from Paks
@@ -1177,7 +1177,7 @@ Result FileSystem::OpenFile(
 			// go in reverse order so paks added last get checked first.
 			for (size_t i = m_paks.size(); i > 0; --i)
 			{
-				r = m_paks[i-1]->OpenFile(path.c_str(), hFile);
+				r = m_paks[i-1]->OpenFile(path.c_str, hFile);
 				if (r == Success) 
 					break;
 			}
@@ -1186,7 +1186,7 @@ Result FileSystem::OpenFile(
 	else
 	{
 		if (media & HDD)
-			r = OpenDiskFile(L"", filename, HDD, hFile, ioComplete);
+			r = OpenDiskFile("", filename, HDD, hFile, ioComplete);
 	}
 
 	if (ioComplete)
@@ -1196,7 +1196,7 @@ Result FileSystem::OpenFile(
 }
 
 Result FileSystem::OpenFileStream(
-	const wchar_t *path,
+	const char *path,
 	int &media,
 	HStreamInputBuffer &stream,
 	const HIONotify &ioComplete,
@@ -1239,16 +1239,16 @@ Result FileSystem::OpenFileStream(
 }
 
 Result FileSystem::OpenDiskFile(
-	const wchar_t *prefix, 
-	const wchar_t *filename, 
+	const char *prefix, 
+	const char *filename, 
 	int media, 
 	HFile &hFile, 
 	const HIONotify &ioComplete
 )
 {
 	AssertInit();
-	::string::WString strFile = ::string::WString(prefix) + ::string::WString(filename);
-	if (file::FileExists(strFile.c_str(), 0))
+	String strFile = String(prefix, RefTag) + String(filename, RefTag);
+	if (file::FileExists(strFile.c_str, 0))
 	{
 		DiskFile *diskFile = m_diskFilePool.Construct();
 		RAD_OUT_OF_MEM(diskFile);
@@ -1257,9 +1257,9 @@ Result FileSystem::OpenDiskFile(
 		diskFile->m_fs = this;
 		diskFile->m_media = media;
 
-		diskFile->m_sectorSize = file::DeviceSectorSize(strFile.c_str(), 0);
+		diskFile->m_sectorSize = file::DeviceSectorSize(strFile.c_str, 0);
 		RAD_ASSERT(diskFile->m_sectorSize);
-		Result r = diskFile->m_file.Open(strFile.c_str(), OpenAlways, AccessRead, ShareRead, Async, 0);
+		Result r = diskFile->m_file.Open(strFile.c_str, OpenAlways, AccessRead, ShareRead, Async, 0);
 
 		if (r == Success)
 		{
@@ -1288,12 +1288,12 @@ void *FileSystem::AlignedFileBuffer(FPos size, FPos alignment, Zone &zone)
 	return zone_malloc(zone, size, 0, alignment);
 }
 
-void FileSystem::FixupPath(const wchar_t *str, ::string::WString &path)
+void FileSystem::FixupPath(const char *str, String &path)
 {
 	RAD_ASSERT(str);
 	path.clear();
 	if (str[0] == 0) return;
-	::string::WString prefix, right;
+	String prefix, right;
 
 	// remove leading ../
 	while (str[0] == L'.' && str[1] == L'.' && str[2] == L'/')
@@ -1304,23 +1304,23 @@ void FileSystem::FixupPath(const wchar_t *str, ::string::WString &path)
 	right = str;
 
 	// process '../' command inside path string.
-	while (!right.empty())
+	while (!right.empty)
 	{
-		::string::WString::size_type ofs = right.find_first_of(L'/');
-		if (ofs != ::string::WString::npos)
+		int ofs = right.strstr("/");
+		if (ofs != -1)
 		{
 			prefix = right.substr(0, ofs+1); // include '/'
-			right = right.substr(ofs+1);
+			right = right.left(ofs+1);
 
-			if (right.length() >= 3)
+			if (right.length >= 3)
 			{
-				if (right[0] == L'.' && right[1] == L'.' && right[2] == L'/')
+				if (right[0] == '.' && right[1] == '.' && right[2] == '/')
 				{
 					prefix.clear();
 					// remove leading ../
-					while (right.length() >= 3 && right[0] == L'.' && right[1] == L'.' && right[2] == L'/')
+					while (right.length >= 3 && right[0] == '.' && right[1] == '.' && right[2] == '/')
 					{
-						right = right.substr(3);
+						right = right.left(3);
 					}
 				}
 			}
@@ -1354,34 +1354,35 @@ void FileSystem::RAD_IMPLEMENT_SET(enabledMedia) (int value)
 	m_enabledMedia = value;
 }
 
-const wchar_t *FileSystem::RAD_IMPLEMENT_GET(cddvdRoot)
+const char *FileSystem::RAD_IMPLEMENT_GET(cddvdRoot)
 {
 
-	return m_cddvd.c_str();
+	return m_cddvd.c_str;
 }
 
-void FileSystem::RAD_IMPLEMENT_SET(cddvdRoot) (const wchar_t *value)
+void FileSystem::RAD_IMPLEMENT_SET(cddvdRoot) (const char *value)
 {
 	AssertInit();
 
-	if(value == 0 || value[0] == 0)
-	{
-		value = L"";
+	if(value == 0) {
+		value = "";
 	}
 
 	m_cddvd = value;
-	if (m_cddvd[0] == L'/') m_cddvd.erase(0, 1);
-	if (!m_cddvd.empty())
+	if (m_cddvd[0] == '/') 
+		m_cddvd.erase(0, 1);
+
+	if (!m_cddvd.empty)
 	{
-		if (*(m_cddvd.end()-1) == L'/')
+		if (*(m_cddvd.end-1) == L'/')
 		{
-			m_cddvd.erase(m_cddvd.end()-1);
+			m_cddvd.erase(m_cddvd.length-1);
 		}
 	}
-	if (!m_cddvd.empty())
+	if (!m_cddvd.empty)
 	{
-		m_cddvdPath = ::string::WString(L"1:/") + m_cddvd;
-		m_cddvdPathSlash = m_cddvdPath + L'/';
+		m_cddvdPath = String("1:/", RefTag) + m_cddvd;
+		m_cddvdPathSlash = m_cddvdPath + '/';
 	}
 	else
 	{
@@ -1390,75 +1391,77 @@ void FileSystem::RAD_IMPLEMENT_SET(cddvdRoot) (const wchar_t *value)
 	}
 }
 
-const wchar_t *FileSystem::RAD_IMPLEMENT_GET(hddRoot)
+const char *FileSystem::RAD_IMPLEMENT_GET(hddRoot)
 {
 	AssertInit();
-	return m_hdd.c_str();
+	return m_hdd.c_str;
 }
 
-void FileSystem::RAD_IMPLEMENT_SET(hddRoot) (const wchar_t *value)
+void FileSystem::RAD_IMPLEMENT_SET(hddRoot) (const char *value)
 {
 	AssertInit();
 
 	if(value == 0 || value[0] == 0)
 	{
-		value = L"";
+		value = "";
 	}
 
 	m_hdd = value;
-	if (m_hdd[0] == L'/') m_hdd.erase(0, 1);
-	if (!m_hdd.empty())
+	if (m_hdd[0] == '/') 
+		m_hdd.erase(0, 1);
+	if (!m_hdd.empty)
 	{
-		if (*(m_hdd.end()-1) == L'/')
+		if (*(m_hdd.end-1) == '/')
 		{
-			m_hdd.erase(m_hdd.end()-1);
+			m_hdd.erase(m_hdd.length-1);
 		}
 	}
-	if (!m_hdd.empty())
+	if (!m_hdd.empty)
 	{
-		m_hddPath = ::string::WString(L"9:/") + m_hdd;
-		m_hddPathSlash = m_hddPath + L'/';
+		m_hddPath = String("9:/") + m_hdd;
+		m_hddPathSlash = m_hddPath + '/';
 	}
 	else
 	{
-		m_hddPath = L"9:";
-		m_hddPathSlash = L"9:/";
+		m_hddPath = "9:";
+		m_hddPathSlash = "9:/";
 	}
 }
 
-const wchar_t *FileSystem::RAD_IMPLEMENT_GET(modRoot)
+const char *FileSystem::RAD_IMPLEMENT_GET(modRoot)
 {
 	AssertInit();
-	return m_mod.c_str();
+	return m_mod.c_str;
 }
 
-void FileSystem::RAD_IMPLEMENT_SET(modRoot) (const wchar_t *value)
+void FileSystem::RAD_IMPLEMENT_SET(modRoot) (const char *value)
 {
 	AssertInit();
 
 	if(value == 0 || value[0] == 0)
 	{
-		value = L"";
+		value = "";
 	}
 
 	m_mod = value;
-	if (m_mod[0] == L'/') m_mod.erase(0, 1);
-	if (!m_mod.empty())
+	if (m_mod[0] == '/') 
+		m_mod.erase(0, 1);
+	if (!m_mod.empty)
 	{
-		if (*(m_mod.end()-1) == L'/')
+		if (*(m_mod.end-1) == '/')
 		{
-			m_mod.erase(m_mod.end()-1);
+			m_mod.erase(m_mod.length-1);
 		}
 	}
-	if (!m_mod.empty())
+	if (!m_mod.empty)
 	{
-		m_modPath = ::string::WString(L"9:/") + m_mod;
-		m_modPathSlash = m_modPath + L'/';
+		m_modPath = String("9:/") + m_mod;
+		m_modPathSlash = m_modPath + '/';
 	}
 	else
 	{
-		m_modPath = L"9:";
-		m_modPathSlash = L"9:/";
+		m_modPath = "9:";
+		m_modPathSlash = "9:/";
 	}
 }
 

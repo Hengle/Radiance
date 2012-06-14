@@ -35,13 +35,13 @@ private:
 	Search();
 	~Search();
 
-	bool Open(const wchar_t* directory,
-		const wchar_t* extWithPeriod,
+	bool Open(const char* directory,
+		const char* extWithPeriod,
 		SearchFlags flags
 	);
 
 	bool NextFile(
-		wchar_t* filenameBuffer,
+		char* filenameBuffer,
 		UReg filenameBufferSize,
 		FileAttributes* fileFlags,
 		xtime::TimeDate* fileTime
@@ -50,17 +50,17 @@ private:
 	void Close();
 
 	bool PrivateOpen(
-		const wchar_t* root,
-		const wchar_t* directory,
-		const wchar_t* extWithPeriod,
+		const char* root,
+		const char* directory,
+		const char* extWithPeriod,
 		SearchFlags flags
 	);
 
 	bool IsValid();
 
-	wchar_t m_root[MaxFilePathLen+1];
-	wchar_t m_dir[MaxFilePathLen+1];
-	wchar_t m_ext[MaxExtLen+1];
+	char m_root[MaxFilePathLen+1];
+	char m_dir[MaxFilePathLen+1];
+	char m_ext[MaxExtLen+1];
 	HANDLE m_search;
 	WIN32_FIND_DATAW m_findData;
 	Search* m_recursed;
@@ -123,7 +123,7 @@ class RADRT_CLASS File
 	~File();
 
 	Result Open(
-		const wchar_t* filename,
+		const char* filename,
 		CreationType creationType,
 		AccessMode accessMode,
 		ShareMode shareMode,

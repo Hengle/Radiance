@@ -7,6 +7,7 @@
 
 #include "StringDef.h"
 #include "../Base/MemoryPool.h"
+#include "../Base/ObjectPool.h"
 #include "../Thread/Locks.h"
 
 #include "../PushPack.h"
@@ -20,88 +21,132 @@ public:
 	typedef boost::mutex M;
 	typedef boost::lock_guard<M> Lock;
 	typedef thread::scoped_lock_guard<M> ScopedLock;
-	static M &Get() {
+	static M &get() {
 		static M s_m;
 		return s_m;
 	}
 };
 
-//! Immutable String Buffer
-class StringBuf : public boost::noncopyable {
+class DataBlock {
 public:
-
-	typedef StringBufRef Ref;
-	typedef StringBufWRef WRef;
-
-	static Ref New(
-		RefType refType,
-		const char *src,
-		int numBytes,
-		Zone &zone
-	);
-
-	static Ref New(
-		const wchar_t *src,
-		int numChars,
-		Zone &zone
-	);
-
-	static Ref New(
-		const wchar_t *src,
-		int numChars,
-		Zone &zone
-	);
-
-	RAD_DECLARE_READONLY_PROPERTY(StringBuf, buf, const char *);
-	RAD_DECLARE_READONLY_PROPERTY(StringBuf, numBytes, int);
-
-private:
+	typedef boost::shared_ptr<DataBlock> Ref;
 	
-	StringBuf(
-		RefType refType,
-		const char *src,
-		int numBytes,
-		MemoryPool *pool
-	) : m_refType(refType),
-	    m_buf(src),
-	    m_numBytes(numBytes),
-	    m_pool(pool) {
-	}
-
-	~StringBuf() {
-		if (m_buf && RT_Copy == m_refType) {
+	~DataBlock() {
+		if (m_refType == kRefType_Copy) {
 			if (m_pool) {
-				Mutex::ScopedLock L(Mutex::Get());
 				m_pool->ReturnChunk(m_buf);
+			} else {
+				zone_free(m_buf);
 			}
 		}
 	}
 
-	RAD_DECLARE_GET(buf, const char *) {
+private:
+
+	friend class String;
+	template <typename> friend class CharBuf;
+	friend class ObjectPool<DataBlock>;
+
+	typedef void (*unspecified_bool_type) ();
+
+	RAD_DECLARE_READONLY_PROPERTY(DataBlock, data, void*);
+	RAD_DECLARE_READONLY_PROPERTY(DataBlock, size, int);
+
+	// len here is the total buffer length.
+	static DataBlock::Ref create(
+		RefType type,
+		int len,
+		const void *src,
+		int srcLen,
+		Zone &zone
+	);
+
+	static Ref create(
+		const U16 *src,
+		int len,
+		Zone &zone
+	);
+
+	static Ref create(
+		const U32 *src,
+		int len,
+		Zone &zone
+	);
+
+#if defined(RAD_NATIVE_WCHAR_T_DEFINED)
+	static Ref create(
+		const wchar_t *src,
+		int len,
+		Zone &zone
+	) {
+#if defined(RAD_OPT_4BYTE_WCHAR)
+		return DataBlock::create((const U32*)src, len, zone);
+#else
+		return DataBlock::create((const U16*)src, len, zone);
+#endif
+	}
+#endif
+
+	static DataBlock::Ref resize(const DataBlock::Ref &block, int size, Zone &zone);
+
+	static DataBlock::Ref isolate(const DataBlock::Ref &block, Zone &zone) {
+		RAD_ASSERT(block);
+		if (!block.unique() || (block->m_refType != kRefType_Copy))
+			return create(kRefType_Copy, block->m_size, block->m_buf, block->m_size, zone);
+		return block;
+	}
+
+	DataBlock(
+		RefType type,
+		void *src,
+		int size,
+		MemoryPool *pool,
+		int poolIdx
+	) : 
+	m_buf(src),
+	m_size(size),
+	m_pool(pool),
+	m_poolIdx(poolIdx),
+	m_refType(type) {
+	}
+
+	void *m_buf;
+	int m_size;
+
+	MemoryPool *m_pool;
+	int m_poolIdx;
+	RefType m_refType;
+
+	RAD_DECLARE_GET(data, void*) {
 		return m_buf;
 	}
 
-	RAD_DECLARE_GET(numBytes, int) {
-		return m_numBytes;
+	RAD_DECLARE_GET(size, int) {
+		return m_size;
 	}
 
-	const char *m_buf;
-	MemoryPool *m_pool;
-	int m_numBytes;
-	RefType m_refType;
+	static void destroy(DataBlock *d) {
+		s_dataBlockPool.Destroy(d);
+	}
 
 	enum {
-		MinPoolSize = 4,
-		NumPools = 5,
-		MaxPoolSize = MinPoolSize << NumPools
+		kMinPoolSize = 4,
+		kNumPools = 5,
+		kMaxPoolSize = kMinPoolSize << kNumPools
 	};
 
 	typedef boost::mutex Mutex;
 	typedef boost::lock_guard<Mutex> Lock;
+	typedef ObjectPool<DataBlock> DataBlockPool;
 
 	static bool s_init;
-	static MemoryPool s_pools[NumPools];
-	static MemoryPool *PoolForSize(int size, Mutex::ScopedLock &L);
+	static DataBlockPool s_dataBlockPool;
+	static MemoryPool s_pools[kNumPools];
+	static MemoryPool *poolForSize(
+		int size, 
+		int &poolIdx, 
+		string::details::Mutex::ScopedLock &L
+	);
 };
 
 } // details

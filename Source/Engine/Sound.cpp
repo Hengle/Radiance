@@ -37,7 +37,7 @@ bool CheckALErrors(const char *file, const char *function, int line)
 #if defined(RAD_OPT_IOS)
 	return alGetError() != AL_NO_ERROR;
 #else
-	WString str;
+	String str;
 	bool found = false;
 	int count = 0;
 
@@ -48,10 +48,10 @@ bool CheckALErrors(const char *file, const char *function, int line)
 
 		if (!found)
 		{
-			str.format(
-				L"AL Errors (file: %s, function: %s, line: %d):\n",
-				string::Widen(file).c_str(),
-				string::Widen(function).c_str(),
+			str.printf(
+				"AL Errors (file: %s, function: %s, line: %d):\n",
+				file,
+				function,
 				line
 			);
 			found = true;
@@ -60,29 +60,29 @@ bool CheckALErrors(const char *file, const char *function, int line)
 		switch (err)
 		{
 		case AL_INVALID_NAME:
-			str += L"AL_INVALID_NAME\n";
+			str += CStr("AL_INVALID_NAME\n");
 			break;
 		case AL_INVALID_ENUM:
-			str += L"AL_INVALID_ENUM\n";
+			str += CStr("AL_INVALID_ENUM\n");
 			break;
 		case AL_INVALID_VALUE:
-			str += L"AL_INVALID_VALUE\n";
+			str += CStr("AL_INVALID_VALUE\n");
 			break;
 		case AL_INVALID_OPERATION:
-			str += L"AL_INVALID_OPERATION\n";
+			str += CStr("AL_INVALID_OPERATION\n");
 			break;
 		case AL_OUT_OF_MEMORY:
-			str += L"AL_OUT_OF_MEMORY\n";
+			str += CStr("AL_OUT_OF_MEMORY\n");
 			break;
 		default:
-			str += L"Unknown Error\n";
+			str += CStr("Unknown Error\n");
 		};
 	}
 
 	ClearALErrors();
 	if (found)
 	{
-		MessageBox(L"AL Errors Detected", str.c_str(), MBStyleOk);
+		MessageBox("AL Errors Detected", str.c_str.get(), MBStyleOk);
 	}
 
 	return found;

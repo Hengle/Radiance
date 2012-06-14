@@ -20,7 +20,7 @@ int Keys::IntForKey(const char *name, int def) const
 	int r;
 #define CAWARN_DISABLE 6031 // return value ignored
 #include <Runtime/PushCAWarnings.h>
-	sscanf(it->second.c_str(), "%d", &r);
+	sscanf(it->second.c_str, "%d", &r);
 #include <Runtime/PopCAWarnings.h>
 	return r;
 }
@@ -45,7 +45,7 @@ float Keys::FloatForKey(const char *name, float def) const
 	float r;
 #define CAWARN_DISABLE 6031 // return value ignored
 #include <Runtime/PushCAWarnings.h>
-	sscanf(it->second.c_str(), "%f", &r);
+	sscanf(it->second.c_str, "%f", &r);
 #include <Runtime/PopCAWarnings.h>
 	return r;
 }
@@ -57,7 +57,7 @@ const char *Keys::StringForKey(const char *name, const char *def) const
 	Pairs::const_iterator it = pairs.find(s);
 	if (it == pairs.end())
 		return def;
-	return it->second.c_str();
+	return it->second.c_str;
 }
 
 Color4 Keys::Color4ForKey(const char *name, const Color4 &def) const
@@ -70,7 +70,7 @@ Color4 Keys::Color4ForKey(const char *name, const Color4 &def) const
 	int r, g, b, a;
 #define CAWARN_DISABLE 6031 // return value ignored
 #include <Runtime/PushCAWarnings.h>
-	sscanf(it->second.c_str(), "%d %d %d %d", &r, &g, &b, &a);
+	sscanf(it->second.c_str, "%d %d %d %d", &r, &g, &b, &a);
 #include <Runtime/PopCAWarnings.h>
 	return Color4(r/255.0f, g/255.0f, b/255.0f, a/255.0f);
 }
@@ -85,7 +85,7 @@ Vec3 Keys::Vec3ForKey(const char *name, const Vec3 &def) const
 	float x, y, z;
 #define CAWARN_DISABLE 6031 // return value ignored
 #include <Runtime/PushCAWarnings.h>
-	sscanf(it->second.c_str(), "%f %f %f", &x, &y, &z);
+	sscanf(it->second.c_str, "%f %f %f", &x, &y, &z);
 #include <Runtime/PopCAWarnings.h>
 	return Vec3(x, y, z);
 }

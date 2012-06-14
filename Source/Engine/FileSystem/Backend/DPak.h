@@ -117,20 +117,20 @@ struct DPakFile :
 	private AtomicRefCount
 {
 	HDPakReader m_reader;
-	string::WString m_name;
+	string::String m_name;
 	HFile m_file;
 	data_codec::lmp::StreamReader m_pak;
 
 	DPakFile();
 
-	bool Initialize(const HDPakReader &reader, const HFile &file, const wchar_t *name);
+	bool Initialize(const HDPakReader &reader, const HFile &file, const char *name);
 
-	virtual HSearch OpenSearch(const wchar_t* path, const wchar_t* extIncludingPeriod);
-	virtual Result OpenFile(const wchar_t *path, HFile &file);
-	virtual bool FileExists(const wchar_t* path);
-	virtual bool FileSize(const wchar_t* path, file::FPos& size);
+	virtual HSearch OpenSearch(const char* path, const char* extIncludingPeriod);
+	virtual Result OpenFile(const char *path, HFile &file);
+	virtual bool FileExists(const char* path);
+	virtual bool FileSize(const char* path, file::FPos& size);
 
-	virtual RAD_DECLARE_GET(name, const wchar_t*);
+	virtual RAD_DECLARE_GET(name, const char*);
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// IInterface
@@ -155,12 +155,12 @@ struct DPakFileSearch :
 	HPakFile m_pakFile;
 	DPakFile *m_dpakFile;
 	U32 m_lumpNum;
-	string::WString m_path;
-	string::WString m_ext;
+	string::String m_path;
+	string::String m_ext;
 
 	DPakFileSearch();
 
-	virtual bool NextFile(string::WString &outFilename);
+	virtual bool NextFile(string::String &outFilename);
 	
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// IInterface
@@ -210,7 +210,7 @@ private AtomicRefCount
 		U32 version
 	);
 
-	virtual HPakFile MountPakFile(const HFile &file, const wchar_t *name);
+	virtual HPakFile MountPakFile(const HFile &file, const char *name);
 	virtual int ThreadProc();
 	bool ProcessDecoder(DPakFileEntry::Decoder &decoder, bool &waitingForIO);
 

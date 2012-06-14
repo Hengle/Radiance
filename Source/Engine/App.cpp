@@ -104,10 +104,10 @@ StringTable::LangId App::LoadLangId(int *enabledLangMask) {
 	if (enabledLangMask)
 		*enabledLangMask = StringTable::LangFlag_EN;
 
-	wchar_t nativePath[file::MaxFilePathLen+1];
-	file::ExpandToNativePath(L"9:/languages.txt", nativePath, file::MaxFilePathLen+1);
-	FILE *fp = file::wfopen(nativePath, L"rb");
-	if (!fp)
+	char nativePath[file::MaxFilePathLen+1];
+	file::ExpandToNativePath("9:/languages.txt", nativePath, file::MaxFilePathLen+1);
+	FILE *fp = fopen(nativePath, "rb");
+	if (!fp)	
 		return ErrLang;
 	fseek(fp, 0, SEEK_END);
 	size_t size = ftell(fp);
@@ -135,7 +135,7 @@ StringTable::LangId App::LoadLangId(int *enabledLangMask) {
 			if (!script.GetToken(token))
 				return ErrLang;
 			token = token.lower();
-			int id = StringTable::Map(token.c_str());
+			int id = StringTable::Map(token.c_str);
 			if (id != -1)
 				defaultLang = (StringTable::LangId)id;
 		} else if (token == "FORCE") {
@@ -144,7 +144,7 @@ StringTable::LangId App::LoadLangId(int *enabledLangMask) {
 			if (!script.GetToken(token))
 				return ErrLang;
 			token = token.lower();
-			int id = StringTable::Map(token.c_str());
+			int id = StringTable::Map(token.c_str);
 			if (id != -1) {
 				if (enabledLangMask) // make sure to set this
 					*enabledLangMask = validLangBits;
@@ -152,7 +152,7 @@ StringTable::LangId App::LoadLangId(int *enabledLangMask) {
 			}
 		} else {
 			token = token.lower();
-			int id = StringTable::Map(token.c_str());
+			int id = StringTable::Map(token.c_str);
 			if (id != -1)
 				validLangBits |= (1<<id);
 		}

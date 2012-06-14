@@ -88,8 +88,7 @@ int MapParser::ParseScript(world::EntSpawn &spawn)
 			return SR_ParseError;
 
 		// turn "\n" into '\n'
-		const char *sz = value.c_str();
-		temp.reserve(value.length());
+		const char *sz = value.c_str;
 		temp.clear();
 
 		while (*sz)
@@ -122,14 +121,12 @@ int MapParser::Load(
 	if (m_state == S_None)
 	{
 		const String *name = asset->entry->KeyValue<String>("Source.File", P_TARGET_FLAGS(flags));
-		if (!name || name->empty())
+		if (!name || name->empty)
 			return SR_MetaError;
-
-		WString wname(string::Widen(name->c_str()));
 
 		int media = file::AllMedia;
 		int r = engine.sys->files->LoadFile(
-			wname.c_str(),
+			name->c_str,
 			media,
 			m_buf,
 			file::HIONotify()

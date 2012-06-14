@@ -30,8 +30,8 @@ RAD_REFLECTED_INTERFACE_BEGIN(IFileSystem, IInterface, file.IFileSystem)
 	virtual HPakFile Pak(int num) = 0;
 	
 	virtual HSearch OpenSearch(
-		const wchar_t *path, 
-		const wchar_t *extIncludingPeriod, 
+		const char *path, 
+		const char *extIncludingPeriod, 
 		int media
 	) = 0;
 
@@ -66,7 +66,7 @@ RAD_REFLECTED_INTERFACE_BEGIN(IFileSystem, IInterface, file.IFileSystem)
 	) = 0;
 
 	virtual Result LoadFile(
-		const wchar_t          *path,
+		const char          *path,
 		int                    &media,
 		HBufferedAsyncIO       &asyncIO,
 		const HIONotify        &ioComplete,
@@ -76,7 +76,7 @@ RAD_REFLECTED_INTERFACE_BEGIN(IFileSystem, IInterface, file.IFileSystem)
 	) = 0;
 
 	virtual Result OpenFile(
-		const wchar_t *path, 
+		const char *path, 
 		int media, 
 		HFile &file, 
 		const HIONotify &ioComplete,
@@ -84,7 +84,7 @@ RAD_REFLECTED_INTERFACE_BEGIN(IFileSystem, IInterface, file.IFileSystem)
 	) = 0;
 
 	virtual Result OpenFileStream(
-		const wchar_t *path,
+		const char *path,
 		int &media,
 		HStreamInputBuffer &stream,
 		const HIONotify &ioComplete,
@@ -94,19 +94,19 @@ RAD_REFLECTED_INTERFACE_BEGIN(IFileSystem, IInterface, file.IFileSystem)
 	) = 0;
 
 	// returns the media where the file was found.
-	virtual int FileExists(const wchar_t *path, int media) = 0;
-	virtual bool FileSize(const wchar_t *path, int media, FPos& size) = 0;
+	virtual int FileExists(const char *path, int media) = 0;
+	virtual bool FileSize(const char *path, int media, FPos& size) = 0;
 
 	// returns the media the file was deleted from.
-	virtual int DeleteFile(const wchar_t *path, int media) = 0;
+	virtual int DeleteFile(const char *path, int media) = 0;
 
 	// Properties
 
 	RAD_DECLARE_READONLY_PROPERTY(IFileSystem, numPaks, int);
 	RAD_DECLARE_PROPERTY(IFileSystem, enabledMedia, int, int);
-	RAD_DECLARE_PROPERTY(IFileSystem, cddvdRoot, const wchar_t*, const wchar_t*);
-	RAD_DECLARE_PROPERTY(IFileSystem, hddRoot, const wchar_t*, const wchar_t*);
-	RAD_DECLARE_PROPERTY(IFileSystem, modRoot, const wchar_t*, const wchar_t*);
+	RAD_DECLARE_PROPERTY(IFileSystem, cddvdRoot, const char*, const char*);
+	RAD_DECLARE_PROPERTY(IFileSystem, hddRoot, const char*, const char*);
+	RAD_DECLARE_PROPERTY(IFileSystem, modRoot, const char*, const char*);
 
 protected:
 
@@ -115,12 +115,12 @@ protected:
 	virtual RAD_DECLARE_GET(numPaks, int) = 0;
 	virtual RAD_DECLARE_GET(enabledMedia, int) = 0;
 	virtual RAD_DECLARE_SET(enabledMedia, int) = 0;
-	virtual RAD_DECLARE_GET(cddvdRoot, const wchar_t*) = 0;
-	virtual RAD_DECLARE_SET(cddvdRoot, const wchar_t*) = 0;
-	virtual RAD_DECLARE_GET(hddRoot, const wchar_t*) = 0;
-	virtual RAD_DECLARE_SET(hddRoot, const wchar_t*) = 0;
-	virtual RAD_DECLARE_GET(modRoot, const wchar_t*) = 0;
-	virtual RAD_DECLARE_SET(modRoot, const wchar_t*) = 0;
+	virtual RAD_DECLARE_GET(cddvdRoot, const char*) = 0;
+	virtual RAD_DECLARE_SET(cddvdRoot, const char*) = 0;
+	virtual RAD_DECLARE_GET(hddRoot, const char*) = 0;
+	virtual RAD_DECLARE_SET(hddRoot, const char*) = 0;
+	virtual RAD_DECLARE_GET(modRoot, const char*) = 0;
+	virtual RAD_DECLARE_SET(modRoot, const char*) = 0;
 
 RAD_INTERFACE_END
 
@@ -270,7 +270,7 @@ RAD_INTERFACE_END
 
 RAD_REFLECTED_INTERFACE_BEGIN(ISearch, IInterface, file.ISearch)
 
-	virtual bool NextFile(string::WString &outFilename) = 0;
+	virtual bool NextFile(string::String &outFilename) = 0;
 
 RAD_INTERFACE_END
 
@@ -282,18 +282,18 @@ RAD_REFLECTED_INTERFACE_BEGIN(IPakFile, IInterface, file.IPakFile)
 
 	// Methods
 
-	virtual HSearch OpenSearch(const wchar_t *path, const wchar_t *extIncludingPeriod) = 0;
-	virtual Result OpenFile(const wchar_t *path, HFile &file) = 0;
-	virtual bool FileExists(const wchar_t *path) = 0;
-	virtual bool FileSize(const wchar_t *path, file::FPos &size) = 0;
+	virtual HSearch OpenSearch(const char *path, const char *extIncludingPeriod) = 0;
+	virtual Result OpenFile(const char *path, HFile &file) = 0;
+	virtual bool FileExists(const char *path) = 0;
+	virtual bool FileSize(const char *path, file::FPos &size) = 0;
 
 	// Properties
 
-	RAD_DECLARE_READONLY_PROPERTY(IPakFile, name, const wchar_t*);
+	RAD_DECLARE_READONLY_PROPERTY(IPakFile, name, const char*);
 
 protected:
 
-	virtual RAD_DECLARE_GET(name, const wchar_t*) = 0;
+	virtual RAD_DECLARE_GET(name, const char*) = 0;
 
 RAD_INTERFACE_END
 

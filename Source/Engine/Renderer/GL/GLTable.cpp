@@ -903,7 +903,7 @@ bool GLTable::CheckErrors(const char *file, const char *function, int line)
 #if defined(RAD_OPT_IOS) || defined(RAD_OPT_OSX)
 	return glGetError() != GL_NO_ERROR;
 #else
-	WString str;
+	String str;
 	bool found = false;
 	int count = 0;
 
@@ -914,23 +914,23 @@ bool GLTable::CheckErrors(const char *file, const char *function, int line)
 
 		if (!found)
 		{
-			str.format(
-				L"GL Errors (file: %s, function: %s, line: %d):\n",
-				string::Widen(file).c_str(),
-				string::Widen(function).c_str(),
+			str.printf(
+				"GL Errors (file: %s, function: %s, line: %d):\n",
+				file,
+				function,
 				line
 			);
 			found = true;
 		}
 
-		str += string::Widen((const char*)gluErrorString(err));
-		str += L"\n";
+		str += (const char*)gluErrorString(err);
+		str += CStr("\n");
 	}
 
 	ClearErrors();
 	if (found)
 	{
-		MessageBox(L"GL Errors Detected", str.c_str(), MBStyleOk);
+		MessageBox("GL Errors Detected", str.c_str, MBStyleOk);
 	}
 
 	return found;

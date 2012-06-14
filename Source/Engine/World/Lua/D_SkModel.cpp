@@ -188,7 +188,7 @@ void D_SkModel::Notify::OnTag(const ska::AnimTagEventData &data)
 	}
 
 	entity->PushEntityFrame(L);
-	lua_pushstring(L, data.tag.c_str());
+	lua_pushstring(L, data.tag.c_str);
 	entity->world->lua->Call(L, "D_SkModel::Notify::OnTag", 2, 0, 0);
 	lua_pop(L, 1); // pop callback table
 }

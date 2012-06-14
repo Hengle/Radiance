@@ -21,7 +21,7 @@ using namespace string;
 
 namespace file {
 
-const wchar_t * const NativePathSeparator = L"\\";
+const char * const NativePathSeparator = L"\\";
 
 namespace details {
 
@@ -374,13 +374,13 @@ File::~File()
 // unless otherwise noted, if the AsyncIO object on any function is NULL, the function is
 // blocking.
 
-Result File::Open(const wchar_t *filename, CreationType creationType, AccessMode accessMode, ShareMode shareMode, FileOptions fileOptions, AsyncIO *io)
+Result File::Open(const char *filename, CreationType creationType, AccessMode accessMode, ShareMode shareMode, FileOptions fileOptions, AsyncIO *io)
 {
 	RAD_ASSERT(m_file == INVALID_HANDLE_VALUE);
 	RAD_ASSERT(filename && filename[0]);
 	RAD_DEBUG_ONLY( AssertCreationType( creationType ) );
 
-	wchar_t nativeFilename[MaxFilePathLen+1];
+	char nativeFilename[MaxFilePathLen+1];
 	DWORD access, share, create, attrs;
 
 	// make sure we can expand this.
@@ -658,7 +658,7 @@ Search::~Search()
 	}
 }
 
-bool Search::Open(const wchar_t *directory, const wchar_t *ext, SearchFlags flags)
+bool Search::Open(const char *directory, const char *ext, SearchFlags flags)
 {
 	RAD_ASSERT(directory && directory[0]);
 	RAD_ASSERT(ext && ext[0]);
@@ -686,7 +686,7 @@ bool Search::Open(const wchar_t *directory, const wchar_t *ext, SearchFlags flag
 	return PrivateOpen(L"", directory, ext, flags);
 }
 
-bool Search::PrivateOpen(const wchar_t *root, const wchar_t *directory, const wchar_t *ext, SearchFlags flags)
+bool Search::PrivateOpen(const char *root, const char *directory, const char *ext, SearchFlags flags)
 {
 	RAD_ASSERT(root);
 	RAD_ASSERT(directory && directory[0]);
@@ -707,7 +707,7 @@ bool Search::PrivateOpen(const wchar_t *root, const wchar_t *directory, const wc
 
 	cpy(m_ext, ext);
 
-	wchar_t buff[MaxFilePathLen+1];
+	char buff[MaxFilePathLen+1];
 	if (flags & NativePath)
 	{
 		ncpy(buff, directory, MaxFilePathLen+1);
@@ -754,7 +754,7 @@ bool Search::PrivateOpen(const wchar_t *root, const wchar_t *directory, const wc
 	return false;
 }
 
-bool Search::NextFile(wchar_t *filenameBuffer, UReg filenameBufferSize, FileAttributes *fileFlags, xtime::TimeDate *fileTime)
+bool Search::NextFile(char *filenameBuffer, UReg filenameBufferSize, FileAttributes *fileFlags, xtime::TimeDate *fileTime)
 {
 	RAD_ASSERT(filenameBuffer);
 	RAD_ASSERT(filenameBufferSize > 0);
@@ -772,7 +772,7 @@ bool Search::NextFile(wchar_t *filenameBuffer, UReg filenameBufferSize, FileAttr
 	}
 
 	RAD_ASSERT(m_recursed == 0);
-	wchar_t ext[MaxExtLen+1];
+	char ext[MaxExtLen+1];
 
 	for (;;)
 	{
@@ -866,7 +866,7 @@ bool Search::NextFile(wchar_t *filenameBuffer, UReg filenameBufferSize, FileAttr
 				if (m_flags & Recursive)
 				{
 					UReg l;
-					wchar_t root[MaxFilePathLen+1], dir[MaxFilePathLen+1];
+					char root[MaxFilePathLen+1], dir[MaxFilePathLen+1];
 
 					if (m_root[0] != 0)
 					{
@@ -1088,7 +1088,7 @@ namespace {
 void SetDefaultAliases()
 {
 	{
-		wchar_t buff[MaxFilePathLen+1];
+		char buff[MaxFilePathLen+1];
 
 		{
 			_wgetcwd(buff, MaxFilePathLen);
@@ -1136,9 +1136,9 @@ void SetDefaultAliases()
 	}
 
 	bool setHDD, setCDDVD;
-	wchar_t path[4], i;
-	const wchar_t firstDrive = L'C';
-	const wchar_t lastDrive  = L'Z';
+	char path[4], i;
+	const char firstDrive = L'C';
+	const char lastDrive  = L'Z';
 
 	DWORD driveList;
 
@@ -1186,7 +1186,7 @@ void SetDefaultAliases()
 } // namespace
 } // details
 
-RADRT_API bool RADRT_CALL ExpandToNativePath(const wchar_t *portablePath, wchar_t *nativePath, UReg nativePathBufferSize)
+RADRT_API bool RADRT_CALL ExpandToNativePath(const char *portablePath, char *nativePath, UReg nativePathBufferSize)
 {
 	RAD_ASSERT(portablePath);
 	RAD_ASSERT(nativePath);
@@ -1222,7 +1222,7 @@ RADRT_API bool RADRT_CALL ExpandToNativePath(const wchar_t *portablePath, wchar_
 // returns number of characters that would be written to buffer via ExpandPath if successful (excluding null terminator),
 // or 0 if error (or path is a null string).
 
-RADRT_API UReg RADRT_CALL ExpandToNativePathLength(const wchar_t *portablePath)
+RADRT_API UReg RADRT_CALL ExpandToNativePathLength(const char *portablePath)
 {
 	RAD_ASSERT(portablePath);
 
@@ -1235,12 +1235,12 @@ RADRT_API UReg RADRT_CALL ExpandToNativePathLength(const wchar_t *portablePath)
 // Returns the sector size of the device that the given file path resides on. Note this
 // doesn't have to be a filename, it can be a path, or an alias.
 
-RADRT_API FPos RADRT_CALL DeviceSectorSize(const wchar_t *path, int flags)
+RADRT_API FPos RADRT_CALL DeviceSectorSize(const char *path, int flags)
 {
 	RAD_ASSERT(path);
 	DWORD bytesPerSector = 0;
 
-	wchar_t buff[MaxFilePathLen+1];
+	char buff[MaxFilePathLen+1];
 
 	if (flags & NativePath)
 	{
@@ -1269,7 +1269,7 @@ RADRT_API FPos RADRT_CALL DeviceSectorSize(const wchar_t *path, int flags)
 	return (FPos)bytesPerSector;
 }
 
-RADRT_API bool RADRT_CALL DeleteFile(const wchar_t *path, int flags)
+RADRT_API bool RADRT_CALL DeleteFile(const char *path, int flags)
 {
 	RAD_ASSERT(path);
 
@@ -1283,7 +1283,7 @@ RADRT_API bool RADRT_CALL DeleteFile(const wchar_t *path, int flags)
 			details::AssertFilePath(path, true);
 		#endif
 
-		wchar_t buff[MaxFilePathLen+1];
+		char buff[MaxFilePathLen+1];
 		if (ExpandToNativePath(path, buff, MaxFilePathLen+1))
 		{
 			return ::DeleteFileW(buff) != 0;
@@ -1295,10 +1295,10 @@ RADRT_API bool RADRT_CALL DeleteFile(const wchar_t *path, int flags)
 	}
 }
 
-static bool PrivateCreateDirectory(const wchar_t *nativePath)
+static bool PrivateCreateDirectory(const char *nativePath)
 {
 	RAD_ASSERT(nativePath);
-	wchar_t buff[MaxFilePathLen+1];
+	char buff[MaxFilePathLen+1];
 
 	int ofs = 0;
 	while (nativePath[ofs])
@@ -1330,7 +1330,7 @@ static bool PrivateCreateDirectory(const wchar_t *nativePath)
 }
 
 #undef CreateDirectory
-RADRT_API bool RADRT_CALL CreateDirectory(const wchar_t *path, int flags)
+RADRT_API bool RADRT_CALL CreateDirectory(const char *path, int flags)
 {
 	RAD_ASSERT(path);
 
@@ -1340,7 +1340,7 @@ RADRT_API bool RADRT_CALL CreateDirectory(const wchar_t *path, int flags)
 	}
 	else
 	{
-		wchar_t buff[MaxFilePathLen+1];
+		char buff[MaxFilePathLen+1];
 		if (ExpandToNativePath(path, buff, MaxFilePathLen+1))
 		{
 			return PrivateCreateDirectory(buff);
@@ -1352,7 +1352,7 @@ RADRT_API bool RADRT_CALL CreateDirectory(const wchar_t *path, int flags)
 	}
 }
 
-static bool DeleteDirectory_r(const wchar_t *nativePath)
+static bool DeleteDirectory_r(const char *nativePath)
 {
 	RAD_ASSERT(nativePath);
 
@@ -1362,7 +1362,7 @@ static bool DeleteDirectory_r(const wchar_t *nativePath)
 
 	if (s.Open(nativePath, L".*", SearchFlags(NativePath|FileNames|DirNames)))
 	{
-		wchar_t file[MaxFilePathLen+1], path[MaxFilePathLen+1];
+		char file[MaxFilePathLen+1], path[MaxFilePathLen+1];
 		FileAttributes fa;
 		while (s.NextFile(file, MaxFilePathLen+1, &fa, 0))
 		{
@@ -1389,7 +1389,7 @@ static bool DeleteDirectory_r(const wchar_t *nativePath)
 	return ::RemoveDirectoryW(nativePath);
 }
 
-RADRT_API bool RADRT_CALL DeleteDirectory(const wchar_t *path, int flags)
+RADRT_API bool RADRT_CALL DeleteDirectory(const char *path, int flags)
 {
 	RAD_ASSERT(path);
 
@@ -1399,7 +1399,7 @@ RADRT_API bool RADRT_CALL DeleteDirectory(const wchar_t *path, int flags)
 	}
 	else
 	{
-		wchar_t buff[MaxFilePathLen+1];
+		char buff[MaxFilePathLen+1];
 		if (ExpandToNativePath(path, buff, MaxFilePathLen+1))
 		{
 			return DeleteDirectory_r(buff);
@@ -1412,7 +1412,7 @@ RADRT_API bool RADRT_CALL DeleteDirectory(const wchar_t *path, int flags)
 }
 
 
-RADRT_API bool RADRT_CALL FileTime(const wchar_t *path, xtime::TimeDate* td, int flags)
+RADRT_API bool RADRT_CALL FileTime(const char *path, xtime::TimeDate* td, int flags)
 {
 	RAD_ASSERT(path);
 
@@ -1428,7 +1428,7 @@ RADRT_API bool RADRT_CALL FileTime(const wchar_t *path, xtime::TimeDate* td, int
 			details::AssertFilePath(path, true);
 		#endif
 
-		wchar_t buff[MaxFilePathLen+1];
+		char buff[MaxFilePathLen+1];
 		if (ExpandToNativePath(path, buff, MaxFilePathLen+1))
 		{
 			h = CreateFileW( buff, GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
@@ -1467,7 +1467,7 @@ RADRT_API bool RADRT_CALL FileTime(const wchar_t *path, xtime::TimeDate* td, int
 	return h != INVALID_HANDLE_VALUE;
 }
 
-RADRT_API bool RADRT_CALL FileExists(const wchar_t *path, int flags)
+RADRT_API bool RADRT_CALL FileExists(const char *path, int flags)
 {
 	RAD_ASSERT(path);
 
@@ -1479,7 +1479,7 @@ RADRT_API bool RADRT_CALL FileExists(const wchar_t *path, int flags)
 	{
 		RAD_DEBUG_ONLY(details::AssertFilePath(path, true));
 
-		wchar_t buff[MaxFilePathLen+1];
+		char buff[MaxFilePathLen+1];
 		if (ExpandToNativePath(path, buff, MaxFilePathLen+1))
 		{
 			return ::GetFileAttributesW(buff) != INVALID_FILE_ATTRIBUTES;

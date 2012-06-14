@@ -254,18 +254,10 @@ struct Marshal<const wchar_t *>
 };
 
 template <>
-struct Marshal< ::string::string<> >
+struct Marshal<String>
 {
-	static void Push(lua_State *L, const ::string::string<> &val);
-	static ::string::string<> Get(lua_State *L, int index, bool forceType);
-	static bool IsA(lua_State *L, int index);
-};
-
-template <>
-struct Marshal< ::string::wstring<> >
-{
-	static void Push(lua_State *L, const ::string::wstring<> &val);
-	static ::string::wstring<> Get(lua_State *L, int index, bool forceType);
+	static void Push(lua_State *L, const String &val);
+	static String Get(lua_State *L, int index, bool forceType);
 	static bool IsA(lua_State *L, int index);
 };
 

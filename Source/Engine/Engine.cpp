@@ -57,13 +57,13 @@ bool Engine::PreInit()
 		baseDir = "Base";
 	}
 
-	m_baseDir = ::string::Widen(baseDir);
+	m_baseDir = baseDir;
 
 	const char *root = ArgArg("-root");
 	if (root)
 	{
 		RAD_DEBUG_ONLY(bool b=file::EnforcePortablePaths(false));
-		file::SetAlias(file::AliasRoot, ::string::Widen(root).c_str());
+		file::SetAlias(file::AliasRoot, root);
 		RAD_DEBUG_ONLY(file::EnforcePortablePaths(b));
 	}
 
@@ -77,8 +77,8 @@ bool Engine::PreInit()
 	COut(C_Info) << SIMD->name << " driver bound." << std::endl;
 
 	sys->files->Initialize(file::AllMedia & ~(file::CDDVD|file::Mod));
-	sys->files->hddRoot = m_baseDir.c_str();
-	sys->files->cddvdRoot = m_baseDir.c_str();
+	sys->files->hddRoot = m_baseDir.c_str;
+	sys->files->cddvdRoot = m_baseDir.c_str;
 	sys->paks->Initialize(sys->files);
 
 	sys->r->Initialize();

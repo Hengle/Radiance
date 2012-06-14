@@ -47,7 +47,7 @@ protected:
 #endif
 			)
 		{
-			MessageBox(L"Error", ::string::Widen(str.c_str()).c_str(), MBStyleOk);
+			MessageBox("Error", str.c_str(), MBStyleOk);
 		}
 #endif
 		return 0;

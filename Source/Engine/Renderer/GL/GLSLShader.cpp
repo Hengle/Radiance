@@ -152,19 +152,19 @@ bool GLSLShader::CompilePass(
 
 #if defined(LOG_DUMP)
 		COut(C_Info) << "GLSLShader::CompilePass('" << s->name.get() << "', " <<
-			channel << ", Vertex): " << std::endl << shader.c_str() << std::endl;
+			channel << ", Vertex): " << std::endl << shader << std::endl;
 #if !defined(RAD_OPT_IOS) && defined(LOG_SAVE)
 		{
-			WString path(L"Shaders/");
-			path += string::Widen(s->name);
-			path += L".vert.glsl";
-			cg::SaveText(engine, path.c_str(), shader.c_str());
+			String path(CStr("Shaders/"));
+			path += s->name;
+			path += CStr(".vert.glsl");
+			cg::SaveText(engine, path.c_str, shader.c_str);
 		}
 #endif
 #endif
 
 		vs.reset(new (ZRender) GLSLShaderObj(GL_VERTEX_SHADER_ARB));
-		const char *sz = shader.c_str();
+		const char *sz = shader.c_str;
 		gl.ShaderSourceARB(vs->id, 1, &sz, 0);
 		CHECK_GL_ERRORS();
 		gl.CompileShaderARB(vs->id);
@@ -214,19 +214,19 @@ bool GLSLShader::CompilePass(
 
 #if defined(LOG_DUMP)
 		COut(C_Info) << "GLSLShader::CompilePass('" << s->name.get() << "', " <<
-			channel << ", Fragment): " << std::endl << shader.c_str() << std::endl;
+			channel << ", Fragment): " << std::endl << shader << std::endl;
 #if !defined(RAD_OPT_IOS) && defined(LOG_SAVE)
 		{
-			WString path(L"Shaders/");
-			path += string::Widen(s->name);
-			path += L".frag.glsl";
-			cg::SaveText(engine, path.c_str(), shader.c_str());
+			String path(CStr("Shaders/"));
+			path += s->name;
+			path += CStr(".frag.glsl");
+			cg::SaveText(engine, path.c_str, shader.c_str);
 		}
 #endif
 #endif
 
 		fs.reset(new (ZRender) GLSLShaderObj(GL_FRAGMENT_SHADER_ARB));
-		const char *sz = shader.c_str();
+		const char *sz = shader.c_str;
 		gl.ShaderSourceARB(fs->id, 1, &sz, 0);
 		CHECK_GL_ERRORS();
 		gl.CompileShaderARB(fs->id);
@@ -301,7 +301,7 @@ bool GLSLShader::CompileShaderSource(
 	const Material &material
 )
 {
-	cg::Shader::Ref s = GLShader::Cache()->Load(engine, m_name.c_str());
+	cg::Shader::Ref s = GLShader::Cache()->Load(engine, m_name.c_str);
 	if (!s)
 		return false;
 
@@ -428,11 +428,11 @@ bool GLSLShader::CompileShaderSource(
 			os << p.m.attributes[i][2];
 		}
 
-		os << (U32)(vertexSource.length()+1);
-		os << (U32)(fragmentSource.length()+1);
-		if (os.Write(vertexSource.c_str(), (stream::SPos)vertexSource.length()+1, 0) != (stream::SPos)(vertexSource.length()+1))
+		os << (U32)(vertexSource.length+1);
+		os << (U32)(fragmentSource.length+1);
+		if (os.Write(vertexSource.c_str.get(), (stream::SPos)vertexSource.length.get()+1, 0) != (stream::SPos)(vertexSource.length.get()+1))
 			return false;
-		if (os.Write(fragmentSource.c_str(), (stream::SPos)fragmentSource.length()+1, 0) != (stream::SPos)(fragmentSource.length()+1))
+		if (os.Write(fragmentSource.c_str.get(), (stream::SPos)fragmentSource.length.get()+1, 0) != (stream::SPos)(fragmentSource.length.get()+1))
 			return false;
 	}
 

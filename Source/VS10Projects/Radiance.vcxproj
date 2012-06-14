@@ -194,6 +194,9 @@
     <None Include="..\..\SConstruct" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Engine\Assets\StringTableCooker.h" />
+    <ClInclude Include="..\Engine\Assets\StringTableParser.h" />
+    <ClInclude Include="..\Engine\StringTable.h" />
     <ClInclude Include="..\Runtime\Base.h" />
     <ClInclude Include="..\Runtime\Endian.h" />
     <ClInclude Include="..\Runtime\Event.h" />
@@ -725,6 +728,9 @@
     <ClInclude Include="..\Engine\UI\UIWidgetDef.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Engine\Assets\StringTableCooker.cpp" />
+    <ClCompile Include="..\Engine\Assets\StringTableParser.cpp" />
+    <ClCompile Include="..\Engine\StringTable.cpp" />
     <ClCompile Include="..\Runtime\Runtime.cpp" />
     <ClCompile Include="..\Runtime\String\String.cpp" />
     <ClCompile Include="..\Runtime\Win\WinCrashReporter.cpp" />

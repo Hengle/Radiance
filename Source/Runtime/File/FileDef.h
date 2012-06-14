@@ -130,7 +130,7 @@ class Search;
 class AsyncIO;
 class File;
 
-extern RADRT_API const wchar_t * const NativePathSeparator;
+extern RADRT_API const char * const NativePathSeparator;
 
 } // file
 

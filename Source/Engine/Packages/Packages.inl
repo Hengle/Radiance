@@ -130,12 +130,12 @@ inline Asset::Ref Package::Entry::Asset(Zone z) const
 
 inline const char *Package::RAD_IMPLEMENT_GET(name)
 {
-	return m_name.c_str();
+	return m_name.c_str;
 }
 
-inline const wchar_t *Package::RAD_IMPLEMENT_GET(path)
+inline const char *Package::RAD_IMPLEMENT_GET(path)
 {
-	return m_path.c_str();
+	return m_path.c_str;
 }
 
 inline Package::Import::Import()
@@ -148,7 +148,7 @@ inline Package::Import::Import(const char *path) : m_path(path)
 
 inline const char *Package::Import::RAD_IMPLEMENT_GET(path)
 {
-	return m_path.c_str();
+	return m_path.c_str;
 }
 
 inline void Package::SetName(const Entry::Ref &entry, const char *name)
@@ -298,12 +298,12 @@ inline asset::Type Package::Entry::RAD_IMPLEMENT_GET(type)
 
 inline const char *Package::Entry::RAD_IMPLEMENT_GET(path)
 {
-	return m_path.c_str();
+	return m_path.c_str;
 }
 
 inline const char *Package::Entry::RAD_IMPLEMENT_GET(name)
 {
-	return m_name.c_str();
+	return m_name.c_str;
 }
 
 inline Package::Ref Package::Entry::RAD_IMPLEMENT_GET(pkg)
@@ -418,12 +418,12 @@ inline asset::Type Asset::RAD_IMPLEMENT_GET(type)
 
 inline const char *Asset::RAD_IMPLEMENT_GET(path)
 {
-	return m_entry->m_path.c_str();
+	return m_entry->m_path.c_str;
 }
 
 inline const char *Asset::RAD_IMPLEMENT_GET(name)
 {
-	return m_entry->m_name.c_str();
+	return m_entry->m_name.c_str;
 }
 
 inline Package::Ref Asset::RAD_IMPLEMENT_GET(pkg)

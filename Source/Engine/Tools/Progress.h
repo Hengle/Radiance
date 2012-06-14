@@ -113,7 +113,7 @@ protected:
 	RAD_DECLARE_SET(subTotal, int) { m_sub[0] = value; }
 	RAD_DECLARE_GET(subProgress, int) { return m_sub[1]; }
 	RAD_DECLARE_SET(subProgress, int) { m_sub[1] = value; }
-	RAD_DECLARE_GET(subTitle, const char*) { return m_ssub.c_str(); }
+	RAD_DECLARE_GET(subTitle, const char*) { return m_ssub.c_str; }
 	RAD_DECLARE_SET(subTitle, const char*)
 	{
 		if (!value)
@@ -124,7 +124,7 @@ protected:
 		m_ssub = value;
 	}
 
-	RAD_DECLARE_GET(title, const char*) { return m_title.c_str(); }
+	RAD_DECLARE_GET(title, const char*) { return m_title.c_str; }
 	RAD_DECLARE_SET(title, const char*)
 	{
 		if (!value)

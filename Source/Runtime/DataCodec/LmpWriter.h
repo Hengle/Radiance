@@ -28,7 +28,7 @@ namespace lmp {
 class RADRT_CLASS Writer
 {
 public:
-	typedef string::string<> String;
+	typedef string::String String;
 
 	Writer();
 	~Writer();

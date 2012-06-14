@@ -58,7 +58,7 @@ public:
 
 	RAD_DECLARE_READONLY_PROPERTY(Engine, argc, int);
 	RAD_DECLARE_READONLY_PROPERTY(Engine, sys, const ComTable*);
-	RAD_DECLARE_READONLY_PROPERTY(Engine, baseDir, const wchar_t*);
+	RAD_DECLARE_READONLY_PROPERTY(Engine, baseDir, const char*);
 
 #if defined(RAD_OPT_PC_TOOLS)
 	virtual void SwitchEditorMode(bool editor);
@@ -69,12 +69,12 @@ private:
 
 	RAD_DECLARE_GET(argc, int);
 	RAD_DECLARE_GET(sys, const ComTable*) { return &m_comTable; }
-	RAD_DECLARE_GET(baseDir, const wchar_t*) { return m_baseDir.c_str(); }
+	RAD_DECLARE_GET(baseDir, const char*) { return m_baseDir.c_str; }
 
 	bool LoadComponents();
 
 	mutable ComTable m_comTable;
-	::string::WString m_baseDir;
+	String m_baseDir;
 
 #if defined(RAD_OPT_PC_TOOLS)
 	SCC::Ref m_scc;

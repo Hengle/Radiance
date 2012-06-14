@@ -61,7 +61,7 @@ Entity::Ref Entity::Create(const char *classname)
 	String factory("spawn::");
 	factory += classname;
 
-	const reflect::Class *type = reflect::Class::Find(factory.c_str());
+	const reflect::Class *type = reflect::Class::Find(factory.c_str.get());
 	if (!type)
 		return Entity::Ref();
 
@@ -300,7 +300,7 @@ int Entity::PrivateSpawn(
 		{
 		case S_LuaCreate:
 			{
-				if (!world->lua->CreateEntity(*this, m_id, m_scripted ? m_classname.c_str() : 0))
+				if (!world->lua->CreateEntity(*this, m_id, m_scripted ? m_classname.c_str.get() : 0))
 					return pkg::SR_ScriptError;
 				++m_spawnState;
 				if (!time.remaining)

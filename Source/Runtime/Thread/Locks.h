@@ -207,8 +207,8 @@ template <typename Mutex>
 class scoped_lock_guard {
 private:
     Mutex* m;
-    explicit scoped_lock_guard(lock_guard&);
-    scoped_lock_guard& operator=(outer_lock_guard&);
+    explicit scoped_lock_guard(const scoped_lock_guard&);
+    scoped_lock_guard& operator=(scoped_lock_guard&);
 
 public:
 	scoped_lock_guard() : m(0) {}

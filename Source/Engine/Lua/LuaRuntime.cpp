@@ -658,8 +658,7 @@ bool MarshalPushBasicOrString(lua_State *L, const ::reflect::Reflected &reflecte
 		MarshalPushBasicHelper<const wchar_t*>(L, reflected) ||
 		MarshalPushBasicHelper<std::string>(L, reflected) ||
 		MarshalPushBasicHelper<std::wstring>(L, reflected) ||
-		MarshalPushBasicHelper< ::string::string<> >(L, reflected) ||
-		MarshalPushBasicHelper< ::string::wstring<> >(L, reflected);
+		MarshalPushBasicHelper< String >(L, reflected);
 }
 
 bool MarshalGetString(lua_State *L, int index, const IFunction::ARGUMENT *arg, ArgumentList &list, ArgRefs &refs, void *basic)
@@ -672,10 +671,10 @@ bool MarshalGetString(lua_State *L, int index, const IFunction::ARGUMENT *arg, A
 	}
 	if (arg->Type() == ::reflect::Type<const wchar_t*>())
 	{
-		// marshal as ::string::wstring
-		TArgRef<WString> *sref = new (ZLuaRuntime) TArgRef<WString>();
+		// marshal as std::wstring
+		TArgRef<std::wstring> *sref = new (ZLuaRuntime) TArgRef<std::wstring>();
 		refs.push_back(ArgRefRef(sref)); // avoid type exceptions causing leak.
-		sref->storage = Marshal<WString>::Get(L, index, true);
+		sref->storage = Marshal<std::wstring>::Get(L, index, true);
 		*reinterpret_cast<const wchar_t**>(basic) = sref->storage.c_str();
 		list.PushBack(::reflect::Reflect(basic, ::reflect::Type<const wchar_t*>()));
 		return true;
@@ -702,14 +701,6 @@ bool MarshalGetString(lua_State *L, int index, const IFunction::ARGUMENT *arg, A
 		refs.push_back(ArgRefRef(sref)); // avoid type exceptions causing leak.
 		sref->storage = Marshal<String>::Get(L, index, true);
 		list.PushBack(::reflect::Reflect(&sref->storage, ::reflect::Type<String>()));
-		return true;
-	}
-	if (arg->Type() == ::reflect::Type<WString>())
-	{
-		TArgRef<WString> *sref = new (ZLuaRuntime) TArgRef<WString>();
-		refs.push_back(ArgRefRef(sref)); // avoid type exceptions causing leak.
-		sref->storage = Marshal<WString>::Get(L, index, true);
-		list.PushBack(::reflect::Reflect(&sref->storage, ::reflect::Type<WString>()));
 		return true;
 	}
 

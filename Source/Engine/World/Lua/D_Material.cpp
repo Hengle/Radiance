@@ -58,6 +58,12 @@ int D_Material::lua_SetState(lua_State *L)
 	String s;
 	const char *waves[] = { "Rotate", "Turb", "Scale", "Shift", "Scroll", 0 };
 
+	const String kAmplitude(CStr("Amplitude"));
+	const String kBase(CStr("Base"));
+	const String kFrequency(CStr("Frequency"));
+	const String kPhase(CStr("Phase"));
+	const String kType(CStr("Type"));
+
 	for (int i = 0; i < 6; ++i)
 	{
 		for (int k = 0;; ++k)
@@ -65,9 +71,9 @@ int D_Material::lua_SetState(lua_State *L)
 			if (!waves[k])
 				break;
 
-			base.format("Texture%d.tcMod.%s.", i+1, waves[k]);
+			base.printf("Texture%d.tcMod.%s.", i+1, waves[k]);
 
-			s = base + "Amplitude";
+			s = base + kAmplitude;
 			if (s == state)
 			{
 				Vec2 c = lua::Marshal<Vec2>::Get(L, 3, true);
@@ -79,7 +85,7 @@ int D_Material::lua_SetState(lua_State *L)
 				return 0;
 			}
 
-			s = base + "Base";
+			s = base + kBase;
 			if (s == state)
 			{
 				Vec2 c = lua::Marshal<Vec2>::Get(L, 3, true);
@@ -91,7 +97,7 @@ int D_Material::lua_SetState(lua_State *L)
 				return 0;
 			}
 
-			s = base + "Frequency";
+			s = base + kFrequency;
 			if (s == state)
 			{
 				Vec2 c = lua::Marshal<Vec2>::Get(L, 3, true);
@@ -103,7 +109,7 @@ int D_Material::lua_SetState(lua_State *L)
 				return 0;
 			}
 
-			s = base + "Phase";
+			s = base + kPhase;
 			if (s == state)
 			{
 				Vec2 c = lua::Marshal<Vec2>::Get(L, 3, true);
@@ -115,7 +121,7 @@ int D_Material::lua_SetState(lua_State *L)
 				return 0;
 			}
 
-			s = base + "Type";
+			s = base + kType;
 			if (s == state)
 			{
 				const char *type = luaL_checkstring(L, 3);

@@ -79,7 +79,7 @@ bool Tokenizer::FindToken( const char* token )
 	String t;
 	while( GetToken(t) )
 	{
-		if(!strcmp( t.c_str(), token ) )
+		if(!strcmp( t.c_str, token ) )
 			return true;
 	}
 	return false;
@@ -90,7 +90,7 @@ bool Tokenizer::FindTokeni( const char* token )
 	String t;
 	while( GetToken(t) )
 	{
-		if(!string::icmp( t.c_str(), token ) )
+		if(!string::icmp( t.c_str.get(), token ) )
 			return true;
 	}
 	return false;
@@ -99,13 +99,13 @@ bool Tokenizer::FindTokeni( const char* token )
 bool Tokenizer::IsNextToken( const char* token )
 {
 	String t;
-	return GetToken(t) && !string::cmp(t.c_str(), token);
+	return GetToken(t) && !string::cmp(t.c_str.get(), token);
 }
 
 bool Tokenizer::IsNextTokeni( const char* token )
 {
 	String t;
-	return GetToken(t) && !string::icmp(t.c_str(), token);
+	return GetToken(t) && !string::icmp(t.c_str.get(), token);
 }
 	
 void Tokenizer::FreeScript()
@@ -165,7 +165,7 @@ bool Tokenizer::GetFloat( float* f )
 	String t;
 	if( !GetToken(t) )
 		return false;
-	*f = (float)atof(t.c_str());
+	*f = (float)atof(t.c_str);
 	return true;
 }
 
@@ -174,7 +174,7 @@ bool Tokenizer::GetInt( int* i )
 	String t;
 	if( !GetToken(t) )
 		return false;
-	*i = (int)atoi(t.c_str());
+	*i = (int)atoi(t.c_str);
 	return true;
 }
 

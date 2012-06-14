@@ -84,7 +84,7 @@ public:
 	static Ref New();
 
 	//! Loads string table text data.
-	static int Load(const char *name, const wchar_t *root, Ref &r, int *loadMask = 0);
+	static int Load(const char *name, const char *root, Ref &r, int *loadMask = 0);
 
 	void SetString(const char *id, LangId lang, const char *value);
 	bool ChangeId(const char *src, const char *dst);

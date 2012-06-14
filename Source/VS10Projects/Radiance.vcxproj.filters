@@ -2184,6 +2184,15 @@
     <ClInclude Include="..\Runtime\String\utf8\unchecked.h">
       <Filter>Runtime\Source\String\utf8</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\Assets\StringTableCooker.h">
+      <Filter>Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Assets\StringTableParser.h">
+      <Filter>Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\StringTable.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Runtime\Runtime.cpp">
@@ -3256,6 +3265,15 @@
     </ClCompile>
     <ClCompile Include="..\Runtime\String\String.cpp">
       <Filter>Runtime\Source\String</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Assets\StringTableCooker.cpp">
+      <Filter>Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Assets\StringTableParser.cpp">
+      <Filter>Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\StringTable.cpp">
+      <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

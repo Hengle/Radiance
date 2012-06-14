@@ -88,7 +88,7 @@ const String *StringTable::Find(const char *id, LangId lang) const {
 	if (entry) {
 		Entry::Strings::const_iterator it = entry->strings.find(lang);
 		if (it != entry->strings.end()) {
-			if (!it->second.empty())
+			if (!it->second.empty)
 				return &it->second;
 		}
 	}
@@ -98,7 +98,7 @@ const String *StringTable::Find(const char *id, LangId lang) const {
 
 #if defined(RAD_OPT_TOOLS)
 
-int StringTable::Load(const char *name, const wchar_t *root, StringTable::Ref &_r, int *_loadMask) {
+int StringTable::Load(const char *name, const char *root, StringTable::Ref &_r, int *_loadMask) {
 
 	StringTable::Ref r(new (ZEngine) StringTable());
 
@@ -121,15 +121,12 @@ int StringTable::Load(const char *name, const wchar_t *root, StringTable::Ref &_
 
 	for (int i = 0; i < LangId_MAX; ++i) {
 
-		WString wpath;
-
-		wpath.format(L"%s.%s", root, string::Widen(StringTable::Langs[i]).c_str());
-
-		String spath(string::Shorten(wpath.c_str()));
+		String path;
+		path.printf("%s.%s", root, StringTable::Langs[i]);
 
 		std::fstream f;
 
-		f.open(spath.c_str(), std::ios_base::in);
+		f.open(path.c_str, std::ios_base::in);
 		if (f.fail())
 			continue;
 
@@ -141,7 +138,7 @@ int StringTable::Load(const char *name, const wchar_t *root, StringTable::Ref &_
 
 		Loader loader(is);
 		
-		if (lua_load(L->L, &Loader::Read, &loader, spath.c_str())) {
+		if (lua_load(L->L, &Loader::Read, &loader, path.c_str)) {
 			COut(C_Error) << "StringTable::Load(parse): " << lua_tostring(L->L, -1) << std::endl;
 			r.reset();
 			return pkg::SR_ScriptError;
@@ -185,9 +182,9 @@ int StringTable::lua_Compile(lua_State *L) {
 
 		const String *value = static_cast<const String*>(it->second);
 		if (!value)
-			luaL_error(L, "StringTable::lua_Compile(): expected string value for string '%s' language '%s'", name.c_str(), StringTable::Langs[langId]);
+			luaL_error(L, "StringTable::lua_Compile(): expected string value for string '%s' language '%s'", name.c_str.get(), StringTable::Langs[langId]);
 
-		table->SetString(name.c_str(), (LangId)langId, value->c_str());
+		table->SetString(name.c_str, (LangId)langId, value->c_str);
 	}
 
 	return 0;
@@ -259,14 +256,12 @@ bool StringTable::SaveText(const char *name, const wchar_t *path, int saveMask) 
 		if (!(saveMask&(1<<i)))
 			continue;
 
-		WString wpath;
-		wpath.format(L"%s.%s", path, string::Widen(StringTable::Langs[i]).c_str());
-
-		String spath(string::Shorten(wpath.c_str()));
+		String path;
+		path.printf("%s.%s", path, StringTable::Langs[i]);
 
 		std::fstream f;
 
-		f.open(spath.c_str(), std::ios_base::out|std::ios_base::trunc);
+		f.open(path.c_str, std::ios_base::out|std::ios_base::trunc);
 		if (f.fail())
 			return false;
 
@@ -286,17 +281,24 @@ bool StringTable::SaveText(const char *name, const wchar_t *path, int saveMask) 
 
 			const String &name = it->first;
 			
-			f << "\t[\"" << name.c_str() << "\"] = \"";
+			f << "\t[\"" << name.c_str.get() << "\"] = \"";
+
+			// Need to do this in UTF32 space.
 
 			if (string != it->second.strings.end()) {
 				const String &val = string->second;
-				String mod;
+				string::UTF32Buf utf = val.toUTF32();
 
-				for (String::const_iterator x = val.begin(); x != val.end(); ++x) {
+				String mod;
+				String slashes(CStr("\\\\"));
+
+				for (string::UTF32Buf::const_iterator x = utf.begin; x != utf.end; ++x) {
 					if (*x == '\\') {
-						mod += "\\\\";
+						mod += slashes;
 					} else {
-						mod += *x;
+						char c[5] = {0, 0, 0, 0, 0};
+						string::utf32to8(c, x, 1);
+						mod += String(c, string::RefTag);
 					}
 				}
 
@@ -356,17 +358,17 @@ bool StringTable::SaveBin(stream::IOutputBuffer &ob) const {
 		if (!os.Write(langMask))
 			return false;
 
-		if (!os.Write((U16)name.length()))
+		if (!os.Write((U16)name.length.get()))
 			return false;
 
-		if (os.Write(name.c_str(), (stream::SPos)name.length(), 0) != (stream::SPos)name.length())
+		if (os.Write(name.c_str.get(), (stream::SPos)name.length.get(), 0) != (stream::SPos)name.length.get())
 			return false;
 
 		for (int i = 0; i < LangId_MAX; ++i) {
 			if (langMask & (1<<i)) {
-				if (!os.Write((U16)strings[i].length()))
+				if (!os.Write((U16)strings[i].length.get()))
 					return false;
-				if (os.Write(strings[i].c_str(), (stream::SPos)strings[i].length(), 0) != (stream::SPos)strings[i].length())
+				if (os.Write(strings[i].c_str.get(), (stream::SPos)strings[i].length.get(), 0) != (stream::SPos)strings[i].length.get())
 					return false;
 			}
 		}

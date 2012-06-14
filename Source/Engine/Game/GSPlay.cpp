@@ -36,14 +36,14 @@ int GSPlay::Tick(Game &game, float dt, const xtime::TimeSlice &time, int flags)
 
 	if (game.world->PendingLoadRequest(name, ud, loadScreen))
 	{
-		game.LoadMap(name.c_str(), game.world->slot, ud, true, loadScreen);
+		game.LoadMap(name.c_str, game.world->slot, ud, true, loadScreen);
 		return TickPop;
 	}
 
 	if (game.world->PendingSwitchLoadRequest(slot, name, ud, loadScreen))
 	{
 		game.Switch(slot);
-		game.LoadMap(name.c_str(), game.world->slot, ud, true, loadScreen);
+		game.LoadMap(name.c_str, game.world->slot, ud, true, loadScreen);
 		return TickPop;
 	}
 
