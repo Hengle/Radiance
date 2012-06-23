@@ -56,15 +56,15 @@ int SkAnimStatesParser::LoadCooked(
 	int flags
 )
 {
-	WString path(L"Cooked/");
-	path += string::Widen(asset->path);
-	path += L".bin";
+	String path(CStr("Cooked/"));
+	path += CStr(asset->path);
+	path += ".bin";
 
 	file::HStreamInputBuffer ib;
 
 	int media = file::AllMedia;
 	int r = engine.sys->files->OpenFileStream(
-		path.c_str(),
+		path.c_str,
 		media,
 		ib,
 		file::HIONotify(),
@@ -140,7 +140,7 @@ int SkAnimStatesParser::Load(
 	int media = file::AllMedia;
 	file::HBufferedAsyncIO buf;
 	bool r = engine.sys->files->LoadFile(
-		string::Widen(s->c_str()).c_str(),
+		s->c_str,
 		media,
 		buf,
 		file::HIONotify()
@@ -166,7 +166,7 @@ int SkAnimStatesParser::Load(
 		L->L,
 		(const char*)buf->data->ptr.get(),
 		buf->data->size,
-		s->c_str()
+		s->c_str
 	) != 0)
 	{
 		COut(C_Error) << "SkAnimStatesParser: '" << asset->name.get() << "' lua parse error '" << lua_tostring(L->L, -1) << "'" << std::endl;
@@ -194,8 +194,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		{
 			luaL_error(L, "AnimState '%s':'%s':'%s':loop expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
-				state.name.c_str(),
-				v.name.c_str(),
+				state.name.c_str.get(),
+				v.name.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -207,8 +207,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		{
 			luaL_error(L, "AnimState '%s':'%s':'%s':loop expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
-				state.name.c_str(),
-				v.name.c_str(),
+				state.name.c_str.get(),
+				v.name.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -220,8 +220,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		{
 			luaL_error(L, "AnimState '%s':'%s':'%s':loop expected number, (Function %s, File %s, Line %d)",
 				asset->name.get(),
-				state.name.c_str(),
-				v.name.c_str(),
+				state.name.c_str.get(),
+				v.name.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -233,8 +233,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		{
 			luaL_error(L, "AnimState '%s':'%s':'%s':loop expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
-				state.name.c_str(),
-				v.name.c_str(),
+				state.name.c_str.get(),
+				v.name.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -246,8 +246,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		{
 			luaL_error(L, "AnimState '%s':'%s':'%s':loop expected number, (Function %s, File %s, Line %d)",
 				asset->name.get(),
-				state.name.c_str(),
-				v.name.c_str(),
+				state.name.c_str.get(),
+				v.name.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -277,8 +277,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		{
 			luaL_error(L, "AnimState '%s':'%s':'%s':timeScale expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
-				state.name.c_str(),
-				v.name.c_str(),
+				state.name.c_str.get(),
+				v.name.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -290,8 +290,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		{
 			luaL_error(L, "AnimState '%s':'%s':'%s':timeScale expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
-				state.name.c_str(),
-				v.name.c_str(),
+				state.name.c_str.get(),
+				v.name.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -303,8 +303,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		{
 			luaL_error(L, "AnimState '%s':'%s':'%s':timeScale expected number, (Function %s, File %s, Line %d)",
 				asset->name.get(),
-				state.name.c_str(),
-				v.name.c_str(),
+				state.name.c_str.get(),
+				v.name.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -316,8 +316,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		{
 			luaL_error(L, "AnimState '%s':'%s':'%s':timeScale expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
-				state.name.c_str(),
-				v.name.c_str(),
+				state.name.c_str.get(),
+				v.name.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -329,8 +329,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		{
 			luaL_error(L, "AnimState '%s':'%s':'%s':timeScale expected number, (Function %s, File %s, Line %d)",
 				asset->name.get(),
-				state.name.c_str(),
-				v.name.c_str(),
+				state.name.c_str.get(),
+				v.name.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -360,8 +360,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		{
 			luaL_error(L, "AnimState '%s':'%s':'%s':xfade expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
-				state.name.c_str(),
-				v.name.c_str(),
+				state.name.c_str.get(),
+				v.name.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -373,8 +373,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		{
 			luaL_error(L, "AnimState '%s':'%s':'%s':xfade expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
-				state.name.c_str(),
-				v.name.c_str(),
+				state.name.c_str.get(),
+				v.name.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -386,8 +386,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		{
 			luaL_error(L, "AnimState '%s':'%s':'%s':xfade expected number, (Function %s, File %s, Line %d)",
 				asset->name.get(),
-				state.name.c_str(),
-				v.name.c_str(),
+				state.name.c_str.get(),
+				v.name.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -399,8 +399,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		{
 			luaL_error(L, "AnimState '%s':'%s':'%s':xfade expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
-				state.name.c_str(),
-				v.name.c_str(),
+				state.name.c_str.get(),
+				v.name.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -412,8 +412,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		{
 			luaL_error(L, "AnimState '%s':'%s':'%s':xfade expected number, (Function %s, File %s, Line %d)",
 				asset->name.get(),
-				state.name.c_str(),
-				v.name.c_str(),
+				state.name.c_str.get(),
+				v.name.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -439,8 +439,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		{
 			luaL_error(L, "AnimState '%s':'%s':'%s':weight expected number, (Function %s, File %s, Line %d)",
 				asset->name.get(),
-				state.name.c_str(),
-				v.name.c_str(),
+				state.name.c_str.get(),
+				v.name.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -471,8 +471,8 @@ void SkAnimStatesParser::ParseAnimState(lua_State *L, const pkg::Asset::Ref &ass
 		{
 			luaL_error(L, "AnimState '%s':'%s':'%s' expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
-				state.name.c_str(),
-				it->first.c_str(),
+				state.name.c_str.get(),
+				it->first.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -504,7 +504,7 @@ int SkAnimStatesParser::lua_Compile(lua_State *L)
 		{
 			luaL_error(L, "AnimState '%s':'%s' expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
-				it->first.c_str(),
+				it->first.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__

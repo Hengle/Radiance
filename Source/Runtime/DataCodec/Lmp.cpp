@@ -39,7 +39,7 @@ inline Writer::Lump::~Lump()
 
 const char* Writer::Lump::Name() const
 {
-	return m_name.c_str();
+	return m_name.c_str;
 }
 
 LOfs Writer::Lump::Size() const
@@ -233,11 +233,11 @@ bool Writer::End()
 			return false;
 		}
 
-		U32 nameLen = (U32)l->m_name.length()+1;
+		U32 nameLen = (U32)l->m_name.length+1;
 		RAD_ASSERT(nameLen <= MaxU16);
 
 		if (!m_stream->Write((U16)nameLen, 0) ||  // name length (including null) (2 bytes)
-			(m_stream->Write(l->m_name.c_str(), nameLen, 0) != nameLen))   // name data (plus null)
+			(m_stream->Write(l->m_name.c_str.get(), nameLen, 0) != nameLen))   // name data (plus null)
 		{
 			return false;
 		}

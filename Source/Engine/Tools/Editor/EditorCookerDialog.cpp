@@ -220,9 +220,9 @@ void CookerDialog::CookClicked()
 
 	pkg::PackageMan::StringVec roots;
 	{
-		wchar_t path[256];
-		file::ExpandToNativePath(L"9:/cook.txt", path, 256);
-		FILE *fp = fopen(string::Shorten(path).c_str(), "rb");
+		char path[256];
+		file::ExpandToNativePath("9:/cook.txt", path, 256);
+		FILE *fp = fopen(path, "rb");
 		if (!fp)
 		{
 			QMessageBox::critical(
@@ -411,7 +411,7 @@ void CookerDialog::OnPrintMsg(const PrintMsgEvent &msg)
 	QTextCursor c = m_textArea->textCursor();
 	c.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
 	m_textArea->setTextCursor(c);
-	m_textArea->insertPlainText(msg.msg.c_str());
+	m_textArea->insertPlainText(msg.msg.c_str.get());
 }
 
 CookThread::CookThread(

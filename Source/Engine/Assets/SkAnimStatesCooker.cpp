@@ -69,10 +69,10 @@ int SkAnimStatesCooker::Compile(int flags, int allflags)
 	if (!parser)
 		return SR_ParseError;
 
-	WString path(string::Widen(asset->path));
-	path += L".bin";
+	String path(CStr(asset->path));
+	path += ".bin";
 
-	BinFile::Ref fp = OpenWrite(path.c_str(), flags);
+	BinFile::Ref fp = OpenWrite(path.c_str, flags);
 	if (!fp)
 		return SR_IOError;
 
@@ -88,13 +88,13 @@ int SkAnimStatesCooker::Compile(int flags, int allflags)
 	{
 		const ska::AnimState &state = it->second;
 
-		os << state.name.c_str();
+		os << state.name;
 		os << (U16)state.variants.size();
 
 		for (ska::Variant::Vec::const_iterator it = state.variants.begin(); it != state.variants.end(); ++it)
 		{
 			const ska::Variant &v = *it;
-			os << v.name.c_str();
+			os << v.name;
 			os << v.timeScale[0];
 			os << v.timeScale[1];
 			os << (S16)v.loopCount[0];

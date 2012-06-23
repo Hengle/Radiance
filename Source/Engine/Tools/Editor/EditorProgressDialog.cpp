@@ -74,7 +74,7 @@ void ProgressDialog::Refresh()
 
 	m_inFlight->s.total[0] = m_total[0];
 	m_inFlight->s.total[1] = m_total[1];
-	m_inFlight->s.title = QString(m_strings[0].c_str());
+	m_inFlight->s.title = QString(m_strings[0].c_str.get());
 
 	m_m.unlock();
 
@@ -112,7 +112,7 @@ void ProgressDialog::RAD_IMPLEMENT_SET(totalProgress) (int x)
 
 const char *ProgressDialog::RAD_IMPLEMENT_GET(title)
 {
-	return m_strings[0].c_str();
+	return m_strings[0].c_str;
 }
 
 void ProgressDialog::RAD_IMPLEMENT_SET(title) (const char *x)
@@ -128,7 +128,7 @@ void ProgressDialog::RAD_IMPLEMENT_SET(title) (const char *x)
 
 const char *ProgressDialog::RAD_IMPLEMENT_GET(subTitle)
 {
-	return m_strings[1].c_str();
+	return m_strings[1].c_str;
 }
 
 void ProgressDialog::RAD_IMPLEMENT_SET(subTitle) (const char *x)

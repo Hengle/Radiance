@@ -89,12 +89,12 @@ int SkAnimSetParser::LoadCooked(
 				COut(C_Info) << asset->path.get() << " is up to date, using cache." << std::endl;
 			}
 
-			WString path(string::Widen(asset->path));
-			path += L".bin";
+			String path(CStr(asset->path));
+			path += ".bin";
 
 			int media = file::AllMedia;
 			int r = cooker->LoadFile( // load cooked data.
-				path.c_str(),
+				path.c_str,
 				0,
 				media,
 				m_buf,
@@ -106,13 +106,13 @@ int SkAnimSetParser::LoadCooked(
 		}
 		else {
 #endif
-		WString path(L"Cooked/");
-		path += string::Widen(asset->path);
-		path += L".bin";
+		String path(CStr("Cooked/"));
+		path += CStr(asset->path);
+		path += ".bin";
 
 		int media = file::AllMedia;
 		int r = engine.sys->files->LoadFile(
-			path.c_str(),
+			path.c_str,
 			media,
 			m_buf,
 			file::HIONotify(),
@@ -156,16 +156,16 @@ int SkAnimSetParser::Load(
 	if (!s)
 		return SR_MetaError;
 
-	wchar_t path[256];
-	wchar_t native[256];
-	string::cpy(path, L"9:/");
+	char path[256];
+	char native[256];
+	string::cpy(path, "9:/");
 	string::cat(path, engine.sys->files->hddRoot.get());
-	string::cat(path, L"/");
-	string::cat(path, string::Widen(s->c_str()).c_str());
+	string::cat(path, "/");
+	string::cat(path, s->c_str.get());
 	if (!file::ExpandToNativePath(path, native, 256))
 		return SR_MetaError;
 
-	FILE *fp = fopen(string::Shorten(native).c_str(), "rt");
+	FILE *fp = fopen(native, "rt");
 	if (fp == 0)
 		return SR_MissingFile;
 
@@ -187,7 +187,7 @@ int SkAnimSetParser::Load(
 		file::HStreamInputBuffer ib;
 
 		int r = engine.sys->files->OpenFileStream(
-			string::Widen(name).c_str(),
+			name,
 			media, 
 			ib,
 			file::HIONotify()

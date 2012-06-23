@@ -250,7 +250,7 @@ bool SkaBuilder::Compile(const char *name, const MapVec &maps, int trimodel, Ska
 				continue;
 
 			BeginAnim(
-				anim.name.c_str(),
+				anim.name.c_str,
 				(float)anim.frameRate,
 				(int)anim.frames.size(),
 				false
@@ -372,7 +372,7 @@ bool SkaBuilder::Compile(const char *name, const Map &map, int trimodel, SkaData
 			continue;
 
 		BeginAnim(
-			anim.name.c_str(),
+			anim.name.c_str,
 			(float)anim.frameRate,
 			(int)anim.frames.size(),
 			false
@@ -490,7 +490,7 @@ struct Tables
 
 	int AddString(const String &str)
 	{
-		if (str.empty())
+		if (str.empty)
 			return -1;
 
 		for (StringVec::const_iterator it = strings.begin(); it != strings.end(); ++it)
@@ -594,14 +594,14 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 
 	for (BoneDef::Vec::const_iterator it = m_bones.begin(); it != m_bones.end(); ++it)
 	{
-		if ((*it).name.length() > ska::DNameLen)
+		if ((*it).name.length > ska::DNameLen)
 		{
 			COut(C_ErrMsgBox) << "ska::DNameLen exceeded, contact a programmer to increase." << std::endl;
 			return false;
 		}
 
 		char name[ska::DNameLen+1];
-		string::ncpy(name, (*it).name.c_str(), ska::DNameLen+1);
+		string::ncpy(name, (*it).name.c_str.get(), ska::DNameLen+1);
 		if (!os.Write(name, ska::DNameLen+1, 0))
 			return false;
 	}
@@ -776,7 +776,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 	for (size_t i = 0; i < at.size(); ++i)
 	{
 		char name[ska::DNameLen+1];
-		string::ncpy(name, m_anims[i].name.c_str(), ska::DNameLen+1);
+		string::ncpy(name, m_anims[i].name.c_str.get(), ska::DNameLen+1);
 		if (os.Write(name, ska::DNameLen+1, 0) != (ska::DNameLen+1))
 			return false;
 		if (!os.Write(0.0f))
@@ -903,7 +903,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 			return false;
 		bytes += 2;
 		const String &str = *it;
-		stringIdx += (int)str.size()+1;
+		stringIdx += (int)str.length+1;
 		if (stringIdx > std::numeric_limits<U16>::max())
 		{
 			COut(C_Error) << "SkaBuilder: String table exceeds 64k in size!" << std::endl;
@@ -915,9 +915,9 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 	for (StringVec::const_iterator it = t.strings.begin(); it != t.strings.end(); ++it)
 	{
 		const String &str = *it;
-		if (os.Write(str.c_str(), (stream::SPos)(str.size()+1), 0) != (stream::SPos)(str.size()+1))
+		if (os.Write(str.c_str.get(), (stream::SPos)(str.length+1), 0) != (stream::SPos)(str.length+1))
 			return false;
-		bytes += (int)str.size()+1;
+		bytes += (int)str.length+1;
 	}
 	
 	if (bytes&3)
@@ -1200,7 +1200,7 @@ bool CompileCpuSkmData(const char *name, const Map &map, int trimodel, SkmData &
 		U16 k;
 		for (k = 0; k < ska.numBones; ++k)
 		{
-			if (!string::cmp(skel.bones[i].name.c_str(), &ska.boneNames[k*(ska::DNameLen+1)]))
+			if (!string::cmp(skel.bones[i].name.c_str.get(), &ska.boneNames[k*(ska::DNameLen+1)]))
 				break;
 		}
 
@@ -1251,14 +1251,14 @@ bool CompileCpuSkmData(const char *name, const Map &map, int trimodel, SkmData &
 				if (!os.Write((U16)0))
 					return false;
 
-			if (map.mats[m->mat].name.length() > ska::DNameLen)
+			if (map.mats[m->mat].name.length > ska::DNameLen)
 			{
 				COut(C_ErrMsgBox) << "ska::DNameLen exceeded, contact a programmer to increase." << std::endl;
 				return false;
 			}
 
 			char name[ska::DNameLen+1];
-			string::ncpy(name, map.mats[m->mat].name.c_str(), ska::DNameLen+1);
+			string::ncpy(name, map.mats[m->mat].name.c_str.get(), ska::DNameLen+1);
 			if (!os.Write(name, ska::DNameLen+1, 0))
 				return false;
 

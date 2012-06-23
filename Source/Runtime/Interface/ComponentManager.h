@@ -20,7 +20,7 @@ RAD_REFLECTED_INTERFACE_BEGIN_API(RADRT_API, IComponentManager, IInterface, ICom
 
 	// load from dll's.
 	virtual void LoadComponents(
-		const wchar_t *path, 
+		const char *path, 
 		ComponentLoadFlags flags = ComponentLoadFlags(CLF_Recursive|CLF_NativePath)
 	) = 0;
 

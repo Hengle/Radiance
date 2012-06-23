@@ -66,13 +66,13 @@ m_delButton(0), m_editable(editable), m_style(style)
 		QWidget *w = new (ZEditor) QWidget();
 		QGridLayout *l = new (ZEditor) QGridLayout(w);
 
-		QPushButton *b = new (ZEditor) QPushButton(LoadIcon(L"Editor/add2_small.png"), "Add Package");
+		QPushButton *b = new (ZEditor) QPushButton(LoadIcon("Editor/add2_small.png"), "Add Package");
 		b->setEnabled(editable);
 		l->addWidget(b, 0, 0);
 		l->addItem(new (ZEditor) QSpacerItem(0, 0), 0, 1);
 		l->setColumnStretch(1, 1);
 		RAD_VERIFY(connect(b, SIGNAL(clicked()), SLOT(AddPackage())));
-		b = new (ZEditor) QPushButton(LoadIcon(L"Editor/delete2_small.png"), "Delete Package(s)");
+		b = new (ZEditor) QPushButton(LoadIcon("Editor/delete2_small.png"), "Delete Package(s)");
 		b->setEnabled(editable);
 		RAD_VERIFY(connect(b, SIGNAL(clicked()), SLOT(DeletePackage())));
 		m_delButton = b;
@@ -263,11 +263,11 @@ pkg::IdVec ContentBrowserWindow::GenericImportAssetFiles(asset::Type type, const
 	QString nativePrefix;
 	
 	{
-		nativePrefix = QString("9:/") + QString::fromWCharArray(Files()->hddRoot);
-		wchar_t native[file::MaxFilePathLen+1];
-		if (!file::ExpandToNativePath(nativePrefix.toStdWString().c_str(), native, file::MaxFilePathLen+1))
+		nativePrefix = QString("9:/") + QString(Files()->hddRoot.get());
+		char native[file::MaxFilePathLen+1];
+		if (!file::ExpandToNativePath(nativePrefix.toAscii().constData(), native, file::MaxFilePathLen+1))
 			return ids;
-		nativePrefix = QString::fromWCharArray(native);
+		nativePrefix = native;
 		for (int i = 0; i < nativePrefix.length(); ++i)
 		{
 			if (nativePrefix[i] == '\\')
@@ -312,7 +312,7 @@ pkg::IdVec ContentBrowserWindow::GenericImportAssetFiles(asset::Type type, const
 		{
 			const String *s = static_cast<const String*>(it2->second.val);
 			if (s)
-				fd.setNameFilter(s->c_str());
+				fd.setNameFilter(s->c_str.get());
 		}
 	}
 	

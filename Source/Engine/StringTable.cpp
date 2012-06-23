@@ -249,19 +249,19 @@ bool StringTable::CreateId(const char *id) {
 	return m_entries.insert(Entry::Map::value_type(sid, e)).second;
 }
 
-bool StringTable::SaveText(const char *name, const wchar_t *path, int saveMask) const {
+bool StringTable::SaveText(const char *name, const char *path, int saveMask) const {
 
 	for (int i = 0; i < LangId_MAX; ++i) {
 
 		if (!(saveMask&(1<<i)))
 			continue;
 
-		String path;
-		path.printf("%s.%s", path, StringTable::Langs[i]);
+		String spath;
+		spath.printf("%s.%s", path, StringTable::Langs[i]);
 
 		std::fstream f;
 
-		f.open(path.c_str, std::ios_base::out|std::ios_base::trunc);
+		f.open(spath.c_str, std::ios_base::out|std::ios_base::trunc);
 		if (f.fail())
 			return false;
 

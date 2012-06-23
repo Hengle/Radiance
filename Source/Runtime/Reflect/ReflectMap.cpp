@@ -57,13 +57,9 @@ RADREFLECT_TYPE(RADRT_API, "const F64*", const F64*)
 
 using namespace reflect;
 
-RADREFLECT_BEGIN_CLASS_DESTRUCTOR_NAMESPACE("string::string<>", string, string<>, string)
+RADREFLECT_BEGIN_CLASS_DESTRUCTOR_NAMESPACE("string::String", string, String, String)
 	RADREFLECT_CONSTRUCTOR
-RADREFLECT_END_NAMESPACE(RADRT_API, string, string<>)
-
-RADREFLECT_BEGIN_CLASS_DESTRUCTOR_NAMESPACE("string::wstring<>", string, wstring<>, wstring)
-	RADREFLECT_CONSTRUCTOR
-RADREFLECT_END_NAMESPACE(RADRT_API, string, wstring<>)
+RADREFLECT_END_NAMESPACE(RADRT_API, string, String)
 
 RADREFLECT_BEGIN_CLASS_DESTRUCTOR_NAMESPACE("std::string", std, string, basic_string)
 	RADREFLECT_CONSTRUCTOR

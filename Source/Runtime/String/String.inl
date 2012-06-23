@@ -19,6 +19,10 @@ inline CharBuf<Traits>::CharBuf(const SelfType &buf) : m_data(buf.m_data), m_zon
 }
 
 template <typename Traits>
+inline CharBuf<Traits>::CharBuf(const details::DataBlock::Ref &data, ::Zone &zone) : m_data(data), m_zone(&zone) {
+}
+
+template <typename Traits>
 inline CharBuf<Traits>::operator unspecified_bool_type () const {
 	return IsValid() ? &bool_true : 0;
 }
@@ -68,8 +72,8 @@ inline int CharBuf<Traits>::RAD_IMPLEMENT_GET(size) {
 }
 
 template <typename Traits>
-inline bool CharBuf<Traits>::RAD_IMPLEMENT_GET(valid) {
-	return (m_data) ? true : false;
+inline bool CharBuf<Traits>::RAD_IMPLEMENT_GET(empty) {
+	return (m_data) ? false : true;
 }
 
 template <typename Traits>
@@ -78,7 +82,7 @@ inline void CharBuf<Traits>::free() {
 }
 
 template <typename Traits>
-inline typename CharBuf<Traits>::SelfType CharBuf<Traits>::create(const T *data, int size, const CopyTag_t&, Zone &zone) {
+inline typename CharBuf<Traits>::SelfType CharBuf<Traits>::create(const T *data, int size, const CopyTag_t&, ::Zone &zone) {
 	RAD_ASSERT(data);
 	return CharBuf(
 		details::DataBlock::New(kRefType_Copy, data, size, zone),
@@ -87,7 +91,7 @@ inline typename CharBuf<Traits>::SelfType CharBuf<Traits>::create(const T *data,
 }
 
 template <typename Traits>
-inline typename CharBuf<Traits>::SelfType CharBuf<Traits>::create(const T *data, int size, const RefTag_t&, Zone &zone) {
+inline typename CharBuf<Traits>::SelfType CharBuf<Traits>::create(const T *data, int size, const RefTag_t&, ::Zone &zone) {
 	RAD_ASSERT(data);
 	return CharBuf(
 		details::DataBlock::New(kRefType_Ref, data, size, zone),
@@ -97,7 +101,7 @@ inline typename CharBuf<Traits>::SelfType CharBuf<Traits>::create(const T *data,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline String::String(Zone &zone) : m_zone(&zone) {
+inline String::String(::Zone &zone) : m_zone(&zone) {
 }
 
 inline String::String(const String &s) : m_data(s.m_data), m_zone(s.m_zone) {
@@ -106,31 +110,31 @@ inline String::String(const String &s) : m_data(s.m_data), m_zone(s.m_zone) {
 inline String::String(const UTF8Buf &buf) : m_data(buf.m_data), m_zone(buf.m_zone) {
 }
 
-inline String::String(const UTF16Buf &buf, Zone &zone) : m_zone(&zone) {
+inline String::String(const UTF16Buf &buf, ::Zone &zone) : m_zone(&zone) {
 	m_data = details::DataBlock::create(buf.c_str.get(), buf.size, zone);
 }
 
-inline String::String(const UTF32Buf &buf, Zone &zone) : m_zone(&zone) {
+inline String::String(const UTF32Buf &buf, ::Zone &zone) : m_zone(&zone) {
 	m_data = details::DataBlock::create(buf.c_str.get(), buf.size, zone);
 }
 
-inline String::String(const WCharBuf &buf, Zone &zone) : m_zone(&zone) {
+inline String::String(const WCharBuf &buf, ::Zone &zone) : m_zone(&zone) {
 	m_data = details::DataBlock::create(buf.c_str.get(), buf.size, zone);
 }
 
-inline String::String(const char *sz, const CopyTag_t&, Zone &zone) : m_zone(&zone) {
+inline String::String(const char *sz, const CopyTag_t&, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
 	if (sz[0])
 		m_data = details::DataBlock::create(kRefType_Copy, 0, sz, len(sz) + 1, zone);
 }
 
-inline String::String(const char *sz, const RefTag_t&, Zone &zone) : m_zone(&zone) {
+inline String::String(const char *sz, const RefTag_t&, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
 	if (sz[0])
 		m_data = details::DataBlock::create(kRefType_Ref, 0, sz, len(sz) + 1, zone);
 }
 
-inline String::String(const char *sz, int len, const CopyTag_t&, Zone &zone) : m_zone(&zone) {
+inline String::String(const char *sz, int len, const CopyTag_t&, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
 	if ((len>0) && sz[0]) {
 		m_data = details::DataBlock::create(kRefType_Copy, len + 1, sz, len, zone);
@@ -138,7 +142,7 @@ inline String::String(const char *sz, int len, const CopyTag_t&, Zone &zone) : m
 	}
 }
 
-inline String::String(const char *sz, int len, const RefTag_t&, Zone &zone) : m_zone(&zone) {
+inline String::String(const char *sz, int len, const RefTag_t&, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
 	if ((len>0) && sz[0]) {
 		m_data = details::DataBlock::create(kRefType_Copy, len + 1, sz, len, zone);
@@ -148,13 +152,13 @@ inline String::String(const char *sz, int len, const RefTag_t&, Zone &zone) : m_
 
 #if defined(RAD_NATIVE_WCHAR_T_DEFINED)
 
-inline String::String(const wchar_t *sz, Zone &zone) : m_zone(&zone) {
+inline String::String(const wchar_t *sz, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
 	if (sz[0])
 		m_data = details::DataBlock::create((const WCharTraits::TT*)sz, len(sz), zone);
 }
 
-inline String::String(const wchar_t *sz, int len, Zone &zone) : m_zone(&zone) {
+inline String::String(const wchar_t *sz, int len, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
 	if ((len>0) && sz[0])
 		m_data = details::DataBlock::create((const WCharTraits::TT*)sz, len, zone);
@@ -162,54 +166,68 @@ inline String::String(const wchar_t *sz, int len, Zone &zone) : m_zone(&zone) {
 
 #endif
 
-inline String::String(const U16 *sz, Zone &zone) : m_zone(&zone) {
+inline String::String(const U16 *sz, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
 	if (sz[0])
 		m_data = details::DataBlock::create(sz, len(sz), zone);
 }
 
-inline String::String(const U16 *sz, int len, Zone &zone) : m_zone(&zone) {
+inline String::String(const U16 *sz, int len, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
 	if ((len>0) && sz[0])
 		m_data = details::DataBlock::create(sz, len, zone);
 }
 
-inline String::String(const U32 *sz, Zone &zone) : m_zone(&zone) {
+inline String::String(const U32 *sz, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
 	if (sz[0])
 		m_data = details::DataBlock::create(sz, len(sz), zone);
 }
 
-inline String::String(const U32 *sz, int len, Zone &zone) : m_zone(&zone) {
+inline String::String(const U32 *sz, int len, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
 	if ((len>0) && sz[0])
 		m_data = details::DataBlock::create(sz, len, zone);
 }
 
-inline String::String(char c, Zone &zone) : m_zone(&zone) {
+inline String::String(char c, ::Zone &zone) : m_zone(&zone) {
 	*this = String(&c, 1, CopyTag, zone);
 }
 
 #if defined(RAD_NATIVE_WCHAR_T_DEFINED)
-inline String::String(wchar_t c, Zone &zone) : m_zone(&zone) {
+inline String::String(wchar_t c, ::Zone &zone) : m_zone(&zone) {
 	*this = String(&c, 1, zone);
 }
 #endif
 
-inline String::String(U16 c, Zone &zone) : m_zone(&zone) {
+inline String::String(U16 c, ::Zone &zone) : m_zone(&zone) {
 	*this = String(&c, 1, zone);
 }
 
-inline String::String(U32 c, Zone &zone) : m_zone(&zone) {
+inline String::String(U32 c, ::Zone &zone) : m_zone(&zone) {
 	*this = String(&c, 1, zone);
 }
 
-inline String::String(const std::string &str, Zone &zone) : m_zone(&zone) {
+inline String::String(const std::string &str, ::Zone &zone) : m_zone(&zone) {
 	*this = str.c_str();
 }
 
-inline String::String(const std::wstring &str, Zone &zone) : m_zone(&zone) {
+inline String::String(const std::wstring &str, ::Zone &zone) : m_zone(&zone) {
 	*this = str.c_str();
+}
+
+inline String::String(int len, ::Zone &zone) : m_zone(&zone) {
+	if (len>0) {
+		m_data = details::DataBlock::create(kRefType_Copy, len, 0, 0, zone);
+		reinterpret_cast<char*>(m_data->m_buf)[len-1] = 0;
+	}
+}
+
+inline UTF8Buf String::toUTF8() const {
+	UTF8Buf buf;
+	buf.m_data = m_data;
+	buf.m_zone = m_zone;
+	return buf;
 }
 
 inline WCharBuf String::toWChar() const {
@@ -484,7 +502,7 @@ inline bool String::equalInstance(const UTF8Buf &buf) const {
 inline String &String::upperASCII() {
 	if (m_data) {
 		m_data = details::DataBlock::isolate(m_data, *m_zone);
-		toupper((char*)m_data->data.get());
+		toupper(reinterpret_cast<char*>(m_data->data.get()));
 	}
 	return *this;
 }
@@ -695,8 +713,25 @@ inline String &String::operator += (wchar_t c) {
 	return append(c);
 }
 
-inline void String::clear() {
+inline String &String::write(int pos, char sz) {
+	return write(pos, &sz, 1);
+}
+
+inline String &String::write(int pos, const char *sz) {
+	return write(pos, sz, len(sz)+1);
+}
+
+inline String &String::write(int pos, const String &str) {
+	return write(pos, str.c_str, str.length);
+}
+
+inline String &String::write(int pos, const String &str, int len) {
+	return write(pos, str.c_str, len);
+}
+
+inline String &String::clear() {
 	m_data.reset();
+	return *this;
 }
 
 inline String operator + (const String &a, const String &b) {
@@ -757,6 +792,22 @@ inline bool String::RAD_IMPLEMENT_GET(empty) {
 
 inline string::String CStr(const char *sz) {
 	return string::String(sz, string::RefTag);
+}
+
+
+template<class CharType, class Traits>
+std::basic_istream<CharType, Traits>& operator >> (std::basic_istream<CharType, Traits> &stream, string::String &string) {
+	std::string x;
+	stream >> x;
+	string = x.c_str();
+	return stream;
+}
+
+
+template<class CharType, class Traits>
+std::basic_ostream<CharType, Traits>& operator << (std::basic_ostream<CharType, Traits> &stream, const string::String &string) {
+	stream << string.c_str.get();
+	return stream;
 }
 
 #include "../PopSystemMacros.h"

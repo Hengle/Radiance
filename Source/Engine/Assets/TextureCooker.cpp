@@ -135,16 +135,16 @@ int TextureCooker::Compile(int flags, int allflags) {
 			return r;
 		}
 		
-		WString path(string::Widen(asset->path));
+		String path(CStr(asset->path));
 
 		if (lang != StringTable::LangId_EN) {
-			path += L"_";
-			path += string::Widen(StringTable::Langs[lang]);
+			path += "_";
+			path +=StringTable::Langs[lang];
 		}
 
 		path += L".bin";
 
-		fp = OpenWrite(path.c_str(), flags);
+		fp = OpenWrite(path.c_str, flags);
 		if (!fp) {
 			cout.get() << "ERROR failed to open '" << asset->path.get() << ".bin'!" << std::endl;
 			return SR_IOError;

@@ -5,10 +5,30 @@
 
 #include "Stream.h"
 #include "../Utils.h"
+#include "../String.h"
 #include <stdlib.h>
 
-
 namespace stream {
+
+bool InputStream::Read(string::String *str, UReg *errorCode) {
+	RAD_ASSERT(str);
+	S32 l;
+	if (!Read(&l, errorCode))
+		return false;
+	*str = string::String((int)l);
+	return Read(const_cast<char*>(str->c_str.get()), (SPos)l, errorCode) == (SPos)l;
+}
+
+bool OutputStream::Write(const string::String &str, UReg *errorCode) {
+	SPos l = (SPos)str.length.get();
+	if (!Write((U32)l))
+		return false;
+	return Write(str.c_str.get(), l, errorCode) == l;
+}
+
+bool OutputStream::Write(const char *sz, UReg *errorCode) {
+	return Write(CStr(sz), errorCode);
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Calculate position
@@ -29,7 +49,6 @@ RADRT_API bool RADRT_CALL CalcSeekPos(Seek seekType, SPos dstOfs, SPos curPos, S
 	*newOfs = dstOfs;
 	return dstOfs <= size;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // stream::InputStream::PipeToStream()
@@ -118,42 +137,6 @@ UReg InputStream::PipeToTarget(IPipeTarget& pipeTarget, void* tempBuffer, SPos t
 		errorCode = Success;
 
 	return errorCode;
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////
-// stream::OutputStream::riteStringHelper<wchar_t>::Write()
-//////////////////////////////////////////////////////////////////////////////////////////
-
-bool OutputStream::WriteStringHelper<wchar_t>::Write(OutputStream &stream, const wchar_t *str, UReg *errorCode)
-{
-	{
-#if defined(RAD_OPT_4BYTE_WCHAR)
-		U32 assertWCharIsFourBytes[sizeof(wchar_t) == 4 ? 1 : 0];
-		assertWCharIsFourBytes;
-#else
-		U32 assertWCharIsTwoBytes[sizeof(wchar_t) == 2 ? 1 : 0];
-		assertWCharIsTwoBytes;
-#endif
-	}
-	RAD_ASSERT(str);
-	size_t len = string::len(str);
-	RAD_VERIFY(len <= (size_t)std::numeric_limits<U16>::max());
-	U16 numChars = (U16)len;
-	if (!stream.Write(numChars, errorCode)) return false;
-
-#if defined(RAD_OPT_4BYTE_WCHAR)
-	U16 *p = stack_alloc(numChars*2);
-	{
-		U16 *w = p;
-		for (const wchar_t *x = str; *x; ++x)
-		{
-			*w++ = (U16)*x;
-		}
-	}
-	return stream.Write(p, (SPos)numChars*2, errorCode) == (SPos)numChars*2;
-#else
-	return stream.Write(str, (SPos)numChars*2, errorCode) == (SPos)numChars*2;
-#endif
 }
 
 } // stream

@@ -119,14 +119,14 @@ void LogWindow::OnPrintMsg(const PrintMsgEvent &msg)
 	QTextCursor c = m_textArea->textCursor();
 	c.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
 	m_textArea->setTextCursor(c);
-	m_textArea->insertPlainText(msg.msg.c_str());
+	m_textArea->insertPlainText(msg.msg.c_str.get());
 
 	if (msg.level == C_ErrMsgBox)
 	{
 		QMessageBox::critical(
 			MainWindow::Get(),
 			"Error",
-			msg.msg.c_str()
+			msg.msg.c_str.get()
 		);
 
 		if (m_exitAfterDialog)

@@ -115,12 +115,12 @@ void SkModelEditorWindow::Load(int id)
 	const ska::AnimState::Map &states = *m_mesh->states.get();
 	for (ska::AnimState::Map::const_iterator it = states.begin(); it != states.end(); ++it)
 	{
-		QTreeWidgetItem *root = new QTreeWidgetItem(QStringList(QString(it->first.c_str())));
+		QTreeWidgetItem *root = new QTreeWidgetItem(QStringList(QString(it->first.c_str.get())));
 		
 		const ska::AnimState &state = it->second;
 		for (ska::Variant::Vec::const_iterator it = state.variants.begin(); it != state.variants.end(); ++it)
 		{
-			new QTreeWidgetItem(root, QStringList(QString((*it).name.c_str())));
+			new QTreeWidgetItem(root, QStringList(QString((*it).name.c_str.get())));
 		}
 
 		items.push_back(root);

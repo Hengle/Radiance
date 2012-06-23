@@ -62,7 +62,7 @@ private:
 	char m_dir[MaxFilePathLen+1];
 	char m_ext[MaxExtLen+1];
 	HANDLE m_search;
-	WIN32_FIND_DATAW m_findData;
+	WIN32_FIND_DATAA m_findData;
 	Search* m_recursed;
 	SearchFlags m_flags;
 };

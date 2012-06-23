@@ -212,7 +212,7 @@ Reflected Reflected::Clone(
 	bool byVal = C(S32)||C(S32*)||C(U32)||C(U32*)||C(void*)||C(bool)||C(bool*)||
 		C(char)||C(char*)||C(wchar_t)||C(wchar_t*)||C(S64)||C(S64*)||C(U64)||C(U64*)||
 		C(F32)||C(F32*)||C(F64)||C(F64*)||C(S16)||C(S16*)||C(U16)||C(U16*)||
-		C(string::string<>)||C(string::wstring<>)||C(std::string)||C(std::wstring);
+		C(string::String)||C(std::string)||C(std::wstring);
 
 	if (!byVal)
 	{

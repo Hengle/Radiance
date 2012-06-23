@@ -197,6 +197,11 @@
     <ClInclude Include="..\Engine\Assets\StringTableCooker.h" />
     <ClInclude Include="..\Engine\Assets\StringTableParser.h" />
     <ClInclude Include="..\Engine\StringTable.h" />
+    <ClInclude Include="..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserWindow.h" />
+    <ClInclude Include="..\Engine\Tools\Editor\EditorStringTableEditorWindow.h" />
+    <ClInclude Include="..\Engine\Tools\Editor\EditorStringTableWidget.h" />
+    <ClInclude Include="..\Engine\Tools\Editor\EditorStringTableWidgetItemModel.h" />
+    <ClInclude Include="..\Engine\Tools\Editor\EditorTextEditorDialog.h" />
     <ClInclude Include="..\Runtime\Base.h" />
     <ClInclude Include="..\Runtime\Endian.h" />
     <ClInclude Include="..\Runtime\Event.h" />
@@ -731,6 +736,11 @@
     <ClCompile Include="..\Engine\Assets\StringTableCooker.cpp" />
     <ClCompile Include="..\Engine\Assets\StringTableParser.cpp" />
     <ClCompile Include="..\Engine\StringTable.cpp" />
+    <ClCompile Include="..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserWindow.cpp" />
+    <ClCompile Include="..\Engine\Tools\Editor\EditorStringTableEditorWindow.cpp" />
+    <ClCompile Include="..\Engine\Tools\Editor\EditorStringTableWidget.cpp" />
+    <ClCompile Include="..\Engine\Tools\Editor\EditorStringTableWidgetItemModel.cpp" />
+    <ClCompile Include="..\Engine\Tools\Editor\EditorTextEditorDialog.cpp" />
     <ClCompile Include="..\Runtime\Runtime.cpp" />
     <ClCompile Include="..\Runtime\String\String.cpp" />
     <ClCompile Include="..\Runtime\Win\WinCrashReporter.cpp" />

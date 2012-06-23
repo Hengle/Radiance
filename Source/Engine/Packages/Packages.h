@@ -954,7 +954,7 @@ private:
 #if defined(RAD_OPT_PC_TOOLS)
 		tools::UIProgress &ui,
 #endif
-		const String &wPath,
+		const String &path,
 		const String &filename,
 		int size
 	);
@@ -971,7 +971,7 @@ private:
 
 	typedef zone_map<asset::Type, KeyDef::MapRef, ZPackagesT>::type TypeToKeyDefsMap;
 	bool LoadKeyDefs();
-	bool LoadKeyDefs(const String &wPath, const String &filename);
+	bool LoadKeyDefs(const String &path, const String &filename);
 	void ParseKeyDefs(lua_State *L, const String &filename, asset::Type type);
 	void ParseKeyDefs(
 		const String &filename, 
@@ -1005,7 +1005,7 @@ private:
     void Delete(const Package::Ref &pkg);
     bool Rename(const Package::Ref &pkg, const char *name);
     void UpdateImports(const char *src, const char *dst);
-	int PackageSize(const String &wPath);
+	int PackageSize(const String &path);
 
 	typedef zone_map<int, Cooker::Ref, ZPackagesT>::type CookerMap;
 	struct CookState

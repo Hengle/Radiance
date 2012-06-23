@@ -13,10 +13,10 @@
 #include <boost/thread/locks.hpp>
 
 #if defined(RAD_OPT_WINX)
-#define SEARCH_EXT L".dll"
+#define SEARCH_EXT ".dll"
 #define COMPONENT_EXPORT_FN "___RAD_ComponentsExport@8"
 #elif defined(RAD_OPT_LINUX) || defined(RAD_OPT_APPLE)
-#define SEARCH_EXT L".so"
+#define SEARCH_EXT ".so"
 #define COMPONENT_EXPORT_FN "_Z22__RAD_ComponentsExportiRib"
 #else
 #error RAD_ERROR_UNSUP_PLAT
@@ -115,13 +115,13 @@ struct ComponentManager :
 		RegisterComponents(fn);
 	}
 
-	virtual void LoadComponents(const wchar_t *path, ComponentLoadFlags flags)
+	virtual void LoadComponents(const char *path, ComponentLoadFlags flags)
 	{
 		Search search;
 		RAD_DEBUG_ONLY(bool _b = EnforcePortablePathsEnabled(); EnforcePortablePaths(false));
 
 		bool recursive = (flags & CLF_Recursive) ? true : false;
-		wchar_t nativePath[MaxFilePathLen+1];
+		char nativePath[MaxFilePathLen+1];
 
 		if (flags & CLF_NativePath)
 		{
@@ -137,10 +137,10 @@ struct ComponentManager :
 			SEARCH_EXT, 
 			SearchFlags(((recursive)?Recursive:0)|FileNames|NativePath)))
 		{
-			wchar_t filename[MaxFilePathLen+1];
+			char filename[MaxFilePathLen+1];
 			while (search.NextFile(filename, MaxFilePathLen+1))
 			{
-				wchar_t buff[MaxFilePathLen+1];
+				char buff[MaxFilePathLen+1];
 				cpy(buff, nativePath);
 				cat(buff, NativePathSeparator);
 				cat(buff, filename);

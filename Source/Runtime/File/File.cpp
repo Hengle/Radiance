@@ -26,7 +26,7 @@ static bool CheckPathCharacters(
 )
 {
 	RAD_ASSERT(string);
-	RAD_ASSERT(len(string) > ofs);
+	RAD_ASSERT(len(string) > (int)ofs);
 
 	string = &string[ofs];
 	while (string[0] != 0)
@@ -50,7 +50,7 @@ static bool CheckExtensionCharacters(
 )
 {
 	RAD_ASSERT(string);
-	RAD_ASSERT(len(string) > ofs);
+	RAD_ASSERT(len(string) > (int)ofs);
 
 	string = &string[ofs];
 	while (string[0] != 0)
@@ -146,7 +146,7 @@ static bool CheckDirectories(
 )
 {
 	RAD_ASSERT(string);
-	RAD_ASSERT(len(string) > ofs);
+	RAD_ASSERT(len(string) > (int)ofs);
 
 	static const UReg MAXDIRDEPTH = 32;
 	UReg c = 0;
@@ -278,7 +278,7 @@ bool ExtractAlias(
 	{
 		*aliasNumber = 0;
 		*strOfs = i+1;
-		swscanf(path, L"%d:", aliasNumber);
+		sscanf(path, "%d:", aliasNumber);
 		return true;
 	}
 	else

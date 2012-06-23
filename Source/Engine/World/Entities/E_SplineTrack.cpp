@@ -287,7 +287,7 @@ E_SplineTrack::StringVec E_SplineTrack::SplitEvents(const char *str)
 	{
 		if (str[0] == '\n') // end of line
 		{
-			if (!s.empty())
+			if (!s.empty)
 				v.push_back(s);
 			s.clear();
 		}
@@ -299,7 +299,7 @@ E_SplineTrack::StringVec E_SplineTrack::SplitEvents(const char *str)
 		++str;
 	}
 
-	if (!s.empty())
+	if (!s.empty)
 		v.push_back(s);
 
 	return v;

@@ -57,14 +57,12 @@ int FontParser::Load(
 	if (!m_buf)
 	{
 		const String *s = asset->entry->KeyValue<String>("Source.File", P_TARGET_FLAGS(flags));
-		if (!s || s->empty())
+		if (!s || s->empty)
 			return SR_MetaError;
-
-		WString path(string::Widen(s->c_str()));
 
 		int media = file::AllMedia;
 		int r = engine.sys->files->LoadFile(
-			path.c_str(),
+			s->c_str,
 			media,
 			m_buf,
 			file::HIONotify()
@@ -102,13 +100,13 @@ int FontParser::LoadCooked(
 {
 	if (!m_buf)
 	{
-		WString path(L"Cooked/");
-		path += string::Widen(asset->path);
-		path += L".bin";
+		String path(CStr("Cooked/"));
+		path += CStr(asset->path);
+		path += ".bin";
 
 		int media = file::AllMedia;
 		int r = engine.sys->files->LoadFile(
-			path.c_str(),
+			path.c_str,
 			media,
 			m_buf,
 			file::HIONotify()

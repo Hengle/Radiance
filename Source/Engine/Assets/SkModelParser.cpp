@@ -91,7 +91,7 @@ int SkModelParser::LoadCooked(
 			if (!s)
 				return SR_MetaError;
 
-			m_skaRef = engine.sys->packages->Resolve(s->c_str(), asset->zone);
+			m_skaRef = engine.sys->packages->Resolve(s->c_str, asset->zone);
 			if (!m_skaRef)
 				return SR_MissingFile;
 
@@ -111,7 +111,7 @@ int SkModelParser::LoadCooked(
 			if (!s)
 				return SR_MetaError;
 
-			m_statesRef = engine.sys->packages->Resolve(s->c_str(), asset->zone);
+			m_statesRef = engine.sys->packages->Resolve(s->c_str, asset->zone);
 			if (!m_statesRef)
 				return SR_MissingFile;
 
@@ -200,12 +200,12 @@ int SkModelParser::LoadCooked(
 					COut(C_Info) << asset->path.get() << " is up to date, using cache." << std::endl;
 				}
 
-				WString path(string::Widen(asset->path));
-				path += L".0.bin";
+				String path(CStr(asset->path));
+				path += ".0.bin";
 
 				int media = file::AllMedia;
 				int r = m_cooker->LoadFile( // load cooked data.
-					path.c_str(),
+					path.c_str,
 					0,
 					media,
 					m_buf[0],
@@ -219,13 +219,13 @@ int SkModelParser::LoadCooked(
 			}
 			else {
 #endif
-			WString path(L"Cooked/");
-			path += string::Widen(asset->path);
-			path += L".0.bin";
+			String path(CStr("Cooked/"));
+			path += CStr(asset->path);
+			path += ".0.bin";
 
 			int media = file::AllMedia;
 			int r = engine.sys->files->LoadFile(
-				path.c_str(),
+				path.c_str,
 				media,
 				m_buf[0],
 				file::HIONotify(),
@@ -261,12 +261,12 @@ int SkModelParser::LoadCooked(
 #if defined(RAD_OPT_TOOLS)
 		if (!asset->cooked)
 		{
-			WString path(string::Widen(asset->path));
-			path += L".1.bin";
+			String path(CStr(asset->path));
+			path += ".1.bin";
 
 			int media = file::AllMedia;
 			int r = m_cooker->LoadFile( // load cooked data.
-				path.c_str(),
+				path.c_str,
 				0,
 				media,
 				m_buf[1],
@@ -282,13 +282,13 @@ int SkModelParser::LoadCooked(
 		}
 		else {
 #endif
-			WString path(L"Cooked/");
-			path += string::Widen(asset->path);
+			String path(CStr("Cooked/"));
+			path += CStr(asset->path);
 			path += L".1.bin";
 
 			int media = file::AllMedia;
 			int r = engine.sys->files->LoadFile(
-				path.c_str(),
+				path.c_str,
 				media,
 				m_buf[1],
 				file::HIONotify(),
@@ -345,7 +345,7 @@ int SkModelParser::Load(
 	if (!s)
 		return SR_MetaError;
 
-	m_skaRef = engine.sys->packages->Resolve(s->c_str(), asset->zone);
+	m_skaRef = engine.sys->packages->Resolve(s->c_str, asset->zone);
 	if (!m_skaRef)
 		return SR_MissingFile;
 
@@ -365,7 +365,7 @@ int SkModelParser::Load(
 	if (!s)
 		return SR_MetaError;
 
-	m_statesRef = engine.sys->packages->Resolve(s->c_str(), asset->zone);
+	m_statesRef = engine.sys->packages->Resolve(s->c_str, asset->zone);
 	if (!m_statesRef)
 		return SR_MissingFile;
 
@@ -385,12 +385,11 @@ int SkModelParser::Load(
 	if (!s)
 		return SR_MetaError;
 
-	WString spath(*s);
 	int media = file::AllMedia;
 	file::HStreamInputBuffer ib;
 
 	r = engine.sys->files->OpenFileStream(
-		spath.c_str(),
+		s->c_str,
 		media,
 		ib,
 		file::HIONotify()

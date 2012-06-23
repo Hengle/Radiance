@@ -11,6 +11,8 @@
 
 namespace string {
 
+RAD_ZONE_DEF(RADRT_API, ZString, "Strings", ZRuntime);
+
 int utf8to16len(const char *src, int len) {
 	U16 b[2];
 	int l = 0;
@@ -125,22 +127,22 @@ namespace details {
 
 bool DataBlock::s_init = false;
 DataBlock::DataBlockPool DataBlock::s_dataBlockPool;
-MemoryPool DataBlock::s_pools[DataBlock::NumPools];
+MemoryPool DataBlock::s_pools[DataBlock::kNumPools];
 
 MemoryPool *DataBlock::poolForSize(int size, int &poolIdx, Mutex::ScopedLock &L) {
 
-	if (size > MaxPoolSize)
+	if (size > kMaxPoolSize)
 		return 0;
 
 	L.lock(Mutex::get());
 
 	if (!s_init) {
-		for (int i = 0; i < NumPools; ++i) {
+		for (int i = 0; i < kNumPools; ++i) {
 			s_pools[i].Create(
 				ZString.Get(),
 				"string_pool",
-				MinPoolSize << i,
-				1024 / (MinPoolSize << i)
+				kMinPoolSize << i,
+				1024 / (kMinPoolSize << i)
 			);
 		}
 		s_init = true;
@@ -149,8 +151,8 @@ MemoryPool *DataBlock::poolForSize(int size, int &poolIdx, Mutex::ScopedLock &L)
 	MemoryPool *pool = 0;
 	poolIdx = 0;
 
-	for (int i = 0; i < NumPools; ++i) {
-		if (size <= (MinPoolSize<<i)) {
+	for (int i = 0; i < kNumPools; ++i) {
+		if (size <= (kMinPoolSize<<i)) {
 			pool = &s_pools[i];
 			poolIdx = i;
 			break;
@@ -166,7 +168,7 @@ DataBlock::Ref DataBlock::create(
 	int len,
 	const void *src,
 	int srcLen,
-	Zone &zone
+	::Zone &zone
 ) {
 
 	MemoryPool *pool = 0;
@@ -181,7 +183,7 @@ DataBlock::Ref DataBlock::create(
 		char *buf = 0;
 
 		if (&zone == &ZString.Get()) {
-			details::Mutex::ScopedLock L;
+			Mutex::ScopedLock L;
 			pool = poolForSize(len, poolIdx, L);
 			if (pool) {
 				buf = reinterpret_cast<char*>(pool->GetChunk());
@@ -202,14 +204,15 @@ DataBlock::Ref DataBlock::create(
 
 	RAD_ASSERT(src);
 
-	DataBlock::Ref r(s_dataBlockPool.Construct(refType, src, len, pool, poolIdx), &DataBlock::destroy);
+	Mutex::Lock L(Mutex::get());
+	DataBlock::Ref r(s_dataBlockPool.Construct(refType, const_cast<void*>(src), len, pool, poolIdx), &DataBlock::destroy);
 	return r;
 }
 
 DataBlock::Ref DataBlock::create(
 	const U16 *u16,
 	int u16Len,
-	Zone &zone
+	::Zone &zone
 ) {
 	DataBlock::Ref r;
 
@@ -227,7 +230,7 @@ DataBlock::Ref DataBlock::create(
 DataBlock::Ref DataBlock::create(
 	const U32 *u32,
 	int u32Len,
-	Zone &zone
+	::Zone &zone
 ) {
 	DataBlock::Ref r;
 
@@ -238,9 +241,11 @@ DataBlock::Ref DataBlock::create(
 		utf32to8(x, u32, u32Len);
 		x[len] = 0;
 	}
+
+	return r;
 }
 
-DataBlock::Ref DataBlock::resize(const DataBlock::Ref &block, int size, Zone &zone) {
+DataBlock::Ref DataBlock::resize(const DataBlock::Ref &block, int size, ::Zone &zone) {
 	
 	if (block && block.unique()) {
 		if (!block->m_pool) {
@@ -257,13 +262,15 @@ DataBlock::Ref DataBlock::resize(const DataBlock::Ref &block, int size, Zone &zo
 
 	if (block)
 		memcpy(r->m_buf, block->m_buf, std::min(size, block->m_size));
+
+	return r;
 }
 
 } // details
 
 ///////////////////////////////////////////////////////////////////////////////
 
-String::String(const String &s, const CopyTag_t&, Zone &zone) {
+String::String(const String &s, const CopyTag_t&, ::Zone &zone) {
 	m_zone = &zone;
 	if (s.m_data) {
 		if (s.m_data->m_refType != kRefType_Copy) {
@@ -272,19 +279,6 @@ String::String(const String &s, const CopyTag_t&, Zone &zone) {
 			m_data = s.m_data;
 		}
 	}
-}
-
-UTF8Buf String::toUTF8() const {
-	UTF8Buf buf;
-	if (m_data && m_data->m_refType != kRefType_Copy) {
-		// We need to copy this data into another buffer.
-		buf.m_data = details::DataBlock::create(kRefType_Copy, 0, m_data->data, m_data->size, *m_zone);
-	} else {
-		buf.m_data = m_data;
-	}
-
-	buf.m_zone = m_zone;
-	return buf;
 }
 
 UTF16Buf String::toUTF16() const {
@@ -373,17 +367,17 @@ String String::substr(int first, int count) const {
 	return String();
 }
 
-int String::charIndexForBytePos(int ofs) const {
-	if (ofs >= length)
+int String::charIndexForBytePos(int pos) const {
+	if (pos >= length)
 		return -1;
 
 	const char *sz = c_str.get();
-	const char *pos = sz + ofs;
+	const char *cpos = sz + pos;
 
 	int c = 0;
 	U32 b;
 
-	while (sz < pos) {
+	while (sz < cpos) {
 		utf8::unchecked::utf8to32(&sz, sz+1, &b);
 		++c;
 	}
@@ -488,20 +482,14 @@ String &String::printf(const char *fmt, va_list args) {
 	return *this;
 }
 
+String &String::write(int pos, const char *sz, int len) {
+	m_data = details::DataBlock::isolate(m_data, *m_zone);
+	ncpy(
+		reinterpret_cast<char*>(m_data->data.get()),
+		sz,
+		len
+	);
+	return *this;
+}
+
 } // string
-
-template<class CharType, class Traits>
-std::basic_istream<CharType, Traits>& operator >> (std::basic_istream<CharType, Traits> &stream, string::String &string) {
-	std::string x;
-	stream >> x;
-	string = x.c_str();
-	return stream;
-}
-
-
-template<class CharType, class Traits>
-std::basic_ostream<CharType, Traits>& operator << (std::basic_ostream<CharType, Traits> &stream, const string::String &string) {
-	std::string x(string.c_str.get());
-	stream << x;
-	return stream;
-}

@@ -18,7 +18,7 @@ RADRT_API void RADRT_CALL __rad_assert(
 {
 #if defined(RAD_OPT_WIN)
 	RAD_NOT_USED(function);
-	_wassert(Widen(message).c_str(), Widen(file).c_str(), line);
+	_wassert(CStr(message).toWChar().c_str, CStr(file).toWChar().c_str, line);
 #elif defined(RAD_OPT_APPLE)
 	__assert_rtn(function, file, line, message);
 #else

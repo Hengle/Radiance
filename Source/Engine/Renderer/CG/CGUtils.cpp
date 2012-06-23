@@ -16,7 +16,7 @@ namespace cg {
 
 bool OpenFile(
 	Engine &e,
-	const wchar_t *filename, 
+	const char *filename, 
 	File &out
 )
 {
@@ -31,7 +31,7 @@ bool OpenFile(
 
 	if (r != file::Success)
 	{
-		COut(C_ErrMsgBox) << "GLSLTool: Error opening \"" << string::Shorten(filename) << "\"" << std::endl;
+		COut(C_ErrMsgBox) << "GLSLTool: Error opening \"" << filename << "\"" << std::endl;
 		return false;
 	}
 
@@ -63,7 +63,7 @@ void Copy(
 
 bool Inject(
 	Engine &e,
-	const wchar_t *filename,
+	const char *filename,
 	std::ostream &out
 )
 {
@@ -117,7 +117,7 @@ bool ExpandIncludes(
 		String include;
 		if (ParseInclude(lineBuf, include))
 		{
-			if (!isrc.AddInclude(include.c_str(), os))
+			if (!isrc.AddInclude(include.c_str, os))
 				return false;
 		}
 		else
@@ -131,17 +131,17 @@ bool ExpandIncludes(
 
 void SaveText(
 	Engine &engine,
-	const wchar_t *filename,
+	const char *filename,
 	const char *sz
 )
 {
-	WString path(WString(L"9:/") + engine.sys->files->hddRoot.get());
-	path += L'/';
+	String path(CStr("9:/") + engine.sys->files->hddRoot.get());
+	path += '/';
 	path += filename;
-	wchar_t nativePath[file::MaxFilePathLen+1];
-	if (file::ExpandToNativePath(path.c_str(), nativePath, file::MaxFilePathLen+1))
+	char nativePath[file::MaxFilePathLen+1];
+	if (file::ExpandToNativePath(path.c_str, nativePath, file::MaxFilePathLen+1))
 	{
-		FILE *fp = fopen(string::Shorten(nativePath).c_str(), "wb");
+		FILE *fp = fopen(nativePath, "wb");
 		if (fp)
 		{
 			fwrite(sz, 1, string::len(sz), fp);

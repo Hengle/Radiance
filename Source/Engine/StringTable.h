@@ -91,7 +91,7 @@ public:
 	void DeleteId(const char *id);
 	bool CreateId(const char *id);
 
-	bool SaveText(const char *name, const wchar_t *root, int saveMask=LangFlag_ALL) const;
+	bool SaveText(const char *name, const char *root, int saveMask=LangFlag_ALL) const;
 	bool SaveBin(stream::IOutputBuffer &ob) const;
 
 #endif

@@ -7,9 +7,8 @@
 
 #include "IntStream.h"
 #include "StreamDef.h"
-#include "../String.h"
+#include "../StringDef.h"
 #include "../PushPack.h"
-
 
 namespace stream {
 
@@ -181,22 +180,20 @@ public:
 	virtual bool Read(F32* var, UReg* errorCode = 0);
 	virtual bool Read(F64* var, UReg* errorCode = 0);
 
-	template <typename T, typename S, typename A>
-	bool Read(std::basic_string<T, S, A> *str, UReg *errorCode = 0);
+	bool Read(string::String *str, UReg *errorCode = 0);
 
 	// >> operators.
-	InputStream& operator >> (S8& var);  // throw(ReadException);
-	InputStream& operator >> (U8& var);  // throw(ReadException);
-	InputStream& operator >> (S16& var); // throw(ReadException);
-	InputStream& operator >> (U16& var); // throw(ReadException);
-	InputStream& operator >> (S32& var); // throw(ReadException);
-	InputStream& operator >> (U32& var); // throw(ReadException);
-	InputStream& operator >> (S64& var); // throw(ReadException);
-	InputStream& operator >> (U64& var); // throw(ReadException);
-	InputStream& operator >> (F32& var); // throw(ReadException);
-	InputStream& operator >> (F64& var); // throw(ReadException);
-	template <typename T, typename S, typename A>
-	InputStream& operator >> (std::basic_string<T, S, A> &str); // throw(ReadException);
+	InputStream &operator >> (S8& var);  // throw(ReadException);
+	InputStream &operator >> (U8& var);  // throw(ReadException);
+	InputStream &operator >> (S16& var); // throw(ReadException);
+	InputStream &operator >> (U16& var); // throw(ReadException);
+	InputStream &operator >> (S32& var); // throw(ReadException);
+	InputStream &operator >> (U32& var); // throw(ReadException);
+	InputStream &operator >> (S64& var); // throw(ReadException);
+	InputStream &operator >> (U64& var); // throw(ReadException);
+	InputStream &operator >> (F32& var); // throw(ReadException);
+	InputStream &operator >> (F64& var); // throw(ReadException);
+	InputStream &operator >> (string::String &str); // throw(ReadException);
 
 	IInputBuffer &Buffer();
 	void SetBuffer(IInputBuffer &buff);
@@ -206,20 +203,6 @@ protected:
 	virtual void InByteSwapWideChars(U16 *chars) {}
 
 private:
-
-	template <typename T, typename S, typename A>
-	struct ReadStringHelper
-	{
-		static bool Read(InputStream &stream, std::basic_string<T, S, A> *str, UReg *errorCode);
-	};
-
-	template <typename S, typename A>
-	struct ReadStringHelper<wchar_t, S, A>
-	{
-		static bool Read(InputStream &stream, std::basic_string<wchar_t, S, A> *str, UReg *errorCode);
-	};
-
-	template<typename T, typename S, typename A> friend struct ReadStringHelper;
 
 	InputStream(const InputStream&);
 	InputStream& operator = (const InputStream&);
@@ -270,22 +253,23 @@ public:
 	virtual bool Write(const U64& var, UReg* errorCode = 0);
 	virtual bool Write(const F32& var, UReg* errorCode = 0);
 	virtual bool Write(const F64& var, UReg* errorCode = 0);
-	template <typename TChar>
-	bool Write(const TChar *str, UReg *errorCode = 0);
+	
+	bool Write(const char *sz, UReg *errorCode = 0);
+	bool Write(const string::String &str, UReg *errorCode = 0);
 
 	// << operators.
-	OutputStream& operator << (const S8& var);  // throw(WriteException);
-	OutputStream& operator << (const U8& var);  // throw(WriteException);
-	OutputStream& operator << (const S16& var); // throw(WriteException);
-	OutputStream& operator << (const U16& var); // throw(WriteException);
-	OutputStream& operator << (const S32& var); // throw(WriteException);
-	OutputStream& operator << (const U32& var); // throw(WriteException);
-	OutputStream& operator << (const S64& var); // throw(WriteException);
-	OutputStream& operator << (const U64& var); // throw(WriteException);
-	OutputStream& operator << (const F32& var); // throw(WriteException);
-	OutputStream& operator << (const F64& var); // throw(WriteException);
-	template <typename TChar>
-	OutputStream& operator << (const TChar *str); // throw(WriteException);
+	OutputStream &operator << (const S8& var);  // throw(WriteException);
+	OutputStream &operator << (const U8& var);  // throw(WriteException);
+	OutputStream &operator << (const S16& var); // throw(WriteException);
+	OutputStream &operator << (const U16& var); // throw(WriteException);
+	OutputStream &operator << (const S32& var); // throw(WriteException);
+	OutputStream &operator << (const U32& var); // throw(WriteException);
+	OutputStream &operator << (const S64& var); // throw(WriteException);
+	OutputStream &operator << (const U64& var); // throw(WriteException);
+	OutputStream &operator << (const F32& var); // throw(WriteException);
+	OutputStream &operator << (const F64& var); // throw(WriteException);
+	OutputStream &operator << (const string::String &str); // throw(WriteException);
+	OutputStream &operator << (const char *sz);
 
 	IOutputBuffer &Buffer();
 	void SetBuffer(IOutputBuffer &buff);
@@ -296,12 +280,6 @@ protected:
 
 private:
 
-	template <typename TChar>
-	struct WriteStringHelper
-	{
-		static bool Write(OutputStream &stream, const TChar *str, UReg *errorCode);
-	};
-
 	OutputStream(const OutputStream&);
 	OutputStream& operator = (const OutputStream&);
 
@@ -309,12 +287,6 @@ private:
 	OutputStream& StreamType(T& var);// throw(WriteException);
 
 	IOutputBuffer* m_buff;
-};
-
-template <>
-struct OutputStream::WriteStringHelper<wchar_t>
-{
-	static bool Write(OutputStream &stream, const wchar_t *str, UReg *errorCode);
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////

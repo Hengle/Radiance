@@ -47,7 +47,7 @@ void ComboCheckBoxExtractor::SetEditorData(ComboCheckBox &cb, const QVariant &v,
 	if (!s)
 		return;
 
-	QString qs(s->c_str());
+	QString qs(s->c_str.get());
 	QStringList values = qs.split(';', QString::SkipEmptyParts);
 	
 	qs = v.toString();
@@ -85,7 +85,7 @@ void ComboBoxExtractor<QString>::SetEditorData(QComboBox &cb, const QVariant &v,
 	if (!s)
 		return;
 
-	QString qs(s->c_str());
+	QString qs(s->c_str.get());
 	QStringList values = qs.split(';', QString::SkipEmptyParts);
 	cb.addItems(values);
 
@@ -117,16 +117,16 @@ void FilePathExtractor::SetEditorData(FilePathFieldWidget &fw, const QVariant &v
 		return;
 
 	QString prefix("9:/");
-	prefix += QString::fromWCharArray(Files()->hddRoot);
+	prefix += Files()->hddRoot.get();
 	fw.SetPrefix(prefix);
 	fw.SetFilter("All Files (*.*)");
 
-	pkg::KeyDef::Pair::Map::const_iterator it = context->def->pairs.find(String("filter"));
+	pkg::KeyDef::Pair::Map::const_iterator it = context->def->pairs.find(CStr("filter"));
 	if (it != context->def->pairs.end())
 	{
 		const String *s = static_cast<const String*>(it->second.val);
 		if (s)
-			fw.SetFilter(s->c_str());
+			fw.SetFilter(s->c_str.get());
 	}
 
 	fw.SetPath(v.toString());
@@ -213,7 +213,7 @@ void ContentImportPathExtractor::SetEditorData(ContentImportFieldWidget &fw, con
 	{
 		const String *s = static_cast<const String*>(it->second.val);
 		if (s)
-			fw.SetFilter(s->c_str());
+			fw.SetFilter(s->c_str.get());
 	}
 
 	fw.SetPath(v.toString());
@@ -302,35 +302,35 @@ RADENG_API Property *RADENG_CALL PropertyForKey(const char *name, const KeyConte
 			{
 			case pkg::K_Import:
 				return new (ZEditor) ContentImportTraits::PropertyType(
-					s->c_str(),
+					s->c_str.get(),
 					key,
 					name,
 					widget
 				);
 			case pkg::K_File:
 				return new (ZEditor) FilePathTraits::PropertyType(
-					s->c_str(),
+					s->c_str.get(),
 					key,
 					name,
 					widget
 				);
 			case pkg::K_List:
 				return new (ZEditor) StringComboBoxTraits::PropertyType(
-					s->c_str(),
+					s->c_str.get(),
 					key,
 					name,
 					widget
 				);
 			case pkg::K_CheckBoxes:
 				return new (ZEditor) StringComboCheckBoxTraits::PropertyType(
-					s->c_str(),
+					s->c_str.get(),
 					key,
 					name,
 					widget
 				);
 			case pkg::K_Color:
 				return new (ZEditor) ColorTraits::PropertyType(
-					s->c_str(),
+					s->c_str.get(),
 					key,
 					name,
 					widget
@@ -338,7 +338,7 @@ RADENG_API Property *RADENG_CALL PropertyForKey(const char *name, const KeyConte
 			}
 
 			return new (ZEditor) StringTraits::PropertyType(
-				s->c_str(),
+				s->c_str.get(),
 				key,
 				name,
 				widget
@@ -411,7 +411,7 @@ RADENG_API PropertyList RADENG_CALL CreateDefaultPropertiesForAsset(const pkg::P
 				}
 
 				KeyContext::Ref ctx(new (ZEditor) KeyContext(e->id, flags ? t : 0, key, def));
-				Property *p = PropertyForKey(def->path.c_str(), ctx, widget);
+				Property *p = PropertyForKey(def->path.c_str, ctx, widget);
 
 				if (p)
 					l.append(p);

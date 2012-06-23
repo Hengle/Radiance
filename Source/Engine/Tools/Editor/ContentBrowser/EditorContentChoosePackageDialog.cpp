@@ -37,7 +37,7 @@ ContentChoosePackageDialog::ContentChoosePackageDialog(
 	label->setText(prompt);
 	l->addWidget(label, 1, 0);
 	
-	QIcon packageIcon = LoadIcon(L"Editor/package_tiny.png");
+	QIcon packageIcon = LoadIcon("Editor/package_tiny.png");
 	m_packages = new (ZEditor) QComboBox(this);
 	RAD_VERIFY(connect(m_packages, SIGNAL(currentIndexChanged(int)), SLOT(SelectedPackageChanged(int))));
 

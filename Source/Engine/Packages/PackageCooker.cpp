@@ -477,7 +477,7 @@ int PackageMan::BuildPak0(int compression)
 	{
 		String path(CStr("9:/"));
 		path += m_engine.sys->files->hddRoot;
-		path += CStr("/Scripts");
+		path += "/Scripts";
 		r = PakDirectory(path.c_str, "Scripts/", compression, lumpWriter);
 		if (r != SR_Success)
 		{
@@ -517,23 +517,23 @@ int PackageMan::BuildTargetPak(int plat, int compression)
 	{
 	case P_TargetPC:
 		*m_cookState->cout << "------ Packaging PC ------" << std::endl;
-		path += CStr("pc.pak");
+		path += "pc.pak";
 		break;
 	case P_TargetIPhone:
 		*m_cookState->cout << "------ Packaging IPhone ------" << std::endl;
-		path += CStr("iphone.pak");
+		path += "iphone.pak";
 		break;
 	case P_TargetIPad:
 		*m_cookState->cout << "------ Packaging IPad ------" << std::endl;
-		path += CStr("ipad.pak");
+		path += "ipad.pak";
 		break;
 	case P_TargetXBox360:
 		*m_cookState->cout << "------ Packaging XBox360 ------" << std::endl;
-		path += CStr("xbox360.pak");
+		path += "xbox360.pak";
 		break;
 	case P_TargetPS3:
 		*m_cookState->cout << "------ Packaging PS3 ------" << std::endl;
-		path += CStr("ps3.pak");
+		path += "ps3.pak";
 		break;
 	}
 
@@ -838,7 +838,7 @@ int PackageMan::BuildPackageData()
 
 		String path(CStr("9:/Cooked/Out/Packages/"));
 		path += pkg.pkg->name;
-		path += CStr(".lump");
+		path += ".lump";
 
 		char nativePath[file::MaxFilePathLen+1];
 		file::ExpandToNativePath(path.c_str, nativePath, file::MaxFilePathLen+1);
@@ -1137,7 +1137,7 @@ void Cooker::LoadImports()
 
 	String spath(CStr("9:/Cooked/Out/Globals/"));
 	spath += m_assetPath;
-	spath += CStr(".imports");
+	spath += ".imports";
 
 	char path[file::MaxFilePathLen+1];
 	if (!file::ExpandToNativePath(spath.c_str, path, file::MaxFilePathLen+1))
@@ -1546,9 +1546,9 @@ int Cooker::CompareCachedFileTime(int target, const char *key, const char *path,
 	TimeDate fileTime;
 
 	spath = CStr("9:/");
-	spath += CStr(engine->sys->files->hddRoot.get());
-	spath += CStr("/");
-	spath += CStr(path);
+	spath += engine->sys->files->hddRoot.get();
+	spath += "/";
+	spath += path;
 
 	if (!file::FileTime(spath.c_str, &fileTime, 0))
 		return -1; // always older
@@ -1599,11 +1599,11 @@ int Cooker::CompareCachedFileTimeKey(int target, const char *key, const char *lo
 
 		if (i != StringTable::LangId_EN) {
 			x = sBasePath;
-			x += CStr("_");
+			x += "_";
 			x += StringTable::Langs[i];
 			x += sExt;
 			k = sKey;
-			k += CStr("_cookerLang_");
+			k += "_cookerLang_";
 			k += StringTable::Langs[i];
 		} else {
 			x = sPath;
@@ -1694,7 +1694,7 @@ String Cooker::TargetPath(int target)
 	const char *sz = pkg::PlatformNameForFlags(target);
 	if (!sz)
 		return CStr("Generic/");
-	return String(sz)+CStr("/");
+	return CStr(sz)+"/";
 }
 
 String Cooker::LocalizedString(int languages) {
@@ -1706,7 +1706,7 @@ String Cooker::LocalizedString(int languages) {
 			continue;
 		if (sep) {
 			sep = false;
-			s += CStr(";");
+			s += ";";
 		}
 		s += String(StringTable::Langs[i]).upper();
 		sep = true;

@@ -157,7 +157,7 @@ bool GLSLShader::CompilePass(
 		{
 			String path(CStr("Shaders/"));
 			path += s->name;
-			path += CStr(".vert.glsl");
+			path += ".vert.glsl";
 			cg::SaveText(engine, path.c_str, shader.c_str);
 		}
 #endif
@@ -219,7 +219,7 @@ bool GLSLShader::CompilePass(
 		{
 			String path(CStr("Shaders/"));
 			path += s->name;
-			path += CStr(".frag.glsl");
+			path += ".frag.glsl";
 			cg::SaveText(engine, path.c_str, shader.c_str);
 		}
 #endif

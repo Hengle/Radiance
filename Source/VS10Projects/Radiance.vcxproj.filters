@@ -2193,6 +2193,21 @@
     <ClInclude Include="..\Engine\StringTable.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="..\Engine\Tools\Editor\EditorStringTableEditorWindow.h">
+      <Filter>Engine\Tools\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Tools\Editor\EditorStringTableWidget.h">
+      <Filter>Engine\Tools\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Tools\Editor\EditorStringTableWidgetItemModel.h">
+      <Filter>Engine\Tools\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Tools\Editor\EditorTextEditorDialog.h">
+      <Filter>Engine\Tools\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserWindow.h">
+      <Filter>Engine\Tools\Editor\ContentBrowser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Runtime\Runtime.cpp">
@@ -3274,6 +3289,21 @@
     </ClCompile>
     <ClCompile Include="..\Engine\StringTable.cpp">
       <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Tools\Editor\EditorStringTableEditorWindow.cpp">
+      <Filter>Engine\Tools\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Tools\Editor\EditorStringTableWidget.cpp">
+      <Filter>Engine\Tools\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Tools\Editor\EditorStringTableWidgetItemModel.cpp">
+      <Filter>Engine\Tools\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Tools\Editor\EditorTextEditorDialog.cpp">
+      <Filter>Engine\Tools\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserWindow.cpp">
+      <Filter>Engine\Tools\Editor\ContentBrowser</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

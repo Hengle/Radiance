@@ -135,8 +135,6 @@ private:
 		kMaxPoolSize = kMinPoolSize << kNumPools
 	};
 
-	typedef boost::mutex Mutex;
-	typedef boost::lock_guard<Mutex> Lock;
 	typedef ObjectPool<DataBlock> DataBlockPool;
 
 	static bool s_init;
@@ -145,7 +143,7 @@ private:
 	static MemoryPool *poolForSize(
 		int size, 
 		int &poolIdx, 
-		string::details::Mutex::ScopedLock &L
+		Mutex::ScopedLock &L
 	);
 };
 

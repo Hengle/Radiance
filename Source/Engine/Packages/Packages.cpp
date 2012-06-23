@@ -543,8 +543,8 @@ void PackageMan::LoadBin(
 {
 	// load package lump
 	String path(CStr("Packages/"));
-	path += CStr(name);
-	path += CStr(".lump");
+	path += name;
+	path += ".lump";
 
 	pkg::Package::Ref pkg = pkg::Package::New(
 		shared_from_this(),

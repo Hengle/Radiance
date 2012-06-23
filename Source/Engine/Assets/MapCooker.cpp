@@ -38,14 +38,13 @@ CookStatus MapCooker::Status(int flags, int allflags)
 		// Check 3DX timestamp
 
 		const String *mapPath = asset->entry->KeyValue<String>("Source.File", flags);
-		if (!mapPath || mapPath->empty())
+		if (!mapPath || mapPath->empty)
 			return CS_NeedRebuild;
 
-		WString path(string::Widen(mapPath->c_str()));
 		int media = file::AllMedia;
 		file::HBufferedAsyncIO m_buf;
 		int r = engine->sys->files->LoadFile(
-			path.c_str(),
+			mapPath->c_str,
 			media,
 			m_buf,
 			file::HIONotify()
@@ -77,7 +76,7 @@ CookStatus MapCooker::Status(int flags, int allflags)
 				{
 					String path(sz);
 					path += ".3dx";
-					if (CompareCachedFileTime(flags, path.c_str(), path.c_str()))
+					if (CompareCachedFileTime(flags, path.c_str, path.c_str))
 					{
 						status = CS_NeedRebuild;
 						break;
@@ -105,16 +104,15 @@ int MapCooker::Compile(int flags, int allflags)
 	CompareCachedFileTimeKey(flags, "Source.File");
 
 	const String *mapPath = asset->entry->KeyValue<String>("Source.File", flags);
-	if (!mapPath || mapPath->empty())
+	if (!mapPath || mapPath->empty)
 		return SR_MetaError;
 
 //	cout.get() << "********" << std::endl << "Loading :" << mapPath->c_str() << std::endl;
 
-	WString path(string::Widen(mapPath->c_str()));
 	int media = file::AllMedia;
 	file::HBufferedAsyncIO m_buf;
 	int r = engine->sys->files->LoadFile(
-		path.c_str(),
+		mapPath->c_str,
 		media,
 		m_buf,
 		file::HIONotify()
@@ -149,7 +147,7 @@ int MapCooker::Compile(int flags, int allflags)
 			{
 				String path(sz);
 				path += ".3dx";
-				CompareCachedFileTime(flags, path.c_str(), path.c_str());
+				CompareCachedFileTime(flags, path.c_str, path.c_str);
 			}
 		}
 	}
@@ -165,9 +163,9 @@ int MapCooker::Compile(int flags, int allflags)
 	if (!mapBuilder.Compile())
 		return SR_CompilerError;
 
-	path = string::Widen(asset->path);
-	path += L".bsp";
-	BinFile::Ref fp = OpenWrite(path.c_str(), flags);
+	String path(CStr(asset->path));
+	path += ".bsp";
+	BinFile::Ref fp = OpenWrite(path.c_str, flags);
 	if (!fp)
 		return SR_IOError;
 
@@ -211,8 +209,7 @@ int MapCooker::ParseScript(world::EntSpawn &spawn)
 			return SR_ParseError;
 
 		// turn "\n" into '\n'
-		const char *sz = value.c_str();
-		temp.reserve(value.length());
+		const char *sz = value.c_str;
 		temp.clear();
 
 		while (*sz)

@@ -924,7 +924,7 @@ bool GLTable::CheckErrors(const char *file, const char *function, int line)
 		}
 
 		str += (const char*)gluErrorString(err);
-		str += CStr("\n");
+		str += "\n";
 	}
 
 	ClearErrors();

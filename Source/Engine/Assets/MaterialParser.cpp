@@ -59,14 +59,14 @@ int MaterialParser::LoadCooked(
 	int flags
 )
 {
-	WString path(L"Cooked/");
-	path += string::Widen(asset->path);
-	path += L".bin";
+	String path(CStr("Cooked/"));
+	path += CStr(asset->path);
+	path += ".bin";
 
 	file::HStreamInputBuffer buf;
 	int media = file::AllMedia;
 	int r = engine.sys->files->OpenFileStream(
-		path.c_str(),
+		path.c_str,
 		media,
 		buf,
 		file::HIONotify()
@@ -211,7 +211,7 @@ int MaterialParser::Load(
 	if (!s)
 		return SR_MetaError;
 
-	m_m.shaderName = s->c_str();
+	m_m.shaderName = s->c_str;
 
 	s = asset->entry->KeyValue<String>("Sort", P_TARGET_FLAGS(flags));
 	if (!s)
@@ -320,12 +320,12 @@ int MaterialParser::Load(
 
 	for (int i = 0; i < r::MTS_MaxIndices; ++i)
 	{
-		path.format("Texture%d.Source.Texture", i+1);
-		s = asset->entry->KeyValue<String>(path.c_str(), P_TARGET_FLAGS(flags));
+		path.printf("Texture%d.Source.Texture", i+1);
+		s = asset->entry->KeyValue<String>(path.c_str, P_TARGET_FLAGS(flags));
 		if (!s)
 			return SR_MetaError;
 
-		if (s->empty())
+		if (s->empty)
 		{
 			if (m_procedural && asset->zone != Z_Engine)
 			{
@@ -341,7 +341,7 @@ int MaterialParser::Load(
 		}
 		else
 		{
-			pkg::Package::Entry::Ref entry = engine.sys->packages->Resolve(s->c_str());
+			pkg::Package::Entry::Ref entry = engine.sys->packages->Resolve(s->c_str);
 			if (!entry && !(flags&P_NoDefaultMedia))
 				entry = engine.sys->packages->Resolve("Sys/T_Missing");
 			if (!entry)
@@ -351,22 +351,22 @@ int MaterialParser::Load(
 			m_m.SetTextureId(r::MTS_Texture, i, entry->id);
 		}
 
-		path.format("Texture%d.Source.FramesPerSecond", i+1);
-		s = asset->entry->KeyValue<String>(path.c_str(), P_TARGET_FLAGS(flags));
+		path.printf("Texture%d.Source.FramesPerSecond", i+1);
+		s = asset->entry->KeyValue<String>(path.c_str, P_TARGET_FLAGS(flags));
 		if (!s)
 			return SR_MetaError;
 		float fps;
-		sscanf(s->c_str(), "%f", &fps);
+		sscanf(s->c_str, "%f", &fps);
 		m_m.SetTextureFPS(r::MTS_Texture, i, fps);
 
-		path.format("Texture%d.Source.ClampTextureFrames", i+1);
-		b = asset->entry->KeyValue<bool>(path.c_str(), P_TARGET_FLAGS(flags));
+		path.printf("Texture%d.Source.ClampTextureFrames", i+1);
+		b = asset->entry->KeyValue<bool>(path.c_str, P_TARGET_FLAGS(flags));
 		if (!b)
 			return SR_MetaError;
 		m_m.SetClampTextureFrames(r::MTS_Texture, i, *b);
 
-		path.format("Texture%d.tcGen", i+1);
-		s = asset->entry->KeyValue<String>(path.c_str(), P_TARGET_FLAGS(flags));
+		path.printf("Texture%d.tcGen", i+1);
+		s = asset->entry->KeyValue<String>(path.c_str, P_TARGET_FLAGS(flags));
 		if (!s)
 			return SR_MetaError;
 
@@ -379,7 +379,7 @@ int MaterialParser::Load(
 
 		for (int k = 0; k < r::Material::NumTcMods; ++k)
 		{
-			path.format("Texture%d.tcMod.%s", i+1, s_tcModNames[k]);
+			path.printf("Texture%d.tcMod.%s", i+1, s_tcModNames[k]);
 			z = path + ".Type";
 
 			WaveAnim &S = m_m.Wave(
@@ -396,7 +396,7 @@ int MaterialParser::Load(
 				r::Material::T
 			);
 
-			s = asset->entry->KeyValue<String>(z.c_str(), P_TARGET_FLAGS(flags));
+			s = asset->entry->KeyValue<String>(z.c_str, P_TARGET_FLAGS(flags));
 			if (!s)
 				return SR_MetaError;
 
@@ -418,40 +418,40 @@ int MaterialParser::Load(
 			m_m.animated = m_m.animated || S.type != WaveAnim::T_Identity;
 
 			z = path + ".Amplitude";
-			s = asset->entry->KeyValue<String>(z.c_str(), P_TARGET_FLAGS(flags));
+			s = asset->entry->KeyValue<String>(z.c_str, P_TARGET_FLAGS(flags));
 			if (!s)
 				return SR_MetaError;
 
 			float a, b;
 
-			sscanf(s->c_str(), "%f %f", &a, &b);
+			sscanf(s->c_str, "%f %f", &a, &b);
 			S.amplitude = a;
 			T.amplitude = b;
 
 			z = path + ".Frequency";
-			s = asset->entry->KeyValue<String>(z.c_str(), P_TARGET_FLAGS(flags));
+			s = asset->entry->KeyValue<String>(z.c_str, P_TARGET_FLAGS(flags));
 			if (!s)
 				return SR_MetaError;
 
-			sscanf(s->c_str(), "%f %f", &a, &b);
+			sscanf(s->c_str, "%f %f", &a, &b);
 			S.freq = a;
 			T.freq = b;
 
 			z = path + ".Phase";
-			s = asset->entry->KeyValue<String>(z.c_str(), P_TARGET_FLAGS(flags));
+			s = asset->entry->KeyValue<String>(z.c_str, P_TARGET_FLAGS(flags));
 			if (!s)
 				return SR_MetaError;
 
-			sscanf(s->c_str(), "%f %f", &a, &b);
+			sscanf(s->c_str, "%f %f", &a, &b);
 			S.phase = a;
 			T.phase = b;
 
 			z = path + ".Base";
-			s = asset->entry->KeyValue<String>(z.c_str(), P_TARGET_FLAGS(flags));
+			s = asset->entry->KeyValue<String>(z.c_str, P_TARGET_FLAGS(flags));
 			if (!s)
 				return SR_MetaError;
 
-			sscanf(s->c_str(), "%f %f", &a, &b);
+			sscanf(s->c_str, "%f %f", &a, &b);
 			S.base = a;
 			T.base = b;
 		}
@@ -461,15 +461,15 @@ int MaterialParser::Load(
 	{
 		for (int k = r::Material::ColorA; k < r::Material::NumColorIndices; ++k)
 		{
-			path.format("Color%d.%c", i, 'A'+k);
-			s = asset->entry->KeyValue<String>(path.c_str(), P_TARGET_FLAGS(flags));
+			path.printf("Color%d.%c", i, 'A'+k);
+			s = asset->entry->KeyValue<String>(path.c_str, P_TARGET_FLAGS(flags));
 			if (!s)
 				return SR_MetaError;
 
 			int r, g, b, a;
 			float c[4];
 
-			sscanf(s->c_str(), "%d %d %d %d", &r, &g, &b, &a);
+			sscanf(s->c_str, "%d %d %d %d", &r, &g, &b, &a);
 			c[0] = r/255.f;
 			c[1] = g/255.f;
 			c[2] = b/255.f;
@@ -481,10 +481,10 @@ int MaterialParser::Load(
 			m_m.SetColor(i, k, c);
 		}
 
-		path.format("Color%d.Gen", i);
+		path.printf("Color%d.Gen", i);
 		z = path + ".Type";
 
-		s = asset->entry->KeyValue<String>(z.c_str(), P_TARGET_FLAGS(flags));
+		s = asset->entry->KeyValue<String>(z.c_str, P_TARGET_FLAGS(flags));
 		if (!s)
 			return SR_MetaError;
 
@@ -508,37 +508,37 @@ int MaterialParser::Load(
 		m_m.animated = m_m.animated || C.type != WaveAnim::T_Identity;
 
 		z = path + ".Amplitude";
-		s = asset->entry->KeyValue<String>(z.c_str(), P_TARGET_FLAGS(flags));
+		s = asset->entry->KeyValue<String>(z.c_str, P_TARGET_FLAGS(flags));
 		if (!s)
 			return SR_MetaError;
 
 		float a;
 
-		sscanf(s->c_str(), "%f", &a);
+		sscanf(s->c_str, "%f", &a);
 		C.amplitude = a;
 		
 		z = path + ".Frequency";
-		s = asset->entry->KeyValue<String>(z.c_str(), P_TARGET_FLAGS(flags));
+		s = asset->entry->KeyValue<String>(z.c_str, P_TARGET_FLAGS(flags));
 		if (!s)
 			return SR_MetaError;
 
-		sscanf(s->c_str(), "%f", &a);
+		sscanf(s->c_str, "%f", &a);
 		C.freq = a;
 
 		z = path + ".Phase";
-		s = asset->entry->KeyValue<String>(z.c_str(), P_TARGET_FLAGS(flags));
+		s = asset->entry->KeyValue<String>(z.c_str, P_TARGET_FLAGS(flags));
 		if (!s)
 			return SR_MetaError;
 
-		sscanf(s->c_str(), "%f", &a);
+		sscanf(s->c_str, "%f", &a);
 		C.phase = a;
 
 		z = path + ".Base";
-		s = asset->entry->KeyValue<String>(z.c_str(), P_TARGET_FLAGS(flags));
+		s = asset->entry->KeyValue<String>(z.c_str, P_TARGET_FLAGS(flags));
 		if (!s)
 			return SR_MetaError;
 
-		sscanf(s->c_str(), "%f", &a);
+		sscanf(s->c_str, "%f", &a);
 		C.base = a;
 	}
 

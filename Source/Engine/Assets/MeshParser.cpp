@@ -78,12 +78,12 @@ int MeshParser::LoadCooked(
 				COut(C_Info) << asset->path.get() << " is up to date, using cache." << std::endl;
 			}
 
-			WString path(string::Widen(asset->path));
-			path += L".bin";
+			String path(CStr(asset->path));
+			path += ".bin";
 
 			int media = file::AllMedia;
 			int r = cooker->LoadFile( // load cooked data.
-				path.c_str(),
+				path.c_str,
 				0,
 				media,
 				m_buf,
@@ -95,13 +95,13 @@ int MeshParser::LoadCooked(
 		}
 		else {
 #endif
-		WString path(L"Cooked/");
-		path += string::Widen(asset->path);
-		path += L".bin";
+		String path(CStr("Cooked/"));
+		path += CStr(asset->path);
+		path += ".bin";
 
 		int media = file::AllMedia;
 		int r = engine.sys->files->LoadFile(
-			path.c_str(),
+			path.c_str,
 			media,
 			m_buf,
 			file::HIONotify(),
@@ -148,12 +148,11 @@ int MeshParser::Load(
 	if (!s)
 		return SR_MetaError;
 
-	WString path(*s);
 	int media = file::AllMedia;
 	file::HStreamInputBuffer ib;
 
 	int r = engine.sys->files->OpenFileStream(
-		path.c_str(),
+		s->c_str,
 		media,
 		ib,
 		file::HIONotify()

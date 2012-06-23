@@ -115,7 +115,7 @@ private:
 		int flags
 	);
 
-	int Format(const wchar_t *name);
+	int Format(const char *name);
 
 	int Resize(
 		Engine &engine,

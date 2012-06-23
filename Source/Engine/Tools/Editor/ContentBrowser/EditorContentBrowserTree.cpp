@@ -265,7 +265,7 @@ void ContentBrowserTree::Delete(const pkg::PackageVec &pkgs, const pkg::IdVec &i
 {
 	enum { MaxItems = 10 };
 	String msg;
-	msg.format("Are you sure you want to delete the following %d item(s)?"RAD_NEWLINE, pkgs.size()+ids.size());
+	msg.printf("Are you sure you want to delete the following %d item(s)?"RAD_NEWLINE, pkgs.size()+ids.size());
 
 	if (!pkgs.empty())
 	{
@@ -275,7 +275,7 @@ void ContentBrowserTree::Delete(const pkg::PackageVec &pkgs, const pkg::IdVec &i
 
 		for (; it != pkgs.end() && c < MaxItems; ++it, ++c)
 		{
-			if (!x.empty())
+			if (!x.empty)
 			{
 				x += RAD_NEWLINE;
 			}
@@ -298,7 +298,7 @@ void ContentBrowserTree::Delete(const pkg::PackageVec &pkgs, const pkg::IdVec &i
 
 		for (; it != ids.end() && c < MaxItems; ++it, ++c)
 		{
-			if (!x.empty())
+			if (!x.empty)
 			{
 				x += RAD_NEWLINE;
 			}
@@ -320,7 +320,7 @@ void ContentBrowserTree::Delete(const pkg::PackageVec &pkgs, const pkg::IdVec &i
 	if (QMessageBox::question(
 		parentWidget(),
 		"Confirmation",
-		msg.c_str(),
+		msg.c_str.get(),
 		QMessageBox::Yes|QMessageBox::No, 
 		QMessageBox::No
 	) != QMessageBox::Yes )

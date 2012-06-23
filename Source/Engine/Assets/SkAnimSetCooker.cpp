@@ -36,16 +36,16 @@ CookStatus SkAnimSetCooker::CheckRebuildFiles(int flags, int allflags)
 	if (!s)
 		return CS_NeedRebuild;
 
-	wchar_t path[256];
-	wchar_t native[256];
-	string::cpy(path, L"9:/");
-	string::cat(path, engine->sys->files->hddRoot.get());
-	string::cat(path, L"/");
-	string::cat(path, string::Widen(s->c_str()).c_str());
-	if (!file::ExpandToNativePath(path, native, 256))
+	String path(CStr("9:/"));
+	path += engine->sys->files->hddRoot.get();
+	path += "/";
+	path += s->c_str.get();
+
+	char native[256];
+	if (!file::ExpandToNativePath(path.c_str, native, 256))
 		return CS_NeedRebuild;
 
-	FILE *fp = fopen(string::Shorten(native).c_str(), "rt");
+	FILE *fp = fopen(native, "rt");
 	if (fp == 0)
 		return CS_NeedRebuild;
 
@@ -119,10 +119,10 @@ int SkAnimSetCooker::Compile(int flags, int allflags)
 	if (!parser)
 		return SR_ParseError;
 
-	WString path(string::Widen(asset->path));
-	path += L".bin";
+	String path(CStr(asset->path));
+	path += ".bin";
 
-	BinFile::Ref fp = OpenWrite(path.c_str(), flags);
+	BinFile::Ref fp = OpenWrite(path.c_str, flags);
 	if (!fp)
 		return SR_IOError;
 

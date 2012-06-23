@@ -129,7 +129,7 @@ namespace utf8
         template <typename u16bit_iterator, typename octet_iterator>
         octet_iterator utf16to8 (u16bit_iterator *_start, u16bit_iterator end, octet_iterator result)
         {
-			octet_iterator start = *_start;
+			u16bit_iterator start = *_start;
             while (start < end) {
                 uint32_t cp = internal::mask16(*start++);
             // Take care of surrogate pairs first
@@ -176,7 +176,7 @@ namespace utf8
         template <typename octet_iterator, typename u32bit_iterator>
         octet_iterator utf32to8 (u32bit_iterator *_start, u32bit_iterator end, octet_iterator result)
         {
-			octet_iterator start = *_start;
+			u32bit_iterator start = *_start;
             while (start < end)
                 result = append(*(start++), result);
 			*_start = start;

@@ -17,7 +17,7 @@ public:
 	// you must supply the platform native filename. you can use the pml file system to
 	// translate this, or provide your own way.
 
-	bool Load(const wchar_t *nativeFilename, bool reportErrors);
+	bool Load(const char *nativeFilename, bool reportErrors);
 	bool Loaded() { return m_h != 0; }
 
 	void Unload();

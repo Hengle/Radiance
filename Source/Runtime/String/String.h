@@ -53,19 +53,19 @@ public:
 	//! Defined as c_str + size
 	RAD_DECLARE_READONLY_PROPERTY_EX(class CharBuf<Traits>, SelfType, end, const T*);
 	RAD_DECLARE_READONLY_PROPERTY_EX(class CharBuf<Traits>, SelfType, size, int);
-	RAD_DECLARE_READONLY_PROPERTY_EX(class CharBuf<Traits>, SelfType, valid, bool);
+	RAD_DECLARE_READONLY_PROPERTY_EX(class CharBuf<Traits>, SelfType, empty, bool);
 
 	//! Explicitly release memory.
 	void free();
 
 	//! Contructs a new character buffer. The specified data is copied into a new buffer.
-	static SelfType create(const T *data, int size, const CopyTag_t&, Zone &zone = ZString);
+	static SelfType create(const T *data, int size, const CopyTag_t&, ::Zone &zone = ZString);
 	//! Constructs a new character buffer. The specified data is referenced directly.
-	static SelfType create(const T *data, int size, const RefTag_t&, Zone &zone = ZString);
+	static SelfType create(const T *data, int size, const RefTag_t&, ::Zone &zone = ZString);
 
 private:
 
-	CharBuf(const details::DataBlock::Ref &data, Zone &zone);
+	CharBuf(const details::DataBlock::Ref &data, ::Zone &zone);
 
 	friend class String;
 
@@ -75,10 +75,10 @@ private:
 	RAD_DECLARE_GET(begin, const T*);
 	RAD_DECLARE_GET(end, const T*);
 	RAD_DECLARE_GET(size, int);
-	RAD_DECLARE_GET(valid, bool);
+	RAD_DECLARE_GET(empty, bool);
 
 	details::DataBlock::Ref m_data;
-	Zone *m_zone;
+	::Zone *m_zone;
 };
 
 //! UTF8 String class.
@@ -89,10 +89,10 @@ private:
     static string data to be used without allocation overhead or copying.
  
     Care must be taken by the user when using certain types of operations on unicode strings.
-    The Upper() and Lower() functions may not correctly handle all unicode code points
+    The upper() and lower() functions may not correctly handle all unicode code points
     depending on your locale and normalization issues. This class does not perform normalization.
     Be aware that normalization issues can also effect sorting. If asthetically correct sort order
-    is important you must manually normalize the string before Compare() will do what you want.
+    is important you must manually normalize the string before compare() will do what you want.
  
     Where appropriate considerably faster versions of certain functions have been provided that
     work on ASCII strings only (their use on strings containing unicode sequences is undefined).
@@ -104,11 +104,11 @@ private:
  
     In general it is safe to assume that doing any operations on a string where the source
     data is not UTF8 encoded will require encoding the data to utf8 and possibly allocation
-    overhead. Upper(), Lower(), and Substr() all require transcoding to UTF32 and back to
+    overhead. upper(), lower(), and substr() all require transcoding to UTF32 and back to
     UTF8. Their ASCII equivelents do not.
  
     Mutable operations on a String object are done in-place if possible (i.e. there are no
-    other references to the string data). Keep in mind that ToUTF8() will usually return
+    other references to the string data). Keep in mind that toUTF8() will usually return
     a reference to the string data, not a copy. Therefore keeping a reference to a returned
     UTF8Buf may force future mutable string operations to create a copy of the data. Additionally
     mutable operations performed on Strings constructed as a RefTag will create a copy of
@@ -123,69 +123,73 @@ public:
 	typedef const char *const_iterator;
 
 	//! Constructs an empty string.
-	String(Zone &zone = ZString);
+	String(::Zone &zone = ZString);
 	//! Constructs a copy of a string.
 	String(const String &s);
 	//! Constructs a copy of a string and forces a copy to be made
 	//! if the source string was constructed with a RefTag.
-	String(const String &s, const CopyTag_t&, Zone &zone = ZString);
+	String(const String &s, const CopyTag_t&, ::Zone &zone = ZString);
 	//! Contructs a copy of utf8 encoded string data.
 	explicit String(const UTF8Buf &buf);
 	//! Constructs a string from UTF16 data.
-	String(const UTF16Buf &buf, Zone &zone = ZString);
+	String(const UTF16Buf &buf, ::Zone &zone = ZString);
 	//! Constructs a string from UTF32 data.
-	String(const UTF32Buf &buf, Zone &zone = ZString);
+	String(const UTF32Buf &buf, ::Zone &zone = ZString);
 	//! Constructs a string from wchar_t data.
-	String(const WCharBuf &buf, Zone &zone = ZString);
+	String(const WCharBuf &buf, ::Zone &zone = ZString);
 
 	//! Constructs a string from a copy of a UTF8 encoded string.
-	String(const char *sz, const CopyTag_t&, Zone &zone = ZString);
+	String(const char *sz, const CopyTag_t&, ::Zone &zone = ZString);
 	//! Constructs a string as an in-place reference of a UTF8 encoded string.
-	String(const char *sz, const RefTag_t&, Zone &zone = ZString);
+	String(const char *sz, const RefTag_t&, ::Zone &zone = ZString);
 	//! Construct a string from a copy of a UTF8 encoded string of the specified length.
-	String(const char *sz, int len, const CopyTag_t&, Zone &zone = ZString);
+	String(const char *sz, int len, const CopyTag_t&, ::Zone &zone = ZString);
 	//! Constructs a string as an in-place reference of a UTF8 encoded string of a the specified length.
 	/*! The referenced string must be null terminated, however the supplied length should only
 	    enclose the actualy character bytes (therefore the null byte should be at len+1) 
 	 */
-	String(const char *sz, int len, const RefTag_t&, Zone &zone = ZString);
+	String(const char *sz, int len, const RefTag_t&, ::Zone &zone = ZString);
 
 #if defined(RAD_NATIVE_WCHAR_T_DEFINED)
 	//! Constructs a string from a wide-character encoded string.
 	//! The source data is re-encoded as a UTF8 string internally.
-	String(const wchar_t *sz, Zone &zone = ZString);
+	String(const wchar_t *sz, ::Zone &zone = ZString);
 	//! Constructs a string from a wide-character encoded string of the specified length.
 	//! The source data is re-encoded as a UTF8 string internally.
-	String(const wchar_t *sz, int len, Zone &zone = ZString);
+	String(const wchar_t *sz, int len, ::Zone &zone = ZString);
 #endif
 
 	//! Constructs a string from a UTF16 encoded string.
 	//! The source data is re-encoded as a UTF8 string internally.
-	String(const U16 *sz, Zone &zone = ZString);
+	String(const U16 *sz, ::Zone &zone = ZString);
 	//! Constructs a string from a UTF16 encoded string of the specified length.
 	//! The source data is re-encoded as a UTF8 string internally.
-	String(const U16 *sz, int len, Zone &zone = ZString);
+	String(const U16 *sz, int len, ::Zone &zone = ZString);
 
 	//! Constructs a string from a UTF32 encoded string.
 	//! The source data is re-encoded as a UTF8 string internally.
-	String(const U32 *sz, Zone &zone = ZString);
+	String(const U32 *sz, ::Zone &zone = ZString);
 	//! Constructs a string from a UTF32 encoded string of the specified length.
 	//! The source data is re-encoded as a UTF8 string internally.
-	String(const U32 *sz, int len, Zone &zone = ZString);
+	String(const U32 *sz, int len, ::Zone &zone = ZString);
 
 	//! Constructs a string from a single character.
-	String(char c, Zone &zone = ZString);
+	String(char c, ::Zone &zone = ZString);
 
 #if defined(RAD_NATIVE_WCHAR_T_DEFINED)
-	String(wchar_t c, Zone &zone = ZString);
+	String(wchar_t c, ::Zone &zone = ZString);
 #endif
 
-	String(U16 c, Zone &zone = ZString);
-	String(U32 c, Zone &zone = ZString);
+	String(U16 c, ::Zone &zone = ZString);
+	String(U32 c, ::Zone &zone = ZString);
 
 	// STL compatible constructors.
-	explicit String(const std::string &str, Zone &zone = ZString);
-	explicit String(const std::wstring &str, Zone &zone = ZString);
+	explicit String(const std::string &str, ::Zone &zone = ZString);
+	explicit String(const std::wstring &str, ::Zone &zone = ZString);
+
+	//! Allocates a string of N bytes in length including the null terminator.
+	/*! The string contains garbase but will be null terminated. */
+	explicit String(int len, ::Zone &zone = ZString);
 
 	// Immutable operations.
 
@@ -199,10 +203,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(String, empty, bool);
 
 	//! Retrieves the string data as a UTF8 encoded buffer.
-	/*! This operation is typically inexpensive unless the original string was constructed as
-	    a reference (RefTag). In that case the UTF8 buffer that is returned is a copy of the
-	    reference data.
-	 */
+	/*! This operation is inexpensive since the original string data is simply referenced by the UTF8Buf object. */
 	UTF8Buf toUTF8() const;
 	//! Retrieves the string data as a UTF16 encoded buffer.
 	UTF16Buf toUTF16() const;
@@ -269,7 +270,7 @@ public:
 	//! Returns a substring. This function is intended for use with ASCII strings.
 	/*! \param first The first \em character to include in the substring.
 	    \param count The number of \em characters to include in the substring.
-	    \remarks This function is faster than the generic Substr() function, 
+	    \remarks This function is faster than the generic substr() function, 
 	    however it is only intended for use with strings that only contains
 	    ASCII characters. If used on a string with unicode characters the results
 	    are undefined.
@@ -279,7 +280,7 @@ public:
 	//! Returns a substring. This function is intended for use with ASCII strings.
 	/*! Equivelent to rightASCII(length - ofs).
 		\param ofs The first \em character to include in the substring.
-		\remarks This function is faster than the generic Substr() function, 
+		\remarks This function is faster than the generic substr() function, 
 	    however it is only intended for use with strings that only contains
 	    ASCII characters. If used on a string with unicode characters the results
 	    are undefined.
@@ -362,7 +363,7 @@ public:
 	/*! \returns A character index or -1 if the byte position is invalid 
 	    (off the end of the string). 
 	 */
-	int charIndexForBytePos(int ofs) const;
+	int charIndexForBytePos(int pos) const;
 
 	//! Returns the byte position corresponding to the specified character index.
 	/*! \returns A byte position or -1 if the character index is invalid 
@@ -375,11 +376,6 @@ public:
 	String &upper();
 	String &lower();
 	String &reverse();
-
-	/*! These versions are only well-defined if the string
-	/*! only contains ascii characters (no unicode). They are
-	    significantly faster than their generic equivelents however. 
-	*/
 
 	String &upperASCII();
 	String &lowerASCII();
@@ -440,7 +436,26 @@ public:
 	String &operator += (char c);
 	String &operator += (wchar_t c);
 
-	void clear();
+	//! Writes a character to a byte position.
+	String &write(int pos, char sz);
+	//! Writes a character string to a byte position (including the null terminator).
+	String &write(int pos, const char *sz);
+	//! Writes \em len bytes of a character string to a byte position.
+	/*! This operation is performed like an strncpy, meaing that if \em sz
+	    terminates before len bytes are written the write stops at that point
+		and the string is terminated.
+
+		\remarks Bounds checking is not performed on the destination string.
+		Make sure to construct a string using the String(len) constructor to 
+		pre-allocate a string large enough to contain the operations of the write. */
+	String &write(int pos, const char *sz, int len);
+
+	//! Writes a \em len bytes of a character string to a byte position.
+	String &write(int pos, const String &str);
+	//! Writes a \em len bytes of a character string to a byte position.
+	String &write(int pos, const String &str, int len);
+	
+	String &clear();
 
 private:
 
@@ -454,7 +469,7 @@ private:
 	RAD_DECLARE_GET(empty, bool);
 
 	details::DataBlock::Ref m_data;
-	Zone *m_zone;
+	::Zone *m_zone;
 };
 
 String operator + (const String &a, const String &b);
@@ -483,7 +498,6 @@ template<class CharType, class Traits>
 std::basic_istream<CharType, Traits>& operator >> (std::basic_istream<CharType, Traits> &stream, string::String &string);
 
 //! Streaming support for strings.
-/*! Internally the string is converted to/from a std::string. */
 template<class CharType, class Traits>
 std::basic_ostream<CharType, Traits>& operator << (std::basic_ostream<CharType, Traits> &stream, const string::String &string);
 

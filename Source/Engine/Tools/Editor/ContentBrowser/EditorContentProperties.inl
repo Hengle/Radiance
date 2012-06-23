@@ -39,7 +39,7 @@ void ComboBoxExtractor<T>::SetEditorData(QComboBox &cb, const QVariant &v, const
 	if (!s)
 		return;
 
-	QString qs(s->c_str());
+	QString qs(s->c_str.get());
 	QStringList values = qs.split(';', QString::SkipEmptyParts);
 	cb.addItems(values);
 
