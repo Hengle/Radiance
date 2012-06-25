@@ -129,6 +129,23 @@ bool DataBlock::s_init = false;
 DataBlock::DataBlockPool DataBlock::s_dataBlockPool;
 MemoryPool DataBlock::s_pools[DataBlock::kNumPools];
 
+void DataBlock::initPools() {
+	if (s_init)
+		return;
+
+	for (int i = 0; i < kNumPools; ++i) {
+		s_pools[i].Create(
+			ZString.Get(),
+			"string_pool",
+			kMinPoolSize << i,
+			1024 / (kMinPoolSize << i)
+		);
+	}
+
+	s_dataBlockPool.Create(ZString.Get(), "string_datablock_pool", 32);
+	s_init = true;
+}
+
 MemoryPool *DataBlock::poolForSize(int size, int &poolIdx, Mutex::ScopedLock &L) {
 
 	if (size > kMaxPoolSize)
@@ -136,17 +153,7 @@ MemoryPool *DataBlock::poolForSize(int size, int &poolIdx, Mutex::ScopedLock &L)
 
 	L.lock(Mutex::get());
 
-	if (!s_init) {
-		for (int i = 0; i < kNumPools; ++i) {
-			s_pools[i].Create(
-				ZString.Get(),
-				"string_pool",
-				kMinPoolSize << i,
-				1024 / (kMinPoolSize << i)
-			);
-		}
-		s_init = true;
-	}
+	initPools();
 
 	MemoryPool *pool = 0;
 	poolIdx = 0;
@@ -160,7 +167,7 @@ MemoryPool *DataBlock::poolForSize(int size, int &poolIdx, Mutex::ScopedLock &L)
 	}
 
 	RAD_ASSERT(pool);
-	return 0;
+	return pool;
 }
 
 DataBlock::Ref DataBlock::create(
@@ -205,6 +212,7 @@ DataBlock::Ref DataBlock::create(
 	RAD_ASSERT(src);
 
 	Mutex::Lock L(Mutex::get());
+	initPools();
 	DataBlock::Ref r(s_dataBlockPool.Construct(refType, const_cast<void*>(src), len, pool, poolIdx), &DataBlock::destroy);
 	return r;
 }
@@ -247,7 +255,7 @@ DataBlock::Ref DataBlock::create(
 
 DataBlock::Ref DataBlock::resize(const DataBlock::Ref &block, int size, ::Zone &zone) {
 	
-	if (block && block.unique()) {
+	if (block && (block->m_refType != kRefType_Ref) && block.unique()) {
 		if (!block->m_pool) {
 			block->m_buf = safe_zone_realloc(zone, block->m_buf, size);
 			block->m_size = size;
@@ -318,7 +326,7 @@ String &String::upper() {
 		// expensive.
 		WCharBuf buf = toWChar();
 		toupper(const_cast<wchar_t*>(buf.c_str.get()));
-		*this = buf;
+		*this = String(buf, *m_zone);
 	}
 	return *this;
 }
@@ -330,7 +338,7 @@ String &String::lower() {
 		// expensive.
 		WCharBuf buf = toWChar();
 		tolower(const_cast<wchar_t*>(buf.c_str.get()));
-		*this = buf;
+		*this = String(buf, *m_zone);
 	}
 	return *this;
 }
@@ -339,14 +347,14 @@ String &String::reverse() {
 	if (m_data) {
 		UTF32Buf buf = toUTF32();
 		std::reverse(const_cast<U32*>(buf.c_str.get()), const_cast<U32*>(buf.c_str.get() + buf.size + 1));
-		*this = buf;
+		*this = String(buf, *m_zone);
 	}
 	return *this;
 }
 
 String String::substr(int first, int count) const {
 	if (m_data) {
-		first = bytePosForCharIndex(first);
+		first = byteForChar(first);
 		if (first >= 0) {
 			const char *sz = (const char*)m_data->data.get() + first;
 
@@ -367,7 +375,7 @@ String String::substr(int first, int count) const {
 	return String();
 }
 
-int String::charIndexForBytePos(int pos) const {
+int String::charForByte(int pos) const {
 	if (pos >= length)
 		return -1;
 
@@ -385,7 +393,7 @@ int String::charIndexForBytePos(int pos) const {
 	return c;
 }
 
-int String::bytePosForCharIndex(int idx) const {
+int String::byteForChar(int idx) const {
 	const char *start = c_str.get();
 	const char *end = start + length;
 	const char *sz = start;
@@ -420,7 +428,7 @@ String &String::erase(int ofs, int count) {
 	return *this;
 }
 
-String &String::eraseASCII(int ofs, int count) {
+String &String::eraseBytes(int ofs, int count) {
 	int nc = length;
 	if (ofs >= nc)
 		return *this;
@@ -429,17 +437,17 @@ String &String::eraseASCII(int ofs, int count) {
 	
 	String l;
 	if (ofs > 0)
-		l = substrASCII(0, ofs);
+		l = substrBytes(0, ofs);
 
 	String r;
 	if (ofs+count < nc)
-		r = substrASCII(ofs+count, nc-(ofs+count));
+		r = substrBytes(ofs+count, nc-(ofs+count));
 
 	*this = l + r;
 	return *this;
 }
 
-String &String::nAppend(const String &str, int len) {
+String &String::nAppendBytes(const String &str, int len) {
 	if (str && len) {
 		int orglen = length;
 		m_data = details::DataBlock::resize(m_data, orglen + len + 1, *m_zone);
@@ -462,7 +470,7 @@ String &String::replace(const String &src, const String &dst) {
 
 		int c = s.length - (x+dst.length);
 		if (c > 0)
-			r = s.rightASCII(c);
+			r = s.rightBytes(c);
 
 		s = l + dst + r;
 	}

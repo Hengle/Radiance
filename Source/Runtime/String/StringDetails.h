@@ -132,7 +132,7 @@ private:
 	enum {
 		kMinPoolSize = 4,
 		kNumPools = 5,
-		kMaxPoolSize = kMinPoolSize << kNumPools
+		kMaxPoolSize = kMinPoolSize << (kNumPools-1)
 	};
 
 	typedef ObjectPool<DataBlock> DataBlockPool;
@@ -140,6 +140,7 @@ private:
 	static bool s_init;
 	static DataBlockPool s_dataBlockPool;
 	static MemoryPool s_pools[kNumPools];
+	static void initPools();
 	static MemoryPool *poolForSize(
 		int size, 
 		int &poolIdx, 

@@ -760,13 +760,13 @@ void FileSystem::Initialize(int enabledMedia, U32 version)
 {
 	if (version != Version) throw BadInterfaceVersionException();
 	m_enabledMedia = enabledMedia;
-	m_cddvdPath = L"1:";
-	m_cddvdPathSlash = L"1:/";
-	m_hddPath = L"9:";
-	m_hddPathSlash = L"9:/";
-	m_mod = L"default_mod_dir";
-	m_modPath = L"9:/default_mod_dir";
-	m_modPathSlash = L"9:/default_mod_dir/";
+	m_cddvdPath = "1:";
+	m_cddvdPathSlash = "1:/";
+	m_hddPath = "9:";
+	m_hddPathSlash = "9:/";
+	m_mod = "default_mod_dir";
+	m_modPath = "9:/default_mod_dir";
+	m_modPathSlash = "9:/default_mod_dir/";
 
 	m_maxSectorSize = 512;
 
@@ -868,7 +868,7 @@ HSearch FileSystem::OpenSearch(const char *path, const char *extIncludingPeriod,
 	RAD_OUT_OF_MEM(search);
 	String str;
 	FixupPath(path, str);
-	String ext = String(extIncludingPeriod).lower();
+	String ext = CStr(extIncludingPeriod).lower();
 	search->Initialize(&m_paks, this, int(media & m_enabledMedia));
 	if (search->OpenSearch(str.c_str, ext.c_str))
 	{

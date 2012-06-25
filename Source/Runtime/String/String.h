@@ -54,6 +54,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY_EX(class CharBuf<Traits>, SelfType, end, const T*);
 	RAD_DECLARE_READONLY_PROPERTY_EX(class CharBuf<Traits>, SelfType, size, int);
 	RAD_DECLARE_READONLY_PROPERTY_EX(class CharBuf<Traits>, SelfType, empty, bool);
+	RAD_DECLARE_READONLY_PROPERTY_EX(class CharBuf<Traits>, SelfType, numChars, int);
 
 	//! Explicitly release memory.
 	void free();
@@ -76,6 +77,7 @@ private:
 	RAD_DECLARE_GET(end, const T*);
 	RAD_DECLARE_GET(size, int);
 	RAD_DECLARE_GET(empty, bool);
+	RAD_DECLARE_GET(numChars, int);
 
 	details::DataBlock::Ref m_data;
 	::Zone *m_zone;
@@ -94,8 +96,12 @@ private:
     Be aware that normalization issues can also effect sorting. If asthetically correct sort order
     is important you must manually normalize the string before compare() will do what you want.
  
-    Where appropriate considerably faster versions of certain functions have been provided that
-    work on ASCII strings only (their use on strings containing unicode sequences is undefined).
+    Considerably faster versions of certain functions have been provided that work based on bytes in a 
+	string only. By default a one byte corresponds to one character in an ASCII encoded string. If a
+	string contains UTF8 encoded data then a single character may be represented by multiple bytes.
+	It is important to be aware that Byte() versions of functions will only work reliably on ASCII data
+	unless the caller has calculated byte offsets for individual characters. \sa byteForCharPos() 
+	\sa charPosForByte()
  
     Converting to/from a UTF8Buf is free as it constructs a buffer around the underlying string
     data. However converting to any other representation is a relatively expensive operation.
@@ -128,60 +134,60 @@ public:
 	String(const String &s);
 	//! Constructs a copy of a string and forces a copy to be made
 	//! if the source string was constructed with a RefTag.
-	String(const String &s, const CopyTag_t&, ::Zone &zone = ZString);
+	explicit String(const String &s, const CopyTag_t&, ::Zone &zone = ZString);
 	//! Contructs a copy of utf8 encoded string data.
 	explicit String(const UTF8Buf &buf);
 	//! Constructs a string from UTF16 data.
-	String(const UTF16Buf &buf, ::Zone &zone = ZString);
+	explicit String(const UTF16Buf &buf, ::Zone &zone = ZString);
 	//! Constructs a string from UTF32 data.
-	String(const UTF32Buf &buf, ::Zone &zone = ZString);
+	explicit String(const UTF32Buf &buf, ::Zone &zone = ZString);
 	//! Constructs a string from wchar_t data.
-	String(const WCharBuf &buf, ::Zone &zone = ZString);
+	explicit String(const WCharBuf &buf, ::Zone &zone = ZString);
 
 	//! Constructs a string from a copy of a UTF8 encoded string.
-	String(const char *sz, const CopyTag_t&, ::Zone &zone = ZString);
+	explicit String(const char *sz, ::Zone &zone = ZString);
 	//! Constructs a string as an in-place reference of a UTF8 encoded string.
-	String(const char *sz, const RefTag_t&, ::Zone &zone = ZString);
+	explicit String(const char *sz, const RefTag_t&, ::Zone &zone = ZString);
 	//! Construct a string from a copy of a UTF8 encoded string of the specified length.
-	String(const char *sz, int len, const CopyTag_t&, ::Zone &zone = ZString);
+	explicit String(const char *sz, int len, const CopyTag_t&, ::Zone &zone = ZString);
 	//! Constructs a string as an in-place reference of a UTF8 encoded string of a the specified length.
 	/*! The referenced string must be null terminated, however the supplied length should only
 	    enclose the actualy character bytes (therefore the null byte should be at len+1) 
 	 */
-	String(const char *sz, int len, const RefTag_t&, ::Zone &zone = ZString);
+	explicit String(const char *sz, int len, const RefTag_t&, ::Zone &zone = ZString);
 
 #if defined(RAD_NATIVE_WCHAR_T_DEFINED)
 	//! Constructs a string from a wide-character encoded string.
 	//! The source data is re-encoded as a UTF8 string internally.
-	String(const wchar_t *sz, ::Zone &zone = ZString);
+	explicit String(const wchar_t *sz, ::Zone &zone = ZString);
 	//! Constructs a string from a wide-character encoded string of the specified length.
 	//! The source data is re-encoded as a UTF8 string internally.
-	String(const wchar_t *sz, int len, ::Zone &zone = ZString);
+	explicit String(const wchar_t *sz, int len, ::Zone &zone = ZString);
 #endif
 
 	//! Constructs a string from a UTF16 encoded string.
 	//! The source data is re-encoded as a UTF8 string internally.
-	String(const U16 *sz, ::Zone &zone = ZString);
+	explicit String(const U16 *sz, ::Zone &zone = ZString);
 	//! Constructs a string from a UTF16 encoded string of the specified length.
 	//! The source data is re-encoded as a UTF8 string internally.
-	String(const U16 *sz, int len, ::Zone &zone = ZString);
+	explicit String(const U16 *sz, int len, ::Zone &zone = ZString);
 
 	//! Constructs a string from a UTF32 encoded string.
 	//! The source data is re-encoded as a UTF8 string internally.
-	String(const U32 *sz, ::Zone &zone = ZString);
+	explicit String(const U32 *sz, ::Zone &zone = ZString);
 	//! Constructs a string from a UTF32 encoded string of the specified length.
 	//! The source data is re-encoded as a UTF8 string internally.
-	String(const U32 *sz, int len, ::Zone &zone = ZString);
+	explicit String(const U32 *sz, int len, ::Zone &zone = ZString);
 
 	//! Constructs a string from a single character.
-	String(char c, ::Zone &zone = ZString);
+	explicit String(char c, ::Zone &zone = ZString);
 
 #if defined(RAD_NATIVE_WCHAR_T_DEFINED)
-	String(wchar_t c, ::Zone &zone = ZString);
+	explicit String(wchar_t c, ::Zone &zone = ZString);
 #endif
 
-	String(U16 c, ::Zone &zone = ZString);
-	String(U32 c, ::Zone &zone = ZString);
+	explicit String(U16 c, ::Zone &zone = ZString);
+	explicit String(U32 c, ::Zone &zone = ZString);
 
 	// STL compatible constructors.
 	explicit String(const std::string &str, ::Zone &zone = ZString);
@@ -268,55 +274,52 @@ public:
 	String substr(int ofs) const;
 
 	//! Returns a substring. This function is intended for use with ASCII strings.
-	/*! \param first The first \em character to include in the substring.
-	    \param count The number of \em characters to include in the substring.
+	/*! \param first The first \em byte to include in the substring.
+	    \param count The number of \em bytes to include in the substring.
 	    \remarks This function is faster than the generic substr() function, 
-	    however it is only intended for use with strings that only contains
-	    ASCII characters. If used on a string with unicode characters the results
-	    are undefined.
+	     however its arguments are expressed as bytes not characters.
 	 */
-	String substrASCII(int first, int count) const;
+	String substrBytes(int first, int count) const;
 		
-	//! Returns a substring. This function is intended for use with ASCII strings.
-	/*! Equivelent to rightASCII(length - ofs).
-		\param ofs The first \em character to include in the substring.
+	//! Returns a substring.
+	/*! Equivelent to rightBytes(length - ofs).
+		\param ofs The first \em byte to include in the substring.
 		\remarks This function is faster than the generic substr() function, 
-	    however it is only intended for use with strings that only contains
-	    ASCII characters. If used on a string with unicode characters the results
-	    are undefined.
+	    however its arguments are expressed as bytes not characters.
 	 */
-	String substrASCII(int ofs) const;
+	String substrBytes(int ofs) const;
 
 	//! Returns a substring containing the leftmost characters.
-	/*! \param count The number of characters to return. 
+	/*! \param count The number of \em characters to return. 
 	    \remarks Care must be used as bounds checking is not performed. Requesting more
 	    characters than there are in a string will most likely result in an invalid access.
 	 */
 	String left(int count) const;
 
 	//! Returns a substring containing the rightmost characters.
-	/*! \param count The number of characters to return. 
+	/*! \param count The number of \em characters to return. 
 	    \remarks Care must be used as bounds checking is not performed. Requesting more
 	    characters than there are in a string will most likely result in an invalid access.
 	 */
 	String right(int count) const;
 
 	//! Returns a substring containing the leftmost characters.
-	/*! \param count The number of characters to return. 
+	/*! \param count The number of \em bytes to return. 
 	    \remarks Care must be used as bounds checking is not performed. Requesting more
 	    characters than there are in a string will most likely result in an invalid access.
-	    This function is intended for use on strings that only contain ASCII characters.
-	    If used on a string that contains unicode the results are undefined.
+	    This function is faster than the generic left() function, however its arguments are 
+		expressed as bytes not characters.
 	 */
-	String leftASCII(int count) const;
+	String leftBytes(int count) const;
 
 	//! Returns a substring containing the rightmost characters.
-	/*! \param count The number of characters to return. 
+	/*! \param count The number of \em bytes to return. 
 	    \remarks Care must be used as bounds checking is not performed. Requesting more
 	    characters than there are in a string will most likely result in an invalid access.
-	    If used on a string that contains unicode the results are undefined.
+	    This function is faster than the generic substr() function, however its arguments are 
+		expressed as bytes not characters.
 	 */
-	String rightASCII(int count) const;
+	String rightBytes(int count) const;
 
 	//! Boolean operator returns true if string is non-empty.
 	operator unspecified_bool_type () const;
@@ -363,13 +366,13 @@ public:
 	/*! \returns A character index or -1 if the byte position is invalid 
 	    (off the end of the string). 
 	 */
-	int charIndexForBytePos(int pos) const;
+	int charForByte(int byte) const;
 
 	//! Returns the byte position corresponding to the specified character index.
 	/*! \returns A byte position or -1 if the character index is invalid 
 	    (off the end of the string). 
 	 */
-	int bytePosForCharIndex(int idx) const;
+	int byteForChar(int pos) const;
 
 	// Mutable Operations
 
@@ -382,16 +385,16 @@ public:
 	String &reverseASCII();
 
 	String &trimSubstr(int ofs, int count);
-	String &trimSubstrASCII(int ofs, int count);
+	String &trimSubstrBytes(int ofs, int count);
 
 	String &trimLeft(int count);
 	String &trimRight(int count);
 
-	String &trimLeftASCII(int count);
-	String &trimRightASCII(int count);
+	String &trimLeftBytes(int count);
+	String &trimRightBytes(int count);
 
 	String &erase(int ofs, int count = 1);
-	String &eraseASCII(int ofs, int count = 1);
+	String &eraseBytes(int ofs, int count = 1);
 
 	String &append(const String &str);
 	String &append(const char *sz);
@@ -402,6 +405,10 @@ public:
 	String &nAppend(const String &str, int len);
 	String &nAppend(const char *sz, int len);
 	String &nAppend(const wchar_t *sz, int len);
+
+	String &nAppendBytes(const String &str, int len);
+	String &nAppendBytes(const char *sz, int len);
+	String &nAppendBytes(const wchar_t *sz, int len);
 
 	String &replace(const String &src, const String &dst);
 	String &replace(char src, char dst);
@@ -441,7 +448,7 @@ public:
 	//! Writes a character string to a byte position (including the null terminator).
 	String &write(int pos, const char *sz);
 	//! Writes \em len bytes of a character string to a byte position.
-	/*! This operation is performed like an strncpy, meaing that if \em sz
+	/*! This operation is performed like an strncpy, meaning that if \em sz
 	    terminates before len bytes are written the write stops at that point
 		and the string is terminated.
 
@@ -477,6 +484,10 @@ String operator + (const String &a, const char *sz);
 String operator + (const String &a, const wchar_t *sz);
 String operator + (const char *sz, const String &b);
 String operator + (const wchar_t *sz, const String &b);
+String operator + (char s, const String &b);
+String operator + (wchar_t s, const String &b);
+String operator + (const String &b, char s);
+String operator + (const String &b, wchar_t s);
 
 } // string
 

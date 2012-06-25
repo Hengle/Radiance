@@ -68,12 +68,17 @@ inline const typename CharBuf<Traits>::T *CharBuf<Traits>::RAD_IMPLEMENT_GET(end
 
 template <typename Traits>
 inline int CharBuf<Traits>::RAD_IMPLEMENT_GET(size) {
-	return (m_data) ? (m_data->size - 1) : 0;
+	return (m_data) ? (m_data->size - sizeof(T)) : 0;
 }
 
 template <typename Traits>
 inline bool CharBuf<Traits>::RAD_IMPLEMENT_GET(empty) {
 	return (m_data) ? false : true;
+}
+
+template<typename Traits>
+inline int CharBuf<Traits>::RAD_IMPLEMENT_GET(numChars) {
+	return size.get() / sizeof(T);
 }
 
 template <typename Traits>
@@ -111,18 +116,18 @@ inline String::String(const UTF8Buf &buf) : m_data(buf.m_data), m_zone(buf.m_zon
 }
 
 inline String::String(const UTF16Buf &buf, ::Zone &zone) : m_zone(&zone) {
-	m_data = details::DataBlock::create(buf.c_str.get(), buf.size, zone);
+	m_data = details::DataBlock::create(buf.c_str.get(), buf.numChars, zone);
 }
 
 inline String::String(const UTF32Buf &buf, ::Zone &zone) : m_zone(&zone) {
-	m_data = details::DataBlock::create(buf.c_str.get(), buf.size, zone);
+	m_data = details::DataBlock::create(buf.c_str.get(), buf.numChars, zone);
 }
 
 inline String::String(const WCharBuf &buf, ::Zone &zone) : m_zone(&zone) {
-	m_data = details::DataBlock::create(buf.c_str.get(), buf.size, zone);
+	m_data = details::DataBlock::create(buf.c_str.get(), buf.numChars, zone);
 }
 
-inline String::String(const char *sz, const CopyTag_t&, ::Zone &zone) : m_zone(&zone) {
+inline String::String(const char *sz, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
 	if (sz[0])
 		m_data = details::DataBlock::create(kRefType_Copy, 0, sz, len(sz) + 1, zone);
@@ -367,7 +372,7 @@ inline String String::nJoin(const wchar_t *sz, int len) const {
 	return x;
 }
 
-inline String String::substrASCII(int first, int count) const {
+inline String String::substrBytes(int first, int count) const {
 	RAD_ASSERT(first < length);
 	RAD_ASSERT((first+count) < length);
 
@@ -386,11 +391,11 @@ inline String String::substr(int ofs) const {
 	return right(x);
 }
 
-inline String String::substrASCII(int ofs) const {
+inline String String::substrBytes(int ofs) const {
 	int x = length - ofs;
 	if (x < 0)
 		return String();
-	return rightASCII(x);
+	return rightBytes(x);
 }
 
 inline String String::left(int count) const {
@@ -402,13 +407,13 @@ inline String String::right(int count) const {
 	return substr(ofs, count);
 }
 
-inline String String::leftASCII(int count) const {
-	return substrASCII(0, count);
+inline String String::leftBytes(int count) const {
+	return substrBytes(0, count);
 }
 
-inline String String::rightASCII(int count) const {
+inline String String::rightBytes(int count) const {
 	int ofs = length - count;
-	return substr(ofs, count);
+	return substrBytes(ofs, count);
 }
 
 inline String::operator unspecified_bool_type () const {
@@ -528,8 +533,8 @@ inline String &String::trimSubstr(int ofs, int count) {
 	return *this;
 }
 
-inline String &String::trimSubstrASCII(int ofs, int count) {
-	*this = substrASCII(ofs, count);
+inline String &String::trimSubstrBytes(int ofs, int count) {
+	*this = substrBytes(ofs, count);
 	return *this;
 }
 
@@ -543,13 +548,13 @@ inline String &String::trimRight(int count) {
 	return *this;
 }
 
-inline String &String::trimLeftASCII(int count) {
-	*this = leftASCII(count);
+inline String &String::trimLeftBytes(int count) {
+	*this = leftBytes(count);
 	return *this;
 }
 
-inline String &String::trimRightASCII(int count) {
-	*this = rightASCII(count);
+inline String &String::trimRightBytes(int count) {
+	*this = rightBytes(count);
 	return *this;
 }
 
@@ -575,12 +580,24 @@ inline String &String::append(const wchar_t c) {
 	return append(x);
 }
 
+inline String &String::nAppend(const String &str, int len) {
+	return nAppendBytes(str, str.byteForChar(len));
+}
+
 inline String &String::nAppend(const char *sz, int len) {
 	return nAppend(String(sz, RefTag), len);
 }
 
 inline String &String::nAppend(const wchar_t *sz, int len) {
-	return nAppend(String(sz), len);
+	return nAppend(String(sz, *m_zone), len);
+}
+
+inline String &String::nAppendBytes(const char *sz, int len) {
+	return nAppendBytes(String(sz, RefTag), len);
+}
+
+inline String &String::nAppendBytes(const wchar_t *sz, int len) {
+	return nAppendBytes(String(sz, *m_zone), len);
 }
 
 inline String &String::replace(char src, char dst) {
@@ -678,7 +695,7 @@ inline String &String::operator = (const String &string) {
 }
 
 inline String &String::operator = (const char *sz) {
-	return (*this = String(sz, CopyTag));
+	return (*this = String(sz));
 }
 
 inline String &String::operator = (const wchar_t *sz) {
@@ -761,6 +778,30 @@ inline String operator + (const char *sz, const String &b) {
 inline String operator + (const wchar_t *sz, const String &b) {
 	String x(sz);
 	x.append(b);
+	return x;
+}
+
+inline String operator + (char s, const String &b) {
+	String x(s);
+	x.append(b);
+	return x;
+}
+
+inline String operator + (wchar_t s, const String &b) {
+	String x(s);
+	x.append(b);
+	return x;
+}
+
+inline String operator + (const String &b, char s) {
+	String x(b);
+	x.append(s);
+	return x;
+}
+
+inline String operator + (const String &b, wchar_t s) {
+	String x(b);
+	x.append(s);
 	return x;
 }
 

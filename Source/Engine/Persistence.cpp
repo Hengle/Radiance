@@ -77,7 +77,7 @@ bool LoadStorage(const char *name, world::Keys &keys)
 	fp = __IOS_OpenPersistence(name, "rb");
 #else
 	String path(CStr("9:/"));
-	path += CStr(name);
+	path += name;
 	char nativePath[file::MaxFilePathLen+1];
 	if (file::ExpandToNativePath(path.c_str, nativePath, file::MaxFilePathLen+1))
 	{

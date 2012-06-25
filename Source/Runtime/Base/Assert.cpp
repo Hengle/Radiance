@@ -6,7 +6,7 @@
 #include "Base.h"
 #undef NDEBUG
 #include <assert.h>
-#include "../String.h"
+#include "../StringBase.h"
 
 using namespace string;
 
@@ -18,7 +18,20 @@ RADRT_API void RADRT_CALL __rad_assert(
 {
 #if defined(RAD_OPT_WIN)
 	RAD_NOT_USED(function);
-	_wassert(CStr(message).toWChar().c_str, CStr(file).toWChar().c_str, line);
+
+	int msgLen  = string::len(message)+1;
+	int fileLen = string::len(file)+1;
+
+	int wmsgLen = string::mbstowcslen(message, msgLen);
+	int wfileLen = string::mbstowcslen(file, fileLen);
+
+	wchar_t *wmessage = (wchar_t*)stack_alloc(wmsgLen * sizeof(wchar_t));
+	wchar_t *wfile = (wchar_t*)stack_alloc(wfileLen * sizeof(wchar_t));
+
+	mbstowcs(wmessage, message, msgLen);
+	mbstowcs(wfile, file, fileLen);
+
+	_wassert(wmessage, wfile, line);
 #elif defined(RAD_OPT_APPLE)
 	__assert_rtn(function, file, line, message);
 #else
