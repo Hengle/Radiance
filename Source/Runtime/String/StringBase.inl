@@ -482,18 +482,18 @@ inline int vsnprintf<wchar_t>(wchar_t *dst, int count, const wchar_t *format, va
 template<>
 inline int vscprintf<char>(const char *format, va_list argptr) {
 #if defined(RAD_OPT_WINX)
-	return ::_vscprintf(format, argptr);
+	return ::_vscprintf(format, argptr) + 1;
 #else
-	return ::vsnprintf(0, 0, format, argptr);
+	return ::vsnprintf(0, 0, format, argptr) + 1;
 #endif
 }
 
 template<>
 inline int vscprintf<wchar_t>(const wchar_t *format, va_list argptr) {
 #if defined(RAD_OPT_WINX)
-	return ::_vscwprintf(format, argptr);
+	return ::_vscwprintf(format, argptr) + 1;
 #else
-	return ::vswprintf(0, 0, format, argptr);
+	return ::vswprintf(0, 0, format, argptr) + 1;
 #endif
 }
 

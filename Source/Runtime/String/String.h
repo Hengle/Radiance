@@ -431,6 +431,9 @@ public:
 	String &printf(const char *fmt, ...);
 	String &printf(const char *fmt, va_list args);
 
+	String &printfASCII(const char *fmt, ...);
+	String &printfASCII(const char *fmt, va_list args);
+
 	String &operator = (const String &string);
 	String &operator = (const char *sz);
 	String &operator = (const wchar_t *sz);

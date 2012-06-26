@@ -115,13 +115,13 @@ bool GLSLTool::Assemble(
 		return false;
 	if (!cg::Inject(engine, "Shaders/Nodes/Shader.cg", ss))
 		return false;
-//	cg::SaveText(engine, L"Materials/Nodes/glsltool.0", ss.str().c_str());
+//	cg::SaveText(engine, "Materials/Nodes/glsltool.0", ss.str().c_str());
 
 	std::stringstream ex;
 	if (!cg::ExpandIncludes(*this, ss, ex))
 		return false;
 //	COut(C_Debug) << ex.str() << std::endl;
-//	cg::SaveText(engine, L"Materials/Nodes/glsltool.1", ex.str().c_str());
+//	cg::SaveText(engine, "Materials/Nodes/glsltool.1", ex.str().c_str());
 
 	if (optimize)
 	{

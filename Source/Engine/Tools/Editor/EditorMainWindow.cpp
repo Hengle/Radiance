@@ -80,6 +80,7 @@ m_userSettings(
 MainWindow::~MainWindow()
 {
 	s_instance = 0;
+	m_app->engine->sys->r->ctx = r::HContext();
 }
 
 void MainWindow::BindGL()

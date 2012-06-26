@@ -23,7 +23,7 @@ template <typename T>
 inline Variant::operator const T *() const
 {
 	RAD_ASSERT(reflect::Type<T>());
-	if (!m_val->IsValid() || reflect::Type<T>()->ConstType() != m_val->Type()->ConstType())
+	if (!m_val || !m_val->IsValid() || reflect::Type<T>()->ConstType() != m_val->Type()->ConstType())
 	{
 		return 0;
 	}
@@ -35,7 +35,7 @@ template <typename T>
 inline Variant::operator T *()
 {
 	RAD_ASSERT(reflect::Type<T>());
-	if (!m_val->IsValid() || reflect::Type<T>()->ConstType() != m_val->Type()->ConstType())
+	if (!m_val || !m_val->IsValid() || reflect::Type<T>()->ConstType() != m_val->Type()->ConstType())
 	{
 		return 0;
 	}
@@ -45,7 +45,8 @@ inline Variant::operator T *()
 
 inline const reflect::Class *Variant::Class() const
 {
-	if (!m_val) return 0;
+	if (!m_val) 
+		return 0;
 	return m_val->Type();
 }
 

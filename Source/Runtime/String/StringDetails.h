@@ -103,14 +103,14 @@ private:
 		MemoryPool *pool,
 		int poolIdx
 	) : 
-	m_buf(src),
+	m_buf((char*)src),
 	m_size(size),
 	m_pool(pool),
 	m_poolIdx(poolIdx),
 	m_refType(type) {
 	}
 
-	void *m_buf;
+	char *m_buf; // char* so we can see the string value with intellisense.
 	int m_size;
 
 	MemoryPool *m_pool;

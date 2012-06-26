@@ -688,6 +688,14 @@ inline String &String::printf(const char *fmt, ...) {
 	return *this;
 }
 
+inline String &String::printfASCII(const char *fmt, ...) {
+	va_list args;
+	va_start(args, fmt);
+	printfASCII(fmt, args);
+	va_end(args);
+	return *this;
+}
+
 inline String &String::operator = (const String &string) {
 	m_data = string.m_data;
 	m_zone = string.m_zone;
@@ -759,13 +767,13 @@ inline String operator + (const String &a, const String &b) {
 
 inline String operator + (const String &a, const char *sz) {
 	String x(a);
-	x.append(a);
+	x.append(sz);
 	return x;
 }
 
 inline String operator + (const String &a, const wchar_t *sz) {
 	String x(a);
-	x.append(a);
+	x.append(sz);
 	return x;
 }
 

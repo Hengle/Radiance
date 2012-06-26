@@ -257,7 +257,7 @@ DataBlock::Ref DataBlock::resize(const DataBlock::Ref &block, int size, ::Zone &
 	
 	if (block && (block->m_refType != kRefType_Ref) && block.unique()) {
 		if (!block->m_pool) {
-			block->m_buf = safe_zone_realloc(zone, block->m_buf, size);
+			block->m_buf = (char*)safe_zone_realloc(zone, block->m_buf, size);
 			block->m_size = size;
 			return block;
 		} else if (size <= (kMinPoolSize<<block->m_poolIdx)) {
@@ -480,9 +480,33 @@ String &String::replace(const String &src, const String &dst) {
 }
 
 String &String::printf(const char *fmt, va_list args) {
-	int x = vscprintf(fmt, args);
-	if (x > 0) {
+	String sfmt(CStr(fmt));
+#if defined(RAD_OPT_WIN) // fuck you windows you non-standard piece of shit
+	sfmt.replace("%s", "%hs");
+#endif
+	WCharBuf wfmt = sfmt.toWChar();
+	int len = vscprintf(wfmt.c_str.get(), args);
+	if (len > 1) { // > 1 because NULL is counted
+		// do as wchars for UTF support.
+		details::DataBlock::Ref wcs = 
+			details::DataBlock::create(kRefType_Copy, len*sizeof(wchar_t), 0, 0, *m_zone);
+		wchar_t *wchars = reinterpret_cast<wchar_t*>(wcs->m_buf);
+		vsprintf(wchars, wfmt.c_str.get(), args);
+		*this = String(wchars, len - 1, *m_zone);
+	} else {
+		clear();
+	}
 
+	return *this;
+}
+
+String &String::printfASCII(const char *fmt, va_list args) {
+
+	int len = vscprintf(fmt, args);
+	if (len > 1) { // > 1 because NULL is counted
+		m_data = details::DataBlock::create(kRefType_Copy, len, 0, 0, *m_zone);
+		char *chars = reinterpret_cast<char*>(m_data->m_buf);
+		vsprintf(chars, fmt, args);
 	} else {
 		clear();
 	}

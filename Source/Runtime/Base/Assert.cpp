@@ -60,7 +60,6 @@ RADRT_API void RADRT_CALL DebugString(const char* message, ...)
 		count = MaxSize;
 
 	::string::vsnprintf(dbgString, count, message, arglist);
-	dbgString[count] = 0;
 	va_end(arglist);
 
 #if defined(RAD_OPT_WINX)

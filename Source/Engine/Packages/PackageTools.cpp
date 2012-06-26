@@ -565,7 +565,7 @@ bool Package::Save() const
 	f.close();
 
 	f.open(
-		(path + L"/" + m_path + L".idx").c_str,
+		(path + "/" + m_path + ".idx").c_str,
 		std::ios_base::out|std::ios_base::trunc
 	);
 
@@ -1278,7 +1278,7 @@ bool PackageMan::DiscoverPackages(tools::UIProgress &ui)
 		const String &x = it->first;
 		{
 			details::WriteLock L(m_m);
-			EnumeratePackage(ui, m_wpkgDir + L"/" + x, x, it->second);
+			EnumeratePackage(ui, m_pkgDir + "/" + x, x, it->second);
 		}
 		totalSize += it->second;
 		ui.totalProgress = totalSize;

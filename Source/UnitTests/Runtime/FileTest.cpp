@@ -15,23 +15,23 @@ namespace ut
 namespace
 {
 #if defined(RAD_OPT_WINX)
-        const wchar_t *s_root = L"c:";
-        const wchar_t *s_data = L"../../Source/UnitTests/Data";
+        const char *s_root = "c:";
+        const char *s_data = "../../Source/UnitTests/Data";
 #else
-        const wchar_t *s_root = L"/";
-        const wchar_t *s_data = L"../../Source/UnitTests/Data";
+        const char *s_root = "/";
+        const char *s_data = "../../Source/UnitTests/Data";
 #endif
 
 	void FileSearch()
 	{
 		Search fs;
-		if (fs.Open(s_root, L".*", SearchFlags(Recursive|FileNames|NativePath)))
+		if (fs.Open(s_root, ".*", SearchFlags(Recursive|FileNames|NativePath)))
 		{
 			enum { MAXFILES = 100 };
 			int c = 0;
-			std::wcout << L"Searching '" << s_root << "' (*.*) (first " << MAXFILES << ")..." << std::endl;
+			std::cout << "Searching '" << s_root << "' (*.*) (first " << MAXFILES << ")..." << std::endl;
 
-			wchar_t name[MaxFilePathLen+1];
+			char name[MaxFilePathLen+1];
 			while (++c <= MAXFILES && fs.NextFile(name, MaxFilePathLen+1, 0, 0))
 			{
 				std::wcout << name << std::endl;
@@ -43,11 +43,11 @@ namespace
 		}
 	}
 
-	void AsyncTest(const wchar_t *filename, const wchar_t *save)
+	void AsyncTest(const char *filename, const char *save)
 	{
-		wchar_t path[MaxFilePathLen+1];
+		char path[MaxFilePathLen+1];
 		cpy(path, s_data);
-		cat(path, L"/");
+		cat(path, "/");
 		cat(path, filename);
 
 		File file;
@@ -64,7 +64,7 @@ namespace
 
 		void *data = file.SafeIOMalloc(size, &alignSize);
 
-		std::wcout << L"Streaming " << size << " byte(s) from file '" << path << "'..." << std::endl;
+		std::cout << "Streaming " << size << " byte(s) from file '" << path << "'..." << std::endl;
 		SecondsTimer<> t;
 		t.Start();
 
@@ -74,7 +74,7 @@ namespace
 			FAIL(-1, "Failed with error code %d", r);
 		}
 		t.Stop();
-		std::wcout << L"Streamed " << ioBytes << L" byte(s) in " << t.Elapsed() << L" second(s)." << std::endl;
+		std::wcout << "Streamed " << ioBytes << " byte(s) in " << t.Elapsed() << " second(s)." << std::endl;
 		file.Close();
 
 		if (ioBytes < size)
@@ -85,7 +85,7 @@ namespace
 		if (save)
 		{
 			cpy(path, s_data);
-			cat(path, L"/");
+			cat(path, "/");
 			cat(path, save);
 
 			if (file.Open(path, CreateAlways, AccessWrite, ShareMode(0), FileOptions(Async|NativePath), 0) != Success)
@@ -93,7 +93,7 @@ namespace
 				FAIL(-1, "Error opening %ls for write!", path);
 			}
 
-			std::wcout << L"Streaming " << size << L" byte(s) to file '" << path << L"'..." << std::endl;
+			std::wcout << "Streaming " << size << " byte(s) to file '" << path << "'..." << std::endl;
 			t.Start();
 
 			r = file.Write(data, size, &ioBytes, 0, 0);
@@ -102,7 +102,7 @@ namespace
 				FAIL(-1, "Write failed, error code %d", r);
 			}
 			t.Stop();
-			std::wcout << L"Streamed " << ioBytes << " byte(s) in " << t.Elapsed() << " second(s)." << std::endl;
+			std::wcout << "Streamed " << ioBytes << " byte(s) in " << t.Elapsed() << " second(s)." << std::endl;
 
 			file.Close();
 
@@ -122,6 +122,6 @@ namespace
         EnforcePortablePaths(false);
 #endif
         DO(FileSearch());
-        DO(AsyncTest(L"big.zip", L"out.zip"));
+        DO(AsyncTest("big.zip", "out.zip"));
 	}
 }

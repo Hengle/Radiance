@@ -142,7 +142,7 @@ int TextureCooker::Compile(int flags, int allflags) {
 			path +=StringTable::Langs[lang];
 		}
 
-		path += L".bin";
+		path += ".bin";
 
 		fp = OpenWrite(path.c_str, flags);
 		if (!fp) {

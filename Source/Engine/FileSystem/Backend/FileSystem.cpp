@@ -1292,7 +1292,8 @@ void FileSystem::FixupPath(const char *str, String &path)
 {
 	RAD_ASSERT(str);
 	path.clear();
-	if (str[0] == 0) return;
+	if (str[0] == 0) 
+		return;
 	String prefix, right;
 
 	// remove leading ../
@@ -1301,7 +1302,7 @@ void FileSystem::FixupPath(const char *str, String &path)
 		str += 3;
 	}
 
-	right = str;
+	right = CStr(str);
 
 	// process '../' command inside path string.
 	while (!right.empty)
@@ -1310,7 +1311,7 @@ void FileSystem::FixupPath(const char *str, String &path)
 		if (ofs != -1)
 		{
 			prefix = right.substr(0, ofs+1); // include '/'
-			right = right.left(ofs+1);
+			right = right.substr(ofs+1);
 
 			if (right.length >= 3)
 			{
@@ -1386,8 +1387,8 @@ void FileSystem::RAD_IMPLEMENT_SET(cddvdRoot) (const char *value)
 	}
 	else
 	{
-		m_cddvdPath = L"1:";
-		m_cddvdPathSlash = L"1:/";
+		m_cddvdPath = "1:";
+		m_cddvdPathSlash = "1:/";
 	}
 }
 

@@ -1065,7 +1065,6 @@ private:
 	Package::Map m_packages;
 	IdPackageWMap m_idDir;
 	String m_pkgDir;
-	String m_wpkgDir;
 	Engine &m_engine;
 
 #if defined(RAD_OPT_TOOLS)

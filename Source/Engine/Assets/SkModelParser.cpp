@@ -283,8 +283,8 @@ int SkModelParser::LoadCooked(
 		else {
 #endif
 			String path(CStr("Cooked/"));
-			path += CStr(asset->path);
-			path += L".1.bin";
+			path += asset->path.get();
+			path += ".1.bin";
 
 			int media = file::AllMedia;
 			int r = engine.sys->files->LoadFile(
