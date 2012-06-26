@@ -292,8 +292,7 @@ inline int String::nCompare(const char *sz, int len) const {
 
 inline int String::nCompare(const wchar_t *sz, int len) const {
 	RAD_ASSERT(sz);
-	int maxlen = string::len(sz);
-	int mblen = wcstombslen(sz, std::min(len, maxlen));
+	int mblen = wcstombslen(sz, len);
 	return nCompare(String(sz, *m_zone), mblen);
 }
 
@@ -308,8 +307,7 @@ inline int String::nComparei(const char *sz, int len) const {
 
 inline int String::nComparei(const wchar_t *sz, int len) const {
 	RAD_ASSERT(sz);
-	int maxlen = string::len(sz);
-	int mblen = wcstombslen(sz, std::min(len, maxlen));
+	int mblen = wcstombslen(sz, len);
 	return nComparei(String(sz, *m_zone), mblen);
 }
 
@@ -496,11 +494,11 @@ inline char String::operator [] (int ofs) const {
 	return reinterpret_cast<const char*>(m_data->data.get())[ofs];
 }
 
-inline bool String::equalInstance(const String &str) const {
+inline bool String::equalsInstance(const String &str) const {
 	return m_data && str.m_data && m_data->data == str.m_data->data;
 }
 
-inline bool String::equalInstance(const UTF8Buf &buf) const {
+inline bool String::equalsInstance(const UTF8Buf &buf) const {
 	return m_data && buf.m_data && m_data->data == buf.m_data->data;
 }
 

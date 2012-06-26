@@ -97,11 +97,11 @@ private:
     is important you must manually normalize the string before compare() will do what you want.
  
     Considerably faster versions of certain functions have been provided that work based on bytes in a 
-	string only. By default a one byte corresponds to one character in an ASCII encoded string. If a
+	string only. By default one byte corresponds to one character in an ASCII encoded string. If a
 	string contains UTF8 encoded data then a single character may be represented by multiple bytes.
 	It is important to be aware that Byte() versions of functions will only work reliably on ASCII data
-	unless the caller has calculated byte offsets for individual characters. \sa byteForCharPos() 
-	\sa charPosForByte()
+	unless the caller has calculated byte offsets for individual characters. \sa byteForChar() 
+	\sa charForByte()
  
     Converting to/from a UTF8Buf is free as it constructs a buffer around the underlying string
     data. However converting to any other representation is a relatively expensive operation.
@@ -194,7 +194,7 @@ public:
 	explicit String(const std::wstring &str, ::Zone &zone = ZString);
 
 	//! Allocates a string of N bytes in length including the null terminator.
-	/*! The string contains garbase but will be null terminated. */
+	/*! The string contains garbage but will be null terminated. */
 	explicit String(int len, ::Zone &zone = ZString);
 
 	// Immutable operations.
@@ -358,9 +358,9 @@ public:
 	char operator [] (int ofs) const;
 
 	//! Returns true if the string objects reference the same string data.
-	bool equalInstance(const String &str) const;
+	bool equalsInstance(const String &str) const;
 	//! Returns true if the string objects reference the same string data.
-	bool equalInstance(const UTF8Buf &buf) const;
+	bool equalsInstance(const UTF8Buf &buf) const;
 
 	//! Returns the character index corresponding to the specified byte offset.
 	/*! \returns A character index or -1 if the byte position is invalid 
@@ -451,7 +451,7 @@ public:
 	//! Writes a character string to a byte position (including the null terminator).
 	String &write(int pos, const char *sz);
 	//! Writes \em len bytes of a character string to a byte position.
-	/*! This operation is performed like an strncpy, meaning that if \em sz
+	/*! This operation is performed like a strncpy, meaning that if \em sz
 	    terminates before len bytes are written the write stops at that point
 		and the string is terminated.
 
