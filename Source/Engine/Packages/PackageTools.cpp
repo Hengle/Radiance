@@ -722,7 +722,7 @@ int PackageMan::lua_Add(lua_State *L)
 	lua::Variant::Map map;
 	lua::ParseVariantTable(L, map, true);
 
-	lua::Variant::Map::iterator it = map.find(String("name"));
+	lua::Variant::Map::iterator it = map.find(CStr("name"));
 	const String *pstr = 0;
 	String name;
 
@@ -739,7 +739,7 @@ int PackageMan::lua_Add(lua_State *L)
 	name = *pstr;
 	map.erase(it); // not a key.
 
-	it = map.find(String("type"));
+	it = map.find(CStr("type"));
 	String stype;
 
 	if (it == map.end() || !(pstr=static_cast<const String*>(it->second)))
@@ -768,7 +768,7 @@ int PackageMan::lua_Add(lua_State *L)
 		);
 	}
 
-	it = map.find(String("modifiedTime"));
+	it = map.find(CStr("modifiedTime"));
 	xtime::TimeDate modifiedTime;
 
 	if (it != map.end() && (pstr=static_cast<const String*>(it->second)))
@@ -886,7 +886,7 @@ bool PackageMan::LoadKeyDefs()
 	m_defaultKeyDef.reset(new (ZPackages) KeyDef());
 	{
 		KeyDef::Pair p;
-		p.name = "value";
+		p.name = CStr("value");
 		p.val = lua::Variant(
 			reflect::SharedReflected::Ref(
 				new (ZPackages) reflect::SharedReflected(
@@ -1076,7 +1076,7 @@ void PackageMan::ParseKeyDefs(const String &filename, const String &path, const 
 
 			parent->pairs.insert(KeyDef::Pair::Map::value_type(pair.name, pair));
 
-			if (it->first == CStr("value"))
+			if (it->first == "value")
 			{
 				parent->val = pair.val;
 			}

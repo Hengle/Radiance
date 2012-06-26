@@ -589,9 +589,6 @@
     <None Include="..\..\SConscript" />
     <None Include="..\..\SConstruct" />
     <None Include="..\..\build_msvc10.py" />
-    <None Include="..\Runtime\String\String2.inl">
-      <Filter>Runtime\Source\String</Filter>
-    </None>
     <None Include="..\Runtime\String\String.inl">
       <Filter>Runtime\Source\String</Filter>
     </None>
@@ -2157,12 +2154,6 @@
     <ClInclude Include="..\Engine\UI\UIWidgetDef.h">
       <Filter>Engine\UI</Filter>
     </ClInclude>
-    <ClInclude Include="..\Runtime\String\String2.h">
-      <Filter>Runtime\Source\String</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Runtime\String\String2Def.h">
-      <Filter>Runtime\Source\String</Filter>
-    </ClInclude>
     <ClInclude Include="..\Runtime\String\String.h">
       <Filter>Runtime\Source\String</Filter>
     </ClInclude>
@@ -3274,9 +3265,6 @@
     </ClCompile>
     <ClCompile Include="..\Engine\UI\UIWidget.cpp">
       <Filter>Engine\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Runtime\String\String2.cpp">
-      <Filter>Runtime\Source\String</Filter>
     </ClCompile>
     <ClCompile Include="..\Runtime\String\String.cpp">
       <Filter>Runtime\Source\String</Filter>

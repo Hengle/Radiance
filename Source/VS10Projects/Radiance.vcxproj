@@ -101,7 +101,6 @@
     <None Include="..\Runtime\Stream\MemoryStream.inl" />
     <None Include="..\Runtime\Stream\STLStream.inl" />
     <None Include="..\Runtime\Stream\Stream.inl" />
-    <None Include="..\Runtime\String\String2.inl" />
     <None Include="..\Runtime\String\StringBase.inl" />
     <None Include="..\Runtime\Tuple\MakeTuple.inl" />
     <None Include="..\Runtime\Tuple\Tuple.inl" />
@@ -362,9 +361,7 @@
     <ClInclude Include="..\Runtime\Stream\StreamDef.h" />
     <ClInclude Include="..\Runtime\String\IntString.h" />
     <ClInclude Include="..\Runtime\String\IntStringBase.h" />
-    <ClInclude Include="..\Runtime\String\String2.h" />
     <ClInclude Include="..\Runtime\String\StringBase.h" />
-    <ClInclude Include="..\Runtime\String\String2Def.h" />
     <ClInclude Include="..\Runtime\Tuple\MakeTuple.h" />
     <ClInclude Include="..\Runtime\Tuple\Tuple.h" />
     <ClInclude Include="..\Runtime\Tuple\TupleDef.h" />
@@ -768,7 +765,6 @@
     <ClCompile Include="..\Runtime\Reflect\Private\ReflectPrivate.cpp" />
     <ClCompile Include="..\Runtime\Stream\MemoryStream.cpp" />
     <ClCompile Include="..\Runtime\Stream\Stream.cpp" />
-    <ClCompile Include="..\Runtime\String\String2.cpp" />
     <ClCompile Include="..\Runtime\DataCodec\Lmp.cpp" />
     <ClCompile Include="..\Runtime\DataCodec\ZLib.cpp" />
     <ClCompile Include="..\Runtime\DataCodec\zlib123\adler32.cpp" />
