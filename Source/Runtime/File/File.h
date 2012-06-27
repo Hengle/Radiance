@@ -1,390 +1,283 @@
 // File.h
-// Platform Agnostic File System
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
 #pragma once
 
-#include "IntFile.h"
 #include "FileDef.h"
 #include "../TimeDef.h"
-#include "../ThreadDef.h"
+#include "../Container/ZoneMap.h"
 #include <stdio.h>
-#include "../PushPack.h"
-
 
 namespace file {
 
-// Strings are passed as char*'s because using a string container will break when
-// used across dll's.
+/*! Memory mapped file system.
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// NOTES
-//
-// The file system operates on platform agnostic file paths. These paths are of the form
-// "alias" + "path". The alias is a number, 0 through MaxAliases-1, followed by
-// a colon and a forward slash ':/'. This number corresponds to an alias table, and
-// the alias is replaced by the string assigned to that alias.
-//
-// Path and filenames can only contain lowercase characters a-z,
-// digits 0-9, and '_' '.' '!'. The '/' character is used to seperate directories.
-//
-// Aliases enabled by default:
-//
-// '9', which corresponds to the directory that the application resides in.
-// '0' corresponds to the primary hard disk (on windows it's the disk that windows
-// is installed on).
-// '1' corresponds to the primary dvd/cdrom drive.
-//
-// Aliases are fully platform specific (except the '/' directory separator is converted).
-// It is not recommended to set your own aliases except in cases where they rely on the
-// built in ones:
-//
-// SetAlias(15, "9:/base/somedir");
-//
-// Windows:
-//
-// SetAlias(3, "c:/games/somegame");
-//
-// Examples:
-//
-// 9:/base/pak0.pak (good)
-// 9:^%$/[]/pak0.pak (bad)
-//
-//////////////////////////////////////////////////////////////////////////////////////////
+	All paths in the file system are platform agnostic UTF8 paths. '/' is the directory separator.
+	
+	- Valid paths
+		- Relative Path 
+			A path that does not start with an alias.
+			- Example: /base/characters/model.3dx
+		- Absolute Path
+			A path that begins with an alias.
+			- Example: r:/base/characters/model.3dx
 
-// subject to MAX alias length
+	- Aliases defined by default.
+		- r: The directory containing the executable (root directory).
+		- w: The working directory that was set when the file system was created.
+		- d: DVD drive (if one exists)
 
-RADRT_API const char *RADRT_CALL Alias(UReg aliasNumber);
-RADRT_API void RADRT_CALL SetAlias(UReg aliasNumber, const char *string);
+	\par Resolving Paths
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// In a debug build you can toggle the enforcement of portable paths via
-// EnforcePortablePaths(). When you do this, the path must not exceed the requirements
-// of the crappiest platform supported. Path checking is not performed in release builds.
-//
-// Example: On the PS2 DVD only 8.3 with a maximum of 32 directories deep (or maybe it was
-// less) is supported. By coding with this enabled, you are guaranteed to be able to
-// run your application on all the platforms supported (from the file system perspective).
-//
-// When this feature is enabled, only alias's 9, 0, and 1 are available for use by
-// paths and other aliases, and ALL user defined aliases MUST use one of them.
-//
-// Example:
-//
-// SetAlias(12, "9:/base") // portable, no error
-// SetAlias(12, "c:/dir/dir2") // not portable, will cause an assertion
-//
-// All the limits like path length filename length, extension length, directory name
-// length and depth is dependant on the target platform. Running with this enforcement
-// emulates the most restrictive platform.
-//
-//////////////////////////////////////////////////////////////////////////////////////////
+	- Absolute Paths
+		An absolute path contains some alias relative path in the form of alias:/dir/file.
+		The alias referenced by the path is expanded recursively to produce the native path
+		used by the file system backend.
 
-#if defined(RAD_OPT_DEBUG)
+	- Relative Paths
+		A relative path is a path that does not have any reference to an alias and has the form:
+		/dir/file.
 
-RADRT_API bool RADRT_CALL EnforcePortablePaths(bool enforce = true);
-RADRT_API bool RADRT_CALL EnforcePortablePathsEnabled();
+		The order in which addPakFile() and addDirectory() are called defines the precidence
+		used in locating a file using a relative path. The first instance of a file located
+		in a directory or pak file is used by a relative path.
 
-#endif
+		\sa addPakFile(), addDirectory()
 
-RADRT_API bool RADRT_CALL FilePathIsValid(const char *string);
+	\note
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// Native path expansion.
-//
-// You can use these functions to convert Radiance file paths into fully native file paths
-// for the target system.
-//
-// Return true if expansion was successful, false if the path was malformed.
-//////////////////////////////////////////////////////////////////////////////////////////
-
-
-RADRT_API bool RADRT_CALL ExpandToNativePath(
-	const char *portablePath,
-	char *nativePath,
-	UReg nativePathBufferSize
-);
-
-// returns number of characters that would be written to buffer via ExpandPath if
-// successful (excluding null terminator), or 0 if error (or path is a null string).
-
-RADRT_API UReg RADRT_CALL ExpandToNativePathLength(
-	const char *portablePath
-);
-
-//////////////////////////////////////////////////////////////////////////////////////////
-// Alias expansion.
-//////////////////////////////////////////////////////////////////////////////////////////
-
-RADRT_API bool RADRT_CALL ExpandAliases(
-	const char *portablePath,
-	char *expandedPath,
-	UReg expandedPathBufferSize
-);
-
-RADRT_API UReg RADRT_CALL ExpandAliasesLength(
-	const char *portablePath
-);
-
-// Returns the sector size of the device that the given file path resides on. Note this
-// doesn't have to be a filename, it can be a path, or an alias.
-
-RADRT_API FPos RADRT_CALL DeviceSectorSize(
-	const char *portablePath,
-	int flags
-);
-
-//////////////////////////////////////////////////////////////////////////////////////////
-// File/Directory deletion.
-//////////////////////////////////////////////////////////////////////////////////////////
-
-RADRT_API bool RADRT_CALL DeleteFile(
-	const char *portablePath,
-	int flags
-);
-
-RADRT_API bool RADRT_CALL CreateDirectory(
-	const char *portablePath,
-	int flags
-);
-
-RADRT_API bool RADRT_CALL DeleteDirectory(
-	const char *portablePath,
-	int flags
-);
-
-//////////////////////////////////////////////////////////////////////////////////////////
-// Misc
-//////////////////////////////////////////////////////////////////////////////////////////
-
-// test the existance of a file or directory.
-
-RADRT_API bool RADRT_CALL FileExists(
-	const char *portablePath,
-	int flags
-);
-
-// returns the modified time of a file.
-
-RADRT_API bool RADRT_CALL FileTime(
-	const char *portablePath,
-	xtime::TimeDate *td,
-	int flags
-);
-
-// returned with a '.'
-
-RADRT_API void RADRT_CALL FileExt(
-	const char *path,
-	char *ext,
-	UReg extBufferSize
-);
-
-// returned with a '.'
-
-RADRT_API UReg RADRT_CALL FileExtLength(
-	const char *path
-);
-
-RADRT_API void RADRT_CALL SetFileExt(
-	const char *path,
-	const char *extWithPeriod,
-	char *newPath,
-	UReg newPathBufferSize
-);
-
-RADRT_API UReg RADRT_CALL SetFileExtLength(
-	const char *path,
-	const char *extWithPeriod
-);
-
-//! Returns the path component of the filename.
-RADRT_API UReg RADRT_CALL FilePathNameLength(
-	const char *path
-);
-
-RADRT_API void RADRT_CALL FilePathName(
-	const char *path,
-	char *pathName,
-	UReg pathNameBufferSize
-);
-
-//! Returns the length of the path returned by file::FileBaseName()
-RADRT_API UReg RADRT_CALL FileBaseNameLength(
-	const char *path
-);
-
-//! Returns the base name of a file, without extension or directory components
-RADRT_API void RADRT_CALL FileBaseName(
-	const char *path,
-	char *basePath,
-	UReg basePathBufferSize
-);
-
-} // file
-
-
-#include "../PopPack.h"
-#include "Backend.h"
-#include "../PushPack.h"
-
-
-namespace file {
-
-class Search : private boost::noncopyable
-{
+	The file system is intended to be case-sensative. Resolving a path in a pak file is a
+	case-sensative operation. While Linux, Mac, and iOS all have case-sensative file systems,
+	Windows does not. When using free-files it is possible to make mistakes in casing of file 
+	names that won't hurt you on windows builds.
+*/
+class FileSystem : public boost::noncopyable {
 public:
-	Search();
-	~Search();
+	typedef FileSystemRef Ref;
 
-	bool Open(
-		const char *directory,
-		const char *extWithPeriod,
-		SearchFlags flags
+	//! Creates a file system object.
+	static Ref create();
+
+	virtual ~FileSystem();
+
+	//! Sets the value of an alias.
+	void setAlias(
+		const char *name,
+		const char *path
 	);
 
-	bool NextFile(
-		char *filenameBuffer,
-		UReg filenameBufferSize,
-		FileAttributes *fileFlags = 0,
-		xtime::TimeDate *fileTime = 0
+	//! Gets the value of the specified alias.
+	String alias(const char *name);
+
+	//! Adds a directory to be used when resolving relative paths.
+	/*! \sa addPakFile() */
+	void addDirectory(
+		const char *path, 
+		int mask = kFileMask_All
 	);
 
-	void Close();
-	bool IsValid();
+	//! Opens a pak file.
+	PakFileRef openPakFile(
+		const char *path, 
+		FileOptions options = kFileOption_None,
+		int mask = kFileMask_Any
+	) const;
 
-private:
-
-	details::Search m_imp;
-};
-
-class AsyncIO : private boost::noncopyable
-{
-public:
-	AsyncIO();
-	virtual ~AsyncIO();
-
-	file::Result Result() const;
-
-	//
-	// Cancel is asynchronous. To ensure that the IO is canceled
-	// call WaitForCompletion() or wait until Result() != Pending.
-	//
-	void Cancel();
-	bool IsCancelled();
-	bool WaitForCompletion(UReg timeout = thread::Infinite) const;
-	FPos ByteCount() const;
-	void SetByteCount(FPos count);
-
-	//
-	// Sets the IO status and triggers processing of the
-	// completion callback if the status changed from pending
-	// to another state. Once the callback is processed, threads
-	// blocking in WaitForCompletion() will become active.
-	//
-	// This call must be synchronized by users of the IO object
-	// and should not be invoked if the object is being used by
-	// an IO operation, as the completion of that operation will
-	// trigger the completion.
-	//
-	// If force is true, then completion notification is triggered
-	// regardless of status.
-	//
-
-	void TriggerStatusChange(
-		file::Result result,
-		bool force = false
+	//! Adds a pak file to be used when resolving relative paths.
+	/*! \sa addDirectory() */
+	void addPakFile(
+		const PakFileRef &file, 
+		int mask = kFileMask_All
 	);
+
+	//! Removes a pak file from the resolvers list for relative paths. 
+	/*! \sa addPakFile() */
+	void removePakFile(const PakFileRef &file);
+	//! Removes all pak files from the resolvers list for relative paths. */
+	/*! \sa addPakFile() */
+	void removePakFiles();
+
+	//! Opens a FILE* to a file.
+	/*! If the path specified is a relative path then the path is expanded using
+		getAbsolutePath(). The path is then expanded to a native path with
+		getNativePath() and passed to the stdio function fopen(). 
+		
+		\sa getAbsolutePath() 
+	*/
+	FILE *fopen(
+		const char *path,
+		const char *mode,
+		FileOptions options = kFileOption_None,
+		int mask = kFileMask_Any,
+		int exclude = 0,
+		int *resolved = 0
+	);
+
+	//! Opens a memory mapped file.
+	MMFileRef openFile(
+		const char *path,
+		FileOptions options = kFileOption_None,
+		int mask = kFileMask_Any,
+		int *resolved = 0
+	);
+
+	//! Opens a wild-card file search.
+	FileSearchRef openSearch(
+		const char *path,
+		FileOptions options = kFileOption_None,
+		int mask = kFileMask_Any
+	);
+
+	//! Expands a relative path into an absolute path.
+	/*! \param path An relative path of the form alias:/path. 
+		\param exclude Any directories matching any bits in the exclude mask will not 
+		       be used.
+		\param resolved optional parameter that contains the mask of the path that was
+		       used to resolve the path.
+	*/
+	bool getAbsolutePath(
+		const char *path, 
+		String &expanded,
+		int mask = kFileMask_Any,
+		int exclude = 0,
+		int *resolved = 0
+	);
+
+	//! Expands an absolute path to a native path that can be used by stdio and other
+	//! OS level functions.
+	/*! \note Only absolute paths are accepted by this function. Using a relative path
+		will fail. */
+	bool getNativePath(
+		const char *path,
+		String &nativePath
+	);
+
+	//! Gets the TimeDate object for the specified file.
+	/*! \note Only absolute paths are accepted by this function. Using a relative path
+		will fail. */
+	bool getFileTime(
+		const char *path,
+		xtime::TimeDate &td,
+		FileOptions options = kFileOption_None
+	);
+
+	//! Deletes the specified file.
+	/*! \note Only absolute paths are accepted by this function. Using a relative path
+		will fail. */
+	bool deleteFile(
+		const char *path,
+		FileOptions options = kFileOption_None
+	);
+
+	//! Deletes the specified directory.
+	/*! \note Only absolute paths are accepted by this function. Using a relative path
+		will fail. */
+	bool deleteDirectory(
+		const char *path,
+		FileOptions options = kFileOption_None
+	);
+
+	//! Global mask used on any file operations that take a mask.
+	/*! The value of this field does not effect addDirectory() or addPakFile() */
+	RAD_DECLARE_PROPERTY(FileSystem, globalMask, int, int);
+
+	//! Gets the system memory mapping page size.
+	RAD_DECLARE_READONLY_PROPERTY(FileSystem, pageSize, AddrSize);
 
 protected:
 
-	virtual void OnComplete(file::Result result);
+	FileSystem(
+		const char *root,
+		const char *cwd,
+		const char *dvd
+	);
+
+	virtual RAD_DECLARE_GET(pageSize, int) = 0;
 
 private:
 
-	details::AsyncIO m_imp;
+	RAD_DECLARE_GET(globalMask, int);
+	RAD_DECLARE_SET(globalMask, int);
 
-	friend class File;
-	friend class details::AsyncIO;
-	friend class details::File;
+	int m_globalMask;
+
 };
 
-class File : private boost::noncopyable
-{
+//! Memory Mapped File
+class MMFile : public boost::noncopyable {
 public:
-	File();
-	~File();
+	typedef MMFileRef Ref;
 
-	//
-	// the file must be opened in Async mode to use asynchronous IO, otherwise all
-	// operations are blocking.
-	//
-	// unless otherwise noted, if the AsyncIO object on any function is NULL, the function is
-	// blocking, even in Async mode.
-	//
-	// all functions returns Success, or an ERROR code (see File.h). A function that
-	// takes an AsyncIO object may return Pending, in which case the IO object must
-	// be queried for the operations results. As stated above, if no IO object is
-	// given, then the function is blocking and Pending will never be returned.
-	//
+	//! Maps the specified file data into user address space.
+	virtual MMappingRef mmap(
+		AddrSize ofs, 
+		AddrSize size
+	) = 0;
 
-	Result Open(
-		const char *filename,
-		CreationType creationType,
-		AccessMode accessMode,
-		ShareMode shareMode,
-		FileOptions fileOptions,
-		AsyncIO *io
+	//! The size of the file.
+	RAD_DECLARE_READONLY_PROPERTY(MMFile, size, AddrSize);
+
+protected:
+
+	MMFile();
+
+	virtual RAD_DECLARE_GET(size, AddrSize) = 0;
+
+};
+
+//! Memory mapping object.
+class MMapping : public boost::noncopyable {
+public:
+	typedef MMappingRef Ref;
+
+	//! Notifies the operating system that the specified memory will be
+	//! used and should be prefetched into memory.
+	/*! \notes This function may not improve performance or may be ignored
+		by the OS. Equivelent to madvise(WILLNEED). */
+	void prefetch(
+		AddrSize offset,
+		AddrSize size
 	);
 
-	Result Close(AsyncIO* io=0);
+	//! Returns a pointer to the mapped file data.
+	RAD_DECLARE_READONLY_PROPERTY(MMapping, data, const void*);
+	//! Returns the size of the mapping window.
+	RAD_DECLARE_READONLY_PROPERTY(MMapping, size, AddrSize);
 
-	//
-	// if you opened the file in Accelerated mode, beware the restrictions!
-	//
-	// filePos determines the file position to start the operation from.
-	//
-	// bytesRead/bytesWritten can be null.
-	//
-	Result Read(
-		void *buffer,
-		FPos bytesToRead,
-		FPos *bytesRead,
-		FPos filePos,
-		AsyncIO *io
+protected:
+
+	MMapping(
+		const void *data,
+		AddrSize size
 	);
-
-	Result Write(
-		const void *buffer,
-		FPos bytesToWrite,
-		FPos *bytesWritten,
-		FPos filePos,
-		AsyncIO *io
-	);
-
-	FPos Size() const;
-	FPos SectorSize() const;
-	bool CancelIO();
-	bool Flush();
-
-	// Allocate a sector aligned buffer for reading the specified #
-	// of bytes using async file mode. Returns buffer, and a valid IO size
-	// to request for file operations.
-	// Free buffer with AlignedFree().
-	void *IOMalloc(AddrSize size, AddrSize *ioSize, Zone &zone = ZFile);
-	void *SafeIOMalloc(AddrSize size, AddrSize *ioSize, Zone &zone = ZFile);
-
-	static void IOFree(void *p);
 
 private:
 
-	details::File m_imp;
+	RAD_DECLARE_GET(data, const void*);
+	RAD_DECLARE_GET(size, AddrSize);
+
+	const void *m_data;
+	AddrSize m_size;
 };
+
+// Helper functions
+
+//! Sets the extension of a file.
+/*! If null is specified for extension then the extension is removed from the file. */
+RADRT_API String RADRT_CALL setFileExtension(
+	const char *file, 
+	const char *ext
+);
+
+//! Returns the file name without any path components.
+RADRT_API String RADRT_CALL getFileName(const char *path);
+
+//! Returns the file name without any extension or path components.
+RADRT_API String RADRT_CALL getBaseFileName(const char *path);
+
+//! Returns the file path without the file name itself.
+RADRT_API String RADRT_CALL getFilePath(const char *path);
 
 } // file
-
-
-#include "../PopPack.h"
-#include "File.inl"

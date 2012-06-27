@@ -61,6 +61,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="..\..\build_msvc10.py" />
+    <None Include="..\Engine\Tools\Editor\EditorWindow.inl" />
+    <None Include="..\Runtime\File\File.inl" />
     <None Include="..\Runtime\SConstruct" />
     <None Include="..\Runtime\String\String.inl" />
     <None Include="..\Runtime\Win\WinThread.inl" />
@@ -131,8 +133,6 @@
     <None Include="..\Runtime\ImageCodec\lpng1216\LICENSE.TXT" />
     <None Include="..\Runtime\Interface\Interface.inl" />
     <None Include="..\Runtime\Interface\SConstruct" />
-    <None Include="..\Runtime\File\File.inl" />
-    <None Include="..\Runtime\File\FileStream.inl" />
     <None Include="..\Runtime\Font\Font.inl" />
     <None Include="..\Runtime\AudioCodec\SConstruct" />
     <None Include="..\Tools\Bsp.SConstruct" />
@@ -201,11 +201,17 @@
     <ClInclude Include="..\Engine\Tools\Editor\EditorStringTableWidget.h" />
     <ClInclude Include="..\Engine\Tools\Editor\EditorStringTableWidgetItemModel.h" />
     <ClInclude Include="..\Engine\Tools\Editor\EditorTextEditorDialog.h" />
+    <ClInclude Include="..\Engine\Tools\Editor\EditorWindow.h" />
     <ClInclude Include="..\Runtime\Base.h" />
+    <ClInclude Include="..\Runtime\Base\EnumFlags.h" />
     <ClInclude Include="..\Runtime\Endian.h" />
     <ClInclude Include="..\Runtime\Event.h" />
     <ClInclude Include="..\Runtime\File.h" />
     <ClInclude Include="..\Runtime\FileDef.h" />
+    <ClInclude Include="..\Runtime\File\File.h" />
+    <ClInclude Include="..\Runtime\File\FileDef.h" />
+    <ClInclude Include="..\Runtime\File\FileDetails.h" />
+    <ClInclude Include="..\Runtime\File\IntFile.h" />
     <ClInclude Include="..\Runtime\Interface.h" />
     <ClInclude Include="..\Runtime\InterfaceDef.h" />
     <ClInclude Include="..\Runtime\Math.h" />
@@ -229,7 +235,6 @@
     <ClInclude Include="..\Runtime\StringBase.h" />
     <ClInclude Include="..\Runtime\StringDef.h" />
     <ClInclude Include="..\Runtime\String\String.h" />
-    <ClInclude Include="..\Runtime\String\StringDef.h" />
     <ClInclude Include="..\Runtime\String\StringDetails.h" />
     <ClInclude Include="..\Runtime\String\utf8.h" />
     <ClInclude Include="..\Runtime\String\utf8\checked.h" />
@@ -462,13 +467,6 @@
     <ClInclude Include="..\Runtime\Interface\InterfaceDef.h" />
     <ClInclude Include="..\Runtime\Interface\IntInterface.h" />
     <ClInclude Include="..\Runtime\Interface\ReflectInterface.h" />
-    <ClInclude Include="..\Runtime\File\Backend.h" />
-    <ClInclude Include="..\Runtime\File\File.h" />
-    <ClInclude Include="..\Runtime\File\FileDef.h" />
-    <ClInclude Include="..\Runtime\File\FileStream.h" />
-    <ClInclude Include="..\Runtime\File\FileStreamDef.h" />
-    <ClInclude Include="..\Runtime\File\IntFile.h" />
-    <ClInclude Include="..\Runtime\File\PrivateFile.h" />
     <ClInclude Include="..\Runtime\Font\Font.h" />
     <ClInclude Include="..\Runtime\Font\FontDef.h" />
     <ClInclude Include="..\Runtime\Font\IntFont.h" />
@@ -738,6 +736,8 @@
     <ClCompile Include="..\Engine\Tools\Editor\EditorStringTableWidget.cpp" />
     <ClCompile Include="..\Engine\Tools\Editor\EditorStringTableWidgetItemModel.cpp" />
     <ClCompile Include="..\Engine\Tools\Editor\EditorTextEditorDialog.cpp" />
+    <ClCompile Include="..\Engine\Tools\Editor\EditorWindow.cpp" />
+    <ClCompile Include="..\Runtime\File\File.cpp" />
     <ClCompile Include="..\Runtime\Runtime.cpp" />
     <ClCompile Include="..\Runtime\String\String.cpp" />
     <ClCompile Include="..\Runtime\Win\WinCrashReporter.cpp" />
@@ -862,8 +862,6 @@
     <ClCompile Include="..\Runtime\Interface\ComponentManager.cpp" />
     <ClCompile Include="..\Runtime\Interface\ComponentManagerReflectMap.cpp" />
     <ClCompile Include="..\Runtime\Interface\InterfaceReflectMap.cpp" />
-    <ClCompile Include="..\Runtime\File\File.cpp" />
-    <ClCompile Include="..\Runtime\File\FileStream.cpp" />
     <ClCompile Include="..\Runtime\Font\Font.cpp" />
     <ClCompile Include="..\Runtime\AudioCodec\Vorbis.cpp" />
     <ClCompile Include="..\Runtime\AudioCodec\Wave.cpp" />

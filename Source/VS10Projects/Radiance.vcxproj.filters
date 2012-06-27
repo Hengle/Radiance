@@ -432,12 +432,6 @@
     <None Include="..\Runtime\Interface\SConstruct">
       <Filter>Runtime\Source\Interface</Filter>
     </None>
-    <None Include="..\Runtime\File\File.inl">
-      <Filter>Runtime\Source\File</Filter>
-    </None>
-    <None Include="..\Runtime\File\FileStream.inl">
-      <Filter>Runtime\Source\File</Filter>
-    </None>
     <None Include="..\Runtime\Font\Font.inl">
       <Filter>Runtime\Source\Font</Filter>
     </None>
@@ -591,6 +585,12 @@
     <None Include="..\..\build_msvc10.py" />
     <None Include="..\Runtime\String\String.inl">
       <Filter>Runtime\Source\String</Filter>
+    </None>
+    <None Include="..\Engine\Tools\Editor\EditorWindow.inl">
+      <Filter>Engine\Tools\Editor</Filter>
+    </None>
+    <None Include="..\Runtime\File\File.inl">
+      <Filter>Runtime\Source\File</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -1355,27 +1355,6 @@
     </ClInclude>
     <ClInclude Include="..\Runtime\Interface\ReflectInterface.h">
       <Filter>Runtime\Source\Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Runtime\File\Backend.h">
-      <Filter>Runtime\Source\File</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Runtime\File\File.h">
-      <Filter>Runtime\Source\File</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Runtime\File\FileDef.h">
-      <Filter>Runtime\Source\File</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Runtime\File\FileStream.h">
-      <Filter>Runtime\Source\File</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Runtime\File\FileStreamDef.h">
-      <Filter>Runtime\Source\File</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Runtime\File\IntFile.h">
-      <Filter>Runtime\Source\File</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Runtime\File\PrivateFile.h">
-      <Filter>Runtime\Source\File</Filter>
     </ClInclude>
     <ClInclude Include="..\Runtime\Font\Font.h">
       <Filter>Runtime\Source\Font</Filter>
@@ -2157,9 +2136,6 @@
     <ClInclude Include="..\Runtime\String\String.h">
       <Filter>Runtime\Source\String</Filter>
     </ClInclude>
-    <ClInclude Include="..\Runtime\String\StringDef.h">
-      <Filter>Runtime\Source\String</Filter>
-    </ClInclude>
     <ClInclude Include="..\Runtime\String\StringDetails.h">
       <Filter>Runtime\Source\String</Filter>
     </ClInclude>
@@ -2198,6 +2174,24 @@
     </ClInclude>
     <ClInclude Include="..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserWindow.h">
       <Filter>Engine\Tools\Editor\ContentBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Runtime\File\File.h">
+      <Filter>Runtime\Source\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Runtime\File\FileDef.h">
+      <Filter>Runtime\Source\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Runtime\File\IntFile.h">
+      <Filter>Runtime\Source\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Runtime\Base\EnumFlags.h">
+      <Filter>Runtime\Source\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Tools\Editor\EditorWindow.h">
+      <Filter>Engine\Tools\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Runtime\File\FileDetails.h">
+      <Filter>Runtime\Source\File</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2569,12 +2563,6 @@
     </ClCompile>
     <ClCompile Include="..\Runtime\Interface\InterfaceReflectMap.cpp">
       <Filter>Runtime\Source\Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Runtime\File\File.cpp">
-      <Filter>Runtime\Source\File</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Runtime\File\FileStream.cpp">
-      <Filter>Runtime\Source\File</Filter>
     </ClCompile>
     <ClCompile Include="..\Runtime\Font\Font.cpp">
       <Filter>Runtime\Source\Font</Filter>
@@ -3292,6 +3280,12 @@
     </ClCompile>
     <ClCompile Include="..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserWindow.cpp">
       <Filter>Engine\Tools\Editor\ContentBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Runtime\File\File.cpp">
+      <Filter>Runtime\Source\File</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Tools\Editor\EditorWindow.cpp">
+      <Filter>Engine\Tools\Editor</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
