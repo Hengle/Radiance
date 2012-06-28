@@ -17,6 +17,5 @@
 #include "Types.h"
 #include "Utils.h"
 #include "Memory.h"
-#include "String.h"
 
 #undef __PRIVATE_RAD_OPT_INTBASE__

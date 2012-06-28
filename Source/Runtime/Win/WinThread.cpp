@@ -403,11 +403,13 @@ DWORD WINAPI Thread::ThreadProc(void* parm)
 
 	::EnterCriticalSection(&thread->m_imp.m_cs);
 	thread->m_imp.m_retCode = ret;
+#if defined(RAD_OPT_FIBERS)
 	if (thread->m_imp.m_fiber)
 	{
 		ConvertFiberToThread();
 		thread->m_imp.m_fiber = 0;
 	}
+#endif
 	CloseHandle(thread->m_imp.m_thread);
 	thread->m_imp.m_thread = 0;
 	::LeaveCriticalSection(&thread->m_imp.m_cs);

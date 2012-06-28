@@ -353,8 +353,8 @@ build_freetype()
 build_libogg()
 build_libvorbis()
 build_runtime()
-build_engine()
-build_main()
+#build_engine()
+#build_main()
 
 #if not build.console():
 #	tools()

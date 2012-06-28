@@ -39,7 +39,7 @@ x.add('String/String.cpp')
 x.add('Endian/Endian.cpp')
 x.add('Time/Time.cpp')
 x.add('File/File.cpp')
-x.add('File/FileStream.cpp')
+#x.add('File/FileStream.cpp')
 x.add('Font/Font.cpp')
 x.add('Thread/Locks.cpp')
 

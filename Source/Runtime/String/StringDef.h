@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "IntStringBase.h"
+
 namespace string {
 namespace details {
 

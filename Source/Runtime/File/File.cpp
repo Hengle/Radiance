@@ -14,7 +14,7 @@ RAD_ZONE_DEF(RADRT_API, ZFile, "Files", ZRuntime);
 namespace {
 	inline bool pathHasAlias(const char *path) {
 		RAD_ASSERT(path);
-		return (path[0] != 0) && (path[1] == ':');
+		return (path[0] == '@') && (path[2] == ':');
 	}
 	inline bool isAbsPath(const char *path) {
 		return pathHasAlias(path);
@@ -22,15 +22,20 @@ namespace {
 	inline bool isRelPath(const char *path) {
 		return !isAbsPath(path);
 	}
+	inline void validatePath(const char *path) {
+#if defined(RAD_OPT_DEBUG)
+		for (int i = 0; path[i]; ++i) {
+			RAD_ASSERT_MSG(path[i] != '\\', "Invalid directory seperator"); // invalid directory seperator
+		}
+#endif
+	}
 }
 
-FileSystem::FileSystem(const char *root, const char *cwd, const char *dvd)
+FileSystem::FileSystem(const char *root, const char *dvd)
 : m_globalMask(kFileMask_Any) {
 	RAD_ASSERT(root);
-	RAD_ASSERT(cwd);
 
 	m_aliasTable['r'] = root;
-	m_aliasTable['w'] = cwd;
 
 	if (dvd)
 		m_aliasTable['d'] = dvd;
@@ -101,7 +106,7 @@ FILE *FileSystem::fopen(
 	RAD_ASSERT(mode);
 
 	String spath;
-	bool nativePath = options & kFileOption_NativePath;
+	bool nativePath = (options&kFileOption_NativePath) ? true : false;
 
 	if (!nativePath) {
 		if (!getAbsolutePath(path, spath, mask, exclude, resolved))
@@ -143,7 +148,14 @@ bool FileSystem::getAbsolutePath(
 		if (m.mask&exclude)
 			continue;
 		if (m.mask&mask) {
-			absPath = m.dir + CStr(path);
+			const String kPath(CStr(path));
+
+			if (kPath[0] != '/') {
+				absPath = m.dir + "/" + kPath;
+			} else {
+				absPath = m.dir + kPath;
+			}
+
 			if (resolved)
 				*resolved = m.mask;
 			return true;
@@ -172,12 +184,12 @@ bool FileSystem::getNativePath(
 #endif
 
 	while (pathHasAlias(spath.c_str)) {
-		char alias = spath[0];
+		char alias = spath[1];
 #if defined(RAD_OPT_DEBUG)
 		RAD_ASSERT_MSG(!m_touched[alias], "Expanding recursive file system alias!");
 		m_touched[alias] = true;
 #endif
-		spath = m_aliasTable[alias] + spath.substr(2);
+		spath = m_aliasTable[alias] + spath.substr(3);
 	}
 
 	nativePath = spath;
@@ -229,6 +241,8 @@ bool FileSystem::fileExists(
 			}
 		}
 	}
+
+	return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

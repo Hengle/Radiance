@@ -1047,9 +1047,6 @@
     <ClInclude Include="..\Runtime\Stream\StreamDef.h">
       <Filter>Runtime\Source\Stream</Filter>
     </ClInclude>
-    <ClInclude Include="..\Runtime\String\IntString.h">
-      <Filter>Runtime\Source\String</Filter>
-    </ClInclude>
     <ClInclude Include="..\Runtime\String\IntStringBase.h">
       <Filter>Runtime\Source\String</Filter>
     </ClInclude>
@@ -2192,6 +2189,9 @@
     </ClInclude>
     <ClInclude Include="..\Runtime\File\FileDetails.h">
       <Filter>Runtime\Source\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Runtime\String\StringDef.h">
+      <Filter>Runtime\Source\String</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

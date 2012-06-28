@@ -113,7 +113,7 @@ public:
 	}
 
 	unspecified_bool_type operator ! () const {
-		return (!m_i) ? &bool_true : 0;
+		return (!m_i) ? &SelfType::bool_true : 0;
 	}
 
 private:

@@ -18,7 +18,7 @@ inline void FileSystem::setAlias(
 	m_aliasTable[name[0]] = path;
 }
 
-inline String FileSystem::alias(const char *name) {
+inline string::String FileSystem::alias(const char *name) {
 	RAD_ASSERT(name);
 	RAD_ASSERT(name[1] == 0); // only single characters allowed!
 	return m_aliasTable[name[0]];

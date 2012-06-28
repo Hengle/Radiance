@@ -22,7 +22,7 @@ namespace file {
 			- Example: /base/characters/model.3dx
 		- Absolute Path
 			A path that begins with an alias.
-			- Example: r:/base/characters/model.3dx
+			- Example: @r:/base/characters/model.3dx
 
 	- Aliases defined by default.
 		- r: The directory containing the executable (root directory).
@@ -32,7 +32,7 @@ namespace file {
 	\par Resolving Paths
 
 	- Absolute Paths
-		An absolute path contains some alias relative path in the form of alias:/dir/file.
+		An absolute path contains some alias relative path in the form of @[letter/number]:/dir/file.
 		The alias referenced by the path is expanded recursively to produce the native path
 		used by the file system backend.
 
@@ -69,7 +69,7 @@ public:
 	);
 
 	//! Gets the value of the specified alias.
-	String alias(const char *name);
+	string::String alias(const char *name);
 
 	//! Adds a directory to be used when resolving relative paths.
 	/*! \sa addPakFile() */
@@ -81,7 +81,7 @@ public:
 	//! Opens a pak file.
 	PakFileRef openPakFile(
 		const char *path, 
-		FileOptions options = kFileOption_None,
+		FileOptions options = kFileOptions_None,
 		int mask = kFileMask_Any
 	);
 
@@ -109,7 +109,7 @@ public:
 	FILE *fopen(
 		const char *path,
 		const char *mode,
-		FileOptions options = kFileOption_None,
+		FileOptions options = kFileOptions_None,
 		int mask = kFileMask_Any,
 		int exclude = 0,
 		int *resolved = 0
@@ -118,7 +118,7 @@ public:
 	//! Opens a memory mapped file.
 	virtual MMFileRef openFile(
 		const char *path,
-		FileOptions options = kFileOption_None,
+		FileOptions options = kFileOptions_None,
 		int mask = kFileMask_Any,
 		int *resolved = 0
 	) = 0;
@@ -126,7 +126,8 @@ public:
 	//! Opens a wild-card file search.
 	virtual FileSearchRef openSearch(
 		const char *path,
-		FileOptions options = kFileOption_None,
+		SearchOptions searchOptions = kSearchOption_Recursive,
+		FileOptions fileOptions = kFileOptions_None,
 		int mask = kFileMask_Any
 	) = 0;
 
@@ -142,7 +143,7 @@ public:
 	*/
 	bool getAbsolutePath(
 		const char *path, 
-		String &absPath,
+		string::String &absPath,
 		int mask = kFileMask_Any,
 		int exclude = 0,
 		int *resolved = 0
@@ -152,7 +153,7 @@ public:
 	//! OS level functions.
 	bool getNativePath(
 		const char *path,
-		String &nativePath
+		string::String &nativePath
 	);
 
 	//! Returns true if the file exists.
@@ -160,7 +161,7 @@ public:
 		parameter. */
 	bool fileExists(
 		const char *path,
-		FileOptions options = kFileOption_None,
+		FileOptions options = kFileOptions_None,
 		int mask = kFileMask_Any,
 		int exclude = 0,
 		int *resolved = 0
@@ -172,7 +173,7 @@ public:
 	virtual bool getFileTime(
 		const char *path,
 		xtime::TimeDate &td,
-		FileOptions options = kFileOption_None
+		FileOptions options = kFileOptions_None
 	) = 0;
 
 	//! Deletes the specified file.
@@ -180,7 +181,15 @@ public:
 		will fail. */
 	virtual bool deleteFile(
 		const char *path,
-		FileOptions options = kFileOption_None
+		FileOptions options = kFileOptions_None
+	) = 0;
+
+	//! Creates the specified directory.
+	/*! \note Only absolute paths are accepted by this function. Using a relative path
+		will fail. */
+	virtual bool createDirectory(
+		const char *path,
+		FileOptions options = kFileOptions_None
 	) = 0;
 
 	//! Deletes the specified directory.
@@ -188,25 +197,20 @@ public:
 		will fail. */
 	virtual bool deleteDirectory(
 		const char *path,
-		FileOptions options = kFileOption_None
+		FileOptions options = kFileOptions_None
 	) = 0;
 
 	//! Global mask used on any file operations that take a mask.
 	/*! The value of this field does not effect addDirectory() or addPakFile() */
 	RAD_DECLARE_PROPERTY(FileSystem, globalMask, int, int);
 
-	//! Gets the system memory mapping page size.
-	RAD_DECLARE_READONLY_PROPERTY(FileSystem, pageSize, AddrSize);
-
 protected:
 
 	FileSystem(
 		const char *root,
-		const char *cwd,
 		const char *dvd
 	);
 
-	virtual RAD_DECLARE_GET(pageSize, int) = 0;
 	virtual bool nativeFileExists(const char *path) = 0;
 
 private:
@@ -221,12 +225,12 @@ private:
 	struct PathMapping {
 		typedef zone_vector<PathMapping, ZFileT>::type Vec;
 		PakFileRef pak;
-		String dir;
+		string::String dir;
 		int mask;
 	};
 	
 	PathMapping::Vec m_paths;
-	boost::array<String, kAliasMax> m_aliasTable;
+	boost::array<string::String, kAliasMax> m_aliasTable;
 	int m_globalMask;
 };
 
@@ -287,45 +291,49 @@ private:
 	AddrSize m_size;
 };
 
-//! Pak file.
-class PakFile : public boost::noncopyable {
-public:
-	typedef PakFileRef Ref;
-};
-
 //! File search
 class FileSearch : public boost::noncopyable {
 public:
 	typedef FileSearchRef Ref;
 
-	virtual bool NextFile(String &path) = 0;
+	virtual bool nextFile(
+		string::String &path,
+		FileAttributes *fileAttributes = 0,
+		xtime::TimeDate *fileTime = 0
+	) = 0;
 
 protected:
 
 	FileSearch();
 };
 
+//! Pak file.
+class PakFile : public boost::noncopyable {
+public:
+	typedef PakFileRef Ref;
+};
+
 // Helper functions
 
 //! Gets the file extension, including the '.'
-RADRT_API String RADRT_CALL getFileExtension(const char *path);
+RADRT_API string::String RADRT_CALL getFileExtension(const char *path);
 
 //! Sets the extension of a file.
 /*! If null is specified for extension then the extension is removed from the file. 
 	\param ext The extension to set, including the '.' */
-RADRT_API String RADRT_CALL setFileExtension(
+RADRT_API string::String RADRT_CALL setFileExtension(
 	const char *path, 
 	const char *ext
 );
 
 //! Returns the file name without any path components.
-RADRT_API String RADRT_CALL getFileName(const char *path);
+RADRT_API string::String RADRT_CALL getFileName(const char *path);
 
 //! Returns the file name without any extension or path components.
-RADRT_API String RADRT_CALL getBaseFileName(const char *path);
+RADRT_API string::String RADRT_CALL getBaseFileName(const char *path);
 
 //! Returns the file path without the file name itself.
-RADRT_API String RADRT_CALL getFilePath(const char *path);
+RADRT_API string::String RADRT_CALL getFilePath(const char *path);
 
 } // file
 

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "IntFile.h"
+#include "../String.h"
 
 namespace file {
 
@@ -26,8 +27,6 @@ typedef boost::shared_ptr<MMFile> MMFileRef;
 class MMapping;
 typedef boost::shared_ptr<MMapping> MMappingRef;
 
-typedef string::String String;
-
 enum {
 	RAD_FLAG(kFileMask_Base),
 	RAD_FLAG(kFileMask_Mod),
@@ -39,9 +38,25 @@ enum {
 
 RAD_BEGIN_FLAGS
 	RAD_FLAG(kFileOption_NativePath),
-	kFileOption_None = 0
+	kFileOptions_None = 0
 RAD_END_FLAGS(FileOptions)
+
+RAD_BEGIN_FLAGS
+	RAD_FLAG(kFileAttribute_Hidden),
+	RAD_FLAG(kFileAttribute_Normal),
+	RAD_FLAG(kFileAttribute_ReadOnly),
+	RAD_FLAG(kFileAttribute_Directory),
+	kFileAttributes_None = 0
+RAD_END_FLAGS(FileAttributes)
+
+RAD_BEGIN_FLAGS
+	RAD_FLAG(kSearchOption_Recursive),
+	RAD_FLAG(kSearchOption_ReturnNativePaths),
+	kSearchOptions_None = 0
+RAD_END_FLAGS(SearchOptions)
 
 } // file
 
 RAD_IMPLEMENT_FLAGS(file::FileOptions)
+RAD_IMPLEMENT_FLAGS(file::FileAttributes)
+RAD_IMPLEMENT_FLAGS(file::SearchOptions)

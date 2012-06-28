@@ -262,7 +262,7 @@ public:
 	String SubStr(int first, int count) const;
 
 	//! Returns a substring.
-	/*! Returns the remaining string after the specified \em character.
+	/*! Returns the remaining string starting at the specified \em character.
 		Equivelent to Right(NumChars() - ofs).
 		\param ofs The first \em character to include in the substring.
 		\remarks Since the string is UTF8 encoded there is a difference between

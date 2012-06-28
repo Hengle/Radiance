@@ -235,6 +235,7 @@
     <ClInclude Include="..\Runtime\StringBase.h" />
     <ClInclude Include="..\Runtime\StringDef.h" />
     <ClInclude Include="..\Runtime\String\String.h" />
+    <ClInclude Include="..\Runtime\String\StringDef.h" />
     <ClInclude Include="..\Runtime\String\StringDetails.h" />
     <ClInclude Include="..\Runtime\String\utf8.h" />
     <ClInclude Include="..\Runtime\String\utf8\checked.h" />
@@ -364,7 +365,6 @@
     <ClInclude Include="..\Runtime\Stream\STLStreamDef.h" />
     <ClInclude Include="..\Runtime\Stream\Stream.h" />
     <ClInclude Include="..\Runtime\Stream\StreamDef.h" />
-    <ClInclude Include="..\Runtime\String\IntString.h" />
     <ClInclude Include="..\Runtime\String\IntStringBase.h" />
     <ClInclude Include="..\Runtime\String\StringBase.h" />
     <ClInclude Include="..\Runtime\Tuple\MakeTuple.h" />
