@@ -141,7 +141,7 @@ private:
 #define RAD_BEGIN_FLAGS typedef enum {
 #define RAD_END_FLAGS(_type) } k##_type; typedef ::RadEnumFlags<k##_type> _type;
 #define RAD_IMPLEMENT_FLAGS(_type) \
-inline TestFlags operator | (_type::Enum a, _type::Enum b) { \
+inline _type operator | (_type::Enum a, _type::Enum b) { \
 	return _type(a) | b; \
 } \
 inline _type operator & (_type::Enum a, _type::Enum b) { \

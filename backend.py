@@ -69,18 +69,8 @@ class Backend:
 		if self.build.pc():
 			defines.append('RAD_OPT_PC')
 			
-		if not self.build.ios():
-			defines.append('RAD_OPT_FIBERS')
-			
 		if self.build.gl():
 			defines.append('RAD_OPT_GL')
-
-		if self.build.ios():
-			defines.append('RAD_OPT_IOS')
-		if self.build.switches.ios_simulator():
-			defines.append('RAD_OPT_IOS_SIMULATOR')
-		if self.build.switches.ios_device():
-			defines.append('RAD_OPT_IOS_DEVICE')
 
 		if self.build.osx():
 			defines.append('RAD_OPT_OSX')

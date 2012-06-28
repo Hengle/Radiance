@@ -9,9 +9,6 @@ Import('variant_dir')
 Import('radiance_engine')
 (build, source) = radvars
 
-if build.ios():
-	source = source.Clone()
-	
 def getbuilder():
 	if build.tools() and build.pc():
 		x = build.qtBuilder('Main', build, source, '.', variant_dir, 'LIB')
@@ -28,12 +25,6 @@ if build.pc():
 
 if build.osx(): #OSX always launches via SDL
 	x.add('SDLMain.m')
-	
-if build.ios():
-	if build.switches.ios_simulator():
-		build.backend.addCCFlag(x.source, ['-fobjc-abi-version=2', '-fobjc-legacy-dispatch'])
-	build.backend.addCCFlag(x.source, ['-fpascal-strings'])
-	x.add('IOSMain.mm')
 	
 ###############################################################################
 # Export

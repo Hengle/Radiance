@@ -7,7 +7,7 @@
 
 #include "FileDef.h"
 #include "../TimeDef.h"
-#include "../Container/ZoneMap.h"
+#include "../Container/ZoneVector.h"
 #include <stdio.h>
 
 namespace file {
@@ -83,18 +83,18 @@ public:
 		const char *path, 
 		FileOptions options = kFileOption_None,
 		int mask = kFileMask_Any
-	) const;
+	);
 
 	//! Adds a pak file to be used when resolving relative paths.
 	/*! \sa addDirectory() */
 	void addPakFile(
-		const PakFileRef &file, 
+		const PakFileRef &pakFile, 
 		int mask = kFileMask_All
 	);
 
 	//! Removes a pak file from the resolvers list for relative paths. 
 	/*! \sa addPakFile() */
-	void removePakFile(const PakFileRef &file);
+	void removePakFile(const PakFileRef &pakFile);
 	//! Removes all pak files from the resolvers list for relative paths. */
 	/*! \sa addPakFile() */
 	void removePakFiles();
@@ -116,30 +116,33 @@ public:
 	);
 
 	//! Opens a memory mapped file.
-	MMFileRef openFile(
+	virtual MMFileRef openFile(
 		const char *path,
 		FileOptions options = kFileOption_None,
 		int mask = kFileMask_Any,
 		int *resolved = 0
-	);
+	) = 0;
 
 	//! Opens a wild-card file search.
-	FileSearchRef openSearch(
+	virtual FileSearchRef openSearch(
 		const char *path,
 		FileOptions options = kFileOption_None,
 		int mask = kFileMask_Any
-	);
+	) = 0;
 
 	//! Expands a relative path into an absolute path.
-	/*! \param path An relative path of the form alias:/path. 
+	/*! \param path A relative path of the form alias:/path. 
 		\param exclude Any directories matching any bits in the exclude mask will not 
 		       be used.
 		\param resolved optional parameter that contains the mask of the path that was
 		       used to resolve the path.
+
+		\note The returned absolute path will only reference a disk path. You cannot access 
+		pak files via absolute paths.
 	*/
 	bool getAbsolutePath(
 		const char *path, 
-		String &expanded,
+		String &absPath,
 		int mask = kFileMask_Any,
 		int exclude = 0,
 		int *resolved = 0
@@ -147,37 +150,46 @@ public:
 
 	//! Expands an absolute path to a native path that can be used by stdio and other
 	//! OS level functions.
-	/*! \note Only absolute paths are accepted by this function. Using a relative path
-		will fail. */
 	bool getNativePath(
 		const char *path,
 		String &nativePath
 	);
 
+	//! Returns true if the file exists.
+	/*! The location that the file was found in is returned by the optional \em resolved
+		parameter. */
+	bool fileExists(
+		const char *path,
+		FileOptions options = kFileOption_None,
+		int mask = kFileMask_Any,
+		int exclude = 0,
+		int *resolved = 0
+	);
+
 	//! Gets the TimeDate object for the specified file.
 	/*! \note Only absolute paths are accepted by this function. Using a relative path
 		will fail. */
-	bool getFileTime(
+	virtual bool getFileTime(
 		const char *path,
 		xtime::TimeDate &td,
 		FileOptions options = kFileOption_None
-	);
+	) = 0;
 
 	//! Deletes the specified file.
 	/*! \note Only absolute paths are accepted by this function. Using a relative path
 		will fail. */
-	bool deleteFile(
+	virtual bool deleteFile(
 		const char *path,
 		FileOptions options = kFileOption_None
-	);
+	) = 0;
 
 	//! Deletes the specified directory.
 	/*! \note Only absolute paths are accepted by this function. Using a relative path
 		will fail. */
-	bool deleteDirectory(
+	virtual bool deleteDirectory(
 		const char *path,
 		FileOptions options = kFileOption_None
-	);
+	) = 0;
 
 	//! Global mask used on any file operations that take a mask.
 	/*! The value of this field does not effect addDirectory() or addPakFile() */
@@ -195,14 +207,27 @@ protected:
 	);
 
 	virtual RAD_DECLARE_GET(pageSize, int) = 0;
+	virtual bool nativeFileExists(const char *path) = 0;
 
 private:
 
 	RAD_DECLARE_GET(globalMask, int);
 	RAD_DECLARE_SET(globalMask, int);
 
-	int m_globalMask;
+	enum {
+		kAliasMax = 255
+	};
 
+	struct PathMapping {
+		typedef zone_vector<PathMapping, ZFileT>::type Vec;
+		PakFileRef pak;
+		String dir;
+		int mask;
+	};
+	
+	PathMapping::Vec m_paths;
+	boost::array<String, kAliasMax> m_aliasTable;
+	int m_globalMask;
 };
 
 //! Memory Mapped File
@@ -236,10 +261,10 @@ public:
 	//! used and should be prefetched into memory.
 	/*! \notes This function may not improve performance or may be ignored
 		by the OS. Equivelent to madvise(WILLNEED). */
-	void prefetch(
+	virtual void prefetch(
 		AddrSize offset,
 		AddrSize size
-	);
+	) = 0;
 
 	//! Returns a pointer to the mapped file data.
 	RAD_DECLARE_READONLY_PROPERTY(MMapping, data, const void*);
@@ -262,12 +287,34 @@ private:
 	AddrSize m_size;
 };
 
+//! Pak file.
+class PakFile : public boost::noncopyable {
+public:
+	typedef PakFileRef Ref;
+};
+
+//! File search
+class FileSearch : public boost::noncopyable {
+public:
+	typedef FileSearchRef Ref;
+
+	virtual bool NextFile(String &path) = 0;
+
+protected:
+
+	FileSearch();
+};
+
 // Helper functions
 
+//! Gets the file extension, including the '.'
+RADRT_API String RADRT_CALL getFileExtension(const char *path);
+
 //! Sets the extension of a file.
-/*! If null is specified for extension then the extension is removed from the file. */
+/*! If null is specified for extension then the extension is removed from the file. 
+	\param ext The extension to set, including the '.' */
 RADRT_API String RADRT_CALL setFileExtension(
-	const char *file, 
+	const char *path, 
 	const char *ext
 );
 
@@ -281,3 +328,5 @@ RADRT_API String RADRT_CALL getBaseFileName(const char *path);
 RADRT_API String RADRT_CALL getFilePath(const char *path);
 
 } // file
+
+#include "File.inl"

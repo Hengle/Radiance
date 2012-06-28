@@ -227,10 +227,6 @@ if build.pc():
 	x.add('Renderer/PC/RBackend.cpp')
 	x.add('Renderer/PC/RBAssets.cpp')
 	x.add('Game/GameNetworkNull.cpp')
-	
-if build.ios():
-	x.add('Renderer/IOS/RBackend.cpp')
-	x.add('Renderer/IOS/RBAssets.cpp')
 
 if build.gl():
 	x.add('Renderer/GL/GLMaterial.cpp')

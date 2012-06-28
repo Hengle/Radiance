@@ -29,8 +29,6 @@ class NodeGen:
 	def __init__(self, name, build, source, root, variant, type, objs, setupEnv=True):
 		self.uic = None
 		self.name = name
-		if build.switches.ios_device() and build.switches.ios_universal_binary():
-			self.name = name + '-' + build.switches.architecture()
 		self.build = build
 		self.type = type
 		self.uic_depends = []
@@ -211,9 +209,6 @@ class BuildPlatform:
 		if s == 'windows': s = 'win'
 		if s == 'darwin': s = 'osx'
 		return s
-	
-	def ios(self):
-		return self.system() == 'ios'
 		
 	def osx(self):
 		return self.system() == 'osx'
@@ -222,10 +217,10 @@ class BuildPlatform:
 		return self.system() == 'linux'
 		
 	def pthreads(self):
-		return self.linux() or self.osx() or self.ios()
+		return self.linux() or self.osx()
 
 	def pfiles(self):
-		return self.linux() or self.osx() or self.ios()
+		return self.linux() or self.osx()
 
 	def win(self):
 		return self.system() == 'win'
@@ -237,7 +232,7 @@ class BuildPlatform:
 		return False
 	
 	def console(self):
-		return self.xbox360() or self.ps3() or self.ios()
+		return self.xbox360() or self.ps3()
 		
 	def pc(self):
 		return not self.console()
@@ -315,10 +310,7 @@ class BuildTarget(BuildPlatform):
 		if self.backend is None: raise UserError('unable to find target backend for: ' + self.system() + '-' + self.compiler())
 
 		self.backend = self.backend.create(self)
-		if self.switches.ios_device():
-			print('target: ' + self.backend.target() + '-' + switches.targetName() + '-' + switches.architecture())
-		else:
-			print('target: ' + self.backend.target() + '-' + switches.targetName())
+		print('target: ' + self.backend.target() + '-' + switches.targetName())
 	
 	def tools(self):
 		return not self.switches.golden()
@@ -336,8 +328,6 @@ class BuildTarget(BuildPlatform):
 		return '/' + self.backend.target() + '-' + self.switches.targetName()
 		
 	def targetDir(self):
-		if self.switches.ios_device() and self.switches.ios_universal_binary():
-			return self.__targetDir__() + '-' + self.switches.architecture()
 		return self.__targetDir__();
 
 	def absPath(self, p):
