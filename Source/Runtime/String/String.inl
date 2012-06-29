@@ -23,11 +23,6 @@ inline CharBuf<Traits>::CharBuf(const details::DataBlock::Ref &data, ::Zone &zon
 }
 
 template <typename Traits>
-inline CharBuf<Traits>::operator unspecified_bool_type () const {
-	return IsValid() ? &bool_true : 0;
-}
-
-template <typename Traits>
 inline typename CharBuf<Traits>::SelfType &CharBuf<Traits>::operator = (const SelfType &buf) {
 	m_data = buf.m_data;
 	m_zone = buf.m_zone;
@@ -372,7 +367,7 @@ inline String String::NJoin(const wchar_t *sz, int len) const {
 
 inline String String::SubStrBytes(int first, int count) const {
 	RAD_ASSERT(first < length);
-	RAD_ASSERT((first+count) < length);
+	RAD_ASSERT((first+count) <= length);
 
 	return String(
 		c_str.get() + first,
@@ -412,10 +407,6 @@ inline String String::LeftBytes(int count) const {
 inline String String::RightBytes(int count) const {
 	int ofs = length - count;
 	return SubStrBytes(ofs, count);
-}
-
-inline String::operator unspecified_bool_type () const {
-	return !empty.get() ? &String::bool_true : 0;
 }
 
 inline bool String::operator == (const String &str) const {
@@ -835,15 +826,8 @@ inline bool String::RAD_IMPLEMENT_GET(empty) {
 	return !m_data;
 }
 
-} // string
-
-inline string::String CStr(const char *sz) {
-	return string::String(sz, string::RefTag);
-}
-
-
 template<class CharType, class Traits>
-std::basic_istream<CharType, Traits>& operator >> (std::basic_istream<CharType, Traits> &stream, string::String &string) {
+std::basic_istream<CharType, Traits>& operator >> (std::basic_istream<CharType, Traits> &stream, String &string) {
 	std::string x;
 	stream >> x;
 	string = x.c_str();
@@ -852,9 +836,15 @@ std::basic_istream<CharType, Traits>& operator >> (std::basic_istream<CharType, 
 
 
 template<class CharType, class Traits>
-std::basic_ostream<CharType, Traits>& operator << (std::basic_ostream<CharType, Traits> &stream, const string::String &string) {
+std::basic_ostream<CharType, Traits>& operator << (std::basic_ostream<CharType, Traits> &stream, const String &string) {
 	stream << string.c_str.get();
 	return stream;
+}
+
+} // string
+
+inline string::String CStr(const char *sz) {
+	return string::String(sz, string::RefTag);
 }
 
 #include "../PopSystemMacros.h"

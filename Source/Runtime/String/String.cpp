@@ -448,7 +448,7 @@ String &String::EraseBytes(int ofs, int count) {
 }
 
 String &String::NAppendBytes(const String &str, int len) {
-	if (str && len) {
+	if (!str.empty && len) {
 		int orglen = length;
 		m_data = details::DataBlock::Resize(m_data, orglen + len + 1, *m_zone);
 		char *sz = (char*)m_data->m_buf;

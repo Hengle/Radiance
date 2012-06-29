@@ -11,19 +11,15 @@
 
 namespace file {
 
+///////////////////////////////////////////////////////////////////////////////
+
 class WinFileSystem : public FileSystem {
 public:
 
 	WinFileSystem(
 		const char *root,
-		const char *dvd
-	);
-
-	virtual MMFileRef openFile(
-		const char *path,
-		FileOptions options,
-		int mask,
-		int *resolved
+		const char *dvd,
+		AddrSize pageSize
 	);
 
 	virtual FileSearchRef openSearch(
@@ -57,33 +53,70 @@ public:
 protected:
 
 	virtual bool nativeFileExists(const char *path);
+	virtual MMFileRef nativeOpenFile(const char *path);
 
 private:
 
 	bool deleteDirectory_r(const char *nativePath);
 
+	AddrSize m_pageSize;
 };
+
+///////////////////////////////////////////////////////////////////////////////
 
 class WinMMFile : public MMFile {
 public:
+
+	~WinMMFile();
 
 	virtual MMappingRef mmap(
 		AddrSize ofs, 
 		AddrSize size
 	);
+
+protected:
+
+	virtual RAD_DECLARE_GET(size, AddrSize);
+
+private:
+
+	friend class WinFileSystem;
+
+	WinMMFile(HANDLE f, HANDLE m, AddrSize pageSize);
+
+	HANDLE m_f, m_m;
+	AddrSize m_pageSize;
 };
+
+///////////////////////////////////////////////////////////////////////////////
 
 class WinMMapping : public MMapping {
 public:
 
-	WinMMapping();
+	~WinMMapping();
 
 	virtual void prefetch(
 		AddrSize offset,
 		AddrSize size
 	);
 
+private:
+
+	friend class WinMMFile;
+
+	WinMMapping(
+		const MMFile::Ref &file,
+		const void *base,
+		const void *data,
+		AddrSize size,
+		AddrSize offset
+	);
+
+	MMFile::Ref m_file; // keeps the file open.
+	const void *m_base;
 };
+
+///////////////////////////////////////////////////////////////////////////////
 
 class WinFileSearch : public FileSearch {
 public:

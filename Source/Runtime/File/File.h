@@ -6,6 +6,7 @@
 #pragma once
 
 #include "FileDef.h"
+#include "../Stream.h"
 #include "../TimeDef.h"
 #include "../Container/ZoneVector.h"
 #include <stdio.h>
@@ -64,12 +65,12 @@ public:
 
 	//! Sets the value of an alias.
 	void setAlias(
-		const char *name,
+		char name,
 		const char *path
 	);
 
 	//! Gets the value of the specified alias.
-	string::String alias(const char *name);
+	string::String alias(char name);
 
 	//! Adds a directory to be used when resolving relative paths.
 	/*! \sa addPakFile() */
@@ -116,12 +117,13 @@ public:
 	);
 
 	//! Opens a memory mapped file.
-	virtual MMFileRef openFile(
+	MMFileRef openFile(
 		const char *path,
 		FileOptions options = kFileOptions_None,
 		int mask = kFileMask_Any,
+		int exclude = 0,
 		int *resolved = 0
-	) = 0;
+	);
 
 	//! Opens a wild-card file search.
 	virtual FileSearchRef openSearch(
@@ -212,6 +214,7 @@ protected:
 	);
 
 	virtual bool nativeFileExists(const char *path) = 0;
+	virtual MMFileRef nativeOpenFile(const char *path) = 0;
 
 private:
 
@@ -235,7 +238,7 @@ private:
 };
 
 //! Memory Mapped File
-class MMFile : public boost::noncopyable {
+class MMFile : public boost::noncopyable, public boost::enable_shared_from_this<MMFile> {
 public:
 	typedef MMFileRef Ref;
 
@@ -274,21 +277,26 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(MMapping, data, const void*);
 	//! Returns the size of the mapping window.
 	RAD_DECLARE_READONLY_PROPERTY(MMapping, size, AddrSize);
+	//! Returns the offset into the file this mapping object represents.
+	RAD_DECLARE_READONLY_PROPERTY(MMapping, offset, AddrSize);
 
 protected:
 
 	MMapping(
 		const void *data,
-		AddrSize size
+		AddrSize size,
+		AddrSize offset
 	);
 
 private:
 
 	RAD_DECLARE_GET(data, const void*);
 	RAD_DECLARE_GET(size, AddrSize);
+	RAD_DECLARE_GET(offset, AddrSize);
 
 	const void *m_data;
 	AddrSize m_size;
+	AddrSize m_offset;
 };
 
 //! File search
@@ -311,6 +319,79 @@ protected:
 class PakFile : public boost::noncopyable {
 public:
 	typedef PakFileRef Ref;
+
+	MMFileRef openFile(const char *path);
+	bool fileExists(const char *path);
+};
+
+//! Stream InputBuffer for MMFile's
+class MMFileInputBuffer : public boost::noncopyable, public stream::IInputBuffer {
+public:
+	typedef MMFileInputBufferRef Ref;
+	
+	MMFileInputBuffer(
+		const MMFile::Ref &file,
+		AddrSize bufSize = 64*Kilo
+	);
+
+	virtual stream::SPos Read(void *buf, stream::SPos numBytes, UReg *errorCode);
+	virtual bool SeekIn(stream::Seek seekType, stream::SPos ofs, UReg* errorCode);
+	virtual stream::SPos InPos() const;
+	virtual stream::SPos Size()  const;
+
+	virtual UReg InCaps() const;
+	virtual UReg InStatus() const;
+
+private:
+
+	MMFile::Ref m_file;
+	MMapping::Ref m_mmap;
+	stream::SPos m_pos;
+	stream::SPos m_bufSize;
+};
+
+//! Stream InputBuffer for FILE*
+class FILEInputBuffer : public boost::noncopyable, public stream::IInputBuffer {
+public:
+	typedef FILEInputBufferRef Ref;
+
+	FILEInputBuffer(FILE *fp);
+
+	virtual stream::SPos Read(void *buff, stream::SPos numBytes, UReg *errorCode);
+	virtual bool SeekIn(stream::Seek seekType, stream::SPos ofs, UReg* errorCode);
+	virtual stream::SPos InPos() const;
+	virtual stream::SPos Size() const;
+
+	virtual UReg InCaps() const;
+	virtual UReg InStatus() const;
+
+private:
+
+	FILE *m_fp;
+	stream::SPos m_pos;
+};
+
+//! Stream OutputBuffer for FILE*
+class FILEOutputBuffer : public boost::noncopyable, public stream::IOutputBuffer {
+public:
+	typedef FILEOutputBufferRef Ref;
+
+	FILEOutputBuffer(FILE *fp);
+
+	virtual stream::SPos Write(const void* buff, stream::SPos numBytes, UReg* errorCode);
+	virtual bool SeekOut(stream::Seek seekType, stream::SPos ofs, UReg* errorCode);
+	virtual stream::SPos OutPos() const;
+	virtual void Flush();
+
+	virtual UReg OutCaps() const;
+	virtual UReg OutStatus() const;
+
+private:
+
+	stream::SPos Size() const;
+
+	FILE *m_fp;
+	stream::SPos m_pos;
 };
 
 // Helper functions

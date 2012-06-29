@@ -35,7 +35,6 @@ public:
 	typedef CharBuf<Traits> SelfType;
 	typedef Traits TraitsType;
 	typedef typename Traits::T T;
-	typedef void (SelfType::*unspecified_bool_type) ();
 	typedef const T *const_iterator;
 
 	CharBuf();
@@ -43,7 +42,6 @@ public:
 
 	SelfType &operator = (const SelfType &buf);
 
-	operator unspecified_bool_type () const;
 	bool operator == (const SelfType &buf) const;
 	bool operator != (const SelfType &buf) const;
 
@@ -69,8 +67,6 @@ private:
 	CharBuf(const details::DataBlock::Ref &data, ::Zone &zone);
 
 	friend class String;
-
-	void bool_true() {};
 
 	RAD_DECLARE_GET(c_str, const T*);
 	RAD_DECLARE_GET(begin, const T*);
@@ -125,7 +121,6 @@ private:
  */
 class String {
 public:
-	typedef void (String::*unspecified_bool_type) ();
 	typedef const char *const_iterator;
 
 	//! Constructs an empty string.
@@ -321,9 +316,6 @@ public:
 	 */
 	String RightBytes(int count) const;
 
-	//! Boolean operator returns true if string is non-empty.
-	operator unspecified_bool_type () const;
-
 	//! Case sensitive equality test.
 	bool operator == (const String &str) const;
 	bool operator == (const char *sz) const;
@@ -469,8 +461,6 @@ public:
 
 private:
 
-	void bool_true() {}
-
 	RAD_DECLARE_GET(length, int);
 	RAD_DECLARE_GET(begin, const char*);
 	RAD_DECLARE_GET(end, const char*);
@@ -506,15 +496,18 @@ template <class C, class T> class basic_istream;
 template <class C, class T> class basic_ostream;
 }
 
+namespace string {
+
 //! Streaming support for strings.
 /*! Internally the string is converted to/from a std::string. */
 template<class CharType, class Traits>
-std::basic_istream<CharType, Traits>& operator >> (std::basic_istream<CharType, Traits> &stream, string::String &string);
+std::basic_istream<CharType, Traits>& operator >> (std::basic_istream<CharType, Traits> &stream, String &string);
 
 //! Streaming support for strings.
 template<class CharType, class Traits>
-std::basic_ostream<CharType, Traits>& operator << (std::basic_ostream<CharType, Traits> &stream, const string::String &string);
+std::basic_ostream<CharType, Traits>& operator << (std::basic_ostream<CharType, Traits> &stream, const String &string);
 
+} //string
 
 #include "../PopPack.h"
 

@@ -27,6 +27,15 @@ typedef boost::shared_ptr<MMFile> MMFileRef;
 class MMapping;
 typedef boost::shared_ptr<MMapping> MMappingRef;
 
+class MMFileInputBuffer;
+typedef boost::shared_ptr<MMFileInputBuffer> MMFileInputBufferRef;
+
+class FILEInputBuffer;
+typedef boost::shared_ptr<FILEInputBuffer> FILEInputBufferRef;
+
+class FILEOutputBuffer;
+typedef boost::shared_ptr<FILEOutputBuffer> FILEOutputBufferRef;
+
 enum {
 	RAD_FLAG(kFileMask_Base),
 	RAD_FLAG(kFileMask_Mod),

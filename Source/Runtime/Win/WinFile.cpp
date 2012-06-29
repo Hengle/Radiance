@@ -24,6 +24,7 @@ FileSystem::Ref FileSystem::create() {
 	}
 
 	cwd.replace('\\', '/');
+	cwd.lower();
 	
 	// Find DVD if there is one
 
@@ -37,8 +38,9 @@ FileSystem::Ref FileSystem::create() {
 			char path[4] = {'A' + i, ':', '\\', 0};
 			if (GetDriveTypeA(path) == DRIVE_CDROM) {
 				path[0] = 'a' + i;
-				path[2] = '/';
+				path[2] = 0;
 				sdvd = path;
+				sdvd.lower();
 				break;
 			}
 		}
@@ -47,19 +49,48 @@ FileSystem::Ref FileSystem::create() {
 	if (!sdvd.empty)
 		dvd = sdvd.c_str;
 
-	return FileSystem::Ref(new WinFileSystem(cwd.c_str, dvd));
+	SYSTEM_INFO si;
+	GetSystemInfo(&si);
+
+	return FileSystem::Ref(new WinFileSystem(cwd.c_str, dvd, (AddrSize)si.dwAllocationGranularity));
 }
 
-WinFileSystem::WinFileSystem(const char *root, const char *dvd) : FileSystem(root, dvd) {
+WinFileSystem::WinFileSystem(
+	const char *root, 
+	const char *dvd,
+	AddrSize pageSize
+) : FileSystem(root, dvd), m_pageSize(pageSize) {
 }
 
-MMFileRef WinFileSystem::openFile(
-	const char *path,
-	FileOptions options,
-	int mask,
-	int *resolved
-) {
-	return MMFileRef();
+MMFile::Ref WinFileSystem::nativeOpenFile(const char *path) {
+	HANDLE f = CreateFileA(
+		path,
+		GENERIC_READ,
+		FILE_SHARE_READ,
+		0,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		0
+	);
+
+	if (f == INVALID_HANDLE_VALUE)
+		return MMFileRef();
+
+	HANDLE m = CreateFileMapping(
+		f,
+		0,
+		PAGE_READONLY,
+		0,
+		0,
+		0
+	);
+
+	if (m == INVALID_HANDLE_VALUE) {
+		CloseHandle(f);
+		return MMFileRef();
+	}
+
+	return MMFile::Ref(new (ZFile) WinMMFile(f, m, m_pageSize));
 }
 
 FileSearch::Ref WinFileSystem::openSearch(
@@ -250,6 +281,59 @@ bool WinFileSystem::nativeFileExists(const char *path) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+WinMMFile::WinMMFile(HANDLE f, HANDLE m, AddrSize pageSize) : m_f(f), m_m(m), m_pageSize(pageSize) {
+}
+
+WinMMFile::~WinMMFile() {
+	if (m_m != INVALID_HANDLE_VALUE)
+		CloseHandle(m_m);
+	if (m_f != INVALID_HANDLE_VALUE)
+		CloseHandle(m_f);
+}
+
+MMapping::Ref WinMMFile::mmap(AddrSize ofs, AddrSize size) {
+	
+	AddrSize base = ofs & ~(m_pageSize-1);
+	AddrSize padd = ofs - base;
+	
+	const void *pbase = MapViewOfFile(
+		m_m,
+		FILE_MAP_READ,
+		0,
+		(DWORD)base,
+		(DWORD)(size + padd)
+	);
+
+	const void *data = reinterpret_cast<const U8*>(pbase) + padd;
+	return MMapping::Ref(new (ZFile) WinMMapping(shared_from_this(), pbase, data, size, ofs));
+}
+
+AddrSize WinMMFile::RAD_IMPLEMENT_GET(size) {
+	return (AddrSize)GetFileSize(m_f, 0);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+WinMMapping::WinMMapping(
+	const MMFile::Ref &file,
+	const void *base,
+	const void *data,
+	AddrSize size,
+	AddrSize offset
+) : MMapping(data, size, offset), m_file(file), m_base(base) {
+}
+
+WinMMapping::~WinMMapping() {
+	UnmapViewOfFile(m_base);
+}
+
+void WinMMapping::prefetch(AddrSize offset, AddrSize size) {
+	RAD_NOT_USED(offset);
+	RAD_NOT_USED(size);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 FileSearch::Ref WinFileSearch::create(
 	const string::String &path,
 	const string::String &prefix,
@@ -263,6 +347,7 @@ FileSearch::Ref WinFileSearch::create(
 		if (sz[i] == '/' || sz[i] == '\\') {
 			dir = String(sz, i, CopyTag);
 			pattern = path.substr(i); // include the leading '/'
+			break;
 		}
 	}
 
@@ -298,7 +383,6 @@ WinFileSearch::WinFileSearch(
 	m_state(kState_Files), 
 	m_h(INVALID_HANDLE_VALUE) 
 {
-	m_prefix += "/";
 }
 
 WinFileSearch::~WinFileSearch() {
@@ -326,7 +410,9 @@ bool WinFileSearch::nextFile(
 			}
 		}
 
-		const String kFileName(CStr(m_fd.cFileName));
+		char kszFileName[256];
+		cpy(kszFileName, m_fd.cFileName);
+		const String kFileName(CStr(kszFileName));
 		m_fd.cFileName[0] = 0;
 
 		if (kFileName == "." || kFileName == "..")
@@ -336,14 +422,14 @@ bool WinFileSearch::nextFile(
 			if (m_state == kState_Dirs) {
 				path = m_path + "/" + kFileName;
 				m_subDir = create(path + m_pattern, m_prefix + kFileName + "/", m_options);
-				if (m_subDir->nextFile(path, fileAttributes, fileTime))
+				if (m_subDir && m_subDir->nextFile(path, fileAttributes, fileTime))
 					return true;
 				m_subDir.reset();
 			}
 		} else if(m_state == kState_Files) {
 
 			if (m_prefix.empty) {
-				path = kFileName;
+				path = String(kFileName, CopyTag); // move off of stack.
 			} else {
 				path = m_prefix + kFileName;
 			}
@@ -396,6 +482,8 @@ WinFileSearch::State WinFileSearch::nextState() {
 			if (m_h == INVALID_HANDLE_VALUE)
 				++m_state;
 		}
+	} else if (m_state == kState_Dirs) {
+		++m_state;
 	}
 	return (State)m_state;
 }

@@ -35,10 +35,29 @@ FileSystem::FileSystem(const char *root, const char *dvd)
 : m_globalMask(kFileMask_Any) {
 	RAD_ASSERT(root);
 
-	m_aliasTable['r'] = root;
-
+	setAlias('r', root);
+	
 	if (dvd)
-		m_aliasTable['d'] = dvd;
+		setAlias('d', dvd);
+}
+
+void FileSystem::setAlias(
+	char name,
+	const char *path
+) {
+	RAD_ASSERT(path);
+	
+	String &alias = m_aliasTable[name];
+
+	alias = path;
+
+	if (!alias.empty) {
+		char trailing = *(alias.end.get()-1);
+		if (trailing == '/' || trailing == '\\') {
+			// drop the /
+			alias = alias.substr(0, alias.length - 1);
+		}
+	}
 }
 
 void FileSystem::addDirectory(
@@ -52,12 +71,12 @@ void FileSystem::addDirectory(
 	m_paths.push_back(m);
 }
 
-PakFileRef FileSystem::openPakFile(
+PakFile::Ref FileSystem::openPakFile(
 	const char *path,
 	FileOptions options,
 	int mask
 ) {
-	return PakFileRef();
+	return PakFile::Ref();
 }
 
 void FileSystem::addPakFile(
@@ -125,6 +144,61 @@ FILE *FileSystem::fopen(
 	return ::fopen(spath.c_str, mode);
 }
 
+MMFile::Ref FileSystem::openFile(
+	const char *path,
+	FileOptions options,
+	int mask,
+	int exclude,
+	int *resolved
+) {
+	mask &= m_globalMask;
+
+	if (options & kFileOption_NativePath)
+		return nativeOpenFile(path);
+
+	if (isAbsPath(path)) {
+		String nativePath;
+		if (!getNativePath(path, nativePath))
+			return MMFile::Ref();
+		return nativeOpenFile(nativePath.c_str);
+	}
+
+	const String kPath(CStr(path));
+
+	if (resolved)
+		*resolved = 0;
+
+	for (PathMapping::Vec::const_iterator it = m_paths.begin(); it != m_paths.end(); ++it) {
+		const PathMapping &m = *it;
+
+		if (m.mask&exclude)
+			continue;
+		if (m.mask&mask) {
+
+			if (m.pak) {
+				MMFileRef r = m.pak->openFile(kPath.c_str);
+				if (r) {
+					if (resolved)
+						*resolved = m.mask;
+					return r;
+				}
+			} else {
+				String spath = m.dir + kPath;
+				if (!getNativePath(spath.c_str, spath))
+					return MMFileRef();
+				MMFileRef r = nativeOpenFile(spath.c_str);
+				if (r) {
+					if (resolved)
+						*resolved = m.mask;
+					return r;
+				}
+			}
+		}
+	}
+
+	return MMFile::Ref();
+}
+
 bool FileSystem::getAbsolutePath(
 	const char *path, 
 	String &absPath,
@@ -189,7 +263,7 @@ bool FileSystem::getNativePath(
 		RAD_ASSERT_MSG(!m_touched[alias], "Expanding recursive file system alias!");
 		m_touched[alias] = true;
 #endif
-		spath = m_aliasTable[alias] + spath.substr(3);
+		spath = m_aliasTable[alias] + spath.substr(3); // include '/' separator.
 	}
 
 	nativePath = spath;
@@ -228,7 +302,11 @@ bool FileSystem::fileExists(
 		if (m.mask&mask) {
 
 			if (m.pak) {
-				// TODO: Handle Pak Files
+				if (m.pak->fileExists(kPath.c_str)) {
+					if (resolved)
+						*resolved = m.mask;
+					return true;
+				}
 			} else {
 				String spath = m.dir + kPath;
 				if (!getNativePath(spath.c_str, spath))
@@ -243,6 +321,157 @@ bool FileSystem::fileExists(
 	}
 
 	return false;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+MMFile::Ref PakFile::openFile(const char *path) {
+	return MMFile::Ref();
+}
+
+bool PakFile::fileExists(const char *path) {
+	return false;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+MMFileInputBuffer::MMFileInputBuffer(
+	const MMFile::Ref &file,
+	AddrSize bufSize
+) : m_file(file), m_bufSize(bufSize) {
+	RAD_ASSERT(bufSize);
+}
+
+stream::SPos MMFileInputBuffer::Read(void *buf, stream::SPos numBytes, UReg *errorCode) {
+
+	U8 *bytes = reinterpret_cast<U8*>(buf);
+	stream::SPos bytesRead = 0;
+	const stream::SPos kFileSize = Size();
+	stream::SPos bytesLeftInFile = kFileSize - m_pos;
+
+	while ((numBytes > 0) && (bytesLeftInFile > 0)) {
+
+		if (m_mmap) {
+			// see if we have a valid window to read.
+			stream::SPos size = (stream::SPos)m_mmap->size.get();
+			stream::SPos offset = (stream::SPos)m_mmap->offset.get();
+
+			if (m_pos >= offset+size) { // no more data left in this mapping
+				m_mmap.reset();
+			}
+		}
+
+		// generate a new mapping?
+		if (!m_mmap) {
+			AddrSize bufSize = m_bufSize;
+			if (bufSize > bytesLeftInFile)
+				bufSize = bytesLeftInFile;
+
+			m_mmap = m_file->mmap(m_pos, bufSize);
+			if (!m_mmap)
+				break; // error.
+		}
+
+		// copy
+		stream::SPos mmSize = (stream::SPos)m_mmap->size.get();
+		stream::SPos mmBase = (stream::SPos)m_mmap->offset.get();
+		stream::SPos mmOffset = m_pos - mmBase;
+		stream::SPos mmR = mmSize - mmOffset;
+
+		RAD_ASSERT(mmR > 0);
+
+		if (mmR > numBytes)
+			mmR = numBytes;
+		if (mmR > bytesLeftInFile)
+			mmR = bytesLeftInFile;
+
+		const U8 *src = reinterpret_cast<const U8*>(m_mmap->data.get()) + mmOffset;
+		memcpy(bytes, src, mmR);
+		bytes += mmR;
+		numBytes -= mmR;
+		bytesLeftInFile -= mmR;
+	}
+
+	stream::SetErrorCode(errorCode, (numBytes>0)?stream::ErrorUnderflow:stream::Success);
+	return bytesRead;
+}
+
+bool MMFileInputBuffer::SeekIn(stream::Seek seekType, stream::SPos ofs, UReg* errorCode) {
+	bool b = stream::CalcSeekPos(seekType, ofs, m_pos, Size(), &ofs);
+	if (b) {
+		m_pos = ofs;
+		stream::SetErrorCode(errorCode, stream::Success);
+	} else {
+		SetErrorCode(errorCode, stream::ErrorBadSeekPos);
+	}
+	return b;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+FILEInputBuffer::FILEInputBuffer(FILE *fp) : m_fp(fp) {
+	RAD_ASSERT(fp);
+	m_pos = (stream::SPos)ftell(fp);
+}
+
+stream::SPos FILEInputBuffer::Read(void *buff, stream::SPos numBytes, UReg *errorCode) {
+	fseek(m_fp, m_pos, SEEK_SET);
+	stream::SPos read = (stream::SPos)fread(buff, 1, numBytes, m_fp);
+	stream::SetErrorCode(errorCode, (read<numBytes) ? stream::Success : stream::ErrorUnderflow);
+	m_pos += read;
+	return read;
+}
+
+bool FILEInputBuffer::SeekIn(stream::Seek seekType, stream::SPos ofs, UReg* errorCode) {
+	bool b = stream::CalcSeekPos(seekType, ofs, m_pos, Size(), &ofs);
+	if (b) {
+		m_pos = ofs;
+		stream::SetErrorCode(errorCode, stream::Success);
+	} else {
+		SetErrorCode(errorCode, stream::ErrorBadSeekPos);
+	}
+	return b;
+}
+
+stream::SPos FILEInputBuffer::Size()  const {
+	size_t x = ftell(m_fp);
+	fseek(m_fp, 0, SEEK_END);
+	size_t s = ftell(m_fp);
+	fseek(m_fp, (long)x, SEEK_SET);
+	return (stream::SPos)s;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+FILEOutputBuffer::FILEOutputBuffer(FILE *fp) : m_fp(fp) {
+	RAD_ASSERT(fp);
+	m_pos = (stream::SPos)ftell(fp);
+}
+
+stream::SPos FILEOutputBuffer::Write(const void* buff, stream::SPos numBytes, UReg* errorCode) {
+	fseek(m_fp, m_pos, SEEK_SET);
+	stream::SPos write = (stream::SPos)fwrite(buff, 1, numBytes, m_fp);
+	SetErrorCode(errorCode, (write<numBytes) ? stream::ErrorUnderflow : stream::Success );
+	m_pos += write;
+	return write;
+}
+
+bool FILEOutputBuffer::SeekOut(stream::Seek seekType, stream::SPos ofs, UReg* errorCode) {
+	bool b = stream::CalcSeekPos(seekType, ofs, m_pos, Size(), &ofs);
+	if (b) {
+		m_pos = ofs;
+		stream::SetErrorCode(errorCode, stream::Success);
+	} else {
+		SetErrorCode(errorCode, stream::ErrorBadSeekPos);
+	}
+	return b;
+}
+
+stream::SPos FILEOutputBuffer::Size()  const {
+	size_t x = ftell(m_fp);
+	fseek(m_fp, 0, SEEK_END);
+	size_t s = ftell(m_fp);
+	fseek(m_fp, (long)x, SEEK_SET);
+	return (stream::SPos)s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
