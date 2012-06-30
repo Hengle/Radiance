@@ -70,7 +70,7 @@ public:
 
 UReg InputStream::PipeToStream(OutputStream& outputStream, SPos* bytesRead, SPos numBytesToPipe, PipeFlags pipeFlags)
 {
-	const int SIZE = 256;
+	const int SIZE = Kilo*16;
 	S8 bytes[SIZE];
 	Pump np;
 

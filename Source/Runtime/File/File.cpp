@@ -6,6 +6,7 @@
 #include "File.h"
 
 using namespace string;
+using namespace data_codec::lmp;
 
 namespace file {
 
@@ -74,8 +75,13 @@ void FileSystem::addDirectory(
 PakFile::Ref FileSystem::openPakFile(
 	const char *path,
 	FileOptions options,
-	int mask
+	int mask,
+	int exclude,
+	int *resolved
 ) {
+	MMFile::Ref file = openFile(path, options, mask, exclude, resolved);
+	if (file)
+		return PakFile::open(file);
 	return PakFile::Ref();
 }
 
@@ -154,16 +160,18 @@ MMFile::Ref FileSystem::openFile(
 	mask &= m_globalMask;
 
 	if (options & kFileOption_NativePath)
-		return nativeOpenFile(path);
+		return nativeOpenFile(path, options);
 
 	if (isAbsPath(path)) {
 		String nativePath;
 		if (!getNativePath(path, nativePath))
 			return MMFile::Ref();
-		return nativeOpenFile(nativePath.c_str);
+		return nativeOpenFile(nativePath.c_str, options);
 	}
 
 	const String kPath(CStr(path));
+
+	RAD_ASSERT_MSG(kPath[0] != '/', "Relative paths should never being with a '/'!");
 
 	if (resolved)
 		*resolved = 0;
@@ -183,10 +191,13 @@ MMFile::Ref FileSystem::openFile(
 					return r;
 				}
 			} else {
-				String spath = m.dir + kPath;
+				String spath;
+				
+				spath = m.dir + "/" + kPath;
+			
 				if (!getNativePath(spath.c_str, spath))
 					return MMFileRef();
-				MMFileRef r = nativeOpenFile(spath.c_str);
+				MMFileRef r = nativeOpenFile(spath.c_str, options);
 				if (r) {
 					if (resolved)
 						*resolved = m.mask;
@@ -214,6 +225,10 @@ bool FileSystem::getAbsolutePath(
 		return true;
 	}
 
+	const String kPath(CStr(path));
+
+	RAD_ASSERT_MSG(kPath[0] != '/', "Relative paths should never being with a '/'!");
+
 	for (PathMapping::Vec::const_iterator it = m_paths.begin(); it != m_paths.end(); ++it) {
 		const PathMapping &m = *it;
 
@@ -222,14 +237,9 @@ bool FileSystem::getAbsolutePath(
 		if (m.mask&exclude)
 			continue;
 		if (m.mask&mask) {
-			const String kPath(CStr(path));
-
-			if (kPath[0] != '/') {
-				absPath = m.dir + "/" + kPath;
-			} else {
-				absPath = m.dir + kPath;
-			}
-
+		
+			absPath = m.dir + "/" + kPath;
+			
 			if (resolved)
 				*resolved = m.mask;
 			return true;
@@ -324,21 +334,71 @@ bool FileSystem::fileExists(
 }
 ///////////////////////////////////////////////////////////////////////////////
 
+PakFile::Ref PakFile::open(const MMFile::Ref &file) {
+	PakFile::Ref r(new (ZFile) PakFile(file));
+
+	MMFileInputBuffer ib(file, 1*Meg);
+	stream::InputStream is(ib);
+
+	if (!r->m_pak.LoadLumpInfo(kDPakSig, kDPakMagic, is, data_codec::lmp::LittleEndian))
+		r.reset();
+
+	return r;
+}
+
+PakFile::PakFile(const MMFile::Ref &file) : m_file(file) {
+}
+
 MMFile::Ref PakFile::openFile(const char *path) {
-	return MMFile::Ref();
+	MMFile::Ref r;
+
+	const StreamReader::Lump *l = m_pak.GetByName(path);
+	if (l)
+		r.reset(new (ZFile) MMPakEntry(shared_from_this(), *l));
+	return r;
 }
 
 bool PakFile::fileExists(const char *path) {
-	return false;
+	return m_pak.GetByName(path) != 0;
+}
+
+int PakFile::RAD_IMPLEMENT_GET(numLumps) {
+	return (int)m_pak.NumLumps();
+}
+
+const data_codec::lmp::StreamReader::Lump *PakFile::lumpForIndex(int i) {
+	return m_pak.GetByIndex(i);
+}
+
+const data_codec::lmp::StreamReader::Lump *PakFile::lumpForName(const char *path) {
+	return m_pak.GetByName(path);
+}
+
+PakFile::MMPakEntry::MMPakEntry(
+	const PakFileRef &pakFile,
+	const data_codec::lmp::StreamReader::Lump &lump
+) : m_pakFile(pakFile), m_lump(lump) {
+}
+
+MMapping::Ref PakFile::MMPakEntry::mmap(AddrSize ofs, AddrSize size) {
+	RAD_ASSERT(ofs+size <= (AddrSize)m_lump.Size());
+	return m_pakFile->m_file->mmap(
+		(AddrSize)m_lump.Ofs() + ofs,
+		size
+	);
+}
+
+AddrSize PakFile::MMPakEntry::RAD_IMPLEMENT_GET(size) {
+	return (AddrSize)m_lump.Size();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 MMFileInputBuffer::MMFileInputBuffer(
 	const MMFile::Ref &file,
-	AddrSize bufSize
-) : m_file(file), m_bufSize(bufSize) {
-	RAD_ASSERT(bufSize);
+	AddrSize mappedSize
+) : m_file(file), m_bufSize(mappedSize), m_pos(0) {
+	RAD_ASSERT(mappedSize);
 }
 
 stream::SPos MMFileInputBuffer::Read(void *buf, stream::SPos numBytes, UReg *errorCode) {
@@ -355,7 +415,7 @@ stream::SPos MMFileInputBuffer::Read(void *buf, stream::SPos numBytes, UReg *err
 			stream::SPos size = (stream::SPos)m_mmap->size.get();
 			stream::SPos offset = (stream::SPos)m_mmap->offset.get();
 
-			if (m_pos >= offset+size) { // no more data left in this mapping
+			if ((m_pos < offset) || (m_pos >= offset+size)) { // no more data left in this mapping
 				m_mmap.reset();
 			}
 		}
@@ -387,6 +447,8 @@ stream::SPos MMFileInputBuffer::Read(void *buf, stream::SPos numBytes, UReg *err
 		const U8 *src = reinterpret_cast<const U8*>(m_mmap->data.get()) + mmOffset;
 		memcpy(bytes, src, mmR);
 		bytes += mmR;
+		bytesRead += mmR;
+		m_pos += mmR;
 		numBytes -= mmR;
 		bytesLeftInFile -= mmR;
 	}

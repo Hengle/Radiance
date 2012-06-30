@@ -897,9 +897,7 @@ private:
 	enum
 	{
 		LumpSig = RAD_FOURCC_LE('p', 'l', 'm', 'p'),
-		LumpId  = 0x55bddecf,
-		DPakSig = RAD_FOURCC('D', 'P', 'A', 'K'),
-		DPakMagic = 0xA3054028
+		LumpId  = 0x55bddecf
 	};
 
 	RAD_DECLARE_GET(packages, const Package::Map&) { return m_packages; }

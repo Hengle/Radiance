@@ -45,8 +45,14 @@ enum {
 	kFileMask_Any = kFileMask_All
 };
 
+enum { // pak files
+	kDPakSig = RAD_FOURCC('D', 'P', 'A', 'K'),
+	kDPakMagic = 0xA3054028
+};
+
 RAD_BEGIN_FLAGS
 	RAD_FLAG(kFileOption_NativePath),
+	RAD_FLAG(kFileOption_MapEntireFile),
 	kFileOptions_None = 0
 RAD_END_FLAGS(FileOptions)
 

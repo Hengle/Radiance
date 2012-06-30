@@ -53,7 +53,11 @@ public:
 protected:
 
 	virtual bool nativeFileExists(const char *path);
-	virtual MMFileRef nativeOpenFile(const char *path);
+	
+	virtual MMFileRef nativeOpenFile(
+		const char *path,
+		FileOptions options
+	);
 
 private:
 
@@ -82,10 +86,15 @@ private:
 
 	friend class WinFileSystem;
 
-	WinMMFile(HANDLE f, HANDLE m, AddrSize pageSize);
+	WinMMFile(
+		HANDLE f, 
+		HANDLE m, 
+		AddrSize pageSize
+	);
 
 	HANDLE m_f, m_m;
 	AddrSize m_pageSize;
+	MMapping::Ref m_mm; // only if kFileOption_MapEntireFile is set.
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -103,6 +112,7 @@ public:
 private:
 
 	friend class WinMMFile;
+	friend class WinFileSystem;
 
 	WinMMapping(
 		const MMFile::Ref &file,

@@ -9,6 +9,7 @@
 #include "../Stream.h"
 #include "../TimeDef.h"
 #include "../Container/ZoneVector.h"
+#include "../DataCodec/LmpReader.h"
 #include <stdio.h>
 
 namespace file {
@@ -83,7 +84,9 @@ public:
 	PakFileRef openPakFile(
 		const char *path, 
 		FileOptions options = kFileOptions_None,
-		int mask = kFileMask_Any
+		int mask = kFileMask_Any,
+		int exclude = 0,
+		int *resolved = 0
 	);
 
 	//! Adds a pak file to be used when resolving relative paths.
@@ -214,7 +217,11 @@ protected:
 	);
 
 	virtual bool nativeFileExists(const char *path) = 0;
-	virtual MMFileRef nativeOpenFile(const char *path) = 0;
+
+	virtual MMFileRef nativeOpenFile(
+		const char *path,
+		FileOptions options
+	) = 0;
 
 private:
 
@@ -316,12 +323,55 @@ protected:
 };
 
 //! Pak file.
-class PakFile : public boost::noncopyable {
+class PakFile : public boost::noncopyable, public boost::enable_shared_from_this<PakFile> {
 public:
 	typedef PakFileRef Ref;
 
 	MMFileRef openFile(const char *path);
 	bool fileExists(const char *path);
+
+	const data_codec::lmp::StreamReader::Lump *lumpForIndex(int i);
+	const data_codec::lmp::StreamReader::Lump *lumpForName(const char *path);
+
+	RAD_DECLARE_READONLY_PROPERTY(PakFile, numLumps, int);
+
+private:
+
+	friend class FileSystem;
+	friend class MMPakEntry;
+
+	class MMPakEntry : public MMFile {
+	public:
+
+		MMPakEntry(
+			const PakFileRef &pakFile,
+			const data_codec::lmp::StreamReader::Lump &lump
+		);
+
+		virtual MMappingRef mmap(
+			AddrSize ofs, 
+			AddrSize size
+		);
+
+	protected:
+
+		virtual RAD_DECLARE_GET(size, AddrSize);
+
+	private:
+
+		PakFileRef m_pakFile;
+		const data_codec::lmp::StreamReader::Lump &m_lump;
+	};
+
+	static Ref open(const MMFileRef &file);
+
+	PakFile(const MMFileRef &file);
+
+	RAD_DECLARE_GET(numLumps, int);
+
+	MMFileRef m_file;
+	data_codec::lmp::StreamReader m_pak;
+
 };
 
 //! Stream InputBuffer for MMFile's
@@ -331,7 +381,7 @@ public:
 	
 	MMFileInputBuffer(
 		const MMFile::Ref &file,
-		AddrSize bufSize = 64*Kilo
+		AddrSize mappedSize = 8*Meg
 	);
 
 	virtual stream::SPos Read(void *buf, stream::SPos numBytes, UReg *errorCode);

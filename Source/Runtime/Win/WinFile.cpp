@@ -62,7 +62,10 @@ WinFileSystem::WinFileSystem(
 ) : FileSystem(root, dvd), m_pageSize(pageSize) {
 }
 
-MMFile::Ref WinFileSystem::nativeOpenFile(const char *path) {
+MMFile::Ref WinFileSystem::nativeOpenFile(
+	const char *path,
+	FileOptions options
+) {
 	HANDLE f = CreateFileA(
 		path,
 		GENERIC_READ,
@@ -90,7 +93,18 @@ MMFile::Ref WinFileSystem::nativeOpenFile(const char *path) {
 		return MMFileRef();
 	}
 
-	return MMFile::Ref(new (ZFile) WinMMFile(f, m, m_pageSize));
+	MMFile::Ref r(new (ZFile) WinMMFile(f, m, m_pageSize));
+
+	if (options & kFileOption_MapEntireFile) {
+		MMapping::Ref mm = r->mmap(0, 0);
+		if (mm) {
+			static_cast<WinMMFile*>(r.get())->m_mm = mm;
+			// important otherwise we have a circular reference.
+			static_cast<WinMMapping*>(mm.get())->m_file.reset();
+		}
+	}
+
+	return r;
 }
 
 FileSearch::Ref WinFileSystem::openSearch(
@@ -285,6 +299,8 @@ WinMMFile::WinMMFile(HANDLE f, HANDLE m, AddrSize pageSize) : m_f(f), m_m(m), m_
 }
 
 WinMMFile::~WinMMFile() {
+	m_mm.reset();
+
 	if (m_m != INVALID_HANDLE_VALUE)
 		CloseHandle(m_m);
 	if (m_f != INVALID_HANDLE_VALUE)
@@ -293,6 +309,14 @@ WinMMFile::~WinMMFile() {
 
 MMapping::Ref WinMMFile::mmap(AddrSize ofs, AddrSize size) {
 	
+	RAD_ASSERT(ofs+size <= this->size.get());
+
+	if (m_mm) {
+		// we mapped the whole file just return the window
+		const void *data = reinterpret_cast<const U8*>(m_mm->data.get()) + ofs;
+		return MMapping::Ref(new (ZFile) WinMMapping(shared_from_this(), 0, data, size, ofs));
+	}
+
 	AddrSize base = ofs & ~(m_pageSize-1);
 	AddrSize padd = ofs - base;
 	
@@ -324,7 +348,8 @@ WinMMapping::WinMMapping(
 }
 
 WinMMapping::~WinMMapping() {
-	UnmapViewOfFile(m_base);
+	if (m_base)
+		UnmapViewOfFile(m_base);
 }
 
 void WinMMapping::prefetch(AddrSize offset, AddrSize size) {
