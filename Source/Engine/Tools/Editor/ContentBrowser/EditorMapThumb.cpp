@@ -40,6 +40,9 @@ void MapThumb::Play()
 void MapThumb::Play(const pkg::Package::Entry::Ref &entry)
 {
 	RAD_ASSERT(entry);
+
+	std::pair<int, int> res = View().selectedResolution();
+
 	PIEWidget *w = new (ZEditor) PIEWidget(0, 
 		Qt::Window|
 		Qt::CustomizeWindowHint|
@@ -50,7 +53,7 @@ void MapThumb::Play(const pkg::Package::Entry::Ref &entry)
 	);
 	w->setAttribute(Qt::WA_DeleteOnClose);
 	w->setWindowTitle(entry->name.get());
-	w->resize(1024, 768);
+	w->resize(res.first, res.second);
 	//PercentSize(*w, *MainWindow::Get(), 0.85f, 0.85f);
 	CenterWidget(*w, *MainWindow::Get());
 	w->show();
