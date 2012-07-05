@@ -10,7 +10,7 @@
 #include "GSPlay.h"
 #include "../World/World.h"
 #include "../Assets/MapAsset.h"
-#include "../Sound.h"
+#include "../Sound/Sound.h"
 #include <Runtime/Time.h>
 #include <Runtime/Math.h>
 #if defined(RAD_OPT_GL)
@@ -208,7 +208,7 @@ bool Game::LoadMapSeq(int id, int slot, world::UnloadDisposition ud, bool play)
 		{ // tick music
 			world::World::Ref world = mapAsset->world;
 			if (world)
-				world->sound->Tick(elapsed/1000.f, false);
+				world->sound->tick(elapsed/1000.f, false);
 		}
 	}
 

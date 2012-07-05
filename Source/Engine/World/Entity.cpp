@@ -11,7 +11,7 @@
 #include "Lua/D_Sound.h"
 #include "Lua/D_Mesh.h"
 #include "Lua/T_Tick.h"
-#include "../Sound.h"
+#include "../Sound/Sound.h"
 #include "../MathUtils.h"
 #include <Runtime/Reflect.h>
 

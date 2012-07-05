@@ -13,6 +13,25 @@ namespace thread {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void EventMutex::notifyOne() {
+	Lock L(m_m);
+	if (m_waiting < 1)
+		return;
+	--m_waiting;
+	++m_ready;
+	m_c.notify_one();
+}
+
+void EventMutex::notifyAll() {
+	Lock L(m_m);
+	if (m_waiting < 1 )
+		return;
+	m_ready += m_waiting;
+	m_waiting = 0;
+	m_c.notify_all();
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 //
 // Wait for gate to be "opened".

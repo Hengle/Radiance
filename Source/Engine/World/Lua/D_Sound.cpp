@@ -4,7 +4,7 @@
 // See Radiance/LICENSE for licensing terms.
 
 #include "D_Sound.h"
-#include "../../Sound.h"
+#include "../../Sound/Sound.h"
 
 namespace world {
 
@@ -145,7 +145,7 @@ int D_Sound::lua_Paused(lua_State *L)
 int D_Sound::lua_FadeVolume(lua_State *L)
 {
 	Ref self = Get<D_Sound>(L, "D_Sound", 1, true);
-	self->sound->FadeVolume(
+	self->sound->fadeVolume(
 		(float)luaL_checknumber(L, 2),
 		(float)luaL_checknumber(L, 3)
 	);
@@ -159,7 +159,7 @@ int D_Sound::lua_Play(lua_State *L)
 	if (c < SC_First || c >= SC_Max)
 		luaL_error(L, "Invalid sound channel number %d", c);
 
-	bool r = self->sound->Play(
+	bool r = self->sound->play(
 		(SoundChannel)c,
 		(int)luaL_checkinteger(L, 3)
 	);
@@ -171,21 +171,21 @@ int D_Sound::lua_Play(lua_State *L)
 int D_Sound::lua_Pause(lua_State *L)
 {
 	Ref self = Get<D_Sound>(L, "D_Sound", 1, true);
-	self->sound->Pause(lua_toboolean(L, 2) ? true : false);
+	self->sound->pause(lua_toboolean(L, 2) ? true : false);
 	return 0;
 }
 
 int D_Sound::lua_Rewind(lua_State *L)
 {
 	Ref self = Get<D_Sound>(L, "D_Sound", 1, true);
-	self->sound->Rewind();
+	self->sound->rewind();
 	return 0;
 }
 
 int D_Sound::lua_Stop(lua_State *L)
 {
 	Ref self = Get<D_Sound>(L, "D_Sound", 1, true);
-	self->sound->Stop();
+	self->sound->stop();
 	return 0;
 }
 

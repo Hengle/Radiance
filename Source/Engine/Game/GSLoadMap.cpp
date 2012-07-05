@@ -8,7 +8,7 @@
 #include "../App.h"
 #include "../Engine.h"
 #include "../World/World.h"
-#include "../Sound.h"
+#include "../Sound/Sound.h"
 #include <algorithm>
 #undef min
 #undef max
@@ -77,7 +77,7 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 			world::World::Ref world = m_mapAsset->world;
 			if (world)
 			{
-				world->sound->Tick(elapsed/1000.f, false);
+				world->sound->tick(elapsed/1000.f, false);
 				Draw(game, elapsed/1000.f);
 			}
 		}

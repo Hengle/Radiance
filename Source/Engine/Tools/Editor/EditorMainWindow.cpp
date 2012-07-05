@@ -21,7 +21,7 @@
 #include "../../App.h"
 #include "../../Renderer/PC/RBackend.h"
 #include "../../Renderer/GL/GLTable.h"
-#include "../../Sound.h"
+#include "../../Sound/Sound.h"
 
 bool __PostQuitPending();
 
@@ -128,7 +128,7 @@ bool MainWindow::Show()
 	BindGL();
 	CLEAR_GL_ERRORS();
 
-	m_sound = m_app->engine->sys->soundDevice->CreateContext();
+	m_sound = SoundContext::create(m_app->engine->sys->alDriver);
 
 	m_logWinShowHide = new (ZEditor) QAction("Log Window", this);
 	m_logWinShowHide->setCheckable(true);
@@ -263,7 +263,7 @@ void MainWindow::AppTick()
 		float elapsed = m_app->Tick();
 		emit OnTick(elapsed);
 		ContentBrowserView::Tick(elapsed);
-		m_sound->Tick(elapsed, true);
+		m_sound->tick(elapsed, true);
 	}
 
 	CheckExit();

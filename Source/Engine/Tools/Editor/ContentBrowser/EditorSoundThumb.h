@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../../../Sound.h"
+#include "../../../Sound/Sound.h"
 #include "EditorContentBrowserView.h"
 #include <Runtime/PushPack.h>
 

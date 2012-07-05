@@ -6,7 +6,7 @@
 #pragma once
 
 #include "../../Types.h"
-#include "../../SoundDef.h"
+#include "../../Sound/SoundDef.h"
 #include "D_Asset.h"
 #include <Runtime/PushPack.h>
 

@@ -16,7 +16,7 @@
 #include "ViewModel.h"
 #include "../SkAnim/SkAnim.h"
 #include "../Physics/Spring.h"
-#include "../SoundDef.h"
+#include "../Sound/SoundDef.h"
 #include <Runtime/ReflectDef.h>
 #include <Runtime/Container/ZoneMap.h>
 #include <Runtime/Container/ZoneVector.h>

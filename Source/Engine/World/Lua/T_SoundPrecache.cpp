@@ -6,7 +6,7 @@
 #include "T_SoundPrecache.h"
 #include "../../Renderer/SkMesh.h"
 #include "D_Sound.h"
-#include "../../Sound.h"
+#include "../../Sound/Sound.h"
 #include "../World.h"
 
 namespace world {
@@ -25,7 +25,7 @@ int T_SoundPrecache::PushResult(lua_State *L)
 	if (result != pkg::SR_Success)
 		return 0;
 
-	Sound::Ref sound = world->sound->NewSound(
+	Sound::Ref sound = world->sound->newSound(
 		asset,
 		m_maxInstances
 	);
