@@ -200,8 +200,8 @@ void ALDriver::sync_suspend(ALDRIVER_VOID_PARAMS) {
 void ALDriver::sync_flush(ALDRIVER_VOID_PARAMS) {
 	MutexedCommand c(&fn_flush);
 	ALDRIVER_CMD_SIG(c);
-	submit(c);
 	thread::EventMutex::Sync S(c.m);
+	submit(c);
 	S.wait();
 }
 

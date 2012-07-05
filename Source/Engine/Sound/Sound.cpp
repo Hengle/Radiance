@@ -22,8 +22,8 @@ enum {
 	kMaxSimultaneousSounds = 32,
 	kDefaultReferenceDistance = 50,
 	kDefaultMaxDistance = 150,
-	kStreamingBufferSize = 12*Kilo,
-	kMaxDecodeBuffersPerTick = 2
+	kStreamingBufferSize = 16*Kilo,
+	kMaxBytesDecodedPerTick = Kilo
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -388,6 +388,7 @@ m_refDistance(-1.0f),
 m_is(0),
 m_vbd(0),
 m_blockData(0),
+m_decodeOfs(0),
 m_eos(false),
 m_bsi(0) {
 	m_pos[0] = Vec3::Zero;
@@ -798,7 +799,7 @@ Sound::StreamResult Sound::tickStream(SoundContext::Source &source)
 	if (m_eos) {
 		ALint num;
 		alGetSourcei(source.source, AL_BUFFERS_QUEUED, &num);
-		return kStreamResult_Finished;
+		return (num > 0) ? kStreamResult_Playing : kStreamResult_Finished;
 	}
 	
 	// unqueue AL buffers if we don't have anything to read in.
@@ -818,19 +819,20 @@ Sound::StreamResult Sound::tickStream(SoundContext::Source &source)
 		m_availBuf[0] = 0;
 	}
 
-	int numBuffers = 0;
+	AddrSize bytesDecoded = 0;
 	
-	while ((m_availBuf[0] != m_availBuf[1]) && !m_eos && (numBuffers < kMaxDecodeBuffersPerTick)) {
+	while ((m_availBuf[0] != m_availBuf[1]) && !m_eos && (bytesDecoded < kMaxBytesDecodedPerTick)) {
 		// decode another block.
 		
-		AddrSize read = 0;
-		
-		while (read < kStreamingBufferSize) {
+		while ((m_decodeOfs < kStreamingBufferSize) && (bytesDecoded < kMaxBytesDecodedPerTick)) {
 			AddrSize x;
+
+			AddrSize bytesToDecode = std::min(kStreamingBufferSize-m_decodeOfs, kMaxBytesDecodedPerTick-bytesDecoded);
+			RAD_ASSERT(bytesToDecode > 0);
 			
 			m_vbd->Decode(
-				((U8*)m_blockData)+read,
-				kStreamingBufferSize-read,
+				((U8*)m_blockData)+m_decodeOfs,
+				bytesToDecode,
 				audio_codec::ogg_vorbis::EM_Little,
 				audio_codec::ogg_vorbis::ST_16Bit,
 				audio_codec::ogg_vorbis::DT_Signed,
@@ -847,10 +849,11 @@ Sound::StreamResult Sound::tickStream(SoundContext::Source &source)
 				}
 			}
 			
-			read += x;
+			m_decodeOfs += x;
+			bytesDecoded += x;
 		}
 		
-		if (read > 0) {
+		if ((m_decodeOfs > 0) && (m_eos || (m_decodeOfs == kStreamingBufferSize))) {
 			int idx = m_availBuf[0]++;
 			RAD_ASSERT(idx < kNumStreamingBuffers);
 			
@@ -861,15 +864,15 @@ Sound::StreamResult Sound::tickStream(SoundContext::Source &source)
 					buf,
 					(m_bsi->channels==2) ? AL_FORMAT_STEREO16 : AL_FORMAT_MONO16,
 					m_blockData,
-					(ALsizei)read,
+					(ALsizei)m_decodeOfs,
 					m_bsi->rate
 				);
 				
 				if (source.source)
 					alSourceQueueBuffers(source.source, 1, &buf);
-				
-				++numBuffers;
 			}
+
+			m_decodeOfs = 0;
 		}
 	}
 

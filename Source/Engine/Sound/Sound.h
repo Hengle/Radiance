@@ -225,7 +225,7 @@ private:
 	Sound();
 
 	enum {
-		kNumStreamingBuffers = 4
+		kNumStreamingBuffers = 2
 	};
 
 	enum StreamResult {
@@ -277,6 +277,7 @@ private:
 	audio_codec::ogg_vorbis::BSI *m_bsi;
 	file::HStreamInputBuffer m_ib;
 	void *m_blockData;
+	AddrSize m_decodeOfs;
 	bool m_eos;
 	SourceVec m_sources;
 	SoundContext::WRef m_ctx;
