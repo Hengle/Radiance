@@ -32,7 +32,7 @@ namespace
 	}
 
 	void FileCopyTest(const FileSystem::Ref &fs, const char *szSrc, const char *szDst) {
-		MMFile::Ref src = fs->openFile(szSrc, kFileOption_MapEntireFile);
+		MMFile::Ref src = fs->openFile(szSrc);//, kFileOption_MapEntireFile);
 		if (!src)
 			return;
 		FILE *dst = fs->fopen(szDst, "wb");

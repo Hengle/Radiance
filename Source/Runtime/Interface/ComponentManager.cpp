@@ -117,9 +117,8 @@ struct ComponentManager :
 
 	virtual void LoadComponents(const char *path, ComponentLoadFlags flags)
 	{
-		Search search;
-		RAD_DEBUG_ONLY(bool _b = EnforcePortablePathsEnabled(); EnforcePortablePaths(false));
-
+		FileSearch::Ref search;
+	
 		bool recursive = (flags & CLF_Recursive) ? true : false;
 		char nativePath[MaxFilePathLen+1];
 

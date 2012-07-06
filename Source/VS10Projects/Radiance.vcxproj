@@ -564,12 +564,6 @@
     <ClInclude Include="..\Engine\Tools\Editor\ContentBrowser\EditorSkModelThumb.h" />
     <ClInclude Include="..\Engine\Tools\Editor\ContentBrowser\EditorSoundThumb.h" />
     <ClInclude Include="..\Engine\Tools\Editor\ContentBrowser\EditorTextureThumb.h" />
-    <ClInclude Include="..\Engine\FileSystem\DPak.h" />
-    <ClInclude Include="..\Engine\FileSystem\DPakDef.h" />
-    <ClInclude Include="..\Engine\FileSystem\FileSystem.h" />
-    <ClInclude Include="..\Engine\FileSystem\FileSystemDef.h" />
-    <ClInclude Include="..\Engine\FileSystem\Backend\DPak.h" />
-    <ClInclude Include="..\Engine\FileSystem\Backend\FileSystem.h" />
     <ClInclude Include="..\Engine\Lua\LuaRuntime.h" />
     <ClInclude Include="..\Engine\Lua\LuaRuntimeDef.h" />
     <ClInclude Include="..\..\Extern\Lua\5.1.4\Lua\lapi.h" />
@@ -946,9 +940,6 @@
     <ClCompile Include="..\Engine\Tools\Editor\ContentBrowser\EditorSkModelThumb.cpp" />
     <ClCompile Include="..\Engine\Tools\Editor\ContentBrowser\EditorSoundThumb.cpp" />
     <ClCompile Include="..\Engine\Tools\Editor\ContentBrowser\EditorTextureThumb.cpp" />
-    <ClCompile Include="..\Engine\FileSystem\FileSystemReflectMap.cpp" />
-    <ClCompile Include="..\Engine\FileSystem\Backend\DPak.cpp" />
-    <ClCompile Include="..\Engine\FileSystem\Backend\FileSystem.cpp" />
     <ClCompile Include="..\Engine\Lua\LuaRuntime.cpp" />
     <ClCompile Include="..\..\Extern\Lua\5.1.4\Lua\bit.cpp" />
     <ClCompile Include="..\..\Extern\Lua\5.1.4\Lua\lapi.cpp" />

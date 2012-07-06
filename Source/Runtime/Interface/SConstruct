@@ -5,6 +5,6 @@
 
 Import('x')
 
-#x.add('InterfaceReflectMap.cpp')
-#x.add('ComponentManager.cpp')
-#x.add('ComponentManagerReflectMap.cpp')
+x.add('InterfaceReflectMap.cpp')
+x.add('ComponentManager.cpp')
+x.add('ComponentManagerReflectMap.cpp')

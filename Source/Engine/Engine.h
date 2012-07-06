@@ -8,9 +8,8 @@
 #include "Types.h"
 #include <Runtime/Base.h>
 #include <Runtime/String.h>
+#include <Runtime/File.h>
 #include <Runtime/Interface/ComponentManager.h>
-#include "FileSystem/FileSystem.h"
-#include "FileSystem/DPak.h"
 #include "Packages/Packages.h"
 #include "Renderer/Renderer.h"
 #include "COut.h"
@@ -30,8 +29,7 @@ public:
 	{
 		r::HRenderer         r;
 		pkg::PackageMan::Ref packages;
-		file::HFileSystem    files;
-		file::HDPakReader    paks;
+		file::FileSystem::Ref files;
 		HComponentManager    components;
 		SoundDeviceRef       soundDevice;
 		Persistence::Ref     globals;

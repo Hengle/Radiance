@@ -145,12 +145,6 @@
     <Filter Include="Engine\Tools\Editor\ContentBrowser">
       <UniqueIdentifier>{43120b04-1f49-406b-8368-e25c97c9dcf7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\FileSystem">
-      <UniqueIdentifier>{eb18f226-63e2-410e-af68-bc198c154730}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\FileSystem\Backend">
-      <UniqueIdentifier>{3f0b2688-7227-4cab-b2ea-78f287fd6cbf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Lua">
       <UniqueIdentifier>{9d91909f-9887-407f-8e8c-0d9be2df89b9}</UniqueIdentifier>
     </Filter>
@@ -1644,24 +1638,6 @@
     <ClInclude Include="..\Engine\Tools\Editor\ContentBrowser\EditorTextureThumb.h">
       <Filter>Engine\Tools\Editor\ContentBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\FileSystem\DPak.h">
-      <Filter>Engine\FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\FileSystem\DPakDef.h">
-      <Filter>Engine\FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\FileSystem\FileSystem.h">
-      <Filter>Engine\FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\FileSystem\FileSystemDef.h">
-      <Filter>Engine\FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\FileSystem\Backend\DPak.h">
-      <Filter>Engine\FileSystem\Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\FileSystem\Backend\FileSystem.h">
-      <Filter>Engine\FileSystem\Backend</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\Lua\LuaRuntime.h">
       <Filter>Engine\Lua</Filter>
     </ClInclude>
@@ -2815,15 +2791,6 @@
     </ClCompile>
     <ClCompile Include="..\Engine\Tools\Editor\ContentBrowser\EditorTextureThumb.cpp">
       <Filter>Engine\Tools\Editor\ContentBrowser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\FileSystem\FileSystemReflectMap.cpp">
-      <Filter>Engine\FileSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\FileSystem\Backend\DPak.cpp">
-      <Filter>Engine\FileSystem\Backend</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\FileSystem\Backend\FileSystem.cpp">
-      <Filter>Engine\FileSystem\Backend</Filter>
     </ClCompile>
     <ClCompile Include="..\Engine\Lua\LuaRuntime.cpp">
       <Filter>Engine\Lua</Filter>
