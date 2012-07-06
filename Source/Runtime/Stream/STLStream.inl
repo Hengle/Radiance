@@ -47,7 +47,7 @@ template<typename _Elem, typename _Traits>
 inline bool basic_streambuf_adapter<_Elem, _Traits>::SeekIn(Seek seekType, SPos ofs, UReg* errorCode)
 {
 	RAD_ASSERT(seekType >= StreamBegin && seekType <= StreamEnd);
-	RAD_ASSERT_MSG((ofs%sizeof(stl_buf::char_type)) == 0, "Illegal offset! The offset is not a multiple of the underlying STL stream element size!");
+	RAD_ASSERT_MSG((ofs%sizeof(typename stl_buf::char_type)) == 0, "Illegal offset! The offset is not a multiple of the underlying STL stream element size!");
 
 	bool s;
 
@@ -73,11 +73,13 @@ inline SPos basic_streambuf_adapter<_Elem, _Traits>::Size() const
 {
 	typename stl_buf::off_type p = m_b->pubseekoff(0, std::ios_base::cur, std::ios_base::in);
 
-	if (p == (stl_buf::off_type)(-1)) return 0;
+	if (p == (typename stl_buf::off_type)(-1)) 
+		return 0;
 
 	typename stl_buf::off_type e = m_b->pubseekoff(0, std::ios_base::end, std::ios_base::in);
 
-	if (e == (stl_buf::off_type)(-1)) return 0;
+	if (e == (typename stl_buf::off_type)(-1)) 
+		return 0;
 
 	m_b->pubseekpos((typename stl_buf::pos_type)p, std::ios_base::in);
 
@@ -87,7 +89,7 @@ inline SPos basic_streambuf_adapter<_Elem, _Traits>::Size() const
 template<typename _Elem, typename _Traits>
 inline SPos basic_streambuf_adapter<_Elem, _Traits>::InPos() const
 {
-	return (SPos)(m_b->pubseekoff(0, std::ios_base::cur, std::ios_base::in) * sizeof(stl_buf::char_type));
+	return (SPos)(m_b->pubseekoff(0, std::ios_base::cur, std::ios_base::in) * sizeof(typename stl_buf::char_type));
 }
 
 template<typename _Elem, typename _Traits>

@@ -6,7 +6,7 @@
 #include "T_SoundPrecache.h"
 #include "../../Renderer/SkMesh.h"
 #include "D_Sound.h"
-#include "../../Sound.h"
+#include "../../Sound/Sound.h"
 #include "../World.h"
 
 namespace world {

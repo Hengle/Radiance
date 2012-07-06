@@ -7,7 +7,7 @@
 
 #include "EditorTypes.h"
 #include "../../Renderer/Renderer.h"
-#include "../../SoundDef.h"
+#include "../../Sound/SoundDef.h"
 #include <QtGui/QMainWindow>
 #include <QtOpenGL/QGLContext>
 #include <QtOpenGL/QGLWidget>

@@ -8,7 +8,7 @@
 #include "../App.h"
 #include "../Engine.h"
 #include "../World/World.h"
-#include "../Sound.h"
+#include "../Sound/Sound.h"
 #include <algorithm>
 #undef min
 #undef max

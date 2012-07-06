@@ -13,7 +13,7 @@ using namespace pkg;
 
 namespace asset {
 
-MapCooker::MapCooker() : Cooker(9)
+MapCooker::MapCooker() : Cooker(10)
 {
 }
 

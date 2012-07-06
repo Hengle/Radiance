@@ -77,7 +77,7 @@
 		#define RAD_OPT_DEBUG
 	#endif
 
-	#define RAD_OPT_WCHAR_4        // 4 byte wchar_t platform.
+	#define RAD_OPT_4BYTE_WCHAR        // 4 byte wchar_t platform.
 
 #if defined(RAD_OPT_ARM)
 	#define RAD_FASTCALL

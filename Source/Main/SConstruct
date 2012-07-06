@@ -24,7 +24,10 @@ if build.pc():
 	z = x.add('PCMain.cpp')
 
 if build.osx(): #OSX always launches via SDL
-	x.add('SDLMain.m')
+	x.add('SDLMain.mm')
+	x.add('IOSMacLangPrefs.mm')
+	
+x.add('SystemLanguage.cpp')
 	
 ###############################################################################
 # Export

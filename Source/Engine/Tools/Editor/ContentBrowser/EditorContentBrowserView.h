@@ -19,6 +19,7 @@
 #include <Runtime/Thread/Locks.h>
 #include "../../../Packages/Packages.h"
 #include "../../../Renderer/GL/GLTexture.h"
+#include <utility>
 #include <Runtime/PushPack.h>
 
 class QScrollBar;
@@ -182,6 +183,7 @@ public:
 	void Select(const pkg::IdVec &ids, bool clear=true, bool redraw=true);
 	ContentAssetThumb *ThumbForType(asset::Type type);
 	r::GLTexture::Ref GetIcon(Icon i) const;
+	std::pair<int, int> selectedResolution() const;
 
 	static const ViewSet &Views() { return s_views; }
 	static void Tick(float t);
@@ -218,6 +220,7 @@ private slots:
 	void OnScrollMove(int pos);
 	void SortChanged(int index);
 	void SizeChanged(int index);
+	void resolutionChanged(int index);
 	void ZoomIn();
 	void ZoomOut();
 	void ZoomFull();
@@ -300,6 +303,7 @@ private:
 	int m_maxs[2];
 	int m_hoverId;
 	int m_step;
+	int m_resolution;
 	bool m_vscroll;
 	bool m_editable;
 	bool m_modal;
@@ -310,6 +314,7 @@ private:
 	QScrollBar *m_scroll;
 	QComboBox *m_sort;
 	QComboBox *m_sizes;
+	QComboBox *m_resolutions;
 	QPushButton *m_delButton;
 	QPushButton *m_cloneButton;
 	QPushButton *m_moveButton;

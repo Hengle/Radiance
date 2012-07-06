@@ -57,14 +57,14 @@ public:
 	}
 	
 	static T *Find(int id) {
-		WindowMap::const_iterator it = s_map.find(id);
+		typename WindowMap::const_iterator it = s_map.find(id);
 		if (it != s_map.end())
 			return it->second;
 		return 0;
 	}
 
 	void DataChanged(EditorWindow *src, const QVariant &data) {
-		for (WindowMap::const_iterator it = s_map.begin(); it != s_map.end(); ++it) {
+		for (typename WindowMap::const_iterator it = s_map.begin(); it != s_map.end(); ++it) {
 			EditorWindow *target = static_cast<EditorWindow*>(it->second);
 			if (target != src)
 				EditorWindowDetails::OnDataChanged(target, data);

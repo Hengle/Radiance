@@ -4,7 +4,7 @@
 // See Radiance/LICENSE for licensing terms.
 
 #include "D_Sound.h"
-#include "../../Sound.h"
+#include "../../Sound/Sound.h"
 
 namespace world {
 

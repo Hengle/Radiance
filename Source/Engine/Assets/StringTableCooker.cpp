@@ -12,7 +12,7 @@ using namespace pkg;
 
 namespace asset {
 
-StringTableCooker::StringTableCooker() : Cooker(1) {
+StringTableCooker::StringTableCooker() : Cooker(2) {
 }
 
 StringTableCooker::~StringTableCooker() {

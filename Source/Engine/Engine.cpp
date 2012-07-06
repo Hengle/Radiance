@@ -12,7 +12,7 @@
 #include <Runtime/Base/SIMD.h>
 #include "Zones.h"
 #include "Assets/Assets.h"
-#include "Sound.h"
+#include "Sound/ALDriver.h"
 #include <sstream>
 
 #if defined(RAD_OPT_PC)
@@ -82,11 +82,11 @@ bool Engine::PreInit()
 	sys->paks->Initialize(sys->files);
 
 	sys->r->Initialize();
-	m_comTable.soundDevice = SoundDevice::New();
+	m_comTable.alDriver = ALDriver::New(ALDRIVER_SIG 0);
 
-	if (!m_comTable.soundDevice)
+	if (!m_comTable.alDriver)
 	{
-		COut(C_Info) << "Error initializing OpenAL!" << std::endl;
+		COut(C_Info) << "Error initializing sound system!" << std::endl;
 		return false;
 	}
 
@@ -107,7 +107,7 @@ bool Engine::Initialize()
 
 void Engine::Finalize()
 {
-	m_comTable.soundDevice.reset();
+	m_comTable.alDriver.reset();
 	m_comTable.components->ReleaseCachedComponents();
 	m_comTable.packages.reset();
 

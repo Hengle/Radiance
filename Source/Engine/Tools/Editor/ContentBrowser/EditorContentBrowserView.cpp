@@ -65,6 +65,14 @@ void CreateThumbs(ContentBrowserView &view) {
 	CreateStringTableThumb(view);
 }
 
+inline int makeRes(int w, int h) {
+	return w|(h<<16);
+}
+
+inline std::pair<int, int> getRes(int x) {
+	return std::pair<int, int>(x & 0xffff, (x>>16)&0xffff);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 ContentAssetThumb::ContentAssetThumb(ContentBrowserView &view)
@@ -177,6 +185,11 @@ r::GLTexture::Ref ContentBrowserView::GetIcon(Icon i) const
 	return m_icons[i];
 }
 
+std::pair<int, int> ContentBrowserView::selectedResolution() const {
+	int mask = m_resolutions->itemData(m_resolution).toInt();
+	return getRes(mask);
+}
+
 void ContentBrowserView::NotifyAddRemovePackages()
 {
 	for (ViewSet::iterator it = s_views.begin(); it != s_views.end(); ++it)
@@ -254,6 +267,7 @@ m_loadedIcons(false),
 m_inTick(false),
 m_tickRedraw(false)
 {
+	m_resolution = MainWindow::Get()->userPrefs->value("contentBrowser/resolution", 1).toInt();
 	m_font.setPixelSize(12);
 
 	QGridLayout *l = new (ZEditor) QGridLayout(this);
@@ -344,7 +358,7 @@ m_tickRedraw(false)
 	m_sizes->setCurrentIndex(3);
 	RAD_VERIFY(connect(m_sizes, SIGNAL(currentIndexChanged(int)), SLOT(SizeChanged(int))));
 	s->addWidget(m_sizes, 0, col++);
-	m_sizes->setToolTip("Set Preview Size");
+	m_sizes->setToolTip("Set Thumnail Size");
 
 	s->addItem(new (ZEditor) QSpacerItem(32, 0), 0, col++);
 	s->addWidget(new (ZEditor) QLabel(QString("Sort By:")), 0, col++);
@@ -357,6 +371,23 @@ m_tickRedraw(false)
 	RAD_VERIFY(connect(m_sort, SIGNAL(currentIndexChanged(int)), SLOT(SortChanged(int))));
 	s->addWidget(m_sort, 0, col++);
 	m_sort->setToolTip("Set Sort Mode");
+
+	s->addItem(new (ZEditor) QSpacerItem(32, 0), 0, col++);
+	s->addWidget(new (ZEditor) QLabel(QString("Resolution:")), 0, col++);
+
+	m_resolutions = new (ZEditor) QComboBox(this);
+	m_resolutions->addItem(QString("320x480 (3GS)"), makeRes(320, 480));
+	m_resolutions->addItem(QString("1024x768 (iPad)"), makeRes(1024, 768));
+	m_resolutions->addItem(QString("1366x768 (16:9)"), makeRes(1366, 768));
+	m_resolutions->addItem(QString("1440x900 (16:10)"), makeRes(1440, 900));
+	m_resolutions->addItem(QString("16000x900 (16:9)"), makeRes(1600, 900));
+	m_resolutions->addItem(QString("1680x1050 (16:10)"), makeRes(1680, 1050));
+	m_resolutions->addItem(QString("1920x1080 (16:9)"), makeRes(1920, 1080));
+	m_resolutions->setCurrentIndex(m_resolution);
+
+	RAD_VERIFY(connect(m_resolutions, SIGNAL(currentIndexChanged(int)), SLOT(resolutionChanged(int))));
+	s->addWidget(m_resolutions, 0, col++);
+	m_sort->setToolTip("Set Game Resolution");
 
 	s->setColumnStretch(col++, 1);
 
@@ -504,6 +535,11 @@ void ContentBrowserView::SizeChanged(int index)
 		RecalcLayout(true);
 		ScrollToSelection();
 	}
+}
+
+void ContentBrowserView::resolutionChanged(int index) {
+	m_resolution = index;
+	MainWindow::Get()->userPrefs->setValue("contentBrowser/resolution", index);
 }
 
 void ContentBrowserView::ZoomIn()

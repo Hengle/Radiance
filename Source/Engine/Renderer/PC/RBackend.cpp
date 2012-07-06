@@ -145,7 +145,7 @@ int stdVidModes[] =
 	-1
 };
 
-void MakeVidModeList(const VidMode &curMode, const int *modes, VidModeVec &out)
+void MakeWindowedVidModeList(const VidMode &curMode, const int *modes, VidModeVec &out)
 {
 	RAD_ASSERT(modes);
 	for (int i = 0;modes[i] != -1;i += 2)
@@ -322,7 +322,6 @@ bool RBackend::CheckCaps()
 		gl.ARB_vertex_program &&
 		gl.ARB_texture_compression &&
 		gl.EXT_texture_compression_s3tc &&
-		gl.ARB_imaging &&
 		gl.ARB_multitexture &&
 		gl.SGIS_generate_mipmap &&
 		gl.ARB_texture_non_power_of_two;
@@ -379,7 +378,7 @@ void RBackend::EnumVidModes()
 
 	m_modes.clear();
 	// get all possible windowed modes.
-	MakeVidModeList(m_curMode, stdVidModes, m_modes);
+	MakeWindowedVidModeList(m_curMode, stdVidModes, m_modes);
 
 	// ask SDL for fullscreen modes.
 	SetSDLGLAttributes(
@@ -388,22 +387,18 @@ void RBackend::EnumVidModes()
 		0, // no vsync
 		true // force hardware
 	);
-
-	SDL_Rect **modes = SDL_ListModes(0, SDL_FULLSCREEN|SDL_OPENGL);
-	if (modes && (modes != (SDL_Rect**)-1))
+	
+	// SDL_ListModes crashes on OSX so I'm doing it this way.
+	for (int i = 0;stdVidModes[i] != -1;i += 2)
 	{
-		while (*modes)
+		VidMode mode(stdVidModes[i], stdVidModes[i+1], m_curMode);
+		mode.fullscreen = true;
+		if (CheckVidMode(mode))
 		{
-			VidMode mode((*modes)->w, (*modes)->h, m_curMode);
-			mode.fullscreen = true;
-			if (CheckVidMode(mode))
-			{
-				COut(C_Info) << "\t" <<
-					mode.w << "x" << mode.h << "x" << mode.bpp << " " <<
-					mode.hz << "hz" << std::endl;
-				m_modes.push_back(mode);
-			}
-			++modes;
+			COut(C_Info) << "\t" <<
+			mode.w << "x" << mode.h << "x" << mode.bpp << " " <<
+			mode.hz << "hz" << std::endl;
+			m_modes.push_back(mode);
 		}
 	}
 }

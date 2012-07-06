@@ -24,7 +24,7 @@
 #include "Lua/D_SkModel.h"
 #include "Lua/D_Sound.h"
 #include "Lua/D_Mesh.h"
-#include "../Sound.h"
+#include "../Sound/Sound.h"
 #include "../Persistence.h"
 #include "../StringTable.h"
 #include <Lua/lualib.h>
@@ -175,6 +175,7 @@ bool WorldLua::Init()
 		{ "Platform", lua_System_Platform },
 		{ "SystemLanguage", lua_System_SystemLanguage },
 		{ "GetLangString", lua_System_GetLangString },
+		{ "LaunchURL", lua_System_LaunchURL },
 		{ 0, 0 }
 	};
 
@@ -702,6 +703,12 @@ int WorldLua::lua_System_GetLangString(lua_State *L) {
 		}
 	}
 
+	return 0;
+}
+
+int WorldLua::lua_System_LaunchURL(lua_State *L) {
+	const char *sz = luaL_checkstring(L, 1);
+	App::Get()->LaunchURL(sz);
 	return 0;
 }
 

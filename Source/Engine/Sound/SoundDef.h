@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "Types.h"
+#include "../Types.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -25,6 +25,4 @@ typedef boost::weak_ptr<Sound> SoundWRef;
 class SoundContext;
 typedef boost::shared_ptr<SoundContext> SoundContextRef;
 typedef boost::weak_ptr<SoundContext> SoundContextWRef;
-class SoundDevice;
-typedef boost::shared_ptr<SoundDevice> SoundDeviceRef;
-typedef boost::weak_ptr<SoundDevice> SoundDeviceWRef;
+

@@ -218,6 +218,9 @@ int TextureParser::LoadCooked(
 				return r;
 		}
 		else {
+		StringTable::LangId langId = m_langId;
+#else
+		StringTable::LangId langId = App::Get()->langId;
 #endif
 		const asset::TextureTag *tag = (const asset::TextureTag*)asset->entry->TagData(P_TARGET_FLAGS(flags));
 		if (!tag)
@@ -228,9 +231,9 @@ int TextureParser::LoadCooked(
 		String path(CStr("Cooked/"));
 		path += CStr(asset->path);
 
-		if ((m_tag.flags&TextureTag::Localized) && (m_langId != StringTable::LangId_EN)) {
+		if ((m_tag.flags&TextureTag::Localized) && (langId != StringTable::LangId_EN)) {
 			path += "_";
-			path += StringTable::Langs[m_langId];
+			path += string::Widen(StringTable::Langs[langId]);
 		}
 
 		path += ".bin";

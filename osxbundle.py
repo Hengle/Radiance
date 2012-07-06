@@ -117,6 +117,13 @@ def TOOL_BUNDLE(env):
 #				   print f[len(inDirNode.abspath):]
 				   outputs += ensureWritable (env.InstallAs (outDirNode.abspath + '/' + f[len(dirname(inDirNode.abspath))+1:], env.File (f)))
 			return outputs
+        
+		def copySDLdylibs(preAction, env, bundledir):
+			oalDir = env['OALDIR'] + '/libs/'
+			files = ['libopenal.1.14.0.dylib']
+			for f in files:
+				postAction = env.Install(bundledir, oalDir + f)
+				env.AddPostAction(preAction, postAction)
 
 		def openALFrameworkSrc(framework):
 			return framework + '.framework/Versions/A/' + framework
@@ -168,7 +175,7 @@ def TOOL_BUNDLE(env):
 
 		def nullPrint(target, source, env): return
 
-		def copyAndFixupOpenALFramework(root, env, bundledir, framework, fixups=None):
+       	 	def copyAndFixupOpenALFramework(root, env, bundledir, framework, fixups=None):
 			cgDir = env['OALDIR']
 			x = env.Install(openALFrameworkBundlePath(framework, bundledir), cgDir + '/' + openALFrameworkSrc(framework))
 			def installId():
@@ -269,6 +276,9 @@ def TOOL_BUNDLE(env):
 			if framework == 'QtGui': return ['QtCore']
 			if framework == 'QtOpenGL': return ['QtCore', 'QtGui']
 			return None
+
+		def copyOpenALdylib(root, env, bundledir):
+			return copyOpenALdylibs(root, env, bundledir)
 
 		def copyOpenALFrameworks(root, env, bundledir, frameworks):
 			outputs = []
@@ -393,6 +403,8 @@ def TOOL_BUNDLE(env):
 			env.SideEffect (bundledir, app)
 			
 			inst = env.Install(bundledir+'/Contents/MacOS', app)
+        
+			copySDLdylibs(inst, env, bundledir+'/Contents/Frameworks')
 			
 			if (qtFrameworks != None):
 				a = fixupQtRefs(env, bundledir, app, qtFrameworks)

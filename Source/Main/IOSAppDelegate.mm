@@ -573,4 +573,8 @@ CloudFile::Status CloudStorage::FileStatus(const char *name)
 	return CloudFile::Ready;
 }
 
+void NativeApp::LaunchURL(const char *sz) {
+	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithUTF8String:sz]]];
+}
+
 @end

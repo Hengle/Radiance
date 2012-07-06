@@ -7,7 +7,7 @@
 #include "../World/World.h"
 #include "../App.h"
 #include "../Engine.h"
-#include "../Sound.h"
+#include "../Sound/Sound.h"
 #include "../UI/UIWidget.h"
 
 GSPlay::GSPlay() : Game::Tickable(Priority)

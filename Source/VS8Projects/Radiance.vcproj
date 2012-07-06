@@ -2523,18 +2523,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Engine\Sound.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Engine\Sound.h"
-				>
-			</File>
-			<File
-				RelativePath="..\Engine\SoundDef.h"
-				>
-			</File>
-			<File
 				RelativePath="..\Engine\StringTable.cpp"
 				>
 			</File>
@@ -4427,6 +4415,34 @@
 				</File>
 				<File
 					RelativePath="..\Engine\UI\UIWidgetDef.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Sound"
+				>
+				<File
+					RelativePath="..\Engine\Sound\ALDriver.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Engine\Sound\ALDriver.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Engine\Sound\ALDriverDef.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Engine\Sound\Sound.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Engine\Sound\Sound.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Engine\Sound\SoundDef.h"
 					>
 				</File>
 			</Filter>

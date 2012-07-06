@@ -8,6 +8,56 @@
 
 namespace thread {
 
+inline EventMutex::EventMutex() : m_waiting(0), m_ready(0) {
+}
+
+inline EventMutex::Sync::Sync(EventMutex &m) : 
+L(m.m_m), m_m(m.m_m), m_c(m.m_c), m_x(m) {
+}
+
+inline void EventMutex::Inc() {
+	++m_waiting;
+}
+
+inline bool EventMutex::Ready() {
+	RAD_ASSERT(m_ready >= 0);
+	if (m_ready > 0) {
+		--m_ready;
+		return true;
+	}
+	return false;
+}
+
+inline void EventMutex::Sync::Inc() {
+	m_x.Inc();
+}
+
+inline bool EventMutex::Sync::Ready() {
+	return m_x.Ready();
+}
+
+inline void EventMutex::Sync::Wait() {
+	Inc();
+	do {
+		m_c.wait(L);
+	} while (!Ready());
+}
+
+inline bool EventMutex::Sync::TimedWait(const boost::system_time &wait_until) {
+	return m_c.timed_wait(L, wait_until);
+}
+
+inline bool EventMutex::Sync::TimedWait(const boost::xtime &wait_until) {
+	return m_c.timed_wait(L, wait_until);
+}
+
+template <typename duration_type>
+inline bool EventMutex::Sync::TimedWait(const duration_type &wait_duration) {
+	return m_c.timed_wait(L, wait_duration);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 template <UReg NumKeys>
 inline SegmentedLock<NumKeys>::SegmentedLock()
 {

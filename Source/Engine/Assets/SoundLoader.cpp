@@ -6,7 +6,7 @@
 #include "SoundLoader.h"
 #include "SoundParser.h"
 #include "../Engine.h"
-#include "../Sound.h"
+#include "../Sound/Sound.h"
 
 using namespace pkg;
 
@@ -31,8 +31,7 @@ int SoundLoader::Process(
 	{
 		if (m_id)
 		{
-			alDeleteBuffers(1, &m_id);
-			CHECK_AL_ERRORS();
+			engine.sys->alDriver->SyncDeleteBuffers(ALDRIVER_SIG 1, &m_id);
 			ZSound.Get().Dec(m_size, 0);
 		}
 		m_id = 0;
@@ -46,9 +45,9 @@ int SoundLoader::Process(
 			if (!parser || !parser->header)
 				return SR_ParseError;
 
-			ClearALErrors();
-			alGenBuffers(1, &m_id);
-			CHECK_AL_ERRORS();
+			if (!engine.sys->alDriver->SyncGenBuffers(ALDRIVER_SIG 1, &m_id))
+				return SR_ErrorGeneric;
+
 			RAD_ASSERT(m_id);
 
 			int alFormat;
@@ -70,7 +69,8 @@ int SoundLoader::Process(
 			
 			m_size = parser->header->numBytes;
 			
-			alBufferData(
+			bool r = engine.sys->alDriver->SyncBufferData(
+				ALDRIVER_SIG
 				m_id,
 				alFormat,
 				(ALvoid*)parser->data.get(),
@@ -78,11 +78,10 @@ int SoundLoader::Process(
 				parser->header->rate
 			);
 			
-			ZSound.Get().Inc(m_size, 0);
-
-			int error = alGetError();
-			if (error != AL_NO_ERROR)
+			if (!r)
 				return SR_InvalidFormat;
+
+			ZSound.Get().Inc(m_size, 0);
 		}
 	}
 

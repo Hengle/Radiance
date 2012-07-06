@@ -17,7 +17,7 @@
 #include "../Renderer/Mesh.h"
 #include "../Renderer/Material.h"
 #include "../UI/UIWidgetDef.h"
-#include "../SoundDef.h"
+#include "../Sound/SoundDef.h"
 #include "../Game/GameNetworkDef.h"
 #include <Runtime/Container/ZoneList.h>
 #include <Runtime/Container/ZoneMap.h>

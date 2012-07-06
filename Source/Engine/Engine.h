@@ -14,7 +14,7 @@
 #include "Renderer/Renderer.h"
 #include "COut.h"
 #include "LogFile.h"
-#include "SoundDef.h"
+#include "Sound/ALDriverDef.h"
 #include "Persistence.h"
 
 #if defined(RAD_OPT_PC_TOOLS)
@@ -31,7 +31,7 @@ public:
 		pkg::PackageMan::Ref packages;
 		file::FileSystem::Ref files;
 		HComponentManager    components;
-		SoundDeviceRef       soundDevice;
+		ALDriverRef          alDriver;
 		Persistence::Ref     globals;
 	};
 

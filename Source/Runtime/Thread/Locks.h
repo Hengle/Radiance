@@ -16,6 +16,61 @@ namespace thread {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+//! A mutex with event functionality (wait & notify).
+class EventMutex : private boost::noncopyable {
+public:
+	
+	EventMutex();
+
+	class Sync {
+	public:
+
+		Sync(EventMutex &m);
+
+		void Wait();
+
+		bool TimedWait(const boost::system_time &wait_until);
+		bool TimedWait(const boost::xtime &wait_until);
+
+		template <typename duration_type>
+		bool TimedWait(const duration_type &wait_duration);
+	
+	private:
+
+		typedef boost::unique_lock<boost::mutex> Lock;
+
+		void Inc();
+		bool Ready();
+
+		Lock L;
+		EventMutex &m_x;
+		boost::condition_variable &m_c;
+		boost::mutex &m_m;
+	};
+
+	// Do not call the notify functions while you have a Sync object you will deadlock.
+
+	void NotifyOne();
+	void NotifyAll();
+
+private:
+	
+	typedef boost::unique_lock<boost::mutex> Lock;
+
+	void Inc();
+	bool Ready();
+
+	friend class Sync;
+
+	volatile int m_waiting;
+	volatile int m_ready;
+
+	boost::mutex m_m;
+	boost::condition_variable m_c;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
 class RADRT_CLASS Gate : private boost::noncopyable
 {
 public:
