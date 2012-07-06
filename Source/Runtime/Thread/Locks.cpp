@@ -13,7 +13,7 @@ namespace thread {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void EventMutex::notifyOne() {
+void EventMutex::NotifyOne() {
 	Lock L(m_m);
 	if (m_waiting < 1)
 		return;
@@ -22,7 +22,7 @@ void EventMutex::notifyOne() {
 	m_c.notify_one();
 }
 
-void EventMutex::notifyAll() {
+void EventMutex::NotifyAll() {
 	Lock L(m_m);
 	if (m_waiting < 1 )
 		return;

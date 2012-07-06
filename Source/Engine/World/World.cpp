@@ -305,7 +305,7 @@ void World::TickState(float dt, float unmod_dt)
 		m_sound->rot = QuatFromAngles(m_playerPawn->ps->worldAngles);
 	}
 
-	m_sound->tick(dt, m_time > 0.5f);
+	m_sound->Tick(dt, m_time > 0.5f);
 	
 	if (gc)
 	{

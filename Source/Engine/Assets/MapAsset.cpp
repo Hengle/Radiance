@@ -185,7 +185,7 @@ int MapAsset::SpawnCooked(
 	if (m_bspData->result < file::Success)
 		return m_bspData->result.get();
 
-	SoundContext::Ref sound = SoundContext::create(App::Get()->engine->sys->alDriver);
+	SoundContext::Ref sound = SoundContext::New(App::Get()->engine->sys->alDriver);
 
 	m_world = world::World::New(*m_game, m_slot, sound, asset->zone);
 	int r = m_world->Init();
@@ -255,7 +255,7 @@ int MapAsset::SpawnTool(
 		if (!m_mapBuilder->Compile())
 			return SR_CompilerError;
 
-		SoundContext::Ref sound = SoundContext::create(App::Get()->engine->sys->alDriver);
+		SoundContext::Ref sound = SoundContext::New(App::Get()->engine->sys->alDriver);
 
 		m_world = world::World::New(*m_game, m_slot, sound, asset->zone);
 

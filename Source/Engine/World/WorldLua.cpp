@@ -1266,7 +1266,7 @@ int WorldLua::lua_SoundFadeMasterVolume(lua_State *L)
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
-	self->m_world->sound->fadeMasterVolume(
+	self->m_world->sound->FadeMasterVolume(
 		(float)luaL_checknumber(L, 1),
 		(float)luaL_checknumber(L, 2)
 	);
@@ -1281,7 +1281,7 @@ int WorldLua::lua_SoundFadeChannelVolume(lua_State *L)
 	int c = (int)luaL_checkinteger(L, 1);
 	if (c < SC_First || c >= SC_Max)
 		luaL_error(L, "Invalid SoundChannel %d", c);
-	self->m_world->sound->fadeChannelVolume(
+	self->m_world->sound->FadeChannelVolume(
 		(SoundChannel)c,
 		(float)luaL_checknumber(L, 2),
 		(float)luaL_checknumber(L, 3)
@@ -1297,7 +1297,7 @@ int WorldLua::lua_SoundChannelVolume(lua_State *L)
 	int c = (int)luaL_checkinteger(L, 1);
 	if (c < SC_First || c >= SC_Max)
 		luaL_error(L, "Invalid SoundChannel %d", c);
-	lua_pushnumber(L, (lua_Number)self->m_world->sound->channelVolume((SoundChannel)c));
+	lua_pushnumber(L, (lua_Number)self->m_world->sound->ChannelVolume((SoundChannel)c));
 	return 1;
 }
 
@@ -1309,7 +1309,7 @@ int WorldLua::lua_SoundPauseChannel(lua_State *L)
 	int c = (int)luaL_checkinteger(L, 1);
 	if (c < SC_First || c >= SC_Max)
 		luaL_error(L, "Invalid SoundChannel %d", c);
-	self->m_world->sound->pauseChannel((SoundChannel)c, lua_toboolean(L, 2) ? true : false);
+	self->m_world->sound->PauseChannel((SoundChannel)c, lua_toboolean(L, 2) ? true : false);
 	return 0;
 }
 
@@ -1321,7 +1321,7 @@ int WorldLua::lua_SoundChannelIsPaused(lua_State *L)
 	int c = (int)luaL_checkinteger(L, 1);
 	if (c < SC_First || c >= SC_Max)
 		luaL_error(L, "Invalid SoundChannel %d", c);
-	lua_pushboolean(L, self->m_world->sound->channelIsPaused((SoundChannel)c) ? 1 : 0);
+	lua_pushboolean(L, self->m_world->sound->ChannelIsPaused((SoundChannel)c) ? 1 : 0);
 	return 1;
 }
 
@@ -1330,7 +1330,7 @@ int WorldLua::lua_SoundPauseAll(lua_State *L)
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
-	self->m_world->sound->pauseAll(lua_toboolean(L, 1) ? true : false);
+	self->m_world->sound->PauseAll(lua_toboolean(L, 1) ? true : false);
 	return 0;
 }
 
@@ -1339,7 +1339,7 @@ int WorldLua::lua_SoundStopAll(lua_State *L)
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
-	self->m_world->sound->stopAll();
+	self->m_world->sound->StopAll();
 	return 0;
 }
 
@@ -1348,7 +1348,7 @@ int WorldLua::lua_SoundSetDoppler(lua_State *L)
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
-	self->m_world->sound->setDoppler(
+	self->m_world->sound->SetDoppler(
 		(float)luaL_checknumber(L, 1),
 		(float)luaL_checknumber(L, 2)
 	);

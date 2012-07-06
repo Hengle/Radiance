@@ -27,20 +27,20 @@ public:
 
 		Sync(EventMutex &m);
 
-		void wait();
+		void Wait();
 
-		bool timedWait(const boost::system_time &wait_until);
-		bool timedWait(const boost::xtime &wait_until);
+		bool TimedWait(const boost::system_time &wait_until);
+		bool TimedWait(const boost::xtime &wait_until);
 
 		template <typename duration_type>
-		bool timedWait(const duration_type &wait_duration);
+		bool TimedWait(const duration_type &wait_duration);
 	
 	private:
 
 		typedef boost::unique_lock<boost::mutex> Lock;
 
-		void inc();
-		bool ready();
+		void Inc();
+		bool Ready();
 
 		Lock L;
 		EventMutex &m_x;
@@ -50,15 +50,15 @@ public:
 
 	// Do not call the notify functions while you have a Sync object you will deadlock.
 
-	void notifyOne();
-	void notifyAll();
+	void NotifyOne();
+	void NotifyAll();
 
 private:
 	
 	typedef boost::unique_lock<boost::mutex> Lock;
 
-	void inc();
-	bool ready();
+	void Inc();
+	bool Ready();
 
 	friend class Sync;
 

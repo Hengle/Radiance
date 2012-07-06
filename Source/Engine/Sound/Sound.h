@@ -27,27 +27,27 @@ public:
 	typedef SoundContextRef Ref;
 	typedef SoundContextWRef WRef;
 
-	static Ref create(const ALDriver::Ref &driver);
+	static Ref New(const ALDriver::Ref &driver);
 
 	~SoundContext();
 
-	void tick(float dt, bool positional);
+	void Tick(float dt, bool positional);
 
-	void fadeMasterVolume(float volume, float time);
+	void FadeMasterVolume(float volume, float time);
 
-	void fadeChannelVolume(SoundChannel c, float volume, float time);
-	float channelVolume(SoundChannel c) { return m_channels[c].volume[0]; }
+	void FadeChannelVolume(SoundChannel c, float volume, float time);
+	float ChannelVolume(SoundChannel c) { return m_channels[c].volume[0]; }
 
-	void pauseChannel(SoundChannel c, bool pause=true);
-	bool channelIsPaused(SoundChannel c) { return m_channels[c].paused; }
+	void PauseChannel(SoundChannel c, bool pause=true);
+	bool ChannelIsPaused(SoundChannel c) { return m_channels[c].paused; }
 
-	void pauseAll(bool pause=true);
-	void stopAll();
+	void PauseAll(bool pause=true);
+	void StopAll();
 
-	void setDoppler(float dopplerFactor, float speedOfSound);
+	void SetDoppler(float dopplerFactor, float speedOfSound);
 
-	SoundRef newSound(ALuint buffer, int maxInstances=1);
-	SoundRef newSound(const pkg::AssetRef &sound, int maxInstances=1);
+	SoundRef NewSound(ALuint buffer, int maxInstances=1);
+	SoundRef NewSound(const pkg::AssetRef &sound, int maxInstances=1);
 
 	RAD_DECLARE_PROPERTY(SoundContext, pos, const Vec3&, const Vec3&);
 	RAD_DECLARE_PROPERTY(SoundContext, vel, const Vec3&, const Vec3&);
@@ -114,7 +114,7 @@ private:
 	public:
 		StreamCallback(SoundContext &ctx);
 
-		virtual void tick(ALDriver &alDriver);
+		virtual void Tick(ALDriver &alDriver);
 
 	private:
 
@@ -124,10 +124,10 @@ private:
 	friend class Sound;
 	friend class StreamCallback;
 
-	bool evict(int priority);
-	bool mapSource(Source &source);
-	void unmapSource(Source &source);
-	int tickStreams(ALDriver &alDriver);
+	bool Evict(int priority);
+	bool MapSource(Source &source);
+	void UnmapSource(Source &source);
+	int TickStreams(ALDriver &alDriver);
 
 	typedef boost::shared_mutex Mutex;
 	typedef boost::lock_guard<Mutex> WriteLock;
@@ -178,11 +178,11 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Sound, context, SoundContext::Ref);
 	RAD_DECLARE_READONLY_PROPERTY(Sound, asset, const pkg::AssetRef&);
 
-	void fadeVolume(float volume, float time);
-	bool play(SoundChannel c, int priority);
-	void pause(bool pause = true);
-	void rewind();
-	void stop();
+	void FadeVolume(float volume, float time);
+	bool Play(SoundChannel c, int priority);
+	void Pause(bool pause = true);
+	void Rewind();
+	void Stop();
 
 private:
 
@@ -234,35 +234,35 @@ private:
 		kStreamResult_Finished
 	};
 
-	bool init(
+	bool Init(
 		const SoundContext::Ref &ctx,
 		ALuint buffer,
 		int maxInstances
 	);
 
-	bool init(
+	bool Init(
 		const SoundContext::Ref &ctx,
 		const pkg::AssetRef &asset,
 		int maxInstances
 	);
 
-	bool initStreaming(
+	bool InitStreaming(
 		const SoundContext::Ref &ctx,
 		const pkg::AssetRef &asset
 	);
 
-	bool tick(
+	bool Tick(
 		float dt, 
 		const SoundContext::Channel &channel,
 		SoundContext::Source &source,
 		bool positional
 	);
 
-	StreamResult tickStream(SoundContext::Source &source);
+	StreamResult TickStream(SoundContext::Source &source);
 
-	void pause(SoundContext::Source &source, bool pause);
-	void stop(SoundContext::Source &source);
-	static void fn_getSourceStatus(ALDriver &driver, ALDriver::Command *cmd);
+	void Pause(SoundContext::Source &source, bool pause);
+	void Stop(SoundContext::Source &source);
+	static void fn_GetSourceStatus(ALDriver &driver, ALDriver::Command *cmd);
 
 	typedef zone_vector<SoundContext::Source, ZSoundT>::type SourceVec;
 
