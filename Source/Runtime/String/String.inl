@@ -681,7 +681,7 @@ inline String &String::Replace(const wchar_t *src, const wchar_t *dst) {
 inline String &String::Printf(const char *fmt, ...) {
 	va_list args;
 	va_start(args, fmt);
-	printf(fmt, args);
+	Printf(fmt, args);
 	va_end(args);
 	return *this;
 }
