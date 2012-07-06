@@ -129,7 +129,7 @@ bool DataBlock::s_init = false;
 DataBlock::DataBlockPool DataBlock::s_dataBlockPool;
 MemoryPool DataBlock::s_pools[DataBlock::kNumPools];
 
-void DataBlock::initPools() {
+void DataBlock::InitPools() {
 	if (s_init)
 		return;
 
@@ -146,14 +146,14 @@ void DataBlock::initPools() {
 	s_init = true;
 }
 
-MemoryPool *DataBlock::poolForSize(int size, int &poolIdx, Mutex::ScopedLock &L) {
+MemoryPool *DataBlock::PoolForSize(int size, int &poolIdx, Mutex::ScopedLock &L) {
 
 	if (size > kMaxPoolSize)
 		return 0;
 
-	L.lock(Mutex::get());
+	L.lock(Mutex::Get());
 
-	initPools();
+	InitPools();
 
 	MemoryPool *pool = 0;
 	poolIdx = 0;
@@ -170,7 +170,7 @@ MemoryPool *DataBlock::poolForSize(int size, int &poolIdx, Mutex::ScopedLock &L)
 	return pool;
 }
 
-DataBlock::Ref DataBlock::create(
+DataBlock::Ref DataBlock::New(
 	RefType refType,
 	int len,
 	const void *src,
@@ -191,7 +191,7 @@ DataBlock::Ref DataBlock::create(
 
 		if (&zone == &ZString.Get()) {
 			Mutex::ScopedLock L;
-			pool = poolForSize(len, poolIdx, L);
+			pool = PoolForSize(len, poolIdx, L);
 			if (pool) {
 				buf = reinterpret_cast<char*>(pool->GetChunk());
 			}
@@ -211,13 +211,13 @@ DataBlock::Ref DataBlock::create(
 
 	RAD_ASSERT(src);
 
-	Mutex::Lock L(Mutex::get());
-	initPools();
-	DataBlock::Ref r(s_dataBlockPool.Construct(refType, const_cast<void*>(src), len, pool, poolIdx), &DataBlock::destroy);
+	Mutex::Lock L(Mutex::Get());
+	InitPools();
+	DataBlock::Ref r(s_dataBlockPool.Construct(refType, const_cast<void*>(src), len, pool, poolIdx), &DataBlock::Destroy);
 	return r;
 }
 
-DataBlock::Ref DataBlock::create(
+DataBlock::Ref DataBlock::New(
 	const U16 *u16,
 	int u16Len,
 	::Zone &zone
@@ -226,7 +226,7 @@ DataBlock::Ref DataBlock::create(
 
 	int len = utf16to8len(u16, u16Len);
 	if (len > 0) {
-		r = create(kRefType_Copy, len + 1, 0, 0, zone);
+		r = New(kRefType_Copy, len + 1, 0, 0, zone);
 		char *x = (char*)r->m_buf;
 		utf16to8(x, u16, u16Len);
 		x[len] = 0;
@@ -235,7 +235,7 @@ DataBlock::Ref DataBlock::create(
 	return r;
 }
 
-DataBlock::Ref DataBlock::create(
+DataBlock::Ref DataBlock::New(
 	const U32 *u32,
 	int u32Len,
 	::Zone &zone
@@ -244,7 +244,7 @@ DataBlock::Ref DataBlock::create(
 
 	int len = utf32to8len(u32, u32Len);
 	if (len > 0) {
-		r = create(kRefType_Copy, len + 1, 0, 0, zone);
+		r = New(kRefType_Copy, len + 1, 0, 0, zone);
 		char *x = (char*)r->m_buf;
 		utf32to8(x, u32, u32Len);
 		x[len] = 0;
@@ -253,7 +253,7 @@ DataBlock::Ref DataBlock::create(
 	return r;
 }
 
-DataBlock::Ref DataBlock::resize(const DataBlock::Ref &block, int size, ::Zone &zone) {
+DataBlock::Ref DataBlock::Resize(const DataBlock::Ref &block, int size, ::Zone &zone) {
 	
 	if (block && (block->m_refType != kRefType_Ref) && block.unique()) {
 		if (!block->m_pool) {
@@ -266,7 +266,7 @@ DataBlock::Ref DataBlock::resize(const DataBlock::Ref &block, int size, ::Zone &
 		}
 	}
 
-	DataBlock::Ref r = create(kRefType_Copy, size, 0, 0, zone);
+	DataBlock::Ref r = New(kRefType_Copy, size, 0, 0, zone);
 
 	if (block)
 		memcpy(r->m_buf, block->m_buf, std::min(size, block->m_size));
@@ -282,21 +282,21 @@ String::String(const String &s, const CopyTag_t&, ::Zone &zone) {
 	m_zone = &zone;
 	if (s.m_data) {
 		if (s.m_data->m_refType != kRefType_Copy) {
-			m_data = details::DataBlock::create(kRefType_Copy, 0, s.m_data->data, s.m_data->size, zone);
+			m_data = details::DataBlock::New(kRefType_Copy, 0, s.m_data->data, s.m_data->size, zone);
 		} else {
 			m_data = s.m_data;
 		}
 	}
 }
 
-UTF16Buf String::toUTF16() const {
+UTF16Buf String::ToUTF16() const {
 	UTF16Buf buf;
 
 	if (m_data) {
 		int len = utf8to16len(c_str, length + 1);
 		if (len > 0) {
 			buf.m_zone = m_zone;
-			buf.m_data = details::DataBlock::create(kRefType_Copy, len*sizeof(U16), 0, 0, *m_zone);
+			buf.m_data = details::DataBlock::New(kRefType_Copy, len*sizeof(U16), 0, 0, *m_zone);
 			utf8to16((U16*)buf.m_data->data.get(), c_str, length + 1);
 		}
 	}
@@ -304,14 +304,14 @@ UTF16Buf String::toUTF16() const {
 	return buf;
 }
 
-UTF32Buf String::toUTF32() const {
+UTF32Buf String::ToUTF32() const {
 	UTF32Buf buf;
 
 	if (m_data) {
 		int len = utf8to32len(c_str, length + 1);
 		if (len > 0) {
 			buf.m_zone = m_zone;
-			buf.m_data = details::DataBlock::create(kRefType_Copy, len*sizeof(U32), 0, 0, *m_zone);
+			buf.m_data = details::DataBlock::New(kRefType_Copy, len*sizeof(U32), 0, 0, *m_zone);
 			utf8to32((U32*)buf.m_data->data.get(), c_str, length + 1);
 		}
 	}
@@ -319,42 +319,42 @@ UTF32Buf String::toUTF32() const {
 	return buf;
 }
 
-String &String::upper() {
+String &String::Upper() {
 	if (m_data) {
 		// toupper UNICODE only works reliable using towupper
 		// this requires transcoding to a wide string and then back.
 		// expensive.
-		WCharBuf buf = toWChar();
+		WCharBuf buf = ToWChar();
 		toupper(const_cast<wchar_t*>(buf.c_str.get()));
 		*this = String(buf, *m_zone);
 	}
 	return *this;
 }
 
-String &String::lower() {
+String &String::Lower() {
 	if (m_data) {
 		// tolower UNICODE only works reliable using towlower
 		// this requires transcoding to a wide string and then back.
 		// expensive.
-		WCharBuf buf = toWChar();
+		WCharBuf buf = ToWChar();
 		tolower(const_cast<wchar_t*>(buf.c_str.get()));
 		*this = String(buf, *m_zone);
 	}
 	return *this;
 }
 
-String &String::reverse() {
+String &String::Reverse() {
 	if (m_data) {
-		UTF32Buf buf = toUTF32();
+		UTF32Buf buf = ToUTF32();
 		std::reverse(const_cast<U32*>(buf.c_str.get()), const_cast<U32*>(buf.c_str.get() + buf.size + 1));
 		*this = String(buf, *m_zone);
 	}
 	return *this;
 }
 
-String String::substr(int first, int count) const {
+String String::SubStr(int first, int count) const {
 	if (m_data) {
-		first = byteForChar(first);
+		first = ByteForChar(first);
 		if (first >= 0) {
 			const char *sz = (const char*)m_data->data.get() + first;
 
@@ -365,7 +365,7 @@ String String::substr(int first, int count) const {
 			while (count-- > 0) {
 				const char *tail = sz;
 				utf8::unchecked::utf8to32(&tail, tail+1, &b);
-				sub.nAppend(sz, tail-sz);
+				sub.NAppend(sz, tail-sz);
 				sz = tail;
 			}
 
@@ -375,7 +375,7 @@ String String::substr(int first, int count) const {
 	return String();
 }
 
-int String::charForByte(int pos) const {
+int String::CharForByte(int pos) const {
 	if (pos >= length)
 		return -1;
 
@@ -393,7 +393,7 @@ int String::charForByte(int pos) const {
 	return c;
 }
 
-int String::byteForChar(int idx) const {
+int String::ByteForChar(int idx) const {
 	const char *start = c_str.get();
 	const char *end = start + length;
 	const char *sz = start;
@@ -409,7 +409,7 @@ int String::byteForChar(int idx) const {
 	return sz-start;
 }
 
-String &String::erase(int ofs, int count) {
+String &String::Erase(int ofs, int count) {
 	int nc = numChars;
 	if (ofs >= nc)
 		return *this;
@@ -418,17 +418,17 @@ String &String::erase(int ofs, int count) {
 	
 	String l;
 	if (ofs > 0)
-		l = substr(0, ofs);
+		l = SubStr(0, ofs);
 
 	String r;
 	if (ofs+count < nc)
-		r = substr(ofs+count, nc-(ofs+count));
+		r = SubStr(ofs+count, nc-(ofs+count));
 
 	*this = l + r;
 	return *this;
 }
 
-String &String::eraseBytes(int ofs, int count) {
+String &String::EraseBytes(int ofs, int count) {
 	int nc = length;
 	if (ofs >= nc)
 		return *this;
@@ -437,20 +437,20 @@ String &String::eraseBytes(int ofs, int count) {
 	
 	String l;
 	if (ofs > 0)
-		l = substrBytes(0, ofs);
+		l = SubStrBytes(0, ofs);
 
 	String r;
 	if (ofs+count < nc)
-		r = substrBytes(ofs+count, nc-(ofs+count));
+		r = SubStrBytes(ofs+count, nc-(ofs+count));
 
 	*this = l + r;
 	return *this;
 }
 
-String &String::nAppendBytes(const String &str, int len) {
+String &String::NAppendBytes(const String &str, int len) {
 	if (str && len) {
 		int orglen = length;
-		m_data = details::DataBlock::resize(m_data, orglen + len + 1, *m_zone);
+		m_data = details::DataBlock::Resize(m_data, orglen + len + 1, *m_zone);
 		char *sz = (char*)m_data->m_buf;
 		memcpy(sz + orglen, str.m_data->data, len);
 		sz[orglen + len] = 0;
@@ -458,19 +458,19 @@ String &String::nAppendBytes(const String &str, int len) {
 	return *this;
 }
 
-String &String::replace(const String &src, const String &dst) {
+String &String::Replace(const String &src, const String &dst) {
 	String s(*this);
 
 	int x;
-	while ((x=s.strstr(src)) >= 0) {
+	while ((x=s.StrStr(src)) >= 0) {
 		String l, r;
 
 		if (x > 0)
-			l = s.left(x);
+			l = s.Left(x);
 
 		int c = s.length - (x+dst.length);
 		if (c > 0)
-			r = s.rightBytes(c);
+			r = s.RightBytes(c);
 
 		s = l + dst + r;
 	}
@@ -479,43 +479,43 @@ String &String::replace(const String &src, const String &dst) {
 	return *this;
 }
 
-String &String::printf(const char *fmt, va_list args) {
+String &String::Printf(const char *fmt, va_list args) {
 	String sfmt(CStr(fmt));
 #if defined(RAD_OPT_WIN) // fuck you windows you non-standard piece of shit
-	sfmt.replace("%s", "%hs");
+	sfmt.Replace("%s", "%hs");
 #endif
-	WCharBuf wfmt = sfmt.toWChar();
+	WCharBuf wfmt = sfmt.ToWChar();
 	int len = vscprintf(wfmt.c_str.get(), args);
 	if (len > 1) { // > 1 because NULL is counted
 		// do as wchars for UTF support.
 		details::DataBlock::Ref wcs = 
-			details::DataBlock::create(kRefType_Copy, len*sizeof(wchar_t), 0, 0, *m_zone);
+			details::DataBlock::New(kRefType_Copy, len*sizeof(wchar_t), 0, 0, *m_zone);
 		wchar_t *wchars = reinterpret_cast<wchar_t*>(wcs->m_buf);
 		vsprintf(wchars, wfmt.c_str.get(), args);
 		*this = String(wchars, len - 1, *m_zone);
 	} else {
-		clear();
+		Clear();
 	}
 
 	return *this;
 }
 
-String &String::printfASCII(const char *fmt, va_list args) {
+String &String::PrintfASCII(const char *fmt, va_list args) {
 
 	int len = vscprintf(fmt, args);
 	if (len > 1) { // > 1 because NULL is counted
-		m_data = details::DataBlock::create(kRefType_Copy, len, 0, 0, *m_zone);
+		m_data = details::DataBlock::New(kRefType_Copy, len, 0, 0, *m_zone);
 		char *chars = reinterpret_cast<char*>(m_data->m_buf);
 		vsprintf(chars, fmt, args);
 	} else {
-		clear();
+		Clear();
 	}
 
 	return *this;
 }
 
-String &String::write(int pos, const char *sz, int len) {
-	m_data = details::DataBlock::isolate(m_data, *m_zone);
+String &String::Write(int pos, const char *sz, int len) {
+	m_data = details::DataBlock::Isolate(m_data, *m_zone);
 	ncpy(
 		reinterpret_cast<char*>(m_data->data.get()),
 		sz,

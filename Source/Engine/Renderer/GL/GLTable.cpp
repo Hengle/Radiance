@@ -914,7 +914,7 @@ bool GLTable::CheckErrors(const char *file, const char *function, int line)
 
 		if (!found)
 		{
-			str.printf(
+			str.Printf(
 				"GL Errors (file: %s, function: %s, line: %d):\n",
 				file,
 				function,

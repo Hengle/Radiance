@@ -48,7 +48,7 @@ bool CheckALErrors(const char *file, const char *function, int line)
 
 		if (!found)
 		{
-			str.printf(
+			str.Printf(
 				"AL Errors (file: %s, function: %s, line: %d):\n",
 				file,
 				function,

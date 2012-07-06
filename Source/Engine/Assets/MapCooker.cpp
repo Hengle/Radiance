@@ -210,7 +210,7 @@ int MapCooker::ParseScript(world::EntSpawn &spawn)
 
 		// turn "\n" into '\n'
 		const char *sz = value.c_str;
-		temp.clear();
+		temp.Clear();
 
 		while (*sz)
 		{

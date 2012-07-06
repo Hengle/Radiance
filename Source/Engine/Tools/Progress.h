@@ -118,7 +118,7 @@ protected:
 	{
 		if (!value)
 		{
-			m_ssub.clear();
+			m_ssub.Clear();
 			return;
 		}
 		m_ssub = value;
@@ -129,7 +129,7 @@ protected:
 	{
 		if (!value)
 		{
-			m_title.clear();
+			m_title.Clear();
 			return;
 		}
 		m_title = value;

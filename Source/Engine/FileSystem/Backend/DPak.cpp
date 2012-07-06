@@ -458,7 +458,7 @@ bool DPakFileSearch::NextFile(String &outFilename)
 		// trivial rejection.
 		if (name.length < m_path.length) 
 			continue;
-		if (name.substr(0, m_path.length) != m_path) 
+		if (name.SubStr(0, m_path.length) != m_path) 
 			continue; // doesn't start with our path.
 
 		if (m_ext[1] != '*') // filter the extension.

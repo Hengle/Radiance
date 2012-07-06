@@ -195,7 +195,7 @@ inline void Marshal<std::wstring>::Push(lua_State *L, const std::wstring &val)
 inline std::wstring Marshal<std::wstring>::Get(lua_State *L, int index, bool forceType)
 {
 	String x(Marshal<String>::Get(L, index, forceType));
-	std::wstring z(x.toWChar().c_str.get());
+	std::wstring z(x.ToWChar().c_str.get());
 	return z;
 }
 

@@ -117,7 +117,7 @@ int MaterialCooker::Compile(int flags, int allflags)
 	for (int i = 0; i < r::MTS_MaxIndices; ++i)
 	{
 		String path;
-		path.printf("Texture%d.Source.Texture", i+1);
+		path.Printf("Texture%d.Source.Texture", i+1);
 		const String *s = asset->entry->KeyValue<String>(path.c_str, flags);
 		if (!s)
 			return SR_MetaError;
@@ -196,11 +196,11 @@ int MaterialCooker::MatchTargetKeys(int flags, int allflags)
 
 	for (int i = 0; i < r::MTS_MaxIndices; ++i)
 	{
-		path.printf("Texture%d.Source.Texture", i+1);
+		path.Printf("Texture%d.Source.Texture", i+1);
 		x &= asset->entry->MatchTargetKeys<String>(path.c_str, flags, allflags);
-		path.printf("Texture%d.Source.FramesPerSecond", i+1);
+		path.Printf("Texture%d.Source.FramesPerSecond", i+1);
 		x &= asset->entry->MatchTargetKeys<String>(path.c_str, flags, allflags);
-		path.printf("Texture%d.tcGen", i+1);
+		path.Printf("Texture%d.tcGen", i+1);
 		x &= asset->entry->MatchTargetKeys<String>(path.c_str, flags, allflags);
 
 		if (!x)
@@ -208,7 +208,7 @@ int MaterialCooker::MatchTargetKeys(int flags, int allflags)
 
 		for (int k = 0; k < r::Material::NumTcMods; ++k)
 		{
-			path.printf("Texture%d.tcMod.%s", i+1, s_tcModNames[k]);
+			path.Printf("Texture%d.tcMod.%s", i+1, s_tcModNames[k]);
 			z = path + ".Type";
 			x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
 			z = path + ".Amplitude";
@@ -229,14 +229,14 @@ int MaterialCooker::MatchTargetKeys(int flags, int allflags)
 	{
 		for (int k = r::Material::ColorA; k < r::Material::NumColorIndices; ++k)
 		{
-			path.printf("Color%d.%c", i, 'A'+k);
+			path.Printf("Color%d.%c", i, 'A'+k);
 			x &= asset->entry->MatchTargetKeys<String>(path.c_str, flags, allflags);
 		}
 
 		if (!x)
 			return 0;
 
-		path.printf("Color%d.Gen", i);
+		path.Printf("Color%d.Gen", i);
 		z = path + ".Type";
 		x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
 		z = path + ".Amplitude";

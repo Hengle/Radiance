@@ -21,7 +21,7 @@ public:
 	typedef boost::mutex M;
 	typedef boost::lock_guard<M> Lock;
 	typedef thread::scoped_lock_guard<M> ScopedLock;
-	static M &get() {
+	static M &Get() {
 		static M s_m;
 		return s_m;
 	}
@@ -53,7 +53,7 @@ private:
 	RAD_DECLARE_READONLY_PROPERTY(DataBlock, size, int);
 
 	// len here is the total buffer length.
-	static DataBlock::Ref create(
+	static DataBlock::Ref New(
 		RefType type,
 		int len,
 		const void *src,
@@ -61,38 +61,38 @@ private:
 		Zone &zone
 	);
 
-	static Ref create(
+	static Ref New(
 		const U16 *src,
 		int len,
 		Zone &zone
 	);
 
-	static Ref create(
+	static Ref New(
 		const U32 *src,
 		int len,
 		Zone &zone
 	);
 
 #if defined(RAD_NATIVE_WCHAR_T_DEFINED)
-	static Ref create(
+	static Ref New(
 		const wchar_t *src,
 		int len,
 		Zone &zone
 	) {
 #if defined(RAD_OPT_4BYTE_WCHAR)
-		return DataBlock::create((const U32*)src, len, zone);
+		return DataBlock::New((const U32*)src, len, zone);
 #else
-		return DataBlock::create((const U16*)src, len, zone);
+		return DataBlock::New((const U16*)src, len, zone);
 #endif
 	}
 #endif
 
-	static DataBlock::Ref resize(const DataBlock::Ref &block, int size, Zone &zone);
+	static DataBlock::Ref Resize(const DataBlock::Ref &block, int size, Zone &zone);
 
-	static DataBlock::Ref isolate(const DataBlock::Ref &block, Zone &zone) {
+	static DataBlock::Ref Isolate(const DataBlock::Ref &block, Zone &zone) {
 		RAD_ASSERT(block);
 		if (!block.unique() || (block->m_refType != kRefType_Copy))
-			return create(kRefType_Copy, block->m_size, block->m_buf, block->m_size, zone);
+			return New(kRefType_Copy, block->m_size, block->m_buf, block->m_size, zone);
 		return block;
 	}
 
@@ -125,7 +125,7 @@ private:
 		return m_size;
 	}
 
-	static void destroy(DataBlock *d) {
+	static void Destroy(DataBlock *d) {
 		s_dataBlockPool.Destroy(d);
 	}
 
@@ -137,15 +137,16 @@ private:
 
 	typedef ObjectPool<DataBlock> DataBlockPool;
 
-	static bool s_init;
-	static DataBlockPool s_dataBlockPool;
-	static MemoryPool s_pools[kNumPools];
-	static void initPools();
-	static MemoryPool *poolForSize(
+	static void InitPools();
+	static MemoryPool *PoolForSize(
 		int size, 
 		int &poolIdx, 
 		Mutex::ScopedLock &L
 	);
+
+	static bool s_init;
+	static DataBlockPool s_dataBlockPool;
+	static MemoryPool s_pools[kNumPools];
 };
 
 } // details

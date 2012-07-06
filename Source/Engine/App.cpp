@@ -134,7 +134,7 @@ StringTable::LangId App::LoadLangId(int *enabledLangMask) {
 				return ErrLang;
 			if (!script.GetToken(token))
 				return ErrLang;
-			token = token.lower();
+			token.Lower();
 			int id = StringTable::Map(token.c_str);
 			if (id != -1)
 				defaultLang = (StringTable::LangId)id;
@@ -143,7 +143,7 @@ StringTable::LangId App::LoadLangId(int *enabledLangMask) {
 				return ErrLang;
 			if (!script.GetToken(token))
 				return ErrLang;
-			token = token.lower();
+			token.Lower();
 			int id = StringTable::Map(token.c_str);
 			if (id != -1) {
 				if (enabledLangMask) // make sure to set this
@@ -151,7 +151,7 @@ StringTable::LangId App::LoadLangId(int *enabledLangMask) {
 				return (StringTable::LangId)id;
 			}
 		} else {
-			token = token.lower();
+			token.Lower();
 			int id = StringTable::Map(token.c_str);
 			if (id != -1)
 				validLangBits |= (1<<id);

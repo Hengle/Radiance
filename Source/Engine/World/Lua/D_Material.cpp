@@ -71,7 +71,7 @@ int D_Material::lua_SetState(lua_State *L)
 			if (!waves[k])
 				break;
 
-			base.printf("Texture%d.tcMod.%s.", i+1, waves[k]);
+			base.Printf("Texture%d.tcMod.%s.", i+1, waves[k]);
 
 			s = base + kAmplitude;
 			if (s == state)

@@ -144,7 +144,7 @@ Material::ShaderInstance::Ref Material::ShaderInstance::FindOrCreate(Engine &eng
 	if (!r)
 	{
 		String path;
-		path.printf("Shaders/%d.bin", m.shaderId.get());
+		path.Printf("Shaders/%d.bin", m.shaderId.get());
 
 		file::HStreamInputBuffer ib;
 
@@ -203,7 +203,7 @@ int Material::ShaderInstance::Cook(const char *path, Engine &engine, const Mater
 	r->cooked = true;
 	
 	String spath;
-	spath.printf("%s/%d.bin", path, r->idx);
+	spath.Printf("%s/%d.bin", path, r->idx);
 	char nativePath[file::MaxFilePathLen+1];
 	file::ExpandToNativePath(spath.c_str, nativePath, file::MaxFilePathLen+1);
 

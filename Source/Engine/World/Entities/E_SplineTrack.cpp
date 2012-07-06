@@ -289,7 +289,7 @@ E_SplineTrack::StringVec E_SplineTrack::SplitEvents(const char *str)
 		{
 			if (!s.empty)
 				v.push_back(s);
-			s.clear();
+			s.Clear();
 		}
 		else
 		{

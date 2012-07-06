@@ -122,7 +122,7 @@ int StringTable::Load(const char *name, const char *root, StringTable::Ref &_r, 
 	for (int i = 0; i < LangId_MAX; ++i) {
 
 		String path;
-		path.printf("%s.%s", root, StringTable::Langs[i]);
+		path.Printf("%s.%s", root, StringTable::Langs[i]);
 
 		std::fstream f;
 
@@ -257,7 +257,7 @@ bool StringTable::SaveText(const char *name, const char *path, int saveMask) con
 			continue;
 
 		String spath;
-		spath.printf("%s.%s", path, StringTable::Langs[i]);
+		spath.Printf("%s.%s", path, StringTable::Langs[i]);
 
 		std::fstream f;
 
@@ -287,7 +287,7 @@ bool StringTable::SaveText(const char *name, const char *path, int saveMask) con
 
 			if (string != it->second.strings.end()) {
 				const String &val = string->second;
-				string::UTF32Buf utf = val.toUTF32();
+				string::UTF32Buf utf = val.ToUTF32();
 
 				String mod;
 				String slashes(CStr("\\\\"));

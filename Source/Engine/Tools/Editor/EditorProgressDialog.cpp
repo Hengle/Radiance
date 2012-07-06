@@ -119,7 +119,7 @@ void ProgressDialog::RAD_IMPLEMENT_SET(title) (const char *x)
 {
 	if (!x)
 	{
-		m_strings[0].clear();
+		m_strings[0].Clear();
 		return;
 	}
 
@@ -135,7 +135,7 @@ void ProgressDialog::RAD_IMPLEMENT_SET(subTitle) (const char *x)
 {
 	if (!x)
 	{
-		m_strings[1].clear();
+		m_strings[1].Clear();
 		return;
 	}
 

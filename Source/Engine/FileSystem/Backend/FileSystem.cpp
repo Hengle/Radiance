@@ -868,7 +868,7 @@ HSearch FileSystem::OpenSearch(const char *path, const char *extIncludingPeriod,
 	RAD_OUT_OF_MEM(search);
 	String str;
 	FixupPath(path, str);
-	String ext = CStr(extIncludingPeriod).lower();
+	String ext = CStr(extIncludingPeriod).Lower();
 	search->Initialize(&m_paks, this, int(media & m_enabledMedia));
 	if (search->OpenSearch(str.c_str, ext.c_str))
 	{
@@ -1291,7 +1291,7 @@ void *FileSystem::AlignedFileBuffer(FPos size, FPos alignment, Zone &zone)
 void FileSystem::FixupPath(const char *str, String &path)
 {
 	RAD_ASSERT(str);
-	path.clear();
+	path.Clear();
 	if (str[0] == 0) 
 		return;
 	String prefix, right;
@@ -1307,21 +1307,21 @@ void FileSystem::FixupPath(const char *str, String &path)
 	// process '../' command inside path string.
 	while (!right.empty)
 	{
-		int ofs = right.strstr("/");
+		int ofs = right.StrStr("/");
 		if (ofs != -1)
 		{
-			prefix = right.substr(0, ofs+1); // include '/'
-			right = right.substr(ofs+1);
+			prefix = right.SubStr(0, ofs+1); // include '/'
+			right = right.SubStr(ofs+1);
 
 			if (right.length >= 3)
 			{
 				if (right[0] == '.' && right[1] == '.' && right[2] == '/')
 				{
-					prefix.clear();
+					prefix.Clear();
 					// remove leading ../
 					while (right.length >= 3 && right[0] == '.' && right[1] == '.' && right[2] == '/')
 					{
-						right = right.left(3);
+						right = right.Left(3);
 					}
 				}
 			}
@@ -1371,13 +1371,13 @@ void FileSystem::RAD_IMPLEMENT_SET(cddvdRoot) (const char *value)
 
 	m_cddvd = value;
 	if (m_cddvd[0] == '/') 
-		m_cddvd.erase(0, 1);
+		m_cddvd.Erase(0, 1);
 
 	if (!m_cddvd.empty)
 	{
 		if (*(m_cddvd.end-1) == L'/')
 		{
-			m_cddvd.erase(m_cddvd.length-1);
+			m_cddvd.Erase(m_cddvd.length-1);
 		}
 	}
 	if (!m_cddvd.empty)
@@ -1409,12 +1409,12 @@ void FileSystem::RAD_IMPLEMENT_SET(hddRoot) (const char *value)
 
 	m_hdd = value;
 	if (m_hdd[0] == '/') 
-		m_hdd.erase(0, 1);
+		m_hdd.Erase(0, 1);
 	if (!m_hdd.empty)
 	{
 		if (*(m_hdd.end-1) == '/')
 		{
-			m_hdd.erase(m_hdd.length-1);
+			m_hdd.Erase(m_hdd.length-1);
 		}
 	}
 	if (!m_hdd.empty)
@@ -1446,12 +1446,12 @@ void FileSystem::RAD_IMPLEMENT_SET(modRoot) (const char *value)
 
 	m_mod = value;
 	if (m_mod[0] == '/') 
-		m_mod.erase(0, 1);
+		m_mod.Erase(0, 1);
 	if (!m_mod.empty)
 	{
 		if (*(m_mod.end-1) == '/')
 		{
-			m_mod.erase(m_mod.length-1);
+			m_mod.Erase(m_mod.length-1);
 		}
 	}
 	if (!m_mod.empty)

@@ -186,7 +186,7 @@ private:
 
 #if defined(RAD_OPT_TOOLS)
 	RAD_DECLARE_GET(shaderName, const char*) { return m_shaderName.c_str; }
-	RAD_DECLARE_SET(shaderName, const char*) { if (value) { m_shaderName = value; } else { m_shaderName.clear(); } }
+	RAD_DECLARE_SET(shaderName, const char*) { if (value) { m_shaderName = value; } else { m_shaderName.Clear(); } }
 #endif
 	RAD_DECLARE_GET(shader, Shader::Ref) { return m_shader->shader; }
 	RAD_DECLARE_GET(sort, Sort) { return m_sort; }

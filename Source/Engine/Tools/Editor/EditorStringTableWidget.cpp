@@ -224,7 +224,7 @@ void StringTableWidget::OnAddClicked() {
 	for (int i = 2; ; ++i) {
 		if (m_parser->mutableStringTable->CreateId(id.c_str))
 			break;
-		id.printf("New String %d", i);
+		id.Printf("New String %d", i);
 	}
 
 	m_model->Load();

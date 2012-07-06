@@ -126,7 +126,7 @@ Package::Entry::Ref Package::CreateEntry(const char *name, asset::Type type)
 	RAD_ASSERT(name);
 	details::WriteLock WL(m_m);
 
-	if (m_dirSet.find(String(name, string::RefTag).lower()) != m_dirSet.end())
+	if (m_dirSet.find(CStr(name).Lower()) != m_dirSet.end())
 		return Entry::Ref(); // already exists.
 
 	PackageMan::Ref pm = m_pm.lock();
@@ -145,7 +145,7 @@ Package::Entry::Ref Package::CreateEntry(const char *name, asset::Type type)
 
 	RAD_VERIFY(m_dir.insert(Entry::Map::value_type(ref->m_name, ref)).second);
 	RAD_VERIFY(m_idDir.insert(Entry::IdMap::value_type(ref->m_id, ref)).second);
-	RAD_VERIFY(m_dirSet.insert(StringIdMap::value_type(ref->m_name.lower(), ref->id)).second);
+	RAD_VERIFY(m_dirSet.insert(StringIdMap::value_type(String(ref->m_name).Lower(), ref->id)).second);
 	pkgMan->MapId(ref->id, shared_from_this());
 
 	return ref;
@@ -363,7 +363,7 @@ Package::Ref PackageMan::ResolvePackage(const char *name, int flags)
 		// check to see if this is a case sensativity issue, like someone typed in
 		// a bad letter
 		String lowerName(sname);
-		lowerName.lower();
+		lowerName.Lower();
 
 		if (m_packageDir.find(lowerName) != m_packageDir.end())
 			return Package::Ref();

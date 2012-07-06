@@ -98,7 +98,7 @@ TimeDate TimeDate::FromString(const char *str)
 string::String TimeDate::ToString() const
 {
 	string::String s;
-	s.printf("%d %d %d %d %d %d %d %d",
+	s.Printf("%d %d %d %d %d %d %d %d",
 		(int)year,
 		(int)millis,
 		(int)month,

@@ -423,7 +423,7 @@ void ContentBrowserView::DoTick(float dt)
 
 void ContentBrowserView::UpdateFilter(bool redraw)
 {
-	m_filter.filter = String(m_searchLine->text.get().toAscii().constData()).lower();
+	m_filter.filter = String(m_searchLine->text.get().toAscii().constData()).Lower();
 	BuildAssetList();
 	RecalcLayout(false);
 	if (!ScrollToSelection() && redraw)
@@ -542,7 +542,7 @@ void ContentBrowserView::DeleteSelection()
 	SelSet sel(m_sel);
 	
 	String msg;
-	msg.printf("Are you sure you want to delete the following %d item(s)?"RAD_NEWLINE, sel.size());
+	msg.Printf("Are you sure you want to delete the following %d item(s)?"RAD_NEWLINE, sel.size());
 
 	{
 		String x;

@@ -240,7 +240,7 @@ KeyVal::Ref Package::Entry::RemoveKey(const char *path, int flags)
 	{
 		for (KeyVal::Map::iterator it = m_keys.begin(); it != m_keys.end();)
 		{
-			if (sPath.nCompare(it->second->path, sPath.length) == 0)
+			if (sPath.NCompare(it->second->path, sPath.length) == 0)
 			{
 				KeyVal::Map::iterator next = it; ++next;
 				r = it->second;
@@ -334,7 +334,7 @@ String Package::Entry::TrimKeyName(const String &name)
 		if (name[period] == '.') break;
 	}
 
-	return name.left(period);
+	return name.Left(period);
 }
 
 void Package::Entry::AddImport(const char *name, const char *path)
@@ -379,7 +379,7 @@ void Package::Delete(int id)
         Entry::Ref ref = it->second;
         pkgMan->UpdateImports(ref->m_path.c_str, 0);
         m_dir.erase(ref->m_name);
-        m_dirSet.erase(ref->m_name.lower());
+        m_dirSet.erase(String(ref->m_name).Lower());
         m_idDir.erase(it);
     }
 }
@@ -413,7 +413,7 @@ bool Package::Rename(int id, const char *name)
 
 	RAD_ASSERT(name);
 	{
-		StringIdMap::const_iterator it = m_dirSet.find(String(name).lower());
+		StringIdMap::const_iterator it = m_dirSet.find(String(name).Lower());
 		if (it != m_dirSet.end() && it->second != id)
 		{ // already something with that name.
 			return false;
@@ -434,8 +434,8 @@ bool Package::Rename(int id, const char *name)
 	newPath = ref->m_path;
 	m_dir.erase(oldName);
 	m_dir[ref->m_name] = ref;
-	m_dirSet.erase(oldName.lower());
-	m_dirSet[ref->m_name.lower()] = id;
+	m_dirSet.erase(oldName.Lower());
+	m_dirSet[ref->m_name.Lower()] = id;
 
 	for (int i = 0; i < Z_Max; ++i)
 	{
@@ -1050,7 +1050,7 @@ void PackageMan::ParseKeyDefs(const String &filename, const String &path, const 
 #endif
 			continue;
 		}
-		else if(it->first == String(it->first).lower()) // all lowercase
+		else if(it->first == String(it->first).Lower()) // all lowercase
 		{
 			if (!parent) 
 				continue;
@@ -1224,7 +1224,7 @@ void PackageMan::EnumeratePackage(
 	}
 
 	String lowerName = CStr(name);
-	lowerName.lower();
+	lowerName.Lower();
 
 	if (!m_packageDir.insert(lowerName).second)
 	{
@@ -1330,7 +1330,7 @@ void PackageMan::Delete(const Package::Ref &pkg)
 		UnmapId(it->second->id);
 	}
 	m_packages.erase(pkg->m_name);
-	m_packageDir.erase(pkg->m_name.lower());
+	m_packageDir.erase(String(pkg->m_name).Lower());
 }
 
 bool PackageMan::Rename(int id, const char *name)
@@ -1371,7 +1371,7 @@ Package::Ref PackageMan::CreatePackage(const char *name)
 
 	String sname(CStr(name));
 
-	if (!m_packageDir.insert(String(sname).lower()).second)
+	if (!m_packageDir.insert(String(sname).Lower()).second)
 		return Package::Ref();
 
 	m_packages.insert(Package::Map::value_type(sname, pkg));
@@ -1384,7 +1384,8 @@ bool PackageMan::Rename(const Package::Ref &pkg, const char *name)
 	details::WriteLock L(m_m);
 
 	String sname(name);
-	String lowerName(sname.lower());
+	String lowerName(sname);
+	lowerName.Lower();
 	
 	if (!m_packageDir.insert(lowerName).second)
 	{ // exists
@@ -1397,7 +1398,7 @@ bool PackageMan::Rename(const Package::Ref &pkg, const char *name)
 		m_packages.erase(it);
 	}
 
-	lowerName = pkg->m_name.lower();
+	lowerName = pkg->m_name.Lower();
 	m_packageDir.erase(lowerName);
 
 	m_packages[sname] = pkg;

@@ -727,7 +727,7 @@ void WorldCinematics::EmitCameraTags(Cinematic &c)
 				{
 					if (!x.empty)
 						c.notify->OnTag(x.c_str);
-					x.clear();
+					x.Clear();
 				}
 				else
 				{

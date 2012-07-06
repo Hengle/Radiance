@@ -320,7 +320,7 @@ int MaterialParser::Load(
 
 	for (int i = 0; i < r::MTS_MaxIndices; ++i)
 	{
-		path.printf("Texture%d.Source.Texture", i+1);
+		path.Printf("Texture%d.Source.Texture", i+1);
 		s = asset->entry->KeyValue<String>(path.c_str, P_TARGET_FLAGS(flags));
 		if (!s)
 			return SR_MetaError;
@@ -351,7 +351,7 @@ int MaterialParser::Load(
 			m_m.SetTextureId(r::MTS_Texture, i, entry->id);
 		}
 
-		path.printf("Texture%d.Source.FramesPerSecond", i+1);
+		path.Printf("Texture%d.Source.FramesPerSecond", i+1);
 		s = asset->entry->KeyValue<String>(path.c_str, P_TARGET_FLAGS(flags));
 		if (!s)
 			return SR_MetaError;
@@ -359,13 +359,13 @@ int MaterialParser::Load(
 		sscanf(s->c_str, "%f", &fps);
 		m_m.SetTextureFPS(r::MTS_Texture, i, fps);
 
-		path.printf("Texture%d.Source.ClampTextureFrames", i+1);
+		path.Printf("Texture%d.Source.ClampTextureFrames", i+1);
 		b = asset->entry->KeyValue<bool>(path.c_str, P_TARGET_FLAGS(flags));
 		if (!b)
 			return SR_MetaError;
 		m_m.SetClampTextureFrames(r::MTS_Texture, i, *b);
 
-		path.printf("Texture%d.tcGen", i+1);
+		path.Printf("Texture%d.tcGen", i+1);
 		s = asset->entry->KeyValue<String>(path.c_str, P_TARGET_FLAGS(flags));
 		if (!s)
 			return SR_MetaError;
@@ -379,7 +379,7 @@ int MaterialParser::Load(
 
 		for (int k = 0; k < r::Material::NumTcMods; ++k)
 		{
-			path.printf("Texture%d.tcMod.%s", i+1, s_tcModNames[k]);
+			path.Printf("Texture%d.tcMod.%s", i+1, s_tcModNames[k]);
 			z = path + ".Type";
 
 			WaveAnim &S = m_m.Wave(
@@ -461,7 +461,7 @@ int MaterialParser::Load(
 	{
 		for (int k = r::Material::ColorA; k < r::Material::NumColorIndices; ++k)
 		{
-			path.printf("Color%d.%c", i, 'A'+k);
+			path.Printf("Color%d.%c", i, 'A'+k);
 			s = asset->entry->KeyValue<String>(path.c_str, P_TARGET_FLAGS(flags));
 			if (!s)
 				return SR_MetaError;
@@ -481,7 +481,7 @@ int MaterialParser::Load(
 			m_m.SetColor(i, k, c);
 		}
 
-		path.printf("Color%d.Gen", i);
+		path.Printf("Color%d.Gen", i);
 		z = path + ".Type";
 
 		s = asset->entry->KeyValue<String>(z.c_str, P_TARGET_FLAGS(flags));

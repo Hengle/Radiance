@@ -57,12 +57,12 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY_EX(class CharBuf<Traits>, SelfType, numChars, int);
 
 	//! Explicitly release memory.
-	void free();
+	void Free();
 
 	//! Contructs a new character buffer. The specified data is copied into a new buffer.
-	static SelfType create(const T *data, int size, const CopyTag_t&, ::Zone &zone = ZString);
+	static SelfType New(const T *data, int size, const CopyTag_t&, ::Zone &zone = ZString);
 	//! Constructs a new character buffer. The specified data is referenced directly.
-	static SelfType create(const T *data, int size, const RefTag_t&, ::Zone &zone = ZString);
+	static SelfType New(const T *data, int size, const RefTag_t&, ::Zone &zone = ZString);
 
 private:
 
@@ -210,45 +210,45 @@ public:
 
 	//! Retrieves the string data as a UTF8 encoded buffer.
 	/*! This operation is inexpensive since the original string data is simply referenced by the UTF8Buf object. */
-	UTF8Buf toUTF8() const;
+	UTF8Buf ToUTF8() const;
 	//! Retrieves the string data as a UTF16 encoded buffer.
-	UTF16Buf toUTF16() const;
+	UTF16Buf ToUTF16() const;
 	//! Retrieves the string data as a UTF32 encoded buffer.
-	UTF32Buf toUTF32() const;
+	UTF32Buf ToUTF32() const;
 	//! Retrieves the string data as a wide-character encoded buffer.
-	WCharBuf toWChar() const;
+	WCharBuf ToWChar() const;
 
-	std::string toStdString() const;
-	std::wstring toStdWString() const;
+	std::string ToStdString() const;
+	std::wstring ToStdWString() const;
 
-	int compare(const String &str) const;
-	int compare(const char *sz) const;
-	int compare(const wchar_t *sz) const;
+	int Compare(const String &str) const;
+	int Compare(const char *sz) const;
+	int Compare(const wchar_t *sz) const;
 
-	int comparei(const String &str) const;
-	int comparei(const char *sz) const;
-	int comparei(const wchar_t *sz) const;
+	int Comparei(const String &str) const;
+	int Comparei(const char *sz) const;
+	int Comparei(const wchar_t *sz) const;
 
-	int nCompare(const String &str, int len) const;
-	int nCompare(const char *sz, int len) const;
-	int nCompare(const wchar_t *sz, int len) const;
+	int NCompare(const String &str, int len) const;
+	int NCompare(const char *sz, int len) const;
+	int NCompare(const wchar_t *sz, int len) const;
 
-	int nComparei(const String &str, int len) const;
-	int nComparei(const char *sz, int len) const;
-	int nComparei(const wchar_t *sz, int len) const;
+	int NComparei(const String &str, int len) const;
+	int NComparei(const char *sz, int len) const;
+	int NComparei(const wchar_t *sz, int len) const;
 
-	int strstr(const String &str) const;
-	int strstr(const char *sz) const;
+	int StrStr(const String &str) const;
+	int StrStr(const char *sz) const;
 
-	String join(const String &str) const;
-	String join(const char *sz) const;
-	String join(const wchar_t *sz) const;
-	String join(const char c) const;
-	String join(const wchar_t c) const;
+	String Join(const String &str) const;
+	String Join(const char *sz) const;
+	String Join(const wchar_t *sz) const;
+	String Join(const char c) const;
+	String Join(const wchar_t c) const;
 
-	String nJoin(const String &str, int len) const;
-	String nJoin(const char *sz, int len) const;
-	String nJoin(const wchar_t *sz, int len) const;
+	String NJoin(const String &str, int len) const;
+	String NJoin(const char *sz, int len) const;
+	String NJoin(const wchar_t *sz, int len) const;
 
 	//! Returns a substring.
 	/*! \param first The first \em character to include in the substring.
@@ -256,70 +256,70 @@ public:
 	    \remarks Since the string is UTF8 encoded there is a difference between
 	    a character index and a byte position in the string. For strings that
 	    only contain ASCII the character index and byte position are the same.
-	    \sa CharIndexForBytePos()
-	    \sa BytePosForCharIndex()
+	    \sa CharForByte()
+	    \sa ByteForChar()
 	 */
-	String substr(int first, int count) const;
+	String SubStr(int first, int count) const;
 
 	//! Returns a substring.
 	/*! Returns the remaining string after the specified \em character.
-		Equivelent to right(numChars() - ofs).
+		Equivelent to Right(NumChars() - ofs).
 		\param ofs The first \em character to include in the substring.
 		\remarks Since the string is UTF8 encoded there is a difference between
 	    a character index and a byte position in the string. For strings that
 	    only contain ASCII the character index and byte position are the same.
-	    \sa CharIndexForBytePos()
-	    \sa BytePosForCharIndex()
+	    \sa CharForByte()
+	    \sa ByteForChar()
 	 */
-	String substr(int ofs) const;
+	String SubStr(int ofs) const;
 
 	//! Returns a substring. This function is intended for use with ASCII strings.
 	/*! \param first The first \em byte to include in the substring.
 	    \param count The number of \em bytes to include in the substring.
-	    \remarks This function is faster than the generic substr() function, 
+	    \remarks This function is faster than the generic SubStr() function, 
 	     however its arguments are expressed as bytes not characters.
 	 */
-	String substrBytes(int first, int count) const;
+	String SubStrBytes(int first, int count) const;
 		
 	//! Returns a substring.
-	/*! Equivelent to rightBytes(length - ofs).
+	/*! Equivelent to RightBytes(length - ofs).
 		\param ofs The first \em byte to include in the substring.
-		\remarks This function is faster than the generic substr() function, 
+		\remarks This function is faster than the generic SubStr() function, 
 	    however its arguments are expressed as bytes not characters.
 	 */
-	String substrBytes(int ofs) const;
+	String SubStrBytes(int ofs) const;
 
 	//! Returns a substring containing the leftmost characters.
 	/*! \param count The number of \em characters to return. 
 	    \remarks Care must be used as bounds checking is not performed. Requesting more
 	    characters than there are in a string will most likely result in an invalid access.
 	 */
-	String left(int count) const;
+	String Left(int count) const;
 
 	//! Returns a substring containing the rightmost characters.
 	/*! \param count The number of \em characters to return. 
 	    \remarks Care must be used as bounds checking is not performed. Requesting more
 	    characters than there are in a string will most likely result in an invalid access.
 	 */
-	String right(int count) const;
+	String Right(int count) const;
 
 	//! Returns a substring containing the leftmost characters.
 	/*! \param count The number of \em bytes to return. 
 	    \remarks Care must be used as bounds checking is not performed. Requesting more
 	    characters than there are in a string will most likely result in an invalid access.
-	    This function is faster than the generic left() function, however its arguments are 
+	    This function is faster than the generic Left() function, however its arguments are 
 		expressed as bytes not characters.
 	 */
-	String leftBytes(int count) const;
+	String LeftBytes(int count) const;
 
 	//! Returns a substring containing the rightmost characters.
 	/*! \param count The number of \em bytes to return. 
 	    \remarks Care must be used as bounds checking is not performed. Requesting more
 	    characters than there are in a string will most likely result in an invalid access.
-	    This function is faster than the generic substr() function, however its arguments are 
+	    This function is faster than the generic SubStr() function, however its arguments are 
 		expressed as bytes not characters.
 	 */
-	String rightBytes(int count) const;
+	String RightBytes(int count) const;
 
 	//! Boolean operator returns true if string is non-empty.
 	operator unspecified_bool_type () const;
@@ -358,81 +358,81 @@ public:
 	char operator [] (int ofs) const;
 
 	//! Returns true if the string objects reference the same string data.
-	bool equalsInstance(const String &str) const;
+	bool EqualsInstance(const String &str) const;
 	//! Returns true if the string objects reference the same string data.
-	bool equalsInstance(const UTF8Buf &buf) const;
+	bool EqualsInstance(const UTF8Buf &buf) const;
 
 	//! Returns the character index corresponding to the specified byte offset.
 	/*! \returns A character index or -1 if the byte position is invalid 
 	    (off the end of the string). 
 	 */
-	int charForByte(int byte) const;
+	int CharForByte(int byte) const;
 
 	//! Returns the byte position corresponding to the specified character index.
 	/*! \returns A byte position or -1 if the character index is invalid 
 	    (off the end of the string). 
 	 */
-	int byteForChar(int pos) const;
+	int ByteForChar(int pos) const;
 
 	// Mutable Operations
 
-	String &upper();
-	String &lower();
-	String &reverse();
+	String &Upper();
+	String &Lower();
+	String &Reverse();
 
-	String &upperASCII();
-	String &lowerASCII();
-	String &reverseASCII();
+	String &UpperASCII();
+	String &LowerASCII();
+	String &ReverseASCII();
 
-	String &trimSubstr(int ofs, int count);
-	String &trimSubstrBytes(int ofs, int count);
+	String &TrimSubStr(int ofs, int count);
+	String &TrimSubStrBytes(int ofs, int count);
 
-	String &trimLeft(int count);
-	String &trimRight(int count);
+	String &TrimLeft(int count);
+	String &TrimRight(int count);
 
-	String &trimLeftBytes(int count);
-	String &trimRightBytes(int count);
+	String &TrimLeftBytes(int count);
+	String &TrimRightBytes(int count);
 
-	String &erase(int ofs, int count = 1);
-	String &eraseBytes(int ofs, int count = 1);
+	String &Erase(int ofs, int count = 1);
+	String &EraseBytes(int ofs, int count = 1);
 
-	String &append(const String &str);
-	String &append(const char *sz);
-	String &append(const wchar_t *sz);
-	String &append(const char c);
-	String &append(const wchar_t c);
+	String &Append(const String &str);
+	String &Append(const char *sz);
+	String &Append(const wchar_t *sz);
+	String &Append(const char c);
+	String &Append(const wchar_t c);
 
-	String &nAppend(const String &str, int len);
-	String &nAppend(const char *sz, int len);
-	String &nAppend(const wchar_t *sz, int len);
+	String &NAppend(const String &str, int len);
+	String &NAppend(const char *sz, int len);
+	String &NAppend(const wchar_t *sz, int len);
 
-	String &nAppendBytes(const String &str, int len);
-	String &nAppendBytes(const char *sz, int len);
-	String &nAppendBytes(const wchar_t *sz, int len);
+	String &NAppendBytes(const String &str, int len);
+	String &NAppendBytes(const char *sz, int len);
+	String &NAppendBytes(const wchar_t *sz, int len);
 
-	String &replace(const String &src, const String &dst);
-	String &replace(char src, char dst);
-	String &replace(char src, const char *dst);
-	String &replace(char src, wchar_t dst);
-	String &replace(char src, const wchar_t *dst);
-	String &replace(const char *src, char dst);
-	String &replace(const char *src, const char *dst);
-	String &replace(const char *src, wchar_t dst);
-	String &replace(const char *src, const wchar_t *dst);
-	String &replace(wchar_t src, char dst);
-	String &replace(wchar_t src, const char *dst);
-	String &replace(wchar_t src, wchar_t dst);
-	String &replace(wchar_t src, const wchar_t *dst);
-	String &replace(const wchar_t *src, char dst);
-	String &replace(const wchar_t *src, const char *dst);
-	String &replace(const wchar_t *src, wchar_t dst);
-	String &replace(const wchar_t *src, const wchar_t *dst);
+	String &Replace(const String &src, const String &dst);
+	String &Replace(char src, char dst);
+	String &Replace(char src, const char *dst);
+	String &Replace(char src, wchar_t dst);
+	String &Replace(char src, const wchar_t *dst);
+	String &Replace(const char *src, char dst);
+	String &Replace(const char *src, const char *dst);
+	String &Replace(const char *src, wchar_t dst);
+	String &Replace(const char *src, const wchar_t *dst);
+	String &Replace(wchar_t src, char dst);
+	String &Replace(wchar_t src, const char *dst);
+	String &Replace(wchar_t src, wchar_t dst);
+	String &Replace(wchar_t src, const wchar_t *dst);
+	String &Replace(const wchar_t *src, char dst);
+	String &Replace(const wchar_t *src, const char *dst);
+	String &Replace(const wchar_t *src, wchar_t dst);
+	String &Replace(const wchar_t *src, const wchar_t *dst);
 
-	String &printf(const char *fmt, ...);
-	String &printf(const char *fmt, va_list args);
+	String &Printf(const char *fmt, ...);
+	String &Printf(const char *fmt, va_list args);
 
-	String &printfASCII(const char *fmt, ...);
-	String &printfASCII(const char *fmt, va_list args);
+	String &PrintfASCII(const char *fmt, ...);
+	String &PrintfASCII(const char *fmt, va_list args);
 
 	String &operator = (const String &string);
 	String &operator = (const char *sz);
@@ -447,9 +447,9 @@ public:
 	String &operator += (wchar_t c);
 
 	//! Writes a character to a byte position.
-	String &write(int pos, char sz);
+	String &Write(int pos, char sz);
 	//! Writes a character string to a byte position (including the null terminator).
-	String &write(int pos, const char *sz);
+	String &Write(int pos, const char *sz);
 	//! Writes \em len bytes of a character string to a byte position.
 	/*! This operation is performed like a strncpy, meaning that if \em sz
 	    terminates before len bytes are written the write stops at that point
@@ -458,14 +458,14 @@ public:
 		\remarks Bounds checking is not performed on the destination string.
 		Make sure to construct a string using the String(len) constructor to 
 		pre-allocate a string large enough to contain the operations of the write. */
-	String &write(int pos, const char *sz, int len);
+	String &Write(int pos, const char *sz, int len);
 
 	//! Writes a \em len bytes of a character string to a byte position.
-	String &write(int pos, const String &str);
+	String &Write(int pos, const String &str);
 	//! Writes a \em len bytes of a character string to a byte position.
-	String &write(int pos, const String &str, int len);
+	String &Write(int pos, const String &str, int len);
 	
-	String &clear();
+	String &Clear();
 
 private:
 

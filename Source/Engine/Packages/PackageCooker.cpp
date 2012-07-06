@@ -186,7 +186,7 @@ int PackageMan::Cook(
 				sep = false;
 				out << ", ";
 			}
-			out << String(StringTable::Langs[i]).upper();
+			out << CStr(StringTable::Langs[i]).Upper();
 			sep = true;
 		}
 		out << std::endl;
@@ -1708,7 +1708,7 @@ String Cooker::LocalizedString(int languages) {
 			sep = false;
 			s += ";";
 		}
-		s += String(StringTable::Langs[i]).upper();
+		s += CStr(StringTable::Langs[i]).Upper();
 		sep = true;
 	}
 
