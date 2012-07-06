@@ -290,14 +290,20 @@ class GCC4(Backend):
 	def addSDLMain(self, env):
 		return env
 
+	def openALPath(self, path):
+		if self.build.osx():
+			return self.build.absPath('./Extern/Mac/OpenAL') + path
+		return None
+
 	def addOpenALPaths(self, env):
 		if self.build.osx():
-			return self.addOpenALLibs(env)
+			return self.addIncludePath(env, self.openALPath('/include'))
 		return env
 
 	def addOpenALLibs(self, env):
 		if self.build.osx():
-			env.AppendUnique(FRAMEWORKS=['OpenAL'])
+			self.addLibPath(env, [self.openALPath('/libs')])
+			self.addLib(env, ['openal.1.14.0'])
 			return env
 		raise UserError("Unsupported OpenAL target")
 
@@ -305,7 +311,7 @@ class GCC4(Backend):
 		return self.build.absPath('./Extern/Mac/PVRTexLib' + path)
 		
 	def addPVRLibs(self, env):
-		self.addLibPath(env, self.pvrLibPath(''))
+		self.addLibPath(env, [self.pvrLibPath('')])
 		self.addLib(env, ['PVRTexLib'])
 		return env
 
@@ -321,10 +327,11 @@ class GCC4(Backend):
 		
 		if self.build.ios():
 			return env.MakeIOSBundle(self.__iosType__(), name + '.app', p)
-			
+
 		env.AppendUnique(QTDIR=self.qtPath(''))
 		env.AppendUnique(SDLDIR=self.macSDLPath(''))
 		env.AppendUnique(CGDIR=self.cgPath(''))
+		env.AppendUnique(OALDIR=self.openALPath(''))
 		
 		return env.MakeOSXBundle(name + '.app', p, name)
 	

@@ -4,6 +4,7 @@
 // See Radiance/LICENSE for licensing terms.
 
 #include "ALDriver.h"
+#include "../COut.h"
 #include <Runtime/StringBase.h>
 
 #if defined(RAD_OPT_OSX)
@@ -31,7 +32,7 @@ bool CheckALErrors(const char *file, int line)
 #if defined(RAD_OPT_IOS)
 	return alGetError() != AL_NO_ERROR;
 #else
-	WString str;
+	String str;
 	bool found = false;
 	int count = 0;
 
@@ -43,8 +44,8 @@ bool CheckALErrors(const char *file, int line)
 		if (!found)
 		{
 			str.format(
-				L"AL Errors (file: %s, line: %d):\n",
-				string::Widen(file).c_str(),
+				"AL Errors (file: %s, line: %d):\n",
+				file,
 				line
 			);
 			found = true;
@@ -53,29 +54,29 @@ bool CheckALErrors(const char *file, int line)
 		switch (err)
 		{
 		case AL_INVALID_NAME:
-			str += L"AL_INVALID_NAME\n";
+			str += "AL_INVALID_NAME\n";
 			break;
 		case AL_INVALID_ENUM:
-			str += L"AL_INVALID_ENUM\n";
+			str += "AL_INVALID_ENUM\n";
 			break;
 		case AL_INVALID_VALUE:
-			str += L"AL_INVALID_VALUE\n";
+			str += "AL_INVALID_VALUE\n";
 			break;
 		case AL_INVALID_OPERATION:
-			str += L"AL_INVALID_OPERATION\n";
+			str += "AL_INVALID_OPERATION\n";
 			break;
 		case AL_OUT_OF_MEMORY:
-			str += L"AL_OUT_OF_MEMORY\n";
+			str += "AL_OUT_OF_MEMORY\n";
 			break;
 		default:
-			str += L"Unknown Error\n";
+			str += "Unknown Error\n";
 		};
 	}
 
 	ClearALErrors();
 	if (found)
 	{
-		MessageBox(L"AL Errors Detected", str.c_str(), MBStyleOk);
+		COut(C_Debug) << str.c_str() << std::endl;
 	}
 
 	return found;

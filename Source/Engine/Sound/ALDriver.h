@@ -53,12 +53,10 @@ bool CheckALErrors(const char *file, int line);
 
 
 //! Multithreaded OpenAL driver command stream.
-/*! Some platforms have problems when AL functions are issued from different threads even
-	when the API is properly synchronized. This class encapsulates an openAL device & context
-	and issues all API commands from one thread. A mechanism is provided to do periodic
-	processing to perform streaming buffer operations (music). 
-	
-	All functions are asychrnous except for addCallback() and functions that start with sync_ .
+/*! This class is designed to minimize the locking and thread contention during music
+	streaming. Streaming sounds must be decoded and queued on a seperate thread forcing
+	all calls into OpenAL to be synchronized. The ALDriver is an AL command stream that
+	runs on its own thread where all AL commands are submitted and music streaming occurs.
 */
 class ALDriver : protected thread::Thread {
 public:
