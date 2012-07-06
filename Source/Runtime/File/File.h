@@ -12,6 +12,12 @@
 #include "../DataCodec/LmpReader.h"
 #include <stdio.h>
 
+#if defined(RAD_OPT_WINX)
+	#define RAD_NATIVEPATHSEP "\\"
+#else
+	#define RAD_NATIVEPATHSEP "/"
+#endif
+
 namespace file {
 
 /*! Memory mapped file system.
@@ -60,28 +66,28 @@ public:
 	typedef FileSystemRef Ref;
 
 	//! Creates a file system object.
-	static Ref create();
+	static Ref New();
 
 	virtual ~FileSystem();
 
 	//! Sets the value of an alias.
-	void setAlias(
+	void SetAlias(
 		char name,
 		const char *path
 	);
 
 	//! Gets the value of the specified alias.
-	string::String alias(char name);
+	string::String Alias(char name);
 
 	//! Adds a directory to be used when resolving relative paths.
 	/*! \sa addPakFile() */
-	void addDirectory(
+	void AddDirectory(
 		const char *path, 
 		int mask = kFileMask_All
 	);
 
 	//! Opens a pak file.
-	PakFileRef openPakFile(
+	PakFileRef OpenPakFile(
 		const char *path, 
 		FileOptions options = kFileOptions_None,
 		int mask = kFileMask_Any,
@@ -91,17 +97,17 @@ public:
 
 	//! Adds a pak file to be used when resolving relative paths.
 	/*! \sa addDirectory() */
-	void addPakFile(
+	void AddPakFile(
 		const PakFileRef &pakFile, 
 		int mask = kFileMask_All
 	);
 
 	//! Removes a pak file from the resolvers list for relative paths. 
 	/*! \sa addPakFile() */
-	void removePakFile(const PakFileRef &pakFile);
+	void RemovePakFile(const PakFileRef &pakFile);
 	//! Removes all pak files from the resolvers list for relative paths. */
 	/*! \sa addPakFile() */
-	void removePakFiles();
+	void RemovePakFiles();
 
 	//! Opens a FILE* to a file.
 	/*! If the path specified is a relative path then the path is expanded using
@@ -120,7 +126,7 @@ public:
 	);
 
 	//! Opens a memory mapped file.
-	MMFileRef openFile(
+	MMFileRef OpenFile(
 		const char *path,
 		FileOptions options = kFileOptions_None,
 		int mask = kFileMask_Any,
@@ -129,7 +135,7 @@ public:
 	);
 
 	//! Opens a wild-card file search.
-	virtual FileSearchRef openSearch(
+	virtual FileSearchRef OpenSearch(
 		const char *path,
 		SearchOptions searchOptions = kSearchOption_Recursive,
 		FileOptions fileOptions = kFileOptions_None,
@@ -146,7 +152,7 @@ public:
 		\note The returned absolute path will only reference a disk path. You cannot access 
 		pak files via absolute paths.
 	*/
-	bool getAbsolutePath(
+	bool GetAbsolutePath(
 		const char *path, 
 		string::String &absPath,
 		int mask = kFileMask_Any,
@@ -156,7 +162,7 @@ public:
 
 	//! Expands an absolute path to a native path that can be used by stdio and other
 	//! OS level functions.
-	bool getNativePath(
+	bool GetNativePath(
 		const char *path,
 		string::String &nativePath
 	);
@@ -164,7 +170,7 @@ public:
 	//! Returns true if the file exists.
 	/*! The location that the file was found in is returned by the optional \em resolved
 		parameter. */
-	bool fileExists(
+	bool FileExists(
 		const char *path,
 		FileOptions options = kFileOptions_None,
 		int mask = kFileMask_Any,
@@ -175,7 +181,7 @@ public:
 	//! Gets the TimeDate object for the specified file.
 	/*! \note Only absolute paths are accepted by this function. Using a relative path
 		will fail. */
-	virtual bool getFileTime(
+	virtual bool GetFileTime(
 		const char *path,
 		xtime::TimeDate &td,
 		FileOptions options = kFileOptions_None
@@ -184,7 +190,7 @@ public:
 	//! Deletes the specified file.
 	/*! \note Only absolute paths are accepted by this function. Using a relative path
 		will fail. */
-	virtual bool deleteFile(
+	virtual bool DeleteFile(
 		const char *path,
 		FileOptions options = kFileOptions_None
 	) = 0;
@@ -192,7 +198,7 @@ public:
 	//! Creates the specified directory.
 	/*! \note Only absolute paths are accepted by this function. Using a relative path
 		will fail. */
-	virtual bool createDirectory(
+	virtual bool CreateDirectory(
 		const char *path,
 		FileOptions options = kFileOptions_None
 	) = 0;
@@ -200,7 +206,7 @@ public:
 	//! Deletes the specified directory.
 	/*! \note Only absolute paths are accepted by this function. Using a relative path
 		will fail. */
-	virtual bool deleteDirectory(
+	virtual bool DeleteDirectory(
 		const char *path,
 		FileOptions options = kFileOptions_None
 	) = 0;
@@ -216,9 +222,9 @@ protected:
 		const char *dvd
 	);
 
-	virtual bool nativeFileExists(const char *path) = 0;
+	virtual bool NativeFileExists(const char *path) = 0;
 
-	virtual MMFileRef nativeOpenFile(
+	virtual MMFileRef NativeOpenFile(
 		const char *path,
 		FileOptions options
 	) = 0;
@@ -250,7 +256,7 @@ public:
 	typedef MMFileRef Ref;
 
 	//! Maps the specified file data into user address space.
-	virtual MMappingRef mmap(
+	virtual MMappingRef MMap(
 		AddrSize ofs, 
 		AddrSize size
 	) = 0;
@@ -275,7 +281,7 @@ public:
 	//! used and should be prefetched into memory.
 	/*! \notes This function may not improve performance or may be ignored
 		by the OS. Equivelent to madvise(WILLNEED). */
-	virtual void prefetch(
+	virtual void Prefetch(
 		AddrSize offset,
 		AddrSize size
 	) = 0;
@@ -311,7 +317,7 @@ class FileSearch : public boost::noncopyable {
 public:
 	typedef FileSearchRef Ref;
 
-	virtual bool nextFile(
+	virtual bool NextFile(
 		string::String &path,
 		FileAttributes *fileAttributes = 0,
 		xtime::TimeDate *fileTime = 0
@@ -327,11 +333,11 @@ class PakFile : public boost::noncopyable, public boost::enable_shared_from_this
 public:
 	typedef PakFileRef Ref;
 
-	MMFileRef openFile(const char *path);
-	bool fileExists(const char *path);
+	MMFileRef OpenFile(const char *path);
+	bool FileExists(const char *path);
 
-	const data_codec::lmp::StreamReader::Lump *lumpForIndex(int i);
-	const data_codec::lmp::StreamReader::Lump *lumpForName(const char *path);
+	const data_codec::lmp::StreamReader::Lump *LumpForIndex(int i);
+	const data_codec::lmp::StreamReader::Lump *LumpForName(const char *path);
 
 	RAD_DECLARE_READONLY_PROPERTY(PakFile, numLumps, int);
 
@@ -348,7 +354,7 @@ private:
 			const data_codec::lmp::StreamReader::Lump &lump
 		);
 
-		virtual MMappingRef mmap(
+		virtual MMappingRef MMap(
 			AddrSize ofs, 
 			AddrSize size
 		);
@@ -363,7 +369,7 @@ private:
 		const data_codec::lmp::StreamReader::Lump &m_lump;
 	};
 
-	static Ref open(const MMFileRef &file);
+	static Ref Open(const MMFileRef &file);
 
 	PakFile(const MMFileRef &file);
 
@@ -447,24 +453,24 @@ private:
 // Helper functions
 
 //! Gets the file extension, including the '.'
-RADRT_API string::String RADRT_CALL getFileExtension(const char *path);
+RADRT_API string::String RADRT_CALL GetFileExtension(const char *path);
 
 //! Sets the extension of a file.
 /*! If null is specified for extension then the extension is removed from the file. 
 	\param ext The extension to set, including the '.' */
-RADRT_API string::String RADRT_CALL setFileExtension(
+RADRT_API string::String RADRT_CALL SetFileExtension(
 	const char *path, 
 	const char *ext
 );
 
 //! Returns the file name without any path components.
-RADRT_API string::String RADRT_CALL getFileName(const char *path);
+RADRT_API string::String RADRT_CALL GetFileName(const char *path);
 
 //! Returns the file name without any extension or path components.
-RADRT_API string::String RADRT_CALL getBaseFileName(const char *path);
+RADRT_API string::String RADRT_CALL GetBaseFileName(const char *path);
 
 //! Returns the file path without the file name itself.
-RADRT_API string::String RADRT_CALL getFilePath(const char *path);
+RADRT_API string::String RADRT_CALL GetFilePath(const char *path);
 
 } // file
 

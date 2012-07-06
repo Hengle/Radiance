@@ -22,46 +22,46 @@ public:
 		AddrSize pageSize
 	);
 
-	virtual FileSearchRef openSearch(
+	virtual FileSearchRef OpenSearch(
 		const char *path,
 		SearchOptions searchOptions,
 		FileOptions fileOptions,
 		int mask
 	);
 
-	virtual bool getFileTime(
+	virtual bool GetFileTime(
 		const char *path,
 		xtime::TimeDate &td,
 		FileOptions options
 	);
 
-	virtual bool deleteFile(
+	virtual bool DeleteFile(
 		const char *path,
 		FileOptions options
 	);
 
-	virtual bool createDirectory(
+	virtual bool CreateDirectory(
 		const char *path,
 		FileOptions options
 	);
 
-	virtual bool deleteDirectory(
+	virtual bool DeleteDirectory(
 		const char *path,
 		FileOptions options
 	);
 
 protected:
 
-	virtual bool nativeFileExists(const char *path);
+	virtual bool NativeFileExists(const char *path);
 	
-	virtual MMFileRef nativeOpenFile(
+	virtual MMFileRef NativeOpenFile(
 		const char *path,
 		FileOptions options
 	);
 
 private:
 
-	bool deleteDirectory_r(const char *nativePath);
+	bool DeleteDirectory_r(const char *nativePath);
 
 	AddrSize m_pageSize;
 };
@@ -73,7 +73,7 @@ public:
 
 	~WinMMFile();
 
-	virtual MMappingRef mmap(
+	virtual MMappingRef MMap(
 		AddrSize ofs, 
 		AddrSize size
 	);
@@ -104,7 +104,7 @@ public:
 
 	~WinMMapping();
 
-	virtual void prefetch(
+	virtual void Prefetch(
 		AddrSize offset,
 		AddrSize size
 	);
@@ -133,13 +133,13 @@ public:
 
 	~WinFileSearch();
 
-	static FileSearch::Ref create(
+	static FileSearch::Ref New(
 		const string::String &path,
 		const string::String &prefix,
 		SearchOptions options
 	);
 
-	virtual bool nextFile(
+	virtual bool NextFile(
 		string::String &path,
 		FileAttributes *fileAttributes,
 		xtime::TimeDate *fileTime
@@ -160,7 +160,7 @@ private:
 		kState_Done
 	};
 
-	State nextState();
+	State NextState();
 
 	WIN32_FIND_DATAA m_fd;
 	string::String m_path;

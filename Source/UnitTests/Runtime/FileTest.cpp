@@ -21,18 +21,21 @@ namespace
 
 	void FileSearch(const FileSystem::Ref &fs) {
 		std::cout << "Searchin @r:/*.*" << std::endl;
-		FileSearch::Ref search = fs->openSearch("@r:/*.*");
+		FileSearch::Ref search = fs->OpenSearch("@r:/*.*");
 		if (!search)
 			return;
 		int c = 0;
 		String path;
-		while (search->nextFile(path) && (c++ < kMaxSearchFiles)) {
+		while (search->NextFile(path) && (c++ < kMaxSearchFiles)) {
 			std::cout << path << std::endl;
 		}
 	}
 
 	void FileCopyTest(const FileSystem::Ref &fs, const char *szSrc, const char *szDst) {
-		MMFile::Ref src = fs->openFile(szSrc);//, kFileOption_MapEntireFile);
+
+		std::cout << "Copying " << szSrc << " to " << szDst << "..." << std::endl;
+
+		MMFile::Ref src = fs->OpenFile(szSrc);//, kFileOption_MapEntireFile);
 		if (!src)
 			return;
 		FILE *dst = fs->fopen(szDst, "wb");
@@ -54,19 +57,19 @@ namespace
 	}
 
 	void PakFileTest(const FileSystem::Ref &fs, const char *path) {
-		PakFile::Ref pak = fs->openPakFile(path);
+		PakFile::Ref pak = fs->OpenPakFile(path);
 		if (!pak)
 			return;
 		const int kNumLumps = pak->numLumps;
 		std::cout << "Num Lumps: " << kNumLumps << std::endl;
 		for (int i = 0; i < kNumLumps; ++i) {
-			std::cout << pak->lumpForIndex(i)->Name() << std::endl;
+			std::cout << pak->LumpForIndex(i)->Name() << std::endl;
 		}
 	}
 }
 	void FileTest() {
         Begin("File Test");
-		FileSystem::Ref fs = FileSystem::create();
+		FileSystem::Ref fs = FileSystem::New();
         //DO(FileSearch(fs));
         DO(FileCopyTest(fs, "@r:/pak0.pak", "@r:/pak0.copy"));
 		DO(PakFileTest(fs, "@r:/pak0.pak"));

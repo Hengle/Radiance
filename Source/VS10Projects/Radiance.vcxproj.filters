@@ -2163,9 +2163,6 @@
     <ClInclude Include="..\Engine\Tools\Editor\EditorWindow.h">
       <Filter>Engine\Tools\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="..\Runtime\File\FileDetails.h">
-      <Filter>Runtime\Source\File</Filter>
-    </ClInclude>
     <ClInclude Include="..\Runtime\String\StringDef.h">
       <Filter>Runtime\Source\String</Filter>
     </ClInclude>
@@ -2296,33 +2293,6 @@
     </ClCompile>
     <ClCompile Include="..\Runtime\Thread\Locks.cpp">
       <Filter>Runtime\Source\Thread</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Runtime\Math\MathAffineMatrix4X4ReflectMap.cpp">
-      <Filter>Runtime\Source\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Runtime\Math\MathAxisAngleReflectMap.cpp">
-      <Filter>Runtime\Source\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Runtime\Math\MathEulerReflectMap.cpp">
-      <Filter>Runtime\Source\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Runtime\Math\MathMatrix4X4ReflectMap.cpp">
-      <Filter>Runtime\Source\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Runtime\Math\MathMatrixGeneralReflectMap.cpp">
-      <Filter>Runtime\Source\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Runtime\Math\MathQuaternionReflectMap.cpp">
-      <Filter>Runtime\Source\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Runtime\Math\MathRigidMatrix4X4ReflectMap.cpp">
-      <Filter>Runtime\Source\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Runtime\Math\MathSolidMatrix4X4ReflectMap.cpp">
-      <Filter>Runtime\Source\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Runtime\Math\MathVectorReflectMap.cpp">
-      <Filter>Runtime\Source\Math</Filter>
     </ClCompile>
     <ClCompile Include="..\Runtime\ImageCodec\Bmp.cpp">
       <Filter>Runtime\Source\ImageCodec</Filter>

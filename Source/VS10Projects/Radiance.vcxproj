@@ -210,7 +210,6 @@
     <ClInclude Include="..\Runtime\FileDef.h" />
     <ClInclude Include="..\Runtime\File\File.h" />
     <ClInclude Include="..\Runtime\File\FileDef.h" />
-    <ClInclude Include="..\Runtime\File\FileDetails.h" />
     <ClInclude Include="..\Runtime\File\IntFile.h" />
     <ClInclude Include="..\Runtime\Interface.h" />
     <ClInclude Include="..\Runtime\InterfaceDef.h" />
@@ -775,15 +774,6 @@
     <ClCompile Include="..\Runtime\Endian\Endian.cpp" />
     <ClCompile Include="..\Runtime\Time\Time.cpp" />
     <ClCompile Include="..\Runtime\Thread\Locks.cpp" />
-    <ClCompile Include="..\Runtime\Math\MathAffineMatrix4X4ReflectMap.cpp" />
-    <ClCompile Include="..\Runtime\Math\MathAxisAngleReflectMap.cpp" />
-    <ClCompile Include="..\Runtime\Math\MathEulerReflectMap.cpp" />
-    <ClCompile Include="..\Runtime\Math\MathMatrix4X4ReflectMap.cpp" />
-    <ClCompile Include="..\Runtime\Math\MathMatrixGeneralReflectMap.cpp" />
-    <ClCompile Include="..\Runtime\Math\MathQuaternionReflectMap.cpp" />
-    <ClCompile Include="..\Runtime\Math\MathRigidMatrix4X4ReflectMap.cpp" />
-    <ClCompile Include="..\Runtime\Math\MathSolidMatrix4X4ReflectMap.cpp" />
-    <ClCompile Include="..\Runtime\Math\MathVectorReflectMap.cpp" />
     <ClCompile Include="..\Runtime\ImageCodec\Bmp.cpp" />
     <ClCompile Include="..\Runtime\ImageCodec\Dds.cpp" />
     <ClCompile Include="..\Runtime\ImageCodec\ImageCodec.cpp" />

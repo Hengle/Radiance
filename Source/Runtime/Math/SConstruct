@@ -5,12 +5,3 @@
 
 Import('x')
 
-x.add('MathAffineMatrix4X4ReflectMap.cpp')
-x.add('MathAxisAngleReflectMap.cpp')
-x.add('MathEulerReflectMap.cpp')
-x.add('MathMatrix4X4ReflectMap.cpp')
-x.add('MathMatrixGeneralReflectMap.cpp')
-x.add('MathQuaternionReflectMap.cpp')
-x.add('MathRigidMatrix4X4ReflectMap.cpp')
-x.add('MathSolidMatrix4X4ReflectMap.cpp')
-x.add('MathVectorReflectMap.cpp')

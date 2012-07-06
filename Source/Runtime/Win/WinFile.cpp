@@ -12,7 +12,7 @@ using namespace xtime;
 
 namespace file {
 
-FileSystem::Ref FileSystem::create() {
+FileSystem::Ref FileSystem::New() {
 
 	String cwd;
 
@@ -23,8 +23,8 @@ FileSystem::Ref FileSystem::create() {
 		cwd = x;
 	}
 
-	cwd.replace('\\', '/');
-	cwd.lower();
+	cwd.Replace('\\', '/');
+	cwd.Lower();
 	
 	// Find DVD if there is one
 
@@ -40,7 +40,7 @@ FileSystem::Ref FileSystem::create() {
 				path[0] = 'a' + i;
 				path[2] = 0;
 				sdvd = path;
-				sdvd.lower();
+				sdvd.Lower();
 				break;
 			}
 		}
@@ -62,7 +62,7 @@ WinFileSystem::WinFileSystem(
 ) : FileSystem(root, dvd), m_pageSize(pageSize) {
 }
 
-MMFile::Ref WinFileSystem::nativeOpenFile(
+MMFile::Ref WinFileSystem::NativeOpenFile(
 	const char *path,
 	FileOptions options
 ) {
@@ -96,7 +96,7 @@ MMFile::Ref WinFileSystem::nativeOpenFile(
 	MMFile::Ref r(new (ZFile) WinMMFile(f, m, m_pageSize));
 
 	if (options & kFileOption_MapEntireFile) {
-		MMapping::Ref mm = r->mmap(0, 0);
+		MMapping::Ref mm = r->MMap(0, 0);
 		if (mm) {
 			static_cast<WinMMFile*>(r.get())->m_mm = mm;
 			// important otherwise we have a circular reference.
@@ -107,24 +107,24 @@ MMFile::Ref WinFileSystem::nativeOpenFile(
 	return r;
 }
 
-FileSearch::Ref WinFileSystem::openSearch(
+FileSearch::Ref WinFileSystem::OpenSearch(
 	const char *path,
 	SearchOptions searchOptions,
 	FileOptions fileOptions,
 	int mask
 ) {
 	String nativePath;
-	if (!getNativePath(path, nativePath))
+	if (!GetNativePath(path, nativePath))
 		return FileSearchRef();
 
-	return WinFileSearch::create(
+	return WinFileSearch::New(
 		nativePath,
 		String(),
 		searchOptions
 	);
 }
 
-bool WinFileSystem::getFileTime(
+bool WinFileSystem::GetFileTime(
 	const char *path,
 	xtime::TimeDate &td,
 	FileOptions options
@@ -135,7 +135,7 @@ bool WinFileSystem::getFileTime(
 	if (options & kFileOption_NativePath) {
 		nativePath = CStr(path);
 	} else {
-		if (!getNativePath(path, nativePath))
+		if (!GetNativePath(path, nativePath))
 			return false;
 	}
 
@@ -153,7 +153,7 @@ bool WinFileSystem::getFileTime(
 		FILETIME ft;
 		SYSTEMTIME st;
 
-		if (GetFileTime(h, 0, 0, &ft)) {
+		if (::GetFileTime(h, 0, 0, &ft)) {
 			FileTimeToLocalFileTime( &ft, &ft );
 			FileTimeToSystemTime( &ft, &st );
 
@@ -176,7 +176,7 @@ bool WinFileSystem::getFileTime(
 	return h != INVALID_HANDLE_VALUE;
 }
 
-bool WinFileSystem::deleteFile(
+bool WinFileSystem::DeleteFile(
 	const char *path,
 	FileOptions options
 ) {
@@ -186,14 +186,14 @@ bool WinFileSystem::deleteFile(
 	if (options & kFileOption_NativePath) {
 		nativePath = CStr(path);
 	} else {
-		if (!getNativePath(path, nativePath))
+		if (!GetNativePath(path, nativePath))
 			return false;
 	}
 
 	return DeleteFileA(nativePath.c_str) != 0;
 }
 
-bool WinFileSystem::createDirectory(
+bool WinFileSystem::CreateDirectory(
 	const char *path,
 	FileOptions options
 ) {
@@ -203,7 +203,7 @@ bool WinFileSystem::createDirectory(
 	if (options & kFileOption_NativePath) {
 		nativePath = CStr(path);
 	} else {
-		if (!getNativePath(path, nativePath))
+		if (!GetNativePath(path, nativePath))
 			return false;
 	}
 
@@ -231,7 +231,7 @@ bool WinFileSystem::createDirectory(
 	return true;
 }
 
-bool WinFileSystem::deleteDirectory_r(const char *nativePath) {
+bool WinFileSystem::DeleteDirectory_r(const char *nativePath) {
 
 	RAD_ASSERT(nativePath);
 
@@ -239,7 +239,7 @@ bool WinFileSystem::deleteDirectory_r(const char *nativePath) {
 	if (basePath.empty)
 		return false;
 
-	FileSearch::Ref s = openSearch(
+	FileSearch::Ref s = OpenSearch(
 		(basePath + "/*.*").c_str, 
 		kSearchOption_Recursive,
 		kFileOption_NativePath, 
@@ -253,11 +253,11 @@ bool WinFileSystem::deleteDirectory_r(const char *nativePath) {
 		String name;
 		FileAttributes fa;
 
-		while (s->nextFile(name, &fa, 0)) {
+		while (s->NextFile(name, &fa, 0)) {
 			String path = basePath + name;
 
 			if (fa & kFileAttribute_Directory) {
-				if (!deleteDirectory_r(path.c_str))
+				if (!DeleteDirectory_r(path.c_str))
 					return false;
 			} else {
 				if (!DeleteFileA(path.c_str))
@@ -271,7 +271,7 @@ bool WinFileSystem::deleteDirectory_r(const char *nativePath) {
 	return RemoveDirectoryA(nativePath) != 0;
 }
 
-bool WinFileSystem::deleteDirectory(
+bool WinFileSystem::DeleteDirectory(
 	const char *path,
 	FileOptions options
 ) {
@@ -281,14 +281,14 @@ bool WinFileSystem::deleteDirectory(
 	if (options & kFileOption_NativePath) {
 		nativePath = CStr(path);
 	} else {
-		if (!getNativePath(path, nativePath))
+		if (!GetNativePath(path, nativePath))
 			return false;
 	}
 
-	return deleteDirectory_r(nativePath.c_str);
+	return DeleteDirectory_r(nativePath.c_str);
 }
 
-bool WinFileSystem::nativeFileExists(const char *path) {
+bool WinFileSystem::NativeFileExists(const char *path) {
 	RAD_ASSERT(path);
 	return GetFileAttributesA(path) != INVALID_FILE_ATTRIBUTES;
 }
@@ -307,7 +307,7 @@ WinMMFile::~WinMMFile() {
 		CloseHandle(m_f);
 }
 
-MMapping::Ref WinMMFile::mmap(AddrSize ofs, AddrSize size) {
+MMapping::Ref WinMMFile::MMap(AddrSize ofs, AddrSize size) {
 	
 	RAD_ASSERT(ofs+size <= this->size.get());
 
@@ -352,14 +352,14 @@ WinMMapping::~WinMMapping() {
 		UnmapViewOfFile(m_base);
 }
 
-void WinMMapping::prefetch(AddrSize offset, AddrSize size) {
+void WinMMapping::Prefetch(AddrSize offset, AddrSize size) {
 	RAD_NOT_USED(offset);
 	RAD_NOT_USED(size);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-FileSearch::Ref WinFileSearch::create(
+FileSearch::Ref WinFileSearch::New(
 	const string::String &path,
 	const string::String &prefix,
 	SearchOptions options
@@ -371,7 +371,7 @@ FileSearch::Ref WinFileSearch::create(
 	for (int i = path.length - 1; i >= 0; --i) {
 		if (sz[i] == '/' || sz[i] == '\\') {
 			dir = String(sz, i, CopyTag);
-			pattern = path.substr(i); // include the leading '/'
+			pattern = path.SubStr(i); // include the leading '/'
 			break;
 		}
 	}
@@ -387,7 +387,7 @@ FileSearch::Ref WinFileSearch::create(
 	);
 
 	if (s->m_h == INVALID_HANDLE_VALUE) {
-		if (s->nextState() == kState_Done) {
+		if (s->NextState() == kState_Done) {
 			delete s;
 			s = 0;
 		}
@@ -415,13 +415,13 @@ WinFileSearch::~WinFileSearch() {
 		FindClose(m_h);
 }
 
-bool WinFileSearch::nextFile(
+bool WinFileSearch::NextFile(
 	string::String &path,
 	FileAttributes *fileAttributes,
 	xtime::TimeDate *fileTime
 ) {
 	if (m_subDir) {
-		if (m_subDir->nextFile(path, fileAttributes, fileTime))
+		if (m_subDir->NextFile(path, fileAttributes, fileTime))
 			return true;
 		m_subDir.reset();
 	}
@@ -429,7 +429,7 @@ bool WinFileSearch::nextFile(
 	for (;;) {
 		if (m_fd.cFileName[0] == 0) {
 			if (!FindNextFileA(m_h, &m_fd)) {
-				if (nextState() == kState_Done)
+				if (NextState() == kState_Done)
 					return false;
 				RAD_ASSERT(m_fd.cFileName[0] != 0); // nextState() *must* fill this in.
 			}
@@ -446,8 +446,8 @@ bool WinFileSearch::nextFile(
 		if (m_fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 			if (m_state == kState_Dirs) {
 				path = m_path + "/" + kFileName;
-				m_subDir = create(path + m_pattern, m_prefix + kFileName + "/", m_options);
-				if (m_subDir && m_subDir->nextFile(path, fileAttributes, fileTime))
+				m_subDir = New(path + m_pattern, m_prefix + kFileName + "/", m_options);
+				if (m_subDir && m_subDir->NextFile(path, fileAttributes, fileTime))
 					return true;
 				m_subDir.reset();
 			}
@@ -485,14 +485,14 @@ bool WinFileSearch::nextFile(
 			}
 
 			if (m_options & kSearchOption_ReturnNativePaths)
-				path.replace('/', '\\');
+				path.Replace('/', '\\');
 
 			return true;
 		}
 	}
 }
 
-WinFileSearch::State WinFileSearch::nextState() {
+WinFileSearch::State WinFileSearch::NextState() {
 	if (m_state == kState_Files) {
 		++m_state;
 		// move onto directories? (recursive)

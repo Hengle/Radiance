@@ -8,7 +8,7 @@ namespace file {
 inline FileSystem::~FileSystem() {
 }
 
-inline string::String FileSystem::alias(char name) {
+inline string::String FileSystem::Alias(char name) {
 	return m_aliasTable[name];
 }
 
