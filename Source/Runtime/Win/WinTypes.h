@@ -8,6 +8,13 @@
 
 #include <exception>
 #include <string>
+
+#if defined(_NATIVE_WCHAR_T_DEFINED)
+	#define RAD_NATIVE_WCHAR_T_DEFINED
+#else
+	#include <wchar.h>
+#endif
+
 #include "../PushPack.h"
 
 #define RAD_NEWLINE "\n"
@@ -31,8 +38,13 @@ typedef double                     F64, *PF64;
 
 #if RAD_OPT_MACHINE_WORD_SIZE == 4
 
-	typedef __w64 U32                  AddrSize; // Can always hold a void*.
-	typedef __w64 S32                  SAddrSize; // signed version!       
+	#if defined(RAD_OPT_VISUAL_C_2005)
+		typedef __w64 U32                  AddrSize; // Can always hold a void*.
+		typedef __w64 S32                  SAddrSize; // signed version!       
+	#else
+		typedef __w64 U32                  AddrSize; // Can always hold a void*.
+		typedef __w64 S32                  SAddrSize; // signed version!
+	#endif
 
 	typedef S32                        SReg;   // Signed register size.
 	typedef S16                        SHReg;  // Half a signed register size.

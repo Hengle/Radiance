@@ -1,5 +1,5 @@
 // ANSIStringBase.inl
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved
 // Author: Mike Songy & Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
@@ -15,7 +15,6 @@
 #include <wchar.h>
 #include <wctype.h>
 #include <algorithm>
-#include "utf8.h"
 
 #if defined(RAD_OPT_APPLE)
 	#include "../Utils.h"
@@ -24,109 +23,75 @@
 
 namespace string {
 
-//! Returns number of bytes needed to store the specified widestring in an mbstring.
-inline size_t my_wcstombslen(const wchar_t *src, size_t numChars) {
-	char bytes[4];
-	size_t len = 0;
-	while (numChars-- > 0) {
+inline int wcstombslen(const wchar_t *src, int len) {
 #if defined(RAD_OPT_4BYTE_WCHAR)
-		BOOST_STATIC_ASSERT(sizeof(wchar_t) == 4);
-		char *end = utf8::unchecked::utf32to8(src, src+1, bytes);
+	return utf32to8len((const U32*)src, len);
 #else
-		BOOST_STATIC_ASSERT(sizeof(wchar_t) == 2);
-		char *end = utf8::unchecked::utf16to8(src, src+1, bytes);
-#endif
-		len += (end-bytes);
-	}
-
-	return len;
-}
-
-//! Converts wchar_t string to UTF8 string.
-inline void my_wcstombs(const wchar_t *src, size_t numChars, char *dst) {
-#if defined(RAD_OPT_4BYTE_WCHAR)
-	BOOST_STATIC_ASSERT(sizeof(wchar_t) == 4);
-	utf8::unchecked::utf32to8(src, src+numChars, dst);
-#else
-	BOOST_STATIC_ASSERT(sizeof(wchar_t) == 2);
-	utf8::unchecked::utf16to8(src, src+numChars, dst);
+	return utf16to8len((const U16*)src, len);
 #endif
 }
 
-//! Returns number of bytes needed to store the specified widestring in an mbstring.
-inline size_t my_mbstowcslen(const char *src, size_t numChars) {
-	wchar_t bytes[4];
-	size_t len = 0;
-	while (numChars-- > 0) {
+inline int wcstombs(char *dst, const wchar_t *src, int len) {
 #if defined(RAD_OPT_4BYTE_WCHAR)
-		BOOST_STATIC_ASSERT(sizeof(wchar_t) == 4);
-		wchar_t *end = utf8::unchecked::utf8to32(src, src+1, bytes);
+	return utf32to8(dst, (const U32*)src, len);
 #else
-		BOOST_STATIC_ASSERT(sizeof(wchar_t) == 2);
-		wchar_t *end = utf8::unchecked::utf8to16(src, src+1, bytes);
+	return utf16to8(dst, (const U16*)src, len);
 #endif
-		len += (end-bytes);
-	}
-
-	return len;
 }
 
-//! Converts wchar_t string to UTF8 string.
-inline void my_mbstowcs(const char *src, size_t numChars, wchar_t *dst) {
+inline int mbstowcslen(const char *src, int len) {
 #if defined(RAD_OPT_4BYTE_WCHAR)
-	BOOST_STATIC_ASSERT(sizeof(wchar_t) == 4);
-	utf8::unchecked::utf8to32(src, src+numChars, dst);
+	return utf8to32len(src, len);
 #else
-	BOOST_STATIC_ASSERT(sizeof(wchar_t) == 2);
-	utf8::unchecked::utf8to16(src, src+numChars, dst);
+	return utf8to16len(src, len);
+#endif
+}
+
+inline int mbstowcs(wchar_t *dst, const char *src, int len) {
+#if defined(RAD_OPT_4BYTE_WCHAR)
+	return utf8to32((U32*)dst, src, len);
+#else
+	return utf8to16((U16*)dst, src, len);
 #endif
 }
 
 template<>
-inline bool isspace<char>(char c)
-{
+inline bool isspace<char>(char c) {
 	return ::isspace(static_cast<int>(c) & 0xFF) != 0;
 }
 
 template<>
-inline bool isspace<wchar_t>(wchar_t c)
-{
+inline bool isspace<wchar_t>(wchar_t c) {
 	return ::iswspace(static_cast<wint_t>(c)) != 0;
 }
 
 template<>
-inline bool isalpha<char>(char c)
-{
+inline bool isalpha<char>(char c) {
 	return ::isalpha(static_cast<int>(c) & 0xFF) != 0;
 }
 
 template<>
-inline bool isalpha<wchar_t>(wchar_t c)
-{
+inline bool isalpha<wchar_t>(wchar_t c) {
 	return ::iswalpha(static_cast<wint_t>(c)) != 0;
 }
 
 template<>
-inline bool isdigit<char>(char c)
-{
+inline bool isdigit<char>(char c) {
 	return ::isdigit(static_cast<int>(c) & 0xFF) != 0;
 }
 
 template<>
-inline bool isdigit<wchar_t>(wchar_t c)
-{
+inline bool isdigit<wchar_t>(wchar_t c) {
 	return ::iswdigit(static_cast<wint_t>(c)) != 0;
 }
 
 template<>
-inline bool isprint<char>(char c)
-{
+inline bool isprint<char>(char c) {
 	return ::isprint(static_cast<int>(c) & 0xFF) != 0;
 }
 
 template<>
-inline bool isprint<wchar_t>(wchar_t c)
-{
+inline bool isprint<wchar_t>(wchar_t c) {
 	return ::iswprint(static_cast<wint_t>(c)) != 0;
 }
 
@@ -135,20 +100,17 @@ inline bool isprint<wchar_t>(wchar_t c)
 //////////////////////////////////////////////////////////////////////////////////////////
 
 template<>
-inline int cmp<char>(const char *a, const char *b)
-{
+inline int cmp<char>(const char *a, const char *b) {
 	return ::strcmp(a, b);
 }
 
 template<>
-inline int cmp<wchar_t>(const wchar_t *a, const wchar_t *b)
-{
+inline int cmp<wchar_t>(const wchar_t *a, const wchar_t *b) {
 	return ::wcscmp(a, b);
 }
 
 template<>
-inline int icmp<char>(const char *a, const char *b)
-{
+inline int icmp<char>(const char *a, const char *b) {
 #if defined(RAD_OPT_WINX)
 	return ::stricmp(a, b);
 #else
@@ -157,18 +119,25 @@ inline int icmp<char>(const char *a, const char *b)
 }
 
 template<>
-inline int icmp<wchar_t>(const wchar_t *a, const wchar_t *b)
-{
+inline int icmp<wchar_t>(const wchar_t *a, const wchar_t *b) {
 #if defined(RAD_OPT_WINX)
 	return ::wcsicmp(a, b);
 #elif defined(RAD_OPT_APPLE)
 	wchar_t *_a = (wchar_t*)stack_alloc((::wcslen(a)+1)*sizeof(wchar_t));
 	wchar_t *_b = (wchar_t*)stack_alloc((::wcslen(b)+1)*sizeof(wchar_t));
 	wchar_t *z  = _a;
-	while(*a) { *z = ::towlower(*a); ++z; ++a; }
+	while(*a) { 
+		*z = ::towlower(*a); 
+		++z; 
+		++a; 
+	}
 	*z = 0;
 	z = _b;
-	while(*b) { *z = ::towlower(*b); ++z; ++b; }
+	while(*b) { 
+		*z = ::towlower(*b); 
+		++z; 
+		++b; 
+	}
 	*z = 0;
 	return ::wcscmp(_a, _b);
 #else
@@ -177,113 +146,113 @@ inline int icmp<wchar_t>(const wchar_t *a, const wchar_t *b)
 }
 
 template<>
-inline int ncmp<char>(const char *str0, const char *str1, size_t len)
-{
-	return ::strncmp(str0, str1, len);
+inline int ncmp<char>(const char *str0, const char *str1, int len) {
+	return ::strncmp(str0, str1, (size_t)len);
 }
 template<>
-inline int ncmp<wchar_t>(const wchar_t *str0, const wchar_t *str1, size_t len)
-{
-	return ::wcsncmp(str0, str1, len);
+inline int ncmp<wchar_t>(const wchar_t *str0, const wchar_t *str1, int len) {
+	return ::wcsncmp(str0, str1, (size_t)len);
 }
 
 template<>
-inline int nicmp<char>(const char *str0, const char *str1, size_t len)
-{
+inline int nicmp<char>(const char *str0, const char *str1, int len) {
 #if defined(RAD_OPT_WINX)
-	return ::strnicmp(str0, str1, len);
+	return ::strnicmp(str0, str1, (size_t)len);
 #else
-	return ::strncasecmp(str0, str1, len);
+	return ::strncasecmp(str0, str1, (size_t)len);
 #endif
 }
 
 template<>
-inline int nicmp<wchar_t>(const wchar_t *a, const wchar_t *b, size_t _len)
-{
+inline int nicmp<wchar_t>(const wchar_t *a, const wchar_t *b, int _len) {
 #if defined(RAD_OPT_WINX)
-	return ::wcsnicmp(a, b, _len);
+	return ::wcsnicmp(a, b, (size_t)_len);
 #elif defined(RAD_OPT_APPLE)
 	wchar_t *_a = (wchar_t*)a;
-	size_t _l = _len;
-	size_t _s = 0;
-	while (*_a++ && _l--) { ++_s; }
+	int _l = _len;
+	int _s = 0;
+	while (*_a++ && _l--) { 
+		++_s; 
+	}
 	_a = (wchar_t*)stack_alloc((_s+1)*sizeof(wchar_t));
 	wchar_t *_b = (wchar_t*)b;
 	_s = 0;
 	_l = _len;
-	while (*_b++ && _l--) { ++_s; }
+	while (*_b++ && _l--) { 
+		++_s; 
+	}
 	_b = (wchar_t*)stack_alloc((_s+1)*sizeof(wchar_t));
 	wchar_t *z  = _a;
 	_l = _len;
-	while(*a && _l) { *z = ::towlower(*a); ++z; ++a; --_l; }
+	while(*a && _l) { 
+		*z = ::towlower(*a); 
+		++z; 
+		++a; 
+		--_l; 
+	}
 	*z = 0;
 	z = _b;
 	_l = _len;
-	while(*b && _l) { *z = ::towlower(*b); ++z; ++b; --_l; }
+	while(*b && _l) { 
+		*z = ::towlower(*b); 
+		++z; 
+		++b; 
+		--_l; 
+	}
 	*z = 0;
-	return ::wcsncmp(_a, _b, _len);
+	return ::wcsncmp(_a, _b, (size_t)_len);
 #else
-	return ::wcsncasecmp(a, b, _len);
+	return ::wcsncasecmp(a, b, (size_t)_len);
 #endif
 }
 
 template<>
-inline int coll<char>(const char *a, const char *b)
-{
+inline int coll<char>(const char *a, const char *b) {
 	return ::strcoll(a, b);
 }
 
 template<>
-inline int coll<wchar_t>(const wchar_t *a, const wchar_t *b)
-{
+inline int coll<wchar_t>(const wchar_t *a, const wchar_t *b) {
 	return ::wcscoll(a, b);
 }
 
 template<>
-inline size_t spn<char>(const char *a, const char *b)
-{
+inline int spn<char>(const char *a, const char *b) {
 	return ::strspn(a, b);
 }
 
 template<>
-inline size_t spn<wchar_t>(const wchar_t *a, const wchar_t *b)
-{
-	return ::wcsspn(a, b);
+inline int spn<wchar_t>(const wchar_t *a, const wchar_t *b) {
+	return (int)::wcsspn(a, b);
 }
 
 template<>
-inline size_t cspn<char>(const char *a, const char *b)
-{
-	return ::strcspn(a, b);
+inline int cspn<char>(const char *a, const char *b) {
+	return (int)::strcspn(a, b);
 }
 
 template<>
-inline size_t cspn<wchar_t>(const wchar_t *a, const wchar_t *b)
-{
-	return ::wcscspn(a, b);
+inline int cspn<wchar_t>(const wchar_t *a, const wchar_t *b) {
+	return (int)::wcscspn(a, b);
 }
 
 template<>
-inline const char *strstr(const char *a, const char *b)
-{
+inline const char *strstr(const char *a, const char *b) {
 	return ::strstr(a, b);
 }
 
 template<>
-inline const wchar_t *strstr(const wchar_t *a, const wchar_t *b)
-{
+inline const wchar_t *strstr(const wchar_t *a, const wchar_t *b) {
 	return ::wcsstr(a, b);
 }
 
 template<>
-inline int atoi(const char *str)
-{
+inline int atoi(const char *str) {
 	return ::atoi(str);
 }
 
 template<>
-inline int atoi(const wchar_t *str)
-{
+inline int atoi(const wchar_t *str) {
 #if defined(RAD_OPT_WINX)
 	return (int)::_wtoi(str);
 #else
@@ -293,14 +262,12 @@ inline int atoi(const wchar_t *str)
 }
 
 template<>
-inline float atof(const char *str)
-{
+inline float atof(const char *str) {
 	return (float)::atof(str);
 }
 
 template<>
-inline float atof(const wchar_t *str)
-{
+inline float atof(const wchar_t *str) {
 #if defined(RAD_OPT_WINX)
 	return (float)::_wtof(str);
 #else
@@ -309,25 +276,21 @@ inline float atof(const wchar_t *str)
 }
 
 template<>
-inline char *itoa<char>(int i, char *dst)
-{
+inline char *itoa<char>(int i, char *dst) {
 	::sprintf(dst, "%d", i);
 	return dst;
 }
 
 template<>
-inline wchar_t *itoa<wchar_t>(int i, wchar_t *dst)
-{
+inline wchar_t *itoa<wchar_t>(int i, wchar_t *dst) {
 	::swprintf(dst, 0xFFFFFFFF, L"%d", i);
 	return dst;
 }
 
 template<>
-inline char *toupper<char *>(char *a)
-{
+inline char *toupper<char *>(char *a) {
 	char *z = a;
-	while (*z != 0)
-	{
+	while (*z != 0) {
 		*z = ::toupper(*z);
 		++z;
 	}
@@ -336,11 +299,9 @@ inline char *toupper<char *>(char *a)
 }
 
 template<>
-inline wchar_t *toupper<wchar_t *>(wchar_t *a)
-{
+inline wchar_t *toupper<wchar_t *>(wchar_t *a) {
 	wchar_t *z = a;
-	while (*z != 0)
-	{
+	while (*z != 0) {
 		*z = ::towupper(*z);
 		++z;
 	}
@@ -349,23 +310,19 @@ inline wchar_t *toupper<wchar_t *>(wchar_t *a)
 }
 
 template<>
-inline char toupper<char>(char a)
-{
+inline char toupper<char>(char a) {
 	return static_cast<char>(::toupper(a));
 }
 
 template<>
-inline wchar_t toupper<wchar_t>(wchar_t a)
-{
+inline wchar_t toupper<wchar_t>(wchar_t a) {
 	return ::towupper(a);
 }
 
 template<>
-inline char *tolower<char *>(char *a)
-{
+inline char *tolower<char *>(char *a) {
 	char *z = a;
-	while (*z != 0)
-	{
+	while (*z != 0) {
 		*z = ::tolower(*z);
 		++z;
 	}
@@ -374,11 +331,9 @@ inline char *tolower<char *>(char *a)
 }
 
 template<>
-inline wchar_t *tolower<wchar_t *>(wchar_t *a)
-{
+inline wchar_t *tolower<wchar_t *>(wchar_t *a) {
 	wchar_t *z = a;
-	while (*z != 0)
-	{
+	while (*z != 0) {
 		*z = ::towlower(*z);
 		++z;
 	}
@@ -387,25 +342,21 @@ inline wchar_t *tolower<wchar_t *>(wchar_t *a)
 }
 
 template<>
-inline char tolower<char>(char a)
-{
+inline char tolower<char>(char a) {
 	return (char)::tolower(a);
 }
 
 template<>
-inline wchar_t tolower<wchar_t>(wchar_t a)
-{
+inline wchar_t tolower<wchar_t>(wchar_t a) {
 	return ::towlower(a);
 }
 
 template <typename T>
-inline T *reverse(T *a)
-{
+inline T *reverse(T *a) {
 	T *f = a;
 	T *b = a + len(a) - 1;
 
-	while (f < b)
-	{
+	while (f < b) {
 		std::swap(*f, *b);
 		++f;
 		++b;
@@ -415,39 +366,42 @@ inline T *reverse(T *a)
 }
 
 template<>
-inline size_t len(const char *a)
-{
+inline int len(const char *a) {
 	RAD_ASSERT(a);
-	return ::strlen(a);
+	return (int)::strlen(a);
 }
 
 template<>
-inline size_t len(const wchar_t *a)
-{
+inline int len(const wchar_t *a) {
 	RAD_ASSERT(a);
-	return ::wcslen(a);
+	return (int)::wcslen(a);
+}
+
+template <typename T>
+inline int len(const T *a) {
+	const T *b = a;
+	while (*b) {
+		++b;
+	}
+	return b-a;
 }
 
 template<>
-inline char *cpy<char>(char *dst, const char *src)
-{
+inline char *cpy<char>(char *dst, const char *src) {
 	RAD_ASSERT(dst && src);
 	return ::strcpy(dst, src);
 }
 
 template<>
-inline wchar_t *cpy<wchar_t>(wchar_t *dst, const wchar_t *src)
-{
+inline wchar_t *cpy<wchar_t>(wchar_t *dst, const wchar_t *src) {
 	RAD_ASSERT(dst && src);
 	return ::wcscpy((wchar_t *)dst, (const wchar_t *)src);
 }
 
 template<>
-inline char *ncpy<char>(char *dst, const char *src, size_t len)
-{
+inline char *ncpy<char>(char *dst, const char *src, int len) {
 	RAD_ASSERT(dst && src);
-	if (len > 0)
-	{
+	if (len > 0) {
 		::strncpy(dst, src, len-1);
 		dst[len-1] = 0;
 	}
@@ -456,11 +410,9 @@ inline char *ncpy<char>(char *dst, const char *src, size_t len)
 }
 
 template<>
-inline wchar_t *ncpy<wchar_t>(wchar_t *dst, const wchar_t *src, size_t len)
-{
+inline wchar_t *ncpy<wchar_t>(wchar_t *dst, const wchar_t *src, int len) {
 	RAD_ASSERT(dst && src);
-	if (len > 0)
-	{
+	if (len > 0) {
 		::wcsncpy(dst, src, len-1);
 		dst[len-1] = 0;
 	}
@@ -469,122 +421,115 @@ inline wchar_t *ncpy<wchar_t>(wchar_t *dst, const wchar_t *src, size_t len)
 }
 
 template<>
-inline char *cat<char>(char *dst, const char *src)
-{
+inline char *cat<char>(char *dst, const char *src) {
 	RAD_ASSERT(dst && src);
 	return ::strcat(dst, src);
 }
 
 template<>
-inline wchar_t *cat<wchar_t>(wchar_t *dst, const wchar_t *src)
-{
+inline wchar_t *cat<wchar_t>(wchar_t *dst, const wchar_t *src) {
 	return ::wcscat(dst, src);
 }
 
 template<>
-inline char *ncat<char>(char *dst, const char *src, size_t len)
-{
+inline char *ncat<char>(char *dst, const char *src, int len) {
 	RAD_ASSERT(dst && src);
 	return ::strncat(dst, src, len - 1);
 }
 
 template<>
-inline wchar_t *ncat<wchar_t>(wchar_t *dst, const wchar_t *src, size_t len)
-{
+inline wchar_t *ncat<wchar_t>(wchar_t *dst, const wchar_t *src, int len) {
+	RAD_ASSERT(dst && src);
 	return ::wcsncat(dst, src, len);
 }
 
 template<>
-inline int vsprintf<char>(char *buffer, const char *format, va_list argptr)
-{
+inline int vsprintf<char>(char *dst, const char *format, va_list argptr) {
+	RAD_ASSERT(dst && format);
 #if defined(RAD_OPT_GCC)
 	va_list _valist;
 	va_copy(_valist, argptr);
-	return ::vsprintf(buffer, format, _valist );
+	return ::vsprintf(dst, format, _valist ) + 1;
 #else
-	return ::vsprintf(buffer, format, argptr );
+	return ::vsprintf(dst, format, argptr ) + 1;
 #endif
 }
 
 template<>
-inline int vsprintf<wchar_t>(wchar_t *buffer, const wchar_t *format, va_list argptr)
-{
+inline int vsprintf<wchar_t>(wchar_t *dst, const wchar_t *format, va_list argptr) {
+	RAD_ASSERT(dst && format);
 #if defined(RAD_OPT_GCC)
 	va_list _valist;
 	va_copy(_valist, argptr);
-	return ::vswprintf(buffer, 0xffffffff, format, _valist);
+	return ::vswprintf(dst, 0xffffffff, format, _valist) + 1;
 #else
-	return ::vswprintf(buffer, 0xffffffff, format, argptr);
+	return ::vswprintf(dst, 0xffffffff, format, argptr) + 1;
 #endif
 }
 
 template<>
-inline int vsnprintf<char>(char *buffer, size_t count, const char *format, va_list argptr)
-{
+inline int vsnprintf<char>(char *dst, int count, const char *format, va_list argptr) {
+	RAD_ASSERT(dst && format);
 #if defined(RAD_OPT_GCC)
 	va_list _valist;
 	va_copy(_valist, argptr);
-	return ::vsnprintf(buffer, count, format, _valist);
+	int r = ::vsnprintf(buffer, count, format, _valist);
 #else
-	return ::vsnprintf(buffer, count, format, argptr);
+	int r = ::vsnprintf(dst, (size_t)count, format, argptr);
 #endif
+#if defined(RAD_OPT_WINX)
+	if (r < 0) // conform the return value from vsnprintf on windows (microsoft thinks they are cool).
+		r = count;
+#endif
+	if (r < count)
+		++r; // count null terminator in return.
+	dst[count-1] = 0; // always null terminate.
+	return r;
 }
 
 template<>
-inline int vsnprintf<wchar_t>(wchar_t *buffer, size_t count, const wchar_t *format, va_list argptr)
-{
+inline int vsnprintf<wchar_t>(wchar_t *dst, int count, const wchar_t *format, va_list argptr) {
+	RAD_ASSERT(dst && format);
 #if defined(RAD_OPT_GCC)
 	va_list _valist;
 	va_copy(_valist, argptr);
 	return ::vswprintf(buffer, count, format, _valist);
 #else
-	return ::vswprintf(buffer, count, format, argptr);
+	int r = ::vswprintf(dst, (size_t)count, format, argptr);
 #endif
+	if (r < count)
+		++r; // count null terminator in return.
+	dst[count-1] = 0; // always null terminate.
+	return r;
 }
 
 template<>
-inline int vscprintf<char>(const char *format, va_list argptr)
-{
-	enum { TempMax = 32*Kilo };
-	char temp[TempMax];
-#if defined(RAD_OPT_GCC)
+inline int vscprintf<char>(const char *format, va_list argptr) {
+#if defined(RAD_OPT_WINX)
+	return ::_vscprintf(format, argptr) + 1;
+#else
 	va_list _valist;
 	va_copy(_valist, argptr);
-	int z = ::vsnprintf(temp, TempMax-1, format, _valist);
-#else
-	int z = ::vsnprintf(temp, TempMax-1, format, argptr);
+	return ::vsnprintf(temp, TempMax-1, format, _valist) + 1;
+
 #endif
-	if (z < 0)
-	{
-		z = TempMax-1;
-	}
-	temp[TempMax-1] = 0;
-	return z;
 }
 
 template<>
-inline int vscprintf<wchar_t>(const wchar_t *format, va_list argptr)
-{
-	enum { TempMax = 32*Kilo };
-	wchar_t temp[TempMax];
-#if defined(RAD_OPT_GCC)
+inline int vscprintf<wchar_t>(const wchar_t *format, va_list argptr) {
+#if defined(RAD_OPT_WINX)
+	return ::_vscwprintf(format, argptr) + 1;
+#else
+
 	va_list _valist;
 	va_copy(_valist, argptr);
-	int z = ::vswprintf(temp, TempMax-1, format, _valist);
-#else
-	int z = ::vswprintf(temp, TempMax-1, format, argptr);
+	return ::vswprintf(temp, TempMax-1, format, _valist) + 1;
+
 #endif
-	if (z < 0)
-	{
-		z = TempMax-1;
-	}
-	temp[TempMax-1] = 0;
-	return z;
 }
 
 template<>
-inline int sprintf<char>(char *dst, const char *fmt, ...)
-{
+inline int sprintf<char>(char *dst, const char *fmt, ...) {
 	RAD_ASSERT(dst && fmt);
 
 	va_list args;
@@ -596,8 +541,7 @@ inline int sprintf<char>(char *dst, const char *fmt, ...)
 }
 
 template<>
-inline int sprintf<wchar_t>(wchar_t *dst, const wchar_t *fmt, ...)
-{
+inline int sprintf<wchar_t>(wchar_t *dst, const wchar_t *fmt, ...) {
 	RAD_ASSERT(dst && fmt);
 
 	va_list args;
@@ -617,82 +561,29 @@ inline int sprintf<wchar_t>(wchar_t *dst, const wchar_t *fmt, ...)
 // windows.
 // note this handles char and wchar_t!
 
-template<>
-inline int snprintf<char>(char *dst, size_t len, const char *fmt, ...)
-{
+template <typename T>
+inline int snprintf(T *dst, int len, const T *fmt, ...) {
 	RAD_ASSERT(dst && fmt);
 
 	int c = 0;
-	if (len > 0)
-	{
+	if (len > 0) {
 		va_list args;
 		va_start(args, fmt);
-		c = vsnprintf(dst, len, fmt, args);
+		c = vsnprintf<T>(dst, len, fmt, args);
 		va_end(args);
 		dst[len-1] = 0;
-
-		if (c < -1)
-			return Error;
-		if (c == -1)
-			c = (int)len - 1; // don't count NULL.
 	}
 
 	return c;
 }
 
-template<>
-inline int snprintf<wchar_t>(wchar_t *dst, size_t len, const wchar_t *fmt, ...)
-{
-	RAD_ASSERT(dst && fmt);
-
-	int c = 0;
-	if (len > 0)
-	{
-		va_list args;
-		va_start(args, fmt);
-#if defined(RAD_OPT_WIN)
-		c = _vsnwprintf(dst, len, fmt, args);
-#else
-		c = vswprintf(dst, len, fmt, args);
-#endif
-		va_end(args);
-		dst[len-1] = 0;
-
-		if (c < -1)
-			return Error;
-		if (c == -1)
-			c = (int)len - 1; // don't count NULL.
-	}
-
-	return c;
-}
-
-template<>
-inline int scprintf<char>(const char *fmt, ...)
+template <typename T>
+inline int scprintf(const T *fmt, ...)
 {
 	RAD_ASSERT(fmt);
 	va_list args;
 	va_start(args, fmt);
-#if defined(RAD_OPT_WIN)
-	int c = vscprintf(fmt, args);
-#else
-	int c = vsnprintf((char*)0, 0, fmt, args);
-#endif
-	va_end(args);
-	return c;
-}
-
-template<>
-inline int scprintf<wchar_t>(const wchar_t *fmt, ...)
-{
-	RAD_ASSERT(fmt);
-	va_list args;
-	va_start(args, fmt);
-#if defined(RAD_OPT_WIN)
-	int c = _vscwprintf(fmt, args);
-#else
-	int c = vswprintf((wchar_t*)0, 0, fmt, args);
-#endif
+	int c = vscprintf<T>(fmt, args);
 	va_end(args);
 	return c;
 }

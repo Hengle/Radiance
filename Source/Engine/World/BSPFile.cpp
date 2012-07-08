@@ -334,9 +334,9 @@ int BSPFileBuilder::Write(stream::OutputStream &os)
 	// string table.
 	for (size_t i = 0; i < m_strings.size(); ++i)
 	{
-		if (!os.Write((U16)(m_strings[i].length()+1)))
+		if (!os.Write((U16)(m_strings[i].length+1)))
 			return pkg::SR_IOError;
-		if (os.Write(m_strings[i].c_str(), (stream::SPos)(m_strings[i].length()+1), 0) != (stream::SPos)(m_strings[i].length()+1))
+		if (os.Write(m_strings[i].c_str.get(), (stream::SPos)(m_strings[i].length+1), 0) != (stream::SPos)(m_strings[i].length+1))
 			return pkg::SR_IOError;
 	}
 

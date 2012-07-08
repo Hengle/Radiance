@@ -417,20 +417,20 @@ r::HRenderer Renderer()
 	return App::Get()->engine->sys->r;
 }
 
-WString ExpandBaseDir(const wchar_t *append)
+String ExpandBaseDir(const char *append)
 {
-	WString dir(L"9:/");
+	String dir(CStr("9:/"));
 	dir += Files()->hddRoot.get();
-	wchar_t native[file::MaxFilePathLen+1];
-	if (file::ExpandToNativePath(dir.c_str(), native, file::MaxFilePathLen+1))
+	char native[file::MaxFilePathLen+1];
+	if (file::ExpandToNativePath(dir.c_str, native, file::MaxFilePathLen+1))
 	{
 		if (append)
 			string::cat(native, append);
 
-		return WString(native);
+		return String(native);
 	}
 
-	return WString();
+	return String();
 }
 
 bool IsGuiThread()
@@ -438,7 +438,7 @@ bool IsGuiThread()
 	return __QMainThreadId() == thread::ThreadId();
 }
 
-bool LoadPixmap(const wchar_t *filename, QPixmap &pixmap)
+bool LoadPixmap(const char *filename, QPixmap &pixmap)
 {
 	int media = file::AllMedia;
 	file::HBufferedAsyncIO buf;
@@ -464,7 +464,7 @@ bool LoadPixmap(const wchar_t *filename, QPixmap &pixmap)
 	);
 }
 
-bool LoadIcon(const wchar_t *filename, QIcon &icon)
+bool LoadIcon(const char *filename, QIcon &icon)
 {
 	QPixmap pixmap;
 	if (!LoadPixmap(filename, pixmap)) 

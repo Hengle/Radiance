@@ -376,10 +376,10 @@ Event::Vec World::ParseMultiEvent(const char *string)
 		switch (evTarget)
 		{
 		case Event::T_Name:
-			event.reset(new (ZWorld) Event(target.c_str(), cmd.c_str(), args.c_str()));
+			event.reset(new (ZWorld) Event(target.c_str.get(), cmd.c_str.get(), args.c_str.get()));
 			break;
 		default:
-			event.reset(new (ZWorld) Event(evTarget, cmd.c_str(), args.c_str()));
+			event.reset(new (ZWorld) Event(evTarget, cmd.c_str.get(), args.c_str.get()));
 			break;
 		}
 

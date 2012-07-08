@@ -56,9 +56,9 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(App, game, Game*);
 #endif
 	RAD_DECLARE_READONLY_PROPERTY(App, engine, Engine*);
-	RAD_DECLARE_READONLY_PROPERTY(App, title, const wchar_t*);
-	RAD_DECLARE_READONLY_PROPERTY(App, company, const wchar_t*);
-	RAD_DECLARE_READONLY_PROPERTY(App, website, const wchar_t*);
+	RAD_DECLARE_READONLY_PROPERTY(App, title, const char*);
+	RAD_DECLARE_READONLY_PROPERTY(App, company, const char*);
+	RAD_DECLARE_READONLY_PROPERTY(App, website, const char*);
 	RAD_DECLARE_READONLY_PROPERTY(App, flurryAPIKey, const char*);
 	RAD_DECLARE_READONLY_PROPERTY(App, allowMultipleInstances, bool);
 	RAD_DECLARE_READONLY_PROPERTY(App, state, Tickable::Ref);
@@ -82,9 +82,9 @@ protected:
 #if defined(RAD_OPT_GOLDEN) || defined(RAD_OPT_IOS)
 	virtual RAD_DECLARE_GET(game, Game*) = 0;
 #endif
-	virtual RAD_DECLARE_GET(title, const wchar_t*) = 0;
-	virtual RAD_DECLARE_GET(company, const wchar_t*) = 0;
-	virtual RAD_DECLARE_GET(website, const wchar_t*) = 0;
+	virtual RAD_DECLARE_GET(title, const char*) = 0;
+	virtual RAD_DECLARE_GET(company, const char*) = 0;
+	virtual RAD_DECLARE_GET(website, const char*) = 0;
 	virtual RAD_DECLARE_GET(allowMultipleInstances, bool) = 0;
 	virtual RAD_DECLARE_GET(flurryAPIKey, const char *) = 0;
 	

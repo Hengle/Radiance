@@ -55,9 +55,9 @@ private:
 
 	RAD_DECLARE_GET(target, Target) { return m_target; }
 	RAD_DECLARE_GET(targetId, int) { return m_targetId; }
-	RAD_DECLARE_GET(name, const char*) { return m_name.c_str(); }
-	RAD_DECLARE_GET(cmd, const char*) { return m_cmd.c_str(); }
-	RAD_DECLARE_GET(args, const char*) { return m_args.empty() ? 0 : m_args.c_str(); }
+	RAD_DECLARE_GET(name, const char*) { return m_name.c_str; }
+	RAD_DECLARE_GET(cmd, const char*) { return m_cmd.c_str; }
+	RAD_DECLARE_GET(args, const char*) { return m_args.empty ? 0 : (const char*)m_args.c_str; }
 
 	Target m_target;
 	int m_targetId;

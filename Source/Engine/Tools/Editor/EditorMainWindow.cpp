@@ -80,6 +80,7 @@ m_userSettings(
 MainWindow::~MainWindow()
 {
 	s_instance = 0;
+	m_app->engine->sys->r->ctx = r::HContext();
 }
 
 void MainWindow::BindGL()
@@ -96,9 +97,9 @@ void MainWindow::UnbindGL()
 
 bool MainWindow::Init()
 {
-	setWindowTitle(QString::fromWCharArray(m_app->title) + ": Content Browser");
+	setWindowTitle(QString(m_app->title.get()) + ": Content Browser");
 	m_logWin = new (ZEditor) LogWindow(this);
-	m_logWin->setWindowTitle(QString::fromWCharArray(m_app->title) + QString(": Starting Editor..."));
+	m_logWin->setWindowTitle(QString(m_app->title.get()) + QString(": Starting Editor..."));
 
 	s_instance = this;
 

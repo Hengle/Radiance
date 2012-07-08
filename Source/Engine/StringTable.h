@@ -84,14 +84,14 @@ public:
 	static Ref New();
 
 	//! Loads string table text data.
-	static int Load(const char *name, const wchar_t *root, Ref &r, int *loadMask = 0);
+	static int Load(const char *name, const char *root, Ref &r, int *loadMask = 0);
 
 	void SetString(const char *id, LangId lang, const char *value);
 	bool ChangeId(const char *src, const char *dst);
 	void DeleteId(const char *id);
 	bool CreateId(const char *id);
 
-	bool SaveText(const char *name, const wchar_t *root, int saveMask=LangFlag_ALL) const;
+	bool SaveText(const char *name, const char *root, int saveMask=LangFlag_ALL) const;
 	bool SaveBin(stream::IOutputBuffer &ob) const;
 
 #endif

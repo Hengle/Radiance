@@ -26,15 +26,15 @@ namespace tools {
 namespace editor {
 
 namespace {
-const wchar_t *s_iconNames[StringTable::LangId_MAX] = {
-	L"Editor/Flags/flag_usa.png",
-	L"Editor/Flags/flag_france.png",
-	L"Editor/Flags/flag_italy.png",
-	L"Editor/Flags/flag_germany.png",
-	L"Editor/Flags/flag_spain.png",
-	L"Editor/Flags/flag_russia.png",
-	L"Editor/Flags/flag_japan.png",
-	L"Editor/Flags/flag_china.png"
+const char *s_iconNames[StringTable::LangId_MAX] = {
+	"Editor/Flags/flag_usa.png",
+	"Editor/Flags/flag_france.png",
+	"Editor/Flags/flag_italy.png",
+	"Editor/Flags/flag_germany.png",
+	"Editor/Flags/flag_spain.png",
+	"Editor/Flags/flag_russia.png",
+	"Editor/Flags/flag_japan.png",
+	"Editor/Flags/flag_china.png"
 };
 
 inline QString ExpandNewlines(const QString &str) {
@@ -75,7 +75,7 @@ m_sort(Qt::AscendingOrder)
 	QHBoxLayout *controlStrip = new (ZEditor) QHBoxLayout();
 
 	QPushButton *addButton = new (ZEditor) QPushButton(
-		LoadIcon(L"Editor/add2.png"),
+		LoadIcon("Editor/add2.png"),
 		QString(),
 		this
 	);
@@ -87,7 +87,7 @@ m_sort(Qt::AscendingOrder)
 	controlStrip->addWidget(addButton);
 
 	m_delButton = new (ZEditor) QPushButton(
-		LoadIcon(L"Editor/delete2.png"),
+		LoadIcon("Editor/delete2.png"),
 		QString(),
 		this
 	);
@@ -219,17 +219,17 @@ void StringTableWidget::OnLanguageChanged(int index) {
 }
 
 void StringTableWidget::OnAddClicked() {
-	String id("New String");
+	String id(CStr("New String"));
 
 	for (int i = 2; ; ++i) {
-		if (m_parser->mutableStringTable->CreateId(id.c_str()))
+		if (m_parser->mutableStringTable->CreateId(id.c_str))
 			break;
-		id.format("New String %d", i);
+		id.Printf("New String %d", i);
 	}
 
 	m_model->Load();
 	// select the new string
-	int row = m_model->RowForId(id.c_str());
+	int row = m_model->RowForId(id.c_str);
 	QModelIndex index = m_model->IndexForRow(row);
 	index = m_sortModel->mapFromSource(index);
 	m_table->selectRow(index.row());
@@ -308,7 +308,7 @@ void StringTableWidget::OnItemDoubleClicked(const QModelIndex &index) {
 			lang = StringTable::LangTitles[m_model->langId];
 		}
 
-		dlg.setWindowTitle(QString("Editing: %1 (%2)").arg((*it)->first.c_str(), lang));
+		dlg.setWindowTitle(QString("Editing: %1 (%2)").arg((*it)->first.c_str.get(), lang));
 
 		if (dlg.exec() == QDialog::Accepted) {
 			if (m_sortModel->setData(index, ExpandNewlines(dlg.textEdit->toPlainText()), Qt::EditRole)) {

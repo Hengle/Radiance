@@ -56,40 +56,40 @@ bool BSPBuilder::Build(const Map &map)
 	String s;
 
 	COut(C_Info) << "MapStats:" << std::endl;
-	s.format("\t%8d Strings", m_bspFile->numStrings.get());
+	s.Printf("\t%8d Strings", m_bspFile->numStrings.get());
 	COut(C_Info) << s << std::endl;
-	s.format("\t%8d Entities", m_bspFile->numEntities.get());
+	s.Printf("\t%8d Entities", m_bspFile->numEntities.get());
 	COut(C_Info) << s << std::endl;
-	s.format("\t%8d Nodes", m_bspFile->numNodes.get());
+	s.Printf("\t%8d Nodes", m_bspFile->numNodes.get());
 	COut(C_Info) << s << std::endl;
-	s.format("\t%8d Leafs", m_bspFile->numLeafs.get());
+	s.Printf("\t%8d Leafs", m_bspFile->numLeafs.get());
 	COut(C_Info) << s << std::endl;
-	s.format("\t%8d Planes", m_bspFile->numPlanes.get());
+	s.Printf("\t%8d Planes", m_bspFile->numPlanes.get());
 	COut(C_Info) << s << std::endl;
-	s.format("\t%8d Models", m_bspFile->numModels.get());
+	s.Printf("\t%8d Models", m_bspFile->numModels.get());
 	COut(C_Info) << s << std::endl;
-	s.format("\t%8d Verts", m_bspFile->numVerts.get());
+	s.Printf("\t%8d Verts", m_bspFile->numVerts.get());
 	COut(C_Info) << s << std::endl;
-	s.format("\t%8d Indices", m_bspFile->numIndices.get());
+	s.Printf("\t%8d Indices", m_bspFile->numIndices.get());
 	COut(C_Info) << s << std::endl;
-	s.format("\t%8d Camera TMs", m_bspFile->numCameraTMs.get());
+	s.Printf("\t%8d Camera TMs", m_bspFile->numCameraTMs.get());
 	COut(C_Info) << s << std::endl;
-	s.format("\t%8d Camera Tracks", m_bspFile->numCameraTracks.get());
+	s.Printf("\t%8d Camera Tracks", m_bspFile->numCameraTracks.get());
 	COut(C_Info) << s << std::endl;
-	s.format("\t%8d Cinematic Triggers", m_bspFile->numCinematicTriggers.get());
+	s.Printf("\t%8d Cinematic Triggers", m_bspFile->numCinematicTriggers.get());
 	COut(C_Info) << s << std::endl;
-	s.format("\t%8d Cinematics", m_bspFile->numCinematics.get());
+	s.Printf("\t%8d Cinematics", m_bspFile->numCinematics.get());
 	COut(C_Info) << s << std::endl;
-	s.format("\t%8d Skas", m_bspFile->numSkas.get());
+	s.Printf("\t%8d Skas", m_bspFile->numSkas.get());
 	COut(C_Info) << s << std::endl;
-	s.format("\t%8d Actors", m_bspFile->numActors.get());
+	s.Printf("\t%8d Actors", m_bspFile->numActors.get());
 	COut(C_Info) << s << std::endl;
-	s.format("\t%8d Actor Indices", m_bspFile->numActorIndices.get());
+	s.Printf("\t%8d Actor Indices", m_bspFile->numActorIndices.get());
 	COut(C_Info) << s << std::endl;
 
 	SizeBuffer memSize;
 	FormatSize(memSize, m_skaSize);
-	s.format("\t%s Ska Data", memSize);
+	s.Printf("\t%s Ska Data", memSize);
 	COut(C_Info) << s << std::endl;
 
 	return true;
@@ -259,7 +259,7 @@ bool BSPBuilder::EmitCinematic(const Map &map, const String &name)
 
 	world::bsp_file::BSPCinematic *cinematic = m_bspFile->AddCinematic();
 	cinematic->name = (int)m_bspFile->numStrings.get();
-	*m_bspFile->AddString() = name.c_str();
+	*m_bspFile->AddString() = name.c_str;
 	cinematic->firstTrigger = (int)m_bspFile->numCinematicTriggers.get();
 	cinematic->fps = fps;
 
@@ -286,7 +286,7 @@ bool BSPBuilder::EmitCinematic(const Map &map, const String &name)
 
 			track->firstTM = (int)m_bspFile->numCameraTMs.get();
 			track->name = (int)m_bspFile->numStrings.get();
-			*m_bspFile->AddString() = camera->name.c_str();
+			*m_bspFile->AddString() = camera->name.c_str;
 
 			m_bspFile->ReserveCameraTMs((int)anim->frames.size());
 
@@ -300,14 +300,14 @@ bool BSPBuilder::EmitCinematic(const Map &map, const String &name)
 				tm->t = pose[0].m.t;
 				tm->fov = pose[0].fov;
 
-				if (pose[0].tag.empty())
+				if (pose[0].tag.empty)
 				{
 					tm->tag = -1;
 				}
 				else
 				{
 					tm->tag = (int)m_bspFile->numStrings.get();
-					*m_bspFile->AddString() = pose[0].tag.c_str();
+					*m_bspFile->AddString() = pose[0].tag.c_str;
 				}
 
 				++track->numTMs;

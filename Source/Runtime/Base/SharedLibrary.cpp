@@ -18,22 +18,22 @@ using namespace string;
 #error RAD_ERROR_UNSUP_PLAT
 #endif
 
-bool SharedLibrary::Load(const wchar_t *nativeFilename, bool reportErrors)
+bool SharedLibrary::Load(const char *nativeFilename, bool reportErrors)
 {
 	RAD_ASSERT(!Loaded());
 	
 #if defined(RAD_OPT_WINX)
 	UINT x = SetErrorMode(reportErrors ? 0 : SEM_NOOPENFILEERRORBOX);
-	m_h = LoadLibraryExW(nativeFilename, 0, LOAD_WITH_ALTERED_SEARCH_PATH);
+	m_h = LoadLibraryExA(nativeFilename, 0, LOAD_WITH_ALTERED_SEARCH_PATH);
 	SetErrorMode(x);
 #elif defined(DLOPEN)
 	dlerror();
-	m_h = dlopen(Shorten(nativeFilename).c_str(), RTLD_NOW|RTLD_GLOBAL);
+	m_h = dlopen(nativeFilename, RTLD_NOW|RTLD_GLOBAL);
 	
 #if defined(RAD_OPT_PC)
 	if (!m_h && reportErrors)
 	{
-		MessageBox(L"dlopen(): failed", RAD_WSS(L"Failed to load " << nativeFilename << L". Error: " << Widen(dlerror())).c_str(), MBStyleOk);
+		MessageBox("dlopen(): failed", RAD_SS("Failed to load " << nativeFilename << ". Error: " << dlerror()), MBStyleOk);
 	}
 #endif
 #endif

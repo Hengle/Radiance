@@ -156,5 +156,11 @@ RADRT_API void RADRT_CALL ProcessTasks()
 	thread::details::ProcessTasks();
 }
 
+RADRT_API boost::mutex &RADRT_CALL GlobalMutex()
+{
+	static boost::mutex M;
+	return M;
+}
+
 } // rt
 

@@ -97,12 +97,12 @@ SinkBase::Ref SinkFactoryBase::Cast(const AssetRef &asset)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Package::Ref Package::New(const PackageManRef &pm, const wchar_t *path, const char *name)
+Package::Ref Package::New(const PackageManRef &pm, const char *path, const char *name)
 {
 	return Ref(new (ZPackages) Package(pm, path, name));
 }
 
-Package::Package(const PackageMan::Ref &pm, const wchar_t *path, const char *name) :
+Package::Package(const PackageMan::Ref &pm, const char *path, const char *name) :
 m_name(name),
 m_path(path),
 m_pm(pm)
@@ -126,7 +126,7 @@ Package::Entry::Ref Package::CreateEntry(const char *name, asset::Type type)
 	RAD_ASSERT(name);
 	details::WriteLock WL(m_m);
 
-	if (m_dirSet.find(String(name).lower()) != m_dirSet.end())
+	if (m_dirSet.find(CStr(name).Lower()) != m_dirSet.end())
 		return Entry::Ref(); // already exists.
 
 	PackageMan::Ref pm = m_pm.lock();
@@ -135,7 +135,7 @@ Package::Entry::Ref Package::CreateEntry(const char *name, asset::Type type)
 	Entry::Ref ref(new (ZPackages) Entry(
 		(int)(pm->m_nextId++), 
 		name, 
-		(m_name + RAD_PACKAGE_SEP_STR + name).c_str(), 
+		(m_name + RAD_PACKAGE_SEP_STR + name).c_str, 
 		type,
 		shared_from_this()
 #if defined(RAD_OPT_TOOLS)
@@ -145,7 +145,7 @@ Package::Entry::Ref Package::CreateEntry(const char *name, asset::Type type)
 
 	RAD_VERIFY(m_dir.insert(Entry::Map::value_type(ref->m_name, ref)).second);
 	RAD_VERIFY(m_idDir.insert(Entry::IdMap::value_type(ref->m_id, ref)).second);
-	RAD_VERIFY(m_dirSet.insert(StringIdMap::value_type(ref->m_name.lower(), ref->id)).second);
+	RAD_VERIFY(m_dirSet.insert(StringIdMap::value_type(String(ref->m_name).Lower(), ref->id)).second);
 	pkgMan->MapId(ref->id, shared_from_this());
 
 	return ref;
@@ -316,7 +316,6 @@ PackageMan::Ref PackageMan::New(Engine &engine, const char *pkgDir)
 PackageMan::PackageMan(Engine &engine, const char *pkgDir) :
 m_engine(engine),
 m_pkgDir(pkgDir),
-m_wpkgDir(string::Widen(pkgDir)),
 m_nextId(0)
 #if defined(RAD_OPT_PC_TOOLS)
 , m_ui(0),
@@ -347,7 +346,7 @@ bool PackageMan::Initialize()
 
 Package::Ref PackageMan::ResolvePackage(const char *name, int flags)
 {
-	const String sname(name);
+	const String sname(name, string::RefTag);
 	details::ReadLock L(m_m);
 	Package::Map::iterator it = m_packages.find(sname);
 	if (it != m_packages.end())
@@ -363,20 +362,22 @@ Package::Ref PackageMan::ResolvePackage(const char *name, int flags)
 
 		// check to see if this is a case sensativity issue, like someone typed in
 		// a bad letter
-		String lowerName(sname.lower());
+		String lowerName(sname);
+		lowerName.Lower();
+
 		if (m_packageDir.find(lowerName) != m_packageDir.end())
 			return Package::Ref();
 
-		WString wname(string::Widen(name) + L".pkg");
-		WString wPath(m_wpkgDir + L"/" + wname);
-		if (m_engine.sys->files->FileExists(wPath.c_str(), file::AllMedia))
+		String extName(sname + ".pkg");
+		String path(m_pkgDir + "/" + extName);
+		if (m_engine.sys->files->FileExists(path.c_str, file::AllMedia))
 		{
 			EnumeratePackage(
 #if defined(RAD_OPT_PC_TOOLS)
 				tools::NullUIProgress,
 #endif
-				wPath, 
-				wname, 
+				path, 
+				extName, 
 				0
 			);
 		}
@@ -541,20 +542,20 @@ void PackageMan::LoadBin(
 )
 {
 	// load package lump
-	WString path(L"Packages/");
-	path += string::Widen(name);
-	path += L".lump";
+	String path(CStr("Packages/"));
+	path += name;
+	path += ".lump";
 
 	pkg::Package::Ref pkg = pkg::Package::New(
 		shared_from_this(),
-		path.c_str(),
+		path.c_str,
 		name
 	);
 
 	int media = file::AllMedia;
 	file::HStreamInputBuffer buf;
 	file::Result r = m_engine.sys->files->OpenFileStream(
-		path.c_str(),
+		path.c_str,
 		media,
 		buf,
 		file::HIONotify()
@@ -562,7 +563,7 @@ void PackageMan::LoadBin(
 
 	if (r != file::Success)
 	{
-		COut(C_Error) << "Unable to open '" << string::Shorten(path.c_str()) << "'!" << std::endl;
+		COut(C_Error) << "Unable to open '" << path.c_str.get() << "'!" << std::endl;
 		return;
 	}
 
@@ -570,7 +571,7 @@ void PackageMan::LoadBin(
 	
 	if (!pkg->m_lmpReader.LoadLumpInfo(LumpSig, LumpId, is, data_codec::lmp::LittleEndian))
 	{
-		COut(C_Error) << "'" << string::Shorten(path.c_str()) << "' is not a valid package lump!" << std::endl;
+		COut(C_Error) << "'" << path.c_str.get() << "' is not a valid package lump!" << std::endl;
 		return;
 	}
 
@@ -619,7 +620,7 @@ void PackageMan::LoadBin(
 
 	if (!imports || !imports->TagData())
 	{
-		COut(C_Error) << "'" << string::Shorten(path.c_str()) << "' missing imports table!" << std::endl;
+		COut(C_Error) << "'" << path.c_str.get() << "' missing imports table!" << std::endl;
 		return;
 	}
 
@@ -693,11 +694,11 @@ Asset::Ref PackageMan::Resolve(
 	String pkgName, assetName;
 	Split(path, pkgName, assetName);
 
-	pkg::Package::Ref pkg = ResolvePackage(pkgName.c_str(), flags);
+	pkg::Package::Ref pkg = ResolvePackage(pkgName.c_str, flags);
 	Asset::Ref ref;
 
 	if (pkg)
-		ref = pkg->Asset(assetName.c_str(), z);
+		ref = pkg->Asset(assetName.c_str, z);
 
 	return ref;
 }
@@ -713,11 +714,11 @@ Package::Entry::Ref PackageMan::Resolve(
 	String pkgName, assetName;
 	Split(path, pkgName, assetName);
 
-	pkg::Package::Ref pkg = ResolvePackage(pkgName.c_str(), flags);
+	pkg::Package::Ref pkg = ResolvePackage(pkgName.c_str, flags);
 	Package::Entry::Ref ref;
 
 	if (pkg)
-		ref = pkg->FindEntry(assetName.c_str());
+		ref = pkg->FindEntry(assetName.c_str);
 
 	return ref;
 }

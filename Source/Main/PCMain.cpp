@@ -79,13 +79,13 @@ bool Initialize(App &app)
 
 	if (!rb->VidBind())
 	{
-		MessageBox(L"Error", L"Failed to initialize OpenGL.", MBStyleOk);
+		MessageBox("Error", "Failed to initialize OpenGL.", MBStyleOk);
 		return false;
 	}
 
 	if (!rb->CheckCaps())
 	{
-		MessageBox(L"Error", L"Unsupported Graphics Card Detected.", MBStyleOk);
+		MessageBox("Error", "Unsupported Graphics Card Detected.", MBStyleOk);
 		return false;
 	}
 
@@ -209,7 +209,7 @@ bool SDLInit(int argc, char *argv[], App &app)
 	r::VidMode vidMode(1440, 900, 32, 60, true);
 	app.engine->sys->r.Cast<r::IRBackend>()->SetVidMode(vidMode);
 
-	SDL_WM_SetCaption(string::Shorten(app.title).c_str(), string::Shorten(app.title).c_str());
+	SDL_WM_SetCaption(app.title, app.title);
 
 	return true;
 }
@@ -485,9 +485,9 @@ extern "C" int main(int argc, char *argv[])
 #endif
 
 #if defined(RAD_OPT_PC_TOOLS)
-	QCoreApplication::setOrganizationName(string::Shorten(app->company).c_str());
-	QCoreApplication::setOrganizationDomain(string::Shorten(app->website).c_str());
-	QCoreApplication::setApplicationName(string::Shorten(app->title).c_str());
+	QCoreApplication::setOrganizationName(app->company.get());
+	QCoreApplication::setOrganizationDomain(app->website.get());
+	QCoreApplication::setApplicationName(app->title.get());
 #endif
 
 	try

@@ -74,17 +74,17 @@ int TypefaceCooker::Compile(int flags, int allflags)
 	}
 
 	const String *s = asset->entry->KeyValue<String>("Source.Font", flags);
-	if (!s || s->empty())
+	if (!s || s->empty)
 		return SR_MetaError;
 
 	// import font.
-	AddImport(s->c_str(), pflags);
+	AddImport(s->c_str, pflags);
 
 	s = asset->entry->KeyValue<String>("Source.Material", flags);
-	if (!s || s->empty())
+	if (!s || s->empty)
 		return SR_MetaError;
 
-	Asset::Ref matRef = App::Get()->engine->sys->packages->Resolve(s->c_str(), asset->zone);
+	Asset::Ref matRef = App::Get()->engine->sys->packages->Resolve(s->c_str, asset->zone);
 	if (!matRef)
 		return SR_MissingFile;
 
@@ -106,7 +106,7 @@ int TypefaceCooker::Compile(int flags, int allflags)
 	}
 	
 	// import material
-	AddImport(s->c_str(), pflags);
+	AddImport(s->c_str, pflags);
 
 	int w, h;
 

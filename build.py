@@ -284,9 +284,9 @@ class BuildPlatform:
 		
 	def compiler(self, env=None):
 		if env is None: 
-			env = Environment(MSVS_VERSION='8.0')
+			env = Environment(MSVC_VERSION='10.0')
 		if (env['CC'] == 'cl'): 
-			return 'msvc8'
+			return 'msvc10'
 		return env['CC'].lower()
 	
 	def importModule(self, name, path, relative=None, addToSystem=0):

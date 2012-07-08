@@ -30,13 +30,13 @@ namespace cg {
 
 	bool OpenFile(
 		Engine &e,
-		const wchar_t *filename, 
+		const char *filename, 
 		File &out
 	);
 
 	bool Inject(
 		Engine &e,
-		const wchar_t *filename,
+		const char *filename,
 		std::ostream &out
 	);
 
@@ -56,7 +56,7 @@ namespace cg {
 
 	void SaveText(
 		Engine &engine,
-		const wchar_t *filename,
+		const char *filename,
 		const char *sz
 	);
 

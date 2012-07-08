@@ -267,19 +267,19 @@ typedef boost::shared_ptr<PackageMan> PackageManRef;
 typedef boost::weak_ptr<PackageMan> PackageManWRef;
 typedef boost::shared_ptr<Package> PackageRef;
 typedef boost::weak_ptr<Package> PackageWRef;
-typedef zone_map<String, PackageRef, ZPackagesT>::type PackageMap;
+typedef zone_map<string::String, PackageRef, ZPackagesT>::type PackageMap;
 typedef zone_map<int, PackageWRef, ZPackagesT>::type IdPackageWMap;
 typedef zone_vector<PackageRef, ZPackagesT>::type PackageVec;
 typedef zone_vector<int, ZPackagesT>::type IdVec;
 typedef boost::shared_ptr<Asset> AssetRef;
 typedef boost::weak_ptr<Asset> AssetWRef;
-typedef zone_map<String, AssetRef, ZPackagesT>::type AssetMap;
-typedef zone_map<String, AssetWRef, ZPackagesT>::type AssetWMap;
+typedef zone_map<string::String, AssetRef, ZPackagesT>::type AssetMap;
+typedef zone_map<string::String, AssetWRef, ZPackagesT>::type AssetWMap;
 typedef zone_map<int, AssetRef, ZPackagesT>::type AssetIdMap;
 typedef zone_map<int, AssetWRef, ZPackagesT>::type AssetIdWMap;
 typedef zone_vector<AssetRef, ZPackagesT>::type AssetVec;
-typedef zone_map<String, int, ZPackagesT>::type StringIdMap;
-typedef zone_set<String, ZPackagesT>::type StringSet;
+typedef zone_map<string::String, int, ZPackagesT>::type StringIdMap;
+typedef zone_set<string::String, ZPackagesT>::type StringSet;
 typedef boost::shared_ptr<SinkBase> SinkBaseRef;
 
 #if defined(RAD_OPT_TOOLS)

@@ -8,6 +8,7 @@
 #include "../Thread/Interlocked.h"
 #include "../Base/ObjectPool.h"
 #include "../String/StringBase.h"
+#include "../String/utf8.h"
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
 #include <algorithm>

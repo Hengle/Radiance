@@ -237,7 +237,7 @@ std::streamsize basic_streambuf<_Elem, _Traits>::xsgetn(_Elem *ptr, std::streams
 	SPos r = 0;
 	if (m_in)
 	{
-		r = m_in->Read(ptr, count*sizeof(_Elem), 0) / sizeof(_Elem);
+		r = m_in->Read(ptr, (SPos)count*sizeof(_Elem), 0) / sizeof(_Elem);
 		this->setg(0, 0, 0);
 	}
 	return (std::streamsize)r;
@@ -249,7 +249,7 @@ std::streamsize basic_streambuf<_Elem, _Traits>::xsputn(const _Elem *ptr, std::s
 	SPos r = 0;
 	if (m_out)
 	{
-		r = m_out->Write(ptr, count*sizeof(_Elem), 0) / sizeof(_Elem);
+		r = m_out->Write(ptr, (SPos)count*sizeof(_Elem), 0) / sizeof(_Elem);
 	}
 	return (std::streamsize)r;
 }

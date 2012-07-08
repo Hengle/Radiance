@@ -21,7 +21,7 @@ int World::Spawn(
 )
 {
 	RAD_ASSERT(mapName);
-	if (m_mapPath.empty())
+	if (m_mapPath.empty)
 		m_mapPath = mapName;
 
 	if (m_spawnState == SS_Done)
@@ -322,9 +322,9 @@ void World::SetupEntity(const Entity::Ref &entity, int id)
 void World::MapEntity(const Entity::Ref &entity)
 {
 	m_ents.insert(Entity::IdMap::value_type(entity->m_id, entity));
-	m_classnames.insert(Entity::StringMMap::value_type(String(entity->classname), entity));
+	m_classnames.insert(Entity::StringMMap::value_type(CStr(entity->classname), entity));
 	if (entity->targetname.get() != 0)
-		m_targetnames.insert(Entity::StringMMap::value_type(String(entity->targetname), entity));
+		m_targetnames.insert(Entity::StringMMap::value_type(CStr(entity->targetname), entity));
 }
 
 void World::UnmapEntity(const Entity::Ref &entity)
@@ -332,9 +332,9 @@ void World::UnmapEntity(const Entity::Ref &entity)
 	m_lua->DeleteEntId(*entity);
 
 	m_ents.erase(entity->m_id);
-	m_classnames.erase(String(entity->classname));
+	m_classnames.erase(CStr(entity->classname));
 	if (entity->targetname.get() != 0)
-		m_targetnames.erase(String(entity->targetname));
+		m_targetnames.erase(CStr(entity->targetname));
 
 	if (m_viewController.get() == entity.get())
 		m_viewController.reset();

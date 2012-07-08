@@ -53,12 +53,12 @@ int StringTableParser::Load(
 	if (!s)
 		return pkg::SR_MetaError;
 
-	wchar_t path[256];
-	wchar_t native[256];
-	string::cpy(path, L"9:/");
+	char path[256];
+	char native[256];
+	string::cpy(path, "9:/");
 	string::cat(path, engine.sys->files->hddRoot.get());
-	string::cat(path, L"/");
-	string::cat(path, string::Widen(s->c_str()).c_str());
+	string::cat(path, "/");
+	string::cat(path, s->c_str.get());
 	if (!file::ExpandToNativePath(path, native, 256))
 		return SR_ErrorGeneric;
 
@@ -88,12 +88,12 @@ int StringTableParser::Save(
 	if (!s)
 		return SR_MetaError;
 
-	wchar_t path[256];
-	wchar_t native[256];
-	string::cpy(path, L"9:/");
+	char path[256];
+	char native[256];
+	string::cpy(path, "9:/");
 	string::cat(path, engine.sys->files->hddRoot.get());
-	string::cat(path, L"/");
-	string::cat(path, string::Widen(s->c_str()).c_str());
+	string::cat(path, "/");
+	string::cat(path, s->c_str.get());
 	if (!file::ExpandToNativePath(path, native, 256))
 		return SR_ErrorGeneric;
 
@@ -112,13 +112,13 @@ int StringTableParser::LoadCooked(
 	int flags
 ) {
 	if (!m_buf) {
-		WString path(L"Cooked/");
-		path += string::Widen(asset->path);
-		path += L".bin";
+		String path(CStr("Cooked/"));
+		path += CStr(asset->path);
+		path += ".bin";
 
 		int media = file::AllMedia;
 		int r = engine.sys->files->LoadFile(
-			path.c_str(),
+			path.c_str,
 			media,
 			m_buf,
 			file::HIONotify()

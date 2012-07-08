@@ -89,13 +89,13 @@ namespace utf8
         }
 
         template <typename octet_iterator>
-        uint32_t peek_next(octet_iterator it)
+        inline uint32_t peek_next(octet_iterator it)
         {
             return next(it);    
         }
 
         template <typename octet_iterator>
-        uint32_t prior(octet_iterator& it)
+        inline uint32_t prior(octet_iterator& it)
         {
             while (internal::is_trail(*(--it))) ;
             octet_iterator temp = it;
@@ -110,7 +110,7 @@ namespace utf8
         }
 
         template <typename octet_iterator, typename distance_type>
-        void advance (octet_iterator& it, distance_type n)
+        inline void advance (octet_iterator& it, distance_type n)
         {
             for (distance_type i = 0; i < n; ++i)
                 next(it);
@@ -118,7 +118,7 @@ namespace utf8
 
         template <typename octet_iterator>
         typename std::iterator_traits<octet_iterator>::difference_type
-        distance (octet_iterator first, octet_iterator last)
+        inline distance (octet_iterator first, octet_iterator last)
         {
             typename std::iterator_traits<octet_iterator>::difference_type dist;
             for (dist = 0; first < last; ++dist) 
@@ -127,9 +127,10 @@ namespace utf8
         }
 
         template <typename u16bit_iterator, typename octet_iterator>
-        octet_iterator utf16to8 (u16bit_iterator start, u16bit_iterator end, octet_iterator result)
-        {       
-            while (start != end) {
+        octet_iterator utf16to8 (u16bit_iterator *_start, u16bit_iterator end, octet_iterator result)
+        {
+			u16bit_iterator start = *_start;
+            while (start < end) {
                 uint32_t cp = internal::mask16(*start++);
             // Take care of surrogate pairs first
                 if (internal::is_lead_surrogate(cp)) {
@@ -138,12 +139,20 @@ namespace utf8
                 }
                 result = append(cp, result);
             }
+			*_start = start;
             return result;         
         }
 
+		template <typename u16bit_iterator, typename octet_iterator>
+        inline octet_iterator utf16to8 (u16bit_iterator start, u16bit_iterator end, octet_iterator result)
+        {       
+            return utf16to8(&start, end, result);       
+        }
+
         template <typename u16bit_iterator, typename octet_iterator>
-        u16bit_iterator utf8to16 (octet_iterator start, octet_iterator end, u16bit_iterator result)
+        u16bit_iterator utf8to16 (octet_iterator *_start, octet_iterator end, u16bit_iterator result)
         {
+			octet_iterator start = *_start;
             while (start < end) {
                 uint32_t cp = next(start);
                 if (cp > 0xffff) { //make a surrogate pair
@@ -153,25 +162,49 @@ namespace utf8
                 else
                     *result++ = static_cast<uint16_t>(cp);
             }
+
+			*_start = start;
             return result;
         }
 
-        template <typename octet_iterator, typename u32bit_iterator>
-        octet_iterator utf32to8 (u32bit_iterator start, u32bit_iterator end, octet_iterator result)
+		template <typename u16bit_iterator, typename octet_iterator>
+        inline u16bit_iterator utf8to16 (octet_iterator start, octet_iterator end, u16bit_iterator result)
         {
-            while (start != end)
+            return utf8to16(&start, end, result);
+        }
+
+        template <typename octet_iterator, typename u32bit_iterator>
+        octet_iterator utf32to8 (u32bit_iterator *_start, u32bit_iterator end, octet_iterator result)
+        {
+			u32bit_iterator start = *_start;
+            while (start < end)
                 result = append(*(start++), result);
+			*_start = start;
 
             return result;
         }
 
-        template <typename octet_iterator, typename u32bit_iterator>
-        u32bit_iterator utf8to32 (octet_iterator start, octet_iterator end, u32bit_iterator result)
+		template <typename octet_iterator, typename u32bit_iterator>
+        inline octet_iterator utf32to8 (u32bit_iterator start, u32bit_iterator end, octet_iterator result)
         {
+            return utf32to8(&start, end, result);
+        }
+
+        template <typename octet_iterator, typename u32bit_iterator>
+        u32bit_iterator utf8to32 (octet_iterator *_start, octet_iterator end, u32bit_iterator result)
+        {
+			octet_iterator start = *_start;
             while (start < end)
                 (*result++) = next(start);
+			*_start = start;
 
             return result;
+        }
+
+		template <typename octet_iterator, typename u32bit_iterator>
+        inline u32bit_iterator utf8to32 (octet_iterator start, octet_iterator end, u32bit_iterator result)
+        {
+            return utf8to32(&start, end, result);
         }
 
         // The iterator class

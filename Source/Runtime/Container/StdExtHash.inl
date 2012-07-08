@@ -52,26 +52,14 @@ struct hash<std::basic_string<A, B, C> >
 	}
 };
 
-template <typename A>
-struct hash<string::string<A> >
+struct hash<string::String>
 {
-	size_t operator () (const string::string<A> &str) const
+	size_t operator () (const string::String &str) const
 	{
 		hash<const char*> x;
-		return x(str.c_str());
+		return x(str.c_str.get());
 	}
 };
-
-template <typename A>
-struct hash<string::wstring<A> >
-{
-	size_t operator () (const string::wstring<A> &str) const
-	{
-		hash<const wchar_t*> x;
-		return x(str.c_str());
-	}
-};
-
 template <>
 struct hash<void*>
 {
@@ -113,16 +101,9 @@ struct hash<_type> \
 
 #else
 
-template <typename A>
-inline size_t hash_value(const ::string::string<A> &str)
+inline size_t hash_value(const ::string::String &str)
 {
-	return hash_value(str.c_str());
-}
-
-template <typename A>
-inline size_t hash_value(const ::string::wstring<A> &str)
-{
-	return hash_value(str.c_str());
+	return hash_value(str.c_str.get());
 }
 
 #define RAD_HASH_INT_TYPE(_type)

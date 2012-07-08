@@ -19,7 +19,7 @@ SearchLineWidget::SearchLineWidget(QWidget *parent, Qt::WindowFlags f) : QWidget
 	QGridLayout *g = new (ZEditor) QGridLayout(this);
 	
 	QLabel *l = new (ZEditor) QLabel(this);
-	l->setPixmap(LoadPixmap(L"Editor/search.png"));
+	l->setPixmap(LoadPixmap("Editor/search.png"));
 	g->addWidget(l, 0, 0);
 	
 	m_lineEdit = new (ZEditor) QLineEdit(this);
@@ -29,7 +29,7 @@ SearchLineWidget::SearchLineWidget(QWidget *parent, Qt::WindowFlags f) : QWidget
 	RAD_VERIFY(connect(m_lineEdit, SIGNAL(returnPressed()), SIGNAL(returnPressed())));
 
 	QPushButton *b = new (ZEditor) QPushButton(
-		LoadIcon(L"Editor/x.png"),
+		LoadIcon("Editor/x.png"),
 		QString(),
 		this
 	);

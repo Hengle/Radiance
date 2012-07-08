@@ -57,7 +57,7 @@ int MusicParser::Load(
 
 	int media = file::AllMedia;
 	int r = engine.sys->files->OpenFile(
-		string::Widen(s->c_str()).c_str(),
+		s->c_str,
 		media,
 		m_file,
 		file::HIONotify()
@@ -74,13 +74,13 @@ int MusicParser::LoadCooked(
 	int flags
 )
 {
-	WString path(L"Cooked/");
-	path += string::Widen(asset->path);
-	path += L".bin";
+	String path(CStr("Cooked/"));
+	path += CStr(asset->path);
+	path += ".bin";
 
 	int media = file::AllMedia;
 	int r = engine.sys->files->OpenFile(
-		path.c_str(),
+		path.c_str,
 		media,
 		m_file,
 		file::HIONotify()

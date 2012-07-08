@@ -191,85 +191,6 @@ inline bool InputStream::Read(F64* var, UReg* errorCode)
 	return Read(var, sizeof(F64), errorCode) == sizeof(F64);
 }
 
-template <typename T, typename S, typename A>
-bool InputStream::ReadStringHelper<T, S, A>::Read(stream::InputStream &stream, std::basic_string<T, S, A> *str, UReg *errorCode)
-{
-	{
-		AddrSize assertTIsOneByte[sizeof(T) == 1 ? 1 : 0];
-		assertTIsOneByte;
-	}
-	U8 *workBytes;
-	U16 numBytes;
-
-	if (!stream.Read(&numBytes, errorCode)) return false;
-	if (numBytes == 0)
-	{
-		*str = std::basic_string<T, S, A>();
-	}
-	else
-	{
-		workBytes = (U8*)stack_alloc(numBytes+1);
-		if (!stream.Read(workBytes, numBytes, errorCode)) 
-			return false;
-		U16 numChars = numBytes;
-		reinterpret_cast<T*>(workBytes)[numChars] = T(0);
-		*str = reinterpret_cast<const T*>(workBytes);
-	}
-	return true;
-}
-
-template <typename S, typename A>
-bool InputStream::ReadStringHelper<wchar_t, S, A>::Read(stream::InputStream &stream, std::basic_string<wchar_t, S, A> *str, UReg *errorCode)
-{
-	{
-#if defined(RAD_OPT_4BYTE_WCHAR)
-		U32 assertWCharIsFourBytes[sizeof(wchar_t) == 4 ? 1 : 0];
-		assertWCharIsFourBytes;
-#else
-		U32 assertWCharIsTwoBytes[sizeof(wchar_t) == 2 ? 1 : 0];
-		assertWCharIsTwoBytes;
-#endif
-	}
-	U8 *workBytes;
-	U16 numChars;
-	if (!stream.Read(&numChars, errorCode)) 
-		return false;
-#if defined(RAD_OPT_4BYTE_WCHAR)
-	workBytes = (U8*)stack_alloc(numChars*4+4);
-#else
-	workBytes = (U8*)stack_alloc(numChars*2+2);
-#endif
-	if (stream.Read(workBytes, numChars*2, errorCode) != numChars*2) 
-		return false;
-	reinterpret_cast<U16*>(workBytes)[numChars] = 0;
-	stream.InByteSwapWideChars(reinterpret_cast<U16*>(workBytes));
-
-#if defined(RAD_OPT_4BYTE_WCHAR)
-	{
-		const U16 *src = reinterpret_cast<const U16*>(workBytes + numChars * 2 - 2);
-		wchar_t *dst   = reinterpret_cast<wchar_t*>(workBytes + numChars * 4 - 4);
-		for (U16 i = 0; i < numChars; ++i)
-		{
-			*dst = static_cast<wchar_t>(*src);
-			--dst;
-			--src;
-		}
-		RAD_ASSERT((void*)dst == (void*)workBytes);
-		reinterpret_cast<wchar_t*>(workBytes)[numChars] = 0; // null
-	}
-#endif
-
-	*str = reinterpret_cast<const wchar_t*>(workBytes);
-	return true;
-}
-
-template <typename T, typename S, typename A>
-inline bool InputStream::Read(std::basic_string<T, S, A> *str, UReg *errorCode)
-{
-	RAD_ASSERT(str);
-	return ReadStringHelper<T, S, A>::Read(*this, str, errorCode);
-}
-
 template<typename T>
 inline InputStream& InputStream::StreamType(T& var)// throw(ReadException)
 {
@@ -329,11 +250,10 @@ inline InputStream& InputStream::operator >> (F64& var)// throw(ReadException)
 	return StreamType(var);
 }
 
-template <typename T, typename S, typename A>
-inline InputStream& InputStream::operator >> (std::basic_string<T, S, A> &str)// throw(ReadException)
+inline InputStream& InputStream::operator >> (string::String &str)// throw(ReadException)
 {
 	UReg errorCode;
-	if (!ReadStringHelper<T, S, A>::Read(*this, &str, &errorCode)) 
+	if (!Read(&str, &errorCode)) 
 		throw ReadException(errorCode);
 	return *this;
 }
@@ -454,28 +374,6 @@ inline bool OutputStream::Write(const F64& var, UReg* errorCode)
 	return Write(&var, sizeof(F64), errorCode) == sizeof(F64);
 }
 
-template <typename TChar>
-bool OutputStream::WriteStringHelper<TChar>::Write(OutputStream &stream, const TChar *str, UReg *errorCode)
-{
-	{
-		AddrSize assertTIsOneByte[sizeof(TChar) == 1 ? 1 : 0];
-		assertTIsOneByte;
-	}
-	RAD_ASSERT(str);
-	size_t len = string::len(str);
-	RAD_VERIFY(len <= (size_t)std::numeric_limits<U16>::max());
-	U16 numBytes = (U16)len;
-	if (!stream.Write(numBytes, errorCode)) 
-		return false;
-	return stream.Write(str, (SPos)len, errorCode) == (SPos)len;
-}
-
-template <typename TChar>
-inline bool OutputStream::Write(const TChar *str, UReg *errorCode)
-{
-	return WriteStringHelper<TChar>::Write(*this, str, errorCode);
-}
-
 template<typename T>
 inline OutputStream& OutputStream::StreamType(T& var)// throw(WriteException)
 {
@@ -535,12 +433,14 @@ inline OutputStream& OutputStream::operator << (const F64& var)// throw(WriteExc
 	return StreamType(var);
 }
 
-template <typename TChar>
-inline OutputStream& OutputStream::operator << (const TChar *str)// throw(WriteException)
+inline OutputStream& OutputStream::operator << (const string::String& str)// throw(WriteException)
 {
-	UReg errorCode;
-	if (!WriteStringHelper<TChar>::Write(*this, str, &errorCode)) throw WriteException(errorCode);
-	return *this;
+	return StreamType(str);
+}
+
+inline OutputStream& OutputStream::operator << (const char *sz)// throw(WriteException)
+{
+	return StreamType(sz);
 }
 
 } // stream

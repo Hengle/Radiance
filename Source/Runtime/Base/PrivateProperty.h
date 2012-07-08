@@ -62,7 +62,7 @@ struct PropertyBaseGetSet : public PropertyBaseGet<_radPropT, GetType>, public P
 		private:\
 			RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name) () {}\
 			RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name) (const RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name)&) {}\
-			friend _ctype _class;\
+			friend _ctype;\
 	}
 
 #define RAD_PRIVATE_PROPERTY_DECLARE_GETSET_CLASS_FOR_INCOMPLETE_TYPE(_ctype, _class, name, get_type, set_type) \
@@ -85,7 +85,7 @@ struct PropertyBaseGetSet : public PropertyBaseGet<_radPropT, GetType>, public P
 		private:\
 			RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name) () {}\
 			RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name) (const RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name)&) {}\
-			friend _ctype _class;\
+			friend _ctype;\
 	}
 
 #define RAD_PRIVATE_PROPERTY_IMPLEMENT_GETSET_CLASS(_class, name, get_type, set_type)\
@@ -112,7 +112,7 @@ struct PropertyBaseGetSet : public PropertyBaseGet<_radPropT, GetType>, public P
 			RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name) () {}\
 			RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name) (const RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name)&) {}\
 			RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name)& operator = (const RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name)&) { return *this; }\
-			friend _ctype _class;\
+			friend _ctype;\
 	}
 
 #define RAD_PRIVATE_PROPERTY_DECLARE_GET_CLASS_FOR_INCOMPLETE_TYPE(_ctype, _class, name, type) \
@@ -132,7 +132,7 @@ struct PropertyBaseGetSet : public PropertyBaseGet<_radPropT, GetType>, public P
 			RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name) () {}\
 			RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name) (const RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name)&) {}\
 			RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name)& operator = (const RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name)&) { return *this; }\
-			friend _ctype _class;\
+			friend _ctype;\
 	}
 
 #define RAD_PRIVATE_PROPERTY_IMPLEMENT_GET_CLASS(_class, name, type)\
@@ -151,7 +151,7 @@ struct PropertyBaseGetSet : public PropertyBaseGet<_radPropT, GetType>, public P
 			RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name) () {}\
 			RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name) (const RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name)&) {}\
 			RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name)& operator = (const RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name)&) { return *this; }\
-			friend _ctype _class;\
+			friend _ctype;\
 	}
 
 #define RAD_PRIVATE_PROPERTY_DECLARE_SET_CLASS_FOR_INCOMPLETE_TYPE(_ctype, _class, name, type) \
@@ -164,7 +164,7 @@ struct PropertyBaseGetSet : public PropertyBaseGet<_radPropT, GetType>, public P
 			RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name) () {}\
 			RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name) (const RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name)&) {}\
 			RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name)& operator = (const RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name)&) { return *this; }\
-			friend _ctype _class;\
+			friend _ctype;\
 	}
 
 #define RAD_PRIVATE_PROPERTY_IMPLEMENT_SET_CLASS(_class, name, type)\

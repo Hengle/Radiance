@@ -33,21 +33,21 @@ void PostInputEvent(QWheelEvent *event, Game &game);
 void PostInputEvent(QMouseEvent *event, Game &game, bool press, bool move);
 void PostInputEvent(QKeyEvent *event, Game &game, bool press);
 
-WString ExpandBaseDir(const wchar_t *append=0);
+String ExpandBaseDir(const char *append=0);
 
 bool IsGuiThread();
 
-bool LoadPixmap(const wchar_t *filename, QPixmap &pixmap);
-bool LoadIcon(const wchar_t *filename, QIcon &icon);
+bool LoadPixmap(const char *filename, QPixmap &pixmap);
+bool LoadIcon(const char *filename, QIcon &icon);
 
-inline QPixmap LoadPixmap(const wchar_t *filename)
+inline QPixmap LoadPixmap(const char *filename)
 {
 	QPixmap pixmap;
 	LoadPixmap(filename, pixmap);
 	return pixmap;
 }
 
-inline QIcon LoadIcon(const wchar_t *filename)
+inline QIcon LoadIcon(const char *filename)
 {
 	QIcon icon;
 	LoadIcon(filename, icon);

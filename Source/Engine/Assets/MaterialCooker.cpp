@@ -89,7 +89,7 @@ int MaterialCooker::Compile(int flags, int allflags)
 	}
 
 	int shaderId = parser->material->CookShader(
-		L"9:/Cooked/Out/Shaders",
+		"9:/Cooked/Out/Shaders",
 		*engine.get(),
 		shaderTarget
 	);
@@ -97,9 +97,9 @@ int MaterialCooker::Compile(int flags, int allflags)
 	if (shaderId < 0)
 		return SR_MetaError;
 
-	WString path(string::Widen(asset->path));
-	path += L".bin";
-	BinFile::Ref fp = OpenWrite(path.c_str(), flags);
+	String path(CStr(asset->path));
+	path += ".bin";
+	BinFile::Ref fp = OpenWrite(path.c_str, flags);
 	if (!fp)
 		return SR_IOError;
 
@@ -117,18 +117,18 @@ int MaterialCooker::Compile(int flags, int allflags)
 	for (int i = 0; i < r::MTS_MaxIndices; ++i)
 	{
 		String path;
-		path.format("Texture%d.Source.Texture", i+1);
-		const String *s = asset->entry->KeyValue<String>(path.c_str(), flags);
+		path.Printf("Texture%d.Source.Texture", i+1);
+		const String *s = asset->entry->KeyValue<String>(path.c_str, flags);
 		if (!s)
 			return SR_MetaError;
 
-		if (s->empty())
+		if (s->empty)
 		{
 			os << (U8)255;
 		}
 		else
 		{
-			os << (U8)AddImport(s->c_str(), flags);
+			os << (U8)AddImport(s->c_str, flags);
 		}
 
 		os << parser->material->TextureFPS(r::MTS_Texture, i);
@@ -196,29 +196,29 @@ int MaterialCooker::MatchTargetKeys(int flags, int allflags)
 
 	for (int i = 0; i < r::MTS_MaxIndices; ++i)
 	{
-		path.format("Texture%d.Source.Texture", i+1);
-		x &= asset->entry->MatchTargetKeys<String>(path.c_str(), flags, allflags);
-		path.format("Texture%d.Source.FramesPerSecond", i+1);
-		x &= asset->entry->MatchTargetKeys<String>(path.c_str(), flags, allflags);
-		path.format("Texture%d.tcGen", i+1);
-		x &= asset->entry->MatchTargetKeys<String>(path.c_str(), flags, allflags);
+		path.Printf("Texture%d.Source.Texture", i+1);
+		x &= asset->entry->MatchTargetKeys<String>(path.c_str, flags, allflags);
+		path.Printf("Texture%d.Source.FramesPerSecond", i+1);
+		x &= asset->entry->MatchTargetKeys<String>(path.c_str, flags, allflags);
+		path.Printf("Texture%d.tcGen", i+1);
+		x &= asset->entry->MatchTargetKeys<String>(path.c_str, flags, allflags);
 
 		if (!x)
 			return 0;
 
 		for (int k = 0; k < r::Material::NumTcMods; ++k)
 		{
-			path.format("Texture%d.tcMod.%s", i+1, s_tcModNames[k]);
+			path.Printf("Texture%d.tcMod.%s", i+1, s_tcModNames[k]);
 			z = path + ".Type";
-			x &= asset->entry->MatchTargetKeys<String>(z.c_str(), flags, allflags);
+			x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
 			z = path + ".Amplitude";
-			x &= asset->entry->MatchTargetKeys<String>(z.c_str(), flags, allflags);
+			x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
 			z = path + ".Frequency";
-			x &= asset->entry->MatchTargetKeys<String>(z.c_str(), flags, allflags);
+			x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
 			z = path + ".Phase";
-			x &= asset->entry->MatchTargetKeys<String>(z.c_str(), flags, allflags);
+			x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
 			z = path + ".Base";
-			x &= asset->entry->MatchTargetKeys<String>(z.c_str(), flags, allflags);
+			x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
 
 			if (!x)
 				return 0;
@@ -229,24 +229,24 @@ int MaterialCooker::MatchTargetKeys(int flags, int allflags)
 	{
 		for (int k = r::Material::ColorA; k < r::Material::NumColorIndices; ++k)
 		{
-			path.format("Color%d.%c", i, 'A'+k);
-			x &= asset->entry->MatchTargetKeys<String>(path.c_str(), flags, allflags);
+			path.Printf("Color%d.%c", i, 'A'+k);
+			x &= asset->entry->MatchTargetKeys<String>(path.c_str, flags, allflags);
 		}
 
 		if (!x)
 			return 0;
 
-		path.format("Color%d.Gen", i);
+		path.Printf("Color%d.Gen", i);
 		z = path + ".Type";
-		x &= asset->entry->MatchTargetKeys<String>(z.c_str(), flags, allflags);
+		x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
 		z = path + ".Amplitude";
-		x &= asset->entry->MatchTargetKeys<String>(z.c_str(), flags, allflags);
+		x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
 		z = path + ".Frequency";
-		x &= asset->entry->MatchTargetKeys<String>(z.c_str(), flags, allflags);
+		x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
 		z = path + ".Phase";
-		x &= asset->entry->MatchTargetKeys<String>(z.c_str(), flags, allflags);
+		x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
 		z = path + ".Base";
-		x &= asset->entry->MatchTargetKeys<String>(z.c_str(), flags, allflags);
+		x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
 	}
 
 	if (!x)

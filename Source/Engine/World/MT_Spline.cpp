@@ -52,7 +52,7 @@ void Entity::Tick_MT_Spline(
 	{
 		for (E_SplineTrack::StringVec::const_iterator it = events.begin(); it != events.end(); ++it)
 		{
-			world->DispatchEvent((*it).c_str());
+			world->DispatchEvent((*it).c_str);
 		}
 	}
 
@@ -166,7 +166,7 @@ void Entity::Tick_MT_Spline(
 	{
 		for (E_SplineTrack::StringVec::const_iterator it = events.begin(); it != events.end(); ++it)
 		{
-			world->DispatchEvent((*it).c_str());
+			world->DispatchEvent((*it).c_str);
 		}
 	}
 }

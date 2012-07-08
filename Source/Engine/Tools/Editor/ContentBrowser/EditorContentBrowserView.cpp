@@ -279,7 +279,7 @@ m_tickRedraw(false)
 	int col = 1;
 
 	m_cloneButton = new (ZEditor) QPushButton(
-		LoadIcon(L"Editor/clone.png"),
+		LoadIcon("Editor/clone.png"),
 		QString(),
 		this
 	);
@@ -290,7 +290,7 @@ m_tickRedraw(false)
 	m_cloneButton->setToolTip("Clone Selection");
 
 	m_moveButton = new (ZEditor) QPushButton(
-		LoadIcon(L"Editor/move.png"),
+		LoadIcon("Editor/move.png"),
 		QString(),
 		this
 	);
@@ -303,7 +303,7 @@ m_tickRedraw(false)
 	s->addItem(new (ZEditor) QSpacerItem(32, 0), 0, col++);
 
 	QPushButton *zoomIn = new (ZEditor) QPushButton(
-		LoadIcon(L"Editor/zoom_in.png"),
+		LoadIcon("Editor/zoom_in.png"),
 		QString(),
 		this
 	);
@@ -313,7 +313,7 @@ m_tickRedraw(false)
 	zoomIn->setToolTip("Preview Bigger");
 
 	QPushButton *zoomOut = new (ZEditor) QPushButton(
-		LoadIcon(L"Editor/zoom_out.png"),
+		LoadIcon("Editor/zoom_out.png"),
 		QString(),
 		this
 	);
@@ -323,7 +323,7 @@ m_tickRedraw(false)
 	zoomOut->setToolTip("Preview Smaller");
 
 	QPushButton *zoomOne = new (ZEditor) QPushButton(
-		LoadIcon(L"Editor/view_1_1.png"),
+		LoadIcon("Editor/view_1_1.png"),
 		QString(),
 		this
 	);
@@ -333,7 +333,7 @@ m_tickRedraw(false)
 	zoomOne->setToolTip("Preview Full Size");
 
 	m_delButton = new (ZEditor) QPushButton(
-		LoadIcon(L"Editor/delete2.png"),
+		LoadIcon("Editor/delete2.png"),
 		QString(),
 		this
 	);
@@ -454,7 +454,7 @@ void ContentBrowserView::DoTick(float dt)
 
 void ContentBrowserView::UpdateFilter(bool redraw)
 {
-	m_filter.filter = String(m_searchLine->text.get().toAscii().constData()).lower();
+	m_filter.filter = String(m_searchLine->text.get().toAscii().constData()).Lower();
 	BuildAssetList();
 	RecalcLayout(false);
 	if (!ScrollToSelection() && redraw)
@@ -578,7 +578,7 @@ void ContentBrowserView::DeleteSelection()
 	SelSet sel(m_sel);
 	
 	String msg;
-	msg.format("Are you sure you want to delete the following %d item(s)?"RAD_NEWLINE, sel.size());
+	msg.Printf("Are you sure you want to delete the following %d item(s)?"RAD_NEWLINE, sel.size());
 
 	{
 		String x;
@@ -587,7 +587,7 @@ void ContentBrowserView::DeleteSelection()
 
 		for (; it != sel.end() && c < MaxItems; ++it, ++c)
 		{
-			if (!x.empty())
+			if (!x.empty)
 			{
 				x += RAD_NEWLINE;
 			}
@@ -609,7 +609,7 @@ void ContentBrowserView::DeleteSelection()
 	if (QMessageBox::question(
 		parentWidget(),
 		"Confirmation",
-		msg.c_str(),
+		msg.c_str.get(),
 		QMessageBox::Yes|QMessageBox::No, 
 		QMessageBox::No
 	) != QMessageBox::Yes)
@@ -1463,11 +1463,11 @@ void ContentBrowserView::LoadIcons()
 
 	m_loadedIcons = true;
 
-	const wchar_t *filenames[I_Max] =
+	static const char *s_filenames[I_Max] =
 	{
-		L"Editor/disk_blue.png",
-		L"Editor/disks.png",
-		L"Editor/disk_blue_error.png"
+		"Editor/disk_blue.png",
+		"Editor/disks.png",
+		"Editor/disk_blue_error.png"
 	};
 
 	for (int i = 0; i < I_Max; ++i)
@@ -1475,7 +1475,7 @@ void ContentBrowserView::LoadIcons()
 		int media = file::AllMedia;
 		file::HBufferedAsyncIO buf;
 		file::Result r = Files()->LoadFile(
-			filenames[i],
+			s_filenames[i],
 			media,
 			buf,
 			file::HIONotify()

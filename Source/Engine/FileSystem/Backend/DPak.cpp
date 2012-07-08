@@ -322,9 +322,10 @@ AtomicRefCount(1)
 {
 }
 
-bool DPakFile::Initialize(const HDPakReader &hreader, const HFile &file, const wchar_t *name)
+bool DPakFile::Initialize(const HDPakReader &hreader, const HFile &file, const char *name)
 {
 	RAD_ASSERT(name);
+
 	m_reader = hreader;
 	if (name) 
 		m_name = name;
@@ -350,7 +351,7 @@ bool DPakFile::Initialize(const HDPakReader &hreader, const HFile &file, const w
 	return true;
 }
 
-HSearch DPakFile::OpenSearch(const wchar_t* path, const wchar_t* extIncludingPeriod)
+HSearch DPakFile::OpenSearch(const char* path, const char* extIncludingPeriod)
 {
 	RAD_ASSERT(path&&extIncludingPeriod);
 	if (extIncludingPeriod[0] == 0 || extIncludingPeriod[1] != L'.') 
@@ -371,11 +372,11 @@ HSearch DPakFile::OpenSearch(const wchar_t* path, const wchar_t* extIncludingPer
 // DPakFile::OpenFile()
 //////////////////////////////////////////////////////////////////////////////////////////
 
-Result DPakFile::OpenFile(const wchar_t *path, HFile &file)
+Result DPakFile::OpenFile(const char *path, HFile &file)
 {
 	file.Close();
 
-	const data_codec::lmp::StreamReader::Lump *lump = m_pak.GetByName(Shorten(path).c_str());
+	const data_codec::lmp::StreamReader::Lump *lump = m_pak.GetByName(path);
 	if (!lump)
 	{
 		return ErrorFileNotFound;
@@ -392,15 +393,15 @@ Result DPakFile::OpenFile(const wchar_t *path, HFile &file)
 	return Success;
 }
 
-bool DPakFile::FileExists(const wchar_t *path)
+bool DPakFile::FileExists(const char *path)
 {
-	const data_codec::lmp::StreamReader::Lump *lump = m_pak.GetByName(Shorten(path).c_str());
+	const data_codec::lmp::StreamReader::Lump *lump = m_pak.GetByName(path);
 	return 0 != lump;
 }
 
-bool DPakFile::FileSize(const wchar_t *path, FPos& size)
+bool DPakFile::FileSize(const char *path, FPos& size)
 {
-	const data_codec::lmp::StreamReader::Lump *lump = m_pak.GetByName(Shorten(path).c_str());
+	const data_codec::lmp::StreamReader::Lump *lump = m_pak.GetByName(path);
 	size = 0;
 	if (lump)
 	{
@@ -418,9 +419,9 @@ bool DPakFile::FileSize(const wchar_t *path, FPos& size)
 	return 0 != lump;
 }
 
-const wchar_t *DPakFile::RAD_IMPLEMENT_GET(name)
+const char *DPakFile::RAD_IMPLEMENT_GET(name)
 {
-	return m_name.c_str();
+	return m_name.c_str;
 }
 
 bool DPakFile::MyOnZeroReferences()
@@ -445,26 +446,26 @@ m_dpakFile(0)
 {
 }
 
-bool DPakFileSearch::NextFile(::string::WString &outFilename)
+bool DPakFileSearch::NextFile(String &outFilename)
 {
 	const U32 NumLumps = m_dpakFile->m_pak.NumLumps();
 	while (m_lumpNum < NumLumps)
 	{
 		const data_codec::lmp::StreamReader::Lump *lump = m_dpakFile->m_pak.GetByIndex(m_lumpNum++);
 		RAD_ASSERT(lump);
-		::string::WString name(Widen(lump->Name()));
+		String name(lump->Name(), RefTag);
 
 		// trivial rejection.
-		if (name.length() < m_path.length()) 
+		if (name.length < m_path.length) 
 			continue;
-		if (name.substr(0, m_path.length()) != m_path) 
+		if (name.SubStr(0, m_path.length) != m_path) 
 			continue; // doesn't start with our path.
 
-		if (m_ext[1] != L'*') // filter the extension.
+		if (m_ext[1] != '*') // filter the extension.
 		{
-			wchar_t ext[file::MaxExtLen+1];
-			file::FileExt(name.c_str(), ext, file::MaxExtLen+1);
-			if (!cmp(ext, m_ext.c_str()))
+			char ext[file::MaxExtLen+1];
+			file::FileExt(name.c_str, ext, file::MaxExtLen+1);
+			if (!cmp(ext, m_ext.c_str.get()))
 			{
 				outFilename = name;
 				return true;
@@ -546,7 +547,7 @@ void DPakReader::Initialize(
 	m_init = true;
 }
 
-HPakFile DPakReader::MountPakFile(const HFile &file, const wchar_t *name)
+HPakFile DPakReader::MountPakFile(const HFile &file, const char *name)
 {
 	RAD_ASSERT(file);
 

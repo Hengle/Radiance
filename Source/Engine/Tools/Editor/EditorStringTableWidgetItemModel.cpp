@@ -33,19 +33,19 @@ QVariant StringTableItemModel::data(const QModelIndex &index, int role) const {
 
 	switch (index.column()) {
 		case 0: {
-			return QVariant((*it)->first.c_str());
+			return QVariant((*it)->first.c_str.get());
 		} break;
 		case 1: {
 			StringTable::Entry::Strings::const_iterator string = (*it)->second.strings.find(StringTable::LangId_EN);
 			if (string == (*it)->second.strings.end())
 				return QVariant();
-			return QVariant(QString::fromUtf8(string->second.c_str()));
+			return QVariant(QString::fromUtf8(string->second.c_str.get()));
 		} break;
 		case 2: {
 			StringTable::Entry::Strings::const_iterator string = (*it)->second.strings.find(m_langId);
 			if (string == (*it)->second.strings.end())
 				return QVariant();
-			return QVariant(QString::fromUtf8(string->second.c_str()));
+			return QVariant(QString::fromUtf8(string->second.c_str.get()));
 		} break;
 		default:
 			return QVariant();
@@ -62,10 +62,10 @@ bool StringTableItemModel::setData(const QModelIndex &index, const QVariant &val
 	QString s = value.toString();
 	switch (index.column()) {
 		case 0: {
-			if (QString((*it)->first.c_str()) != s) {
+			if (QString((*it)->first.c_str.get()) != s) {
 				QByteArray ascii = s.toAscii();
 				// renaming the field
-				if (!m_stringTable.ChangeId((*it)->first.c_str(), ascii.constData())) {
+				if (!m_stringTable.ChangeId((*it)->first.c_str, ascii.constData())) {
 					QMessageBox::critical(0, "Error", "A string with that name already exists");
 					return false;
 				}
@@ -76,7 +76,7 @@ bool StringTableItemModel::setData(const QModelIndex &index, const QVariant &val
 			}
 		} break;
 		case 1: {
-			m_stringTable.SetString((*it)->first.c_str(), StringTable::LangId_EN, s.toUtf8().constData());
+			m_stringTable.SetString((*it)->first.c_str, StringTable::LangId_EN, s.toUtf8().constData());
 			emit dataChanged(
 				createIndex(index.row(), 1),
 				createIndex(index.row(), 1)
@@ -84,7 +84,7 @@ bool StringTableItemModel::setData(const QModelIndex &index, const QVariant &val
 			return true;
 		} break;
 		case 2: {
-			m_stringTable.SetString((*it)->first.c_str(), m_langId, s.toUtf8().constData());
+			m_stringTable.SetString((*it)->first.c_str, m_langId, s.toUtf8().constData());
 			emit dataChanged(
 				createIndex(index.row(), 2),
 				createIndex(index.row(), 2)
@@ -154,7 +154,7 @@ QModelIndex StringTableItemModel::IndexForRow(int row) const {
 void StringTableItemModel::DeleteItem(const QModelIndex &index) {
 	if (index.row() < (int)m_stringVec.size()) {
 		beginRemoveRows(QModelIndex(), index.row(), index.row());
-		m_stringTable.DeleteId(m_stringVec[index.row()]->first.c_str());
+		m_stringTable.DeleteId(m_stringVec[index.row()]->first.c_str);
 		m_stringVec.erase(m_stringVec.begin()+index.row());
 		endRemoveRows();
 	}
@@ -162,7 +162,7 @@ void StringTableItemModel::DeleteItem(const QModelIndex &index) {
 
 void StringTableItemModel::DeleteItems(const QModelIndexList &indices) {
 	foreach(QModelIndex index, indices) {
-		m_stringTable.DeleteId(m_stringVec[index.row()]->first.c_str());
+		m_stringTable.DeleteId(m_stringVec[index.row()]->first.c_str);
 	}
 	Load();
 }

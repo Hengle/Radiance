@@ -184,7 +184,7 @@ inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numSkas)
 
 inline const char *BSPFileBuilder::String(U32 idx) const
 {
-	return m_strings[idx].c_str();
+	return m_strings[idx].c_str;
 }
 
 inline const BSPEntity *BSPFileBuilder::Entities() const

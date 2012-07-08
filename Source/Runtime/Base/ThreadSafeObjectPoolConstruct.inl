@@ -4,11 +4,10 @@
 // See Radiance/LICENSE for licensing terms.
 
 template <typename A1>
-inline T *Construct(A1 &a1)
-{
+inline T *Construct(A1 &a1) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1);
 }
 
@@ -19,11 +18,10 @@ inline T *SafeConstruct(A1 &a1)
 }
 
 template <typename A1>
-inline T *Construct(const A1 &a1)
-{
+inline T *Construct(const A1 &a1) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1);
 }
 
@@ -34,11 +32,10 @@ inline T *SafeConstruct(const A1 &a1)
 }
 
 template <typename A1>
-inline T *Construct(volatile A1 &a1)
-{
+inline T *Construct(volatile A1 &a1) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1);
 }
 
@@ -49,11 +46,10 @@ inline T *SafeConstruct(volatile A1 &a1)
 }
 
 template <typename A1>
-inline T *Construct(const volatile A1 &a1)
-{
+inline T *Construct(const volatile A1 &a1) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1);
 }
 
@@ -64,11 +60,10 @@ inline T *SafeConstruct(const volatile A1 &a1)
 }
 
 template <typename A1, typename A2>
-inline T *Construct(A1 &a1, A2 &a2)
-{
+inline T *Construct(A1 &a1, A2 &a2) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2);
 }
 
@@ -79,11 +74,10 @@ inline T *SafeConstruct(A1 &a1, A2 &a2)
 }
 
 template <typename A1, typename A2>
-inline T *Construct(A1 &a1, const A2 &a2)
-{
+inline T *Construct(A1 &a1, const A2 &a2) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2);
 }
 
@@ -94,11 +88,10 @@ inline T *SafeConstruct(A1 &a1, const A2 &a2)
 }
 
 template <typename A1, typename A2>
-inline T *Construct(A1 &a1, volatile A2 &a2)
-{
+inline T *Construct(A1 &a1, volatile A2 &a2) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2);
 }
 
@@ -109,11 +102,10 @@ inline T *SafeConstruct(A1 &a1, volatile A2 &a2)
 }
 
 template <typename A1, typename A2>
-inline T *Construct(A1 &a1, const volatile A2 &a2)
-{
+inline T *Construct(A1 &a1, const volatile A2 &a2) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2);
 }
 
@@ -124,11 +116,10 @@ inline T *SafeConstruct(A1 &a1, const volatile A2 &a2)
 }
 
 template <typename A1, typename A2>
-inline T *Construct(const A1 &a1, A2 &a2)
-{
+inline T *Construct(const A1 &a1, A2 &a2) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2);
 }
 
@@ -139,11 +130,10 @@ inline T *SafeConstruct(const A1 &a1, A2 &a2)
 }
 
 template <typename A1, typename A2>
-inline T *Construct(const A1 &a1, const A2 &a2)
-{
+inline T *Construct(const A1 &a1, const A2 &a2) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2);
 }
 
@@ -154,11 +144,10 @@ inline T *SafeConstruct(const A1 &a1, const A2 &a2)
 }
 
 template <typename A1, typename A2>
-inline T *Construct(const A1 &a1, volatile A2 &a2)
-{
+inline T *Construct(const A1 &a1, volatile A2 &a2) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2);
 }
 
@@ -169,11 +158,10 @@ inline T *SafeConstruct(const A1 &a1, volatile A2 &a2)
 }
 
 template <typename A1, typename A2>
-inline T *Construct(const A1 &a1, const volatile A2 &a2)
-{
+inline T *Construct(const A1 &a1, const volatile A2 &a2) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2);
 }
 
@@ -184,11 +172,10 @@ inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2)
 }
 
 template <typename A1, typename A2>
-inline T *Construct(volatile A1 &a1, A2 &a2)
-{
+inline T *Construct(volatile A1 &a1, A2 &a2) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2);
 }
 
@@ -199,11 +186,10 @@ inline T *SafeConstruct(volatile A1 &a1, A2 &a2)
 }
 
 template <typename A1, typename A2>
-inline T *Construct(volatile A1 &a1, const A2 &a2)
-{
+inline T *Construct(volatile A1 &a1, const A2 &a2) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2);
 }
 
@@ -214,11 +200,10 @@ inline T *SafeConstruct(volatile A1 &a1, const A2 &a2)
 }
 
 template <typename A1, typename A2>
-inline T *Construct(volatile A1 &a1, volatile A2 &a2)
-{
+inline T *Construct(volatile A1 &a1, volatile A2 &a2) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2);
 }
 
@@ -229,11 +214,10 @@ inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2)
 }
 
 template <typename A1, typename A2>
-inline T *Construct(volatile A1 &a1, const volatile A2 &a2)
-{
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2);
 }
 
@@ -244,11 +228,10 @@ inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2)
 }
 
 template <typename A1, typename A2>
-inline T *Construct(const volatile A1 &a1, A2 &a2)
-{
+inline T *Construct(const volatile A1 &a1, A2 &a2) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2);
 }
 
@@ -259,11 +242,10 @@ inline T *SafeConstruct(const volatile A1 &a1, A2 &a2)
 }
 
 template <typename A1, typename A2>
-inline T *Construct(const volatile A1 &a1, const A2 &a2)
-{
+inline T *Construct(const volatile A1 &a1, const A2 &a2) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2);
 }
 
@@ -274,11 +256,10 @@ inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2)
 }
 
 template <typename A1, typename A2>
-inline T *Construct(const volatile A1 &a1, volatile A2 &a2)
-{
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2);
 }
 
@@ -289,11 +270,10 @@ inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2)
 }
 
 template <typename A1, typename A2>
-inline T *Construct(const volatile A1 &a1, const volatile A2 &a2)
-{
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2);
 }
 
@@ -304,11 +284,10 @@ inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(A1 &a1, A2 &a2, A3 &a3)
-{
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -319,11 +298,10 @@ inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(A1 &a1, A2 &a2, const A3 &a3)
-{
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -334,11 +312,10 @@ inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3)
-{
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -349,11 +326,10 @@ inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3)
-{
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -364,11 +340,10 @@ inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(A1 &a1, const A2 &a2, A3 &a3)
-{
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -379,11 +354,10 @@ inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3)
-{
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -394,11 +368,10 @@ inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3)
-{
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -409,11 +382,10 @@ inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3)
-{
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -424,11 +396,10 @@ inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3)
-{
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -439,11 +410,10 @@ inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3)
-{
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -454,11 +424,10 @@ inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3)
-{
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -469,11 +438,10 @@ inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3)
-{
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -484,11 +452,10 @@ inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3)
-{
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -499,11 +466,10 @@ inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3)
-{
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -514,11 +480,10 @@ inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3)
-{
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -529,11 +494,10 @@ inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3)
-{
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -544,11 +508,10 @@ inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const A1 &a1, A2 &a2, A3 &a3)
-{
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -559,11 +522,10 @@ inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3)
-{
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -574,11 +536,10 @@ inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3)
-{
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -589,11 +550,10 @@ inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3)
-{
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -604,11 +564,10 @@ inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3)
-{
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -619,11 +578,10 @@ inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3)
-{
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -634,11 +592,10 @@ inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3)
-{
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -649,11 +606,10 @@ inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3)
-{
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -664,11 +620,10 @@ inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3)
-{
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -679,11 +634,10 @@ inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3)
-{
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -694,11 +648,10 @@ inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3)
-{
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -709,11 +662,10 @@ inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3)
-{
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -724,11 +676,10 @@ inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3)
-{
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -739,11 +690,10 @@ inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3)
-{
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -754,11 +704,10 @@ inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3)
-{
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -769,11 +718,10 @@ inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3)
-{
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -784,11 +732,10 @@ inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3)
-{
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -799,11 +746,10 @@ inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3)
-{
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -814,11 +760,10 @@ inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3)
-{
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -829,11 +774,10 @@ inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3)
-{
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -844,11 +788,10 @@ inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3)
-{
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -859,11 +802,10 @@ inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3)
-{
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -874,11 +816,10 @@ inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3)
-{
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -889,11 +830,10 @@ inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3)
-{
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -904,11 +844,10 @@ inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3)
-{
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -919,11 +858,10 @@ inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3)
-{
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -934,11 +872,10 @@ inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3)
-{
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -949,11 +886,10 @@ inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3)
-{
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -964,11 +900,10 @@ inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3)
-{
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -979,11 +914,10 @@ inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3)
-{
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -994,11 +928,10 @@ inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3)
-{
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -1009,11 +942,10 @@ inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3)
-{
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -1024,11 +956,10 @@ inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3)
-{
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -1039,11 +970,10 @@ inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3)
-{
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -1054,11 +984,10 @@ inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3)
-{
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -1069,11 +998,10 @@ inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3)
-{
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -1084,11 +1012,10 @@ inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3)
-{
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -1099,11 +1026,10 @@ inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3)
-{
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -1114,11 +1040,10 @@ inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3)
-{
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -1129,11 +1054,10 @@ inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3)
-{
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -1144,11 +1068,10 @@ inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3)
-{
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -1159,11 +1082,10 @@ inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3)
-{
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -1174,11 +1096,10 @@ inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3)
-{
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -1189,11 +1110,10 @@ inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3)
-{
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -1204,11 +1124,10 @@ inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3)
-{
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -1219,11 +1138,10 @@ inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3)
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3)
-{
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -1234,11 +1152,10 @@ inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3)
-{
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -1249,11 +1166,10 @@ inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A
 }
 
 template <typename A1, typename A2, typename A3>
-inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3)
-{
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3) {
 	void *p = m_memoryPool.GetChunk();
 	if (!p)
-	return 0;
+		return 0;
 	return new (p) T(a1, a2, a3);
 }
 
@@ -1261,5 +1177,17925 @@ template <typename A1, typename A2, typename A3>
 inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3)
 {
 	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *Construct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5) {
+	void *p = m_memoryPool.GetChunk();
+	if (!p)
+		return 0;
+	return new (p) T(a1, a2, a3, a4, a5);
+}
+
+template <typename A1, typename A2, typename A3, typename A4, typename A5>
+inline T *SafeConstruct(const volatile A1 &a1, const volatile A2 &a2, const volatile A3 &a3, const volatile A4 &a4, const volatile A5 &a5)
+{
+	return new (m_memoryPool.SafeGetChunk()) T(a1, a2, a3, a4, a5);
 }
 

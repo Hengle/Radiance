@@ -18,7 +18,6 @@
 #include "Zones.h"
 
 typedef ::string::String String;
-typedef ::string::WString WString;
 typedef math::AABB3<float> BBox;
 typedef math::Matrix4X4F Mat4;
 typedef math::Vector2F Vec2;

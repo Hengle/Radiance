@@ -79,10 +79,10 @@ int TypefaceParser::Load(
 			return SR_MetaError;
 
 		const String *s = asset->entry->KeyValue<String>("Source.Font", P_TARGET_FLAGS(flags));
-		if (!s || s->empty())
+		if (!s || s->empty)
 			return SR_MetaError;
 
-		m_fontRef = engine.sys->packages->Resolve(s->c_str(), asset->zone);
+		m_fontRef = engine.sys->packages->Resolve(s->c_str, asset->zone);
 		if (!m_fontRef)
 			return SR_MissingFile;
 	}
@@ -101,10 +101,10 @@ int TypefaceParser::Load(
 	if (!m_matRef)
 	{
 		const String *s = asset->entry->KeyValue<String>("Source.Material", P_TARGET_FLAGS(flags));
-		if (!s || s->empty())
+		if (!s || s->empty)
 			return SR_MetaError;
 
-		m_matRef = engine.sys->packages->Resolve(s->c_str(), asset->zone);
+		m_matRef = engine.sys->packages->Resolve(s->c_str, asset->zone);
 		if (!m_matRef)
 			return SR_MissingFile;
 	}

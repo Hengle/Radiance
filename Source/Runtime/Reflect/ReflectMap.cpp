@@ -15,11 +15,14 @@ RADREFLECT_TYPE(RADRT_API, "bool*", bool*)
 RADREFLECT_TYPE(RADRT_API, "const bool*", const bool*)
 RADREFLECT_TYPE(RADRT_API, "char", char)
 RADREFLECT_TYPE(RADRT_API, "char*", char*)
-RADREFLECT_TYPE(RADRT_API, "wchar_t", wchar_t)
-RADREFLECT_TYPE(RADRT_API, "wchar_t*", wchar_t*)
 RADREFLECT_TYPE(RADRT_API, "const char*", const char*)
 RADREFLECT_TYPE(RADRT_API, "const void*", const void*)
+
+#if defined(RAD_NATIVE_WCHAR_T_DEFINED)
+RADREFLECT_TYPE(RADRT_API, "wchar_t", wchar_t)
+RADREFLECT_TYPE(RADRT_API, "wchar_t*", wchar_t*)
 RADREFLECT_TYPE(RADRT_API, "const wchar_t*", const wchar_t*)
+#endif
 
 RADREFLECT_TYPE(RADRT_API, "S8", S8)
 RADREFLECT_TYPE(RADRT_API, "S8*", S8*)
@@ -54,13 +57,9 @@ RADREFLECT_TYPE(RADRT_API, "const F64*", const F64*)
 
 using namespace reflect;
 
-RADREFLECT_BEGIN_CLASS_DESTRUCTOR_NAMESPACE("string::string<>", string, string<>, string)
+RADREFLECT_BEGIN_CLASS_DESTRUCTOR_NAMESPACE("string::String", string, String, String)
 	RADREFLECT_CONSTRUCTOR
-RADREFLECT_END_NAMESPACE(RADRT_API, string, string<>)
-
-RADREFLECT_BEGIN_CLASS_DESTRUCTOR_NAMESPACE("string::wstring<>", string, wstring<>, wstring)
-	RADREFLECT_CONSTRUCTOR
-RADREFLECT_END_NAMESPACE(RADRT_API, string, wstring<>)
+RADREFLECT_END_NAMESPACE(RADRT_API, string, String)
 
 RADREFLECT_BEGIN_CLASS_DESTRUCTOR_NAMESPACE("std::string", std, string, basic_string)
 	RADREFLECT_CONSTRUCTOR

@@ -72,7 +72,7 @@ int SoundParser::Load(
 
 		int media = file::AllMedia;
 		int r = engine.sys->files->OpenFileStream(
-			string::Widen(s->c_str()).c_str(),
+			s->c_str,
 			media,
 			m_ib,
 			file::HIONotify()
@@ -127,13 +127,13 @@ int SoundParser::LoadCooked(
 {
 	if (!m_buf)
 	{
-		WString path(L"Cooked/");
-		path += string::Widen(asset->path);
-		path += L".bin";
+		String path(CStr("Cooked/"));
+		path += CStr(asset->path);
+		path += ".bin";
 
 		int media = file::AllMedia;
 		int r = engine.sys->files->LoadFile(
-			path.c_str(),
+			path.c_str,
 			media,
 			m_buf,
 			file::HIONotify(),

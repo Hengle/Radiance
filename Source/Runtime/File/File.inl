@@ -22,8 +22,8 @@ inline Search::~Search()
 }
 
 inline bool Search::Open(
-	const wchar_t *directory,
-	const wchar_t *extWithPeriod,
+	const char *directory,
+	const char *extWithPeriod,
 	SearchFlags flags
 )
 {
@@ -35,7 +35,7 @@ inline bool Search::Open(
 }
 
 inline bool Search::NextFile(
-	wchar_t *filenameBuffer,
+	char *filenameBuffer,
 	UReg filenameBufferSize,
 	FileAttributes *fileFlags,
 	xtime::TimeDate *fileTime
@@ -129,7 +129,7 @@ inline File::~File()
 }
 
 inline Result File::Open(
-	const wchar_t *filename,
+	const char *filename,
 	CreationType creationType,
 	AccessMode accessMode,
 	ShareMode shareMode,

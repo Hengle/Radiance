@@ -16,9 +16,7 @@
 
 namespace file {
 
-RADRT_API FILE *RADRT_CALL wfopen(const wchar_t *path, const wchar_t *mode);
-
-// Strings are passed as wchar_t*'s because using a string container will break when
+// Strings are passed as char*'s because using a string container will break when
 // used across dll's.
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -58,8 +56,8 @@ RADRT_API FILE *RADRT_CALL wfopen(const wchar_t *path, const wchar_t *mode);
 
 // subject to MAX alias length
 
-RADRT_API const wchar_t *RADRT_CALL Alias(UReg aliasNumber);
-RADRT_API void RADRT_CALL SetAlias(UReg aliasNumber, const wchar_t *string);
+RADRT_API const char *RADRT_CALL Alias(UReg aliasNumber);
+RADRT_API void RADRT_CALL SetAlias(UReg aliasNumber, const char *string);
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // In a debug build you can toggle the enforcement of portable paths via
@@ -91,7 +89,7 @@ RADRT_API bool RADRT_CALL EnforcePortablePathsEnabled();
 
 #endif
 
-RADRT_API bool RADRT_CALL FilePathIsValid(const wchar_t *string);
+RADRT_API bool RADRT_CALL FilePathIsValid(const char *string);
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Native path expansion.
@@ -104,8 +102,8 @@ RADRT_API bool RADRT_CALL FilePathIsValid(const wchar_t *string);
 
 
 RADRT_API bool RADRT_CALL ExpandToNativePath(
-	const wchar_t *portablePath,
-	wchar_t *nativePath,
+	const char *portablePath,
+	char *nativePath,
 	UReg nativePathBufferSize
 );
 
@@ -113,7 +111,7 @@ RADRT_API bool RADRT_CALL ExpandToNativePath(
 // successful (excluding null terminator), or 0 if error (or path is a null string).
 
 RADRT_API UReg RADRT_CALL ExpandToNativePathLength(
-	const wchar_t *portablePath
+	const char *portablePath
 );
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -121,20 +119,20 @@ RADRT_API UReg RADRT_CALL ExpandToNativePathLength(
 //////////////////////////////////////////////////////////////////////////////////////////
 
 RADRT_API bool RADRT_CALL ExpandAliases(
-	const wchar_t *portablePath,
-	wchar_t *expandedPath,
+	const char *portablePath,
+	char *expandedPath,
 	UReg expandedPathBufferSize
 );
 
 RADRT_API UReg RADRT_CALL ExpandAliasesLength(
-	const wchar_t *portablePath
+	const char *portablePath
 );
 
 // Returns the sector size of the device that the given file path resides on. Note this
 // doesn't have to be a filename, it can be a path, or an alias.
 
 RADRT_API FPos RADRT_CALL DeviceSectorSize(
-	const wchar_t *portablePath,
+	const char *portablePath,
 	int flags
 );
 
@@ -143,17 +141,17 @@ RADRT_API FPos RADRT_CALL DeviceSectorSize(
 //////////////////////////////////////////////////////////////////////////////////////////
 
 RADRT_API bool RADRT_CALL DeleteFile(
-	const wchar_t *portablePath,
+	const char *portablePath,
 	int flags
 );
 
 RADRT_API bool RADRT_CALL CreateDirectory(
-	const wchar_t *portablePath,
+	const char *portablePath,
 	int flags
 );
 
 RADRT_API bool RADRT_CALL DeleteDirectory(
-	const wchar_t *portablePath,
+	const char *portablePath,
 	int flags
 );
 
@@ -164,14 +162,14 @@ RADRT_API bool RADRT_CALL DeleteDirectory(
 // test the existance of a file or directory.
 
 RADRT_API bool RADRT_CALL FileExists(
-	const wchar_t *portablePath,
+	const char *portablePath,
 	int flags
 );
 
 // returns the modified time of a file.
 
 RADRT_API bool RADRT_CALL FileTime(
-	const wchar_t *portablePath,
+	const char *portablePath,
 	xtime::TimeDate *td,
 	int flags
 );
@@ -179,49 +177,49 @@ RADRT_API bool RADRT_CALL FileTime(
 // returned with a '.'
 
 RADRT_API void RADRT_CALL FileExt(
-	const wchar_t *path,
-	wchar_t *ext,
+	const char *path,
+	char *ext,
 	UReg extBufferSize
 );
 
 // returned with a '.'
 
 RADRT_API UReg RADRT_CALL FileExtLength(
-	const wchar_t *path
+	const char *path
 );
 
 RADRT_API void RADRT_CALL SetFileExt(
-	const wchar_t *path,
-	const wchar_t *extWithPeriod,
-	wchar_t *newPath,
+	const char *path,
+	const char *extWithPeriod,
+	char *newPath,
 	UReg newPathBufferSize
 );
 
 RADRT_API UReg RADRT_CALL SetFileExtLength(
-	const wchar_t *path,
-	const wchar_t *extWithPeriod
+	const char *path,
+	const char *extWithPeriod
 );
 
 //! Returns the path component of the filename.
 RADRT_API UReg RADRT_CALL FilePathNameLength(
-	const wchar_t *path
+	const char *path
 );
 
 RADRT_API void RADRT_CALL FilePathName(
-	const wchar_t *path,
-	wchar_t *pathName,
+	const char *path,
+	char *pathName,
 	UReg pathNameBufferSize
 );
 
 //! Returns the length of the path returned by file::FileBaseName()
 RADRT_API UReg RADRT_CALL FileBaseNameLength(
-	const wchar_t *path
+	const char *path
 );
 
 //! Returns the base name of a file, without extension or directory components
 RADRT_API void RADRT_CALL FileBaseName(
-	const wchar_t *path,
-	wchar_t *basePath,
+	const char *path,
+	char *basePath,
 	UReg basePathBufferSize
 );
 
@@ -242,13 +240,13 @@ public:
 	~Search();
 
 	bool Open(
-		const wchar_t *directory,
-		const wchar_t *extWithPeriod,
+		const char *directory,
+		const char *extWithPeriod,
 		SearchFlags flags
 	);
 
 	bool NextFile(
-		wchar_t *filenameBuffer,
+		char *filenameBuffer,
 		UReg filenameBufferSize,
 		FileAttributes *fileFlags = 0,
 		xtime::TimeDate *fileTime = 0
@@ -333,7 +331,7 @@ public:
 	//
 
 	Result Open(
-		const wchar_t *filename,
+		const char *filename,
 		CreationType creationType,
 		AccessMode accessMode,
 		ShareMode shareMode,

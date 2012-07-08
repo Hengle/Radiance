@@ -240,7 +240,7 @@ KeyVal::Ref Package::Entry::RemoveKey(const char *path, int flags)
 	{
 		for (KeyVal::Map::iterator it = m_keys.begin(); it != m_keys.end();)
 		{
-			if (string::ncmp(sPath.c_str(), it->second->path.c_str(), sPath.length()) == 0)
+			if (sPath.NCompare(it->second->path, sPath.length) == 0)
 			{
 				KeyVal::Map::iterator next = it; ++next;
 				r = it->second;
@@ -278,9 +278,9 @@ void Package::Entry::MapImport(const KeyVal::Ref &key)
 	if (key->def && key->def->Type() == K_Import)
 	{
 		const String *s = static_cast<const String*>(key->val);
-		if (s && !s->empty())
+		if (s && !s->empty)
 		{
-			AddImport(key->path.c_str(), s->c_str());
+			AddImport(key->path.c_str, s->c_str);
 		}
 	}
 }
@@ -295,11 +295,11 @@ KeyDef::Ref Package::Entry::FindKeyDef(
 
 	if (itDef == m_defs->end())
 	{
-		int plat = PlatformFlagsForName(name.c_str());
+		int plat = PlatformFlagsForName(name.c_str);
 		if (plat != 0) // platform flag
 		{
 			String trimmed = TrimKeyName(path);
-			if (!trimmed.empty())
+			if (!trimmed.empty)
 			{
 				itDef = m_defs->find(trimmed);
 				if (itDef != m_defs->end())
@@ -324,16 +324,17 @@ KeyDef::Ref Package::Entry::FindKeyDef(
 
 String Package::Entry::TrimKeyName(const String &name)
 {
-	if (name.empty()) return name;
+	if (name.empty) 
+		return name;
 
-	size_t period = name.length();
+	int period = name.length;
 
 	while (period-- > 1)
 	{
 		if (name[period] == '.') break;
 	}
 
-	return name.left(period);
+	return name.Left(period);
 }
 
 void Package::Entry::AddImport(const char *name, const char *path)
@@ -360,14 +361,14 @@ void Package::Delete()
 
     for (Entry::IdMap::iterator it = m_idDir.begin(); it != m_idDir.end(); ++it)
     {
-        pkgMan->UpdateImports(it->second->m_path.c_str(), 0);
+        pkgMan->UpdateImports(it->second->m_path.c_str, 0);
     }
 
     m_idDir.clear();
     m_dirSet.clear();
     m_dir.clear();
 
-	RemoveFileBacking(m_path.c_str());
+	RemoveFileBacking(m_path.c_str);
 }
 
 void Package::Delete(int id)
@@ -376,30 +377,28 @@ void Package::Delete(int id)
     if (it != m_idDir.end())
     {
         Entry::Ref ref = it->second;
-        pkgMan->UpdateImports(ref->m_path.c_str(), 0);
+        pkgMan->UpdateImports(ref->m_path.c_str, 0);
         m_dir.erase(ref->m_name);
-        m_dirSet.erase(ref->m_name.lower());
+        m_dirSet.erase(String(ref->m_name).Lower());
         m_idDir.erase(it);
     }
 }
 
 bool Package::Rename(const char *name)
 {
-	WString path(m_path);
-
-    if (!pkgMan->Rename(shared_from_this(), name))
+	if (!pkgMan->Rename(shared_from_this(), name))
 	{
 		return false;
 	}
 
-	RemoveFileBacking(path.c_str());
+	RemoveFileBacking(m_path.c_str);
 
 	for (Entry::IdMap::const_iterator it = m_idDir.begin(); it != m_idDir.end(); ++it)
 	{
 		Entry::Ref ref = it->second;
 		String oldPath = ref->m_path;
 		ref->m_path = m_name + RAD_PACKAGE_SEP_STR + ref->m_name;
-		pkgMan->UpdateImports(oldPath.c_str(), ref->m_path.c_str());
+		pkgMan->UpdateImports(oldPath.c_str, ref->m_path.c_str);
 	}
 
 	Save();
@@ -414,7 +413,7 @@ bool Package::Rename(int id, const char *name)
 
 	RAD_ASSERT(name);
 	{
-		StringIdMap::const_iterator it = m_dirSet.find(String(name).lower());
+		StringIdMap::const_iterator it = m_dirSet.find(String(name).Lower());
 		if (it != m_dirSet.end() && it->second != id)
 		{ // already something with that name.
 			return false;
@@ -435,8 +434,8 @@ bool Package::Rename(int id, const char *name)
 	newPath = ref->m_path;
 	m_dir.erase(oldName);
 	m_dir[ref->m_name] = ref;
-	m_dirSet.erase(oldName.lower());
-	m_dirSet[ref->m_name.lower()] = id;
+	m_dirSet.erase(oldName.Lower());
+	m_dirSet[ref->m_name.Lower()] = id;
 
 	for (int i = 0; i < Z_Max; ++i)
 	{
@@ -448,7 +447,7 @@ bool Package::Rename(int id, const char *name)
 		}
 	}
 
-    pkgMan->UpdateImports(oldPath.c_str(), newPath.c_str());
+    pkgMan->UpdateImports(oldPath.c_str, newPath.c_str);
     return true;
 }
 
@@ -471,7 +470,7 @@ void _InitPath(std::ostream &out, const String &path, PathMap &map)
 void InitPath(std::ostream &out, const String &path, PathMap &map)
 {
 	String frag;
-	for (String::const_iterator it = path.begin(); it != path.end(); ++it)
+	for (String::const_iterator it = path.begin; it != path.end; ++it)
 	{
 		if (*it == '.') // flush
 		{
@@ -512,18 +511,18 @@ bool Package::Save() const
 	details::WriteLock L(m_m);
 
 	std::fstream f;
-	WString path;
+	String path;
 
 	{
-		path = WString(L"9:/") + pkgMan->m_engine.sys->files->hddRoot.get();
-		wchar_t native[file::MaxFilePathLen+1];
-		if (!file::ExpandToNativePath(path.c_str(), native, file::MaxFilePathLen+1))
+		path = CStr("9:/") + pkgMan->m_engine.sys->files->hddRoot.get();
+		char native[file::MaxFilePathLen+1];
+		if (!file::ExpandToNativePath(path.c_str, native, file::MaxFilePathLen+1))
 			return false;
 		path = native;
 	}
 
 	f.open(
-		string::Shorten((path + L"/" + m_path).c_str()).c_str(), 
+		(path + "/" + m_path).c_str, 
 		std::ios_base::out|std::ios_base::trunc
 	);
 
@@ -566,7 +565,7 @@ bool Package::Save() const
 	f.close();
 
 	f.open(
-		string::Shorten((path + L"/" + m_path + L".idx").c_str()).c_str(),
+		(path + "/" + m_path + ".idx").c_str,
 		std::ios_base::out|std::ios_base::trunc
 	);
 
@@ -627,11 +626,11 @@ void Package::UpdateImports(const char *src, const char *dst)
 	}
 }
 
-void Package::RemoveFileBacking(const wchar_t *path)
+void Package::RemoveFileBacking(const char *path)
 {
 	PackageMan::Ref pm(m_pm.lock());
-	pm->m_engine.sys->files->DeleteFile(path ? path : m_path.c_str(), file::AllMedia);
-	pm->m_engine.sys->files->DeleteFile((WString(path ? path : m_path.c_str()) + L".idx").c_str(), file::AllMedia);
+	pm->m_engine.sys->files->DeleteFile(path ? path : m_path.c_str.get(), file::AllMedia);
+	pm->m_engine.sys->files->DeleteFile((String(path ? CStr(path) : m_path) + ".idx").c_str, file::AllMedia);
 }
 
 Package::Entry::Ref Package::Clone(const Entry::Ref &source, const char *name)
@@ -723,7 +722,7 @@ int PackageMan::lua_Add(lua_State *L)
 	lua::Variant::Map map;
 	lua::ParseVariantTable(L, map, true);
 
-	lua::Variant::Map::iterator it = map.find(String("name"));
+	lua::Variant::Map::iterator it = map.find(CStr("name"));
 	const String *pstr = 0;
 	String name;
 
@@ -740,13 +739,13 @@ int PackageMan::lua_Add(lua_State *L)
 	name = *pstr;
 	map.erase(it); // not a key.
 
-	it = map.find(String("type"));
+	it = map.find(CStr("type"));
 	String stype;
 
 	if (it == map.end() || !(pstr=static_cast<const String*>(it->second)))
 	{
 		luaL_error(L, "Asset (%s) is missing 'type' field, (Function %s, File %s, Line %d)",
-			name.c_str(),
+			name.c_str.get(),
 			__FUNCTION__,
 			__FILE__,
 			__LINE__
@@ -757,24 +756,24 @@ int PackageMan::lua_Add(lua_State *L)
 	stype = *pstr;
 	map.erase(it); // not a key.
 
-	asset::Type type = asset::TypeFromName(stype.c_str());
+	asset::Type type = asset::TypeFromName(stype.c_str);
 	if (type == asset::AT_Max)
 	{
 		luaL_error(L, "Asset (%s) has invalid type '%s', (Function %s, File %s, Line %d)",
-			name.c_str(),
-			stype.c_str(),
+			name.c_str.get(),
+			stype.c_str.get(),
 			__FUNCTION__,
 			__FILE__,
 			__LINE__
 		);
 	}
 
-	it = map.find(String("modifiedTime"));
+	it = map.find(CStr("modifiedTime"));
 	xtime::TimeDate modifiedTime;
 
 	if (it != map.end() && (pstr=static_cast<const String*>(it->second)))
 	{
-		modifiedTime = xtime::TimeDate::FromString(pstr->c_str());
+		modifiedTime = xtime::TimeDate::FromString(pstr->c_str);
 		map.erase(it); // not a key.
 	}
 	else
@@ -783,11 +782,11 @@ int PackageMan::lua_Add(lua_State *L)
 		self->m_resavePackages = true; // resave times.
 	}
 
-	Package::Entry::Ref entry = pkg->CreateEntry(name.c_str(), type);
+	Package::Entry::Ref entry = pkg->CreateEntry(name.c_str, type);
 	if (!entry)
 	{
 		luaL_error(L, "Duplicate asset (%s), (Function %s, File %s, Line %d)",
-			name.c_str(),
+			name.c_str.get(),
 			__FUNCTION__,
 			__FILE__,
 			__LINE__
@@ -824,7 +823,7 @@ void PackageMan::ParseEntry(
 	{
 		String fullName;
 
-		if (path.empty())
+		if (path.empty)
 		{
 			fullName = it->first;
 		}
@@ -887,7 +886,7 @@ bool PackageMan::LoadKeyDefs()
 	m_defaultKeyDef.reset(new (ZPackages) KeyDef());
 	{
 		KeyDef::Pair p;
-		p.name = "value";
+		p.name = CStr("value");
 		p.val = lua::Variant(
 			reflect::SharedReflected::Ref(
 				new (ZPackages) reflect::SharedReflected(
@@ -906,51 +905,50 @@ bool PackageMan::LoadKeyDefs()
 	}
 
 	file::HSearch s = m_engine.sys->files->OpenSearch(
-		m_wpkgDir.c_str(),
-		L".keys",
+		m_pkgDir.c_str,
+		".keys",
 		file::AllMedia
 	);
 
 	if (!s)
 	{
 		COut(C_ErrMsgBox) << "PackageMan::LoadKeyDefs(): unable to open "
-			<< m_pkgDir.c_str() << " directory!" << std::endl;
+			<< m_pkgDir << " directory!" << std::endl;
 		return false;
 	}
 
-	WString filename;
+	String filename;
 	while (s->NextFile(filename))
 	{
-		LoadKeyDefs(m_wpkgDir + L"/" + filename, filename);
+		LoadKeyDefs(m_pkgDir + "/" + filename, filename);
 	}
 
 	return true;
 }
 
-bool PackageMan::LoadKeyDefs(const WString &wPath, const WString &filename)
+bool PackageMan::LoadKeyDefs(const String &path, const String &filename)
 {
-	String path = string::Shorten(wPath.c_str());
 	asset::Type type;
 	{
-		wchar_t x[file::MaxFilePathLen+1];
-		file::SetFileExt(filename.c_str(), 0, x, file::MaxFilePathLen+1);
-		type = asset::TypeFromName(string::Shorten(WString(x).c_str()).c_str());
+		char x[file::MaxFilePathLen+1];
+		file::SetFileExt(filename.c_str, 0, x, file::MaxFilePathLen+1);
+		type = asset::TypeFromName(x);
 		if (type == asset::AT_Max)
 		{
 			COut(C_ErrMsgBox) << "PackageMan: '" << x
 				<< "' is not a valid asset type (source: "
-				<< string::Shorten(filename.c_str()).c_str() << ")" << std::endl;
+				<< filename << ")" << std::endl;
 			return false;
 		}
 
 		COut(C_Info) << "PackageMan: loading '" <<
-			path.c_str() << "'..." << std::endl;
+			path << "'..." << std::endl;
 	}
 
 	int media = file::AllMedia;
 	file::HBufferedAsyncIO buf;
 	bool r = m_engine.sys->files->LoadFile(
-			wPath.c_str(),
+			path.c_str,
 			media,
 			buf,
 			file::HIONotify()
@@ -966,7 +964,7 @@ bool PackageMan::LoadKeyDefs(const WString &wPath, const WString &filename)
 
 	if (!r)
 	{
-		COut(C_ErrMsgBox) << "PackageMan: failed to load '" << path.c_str() << "'" << std::endl;
+		COut(C_ErrMsgBox) << "PackageMan: failed to load '" << path << "'" << std::endl;
 		return false;
 	}
 
@@ -977,7 +975,7 @@ bool PackageMan::LoadKeyDefs(const WString &wPath, const WString &filename)
 		L->L,
 		(const char*)buf->data->ptr.get(),
 		buf->data->size,
-		path.c_str()
+		path.c_str
 	) != 0)
 	{
 		COut(C_ErrMsgBox) << "PackageMan: " << lua_tostring(L->L, -1) << std::endl;
@@ -1021,7 +1019,7 @@ void PackageMan::ParseKeyDefs(const String &filename, const String &path, const 
 			else
 			{
 				COut(C_Error) << "Expected integer value: " <<
-					path.c_str() << ".style, file:" << filename.c_str() << std::endl;
+					path << ".style, file:" << filename << std::endl;
 				parent->style = 0;
 			}
 			continue;
@@ -1036,23 +1034,23 @@ void PackageMan::ParseKeyDefs(const String &filename, const String &path, const 
 			const String *seditor = static_cast<const String*>(it->second);
 			if (seditor)
 			{
-				parent->editor = reflect::Class::Find<char>(seditor->c_str());
+				parent->editor = reflect::Class::Find<char>(seditor->c_str);
 				if (!parent->editor)
 				{
 					COut(C_Error) << "Unable to find editor class: " <<
-						seditor->c_str() << "for keydef: " << parent->path.c_str() <<
-						", file: " << filename.c_str() << std::endl;
+						*seditor << "for keydef: " << parent->path <<
+						", file: " << filename << std::endl;
 				}
 			}
 			else
 			{
 				COut(C_Error) << "Expected string value: " <<
-					path.c_str() << ".editor, file: " << filename.c_str() << std::endl;
+					path << ".editor, file: " << filename << std::endl;
 			}
 #endif
 			continue;
 		}
-		else if(it->first == it->first.lower()) // all lowercase
+		else if(it->first == String(it->first).Lower()) // all lowercase
 		{
 			if (!parent) 
 				continue;
@@ -1089,14 +1087,14 @@ void PackageMan::ParseKeyDefs(const String &filename, const String &path, const 
 		key->name = it->first;
 		key->flags = 0;
 
-		if (path.empty())
+		if (path.empty)
 		{
 			key->path = key->name;	
 		}
 		else
 		{
 			key->path = path + "." + key->name;
-			key->flags = PlatformFlagsForName(key->name.c_str());
+			key->flags = PlatformFlagsForName(key->name.c_str);
 		}
 
 		key->style = K_Variant;
@@ -1112,7 +1110,7 @@ void PackageMan::ParseKeyDefs(const String &filename, const String &path, const 
 		else
 		{
 			COut(C_Error) << "Expected table: " <<
-				path.c_str() << "." << key->name.c_str() << ", file:" << filename.c_str() << std::endl;
+				path << "." << key->name << ", file:" << filename << std::endl;
 
 		}
 
@@ -1144,16 +1142,15 @@ void PackageMan::EnumeratePackage(
 #if defined(RAD_OPT_PC_TOOLS)
 	tools::UIProgress &ui,
 #endif
-	const WString &wPath,
-	const WString &filename,
+	const String &path,
+	const String &filename,
 	int size
 )
 {
-	String path = string::Shorten(wPath.c_str());
-	COut(C_Info) << "PackageMan: loading '" << path.c_str() << "'..." << std::endl;
+	COut(C_Info) << "PackageMan: loading '" << path << "'..." << std::endl;
 	
 #if defined(RAD_OPT_PC_TOOLS)
-	ui.title = (String("Discovering Packages... ") + path + " (fetching)").c_str();
+	ui.title = (CStr("Discovering Packages... ") + path + " (fetching)").c_str;
 	ui.Refresh();
 #endif
 
@@ -1161,13 +1158,13 @@ void PackageMan::EnumeratePackage(
 	file::HStreamInputBuffer stream = m_engine.sys->files->SafeCreateStreamBuffer(32*Kilo);
 
 	if (!stream || m_engine.sys->files->OpenFile(
-			wPath.c_str(),
+			path.c_str,
 			file::AllMedia,
 			file,
 			file::HIONotify()
 		) < file::Success)
 	{
-		COut(C_ErrMsgBox) << "PackageMan: failed to load '" << path.c_str() << "'" << std::endl;
+		COut(C_ErrMsgBox) << "PackageMan: failed to load '" << path << "'" << std::endl;
 #if defined(RAD_OPT_PC_TOOLS)
 		ui.totalProgress = ui.totalProgress.get() + size;
 		ui.Refresh();
@@ -1188,7 +1185,7 @@ void PackageMan::EnumeratePackage(
 				L->L,
 				&Loader::Read,
 				&loader,
-				path.c_str()
+				path.c_str
 			)
 		)
 		{
@@ -1197,14 +1194,13 @@ void PackageMan::EnumeratePackage(
 		}
 	}
 
-	wchar_t name[file::MaxFilePathLen+1];
-	file::SetFileExt(filename.c_str(), 0, name, file::MaxFilePathLen+1);
-	String shortName = string::Shorten(name);
+	char name[file::MaxFilePathLen+1];
+	file::SetFileExt(filename.c_str, 0, name, file::MaxFilePathLen+1);
 
 	pkg::Package::Ref pkg = pkg::Package::New(
 		shared_from_this(),
-		wPath.c_str(),
-		shortName.c_str()
+		path.c_str,
+		name
 	);
 
 #if defined(RAD_OPT_PC_TOOLS)
@@ -1217,7 +1213,7 @@ void PackageMan::EnumeratePackage(
 
 #if defined(RAD_OPT_PC_TOOLS)
 	m_ui = &ui;
-	ui.title = (String("Discovering Packages... ") + path + " (parsing)").c_str();
+	ui.title = (String("Discovering Packages... ") + path + " (parsing)").c_str.get();
 	ui.Refresh();
 #endif
 	
@@ -1227,15 +1223,16 @@ void PackageMan::EnumeratePackage(
 		return;
 	}
 
-	String lowerName = shortName.lower();
+	String lowerName = CStr(name);
+	lowerName.Lower();
 
 	if (!m_packageDir.insert(lowerName).second)
 	{
-		COut(C_ErrMsgBox) << "Duplicate package names (" << shortName.c_str() << ") path: " <<
-			string::Shorten(wPath.c_str()).c_str() << std::endl;
+		COut(C_ErrMsgBox) << "Duplicate package names (" << name << ") path: " <<
+			path << std::endl;
 	}
 
-	m_packages.insert(Package::Map::value_type(shortName, pkg));
+	m_packages.insert(Package::Map::value_type(String(name), pkg));
 }
 
 #if defined(RAD_OPT_PC_TOOLS)
@@ -1248,25 +1245,25 @@ bool PackageMan::DiscoverPackages(tools::UIProgress &ui)
 	ui.Refresh();
 
 	file::HSearch s = m_engine.sys->files->OpenSearch(
-		m_wpkgDir.c_str(),
-		L".pkg",
+		m_pkgDir.c_str,
+		".pkg",
 		file::AllMedia
 	);
 
 	if (!s)
 	{
-		COut(C_ErrMsgBox) << "PackageMan::DiscoverPackages(): unable to open " << m_pkgDir.c_str() << " directory!" << std::endl;
+		COut(C_ErrMsgBox) << "PackageMan::DiscoverPackages(): unable to open " << m_pkgDir << " directory!" << std::endl;
 		return false;
 	}
 
-	typedef zone_vector<std::pair<WString, int>, ZPackagesT>::type Vec;
+	typedef zone_vector<std::pair<String, int>, ZPackagesT>::type Vec;
 	Vec files;
-	WString filename;
+	String filename;
 	int totalSize = 0;
 
 	while (s->NextFile(filename))
 	{
-		int size = PackageSize(m_wpkgDir + L"/" + filename);
+		int size = PackageSize(m_pkgDir + "/" + filename);
 		size = std::max(1, size);
 		totalSize += size;
 		files.push_back(Vec::value_type(filename, size));
@@ -1278,10 +1275,10 @@ bool PackageMan::DiscoverPackages(tools::UIProgress &ui)
 	totalSize = 0;
 	for (Vec::const_iterator it = files.begin(); it != files.end(); ++it)
 	{
-		const WString &x = it->first;
+		const String &x = it->first;
 		{
 			details::WriteLock L(m_m);
-			EnumeratePackage(ui, m_wpkgDir + L"/" + x, x, it->second);
+			EnumeratePackage(ui, m_pkgDir + "/" + x, x, it->second);
 		}
 		totalSize += it->second;
 		ui.totalProgress = totalSize;
@@ -1299,13 +1296,13 @@ bool PackageMan::DiscoverPackages(tools::UIProgress &ui)
 	return true;
 }
 
-int PackageMan::PackageSize(const WString &wPath)
+int PackageMan::PackageSize(const String &path)
 {
 	file::HStreamInputBuffer ibuf = m_engine.sys->files->SafeCreateStreamBuffer(32);
 	file::HFile file;
 
 	if (m_engine.sys->files->OpenFile(
-		(wPath + L".idx").c_str(),
+		(path + ".idx").c_str,
 		file::AllMedia,
 		file,
 		file::HIONotify()
@@ -1333,7 +1330,7 @@ void PackageMan::Delete(const Package::Ref &pkg)
 		UnmapId(it->second->id);
 	}
 	m_packages.erase(pkg->m_name);
-	m_packageDir.erase(pkg->m_name.lower());
+	m_packageDir.erase(String(pkg->m_name).Lower());
 }
 
 bool PackageMan::Rename(int id, const char *name)
@@ -1366,17 +1363,15 @@ void PackageMan::Delete(int id)
 
 Package::Ref PackageMan::CreatePackage(const char *name)
 {
-	WString s = string::Widen(name);
-
 	pkg::Package::Ref pkg = pkg::Package::New(
 		shared_from_this(),
-		(m_wpkgDir + L"/" + s + L".pkg").c_str(),
+		(m_pkgDir + "/" + name + ".pkg").c_str,
 		name
 	);
 
-	String sname(name);
+	String sname(CStr(name));
 
-	if (!m_packageDir.insert(sname.lower()).second)
+	if (!m_packageDir.insert(String(sname).Lower()).second)
 		return Package::Ref();
 
 	m_packages.insert(Package::Map::value_type(sname, pkg));
@@ -1389,7 +1384,8 @@ bool PackageMan::Rename(const Package::Ref &pkg, const char *name)
 	details::WriteLock L(m_m);
 
 	String sname(name);
-	String lowerName(sname.lower());
+	String lowerName(sname);
+	lowerName.Lower();
 	
 	if (!m_packageDir.insert(lowerName).second)
 	{ // exists
@@ -1402,12 +1398,12 @@ bool PackageMan::Rename(const Package::Ref &pkg, const char *name)
 		m_packages.erase(it);
 	}
 
-	lowerName = pkg->m_name.lower();
+	lowerName = pkg->m_name.Lower();
 	m_packageDir.erase(lowerName);
 
 	m_packages[sname] = pkg;
 	pkg->m_name = sname;
-	pkg->m_path = m_wpkgDir + L"/" + string::Widen(name) + L".pkg";
+	pkg->m_path = m_pkgDir + "/" + name + ".pkg";
 
     return true;
 }

@@ -57,14 +57,14 @@ void RegisterOrdinals(lua_State *L)
 
 Shader::Ref Shader::Load(Engine &e, const char *name)
 {
-	WString path(L"Shaders/");
-	path += string::Widen(name);
-	path += L".sh";
+	String path(CStr("Shaders/"));
+	path += name;
+	path += ".sh";
 
 	int media = file::AllMedia;
 	file::HBufferedAsyncIO buf;
 	bool r = e.sys->files->LoadFile(
-		path.c_str(),
+		path.c_str,
 		media,
 		buf,
 		file::HIONotify()
@@ -138,7 +138,7 @@ int Shader::lua_MNode(lua_State *L)
 	String sname(lua_tostring(L, 2));
 	lua_pop(L, 2);
 
-	Node::Ref node = self->LoadNode(*e, L, stype.c_str());
+	Node::Ref node = self->LoadNode(*e, L, stype.c_str);
 	node->m_name = sname;
 	self->m_instances.push_back(node);
 	
@@ -351,7 +351,7 @@ int Shader::lua_NNode(lua_State *L)
 		{
 			luaL_error(L, "Node type %s invalid output field %s!, (Function %s, File %s, Line %d).",
 				node->type.get(),
-				outIt->first.c_str(),
+				outIt->first.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -389,7 +389,7 @@ int Shader::lua_NNode(lua_State *L)
 			{
 				luaL_error(L, "Node type %s invalid input field %s!, (Function %s, File %s, Line %d).",
 					node->type.get(),
-					inIt->first.c_str(),
+					inIt->first.c_str.get(),
 					__FUNCTION__,
 					__FILE__,
 					__LINE__
@@ -508,14 +508,14 @@ Shader::Node::Ref Shader::LoadNode(Engine &e, lua_State *L, const char *type)
 			return it->second->Clone();
 	}
 
-	WString path(L"Shaders/Nodes/");
-	path += string::Widen(type);
-	path += L".n";
+	String path(CStr("Shaders/Nodes/"));
+	path += type;
+	path += ".n";
 
 	int media = file::AllMedia;
 	file::HBufferedAsyncIO buf;
 	bool r = e.sys->files->LoadFile(
-		path.c_str(),
+		path.c_str,
 		media,
 		buf,
 		file::HIONotify()
@@ -860,12 +860,12 @@ Shader::Node::Ref Shader::ParseNodes(
 		}
 		else
 		{
-			output = node->FindOutputName(outputName->c_str());
+			output = node->FindOutputName(outputName->c_str);
 			if (!output)
 			{
 				luaL_error(L, "Node %s does not have output named %s! (Function %s, File %s, Line %d).",
 					node->name.get(),
-					outputName->c_str(),
+					outputName->c_str.get(),
 					__FUNCTION__,
 					__FILE__,
 					__LINE__
@@ -919,20 +919,20 @@ Shader::Node::Ref Shader::ParseNodes(
 		{
 			luaL_error(L, "Invalid node input (%s, %s)! (Function %s, File %s, Line %d).",
 				node->name.get(),
-				mit->first.c_str(),
+				mit->first.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
 			);
 		}
 
-		Input::Ref in = node->FindInputName(mit->first.c_str());
+		Input::Ref in = node->FindInputName(mit->first.c_str);
 
 		if (!in)
 		{
 			luaL_error(L, "Node %s does not have input named %s! (Function %s, File %s, Line %d).",
 				node->name.get(),
-				mit->first.c_str(),
+				mit->first.c_str.get(),
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
@@ -1065,14 +1065,14 @@ bool Shader::EmitFunctions(Engine &engine, std::ostream &out) const
 {
 	for (NodeMap::const_iterator it = m_types.begin(); it != m_types.end(); ++it)
 	{
-		if (!it->second->m_alias.empty())
+		if (!it->second->m_alias.empty)
 			continue;
 
-		WString path(L"Shaders/Nodes/");
-		path += string::Widen(it->first.c_str());
-		path += L".f";
-		out << "// " << string::Shorten(path.c_str()) << "\r\n";
-		if (!Inject(engine, path.c_str(), out))
+		String path(CStr("Shaders/Nodes/"));
+		path += it->first;
+		path += ".f";
+		out << "// " << path << "\r\n";
+		if (!Inject(engine, path.c_str, out))
 		{
 			return false;
 		}
@@ -1267,7 +1267,7 @@ bool Shader::EmitShaderNode(
 		out << "\t";
 	}
 
-	if (node->m_alias.empty())
+	if (node->m_alias.empty)
 	{
 		out << node->type.get() << "(";
 	}
@@ -1283,7 +1283,7 @@ bool Shader::EmitShaderNode(
 		out << it->second;
 	}
 
-	if (node->m_alias.empty())
+	if (node->m_alias.empty)
 	{
 		out << " P_GLOBALS);\r\n";
 	}
@@ -1494,19 +1494,19 @@ Shader::Node::Ref Shader::Node::Clone() const
 void ShaderCache::Discover(Engine &engine)
 {
 	file::HSearch search;
-	search = engine.sys->files->OpenSearch(L"Shaders", L".sh", file::AllMedia);
+	search = engine.sys->files->OpenSearch("Shaders", ".sh", file::AllMedia);
 	if (search)
 	{
-		WString path;
+		String path;
 		while (search->NextFile(path))
 		{
-			if (!engine.sys->files->FileExists((WString(L"Shaders/")+path).c_str(), file::AllMedia))
+			if (!engine.sys->files->FileExists((CStr("Shaders/")+path).c_str, file::AllMedia))
 				continue;
 
-			wchar_t name[256];
-			file::SetFileExt(path.c_str(), 0, name, 256);
+			char name[256];
+			file::SetFileExt(path.c_str, 0, name, 256);
 			
-			Load(engine, string::Shorten(name).c_str());
+			Load(engine, name);
 		}
 	}
 }

@@ -32,31 +32,40 @@ RADRT_API void RADRT_CALL FormatSize(SizeBuffer& buffer, AddrSize size)
 #if defined(RAD_OPT_WIN)
 #include <windows.h>
 #undef MessageBox
-RADRT_API int RADRT_CALL MessageBox(const wchar_t *title, const wchar_t *message, MessageBoxStyle style)
+RADRT_API int RADRT_CALL MessageBox(const char *title, const char *message, MessageBoxStyle style)
 {
 	UINT z = MB_OK;
-	if (style == MBStyleOkCancel) { z = MB_OKCANCEL; }
-	if (style == MBStyleYesNo) { z = MB_YESNO; }
-	int x = MessageBoxW(0, message, title, z);
-	if (x == IDOK) { x = MBOk; }
-	if (x == IDCANCEL) { x = MBCancel; }
-	if (x == IDYES) { x = MBYes; }
-	if (x == IDNO) { x = MBNo; }
+	if (style == MBStyleOkCancel)
+		z = MB_OKCANCEL;
+	if (style == MBStyleYesNo)
+		z = MB_YESNO;
+	int x = MessageBoxA(0, message, title, z);
+	if (x == IDOK)
+		x = MBOk;
+	if (x == IDCANCEL)
+		x = MBCancel;
+	if (x == IDYES)
+		x = MBYes;
+	if (x == IDNO)
+		x = MBNo;
 	return x;
 }
 #else
 #include <stdlib.h>
-RADRT_API int RADRT_CALL MessageBox(const wchar_t *title, const wchar_t *message, MessageBoxStyle style)
+RADRT_API int RADRT_CALL MessageBox(const char *title, const char *message, MessageBoxStyle style)
 {
 	std::string buttons;
 	// Note values match (MBOk, MBCancel, MBYes, MBNo) + 2
-	if (style == MBStyleOk) { buttons = "-buttons OK:2 -default OK"; }
-	if (style == MBStyleOkCancel) { buttons = "-buttons OK:2, Cancel:3 -default OK"; }
-	if (style == MBStyleYesNo) { buttons = "-buttons Yes:4, No:5 -default Yes"; }
+	if (style == MBStyleOk)
+		buttons = "-buttons OK:2 -default OK";
+	if (style == MBStyleOkCancel)
+		buttons = "-buttons OK:2, Cancel:3 -default OK";
+	if (style == MBStyleYesNo)
+		buttons = "-buttons Yes:4, No:5 -default Yes";
 	std::string cmd("xmessage ");
 	cmd += buttons;
 	cmd += " -center ";
-	cmd += string::Shorten(message).c_str();
+	cmd += message;
 
 	int r = system(cmd.c_str());
 	RAD_ASSERT(r>=2);

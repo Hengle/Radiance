@@ -12,32 +12,21 @@
 
 using namespace string;
 
-
 namespace file {
 
 RAD_ZONE_DEF(RADRT_API, ZFile, "File", ZRuntime);
 
-RADRT_API FILE *RADRT_CALL wfopen(const wchar_t *path, const wchar_t *mode)
-{
-#if defined(RAD_OPT_OSX) || defined(RAD_OPT_IOS)
-	FILE *fp = fopen(Shorten(path).c_str(), Shorten(mode).c_str());
-#else
-	FILE *fp = _wfopen(path, mode);
-#endif
-	return fp;
-}
-
 namespace {
 
-wchar_t s_aliasTable[MaxAliases][MaxAliasLen+1];
+char s_aliasTable[MaxAliases][MaxAliasLen+1];
 
 static bool CheckPathCharacters(
-	const wchar_t *string,
+	const char *string,
 	UReg ofs
 )
 {
 	RAD_ASSERT(string);
-	RAD_ASSERT(len(string) > ofs);
+	RAD_ASSERT(len(string) > (int)ofs);
 
 	string = &string[ofs];
 	while (string[0] != 0)
@@ -56,12 +45,12 @@ static bool CheckPathCharacters(
 }
 
 static bool CheckExtensionCharacters(
-	const wchar_t *string,
+	const char *string,
 	UReg ofs
 )
 {
 	RAD_ASSERT(string);
-	RAD_ASSERT(len(string) > ofs);
+	RAD_ASSERT(len(string) > (int)ofs);
 
 	string = &string[ofs];
 	while (string[0] != 0)
@@ -81,7 +70,7 @@ static bool CheckExtensionCharacters(
 }
 
 static bool CheckDirectorySeparators(
-	const wchar_t *string
+	const char *string
 )
 {
 	RAD_ASSERT(string);
@@ -102,7 +91,7 @@ static bool CheckDirectorySeparators(
 
 // enforce 8.3
 static bool CheckFilename(
-	const wchar_t *string
+	const char *string
 )
 {
 	RAD_ASSERT(string);
@@ -152,12 +141,12 @@ static bool CheckFilename(
 
 // enforce 8.3
 static bool CheckDirectories(
-	const wchar_t *string,
+	const char *string,
 	UReg ofs
 )
 {
 	RAD_ASSERT(string);
-	RAD_ASSERT(len(string) > ofs);
+	RAD_ASSERT(len(string) > (int)ofs);
 
 	static const UReg MAXDIRDEPTH = 32;
 	UReg c = 0;
@@ -213,7 +202,7 @@ void AssertCreationType(CreationType ct)
 }
 
 void AssertFilePath(
-	const wchar_t *string,
+	const char *string,
 	bool requireAlias
 )
 {
@@ -252,7 +241,7 @@ void AssertFilePath(
 	if (hasAlias) details::AssertAliasOK(string);
 }
 
-void AssertExtension(const wchar_t *ext)
+void AssertExtension(const char *ext)
 {
 	RAD_ASSERT(ext);
 	RAD_ASSERT_MSG(ext[0] == L'.', "Extensions must start with a period!");
@@ -273,7 +262,7 @@ void AssertExtension(const wchar_t *ext)
 namespace details {
 
 bool ExtractAlias(
-	const wchar_t *path,
+	const char *path,
 	UReg *aliasNumber,
 	UReg *strOfs
 )
@@ -289,7 +278,7 @@ bool ExtractAlias(
 	{
 		*aliasNumber = 0;
 		*strOfs = i+1;
-		swscanf(path, L"%d:", aliasNumber);
+		sscanf(path, "%d:", aliasNumber);
 		return true;
 	}
 	else
@@ -303,8 +292,8 @@ bool ExtractAlias(
 // returned with a '.'
 
 RADRT_API void RADRT_CALL FileExt(
-	const wchar_t *path,
-	wchar_t *ext,
+	const char *path,
+	char *ext,
 	UReg extBufferSize
 )
 {
@@ -332,7 +321,7 @@ RADRT_API void RADRT_CALL FileExt(
 // returned with a '.'
 
 RADRT_API UReg RADRT_CALL FileExtLength(
-	const wchar_t *path
+	const char *path
 )
 {
 	RAD_ASSERT(path);
@@ -357,9 +346,9 @@ RADRT_API UReg RADRT_CALL FileExtLength(
 }
 
 RADRT_API void RADRT_CALL SetFileExt(
-	const wchar_t *path,
-	const wchar_t *ext,
-	wchar_t *newPath,
+	const char *path,
+	const char *ext,
+	char *newPath,
 	UReg newPathBufferSize
 )
 {
@@ -393,8 +382,8 @@ RADRT_API void RADRT_CALL SetFileExt(
 }
 
 RADRT_API UReg RADRT_CALL SetFileExtLength(
-	const wchar_t *path,
-	const wchar_t *ext
+	const char *path,
+	const char *ext
 )
 {
 	RAD_ASSERT(path);
@@ -425,13 +414,13 @@ RADRT_API UReg RADRT_CALL SetFileExtLength(
 }
 
 RADRT_API UReg RADRT_CALL FileBaseNameLength(
-	const wchar_t *path
+	const char *path
 )
 {
 	// work our way backwards until we hit a slash
 	size_t len = ::string::len(path);
-	const wchar_t *start = path + len;
-	const wchar_t *end = start;
+	const char *start = path + len;
+	const char *end = start;
 	bool ext = false;
 
 	for (--start; (end-start) < (int)len; --start)
@@ -452,15 +441,15 @@ RADRT_API UReg RADRT_CALL FileBaseNameLength(
 }
 
 RADRT_API void FileBaseName(
-	const wchar_t *path,
-	wchar_t *basePath,
+	const char *path,
+	char *basePath,
 	UReg basePathBufferSize
 )
 {
 	// work our way backwards until we hit a slash
 	size_t len = ::string::len(path);
-	const wchar_t *start = path + len;
-	const wchar_t *end = start;
+	const char *start = path + len;
+	const char *end = start;
 	bool ext = false;
 
 	for (--start; (end-start) < (int)len; --start)
@@ -483,12 +472,12 @@ RADRT_API void FileBaseName(
 }
 
 RADRT_API UReg RADRT_CALL FilePathNameLength(
-	const wchar_t *path
+	const char *path
 )
 {
 	// work our way backwards until we hit a slash
 	size_t len = ::string::len(path);
-	const wchar_t *end = path + len;
+	const char *end = path + len;
 
 	for (--end; end > path; --end)
 	{
@@ -503,14 +492,14 @@ RADRT_API UReg RADRT_CALL FilePathNameLength(
 }
 
 RADRT_API void RADRT_CALL FilePathName(
-	const wchar_t *path,
-	wchar_t *pathName,
+	const char *path,
+	char *pathName,
 	UReg pathNameBufferSize
 )
 {
 	// work our way backwards until we hit a slash
 	size_t len = ::string::len(path);
-	const wchar_t *end = path + len;
+	const char *end = path + len;
 
 	for (--end; end > path; --end)
 	{
@@ -527,7 +516,7 @@ RADRT_API void RADRT_CALL FilePathName(
 }
 
 RADRT_API bool RADRT_CALL FilePathIsValid(
-	const wchar_t *string
+	const char *string
 )
 {
 	RAD_ASSERT(string);
@@ -558,7 +547,7 @@ RADRT_API bool RADRT_CALL FilePathIsValid(
 		aliasVisitTable[i] = false;
 	}
 
-	wchar_t src[MaxFilePathLen+1], dst[MaxFilePathLen+1];
+	char src[MaxFilePathLen+1], dst[MaxFilePathLen+1];
 
 	cpy(src, string);
 
@@ -595,12 +584,12 @@ RADRT_API bool RADRT_CALL FilePathIsValid(
 namespace details {
 void UncheckedSetAlias(
 	UReg aliasNumber,
-	const wchar_t *string
+	const char *string
 )
 #else
 RADRT_API void RADRT_CALL SetAlias(
 	UReg aliasNumber,
-	const wchar_t *string
+	const char *string
 )
 #endif
 {
@@ -622,14 +611,14 @@ RADRT_API void RADRT_CALL SetAlias(
 #endif
 
 RADRT_API bool RADRT_CALL ExpandAliases(
-	const wchar_t *portablePath,
-	wchar_t *expandedPath,
+	const char *portablePath,
+	char *expandedPath,
 	UReg expandedPathBufferSize
 )
 {
 	RAD_ASSERT(portablePath);
 	RAD_ASSERT(len(portablePath) <= MaxFilePathLen);
-	wchar_t src[MaxFilePathLen+1], dst[MaxFilePathLen+1];
+	char src[MaxFilePathLen+1], dst[MaxFilePathLen+1];
 	UReg num, ofs;
 	bool valid = false;
 
@@ -655,12 +644,12 @@ RADRT_API bool RADRT_CALL ExpandAliases(
 }
 
 RADRT_API UReg RADRT_CALL ExpandAliasesLength(
-	const wchar_t *portablePath
+	const char *portablePath
 )
 {
 	RAD_ASSERT(portablePath);
 	RAD_ASSERT(len(portablePath) <= MaxFilePathLen);
-	wchar_t src[MaxFilePathLen+1], dst[MaxFilePathLen+1];
+	char src[MaxFilePathLen+1], dst[MaxFilePathLen+1];
 	UReg num, ofs;
 	bool valid = false;
 
@@ -694,7 +683,7 @@ RADRT_API UReg RADRT_CALL ExpandAliasesLength(
 namespace details {
 
 void AssertAliasOK(
-	const wchar_t *alias
+	const char *alias
 )
 {
 	RAD_ASSERT(alias);
@@ -706,7 +695,7 @@ void AssertAliasOK(
 		aliasVisitTable[i] = false;
 	}
 
-	wchar_t src[MaxFilePathLen+1], dst[MaxFilePathLen+1];
+	char src[MaxFilePathLen+1], dst[MaxFilePathLen+1];
 	UReg num, ofs;
 
 	cpy(src, alias);
@@ -737,7 +726,7 @@ void AssertAliasOK(
 
 RADRT_API void RADRT_CALL SetAlias(
 	UReg aliasNumber,
-	const wchar_t *string
+	const char *string
 )
 {
 	if (EnforcePortablePathsEnabled())

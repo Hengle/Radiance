@@ -43,11 +43,11 @@ pkg::Package::Entry::Ref ContentBrowserView::Filter::Begin()
 					pkg::Package::Entry::Ref asset = mpkgIt->second->FindEntry(midIt->second);
 					if (types[asset->type])
 					{
-						if (!filter.empty())
+						if (!filter.empty)
 						{
 							string::cpy(sz, asset->path.get());
 							string::tolower(sz);
-							if (!string::strstr(sz, filter.c_str()))
+							if (!string::strstr(sz, filter.c_str.get()))
 								continue;
 						}
 						return asset;
@@ -70,11 +70,11 @@ pkg::Package::Entry::Ref ContentBrowserView::Filter::Begin()
 					pkg::Package::Entry::Ref asset = (*vpkgIt).pkg->FindEntry(midIt->second);
 					if ((*vpkgIt).types[asset->type] && types[asset->type])
 					{
-						if (!filter.empty())
+						if (!filter.empty)
 						{
 							string::cpy(sz, asset->path.get());
 							string::tolower(sz);
-							if (!string::strstr(sz, filter.c_str()))
+							if (!string::strstr(sz, filter.c_str.get()))
 								continue;
 						}
 						return asset;
@@ -114,11 +114,11 @@ pkg::Package::Entry::Ref ContentBrowserView::Filter::Next()
 					pkg::Package::Entry::Ref asset = mpkgIt->second->FindEntry(midIt->second);
 					if (types[asset->type])
 					{
-						if (!filter.empty())
+						if (!filter.empty)
 						{
 							string::cpy(sz, asset->path.get());
 							string::tolower(sz);
-							if (!string::strstr(sz, filter.c_str()))
+							if (!string::strstr(sz, filter.c_str.get()))
 								continue;
 						}
 						return asset;
@@ -148,11 +148,11 @@ pkg::Package::Entry::Ref ContentBrowserView::Filter::Next()
 					pkg::Package::Entry::Ref asset = (*vpkgIt).pkg->FindEntry(midIt->second);
 					if ((*vpkgIt).types[asset->type] && types[asset->type])
 					{
-						if (!filter.empty())
+						if (!filter.empty)
 						{
 							string::cpy(sz, asset->path.get());
 							string::tolower(sz);
-							if (!string::strstr(sz, filter.c_str()))
+							if (!string::strstr(sz, filter.c_str.get()))
 								continue;
 						}
 						return asset;

@@ -63,15 +63,14 @@ int MeshCooker::Compile(int flags, int allflags)
 	CompareCachedFileTimeKey(flags, "Source.File");
 
 	const String *s = asset->entry->KeyValue<String>("Source.File", flags);
-	if (!s || s->empty())
+	if (!s || s->empty)
 		return SR_MetaError;
 
-	WString path(*s);
 	int media = file::AllMedia;
 	file::HStreamInputBuffer ib;
 
 	int r = engine->sys->files->OpenFileStream(
-		path.c_str(),
+		s->c_str,
 		media,
 		ib,
 		file::HIONotify()
@@ -95,10 +94,10 @@ int MeshCooker::Compile(int flags, int allflags)
 	if (!bundleData)
 		return SR_ParseError;
 
-	path = string::Widen(asset->path);
-	path += L".bin";
+	String path(CStr(asset->path));
+	path += ".bin";
 
-	BinFile::Ref file = OpenWrite(path.c_str(), flags);
+	BinFile::Ref file = OpenWrite(path.c_str, flags);
 	if (!file)
 		return SR_IOError;
 

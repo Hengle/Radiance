@@ -76,12 +76,12 @@ bool LoadStorage(const char *name, world::Keys &keys)
 #if defined(RAD_OPT_IOS)
 	fp = __IOS_OpenPersistence(name, "rb");
 #else
-	WString path(L"9:/");
-	path += string::Widen(name);
-	wchar_t nativePath[file::MaxFilePathLen+1];
-	if (file::ExpandToNativePath(path.c_str(), nativePath, file::MaxFilePathLen+1))
+	String path(CStr("9:/"));
+	path += name;
+	char nativePath[file::MaxFilePathLen+1];
+	if (file::ExpandToNativePath(path.c_str, nativePath, file::MaxFilePathLen+1))
 	{
-		fp = file::wfopen(nativePath, L"rb");
+		fp = fopen(nativePath, "rb");
 	}
 #endif
 
@@ -106,13 +106,13 @@ bool SaveStorage(stream::OutputStream &os, const world::Keys &keys)
 			world::Keys::Pairs::const_iterator it;
 			for (it = keys.pairs.begin(); it != keys.pairs.end(); ++it)
 			{
-				if (!os.Write((U32)it->first.length()))
+				if (!os.Write((U32)it->first.length.get()))
 					break;
-				if (os.Write(it->first.c_str(), (stream::SPos)it->first.length(), 0) != (stream::SPos)it->first.length())
+				if (os.Write(it->first.c_str.get(), (stream::SPos)it->first.length.get(), 0) != (stream::SPos)it->first.length.get())
 					break;
-				if (!os.Write((U32)it->second.length()))
+				if (!os.Write((U32)it->second.length.get()))
 					break;
-				if (os.Write(it->second.c_str(), (stream::SPos)it->second.length(), 0) != (stream::SPos)it->second.length())
+				if (os.Write(it->second.c_str.get(), (stream::SPos)it->second.length.get(), 0) != (stream::SPos)it->second.length.get())
 					break;
 			}
 
@@ -129,12 +129,12 @@ bool SaveStorage(const char *name, const world::Keys &keys)
 #if defined(RAD_OPT_IOS)
 	fp = __IOS_OpenPersistence(name, "wb");
 #else
-	WString path(L"9:/");
-	path += string::Widen(name);
-	wchar_t nativePath[file::MaxFilePathLen+1];
-	if (file::ExpandToNativePath(path.c_str(), nativePath, file::MaxFilePathLen+1))
+	String path(CStr("9:/"));
+	path += CStr(name);
+	char nativePath[file::MaxFilePathLen+1];
+	if (file::ExpandToNativePath(path.c_str, nativePath, file::MaxFilePathLen+1))
 	{
-		fp = file::wfopen(nativePath, L"wb");
+		fp = fopen(nativePath, "wb");
 	}
 #endif
 
@@ -196,8 +196,8 @@ bool Persistence::Read(stream::InputStream &is)
 
 bool Persistence::Save()
 {
-	if (!m_name.empty())
-		return SaveStorage(m_name.c_str(), m_keys);
+	if (!m_name.empty)
+		return SaveStorage(m_name.c_str, m_keys);
 	return true;
 }
 

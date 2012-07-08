@@ -52,10 +52,10 @@ void FilePathFieldWidget::SetPrefix(const QString &path)
 	if (path.isEmpty())
 		return;
 
-	wchar_t native[file::MaxFilePathLen+1];
-	if (file::ExpandToNativePath(m_prefix.toStdWString().c_str(), native, file::MaxFilePathLen+1))
+	char native[file::MaxFilePathLen+1];
+	if (file::ExpandToNativePath(m_prefix.toAscii().constData(), native, file::MaxFilePathLen+1))
 	{
-		m_nativePrefix = QString::fromWCharArray(native);
+		m_nativePrefix = native;
 		for (int i = 0; i < m_nativePrefix.length(); ++i)
 		{
 			if (m_nativePrefix[i] == '\\')

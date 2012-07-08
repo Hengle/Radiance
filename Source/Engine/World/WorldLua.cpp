@@ -54,7 +54,7 @@ public:
 protected:
 	RAD_DECLARE_GET(ptr, const void *) { return m_buf->data->ptr; }
 	RAD_DECLARE_GET(size, AddrSize) { return m_buf->data->size; }
-	RAD_DECLARE_GET(name, const char *) { return m_name.c_str(); }
+	RAD_DECLARE_GET(name, const char *) { return m_name.c_str; }
 
 	file::HBufferedAsyncIO m_buf;
 	String m_name;
@@ -521,8 +521,8 @@ void WorldLua::PushKeysTable(lua_State *L, const Keys &keys)
 	lua_createtable(L, 0, (int)keys.pairs.size());
 	for (Keys::Pairs::const_iterator it = keys.pairs.begin(); it != keys.pairs.end(); ++it)
 	{
-		lua_pushstring(L, it->first.c_str());
-		lua_pushstring(L, it->second.c_str());
+		lua_pushstring(L, it->first.c_str);
+		lua_pushstring(L, it->second.c_str);
 		lua_settable(L, -3);
 	}
 }
@@ -698,7 +698,7 @@ int WorldLua::lua_System_GetLangString(lua_State *L) {
 			luaL_error(L, "System.GetLangString() invalid language id %d", lang);
 		const String *s = stringTable->Find(id, (StringTable::LangId)lang);
 		if (s) {
-			lua_pushstring(L, s->c_str());
+			lua_pushstring(L, s->c_str);
 			return 1;
 		}
 	}
@@ -2563,12 +2563,12 @@ lua::SrcBuffer::Ref WorldLua::ImportLoader::Load(lua_State *L, const char *name)
 	int media = file::AllMedia;
 	file::HBufferedAsyncIO buf;
 
-	WString path(L"Scripts/");
-	path += string::Widen(name);
-	path += L".lua";
+	String path(CStr("Scripts/"));
+	path += name;
+	path += CStr(".lua");
 
 	bool r = App::Get()->engine->sys->files->LoadFile(
-		path.c_str(),
+		path.c_str,
 		media,
 		buf,
 		file::HIONotify()

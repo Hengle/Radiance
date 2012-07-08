@@ -51,10 +51,10 @@ int StringTableCooker::Compile(int flags, int allflags) {
 	if (!s)
 		return SR_MetaError;
 
-	WString path(string::Widen(asset->path));
-	path += L".bin";
+	String path(CStr(asset->path));
+	path += ".bin";
 
-	BinFile::Ref fp = OpenWrite(path.c_str(), flags);
+	BinFile::Ref fp = OpenWrite(path.c_str, flags);
 	if (!fp)
 		return SR_IOError;
 

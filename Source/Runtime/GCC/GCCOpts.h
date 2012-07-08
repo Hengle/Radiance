@@ -60,6 +60,7 @@
 	#define RAD_OPT_GCC  __GNUC__
 	#define RAD_OPT_GCC_MINOR __GNUC_MINOR__
 	#define RAD_OPT_GCC_PATCH __GNUC_PATCHLEVEL__
+	#define RAD_NATIVE_WCHAR_T_DEFINED
 
 	#if __GNUC__ > 4 || __GNUC_MINOR__ >= 4
 		#define RAD_OPT_GCC_BSWAP_INTRINSICS

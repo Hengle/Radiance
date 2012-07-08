@@ -370,7 +370,7 @@ bool WorldCinematics::PlayCinematic(
 {
 	for(Cinematic::List::const_iterator it = m_cinematics.begin(); it != m_cinematics.end(); ++it)
 	{
-		if (!strcmp(name, (*it)->name.c_str()) && !(*it)->done)
+		if (!strcmp(name, (*it)->name.c_str) && !(*it)->done)
 			return true;
 	}
 
@@ -420,7 +420,7 @@ void WorldCinematics::StopCinematic(const char *name)
 	for (Cinematic::List::iterator it = m_cinematics.begin(); it != m_cinematics.end(); ++it)
 	{
 		Cinematic &c = *(*it);
-		if (strcmp(name, c.name.c_str()))
+		if (strcmp(name, c.name.c_str))
 			continue;
 
 #if !defined(RAD_TARGET_GOLDEN)
@@ -452,7 +452,7 @@ float WorldCinematics::CinematicTime(const char *name)
 	for (Cinematic::List::iterator it = m_cinematics.begin(); it != m_cinematics.end(); ++it)
 	{
 		Cinematic &c = *(*it);
-		if (strcmp(name, c.name.c_str()))
+		if (strcmp(name, c.name.c_str))
 			continue;
 		return c.frame[0] / c.cinematic->fps;
 	}
@@ -466,7 +466,7 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time)
 	for (Cinematic::List::iterator it = m_cinematics.begin(); it != m_cinematics.end(); ++it)
 	{
 		Cinematic &x = *(*it);
-		if (!strcmp(name, x.name.c_str()))
+		if (!strcmp(name, x.name.c_str))
 		{
 			c = &x;
 			break;
@@ -725,9 +725,9 @@ void WorldCinematics::EmitCameraTags(Cinematic &c)
 			{
 				if (*tag < 32 || *tag > 126)
 				{
-					if (!x.empty())
-						c.notify->OnTag(x.c_str());
-					x.clear();
+					if (!x.empty)
+						c.notify->OnTag(x.c_str);
+					x.Clear();
 				}
 				else
 				{
@@ -737,8 +737,8 @@ void WorldCinematics::EmitCameraTags(Cinematic &c)
 				++tag;
 			}
 
-			if (!x.empty())
-				c.notify->OnTag(x.c_str());
+			if (!x.empty)
+				c.notify->OnTag(x.c_str);
 		}
 	}
 }
@@ -815,9 +815,9 @@ void WorldCinematics::BlendCameraFrame(Cinematic &c)
 void WorldCinematics::SkaNotify::OnTag(const ska::AnimTagEventData &data)
 {
 	if (m_c->notify)
-		m_c->notify->OnTag(data.tag.c_str());
+		m_c->notify->OnTag(data.tag.c_str);
 	else
-		m_w->m_world->PostEvent(data.tag.c_str());
+		m_w->m_world->PostEvent(data.tag.c_str);
 }
 
 Vec4 WorldCinematics::SkActorBatch::s_rgba(1, 1, 1, 1);

@@ -177,7 +177,7 @@ public:
 
 
 #if defined(RAD_OPT_PC_TOOLS)
-	int CookShader(const wchar_t *path, Engine &engine, int pflags);
+	int CookShader(const char *path, Engine &engine, int pflags);
 	static void BeginCook();
 	static void EndCook();
 #endif
@@ -185,8 +185,8 @@ public:
 private:
 
 #if defined(RAD_OPT_TOOLS)
-	RAD_DECLARE_GET(shaderName, const char*) { return m_shaderName.c_str(); }
-	RAD_DECLARE_SET(shaderName, const char*) { if (value) { m_shaderName = value; } else { m_shaderName.clear(); } }
+	RAD_DECLARE_GET(shaderName, const char*) { return m_shaderName.c_str; }
+	RAD_DECLARE_SET(shaderName, const char*) { if (value) { m_shaderName = value; } else { m_shaderName.Clear(); } }
 #endif
 	RAD_DECLARE_GET(shader, Shader::Ref) { return m_shader->shader; }
 	RAD_DECLARE_GET(sort, Sort) { return m_sort; }
@@ -268,7 +268,7 @@ private:
 		static WRefVec s_cShaders;
 
 #if defined(RAD_OPT_PC_TOOLS)
-		static int Cook(const wchar_t *path, Engine &engine, const Material &m, int pflags);
+		static int Cook(const char *path, Engine &engine, const Material &m, int pflags);
 		static RefList s_cookedShaders;
 #endif
 	};

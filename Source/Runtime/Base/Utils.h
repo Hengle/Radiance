@@ -199,7 +199,7 @@ enum MessageBoxStyle
 	MBStyleYesNo
 };
 
-RADRT_API int RADRT_CALL MessageBox(const wchar_t *title, const wchar_t *message, MessageBoxStyle style);
+RADRT_API int RADRT_CALL MessageBox(const char *title, const char *message, MessageBoxStyle style);
 #endif
 
 #include "Utils.inl"

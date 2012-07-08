@@ -37,6 +37,7 @@ RADRT_API void RADRT_CALL Finalize();
 RADRT_API void RADRT_CALL ThreadInitialize();
 RADRT_API void RADRT_CALL ThreadFinalize();
 RADRT_API void RADRT_CALL ProcessTasks();
+RADRT_API boost::mutex &RADRT_CALL GlobalMutex();
 
 } // rt
 

@@ -50,7 +50,7 @@ bool GLSLTool::Assemble(
 		for (size_t i = 0; i < textureTypes.size(); ++i)
 		{
 			char sz[64];
-			string::sprintf(sz, "#define T%dTYPE %s", i, textureTypes[i].c_str());
+			string::sprintf(sz, "#define T%dTYPE %s", i, textureTypes[i].c_str.get());
 			ss << sz << "\r\n";
 		}
 	}
@@ -109,19 +109,19 @@ bool GLSLTool::Assemble(
 	if (gles)
 		ss << "#define _GLES\r\n";
 	
-	if (!cg::Inject(engine, L"Shaders/Nodes/GLSL.cg", ss))
+	if (!cg::Inject(engine, "Shaders/Nodes/GLSL.cg", ss))
 		return false;
-	if (!cg::Inject(engine, L"Shaders/Nodes/Common.cg", ss))
+	if (!cg::Inject(engine, "Shaders/Nodes/Common.cg", ss))
 		return false;
-	if (!cg::Inject(engine, L"Shaders/Nodes/Shader.cg", ss))
+	if (!cg::Inject(engine, "Shaders/Nodes/Shader.cg", ss))
 		return false;
-//	cg::SaveText(engine, L"Materials/Nodes/glsltool.0", ss.str().c_str());
+//	cg::SaveText(engine, "Materials/Nodes/glsltool.0", ss.str().c_str());
 
 	std::stringstream ex;
 	if (!cg::ExpandIncludes(*this, ss, ex))
 		return false;
 //	COut(C_Debug) << ex.str() << std::endl;
-//	cg::SaveText(engine, L"Materials/Nodes/glsltool.1", ex.str().c_str());
+//	cg::SaveText(engine, "Materials/Nodes/glsltool.1", ex.str().c_str());
 
 	if (optimize)
 	{
@@ -130,7 +130,7 @@ bool GLSLTool::Assemble(
 		glslopt_shader *shader = glslopt_optimize(
 			gles ? gl.glslopt_es : gl.glslopt,
 			vertex ? kGlslOptShaderVertex : kGlslOptShaderFragment,
-			in.c_str(), 
+			in.c_str, 
 			0
 		);
 

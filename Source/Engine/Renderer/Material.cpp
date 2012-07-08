@@ -143,14 +143,14 @@ Material::ShaderInstance::Ref Material::ShaderInstance::FindOrCreate(Engine &eng
 
 	if (!r)
 	{
-		WString path;
-		path.format(L"Shaders/%d.bin", m.shaderId.get());
+		String path;
+		path.Printf("Shaders/%d.bin", m.shaderId.get());
 
 		file::HStreamInputBuffer ib;
 
 		int media = file::AllMedia;
 		int z = engine.sys->files->OpenFileStream(
-			path.c_str(),
+			path.c_str,
 			media,
 			ib,
 			file::HIONotify()
@@ -163,7 +163,7 @@ Material::ShaderInstance::Ref Material::ShaderInstance::FindOrCreate(Engine &eng
 
 		Shader::Ref shader = LoadCooked(
 			engine,
-			string::Shorten(path.c_str()).c_str(),
+			path.c_str,
 			is,
 			false,
 			m
@@ -184,7 +184,7 @@ Material::ShaderInstance::Ref Material::ShaderInstance::FindOrCreate(Engine &eng
 
 #if defined(RAD_OPT_PC_TOOLS)
 
-int Material::ShaderInstance::Cook(const wchar_t *path, Engine &engine, const Material &m, int pflags)
+int Material::ShaderInstance::Cook(const char *path, Engine &engine, const Material &m, int pflags)
 {
 	pflags &= pkg::P_AllTargets;
 	
@@ -202,12 +202,12 @@ int Material::ShaderInstance::Cook(const wchar_t *path, Engine &engine, const Ma
 	r->idx = (int)s_cookedShaders.size();
 	r->cooked = true;
 	
-	WString spath;
-	spath.format(L"%ls/%d.bin", path, r->idx);
-	wchar_t nativePath[file::MaxFilePathLen+1];
-	file::ExpandToNativePath(spath.c_str(), nativePath, file::MaxFilePathLen+1);
+	String spath;
+	spath.Printf("%s/%d.bin", path, r->idx);
+	char nativePath[file::MaxFilePathLen+1];
+	file::ExpandToNativePath(spath.c_str, nativePath, file::MaxFilePathLen+1);
 
-	FILE *fp = file::wfopen(nativePath, L"wb");
+	FILE *fp = fopen(nativePath, "wb");
 	if (!fp)
 		return -1;
 
@@ -233,7 +233,7 @@ int Material::ShaderInstance::Cook(const wchar_t *path, Engine &engine, const Ma
 	return r->idx;
 }
 
-int Material::CookShader(const wchar_t *path, Engine &engine, int pflags)
+int Material::CookShader(const char *path, Engine &engine, int pflags)
 {
 	return ShaderInstance::Cook(path, engine, *this, pflags);
 }

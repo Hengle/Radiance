@@ -7,7 +7,7 @@ namespace cg {
 
 inline const char *Shader::Connection::RAD_IMPLEMENT_GET(name)
 {
-	return m_name.c_str();
+	return m_name.c_str;
 }
 
 inline Shader::Ordinal Shader::Connection::RAD_IMPLEMENT_GET(type)
@@ -17,7 +17,7 @@ inline Shader::Ordinal Shader::Connection::RAD_IMPLEMENT_GET(type)
 
 inline const char *Shader::Connection::RAD_IMPLEMENT_GET(semantic)
 {
-	return m_semantic.c_str();
+	return m_semantic.c_str;
 }
 
 inline Shader::NodeRef Shader::Connection::RAD_IMPLEMENT_GET(node)
@@ -122,17 +122,17 @@ inline const Shader::Node::OutputList *Shader::Node::RAD_IMPLEMENT_GET(outputs)
 
 inline const char *Shader::Node::RAD_IMPLEMENT_GET(name)
 {
-	return m_name.c_str();
+	return m_name.c_str;
 }
 
 inline const char *Shader::Node::RAD_IMPLEMENT_GET(type)
 {
-	return m_type.c_str();
+	return m_type.c_str;
 }
 
 inline const char *Shader::Node::RAD_IMPLEMENT_GET(alias)
 {
-	return m_alias.empty() ? 0 : m_alias.c_str();
+	return m_alias.empty ? 0 : m_alias.c_str.get();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -191,7 +191,7 @@ inline r::GLState::MInputMappings Shader::InputMappings(Channel channel) const
 
 inline const char *Shader::RAD_IMPLEMENT_GET(name)
 {
-	return m_name.c_str();
+	return m_name.c_str;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

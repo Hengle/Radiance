@@ -368,8 +368,8 @@ private:
 
 	RAD_DECLARE_GET(zoneTag, ZoneTagRef) { return m_zoneTag.lock(); }
 	RAD_DECLARE_GET(id, int) { return m_id; }
-	RAD_DECLARE_GET(classname, const char*) { return m_classname.c_str(); }
-	RAD_DECLARE_GET(targetname, const char*) { return m_targetname.empty() ? 0 : m_targetname.c_str(); }
+	RAD_DECLARE_GET(classname, const char*) { return m_classname.c_str; }
+	RAD_DECLARE_GET(targetname, const char*) { return m_targetname.empty ? 0 : (const char*)m_targetname.c_str; }
 	RAD_DECLARE_GET(world, World*);
 	RAD_DECLARE_GET(scripted, bool) { return m_scripted; }
 	RAD_DECLARE_GET(viewModels, const ViewModel::Map&) { return m_models; }

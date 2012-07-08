@@ -64,7 +64,7 @@ namespace pkg {
 //! Returns the zero-based index of the specified platform bit.
 /*! \param plat The platform bitflag of the requested index. 
 	\return zero-based index of the platform or -1 if the bitflags did not contain a valid platform bit. 
-	pkg::P_TargetPC, pkg::P_TargetIPhone, pkg::P_TargetIPad, pkg::P_TargetXBox360, and pkg::P_TargetPS3. */
+	\sa pkg::P_TargetPC, pkg::P_TargetIPhone, pkg::P_TargetIPad, pkg::P_TargetXBox360, and pkg::P_TargetPS3. */
 RADENG_API int RADENG_CALL PlatformIndex(int plat);
 
 #if defined(RAD_OPT_TOOLS)
@@ -320,11 +320,11 @@ public:
 	int Cook(int flags, int allflags);
 
 	bool HasTag(int pflags);
-	BinFile::Ref OpenRead(const wchar_t *path, int pflags);
+	BinFile::Ref OpenRead(const char *path, int pflags);
 	BinFile::Ref OpenTagRead(int pflags);
 
 	int LoadFile(
-		const wchar_t *path, 
+		const char *path, 
 		int pflags,
 		int &media,
 		file::HBufferedAsyncIO &buf,
@@ -344,9 +344,9 @@ protected:
 
 	virtual int Compile(int flags, int allflags) = 0;
 
-	WString FilePath(const wchar_t *path, int pflags);
-	bool FileTime(const wchar_t *path, int pflags, xtime::TimeDate &time);
-	BinFile::Ref OpenWrite(const wchar_t *path, int pflags);
+	String FilePath(const char *path, int pflags);
+	bool FileTime(const char *path, int pflags, xtime::TimeDate &time);
+	BinFile::Ref OpenWrite(const char *path, int pflags);
 	BinFile::Ref OpenTagWrite(int pflags);
 	bool NeedsRebuild(const AssetRef &asset);
 	int AddImport(const char *path, int pflags);
@@ -386,15 +386,15 @@ private:
 	RAD_DECLARE_GET(engine, Engine*);
 	RAD_DECLARE_GET(cout, std::ostream&) { return *m_cout; }
 	RAD_DECLARE_GET(asset, const AssetRef&) { return m_asset; }
-	RAD_DECLARE_GET(assetPath, const char*) { return m_assetPath.c_str(); }
-	RAD_DECLARE_GET(assetName, const char*) { return m_assetName.c_str(); }
+	RAD_DECLARE_GET(assetPath, const char*) { return m_assetPath.c_str; }
+	RAD_DECLARE_GET(assetName, const char*) { return m_assetName.c_str; }
 	RAD_DECLARE_GET(globals, world::Keys*) { return m_globals->keys; }
 	RAD_DECLARE_GET(version, int) { return m_version; }
 	RAD_DECLARE_GET(languages, int) {
 		return m_languages;
 	}
 
-	WString TagPath(int pflags);
+	String TagPath(int pflags);
 
 	struct Import
 	{
@@ -450,7 +450,7 @@ public:
 
 	RAD_DECLARE_READONLY_PROPERTY(Package, dir, const StringIdMap&);
 	RAD_DECLARE_READONLY_PROPERTY(Package, name, const char*);
-	RAD_DECLARE_READONLY_PROPERTY(Package, path, const wchar_t*);
+	RAD_DECLARE_READONLY_PROPERTY(Package, path, const char*);
 	RAD_DECLARE_READONLY_PROPERTY(Package, pkgMan, PackageManRef);
 
 #if defined(RAD_OPT_TOOLS)
@@ -693,16 +693,16 @@ private:
 #endif
 	typedef zone_vector<Import, ZPackagesT>::type ImportVec;
 
-	static Ref New(const PackageManRef &pm, const wchar_t *path, const char *name);
+	static Ref New(const PackageManRef &pm, const char *path, const char *name);
 	void SetName(const Entry::Ref &entry, const char *name);
 
 	void UnlinkAsset(pkg::Asset *asset);
 
-	Package(const PackageManRef &pm, const wchar_t *path, const char *name);
+	Package(const PackageManRef &pm, const char *path, const char *name);
 
 	RAD_DECLARE_GET(dir, const StringIdMap&);
 	RAD_DECLARE_GET(name, const char*);
-	RAD_DECLARE_GET(path, const wchar_t*);
+	RAD_DECLARE_GET(path, const char*);
 	RAD_DECLARE_GET(pkgMan, PackageManRef) { return m_pm.lock(); }
 
 #if defined(RAD_OPT_PC_TOOLS)
@@ -710,7 +710,7 @@ private:
     void Delete(int id);
 	bool Rename(int id, const char *name);
 	void UpdateImports(const char *src, const char *dst);
-	void RemoveFileBacking(const wchar_t *path);
+	void RemoveFileBacking(const char *path);
 	RAD_DECLARE_GET(readOnly, bool) { return m_readOnly; }
 	bool m_readOnly;
 	int  m_tickSize;
@@ -730,7 +730,7 @@ private:
 	Entry::IdMap m_idDir;
 	StringIdMap m_dirSet; // case-insensitive
 	String m_name;
-	WString m_path;
+	String m_path;
 	PackageManWRef m_pm;
 	mutable details::SharedMutex m_m;
 };
@@ -954,8 +954,8 @@ private:
 #if defined(RAD_OPT_PC_TOOLS)
 		tools::UIProgress &ui,
 #endif
-		const WString &wPath,
-		const WString &filename,
+		const String &path,
+		const String &filename,
 		int size
 	);
 
@@ -971,7 +971,7 @@ private:
 
 	typedef zone_map<asset::Type, KeyDef::MapRef, ZPackagesT>::type TypeToKeyDefsMap;
 	bool LoadKeyDefs();
-	bool LoadKeyDefs(const WString &wPath, const WString &filename);
+	bool LoadKeyDefs(const String &path, const String &filename);
 	void ParseKeyDefs(lua_State *L, const String &filename, asset::Type type);
 	void ParseKeyDefs(
 		const String &filename, 
@@ -1005,7 +1005,7 @@ private:
     void Delete(const Package::Ref &pkg);
     bool Rename(const Package::Ref &pkg, const char *name);
     void UpdateImports(const char *src, const char *dst);
-	int PackageSize(const WString &wPath);
+	int PackageSize(const String &path);
 
 	typedef zone_map<int, Cooker::Ref, ZPackagesT>::type CookerMap;
 	struct CookState
@@ -1036,7 +1036,7 @@ private:
 	);
 
 	bool MakeBuildDirs(int flags, std::ostream &out);
-	bool MakePackageDirs(const wchar_t *prefix);
+	bool MakePackageDirs(const char *prefix);
 	int BuildPackageData();
 	int BuildPakFiles(int flags, int compression);
 	int BuildPak0(int compression);
@@ -1065,7 +1065,6 @@ private:
 	Package::Map m_packages;
 	IdPackageWMap m_idDir;
 	String m_pkgDir;
-	WString m_wpkgDir;
 	Engine &m_engine;
 
 #if defined(RAD_OPT_TOOLS)

@@ -23,7 +23,7 @@ template <typename T>
 inline Variant::operator const T *() const
 {
 	RAD_ASSERT(reflect::Type<T>());
-	if (!m_val->IsValid() || reflect::Type<T>()->ConstType() != m_val->Type()->ConstType())
+	if (!m_val || !m_val->IsValid() || reflect::Type<T>()->ConstType() != m_val->Type()->ConstType())
 	{
 		return 0;
 	}
@@ -35,7 +35,7 @@ template <typename T>
 inline Variant::operator T *()
 {
 	RAD_ASSERT(reflect::Type<T>());
-	if (!m_val->IsValid() || reflect::Type<T>()->ConstType() != m_val->Type()->ConstType())
+	if (!m_val || !m_val->IsValid() || reflect::Type<T>()->ConstType() != m_val->Type()->ConstType())
 	{
 		return 0;
 	}
@@ -45,7 +45,8 @@ inline Variant::operator T *()
 
 inline const reflect::Class *Variant::Class() const
 {
-	if (!m_val) return 0;
+	if (!m_val) 
+		return 0;
 	return m_val->Type();
 }
 
@@ -146,41 +147,24 @@ inline void Marshal<const wchar_t*>::Push(lua_State *L, const wchar_t *val)
 	Marshal<std::wstring>::Push(L, x);
 }
 
-inline void Marshal< ::string::string<> >::Push(lua_State *L, const ::string::string<> &val)
+inline void Marshal<String>::Push(lua_State *L, const String &val)
 {
 	RAD_ASSERT(L);
-	lua_pushlstring(L, val.c_str(), (int)val.length());
+	lua_pushlstring(L, val.c_str, (int)val.length);
 }
 
-inline ::string::string<> Marshal< ::string::string<> >::Get(lua_State *L, int index, bool forceType)
+inline String Marshal<String>::Get(lua_State *L, int index, bool forceType)
 {
 	const char *p = Marshal<const char*>::Get(L, index, forceType);
-	::string::string<> x;
-	if (p) { x = p; }
+	String x;
+	if (p)
+		x = p;
 	return x;
 }
 
-inline bool Marshal< ::string::string<> >::IsA(lua_State *L, int index)
+inline bool Marshal<String>::IsA(lua_State *L, int index)
 {
 	return Marshal<const char*>::IsA(L, index);
-}
-
-inline void Marshal< ::string::wstring<> >::Push(lua_State *L, const ::string::wstring<> &val)
-{
-	::string::string <> x(val); // conver to ANSI
-	Marshal< ::string::string<> >::Push(L, x);
-}
-
-inline ::string::wstring<> Marshal< ::string::wstring<> >::Get(lua_State *L, int index, bool forceType)
-{
-	::string::wstring <> x(Marshal< ::string::string<> >::Get(L, index, forceType));
-	return x;
-}
-
-inline bool Marshal< ::string::wstring<> >::IsA(lua_State *L, int index)
-{
-	RAD_ASSERT(L);
-	return lua_isstring(L, index) != 0;
 }
 
 inline void Marshal<std::string>::Push(lua_State *L, const std::string &val)
@@ -204,14 +188,14 @@ inline bool Marshal<std::string>::IsA(lua_State *L, int index)
 
 inline void Marshal<std::wstring>::Push(lua_State *L, const std::wstring &val)
 {
-	::string::string <> x(val); // convert to ANSI
-	Marshal< ::string::string<> >::Push(L, x);
+	String x(val); // convert to UTF8
+	Marshal<String>::Push(L, x);
 }
 
 inline std::wstring Marshal<std::wstring>::Get(lua_State *L, int index, bool forceType)
 {
-	::string::wstring <> x(Marshal< ::string::string<> >::Get(L, index, forceType));
-	std::wstring z(x.c_str());
+	String x(Marshal<String>::Get(L, index, forceType));
+	std::wstring z(x.ToWChar().c_str.get());
 	return z;
 }
 

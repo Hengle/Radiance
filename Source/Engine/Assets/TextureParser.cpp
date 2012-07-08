@@ -196,18 +196,18 @@ int TextureParser::LoadCooked(
 
 			// Load Texture
 
-			WString path(string::Widen(asset->path));
+			String path(CStr(asset->path));
 
 			if ((m_tag.flags&TextureTag::Localized) && (m_langId != StringTable::LangId_EN)) {
-				path += L"_";
-				path += string::Widen(StringTable::Langs[m_langId]);
+				path += "_";
+				path += StringTable::Langs[m_langId];
 			}
 
-			path += L".bin";
+			path += ".bin";
 
 			media = file::AllMedia;
 			r = m_cooker->LoadFile( // load cooked data.
-				path.c_str(),
+				path.c_str,
 				0,
 				media,
 				m_buf,
@@ -228,19 +228,19 @@ int TextureParser::LoadCooked(
 		m_tag = *tag;
 
 		// load file...
-		WString path(L"Cooked/");
-		path += string::Widen(asset->path);
+		String path(CStr("Cooked/"));
+		path += CStr(asset->path);
 
 		if ((m_tag.flags&TextureTag::Localized) && (langId != StringTable::LangId_EN)) {
-			path += L"_";
-			path += string::Widen(StringTable::Langs[langId]);
+			path += "_";
+			path += StringTable::Langs[langId];
 		}
 
-		path += L".bin";
+		path += ".bin";
 
 		int media = file::AllMedia;
 		int r = engine.sys->files->LoadFile(
-			path.c_str(),
+			path.c_str,
 			media,
 			m_buf,
 			file::HIONotify(),
@@ -353,38 +353,38 @@ int TextureParser::Load(
 	if (!name)
 		return pkg::SR_MetaError;
 
-	WString wname(string::Widen(name->c_str()));
-
 	const bool *localized = asset->entry->KeyValue<bool>("Localized", P_TARGET_FLAGS(flags));
 	if (!localized)
 		return pkg::SR_MetaError;
 
+	String sname(*name);
+
 	if (*localized && (m_langId != StringTable::LangId_EN)) {
 		// create localized file path.
-		wchar_t ext[file::MaxFilePathLen+1];
-		wchar_t path[file::MaxFilePathLen+1];
+		char ext[file::MaxFilePathLen+1];
+		char path[file::MaxFilePathLen+1];
 
-		file::FileExt(wname.c_str(), ext, file::MaxFilePathLen+1);
-		file::SetFileExt(wname.c_str(), 0, path, file::MaxFilePathLen+1);
+		file::FileExt(sname.c_str, ext, file::MaxFilePathLen+1);
+		file::SetFileExt(sname.c_str, 0, path, file::MaxFilePathLen+1);
 	
-		wname = path;
-		wname += L"_";
-		wname += string::Widen(StringTable::Langs[m_langId]);
-		wname += ext;
+		sname = path;
+		sname += "_";
+		sname += StringTable::Langs[m_langId];
+		sname += ext;
 	}
 
 	int media = file::AllMedia;
 
 	if (!(flags&P_NoDefaultMedia)) {
-		if (wname.empty() || !engine.sys->files->FileExists(wname.c_str(), media)) {
-			wname = L"Textures/Missing_Texture.tga";
-			if (!engine.sys->files->FileExists(wname.c_str(), media)) {
+		if (sname.empty || !engine.sys->files->FileExists(sname.c_str, media)) {
+			sname = CStr("Textures/Missing_Texture.tga");
+			if (!engine.sys->files->FileExists(sname.c_str, media)) {
 				return pkg::SR_MissingFile;
 			}
 		}
 	}
 
-	m_fmt = Format(wname.c_str());
+	m_fmt = Format(sname.c_str);
 
 	if (m_fmt < 0)
 		return pkg::SR_InvalidFormat;
@@ -396,7 +396,7 @@ int TextureParser::Load(
 		file::HBufferedAsyncIO buf;
 
 		r = engine.sys->files->OpenFile(
-			wname.c_str(),
+			sname.c_str,
 			media,
 			file,
 			file::HIONotify()
@@ -411,26 +411,26 @@ int TextureParser::Load(
 	}
 	else
 	{
-		wchar_t base[file::MaxFilePathLen+1];
-		file::FileBaseName(wname.c_str(), base, file::MaxFilePathLen+1);
-		if (base[0] == L'+') { // bundle, load all frames simultaneously
-			wchar_t ext[file::MaxFilePathLen+1];
-			wchar_t path[file::MaxFilePathLen+1];
+		char base[file::MaxFilePathLen+1];
+		file::FileBaseName(sname.c_str, base, file::MaxFilePathLen+1);
+		if (base[0] == '+') { // bundle, load all frames simultaneously
+			char ext[file::MaxFilePathLen+1];
+			char path[file::MaxFilePathLen+1];
 
-			file::FilePathName(wname.c_str(), path, file::MaxFilePathLen+1);
-			file::FileExt(wname.c_str(), ext, file::MaxFilePathLen+1);
+			file::FilePathName(sname.c_str, path, file::MaxFilePathLen+1);
+			file::FileExt(sname.c_str, ext, file::MaxFilePathLen+1);
 
 			// skip +digit
-			const wchar_t *postDigit = base;
+			const char *postDigit = base;
 			if (base[1] != 0)
 				postDigit += 2;
 
 			for (int i = 0;; ++i)
 			{
 				file::HBufferedAsyncIO buf;
-				wchar_t x[file::MaxFilePathLen+1];
+				char x[file::MaxFilePathLen+1];
 
-				string::sprintf(x, L"%ls/+%d%ls%ls", path, i, postDigit, ext);
+				string::sprintf(x, "%ls/+%d%ls%ls", path, i, postDigit, ext);
 
 				r = engine.sys->files->LoadFile(
 					x,
@@ -450,7 +450,7 @@ int TextureParser::Load(
 		else {
 			file::HBufferedAsyncIO buf;
 			r = engine.sys->files->LoadFile(
-				wname.c_str(), 
+				sname.c_str, 
 				media,
 				buf,
 				file::HIONotify()
@@ -752,23 +752,23 @@ int TextureParser::Parsing(
 	return r;
 }
 
-int TextureParser::Format(const wchar_t *name) {
-	wchar_t ext[file::MaxFilePathLen+1];
+int TextureParser::Format(const char *name) {
+	char ext[file::MaxFilePathLen+1];
 	file::FileExt(name, ext, file::MaxFilePathLen+1);
 
-	if (!string::icmp(ext, L".tga")) {
+	if (!string::icmp(ext, ".tga")) {
 		return F_Tga;
 	}
 
-	if (!string::icmp(ext, L".dds")) {
+	if (!string::icmp(ext, ".dds")) {
 		return F_Dds;
 	}
 
-	if (!string::icmp(ext, L".png")) {
+	if (!string::icmp(ext, ".png")) {
 		return F_Png;
 	}
 
-	if (!string::icmp(ext, L".bmp")) {
+	if (!string::icmp(ext, ".bmp")) {
 		return F_Bmp;
 	}
 

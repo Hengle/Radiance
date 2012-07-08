@@ -25,7 +25,7 @@ RAD_REFLECTED_INTERFACE_BEGIN(IDPakReader, IInterface, file.IDPakReader)
 		U32 version = Version
 	) = 0;
 
-	virtual HPakFile MountPakFile(const HFile &file, const wchar_t *name) = 0;
+	virtual HPakFile MountPakFile(const HFile &file, const char *name) = 0;
 
 RAD_INTERFACE_END
 

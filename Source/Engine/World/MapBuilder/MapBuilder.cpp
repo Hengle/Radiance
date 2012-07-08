@@ -78,14 +78,14 @@ bool MapBuilder::LoadScene(const world::EntSpawn &spawn)
 		return false;
 	}
 
-	WString wpath(string::Widen(sz));
-	wpath += L".3dx";
+	String path(CStr(sz));
+	path += ".3dx";
 
 	file::HStreamInputBuffer fs;
 	int media = file::AllMedia;
 
 	if (m_e.sys->files->OpenFileStream(
-		wpath.c_str(),
+		path.c_str,
 		media,
 		fs,
 		file::HIONotify()

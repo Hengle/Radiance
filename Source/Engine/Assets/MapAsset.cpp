@@ -134,12 +134,12 @@ int MapAsset::SpawnCooked(
 				COut(C_Info) << asset->path.get() << " is up to date, using cache." << std::endl;
 			}
 
-			WString path(string::Widen(asset->path));
-			path += L".bsp";
+			String path(CStr(asset->path));
+			path += ".bsp";
 
 			int media = file::AllMedia;
 			int r = cooker->LoadFile( // load cooked data.
-				path.c_str(),
+				path.c_str,
 				0,
 				media,
 				m_bspData,
@@ -153,13 +153,13 @@ int MapAsset::SpawnCooked(
 		}
 		else {
 #endif
-		WString path(L"Cooked/");
-		path += string::Widen(asset->path);
-		path += L".bsp";
+		String path(CStr("Cooked/"));
+		path += CStr(asset->path);
+		path += ".bsp";
 
 		int media = file::AllMedia;
 		int r = engine.sys->files->LoadFile(
-			path.c_str(),
+			path.c_str,
 			media,
 			m_bspData,
 			file::HIONotify(),

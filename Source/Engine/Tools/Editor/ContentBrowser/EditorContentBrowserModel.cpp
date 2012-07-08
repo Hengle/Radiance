@@ -13,20 +13,20 @@ namespace editor {
 
 namespace {
 
-const wchar_t *s_typeIcons[asset::AT_Max] =
+const char *s_typeIcons[asset::AT_Max] =
 {
-	L"Editor/texture_small.png",
-	L"Editor/material_small.png",
-	L"Editor/level_small.png",
-	L"Editor/skmodel_small.png",
-	L"Editor/skanimset_small.png",
-	L"Editor/skanimstates_small.png",
-	L"Editor/mesh_small.png",
-	L"Editor/sound_small.png",
-	L"Editor/music_small.png",
-	L"Editor/font_small.png",
-	L"Editor/typeface_small.png",
-	L"Editor/stringtable_small.png"
+	"Editor/texture_small.png",
+	"Editor/material_small.png",
+	"Editor/level_small.png",
+	"Editor/skmodel_small.png",
+	"Editor/skanimset_small.png",
+	"Editor/skanimstates_small.png",
+	"Editor/mesh_small.png",
+	"Editor/sound_small.png",
+	"Editor/music_small.png",
+	"Editor/font_small.png",
+	"Editor/typeface_small.png",
+	"Editor/stringtable_small.png"
 };
 
 } // namespace
@@ -37,7 +37,7 @@ ContentBrowserModel::ContentBrowserModel(bool typesOnly, QObject *parent)
 : QAbstractItemModel(parent), m_typesOnly(typesOnly)
 {
 	s_set.insert(this);
-	m_ipkg = LoadIcon(L"Editor/package_small.png");
+	m_ipkg = LoadIcon("Editor/package_small.png");
 	for (int i = 0; i < asset::AT_Max; ++i)
 	{
 		if (s_typeIcons[i])
@@ -46,7 +46,7 @@ ContentBrowserModel::ContentBrowserModel(bool typesOnly, QObject *parent)
 		}
 		else
 		{
-			m_itype[i] = LoadIcon(L"Editor/error_small.png");
+			m_itype[i] = LoadIcon("Editor/error_small.png");
 		}
 	}
 }
@@ -83,7 +83,7 @@ QVariant ContentBrowserModel::data(const QModelIndex &index, int role) const
 		else if (IsAsset(index))
 		{
 			const Entry *item = EntryForIndex(index);
-			return QString(item->name.c_str());
+			return QString(item->name.c_str.get());
 		}
 		else
 		{
@@ -128,10 +128,10 @@ bool ContentBrowserModel::setData(const QModelIndex &index, const QVariant &valu
 			pkg::Package::Ref pkg = PackageForIndex(index);
 			RAD_ASSERT(pkg);
 
-			if (name == String(pkg->name))
+			if (name == CStr(pkg->name))
 				return false;
 
-			if (!pkg->Rename(name.c_str()))
+			if (!pkg->Rename(name.c_str))
 			{
 				QMessageBox::critical(
 					static_cast<QWidget*>(QObject::parent())->parentWidget(),
@@ -149,10 +149,10 @@ bool ContentBrowserModel::setData(const QModelIndex &index, const QVariant &valu
 			pkg::Package::Entry::Ref asset = PkgEntryForIndex(index);
 			RAD_ASSERT(asset);
 
-			if (name == String(asset->name))
+			if (name == CStr(asset->name))
 				return false;
 
-			if (!asset->Rename(name.c_str()))
+			if (!asset->Rename(name.c_str))
 			{
 				QMessageBox::critical(
 					static_cast<QWidget*>(QObject::parent())->parentWidget(),

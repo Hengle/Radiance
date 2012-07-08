@@ -71,7 +71,7 @@ int MusicCooker::Compile(int flags, int allflags)
 	int media = file::AllMedia;
 	
 	int r = engine->sys->files->OpenFileStream(
-		string::Widen(s->c_str()).c_str(),
+		s->c_str,
 		media,
 		ib,
 		file::HIONotify()
@@ -82,9 +82,9 @@ int MusicCooker::Compile(int flags, int allflags)
 
 	stream::InputStream is(ib->buffer);
 	
-	WString path(string::Widen(asset->path));
-	path += L".bin";
-	BinFile::Ref fp = OpenWrite(path.c_str(), flags);
+	String path(CStr(asset->path));
+	path += ".bin";
+	BinFile::Ref fp = OpenWrite(path.c_str, flags);
 	if (!fp)
 		return SR_IOError;
 

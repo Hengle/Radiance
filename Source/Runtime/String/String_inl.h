@@ -1,1236 +1,860 @@
 // String.inl
 // Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Mike Songy & Joe Riedel
+// Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
-#include "../StringBase.h"
-#include "../PushPack.h"
+#include <algorithm>
+#include "../PushSystemMacros.h"
 
 namespace string {
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string::string_base explicit instantiations
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
-template<typename T, typename S, typename A>
-const typename string_base<T, S, A>::size_type string_base<T, S, A>::npos = string_base<T, S, A>::basic_string_type::npos;
-
-template<typename A>
-const typename string<A>::size_type string<A>::npos = string<A>::string_base_type::npos;
-
-template<typename A>
-const typename wstring<A>::size_type wstring<A>::npos = wstring<A>::string_base_type::npos;
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::string_base()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename T, typename S, typename A>
-inline string_base<T, S, A>::string_base() :
-std::basic_string<T, traits_type, A>()
-{
+template <typename Traits>
+inline CharBuf<Traits>::CharBuf() : m_zone(&ZString.Get()) {
 }
 
-// Constructors that convert allocator types
-
-template<typename T, typename S, typename A>
-template<typename OtherA>
-inline string_base<T, S, A>::string_base(const string_base<T, S, OtherA>& string) :
-std::basic_string<T, traits_type, A>(string.c_str())
-{
+template <typename Traits>
+inline CharBuf<Traits>::CharBuf(const SelfType &buf) : m_data(buf.m_data), m_zone(buf.m_zone) {
 }
 
-template<typename T, typename S, typename A>
-template<typename OtherA>
-inline string_base<T, S, A>::string_base(const std::basic_string<T, std::char_traits<T>, OtherA> &string) :
-std::basic_string<T, traits_type, A>(string.c_str())
-{
+template <typename Traits>
+inline CharBuf<Traits>::CharBuf(const details::DataBlock::Ref &data, ::Zone &zone) : m_data(data), m_zone(&zone) {
 }
 
-template<typename T, typename S, typename A>
-template<typename OtherA>
-inline string_base<T, S, A>::string_base(const std::basic_stringstream<T, std::char_traits<T>, OtherA> &ss) :
-std::basic_string<T, traits_type, A>(ss.str().c_str())
-{
+template <typename Traits>
+inline CharBuf<Traits>::operator unspecified_bool_type () const {
+	return IsValid() ? &bool_true : 0;
 }
 
-template<typename T, typename S, typename A>
-string_base<T, S, A>::string_base(T ch, size_type nRepeat) :
-std::basic_string<T, traits_type, A>()
-{
-	if (nRepeat >= 1)
-	{
-		reserve(nRepeat);
-		for (size_type i = 0; i < nRepeat; i++)
-		{
-			*this += ch;
-		}
+template <typename Traits>
+inline typename CharBuf<Traits>::SelfType &CharBuf<Traits>::operator = (const SelfType &buf) {
+	m_data = buf.m_data;
+	m_zone = buf.m_zone;
+	return *this;
+}
+
+template <typename Traits>
+inline bool CharBuf<Traits>::operator == (const SelfType &buf) const {
+	if (!m_data || !buf.m_data)
+		return false;
+	if (m_data->data != buf.m_data->data)
+		return false;
+	if (m_data->size != buf.m_data->size)
+		return false;
+	return true;
+}
+
+template <typename Traits>
+inline bool CharBuf<Traits>::operator != (const SelfType &buf) const {
+	return !(*this == buf);
+}
+
+template <typename Traits>
+inline const typename CharBuf<Traits>::T *CharBuf<Traits>::RAD_IMPLEMENT_GET(c_str) {
+	static U32 s_null(0);
+	return (m_data) ? (const T*)m_data->data.get() : (const T*)&s_null;
+}
+
+template <typename Traits>
+inline const typename CharBuf<Traits>::T *CharBuf<Traits>::RAD_IMPLEMENT_GET(begin) {
+	return c_str.get();
+}
+
+template <typename Traits>
+inline const typename CharBuf<Traits>::T *CharBuf<Traits>::RAD_IMPLEMENT_GET(end) {
+	return c_str.get() + size.get();
+}
+
+template <typename Traits>
+inline int CharBuf<Traits>::RAD_IMPLEMENT_GET(size) {
+	return (m_data) ? (m_data->size - sizeof(T)) : 0;
+}
+
+template <typename Traits>
+inline bool CharBuf<Traits>::RAD_IMPLEMENT_GET(empty) {
+	return (m_data) ? false : true;
+}
+
+template<typename Traits>
+inline int CharBuf<Traits>::RAD_IMPLEMENT_GET(numChars) {
+	return size.get() / sizeof(T);
+}
+
+template <typename Traits>
+inline void CharBuf<Traits>::Free() {
+	m_data.reset();
+}
+
+template <typename Traits>
+inline typename CharBuf<Traits>::SelfType CharBuf<Traits>::New(const T *data, int size, const CopyTag_t&, ::Zone &zone) {
+	RAD_ASSERT(data);
+	return CharBuf(
+		details::DataBlock::New(kRefType_Copy, data, size, zone),
+		zone
+	);
+}
+
+template <typename Traits>
+inline typename CharBuf<Traits>::SelfType CharBuf<Traits>::New(const T *data, int size, const RefTag_t&, ::Zone &zone) {
+	RAD_ASSERT(data);
+	return CharBuf(
+		details::DataBlock::New(kRefType_Ref, data, size, zone),
+		zone
+	);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+inline String::String(::Zone &zone) : m_zone(&zone) {
+}
+
+inline String::String(const String &s) : m_data(s.m_data), m_zone(s.m_zone) {
+}
+
+inline String::String(const UTF8Buf &buf) : m_data(buf.m_data), m_zone(buf.m_zone) {
+}
+
+inline String::String(const UTF16Buf &buf, ::Zone &zone) : m_zone(&zone) {
+	m_data = details::DataBlock::New(buf.c_str.get(), buf.numChars, zone);
+}
+
+inline String::String(const UTF32Buf &buf, ::Zone &zone) : m_zone(&zone) {
+	m_data = details::DataBlock::New(buf.c_str.get(), buf.numChars, zone);
+}
+
+inline String::String(const WCharBuf &buf, ::Zone &zone) : m_zone(&zone) {
+	m_data = details::DataBlock::New(buf.c_str.get(), buf.numChars, zone);
+}
+
+inline String::String(const char *sz, ::Zone &zone) : m_zone(&zone) {
+	RAD_ASSERT(sz);
+	if (sz[0])
+		m_data = details::DataBlock::New(kRefType_Copy, 0, sz, len(sz) + 1, zone);
+}
+
+inline String::String(const char *sz, const RefTag_t&, ::Zone &zone) : m_zone(&zone) {
+	RAD_ASSERT(sz);
+	if (sz[0])
+		m_data = details::DataBlock::New(kRefType_Ref, 0, sz, len(sz) + 1, zone);
+}
+
+inline String::String(const char *sz, int len, const CopyTag_t&, ::Zone &zone) : m_zone(&zone) {
+	RAD_ASSERT(sz);
+	if ((len>0) && sz[0]) {
+		m_data = details::DataBlock::New(kRefType_Copy, len + 1, sz, len, zone);
+		reinterpret_cast<char*>(m_data->m_buf)[len] = 0;
 	}
 }
 
-template<typename T, typename S, typename A>
-inline string_base<T, S, A>::string_base(const T *psz) :
-std::basic_string<T, traits_type, A>(psz)
-{
-}
-
-template<typename T, typename S, typename A>
-inline string_base<T, S, A>::string_base(const T *pch, size_type nLength) :
-std::basic_string<T, traits_type, A>(pch, nLength)
-{
-}
-
-template<typename T, typename S, typename A>
-inline string_base<T, S, A>::string_base(T *psz, size_type len, typename string_base<T, S, A>::CON copydel, A& allocator) :
-std::basic_string<T, traits_type, A>(psz)
-{
-	RAD_ASSERT(psz);
-	switch(copydel)
-	{
-	case COPYDEL:
-		if (len)
-		{
-			allocator.deallocate(psz, len);
-		}
-		break;
+inline String::String(const char *sz, int len, const RefTag_t&, ::Zone &zone) : m_zone(&zone) {
+	RAD_ASSERT(sz);
+	if ((len>0) && sz[0]) {
+		m_data = details::DataBlock::New(kRefType_Copy, len + 1, sz, len, zone);
+		reinterpret_cast<char*>(m_data->m_buf)[len] = 0;
 	}
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::~string_base()
-////////////////////////////////////////////////////////////////////////////////
+#if defined(RAD_NATIVE_WCHAR_T_DEFINED)
 
-template<typename T, typename S, typename A>
-string_base<T, S, A>::~string_base()
-{
+inline String::String(const wchar_t *sz, ::Zone &zone) : m_zone(&zone) {
+	RAD_ASSERT(sz);
+	if (sz[0])
+		m_data = details::DataBlock::New((const WCharTraits::TT*)sz, len(sz), zone);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::allocate()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename T, typename S, typename A>
-inline T* string_base<T, S, A>::allocate(size_type len) const
-{
-	return this->get_allocator().allocate(len);
+inline String::String(const wchar_t *sz, int len, ::Zone &zone) : m_zone(&zone) {
+	RAD_ASSERT(sz);
+	if ((len>0) && sz[0])
+		m_data = details::DataBlock::New((const WCharTraits::TT*)sz, len, zone);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::deallocate()
-////////////////////////////////////////////////////////////////////////////////
+#endif
 
-template<typename T, typename S, typename A>
-inline void string_base<T, S, A>::deallocate(T* ptr, size_type len) const
-{
-	this->get_allocator().deallocate(ptr, len);
+inline String::String(const U16 *sz, ::Zone &zone) : m_zone(&zone) {
+	RAD_ASSERT(sz);
+	if (sz[0])
+		m_data = details::DataBlock::New(sz, len(sz), zone);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::operator=()
-////////////////////////////////////////////////////////////////////////////////
+inline String::String(const U16 *sz, int len, ::Zone &zone) : m_zone(&zone) {
+	RAD_ASSERT(sz);
+	if ((len>0) && sz[0])
+		m_data = details::DataBlock::New(sz, len, zone);
+}
 
-template<typename T, typename S, typename A>
-template<typename OtherA>
-inline string_base<T, S, A>& string_base<T, S, A>::operator=(const string_base<T, S, OtherA> &str)
-{
-	*static_cast<std::basic_string<T, traits_type, A>*>(this) = str.c_str();
+inline String::String(const U32 *sz, ::Zone &zone) : m_zone(&zone) {
+	RAD_ASSERT(sz);
+	if (sz[0])
+		m_data = details::DataBlock::New(sz, len(sz), zone);
+}
+
+inline String::String(const U32 *sz, int len, ::Zone &zone) : m_zone(&zone) {
+	RAD_ASSERT(sz);
+	if ((len>0) && sz[0])
+		m_data = details::DataBlock::New(sz, len, zone);
+}
+
+inline String::String(char c, ::Zone &zone) : m_zone(&zone) {
+	*this = String(&c, 1, CopyTag, zone);
+}
+
+#if defined(RAD_NATIVE_WCHAR_T_DEFINED)
+inline String::String(wchar_t c, ::Zone &zone) : m_zone(&zone) {
+	*this = String(&c, 1, zone);
+}
+#endif
+
+inline String::String(U16 c, ::Zone &zone) : m_zone(&zone) {
+	*this = String(&c, 1, zone);
+}
+
+inline String::String(U32 c, ::Zone &zone) : m_zone(&zone) {
+	*this = String(&c, 1, zone);
+}
+
+inline String::String(const std::string &str, ::Zone &zone) : m_zone(&zone) {
+	*this = str.c_str();
+}
+
+inline String::String(const std::wstring &str, ::Zone &zone) : m_zone(&zone) {
+	*this = str.c_str();
+}
+
+inline String::String(int len, ::Zone &zone) : m_zone(&zone) {
+	if (len>0) {
+		m_data = details::DataBlock::New(kRefType_Copy, len, 0, 0, zone);
+		reinterpret_cast<char*>(m_data->m_buf)[len-1] = 0;
+	}
+}
+
+inline UTF8Buf String::ToUTF8() const {
+	UTF8Buf buf;
+	buf.m_data = m_data;
+	buf.m_zone = m_zone;
+	return buf;
+}
+
+inline WCharBuf String::ToWChar() const {
+#if defined(RAD_OPT_4BYTE_WCHAR)
+	UTF32Buf x = ToUTF32();
+#else
+	UTF16Buf x = ToUTF16();
+#endif
+	return WCharBuf(x.m_data, *m_zone);
+}
+
+inline std::string String::ToStdString() const {
+	return std::string(c_str.get());
+}
+
+inline std::wstring String::ToStdWString() const {
+	WCharBuf x = ToWChar();
+	return std::wstring(x.c_str.get());
+}
+
+inline int String::Compare(const String &str) const {
+	return Compare(str.c_str.get());
+}
+
+inline int String::Compare(const char *sz) const {
+	RAD_ASSERT(sz);
+	return cmp(c_str.get(), sz);
+}
+
+inline int String::Compare(const wchar_t *sz) const {
+	RAD_ASSERT(sz);
+	return Compare(String(sz, *m_zone));
+}
+
+inline int String::Comparei(const String &str) const {
+	return Comparei(str.c_str.get());
+}
+
+inline int String::Comparei(const char *sz) const {
+	RAD_ASSERT(sz);
+	return icmp(c_str.get(), sz);
+}
+
+inline int String::Comparei(const wchar_t *sz) const {
+	RAD_ASSERT(sz);
+	return Compare(String(sz, *m_zone));
+}
+
+inline int String::NCompare(const String &str, int len) const {
+	return NCompare(str.c_str.get(), len);
+}
+
+inline int String::NCompare(const char *sz, int len) const {
+	RAD_ASSERT(sz);
+	return ncmp(c_str.get(), sz, len);
+}
+
+inline int String::NCompare(const wchar_t *sz, int len) const {
+	RAD_ASSERT(sz);
+	int mblen = wcstombslen(sz, len);
+	return NCompare(String(sz, *m_zone), mblen);
+}
+
+inline int String::NComparei(const String &str, int len) const {
+	return NComparei(str.c_str.get(), len);
+}
+
+inline int String::NComparei(const char *sz, int len) const {
+	RAD_ASSERT(sz);
+	return nicmp(c_str.get(), sz, len);
+}
+
+inline int String::NComparei(const wchar_t *sz, int len) const {
+	RAD_ASSERT(sz);
+	int mblen = wcstombslen(sz, len);
+	return NComparei(String(sz, *m_zone), mblen);
+}
+
+inline int String::StrStr(const String &str) const {
+	return StrStr(str.c_str.get());
+}
+
+inline int String::StrStr(const char *sz) const {
+	RAD_ASSERT(sz);
+	const char *root = c_str;
+	const char *pos = string::strstr(root, sz);
+	return pos ? (pos-root) : -1;
+}
+
+inline String String::Join(const String &str) const {
+	String x(*this);
+	x.Append(str);
+	return x;
+}
+
+inline String String::Join(const char *sz) const {
+	String x(*this);
+	x.Append(sz);
+	return x;
+}
+
+inline String String::Join(const wchar_t *sz) const {
+	String x(*this);
+	x.Append(sz);
+	return x;
+}
+
+inline String String::Join(const char c) const {
+	String x(*this);
+	x.Append(c);
+	return x;
+}
+
+inline String String::Join(const wchar_t c) const {
+	String x(*this);
+	x.Append(c);
+	return x;
+}
+
+inline String String::NJoin(const String &str, int len) const {
+	String x(*this);
+	x.NAppend(str, len);
+	return x;
+}
+
+inline String String::NJoin(const char *sz, int len) const {
+	String x(*this);
+	x.NAppend(sz, len);
+	return x;
+}
+
+inline String String::NJoin(const wchar_t *sz, int len) const {
+	String x(*this);
+	x.NAppend(sz, len);
+	return x;
+}
+
+inline String String::SubStrBytes(int first, int count) const {
+	RAD_ASSERT(first < length);
+	RAD_ASSERT((first+count) < length);
+
+	return String(
+		c_str.get() + first,
+		count,
+		CopyTag,
+		*m_zone
+	);
+}
+
+inline String String::SubStr(int ofs) const {
+	int x = numChars - ofs;
+	if (x < 0)
+		return String();
+	return Right(x);
+}
+
+inline String String::SubStrBytes(int ofs) const {
+	int x = length - ofs;
+	if (x < 0)
+		return String();
+	return RightBytes(x);
+}
+
+inline String String::Left(int count) const {
+	return SubStr(0, count);
+}
+
+inline String String::Right(int count) const {
+	int ofs = numChars - count;
+	return SubStr(ofs, count);
+}
+
+inline String String::LeftBytes(int count) const {
+	return SubStrBytes(0, count);
+}
+
+inline String String::RightBytes(int count) const {
+	int ofs = length - count;
+	return SubStrBytes(ofs, count);
+}
+
+inline String::operator unspecified_bool_type () const {
+	return !empty.get() ? &String::bool_true : 0;
+}
+
+inline bool String::operator == (const String &str) const {
+	return Compare(str) == 0;
+}
+
+inline bool String::operator == (const char *sz) const {
+	return Compare(sz) == 0;
+}
+
+inline bool String::operator == (const wchar_t *sz) const {
+	return Compare(sz) == 0;
+}
+
+inline bool String::operator != (const String &str) const {
+	return Compare(str) != 0;
+}
+
+inline bool String::operator != (const char *sz) const {
+	return Compare(sz) != 0;
+}
+
+inline bool String::operator != (const wchar_t *sz) const {
+	return Compare(sz) != 0;
+}
+
+inline bool String::operator > (const String &str) const {
+	return Compare(str) > 0;
+}
+
+inline bool String::operator > (const char *sz) const {
+	return Compare(sz) > 0;
+}
+
+inline bool String::operator > (const wchar_t *sz) const {
+	return Compare(sz) > 0;
+}
+
+inline bool String::operator >= (const String &str) const {
+	return Compare(str) >= 0;
+}
+
+inline bool String::operator >= (const char *sz) const {
+	return Compare(sz) >= 0;
+}
+
+inline bool String::operator >= (const wchar_t *sz) const {
+	return Compare(sz) >= 0;
+}
+
+inline bool String::operator < (const String &str) const {
+	return Compare(str) < 0;
+}
+
+inline bool String::operator < (const char *sz) const {
+	return Compare(sz) < 0;
+}
+
+inline bool String::operator < (const wchar_t *sz) const {
+	return Compare(sz) < 0;
+}
+
+inline bool String::operator <= (const String &str) const {
+	return Compare(str) <= 0;
+}
+
+inline bool String::operator <= (const char *sz) const {
+	return Compare(sz) <= 0;
+}
+
+inline bool String::operator <= (const wchar_t *sz) const {
+	return Compare(sz) <= 0;
+}
+
+inline char String::operator [] (int ofs) const {
+	return reinterpret_cast<const char*>(m_data->data.get())[ofs];
+}
+
+inline bool String::EqualsInstance(const String &str) const {
+	return m_data && str.m_data && m_data->data == str.m_data->data;
+}
+
+inline bool String::EqualsInstance(const UTF8Buf &buf) const {
+	return m_data && buf.m_data && m_data->data == buf.m_data->data;
+}
+
+inline String &String::UpperASCII() {
+	if (m_data) {
+		m_data = details::DataBlock::Isolate(m_data, *m_zone);
+		toupper(reinterpret_cast<char*>(m_data->data.get()));
+	}
 	return *this;
 }
 
-template<typename T, typename S, typename A>
-template<typename OtherA>
-inline string_base<T, S, A> &string_base<T, S, A>::operator=(const std::basic_string<T, std::char_traits<T>, OtherA> &str)
-{
-	*static_cast<std::basic_string<T, traits_type, A>*>(this) = str.c_str();
+inline String &String::LowerASCII() {
+	if (m_data) {
+		m_data = details::DataBlock::Isolate(m_data, *m_zone);
+		tolower((char*)m_data->data.get());
+	}
 	return *this;
 }
 
-template<typename T, typename S, typename A>
-template<typename OtherA>
-inline string_base<T, S, A> &string_base<T, S, A>::operator=(const std::basic_stringstream<T, std::char_traits<T>, OtherA> &ss)
-{
-	*static_cast<std::basic_string<T, traits_type, A>*>(this) = ss.str().c_str();
+inline String &String::ReverseASCII() {
+	if (m_data) {
+		m_data = details::DataBlock::Isolate(m_data, *m_zone);
+		std::reverse((char*)m_data->data.get(), ((char*)m_data->data.get()) + m_data->size);
+	}
 	return *this;
 }
 
-template<typename T, typename S, typename A>
-inline string_base<T, S, A>& string_base<T, S, A>::operator=(const T *psz)
-{
-  *static_cast<std::basic_string<T, traits_type, A>*>(this) = psz;
+inline String &String::TrimSubStr(int ofs, int count) {
+	*this = SubStr(ofs, count);
 	return *this;
 }
 
-template<typename T, typename S, typename A>
-inline string_base<T, S, A>& string_base<T, S, A>::operator=(T ch)
-{
-  *static_cast<std::basic_string<T, traits_type, A>*>(this) = ch;
-  return *this;
+inline String &String::TrimSubStrBytes(int ofs, int count) {
+	*this = SubStrBytes(ofs, count);
+	return *this;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::operator==()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename T, typename S, typename A>
-template<typename OtherA>
-inline bool string_base<T, S, A>::operator==(const string_base<T, S, OtherA>& string) const
-{
-	return (0 == compare(string.c_str()));
+inline String &String::TrimLeft(int count) {
+	*this = Left(count);
+	return *this;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::compare_no_case()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename T, typename S, typename A>
-inline int string_base<T, S, A>::compare_no_case(const T *psz) const
-{
-	return icmp<S>(reinterpret_cast<const S *>(this->c_str()), reinterpret_cast<const S *>(psz));
+inline String &String::TrimRight(int count) {
+	*this = Right(count);
+	return *this;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::collate()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename T, typename S, typename A>
-int string_base<T, S, A>::collate(const T *psz) const
-{
-	return coll<S>(reinterpret_cast<const S *>(this->c_str()), reinterpret_cast<const S *>(psz));
+inline String &String::TrimLeftBytes(int count) {
+	*this = LeftBytes(count);
+	return *this;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::contains()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename T, typename S, typename A>
-int string_base<T, S, A>::contains(const T *sz) const
-{
-	const T *x = this->c_str();
-	const T *p = strstr<T>(x, sz);
-	return p ? (int)(p-x) : -1;
+inline String &String::TrimRightBytes(int count) {
+	*this = RightBytes(count);
+	return *this;
 }
 
-template<typename T, typename S, typename A>
-int string_base<T, S, A>::contains(const string_base_type &str) const
-{
-	return contains(str.c_str());
+inline String &String::Append(const String &str) {
+	return NAppend(str, str.length);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::format()
-////////////////////////////////////////////////////////////////////////////////
+inline String &String::Append(const char *sz) {
+	return Append(String(sz, RefTag));
+}
 
-template<typename T, typename S, typename A>
-void string_base<T, S, A>::format(const T *szFormat, ...)
-{
+inline String &String::Append(const wchar_t *sz) {
+	return Append(String(sz, *m_zone));
+}
+
+inline String &String::Append(const char c) {
+	char x[2] = {c, 0};
+	return Append(x);
+}
+
+inline String &String::Append(const wchar_t c) {
+	wchar_t x[2] = {c, 0};
+	return Append(x);
+}
+
+inline String &String::NAppend(const String &str, int len) {
+	return NAppendBytes(str, str.ByteForChar(len));
+}
+
+inline String &String::NAppend(const char *sz, int len) {
+	return NAppend(String(sz, RefTag), len);
+}
+
+inline String &String::NAppend(const wchar_t *sz, int len) {
+	return NAppend(String(sz, *m_zone), len);
+}
+
+inline String &String::NAppendBytes(const char *sz, int len) {
+	return NAppendBytes(String(sz, RefTag), len);
+}
+
+inline String &String::NAppendBytes(const wchar_t *sz, int len) {
+	return NAppendBytes(String(sz, *m_zone), len);
+}
+
+inline String &String::Replace(char src, char dst) {
+	char x[] = {src, 0};
+	char y[] = {dst, 0};
+	return Replace(x, y);
+}
+
+inline String &String::Replace(char src, const char *dst) {
+	char x[] = {src, 0};
+	return Replace(x, dst);
+}
+
+inline String &String::Replace(char src, wchar_t dst) {
+	char x[] = {src, 0};
+	wchar_t y[] = {dst, 0};
+	return Replace(x, y);
+}
+
+inline String &String::Replace(char src, const wchar_t *dst) {
+	char x[] = {src, 0};
+	return Replace(x, dst);
+}
+
+inline String &String::Replace(const char *src, char dst) {
+	char y[] = {dst, 0};
+	return Replace(src, y);
+}
+
+inline String &String::Replace(const char *src, const char *dst) {
+	return Replace(String(src, RefTag), String(dst, RefTag));
+}
+
+inline String &String::Replace(const char *src, wchar_t dst) {
+	wchar_t y[] = {dst, 0};
+	return Replace(src, y);
+}
+
+inline String &String::Replace(const char *src, const wchar_t *dst) {
+	return Replace(String(src, RefTag), String(dst));
+}
+
+inline String &String::Replace(wchar_t src, char dst) {
+	wchar_t x[] = {src, 0};
+	char y[] = {dst, 0};
+	return Replace(x, y);
+}
+
+inline String &String::Replace(wchar_t src, const char *dst) {
+	wchar_t x[] = {src, 0};
+	return Replace(x, dst);
+}
+
+inline String &String::Replace(wchar_t src, wchar_t dst) {
+	wchar_t x[] = {src, 0};
+	wchar_t y[] = {dst, 0};
+	return Replace(x, y);
+}
+
+inline String &String::Replace(wchar_t src, const wchar_t *dst) {
+	wchar_t x[] = {src, 0};
+	return Replace(x, dst);
+}
+
+inline String &String::Replace(const wchar_t *src, char dst) {
+	char y[] = {dst, 0};
+	return Replace(src, y);
+}
+
+inline String &String::Replace(const wchar_t *src, const char *dst) {
+	return Replace(String(src), String(dst, RefTag));
+}
+
+inline String &String::Replace(const wchar_t *src, wchar_t dst) {
+	wchar_t y[] = {dst, 0};
+	return Replace(src, y);
+}
+
+inline String &String::Replace(const wchar_t *src, const wchar_t *dst) {
+	return Replace(String(src), String(dst));
+}
+
+inline String &String::Printf(const char *fmt, ...) {
 	va_list args;
-	va_start(args, szFormat);
-	format_argv(szFormat, args);
+	va_start(args, fmt);
+	Printf(fmt, args);
 	va_end(args);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::format_argv()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename T, typename S, typename A>
-void string_base<T, S, A>::format_argv(const T *szFormat, va_list args)
-{
-	size_type len = vscprintf(szFormat, args)+1;
-	T* buff = this->allocate(len);
-	vsprintf(buff, szFormat, args);
-	string_base<T, S, A>::operator=(buff);
-	this->deallocate(buff, len);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::substring()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename T, typename S, typename A>
-const T *string_base<T, S, A>::substring(size_type &nRLen, size_type nFirst, size_type nCount) const
-{
-	RAD_ASSERT(nCount >= 0);
-	RAD_ASSERT(nCount <= this->length());
-	RAD_ASSERT(nFirst >= 0);
-	RAD_ASSERT((this->empty() && nFirst == 0) || (nFirst <= this->length()));
-
-	const T	*p = this->c_str();
-
-	size_type len = this->length();
-	if (nFirst + nCount > len)
-	{
-		nCount = len - nFirst;
-	}
-
-	if (nCount && p)
-	{
-		nRLen = nCount;
-		return (p + nFirst);
-	}
-	else
-	{
-		nRLen = 0;
-		return NULL;
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::substr()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename T, typename S, typename A>
-const T *string_base<T, S, A>::substr(size_type &nRLen, size_type nFirst, size_type nCount) const
-{
-	size_type len = this->length();
-
-	nFirst = Clamp(nFirst, size_type(0), len);
-	nCount = Clamp(nCount, size_type(0), len - nFirst);
-
-	return substring(nRLen, nFirst, nCount);
-}
-
-template<typename T, typename S, typename A>
-inline const T *string_base<T, S, A>::mid(size_type &nRLen, size_type nFirst) const
-{
-	size_type len = this->length();
-
-	nFirst = Clamp(nFirst, size_type(0), len);
-
-	return substring(nRLen, nFirst, len - nFirst);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::left()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename T, typename S, typename A>
-const T *string_base<T, S, A>::left(size_type &nRLen, size_type nCount) const
-{
-	size_type len = this->length();
-	nCount = Clamp(nCount, size_type(0), len);
-	return substring(nRLen, 0, nCount);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::right()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename T, typename S, typename A>
-const T *string_base<T, S, A>::right(size_type &nRLen, size_type nCount) const
-{
-	size_type len = this->length();
-	nCount = Clamp(nCount, size_type(0), len);
-	return substring(nRLen, len - nCount, nCount);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::span_including()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename T, typename S, typename A>
-const T *string_base<T, S, A>::span_including(size_type &nRLen, const T *pszCharSet) const
-{
-	return left(nRLen, spn<S>(reinterpret_cast<const S *>(this->c_str()), reinterpret_cast<const S *>(pszCharSet)));
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::span_excluding()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename T, typename S, typename A>
-const T *string_base<T, S, A>::span_excluding(size_type &nRLen, const T *pszCharSet) const
-{
-	return left(nRLen, cspn<S>(reinterpret_cast<const S *>(this->c_str()), reinterpret_cast<const S *>(pszCharSet)));
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::trim_right()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename T, typename S, typename A>
-const T *string_base<T, S, A>::trim_right(size_type &nRLen) const
-{
-	size_type len = this->length();
-	const T	*buffer = this->c_str();
-
-	if (len && buffer)
-	{
-		const T *psz = buffer,	*pszLast = NULL;
-
-		// Find beginning of trailing spaces by starting at beginning
-
-		while (*psz != static_cast<T>('\0'))
-		{
-			if (isspace<S>(*reinterpret_cast<const S *>(psz)))
-			{
-				if (!pszLast) { pszLast = psz; }
-			}
-			else
-			{
-				pszLast = NULL;
-			}
-			++psz;
-		}
-
-		// truncate at trailing space start
-
-		nRLen = pszLast ? pszLast - buffer : len;
-		return buffer;
-	}
-	else
-	{
-		nRLen = 0;
-		return NULL;
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::trim_left()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename T, typename S, typename A>
-const T *string_base<T, S, A>::trim_left(size_type &nRLen) const
-{
-	size_type len = this->length();
-
-	const T	*buffer = this->c_str();
-
-	if (len && buffer)
-	{
-		const T *psz = buffer;
-
-		// Find first non-space character
-
-		while (isspace<S>(*reinterpret_cast<const S *>(psz)))
-		{
-			++psz;
-		}
-
-		// Get data and length
-
-		nRLen = len - (psz - buffer);
-		return psz;
-	}
-	else
-	{
-		nRLen = 0;
-		return NULL;
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::upper()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename T, typename S, typename A>
-T *string_base<T, S, A>::upper() const
-{
-	size_type len = this->length();
-
-	if (len > 0)
-	{
-		T	*buffer = this->allocate(len + 1);
-
-		if (buffer)
-		{
-			copy(buffer, len);
-			buffer[len] = static_cast<T>('\0');
-			toupper(reinterpret_cast<S *>(buffer));
-			return buffer;
-		}
-	}
-
-	return NULL;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::lower()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename T, typename S, typename A>
-T *string_base<T, S, A>::lower() const
-{
-	size_type	len = this->length();
-
-	if (len > 0)
-	{
-		T	*buffer = this->allocate(len + 1);
-
-		if (buffer)
-		{
-			copy(buffer, len);
-			buffer[len] = static_cast<T>('\0');
-			tolower(reinterpret_cast<S *>(buffer));
-			return buffer;
-		}
-	}
-
-	return NULL;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string_base<T, S, A>::reverse()
-//////////////////////////////////////////////////////////////////////w//////////
-
-template<typename T, typename S, typename A>
-T *string_base<T, S, A>::reverse() const
-{
-	size_type len = this->length();
-
-	if (len > 0)
-	{
-		T *buffer = this->allocate(len + 1);
-
-		if (buffer)
-		{
-			copy(buffer, len);
-			buffer[len] = static_cast<T>('\0');
-			::string::reverse(reinterpret_cast<S *>(buffer));
-			return buffer;
-		}
-	}
-
-	return NULL;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string inline function definitions
-////////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::string()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A>::string() :
-string_base<char, char, A>()
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::string()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-template<typename OtherA>
-inline string<A>::string(const string<OtherA> &str) :
-string_base<char, char, A>(str)
-{
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// string::string()
-///////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-template<typename OtherA>
-inline string<A>::string(const wstring<OtherA> &str) :
-string_base<char, char, A>()
-{
-#define CAWARN_DISABLE 6309 6387
-#include <Runtime/PushCAWarnings.h>
-	size_t size = ::wcstombs(NULL, str.c_str(), str.length() * 2 + 1) + 1;
-#include <Runtime/PopCAWarnings.h>
-	char *buff = this->allocate(size);
-	::wcstombs(buff, str.c_str(), size);
-	string_base<char, char, A>::operator=(buff);
-	this->deallocate(buff, size);
-}
-
-template<typename A>
-template<typename OtherA>
-inline string<A>::string(const std::basic_string<wchar_t, std::char_traits<wchar_t>, OtherA> &str) :
-string_base<char, char, A>()
-{
-#define CAWARN_DISABLE 6309 6387
-#include <Runtime/PushCAWarnings.h>
-	size_t size = ::wcstombs(NULL, str.c_str(), str.length() * 2 + 1) + 1;
-#include <Runtime/PopCAWarnings.h>
-	char *buff = this->allocate(size);
-	::wcstombs(buff, str.c_str(), size);
-	string_base<char, char, A>::operator=(buff);
-	this->deallocate(buff, size);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::string()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-template<typename OtherA>
-inline string<A>::string(const std::basic_string<char, std::char_traits<char>, OtherA> &str) :
-string_base<char, char, A>(str)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::string()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-template<typename OtherA>
-inline string<A>::string(const std::basic_stringstream<char, std::char_traits<char>, OtherA> &ss) :
-string_base<char, char, A>(ss)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::string()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A>::string(char ch, size_type nRepeat) :
-string_base<char, char, A>(ch, nRepeat)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::string()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A>::string(const char *psz) :
-string_base<char, char, A>(psz)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::string()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A>::string(const char *psz, size_type nLength) :
-string_base<char, char, A>(psz, nLength)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::string()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A>::string(char *psz, size_type len, CON copydel, A& allocator) :
-string_base<char, char, A>(psz, len, copydel, allocator)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::~string()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A>::~string()
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::operator=()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-template<typename OtherA>
-inline string<A>& string<A>::operator=(const string<OtherA>& str)
-{
-	string_base<char, char, A>::operator=(str);
 	return *this;
 }
 
-template<typename A>
-template<typename OtherA>
-inline string<A> &string<A>::operator=(const std::basic_string<char, std::char_traits<char>, OtherA> &str)
-{
-	string_base<char, char, A>::operator=(str);
+inline String &String::PrintfASCII(const char *fmt, ...) {
+	va_list args;
+	va_start(args, fmt);
+	PrintfASCII(fmt, args);
+	va_end(args);
 	return *this;
 }
 
-template<typename A>
-template<typename OtherA>
-inline string<A> &string<A>::operator=(const std::basic_stringstream<char, std::char_traits<char>, OtherA> &ss)
-{
-	string_base<char, char, A>::operator=(ss);
+inline String &String::operator = (const String &string) {
+	m_data = string.m_data;
+	m_zone = string.m_zone;
 	return *this;
 }
 
-template<typename A>
-inline string<A>& string<A>::operator=(char ch)
-{
-	string_base<char, char, A>::operator=(ch);
+inline String &String::operator = (const char *sz) {
+	return (*this = String(sz));
+}
+
+inline String &String::operator = (const wchar_t *sz) {
+	return (*this = String(sz));
+}
+
+inline String &String::operator = (char c) {
+	return (*this = String(c));
+}
+
+inline String &String::operator = (wchar_t c) {
+	return (*this = String(c));
+}
+
+inline String &String::operator += (const String &string) {
+	return Append(string);
+}
+
+inline String &String::operator += (const char *sz) {
+	return Append(sz);
+}
+
+inline String &String::operator += (const wchar_t *sz) {
+	return Append(sz);
+}
+
+inline String &String::operator += (char c) {
+	return Append(c);
+}
+
+inline String &String::operator += (wchar_t c) {
+	return Append(c);
+}
+
+inline String &String::Write(int pos, char sz) {
+	return Write(pos, &sz, 1);
+}
+
+inline String &String::Write(int pos, const char *sz) {
+	return Write(pos, sz, len(sz)+1);
+}
+
+inline String &String::Write(int pos, const String &str) {
+	return Write(pos, str.c_str, str.length);
+}
+
+inline String &String::Write(int pos, const String &str, int len) {
+	return Write(pos, str.c_str, len);
+}
+
+inline String &String::Clear() {
+	m_data.reset();
 	return *this;
 }
 
-template<typename A>
-inline string<A>& string<A>::operator=(const char *psz)
-{
-	string_base<char, char, A>::operator=(psz);
-	return *this;
+inline String operator + (const String &a, const String &b) {
+	String x(a);
+	x.Append(b);
+	return x;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::substr()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A> string<A>::substr(size_type nFirst, size_type nCount) const
-{
-	size_type n = 0;
-	const char *p = string_base<char, char, A>::substr(n, nFirst, nCount);
-	return ((p && n) ? string<A>(p, n) : string());
+inline String operator + (const String &a, const char *sz) {
+	String x(a);
+	x.Append(sz);
+	return x;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::mid()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A> string<A>::mid(size_type nFirst) const
-{
-	size_type n = 0;
-	const char *p = string_base<char, char, A>::mid(n, nFirst);
-	return ((p && n) ? string<A>(p, n) : string());
+inline String operator + (const String &a, const wchar_t *sz) {
+	String x(a);
+	x.Append(sz);
+	return x;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::left()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A> string<A>::left(size_type nCount) const
-{
-	size_type n = 0;
-	const char *p = string_base<char, char, A>::left(n, nCount);
-	return ((p && n) ? string<A>(p, n) : string());
+inline String operator + (const char *sz, const String &b) {
+	String x(sz, RefTag);
+	x.Append(b);
+	return x;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::right()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A> string<A>::right(size_type nCount) const
-{
-	size_type n = 0;
-	const char *p = string_base<char, char, A>::right(n, nCount);
-	return ((p && n) ? string<A>(p, n) : string());
+inline String operator + (const wchar_t *sz, const String &b) {
+	String x(sz);
+	x.Append(b);
+	return x;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string:string<A>:::span_including()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A> string<A>::span_including(const char *pszCharSet) const
-{
-	size_type n = 0;
-	const char *p = string_base<char, char, A>::span_including(n, pszCharSet);
-	return ((p && n) ? string<A>(p, n) : string());
+inline String operator + (char s, const String &b) {
+	String x(s);
+	x.Append(b);
+	return x;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::span_excluding()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A> string<A>::span_excluding(const char *pszCharSet) const
-{
-	size_type n = 0;
-	const char *p = string_base<char, char, A>::span_excluding(n, pszCharSet);
-	return ((p && n) ? string<A>(p, n) : string());
+inline String operator + (wchar_t s, const String &b) {
+	String x(s);
+	x.Append(b);
+	return x;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::trim_right()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A> string<A>::trim_right() const
-{
-	size_type n = 0;
-	const char *p = string_base<char, char, A>::trim_right(n);
-	return ((p && n) ? string<A>(p, n) : string());
+inline String operator + (const String &b, char s) {
+	String x(b);
+	x.Append(s);
+	return x;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::trim_left()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A> string<A>::trim_left() const
-{
-	size_type n = 0;
-	const char *p = string_base<char, char, A>::trim_left(n);
-	return ((p && n) ? string<A>(p, n) : string());
+inline String operator + (const String &b, wchar_t s) {
+	String x(b);
+	x.Append(s);
+	return x;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::upper()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A> string<A>::upper() const
-{
-	char *p = string_base<char, char, A>::upper();
-	A a = this->get_allocator();
-	return (p) ? string<A>(p, this->length(), COPYDEL, a) : string<A>();
+inline int String::RAD_IMPLEMENT_GET(length) {
+	return m_data ? (m_data->size - 1) : 0;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::lower()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A> string<A>::lower() const
-{
-	char *p = string_base<char, char, A>::lower();
-	A a = this->get_allocator();
-	return (p) ? string<A>(p, this->length(), COPYDEL, a) : string<A>();
+inline const char *String::RAD_IMPLEMENT_GET(begin) {
+	return c_str.get();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::string<A>::reverse()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A> string<A>::reverse() const
-{
-	char *p = string_base<char, char, A>::reverse();
-	A a = this->get_allocator();
-	return (p) ? string<A>(p, this->length(), COPYDEL, a) : string<A>();
+inline const char *String::RAD_IMPLEMENT_GET(end) {
+	return c_str.get() + length.get();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::operator+()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A, typename OtherA>
-inline string<A> operator+(const string<A> &l, const string<OtherA> &r)
-{
-	string<A> res(l);
-	res += r;
-	return res;
+inline const char *String::RAD_IMPLEMENT_GET(c_str) {
+	return m_data ? (const char*)m_data->data.get() : "";
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::operator+()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A> operator+(const string<A> &l, const char *r)
-{
-	string<A> res(l);
-	res += r;
-	return res;
+inline int String::RAD_IMPLEMENT_GET(numChars) {
+	return m_data ? utf8to32len((const char*)m_data->data.get(), m_data->size - 1) : 0;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// string::operator+()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A> operator+(const string<A> &l, char r)
-{
-	string<A> res(l);
-	res += r;
-	return res;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::operator+()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A> operator+(const char *l, const string<A> &r)
-{
-	string<A> res(l);
-	res += r;
-	return res;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::operator+()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline string<A> operator+(char l, const string<A> &r)
-{
-	string<A> res(l);
-	res += r;
-	return res;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring inline function definitions
-////////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::wstring()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A>::wstring() :
-string_base<wchar_t, wchar_t, A>()
-{
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// wstring::wstring()
-///////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-template<typename OtherA>
-inline wstring<A>::wstring(const string<OtherA> &str) :
-string_base<wchar_t, wchar_t, A>()
-{
-#define CAWARN_DISABLE 6309 6387
-#include <Runtime/PushCAWarnings.h>
-	size_t size = my_mbstowcslen(str.c_str(), str.length() + 1) + 1;
-#include <Runtime/PopCAWarnings.h>
-	wchar_t* buff = this->allocate(size);
-	my_mbstowcs(str.c_str(), str.length() + 1, buff);
-	string_base<wchar_t, wchar_t, A>::operator=(buff);
-	this->deallocate(buff, size);
-}
-
-template<typename A>
-template<typename OtherA>
-inline wstring<A>::wstring(const std::basic_string<char, std::char_traits<char>, OtherA> &str) :
-string_base<wchar_t, wchar_t, A>()
-{
-	size_t size = my_mbstowcslen(str.c_str(), str.length() + 1) + 1;
-	wchar_t* buff = this->allocate(size);
-	my_mbstowcs(str.c_str(), str.length() + 1, buff);
-	string_base<wchar_t, wchar_t, A>::operator=(buff);
-	this->deallocate(buff, size);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::wstring()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-template<typename OtherA>
-inline wstring<A>::wstring(const wstring<OtherA> &string) :
-string_base<wchar_t, wchar_t, A>(string)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::wstring()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-template<typename OtherA>
-inline wstring<A>::wstring(const std::basic_string<wchar_t, std::char_traits<wchar_t>, OtherA> &str) :
-string_base<wchar_t, wchar_t, A>(str)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::wstring()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-template<typename OtherA>
-inline wstring<A>::wstring(const std::basic_stringstream<wchar_t, std::char_traits<wchar_t>, OtherA> &ss) :
-string_base<wchar_t, wchar_t, A>(ss)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::wstring()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A>::wstring(wchar_t ch, size_type nRepeat) :
-string_base<wchar_t, wchar_t, A>(ch, nRepeat)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::wstring()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A>::wstring(const wchar_t *psz) :
-string_base<wchar_t, wchar_t, A>(psz)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::wstring()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A>::wstring(const wchar_t *psz, size_type nLength) :
-string_base<wchar_t, wchar_t, A>(psz, nLength)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::wstring()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A>::wstring(wchar_t *psz, size_type len, CON copydel, A& allocator) :
-string_base<wchar_t, wchar_t, A>(psz, len, copydel, allocator)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::~wstring()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A>::~wstring()
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::operator=()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-template<typename OtherA>
-inline wstring<A>& wstring<A>::operator=(const wstring<OtherA>& string)
-{
-	string_base<wchar_t, wchar_t, A>::operator=(string);
-	return *this;
-}
-
-template<typename A>
-template<typename OtherA>
-inline wstring<A> &wstring<A>::operator=(const std::basic_string<wchar_t, std::char_traits<wchar_t>, OtherA> &str)
-{
-	string_base<wchar_t, wchar_t, A>::operator=(str);
-	return *this;
-}
-
-template<typename A>
-template<typename OtherA>
-inline wstring<A> &wstring<A>::operator=(const std::basic_stringstream<wchar_t, std::char_traits<wchar_t>, OtherA> &ss)
-{
-	string_base<wchar_t, wchar_t, A>::operator=(ss);
-	return *this;
-}
-
-template<typename A>
-inline wstring<A>& wstring<A>::operator=(wchar_t ch)
-{
-	string_base<wchar_t, wchar_t, A>::operator=(ch);
-	return *this;
-}
-
-template<typename A>
-inline wstring<A>& wstring<A>::operator=(const wchar_t *psz)
-{
-	string_base<wchar_t, wchar_t, A>::operator=(psz);
-	return *this;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::substr()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A> wstring<A>::substr(size_type nFirst, size_type nCount) const
-{
-	size_type n = 0;
-	const wchar_t *p = string_base<wchar_t, wchar_t, A>::substr(n, nFirst, nCount);
-	return ((p && n) ? wstring<A>(p, n) : wstring<A>());
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::mid()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A> wstring<A>::mid(size_type nFirst) const
-{
-	size_type n = 0;
-	const wchar_t *p = string_base<wchar_t, wchar_t, A>::mid(n, nFirst);
-	return ((p && n) ? wstring<A>(p, n) : wstring<A>());
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::left()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A> wstring<A>::left(size_type nCount) const
-{
-	size_type n = 0;
-	const wchar_t *p = string_base<wchar_t, wchar_t, A>::left(n, nCount);
-	return ((p && n) ? wstring<A>(p, n) : wstring<A>());
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::right()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A> wstring<A>::right(size_type nCount) const
-{
-	size_type n = 0;
-	const wchar_t *p = string_base<wchar_t, wchar_t, A>::right(n, nCount);
-	return ((p && n) ? wstring<A>(p, n) : wstring<A>());
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::span_including()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A> wstring<A>::span_including(const wchar_t *pszCharSet) const
-{
-	size_type n = 0;
-	const wchar_t *p = string_base<wchar_t, wchar_t, A>::span_including(n, pszCharSet);
-	return ((p && n) ? wstring<A>(p, n) : wstring<A>());
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::span_excluding()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A> wstring<A>::span_excluding(const wchar_t *pszCharSet) const
-{
-	size_type n = 0;
-	const wchar_t *p = string_base<wchar_t, wchar_t, A>::span_excluding(n, pszCharSet);
-	return ((p && n) ? wstring<A>(p, n) : wstring<A>());
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::trim_right()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A> wstring<A>::trim_right() const
-{
-	size_type n = 0;
-	const wchar_t *p = string_base<wchar_t, wchar_t, A>::trim_right(n);
-	return ((p && n) ? wstring<A>(p, n) : wstring<A>());
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::trim_left()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A> wstring<A>::trim_left() const
-{
-	size_type n = 0;
-	const wchar_t *p = string_base<wchar_t, wchar_t, A>::trim_left(n);
-	return ((p && n) ? wstring<A>(p, n) : wstring<A>());
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::upper()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A> wstring<A>::upper() const
-{
-	wchar_t *p = string_base<wchar_t, wchar_t, A>::upper();
-	A a = this->get_allocator();
-	return (p) ? wstring<A>(p, this->length(), COPYDEL, a) : wstring<A>();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::lower()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A> wstring<A>::lower() const
-{
-	wchar_t *p = string_base<wchar_t, wchar_t, A>::lower();
-	A a = this->get_allocator();
-	return (p) ? wstring<A>(p, this->length(), COPYDEL, a) : wstring<A>();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::wstring<A>::reverse()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A> wstring<A>::reverse() const
-{
-	wchar_t *p = string_base<wchar_t, wchar_t, A>::reverse();
-	A a = this->get_allocator();
-	return (p) ? wstring<A>(p, this->length(), COPYDEL, a) : wstring<A>();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::operator+()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A> operator+(const wstring<A> &l, const wstring<A> &r)
-{
-	wstring<A> res(l);
-	res += r;
-	return res;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::operator+()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A> operator+(const wstring<A> &l, const wchar_t *r)
-{
-	wstring<A> res(l);
-	res += r;
-	return res;
-}
-////////////////////////////////////////////////////////////////////////////////
-// string::operator+()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A> operator+(const wstring<A> &l, wchar_t r)
-{
-	wstring<A> res(l);
-	res += r;
-	return res;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::operator+()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A> operator+(const wchar_t *l, const wstring<A> &r)
-{
-	wstring<A> res(l);
-	res += r;
-	return res;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// string::operator+()
-////////////////////////////////////////////////////////////////////////////////
-
-template<typename A>
-inline wstring<A> operator+(wchar_t l, const wstring<A> &r)
-{
-	wstring<A> res(l);
-	res += r;
-	return res;
-}
-
-inline String Shorten(const wchar_t *str)
-{
-	WString x(str ? str : L"");
-	return String(x);
-}
-
-inline WString Widen(const char *str)
-{
-	String x(str ? str : "");
-	return WString(x);
+inline bool String::RAD_IMPLEMENT_GET(empty) {
+	return !m_data;
 }
 
 } // string
 
+inline string::String CStr(const char *sz) {
+	return string::String(sz, string::RefTag);
+}
 
-#include "../PopPack.h"
+
+template<class CharType, class Traits>
+std::basic_istream<CharType, Traits>& operator >> (std::basic_istream<CharType, Traits> &stream, string::String &string) {
+	std::string x;
+	stream >> x;
+	string = x.c_str();
+	return stream;
+}
+
+
+template<class CharType, class Traits>
+std::basic_ostream<CharType, Traits>& operator << (std::basic_ostream<CharType, Traits> &stream, const string::String &string) {
+	stream << string.c_str.get();
+	return stream;
+}
+
+#include "../PopSystemMacros.h"

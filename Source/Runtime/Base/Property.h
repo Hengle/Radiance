@@ -82,7 +82,7 @@ struct GetSetProperty : public RADProperty {};
 #include "PrivateProperty.h"
 
 #define RAD_DECLARE_PROPERTY(_class, name, get_type, set_type) \
-	RAD_DECLARE_PROPERTY_EX(class, _class, name, get_type, set_type)
+	RAD_DECLARE_PROPERTY_EX(class _class, _class, name, get_type, set_type)
 
 #define RAD_DECLARE_PROPERTY_EX(_ctype, _class, name, get_type, set_type) \
 	RAD_PRIVATE_PROPERTY_DECLARE_FRIENDS(name); \
@@ -90,7 +90,7 @@ struct GetSetProperty : public RADProperty {};
 	RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name) name
 
 #define RAD_DECLARE_PROPERTY_FOR_INCOMPLETE_TYPE(_class, name, get_type, set_type) \
-	RAD_DECLARE_PROPERTY_FOR_INCOMPLETE_TYPE_EX(class, _class, name, get_type, set_type)
+	RAD_DECLARE_PROPERTY_FOR_INCOMPLETE_TYPE_EX(class _class, _class, name, get_type, set_type)
 
 #define RAD_DECLARE_PROPERTY_FOR_INCOMPLETE_TYPE_EX(_ctype, _class, name, get_type, set_type) \
 	RAD_PRIVATE_PROPERTY_DECLARE_FRIENDS(name); \
@@ -98,7 +98,7 @@ struct GetSetProperty : public RADProperty {};
 	RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name) name
 
 #define RAD_DECLARE_READONLY_PROPERTY(_class, name, get_type) \
-	RAD_DECLARE_READONLY_PROPERTY_EX(class, _class, name, get_type)
+	RAD_DECLARE_READONLY_PROPERTY_EX(class _class, _class, name, get_type)
 
 #define RAD_DECLARE_READONLY_PROPERTY_EX(_ctype, _class, name, get_type) \
 	RAD_PRIVATE_PROPERTY_DECLARE_FRIENDS(name); \
@@ -106,7 +106,7 @@ struct GetSetProperty : public RADProperty {};
 	RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name) name
 
 #define RAD_DECLARE_READONLY_PROPERTY_FOR_INCOMPLETE_TYPE(_class, name, get_type) \
-	RAD_DECLARE_READONLY_PROPERTY_FOR_INCOMPLETE_TYPE_EX(class, _class, name, get_type)
+	RAD_DECLARE_READONLY_PROPERTY_FOR_INCOMPLETE_TYPE_EX(class _class, _class, name, get_type)
 
 #define RAD_DECLARE_READONLY_PROPERTY_FOR_INCOMPLETE_TYPE_EX(_ctype, _class, name, get_type) \
 	RAD_PRIVATE_PROPERTY_DECLARE_FRIENDS(name); \
@@ -114,7 +114,7 @@ struct GetSetProperty : public RADProperty {};
 	RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name) name
 
 #define RAD_DECLARE_WRITEONLY_PROPERTY(_class, name, set_type) \
-	RAD_DECLARE_WRITEONLY_PROPERTY_EX(class, _class, name, set_type)
+	RAD_DECLARE_WRITEONLY_PROPERTY_EX(class _class, _class, name, set_type)
 
 #define RAD_DECLARE_WRITEONLY_PROPERTY_EX(_ctype, _class, name, set_type) \
 	RAD_PRIVATE_PROPERTY_DECLARE_FRIENDS(name); \
@@ -122,7 +122,7 @@ struct GetSetProperty : public RADProperty {};
 	RAD_PRIVATE_PROPERTY_GETSET_CLASS_NAME(name) name
 
 #define RAD_DECLARE_WRITEONLY_PROPERTY_FOR_INCOMPLETE_TYPE(_class, name, set_type) \
-	RAD_DECLARE_WRITEONLY_PROPERTY_FOR_INCOMPLETE_TYPE_EX(class, _class, name, set_type)
+	RAD_DECLARE_WRITEONLY_PROPERTY_FOR_INCOMPLETE_TYPE_EX(class _class, _class, name, set_type)
 
 #define RAD_DECLARE_WRITEONLY_PROPERTY_FOR_INCOMPLETE_TYPE_EX(_ctype, _class, name, set_type) \
 	RAD_PRIVATE_PROPERTY_DECLARE_FRIENDS(name); \

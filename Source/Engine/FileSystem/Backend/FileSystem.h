@@ -211,15 +211,15 @@ struct PakSearch :
 	HSearch m_search;
 	HFileSystem m_fs;
 	PakList* m_paks;
-	string::WString m_path, m_ext;
+	string::String m_path, m_ext;
 	PakList::iterator m_last;
 	int m_media;
 	
 	PakSearch();
 
 	void Initialize(PakList *pakList, const HFileSystem& fs, int media);
-	bool OpenSearch(const wchar_t* path, const wchar_t* extIncludingPeriod);
-	bool NextFile(string::WString& outFilename);
+	bool OpenSearch(const char* path, const char* extIncludingPeriod);
+	bool NextFile(string::String& outFilename);
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// IInterface
@@ -246,8 +246,8 @@ struct DiskSearch :
 
 	DiskSearch();
 	
-	bool OpenSearch(const wchar_t* path, const wchar_t* extIncludingPeriod);
-	bool NextFile(string::WString& outFilename);
+	bool OpenSearch(const char* path, const char* extIncludingPeriod);
+	bool NextFile(string::String& outFilename);
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// IInterface
@@ -276,13 +276,13 @@ struct CSearch :
 	int m_media;
 	int m_curMedia;
 	PakList* m_paks;
-	string::WString m_path, m_ext;
+	string::String m_path, m_ext;
 
 	CSearch();
 
 	void Initialize(PakList* pakList, const HFileSystem& fs, int media);
-	bool OpenSearch(const wchar_t *path, const wchar_t *extIncludingPeriod);
-	bool NextFile(string::WString& outFilename);
+	bool OpenSearch(const char *path, const char *extIncludingPeriod);
+	bool NextFile(string::String& outFilename);
 	bool SelectNextMedia();
 	bool MediaSearch();
 
@@ -310,9 +310,9 @@ private AtomicRefCount
 	bool m_init;
 	FPos m_maxSectorSize;
 	PakList m_paks;
-	string::WString m_cddvd, m_hdd, m_mod;
-	string::WString m_cddvdPath, m_hddPath, m_modPath;
-	string::WString m_cddvdPathSlash, m_hddPathSlash, m_modPathSlash;
+	string::String m_cddvd, m_hdd, m_mod;
+	string::String m_cddvdPath, m_hddPath, m_modPath;
+	string::String m_cddvdPathSlash, m_hddPathSlash, m_modPathSlash;
 
 	ThreadSafeObjectPool<StreamInputBuffer> m_streamInputBufferPool;
 	ThreadSafeObjectPool<FileData> m_fileDataPool;
@@ -337,8 +337,8 @@ private AtomicRefCount
 	virtual HPakFile Pak(int num);
 
 	virtual HSearch OpenSearch(
-		const wchar_t* path, 
-		const wchar_t* extIncludingPeriod, 
+		const char* path, 
+		const char* extIncludingPeriod, 
 		int media
 	);
 
@@ -365,23 +365,23 @@ private AtomicRefCount
 	);
 
 	virtual int FileExists(
-		const wchar_t *path, 
+		const char *path, 
 		int media
 	);
 
 	virtual int DeleteFile(
-		const wchar_t *path, 
+		const char *path, 
 		int media
 	);
 
 	virtual bool FileSize(
-		const wchar_t *path, 
+		const char *path, 
 		int media, 
 		file::FPos& size
 	);
 
 	virtual Result LoadFile(
-		const wchar_t *filename, 
+		const char *filename, 
 		int &media, 
 		file::HBufferedAsyncIO& hAsyncIO, 
 		const HIONotify &ioComplete, 
@@ -391,7 +391,7 @@ private AtomicRefCount
 	);
 
 	virtual Result OpenFile(
-		const wchar_t *path, 
+		const char *path, 
 		int media, 
 		file::HFile &file, 
 		const HIONotify &ioComplete,
@@ -399,7 +399,7 @@ private AtomicRefCount
 	);
 
 	virtual Result OpenFileStream(
-		const wchar_t *path,
+		const char *path,
 		int &media,
 		HStreamInputBuffer &stream,
 		const HIONotify &ioComplete,
@@ -409,8 +409,8 @@ private AtomicRefCount
 	);
 
 	Result OpenDiskFile(
-		const wchar_t *prefix, 
-		const wchar_t *filename, 
+		const char *prefix, 
+		const char *filename, 
 		int media, 
 		file::HFile &hAsyncIO, 
 		const HIONotify &ioComplete
@@ -418,17 +418,17 @@ private AtomicRefCount
 
 	void *AlignedFileBuffer(FPos size, FPos alignment, Zone &zone);
 
-	void FixupPath(const wchar_t *str, string::WString &path);
+	void FixupPath(const char *str, string::String &path);
 	
 	RAD_DECLARE_GET(numPaks, int);
 	RAD_DECLARE_GET(enabledMedia, int);
 	RAD_DECLARE_SET(enabledMedia, int);
-	RAD_DECLARE_GET(cddvdRoot, const wchar_t*);
-	RAD_DECLARE_SET(cddvdRoot, const wchar_t*);
-	RAD_DECLARE_GET(hddRoot, const wchar_t*);
-	RAD_DECLARE_SET(hddRoot, const wchar_t*);
-	RAD_DECLARE_GET(modRoot, const wchar_t*);
-	RAD_DECLARE_SET(modRoot, const wchar_t*);
+	RAD_DECLARE_GET(cddvdRoot, const char*);
+	RAD_DECLARE_SET(cddvdRoot, const char*);
+	RAD_DECLARE_GET(hddRoot, const char*);
+	RAD_DECLARE_SET(hddRoot, const char*);
+	RAD_DECLARE_GET(modRoot, const char*);
+	RAD_DECLARE_SET(modRoot, const char*);
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// IInterface

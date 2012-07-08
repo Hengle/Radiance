@@ -220,14 +220,14 @@ bool DoCompileMeshBundle(
 	{
 		const TriModel::Ref &m = *it;
 
-		if (mats[m->mat].length() > ska::DNameLen)
+		if (mats[m->mat].length > ska::DNameLen)
 		{
 			COut(C_ErrMsgBox) << "ska::DNameLen exceeded, contact a programmer to increase." << std::endl;
 			return false;
 		}
 
 		char name[ska::DNameLen+1];
-		string::ncpy(name, mats[m->mat].c_str(), ska::DNameLen+1);
+		string::ncpy(name, mats[m->mat].c_str.get(), ska::DNameLen+1);
 		if (!os.Write(name, ska::DNameLen+1, 0))
 			return false;
 

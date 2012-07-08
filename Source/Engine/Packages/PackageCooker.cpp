@@ -83,7 +83,7 @@ bool PackageMan::MakeBuildDirs(int flags, std::ostream &out)
 	if (flags&P_Clean)
 	{
 		out << "(CLEAN): Removing Output Directories..." << std::endl;
-		file::DeleteDirectory(L"9:/Cooked", 0);
+		file::DeleteDirectory("9:/Cooked", 0);
 	}
 
 	out << "Creating Output Directories..." << std::endl;
@@ -102,23 +102,23 @@ bool PackageMan::MakeBuildDirs(int flags, std::ostream &out)
 			thread::Sleep(2000);
 		}
 
-		if (!file::CreateDirectory(L"9:/Cooked/Packages/Base", 0))
+		if (!file::CreateDirectory("9:/Cooked/Packages/Base", 0))
 			continue;
-		if (!file::CreateDirectory(L"9:/Cooked/Out/Generic", 0))
+		if (!file::CreateDirectory("9:/Cooked/Out/Generic", 0))
 			continue;
-		if (!MakePackageDirs(L"9:/Cooked/Out/Generic/"))
+		if (!MakePackageDirs("9:/Cooked/Out/Generic/"))
 			continue;
-		if (!file::CreateDirectory(L"9:/Cooked/Out/Packages", 0))
+		if (!file::CreateDirectory("9:/Cooked/Out/Packages", 0))
 			continue;
-		if (!file::CreateDirectory(L"9:/Cooked/Out/Shaders", 0))
+		if (!file::CreateDirectory("9:/Cooked/Out/Shaders", 0))
 			continue;
-		if (!file::CreateDirectory(L"9:/Cooked/Out/Tags", 0))
+		if (!file::CreateDirectory("9:/Cooked/Out/Tags", 0))
 			continue;
-		if (!file::CreateDirectory(L"9:/Cooked/Out/Globals", 0))
+		if (!file::CreateDirectory("9:/Cooked/Out/Globals", 0))
 			continue;
-		if (!MakePackageDirs(L"9:/Cooked/Out/Tags/"))
+		if (!MakePackageDirs("9:/Cooked/Out/Tags/"))
 			continue;
-		if (!MakePackageDirs(L"9:/Cooked/Out/Globals/"))
+		if (!MakePackageDirs("9:/Cooked/Out/Globals/"))
 			continue;
 		
 		// package output directories.
@@ -127,25 +127,25 @@ bool PackageMan::MakeBuildDirs(int flags, std::ostream &out)
 		{
 			if (flags&P_TargetIPhone)
 			{
-				if (!file::CreateDirectory(L"9:/Cooked/Out/IOS/IPhone", 0))
+				if (!file::CreateDirectory("9:/Cooked/Out/IOS/IPhone", 0))
 					continue;
-				if (!MakePackageDirs(L"9:/Cooked/Out/IOS/IPhone/"))
+				if (!MakePackageDirs("9:/Cooked/Out/IOS/IPhone/"))
 					continue;
 			}
 			if (flags&P_TargetIPad)
 			{
-				if (!file::CreateDirectory(L"9:/Cooked/Out/IOS/IPad", 0))
+				if (!file::CreateDirectory("9:/Cooked/Out/IOS/IPad", 0))
 					continue;
-				if (!MakePackageDirs(L"9:/Cooked/Out/IOS/IPad/"))
+				if (!MakePackageDirs("9:/Cooked/Out/IOS/IPad/"))
 					continue;
 			}
 		}
 
 		if (flags&P_TargetPC)
 		{
-			if (!file::CreateDirectory(L"9:/Cooked/Out/PC", 0))
+			if (!file::CreateDirectory("9:/Cooked/Out/PC", 0))
 				continue;
-			if (!MakePackageDirs(L"9:/Cooked/Out/PC/"))
+			if (!MakePackageDirs("9:/Cooked/Out/PC/"))
 				continue;
 		}
 
@@ -186,7 +186,7 @@ int PackageMan::Cook(
 				sep = false;
 				out << ", ";
 			}
-			out << String(StringTable::Langs[i]).upper();
+			out << CStr(StringTable::Langs[i]).Upper();
 			sep = true;
 		}
 		out << std::endl;
@@ -273,7 +273,7 @@ int PackageMan::CookPlat(
 			return SR_ErrorGeneric;
 		}
 
-		Asset::Ref asset = Resolve((*it).c_str(), Z_Cooker);
+		Asset::Ref asset = Resolve((*it).c_str, Z_Cooker);
 		if (!asset)
 		{
 			out << "ERROR: resolving " << *it << "!" << std::endl;
@@ -358,7 +358,7 @@ int PackageMan::CookPlat(
 				const Cooker::Import &imp = *it2;
 				if (imp.pflags&pflags || (pflags==imp.pflags))
 				{
-					Asset::Ref asset = Resolve(imp.path.c_str(), Z_Cooker);
+					Asset::Ref asset = Resolve(imp.path.c_str, Z_Cooker);
 					if (!asset)
 					{
 						out << "ERROR: resolving import " << imp.path << " referenced from " << cooker->m_assetPath << "!" << std::endl;
@@ -444,13 +444,13 @@ int PackageMan::BuildPak0(int compression)
 {
 	*m_cookState->cout << "------ Packaging Generics ------" << std::endl;
 
-	wchar_t nativePath[file::MaxFilePathLen+1];
-	file::ExpandToNativePath(L"9:/Cooked/Packages/Base/pak0.pak", nativePath, file::MaxFilePathLen+1);
-	FILE *fp = file::wfopen(nativePath, L"wb");
+	char nativePath[file::MaxFilePathLen+1];
+	file::ExpandToNativePath("9:/Cooked/Packages/Base/pak0.pak", nativePath, file::MaxFilePathLen+1);
+	FILE *fp = fopen(nativePath, "wb");
 
 	if (!fp)
 	{
-		*m_cookState->cout << "ERROR opening '" << string::Shorten(nativePath) << "'" << std::endl;
+		*m_cookState->cout << "ERROR opening '" << nativePath << "'" << std::endl;
 		return SR_IOError;
 	}
 
@@ -475,10 +475,10 @@ int PackageMan::BuildPak0(int compression)
 	}
 
 	{
-		String path("9:/");
-		path += string::Shorten(m_engine.sys->files->hddRoot);
+		String path(CStr("9:/"));
+		path += m_engine.sys->files->hddRoot;
 		path += "/Scripts";
-		r = PakDirectory(path.c_str(), "Scripts/", compression, lumpWriter);
+		r = PakDirectory(path.c_str, "Scripts/", compression, lumpWriter);
 		if (r != SR_Success)
 		{
 			fclose(fp);
@@ -502,7 +502,7 @@ int PackageMan::BuildPak0(int compression)
 
 	if (numLumps < 1)
 	{
-		*m_cookState->cout << "DELETING empty pak file '" << string::Shorten(nativePath) << "'" << std::endl;
+		*m_cookState->cout << "DELETING empty pak file '" << nativePath << "'" << std::endl;
 		file::DeleteFile(nativePath, file::NativePath);
 	}
 
@@ -511,39 +511,39 @@ int PackageMan::BuildPak0(int compression)
 
 int PackageMan::BuildTargetPak(int plat, int compression)
 {
-	WString path(L"9:/Cooked/Packages/Base/");
+	String path("9:/Cooked/Packages/Base/");
 	
 	switch (plat)
 	{
 	case P_TargetPC:
 		*m_cookState->cout << "------ Packaging PC ------" << std::endl;
-		path += L"pc.pak";
+		path += "pc.pak";
 		break;
 	case P_TargetIPhone:
 		*m_cookState->cout << "------ Packaging IPhone ------" << std::endl;
-		path += L"iphone.pak";
+		path += "iphone.pak";
 		break;
 	case P_TargetIPad:
 		*m_cookState->cout << "------ Packaging IPad ------" << std::endl;
-		path += L"ipad.pak";
+		path += "ipad.pak";
 		break;
 	case P_TargetXBox360:
 		*m_cookState->cout << "------ Packaging XBox360 ------" << std::endl;
-		path += L"xbox360.pak";
+		path += "xbox360.pak";
 		break;
 	case P_TargetPS3:
 		*m_cookState->cout << "------ Packaging PS3 ------" << std::endl;
-		path += L"ps3.pak";
+		path += "ps3.pak";
 		break;
 	}
 
-	wchar_t nativePath[file::MaxFilePathLen+1];
-	file::ExpandToNativePath(path.c_str(), nativePath, file::MaxFilePathLen+1);
-	FILE *fp = file::wfopen(nativePath, L"wb");
+	char nativePath[file::MaxFilePathLen+1];
+	file::ExpandToNativePath(path.c_str, nativePath, file::MaxFilePathLen+1);
+	FILE *fp = fopen(nativePath, "wb");
 
 	if (!fp)
 	{
-		*m_cookState->cout << "ERROR opening '" << string::Shorten(nativePath) << "'" << std::endl;
+		*m_cookState->cout << "ERROR opening '" << nativePath << "'" << std::endl;
 		return SR_IOError;
 	}
 
@@ -606,34 +606,35 @@ int PackageMan::PakDirectory(
 
 	file::Search s;
 	file::SearchFlags flags = (file::SearchFlags)(file::FileNames|file::Recursive);
-	WString wpath(string::Widen(path));
-
-	if (!s.Open(wpath.c_str(), L".*", flags))
+	
+	if (!s.Open(path, ".*", flags))
 		return SR_Success;
 
-	wchar_t filename[file::MaxFilePathLen+1];
+	char filename[file::MaxFilePathLen+1];
 	while (s.NextFile(filename, file::MaxFilePathLen+1))
 	{
-		if (string::strstr(filename, L".svn/") || string::strstr(filename, L".cvs/"))
+		const String kFilename(CStr(filename));
+
+		if (string::strstr(filename, ".svn/") || string::strstr(filename, ".cvs/"))
 			continue;
 		
-		WString fpath(wpath);
-		if (fpath[fpath.length()-1] != L'\\' && fpath[fpath.length()-1] != '/')
-			fpath += L'/';
-		fpath += filename;
+		String fpath(CStr(path));
+		if (fpath[fpath.length-1] != '\\' && fpath[fpath.length-1] != '/')
+			fpath += '/';
+		fpath += kFilename;
 
 		String lumpName(prefix);
-		lumpName += string::Shorten(filename);
+		lumpName += kFilename;
 
 		*m_cookState->cout << lumpName << "... " << std::flush;
 
-		wchar_t nativePath[file::MaxFilePathLen+1];
-		file::ExpandToNativePath(fpath.c_str(), nativePath, file::MaxFilePathLen+1);
+		char nativePath[file::MaxFilePathLen+1];
+		file::ExpandToNativePath(fpath.c_str, nativePath, file::MaxFilePathLen+1);
 
-		FILE *fp = file::wfopen(nativePath, L"rb");
+		FILE *fp = fopen(nativePath, "rb");
 		if (!fp)
 		{
-			*m_cookState->cout << std::endl << "ERROR failed to load '" << string::Shorten(nativePath) << "'!" << std::endl;
+			*m_cookState->cout << std::endl << "ERROR failed to load '" << nativePath << "'!" << std::endl;
 			return SR_IOError;
 		}
 
@@ -653,7 +654,7 @@ int PackageMan::PakDirectory(
 		{
 			zone_free(data);
 			fclose(fp);
-			*m_cookState->cout << std::endl << "ERROR failed to read " << size << " byte(s) from '" << string::Shorten(nativePath) << "'!" << std::endl;
+			*m_cookState->cout << std::endl << "ERROR failed to read " << size << " byte(s) from '" << nativePath << "'!" << std::endl;
 			return SR_IOError;
 		}
 
@@ -678,7 +679,7 @@ int PackageMan::PakDirectory(
 			{
 				// compression is good
 				data_codec::lmp::Writer::Lump *l = 
-					lumpWriter.WriteLump(lumpName.c_str(), zipData, zipSize, 8);
+					lumpWriter.WriteLump(lumpName.c_str, zipData, zipSize, 8);
 				data_codec::lmp::LOfs *uncSize = (data_codec::lmp::LOfs*)l->AllocateTagData(sizeof(data_codec::lmp::LOfs));
 				*uncSize = (data_codec::lmp::LOfs)size;
 
@@ -695,7 +696,7 @@ int PackageMan::PakDirectory(
 
 		if (!compressed)
 		{
-			lumpWriter.WriteLump(lumpName.c_str(), data, size, 8);
+			lumpWriter.WriteLump(lumpName.c_str, data, size, 8);
 			*m_cookState->cout << "(0%)" << std::endl;
 		}
 
@@ -707,10 +708,10 @@ int PackageMan::PakDirectory(
 
 bool PackageMan::LoadTagFile(const Cooker::Ref &cooker, int pflags, void *&data, AddrSize &size)
 {
-	WString path = cooker->TagPath(pflags);
-	wchar_t nativePath[file::MaxFilePathLen+1];
-	file::ExpandToNativePath(path.c_str(), nativePath, file::MaxFilePathLen+1);
-	FILE *fp = file::wfopen(nativePath, L"rb");
+	String path = cooker->TagPath(pflags);
+	char nativePath[file::MaxFilePathLen+1];
+	file::ExpandToNativePath(path.c_str, nativePath, file::MaxFilePathLen+1);
+	FILE *fp = fopen(nativePath, "rb");
 	if (!fp)
 		return false;
 
@@ -835,17 +836,17 @@ int PackageMan::BuildPackageData()
 		CookPackage &pkg = it->second;
 		data_codec::lmp::Writer lmpWriter;
 
-		WString path(L"9:/Cooked/Out/Packages/");
-		path += string::Widen(pkg.pkg->name);
-		path += L".lump";
+		String path(CStr("9:/Cooked/Out/Packages/"));
+		path += pkg.pkg->name;
+		path += ".lump";
 
-		wchar_t nativePath[file::MaxFilePathLen+1];
-		file::ExpandToNativePath(path.c_str(), nativePath, file::MaxFilePathLen+1);
+		char nativePath[file::MaxFilePathLen+1];
+		file::ExpandToNativePath(path.c_str, nativePath, file::MaxFilePathLen+1);
 
-		FILE *fp = file::wfopen(nativePath, L"wb");
+		FILE *fp = fopen(nativePath, "wb");
 		if (!fp)
 		{
-			*m_cookState->cout << "ERROR failed to open '" << string::Shorten(path.c_str()) << "!" << std::endl;
+			*m_cookState->cout << "ERROR failed to open '" << path << "!" << std::endl;
 			return SR_ErrorGeneric;
 		}
 
@@ -874,10 +875,10 @@ int PackageMan::BuildPackageData()
 			}
 
 			// write zero length lump
-			data_codec::lmp::Writer::Lump *l = lmpWriter.WriteLump(cooker->m_assetName.c_str(), 0, 0, 4);
+			data_codec::lmp::Writer::Lump *l = lmpWriter.WriteLump(cooker->m_assetName.c_str, 0, 0, 4);
 			if (!l)
 			{
-				*m_cookState->cout << "ERROR writing lump '" << cooker->m_assetName << "' to '" << string::Shorten(path.c_str()) << "!" << std::endl;
+				*m_cookState->cout << "ERROR writing lump '" << cooker->m_assetName << "' to '" << path << "!" << std::endl;
 				fclose(fp);
 				return SR_ErrorGeneric;
 			}
@@ -889,13 +890,13 @@ int PackageMan::BuildPackageData()
 				data->numImports = (U16)cooker->m_imports.size();
 				for (Cooker::ImportVec::const_iterator impIt = cooker->m_imports.begin(); impIt != cooker->m_imports.end(); ++impIt, ++importNum)
 				{
-					data->imports[importNum] = (U16)pkg.AddImport((*impIt).path.c_str());
+					data->imports[importNum] = (U16)pkg.AddImport((*impIt).path.c_str);
 				}
 
 				void *tag = l->AllocateTagData((data_codec::lmp::LOfs)size);
 				if (!tag)
 				{
-					*m_cookState->cout << "ERROR allocating " << size << " byte lump for '" << cooker->m_assetPath << "' in file '" << string::Shorten(path.c_str()) << "!" << std::endl;
+					*m_cookState->cout << "ERROR allocating " << size << " byte lump for '" << cooker->m_assetPath << "' in file '" << path << "!" << std::endl;
 					fclose(fp);
 					return SR_ErrorGeneric;
 				}
@@ -909,14 +910,14 @@ int PackageMan::BuildPackageData()
 			AddrSize importTagSize = sizeof(U16);
 			for (StringVec::const_iterator it = pkg.imports.begin(); it != pkg.imports.end(); ++it)
 			{
-				importTagSize += (*it).length() + 1 + sizeof(U16);
+				importTagSize += (*it).length + 1 + sizeof(U16);
 			}
 
 			data_codec::lmp::Writer::Lump *l = lmpWriter.WriteLump("@imports", 0, 0, 4);
 
 			if (!l)
 			{
-				*m_cookState->cout << "ERROR writing lump '@imports' to '" << string::Shorten(path.c_str()) << "!" << std::endl;
+				*m_cookState->cout << "ERROR writing lump '@imports' to '" << path << "!" << std::endl;
 				fclose(fp);
 				return SR_ErrorGeneric;
 			}
@@ -924,7 +925,7 @@ int PackageMan::BuildPackageData()
 			U8 *tag = (U8*)l->AllocateTagData((data_codec::lmp::LOfs)importTagSize);
 			if (!tag)
 			{
-				*m_cookState->cout << "ERROR allocating " << importTagSize << " byte lump for '@imports' in file '" << string::Shorten(path.c_str()) << "!" << std::endl;
+				*m_cookState->cout << "ERROR allocating " << importTagSize << " byte lump for '@imports' in file '" << path << "!" << std::endl;
 				fclose(fp);
 				return SR_ErrorGeneric;
 			}
@@ -934,10 +935,10 @@ int PackageMan::BuildPackageData()
 
 			for (StringVec::const_iterator it = pkg.imports.begin(); it != pkg.imports.end(); ++it)
 			{
-				*reinterpret_cast<U16*>(tag) = (U16)(*it).length()+1;
+				*reinterpret_cast<U16*>(tag) = (U16)(*it).length+1;
 				tag += sizeof(U16);
-				memcpy(tag, (*it).c_str(), (*it).length()+1);
-				tag += (*it).length()+1;
+				memcpy(tag, (*it).c_str, (*it).length+1);
+				tag += (*it).length+1;
 			}
 		}
 
@@ -1000,32 +1001,34 @@ Cooker::Ref PackageMan::CookerForAsset(const Asset::Ref &asset)
 
 bool PackageMan::MakeIntermediateDirs()
 {
-	file::CreateDirectory(L"9:/Temp/Out/Generic", 0);
-	MakePackageDirs(L"9:/Temp/Out/Generic/");
+	file::CreateDirectory("9:/Temp/Out/Generic", 0);
+	MakePackageDirs("9:/Temp/Out/Generic/");
 
-	file::CreateDirectory(L"9:/Temp/Out/IOS/IPhone", 0);
-	MakePackageDirs(L"9:/Temp/Out/IOS/IPhone/");
-	file::CreateDirectory(L"9:/Temp/Out/IOS/IPad", 0);
-	MakePackageDirs(L"9:/Temp/Out/IOS/IPad/");
-	file::CreateDirectory(L"9:/Temp/Out/PC", 0);
-	MakePackageDirs(L"9:/Temp/Out/PC/");
+	file::CreateDirectory("9:/Temp/Out/IOS/IPhone", 0);
+	MakePackageDirs("9:/Temp/Out/IOS/IPhone/");
+	file::CreateDirectory("9:/Temp/Out/IOS/IPad", 0);
+	MakePackageDirs("9:/Temp/Out/IOS/IPad/");
+	file::CreateDirectory("9:/Temp/Out/PC", 0);
+	MakePackageDirs("9:/Temp/Out/PC/");
 
-	file::CreateDirectory(L"9:/Temp/Out/Shaders", 0);
-	file::CreateDirectory(L"9:/Temp/Out/Tags", 0);
-	file::CreateDirectory(L"9:/Temp/Out/Globals", 0);
-	MakePackageDirs(L"9:/Temp/Out/Tags/");
-	MakePackageDirs(L"9:/Temp/Out/Globals/");
+	file::CreateDirectory("9:/Temp/Out/Shaders", 0);
+	file::CreateDirectory("9:/Temp/Out/Tags", 0);
+	file::CreateDirectory("9:/Temp/Out/Globals", 0);
+	MakePackageDirs("9:/Temp/Out/Tags/");
+	MakePackageDirs("9:/Temp/Out/Globals/");
 
 	return true;
 }
 
-bool PackageMan::MakePackageDirs(const wchar_t *prefix)
+bool PackageMan::MakePackageDirs(const char *prefix)
 {
+	const String kPrefix(CStr(prefix));
+
 	for(Package::Map::const_iterator it = m_packages.begin(); it != m_packages.end(); ++it)
 	{
-		WString path(prefix);
-		path += string::Widen(it->second->name);
-		if (!file::CreateDirectory(path.c_str(), 0))
+		String path(kPrefix);
+		path += it->second->name;
+		if (!file::CreateDirectory(path.c_str, 0))
 			return false;
 	}
 
@@ -1072,22 +1075,22 @@ int Cooker::Cook(int flags, int allflags)
 
 void Cooker::LoadGlobals()
 {
-	WString spath;
+	String spath;
 	if (m_cooking)
-		spath = L"9:/Cooked/Out/Globals/";
+		spath = CStr("9:/Cooked/Out/Globals/");
 	else
-		spath = L"9:/Temp/Out/Globals/";
+		spath = CStr("9:/Temp/Out/Globals/");
 
-	spath += string::Widen(m_assetPath.c_str());
+	spath += m_assetPath;
 
-	wchar_t path[file::MaxFilePathLen+1];
-	if (!file::ExpandToNativePath(spath.c_str(), path, file::MaxFilePathLen+1))
+	char path[file::MaxFilePathLen+1];
+	if (!file::ExpandToNativePath(spath.c_str, path, file::MaxFilePathLen+1))
 	{
 		m_globals = Persistence::Load(0);
 		return;
 	}
 
-	FILE *fp = file::wfopen(path, L"rb");
+	FILE *fp = fopen(path, "rb");
 	if (fp)
 	{
 		file::stream::InputBuffer ib(fp);
@@ -1103,19 +1106,19 @@ void Cooker::LoadGlobals()
 
 void Cooker::SaveGlobals()
 {
-	WString spath;
+	String spath;
 	if (m_cooking)
-		spath = L"9:/Cooked/Out/Globals/";
+		spath = CStr("9:/Cooked/Out/Globals/");
 	else
-		spath = L"9:/Temp/Out/Globals/";
+		spath = CStr("9:/Temp/Out/Globals/");
 
-	spath += string::Widen(m_assetPath.c_str());
+	spath += m_assetPath;
 
-	wchar_t path[file::MaxFilePathLen+1];
-	if (!file::ExpandToNativePath(spath.c_str(), path, file::MaxFilePathLen+1))
+	char path[file::MaxFilePathLen+1];
+	if (!file::ExpandToNativePath(spath.c_str, path, file::MaxFilePathLen+1))
 		return;
 
-	FILE *fp = file::wfopen(path, L"wb");
+	FILE *fp = fopen(path, "wb");
 	if (fp)
 	{
 		file::stream::OutputBuffer ob(fp);
@@ -1132,17 +1135,17 @@ void Cooker::LoadImports()
 
 	m_imports.clear();
 
-	WString spath(L"9:/Cooked/Out/Globals/");
-	spath += string::Widen(m_assetPath.c_str());
-	spath += L".imports";
+	String spath(CStr("9:/Cooked/Out/Globals/"));
+	spath += m_assetPath;
+	spath += ".imports";
 
-	wchar_t path[file::MaxFilePathLen+1];
-	if (!file::ExpandToNativePath(spath.c_str(), path, file::MaxFilePathLen+1))
+	char path[file::MaxFilePathLen+1];
+	if (!file::ExpandToNativePath(spath.c_str, path, file::MaxFilePathLen+1))
 	{
 		return;
 	}
 
-	FILE *fp = file::wfopen(path, L"rb");
+	FILE *fp = fopen(path, "rb");
 	if (fp)
 	{
 		file::stream::InputBuffer ib(fp);
@@ -1187,15 +1190,15 @@ void Cooker::SaveImports()
 	if (!m_cooking)
 		return;
 
-	WString spath(L"9:/Cooked/Out/Globals/");
-	spath += string::Widen(m_assetPath.c_str());
-	spath += L".imports";
+	String spath(CStr("9:/Cooked/Out/Globals/"));
+	spath += m_assetPath;
+	spath += CStr(".imports");
 
-	wchar_t path[file::MaxFilePathLen+1];
-	if (!file::ExpandToNativePath(spath.c_str(), path, file::MaxFilePathLen+1))
+	char path[file::MaxFilePathLen+1];
+	if (!file::ExpandToNativePath(spath.c_str, path, file::MaxFilePathLen+1))
 		return;
 
-	FILE *fp = file::wfopen(path, L"wb");
+	FILE *fp = fopen(path, "wb");
 	if (fp)
 	{
 		file::stream::OutputBuffer ob(fp);
@@ -1211,9 +1214,9 @@ void Cooker::SaveImports()
 			const Import &i = *it;
 			if (!os.Write(i.pflags))
 				return;
-			if (!os.Write((U32)i.path.length()))
+			if (!os.Write((U32)i.path.length.get()))
 				return;
-			if (os.Write(i.path.c_str(), (stream::SPos)i.path.length(), 0) != (stream::SPos)i.path.length())
+			if (os.Write(i.path.c_str, (stream::SPos)i.path.length.get(), 0) != (stream::SPos)i.path.length.get())
 				return;
 		}
 
@@ -1227,76 +1230,76 @@ void Cooker::SaveState()
 	SaveImports();
 }
 
-WString Cooker::FilePath(const wchar_t *path, int pflags)
+String Cooker::FilePath(const char *path, int pflags)
 {
 	RAD_ASSERT(path);
-	WString spath(path);
-	WString sbase;
+	String spath(CStr(path));
+	String sbase;
 
 	if (pflags&P_TargetIPhone)
 	{
 		if (m_cooking)
-			sbase = L"9:/Cooked/Out/IOS/IPhone/";
+			sbase = CStr("9:/Cooked/Out/IOS/IPhone/");
 		else
-			sbase = L"9:/Temp/Out/IOS/IPhone/";
+			sbase = CStr("9:/Temp/Out/IOS/IPhone/");
 	}
 	else if (pflags&P_TargetIPad)
 	{
 		if (m_cooking)
-			sbase = L"9:/Cooked/Out/IOS/IPad/";
+			sbase = CStr("9:/Cooked/Out/IOS/IPad/");
 		else
-			sbase = L"9:/Temp/Out/IOS/IPad/";
+			sbase = CStr("9:/Temp/Out/IOS/IPad/");
 	}
 	else if (pflags&P_TargetPC)
 	{
 		if (m_cooking)
-			sbase = L"9:/Cooked/Out/PC/";
+			sbase = CStr("9:/Cooked/Out/PC/");
 		else
-			sbase = L"9:/Temp/Out/PC/";
+			sbase = CStr("9:/Temp/Out/PC/");
 	}
 	else
 	{
 		if (m_cooking)
-			sbase = L"9:/Cooked/Out/Generic/";
+			sbase = CStr("9:/Cooked/Out/Generic/");
 		else
-			sbase = L"9:/Temp/Out/Generic/";
+			sbase = CStr("9:/Temp/Out/Generic/");
 	}
 
 	return sbase + spath;
 }
 
-bool Cooker::FileTime(const wchar_t *path, int pflags, xtime::TimeDate &time)
+bool Cooker::FileTime(const char *path, int pflags, xtime::TimeDate &time)
 {
-	WString s = FilePath(path, pflags);
-	return file::FileTime(s.c_str(), &time, 0);
+	String s = FilePath(path, pflags);
+	return file::FileTime(s.c_str, &time, 0);
 }
 
-BinFile::Ref Cooker::OpenWrite(const wchar_t *path, int pflags)
+BinFile::Ref Cooker::OpenWrite(const char *path, int pflags)
 {
-	WString spath = FilePath(path, pflags);
-	wchar_t wpath[file::MaxFilePathLen+1];
-	if (!file::ExpandToNativePath(spath.c_str(), wpath, file::MaxFilePathLen+1))
+	String spath = FilePath(path, pflags);
+	char wpath[file::MaxFilePathLen+1];
+	if (!file::ExpandToNativePath(spath.c_str, wpath, file::MaxFilePathLen+1))
 		return BinFile::Ref();
-	FILE *fp = file::wfopen(wpath, L"wb");
+	FILE *fp = fopen(wpath, "wb");
 	if (!fp)
 		return BinFile::Ref();
 	return BinFile::Ref(new (ZPackages) BinFile(fp));
 }
 
-BinFile::Ref Cooker::OpenRead(const wchar_t *path, int pflags)
+BinFile::Ref Cooker::OpenRead(const char *path, int pflags)
 {
-	WString spath = FilePath(path, pflags);
-	wchar_t wpath[file::MaxFilePathLen+1];
-	if (!file::ExpandToNativePath(spath.c_str(), wpath, file::MaxFilePathLen+1))
+	String spath = FilePath(path, pflags);
+	char wpath[file::MaxFilePathLen+1];
+	if (!file::ExpandToNativePath(spath.c_str, wpath, file::MaxFilePathLen+1))
 		return BinFile::Ref();
-	FILE *fp = file::wfopen(wpath, L"rb");
+	FILE *fp = fopen(wpath, "rb");
 	if (!fp)
 		return BinFile::Ref();
 	return BinFile::Ref(new (ZPackages) BinFile(fp));
 }
 
 int Cooker::LoadFile(
-	const wchar_t *path, 
+	const char *path, 
 	int pflags,
 	int &media,
 	file::HBufferedAsyncIO &buf,
@@ -1305,9 +1308,9 @@ int Cooker::LoadFile(
 	::Zone &zone
 )
 {
-	WString spath = FilePath(path, pflags);
+	String spath = FilePath(path, pflags);
 	return engine->sys->files->LoadFile(
-		spath.c_str(),
+		spath.c_str,
 		media,
 		buf,
 		notify,
@@ -1317,42 +1320,42 @@ int Cooker::LoadFile(
 	);
 }
 
-WString Cooker::TagPath(int pflags)
+String Cooker::TagPath(int pflags)
 {
-	WString spath;
+	String spath;
 	if (m_cooking)
-		spath = L"9:/Cooked/Out/Tags/";
+		spath = CStr("9:/Cooked/Out/Tags/");
 	else
-		spath = L"9:/Temp/Out/Tags/";
+		spath = CStr("9:/Temp/Out/Tags/");
 
-	spath += string::Widen(m_assetPath.c_str());
+	spath += m_assetPath;
 
 	if (pflags)
 	{
 		if (pflags&P_TargetPC)
-			spath += L".pc";
+			spath += CStr(".pc");
 		else if (pflags&P_TargetIPhone)
-			spath += L".iphone";
+			spath += CStr(".iphone");
 		else if (pflags&P_TargetIPad)
-			spath += L".ipad";
+			spath += CStr(".ipad");
 		else if (pflags&P_TargetXBox360)
-			spath += L".xbox360";
+			spath += CStr(".xbox360");
 		else if (pflags&P_TargetPS3)
-			spath += L".ps3";
+			spath += CStr(".ps3");
 	}
 
-	spath += L".tag";
+	spath += CStr(".tag");
 	return spath;
 }
 
 BinFile::Ref Cooker::OpenTagWrite(int pflags)
 {
-	WString spath = TagPath(pflags);
+	String spath = TagPath(pflags);
 
-	wchar_t path[file::MaxFilePathLen+1];
-	if (!file::ExpandToNativePath(spath.c_str(), path, file::MaxFilePathLen+1))
+	char path[file::MaxFilePathLen+1];
+	if (!file::ExpandToNativePath(spath.c_str, path, file::MaxFilePathLen+1))
 		return BinFile::Ref();
-	FILE *fp = file::wfopen(path, L"wb");
+	FILE *fp = fopen(path, "wb");
 	if (!fp)
 		return BinFile::Ref();
 	return BinFile::Ref(new (ZPackages) BinFile(fp));
@@ -1360,12 +1363,12 @@ BinFile::Ref Cooker::OpenTagWrite(int pflags)
 
 BinFile::Ref Cooker::OpenTagRead(int pflags)
 {
-	WString spath = TagPath(pflags);
+	String spath = TagPath(pflags);
 
-	wchar_t path[file::MaxFilePathLen+1];
-	if (!file::ExpandToNativePath(spath.c_str(), path, file::MaxFilePathLen+1))
+	char path[file::MaxFilePathLen+1];
+	if (!file::ExpandToNativePath(spath.c_str, path, file::MaxFilePathLen+1))
 		return BinFile::Ref();
-	FILE *fp = file::wfopen(path, L"rb");
+	FILE *fp = fopen(path, "rb");
 	if (!fp)
 		return BinFile::Ref();
 	return BinFile::Ref(new (ZPackages) BinFile(fp));
@@ -1378,9 +1381,9 @@ int Cooker::LoadTag(
 	const file::HIONotify &notify
 )
 {
-	WString spath = TagPath(pflags);
+	String spath = TagPath(pflags);
 	return engine->sys->files->LoadFile(
-		spath.c_str(),
+		spath.c_str,
 		media,
 		buf,
 		notify,
@@ -1392,8 +1395,8 @@ int Cooker::LoadTag(
 
 bool Cooker::HasTag(int pflags)
 {
-	WString spath = TagPath(pflags);
-	return file::FileExists(spath.c_str(), 0);
+	String spath = TagPath(pflags);
+	return file::FileExists(spath.c_str, 0);
 }
 
 bool Cooker::NeedsRebuild(const AssetRef &asset)
@@ -1412,7 +1415,7 @@ int Cooker::AddImport(const char *path, int pflags)
 	RAD_ASSERT(path);
 	for (ImportVec::iterator it = m_imports.begin(); it != m_imports.end(); ++it)
 	{
-		if (!string::cmp((*it).path.c_str(), path))
+		if (!string::cmp((*it).path.c_str.get(), path))
 		{
 			(*it).pflags |= pflags;
 			return (int)(it-m_imports.begin());
@@ -1472,7 +1475,7 @@ int Cooker::CompareVersion(int target, bool updateIfNewer)
 		return -1; // we have no version on disk, so the source data has to be newer
 	}
 
-	int v = string::atoi(it->second.c_str());
+	int v = string::atoi(it->second.c_str.get());
 
 	// this logic may appear backwards but what we are saying here is that
 	// if the cached version is less than our current version then the source
@@ -1505,7 +1508,7 @@ int Cooker::CompareModifiedTime(int target, bool updateIfNewer)
 		return -1; // always older
 	}
 
-	TimeDate td = TimeDate::FromString(it->second.c_str());
+	TimeDate td = TimeDate::FromString(it->second.c_str);
 	int r = td.Compare(*asset->entry->modifiedTime.get());
 	if (r < 0 && updateIfNewer)
 	{
@@ -1542,12 +1545,12 @@ int Cooker::CompareCachedFileTime(int target, const char *key, const char *path,
 
 	TimeDate fileTime;
 
-	WString wpath(L"9:/");
-	wpath += engine->sys->files->hddRoot.get();
-	wpath += L"/";
-	wpath += string::Widen(path);
+	spath = CStr("9:/");
+	spath += engine->sys->files->hddRoot.get();
+	spath += "/";
+	spath += path;
 
-	if (!file::FileTime(wpath.c_str(), &fileTime, 0))
+	if (!file::FileTime(spath.c_str, &fileTime, 0))
 		return -1; // always older
 
 	int c = m ? selfTime.Compare(fileTime) : -1;
@@ -1571,21 +1574,20 @@ int Cooker::CompareCachedFileTimeKey(int target, const char *key, const char *lo
 	}
 
 	if (!localized)
-		return CompareCachedFileTime(target, key, s->c_str(), updateIfNewer);
+		return CompareCachedFileTime(target, key, s->c_str, updateIfNewer);
 
 	String sKey(key);
 	String sPath(*s);
-	WString wsBasePath(sPath);
-
+	
 	// create localized file path.
-	wchar_t ext[file::MaxFilePathLen+1];
-	wchar_t path[file::MaxFilePathLen+1];
+	char ext[file::MaxFilePathLen+1];
+	char path[file::MaxFilePathLen+1];
 
-	file::FileExt(wsBasePath.c_str(), ext, file::MaxFilePathLen+1);
-	file::SetFileExt(wsBasePath.c_str(), 0, path, file::MaxFilePathLen+1);
+	file::FileExt(sPath.c_str, ext, file::MaxFilePathLen+1);
+	file::SetFileExt(sPath.c_str, 0, path, file::MaxFilePathLen+1);
 
-	String sExt(string::Shorten(ext));
-	String sBasePath(string::Shorten(path));
+	String sExt(CStr(ext));
+	String sBasePath(CStr(path));
 
 	int r = 0;
 
@@ -1609,7 +1611,7 @@ int Cooker::CompareCachedFileTimeKey(int target, const char *key, const char *lo
 		}
 
 		// don't early out here just record the newest value. we need to cache all file times for all versions.
-		int z = CompareCachedFileTime(target, k.c_str(), x.c_str(), updateIfNewer);
+		int z = CompareCachedFileTime(target, k.c_str, x.c_str, updateIfNewer);
 		r = ((r<z)&&(r!=0)) ? r : z;
 	}
 
@@ -1655,7 +1657,7 @@ int Cooker::CompareCachedLocalizeKey(int target, const char *key) {
 		return 0; // not localized ignore it.
 
 	String localizedString = LocalizedString(languages);
-	String skey(TargetPath(target)+"__cookerLocalizedVersion");
+	String skey(TargetPath(target)+CStr("__cookerLocalizedVersion"));
 	world::Keys::Pairs::const_iterator it = globals->pairs.find(skey);
 
 	if (it != globals->pairs.end()) {
@@ -1683,7 +1685,7 @@ bool Cooker::TimeForKey(int target, const char *key, xtime::TimeDate &td) const
 	world::Keys::Pairs::const_iterator it = globals->pairs.find(skey);
 	if (it == globals->pairs.end())
 		return false;
-	td = TimeDate::FromString(it->second.c_str());
+	td = TimeDate::FromString(it->second.c_str);
 	return true;
 }
 
@@ -1691,8 +1693,8 @@ String Cooker::TargetPath(int target)
 {
 	const char *sz = pkg::PlatformNameForFlags(target);
 	if (!sz)
-		return String("Generic/");
-	return String(sz)+"/";
+		return CStr("Generic/");
+	return CStr(sz)+"/";
 }
 
 String Cooker::LocalizedString(int languages) {
@@ -1706,7 +1708,7 @@ String Cooker::LocalizedString(int languages) {
 			sep = false;
 			s += ";";
 		}
-		s += String(StringTable::Langs[i]).upper();
+		s += CStr(StringTable::Langs[i]).Upper();
 		sep = true;
 	}
 

@@ -8,12 +8,30 @@
 #include "IntStringBase.h"
 #include <string.h>
 #include <cstdarg>
+#include <wchar.h>
 #include "../PushPack.h"
-
 
 namespace string {
 
-enum { Error = -1 };
+int utf8to16len(const char *src, int len);
+int utf8to32len(const char *src, int len);
+int utf8to16(U16 *dst, const char *src, int len);
+int utf8to32(U32 *dst, const char *src, int len);
+
+int utf16to8len(const U16 *src, int len);
+int utf16to32len(const U16 *src, int len);
+int utf16to8(char *dst, const U16 *src, int len);
+int utf16to32(U32 *dst, const U16 *src, int len);
+
+int utf32to8len(const U32 *src, int len);
+int utf32to16len(const U32 *src, int len);
+int utf32to8(char *dst, const U32 *src, int len);
+int utf32to16(U16 *dst, const U32 *src, int len);
+
+int wcstombslen(const wchar_t *src, int len);
+int mbstowcslen(const char *src, int len);
+int wcstombs(char *dst, const wchar_t *src, int len);
+int mbstowcs(wchar_t *dst, const char *src, int len);
 
 template<typename T>
 bool isspace(T c);
@@ -34,19 +52,19 @@ template<typename T>
 int icmp(const T* str0, const T* str1);
 
 template<typename T>
-int ncmp(const T* str0, const T* str1, size_t len);
+int ncmp(const T* str0, const T* str1, int len);
 
 template<typename T>
-int nicmp(const T* str0, const T* str1, size_t len);
+int nicmp(const T* str0, const T* str1, int len);
 
 template<typename T>
 int coll(const T *a, const T *b);
 
 template<typename T>
-size_t spn(const T *a, const T *b);
+int spn(const T *a, const T *b);
 
 template<typename T>
-size_t cspn(const T *a, const T *b);
+int cspn(const T *a, const T *b);
 
 template<typename T>
 const T *strstr(const T *a, const T*b);
@@ -70,7 +88,7 @@ template<typename T>
 T *reverse(T *a);
 
 template<typename T>
-size_t len(const T* str0);
+int len(const T* str0);
 
 template<typename T>
 T *cpy(T* dst, const T* src);
@@ -81,19 +99,21 @@ T *cpy(T* dst, const T* src);
 // "len" is the size of the "dst" buffer.
 
 template<typename T>
-T *ncpy(T* dst, const T* src, size_t len);
+T *ncpy(T* dst, const T* src, int len);
 
 template<typename T>
 T *cat(T* dst, const T* src);
 
 template<typename T>
-T *ncat(T* dst, const T* src, size_t len);
+T *ncat(T* dst, const T* src, int len);
+
+// Returns the number of characters written including the NULL terminator.
 
 template<typename T> 
 int vsprintf(T *dst, const T *format, va_list argptr);
 
 template<typename T> 
-int vsnprintf(T *dst, size_t count, const T *format, va_list argptr);
+int vsnprintf(T *dst, int count, const T *format, va_list argptr);
 
 template<typename T> 
 int vscprintf(const T *format, va_list argptr);
@@ -108,7 +128,7 @@ int sprintf(T* dst, const T* fmt, ...);
 // "count" is the size of the "dst" buffer.
 
 template<typename T>
-int snprintf(T* dst, size_t count, const T* fmt, ...);
+int snprintf(T* dst, int count, const T* fmt, ...);
 
 template<typename T>
 int scprintf(const T* fmt, ...);

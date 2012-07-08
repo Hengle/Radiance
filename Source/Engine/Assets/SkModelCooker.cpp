@@ -63,12 +63,12 @@ int SkModelCooker::Compile(int flags, int allflags)
 	CompareCachedFileTimeKey(flags, "Mesh.Source.File");
 
 	const String *s = asset->entry->KeyValue<String>("AnimSet.Source", flags);
-	if (!s || s->empty())
+	if (!s || s->empty)
 		return SR_MetaError;
 
 	// CompileSkmData needs the ska info, so load it.
 
-	Asset::Ref skaRef = engine->sys->packages->Resolve(s->c_str(), asset->zone);
+	Asset::Ref skaRef = engine->sys->packages->Resolve(s->c_str, asset->zone);
 	if (!skaRef)
 		return SR_MissingFile;
 
@@ -85,26 +85,25 @@ int SkModelCooker::Compile(int flags, int allflags)
 		return SR_ParseError;
 
 	// AnimSet import index
-	AddImport(s->c_str(), flags);
+	AddImport(s->c_str, flags);
 
 	s = asset->entry->KeyValue<String>("AnimStates.Source", flags);
 	if (!s)
 		return SR_MetaError;
 
 	// AnimStates import index
-	AddImport(s->c_str(), flags);
+	AddImport(s->c_str, flags);
 
 	// Load 3DX Mesh file
 	s = asset->entry->KeyValue<String>("Mesh.Source.File", flags);
 	if (!s)
 		return SR_MetaError;
 
-	WString path(*s);
 	int media = file::AllMedia;
 	file::HStreamInputBuffer ib;
 
 	r = engine->sys->files->OpenFileStream(
-		path.c_str(),
+		s->c_str,
 		media,
 		ib,
 		file::HIONotify()
@@ -129,13 +128,13 @@ int SkModelCooker::Compile(int flags, int allflags)
 		*ska->dska.get()
 	);
 
-	path = string::Widen(asset->path);
-	WString path2(path);
-	path2 += L".0.bin";
+	String path(CStr(asset->path));
+	String path2(path);
+	path2 += ".0.bin";
 
 	// File 0 (discardable after load)
 	{
-		BinFile::Ref skmFile = OpenWrite(path2.c_str(), flags);
+		BinFile::Ref skmFile = OpenWrite(path.c_str, flags);
 		if (!skmFile)
 			return SR_IOError;
 
@@ -145,11 +144,11 @@ int SkModelCooker::Compile(int flags, int allflags)
 	}
 
 	path2 = path;
-	path2 += L".1.bin";
+	path2 += ".1.bin";
 
 	// File 1 (persisted)
 	{
-		BinFile::Ref skmFile = OpenWrite(path2.c_str(), flags);
+		BinFile::Ref skmFile = OpenWrite(path2.c_str, flags);
 		if (!skmFile)
 			return SR_IOError;
 

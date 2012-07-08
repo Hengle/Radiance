@@ -15,15 +15,15 @@ namespace details {
 
 #if defined(RAD_OPT_DEBUG)
 
-void AssertAliasOK(const wchar_t* alias);
-void UncheckedSetAlias(UReg aliasNumber, const wchar_t* string);
+void AssertAliasOK(const char* alias);
+void UncheckedSetAlias(UReg aliasNumber, const char* string);
 void AssertCreationType( CreationType ct );
-void AssertFilePath(const wchar_t *string, bool requireAlias);
-void AssertExtension(const wchar_t *ext);
+void AssertFilePath(const char* string, bool requireAlias);
+void AssertExtension(const char* ext);
 
 #endif
 
-bool ExtractAlias(const wchar_t* path, UReg* aliasNumber, UReg* strOfs);
+bool ExtractAlias(const char* path, UReg* aliasNumber, UReg* strOfs);
 
 } // details
 } // file

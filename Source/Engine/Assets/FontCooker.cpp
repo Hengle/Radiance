@@ -46,14 +46,14 @@ int FontCooker::Compile(int flags, int allflags)
 	CompareCachedFileTimeKey(flags, "Source.File");
 
 	const String *s = asset->entry->KeyValue<String>("Source.File", flags);
-	if (!s || s->empty())
+	if (!s || s->empty)
 		return SR_MetaError;
 
 	int media = file::AllMedia;
 	file::HBufferedAsyncIO buf;
 
 	int r = engine->sys->files->LoadFile(
-		string::Widen(s->c_str()).c_str(),
+		s->c_str,
 		media,
 		buf,
 		file::HIONotify()
@@ -66,10 +66,10 @@ int FontCooker::Compile(int flags, int allflags)
 	if (buf->result < SR_Success)
 		return buf->result;
 
-	WString path(string::Widen(asset->path));
-	path += L".bin";
+	String path(CStr(asset->path));
+	path += ".bin";
 
-	BinFile::Ref file = OpenWrite(path.c_str(), flags);
+	BinFile::Ref file = OpenWrite(path.c_str, flags);
 	if (!file)
 		return SR_IOError;
 

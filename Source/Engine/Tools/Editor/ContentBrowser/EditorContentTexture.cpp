@@ -135,11 +135,11 @@ RADENG_API pkg::IdVec RADENG_CALL CreateTextures(QWidget *parent, const pkg::Pac
 	QString nativePrefix;
 	
 	{
-		nativePrefix = QString("9:/") + QString::fromWCharArray(Files()->hddRoot);
-		wchar_t native[file::MaxFilePathLen+1];
-		if (!file::ExpandToNativePath(nativePrefix.toStdWString().c_str(), native, file::MaxFilePathLen+1))
+		nativePrefix = QString("9:/") + Files()->hddRoot.get();
+		char native[file::MaxFilePathLen+1];
+		if (!file::ExpandToNativePath(nativePrefix.toAscii().constData(), native, file::MaxFilePathLen+1))
 			return ids;
-		nativePrefix = QString::fromWCharArray(native);
+		nativePrefix = native;
 		for (int i = 0; i < nativePrefix.length(); ++i)
 		{
 			if (nativePrefix[i] == '\\')
@@ -161,7 +161,7 @@ RADENG_API pkg::IdVec RADENG_CALL CreateTextures(QWidget *parent, const pkg::Pac
 		{
 			const String *s = static_cast<const String*>(it2->second.val);
 			if (s)
-				fd.setNameFilter(s->c_str());
+				fd.setNameFilter(s->c_str.get());
 		}
 	}
 	
