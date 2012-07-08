@@ -206,7 +206,7 @@ bool SDLInit(int argc, char *argv[], App &app)
 {
 	COut(C_Info) << "SDLInit()..." << std::endl;
 
-	r::VidMode vidMode(1024, 768, 32, 60, false);
+	r::VidMode vidMode(1440, 900, 32, 60, true);
 	app.engine->sys->r.Cast<r::IRBackend>()->SetVidMode(vidMode);
 
 	SDL_WM_SetCaption(string::Shorten(app.title).c_str(), string::Shorten(app.title).c_str());
@@ -239,6 +239,8 @@ bool SDLRun(App &app)
 					i.type = InputEvent::T_KeyDown;
 					i.data[0] = e.key.keysym.sym;
 					app.PostInputEvent(i);
+					if (e.key.keysym.sym == SDLK_ESCAPE)
+						__PostQuit();
 					break;
 				case SDL_KEYUP:
 					i.type = InputEvent::T_KeyUp;

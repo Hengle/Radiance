@@ -83,8 +83,6 @@
 		332C4238132ACE7900E10CA2 /* Input.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Input.h; sourceTree = "<group>"; };
 		332C4239132ACE7900E10CA2 /* LogFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LogFile.cpp; sourceTree = "<group>"; };
 		332C423A132ACE7900E10CA2 /* LogFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogFile.h; sourceTree = "<group>"; };
-		332C423C132ACE7900E10CA2 /* LuaMath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LuaMath.cpp; sourceTree = "<group>"; };
-		332C423D132ACE7900E10CA2 /* LuaMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaMath.h; sourceTree = "<group>"; };
 		332C423E132ACE7900E10CA2 /* LuaRuntime.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LuaRuntime.cpp; sourceTree = "<group>"; };
 		332C423F132ACE7900E10CA2 /* LuaRuntime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaRuntime.h; sourceTree = "<group>"; };
 		332C4240132ACE7900E10CA2 /* LuaRuntime.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LuaRuntime.inl; sourceTree = "<group>"; };
@@ -939,6 +937,12 @@
 		08FB7794FE84155DC02AAC07 /* Radiance */ = {
 			isa = PBXGroup;
 			children = (
+				332C41F1132ACE7300E10CA2 /* Common */,
+				332C41F6132ACE7900E10CA2 /* Engine */,
+				332C4360132ACE7F00E10CA2 /* Main */,
+				332C4366132ACE8400E10CA2 /* Runtime */,
+				332C454D132ACE9300E10CA2 /* Tools */,
+				332C458D132ACE9300E10CA2 /* UnitTests */,
 				332C459B132ACEAF00E10CA2 /* backend.py */,
 				332C459C132ACEAF00E10CA2 /* boost.py */,
 				332C459D132ACEAF00E10CA2 /* build_gcc.py */,
@@ -955,12 +959,6 @@
 				335AFB83136F4A3E007C6377 /* object_pool_constructors.py */,
 				332C454A132ACE9300E10CA2 /* sync_dispatch.py */,
 				332C454B132ACE9300E10CA2 /* template_args.py */,
-				332C41F1132ACE7300E10CA2 /* Common */,
-				332C41F6132ACE7900E10CA2 /* Engine */,
-				332C4360132ACE7F00E10CA2 /* Main */,
-				332C4366132ACE8400E10CA2 /* Runtime */,
-				332C454D132ACE9300E10CA2 /* Tools */,
-				332C458D132ACE9300E10CA2 /* UnitTests */,
 			);
 			name = Radiance;
 			sourceTree = "<group>";
@@ -968,7 +966,6 @@
 		332C41F1132ACE7300E10CA2 /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				33A1660415A86F8A00404C47 /* Sound */,
 				332C41F2132ACE7300E10CA2 /* BSPFile.cpp */,
 				332C41F3132ACE7300E10CA2 /* BSPFile.h */,
 				332C41F4132ACE7300E10CA2 /* Tokenizer.cpp */,
@@ -981,9 +978,23 @@
 		332C41F6132ACE7900E10CA2 /* Engine */ = {
 			isa = PBXGroup;
 			children = (
+				332C41F9132ACE7900E10CA2 /* Assets */,
+				332C4221132ACE7900E10CA2 /* FileSystem */,
+				332C422C132ACE7900E10CA2 /* Game */,
+				332C4236132ACE7900E10CA2 /* GCC */,
+				332C423B132ACE7900E10CA2 /* Lua */,
+				332C4245132ACE7900E10CA2 /* Packages */,
+				332C4286132ACE7A00E10CA2 /* SCC */,
+				332C424C132ACE7900E10CA2 /* Renderer */,
+				332C428B132ACE7A00E10CA2 /* SkAnim */,
+				33A1660415A86F8A00404C47 /* Sound */,
+				332C429B132ACE7A00E10CA2 /* Tools */,
+				335A024713767DFF007C6377 /* UI */,
+				332C4320132ACE7A00E10CA2 /* Utils */,
+				332C4323132ACE7A00E10CA2 /* Win */,
+				332C4325132ACE7A00E10CA2 /* World */,
 				332C41F7132ACE7900E10CA2 /* App.cpp */,
 				332C41F8132ACE7900E10CA2 /* App.h */,
-				332C41F9132ACE7900E10CA2 /* Assets */,
 				332C4219132ACE7900E10CA2 /* Camera.cpp */,
 				332C421A132ACE7900E10CA2 /* Camera.h */,
 				332C421B132ACE7900E10CA2 /* ComponentExports.cpp */,
@@ -992,22 +1003,14 @@
 				332C421E132ACE7900E10CA2 /* COut.h */,
 				332C421F132ACE7900E10CA2 /* Engine.cpp */,
 				332C4220132ACE7900E10CA2 /* Engine.h */,
-				332C4221132ACE7900E10CA2 /* FileSystem */,
-				332C422C132ACE7900E10CA2 /* Game */,
-				332C4236132ACE7900E10CA2 /* GCC */,
 				332C4238132ACE7900E10CA2 /* Input.h */,
 				335A024613767DF2007C6377 /* Input.cpp */,
 				332C4239132ACE7900E10CA2 /* LogFile.cpp */,
 				332C423A132ACE7900E10CA2 /* LogFile.h */,
-				332C423B132ACE7900E10CA2 /* Lua */,
 				332C4242132ACE7900E10CA2 /* MathUtils.cpp */,
 				332C4243132ACE7900E10CA2 /* MathUtils.h */,
 				332C4244132ACE7900E10CA2 /* Opts.h */,
-				332C4245132ACE7900E10CA2 /* Packages */,
-				332C424C132ACE7900E10CA2 /* Renderer */,
-				332C4286132ACE7A00E10CA2 /* SCC */,
 				332C428A132ACE7A00E10CA2 /* SConstruct */,
-				332C428B132ACE7A00E10CA2 /* SkAnim */,
 				3310C9AB156B8DC9001AA756 /* StringTable.cpp */,
 				3310C9AC156B8DC9001AA756 /* StringTable.h */,
 				332C4293132ACE7A00E10CA2 /* SyncDispachFunctor.h */,
@@ -1017,12 +1020,7 @@
 				332C4297132ACE7A00E10CA2 /* SyncDispatchMethods.inl */,
 				332C4299132ACE7A00E10CA2 /* Tickable.h */,
 				332C429A132ACE7A00E10CA2 /* Tickable.inl */,
-				332C429B132ACE7A00E10CA2 /* Tools */,
 				332C431F132ACE7A00E10CA2 /* Types.h */,
-				335A024713767DFF007C6377 /* UI */,
-				332C4320132ACE7A00E10CA2 /* Utils */,
-				332C4323132ACE7A00E10CA2 /* Win */,
-				332C4325132ACE7A00E10CA2 /* World */,
 				332C435E132ACE7A00E10CA2 /* Zones.cpp */,
 				332C435F132ACE7A00E10CA2 /* Zones.h */,
 			);
@@ -1142,8 +1140,6 @@
 		332C423B132ACE7900E10CA2 /* Lua */ = {
 			isa = PBXGroup;
 			children = (
-				332C423C132ACE7900E10CA2 /* LuaMath.cpp */,
-				332C423D132ACE7900E10CA2 /* LuaMath.h */,
 				332C423E132ACE7900E10CA2 /* LuaRuntime.cpp */,
 				332C423F132ACE7900E10CA2 /* LuaRuntime.h */,
 				332C4240132ACE7900E10CA2 /* LuaRuntime.inl */,
@@ -1171,13 +1167,13 @@
 				332C424D132ACE7900E10CA2 /* CG */,
 				332C4253132ACE7900E10CA2 /* GL */,
 				332C426C132ACE7900E10CA2 /* IOS */,
+				332C4279132ACE7A00E10CA2 /* PC */,
 				332C4273132ACE7900E10CA2 /* Material.cpp */,
 				332C4274132ACE7900E10CA2 /* Material.h */,
 				332C4275132ACE7900E10CA2 /* Material.inl */,
 				332C4276132ACE7A00E10CA2 /* Mesh.h */,
 				332C4277132ACE7A00E10CA2 /* Mesh.inl */,
 				33F7046714D0A44D00C194F7 /* Mesh.cpp */,
-				332C4279132ACE7A00E10CA2 /* PC */,
 				332C427F132ACE7A00E10CA2 /* Renderer.cpp */,
 				332C4280132ACE7A00E10CA2 /* Renderer.h */,
 				332C4281132ACE7A00E10CA2 /* RendererDef.h */,
@@ -1459,10 +1455,12 @@
 		332C4325132ACE7A00E10CA2 /* World */ = {
 			isa = PBXGroup;
 			children = (
+				332C432A132ACE7A00E10CA2 /* Entities */,
+				332C433C132ACE7A00E10CA2 /* Lua */,
+				332C434A132ACE7A00E10CA2 /* MapBuilder */,
 				332C4326132ACE7A00E10CA2 /* BSPFile.cpp */,
 				332C4327132ACE7A00E10CA2 /* BSPFile.h */,
 				332C4328132ACE7A00E10CA2 /* BSPFile.inl */,
-				332C432A132ACE7A00E10CA2 /* Entities */,
 				332C4335132ACE7A00E10CA2 /* Entity.cpp */,
 				332C4336132ACE7A00E10CA2 /* Entity.h */,
 				332C4337132ACE7A00E10CA2 /* EntityDef.h */,
@@ -1470,8 +1468,6 @@
 				332C4339132ACE7A00E10CA2 /* Event.h */,
 				332C433A132ACE7A00E10CA2 /* Keys.cpp */,
 				332C433B132ACE7A00E10CA2 /* Keys.h */,
-				332C433C132ACE7A00E10CA2 /* Lua */,
-				332C434A132ACE7A00E10CA2 /* MapBuilder */,
 				332C4353132ACE7A00E10CA2 /* MT_Fly.cpp */,
 				335A02A213788F4C007C6377 /* PostProcess.cpp */,
 				335A02A313788F4C007C6377 /* PostProcess.h */,
@@ -2440,8 +2436,7 @@
 				33A1660915A86F8A00404C47 /* Sound.h */,
 				33A1660A15A86F8A00404C47 /* SoundDef.h */,
 			);
-			name = Sound;
-			path = ../Engine/Sound;
+			path = Sound;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
