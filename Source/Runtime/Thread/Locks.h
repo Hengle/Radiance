@@ -88,7 +88,7 @@ public:
 	//
 	// Wait for gate to be "opened".
 	//
-	bool Wait(UReg timeout = Infinite) const;
+	bool Wait(U32 timeout = Infinite) const;
 
 	//
 	// Open the gate. If "autoCloseSingleRelease" is true, then one waiting thread will
@@ -134,7 +134,7 @@ public:
 	Semaphore(int count = 0);
 
 	void Put();
-	int Get(UReg timeout = Infinite, bool clear=false); // returns count obtained (useful on clear).
+	int Get(U32 timeout = Infinite, bool clear=false); // returns count obtained (useful on clear).
 	int Reset(); // returns count at time of reset.
 
 private:

@@ -901,9 +901,6 @@
 		339E00ED1389BEC7004B5DC9 /* SoundLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundLoader.h; sourceTree = "<group>"; };
 		339E00EE1389BEC7004B5DC9 /* SoundParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoundParser.cpp; sourceTree = "<group>"; };
 		339E00EF1389BEC7004B5DC9 /* SoundParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundParser.h; sourceTree = "<group>"; };
-		339E00F11389BEE9004B5DC9 /* Sound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Sound.cpp; sourceTree = "<group>"; };
-		339E00F21389BEE9004B5DC9 /* Sound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sound.h; sourceTree = "<group>"; };
-		339E00F31389BEE9004B5DC9 /* SoundDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundDef.h; sourceTree = "<group>"; };
 		339E09601389BF8F004B5DC9 /* EditorMusicThumb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorMusicThumb.cpp; sourceTree = "<group>"; };
 		339E09611389BF8F004B5DC9 /* EditorMusicThumb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorMusicThumb.h; sourceTree = "<group>"; };
 		339E09621389BF95004B5DC9 /* EditorMeshThumb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorMeshThumb.cpp; sourceTree = "<group>"; };
@@ -911,6 +908,12 @@
 		339E09641389BF9E004B5DC9 /* EditorSoundThumb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorSoundThumb.cpp; sourceTree = "<group>"; };
 		339E09651389BF9E004B5DC9 /* EditorSoundThumb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorSoundThumb.h; sourceTree = "<group>"; };
 		339E09661389BFA1004B5DC9 /* EditorTextureThumb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorTextureThumb.h; sourceTree = "<group>"; };
+		33A1660515A86F8A00404C47 /* ALDriver.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ALDriver.cpp; sourceTree = "<group>"; };
+		33A1660615A86F8A00404C47 /* ALDriver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ALDriver.h; sourceTree = "<group>"; };
+		33A1660715A86F8A00404C47 /* ALDriverDef.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ALDriverDef.h; sourceTree = "<group>"; };
+		33A1660815A86F8A00404C47 /* Sound.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Sound.cpp; sourceTree = "<group>"; };
+		33A1660915A86F8A00404C47 /* Sound.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Sound.h; sourceTree = "<group>"; };
+		33A1660A15A86F8A00404C47 /* SoundDef.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SoundDef.h; sourceTree = "<group>"; };
 		33D5944914D1D7E5000CA414 /* AssetCookers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AssetCookers.cpp; sourceTree = "<group>"; };
 		33E25EF113903A8800762793 /* E_SoundEmitter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = E_SoundEmitter.cpp; sourceTree = "<group>"; };
 		33E25EF213903A8800762793 /* E_SoundEmitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = E_SoundEmitter.h; sourceTree = "<group>"; };
@@ -965,6 +968,7 @@
 		332C41F1132ACE7300E10CA2 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				33A1660415A86F8A00404C47 /* Sound */,
 				332C41F2132ACE7300E10CA2 /* BSPFile.cpp */,
 				332C41F3132ACE7300E10CA2 /* BSPFile.h */,
 				332C41F4132ACE7300E10CA2 /* Tokenizer.cpp */,
@@ -1004,9 +1008,6 @@
 				332C4286132ACE7A00E10CA2 /* SCC */,
 				332C428A132ACE7A00E10CA2 /* SConstruct */,
 				332C428B132ACE7A00E10CA2 /* SkAnim */,
-				339E00F11389BEE9004B5DC9 /* Sound.cpp */,
-				339E00F21389BEE9004B5DC9 /* Sound.h */,
-				339E00F31389BEE9004B5DC9 /* SoundDef.h */,
 				3310C9AB156B8DC9001AA756 /* StringTable.cpp */,
 				3310C9AC156B8DC9001AA756 /* StringTable.h */,
 				332C4293132ACE7A00E10CA2 /* SyncDispachFunctor.h */,
@@ -2427,6 +2428,20 @@
 				335A024C13767DFF007C6377 /* UIWidgetDef.h */,
 			);
 			path = UI;
+			sourceTree = "<group>";
+		};
+		33A1660415A86F8A00404C47 /* Sound */ = {
+			isa = PBXGroup;
+			children = (
+				33A1660515A86F8A00404C47 /* ALDriver.cpp */,
+				33A1660615A86F8A00404C47 /* ALDriver.h */,
+				33A1660715A86F8A00404C47 /* ALDriverDef.h */,
+				33A1660815A86F8A00404C47 /* Sound.cpp */,
+				33A1660915A86F8A00404C47 /* Sound.h */,
+				33A1660A15A86F8A00404C47 /* SoundDef.h */,
+			);
+			name = Sound;
+			path = ../Engine/Sound;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

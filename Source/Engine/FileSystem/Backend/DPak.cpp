@@ -272,7 +272,7 @@ AddrSize DPakFileEntry::RAD_IMPLEMENT_GET(tagSize)
 
 	if (tag)
 	{
-		s -= sizeof(data_codec::lmp::LOfs);
+		s -= (data_codec::lmp::LOfs)sizeof(data_codec::lmp::LOfs);
 	}
 
 	return s;

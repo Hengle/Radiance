@@ -82,7 +82,7 @@ bool Decoder::Decode(
 	long r = ov_read(
 		&m_ogg,
 		(char*)buffer,
-		(long)bufferSize,
+		(int)bufferSize,
 		(endianMode == EM_Big) ? 1 : 0,
 		(sampleType == ST_16Bit) ? 2 : 1,
 		(dataType == DT_Signed) ? 1 : 0,
@@ -222,13 +222,13 @@ bool Decoder::BSInfo(BSI &info, int bitStream) const
 	vorbis_info *vi = ov_info(&m_ogg, bitStream);
 	if (vi)
 	{
-		info.version = vi->version;
-		info.rate = vi->rate;
-		info.brLower = vi->bitrate_lower;
-		info.brNominal = vi->bitrate_nominal;
-		info.brUpper = vi->bitrate_upper;
-		info.brWindow = vi->bitrate_window;
-		info.channels = vi->channels;
+		info.version = (int)vi->version;
+		info.rate = (int)vi->rate;
+		info.brLower = (int)vi->bitrate_lower;
+		info.brNominal = (int)vi->bitrate_nominal;
+		info.brUpper = (int)vi->bitrate_upper;
+		info.brWindow = (int)vi->bitrate_window;
+		info.channels = (int)vi->channels;
 		return true;
 	}
 

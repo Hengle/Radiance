@@ -1085,18 +1085,18 @@ RADRT_API bool RADRT_CALL Encode(const Image &in, UReg encodeFormat, UReg encode
 	memset(&sd, 0, sizeof(SurfaceDesc2));
 	sd.size = sizeof(SurfaceDesc2);
 	sd.pf.size = sizeof(PixelFormat);
-	sd.width = mip->width;
-	sd.height = mip->height;
+	sd.width = (U32)mip->width;
+	sd.height = (U32)mip->height;
 
 	if (NOT_DXT(encodeFormat))
 	{
 		if (fpFormat)
 		{
-			sd.pitch = mip->width * mip->height * in.bpp;
+			sd.pitch = (U32)(mip->width * mip->height * in.bpp);
 		}
 		else
 		{
-			sd.pitch = mip->width * mip->height * FormatBPP(encodeFormat);
+			sd.pitch = (U32)(mip->width * mip->height * FormatBPP(encodeFormat));
 		}
 	}
 	else
@@ -1174,7 +1174,7 @@ RADRT_API bool RADRT_CALL Encode(const Image &in, UReg encodeFormat, UReg encode
 	{
 		sd.flags = SDMipmapCount;
 		sd.caps.caps1 = CapsMipmap | CapsComplex;
-		sd.mipmapCount = frame->mipCount;
+		sd.mipmapCount = (U32)frame->mipCount;
 	}
 	if (encodeFlags & EncodeFlagCubemap)
 	{
@@ -1193,7 +1193,7 @@ RADRT_API bool RADRT_CALL Encode(const Image &in, UReg encodeFormat, UReg encode
 	}
 	else
 	{
-		sd.pf.RGBBitCount = FormatBPP(encodeFormat) * 8;
+		sd.pf.RGBBitCount = (U32)(FormatBPP(encodeFormat) * 8);
 	}
 
 	SwapSurfaceDesc(&sd); // swap for write.

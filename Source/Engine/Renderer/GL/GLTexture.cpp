@@ -229,7 +229,7 @@ RADENG_API bool RADENG_CALL GLImageFormat(UReg imgType, GLenum &internal, GLenum
 	return (internal=GLInternalFormat(format, type)) != (GLenum)0;
 }
 
-RADENG_API int RADENG_CALL GLCubeFace(int flags)
+RADENG_API int RADENG_CALL GLCubeFace(UReg flags)
 {
 	if (flags&image_codec::dds::FrameFlagCubemapPositiveX)
 		return GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB;
@@ -343,7 +343,7 @@ int UploadTexture(
 			return SR_ErrorGeneric; // invalid cube-map.
 		}
 
-		int numMips = image.frames[0].mipCount;
+		UReg numMips = image.frames[0].mipCount;
 
 		for (int i = 1; i < 6; ++i)
 		{
@@ -385,8 +385,8 @@ int UploadTexture(
 
 	GLTexture::Ref tex(new (ZRender) GLTexture());
 
-	int iwidth = image.frames[0].mipmaps[0].width;
-	int iheight = image.frames[0].mipmaps[0].height;
+	int iwidth = (int)image.frames[0].mipmaps[0].width;
+	int iheight = (int)image.frames[0].mipmaps[0].height;
 
 	tex->target = image.frameCount > 1 ? GL_TEXTURE_CUBE_MAP_ARB : GL_TEXTURE_2D;
 	tex->format = internal;
@@ -441,7 +441,7 @@ int UploadTexture(
 
 	if (mipmap && hasMips)
 	{
-		glTexParameteri(tex->target, GL_TEXTURE_MAX_LEVEL, image.frames[0].mipCount-1);
+		glTexParameteri(tex->target, GL_TEXTURE_MAX_LEVEL, (int)image.frames[0].mipCount-1);
 		CHECK_GL_ERRORS();
 	}
 #endif
@@ -472,10 +472,10 @@ int UploadTexture(
 #else
 					gl.CompressedTexImage2DARB(
 						GLCubeFace(f.flags),
-						k,
+						(GLint)k,
 						internal,
-						m.width,
-						m.height,
+						(GLint)m.width,
+						(GLint)m.height,
 						0,
 						(GLsizei)m.dataSize,
 						m.data
@@ -485,8 +485,8 @@ int UploadTexture(
 				else
 				{
 					void *mdata = m.data;
-					GLint  mw = m.width;
-					GLint  mh = m.height;
+					GLint  mw = (GLint)m.width;
+					GLint  mh = (GLint)m.height;
 
 #if !defined(RAD_OPT_OGLES)
 					if ((width && width != iwidth) || (height && height != iheight))
@@ -499,8 +499,8 @@ int UploadTexture(
 
 						gluScaleImage(
 							format,
-							m.width,
-							m.height,
+							(GLint)m.width,
+							(GLint)m.height,
 							type,
 							m.data,
 							mw,
@@ -515,7 +515,7 @@ int UploadTexture(
 
 					glTexImage2D(
 						GLCubeFace(f.flags), 
-						k, 
+						(GLint)k, 
 						internal, 
 						mw, 
 						mh,
@@ -561,10 +561,10 @@ int UploadTexture(
 #else
 				gl.CompressedTexImage2DARB(
 					tex->target,
-					i,
+					(GLint)i,
 					internal,
-					m.width,
-					m.height,
+					(GLint)m.width,
+					(GLint)m.height,
 					0,
 					(GLsizei)m.dataSize,
 					m.data
@@ -574,8 +574,8 @@ int UploadTexture(
 			else
 			{
 				void *mdata = m.data;
-				GLint  mw = m.width;
-				GLint  mh = m.height;
+				GLint  mw = (GLint)m.width;
+				GLint  mh = (GLint)m.height;
 
 #if !defined(RAD_OPT_OGLES)
 				if ((width && width != iwidth) || (height && height != iheight))
@@ -588,8 +588,8 @@ int UploadTexture(
 
 					gluScaleImage(
 						format,
-						m.width,
-						m.height,
+						(GLint)m.width,
+						(GLint)m.height,
 						type,
 						m.data,
 						mw,
@@ -604,7 +604,7 @@ int UploadTexture(
 
 				glTexImage2D(
 					tex->target, 
-					i, 
+					(GLint)i, 
 					internal, 
 					mw, 
 					mh,

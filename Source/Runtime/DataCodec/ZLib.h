@@ -18,8 +18,7 @@ enum
 {
 	NoCompression = 0,
 	FastestCompression = 1,
-	BestCompression = 9,
-	ZLibError = MaxAddrSize
+	BestCompression = 9
 };
 
 class RADRT_CLASS Encoder

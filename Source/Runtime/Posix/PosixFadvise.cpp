@@ -200,11 +200,11 @@ namespace _posix_fadvise {
 					
 					if (r->type == Read)
 					{
-						r->r = pread(r->fd, r->buf, size, r->ofs);
+						r->r = (int)pread(r->fd, r->buf, size, r->ofs);
 					}
 					else
 					{
-						r->r = pwrite(r->fd, r->buf, size, r->ofs);
+						r->r = (int)pwrite(r->fd, r->buf, size, r->ofs);
 					}
 					
 					if (r->r >= 0)
@@ -234,7 +234,7 @@ namespace _posix_fadvise {
 			
 			void Finish(Req *r)
 			{
-				r->notify->Complete(r->c - r->len, r->r);
+				r->notify->Complete((int)(r->c - r->len), r->r);
 				DelReq(r);
 			}
 			
@@ -347,7 +347,6 @@ namespace _posix_fadvise {
 	
 	int AIO::Flush(int fd)
 	{
-		RAD_NOT_USED(fd);
 		return 0;
 	}
 	

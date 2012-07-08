@@ -1,0 +1,230 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		33A1667E15A87AB300404C47 /* bitwise.c in Sources */ = {isa = PBXBuildFile; fileRef = 33A1667C15A87AB300404C47 /* bitwise.c */; };
+		33A1667F15A87AB300404C47 /* framing.c in Sources */ = {isa = PBXBuildFile; fileRef = 33A1667D15A87AB300404C47 /* framing.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		33A1666815A87A3F00404C47 /* liblibogg.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblibogg.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		33A1667C15A87AB300404C47 /* bitwise.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bitwise.c; path = "../../../Extern/libogg-1.2.2/src/bitwise.c"; sourceTree = "<group>"; };
+		33A1667D15A87AB300404C47 /* framing.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = framing.c; path = "../../../Extern/libogg-1.2.2/src/framing.c"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		33A1666515A87A3F00404C47 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		33A1665D15A87A3F00404C47 = {
+			isa = PBXGroup;
+			children = (
+				33A1667A15A87A8300404C47 /* Source */,
+				33A1666915A87A3F00404C47 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		33A1666915A87A3F00404C47 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				33A1666815A87A3F00404C47 /* liblibogg.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		33A1667A15A87A8300404C47 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				33A1667C15A87AB300404C47 /* bitwise.c */,
+				33A1667D15A87AB300404C47 /* framing.c */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		33A1666615A87A3F00404C47 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		33A1666715A87A3F00404C47 /* libogg */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 33A1666C15A87A3F00404C47 /* Build configuration list for PBXNativeTarget "libogg" */;
+			buildPhases = (
+				33A1666415A87A3F00404C47 /* Sources */,
+				33A1666515A87A3F00404C47 /* Frameworks */,
+				33A1666615A87A3F00404C47 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = libogg;
+			productName = libogg;
+			productReference = 33A1666815A87A3F00404C47 /* liblibogg.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		33A1665F15A87A3F00404C47 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0430;
+			};
+			buildConfigurationList = 33A1666215A87A3F00404C47 /* Build configuration list for PBXProject "libogg" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 33A1665D15A87A3F00404C47;
+			productRefGroup = 33A1666915A87A3F00404C47 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				33A1666715A87A3F00404C47 /* libogg */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		33A1666415A87A3F00404C47 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33A1667E15A87AB300404C47 /* bitwise.c in Sources */,
+				33A1667F15A87AB300404C47 /* framing.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		33A1666A15A87A3F00404C47 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../../Extern/libogg-1.2.2/include",
+					"../../../Extern/libvorbis-1.3.2/include",
+					"../../../Extern/libvorbis-1.3.2/lib",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"-all_load",
+					"-ObjC",
+				);
+				SDKROOT = macosx;
+				USE_HEADERMAP = NO;
+			};
+			name = Debug;
+		};
+		33A1666B15A87A3F00404C47 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../../Extern/libogg-1.2.2/include",
+					"../../../Extern/libvorbis-1.3.2/include",
+					"../../../Extern/libvorbis-1.3.2/lib",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				OTHER_LDFLAGS = (
+					"-all_load",
+					"-ObjC",
+				);
+				SDKROOT = macosx;
+				USE_HEADERMAP = NO;
+			};
+			name = Release;
+		};
+		33A1666D15A87A3F00404C47 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		33A1666E15A87A3F00404C47 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		33A1666215A87A3F00404C47 /* Build configuration list for PBXProject "libogg" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33A1666A15A87A3F00404C47 /* Debug */,
+				33A1666B15A87A3F00404C47 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		33A1666C15A87A3F00404C47 /* Build configuration list for PBXNativeTarget "libogg" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33A1666D15A87A3F00404C47 /* Debug */,
+				33A1666E15A87A3F00404C47 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 33A1665F15A87A3F00404C47 /* Project object */;
+}

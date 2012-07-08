@@ -28,7 +28,7 @@ template <
 >
 struct zone_pool_map
 {
-	typedef pool_allocator<typename std::pair<const K, T>, _Zone, 8, MaxUReg, DefaultAlignment, MemoryPool> pool_type;
+	typedef pool_allocator<typename std::pair<const K, T>, _Zone, 8, 0xffffffff, DefaultAlignment, MemoryPool> pool_type;
 	typedef ::std::map<K, T, Pr, pool_type > type;
 };
 
@@ -51,7 +51,7 @@ template <
 >
 struct zone_pool_multimap
 {
-	typedef pool_allocator<std::pair<const K, T>, _Zone, 8, MaxUReg, DefaultAlignment, MemoryPool> pool_type;
+	typedef pool_allocator<std::pair<const K, T>, _Zone, 8, 0xffffffff, DefaultAlignment, MemoryPool> pool_type;
 	typedef ::std::multimap<K, T, Pr, pool_type > type;
 };
 

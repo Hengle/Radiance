@@ -81,9 +81,6 @@ class Backend:
 			defines.append('RAD_OPT_IOS_SIMULATOR')
 		if self.build.switches.ios_device():
 			defines.append('RAD_OPT_IOS_DEVICE')
-
-		if self.build.osx():
-			defines.append('RAD_OPT_OSX')
 			
 		if self.switches.analyze():
 			defines.append('RAD_OPT_CA_ENABLED')

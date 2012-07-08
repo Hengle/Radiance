@@ -214,7 +214,7 @@ int BSPFileParser::Parse(const void *data, AddrSize len)
 		U16 strLen = *reinterpret_cast<const U16*>(bytes);
 		CHECK_SIZE(sizeof(U16)+strLen);
 		m_stringOfs.push_back(ofs+sizeof(U16));
-		ofs += strLen+sizeof(U16);
+		ofs += strLen+(int)sizeof(U16);
 		bytes += strLen+sizeof(U16);
 	}
 

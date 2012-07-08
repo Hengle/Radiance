@@ -147,7 +147,7 @@ struct LuaPools
 				AddrSize chunkSize = BasePoolSize<<i;
 
 				char sz[64];
-				sprintf(sz, "lua_pool_%d", chunkSize);
+				sprintf(sz, "lua_pool_%d", (int)chunkSize);
 
 				s_pools[i].Create(
 					ZLuaRuntime,

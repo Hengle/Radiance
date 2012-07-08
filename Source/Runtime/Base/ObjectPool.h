@@ -6,6 +6,7 @@
 #pragma once
 
 #include "MemoryPool.h"
+#include <limits>
 #include "../PushPack.h"
 
 template<typename T>
@@ -19,7 +20,7 @@ public:
 		const char* name, 
 		UReg growSize, 
 		int alignment = DefaultAlignment, 
-		UReg maxSize = MaxUReg
+		UReg maxSize = std::numeric_limits<UReg>::max()
 	);
 	~ObjectPool();
 
@@ -28,7 +29,7 @@ public:
 		const char* name, 
 		UReg growSize, 
 		int alignment = DefaultAlignment, 
-		UReg maxSize = MaxUReg
+		UReg maxSize = std::numeric_limits<UReg>::max()
 	);
 
 	void	Destroy();
@@ -73,7 +74,7 @@ public:
 		const char* name, 
 		UReg growSize, 
 		int alignment = DefaultAlignment, 
-		UReg maxSize = MaxUReg
+		UReg maxSize = std::numeric_limits<UReg>::max()
 	);
 
 	~ThreadSafeObjectPool();
@@ -83,7 +84,7 @@ public:
 		const char* name, 
 		UReg growSize, 
 		int alignment = DefaultAlignment, 
-		UReg maxSize = MaxUReg
+		UReg maxSize = std::numeric_limits<UReg>::max()
 	);
 
 	void	Destroy();

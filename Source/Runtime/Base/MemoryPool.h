@@ -28,7 +28,7 @@ public:
 		AddrSize chunkSize, 
 		UReg growSize, 
 		int alignment = DefaultAlignment, 
-		UReg maxSize = MaxUReg
+		UReg maxSize = std::numeric_limits<UReg>::max()
 	);
 
 	~MemoryPool();
@@ -46,7 +46,7 @@ public:
 		AddrSize chunkSize, 
 		UReg growSize, 
 		int alignment = DefaultAlignment, 
-		UReg maxSize = MaxUReg
+		UReg maxSize = std::numeric_limits<UReg>::max()
 	);
 
 	void Destroy(WalkCallback usedChunkCallback = 0);
@@ -155,7 +155,7 @@ public:
 		AddrSize chunkSize, 
 		UReg growSize, 
 		int alignment = DefaultAlignment, 
-		UReg maxSize = MaxUReg
+		UReg maxSize = std::numeric_limits<UReg>::max()
 	);
 	~ThreadSafeMemoryPool();
 
@@ -172,7 +172,7 @@ public:
 		AddrSize chunkSize, 
 		UReg growSize, 
 		int alignment = DefaultAlignment, 
-		UReg maxSize = MaxUReg
+		UReg maxSize = std::numeric_limits<UReg>::max()
 	);
 
 	void Destroy(MemoryPool::WalkCallback usedChunkCallback = 0);

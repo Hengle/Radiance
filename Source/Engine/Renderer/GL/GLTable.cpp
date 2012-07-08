@@ -70,7 +70,7 @@ namespace r {
 	CHECK_EXT(_ext, _name); \
 	if (_ext) { bool *b = &_ext;
 
-#define END }
+#define END *b = *b; }
 
 RADENG_API GLTable gl;
 

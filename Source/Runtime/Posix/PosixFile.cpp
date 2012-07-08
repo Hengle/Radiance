@@ -51,6 +51,8 @@ inline wchar_t *AnsiToWC(wchar_t *dst, const char *src)
 
 #if defined(RAD_OPT_IOS)
 void __IOS_BundlePath(char*);
+#elif defined(RAD_OPT_OSX)
+void __OSX_BundlePath(char*);
 #endif
 
 namespace file {
@@ -72,6 +74,8 @@ void SetDefaultAliases()
 			char z[MaxFilePathLen+1];
 #if defined(RAD_OPT_IOS)
 			__IOS_BundlePath(z);
+#elif defined(RAD_OPT_OSX) && !defined(RAD_OPT_TOOLS)
+			__OSX_BundlePath(z);
 #else
 			getcwd(z, MaxFilePathLen);
 #endif
@@ -631,7 +635,7 @@ void AsyncIO::TriggerStatusChange(file::Result result, bool force)
 	}
 }
 	
-bool AsyncIO::WaitForCompletion(UReg timeout) const
+bool AsyncIO::WaitForCompletion(U32 timeout) const
 {
 	bool r = m_gate.Wait(timeout);
 	RAD_ASSERT(m_status != Pending);
@@ -905,7 +909,7 @@ FPos File::Size() const
 	struct stat s;
 	if (fstat(m_fd, &s) == 0)
 	{
-		return s.st_size;
+		return (FPos)s.st_size;
 	}
 	return 0;
 }

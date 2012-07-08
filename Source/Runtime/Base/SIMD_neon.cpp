@@ -19,7 +19,7 @@
 
 namespace {
 
-void RAD_ANSICALL SkinVerts4(
+void SkinVerts4(
 	float *outVerts, 
 	const float *bones, 
 	const float *vertices,
@@ -115,7 +115,7 @@ void RAD_ANSICALL SkinVerts4(
 	}
 }
 
-void RAD_ANSICALL SkinVerts3(
+void SkinVerts3(
 	float *outVerts, 
 	const float *bones, 
 	const float *vertices,
@@ -193,7 +193,7 @@ void RAD_ANSICALL SkinVerts3(
 	}
 }
 
-void RAD_ANSICALL SkinVerts2(
+void SkinVerts2(
 	float *outVerts, 
 	const float *bones, 
 	const float *vertices,
@@ -252,7 +252,7 @@ void RAD_ANSICALL SkinVerts2(
 	}
 }
 
-void RAD_ANSICALL SkinVerts1(
+void SkinVerts1(
 	float *outVerts, 
 	const float *bones, 
 	const float *vertices,

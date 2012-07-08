@@ -11,7 +11,7 @@
 
 namespace xtime {
 
-typedef UReg TimeVal;
+typedef U32 TimeVal;
 struct TimeDate;
 class TimeSlice;
 

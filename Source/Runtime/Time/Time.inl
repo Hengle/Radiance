@@ -211,12 +211,12 @@ m_time(millis)
 inline TimeVal TimeSlice::RAD_IMPLEMENT_GET(remaining)
 {
 	TimeVal x = m_timer.Elapsed(false);
-	return (m_time==MaxUReg) ? MaxUReg : (x < m_time) ? (m_time-x) : 0;
+	return (m_time==std::numeric_limits<TimeVal>::max()) ? std::numeric_limits<TimeVal>::max() : (x < m_time) ? (m_time-x) : 0;
 }
 
 inline bool TimeSlice::RAD_IMPLEMENT_GET(infinite)
 {
-	return this->remaining == MaxUReg;
+	return this->remaining == std::numeric_limits<TimeVal>::max();
 }
 
 inline TimeSlice::operator TimeSlice::unspecified_bool_type () const

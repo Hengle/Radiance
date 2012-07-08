@@ -18,18 +18,23 @@
 	#define RAD_OPT_ANSI_STRINGBASE
 #elif defined(__APPLE__)
 	#define RAD_OPT_APPLE
-	#if !defined(RAD_OPT_OSX)
-		#include <TargetConditionals.h>
-		#if defined(TARGET_OS_IPHONE)
-			#define RAD_OPT_IOS
-			#if defined(TARGET_IPHONE_SIMULATOR)
-				#define RAD_OPT_IOS_SIMULATOR
-			#else
-				#define RAD_OPT_IOS_DEVICE
-			#endif
+	#include <TargetConditionals.h>
+	#if TARGET_OS_MAC==1
+		#define RAD_OPT_OSX
+	#elif TARGET_OS_IPHONE==1
+		#define RAD_OPT_IOS
+		#if defined(TARGET_IPHONE_SIMULATOR)
+			#define RAD_OPT_IOS_SIMULATOR
 		#else
-			#error RAD_ERROR_UNSUP_PLAT
+			#define RAD_OPT_IOS_DEVICE
 		#endif
+	#else
+		#error RAD_ERROR_UNSUP_PLAT
+	#endif
+	#if defined(TARGET_RT_64_BIT)
+		#define RAD_OPT_MACHINE_WORD_SIZE 8
+	#else
+		#define RAD_OPT_MACHINE_WORD_SIZE 4
 	#endif
 	#define RAD_OPT_ANSI_STRINGBASE
 	#define RAD_OPT_PTHREAD_NO_SPINLOCK
@@ -42,8 +47,6 @@
 #else
 	#define RAD_OPT_LITTLE_ENDIAN
 #endif
-
-#define RAD_OPT_MACHINE_WORD_SIZE 4
 
 #if defined(__cplusplus) && defined(__GNUC__)
 
@@ -78,20 +81,10 @@
 
 	#define RAD_OPT_4BYTE_WCHAR        // 4 byte wchar_t platform.
 
-#if defined(RAD_OPT_ARM)
 	#define RAD_FASTCALL
 	#define RAD_STDCALL
 	#define RAD_ANSICALL
 	#define RAD_ANSICALL_TRAITS
-#else
-	#define RAD_FASTCALL __attribute__((fastcall))
-	#define RAD_STDCALL  __attribute__((stdcall))
-	#define RAD_ANSICALL __attribute__((cdecl))
-
-	#define RAD_ANSICALL_TRAITS
-	#define RAD_FASTCALL_TRAITS
-	#define RAD_STDCALL_TRAITS
-#endif
 
 	#define RAD_THREAD_VAR __thread
 

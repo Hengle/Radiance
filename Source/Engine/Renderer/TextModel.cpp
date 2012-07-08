@@ -10,6 +10,7 @@
 #include <Runtime/Font/Font.h>
 #include <Runtime/StringBase.h>
 #include <algorithm>
+#include <limits>
 #undef min
 #undef max
 
@@ -322,7 +323,7 @@ void TextModel::BindFont(int fontWidth, int fontHeight)
 		PageSize,
 		PageSize,
 		1,
-		MaxSReg,
+		std::numeric_limits<int>::max(),
 		font::IGlyphPageFactory::Ref(&s_factory, GlyphPageFactory::NoopDelete)
 	);
 

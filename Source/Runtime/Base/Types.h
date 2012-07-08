@@ -37,28 +37,6 @@ enum
 	MaxS32 = LONG_MAX
 };
 
-extern RADRT_API const U64 MaxU64;
-extern RADRT_API const S64 MinS64;
-extern RADRT_API const S64 MaxS64;
-
-#if RAD_OPT_MACHINE_WORD_SIZE == 4
-enum
-{
-	MaxUReg = MaxU32,
-	MinSReg = MinS32,
-	MaxSReg = MaxS32,
-	MaxAddrSize = MaxU32
-};
-#elif RAD_OPT_MACHINE_WORD_SIZE == 8
-enum
-{
-	MaxUReg = MaxU32,
-	MinSReg = MinS32,
-	MaxSReg = MaxS32,
-	MaxAddrSize = MaxU64
-};
-#endif
-
 typedef SAddrSize PtrDiff;
 
 template <typename T>

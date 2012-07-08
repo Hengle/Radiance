@@ -74,8 +74,6 @@ bool PreInit(App &app)
 
 bool Initialize(App &app)
 {
-	bool result = true;
-
 	r::HRBackend rb = app.engine->sys->r.Cast<r::IRBackend>();
 	RAD_VERIFY(rb);
 

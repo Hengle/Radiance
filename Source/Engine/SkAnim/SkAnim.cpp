@@ -772,7 +772,7 @@ int DSka::Parse(const void *data, AddrSize len)
 
 	// padd?
 	{
-		int padd = (r+s+t)*sizeof(S16);
+		int padd = (r+s+t)*(int)sizeof(S16);
 		if (padd&3)
 		{ // skip padd bytes
 			padd &= 3;

@@ -25,7 +25,7 @@ template <
 >
 struct zone_pool_hash_map
 {
-	typedef pool_allocator<std::pair<Key, Type>, _Zone, 8, MaxUReg, DefaultAlignment, MemoryPool> pool_type;
+	typedef pool_allocator<std::pair<Key, Type>, _Zone, 8, 0xffffffff, DefaultAlignment, MemoryPool> pool_type;
 	typedef typename container::hash_map<Key, Type, pool_type >::type type;
 };
 
@@ -46,6 +46,6 @@ template <
 >
 struct zone_pool_hash_multimap
 {
-	typedef pool_allocator<std::pair<Key, Type>, _Zone, 8, MaxUReg, DefaultAlignment, MemoryPool> pool_type;
+	typedef pool_allocator<std::pair<Key, Type>, _Zone, 8, 0xffffffff, DefaultAlignment, MemoryPool> pool_type;
 	typedef typename container::hash_multimap<Key, Type, pool_type >::type type;
 };

@@ -12,7 +12,7 @@
 
 namespace xtime {
 	
-const TimeSlice TimeSlice::Infinite(MaxUReg);
+const TimeSlice TimeSlice::Infinite(std::numeric_limits<TimeVal>::max());
 	
 
 RADRT_API void RADRT_CALL MilliToDayHourSecond(TimeVal time, UReg* days, UReg* hours, UReg* minutes, FReg* seconds)

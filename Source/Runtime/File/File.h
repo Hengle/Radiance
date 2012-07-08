@@ -276,7 +276,7 @@ public:
 	//
 	void Cancel();
 	bool IsCancelled();
-	bool WaitForCompletion(UReg timeout = thread::Infinite) const;
+	bool WaitForCompletion(U32 timeout = thread::Infinite) const;
 	FPos ByteCount() const;
 	void SetByteCount(FPos count);
 

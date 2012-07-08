@@ -436,9 +436,9 @@ RADRT_API bool RADRT_CALL Encode(const Image &in, const Mipmap &mip, float quali
 	cinfo.dest = &jdst;
 	cinfo.client_data = &locals;
 
-	cinfo.image_width  = mip.width;
-	cinfo.image_height = mip.height;
-	cinfo.input_components = in.bpp;
+	cinfo.image_width  = (U32)mip.width;
+	cinfo.image_height = (U32)mip.height;
+	cinfo.input_components = (U32)in.bpp;
 	cinfo.in_color_space = (in.format==Format_RGB888)?JCS_RGB:JCS_GRAYSCALE;
 	jpeg_set_defaults(&cinfo);
 

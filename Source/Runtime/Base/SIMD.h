@@ -27,7 +27,7 @@ struct SIMDDriver
 		\param boneIndices index into bone array (N indices per vertex)
 		\param numVerts number of verts to skin
 	*/
-	typedef void (RAD_ANSICALL *FSkinVerts) (
+	typedef void (*FSkinVerts) (
 		float *outVerts,
 		const float *bones,
 		const float *vertices,

@@ -205,6 +205,8 @@ namespace
 			return mid;
 		case PriorityMedium:
 			return (mid+max)/2;
+		default:
+			break;
 		}
 
 		return max;
@@ -402,7 +404,7 @@ bool Thread::SetPriority(PriorityClass p)
 	return r;
 }
 
-bool Thread::Join(UReg maxWaitTime)
+bool Thread::Join(U32 maxWaitTime)
 {
 	if (!m_valid)
 		return true;
@@ -446,7 +448,7 @@ void *Thread::ThreadProc(void *arg)
 	sigfillset(&sigset);
 	pthread_sigmask(SIG_BLOCK, &sigset, 0); // disable all signal interruption by default
 
-	self->m_retCode = thread->ThreadProc();
+	self->m_retCode = (int)thread->ThreadProc();
 	self->m_exited = true;
 	self->m_exitGate.Open();
 

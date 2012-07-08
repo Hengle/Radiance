@@ -334,4 +334,4 @@ inline wchar_t Widen(U16 c)
 } // string
 
 #include "../PopPack.h"
-#include "String.inl"
+#include "String_inl.h"

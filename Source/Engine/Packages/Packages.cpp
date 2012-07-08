@@ -133,7 +133,7 @@ Package::Entry::Ref Package::CreateEntry(const char *name, asset::Type type)
 	RAD_ASSERT(pm);
 
 	Entry::Ref ref(new (ZPackages) Entry(
-		pm->m_nextId++, 
+		(int)(pm->m_nextId++), 
 		name, 
 		(m_name + RAD_PACKAGE_SEP_STR + name).c_str(), 
 		type,

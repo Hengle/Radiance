@@ -61,7 +61,7 @@ bool Encoder::Begin(UReg compression)
 	stream->zalloc = heap_allocate;
 	stream->zfree = heap_free;
 
-	bool ok = deflateInit(stream, compression) == Z_OK;
+	bool ok = deflateInit(stream, (int)compression) == (long)Z_OK;
 
 	if (!ok)
 	{
@@ -261,7 +261,7 @@ RADRT_API bool RADRT_CALL StreamEncode(InputStream &in, OutputStream &out, UReg 
 	stream.zalloc = heap_allocate;
 	stream.zfree = heap_free;
 
-	err = deflateInit(&stream, compression);
+	err = (int)deflateInit(&stream, (int)compression);
 
 	if (err == Z_OK)
 	{
@@ -501,7 +501,7 @@ RADRT_API bool RADRT_CALL Encode(const void* data, AddrSize dataSize, UReg compr
 #endif
 
 	predictedSize = (uLongf)*outSize;
-	int zerr = compress2((Bytef*)out, &predictedSize, (const Bytef*)data, (uInt)dataSize, compression, heap_allocate, heap_free, 0);
+	int zerr = (int)compress2((Bytef*)out, &predictedSize, (const Bytef*)data, (uLong)dataSize, (int)compression, heap_allocate, heap_free, 0);
 	*outSize = (AddrSize)predictedSize;
 
 	return zerr == Z_OK;

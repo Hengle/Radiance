@@ -117,4 +117,4 @@ int scprintf(const T* fmt, ...);
 
 
 #include "../PopPack.h"
-#include "StringBase.inl"
+#include "StringBase_inl.h"

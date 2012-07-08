@@ -35,9 +35,9 @@ enum PriorityClass
 
 enum
 {
-	Infinite = MaxUReg,
-	DefaultContext = MaxUReg,
-	CurrentContext = MaxUReg-1,
+	Infinite = -1,
+	DefaultContext = -1,
+	CurrentContext = 0x7fffffff,
 	TimeSlice = details::TimeSlice,
 	Default = 0
 };

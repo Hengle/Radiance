@@ -285,10 +285,10 @@ template<>
 inline int atoi(const wchar_t *str)
 {
 #if defined(RAD_OPT_WINX)
-	return ::_wtoi(str);
+	return (int)::_wtoi(str);
 #else
 	wchar_t *x;
-	return ::wcstod(str, &x);
+	return (int)::wcstod(str, &x);
 #endif
 }
 
@@ -497,25 +497,49 @@ inline wchar_t *ncat<wchar_t>(wchar_t *dst, const wchar_t *src, size_t len)
 template<>
 inline int vsprintf<char>(char *buffer, const char *format, va_list argptr)
 {
+#if defined(RAD_OPT_GCC)
+	va_list _valist;
+	va_copy(_valist, argptr);
+	return ::vsprintf(buffer, format, _valist );
+#else
 	return ::vsprintf(buffer, format, argptr );
+#endif
 }
 
 template<>
 inline int vsprintf<wchar_t>(wchar_t *buffer, const wchar_t *format, va_list argptr)
 {
-	return ::vswprintf(buffer, MaxAddrSize, format, argptr);
+#if defined(RAD_OPT_GCC)
+	va_list _valist;
+	va_copy(_valist, argptr);
+	return ::vswprintf(buffer, 0xffffffff, format, _valist);
+#else
+	return ::vswprintf(buffer, 0xffffffff, format, argptr);
+#endif
 }
 
 template<>
 inline int vsnprintf<char>(char *buffer, size_t count, const char *format, va_list argptr)
 {
+#if defined(RAD_OPT_GCC)
+	va_list _valist;
+	va_copy(_valist, argptr);
+	return ::vsnprintf(buffer, count, format, _valist);
+#else
 	return ::vsnprintf(buffer, count, format, argptr);
+#endif
 }
 
 template<>
 inline int vsnprintf<wchar_t>(wchar_t *buffer, size_t count, const wchar_t *format, va_list argptr)
 {
+#if defined(RAD_OPT_GCC)
+	va_list _valist;
+	va_copy(_valist, argptr);
+	return ::vswprintf(buffer, count, format, _valist);
+#else
 	return ::vswprintf(buffer, count, format, argptr);
+#endif
 }
 
 template<>
@@ -523,7 +547,13 @@ inline int vscprintf<char>(const char *format, va_list argptr)
 {
 	enum { TempMax = 32*Kilo };
 	char temp[TempMax];
+#if defined(RAD_OPT_GCC)
+	va_list _valist;
+	va_copy(_valist, argptr);
+	int z = ::vsnprintf(temp, TempMax-1, format, _valist);
+#else
 	int z = ::vsnprintf(temp, TempMax-1, format, argptr);
+#endif
 	if (z < 0)
 	{
 		z = TempMax-1;
@@ -537,7 +567,13 @@ inline int vscprintf<wchar_t>(const wchar_t *format, va_list argptr)
 {
 	enum { TempMax = 32*Kilo };
 	wchar_t temp[TempMax];
+#if defined(RAD_OPT_GCC)
+	va_list _valist;
+	va_copy(_valist, argptr);
+	int z = ::vswprintf(temp, TempMax-1, format, _valist);
+#else
 	int z = ::vswprintf(temp, TempMax-1, format, argptr);
+#endif
 	if (z < 0)
 	{
 		z = TempMax-1;

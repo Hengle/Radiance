@@ -92,7 +92,7 @@ _posix_fadvise::AIO
 
 	file::Result Result() const { return m_status; }
 	void Cancel() { AIO::Cancel(); m_cancel = true; }
-	bool WaitForCompletion(UReg timeout=thread::Infinite) const;
+	bool WaitForCompletion(U32 timeout=thread::Infinite) const;
 	FPos ByteCount() const { return m_bytes; }
 	void TriggerStatusChange(file::Result result, bool force);
 	bool IsCancelled() { return m_cancel; }

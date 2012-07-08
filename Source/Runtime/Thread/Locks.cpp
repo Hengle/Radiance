@@ -36,7 +36,7 @@ void EventMutex::NotifyAll() {
 //
 // Wait for gate to be "opened".
 //
-bool Gate::Wait(UReg timeout) const
+bool Gate::Wait(U32 timeout) const
 {
 	Lock l(m_x);
 
@@ -165,7 +165,7 @@ void Semaphore::Put()
 	m_gate.Open();
 }
 
-int Semaphore::Get(UReg timeout, bool clear)
+int Semaphore::Get(U32 timeout, bool clear)
 {
 	xtime::TimeVal start = xtime::ReadMilliseconds();
 	int r = 0;

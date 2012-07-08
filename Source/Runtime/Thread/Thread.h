@@ -104,7 +104,7 @@ public:
 
 	void Create(AddrSize stackSize = Default);
 	bool Run(IThreadContext *context = 0); // null is default
-	bool Join(UReg maxWaitTime = Infinite);
+	bool Join(U32 maxWaitTime = Infinite);
 
 	RAD_DECLARE_READONLY_PROPERTY(Thread, id, Id);
 	RAD_DECLARE_READONLY_PROPERTY(Thread, returnCode, int);

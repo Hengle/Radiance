@@ -66,9 +66,9 @@ class RADRT_CLASS Thread
 	bool SetPriority(PriorityClass p);
 	PriorityClass Priority() { return m_priorityClass; }
 
-	UReg ReturnCode() { return m_retCode; }
+	int ReturnCode() { return m_retCode; }
 	bool HasExited() { return m_exited; }
-	bool Join(UReg maxWaitTime);
+	bool Join(U32 maxWaitTime);
 	void Destroy();
 
 #if defined(RAD_OPT_FIBERS)
@@ -77,7 +77,7 @@ class RADRT_CLASS Thread
 
 	pthread_t         m_thread;
 	AddrSize          m_stackSize;
-	volatile UReg     m_retCode;
+	volatile int      m_retCode;
 	PriorityClass     m_priorityClass;
 	volatile bool     m_exited;
 #if defined(RAD_OPT_FIBERS)

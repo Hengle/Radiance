@@ -400,6 +400,12 @@ void setwd(const char *exe)
 	chdir(path);
 }
 
+void __OSX_BundlePath(char *dst)
+{
+	NSString *bPath = [[NSBundle mainBundle] bundlePath];
+	strcpy(dst, [bPath cStringUsingEncoding:NSASCIIStringEncoding]);
+}
+
 /* Main entry point to executable - should *not* be SDL_main! */
 extern "C" int main (int argc, char **argv)
 {

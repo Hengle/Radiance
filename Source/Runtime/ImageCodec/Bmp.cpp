@@ -647,8 +647,8 @@ RADRT_API bool RADRT_CALL Encode(const Image &in, const Mipmap &mip, bool compre
 	bmi.size = sizeof(BitmapInfo);
 	bmi.bitCount = in.bpp * 8;
 	bmi.compression = (hasPal && compressRLE) ? BM_COMP_RLE8 : BM_COMP_RGB;
-	bmi.width = mip.width;
-	bmi.height = mip.height;
+	bmi.width = (U32)mip.width;
+	bmi.height = (U32)mip.height;
 	bmi.planes = 1;
 	bmi.xpixpm = 2834; // from photoshop.
 	bmi.ypixpm = 2834;

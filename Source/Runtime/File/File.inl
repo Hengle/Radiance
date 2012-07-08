@@ -86,7 +86,7 @@ inline bool AsyncIO::IsCancelled()
 	return m_imp.IsCancelled();
 }
 
-inline bool AsyncIO::WaitForCompletion(UReg timeout) const
+inline bool AsyncIO::WaitForCompletion(U32 timeout) const
 {
 	return m_imp.WaitForCompletion(timeout);
 }
