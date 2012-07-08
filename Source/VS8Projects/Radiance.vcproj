@@ -2311,55 +2311,15 @@
 			Name="Main"
 			>
 			<File
-				RelativePath="..\Main\IOSAppDelegate.h"
+				RelativePath="..\Main\NativeApp.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Main\IOSAppDelegate.mm"
-				>
-			</File>
-			<File
-				RelativePath="..\Main\IOSEAGLView.h"
-				>
-			</File>
-			<File
-				RelativePath="..\Main\IOSEAGLView.mm"
-				>
-			</File>
-			<File
-				RelativePath="..\Main\IOSGameCenter.h"
-				>
-			</File>
-			<File
-				RelativePath="..\Main\IOSGameCenter.mm"
-				>
-			</File>
-			<File
-				RelativePath="..\Main\IOSMain.mm"
-				>
-			</File>
-			<File
-				RelativePath="..\Main\IOSRootViewController.h"
-				>
-			</File>
-			<File
-				RelativePath="..\Main\IOSRootViewController.mm"
-				>
-			</File>
-			<File
-				RelativePath="..\Main\PCMain.cpp"
+				RelativePath="..\Main\NativeApp.h"
 				>
 			</File>
 			<File
 				RelativePath="..\Main\SConstruct"
-				>
-			</File>
-			<File
-				RelativePath="..\Main\SDLMain.h"
-				>
-			</File>
-			<File
-				RelativePath="..\Main\SDLMain.m"
 				>
 			</File>
 		</Filter>
@@ -2488,6 +2448,10 @@
 			</File>
 			<File
 				RelativePath="..\Engine\Input.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Engine\KeyCodes.h"
 				>
 			</File>
 			<File
@@ -3436,6 +3400,10 @@
 						RelativePath="..\Engine\Renderer\PC\RBDetails.h"
 						>
 					</File>
+					<File
+						RelativePath="..\Engine\Renderer\PC\wglext.h"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="CG"
@@ -3464,6 +3432,10 @@
 				<Filter
 					Name="GL"
 					>
+					<File
+						RelativePath="..\Engine\Renderer\GL\glext.h"
+						>
+					</File>
 					<File
 						RelativePath="..\Engine\Renderer\GL\GLMaterial.cpp"
 						>
@@ -3526,6 +3498,10 @@
 					</File>
 					<File
 						RelativePath="..\Engine\Renderer\GL\GLState.inl"
+						>
+					</File>
+					<File
+						RelativePath="..\Engine\Renderer\GL\GLSystem.h"
 						>
 					</File>
 					<File

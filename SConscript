@@ -333,9 +333,6 @@ build.backend.addIncludePath(source,
 		build.absPath('./Source')
 	])
 
-# we use SDL keycodes on all plats
-build.backend.addSDLPaths(source)
-
 if build.pctools():
 	build.backend.addCgPaths(source)
 	

@@ -222,24 +222,6 @@ class MSVC(Backend):
 			return self.qtPath('/lib/' + name + 'd.lib')
 		return self.qtPath('/lib/' + name + '.lib')
 				
-	def addSDLLibs(self, env):
-		self.addLib(env,
-			[
-				self.build.absPath('./Extern/Win/SDL/1.2.15/SDL.lib')
-			])
-		return env
-	
-	def addSDLMain(self, env):
-		self.addLib(env,
-			[
-				self.build.absPath('./Extern/Win/SDL/1.2.15/SDLmain.lib')
-			])
-		return env
-
-	def addSDLPaths(self, env):
-		self.addIncludePath(env, self.build.absPath('./Extern/SDL/1.2.15'))
-		return env
-		
 	def addQtMain(self, env):
 		self.addLib(env, self.qtLibPath('qtmain'))
 		return env

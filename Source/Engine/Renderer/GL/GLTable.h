@@ -9,21 +9,7 @@
 #include <Runtime/Math/Matrix.h>
 #include <Runtime/Container/ZoneVector.h>
 
-#if defined(RAD_OPT_PC)
-#include <SDL/SDL_opengl.h>
-#if defined(RAD_OPT_PC_TOOLS)
-#include <Cg/cg.h>
-#include <Cg/cgGL.h>
-#endif
-#elif defined(RAD_OPT_IOS)
-#define RAD_OPT_OGLES
-#define RAD_OPT_OGLES2
-#include <OpenGLES/ES2/gl.h>
-#include <OpenGLES/ES2/glext.h>
-#include "../IOS/GLPrototypes.h"
-#else
-#error RAD_ERROR_UNSUP_PLAT
-#endif
+#include "OpenGL.h"
 
 #if defined(RAD_OPT_TOOLS)
 struct glslopt_ctx;
