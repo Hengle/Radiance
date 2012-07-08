@@ -23,7 +23,7 @@ template <
 >
 struct zone_pool_hash_set
 {
-	typedef pool_allocator<Key, _Zone, 8, MaxUReg, DefaultAlignment, MemoryPool> pool_type;
+	typedef pool_allocator<Key, _Zone, 8, 0xffffffff, DefaultAlignment, MemoryPool> pool_type;
 	typedef typename container::hash_set<Key, pool_type >::type type;
 };
 
@@ -42,7 +42,7 @@ template <
 >
 struct zone_pool_hash_multiset
 {
-	typedef pool_allocator<Key, _Zone, 8, MaxUReg, DefaultAlignment, MemoryPool> pool_type;
+	typedef pool_allocator<Key, _Zone, 8, 0xffffffff, DefaultAlignment, MemoryPool> pool_type;
 	typedef typename container::hash_multiset<Key, pool_type >::type type;
 };
 
