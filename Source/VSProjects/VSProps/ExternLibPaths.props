@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+    <Import Project="BoostPaths.props" />
+    <Import Project="FreeTypePaths.props" />
+    <Import Project="LibOggPaths.props" />
+    <Import Project="LibVorbisPaths.props" />
+    <Import Project="LuaPaths.props" />
+    <Import Project="ZLibPaths.props" />
+    <Import Project="LibJPEGPaths.props" />
+    <Import Project="LibPNGPaths.props" />
+    <Import Project="CGPaths.props" />
+    <Import Project="OpenALPaths.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup />
+</Project>

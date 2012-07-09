@@ -29,13 +29,13 @@ extern "C" long __cdecl _InterlockedXor(long volatile*, long);
 
 #if RAD_OPT_MACHINE_WORD_SIZE == 8
 
-extern "C" long __cdecl _InterlockedIncrement64(__int64 volatile*);
-extern "C" long __cdecl _InterlockedDecrement64(__int64 volatile*);
-extern "C" long __cdecl _InterlockedExchange64(__int64 volatile*, __int64);
-extern "C" long __cdecl _InterlockedExchangeAdd64(__int64 volatile*, __int64);
-extern "C" long __cdecl _InterlockedAnd64(__int64 volatile*, __int64);
-extern "C" long __cdecl _InterlockedOr64(__int64 volatile*, __int64);
-extern "C" long __cdecl _InterlockedXor64(__int64 volatile*, __int64);
+extern "C" __int64 __cdecl _InterlockedIncrement64(__int64 volatile*);
+extern "C" __int64 __cdecl _InterlockedDecrement64(__int64 volatile*);
+extern "C" __int64 __cdecl _InterlockedExchange64(__int64 volatile*, __int64);
+extern "C" __int64 __cdecl _InterlockedExchangeAdd64(__int64 volatile*, __int64);
+extern "C" __int64 __cdecl _InterlockedAnd64(__int64 volatile*, __int64);
+extern "C" __int64 __cdecl _InterlockedOr64(__int64 volatile*, __int64);
+extern "C" __int64 __cdecl _InterlockedXor64(__int64 volatile*, __int64);
 
 #pragma intrinsic(_InterlockedIncrement64)
 #pragma intrinsic(_InterlockedDecrement64)
@@ -409,7 +409,7 @@ inline U64 Interlocked<U64>::operator += (const U64& x)
 template<>
 inline U64 Interlocked<U64>::operator -= (const U64& x)
 {
-	return (U64)::_InterlockedExchangeAdd64(reinterpret_cast<__int64 volatile*>(&m_val), -x) - x;
+	return (U64)::_InterlockedExchangeAdd64(reinterpret_cast<__int64 volatile*>(&m_val), -((S64)x)) - x;
 }
 
 template<>

@@ -11,6 +11,7 @@
 // This code is provided as-is with no express or implied warrenty and it is the USERS RESPONSIBILITY
 // TO ENSURE THEY ARE NOT VIOLATING ANY LAWS BY USING THIS CODE
 
+#include RADPCH
 #include "Dds.h"
 #include "../Utils.h"
 #include "../Endian.h"
@@ -113,7 +114,7 @@ enum
 // DDS Decode
 //////////////////////////////////////////////////////////////////////////////////////////
 
-static const U8* RADRT_CALL PrivateDXTDecode(const U8* dxtBuff, AddrSize* io_dxtBuffLength, UReg dxtFormat, UReg width, UReg height, void* outBuff);
+static const U8* RADRT_CALL PrivateDXTDecode(const U8* dxtBuff, AddrSize* io_dxtBuffLength, int dxtFormat, int width, int height, void* outBuff);
 
 static void SwapSurfaceDesc(SurfaceDesc2* sd)
 {
@@ -138,7 +139,7 @@ static void SwapSurfaceDesc(SurfaceDesc2* sd)
 	sd->caps.caps2 = endian::SwapLittle(sd->caps.caps2);
 }
 
-static UReg ColorBitsToFormat(UReg bpp, UReg red, UReg green, UReg blue, UReg alpha)
+static int ColorBitsToFormat(int bpp, int red, int green, int blue, int alpha)
 {
 	UReg rbc, gbc, bbc, abc;
 
@@ -193,7 +194,7 @@ static UReg ColorBitsToFormat(UReg bpp, UReg red, UReg green, UReg blue, UReg al
 	return Format_RGBA8888;
 }
 
-static void FormatToColorBits(UReg format, U32* redBits, U32* greenBits, U32* blueBits, U32* alphaBits)
+static void FormatToColorBits(int format, U32* redBits, U32* greenBits, U32* blueBits, U32* alphaBits)
 {
 	RAD_ASSERT(redBits&&greenBits&&blueBits&&alphaBits);
 
@@ -348,10 +349,11 @@ RADRT_API bool RADRT_CALL DecodeHeader(const void *buff, AddrSize buffLength, Im
 	if ((sd.caps.caps1&CapsComplex) && (sd.caps.caps2&Caps2Cubmap))
 	{
 		// how many?
-		UReg numSides = 0;
-		for (UReg i = 0; i < NumCubemapSides; i++)
+		int numSides = 0;
+		for (int i = 0; i < NumCubemapSides; i++)
 		{
-			if (sd.caps.caps2 & s_cubemapDirFlags[i]) numSides++;
+			if (sd.caps.caps2 & s_cubemapDirFlags[i]) 
+				numSides++;
 		}
 
 		if (numSides == 0) 
@@ -359,7 +361,8 @@ RADRT_API bool RADRT_CALL DecodeHeader(const void *buff, AddrSize buffLength, Im
 
 		if (!out.AllocateFrames(numSides)) 
 			return false; // number of frames.
-		for (UReg i = 0; i < numSides; i++)
+
+		for (int i = 0; i < numSides; i++)
 		{
 			Frame* f = &out.frames[i];
 			if (!out.AllocateMipmaps(i, sd.mipmapCount))
@@ -368,8 +371,8 @@ RADRT_API bool RADRT_CALL DecodeHeader(const void *buff, AddrSize buffLength, Im
 				return false;
 			}
 
-			UReg w = sd.width;
-			UReg h = sd.height;
+			int w = (int)sd.width;
+			int h = (int)sd.height;
 			
 			for (UReg k = 0; k < sd.mipmapCount; k++)
 			{
@@ -386,10 +389,10 @@ RADRT_API bool RADRT_CALL DecodeHeader(const void *buff, AddrSize buffLength, Im
 	{
 		if (!(out.AllocateFrames(1)&&out.AllocateMipmaps(0,sd.mipmapCount))) return false;
 
-		UReg w = sd.width;
-		UReg h = sd.height;
+		int w = (int)sd.width;
+		int h = (int)sd.height;
 
-		for (UReg i = 0; i < sd.mipmapCount; i++)
+		for (int i = 0; i < (int)sd.mipmapCount; i++)
 		{
 			out.frames[0].mipmaps[i].width = w;
 			out.frames[0].mipmaps[i].height = h;
@@ -407,7 +410,7 @@ RADRT_API bool RADRT_CALL DecodeHeader(const void *buff, AddrSize buffLength, Im
 	return true;
 }
 
-static void SwapRedAndBlue(U8* src, UReg bpp, AddrSize srcPixelCount, const SurfaceDesc2* sd)
+static void SwapRedAndBlue(U8* src, int bpp, AddrSize srcPixelCount, const SurfaceDesc2* sd)
 {
 	RAD_ASSERT(src);
 	RAD_ASSERT(sd);
@@ -459,17 +462,17 @@ static const U8* DecodePixels(
 	const U8* src, 
 	AddrSize* io_srcLength, 
 	const SurfaceDesc2* sd, 
-	UReg format, 
-	UReg width, 
-	UReg height, 
-	UReg bpp, 
+	int format, 
+	int width, 
+	int height, 
+	int bpp, 
 	AddrSize lumpSize, 
 	bool refSrcData, 
 	bool decompress, 
 	void** out, 
 	AddrSize* outSize, 
-	UReg* outFormat, 
-	UReg* outBPP, 
+	int* outFormat, 
+	int* outBPP, 
 	bool *isRef)
 {
 	RAD_ASSERT(src);
@@ -601,15 +604,15 @@ static const U8* DecodeMipMaps(
 	AddrSize* io_srcLength, 
 	const SurfaceDesc2* sd, 
 	Frame* f, 
-	UReg format, 
-	UReg width,
-	UReg height, 
-	UReg bpp, 
+	int format, 
+	int width,
+	int height, 
+	int bpp, 
 	AddrSize lumpSize, 
 	bool refSrcData, 
 	bool decompress, 
-	UReg* outFormat, 
-	UReg* outBPP)
+	int* outFormat, 
+	int* outBPP)
 {
 	RAD_ASSERT(src);
 	RAD_ASSERT(io_srcLength);
@@ -618,11 +621,11 @@ static const U8* DecodeMipMaps(
 	RAD_ASSERT(outFormat);
 	RAD_ASSERT(f->mipCount == sd->mipmapCount);
 
-	UReg w = width;
-	UReg h = height;
-	UReg newFormat = format;
+	int w = width;
+	int h = height;
+	int newFormat = format;
 	
-	for (UReg i = 0; i < sd->mipmapCount; i++)
+	for (int i = 0; i < (int)sd->mipmapCount; i++)
 	{
 		Mipmap* m = &f->mipmaps[i];
 
@@ -642,8 +645,8 @@ static const U8* DecodeMipMaps(
 			if (isRef) f->flags |= SharedFrameFlagRef;
 		}
 
-		w = (UReg)std::max<UReg>(1, w >> 1);
-		h = (UReg)std::max<UReg>(1, h >> 1);
+		w = (UReg)std::max<int>(1, w >> 1);
+		h = (UReg)std::max<int>(1, h >> 1);
 		lumpSize = w * h * bpp;
 	}
 
@@ -711,7 +714,7 @@ RADRT_API bool RADRT_CALL Decode(const void *buff, AddrSize buffLength, Image &o
 			return false;
 		if (!(sd.caps.caps1&CapsComplex)) 
 			return false;
-		UReg maxEdge = (UReg)std::max(sd.width, sd.height);
+		U32 maxEdge = std::max(sd.width, sd.height);
 		if (sd.mipmapCount > LowBitVal(maxEdge)) 
 			return false;
 	}
@@ -775,10 +778,11 @@ RADRT_API bool RADRT_CALL Decode(const void *buff, AddrSize buffLength, Image &o
 	if ((sd.caps.caps1&CapsComplex) && (sd.caps.caps2&Caps2Cubmap))
 	{
 		// how many?
-		UReg numSides = 0;
-		for (UReg i = 0; i < NumCubemapSides; i++)
+		int numSides = 0;
+		for (int i = 0; i < NumCubemapSides; i++)
 		{
-			if (sd.caps.caps2 & s_cubemapDirFlags[i]) numSides++;
+			if (sd.caps.caps2 & s_cubemapDirFlags[i]) 
+				numSides++;
 		}
 
 		if (numSides == 0) 
@@ -786,12 +790,12 @@ RADRT_API bool RADRT_CALL Decode(const void *buff, AddrSize buffLength, Image &o
 
 		if (!out.AllocateFrames(numSides)) 
 			return false; // number of frames.
-		UReg format;
-		UReg bpp;
-		for (UReg i = 0; i < numSides; i++)
+		int format;
+		int bpp;
+		for (int i = 0; i < numSides; i++)
 		{
 			Frame* f = &out.frames[i];
-			if (!out.AllocateMipmaps(i, sd.mipmapCount))
+			if (!out.AllocateMipmaps(i, (int)sd.mipmapCount))
 			{
 				out.Free(); 
 				return false;
@@ -882,29 +886,31 @@ struct OUTBUFF
 static bool EncodeMipMaps(
 	const SurfaceDesc2* sd, 
 	const Frame* f, 
-	UReg srcBPP, 
-	UReg srcFormat, 
-	UReg dstFormat, 
+	int srcBPP, 
+	int srcFormat, 
+	int dstFormat, 
 	OUTBUFF* outBuff)
 {
 	RAD_ASSERT(sd);
 	RAD_ASSERT(f);
 	RAD_ASSERT(outBuff);
 
-	if (!f->mipCount) return false;
+	if (!f->mipCount) 
+		return false;
 
 	// do we have to convert?
 	if (IS_DXT(srcFormat))
 	{
 		RAD_ASSERT(srcFormat != dstFormat); // give em an RAD_ASSERT in debug.
-		if (srcFormat != dstFormat) return false;
+		if (srcFormat != dstFormat) 
+			return false;
 	}
 
 	void* temp = 0, *dxtBuff = 0;
 
-	UReg expWidth = f->mipmaps[0].width;
-	UReg expHeight = f->mipmaps[0].height;
-	UReg dstBPP;
+	int expWidth = f->mipmaps[0].width;
+	int expHeight = f->mipmaps[0].height;
+	int dstBPP;
 	AddrSize dstSize;
 
 	RAD_ASSERT(expWidth&&expHeight);
@@ -912,7 +918,8 @@ static bool EncodeMipMaps(
 	if (NOT_DXT(srcFormat))
 	{
 		temp = zone_malloc(ZImageCodec, expWidth*expHeight*srcBPP, 0); // biggest we'll need.
-		if (!temp) return false;
+		if (!temp) 
+			return false;
 
 		if (IS_DXT(dstFormat))
 		{
@@ -927,21 +934,25 @@ static bool EncodeMipMaps(
 		}
 	}
 	
-	for (UReg i = 0; i < f->mipCount; i++)
+	for (int i = 0; i < f->mipCount; i++)
 	{
 		Mipmap* m = &f->mipmaps[i];
 
 		if (!expWidth || !expHeight)
 		{
-			if (temp) zone_free(temp);
-			if (dxtBuff) zone_free(dxtBuff);
+			if (temp) 
+				zone_free(temp);
+			if (dxtBuff) 
+				zone_free(dxtBuff);
 			return false;
 		}
 
 		if ((expWidth != m->width) || (expHeight != m->height))
 		{
-			if (temp) zone_free(temp);
-			if (dxtBuff) zone_free(dxtBuff);
+			if (temp) 
+				zone_free(temp);
+			if (dxtBuff) 
+				zone_free(dxtBuff);
 			return false;
 		}
 
@@ -1024,16 +1035,18 @@ static bool EncodeMipMaps(
 			}
 		}
 
-		expWidth = (UReg)std::max<UReg>(1, expWidth >> 1);
-		expHeight = (UReg)std::max<UReg>(1, expHeight >> 1);
+		expWidth = (UReg)std::max<int>(1, expWidth >> 1);
+		expHeight = (UReg)std::max<int>(1, expHeight >> 1);
 	}
 
-	if (temp) zone_free(temp);
-	if (dxtBuff) zone_free(dxtBuff);
+	if (temp) 
+		zone_free(temp);
+	if (dxtBuff) 
+		zone_free(dxtBuff);
 	return true;
 }
 
-RADRT_API bool RADRT_CALL Encode(const Image &in, UReg encodeFormat, UReg encodeFlags, void *&outData, AddrSize &outSize)
+RADRT_API bool RADRT_CALL Encode(const Image &in, int encodeFormat, int encodeFlags, void *&outData, AddrSize &outSize)
 {
 	RAD_ASSERT(in.frameCount>0);
 
@@ -1048,12 +1061,12 @@ RADRT_API bool RADRT_CALL Encode(const Image &in, UReg encodeFormat, UReg encode
 		// better have 6 frames!
 		RAD_ASSERT_MSG(in.frameCount==6, "Need 6 frames for a cubemap!");
 
-		UReg c = in.frames[0].mipCount;
-		UReg w = in.frames[0].mipmaps[0].width;
-		UReg h = in.frames[0].mipmaps[0].width;
+		int c = in.frames[0].mipCount;
+		int w = in.frames[0].mipmaps[0].width;
+		int h = in.frames[0].mipmaps[0].width;
 		AddrSize d = in.frames[0].mipmaps[0].dataSize;
 
-		for (UReg i = 1; i < 6; i++)
+		for (int i = 1; i < 6; i++)
 		{
 			RAD_ASSERT_MSG(in.frames[i].mipCount==c, "All cubemaps sides must have the same mipmap count!");
 			RAD_ASSERT_MSG((in.frames[i].mipmaps[0].width==w)&&
@@ -1068,7 +1081,8 @@ RADRT_API bool RADRT_CALL Encode(const Image &in, UReg encodeFormat, UReg encode
 	if (fpFormat)
 	{
 		RAD_ASSERT_MSG(in.format==encodeFormat, "DDSEncode: cannot convert floating point pixel formats!");
-		if (in.format != encodeFormat) return false;
+		if (in.format != encodeFormat) 
+			return false;
 	}
 
 	Frame* frame = &in.frames[0];
@@ -1080,7 +1094,8 @@ RADRT_API bool RADRT_CALL Encode(const Image &in, UReg encodeFormat, UReg encode
 	RAD_ASSERT(PowerOf2(mip->width)==mip->width);
 	RAD_ASSERT(PowerOf2(mip->height)==mip->height);
 
-	if (!outBuff.Write("DDS ", 4)) return false;
+	if (!outBuff.Write("DDS ", 4)) 
+		return false;
 
 	memset(&sd, 0, sizeof(SurfaceDesc2));
 	sd.size = sizeof(SurfaceDesc2);
@@ -1242,7 +1257,7 @@ RADRT_API bool RADRT_CALL Encode(const Image &in, UReg encodeFormat, UReg encode
 // DXT Encode/Decode
 //////////////////////////////////////////////////////////////////////////////////////////
 
-static const U8* DecodeDXT1(const U8* dxtBuff, AddrSize* io_dxtBuffLength, void* outBuff, UReg width, UReg height)
+static const U8* DecodeDXT1(const U8* dxtBuff, AddrSize* io_dxtBuffLength, void* outBuff, int width, int height)
 {
 	RAD_ASSERT(dxtBuff&&io_dxtBuffLength);
 	RAD_ASSERT(outBuff);
@@ -1264,11 +1279,12 @@ static const U8* DecodeDXT1(const U8* dxtBuff, AddrSize* io_dxtBuffLength, void*
 	
 	// check size. (8 bytes per 16 pixels).
 	UReg lumpSize = (UReg)std::max<UReg>(1, (width*height/16)) * 8;
-	if (*io_dxtBuffLength < lumpSize) return 0;
+	if (*io_dxtBuffLength < lumpSize) 
+		return 0;
 
-	for (UReg y = 0; y < height; y+=4)
+	for (int y = 0; y < height; y+=4)
 	{
-		for (UReg x = 0; x < width; x+=4)
+		for (int x = 0; x < width; x+=4)
 		{
 			colors565[0] = endian::SwapLittle(((U16*)(dxtBuff+0))[0]);
 			colors565[1] = endian::SwapLittle(((U16*)(dxtBuff+2))[0]);
@@ -1316,9 +1332,9 @@ static const U8* DecodeDXT1(const U8* dxtBuff, AddrSize* io_dxtBuffLength, void*
 			UReg sel;
 			AddrSize ofs;
 
-			for (UReg by = 0, bit = 0; by < 4; by++)
+			for (int by = 0, bit = 0; by < 4; by++)
 			{
-				for (UReg bx = 0; bx < 4; bx++, bit++)
+				for (int bx = 0; bx < 4; bx++, bit++)
 				{
 					if (((x+bx)<width) && ((y+by)<height))
 					{
@@ -1341,7 +1357,7 @@ static const U8* DecodeDXT1(const U8* dxtBuff, AddrSize* io_dxtBuffLength, void*
 	return dxtBuff;
 }
 
-static const U8* DecodeDXT3(const U8* dxtBuff, AddrSize* io_dxtBuffLength, void* outBuff, UReg width, UReg height)
+static const U8* DecodeDXT3(const U8* dxtBuff, AddrSize* io_dxtBuffLength, void* outBuff, int width, int height)
 {
 	RAD_ASSERT(dxtBuff&&io_dxtBuffLength);
 	RAD_ASSERT(outBuff);
@@ -1364,11 +1380,12 @@ static const U8* DecodeDXT3(const U8* dxtBuff, AddrSize* io_dxtBuffLength, void*
 	
 	// check size. (8 bytes per 16 pixels).
 	UReg lumpSize = (UReg)std::max<UReg>(1, (width*height/16)) * 16;
-	if (*io_dxtBuffLength < lumpSize) return 0;
+	if (*io_dxtBuffLength < lumpSize) 
+		return 0;
 
-	for (UReg y = 0; y < height; y+=4)
+	for (int y = 0; y < height; y+=4)
 	{
-		for (UReg x = 0; x < width; x+=4)
+		for (int x = 0; x < width; x+=4)
 		{
 			alphaBlock[0] = endian::SwapLittle(((U16*)(dxtBuff))[0]);
 			alphaBlock[1] = endian::SwapLittle(((U16*)(dxtBuff))[1]);
@@ -1407,10 +1424,10 @@ static const U8* DecodeDXT3(const U8* dxtBuff, AddrSize* io_dxtBuffLength, void*
 			U16 alpha;
 			AddrSize ofs;
 
-			for (UReg by = 0, bit = 0; by < 4; by++)
+			for (int by = 0, bit = 0; by < 4; by++)
 			{
 				alpha = alphaBlock[by];
-				for (UReg bx = 0; bx < 4; bx++, bit++)
+				for (int bx = 0; bx < 4; bx++, bit++)
 				{
 					if (((x+bx)<width) && ((y+by)<height))
 					{
@@ -1460,11 +1477,12 @@ static const U8* DecodeDXT5(const U8* dxtBuff, AddrSize* io_dxtBuffLength, void*
 	
 	// check size. (8 bytes per 16 pixels).
 	UReg lumpSize = (UReg)std::max<UReg>(1, (width*height/16)) * 16;
-	if (*io_dxtBuffLength < lumpSize) return 0;
+	if (*io_dxtBuffLength < lumpSize) 
+		return 0;
 
-	for (UReg y = 0; y < height; y+=4)
+	for (int y = 0; y < height; y+=4)
 	{
-		for (UReg x = 0; x < width; x+=4)
+		for (int x = 0; x < width; x+=4)
 		{
 			alphas[0]    = dxtBuff[0];
 			alphas[1]    = dxtBuff[1];
@@ -1584,7 +1602,7 @@ static const U8* DecodeDXT5(const U8* dxtBuff, AddrSize* io_dxtBuffLength, void*
 	return dxtBuff;
 }
 
-static const U8* RADRT_CALL PrivateDXTDecode(const U8* dxtBuff, AddrSize* io_dxtBuffLength, UReg dxtFormat, UReg width, UReg height, void* outBuff)
+static const U8* RADRT_CALL PrivateDXTDecode(const U8* dxtBuff, AddrSize* io_dxtBuffLength, int dxtFormat, int width, int height, void* outBuff)
 {
 	RAD_ASSERT(dxtBuff&&io_dxtBuffLength);
 	RAD_ASSERT(outBuff);
@@ -1608,7 +1626,7 @@ static const U8* RADRT_CALL PrivateDXTDecode(const U8* dxtBuff, AddrSize* io_dxt
 	return r;
 }
 
-RADRT_API bool RADRT_CALL DXTDecode(const void* dxtBuff, AddrSize dxtBuffLength, UReg dxtFormat, UReg width, UReg height, void* outBuff)
+RADRT_API bool RADRT_CALL DXTDecode(const void* dxtBuff, AddrSize dxtBuffLength, int dxtFormat, int width, int height, void* outBuff)
 {
 	RAD_ASSERT(dxtBuff&&dxtBuffLength);
 	RAD_ASSERT(outBuff);
@@ -1775,7 +1793,7 @@ static U32 GenBitMask(U16 ex0, U16 ex1, UReg numColors, const U16* srcColors, co
 				if (d < best)
 				{
 					best = d;
-					mask[i] = k;
+					mask[i] = (U8)k;
 				}
 			}
 		}
@@ -1846,7 +1864,7 @@ static void GenAlphaBitMask(U8 a0, U8 a1, UReg numColors, U8* srcAlpha, U8* mask
 	mask[5] = (U8)((m[13]&0x6) | (m[14]<<2) | (m[15]<<5));
 }
 
-static U8* ExtractAlpha(const void* src, AddrSize srcLength, UReg srcFormat, UReg width, UReg height)
+static U8* ExtractAlpha(const void* src, AddrSize srcLength, int srcFormat, int width, int height)
 {
 	RAD_ASSERT(src);
 	RAD_ASSERT(srcLength);
@@ -1857,7 +1875,8 @@ static U8* ExtractAlpha(const void* src, AddrSize srcLength, UReg srcFormat, URe
 	if (srcFormat != Format_RGBA8888)
 	{
 		rgb = (U8*)zone_malloc(ZImageCodec, width*height*4, 0);
-		if (!rgb) return 0;
+		if (!rgb) 
+			return 0;
 		if (!ConvertPixelData(src, srcLength, rgb, 0, srcFormat, Format_RGBA8888))
 		{
 			zone_free(rgb);
@@ -1887,7 +1906,7 @@ static U8* ExtractAlpha(const void* src, AddrSize srcLength, UReg srcFormat, URe
 	return alpha;
 }
 
-static bool PrivateEncodeDXT1(const void* src, AddrSize srcLength, UReg srcFormat, UReg width, UReg height, void* outBuff)
+static bool PrivateEncodeDXT1(const void* src, AddrSize srcLength, int srcFormat, int width, int height, void* outBuff)
 {
     U8* dstB = (U8*)outBuff;
 	U16* wrkSrc = (U16*)src;
@@ -1896,7 +1915,8 @@ static bool PrivateEncodeDXT1(const void* src, AddrSize srcLength, UReg srcForma
 	{
 		// convert.
 		wrkSrc = (U16*)zone_malloc(ZImageCodec, width*height*2, 0);
-		if (!wrkSrc) return false;
+		if (!wrkSrc) 
+			return false;
 
 		if (!ConvertPixelData(src, srcLength, (void*)wrkSrc, 0, srcFormat, Format_RGB565))
 		{
@@ -1920,11 +1940,11 @@ static bool PrivateEncodeDXT1(const void* src, AddrSize srcLength, UReg srcForma
 	U16 block[16], c0, c1;
 	U8  alphaBlock[16];
     
-	for (UReg y = 0; y < height; y+=4)
+	for (int y = 0; y < height; y+=4)
 	{
-		for (UReg x = 0; x < width; x+=4)
+		for (int x = 0; x < width; x+=4)
 		{
-			GetAlphaBlock(alphaBlock, alpha, x, y, width, height);
+			GetAlphaBlock(alphaBlock, alpha, (UReg)x, (UReg)y, width, height);
 			bool hasAlpha = false;
 
 			// do we need to encode alpha?
@@ -1932,11 +1952,12 @@ static bool PrivateEncodeDXT1(const void* src, AddrSize srcLength, UReg srcForma
 			{
 				if (alphaBlock[i] < 128)
 				{
-					hasAlpha = true; break;
+					hasAlpha = true; 
+					break;
 				}
 			}
 
-			GetBlock(block, wrkSrc, x, y, width, height);
+			GetBlock(block, wrkSrc, (UReg)x, (UReg)y, width, height);
 			ChooseEndPoints(block, &c0, &c1);
 			CorrectDXTEndPoints(&c0, &c1, hasAlpha);
 			((U16*)dstB)[0] = endian::SwapLittle(c0);
@@ -1965,7 +1986,7 @@ static bool PrivateEncodeDXT1(const void* src, AddrSize srcLength, UReg srcForma
 	return true;
 }
 
-static bool PrivateEncodeDXT3(const void* src, AddrSize srcLength, UReg srcFormat, UReg width, UReg height, void* outBuff)
+static bool PrivateEncodeDXT3(const void* src, AddrSize srcLength, int srcFormat, int width, int height, void* outBuff)
 {
     U8* dstB = (U8*)outBuff;
 	U16* wrkSrc = (U16*)src;
@@ -1974,7 +1995,8 @@ static bool PrivateEncodeDXT3(const void* src, AddrSize srcLength, UReg srcForma
 	{
 		// convert.
 		wrkSrc = (U16*)zone_malloc(ZImageCodec, width*height*2, 0);
-		if (!wrkSrc) return false;
+		if (!wrkSrc) 
+			return false;
 
 		if (!ConvertPixelData(src, srcLength, (void*)wrkSrc, 0, srcFormat, Format_RGB565))
 		{
@@ -1998,17 +2020,17 @@ static bool PrivateEncodeDXT3(const void* src, AddrSize srcLength, UReg srcForma
 	U16 block[16], c0, c1;
 	U8  alphaBlock[16];
     
-	for (UReg y = 0; y < height; y+=4)
+	for (int y = 0; y < height; y+=4)
 	{
-		for (UReg x = 0; x < width; x+=4)
+		for (int x = 0; x < width; x+=4)
 		{
-			GetAlphaBlock(alphaBlock, alpha, x, y, width, height);
+			GetAlphaBlock(alphaBlock, alpha, (UReg)x, (UReg)y, width, height);
 			for (UReg i = 0; i < 16; i+=2)
 			{
 				*(dstB++) = ((alphaBlock[i]>>4)<<4) | (alphaBlock[i+1]>>4);
 			}
 
-			GetBlock(block, wrkSrc, x, y, width, height);
+			GetBlock(block, wrkSrc, (UReg)x, (UReg)y, width, height);
 			ChooseEndPoints(block, &c0, &c1);
 			CorrectDXTEndPoints(&c0, &c1, false);
 			((U16*)dstB)[0] = endian::SwapLittle(c0);
@@ -2030,7 +2052,7 @@ static bool PrivateEncodeDXT3(const void* src, AddrSize srcLength, UReg srcForma
 	return true;
 }
 
-static bool PrivateEncodeDXT5(const void* src, AddrSize srcLength, UReg srcFormat, UReg width, UReg height, void* outBuff)
+static bool PrivateEncodeDXT5(const void* src, AddrSize srcLength, int srcFormat, int width, int height, void* outBuff)
 {
     U8* dstB = (U8*)outBuff;
 	U16* wrkSrc = (U16*)src;
@@ -2039,7 +2061,8 @@ static bool PrivateEncodeDXT5(const void* src, AddrSize srcLength, UReg srcForma
 	{
 		// convert.
 		wrkSrc = (U16*)zone_malloc(ZImageCodec, width*height*2, 0);
-		if (!wrkSrc) return false;
+		if (!wrkSrc) 
+			return false;
 
 		if (!ConvertPixelData(src, srcLength, (void*)wrkSrc, 0, srcFormat, Format_RGB565))
 		{
@@ -2063,11 +2086,11 @@ static bool PrivateEncodeDXT5(const void* src, AddrSize srcLength, UReg srcForma
 	U16 block[16], c0, c1;
 	U8  alphaBlock[16], alphaMask[6], alphaOut[16], a0, a1;
     
-	for (UReg y = 0; y < height; y+=4)
+	for (int y = 0; y < height; y+=4)
 	{
-		for (UReg x = 0; x < width; x+=4)
+		for (int x = 0; x < width; x+=4)
 		{
-			GetAlphaBlock(alphaBlock, alpha, x, y, width, height);
+			GetAlphaBlock(alphaBlock, alpha, (UReg)x, (UReg)y, width, height);
 			ChooseAlphaEndPoints(alphaBlock, &a0, &a1);
 			GenAlphaBitMask(a0, a1, 6, alphaBlock, alphaMask, alphaOut);
 			dstB[0] = a0;
@@ -2080,7 +2103,7 @@ static bool PrivateEncodeDXT5(const void* src, AddrSize srcLength, UReg srcForma
 			dstB[7] = alphaMask[5];
 			dstB += 8;
 
-			GetBlock(block, wrkSrc, x, y, width, height);
+			GetBlock(block, wrkSrc, (UReg)x, (UReg)y, width, height);
 			ChooseEndPoints(block, &c0, &c1);
 			CorrectDXTEndPoints(&c0, &c1, false);
 			((U16*)dstB)[0] = endian::SwapLittle(c0);
@@ -2102,7 +2125,7 @@ static bool PrivateEncodeDXT5(const void* src, AddrSize srcLength, UReg srcForma
 	return true;
 }
 
-RADRT_API bool RADRT_CALL DXTEncode(const void* src, AddrSize srcLength, UReg srcFormat, UReg dstFormat, UReg width, UReg height, void* outBuff)
+RADRT_API bool RADRT_CALL DXTEncode(const void* src, AddrSize srcLength, int srcFormat, int dstFormat, int width, int height, void* outBuff)
 {
 	RAD_ASSERT(src&&srcLength);
 	RAD_ASSERT(NOT_DXT(srcFormat));
@@ -2131,7 +2154,7 @@ RADRT_API bool RADRT_CALL DXTEncode(const void* src, AddrSize srcLength, UReg sr
 	return s;
 }
 
-RADRT_API AddrSize RADRT_CALL DXTEncodeSize(UReg format, UReg width, UReg height)
+RADRT_API AddrSize RADRT_CALL DXTEncodeSize(int format, int width, int height)
 {
 	switch(format)
 	{

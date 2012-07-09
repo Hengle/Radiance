@@ -4,6 +4,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "Bmp.h"
 #include "../Endian.h"
 
@@ -544,7 +545,7 @@ static bool BmpEncodeRLE8Scanline(const U8* scanline, UReg width, OUTBUFF &outBu
 				{
 					RAD_ASSERT(scanlen >= 3);
 					codes[0] = 0;
-					codes[1] = scanlen; // literal bytes.
+					codes[1] = (U8)scanlen; // literal bytes.
 					if (!(outBuff.Write(codes, 2)&&outBuff.Write(rawline, scanlen))) 
 						return false;
 					if (scanlen&1)
@@ -571,7 +572,7 @@ static bool BmpEncodeRLE8Scanline(const U8* scanline, UReg width, OUTBUFF &outBu
 				RAD_ASSERT(scanmode == SCANMODE_RLE);
 				if (scanlen > 0)
 				{
-					codes[0] = scanlen;
+					codes[0] = (U8)scanlen;
 					codes[1] = scanpix;
 					if (!outBuff.Write(codes, 2)) 
 						return false;

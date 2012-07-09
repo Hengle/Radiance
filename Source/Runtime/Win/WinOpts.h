@@ -15,7 +15,12 @@
 #define RAD_OPT_INTEL
 #define RAD_OPT_WIN
 #define RAD_OPT_LITTLE_ENDIAN
-#define RAD_OPT_MACHINE_WORD_SIZE 4
+
+#if defined(_WIN64)
+	#define RAD_OPT_MACHINE_WORD_SIZE 8
+#else
+	#define RAD_OPT_MACHINE_WORD_SIZE 4
+#endif
 
 #if defined(_MSC_VER)
 
@@ -86,13 +91,21 @@
 		#define RAD_OPT_ASCIISTRING
 	#endif
 
-	#define RAD_FASTCALL           __fastcall
-	#define RAD_STDCALL            __stdcall
-	#define RAD_ANSICALL           __cdecl
+	#if defined(_WIN64)
+		#define RAD_FASTCALL
+		#define RAD_STDCALL
+		#define RAD_ANSICALL
 
-	#define RAD_FASTCALL_TRAITS
-	#define RAD_STDCALL_TRAITS
-	#define RAD_ANSICALL_TRAITS
+		#define RAD_ANSICALL_TRAITS
+	#else
+		#define RAD_FASTCALL           __fastcall
+		#define RAD_STDCALL            __stdcall
+		#define RAD_ANSICALL           __cdecl
+
+		#define RAD_FASTCALL_TRAITS
+		#define RAD_STDCALL_TRAITS
+		#define RAD_ANSICALL_TRAITS
+	#endif
 
 	#define RAD_THREAD_VAR __declspec(thread)
 

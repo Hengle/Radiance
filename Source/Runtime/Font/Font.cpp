@@ -4,6 +4,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "Font.h"
 #include "../Thread/Interlocked.h"
 #include "../Base/ObjectPool.h"
@@ -108,7 +109,7 @@ const U8* Bitmap::RAD_IMPLEMENT_GET(data) {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void Metrics::Copy(const FT_Glyph_Metrics_ *metrics) {
-	BOOST_STATIC_ASSERT(sizeof(FT_Glyph_Metrics_)  == SizeofMetrics);
+	BOOST_STATIC_ASSERT(sizeof(FT_Glyph_Metrics_)  <= SizeofMetrics);
 	RAD_ASSERT(metrics);
 	memcpy(m_metrics, metrics, SizeofMetrics);
 }

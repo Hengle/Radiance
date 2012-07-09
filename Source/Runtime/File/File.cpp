@@ -4,6 +4,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "File.h"
 #include "PrivateFile.h"
 #include "../String.h"
@@ -311,7 +312,7 @@ RADRT_API void RADRT_CALL FileExt(
 		{
 			if (path[i-1] == L'.')
 			{
-				ncpy(ext, &path[i-1], extBufferSize);
+				ncpy(ext, &path[i-1], (int)extBufferSize);
 				break;
 			}
 		}
@@ -468,7 +469,7 @@ RADRT_API void FileBaseName(
 
 	// +1 ncpy null
 	len = std::min<UReg>((UReg)(end-start)+1, basePathBufferSize);
-	::string::ncpy(basePath, start, len);
+	::string::ncpy(basePath, start, (int)len);
 }
 
 RADRT_API UReg RADRT_CALL FilePathNameLength(
@@ -512,7 +513,7 @@ RADRT_API void RADRT_CALL FilePathName(
 
 	// +1 ncpy null
 	len = std::min<UReg>((UReg)(end-path)+2, pathNameBufferSize);
-	::string::ncpy(pathName, path, len);
+	::string::ncpy(pathName, path, (int)len);
 }
 
 RADRT_API bool RADRT_CALL FilePathIsValid(
@@ -638,7 +639,7 @@ RADRT_API bool RADRT_CALL ExpandAliases(
 		valid = true;
 	}
 
-	ncpy(expandedPath, src, expandedPathBufferSize);
+	ncpy(expandedPath, src, (int)expandedPathBufferSize);
 
 	return valid;
 }

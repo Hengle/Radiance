@@ -4,6 +4,7 @@
 // Author: Mike Songy
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/thread/locks.hpp>
 

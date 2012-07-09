@@ -518,4 +518,4 @@ std::basic_ostream<CharType, Traits>& operator << (std::basic_ostream<CharType, 
 
 #include "../PopPack.h"
 
-#include "String.inl"
+#include "String_inl.h"

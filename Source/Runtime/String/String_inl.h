@@ -319,7 +319,7 @@ inline int String::StrStr(const char *sz) const {
 	RAD_ASSERT(sz);
 	const char *root = c_str;
 	const char *pos = string::strstr(root, sz);
-	return pos ? (pos-root) : -1;
+	return pos ? (int)(pos-root) : -1;
 }
 
 inline String String::Join(const String &str) const {

@@ -17,6 +17,12 @@ class App;
 class Game;
 struct InputEvent;
 
+class RADENG_CLASS NativeApp {
+public:
+	
+	void LaunchURL(const char *sz);
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 
 class RADENG_CLASS App : public NativeApp

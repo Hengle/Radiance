@@ -218,7 +218,7 @@ inline int coll<wchar_t>(const wchar_t *a, const wchar_t *b) {
 
 template<>
 inline int spn<char>(const char *a, const char *b) {
-	return ::strspn(a, b);
+	return (int)::strspn(a, b);
 }
 
 template<>
@@ -383,7 +383,7 @@ inline int len(const T *a) {
 	while (*b) {
 		++b;
 	}
-	return b-a;
+	return (int)(b-a);
 }
 
 template<>

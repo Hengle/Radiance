@@ -125,7 +125,7 @@ inline T LowBitVal(T val)
 {
 	if (!val)
 		return T(0);
-	return 1<<LowBit(val);
+	return static_cast<T>(1)<<LowBit(val);
 }
 
 template <typename T>

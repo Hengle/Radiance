@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "../Thread.h"
 #include "../Runtime.h"
 #include "../Base/CPUCount.h"
@@ -71,16 +72,16 @@ void Initialize()
 		logical  = 1;
 	}
 	
-	UReg logMask = 0;
+	int logMask = 0;
 
 	for (int i = 0; i < (int)logical; ++i)
 	{
-		logMask |= (1<<i);
+		logMask |= 1<<i;
 	}
 
 	for (int i = 0; i < (int)physical; ++i)
 	{
-		UReg mask = logMask << (i*logical);
+		int mask = logMask << (i*logical);
 		ThreadContext::Ref r(new (ZRuntime) ThreadContext(i, mask));
 		s_processors.push_back(r);
 	}
@@ -383,7 +384,7 @@ PriorityClass Thread::Priority()
 	return p;
 }
 
-bool Thread::Join(UReg maxWaitTime)
+bool Thread::Join(U32 maxWaitTime)
 {
 	// i don't think it's necessary to wrap this in a crit.
 	return (::WaitForSingleObject(m_exitEvent, maxWaitTime) == WAIT_OBJECT_0) ? true : false;
@@ -403,11 +404,13 @@ DWORD WINAPI Thread::ThreadProc(void* parm)
 
 	::EnterCriticalSection(&thread->m_imp.m_cs);
 	thread->m_imp.m_retCode = ret;
+#if defined(RAD_OPT_FIBERS)
 	if (thread->m_imp.m_fiber)
 	{
 		ConvertFiberToThread();
 		thread->m_imp.m_fiber = 0;
 	}
+#endif
 	CloseHandle(thread->m_imp.m_thread);
 	thread->m_imp.m_thread = 0;
 	::LeaveCriticalSection(&thread->m_imp.m_cs);

@@ -9,7 +9,7 @@
 #include <Runtime/Math/Matrix.h>
 #include <Runtime/Container/ZoneVector.h>
 
-#include "OpenGL.h"
+#include "GLSystem.h"
 
 #if defined(RAD_OPT_TOOLS)
 struct glslopt_ctx;
@@ -209,7 +209,7 @@ struct RADENG_CLASS GLTable
 	PFNGLDISABLEVERTEXATTRIBARRAYARBPROC DisableVertexAttribArrayARB;
 	
 	bool EXT_framebuffer_multisample;
-	PFNGLRENDERBUFFERSTORAGEMULTISAMPLE RenderbufferStorageMultisampleEXT;
+	PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC RenderbufferStorageMultisampleEXT;
 	
 	bool EXT_swap_control;
 	int (APIENTRYP SetSwapInterval) (int i);

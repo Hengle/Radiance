@@ -125,7 +125,7 @@ class RADRT_CLASS Thread
 
 	UReg ReturnCode() { return m_retCode; }
 	bool HasExited() { return m_exited; }
-	bool Join(UReg maxWaitTime);
+	bool Join(U32 maxWaitTime);
 #if defined(RAD_OPT_FIBERS)
 	void SwitchToFiber(Fiber &fiber);
 #endif

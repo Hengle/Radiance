@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "Runtime.h"
 #include "Thread.h"
 #include "Base/SIMD.h"

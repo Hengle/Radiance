@@ -26,9 +26,9 @@
 #error RAD_ERROR_UNSUP_PLAT
 #endif
 
-#if defined(RAD_OPT_PC) && defined (RAD_OPT_PC_TOOLS)
-#include <Cg/cg.h>
-#include <Cg/cgGL.h>
+#if defined (RAD_OPT_PC_TOOLS)
+	#include <Cg/cg.h>
+	#include <Cg/cgGL.h>
 #endif
 
 #include "glext.h"

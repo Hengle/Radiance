@@ -10,7 +10,6 @@
 #endif
 
 #include <string>
-#include <boost/algorithm/string.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/array.hpp>

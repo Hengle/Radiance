@@ -4,6 +4,7 @@
 // Author: Vlad Andreev
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "../Base.h"
 #include "WinCrashReporter.h"
 #include "../File.h"
@@ -203,6 +204,18 @@ BOOL CALLBACK CrashReporter::Enumerate(PSTR moduleName, DWORD64 moduleBase, ULON
 	return TRUE;
 }
 
+#if defined(_WIN64)
+#define MACHINE_TYPE IMAGE_FILE_MACHINE_AMD64
+#define CONTEXT_RECORD_PC(_x) _x->Rip
+#define CONTEXT_RECORD_STACK(_x) _x->Rsp
+#define CONTEXT_RECORD_FRAME(_x) _x->Rbp
+#else
+#define MACHINE_TYPE IMAGE_FILE_MACHINE_I386
+#define CONTEXT_RECORD_PC(_x) _x->Eip
+#define CONTEXT_RECORD_STACK(_x) _x->Esp
+#define CONTEXT_RECORD_FRAME(_x) _x->Ebp
+#endif
+
 LONG WINAPI CrashReporter::ExceptionFilter(struct _EXCEPTION_POINTERS* ptrs)
 {
 	std::stringstream reportStream;
@@ -218,12 +231,13 @@ LONG WINAPI CrashReporter::ExceptionFilter(struct _EXCEPTION_POINTERS* ptrs)
 		memset(&frame, 0, sizeof(frame));
 
 		// Set up the frame
-		frame.AddrPC.Offset = ptrs->ContextRecord->Eip;
+		frame.AddrPC.Offset = CONTEXT_RECORD_PC(ptrs->ContextRecord);
 		frame.AddrPC.Mode = AddrModeFlat;
-		frame.AddrStack.Offset = ptrs->ContextRecord->Esp;
+		frame.AddrStack.Offset = CONTEXT_RECORD_STACK(ptrs->ContextRecord);
 		frame.AddrStack.Mode = AddrModeFlat;
-		frame.AddrFrame.Offset = ptrs->ContextRecord->Ebp;
+		frame.AddrFrame.Offset = CONTEXT_RECORD_FRAME(ptrs->ContextRecord);
 		frame.AddrFrame.Mode = AddrModeFlat;
+
 		BOOL ret;
 
 		DWORD64 offsetFromSymbol = 0;

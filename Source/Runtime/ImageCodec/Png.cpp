@@ -4,6 +4,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "Png.h"
 
 #include "../Stream/MemoryStream.h"
@@ -12,7 +13,7 @@
 #undef min
 #undef max
 
-#include "lpng1216/png.h"
+#include <libpng/png.h>
 
 #include <setjmp.h>
 
@@ -56,12 +57,12 @@ namespace
 	void PNGAPI PNGRead(png_structp png, png_bytep in, png_size_t size)
 	{
 		RAD_ASSERT(png);
-		RAD_ASSERT(png->io_ptr);
+		RAD_ASSERT(png_get_io_ptr(png));
 
 		if (size)
 		{
 			RAD_ASSERT(size <= std::numeric_limits<stream::SPos>::max());
-			stream::InputStream *s = reinterpret_cast<stream::InputStream*>(png->io_ptr);
+			stream::InputStream *s = reinterpret_cast<stream::InputStream*>(png_get_io_ptr(png));
 			if (s->Read(in, (stream::SPos)size, 0) != size)
 			{
 				png_error(png, "PNGRead: buffer underflow");
@@ -72,13 +73,13 @@ namespace
 	void PNGAPI PNGWrite(png_structp png, png_bytep out, png_size_t size)
 	{
 		RAD_ASSERT(png);
-		RAD_ASSERT(png->io_ptr);
+		RAD_ASSERT(png_get_io_ptr(png));
 		RAD_ASSERT(out);
 
 		if (size)
 		{
 			RAD_ASSERT(size <= std::numeric_limits<stream::SPos>::max());
-			stream::OutputStream *s = reinterpret_cast<stream::OutputStream*>(png->io_ptr);
+			stream::OutputStream *s = reinterpret_cast<stream::OutputStream*>(png_get_io_ptr(png));
 			if (s->Write(out, (stream::SPos)size, 0) != size)
 			{
 				png_error(png, "PNGWrite: buffer write error");
@@ -90,9 +91,10 @@ namespace
 	{
 	}
 
-	UReg Format(png_structp png, png_infop info, int bits, int color)
+	int Format(png_structp png, png_infop info, int bits, int color)
 	{
-		if (png_get_valid(png, info, PNG_INFO_tRNS)) return Format_RGBA8888;
+		if (png_get_valid(png, info, PNG_INFO_tRNS)) 
+			return Format_RGBA8888;
 
 		switch (color)
 		{
@@ -130,9 +132,11 @@ RADRT_API bool RADRT_CALL DecodeHeader(const void *buff, AddrSize buffLength, Im
 
 	{
 		char sig[SigSize];
-		if (is.Read(sig, SigSize, 0) != SigSize) return false;
+		if (is.Read(sig, SigSize, 0) != SigSize) 
+			return false;
 		// NOTE: png_sig_cmp() returns 0 if the sig matches the PNG sig.
-		if (png_sig_cmp((png_bytep)sig, 0, SigSize)) return false;
+		if (png_sig_cmp((png_bytep)sig, 0, SigSize)) 
+			return false;
 	}
 
 	png_structp png;
@@ -158,7 +162,8 @@ RADRT_API bool RADRT_CALL DecodeHeader(const void *buff, AddrSize buffLength, Im
 
 		png_read_info(png, info);
 		png_get_IHDR(png, info, &w, &h, &bd, &color, &interlace, 0, 0);
-		if (!out.AllocateFrames(1)||!out.AllocateMipmaps(0, 1)) return false;
+		if (!out.AllocateFrames(1)||!out.AllocateMipmaps(0, 1)) 
+			return false;
 		
 		Mipmap &m = out.frames[0].mipmaps[0];
 
@@ -266,7 +271,7 @@ RADRT_API bool RADRT_CALL Decode(const void *buff, AddrSize buffLength, Image &o
 
 		if (color == PNG_COLOR_TYPE_GRAY && bd < 8)
 		{
-			png_set_gray_1_2_4_to_8(png);
+			png_set_expand_gray_1_2_4_to_8(png);
 		}
 
 		if (png_get_valid(png, info, PNG_INFO_tRNS))
@@ -279,7 +284,7 @@ RADRT_API bool RADRT_CALL Decode(const void *buff, AddrSize buffLength, Image &o
 
 		png_bytep dstRow = 0;
 		png_bytep imgRow = 0;
-		png_uint_32 stride = png_get_rowbytes(png, info);
+		png_uint_32 stride = (png_uint_32)png_get_rowbytes(png, info);
 
 		RAD_ASSERT(stride >= m.stride);
 		if (stride != m.stride) 

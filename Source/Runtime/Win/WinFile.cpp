@@ -4,6 +4,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "../File.h"
 #include "../Thread.h"
 #include "../File/PrivateFile.h"
@@ -343,7 +344,7 @@ void AsyncIO::TriggerStatusChange(file::Result result, bool force)
 	}
 }
 
-bool AsyncIO::WaitForCompletion(UReg timeout) const
+bool AsyncIO::WaitForCompletion(U32 timeout) const
 {
 	return m_gate.Wait(timeout);
 }
@@ -800,25 +801,25 @@ bool Search::NextFile(char *filenameBuffer, UReg filenameBufferSize, FileAttribu
 					{
 						// search this directory.
 						l = filenameBufferSize;
-						ncpy(filenameBuffer, m_root, l);
+						ncpy(filenameBuffer, m_root, (int)l);
 						l -= (UReg)len(filenameBuffer);
 						if (m_flags & NativePath)
 						{
-							ncat(filenameBuffer, "\\", l);
+							ncat(filenameBuffer, "\\", (int)l);
 						}
 						else
 						{
-							ncat(filenameBuffer, "/", l);
+							ncat(filenameBuffer, "/", (int)l);
 						}
 						if (l > 0)
 						{
 							--l;
-							ncat(filenameBuffer, m_findData.cFileName, l);
+							ncat(filenameBuffer, m_findData.cFileName, (int)l);
 						}
 					}
 					else
 					{
-						ncpy(filenameBuffer, m_findData.cFileName, filenameBufferSize);
+						ncpy(filenameBuffer, m_findData.cFileName, (int)filenameBufferSize);
 					}
 
 #if defined(RAD_OPT_DEBUG)
@@ -875,22 +876,22 @@ bool Search::NextFile(char *filenameBuffer, UReg filenameBufferSize, FileAttribu
 					{
 						// search this directory.
 						l = MaxFilePathLen;
-						ncpy(root, m_root, l);
+						ncpy(root, m_root, (int)l);
 						l -= (UReg)len(root);
 
 						if (m_flags & NativePath)
 						{
-							ncat(root, "\\", l);
+							ncat(root, "\\", (int)l);
 						}
 						else
 						{
-							ncat(root, "/", l);
+							ncat(root, "/", (int)l);
 						}
 
 						if (l > 0)
 						{
 							--l;
-							ncat(root, m_findData.cFileName, l);
+							ncat(root, m_findData.cFileName, (int)l);
 						}
 					}
 					else
@@ -912,22 +913,22 @@ bool Search::NextFile(char *filenameBuffer, UReg filenameBufferSize, FileAttribu
 					{
 						// search this directory.
 						l = MaxFilePathLen;
-						ncpy(dir, m_dir, l);
+						ncpy(dir, m_dir, (int)l);
 						l -= (UReg)len(dir);
 
 						if (m_flags & NativePath)
 						{
-							ncat(dir, "\\", l);
+							ncat(dir, "\\", (int)l);
 						}
 						else
 						{
-							ncat(dir, "/", l);
+							ncat(dir, "/", (int)l);
 						}
 
 						if (l > 0)
 						{
 							--l;
-							ncat(dir, m_findData.cFileName, l);
+							ncat(dir, m_findData.cFileName, (int)l);
 						}
 					}
 					else
@@ -987,27 +988,27 @@ bool Search::NextFile(char *filenameBuffer, UReg filenameBufferSize, FileAttribu
 				{
 					// search this directory.
 					l = filenameBufferSize;
-					ncpy(filenameBuffer, m_root, l);
+					ncpy(filenameBuffer, m_root, (int)l);
 					l -= (UReg)len(filenameBuffer);
 
 					if (m_flags & NativePath)
 					{
-						ncat(filenameBuffer, "\\", l);
+						ncat(filenameBuffer, "\\", (int)l);
 					}
 					else
 					{
-						ncat(filenameBuffer, "/", l);
+						ncat(filenameBuffer, "/", (int)l);
 					}
 
 					if (l > 0)
 					{
 						--l;
-						ncat(filenameBuffer, m_findData.cFileName, l);
+						ncat(filenameBuffer, m_findData.cFileName, (int)l);
 					}
 				}
 				else
 				{
-					ncpy(filenameBuffer, m_findData.cFileName, filenameBufferSize);
+					ncpy(filenameBuffer, m_findData.cFileName, (int)filenameBufferSize);
 				}
 
 #if defined(RAD_OPT_DEBUG)

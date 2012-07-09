@@ -4,10 +4,11 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "ZLib.h"
 #include "../Utils.h"
 #include "../Stream.h"
-#include "zlib123/zlib_original.h"
+#include <ZLib/zlib.h>
 #include <stdlib.h>
 
 using namespace stream;

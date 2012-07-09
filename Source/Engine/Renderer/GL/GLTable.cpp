@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "GLTable.h"
 #include "GLState.h"
 #include "GLVertexBuffer.h"
@@ -47,7 +48,7 @@ bool __IOS_IPad();
 #endif
 
 #if defined(RAD_OPT_TOOLS)
-#include "../../../../Extern/glsl-optimizer/v1/src/glsl/glsl_optimizer.h"
+#include "../../../../../Extern/glsl-optimizer-v1/src/glsl/glsl_optimizer.h"
 #endif
 
 namespace r {
@@ -584,7 +585,7 @@ void GLTable::Load()
 	END
 
 	BEGIN(EXT_framebuffer_multisample)
-		L(PFNGLRENDERBUFFERSTORAGEMULTISAMPLE, RenderbufferStorageMultisampleEXT);
+		L(PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC, RenderbufferStorageMultisampleEXT);
 	END
 
 	BEGIN(ARB_texture_compression)

@@ -4,6 +4,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "IntDataCodec.h"
 #include "LmpWriter.h"
 #include "LmpReader.h"

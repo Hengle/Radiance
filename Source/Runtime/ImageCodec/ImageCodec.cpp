@@ -4,6 +4,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "ImageCodec.h"
 #include <algorithm>
 
@@ -13,7 +14,7 @@ RAD_ZONE_DEF(RADRT_API, ZImageCodec, "Image Codec", ZRuntime);
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-RADRT_API void RADRT_CALL ConvertPixel(const void* voidsrcPix, void* voiddstPix, const void* pal, UReg srcFormat, UReg dstFormat)
+RADRT_API void RADRT_CALL ConvertPixel(const void* voidsrcPix, void* voiddstPix, const void* pal, int srcFormat, int dstFormat)
 {
 	RAD_ASSERT(voidsrcPix);
 	RAD_ASSERT(voiddstPix);
@@ -656,7 +657,7 @@ RADRT_API void RADRT_CALL ConvertPixel(const void* voidsrcPix, void* voiddstPix,
 // image_codec::FormatBPP()
 //////////////////////////////////////////////////////////////////////////////////////////
 
-RADRT_API UReg RADRT_CALL FormatBPP(UReg format)
+RADRT_API int RADRT_CALL FormatBPP(int format)
 {
 	switch(format)
 	{
@@ -689,10 +690,10 @@ RADRT_API UReg RADRT_CALL FormatBPP(UReg format)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-RADRT_API UReg RADRT_CALL PaletteSize(UReg format)
+RADRT_API int RADRT_CALL PaletteSize(int format)
 {
 	RAD_ASSERT(IsPalettedFormat(format));
-	UReg size = 0;
+	int size = 0;
 
 	switch (format)
 	{
@@ -709,10 +710,10 @@ RADRT_API UReg RADRT_CALL PaletteSize(UReg format)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-UReg RADRT_CALL PaletteBPP(UReg format)
+int RADRT_CALL PaletteBPP(int format)
 {
 	RAD_ASSERT(IsPalettedFormat(format));
-	UReg size = 0;
+	int size = 0;
 
 	switch (format)
 	{
@@ -737,7 +738,7 @@ UReg RADRT_CALL PaletteBPP(UReg format)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-RADRT_API bool RADRT_CALL ConvertPixelData(const void* src, AddrSize srcByteCount, void* dst, const void* pal, UReg srcFormat, UReg dstFormat)
+RADRT_API bool RADRT_CALL ConvertPixelData(const void* src, AddrSize srcByteCount, void* dst, const void* pal, int srcFormat, int dstFormat)
 {
 	RAD_ASSERT(src&&dst&&srcByteCount);
 	RAD_ASSERT(FormatBPP(srcFormat)!=0);
@@ -745,8 +746,8 @@ RADRT_API bool RADRT_CALL ConvertPixelData(const void* src, AddrSize srcByteCoun
 	RAD_ASSERT(!IsPalettedFormat(dstFormat)); // we don't quantize.
 	RAD_ASSERT((!IsPalettedFormat(srcFormat)) || pal); // if it's palettized must supply the palette.
 
-	UReg srcBPP = FormatBPP(srcFormat);
-	UReg dstBPP = FormatBPP(dstFormat);
+	int srcBPP = FormatBPP(srcFormat);
+	int dstBPP = FormatBPP(dstFormat);
 
 	if (!(srcBPP&&dstBPP)) 
 		return false;
@@ -768,7 +769,7 @@ RADRT_API bool RADRT_CALL ConvertPixelData(const void* src, AddrSize srcByteCoun
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-RADRT_API bool RADRT_CALL ConvertImageFormat(const Image &src, Image &dst, UReg dstFormat)
+RADRT_API bool RADRT_CALL ConvertImageFormat(const Image &src, Image &dst, int dstFormat)
 {
 	RAD_ASSERT(src.bpp!=0);
 	RAD_ASSERT(FormatBPP(dstFormat)!=0);
@@ -783,7 +784,7 @@ RADRT_API bool RADRT_CALL ConvertImageFormat(const Image &src, Image &dst, UReg 
 		dst.bpp = FormatBPP(dstFormat);
 		dst.AllocateFrames(src.frameCount);
 
-		for (UReg i = 0; i < src.frameCount; i++)
+		for (int i = 0; i < src.frameCount; i++)
 		{
 			Frame* srcF = &src.frames[i];
 
@@ -801,7 +802,7 @@ RADRT_API bool RADRT_CALL ConvertImageFormat(const Image &src, Image &dst, UReg 
 				return false;
 			}
 
-			for (UReg k = 0; k < srcF->mipCount; k++)
+			for (int k = 0; k < srcF->mipCount; k++)
 			{
 				Mipmap* srcM = &srcF->mipmaps[k];
 
@@ -831,7 +832,7 @@ RADRT_API bool RADRT_CALL ConvertImageFormat(const Image &src, Image &dst, UReg 
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-RADRT_API void RADRT_CALL VerticalFlip(void* pix, UReg width, UReg height, UReg bpp, UReg stride)
+RADRT_API void RADRT_CALL VerticalFlip(void* pix, int width, int height, int bpp, AddrSize stride)
 {
 	RAD_ASSERT(pix);
 	RAD_ASSERT(height&&stride);
@@ -839,12 +840,12 @@ RADRT_API void RADRT_CALL VerticalFlip(void* pix, UReg width, UReg height, UReg 
 	U8* top = (U8*)pix;
 	U8* bottom = top + ((height-1) * stride);
 
-	UReg scanwidth = width * bpp;
+	int scanwidth = width * bpp;
 
 	while (top < bottom)
 	{
 		// swap the scanlines.
-		for (UReg ofs = 0; ofs < scanwidth; ofs++)
+		for (int ofs = 0; ofs < scanwidth; ofs++)
 		{
 			std::swap(top[ofs], bottom[ofs]);
 		}
@@ -856,7 +857,7 @@ RADRT_API void RADRT_CALL VerticalFlip(void* pix, UReg width, UReg height, UReg 
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-RADRT_API void RADRT_CALL HorizontalFlip(void* pix, UReg width, UReg height, UReg bpp, UReg stride)
+RADRT_API void RADRT_CALL HorizontalFlip(void* pix, int width, int height, int bpp, AddrSize stride)
 {
 	RAD_ASSERT(pix);
 	RAD_ASSERT(width&&bpp&&stride);
@@ -870,9 +871,9 @@ RADRT_API void RADRT_CALL HorizontalFlip(void* pix, UReg width, UReg height, URe
 		U8* swapright = right;
 
 		// swap the scanlines.
-		for (UReg ofs = 0; ofs < height; ofs++)
+		for (int ofs = 0; ofs < height; ofs++)
 		{
-			for (UReg bppc = 0; bppc < bpp; bppc++)
+			for (int bppc = 0; bppc < bpp; bppc++)
 			{
 				std::swap(swapleft[bppc], swapright[bppc]);
 			}
@@ -912,9 +913,9 @@ void Image::VerticalFlip()
 {
 	if (frameCount&&frames)
 	{
-		for (UReg i = 0; i < frameCount; i++)
+		for (int i = 0; i < frameCount; i++)
 		{
-			for (UReg k = 0; k < frames[i].mipCount; k++)
+			for (int k = 0; k < frames[i].mipCount; k++)
 			{
 				image_codec::VerticalFlip(frames[i].mipmaps[k].data,
 					frames[i].mipmaps[k].width,
@@ -930,9 +931,9 @@ void Image::HorizontalFlip()
 {
 	if (frameCount&&frames)
 	{
-		for (UReg i = 0; i < frameCount; i++)
+		for (int i = 0; i < frameCount; i++)
 		{
-			for (UReg k = 0; k < frames[i].mipCount; k++)
+			for (int k = 0; k < frames[i].mipCount; k++)
 			{
 				image_codec::HorizontalFlip(frames[i].mipmaps[k].data,
 					frames[i].mipmaps[k].width,
@@ -954,12 +955,12 @@ Image& Image::operator = (const Image& im)
 
 	if (AllocateFrames(im.frameCount))
 	{
-		for (UReg i = 0; i < im.frameCount; i++)
+		for (int i = 0; i < im.frameCount; i++)
 		{
 			RAD_ASSERT(im.frames[i].mipCount > 0);
 			AllocateMipmaps(i, im.frames[i].mipCount);
 
-			for (UReg k = 0; k < im.frames[i].mipCount; k++)
+			for (int k = 0; k < im.frames[i].mipCount; k++)
 			{
 				frames[i].flags = im.frames[i].flags;
 
@@ -1010,11 +1011,11 @@ void Image::Free(bool all)
 {
 	if (frameCount&&frames)
 	{
-		for (UReg i = 0; i < frameCount; i++)
+		for (int i = 0; i < frameCount; i++)
 		{
 			if (frames[i].mipmaps)
 			{
-				for (UReg k = 0; k < frames[i].mipCount; k++)
+				for (int k = 0; k < frames[i].mipCount; k++)
 				{
 					if (frames[i].mipmaps[k].data && !(frames[i].flags&SharedFrameFlagRef) && all) 
 					{
@@ -1038,7 +1039,7 @@ void Image::Free(bool all)
 	pal = 0;
 }
 
-bool Image::AllocateFrames(UReg fc)
+bool Image::AllocateFrames(int fc)
 {
 	Free();
 	if (fc)
@@ -1050,7 +1051,7 @@ bool Image::AllocateFrames(UReg fc)
 	return frames != 0;
 }
 
-bool Image::AllocateMipmaps(UReg frameNum, UReg mipmapCount)
+bool Image::AllocateMipmaps(int frameNum, int mipmapCount)
 {
 	RAD_ASSERT(frameNum < frameCount);
 	RAD_ASSERT(mipmapCount > 0);
@@ -1063,7 +1064,7 @@ bool Image::AllocateMipmaps(UReg frameNum, UReg mipmapCount)
 	return f->mipmaps != 0;
 }
 
-bool Image::AllocateMipmap(UReg frameNum, UReg mipmapNum, UReg width, UReg height, UReg stride, AddrSize dataSize)
+bool Image::AllocateMipmap(int frameNum, int mipmapNum, int width, int height, AddrSize stride, AddrSize dataSize)
 {
 	RAD_ASSERT(frameNum < frameCount);
 	Frame* f = &frames[frameNum];
@@ -1079,7 +1080,7 @@ bool Image::AllocateMipmap(UReg frameNum, UReg mipmapNum, UReg width, UReg heigh
 	return m->data != 0;
 }
 
-bool Image::AllocatePalette(UReg format)
+bool Image::AllocatePalette(int format)
 {
 	RAD_ASSERT(format);
 	RAD_ASSERT(bpp);

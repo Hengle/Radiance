@@ -75,16 +75,16 @@ RADRT_API bool RADRT_CALL Decode(const void *buff, AddrSize buffLength, Image &o
 // DDS Encode
 //////////////////////////////////////////////////////////////////////////////////////////
 
-RADRT_API bool RADRT_CALL Encode(const Image &in, UReg encodeFormat, UReg encodeFlags, void *&outData, AddrSize &outSize);
+RADRT_API bool RADRT_CALL Encode(const Image &in, int encodeFormat, int encodeFlags, void *&outData, AddrSize &outSize);
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // DXT Encode/Decode
 //////////////////////////////////////////////////////////////////////////////////////////
 
 // DXT Decode always decompresses to RGBA8888
-RADRT_API bool RADRT_CALL DXTDecode(const void* dxtBuff, AddrSize dxtBuffLength, UReg dxtFormat, UReg width, UReg height, void* outBuff);
-RADRT_API bool RADRT_CALL DXTEncode(const void* src, AddrSize srcLength, UReg srcFormat, UReg dstFormat, UReg width, UReg height, void* outBuff);
-RADRT_API AddrSize RADRT_CALL DXTEncodeSize(UReg format, UReg width, UReg height);
+RADRT_API bool RADRT_CALL DXTDecode(const void* dxtBuff, AddrSize dxtBuffLength, int dxtFormat, int width, int height, void* outBuff);
+RADRT_API bool RADRT_CALL DXTEncode(const void* src, AddrSize srcLength, int srcFormat, int dstFormat, int width, int height, void* outBuff);
+RADRT_API AddrSize RADRT_CALL DXTEncodeSize(int format, int width, int height);
 
 } // dds
 } // image_codec

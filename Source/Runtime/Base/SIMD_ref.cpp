@@ -4,6 +4,7 @@
 	\ingroup runtime
 */
 
+#include RADPCH
 #include "SIMD.h"
 #include "../StringBase.h"
 

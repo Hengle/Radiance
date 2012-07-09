@@ -1,8 +1,10 @@
-
+#include RADPCH
 #include "Base.h"
 #include "CPUCount.h"
 
-#if defined(RAD_OPT_APPLE)
+#if defined(RAD_OPT_APPLE) || defined(_WIN64)
+
+#pragma message ("CPUCount - Stubbed Out")
 
 unsigned char CPUCount(unsigned int *a, unsigned int *b, unsigned int *c)
 { // rewrite using mach later.

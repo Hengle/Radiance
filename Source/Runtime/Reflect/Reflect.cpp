@@ -3,6 +3,7 @@
 // Author: Mike Songy & Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "Reflect.h"
 #include "../StringBase.h"
 #include "../Predicate.h"

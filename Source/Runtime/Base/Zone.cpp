@@ -4,6 +4,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "Base.h"
 #include <algorithm>
 #include <boost/thread/mutex.hpp>

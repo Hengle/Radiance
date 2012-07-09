@@ -102,7 +102,7 @@ inline Id Thread::RAD_IMPLEMENT_GET(id)
 
 inline int Thread::RAD_IMPLEMENT_GET(returnCode)
 {
-	return m_imp.ReturnCode();
+	return (int)m_imp.ReturnCode();
 }
 
 inline bool Thread::RAD_IMPLEMENT_GET(exited)

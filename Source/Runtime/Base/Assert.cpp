@@ -3,6 +3,8 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
+
 #include "Base.h"
 #undef NDEBUG
 #include <assert.h>

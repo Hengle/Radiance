@@ -3,6 +3,8 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
+
 #if !defined(RAD_OPT_NO_REFLECTION)
 
 #include "ReflectInterface.h"

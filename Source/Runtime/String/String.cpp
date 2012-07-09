@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "String.h"
 #include "utf8.h"
 #include <limits.h>
@@ -19,7 +20,7 @@ int utf8to16len(const char *src, int len) {
 	const char *end = src + len;
 	while (src < end) {
 		U16 *a = utf8::unchecked::utf8to16(&src, src+1, b);
-		l += a-b;
+		l += (int)(a-b);
 	}
 	return l;
 }
@@ -37,12 +38,12 @@ int utf8to32len(const char *src, int len) {
 
 int utf8to16(U16 *dst, const char *src, int len) {
 	U16 *end = utf8::unchecked::utf8to16(src, src+len, dst);
-	return end-dst;
+	return (int)(end-dst);
 }
 
 int utf8to32(U32 *dst, const char *src, int len) {
 	U32 *end = utf8::unchecked::utf8to32(src, src+len, dst);
-	return end-dst;
+	return (int)(end-dst);
 }
 
 int utf16to8len(const U16 *src, int len) {
@@ -51,7 +52,7 @@ int utf16to8len(const U16 *src, int len) {
 	const U16 *end = src + len;
 	while (src < end) {
 		char *a = utf8::unchecked::utf16to8(&src, src+1, b);
-		l += a-b;
+		l += (int)(a-b);
 	}
 	return l;
 }
@@ -69,7 +70,7 @@ int utf16to32len(const U16 *src, int len) {
 
 int utf16to8(char *dst, const U16 *src, int len) {
 	char *end = utf8::unchecked::utf16to8(src, src+len, dst);
-	return end-dst;
+	return (int)(end-dst);
 }
 
 int utf16to32(U32 *dst, const U16 *src, int len) {
@@ -80,7 +81,7 @@ int utf16to32(U32 *dst, const U16 *src, int len) {
 		char *a = utf8::unchecked::utf16to8(&src, src+1, b);
 		x = utf8::unchecked::utf8to32(b, a, x);
 	}
-	return x-dst;
+	return (int)(x-dst);
 }
 
 int utf32to8len(const U32 *src, int len) {
@@ -89,7 +90,7 @@ int utf32to8len(const U32 *src, int len) {
 	const U32 *end = src + len;
 	while (src < end) {
 		char *a = utf8::unchecked::utf32to8(&src, src+1, b);
-		l += a-b;
+		l += (int)(a-b);
 	}
 	return l;
 }
@@ -102,14 +103,14 @@ int utf32to16len(const U32 *src, int len) {
 	while (src < end) {
 		char *y = utf8::unchecked::utf32to8(&src, src+1, x);
 		U16 *a = utf8::unchecked::utf8to16(x, y, b);
-		l += a-b;
+		l += (int)(a-b);
 	}
 	return l;
 }
 
 int utf32to8(char *dst, const U32 *src, int len) {
 	char *end = utf8::unchecked::utf32to8(src, src+len, dst);
-	return end-dst;
+	return (int)(end-dst);
 }
 
 int utf32to16(U16 *dst, const U32 *src, int len) {
@@ -120,7 +121,7 @@ int utf32to16(U16 *dst, const U32 *src, int len) {
 		char *a = utf8::unchecked::utf32to8(&src, src+1, b);
 		x = utf8::unchecked::utf8to16(b, a, x);
 	}
-	return x-dst;
+	return (int)(x-dst);
 }
 
 namespace details {
@@ -365,7 +366,7 @@ String String::SubStr(int first, int count) const {
 			while (count-- > 0) {
 				const char *tail = sz;
 				utf8::unchecked::utf8to32(&tail, tail+1, &b);
-				sub.NAppend(sz, tail-sz);
+				sub.NAppend(sz, (int)(tail-sz));
 				sz = tail;
 			}
 
@@ -406,7 +407,7 @@ int String::ByteForChar(int idx) const {
 		utf8::unchecked::utf8to32(&sz, sz+1, &b);
 	}
 
-	return sz-start;
+	return (int)(sz-start);
 }
 
 String &String::Erase(int ofs, int count) {

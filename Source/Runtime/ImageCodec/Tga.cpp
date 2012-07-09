@@ -4,8 +4,8 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "Tga.h"
-
 #include "../Endian.h"
 
 
@@ -783,7 +783,7 @@ static U8 rle_packet_len(const U8 *row, const U16 pos, const U16 width, const U1
 #undef SAME
 #undef PIXEL
 
-static void PrepForEncode(void* image, AddrSize len, UReg width, UReg height, UReg bpp, UReg stride)
+static void PrepForEncode(void* image, AddrSize len, int width, int height, int bpp, AddrSize stride)
 {
 	VerticalFlip(image, width, height, bpp, stride);
 
@@ -792,7 +792,7 @@ static void PrepForEncode(void* image, AddrSize len, UReg width, UReg height, UR
 	{
 		U8* dst = (U8*)image;
 		U8 t;
-		for(UReg i = 0; i < len; i+=4)
+		for(AddrSize i = 0; i < len; i+=4)
 		{
 			// swap R&B
 			t = dst[i+0];
@@ -804,7 +804,7 @@ static void PrepForEncode(void* image, AddrSize len, UReg width, UReg height, UR
 	{
 		U8* dst = (U8*)image;
 		U8 t;
-		for(UReg i = 0; i < len; i+=3)
+		for(AddrSize i = 0; i < len; i+=3)
 		{
 			// swap R&B
 			t = dst[i+0];
@@ -816,7 +816,7 @@ static void PrepForEncode(void* image, AddrSize len, UReg width, UReg height, UR
 	{
 		U8* dst = (U8*)image;
 		U16 t;
-		for(UReg i = 0; i < len; i+=2)
+		for(AddrSize i = 0; i < len; i+=2)
 		{
 			// swap R&B
 			t = ((U16*)(&dst[i]))[0]&endian::SwapLittle(0x7FFF);

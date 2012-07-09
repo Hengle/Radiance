@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "SharedLibrary.h"
 
 #if defined(RAD_OPT_WINX)

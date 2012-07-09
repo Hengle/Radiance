@@ -69,11 +69,7 @@ private:
 
 	void Copy(const FT_Glyph_Metrics_ *metrics);
 
-#if defined(RAD_OPT_MACHINE_SIZE_64)
-	enum { SizeofMetrics = 64 };
-#else
 	enum { SizeofMetrics = 32 };
-#endif
 
 	U8 m_metrics[SizeofMetrics];
 

@@ -3,6 +3,7 @@
 // Author: Steve Nowalk
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "MemoryPool.h"
 #include "../StringBase.h"
 

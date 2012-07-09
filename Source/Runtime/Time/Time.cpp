@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "IntTime.h"
 #include "Time.h"
 #include <boost/thread/thread_time.hpp>

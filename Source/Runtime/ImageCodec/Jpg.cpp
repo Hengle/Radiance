@@ -4,10 +4,11 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "Jpg.h"
-#include "jpeg-6b/jpeglib.h"
-#include "jpeg-6b/jerror.h"
-#include "jpeg-6b/jversion.h"
+#include <libjpeg/jpeglib.h>
+#include <libjpeg/jerror.h>
+#include <libjpeg/jversion.h>
 
 #define MAKE_JERROR_TABLE
 
@@ -26,7 +27,7 @@ typedef struct
 	AddrSize buffer_length;
 } decode_locals_t;
 
-static image_codec::jpg::boolean my_jpeg_fill_input_buffer( j_decompress_ptr cinfo )
+static boolean my_jpeg_fill_input_buffer( j_decompress_ptr cinfo )
 {
 	decode_locals_t *locals = (decode_locals_t*)cinfo->client_data;
 	
@@ -45,7 +46,7 @@ static void my_jpeg_init_source( j_decompress_ptr cinfo )
 	cinfo->src->bytes_in_buffer = locals->buffer_length;
 }
 
-static void my_jpeg_skip_input_data( j_decompress_ptr cinfo, int num_bytes )
+static void my_jpeg_skip_input_data( j_decompress_ptr cinfo, long num_bytes )
 {
 	if( num_bytes >= (int)cinfo->src->bytes_in_buffer )
 		my_jpeg_fill_input_buffer( cinfo );
@@ -149,7 +150,7 @@ static void my_jpeg_reset_error_mgr (j_common_ptr cinfo)
 #undef JMESSAGE
 #define JMESSAGE(code, string) string,
 static const char * const jpeg_std_message_table[] = {
-#include "jpeg-6b/jerror.h"
+#include <libjpeg/jerror.h>
   0
 };
 

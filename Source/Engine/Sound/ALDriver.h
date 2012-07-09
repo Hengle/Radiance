@@ -10,9 +10,8 @@
 #include <Runtime/Thread/Locks.h>
 #include <Runtime/Base/ObjectPool.h>
 #include <Runtime/Container/ZoneSet.h>
-#include <OpenAL/al.h>
-#include <OpenAL/alc.h>
-
+#include <AL/al.h>
+#include <AL/alc.h>
 
 #if defined(RAD_OPT_ALERRORS)
 
