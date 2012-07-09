@@ -3,6 +3,7 @@
 // Author: Joe Riedel (joeriedel@hotmail.com)
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "E_PlayerPawn.h"
 
 namespace world {

@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "EditorStringTableWidgetItemModel.h"
 #include <QtGui/QIcon>
 #include <QtGui/QMessageBox>

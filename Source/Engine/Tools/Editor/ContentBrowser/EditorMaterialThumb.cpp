@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "EditorMaterialThumb.h"
 #include "../EditorUtils.h"
 #include "../../../Assets/MaterialParser.h"

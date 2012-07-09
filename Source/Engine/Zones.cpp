@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "Zones.h"
 
 RAD_ZONE_DEF(RADENG_API, ZEngine, "Engine", ZRuntime);

@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "StringTable.h"
 #include "Packages/PackagesDef.h"
 
@@ -138,7 +139,7 @@ int StringTable::Load(const char *name, const char *root, StringTable::Ref &_r, 
 
 		Loader loader(is);
 		
-		if (lua_load(L->L, &Loader::Read, &loader, path.c_str)) {
+		if (lua_load(L->L, &Loader::Read, &loader, path.c_str, 0)) {
 			COut(C_Error) << "StringTable::Load(parse): " << lua_tostring(L->L, -1) << std::endl;
 			r.reset();
 			return pkg::SR_ScriptError;
@@ -329,7 +330,7 @@ bool StringTable::SaveBin(stream::IOutputBuffer &ob) const {
 		if (!it->second.strings.empty()) {
 			// Only count non-blank strings.
 			for (Entry::Strings::const_iterator x = it->second.strings.begin(); x != it->second.strings.end(); ++x) {
-				if (!x->second.empty()) {
+				if (!x->second.empty) {
 					++numStrings;
 					break;
 				}
@@ -354,7 +355,7 @@ bool StringTable::SaveBin(stream::IOutputBuffer &ob) const {
 		for (int i = 0; i < LangId_MAX; ++i) {
 			Entry::Strings::const_iterator x = e.strings.find((LangId)i);
 			if (x != e.strings.end()) {
-				if (!x->second.empty()) {
+				if (!x->second.empty) {
 					langMask |= (1<<i);
 					strings[i] = x->second;
 				}

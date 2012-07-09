@@ -7,53 +7,11 @@
 
 #include "Types.h"
 #include "Lua/LuaRuntime.h"
-#include <SDL/SDL_keysym.h>
+#include "KeyCodes.h"
 #include <Runtime/Time.h>
 #include <Runtime/Container/ZoneMap.h>
-
-#if defined(RAD_OPT_PC)
-#include <SDL/SDL_mouse.h>
-#include <SDL/SDL_joystick.h>
-#else
-/* Used as a mask when testing buttons in buttonstate
-   Button 1:	Left mouse button
-   Button 2:	Middle mouse button
-   Button 3:	Right mouse button
-   Button 4:	Mouse wheel up	 (may also be a real button)
-   Button 5:	Mouse wheel down (may also be a real button)
- */
-#define SDL_BUTTON(X)		(1 << ((X)-1))
-#define SDL_BUTTON_LEFT		1
-#define SDL_BUTTON_MIDDLE	2
-#define SDL_BUTTON_RIGHT	3
-#define SDL_BUTTON_WHEELUP	4
-#define SDL_BUTTON_WHEELDOWN	5
-#define SDL_BUTTON_X1		6
-#define SDL_BUTTON_X2		7
-#define SDL_BUTTON_LMASK	SDL_BUTTON(SDL_BUTTON_LEFT)
-#define SDL_BUTTON_MMASK	SDL_BUTTON(SDL_BUTTON_MIDDLE)
-#define SDL_BUTTON_RMASK	SDL_BUTTON(SDL_BUTTON_RIGHT)
-#define SDL_BUTTON_X1MASK	SDL_BUTTON(SDL_BUTTON_X1)
-#define SDL_BUTTON_X2MASK	SDL_BUTTON(SDL_BUTTON_X2)
-/*
- * Get the current state of a POV hat on a joystick
- * The return value is one of the following positions:
- */
-#define SDL_HAT_CENTERED	0x00
-#define SDL_HAT_UP		0x01
-#define SDL_HAT_RIGHT		0x02
-#define SDL_HAT_DOWN		0x04
-#define SDL_HAT_LEFT		0x08
-#define SDL_HAT_RIGHTUP		(SDL_HAT_RIGHT|SDL_HAT_UP)
-#define SDL_HAT_RIGHTDOWN	(SDL_HAT_RIGHT|SDL_HAT_DOWN)
-#define SDL_HAT_LEFTUP		(SDL_HAT_LEFT|SDL_HAT_UP)
-#define SDL_HAT_LEFTDOWN	(SDL_HAT_LEFT|SDL_HAT_DOWN)
-#endif
-
 #include <algorithm>
 #include <Runtime/PushPack.h>
-
-enum { NumMouseButtons = 3 };
 
 // Basic Input Gestures
 enum InputGestureId
@@ -223,7 +181,7 @@ struct KeyState
 
 struct KBState
 {
-	boost::array<KeyState, SDLK_LAST> keys;
+	boost::array<KeyState, kKeyCode_Max> keys;
 };
 
 struct MouseState

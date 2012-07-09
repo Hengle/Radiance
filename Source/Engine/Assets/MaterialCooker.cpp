@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "MaterialCooker.h"
 #include "MaterialParser.h"
 #include <Runtime/Stream.h>

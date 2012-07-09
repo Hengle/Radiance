@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "GLTextModel.h"
 #include "GLState.h"
 #include "GLTexture.h"

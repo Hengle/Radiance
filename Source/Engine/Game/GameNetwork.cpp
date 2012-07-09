@@ -4,6 +4,7 @@
 	\author Joe Riedel
 */
 
+#include RADPCH
 #include "GameNetwork.h"
 #include "../World/World.h"
 

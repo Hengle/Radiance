@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "T_MeshPrecache.h"
 #include "../../Renderer/Mesh.h"
 #include "D_Mesh.h"

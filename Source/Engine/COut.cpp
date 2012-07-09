@@ -4,6 +4,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "COut.h"
 #include "LogFile.h"
 #include <Runtime/Stream/STLStream.h>

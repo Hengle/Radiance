@@ -11,6 +11,7 @@
     <Import Project="LibPNGPaths.props" />
     <Import Project="CGPaths.props" />
     <Import Project="OpenALPaths.props" />
+    <Import Project="PVRTexLibPaths.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />

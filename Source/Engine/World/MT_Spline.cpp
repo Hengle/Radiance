@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "Entity.h"
 #include "Entities/E_SplineTrack.h"
 #include "World.h"

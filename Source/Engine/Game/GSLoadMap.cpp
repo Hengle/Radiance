@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "GSLoadMap.h"
 #include "../COut.h"
 #include "../App.h"

@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "EditorMusicThumb.h"
 #include "../EditorMainWindow.h"
 #include "../../../Packages/Packages.h"
@@ -87,3 +88,4 @@ void CreateMusicThumb(ContentBrowserView &view)
 } // editor
 } // tools
 
+#include "moc_EditorMusicThumb.cc"

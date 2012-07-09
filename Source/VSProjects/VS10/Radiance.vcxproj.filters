@@ -1236,97 +1236,19 @@
     <ClInclude Include="..\..\Engine\Tools\Progress.h">
       <Filter>Source\Engine\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorMeshEditorWindow.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorPIEWidget.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorPopupMenu.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorProgressDialog.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorSearchLineWidget.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorSkModelEditorWindow.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorStringTableEditorWindow.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorStringTableWidget.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorStringTableWidgetItemModel.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorTextEditorDialog.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\Tools\Editor\EditorTickState.h">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Engine\Tools\Editor\EditorTypes.h">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorUpdate.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\Tools\Editor\EditorUtils.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorWindow.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorZoneViewWindow.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorComboCheckBox.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorCookerDialog.h">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Engine\Tools\Editor\EditorEventRegistry.h">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorGLCamera.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorGLNavWidget.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorGLWidget.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorLineEditDialog.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserModel.h">
-      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserTree.h">
-      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserView.h">
-      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserWindow.h">
-      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentChoosePackageDialog.h">
-      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentImportFieldWidget.h">
-      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentProperties.h">
-      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentPropertyGrid.h">
       <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentTexture.h">
@@ -1335,56 +1257,8 @@
     <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentThumbCache.h">
       <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorMapThumb.h">
-      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorMaterialThumb.h">
-      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorMeshThumb.h">
-      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorMusicThumb.h">
-      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorSkModelThumb.h">
-      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorSoundThumb.h">
-      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorStringTableThumb.h">
-      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorTextureThumb.h">
-      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserDef.h">
       <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorWindow.h">
-      <Filter>Source\Engine\Tools\Editor\MapEditor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorColorFieldWidget.h">
-      <Filter>Source\Engine\Tools\Editor\PropertyGrid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorFilePathFieldWidget.h">
-      <Filter>Source\Engine\Tools\Editor\PropertyGrid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorProperty.h">
-      <Filter>Source\Engine\Tools\Editor\PropertyGrid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorPropertyGrid.h">
-      <Filter>Source\Engine\Tools\Editor\PropertyGrid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorPropertyGridItemDelegate.h">
-      <Filter>Source\Engine\Tools\Editor\PropertyGrid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorPropertyGridModel.h">
-      <Filter>Source\Engine\Tools\Editor\PropertyGrid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorWidgetPropertyEditors.h">
-      <Filter>Source\Engine\Tools\Editor\PropertyGrid</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Engine\UI\UIMatWidget.h">
       <Filter>Source\Engine\UI</Filter>
@@ -1541,9 +1415,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Engine\World\MapBuilder\BoxBSP\VecHash.h">
       <Filter>Source\Engine\World\MapBuilder\BoxBSP</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorLogWindow.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1811,9 +1682,6 @@
     <ClCompile Include="..\..\Engine\Assets\TypefaceParser.cpp">
       <Filter>Source\Engine\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\FileSystem\FileSystemReflectMap.cpp">
-      <Filter>Source\Engine\FileSystem</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Engine\FileSystem\Backend\DPak.cpp">
       <Filter>Source\Engine\FileSystem\Backend</Filter>
     </ClCompile>
@@ -1982,9 +1850,6 @@
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorTickState.cpp">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\Tools\Editor\EditorUpdate.cpp">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorUtils.cpp">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </ClCompile>
@@ -1998,9 +1863,6 @@
       <Filter>Source\Engine\Tools\Editor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorCookerDialog.cpp">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\Tools\Editor\EditorGLCamera.cpp">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorGLNavWidget.cpp">
@@ -2486,6 +2348,129 @@
   <ItemGroup>
     <QtMOC Include="..\..\Engine\Tools\Editor\EditorMainWindow.h">
       <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserModel.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorTextEditorDialog.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorStringTableWidgetItemModel.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorStringTableWidget.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorStringTableEditorWindow.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorSkModelEditorWindow.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorSearchLineWidget.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorProgressDialog.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorPIEWidget.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorMeshEditorWindow.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorLogWindow.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorLineEditDialog.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorGLWidget.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorGLNavWidget.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorCookerDialog.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorComboCheckBox.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorPopupMenu.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorWindow.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorZoneViewWindow.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserTree.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserView.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserWindow.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentChoosePackageDialog.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentImportFieldWidget.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentPropertyGrid.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorMeshThumb.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorMaterialThumb.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorMapThumb.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorSoundThumb.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorSkModelThumb.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorMusicThumb.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorStringTableThumb.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorTextureThumb.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorWindow.h">
+      <Filter>Source\Engine\Tools\Editor\MapEditor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorColorFieldWidget.h">
+      <Filter>Source\Engine\Tools\Editor\PropertyGrid</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorFilePathFieldWidget.h">
+      <Filter>Source\Engine\Tools\Editor\PropertyGrid</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorProperty.h">
+      <Filter>Source\Engine\Tools\Editor\PropertyGrid</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorPropertyGrid.h">
+      <Filter>Source\Engine\Tools\Editor\PropertyGrid</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorPropertyGridItemDelegate.h">
+      <Filter>Source\Engine\Tools\Editor\PropertyGrid</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorPropertyGridModel.h">
+      <Filter>Source\Engine\Tools\Editor\PropertyGrid</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorWidgetPropertyEditors.h">
+      <Filter>Source\Engine\Tools\Editor\PropertyGrid</Filter>
     </QtMOC>
   </ItemGroup>
 </Project>

@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "FontCooker.h"
 #include "../Engine.h"
 #include <Runtime/Stream.h>

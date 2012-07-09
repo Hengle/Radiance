@@ -3,6 +3,8 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
+
 #if defined(RAD_OPT_TOOLS)
 
 #include "GLSLTool.h"
@@ -13,7 +15,7 @@
 #include <sstream>
 #include <Runtime/Stream/STLStream.h>
 #include <Runtime/StringBase.h>
-#include "../../../../Extern/glsl-optimizer/v1/src/glsl/glsl_optimizer.h"
+#include "../../../../Extern/glsl-optimizer-v1/src/glsl/glsl_optimizer.h"
 
 namespace r {
 

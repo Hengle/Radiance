@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "../App.h"
 #include "../Engine.h"
 #include "Game.h"
@@ -82,9 +83,9 @@ void Game::Tick(float dt)
 #endif
 {
 #if defined(RAD_OPT_PC_TOOLS)
-	if (m_inputState.kb.keys[SDLK_UP].state)
+	if (m_inputState.kb.keys[kKeyCode_Up].state)
 		dt *= 4.f;
-	if (m_inputState.kb.keys[SDLK_DOWN].state)
+	if (m_inputState.kb.keys[kKeyCode_Down].state)
 		dt /= 8.f;
 	
 	m_toolsCallback = cb;
@@ -397,7 +398,7 @@ void Game::PostInputEvent(const InputEvent &e)
 
 	// Only translate LEFT mouse button
 	if ((x.type == InputEvent::T_MouseUp || x.type == InputEvent::T_MouseDown || x.type == InputEvent::T_MouseMove) && 
-		(x.data[2]&SDL_BUTTON_LMASK))
+		(x.data[2]&kMouseButton_Left))
 	{
 		switch (x.type)
 		{
@@ -446,7 +447,7 @@ void Game::FlushInput(bool reset)
 		m_inputState.ms.wheel = 0;
 		m_doubleTap.type = InputEvent::T_Invalid;
 
-		for (int i = 0; i < SDLK_LAST; ++i)
+		for (int i = 0; i < kKeyCode_Max; ++i)
 		{
 			m_inputState.kb.keys[i].state = false;
 			m_inputState.kb.keys[i].impulse = false;
@@ -456,7 +457,7 @@ void Game::FlushInput(bool reset)
 	{
 		xtime::TimeVal now = xtime::ReadMilliseconds();
 
-		for (int i = 0; i < SDLK_LAST; ++i)
+		for (int i = 0; i < kKeyCode_Max; ++i)
 		{
 			if (m_inputState.kb.keys[i].state &&
 				m_inputState.kb.keys[i].impulse &&

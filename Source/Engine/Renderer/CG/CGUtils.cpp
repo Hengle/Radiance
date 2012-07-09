@@ -3,6 +3,8 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
+
 #if defined(RAD_OPT_TOOLS)
 
 #include "CGUtils.h"
@@ -76,10 +78,12 @@ bool Inject(
 
 bool ParseInclude(const char *line, String &filename)
 {
-	while (*line && *line != '#') { ++line; }
+	while (*line && *line != '#') {
+		++line;
+	}
 	if (!*line)
 		return false;
-	const size_t z = string::len("#include ");
+	const int z = string::len("#include ");
 	if (string::len(line) < string::len("#include "))
 		return false;
 	if (string::ncmp(line, "#include ", z))

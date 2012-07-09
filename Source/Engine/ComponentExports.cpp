@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "ComponentExports.h"
 #include "FileSystem/Backend/FileSystem.h"
 #include "FileSystem/Backend/DPak.h"

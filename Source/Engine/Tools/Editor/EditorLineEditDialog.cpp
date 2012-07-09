@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "EditorLineEditDialog.h"
 #include "EditorUtils.h"
 #include <QtGui/QLineEdit>
@@ -12,7 +13,6 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
-
 
 namespace tools {
 namespace editor {

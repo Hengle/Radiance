@@ -4,6 +4,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "SkAnim.h"
 #include "SkControllers.h"
 #include "../Engine.h"

@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "BSPFile.h"
 #include "../COut.h"
 #include "../Packages/PackagesDef.h"

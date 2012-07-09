@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "EditorPropertyGridModel.h"
 #include "EditorProperty.h"
 #include <QtCore/QList>

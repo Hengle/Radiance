@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "ALDriver.h"
 #include "../COut.h"
 #include <Runtime/StringBase.h>
@@ -43,7 +44,7 @@ bool CheckALErrors(const char *file, int line)
 
 		if (!found)
 		{
-			str.format(
+			str.Printf(
 				"AL Errors (file: %s, line: %d):\n",
 				file,
 				line
@@ -76,7 +77,7 @@ bool CheckALErrors(const char *file, int line)
 	ClearALErrors();
 	if (found)
 	{
-		COut(C_Debug) << str.c_str() << std::endl;
+		COut(C_Debug) << str.c_str.get() << std::endl;
 	}
 
 	return found;

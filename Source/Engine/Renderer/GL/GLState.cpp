@@ -4,6 +4,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "GLState.h"
 #include "GLTexture.h"
 #include "GLVertexBuffer.h"

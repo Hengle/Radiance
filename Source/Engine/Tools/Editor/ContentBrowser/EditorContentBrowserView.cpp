@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "EditorContentBrowserWindow.h"
 #include "EditorContentBrowserView.h"
 #include "EditorContentBrowserModel.h"

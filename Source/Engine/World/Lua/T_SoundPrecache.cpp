@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "T_SoundPrecache.h"
 #include "../../Renderer/SkMesh.h"
 #include "D_Sound.h"

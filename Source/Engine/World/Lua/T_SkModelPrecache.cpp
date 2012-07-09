@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "T_SkModelPrecache.h"
 #include "../../Renderer/SkMesh.h"
 #include "D_SkModel.h"

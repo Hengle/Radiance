@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "Packages.h"
 #include "../COut.h"
 #include <Runtime/File.h>

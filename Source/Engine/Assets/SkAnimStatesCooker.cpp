@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "SkAnimStatesCooker.h"
 #include "SkAnimStatesParser.h"
 #include <Runtime/Stream.h>

@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include <Runtime/Base.h>
 #include "SCC.h"
 #include "SCC_null.h"

@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "LuaRuntime.h"
 #include <Lua/lua.h>
 #include <Lua/lualib.h>
@@ -26,6 +27,15 @@
 #undef max
 
 //#define LOG_ALLOCS
+
+#if LUA_VERSION_NUM >= 502
+// Why did they remove this?
+RADENG_API int RADENG_CALL luaL_typerror (lua_State *L, int narg, const char *tname) {
+  const char *msg = lua_pushfstring(L, "%s expected, got %s",
+                                    tname, luaL_typename(L, narg));
+  return luaL_argerror(L, narg, msg);
+}
+#endif
 
 namespace lua {
 
@@ -1214,7 +1224,7 @@ RADENG_API void RADENG_CALL EnableNativeClassImport(lua_State *L)
 RADENG_API void RADENG_CALL RegisterGlobals(lua_State *L, const char *table, luaL_Reg *r)
 {
 	RAD_ASSERT(L);
-	int index = LUA_GLOBALSINDEX;
+	int index = -1000;
 
 	if (table != 0)
 	{
@@ -1227,7 +1237,11 @@ RADENG_API void RADENG_CALL RegisterGlobals(lua_State *L, const char *table, lua
 	while (r->name && r->func)
 	{
 		lua_pushcfunction(L, r->func);
-		lua_setfield(L, index, r->name);
+		if (index == -1000) {
+			lua_setglobal(L, r->name);
+		} else {
+			lua_setfield(L, index, r->name);
+		}
 		++r;
 	}
 

@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include <Runtime/Math.h>
 #include "WaveAnim.h"
 #include <cstdlib>

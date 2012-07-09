@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "../Engine.h"
 #include "Game.h"
 #include <algorithm>
@@ -210,7 +211,7 @@ bool Game::G_LClick(const InputEvent &e, InputState &is, TouchState &touch, Inpu
 	switch (e.type)
 	{
 	case InputEvent::T_MouseUp:
-		if (e.data[2] & SDL_BUTTON_LMASK)
+		if (e.data[2] & kMouseButton_Left)
 		{
 			g.id = IG_LClick;
 			g.phase = IGPhase_Begin;
@@ -231,7 +232,7 @@ bool Game::G_RClick(const InputEvent &e, InputState &is, TouchState &touch, Inpu
 	switch (e.type)
 	{
 	case InputEvent::T_MouseUp:
-		if(e.data[2] & SDL_BUTTON_RMASK)
+		if(e.data[2] & kMouseButton_Right)
 			g.id = IG_RClick;
 			g.phase = IGPhase_Begin;
 		break;
@@ -250,7 +251,7 @@ bool Game::G_DoubleTap(const InputEvent &e, InputState &is, TouchState &touch, I
 	switch (e.type)
 	{
 	case InputEvent::T_MouseDown:
-		if (e.data[2] & SDL_BUTTON_LMASK)
+		if (e.data[2] & kMouseButton_Left)
 		{
 			// check double click.
 			if ((e.time-is.ms.time) <= DoubleClickMs)

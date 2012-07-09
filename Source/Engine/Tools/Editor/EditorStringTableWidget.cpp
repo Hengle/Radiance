@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "EditorStringTableWidget.h"
 #include "EditorSearchLineWidget.h"
 #include "EditorComboCheckBox.h"

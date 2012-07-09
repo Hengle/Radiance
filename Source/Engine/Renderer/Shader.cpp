@@ -4,6 +4,7 @@
 	\ingroup renderer
 */
 
+#include RADPCH
 #include "Shader.h"
 
 namespace r {

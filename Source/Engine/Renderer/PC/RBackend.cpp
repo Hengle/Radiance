@@ -4,6 +4,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "RBDetails.h"
 #include "../../COut.h"
 #include <SDL/SDL.h>

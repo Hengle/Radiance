@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "MeshMaterialLoader.h"
 #include "MeshParser.h"
 #include "../Engine.h"

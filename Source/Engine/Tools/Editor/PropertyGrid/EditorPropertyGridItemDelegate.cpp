@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "EditorProperty.h"
 #include "EditorPropertyGrid.h"
 #include "EditorPropertyGridItemDelegate.h"

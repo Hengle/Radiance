@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "../App.h"
 #include "../Engine.h"
 #include "World.h"
@@ -279,7 +280,10 @@ Entity::Ref WorldLua::CreateEntity(const Keys &keys)
 
 bool WorldLua::PushGlobalCall(const char *name)
 {
-	return lua::GetFieldExt(L, LUA_GLOBALSINDEX, name);
+	lua_pushglobaltable(L);
+	bool r = lua::GetFieldExt(L, -1, name);
+	lua_pop(L, 1);
+	return r;
 }
 
 bool WorldLua::Call(const char *context, int nargs, int nresults, int errfunc)

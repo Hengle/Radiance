@@ -3,6 +3,8 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
+
 #if defined(RAD_OPT_TOOLS) && !defined(RAD_OPT_IOS)
 
 // Engine supports IntermediateCookers on any RAD_OPT_TOOLS target

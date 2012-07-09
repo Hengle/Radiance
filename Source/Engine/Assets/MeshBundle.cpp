@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "MeshBundle.h"
 #include "../COut.h"
 #include "../SkAnim/SkAnimDef.h"

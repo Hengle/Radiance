@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "EditorContentBrowserView.h"
 #include "../EditorUtils.h"
 #include <Runtime/Container/ZoneMap.h>

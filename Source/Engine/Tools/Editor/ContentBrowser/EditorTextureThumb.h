@@ -15,6 +15,7 @@ namespace editor {
 
 class TextureThumb : public ContentAssetThumb
 {
+	Q_OBJECT
 public:
 
 	enum

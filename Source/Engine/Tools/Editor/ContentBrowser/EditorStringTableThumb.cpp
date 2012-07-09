@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "EditorStringTableThumb.h"
 #include "../EditorStringTableEditorWindow.h"
 #include <QtGui/QMessageBox>

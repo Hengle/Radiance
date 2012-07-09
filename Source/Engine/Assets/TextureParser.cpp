@@ -20,6 +20,7 @@
 // Furthermore: All DXT related functionality is not linked into any shipping builds of 
 // a game. PVRTexLib, DDS, JPEG, TGA loading is only part of development/tools builds of the engine.
 
+#include RADPCH
 #include "TextureParser.h"
 #include "../App.h"
 #include "../Engine.h"
@@ -294,7 +295,7 @@ int TextureParser::LoadCooked(
 		img->bpp = bpp;
 		img->AllocateFrames(numFrames);
 
-		for (UReg f = 0; f < img->frameCount; ++f) {
+		for (int f = 0; f < img->frameCount; ++f) {
 			image_codec::Frame &frame = img->frames[f];
 			CHECK_SIZE(sizeof(U32));
 			img->AllocateMipmaps(f, *reinterpret_cast<const U32*>(bytes));
@@ -305,7 +306,7 @@ int TextureParser::LoadCooked(
 			frame.flags |= image_codec::SharedFrameFlagRef;
 			bytes += sizeof(U32);
 
-			for (UReg m = 0; m < frame.mipCount; ++m) {
+			for (int m = 0; m < frame.mipCount; ++m) {
 				image_codec::Mipmap &mip = frame.mipmaps[m];
 
 				CHECK_SIZE(sizeof(U32));
@@ -825,9 +826,9 @@ int TextureParser::Resize(
 						img->bpp = src.bpp;
 						img->AllocateFrames(src.frameCount);
 
-						for (UReg i = 0; i < src.frameCount; ++i) {
+						for (int i = 0; i < src.frameCount; ++i) {
 							img->AllocateMipmaps(i, 1);
-							img->AllocateMipmap(i, 0, (UReg)*w, (UReg)*h, (*w)*src.bpp, (*w)*(*h)*src.bpp);
+							img->AllocateMipmap(i, 0, *w, *h, (*w)*src.bpp, (*w)*(*h)*src.bpp);
 
 							SizeBuffer a, b;
 							FormatSize(a, (AddrSize)(m_header.width*m_header.height*src.bpp));
@@ -902,7 +903,7 @@ int TextureParser::Mipmap(
 	if (*b) {
 		int w = m_header.width;
 		int h = m_header.height;
-		UReg numMips = 1;
+		int numMips = 1;
 
 		while (w > MinMipSize || h > MinMipSize) {
 			if (w > MinMipSize)
@@ -946,7 +947,7 @@ int TextureParser::Mipmap(
 				img->format = src.format;
 				img->AllocateFrames(src.frameCount);
 
-				for (UReg i = 0; i < src.frameCount; ++i) {
+				for (int i = 0; i < src.frameCount; ++i) {
 					w = m_header.width;
 					h = m_header.height;
 
@@ -957,7 +958,7 @@ int TextureParser::Mipmap(
 					}
 
 					img->AllocateMipmaps(i, numMips);
-					for (UReg m = 0; m < numMips; ++m) {
+					for (int m = 0; m < numMips; ++m) {
 						img->AllocateMipmap(i, m, w, h, w*src.bpp, w*h*src.bpp);
 						
 						if (w == m_header.width && h == m_header.height) {
@@ -1061,7 +1062,7 @@ int TextureParser::Compress(
 		}
 	}
 
-	UReg format;
+	int format;
 	PixelType pvrFormat=OGL_RGBA_8888;
 	bool twiddle = false;
 	bool flip = false;
@@ -1124,7 +1125,7 @@ int TextureParser::Compress(
 		img->format = format;
 		
 		img->AllocateFrames(src.frameCount);
-		for (UReg i = 0; i < src.frameCount; ++i) {
+		for (int i = 0; i < src.frameCount; ++i) {
 			const image_codec::Frame &sf = src.frames[i];
 			if (sf.mipCount < 1)
 				continue;
@@ -1206,8 +1207,8 @@ int TextureParser::Compress(
 		AddrSize srcSize=0;
 		AddrSize dstSize=0;
 
-		for (UReg i = 0; i < src.frameCount; ++i) {
-			for (UReg m = 0; m < src.frames[i].mipCount; ++m) {
+		for (int i = 0; i < src.frameCount; ++i) {
+			for (int m = 0; m < src.frames[i].mipCount; ++m) {
 				srcSize += src.frames[i].mipmaps[m].dataSize;
 				dstSize += img->frames[i].mipmaps[m].dataSize;
 			}
@@ -1259,7 +1260,7 @@ int TextureParser::ExtractPVR(
 	
 #if defined(RAD_OPT_DEBUG)
 	{
-		UReg format=0;
+		int format=0;
 
 		// What format?
 		switch (src.getPixelType()) {
@@ -1287,13 +1288,13 @@ int TextureParser::ExtractPVR(
 	}
 #endif
 	
-	UReg numMips = (UReg)src.getMipMapCount()+1;
+	int numMips = (int)src.getMipMapCount()+1;
 	img.AllocateMipmaps(frame, numMips);
 	
-	UReg w = (UReg)src.getWidth();
-	UReg h = (UReg)src.getHeight();
+	int w = (int)src.getWidth();
+	int h = (int)src.getHeight();
 	
-	for (UReg m = 0; m < numMips; ++m) {
+	for (int m = 0; m < numMips; ++m) {
 		image_codec::Mipmap &mip = img.frames[frame].mipmaps[m];
 		AddrSize blockSize = 0;
 		
@@ -1321,8 +1322,8 @@ int TextureParser::ExtractPVR(
 		img.AllocateMipmap(frame, m, w, h, 0, blockSize);
 		memcpy(mip.data, data, blockSize);
 		data += blockSize;
-		w = (UReg)std::max<UReg>(w>>1, 1);
-		h = (UReg)std::max<UReg>(h>>1, 1);
+		w = std::max(w>>1, 1);
+		h = std::max(h>>1, 1);
 	}
 
 	return SR_Success;

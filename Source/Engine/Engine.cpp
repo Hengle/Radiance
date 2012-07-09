@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "Engine.h"
 #include "ComponentExports.h"
 #include "World/Entities/E_Exports.h"

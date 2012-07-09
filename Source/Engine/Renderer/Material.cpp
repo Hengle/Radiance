@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "Material.h"
 #include <Runtime/Math.h>
 #include <Runtime/Stream.h>

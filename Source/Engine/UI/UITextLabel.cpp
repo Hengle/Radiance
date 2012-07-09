@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "UITextLabel.h"
 #include "../World/Lua/D_Typeface.h"
 #include <Runtime/StringBase.h>

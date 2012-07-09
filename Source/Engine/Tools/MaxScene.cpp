@@ -3,6 +3,8 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
+
 #if defined(RAD_OPT_TOOLS)
 
 #include "MaxScene.h"
@@ -775,13 +777,13 @@ bool LoadMaxScene(InputStream &nakedstr, Map &map, bool smooth)
 						{
 							if (sub->second.emitId == -1)
 								sub->second.emitId = EmitMaterial(sub->second.name, map);
-							it->mat = sub->second.emitId;
+							it->mat = (int)sub->second.emitId;
 						}
 						else
 						{
 							if (m->emitId == -1)
 								m->emitId = EmitMaterial(m->name, map);
-							it->mat = m->emitId;
+							it->mat = (int)m->emitId;
 						}
 					}
 					else

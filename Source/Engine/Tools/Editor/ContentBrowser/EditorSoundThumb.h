@@ -14,6 +14,7 @@ namespace editor {
 
 class SoundThumb : public ContentAssetThumb
 {
+	Q_OBJECT
 public:
 	SoundThumb(ContentBrowserView &view);
 	virtual void OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable, bool modal);

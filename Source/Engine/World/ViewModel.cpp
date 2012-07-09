@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "../MathUtils.h"
 #include "ViewModel.h"
 #include "Entity.h"

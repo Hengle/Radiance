@@ -7,6 +7,7 @@
 *****************************************************************************************************************/
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "EditorComboCheckBox.h"
 #include <QtGui/QItemDelegate>
 #include <QtGui/QStandardItemModel>

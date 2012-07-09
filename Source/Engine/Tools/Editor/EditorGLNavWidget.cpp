@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "EditorGLNavWidget.h"
 #include <QtGui/QMouseEvent>
 #include <QtGui/QWheelEvent>

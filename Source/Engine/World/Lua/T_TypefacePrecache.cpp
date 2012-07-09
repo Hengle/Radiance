@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "T_TypefacePrecache.h"
 #include "D_Typeface.h"
 

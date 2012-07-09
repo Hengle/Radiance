@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "EditorWidgetPropertyEditors.h"
 #include "EditorFilePathFieldWidget.h"
 #include <QtGui/QComboBox>

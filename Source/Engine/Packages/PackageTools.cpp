@@ -3,6 +3,8 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
+
 #if defined(RAD_OPT_TOOLS)
 
 #include "Packages.h"
@@ -667,7 +669,7 @@ lua::State::Ref PackageMan::InitLua()
 	lua_State *L = state->L;
 #define MAP(_x) \
 	lua_pushnumber(L, (lua_Number)_x); \
-	lua_setfield(L, LUA_GLOBALSINDEX, #_x)
+	lua_setglobal(L, #_x)
 
 	MAP(K_TypeMask);
 	MAP(K_Variant);
@@ -1185,7 +1187,8 @@ void PackageMan::EnumeratePackage(
 				L->L,
 				&Loader::Read,
 				&loader,
-				path.c_str
+				path.c_str,
+				0
 			)
 		)
 		{

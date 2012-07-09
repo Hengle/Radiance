@@ -4,6 +4,7 @@
     <Import Project="BaseDebug.props" />
     <Import Project="TreatWarningsAsErrors.props" />
     <Import Project="EnginePCH.props" />
+    <Import Project="DisableWarnings.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />

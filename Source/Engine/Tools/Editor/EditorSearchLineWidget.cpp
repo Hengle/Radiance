@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "EditorSearchLineWidget.h"
 #include "EditorUtils.h"
 #include <QtGui/QLineEdit>

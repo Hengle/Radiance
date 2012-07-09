@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "UIMatWidget.h"
 #include "../World/Lua/D_Material.h"
 

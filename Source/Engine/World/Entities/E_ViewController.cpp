@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "E_ViewController.h"
 #include "../World.h"
 #include <algorithm>

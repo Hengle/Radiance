@@ -126,61 +126,59 @@
     <ClInclude Include="..\..\Engine\StringTable.h" />
     <ClInclude Include="..\..\Engine\Tickable.h" />
     <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserDef.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserModel.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserTree.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserView.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserWindow.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentChoosePackageDialog.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentImportFieldWidget.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserModel.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserTree.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserView.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserWindow.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentChoosePackageDialog.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentImportFieldWidget.h" />
     <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentProperties.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentPropertyGrid.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentPropertyGrid.h" />
     <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentTexture.h" />
     <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentThumbCache.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorMapThumb.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorMaterialThumb.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorMeshThumb.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorMusicThumb.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorSkModelThumb.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorSoundThumb.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorStringTableThumb.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorTextureThumb.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorComboCheckBox.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorCookerDialog.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorMapThumb.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorMaterialThumb.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorMeshThumb.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorMusicThumb.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorSkModelThumb.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorSoundThumb.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorStringTableThumb.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorTextureThumb.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorComboCheckBox.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorCookerDialog.h" />
     <ClInclude Include="..\..\Engine\Tools\Editor\EditorEventRegistry.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorGLCamera.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorGLNavWidget.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorGLWidget.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorLineEditDialog.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorLogWindow.h">
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorGLNavWidget.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorGLWidget.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorLineEditDialog.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorLogWindow.h">
       <FileType>Document</FileType>
-    </ClInclude>
+    </QtMOC>
     <QtMOC Include="..\..\Engine\Tools\Editor\EditorMainWindow.h">
       <FileType>Document</FileType>
     </QtMOC>
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorMeshEditorWindow.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorPIEWidget.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorPopupMenu.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorProgressDialog.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorSearchLineWidget.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorSkModelEditorWindow.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorStringTableEditorWindow.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorStringTableWidget.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorStringTableWidgetItemModel.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorTextEditorDialog.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorMeshEditorWindow.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorPIEWidget.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorPopupMenu.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorProgressDialog.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorSearchLineWidget.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorSkModelEditorWindow.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorStringTableEditorWindow.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorStringTableWidget.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorStringTableWidgetItemModel.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorTextEditorDialog.h" />
     <ClInclude Include="..\..\Engine\Tools\Editor\EditorTickState.h" />
     <ClInclude Include="..\..\Engine\Tools\Editor\EditorTypes.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorUpdate.h" />
     <ClInclude Include="..\..\Engine\Tools\Editor\EditorUtils.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorWindow.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\EditorZoneViewWindow.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorWindow.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorColorFieldWidget.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorFilePathFieldWidget.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorProperty.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorPropertyGrid.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorPropertyGridItemDelegate.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorPropertyGridModel.h" />
-    <ClInclude Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorWidgetPropertyEditors.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorWindow.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorZoneViewWindow.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorWindow.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorColorFieldWidget.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorFilePathFieldWidget.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorProperty.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorPropertyGrid.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorPropertyGridItemDelegate.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorPropertyGridModel.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorWidgetPropertyEditors.h" />
     <ClInclude Include="..\..\Engine\Tools\Map.h" />
     <ClInclude Include="..\..\Engine\Tools\MaxScene.h" />
     <ClInclude Include="..\..\Engine\Tools\Progress.h" />
@@ -523,7 +521,6 @@
     <ClCompile Include="..\..\Engine\Engine.cpp" />
     <ClCompile Include="..\..\Engine\FileSystem\Backend\DPak.cpp" />
     <ClCompile Include="..\..\Engine\FileSystem\Backend\FileSystem.cpp" />
-    <ClCompile Include="..\..\Engine\FileSystem\FileSystemReflectMap.cpp" />
     <ClCompile Include="..\..\Engine\Game\Game.cpp" />
     <ClCompile Include="..\..\Engine\Game\GameNetwork.cpp" />
     <ClCompile Include="..\..\Engine\Game\GameNetworkNull.cpp" />
@@ -590,7 +587,6 @@
     <ClCompile Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorTextureThumb.cpp" />
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorComboCheckBox.cpp" />
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorCookerDialog.cpp" />
-    <ClCompile Include="..\..\Engine\Tools\Editor\EditorGLCamera.cpp" />
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorGLNavWidget.cpp" />
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorGLWidget.cpp" />
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorLineEditDialog.cpp" />
@@ -607,7 +603,6 @@
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorStringTableWidgetItemModel.cpp" />
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorTextEditorDialog.cpp" />
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorTickState.cpp" />
-    <ClCompile Include="..\..\Engine\Tools\Editor\EditorUpdate.cpp" />
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorUtils.cpp" />
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorWindow.cpp" />
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorZoneViewWindow.cpp" />
@@ -834,7 +829,6 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
     <Import Project="..\VSProps\QtMocRule.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug - Developer|x64'" Label="PropertySheets">
@@ -912,7 +906,6 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
     <Import Project="..\VSProps\QtMocRule.targets" />
   </ImportGroup>
 </Project>

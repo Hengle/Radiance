@@ -411,6 +411,11 @@ struct Marshal< ::reflect::Reflected>
 
 #include <Runtime/PopPack.h>
 
+#if LUA_VERSION_NUM >= 502
+// Why did they remove this?
+RADENG_API int RADENG_CALL luaL_typerror (lua_State *L, int narg, const char *tname);
+#endif
+
 #define LUART_GETFN(_name) luart_get_##_name
 #define LUART_SETFN(_name) luart_set_##_name
 

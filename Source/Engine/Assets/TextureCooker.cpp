@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "TextureCooker.h"
 #include "TextureParser.h"
 #include <Runtime/Stream.h>

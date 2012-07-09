@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "SkAnimSetCooker.h"
 #include "SkAnimSetParser.h"
 #include <Runtime/Stream.h>

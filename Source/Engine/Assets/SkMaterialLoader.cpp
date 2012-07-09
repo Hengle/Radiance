@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "SkMaterialLoader.h"
 #include "SkModelParser.h"
 #include "../Engine.h"

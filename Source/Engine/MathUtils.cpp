@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "MathUtils.h"
 
 RADENG_API Quat RADENG_CALL QuatFromAngles(const Vec3 &angles)

@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include <Runtime/ReflectMap.h>
 #include "../Entity.h"
 #include "E_SplineTrack.h"

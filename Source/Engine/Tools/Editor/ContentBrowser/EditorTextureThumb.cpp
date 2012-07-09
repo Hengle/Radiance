@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "EditorTextureThumb.h"
 #include "EditorContentPropertyGrid.h"
 #include "../EditorUtils.h"
@@ -373,3 +374,4 @@ void CreateTextureThumb(ContentBrowserView &view)
 } // editor
 } // tools
 
+#include "moc_EditorTextureThumb.cc"

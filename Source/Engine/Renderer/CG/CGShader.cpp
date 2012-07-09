@@ -3,6 +3,8 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
+
 #if defined(RAD_OPT_TOOLS)
 
 #include "CGShader.h"
@@ -49,7 +51,7 @@ void RegisterOrdinals(lua_State *L)
 	for (int i = 0; i < Shader::OrdMax; ++i)
 	{
 		lua_pushnumber(L, (lua_Number)i);
-		lua_setfield(L, LUA_GLOBALSINDEX, s_ord[i]);
+		lua_setglobal(L, s_ord[i]);
 	}
 }
 

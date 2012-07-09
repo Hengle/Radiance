@@ -118,14 +118,6 @@
 
 	#define RAD_TT_IS_UNION(T)   __is_union(T)
 
-	//#pragma warning (disable:4290) // C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
-
-	// starting in VS2005, alot of the old C style string functions were marked deprecated.
-	#pragma warning (disable:4996) // 'X' was declared deprecated
-	#pragma warning (disable:4251) // class 'X' needs to have dll-interface to be used by clients of class 'Y'
-	#pragma warning (disable:4275) // non dll-interface class 'X' used as base for dll-interface class 'Y'
-	#pragma warning (disable:6246) // Local declaration of 'xxx' hides declaration of the same name in outer scope.
-
 #else
 
 	#error "unrecognized target compiler"

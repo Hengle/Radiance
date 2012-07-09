@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "TextModel.h"
 #include "../Assets/FontParser.h"
 #include "../App.h"

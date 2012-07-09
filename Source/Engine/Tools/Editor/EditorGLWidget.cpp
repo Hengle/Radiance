@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "EditorMainWindow.h"
 #include "EditorGLWidget.h"
 #include "EditorUtils.h"
