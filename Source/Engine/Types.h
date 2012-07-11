@@ -17,7 +17,6 @@
 #include "Opts.h"
 #include "Zones.h"
 
-typedef ::string::String String;
 typedef math::AABB3<float> BBox;
 typedef math::Matrix4X4F Mat4;
 typedef math::Vector2F Vec2;

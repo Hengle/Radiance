@@ -9,6 +9,7 @@
 #include <algorithm>
 #undef min
 #undef max
+#undef emit
 
 #if defined(RAD_OPT_IOS)
 bool __IOS_IPad3();

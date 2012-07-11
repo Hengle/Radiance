@@ -63,18 +63,18 @@ RADREFLECT_BEGIN_CLASS("reflect::rtl_interop::PropertySet", PropertySet)
 RADREFLECT_END(RADRT_API, PropertySet)
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// reflect::rtl_interop::Interface
+// reflect::rtl_interop::RTLInterface
 //////////////////////////////////////////////////////////////////////////////////////////
 
-RADREFLECT_BEGIN_CLASS("reflect::rtl_interop::Interface", Interface)
-RADREFLECT_END(RADRT_API, Interface)
+RADREFLECT_BEGIN_CLASS("reflect::rtl_interop::RTLInterface", RTLInterface)
+RADREFLECT_END(RADRT_API, RTLInterface)
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// reflect::rtl_interop::InterfaceHandle
+// reflect::rtl_interop::RTLInterfaceHandle
 //////////////////////////////////////////////////////////////////////////////////////////
 
-RADREFLECT_BEGIN_CLASS("reflect::rtl_interop::InterfaceHandle", InterfaceHandle)
-RADREFLECT_END(RADRT_API, InterfaceHandle)
+RADREFLECT_BEGIN_CLASS("reflect::rtl_interop::RTLInterfaceHandle", RTLInterfaceHandle)
+RADREFLECT_END(RADRT_API, RTLInterfaceHandle)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // reflect::rtl_interop::Interface

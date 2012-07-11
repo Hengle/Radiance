@@ -95,22 +95,22 @@ class PropertySet {};
 // I actually don't understand how/why this worked on MSVC, it seems
 // impossible...
 
-class Interface
+class RTLInterface
 {
-	RADREFLECT_EXPOSE_PRIVATES(Interface)
+	RADREFLECT_EXPOSE_PRIVATES(RTLInterface)
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // reflect::rtl_interop::InterfaceHandle
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class InterfaceHandle
+class RTLInterfaceHandle
 {
-	RADREFLECT_EXPOSE_PRIVATES(InterfaceHandle)
+	RADREFLECT_EXPOSE_PRIVATES(RTLInterfaceHandle)
 
 public:
 
-	explicit InterfaceHandle(const reflect::Class *ifaceType) : m_iface(ifaceType) {}
+	explicit RTLInterfaceHandle(const reflect::Class *ifaceType) : m_iface(ifaceType) {}
 	const reflect::Class *InterfaceType() const { return m_iface; }
 
 private:
@@ -188,16 +188,16 @@ inline T ^CreateManagedType(X *x)
 	RADREFLECT_CLASS_ATTRIBUTE(::reflect::rtl_interop::Visible, (_visible))
 
 #define RADREFLECT_RTLI_CLASS_ATTRIBUTE_INTERFACE_NAMESPACE(_namespace, _handleType) \
-	RADREFLECT_CLASS_ATTRIBUTE(::reflect::rtl_interop::Interface, ())
+	RADREFLECT_CLASS_ATTRIBUTE(::reflect::rtl_interop::RTLInterface, ())
 
 #define RADREFLECT_RTLI_CLASS_ATTRIBUTE_INTERFACE(_handleType)\
-	RADREFLECT_CLASS_ATTRIBUTE(::reflect::rtl_interop::Interface, ())
+	RADREFLECT_CLASS_ATTRIBUTE(::reflect::rtl_interop::RTLInterface, ())
 
 #define RADREFLECT_RTLI_CLASS_ATTRIBUTE_INTERFACEHANDLE_NAMESPACE(_namespace, _ifaceType)\
-	RADREFLECT_CLASS_ATTRIBUTE(::reflect::rtl_interop::InterfaceHandle, (::reflect::Type<_namespace::_ifaceType>()))
+	RADREFLECT_CLASS_ATTRIBUTE(::reflect::rtl_interop::RTLInterfaceHandle, (::reflect::Type<_namespace::_ifaceType>()))
 
 #define RADREFLECT_RTLI_CLASS_ATTRIBUTE_INTERFACEHANDLE(_ifaceType)\
-	RADREFLECT_CLASS_ATTRIBUTE(::reflect::rtl_interop::InterfaceHandle, (::reflect::Type<_ifaceType>()))
+	RADREFLECT_CLASS_ATTRIBUTE(::reflect::rtl_interop::RTLInterfaceHandle, (::reflect::Type<_ifaceType>()))
 
 #define RADREFLECT_RTLI_CLASS_ATTRIBUTE_QUERYINTERFACE\
 	RADREFLECT_CLASS_ATTRIBUTE(::reflect::rtl_interop::QueryInterface, ())
@@ -225,8 +225,8 @@ RADREFLECT_DECLARE(RADRT_API, reflect::rtl_interop::Visible)
 RADREFLECT_DECLARE(RADRT_API, reflect::rtl_interop::NoSuper)
 RADREFLECT_DECLARE(RADRT_API, reflect::rtl_interop::PropertyGet)
 RADREFLECT_DECLARE(RADRT_API, reflect::rtl_interop::PropertySet)
-RADREFLECT_DECLARE(RADRT_API, reflect::rtl_interop::Interface)
-RADREFLECT_DECLARE(RADRT_API, reflect::rtl_interop::InterfaceHandle)
+RADREFLECT_DECLARE(RADRT_API, reflect::rtl_interop::RTLInterface)
+RADREFLECT_DECLARE(RADRT_API, reflect::rtl_interop::RTLInterfaceHandle)
 RADREFLECT_DECLARE(RADRT_API, reflect::rtl_interop::QueryInterface)
 #endif // !defined(RAD_OPT_NO_REFLECTION)
 

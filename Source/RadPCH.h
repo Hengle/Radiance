@@ -25,4 +25,13 @@
 #include <Runtime/Stream.h>
 #include <Runtime/Thread.h>
 #include <Runtime/Time.h>
+#include <Runtime/Interface.h>
+#include <Engine/Packages/Packages.h>
+#include <Engine/Lua/LuaRuntime.h>
+#include <Engine/FileSystem/FileSystem.h>
+#if defined(RAD_OPT_PC_TOOLS)
+#include <QtGui/QWidget>
+#include <QtGui/QDialog>
+#include <Engine/Tools/Editor/ContentBrowser/EditorContentProperties.h>
+#endif
 #endif

@@ -10,8 +10,6 @@
 #include <limits>
 #include <Runtime/PushSystemMacros.h>
 
-using namespace string;
-
 namespace file {
 namespace details {
 
@@ -454,7 +452,7 @@ bool DPakFileSearch::NextFile(String &outFilename)
 	{
 		const data_codec::lmp::StreamReader::Lump *lump = m_dpakFile->m_pak.GetByIndex(m_lumpNum++);
 		RAD_ASSERT(lump);
-		String name(lump->Name(), RefTag);
+		String name(CStr(lump->Name()));
 
 		// trivial rejection.
 		if (name.length < m_path.length) 
@@ -466,7 +464,7 @@ bool DPakFileSearch::NextFile(String &outFilename)
 		{
 			char ext[file::MaxExtLen+1];
 			file::FileExt(name.c_str, ext, file::MaxExtLen+1);
-			if (!cmp(ext, m_ext.c_str.get()))
+			if (!string::cmp(ext, m_ext.c_str.get()))
 			{
 				outFilename = name;
 				return true;

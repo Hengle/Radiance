@@ -282,8 +282,8 @@ namespace {
 typedef ::reflect::Class Class;
 typedef ::reflect::ATTRIBUTE Attribute;
 typedef ::reflect::rtl_interop::Visible VisibleAttr;
-typedef ::reflect::rtl_interop::InterfaceHandle InterfaceHandleAttr;
-typedef ::reflect::rtl_interop::Interface InterfaceAttr;
+typedef ::reflect::rtl_interop::RTLInterfaceHandle RTLInterfaceHandle;
+typedef ::reflect::rtl_interop::RTLInterface RTLInterface;
 typedef ::reflect::Enum EnumAttr;
 typedef ::reflect::EnumValue EnumValue;
 typedef ::reflect::ArgumentList ArgumentList;
@@ -300,7 +300,7 @@ bool IsVisible(const Class *type)
 
 	if (!isVis) // make handles inherit their interfaces visiblity (they are hidden by default)
 	{
-		InterfaceHandleAttr h(0);
+		RTLInterfaceHandle h(0);
 		if (type->AttributeValue(h) && h.InterfaceType())
 		{
 			isVis = h.InterfaceType()->AttributeValue(vis) && vis;
@@ -333,12 +333,12 @@ int NumEnumVals(const Class *type)
 
 bool IsInterface(const Class *type)
 {
-	return type->FindAttribute(::reflect::Type<InterfaceAttr>()) != 0;
+	return type->FindAttribute(::reflect::Type<RTLInterface>()) != 0;
 }
 
 bool IsInterfaceHandle(const Class *type)
 {
-	return type->FindAttribute(::reflect::Type<InterfaceHandleAttr>()) != 0;
+	return type->FindAttribute(::reflect::Type<RTLInterfaceHandle>()) != 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -789,7 +789,7 @@ int lua_ReflectedCall(lua_State *L)
 		if (m->iface)
 		{	// marshal an InterfaceHandle into an IInterface derived class.
 			// type check
-			InterfaceHandleAttr attr(0);
+			RTLInterfaceHandle attr(0);
 
 			if (!self.Type()->AttributeValue(attr) || !attr.InterfaceType()->IsA(m->type))
 			{

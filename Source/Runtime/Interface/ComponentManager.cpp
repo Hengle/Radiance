@@ -27,7 +27,6 @@
 #include "../SharedLibrary.h"
 
 using namespace file;
-using namespace string;
 
 RAD_ZONE_DEF(RADRT_API, ZComMan, "Component Manager", ZRuntime);
 
@@ -126,7 +125,7 @@ struct ComponentManager :
 
 		if (flags & CLF_NativePath)
 		{
-			cpy(nativePath, path);
+			string::cpy(nativePath, path);
 		}
 		else
 		{
@@ -142,9 +141,9 @@ struct ComponentManager :
 			while (search.NextFile(filename, MaxFilePathLen+1))
 			{
 				char buff[MaxFilePathLen+1];
-				cpy(buff, nativePath);
-				cat(buff, NativePathSeparator);
-				cat(buff, filename);
+				string::cpy(buff, nativePath);
+				string::cat(buff, NativePathSeparator);
+				string::cat(buff, filename);
 
 				SharedLibrary *so = m_sharedLibraryPool.Construct();
 				RAD_VERIFY(so);

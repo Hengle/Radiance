@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <algorithm>
 #undef max
+#undef emit
 
 namespace ska {
 

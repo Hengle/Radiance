@@ -12,8 +12,6 @@
 #undef max
 #include <Runtime/PushSystemMacros.h>
 
-using namespace string;
-
 namespace file {
 namespace details {
 
@@ -1248,7 +1246,7 @@ Result FileSystem::OpenDiskFile(
 )
 {
 	AssertInit();
-	String strFile = String(prefix, RefTag) + String(filename, RefTag);
+	String strFile = CStr(prefix) + CStr(filename);
 	if (file::FileExists(strFile.c_str, 0))
 	{
 		DiskFile *diskFile = m_diskFilePool.Construct();
@@ -1383,7 +1381,7 @@ void FileSystem::RAD_IMPLEMENT_SET(cddvdRoot) (const char *value)
 	}
 	if (!m_cddvd.empty)
 	{
-		m_cddvdPath = String("1:/", RefTag) + m_cddvd;
+		m_cddvdPath = CStr("1:/") + m_cddvd;
 		m_cddvdPathSlash = m_cddvdPath + '/';
 	}
 	else
