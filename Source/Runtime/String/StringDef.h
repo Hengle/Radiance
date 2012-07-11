@@ -1,7 +1,9 @@
-// StringDef.h
-// Copyright (c) 2012 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file StringDef.h
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup Runtime
+*/
 
 #pragma once
 

@@ -3,11 +3,12 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <_PropertySheetDisplayName>GLSLOptimizerBuildPaths</_PropertySheetDisplayName>
+    <_PropertySheetDisplayName>GLSLOptimizerBuild</_PropertySheetDisplayName>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(EXTERN_PATH)\glsl-optimizer-v1\include;$(EXTERN_PATH)\glsl-optimizer-v1\include\c99;$(EXTERN_PATH)\glsl-optimizer-v1\src\mesa;$(EXTERN_PATH)\glsl-optimizer-v1\src\mapi;$(EXTERN_PATH)\glsl-optimizer-v1\src\talloc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4291;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

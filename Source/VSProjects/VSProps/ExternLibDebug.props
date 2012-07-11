@@ -3,9 +3,12 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="BaseDebug.props" />
     <Import Project="ExternLibOpts.props" />
+    <Import Project="NoOptimizations.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
-  <ItemDefinitionGroup />
+  <ItemDefinitionGroup>
+    <ClCompile />
+  </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

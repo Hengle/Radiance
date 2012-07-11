@@ -1,7 +1,9 @@
-// String.inl
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file String_inl.h
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup Runtime
+*/
 
 #include <algorithm>
 #include "../PushSystemMacros.h"

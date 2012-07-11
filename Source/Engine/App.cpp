@@ -21,9 +21,9 @@ enum { FrameHistorySize = 15 };
 
 App *App::s_instance = 0;
 
-App *App::Get() {
+App *App::Get(int argc, const char **argv) {
 	if (!s_instance)
-		s_instance = New();
+		s_instance = New(argc, argv);
 	return s_instance;
 }
 
@@ -71,15 +71,13 @@ void App::DumpMemStats(int level) {
 	COut(level) << "  Uncategorized: " << buf << std::endl;
 }
 
-App::App() :
+App::App(int argc, const char **argv) :
+NativeApp(argc, argv),
 m_ticks(0),
 m_exit(false),
 m_time(0.f),
 m_frameHistoryIdx(0),
 m_langId(StringTable::LangId_EN)
-#if defined(RAD_OPT_PC_TOOLS)
-,m_editor(false)
-#endif
 {
 	m_e = Engine::New();
 #if defined(FRAME_SMOOTH)
@@ -177,9 +175,6 @@ bool App::Initialize() {
 
 void App::Finalize() {
 	engine->Finalize();
-}
-
-void App::Run() { // called to startup game
 }
 
 float App::Tick() {

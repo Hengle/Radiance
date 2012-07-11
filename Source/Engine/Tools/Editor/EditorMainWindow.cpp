@@ -20,7 +20,7 @@
 #include "ContentBrowser/EditorContentBrowserView.h"
 #include "PropertyGrid/EditorPropertyGrid.h"
 #include "../../App.h"
-#include "../../Renderer/PC/RBackend.h"
+#include "../../Renderer/PC/RGLBackend.h"
 #include "../../Renderer/GL/GLTable.h"
 #include "../../Sound/Sound.h"
 
@@ -36,10 +36,9 @@ MainWindow *MainWindow::Get()
 	return s_instance;
 }
 
-MainWindow::MainWindow(::App &app, bool firstTime, QWidget *parent) :
+MainWindow::MainWindow(::App &app, QWidget *parent) :
 QMainWindow(parent),
 m_app(&app),
-m_firstTime(firstTime),
 m_run(false),
 m_glBase(0),
 m_exitPosted(false),
@@ -124,7 +123,7 @@ bool MainWindow::Show()
 	m_glBase = new (ZEditor) QGLWidget(this);
 
 	m_glBase->makeCurrent();
-	m_glBaseCtx = m_app->engine->sys->r.Cast<r::IRBackend>()->BindContext();
+	m_glBaseCtx = m_app->engine->sys->r.Cast<r::IRBackend>()->CreateContext(NativeDeviceContext::Ref());
 	RAD_ASSERT(m_glBaseCtx);
 	m_app->engine->sys->r->ctx = m_glBaseCtx;
 	BindGL();
@@ -183,11 +182,7 @@ void MainWindow::OpenCookerDialog()
 
 void MainWindow::Run()
 {
-	if (m_firstTime)
-	{
-		m_app->Push(TickInit::New());
-	}
-
+	m_app->Push(TickInit::New());
 	m_run = true;
 	startTimer(1);
 }
@@ -207,8 +202,6 @@ void MainWindow::PostLoad()
 
 	m_contentBrowser = new (ZEditor) ContentBrowserWindow(WS_Widget, true, true);
 	setCentralWidget(m_contentBrowser);
-	
-	m_app->EditorStart();
 }
 
 void MainWindow::timerEvent(QTimerEvent*)
@@ -239,11 +232,7 @@ bool MainWindow::CheckExit()
 	if (m_exitPosted) 
 		return true;
 
-	if (__PostQuitPending() || m_app->exit
-#if !defined(RAD_OPT_APPLE)
-		|| !m_app->wantEditor
-#endif
-		)
+	if (__PostQuitPending() || m_app->exit)
 	{
 		m_exitPosted = true;
 		close();

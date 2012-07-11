@@ -1191,9 +1191,6 @@
     <ClInclude Include="..\..\Engine\Renderer\PC\RBackendDef.h">
       <Filter>Source\Engine\Renderer\PC</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\Renderer\PC\RBDetails.h">
-      <Filter>Source\Engine\Renderer\PC</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\Renderer\PC\wglext.h">
       <Filter>Source\Engine\Renderer\PC</Filter>
     </ClInclude>
@@ -1415,6 +1412,12 @@
     </ClInclude>
     <ClInclude Include="..\..\Engine\World\MapBuilder\BoxBSP\VecHash.h">
       <Filter>Source\Engine\World\MapBuilder\BoxBSP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Renderer\GL\GLRenderer.h">
+      <Filter>Source\Engine\Renderer\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Renderer\PC\RGLBackend.h">
+      <Filter>Source\Engine\Renderer\PC</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1784,12 +1787,6 @@
     <ClCompile Include="..\..\Engine\Renderer\GL\GLSLTool.cpp">
       <Filter>Source\Engine\Renderer\GL</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\Renderer\PC\RBackend.cpp">
-      <Filter>Source\Engine\Renderer\PC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\Renderer\PC\RBAssets.cpp">
-      <Filter>Source\Engine\Renderer\PC</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Engine\SCC\SCC.cpp">
       <Filter>Source\Engine\SCC</Filter>
     </ClCompile>
@@ -2089,6 +2086,15 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\World\MapBuilder\BoxBSP\BoxBSP.cpp">
       <Filter>Source\Engine\World\MapBuilder\BoxBSP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Renderer\PC\RBGLAssets.cpp">
+      <Filter>Source\Engine\Renderer\PC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Renderer\GL\GLRenderer.cpp">
+      <Filter>Source\Engine\Renderer\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Renderer\PC\RGLBackend.cpp">
+      <Filter>Source\Engine\Renderer\PC</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

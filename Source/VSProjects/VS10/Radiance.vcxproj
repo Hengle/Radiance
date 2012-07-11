@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug - Developer|Win32">
-      <Configuration>Debug - Developer</Configuration>
+    <ProjectConfiguration Include="Dev - Debug|Win32">
+      <Configuration>Dev - Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug - Developer|x64">
-      <Configuration>Debug - Developer</Configuration>
+    <ProjectConfiguration Include="Dev - Debug|x64">
+      <Configuration>Dev - Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release - Developer|Win32">
-      <Configuration>Release - Developer</Configuration>
+    <ProjectConfiguration Include="Dev - Release|Win32">
+      <Configuration>Dev - Release</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release - Developer|x64">
-      <Configuration>Release - Developer</Configuration>
+    <ProjectConfiguration Include="Dev - Release|x64">
+      <Configuration>Dev - Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -101,11 +101,12 @@
     <ClInclude Include="..\..\Engine\Renderer\GL\GLVertexBuffer.h" />
     <ClInclude Include="..\..\Engine\Renderer\GL\GLVertexBufferDef.h" />
     <ClInclude Include="..\..\Engine\Renderer\GL\GLWorldDraw.h" />
+    <ClInclude Include="..\..\Engine\Renderer\GL\GLRenderer.h" />
     <ClInclude Include="..\..\Engine\Renderer\Material.h" />
     <ClInclude Include="..\..\Engine\Renderer\Mesh.h" />
     <ClInclude Include="..\..\Engine\Renderer\PC\RBackend.h" />
     <ClInclude Include="..\..\Engine\Renderer\PC\RBackendDef.h" />
-    <ClInclude Include="..\..\Engine\Renderer\PC\RBDetails.h" />
+    <ClInclude Include="..\..\Engine\Renderer\PC\RGLBackend.h" />
     <ClInclude Include="..\..\Engine\Renderer\PC\wglext.h" />
     <ClInclude Include="..\..\Engine\Renderer\Renderer.h" />
     <ClInclude Include="..\..\Engine\Renderer\RendererDef.h" />
@@ -551,10 +552,11 @@
     <ClCompile Include="..\..\Engine\Renderer\GL\GLTexture.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\GL\GLUIDraw.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\GL\GLWorldDraw.cpp" />
+    <ClCompile Include="..\..\Engine\Renderer\GL\GLRenderer.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\Material.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\Mesh.cpp" />
-    <ClCompile Include="..\..\Engine\Renderer\PC\RBackend.cpp" />
-    <ClCompile Include="..\..\Engine\Renderer\PC\RBAssets.cpp" />
+    <ClCompile Include="..\..\Engine\Renderer\PC\RGLBackend.cpp" />
+    <ClCompile Include="..\..\Engine\Renderer\PC\RBGLAssets.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\Renderer.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\Shader.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\SkMesh.cpp" />
@@ -662,8 +664,8 @@
     <ClCompile Include="..\..\Engine\World\WorldSpawn.cpp" />
     <ClCompile Include="..\..\Engine\Zones.cpp" />
     <ClCompile Include="..\..\RadPCH.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug - Developer|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug - Developer|x64'">$(PCH)</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Dev - Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Dev - Debug|x64'">$(PCH)</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="..\..\Runtime\AudioCodec\Vorbis.cpp" />
     <ClCompile Include="..\..\Runtime\AudioCodec\Wave.cpp" />
@@ -676,7 +678,7 @@
     <ClCompile Include="..\..\Runtime\Base\SIMD.cpp" />
     <ClCompile Include="..\..\Runtime\Base\SIMD_ref.cpp" />
     <ClCompile Include="..\..\Runtime\Base\SIMD_sse2.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug - Developer|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Dev - Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\Runtime\Base\Utils.cpp" />
     <ClCompile Include="..\..\Runtime\Base\Zone.cpp" />
@@ -805,23 +807,23 @@
     <RootNamespace>Radiance</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug - Developer|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dev - Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug - Developer|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dev - Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release - Developer|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dev - Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release - Developer|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dev - Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -831,25 +833,24 @@
   <ImportGroup Label="ExtensionSettings">
     <Import Project="..\VSProps\QtMocRule.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug - Developer|x64'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Dev - Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\VSProps\EngineDebugDeveloperBuild.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug - Developer|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Dev - Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release - Developer|x64'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Dev - Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release - Developer|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Dev - Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug - Developer|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dev - Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -857,12 +858,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug - Developer|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dev - Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -870,11 +868,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release - Developer|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dev - Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -887,13 +883,10 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release - Developer|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dev - Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>

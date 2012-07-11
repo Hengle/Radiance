@@ -14,8 +14,7 @@
 
 namespace r {
 
-class RADENG_CLASS VidMode
-{
+class VidMode {
 public:
 
 	VidMode() : w(0), h(0), bpp(0), hz(0), fullscreen(false) {}
@@ -32,11 +31,25 @@ public:
 	int w, h, bpp, hz;
 	bool fullscreen;
 
-	bool Standard() const { return Is4x3(); }
-	bool Wide() const { return !Standard(); }
-	bool Is4x3() const { return !(Is16x9() || Is16x10()); }
-	bool Is16x9() const { return Div(16, 9); }
-	bool Is16x10() const { return Div(16, 10); }
+	bool Standard() const { 
+		return Is4x3(); 
+	}
+
+	bool Wide() const { 
+		return !Standard(); 
+	}
+
+	bool Is4x3() const { 
+		return !(Is16x9() || Is16x10()); 
+	}
+
+	bool Is16x9() const { 
+		return Div(16, 9); 
+	}
+
+	bool Is16x10() const { 
+		return Div(16, 10); 
+	}
 
 private:
 
@@ -54,27 +67,21 @@ RAD_REFLECTED_INTERFACE_BEGIN(IRenderer, IInterface, r.IRenderer)
 
 	virtual void ClearBackBuffer() = 0;
 	virtual void ClearDepthBuffer() = 0;
-	virtual void SwapBuffers() = 0;
 	virtual void CommitStates() = 0;
 	virtual void BindFramebuffer() = 0;
 	virtual void UnbindStates() = 0;
 
-#if defined(RAD_OPT_CONSOLE)
-	RAD_DECLARE_READONLY_PROPERTY(IRenderer, ctx, const HContext&);
-#else
-	RAD_DECLARE_PROPERTY(IRenderer, ctx, const HContext&, const HContext&);
+#if !defined(RAD_OPT_PC_TOOLS)
+	// handled by Qt in tools builds
+	virtual void SwapBuffers() = 0;
 #endif
 
-	RAD_DECLARE_READONLY_PROPERTY(IRenderer, curVidMode, const VidMode&);
+	RAD_DECLARE_PROPERTY(IRenderer, ctx, const HContext&, const HContext&);
 
 protected:
 
-	virtual RAD_DECLARE_GET(curVidMode, const VidMode&) = 0;
 	virtual RAD_DECLARE_GET(ctx, const HContext&) = 0;
-	
-#if !defined(RAD_OPT_CONSOLE)
 	virtual RAD_DECLARE_SET(ctx, const HContext&) = 0;
-#endif
 	
 RAD_INTERFACE_END
 

@@ -38,7 +38,6 @@ void SoundContext::StreamCallback::Tick(ALDriver &alDriver) {
 		alDriver.Wake(); // don't sleep we are still working.
 }
 
-
 SoundContext::Ref SoundContext::New(const ALDriver::Ref &driver) {
 	return SoundContext::Ref(new (ZSound) SoundContext(driver));
 }
@@ -427,7 +426,7 @@ Sound::~Sound() {
 				m_alDriver->SyncDeleteBuffers(ALDRIVER_SIG 1, &m_sbufs[i]);
 		}
 
-		// NOTE: in Sound::tick we issue a custom ALDriver command that queries that status
+		// NOTE: in Sound::Tick we issue a custom ALDriver command that queries the status
 		// of the source (alSourcei(AL_SOURCE_STATUS). This is an asynchronous command that
 		// writes to a member of a Source object contained in the m_sources[] vector of this
 		// object.
@@ -435,7 +434,7 @@ Sound::~Sound() {
 		// There is no chance of contention here (or crashing because we write to this
 		// data after the destructor is finished) because in order for us to issue this command
 		// the source must have a valid openAL source/buffer attached. That means we call
-		// ALDriver::deleteSources() & ALDriver::deleteBuffers() which are both synchronous operations
+		// ALDriver::DeleteSources() & ALDriver::DeleteBuffers() which are both synchronous operations
 		// and therefore our custom command is guaranteed to be executed before the destructor returns
 
 	}

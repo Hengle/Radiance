@@ -295,7 +295,6 @@ bool ALDriver::SyncBufferData(
 	return c.args.pvoid != 0;
 }
 
-
 bool ALDriver::SyncGenSources(ALDRIVER_PARAMS ALsizei n, ALuint *sources) {
 	GenCommand c(&fn_GenSources);
 	ALDRIVER_CMD_SIG(c);

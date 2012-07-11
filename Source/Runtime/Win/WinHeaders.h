@@ -13,29 +13,28 @@
 	#error "Include error, this file only works under windows!"
 #endif
 
+#define RAD_REQ_WINVER 0x500
+
 //
 // Is windows already included?
 //
 #if defined(_WINDOWS_)
 	
 	// Check the version.
-	#if !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x0403)
-		#error <windows.h> was included before base with a _WIN32_WINNT version < 0x0403. Please define _WIN32_WINNT to be >= 0x0403"
-		//
-		// If you got the above error, copy and paste the following code before you include windows.h
-		//
-		//#if !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x0403)
-		//	#undef _WIN32_WINNT
-		//	#define _WIN32_WINNT 0x0403
-		//#endif
-		//
+	#if !defined(_WIN32_WINNT) || (_WIN32_WINNT < RAD_REQ_WINVER) || !defined(WINVER) || (WINVER < RAD_REQ_WINVER)
+		#error <windows.h> was included before base with a _WIN32_WINNT version < 0x500. Please define _WIN32_WINNT to be >= 0x500"
 	#endif
 
 #else
 
-	#if !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x0403)
+	#if !defined(_WIN32_WINNT) || (_WIN32_WINNT < RAD_REQ_WINVER)
 		#undef _WIN32_WINNT
-		#define _WIN32_WINNT 0x0403
+		#define _WIN32_WINNT RAD_REQ_WINVER
+	#endif
+
+	#if !defined(WINVER) || (WINVER < RAD_REQ_WINVER)
+		#undef WINVER
+		#define WINVER RAD_REQ_WINVER
 	#endif
 
 	#if defined(NULL)

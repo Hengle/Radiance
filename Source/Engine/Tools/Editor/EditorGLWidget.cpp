@@ -42,7 +42,7 @@ void GLWidget::bindGL(bool makeCurrent)
 		return;
 
 	if (!m_ctx)
-		m_ctx = Renderer().Cast<r::IRBackend>()->BindContext();
+		m_ctx = Renderer().Cast<r::IRBackend>()->CreateContext(NativeDeviceContext::Ref());
 
 	Renderer()->ctx = m_ctx;
 }

@@ -33,7 +33,7 @@ public:
 
 	static MainWindow *Get();
 
-	MainWindow(::App &app, bool firstTime, QWidget *parent=0);
+	MainWindow(::App &app, QWidget *parent=0);
 	virtual ~MainWindow();
 
 	bool Init();
@@ -108,7 +108,6 @@ private:
 	::App *m_app;
 	mutable QSettings m_userSettings;
 	bool m_run;
-	bool m_firstTime;
 	bool m_exitPosted;
 	bool m_tickEnabled;
 
