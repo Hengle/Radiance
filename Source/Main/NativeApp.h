@@ -52,12 +52,14 @@ public:
 	bool BindDisplayDevice(const DisplayDevice::Ref &display, const r::VidMode &mode);
 	void ResetDisplayDevice();
 	void LaunchURL(const char *sz);
+	bool FindArg(const char *arg);
+	const char *ArgArg(const char *arg);
 	
 #if defined(RAD_OPT_GL) && !defined(RAD_OPT_PC_TOOLS)
 	NativeDeviceContext::Ref CreateOpenGLContext();
 #endif
 
-	RAD_DECLARE_READONLY_PROPERTY(NativeApp, systemLanguage, StringTable::LangId);
+	RAD_DECLARE_READONLY_PROPERTY(NativeApp, systemLangId, StringTable::LangId);
 	RAD_DECLARE_READONLY_PROPERTY(NativeApp, displayDevices, const DisplayDevice::Vec&);
 	RAD_DECLARE_READONLY_PROPERTY(NativeApp, mainThreadId, thread::Id);
 	RAD_DECLARE_READONLY_PROPERTY(NativeApp, argc, int);
@@ -65,7 +67,7 @@ public:
 
 private:
 		
-	RAD_DECLARE_GET(systemLanguage, StringTable::LangId);
+	RAD_DECLARE_GET(systemLangId, StringTable::LangId);
 	RAD_DECLARE_GET(displayDevices, const DisplayDevice::Vec&);
 	RAD_DECLARE_GET(mainThreadId, thread::Id);
 	RAD_DECLARE_GET(argc, int);

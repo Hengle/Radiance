@@ -4,9 +4,10 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
   <ItemDefinitionGroup>
-    <ClCompile>
-      <PreprocessorDefinitions>BOOST_THREAD_BUILD_LIB;BOOST_ALL_NO_LIB;BOOST_NO_EXCEPTIONS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(OPENAL_PATH)\Win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OpenAL64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

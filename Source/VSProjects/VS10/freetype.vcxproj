@@ -25,6 +25,8 @@
     <ClCompile Include="..\..\..\..\Extern\freetype-2.4.4\src\base\ftbitmap.c" />
     <ClCompile Include="..\..\..\..\Extern\freetype-2.4.4\src\base\ftdebug.c" />
     <ClCompile Include="..\..\..\..\Extern\freetype-2.4.4\src\base\ftglyph.c" />
+    <ClCompile Include="..\..\..\..\Extern\freetype-2.4.4\src\base\ftinit.c" />
+    <ClCompile Include="..\..\..\..\Extern\freetype-2.4.4\src\base\ftsystem.c" />
     <ClCompile Include="..\..\..\..\Extern\freetype-2.4.4\src\bdf\bdf.c" />
     <ClCompile Include="..\..\..\..\Extern\freetype-2.4.4\src\cff\cff.c" />
     <ClCompile Include="..\..\..\..\Extern\freetype-2.4.4\src\cid\type1cid.c" />

@@ -6,8 +6,6 @@
 #pragma once
 
 #include "../Types.h"
-#include <Lua/lua.h>
-#include <Lua/lauxlib.h>
 #include <Runtime/Interface.h>
 #include <Runtime/Reflect.h>
 #include <Runtime/Stream.h>
@@ -19,6 +17,11 @@
 #include <string>
 #include <map>
 #include <vector>
+
+extern "C" {
+#include <Lua/lua.h>
+#include <Lua/lauxlib.h>
+}
 
 #include <Runtime/PushPack.h>
 

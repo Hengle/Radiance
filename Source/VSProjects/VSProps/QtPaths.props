@@ -3,6 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
     <QT_BIN_PATH>$(QT_PATH)\bin</QT_BIN_PATH>
+    <QT_LIB_PATH>$(QT_PATH)\lib</QT_LIB_PATH>
     <QT_MOC>$(QT_BIN_PATH)\moc.exe</QT_MOC>
   </PropertyGroup>
   <PropertyGroup />
@@ -14,6 +15,9 @@
   <ItemGroup>
     <BuildMacro Include="QT_BIN_PATH">
       <Value>$(QT_BIN_PATH)</Value>
+    </BuildMacro>
+    <BuildMacro Include="QT_LIB_PATH">
+      <Value>$(QT_LIB_PATH)</Value>
     </BuildMacro>
     <BuildMacro Include="QT_MOC">
       <Value>$(QT_MOC)</Value>

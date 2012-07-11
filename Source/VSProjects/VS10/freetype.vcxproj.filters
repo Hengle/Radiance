@@ -72,5 +72,11 @@
     <ClCompile Include="..\..\..\..\Extern\freetype-2.4.4\src\winfonts\winfnt.c">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\freetype-2.4.4\src\base\ftinit.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\freetype-2.4.4\src\base\ftsystem.c">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -27,6 +27,9 @@
     <ClCompile Include="..\..\Main\Win\WinMain.cpp">
       <Filter>Source\Win</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\..\CrowIOS\Radiance\Source\Main\null_CloudStorage.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Main\NativeApp.h">

@@ -8,22 +8,22 @@ namespace editor {
 
 inline bool ContentBrowserModel::IsPackage(const QModelIndex &index) const
 {
-	return index.isValid() && ((index.internalId()&ModelFlags)==PkgFlag);
+	return index.isValid() && ((static_cast<int>(index.internalId())&ModelFlags)==PkgFlag);
 }
 
 inline bool ContentBrowserModel::IsAsset(const QModelIndex &index) const
 {
-	return index.isValid() && ((index.internalId()&ModelFlags)==0);
+	return index.isValid() && ((static_cast<int>(index.internalId())&ModelFlags)==0);
 }
 
 inline bool ContentBrowserModel::IsPackageType(const QModelIndex &index) const
 {
-	return index.isValid() && ((index.internalId()&ModelFlags)==(TypeFlag|PkgFlag));
+	return index.isValid() && ((static_cast<int>(index.internalId())&ModelFlags)==(TypeFlag|PkgFlag));
 }
 
 inline bool ContentBrowserModel::IsType(const QModelIndex &index) const
 {
-	return index.isValid() && ((index.internalId()&ModelFlags)==TypeFlag);
+	return index.isValid() && ((static_cast<int>(index.internalId())&ModelFlags)==TypeFlag);
 }
 
 inline pkg::Package::Ref ContentBrowserModel::PackageForIndex(const QModelIndex &index) const
@@ -59,12 +59,12 @@ inline asset::Type ContentBrowserModel::TypeForIndex(const QModelIndex &index) c
 
 inline quint32 ContentBrowserModel::PkgModelId(int idx) const
 {
-	return static_cast<quint32>(idx<<PkgShift) | PkgFlag;
+	return (static_cast<quint32>(idx)<<PkgShift) | PkgFlag;
 }
 
 inline int ContentBrowserModel::PkgIdx(qint64 mid) const
 {
-	return static_cast<int>((mid&PkgMask)>>PkgShift);
+	return (static_cast<int>(mid)&PkgMask)>>PkgShift;
 }
 
 inline quint32 ContentBrowserModel::AssetModelId(int pkg, int idx) const
@@ -75,17 +75,17 @@ inline quint32 ContentBrowserModel::AssetModelId(int pkg, int idx) const
 inline void ContentBrowserModel::AssetIdx(qint64 mid, int &pkg, int &id) const
 {
 	pkg = PkgIdx(mid);
-	id  = static_cast<int>(mid&AssetMask);
+	id  = static_cast<int>(mid)&AssetMask;
 }
 
 inline quint32 ContentBrowserModel::TypeModelId(int type) const
 {
-	return static_cast<quint32>(type) | TypeFlag;
+	return static_cast<quint32>(type|TypeFlag);
 }
 
 inline int ContentBrowserModel::TypeIdx(qint64 mid) const
 {
-	return static_cast<int>(mid&TypeMask);
+	return static_cast<int>(mid)&TypeMask;
 }
 	
 } // editor

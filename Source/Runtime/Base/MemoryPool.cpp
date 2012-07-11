@@ -319,7 +319,9 @@ void* MemoryPool::GetChunk()
 
 void MemoryPool::ReturnChunk(void* userData)
 {
-	RAD_ASSERT(m_inited);
+	if (!m_inited) // this can happen during static destruction from a doexit chain.
+		return;
+
 	RAD_ASSERT(userData);
 
 	PoolNode* node = PoolNodeFromUserData(userData);

@@ -140,7 +140,7 @@ RADENG_API GLenum RADENG_CALL GLInternalFormat(GLenum format, GLenum type)
 	return (GLenum)0;
 }
 
-RADENG_API bool RADENG_CALL GLImageFormat(UReg imgType, GLenum &format, GLenum &type, GLenum alpha)
+RADENG_API bool RADENG_CALL GLImageFormat(int imgType, GLenum &format, GLenum &type, GLenum alpha)
 {
 	switch (imgType)
 	{
@@ -220,7 +220,7 @@ RADENG_API bool RADENG_CALL GLImageFormat(UReg imgType, GLenum &format, GLenum &
 	return false;
 }
 
-RADENG_API bool RADENG_CALL GLImageFormat(UReg imgType, GLenum &internal, GLenum &format, GLenum &type, GLenum alpha)
+RADENG_API bool RADENG_CALL GLImageFormat(int imgType, GLenum &internal, GLenum &format, GLenum &type, GLenum alpha)
 {
 	if (!GLImageFormat(imgType, format, type, alpha))
 	{
@@ -230,7 +230,7 @@ RADENG_API bool RADENG_CALL GLImageFormat(UReg imgType, GLenum &internal, GLenum
 	return (internal=GLInternalFormat(format, type)) != (GLenum)0;
 }
 
-RADENG_API int RADENG_CALL GLCubeFace(UReg flags)
+RADENG_API int RADENG_CALL GLCubeFace(int flags)
 {
 	if (flags&image_codec::dds::FrameFlagCubemapPositiveX)
 		return GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB;

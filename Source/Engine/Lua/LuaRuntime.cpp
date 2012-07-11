@@ -5,9 +5,6 @@
 
 #include RADPCH
 #include "LuaRuntime.h"
-#include <Lua/lua.h>
-#include <Lua/lualib.h>
-#include <Lua/lauxlib.h>
 #include <Runtime/Reflect.h>
 #include <Runtime/Reflect/Attributes.h>
 #include <Runtime/Reflect/RTLInterop.h>
@@ -22,6 +19,10 @@
 #include <limits>
 #include <algorithm>
 #include <new>
+
+extern "C" {
+#include <Lua/lualib.h>
+}
 
 #undef min
 #undef max

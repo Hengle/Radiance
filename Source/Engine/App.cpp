@@ -12,8 +12,6 @@
 #include <Runtime/File.h>
 #include <Runtime/Time.h>
 
-StringTable::LangId __SystemLanguage();
-
 //#define FRAME_SMOOTH
 #if defined(FRAME_SMOOTH)
 enum { FrameHistorySize = 15 };
@@ -31,10 +29,6 @@ void App::DestroyInstance() {
 	if (s_instance)
 		delete s_instance;
 	s_instance = 0;
-}
-
-StringTable::LangId App::RAD_IMPLEMENT_GET(systemLangId) {
-	return __SystemLanguage();
 }
 
 void App::DumpMemStats(int level) {
@@ -93,11 +87,11 @@ App::~App() {
 bool App::PreInit() {
 	if (!engine->PreInit())
 		return false;
-	m_langId = LoadLangId();
+	m_langId = LoadLangId(0, systemLangId);
 	return true;
 }
 
-StringTable::LangId App::LoadLangId(int *enabledLangMask) {
+StringTable::LangId App::LoadLangId(int *enabledLangMask, StringTable::LangId defaultLangId) {
 
 	const StringTable::LangId ErrLang = StringTable::LangId_EN;
 	if (enabledLangMask)
@@ -159,7 +153,7 @@ StringTable::LangId App::LoadLangId(int *enabledLangMask) {
 
 	// If our system language isn't an enabled language then
 	// use our default language
-	StringTable::LangId langId = __SystemLanguage();
+	StringTable::LangId langId = defaultLangId;
 	if (!((1<<langId) & validLangBits))
 		langId = defaultLang;
 

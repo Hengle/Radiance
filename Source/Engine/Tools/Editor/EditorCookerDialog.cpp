@@ -273,7 +273,7 @@ void CookerDialog::CookClicked()
 	}
 
 	int enabledLangMask;
-	App::LoadLangId(&enabledLangMask);
+	App::LoadLangId(&enabledLangMask, App::Get()->systemLangId);
 	if (enabledLangMask == 0) {
 		QMessageBox::critical(
 			this,

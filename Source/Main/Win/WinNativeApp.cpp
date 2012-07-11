@@ -31,7 +31,7 @@ void NativeApp::LaunchURL(const char *sz) {
 	ShellExecuteA(0, "open", sz, 0, 0, SW_SHOWNORMAL);
 }
 
-StringTable::LangId NativeApp::RAD_IMPLEMENT_GET(systemLanguage) {
+StringTable::LangId NativeApp::RAD_IMPLEMENT_GET(systemLangId) {
 	StringTable::LangId id = StringTable::LangId_EN;
 	
 	LANGID winId = GetUserDefaultUILanguage();

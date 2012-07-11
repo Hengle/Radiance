@@ -50,10 +50,10 @@ private:
 	NativeDeviceContext::Ref CreateOpenGLContext();
 #endif
 
-	RAD_DECLARE_READONLY_PROPERTY(NativeApp, systemLanguage, StringTable::LangId);
+	RAD_DECLARE_READONLY_PROPERTY(NativeApp, systemLangId, StringTable::LangId);
 	RAD_DECLARE_READONLY_PROPERTY(NativeApp, displayDevices, const ::DisplayDeviceVec&);
 
-	RAD_DECLARE_GET(systemLanguage, StringTable::LangId);
+	RAD_DECLARE_GET(systemLangId, StringTable::LangId);
 	RAD_DECLARE_GET(displayDevices, const ::DisplayDeviceVec&);
 
 	::DisplayDeviceVec m_displayDevices;

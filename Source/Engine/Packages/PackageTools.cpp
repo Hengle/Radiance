@@ -10,7 +10,6 @@
 #include "Packages.h"
 #include "../COut.h"
 #include "../Lua/LuaRuntime.h"
-#include <Lua/lualib.h>
 #include <Runtime/File.h>
 #include <Runtime/Stream/STLStream.h>
 #include <Runtime/Container/ZoneSet.h>
@@ -18,6 +17,11 @@
 #include "../Engine.h"
 #include <iostream>
 #include <fstream>
+
+extern "C" {
+#include <Lua/lualib.h>
+}
+
 #include <Runtime/PushSystemMacros.h>
 
 namespace pkg {
@@ -703,7 +707,13 @@ lua::State::Ref PackageMan::InitLua()
 	lua_pushlightuserdata(L, this);
 	lua_setfield(L, LUA_REGISTRYINDEX, PACKAGEMAN_KEY);
 	luaopen_bit(L);
+#if LUA_VERSION_NUM >= 502
+	lua_setglobal(L, LUA_BITLIBNAME);
+#endif
 	luaopen_string(L);
+#if LUA_VERSION_NUM >= 502
+	lua_setglobal(L, LUA_STRLIBNAME);
+#endif
 
 	return state;
 }

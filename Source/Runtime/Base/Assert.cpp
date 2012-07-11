@@ -41,6 +41,14 @@ RADRT_API void RADRT_CALL __rad_assert(
 #endif
 }
 
+#if defined(BOOST_NO_EXCEPTIONS)
+namespace boost {
+void throw_exception(const std::exception &) {
+	__rad_assert("boost::throw_excpetion", __FILE__, __FUNCTION__, __LINE__);
+}
+}
+#endif
+
 #if defined(RAD_OPT_DEBUG)
 
 #if defined(RAD_OPT_WINX)

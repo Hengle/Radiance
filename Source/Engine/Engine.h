@@ -46,9 +46,6 @@ public:
 	bool Initialize();
 	void Finalize();
 
-	bool FindArg(const char *arg);
-	const char *ArgArg(const char *arg);
-	const char *Argv(int arg);
 	void Tick(float elapsed);
 
 #if defined(RAD_OPT_PC)
@@ -56,14 +53,8 @@ public:
 	void VidReset();
 #endif
 
-	RAD_DECLARE_READONLY_PROPERTY(Engine, argc, int);
 	RAD_DECLARE_READONLY_PROPERTY(Engine, sys, const ComTable*);
 	RAD_DECLARE_READONLY_PROPERTY(Engine, baseDir, const char*);
-
-#if defined(RAD_OPT_PC_TOOLS)
-	virtual void SwitchEditorMode(bool editor);
-	RAD_DECLARE_READONLY_PROPERTY(Engine, scc, SCC*);
-#endif
 
 private:
 

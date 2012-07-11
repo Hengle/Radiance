@@ -36,6 +36,7 @@
     <ClCompile Include="..\..\..\..\Extern\libvorbis-1.3.2\lib\registry.c" />
     <ClCompile Include="..\..\..\..\Extern\libvorbis-1.3.2\lib\res0.c" />
     <ClCompile Include="..\..\..\..\Extern\libvorbis-1.3.2\lib\sharedbook.c" />
+    <ClCompile Include="..\..\..\..\Extern\libvorbis-1.3.2\lib\smallft.c" />
     <ClCompile Include="..\..\..\..\Extern\libvorbis-1.3.2\lib\synthesis.c" />
     <ClCompile Include="..\..\..\..\Extern\libvorbis-1.3.2\lib\vorbisenc.c" />
     <ClCompile Include="..\..\..\..\Extern\libvorbis-1.3.2\lib\vorbisfile.c" />

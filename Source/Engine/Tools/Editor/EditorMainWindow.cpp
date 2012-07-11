@@ -24,8 +24,6 @@
 #include "../../Renderer/GL/GLTable.h"
 #include "../../Sound/Sound.h"
 
-bool __PostQuitPending();
-
 namespace tools {
 namespace editor {
 
@@ -189,6 +187,7 @@ void MainWindow::Run()
 
 void MainWindow::PostInit()
 {
+	m_app->Run();
 	setEnabled(true);
 	m_logWin->EnableCloseButton();
 	m_logWin->setWindowTitle("System Log");
@@ -232,7 +231,7 @@ bool MainWindow::CheckExit()
 	if (m_exitPosted) 
 		return true;
 
-	if (__PostQuitPending() || m_app->exit)
+	if (m_app->exit)
 	{
 		m_exitPosted = true;
 		close();

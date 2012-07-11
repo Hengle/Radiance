@@ -33,6 +33,11 @@ namespace details
 		{
 		}
 
+		~Tasks() {
+			if (!m_exit)
+				Exit();
+		}
+
 		void Exit() 
 		{ 
 			m_exit = true; 

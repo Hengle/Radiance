@@ -28,9 +28,12 @@
 #include "../Sound/Sound.h"
 #include "../Persistence.h"
 #include "../StringTable.h"
+
+extern "C" {
 #include <Lua/lualib.h>
 #include <Lua/lgc.h>
 #include <Lua/lstate.h>
+}
 
 #define SELF "@world"
 #define ENTREF_TABLE "@ents"
@@ -77,10 +80,25 @@ bool WorldLua::Init()
 	lua_State *L = m_L->L;
 
 	luaopen_base(L);
+#if LUA_VERSION_NUM >= 502
+	lua_setglobal(L, "_G");
+#endif
 	luaopen_math(L);
+#if LUA_VERSION_NUM >= 502
+	lua_setglobal(L, LUA_MATHLIBNAME);
+#endif
 	luaopen_string(L);
+#if LUA_VERSION_NUM >= 502
+	lua_setglobal(L, LUA_STRLIBNAME);
+#endif
 	luaopen_table(L);
+#if LUA_VERSION_NUM >= 502
+	lua_setglobal(L, LUA_TABLIBNAME);
+#endif
 	luaopen_bit(L);
+#if LUA_VERSION_NUM >= 502
+	lua_setglobal(L, LUA_BITLIBNAME);
+#endif
 	lua::EnableModuleImport(L, m_impLoader);
 	
 	lua_createtable(L, World::MaxEnts, 0);

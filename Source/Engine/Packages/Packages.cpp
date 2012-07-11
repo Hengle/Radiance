@@ -480,6 +480,9 @@ int PackageMan::Process(
 
 void PackageMan::Unbind(Binding *binding)
 {
+	if (!binding->m_f)
+		return;
+
 	Asset::IdWMap *assets = binding->m_f->assets;
 	for (int i = 0; i < Z_Max; ++i)
 	{

@@ -49,25 +49,6 @@ RADENG_API int RADENG_CALL QtAppMain(int argc, const char **argv) {
 	if (!(mainWin->Init() && mainWin->Show()))
 		return 1;
 
-	r::HRBackend rb = app->engine->sys->r.Cast<r::IRBackend>();
-	RAD_VERIFY(rb);
-	if (!rb->VidBind()) {
-		QMessageBox::critical(0, "Error", "Failed to initialize OpenGL!");
-		return 1;
-	}
-
-	// NOTE: normally before CheckCaps() is called you must set the context on the renderer.
-	// MainWindow::Show() called previously binds the GL context and sets the renderer state for us.
-
-	if (!rb->CheckCaps()) {
-		QMessageBox::critical(0, "Error", "Unsupported graphics card detected!");
-		return 1;
-	}
-
-	if (!app->Initialize())
-		return 1;
-
-	app->Run();
 	mainWin->Run();
 	int r = qApp.exec();
 

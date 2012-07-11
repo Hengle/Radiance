@@ -19,8 +19,6 @@
 
 #undef LoadIcon
 
-thread::Id __QMainThreadId();
-
 namespace tools {
 namespace editor {
 
@@ -436,7 +434,7 @@ String ExpandBaseDir(const char *append)
 
 bool IsGuiThread()
 {
-	return __QMainThreadId() == thread::ThreadId();
+	return App::Get()->mainThreadId == thread::ThreadId();
 }
 
 bool LoadPixmap(const char *filename, QPixmap &pixmap)

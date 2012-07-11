@@ -29,8 +29,8 @@ inline void NativeApp::ResetDisplayDevice() {
 	m_imp.ResetDisplayDevice();
 }
 
-inline StringTable::LangId NativeApp::RAD_IMPLEMENT_GET(systemLanguage) {
-	return m_imp.systemLanguage;
+inline StringTable::LangId NativeApp::RAD_IMPLEMENT_GET(systemLangId) {
+	return m_imp.systemLangId;
 }
 
 inline const DisplayDevice::Vec &NativeApp::RAD_IMPLEMENT_GET(displayDevices) {

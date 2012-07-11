@@ -431,7 +431,7 @@ int TextureParser::Load(
 				file::HBufferedAsyncIO buf;
 				char x[file::MaxFilePathLen+1];
 
-				string::sprintf(x, "%ls/+%d%ls%ls", path, i, postDigit, ext);
+				string::sprintf(x, "%s/+%d%s%s", path, i, postDigit, ext);
 
 				r = engine.sys->files->LoadFile(
 					x,

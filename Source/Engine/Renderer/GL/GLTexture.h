@@ -29,8 +29,8 @@ enum
 };
 
 RADENG_API GLenum RADENG_CALL GLInternalFormat(GLenum format, GLenum type);
-RADENG_API bool RADENG_CALL GLImageFormat(UReg imgType, GLenum &format, GLenum &type, GLenum alpha);
-RADENG_API bool RADENG_CALL GLImageFormat(UReg imgType, GLenum &internal, GLenum &format, GLenum &type, GLenum alpha);
+RADENG_API bool RADENG_CALL GLImageFormat(int imgType, GLenum &format, GLenum &type, GLenum alpha);
+RADENG_API bool RADENG_CALL GLImageFormat(int imgType, GLenum &internal, GLenum &format, GLenum &type, GLenum alpha);
 RADENG_API int RADENG_CALL GLCubeFace(int flags);
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -52,7 +52,7 @@ bool Engine::PreInit()
 	RAD_ASSERT(m_scc);
 #endif
 
-	const char *baseDir = ArgArg("-base");
+	const char *baseDir = App::Get()->ArgArg("-base");
 	if (!baseDir)
 	{
 		baseDir = "Base";
@@ -60,7 +60,7 @@ bool Engine::PreInit()
 
 	m_baseDir = baseDir;
 
-	const char *root = ArgArg("-root");
+	const char *root = App::Get()->ArgArg("-root");
 	if (root)
 	{
 		RAD_DEBUG_ONLY(bool b=file::EnforcePortablePaths(false));
@@ -117,33 +117,6 @@ void Engine::Finalize()
 	m_comTable.files.Close();
 }
 
-bool Engine::FindArg(const char *arg)
-{
-	for (int i = 0; i < __Argc(); ++i)
-	{
-		if (!icmp(arg, Argv(i))) return true;
-	}
-	return false;
-}
-
-const char *Engine::ArgArg(const char *arg)
-{
-	for (int i = 0; i < __Argc(); ++i)
-	{
-		if (!icmp(arg, Argv(i)))
-		{
-			return Argv(i+1);
-		}
-	}
-	return 0;
-}
-
-const char *Engine::Argv(int arg)
-{
-	if (arg >= 0 && arg < __Argc()) return __Argv()[arg];
-	return 0;
-}
-
 void Engine::Tick(float elapsed)
 {
 }
@@ -183,17 +156,6 @@ void Engine::VidReset()
 	}
 }
 #endif
-
-#if defined(RAD_OPT_PC_TOOLS)
-void Engine::SwitchEditorMode(bool editor)
-{
-}
-#endif
-
-int Engine::RAD_IMPLEMENT_GET(argc)
-{
-	return __Argc();
-}
 
 #define LOAD_COM(_iface, _com, _name) \
 	if (!m_comTable._com) { \

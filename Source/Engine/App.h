@@ -38,7 +38,7 @@ public:
 	static App *Get(int argc = 0, const char **argv = 0);
 	static void DestroyInstance();
 	static void DumpMemStats(int level);
-	static StringTable::LangId LoadLangId(int *enabledLangMask = 0);
+	static StringTable::LangId LoadLangId(int *enabledLangMask, StringTable::LangId defaultLangId);
 
 	// Tickable
 	void Push(const Tickable::Ref &state);
@@ -57,7 +57,6 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(App, state, Tickable::Ref);
 	RAD_DECLARE_READONLY_PROPERTY(App, time, float);
 	RAD_DECLARE_READONLY_PROPERTY(App, langId, StringTable::LangId);
-	RAD_DECLARE_READONLY_PROPERTY(App, systemLangId, StringTable::LangId);
 	RAD_DECLARE_PROPERTY(App, exit, bool, bool);
 
 protected:
@@ -92,8 +91,6 @@ protected:
 	RAD_DECLARE_GET(langId, StringTable::LangId) {
 		return m_langId;
 	}
-
-	RAD_DECLARE_GET(systemLangId, StringTable::LangId);
 
 private:
 

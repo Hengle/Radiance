@@ -3,9 +3,9 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="EngineDebug.props" />
     <Import Project="EngineDeveloper.props" />
-    <Import Project="QtLink_x64.props" />
     <Import Project="LinkAdditionalWindowsLibs.props" />
     <Import Project="NoOptimizations.props" />
+    <Import Project="LinkEngineDeveloperDebug.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
