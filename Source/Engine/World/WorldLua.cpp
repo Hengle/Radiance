@@ -99,6 +99,10 @@ bool WorldLua::Init()
 #if LUA_VERSION_NUM >= 502
 	lua_setglobal(L, LUA_BITLIBNAME);
 #endif
+#if LUA_VERSION_NUM >= 502
+	luaopen_coroutine(L);
+	lua_setglobal(L, LUA_COLIBNAME);
+#endif
 	lua::EnableModuleImport(L, m_impLoader);
 	
 	lua_createtable(L, World::MaxEnts, 0);
@@ -300,7 +304,11 @@ bool WorldLua::PushGlobalCall(const char *name)
 {
 	lua_pushglobaltable(L);
 	bool r = lua::GetFieldExt(L, -1, name);
-	lua_pop(L, 1);
+	if (r) {
+		lua_remove(L, -2);
+	} else {
+		lua_pop(L, 1);
+	}
 	return r;
 }
 

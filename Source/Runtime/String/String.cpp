@@ -508,7 +508,13 @@ String &String::NAppendBytes(const String &str, int len) {
 			// this string is in stackBytes.
 			RAD_ASSERT((orglen == 0) || (m_stackLen == orglen + 1));
 			if (newLen+1 > kStackSize) { // need to move into m_data
-				m_data = details::DataBlock::New(kRefType_Copy, newLen + 1, m_stackBytes, m_stackLen-1, *m_zone);
+				m_data = details::DataBlock::New(
+					kRefType_Copy, 
+					newLen + 1, 
+					m_stackBytes, 
+					(m_stackLen>0) ? m_stackLen-1 : 0, 
+					*m_zone
+				);
 				m_stackLen = 0;
 				sz = (char*)m_data->m_buf;
 			} else {
