@@ -139,6 +139,7 @@ struct RADENG_CLASS DSka
 	// animations
 	DAnim::Vec anims;
 
+	void Clear();
 	int Parse(const void *data, AddrSize len);
 };
 
@@ -167,6 +168,8 @@ struct DMesh
 struct RADENG_CLASS DSkm
 {
 	DMesh::Vec meshes;
+
+	void Clear();
 
 	// if SkinType == SkinCpu then:
 	// data[0] == non-persisted data: material names, texCoords, tris

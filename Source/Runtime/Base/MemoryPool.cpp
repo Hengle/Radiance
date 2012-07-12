@@ -17,9 +17,7 @@ m_numUsedObjects(0),
 m_numAllocatedObjects(0)
 {
 	string::ncpy(m_name, "uninited", MaxNameLen+1);
-#if defined (RAD_OPT_DEBUG)
 	m_inited = false;
-#endif
 }
 
 MemoryPool::MemoryPool(
@@ -36,9 +34,8 @@ m_freeList(0),
 m_numUsedObjects(0), 
 m_numAllocatedObjects(0)
 {
-#if defined (RAD_OPT_DEBUG)
 	m_inited = false;
-#endif
+
 	Create(
 		zone,
 		name,
@@ -74,9 +71,7 @@ void MemoryPool::Create(
 	RAD_ASSERT(inDataSize > 0);
 	RAD_ASSERT(alignment >= PoolAlignment);
 
-#if defined (RAD_OPT_DEBUG)
 	m_inited = true;
-#endif
 
 	string::ncpy(m_name, name, MaxNameLen+1);
 
@@ -104,9 +99,7 @@ void MemoryPool::Destroy(WalkCallback callback)
 
 	Delete(callback);
 
-#if defined (RAD_OPT_DEBUG)
 	m_inited = false;
-#endif
 }
 
 void MemoryPool::Delete(WalkCallback callback)

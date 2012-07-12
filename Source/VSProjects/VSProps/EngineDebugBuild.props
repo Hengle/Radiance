@@ -3,13 +3,12 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="EngineDebug.props" />
     <Import Project="EnginePCH.props" />
-    <Import Project="NoOptimizations.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>_LIB;RAD_OVERLOAD_STD_NEW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

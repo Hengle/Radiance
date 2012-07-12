@@ -713,6 +713,20 @@ void Ska::Tick(
 ///////////////////////////////////////////////////////////////////////////////
 #define CHECK_SIZE(_size) if (((bytes+(_size))-reinterpret_cast<const U8*>(data)) > (int)len) return pkg::SR_CorruptFile;
 
+void DSka::Clear() {
+	numBones = 0;
+	boneNames = 0;
+	boneParents = 0;
+	invWorld = 0;
+	sDecodeMag = 0;
+	tDecodeMag = 0;
+	rTable = 0;
+	sTable = 0;
+	stringOfs = 0;
+	strings = 0;
+	anims.clear();
+}
+
 int DSka::Parse(const void *data, AddrSize len)
 {
 	anims.clear();
@@ -860,6 +874,10 @@ int DSka::Parse(const void *data, AddrSize len)
 	}
 
 	return pkg::SR_Success;
+}
+
+void DSkm::Clear() {
+	meshes.clear();
 }
 
 int DSkm::Parse(const void * const *_data, const AddrSize *_len, SkinType type)

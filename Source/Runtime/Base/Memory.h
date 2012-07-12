@@ -10,7 +10,7 @@
 #endif
 
 #if defined(RAD_OPT_WINX)
-	#define stack_alloc(_x) (_malloca(_x))
+	#define stack_alloc(_x) (_alloca(_x))
 #elif defined(RAD_OPT_GCC)
 	#define stack_alloc(_x) ::alloca(_x)
 	#if defined(RAD_OPT_LINUX)
@@ -65,7 +65,8 @@ inline void *safe_realloc(void *p, size_t size)
 #if !defined(RAD_OPT_APPLE) // mac implements malloc_size
 inline AddrSize malloc_size(const void *p)
 {
-	if (!p) return 0;
+	if (!p) 
+		return 0;
 #if defined(RAD_OPT_WINX)
 	return (AddrSize)_msize(const_cast<void*>(p));
 #elif defined(RAD_OPT_LINUX)

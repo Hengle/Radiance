@@ -11,51 +11,48 @@
 namespace string {
 
 ///////////////////////////////////////////////////////////////////////////////
-
 template <typename Traits>
 inline CharBuf<Traits>::CharBuf() : m_zone(&ZString.Get()) {
+	BOOST_STATIC_ASSERT(kStackSize >= 4);
+	m_stackLen = 0;
 }
 
 template <typename Traits>
 inline CharBuf<Traits>::CharBuf(const SelfType &buf) : m_data(buf.m_data), m_zone(buf.m_zone) {
+	if (!m_data) {
+		m_stackLen = buf.m_stackLen;
+		RAD_ASSERT(m_stackLen <= kStackSize);
+		memcpy(m_stackBytes, buf.m_stackBytes, m_stackLen);
+	} else {
+		m_stackLen = 0;
+	}
 }
 
 template <typename Traits>
 inline CharBuf<Traits>::CharBuf(const details::DataBlock::Ref &data, ::Zone &zone) : m_data(data), m_zone(&zone) {
-}
-
-template <typename Traits>
-inline CharBuf<Traits>::operator unspecified_bool_type () const {
-	return IsValid() ? &bool_true : 0;
+	m_stackLen = 0;
 }
 
 template <typename Traits>
 inline typename CharBuf<Traits>::SelfType &CharBuf<Traits>::operator = (const SelfType &buf) {
 	m_data = buf.m_data;
 	m_zone = buf.m_zone;
+	m_stackLen = buf.m_stackLen;
+	if (!m_data) {
+		RAD_ASSERT(m_stackLen <= kStackSize);
+		memcpy(m_stackBytes, buf.m_stackBytes, m_stackLen);
+	}
 	return *this;
-}
-
-template <typename Traits>
-inline bool CharBuf<Traits>::operator == (const SelfType &buf) const {
-	if (!m_data || !buf.m_data)
-		return false;
-	if (m_data->data != buf.m_data->data)
-		return false;
-	if (m_data->size != buf.m_data->size)
-		return false;
-	return true;
-}
-
-template <typename Traits>
-inline bool CharBuf<Traits>::operator != (const SelfType &buf) const {
-	return !(*this == buf);
 }
 
 template <typename Traits>
 inline const typename CharBuf<Traits>::T *CharBuf<Traits>::RAD_IMPLEMENT_GET(c_str) {
 	static U32 s_null(0);
-	return (m_data) ? (const T*)m_data->data.get() : (const T*)&s_null;
+	if (m_data)
+		return (const T*)m_data->data.get();
+	if (m_stackLen)
+		return reinterpret_cast<const T*>(m_stackBytes);
+	return reinterpret_cast<const T*>(&s_null);
 }
 
 template <typename Traits>
@@ -70,12 +67,14 @@ inline const typename CharBuf<Traits>::T *CharBuf<Traits>::RAD_IMPLEMENT_GET(end
 
 template <typename Traits>
 inline int CharBuf<Traits>::RAD_IMPLEMENT_GET(size) {
-	return (m_data) ? (m_data->size - sizeof(T)) : 0;
+	if (m_data)
+		return m_data->size - sizeof(T);
+	return (int)m_stackLen - sizeof(T);
 }
 
 template <typename Traits>
 inline bool CharBuf<Traits>::RAD_IMPLEMENT_GET(empty) {
-	return (m_data) ? false : true;
+	return !(m_data || (m_stackLen > 0));
 }
 
 template<typename Traits>
@@ -84,117 +83,159 @@ inline int CharBuf<Traits>::RAD_IMPLEMENT_GET(numChars) {
 }
 
 template <typename Traits>
-inline void CharBuf<Traits>::Free() {
+inline void CharBuf<Traits>::Clear() {
+	m_stackLen = 0;
 	m_data.reset();
 }
 
 template <typename Traits>
 inline typename CharBuf<Traits>::SelfType CharBuf<Traits>::New(const T *data, int size, const CopyTag_t&, ::Zone &zone) {
 	RAD_ASSERT(data);
-	return CharBuf(
-		details::DataBlock::New(kRefType_Copy, data, size, zone),
-		zone
-	);
+	if (size > kStackSize) {
+		return CharBuf(
+			details::DataBlock::New(kRefType_Copy, data, size, zone),
+			zone
+		);
+	}
+	SelfType buf;
+	buf.m_stackLen = (U8)size;
+	memcpy(buf.m_stackBytes, data, size);
+	return buf;
 }
 
 template <typename Traits>
 inline typename CharBuf<Traits>::SelfType CharBuf<Traits>::New(const T *data, int size, const RefTag_t&, ::Zone &zone) {
 	RAD_ASSERT(data);
-	return CharBuf(
-		details::DataBlock::New(kRefType_Ref, data, size, zone),
-		zone
-	);
+	if (size > kStackSize) {
+		// It's faster to copy on the stack so don't do this unless we don't have the StackBytes for it.
+		return CharBuf(
+			details::DataBlock::New(kRefType_Ref, data, size, zone),
+			zone
+		);
+	}
+	SelfType buf;
+	buf.m_stackLen = (U8)size;
+	memcpy(buf.m_stackBytes, data, size);
+	return buf;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 inline String::String(::Zone &zone) : m_zone(&zone) {
+	m_stackLen = 0;
 }
 
 inline String::String(const String &s) : m_data(s.m_data), m_zone(s.m_zone) {
+	m_stackLen = s.m_stackLen;
+	if (!m_data) {
+		RAD_ASSERT(m_stackLen <= kStackSize);
+		memcpy(m_stackBytes, s.m_stackBytes, m_stackLen);
+	}
 }
 
 inline String::String(const UTF8Buf &buf) : m_data(buf.m_data), m_zone(buf.m_zone) {
-}
-
-inline String::String(const UTF16Buf &buf, ::Zone &zone) : m_zone(&zone) {
-	m_data = details::DataBlock::New(buf.c_str.get(), buf.numChars, zone);
-}
-
-inline String::String(const UTF32Buf &buf, ::Zone &zone) : m_zone(&zone) {
-	m_data = details::DataBlock::New(buf.c_str.get(), buf.numChars, zone);
-}
-
-inline String::String(const WCharBuf &buf, ::Zone &zone) : m_zone(&zone) {
-	m_data = details::DataBlock::New(buf.c_str.get(), buf.numChars, zone);
+	m_stackLen = buf.m_stackLen;
+	if (!m_data) {
+		RAD_ASSERT(m_stackLen <= kStackSize);
+		memcpy(m_stackBytes, buf.m_stackBytes, m_stackLen);
+	}
 }
 
 inline String::String(const char *sz, ::Zone &zone) : m_zone(&zone) {
-	RAD_ASSERT(sz);
-	if (sz[0])
-		m_data = details::DataBlock::New(kRefType_Copy, 0, sz, len(sz) + 1, zone);
+	int l = len(sz);
+	if (l+1 > kStackSize) {
+		m_stackLen = 0;
+		m_data = details::DataBlock::New(kRefType_Copy, 0, sz, l + 1, zone);
+		reinterpret_cast<char*>(m_data->m_buf)[l] = 0;
+	} else if (l) {
+		m_stackLen = l + 1;
+		RAD_ASSERT(m_stackLen <= kStackSize);
+		memcpy(m_stackBytes, sz, m_stackLen);
+	} else {
+		m_stackLen = 0;
+	}
 }
 
 inline String::String(const char *sz, const RefTag_t&, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
-	if (sz[0])
-		m_data = details::DataBlock::New(kRefType_Ref, 0, sz, len(sz) + 1, zone);
+	int l = len(sz);
+	if (l+1 > kStackSize) {
+		m_stackLen = 0;
+		m_data = details::DataBlock::New(kRefType_Ref, 0, sz, l + 1, zone);
+	} else if (l) {
+		m_stackLen = l + 1;
+		RAD_ASSERT(m_stackLen <= kStackSize);
+		memcpy(m_stackBytes, sz, m_stackLen);
+	} else {
+		m_stackLen = 0;
+	}	
 }
 
 inline String::String(const char *sz, int len, const CopyTag_t&, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
-	if ((len>0) && sz[0]) {
-		m_data = details::DataBlock::New(kRefType_Copy, len + 1, sz, len, zone);
+	if (len+1 > kStackSize) {
+		m_stackLen = 0;
+		m_data = details::DataBlock::New(kRefType_Copy, 0, sz, len + 1, zone);
 		reinterpret_cast<char*>(m_data->m_buf)[len] = 0;
+	} else if (len) {
+		m_stackLen = len + 1;
+		RAD_ASSERT(m_stackLen <= kStackSize);
+		memcpy(m_stackBytes, sz, m_stackLen);
+	} else {
+		m_stackLen = 0;
 	}
 }
 
 inline String::String(const char *sz, int len, const RefTag_t&, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
-	if ((len>0) && sz[0]) {
-		m_data = details::DataBlock::New(kRefType_Copy, len + 1, sz, len, zone);
-		reinterpret_cast<char*>(m_data->m_buf)[len] = 0;
+	if (len+1 > kStackSize) {
+		m_stackLen = 0;
+		m_data = details::DataBlock::New(kRefType_Ref, 0, sz, len + 1, zone);
+		// if you get this assert you are mis-using RefTag. RefTag data must 
+		// always be null terminated.
+		RAD_ASSERT(reinterpret_cast<const char*>(m_data->m_buf)[len] == 0);
+	} else if (len) {
+		// if you get this assert you are mis-using RefTag. RefTag data must 
+		// always be null terminated.
+		RAD_ASSERT(sz[len] == 0);
+		m_stackLen = len + 1;
+		RAD_ASSERT(m_stackLen <= kStackSize);
+		memcpy(m_stackBytes, sz, m_stackLen);
+	} else {
+		m_stackLen = 0;
 	}
+}
+
+inline String::String(const UTF16Buf &buf, ::Zone &zone) : m_zone(&zone) {
+	*this = String(buf.c_str.get(), buf.numChars, zone);
+}
+
+inline String::String(const UTF32Buf &buf, ::Zone &zone) : m_zone(&zone) {
+	*this = String(buf.c_str.get(), buf.numChars, zone);
+}
+
+inline String::String(const WCharBuf &buf, ::Zone &zone) : m_zone(&zone) {
+	*this = String(buf.c_str.get(), buf.numChars, zone);
 }
 
 #if defined(RAD_NATIVE_WCHAR_T_DEFINED)
 
 inline String::String(const wchar_t *sz, ::Zone &zone) : m_zone(&zone) {
-	RAD_ASSERT(sz);
-	if (sz[0])
-		m_data = details::DataBlock::New((const WCharTraits::TT*)sz, len(sz), zone);
+	*this = String((const WCharTraits::TT*)sz, len(sz), zone);
 }
 
 inline String::String(const wchar_t *sz, int len, ::Zone &zone) : m_zone(&zone) {
-	RAD_ASSERT(sz);
-	if ((len>0) && sz[0])
-		m_data = details::DataBlock::New((const WCharTraits::TT*)sz, len, zone);
+	*this = String((const WCharTraits::TT*)sz, len, zone);
 }
 
 #endif
 
 inline String::String(const U16 *sz, ::Zone &zone) : m_zone(&zone) {
-	RAD_ASSERT(sz);
-	if (sz[0])
-		m_data = details::DataBlock::New(sz, len(sz), zone);
-}
-
-inline String::String(const U16 *sz, int len, ::Zone &zone) : m_zone(&zone) {
-	RAD_ASSERT(sz);
-	if ((len>0) && sz[0])
-		m_data = details::DataBlock::New(sz, len, zone);
+	*this = String(sz, len(sz), zone);
 }
 
 inline String::String(const U32 *sz, ::Zone &zone) : m_zone(&zone) {
-	RAD_ASSERT(sz);
-	if (sz[0])
-		m_data = details::DataBlock::New(sz, len(sz), zone);
-}
-
-inline String::String(const U32 *sz, int len, ::Zone &zone) : m_zone(&zone) {
-	RAD_ASSERT(sz);
-	if ((len>0) && sz[0])
-		m_data = details::DataBlock::New(sz, len, zone);
+	*this = String(sz, len(sz), zone);
 }
 
 inline String::String(char c, ::Zone &zone) : m_zone(&zone) {
@@ -225,8 +266,16 @@ inline String::String(const std::wstring &str, ::Zone &zone) : m_zone(&zone) {
 
 inline String::String(int len, ::Zone &zone) : m_zone(&zone) {
 	if (len>0) {
-		m_data = details::DataBlock::New(kRefType_Copy, len, 0, 0, zone);
-		reinterpret_cast<char*>(m_data->m_buf)[len-1] = 0;
+		if (len > kStackSize) {
+			m_stackLen = 0;
+			m_data = details::DataBlock::New(kRefType_Copy, len, 0, 0, zone);
+			reinterpret_cast<char*>(m_data->m_buf)[len-1] = 0;
+		} else {
+			m_stackLen = (U8)len;
+			m_stackBytes[len-1] = 0;
+		}
+	} else {
+		m_stackLen = 0;
 	}
 }
 
@@ -234,6 +283,11 @@ inline UTF8Buf String::ToUTF8() const {
 	UTF8Buf buf;
 	buf.m_data = m_data;
 	buf.m_zone = m_zone;
+	buf.m_stackLen = m_stackLen;
+	if (m_stackLen) {
+		RAD_ASSERT(!m_data);
+		memcpy(buf.m_stackBytes, m_stackBytes, m_stackLen);
+	}
 	return buf;
 }
 
@@ -243,7 +297,13 @@ inline WCharBuf String::ToWChar() const {
 #else
 	UTF16Buf x = ToUTF16();
 #endif
-	return WCharBuf(x.m_data, *m_zone);
+	WCharBuf wchars(x.m_data, *m_zone);
+	wchars.m_stackLen = x.m_stackLen;
+	if (x.m_stackLen) {
+		RAD_ASSERT(!x.m_data);
+		memcpy(wchars.m_stackBytes, x.m_stackBytes, x.m_stackLen);
+	}
+	return wchars;
 }
 
 inline std::string String::ToStdString() const {
@@ -374,7 +434,7 @@ inline String String::NJoin(const wchar_t *sz, int len) const {
 
 inline String String::SubStrBytes(int first, int count) const {
 	RAD_ASSERT(first < length);
-	RAD_ASSERT((first+count) < length);
+	RAD_ASSERT((first+count) <= length);
 
 	return String(
 		c_str.get() + first,
@@ -414,10 +474,6 @@ inline String String::LeftBytes(int count) const {
 inline String String::RightBytes(int count) const {
 	int ofs = length - count;
 	return SubStrBytes(ofs, count);
-}
-
-inline String::operator unspecified_bool_type () const {
-	return !empty.get() ? &String::bool_true : 0;
 }
 
 inline bool String::operator == (const String &str) const {
@@ -493,7 +549,7 @@ inline bool String::operator <= (const wchar_t *sz) const {
 }
 
 inline char String::operator [] (int ofs) const {
-	return reinterpret_cast<const char*>(m_data->data.get())[ofs];
+	return c_str.get()[ofs];
 }
 
 inline bool String::EqualsInstance(const String &str) const {
@@ -505,26 +561,23 @@ inline bool String::EqualsInstance(const UTF8Buf &buf) const {
 }
 
 inline String &String::UpperASCII() {
-	if (m_data) {
+	if (m_data)
 		m_data = details::DataBlock::Isolate(m_data, *m_zone);
-		toupper(reinterpret_cast<char*>(m_data->data.get()));
-	}
+	toupper(const_cast<char*>(c_str.get()));
 	return *this;
 }
 
 inline String &String::LowerASCII() {
-	if (m_data) {
+	if (m_data)
 		m_data = details::DataBlock::Isolate(m_data, *m_zone);
-		tolower((char*)m_data->data.get());
-	}
+	tolower(const_cast<char*>(c_str.get()));
 	return *this;
 }
 
 inline String &String::ReverseASCII() {
-	if (m_data) {
+	if (m_data)
 		m_data = details::DataBlock::Isolate(m_data, *m_zone);
-		std::reverse((char*)m_data->data.get(), ((char*)m_data->data.get()) + m_data->size);
-	}
+	std::reverse(const_cast<char*>(c_str.get()), const_cast<char*>(end.get()));
 	return *this;
 }
 
@@ -699,6 +752,12 @@ inline String &String::PrintfASCII(const char *fmt, ...) {
 inline String &String::operator = (const String &string) {
 	m_data = string.m_data;
 	m_zone = string.m_zone;
+	m_stackLen = string.m_stackLen;
+	RAD_ASSERT(!m_data || m_stackLen == 0);
+	if (!m_data) {
+		RAD_ASSERT(m_stackLen <= kStackSize);
+		memcpy(m_stackBytes, string.m_stackBytes, m_stackLen);
+	}
 	return *this;
 }
 
@@ -756,6 +815,7 @@ inline String &String::Write(int pos, const String &str, int len) {
 
 inline String &String::Clear() {
 	m_data.reset();
+	m_stackLen = 0;
 	return *this;
 }
 
@@ -814,7 +874,11 @@ inline String operator + (const String &b, wchar_t s) {
 }
 
 inline int String::RAD_IMPLEMENT_GET(length) {
-	return m_data ? (m_data->size - 1) : 0;
+	if (m_data)
+		return m_data->size - 1;
+	if (m_stackLen)
+		return m_stackLen - 1;
+	return 0;
 }
 
 inline const char *String::RAD_IMPLEMENT_GET(begin) {
@@ -826,26 +890,27 @@ inline const char *String::RAD_IMPLEMENT_GET(end) {
 }
 
 inline const char *String::RAD_IMPLEMENT_GET(c_str) {
-	return m_data ? (const char*)m_data->data.get() : "";
+	RAD_ASSERT(m_stackLen != 1); // logic error if we only contain a null.
+	if (m_data)
+		return reinterpret_cast<const char*>(m_data->data.get());
+	if (m_stackLen)
+		return m_stackBytes;
+	static char s_null(0);
+	return &s_null;
 }
 
 inline int String::RAD_IMPLEMENT_GET(numChars) {
-	return m_data ? utf8to32len((const char*)m_data->data.get(), m_data->size - 1) : 0;
+	if (empty)
+		return 0;
+	return utf8to32len(c_str.get(), length.get());
 }
 
 inline bool String::RAD_IMPLEMENT_GET(empty) {
-	return !m_data;
+	return !(m_data || (m_stackLen>0));
 }
-
-} // string
-
-inline string::String CStr(const char *sz) {
-	return string::String(sz, string::RefTag);
-}
-
 
 template<class CharType, class Traits>
-std::basic_istream<CharType, Traits>& operator >> (std::basic_istream<CharType, Traits> &stream, string::String &string) {
+std::basic_istream<CharType, Traits>& operator >> (std::basic_istream<CharType, Traits> &stream, String &string) {
 	std::string x;
 	stream >> x;
 	string = x.c_str();
@@ -854,9 +919,15 @@ std::basic_istream<CharType, Traits>& operator >> (std::basic_istream<CharType, 
 
 
 template<class CharType, class Traits>
-std::basic_ostream<CharType, Traits>& operator << (std::basic_ostream<CharType, Traits> &stream, const string::String &string) {
+std::basic_ostream<CharType, Traits>& operator << (std::basic_ostream<CharType, Traits> &stream, const String &string) {
 	stream << string.c_str.get();
 	return stream;
+}
+
+} // string
+
+inline string::String CStr(const char *sz) {
+	return string::String(sz, string::RefTag);
 }
 
 #include "../PopSystemMacros.h"

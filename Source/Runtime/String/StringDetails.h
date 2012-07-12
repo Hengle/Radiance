@@ -66,12 +66,14 @@ private:
 	static Ref New(
 		const U16 *src,
 		int len,
+		int numBytes,
 		Zone &zone
 	);
 
 	static Ref New(
 		const U32 *src,
 		int len,
+		int numBytes,
 		Zone &zone
 	);
 
@@ -79,12 +81,13 @@ private:
 	static Ref New(
 		const wchar_t *src,
 		int len,
+		int numBytes,
 		Zone &zone
 	) {
 #if defined(RAD_OPT_4BYTE_WCHAR)
-		return DataBlock::New((const U32*)src, len, zone);
+		return DataBlock::New((const U32*)src, len, numBytes, zone);
 #else
-		return DataBlock::New((const U16*)src, len, zone);
+		return DataBlock::New((const U16*)src, len, numBytes, zone);
 #endif
 	}
 #endif

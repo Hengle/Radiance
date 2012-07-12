@@ -45,10 +45,6 @@ public:
 
 	SelfType &operator = (const SelfType &buf);
 
-	operator unspecified_bool_type () const;
-	bool operator == (const SelfType &buf) const;
-	bool operator != (const SelfType &buf) const;
-
 	RAD_DECLARE_READONLY_PROPERTY_EX(class CharBuf<Traits>, SelfType, c_str, const T*);
 	//! Defined as c_str
 	RAD_DECLARE_READONLY_PROPERTY_EX(class CharBuf<Traits>, SelfType, begin, const T*);
@@ -58,8 +54,8 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY_EX(class CharBuf<Traits>, SelfType, empty, bool);
 	RAD_DECLARE_READONLY_PROPERTY_EX(class CharBuf<Traits>, SelfType, numChars, int);
 
-	//! Explicitly release memory.
-	void Free();
+	//! Clear the buffer.
+	void Clear();
 
 	//! Contructs a new character buffer. The specified data is copied into a new buffer.
 	static SelfType New(const T *data, int size, const CopyTag_t&, ::Zone &zone = ZString);
@@ -67,6 +63,10 @@ public:
 	static SelfType New(const T *data, int size, const RefTag_t&, ::Zone &zone = ZString);
 
 private:
+
+	enum { 
+		kStackSize = 31 
+	};
 
 	CharBuf(const details::DataBlock::Ref &data, ::Zone &zone);
 
@@ -83,6 +83,8 @@ private:
 
 	details::DataBlock::Ref m_data;
 	::Zone *m_zone;
+	char m_stackBytes[kStackSize];
+	char m_stackLen;
 };
 
 //! UTF8 String class.
@@ -127,7 +129,6 @@ private:
  */
 class String {
 public:
-	typedef void (String::*unspecified_bool_type) ();
 	typedef const char *const_iterator;
 
 	//! Constructs an empty string.
@@ -264,7 +265,7 @@ public:
 	String SubStr(int first, int count) const;
 
 	//! Returns a substring.
-	/*! Returns the remaining string after the specified \em character.
+	/*! Returns the remaining string starting at the specified \em character.
 		Equivelent to Right(NumChars() - ofs).
 		\param ofs The first \em character to include in the substring.
 		\remarks Since the string is UTF8 encoded there is a difference between
@@ -322,9 +323,6 @@ public:
 		expressed as bytes not characters.
 	 */
 	String RightBytes(int count) const;
-
-	//! Boolean operator returns true if string is non-empty.
-	operator unspecified_bool_type () const;
 
 	//! Case sensitive equality test.
 	bool operator == (const String &str) const;
@@ -471,6 +469,8 @@ public:
 
 private:
 
+	enum { kStackSize = UTF8Buf::kStackSize };
+
 	void bool_true() {}
 
 	RAD_DECLARE_GET(length, int);
@@ -482,6 +482,8 @@ private:
 
 	details::DataBlock::Ref m_data;
 	::Zone *m_zone;
+	char m_stackBytes[kStackSize];
+	U8 m_stackLen;
 };
 
 String operator + (const String &a, const String &b);
@@ -508,15 +510,18 @@ template <class C, class T> class basic_istream;
 template <class C, class T> class basic_ostream;
 }
 
+namespace string {
+
 //! Streaming support for strings.
 /*! Internally the string is converted to/from a std::string. */
 template<class CharType, class Traits>
-std::basic_istream<CharType, Traits>& operator >> (std::basic_istream<CharType, Traits> &stream, string::String &string);
+std::basic_istream<CharType, Traits>& operator >> (std::basic_istream<CharType, Traits> &stream, String &string);
 
 //! Streaming support for strings.
 template<class CharType, class Traits>
-std::basic_ostream<CharType, Traits>& operator << (std::basic_ostream<CharType, Traits> &stream, const string::String &string);
+std::basic_ostream<CharType, Traits>& operator << (std::basic_ostream<CharType, Traits> &stream, const String &string);
 
+} //string
 
 #include "../PopPack.h"
 

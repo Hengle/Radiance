@@ -3864,46 +3864,33 @@ Concurrency::details::_Concurrent_queue_iterator<Concurrency::concurrent_queue<*
 ;------------------------------------------------------------------------------
 ;  string::String
 ;------------------------------------------------------------------------------
-string::String{
-	preview		( #if (($e.m_data.px) != 0) ([$e.m_data.px->m_buf,s]) #else ("<null>") )
-	stringview	( #if (($e.m_data.px) != 0) ([$e.m_data.px->m_buf,s]) #else ("<null>") )
+string::String|string::CharBuf<string::CharTraits>{
+	preview		( #if (($e.m_data.px) != 0) ([$e.m_data.px->m_buf,s]) #else (#if ($e.m_stackLen > 0) ([$e.m_stackBytes, s]) #else ("<null>")) )
+	stringview	( #if (($e.m_data.px) != 0) ([$e.m_data.px->m_buf,s]) #else (#if ($e.m_stackLen > 0) ([$e.m_stackBytes, s]) #else ("<null>")) )
 
 	children (
 		#(
 			[members]: [$e,!],
-			#([c_str] : #if (($e.m_data.px) != 0) ([$e.m_data.px->m_buf,s]) #else ("") ),
-			#([length] : #if (($e.m_data.px) != 0) ($e.m_data.px->m_size-1) #else (0) ),
-			#array(expr: $e.m_data.px->m_buf[$i], size: #if (($e.m_data.px) != 0) ($e.m_data.px->m_size) #else (0) )
-		)
-	)
-}
-
-string::CharBuf<string::CharTraits>{
-	preview		( #if (($e.m_data.px) != 0) ([$e.m_data.px->m_buf,s]) #else ("<null>") )
-	stringview	( #if (($e.m_data.px) != 0) ([$e.m_data.px->m_buf,s]) #else ("<null>") )
-
-	children (
-		#(
-			[members]: [$e,!],
-			#([c_str] : #if (($e.m_data.px) != 0) ([$e.m_data.px->m_buf,s]) #else ("") ),
-			#([size] : #if (($e.m_data.px) != 0) ($e.m_data.px->m_size-1) #else (0) ),
-			#([numChars] : #if (($e.m_data.px) != 0) ($e.m_data.px->m_size-1) #else (0) ),
-			#array(expr: $e.m_data.px->m_buf[$i], size: #if (($e.m_data.px) != 0) ($e.m_data.px->m_size) #else (0) )
+			#([stack] : ($e.m_data.px) == 0 ),
+			#([c_str] : #if (($e.m_data.px) != 0) ([$e.m_data.px->m_buf,s]) #else (#if ($e.m_stackLen > 0) ([$e.m_stackBytes, s]) #else ("")) ),
+			#([length] : #if (($e.m_data.px) != 0) ($e.m_data.px->m_size-1) #else (#if ($e.m_stackLen > 0) ($e.m_stackLen-1) #else (0)) ),
+			#array(expr: #if (($e.m_data.px) != 0) ($e.m_data.px->m_buf[$i]) #else ($e.m_stackBytes[$i]), size: #if (($e.m_data.px) != 0) ($e.m_data.px->m_size) #else ($e.m_stackLen) )
 		)
 	)
 }
 
 string::CharBuf<string::WCharTraits>|string::CharBuf<string::UTF16Traits>{
-	preview		( #if (($e.m_data.px) != 0) ([$e.m_data.px->m_buf,su]) #else ("<null>") )
-	stringview	( #if (($e.m_data.px) != 0) ([$e.m_data.px->m_buf,sub]) #else ("<null>") )
+	preview		( #if (($e.m_data.px) != 0) ([$e.m_data.px->m_buf,su]) #else (#if ($e.m_stackLen > 0) ([$e.m_stackBytes, su]) #else ("<null>")) )
+	stringview	( #if (($e.m_data.px) != 0) ([$e.m_data.px->m_buf,sub]) #else (#if ($e.m_stackLen > 0) ([$e.m_stackBytes, sub]) #else ("<null>")) )
 
 	children (
 		#(
 			[members]: [$e,!],
-			#([c_str] : #if (($e.m_data.px) != 0) ([$e.m_data.px->m_buf,sub]) #else ("") ),
-			#([size] : #if (($e.m_data.px) != 0) ($e.m_data.px->m_size-1) #else (0) ),
-			#([numChars] : #if (($e.m_data.px) != 0) (($e.m_data.px->m_size/2)-1) #else (0) ),
-			#array(expr: ((wchar_t*)$e.m_data.px->m_buf)[$i], size: #if (($e.m_data.px) != 0) ($e.m_data.px->m_size/2) #else (0) )
+			#([stack] : ($e.m_data.px) == 0 ),
+			#([c_str] : #if (($e.m_data.px) != 0) ([$e.m_data.px->m_buf,sub]) #else (#if ($e.m_stackLen > 0) ([$e.m_stackBytes, sub]) #else ("")) ),
+			#([size] : #if (($e.m_data.px) != 0) ($e.m_data.px->m_size-1) #else (#if ($e.m_stackLen > 0) ($e.m_stackLen-1) #else (0)) ),
+			#([numChars] : #if (($e.m_data.px) != 0) (($e.m_data.px->m_size/2)-1) #else (#if ($e.m_stackLen > 0) (($e.m_stackLen/2)-1) #else (0)) ),
+			#array(expr: #if (($e.m_data.px) != 0) (((wchar_t*)$e.m_data.px->m_buf)[$i]) #else (((wchar_t*)$e.m_stackBytes)[$i]), size: #if (($e.m_data.px) != 0) ($e.m_data.px->m_size/2) #else ($e.m_stackLen/2) )
 		)
 	)
 }

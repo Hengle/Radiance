@@ -1451,7 +1451,7 @@ SkaData::SkaData() :
 skaData(0),
 skaSize(0)
 {
-	memset(&dska, 0, sizeof(ska::DSka));
+	dska.Clear();
 }
 
 SkaData::~SkaData()
@@ -1465,7 +1465,7 @@ skinType(ska::SkinCpu)
 {
 	skmData[0] = skmData[1] = 0;
 	skmSize[0] = skmSize[1] = 0;
-	memset(&dskm, 0, sizeof(ska::DSkm));
+	dskm.Clear();
 }
 
 SkmData::~SkmData()

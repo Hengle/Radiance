@@ -1,0 +1,5 @@
+To view custom radiance types in intellisense copy the autoexp.dat file into:
+
+C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\Packages\Debugger
+
+Making a backup of the original file is recommended!

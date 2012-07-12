@@ -221,16 +221,16 @@ DataBlock::Ref DataBlock::New(
 DataBlock::Ref DataBlock::New(
 	const U16 *u16,
 	int u16Len,
+	int numBytes,
 	::Zone &zone
 ) {
 	DataBlock::Ref r;
 
-	int len = utf16to8len(u16, u16Len);
-	if (len > 0) {
-		r = New(kRefType_Copy, len + 1, 0, 0, zone);
+	if (numBytes > 0) {
+		r = New(kRefType_Copy, numBytes + 1, 0, 0, zone);
 		char *x = (char*)r->m_buf;
 		utf16to8(x, u16, u16Len);
-		x[len] = 0;
+		x[numBytes] = 0;
 	}
 
 	return r;
@@ -239,16 +239,16 @@ DataBlock::Ref DataBlock::New(
 DataBlock::Ref DataBlock::New(
 	const U32 *u32,
 	int u32Len,
+	int numBytes,
 	::Zone &zone
 ) {
 	DataBlock::Ref r;
 
-	int len = utf32to8len(u32, u32Len);
-	if (len > 0) {
-		r = New(kRefType_Copy, len + 1, 0, 0, zone);
+	if (numBytes > 0) {
+		r = New(kRefType_Copy, numBytes + 1, 0, 0, zone);
 		char *x = (char*)r->m_buf;
 		utf32to8(x, u32, u32Len);
-		x[len] = 0;
+		x[numBytes] = 0;
 	}
 
 	return r;
@@ -281,24 +281,64 @@ DataBlock::Ref DataBlock::Resize(const DataBlock::Ref &block, int size, ::Zone &
 
 String::String(const String &s, const CopyTag_t&, ::Zone &zone) {
 	m_zone = &zone;
+	m_stackLen = s.m_stackLen;
 	if (s.m_data) {
+		RAD_ASSERT(m_stackLen == 0);
 		if (s.m_data->m_refType != kRefType_Copy) {
 			m_data = details::DataBlock::New(kRefType_Copy, 0, s.m_data->data, s.m_data->size, zone);
 		} else {
 			m_data = s.m_data;
 		}
+	} else {
+		RAD_ASSERT(m_stackLen <= kStackSize);
+		memcpy(m_stackBytes, s.m_stackBytes, m_stackLen);
+	}
+}
+
+String::String(const U16 *sz, int len, ::Zone &zone) : m_zone(&zone) {
+	RAD_ASSERT(sz);
+	int numBytes = utf16to8len(sz, len);
+	if (numBytes+1 > kStackSize) { // +1 for null
+		m_stackLen = 0;
+		m_data = details::DataBlock::New(sz, len, numBytes, zone);
+	} else if (numBytes) { // fits in stack bytes
+		utf16to8(m_stackBytes, sz, len);
+		m_stackBytes[numBytes] = 0;
+		m_stackLen = numBytes + 1;
+ 	} else {
+		m_stackLen = 0;
+	}
+}
+
+inline String::String(const U32 *sz, int len, ::Zone &zone) : m_zone(&zone) {
+	RAD_ASSERT(sz);
+	int numBytes = utf32to8len(sz, len);
+	if (numBytes+1 > kStackSize) { // +1 for null
+		m_stackLen = 0;
+		m_data = details::DataBlock::New(sz, len, numBytes, zone);
+	} else if (numBytes) { // fits in stack bytes
+		utf32to8(m_stackBytes, sz, len);
+		m_stackBytes[numBytes] = 0;
+		m_stackLen = numBytes + 1;
+ 	} else {
+		m_stackLen = 0;
 	}
 }
 
 UTF16Buf String::ToUTF16() const {
 	UTF16Buf buf;
+	buf.m_zone = m_zone;
 
-	if (m_data) {
-		int len = utf8to16len(c_str, length + 1);
-		if (len > 0) {
-			buf.m_zone = m_zone;
-			buf.m_data = details::DataBlock::New(kRefType_Copy, len*sizeof(U16), 0, 0, *m_zone);
-			utf8to16((U16*)buf.m_data->data.get(), c_str, length + 1);
+	if (!empty) {
+		int len = utf8to16len(c_str, length + 1) * sizeof(U16);
+		if (len > sizeof(U16)) {
+			if (len > UTF16Buf::kStackSize) {
+				buf.m_data = details::DataBlock::New(kRefType_Copy, len, 0, 0, *m_zone);
+				utf8to16((U16*)buf.m_data->data.get(), c_str, length + 1);
+			} else {
+				buf.m_stackLen = len;
+				utf8to16((U16*)buf.m_stackBytes, c_str, length + 1);
+			}
 		}
 	}
 
@@ -307,13 +347,18 @@ UTF16Buf String::ToUTF16() const {
 
 UTF32Buf String::ToUTF32() const {
 	UTF32Buf buf;
+	buf.m_zone = m_zone;
 
-	if (m_data) {
-		int len = utf8to32len(c_str, length + 1);
-		if (len > 0) {
-			buf.m_zone = m_zone;
-			buf.m_data = details::DataBlock::New(kRefType_Copy, len*sizeof(U32), 0, 0, *m_zone);
-			utf8to32((U32*)buf.m_data->data.get(), c_str, length + 1);
+	if (!empty) {
+		int len = utf8to32len(c_str, length + 1) * sizeof(U32);
+		if (len > sizeof(U32)) {
+			if (len > UTF32Buf::kStackSize) {
+				buf.m_data = details::DataBlock::New(kRefType_Copy, len, 0, 0, *m_zone);
+				utf8to32((U32*)buf.m_data->data.get(), c_str, length + 1);
+			} else {
+				buf.m_stackLen = len;
+				utf8to32((U32*)buf.m_stackBytes, c_str, length + 1);
+			}
 		}
 	}
 
@@ -321,7 +366,7 @@ UTF32Buf String::ToUTF32() const {
 }
 
 String &String::Upper() {
-	if (m_data) {
+	if (!empty) {
 		// toupper UNICODE only works reliable using towupper
 		// this requires transcoding to a wide string and then back.
 		// expensive.
@@ -333,7 +378,7 @@ String &String::Upper() {
 }
 
 String &String::Lower() {
-	if (m_data) {
+	if (!empty) {
 		// tolower UNICODE only works reliable using towlower
 		// this requires transcoding to a wide string and then back.
 		// expensive.
@@ -345,7 +390,7 @@ String &String::Lower() {
 }
 
 String &String::Reverse() {
-	if (m_data) {
+	if (!empty) {
 		UTF32Buf buf = ToUTF32();
 		std::reverse(const_cast<U32*>(buf.c_str.get()), const_cast<U32*>(buf.c_str.get() + buf.size + 1));
 		*this = String(buf, *m_zone);
@@ -354,10 +399,10 @@ String &String::Reverse() {
 }
 
 String String::SubStr(int first, int count) const {
-	if (m_data) {
+	if (!empty) {
 		first = ByteForChar(first);
 		if (first >= 0) {
-			const char *sz = (const char*)m_data->data.get() + first;
+			const char *sz = c_str.get() + first;
 
 			String sub;
 
@@ -449,11 +494,31 @@ String &String::EraseBytes(int ofs, int count) {
 }
 
 String &String::NAppendBytes(const String &str, int len) {
-	if (str && len) {
+	RAD_ASSERT(len <= str.length);
+	if (len) {
 		int orglen = length;
-		m_data = details::DataBlock::Resize(m_data, orglen + len + 1, *m_zone);
-		char *sz = (char*)m_data->m_buf;
-		memcpy(sz + orglen, str.m_data->data, len);
+		int newLen = orglen + len;
+		char *sz;
+
+		if (m_data) {
+			RAD_ASSERT(m_stackLen == 0);
+			m_data = details::DataBlock::Resize(m_data, newLen + 1, *m_zone);
+			sz = (char*)m_data->m_buf;
+		} else {
+			// this string is in stackBytes.
+			RAD_ASSERT((orglen == 0) || (m_stackLen == orglen + 1));
+			if (newLen+1 > kStackSize) { // need to move into m_data
+				m_data = details::DataBlock::New(kRefType_Copy, newLen + 1, m_stackBytes, m_stackLen-1, *m_zone);
+				m_stackLen = 0;
+				sz = (char*)m_data->m_buf;
+			} else {
+				// still fits on stack
+				sz = m_stackBytes;
+				m_stackLen = newLen + 1;
+			}
+		}
+
+		memcpy(sz + orglen, str.c_str.get(), len);
 		sz[orglen + len] = 0;
 	}
 	return *this;
@@ -469,9 +534,8 @@ String &String::Replace(const String &src, const String &dst) {
 		if (x > 0)
 			l = s.Left(x);
 
-		int c = s.length - (x+dst.length);
-		if (c > 0)
-			r = s.RightBytes(c);
+		int c = x+src.length;
+		r = s.SubStr(c);
 
 		s = l + dst + r;
 	}
@@ -489,11 +553,17 @@ String &String::Printf(const char *fmt, va_list args) {
 	int len = vscprintf(wfmt.c_str.get(), args);
 	if (len > 1) { // > 1 because NULL is counted
 		// do as wchars for UTF support.
-		details::DataBlock::Ref wcs = 
-			details::DataBlock::New(kRefType_Copy, len*sizeof(wchar_t), 0, 0, *m_zone);
-		wchar_t *wchars = reinterpret_cast<wchar_t*>(wcs->m_buf);
+		bool stack = (len*sizeof(wchar_t)) < (4*Kilo);
+		wchar_t *wchars;
+		if (stack) {
+			wchars = (wchar_t*)stack_alloc(len*sizeof(wchar_t));
+		} else {
+			wchars = (wchar_t*)safe_zone_malloc(*m_zone, len*sizeof(wchar_t));
+		}
 		vsprintf(wchars, wfmt.c_str.get(), args);
 		*this = String(wchars, len - 1, *m_zone);
+		if (!stack)
+			zone_free(wchars);
 	} else {
 		Clear();
 	}
@@ -505,8 +575,15 @@ String &String::PrintfASCII(const char *fmt, va_list args) {
 
 	int len = vscprintf(fmt, args);
 	if (len > 1) { // > 1 because NULL is counted
-		m_data = details::DataBlock::New(kRefType_Copy, len, 0, 0, *m_zone);
-		char *chars = reinterpret_cast<char*>(m_data->m_buf);
+		char *chars;
+		if (len > kStackSize) {
+			m_data = details::DataBlock::New(kRefType_Copy, len, 0, 0, *m_zone);
+			chars = reinterpret_cast<char*>(m_data->m_buf);
+		} else {
+			m_stackLen = len;
+			chars = m_stackBytes;
+			m_data.reset();
+		}
 		vsprintf(chars, fmt, args);
 	} else {
 		Clear();
@@ -516,12 +593,9 @@ String &String::PrintfASCII(const char *fmt, va_list args) {
 }
 
 String &String::Write(int pos, const char *sz, int len) {
-	m_data = details::DataBlock::Isolate(m_data, *m_zone);
-	ncpy(
-		reinterpret_cast<char*>(m_data->data.get()),
-		sz,
-		len
-	);
+	if (m_data)
+		m_data = details::DataBlock::Isolate(m_data, *m_zone);
+	ncpy(const_cast<char*>(c_str.get()), sz, len);
 	return *this;
 }
 

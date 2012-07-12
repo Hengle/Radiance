@@ -124,9 +124,7 @@ private:
 
 	enum { MaxNameLen = 31 };
 
-#if defined (RAD_OPT_DEBUG)
 	bool                        m_inited;
-#endif
 	char                        m_name[MaxNameLen+1];
 	UReg                        m_growSize;
 	UReg                        m_maxSize;

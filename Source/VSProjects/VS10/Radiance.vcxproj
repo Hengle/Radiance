@@ -665,7 +665,9 @@
     <ClCompile Include="..\..\Engine\Zones.cpp" />
     <ClCompile Include="..\..\RadPCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Dev - Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Dev - Debug|x64'">$(PCH)</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Dev - Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Dev - Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Dev - Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\Runtime\AudioCodec\Vorbis.cpp" />
     <ClCompile Include="..\..\Runtime\AudioCodec\Wave.cpp" />
@@ -679,6 +681,7 @@
     <ClCompile Include="..\..\Runtime\Base\SIMD_ref.cpp" />
     <ClCompile Include="..\..\Runtime\Base\SIMD_sse2.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Dev - Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Dev - Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\Runtime\Base\Utils.cpp" />
     <ClCompile Include="..\..\Runtime\Base\Zone.cpp" />
@@ -842,6 +845,7 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Dev - Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\VSProps\EngineReleaseDeveloperBuild.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Dev - Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -869,9 +873,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dev - Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -883,8 +885,6 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dev - Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
