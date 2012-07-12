@@ -736,7 +736,7 @@ inline String &String::Replace(const wchar_t *src, const wchar_t *dst) {
 inline String &String::Printf(const char *fmt, ...) {
 	va_list args;
 	va_start(args, fmt);
-	Printf(fmt, args);
+	Printf_valist(fmt, args);
 	va_end(args);
 	return *this;
 }
@@ -744,7 +744,7 @@ inline String &String::Printf(const char *fmt, ...) {
 inline String &String::PrintfASCII(const char *fmt, ...) {
 	va_list args;
 	va_start(args, fmt);
-	PrintfASCII(fmt, args);
+	PrintfASCII_valist(fmt, args);
 	va_end(args);
 	return *this;
 }

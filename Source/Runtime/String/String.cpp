@@ -544,7 +544,7 @@ String &String::Replace(const String &src, const String &dst) {
 	return *this;
 }
 
-String &String::Printf(const char *fmt, va_list args) {
+String &String::Printf_valist(const char *fmt, va_list args) {
 	String sfmt(CStr(fmt));
 #if defined(RAD_OPT_WIN) // fuck you windows you non-standard piece of shit
 	sfmt.Replace("%s", "%hs");
@@ -571,7 +571,7 @@ String &String::Printf(const char *fmt, va_list args) {
 	return *this;
 }
 
-String &String::PrintfASCII(const char *fmt, va_list args) {
+String &String::PrintfASCII_valist(const char *fmt, va_list args) {
 
 	int len = vscprintf(fmt, args);
 	if (len > 1) { // > 1 because NULL is counted

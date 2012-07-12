@@ -429,10 +429,10 @@ public:
 	String &Replace(const wchar_t *src, const wchar_t *dst);
 
 	String &Printf(const char *fmt, ...);
-	String &Printf(const char *fmt, va_list args);
+	String &Printf_valist(const char *fmt, va_list args);
 
 	String &PrintfASCII(const char *fmt, ...);
-	String &PrintfASCII(const char *fmt, va_list args);
+	String &PrintfASCII_valist(const char *fmt, va_list args);
 
 	String &operator = (const String &string);
 	String &operator = (const char *sz);
