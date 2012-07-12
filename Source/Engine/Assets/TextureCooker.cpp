@@ -161,12 +161,12 @@ int TextureCooker::Compile(int flags, int allflags) {
 
 			os << (U32)image->format << (U32)image->bpp << (U32)image->frameCount;
 
-			for (UReg f = 0; f < image->frameCount; ++f) {
+			for (int f = 0; f < image->frameCount; ++f) {
 				const image_codec::Frame &frame = image->frames[f];
 
 				os << (U32)frame.mipCount << (U32)frame.flags;
 
-				for (UReg i = 0; i < frame.mipCount; ++i) {
+				for (int i = 0; i < frame.mipCount; ++i) {
 					const image_codec::Mipmap &mip = frame.mipmaps[i];
 
 					os << (U32)mip.width << (U32)mip.height << (U32)mip.stride << (U32)mip.dataSize;

@@ -438,7 +438,7 @@ static bool BmpEncode24(const Mipmap &mip, OUTBUFF &outBuff)
 	for (UReg y = mip.height; y > 0; y--)
 	{
 		const U8* src = ((const U8*)mip.data) + ((y-1)*mip.width*3);
-		for (UReg x = 0; x < mip.width; x++)
+		for (int x = 0; x < mip.width; x++)
 		{
 			pix[0] = src[2];
 			pix[1] = src[1];

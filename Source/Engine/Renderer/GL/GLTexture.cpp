@@ -452,7 +452,7 @@ int UploadTexture(
 		for (int i = 0; i < 6; ++i)
 		{
 			const image_codec::Frame &f = image.frames[i];
-			for (UReg k = 0; k < f.mipCount; ++k)
+			for (int k = 0; k < f.mipCount; ++k)
 			{
 				const image_codec::Mipmap &m = f.mipmaps[k];
 				GLuint msize = (GLuint)m.dataSize;
@@ -541,7 +541,7 @@ int UploadTexture(
 	else
 	{
 		const image_codec::Frame &f = image.frames[0];
-		for (UReg i = 0; i < f.mipCount; ++i)
+		for (int i = 0; i < f.mipCount; ++i)
 		{
 			const image_codec::Mipmap &m = f.mipmaps[i];
 			GLuint msize = (GLuint)m.dataSize;

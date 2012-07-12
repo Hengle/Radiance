@@ -418,7 +418,7 @@ RADRT_API bool RADRT_CALL Encode(const Image &in, const Mipmap &mip, float quali
 	if (scanlines)
 	{
 		const U8* row = (const U8*)mip.data;
-		for(UReg y = 0; y < mip.height; y++)
+		for(int y = 0; y < mip.height; y++)
 		{
 			scanlines[y] = ((const JSAMPROW)row) + y * mip.stride;
 		}

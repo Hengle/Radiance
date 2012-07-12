@@ -602,7 +602,7 @@ int TextureParser::Parsing(
 			const image_codec::Image::Ref &img = *it;
 			if (img->frameCount < 1)
 				break;
-			UReg i;
+			int i;
 			for (i = 0; i < img->frameCount; ++i) {
 				if (img->frames[i].mipCount < 1)
 					break;
@@ -662,7 +662,7 @@ int TextureParser::Parsing(
 						for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it) {
 							image_codec::Image::Ref &image = *it;
 
-							UReg f;
+							int f;
 							for (f = 0; f < image->frameCount; ++f) {
 								const image_codec::Frame &frame = image->frames[f];
 								
@@ -692,9 +692,9 @@ int TextureParser::Parsing(
 								m_header.format = image_codec::Format_RGBA8888;
 							}
 
-							for (UReg i = 0; i < img->frameCount; ++i) {
+							for (int i = 0; i < img->frameCount; ++i) {
 								image_codec::Frame &sf = img->frames[i];
-								for (UReg k = 0; k < sf.mipCount; ++k) {
+								for (int k = 0; k < sf.mipCount; ++k) {
 									image_codec::Mipmap &sm = sf.mipmaps[k];
 
 									U8 *data = (U8*)safe_zone_malloc(image_codec::ZImageCodec, sm.width*sm.height*4);

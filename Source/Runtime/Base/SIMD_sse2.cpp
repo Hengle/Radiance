@@ -7,6 +7,7 @@
 
 // timings taken for i7 from http://www.agner.org/optimize/instruction_tables.pdf
 
+#include RADPCH
 #include "SIMD.h"
 
 #if defined(RAD_OPT_WINX)

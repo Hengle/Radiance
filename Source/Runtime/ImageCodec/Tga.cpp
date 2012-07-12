@@ -918,7 +918,7 @@ RADRT_API bool RADRT_CALL Encode(const Image &in, const Mipmap &mip, bool compre
 
 	if (compressRLE)
 	{
-		for (UReg row = 0; row < mip.height; row++)
+		for (int row = 0; row < mip.height; row++)
 		{
 			if (!tga_write_row_RLE(outBuff, in, mip, ((U8*)image_copy) + row * mip.stride))
 			{

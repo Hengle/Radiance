@@ -423,7 +423,7 @@ RADRT_API bool RADRT_CALL Encode(const Image &in, const Mipmap &mip, bool interl
 	{
 		png_bytep src = (png_bytep)mip.data;
 
-		for (UReg y = 0; y < mip.height; ++y)
+		for (int y = 0; y < mip.height; ++y)
 		{
 			png_write_rows(png, (png_bytepp)&src, 1);
 			src += mip.stride;

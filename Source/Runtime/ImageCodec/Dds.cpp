@@ -1224,7 +1224,7 @@ RADRT_API bool RADRT_CALL Encode(const Image &in, int encodeFormat, int encodeFl
 
 	if (encodeFlags & EncodeFlagCubemap)
 	{
-		UReg i;
+		int i;
 		for (i = 0; i < in.frameCount; i++)
 		{
 			if (!EncodeMipMaps(&sd, &in.frames[i], in.bpp, in.format, encodeFormat, &outBuff))
@@ -1453,7 +1453,7 @@ static const U8* DecodeDXT3(const U8* dxtBuff, AddrSize* io_dxtBuffLength, void*
 	return dxtBuff;
 }
 
-static const U8* DecodeDXT5(const U8* dxtBuff, AddrSize* io_dxtBuffLength, void* outBuff, UReg width, UReg height)
+static const U8* DecodeDXT5(const U8* dxtBuff, AddrSize* io_dxtBuffLength, void* outBuff, int width, int height)
 {
 	RAD_ASSERT(dxtBuff&&io_dxtBuffLength);
 	RAD_ASSERT(outBuff);
@@ -1548,9 +1548,9 @@ static const U8* DecodeDXT5(const U8* dxtBuff, AddrSize* io_dxtBuffLength, void*
 			UReg sel;
 			AddrSize ofs;
 
-			for (UReg by = 0, bit = 0; by < 4; by++)
+			for (int by = 0, bit = 0; by < 4; by++)
 			{
-				for (UReg bx = 0; bx < 4; bx++, bit++)
+				for (int bx = 0; bx < 4; bx++, bit++)
 				{
 					if (((x+bx)<width) && ((y+by)<height))
 					{
@@ -1567,9 +1567,9 @@ static const U8* DecodeDXT5(const U8* dxtBuff, AddrSize* io_dxtBuffLength, void*
 
 			U32 abits = endian::SwapLittle(((U32*)&alphamask[0])[0]);
 
-			for (UReg by = 0; by < 2; by++)
+			for (int by = 0; by < 2; by++)
 			{
-				for (UReg bx = 0; bx < 4; bx++)
+				for (int bx = 0; bx < 4; bx++)
 				{
 					if (((x+bx)<width) && ((y+by)<height))
 					{
@@ -1582,9 +1582,9 @@ static const U8* DecodeDXT5(const U8* dxtBuff, AddrSize* io_dxtBuffLength, void*
 
 			abits = endian::SwapLittle(((U32*)&alphamask[3])[0]);
 
-			for (UReg by = 2; by < 4; by++)
+			for (int by = 2; by < 4; by++)
 			{
-				for (UReg bx = 0; bx < 4; bx++)
+				for (int bx = 0; bx < 4; bx++)
 				{
 					if (((x+bx)<width) && ((y+by)<height))
 					{
