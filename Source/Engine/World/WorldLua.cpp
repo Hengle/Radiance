@@ -34,9 +34,14 @@ extern "C" {
 #include <Lua/lgc.h>
 #include <Lua/lstate.h>
 #if LUA_VERSION_NUM >= 502
-LUAMOD_API int luaopen_bit(lua_State *L);
+#define LUALIB_API LUAMOD_API
 #endif
+LUALIB_API int luaopen_bit(lua_State *L);
 }
+
+#if defined(LUA_EDIT_SUPPORT)
+#include <LuaEdit/RemoteDebugger.hpp>
+#endif
 
 #define SELF "@world"
 #define ENTREF_TABLE "@ents"
@@ -75,12 +80,19 @@ WorldLua::WorldLua(World *w) : m_world(w)
 
 WorldLua::~WorldLua() 
 {
+#if defined(LUA_EDIT_SUPPORT)
+	StopLuaEditRemoteDebugger();
+#endif
 }
 
 bool WorldLua::Init()
 {
 	m_L = lua::State::Ref(new (ZWorld) lua::State("GameScript"));
 	lua_State *L = m_L->L;
+
+#if defined(LUA_EDIT_SUPPORT)
+	StartLuaEditRemoteDebugger(6666, L);
+#endif
 
 	lua_pushinteger(L, LUA_VERSION_NUM);
 	lua_setglobal(L, "LUA_VERSION_NUM");
@@ -308,6 +320,7 @@ Entity::Ref WorldLua::CreateEntity(const Keys &keys)
 
 bool WorldLua::PushGlobalCall(const char *name)
 {
+#if LUA_VERSION_NUM >= 502
 	lua_pushglobaltable(L);
 	bool r = lua::GetFieldExt(L, -1, name);
 	if (r) {
@@ -315,6 +328,9 @@ bool WorldLua::PushGlobalCall(const char *name)
 	} else {
 		lua_pop(L, 1);
 	}
+#else
+	bool r = lua::GetFieldExt(L, LUA_GLOBALSINDEX, name);
+#endif
 	return r;
 }
 

@@ -6,7 +6,9 @@
     <Import Project="ExternLibSupport.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup>
+    <_PropertySheetDisplayName>EngineDeveloper_x64</_PropertySheetDisplayName>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>RAD_OPT_PC;RAD_OPT_GL;RAD_OPT_TOOLS;RAD_OPT_PC_TOOLS;RAD_OVERLOAD_STD_NEW;%(PreprocessorDefinitions)</PreprocessorDefinitions>

@@ -4,6 +4,9 @@
     <Filter Include="lua-5.2.1">
       <UniqueIdentifier>{4dd7e972-0b30-4d61-adf8-f9b0cdbd55ec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lua-5.1.5">
+      <UniqueIdentifier>{03492b4b-e235-4a3b-90f9-0e4370c748fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\bitop.c">
@@ -104,6 +107,96 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lzio.c">
       <Filter>lua-5.2.1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\lapi.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\lauxlib.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\lbaselib.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\lcode.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\ldblib.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\ldebug.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\ldo.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\ldump.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\lfunc.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\lgc.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\linit.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\liolib.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\llex.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\lmathlib.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\lmem.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\loadlib.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\lobject.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\lopcodes.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\loslib.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\lparser.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\lstate.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\lstring.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\lstrlib.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\ltable.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\ltablib.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\ltm.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\lundump.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\lvm.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\lzio.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\bitop.c">
+      <Filter>lua-5.1.5</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

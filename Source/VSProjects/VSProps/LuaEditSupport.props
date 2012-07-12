@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <LUA_EDIT_PATH>$(EXTERN_PATH)\LuaEdit-3.0.9</LUA_EDIT_PATH>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_PropertySheetDisplayName>LuaEditSupport</_PropertySheetDisplayName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>LUA_EDIT_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(LUA_EDIT_PATH);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="LUA_EDIT_PATH">
+      <Value>$(LUA_EDIT_PATH)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

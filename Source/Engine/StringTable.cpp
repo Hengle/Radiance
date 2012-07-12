@@ -139,7 +139,11 @@ int StringTable::Load(const char *name, const char *root, StringTable::Ref &_r, 
 
 		Loader loader(is);
 		
+#if LUA_VERSION_NUM >= 502
 		if (lua_load(L->L, &Loader::Read, &loader, path.c_str, 0)) {
+#else
+		if (lua_load(L->L, &Loader::Read, &loader, path.c_str)) {
+#endif
 			COut(C_Error) << "StringTable::Load(parse): " << lua_tostring(L->L, -1) << std::endl;
 			r.reset();
 			return pkg::SR_ScriptError;

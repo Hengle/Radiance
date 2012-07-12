@@ -21,8 +21,9 @@
 extern "C" {
 #include <Lua/lualib.h>
 #if LUA_VERSION_NUM >= 502
-LUAMOD_API int luaopen_bit(lua_State *L);
+#define LUALIB_API LUAMOD_API
 #endif
+LUALIB_API int luaopen_bit(lua_State *L);
 }
 
 #include <Runtime/PushSystemMacros.h>
@@ -1196,6 +1197,7 @@ void PackageMan::EnumeratePackage(
 
 		Loader loader(is);
 
+#if LUA_VERSION_NUM >= 502
 		if (lua_load(
 				L->L,
 				&Loader::Read,
@@ -1204,6 +1206,15 @@ void PackageMan::EnumeratePackage(
 				0
 			)
 		)
+#else
+		if (lua_load(
+				L->L,
+				&Loader::Read,
+				&loader,
+				path.c_str
+			)
+		)
+#endif
 		{
 			COut(C_ErrMsgBox) << "PackageMan(parse): " << lua_tostring(L->L, -1) << std::endl;
 			return;
