@@ -1225,7 +1225,11 @@ RADENG_API void RADENG_CALL EnableNativeClassImport(lua_State *L)
 RADENG_API void RADENG_CALL RegisterGlobals(lua_State *L, const char *table, luaL_Reg *r)
 {
 	RAD_ASSERT(L);
+#if LUA_VERSION_NUM >= 502
 	int index = -1000;
+#else
+	int index = LUA_GLOBALSINDEX;
+#endif
 
 	if (table != 0)
 	{
@@ -1238,11 +1242,15 @@ RADENG_API void RADENG_CALL RegisterGlobals(lua_State *L, const char *table, lua
 	while (r->name && r->func)
 	{
 		lua_pushcfunction(L, r->func);
+#if LUA_VERSION_NUM >= 502
 		if (index == -1000) {
 			lua_setglobal(L, r->name);
 		} else {
 			lua_setfield(L, index, r->name);
 		}
+#else
+		lua_setfield(L, index, r->name);
+#endif
 		++r;
 	}
 

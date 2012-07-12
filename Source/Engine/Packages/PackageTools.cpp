@@ -20,6 +20,9 @@
 
 extern "C" {
 #include <Lua/lualib.h>
+#if LUA_VERSION_NUM >= 502
+LUAMOD_API int luaopen_bit(lua_State *L);
+#endif
 }
 
 #include <Runtime/PushSystemMacros.h>
@@ -708,7 +711,7 @@ lua::State::Ref PackageMan::InitLua()
 	lua_setfield(L, LUA_REGISTRYINDEX, PACKAGEMAN_KEY);
 	luaopen_bit(L);
 #if LUA_VERSION_NUM >= 502
-	lua_setglobal(L, LUA_BITLIBNAME);
+	lua_setglobal(L, "bit");
 #endif
 	luaopen_string(L);
 #if LUA_VERSION_NUM >= 502

@@ -33,6 +33,9 @@ extern "C" {
 #include <Lua/lualib.h>
 #include <Lua/lgc.h>
 #include <Lua/lstate.h>
+#if LUA_VERSION_NUM >= 502
+LUAMOD_API int luaopen_bit(lua_State *L);
+#endif
 }
 
 #define SELF "@world"
@@ -79,6 +82,9 @@ bool WorldLua::Init()
 	m_L = lua::State::Ref(new (ZWorld) lua::State("GameScript"));
 	lua_State *L = m_L->L;
 
+	lua_pushinteger(L, LUA_VERSION_NUM);
+	lua_setglobal(L, "LUA_VERSION_NUM");
+
 	luaopen_base(L);
 #if LUA_VERSION_NUM >= 502
 	lua_setglobal(L, "_G");
@@ -97,7 +103,7 @@ bool WorldLua::Init()
 #endif
 	luaopen_bit(L);
 #if LUA_VERSION_NUM >= 502
-	lua_setglobal(L, LUA_BITLIBNAME);
+	lua_setglobal(L, "bit");
 #endif
 #if LUA_VERSION_NUM >= 502
 	luaopen_coroutine(L);

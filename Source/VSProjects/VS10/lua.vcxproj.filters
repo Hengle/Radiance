@@ -1,109 +1,109 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source">
+    <Filter Include="lua-5.2.1">
       <UniqueIdentifier>{4dd7e972-0b30-4d61-adf8-f9b0cdbd55ec}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\ldebug.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\bitop.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\ldo.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lapi.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\ldump.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lauxlib.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lfunc.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lbaselib.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lgc.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lbitlib.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\linit.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lcode.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\liolib.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lcorolib.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\llex.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lctype.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lmathlib.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\ldblib.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lmem.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\ldebug.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\loadlib.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\ldo.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lobject.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\ldump.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lopcodes.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lfunc.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\loslib.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lgc.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lparser.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\linit.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lstate.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\liolib.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lstring.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\llex.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lstrlib.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lmathlib.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\ltable.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lmem.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\ltablib.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\loadlib.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\ltm.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lobject.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lundump.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lopcodes.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lvm.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\loslib.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lzio.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lparser.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lapi.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lstate.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lauxlib.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lstring.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lbaselib.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lstrlib.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lbitlib.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\ltable.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lcode.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\ltablib.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lcorolib.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\ltm.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\lctype.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lundump.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\ldblib.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lvm.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\lua-5.2.0\Lua\bitop.c">
-      <Filter>Source</Filter>
+    <ClCompile Include="..\..\..\..\Extern\lua-5.2.1\Lua\lzio.c">
+      <Filter>lua-5.2.1</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
