@@ -135,7 +135,7 @@ int SkModelCooker::Compile(int flags, int allflags)
 
 	// File 0 (discardable after load)
 	{
-		BinFile::Ref skmFile = OpenWrite(path.c_str, flags);
+		BinFile::Ref skmFile = OpenWrite(path2.c_str, flags);
 		if (!skmFile)
 			return SR_IOError;
 

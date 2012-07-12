@@ -49,14 +49,14 @@ namespace
 	struct Material
 	{
 		String name;
-		U32 flags;
-		UReg emitId;
+		int flags;
+		int emitId;
 
 		struct Sub
 		{
 			String name;
-			UReg id;
-			UReg emitId;
+			int id;
+			int emitId;
 		};
 
 		typedef zone_map<UReg, Sub, ZToolsT>::type SubHash;

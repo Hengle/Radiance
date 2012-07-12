@@ -17,6 +17,34 @@
 
 namespace string {
 
+#if !defined(RAD_OPT_SHIP)
+/*! In cases where string data is short (31 bytes or less) the string is stored
+	locally inside the string object in a small buffer. If the string is longer
+	than 31 bytes it is placed inside a shared data block object that can be
+	referenced by multiple strings (the immutable reference part of the storage 
+	semantics). A string which contains its contents inside this internal buffer
+	is called a stack string.
+
+	To keep the implementation orthogonal and simple short RefTag data is also
+	copied into the object if it fits, avoiding the need to allocate a boost::shared_ptr
+	to track the RefTag. This does mean that a copies of the RefTag data is made
+	however.
+
+	RefTag data requires special care by the user (it must not change) and because
+	of the nature of a string (stack string or not) is size dependant this can lead
+	to some very hard to find bugs when RefTag data is improperly used. In some
+	cases modifying the source data of the RefTag may cause no side-effects (because
+	the data was moved inside a stack string) and in other cases it may alter the
+	string contents (because the RefTag data was too large and the source is indeed
+	referenced directly) depending on the particular data being used.
+
+	Enable this define to disable using stack strings for RefTag data. This does
+	require an allocation per string in the form of a boost::shared_ptr however
+	illegal modification of RefTag data is guaranteed to have a side effect.
+*/
+#define RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA
+#endif
+
 //! Immutable Character Buffer.
 /*! This class contains NULL terminated string data in various encodings. There
     are specializations of this class which are used for UTF8, UTF16, UTF32, and wide
@@ -511,6 +539,9 @@ template <class C, class T> class basic_ostream;
 }
 
 namespace string {
+
+bool operator == (const char *sz, const String &s);
+bool operator != (const char *sz, const String &s);
 
 //! Streaming support for strings.
 /*! Internally the string is converted to/from a std::string. */

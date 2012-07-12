@@ -159,16 +159,20 @@ inline String::String(const char *sz, ::Zone &zone) : m_zone(&zone) {
 inline String::String(const char *sz, const RefTag_t&, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
 	int l = len(sz);
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	if (l+1 > kStackSize) {
+#endif
 		m_stackLen = 0;
 		m_data = details::DataBlock::New(kRefType_Ref, 0, sz, l + 1, zone);
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	} else if (l) {
 		m_stackLen = l + 1;
 		RAD_ASSERT(m_stackLen <= kStackSize);
 		memcpy(m_stackBytes, sz, m_stackLen);
 	} else {
 		m_stackLen = 0;
-	}	
+	}
+#endif
 }
 
 inline String::String(const char *sz, int len, const CopyTag_t&, ::Zone &zone) : m_zone(&zone) {
@@ -188,12 +192,15 @@ inline String::String(const char *sz, int len, const CopyTag_t&, ::Zone &zone) :
 
 inline String::String(const char *sz, int len, const RefTag_t&, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	if (len+1 > kStackSize) {
+#endif
 		m_stackLen = 0;
 		m_data = details::DataBlock::New(kRefType_Ref, 0, sz, len + 1, zone);
 		// if you get this assert you are mis-using RefTag. RefTag data must 
 		// always be null terminated.
 		RAD_ASSERT(reinterpret_cast<const char*>(m_data->m_buf)[len] == 0);
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	} else if (len) {
 		// if you get this assert you are mis-using RefTag. RefTag data must 
 		// always be null terminated.
@@ -204,6 +211,7 @@ inline String::String(const char *sz, int len, const RefTag_t&, ::Zone &zone) : 
 	} else {
 		m_stackLen = 0;
 	}
+#endif
 }
 
 inline String::String(const UTF16Buf &buf, ::Zone &zone) : m_zone(&zone) {
@@ -907,6 +915,14 @@ inline int String::RAD_IMPLEMENT_GET(numChars) {
 
 inline bool String::RAD_IMPLEMENT_GET(empty) {
 	return !(m_data || (m_stackLen>0));
+}
+
+inline bool operator == (const char *sz, const String &s) {
+	return s == sz;
+}
+
+inline bool operator != (const char *sz, const String &s) {
+	return s != sz;
 }
 
 template<class CharType, class Traits>
