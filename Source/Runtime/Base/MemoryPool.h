@@ -10,7 +10,7 @@
 #include <boost/thread/locks.hpp>
 #include <limits>
 
-#if !defined(RAD_OPT_SHIP)
+#if !defined(RAD_OPT_SHIP) || defined(RAD_OPT_DEBUG)
 #define RAD_OPT_MEMPOOL_DEBUG
 #endif
 

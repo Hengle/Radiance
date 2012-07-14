@@ -51,7 +51,7 @@ inline const char **NativeApp::RAD_IMPLEMENT_GET(argv) {
 }
 
 #if defined(RAD_OPT_GL) && !defined(RAD_OPT_PC_TOOLS)
-NativeDeviceContext::Ref NativeApp::CreateOpenGLContext() {
+inline NativeDeviceContext::Ref NativeApp::CreateOpenGLContext() {
 	return m_imp.CreateOpenGLContext();
 }
 #endif

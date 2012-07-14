@@ -4,6 +4,7 @@
 // See Radiance/LICENSE for licensing terms.
 
 #include RADPCH
+#include "App.h"
 #include "Engine.h"
 #include "ComponentExports.h"
 #include "World/Entities/E_Exports.h"

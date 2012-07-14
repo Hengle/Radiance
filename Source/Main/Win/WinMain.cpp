@@ -108,10 +108,12 @@ int APIENTRY WinMain(
 	LPSTR     lpCmdLine,
 	int       nCmdShow)
 {
+#if defined(RAD_OPT_PC_TOOLS)
 	if (IsDotCom()) {
 		SpawnSelf();
 		return 0;
 	}
+#endif
 
 	Argcv args(lpCmdLine);
 

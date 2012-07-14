@@ -38,7 +38,12 @@
     <ClCompile Include="..\..\..\..\..\CrowIOS\Radiance\Source\Main\null_CloudStorage.cpp" />
     <ClCompile Include="..\..\Main\NativeApp.cpp" />
     <ClInclude Include="..\..\Main\NativeApp_inl.h" />
-    <ClCompile Include="..\..\Main\QtAppMain.cpp" />
+    <ClCompile Include="..\..\Main\QtAppMain.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\Main\Win\WinMain.cpp" />
     <ClCompile Include="..\..\Main\Win\WinNativeApp.cpp" />
     <ClCompile Include="..\..\RadPCH.cpp">
@@ -59,7 +64,12 @@
     <ClInclude Include="..\..\Main\NativeAppBackend.h" />
     <ClInclude Include="..\..\Main\NativeAppDef.h" />
     <ClInclude Include="..\..\Main\NativeDeviceContext.h" />
-    <ClInclude Include="..\..\Main\QtAppMain.h" />
+    <ClInclude Include="..\..\Main\QtAppMain.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\..\Main\StdVidModes.h" />
     <ClInclude Include="..\..\Main\Win\WinNativeApp.h" />
     <ClInclude Include="..\..\RadPCH.h" />
@@ -99,6 +109,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dev - Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -109,6 +120,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">

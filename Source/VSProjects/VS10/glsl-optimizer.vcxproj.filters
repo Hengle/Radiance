@@ -213,5 +213,6 @@
     <ClCompile Include="..\..\..\..\Extern\glsl-optimizer-v1\src\glsl\lower_noise.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer-v1\ship_null.c" />
   </ItemGroup>
 </Project>
