@@ -129,6 +129,10 @@ inline String::String(::Zone &zone) : m_zone(&zone) {
 
 inline String::String(const String &s) : m_data(s.m_data), m_zone(s.m_zone) {
 	m_stackLen = s.m_stackLen;
+#if defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
+	RAD_VERIFY(m_stackLen == 0);
+#endif
+	RAD_ASSERT(!m_data || (m_stackLen==0));
 	if (!m_data) {
 		RAD_ASSERT(m_stackLen <= kStackSize);
 		memcpy(m_stackBytes, s.m_stackBytes, m_stackLen);
@@ -145,14 +149,23 @@ inline String::String(const UTF8Buf &buf) : m_data(buf.m_data), m_zone(buf.m_zon
 
 inline String::String(const char *sz, ::Zone &zone) : m_zone(&zone) {
 	int l = len(sz);
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	if (l+1 > kStackSize) {
+#else
+	if (l > 0) {
+#endif
 		m_stackLen = 0;
 		m_data = details::DataBlock::New(kRefType_Copy, 0, sz, l + 1, zone);
 		reinterpret_cast<char*>(m_data->m_buf)[l] = 0;
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+		m_data->Validate();
+#endif
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	} else if (l) {
 		m_stackLen = l + 1;
 		RAD_ASSERT(m_stackLen <= kStackSize);
 		memcpy(m_stackBytes, sz, m_stackLen);
+#endif
 	} else {
 		m_stackLen = 0;
 	}
@@ -163,30 +176,44 @@ inline String::String(const char *sz, const RefTag_t&, ::Zone &zone) : m_zone(&z
 	int l = len(sz);
 #if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	if (l+1 > kStackSize) {
+#else
+	if (l > 0) {
 #endif
 		m_stackLen = 0;
 		m_data = details::DataBlock::New(kRefType_Ref, 0, sz, l + 1, zone);
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+		m_data->Validate();
+#endif
 #if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	} else if (l) {
 		m_stackLen = l + 1;
 		RAD_ASSERT(m_stackLen <= kStackSize);
 		memcpy(m_stackBytes, sz, m_stackLen);
+#endif
 	} else {
 		m_stackLen = 0;
 	}
-#endif
 }
 
 inline String::String(const char *sz, int len, const CopyTag_t&, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	if (len+1 > kStackSize) {
+#else
+	if (len > 0) {
+#endif
 		m_stackLen = 0;
 		m_data = details::DataBlock::New(kRefType_Copy, 0, sz, len + 1, zone);
 		reinterpret_cast<char*>(m_data->m_buf)[len] = 0;
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+		m_data->Validate();
+#endif
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	} else if (len) {
 		m_stackLen = len + 1;
 		RAD_ASSERT(m_stackLen <= kStackSize);
 		memcpy(m_stackBytes, sz, m_stackLen);
+#endif
 	} else {
 		m_stackLen = 0;
 	}
@@ -196,12 +223,17 @@ inline String::String(const char *sz, int len, const RefTag_t&, ::Zone &zone) : 
 	RAD_ASSERT(sz);
 #if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	if (len+1 > kStackSize) {
+#else
+	if (len > 0) {
 #endif
 		m_stackLen = 0;
 		m_data = details::DataBlock::New(kRefType_Ref, 0, sz, len + 1, zone);
 		// if you get this assert you are mis-using RefTag. RefTag data must 
 		// always be null terminated.
 		RAD_ASSERT(reinterpret_cast<const char*>(m_data->m_buf)[len] == 0);
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+		m_data->Validate();
+#endif
 #if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	} else if (len) {
 		// if you get this assert you are mis-using RefTag. RefTag data must 
@@ -210,10 +242,10 @@ inline String::String(const char *sz, int len, const RefTag_t&, ::Zone &zone) : 
 		m_stackLen = len + 1;
 		RAD_ASSERT(m_stackLen <= kStackSize);
 		memcpy(m_stackBytes, sz, m_stackLen);
+#endif
 	} else {
 		m_stackLen = 0;
 	}
-#endif
 }
 
 inline String::String(const UTF16Buf &buf, ::Zone &zone) : m_zone(&zone) {
@@ -282,6 +314,9 @@ inline String::String(int len, ::Zone &zone) : m_zone(&zone) {
 			m_stackLen = 0;
 			m_data = details::DataBlock::New(kRefType_Copy, len, 0, 0, zone);
 			reinterpret_cast<char*>(m_data->m_buf)[len-1] = 0;
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+			m_data->Validate();
+#endif
 #if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 		} else {
 			m_stackLen = (U8)len;

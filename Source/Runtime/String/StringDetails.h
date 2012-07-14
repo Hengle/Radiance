@@ -34,6 +34,7 @@ public:
 	typedef boost::shared_ptr<DataBlock> Ref;
 	
 	~DataBlock() {
+		// No lock here, DataBlock::Destory acquires mutex.
 		if (m_refType == kRefType_Copy) {
 			if (m_pool) {
 				m_pool->ReturnChunk(m_buf);
@@ -131,8 +132,16 @@ private:
 	}
 
 	static void Destroy(DataBlock *d) {
+		Mutex::Lock L(Mutex::Get());
 		s_dataBlockPool.Destroy(d);
 	}
+
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+	void Validate() {
+		if (m_pool)
+			MemoryPool::AssertChunkIsValid(m_buf);
+	}
+#endif
 
 	enum {
 		kMinPoolSize = 4,

@@ -9,6 +9,15 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
 #include <limits>
+
+#if !defined(RAD_OPT_SHIP)
+#define RAD_OPT_MEMPOOL_DEBUG
+#endif
+
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+#include "../Thread/Interlocked.h"
+#endif
+
 #include "../PushPack.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -60,6 +69,10 @@ public:
 
 	void ReturnChunk(void* pT);
 
+#if defined (RAD_OPT_MEMPOOL_DEBUG)
+	static void AssertChunkIsValid(void *pT);
+#endif
+
 	UReg NumUsedChunks() const;
 	UReg NumAllocatedChunks() const;
 
@@ -81,9 +94,9 @@ private:
 	struct PoolNode
 	{
 	
-#if defined (RAD_OPT_DEBUG)
+#if defined (RAD_OPT_MEMPOOL_DEBUG)
 		enum { MagicId = RAD_FOURCC_LE('M','E','P','N') };
-		UReg        m_magicID;
+		int m_magicID;
 #endif
 
 		Pool*       m_pool;
@@ -101,9 +114,9 @@ private:
 		void Reset(UReg inArraySize,PoolNode** inFreeHead, ChunkDestructor destructor, WalkCallback callback);
 		void WalkUsed(UReg inArraySize,WalkCallback callback);
 
-#if defined (RAD_OPT_DEBUG)
+#if defined (RAD_OPT_MEMPOOL_DEBUG)
 		enum { MagicId = RAD_FOURCC_LE('M','E','M','P') };
-		UReg        m_magicID;
+		int m_magicID;
 #endif
 
 		UReg         m_numNodesInUse;
@@ -117,7 +130,7 @@ private:
 	static void *UserDataFromPoolNode(PoolNode *node);
 	static PoolNode *PoolNodeFromUserData(void *data);
 
-#if defined(RAD_OPT_DEBUG)
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
 	static bool IsPoolNodeValid(PoolNode *node);
 	static void AssertPoolNodeIsValid(PoolNode *node);
 #endif
@@ -138,6 +151,9 @@ private:
 	int                         m_alignment;
 	AddrSize                    m_offsetToNext;
 	Zone*                       m_zone;
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+	thread::Interlocked<UReg>   m_concurrencyCheck;
+#endif
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////

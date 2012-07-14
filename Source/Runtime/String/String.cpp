@@ -221,6 +221,9 @@ DataBlock::Ref DataBlock::New(
 	Mutex::Lock L(Mutex::Get());
 	InitPools();
 	DataBlock::Ref r(s_dataBlockPool.Construct(refType, const_cast<void*>(src), len, pool, poolIdx), &DataBlock::Destroy);
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+	r->Validate();
+#endif
 	return r;
 }
 
@@ -237,6 +240,9 @@ DataBlock::Ref DataBlock::New(
 		char *x = (char*)r->m_buf;
 		utf16to8(x, u16, u16Len);
 		x[numBytes] = 0;
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+		r->Validate();
+#endif
 	}
 
 	return r;
@@ -255,6 +261,9 @@ DataBlock::Ref DataBlock::New(
 		char *x = (char*)r->m_buf;
 		utf32to8(x, u32, u32Len);
 		x[numBytes] = 0;
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+		r->Validate();
+#endif
 	}
 
 	return r;
@@ -275,8 +284,16 @@ DataBlock::Ref DataBlock::Resize(const DataBlock::Ref &block, int size, ::Zone &
 
 	DataBlock::Ref r = New(kRefType_Copy, size, 0, 0, zone);
 
-	if (block)
+	if (block) {
 		memcpy(r->m_buf, block->m_buf, std::min(size, block->m_size));
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+		block->Validate();
+#endif
+	}
+
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+	r->Validate();
+#endif
 
 	return r;
 }
@@ -295,8 +312,14 @@ String::String(const String &s, const CopyTag_t&, ::Zone &zone) {
 		} else {
 			m_data = s.m_data;
 		}
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+		m_data->Validate();
+#endif
 	} else {
 		RAD_ASSERT(m_stackLen <= kStackSize);
+#if defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
+		RAD_VERIFY(m_stackLen == 0);
+#endif
 		memcpy(m_stackBytes, s.m_stackBytes, m_stackLen);
 	}
 }
@@ -306,18 +329,23 @@ String::String(const U16 *sz, int len, ::Zone &zone) : m_zone(&zone) {
 	int numBytes = utf16to8len(sz, len);
 #if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	if (numBytes+1 > kStackSize) { // +1 for null
+#else
+	if (numBytes > 0) {
 #endif
 		m_stackLen = 0;
 		m_data = details::DataBlock::New(sz, len, numBytes, zone);
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+		m_data->Validate();
+#endif
 #if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	} else if (numBytes) { // fits in stack bytes
 		utf16to8(m_stackBytes, sz, len);
 		m_stackBytes[numBytes] = 0;
 		m_stackLen = numBytes + 1;
+#endif
  	} else {
 		m_stackLen = 0;
 	}
-#endif
 }
 
 inline String::String(const U32 *sz, int len, ::Zone &zone) : m_zone(&zone) {
@@ -325,18 +353,23 @@ inline String::String(const U32 *sz, int len, ::Zone &zone) : m_zone(&zone) {
 	int numBytes = utf32to8len(sz, len);
 #if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	if (numBytes+1 > kStackSize) { // +1 for null
+#else 
+	if (numBytes > 0) {
 #endif
 		m_stackLen = 0;
 		m_data = details::DataBlock::New(sz, len, numBytes, zone);
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+		m_data->Validate();
+#endif
 #if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	} else if (numBytes) { // fits in stack bytes
 		utf32to8(m_stackBytes, sz, len);
 		m_stackBytes[numBytes] = 0;
 		m_stackLen = numBytes + 1;
+#endif
  	} else {
 		m_stackLen = 0;
 	}
-#endif
 }
 
 UTF16Buf String::ToUTF16() const {
@@ -345,19 +378,22 @@ UTF16Buf String::ToUTF16() const {
 
 	if (!empty) {
 		int len = utf8to16len(c_str, length + 1) * sizeof(U16);
-#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 		if (len > sizeof(U16)) {
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 			if (len > UTF16Buf::kStackSize) {
 #endif
 				buf.m_data = details::DataBlock::New(kRefType_Copy, len, 0, 0, *m_zone);
 				utf8to16((U16*)buf.m_data->data.get(), c_str, length + 1);
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+				buf.m_data->Validate();
+#endif
 #if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 			} else {
 				buf.m_stackLen = len;
 				utf8to16((U16*)buf.m_stackBytes, c_str, length + 1);
 			}
-		}
 #endif
+		}
 	}
 
 	return buf;
@@ -369,19 +405,22 @@ UTF32Buf String::ToUTF32() const {
 
 	if (!empty) {
 		int len = utf8to32len(c_str, length + 1) * sizeof(U32);
-#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 		if (len > sizeof(U32)) {
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 			if (len > UTF32Buf::kStackSize) {
 #endif
 				buf.m_data = details::DataBlock::New(kRefType_Copy, len, 0, 0, *m_zone);
 				utf8to32((U32*)buf.m_data->data.get(), c_str, length + 1);
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+				buf.m_data->Validate();
+#endif
 #if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 			} else {
 				buf.m_stackLen = len;
 				utf8to32((U32*)buf.m_stackBytes, c_str, length + 1);
 			}
-		}
 #endif
+		}
 	}
 
 	return buf;
@@ -567,6 +606,12 @@ String &String::NAppendBytes(const String &str, int len) {
 
 		memcpy(sz + orglen, str.c_str.get(), len);
 		sz[orglen + len] = 0;
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+		if (m_data) {
+			RAD_VERIFY(m_stackLen == 0);
+			m_data->Validate();
+		}
+#endif
 	}
 	return *this;
 }
@@ -645,6 +690,10 @@ String &String::Write(int pos, const char *sz, int len) {
 	if (m_data)
 		m_data = details::DataBlock::Isolate(m_data, *m_zone);
 	ncpy(const_cast<char*>(c_str.get()), sz, len);
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+	if (m_data)
+		m_data->Validate();
+#endif
 	return *this;
 }
 
