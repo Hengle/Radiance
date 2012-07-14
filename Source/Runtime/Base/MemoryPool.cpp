@@ -70,6 +70,7 @@ void MemoryPool::Create(
 	RAD_ASSERT(!m_inited);
 	RAD_ASSERT(inDataSize > 0);
 	RAD_ASSERT(alignment >= PoolAlignment);
+	BOOST_STATIC_ASSERT(MemoryPool::PoolAlignment >= DefaultAlignment);
 
 	m_inited = true;
 

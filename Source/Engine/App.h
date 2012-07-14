@@ -46,7 +46,7 @@ public:
 	
 	void ClearFrameHistory();
 
-#if defined(RAD_OPT_GOLDEN) || defined(RAD_OPT_IOS)
+#if defined(RAD_TARGET_GOLDEN) || defined(RAD_OPT_IOS)
 	RAD_DECLARE_READONLY_PROPERTY(App, game, Game*);
 #endif
 	RAD_DECLARE_READONLY_PROPERTY(App, engine, Engine*);
@@ -64,7 +64,7 @@ protected:
 	virtual void OnTick(float elapsed) {}
 	virtual void DoTickable(float elapsed);
 
-#if defined(RAD_OPT_GOLDEN) || defined(RAD_OPT_IOS)
+#if defined(RAD_TARGET_GOLDEN) || defined(RAD_OPT_IOS)
 	virtual RAD_DECLARE_GET(game, Game*) = 0;
 #endif
 	virtual RAD_DECLARE_GET(title, const char*) = 0;

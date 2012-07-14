@@ -192,92 +192,6 @@ private:
 #endif
 };
 
-template <typename T, typename Z>
-class zone_allocator
-{
-public:
-	typedef Z zone_type;
-	typedef T value_type;
-	typedef value_type *pointer;
-	typedef const value_type *const_pointer;
-	typedef value_type &reference;
-	typedef const value_type &const_reference;
-	typedef AddrSize size_type;
-	typedef SAddrSize difference_type;
-
-	template <typename U>
-	struct rebind { typedef zone_allocator<U, Z> other; };
-
-	zone_allocator() {}
-	// The following is not explicit, mimicking std::allocator [20.4.1]
-	template <typename U>
-	zone_allocator(const zone_allocator<U, Z> &) {}
-
-	static pointer address(reference r) { return &r; }
-	static const_pointer address(const_reference s) { return &s; }
-	static size_type max_size()	{ return (std::numeric_limits<size_type>::max)(); }
-	static void construct(const pointer ptr, const value_type & t) { new (ptr) T(t); }
-	static void destroy(const pointer ptr)
-	{
-		ptr->~T();
-		(void) ptr;
-	}
-
-	bool operator==(const zone_allocator &) const { return true; }
-	bool operator!=(const zone_allocator &) const { return false; }
-
-	static pointer allocate(const size_type n)
-	{
-		return (pointer)zone_type::Get().Realloc(0, n*sizeof(T), 0, DefaultZoneAlignment);
-	}
-
-	static pointer allocate(const size_type n, const void * const) { return allocate(n); }
-
-	static void deallocate(const pointer ptr, const size_type n)
-	{
-#ifdef BOOST_NO_PROPER_STL_DEALLOCATE
-		if (ptr == 0 || n == 0)
-			return;
-#endif
-		zone_type::Get().Delete(ptr);
-	}
-};
-
-template <typename Z>
-class zone_allocator<void, Z>
-{
-public:
-	typedef Z zone_type;
-	typedef void value_type;
-	typedef value_type *pointer;
-	typedef const value_type *const_pointer;
-
-	template <typename U>
-	struct rebind { typedef zone_allocator<U, Z> other; };
-};
-
-// Declare a zone
-// _type: the zone identifier, used with new: Class *p = new (_type) Class();
-#define RAD_ZONE_DEC(_api, _type) \
-	struct _api _type##_zone { \
-		typedef _type##_zone T; \
-		operator ::Zone &() const { return Get(); } \
-		static ::Zone &Get(); \
-	}; \
-	typedef _type##_zone _type##T; \
-	extern _api _type##T _type
-
-// Defines a zone
-// _type: the zone identifier
-// _name: the zone name
-// _parent: the zone parent
-#define RAD_ZONE_DEF(_api, _type, _name, _parent) \
-	_api _type##_zone _type; \
-	::Zone &_type##_zone::Get() { static ::Zone z(_parent, _name); return z; }
-
-RAD_ZONE_DEC(RADRT_API, ZUnknown);
-RAD_ZONE_DEC(RADRT_API, ZRuntime);
-
 AddrSize zone_malloc_size(void *p);
 
 void *zone_realloc(
@@ -327,6 +241,92 @@ void *safe_zone_calloc(
 );
 
 void zone_free(void *p);
+
+template <typename T, typename Z>
+class zone_allocator
+{
+public:
+	typedef Z zone_type;
+	typedef T value_type;
+	typedef value_type *pointer;
+	typedef const value_type *const_pointer;
+	typedef value_type &reference;
+	typedef const value_type &const_reference;
+	typedef AddrSize size_type;
+	typedef SAddrSize difference_type;
+
+	template <typename U>
+	struct rebind { typedef zone_allocator<U, Z> other; };
+
+	zone_allocator() {}
+	// The following is not explicit, mimicking std::allocator [20.4.1]
+	template <typename U>
+	zone_allocator(const zone_allocator<U, Z> &) {}
+
+	static pointer address(reference r) { return &r; }
+	static const_pointer address(const_reference s) { return &s; }
+	static size_type max_size()	{ return (std::numeric_limits<size_type>::max)(); }
+	static void construct(const pointer ptr, const value_type & t) { new (ptr) T(t); }
+	static void destroy(const pointer ptr)
+	{
+		ptr->~T();
+		(void) ptr;
+	}
+
+	bool operator==(const zone_allocator &) const { return true; }
+	bool operator!=(const zone_allocator &) const { return false; }
+
+	static pointer allocate(const size_type n)
+	{
+		return (pointer)safe_zone_malloc(zone_type::Get(), n*sizeof(T));
+	}
+
+	static pointer allocate(const size_type n, const void * const) { return allocate(n); }
+
+	static void deallocate(const pointer ptr, const size_type n)
+	{
+#ifdef BOOST_NO_PROPER_STL_DEALLOCATE
+		if (ptr == 0 || n == 0)
+			return;
+#endif
+		zone_free(ptr);
+	}
+};
+
+template <typename Z>
+class zone_allocator<void, Z>
+{
+public:
+	typedef Z zone_type;
+	typedef void value_type;
+	typedef value_type *pointer;
+	typedef const value_type *const_pointer;
+
+	template <typename U>
+	struct rebind { typedef zone_allocator<U, Z> other; };
+};
+
+// Declare a zone
+// _type: the zone identifier, used with new: Class *p = new (_type) Class();
+#define RAD_ZONE_DEC(_api, _type) \
+	struct _api _type##_zone { \
+		typedef _type##_zone T; \
+		operator ::Zone &() const { return Get(); } \
+		static ::Zone &Get(); \
+	}; \
+	typedef _type##_zone _type##T; \
+	extern _api _type##T _type
+
+// Defines a zone
+// _type: the zone identifier
+// _name: the zone name
+// _parent: the zone parent
+#define RAD_ZONE_DEF(_api, _type, _name, _parent) \
+	_api _type##_zone _type; \
+	::Zone &_type##_zone::Get() { static ::Zone z(_parent, _name); return z; }
+
+RAD_ZONE_DEC(RADRT_API, ZUnknown);
+RAD_ZONE_DEC(RADRT_API, ZRuntime);
 
 void *operator new(size_t s, Zone &zone) throw();
 void *operator new[](size_t s, Zone &zone) throw();

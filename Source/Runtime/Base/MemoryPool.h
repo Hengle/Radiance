@@ -76,7 +76,7 @@ private:
 	struct Pool;
 	struct PoolNode;
 
-	enum { PoolAlignment = sizeof(AddrSize) };
+	enum { PoolAlignment = DefaultAlignment };
 
 	struct PoolNode
 	{

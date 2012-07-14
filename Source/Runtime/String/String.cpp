@@ -10,6 +10,8 @@
 #include <iostream>
 #include "../PushSystemMacros.h"
 
+//#define DISABLE_POOLS
+
 namespace string {
 
 RAD_ZONE_DEF(RADRT_API, ZString, "Strings", ZRuntime);
@@ -149,6 +151,9 @@ void DataBlock::InitPools() {
 
 MemoryPool *DataBlock::PoolForSize(int size, int &poolIdx, Mutex::ScopedLock &L) {
 
+#if defined(DISABLE_POOLS)
+	return 0;
+#else
 	if (size > kMaxPoolSize)
 		return 0;
 
@@ -169,6 +174,7 @@ MemoryPool *DataBlock::PoolForSize(int size, int &poolIdx, Mutex::ScopedLock &L)
 
 	RAD_ASSERT(pool);
 	return pool;
+#endif
 }
 
 DataBlock::Ref DataBlock::New(
@@ -298,9 +304,12 @@ String::String(const String &s, const CopyTag_t&, ::Zone &zone) {
 String::String(const U16 *sz, int len, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
 	int numBytes = utf16to8len(sz, len);
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	if (numBytes+1 > kStackSize) { // +1 for null
+#endif
 		m_stackLen = 0;
 		m_data = details::DataBlock::New(sz, len, numBytes, zone);
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	} else if (numBytes) { // fits in stack bytes
 		utf16to8(m_stackBytes, sz, len);
 		m_stackBytes[numBytes] = 0;
@@ -308,14 +317,18 @@ String::String(const U16 *sz, int len, ::Zone &zone) : m_zone(&zone) {
  	} else {
 		m_stackLen = 0;
 	}
+#endif
 }
 
 inline String::String(const U32 *sz, int len, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
 	int numBytes = utf32to8len(sz, len);
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	if (numBytes+1 > kStackSize) { // +1 for null
+#endif
 		m_stackLen = 0;
 		m_data = details::DataBlock::New(sz, len, numBytes, zone);
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 	} else if (numBytes) { // fits in stack bytes
 		utf32to8(m_stackBytes, sz, len);
 		m_stackBytes[numBytes] = 0;
@@ -323,6 +336,7 @@ inline String::String(const U32 *sz, int len, ::Zone &zone) : m_zone(&zone) {
  	} else {
 		m_stackLen = 0;
 	}
+#endif
 }
 
 UTF16Buf String::ToUTF16() const {
@@ -331,15 +345,19 @@ UTF16Buf String::ToUTF16() const {
 
 	if (!empty) {
 		int len = utf8to16len(c_str, length + 1) * sizeof(U16);
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 		if (len > sizeof(U16)) {
 			if (len > UTF16Buf::kStackSize) {
+#endif
 				buf.m_data = details::DataBlock::New(kRefType_Copy, len, 0, 0, *m_zone);
 				utf8to16((U16*)buf.m_data->data.get(), c_str, length + 1);
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 			} else {
 				buf.m_stackLen = len;
 				utf8to16((U16*)buf.m_stackBytes, c_str, length + 1);
 			}
 		}
+#endif
 	}
 
 	return buf;
@@ -351,15 +369,19 @@ UTF32Buf String::ToUTF32() const {
 
 	if (!empty) {
 		int len = utf8to32len(c_str, length + 1) * sizeof(U32);
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 		if (len > sizeof(U32)) {
 			if (len > UTF32Buf::kStackSize) {
+#endif
 				buf.m_data = details::DataBlock::New(kRefType_Copy, len, 0, 0, *m_zone);
 				utf8to32((U32*)buf.m_data->data.get(), c_str, length + 1);
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 			} else {
 				buf.m_stackLen = len;
 				utf8to32((U32*)buf.m_stackBytes, c_str, length + 1);
 			}
 		}
+#endif
 	}
 
 	return buf;
@@ -399,7 +421,10 @@ String &String::Reverse() {
 }
 
 String String::SubStr(int first, int count) const {
-	if (!empty) {
+	RAD_VERIFY(first >= 0);
+	RAD_VERIFY(count >= 0);
+
+	if (!empty && count > 0) {
 		first = ByteForChar(first);
 		if (first >= 0) {
 			const char *sz = c_str.get() + first;
@@ -422,6 +447,8 @@ String String::SubStr(int first, int count) const {
 }
 
 int String::CharForByte(int pos) const {
+	RAD_VERIFY(pos >= 0);
+
 	if (pos >= length)
 		return -1;
 
@@ -440,6 +467,8 @@ int String::CharForByte(int pos) const {
 }
 
 int String::ByteForChar(int idx) const {
+	RAD_VERIFY(idx >= 0);
+
 	const char *start = c_str.get();
 	const char *end = start + length;
 	const char *sz = start;
@@ -456,6 +485,9 @@ int String::ByteForChar(int idx) const {
 }
 
 String &String::Erase(int ofs, int count) {
+	RAD_VERIFY(ofs >= 0);
+	RAD_VERIFY(count >= 0);
+
 	int nc = numChars;
 	if (ofs >= nc)
 		return *this;
@@ -475,6 +507,9 @@ String &String::Erase(int ofs, int count) {
 }
 
 String &String::EraseBytes(int ofs, int count) {
+	RAD_VERIFY(ofs >= 0);
+	RAD_VERIFY(count >= 0);
+
 	int nc = length;
 	if (ofs >= nc)
 		return *this;
@@ -494,7 +529,9 @@ String &String::EraseBytes(int ofs, int count) {
 }
 
 String &String::NAppendBytes(const String &str, int len) {
-	RAD_ASSERT(len <= str.length);
+	RAD_VERIFY(len >= 0);
+	RAD_VERIFY(len <= str.length);
+
 	if (len) {
 		int orglen = length;
 		int newLen = orglen + len;
@@ -507,7 +544,9 @@ String &String::NAppendBytes(const String &str, int len) {
 		} else {
 			// this string is in stackBytes.
 			RAD_ASSERT((orglen == 0) || (m_stackLen == orglen + 1));
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 			if (newLen+1 > kStackSize) { // need to move into m_data
+#endif
 				m_data = details::DataBlock::New(
 					kRefType_Copy, 
 					newLen + 1, 
@@ -517,11 +556,13 @@ String &String::NAppendBytes(const String &str, int len) {
 				);
 				m_stackLen = 0;
 				sz = (char*)m_data->m_buf;
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 			} else {
 				// still fits on stack
 				sz = m_stackBytes;
 				m_stackLen = newLen + 1;
 			}
+#endif
 		}
 
 		memcpy(sz + orglen, str.c_str.get(), len);
@@ -544,6 +585,8 @@ String &String::Replace(const String &src, const String &dst) {
 		r = s.SubStr(c);
 
 		s = l + dst + r;
+
+		RAD_VERIFY(src != dst);
 	}
 
 	*this = s;

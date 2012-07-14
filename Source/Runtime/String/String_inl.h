@@ -69,7 +69,9 @@ template <typename Traits>
 inline int CharBuf<Traits>::RAD_IMPLEMENT_GET(size) {
 	if (m_data)
 		return m_data->size - sizeof(T);
-	return (int)m_stackLen - sizeof(T);
+	if (m_stackLen)
+		return (int)m_stackLen - sizeof(T);
+	return 0;
 }
 
 template <typename Traits>
@@ -274,14 +276,18 @@ inline String::String(const std::wstring &str, ::Zone &zone) : m_zone(&zone) {
 
 inline String::String(int len, ::Zone &zone) : m_zone(&zone) {
 	if (len>0) {
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 		if (len > kStackSize) {
+#endif
 			m_stackLen = 0;
 			m_data = details::DataBlock::New(kRefType_Copy, len, 0, 0, zone);
 			reinterpret_cast<char*>(m_data->m_buf)[len-1] = 0;
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 		} else {
 			m_stackLen = (U8)len;
 			m_stackBytes[len-1] = 0;
 		}
+#endif
 	} else {
 		m_stackLen = 0;
 	}

@@ -331,7 +331,8 @@ bool Thread::Run(thread::IThreadContext *context)
 		::ResetEvent(m_exitEvent);
 		m_context = context;
 		m_thread = ::CreateThread(0, m_stackSize, Thread::ThreadProc, this, 0, (DWORD*)&m_id);
-		if (m_thread) { SetPriority(m_priorityClass); }
+		if (m_thread)
+			SetPriority(m_priorityClass);
 	}
 	bool s = m_thread != 0;
 	::LeaveCriticalSection(&m_cs);
@@ -398,6 +399,7 @@ DWORD WINAPI Thread::ThreadProc(void* parm)
 	Thread *self = reinterpret_cast<thread::details::Thread*>(parm);
 	s_curContext.reset(self->m_context);
 	thread::Thread* thread = RAD_CLASS_FROM_MEMBER(thread::Thread, m_imp, self);
+	RAD_VERIFY(thread->m_imp.m_thread);
 	SetThreadAffinityMask(thread->m_imp.m_thread, static_cast<ThreadContext*>(self->m_context)->m_mask);
 
 	int ret = thread->ThreadProc();
