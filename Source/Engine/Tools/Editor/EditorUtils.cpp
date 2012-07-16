@@ -25,7 +25,6 @@ namespace editor {
 void PostInputEvent(QWheelEvent *event, Game &game)
 {
 	InputEvent i;
-	i.touch = 0;
 	i.type = InputEvent::T_MouseWheel;
 	i.time = xtime::ReadMilliseconds();
 	i.data[0] = event->x();
@@ -37,7 +36,6 @@ void PostInputEvent(QWheelEvent *event, Game &game)
 void PostInputEvent(QMouseEvent *event, Game &game, bool press, bool move)
 {
 	InputEvent i;
-	i.touch = 0;
 	i.type = move ? InputEvent::T_MouseMove : press ? InputEvent::T_MouseDown : InputEvent::T_MouseUp;
 	i.time = xtime::ReadMilliseconds();
 	i.data[0] = event->x();
@@ -61,7 +59,7 @@ void PostInputEvent(QMouseEvent *event, Game &game, bool press, bool move)
 
 void PostInputEvent(QKeyEvent *event, Game &game, bool press)
 {
-	if (event->count() != 1 || event->isAutoRepeat())
+	if (event->count() > 1)
 		return;
 
 	int key = 0;
@@ -394,7 +392,7 @@ void PostInputEvent(QKeyEvent *event, Game &game, bool press)
 	}
 
 	InputEvent i;
-	i.touch = 0;
+	i.repeat = event->isAutoRepeat();
 	i.type = press ? InputEvent::T_KeyDown : InputEvent::T_KeyUp;
 	i.time = xtime::ReadMilliseconds();
 	i.data[0] = key;

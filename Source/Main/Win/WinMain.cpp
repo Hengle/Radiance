@@ -39,7 +39,14 @@ void SpawnSelf() {
 	::_spawnl(_P_DETACH, str, str, NULL);
 }
 }
-
+#else
+int NativeWinMain(
+	HINSTANCE hInstance, 
+	HINSTANCE hPrevInstance, 
+	int argc,
+	const char **argv,
+	int nCmdShow
+);
 #endif
 
 namespace {
@@ -119,5 +126,7 @@ int APIENTRY WinMain(
 
 #if defined(RAD_OPT_PC_TOOLS)
 	return QtAppMain(args.argc, args.argv);
+#else
+	return NativeWinMain(hInstance, hPrevInstance, args.argc, args.argv, nCmdShow);
 #endif
 }

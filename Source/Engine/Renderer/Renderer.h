@@ -51,6 +51,16 @@ public:
 		return Div(16, 10); 
 	}
 
+	bool SameAspect(const r::VidMode &v) const {
+		if (Is4x3())
+			return v.Is4x3();
+		if (Is16x9())
+			return v.Is16x9();
+		if (Is16x10())
+			return v.Is16x10();
+		return true; // unrecognizable.
+	}
+
 private:
 
 	bool Div(int x, int y) const;

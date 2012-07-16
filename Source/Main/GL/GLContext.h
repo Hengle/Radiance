@@ -11,6 +11,19 @@
 #include "../NativeDeviceContext.h"
 
 struct GLPixelFormat {
+
+	GLPixelFormat() :
+	red(0),
+	green(0),
+	blue(0),
+	alpha(0),
+	depth(0),
+	stencil(0),
+	mSamples(0),
+	doubleBuffer(false)
+	{
+	}
+
 	int red;
 	int green;
 	int blue;
@@ -18,7 +31,7 @@ struct GLPixelFormat {
 	int depth;
 	int stencil;
 	int mSamples;
-	bool doublebuffer;
+	bool doubleBuffer;
 };
 
 class GLDeviceContext : public NativeDeviceContext {

@@ -197,6 +197,8 @@ void GLTable::Reset()
 	ARB_vertex_array_object = false;
 	EXT_framebuffer_object = false;
 	EXT_framebuffer_multisample = false;
+	EXT_texture_filter_anisotropic = false;
+	maxAnisotropy = 0;
 	EXT_swap_control = false;
 	ARB_shader_objects = false;
 	ARB_vertex_shader = false;
@@ -505,6 +507,11 @@ void GLTable::Load()
 	CHECK(EXT_texture_compression_s3tc);
 	CHECK(SGIS_generate_mipmap);
 	CHECK(ARB_texture_non_power_of_two);
+	CHECK(EXT_texture_filter_anisotropic);
+
+	maxAnisotropy = 0;
+	if (EXT_texture_filter_anisotropic)
+		glGetIntegerv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy);
 
 	maxTextures = 1;
 	BEGIN(ARB_multitexture)

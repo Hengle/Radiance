@@ -210,6 +210,9 @@ struct RADENG_CLASS GLTable
 	
 	bool EXT_framebuffer_multisample;
 	PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC RenderbufferStorageMultisampleEXT;
+
+	bool EXT_texture_filter_anisotropic;
+	int maxAnisotropy;
 	
 	bool EXT_swap_control;
 	int (APIENTRYP SetSwapInterval) (int i);

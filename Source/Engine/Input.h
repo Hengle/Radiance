@@ -63,13 +63,14 @@ struct InputEvent
 		T_Invalid
 	};
 
-	InputEvent() : touch(0), delay(0), type(T_Invalid), gesture(false) {}
+	InputEvent() : touch(0), delay(0), type(T_Invalid), gesture(false), repeat(false) {}
 	InputEvent(const InputEvent &e) : 
 	touch(e.touch),
 	type(e.type),
 	time(e.time),
 	delay(e.delay),
-	gesture(e.gesture)
+	gesture(e.gesture),
+	repeat(e.repeat)
 	{
 		data[0] = e.data[0];
 		data[1] = e.data[1];
@@ -78,6 +79,7 @@ struct InputEvent
 
 	void *touch;
 	bool gesture;
+	bool repeat;
 	Type type;
 	xtime::TimeVal time;
 	xtime::TimeVal delay;

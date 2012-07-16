@@ -642,6 +642,7 @@
     <ClInclude Include="..\..\Runtime\Base\Assert.h" />
     <ClInclude Include="..\..\Runtime\Base\Base.h" />
     <ClInclude Include="..\..\Runtime\Base\CPUCount.h" />
+    <ClInclude Include="..\..\Runtime\Base\EnumFlags.h" />
     <ClInclude Include="..\..\Runtime\Base\Event.h" />
     <ClInclude Include="..\..\Runtime\Base\EventDetails.h" />
     <ClInclude Include="..\..\Runtime\Base\Macros.h" />

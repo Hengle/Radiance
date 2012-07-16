@@ -85,6 +85,8 @@ App::~App() {
 }
 
 bool App::PreInit() {
+	if (!NativeApp::PreInit())
+		return false;
 	if (!engine->PreInit())
 		return false;
 	m_langId = LoadLangId(0, systemLangId);
@@ -164,11 +166,12 @@ StringTable::LangId App::LoadLangId(int *enabledLangMask, StringTable::LangId de
 }
 
 bool App::Initialize() {
-	return engine->Initialize();
+	return NativeApp::Initialize() && engine->Initialize();
 }
 
 void App::Finalize() {
 	engine->Finalize();
+	NativeApp::Finalize();
 }
 
 float App::Tick() {

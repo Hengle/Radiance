@@ -15,6 +15,7 @@
 #include <Engine/App.h>
 #include <Engine/Engine.h>
 #include <Engine/Zones.h>
+#include <Runtime/File.h>
 #include <Engine/Renderer/PC/RBackend.h>
 
 #undef qApp

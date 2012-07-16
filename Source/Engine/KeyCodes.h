@@ -4,7 +4,9 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
-enum KeyCodes {
+#pragma once
+
+enum KeyCode {
 	kKeyCode_None        = 0,
 	kKeyCode_Backspace   = 8,
 	kKeyCode_Tab         = 9,
@@ -95,7 +97,7 @@ enum KeyCodes {
 	kKeyCode_KP7        = 263,
 	kKeyCode_KP8        = 264,
 	kKeyCode_KP9        = 265,
-	kKeyCode_KP_Perdiod = 266,
+	kKeyCode_KP_Period  = 266,
 	kKeyCode_KP_Divide  = 267,
 	kKeyCode_KP_Multiply = 268,
 	kKeyCode_KP_Minus   = 269,
@@ -138,13 +140,11 @@ enum KeyCodes {
 	kKeyCode_LCtrl      = 306,
 	kKeyCode_RAlt       = 307,
 	kKeyCode_LAlt       = 308,
-	kKeyCode_RMeta      = 309,
-	kKeyCode_LMeta      = 310,
 	kKeyCode_LCommand   = 311,
 	kKeyCode_RCommand   = 312,
 		
 	kKeyCode_Help       = 315,
-	kKeyCode_Print      = 316,
+	kKeyCode_PrintScreen = 316,
 	kKeyCode_SysReq     = 317,
 	kKeyCode_Break      = 318,
 	kKeyCode_Menu       = 319,
@@ -157,7 +157,5 @@ enum MouseButtons {
 	kMouseButton_Right = 4,
 	kMouseButton_Mouse4 = 8,
 	kMouseButton_Mouse5 = 16,
-	kMouseButton_WheelUp = 32,
-	kMouseButton_WheelDown = 64,
 	kMouseButton_NumButtons = 5
 };

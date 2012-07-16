@@ -4,6 +4,7 @@
     <Import Project="EngineDebug.props" />
     <Import Project="EngineShip.props" />
     <Import Project="LinkEngineShipDebug_x32.props" />
+    <Import Project="LinkAdditionalWindowsLibs.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />

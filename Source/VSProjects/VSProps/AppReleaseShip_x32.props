@@ -3,6 +3,7 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="LinkOpenALSoft_x32.props" />
     <Import Project="CopyEngineShipReleaseDLLs_x32.props" />
+    <Import Project="LinkAdditionalWindowsLibs.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />

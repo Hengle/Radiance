@@ -11,6 +11,7 @@
 #include "Opts.h"
 #include "Macros.h"
 #include "Assert.h"
+#include "EnumFlags.h"
 #include "Property.h"
 #include "Zone.h"
 #include "Types.h"

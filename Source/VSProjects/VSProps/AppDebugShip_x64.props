@@ -4,6 +4,7 @@
     <Import Project="LinkOpenALSoft_x64.props" />
     <Import Project="LinkVisualLeakDetector_x64.props" />
     <Import Project="CopyEngineShipDebugDLLs_x64.props" />
+    <Import Project="LinkAdditionalWindowsLibs.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />

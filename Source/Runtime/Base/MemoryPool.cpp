@@ -22,6 +22,9 @@ m_poolList(0),
 m_freeList(0), 
 m_numUsedObjects(0), 
 m_numAllocatedObjects(0)
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+, m_concurrencyCheck(0)
+#endif
 {
 	string::ncpy(m_name, "uninited", MaxNameLen+1);
 	m_inited = false;
@@ -40,6 +43,9 @@ m_poolList(0),
 m_freeList(0), 
 m_numUsedObjects(0), 
 m_numAllocatedObjects(0)
+#if defined(RAD_OPT_MEMPOOL_DEBUG)
+, m_concurrencyCheck(0)
+#endif
 {
 	m_inited = false;
 

@@ -30,6 +30,9 @@
     <ClCompile Include="..\..\..\..\..\CrowIOS\Radiance\Source\Main\null_CloudStorage.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Main\Win\WinKeys.cpp">
+      <Filter>Source\Win</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Main\NativeApp.h">
@@ -64,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Main\NativeApp_inl.h">
       <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Main\Win\WinKeys.h">
+      <Filter>Source\Win</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
