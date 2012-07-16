@@ -113,6 +113,9 @@ void Engine::Finalize()
 	m_comTable.components->ReleaseCachedComponents();
 	m_comTable.packages.reset();
 
+	if (m_comTable.r)
+		m_comTable.r->ctx = r::HContext();
+
 	m_comTable.r.Close();
 	m_comTable.paks.Close();
 	m_comTable.files.Close();

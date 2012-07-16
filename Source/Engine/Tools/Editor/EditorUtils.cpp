@@ -90,9 +90,6 @@ void PostInputEvent(QKeyEvent *event, Game &game, bool press)
 	case Qt::Key_Pause:
 		key = kKeyCode_Pause;
 		break;
-	case Qt::Key_Print:
-		key = kKeyCode_Print;
-		break;
 	case Qt::Key_SysReq:
 		key = kKeyCode_SysReq;
 		break;
@@ -128,9 +125,6 @@ void PostInputEvent(QKeyEvent *event, Game &game, bool press)
 		break;
 	case Qt::Key_Control:
 		key = kKeyCode_LCtrl;
-		break;
-	case Qt::Key_Meta:
-		key = kKeyCode_LMeta;
 		break;
 	case Qt::Key_Alt:
 		key = kKeyCode_LAlt;

@@ -25,11 +25,13 @@ m_pm(ref)
 
 inline Binding::~Binding()
 {
+#if 0 // this isn't a useful feature and doesn't shut-down properly anyway.
 	PackageMan::Ref ref = m_pm.lock();
 	if (ref)
 	{
 		ref->Unbind(this);
 	}
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

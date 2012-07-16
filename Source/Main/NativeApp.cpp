@@ -144,7 +144,10 @@ bool DisplayDevice::MatchVidMode(
 	if (bestY == std::numeric_limits<size_t>::max())
 		return false;
 
+	bool fullscreen = mode.fullscreen;
 	mode = list[bestY];
+	mode.fullscreen = fullscreen;
+
 	return true;
 }
 

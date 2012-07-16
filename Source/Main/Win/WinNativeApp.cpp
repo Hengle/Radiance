@@ -21,25 +21,22 @@
 #include <Runtime/Runtime.h>
 #include <ShellAPI.h>
 #include "../../../../Source/VSProjects/VS10/resource.h"
+#include <tchar.h>
 
-#if defined(RAD_OPT_GL) && !defined(RAD_OPT_PC_TOOLS)
+#if defined(RAD_OPT_GL)
 #include <Engine/Renderer/GL/GLTable.h>
 #include <Engine/Renderer/PC/wglext.h>
 #endif
 
-#include "WinKeys.h"
-
 #if !defined(RAD_OPT_PC_TOOLS)
+#include "WinKeys.h"
+#endif
+
 namespace {
 enum {
 	kRequiredDMFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT,
 	kMaxMultiSample = 32
 };
-
-HDC s_hDC=0;
-HWND s_hWnd=0;
-HINSTANCE s_hInstance=0;
-
 r::VidMode VidModeFromDevMode(const DEVMODEA &dm) {
 	RAD_ASSERT((dm.dmFields&kRequiredDMFields) == kRequiredDMFields);
 	r::VidMode m;
@@ -59,6 +56,15 @@ r::VidMode VidModeFromDevMode(const DEVMODEA &dm) {
 }
 }
 
+#if !defined(RAD_OPT_PC_TOOLS)
+
+namespace {
+
+HDC s_hDC=0;
+HWND s_hWnd=0;
+HINSTANCE s_hInstance=0;
+}
+
 bool ConfigureWindow(
 	int width,
 	int height,
@@ -66,6 +72,10 @@ bool ConfigureWindow(
 	int screenWidth,
 	int screenHeight
 );
+#else
+namespace {
+HINSTANCE s_hInstance=0;
+}
 
 #endif
 
@@ -98,13 +108,13 @@ bool NativeApp::PreInit() {
 		clex.style = CS_OWNDC;
 		clex.lpfnWndProc = DefWindowProc;
 		clex.hInstance = s_hInstance;
-		clex.lpszClassName = "openGL_ini";
+		clex.lpszClassName = "rad_openGL_ini";
 
 		RegisterClassExA(&clex);
 	}
 
 	HWND wglWnd = CreateWindowA(
-		"openGL_ini", 
+		"rad_openGL_ini", 
 		"", 
 		WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
 		0,
@@ -298,7 +308,7 @@ bool NativeApp::PreInit() {
 
 #if defined(RAD_OPT_GL)
 		HWND hWnd = CreateWindowA(
-			"openGL_ini", 
+			"rad_openGL_ini", 
 			"", 
 			WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
 			dm.dmPosition.x,
@@ -456,8 +466,10 @@ bool NativeApp::BindDisplayDevice(const ::DisplayDeviceRef &display, const r::Vi
 			dm.dmDisplayFrequency = mode.hz;
 		}
 
-		if (!ChangeDisplaySettingsA(&dm, 0))
+		if (ChangeDisplaySettingsA(&dm, 0) != DISP_CHANGE_SUCCESSFUL) {
+			ChangeDisplaySettings(0, 0);
 			return false;
+		}
 
 		screenWidth = mode.w;
 		screenHeight = mode.h;
@@ -466,6 +478,7 @@ bool NativeApp::BindDisplayDevice(const ::DisplayDeviceRef &display, const r::Vi
 		screenHeight = display->m_imp.m_defMode.h;
 	}
 
+#if !defined(RAD_OPT_PC_TOOLS)
 	ConfigureWindow(
 		mode.w,
 		mode.h,
@@ -476,6 +489,7 @@ bool NativeApp::BindDisplayDevice(const ::DisplayDeviceRef &display, const r::Vi
 
 	ShowWindow(s_hWnd, SW_SHOW);
 	UpdateWindow(s_hWnd);
+#endif
 
 	display->m_imp.m_curMode = mode;
 	m_activeDisplay = display;
@@ -485,7 +499,8 @@ bool NativeApp::BindDisplayDevice(const ::DisplayDeviceRef &display, const r::Vi
 
 void NativeApp::ResetDisplayDevice() {
 	if (m_activeDisplay) {
-		ChangeDisplaySettings(0, 0);
+		if (m_activeDisplay->curVidMode->fullscreen)
+			ChangeDisplaySettings(0, 0);
 		m_activeDisplay->m_imp.m_curMode = m_activeDisplay->m_imp.m_defMode;
 		m_activeDisplay.reset();
 	}
@@ -529,7 +544,7 @@ GLDeviceContext::Ref NativeApp::CreateOpenGLContext(const GLPixelFormat &pf) {
 		s_hDC = GetDC(s_hWnd);
 
 	HWND wglWnd = CreateWindowA(
-		"openGL_ini", 
+		"rad_openGL_ini", 
 		"", 
 		WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
 		0,
@@ -744,9 +759,15 @@ StringTable::LangId NativeApp::RAD_IMPLEMENT_GET(systemLangId) {
 
 } // details
 
-#if !defined(RAD_OPT_PC_TOOLS)
+#if defined(RAD_OPT_PC_TOOLS)
 
-ATOM MyRegisterClass(HINSTANCE hInstance, const char *className);
+void SetNativeWinInstance(HINSTANCE hInstance) {
+	s_hInstance = hInstance;
+}
+
+#else
+
+ATOM MyRegisterClass(HINSTANCE hInstance);
 LRESULT CALLBACK MyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 bool ConfigureWindow(
@@ -756,12 +777,12 @@ bool ConfigureWindow(
 	int screenWidth,
 	int screenHeight
 ) {
-	DWORD style = WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
+	DWORD style = WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
 	int x = 0;
 	int y = 0;
 
 	if (!fullscreen) {
-		style |= WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX;
+		style = WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
 
 		RECT rect;
 		rect.left = 0;
@@ -771,8 +792,8 @@ bool ConfigureWindow(
 
 		AdjustWindowRect(&rect,	style, false);
 
-		width = (int)rect.right;
-		height = (int)rect.bottom;
+		width = (int)(rect.right - rect.left);
+		height = (int)(rect.bottom - rect.top);
 
 		// center the window
 		x = (screenWidth - width) / 2;
@@ -782,9 +803,9 @@ bool ConfigureWindow(
 	App *app = App::Get();
 
 	if (!s_hWnd) {
-		s_hWnd = CreateWindowA(
-			app->title, 
-			app->title,
+		s_hWnd = CreateWindow(
+			_T("rad_game_win"), 
+			CStr(app->title.get()).ToWChar().c_str,
 			style,
 			x,
 			y,
@@ -800,12 +821,14 @@ bool ConfigureWindow(
 	}
 
 	// adjust existing window style.
-	SetWindowLongPtrA(s_hWnd, GWL_STYLE, (LONG_PTR)style);
+	SetWindowLongPtr(s_hWnd, GWL_STYLE, (LONG_PTR)style);
 	SetWindowPos(s_hWnd, 0, x, y, width, height, SWP_FRAMECHANGED|SWP_SHOWWINDOW);
 	return true;
 }
 
 int NativeWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, int argc, const char **argv, int nCmdShow) {
+
+	ChangeDisplaySettings(0, 0);
 
 	s_hInstance = hInstance;
 
@@ -823,7 +846,7 @@ int NativeWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, int argc, const 
 
 	App *app = App::Get();
 
-	MyRegisterClass(hInstance, app->title);
+	MyRegisterClass(hInstance);
 
 	if (!app->PreInit()) {
 		app->ResetDisplayDevice();
@@ -831,7 +854,7 @@ int NativeWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, int argc, const 
 		return 1;
 	}
 
-	// after pre-init was called, we have to have set a video mode and created a window.
+	// after pre-init was called, we must have set a video mode and created a window.
 	if (!s_hWnd) {
 		COut(C_Error) << "Windowing system was not initialized (Developer note your custom PreInit method must call BindDisplayDevice() before returning!" << std::endl;
 		MessageBoxA(0, "Windowing system was not initialized! See log.txt for details.", "Error", MB_OK);
@@ -879,21 +902,17 @@ int NativeWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, int argc, const 
 	ReleaseDC(s_hWnd, s_hDC);
 	DestroyWindow(s_hWnd);
 
-	while (GetMessage(&m, NULL, 0, 0)) {
-		DispatchMessage(&m);
-	}
-
 	App::DestroyInstance();
 	
 	rt::Finalize();
 	return 0;
 }
 
-ATOM MyRegisterClass(HINSTANCE hInstance, const char *className) {
-	WNDCLASSEXA clex;
-	memset(&clex, 0, sizeof(WNDCLASSEXA));
+ATOM MyRegisterClass(HINSTANCE hInstance) {
+	WNDCLASSEX clex;
+	memset(&clex, 0, sizeof(WNDCLASSEX));
 
-	clex.cbSize = sizeof(WNDCLASSEXA);
+	clex.cbSize = sizeof(WNDCLASSEX);
 	clex.style = CS_DBLCLKS | CS_OWNDC;
 	clex.lpfnWndProc = MyWndProc;
 	clex.hInstance = hInstance;
@@ -901,9 +920,9 @@ ATOM MyRegisterClass(HINSTANCE hInstance, const char *className) {
 	clex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_APPICON));
 	clex.hIconSm = LoadIcon(clex.hInstance, MAKEINTRESOURCE(IDI_SMALLICON));
 	clex.hCursor = LoadCursor(NULL, IDC_ARROW);
-	clex.lpszClassName = className;
+	clex.lpszClassName = _T("rad_game_win");
 
-	return RegisterClassExA(&clex);
+	return RegisterClassEx(&clex);
 }
 
 LRESULT CALLBACK MyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {

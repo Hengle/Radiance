@@ -39,6 +39,7 @@ void SpawnSelf() {
 	::_spawnl(_P_DETACH, str, str, NULL);
 }
 }
+void SetNativeWinInstance(HINSTANCE hInstance);
 #else
 int NativeWinMain(
 	HINSTANCE hInstance, 
@@ -125,6 +126,7 @@ int APIENTRY WinMain(
 	Argcv args(lpCmdLine);
 
 #if defined(RAD_OPT_PC_TOOLS)
+	SetNativeWinInstance(hInstance);
 	return QtAppMain(args.argc, args.argv);
 #else
 	return NativeWinMain(hInstance, hPrevInstance, args.argc, args.argv, nCmdShow);
