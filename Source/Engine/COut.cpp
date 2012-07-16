@@ -37,7 +37,7 @@ protected:
 		tools::editor::CookerDialog::SPrint(str.c_str());
 		bool dialog = tools::editor::LogWindow::SPrint(m_level, str.c_str());
 #endif
-#if defined(RAD_OPT_SHIP) || defined(RAD_OPT_ADHOC)
+#if !defined(RAD_OPT_DEBUG) && (defined(RAD_OPT_SHIP) || defined(RAD_OPT_ADHOC))
 		if (m_level != C_Debug)
 #endif
 		Log() << str.c_str() << std::flush;

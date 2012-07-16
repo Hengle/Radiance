@@ -77,6 +77,12 @@ void RBackend::VidReset() {
 }
 
 bool RBackend::VidBind() {
+	glClearColor(0, 0, 0, 0);
+	glClear(GL_COLOR_BUFFER_BIT);
+	SwapBuffers();
+	glClear(GL_COLOR_BUFFER_BIT);
+	SwapBuffers();
+
 	COut(C_Info) << "VidBind()..." << std::endl;
 	COut(C_Info) << "Vendor: " << glGetString(GL_VENDOR) << std::endl <<
 		"Renderer: " << glGetString(GL_RENDERER) << std::endl <<

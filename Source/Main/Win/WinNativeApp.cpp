@@ -916,7 +916,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 	clex.style = CS_DBLCLKS | CS_OWNDC;
 	clex.lpfnWndProc = MyWndProc;
 	clex.hInstance = hInstance;
-	clex.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH);
+	clex.hbrBackground = (HBRUSH)NULL_BRUSH;
 	clex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_APPICON));
 	clex.hIconSm = LoadIcon(clex.hInstance, MAKEINTRESOURCE(IDI_SMALLICON));
 	clex.hCursor = LoadCursor(NULL, IDC_ARROW);

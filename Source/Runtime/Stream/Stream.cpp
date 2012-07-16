@@ -21,7 +21,7 @@ bool InputStream::Read(string::String *str, UReg *errorCode) {
 }
 
 bool OutputStream::Write(const string::String &str, UReg *errorCode) {
-	SPos l = (SPos)str.length.get();
+	SPos l = (SPos)str.length.get() + 1;
 	if (!Write((U32)l))
 		return false;
 	return Write(str.c_str.get(), l, errorCode) == l;
