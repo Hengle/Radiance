@@ -963,8 +963,10 @@ void Sound::RAD_IMPLEMENT_SET(sourceRelative)(bool value)
 				value ? AL_TRUE : AL_FALSE
 			);
 			
-			if (!value) // force muted until we tick
+			if (!value) { // force muted until we tick
 				m_alDriver->Sourcef(ALDRIVER_SIG source.source, AL_GAIN, 0.f);
+				m_volume[3] = 0.f;
+			}
 		}
 	}
 }
