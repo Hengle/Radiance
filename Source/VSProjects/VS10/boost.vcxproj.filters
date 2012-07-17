@@ -6,13 +6,25 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Extern\boost-1.4.9\libs\thread\src\win32\thread.cpp">
+    <ClCompile Include="..\..\..\..\Extern\boost-1.50.0\libs\thread\src\win32\thread.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\boost-1.4.9\libs\thread\src\win32\tss_dll.cpp">
+    <ClCompile Include="..\..\..\..\Extern\boost-1.50.0\libs\thread\src\win32\tss_dll.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\boost-1.4.9\libs\thread\src\win32\tss_pe.cpp">
+    <ClCompile Include="..\..\..\..\Extern\boost-1.50.0\libs\thread\src\win32\tss_pe.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\boost-1.50.0\libs\system\src\error_code.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\boost-1.50.0\libs\chrono\src\chrono.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\boost-1.50.0\libs\chrono\src\process_cpu_clocks.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\boost-1.50.0\libs\chrono\src\thread_clock.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

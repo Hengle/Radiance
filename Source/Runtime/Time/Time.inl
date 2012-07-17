@@ -10,14 +10,14 @@ namespace xtime {
 inline TimeVal ReadMilliseconds()
 {
 	boost::xtime t;
-	boost::xtime_get(&t, boost::TIME_UTC);
+	boost::xtime_get(&t, boost::TIME_UTC_);
 	return (TimeVal)(Constants<boost::xtime::xtime_sec_t>::SecondsToMilli(t.sec) + t.nsec / (1000*1000));
 }
 
 inline TimeVal ReadMicroseconds()
 {
 	boost::xtime t;
-	boost::xtime_get(&t, boost::TIME_UTC);
+	boost::xtime_get(&t, boost::TIME_UTC_);
 	return (TimeVal)(Constants<boost::xtime::xtime_sec_t>::SecondsToMicro(t.sec) + t.nsec / 1000);
 }
 
@@ -29,7 +29,7 @@ inline float ReadSeconds()
 inline boost::xtime xtime_now()
 {
 	boost::xtime t;
-	boost::xtime_get(&t, boost::TIME_UTC);
+	boost::xtime_get(&t, boost::TIME_UTC_);
 	return t;
 }
 
