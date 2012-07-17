@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <OPENAL_PATH>$(EXTERN_PATH)\OpenALSoft-1.1.4</OPENAL_PATH>
+    <OPENAL_PATH>$(EXTERN_PATH)\OpenALSoft-1.14</OPENAL_PATH>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup>
