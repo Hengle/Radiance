@@ -5,10 +5,10 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <PostBuildEvent>
-      <Command>xcopy "$(VLD_PATH)\Win64\dbghelp.dll" "$(OutDir)" /D
-xcopy "$(VLD_PATH)\Win64\Microsoft.DTfW.DHL.manifest" "$(OutDir)" /D
-xcopy "$(VLD_PATH)\Win64\vld_x64.dll" "$(OutDir)" /D
-xcopy "$(OPENAL_PATH)\Win64\OpenAL64.dll" "$(OutDir)" /D</Command>
+      <Command>xcopy "$(VLD_PATH)\Win64\dbghelp.dll" "$(OutDir)" /D /Y
+xcopy "$(VLD_PATH)\Win64\Microsoft.DTfW.DHL.manifest" "$(OutDir)" /D /Y
+xcopy "$(VLD_PATH)\Win64\vld_x64.dll" "$(OutDir)" /D /Y
+xcopy "$(OPENAL_PATH)\Win64\OpenAL64.dll" "$(OutDir)" /D /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup />

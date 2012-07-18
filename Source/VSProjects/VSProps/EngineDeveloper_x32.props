@@ -9,7 +9,7 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>RAD_OPT_PC;RAD_OPT_GL;RAD_OPT_TOOLS;RAD_OPT_PC_TOOLS;RAD_OVERLOAD_STD_NEW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RAD_OPT_PC;RAD_OPT_GL;RAD_OPT_TOOLS;RAD_OPT_PC_TOOLS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

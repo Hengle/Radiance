@@ -6,49 +6,49 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.3\ZLib\adler32.c">
+    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.7\ZLib\gzclose.c">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.3\ZLib\compress.c">
+    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.7\ZLib\gzlib.c">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.3\ZLib\crc32.c">
+    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.7\ZLib\gzread.c">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.3\ZLib\deflate.c">
+    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.7\ZLib\gzwrite.c">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.3\ZLib\gzclose.c">
+    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.7\ZLib\infback.c">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.3\ZLib\gzlib.c">
+    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.7\ZLib\inffast.c">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.3\ZLib\gzread.c">
+    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.7\ZLib\inflate.c">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.3\ZLib\gzwrite.c">
+    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.7\ZLib\inftrees.c">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.3\ZLib\infback.c">
+    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.7\ZLib\trees.c">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.3\ZLib\inffast.c">
+    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.7\ZLib\uncompr.c">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.3\ZLib\inflate.c">
+    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.7\ZLib\zutil.c">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.3\ZLib\inftrees.c">
+    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.7\ZLib\adler32.c">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.3\ZLib\uncompr.c">
+    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.7\ZLib\compress.c">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.3\ZLib\zutil.c">
+    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.7\ZLib\crc32.c">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.3\ZLib\trees.c">
+    <ClCompile Include="..\..\..\..\Extern\zlib-1.2.7\ZLib\deflate.c">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

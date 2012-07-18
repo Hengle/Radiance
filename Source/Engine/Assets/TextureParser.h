@@ -16,7 +16,7 @@
 class Engine;
 
 #if defined(RAD_OPT_PC_TOOLS)
-namespace pvrtexlib {
+namespace pvrtexture {
 	class CPVRTexture;	
 }
 #endif
@@ -142,7 +142,7 @@ private:
 	static int ExtractPVR(
 		Engine &engine,
 		int frame,
-		pvrtexlib::CPVRTexture &src,
+		pvrtexture::CPVRTexture &src,
 		image_codec::Image &img
 	);
 #endif

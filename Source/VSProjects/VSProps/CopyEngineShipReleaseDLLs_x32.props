@@ -5,7 +5,7 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <PostBuildEvent>
-      <Command>xcopy "$(OPENAL_PATH)\Win32\OpenAL32.dll" "$(OutDir)" /D</Command>
+      <Command>xcopy "$(OPENAL_PATH)\Win32\OpenAL32.dll" "$(OutDir)" /D /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup />

@@ -33,10 +33,12 @@
 #include <Runtime/ImageCodec/Png.h>
 #endif
 #if defined(RAD_OPT_PC_TOOLS)
-#include <PVRTexLib/PVRTexLib.h>
+#include <PVRTexLib/PVRTTexture.h>
+#include <PVRTexLib/PVRTextureHeader.h>
+#include <PVRTexLib/PVRTextureUtilities.h>
 #include "../Renderer/GL/GLTexture.h"
 #include <algorithm>
-using namespace pvrtexlib;
+using namespace pvrtexture;
 #undef min
 #undef max
 #undef DeleteFile
@@ -1063,10 +1065,8 @@ int TextureParser::Compress(
 	}
 
 	int format;
-	PixelType pvrFormat=OGL_RGBA_8888;
-	bool twiddle = false;
-	bool flip = false;
-
+	EPVRTPixelFormat pvrFormat=ePVRTPF_RGBG8888;
+	
 	{
 		if (m_images.empty())
 			return SR_InvalidFormat;
@@ -1076,35 +1076,23 @@ int TextureParser::Compress(
 			if (*s == "DXT1/PVR2" ||
 				*s == "DXT3/PVR2" ||
 				*s == "DXT5/PVR2") {
-				twiddle = true;
-				pvrFormat = OGL_PVRTC2;
+				pvrFormat = (img->bpp==4) ? ePVRTPF_PVRTCI_2bpp_RGBA : ePVRTPF_PVRTCI_2bpp_RGB;
 				format = (img->bpp==4) ? image_codec::dds::Format_PVR2A : image_codec::dds::Format_PVR2;
 			} else {
-				twiddle = true;
-				pvrFormat = OGL_PVRTC4;
+				pvrFormat = (img->bpp==4) ? ePVRTPF_PVRTCI_4bpp_RGBA : ePVRTPF_PVRTCI_4bpp_RGB;
 				format = (img->bpp==4) ? image_codec::dds::Format_PVR4A : image_codec::dds::Format_PVR4;
 			}
 		} else {
-#if !defined(RAD_OPT_WIN)
-			COut(C_Warn) << "Warning: " << asset->path.get() << " is flagged for DXT compression but a compressor is not available on this platform. Compression setting ignored." << std::endl;
-			return SR_Success;
-#endif
-
+			
 			if (*s == "DXT1/PVR2" ||
 				*s == "DXT1/PVR4") {
-#if defined(RAD_OPT_WIN)
-				pvrFormat = D3D_DXT1;
-#endif
+				pvrFormat = ePVRTPF_DXT1;
 				format = img->bpp==4 ? image_codec::dds::Format_DXT1A : image_codec::dds::Format_DXT1;
 			} else if (*s == "DXT3/PVR2" || *s == "DXT3/PVR4") {
-#if defined(RAD_OPT_WIN)
-				pvrFormat = D3D_DXT3;
-#endif
+				pvrFormat = ePVRTPF_DXT3;
 				format = image_codec::dds::Format_DXT3;
 			} else {
-#if defined(RAD_OPT_WIN)
-				pvrFormat = D3D_DXT5;
-#endif
+				pvrFormat = ePVRTPF_DXT5;
 				format = image_codec::dds::Format_DXT5;
 			}
 		}
@@ -1157,46 +1145,40 @@ int TextureParser::Compress(
 						data = temp;
 					}
 
-					PVRTRY {
-						PVRTextureUtilities u;
-						CPVRTexture pvrSrc(
-							(unsigned int)sm.width,
-							(unsigned int)sm.height,
-							0,
-							1,
-							false, // border
-							twiddle, // twiddle
-							false, // cube map
-							false, // volume
-							false, // false mips
-							src.bpp==4, // alpha
-							false, // flipped
-							DX10_R8G8B8A8_UNORM, // pixel type
-							0.f, // normal map scale
-							data
-						);
+					CPVRTextureHeader pvrHeader(
+						(uint64)PVRStandard8PixelType.PixelTypeID,
+						(uint32)sm.width,
+						(uint32)sm.height,
+						(uint32)1,
+						(uint32)1,
+						(uint32)1,
+						(uint32)1,
+						ePVRTCSpacelRGB,
+						ePVRTVarTypeUnsignedByteNorm,
+						false // not-premultiplied.
+					);
 
-						if (numMips > 1) {
-							CPVRTextureHeader pvrMip(pvrSrc.getHeader());
-							pvrMip.setMipMapCount(numMips-1);
-							u.ProcessRawPVR(pvrSrc, pvrMip);
-						}
+					CPVRTexture pvrTex(
+						pvrHeader,
+						data
+					);
 
-						CPVRTexture pvrDst(pvrSrc.getHeader());
-						pvrDst.setPixelType(pvrFormat);
-
-						u.CompressPVR(pvrSrc, pvrDst, 0);
-						if (ExtractPVR(engine, i, pvrDst, *img) != SR_Success) {
-							if (temp)
-								zone_free(temp);
-							COut(C_Error) << "PVRTexLib compression failure: failed to extract PVR texture data!" << std::endl;
+					if (numMips > 1) {
+						if (!GenerateMIPMaps(pvrTex, eResizeCubic, numMips)) {
+							COut(C_Error) << "PVRTexLib failure: failed to create mimaps!" << std::endl;
 							return SR_CompilerError;
 						}
 					}
-					PVRCATCH(e) {
+
+					if (!Transcode(pvrTex, pvrFormat, ePVRTVarTypeUnsignedByteNorm, ePVRTCSpacelRGB, ePVRTCBest, false)) {
+						COut(C_Error) << "PVRTexLib failure: failed to compress texture!" << std::endl;
+						return SR_CompilerError;
+					}
+
+					if (ExtractPVR(engine, i, pvrTex, *img) != SR_Success) {
 						if (temp)
 							zone_free(temp);
-						COut(C_Error) << "PVRTexLib exception: " << e.what() << std::endl;
+						COut(C_Error) << "PVRTexLib compression failure: failed to extract PVR texture data!" << std::endl;
 						return SR_CompilerError;
 					}
 				}
@@ -1231,64 +1213,19 @@ int TextureParser::Compress(
 }
 	
 #if defined(RAD_OPT_PC_TOOLS)
-namespace {
-enum 
-{
-	PVR_MGLPVR2 = 0xc,
-	PVR_OGLPVR2 = 0x18,
-	PVR_MGLPVR4 = 0xd,
-	PVR_OGLPVR4 = 0x19,
-	PVR_DXT1 = 0x20,
-	PVR_DXT2,
-	PVR_DXT3,
-	PVR_DXT4,
-	PVR_DXT5
-};	
-} // namespace
-	
 int TextureParser::ExtractPVR(
 	Engine &engine,
 	int frame,
 	CPVRTexture &src,
 	image_codec::Image &img
 ) {
-	const U8 *data = (const U8*)src.getData().getData();
-	AddrSize len = (AddrSize)src.getData().getDataSize();
+	const U8 *data = (const U8*)src.getDataPtr();
+	const CPVRTextureHeader &header = src.getHeader();
+	AddrSize len = (AddrSize)header.getDataSize();
 
-	bool hasMips = src.hasMips() && src.getMipMapCount()>0;
-	bool hasAlpha = src.hasAlpha();
-	
-#if defined(RAD_OPT_DEBUG)
-	{
-		int format=0;
-
-		// What format?
-		switch (src.getPixelType()) {
-			case PVR_MGLPVR2:
-			case PVR_OGLPVR2:
-				format = (hasAlpha) ? image_codec::dds::Format_PVR2A : image_codec::dds::Format_PVR2;
-				break;
-			case PVR_MGLPVR4:
-			case PVR_OGLPVR4:
-				format = (hasAlpha) ? image_codec::dds::Format_PVR4A : image_codec::dds::Format_PVR4;
-				break;
-			case PVR_DXT1:
-			case PVR_DXT2:
-				format = (hasAlpha) ? image_codec::dds::Format_DXT1A : image_codec::dds::Format_DXT1;
-				break;
-			case PVR_DXT3:
-			case PVR_DXT4:
-				format = image_codec::dds::Format_DXT3;
-				break;
-			case PVR_DXT5:
-				format = image_codec::dds::Format_DXT5;
-				break;
-		}
-		RAD_ASSERT(img.format==format);
-	}
-#endif
-	
-	int numMips = (int)src.getMipMapCount()+1;
+	int numMips = header.getNumMIPLevels();
+	bool hasMips = numMips>1;
+		
 	img.AllocateMipmaps(frame, numMips);
 	
 	int w = (int)src.getWidth();
@@ -1299,22 +1236,22 @@ int TextureParser::ExtractPVR(
 		AddrSize blockSize = 0;
 		
 		// What format?
-		switch (src.getPixelType()) {
-			case PVR_MGLPVR2:
-			case PVR_OGLPVR2:
+		switch (src.getPixelType().PixelTypeID) {
+			case ePVRTPF_PVRTCI_2bpp_RGB:
+			case ePVRTPF_PVRTCI_2bpp_RGBA:
 				blockSize = std::max<AddrSize>(w/8,2)*std::max<AddrSize>(h/4,2)*8;
 				break;
-			case PVR_MGLPVR4:
-			case PVR_OGLPVR4:
+			case ePVRTPF_PVRTCI_4bpp_RGB:
+			case ePVRTPF_PVRTCI_4bpp_RGBA:
 				blockSize = std::max<AddrSize>(w/4,2)*std::max<AddrSize>(h/4,2)*8;
 				break;
-			case PVR_DXT1:
-			case PVR_DXT2:
+			case ePVRTPF_DXT1:
+			case ePVRTPF_DXT2:
 				blockSize = std::max<AddrSize>((w*h/16)*8, 8);
 				break;
-			case PVR_DXT3:
-			case PVR_DXT4:
-			case PVR_DXT5:
+			case ePVRTPF_DXT3:
+			case ePVRTPF_DXT4:
+			case ePVRTPF_DXT5:
 				blockSize = std::max<AddrSize>((w*h/16)*16, 16);
 				break;
 		}
