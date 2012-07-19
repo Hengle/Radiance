@@ -35,9 +35,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\CrowIOS\Radiance\Source\Main\null_CloudStorage.cpp" />
     <ClCompile Include="..\..\Main\NativeApp.cpp" />
     <ClInclude Include="..\..\Main\NativeApp_inl.h" />
+    <ClCompile Include="..\..\Main\null_CloudStorage.cpp" />
     <ClCompile Include="..\..\Main\QtAppMain.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>

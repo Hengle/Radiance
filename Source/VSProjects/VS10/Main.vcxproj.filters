@@ -27,11 +27,11 @@
     <ClCompile Include="..\..\Main\Win\WinMain.cpp">
       <Filter>Source\Win</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\CrowIOS\Radiance\Source\Main\null_CloudStorage.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Main\Win\WinKeys.cpp">
       <Filter>Source\Win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Main\null_CloudStorage.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
