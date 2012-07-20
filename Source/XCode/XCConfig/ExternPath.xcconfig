@@ -1,0 +1,6 @@
+// ExternPath.xcconfig
+// Sets up the extern library path.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+EXTERN_PATH = $(GLOBAL_PROJECT_ROOT)/Extern

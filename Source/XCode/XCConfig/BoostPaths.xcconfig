@@ -1,0 +1,6 @@
+// BoostPaths.xcconfig
+// Sets up the boost library library path.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+BOOST_PATH = $(EXTERN_PATH)/boost-1.50.0

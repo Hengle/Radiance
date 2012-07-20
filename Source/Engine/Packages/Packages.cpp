@@ -160,7 +160,6 @@ Asset::Ref Package::Asset(int id, Zone z) const
 		Entry::Ref entry = FindEntry(id);
 		if (!entry)
 			return Asset::Ref();
-		Package *self = const_cast<Package*>(this);
 		return pkg::Asset::New(z, entry);
 	}
 #endif
@@ -209,7 +208,6 @@ Asset::Ref Package::Asset(const char *name, Zone z) const
 		Entry::Ref entry = FindEntry(name);
 		if (!entry)
 			return Asset::Ref();
-		Package *self = const_cast<Package*>(this);
 		return pkg::Asset::New(z, entry);
 	}
 #endif

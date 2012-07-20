@@ -1,0 +1,8 @@
+// ZLibReleaseOSX.xcconfig
+// zlib release OSX build config
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "ExternLibReleaseOSX.xcconfig"
+#include "ZLibPaths.xcconfig"
+#include "ZLibBuild.xcconfig"

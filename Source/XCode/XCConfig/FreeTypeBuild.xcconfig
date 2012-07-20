@@ -1,0 +1,8 @@
+// FreeTypeBuild.xcconfig
+// Settings common to freetype build on all platforms.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+HEADER_SEARCH_PATHS = "$(FREETYPE_PATH)" $(inherited)
+GCC_PREPROCESSOR_DEFINITIONS = $(CONFIG_DEFINES) $(EXTRA_DEFINES) FT2_BUILD_LIBRARY
+OTHER_LDFLAGS = $(CONFIG_LINKER_FLAGS)

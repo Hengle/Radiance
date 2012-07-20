@@ -68,9 +68,9 @@ inline const typename CharBuf<Traits>::T *CharBuf<Traits>::RAD_IMPLEMENT_GET(end
 template <typename Traits>
 inline int CharBuf<Traits>::RAD_IMPLEMENT_GET(size) {
 	if (m_data)
-		return m_data->size - sizeof(T);
+		return m_data->size - (int)sizeof(T);
 	if (m_stackLen)
-		return (int)m_stackLen - sizeof(T);
+		return (int)m_stackLen - (int)sizeof(T);
 	return 0;
 }
 
@@ -81,7 +81,7 @@ inline bool CharBuf<Traits>::RAD_IMPLEMENT_GET(empty) {
 
 template<typename Traits>
 inline int CharBuf<Traits>::RAD_IMPLEMENT_GET(numChars) {
-	return size.get() / sizeof(T);
+	return size.get() / (int)sizeof(T);
 }
 
 template <typename Traits>

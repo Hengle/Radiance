@@ -1,0 +1,4 @@
+// Common Config File
+
+
+GCC_VERSION = com.apple.compilers.llvmgcc42

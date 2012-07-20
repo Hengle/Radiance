@@ -1,0 +1,13 @@
+// RadianceBuild.xcconfig
+// Common settings for building radiance library.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+HEADER_SEARCH_PATHS = $(EXTERNLIB_INCLUDES) $(OPTIONAL_EXTERNLIB_INCLUDES) "$(ENGINE_PATH)" $(inherited)
+GCC_PREPROCESSOR_DEFINITIONS = $(CONFIG_DEFINES) $(RAD_DEFINES) USE_RADPCH RADPCH=<Engine/../null_RadPCH.h>
+OTHER_LDFLAGS = $(CONFIG_LINKER_FLAGS)
+
+GCC_PRECOMPILE_PREFIX_HEADER = YES
+GCC_PREFIX_HEADER = ../RadPCH.h
+
+QT_MOC = $(EXTERN_PATH)/Qt-4.8.2/moc

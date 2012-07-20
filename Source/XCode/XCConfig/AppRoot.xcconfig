@@ -1,0 +1,7 @@
+// AppRoot.xcconfig
+// Selects APP_PROJECT_ROOT as the project root.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+#include "RootPath.xcconfig"
+
+GLOBAL_PROJECT_ROOT = $(APP_PROJECT_ROOT)

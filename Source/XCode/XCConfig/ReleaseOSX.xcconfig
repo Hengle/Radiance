@@ -1,0 +1,7 @@
+// ReleaseOSX.xcconfig
+// Sets up the basic settings for building for release OSX.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "OSX.xcconfig"
+#include "Release.xcconfig"

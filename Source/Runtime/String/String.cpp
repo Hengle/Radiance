@@ -377,7 +377,7 @@ UTF16Buf String::ToUTF16() const {
 	buf.m_zone = m_zone;
 
 	if (!empty) {
-		int len = utf8to16len(c_str, length + 1) * sizeof(U16);
+		int len = utf8to16len(c_str, length + 1) * (int)sizeof(U16);
 		if (len > sizeof(U16)) {
 #if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 			if (len > UTF16Buf::kStackSize) {
@@ -404,7 +404,7 @@ UTF32Buf String::ToUTF32() const {
 	buf.m_zone = m_zone;
 
 	if (!empty) {
-		int len = utf8to32len(c_str, length + 1) * sizeof(U32);
+		int len = utf8to32len(c_str, length + 1) * (int)sizeof(U32);
 		if (len > sizeof(U32)) {
 #if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 			if (len > UTF32Buf::kStackSize) {

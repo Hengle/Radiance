@@ -1,0 +1,6 @@
+// LibJPEGPaths.xcconfig
+// Sets up the libjpeg library library path.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+LIBJPEG_PATH = $(EXTERN_PATH)/libjpeg-8d

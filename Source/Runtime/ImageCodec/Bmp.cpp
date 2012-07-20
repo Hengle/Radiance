@@ -237,9 +237,9 @@ RADRT_API bool RADRT_CALL DecodeHeader(const void *buff, AddrSize buffLength, Im
 	RAD_ASSERT(out.bpp > 0);
 
 	out.format = (out.bpp==1) ? Format_PAL8_RGB888 : (out.bpp==2) ? Format_RGB565 : Format_RGB888;
-	out.frames[0].mipmaps[0].width = (UReg)bmi.width;
-	out.frames[0].mipmaps[0].height = (UReg)bmi.height;
-	out.frames[0].mipmaps[0].stride = (UReg)(bmi.width * out.bpp);
+	out.frames[0].mipmaps[0].width = (int)bmi.width;
+	out.frames[0].mipmaps[0].height = (int)bmi.height;
+	out.frames[0].mipmaps[0].stride = (AddrSize)(bmi.width * out.bpp);
 
 	return true;
 }
@@ -291,7 +291,7 @@ RADRT_API bool RADRT_CALL Decode(const void *buff, AddrSize buffLength, Image &o
 
 	out.format = (out.bpp==1) ? Format_PAL8_RGB888 : (out.bpp==2) ? Format_RGB565 : Format_RGB888;
 	
-	if (!out.AllocateMipmap(0, 0, (UReg)bmi.width, (UReg)bmi.height, (UReg)bmi.width*out.bpp, (AddrSize)(bmi.width*bmi.height*out.bpp))) 
+	if (!out.AllocateMipmap(0, 0, (int)bmi.width, (int)bmi.height, (AddrSize)bmi.width*out.bpp, (AddrSize)(bmi.width*bmi.height*out.bpp))) 
 	{
 		out.Free();
 		return false;

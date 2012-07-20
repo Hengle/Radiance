@@ -279,7 +279,7 @@ bool ExtractAlias(
 	{
 		*aliasNumber = 0;
 		*strOfs = i+1;
-		sscanf(path, "%d:", aliasNumber);
+		sscanf(path, "%d:", (int*)aliasNumber);
 		return true;
 	}
 	else

@@ -1,0 +1,633 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3319499915BA03AA00458F43 /* pfr.c in Sources */ = {isa = PBXBuildFile; fileRef = 3319499815BA03AA00458F43 /* pfr.c */; };
+		3319499A15BA03AA00458F43 /* pfr.c in Sources */ = {isa = PBXBuildFile; fileRef = 3319499815BA03AA00458F43 /* pfr.c */; };
+		338243A915B78E33002B9F95 /* type1cid.c in Sources */ = {isa = PBXBuildFile; fileRef = 338243A815B78E33002B9F95 /* type1cid.c */; };
+		338243AA15B78E33002B9F95 /* type1cid.c in Sources */ = {isa = PBXBuildFile; fileRef = 338243A815B78E33002B9F95 /* type1cid.c */; };
+		338243AC15B78E75002B9F95 /* smooth.c in Sources */ = {isa = PBXBuildFile; fileRef = 338243AB15B78E75002B9F95 /* smooth.c */; };
+		338243AD15B78E75002B9F95 /* smooth.c in Sources */ = {isa = PBXBuildFile; fileRef = 338243AB15B78E75002B9F95 /* smooth.c */; };
+		338382DC15B771AA00A28CCF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 338382DB15B771AA00A28CCF /* Foundation.framework */; };
+		338382F715B7755400A28CCF /* autofit.c in Sources */ = {isa = PBXBuildFile; fileRef = 338382F615B7755400A28CCF /* autofit.c */; };
+		338382F815B7755400A28CCF /* autofit.c in Sources */ = {isa = PBXBuildFile; fileRef = 338382F615B7755400A28CCF /* autofit.c */; };
+		3383830015B7759D00A28CCF /* ftbase.c in Sources */ = {isa = PBXBuildFile; fileRef = 338382F915B7759D00A28CCF /* ftbase.c */; };
+		3383830115B7759D00A28CCF /* ftbase.c in Sources */ = {isa = PBXBuildFile; fileRef = 338382F915B7759D00A28CCF /* ftbase.c */; };
+		3383830215B7759D00A28CCF /* ftbbox.c in Sources */ = {isa = PBXBuildFile; fileRef = 338382FA15B7759D00A28CCF /* ftbbox.c */; };
+		3383830315B7759D00A28CCF /* ftbbox.c in Sources */ = {isa = PBXBuildFile; fileRef = 338382FA15B7759D00A28CCF /* ftbbox.c */; };
+		3383830415B7759D00A28CCF /* ftbitmap.c in Sources */ = {isa = PBXBuildFile; fileRef = 338382FB15B7759D00A28CCF /* ftbitmap.c */; };
+		3383830515B7759D00A28CCF /* ftbitmap.c in Sources */ = {isa = PBXBuildFile; fileRef = 338382FB15B7759D00A28CCF /* ftbitmap.c */; };
+		3383830615B7759D00A28CCF /* ftdebug.c in Sources */ = {isa = PBXBuildFile; fileRef = 338382FC15B7759D00A28CCF /* ftdebug.c */; };
+		3383830715B7759D00A28CCF /* ftdebug.c in Sources */ = {isa = PBXBuildFile; fileRef = 338382FC15B7759D00A28CCF /* ftdebug.c */; };
+		3383830815B7759D00A28CCF /* ftglyph.c in Sources */ = {isa = PBXBuildFile; fileRef = 338382FD15B7759D00A28CCF /* ftglyph.c */; };
+		3383830915B7759D00A28CCF /* ftglyph.c in Sources */ = {isa = PBXBuildFile; fileRef = 338382FD15B7759D00A28CCF /* ftglyph.c */; };
+		3383830A15B7759D00A28CCF /* ftinit.c in Sources */ = {isa = PBXBuildFile; fileRef = 338382FE15B7759D00A28CCF /* ftinit.c */; };
+		3383830B15B7759D00A28CCF /* ftinit.c in Sources */ = {isa = PBXBuildFile; fileRef = 338382FE15B7759D00A28CCF /* ftinit.c */; };
+		3383830C15B7759D00A28CCF /* ftsystem.c in Sources */ = {isa = PBXBuildFile; fileRef = 338382FF15B7759D00A28CCF /* ftsystem.c */; };
+		3383830D15B7759D00A28CCF /* ftsystem.c in Sources */ = {isa = PBXBuildFile; fileRef = 338382FF15B7759D00A28CCF /* ftsystem.c */; };
+		3383830F15B775A700A28CCF /* bdf.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383830E15B775A700A28CCF /* bdf.c */; };
+		3383831015B775A700A28CCF /* bdf.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383830E15B775A700A28CCF /* bdf.c */; };
+		3383831215B775AE00A28CCF /* cff.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383831115B775AE00A28CCF /* cff.c */; };
+		3383831315B775AE00A28CCF /* cff.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383831115B775AE00A28CCF /* cff.c */; };
+		3383831515B775D000A28CCF /* ftlzw.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383831415B775D000A28CCF /* ftlzw.c */; };
+		3383831615B775D000A28CCF /* ftlzw.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383831415B775D000A28CCF /* ftlzw.c */; };
+		3383831815B775DC00A28CCF /* pcf.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383831715B775DC00A28CCF /* pcf.c */; };
+		3383831915B775DC00A28CCF /* pcf.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383831715B775DC00A28CCF /* pcf.c */; };
+		3383831B15B775E400A28CCF /* psaux.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383831A15B775E400A28CCF /* psaux.c */; };
+		3383831C15B775E400A28CCF /* psaux.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383831A15B775E400A28CCF /* psaux.c */; };
+		3383831E15B775EE00A28CCF /* pshinter.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383831D15B775EE00A28CCF /* pshinter.c */; };
+		3383831F15B775EE00A28CCF /* pshinter.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383831D15B775EE00A28CCF /* pshinter.c */; };
+		3383832115B7760600A28CCF /* psmodule.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383832015B7760600A28CCF /* psmodule.c */; };
+		3383832215B7760600A28CCF /* psmodule.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383832015B7760600A28CCF /* psmodule.c */; };
+		3383832415B7760F00A28CCF /* raster.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383832315B7760F00A28CCF /* raster.c */; };
+		3383832515B7760F00A28CCF /* raster.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383832315B7760F00A28CCF /* raster.c */; };
+		3383832715B7761700A28CCF /* sfnt.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383832615B7761700A28CCF /* sfnt.c */; };
+		3383832815B7761700A28CCF /* sfnt.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383832615B7761700A28CCF /* sfnt.c */; };
+		3383832D15B7763000A28CCF /* truetype.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383832C15B7763000A28CCF /* truetype.c */; };
+		3383832E15B7763000A28CCF /* truetype.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383832C15B7763000A28CCF /* truetype.c */; };
+		3383833015B7763A00A28CCF /* type1.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383832F15B7763A00A28CCF /* type1.c */; };
+		3383833115B7763A00A28CCF /* type1.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383832F15B7763A00A28CCF /* type1.c */; };
+		3383833315B7764200A28CCF /* type42.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383833215B7764200A28CCF /* type42.c */; };
+		3383833415B7764200A28CCF /* type42.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383833215B7764200A28CCF /* type42.c */; };
+		3383833615B7764A00A28CCF /* winfnt.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383833515B7764A00A28CCF /* winfnt.c */; };
+		3383833715B7764A00A28CCF /* winfnt.c in Sources */ = {isa = PBXBuildFile; fileRef = 3383833515B7764A00A28CCF /* winfnt.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		3319499815BA03AA00458F43 /* pfr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pfr.c; path = "../../../Extern/freetype-2.4.4/src/pfr/pfr.c"; sourceTree = "<group>"; };
+		338243A815B78E33002B9F95 /* type1cid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = type1cid.c; path = "../../../Extern/freetype-2.4.4/src/cid/type1cid.c"; sourceTree = "<group>"; };
+		338243AB15B78E75002B9F95 /* smooth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = smooth.c; path = "../../../Extern/freetype-2.4.4/src/smooth/smooth.c"; sourceTree = "<group>"; };
+		338382DB15B771AA00A28CCF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		338382E915B771E400A28CCF /* libfreetypeOSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libfreetypeOSX.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		338382EA15B771E400A28CCF /* libfreetypeiOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libfreetypeiOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		338382F615B7755400A28CCF /* autofit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = autofit.c; path = "../../../Extern/freetype-2.4.4/src/autofit/autofit.c"; sourceTree = "<group>"; };
+		338382F915B7759D00A28CCF /* ftbase.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ftbase.c; path = "../../../Extern/freetype-2.4.4/src/base/ftbase.c"; sourceTree = "<group>"; };
+		338382FA15B7759D00A28CCF /* ftbbox.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ftbbox.c; path = "../../../Extern/freetype-2.4.4/src/base/ftbbox.c"; sourceTree = "<group>"; };
+		338382FB15B7759D00A28CCF /* ftbitmap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ftbitmap.c; path = "../../../Extern/freetype-2.4.4/src/base/ftbitmap.c"; sourceTree = "<group>"; };
+		338382FC15B7759D00A28CCF /* ftdebug.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ftdebug.c; path = "../../../Extern/freetype-2.4.4/src/base/ftdebug.c"; sourceTree = "<group>"; };
+		338382FD15B7759D00A28CCF /* ftglyph.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ftglyph.c; path = "../../../Extern/freetype-2.4.4/src/base/ftglyph.c"; sourceTree = "<group>"; };
+		338382FE15B7759D00A28CCF /* ftinit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ftinit.c; path = "../../../Extern/freetype-2.4.4/src/base/ftinit.c"; sourceTree = "<group>"; };
+		338382FF15B7759D00A28CCF /* ftsystem.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ftsystem.c; path = "../../../Extern/freetype-2.4.4/src/base/ftsystem.c"; sourceTree = "<group>"; };
+		3383830E15B775A700A28CCF /* bdf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bdf.c; path = "../../../Extern/freetype-2.4.4/src/bdf/bdf.c"; sourceTree = "<group>"; };
+		3383831115B775AE00A28CCF /* cff.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cff.c; path = "../../../Extern/freetype-2.4.4/src/cff/cff.c"; sourceTree = "<group>"; };
+		3383831415B775D000A28CCF /* ftlzw.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ftlzw.c; path = "../../../Extern/freetype-2.4.4/src/lzw/ftlzw.c"; sourceTree = "<group>"; };
+		3383831715B775DC00A28CCF /* pcf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pcf.c; path = "../../../Extern/freetype-2.4.4/src/pcf/pcf.c"; sourceTree = "<group>"; };
+		3383831A15B775E400A28CCF /* psaux.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = psaux.c; path = "../../../Extern/freetype-2.4.4/src/psaux/psaux.c"; sourceTree = "<group>"; };
+		3383831D15B775EE00A28CCF /* pshinter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pshinter.c; path = "../../../Extern/freetype-2.4.4/src/pshinter/pshinter.c"; sourceTree = "<group>"; };
+		3383832015B7760600A28CCF /* psmodule.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = psmodule.c; path = "../../../Extern/freetype-2.4.4/src/psnames/psmodule.c"; sourceTree = "<group>"; };
+		3383832315B7760F00A28CCF /* raster.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = raster.c; path = "../../../Extern/freetype-2.4.4/src/raster/raster.c"; sourceTree = "<group>"; };
+		3383832615B7761700A28CCF /* sfnt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sfnt.c; path = "../../../Extern/freetype-2.4.4/src/sfnt/sfnt.c"; sourceTree = "<group>"; };
+		3383832C15B7763000A28CCF /* truetype.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = truetype.c; path = "../../../Extern/freetype-2.4.4/src/truetype/truetype.c"; sourceTree = "<group>"; };
+		3383832F15B7763A00A28CCF /* type1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = type1.c; path = "../../../Extern/freetype-2.4.4/src/type1/type1.c"; sourceTree = "<group>"; };
+		3383833215B7764200A28CCF /* type42.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = type42.c; path = "../../../Extern/freetype-2.4.4/src/type42/type42.c"; sourceTree = "<group>"; };
+		3383833515B7764A00A28CCF /* winfnt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = winfnt.c; path = "../../../Extern/freetype-2.4.4/src/winfonts/winfnt.c"; sourceTree = "<group>"; };
+		33F199CD15B89911006D8DCC /* FreeTypeBuild.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = FreeTypeBuild.xcconfig; path = XCConfig/FreeTypeBuild.xcconfig; sourceTree = "<group>"; };
+		33F199CE15B89911006D8DCC /* FreeTypeDebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = FreeTypeDebugiOS.xcconfig; path = XCConfig/FreeTypeDebugiOS.xcconfig; sourceTree = "<group>"; };
+		33F199CF15B89911006D8DCC /* FreeTypeDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = FreeTypeDebugOSX.xcconfig; path = XCConfig/FreeTypeDebugOSX.xcconfig; sourceTree = "<group>"; };
+		33F199D015B89911006D8DCC /* FreeTypePaths.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = FreeTypePaths.xcconfig; path = XCConfig/FreeTypePaths.xcconfig; sourceTree = "<group>"; };
+		33F199D115B89911006D8DCC /* FreeTypeReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = FreeTypeReleaseiOS.xcconfig; path = XCConfig/FreeTypeReleaseiOS.xcconfig; sourceTree = "<group>"; };
+		33F199D215B89911006D8DCC /* FreeTypeReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = FreeTypeReleaseOSX.xcconfig; path = XCConfig/FreeTypeReleaseOSX.xcconfig; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		338382CB15B7717D00A28CCF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		338382D615B771AA00A28CCF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				338382DC15B771AA00A28CCF /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		338382C315B7717D00A28CCF = {
+			isa = PBXGroup;
+			children = (
+				338382F515B7752200A28CCF /* Source */,
+				338382ED15B7735B00A28CCF /* XCConfig */,
+				338382DA15B771AA00A28CCF /* Frameworks */,
+				338382EB15B772F000A28CCF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		338382DA15B771AA00A28CCF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				338382DB15B771AA00A28CCF /* Foundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		338382EB15B772F000A28CCF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				338382E915B771E400A28CCF /* libfreetypeOSX.a */,
+				338382EA15B771E400A28CCF /* libfreetypeiOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		338382ED15B7735B00A28CCF /* XCConfig */ = {
+			isa = PBXGroup;
+			children = (
+				33F199CD15B89911006D8DCC /* FreeTypeBuild.xcconfig */,
+				33F199CE15B89911006D8DCC /* FreeTypeDebugiOS.xcconfig */,
+				33F199CF15B89911006D8DCC /* FreeTypeDebugOSX.xcconfig */,
+				33F199D015B89911006D8DCC /* FreeTypePaths.xcconfig */,
+				33F199D115B89911006D8DCC /* FreeTypeReleaseiOS.xcconfig */,
+				33F199D215B89911006D8DCC /* FreeTypeReleaseOSX.xcconfig */,
+			);
+			name = XCConfig;
+			sourceTree = "<group>";
+		};
+		338382F515B7752200A28CCF /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				338382F615B7755400A28CCF /* autofit.c */,
+				3383830E15B775A700A28CCF /* bdf.c */,
+				3383831115B775AE00A28CCF /* cff.c */,
+				338382F915B7759D00A28CCF /* ftbase.c */,
+				338382FA15B7759D00A28CCF /* ftbbox.c */,
+				338382FB15B7759D00A28CCF /* ftbitmap.c */,
+				338382FC15B7759D00A28CCF /* ftdebug.c */,
+				338382FD15B7759D00A28CCF /* ftglyph.c */,
+				338382FE15B7759D00A28CCF /* ftinit.c */,
+				3383831415B775D000A28CCF /* ftlzw.c */,
+				338382FF15B7759D00A28CCF /* ftsystem.c */,
+				3383831715B775DC00A28CCF /* pcf.c */,
+				3319499815BA03AA00458F43 /* pfr.c */,
+				3383831A15B775E400A28CCF /* psaux.c */,
+				3383831D15B775EE00A28CCF /* pshinter.c */,
+				3383832015B7760600A28CCF /* psmodule.c */,
+				3383832315B7760F00A28CCF /* raster.c */,
+				3383832615B7761700A28CCF /* sfnt.c */,
+				338243AB15B78E75002B9F95 /* smooth.c */,
+				3383832C15B7763000A28CCF /* truetype.c */,
+				3383832F15B7763A00A28CCF /* type1.c */,
+				338243A815B78E33002B9F95 /* type1cid.c */,
+				3383833215B7764200A28CCF /* type42.c */,
+				3383833515B7764A00A28CCF /* winfnt.c */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		338382CC15B7717D00A28CCF /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		338382D715B771AA00A28CCF /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		338382CD15B7717D00A28CCF /* freetypeOSX */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 338382D215B7717D00A28CCF /* Build configuration list for PBXNativeTarget "freetypeOSX" */;
+			buildPhases = (
+				338382CA15B7717D00A28CCF /* Sources */,
+				338382CB15B7717D00A28CCF /* Frameworks */,
+				338382CC15B7717D00A28CCF /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = freetypeOSX;
+			productName = freetype;
+			productReference = 338382E915B771E400A28CCF /* libfreetypeOSX.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		338382D815B771AA00A28CCF /* freetypeiOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 338382E315B771AA00A28CCF /* Build configuration list for PBXNativeTarget "freetypeiOS" */;
+			buildPhases = (
+				338382D515B771AA00A28CCF /* Sources */,
+				338382D615B771AA00A28CCF /* Frameworks */,
+				338382D715B771AA00A28CCF /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = freetypeiOS;
+			productName = freetypeiOS;
+			productReference = 338382EA15B771E400A28CCF /* libfreetypeiOS.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		338382C515B7717D00A28CCF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0430;
+			};
+			buildConfigurationList = 338382C815B7717D00A28CCF /* Build configuration list for PBXProject "freetype" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 338382C315B7717D00A28CCF;
+			productRefGroup = 338382C315B7717D00A28CCF;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				338382CD15B7717D00A28CCF /* freetypeOSX */,
+				338382D815B771AA00A28CCF /* freetypeiOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		338382CA15B7717D00A28CCF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				338382F715B7755400A28CCF /* autofit.c in Sources */,
+				3383830015B7759D00A28CCF /* ftbase.c in Sources */,
+				3383830215B7759D00A28CCF /* ftbbox.c in Sources */,
+				3383830415B7759D00A28CCF /* ftbitmap.c in Sources */,
+				3383830615B7759D00A28CCF /* ftdebug.c in Sources */,
+				3383830815B7759D00A28CCF /* ftglyph.c in Sources */,
+				3383830A15B7759D00A28CCF /* ftinit.c in Sources */,
+				3383830C15B7759D00A28CCF /* ftsystem.c in Sources */,
+				3383830F15B775A700A28CCF /* bdf.c in Sources */,
+				3383831215B775AE00A28CCF /* cff.c in Sources */,
+				3383831515B775D000A28CCF /* ftlzw.c in Sources */,
+				3383831815B775DC00A28CCF /* pcf.c in Sources */,
+				3383831B15B775E400A28CCF /* psaux.c in Sources */,
+				3383831E15B775EE00A28CCF /* pshinter.c in Sources */,
+				3383832115B7760600A28CCF /* psmodule.c in Sources */,
+				3383832415B7760F00A28CCF /* raster.c in Sources */,
+				3383832715B7761700A28CCF /* sfnt.c in Sources */,
+				3383832D15B7763000A28CCF /* truetype.c in Sources */,
+				3383833015B7763A00A28CCF /* type1.c in Sources */,
+				3383833315B7764200A28CCF /* type42.c in Sources */,
+				3383833615B7764A00A28CCF /* winfnt.c in Sources */,
+				338243A915B78E33002B9F95 /* type1cid.c in Sources */,
+				338243AC15B78E75002B9F95 /* smooth.c in Sources */,
+				3319499915BA03AA00458F43 /* pfr.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		338382D515B771AA00A28CCF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				338382F815B7755400A28CCF /* autofit.c in Sources */,
+				3383830115B7759D00A28CCF /* ftbase.c in Sources */,
+				3383830315B7759D00A28CCF /* ftbbox.c in Sources */,
+				3383830515B7759D00A28CCF /* ftbitmap.c in Sources */,
+				3383830715B7759D00A28CCF /* ftdebug.c in Sources */,
+				3383830915B7759D00A28CCF /* ftglyph.c in Sources */,
+				3383830B15B7759D00A28CCF /* ftinit.c in Sources */,
+				3383830D15B7759D00A28CCF /* ftsystem.c in Sources */,
+				3383831015B775A700A28CCF /* bdf.c in Sources */,
+				3383831315B775AE00A28CCF /* cff.c in Sources */,
+				3383831615B775D000A28CCF /* ftlzw.c in Sources */,
+				3383831915B775DC00A28CCF /* pcf.c in Sources */,
+				3383831C15B775E400A28CCF /* psaux.c in Sources */,
+				3383831F15B775EE00A28CCF /* pshinter.c in Sources */,
+				3383832215B7760600A28CCF /* psmodule.c in Sources */,
+				3383832515B7760F00A28CCF /* raster.c in Sources */,
+				3383832815B7761700A28CCF /* sfnt.c in Sources */,
+				3383832E15B7763000A28CCF /* truetype.c in Sources */,
+				3383833115B7763A00A28CCF /* type1.c in Sources */,
+				3383833415B7764200A28CCF /* type42.c in Sources */,
+				3383833715B7764A00A28CCF /* winfnt.c in Sources */,
+				338243AA15B78E33002B9F95 /* type1cid.c in Sources */,
+				338243AD15B78E75002B9F95 /* smooth.c in Sources */,
+				3319499A15BA03AA00458F43 /* pfr.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		338382D015B7717D00A28CCF /* Dev - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				ENGINE_PROJECT_ROOT = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = "Dev - Debug";
+		};
+		338382D115B7717D00A28CCF /* Dev - Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENGINE_PROJECT_ROOT = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = "Dev - Release";
+		};
+		338382D315B7717D00A28CCF /* Dev - Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33F199CF15B89911006D8DCC /* FreeTypeDebugOSX.xcconfig */;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Dev - Debug";
+		};
+		338382D415B7717D00A28CCF /* Dev - Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33F199D215B89911006D8DCC /* FreeTypeReleaseOSX.xcconfig */;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Dev - Release";
+		};
+		338382E415B771AA00A28CCF /* Dev - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/freetypeiOS.dst;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = "Dev - Debug";
+		};
+		338382E515B771AA00A28CCF /* Dev - Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/freetypeiOS.dst;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = "Dev - Release";
+		};
+		33E881C415B8B0500089BA08 /* Ship - Debug - iOS */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				ENGINE_PROJECT_ROOT = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = "Ship - Debug - iOS";
+		};
+		33E881C515B8B0500089BA08 /* Ship - Debug - iOS */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Ship - Debug - iOS";
+		};
+		33E881C615B8B0500089BA08 /* Ship - Debug - iOS */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33F199CE15B89911006D8DCC /* FreeTypeDebugiOS.xcconfig */;
+			buildSettings = {
+				DSTROOT = /tmp/freetypeiOS.dst;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = "Ship - Debug - iOS";
+		};
+		33E881C815B8B0560089BA08 /* Ship - Debug - OSX */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				ENGINE_PROJECT_ROOT = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = "Ship - Debug - OSX";
+		};
+		33E881C915B8B0560089BA08 /* Ship - Debug - OSX */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33F199CF15B89911006D8DCC /* FreeTypeDebugOSX.xcconfig */;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Ship - Debug - OSX";
+		};
+		33E881CA15B8B0560089BA08 /* Ship - Debug - OSX */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/freetypeiOS.dst;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = "Ship - Debug - OSX";
+		};
+		33E881CB15B8B05E0089BA08 /* Ship - Release - iOS */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENGINE_PROJECT_ROOT = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = "Ship - Release - iOS";
+		};
+		33E881CC15B8B05E0089BA08 /* Ship - Release - iOS */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Ship - Release - iOS";
+		};
+		33E881CD15B8B05E0089BA08 /* Ship - Release - iOS */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33F199D115B89911006D8DCC /* FreeTypeReleaseiOS.xcconfig */;
+			buildSettings = {
+				DSTROOT = /tmp/freetypeiOS.dst;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = "Ship - Release - iOS";
+		};
+		33E881CE15B8B0660089BA08 /* Ship - Release - OSX */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENGINE_PROJECT_ROOT = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = "Ship - Release - OSX";
+		};
+		33E881CF15B8B0660089BA08 /* Ship - Release - OSX */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33F199D215B89911006D8DCC /* FreeTypeReleaseOSX.xcconfig */;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Ship - Release - OSX";
+		};
+		33E881D015B8B0660089BA08 /* Ship - Release - OSX */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/freetypeiOS.dst;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = "Ship - Release - OSX";
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		338382C815B7717D00A28CCF /* Build configuration list for PBXProject "freetype" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				338382D015B7717D00A28CCF /* Dev - Debug */,
+				33E881C415B8B0500089BA08 /* Ship - Debug - iOS */,
+				33E881C815B8B0560089BA08 /* Ship - Debug - OSX */,
+				338382D115B7717D00A28CCF /* Dev - Release */,
+				33E881CB15B8B05E0089BA08 /* Ship - Release - iOS */,
+				33E881CE15B8B0660089BA08 /* Ship - Release - OSX */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Dev - Release";
+		};
+		338382D215B7717D00A28CCF /* Build configuration list for PBXNativeTarget "freetypeOSX" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				338382D315B7717D00A28CCF /* Dev - Debug */,
+				33E881C515B8B0500089BA08 /* Ship - Debug - iOS */,
+				33E881C915B8B0560089BA08 /* Ship - Debug - OSX */,
+				338382D415B7717D00A28CCF /* Dev - Release */,
+				33E881CC15B8B05E0089BA08 /* Ship - Release - iOS */,
+				33E881CF15B8B0660089BA08 /* Ship - Release - OSX */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Dev - Release";
+		};
+		338382E315B771AA00A28CCF /* Build configuration list for PBXNativeTarget "freetypeiOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				338382E415B771AA00A28CCF /* Dev - Debug */,
+				33E881C615B8B0500089BA08 /* Ship - Debug - iOS */,
+				33E881CA15B8B0560089BA08 /* Ship - Debug - OSX */,
+				338382E515B771AA00A28CCF /* Dev - Release */,
+				33E881CD15B8B05E0089BA08 /* Ship - Release - iOS */,
+				33E881D015B8B0660089BA08 /* Ship - Release - OSX */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Dev - Release";
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 338382C515B7717D00A28CCF /* Project object */;
+}

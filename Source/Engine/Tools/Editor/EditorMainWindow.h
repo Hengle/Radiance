@@ -8,9 +8,8 @@
 #include "EditorTypes.h"
 #include "../../Renderer/Renderer.h"
 #include "../../Sound/SoundDef.h"
+#include "EditorGLWidget.h"
 #include <QtGui/QMainWindow>
-#include <QtOpenGL/QGLContext>
-#include <QtOpenGL/QGLWidget>
 #include <QtGui/QMdiArea>
 #include <QtCore/QSettings>
 #include <QtGui/QCloseEvent>

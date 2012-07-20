@@ -1,0 +1,6 @@
+// LibPNGPaths.xcconfig
+// Sets up the libpng library library path.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+LIBPNG_PATH = $(EXTERN_PATH)/libpng-1.5.9

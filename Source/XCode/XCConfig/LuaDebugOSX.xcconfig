@@ -1,0 +1,8 @@
+// LuaDebugOSX.xcconfig
+// lua debug OSX build config
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "ExternLibDebugOSX.xcconfig"
+#include "LuaPaths.xcconfig"
+#include "LuaBuild.xcconfig"

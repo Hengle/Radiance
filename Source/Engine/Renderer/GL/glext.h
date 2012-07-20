@@ -5587,8 +5587,6 @@ typedef void (APIENTRY *GLDEBUGPROCAMD)(GLuint id,GLenum category,GLenum severit
 typedef GLintptr GLvdpauSurfaceNV;
 #endif
 
-#ifndef GL_VERSION_1_2
-#define GL_VERSION_1_2 1
 #ifdef GL_GLEXT_PROTOTYPES
 GLAPI void APIENTRY glBlendColor (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
 GLAPI void APIENTRY glBlendEquation (GLenum mode);
@@ -5596,7 +5594,7 @@ GLAPI void APIENTRY glDrawRangeElements (GLenum mode, GLuint start, GLuint end, 
 GLAPI void APIENTRY glTexImage3D (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid *pixels);
 GLAPI void APIENTRY glTexSubImage3D (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid *pixels);
 GLAPI void APIENTRY glCopyTexSubImage3D (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height);
-#endif /* GL_GLEXT_PROTOTYPES */
+#else /* GL_GLEXT_PROTOTYPES */
 typedef void (APIENTRYP PFNGLBLENDCOLORPROC) (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
 typedef void (APIENTRYP PFNGLBLENDEQUATIONPROC) (GLenum mode);
 typedef void (APIENTRYP PFNGLDRAWRANGEELEMENTSPROC) (GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid *indices);
@@ -5675,8 +5673,6 @@ typedef void (APIENTRYP PFNGLRESETHISTOGRAMPROC) (GLenum target);
 typedef void (APIENTRYP PFNGLRESETMINMAXPROC) (GLenum target);
 #endif
 
-#ifndef GL_VERSION_1_3
-#define GL_VERSION_1_3 1
 #ifdef GL_GLEXT_PROTOTYPES
 GLAPI void APIENTRY glActiveTexture (GLenum texture);
 GLAPI void APIENTRY glSampleCoverage (GLfloat value, GLboolean invert);
@@ -5687,7 +5683,7 @@ GLAPI void APIENTRY glCompressedTexSubImage3D (GLenum target, GLint level, GLint
 GLAPI void APIENTRY glCompressedTexSubImage2D (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid *data);
 GLAPI void APIENTRY glCompressedTexSubImage1D (GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const GLvoid *data);
 GLAPI void APIENTRY glGetCompressedTexImage (GLenum target, GLint level, GLvoid *img);
-#endif /* GL_GLEXT_PROTOTYPES */
+#else /* GL_GLEXT_PROTOTYPES */
 typedef void (APIENTRYP PFNGLACTIVETEXTUREPROC) (GLenum texture);
 typedef void (APIENTRYP PFNGLSAMPLECOVERAGEPROC) (GLfloat value, GLboolean invert);
 typedef void (APIENTRYP PFNGLCOMPRESSEDTEXIMAGE3DPROC) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid *data);

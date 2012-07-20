@@ -29,10 +29,6 @@
 
 #else
 
-#define RAD_FLAG(name) rad_flag_head_##name, name = RAD_MKFLAG(rad_flag_head_##name), rad_flag_tail_##name = rad_flag_head_##name
-#define RAD_FLAG_BIT(name, bit) name = RAD_MKFLAG(bit), rad_flag_tail_##name = bit
-
-#define RAD_MKFLAG(x) (1 << (x))
 #define RAD_FLAG_ARRAY_INDEX(_bit_, _array_type_) ((_bit_) / (sizeof(_array_type_) << 3))
 #define RAD_FLAG_ARRAY_VALUE(_bit_, _array_type_) (1 << ((_bit_) - ((_bit_) / (sizeof(_array_type_) << 3) * (sizeof(_array_type_) << 3))))
 

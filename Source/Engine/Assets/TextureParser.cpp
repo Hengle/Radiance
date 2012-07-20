@@ -1221,10 +1221,8 @@ int TextureParser::ExtractPVR(
 ) {
 	const U8 *data = (const U8*)src.getDataPtr();
 	const CPVRTextureHeader &header = src.getHeader();
-	AddrSize len = (AddrSize)header.getDataSize();
 
 	int numMips = header.getNumMIPLevels();
-	bool hasMips = numMips>1;
 		
 	img.AllocateMipmaps(frame, numMips);
 	

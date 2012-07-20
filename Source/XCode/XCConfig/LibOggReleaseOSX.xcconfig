@@ -1,0 +1,8 @@
+// LibOggReleaseOSX.xcconfig
+// libogg release OSX build config
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "ExternLibReleaseOSX.xcconfig"
+#include "LibOggPaths.xcconfig"
+#include "LibOggBuild.xcconfig"

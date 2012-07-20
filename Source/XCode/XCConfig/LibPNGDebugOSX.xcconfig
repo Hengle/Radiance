@@ -1,0 +1,8 @@
+// LibPNGDebugOSX.xcconfig
+// libpng debug OSX build config
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "ExternLibDebugOSX.xcconfig"
+#include "LibPNGPaths.xcconfig"
+#include "LibPNGBuild.xcconfig"

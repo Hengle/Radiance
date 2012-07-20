@@ -3,7 +3,11 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#pragma once
+
 #include <Runtime/Base.h>
+
+#define __glext_h_
 
 #if defined(RAD_OPT_WINX)
 	#define WIN32_LEAN_AND_MEAN
@@ -31,8 +35,10 @@
 	#include <Cg/cgGL.h>
 #endif
 
+#undef __glext_h_
 #include "glext.h"
 
 #if defined(RAD_OPT_WINX)
 #include "../PC/wglext.h"
 #endif
+

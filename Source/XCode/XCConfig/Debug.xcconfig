@@ -1,0 +1,11 @@
+// Debug.xcconfig
+// Sets debug settings common to all projects.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+DEBUG_INFORMATION_FORMAT = dwarf
+COPY_PHASE_STRIP = NO
+CONFIG_DEFINES = DEBUG=1 _DEBUG=1
+GCC_OPTIMIZATION_LEVEL = 0
+
+GCC_WARN_UNINITIALIZED_AUTOS = NO

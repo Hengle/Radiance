@@ -1,0 +1,10 @@
+// FreeTypeDebugiOS.xcconfig
+// freetype debug iOS build config
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+EXTRA_DEFINES = DARWIN_NO_CARBON
+
+#include "ExternLibDebugiOS.xcconfig"
+#include "FreeTypePaths.xcconfig"
+#include "FreeTypeBuild.xcconfig"

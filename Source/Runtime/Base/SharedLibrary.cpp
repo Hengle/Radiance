@@ -13,6 +13,7 @@
 #include "Utils.h"
 #include <dlfcn.h>
 #include <sstream>
+#include <iostream>
 #define DLOPEN
 using namespace string;
 #else
@@ -34,7 +35,7 @@ bool SharedLibrary::Load(const char *nativeFilename, bool reportErrors)
 #if defined(RAD_OPT_PC)
 	if (!m_h && reportErrors)
 	{
-		MessageBox("dlopen(): failed", RAD_SS("Failed to load " << nativeFilename << ". Error: " << dlerror()), MBStyleOk);
+		std::cerr << "dlopen(): failed" << "Failed to load " << nativeFilename << ". Error: " << dlerror();
 	}
 #endif
 #endif

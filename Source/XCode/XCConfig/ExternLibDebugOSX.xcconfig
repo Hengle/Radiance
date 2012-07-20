@@ -1,0 +1,10 @@
+// ExternLibDebugOSX.xcconfig
+// Sets up the basic settings for building an extern library for debug OSX.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "Common.xcconfig"
+#include "DebugOSX.xcconfig"
+#include "EngineRoot.xcconfig"
+#include "ExternPath.xcconfig"
+#include "DisablePCH.xcconfig"

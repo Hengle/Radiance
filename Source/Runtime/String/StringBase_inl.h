@@ -475,7 +475,7 @@ inline int vsnprintf<char>(char *dst, int count, const char *format, va_list arg
 #if defined(RAD_OPT_GCC)
 	va_list _valist;
 	va_copy(_valist, argptr);
-	int r = ::vsnprintf(buffer, count, format, _valist);
+	int r = ::vsnprintf(dst, count, format, _valist);
 #else
 	int r = ::vsnprintf(dst, (size_t)count, format, argptr);
 #endif
@@ -495,7 +495,7 @@ inline int vsnprintf<wchar_t>(wchar_t *dst, int count, const wchar_t *format, va
 #if defined(RAD_OPT_GCC)
 	va_list _valist;
 	va_copy(_valist, argptr);
-	return ::vswprintf(buffer, count, format, _valist);
+	int r = ::vswprintf(dst, count, format, _valist);
 #else
 	int r = ::vswprintf(dst, (size_t)count, format, argptr);
 #endif
@@ -512,8 +512,7 @@ inline int vscprintf<char>(const char *format, va_list argptr) {
 #else
 	va_list _valist;
 	va_copy(_valist, argptr);
-	return ::vsnprintf(temp, TempMax-1, format, _valist) + 1;
-
+	return ::vsnprintf(0, 0, format, _valist) + 1;
 #endif
 }
 
@@ -525,8 +524,7 @@ inline int vscprintf<wchar_t>(const wchar_t *format, va_list argptr) {
 
 	va_list _valist;
 	va_copy(_valist, argptr);
-	return ::vswprintf(temp, TempMax-1, format, _valist) + 1;
-
+	return ::vswprintf(0, 0, format, _valist) + 1;
 #endif
 }
 
@@ -551,7 +549,7 @@ inline int sprintf<wchar_t>(wchar_t *dst, const wchar_t *fmt, ...) {
 #if defined(RAD_OPT_WIN)
 	int c = vswprintf(dst, fmt, args);
 #else
-	int c = vswprintf(dst, 1024*1024, fmt, args);
+	int c = vswprintf(dst, std::numeric_limits<size_t>::max(), fmt, args);
 #endif
 	va_end(args);
 

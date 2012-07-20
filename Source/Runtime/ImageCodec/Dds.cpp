@@ -645,8 +645,8 @@ static const U8* DecodeMipMaps(
 			if (isRef) f->flags |= SharedFrameFlagRef;
 		}
 
-		w = (UReg)std::max<int>(1, w >> 1);
-		h = (UReg)std::max<int>(1, h >> 1);
+		w = std::max<int>(1, w >> 1);
+		h = std::max<int>(1, h >> 1);
 		lumpSize = w * h * bpp;
 	}
 
@@ -1035,8 +1035,8 @@ static bool EncodeMipMaps(
 			}
 		}
 
-		expWidth = (UReg)std::max<int>(1, expWidth >> 1);
-		expHeight = (UReg)std::max<int>(1, expHeight >> 1);
+		expWidth = std::max<int>(1, expWidth >> 1);
+		expHeight = std::max<int>(1, expHeight >> 1);
 	}
 
 	if (temp) 

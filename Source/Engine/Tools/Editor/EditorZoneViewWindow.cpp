@@ -74,7 +74,7 @@ void ZoneViewWindow::Update(const Zone &zone)
 	FormatSize(buf[3], zone.large);
 	FormatSize(buf[4], zone.high);
 	self.sprintf("Self: B(%s), O(%s), A(%d), S(%s), L(%s), H(%s)", 
-		buf[0], buf[1], zone.count.get(), buf[2], buf[3], buf[4]);
+		buf[0], buf[1], (int)zone.count.get(), buf[2], buf[3], buf[4]);
 
 	QString total;
 	FormatSize(buf[0], zone.totalBytes);
@@ -83,7 +83,7 @@ void ZoneViewWindow::Update(const Zone &zone)
 	FormatSize(buf[3], zone.totalLarge);
 	FormatSize(buf[4], zone.totalHigh);
 	total.sprintf("Total: B(%s), O(%s), A(%d), S(%s), L(%s), H(%s)", 
-		buf[0], buf[1], zone.totalCount.get(), buf[2], buf[3], buf[4]);
+		buf[0], buf[1], (int)zone.totalCount.get(), buf[2], buf[3], buf[4]);
 
 	QString title = "<" + QString(zone.name) + ">: " + total + "|" + self;
 

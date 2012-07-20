@@ -1,0 +1,7 @@
+// FreeTypePaths.xcconfig
+// Sets up the freetype library path.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+FREETYPE_PATH = $(EXTERN_PATH)/freetype-2.4.4/include
+

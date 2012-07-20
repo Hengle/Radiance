@@ -1,0 +1,8 @@
+// LuaReleaseOSX.xcconfig
+// lua release OSX build config
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "ExternLibReleaseOSX.xcconfig"
+#include "LuaPaths.xcconfig"
+#include "LuaBuild.xcconfig"

@@ -1,0 +1,8 @@
+// BoostBuild.xcconfig
+// Settings common to boost build on all platforms.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+HEADER_SEARCH_PATHS = "$(BOOST_PATH)" $(inherited)
+GCC_PREPROCESSOR_DEFINITIONS = $(CONFIG_DEFINES) BOOST_THREADED_BUILD_LIB BOOST_ALL_NO_LIB BOOST_NO_EXCEPTIONS BOOST_ALL_STATIC_LINK
+OTHER_LDFLAGS = $(CONFIG_LINKER_FLAGS)

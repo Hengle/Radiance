@@ -1,0 +1,10 @@
+// OSX.xcconfig
+// Settings common to all OSX projects
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+ARCHS = $(ARCHS_STANDARD_64_BIT)
+SDKROOT = macosx
+MACOSX_DEPLOYMENT_TARGET = 10.5
+VALID_ARCHS = i386 x86_64
+SUPPORTED_PLATFORMS = macosx

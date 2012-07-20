@@ -1,0 +1,6 @@
+// EnginePaths.xcconfig
+// Sets up the basic settings for building the engine library for debug OSX.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+ENGINE_PATH = $(GLOBAL_PROJECT_ROOT)/Radiance/Source

@@ -1,0 +1,9 @@
+// LibVorbisPaths.xcconfig
+// Sets up the libvorbis library library path.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "LibOggPaths.xcconfig"
+
+LIBVORBIS_PATH = $(EXTERN_PATH)/libvorbis-1.3.2/include
+

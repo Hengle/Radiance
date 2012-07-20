@@ -1072,7 +1072,6 @@ bool ContentBrowserView::ScrollToAsset(int id)
 		IdPos::Map::const_iterator it = m_ids.find(id);
 		if (it != m_ids.end())
 		{
-			const AssetInfo &info = it->second.row->second.assets[it->second.idx];
 			int vh = m_glw->height();
 			int y = it->second.row->second.y[0] - (vh-it->second.row->second.y[1])/2;
 			m_scroll->setSliderPosition(y < 0 ? 0 : y);
@@ -1134,7 +1133,6 @@ void ContentBrowserView::BuildRows()
 	int vh = m_glw->height();
 
 	int y = VItemSpace/2;
-	int yext = 0;
 
 	Row r;
 	r.assets.reserve(32);

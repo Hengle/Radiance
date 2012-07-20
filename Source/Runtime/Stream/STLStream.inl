@@ -98,7 +98,7 @@ inline SPos basic_streambuf_adapter<_Elem, _Traits>::Read(void* buff, SPos numBy
 	if (numBytes > 0)
 	{
 		RAD_ASSERT_MSG((numBytes%sizeof(typename stl_buf::char_type)) == 0, "Illegal byte count. numBytes is not a multiple of the underlying STL stream element size!");
-		SPos read = (SPos)m_b->sgetn((typename stl_buf::char_type*)buff, (std::streamsize)(numBytes / sizeof(typename stl_buf::char_type))) * sizeof(typename stl_buf::char_type);
+		SPos read = (SPos)(m_b->sgetn((typename stl_buf::char_type*)buff, (std::streamsize)(numBytes / sizeof(typename stl_buf::char_type))) * sizeof(typename stl_buf::char_type));
 		SetErrorCode(errorCode, (read<numBytes) ? ErrorUnderflow : Success);
 		return read;
 	}
@@ -134,7 +134,7 @@ inline bool basic_streambuf_adapter<_Elem, _Traits>::SeekOut(Seek seekType, SPos
 template<typename _Elem, typename _Traits>
 inline SPos basic_streambuf_adapter<_Elem, _Traits>::OutPos() const
 {
-	return (SPos)m_b->pubseekoff(0, std::ios_base::cur, std::ios_base::out) * sizeof(typename stl_buf::char_type);
+	return (SPos)(m_b->pubseekoff(0, std::ios_base::cur, std::ios_base::out) * sizeof(typename stl_buf::char_type));
 }
 
 template<typename _Elem, typename _Traits>
@@ -143,7 +143,7 @@ inline SPos basic_streambuf_adapter<_Elem, _Traits>::Write(const void* buff, SPo
 	if (numBytes > 0)
 	{
 		RAD_ASSERT_MSG((numBytes%sizeof(_Elem)) == 0, "Illegal byte count. numBytes is not a multiple of the underlying STL stream element size!");
-		SPos write = (SPos)m_b->sputn((const typename stl_buf::char_type*)buff, (std::streamsize)(numBytes / sizeof(typename stl_buf::char_type))) * sizeof(typename stl_buf::char_type);
+		SPos write = (SPos)(m_b->sputn((const typename stl_buf::char_type*)buff, (std::streamsize)(numBytes / sizeof(typename stl_buf::char_type))) * sizeof(typename stl_buf::char_type));
 		SetErrorCode(errorCode, (write<numBytes) ? ErrorOverflow : Success);
 		return write;
 	}
@@ -237,7 +237,7 @@ std::streamsize basic_streambuf<_Elem, _Traits>::xsgetn(_Elem *ptr, std::streams
 	SPos r = 0;
 	if (m_in)
 	{
-		r = m_in->Read(ptr, (SPos)count*sizeof(_Elem), 0) / sizeof(_Elem);
+		r = m_in->Read(ptr, (SPos)count*(SPos)sizeof(_Elem), 0) / (SPos)sizeof(_Elem);
 		this->setg(0, 0, 0);
 	}
 	return (std::streamsize)r;
@@ -249,7 +249,7 @@ std::streamsize basic_streambuf<_Elem, _Traits>::xsputn(const _Elem *ptr, std::s
 	SPos r = 0;
 	if (m_out)
 	{
-		r = m_out->Write(ptr, (SPos)count*sizeof(_Elem), 0) / sizeof(_Elem);
+		r = m_out->Write(ptr, (SPos)count*(SPos)sizeof(_Elem), 0) / (SPos)sizeof(_Elem);
 	}
 	return (std::streamsize)r;
 }

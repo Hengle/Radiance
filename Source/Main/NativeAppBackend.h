@@ -11,6 +11,8 @@
 
 #if defined(RAD_OPT_WIN)
 #include "Win/WinNativeApp.h"
+#elif defined(RAD_OPT_OSX)
+#include "OSX/OSXNativeApp.h"
 #else
 #error RAD_ERROR_UNSUP_PLAT
 #endif

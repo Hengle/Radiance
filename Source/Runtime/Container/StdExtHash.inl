@@ -52,6 +52,7 @@ struct hash<std::basic_string<A, B, C> >
 	}
 };
 
+template <>
 struct hash<string::String>
 {
 	size_t operator () (const string::String &str) const

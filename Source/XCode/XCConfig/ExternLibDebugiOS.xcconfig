@@ -1,0 +1,10 @@
+// ExternLiDebugiOS.xcconfig
+// Sets up the basic settings for building an extern library for debug iOS.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "Common.xcconfig"
+#include "DebugiOS.xcconfig"
+#include "EngineRoot.xcconfig"
+#include "ExternPath.xcconfig"
+#include "DisablePCH.xcconfig"

@@ -1,0 +1,8 @@
+// LibOggReleaseiOS.xcconfig
+// libogg debug iOS build config
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "ExternLibReleaseiOS.xcconfig"
+#include "LibOggPaths.xcconfig"
+#include "LibOggBuild.xcconfig"

@@ -1,0 +1,7 @@
+// LuaPaths.xcconfig
+// Sets up the libvorbis library library path.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+LUA_PATH = $(EXTERN_PATH)/lua-5.1.5
+

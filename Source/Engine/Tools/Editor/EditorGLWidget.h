@@ -7,8 +7,10 @@
 
 #include "EditorTypes.h"
 #include "../../Renderer/Renderer.h"
+#define __glext_h_
 #include <QtOpenGL/QGLContext>
 #include <QtOpenGL/QGLWidget>
+#undef __glext_h_
 #include <Runtime/PushPack.h>
 
 class QWheelEvent;

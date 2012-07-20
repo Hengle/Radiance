@@ -55,8 +55,8 @@ m_userSettings(
 m_userSettings(
 	QSettings::IniFormat,
 	QSettings::UserScope,
-	QString::fromWCharArray(app.company),
-	QString::fromWCharArray(app.title)
+	QString(app.company.get()),
+	QString(app.title.get())
 )
 #endif
 {

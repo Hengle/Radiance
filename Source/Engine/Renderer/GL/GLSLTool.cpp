@@ -15,7 +15,7 @@
 #include <sstream>
 #include <Runtime/Stream/STLStream.h>
 #include <Runtime/StringBase.h>
-#include "../../../../Extern/glsl-optimizer-v1/src/glsl/glsl_optimizer.h"
+#include "../../../../../Extern/glsl-optimizer-v1/src/glsl/glsl_optimizer.h"
 
 namespace r {
 

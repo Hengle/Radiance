@@ -1,0 +1,7 @@
+// DebugOSX.xcconfig
+// Sets up the basic settings for building for debug OSX.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "OSX.xcconfig"
+#include "Debug.xcconfig"

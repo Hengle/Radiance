@@ -1,0 +1,11 @@
+// RootPath.xcconfig
+// Sets up the basic root project paths.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+// NOTE: These are not both used. 
+// The Application will include AppRoot.xcconfig to select the APP_PROJECT_ROOT
+// Engine libraries will include EngineRoot.xcconfig
+
+APP_PROJECT_ROOT = $(PROJECT_DIR)/../..
+ENGINE_PROJECT_ROOT = $(APP_PROJECT_ROOT)/..

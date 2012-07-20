@@ -1,0 +1,6 @@
+// PVRTexLibPaths.xcconfig
+// Sets up the zlib library library path.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+PVRTEXLIB_PATH = $(EXTERN_PATH)/PVRTexLib-4.04

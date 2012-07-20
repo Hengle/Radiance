@@ -1,0 +1,483 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3382439015B789B1002B9F95 /* bitwise.c in Sources */ = {isa = PBXBuildFile; fileRef = 3382438E15B789B1002B9F95 /* bitwise.c */; };
+		3382439115B789B1002B9F95 /* bitwise.c in Sources */ = {isa = PBXBuildFile; fileRef = 3382438E15B789B1002B9F95 /* bitwise.c */; };
+		3382439215B789B1002B9F95 /* framing.c in Sources */ = {isa = PBXBuildFile; fileRef = 3382438F15B789B1002B9F95 /* framing.c */; };
+		3382439315B789B1002B9F95 /* framing.c in Sources */ = {isa = PBXBuildFile; fileRef = 3382438F15B789B1002B9F95 /* framing.c */; };
+		338384BD15B7882F00A28CCF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 338384BC15B7882F00A28CCF /* Foundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		3382438E15B789B1002B9F95 /* bitwise.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bitwise.c; path = "../../../Extern/libogg-1.2.2/src/bitwise.c"; sourceTree = "<group>"; };
+		3382438F15B789B1002B9F95 /* framing.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = framing.c; path = "../../../Extern/libogg-1.2.2/src/framing.c"; sourceTree = "<group>"; };
+		338384BC15B7882F00A28CCF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		338384CA15B7886900A28CCF /* libliboggOSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libliboggOSX.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		338384CB15B7886900A28CCF /* libliboggiOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libliboggiOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		33F199DD15B89931006D8DCC /* LibOggBuild.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = LibOggBuild.xcconfig; path = XCConfig/LibOggBuild.xcconfig; sourceTree = "<group>"; };
+		33F199DE15B89931006D8DCC /* LibOggDebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = LibOggDebugiOS.xcconfig; path = XCConfig/LibOggDebugiOS.xcconfig; sourceTree = "<group>"; };
+		33F199DF15B89931006D8DCC /* LibOggDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = LibOggDebugOSX.xcconfig; path = XCConfig/LibOggDebugOSX.xcconfig; sourceTree = "<group>"; };
+		33F199E015B89931006D8DCC /* LibOggPaths.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = LibOggPaths.xcconfig; path = XCConfig/LibOggPaths.xcconfig; sourceTree = "<group>"; };
+		33F199E115B89931006D8DCC /* LibOggReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = LibOggReleaseiOS.xcconfig; path = XCConfig/LibOggReleaseiOS.xcconfig; sourceTree = "<group>"; };
+		33F199E215B89931006D8DCC /* LibOggReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = LibOggReleaseOSX.xcconfig; path = XCConfig/LibOggReleaseOSX.xcconfig; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		338384AC15B7882100A28CCF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		338384B715B7882F00A28CCF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				338384BD15B7882F00A28CCF /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3382438C15B789A0002B9F95 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				3382438E15B789B1002B9F95 /* bitwise.c */,
+				3382438F15B789B1002B9F95 /* framing.c */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		338384A415B7882100A28CCF = {
+			isa = PBXGroup;
+			children = (
+				3382438C15B789A0002B9F95 /* Source */,
+				338384CF15B7887A00A28CCF /* XCConfig */,
+				338384BB15B7882F00A28CCF /* Frameworks */,
+				338384CE15B7887200A28CCF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		338384BB15B7882F00A28CCF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				338384BC15B7882F00A28CCF /* Foundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		338384CE15B7887200A28CCF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				338384CA15B7886900A28CCF /* libliboggOSX.a */,
+				338384CB15B7886900A28CCF /* libliboggiOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		338384CF15B7887A00A28CCF /* XCConfig */ = {
+			isa = PBXGroup;
+			children = (
+				33F199DD15B89931006D8DCC /* LibOggBuild.xcconfig */,
+				33F199DE15B89931006D8DCC /* LibOggDebugiOS.xcconfig */,
+				33F199DF15B89931006D8DCC /* LibOggDebugOSX.xcconfig */,
+				33F199E015B89931006D8DCC /* LibOggPaths.xcconfig */,
+				33F199E115B89931006D8DCC /* LibOggReleaseiOS.xcconfig */,
+				33F199E215B89931006D8DCC /* LibOggReleaseOSX.xcconfig */,
+			);
+			name = XCConfig;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		338384AD15B7882100A28CCF /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		338384B815B7882F00A28CCF /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		338384AE15B7882100A28CCF /* liboggOSX */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 338384B315B7882100A28CCF /* Build configuration list for PBXNativeTarget "liboggOSX" */;
+			buildPhases = (
+				338384AB15B7882100A28CCF /* Sources */,
+				338384AC15B7882100A28CCF /* Frameworks */,
+				338384AD15B7882100A28CCF /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = liboggOSX;
+			productName = libogg;
+			productReference = 338384CA15B7886900A28CCF /* libliboggOSX.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		338384B915B7882F00A28CCF /* liboggiOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 338384C415B7882F00A28CCF /* Build configuration list for PBXNativeTarget "liboggiOS" */;
+			buildPhases = (
+				338384B615B7882F00A28CCF /* Sources */,
+				338384B715B7882F00A28CCF /* Frameworks */,
+				338384B815B7882F00A28CCF /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = liboggiOS;
+			productName = liboggiOS;
+			productReference = 338384CB15B7886900A28CCF /* libliboggiOS.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		338384A615B7882100A28CCF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0430;
+			};
+			buildConfigurationList = 338384A915B7882100A28CCF /* Build configuration list for PBXProject "libogg" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 338384A415B7882100A28CCF;
+			productRefGroup = 338384A415B7882100A28CCF;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				338384AE15B7882100A28CCF /* liboggOSX */,
+				338384B915B7882F00A28CCF /* liboggiOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		338384AB15B7882100A28CCF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3382439015B789B1002B9F95 /* bitwise.c in Sources */,
+				3382439215B789B1002B9F95 /* framing.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		338384B615B7882F00A28CCF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3382439115B789B1002B9F95 /* bitwise.c in Sources */,
+				3382439315B789B1002B9F95 /* framing.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		338384B115B7882100A28CCF /* Dev - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+			};
+			name = "Dev - Debug";
+		};
+		338384B215B7882100A28CCF /* Dev - Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+			};
+			name = "Dev - Release";
+		};
+		338384B415B7882100A28CCF /* Dev - Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33F199DF15B89931006D8DCC /* LibOggDebugOSX.xcconfig */;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Dev - Debug";
+		};
+		338384B515B7882100A28CCF /* Dev - Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33F199E215B89931006D8DCC /* LibOggReleaseOSX.xcconfig */;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Dev - Release";
+		};
+		338384C515B7882F00A28CCF /* Dev - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/liboggiOS.dst;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = "Dev - Debug";
+		};
+		338384C615B7882F00A28CCF /* Dev - Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/liboggiOS.dst;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Dev - Release";
+		};
+		33E881E715B8B0FD0089BA08 /* Ship - Debug - iOS */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+			};
+			name = "Ship - Debug - iOS";
+		};
+		33E881E815B8B0FD0089BA08 /* Ship - Debug - iOS */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Ship - Debug - iOS";
+		};
+		33E881E915B8B0FD0089BA08 /* Ship - Debug - iOS */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33F199DE15B89931006D8DCC /* LibOggDebugiOS.xcconfig */;
+			buildSettings = {
+				DSTROOT = /tmp/liboggiOS.dst;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = "Ship - Debug - iOS";
+		};
+		33E881EB15B8B42A0089BA08 /* Ship - Debug - OSX */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+			};
+			name = "Ship - Debug - OSX";
+		};
+		33E881EC15B8B42A0089BA08 /* Ship - Debug - OSX */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33F199DF15B89931006D8DCC /* LibOggDebugOSX.xcconfig */;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Ship - Debug - OSX";
+		};
+		33E881ED15B8B42A0089BA08 /* Ship - Debug - OSX */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/liboggiOS.dst;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = "Ship - Debug - OSX";
+		};
+		33E881EE15B8B4300089BA08 /* Ship - Release - iOS */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+			};
+			name = "Ship - Release - iOS";
+		};
+		33E881EF15B8B4300089BA08 /* Ship - Release - iOS */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Ship - Release - iOS";
+		};
+		33E881F015B8B4300089BA08 /* Ship - Release - iOS */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33F199E115B89931006D8DCC /* LibOggReleaseiOS.xcconfig */;
+			buildSettings = {
+				DSTROOT = /tmp/liboggiOS.dst;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Ship - Release - iOS";
+		};
+		33E881F115B8B4370089BA08 /* Ship - Release - OSX */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+			};
+			name = "Ship - Release - OSX";
+		};
+		33E881F215B8B4370089BA08 /* Ship - Release - OSX */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33F199E215B89931006D8DCC /* LibOggReleaseOSX.xcconfig */;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Ship - Release - OSX";
+		};
+		33E881F315B8B4370089BA08 /* Ship - Release - OSX */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/liboggiOS.dst;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Ship - Release - OSX";
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		338384A915B7882100A28CCF /* Build configuration list for PBXProject "libogg" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				338384B115B7882100A28CCF /* Dev - Debug */,
+				33E881EB15B8B42A0089BA08 /* Ship - Debug - OSX */,
+				33E881E715B8B0FD0089BA08 /* Ship - Debug - iOS */,
+				338384B215B7882100A28CCF /* Dev - Release */,
+				33E881EE15B8B4300089BA08 /* Ship - Release - iOS */,
+				33E881F115B8B4370089BA08 /* Ship - Release - OSX */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Dev - Release";
+		};
+		338384B315B7882100A28CCF /* Build configuration list for PBXNativeTarget "liboggOSX" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				338384B415B7882100A28CCF /* Dev - Debug */,
+				33E881EC15B8B42A0089BA08 /* Ship - Debug - OSX */,
+				33E881E815B8B0FD0089BA08 /* Ship - Debug - iOS */,
+				338384B515B7882100A28CCF /* Dev - Release */,
+				33E881EF15B8B4300089BA08 /* Ship - Release - iOS */,
+				33E881F215B8B4370089BA08 /* Ship - Release - OSX */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Dev - Release";
+		};
+		338384C415B7882F00A28CCF /* Build configuration list for PBXNativeTarget "liboggiOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				338384C515B7882F00A28CCF /* Dev - Debug */,
+				33E881ED15B8B42A0089BA08 /* Ship - Debug - OSX */,
+				33E881E915B8B0FD0089BA08 /* Ship - Debug - iOS */,
+				338384C615B7882F00A28CCF /* Dev - Release */,
+				33E881F015B8B4300089BA08 /* Ship - Release - iOS */,
+				33E881F315B8B4370089BA08 /* Ship - Release - OSX */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Dev - Release";
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 338384A615B7882100A28CCF /* Project object */;
+}

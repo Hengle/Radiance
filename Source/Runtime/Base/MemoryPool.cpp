@@ -83,7 +83,7 @@ void MemoryPool::Create(
 	MP_ASSERT(!m_inited);
 	MP_ASSERT(inDataSize > 0);
 	MP_ASSERT(alignment >= PoolAlignment);
-	BOOST_STATIC_ASSERT(MemoryPool::PoolAlignment >= DefaultAlignment);
+	BOOST_STATIC_ASSERT((int)MemoryPool::PoolAlignment >= (int)DefaultAlignment);
 
 	m_inited = true;
 

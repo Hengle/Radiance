@@ -1,0 +1,14 @@
+// Common.xcconfig
+// Settings shared by all projects.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+GCC_STRICT_ALIASING = NO
+GCC_VERSION = com.apple.compilers.llvmgcc42
+USE_HEADERMAP = NO
+GCC_SYMBOLS_PRIVATE_EXTERN = NO
+GCC_C_LANGUAGE_STANDARD = gnu99
+GCC_ENABLE_OBJC_EXCEPTIONS = YES
+GCC_DYNAMIC_NO_PIC = NO
+ALWAYS_SEARCH_USER_PATHS = NO
+CONFIG_LINKER_FLAGS = -ObjC

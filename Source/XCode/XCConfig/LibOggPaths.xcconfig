@@ -1,0 +1,6 @@
+// LibOggPaths.xcconfig
+// Sets up the libogg library library path.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+LIBOGG_PATH = $(EXTERN_PATH)/libogg-1.2.2/include

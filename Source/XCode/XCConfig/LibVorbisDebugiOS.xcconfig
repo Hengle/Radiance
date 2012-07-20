@@ -1,0 +1,8 @@
+// LibVobisDebugiOS.xcconfig
+// libvorbis debug iOS build config
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "ExternLibDebugiOS.xcconfig"
+#include "LibVorbisPaths.xcconfig"
+#include "LibVorbisBuild.xcconfig"

@@ -1,0 +1,7 @@
+// DisablePCH.xcconfig
+// Disables precompiled headers.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+GCC_PRECOMPILE_PREFIX_HEADER = NO
+GCC_PREFIX_HEADER = 

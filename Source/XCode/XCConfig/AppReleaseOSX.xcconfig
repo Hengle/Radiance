@@ -1,0 +1,11 @@
+// AppReleaseOSX.xcconfig
+// Sets up the basic settings for building the app for release OSX.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "Common.xcconfig"
+#include "ReleaseOSX.xcconfig"
+#include "AppRoot.xcconfig"
+#include "ExternPath.xcconfig"
+#include "EnginePaths.xcconfig"
+#include "ExternLibPaths.xcconfig"

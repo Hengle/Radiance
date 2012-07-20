@@ -1,0 +1,8 @@
+// ZLibBuild.xcconfig
+// Settings common to zlib build on all platforms.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+HEADER_SEARCH_PATHS = $(inherited)
+GCC_PREPROCESSOR_DEFINITIONS = $(CONFIG_DEFINES)
+OTHER_LDFLAGS = $(CONFIG_LINKER_FLAGS)

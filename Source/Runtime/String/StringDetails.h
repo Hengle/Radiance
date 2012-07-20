@@ -46,8 +46,8 @@ public:
 
 private:
 
-	friend class String;
-	template <typename> friend class CharBuf;
+	friend class string::String;
+	template <typename> friend class string::CharBuf;
 	friend class ObjectPool<DataBlock>;
 
 	typedef void (*unspecified_bool_type) ();

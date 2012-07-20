@@ -1,0 +1,6 @@
+// ZLibPaths.xcconfig
+// Sets up the zlib library library path.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+ZLIB_PATH = $(EXTERN_PATH)/zlib-1.2.7

@@ -1,0 +1,7 @@
+// GLOptimizerPaths.xcconfig
+// Sets up the glsl-optimizer library library path.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+GLSLOPTIMIZER_PATH = $(EXTERN_PATH)/glsl-optimizer-v1
+

@@ -1,0 +1,6 @@
+// OpenALPaths.xcconfig
+// Sets up the openal library library path.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+OPENAL_PATH = $(EXTERN_PATH)/OpenALSoft-1.14/include

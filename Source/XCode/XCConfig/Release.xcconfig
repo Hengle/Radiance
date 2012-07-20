@@ -1,0 +1,8 @@
+// Release.xcconfig
+// Sets release settings common to all projects.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
+COPY_PHASE_STRIP = YES
+CONFIG_DEFINES = NDEBUG=1

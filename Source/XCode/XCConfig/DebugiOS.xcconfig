@@ -1,0 +1,9 @@
+// DebugiOS.xcconfig
+// Sets up the basic settings for building for debug iOS.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "iOS.xcconfig"
+#include "Debug.xcconfig"
+
+VALIDATE_PRODUCT = NO

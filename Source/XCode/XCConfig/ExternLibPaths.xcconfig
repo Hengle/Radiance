@@ -1,0 +1,16 @@
+// ExternLibPaths.xcconfig
+// Sets up the extern library paths
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "BoostPaths.xcconfig"
+#include "FreeTypePaths.xcconfig"
+#include "LibJPEGPaths.xcconfig"
+#include "LibVorbisPaths.xcconfig"
+#include "LibPNGPaths.xcconfig"
+#include "LuaPaths.xcconfig"
+#include "ZLibPaths.xcconfig"
+#include "PVRTexLibPaths.xcconfig"
+#include "OpenALPaths.xcconfig"
+
+EXTERNLIB_INCLUDES = "$(BOOST_PATH)" "$(FREETYPE_PATH)" "$(LIBJPEG_PATH)" "$(LIBOGG_PATH)" "$(LIBVORBIS_PATH)" "$(LIBPNG_PATH)" "$(LUA_PATH)" "$(ZLIB_PATH)" "$(OPENAL_PATH)"

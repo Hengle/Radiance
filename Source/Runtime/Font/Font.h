@@ -69,8 +69,12 @@ private:
 
 	void Copy(const FT_Glyph_Metrics_ *metrics);
 
+#if defined(RAD_OPT_GCC) && (RAD_OPT_MACHINE_WORD_SIZE==8)
+	enum { SizeofMetrics = 64 };
+#else
 	enum { SizeofMetrics = 32 };
-
+#endif
+	
 	U8 m_metrics[SizeofMetrics];
 
 	friend class Glyph;

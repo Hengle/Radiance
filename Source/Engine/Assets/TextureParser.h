@@ -49,7 +49,7 @@ public:
 	typedef boost::shared_ptr<TextureParser> Ref;
 
 	struct Header {
-		UReg format;
+		int format;
 		int width;
 		int height;
 		int numMips;

@@ -22,7 +22,7 @@
 #undef min
 #undef max
 
-BOOST_STATIC_ASSERT(ska::MaxUVChannels <= tools::Map::MaxUVChannels);
+BOOST_STATIC_ASSERT((int)ska::MaxUVChannels <= (int)tools::Map::MaxUVChannels);
 
 namespace tools {
 
@@ -859,7 +859,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 			if (!os.Write((U16)boneTagOfs))
 				return false;
 
-			bytes += sizeof(U16) * 3;
+			bytes += (int)sizeof(U16) * 3;
 
 			boneTagOfs += numBones * 3;
 			if (boneTagOfs > std::numeric_limits<U16>::max())
@@ -871,14 +871,12 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 
 		if (!os.Write((U16)boneTagOfs))
 			return false;
-		bytes += sizeof(U16);
+		bytes += (int)sizeof(U16);
 
 		// build bone tag data.
 		tagIt = tables.tags.begin();
 		for (size_t j = 0; j < m_anims[i].frames.size(); ++j)
 		{
-			int numBones = 0;
-
 			for (size_t k = 0; k < m_bones.size(); ++k, ++tagIt)
 			{
 				int tagIdx = *tagIt;

@@ -1,0 +1,522 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3383823F15B73D2300A28CCF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3383823E15B73D2300A28CCF /* Foundation.framework */; };
+		338382A615B751B300A28CCF /* chrono.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 338382A315B751B300A28CCF /* chrono.cpp */; };
+		338382A715B751B300A28CCF /* chrono.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 338382A315B751B300A28CCF /* chrono.cpp */; };
+		338382A815B751B300A28CCF /* process_cpu_clocks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 338382A415B751B300A28CCF /* process_cpu_clocks.cpp */; };
+		338382A915B751B300A28CCF /* process_cpu_clocks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 338382A415B751B300A28CCF /* process_cpu_clocks.cpp */; };
+		338382AA15B751B300A28CCF /* thread_clock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 338382A515B751B300A28CCF /* thread_clock.cpp */; };
+		338382AB15B751B300A28CCF /* thread_clock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 338382A515B751B300A28CCF /* thread_clock.cpp */; };
+		338382AD15B751D000A28CCF /* error_code.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 338382AC15B751D000A28CCF /* error_code.cpp */; };
+		338382AE15B751D000A28CCF /* error_code.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 338382AC15B751D000A28CCF /* error_code.cpp */; };
+		338382B115B751E700A28CCF /* once.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 338382AF15B751E700A28CCF /* once.cpp */; };
+		338382B215B751E700A28CCF /* once.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 338382AF15B751E700A28CCF /* once.cpp */; };
+		338382B315B751E700A28CCF /* thread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 338382B015B751E700A28CCF /* thread.cpp */; };
+		338382B415B751E700A28CCF /* thread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 338382B015B751E700A28CCF /* thread.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		3383823E15B73D2300A28CCF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		3383824C15B73D7200A28CCF /* libboostOSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libboostOSX.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		3383824D15B73D7200A28CCF /* libboostiOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libboostiOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		338382A315B751B300A28CCF /* chrono.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = chrono.cpp; path = "../../../Extern/boost-1.50.0/libs/chrono/src/chrono.cpp"; sourceTree = "<group>"; };
+		338382A415B751B300A28CCF /* process_cpu_clocks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = process_cpu_clocks.cpp; path = "../../../Extern/boost-1.50.0/libs/chrono/src/process_cpu_clocks.cpp"; sourceTree = "<group>"; };
+		338382A515B751B300A28CCF /* thread_clock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = thread_clock.cpp; path = "../../../Extern/boost-1.50.0/libs/chrono/src/thread_clock.cpp"; sourceTree = "<group>"; };
+		338382AC15B751D000A28CCF /* error_code.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = error_code.cpp; path = "../../../Extern/boost-1.50.0/libs/system/src/error_code.cpp"; sourceTree = "<group>"; };
+		338382AF15B751E700A28CCF /* once.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = once.cpp; path = "../../../Extern/boost-1.50.0/libs/thread/src/pthread/once.cpp"; sourceTree = "<group>"; };
+		338382B015B751E700A28CCF /* thread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = thread.cpp; path = "../../../Extern/boost-1.50.0/libs/thread/src/pthread/thread.cpp"; sourceTree = "<group>"; };
+		33F199C715B89901006D8DCC /* BoostBuild.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = BoostBuild.xcconfig; path = XCConfig/BoostBuild.xcconfig; sourceTree = "<group>"; };
+		33F199C815B89901006D8DCC /* BoostDebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = BoostDebugiOS.xcconfig; path = XCConfig/BoostDebugiOS.xcconfig; sourceTree = "<group>"; };
+		33F199C915B89901006D8DCC /* BoostDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = BoostDebugOSX.xcconfig; path = XCConfig/BoostDebugOSX.xcconfig; sourceTree = "<group>"; };
+		33F199CA15B89901006D8DCC /* BoostPaths.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = BoostPaths.xcconfig; path = XCConfig/BoostPaths.xcconfig; sourceTree = "<group>"; };
+		33F199CB15B89901006D8DCC /* BoostReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = BoostReleaseiOS.xcconfig; path = XCConfig/BoostReleaseiOS.xcconfig; sourceTree = "<group>"; };
+		33F199CC15B89901006D8DCC /* BoostReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = BoostReleaseOSX.xcconfig; path = XCConfig/BoostReleaseOSX.xcconfig; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3383822E15B73CF800A28CCF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3383823915B73D2300A28CCF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3383823F15B73D2300A28CCF /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3383822615B73CF800A28CCF = {
+			isa = PBXGroup;
+			children = (
+				338382A215B7518700A28CCF /* Source */,
+				3383825E15B742C000A28CCF /* XCConfig */,
+				3383823D15B73D2300A28CCF /* Frameworks */,
+				3383824E15B73D7C00A28CCF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		3383823D15B73D2300A28CCF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3383823E15B73D2300A28CCF /* Foundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3383824E15B73D7C00A28CCF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3383824C15B73D7200A28CCF /* libboostOSX.a */,
+				3383824D15B73D7200A28CCF /* libboostiOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3383825E15B742C000A28CCF /* XCConfig */ = {
+			isa = PBXGroup;
+			children = (
+				33F199C715B89901006D8DCC /* BoostBuild.xcconfig */,
+				33F199C815B89901006D8DCC /* BoostDebugiOS.xcconfig */,
+				33F199C915B89901006D8DCC /* BoostDebugOSX.xcconfig */,
+				33F199CA15B89901006D8DCC /* BoostPaths.xcconfig */,
+				33F199CB15B89901006D8DCC /* BoostReleaseiOS.xcconfig */,
+				33F199CC15B89901006D8DCC /* BoostReleaseOSX.xcconfig */,
+			);
+			name = XCConfig;
+			sourceTree = "<group>";
+		};
+		338382A215B7518700A28CCF /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				338382AF15B751E700A28CCF /* once.cpp */,
+				338382B015B751E700A28CCF /* thread.cpp */,
+				338382AC15B751D000A28CCF /* error_code.cpp */,
+				338382A315B751B300A28CCF /* chrono.cpp */,
+				338382A415B751B300A28CCF /* process_cpu_clocks.cpp */,
+				338382A515B751B300A28CCF /* thread_clock.cpp */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		3383822F15B73CF800A28CCF /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3383823A15B73D2300A28CCF /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		3383823015B73CF800A28CCF /* boostOSX */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3383823515B73CF800A28CCF /* Build configuration list for PBXNativeTarget "boostOSX" */;
+			buildPhases = (
+				3383822D15B73CF800A28CCF /* Sources */,
+				3383822E15B73CF800A28CCF /* Frameworks */,
+				3383822F15B73CF800A28CCF /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = boostOSX;
+			productName = boost;
+			productReference = 3383824C15B73D7200A28CCF /* libboostOSX.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		3383823B15B73D2300A28CCF /* boostiOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3383824615B73D2300A28CCF /* Build configuration list for PBXNativeTarget "boostiOS" */;
+			buildPhases = (
+				3383823815B73D2300A28CCF /* Sources */,
+				3383823915B73D2300A28CCF /* Frameworks */,
+				3383823A15B73D2300A28CCF /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = boostiOS;
+			productName = boostiOS;
+			productReference = 3383824D15B73D7200A28CCF /* libboostiOS.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3383822815B73CF800A28CCF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0430;
+			};
+			buildConfigurationList = 3383822B15B73CF800A28CCF /* Build configuration list for PBXProject "boost" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 3383822615B73CF800A28CCF;
+			productRefGroup = 3383822615B73CF800A28CCF;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3383823015B73CF800A28CCF /* boostOSX */,
+				3383823B15B73D2300A28CCF /* boostiOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3383822D15B73CF800A28CCF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				338382A615B751B300A28CCF /* chrono.cpp in Sources */,
+				338382A815B751B300A28CCF /* process_cpu_clocks.cpp in Sources */,
+				338382AA15B751B300A28CCF /* thread_clock.cpp in Sources */,
+				338382AD15B751D000A28CCF /* error_code.cpp in Sources */,
+				338382B115B751E700A28CCF /* once.cpp in Sources */,
+				338382B315B751E700A28CCF /* thread.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3383823815B73D2300A28CCF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				338382A715B751B300A28CCF /* chrono.cpp in Sources */,
+				338382A915B751B300A28CCF /* process_cpu_clocks.cpp in Sources */,
+				338382AB15B751B300A28CCF /* thread_clock.cpp in Sources */,
+				338382AE15B751D000A28CCF /* error_code.cpp in Sources */,
+				338382B215B751E700A28CCF /* once.cpp in Sources */,
+				338382B415B751E700A28CCF /* thread.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		3383823315B73CF800A28CCF /* Dev - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = "Dev - Debug";
+		};
+		3383823415B73CF800A28CCF /* Dev - Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = "Dev - Release";
+		};
+		3383823615B73CF800A28CCF /* Dev - Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33F199C915B89901006D8DCC /* BoostDebugOSX.xcconfig */;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Dev - Debug";
+		};
+		3383823715B73CF800A28CCF /* Dev - Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33F199CC15B89901006D8DCC /* BoostReleaseOSX.xcconfig */;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Dev - Release";
+		};
+		3383824715B73D2300A28CCF /* Dev - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				DSTROOT = /tmp/boostiOS.dst;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = "Dev - Debug";
+		};
+		3383824815B73D2300A28CCF /* Dev - Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				DSTROOT = /tmp/boostiOS.dst;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Dev - Release";
+		};
+		33E8816D15B8AE2C0089BA08 /* Ship - Debug - iOS */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = "Ship - Debug - iOS";
+		};
+		33E8816E15B8AE2C0089BA08 /* Ship - Debug - iOS */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Ship - Debug - iOS";
+		};
+		33E8816F15B8AE2C0089BA08 /* Ship - Debug - iOS */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33F199C815B89901006D8DCC /* BoostDebugiOS.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				DSTROOT = /tmp/boostiOS.dst;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = "Ship - Debug - iOS";
+		};
+		33E8817015B8AE360089BA08 /* Ship - Release - iOS */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = "Ship - Release - iOS";
+		};
+		33E8817115B8AE360089BA08 /* Ship - Release - iOS */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Ship - Release - iOS";
+		};
+		33E8817215B8AE360089BA08 /* Ship - Release - iOS */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33F199CB15B89901006D8DCC /* BoostReleaseiOS.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				DSTROOT = /tmp/boostiOS.dst;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Ship - Release - iOS";
+		};
+		33E881BE15B8B0270089BA08 /* Ship - Debug - OSX */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = "Ship - Debug - OSX";
+		};
+		33E881BF15B8B0270089BA08 /* Ship - Debug - OSX */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33F199C915B89901006D8DCC /* BoostDebugOSX.xcconfig */;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Ship - Debug - OSX";
+		};
+		33E881C015B8B0270089BA08 /* Ship - Debug - OSX */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				DSTROOT = /tmp/boostiOS.dst;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = "Ship - Debug - OSX";
+		};
+		33E881C115B8B03C0089BA08 /* Ship - Release - OSX */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = "Ship - Release - OSX";
+		};
+		33E881C215B8B03C0089BA08 /* Ship - Release - OSX */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33F199CC15B89901006D8DCC /* BoostReleaseOSX.xcconfig */;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Ship - Release - OSX";
+		};
+		33E881C315B8B03C0089BA08 /* Ship - Release - OSX */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				DSTROOT = /tmp/boostiOS.dst;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Ship - Release - OSX";
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3383822B15B73CF800A28CCF /* Build configuration list for PBXProject "boost" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3383823315B73CF800A28CCF /* Dev - Debug */,
+				33E8816D15B8AE2C0089BA08 /* Ship - Debug - iOS */,
+				33E881BE15B8B0270089BA08 /* Ship - Debug - OSX */,
+				3383823415B73CF800A28CCF /* Dev - Release */,
+				33E8817015B8AE360089BA08 /* Ship - Release - iOS */,
+				33E881C115B8B03C0089BA08 /* Ship - Release - OSX */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Dev - Release";
+		};
+		3383823515B73CF800A28CCF /* Build configuration list for PBXNativeTarget "boostOSX" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3383823615B73CF800A28CCF /* Dev - Debug */,
+				33E8816E15B8AE2C0089BA08 /* Ship - Debug - iOS */,
+				33E881BF15B8B0270089BA08 /* Ship - Debug - OSX */,
+				3383823715B73CF800A28CCF /* Dev - Release */,
+				33E8817115B8AE360089BA08 /* Ship - Release - iOS */,
+				33E881C215B8B03C0089BA08 /* Ship - Release - OSX */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Dev - Release";
+		};
+		3383824615B73D2300A28CCF /* Build configuration list for PBXNativeTarget "boostiOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3383824715B73D2300A28CCF /* Dev - Debug */,
+				33E8816F15B8AE2C0089BA08 /* Ship - Debug - iOS */,
+				33E881C015B8B0270089BA08 /* Ship - Debug - OSX */,
+				3383824815B73D2300A28CCF /* Dev - Release */,
+				33E8817215B8AE360089BA08 /* Ship - Release - iOS */,
+				33E881C315B8B03C0089BA08 /* Ship - Release - OSX */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Dev - Release";
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3383822815B73CF800A28CCF /* Project object */;
+}

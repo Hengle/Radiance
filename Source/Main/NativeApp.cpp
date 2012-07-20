@@ -6,8 +6,7 @@
 */
 
 #include RADPCH
-#include "NativeApp.h"
-#include "StdVidModes.h" // s_stdVidModes
+#include "NativeApp.h"char
 #include <Engine/COut.h>
 #include <Runtime/StringBase.h>
 #include <limits>
@@ -38,7 +37,6 @@ bool DisplayDevice::MatchVidMode(
 	MatchDisposition disposition
 ) {
 	const r::VidModeVec &list = *this->vidModes.get();
-	bool found = false;
 
 	if (disposition&(
 		kMatchDisposition_AllowAspect4x3|
