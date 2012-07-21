@@ -451,7 +451,9 @@ inline int vsprintf<char>(char *dst, const char *format, va_list argptr) {
 #if defined(RAD_OPT_GCC)
 	va_list _valist;
 	va_copy(_valist, argptr);
-	return ::vsprintf(dst, format, _valist ) + 1;
+	int r = ::vsprintf(dst, format, _valist ) + 1;
+	va_end(_valist);
+	return r;
 #else
 	return ::vsprintf(dst, format, argptr ) + 1;
 #endif
@@ -463,7 +465,9 @@ inline int vsprintf<wchar_t>(wchar_t *dst, const wchar_t *format, va_list argptr
 #if defined(RAD_OPT_GCC)
 	va_list _valist;
 	va_copy(_valist, argptr);
-	return ::vswprintf(dst, 0xffffffff, format, _valist) + 1;
+	int r = ::vswprintf(dst, 0xffffffff, format, _valist) + 1;
+	va_end(_valist);
+	return r;
 #else
 	return ::vswprintf(dst, 0xffffffff, format, argptr) + 1;
 #endif
@@ -476,6 +480,8 @@ inline int vsnprintf<char>(char *dst, int count, const char *format, va_list arg
 	va_list _valist;
 	va_copy(_valist, argptr);
 	int r = ::vsnprintf(dst, count, format, _valist);
+	va_end(_valist);
+	return r;
 #else
 	int r = ::vsnprintf(dst, (size_t)count, format, argptr);
 #endif
@@ -496,6 +502,8 @@ inline int vsnprintf<wchar_t>(wchar_t *dst, int count, const wchar_t *format, va
 	va_list _valist;
 	va_copy(_valist, argptr);
 	int r = ::vswprintf(dst, count, format, _valist);
+	va_end(_valist);
+	return r;
 #else
 	int r = ::vswprintf(dst, (size_t)count, format, argptr);
 #endif
@@ -512,7 +520,9 @@ inline int vscprintf<char>(const char *format, va_list argptr) {
 #else
 	va_list _valist;
 	va_copy(_valist, argptr);
-	return ::vsnprintf(0, 0, format, _valist) + 1;
+	int r = ::vsnprintf(0, 0, format, _valist) + 1;
+	va_end(_valist);
+	return r;
 #endif
 }
 
@@ -524,7 +534,15 @@ inline int vscprintf<wchar_t>(const wchar_t *format, va_list argptr) {
 
 	va_list _valist;
 	va_copy(_valist, argptr);
-	return ::vswprintf(0, 0, format, _valist) + 1;
+	
+	// Posix systems lack a vsnwprintf... sigh
+	enum { MaxLen = Kilo*4 };
+	
+	int r = ::vswprintf((wchar_t*)stack_alloc(MaxLen), MaxLen, format, _valist) + 1;
+	RAD_ASSERT(r != -1); // make sure this buffer is large enough.
+	
+	va_end(_valist);
+	return r;
 #endif
 }
 

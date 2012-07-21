@@ -5,7 +5,6 @@
 	\ingroup Main
 */
 
-#include RADPCH
 #include "../NativeApp.h"
 #include <Engine/App.h>
 #include <Engine/COut.h>
@@ -22,6 +21,8 @@
 #if defined(RAD_OPT_GL)
 #include <Engine/Renderer/GL/GLTable.h>
 #endif
+
+#import <AppKit/NSWorkspace.h>
 
 namespace details {
 
@@ -58,7 +59,7 @@ void NativeApp::ResetDisplayDevice() {
 }
 
 void NativeApp::LaunchURL(const char *sz) {
-
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithUTF8String:sz]]];
 }
 
 #if defined(RAD_OPT_GL) && !defined(RAD_OPT_PC_TOOLS)

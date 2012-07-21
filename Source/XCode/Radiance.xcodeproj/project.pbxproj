@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3319497315B9F23400458F43 /* OSXMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3319497215B9F23400458F43 /* OSXMain.cpp */; };
 		33836C1A15B9CF590030EAEC /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33836C0015B9CF580030EAEC /* App.cpp */; };
 		33836C1B15B9CF590030EAEC /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33836C0015B9CF580030EAEC /* App.cpp */; };
 		33836C1C15B9CF590030EAEC /* App.h in Headers */ = {isa = PBXBuildFile; fileRef = 33836C0115B9CF580030EAEC /* App.h */; };
@@ -140,30 +139,6 @@
 		33E8836E15B999680089BA08 /* PosixThread.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8835F15B999680089BA08 /* PosixThread.h */; };
 		33E8836F15B999680089BA08 /* PosixThreadDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8836015B999680089BA08 /* PosixThreadDef.h */; };
 		33E8837015B999680089BA08 /* PosixThreadDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8836015B999680089BA08 /* PosixThreadDef.h */; };
-		33E8837C15B99CAE0089BA08 /* IntMain.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8837215B99CAE0089BA08 /* IntMain.h */; };
-		33E8837D15B99CAE0089BA08 /* IntMain.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8837215B99CAE0089BA08 /* IntMain.h */; };
-		33E8837E15B99CAE0089BA08 /* NativeApp_inl.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8837315B99CAE0089BA08 /* NativeApp_inl.h */; };
-		33E8837F15B99CAE0089BA08 /* NativeApp_inl.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8837315B99CAE0089BA08 /* NativeApp_inl.h */; };
-		33E8838015B99CAE0089BA08 /* NativeApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8837415B99CAE0089BA08 /* NativeApp.cpp */; };
-		33E8838115B99CAE0089BA08 /* NativeApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8837415B99CAE0089BA08 /* NativeApp.cpp */; };
-		33E8838215B99CAE0089BA08 /* NativeApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8837515B99CAE0089BA08 /* NativeApp.h */; };
-		33E8838315B99CAE0089BA08 /* NativeApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8837515B99CAE0089BA08 /* NativeApp.h */; };
-		33E8838415B99CAE0089BA08 /* NativeAppBackend.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8837615B99CAE0089BA08 /* NativeAppBackend.h */; };
-		33E8838515B99CAE0089BA08 /* NativeAppBackend.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8837615B99CAE0089BA08 /* NativeAppBackend.h */; };
-		33E8838615B99CAE0089BA08 /* NativeAppDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8837715B99CAE0089BA08 /* NativeAppDef.h */; };
-		33E8838715B99CAE0089BA08 /* NativeAppDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8837715B99CAE0089BA08 /* NativeAppDef.h */; };
-		33E8838815B99CAE0089BA08 /* NativeDeviceContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8837815B99CAE0089BA08 /* NativeDeviceContext.h */; };
-		33E8838915B99CAE0089BA08 /* NativeDeviceContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8837815B99CAE0089BA08 /* NativeDeviceContext.h */; };
-		33E8838A15B99CAE0089BA08 /* null_CloudStorage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8837915B99CAE0089BA08 /* null_CloudStorage.cpp */; };
-		33E8838B15B99CAE0089BA08 /* null_CloudStorage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8837915B99CAE0089BA08 /* null_CloudStorage.cpp */; };
-		33E8838C15B99CAE0089BA08 /* QtAppMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8837A15B99CAE0089BA08 /* QtAppMain.cpp */; };
-		33E8838D15B99CAE0089BA08 /* QtAppMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8837A15B99CAE0089BA08 /* QtAppMain.cpp */; };
-		33E8838E15B99CAE0089BA08 /* QtAppMain.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8837B15B99CAE0089BA08 /* QtAppMain.h */; };
-		33E8838F15B99CAE0089BA08 /* QtAppMain.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8837B15B99CAE0089BA08 /* QtAppMain.h */; };
-		33E8839315B99D8B0089BA08 /* OSXNativeApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8839115B99D8B0089BA08 /* OSXNativeApp.cpp */; };
-		33E8839415B99D8B0089BA08 /* OSXNativeApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8839115B99D8B0089BA08 /* OSXNativeApp.cpp */; };
-		33E8839515B99D8B0089BA08 /* OSXNativeApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8839215B99D8B0089BA08 /* OSXNativeApp.h */; };
-		33E8839615B99D8B0089BA08 /* OSXNativeApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8839215B99D8B0089BA08 /* OSXNativeApp.h */; };
 		33E8839815B9A3680089BA08 /* Cg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33E8839715B9A3680089BA08 /* Cg.framework */; };
 		33E883C715B9AB370089BA08 /* Assert.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8839A15B9AB370089BA08 /* Assert.cpp */; };
 		33E883C815B9AB370089BA08 /* Assert.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8839A15B9AB370089BA08 /* Assert.cpp */; };
@@ -1266,7 +1241,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		3319497215B9F23400458F43 /* OSXMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OSXMain.cpp; path = ../Main/OSX/OSXMain.cpp; sourceTree = "<group>"; };
 		3319498215B9FB0600458F43 /* AppDebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppDebugiOS.xcconfig; path = XCConfig/AppDebugiOS.xcconfig; sourceTree = "<group>"; };
 		3319498315B9FB0600458F43 /* AppDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppDebugOSX.xcconfig; path = XCConfig/AppDebugOSX.xcconfig; sourceTree = "<group>"; };
 		3319498415B9FB0600458F43 /* AppReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppReleaseiOS.xcconfig; path = XCConfig/AppReleaseiOS.xcconfig; sourceTree = "<group>"; };
@@ -1374,18 +1348,6 @@
 		33E8835E15B999680089BA08 /* PosixThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PosixThread.cpp; path = ../Runtime/Posix/PosixThread.cpp; sourceTree = "<group>"; };
 		33E8835F15B999680089BA08 /* PosixThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PosixThread.h; path = ../Runtime/Posix/PosixThread.h; sourceTree = "<group>"; };
 		33E8836015B999680089BA08 /* PosixThreadDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PosixThreadDef.h; path = ../Runtime/Posix/PosixThreadDef.h; sourceTree = "<group>"; };
-		33E8837215B99CAE0089BA08 /* IntMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IntMain.h; path = ../Main/IntMain.h; sourceTree = "<group>"; };
-		33E8837315B99CAE0089BA08 /* NativeApp_inl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NativeApp_inl.h; path = ../Main/NativeApp_inl.h; sourceTree = "<group>"; };
-		33E8837415B99CAE0089BA08 /* NativeApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NativeApp.cpp; path = ../Main/NativeApp.cpp; sourceTree = "<group>"; };
-		33E8837515B99CAE0089BA08 /* NativeApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NativeApp.h; path = ../Main/NativeApp.h; sourceTree = "<group>"; };
-		33E8837615B99CAE0089BA08 /* NativeAppBackend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NativeAppBackend.h; path = ../Main/NativeAppBackend.h; sourceTree = "<group>"; };
-		33E8837715B99CAE0089BA08 /* NativeAppDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NativeAppDef.h; path = ../Main/NativeAppDef.h; sourceTree = "<group>"; };
-		33E8837815B99CAE0089BA08 /* NativeDeviceContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NativeDeviceContext.h; path = ../Main/NativeDeviceContext.h; sourceTree = "<group>"; };
-		33E8837915B99CAE0089BA08 /* null_CloudStorage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = null_CloudStorage.cpp; path = ../Main/null_CloudStorage.cpp; sourceTree = "<group>"; };
-		33E8837A15B99CAE0089BA08 /* QtAppMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = QtAppMain.cpp; path = ../Main/QtAppMain.cpp; sourceTree = "<group>"; };
-		33E8837B15B99CAE0089BA08 /* QtAppMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = QtAppMain.h; path = ../Main/QtAppMain.h; sourceTree = "<group>"; };
-		33E8839115B99D8B0089BA08 /* OSXNativeApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OSXNativeApp.cpp; path = ../Main/OSX/OSXNativeApp.cpp; sourceTree = "<group>"; };
-		33E8839215B99D8B0089BA08 /* OSXNativeApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSXNativeApp.h; path = ../Main/OSX/OSXNativeApp.h; sourceTree = "<group>"; };
 		33E8839715B9A3680089BA08 /* Cg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cg.framework; path = "../../../Extern/Cg-3.1.0013/Cg.framework"; sourceTree = "<group>"; };
 		33E8839A15B9AB370089BA08 /* Assert.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Assert.cpp; sourceTree = "<group>"; };
 		33E8839B15B9AB370089BA08 /* Assert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Assert.h; sourceTree = "<group>"; };
@@ -2185,7 +2147,6 @@
 			isa = PBXGroup;
 			children = (
 				33E886E115B9B9AA0089BA08 /* Engine */,
-				33E8837115B99C8D0089BA08 /* Main */,
 				33E8828615B98E6D0089BA08 /* Runtime */,
 				33E8830515B998400089BA08 /* RadPCH.h */,
 				33E88B7315B9BC7E0089BA08 /* mocfiles.sh */,
@@ -2340,34 +2301,6 @@
 				33E8836015B999680089BA08 /* PosixThreadDef.h */,
 			);
 			name = Posix;
-			sourceTree = "<group>";
-		};
-		33E8837115B99C8D0089BA08 /* Main */ = {
-			isa = PBXGroup;
-			children = (
-				33E8839015B99D6F0089BA08 /* OSX */,
-				33E8837215B99CAE0089BA08 /* IntMain.h */,
-				33E8837315B99CAE0089BA08 /* NativeApp_inl.h */,
-				33E8837415B99CAE0089BA08 /* NativeApp.cpp */,
-				33E8837515B99CAE0089BA08 /* NativeApp.h */,
-				33E8837615B99CAE0089BA08 /* NativeAppBackend.h */,
-				33E8837715B99CAE0089BA08 /* NativeAppDef.h */,
-				33E8837815B99CAE0089BA08 /* NativeDeviceContext.h */,
-				33E8837915B99CAE0089BA08 /* null_CloudStorage.cpp */,
-				33E8837A15B99CAE0089BA08 /* QtAppMain.cpp */,
-				33E8837B15B99CAE0089BA08 /* QtAppMain.h */,
-			);
-			name = Main;
-			sourceTree = "<group>";
-		};
-		33E8839015B99D6F0089BA08 /* OSX */ = {
-			isa = PBXGroup;
-			children = (
-				3319497215B9F23400458F43 /* OSXMain.cpp */,
-				33E8839115B99D8B0089BA08 /* OSXNativeApp.cpp */,
-				33E8839215B99D8B0089BA08 /* OSXNativeApp.h */,
-			);
-			name = OSX;
 			sourceTree = "<group>";
 		};
 		33E8839915B9AB360089BA08 /* Base */ = {
@@ -3491,14 +3424,6 @@
 				33E8836915B999680089BA08 /* PosixInterlocked.h in Headers */,
 				33E8836D15B999680089BA08 /* PosixThread.h in Headers */,
 				33E8836F15B999680089BA08 /* PosixThreadDef.h in Headers */,
-				33E8837C15B99CAE0089BA08 /* IntMain.h in Headers */,
-				33E8837E15B99CAE0089BA08 /* NativeApp_inl.h in Headers */,
-				33E8838215B99CAE0089BA08 /* NativeApp.h in Headers */,
-				33E8838415B99CAE0089BA08 /* NativeAppBackend.h in Headers */,
-				33E8838615B99CAE0089BA08 /* NativeAppDef.h in Headers */,
-				33E8838815B99CAE0089BA08 /* NativeDeviceContext.h in Headers */,
-				33E8838E15B99CAE0089BA08 /* QtAppMain.h in Headers */,
-				33E8839515B99D8B0089BA08 /* OSXNativeApp.h in Headers */,
 				33E883C915B9AB370089BA08 /* Assert.h in Headers */,
 				33E883CB15B9AB370089BA08 /* Base.h in Headers */,
 				33E883CF15B9AB370089BA08 /* CPUCount.h in Headers */,
@@ -3963,14 +3888,6 @@
 				33E8836A15B999680089BA08 /* PosixInterlocked.h in Headers */,
 				33E8836E15B999680089BA08 /* PosixThread.h in Headers */,
 				33E8837015B999680089BA08 /* PosixThreadDef.h in Headers */,
-				33E8837D15B99CAE0089BA08 /* IntMain.h in Headers */,
-				33E8837F15B99CAE0089BA08 /* NativeApp_inl.h in Headers */,
-				33E8838315B99CAE0089BA08 /* NativeApp.h in Headers */,
-				33E8838515B99CAE0089BA08 /* NativeAppBackend.h in Headers */,
-				33E8838715B99CAE0089BA08 /* NativeAppDef.h in Headers */,
-				33E8838915B99CAE0089BA08 /* NativeDeviceContext.h in Headers */,
-				33E8838F15B99CAE0089BA08 /* QtAppMain.h in Headers */,
-				33E8839615B99D8B0089BA08 /* OSXNativeApp.h in Headers */,
 				33E883CA15B9AB370089BA08 /* Assert.h in Headers */,
 				33E883CC15B9AB370089BA08 /* Base.h in Headers */,
 				33E883D015B9AB370089BA08 /* CPUCount.h in Headers */,
@@ -4483,10 +4400,6 @@
 				33E8836115B999680089BA08 /* PosixFadvise.cpp in Sources */,
 				33E8836515B999680089BA08 /* PosixFile.cpp in Sources */,
 				33E8836B15B999680089BA08 /* PosixThread.cpp in Sources */,
-				33E8838015B99CAE0089BA08 /* NativeApp.cpp in Sources */,
-				33E8838A15B99CAE0089BA08 /* null_CloudStorage.cpp in Sources */,
-				33E8838C15B99CAE0089BA08 /* QtAppMain.cpp in Sources */,
-				33E8839315B99D8B0089BA08 /* OSXNativeApp.cpp in Sources */,
 				33E883C715B9AB370089BA08 /* Assert.cpp in Sources */,
 				33E883CD15B9AB370089BA08 /* CPUCount.cpp in Sources */,
 				33E883D315B9AB370089BA08 /* Event.cpp in Sources */,
@@ -4703,7 +4616,6 @@
 				33836C3E15B9CF590030EAEC /* Persistence.cpp in Sources */,
 				33836C4215B9CF590030EAEC /* StringTable.cpp in Sources */,
 				33836C4A15B9CF590030EAEC /* Zones.cpp in Sources */,
-				3319497315B9F23400458F43 /* OSXMain.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4719,10 +4631,6 @@
 				33E8836215B999680089BA08 /* PosixFadvise.cpp in Sources */,
 				33E8836615B999680089BA08 /* PosixFile.cpp in Sources */,
 				33E8836C15B999680089BA08 /* PosixThread.cpp in Sources */,
-				33E8838115B99CAE0089BA08 /* NativeApp.cpp in Sources */,
-				33E8838B15B99CAE0089BA08 /* null_CloudStorage.cpp in Sources */,
-				33E8838D15B99CAE0089BA08 /* QtAppMain.cpp in Sources */,
-				33E8839415B99D8B0089BA08 /* OSXNativeApp.cpp in Sources */,
 				33E883C815B9AB370089BA08 /* Assert.cpp in Sources */,
 				33E883CE15B9AB370089BA08 /* CPUCount.cpp in Sources */,
 				33E883D415B9AB370089BA08 /* Event.cpp in Sources */,
