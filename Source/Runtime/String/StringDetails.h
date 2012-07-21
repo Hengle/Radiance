@@ -24,7 +24,11 @@ public:
 	typedef boost::lock_guard<M> Lock;
 	typedef thread::scoped_lock_guard<M> ScopedLock;
 	static M &Get() {
+#if defined(RAD_OPT_GCC)
+		static M &s_m(*(new M()));
+#else
 		static M s_m;
+#endif
 		return s_m;
 	}
 };
