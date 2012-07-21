@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		331949C615BA344A00458F43 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 331949C515BA344A00458F43 /* Foundation.framework */; };
-		331949ED15BA34BC00458F43 /* OSXMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949EA15BA34BC00458F43 /* OSXMain.cpp */; };
 		331949EE15BA34BC00458F43 /* OSXNativeApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949EB15BA34BC00458F43 /* OSXNativeApp.h */; };
 		331949EF15BA34BC00458F43 /* OSXNativeApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 331949EC15BA34BC00458F43 /* OSXNativeApp.mm */; };
 		331949F015BA34BC00458F43 /* IntMain.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E015BA34BC00458F43 /* IntMain.h */; };
@@ -25,6 +24,7 @@
 		33194A0515BA368300458F43 /* QtGui.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33194A0215BA368300458F43 /* QtGui.framework */; };
 		33194A0615BA368300458F43 /* QtOpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33194A0315BA368300458F43 /* QtOpenGL.framework */; };
 		33194A0815BA36A900458F43 /* Cg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33194A0715BA36A900458F43 /* Cg.framework */; };
+		33194A2615BA4F4A00458F43 /* OSXMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33194A2515BA4F4A00458F43 /* OSXMain.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,7 +41,6 @@
 		331949E715BA34BC00458F43 /* null_CloudStorage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = null_CloudStorage.cpp; path = ../Main/null_CloudStorage.cpp; sourceTree = "<group>"; };
 		331949E815BA34BC00458F43 /* QtAppMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = QtAppMain.cpp; path = ../Main/QtAppMain.cpp; sourceTree = "<group>"; };
 		331949E915BA34BC00458F43 /* QtAppMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = QtAppMain.h; path = ../Main/QtAppMain.h; sourceTree = "<group>"; };
-		331949EA15BA34BC00458F43 /* OSXMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OSXMain.cpp; path = ../Main/OSX/OSXMain.cpp; sourceTree = "<group>"; };
 		331949EB15BA34BC00458F43 /* OSXNativeApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSXNativeApp.h; path = ../Main/OSX/OSXNativeApp.h; sourceTree = "<group>"; };
 		331949EC15BA34BC00458F43 /* OSXNativeApp.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = OSXNativeApp.mm; path = ../Main/OSX/OSXNativeApp.mm; sourceTree = "<group>"; };
 		331949FD15BA356300458F43 /* MainBuild.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainBuild.xcconfig; path = XCConfig/MainBuild.xcconfig; sourceTree = "<group>"; };
@@ -51,6 +50,7 @@
 		33194A0215BA368300458F43 /* QtGui.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QtGui.framework; path = "../../../Extern/Qt-4.8.2/QtGui.framework"; sourceTree = "<group>"; };
 		33194A0315BA368300458F43 /* QtOpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QtOpenGL.framework; path = "../../../Extern/Qt-4.8.2/QtOpenGL.framework"; sourceTree = "<group>"; };
 		33194A0715BA36A900458F43 /* Cg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cg.framework; path = "../../../Extern/Cg-3.1.0013/Cg.framework"; sourceTree = "<group>"; };
+		33194A2515BA4F4A00458F43 /* OSXMain.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = OSXMain.mm; path = ../Main/OSX/OSXMain.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,7 +119,7 @@
 		331949DF15BA34BC00458F43 /* OSX */ = {
 			isa = PBXGroup;
 			children = (
-				331949EA15BA34BC00458F43 /* OSXMain.cpp */,
+				33194A2515BA4F4A00458F43 /* OSXMain.mm */,
 				331949EB15BA34BC00458F43 /* OSXNativeApp.h */,
 				331949EC15BA34BC00458F43 /* OSXNativeApp.mm */,
 			);
@@ -238,11 +238,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				331949ED15BA34BC00458F43 /* OSXMain.cpp in Sources */,
 				331949EF15BA34BC00458F43 /* OSXNativeApp.mm in Sources */,
 				331949F215BA34BC00458F43 /* NativeApp.cpp in Sources */,
 				331949F715BA34BC00458F43 /* null_CloudStorage.cpp in Sources */,
 				331949F815BA34BC00458F43 /* QtAppMain.cpp in Sources */,
+				33194A2615BA4F4A00458F43 /* OSXMain.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
