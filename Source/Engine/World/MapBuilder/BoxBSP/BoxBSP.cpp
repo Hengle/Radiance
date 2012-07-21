@@ -516,7 +516,7 @@ void BSPBuilder::BoxTree(const Node::Ref &node, int planebits)
 	front->parent = node;
 	back->parent = node;
 
-	int bits = SplitBounds(axis, pl.D(), node->bounds, front->bounds, back->bounds);
+	RAD_DEBUG_ONLY(int bits = )SplitBounds(axis, pl.D(), node->bounds, front->bounds, back->bounds);
 	RAD_ASSERT(bits == 3); // should have split!
 
 	node->children[0] = front;

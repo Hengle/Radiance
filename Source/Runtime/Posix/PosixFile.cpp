@@ -115,7 +115,7 @@ void SetDefaultAliases()
 #if defined(RAD_OPT_DEBUG)
 	details::UncheckedSetAlias(AliasHDD, ""); // this is root '/', user paths start with '/' already
 #else
-	SetAlias(AliasHDD, s"");
+	SetAlias(AliasHDD, "");
 #endif
 
 }

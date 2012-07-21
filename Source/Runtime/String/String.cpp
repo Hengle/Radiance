@@ -348,7 +348,7 @@ String::String(const U16 *sz, int len, ::Zone &zone) : m_zone(&zone) {
 	}
 }
 
-inline String::String(const U32 *sz, int len, ::Zone &zone) : m_zone(&zone) {
+String::String(const U32 *sz, int len, ::Zone &zone) : m_zone(&zone) {
 	RAD_ASSERT(sz);
 	int numBytes = utf32to8len(sz, len);
 #if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)

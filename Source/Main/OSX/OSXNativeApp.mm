@@ -23,6 +23,7 @@
 #endif
 
 #import <AppKit/NSWorkspace.h>
+#import <Foundation/Foundation.h>
 
 namespace details {
 

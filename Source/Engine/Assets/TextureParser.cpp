@@ -1083,7 +1083,10 @@ int TextureParser::Compress(
 				format = (img->bpp==4) ? image_codec::dds::Format_PVR4A : image_codec::dds::Format_PVR4;
 			}
 		} else {
-			
+#if !defined(RAD_OPT_WIN)
+			COut(C_Warn) << "Warning: " << asset->path.get() << " is flagged for DXT compression but a compressor is not available on this platform. Compression setting ignored." << std::endl;
+			return SR_Success;
+#endif
 			if (*s == "DXT1/PVR2" ||
 				*s == "DXT1/PVR4") {
 				pvrFormat = ePVRTPF_DXT1;
