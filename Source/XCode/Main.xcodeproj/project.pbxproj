@@ -7,6 +7,34 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		330A99B415BCA114002A81EC /* IntMain.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E015BA34BC00458F43 /* IntMain.h */; };
+		330A99B515BCA114002A81EC /* NativeApp_inl.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E115BA34BC00458F43 /* NativeApp_inl.h */; };
+		330A99B615BCA114002A81EC /* NativeApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949E215BA34BC00458F43 /* NativeApp.cpp */; };
+		330A99B715BCA114002A81EC /* NativeApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E315BA34BC00458F43 /* NativeApp.h */; };
+		330A99B815BCA114002A81EC /* NativeAppBackend.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E415BA34BC00458F43 /* NativeAppBackend.h */; };
+		330A99B915BCA114002A81EC /* NativeAppDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E515BA34BC00458F43 /* NativeAppDef.h */; };
+		330A99BA15BCA114002A81EC /* NativeDeviceContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E615BA34BC00458F43 /* NativeDeviceContext.h */; };
+		330A99BB15BCA114002A81EC /* null_CloudStorage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949E715BA34BC00458F43 /* null_CloudStorage.cpp */; };
+		330A99BD15BCA115002A81EC /* IntMain.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E015BA34BC00458F43 /* IntMain.h */; };
+		330A99BE15BCA115002A81EC /* NativeApp_inl.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E115BA34BC00458F43 /* NativeApp_inl.h */; };
+		330A99BF15BCA115002A81EC /* NativeApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949E215BA34BC00458F43 /* NativeApp.cpp */; };
+		330A99C015BCA115002A81EC /* NativeApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E315BA34BC00458F43 /* NativeApp.h */; };
+		330A99C115BCA115002A81EC /* NativeAppBackend.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E415BA34BC00458F43 /* NativeAppBackend.h */; };
+		330A99C215BCA115002A81EC /* NativeAppDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E515BA34BC00458F43 /* NativeAppDef.h */; };
+		330A99C315BCA115002A81EC /* NativeDeviceContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E615BA34BC00458F43 /* NativeDeviceContext.h */; };
+		330A99C415BCA115002A81EC /* null_CloudStorage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949E715BA34BC00458F43 /* null_CloudStorage.cpp */; };
+		330A99C615BCA125002A81EC /* OSXNativeApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 331949EC15BA34BC00458F43 /* OSXNativeApp.mm */; };
+		330A99C715BCA126002A81EC /* OSXNativeApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949EB15BA34BC00458F43 /* OSXNativeApp.h */; };
+		330A99C815BCA126002A81EC /* OSXNativeApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 331949EC15BA34BC00458F43 /* OSXNativeApp.mm */; };
+		330A99C915BCA1BE002A81EC /* AppDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 33194B2715BC8A6700458F43 /* AppDelegate.h */; };
+		330A99CA15BCA1BE002A81EC /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33194B2815BC8A6700458F43 /* AppDelegate.mm */; };
+		330A99CB15BCA1C9002A81EC /* OSXMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33194A2515BA4F4A00458F43 /* OSXMain.mm */; };
+		330A99CC15BCA1D6002A81EC /* QtAppMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949E815BA34BC00458F43 /* QtAppMain.cpp */; };
+		330A99CD15BCA1D6002A81EC /* QtAppMain.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E915BA34BC00458F43 /* QtAppMain.h */; };
+		33188E9B15BCA6D900C69D36 /* Cg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33194A0715BA36A900458F43 /* Cg.framework */; };
+		33188E9D15BCA6E800C69D36 /* QtCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33194A0115BA368300458F43 /* QtCore.framework */; };
+		33188E9E15BCA6E800C69D36 /* QtGui.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33194A0215BA368300458F43 /* QtGui.framework */; };
+		33188E9F15BCA6E800C69D36 /* QtOpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33194A0315BA368300458F43 /* QtOpenGL.framework */; };
 		331949C615BA344A00458F43 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 331949C515BA344A00458F43 /* Foundation.framework */; };
 		331949EE15BA34BC00458F43 /* OSXNativeApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949EB15BA34BC00458F43 /* OSXNativeApp.h */; };
 		331949EF15BA34BC00458F43 /* OSXNativeApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 331949EC15BA34BC00458F43 /* OSXNativeApp.mm */; };
@@ -18,19 +46,11 @@
 		331949F515BA34BC00458F43 /* NativeAppDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E515BA34BC00458F43 /* NativeAppDef.h */; };
 		331949F615BA34BC00458F43 /* NativeDeviceContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E615BA34BC00458F43 /* NativeDeviceContext.h */; };
 		331949F715BA34BC00458F43 /* null_CloudStorage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949E715BA34BC00458F43 /* null_CloudStorage.cpp */; };
-		331949F815BA34BC00458F43 /* QtAppMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949E815BA34BC00458F43 /* QtAppMain.cpp */; };
-		331949F915BA34BC00458F43 /* QtAppMain.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E915BA34BC00458F43 /* QtAppMain.h */; };
-		33194A0415BA368300458F43 /* QtCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33194A0115BA368300458F43 /* QtCore.framework */; };
-		33194A0515BA368300458F43 /* QtGui.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33194A0215BA368300458F43 /* QtGui.framework */; };
-		33194A0615BA368300458F43 /* QtOpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33194A0315BA368300458F43 /* QtOpenGL.framework */; };
-		33194A0815BA36A900458F43 /* Cg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33194A0715BA36A900458F43 /* Cg.framework */; };
 		33194A2615BA4F4A00458F43 /* OSXMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33194A2515BA4F4A00458F43 /* OSXMain.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		331949C515BA344A00458F43 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		331949D615BA34A700458F43 /* libMainOSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainOSX.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		331949D715BA34A700458F43 /* libMainiOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainiOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		331949E015BA34BC00458F43 /* IntMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IntMain.h; path = ../Main/IntMain.h; sourceTree = "<group>"; };
 		331949E115BA34BC00458F43 /* NativeApp_inl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NativeApp_inl.h; path = ../Main/NativeApp_inl.h; sourceTree = "<group>"; };
 		331949E215BA34BC00458F43 /* NativeApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NativeApp.cpp; path = ../Main/NativeApp.cpp; sourceTree = "<group>"; };
@@ -44,13 +64,22 @@
 		331949EB15BA34BC00458F43 /* OSXNativeApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSXNativeApp.h; path = ../Main/OSX/OSXNativeApp.h; sourceTree = "<group>"; };
 		331949EC15BA34BC00458F43 /* OSXNativeApp.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = OSXNativeApp.mm; path = ../Main/OSX/OSXNativeApp.mm; sourceTree = "<group>"; };
 		331949FD15BA356300458F43 /* MainBuild.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainBuild.xcconfig; path = XCConfig/MainBuild.xcconfig; sourceTree = "<group>"; };
-		331949FE15BA356300458F43 /* MainDeveloperDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainDeveloperDebug.xcconfig; path = XCConfig/MainDeveloperDebug.xcconfig; sourceTree = "<group>"; };
-		331949FF15BA356300458F43 /* MainDeveloperRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainDeveloperRelease.xcconfig; path = XCConfig/MainDeveloperRelease.xcconfig; sourceTree = "<group>"; };
 		33194A0115BA368300458F43 /* QtCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QtCore.framework; path = "../../../Extern/Qt-4.8.2/QtCore.framework"; sourceTree = "<group>"; };
 		33194A0215BA368300458F43 /* QtGui.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QtGui.framework; path = "../../../Extern/Qt-4.8.2/QtGui.framework"; sourceTree = "<group>"; };
 		33194A0315BA368300458F43 /* QtOpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QtOpenGL.framework; path = "../../../Extern/Qt-4.8.2/QtOpenGL.framework"; sourceTree = "<group>"; };
 		33194A0715BA36A900458F43 /* Cg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cg.framework; path = "../../../Extern/Cg-3.1.0013/Cg.framework"; sourceTree = "<group>"; };
 		33194A2515BA4F4A00458F43 /* OSXMain.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = OSXMain.mm; path = ../Main/OSX/OSXMain.mm; sourceTree = "<group>"; };
+		33194B2715BC8A6700458F43 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = ../Main/OSX/AppDelegate.h; sourceTree = "<group>"; };
+		33194B2815BC8A6700458F43 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = ../Main/OSX/AppDelegate.mm; sourceTree = "<group>"; };
+		33194B2E15BC8A8400458F43 /* libMainDeveloper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainDeveloper.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		33194B5D15BC8A9F00458F43 /* libMainOSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainOSX.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		33194B5E15BC8A9F00458F43 /* libMainiOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainiOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		338CDF0B15BC8F820058DFF5 /* MainDeveloperDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainDeveloperDebugOSX.xcconfig; path = XCConfig/MainDeveloperDebugOSX.xcconfig; sourceTree = "<group>"; };
+		338CDF0C15BC8F820058DFF5 /* MainDeveloperReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainDeveloperReleaseOSX.xcconfig; path = XCConfig/MainDeveloperReleaseOSX.xcconfig; sourceTree = "<group>"; };
+		338CDF0D15BC8F820058DFF5 /* MainShipDebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainShipDebugiOS.xcconfig; path = XCConfig/MainShipDebugiOS.xcconfig; sourceTree = "<group>"; };
+		338CDF0E15BC8F820058DFF5 /* MainShipDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainShipDebugOSX.xcconfig; path = XCConfig/MainShipDebugOSX.xcconfig; sourceTree = "<group>"; };
+		338CDF0F15BC8F820058DFF5 /* MainShipReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainShipReleaseiOS.xcconfig; path = XCConfig/MainShipReleaseiOS.xcconfig; sourceTree = "<group>"; };
+		338CDF1015BC8F820058DFF5 /* MainShipReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainShipReleaseOSX.xcconfig; path = XCConfig/MainShipReleaseOSX.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,10 +87,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				33194A0815BA36A900458F43 /* Cg.framework in Frameworks */,
-				33194A0415BA368300458F43 /* QtCore.framework in Frameworks */,
-				33194A0515BA368300458F43 /* QtGui.framework in Frameworks */,
-				33194A0615BA368300458F43 /* QtOpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,6 +95,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				331949C615BA344A00458F43 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		33194B2B15BC8A8400458F43 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33188E9D15BCA6E800C69D36 /* QtCore.framework in Frameworks */,
+				33188E9E15BCA6E800C69D36 /* QtGui.framework in Frameworks */,
+				33188E9F15BCA6E800C69D36 /* QtOpenGL.framework in Frameworks */,
+				33188E9B15BCA6D900C69D36 /* Cg.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -82,7 +118,7 @@
 				331949DE15BA34BC00458F43 /* Source */,
 				331949FC15BA352400458F43 /* XCConfig */,
 				331949C415BA344A00458F43 /* Frameworks */,
-				331949FB15BA34E400458F43 /* Products */,
+				338CDF0415BC8D600058DFF5 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -119,6 +155,8 @@
 		331949DF15BA34BC00458F43 /* OSX */ = {
 			isa = PBXGroup;
 			children = (
+				33194B2715BC8A6700458F43 /* AppDelegate.h */,
+				33194B2815BC8A6700458F43 /* AppDelegate.mm */,
 				33194A2515BA4F4A00458F43 /* OSXMain.mm */,
 				331949EB15BA34BC00458F43 /* OSXNativeApp.h */,
 				331949EC15BA34BC00458F43 /* OSXNativeApp.mm */,
@@ -126,23 +164,28 @@
 			name = OSX;
 			sourceTree = "<group>";
 		};
-		331949FB15BA34E400458F43 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				331949D615BA34A700458F43 /* libMainOSX.a */,
-				331949D715BA34A700458F43 /* libMainiOS.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		331949FC15BA352400458F43 /* XCConfig */ = {
 			isa = PBXGroup;
 			children = (
 				331949FD15BA356300458F43 /* MainBuild.xcconfig */,
-				331949FE15BA356300458F43 /* MainDeveloperDebug.xcconfig */,
-				331949FF15BA356300458F43 /* MainDeveloperRelease.xcconfig */,
+				338CDF0B15BC8F820058DFF5 /* MainDeveloperDebugOSX.xcconfig */,
+				338CDF0C15BC8F820058DFF5 /* MainDeveloperReleaseOSX.xcconfig */,
+				338CDF0D15BC8F820058DFF5 /* MainShipDebugiOS.xcconfig */,
+				338CDF0E15BC8F820058DFF5 /* MainShipDebugOSX.xcconfig */,
+				338CDF0F15BC8F820058DFF5 /* MainShipReleaseiOS.xcconfig */,
+				338CDF1015BC8F820058DFF5 /* MainShipReleaseOSX.xcconfig */,
 			);
 			name = XCConfig;
+			sourceTree = "<group>";
+		};
+		338CDF0415BC8D600058DFF5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				33194B2E15BC8A8400458F43 /* libMainDeveloper.a */,
+				33194B5D15BC8A9F00458F43 /* libMainOSX.a */,
+				33194B5E15BC8A9F00458F43 /* libMainiOS.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -159,7 +202,7 @@
 				331949F415BA34BC00458F43 /* NativeAppBackend.h in Headers */,
 				331949F515BA34BC00458F43 /* NativeAppDef.h in Headers */,
 				331949F615BA34BC00458F43 /* NativeDeviceContext.h in Headers */,
-				331949F915BA34BC00458F43 /* QtAppMain.h in Headers */,
+				330A99C915BCA1BE002A81EC /* AppDelegate.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -167,6 +210,27 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				330A99B415BCA114002A81EC /* IntMain.h in Headers */,
+				330A99B515BCA114002A81EC /* NativeApp_inl.h in Headers */,
+				330A99B715BCA114002A81EC /* NativeApp.h in Headers */,
+				330A99B815BCA114002A81EC /* NativeAppBackend.h in Headers */,
+				330A99B915BCA114002A81EC /* NativeAppDef.h in Headers */,
+				330A99BA15BCA114002A81EC /* NativeDeviceContext.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		33194B2C15BC8A8400458F43 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				330A99BD15BCA115002A81EC /* IntMain.h in Headers */,
+				330A99BE15BCA115002A81EC /* NativeApp_inl.h in Headers */,
+				330A99C015BCA115002A81EC /* NativeApp.h in Headers */,
+				330A99C115BCA115002A81EC /* NativeAppBackend.h in Headers */,
+				330A99C215BCA115002A81EC /* NativeAppDef.h in Headers */,
+				330A99C315BCA115002A81EC /* NativeDeviceContext.h in Headers */,
+				330A99C715BCA126002A81EC /* OSXNativeApp.h in Headers */,
+				330A99CD15BCA1D6002A81EC /* QtAppMain.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -187,7 +251,7 @@
 			);
 			name = MainOSX;
 			productName = Main;
-			productReference = 331949D615BA34A700458F43 /* libMainOSX.a */;
+			productReference = 33194B5D15BC8A9F00458F43 /* libMainOSX.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		331949C215BA344A00458F43 /* MainiOS */ = {
@@ -204,7 +268,24 @@
 			);
 			name = MainiOS;
 			productName = MainiOS;
-			productReference = 331949D715BA34A700458F43 /* libMainiOS.a */;
+			productReference = 33194B5E15BC8A9F00458F43 /* libMainiOS.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		33194B2D15BC8A8400458F43 /* MainDeveloper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 33194B2F15BC8A8400458F43 /* Build configuration list for PBXNativeTarget "MainDeveloper" */;
+			buildPhases = (
+				33194B2A15BC8A8400458F43 /* Sources */,
+				33194B2B15BC8A8400458F43 /* Frameworks */,
+				33194B2C15BC8A8400458F43 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MainDeveloper;
+			productName = MainDeveloper;
+			productReference = 33194B2E15BC8A8400458F43 /* libMainDeveloper.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -229,6 +310,7 @@
 			targets = (
 				331949B115BA343800458F43 /* MainOSX */,
 				331949C215BA344A00458F43 /* MainiOS */,
+				33194B2D15BC8A8400458F43 /* MainDeveloper */,
 			);
 		};
 /* End PBXProject section */
@@ -241,8 +323,8 @@
 				331949EF15BA34BC00458F43 /* OSXNativeApp.mm in Sources */,
 				331949F215BA34BC00458F43 /* NativeApp.cpp in Sources */,
 				331949F715BA34BC00458F43 /* null_CloudStorage.cpp in Sources */,
-				331949F815BA34BC00458F43 /* QtAppMain.cpp in Sources */,
 				33194A2615BA4F4A00458F43 /* OSXMain.mm in Sources */,
+				330A99CA15BCA1BE002A81EC /* AppDelegate.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -250,13 +332,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				330A99B615BCA114002A81EC /* NativeApp.cpp in Sources */,
+				330A99BB15BCA114002A81EC /* null_CloudStorage.cpp in Sources */,
+				330A99C615BCA125002A81EC /* OSXNativeApp.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		33194B2A15BC8A8400458F43 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				330A99BF15BCA115002A81EC /* NativeApp.cpp in Sources */,
+				330A99C415BCA115002A81EC /* null_CloudStorage.cpp in Sources */,
+				330A99C815BCA126002A81EC /* OSXNativeApp.mm in Sources */,
+				330A99CB15BCA1C9002A81EC /* OSXMain.mm in Sources */,
+				330A99CC15BCA1D6002A81EC /* QtAppMain.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		331949B415BA343800458F43 /* Dev - Debug */ = {
+		331949B415BA343800458F43 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -280,9 +377,9 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
-			name = "Dev - Debug";
+			name = Debug;
 		};
-		331949B515BA343800458F43 /* Dev - Release */ = {
+		331949B515BA343800458F43 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -299,11 +396,11 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				SDKROOT = macosx;
 			};
-			name = "Dev - Release";
+			name = Release;
 		};
-		331949B715BA343800458F43 /* Dev - Debug */ = {
+		331949B715BA343800458F43 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 331949FE15BA356300458F43 /* MainDeveloperDebug.xcconfig */;
+			baseConfigurationReference = 338CDF0E15BC8F820058DFF5 /* MainShipDebugOSX.xcconfig */;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -313,11 +410,11 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Dev - Debug";
+			name = Debug;
 		};
-		331949B815BA343800458F43 /* Dev - Release */ = {
+		331949B815BA343800458F43 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 331949FF15BA356300458F43 /* MainDeveloperRelease.xcconfig */;
+			baseConfigurationReference = 338CDF1015BC8F820058DFF5 /* MainShipReleaseOSX.xcconfig */;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -327,124 +424,62 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Dev - Release";
+			name = Release;
 		};
-		331949CE15BA344A00458F43 /* Dev - Debug */ = {
+		331949CE15BA344A00458F43 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 338CDF0D15BC8F820058DFF5 /* MainShipDebugiOS.xcconfig */;
 			buildSettings = {
 				DSTROOT = /tmp/MainiOS.dst;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
-			name = "Dev - Debug";
+			name = Debug;
 		};
-		331949CF15BA344A00458F43 /* Dev - Release */ = {
+		331949CF15BA344A00458F43 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 338CDF0F15BC8F820058DFF5 /* MainShipReleaseiOS.xcconfig */;
 			buildSettings = {
 				DSTROOT = /tmp/MainiOS.dst;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
-			name = "Dev - Release";
+			name = Release;
 		};
-		33194A2D15BB085F00458F43 /* Ship - Debug - OSX */ = {
+		33194B3015BC8A8400458F43 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 338CDF0B15BC8F820058DFF5 /* MainDeveloperDebugOSX.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
+				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/../../../Extern/Cg-3.1.0013\"",
+					"\"$(SRCROOT)/../../../Extern/Qt-4.8.2\"",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Debug - OSX";
-		};
-		33194A2E15BB085F00458F43 /* Ship - Debug - OSX */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 331949FE15BA356300458F43 /* MainDeveloperDebug.xcconfig */;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../../Extern/Qt-4.8.2\"",
-					"\"$(SRCROOT)/../../../Extern/Cg-3.1.0013\"",
-				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Ship - Debug - OSX";
+			name = Debug;
 		};
-		33194A2F15BB085F00458F43 /* Ship - Debug - OSX */ = {
+		33194B3215BC8A8400458F43 /* Release */ = {
 			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/MainiOS.dst;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = "Ship - Debug - OSX";
-		};
-		33194A3015BB086500458F43 /* Ship - Release - OSX */ = {
-			isa = XCBuildConfiguration;
+			baseConfigurationReference = 338CDF0C15BC8F820058DFF5 /* MainDeveloperReleaseOSX.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Release - OSX";
-		};
-		33194A3115BB086500458F43 /* Ship - Release - OSX */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 331949FF15BA356300458F43 /* MainDeveloperRelease.xcconfig */;
-			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../../../Extern/Qt-4.8.2\"",
 					"\"$(SRCROOT)/../../../Extern/Cg-3.1.0013\"",
+					"\"$(SRCROOT)/../../../Extern/Qt-4.8.2\"",
 				);
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Ship - Release - OSX";
-		};
-		33194A3215BB086500458F43 /* Ship - Release - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/MainiOS.dst;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = "Ship - Release - OSX";
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
@@ -452,35 +487,38 @@
 		331949AC15BA343700458F43 /* Build configuration list for PBXProject "Main" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				331949B415BA343800458F43 /* Dev - Debug */,
-				33194A2D15BB085F00458F43 /* Ship - Debug - OSX */,
-				331949B515BA343800458F43 /* Dev - Release */,
-				33194A3015BB086500458F43 /* Ship - Release - OSX */,
+				331949B415BA343800458F43 /* Debug */,
+				331949B515BA343800458F43 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 		331949B615BA343800458F43 /* Build configuration list for PBXNativeTarget "MainOSX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				331949B715BA343800458F43 /* Dev - Debug */,
-				33194A2E15BB085F00458F43 /* Ship - Debug - OSX */,
-				331949B815BA343800458F43 /* Dev - Release */,
-				33194A3115BB086500458F43 /* Ship - Release - OSX */,
+				331949B715BA343800458F43 /* Debug */,
+				331949B815BA343800458F43 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 		331949CD15BA344A00458F43 /* Build configuration list for PBXNativeTarget "MainiOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				331949CE15BA344A00458F43 /* Dev - Debug */,
-				33194A2F15BB085F00458F43 /* Ship - Debug - OSX */,
-				331949CF15BA344A00458F43 /* Dev - Release */,
-				33194A3215BB086500458F43 /* Ship - Release - OSX */,
+				331949CE15BA344A00458F43 /* Debug */,
+				331949CF15BA344A00458F43 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
+		};
+		33194B2F15BC8A8400458F43 /* Build configuration list for PBXNativeTarget "MainDeveloper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33194B3015BC8A8400458F43 /* Debug */,
+				33194B3215BC8A8400458F43 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
