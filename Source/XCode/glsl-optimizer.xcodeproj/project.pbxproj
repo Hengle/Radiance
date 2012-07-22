@@ -405,7 +405,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		3383834515B77F4A00A28CCF /* Dev - Debug */ = {
+		3383834515B77F4A00A28CCF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -429,9 +429,9 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
-			name = "Dev - Debug";
+			name = Debug;
 		};
-		3383834615B77F4A00A28CCF /* Dev - Release */ = {
+		3383834615B77F4A00A28CCF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -448,25 +448,25 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				SDKROOT = macosx;
 			};
-			name = "Dev - Release";
+			name = Release;
 		};
-		3383834815B77F4A00A28CCF /* Dev - Debug */ = {
+		3383834815B77F4A00A28CCF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33F199D415B8991A006D8DCC /* GLSLOptimizerDebugOSX.xcconfig */;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Dev - Debug";
+			name = Debug;
 		};
-		3383834915B77F4A00A28CCF /* Dev - Release */ = {
+		3383834915B77F4A00A28CCF /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33F199D615B8991A006D8DCC /* GLSLOptimizerReleaseOSX.xcconfig */;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Dev - Release";
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
@@ -474,20 +474,20 @@
 		3383833D15B77F4A00A28CCF /* Build configuration list for PBXProject "glsl-optimizer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3383834515B77F4A00A28CCF /* Dev - Debug */,
-				3383834615B77F4A00A28CCF /* Dev - Release */,
+				3383834515B77F4A00A28CCF /* Debug */,
+				3383834615B77F4A00A28CCF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 		3383834715B77F4A00A28CCF /* Build configuration list for PBXNativeTarget "glsl-optimizer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3383834815B77F4A00A28CCF /* Dev - Debug */,
-				3383834915B77F4A00A28CCF /* Dev - Release */,
+				3383834815B77F4A00A28CCF /* Debug */,
+				3383834915B77F4A00A28CCF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

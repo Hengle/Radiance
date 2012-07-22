@@ -1,0 +1,11 @@
+// RadianceShipDebugOSX.xcconfig
+// Radiance ship debug iOS build config
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "EngineDebugOSX.xcconfig"
+#include "EngineShip.xcconfig"
+
+OPTIONAL_EXTERNLIB_INCLUDES =
+
+#include "RadianceBuild.xcconfig"

@@ -5,10 +5,14 @@
 	\ingroup Main
 */
 
+#if defined(RAD_OPT_PC_TOOLS)
 #include "../QtAppMain.h"
 #include <string.h>
 #include <unistd.h>
 #import <CoreFoundation/CoreFoundation.h>
+#else
+#import <Cocoa/Cocoa.h>
+#endif
 
 extern "C" int main(int argc, char *argv[]) {
 	
@@ -24,7 +28,9 @@ extern "C" int main(int argc, char *argv[]) {
 		CFRelease(url);
 		CFRelease(url2);
 	}
+	return QtAppMain(argc, (const char **)argv);
+#else
+	return NSApplicationMain(argc, (const char **)argv);
 #endif
 	
-	return QtAppMain(argc, (const char **)argv);
 }

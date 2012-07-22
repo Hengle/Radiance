@@ -1,0 +1,11 @@
+// AppShipReleaseiOS.xcconfig
+// App ship release iOS build config
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "AppReleaseiOS.xcconfig"
+#include "EngineDeveloper.xcconfig"
+
+OPTIONAL_EXTERNLIB_INCLUDES = 
+
+#include "AppBuild.xcconfig"

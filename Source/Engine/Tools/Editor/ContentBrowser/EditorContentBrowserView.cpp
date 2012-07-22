@@ -278,73 +278,7 @@ m_tickRedraw(false)
 	s->setColumnStretch(0, 1);
 
 	int col = 1;
-
-	m_cloneButton = new (ZEditor) QPushButton(
-		LoadIcon("Editor/clone.png"),
-		QString(),
-		this
-	);
-	RAD_VERIFY(connect(m_cloneButton, SIGNAL(clicked()), SLOT(CloneSelection())));
-	m_cloneButton->setIconSize(QSize(32, 32));
-	s->addWidget(m_cloneButton, 0, col++);
-	m_cloneButton->setEnabled(false);
-	m_cloneButton->setToolTip("Clone Selection");
-
-	m_moveButton = new (ZEditor) QPushButton(
-		LoadIcon("Editor/move.png"),
-		QString(),
-		this
-	);
-	RAD_VERIFY(connect(m_moveButton, SIGNAL(clicked()), SLOT(MoveSelection())));
-	m_moveButton->setIconSize(QSize(32, 32));
-	s->addWidget(m_moveButton, 0, col++);
-	m_moveButton->setEnabled(false);
-	m_moveButton->setToolTip("Move Selection");
-
-	s->addItem(new (ZEditor) QSpacerItem(32, 0), 0, col++);
-
-	QPushButton *zoomIn = new (ZEditor) QPushButton(
-		LoadIcon("Editor/zoom_in.png"),
-		QString(),
-		this
-	);
-	RAD_VERIFY(connect(zoomIn, SIGNAL(clicked()), SLOT(ZoomIn())));
-	zoomIn->setIconSize(QSize(32, 32));
-	s->addWidget(zoomIn, 0, col++);
-	zoomIn->setToolTip("Preview Bigger");
-
-	QPushButton *zoomOut = new (ZEditor) QPushButton(
-		LoadIcon("Editor/zoom_out.png"),
-		QString(),
-		this
-	);
-	zoomOut->setIconSize(QSize(32, 32));
-	RAD_VERIFY(connect(zoomOut, SIGNAL(clicked()), SLOT(ZoomOut())));
-	s->addWidget(zoomOut, 0, col++);
-	zoomOut->setToolTip("Preview Smaller");
-
-	QPushButton *zoomOne = new (ZEditor) QPushButton(
-		LoadIcon("Editor/view_1_1.png"),
-		QString(),
-		this
-	);
-	zoomOne->setIconSize(QSize(32, 32));
-	RAD_VERIFY(connect(zoomOne, SIGNAL(clicked()), SLOT(ZoomFull())));
-	s->addWidget(zoomOne, 0, col++);
-	zoomOne->setToolTip("Preview Full Size");
-
-	m_delButton = new (ZEditor) QPushButton(
-		LoadIcon("Editor/delete2.png"),
-		QString(),
-		this
-	);
-	m_delButton->setIconSize(QSize(32, 32));
-	RAD_VERIFY(connect(m_delButton, SIGNAL(clicked()), SLOT(DeleteSelection())));
-	s->addWidget(m_delButton, 0, col++);
-	m_delButton->setEnabled(false);
-	m_delButton->setToolTip("Delete Selection");
-
-	s->addItem(new (ZEditor) QSpacerItem(32, 0), 0, col++);
+	
 	s->addWidget(new (ZEditor) QLabel(QString("Size:")), 0, col++);
 	
 	m_sizes = new (ZEditor) QComboBox(this);
@@ -360,10 +294,10 @@ m_tickRedraw(false)
 	RAD_VERIFY(connect(m_sizes, SIGNAL(currentIndexChanged(int)), SLOT(SizeChanged(int))));
 	s->addWidget(m_sizes, 0, col++);
 	m_sizes->setToolTip("Set Thumnail Size");
-
+	
 	s->addItem(new (ZEditor) QSpacerItem(32, 0), 0, col++);
 	s->addWidget(new (ZEditor) QLabel(QString("Sort By:")), 0, col++);
-
+	
 	m_sort = new (ZEditor) QComboBox(this);
 	m_sort->addItem(QString("Name"));
 	m_sort->addItem(QString("Size"));
@@ -372,10 +306,10 @@ m_tickRedraw(false)
 	RAD_VERIFY(connect(m_sort, SIGNAL(currentIndexChanged(int)), SLOT(SortChanged(int))));
 	s->addWidget(m_sort, 0, col++);
 	m_sort->setToolTip("Set Sort Mode");
-
+	
 	s->addItem(new (ZEditor) QSpacerItem(32, 0), 0, col++);
 	s->addWidget(new (ZEditor) QLabel(QString("Resolution:")), 0, col++);
-
+	
 	m_resolutions = new (ZEditor) QComboBox(this);
 	m_resolutions->addItem(QString("320x480 (3GS)"), makeRes(320, 480));
 	m_resolutions->addItem(QString("1024x768 (iPad)"), makeRes(1024, 768));
@@ -385,16 +319,89 @@ m_tickRedraw(false)
 	m_resolutions->addItem(QString("1680x1050 (16:10)"), makeRes(1680, 1050));
 	m_resolutions->addItem(QString("1920x1080 (16:9)"), makeRes(1920, 1080));
 	m_resolutions->setCurrentIndex(m_resolution);
-
+	
 	RAD_VERIFY(connect(m_resolutions, SIGNAL(currentIndexChanged(int)), SLOT(resolutionChanged(int))));
 	s->addWidget(m_resolutions, 0, col++);
 	m_sort->setToolTip("Set Game Resolution");
-
-	s->setColumnStretch(col++, 1);
-
+	
 	m_searchLine = new (ZEditor) SearchLineWidget(this);
 	RAD_VERIFY(connect(m_searchLine, SIGNAL(textChanged(const QString&)), SLOT(UpdateFilter())));
 	s->addWidget(m_searchLine, 0, col++);
+	
+	s->setColumnStretch(col, 1);
+
+	s = new (ZEditor) QGridLayout();
+	l->addLayout(s, 1, 0, 1, -1);
+	s->setColumnStretch(0, 1);
+	
+	col = 1;
+	
+	m_cloneButton = new (ZEditor) QPushButton(
+											  LoadIcon("Editor/clone.png"),
+											  QString(),
+											  this
+											  );
+	RAD_VERIFY(connect(m_cloneButton, SIGNAL(clicked()), SLOT(CloneSelection())));
+	m_cloneButton->setIconSize(QSize(32, 32));
+	s->addWidget(m_cloneButton, 0, col++);
+	m_cloneButton->setEnabled(false);
+	m_cloneButton->setToolTip("Clone Selection");
+	
+	m_moveButton = new (ZEditor) QPushButton(
+											 LoadIcon("Editor/move.png"),
+											 QString(),
+											 this
+											 );
+	RAD_VERIFY(connect(m_moveButton, SIGNAL(clicked()), SLOT(MoveSelection())));
+	m_moveButton->setIconSize(QSize(32, 32));
+	s->addWidget(m_moveButton, 0, col++);
+	m_moveButton->setEnabled(false);
+	m_moveButton->setToolTip("Move Selection");
+	
+	s->addItem(new (ZEditor) QSpacerItem(32, 0), 0, col++);
+	
+	QPushButton *zoomIn = new (ZEditor) QPushButton(
+													LoadIcon("Editor/zoom_in.png"),
+													QString(),
+													this
+													);
+	RAD_VERIFY(connect(zoomIn, SIGNAL(clicked()), SLOT(ZoomIn())));
+	zoomIn->setIconSize(QSize(32, 32));
+	s->addWidget(zoomIn, 0, col++);
+	zoomIn->setToolTip("Preview Bigger");
+	
+	QPushButton *zoomOut = new (ZEditor) QPushButton(
+													 LoadIcon("Editor/zoom_out.png"),
+													 QString(),
+													 this
+													 );
+	zoomOut->setIconSize(QSize(32, 32));
+	RAD_VERIFY(connect(zoomOut, SIGNAL(clicked()), SLOT(ZoomOut())));
+	s->addWidget(zoomOut, 0, col++);
+	zoomOut->setToolTip("Preview Smaller");
+	
+	QPushButton *zoomOne = new (ZEditor) QPushButton(
+													 LoadIcon("Editor/view_1_1.png"),
+													 QString(),
+													 this
+													 );
+	zoomOne->setIconSize(QSize(32, 32));
+	RAD_VERIFY(connect(zoomOne, SIGNAL(clicked()), SLOT(ZoomFull())));
+	s->addWidget(zoomOne, 0, col++);
+	zoomOne->setToolTip("Preview Full Size");
+	
+	m_delButton = new (ZEditor) QPushButton(
+											LoadIcon("Editor/delete2.png"),
+											QString(),
+											this
+											);
+	m_delButton->setIconSize(QSize(32, 32));
+	RAD_VERIFY(connect(m_delButton, SIGNAL(clicked()), SLOT(DeleteSelection())));
+	s->addWidget(m_delButton, 0, col++);
+	m_delButton->setEnabled(false);
+	m_delButton->setToolTip("Delete Selection");
+	
+	s->setColumnStretch(col, 1);
 
 	m_glw = new GLWidget(this);
 	m_glw->setFocusPolicy(Qt::ClickFocus);
@@ -409,14 +416,14 @@ m_tickRedraw(false)
 	RAD_VERIFY(connect(m_glw, SIGNAL(OnMouseDoubleClickEvent(QMouseEvent*)), SLOT(OnMouseDoubleClickEvent(QMouseEvent*))));
 	RAD_VERIFY(connect(m_glw, SIGNAL(OnKeyPressEvent(QKeyEvent*)), SLOT(OnKeyPressEvent(QKeyEvent*))));
 	m_glw->setMouseTracking(true);
-	l->addWidget(m_glw, 1, 0);
+	l->addWidget(m_glw, 2, 0);
 	l->setColumnStretch(0, 1);
 
 	m_scroll = new QScrollBar(Qt::Vertical, this);
 	m_scroll->setTracking(true);
 	m_scroll->hide();
 	RAD_VERIFY(connect(m_scroll, SIGNAL(valueChanged(int)), SLOT(OnScrollMove(int))));
-	l->addWidget(m_scroll, 1, 1);
+	l->addWidget(m_scroll, 2, 1);
 
 	m_maxs[0] = m_maxs[1] = 256;
 	m_scroll->setPageStep(256);

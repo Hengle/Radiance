@@ -1,5 +1,5 @@
-// AppDeveloperRelease.xcconfig
-// App developer release build config
+// AppDeveloperReleaseOSX.xcconfig
+// App developer release OSX build config
 // Copyright (c) 2012 Sunside Inc., All Rights Reserved.
 // See Radiance/LICENSE for licensing terms.
 

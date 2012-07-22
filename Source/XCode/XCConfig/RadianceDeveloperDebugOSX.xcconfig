@@ -1,5 +1,5 @@
-// RadianceDeveloperDebug.xcconfig
-// Radiance developer debug build config
+// RadianceDeveloperDebugOSX.xcconfig
+// Radiance developer debug osx build config
 // Copyright (c) 2012 Sunside Inc., All Rights Reserved.
 // See Radiance/LICENSE for licensing terms.
 

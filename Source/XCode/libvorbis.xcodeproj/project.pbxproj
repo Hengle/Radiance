@@ -320,7 +320,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		334B546F15B89AA300EEFC92 /* Dev - Debug */ = {
+		334B546F15B89AA300EEFC92 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -344,9 +344,9 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
-			name = "Dev - Debug";
+			name = Debug;
 		};
-		334B547015B89AA300EEFC92 /* Dev - Release */ = {
+		334B547015B89AA300EEFC92 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -363,211 +363,45 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				SDKROOT = macosx;
 			};
-			name = "Dev - Release";
+			name = Release;
 		};
-		334B547215B89AA300EEFC92 /* Dev - Debug */ = {
+		334B547215B89AA300EEFC92 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 334B549E15B89B6100EEFC92 /* LibVorbisDebugOSX.xcconfig */;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Dev - Debug";
+			name = Debug;
 		};
-		334B547315B89AA300EEFC92 /* Dev - Release */ = {
+		334B547315B89AA300EEFC92 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 334B54A115B89B6100EEFC92 /* LibVorbisReleaseOSX.xcconfig */;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Dev - Release";
+			name = Release;
 		};
-		334B548915B89AB300EEFC92 /* Dev - Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/libvorbisiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = "Dev - Debug";
-		};
-		334B548A15B89AB300EEFC92 /* Dev - Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/libvorbisiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = "Dev - Release";
-		};
-		33E8820115B8B4B20089BA08 /* Ship - Debug - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Debug - iOS";
-		};
-		33E8820215B8B4B20089BA08 /* Ship - Debug - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Debug - iOS";
-		};
-		33E8820315B8B4B20089BA08 /* Ship - Debug - iOS */ = {
+		334B548915B89AB300EEFC92 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 334B549D15B89B6100EEFC92 /* LibVorbisDebugiOS.xcconfig */;
 			buildSettings = {
 				DSTROOT = /tmp/libvorbisiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
-			name = "Ship - Debug - iOS";
+			name = Debug;
 		};
-		33E8820515B8B4B90089BA08 /* Ship - Debug - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Debug - OSX";
-		};
-		33E8820615B8B4B90089BA08 /* Ship - Debug - OSX */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 334B549E15B89B6100EEFC92 /* LibVorbisDebugOSX.xcconfig */;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Debug - OSX";
-		};
-		33E8820715B8B4B90089BA08 /* Ship - Debug - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/libvorbisiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = "Ship - Debug - OSX";
-		};
-		33E8820815B8B4C00089BA08 /* Ship - Release - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Release - iOS";
-		};
-		33E8820915B8B4C00089BA08 /* Ship - Release - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Release - iOS";
-		};
-		33E8820A15B8B4C00089BA08 /* Ship - Release - iOS */ = {
+		334B548A15B89AB300EEFC92 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 334B54A015B89B6100EEFC92 /* LibVorbisReleaseiOS.xcconfig */;
 			buildSettings = {
 				DSTROOT = /tmp/libvorbisiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
-			name = "Ship - Release - iOS";
-		};
-		33E8820B15B8B4C60089BA08 /* Ship - Release - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Release - OSX";
-		};
-		33E8820C15B8B4C60089BA08 /* Ship - Release - OSX */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 334B54A115B89B6100EEFC92 /* LibVorbisReleaseOSX.xcconfig */;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Release - OSX";
-		};
-		33E8820D15B8B4C60089BA08 /* Ship - Release - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/libvorbisiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = "Ship - Release - OSX";
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
@@ -575,41 +409,29 @@
 		334B546715B89AA300EEFC92 /* Build configuration list for PBXProject "libvorbis" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				334B546F15B89AA300EEFC92 /* Dev - Debug */,
-				33E8820115B8B4B20089BA08 /* Ship - Debug - iOS */,
-				33E8820515B8B4B90089BA08 /* Ship - Debug - OSX */,
-				334B547015B89AA300EEFC92 /* Dev - Release */,
-				33E8820815B8B4C00089BA08 /* Ship - Release - iOS */,
-				33E8820B15B8B4C60089BA08 /* Ship - Release - OSX */,
+				334B546F15B89AA300EEFC92 /* Debug */,
+				334B547015B89AA300EEFC92 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 		334B547115B89AA300EEFC92 /* Build configuration list for PBXNativeTarget "libvorbisOSX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				334B547215B89AA300EEFC92 /* Dev - Debug */,
-				33E8820215B8B4B20089BA08 /* Ship - Debug - iOS */,
-				33E8820615B8B4B90089BA08 /* Ship - Debug - OSX */,
-				334B547315B89AA300EEFC92 /* Dev - Release */,
-				33E8820915B8B4C00089BA08 /* Ship - Release - iOS */,
-				33E8820C15B8B4C60089BA08 /* Ship - Release - OSX */,
+				334B547215B89AA300EEFC92 /* Debug */,
+				334B547315B89AA300EEFC92 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 		334B548815B89AB300EEFC92 /* Build configuration list for PBXNativeTarget "libvorbisiOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				334B548915B89AB300EEFC92 /* Dev - Debug */,
-				33E8820315B8B4B20089BA08 /* Ship - Debug - iOS */,
-				33E8820715B8B4B90089BA08 /* Ship - Debug - OSX */,
-				334B548A15B89AB300EEFC92 /* Dev - Release */,
-				33E8820A15B8B4C00089BA08 /* Ship - Release - iOS */,
-				33E8820D15B8B4C60089BA08 /* Ship - Release - OSX */,
+				334B548915B89AB300EEFC92 /* Debug */,
+				334B548A15B89AB300EEFC92 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

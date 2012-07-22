@@ -276,7 +276,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		33E880FF15B8AB270089BA08 /* Dev - Debug */ = {
+		33E880FF15B8AB270089BA08 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -300,9 +300,9 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
-			name = "Dev - Debug";
+			name = Debug;
 		};
-		33E8810015B8AB270089BA08 /* Dev - Release */ = {
+		33E8810015B8AB270089BA08 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -319,211 +319,45 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				SDKROOT = macosx;
 			};
-			name = "Dev - Release";
+			name = Release;
 		};
-		33E8810215B8AB270089BA08 /* Dev - Debug */ = {
+		33E8810215B8AB270089BA08 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33E8812E15B8ABCA0089BA08 /* ZLibDebugOSX.xcconfig */;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Dev - Debug";
+			name = Debug;
 		};
-		33E8810315B8AB270089BA08 /* Dev - Release */ = {
+		33E8810315B8AB270089BA08 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33E8813115B8ABCA0089BA08 /* ZLibReleaseOSX.xcconfig */;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Dev - Release";
+			name = Release;
 		};
-		33E8811915B8AB310089BA08 /* Dev - Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/zlibiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = "Dev - Debug";
-		};
-		33E8811A15B8AB310089BA08 /* Dev - Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/zlibiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = "Dev - Release";
-		};
-		33E8821B15B8B7F80089BA08 /* Ship - Debug - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Debug - iOS";
-		};
-		33E8821C15B8B7F80089BA08 /* Ship - Debug - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Debug - iOS";
-		};
-		33E8821D15B8B7F80089BA08 /* Ship - Debug - iOS */ = {
+		33E8811915B8AB310089BA08 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33E8812D15B8ABCA0089BA08 /* ZlibDebugiOS.xcconfig */;
 			buildSettings = {
 				DSTROOT = /tmp/zlibiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
-			name = "Ship - Debug - iOS";
+			name = Debug;
 		};
-		33E8821F15B8B7FE0089BA08 /* Ship - Debug - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Debug - OSX";
-		};
-		33E8822015B8B7FE0089BA08 /* Ship - Debug - OSX */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 33E8812E15B8ABCA0089BA08 /* ZLibDebugOSX.xcconfig */;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Debug - OSX";
-		};
-		33E8822115B8B7FE0089BA08 /* Ship - Debug - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/zlibiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = "Ship - Debug - OSX";
-		};
-		33E8822215B8B8050089BA08 /* Ship - Release - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Release - iOS";
-		};
-		33E8822315B8B8050089BA08 /* Ship - Release - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Release - iOS";
-		};
-		33E8822415B8B8050089BA08 /* Ship - Release - iOS */ = {
+		33E8811A15B8AB310089BA08 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33E8813015B8ABCA0089BA08 /* ZLibReleaseiOS.xcconfig */;
 			buildSettings = {
 				DSTROOT = /tmp/zlibiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
-			name = "Ship - Release - iOS";
-		};
-		33E8822515B8B80B0089BA08 /* Ship - Release - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Release - OSX";
-		};
-		33E8822615B8B80B0089BA08 /* Ship - Release - OSX */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 33E8813115B8ABCA0089BA08 /* ZLibReleaseOSX.xcconfig */;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Release - OSX";
-		};
-		33E8822715B8B80B0089BA08 /* Ship - Release - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/zlibiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = "Ship - Release - OSX";
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
@@ -531,41 +365,29 @@
 		33E880F715B8AB270089BA08 /* Build configuration list for PBXProject "zlib" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				33E880FF15B8AB270089BA08 /* Dev - Debug */,
-				33E8821B15B8B7F80089BA08 /* Ship - Debug - iOS */,
-				33E8821F15B8B7FE0089BA08 /* Ship - Debug - OSX */,
-				33E8810015B8AB270089BA08 /* Dev - Release */,
-				33E8822215B8B8050089BA08 /* Ship - Release - iOS */,
-				33E8822515B8B80B0089BA08 /* Ship - Release - OSX */,
+				33E880FF15B8AB270089BA08 /* Debug */,
+				33E8810015B8AB270089BA08 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 		33E8810115B8AB270089BA08 /* Build configuration list for PBXNativeTarget "zlibOSX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				33E8810215B8AB270089BA08 /* Dev - Debug */,
-				33E8821C15B8B7F80089BA08 /* Ship - Debug - iOS */,
-				33E8822015B8B7FE0089BA08 /* Ship - Debug - OSX */,
-				33E8810315B8AB270089BA08 /* Dev - Release */,
-				33E8822315B8B8050089BA08 /* Ship - Release - iOS */,
-				33E8822615B8B80B0089BA08 /* Ship - Release - OSX */,
+				33E8810215B8AB270089BA08 /* Debug */,
+				33E8810315B8AB270089BA08 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 		33E8811815B8AB310089BA08 /* Build configuration list for PBXNativeTarget "zlibiOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				33E8811915B8AB310089BA08 /* Dev - Debug */,
-				33E8821D15B8B7F80089BA08 /* Ship - Debug - iOS */,
-				33E8822115B8B7FE0089BA08 /* Ship - Debug - OSX */,
-				33E8811A15B8AB310089BA08 /* Dev - Release */,
-				33E8822415B8B8050089BA08 /* Ship - Release - iOS */,
-				33E8822715B8B80B0089BA08 /* Ship - Release - OSX */,
+				33E8811915B8AB310089BA08 /* Debug */,
+				33E8811A15B8AB310089BA08 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

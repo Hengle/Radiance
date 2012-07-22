@@ -1,9 +1,9 @@
-// AppDeveloperDebug.xcconfig
-// App developer debug build config
+// AppShipReleaseOSX.xcconfig
+// App ship release OSX build config
 // Copyright (c) 2012 Sunside Inc., All Rights Reserved.
 // See Radiance/LICENSE for licensing terms.
 
-#include "AppDebugOSX.xcconfig"
+#include "AppReleaseOSX.xcconfig"
 #include "EngineDeveloper.xcconfig"
 
 OPTIONAL_EXTERNLIB_INCLUDES = 

@@ -351,6 +351,101 @@
 			};
 			name = "Dev - Release";
 		};
+		33194A2D15BB085F00458F43 /* Ship - Debug - OSX */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = "Ship - Debug - OSX";
+		};
+		33194A2E15BB085F00458F43 /* Ship - Debug - OSX */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 331949FE15BA356300458F43 /* MainDeveloperDebug.xcconfig */;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../Extern/Qt-4.8.2\"",
+					"\"$(SRCROOT)/../../../Extern/Cg-3.1.0013\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Ship - Debug - OSX";
+		};
+		33194A2F15BB085F00458F43 /* Ship - Debug - OSX */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/MainiOS.dst;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = "Ship - Debug - OSX";
+		};
+		33194A3015BB086500458F43 /* Ship - Release - OSX */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = "Ship - Release - OSX";
+		};
+		33194A3115BB086500458F43 /* Ship - Release - OSX */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 331949FF15BA356300458F43 /* MainDeveloperRelease.xcconfig */;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../Extern/Qt-4.8.2\"",
+					"\"$(SRCROOT)/../../../Extern/Cg-3.1.0013\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Ship - Release - OSX";
+		};
+		33194A3215BB086500458F43 /* Ship - Release - OSX */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/MainiOS.dst;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = "Ship - Release - OSX";
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -358,7 +453,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				331949B415BA343800458F43 /* Dev - Debug */,
+				33194A2D15BB085F00458F43 /* Ship - Debug - OSX */,
 				331949B515BA343800458F43 /* Dev - Release */,
+				33194A3015BB086500458F43 /* Ship - Release - OSX */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = "Dev - Release";
@@ -367,7 +464,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				331949B715BA343800458F43 /* Dev - Debug */,
+				33194A2E15BB085F00458F43 /* Ship - Debug - OSX */,
 				331949B815BA343800458F43 /* Dev - Release */,
+				33194A3115BB086500458F43 /* Ship - Release - OSX */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = "Dev - Release";
@@ -376,7 +475,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				331949CE15BA344A00458F43 /* Dev - Debug */,
+				33194A2F15BB085F00458F43 /* Ship - Debug - OSX */,
 				331949CF15BA344A00458F43 /* Dev - Release */,
+				33194A3215BB086500458F43 /* Ship - Release - OSX */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = "Dev - Release";

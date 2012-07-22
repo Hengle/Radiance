@@ -366,7 +366,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		334B558515B8A74D00EEFC92 /* Dev - Debug */ = {
+		334B558515B8A74D00EEFC92 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -390,9 +390,9 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
-			name = "Dev - Debug";
+			name = Debug;
 		};
-		334B558615B8A74D00EEFC92 /* Dev - Release */ = {
+		334B558615B8A74D00EEFC92 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -409,211 +409,45 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				SDKROOT = macosx;
 			};
-			name = "Dev - Release";
+			name = Release;
 		};
-		334B558815B8A74D00EEFC92 /* Dev - Debug */ = {
+		334B558815B8A74D00EEFC92 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 334B55B415B8A92E00EEFC92 /* LuaDebugOSX.xcconfig */;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Dev - Debug";
+			name = Debug;
 		};
-		334B558915B8A74D00EEFC92 /* Dev - Release */ = {
+		334B558915B8A74D00EEFC92 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 334B55B715B8A92E00EEFC92 /* LuaReleaseOSX.xcconfig */;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Dev - Release";
+			name = Release;
 		};
-		334B559F15B8A75A00EEFC92 /* Dev - Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/luaiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = "Dev - Debug";
-		};
-		334B55A015B8A75A00EEFC92 /* Dev - Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/luaiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = "Dev - Release";
-		};
-		33E8820E15B8B55E0089BA08 /* Ship - Debug - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Debug - iOS";
-		};
-		33E8820F15B8B55E0089BA08 /* Ship - Debug - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Debug - iOS";
-		};
-		33E8821015B8B55E0089BA08 /* Ship - Debug - iOS */ = {
+		334B559F15B8A75A00EEFC92 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 334B55B315B8A92E00EEFC92 /* LuaDebugiOS.xcconfig */;
 			buildSettings = {
 				DSTROOT = /tmp/luaiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
-			name = "Ship - Debug - iOS";
+			name = Debug;
 		};
-		33E8821215B8B5650089BA08 /* Ship - Debug - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Debug - OSX";
-		};
-		33E8821315B8B5650089BA08 /* Ship - Debug - OSX */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 334B55B415B8A92E00EEFC92 /* LuaDebugOSX.xcconfig */;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Debug - OSX";
-		};
-		33E8821415B8B5650089BA08 /* Ship - Debug - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/luaiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = "Ship - Debug - OSX";
-		};
-		33E8821515B8B5800089BA08 /* Ship - Release - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Release - iOS";
-		};
-		33E8821615B8B5800089BA08 /* Ship - Release - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Release - iOS";
-		};
-		33E8821715B8B5800089BA08 /* Ship - Release - iOS */ = {
+		334B55A015B8A75A00EEFC92 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 334B55B615B8A92E00EEFC92 /* LuaReleaseiOS.xcconfig */;
 			buildSettings = {
 				DSTROOT = /tmp/luaiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
-			name = "Ship - Release - iOS";
-		};
-		33E8821815B8B58A0089BA08 /* Ship - Release - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Release - OSX";
-		};
-		33E8821915B8B58A0089BA08 /* Ship - Release - OSX */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 334B55B715B8A92E00EEFC92 /* LuaReleaseOSX.xcconfig */;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Release - OSX";
-		};
-		33E8821A15B8B58A0089BA08 /* Ship - Release - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/luaiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = "Ship - Release - OSX";
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
@@ -621,41 +455,29 @@
 		334B557D15B8A74D00EEFC92 /* Build configuration list for PBXProject "lua" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				334B558515B8A74D00EEFC92 /* Dev - Debug */,
-				33E8820E15B8B55E0089BA08 /* Ship - Debug - iOS */,
-				33E8821215B8B5650089BA08 /* Ship - Debug - OSX */,
-				334B558615B8A74D00EEFC92 /* Dev - Release */,
-				33E8821515B8B5800089BA08 /* Ship - Release - iOS */,
-				33E8821815B8B58A0089BA08 /* Ship - Release - OSX */,
+				334B558515B8A74D00EEFC92 /* Debug */,
+				334B558615B8A74D00EEFC92 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 		334B558715B8A74D00EEFC92 /* Build configuration list for PBXNativeTarget "luaOSX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				334B558815B8A74D00EEFC92 /* Dev - Debug */,
-				33E8820F15B8B55E0089BA08 /* Ship - Debug - iOS */,
-				33E8821315B8B5650089BA08 /* Ship - Debug - OSX */,
-				334B558915B8A74D00EEFC92 /* Dev - Release */,
-				33E8821615B8B5800089BA08 /* Ship - Release - iOS */,
-				33E8821915B8B58A0089BA08 /* Ship - Release - OSX */,
+				334B558815B8A74D00EEFC92 /* Debug */,
+				334B558915B8A74D00EEFC92 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 		334B559E15B8A75A00EEFC92 /* Build configuration list for PBXNativeTarget "luaiOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				334B559F15B8A75A00EEFC92 /* Dev - Debug */,
-				33E8821015B8B55E0089BA08 /* Ship - Debug - iOS */,
-				33E8821415B8B5650089BA08 /* Ship - Debug - OSX */,
-				334B55A015B8A75A00EEFC92 /* Dev - Release */,
-				33E8821715B8B5800089BA08 /* Ship - Release - iOS */,
-				33E8821A15B8B58A0089BA08 /* Ship - Release - OSX */,
+				334B559F15B8A75A00EEFC92 /* Debug */,
+				334B55A015B8A75A00EEFC92 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

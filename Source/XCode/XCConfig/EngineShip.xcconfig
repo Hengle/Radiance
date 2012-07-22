@@ -1,4 +1,6 @@
-// Common Config File
+// EngineShip.xcconfig
+// Sets ship build options.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
 
-
-GCC_VERSION = com.apple.compilers.llvmgcc42
+RAD_DEFINES = RAD_OPT_PC RAD_OPT_GL BOOST_ALL_NO_LIB BOOST_NO_EXCEPTIONS RAD_OPT_POSIXTHREADS RAD_OPT_POSIXFILES

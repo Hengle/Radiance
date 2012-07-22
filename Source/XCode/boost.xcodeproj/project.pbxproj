@@ -222,7 +222,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		3383823315B73CF800A28CCF /* Dev - Debug */ = {
+		3383823315B73CF800A28CCF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -242,9 +242,9 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
-			name = "Dev - Debug";
+			name = Debug;
 		};
-		3383823415B73CF800A28CCF /* Dev - Release */ = {
+		3383823415B73CF800A28CCF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -261,218 +261,49 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				SDKROOT = macosx;
 			};
-			name = "Dev - Release";
+			name = Release;
 		};
-		3383823615B73CF800A28CCF /* Dev - Debug */ = {
+		3383823615B73CF800A28CCF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33F199C915B89901006D8DCC /* BoostDebugOSX.xcconfig */;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Dev - Debug";
+			name = Debug;
 		};
-		3383823715B73CF800A28CCF /* Dev - Release */ = {
+		3383823715B73CF800A28CCF /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33F199CC15B89901006D8DCC /* BoostReleaseOSX.xcconfig */;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Dev - Release";
+			name = Release;
 		};
-		3383824715B73D2300A28CCF /* Dev - Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				DSTROOT = /tmp/boostiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-			};
-			name = "Dev - Debug";
-		};
-		3383824815B73D2300A28CCF /* Dev - Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				DSTROOT = /tmp/boostiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				VALIDATE_PRODUCT = YES;
-			};
-			name = "Dev - Release";
-		};
-		33E8816D15B8AE2C0089BA08 /* Ship - Debug - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Debug - iOS";
-		};
-		33E8816E15B8AE2C0089BA08 /* Ship - Debug - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Debug - iOS";
-		};
-		33E8816F15B8AE2C0089BA08 /* Ship - Debug - iOS */ = {
+		3383824715B73D2300A28CCF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33F199C815B89901006D8DCC /* BoostDebugiOS.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				DSTROOT = /tmp/boostiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 			};
-			name = "Ship - Debug - iOS";
+			name = Debug;
 		};
-		33E8817015B8AE360089BA08 /* Ship - Release - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Release - iOS";
-		};
-		33E8817115B8AE360089BA08 /* Ship - Release - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Release - iOS";
-		};
-		33E8817215B8AE360089BA08 /* Ship - Release - iOS */ = {
+		3383824815B73D2300A28CCF /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33F199CB15B89901006D8DCC /* BoostReleaseiOS.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				DSTROOT = /tmp/boostiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				VALIDATE_PRODUCT = YES;
-			};
-			name = "Ship - Release - iOS";
-		};
-		33E881BE15B8B0270089BA08 /* Ship - Debug - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Debug - OSX";
-		};
-		33E881BF15B8B0270089BA08 /* Ship - Debug - OSX */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 33F199C915B89901006D8DCC /* BoostDebugOSX.xcconfig */;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Debug - OSX";
-		};
-		33E881C015B8B0270089BA08 /* Ship - Debug - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				DSTROOT = /tmp/boostiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 			};
-			name = "Ship - Debug - OSX";
-		};
-		33E881C115B8B03C0089BA08 /* Ship - Release - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Release - OSX";
-		};
-		33E881C215B8B03C0089BA08 /* Ship - Release - OSX */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 33F199CC15B89901006D8DCC /* BoostReleaseOSX.xcconfig */;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Release - OSX";
-		};
-		33E881C315B8B03C0089BA08 /* Ship - Release - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				DSTROOT = /tmp/boostiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				VALIDATE_PRODUCT = YES;
-			};
-			name = "Ship - Release - OSX";
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
@@ -480,41 +311,29 @@
 		3383822B15B73CF800A28CCF /* Build configuration list for PBXProject "boost" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3383823315B73CF800A28CCF /* Dev - Debug */,
-				33E8816D15B8AE2C0089BA08 /* Ship - Debug - iOS */,
-				33E881BE15B8B0270089BA08 /* Ship - Debug - OSX */,
-				3383823415B73CF800A28CCF /* Dev - Release */,
-				33E8817015B8AE360089BA08 /* Ship - Release - iOS */,
-				33E881C115B8B03C0089BA08 /* Ship - Release - OSX */,
+				3383823315B73CF800A28CCF /* Debug */,
+				3383823415B73CF800A28CCF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 		3383823515B73CF800A28CCF /* Build configuration list for PBXNativeTarget "boostOSX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3383823615B73CF800A28CCF /* Dev - Debug */,
-				33E8816E15B8AE2C0089BA08 /* Ship - Debug - iOS */,
-				33E881BF15B8B0270089BA08 /* Ship - Debug - OSX */,
-				3383823715B73CF800A28CCF /* Dev - Release */,
-				33E8817115B8AE360089BA08 /* Ship - Release - iOS */,
-				33E881C215B8B03C0089BA08 /* Ship - Release - OSX */,
+				3383823615B73CF800A28CCF /* Debug */,
+				3383823715B73CF800A28CCF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 		3383824615B73D2300A28CCF /* Build configuration list for PBXNativeTarget "boostiOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3383824715B73D2300A28CCF /* Dev - Debug */,
-				33E8816F15B8AE2C0089BA08 /* Ship - Debug - iOS */,
-				33E881C015B8B0270089BA08 /* Ship - Debug - OSX */,
-				3383824815B73D2300A28CCF /* Dev - Release */,
-				33E8817215B8AE360089BA08 /* Ship - Release - iOS */,
-				33E881C315B8B03C0089BA08 /* Ship - Release - OSX */,
+				3383824715B73D2300A28CCF /* Debug */,
+				3383824815B73D2300A28CCF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

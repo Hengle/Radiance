@@ -330,7 +330,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		338382D015B7717D00A28CCF /* Dev - Debug */ = {
+		338382D015B7717D00A28CCF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -355,9 +355,9 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
-			name = "Dev - Debug";
+			name = Debug;
 		};
-		338382D115B7717D00A28CCF /* Dev - Release */ = {
+		338382D115B7717D00A28CCF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -375,215 +375,45 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				SDKROOT = macosx;
 			};
-			name = "Dev - Release";
+			name = Release;
 		};
-		338382D315B7717D00A28CCF /* Dev - Debug */ = {
+		338382D315B7717D00A28CCF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33F199CF15B89911006D8DCC /* FreeTypeDebugOSX.xcconfig */;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Dev - Debug";
+			name = Debug;
 		};
-		338382D415B7717D00A28CCF /* Dev - Release */ = {
+		338382D415B7717D00A28CCF /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33F199D215B89911006D8DCC /* FreeTypeReleaseOSX.xcconfig */;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Dev - Release";
+			name = Release;
 		};
-		338382E415B771AA00A28CCF /* Dev - Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/freetypeiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = "Dev - Debug";
-		};
-		338382E515B771AA00A28CCF /* Dev - Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/freetypeiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = "Dev - Release";
-		};
-		33E881C415B8B0500089BA08 /* Ship - Debug - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = NO;
-				ENGINE_PROJECT_ROOT = "";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Debug - iOS";
-		};
-		33E881C515B8B0500089BA08 /* Ship - Debug - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Debug - iOS";
-		};
-		33E881C615B8B0500089BA08 /* Ship - Debug - iOS */ = {
+		338382E415B771AA00A28CCF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33F199CE15B89911006D8DCC /* FreeTypeDebugiOS.xcconfig */;
 			buildSettings = {
 				DSTROOT = /tmp/freetypeiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
-			name = "Ship - Debug - iOS";
+			name = Debug;
 		};
-		33E881C815B8B0560089BA08 /* Ship - Debug - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = NO;
-				ENGINE_PROJECT_ROOT = "";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Debug - OSX";
-		};
-		33E881C915B8B0560089BA08 /* Ship - Debug - OSX */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 33F199CF15B89911006D8DCC /* FreeTypeDebugOSX.xcconfig */;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Debug - OSX";
-		};
-		33E881CA15B8B0560089BA08 /* Ship - Debug - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/freetypeiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = "Ship - Debug - OSX";
-		};
-		33E881CB15B8B05E0089BA08 /* Ship - Release - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENGINE_PROJECT_ROOT = "";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Release - iOS";
-		};
-		33E881CC15B8B05E0089BA08 /* Ship - Release - iOS */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Release - iOS";
-		};
-		33E881CD15B8B05E0089BA08 /* Ship - Release - iOS */ = {
+		338382E515B771AA00A28CCF /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33F199D115B89911006D8DCC /* FreeTypeReleaseiOS.xcconfig */;
 			buildSettings = {
 				DSTROOT = /tmp/freetypeiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
-			name = "Ship - Release - iOS";
-		};
-		33E881CE15B8B0660089BA08 /* Ship - Release - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENGINE_PROJECT_ROOT = "";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				SDKROOT = macosx;
-			};
-			name = "Ship - Release - OSX";
-		};
-		33E881CF15B8B0660089BA08 /* Ship - Release - OSX */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 33F199D215B89911006D8DCC /* FreeTypeReleaseOSX.xcconfig */;
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Ship - Release - OSX";
-		};
-		33E881D015B8B0660089BA08 /* Ship - Release - OSX */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/freetypeiOS.dst;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = "Ship - Release - OSX";
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
@@ -591,41 +421,29 @@
 		338382C815B7717D00A28CCF /* Build configuration list for PBXProject "freetype" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				338382D015B7717D00A28CCF /* Dev - Debug */,
-				33E881C415B8B0500089BA08 /* Ship - Debug - iOS */,
-				33E881C815B8B0560089BA08 /* Ship - Debug - OSX */,
-				338382D115B7717D00A28CCF /* Dev - Release */,
-				33E881CB15B8B05E0089BA08 /* Ship - Release - iOS */,
-				33E881CE15B8B0660089BA08 /* Ship - Release - OSX */,
+				338382D015B7717D00A28CCF /* Debug */,
+				338382D115B7717D00A28CCF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 		338382D215B7717D00A28CCF /* Build configuration list for PBXNativeTarget "freetypeOSX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				338382D315B7717D00A28CCF /* Dev - Debug */,
-				33E881C515B8B0500089BA08 /* Ship - Debug - iOS */,
-				33E881C915B8B0560089BA08 /* Ship - Debug - OSX */,
-				338382D415B7717D00A28CCF /* Dev - Release */,
-				33E881CC15B8B05E0089BA08 /* Ship - Release - iOS */,
-				33E881CF15B8B0660089BA08 /* Ship - Release - OSX */,
+				338382D315B7717D00A28CCF /* Debug */,
+				338382D415B7717D00A28CCF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 		338382E315B771AA00A28CCF /* Build configuration list for PBXNativeTarget "freetypeiOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				338382E415B771AA00A28CCF /* Dev - Debug */,
-				33E881C615B8B0500089BA08 /* Ship - Debug - iOS */,
-				33E881CA15B8B0560089BA08 /* Ship - Debug - OSX */,
-				338382E515B771AA00A28CCF /* Dev - Release */,
-				33E881CD15B8B05E0089BA08 /* Ship - Release - iOS */,
-				33E881D015B8B0660089BA08 /* Ship - Release - OSX */,
+				338382E415B771AA00A28CCF /* Debug */,
+				338382E515B771AA00A28CCF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Dev - Release";
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

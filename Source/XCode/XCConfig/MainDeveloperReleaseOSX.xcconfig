@@ -1,11 +1,11 @@
-// RadianceDeveloperRelease.xcconfig
-// Radiance developer release build config
+// MainDeveloperReleaseOSX.xcconfig
+// Main developer release OSX build config
 // Copyright (c) 2012 Sunside Inc., All Rights Reserved.
 // See Radiance/LICENSE for licensing terms.
 
 #include "EngineReleaseOSX.xcconfig"
 #include "EngineDeveloper.xcconfig"
 
-OPTIONAL_EXTERNLIB_INCLUDES = "$(PVRTEXLIB_PATH)"
+OPTIONAL_EXTERNLIB_INCLUDES =
 
-#include "RadianceBuild.xcconfig"
+#include "MainBuild.xcconfig"
