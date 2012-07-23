@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "IntString.h"
+#include "IntStringBase.h"
 
 namespace string {
 namespace details {

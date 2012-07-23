@@ -12,14 +12,7 @@
 
 
 
-DECLARE(file)
 DECLARE(thread)
-
-#if defined(RAD_OPT_POSIXAIO)
-	DECLARE(posix_aio)
-#elif defined(RAD_OPT_POSIXFILES)
-	DECLARE(_posix_fadvise)
-#endif
 
 namespace rt {
 
@@ -98,14 +91,6 @@ RADRT_API void RADRT_CALL Initialize(RuntimeFlags flags, thread::IThreadContext 
 
 	thread::details::Initialize();
 
-#if defined(RAD_OPT_POSIXAIO)
-	posix_aio::details::Initialize();
-#elif defined(RAD_OPT_POSIXFILES)
-	_posix_fadvise::details::Initialize();
-#endif
-
-	file::details::Initialize();
-
 	if (flags != RFNoDefaultThreads)
 	{
 		details::s_tasks.Run(context);
@@ -118,12 +103,6 @@ RADRT_API void RADRT_CALL Finalize()
 	{
 		details::s_tasks.Exit();
 	}
-	file::details::Finalize();
-#if defined(RAD_OPT_POSIXAIO)
-	posix_aio::details::Finalize();
-#elif defined(RAD_OPT_POSIXFILES)
-	_posix_fadvise::details::Finalize();
-#endif
 
 	thread::details::Finalize();
 }
@@ -131,34 +110,15 @@ RADRT_API void RADRT_CALL Finalize()
 RADRT_API void RADRT_CALL ThreadInitialize()
 {
 	thread::details::ThreadInitialize();
-
-#if defined(RAD_OPT_POSIXAIO)
-	posix_aio::details::ThreadInitialize();
-#elif defined(RAD_OPT_POSIXFILES)
-	_posix_fadvise::details::ThreadInitialize();
-#endif
-	file::details::ThreadInitialize();
 }
 
 RADRT_API void RADRT_CALL ThreadFinalize()
 {
-	file::details::ThreadFinalize();
-#if defined(RAD_OPT_POSIXAIO)
-	posix_aio::details::ThreadInitialize();
-#elif defined(RAD_OPT_POSIXFILES)
-	_posix_fadvise::details::ThreadInitialize();
-#endif
 	thread::details::ThreadFinalize();
 }
 
 RADRT_API void RADRT_CALL ProcessTasks()
 {
-#if defined(RAD_OPT_POSIXAIO)
-	posix_aio::details::ProcessTasks();
-#elif defined(RAD_OPT_POSIXFILES)
-	_posix_fadvise::details::ProcessTasks();
-#endif
-	file::details::ProcessTasks();
 	thread::details::ProcessTasks();
 }
 

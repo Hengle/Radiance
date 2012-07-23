@@ -10,6 +10,7 @@
 
 #include "Opts.h"
 #include "Macros.h"
+#include "EnumFlags.h"
 #include "Assert.h"
 #include "EnumFlags.h"
 #include "Property.h"

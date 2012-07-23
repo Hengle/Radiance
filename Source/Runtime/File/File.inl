@@ -1,230 +1,101 @@
 // File.inl
-// Platform Agnostic File System (inlines)
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
-#include "../Utils.h"
-
-
 namespace file {
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// file::Search
-//////////////////////////////////////////////////////////////////////////////////////////
-
-inline Search::Search()
-{
+inline FileSystem::~FileSystem() {
 }
 
-inline Search::~Search()
-{
+inline string::String FileSystem::Alias(char name) {
+	return m_aliasTable[name];
 }
 
-inline bool Search::Open(
-	const char *directory,
-	const char *extWithPeriod,
-	SearchFlags flags
-)
-{
-	return m_imp.Open(
-		directory,
-		extWithPeriod,
-		flags
-	);
+inline int FileSystem::RAD_IMPLEMENT_GET(globalMask) {
+	return m_globalMask;
 }
 
-inline bool Search::NextFile(
-	char *filenameBuffer,
-	UReg filenameBufferSize,
-	FileAttributes *fileFlags,
-	xtime::TimeDate *fileTime
-)
-{
-	return m_imp.NextFile(
-		filenameBuffer,
-		filenameBufferSize,
-		fileFlags,
-		fileTime
-	);
+inline void FileSystem::RAD_IMPLEMENT_SET(globalMask) (int value) {
+	m_globalMask = value;
 }
 
-inline bool Search::IsValid()
-{
-	return m_imp.IsValid();
+///////////////////////////////////////////////////////////////////////////////
+
+inline MMFile::MMFile() {
 }
 
-inline void Search::Close()
-{
-	m_imp.Close();
+///////////////////////////////////////////////////////////////////////////////
+
+inline MMapping::MMapping(const void *data, AddrSize size, AddrSize offset)
+: m_data(data), m_size(size), m_offset(offset) {
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// file::AsyncIO
-//////////////////////////////////////////////////////////////////////////////////////////
-
-inline AsyncIO::AsyncIO()
-{
+inline const void *MMapping::RAD_IMPLEMENT_GET(data) {
+	return m_data;
 }
 
-inline AsyncIO::~AsyncIO()
-{
+inline AddrSize MMapping::RAD_IMPLEMENT_GET(size) {
+	return m_size;
 }
 
-inline Result AsyncIO::Result() const
-{
-	return m_imp.Result();
+inline AddrSize MMapping::RAD_IMPLEMENT_GET(offset) {
+	return m_offset;
 }
 
-inline void AsyncIO::Cancel()
-{
-	m_imp.Cancel();
+///////////////////////////////////////////////////////////////////////////////
+
+inline FileSearch::FileSearch() {
 }
 
-inline bool AsyncIO::IsCancelled()
-{
-	return m_imp.IsCancelled();
+///////////////////////////////////////////////////////////////////////////////
+
+inline stream::SPos MMFileInputBuffer::InPos() const {
+	return m_pos;
 }
 
-inline bool AsyncIO::WaitForCompletion(U32 timeout) const
-{
-	return m_imp.WaitForCompletion(timeout);
+inline stream::SPos MMFileInputBuffer::Size()  const {
+	return (stream::SPos)m_file->size.get();
 }
 
-inline FPos AsyncIO::ByteCount() const
-{
-	return m_imp.ByteCount();
+inline UReg MMFileInputBuffer::InCaps() const {
+	return stream::CapSeekInput | stream::CapSizeInput;
 }
 
-inline void AsyncIO::SetByteCount(FPos count)
-{
-	m_imp.SetByteCount(count);
+inline UReg MMFileInputBuffer::InStatus() const {
+	return m_file ? stream::StatusInputOpen : 0;
 }
 
-inline void AsyncIO::TriggerStatusChange(
-	file::Result result,
-	bool force
-)
-{
-	m_imp.TriggerStatusChange(
-		result,
-		force
-	);
+///////////////////////////////////////////////////////////////////////////////
+
+inline stream::SPos FILEInputBuffer::InPos() const {
+	return m_pos;
 }
 
-inline void AsyncIO::OnComplete(file::Result result)
-{
+inline UReg FILEInputBuffer::InCaps() const {
+	return stream::CapSeekInput|stream::CapSizeInput;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// file::File
-//////////////////////////////////////////////////////////////////////////////////////////
-
-inline File::File()
-{
+inline UReg FILEInputBuffer::InStatus() const {
+	return m_fp ? stream::StatusInputOpen : 0;
 }
 
-inline File::~File()
-{
+///////////////////////////////////////////////////////////////////////////////
+
+inline stream::SPos FILEOutputBuffer::OutPos() const {
+	return m_pos;
 }
 
-inline Result File::Open(
-	const char *filename,
-	CreationType creationType,
-	AccessMode accessMode,
-	ShareMode shareMode,
-	FileOptions fileOptions,
-	AsyncIO *io
-)
-{
-	return m_imp.Open(
-		filename,
-		creationType,
-		accessMode,
-		shareMode,
-		fileOptions,
-		(io) ? (&(io->m_imp)) : 0
-	);
+inline void FILEOutputBuffer::Flush() {
+	fflush(m_fp);
 }
 
-inline Result File::Close(AsyncIO* io)
-{
-	return m_imp.Close((io) ? (&(io->m_imp)) : 0);
+inline UReg FILEOutputBuffer::OutCaps() const {
+	return stream::CapSeekOutput;
 }
 
-inline Result File::Read(
-	void *buffer,
-	FPos bytesToRead,
-	FPos *bytesRead,
-	FPos filePos,
-	AsyncIO *io
-)
-{
-	return m_imp.Read(
-		buffer,
-		bytesToRead,
-		bytesRead,
-		filePos,
-		(io) ? (&(io->m_imp)) : 0
-	);
-}
-
-inline Result File::Write(
-	const void *buffer,
-	FPos bytesToWrite,
-	FPos* bytesWritten,
-	FPos filePos,
-	AsyncIO* io
-)
-{
-	return m_imp.Write(
-		buffer,
-		bytesToWrite,
-		bytesWritten,
-		filePos,
-		(io) ? (&(io->m_imp)) : 0
-	);
-}
-
-inline FPos File::Size() const
-{
-	return m_imp.Size();
-}
-
-inline FPos File::SectorSize() const
-{
-	return m_imp.SectorSize();
-}
-
-inline bool File::CancelIO()
-{
-	return m_imp.CancelIO();
-}
-
-inline bool File::Flush()
-{
-	return m_imp.Flush();
-}
-
-inline void *File::IOMalloc(AddrSize size, AddrSize *ioSize, Zone &zone)
-{
-	RAD_ASSERT(size);
-	size = Align(size, SectorSize());
-	if (ioSize) { *ioSize = size; }
-	return zone_malloc(zone, size, 0, SectorSize());
-}
-
-inline void *File::SafeIOMalloc(AddrSize size, AddrSize *ioSize, Zone &zone)
-{
-	void *p = IOMalloc(size, ioSize, zone);
-	RAD_VERIFY(p);
-	return p;
-}
-
-inline void File::IOFree(void *p)
-{
-	zone_free(p);
+inline UReg FILEOutputBuffer::OutStatus() const {
+	return m_fp ? stream::StatusOutputOpen : 0;
 }
 
 } // file
-

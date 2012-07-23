@@ -1,167 +1,175 @@
 // WinFile.h
-// File System for Windows 95/98/2000/XP.
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
 #pragma once
 
+#include "../File.h"
+#include "../Container/ZoneDeque.h"
 #include "WinHeaders.h"
-#include "../TimeDef.h"
-#include "../Thread/Locks.h"
-#include "../PushPack.h"
-
 
 namespace file {
 
-enum
-{
-	MaxAliasLen   = 255,
-	MaxFilePathLen = 255,
-	MaxExtLen      = 31
-};
+///////////////////////////////////////////////////////////////////////////////
 
-namespace details {
+class WinFileSystem : public FileSystem {
+public:
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// File searching
-//////////////////////////////////////////////////////////////////////////////////////////
-
-class RADRT_CLASS Search
-{
-private:
-	friend class file::Search;
-
-	Search();
-	~Search();
-
-	bool Open(const char* directory,
-		const char* extWithPeriod,
-		SearchFlags flags
+	WinFileSystem(
+		const char *root,
+		const char *dvd,
+		AddrSize pageSize
 	);
 
-	bool NextFile(
-		char* filenameBuffer,
-		UReg filenameBufferSize,
-		FileAttributes* fileFlags,
-		xtime::TimeDate* fileTime
-	);
-
-	void Close();
-
-	bool PrivateOpen(
-		const char* root,
-		const char* directory,
-		const char* extWithPeriod,
-		SearchFlags flags
-	);
-
-	bool IsValid();
-
-	char m_root[MaxFilePathLen+1];
-	char m_dir[MaxFilePathLen+1];
-	char m_ext[MaxExtLen+1];
-	HANDLE m_search;
-	WIN32_FIND_DATAA m_findData;
-	Search* m_recursed;
-	SearchFlags m_flags;
-};
-
-//////////////////////////////////////////////////////////////////////////////////////////
-// Asynchronous IO management
-//////////////////////////////////////////////////////////////////////////////////////////
-
-class File;
-class IO;
-class RADRT_CLASS AsyncIO
-{
-	friend class file::AsyncIO;
-
-	AsyncIO();
-	~AsyncIO();
-
-	Result Result() const { return m_status; }
-	void Cancel() { m_cancel = true; }
-	bool WaitForCompletion(U32 timeout = thread::Infinite) const;
-	FPos ByteCount() const { return m_bytes; }
-	void TriggerStatusChange(file::Result result, bool force);
-	bool IsCancelled() { return m_cancel; }
-	void SetByteCount(FPos count) { m_bytes = count; }
-
-	mutable OVERLAPPED          m_o;
-	volatile FPos               m_bytes;
-	FPos                        m_req;
-	FPos                        m_chunkSize;
-	HANDLE                      m_file;
-	volatile file::Result  m_status;
-	bool                        m_read;
-	volatile bool               m_cancel;
-	U8*                         m_buffer;
-	AsyncIO*                    m_nextStart;
-	mutable thread::Gate   m_gate;
-
-	static void CALLBACK IOCompletion(DWORD errorCode, DWORD numBytes, LPOVERLAPPED ovr);
-
-	friend class RADRT_CLASS File;
-	friend class file::details::IO;
-};
-
-//////////////////////////////////////////////////////////////////////////////////////////
-// file::File
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-// This file object operates in two modes: asyncronous IO mode, and
-// syncronous IO mode.
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-
-class RADRT_CLASS File
-{
-	friend class file::File;
-
-	File();
-	~File();
-
-	Result Open(
-		const char* filename,
-		CreationType creationType,
-		AccessMode accessMode,
-		ShareMode shareMode,
+	virtual FileSearchRef OpenSearch(
+		const char *path,
+		SearchOptions searchOptions,
 		FileOptions fileOptions,
-		AsyncIO* io
+		int mask
 	);
 
-	Result Close(AsyncIO* io);
-
-	Result Read (
-		void* buffer,
-		FPos bytesToRead,
-		FPos* bytesRead,
-		FPos filePos,
-		AsyncIO* io
+	virtual bool GetFileTime(
+		const char *path,
+		xtime::TimeDate &td,
+		FileOptions options
 	);
 
-	Result Write(
-		const void* buffer,
-		FPos bytesToWrite,
-		FPos* bytesWritten,
-		FPos filePos,
-		AsyncIO* io
+	virtual bool DeleteFile(
+		const char *path,
+		FileOptions options
 	);
 
-	FPos Size() const;
-	FPos SectorSize() const { return m_sectorSize; }
+	virtual bool CreateDirectory(
+		const char *path,
+		FileOptions options
+	);
 
-	bool CancelIO();
-	bool Flush();
+	virtual bool DeleteDirectory(
+		const char *path,
+		FileOptions options
+	);
 
-	HANDLE m_file;
-	FileOptions m_flags;
-	FPos   m_sectorSize;
+protected:
+
+	virtual bool NativeFileExists(const char *path);
+	
+	virtual MMFileRef NativeOpenFile(
+		const char *path,
+		FileOptions options
+	);
+
+private:
+
+	bool DeleteDirectory_r(const char *nativePath);
+
+	AddrSize m_pageSize;
 };
 
-} // details
+///////////////////////////////////////////////////////////////////////////////
+
+class WinMMFile : public MMFile {
+public:
+
+	~WinMMFile();
+
+	virtual MMappingRef MMap(
+		AddrSize ofs, 
+		AddrSize size
+	);
+
+protected:
+
+	virtual RAD_DECLARE_GET(size, AddrSize);
+
+private:
+
+	friend class WinFileSystem;
+
+	WinMMFile(
+		HANDLE f, 
+		HANDLE m, 
+		AddrSize pageSize
+	);
+
+	HANDLE m_f, m_m;
+	AddrSize m_pageSize;
+	MMapping::Ref m_mm; // only if kFileOption_MapEntireFile is set.
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+class WinMMapping : public MMapping {
+public:
+
+	~WinMMapping();
+
+	virtual void Prefetch(
+		AddrSize offset,
+		AddrSize size
+	);
+
+private:
+
+	friend class WinMMFile;
+	friend class WinFileSystem;
+
+	WinMMapping(
+		const MMFile::Ref &file,
+		const void *base,
+		const void *data,
+		AddrSize size,
+		AddrSize offset
+	);
+
+	MMFile::Ref m_file; // keeps the file open.
+	const void *m_base;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+class WinFileSearch : public FileSearch {
+public:
+
+	~WinFileSearch();
+
+	static FileSearch::Ref New(
+		const string::String &path,
+		const string::String &prefix,
+		SearchOptions options
+	);
+
+	virtual bool NextFile(
+		string::String &path,
+		FileAttributes *fileAttributes,
+		xtime::TimeDate *fileTime
+	);
+
+private:
+
+	WinFileSearch(
+		const string::String &path,
+		const string::String &prefix,
+		const string::String &pattern,
+		SearchOptions options
+	);
+
+	enum State {
+		kState_Files,
+		kState_Dirs,
+		kState_Done
+	};
+
+	State NextState();
+
+	WIN32_FIND_DATAA m_fd;
+	string::String m_path;
+	string::String m_prefix;
+	string::String m_pattern;
+	FileSearch::Ref m_subDir;
+	SearchOptions m_options;
+	int m_state;
+	HANDLE m_h;
+};
+
 } // file
-
-
-#include"../PopPack.h"

@@ -81,7 +81,7 @@ public:
 	// All other seek types can only accept positive offsets!
 	virtual bool SeekIn(Seek seekType, SPos ofs, UReg* errorCode) = 0;
 	virtual SPos InPos() const = 0;
-	virtual SPos Size()  const = 0;
+	virtual SPos Size() const = 0;
 
 	virtual UReg InCaps() const = 0;
 	virtual UReg InStatus() const = 0;

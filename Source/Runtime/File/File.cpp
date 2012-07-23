@@ -1,764 +1,616 @@
 // File.cpp
-// Platform Agnostic File System
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
-#include RADPCH
 #include "File.h"
-#include "PrivateFile.h"
-#include "../String.h"
-#include <stdio.h>
-#include "../PushSystemMacros.h"
 
 using namespace string;
+using namespace data_codec::lmp;
 
 namespace file {
 
-RAD_ZONE_DEF(RADRT_API, ZFile, "File", ZRuntime);
+RAD_ZONE_DEF(RADRT_API, ZFile, "Files", ZRuntime);
 
 namespace {
-
-char s_aliasTable[MaxAliases][MaxAliasLen+1];
-
-static bool CheckPathCharacters(
-	const char *string,
-	UReg ofs
-)
-{
-	RAD_ASSERT(string);
-	RAD_ASSERT(len(string) > (int)ofs);
-
-	string = &string[ofs];
-	while (string[0] != 0)
-	{
-		if (!((string[0] >= L'0' && string[0] <= L'9') ||
-			(string[0] >= L'a' && string[0] <= L'z') || (string[0] >= L'A' && string[0] <= L'Z') ||
-			(string[0] == L'_') || (string[0] == L'.') || string[0] == L'!' || string[0] == L'/'))
-		{
-			return false;
+	inline bool pathHasAlias(const char *path) {
+		RAD_ASSERT(path);
+		return (path[0] == '@') && (path[2] == ':');
+	}
+	inline bool isAbsPath(const char *path) {
+		return pathHasAlias(path);
+	}
+	inline bool isRelPath(const char *path) {
+		return !isAbsPath(path);
+	}
+	inline void validatePath(const char *path) {
+#if defined(RAD_OPT_DEBUG)
+		for (int i = 0; path[i]; ++i) {
+			RAD_ASSERT_MSG(path[i] != '\\', "Invalid directory seperator"); // invalid directory seperator
 		}
-
-		string++;
+#endif
 	}
-
-	return true;
 }
 
-static bool CheckExtensionCharacters(
-	const char *string,
-	UReg ofs
-)
-{
-	RAD_ASSERT(string);
-	RAD_ASSERT(len(string) > (int)ofs);
+FileSystem::FileSystem(const char *root, const char *dvd)
+: m_globalMask(kFileMask_Any) {
+	RAD_ASSERT(root);
 
-	string = &string[ofs];
-	while (string[0] != 0)
-	{
-		if (!((string[0] >= L'0' && string[0] <= L'9') ||
-			(string[0] >= L'a' && string[0] <= L'z') || (string[0] >= L'A' && string[0] <= L'Z')
-			|| (string[0] == L'_') ||
-			(string[0] == L'.') || string[0] == L'!' || string[0] == L'*'))
-		{
-			return false;
+	SetAlias('r', root);
+	
+	if (dvd)
+		SetAlias('d', dvd);
+}
+
+void FileSystem::SetAlias(
+	char name,
+	const char *path
+) {
+	RAD_ASSERT(path);
+	
+	String &alias = m_aliasTable[name];
+
+	alias = path;
+
+	if (!alias.empty) {
+		char trailing = *(alias.end.get()-1);
+		if (trailing == '/' || trailing == '\\') {
+			// drop the /
+			alias = alias.SubStr(0, alias.length - 1);
 		}
-
-		string++;
 	}
-
-	return true;
 }
 
-static bool CheckDirectorySeparators(
-	const char *string
-)
-{
-	RAD_ASSERT(string);
-
-	UReg c = 0;
-	while (string[0] != 0)
-	{
-		if (string[0] == L'\\') return false;
-		if (string[0] != L'/') c = 0;
-		if (string[0] == L'/') c++;
-
-		if (c > 1) return false; // more than one / in a row (i.e. blah//blah//blah)
-		string++;
-	}
-
-	return true;
+void FileSystem::AddDirectory(
+	const char *path,
+	int mask
+) {
+	RAD_ASSERT(path);
+	PathMapping m;
+	m.dir = path;
+	m.mask = mask;
+	m_paths.push_back(m);
 }
 
-// enforce 8.3
-static bool CheckFilename(
-	const char *string
-)
-{
-	RAD_ASSERT(string);
-	UReg name, ext, l;
+PakFile::Ref FileSystem::OpenPakFile(
+	const char *path,
+	FileOptions options,
+	int mask,
+	int exclude,
+	int *resolved
+) {
+	MMFile::Ref file = OpenFile(path, options, mask, exclude, resolved);
+	if (file)
+		return PakFile::Open(file);
+	return PakFile::Ref();
+}
 
-	name = ext = 0;
-	l = (UReg)len(string);
-	for (; l > 0 && (string[l-1] != L'/'); --l)
-	{
-		if (string[l-1] == L'.')
-		{
-			if (l-1 > 0)
-			{
-				for (l = l-1; l > 0 && (string[l-1] != L'/'); --l)
-				{
-					name++;
+void FileSystem::AddPakFile(
+	const PakFileRef &pakFile,
+	int mask
+) {
+	RAD_ASSERT(pakFile);
+	PathMapping m;
+	m.pak = pakFile;
+	m.mask = mask;
+	m_paths.push_back(m);
+}
+
+void FileSystem::RemovePakFile(const PakFileRef &pakFile) {
+	RAD_ASSERT(pakFile);
+	for (PathMapping::Vec::iterator it = m_paths.begin(); it != m_paths.end();) {
+		const PathMapping &path = *it;
+		if (path.pak && path.pak.get() == pakFile.get()) {
+			it = m_paths.erase(it);
+		} else {
+			++it;
+		}
+	}
+}
+
+void FileSystem::RemovePakFiles() {
+	for (PathMapping::Vec::iterator it = m_paths.begin(); it != m_paths.end();) {
+		const PathMapping &path = *it;
+		if (path.pak) {
+			it = m_paths.erase(it);
+		} else {
+			++it;
+		}
+	}
+}
+
+FILE *FileSystem::fopen(
+	const char *path,
+	const char *mode,
+	FileOptions options,
+	int mask,
+	int exclude,
+	int *resolved
+) {
+	RAD_ASSERT(path);
+	RAD_ASSERT(mode);
+
+	String spath;
+	bool nativePath = (options&kFileOption_NativePath) ? true : false;
+
+	if (!nativePath) {
+		if (!GetAbsolutePath(path, spath, mask, exclude, resolved))
+			return 0;
+	} else {
+		spath = CStr(path);
+	}
+
+	if (!nativePath) {
+		String x;
+		if (!GetNativePath(spath.c_str, x))
+			return 0;
+		spath = x;
+	}
+
+	return ::fopen(spath.c_str, mode);
+}
+
+MMFile::Ref FileSystem::OpenFile(
+	const char *path,
+	FileOptions options,
+	int mask,
+	int exclude,
+	int *resolved
+) {
+	mask &= m_globalMask;
+
+	if (options & kFileOption_NativePath)
+		return NativeOpenFile(path, options);
+
+	if (isAbsPath(path)) {
+		String nativePath;
+		if (!GetNativePath(path, nativePath))
+			return MMFile::Ref();
+		return NativeOpenFile(nativePath.c_str, options);
+	}
+
+	const String kPath(CStr(path));
+
+	RAD_ASSERT_MSG(kPath[0] != '/', "Relative paths should never being with a '/'!");
+
+	if (resolved)
+		*resolved = 0;
+
+	for (PathMapping::Vec::const_iterator it = m_paths.begin(); it != m_paths.end(); ++it) {
+		const PathMapping &m = *it;
+
+		if (m.mask&exclude)
+			continue;
+		if (m.mask&mask) {
+
+			if (m.pak) {
+				MMFileRef r = m.pak->OpenFile(kPath.c_str);
+				if (r) {
+					if (resolved)
+						*resolved = m.mask;
+					return r;
 				}
+			} else {
+				String spath;
+				
+				spath = m.dir + "/" + kPath;
+			
+				if (!GetNativePath(spath.c_str, spath))
+					return MMFileRef();
+				MMFileRef r = NativeOpenFile(spath.c_str, options);
+				if (r) {
+					if (resolved)
+						*resolved = m.mask;
+					return r;
+				}
+			}
+		}
+	}
 
-				// special case, because they had an extension.
-				//if (name > 0 || ext > 0)
-				{
-					if (name == 0 || name > 8) return false; // illegal
-					if (ext == 0 || ext > 3) return false;
+	return MMFile::Ref();
+}
+
+bool FileSystem::GetAbsolutePath(
+	const char *path, 
+	String &absPath,
+	int mask,
+	int exclude,
+	int *resolved
+) {
+	RAD_ASSERT(path);
+	mask &= m_globalMask;
+
+	if (isAbsPath(path)) {
+		absPath = path;
+		return true;
+	}
+
+	const String kPath(CStr(path));
+
+	RAD_ASSERT_MSG(kPath[0] != '/', "Relative paths should never being with a '/'!");
+
+	for (PathMapping::Vec::const_iterator it = m_paths.begin(); it != m_paths.end(); ++it) {
+		const PathMapping &m = *it;
+
+		if (m.pak)
+			continue;
+		if (m.mask&exclude)
+			continue;
+		if (m.mask&mask) {
+		
+			absPath = m.dir + "/" + kPath;
+			
+			if (resolved)
+				*resolved = m.mask;
+			return true;
+		}
+	}
+
+	if (resolved)
+		*resolved = 0;
+	return false;
+}
+
+bool FileSystem::GetNativePath(
+	const char *path,
+	String &nativePath
+) {
+	RAD_ASSERT(path);
+
+	if (!pathHasAlias(path))
+		return false;
+
+	String spath(CStr(path));
+
+#if defined(RAD_OPT_DEBUG)
+	boost::array<bool, kAliasMax> m_touched;
+	memset(&m_touched[0], 0, sizeof(bool)*kAliasMax);
+#endif
+
+	while (pathHasAlias(spath.c_str)) {
+		char alias = spath[1];
+#if defined(RAD_OPT_DEBUG)
+		RAD_ASSERT_MSG(!m_touched[alias], "Expanding recursive file system alias!");
+		m_touched[alias] = true;
+#endif
+		spath = m_aliasTable[alias] + spath.SubStr(3); // include '/' separator.
+	}
+
+	nativePath = spath;
+	return true;
+}
+
+bool FileSystem::FileExists(
+	const char *path,
+	FileOptions options,
+	int mask,
+	int exclude,
+	int *resolved
+) {
+	mask &= m_globalMask;
+
+	if (options & kFileOption_NativePath)
+		return NativeFileExists(path);
+
+	if (isAbsPath(path)) {
+		String nativePath;
+		if (!GetNativePath(path, nativePath))
+			return false;
+		return NativeFileExists(nativePath.c_str);
+	}
+
+	const String kPath(CStr(path));
+
+	if (resolved)
+		*resolved = 0;
+
+	for (PathMapping::Vec::const_iterator it = m_paths.begin(); it != m_paths.end(); ++it) {
+		const PathMapping &m = *it;
+
+		if (m.mask&exclude)
+			continue;
+		if (m.mask&mask) {
+
+			if (m.pak) {
+				if (m.pak->FileExists(kPath.c_str)) {
+					if (resolved)
+						*resolved = m.mask;
 					return true;
 				}
-
-				//continue; // was just a directory like '9:/test/../../something'
+			} else {
+				String spath = m.dir + kPath;
+				if (!GetNativePath(spath.c_str, spath))
+					return false;
+				if (NativeFileExists(spath.c_str)) {
+					if (resolved)
+						*resolved = m.mask;
+					return true;
+				}
 			}
-
-			return false;
 		}
-		else
-		{
-			ext++;
-		}
-	}
-
-	if ((l>0) && (string[l-1] == L'/'))
-	{
-		// note that 'ext' is the name length in this case because we had no period '.'
-		if (ext == 0 || ext > 8) return false; // illegal
-		return true;
 	}
 
 	return false;
 }
+///////////////////////////////////////////////////////////////////////////////
 
-// enforce 8.3
-static bool CheckDirectories(
-	const char *string,
-	UReg ofs
-)
-{
-	RAD_ASSERT(string);
-	RAD_ASSERT(len(string) > (int)ofs);
+PakFile::Ref PakFile::Open(const MMFile::Ref &file) {
+	PakFile::Ref r(new (ZFile) PakFile(file));
 
-	static const UReg MAXDIRDEPTH = 32;
-	UReg c = 0;
-	UReg l = 0;
-	bool n = false;
-	string = &string[ofs];
+	MMFileInputBuffer ib(file, 1*Meg);
+	stream::InputStream is(ib);
 
-	while (string[0] != 0)
-	{
-		if (string[0] == L'/')
-		{
-			c++;
-			n = false;
-			if (l > 8) return false;
-			l = 0;
+	if (!r->m_pak.LoadLumpInfo(kDPakSig, kDPakMagic, is, data_codec::lmp::LittleEndian))
+		r.reset();
+
+	return r;
+}
+
+PakFile::PakFile(const MMFile::Ref &file) : m_file(file) {
+}
+
+MMFile::Ref PakFile::OpenFile(const char *path) {
+	MMFile::Ref r;
+
+	const StreamReader::Lump *l = m_pak.GetByName(path);
+	if (l)
+		r.reset(new (ZFile) MMPakEntry(shared_from_this(), *l));
+	return r;
+}
+
+bool PakFile::FileExists(const char *path) {
+	return m_pak.GetByName(path) != 0;
+}
+
+int PakFile::RAD_IMPLEMENT_GET(numLumps) {
+	return (int)m_pak.NumLumps();
+}
+
+const data_codec::lmp::StreamReader::Lump *PakFile::LumpForIndex(int i) {
+	return m_pak.GetByIndex(i);
+}
+
+const data_codec::lmp::StreamReader::Lump *PakFile::LumpForName(const char *path) {
+	return m_pak.GetByName(path);
+}
+
+PakFile::MMPakEntry::MMPakEntry(
+	const PakFileRef &pakFile,
+	const data_codec::lmp::StreamReader::Lump &lump
+) : m_pakFile(pakFile), m_lump(lump) {
+}
+
+MMapping::Ref PakFile::MMPakEntry::MMap(AddrSize ofs, AddrSize size) {
+	RAD_ASSERT(ofs+size <= (AddrSize)m_lump.Size());
+	return m_pakFile->m_file->MMap(
+		(AddrSize)m_lump.Ofs() + ofs,
+		size
+	);
+}
+
+AddrSize PakFile::MMPakEntry::RAD_IMPLEMENT_GET(size) {
+	return (AddrSize)m_lump.Size();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+MMFileInputBuffer::MMFileInputBuffer(
+	const MMFile::Ref &file,
+	AddrSize mappedSize
+) : m_file(file), m_bufSize(mappedSize), m_pos(0) {
+	RAD_ASSERT(mappedSize);
+}
+
+stream::SPos MMFileInputBuffer::Read(void *buf, stream::SPos numBytes, UReg *errorCode) {
+
+	U8 *bytes = reinterpret_cast<U8*>(buf);
+	stream::SPos bytesRead = 0;
+	const stream::SPos kFileSize = Size();
+	stream::SPos bytesLeftInFile = kFileSize - m_pos;
+
+	while ((numBytes > 0) && (bytesLeftInFile > 0)) {
+
+		if (m_mmap) {
+			// see if we have a valid window to read.
+			stream::SPos size = (stream::SPos)m_mmap->size.get();
+			stream::SPos offset = (stream::SPos)m_mmap->offset.get();
+
+			if ((m_pos < offset) || (m_pos >= offset+size)) { // no more data left in this mapping
+				m_mmap.reset();
+			}
 		}
-		else
-		{
-			n = true;
-			l++;
+
+		// generate a new mapping?
+		if (!m_mmap) {
+			AddrSize bufSize = m_bufSize;
+			if (bufSize > bytesLeftInFile)
+				bufSize = bytesLeftInFile;
+
+			m_mmap = m_file->MMap(m_pos, bufSize);
+			if (!m_mmap)
+				break; // error.
 		}
 
-		string++;
+		// copy
+		stream::SPos mmSize = (stream::SPos)m_mmap->size.get();
+		stream::SPos mmBase = (stream::SPos)m_mmap->offset.get();
+		stream::SPos mmOffset = m_pos - mmBase;
+		stream::SPos mmR = mmSize - mmOffset;
+
+		RAD_ASSERT(mmR > 0);
+
+		if (mmR > numBytes)
+			mmR = numBytes;
+		if (mmR > bytesLeftInFile)
+			mmR = bytesLeftInFile;
+
+		const U8 *src = reinterpret_cast<const U8*>(m_mmap->data.get()) + mmOffset;
+		memcpy(bytes, src, mmR);
+		bytes += mmR;
+		bytesRead += mmR;
+		m_pos += mmR;
+		numBytes -= mmR;
+		bytesLeftInFile -= mmR;
 	}
 
-	c += n ? 1 : 0;
-	return (c <= MAXDIRDEPTH) && (l <= 12);
+	stream::SetErrorCode(errorCode, (numBytes>0)?stream::ErrorUnderflow:stream::Success);
+	return bytesRead;
 }
 
-}
-
-#if defined(RAD_OPT_DEBUG)
-
-static bool s_enforcePortablePaths = true;
-
-RADRT_API bool RADRT_CALL EnforcePortablePaths(bool enforce)
-{
-	bool x = s_enforcePortablePaths;
-	s_enforcePortablePaths = enforce;
-	return x;
-}
-
-RADRT_API bool RADRT_CALL EnforcePortablePathsEnabled()
-{
-	return s_enforcePortablePaths;
-}
-
-namespace details {
-
-void AssertCreationType(CreationType ct)
-{
-	RAD_ASSERT_MSG( ct >= CreateAlways && ct <= TruncateExisting, "Invalid Creation Type!" );
-}
-
-void AssertFilePath(
-	const char *string,
-	bool requireAlias
-)
-{
-	UReg p, ofs;
-	bool hasAlias;
-
-	RAD_ASSERT_MSG(string[0] != 0, "Null file path!");
-
-	hasAlias = details::ExtractAlias(string, &p, &ofs);
-	if (!hasAlias)
-	{
-		ofs = 0;
+bool MMFileInputBuffer::SeekIn(stream::Seek seekType, stream::SPos ofs, UReg* errorCode) {
+	bool b = stream::CalcSeekPos(seekType, ofs, m_pos, Size(), &ofs);
+	if (b) {
+		m_pos = ofs;
+		stream::SetErrorCode(errorCode, stream::Success);
+	} else {
+		SetErrorCode(errorCode, stream::ErrorBadSeekPos);
 	}
-
-	if (requireAlias)
-	{
-		RAD_ASSERT_MSG(hasAlias, "File path must have an alias!");
-		RAD_ASSERT_MSG(string[ofs] == L'/' || string[ofs] == 0, "File path must have a '/' separating the alias from the path (i.e. 9:/dir/filename.ext)");
-	}
-
-	RAD_ASSERT_MSG(string[len(string)-1] != L'/', "File path cannot end in a '/'");
-	RAD_ASSERT_MSG(CheckDirectorySeparators(string), "Only a single '/' can be used to seperate directories!");
-
-	if (EnforcePortablePathsEnabled())
-	{
-		if (hasAlias) ++ofs;
-
-		if (string[ofs] != 0)
-		{
-			// can have nothing other than lower-case alpha numeric characters, in 8.3 format.
-			RAD_ASSERT_MSG(CheckPathCharacters(string, ofs), "Path and filenames can only contain characters a-z, digits 0-9, and '_' '.' '!'");
-			RAD_ASSERT_MSG(CheckFilename(string) && CheckDirectories(string, ofs), "Path and filenames must be in 8.3 format, and cannot be nested deeper than 32 levels!");
-		}
-	}
-
-	if (hasAlias) details::AssertAliasOK(string);
+	return b;
 }
 
-void AssertExtension(const char *ext)
-{
-	RAD_ASSERT(ext);
-	RAD_ASSERT_MSG(ext[0] == L'.', "Extensions must start with a period!");
-	RAD_ASSERT_MSG(CheckExtensionCharacters(ext,0), "Extensions can only can only contain characters a-z, digits 0-9, and '_' '.' '*'");
-	RAD_ASSERT_MSG(len(ext) <= MaxExtLen, "Extension length exceeds MaxExtLen!");
+///////////////////////////////////////////////////////////////////////////////
 
-	if (EnforcePortablePathsEnabled())
-	{
-		// check for four because of the '.'
-		RAD_ASSERT_MSG(len(ext) <= 4, "An extension cannot be > 3 characters!");
-	}
+FILEInputBuffer::FILEInputBuffer(FILE *fp) : m_fp(fp) {
+	RAD_ASSERT(fp);
+	m_pos = (stream::SPos)ftell(fp);
 }
 
-} // details
+stream::SPos FILEInputBuffer::Read(void *buff, stream::SPos numBytes, UReg *errorCode) {
+	fseek(m_fp, m_pos, SEEK_SET);
+	stream::SPos read = (stream::SPos)fread(buff, 1, numBytes, m_fp);
+	stream::SetErrorCode(errorCode, (read<numBytes) ? stream::Success : stream::ErrorUnderflow);
+	m_pos += read;
+	return read;
+}
 
-#endif
+bool FILEInputBuffer::SeekIn(stream::Seek seekType, stream::SPos ofs, UReg* errorCode) {
+	bool b = stream::CalcSeekPos(seekType, ofs, m_pos, Size(), &ofs);
+	if (b) {
+		m_pos = ofs;
+		stream::SetErrorCode(errorCode, stream::Success);
+	} else {
+		SetErrorCode(errorCode, stream::ErrorBadSeekPos);
+	}
+	return b;
+}
 
-namespace details {
+stream::SPos FILEInputBuffer::Size()  const {
+	size_t x = ftell(m_fp);
+	fseek(m_fp, 0, SEEK_END);
+	size_t s = ftell(m_fp);
+	fseek(m_fp, (long)x, SEEK_SET);
+	return (stream::SPos)s;
+}
 
-bool ExtractAlias(
-	const char *path,
-	UReg *aliasNumber,
-	UReg *strOfs
-)
-{
+///////////////////////////////////////////////////////////////////////////////
+
+FILEOutputBuffer::FILEOutputBuffer(FILE *fp) : m_fp(fp) {
+	RAD_ASSERT(fp);
+	m_pos = (stream::SPos)ftell(fp);
+}
+
+stream::SPos FILEOutputBuffer::Write(const void* buff, stream::SPos numBytes, UReg* errorCode) {
+	fseek(m_fp, m_pos, SEEK_SET);
+	stream::SPos write = (stream::SPos)fwrite(buff, 1, numBytes, m_fp);
+	SetErrorCode(errorCode, (write<numBytes) ? stream::ErrorUnderflow : stream::Success );
+	m_pos += write;
+	return write;
+}
+
+bool FILEOutputBuffer::SeekOut(stream::Seek seekType, stream::SPos ofs, UReg* errorCode) {
+	bool b = stream::CalcSeekPos(seekType, ofs, m_pos, Size(), &ofs);
+	if (b) {
+		m_pos = ofs;
+		stream::SetErrorCode(errorCode, stream::Success);
+	} else {
+		SetErrorCode(errorCode, stream::ErrorBadSeekPos);
+	}
+	return b;
+}
+
+stream::SPos FILEOutputBuffer::Size()  const {
+	size_t x = ftell(m_fp);
+	fseek(m_fp, 0, SEEK_END);
+	size_t s = ftell(m_fp);
+	fseek(m_fp, (long)x, SEEK_SET);
+	return (stream::SPos)s;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+RADRT_API String RADRT_CALL GetFileExtension(const char *path) {
 	RAD_ASSERT(path);
-	RAD_ASSERT(aliasNumber&&strOfs);
+	String ext;
 
-	// if the path is all digits, followed by a colon, then parse it out.
-	int i;
-	for (i = 0; path[i] >= L'0' && path[i] <= L'9'; i++) {}
-
-	if (path[i] == L':')
-	{
-		*aliasNumber = 0;
-		*strOfs = i+1;
-		sscanf(path, "%d:", (int*)aliasNumber);
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-} // details
-
-// returned with a '.'
-
-RADRT_API void RADRT_CALL FileExt(
-	const char *path,
-	char *ext,
-	UReg extBufferSize
-)
-{
-	RAD_ASSERT(path);
-	RAD_ASSERT(ext);
-	RAD_ASSERT(extBufferSize > 0);
-
-	ext[0] = 0;
-
-	UReg l = (UReg)len(path);
-	if (l > 0)
-	{
+	int l = len(path);
+	if (l > 0) {
 		// find the '.'
-		for (UReg i = l; i > 0; --i)
-		{
-			if (path[i-1] == L'.')
-			{
-				ncpy(ext, &path[i-1], (int)extBufferSize);
+		for (int i = l-1; i >= 0; --i) {
+			if (path[i] == '.') {
+				ext = &path[i];
 				break;
 			}
 		}
 	}
+
+	return ext;
 }
 
-// returned with a '.'
-
-RADRT_API UReg RADRT_CALL FileExtLength(
-	const char *path
-)
-{
-	RAD_ASSERT(path);
-
-	UReg c = 0;
-
-	UReg l = (UReg)len(path);
-	if (l > 0)
-	{
-		// find the '.'
-		for (UReg i = l-1; i >= 0; i--)
-		{
-			if (path[i] == L'.')
-			{
-				c = l-i;
-				break;
-			}
-		}
-	}
-
-	return c;
-}
-
-RADRT_API void RADRT_CALL SetFileExt(
-	const char *path,
-	const char *ext,
-	char *newPath,
-	UReg newPathBufferSize
-)
-{
-	RAD_ASSERT(path);
-	RAD_ASSERT(newPath);
-	RAD_ASSERT(newPathBufferSize);
-#if defined(RAD_OPT_DEBUG)
-	if (ext && ext[0])
-	{
-		RAD_ASSERT_MSG(ext[0] == '.', "Extensions must start with a period!");
-	}
-#endif
-
-	newPathBufferSize--; // for null.
-	UReg ofs = 0;
-	while (path[ofs] != L'.' && path[ofs] != 0 && ofs < newPathBufferSize)
-	{
-		newPath[ofs] = path[ofs++];
-	}
-
-	if (ext && ext[0])
-	{
-		UReg extOfs = 0;
-		while (ofs < newPathBufferSize && ext[extOfs] != 0)
-		{
-			newPath[ofs++] = ext[extOfs++];
-		}
-	}
-
-	newPath[ofs] = 0;
-}
-
-RADRT_API UReg RADRT_CALL SetFileExtLength(
-	const char *path,
+RADRT_API String RADRT_CALL SetFileExtension(
+	const char *path, 
 	const char *ext
-)
-{
+) {
 	RAD_ASSERT(path);
+	String newPath;
 
 #if defined(RAD_OPT_DEBUG)
-	if (ext && ext[0])
-	{
+	if (ext && ext[0]) {
 		RAD_ASSERT_MSG(ext[0] == '.', "Extensions must start with a period!");
 	}
 #endif
 
-	UReg ofs = 0;
-	while (path[ofs] != L'.' && path[ofs] != 0)
-	{
-		ofs++;
+	for (int i = 0; path[i] && (path[i] != '.'); ++i) {
+		newPath += path[i];
 	}
 
-	if (ext && ext[0])
-	{
-		UReg extOfs = 0;
-		while (ext[extOfs] != 0)
-		{
-			ofs++; extOfs++;
+	if (ext) {
+		for (int i = 0; ext[i]; ++i) {
+			newPath += ext[i];
 		}
 	}
 
-	return ofs;
+	return newPath;
 }
 
-RADRT_API UReg RADRT_CALL FileBaseNameLength(
-	const char *path
-)
-{
-	// work our way backwards until we hit a slash
-	size_t len = ::string::len(path);
-	const char *start = path + len;
-	const char *end = start;
-	bool ext = false;
-
-	for (--start; (end-start) < (int)len; --start)
-	{
-		if (*start == L'.' && !ext)
-		{
-			end = start;
-			ext = true;
-		}
-		else if (*start == L'/' || *start == L'\\')
-		{
-			++start;
-			break;
+RADRT_API String RADRT_CALL GetFileName(const char *path) {
+	RAD_ASSERT(path);
+	
+	int l = len(path);
+	for (int i = l-1; i >= 0; --i) {
+		if (path[i] == '/' || path[i] == '\\') {
+			return String(&path[i+1]);
 		}
 	}
 
-	return (UReg)(end-start);
+	return String(path);
 }
 
-RADRT_API void FileBaseName(
-	const char *path,
-	char *basePath,
-	UReg basePathBufferSize
-)
-{
-	// work our way backwards until we hit a slash
-	size_t len = ::string::len(path);
-	const char *start = path + len;
-	const char *end = start;
-	bool ext = false;
+RADRT_API String RADRT_CALL GetBaseFileName(const char *path) {
+	String filename = GetFileName(path);
+	return SetFileExtension(filename.c_str, 0);
+}
 
-	for (--start; (end-start) < (int)len; --start)
-	{
-		if (*start == L'.' && !ext)
-		{
-			end = start;
-			ext = true;
-		}
-		else if (*start == L'/' || *start == L'\\')
-		{
-			++start;
-			break;
+RADRT_API String RADRT_CALL GetFilePath(const char *path) {
+	RAD_ASSERT(path);
+	
+	int l = len(path);
+	for (int i = l-1; i >= 0; --i) {
+		if (path[i] == '/' || path[i] == '\\') {
+			return String(path, i, CopyTag);
 		}
 	}
 
-	// +1 ncpy null
-	len = std::min<UReg>((UReg)(end-start)+1, basePathBufferSize);
-	::string::ncpy(basePath, start, (int)len);
+	return String();
 }
 
-RADRT_API UReg RADRT_CALL FilePathNameLength(
-	const char *path
-)
-{
-	// work our way backwards until we hit a slash
-	size_t len = ::string::len(path);
-	const char *end = path + len;
-
-	for (--end; end > path; --end)
-	{
-		if (*end == L'/' || *end == L'\\')
-		{
-			--end;
-			break;
-		}
-	}
-
-	return (UReg)(end-path)+1;
-}
-
-RADRT_API void RADRT_CALL FilePathName(
-	const char *path,
-	char *pathName,
-	UReg pathNameBufferSize
-)
-{
-	// work our way backwards until we hit a slash
-	size_t len = ::string::len(path);
-	const char *end = path + len;
-
-	for (--end; end > path; --end)
-	{
-		if (*end == L'/' || *end == L'\\')
-		{
-			--end;
-			break;
-		}
-	}
-
-	// +1 ncpy null
-	len = std::min<UReg>((UReg)(end-path)+2, pathNameBufferSize);
-	::string::ncpy(pathName, path, (int)len);
-}
-
-RADRT_API bool RADRT_CALL FilePathIsValid(
-	const char *string
-)
-{
-	RAD_ASSERT(string);
-	UReg p, ofs;
-
-	if (string[0] == 0) 
-		return false;
-	if (!details::ExtractAlias(string, &p, &ofs)) 
-		return false;
-	if (string[ofs] != L'/') 
-		return false;
-	if (string[len(string)-1] == L'/') 
-		return false;
-
-	bool s = CheckDirectorySeparators(string);
-
-#if defined(RAD_OPT_DEBUG)
-	if (EnforcePortablePathsEnabled())
-	{
-		s = s && CheckPathCharacters(string, ofs+1) && CheckFilename(string) && CheckDirectories(string, ofs+1);
-	}
-#endif
-
-	bool aliasVisitTable[MaxAliases];
-
-	for (int i = 0; i < MaxAliases; i++)
-	{
-		aliasVisitTable[i] = false;
-	}
-
-	char src[MaxFilePathLen+1], dst[MaxFilePathLen+1];
-
-	cpy(src, string);
-
-	while (details::ExtractAlias(src, &p, &ofs))
-	{
-		s = s && (p < MaxAliases);
-		s = s && (s_aliasTable[p] != 0);
-		s = s && ((len(s_aliasTable[p]) + len(src)-ofs) <= MaxFilePathLen);
-		s = s && (aliasVisitTable[p] == false);
-
-		s = s && (src[ofs] == 0 || (src[ofs] == L'/' && src[ofs+1] != 0));
-		s = s && ((len(s_aliasTable[p]) + len(src)-ofs) <= MaxFilePathLen);
-
-		if (!s) break;
-
-		cpy(dst, s_aliasTable[p]);
-		cat(dst, &src[ofs]);
-		cpy(src, dst);
-
-		aliasVisitTable[p] = true;
-	}
-
-#if defined(RAD_OPT_DEBUG)
-	if (s && EnforcePortablePathsEnabled())
-	{
-		s = (aliasVisitTable[0]||aliasVisitTable[1]||aliasVisitTable[9]);
-	}
-#endif
-
-	return s;
-}
-
-#if defined(RAD_OPT_DEBUG)
-namespace details {
-void UncheckedSetAlias(
-	UReg aliasNumber,
-	const char *string
-)
-#else
-RADRT_API void RADRT_CALL SetAlias(
-	UReg aliasNumber,
-	const char *string
-)
-#endif
-{
-	RAD_ASSERT(aliasNumber < MaxAliases);
-	if (string && string[0])
-	{
-		RAD_ASSERT_MSG(len(string) <= MaxAliasLen, "Alias length exceeds maximum!");
-		RAD_ASSERT_MSG(string[len(string)-1] != '/', "Alias cannot end with a directory!");
-		RAD_ASSERT_MSG(aliasNumber < MaxAliases, "Alias out of bounds!");
-		cpy(s_aliasTable[aliasNumber], string);
-	}
-	else
-	{
-		s_aliasTable[aliasNumber][0] = 0;
-	}
-}
-#if defined (RAD_OPT_DEBUG)
-} // details
-#endif
-
-RADRT_API bool RADRT_CALL ExpandAliases(
-	const char *portablePath,
-	char *expandedPath,
-	UReg expandedPathBufferSize
-)
-{
-	RAD_ASSERT(portablePath);
-	RAD_ASSERT(len(portablePath) <= MaxFilePathLen);
-	char src[MaxFilePathLen+1], dst[MaxFilePathLen+1];
-	UReg num, ofs;
-	bool valid = false;
-
-	expandedPath[0] = 0;
-	cpy(src, portablePath);
-
-	while (details::ExtractAlias(src, &num, &ofs))
-	{
-		RAD_ASSERT_MSG(num < MaxAliases, "Alias out of bounds!");
-		RAD_ASSERT_MSG(s_aliasTable[num] != 0, "Invalid alias (an alias was referenced that has not been set)!");
-		RAD_ASSERT_MSG((len(s_aliasTable[num]) + len(src)-ofs) <= MaxFilePathLen, "Expanded alias exceeds MaxFilePathLen!");
-
-		cpy(dst, s_aliasTable[num]);
-		cat(dst, &src[ofs]);
-		cpy(src, dst);
-
-		valid = true;
-	}
-
-	ncpy(expandedPath, src, (int)expandedPathBufferSize);
-
-	return valid;
-}
-
-RADRT_API UReg RADRT_CALL ExpandAliasesLength(
-	const char *portablePath
-)
-{
-	RAD_ASSERT(portablePath);
-	RAD_ASSERT(len(portablePath) <= MaxFilePathLen);
-	char src[MaxFilePathLen+1], dst[MaxFilePathLen+1];
-	UReg num, ofs;
-	bool valid = false;
-
-	cpy(src, portablePath);
-
-	while (details::ExtractAlias(src, &num, &ofs))
-	{
-		RAD_ASSERT_MSG(num < MaxAliases, "Alias out of bounds!");
-		RAD_ASSERT_MSG(s_aliasTable[num][0] != 0, "Invalid alias (an alias was referenced that has not been set)!");
-		RAD_ASSERT_MSG((len(s_aliasTable[num]) + len(src)-ofs) <= MaxFilePathLen, "Expanded alias exceeds MaxFilePathLen!");
-
-		cpy(dst, s_aliasTable[num]);
-		cat(dst, &src[ofs]);
-		cpy(src, dst);
-
-		valid = true;
-	}
-
-	if (valid)
-	{
-		return (UReg)len(src);
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-#if defined(RAD_OPT_DEBUG)
-
-namespace details {
-
-void AssertAliasOK(
-	const char *alias
-)
-{
-	RAD_ASSERT(alias);
-	RAD_ASSERT(len(alias) <= MaxFilePathLen);
-	bool aliasVisitTable[MaxAliases];
-
-	for (int i = 0; i < MaxAliases; i++)
-	{
-		aliasVisitTable[i] = false;
-	}
-
-	char src[MaxFilePathLen+1], dst[MaxFilePathLen+1];
-	UReg num, ofs;
-
-	cpy(src, alias);
-
-	while (details::ExtractAlias(src, &num, &ofs))
-	{
-		RAD_ASSERT_MSG(num < MaxAliases, "Alias out of bounds!");
-		RAD_ASSERT_MSG(s_aliasTable[num] != 0, "Invalid alias (an alias was referenced that has not been set)!");
-		RAD_ASSERT_MSG((len(s_aliasTable[num]) + len(src)-ofs) <= MaxFilePathLen, "Expanded alias exceeds MaxFilePathLen!");
-		RAD_ASSERT_MSG(aliasVisitTable[num] == false, "Recursive alias!");
-
-		RAD_ASSERT_MSG((src[ofs] == '/' && src[ofs+1] != 0) || src[ofs] == 0 , "A path must start with a '/' immediately after the alias (i.e. 9:/path/filename.ext) if there is a filename, and cannot end with a '/'!");
-
-		cpy(dst, s_aliasTable[num]);
-		cat(dst, &src[ofs]);
-		cpy(src, dst);
-
-		aliasVisitTable[num] = true;
-	}
-
-	if (EnforcePortablePathsEnabled())
-	{
-		RAD_ASSERT_MSG((aliasVisitTable[0]||aliasVisitTable[1]||aliasVisitTable[9]), "File System Alias portability error: all user defined aliases/paths MUST referece alias 0, 1 or 9 directly or by reduction!");
-	}
-}
-
-} // details
-
-RADRT_API void RADRT_CALL SetAlias(
-	UReg aliasNumber,
-	const char *string
-)
-{
-	if (EnforcePortablePathsEnabled())
-	{
-		RAD_ASSERT_MSG((aliasNumber != 0 && aliasNumber != 1 && aliasNumber != 9), "File System Alias portability error: you cannot set aliases 0, 1, or 9 in portability mode!");
-	}
-	if (string)
-	{
-		details::AssertAliasOK(string);
-		details::UncheckedSetAlias(aliasNumber, string);
-		details::AssertAliasOK(string);
-	}
-	else
-	{
-		details::UncheckedSetAlias(aliasNumber, 0);
-	}
-}
-
-#endif
-
-namespace details {
-
-void InitializeAliasTable()
-{
-	// clear the alias table.
-	for (int i = 0; i < MaxAliases; i++)
-	{
-		s_aliasTable[i][0] = 0;
-	}
-}
-
-} // details
 } // file
-

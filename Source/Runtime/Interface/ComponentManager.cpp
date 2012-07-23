@@ -3,7 +3,6 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
-#include RADPCH
 #include "ComponentManager.h"
 #include "ComponentBuilder.h"
 #include "../String.h"
@@ -27,6 +26,7 @@
 #include "../SharedLibrary.h"
 
 using namespace file;
+using namespace string;
 
 RAD_ZONE_DEF(RADRT_API, ZComMan, "Component Manager", ZRuntime);
 
@@ -43,8 +43,7 @@ struct ComponentManager :
 	typedef zone_vector<SharedLibrary*, ZComManT>::type SharedLibraryVec;
 	typedef ObjectPool<SharedLibrary> SharedLibraryPool;
 
-	struct SharedComponentFactory
-	{
+	struct SharedComponentFactory {
 		RadComponentsExportFnType fn;
 		int idx;
 	};
@@ -52,8 +51,7 @@ struct ComponentManager :
 	SharedLibraryVec m_sharedLibraries;
 	SharedLibraryPool m_sharedLibraryPool;
 
-	struct StaticComponentFactory
-	{
+	struct StaticComponentFactory {
 		IComponentRegistrar *registrar;
 	};
 
@@ -82,109 +80,92 @@ struct ComponentManager :
 	static StaticComponentFactoryMap s_factories;
 	ComponentInstanceMap m_instances;
 
-	ComponentManager()
-	{
+	ComponentManager() {
 		m_sharedLibraryPool.Create(ZComMan, "component-man-shared-lib-pool", 8);
 	}
 
-	virtual ~ComponentManager()
-	{
+	virtual ~ComponentManager() {
 		//
 		// This ensures that we release our handle to any components *before* the dll's are detached.
 		//
 		ReleaseCachedComponents();
 	}
 
-	virtual void ReleaseCachedComponents()
-	{
+	virtual void ReleaseCachedComponents() {
 		m_instances.clear();
 	}
 
-	virtual void ReleaseSharedLibraries()
-	{
+	virtual void ReleaseSharedLibraries() {
 		ReleaseCachedComponents();
-		for (SharedLibraryVec::iterator it = m_sharedLibraries.begin(); it != m_sharedLibraries.end(); ++it)
-		{
+		for (SharedLibraryVec::iterator it = m_sharedLibraries.begin(); it != m_sharedLibraries.end(); ++it) {
 			m_sharedLibraryPool.Destroy(*it);
 		}
 		m_sharedLibraries.clear();
 	}
 
-	virtual void LoadComponents(RadComponentsExportFnType fn)
-	{
+	virtual void LoadComponents(RadComponentsExportFnType fn) {
 		RegisterComponents(fn);
 	}
 
-	virtual void LoadComponents(const char *path, ComponentLoadFlags flags)
+	virtual void LoadComponents(
+		const char *path, 
+		const FileSystem::Ref &fs, 
+		ComponentLoadFlags flags) 
 	{
-		Search search;
-		RAD_DEBUG_ONLY(bool _b = EnforcePortablePathsEnabled(); EnforcePortablePaths(false));
-
 		bool recursive = (flags & CLF_Recursive) ? true : false;
-		char nativePath[MaxFilePathLen+1];
+		String nativePath;
 
-		if (flags & CLF_NativePath)
-		{
-			string::cpy(nativePath, path);
-		}
-		else
-		{
-			ExpandToNativePath(path, nativePath, MaxFilePathLen+1);
+		if (flags & CLF_NativePath) {
+			nativePath = CStr(path);
+		} else {
+			if (!fs->GetNativePath(path, nativePath))
+				return;
 		}
 		
-		if (search.Open(
-			nativePath, 
-			SEARCH_EXT, 
-			SearchFlags(((recursive)?Recursive:0)|FileNames|NativePath)))
-		{
-			char filename[MaxFilePathLen+1];
-			while (search.NextFile(filename, MaxFilePathLen+1))
-			{
-				char buff[MaxFilePathLen+1];
-				string::cpy(buff, nativePath);
-				string::cat(buff, NativePathSeparator);
-				string::cat(buff, filename);
+		SearchOptions searchOptions = kSearchOption_ReturnNativePaths;
+		if (recursive)
+			searchOptions |= kSearchOption_Recursive;
 
+		FileSearch::Ref search = fs->OpenSearch(
+			(nativePath + "/*" + SEARCH_EXT).c_str,
+			searchOptions,
+			kFileOption_NativePath
+		);
+
+		if (search) {
+			String filename;
+			while (search->NextFile(filename)) {
+				String soPath(nativePath + RAD_NATIVEPATHSEP + filename);
+				
 				SharedLibrary *so = m_sharedLibraryPool.Construct();
 				RAD_VERIFY(so);
-				if (so->Load(buff, (flags & CLF_DisplayErrors) ? true : false))
-				{
+				if (so->Load(soPath.c_str, (flags & CLF_DisplayErrors) ? true : false)) {
 					RegisterComponents(so);
-				}
-				else
-				{
+				} else {
 					m_sharedLibraryPool.Destroy(so);
 				}
 			}
 		}
-		
-		RAD_DEBUG_ONLY(EnforcePortablePaths(_b));
+
 	}
 
-	void RegisterComponents(SharedLibrary *so)
-	{
+	void RegisterComponents(SharedLibrary *so) {
 		int count = 0;
 		RadComponentsExportFnType fn = (RadComponentsExportFnType)so->ProcAddress(COMPONENT_EXPORT_FN);
-		if (fn)
-		{
+		if (fn) {
 			count = RegisterComponents(fn);
 		}
 
-		if (0 == count)
-		{
+		if (0 == count) {
 			m_sharedLibraryPool.Destroy(so);
-		}
-		else
-		{
+		} else {
 			m_sharedLibraries.push_back(so);
 		}
 	}
 
-	int RegisterComponents(RadComponentsExportFnType fn)
-	{
+	int RegisterComponents(RadComponentsExportFnType fn) {
 		int count = 0;
-		for (int i = 0;; ++i)
-		{
+		for (int i = 0;; ++i) {
 			int ofs = 0;
 			const char *name = (const char*)fn(i, ofs, true);
 			if (!name) { break; }
@@ -194,26 +175,24 @@ struct ComponentManager :
 			{
 				LOCK();
 				std::pair<SharedComponentFactoryMap::iterator, bool> r = m_factories.insert(SharedComponentFactoryMap::value_type(String(name), f));
-				if (r.second) { ++count; }
+				if (r.second)
+					++count;
 			}
 		}
 		return count;
 	}
 
-	static void StaticRegisterComponent(IComponentRegistrar *registrar)
-	{
-//		LOCK();
+	static void StaticRegisterComponent(IComponentRegistrar *registrar) {
 		StaticComponentFactory f;
 		f.registrar = registrar;
 		s_factories.insert(StaticComponentFactoryMap::value_type(String(registrar->ID()), f));
 	}
 
-	virtual HInterface Create(const char *cid, bool cacheInstance)
-	{
-		if (cacheInstance)
-		{
+	virtual HInterface Create(const char *cid, bool cacheInstance) {
+		if (cacheInstance) {
 			HInterface x = Find(cid);
-			if (x) { return x; }
+			if (x)
+				return x;
 		}
 
 		LOCK();
@@ -221,29 +200,22 @@ struct ComponentManager :
 		String scid(cid);
 		{
 			StaticComponentFactoryMap::const_iterator it = s_factories.find(scid);
-			if (it != s_factories.end())
-			{
+			if (it != s_factories.end()) {
 				HInterface x(it->second.registrar->New());
 				if (x && cacheInstance)
-				{
 					m_instances.insert(ComponentInstanceMap::value_type(scid, x));
-				}
 				return x;
 			}
 		}
 
 		{
 			SharedComponentFactoryMap::const_iterator it = m_factories.find(scid);
-			if (it != m_factories.end())
-			{
+			if (it != m_factories.end()) {
 				int ofs = 0;
 				HInterface x(it->second.fn(it->second.idx, ofs, false));
 
 				if (x && cacheInstance)
-				{
 					m_instances.insert(ComponentInstanceMap::value_type(scid, x));
-				}
-
 				return x;
 			}
 		}
@@ -251,33 +223,26 @@ struct ComponentManager :
 		return 0;
 	}
 
-	virtual HInterface Find(const char *cid)
-	{
+	virtual HInterface Find(const char *cid) {
 		String scid(cid);
 
 		LOCK();
 
 		ComponentInstanceMap::const_iterator it = m_instances.find(scid);
 		if (it != m_instances.end())
-		{
 			return it->second;
-		}
 		
 		return 0;
 	}
 
-	void ForEachLibFn(const char *nativeFnSymbol, Callback *cb)
-	{
+	void ForEachLibFn(const char *nativeFnSymbol, Callback *cb) {
 		RAD_ASSERT(cb&&nativeFnSymbol);
 		LOCK();
 
-		for (SharedLibraryVec::const_iterator it = m_sharedLibraries.begin(); it != m_sharedLibraries.end(); ++it)
-		{
+		for (SharedLibraryVec::const_iterator it = m_sharedLibraries.begin(); it != m_sharedLibraries.end(); ++it) {
 			void *f = (*it)->ProcAddress(nativeFnSymbol);
 			if (f)
-			{
 				cb->Call(f);
-			}
 		}
 	}
 
@@ -300,7 +265,8 @@ RAD_IMPLEMENT_COMPONENT(ComponentManager, ComponentManager);
 HComponentManager IComponentManager::Instance()
 {
 	static HComponentManager s;
-	if (!s) { s = new (ZComMan) ::details::ComponentManager(); }
+	if (!s)
+		s = new (ZComMan) ::details::ComponentManager();
 	return s;
 }
 

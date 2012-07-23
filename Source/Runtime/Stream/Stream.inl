@@ -130,7 +130,8 @@ inline SPos InputStream::Read(void* buff, SPos numBytes, UReg* errorCode)
 {
 	RAD_ASSERT(m_buff);
 	RAD_ASSERT(InStatus()&StatusInputOpen);
-	if (numBytes > 0) return m_buff->Read(buff, numBytes, errorCode);
+	if (numBytes > 0) 
+		return m_buff->Read(buff, numBytes, errorCode);
 	return 0;
 }
 
