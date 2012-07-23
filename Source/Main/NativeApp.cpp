@@ -6,7 +6,7 @@
 */
 
 #include RADPCH
-#include "NativeApp.h"char
+#include "NativeApp.h"
 #include <Engine/COut.h>
 #include <Runtime/StringBase.h>
 #include <limits>
