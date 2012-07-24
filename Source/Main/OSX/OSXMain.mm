@@ -5,6 +5,8 @@
 	\ingroup Main
 */
 
+#include <Runtime/Base.h>
+
 #if defined(RAD_OPT_PC_TOOLS)
 #include "../QtAppMain.h"
 #include <string.h>

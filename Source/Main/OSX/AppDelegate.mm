@@ -30,6 +30,8 @@ AppDelegate *s_appd = 0;
 -(void) appMain;
 -(const char**)getArgs:(int&)argc;
 -(void)freeArgs:(int)argc:(const char**)argv;
+-(void)processEvents;
+-(void)dispatchEvent:(NSEvent*)event;
 @end
 
 @implementation AppDelegate
@@ -41,6 +43,15 @@ AppDelegate *s_appd = 0;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 	s_appd = self;
 	[self appMain];
+}
+
+- (void)applicationWillTerminate:(NSNotification*)notification {
+	App::Get()->ResetDisplayDevice();
+	App::Get()->Finalize();
+	
+	App::DestroyInstance();
+	
+	rt::Finalize();
 }
 
 @end
@@ -78,7 +89,7 @@ AppDelegate *s_appd = 0;
 	int argc;
 	const char **argv;
 	
-	argv = [self getArgs:argc];
+	argv = [self getArgs:argc]; // these are leaked.
 	
 	rt::Initialize();
 	RAD_DEBUG_ONLY(file::EnforcePortablePaths(false));
@@ -101,13 +112,6 @@ AppDelegate *s_appd = 0;
 		NSRunAlertPanel(@"Error", @"Initialization failed! See log.txt for details.", nil, nil, nil);
 		[NSApp terminate:nil];
 	}
-	
-	// after pre-init was called, we must have set a video mode and created a window.
-/*	if (!s_hWnd) {
-		COut(C_Error) << "Windowing system was not initialized (Developer note your custom PreInit method must call BindDisplayDevice() before returning!" << std::endl;
-		NSRunAlertPanel(@"Error", @"Windowing system was not initialized! See log.txt for details.", nil, nil, nil);
-		[NSApp terminate:nil];
-	}*/
 	
 	if (!app->engine->sys->r->ctx.get()) {
 		COut(C_Error) << "Rendering system was not initialized (Developer note your custom PreInit method must set the rendering context before returning!" << std::endl;
@@ -136,26 +140,44 @@ AppDelegate *s_appd = 0;
 	}
 	
 	while (!app->exit) {
-		/*while (PeekMessage(&m, s_hWnd, 0, 0, PM_REMOVE)) {
-			DispatchMessage(&m);
-		}*/
+		[self processEvents];
 		app->Tick();
 		[pool release];
 		pool = [[NSAutoreleasePool alloc] init];
 	}
 	
-	app->ResetDisplayDevice();
-	app->Finalize();
-	
-	App::DestroyInstance();
-	
-	rt::Finalize();
-	
-	// we are not going to return from this function.
-	
-	[self freeArgs:argc:argv];
-	
 	[NSApp terminate:nil];
+}
+
+-(void)processEvents {
+	NSEvent *e;
+	
+	while ((e=[NSApp nextEventMatchingMask: NSAnyEventMask untilDate: nil inMode: NSDefaultRunLoopMode dequeue: YES])) {
+		[self dispatchEvent: e];
+	}
+}
+
+-(void)dispatchEvent: (NSEvent*) event {
+	NSEventType type = [event type];
+	
+	switch (type) {
+	case NSLeftMouseDown:
+	case NSLeftMouseUp:
+	case NSRightMouseDown:
+	case NSRightMouseUp:
+	case NSMouseMoved:
+	case NSLeftMouseDragged:
+	case NSRightMouseDragged:
+	case NSKeyDown:
+		/*if ([ event modifierFlags ] & NSCommandKeyMask) {
+		}*/
+	case NSKeyUp:
+	case NSFlagsChanged:
+	case NSSystemDefined:
+	case NSScrollWheel:
+		return;
+	}
+	[NSApp sendEvent: event];
 }
 
 @end

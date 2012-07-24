@@ -1,0 +1,11 @@
+// AppGoldenDebugOSX.xcconfig
+// App golden debug OSX build config
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "AppDebugOSX.xcconfig"
+#include "EngineGolden.xcconfig"
+
+OPTIONAL_EXTERNLIB_INCLUDES = 
+
+#include "AppBuild.xcconfig"

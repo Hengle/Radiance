@@ -50,6 +50,20 @@
 		337AE54715BF033700AD1617 /* GLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 337AE54615BF033700AD1617 /* GLContext.h */; };
 		337AE54815BF033700AD1617 /* GLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 337AE54615BF033700AD1617 /* GLContext.h */; };
 		337AE54915BF033700AD1617 /* GLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 337AE54615BF033700AD1617 /* GLContext.h */; };
+		337AE77015BF217000AD1617 /* OSXNativeApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 331949EC15BA34BC00458F43 /* OSXNativeApp.mm */; };
+		337AE77115BF217000AD1617 /* NativeApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949E215BA34BC00458F43 /* NativeApp.cpp */; };
+		337AE77215BF217000AD1617 /* null_CloudStorage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949E715BA34BC00458F43 /* null_CloudStorage.cpp */; };
+		337AE77315BF217000AD1617 /* OSXMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33194A2515BA4F4A00458F43 /* OSXMain.mm */; };
+		337AE77415BF217000AD1617 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33194B2815BC8A6700458F43 /* AppDelegate.mm */; };
+		337AE77715BF217000AD1617 /* OSXNativeApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949EB15BA34BC00458F43 /* OSXNativeApp.h */; };
+		337AE77815BF217000AD1617 /* IntMain.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E015BA34BC00458F43 /* IntMain.h */; };
+		337AE77915BF217000AD1617 /* NativeApp_inl.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E115BA34BC00458F43 /* NativeApp_inl.h */; };
+		337AE77A15BF217000AD1617 /* NativeApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E315BA34BC00458F43 /* NativeApp.h */; };
+		337AE77B15BF217000AD1617 /* NativeAppBackend.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E415BA34BC00458F43 /* NativeAppBackend.h */; };
+		337AE77C15BF217000AD1617 /* NativeAppDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E515BA34BC00458F43 /* NativeAppDef.h */; };
+		337AE77D15BF217000AD1617 /* NativeDeviceContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E615BA34BC00458F43 /* NativeDeviceContext.h */; };
+		337AE77E15BF217000AD1617 /* AppDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 33194B2715BC8A6700458F43 /* AppDelegate.h */; };
+		337AE77F15BF217000AD1617 /* GLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 337AE54615BF033700AD1617 /* GLContext.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -74,10 +88,15 @@
 		33194A2515BA4F4A00458F43 /* OSXMain.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = OSXMain.mm; path = ../Main/OSX/OSXMain.mm; sourceTree = "<group>"; };
 		33194B2715BC8A6700458F43 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = ../Main/OSX/AppDelegate.h; sourceTree = "<group>"; };
 		33194B2815BC8A6700458F43 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = ../Main/OSX/AppDelegate.mm; sourceTree = "<group>"; };
-		33194B2E15BC8A8400458F43 /* libMainDeveloper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainDeveloper.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		33194B5D15BC8A9F00458F43 /* libMainOSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainOSX.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		33194B5E15BC8A9F00458F43 /* libMainiOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainiOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		335ED5AC15BF22BB008DDBD9 /* libMainShipOSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainShipOSX.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		335ED5AD15BF22BB008DDBD9 /* libMainiOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainiOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		335ED5AE15BF22BB008DDBD9 /* libMainDeveloper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainDeveloper.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		337AE54615BF033700AD1617 /* GLContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GLContext.h; path = ../Main/GL/GLContext.h; sourceTree = "<group>"; };
+		337AE78315BF217000AD1617 /* libMainGoldenOSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainGoldenOSX.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		337AE78415BF21A600AD1617 /* MainGoldenDebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainGoldenDebugiOS.xcconfig; path = XCConfig/MainGoldenDebugiOS.xcconfig; sourceTree = "<group>"; };
+		337AE78515BF21A600AD1617 /* MainGoldenDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainGoldenDebugOSX.xcconfig; path = XCConfig/MainGoldenDebugOSX.xcconfig; sourceTree = "<group>"; };
+		337AE78615BF21A600AD1617 /* MainGoldenReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainGoldenReleaseiOS.xcconfig; path = XCConfig/MainGoldenReleaseiOS.xcconfig; sourceTree = "<group>"; };
+		337AE78715BF21A700AD1617 /* MainGoldenReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainGoldenReleaseOSX.xcconfig; path = XCConfig/MainGoldenReleaseOSX.xcconfig; sourceTree = "<group>"; };
 		338CDF0B15BC8F820058DFF5 /* MainDeveloperDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainDeveloperDebugOSX.xcconfig; path = XCConfig/MainDeveloperDebugOSX.xcconfig; sourceTree = "<group>"; };
 		338CDF0C15BC8F820058DFF5 /* MainDeveloperReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainDeveloperReleaseOSX.xcconfig; path = XCConfig/MainDeveloperReleaseOSX.xcconfig; sourceTree = "<group>"; };
 		338CDF0D15BC8F820058DFF5 /* MainShipDebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainShipDebugiOS.xcconfig; path = XCConfig/MainShipDebugiOS.xcconfig; sourceTree = "<group>"; };
@@ -113,6 +132,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		337AE77515BF217000AD1617 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -122,7 +148,7 @@
 				331949DE15BA34BC00458F43 /* Source */,
 				331949FC15BA352400458F43 /* XCConfig */,
 				331949C415BA344A00458F43 /* Frameworks */,
-				338CDF0415BC8D600058DFF5 /* Products */,
+				335ED5EB15BF2348008DDBD9 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -175,6 +201,10 @@
 				331949FD15BA356300458F43 /* MainBuild.xcconfig */,
 				338CDF0B15BC8F820058DFF5 /* MainDeveloperDebugOSX.xcconfig */,
 				338CDF0C15BC8F820058DFF5 /* MainDeveloperReleaseOSX.xcconfig */,
+				337AE78415BF21A600AD1617 /* MainGoldenDebugiOS.xcconfig */,
+				337AE78515BF21A600AD1617 /* MainGoldenDebugOSX.xcconfig */,
+				337AE78615BF21A600AD1617 /* MainGoldenReleaseiOS.xcconfig */,
+				337AE78715BF21A700AD1617 /* MainGoldenReleaseOSX.xcconfig */,
 				338CDF0D15BC8F820058DFF5 /* MainShipDebugiOS.xcconfig */,
 				338CDF0E15BC8F820058DFF5 /* MainShipDebugOSX.xcconfig */,
 				338CDF0F15BC8F820058DFF5 /* MainShipReleaseiOS.xcconfig */,
@@ -183,22 +213,23 @@
 			name = XCConfig;
 			sourceTree = "<group>";
 		};
+		335ED5EB15BF2348008DDBD9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				337AE78315BF217000AD1617 /* libMainGoldenOSX.a */,
+				335ED5AC15BF22BB008DDBD9 /* libMainShipOSX.a */,
+				335ED5AD15BF22BB008DDBD9 /* libMainiOS.a */,
+				335ED5AE15BF22BB008DDBD9 /* libMainDeveloper.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		337AE54415BF032900AD1617 /* GL */ = {
 			isa = PBXGroup;
 			children = (
 				337AE54615BF033700AD1617 /* GLContext.h */,
 			);
 			name = GL;
-			sourceTree = "<group>";
-		};
-		338CDF0415BC8D600058DFF5 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				33194B2E15BC8A8400458F43 /* libMainDeveloper.a */,
-				33194B5D15BC8A9F00458F43 /* libMainOSX.a */,
-				33194B5E15BC8A9F00458F43 /* libMainiOS.a */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -250,12 +281,28 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		337AE77615BF217000AD1617 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				337AE77715BF217000AD1617 /* OSXNativeApp.h in Headers */,
+				337AE77815BF217000AD1617 /* IntMain.h in Headers */,
+				337AE77915BF217000AD1617 /* NativeApp_inl.h in Headers */,
+				337AE77A15BF217000AD1617 /* NativeApp.h in Headers */,
+				337AE77B15BF217000AD1617 /* NativeAppBackend.h in Headers */,
+				337AE77C15BF217000AD1617 /* NativeAppDef.h in Headers */,
+				337AE77D15BF217000AD1617 /* NativeDeviceContext.h in Headers */,
+				337AE77E15BF217000AD1617 /* AppDelegate.h in Headers */,
+				337AE77F15BF217000AD1617 /* GLContext.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		331949B115BA343800458F43 /* MainOSX */ = {
+		331949B115BA343800458F43 /* MainShipOSX */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 331949B615BA343800458F43 /* Build configuration list for PBXNativeTarget "MainOSX" */;
+			buildConfigurationList = 331949B615BA343800458F43 /* Build configuration list for PBXNativeTarget "MainShipOSX" */;
 			buildPhases = (
 				331949AE15BA343800458F43 /* Sources */,
 				331949AF15BA343800458F43 /* Frameworks */,
@@ -265,9 +312,9 @@
 			);
 			dependencies = (
 			);
-			name = MainOSX;
+			name = MainShipOSX;
 			productName = Main;
-			productReference = 33194B5D15BC8A9F00458F43 /* libMainOSX.a */;
+			productReference = 335ED5AC15BF22BB008DDBD9 /* libMainShipOSX.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		331949C215BA344A00458F43 /* MainiOS */ = {
@@ -284,7 +331,7 @@
 			);
 			name = MainiOS;
 			productName = MainiOS;
-			productReference = 33194B5E15BC8A9F00458F43 /* libMainiOS.a */;
+			productReference = 335ED5AD15BF22BB008DDBD9 /* libMainiOS.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		33194B2D15BC8A8400458F43 /* MainDeveloper */ = {
@@ -301,7 +348,24 @@
 			);
 			name = MainDeveloper;
 			productName = MainDeveloper;
-			productReference = 33194B2E15BC8A8400458F43 /* libMainDeveloper.a */;
+			productReference = 335ED5AE15BF22BB008DDBD9 /* libMainDeveloper.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		337AE76E15BF217000AD1617 /* MainGoldenOSX */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 337AE78015BF217000AD1617 /* Build configuration list for PBXNativeTarget "MainGoldenOSX" */;
+			buildPhases = (
+				337AE76F15BF217000AD1617 /* Sources */,
+				337AE77515BF217000AD1617 /* Frameworks */,
+				337AE77615BF217000AD1617 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MainGoldenOSX;
+			productName = Main;
+			productReference = 337AE78315BF217000AD1617 /* libMainGoldenOSX.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -324,9 +388,10 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				331949B115BA343800458F43 /* MainOSX */,
+				331949B115BA343800458F43 /* MainShipOSX */,
 				331949C215BA344A00458F43 /* MainiOS */,
 				33194B2D15BC8A8400458F43 /* MainDeveloper */,
+				337AE76E15BF217000AD1617 /* MainGoldenOSX */,
 			);
 		};
 /* End PBXProject section */
@@ -363,6 +428,18 @@
 				330A99C815BCA126002A81EC /* OSXNativeApp.mm in Sources */,
 				330A99CB15BCA1C9002A81EC /* OSXMain.mm in Sources */,
 				330A99CC15BCA1D6002A81EC /* QtAppMain.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		337AE76F15BF217000AD1617 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				337AE77015BF217000AD1617 /* OSXNativeApp.mm in Sources */,
+				337AE77115BF217000AD1617 /* NativeApp.cpp in Sources */,
+				337AE77215BF217000AD1617 /* null_CloudStorage.cpp in Sources */,
+				337AE77315BF217000AD1617 /* OSXMain.mm in Sources */,
+				337AE77415BF217000AD1617 /* AppDelegate.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -497,6 +574,34 @@
 			};
 			name = Release;
 		};
+		337AE78115BF217000AD1617 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 337AE78515BF21A600AD1617 /* MainGoldenDebugOSX.xcconfig */;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../Extern/Qt-4.8.2\"",
+					"\"$(SRCROOT)/../../../Extern/Cg-3.1.0013\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		337AE78215BF217000AD1617 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 337AE78715BF21A700AD1617 /* MainGoldenReleaseOSX.xcconfig */;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../Extern/Qt-4.8.2\"",
+					"\"$(SRCROOT)/../../../Extern/Cg-3.1.0013\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -509,7 +614,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		331949B615BA343800458F43 /* Build configuration list for PBXNativeTarget "MainOSX" */ = {
+		331949B615BA343800458F43 /* Build configuration list for PBXNativeTarget "MainShipOSX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				331949B715BA343800458F43 /* Debug */,
@@ -532,6 +637,15 @@
 			buildConfigurations = (
 				33194B3015BC8A8400458F43 /* Debug */,
 				33194B3215BC8A8400458F43 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		337AE78015BF217000AD1617 /* Build configuration list for PBXNativeTarget "MainGoldenOSX" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				337AE78115BF217000AD1617 /* Debug */,
+				337AE78215BF217000AD1617 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

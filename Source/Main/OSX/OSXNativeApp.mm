@@ -471,8 +471,9 @@ GLDeviceContext::Ref NativeApp::CreateOpenGLContext(const GLPixelFormat &pf) {
 	attribs.reserve(128);
 	
 	attribs.push_back(NSOpenGLPFAMinimumPolicy);
+	if (m_activeDisplay->curVidMode->fullscreen)
+		attribs.push_back(NSOpenGLPFAFullScreen);
 	attribs.push_back(NSOpenGLPFAAccelerated);
-	attribs.push_back(NSOpenGLPFAFullScreen);
 	if (pf.doubleBuffer)
 		attribs.push_back(NSOpenGLPFADoubleBuffer);
 	attribs.push_back(NSOpenGLPFAColorSize);
@@ -483,8 +484,7 @@ GLDeviceContext::Ref NativeApp::CreateOpenGLContext(const GLPixelFormat &pf) {
 	attribs.push_back(pf.depth);
 	attribs.push_back(NSOpenGLPFAStencilSize);
 	attribs.push_back(pf.stencil);
-	if (m_activeDisplay->curVidMode->fullscreen)
-		attribs.push_back(NSOpenGLPFAScreenMask);
+	attribs.push_back(NSOpenGLPFAScreenMask);
 	attribs.push_back(CGDisplayIDToOpenGLDisplayMask(ddv->displayId));
 	
 	if (pf.mSamples > 0) {
@@ -493,6 +493,8 @@ GLDeviceContext::Ref NativeApp::CreateOpenGLContext(const GLPixelFormat &pf) {
 		attribs.push_back(NSOpenGLPFASamples);
 		attribs.push_back((NSOpenGLPixelFormatAttribute)pf.mSamples);
 	}
+	
+	attribs.push_back(0);
 	
 	NSOpenGLPixelFormat *nspf = 0;
 	

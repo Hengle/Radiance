@@ -1,0 +1,6 @@
+// EngineGolden.xcconfig
+// Sets golden build options.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+RAD_DEFINES = RAD_OPT_PC RAD_OPT_GL RAD_TARGET_GOLDEN BOOST_ALL_NO_LIB BOOST_NO_EXCEPTIONS RAD_OPT_POSIXTHREADS RAD_OPT_POSIXFILES
