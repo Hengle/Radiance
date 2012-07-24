@@ -16,8 +16,9 @@
 
 extern "C" int main(int argc, char *argv[]) {
 	
-#if defined(RAD_OPT_PC_TOOLS)
+#if defined(RAD_OPT_DEBUG)
 	if (argc < 2 || strcmp(argv[1], "-nosetwd")) {
+#endif
 		// Set working directory to the same folder that our .app bundle is in.
 		char bundlepath[1024];
 		CFURLRef url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
@@ -27,10 +28,21 @@ extern "C" int main(int argc, char *argv[]) {
 		}
 		CFRelease(url);
 		CFRelease(url2);
+#if defined(RAD_OPT_DEBUG)
 	}
+#endif
+	
+#if defined(RAD_OPT_PC_TOOLS)
 	return QtAppMain(argc, (const char **)argv);
 #else
 	return NSApplicationMain(argc, (const char **)argv);
 #endif
 	
 }
+
+#if !defined(RAD_OPT_PC_TOOLS)
+void __OSX_BundlePath(char *dst) {
+	NSString *bPath = [[NSBundle mainBundle] bundlePath];
+	strcpy(dst, [bPath cStringUsingEncoding:NSASCIIStringEncoding]);
+}
+#endif

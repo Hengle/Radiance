@@ -47,6 +47,9 @@
 		331949F615BA34BC00458F43 /* NativeDeviceContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E615BA34BC00458F43 /* NativeDeviceContext.h */; };
 		331949F715BA34BC00458F43 /* null_CloudStorage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949E715BA34BC00458F43 /* null_CloudStorage.cpp */; };
 		33194A2615BA4F4A00458F43 /* OSXMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33194A2515BA4F4A00458F43 /* OSXMain.mm */; };
+		337AE54715BF033700AD1617 /* GLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 337AE54615BF033700AD1617 /* GLContext.h */; };
+		337AE54815BF033700AD1617 /* GLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 337AE54615BF033700AD1617 /* GLContext.h */; };
+		337AE54915BF033700AD1617 /* GLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 337AE54615BF033700AD1617 /* GLContext.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -74,6 +77,7 @@
 		33194B2E15BC8A8400458F43 /* libMainDeveloper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainDeveloper.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		33194B5D15BC8A9F00458F43 /* libMainOSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainOSX.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		33194B5E15BC8A9F00458F43 /* libMainiOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainiOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		337AE54615BF033700AD1617 /* GLContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GLContext.h; path = ../Main/GL/GLContext.h; sourceTree = "<group>"; };
 		338CDF0B15BC8F820058DFF5 /* MainDeveloperDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainDeveloperDebugOSX.xcconfig; path = XCConfig/MainDeveloperDebugOSX.xcconfig; sourceTree = "<group>"; };
 		338CDF0C15BC8F820058DFF5 /* MainDeveloperReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainDeveloperReleaseOSX.xcconfig; path = XCConfig/MainDeveloperReleaseOSX.xcconfig; sourceTree = "<group>"; };
 		338CDF0D15BC8F820058DFF5 /* MainShipDebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainShipDebugiOS.xcconfig; path = XCConfig/MainShipDebugiOS.xcconfig; sourceTree = "<group>"; };
@@ -137,6 +141,7 @@
 		331949DE15BA34BC00458F43 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				337AE54415BF032900AD1617 /* GL */,
 				331949DF15BA34BC00458F43 /* OSX */,
 				331949E015BA34BC00458F43 /* IntMain.h */,
 				331949E115BA34BC00458F43 /* NativeApp_inl.h */,
@@ -178,6 +183,14 @@
 			name = XCConfig;
 			sourceTree = "<group>";
 		};
+		337AE54415BF032900AD1617 /* GL */ = {
+			isa = PBXGroup;
+			children = (
+				337AE54615BF033700AD1617 /* GLContext.h */,
+			);
+			name = GL;
+			sourceTree = "<group>";
+		};
 		338CDF0415BC8D600058DFF5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -203,6 +216,7 @@
 				331949F515BA34BC00458F43 /* NativeAppDef.h in Headers */,
 				331949F615BA34BC00458F43 /* NativeDeviceContext.h in Headers */,
 				330A99C915BCA1BE002A81EC /* AppDelegate.h in Headers */,
+				337AE54715BF033700AD1617 /* GLContext.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -216,6 +230,7 @@
 				330A99B815BCA114002A81EC /* NativeAppBackend.h in Headers */,
 				330A99B915BCA114002A81EC /* NativeAppDef.h in Headers */,
 				330A99BA15BCA114002A81EC /* NativeDeviceContext.h in Headers */,
+				337AE54815BF033700AD1617 /* GLContext.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -231,6 +246,7 @@
 				330A99C315BCA115002A81EC /* NativeDeviceContext.h in Headers */,
 				330A99C715BCA126002A81EC /* OSXNativeApp.h in Headers */,
 				330A99CD15BCA1D6002A81EC /* QtAppMain.h in Headers */,
+				337AE54915BF033700AD1617 /* GLContext.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

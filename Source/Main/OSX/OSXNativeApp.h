@@ -27,6 +27,7 @@ class RADENG_CLASS DisplayDevice {
 public:
 	struct NativeVars {
 		typedef boost::shared_ptr<NativeVars> Ref;
+		virtual ~NativeVars() {}
 	};
 private:
 	friend class NativeApp;

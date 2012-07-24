@@ -274,6 +274,9 @@ bool NativeApp::PreInit() {
 			if (dm.dmBitsPerPel < 32)
 				continue;
 			r::VidMode m = VidModeFromDevMode(dm);
+			
+			if (!m.SameAspect(dd->m_defMode)) // don't allow stretched modes.
+				continue;
 
 			r::VidModeVec::iterator it;
 			for (it = dd->m_vidModes.begin(); it != dd->m_vidModes.end(); ++it) {
@@ -711,6 +714,11 @@ GLDeviceContext::Ref NativeApp::CreateOpenGLContext(const GLPixelFormat &pf) {
 				wGLContext *wglc = new (ZEngine) wGLContext();
 				wglc->glrc = glrc;
 				wglc->Bind();
+				glClearColor(0, 0, 0, 0);
+				glClear(GL_COLOR_BUFFER_BIT);
+				::SwapBuffers(s_hDC);
+				glClear(GL_COLOR_BUFFER_BIT);
+				::SwapBuffers(s_hDC);
 				return GLDeviceContext::Ref(wglc);
 			}
 		}
