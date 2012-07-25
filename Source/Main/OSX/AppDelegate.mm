@@ -55,8 +55,8 @@ static int s_vkeys_en[256] = {
 -(void)processEvents;
 -(void)dispatchEvent:(NSEvent*)event;
 -(void)handleKeyEvent:(NSEvent*)event;
-/*-(void)handleModifierKeys:(NSEvent*)event;
--(void)postModifierKeys:(int)keys:(int)type;*/
+-(void)handleModifierKeys:(NSEvent*)event;
+-(void)postModifierKeys:(int)x type:(InputEvent::Type)type;
 -(void)handleMouseButtons:(NSEvent*)event;
 @end
 
@@ -233,9 +233,9 @@ static int s_vkeys_en[256] = {
 		[self handleKeyEvent: event];
 		break;
 			
-	/*case NSFlagsChanged:
+	case NSFlagsChanged:
 		[self handleModifierKeys: event];
-		break;*/
+		break;
 			
 	case NSSystemDefined:
 		[self handleMouseButtons: event];
@@ -271,8 +271,8 @@ static int s_vkeys_en[256] = {
 	App::Get()->PostInputEvent(e);
 }
 
-/*-(void)handleModifierKeys: (NSEvent*)event {
-	int modifiers = [event modifierFlags];
+-(void)handleModifierKeys: (NSEvent*)event {
+	int modifiers = (int)[event modifierFlags];
 	int down = modifiers & ~m_modifiers;
 	int up = m_modifiers & ~modifiers;
 	
@@ -280,15 +280,30 @@ static int s_vkeys_en[256] = {
 		[self postModifierKeys: down type: InputEvent::T_KeyDown];
 	if (up)
 		[self postModifierKeys: up type: InputEvent::T_KeyUp];
+	
+	m_modifiers = modifiers;
 }
 
--(void)handleModifierKeys:(int)keys:(int)type {
+-(void)postModifierKeys: (int)keys type: (InputEvent::Type)type {
 	int flags[6] = {
 		NSAlternateKeyMask, kKeyCode_LAlt,
-		NSControlKeyMask, kKeyCode_LControl,
+		NSControlKeyMask, kKeyCode_LCtrl,
 		NSShiftKeyMask, kKeyCode_LShift
 	};
-}*/
+	
+	xtime::TimeVal millis = xtime::ReadMilliseconds();
+	
+	for (int i = 0; i < 6; i += 2) {
+		if (keys & flags[i]) {
+			InputEvent e;
+			e.type = type;
+			e.repeat = 0;
+			e.data[0] = flags[i+1];
+			e.time = millis;
+			App::Get()->PostInputEvent(e);
+		}
+	}
+}
 
 -(void)handleMouseButtons: (NSEvent*)event {
 	
