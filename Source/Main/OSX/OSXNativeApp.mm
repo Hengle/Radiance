@@ -343,11 +343,13 @@ bool NativeApp::BindDisplayDevice(const ::DisplayDeviceRef &display, const r::Vi
 	
 	DDVars *ddv = DDVars::Get(display->m_imp.m_vars);
 	
+#if !defined(RAD_OPT_PC_TOOLS)
 	NSRect screenRect;
 	screenRect.origin.x = 0;
 	screenRect.origin.y = 0;
 	
 	NSUInteger style;
+#endif
 	
 	if (mode.fullscreen) {
 		
@@ -381,6 +383,7 @@ bool NativeApp::BindDisplayDevice(const ::DisplayDeviceRef &display, const r::Vi
 			}
 		}
 		
+#if !defined(RAD_OPT_PC_TOOLS)
 		style = NSBorderlessWindowMask;
 		screenRect.size.width = mode.w;
 		screenRect.size.height = mode.h;
@@ -424,6 +427,9 @@ bool NativeApp::BindDisplayDevice(const ::DisplayDeviceRef &display, const r::Vi
 	}
 	
 	[s_appd->window orderFront: nil];
+#else
+	}
+#endif
 	
 	display->m_imp.m_curMode = mode;
 	m_activeDisplay = display;

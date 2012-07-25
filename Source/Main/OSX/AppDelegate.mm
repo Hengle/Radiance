@@ -23,6 +23,7 @@
 #endif
 
 #import "AppDelegate.h"
+#import <AppKit/NSWorkspace.h>
 
 AppDelegate *s_appd = 0;
 
@@ -66,6 +67,14 @@ static int s_vkeys_en[256] = {
     [super dealloc];
 }
 
+- (void)launchAboutPage:(id)sender {
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.sunsidegames.com/crow"]];
+};
+
+- (void)launchSupportPage:(id)sender {
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.sunsidegames.com/crow"]];
+};
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 	m_mButtons = 0;
 	m_modifiers = 0;
@@ -86,6 +95,10 @@ static int s_vkeys_en[256] = {
 	App::DestroyInstance();
 	
 	rt::Finalize();
+}
+
+- (void)showHelp:(id)sender {
+	COut(C_Debug) << "showHelp" << std::endl;
 }
 
 @end
@@ -205,30 +218,28 @@ static int s_vkeys_en[256] = {
 			
 	case NSMouseMoved: 
 	case NSLeftMouseDragged:
-	case NSRightMouseDragged:
-	{
-		m_mPos = [event locationInWindow];
-		if (window) {
-			m_mPos = [[window contentView] convertPoint: m_mPos fromView: nil];
-			NSRect r = [[window contentView] bounds];
-			m_mPos.y = r.size.height - m_mPos.y; // why?
-		}
-		InputEvent e;
-		e.type = InputEvent::T_MouseMove;
-		e.data[0] = (int)m_mPos.x;
-		e.data[1] = (int)m_mPos.y;
-		e.data[2] = m_mButtons;
-		e.time = xtime::ReadMilliseconds();
-		app->PostInputEvent(e);
-	} break;
+		case NSRightMouseDragged:
+		{
+			m_mPos = [event locationInWindow];
+			if (window) {
+				m_mPos = [[window contentView] convertPoint: m_mPos fromView: nil];
+				NSRect r = [[window contentView] bounds];
+				m_mPos.y = r.size.height - m_mPos.y; // why?
+			}
+			InputEvent e;
+			e.type = InputEvent::T_MouseMove;
+			e.data[0] = (int)m_mPos.x;
+			e.data[1] = (int)m_mPos.y;
+			e.data[2] = m_mButtons;
+			e.time = xtime::ReadMilliseconds();
+			app->PostInputEvent(e);
+		} break;
 			
 	case NSKeyDown:
-		App::Get()->exit = true;
-		if ([event modifierFlags] & NSCommandKeyMask) {
-			// ignore command key combinations, they won't get NSKeyUp messages.
-			return;
-		}
-	// fall-through
+		if ([event modifierFlags] & NSCommandKeyMask)// ignore command key combinations, they won't get NSKeyUp messages.
+			break;
+		[self handleKeyEvent: event];
+		break;
 	case NSKeyUp:
 		[self handleKeyEvent: event];
 		break;
@@ -242,16 +253,16 @@ static int s_vkeys_en[256] = {
 		break;
 			
 	case NSScrollWheel:
-	{
-		NSPoint p = [event locationInWindow];
-		InputEvent e;
-		e.type = InputEvent::T_MouseWheel;
-		e.data[0] = (int)p.x;
-		e.data[1] = (int)p.y;
-		e.data[2] = (int)[event deltaY]; // TODO: scaling?
-		e.time = xtime::ReadMilliseconds();
-		app->PostInputEvent(e);
-	} break;
+		{
+			NSPoint p = [event locationInWindow];
+			InputEvent e;
+			e.type = InputEvent::T_MouseWheel;
+			e.data[0] = (int)p.x;
+			e.data[1] = (int)p.y;
+			e.data[2] = (int)[event deltaY]; // TODO: scaling?
+			e.time = xtime::ReadMilliseconds();
+			app->PostInputEvent(e);
+		} break;
 	default:
 		[NSApp sendEvent: event];
 		break;
