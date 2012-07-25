@@ -1021,6 +1021,7 @@ LRESULT CALLBACK MyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		if (wParam & MK_RBUTTON)
 			e.data[2] |= kMouseButton_Right;
 
+		e.time = xtime::ReadMilliseconds();
 		app->PostInputEvent(e);
 		break;
 	case WM_MOUSEWHEEL:
