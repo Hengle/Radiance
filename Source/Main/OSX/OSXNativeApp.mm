@@ -148,9 +148,9 @@ struct DDVars : public DisplayDevice::NativeVars {
 			fadeState = DDVars::kFadeState_Black;
 			
 			CGDisplayFadeReservationToken token;
-			while (CGAcquireDisplayFadeReservation(2.f, &token) != kCGErrorSuccess) {}
+			while (CGAcquireDisplayFadeReservation(1.f, &token) != kCGErrorSuccess) {}
 			
-			CGDisplayFade(token, 2.f, 0.f, 1.f, 0.f, 0.f, 0.f, true);
+			CGDisplayFade(token, 1.f, 0.f, 1.f, 0.f, 0.f, 0.f, true);
 			CGReleaseDisplayFadeReservation(token);
 		}
 	}
@@ -332,10 +332,22 @@ void NativeApp::Finalize() {
 bool NativeApp::BindDisplayDevice(const ::DisplayDeviceRef &display, const r::VidMode &mode) {
 	RAD_ASSERT(display);
 	
-	if (m_activeDisplay && m_activeDisplay.get() != display.get())
-		ResetDisplayDevice();
+	bool capture = true;
+	if (m_activeDisplay) {
+		if (m_activeDisplay.get() != display.get()) {
+			ResetDisplayDevice();
+		} else {
+			capture = false;
+		}
+	}
 	
 	DDVars *ddv = DDVars::Get(display->m_imp.m_vars);
+	
+	NSRect screenRect;
+	screenRect.origin.x = 0;
+	screenRect.origin.y = 0;
+	
+	NSUInteger style;
 	
 	if (mode.fullscreen) {
 		
@@ -353,52 +365,65 @@ bool NativeApp::BindDisplayDevice(const ::DisplayDeviceRef &display, const r::Vi
 			return false;
 		}
 		
-		if (CGDisplayCaptureWithOptions(ddv->displayId, kCGCaptureNoFill) != kCGErrorSuccess) {
+		ddv->FadeOut();
+		
+		if (capture && (CGCaptureAllDisplaysWithOptions(kCGCaptureNoOptions) != kCGErrorSuccess)) {
+			ddv->FadeIn(DDVars::kFadeTiming_Immediate);
 			COut(C_Error) << "CGDisplayCapture failed!" << std::endl;
 			return false;
 		}
 		
-		ddv->FadeOut();
-		
-		if (CGDisplaySetDisplayMode(ddv->displayId, cgMode, 0) != kCGErrorSuccess) {
-			COut(C_Error) << "CGDisplaySetDisplayMode failed for mode " << mode.w << "x" << mode.h << "x" << mode.bpp << " @ " << mode.hz << "hz" << std::endl;
-			ddv->FadeIn(DDVars::kFadeTiming_Immediate);
-			return false;
+		if (!display->curVidMode->SameSize(mode)) {
+			if (CGDisplaySetDisplayMode(ddv->displayId, cgMode, 0) != kCGErrorSuccess) {
+				ddv->FadeIn(DDVars::kFadeTiming_Immediate);
+				COut(C_Error) << "CGDisplaySetDisplayMode failed for mode " << mode.w << "x" << mode.h << "x" << mode.bpp << " @ " << mode.hz << "hz" << std::endl;
+				return false;
+			}
 		}
 		
-		
+		style = NSBorderlessWindowMask;
+		screenRect.size.width = mode.w;
+		screenRect.size.height = mode.h;
 	} else {
-#if !defined(RAD_OPT_PC_TOOLS)
+		
 		NSScreen *screen = NSScreenForCGDirectDisplayID(ddv->displayId);
 		if (!screen) {
 			COut(C_Error) << "ERROR: unable to find screen!" << std::endl;
 			return false;
 		}
 		
-		NSRect screenRect = [screen frame];
-		
-		NSRect windowRect;
-		windowRect.size.width = mode.w;
-		windowRect.size.height = mode.h;
-		windowRect.origin.x = ((short)screenRect.size.width - windowRect.size.width) / 2;
-		windowRect.origin.y = ((short)screenRect.size.height - windowRect.size.height) / 2;
-		
-		if (s_appd->window) {
-			NSRect r = [NSWindow frameRectForContentRect: windowRect styleMask: NSTitledWindowMask];
-			[s_appd->window setFrame: r display: TRUE];
-		} else {
-			s_appd->window = [[NSWindow alloc] initWithContentRect: windowRect styleMask: NSTitledWindowMask backing: NSBackingStoreBuffered defer: NO screen: screen];
-			
-			NSString *title = [NSString stringWithUTF8String: App::Get()->title.get()];
-			[s_appd->window setTitle: title];
-			[title release];
-			
-			[s_appd->window setAcceptsMouseMovedEvents: YES];
-		}
-		
-		[s_appd->window orderFront: nil];
-#endif
+		style = NSTitledWindowMask;
+		screenRect = [screen frame];
 	}
+	
+	NSRect windowRect;
+	windowRect.size.width = mode.w;
+	windowRect.size.height = mode.h;
+	windowRect.origin.x = ((short)screenRect.size.width - windowRect.size.width) / 2;
+	windowRect.origin.y = ((short)screenRect.size.height - windowRect.size.height) / 2;
+	
+	if (s_appd->window) {
+		NSRect r = [NSWindow frameRectForContentRect: windowRect styleMask: style];
+		[s_appd->window setStyleMask: style];
+		[s_appd->window setFrame: r display: TRUE];
+	} else {
+		s_appd->window = [[NSWindow alloc] initWithContentRect: windowRect styleMask: style backing: NSBackingStoreBuffered defer: NO screen: nil];
+		
+		NSString *title = [NSString stringWithUTF8String: App::Get()->title.get()];
+		[s_appd->window setTitle: title];
+		[title release];
+		
+		[s_appd->window setAcceptsMouseMovedEvents: YES];
+		[s_appd->window setOpaque: YES];
+	}
+	
+	if (mode.fullscreen) {
+		[s_appd->window setLevel: CGShieldingWindowLevel()+1];
+	} else {
+		[s_appd->window setLevel: NSNormalWindowLevel];
+	}
+	
+	[s_appd->window orderFront: nil];
 	
 	display->m_imp.m_curMode = mode;
 	m_activeDisplay = display;
@@ -413,11 +438,34 @@ void NativeApp::ResetDisplayDevice() {
 			
 			ddv->FadeOut();
 			
-			CGDisplaySetDisplayMode(ddv->displayId, ddv->defModeRef, 0);
-			CGDisplayRelease(ddv->displayId);
+			if ([NSOpenGLContext currentContext]) {
+				glClearColor(0, 0, 0, 0);
+				glClear(GL_COLOR_BUFFER_BIT);
+				[[NSOpenGLContext currentContext] flushBuffer];
+				glClear(GL_COLOR_BUFFER_BIT);
+				[[NSOpenGLContext currentContext] flushBuffer];
+			}
+			
+			if (!m_activeDisplay->curVidMode->SameSize(m_activeDisplay->m_imp.m_defMode))
+				CGDisplaySetDisplayMode(ddv->displayId, ddv->defModeRef, 0);
+			
+			CGReleaseAllDisplays();
+			
+#if !defined(RAD_OPT_PC_TOOLS)
+			if (s_appd->window) {
+				if (App::Get()->exit) {
+					[s_appd->window close];
+				}
+				else {
+					[s_appd->window release];
+				}
+				s_appd->window = 0;
+			}
+#endif
 			
 			ddv->FadeIn();
-		}
+			
+		} else {
 	
 #if !defined(RAD_OPT_PC_TOOLS)
 		if (s_appd->window) {
@@ -425,6 +473,7 @@ void NativeApp::ResetDisplayDevice() {
 			s_appd->window = 0;
 		}
 #endif
+		}
 		
 		m_activeDisplay->m_imp.m_curMode = m_activeDisplay->m_imp.m_defMode;
 		m_activeDisplay.reset();
@@ -445,6 +494,7 @@ struct wGLContext : public GLDeviceContext {
 	}
 	
 	~wGLContext() {
+		[NSOpenGLContext clearCurrentContext];
 		[glCtx clearDrawable];
 		[glCtx release];
 	}
@@ -471,8 +521,8 @@ GLDeviceContext::Ref NativeApp::CreateOpenGLContext(const GLPixelFormat &pf) {
 	attribs.reserve(128);
 	
 	attribs.push_back(NSOpenGLPFAMinimumPolicy);
-	if (m_activeDisplay->curVidMode->fullscreen)
-		attribs.push_back(NSOpenGLPFAFullScreen);
+	/*if (m_activeDisplay->curVidMode->fullscreen)
+		attribs.push_back(NSOpenGLPFAFullScreen);*/
 	attribs.push_back(NSOpenGLPFAAccelerated);
 	if (pf.doubleBuffer)
 		attribs.push_back(NSOpenGLPFADoubleBuffer);
@@ -510,17 +560,12 @@ GLDeviceContext::Ref NativeApp::CreateOpenGLContext(const GLPixelFormat &pf) {
 		return GLDeviceContext::Ref();
 	}
 	
-	if (s_appd->window) {
-		RAD_ASSERT(!m_activeDisplay->curVidMode->fullscreen);
-		[glCtx setView: [s_appd->window contentView]];
-	} else {
-		RAD_ASSERT(m_activeDisplay->curVidMode->fullscreen);
-		[glCtx setFullScreen];
-	}
-	
 	GLDeviceContext::Ref r(new wGLContext(glCtx));
-	
 	r->Bind();
+	
+	if (s_appd->window)
+		[glCtx setView: [s_appd->window contentView]];
+	
 	glClearColor(0, 0, 0, 0);
 	glClear(GL_COLOR_BUFFER_BIT);
 	r->SwapBuffers();

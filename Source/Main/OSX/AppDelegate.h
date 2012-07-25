@@ -11,6 +11,11 @@
 @interface AppDelegate : NSObject <NSApplicationDelegate> {
 @public
 	NSWindow *window;
+@private
+	int m_mButtons; // tracked through event loop
+	int m_modifiers;
+	NSPoint m_mPos;
+	const int *m_vKeys;
 }
 @end
 

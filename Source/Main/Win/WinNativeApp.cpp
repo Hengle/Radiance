@@ -1035,12 +1035,14 @@ LRESULT CALLBACK MyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		e.type = InputEvent::T_KeyDown;
 		e.repeat = LOWORD(lParam) > 1;
 		e.data[0] = TranslateVKey((int)wParam, (int)lParam);
+		e.time = xtime::ReadMilliseconds();
 		app->PostInputEvent(e);
 		break;
 	case WM_KEYUP:
 		e.type = InputEvent::T_KeyUp;
 		e.repeat = false;
 		e.data[0] = TranslateVKey((int)wParam, (int)lParam);
+		e.time = xtime::ReadMilliseconds();
 		app->PostInputEvent(e);
 		break;
 	default:

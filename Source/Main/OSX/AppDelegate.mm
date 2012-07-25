@@ -26,12 +26,38 @@
 
 AppDelegate *s_appd = 0;
 
+// See Carbon/HIToolbox/Events.h
+// Missing or unconvertable characters are question marks (?), helps to see if something is missing.
+
+static int s_vkeys_en[256] = {
+/*0x00*/ 'a', 's', 'd', 'f', 'h', 'g', 'z', 'x',
+/*0x08*/ 'c', 'v', '?', 'b', 'q', 'w', 'e', 'r',
+/*0x10*/ 'y', 't', '1', '2', '3', '4', '6', '5',
+/*0x18*/ '=', '9', '7', '-', '8', '0', ']', 'o',
+/*0x20*/ 'u', '[', 'i', 'p', kKeyCode_Return, 'l', 'j', '\'',
+/*0x28*/ 'k', ';', '\\', ',', '/', 'n', 'm', '.',
+/*0x30*/ kKeyCode_Tab, kKeyCode_Space, '`', kKeyCode_Backspace, '?', kKeyCode_Escape, '?', kKeyCode_LCommand,
+/*0x38*/ kKeyCode_LShift, kKeyCode_CapsLock, kKeyCode_LAlt, kKeyCode_LCtrl, kKeyCode_RShift, kKeyCode_RAlt, kKeyCode_RCtrl,'?',
+/*0x40*/ '?', kKeyCode_KP_Period, '?', kKeyCode_KP_Multiply, '?', kKeyCode_KP_Plus, '?', kKeyCode_NumLock,
+/*0x48*/ '?', '?', '?', kKeyCode_KP_Divide, kKeyCode_KP_Enter, '?', kKeyCode_KP_Minus, '?',
+/*0x50*/ '?', kKeyCode_KP_Equals, kKeyCode_KP0, kKeyCode_KP1, kKeyCode_KP2, kKeyCode_KP3, kKeyCode_KP4, kKeyCode_KP5,
+/*0x58*/ kKeyCode_KP6, kKeyCode_KP7, '?', kKeyCode_KP8, kKeyCode_KP9, '?', '?', '?',
+/*0x60*/ kKeyCode_F5, kKeyCode_F6, kKeyCode_F7, kKeyCode_F3, kKeyCode_F8, kKeyCode_F9, '?', kKeyCode_F11,
+/*0x68*/ '?', kKeyCode_F13, '?', kKeyCode_F14, '?', kKeyCode_F10, '?', kKeyCode_F12,
+/*0x70*/ '?', kKeyCode_F15, kKeyCode_Help, kKeyCode_Home, kKeyCode_PageUp, kKeyCode_Delete, kKeyCode_F4, kKeyCode_End,
+/*0x78*/ kKeyCode_F2, kKeyCode_PageDown, kKeyCode_F1, kKeyCode_Left, kKeyCode_Right, kKeyCode_Down, kKeyCode_Up, '?'
+};
+
 @interface AppDelegate (Private)
--(void) appMain;
+-(void)appMain;
 -(const char**)getArgs:(int&)argc;
 -(void)freeArgs:(int)argc:(const char**)argv;
 -(void)processEvents;
 -(void)dispatchEvent:(NSEvent*)event;
+-(void)handleKeyEvent:(NSEvent*)event;
+/*-(void)handleModifierKeys:(NSEvent*)event;
+-(void)postModifierKeys:(int)keys:(int)type;*/
+-(void)handleMouseButtons:(NSEvent*)event;
 @end
 
 @implementation AppDelegate
@@ -41,11 +67,19 @@ AppDelegate *s_appd = 0;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+	m_mButtons = 0;
+	m_modifiers = 0;
+	m_mPos.x = 0;
+	m_mPos.y = 0;
+	m_vKeys = s_vkeys_en;
 	s_appd = self;
 	[self appMain];
 }
 
 - (void)applicationWillTerminate:(NSNotification*)notification {
+	
+	App::Get()->exit = true;
+	
 	App::Get()->ResetDisplayDevice();
 	App::Get()->Finalize();
 	
@@ -159,25 +193,135 @@ AppDelegate *s_appd = 0;
 
 -(void)dispatchEvent: (NSEvent*) event {
 	NSEventType type = [event type];
+	App *app = App::Get();
 	
 	switch (type) {
+			
 	case NSLeftMouseDown:
 	case NSLeftMouseUp:
 	case NSRightMouseDown:
 	case NSRightMouseUp:
-	case NSMouseMoved:
+		break; // these also come through NSSystemDefined and give us more mouse buttons.
+			
+	case NSMouseMoved: 
 	case NSLeftMouseDragged:
 	case NSRightMouseDragged:
+	{
+		m_mPos = [event locationInWindow];
+		if (window) {
+			m_mPos = [[window contentView] convertPoint: m_mPos fromView: nil];
+			NSRect r = [[window contentView] bounds];
+			m_mPos.y = r.size.height - m_mPos.y; // why?
+		}
+		InputEvent e;
+		e.type = InputEvent::T_MouseMove;
+		e.data[0] = (int)m_mPos.x;
+		e.data[1] = (int)m_mPos.y;
+		e.data[2] = m_mButtons;
+		e.time = xtime::ReadMilliseconds();
+		app->PostInputEvent(e);
+	} break;
+			
 	case NSKeyDown:
-		/*if ([ event modifierFlags ] & NSCommandKeyMask) {
-		}*/
+		App::Get()->exit = true;
+		if ([event modifierFlags] & NSCommandKeyMask) {
+			// ignore command key combinations, they won't get NSKeyUp messages.
+			return;
+		}
+	// fall-through
 	case NSKeyUp:
-	case NSFlagsChanged:
+		[self handleKeyEvent: event];
+		break;
+			
+	/*case NSFlagsChanged:
+		[self handleModifierKeys: event];
+		break;*/
+			
 	case NSSystemDefined:
+		[self handleMouseButtons: event];
+		break;
+			
 	case NSScrollWheel:
-		return;
+	{
+		NSPoint p = [event locationInWindow];
+		InputEvent e;
+		e.type = InputEvent::T_MouseWheel;
+		e.data[0] = (int)p.x;
+		e.data[1] = (int)p.y;
+		e.data[2] = (int)[event deltaY]; // TODO: scaling?
+		e.time = xtime::ReadMilliseconds();
+		app->PostInputEvent(e);
+	} break;
+	default:
+		[NSApp sendEvent: event];
+		break;
 	}
-	[NSApp sendEvent: event];
+}
+
+-(void)handleKeyEvent: (NSEvent*)event {
+	bool keyDown = [event type] == NSKeyDown;
+	//NSUInteger nsModifers = [event modifierFlags];
+	unsigned short vkey = [event keyCode];
+	
+	InputEvent e;
+	e.type = keyDown ? InputEvent::T_KeyDown : InputEvent::T_KeyUp;
+	e.repeat = 0;
+	e.data[0] = m_vKeys[vkey&0xff];
+	e.time = xtime::ReadMilliseconds();
+	App::Get()->PostInputEvent(e);
+}
+
+/*-(void)handleModifierKeys: (NSEvent*)event {
+	int modifiers = [event modifierFlags];
+	int down = modifiers & ~m_modifiers;
+	int up = m_modifiers & ~modifiers;
+	
+	if (down)
+		[self postModifierKeys: down type: InputEvent::T_KeyDown];
+	if (up)
+		[self postModifierKeys: up type: InputEvent::T_KeyUp];
+}
+
+-(void)handleModifierKeys:(int)keys:(int)type {
+	int flags[6] = {
+		NSAlternateKeyMask, kKeyCode_LAlt,
+		NSControlKeyMask, kKeyCode_LControl,
+		NSShiftKeyMask, kKeyCode_LShift
+	};
+}*/
+
+-(void)handleMouseButtons: (NSEvent*)event {
+	
+	if ([event subtype] != 7)
+		return;
+	
+	xtime::TimeVal millis = xtime::ReadMilliseconds();
+	
+	const int ButtonTypes[3] = {
+		kMouseButton_Left,
+		kMouseButton_Right,
+		kMouseButton_Middle
+	};
+	
+	int buttons = (int)[event data2];
+	int changed = buttons ^ m_mButtons;
+	
+	for (int i = 0; i < 3; ++i) {
+		int mask = (1<<i);
+		
+		if ((changed&mask)==0)
+			continue;
+		
+		InputEvent e;
+		e.type = (buttons&mask) ? InputEvent::T_MouseDown : InputEvent::T_MouseUp;
+		e.data[0] = (int)m_mPos.x;
+		e.data[1] = (int)m_mPos.y;
+		e.data[2] = ButtonTypes[i];
+		e.time = millis;
+		App::Get()->PostInputEvent(e);
+	}
+	
+	m_mButtons = buttons;
 }
 
 @end
