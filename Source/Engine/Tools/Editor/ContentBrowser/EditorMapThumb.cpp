@@ -50,7 +50,8 @@ void MapThumb::Play(const pkg::Package::Entry::Ref &entry)
 		Qt::WindowTitleHint|
 		Qt::WindowSystemMenuHint|
 		Qt::WindowCloseButtonHint|
-		Qt::WindowMinMaxButtonsHint
+		Qt::WindowMinimizeButtonHint|
+		Qt::MSWindowsFixedSizeDialogHint
 	);
 	w->setAttribute(Qt::WA_DeleteOnClose);
 	w->setWindowTitle(entry->name.get());

@@ -199,6 +199,7 @@ bool WorldLua::Init()
 		{ "ViewModelBonePos", lua_ViewModelBonePos },
 		{ "ViewModelFindBone", lua_ViewModelFindBone },
 		{ "CurrentDateAndTime", lua_CurrentDateAndTime },
+		{ "QuitGame", lua_QuitGame },
 		{ 0, 0 }
 	};
 
@@ -2377,6 +2378,13 @@ int WorldLua::lua_CurrentDateAndTime(lua_State *L)
 	lua_setfield(L, -2, "second");
 
 	return 1;
+}
+
+int WorldLua::lua_QuitGame(lua_State *L) {
+	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
+	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
+	self->m_world->game->quit = true;
+	return 0;
 }
 
 int WorldLua::lua_gnCreate(lua_State *L)

@@ -99,6 +99,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Game, gameNetwork, gn::GameNetwork *);
 	RAD_DECLARE_READONLY_PROPERTY(Game, stringTable, const StringTable*);
 	RAD_DECLARE_PROPERTY(Game, cloudStorage, bool, bool);
+	RAD_DECLARE_PROPERTY(Game, quit, bool, bool);
 
 #if defined(RAD_OPT_PC_TOOLS)
 	RAD_DECLARE_READONLY_PROPERTY(Game, toolsCallback, IToolsCallbacks*);
@@ -200,6 +201,14 @@ private:
 		return 0;
 	}
 
+	RAD_DECLARE_GET(quit, bool) {
+		return m_quit;
+	}
+
+	RAD_DECLARE_SET(quit, bool) {
+		m_quit = value;
+	}
+
 #if defined(RAD_OPT_PC_TOOLS)
 	RAD_DECLARE_GET(toolsCallback, IToolsCallbacks*) { return m_toolsCallback; }
 	IToolsCallbacks *m_toolsCallback;
@@ -221,6 +230,7 @@ private:
 	gn::GameNetworkRef m_gameNetwork;
 	gn::GameNetworkEventQueue m_gameNetworkEventQueue;
 	bool m_cloudStorage;
+	bool m_quit;
 	int m_vp[4];
 };
 
