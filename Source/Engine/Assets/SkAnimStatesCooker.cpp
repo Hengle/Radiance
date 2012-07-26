@@ -13,16 +13,13 @@ using namespace pkg;
 
 namespace asset {
 
-SkAnimStatesCooker::SkAnimStatesCooker() : Cooker(0)
-{
+SkAnimStatesCooker::SkAnimStatesCooker() : Cooker(0) {
 }
 
-SkAnimStatesCooker::~SkAnimStatesCooker()
-{
+SkAnimStatesCooker::~SkAnimStatesCooker() {
 }
 
-CookStatus SkAnimStatesCooker::CheckRebuild(int flags, int allflags)
-{
+CookStatus SkAnimStatesCooker::CheckRebuild(int flags, int allflags) {
 	if (CompareVersion(flags) || 
 		CompareModifiedTime(flags) || 
 		CompareCachedFileTimeKey(flags, "Source.File"))
@@ -30,13 +27,12 @@ CookStatus SkAnimStatesCooker::CheckRebuild(int flags, int allflags)
 	return CS_UpToDate;
 }
 
-CookStatus SkAnimStatesCooker::Status(int flags, int allflags)
-{
+CookStatus SkAnimStatesCooker::Status(int flags, int allflags) {
 	flags &= P_AllTargets;
 	allflags &= P_AllTargets;
 
-	if (flags == 0)
-	{ // only build generics if all platforms are identical to eachother.
+	if (flags == 0) { 
+		// only build generics if all platforms are identical to eachother.
 		if (MatchTargetKeys(allflags, allflags)==allflags)
 			return CheckRebuild(flags, allflags);
 		return CS_Ignore;
@@ -46,8 +42,7 @@ CookStatus SkAnimStatesCooker::Status(int flags, int allflags)
 		return CS_Ignore;
 
 	// only build ipad if different from iphone
-	if ((flags&P_TargetIPad) && (allflags&P_TargetIPhone))
-	{
+	if ((flags&P_TargetIPad) && (allflags&P_TargetIPhone)) {
 		if (MatchTargetKeys(P_TargetIPad, P_TargetIPhone))
 			return CS_Ignore;
 	}
@@ -55,8 +50,7 @@ CookStatus SkAnimStatesCooker::Status(int flags, int allflags)
 	return CheckRebuild(flags, allflags);
 }
 
-int SkAnimStatesCooker::Compile(int flags, int allflags)
-{
+int SkAnimStatesCooker::Compile(int flags, int allflags) {
 	// Make sure these get updated
 	CompareVersion(flags);
 	CompareModifiedTime(flags);
@@ -85,15 +79,13 @@ int SkAnimStatesCooker::Compile(int flags, int allflags)
 
 	os << (U16)states->size();
 
-	for (ska::AnimState::Map::const_iterator it = states->begin(); it != states->end(); ++it)
-	{
+	for (ska::AnimState::Map::const_iterator it = states->begin(); it != states->end(); ++it) {
 		const ska::AnimState &state = it->second;
 
 		os << state.name;
 		os << (U16)state.variants.size();
 
-		for (ska::Variant::Vec::const_iterator it = state.variants.begin(); it != state.variants.end(); ++it)
-		{
+		for (ska::Variant::Vec::const_iterator it = state.variants.begin(); it != state.variants.end(); ++it) {
 			const ska::Variant &v = *it;
 			os << v.name;
 			os << v.timeScale[0];
@@ -109,13 +101,11 @@ int SkAnimStatesCooker::Compile(int flags, int allflags)
 	return SR_Success;
 }
 
-int SkAnimStatesCooker::MatchTargetKeys(int flags, int allflags)
-{
+int SkAnimStatesCooker::MatchTargetKeys(int flags, int allflags) {
 	return asset->entry->MatchTargetKeys<String>("Source.File", flags, allflags);
 }
 
-void SkAnimStatesCooker::Register(Engine &engine)
-{
+void SkAnimStatesCooker::Register(Engine &engine) {
 	static pkg::Binding::Ref binding = engine.sys->packages->BindCooker<SkAnimStatesCooker>();
 }
 

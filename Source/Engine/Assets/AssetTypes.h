@@ -15,8 +15,7 @@
 
 namespace asset {
 
-enum Type
-{
+enum Type {
 	AT_Texture,
 	AT_Material,
 	AT_Map,
@@ -37,8 +36,7 @@ RADENG_API const char * RADENG_CALL TypeString(Type type);
 RADENG_API Type RADENG_CALL TypeFromName(const char *str);
 typedef std::bitset<AT_Max> TypeBits;
 
-inline TypeBits TypeMask(Type type)
-{
+inline TypeBits TypeMask(Type type) {
 	TypeBits b;
 	b[type] = 1;
 	return b;
@@ -53,8 +51,7 @@ RAD_HASH_INT_TYPE(asset::Type);
 #else
 
 namespace {
-const char *s_strings[asset::AT_Max] =
-{
+const char *s_strings[asset::AT_Max] = {
 	"Texture",
 	"Material",
 	"Map",

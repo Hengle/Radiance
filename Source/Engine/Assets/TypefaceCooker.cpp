@@ -87,7 +87,7 @@ int TypefaceCooker::Compile(int flags, int allflags)
 
 	Asset::Ref matRef = App::Get()->engine->sys->packages->Resolve(s->c_str, asset->zone);
 	if (!matRef)
-		return SR_MissingFile;
+		return SR_FileNotFound;
 
 	int r = matRef->Process(
 		xtime::TimeSlice::Infinite,

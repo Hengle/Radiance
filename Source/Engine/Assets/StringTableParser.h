@@ -7,16 +7,15 @@
 
 #include "AssetTypes.h"
 #include "../Packages/Packages.h"
-#include "../FileSystem/FileSystem.h"
 #include "../StringTable.h"
+#include <Runtime/File.h>
 #include <Runtime/PushPack.h>
 
 class Engine;
 
 namespace asset {
 
-class RADENG_CLASS StringTableParser : public pkg::Sink<StringTableParser> 
-{
+class RADENG_CLASS StringTableParser : public pkg::Sink<StringTableParser>  {
 public:
 
 	static void Register(Engine &engine);
@@ -79,7 +78,7 @@ private:
 	}
 #endif
 
-	file::HBufferedAsyncIO m_buf;
+	file::MMapping::Ref m_mm;
 	StringTable::Ref m_stringTable;
 
 };

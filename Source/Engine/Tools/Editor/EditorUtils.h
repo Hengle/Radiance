@@ -25,8 +25,8 @@ class QKeyEvent;
 namespace tools {
 namespace editor {
 
-pkg::PackageManRef Packages();
-file::HFileSystem Files();
+const pkg::PackageManRef &Packages();
+const file::FileSystem::Ref &Files();
 r::HRenderer Renderer();
 
 void PostInputEvent(QWheelEvent *event, Game &game);

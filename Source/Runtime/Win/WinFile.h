@@ -8,6 +8,7 @@
 #include "../File.h"
 #include "../Container/ZoneDeque.h"
 #include "WinHeaders.h"
+#include "../PushPack.h"
 
 namespace file {
 
@@ -56,6 +57,13 @@ protected:
 	
 	virtual MMFileRef NativeOpenFile(
 		const char *path,
+		::Zone &zone,
+		FileOptions options
+	);
+
+	virtual FileSearchRef NativeOpenSearch(
+		const char *path,
+		SearchOptions searchOptions,
 		FileOptions options
 	);
 
@@ -75,7 +83,8 @@ public:
 
 	virtual MMappingRef MMap(
 		AddrSize ofs, 
-		AddrSize size
+		AddrSize size,
+		::Zone &zone
 	);
 
 protected:
@@ -119,7 +128,9 @@ private:
 		const void *base,
 		const void *data,
 		AddrSize size,
-		AddrSize offset
+		AddrSize offset,
+		AddrSize backingSize,
+		::Zone &zone
 	);
 
 	MMFile::Ref m_file; // keeps the file open.
@@ -134,13 +145,13 @@ public:
 	~WinFileSearch();
 
 	static FileSearch::Ref New(
-		const string::String &path,
-		const string::String &prefix,
+		const String &path,
+		const String &prefix,
 		SearchOptions options
 	);
 
 	virtual bool NextFile(
-		string::String &path,
+		String &path,
 		FileAttributes *fileAttributes,
 		xtime::TimeDate *fileTime
 	);
@@ -148,9 +159,9 @@ public:
 private:
 
 	WinFileSearch(
-		const string::String &path,
-		const string::String &prefix,
-		const string::String &pattern,
+		const String &path,
+		const String &prefix,
+		const String &pattern,
 		SearchOptions options
 	);
 
@@ -163,9 +174,9 @@ private:
 	State NextState();
 
 	WIN32_FIND_DATAA m_fd;
-	string::String m_path;
-	string::String m_prefix;
-	string::String m_pattern;
+	String m_path;
+	String m_prefix;
+	String m_pattern;
 	FileSearch::Ref m_subDir;
 	SearchOptions m_options;
 	int m_state;
@@ -173,3 +184,5 @@ private:
 };
 
 } // file
+
+#include "../PopPack.h"

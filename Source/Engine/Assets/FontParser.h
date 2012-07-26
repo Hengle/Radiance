@@ -7,7 +7,7 @@
 
 #include "AssetTypes.h"
 #include "../Packages/Packages.h"
-#include "../FileSystem/FileSystem.h"
+#include <Runtime/File.h>
 #include <Runtime/Font/Font.h>
 #include <Runtime/PushPack.h>
 
@@ -15,14 +15,12 @@ class Engine;
 
 namespace asset {
 
-class RADENG_CLASS FontParser : public pkg::Sink<FontParser>
-{
+class RADENG_CLASS FontParser : public pkg::Sink<FontParser> {
 public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
+	enum {
 		SinkStage = pkg::SS_Parser,
 		AssetType = AT_Font
 	};
@@ -64,7 +62,7 @@ private:
 	RAD_DECLARE_GET(font, font::Font*) { return m_loaded ? &const_cast<FontParser*>(this)->m_font : 0; }
 
 	font::Font m_font;
-	file::HBufferedAsyncIO m_buf;
+	file::MMapping::Ref m_mm;
 	bool m_loaded;
 };
 

@@ -16,12 +16,10 @@ using namespace pkg;
 namespace asset {
 
 MapParser::MapParser()
-: m_state(S_None)
-{
+: m_state(S_None) {
 }
 
-MapParser::~MapParser()
-{
+MapParser::~MapParser() {
 }
 
 int MapParser::Process(
@@ -29,12 +27,11 @@ int MapParser::Process(
 	Engine &engine,
 	const AssetRef &asset,
 	int flags
-)
-{
+) {
 	if (flags&(P_Unload|P_Trim|P_Cancel))
 	{
 		m_state = S_None;
-		m_buf.Close();
+		m_mm.reset();
 		m_script.FreeScript();
 		return SR_Success;
 	}
@@ -55,24 +52,21 @@ int MapParser::Process(
 		flags
 	);
 
-	if (r < SR_Success)
-	{
+	if (r < SR_Success) {
 		m_state = S_None;
-		m_buf.Close();
+		m_mm.reset();
 		m_script.FreeScript();
 	}
 
 	return r;
 }
 
-int MapParser::ParseEntity(world::EntSpawn &spawn)
-{
+int MapParser::ParseEntity(world::EntSpawn &spawn) {
 	spawn.keys.pairs.clear();
 	return ParseScript(spawn);
 }
 
-int MapParser::ParseScript(world::EntSpawn &spawn)
-{
+int MapParser::ParseScript(world::EntSpawn &spawn) {
 	String token, value, temp;
 
 	if (!m_script.GetToken(token))
@@ -80,8 +74,7 @@ int MapParser::ParseScript(world::EntSpawn &spawn)
 	if (token != "{")
 		return SR_ParseError;
 
-	for (;;)
-	{
+	for (;;) {
 		if (!m_script.GetToken(token))
 			return SR_ParseError;
 		if (token == "}")
@@ -93,15 +86,11 @@ int MapParser::ParseScript(world::EntSpawn &spawn)
 		const char *sz = value.c_str;
 		temp.Clear();
 
-		while (*sz)
-		{
-			if (sz[0] == '\\' && sz[1] == 'n')
-			{
+		while (*sz) {
+			if (sz[0] == '\\' && sz[1] == 'n') {
 				temp += '\n';
 				++sz;
-			}
-			else
-			{
+			} else {
 				temp += *sz;
 			}
 			++sz;
@@ -118,57 +107,37 @@ int MapParser::Load(
 	Engine &engine,
 	const AssetRef &asset,
 	int flags
-)
-{
-	if (m_state == S_None)
-	{
+) {
+	if (m_state == S_None) {
 		const String *name = asset->entry->KeyValue<String>("Source.File", P_TARGET_FLAGS(flags));
 		if (!name || name->empty)
 			return SR_MetaError;
 
-		int media = file::AllMedia;
-		int r = engine.sys->files->LoadFile(
-			name->c_str,
-			media,
-			m_buf,
-			file::HIONotify()
-		);
-
-		if (r < file::Success)
-			return r;
-
+		m_mm = engine.sys->files->MapFile(name->c_str, ZWorld);
+		if (!m_mm)
+			return SR_FileNotFound;
+		
 		m_state = S_Loading;
 		if (!time.remaining)
 			return SR_Pending;
 	}
 
-	if (m_state == S_Loading)
-	{
-		RAD_ASSERT(m_buf);
-		if (m_buf->result == file::Pending)
-		{
-			if (!time.remaining || time.infinite)
-				return SR_Pending;
-			m_buf->WaitForCompletion();
-		}
-
-		if (m_buf->result < file::Success)
-			return m_buf->result;
-
+	if (m_state == S_Loading) {
+		RAD_ASSERT(m_mm);
+		
 		m_script.InitParsing(
-			(const char*)m_buf->data->ptr.get(),
-			(int)m_buf->data->size.get()
+			(const char*)m_mm->data.get(),
+			(int)m_mm->size.get()
 		);
 
-		m_buf.Close();
+		m_mm.reset();
 		m_state = S_Done;
 	}
 
 	return SR_Success;
 }
 
-void MapParser::Register(Engine &engine)
-{
+void MapParser::Register(Engine &engine) {
 	static pkg::Binding::Ref r = engine.sys->packages->Bind<MapParser>();
 }
 

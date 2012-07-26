@@ -52,22 +52,23 @@ public:
 #endif
 
 	RAD_DECLARE_READONLY_PROPERTY(Engine, sys, const ComTable*);
-	RAD_DECLARE_READONLY_PROPERTY(Engine, baseDir, const char*);
 
 private:
 
 	RAD_DECLARE_GET(argc, int);
-	RAD_DECLARE_GET(sys, const ComTable*) { return &m_comTable; }
-	RAD_DECLARE_GET(baseDir, const char*) { return m_baseDir.c_str; }
+	RAD_DECLARE_GET(sys, const ComTable*) { 
+		return &m_comTable; 
+	}
 
 	bool LoadComponents();
 
 	mutable ComTable m_comTable;
-	String m_baseDir;
 
 #if defined(RAD_OPT_PC_TOOLS)
 	SCC::Ref m_scc;
-	RAD_DECLARE_GET(scc, SCC*) { return m_scc.get(); }
+	RAD_DECLARE_GET(scc, SCC*) { 
+		return m_scc.get(); 
+	}
 #endif
 
 };

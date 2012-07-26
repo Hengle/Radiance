@@ -60,39 +60,27 @@ int SkAnimStatesParser::LoadCooked(
 	String path(CStr("Cooked/"));
 	path += CStr(asset->path);
 	path += ".bin";
+	
+	file::MMFileInputBuffer::Ref ib = engine.sys->files->OpenInputBuffer(path.c_str, ska::ZSka);
+	if (!ib)
+		return SR_FileNotFound;
+	
+	stream::InputStream is(*ib);
 
-	file::HStreamInputBuffer ib;
+	int r = SR_IOError;
 
-	int media = file::AllMedia;
-	int r = engine.sys->files->OpenFileStream(
-		path.c_str,
-		media,
-		ib,
-		file::HIONotify(),
-		8,
-		ska::ZSka
-	);
-
-	if (r < SR_Success)
-		return r;
-
-	stream::InputStream is(ib->buffer);
-
-	try
-	{
+	try {
 		U16 numStates;
 		is >> numStates;
 
-		for (U16 i = 0; i < numStates; ++i)
-		{
+		for (U16 i = 0; i < numStates; ++i) {
 			ska::AnimState state;
 			is >> state.name;
 
 			U16 numVariants;
 			is >> numVariants;
 
-			for (U16 i = 0; i < numVariants; ++i)
-			{
+			for (U16 i = 0; i < numVariants; ++i) {
 				S16 temp;
 
 				ska::Variant v;
@@ -114,9 +102,7 @@ int SkAnimStatesParser::LoadCooked(
 		r = SR_Success;
 		m_valid = true;
 	}
-	catch (exception &)
-	{
-		r = SR_IOError;
+	catch (exception &) {
 	}
 
 	return r;
@@ -132,50 +118,30 @@ int SkAnimStatesParser::Load(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
+) {
 	const String *s = asset->entry->KeyValue<String>("Source.File", P_TARGET_FLAGS(flags));
 	if (!s)
 		return SR_MetaError;
 
-	int media = file::AllMedia;
-	file::HBufferedAsyncIO buf;
-	bool r = engine.sys->files->LoadFile(
-		s->c_str,
-		media,
-		buf,
-		file::HIONotify()
-	) >= file::Success;
-
-	r = r && buf;
-
-	if (r)
-	{
-		buf->WaitForCompletion();
-		r = buf->result == file::Success;
-	}
-
-	if (!r)
-	{
+	file::MMapping::Ref mm = engine.sys->files->MapFile(s->c_str, ska::ZSka);
+	if (!mm) {
 		COut(C_Error) << "SkAnimStatesParser: '" << asset->name.get() << "' failed to load '" << *s << "'" << std::endl;
-		return SR_MissingFile;
+		return SR_FileNotFound;
 	}
 
 	lua::State::Ref L = InitLua(asset);
 
 	if (luaL_loadbuffer(
 		L->L,
-		(const char*)buf->data->ptr.get(),
-		buf->data->size,
+		(const char*)mm->data.get(),
+		mm->size,
 		s->c_str
-	) != 0)
-	{
+	) != 0) {
 		COut(C_Error) << "SkAnimStatesParser: '" << asset->name.get() << "' lua parse error '" << lua_tostring(L->L, -1) << "'" << std::endl;
 		return SR_ParseError;
 	}
 
-	if (lua_pcall(L->L, 0, 1, 0) != 0)
-	{
+	if (lua_pcall(L->L, 0, 1, 0) != 0) {
 		COut(C_Error) << "SkAnimStatesParser: '" << asset->name.get() << "' lua runtime error '" << lua_tostring(L->L, -1) << "'" << std::endl;
 		return SR_ParseError;
 	}
@@ -185,14 +151,11 @@ int SkAnimStatesParser::Load(
 	return SR_Success;
 }
 
-void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &asset, const lua::Variant::Map &map, const ska::AnimState &state, ska::Variant &v)
-{
-	lua::Variant::Map::const_iterator it = map.find(String("loop"));
-	if (it != map.end())
-	{
+void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &asset, const lua::Variant::Map &map, const ska::AnimState &state, ska::Variant &v) {
+	lua::Variant::Map::const_iterator it = map.find(CStr("loop"));
+	if (it != map.end()) {
 		const lua::Variant::Map *vars = static_cast<const lua::Variant::Map*>(it->second);
-		if (!vars)
-		{
+		if (!vars) {
 			luaL_error(L, "AnimState '%s':'%s':'%s':loop expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
 				state.name.c_str.get(),
@@ -203,9 +166,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 			);
 		}
 
-		it = vars->find(String("1"));
-		if (it == vars->end())
-		{
+		it = vars->find(CStr("1"));
+		if (it == vars->end()) {
 			luaL_error(L, "AnimState '%s':'%s':'%s':loop expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
 				state.name.c_str.get(),
@@ -217,8 +179,7 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		}
 
 		const lua_Number *low = static_cast<const lua_Number*>(it->second);
-		if (!low)
-		{
+		if (!low) {
 			luaL_error(L, "AnimState '%s':'%s':'%s':loop expected number, (Function %s, File %s, Line %d)",
 				asset->name.get(),
 				state.name.c_str.get(),
@@ -229,9 +190,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 			);
 		}
 
-		it = vars->find(String("2"));
-		if (it == vars->end())
-		{
+		it = vars->find(CStr("2"));
+		if (it == vars->end()) {
 			luaL_error(L, "AnimState '%s':'%s':'%s':loop expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
 				state.name.c_str.get(),
@@ -243,8 +203,7 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		}
 
 		const lua_Number *high = static_cast<const lua_Number*>(it->second);
-		if (!high)
-		{
+		if (!high) {
 			luaL_error(L, "AnimState '%s':'%s':'%s':loop expected number, (Function %s, File %s, Line %d)",
 				asset->name.get(),
 				state.name.c_str.get(),
@@ -264,18 +223,14 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 			v.loopCount[1] = 0;
 		if (v.loopCount[0] > v.loopCount[1])
 			v.loopCount[1] = v.loopCount[0];
-	}
-	else
-	{
+	} else {
 		v.loopCount[0] = v.loopCount[1] = 1;
 	}
 
-	it = map.find(String("timeScale"));
-	if (it != map.end())
-	{
+	it = map.find(CStr("timeScale"));
+	if (it != map.end()) {
 		const lua::Variant::Map *vars = static_cast<const lua::Variant::Map*>(it->second);
-		if (!vars)
-		{
+		if (!vars) {
 			luaL_error(L, "AnimState '%s':'%s':'%s':timeScale expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
 				state.name.c_str.get(),
@@ -286,9 +241,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 			);
 		}
 
-		it = vars->find(String("1"));
-		if (it == vars->end())
-		{
+		it = vars->find(CStr("1"));
+		if (it == vars->end()) {
 			luaL_error(L, "AnimState '%s':'%s':'%s':timeScale expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
 				state.name.c_str.get(),
@@ -300,8 +254,7 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		}
 
 		const lua_Number *low = static_cast<const lua_Number*>(it->second);
-		if (!low)
-		{
+		if (!low) {
 			luaL_error(L, "AnimState '%s':'%s':'%s':timeScale expected number, (Function %s, File %s, Line %d)",
 				asset->name.get(),
 				state.name.c_str.get(),
@@ -312,9 +265,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 			);
 		}
 
-		it = vars->find(String("2"));
-		if (it == vars->end())
-		{
+		it = vars->find(CStr("2"));
+		if (it == vars->end()) {
 			luaL_error(L, "AnimState '%s':'%s':'%s':timeScale expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
 				state.name.c_str.get(),
@@ -326,8 +278,7 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		}
 
 		const lua_Number *high = static_cast<const lua_Number*>(it->second);
-		if (!high)
-		{
+		if (!high) {
 			luaL_error(L, "AnimState '%s':'%s':'%s':timeScale expected number, (Function %s, File %s, Line %d)",
 				asset->name.get(),
 				state.name.c_str.get(),
@@ -347,18 +298,14 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 			v.timeScale[1] = 0.f;
 		if (v.timeScale[0] > v.timeScale[1])
 			v.timeScale[1] = v.timeScale[0];
-	}
-	else
-	{
+	} else {
 		v.timeScale[0] = v.timeScale[1] = 1.f;
 	}
 
-	it = map.find(String("xfade"));
-	if (it != map.end())
-	{
+	it = map.find(CStr("xfade"));
+	if (it != map.end()) {
 		const lua::Variant::Map *vars = static_cast<const lua::Variant::Map*>(it->second);
-		if (!vars)
-		{
+		if (!vars) {
 			luaL_error(L, "AnimState '%s':'%s':'%s':xfade expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
 				state.name.c_str.get(),
@@ -369,9 +316,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 			);
 		}
 
-		it = vars->find(String("1"));
-		if (it == vars->end())
-		{
+		it = vars->find(CStr("1"));
+		if (it == vars->end()) {
 			luaL_error(L, "AnimState '%s':'%s':'%s':xfade expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
 				state.name.c_str.get(),
@@ -383,8 +329,7 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		}
 
 		const lua_Number *in = static_cast<const lua_Number*>(it->second);
-		if (!in)
-		{
+		if (!in) {
 			luaL_error(L, "AnimState '%s':'%s':'%s':xfade expected number, (Function %s, File %s, Line %d)",
 				asset->name.get(),
 				state.name.c_str.get(),
@@ -395,9 +340,8 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 			);
 		}
 
-		it = vars->find(String("2"));
-		if (it == vars->end())
-		{
+		it = vars->find(CStr("2"));
+		if (it == vars->end()) {
 			luaL_error(L, "AnimState '%s':'%s':'%s':xfade expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
 				state.name.c_str.get(),
@@ -409,8 +353,7 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		}
 
 		const lua_Number *out = static_cast<const lua_Number*>(it->second);
-		if (!out)
-		{
+		if (!out) {
 			luaL_error(L, "AnimState '%s':'%s':'%s':xfade expected number, (Function %s, File %s, Line %d)",
 				asset->name.get(),
 				state.name.c_str.get(),
@@ -426,18 +369,14 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 
 		if (v.out < 0.f)
 			v.out = 0.f;
-	}
-	else
-	{
+	} else {
 		v.in = v.out = 1.f;
 	}
 
-	it = map.find(String("weight"));
-	if (it != map.end())
-	{
+	it = map.find(CStr("weight"));
+	if (it != map.end()) {
 		const lua_Number *n = static_cast<const lua_Number*>(it->second);
-		if (!n)
-		{
+		if (!n) {
 			luaL_error(L, "AnimState '%s':'%s':'%s':weight expected number, (Function %s, File %s, Line %d)",
 				asset->name.get(),
 				state.name.c_str.get(),
@@ -451,25 +390,20 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 		v.weight = (float)*n;
 		if (v.weight < 0.f)
 			v.weight = 0.f;
-	}
-	else
-	{
+	} else {
 		v.weight = 1.f;
 	}
 }
 
-void SkAnimStatesParser::ParseAnimState(lua_State *L, const pkg::Asset::Ref &asset, const lua::Variant::Map &map, ska::AnimState &state)
-{
+void SkAnimStatesParser::ParseAnimState(lua_State *L, const pkg::Asset::Ref &asset, const lua::Variant::Map &map, ska::AnimState &state) {
 	state.variants.reserve(map.size());
 
-	for (lua::Variant::Map::const_iterator it = map.begin(); it != map.end(); ++it)
-	{
+	for (lua::Variant::Map::const_iterator it = map.begin(); it != map.end(); ++it) {
 		ska::Variant v;
 		v.name = it->first;
 
 		const lua::Variant::Map *vars = static_cast<const lua::Variant::Map*>(it->second);
-		if (!vars)
-		{
+		if (!vars) {
 			luaL_error(L, "AnimState '%s':'%s':'%s' expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
 				state.name.c_str.get(),
@@ -485,8 +419,8 @@ void SkAnimStatesParser::ParseAnimState(lua_State *L, const pkg::Asset::Ref &ass
 	}
 }
 
-int SkAnimStatesParser::lua_Compile(lua_State *L)
-{
+int SkAnimStatesParser::lua_Compile(lua_State *L) {
+
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	SkAnimStatesParser *self = (SkAnimStatesParser*)lua_touserdata(L, -1);
 	lua_pop(L, 1);
@@ -498,11 +432,9 @@ int SkAnimStatesParser::lua_Compile(lua_State *L)
 	lua::Variant::Map map;
 	lua::ParseVariantTable(L, map, true);
 
-	for (lua::Variant::Map::const_iterator it = map.begin(); it != map.end(); ++it)
-	{
+	for (lua::Variant::Map::const_iterator it = map.begin(); it != map.end(); ++it) {
 		const lua::Variant::Map *vars = static_cast<const lua::Variant::Map*>(it->second);
-		if (!vars)
-		{
+		if (!vars) {
 			luaL_error(L, "AnimState '%s':'%s' expected table, (Function %s, File %s, Line %d)",
 				asset->name.get(),
 				it->first.c_str.get(),
@@ -521,13 +453,11 @@ int SkAnimStatesParser::lua_Compile(lua_State *L)
 	return 0;
 }
 
-lua::State::Ref SkAnimStatesParser::InitLua(const pkg::Asset::Ref &asset)
-{
+lua::State::Ref SkAnimStatesParser::InitLua(const pkg::Asset::Ref &asset) {
 	lua::State::Ref state(new (ska::ZSka) lua::State("SkAnimStates"));
 	lua_State *L = state->L;
 
-	luaL_Reg r[] =
-	{
+	luaL_Reg r[] = {
 		{ "Compile", lua_Compile },
 		{ 0, 0 }
 	};
@@ -543,8 +473,7 @@ lua::State::Ref SkAnimStatesParser::InitLua(const pkg::Asset::Ref &asset)
 
 #endif
 
-void SkAnimStatesParser::Register(Engine &engine)
-{
+void SkAnimStatesParser::Register(Engine &engine) {
 	static pkg::Binding::Ref ref = engine.sys->packages->Bind<SkAnimStatesParser>();
 }
 

@@ -160,7 +160,7 @@ int StringTable::Load(const char *name, const char *root, StringTable::Ref &_r, 
 	}
 
 	if (!loadMask)
-		return file::ErrorFileNotFound;
+		return pkg::SR_FileNotFound;
 
 	_r = r;
 	if (_loadMask)

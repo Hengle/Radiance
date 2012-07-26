@@ -21,67 +21,41 @@
 	#include "Renderer/PC/RBackend.h"
 #endif
 
-enum
-{
-	FiberStackSize = 32*Kilo,
-	MaxTotalFiberMem = 8*Meg,
-	MaxFibers = MaxTotalFiberMem/FiberStackSize
-};
+Engine *Engine::New() { 
+	return new (ZEngine) Engine(); 
+}
 
-using namespace string;
-
-int __Argc();
-const char **__Argv();
-
-Engine *Engine::New() { return new (ZEngine) Engine(); }
-
-Engine::Engine()
-{
+Engine::Engine() {
 	spawn::E_Exports();
 	m_comTable.components = IComponentManager::Instance();
 	RAD_REGISTER_COMPONENTS(m_comTable.components, ExportEngineComponents);
 }
 
-Engine::~Engine()
-{
+Engine::~Engine() {
 }
 
-bool Engine::PreInit()
-{
+bool Engine::PreInit() {
 #if defined(RAD_OPT_PC_TOOLS)
 	m_scc = SCC::Create("null");
 	RAD_ASSERT(m_scc);
 #endif
 
-	const char *baseDir = App::Get()->ArgArg("-base");
-	if (!baseDir)
-	{
-		baseDir = "Base";
-	}
-
-	m_baseDir = baseDir;
-
-	const char *root = App::Get()->ArgArg("-root");
-	if (root)
-	{
-		RAD_DEBUG_ONLY(bool b=file::EnforcePortablePaths(false));
-		file::SetAlias(file::AliasRoot, root);
-		RAD_DEBUG_ONLY(file::EnforcePortablePaths(b));
-	}
-
 	if (!LoadComponents())
-	{
 		return false;
-	}
 
 	COut(C_Info) << "num processors: " << thread::NumContexts() << std::endl;
 	COut(C_Info) << "hyper-threading enabled: " << (thread::details::IsHyperThreadingOn() ? "true" : "false") << std::endl;
 	COut(C_Info) << SIMD->name << " driver bound." << std::endl;
 
-	sys->files->Initialize(file::AllMedia & ~(file::CDDVD|file::Mod));
-	sys->files->hddRoot = m_baseDir.c_str;
-	sys->files->cddvdRoot = m_baseDir.c_str;
-	sys->paks->Initialize(sys->files);
+	const char *baseDir = App::Get()->ArgArg("-base");
+	if (!baseDir)
+		baseDir = "Base";
+
+	const char *root = App::Get()->ArgArg("-root");
+	if (root)
+		sys->files->SetAlias('r', root);
+
+	sys->files->AddDirectory((CStr("@r:/") + baseDir).c_str, file::kFileMask_Base);
 
 	sys->r->Initialize();
 	m_comTable.alDriver = ALDriver::New(ALDRIVER_SIG 0);
@@ -117,8 +91,7 @@ void Engine::Finalize()
 		m_comTable.r->ctx = r::HContext();
 
 	m_comTable.r.Close();
-	m_comTable.paks.Close();
-	m_comTable.files.Close();
+	m_comTable.files.reset();
 }
 
 void Engine::Tick(float elapsed)
@@ -169,8 +142,7 @@ void Engine::VidReset()
 
 bool Engine::LoadComponents()
 {
-	LOAD_COM(file::IFileSystem, files, file.FileSystem);
-	LOAD_COM(file::IDPakReader, paks, file.DPakReader);
+	m_comTable.files = file::FileSystem::New();
 	LOAD_COM(r::IRenderer, r, r.RBackend);
 	m_comTable.packages = pkg::PackageMan::New(*this, "Packages");
 	return true;

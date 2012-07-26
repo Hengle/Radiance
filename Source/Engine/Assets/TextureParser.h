@@ -7,8 +7,8 @@
 
 #include "AssetTypes.h"
 #include "../Packages/Packages.h"
-#include "../FileSystem/FileSystem.h"
 #include "../StringTable.h"
+#include <Runtime/File.h>
 #include <Runtime/ImageCodec/ImageCodec.h>
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/PushPack.h>
@@ -84,7 +84,9 @@ private:
 	enum {
 		S_None,
 		S_Loading,
+#if defined(RAD_OPT_TOOLS)
 		S_Parsing,
+#endif
 		S_Done,
 		S_Header,
 		F_Tga = 0,
@@ -95,13 +97,6 @@ private:
 
 #if defined(RAD_OPT_TOOLS)
 	int Load(
-		Engine &engine,
-		const xtime::TimeSlice &time,
-		const pkg::Asset::Ref &asset,
-		int flags
-	);
-
-	int Loading(
 		Engine &engine,
 		const xtime::TimeSlice &time,
 		const pkg::Asset::Ref &asset,
@@ -189,7 +184,7 @@ private:
 #endif
 	
 	typedef zone_vector<image_codec::Image::Ref, ZEngineT>::type ImageVec;
-	typedef zone_vector<file::HBufferedAsyncIO, ZEngineT>::type IOVec;
+	typedef zone_vector<file::MMapping::Ref, ZEngineT>::type IOVec;
 
 	int m_state;
 	bool m_load;
@@ -200,7 +195,7 @@ private:
 	pkg::Cooker::Ref m_cooker;
 	StringTable::LangId m_langId;
 #endif
-	file::HBufferedAsyncIO m_buf;
+	file::MMapping::Ref m_mm;
 	TextureTag m_tag;
 };
 

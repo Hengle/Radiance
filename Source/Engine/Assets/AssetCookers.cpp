@@ -33,8 +33,7 @@ namespace asset {
 
 void RB_RegisterCookers(Engine&);
 
-RADENG_API void RADENG_CALL RegisterCookers(Engine &engine)
-{
+RADENG_API void RADENG_CALL RegisterCookers(Engine &engine) {
 	MapCooker::Register(engine);
 	MaterialCooker::Register(engine);
 	TextureCooker::Register(engine);
@@ -56,8 +55,7 @@ RADENG_API void RADENG_CALL RegisterCookers(Engine &engine)
 
 namespace asset {
 
-RADENG_API void RADENG_CALL RegisterCookers(Engine &engine)
-{
+RADENG_API void RADENG_CALL RegisterCookers(Engine &engine) {
 }
 
 } // asset

@@ -13,14 +13,12 @@ class Engine;
 
 namespace asset {
 
-class RADENG_CLASS MeshCooker : public pkg::Cooker
-{
+class RADENG_CLASS MeshCooker : public pkg::Cooker {
 public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
+	enum {
 		AssetType = AT_Mesh
 	};
 

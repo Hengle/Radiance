@@ -117,9 +117,9 @@ void FilePathExtractor::SetEditorData(FilePathFieldWidget &fw, const QVariant &v
 	if (!context->def)
 		return;
 
-	QString prefix("9:/");
-	prefix += Files()->hddRoot.get();
-	fw.SetPrefix(prefix);
+	String prefix;
+	Files()->GetAbsolutePath("", prefix, file::kFileMask_Base);
+	fw.SetPrefix(prefix.c_str.get());
 	fw.SetFilter("All Files (*.*)");
 
 	pkg::KeyDef::Pair::Map::const_iterator it = context->def->pairs.find(CStr("filter"));

@@ -31,7 +31,7 @@ int StringTableParser::Process(
 
 	if (flags&P_Unload) {
 		m_stringTable.reset();
-		m_buf.Close();
+		m_mm.reset();
 		return SR_Success;
 	}
 
@@ -54,18 +54,13 @@ int StringTableParser::Load(
 	if (!s)
 		return pkg::SR_MetaError;
 
-	char path[256];
-	char native[256];
-	string::cpy(path, "9:/");
-	string::cat(path, engine.sys->files->hddRoot.get());
-	string::cat(path, "/");
-	string::cat(path, s->c_str.get());
-	if (!file::ExpandToNativePath(path, native, 256))
+	String native;
+	if (!engine.sys->files->ExpandToNativePath(s->c_str, native, ~file::kFileMask_PakFiles))
 		return SR_ErrorGeneric;
 
-	int r = StringTable::Load(asset->path, native, m_stringTable);
+	int r = StringTable::Load(asset->path, native.c_str, m_stringTable);
 
-	if ((flags&P_Create) && (r == file::ErrorFileNotFound)) // this is OK for this asset just make a new table.
+	if ((flags&P_Create) && (r == SR_FileNotFound)) // this is OK for this asset just make a new table.
 		m_stringTable = StringTable::New();
 
 	if (!m_stringTable)
@@ -89,16 +84,11 @@ int StringTableParser::Save(
 	if (!s)
 		return SR_MetaError;
 
-	char path[256];
-	char native[256];
-	string::cpy(path, "9:/");
-	string::cat(path, engine.sys->files->hddRoot.get());
-	string::cat(path, "/");
-	string::cat(path, s->c_str.get());
-	if (!file::ExpandToNativePath(path, native, 256))
+	String native;
+	if (!engine.sys->files->ExpandToNativePath(s->c_str, native, ~file::kFileMask_PakFiles))
 		return SR_ErrorGeneric;
 
-	if (!m_stringTable->SaveText(asset->path, native))
+	if (!m_stringTable->SaveText(asset->path, native.c_str))
 		return SR_IOError;
 
 	return SR_Success;
@@ -112,33 +102,18 @@ int StringTableParser::LoadCooked(
 	const pkg::Asset::Ref &asset,
 	int flags
 ) {
-	if (!m_buf) {
+	if (!m_mm) {
 		String path(CStr("Cooked/"));
 		path += CStr(asset->path);
 		path += ".bin";
 
-		int media = file::AllMedia;
-		int r = engine.sys->files->LoadFile(
-			path.c_str,
-			media,
-			m_buf,
-			file::HIONotify()
-		);
-
-		if (r == SR_Pending) {
-			if (!time.infinite)
-				return r;
-			m_buf->WaitForCompletion();
-		} else if (r != SR_Success) {
-			return r;
-		}
+		m_mm = engine.sys->files->MapFile(path.c_str, ZStringTables);
+		if (!m_mm)
+			return SR_FileNotFound;
 	}
 
-	if (m_buf->result != SR_Success)
-		return m_buf->result;
-
-	int r = StringTable::Load(m_buf->data->ptr, m_buf->data->size, m_stringTable);
-	m_buf.Close();
+	int r = StringTable::Load(m_mm->data, m_mm->size, m_stringTable);
+	m_mm.reset();
 	return r;
 }
 

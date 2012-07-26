@@ -72,17 +72,16 @@ enum SinkResult
 	SR_Success = 0, /*!< Sink command completed successfully. */
 	SR_Pending, /*!< Sink command is pending, pkg::Asset::Process() must be called until the command does not return pkg::SR_Pending. */
 	SR_User, /*!< First valid user result code, for internal use by Sinks. */
-	// -1 to -11 are file system error codes. See <Runtime/File/FileDef.h>
-	SR_ErrorGeneric = -128, /*!< A generic (unidentified) error occurred. */
-	SR_ParseError = -129, /*!< Invalid or erroneous input data. Common with scripts or structured text files. */
-	SR_BadVersion = -130, /*!< Invalid version of a file. */
-	SR_MetaError = -131, /*!< Invalid asset meta data. */
-	SR_MissingFile = -132, /*!< File was not found or could not be opened. */
-	SR_InvalidFormat = -133, /*!< Unsupported file format. */
-	SR_CorruptFile = -134, /*!< Corrupt file data or unrecognized file type. */
-	SR_IOError = -135, /*!< Generic error related to file system or IO. */
-	SR_CompilerError = -136, /*!< Error occurred during compilation. */
-	SR_ScriptError = -137 /*!< Syntax or logic error during script processing. */
+	SR_ErrorGeneric = -1, /*!< A generic (unidentified) error occurred. */
+	SR_FileNotFound = -2, /*!< Error opening file */
+	SR_ParseError = -3, /*!< Invalid or erroneous input data. Common with scripts or structured text files. */
+	SR_BadVersion = -4, /*!< Invalid version of a file. */
+	SR_MetaError = -5, /*!< Invalid asset meta data. */
+	SR_InvalidFormat = -6, /*!< Unsupported file format. */
+	SR_CorruptFile = -7, /*!< Corrupt file data or unrecognized file type. */
+	SR_IOError = -8, /*!< Generic error related to file system or IO. */
+	SR_CompilerError = -9, /*!< Error occurred during compilation. */
+	SR_ScriptError = -10 /*!< Syntax or logic error during script processing. */
 };
 
 //! Defines the relative order of stages of sink processing.
@@ -166,7 +165,7 @@ enum PFlags
                                */
 	RAD_FLAG(P_Clean),         /*!< Used during cooking to request that any output files be cleaned. */
 	RAD_FLAG(P_ScriptsOnly),   /*!< Used during cooking to request that only scripts be cooked. */
-	RAD_FLAG(P_NoDefaultMedia),/*!< Requests that sinks do not resolve pkg::SR_MissingFile by substituting a place-holder,
+	RAD_FLAG(P_NoDefaultMedia),/*!< Requests that sinks do not resolve pkg::SR_FileNotFound by substituting a place-holder,
                                     for example do not load a missing texture image.
                                */
 	RAD_FLAG(P_NoDefaultKey),  /*!< When requesting a key value from pkg::Package::Entry::KeyValue() or any other method

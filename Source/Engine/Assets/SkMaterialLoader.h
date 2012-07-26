@@ -13,14 +13,12 @@ class Engine;
 
 namespace asset {
 
-class RADENG_CLASS SkMaterialLoader : public pkg::Sink<SkMaterialLoader>
-{
+class RADENG_CLASS SkMaterialLoader : public pkg::Sink<SkMaterialLoader> {
 public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
+	enum {
 		SinkStage = pkg::SS_Process,
 		AssetType = AT_SkModel
 	};
@@ -30,8 +28,7 @@ public:
 	SkMaterialLoader();
 	virtual ~SkMaterialLoader();
 
-	const pkg::Asset::Ref &MaterialAsset(int mesh) const
-	{
+	const pkg::Asset::Ref &MaterialAsset(int mesh) const {
 		return m_matRefs[mesh];
 	}
 	
@@ -53,8 +50,7 @@ protected:
 
 private:
 
-	enum
-	{
+	enum {
 		S_None,
 		S_LoadMaterials,
 		S_Done,

@@ -21,8 +21,6 @@ namespace ska {
 BOOST_STATIC_ASSERT(sizeof(Mat4)==(16*sizeof(float)));
 BOOST_STATIC_ASSERT(sizeof(DTag)==6);
 
-RAD_ZONE_DEF(RADENG_API, ZSka, "SkModels", ZEngine);
-
 namespace details {
 
 Quat Slerp(const Quat &from, const Quat &to, float t)

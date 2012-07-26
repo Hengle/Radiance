@@ -19,12 +19,10 @@ using namespace pkg;
 
 namespace asset {
 
-MapAsset::MapAsset() : m_game(0), m_slot(0), m_spawning(false)
-{
+MapAsset::MapAsset() : m_game(0), m_slot(0), m_spawning(false) {
 }
 
-MapAsset::~MapAsset()
-{
+MapAsset::~MapAsset() {
 }
 
 int MapAsset::Process(
@@ -32,15 +30,13 @@ int MapAsset::Process(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
-	if (flags&P_Unload)
-	{
+) {
+	if (flags&P_Unload) {
 #if defined(RAD_OPT_TOOLS)
 		m_mapBuilder.reset();
 #endif
 		m_bspFile.reset();
-		m_bspData.Close();
+		m_bspData.reset();
 		m_world.reset();
 		m_spawning = false;
 		return SR_Success;
@@ -52,8 +48,7 @@ int MapAsset::Process(
 	RAD_ASSERT(m_game);
 
 #if defined(RAD_OPT_TOOLS)
-	if (!asset->cooked && !(flags&P_FastPath))
-	{
+	if (!asset->cooked && !(flags&P_FastPath)) {
 		int r = SpawnTool(
 			time,
 			engine,
@@ -61,8 +56,7 @@ int MapAsset::Process(
 			flags
 		);
 
-		if (r < SR_Success)
-		{
+		if (r < SR_Success) {
 			m_world.reset();
 			m_mapBuilder.reset();
 		}
@@ -84,12 +78,9 @@ int MapAsset::SpawnCooked(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
-	if (m_world)
-	{
-		if (m_spawning)
-		{
+) {
+	if (m_world) {
+		if (m_spawning) {
 			int r = m_world->Spawn(
 				asset->path,
 				m_bspFile,
@@ -97,8 +88,7 @@ int MapAsset::SpawnCooked(
 				flags
 			);
 
-			if (r == SR_Success)
-			{
+			if (r == SR_Success) {
 #pragma message ("TODO: split bsp into persistant/non-persistant files to save memory like i do for ska's.")
 				// Cinematics data references data in-place in bsp file.
 //				m_bspData.Close();
@@ -112,45 +102,30 @@ int MapAsset::SpawnCooked(
 	}
 
 
-	if (!m_bspData)
-	{
+	if (!m_bspData) {
 #if defined(RAD_OPT_TOOLS)
-		if (!asset->cooked)
-		{
+		if (!asset->cooked) {
 			Cooker::Ref cooker = asset->AllocateIntermediateCooker();
 			CookStatus status = cooker->Status(0, P_TARGET_FLAGS(flags));
 
 			if (status == CS_Ignore)
 				return SR_CompilerError;
 
-			if (status == CS_NeedRebuild)
-			{
+			if (status == CS_NeedRebuild) {
 				COut(C_Info) << asset->path.get() << " is out of date, rebuilding..." << std::endl;
 				int r = cooker->Cook(0, P_TARGET_FLAGS(flags));
 				if (r != SR_Success)
 					return r;
-			}
-			else
-			{
+			} else {
 				COut(C_Info) << asset->path.get() << " is up to date, using cache." << std::endl;
 			}
 
 			String path(CStr(asset->path));
 			path += ".bsp";
 
-			int media = file::AllMedia;
-			int r = cooker->LoadFile( // load cooked data.
-				path.c_str,
-				0,
-				media,
-				m_bspData,
-				file::HIONotify(),
-				SIMDDriver::Alignment,
-				ZWorld
-			);
-
-			if (r < SR_Success)
-				return r;
+			m_bspData = cooker->MapFile(path.c_str, 0, ZWorld);
+			if (!m_bspData)
+				return SR_FileNotFound;
 		}
 		else {
 #endif
@@ -158,33 +133,14 @@ int MapAsset::SpawnCooked(
 		path += CStr(asset->path);
 		path += ".bsp";
 
-		int media = file::AllMedia;
-		int r = engine.sys->files->LoadFile(
-			path.c_str,
-			media,
-			m_bspData,
-			file::HIONotify(),
-			SIMDDriver::Alignment,
-			ZWorld
-		);
+		m_bspData = engine.sys->files->MapFile(path.c_str, ZWorld);
+		if (!m_bspData)
+			return SR_FileNotFound;
 
-		if (r < SR_Success)
-			return r;
 #if defined(RAD_OPT_TOOLS)
 		}
 #endif
 	}
-
-	if (m_bspData->result == file::Pending)
-	{
-		if (time.infinite)
-			m_bspData->WaitForCompletion();
-		else
-			return SR_Pending;
-	}
-
-	if (m_bspData->result < file::Success)
-		return m_bspData->result.get();
 
 	SoundContext::Ref sound = SoundContext::New(App::Get()->engine->sys->alDriver);
 
@@ -194,7 +150,7 @@ int MapAsset::SpawnCooked(
 		return r;
 
 	m_bspFile.reset(new (ZWorld) world::bsp_file::BSPFileParser());
-	r = m_bspFile->Parse(m_bspData->data->ptr, m_bspData->data->size);
+	r = m_bspFile->Parse(m_bspData->data, m_bspData->size);
 	if (r < SR_Success)
 		return r;
 
@@ -209,12 +165,9 @@ int MapAsset::SpawnTool(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
-	if (m_world)
-	{
-		if (m_spawning)
-		{
+) {
+	if (m_world) {
+		if (m_spawning) {
 			RAD_ASSERT(m_mapBuilder);
 			
 			int r = m_world->Spawn(
@@ -224,8 +177,7 @@ int MapAsset::SpawnTool(
 				flags
 			);
 
-			if (r == SR_Success)
-			{
+			if (r == SR_Success) {
 				m_mapBuilder.reset();
 				m_spawning = false;
 			}
@@ -243,16 +195,14 @@ int MapAsset::SpawnTool(
 
 	world::EntSpawn spawn;
 	int r;
-	while ((r=parser->ParseEntity(spawn)) == SR_Success)
-	{
+	while ((r=parser->ParseEntity(spawn)) == SR_Success) {
 		if (!m_mapBuilder->LoadEntSpawn(spawn))
 			return SR_ParseError;
 	}
 
 	r = r == MapParser::SR_End ? SR_Success : r;
 
-	if (r == SR_Success)
-	{
+	if (r == SR_Success) {
 		if (!m_mapBuilder->Compile())
 			return SR_CompilerError;
 
@@ -271,12 +221,9 @@ int MapAsset::SpawnTool(
 			flags
 		);
 		
-		if (r == SR_Success)
-		{
+		if (r == SR_Success) {
 			m_mapBuilder.reset();
-		}
-		else
-		{
+		} else {
 			m_spawning = true;
 		}
 	}
@@ -285,8 +232,7 @@ int MapAsset::SpawnTool(
 }
 #endif
 
-void MapAsset::Register(Engine &engine)
-{
+void MapAsset::Register(Engine &engine) {
 	static pkg::Binding::Ref r = engine.sys->packages->Bind<MapAsset>();
 }
 

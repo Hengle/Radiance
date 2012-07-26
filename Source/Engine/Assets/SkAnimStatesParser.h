@@ -17,14 +17,12 @@
 
 namespace asset  {
 
-class RADENG_CLASS SkAnimStatesParser : public pkg::Sink<SkAnimStatesParser>
-{
+class RADENG_CLASS SkAnimStatesParser : public pkg::Sink<SkAnimStatesParser> {
 public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
+	enum {
 		SinkStage = pkg::SS_Parser,
 		AssetType = AT_SkAnimStates
 	};
@@ -64,8 +62,13 @@ protected:
 
 private:
 
-	RAD_DECLARE_GET(states, const ska::AnimState::Map*) { return &m_states; }
-	RAD_DECLARE_GET(valid, bool) { return m_valid; }
+	RAD_DECLARE_GET(states, const ska::AnimState::Map*) { 
+		return &m_states; 
+	}
+
+	RAD_DECLARE_GET(valid, bool) { 
+		return m_valid; 
+	}
 
 #if defined(RAD_OPT_TOOLS)
 	void ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &asset, const lua::Variant::Map &map, const ska::AnimState &states, ska::Variant &variant);

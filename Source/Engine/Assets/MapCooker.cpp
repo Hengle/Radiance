@@ -14,21 +14,17 @@ using namespace pkg;
 
 namespace asset {
 
-MapCooker::MapCooker() : Cooker(10)
-{
+MapCooker::MapCooker() : Cooker(10) {
 }
 
-MapCooker::~MapCooker()
-{
+MapCooker::~MapCooker() {
 }
 
-CookStatus MapCooker::Status(int flags, int allflags)
-{
+CookStatus MapCooker::Status(int flags, int allflags) {
 	// Maps only cook on the generics path
 	flags &= P_AllTargets;
 
-	if (flags == 0)
-	{
+	if (flags == 0) {
 		if (CompareVersion(flags) ||
 			CompareModifiedTime(flags) ||
 			CompareCachedFileTimeKey(flags, "Source.File"))
@@ -42,43 +38,31 @@ CookStatus MapCooker::Status(int flags, int allflags)
 		if (!mapPath || mapPath->empty)
 			return CS_NeedRebuild;
 
-		int media = file::AllMedia;
-		file::HBufferedAsyncIO m_buf;
-		int r = engine->sys->files->LoadFile(
-			mapPath->c_str,
-			media,
-			m_buf,
-			file::HIONotify()
-		);
-
-		if (r < file::Success)
-			return CS_NeedRebuild; // force error
-
-		m_buf->WaitForCompletion();
+		file::MMapping::Ref mm = engine->sys->files->MapFile(mapPath->c_str, ZTools);
+		if (!mm)
+			return CS_NeedRebuild;
 
 		m_script.InitParsing(
-			(const char *)m_buf->data->ptr.get(),
-			(int)m_buf->data->size.get()
+			(const char *)mm->data.get(),
+			(int)mm->size.get()
 		);
 
-		m_buf.Close();
+		mm.reset();
 
+		int r;
 		CookStatus status = CS_UpToDate;
 		world::EntSpawn spawn;
-		while ((r=ParseEntity(spawn))==SR_Success)
-		{
+
+		while ((r=ParseEntity(spawn))==SR_Success) {
 			const char *sz = spawn.keys.StringForKey("classname");
 			if (!sz)
 				continue;
-			if (!string::cmp(sz, "static_mesh_scene"))
-			{
+			if (!string::cmp(sz, "static_mesh_scene")) {
 				sz = spawn.keys.StringForKey("file");
-				if (sz)
-				{
+				if (sz) {
 					String path(sz);
 					path += ".3dx";
-					if (CompareCachedFileTime(flags, path.c_str, path.c_str))
-					{
+					if (CompareCachedFileTime(flags, path.c_str, path.c_str)) {
 						status = CS_NeedRebuild;
 						break;
 					}
@@ -95,8 +79,7 @@ CookStatus MapCooker::Status(int flags, int allflags)
 	return CS_Ignore;
 }
 
-int MapCooker::Compile(int flags, int allflags)
-{
+int MapCooker::Compile(int flags, int allflags) {
 	RAD_ASSERT((flags&P_AllTargets)==0);
 
 	// Make sure these get updated
@@ -110,42 +93,30 @@ int MapCooker::Compile(int flags, int allflags)
 
 //	cout.get() << "********" << std::endl << "Loading :" << mapPath->c_str() << std::endl;
 
-	int media = file::AllMedia;
-	file::HBufferedAsyncIO m_buf;
-	int r = engine->sys->files->LoadFile(
-		mapPath->c_str,
-		media,
-		m_buf,
-		file::HIONotify()
-	);
-
-	if (r < file::Success)
-		return r;
-
-	m_buf->WaitForCompletion();
-
+	file::MMapping::Ref mm = engine->sys->files->MapFile(mapPath->c_str, ZTools);
+	if (!mm)
+		return SR_FileNotFound;
+	
 	m_script.InitParsing(
-		(const char *)m_buf->data->ptr.get(),
-		(int)m_buf->data->size.get()
+		(const char *)mm->data.get(),
+		(int)mm->size.get()
 	);
 
-	m_buf.Close();
+	mm.reset();
 
 	::tools::MapBuilder mapBuilder(*engine.get());
 
+	int r;
 	world::EntSpawn spawn;
-	while ((r=ParseEntity(spawn))==SR_Success)
-	{
+	while ((r=ParseEntity(spawn))==SR_Success) {
 		if (!mapBuilder.LoadEntSpawn(spawn))
 			return SR_ParseError;
 
 		// For static_mesh_scene, cache the 3DX filetime
 		const char *sz = spawn.keys.StringForKey("classname");
-		if (sz && !string::cmp(sz, "static_mesh_scene"))
-		{
+		if (sz && !string::cmp(sz, "static_mesh_scene")) {
 			sz = spawn.keys.StringForKey("file");
-			if (sz)
-			{
+			if (sz) {
 				String path(sz);
 				path += ".3dx";
 				CompareCachedFileTime(flags, path.c_str, path.c_str);
@@ -177,22 +148,20 @@ int MapCooker::Compile(int flags, int allflags)
 	world::bsp_file::BSPFile::Ref bspFile = mapBuilder.bspFile;
 	RAD_ASSERT(bspFile);
 
-	for (U32 i = 0; i < bspFile->numMaterials; ++i)
-	{ // import materials.
+	for (U32 i = 0; i < bspFile->numMaterials; ++i) { 
+		// import materials.
 		AddImport(bspFile->String((bspFile->Materials()+i)->string), flags);
 	}
 
 	return SR_Success;
 }
 
-int MapCooker::ParseEntity(world::EntSpawn &spawn)
-{
+int MapCooker::ParseEntity(world::EntSpawn &spawn) {
 	spawn.keys.pairs.clear();
 	return ParseScript(spawn);
 }
 
-int MapCooker::ParseScript(world::EntSpawn &spawn)
-{
+int MapCooker::ParseScript(world::EntSpawn &spawn) {
 	String token, value, temp;
 
 	if (!m_script.GetToken(token))
@@ -200,8 +169,7 @@ int MapCooker::ParseScript(world::EntSpawn &spawn)
 	if (token != "{")
 		return SR_ParseError;
 
-	for (;;)
-	{
+	for (;;) {
 		if (!m_script.GetToken(token))
 			return SR_ParseError;
 		if (token == "}")
@@ -213,15 +181,11 @@ int MapCooker::ParseScript(world::EntSpawn &spawn)
 		const char *sz = value.c_str;
 		temp.Clear();
 
-		while (*sz)
-		{
-			if (sz[0] == '\\' && sz[1] == 'n')
-			{
+		while (*sz) {
+			if (sz[0] == '\\' && sz[1] == 'n') {
 				temp += '\n';
 				++sz;
-			}
-			else
-			{
+			} else {
 				temp += *sz;
 			}
 			++sz;
@@ -233,8 +197,7 @@ int MapCooker::ParseScript(world::EntSpawn &spawn)
 	return SR_Success;
 }
 
-void MapCooker::Register(Engine &engine)
-{
+void MapCooker::Register(Engine &engine) {
 	static pkg::Binding::Ref binding = engine.sys->packages->BindCooker<MapCooker>();
 }
 

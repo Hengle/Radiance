@@ -22,22 +22,14 @@ bool OpenFile(
 	File &out
 )
 {
-	int media = file::AllMedia;
-	file::Result r = e.sys->files->OpenFileStream(
-		filename,
-		media,
-		out.ib,
-		file::HIONotify(),
-		Kilo
-	);
+	out.ib = e.sys->files->OpenInputBuffer(filename, ZTools);
 
-	if (r != file::Success)
-	{
+	if (!out.ib) {
 		COut(C_ErrMsgBox) << "GLSLTool: Error opening \"" << filename << "\"" << std::endl;
 		return false;
 	}
 
-	out.sb.reset(new (r::ZRender) stream::basic_streambuf<char>(&out.ib->buffer.get(), 0));
+	out.sb.reset(new (r::ZRender) stream::basic_streambuf<char>(out.ib.get(), 0));
 	out.is.reset(new std::istream(out.sb.get()));
 	return out.is->good();
 }
@@ -139,18 +131,10 @@ void SaveText(
 	const char *sz
 )
 {
-	String path(CStr("9:/") + engine.sys->files->hddRoot.get());
-	path += '/';
-	path += filename;
-	char nativePath[file::MaxFilePathLen+1];
-	if (file::ExpandToNativePath(path.c_str, nativePath, file::MaxFilePathLen+1))
-	{
-		FILE *fp = fopen(nativePath, "wb");
-		if (fp)
-		{
-			fwrite(sz, 1, string::len(sz), fp);
-			fclose(fp);
-		}
+	FILE *fp = engine.sys->files->fopen(filename, "wb", file::kFileOptions_None, file::kFileMask_Base);
+	if (fp) {
+		fwrite(sz, 1, string::len(sz), fp);
+		fclose(fp);
 	}
 }
 

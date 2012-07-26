@@ -77,19 +77,14 @@ bool LoadStorage(const char *name, world::Keys &keys)
 #if defined(RAD_OPT_IOS)
 	fp = __IOS_OpenPersistence(name, "rb");
 #else
-	String path(CStr("9:/"));
-	path += name;
-	char nativePath[file::MaxFilePathLen+1];
-	if (file::ExpandToNativePath(path.c_str, nativePath, file::MaxFilePathLen+1))
-	{
-		fp = fopen(nativePath, "rb");
-	}
+	String path(CStr("@r:/") + name);
+	fp = App::Get()->engine->sys->files->fopen(path.c_str, "rb");
 #endif
 
 	if (!fp)
 		return false;
 
-	file::stream::InputBuffer ib(fp);
+	file::FILEInputBuffer ib(fp);
 	stream::InputStream is(ib);
 
 	bool r = LoadStorage(is, keys);
@@ -130,19 +125,14 @@ bool SaveStorage(const char *name, const world::Keys &keys)
 #if defined(RAD_OPT_IOS)
 	fp = __IOS_OpenPersistence(name, "wb");
 #else
-	String path(CStr("9:/"));
-	path += CStr(name);
-	char nativePath[file::MaxFilePathLen+1];
-	if (file::ExpandToNativePath(path.c_str, nativePath, file::MaxFilePathLen+1))
-	{
-		fp = fopen(nativePath, "wb");
-	}
+	String path(CStr("9:/") + name);
+	fp = App::Get()->engine->sys->files->fopen(path.c_str, "wb");
 #endif
 
 	if (!fp)
 		return false;
 
-	file::stream::OutputBuffer ob(fp);
+	file::FILEOutputBuffer ob(fp);
 	stream::OutputStream os(ob);
 
 	bool r = SaveStorage(os, keys);

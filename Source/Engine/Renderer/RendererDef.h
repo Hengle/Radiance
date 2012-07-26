@@ -11,12 +11,6 @@
 
 namespace r {
 
-RAD_ZONE_DEC(RADENG_API, ZRender);
-RAD_ZONE_DEC(RADENG_API, ZTextures);
-RAD_ZONE_DEC(RADENG_API, ZVertexBuffers);
-RAD_ZONE_DEC(RADENG_API, ZSkm);
-RAD_ZONE_DEC(RADENG_API, ZFonts);
-
 enum Info { Version = (1 << 16) | (0) }; // 1.0
 RAD_DECLARE_INTERFACE(HRenderer, IRenderer);
 RAD_DECLARE_INTERFACE(HContext, IContext);

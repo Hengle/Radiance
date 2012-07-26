@@ -23,14 +23,12 @@ class Game;
 
 namespace asset {
 
-class RADENG_CLASS MapAsset : public pkg::Sink<MapAsset>
-{
+class RADENG_CLASS MapAsset : public pkg::Sink<MapAsset> {
 public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
+	enum {
 		SinkStage = pkg::SS_Process,
 		AssetType = asset::AT_Map
 	};
@@ -40,8 +38,7 @@ public:
 	MapAsset();
 	virtual ~MapAsset();
 
-	void SetGame(Game &game, int slot) 
-	{ 
+	void SetGame(Game &game, int slot) { 
 		m_game = &game;
 		m_slot = slot;
 	}
@@ -81,7 +78,7 @@ private:
 	int m_slot;
 	bool m_spawning;
 	::world::WorldRef m_world;
-	file::HBufferedAsyncIO m_bspData;
+	file::MMapping::Ref m_bspData;
 	world::bsp_file::BSPFileParser::Ref m_bspFile;
 
 #if defined(RAD_OPT_TOOLS)

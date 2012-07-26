@@ -10,9 +10,9 @@
 #endif
 
 #include "../Packages/Packages.h"
-#include "../FileSystem/FileSystem.h"
 #include "../World/EntityDef.h"
 #include "../Utils/Tokenizer.h"
+#include <Runtime/File.h>
 
 #include <Runtime/PushPack.h>
 
@@ -20,27 +20,21 @@ class Engine;
 
 namespace asset {
 
-class RADENG_CLASS MapParser : public pkg::Sink<MapParser>
-{
+class RADENG_CLASS MapParser : public pkg::Sink<MapParser> {
 public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
+	enum {
 		SinkStage = pkg::SS_Parser,
-		AssetType = AT_Map
+		AssetType = AT_Map,
+		SR_End = pkg::SR_User
 	};
 
 	typedef boost::shared_ptr<MapParser> Ref;
 
 	MapParser();
 	virtual ~MapParser();
-
-	enum
-	{
-		SR_End = pkg::SR_User
-	};
 
 	int ParseEntity(world::EntSpawn &spawn);
 
@@ -64,8 +58,7 @@ private:
 		int flags
 	);
 
-	enum
-	{
+	enum {
 		S_None,
 		S_Loading,
 		S_Done
@@ -73,7 +66,7 @@ private:
 
 	Tokenizer m_script;
 
-	file::HBufferedAsyncIO m_buf;
+	file::MMapping::Ref m_mm;
 	int m_state;
 };
 

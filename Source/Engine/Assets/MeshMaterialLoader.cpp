@@ -101,7 +101,7 @@ int MeshMaterialLoader::Load(
 					m = engine.sys->packages->Resolve("Sys/M_Missing", asset->zone);
 				if (!m)
 #endif
-					return SR_MissingFile;
+					return SR_FileNotFound;
 			}
 		}
 

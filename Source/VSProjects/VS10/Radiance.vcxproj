@@ -131,12 +131,6 @@
     <ClInclude Include="..\..\Engine\ComponentExports.h" />
     <ClInclude Include="..\..\Engine\COut.h" />
     <ClInclude Include="..\..\Engine\Engine.h" />
-    <ClInclude Include="..\..\Engine\FileSystem\Backend\DPak.h" />
-    <ClInclude Include="..\..\Engine\FileSystem\Backend\FileSystem.h" />
-    <ClInclude Include="..\..\Engine\FileSystem\DPak.h" />
-    <ClInclude Include="..\..\Engine\FileSystem\DPakDef.h" />
-    <ClInclude Include="..\..\Engine\FileSystem\FileSystem.h" />
-    <ClInclude Include="..\..\Engine\FileSystem\FileSystemDef.h" />
     <ClInclude Include="..\..\Engine\Game\Game.h" />
     <ClInclude Include="..\..\Engine\Game\GameNetwork.h" />
     <ClInclude Include="..\..\Engine\Game\GameNetworkDef.h" />
@@ -706,13 +700,9 @@
     <ClInclude Include="..\..\Runtime\Event.h" />
     <ClInclude Include="..\..\Runtime\File.h" />
     <ClInclude Include="..\..\Runtime\FileDef.h" />
-    <ClInclude Include="..\..\Runtime\File\Backend.h" />
     <ClInclude Include="..\..\Runtime\File\File.h" />
     <ClInclude Include="..\..\Runtime\File\FileDef.h" />
-    <ClInclude Include="..\..\Runtime\File\FileStream.h" />
-    <ClInclude Include="..\..\Runtime\File\FileStreamDef.h" />
     <ClInclude Include="..\..\Runtime\File\IntFile.h" />
-    <ClInclude Include="..\..\Runtime\File\PrivateFile.h" />
     <ClInclude Include="..\..\Runtime\Font\Font.h" />
     <ClInclude Include="..\..\Runtime\Font\FontDef.h" />
     <ClInclude Include="..\..\Runtime\Font\IntFont.h" />
@@ -980,8 +970,6 @@
     <ClCompile Include="..\..\Engine\ComponentExports.cpp" />
     <ClCompile Include="..\..\Engine\COut.cpp" />
     <ClCompile Include="..\..\Engine\Engine.cpp" />
-    <ClCompile Include="..\..\Engine\FileSystem\Backend\DPak.cpp" />
-    <ClCompile Include="..\..\Engine\FileSystem\Backend\FileSystem.cpp" />
     <ClCompile Include="..\..\Engine\Game\Game.cpp" />
     <ClCompile Include="..\..\Engine\Game\GameNetwork.cpp" />
     <ClCompile Include="..\..\Engine\Game\GameNetworkNull.cpp" />
@@ -1454,7 +1442,6 @@
     <ClCompile Include="..\..\Runtime\DataCodec\ZLib.cpp" />
     <ClCompile Include="..\..\Runtime\Endian\Endian.cpp" />
     <ClCompile Include="..\..\Runtime\File\File.cpp" />
-    <ClCompile Include="..\..\Runtime\File\FileStream.cpp" />
     <ClCompile Include="..\..\Runtime\Font\Font.cpp" />
     <ClCompile Include="..\..\Runtime\ImageCodec\Bmp.cpp" />
     <ClCompile Include="..\..\Runtime\ImageCodec\Dds.cpp" />
@@ -1552,7 +1539,6 @@
     <None Include="..\..\Runtime\Endian\Endian.inl" />
     <None Include="..\..\Runtime\Endian\EndianStream.inl" />
     <None Include="..\..\Runtime\File\File.inl" />
-    <None Include="..\..\Runtime\File\FileStream.inl" />
     <None Include="..\..\Runtime\Font\Font.inl" />
     <None Include="..\..\Runtime\ImageCodec\ImageCodec.inl" />
     <None Include="..\..\Runtime\Interface\Interface.inl" />

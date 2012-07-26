@@ -32,11 +32,11 @@
 #include "PackagesDef.h"
 #include "PackageDetails.h"
 #include "../Lua/LuaRuntime.h"
-#include "../FileSystem/FileSystemDef.h"
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/Container/ZoneList.h>
 #include <Runtime/Time/Time.h>
 #include <Runtime/Stream.h>
+#include <Runtime/File.h>
 #include <Runtime/DataCodec/LmpReader.h>
 #include <Runtime/ReflectDef.h>
 #include <Runtime/Base/ObjectPool.h>
@@ -46,7 +46,6 @@
 	#include "../Persistence.h"
 	#include <Runtime/Event.h>
 	#include <Runtime/Time.h>
-	#include <Runtime/File/FileStream.h>
 	#include <Runtime/DataCodec/LmpDef.h>
 	#include <stdio.h>
 #endif
@@ -95,8 +94,7 @@ RADENG_API const char *RADENG_CALL PlatformNameForFlags(int flags);
 	
 	\sa pkg::KeyDef 
 */
-struct KeyVal
-{
+struct KeyVal {
 	typedef boost::shared_ptr<KeyVal> Ref;
 	typedef zone_map<String, Ref, ZPackagesT>::type Map;
 
@@ -137,10 +135,9 @@ struct KeyVal
 };
 
 //! Defines the attributes of a KeyValue.
-struct KeyDef : boost::enable_shared_from_this<KeyDef>
-{
-	struct Pair
-	{
+struct KeyDef : boost::enable_shared_from_this<KeyDef> {
+	
+	struct Pair {
 		typedef zone_map<String, Pair, ZPackagesT>::type Map;
 		String name;
 		lua::Variant val;
@@ -160,8 +157,7 @@ struct KeyDef : boost::enable_shared_from_this<KeyDef>
 	{
 	}
 
-	int Type() const
-	{
+	int Type() const {
 		return (style&K_TypeMask);
 	}
 
@@ -183,8 +179,7 @@ struct KeyDef : boost::enable_shared_from_this<KeyDef>
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS Binding : public boost::noncopyable
-{
+class RADENG_CLASS Binding : public boost::noncopyable {
 public:
 	typedef boost::shared_ptr<Binding> Ref;
 	virtual ~Binding();
@@ -225,8 +220,7 @@ private:
 // are atomic (i.e. more than one thread will never be in a sinks Process call)
 
 class SinkBaseHelper;
-class SinkBase
-{
+class SinkBase {
 public:
 
 	typedef SinkBaseRef Ref;
@@ -271,8 +265,7 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-class Sink : public SinkBase
-{
+class Sink : public SinkBase {
 public:
 	static boost::shared_ptr<T> Cast(const AssetRef &asset);
 };
@@ -281,16 +274,15 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class BinFile
-{
+class BinFile {
 public:
 	typedef boost::shared_ptr<BinFile> Ref;
 
 	BinFile(FILE *fp) : m_ib(fp), m_ob(fp) {}
 	~BinFile()
 	{
-		if (m_ib.FilePtr())
-			fclose(m_ib.FilePtr());
+		if (m_ib.fp)
+			fclose(m_ib.fp);
 	}
 
 	RAD_DECLARE_READONLY_PROPERTY(BinFile, ib, stream::IInputBuffer&);
@@ -298,17 +290,21 @@ public:
 
 private:
 
-	RAD_DECLARE_GET(ib, stream::IInputBuffer&) { return m_ib; }
-	RAD_DECLARE_GET(ob, stream::IOutputBuffer&) { return m_ob; }
+	RAD_DECLARE_GET(ib, stream::IInputBuffer&) { 
+		return m_ib; 
+	}
 
-	mutable file::stream::InputBuffer m_ib;
-	mutable file::stream::OutputBuffer m_ob;
+	RAD_DECLARE_GET(ob, stream::IOutputBuffer&) { 
+		return m_ob; 
+	}
+
+	mutable file::FILEInputBuffer m_ib;
+	mutable file::FILEOutputBuffer m_ob;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class Cooker
-{
+class Cooker {
 public:
 	typedef CookerRef Ref;
 	typedef zone_vector<Ref, ZPackagesT>::type Vec;
@@ -323,22 +319,13 @@ public:
 	BinFile::Ref OpenRead(const char *path, int pflags);
 	BinFile::Ref OpenTagRead(int pflags);
 
-	int LoadFile(
+	file::MMapping::Ref MapFile(
 		const char *path, 
 		int pflags,
-		int &media,
-		file::HBufferedAsyncIO &buf,
-		const file::HIONotify &notify,
-		file::FPos alignment = 8,
-		::Zone &zone = file::ZFile
+		::Zone &zone
 	);
 
-	int LoadTag(
-		int pflags,
-		int &media,
-		file::HBufferedAsyncIO &buf,
-		const file::HIONotify &notify
-	);
+	file::MMapping::Ref LoadTag(int pflags);
 
 protected:
 
@@ -346,15 +333,14 @@ protected:
 
 	String FilePath(const char *path, int pflags);
 	bool FileTime(const char *path, int pflags, xtime::TimeDate &time);
+	bool CopyOutputFile(const char *src, const char *dst, int pflags);
+	bool CopyOutputBinFile(const char *src, int pflags);
 	BinFile::Ref OpenWrite(const char *path, int pflags);
 	BinFile::Ref OpenTagWrite(int pflags);
 	bool NeedsRebuild(const AssetRef &asset);
 	int AddImport(const char *path, int pflags);
 	int FirstTarget(int allflags);
 	void UpdateModifiedTime(int target);
-
-	//! After compiling this must be called to save cooker state.
-	void SaveState();
 
 	// Compares: -1 == source is newer, 1 == cook is newer, 0 == same
 
@@ -394,17 +380,19 @@ private:
 		return m_languages;
 	}
 
+	//! After compiling this must be called to save cooker state.
+	void SaveState();
+
 	String TagPath(int pflags);
 
-	struct Import
-	{
+	struct Import {
 		String path;
 		int pflags;
 	};
+
 	typedef zone_vector<Import, ZPackagesT>::type ImportVec;
 
-	enum
-	{
+	enum {
 		ImportsTag = RAD_FOURCC('I', 'M', 'P', 'T')
 	};
 
@@ -432,8 +420,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS Package : public boost::enable_shared_from_this<Package>, public boost::noncopyable
-{
+class RADENG_CLASS Package : public boost::enable_shared_from_this<Package>, public boost::noncopyable {
 public:
 	typedef PackageRef Ref;
 	typedef PackageWRef WRef;
@@ -503,8 +490,7 @@ public:
 		String m_path;
 	};
 
-	class Entry
-	{
+	class Entry {
 #if defined(RAD_OPT_PC_TOOLS)
 		RAD_EVENT_CLASS(EventNoAccess)
 #endif
@@ -586,8 +572,7 @@ public:
 		KeyChangeEvent OnKeyChange;
 #endif
 
-		class Import
-		{
+		class Import {
 		public:
 
 #if defined(RAD_OPT_TOOLS)
@@ -703,7 +688,10 @@ private:
 	RAD_DECLARE_GET(dir, const StringIdMap&);
 	RAD_DECLARE_GET(name, const char*);
 	RAD_DECLARE_GET(path, const char*);
-	RAD_DECLARE_GET(pkgMan, PackageManRef) { return m_pm.lock(); }
+
+	RAD_DECLARE_GET(pkgMan, PackageManRef) { 
+		return m_pm.lock(); 
+	}
 
 #if defined(RAD_OPT_PC_TOOLS)
 	// Delete, Rename, UpdateImports, RemoveFileBacking are not thread safe.
@@ -711,14 +699,22 @@ private:
 	bool Rename(int id, const char *name);
 	void UpdateImports(const char *src, const char *dst);
 	void RemoveFileBacking(const char *path);
-	RAD_DECLARE_GET(readOnly, bool) { return m_readOnly; }
+	
+	RAD_DECLARE_GET(readOnly, bool) { 
+		return m_readOnly; 
+	}
+	
 	bool m_readOnly;
 	int  m_tickSize;
 #endif
 
 #if defined(RAD_OPT_TOOLS)
 	bool m_cooked;
-	RAD_DECLARE_GET(cooked, bool) { return m_cooked; }
+	
+	RAD_DECLARE_GET(cooked, bool) { 
+		return m_cooked; 
+	}
+
 	ImportMap m_importMap;
 #endif
 
@@ -737,8 +733,9 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS Asset : public boost::enable_shared_from_this<Asset>, public boost::noncopyable
-{
+class RADENG_CLASS Asset : 
+	public boost::enable_shared_from_this<Asset>, 
+	public boost::noncopyable {
 public:
 	typedef AssetRef Ref;
 	typedef AssetWRef WRef;
@@ -815,8 +812,7 @@ private:
 
 class RADENG_CLASS PackageMan :
 	public boost::enable_shared_from_this<PackageMan>,
-	public boost::noncopyable
-{
+	public boost::noncopyable {
 public:
 	typedef boost::shared_ptr<PackageMan> Ref;
 	typedef boost::weak_ptr<PackageMan> WRef;
@@ -894,8 +890,7 @@ public:
 
 private:
 
-	enum
-	{
+	enum {
 		LumpSig = RAD_FOURCC_LE('p', 'l', 'm', 'p'),
 		LumpId  = 0x55bddecf
 	};
@@ -903,8 +898,7 @@ private:
 	RAD_DECLARE_GET(packages, const Package::Map&) { return m_packages; }
 
 	template <typename T>
-	struct SinkFactory : public details::SinkFactoryBase
-	{
+	struct SinkFactory : public details::SinkFactoryBase {
 		virtual SinkBase::Ref New();
 		virtual int Stage() const;
 	};
@@ -940,9 +934,9 @@ private:
 #if defined(RAD_OPT_TOOLS)
 	friend class Cooker;
 	typedef zone_map<asset::Type, details::CookerFactoryBase::Ref, ZPackagesT>::type TypeCookerFactoryMap;
+
 	template <typename T>
-	struct CookerFactory : public details::CookerFactoryBase
-	{
+	struct CookerFactory : public details::CookerFactoryBase {
 		virtual Cooker::Ref New();
 	};
 
@@ -983,8 +977,7 @@ private:
 	KeyDef::Ref m_defaultKeyDef;
 #endif
 
-	struct TagData
-	{
+	struct TagData {
 		U32 ofs[P_NumTargets+1];
 		U16 type;
 		U16 numImports;
@@ -1006,16 +999,14 @@ private:
 	int PackageSize(const String &path);
 
 	typedef zone_map<int, Cooker::Ref, ZPackagesT>::type CookerMap;
-	struct CookState
-	{
+	struct CookState {
 		typedef boost::shared_ptr<CookState> Ref;
 		CookerMap cookers;
 		std::ostream *cout;
 		int languages;
 	};
 
-	struct CookPackage
-	{
+	struct CookPackage {
 		typedef zone_map<pkg::Package*, CookPackage, ZPackagesT>::type Map;
 		Cooker::Vec cookers;
 		Package::Ref pkg;

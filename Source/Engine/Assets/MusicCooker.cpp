@@ -68,40 +68,16 @@ int MusicCooker::Compile(int flags, int allflags)
 	if (!s)
 		return SR_MetaError;
 
-	file::HStreamInputBuffer ib;
-	int media = file::AllMedia;
-	
-	int r = engine->sys->files->OpenFileStream(
-		s->c_str,
-		media,
-		ib,
-		file::HIONotify()
-	);
-
-	if (r != SR_Success)
-		return r;
-
-	stream::InputStream is(ib->buffer);
-	
-	String path(CStr(asset->path));
-	path += ".bin";
-	BinFile::Ref fp = OpenWrite(path.c_str, flags);
-	if (!fp)
+	if (!CopyOutputBinFile(s->c_str, flags))
 		return SR_IOError;
-
-	stream::OutputStream os(fp->ob);
-
-	UReg err = is.PipeToStream(os, 0, 0, stream::PipeAll);
-	return (err == stream::Success) ? SR_Success : SR_IOError;
+	return SR_Success;
 }
 
-int MusicCooker::MatchTargetKeys(int flags, int allflags)
-{
+int MusicCooker::MatchTargetKeys(int flags, int allflags) {
 	return asset->entry->MatchTargetKeys<String>("Source.File", flags, allflags);
 }
 
-void MusicCooker::Register(Engine &engine)
-{
+void MusicCooker::Register(Engine &engine) {
 	static pkg::Binding::Ref binding = engine.sys->packages->BindCooker<MusicCooker>();
 }
 

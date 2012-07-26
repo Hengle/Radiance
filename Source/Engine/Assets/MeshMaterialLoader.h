@@ -13,14 +13,12 @@ class Engine;
 
 namespace asset {
 
-class RADENG_CLASS MeshMaterialLoader : public pkg::Sink<MeshMaterialLoader>
-{
+class RADENG_CLASS MeshMaterialLoader : public pkg::Sink<MeshMaterialLoader> {
 public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
+	enum {
 		SinkStage = pkg::SS_Process,
 		AssetType = AT_Mesh
 	};
@@ -30,13 +28,11 @@ public:
 	MeshMaterialLoader();
 	virtual ~MeshMaterialLoader();
 
-	const pkg::Asset::Ref &MaterialAsset(int mesh) const
-	{
+	const pkg::Asset::Ref &MaterialAsset(int mesh) const {
 		return m_matRefs[mesh];
 	}
 
-	const pkg::Asset::Ref &UniqueMaterialAsset(int mesh) const
-	{
+	const pkg::Asset::Ref &UniqueMaterialAsset(int mesh) const {
 		return m_umatRefs[mesh];
 	}
 
@@ -60,8 +56,7 @@ protected:
 
 private:
 
-	enum
-	{
+	enum {
 		S_None,
 		S_LoadMaterials,
 		S_Done,

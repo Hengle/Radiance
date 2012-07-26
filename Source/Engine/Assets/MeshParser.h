@@ -7,22 +7,20 @@
 
 #include "AssetTypes.h"
 #include "../Packages/Packages.h"
-#include "../FileSystem/FileSystem.h"
 #include "MeshBundle.h"
+#include <Runtime/File.h>
 #include <Runtime/PushPack.h>
 
 class Engine;
 
 namespace asset {
 
-class RADENG_CLASS MeshParser : public pkg::Sink<MeshParser>
-{
+class RADENG_CLASS MeshParser : public pkg::Sink<MeshParser> {
 public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
+	enum {
 		SinkStage = pkg::SS_Parser,
 		AssetType = AT_Mesh
 	};
@@ -65,15 +63,19 @@ private:
 	RAD_DECLARE_GET(valid, bool) { return m_valid; }
 
 #if defined(RAD_OPT_TOOLS)
-	RAD_DECLARE_GET(bundle, const DMeshBundle*) { return m_bundleData ? &m_bundleData->bundle : &m_bundle; }
+	RAD_DECLARE_GET(bundle, const DMeshBundle*) { 
+		return m_bundleData ? &m_bundleData->bundle : &m_bundle; 
+	}
 	tools::DMeshBundleData::Ref m_bundleData;
 #else
-	RAD_DECLARE_GET(bundle, const DMeshBundle*) { return &m_bundle; }
+	RAD_DECLARE_GET(bundle, const DMeshBundle*) { 
+		return &m_bundle; 
+	}
 #endif
 
 	bool m_valid;
 	DMeshBundle m_bundle;
-	file::HBufferedAsyncIO m_buf;
+	file::MMapping::Ref m_mm;
 };
 
 } // asset

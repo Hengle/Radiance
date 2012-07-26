@@ -99,9 +99,7 @@ StringTable::LangId App::LoadLangId(int *enabledLangMask, StringTable::LangId de
 	if (enabledLangMask)
 		*enabledLangMask = StringTable::LangFlag_EN;
 
-	char nativePath[file::MaxFilePathLen+1];
-	file::ExpandToNativePath("9:/languages.txt", nativePath, file::MaxFilePathLen+1);
-	FILE *fp = fopen(nativePath, "rb");
+	FILE *fp = engine->sys->files->fopen("@r:/languages.txt", "rb");
 	if (!fp)	
 		return ErrLang;
 	fseek(fp, 0, SEEK_END);

@@ -71,7 +71,7 @@ int T_Precache::Tick(Entity &e, float dt, const xtime::TimeSlice &time, int flag
 {
 	if (!m_asset)
 	{
-		m_r = pkg::SR_MissingFile;
+		m_r = pkg::SR_FileNotFound;
 		return TickPop;
 	}
 

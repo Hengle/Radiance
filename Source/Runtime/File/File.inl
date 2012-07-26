@@ -3,12 +3,14 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include "../PushSystemMacros.h"
+
 namespace file {
 
 inline FileSystem::~FileSystem() {
 }
 
-inline string::String FileSystem::Alias(char name) {
+inline String FileSystem::Alias(char name) {
 	return m_aliasTable[name];
 }
 
@@ -27,8 +29,18 @@ inline MMFile::MMFile() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline MMapping::MMapping(const void *data, AddrSize size, AddrSize offset)
-: m_data(data), m_size(size), m_offset(offset) {
+inline MMapping::MMapping(
+	const void *data, 
+	AddrSize size, 
+	AddrSize offset, 
+	AddrSize backingSize,
+	::Zone &zone
+) : m_data(data), m_size(size), m_offset(offset), m_backingSize(backingSize), m_zone(zone) {
+	m_zone.Inc(backingSize, 0);
+}
+
+inline MMapping::~MMapping() {
+	m_zone.Dec(m_backingSize, 0);
 }
 
 inline const void *MMapping::RAD_IMPLEMENT_GET(data) {
@@ -80,6 +92,10 @@ inline UReg FILEInputBuffer::InStatus() const {
 	return m_fp ? stream::StatusInputOpen : 0;
 }
 
+inline FILE *FILEInputBuffer::RAD_IMPLEMENT_GET(fp) {
+	return m_fp;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 inline stream::SPos FILEOutputBuffer::OutPos() const {
@@ -98,4 +114,10 @@ inline UReg FILEOutputBuffer::OutStatus() const {
 	return m_fp ? stream::StatusOutputOpen : 0;
 }
 
+inline FILE *FILEOutputBuffer::RAD_IMPLEMENT_GET(fp) {
+	return m_fp;
+}
+
 } // file
+
+#include "../PopSystemMacros.h"

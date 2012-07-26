@@ -439,7 +439,7 @@ Sound::~Sound() {
 
 	}
 
-	m_ib.Close();
+	m_ib.reset();
 	
 	if (m_vbd)
 		delete m_vbd;
@@ -502,9 +502,8 @@ bool Sound::InitStreaming(
 	asset::MusicParser::Ref parser = asset::MusicParser::Cast(asset);
 	if (!parser || !parser->file.get())
 		return false;
-	m_ib = App::Get()->engine->sys->files->SafeCreateStreamBuffer(8*Kilo, ZMusic);
-	m_ib->Bind(parser->file.get());
-	m_is = new (ZMusic) stream::InputStream(m_ib->buffer);
+	m_ib.reset(new (ZSound) file::MMFileInputBuffer(parser->file, 256*Kilo, ZSound));
+	m_is = new (ZMusic) stream::InputStream(*m_ib);
 	if (!m_is)
 		return false;
 	m_vbd = new (ZMusic) audio_codec::ogg_vorbis::Decoder();

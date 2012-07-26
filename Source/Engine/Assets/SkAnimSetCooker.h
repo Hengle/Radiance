@@ -11,14 +11,12 @@
 
 namespace asset {
 
-class RADENG_CLASS SkAnimSetCooker : public pkg::Cooker
-{
+class RADENG_CLASS SkAnimSetCooker : public pkg::Cooker {
 public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
+	enum {
 		AssetType = AT_SkAnimSet
 	};
 

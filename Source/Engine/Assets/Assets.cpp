@@ -31,18 +31,15 @@
 namespace asset {
 
 #if defined(RAD_OPT_TOOLS)
-RADENG_API const char * RADENG_CALL TypeString(Type type)
-{
+RADENG_API const char * RADENG_CALL TypeString(Type type) {
 	RAD_ASSERT(type < AT_Max);
 	return s_strings[type];
 }
 
-RADENG_API Type RADENG_CALL TypeFromName(const char *str)
-{
+RADENG_API Type RADENG_CALL TypeFromName(const char *str) {
 	RAD_ASSERT(str);
 
-	for (int i = 0; i < AT_Max; ++i)
-	{
+	for (int i = 0; i < AT_Max; ++i) {
 		if (!string::cmp(s_strings[i], str)) 
 			return (Type)i;
 	}
@@ -53,8 +50,7 @@ RADENG_API Type RADENG_CALL TypeFromName(const char *str)
 
 void RB_RegisterParsers(Engine&);
 
-RADENG_API void RADENG_CALL RegisterParsers(Engine &engine)
-{
+RADENG_API void RADENG_CALL RegisterParsers(Engine &engine) {
 	TextureParser::Register(engine);
 #if defined(RAD_OPT_TOOLS)
 	MapParser::Register(engine);

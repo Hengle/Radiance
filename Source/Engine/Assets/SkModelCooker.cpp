@@ -14,16 +14,13 @@ using namespace pkg;
 
 namespace asset {
 
-SkModelCooker::SkModelCooker() : Cooker(2)
-{
+SkModelCooker::SkModelCooker() : Cooker(2) {
 }
 
-SkModelCooker::~SkModelCooker()
-{
+SkModelCooker::~SkModelCooker() {
 }
 
-CookStatus SkModelCooker::CheckRebuild(int flags, int allflags)
-{
+CookStatus SkModelCooker::CheckRebuild(int flags, int allflags) {
 	if (CompareVersion(flags) || 
 		CompareModifiedTime(flags) || 
 		CompareCachedFileTimeKey(flags, "Mesh.Source.File"))
@@ -31,13 +28,12 @@ CookStatus SkModelCooker::CheckRebuild(int flags, int allflags)
 	return CS_UpToDate;
 }
 
-CookStatus SkModelCooker::Status(int flags, int allflags)
-{
+CookStatus SkModelCooker::Status(int flags, int allflags) {
 	flags &= P_AllTargets;
 	allflags &= P_AllTargets;
 
-	if (flags == 0)
-	{ // generic only gets cooked if all platforms are identical
+	if (flags == 0) { 
+		// generic only gets cooked if all platforms are identical
 		if (MatchTargetKeys(allflags, allflags)==allflags)
 			return CheckRebuild(flags, allflags);
 		return CS_Ignore;
@@ -47,8 +43,7 @@ CookStatus SkModelCooker::Status(int flags, int allflags)
 		return CS_Ignore; // generics are selected
 
 	// only build ipad if different from iphone
-	if ((flags&P_TargetIPad) && (allflags&P_TargetIPhone))
-	{
+	if ((flags&P_TargetIPad) && (allflags&P_TargetIPhone)) {
 		if (MatchTargetKeys(P_TargetIPad, P_TargetIPhone))
 			return CS_Ignore;
 	}
@@ -56,8 +51,7 @@ CookStatus SkModelCooker::Status(int flags, int allflags)
 	return CS_NeedRebuild;
 }
 
-int SkModelCooker::Compile(int flags, int allflags)
-{
+int SkModelCooker::Compile(int flags, int allflags) {
 	// Make sure these get updated
 	CompareVersion(flags);
 	CompareModifiedTime(flags);
@@ -71,7 +65,7 @@ int SkModelCooker::Compile(int flags, int allflags)
 
 	Asset::Ref skaRef = engine->sys->packages->Resolve(s->c_str, asset->zone);
 	if (!skaRef)
-		return SR_MissingFile;
+		return SR_FileNotFound;
 
 	int r = skaRef->Process(
 		xtime::TimeSlice::Infinite,
@@ -100,26 +94,17 @@ int SkModelCooker::Compile(int flags, int allflags)
 	if (!s)
 		return SR_MetaError;
 
-	int media = file::AllMedia;
-	file::HStreamInputBuffer ib;
-
-	r = engine->sys->files->OpenFileStream(
-		s->c_str,
-		media,
-		ib,
-		file::HIONotify()
-	);
-
-	if (r < file::Success)
-		return r;
-
-	stream::InputStream is (ib->buffer);
+	file::MMFileInputBuffer::Ref ib = engine->sys->files->OpenInputBuffer(s->c_str, ZTools);
+	if (!ib)
+		return SR_FileNotFound;
+	
+	stream::InputStream is (*ib);
 
 	tools::Map map;
 	if (!tools::LoadMaxScene(is, map, false))
 		return SR_ParseError;
 
-	ib.Close();
+	ib.reset();
 
 	tools::SkmData::Ref skmd = tools::CompileSkmData(
 		asset->name,
@@ -160,21 +145,18 @@ int SkModelCooker::Compile(int flags, int allflags)
 
 	// add material imports
 
-	for (ska::DMesh::Vec::const_iterator it = skmd->dskm.meshes.begin(); it != skmd->dskm.meshes.end(); ++it)
-	{
+	for (ska::DMesh::Vec::const_iterator it = skmd->dskm.meshes.begin(); it != skmd->dskm.meshes.end(); ++it) {
 		AddImport((*it).material, flags);
 	}
 
 	return SR_Success;
 }
 
-int SkModelCooker::MatchTargetKeys(int flags, int allflags)
-{
+int SkModelCooker::MatchTargetKeys(int flags, int allflags) {
 	return asset->entry->MatchTargetKeys<String>("Mesh.Source.File", flags, allflags);
 }
 
-void SkModelCooker::Register(Engine &engine)
-{
+void SkModelCooker::Register(Engine &engine) {
 	static pkg::Binding::Ref binding = engine.sys->packages->BindCooker<SkModelCooker>();
 }
 

@@ -15,19 +15,13 @@ class Engine;
 
 namespace asset {
 
-class RADENG_CLASS MapCooker : public pkg::Cooker
-{
+class RADENG_CLASS MapCooker : public pkg::Cooker {
 public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
-		AssetType = AT_Map
-	};
-
-	enum
-	{
+	enum {
+		AssetType = AT_Map,
 		SR_End = pkg::SR_User
 	};
 

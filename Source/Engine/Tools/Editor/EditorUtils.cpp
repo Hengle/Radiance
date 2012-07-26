@@ -393,12 +393,12 @@ void PostInputEvent(QKeyEvent *event, Game &game, bool press)
 	game.PostInputEvent(i);
 }
 
-pkg::PackageManRef Packages()
+const pkg::PackageManRef &Packages()
 {
 	return App::Get()->engine->sys->packages;
 }
 
-file::HFileSystem Files()
+const file::FileSystem::Ref &Files()
 {
 	return App::Get()->engine->sys->files;
 }
@@ -410,15 +410,12 @@ r::HRenderer Renderer()
 
 String ExpandBaseDir(const char *append)
 {
-	String dir(CStr("9:/"));
-	dir += Files()->hddRoot.get();
-	char native[file::MaxFilePathLen+1];
-	if (file::ExpandToNativePath(dir.c_str, native, file::MaxFilePathLen+1))
+	String native;
+	if (Files()->ExpandToNativePath("", native, file::kFileMask_Base))
 	{
 		if (append)
-			string::cat(native, append);
-
-		return String(native);
+			native += append;
+		return native;
 	}
 
 	return String();
@@ -431,27 +428,13 @@ bool IsGuiThread()
 
 bool LoadPixmap(const char *filename, QPixmap &pixmap)
 {
-	int media = file::AllMedia;
-	file::HBufferedAsyncIO buf;
-
-	int r = Files()->LoadFile(
-		filename,
-		media,
-		buf,
-		file::HIONotify()
-	);
-
-	if (r == file::Pending)
-	{
-		buf->WaitForCompletion();
-		r = buf->result;
-	}
-
-	if (r != file::Success) return false;
+	file::MMapping::Ref mm = Files()->MapFile(filename, ZTools);
+	if (!mm)
+		return false;
 
 	return pixmap.loadFromData(
-		(const uchar*)buf->data->ptr.get(),
-		(uint)buf->data->size.get()
+		(const uchar*)mm->data.get(),
+		(uint)mm->size.get()
 	);
 }
 

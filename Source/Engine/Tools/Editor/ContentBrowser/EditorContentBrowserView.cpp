@@ -1478,24 +1478,15 @@ void ContentBrowserView::LoadIcons()
 
 	for (int i = 0; i < I_Max; ++i)
 	{
-		int media = file::AllMedia;
-		file::HBufferedAsyncIO buf;
-		file::Result r = Files()->LoadFile(
-			s_filenames[i],
-			media,
-			buf,
-			file::HIONotify()
-		);
+		file::MMapping::Ref mm = Files()->MapFile(s_filenames[i], ZTools);
 
-		if (r >= file::Success)
+		if (mm)
 		{
-			buf->WaitForCompletion();
-
 			image_codec::Image img;
 
 			if (image_codec::png::Decode(
-				buf->data->ptr,
-				buf->data->size,
+				mm->data,
+				mm->size,
 				img
 			))
 			{

@@ -36,8 +36,8 @@ CookStatus MeshCooker::Status(int flags, int allflags)
 	flags &= P_AllTargets;
 	allflags &= P_AllTargets;
 
-	if (flags == 0)
-	{ // generic only gets cooked if all platforms are identical
+	if (flags == 0) { 
+		// generic only gets cooked if all platforms are identical
 		if (MatchTargetKeys(allflags, allflags)==allflags)
 			return CheckRebuild(flags, allflags);
 		return CS_Ignore;
@@ -47,8 +47,7 @@ CookStatus MeshCooker::Status(int flags, int allflags)
 		return CS_Ignore; // generics are selected
 
 	// only build ipad if different from iphone
-	if ((flags&P_TargetIPad) && (allflags&P_TargetIPhone))
-	{
+	if ((flags&P_TargetIPad) && (allflags&P_TargetIPhone)) {
 		if (MatchTargetKeys(P_TargetIPad, P_TargetIPhone))
 			return CS_Ignore;
 	}
@@ -67,20 +66,11 @@ int MeshCooker::Compile(int flags, int allflags)
 	if (!s || s->empty)
 		return SR_MetaError;
 
-	int media = file::AllMedia;
-	file::HStreamInputBuffer ib;
+	file::MMFileInputBuffer::Ref ib = engine->sys->files->OpenInputBuffer(s->c_str, ZTools);
+	if (!ib)
+		return SR_FileNotFound;
 
-	int r = engine->sys->files->OpenFileStream(
-		s->c_str,
-		media,
-		ib,
-		file::HIONotify()
-	);
-
-	if (r < file::Success)
-		return r;
-
-	stream::InputStream is(ib->buffer);
+	stream::InputStream is(*ib);
 
 	tools::MapRef map(new (ZTools) tools::Map());
 	tools::MapVec vec;
@@ -88,7 +78,7 @@ int MeshCooker::Compile(int flags, int allflags)
 	if (!tools::LoadMaxScene(is, *map, false))
 		return SR_ParseError;
 
-	ib.Close();
+	ib.reset();
 
 	vec.push_back(map);
 	tools::DMeshBundleData::Ref bundleData = tools::CompileMeshBundle(asset->path, vec);
@@ -107,21 +97,18 @@ int MeshCooker::Compile(int flags, int allflags)
 		return SR_IOError;
 
 	// add material imports
-	for (DMesh::Vec::const_iterator it = bundleData->bundle.meshes.begin(); it != bundleData->bundle.meshes.end(); ++it)
-	{
+	for (DMesh::Vec::const_iterator it = bundleData->bundle.meshes.begin(); it != bundleData->bundle.meshes.end(); ++it) {
 		AddImport((*it).material, flags);
 	}
 
 	return SR_Success;
 }
 
-int MeshCooker::MatchTargetKeys(int flags, int allflags)
-{
+int MeshCooker::MatchTargetKeys(int flags, int allflags) {
 	return asset->entry->MatchTargetKeys<String>("Source.File", flags, allflags);
 }
 
-void MeshCooker::Register(Engine &engine)
-{
+void MeshCooker::Register(Engine &engine) {
 	static pkg::Binding::Ref binding = engine.sys->packages->BindCooker<MeshCooker>();
 }
 

@@ -14,13 +14,11 @@ using namespace pkg;
 
 namespace asset {
 
-SoundParser::SoundParser() : m_loaded(false)
-{
+SoundParser::SoundParser() : m_loaded(false) {
 	m_data.bytes = 0;
 }
 
-SoundParser::~SoundParser()
-{
+SoundParser::~SoundParser() {
 }
 
 int SoundParser::Process(
@@ -28,25 +26,22 @@ int SoundParser::Process(
 	Engine &engine, 
 	const pkg::Asset::Ref &asset, 
 	int flags
-)
-{
-	if (flags&(P_Unload|P_Trim))
-	{
+) {
+	if (flags&(P_Unload|P_Trim)) {
 #if defined(RAD_OPT_TOOLS)
 		if (m_ib)
 			zone_free(m_data.bytes);
-		m_ib.Close();
+		m_ib.reset();
 		m_decoder.Finalize();
 		m_decodeOfs = 0;
 #endif
 
 		m_data.bytes = 0;
-		m_buf.Close();
+		m_mm.reset();
 		return SR_Success;
 	}
 
-	if (flags&(P_Load|P_Parse) && !m_loaded)
-	{
+	if (flags&(P_Load|P_Parse) && !m_loaded) {
 #if defined(RAD_OPT_TOOLS)
 		if (!asset->cooked)
 			return Load(time, engine, asset, flags);
@@ -63,29 +58,19 @@ int SoundParser::Load(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
-	if (!m_ib)
-	{
+) {
+	if (!m_ib) {
 		const String *s = asset->entry->KeyValue<String>("Source.File", P_TARGET_FLAGS(flags));
 		if (!s)
 			return SR_MetaError;
 
-		int media = file::AllMedia;
-		int r = engine.sys->files->OpenFileStream(
-			s->c_str,
-			media,
-			m_ib,
-			file::HIONotify()
-		);
+		m_ib = engine.sys->files->OpenInputBuffer(s->c_str, ZSound);
+		if (!m_ib)
+			return SR_FileNotFound;
 
-		if (r != SR_Success)
-			return r;
-
-		m_is.SetBuffer(m_ib->buffer);
-		if (!m_decoder.Initialize(m_is))
-		{
-			m_ib.Close();
+		m_is.SetBuffer(*m_ib);
+		if (!m_decoder.Initialize(m_is)) {
+			m_ib.reset();
 			return SR_InvalidFormat;
 		}
 
@@ -94,19 +79,17 @@ int SoundParser::Load(
 		m_decodeOfs = 0;
 	}
 
-	enum { BlockSize = 64*Kilo };
+	enum { kBlockSize = 64*Kilo };
 
-	while (m_decodeOfs < m_header.numBytes && time.remaining)
-	{
-		AddrSize reqBytes = (AddrSize)std::min<int>(BlockSize, (m_header.numBytes-m_decodeOfs));
+	while (m_decodeOfs < m_header.numBytes && time.remaining) {
+		AddrSize reqBytes = (AddrSize)std::min<int>(kBlockSize, (m_header.numBytes-m_decodeOfs));
 		AddrSize bytesDecoded;
 
-		if (!m_decoder.Decode(m_data.bytes+m_decodeOfs, reqBytes, bytesDecoded) || (bytesDecoded != reqBytes))
-		{
+		if (!m_decoder.Decode(m_data.bytes+m_decodeOfs, reqBytes, bytesDecoded) || (bytesDecoded != reqBytes)) {
 			zone_free(m_data.bytes);
 			m_data.bytes = 0;
 			m_decoder.Finalize();
-			m_ib.Close();
+			m_ib.reset();
 			return SR_InvalidFormat;
 		}
 
@@ -124,47 +107,25 @@ int SoundParser::LoadCooked(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
-	if (!m_buf)
-	{
+) {
+	if (!m_mm) {
 		String path(CStr("Cooked/"));
 		path += CStr(asset->path);
 		path += ".bin";
 
-		int media = file::AllMedia;
-		int r = engine.sys->files->LoadFile(
-			path.c_str,
-			media,
-			m_buf,
-			file::HIONotify(),
-			8,
-			ZSound
-		);
-
-		if (r < SR_Success)
-			return r;
+		m_mm = engine.sys->files->MapFile(path.c_str, ZSound);
+		if (!m_mm)
+			return SR_FileNotFound;
 	}
-
-	if (m_buf->result == SR_Pending)
-	{
-		if (time.infinite)
-			m_buf->WaitForCompletion();
-		else
-			return SR_Pending;
-	}
-
-	if (m_buf->result < SR_Success)
-		return m_buf->result;
 
 	const int HeaderSize = sizeof(audio_codec::SoundHeader);
 
-	if (m_buf->data->size < HeaderSize)
+	if (m_mm->size < HeaderSize)
 		return SR_CorruptFile;
-	m_header = *reinterpret_cast<const audio_codec::SoundHeader*>(m_buf->data->ptr.get());
-	m_data.cvoid = reinterpret_cast<const U8*>(m_buf->data->ptr.get()) + HeaderSize;
+	m_header = *reinterpret_cast<const audio_codec::SoundHeader*>(m_mm->data.get());
+	m_data.cvoid = reinterpret_cast<const U8*>(m_mm->data.get()) + HeaderSize;
 
-	if ((HeaderSize+m_header.numBytes) > (int)m_buf->data->size.get())
+	if ((HeaderSize+m_header.numBytes) > (int)m_mm->size.get())
 		return SR_CorruptFile;
 
 	m_loaded = true;

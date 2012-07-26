@@ -38,7 +38,8 @@ public:
 	static App *Get(int argc = 0, const char **argv = 0);
 	static void DestroyInstance();
 	static void DumpMemStats(int level);
-	static StringTable::LangId LoadLangId(int *enabledLangMask, StringTable::LangId defaultLangId);
+
+	StringTable::LangId LoadLangId(int *enabledLangMask, StringTable::LangId defaultLangId);
 
 	// Tickable
 	void Push(const Tickable::Ref &state);

@@ -113,7 +113,7 @@ int WorldDraw::LoadMaterials()
 	if (!m_wireframeAsset || m_wireframeAsset->type != asset::AT_Material)
 	{
 		COut(C_Error) << "Error: Unable to load Sys/DebugWireframe_M." << std::endl;
-		return pkg::SR_MissingFile;
+		return pkg::SR_FileNotFound;
 	}
 	
 	int r = m_wireframeAsset->Process(

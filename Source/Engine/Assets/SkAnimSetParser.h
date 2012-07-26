@@ -7,27 +7,25 @@
 
 #include "AssetTypes.h"
 #include "../Packages/Packages.h"
-#include "../FileSystem/FileSystem.h"
 #include "../SkAnim/SkAnim.h"
 
 #if defined(RAD_OPT_TOOLS)
 #include "../SkAnim/SkBuilder.h"
 #endif
 
+#include <Runtime/File.h>
 #include <Runtime/PushPack.h>
 
 namespace asset  {
 
 class SkAnimSetCooker;
 
-class RADENG_CLASS SkAnimSetParser : public pkg::Sink<SkAnimSetParser>
-{
+class RADENG_CLASS SkAnimSetParser : public pkg::Sink<SkAnimSetParser> {
 public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
+	enum {
 		SinkStage = pkg::SS_Parser,
 		AssetType = AT_SkAnimSet
 	};
@@ -70,17 +68,25 @@ private:
 	friend class SkAnimSetCooker;
 
 #if defined(RAD_OPT_TOOLS)
-	RAD_DECLARE_GET(valid, bool) { return m_skad||m_load; }
-	RAD_DECLARE_GET(dska, const ska::DSka*) { return m_skad ? &m_skad->dska : &m_ska; }
+	RAD_DECLARE_GET(valid, bool) { 
+		return m_skad||m_load; 
+	}
+	RAD_DECLARE_GET(dska, const ska::DSka*) { 
+		return m_skad ? &m_skad->dska : &m_ska; 
+	}
 	tools::SkaData::Ref m_skad;
 #else
-	RAD_DECLARE_GET(valid, bool) { return m_load; }
-	RAD_DECLARE_GET(dska, const ska::DSka*) { return &m_ska; }
+	RAD_DECLARE_GET(valid, bool) { 
+		return m_load; 
+	}
+	RAD_DECLARE_GET(dska, const ska::DSka*) { 
+		return &m_ska; 
+	}
 #endif
 
 	bool m_load;
 	ska::DSka m_ska;
-	file::HBufferedAsyncIO m_buf;
+	file::MMapping::Ref m_mm;
 };
 
 } // asset

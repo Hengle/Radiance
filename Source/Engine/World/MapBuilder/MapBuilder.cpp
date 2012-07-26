@@ -83,21 +83,14 @@ bool MapBuilder::LoadScene(const world::EntSpawn &spawn)
 	String path(CStr(sz));
 	path += ".3dx";
 
-	file::HStreamInputBuffer fs;
-	int media = file::AllMedia;
-
-	if (m_e.sys->files->OpenFileStream(
-		path.c_str,
-		media,
-		fs,
-		file::HIONotify()
-	) < file::Success)
+	file::MMFileInputBuffer::Ref ib = m_e.sys->files->OpenInputBuffer(path.c_str, ZTools);
+	if (!ib)
 	{
 		COut(C_Error) << "ERROR: unable to open '" << sz << "'" << std::endl;
 		return false;
 	}
 
-	stream::InputStream is(fs->buffer);
+	stream::InputStream is(*ib);
 
 	return LoadMaxScene(is, m_map, false);
 }

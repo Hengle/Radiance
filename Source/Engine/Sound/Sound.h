@@ -7,9 +7,9 @@
 
 #include "../Types.h"
 #include "../Packages/PackagesDef.h"
-#include "../FileSystem/FileSystem.h"
 #include "SoundDef.h"
 #include "ALDriver.h"
+#include <Runtime/File.h>
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/Container/ZoneList.h>
 #include <Runtime/Container/ZoneMap.h>
@@ -275,7 +275,7 @@ private:
 	stream::InputStream *m_is;
 	audio_codec::ogg_vorbis::Decoder *m_vbd;
 	audio_codec::ogg_vorbis::BSI *m_bsi;
-	file::HStreamInputBuffer m_ib;
+	file::MMFileInputBuffer::Ref m_ib;
 	void *m_blockData;
 	AddrSize m_decodeOfs;
 	bool m_eos;

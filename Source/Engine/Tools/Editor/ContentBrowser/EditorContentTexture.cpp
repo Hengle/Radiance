@@ -136,16 +136,10 @@ RADENG_API pkg::IdVec RADENG_CALL CreateTextures(QWidget *parent, const pkg::Pac
 	QString nativePrefix;
 	
 	{
-		nativePrefix = QString("9:/") + Files()->hddRoot.get();
-		char native[file::MaxFilePathLen+1];
-		if (!file::ExpandToNativePath(nativePrefix.toAscii().constData(), native, file::MaxFilePathLen+1))
-			return ids;
-		nativePrefix = native;
-		for (int i = 0; i < nativePrefix.length(); ++i)
-		{
-			if (nativePrefix[i] == '\\')
-				nativePrefix[i] = '/';
-		}
+		String nativePath;
+		Files()->ExpandToNativePath("", nativePath, file::kFileMask_Base);
+		nativePrefix = nativePath.c_str.get();
+		nativePrefix.replace('\\', '/');
 	}
 
 	fd.setDirectory(nativePrefix + QString("/Textures"));

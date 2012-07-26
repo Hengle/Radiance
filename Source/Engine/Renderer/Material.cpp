@@ -147,20 +147,11 @@ Material::ShaderInstance::Ref Material::ShaderInstance::FindOrCreate(Engine &eng
 		String path;
 		path.Printf("Shaders/%d.bin", m.shaderId.get());
 
-		file::HStreamInputBuffer ib;
-
-		int media = file::AllMedia;
-		int z = engine.sys->files->OpenFileStream(
-			path.c_str,
-			media,
-			ib,
-			file::HIONotify()
-		);
-
-		if (z != pkg::SR_Success)
+		file::MMFileInputBuffer::Ref ib = engine.sys->files->OpenInputBuffer(path.c_str, ZTools);
+		if (!ib)
 			return Ref();
 
-		stream::InputStream is(ib->buffer);
+		stream::InputStream is(*ib);
 
 		Shader::Ref shader = LoadCooked(
 			engine,
@@ -205,14 +196,13 @@ int Material::ShaderInstance::Cook(const char *path, Engine &engine, const Mater
 	
 	String spath;
 	spath.Printf("%s/%d.bin", path, r->idx);
-	char nativePath[file::MaxFilePathLen+1];
-	file::ExpandToNativePath(spath.c_str, nativePath, file::MaxFilePathLen+1);
 
-	FILE *fp = fopen(nativePath, "wb");
+	FILE *fp = engine.sys->files->fopen(spath.c_str, "wb");
+	
 	if (!fp)
 		return -1;
 
-	file::stream::OutputBuffer ob(fp);
+	file::FILEOutputBuffer ob(fp);
 	stream::OutputStream os(ob);
 
 	bool s = false;

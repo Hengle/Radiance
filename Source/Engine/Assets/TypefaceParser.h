@@ -7,23 +7,21 @@
 
 #include "AssetTypes.h"
 #include "../Packages/Packages.h"
-#include "../FileSystem/FileSystem.h"
 #include "../Renderer/Material.h"
 #include <Runtime/Font/FontDef.h>
+#include <Runtime/File.h>
 #include <Runtime/PushPack.h>
 
 class Engine;
 
 namespace asset {
 
-class RADENG_CLASS TypefaceParser : public pkg::Sink<TypefaceParser>
-{
+class RADENG_CLASS TypefaceParser : public pkg::Sink<TypefaceParser> {
 public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
+	enum {
 		SinkStage = pkg::SS_Parser,
 		AssetType = AT_Typeface
 	};
@@ -68,13 +66,33 @@ protected:
 
 private:
 
-	RAD_DECLARE_GET(font, font::Font*) { return m_font; }
-	RAD_DECLARE_GET(fontAsset, const pkg::AssetRef&) { return m_fontRef; }
-	RAD_DECLARE_GET(material, r::Material*) { return m_mat; }
-	RAD_DECLARE_GET(materialAsset, const pkg::AssetRef&) { return m_matRef; }
-	RAD_DECLARE_GET(width, int) { return m_width; }
-	RAD_DECLARE_GET(height, int) { return m_height; }
-	RAD_DECLARE_GET(valid, bool) { return m_font&&m_mat; }
+	RAD_DECLARE_GET(font, font::Font*) { 
+		return m_font; 
+	}
+
+	RAD_DECLARE_GET(fontAsset, const pkg::AssetRef&) { 
+		return m_fontRef; 
+	}
+
+	RAD_DECLARE_GET(material, r::Material*) { 
+		return m_mat; 
+	}
+
+	RAD_DECLARE_GET(materialAsset, const pkg::AssetRef&) { 
+		return m_matRef; 
+	}
+
+	RAD_DECLARE_GET(width, int) { 
+		return m_width; 
+	}
+
+	RAD_DECLARE_GET(height, int) { 
+		return m_height; 
+	}
+
+	RAD_DECLARE_GET(valid, bool) { 
+		return m_font&&m_mat; 
+	}
 
 	pkg::Asset::Ref m_fontRef;
 	pkg::Asset::Ref m_matRef;

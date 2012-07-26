@@ -88,12 +88,6 @@
     <Filter Include="Source\Engine\Assets">
       <UniqueIdentifier>{1086c941-d18a-439e-a341-121899e4f2b6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Engine\FileSystem">
-      <UniqueIdentifier>{45641f75-eacb-44fa-8936-13ae33a33b0d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Engine\FileSystem\Backend">
-      <UniqueIdentifier>{e9d3efeb-9f7c-4108-b02e-60cef0965a9d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\Engine\Game">
       <UniqueIdentifier>{66361601-89b9-484b-a2e9-e73ea807c5c5}</UniqueIdentifier>
     </Filter>
@@ -512,27 +506,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Runtime\Endian\IntEndian.h">
       <Filter>Source\Runtime\Endian</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Runtime\File\FileStream.h">
-      <Filter>Source\Runtime\File</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Runtime\File\FileStreamDef.h">
-      <Filter>Source\Runtime\File</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Runtime\File\IntFile.h">
-      <Filter>Source\Runtime\File</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Runtime\File\PrivateFile.h">
-      <Filter>Source\Runtime\File</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Runtime\File\Backend.h">
-      <Filter>Source\Runtime\File</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Runtime\File\File.h">
-      <Filter>Source\Runtime\File</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Runtime\File\FileDef.h">
-      <Filter>Source\Runtime\File</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Runtime\Font\Font.h">
       <Filter>Source\Runtime\Font</Filter>
@@ -1041,24 +1014,6 @@
     <ClInclude Include="..\..\Engine\Assets\TypefaceParser.h">
       <Filter>Source\Engine\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\FileSystem\DPak.h">
-      <Filter>Source\Engine\FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\FileSystem\DPakDef.h">
-      <Filter>Source\Engine\FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\FileSystem\FileSystem.h">
-      <Filter>Source\Engine\FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\FileSystem\FileSystemDef.h">
-      <Filter>Source\Engine\FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\FileSystem\Backend\DPak.h">
-      <Filter>Source\Engine\FileSystem\Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\FileSystem\Backend\FileSystem.h">
-      <Filter>Source\Engine\FileSystem\Backend</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\Game\Game.h">
       <Filter>Source\Engine\Game</Filter>
     </ClInclude>
@@ -1422,6 +1377,15 @@
     <ClInclude Include="..\..\Runtime\Base\EnumFlags.h">
       <Filter>Source\Runtime\Base</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Runtime\File\File.h">
+      <Filter>Source\Runtime\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Runtime\File\FileDef.h">
+      <Filter>Source\Runtime\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Runtime\File\IntFile.h">
+      <Filter>Source\Runtime\File</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -1492,12 +1456,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Runtime\Endian\Endian.cpp">
       <Filter>Source\Runtime\Endian</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Runtime\File\FileStream.cpp">
-      <Filter>Source\Runtime\File</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Runtime\File\File.cpp">
-      <Filter>Source\Runtime\File</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Runtime\Font\Font.cpp">
       <Filter>Source\Runtime\Font</Filter>
@@ -1687,12 +1645,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\Assets\TypefaceParser.cpp">
       <Filter>Source\Engine\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\FileSystem\Backend\DPak.cpp">
-      <Filter>Source\Engine\FileSystem\Backend</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\FileSystem\Backend\FileSystem.cpp">
-      <Filter>Source\Engine\FileSystem\Backend</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Engine\Game\Game.cpp">
       <Filter>Source\Engine\Game</Filter>
@@ -2099,6 +2051,9 @@
     <ClCompile Include="..\..\Engine\Renderer\PC\RGLBackend.cpp">
       <Filter>Source\Engine\Renderer\PC</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Runtime\File\File.cpp">
+      <Filter>Source\Runtime\File</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Runtime\Base\Event.inl">
@@ -2166,12 +2121,6 @@
     </None>
     <None Include="..\..\Runtime\Endian\EndianStream.inl">
       <Filter>Source\Runtime\Endian</Filter>
-    </None>
-    <None Include="..\..\Runtime\File\FileStream.inl">
-      <Filter>Source\Runtime\File</Filter>
-    </None>
-    <None Include="..\..\Runtime\File\File.inl">
-      <Filter>Source\Runtime\File</Filter>
     </None>
     <None Include="..\..\Runtime\Font\Font.inl">
       <Filter>Source\Runtime\Font</Filter>
@@ -2352,6 +2301,9 @@
     </None>
     <None Include="..\..\Engine\World\Lua\LuaTask.inl">
       <Filter>Source\Engine\World\Lua</Filter>
+    </None>
+    <None Include="..\..\Runtime\File\File.inl">
+      <Filter>Source\Runtime\File</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

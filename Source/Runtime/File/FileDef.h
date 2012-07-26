@@ -11,6 +11,7 @@
 namespace file {
 
 RAD_ZONE_DEC(RADRT_API, ZFile);
+RAD_ZONE_DEC(RADRT_API, ZPakFile);
 
 class FileSystem;
 typedef boost::shared_ptr<FileSystem> FileSystemRef;
@@ -35,6 +36,10 @@ typedef boost::shared_ptr<FILEInputBuffer> FILEInputBufferRef;
 
 class FILEOutputBuffer;
 typedef boost::shared_ptr<FILEOutputBuffer> FILEOutputBufferRef;
+
+namespace details {
+class DetailsSearch;
+}
 
 enum {
 	RAD_FLAG(kFileMask_Base),
@@ -61,6 +66,7 @@ RAD_BEGIN_FLAGS
 	RAD_FLAG(kFileAttribute_Normal),
 	RAD_FLAG(kFileAttribute_ReadOnly),
 	RAD_FLAG(kFileAttribute_Directory),
+	RAD_FLAG(kFileAttribute_PakFile),
 	kFileAttributes_None = 0
 RAD_END_FLAGS(FileAttributes)
 

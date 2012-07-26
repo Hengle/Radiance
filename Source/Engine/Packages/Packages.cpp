@@ -8,7 +8,6 @@
 #include "../COut.h"
 #include <Runtime/File.h>
 #include <Runtime/DataCodec/LmpReader.h>
-#include "../FileSystem/FileSystem.h"
 #include "../Engine.h"
 #include <iostream>
 #undef max
@@ -19,12 +18,9 @@ RAD_ZONE_DEF(RADENG_API, ZPackages, "Packages", ZEngine);
 
 ///////////////////////////////////////////////////////////////////////////////
 
-RADENG_API int RADENG_CALL PlatformIndex(int plat)
-{
-	if (plat)
-	{
-		for (int i = 0; i < P_NumTargets; ++i)
-		{
+RADENG_API int RADENG_CALL PlatformIndex(int plat) {
+	if (plat) {
+		for (int i = 0; i < P_NumTargets; ++i) {
 			if ((P_FirstTarget<<i)&plat)
 				return i;
 		}
@@ -36,14 +32,11 @@ RADENG_API int RADENG_CALL PlatformIndex(int plat)
 SinkBase::Mutex SinkBase::s_m;
 SinkBase::MutexPool SinkBase::s_mp(ZPackages, "pkg-sink-mutex-pool", 8);
 
-SinkBase::Ref SinkBase::Cast(const Asset::Ref &asset, int stage)
-{
+SinkBase::Ref SinkBase::Cast(const Asset::Ref &asset, int stage) {
 	RAD_ASSERT(asset);
 	Asset::SinkMap::const_iterator it = asset->m_sinks.find(stage);
 	if (it != asset->m_sinks.end())
-	{
 		return it->second;
-	}
 	return SinkBase::Ref();
 }
 
@@ -52,13 +45,11 @@ int SinkBase::_Process(
 		Engine &engine,
 		const AssetRef &asset,
 		int flags
-)
-{
+) {
 	int r;
 	{
 		Lock L(s_m);
-		if (++m_c == 1)
-		{
+		if (++m_c == 1) {
 			RAD_ASSERT(!m_m);
 			m_m = s_mp.Construct();
 		}
@@ -77,8 +68,7 @@ int SinkBase::_Process(
 
 	{
 		Lock L(s_m);
-		if (--m_c == 0)
-		{
+		if (--m_c == 0) {
 			s_mp.Destroy(m_m);
 			m_m = 0;
 		}
@@ -89,8 +79,7 @@ int SinkBase::_Process(
 
 namespace details {
 
-SinkBase::Ref SinkFactoryBase::Cast(const AssetRef &asset)
-{
+SinkBase::Ref SinkFactoryBase::Cast(const AssetRef &asset) {
 	return SinkBaseHelper::Cast(asset, Stage());
 }
 
@@ -98,8 +87,7 @@ SinkBase::Ref SinkFactoryBase::Cast(const AssetRef &asset)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Package::Ref Package::New(const PackageManRef &pm, const char *path, const char *name)
-{
+Package::Ref Package::New(const PackageManRef &pm, const char *path, const char *name) {
 	return Ref(new (ZPackages) Package(pm, path, name));
 }
 
@@ -118,12 +106,10 @@ m_tickSize(0)
 	RAD_ASSERT(pm);
 }
 
-Package::~Package()
-{
+Package::~Package() {
 }
 
-Package::Entry::Ref Package::CreateEntry(const char *name, asset::Type type)
-{
+Package::Entry::Ref Package::CreateEntry(const char *name, asset::Type type) {
 	RAD_ASSERT(name);
 	details::WriteLock WL(m_m);
 
@@ -152,11 +138,9 @@ Package::Entry::Ref Package::CreateEntry(const char *name, asset::Type type)
 	return ref;
 }
 
-Asset::Ref Package::Asset(int id, Zone z) const
-{
+Asset::Ref Package::Asset(int id, Zone z) const {
 #if defined(RAD_OPT_PC_TOOLS)
-	if (z == Z_Unique)
-	{
+	if (z == Z_Unique) {
 		Entry::Ref entry = FindEntry(id);
 		if (!entry)
 			return Asset::Ref();
@@ -172,13 +156,11 @@ Asset::Ref Package::Asset(int id, Zone z) const
 
 	AssetIdWMap::const_iterator it = m_idAssets[z].find(id);
 
-	if (it == m_idAssets[z].end())
-	{
+	if (it == m_idAssets[z].end()) {
 		details::UpgradeToWriteLock WL(L);
 
 		it = m_idAssets[z].find(id);
-		if (it == m_idAssets[z].end())
-		{
+		if (it == m_idAssets[z].end()) {
 			Entry::Ref entry = FindEntry(id);
 			if (!entry)
 				return Asset::Ref();
@@ -198,13 +180,11 @@ Asset::Ref Package::Asset(int id, Zone z) const
 	return r;
 }
 
-Asset::Ref Package::Asset(const char *name, Zone z) const
-{
+Asset::Ref Package::Asset(const char *name, Zone z) const {
 	RAD_ASSERT(name);
 
 #if defined(RAD_OPT_PC_TOOLS)
-	if (z == Z_Unique)
-	{
+	if (z == Z_Unique) {
 		Entry::Ref entry = FindEntry(name);
 		if (!entry)
 			return Asset::Ref();
@@ -221,18 +201,14 @@ Asset::Ref Package::Asset(const char *name, Zone z) const
 
 	AssetWMap::const_iterator it = m_assets[z].find(_name);
 
-	if (it == m_assets[z].end())
-	{
+	if (it == m_assets[z].end()) {
 		details::UpgradeToWriteLock WL(L);
 
 		it = m_assets[z].find(_name);
-		if (it == m_assets[z].end())
-		{
+		if (it == m_assets[z].end()) {
 			Entry::Ref entry = FindEntry(name);
 			if (!entry)
-			{
 				return Asset::Ref();
-			}
 
 			Package *self = const_cast<Package*>(this);
 
@@ -249,8 +225,7 @@ Asset::Ref Package::Asset(const char *name, Zone z) const
 	return r;
 }
 
-Asset::Map Package::RefedAssets(Zone z) const
-{
+Asset::Map Package::RefedAssets(Zone z) const {
 #if defined(RAD_OPT_PC_TOOLS)
 	if (z == Z_Unique)
 		return Asset::Map();
@@ -261,11 +236,9 @@ Asset::Map Package::RefedAssets(Zone z) const
 
 	Asset::Map assets;
 	details::WriteLock L(m_m);
-	for (AssetWMap::const_iterator it = m_assets[z].begin(); it != m_assets[z].end(); ++it)
-	{
+	for (AssetWMap::const_iterator it = m_assets[z].begin(); it != m_assets[z].end(); ++it) {
 		Asset::Ref r(it->second.lock());
-		if (r)
-		{
+		if (r) {
 			RAD_VERIFY(assets.insert(Asset::Map::value_type(it->first, r)).second);
 		}
 	}
@@ -277,8 +250,7 @@ Asset::Map Package::RefedAssets(Zone z) const
 Asset::Ref Asset::New(
 	Zone z,
 	const Package::Entry::Ref &entry
-)
-{
+) {
 	Ref r(new (ZPackages) Asset (z, entry));
 	entry->m_pkg.lock()->m_pm.lock()->AllocSinks(r);
 	return r;
@@ -289,15 +261,13 @@ Asset::Asset(
 	const Package::Entry::Ref &entry
 ) :
 m_z(z),
-m_entry(entry)
-{
+m_entry(entry) {
 }
 
 int Asset::Process(
 	const xtime::TimeSlice &time,
 	int flags
-)
-{
+) {
 	return m_entry->m_pkg.lock()->m_pm.lock()->Process(
 		time,
 		shared_from_this(),
@@ -307,8 +277,7 @@ int Asset::Process(
 
 ///////////////////////////////////////////////////////////////////////////////
 
-PackageMan::Ref PackageMan::New(Engine &engine, const char *pkgDir)
-{
+PackageMan::Ref PackageMan::New(Engine &engine, const char *pkgDir) {
 	return Ref(new (ZPackages) PackageMan(engine, pkgDir));
 }
 
@@ -323,40 +292,31 @@ m_resavePackages(false)
 {
 }
 
-PackageMan::~PackageMan()
-{
+PackageMan::~PackageMan() {
 }
 
-bool PackageMan::Initialize()
-{
+bool PackageMan::Initialize() {
 	COut(C_Info) << "PackageMan: initializing packages..." << std::endl;
 
 #if defined(RAD_OPT_TOOLS)
 	if (!LoadKeyDefs())
-	{
 		return false;
-	}
 #endif
 
 	COut(C_Info) << "PackageMan: finished..." << std::endl;
-
 	return true;
 }
 
-Package::Ref PackageMan::ResolvePackage(const char *name, int flags)
-{
+Package::Ref PackageMan::ResolvePackage(const char *name, int flags) {
 	const String sname(name, string::RefTag);
 	details::ReadLock L(m_m);
 	Package::Map::iterator it = m_packages.find(sname);
 	if (it != m_packages.end())
-	{
 		return it->second;
-	}
 
 	details::UpgradeToWriteLock WL(L); // (+readers, writer)
 
-	if (flags&P_Load)
-	{
+	if (flags&P_Load) {
 #if defined(RAD_OPT_TOOLS)
 
 		// check to see if this is a case sensativity issue, like someone typed in
@@ -369,8 +329,7 @@ Package::Ref PackageMan::ResolvePackage(const char *name, int flags)
 
 		String extName(sname + ".pkg");
 		String path(m_pkgDir + "/" + extName);
-		if (m_engine.sys->files->FileExists(path.c_str, file::AllMedia))
-		{
+		if (m_engine.sys->files->FileExists(path.c_str, file::kFileOptions_None, file::kFileMask_Base)) {
 			EnumeratePackage(
 #if defined(RAD_OPT_PC_TOOLS)
 				tools::NullUIProgress,
@@ -401,8 +360,7 @@ int PackageMan::ProcessAll(
 	const xtime::TimeSlice &time,
 	int flags,
 	bool ignoreErrors
-)
-{
+) {
 
 #if defined(RAD_OPT_PC_TOOLS)
 	if (z == Z_Unique)
@@ -410,11 +368,11 @@ int PackageMan::ProcessAll(
 #endif
 
 	const Package::Map &pkgs = packages;
-	for (Package::Map::const_iterator it = pkgs.begin(); it != pkgs.end(); ++it)
-	{
+	for (Package::Map::const_iterator it = pkgs.begin(); it != pkgs.end(); ++it) {
+
 		const Package::Ref &pkg = it->second;
-		for (int curZone = (z==Z_All)?Z_First:z; curZone < Z_Max; ++curZone)
-		{
+		for (int curZone = (z==Z_All)?Z_First:z; curZone < Z_Max; ++curZone) {
+
 			Asset::Map assets(pkg->RefedAssets((Zone)curZone));
 			for (Asset::Map::const_iterator it2 = assets.begin(); it2 != assets.end(); ++it2)
 			{
@@ -424,9 +382,7 @@ int PackageMan::ProcessAll(
 				);
 
 				if (r < SR_Success && !ignoreErrors)
-				{
 					return r;
-				}
 			}
 
 			if (z != Z_All)
@@ -441,24 +397,21 @@ int PackageMan::Process(
 	const xtime::TimeSlice &time,
 	const Asset::Ref &asset,
 	int flags
-)
-{
+) {
 	RAD_ASSERT(!(flags&P_Unload));
 
 	bool alloc = (flags==P_SAlloc) ? true : false;
 	const SinkFactoryMap &factories = TypeSinks(asset->m_entry->type);
 
-	for (SinkFactoryMap::const_iterator it = factories.begin(); it != factories.end(); ++it)
-	{
+	for (SinkFactoryMap::const_iterator it = factories.begin(); it != factories.end(); ++it) {
 		const details::SinkFactoryBase::Ref &f = it->second;
 		SinkBase::Ref sink = f->Cast(asset);
 
 		if (!sink)
-		{
 			sink = AllocSink(f, asset);
-		}
 
-		if (alloc || !sink) continue;
+		if (alloc || !sink) 
+			continue;
 
 		int r = sink->_Process(
 			time,
@@ -468,29 +421,22 @@ int PackageMan::Process(
 		);
 
 		if (r != SR_Success)
-		{
 			return r;
-		}
 	}
 
 	return SR_Success;
 }
 
-void PackageMan::Unbind(Binding *binding)
-{
+void PackageMan::Unbind(Binding *binding) {
 	if (!binding->m_f)
 		return;
 
 	Asset::IdWMap *assets = binding->m_f->assets;
-	for (int i = 0; i < Z_Max; ++i)
-	{
-		while (!assets[i].empty())
-		{
+	for (int i = 0; i < Z_Max; ++i) {
+		while (!assets[i].empty()) {
 			Asset::Ref asset(assets[i].begin()->second);
 			if (asset)
-			{
 				asset->m_sinks.erase(binding->m_f->Stage());
-			}
 			assets[i].erase(assets[i].begin());
 		}
 	}
@@ -498,23 +444,18 @@ void PackageMan::Unbind(Binding *binding)
 	map.erase(binding->m_f->Stage());
 }
 
-PackageMan::SinkFactoryMap &PackageMan::TypeSinks(asset::Type type)
-{
+PackageMan::SinkFactoryMap &PackageMan::TypeSinks(asset::Type type) {
 	TypeSinkFactoryMap::iterator it = m_sinkFactoryMap.find(type);
 
 	if (it == m_sinkFactoryMap.end())
-	{
 		return m_sinkFactoryMap.insert(TypeSinkFactoryMap::value_type(type, SinkFactoryMap())).first->second;
-	}
 
 	return it->second;
 }
 
-SinkBase::Ref PackageMan::AllocSink(const details::SinkFactoryBase::Ref &f, const Asset::Ref &asset)
-{
+SinkBase::Ref PackageMan::AllocSink(const details::SinkFactoryBase::Ref &f, const Asset::Ref &asset) {
 	SinkBase::Ref state = f->New();
-	if (state)
-	{
+	if (state) {
 #if defined(RAD_OPT_PC_TOOLS)
 		if (asset->zone != Z_Unique)
 #endif
@@ -528,12 +469,10 @@ SinkBase::Ref PackageMan::AllocSink(const details::SinkFactoryBase::Ref &f, cons
 	return state;
 }
 
-void PackageMan::AllocSinks(const Asset::Ref &asset)
-{
+void PackageMan::AllocSinks(const Asset::Ref &asset) {
 	SinkFactoryMap &map = TypeSinks(asset->m_entry->type);
 
-	for (SinkFactoryMap::const_iterator it = map.begin(); it != map.end(); ++it)
-	{
+	for (SinkFactoryMap::const_iterator it = map.begin(); it != map.end(); ++it) {
 		AllocSink(it->second, asset);
 	}
 }
@@ -541,8 +480,7 @@ void PackageMan::AllocSinks(const Asset::Ref &asset)
 void PackageMan::LoadBin(
 	const char *name,
 	int loadFlags
-)
-{
+) {
 	// load package lump
 	String path(CStr("Packages/"));
 	path += name;
@@ -554,42 +492,35 @@ void PackageMan::LoadBin(
 		name
 	);
 
-	int media = file::AllMedia;
-	file::HStreamInputBuffer buf;
-	file::Result r = m_engine.sys->files->OpenFileStream(
+	file::MMFileInputBuffer::Ref ib = m_engine.sys->files->OpenInputBuffer(
 		path.c_str,
-		media,
-		buf,
-		file::HIONotify()
+		ZPackages,
+		1*Meg,
+		file::kFileOptions_None,
+		file::kFileMask_Base
 	);
 
-	if (r != file::Success)
-	{
+	if (!ib) {
 		COut(C_Error) << "Unable to open '" << path.c_str.get() << "'!" << std::endl;
 		return;
 	}
 
-	stream::InputStream is(buf->buffer);
+	stream::InputStream is(*ib);
 	
-	if (!pkg->m_lmpReader.LoadLumpInfo(LumpSig, LumpId, is, data_codec::lmp::LittleEndian))
-	{
+	if (!pkg->m_lmpReader.LoadLumpInfo(LumpSig, LumpId, is, data_codec::lmp::LittleEndian)) {
 		COut(C_Error) << "'" << path.c_str.get() << "' is not a valid package lump!" << std::endl;
 		return;
 	}
 
-	buf.Close();
+	ib.reset();
 
 	const data_codec::lmp::StreamReader::Lump *imports = 0;
 
-	for (U32 i = 0; i < pkg->m_lmpReader.NumLumps(); ++i)
-	{
+	for (U32 i = 0; i < pkg->m_lmpReader.NumLumps(); ++i) {
 		const data_codec::lmp::StreamReader::Lump *l = pkg->m_lmpReader.GetByIndex(i);
-		if (!string::cmp("@imports", l->Name()))
-		{
+		if (!string::cmp("@imports", l->Name())) {
 			imports = l;
-		}
-		else
-		{
+		} else {
 			const TagData *tag = (const TagData*)l->TagData();
 			if (!tag)
 			{
@@ -604,24 +535,19 @@ void PackageMan::LoadBin(
 			entry->m_cooked = true;
 #endif
 
-			for (U16 k = 0; k < tag->numImports; ++k)
-			{
+			for (U16 k = 0; k < tag->numImports; ++k) {
 				Package::Entry::Import import((int)tag->imports[k]);
 				entry->m_imports.push_back(import);
 			}
 
-			for (int k = 0; k < P_NumTargets+1; ++k)
-			{
+			for (int k = 0; k < P_NumTargets+1; ++k) {
 				if (tag->ofs[k] != 0)
-				{
 					entry->m_tags[k] = ((U8*)tag)+tag->ofs[k];
-				}
 			}
 		}
 	}
 
-	if (!imports || !imports->TagData())
-	{
+	if (!imports || !imports->TagData()) {
 		COut(C_Error) << "'" << path.c_str.get() << "' missing imports table!" << std::endl;
 		return;
 	}
@@ -632,8 +558,7 @@ void PackageMan::LoadBin(
 
 	pkg->m_imports.resize(numImports);
 
-	for (U16 i = 0; i < numImports; ++i)
-	{
+	for (U16 i = 0; i < numImports; ++i) {
 		U16 size = *reinterpret_cast<const U16*>(tag);
 		tag += sizeof(U16);
 		pkg->m_imports[i].m_path = (const char*)tag;
@@ -645,8 +570,7 @@ void PackageMan::LoadBin(
 
 namespace {
 
-void Split(const char *path, String &pkgName, String &assetName)
-{
+void Split(const char *path, String &pkgName, String &assetName) {
 	char p[256];
 	char n[256];
 
@@ -655,14 +579,10 @@ void Split(const char *path, String &pkgName, String &assetName)
 
 	char *w = p;
 
-	while (*path)
-	{
-		if (*path != RAD_PACKAGE_SEP_CHAR)
-		{
+	while (*path) {
+		if (*path != RAD_PACKAGE_SEP_CHAR) {
 			*w++ = *path++;
-		}
-		else
-		{
+		} else {
 			path++;
 			break;
 		}
@@ -672,9 +592,7 @@ void Split(const char *path, String &pkgName, String &assetName)
 	w = n;
 
 	while (*path)
-	{
 		*w++ = *path++;
-	}
 
 	*w = 0;
 
@@ -688,8 +606,7 @@ Asset::Ref PackageMan::Resolve(
 	const char *path,
 	Zone z,
 	int flags
-)
-{
+) {
 	if (!path || !path[0]) 
 		return Asset::Ref();
 
@@ -708,8 +625,7 @@ Asset::Ref PackageMan::Resolve(
 Package::Entry::Ref PackageMan::Resolve(
 	const char *path,
 	int flags
-)
-{
+) {
 	if (!path || !path[0]) 
 		return Package::Entry::Ref();
 
@@ -728,8 +644,7 @@ Package::Entry::Ref PackageMan::Resolve(
 int PackageMan::ResolveId(
 	const char *path,
 	int flags
-)
-{
+) {
 	Package::Entry::Ref ref = Resolve(path, flags);
 	return ref ? ref->id : -1;
 }

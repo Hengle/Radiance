@@ -11,12 +11,10 @@ using namespace pkg;
 
 namespace asset {
 
-MeshParser::MeshParser() : m_valid(false)
-{
+MeshParser::MeshParser() : m_valid(false) {
 }
 
-MeshParser::~MeshParser()
-{
+MeshParser::~MeshParser() {
 }
 
 int MeshParser::Process(
@@ -24,20 +22,18 @@ int MeshParser::Process(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
+) {
 	if (!(flags&(P_Load|P_Unload|P_Parse|P_Info|P_Trim)))
 		return SR_Success;
 
 	if (m_valid && (flags&(P_Load|P_Parse|P_Info|P_Trim)))
 		return SR_Success;
 
-	if (flags&P_Unload)
-	{
+	if (flags&P_Unload) {
 #if defined(RAD_OPT_TOOLS)
 		m_bundleData.reset();
 #endif
-		m_buf.Close();
+		m_mm.reset();
 		return SR_Success;
 	}
 
@@ -54,45 +50,31 @@ int MeshParser::LoadCooked(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
-	if (!m_buf)
-	{
+) {
+	if (!m_mm) {
 #if defined(RAD_OPT_TOOLS)
-		if (!asset->cooked)
-		{
+		if (!asset->cooked) {
 			Cooker::Ref cooker = asset->AllocateIntermediateCooker();
 			CookStatus status = cooker->Status(0, P_TARGET_FLAGS(flags));
 
 			if (status == CS_Ignore)
 				return SR_CompilerError;
 
-			if (status == CS_NeedRebuild)
-			{
+			if (status == CS_NeedRebuild) {
 				COut(C_Info) << asset->path.get() << " is out of date, rebuilding..." << std::endl;
 				int r = cooker->Cook(0, P_TARGET_FLAGS(flags));
 				if (r != SR_Success)
 					return r;
-			}
-			else
-			{
+			} else {
 				COut(C_Info) << asset->path.get() << " is up to date, using cache." << std::endl;
 			}
 
 			String path(CStr(asset->path));
 			path += ".bin";
 
-			int media = file::AllMedia;
-			int r = cooker->LoadFile( // load cooked data.
-				path.c_str,
-				0,
-				media,
-				m_buf,
-				file::HIONotify()
-			);
-
-			if (r < SR_Success)
-				return r;
+			m_mm = cooker->MapFile(path.c_str, 0, ZMeshes);
+			if (!m_mm)
+				return SR_FileNotFound;
 		}
 		else {
 #endif
@@ -100,35 +82,15 @@ int MeshParser::LoadCooked(
 		path += CStr(asset->path);
 		path += ".bin";
 
-		int media = file::AllMedia;
-		int r = engine.sys->files->LoadFile(
-			path.c_str,
-			media,
-			m_buf,
-			file::HIONotify(),
-			8,
-			r::ZRender
-		);
-
-		if (r < SR_Success)
-			return r;
+		m_mm = engine.sys->files->MapFile(path.c_str, ZMeshes);
+		if (!m_mm)
+			return SR_FileNotFound;
 #if defined(RAD_OPT_TOOLS)
 		}
 #endif
 	}
 
-	if (m_buf->result == SR_Pending)
-	{
-		if (time.infinite)
-			m_buf->WaitForCompletion();
-		else
-			return SR_Pending;
-	}
-
-	if (m_buf->result < SR_Success)
-		return m_buf->result;
-
-	int r = m_bundle.Parse(m_buf->data->ptr, m_buf->data->size);
+	int r = m_bundle.Parse(m_mm->data, m_mm->size);
 	if (r < SR_Success)
 		return r;
 
@@ -143,26 +105,16 @@ int MeshParser::Load(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
+) {
 	const String *s = asset->entry->KeyValue<String>("Source.File", P_TARGET_FLAGS(flags));
 	if (!s)
 		return SR_MetaError;
 
-	int media = file::AllMedia;
-	file::HStreamInputBuffer ib;
-
-	int r = engine.sys->files->OpenFileStream(
-		s->c_str,
-		media,
-		ib,
-		file::HIONotify()
-	);
-
-	if (r < file::Success)
-		return r;
-
-	stream::InputStream is(ib->buffer);
+	file::MMFileInputBuffer::Ref ib = engine.sys->files->OpenInputBuffer(s->c_str, ZTools);
+	if (!ib)
+		return SR_FileNotFound;
+	
+	stream::InputStream is(*ib);
 
 	tools::MapRef map(new (ZTools) tools::Map());
 	tools::MapVec vec;
@@ -170,7 +122,7 @@ int MeshParser::Load(
 	if (!tools::LoadMaxScene(is, *map, false))
 		return SR_ParseError;
 
-	ib.Close();
+	ib.reset();
 
 	vec.push_back(map);
 	m_bundleData = tools::CompileMeshBundle(asset->path, vec);
@@ -181,8 +133,7 @@ int MeshParser::Load(
 
 #endif
 	
-void MeshParser::Register(Engine &engine)
-{
+void MeshParser::Register(Engine &engine) {
 	static pkg::Binding::Ref ref = engine.sys->packages->Bind<MeshParser>();
 }
 

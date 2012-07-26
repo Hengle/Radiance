@@ -10,12 +10,6 @@
 
 namespace r {
 
-RAD_ZONE_DEF(RADENG_API, ZRender, "Renderer", ZEngine);
-RAD_ZONE_DEF(RADENG_API, ZTextures, "Textures", ZRender);
-RAD_ZONE_DEF(RADENG_API, ZVertexBuffers, "VertexBuffers", ZRender);
-RAD_ZONE_DEF(RADENG_API, ZSkm, "Skm", ZRender);
-RAD_ZONE_DEF(RADENG_API, ZFonts, "Fonts", ZRender);
-
 bool VidMode::Div(int x, int y) const {
 	RAD_ASSERT(x&&y);
 	if (w <=0 || h <= 0) 

@@ -13,12 +13,10 @@ using namespace pkg;
 
 namespace asset {
 
-SoundLoader::SoundLoader() : m_id(0), m_size(0)
-{
+SoundLoader::SoundLoader() : m_id(0), m_size(0) {
 }
 
-SoundLoader::~SoundLoader()
-{
+SoundLoader::~SoundLoader() {
 }
 
 int SoundLoader::Process(
@@ -26,22 +24,16 @@ int SoundLoader::Process(
 	Engine &engine, 
 	const pkg::Asset::Ref &asset, 
 	int flags
-)
-{
-	if (flags&P_Unload)
-	{
-		if (m_id)
-		{
+) {
+	if (flags&P_Unload) {
+		if (m_id) {
 			engine.sys->alDriver->SyncDeleteBuffers(ALDRIVER_SIG 1, &m_id);
 			ZSound.Get().Dec(m_size, 0);
 		}
 		m_id = 0;
 		m_size = 0;
-	}
-	else if (flags&P_Load)
-	{
-		if (!m_id)
-		{
+	} else if (flags&P_Load) {
+		if (!m_id) {
 			SoundParser::Ref parser = SoundParser::Cast(asset);
 			if (!parser || !parser->header)
 				return SR_ParseError;
@@ -89,8 +81,7 @@ int SoundLoader::Process(
 	return SR_Success;
 }
 
-void SoundLoader::Register(Engine &engine)
-{
+void SoundLoader::Register(Engine &engine) {
 	static pkg::Binding::Ref binding = engine.sys->packages->Bind<SoundLoader>();
 }
 

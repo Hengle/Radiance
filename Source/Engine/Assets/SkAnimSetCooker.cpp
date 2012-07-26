@@ -13,16 +13,13 @@ using namespace pkg;
 
 namespace asset {
 
-SkAnimSetCooker::SkAnimSetCooker() : Cooker(4)
-{
+SkAnimSetCooker::SkAnimSetCooker() : Cooker(4) {
 }
 
-SkAnimSetCooker::~SkAnimSetCooker()
-{
+SkAnimSetCooker::~SkAnimSetCooker() {
 }
 
-CookStatus SkAnimSetCooker::CheckRebuild(int flags, int allflags)
-{
+CookStatus SkAnimSetCooker::CheckRebuild(int flags, int allflags) {
 	if (CompareVersion(flags) || 
 		CompareModifiedTime(flags) || 
 		CompareCachedFileTimeKey(flags, "Source.File"))
@@ -31,22 +28,18 @@ CookStatus SkAnimSetCooker::CheckRebuild(int flags, int allflags)
 	return CheckRebuildFiles(flags, allflags);
 }
 
-CookStatus SkAnimSetCooker::CheckRebuildFiles(int flags, int allflags)
-{
+CookStatus SkAnimSetCooker::CheckRebuildFiles(int flags, int allflags) {
 	const String *s = asset->entry->KeyValue<String>("Source.File", flags);
 	if (!s)
 		return CS_NeedRebuild;
 
-	String path(CStr("9:/"));
-	path += engine->sys->files->hddRoot.get();
-	path += "/";
-	path += s->c_str.get();
+	FILE *fp = engine->sys->files->fopen(
+		s->c_str.get(), 
+		"rt", 
+		file::kFileOptions_None, 
+		file::kFileMask_Base
+	);
 
-	char native[256];
-	if (!file::ExpandToNativePath(path.c_str, native, 256))
-		return CS_NeedRebuild;
-
-	FILE *fp = fopen(native, "rt");
 	if (fp == 0)
 		return CS_NeedRebuild;
 
@@ -54,19 +47,16 @@ CookStatus SkAnimSetCooker::CheckRebuildFiles(int flags, int allflags)
 
 	CookStatus r = CS_UpToDate;
 
-	while (fgets(name, 256, fp) != 0)
-	{
-		for (char *c = name; *c; ++c)
-		{
-			if (*c < 20)
-			{
+	while (fgets(name, 256, fp) != 0) {
+
+		for (char *c = name; *c; ++c) {
+			if (*c < 20) {
 				*c = 0;
 				break;
 			}
 		}
 
-		if (CompareCachedFileTime(flags, name, name))
-		{
+		if (CompareCachedFileTime(flags, name, name)) {
 			r = CS_NeedRebuild; // NOTE: no break here because we must cache all times
 		}
 	}
@@ -75,13 +65,12 @@ CookStatus SkAnimSetCooker::CheckRebuildFiles(int flags, int allflags)
 	return r;
 }
 
-CookStatus SkAnimSetCooker::Status(int flags, int allflags)
-{
+CookStatus SkAnimSetCooker::Status(int flags, int allflags) {
 	flags &= P_AllTargets;
 	allflags &= P_AllTargets;
 
-	if (flags == 0)
-	{ // only build generics if all platforms are identical to eachother.
+	if (flags == 0) { 
+		// only build generics if all platforms are identical to eachother.
 		if (MatchTargetKeys(allflags, allflags)==allflags)
 			return CheckRebuild(flags, allflags);
 		return CS_Ignore;
@@ -91,8 +80,7 @@ CookStatus SkAnimSetCooker::Status(int flags, int allflags)
 		return CS_Ignore;
 
 	// only build ipad if different from iphone
-	if ((flags&P_TargetIPad) && (allflags&P_TargetIPhone))
-	{
+	if ((flags&P_TargetIPad) && (allflags&P_TargetIPhone)) {
 		if (MatchTargetKeys(P_TargetIPad, P_TargetIPhone))
 			return CS_Ignore;
 	}
@@ -100,8 +88,7 @@ CookStatus SkAnimSetCooker::Status(int flags, int allflags)
 	return CheckRebuild(flags, allflags);
 }
 
-int SkAnimSetCooker::Compile(int flags, int allflags)
-{
+int SkAnimSetCooker::Compile(int flags, int allflags) {
 	// Make sure these get updated
 	CompareVersion(flags);
 	CompareModifiedTime(flags);
@@ -135,13 +122,11 @@ int SkAnimSetCooker::Compile(int flags, int allflags)
 	return SR_Success;
 }
 
-int SkAnimSetCooker::MatchTargetKeys(int flags, int allflags)
-{
+int SkAnimSetCooker::MatchTargetKeys(int flags, int allflags) {
 	return asset->entry->MatchTargetKeys<String>("Source.File", flags, allflags);
 }
 
-void SkAnimSetCooker::Register(Engine &engine)
-{
+void SkAnimSetCooker::Register(Engine &engine) {
 	static pkg::Binding::Ref binding = engine.sys->packages->BindCooker<SkAnimSetCooker>();
 }
 

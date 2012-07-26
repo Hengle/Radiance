@@ -83,7 +83,7 @@ int TextureParser::Process(
 		STLContainerShrinkToSize(m_bufs);
 		m_cooker.reset();
 #endif
-		m_buf.Close();
+		m_mm.reset();
 		return SR_Success;
 	}
 
@@ -94,7 +94,7 @@ int TextureParser::Process(
 		m_bufs.clear();
 		STLContainerShrinkToSize(m_bufs);
 #endif
-		m_buf.Close();
+		m_mm.reset();
 		m_load = false;
 		if (m_state < S_Done)
 			m_state = S_None;
@@ -111,7 +111,7 @@ int TextureParser::Process(
 		return m_state; // error code
 
 	if (m_state == S_Header) {
-		m_buf.Close();
+		m_mm.reset();
 		m_images.clear();
 #if defined(RAD_OPT_TOOLS)
 		m_bufs.clear();
@@ -123,12 +123,10 @@ int TextureParser::Process(
 
 #if defined(RAD_OPT_TOOLS)
 	if (!asset->cooked && ((flags&(P_Info|P_Parse|P_Unformatted)) || !(flags&P_FastPath))) {
+		RAD_ASSERT(m_state != S_Loading); // only used in cooked path.
 		switch (m_state) {
 		case S_None:
 			r = Load(engine, time, asset, flags);
-			break;
-		case S_Loading:
-			r = Loading(engine, time, asset, flags);
 			break;
 		case S_Parsing:
 			r = Parsing(engine, time, asset, flags);
@@ -182,19 +180,11 @@ int TextureParser::LoadCooked(
 			}
 
 			// Load TAG
+			file::MMapping::Ref mm = m_cooker->LoadTag(0);
+			if (!mm)
+				return SR_FileNotFound;
 
-			file::HBufferedAsyncIO buf;
-			int media = file::AllMedia;
-			int r = m_cooker->LoadTag(
-				0,
-				media,
-				buf,
-				file::HIONotify()
-			);
-			if (r < SR_Success)
-				return r;
-			buf->WaitForCompletion();
-			const asset::TextureTag *tag = (const asset::TextureTag*)buf->data->ptr.get();
+			const asset::TextureTag *tag = (const asset::TextureTag*)mm->data.get();
 			m_tag = *tag;
 
 			// Load Texture
@@ -208,17 +198,9 @@ int TextureParser::LoadCooked(
 
 			path += ".bin";
 
-			media = file::AllMedia;
-			r = m_cooker->LoadFile( // load cooked data.
-				path.c_str,
-				0,
-				media,
-				m_buf,
-				file::HIONotify()
-			);
-
-			if (r < SR_Success)
-				return r;
+			m_mm = m_cooker->MapFile(path.c_str, 0, r::ZTextures);
+			if (!m_mm)
+				return SR_FileNotFound;
 		}
 		else {
 		StringTable::LangId langId = m_langId;
@@ -241,18 +223,9 @@ int TextureParser::LoadCooked(
 
 		path += ".bin";
 
-		int media = file::AllMedia;
-		int r = engine.sys->files->LoadFile(
-			path.c_str,
-			media,
-			m_buf,
-			file::HIONotify(),
-			8,
-			r::ZTextures
-		);
-
-		if (r < file::Success)
-			return r;
+		m_mm = engine.sys->files->MapFile(path.c_str, r::ZTextures);
+		if (!m_mm)
+			return SR_FileNotFound;
 #if defined(RAD_OPT_TOOLS)
 		}
 #endif
@@ -261,19 +234,8 @@ int TextureParser::LoadCooked(
 			return SR_Pending;
 	}
 
-	RAD_ASSERT(m_buf);
-	if (m_buf->result == file::Pending) {
-		if (time.infinite)
-			m_buf->WaitForCompletion();
-		else
-			return SR_Pending;
-	}
-
-	if (m_buf->result < file::Success)
-		return m_buf->result;
-
-	const AddrSize size = m_buf->data->size.get();
-	const void *data = m_buf->data->ptr.get();
+	const AddrSize size = m_mm->size.get();
+	const void *data = m_mm->data.get();
 	const U8 *bytes = reinterpret_cast<const U8*>(data);
 
 	CHECK_SIZE(sizeof(U32));
@@ -363,26 +325,20 @@ int TextureParser::Load(
 	String sname(*name);
 
 	if (*localized && (m_langId != StringTable::LangId_EN)) {
-		// create localized file path.
-		char ext[file::MaxFilePathLen+1];
-		char path[file::MaxFilePathLen+1];
-
-		file::FileExt(sname.c_str, ext, file::MaxFilePathLen+1);
-		file::SetFileExt(sname.c_str, 0, path, file::MaxFilePathLen+1);
-	
+		String ext = file::GetFileExtension(sname.c_str);
+		String path = file::SetFileExtension(sname.c_str, 0);
+			
 		sname = path;
 		sname += "_";
 		sname += StringTable::Langs[m_langId];
 		sname += ext;
 	}
 
-	int media = file::AllMedia;
-
 	if (!(flags&P_NoDefaultMedia)) {
-		if (sname.empty || !engine.sys->files->FileExists(sname.c_str, media)) {
+		if (sname.empty || !engine.sys->files->FileExists(sname.c_str)) {
 			sname = CStr("Textures/Missing_Texture.tga");
-			if (!engine.sys->files->FileExists(sname.c_str, media)) {
-				return pkg::SR_MissingFile;
+			if (!engine.sys->files->FileExists(sname.c_str)) {
+				return pkg::SR_FileNotFound;
 			}
 		}
 	}
@@ -392,115 +348,58 @@ int TextureParser::Load(
 	if (m_fmt < 0)
 		return pkg::SR_InvalidFormat;
 
-	int r;
-
 	if (flags&P_Info) { // read enough to parse header
-		file::HFile file;
-		file::HBufferedAsyncIO buf;
-
-		r = engine.sys->files->OpenFile(
-			sname.c_str,
-			media,
-			file,
-			file::HIONotify()
-		);
-
-		RAD_ASSERT(r <= file::Success);
-		if (r == file::Success) {
-			buf = engine.sys->files->SafeCreateBufferedIO(Kilo);
-			r = file->Read(buf, 0, Kilo, file::HIONotify());
-			m_bufs.push_back(buf);
-		}
-	}
-	else
-	{
-		char base[file::MaxFilePathLen+1];
-		file::FileBaseName(sname.c_str, base, file::MaxFilePathLen+1);
-		if (base[0] == '+') { // bundle, load all frames simultaneously
-			char ext[file::MaxFilePathLen+1];
-			char path[file::MaxFilePathLen+1];
-
-			file::FilePathName(sname.c_str, path, file::MaxFilePathLen+1);
-			file::FileExt(sname.c_str, ext, file::MaxFilePathLen+1);
+		file::MMFile::Ref file = engine.sys->files->OpenFile(sname.c_str, r::ZTextures);
+		if (!file)
+			return SR_FileNotFound;
+		file::MMapping::Ref mm = file->MMap(0, Kilo, r::ZTextures);
+		if (!mm)
+			return SR_IOError;
+		m_bufs.push_back(mm);
+	} else {
+		String base = file::GetBaseFileName(sname.c_str);
+		if (!base.empty && base[0] == '+') { // bundle, load all frames simultaneously
+			String path = file::GetFilePath(sname.c_str);
+			String ext = file::GetFileExtension(sname.c_str);
 
 			// skip +digit
-			const char *postDigit = base;
+			const char *postDigit = base.c_str;
 			if (base[1] != 0)
 				postDigit += 2;
 
-			for (int i = 0;; ++i)
-			{
-				file::HBufferedAsyncIO buf;
-				char x[file::MaxFilePathLen+1];
+			for (int i = 0;; ++i) {
+				file::MMapping::Ref mm;
+				char x[256];
 
-				string::sprintf(x, "%s/+%d%s%s", path, i, postDigit, ext);
+				string::sprintf(x, "%s/+%d%s%s", path.c_str.get(), i, postDigit, ext.c_str.get());
 
-				r = engine.sys->files->LoadFile(
-					x,
-					media,
-					buf,
-					file::HIONotify()
-				);
-
-				if (r < file::Success)
+				mm = engine.sys->files->MapFile(x, r::ZTextures);
+				if (!mm)
 					break;
-				m_bufs.push_back(buf);
+
+				m_bufs.push_back(mm);
 			}
 
-			if (!m_bufs.empty() && (r == file::ErrorFileNotFound))
-				r = file::Pending;
+			if (m_bufs.empty())
+				return SR_FileNotFound;
 		}
 		else {
-			file::HBufferedAsyncIO buf;
-			r = engine.sys->files->LoadFile(
-				sname.c_str, 
-				media,
-				buf,
-				file::HIONotify()
-			);
-			m_bufs.push_back(buf);
-		}
-	}
-
-	if (r < file::Success) {
-		m_bufs.clear();
-		return r;
-	}
-
-	m_state = S_Loading;
-	
-	if (time.remaining) {
-		r = Loading(engine, time, asset, flags);
-	}
-
-	return r;
-}
-
-int TextureParser::Loading(
-	Engine &engine,
-	const xtime::TimeSlice &time,
-	const pkg::Asset::Ref &asset,
-	int flags
-) {
-	for (IOVec::const_iterator it = m_bufs.begin(); it != m_bufs.end(); ++it) {
-		const file::HBufferedAsyncIO &buf = *it;
-
-		if (buf->result == file::Pending) {
-			if (time.infinite) {
-				buf->WaitForCompletion();
-			}
-			else {
-				return SR_Pending;
-			}
-		}
-
-		if (buf->result < file::Success) {
-			return buf->result;
+			file::MMapping::Ref mm = engine.sys->files->MapFile(sname.c_str, r::ZTextures);
+			if (!mm)
+				return SR_FileNotFound;
+			m_bufs.push_back(mm);
 		}
 	}
 
 	m_state = S_Parsing;
-	return time.remaining ? Parsing(engine, time, asset, flags) : SR_Pending;
+	
+	int r = SR_Pending;
+
+	if (time.remaining) {
+		r = Parsing(engine, time, asset, flags);
+	}
+
+	return r;
 }
 
 int TextureParser::Parsing(
@@ -522,29 +421,29 @@ int TextureParser::Parsing(
 		switch (m_fmt) {
 		case F_Tga:
 			r = image_codec::tga::DecodeHeader(
-				m_bufs[0]->data->ptr,
-				m_bufs[0]->data->size,
+				m_bufs[0]->data,
+				m_bufs[0]->size,
 				*img
 			) ? SR_Success : SR_InvalidFormat;
 			break;
 		case F_Dds:
 			r = image_codec::dds::DecodeHeader(
-				m_bufs[0]->data->ptr,
-				m_bufs[0]->data->size,
+				m_bufs[0]->data,
+				m_bufs[0]->size,
 				*img
 			) ? SR_Success : SR_InvalidFormat;
 			break;
 		case F_Png:
 			r = image_codec::png::DecodeHeader(
-				m_bufs[0]->data->ptr,
-				m_bufs[0]->data->size,
+				m_bufs[0]->data,
+				m_bufs[0]->size,
 				*img
 			) ? SR_Success : SR_InvalidFormat;
 			break;
 		case F_Bmp:
 			r = image_codec::bmp::DecodeHeader(
-				m_bufs[0]->data->ptr,
-				m_bufs[0]->data->size,
+				m_bufs[0]->data,
+				m_bufs[0]->size,
 				*img
 			) ? SR_Success : SR_InvalidFormat;
 			break;
@@ -554,21 +453,21 @@ int TextureParser::Parsing(
 			m_images.push_back(img);
 	} else {
 		for (IOVec::iterator it = m_bufs.begin(); it != m_bufs.end(); ++it) {
-			file::HBufferedAsyncIO &buf = *it;
+			file::MMapping::Ref &mm = *it;
 			image_codec::Image::Ref img(new (ZEngine) image_codec::Image(r::ZTextures));
 
 			switch (m_fmt) {
 			case F_Tga:
 				r = image_codec::tga::Decode(
-					buf->data->ptr,
-					buf->data->size,
+					mm->data,
+					mm->size,
 					*img
 				) ? SR_Success : SR_InvalidFormat;
 				break;
 			case F_Dds:
 				r = image_codec::dds::Decode(
-					buf->data->ptr,
-					buf->data->size,
+					mm->data,
+					mm->size,
 					*img,
 					false, // no-ref
 					false // no decompress
@@ -576,15 +475,15 @@ int TextureParser::Parsing(
 				break;
 			case F_Png:
 				r = image_codec::png::Decode(
-					buf->data->ptr,
-					buf->data->size,
+					mm->data,
+					mm->size,
 					*img
 				) ? SR_Success : SR_InvalidFormat;
 				break;
 			case F_Bmp:
 				r = image_codec::bmp::Decode(
-					buf->data->ptr,
-					buf->data->size,
+					mm->data,
+					mm->size,
 					*img
 				) ? SR_Success : SR_InvalidFormat;
 				break;
@@ -594,7 +493,7 @@ int TextureParser::Parsing(
 				break;
 
 			m_images.push_back(img);
-			buf.Close(); // free data.
+			mm.reset(); // free data.
 		}
 	}
 
@@ -756,24 +655,16 @@ int TextureParser::Parsing(
 }
 
 int TextureParser::Format(const char *name) {
-	char ext[file::MaxFilePathLen+1];
-	file::FileExt(name, ext, file::MaxFilePathLen+1);
+	String ext = file::GetFileExtension(name);
 
-	if (!string::icmp(ext, ".tga")) {
+	if (ext == ".tga")
 		return F_Tga;
-	}
-
-	if (!string::icmp(ext, ".dds")) {
+	if (ext == ".dds")
 		return F_Dds;
-	}
-
-	if (!string::icmp(ext, ".png")) {
+	if (ext == ".png")
 		return F_Png;
-	}
-
-	if (!string::icmp(ext, ".bmp")) {
+	if (ext == ".bmp")
 		return F_Bmp;
-	}
 
 	return -1;
 }

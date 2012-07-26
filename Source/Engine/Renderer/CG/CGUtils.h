@@ -23,7 +23,7 @@ namespace cg {
 
 	struct File
 	{
-		file::HStreamInputBuffer ib;
+		file::MMFileInputBuffer::Ref ib;
 		streamBufRef sb;
 		istreamRef is;
 	};

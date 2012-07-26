@@ -40,8 +40,6 @@ RADENG_API int RADENG_CALL luaL_typerror (lua_State *L, int narg, const char *tn
 
 namespace lua {
 
-RAD_ZONE_DEF(RADENG_API, ZLuaRuntime, "Lua Runtime", ZEngine);
-
 struct LuaPools
 {
 	enum

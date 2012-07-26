@@ -23,7 +23,6 @@
 RADENG_API int RADENG_CALL QtAppMain(int argc, const char **argv) {
 
 	rt::Initialize();
-	RAD_DEBUG_ONLY(file::EnforcePortablePaths(false));
 
 	QApplication qApp(argc, (char**)argv);
 

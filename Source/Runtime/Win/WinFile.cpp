@@ -3,11 +3,12 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "WinFile.h"
 #include "../TimeDef.h"
 #include <direct.h>
+#include "../PushSystemMacros.h"
 
-using namespace string;
 using namespace xtime;
 
 namespace file {
@@ -64,6 +65,7 @@ WinFileSystem::WinFileSystem(
 
 MMFile::Ref WinFileSystem::NativeOpenFile(
 	const char *path,
+	::Zone &zone,
 	FileOptions options
 ) {
 	HANDLE f = CreateFileA(
@@ -96,7 +98,7 @@ MMFile::Ref WinFileSystem::NativeOpenFile(
 	MMFile::Ref r(new (ZFile) WinMMFile(f, m, m_pageSize));
 
 	if (options & kFileOption_MapEntireFile) {
-		MMapping::Ref mm = r->MMap(0, 0);
+		MMapping::Ref mm = r->MMap(0, 0, zone);
 		if (mm) {
 			static_cast<WinMMFile*>(r.get())->m_mm = mm;
 			// important otherwise we have a circular reference.
@@ -107,18 +109,13 @@ MMFile::Ref WinFileSystem::NativeOpenFile(
 	return r;
 }
 
-FileSearch::Ref WinFileSystem::OpenSearch(
+FileSearch::Ref WinFileSystem::NativeOpenSearch(
 	const char *path,
 	SearchOptions searchOptions,
-	FileOptions fileOptions,
-	int mask
+	FileOptions fileOptions
 ) {
-	String nativePath;
-	if (!GetNativePath(path, nativePath))
-		return FileSearchRef();
-
 	return WinFileSearch::New(
-		nativePath,
+		String(path), // not CStr since this string persists outside the scope of this function.
 		String(),
 		searchOptions
 	);
@@ -213,7 +210,7 @@ bool WinFileSystem::CreateDirectory(
 	for (int i = 0; path[i]; ++i) {
 		if (path[i] == '/' && (path[1] != ':' || i > 2)) {
 			char dir[256];
-			ncpy(dir, path, i+1);
+			string::ncpy(dir, path, i+1);
 			if (!CreateDirectoryA(dir, 0)) {
 				if (GetLastError() != ERROR_ALREADY_EXISTS)
 					return false;
@@ -307,19 +304,22 @@ WinMMFile::~WinMMFile() {
 		CloseHandle(m_f);
 }
 
-MMapping::Ref WinMMFile::MMap(AddrSize ofs, AddrSize size) {
-	
+MMapping::Ref WinMMFile::MMap(AddrSize ofs, AddrSize size, ::Zone &zone) {
+	if (size == 0)
+		size = this->size.get();
+
 	RAD_ASSERT(ofs+size <= this->size.get());
+
+	AddrSize base = ofs & ~(m_pageSize-1);
+	AddrSize padd = ofs - base;
+	AddrSize backingSize = (size+padd) - base;
 
 	if (m_mm) {
 		// we mapped the whole file just return the window
 		const void *data = reinterpret_cast<const U8*>(m_mm->data.get()) + ofs;
-		return MMapping::Ref(new (ZFile) WinMMapping(shared_from_this(), 0, data, size, ofs));
+		return MMapping::Ref(new (ZFile) WinMMapping(shared_from_this(), 0, data, size, ofs, backingSize, zone));
 	}
 
-	AddrSize base = ofs & ~(m_pageSize-1);
-	AddrSize padd = ofs - base;
-	
 	const void *pbase = MapViewOfFile(
 		m_m,
 		FILE_MAP_READ,
@@ -329,7 +329,7 @@ MMapping::Ref WinMMFile::MMap(AddrSize ofs, AddrSize size) {
 	);
 
 	const void *data = reinterpret_cast<const U8*>(pbase) + padd;
-	return MMapping::Ref(new (ZFile) WinMMapping(shared_from_this(), pbase, data, size, ofs));
+	return MMapping::Ref(new (ZFile) WinMMapping(shared_from_this(), pbase, data, size, ofs, backingSize, zone));
 }
 
 AddrSize WinMMFile::RAD_IMPLEMENT_GET(size) {
@@ -343,8 +343,10 @@ WinMMapping::WinMMapping(
 	const void *base,
 	const void *data,
 	AddrSize size,
-	AddrSize offset
-) : MMapping(data, size, offset), m_file(file), m_base(base) {
+	AddrSize offset,
+	AddrSize backingSize,
+	::Zone &zone
+) : MMapping(data, size, offset, backingSize, zone), m_file(file), m_base(base) {
 }
 
 WinMMapping::~WinMMapping() {
@@ -360,8 +362,8 @@ void WinMMapping::Prefetch(AddrSize offset, AddrSize size) {
 ///////////////////////////////////////////////////////////////////////////////
 
 FileSearch::Ref WinFileSearch::New(
-	const string::String &path,
-	const string::String &prefix,
+	const String &path,
+	const String &prefix,
 	SearchOptions options
 ) {
 	String dir, pattern;
@@ -370,7 +372,7 @@ FileSearch::Ref WinFileSearch::New(
 	const char *sz = path.c_str;
 	for (int i = path.length - 1; i >= 0; --i) {
 		if (sz[i] == '/' || sz[i] == '\\') {
-			dir = String(sz, i, CopyTag);
+			dir = String(sz, i, string::CopyTag);
 			pattern = path.SubStr(i); // include the leading '/'
 			break;
 		}
@@ -397,9 +399,9 @@ FileSearch::Ref WinFileSearch::New(
 }
 
 WinFileSearch::WinFileSearch(
-	const string::String &path,
-	const string::String &prefix,
-	const string::String &pattern,
+	const String &path,
+	const String &prefix,
+	const String &pattern,
 	SearchOptions options
 ) : m_path(path), 
     m_prefix(prefix), 
@@ -416,7 +418,7 @@ WinFileSearch::~WinFileSearch() {
 }
 
 bool WinFileSearch::NextFile(
-	string::String &path,
+	String &path,
 	FileAttributes *fileAttributes,
 	xtime::TimeDate *fileTime
 ) {
@@ -436,7 +438,7 @@ bool WinFileSearch::NextFile(
 		}
 
 		char kszFileName[256];
-		cpy(kszFileName, m_fd.cFileName);
+		string::cpy(kszFileName, m_fd.cFileName);
 		const String kFileName(CStr(kszFileName));
 		m_fd.cFileName[0] = 0;
 
@@ -454,7 +456,7 @@ bool WinFileSearch::NextFile(
 		} else if(m_state == kState_Files) {
 
 			if (m_prefix.empty) {
-				path = String(kFileName, CopyTag); // move off of stack.
+				path = String(kFileName, string::CopyTag); // move off of stack.
 			} else {
 				path = m_prefix + kFileName;
 			}

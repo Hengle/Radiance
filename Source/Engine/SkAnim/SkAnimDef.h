@@ -11,8 +11,6 @@
 
 namespace ska {
 
-RAD_ZONE_DEC(RADENG_API, ZSka);
-
 //#define SKA_NORMALS
 
 class Animation;

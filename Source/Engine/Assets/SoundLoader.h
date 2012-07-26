@@ -15,14 +15,12 @@ class Engine;
 
 namespace asset {
 
-class RADENG_CLASS SoundLoader : public pkg::Sink<SoundLoader>
-{
+class RADENG_CLASS SoundLoader : public pkg::Sink<SoundLoader> {
 public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
+	enum {
 		SinkStage = pkg::SS_Process,
 		AssetType = AT_Sound
 	};
@@ -36,7 +34,9 @@ public:
 
 protected:
 
-	RAD_DECLARE_GET(id, ALuint) { return m_id; }
+	RAD_DECLARE_GET(id, ALuint) { 
+		return m_id; 
+	}
 
 	int Process(
 		const xtime::TimeSlice &time,

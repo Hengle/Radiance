@@ -29,7 +29,7 @@
 
 namespace font {
 
-RAD_ZONE_DEF(RADRT_API, ZFont, "Font", ZRuntime);
+RAD_ZONE_DEF(RADRT_API, ZFonts, "Fonts", ZRuntime);
 
 // private
 namespace {
@@ -44,7 +44,7 @@ namespace {
 	ThreadSafeObjectPool<UserGlyph> s_glyphPool;
 
 	void *Allocate(FT_Memory memory, long size) {
-		return safe_zone_malloc(ZFont, size);
+		return safe_zone_malloc(ZFonts, size);
 	}
 
 	void Free(FT_Memory memory, void *block) {
@@ -52,7 +52,7 @@ namespace {
 	}
 
 	void *Realloc(FT_Memory memory, long cur_size, long new_size, void *block) {
-		return safe_zone_realloc(ZFont, block, new_size);
+		return safe_zone_realloc(ZFonts, block, new_size);
 	}
 
 	void InitMemory() {
@@ -66,7 +66,7 @@ namespace {
 
 		if (++s_libRefs == 1) {
 			InitMemory();
-			s_glyphPool.Create(ZFont, "free-type glyph pool", 32);
+			s_glyphPool.Create(ZFonts, "free-type glyph pool", 32);
 			Lock L(s_mutex);
 			RAD_VERIFY(FT_New_Library(&s_mem, &s_lib) == 0);
 			FT_Add_Default_Modules(s_lib);
@@ -524,11 +524,11 @@ void GlyphCache::Create(Font &font,
 	m_maxPages = maxPages;
 	m_numPages = 0;
 
-	m_bankPool.Create(ZFont, "glyph-cache-ch-bnk-pool", 32);
-	m_charMapPool.Create(ZFont, "glyph-cache-ch-map-pool", 32);
-	m_pagePool.Create(ZFont, "glyph-cache-page-pool", 8);
-	m_drawPool.Create(ZFont, "glyph-cache-draw-pool", MaxBatchSize);
-	m_cellPool.Create(ZFont, "glyph-cache-cell-pool", sizeof(Cell) * m_cellsPerPage, 1);
+	m_bankPool.Create(ZFonts, "glyph-cache-ch-bnk-pool", 32);
+	m_charMapPool.Create(ZFonts, "glyph-cache-ch-map-pool", 32);
+	m_pagePool.Create(ZFonts, "glyph-cache-page-pool", 8);
+	m_drawPool.Create(ZFonts, "glyph-cache-draw-pool", MaxBatchSize);
+	m_cellPool.Create(ZFonts, "glyph-cache-cell-pool", sizeof(Cell) * m_cellsPerPage, 1);
 
 	for (int i = 0; i < initialPages; ++i)
 		CreatePage();

@@ -11,12 +11,10 @@ using namespace pkg;
 
 namespace asset {
 
-FontParser::FontParser() : m_loaded(false)
-{
+FontParser::FontParser() : m_loaded(false) {
 }
 
-FontParser::~FontParser()
-{
+FontParser::~FontParser() {
 }
 
 int FontParser::Process(
@@ -24,18 +22,16 @@ int FontParser::Process(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
+) {
 	if (!(flags&(P_Load|P_Unload|P_Parse|P_Info|P_Trim)))
 		return SR_Success;
 
 	if (m_loaded && (flags&(P_Load|P_Parse|P_Info|P_Trim)))
 		return SR_Success;
 
-	if (flags&P_Unload)
-	{
+	if (flags&P_Unload) {
 		m_font.Destroy();
-		m_buf.Close();
+		m_mm.reset();
 		m_loaded = false;
 		return SR_Success;
 	}
@@ -53,38 +49,18 @@ int FontParser::Load(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
-	if (!m_buf)
-	{
+) {
+	if (!m_mm) {
 		const String *s = asset->entry->KeyValue<String>("Source.File", P_TARGET_FLAGS(flags));
 		if (!s || s->empty)
 			return SR_MetaError;
-
-		int media = file::AllMedia;
-		int r = engine.sys->files->LoadFile(
-			s->c_str,
-			media,
-			m_buf,
-			file::HIONotify()
-		);
-
-		if (r < SR_Success)
-			return r;
+		m_mm = engine.sys->files->MapFile(s->c_str, ZAssets);
+		
+		if (!m_mm)
+			return SR_FileNotFound;
 	}
 
-	if (m_buf->result == SR_Pending)
-	{
-		if (time.infinite)
-			m_buf->WaitForCompletion();
-		else
-			return SR_Pending;
-	}
-
-	if (m_buf->result < SR_Success)
-		return m_buf->result;
-
-	if (!m_font.Create(m_buf->data->ptr, m_buf->data->size))
+	if (!m_font.Create(m_mm->data, m_mm->size))
 		return SR_InvalidFormat;
 
 	m_loaded = true;
@@ -97,38 +73,18 @@ int FontParser::LoadCooked(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
-	if (!m_buf)
-	{
+) {
+	if (!m_mm) {
 		String path(CStr("Cooked/"));
 		path += CStr(asset->path);
 		path += ".bin";
 
-		int media = file::AllMedia;
-		int r = engine.sys->files->LoadFile(
-			path.c_str,
-			media,
-			m_buf,
-			file::HIONotify()
-		);
-
-		if (r < SR_Success)
-			return r;
+		m_mm = engine.sys->files->MapFile(path.c_str, ZAssets);
+		if (!m_mm)
+			return SR_FileNotFound;
 	}
 
-	if (m_buf->result == SR_Pending)
-	{
-		if (time.infinite)
-			m_buf->WaitForCompletion();
-		else
-			return SR_Pending;
-	}
-
-	if (m_buf->result < SR_Success)
-		return m_buf->result;
-
-	if (!m_font.Create(m_buf->data->ptr, m_buf->data->size))
+	if (!m_font.Create(m_mm->data, m_mm->size))
 		return SR_InvalidFormat;
 
 	m_loaded = true;

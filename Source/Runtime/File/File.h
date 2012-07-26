@@ -18,6 +18,8 @@
 	#define RAD_NATIVEPATHSEP "/"
 #endif
 
+#include "../PushPack.h"
+
 namespace file {
 
 /*! Memory mapped file system.
@@ -77,7 +79,7 @@ public:
 	);
 
 	//! Gets the value of the specified alias.
-	string::String Alias(char name);
+	String Alias(char name);
 
 	//! Adds a directory to be used when resolving relative paths.
 	/*! \sa addPakFile() */
@@ -89,6 +91,7 @@ public:
 	//! Opens a pak file.
 	PakFileRef OpenPakFile(
 		const char *path, 
+		::Zone &zone = ZPakFile,
 		FileOptions options = kFileOptions_None,
 		int mask = kFileMask_Any,
 		int exclude = 0,
@@ -111,8 +114,8 @@ public:
 
 	//! Opens a FILE* to a file.
 	/*! If the path specified is a relative path then the path is expanded using
-		getAbsolutePath(). The path is then expanded to a native path with
-		getNativePath() and passed to the stdio function fopen(). 
+		GetAbsolutePath(). The path is then expanded to a native path with
+		GetNativePath() and passed to the stdio function fopen(). 
 		
 		\sa getAbsolutePath() 
 	*/
@@ -128,6 +131,28 @@ public:
 	//! Opens a memory mapped file.
 	MMFileRef OpenFile(
 		const char *path,
+		::Zone &zone = ZFile, // zone is only used if kFileOption_MapEntireFile is specified.
+		FileOptions options = kFileOptions_None,
+		int mask = kFileMask_Any,
+		int exclude = 0,
+		int *resolved = 0
+	);
+
+	//! Maps an entire file into memory.
+	MMappingRef MapFile(
+		const char *path,
+		::Zone &zone,
+		FileOptions options = kFileOptions_None,
+		int mask = kFileMask_Any,
+		int exclude = 0,
+		int *resolved = 0
+	);
+
+	//! Open a file mapping and creates a stream buffer.
+	MMFileInputBufferRef OpenInputBuffer(
+		const char *path,
+		::Zone &zone,
+		AddrSize mappedSize = 8*Meg,
 		FileOptions options = kFileOptions_None,
 		int mask = kFileMask_Any,
 		int exclude = 0,
@@ -139,8 +164,9 @@ public:
 		const char *path,
 		SearchOptions searchOptions = kSearchOption_Recursive,
 		FileOptions fileOptions = kFileOptions_None,
-		int mask = kFileMask_Any
-	) = 0;
+		int mask = kFileMask_Any,
+		int exclude = 0
+	);
 
 	//! Expands a relative path into an absolute path.
 	/*! \param path A relative path of the form alias:/path. 
@@ -154,7 +180,7 @@ public:
 	*/
 	bool GetAbsolutePath(
 		const char *path, 
-		string::String &absPath,
+		String &absPath,
 		int mask = kFileMask_Any,
 		int exclude = 0,
 		int *resolved = 0
@@ -164,7 +190,17 @@ public:
 	//! OS level functions.
 	bool GetNativePath(
 		const char *path,
-		string::String &nativePath
+		String &nativePath
+	);
+
+	//! Expands a relative path into a native path.
+	//! Identical to calling GetAbsolutePath() followed by GetNativePath().
+	bool ExpandToNativePath(
+		const char *path, 
+		String &nativePath,
+		int mask = kFileMask_Any,
+		int exclude = 0,
+		int *resolved = 0
 	);
 
 	//! Returns true if the file exists.
@@ -226,10 +262,19 @@ protected:
 
 	virtual MMFileRef NativeOpenFile(
 		const char *path,
+		::Zone &zone,
 		FileOptions options
 	) = 0;
 
+	virtual FileSearchRef NativeOpenSearch(
+		const char *path,
+		SearchOptions searchOptions,
+		FileOptions fileOptions
+	) = 0;
+
 private:
+
+	friend class details::DetailsSearch;
 
 	RAD_DECLARE_GET(globalMask, int);
 	RAD_DECLARE_SET(globalMask, int);
@@ -241,14 +286,16 @@ private:
 	struct PathMapping {
 		typedef zone_vector<PathMapping, ZFileT>::type Vec;
 		PakFileRef pak;
-		string::String dir;
+		String dir;
 		int mask;
 	};
 	
 	PathMapping::Vec m_paths;
-	boost::array<string::String, kAliasMax> m_aliasTable;
+	boost::array<String, kAliasMax> m_aliasTable;
 	int m_globalMask;
 };
+
+///////////////////////////////////////////////////////////////////////////////
 
 //! Memory Mapped File
 class MMFile : public boost::noncopyable, public boost::enable_shared_from_this<MMFile> {
@@ -256,9 +303,16 @@ public:
 	typedef MMFileRef Ref;
 
 	//! Maps the specified file data into user address space.
+	/*! Passing zeros for the offset and size maps the entire file into memory.
+
+		\remarks
+		The mapping object that is returned contains a reference to the file it is
+		mapping, the caller is therefore able to discard any references to the file
+		object without invalidating any outstanding mapping objects. */
 	virtual MMappingRef MMap(
-		AddrSize ofs, 
-		AddrSize size
+		AddrSize ofs = 0, 
+		AddrSize size = 0,
+		::Zone &zone = ZFile
 	) = 0;
 
 	//! The size of the file.
@@ -272,10 +326,14 @@ protected:
 
 };
 
+///////////////////////////////////////////////////////////////////////////////
+
 //! Memory mapping object.
 class MMapping : public boost::noncopyable {
 public:
 	typedef MMappingRef Ref;
+
+	~MMapping();
 
 	//! Notifies the operating system that the specified memory will be
 	//! used and should be prefetched into memory.
@@ -298,7 +356,9 @@ protected:
 	MMapping(
 		const void *data,
 		AddrSize size,
-		AddrSize offset
+		AddrSize offset,
+		AddrSize backingSize,
+		::Zone &zone
 	);
 
 private:
@@ -310,7 +370,11 @@ private:
 	const void *m_data;
 	AddrSize m_size;
 	AddrSize m_offset;
+	AddrSize m_backingSize;
+	::Zone &m_zone;
 };
+
+///////////////////////////////////////////////////////////////////////////////
 
 //! File search
 class FileSearch : public boost::noncopyable {
@@ -318,7 +382,7 @@ public:
 	typedef FileSearchRef Ref;
 
 	virtual bool NextFile(
-		string::String &path,
+		String &path,
 		FileAttributes *fileAttributes = 0,
 		xtime::TimeDate *fileTime = 0
 	) = 0;
@@ -327,6 +391,8 @@ protected:
 
 	FileSearch();
 };
+
+///////////////////////////////////////////////////////////////////////////////
 
 //! Pak file.
 class PakFile : public boost::noncopyable, public boost::enable_shared_from_this<PakFile> {
@@ -345,6 +411,7 @@ private:
 
 	friend class FileSystem;
 	friend class MMPakEntry;
+	friend class details::DetailsSearch;
 
 	class MMPakEntry : public MMFile {
 	public:
@@ -356,7 +423,8 @@ private:
 
 		virtual MMappingRef MMap(
 			AddrSize ofs, 
-			AddrSize size
+			AddrSize size,
+			::Zone &zone
 		);
 
 	protected:
@@ -369,9 +437,39 @@ private:
 		const data_codec::lmp::StreamReader::Lump &m_lump;
 	};
 
+	class PakSearch : public FileSearch {
+	public:
+		PakSearch(
+			const char *path,
+			SearchOptions searchOptions,
+			const PakFile::Ref &pak
+		);
+
+		void Reset();
+
+		virtual bool NextFile(
+			String &path,
+			FileAttributes *fileAttributes,
+			xtime::TimeDate *fileTime
+		);
+
+	private:
+
+		String m_prefix;
+		String m_pattern;
+		PakFile::Ref m_pak;
+		SearchOptions m_searchOptions;
+		int m_idx;
+	};
+
 	static Ref Open(const MMFileRef &file);
 
 	PakFile(const MMFileRef &file);
+	
+	FileSearchRef OpenSearch(
+		const char *path,
+		SearchOptions searchOptions
+	);
 
 	RAD_DECLARE_GET(numLumps, int);
 
@@ -380,6 +478,8 @@ private:
 
 };
 
+///////////////////////////////////////////////////////////////////////////////
+
 //! Stream InputBuffer for MMFile's
 class MMFileInputBuffer : public boost::noncopyable, public stream::IInputBuffer {
 public:
@@ -387,7 +487,8 @@ public:
 	
 	MMFileInputBuffer(
 		const MMFile::Ref &file,
-		AddrSize mappedSize = 8*Meg
+		AddrSize mappedSize = 8*Meg,
+		::Zone &zone = ZFile
 	);
 
 	virtual stream::SPos Read(void *buf, stream::SPos numBytes, UReg *errorCode);
@@ -404,7 +505,10 @@ private:
 	MMapping::Ref m_mmap;
 	stream::SPos m_pos;
 	stream::SPos m_bufSize;
+	::Zone &m_zone;
 };
+
+///////////////////////////////////////////////////////////////////////////////
 
 //! Stream InputBuffer for FILE*
 class FILEInputBuffer : public boost::noncopyable, public stream::IInputBuffer {
@@ -421,11 +525,17 @@ public:
 	virtual UReg InCaps() const;
 	virtual UReg InStatus() const;
 
+	RAD_DECLARE_READONLY_PROPERTY(FILEInputBuffer, fp, FILE*);
+
 private:
+
+	RAD_DECLARE_GET(fp, FILE*);
 
 	FILE *m_fp;
 	stream::SPos m_pos;
 };
+
+///////////////////////////////////////////////////////////////////////////////
 
 //! Stream OutputBuffer for FILE*
 class FILEOutputBuffer : public boost::noncopyable, public stream::IOutputBuffer {
@@ -442,36 +552,46 @@ public:
 	virtual UReg OutCaps() const;
 	virtual UReg OutStatus() const;
 
+	RAD_DECLARE_READONLY_PROPERTY(FILEOutputBuffer, fp, FILE*);
+
 private:
+
+	RAD_DECLARE_GET(fp, FILE*);
 
 	stream::SPos Size() const;
 
 	FILE *m_fp;
 	stream::SPos m_pos;
 };
+	
+///////////////////////////////////////////////////////////////////////////////
 
 // Helper functions
 
 //! Gets the file extension, including the '.'
-RADRT_API string::String RADRT_CALL GetFileExtension(const char *path);
+RADRT_API String RADRT_CALL GetFileExtension(const char *path);
 
 //! Sets the extension of a file.
 /*! If null is specified for extension then the extension is removed from the file. 
 	\param ext The extension to set, including the '.' */
-RADRT_API string::String RADRT_CALL SetFileExtension(
+RADRT_API String RADRT_CALL SetFileExtension(
 	const char *path, 
 	const char *ext
 );
 
 //! Returns the file name without any path components.
-RADRT_API string::String RADRT_CALL GetFileName(const char *path);
+RADRT_API String RADRT_CALL GetFileName(const char *path);
 
 //! Returns the file name without any extension or path components.
-RADRT_API string::String RADRT_CALL GetBaseFileName(const char *path);
+RADRT_API String RADRT_CALL GetBaseFileName(const char *path);
 
 //! Returns the file path without the file name itself.
-RADRT_API string::String RADRT_CALL GetFilePath(const char *path);
+RADRT_API String RADRT_CALL GetFilePath(const char *path);
+
+//! Returns true if the path matches a pattern of the form *.ext
+RADRT_API bool RADRT_CALL PathMatchesExtension(const char *path, const char *pattern);
 
 } // file
 
+#include "../PopPack.h"
 #include "File.inl"

@@ -18,16 +18,13 @@ using namespace endian;
 
 namespace asset {
 
-SoundCooker::SoundCooker() : Cooker(0)
-{
+SoundCooker::SoundCooker() : Cooker(0) {
 }
 
-SoundCooker::~SoundCooker()
-{
+SoundCooker::~SoundCooker() {
 }
 
-CookStatus SoundCooker::CheckRebuild(int flags, int allflags)
-{
+CookStatus SoundCooker::CheckRebuild(int flags, int allflags) {
 	if (CompareVersion(flags) ||
 		CompareModifiedTime(flags) || 
 		CompareCachedFileTimeKey(flags, "Source.File"))
@@ -35,13 +32,12 @@ CookStatus SoundCooker::CheckRebuild(int flags, int allflags)
 	return CS_UpToDate;
 }
 
-CookStatus SoundCooker::Status(int flags, int allflags)
-{
+CookStatus SoundCooker::Status(int flags, int allflags) {
 	flags &= P_AllTargets;
 	allflags &= P_AllTargets;
 
-	if (flags == 0)
-	{ // only build generics if all platforms are identical to eachother.
+	if (flags == 0) { 
+		// only build generics if all platforms are identical to eachother.
 		if (MatchTargetKeys(allflags, allflags)==allflags)
 			return CheckRebuild(flags, allflags);
 		return CS_Ignore;
@@ -51,8 +47,7 @@ CookStatus SoundCooker::Status(int flags, int allflags)
 		return CS_Ignore;
 
 	// only build ipad if different from iphone
-	if ((flags&P_TargetIPad) && (allflags&P_TargetIPhone))
-	{
+	if ((flags&P_TargetIPad) && (allflags&P_TargetIPhone)) {
 		if (MatchTargetKeys(P_TargetIPad, P_TargetIPhone))
 			return CS_Ignore;
 	}
@@ -60,8 +55,7 @@ CookStatus SoundCooker::Status(int flags, int allflags)
 	return CheckRebuild(flags, allflags);
 }
 
-int SoundCooker::Compile(int flags, int allflags)
-{
+int SoundCooker::Compile(int flags, int allflags) {
 	// Make sure these get updated
 	CompareVersion(flags);
 	CompareModifiedTime(flags);
@@ -71,20 +65,11 @@ int SoundCooker::Compile(int flags, int allflags)
 	if (!s)
 		return SR_MetaError;
 
-	file::HStreamInputBuffer ib;
-	int media = file::AllMedia;
+	file::MMFileInputBuffer::Ref ib = engine->sys->files->OpenInputBuffer(s->c_str, ZTools);
+	if (!ib)
+		return SR_FileNotFound;
 	
-	int r = engine->sys->files->OpenFileStream(
-		s->c_str,
-		media,
-		ib,
-		file::HIONotify()
-	);
-
-	if (r != SR_Success)
-		return r;
-
-	stream::InputStream is(ib->buffer);
+	stream::InputStream is(*ib);
 	audio_codec::wave::Decoder decoder;
 
 	if (!decoder.Initialize(is))
@@ -115,8 +100,7 @@ int SoundCooker::Compile(int flags, int allflags)
 	AddrSize size = 0;
 	AddrSize numBytes = (AddrSize)decoder.header->numBytes;
 
-	while(numBytes && decoder.Decode(block, BlockSize, size))
-	{
+	while(numBytes && decoder.Decode(block, BlockSize, size)) {
 		size = std::min(numBytes, size);
 
 		if (os.Write(block, (stream::SPos)size, 0) != (stream::SPos)size)
@@ -128,13 +112,11 @@ int SoundCooker::Compile(int flags, int allflags)
 	return numBytes ? SR_InvalidFormat : SR_Success;
 }
 
-int SoundCooker::MatchTargetKeys(int flags, int allflags)
-{
+int SoundCooker::MatchTargetKeys(int flags, int allflags) {
 	return asset->entry->MatchTargetKeys<String>("Source.File", flags, allflags);
 }
 
-void SoundCooker::Register(Engine &engine)
-{
+void SoundCooker::Register(Engine &engine) {
 	static pkg::Binding::Ref binding = engine.sys->packages->BindCooker<SoundCooker>();
 }
 

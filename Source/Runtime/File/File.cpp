@@ -3,34 +3,159 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "File.h"
+#include "../PushSystemMacros.h"
 
-using namespace string;
 using namespace data_codec::lmp;
 
 namespace file {
 
 RAD_ZONE_DEF(RADRT_API, ZFile, "Files", ZRuntime);
+RAD_ZONE_DEF(RADRT_API, ZPakFile, "Files", 0); // this is a dummy zone for memory mapped pak files.
 
 namespace {
-	inline bool pathHasAlias(const char *path) {
+	inline bool PathHasAlias(const char *path) {
 		RAD_ASSERT(path);
 		return (path[0] == '@') && (path[2] == ':');
 	}
-	inline bool isAbsPath(const char *path) {
-		return pathHasAlias(path);
+	inline bool IsAbsPath(const char *path) {
+		return PathHasAlias(path);
 	}
-	inline bool isRelPath(const char *path) {
-		return !isAbsPath(path);
-	}
-	inline void validatePath(const char *path) {
-#if defined(RAD_OPT_DEBUG)
-		for (int i = 0; path[i]; ++i) {
-			RAD_ASSERT_MSG(path[i] != '\\', "Invalid directory seperator"); // invalid directory seperator
-		}
-#endif
+	inline bool IsRelPath(const char *path) {
+		return !IsAbsPath(path);
 	}
 }
+
+namespace details {
+
+///////////////////////////////////////////////////////////////////////////////
+
+//! Handles searching through mount points/pak files, and performs shadowing.
+
+class DetailsSearch : public FileSearch {
+public:
+
+	DetailsSearch(FileSystem &fs) : m_fs(fs), m_paths(fs.m_paths) {
+	}
+
+	bool Init(
+		const char *path,
+		SearchOptions searchOptions,
+		FileOptions fileOptions,
+		int mask,
+		int exclude
+	) {
+		m_path = path;
+		m_root = GetFilePath(path);
+		m_searchOptions = searchOptions;
+		m_fileOptions = fileOptions;
+		m_mask = mask;
+		m_exclude = exclude;
+		m_it = m_paths.begin();
+		OpenSearch();
+		return m_s;
+	}
+
+	virtual bool NextFile(
+		String &path,
+		FileAttributes *fileAttributes,
+		xtime::TimeDate *fileTime
+	) {
+		while (m_s) {
+			FileSystem::PathMapping::Vec::const_iterator end = m_it;
+			--end;
+
+			while (m_s->NextFile(path, fileAttributes, fileTime)) {
+				// is this shadowed by a higher precident mount point?
+				FileSystem::PathMapping::Vec::const_iterator it;
+				for (it = m_paths.begin(); it != end; ++it) {
+
+					const FileSystem::PathMapping &m = *m_it;
+
+					if (m.mask&m_exclude)
+						continue;
+
+					if (m.mask&m_mask) {
+
+						String filePath;
+						if (!m_root.empty) {
+							filePath = m_root + "/" + path;
+						} else {
+							filePath = path;
+						}
+
+						if (m.pak) {
+							if (m.pak->FileExists(filePath.c_str))
+								break;
+						} else {
+							String diskPath = m.dir + "/" + filePath;
+							String nativePath;
+					
+							if (m_fs.GetNativePath(diskPath.c_str, nativePath)) {
+								if (m_fs.NativeFileExists(nativePath.c_str))
+									break;
+							}
+						}
+					}
+				}
+
+				if (it == end)
+					return true; // not shadowed.
+			}
+
+			OpenSearch();
+		}
+		return false;
+	}
+
+private:
+
+	void OpenSearch() {
+
+		m_s.reset();
+
+		for (;m_it != m_paths.end(); ++m_it) {
+			
+			const FileSystem::PathMapping &m = *m_it;
+			if (m.mask&m_exclude)
+				continue;
+			if (m.mask&m_mask) {
+				if (m.pak) {
+					m_s = m.pak->OpenSearch(m_path.c_str, m_searchOptions);
+				} else {
+					String path(m.dir + "/" + m_path);
+					String nativePath;
+					
+					if (m_fs.GetNativePath(path.c_str, nativePath)) {
+						m_s = m_fs.NativeOpenSearch(nativePath.c_str, m_searchOptions, m_fileOptions);
+					}
+				}
+
+				if (m_s) {
+					++m_it;
+					break;
+				}
+			}
+		}
+	}
+
+	String m_path;
+	String m_root;
+	SearchOptions m_searchOptions;
+	FileOptions m_fileOptions;
+	int m_mask;
+	int m_exclude;
+
+	FileSystem &m_fs;
+	FileSearch::Ref m_s;
+	FileSystem::PathMapping::Vec m_paths;
+	FileSystem::PathMapping::Vec::const_iterator m_it;
+};
+
+} // details
+
+///////////////////////////////////////////////////////////////////////////////
 
 FileSystem::FileSystem(const char *root, const char *dvd)
 : m_globalMask(kFileMask_Any) {
@@ -74,12 +199,13 @@ void FileSystem::AddDirectory(
 
 PakFile::Ref FileSystem::OpenPakFile(
 	const char *path,
+	::Zone &zone,
 	FileOptions options,
 	int mask,
 	int exclude,
 	int *resolved
 ) {
-	MMFile::Ref file = OpenFile(path, options, mask, exclude, resolved);
+	MMFile::Ref file = OpenFile(path, zone, options, mask, exclude, resolved);
 	if (file)
 		return PakFile::Open(file);
 	return PakFile::Ref();
@@ -152,6 +278,7 @@ FILE *FileSystem::fopen(
 
 MMFile::Ref FileSystem::OpenFile(
 	const char *path,
+	::Zone &zone,
 	FileOptions options,
 	int mask,
 	int exclude,
@@ -160,18 +287,18 @@ MMFile::Ref FileSystem::OpenFile(
 	mask &= m_globalMask;
 
 	if (options & kFileOption_NativePath)
-		return NativeOpenFile(path, options);
+		return NativeOpenFile(path, zone, options);
 
-	if (isAbsPath(path)) {
+	if (IsAbsPath(path)) {
 		String nativePath;
 		if (!GetNativePath(path, nativePath))
 			return MMFile::Ref();
-		return NativeOpenFile(nativePath.c_str, options);
+		return NativeOpenFile(nativePath.c_str, zone, options);
 	}
 
 	const String kPath(CStr(path));
 
-	RAD_ASSERT_MSG(kPath[0] != '/', "Relative paths should never being with a '/'!");
+	RAD_ASSERT_MSG(kPath[0] != '/', "Relative paths should never begin with a '/'!");
 
 	if (resolved)
 		*resolved = 0;
@@ -197,7 +324,7 @@ MMFile::Ref FileSystem::OpenFile(
 			
 				if (!GetNativePath(spath.c_str, spath))
 					return MMFileRef();
-				MMFileRef r = NativeOpenFile(spath.c_str, options);
+				MMFileRef r = NativeOpenFile(spath.c_str, zone, options);
 				if (r) {
 					if (resolved)
 						*resolved = m.mask;
@@ -210,6 +337,36 @@ MMFile::Ref FileSystem::OpenFile(
 	return MMFile::Ref();
 }
 
+//! Maps an entire file into memory.
+MMapping::Ref FileSystem::MapFile(
+	const char *path,
+	::Zone &zone,
+	FileOptions options,
+	int mask,
+	int exclude,
+	int *resolved
+) {
+	MMFile::Ref file = OpenFile(path, zone, options, mask, exclude, resolved);
+	if (!file)
+		return MMapping::Ref();
+	return file->MMap(0, 0);
+}
+
+MMFileInputBuffer::Ref FileSystem::OpenInputBuffer(
+	const char *path,
+	::Zone &zone,
+	AddrSize mappedSize,
+	FileOptions options,
+	int mask,
+	int exclude,
+	int *resolved
+) {
+	MMFile::Ref file = OpenFile(path, zone, options, mask, exclude, resolved);
+	if (!file)
+		return MMFileInputBuffer::Ref();
+	return MMFileInputBuffer::Ref(new (ZFile) MMFileInputBuffer(file, mappedSize, zone));
+}
+
 bool FileSystem::GetAbsolutePath(
 	const char *path, 
 	String &absPath,
@@ -220,14 +377,14 @@ bool FileSystem::GetAbsolutePath(
 	RAD_ASSERT(path);
 	mask &= m_globalMask;
 
-	if (isAbsPath(path)) {
+	if (IsAbsPath(path)) {
 		absPath = path;
 		return true;
 	}
 
 	const String kPath(CStr(path));
 
-	RAD_ASSERT_MSG(kPath[0] != '/', "Relative paths should never being with a '/'!");
+	RAD_ASSERT_MSG(kPath[0] != '/', "Relative paths should never begin with a '/'!");
 
 	for (PathMapping::Vec::const_iterator it = m_paths.begin(); it != m_paths.end(); ++it) {
 		const PathMapping &m = *it;
@@ -238,7 +395,9 @@ bool FileSystem::GetAbsolutePath(
 			continue;
 		if (m.mask&mask) {
 		
-			absPath = m.dir + "/" + kPath;
+			absPath = m.dir;
+			if (!kPath.empty)
+				absPath += "/" + kPath;
 			
 			if (resolved)
 				*resolved = m.mask;
@@ -257,7 +416,7 @@ bool FileSystem::GetNativePath(
 ) {
 	RAD_ASSERT(path);
 
-	if (!pathHasAlias(path))
+	if (!PathHasAlias(path))
 		return false;
 
 	String spath(CStr(path));
@@ -267,7 +426,7 @@ bool FileSystem::GetNativePath(
 	memset(&m_touched[0], 0, sizeof(bool)*kAliasMax);
 #endif
 
-	while (pathHasAlias(spath.c_str)) {
+	while (PathHasAlias(spath.c_str)) {
 		char alias = spath[1];
 #if defined(RAD_OPT_DEBUG)
 		RAD_ASSERT_MSG(!m_touched[alias], "Expanding recursive file system alias!");
@@ -278,6 +437,18 @@ bool FileSystem::GetNativePath(
 
 	nativePath = spath;
 	return true;
+}
+
+bool FileSystem::ExpandToNativePath(
+	const char *path, 
+	String &nativePath,
+	int mask,
+	int exclude,
+	int *resolved
+) {
+	if (!GetAbsolutePath(path, nativePath, mask, exclude, resolved))
+		return false;
+	return GetNativePath(nativePath.c_str, nativePath);
 }
 
 bool FileSystem::FileExists(
@@ -292,7 +463,7 @@ bool FileSystem::FileExists(
 	if (options & kFileOption_NativePath)
 		return NativeFileExists(path);
 
-	if (isAbsPath(path)) {
+	if (IsAbsPath(path)) {
 		String nativePath;
 		if (!GetNativePath(path, nativePath))
 			return false;
@@ -318,7 +489,7 @@ bool FileSystem::FileExists(
 					return true;
 				}
 			} else {
-				String spath = m.dir + kPath;
+				String spath = m.dir + "/" + kPath;
 				if (!GetNativePath(spath.c_str, spath))
 					return false;
 				if (NativeFileExists(spath.c_str)) {
@@ -332,6 +503,35 @@ bool FileSystem::FileExists(
 
 	return false;
 }
+
+FileSearch::Ref FileSystem::OpenSearch(
+	const char *path,
+	SearchOptions searchOptions,
+	FileOptions fileOptions,
+	int mask,
+	int exclude
+) {
+	if (fileOptions & kFileOption_NativePath)
+		return NativeOpenSearch(path, searchOptions, fileOptions);
+
+	if (IsAbsPath(path)) {
+		String nativePath;
+		if (!GetNativePath(path, nativePath))
+			return FileSearch::Ref();
+		return NativeOpenSearch(nativePath.c_str, searchOptions, fileOptions);
+	}
+
+	mask &= m_globalMask;
+
+	details::DetailsSearch *s = new (ZFile) details::DetailsSearch(*this);
+	FileSearch::Ref r(s);
+
+	if (!s->Init(path, searchOptions, fileOptions, mask, exclude))
+		return FileSearch::Ref();
+
+	return r;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 PakFile::Ref PakFile::Open(const MMFile::Ref &file) {
@@ -358,6 +558,21 @@ MMFile::Ref PakFile::OpenFile(const char *path) {
 	return r;
 }
 
+FileSearch::Ref PakFile::OpenSearch(
+	const char *path,
+	SearchOptions searchOptions
+) {
+	PakSearch *s = new (ZFile) PakSearch(path, searchOptions, shared_from_this());
+	FileSearch::Ref r(s);
+
+	String temp;
+	if (!s->NextFile(temp, 0, 0))
+		return FileSearch::Ref();
+
+	s->Reset();
+	return r;
+}
+
 bool PakFile::FileExists(const char *path) {
 	return m_pak.GetByName(path) != 0;
 }
@@ -380,11 +595,12 @@ PakFile::MMPakEntry::MMPakEntry(
 ) : m_pakFile(pakFile), m_lump(lump) {
 }
 
-MMapping::Ref PakFile::MMPakEntry::MMap(AddrSize ofs, AddrSize size) {
+MMapping::Ref PakFile::MMPakEntry::MMap(AddrSize ofs, AddrSize size, ::Zone &zone) {
 	RAD_ASSERT(ofs+size <= (AddrSize)m_lump.Size());
 	return m_pakFile->m_file->MMap(
 		(AddrSize)m_lump.Ofs() + ofs,
-		size
+		size,
+		zone
 	);
 }
 
@@ -392,12 +608,62 @@ AddrSize PakFile::MMPakEntry::RAD_IMPLEMENT_GET(size) {
 	return (AddrSize)m_lump.Size();
 }
 
+PakFile::PakSearch::PakSearch(const char *_path, SearchOptions searchOptions, const PakFile::Ref &pak)
+	: m_searchOptions(searchOptions), m_pak(pak), m_idx(0) {
+
+	m_prefix = GetFilePath(_path);
+	m_pattern = GetFileName(_path);
+}
+
+void PakFile::PakSearch::Reset() {
+	m_idx = 0;
+}
+
+bool PakFile::PakSearch::NextFile(
+	String &path,
+	FileAttributes *fileAttributes,
+	xtime::TimeDate *fileTime
+) {
+	const int numLumps = m_pak->numLumps;
+
+	for (; m_idx < numLumps; ++m_idx) {
+		const data_codec::lmp::StreamReader::Lump *l = m_pak->LumpForIndex(m_idx);
+		if (!l)
+			break;
+
+		String lumpPath(CStr(l->Name()));
+
+		if (m_prefix.NCompare(lumpPath, m_prefix.length))
+			continue;
+
+		if (!(m_searchOptions & kSearchOption_Recursive)) {
+			String name = GetFileName(lumpPath.c_str);
+			int len = name.length + m_prefix.length + 1;
+			if (len != lumpPath.length)
+				continue; // in a sub-directory, not recursing so skip.
+		}
+
+		if (PathMatchesExtension(lumpPath.c_str, m_pattern.c_str)) {
+			++m_idx;
+			path = lumpPath.SubStr(m_prefix.length);
+			if (fileAttributes)
+				*fileAttributes = kFileAttribute_PakFile;
+			if (fileTime)
+				memset(fileTime, 0, sizeof(xtime::TimeDate));
+			return true;
+		}
+	}
+
+	return false;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 MMFileInputBuffer::MMFileInputBuffer(
 	const MMFile::Ref &file,
-	AddrSize mappedSize
-) : m_file(file), m_bufSize(mappedSize), m_pos(0) {
+	AddrSize mappedSize,
+	::Zone &zone
+) : m_file(file), m_bufSize(mappedSize), m_pos(0), m_zone(zone) {
 	RAD_ASSERT(mappedSize);
 }
 
@@ -426,7 +692,7 @@ stream::SPos MMFileInputBuffer::Read(void *buf, stream::SPos numBytes, UReg *err
 			if (bufSize > bytesLeftInFile)
 				bufSize = bytesLeftInFile;
 
-			m_mmap = m_file->MMap(m_pos, bufSize);
+			m_mmap = m_file->MMap(m_pos, bufSize, m_zone);
 			if (!m_mmap)
 				break; // error.
 		}
@@ -542,7 +808,7 @@ RADRT_API String RADRT_CALL GetFileExtension(const char *path) {
 	RAD_ASSERT(path);
 	String ext;
 
-	int l = len(path);
+	int l = string::len(path);
 	if (l > 0) {
 		// find the '.'
 		for (int i = l-1; i >= 0; --i) {
@@ -585,7 +851,7 @@ RADRT_API String RADRT_CALL SetFileExtension(
 RADRT_API String RADRT_CALL GetFileName(const char *path) {
 	RAD_ASSERT(path);
 	
-	int l = len(path);
+	int l = string::len(path);
 	for (int i = l-1; i >= 0; --i) {
 		if (path[i] == '/' || path[i] == '\\') {
 			return String(&path[i+1]);
@@ -603,14 +869,27 @@ RADRT_API String RADRT_CALL GetBaseFileName(const char *path) {
 RADRT_API String RADRT_CALL GetFilePath(const char *path) {
 	RAD_ASSERT(path);
 	
-	int l = len(path);
+	int l = string::len(path);
 	for (int i = l-1; i >= 0; --i) {
 		if (path[i] == '/' || path[i] == '\\') {
-			return String(path, i, CopyTag);
+			return String(path, i, string::CopyTag);
 		}
 	}
 
 	return String();
+}
+
+RADRT_API bool RADRT_CALL PathMatchesExtension(const char *path, const char *pattern) {
+	RAD_ASSERT(path);
+	RAD_ASSERT(pattern);
+
+	if (!string::cmp(pattern, "*.*"))
+		return true;
+
+	String s = GetFileExtension(path);
+	String p = GetFileExtension(pattern);
+
+	return s == p;
 }
 
 } // file

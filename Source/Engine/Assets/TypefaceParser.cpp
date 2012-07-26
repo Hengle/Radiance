@@ -17,12 +17,10 @@ TypefaceParser::TypefaceParser() :
 m_font(0),
 m_mat(0),
 m_width(0),
-m_height(0)
-{
+m_height(0) {
 }
 
-TypefaceParser::~TypefaceParser()
-{
+TypefaceParser::~TypefaceParser() {
 }
 
 int TypefaceParser::Process(
@@ -30,16 +28,14 @@ int TypefaceParser::Process(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
+) {
 	if (!(flags&(P_Load|P_Unload|P_Parse|P_Info|P_Trim)))
 		return SR_Success;
 
 	if (valid && (flags&(P_Load|P_Parse|P_Info|P_Trim)))
 		return SR_Success;
 
-	if (flags&P_Unload)
-	{
+	if (flags&P_Unload) {
 		m_fontRef.reset();
 		m_matRef.reset();
 		m_font = 0;
@@ -62,10 +58,8 @@ int TypefaceParser::Load(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
-	if (!m_fontRef)
-	{
+) {
+	if (!m_fontRef) {
 		const int *i = asset->entry->KeyValue<int>("Typeface.Width", P_TARGET_FLAGS(flags));
 		if (!i)
 			return SR_MetaError;
@@ -85,11 +79,10 @@ int TypefaceParser::Load(
 
 		m_fontRef = engine.sys->packages->Resolve(s->c_str, asset->zone);
 		if (!m_fontRef)
-			return SR_MissingFile;
+			return SR_FileNotFound;
 	}
 
-	if (!m_font)
-	{
+	if (!m_font) {
 		int r = m_fontRef->Process(time, flags);
 		if (r != SR_Success)
 			return r;
@@ -99,19 +92,17 @@ int TypefaceParser::Load(
 		m_font = parser->font;
 	}
 
-	if (!m_matRef)
-	{
+	if (!m_matRef) {
 		const String *s = asset->entry->KeyValue<String>("Source.Material", P_TARGET_FLAGS(flags));
 		if (!s || s->empty)
 			return SR_MetaError;
 
 		m_matRef = engine.sys->packages->Resolve(s->c_str, asset->zone);
 		if (!m_matRef)
-			return SR_MissingFile;
+			return SR_FileNotFound;
 	}
 
-	if (!m_mat)
-	{
+	if (!m_mat) {
 		int r = m_matRef->Process(time, flags);
 		if (r != SR_Success)
 			return r;
@@ -130,10 +121,8 @@ int TypefaceParser::LoadCooked(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
-	if (!m_fontRef)
-	{
+) {
+	if (!m_fontRef) {
 		const U16 *tags = (const U16*)asset->entry->TagData(P_TARGET_FLAGS(flags));
 
 		m_width = tags[0];
@@ -145,11 +134,10 @@ int TypefaceParser::LoadCooked(
 
 		m_fontRef = asset->entry->Resolve(*i, asset->zone);
 		if (!m_fontRef)
-			return SR_MissingFile;
+			return SR_FileNotFound;
 	}
 
-	if (!m_font)
-	{
+	if (!m_font) {
 		int r = m_fontRef->Process(time, flags);
 		if (r != SR_Success)
 			return r;
@@ -159,19 +147,17 @@ int TypefaceParser::LoadCooked(
 		m_font = parser->font;
 	}
 
-	if (!m_matRef)
-	{
+	if (!m_matRef) {
 		const Package::Entry::Import *i = asset->entry->Resolve(1);
 		if (!i)
 			return SR_ParseError;
 
 		m_matRef = asset->entry->Resolve(*i, asset->zone);
 		if (!m_matRef)
-			return SR_MissingFile;
+			return SR_FileNotFound;
 	}
 
-	if (!m_mat)
-	{
+	if (!m_mat) {
 		int r = m_matRef->Process(time, flags);
 		if (r != SR_Success)
 			return r;
@@ -184,8 +170,7 @@ int TypefaceParser::LoadCooked(
 	return SR_Success;
 }
 
-void TypefaceParser::Register(Engine &engine)
-{
+void TypefaceParser::Register(Engine &engine) {
 	static pkg::Binding::Ref binding = engine.sys->packages->Bind<TypefaceParser>();
 }
 

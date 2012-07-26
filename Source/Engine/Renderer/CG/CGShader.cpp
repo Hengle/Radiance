@@ -63,23 +63,8 @@ Shader::Ref Shader::Load(Engine &e, const char *name)
 	path += name;
 	path += ".sh";
 
-	int media = file::AllMedia;
-	file::HBufferedAsyncIO buf;
-	bool r = e.sys->files->LoadFile(
-		path.c_str,
-		media,
-		buf,
-		file::HIONotify()
-	) >= file::Success;
-
-	r = r && buf;
-	if (r)
-	{
-		buf->WaitForCompletion();
-		r = buf->result == file::Success;
-	}
-
-	if (!r)
+	file::MMapping::Ref mm = e.sys->files->MapFile(path.c_str, ZTools);
+	if (!mm)
 	{
 		COut(C_ErrMsgBox) << "cg::Shader::Load(): failed to load '" << name << "'" << std::endl;
 		return Ref();
@@ -90,8 +75,8 @@ Shader::Ref Shader::Load(Engine &e, const char *name)
 
 	if (luaL_loadbuffer(
 		L->L,
-		(const char *)buf->data->ptr.get(),
-		buf->data->size,
+		(const char *)mm->data.get(),
+		mm->size,
 		name
 	) != 0)
 	{
@@ -514,23 +499,8 @@ Shader::Node::Ref Shader::LoadNode(Engine &e, lua_State *L, const char *type)
 	path += type;
 	path += ".n";
 
-	int media = file::AllMedia;
-	file::HBufferedAsyncIO buf;
-	bool r = e.sys->files->LoadFile(
-		path.c_str,
-		media,
-		buf,
-		file::HIONotify()
-	) >= file::Success;
-
-	r = r && buf;
-	if (r)
-	{
-		buf->WaitForCompletion();
-		r = buf->result == file::Success;
-	}
-
-	if (!r)
+	file::MMapping::Ref mm = e.sys->files->MapFile(path.c_str, ZTools);
+	if (!mm)
 	{
 		luaL_error(L, "cg::Shader::LoadNode(): Error loading %s, (Function %s, File %s, Line %d).",
 			type,
@@ -546,8 +516,8 @@ Shader::Node::Ref Shader::LoadNode(Engine &e, lua_State *L, const char *type)
 
 	if (luaL_loadbuffer(
 		S->L,
-		(const char *)buf->data->ptr.get(),
-		buf->data->size,
+		(const char *)mm->data.get(),
+		mm->size,
 		type
 	) != 0)
 	{
@@ -1495,20 +1465,20 @@ Shader::Node::Ref Shader::Node::Clone() const
 
 void ShaderCache::Discover(Engine &engine)
 {
-	file::HSearch search;
-	search = engine.sys->files->OpenSearch("Shaders", ".sh", file::AllMedia);
+	file::FileSearch::Ref search = engine.sys->files->OpenSearch(
+		"Shaders/*.sh",
+		file::kSearchOption_Recursive,
+		file::kFileOptions_None,
+		file::kFileMask_Base
+	);
+
 	if (search)
 	{
 		String path;
 		while (search->NextFile(path))
 		{
-			if (!engine.sys->files->FileExists((CStr("Shaders/")+path).c_str, file::AllMedia))
-				continue;
-
-			char name[256];
-			file::SetFileExt(path.c_str, 0, name, 256);
-			
-			Load(engine, name);
+			String name = file::SetFileExtension(path.c_str, 0);
+			Load(engine, name.c_str);
 		}
 	}
 }

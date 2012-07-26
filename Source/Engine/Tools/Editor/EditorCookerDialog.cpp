@@ -221,9 +221,7 @@ void CookerDialog::CookClicked()
 
 	pkg::PackageMan::StringVec roots;
 	{
-		char path[256];
-		file::ExpandToNativePath("9:/cook.txt", path, 256);
-		FILE *fp = fopen(path, "rb");
+		FILE *fp = App::Get()->engine->sys->files->fopen("@r:/cook.txt", "rb");
 		if (!fp)
 		{
 			QMessageBox::critical(
@@ -273,7 +271,7 @@ void CookerDialog::CookClicked()
 	}
 
 	int enabledLangMask;
-	App::LoadLangId(&enabledLangMask, App::Get()->systemLangId);
+	App::Get()->LoadLangId(&enabledLangMask, App::Get()->systemLangId);
 	if (enabledLangMask == 0) {
 		QMessageBox::critical(
 			this,

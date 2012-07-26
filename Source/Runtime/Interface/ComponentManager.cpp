@@ -3,6 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#include RADPCH
 #include "ComponentManager.h"
 #include "ComponentBuilder.h"
 #include "../String.h"

@@ -18,12 +18,10 @@ namespace asset {
 
 RAD_ZONE_DEC(RADENG_API, ZMesh);
 
-struct RADENG_CLASS DMesh
-{
+struct RADENG_CLASS DMesh {
 	typedef zone_vector<DMesh, ZMeshT>::type Vec;
 
-	enum
-	{
+	enum {
 		RAD_FLAG(Vertices),
 		RAD_FLAG(Texture1),
 		RAD_FLAG(Texture2)
@@ -39,8 +37,7 @@ struct RADENG_CLASS DMesh
 	const void *indices;
 };
 
-struct RADENG_CLASS DMeshBundle
-{
+struct RADENG_CLASS DMeshBundle {
 	DMesh::Vec meshes;
 
 	// NOTE: bundle will reference data in place, do not free
@@ -53,8 +50,8 @@ struct RADENG_CLASS DMeshBundle
 
 namespace tools {
 
-struct DMeshBundleData
-{ // cleans itself up when destructed
+struct DMeshBundleData { 
+	// cleans itself up when destructed
 	typedef boost::shared_ptr<DMeshBundleData> Ref;
 
 	DMeshBundleData();

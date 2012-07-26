@@ -7,21 +7,19 @@
 
 #include "AssetTypes.h"
 #include "../Packages/Packages.h"
-#include "../FileSystem/FileSystem.h"
+#include <Runtime/File.h>
 #include <Runtime/PushPack.h>
 
 class Engine;
 
 namespace asset {
 
-class RADENG_CLASS MusicParser : public pkg::Sink<MusicParser>
-{
+class RADENG_CLASS MusicParser : public pkg::Sink<MusicParser> {
 public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
+	enum {
 		SinkStage = pkg::SS_Parser,
 		AssetType = AT_Music
 	};
@@ -31,11 +29,13 @@ public:
 	MusicParser();
 	virtual ~MusicParser();
 
-	RAD_DECLARE_READONLY_PROPERTY(MusicParser, file, const file::HFile&);
+	RAD_DECLARE_READONLY_PROPERTY(MusicParser, file, const file::MMFile::Ref&);
 
 protected:
 
-	RAD_DECLARE_GET(file, const file::HFile&) { return m_file; }
+	RAD_DECLARE_GET(file, const file::MMFile::Ref&) { 
+		return m_file; 
+	}
 	
 	virtual int Process(
 		const xtime::TimeSlice &time,
@@ -62,7 +62,7 @@ protected:
 
 private:
 
-	file::HFile m_file;
+	file::MMFile::Ref m_file;
 };
 
 } // asset

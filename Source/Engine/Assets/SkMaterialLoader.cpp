@@ -12,12 +12,10 @@ using namespace pkg;
 
 namespace asset {
 
-SkMaterialLoader::SkMaterialLoader() : m_state(S_None), m_matIdx(0)
-{
+SkMaterialLoader::SkMaterialLoader() : m_state(S_None), m_matIdx(0) {
 }
 
-SkMaterialLoader::~SkMaterialLoader()
-{
+SkMaterialLoader::~SkMaterialLoader() {
 }
 
 int SkMaterialLoader::Process(
@@ -25,20 +23,15 @@ int SkMaterialLoader::Process(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
+) {
 	if (!(flags&(P_Load|P_Unload|P_Parse|P_Info|P_Trim)))
 		return SR_Success;
 
-	if (flags&(P_Load|P_Parse|P_Info|P_Trim))
-	{
-		if (flags&P_Trim)
-		{
+	if (flags&(P_Load|P_Parse|P_Info|P_Trim)) {
+		if (flags&P_Trim) {
 			if (m_state == S_Done)
 				m_state = S_LoadMaterials;
-		}
-		else
-		{
+		} else {
 			if (m_state == S_Done)
 				return SR_Success;
 			if (m_state == S_None)
@@ -46,8 +39,7 @@ int SkMaterialLoader::Process(
 		}
 	}
 
-	if (flags&P_Unload)
-	{
+	if (flags&P_Unload) {
 		m_matRefs.clear();
 		m_state = S_None;
 		return SR_Success;
@@ -75,8 +67,7 @@ int SkMaterialLoader::Load(
 	if (!parser)
 		return SR_ParseError;
 
-	if (parser->dskm->meshes.size() == 0)
-	{
+	if (parser->dskm->meshes.size() == 0) {
 		m_state = S_Error;
 		return SR_InvalidFormat;
 	}
@@ -85,22 +76,19 @@ int SkMaterialLoader::Load(
 		m_matRefs.resize(parser->dskm->meshes.size());
 		
 	RAD_ASSERT(m_state == S_LoadMaterials);
-	for (; m_matIdx < (int)m_matRefs.size(); ++m_matIdx)
-	{
+	for (; m_matIdx < (int)m_matRefs.size(); ++m_matIdx) {
 		pkg::Asset::Ref &m = m_matRefs[m_matIdx];
 		const ska::DMesh &dm = parser->dskm->meshes[m_matIdx];
 
-		if (!m)
-		{
+		if (!m) {
 			m = engine.sys->packages->Resolve(dm.material, asset->zone);
-			if (!m || m->type != asset::AT_Material)
-			{
+			if (!m || m->type != asset::AT_Material) {
 #if defined(RAD_OPT_TOOLS)
 				if (!(flags&P_NoDefaultMedia))
 					m = engine.sys->packages->Resolve("Sys/M_Missing", asset->zone);
 				if (!m)
 #endif
-					return SR_MissingFile;
+					return SR_FileNotFound;
 			}
 		}
 
@@ -113,8 +101,7 @@ int SkMaterialLoader::Load(
 			flags
 		);
 
-		if (r < SR_Success)
-		{
+		if (r < SR_Success) {
 			m_state = S_Error;
 			return r;
 		}
@@ -128,8 +115,7 @@ int SkMaterialLoader::Load(
 	return SR_Success;
 }
 
-void SkMaterialLoader::Register(Engine &engine)
-{
+void SkMaterialLoader::Register(Engine &engine) {
 	static pkg::Binding::Ref ref = engine.sys->packages->Bind<SkMaterialLoader>();
 }
 

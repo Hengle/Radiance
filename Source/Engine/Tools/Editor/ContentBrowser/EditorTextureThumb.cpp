@@ -9,13 +9,13 @@
 #include "../EditorUtils.h"
 #include "../../../Renderer/GL/GLState.h"
 #include "../../../Assets/TextureParser.h"
-#include "../../../FileSystem/FileSystem.h"
 #include <Runtime/Container/ZoneList.h>
 #include <Runtime/Container/ZoneMap.h>
 #include <Runtime/Container/ZoneSet.h>
 #include <Runtime/Thread/Thread.h>
 #include <Runtime/Thread/Locks.h>
 #include <Runtime/Math/Math.h>
+#include <Runtime/File.h>
 #include <algorithm>
 #undef min
 #undef max
