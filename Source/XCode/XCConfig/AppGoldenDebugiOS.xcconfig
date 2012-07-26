@@ -1,10 +1,10 @@
-// AppShipReleaseOSX.xcconfig
-// App ship release OSX build config
+// AppGoldenDebugiOS.xcconfig
+// App golden debug iOS build config
 // Copyright (c) 2012 Sunside Inc., All Rights Reserved.
 // See Radiance/LICENSE for licensing terms.
 
-#include "AppReleaseOSX.xcconfig"
-#include "EngineShip.xcconfig"
+#include "AppDebugiOS.xcconfig"
+#include "EngineGolden.xcconfig"
 
 OPTIONAL_EXTERNLIB_INCLUDES = 
 

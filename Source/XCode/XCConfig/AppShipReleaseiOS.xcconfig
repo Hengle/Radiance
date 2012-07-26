@@ -4,7 +4,7 @@
 // See Radiance/LICENSE for licensing terms.
 
 #include "AppReleaseiOS.xcconfig"
-#include "EngineDeveloper.xcconfig"
+#include "EngineShip.xcconfig"
 
 OPTIONAL_EXTERNLIB_INCLUDES = 
 

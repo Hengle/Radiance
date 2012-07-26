@@ -28,7 +28,7 @@ enum
 };
 
 
-Game::Game() : m_slot(0), m_pinch(0), m_pinchDelay(0), m_cloudStorage(false)
+Game::Game() : m_slot(0), m_pinch(0), m_pinchDelay(0), m_cloudStorage(false), m_quit(false)
 #if defined(RAD_OPT_PC_TOOLS)
 , m_toolsCallback(0)
 #endif

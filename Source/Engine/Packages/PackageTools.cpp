@@ -351,7 +351,7 @@ bool Package::Rename(int id, const char *name) {
 
 	RAD_ASSERT(name);
 	{
-		StringIdMap::const_iterator it = m_dirSet.find(String(name).Lower());
+		StringIdMap::const_iterator it = m_dirSet.find(CStr(name).Lower());
 		if (it != m_dirSet.end() && it->second != id) { 
 			// already something with that name.
 			return false;
@@ -370,8 +370,8 @@ bool Package::Rename(int id, const char *name) {
 	newPath = ref->m_path;
 	m_dir.erase(oldName);
 	m_dir[ref->m_name] = ref;
-	m_dirSet.erase(oldName.Lower());
-	m_dirSet[ref->m_name.Lower()] = id;
+	m_dirSet.erase(String(oldName).Lower());
+	m_dirSet[String(ref->m_name).Lower()] = id;
 
 	for (int i = 0; i < Z_Max; ++i) {
 		AssetWMap::iterator it = m_assets[i].find(oldName);

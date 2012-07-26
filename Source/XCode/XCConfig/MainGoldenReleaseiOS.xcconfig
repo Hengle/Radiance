@@ -1,0 +1,11 @@
+// MainGoldenReleaseiOS.xcconfig
+// Main golden release ios build config
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+#include "EngineReleaseiOS.xcconfig"
+#include "EngineGolden.xcconfig"
+
+OPTIONAL_EXTERNLIB_INCLUDES =
+
+#include "MainBuild.xcconfig"

@@ -313,6 +313,7 @@ m_tickRedraw(false)
 	m_resolutions = new (ZEditor) QComboBox(this);
 	m_resolutions->addItem(QString("320x480 (3GS)"), makeRes(320, 480));
 	m_resolutions->addItem(QString("1024x768 (iPad)"), makeRes(1024, 768));
+	m_resolutions->addItem(QString("1280x720 (16:9)"), makeRes(1280, 720));
 	m_resolutions->addItem(QString("1366x768 (16:9)"), makeRes(1366, 768));
 	m_resolutions->addItem(QString("1440x900 (16:10)"), makeRes(1440, 900));
 	m_resolutions->addItem(QString("16000x900 (16:9)"), makeRes(1600, 900));

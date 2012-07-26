@@ -92,8 +92,11 @@ void PIEWidget::CenterCursor()
 void PIEWidget::OnTick(float dt)
 {
 	m_dt = dt;
-	if (m_game)
+	if (m_game) {
 		updateGL(); // renderGL immediately.
+		if (m_game->quit)
+			close();
+	}
 }
 
 void PIEWidget::renderGL()

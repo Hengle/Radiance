@@ -54,7 +54,7 @@ void SetDefaultAliases()
 		{
 #if defined(RAD_OPT_IOS)
 			__IOS_BundlePath(buff);
-#elif defined(RAD_OPT_OSX) && !defined(RAD_OPT_TOOLS)
+#elif defined(RAD_OPT_OSX) && defined(RAD_OPT_SHIP)
 			__OSX_BundlePath(buff);
 #else
 			getcwd(buff, MaxFilePathLen);

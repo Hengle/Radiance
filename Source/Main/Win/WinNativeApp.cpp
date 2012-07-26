@@ -274,6 +274,9 @@ bool NativeApp::PreInit() {
 			if (dm.dmBitsPerPel < 32)
 				continue;
 			r::VidMode m = VidModeFromDevMode(dm);
+			
+			if (!m.SameAspect(dd->m_defMode)) // don't allow stretched modes.
+				continue;
 
 			r::VidModeVec::iterator it;
 			for (it = dd->m_vidModes.begin(); it != dd->m_vidModes.end(); ++it) {
@@ -711,6 +714,11 @@ GLDeviceContext::Ref NativeApp::CreateOpenGLContext(const GLPixelFormat &pf) {
 				wGLContext *wglc = new (ZEngine) wGLContext();
 				wglc->glrc = glrc;
 				wglc->Bind();
+				glClearColor(0, 0, 0, 0);
+				glClear(GL_COLOR_BUFFER_BIT);
+				::SwapBuffers(s_hDC);
+				glClear(GL_COLOR_BUFFER_BIT);
+				::SwapBuffers(s_hDC);
 				return GLDeviceContext::Ref(wglc);
 			}
 		}
@@ -1013,6 +1021,7 @@ LRESULT CALLBACK MyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		if (wParam & MK_RBUTTON)
 			e.data[2] |= kMouseButton_Right;
 
+		e.time = xtime::ReadMilliseconds();
 		app->PostInputEvent(e);
 		break;
 	case WM_MOUSEWHEEL:
@@ -1027,12 +1036,14 @@ LRESULT CALLBACK MyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		e.type = InputEvent::T_KeyDown;
 		e.repeat = LOWORD(lParam) > 1;
 		e.data[0] = TranslateVKey((int)wParam, (int)lParam);
+		e.time = xtime::ReadMilliseconds();
 		app->PostInputEvent(e);
 		break;
 	case WM_KEYUP:
 		e.type = InputEvent::T_KeyUp;
 		e.repeat = false;
 		e.data[0] = TranslateVKey((int)wParam, (int)lParam);
+		e.time = xtime::ReadMilliseconds();
 		app->PostInputEvent(e);
 		break;
 	default:

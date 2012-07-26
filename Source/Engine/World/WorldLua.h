@@ -208,6 +208,7 @@ private:
 	static int lua_ViewModelBonePos(lua_State *L);
 	static int lua_ViewModelFindBone(lua_State *L);
 	static int lua_CurrentDateAndTime(lua_State *L);
+	static int lua_QuitGame(lua_State *L);
 	static int lua_gnCreate(lua_State *L);
 	static int lua_gnAuthenticateLocalPlayer(lua_State *L);
 	static int lua_gnLocalPlayerId(lua_State *L);

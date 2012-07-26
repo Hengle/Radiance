@@ -16,7 +16,7 @@ namespace r {
 
 class VidMode {
 public:
-
+	
 	VidMode() : w(0), h(0), bpp(0), hz(0), fullscreen(false) {}
 	VidMode(const VidMode &v) : w(v.w), h(v.h), bpp(v.bpp), hz(v.hz), fullscreen(v.fullscreen) {}
 	VidMode(int _w, int _h, const VidMode &v) : w(_w), h(_h), bpp(v.bpp), hz(v.hz), fullscreen(v.fullscreen) {}
@@ -59,6 +59,10 @@ public:
 		if (Is16x10())
 			return v.Is16x10();
 		return true; // unrecognizable.
+	}
+	
+	bool SameSize(const r::VidMode &v) const {
+		return (w == v.w) && (h == v.h);
 	}
 
 private:
