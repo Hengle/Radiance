@@ -90,7 +90,7 @@ int MaterialCooker::Compile(int flags, int allflags)
 	}
 
 	int shaderId = parser->material->CookShader(
-		"9:/Cooked/Out/Shaders",
+		"@r:/Cooked/Out/Shaders",
 		*engine.get(),
 		shaderTarget
 	);

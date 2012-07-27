@@ -125,7 +125,7 @@ bool SaveStorage(const char *name, const world::Keys &keys)
 #if defined(RAD_OPT_IOS)
 	fp = __IOS_OpenPersistence(name, "wb");
 #else
-	String path(CStr("9:/") + name);
+	String path(CStr("@r:/") + name);
 	fp = App::Get()->engine->sys->files->fopen(path.c_str, "wb");
 #endif
 
