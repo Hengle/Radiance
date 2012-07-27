@@ -1014,8 +1014,7 @@ void PackageMan::EnumeratePackage(
 		file::kFileMask_Base
 	);
 
-	if (!ib) 
-	{
+	if (!ib) {
 		COut(C_ErrMsgBox) << "PackageMan: failed to load '" << path << "'" << std::endl;
 #if defined(RAD_OPT_PC_TOOLS)
 		ui.totalProgress = ui.totalProgress.get() + size;

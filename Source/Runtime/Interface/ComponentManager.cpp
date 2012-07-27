@@ -27,7 +27,6 @@
 #include "../SharedLibrary.h"
 
 using namespace file;
-using namespace string;
 
 RAD_ZONE_DEF(RADRT_API, ZComMan, "Component Manager", ZRuntime);
 
@@ -169,7 +168,8 @@ struct ComponentManager :
 		for (int i = 0;; ++i) {
 			int ofs = 0;
 			const char *name = (const char*)fn(i, ofs, true);
-			if (!name) { break; }
+			if (!name)
+				break;
 			SharedComponentFactory f;
 			f.fn = fn;
 			f.idx = i;

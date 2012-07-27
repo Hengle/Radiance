@@ -23,13 +23,6 @@ public:
 		AddrSize pageSize
 	);
 
-	virtual FileSearchRef OpenSearch(
-		const char *path,
-		SearchOptions searchOptions,
-		FileOptions fileOptions,
-		int mask
-	);
-
 	virtual bool GetFileTime(
 		const char *path,
 		xtime::TimeDate &td,

@@ -58,17 +58,17 @@ namespace {
 class FileSrcBuffer : public lua::SrcBuffer
 {
 public:
-	FileSrcBuffer(const char *name, const file::HBufferedAsyncIO &buf) : m_name(name), m_buf(buf)
+	FileSrcBuffer(const char *name, const file::MMapping::Ref &mm) : m_name(name), m_mm(mm)
 	{ 
 		m_name += ".lua";
 	}
 
 protected:
-	RAD_DECLARE_GET(ptr, const void *) { return m_buf->data->ptr; }
-	RAD_DECLARE_GET(size, AddrSize) { return m_buf->data->size; }
+	RAD_DECLARE_GET(ptr, const void *) { return m_mm->data; }
+	RAD_DECLARE_GET(size, AddrSize) { return m_mm->size; }
 	RAD_DECLARE_GET(name, const char *) { return m_name.c_str; }
 
-	file::HBufferedAsyncIO m_buf;
+	file::MMapping::Ref m_mm;
 	String m_name;
 };
 
@@ -2620,31 +2620,15 @@ int WorldLua::lua_gnSetSessionReportOnAppPause(lua_State *L)
 
 lua::SrcBuffer::Ref WorldLua::ImportLoader::Load(lua_State *L, const char *name)
 {
-	int media = file::AllMedia;
-	file::HBufferedAsyncIO buf;
-
 	String path(CStr("Scripts/"));
 	path += name;
-	path += CStr(".lua");
+	path += ".lua";
 
-	bool r = App::Get()->engine->sys->files->LoadFile(
-		path.c_str,
-		media,
-		buf,
-		file::HIONotify()
-	) >= file::Success;
-
-	r = r && buf;
-	if (r)
-	{
-		buf->WaitForCompletion();
-		r = buf->result == file::Success;
-	}
-
-	if (!r)
+	file::MMapping::Ref mm = App::Get()->engine->sys->files->MapFile(path.c_str, ZWorld);
+	if (!mm)
 		return lua::SrcBuffer::Ref();
 
-	return lua::SrcBuffer::Ref(new FileSrcBuffer(name, buf));
+	return lua::SrcBuffer::Ref(new FileSrcBuffer(name, mm));
 }
 
 } // world

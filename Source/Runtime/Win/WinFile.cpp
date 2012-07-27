@@ -305,9 +305,9 @@ WinMMFile::~WinMMFile() {
 }
 
 MMapping::Ref WinMMFile::MMap(AddrSize ofs, AddrSize size, ::Zone &zone) {
-	if (size == 0)
+	if (size == 0 || (size > this->size.get()))
 		size = this->size.get();
-
+	RAD_ASSERT(size > 0);
 	RAD_ASSERT(ofs+size <= this->size.get());
 
 	AddrSize base = ofs & ~(m_pageSize-1);

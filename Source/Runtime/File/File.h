@@ -102,7 +102,7 @@ public:
 	/*! \sa addDirectory() */
 	void AddPakFile(
 		const PakFileRef &pakFile, 
-		int mask = kFileMask_All
+		int mask = kFileMask_PakFiles
 	);
 
 	//! Removes a pak file from the resolvers list for relative paths. 
@@ -160,7 +160,7 @@ public:
 	);
 
 	//! Opens a wild-card file search.
-	virtual FileSearchRef OpenSearch(
+	FileSearchRef OpenSearch(
 		const char *path,
 		SearchOptions searchOptions = kSearchOption_Recursive,
 		FileOptions fileOptions = kFileOptions_None,
