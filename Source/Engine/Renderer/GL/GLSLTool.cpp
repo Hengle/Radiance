@@ -33,46 +33,38 @@ bool GLSLTool::Assemble(
 	const GLState::MInputMappings *mapping,
 	bool optimize,
 	std::ostream &out
-)
-{
+) {
 	std::stringstream ss;
+	
 	if (vertex)
 	{
 		ss << "#define VERTEX" << "\r\n";
-	}
-	else
-	{
+	} else {
 		ss << "#define FRAGMENT" << "\r\n";
 		ss << "#define MATERIAL" << "\r\n";
 	}
 
-	if (textureTypes.size() > 0)
-	{
+	if (textureTypes.size() > 0) {
 		ss << "#define TEXTURES " << textureTypes.size() << "\r\n";
-		for (size_t i = 0; i < textureTypes.size(); ++i)
-		{
+		for (size_t i = 0; i < textureTypes.size(); ++i) {
 			char sz[64];
 			string::sprintf(sz, "#define T%dTYPE %s", i, textureTypes[i].c_str.get());
 			ss << sz << "\r\n";
 		}
 	}
-	if (numTexCoords > 0)
-	{
+	
+	if (numTexCoords > 0) {
 		ss << "#define TEXCOORDS " << numTexCoords << "\r\n";
 
-		if (vertex)
-		{
+		if (vertex) {
 			RAD_ASSERT(material&&mapping);
-			for (int i = 0; i < numTexCoords; ++i)
-			{
+			for (int i = 0; i < numTexCoords; ++i) {
 				// TODO: this won't work when I add MTS_Framebuffer"
 #pragma message ("TODO: this won't work when I add MTS_Framebuffer")
 				int txIndex = -1;
-				for (int k = 0; k < GLState::MaxAttribArrays; ++k)
-				{
+				for (int k = 0; k < GLState::MaxAttribArrays; ++k) {
 					if (mapping->attributes[k][0] == MGS_TexCoords &&
-						mapping->attributes[k][2] == i)
-					{
+						mapping->attributes[k][2] == i) {
 						txIndex = mapping->attributes[k][1];
 						break;
 					}
@@ -125,8 +117,7 @@ bool GLSLTool::Assemble(
 //	COut(C_Debug) << ex.str() << std::endl;
 //	cg::SaveText(engine, "Materials/Nodes/glsltool.1", ex.str().c_str());
 
-	if (optimize)
-	{
+	if (optimize) {
 		String in(ex.str());
 
 		glslopt_shader *shader = glslopt_optimize(
@@ -136,16 +127,14 @@ bool GLSLTool::Assemble(
 			0
 		);
 
-		if (!glslopt_get_status(shader))
-		{
+		if (!glslopt_get_status(shader)) {
 			COut(C_Error) << "Error optimizing shader: " << std::endl << in << std::endl << glslopt_get_log(shader) << std::endl;
 			glslopt_shader_delete(shader);
 			return false;
 		}
 
 		std::stringstream z;
-		if (gles)
-		{
+		if (gles) {
 			if (vertex)
 				z << "precision mediump float;\r\n";
 			else
@@ -155,9 +144,7 @@ bool GLSLTool::Assemble(
 		glslopt_shader_delete(shader);
 
 		cg::Copy(z, out);
-	}
-	else
-	{
+	} else {
 		cg::Copy(ex, out);
 	}
 
