@@ -48,7 +48,7 @@ bool __IOS_IPad();
 #endif
 
 #if defined(RAD_OPT_TOOLS)
-#include "../../../../../Extern/glsl-optimizer-v1/src/glsl/glsl_optimizer.h"
+#include "../../../../../Extern/aras-p-glsl-optimizer-f2217b0/src/glsl/glsl_optimizer.h"
 #endif
 
 namespace r {

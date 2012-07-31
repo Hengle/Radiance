@@ -479,7 +479,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer-v1\ship_null.c" />
+    <ClCompile Include="..\..\glslopt_ship_null.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6D6DD20D-6BD6-4D9E-84F8-EADA3540252E}</ProjectGuid>

@@ -6,7 +6,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer-v1\ship_null.c" />
     <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\s_expression.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -229,5 +228,6 @@
     <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\standalone_scaffolding.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\glslopt_ship_null.cpp" />
   </ItemGroup>
 </Project>
