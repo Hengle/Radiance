@@ -3,6 +3,6 @@
 // Copyright (c) 2012 Sunside Inc., All Rights Reserved.
 // See Radiance/LICENSE for licensing terms.
 
-HEADER_SEARCH_PATHS = "$(GLSLOPTIMIZER_PATH)/include" "$(GLSLOPTIMIZER_PATH)/include/c99" "$(GLSLOPTIMIZER_PATH)/src/mesa" "$(GLSLOPTIMIZER_PATH)/src/mapi" "$(GLSLOPTIMIZER_PATH)/src/talloc" $(inherited)
+HEADER_SEARCH_PATHS = "$(GLSLOPTIMIZER_PATH)/include" "$(GLSLOPTIMIZER_PATH)/src/mesa" "$(GLSLOPTIMIZER_PATH)/src/mapi" $(inherited)
 GCC_PREPROCESSOR_DEFINITIONS = $(CONFIG_DEFINES)
 OTHER_LDFLAGS = $(CONFIG_LINKER_FLAGS)
