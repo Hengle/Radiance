@@ -4,17 +4,14 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
   <ItemDefinitionGroup>
-    <CustomBuildStep />
     <PostBuildEvent>
-      <Command>xcopy "$(VLD_PATH)\Win32\dbghelp.dll" "$(OutDir)" /D /Y
-xcopy "$(VLD_PATH)\Win32\Microsoft.DTfW.DHL.manifest" "$(OutDir)" /D /Y
-xcopy "$(VLD_PATH)\Win32\vld_x86.dll" "$(OutDir)" /D /Y
+      <Command>xcopy "$(VLD_PATH)\Win32\dbghelp.dll" "$(OutDir)" /D
+xcopy "$(VLD_PATH)\Win32\Microsoft.DTfW.DHL.manifest" "$(OutDir)" /D
+xcopy "$(VLD_PATH)\Win32\vld_x86.dll" "$(OutDir)" /D
 xcopy "$(QT_PATH)\bin\QtCored4.dll" "$(OutDir)" /D /Y
 xcopy "$(QT_PATH)\bin\QtGuid4.dll" "$(OutDir)" /D /Y
 xcopy "$(QT_PATH)\bin\QtOpenGLd4.dll" "$(OutDir)" /D /Y
-xcopy "$(OPENAL_PATH)\Win32\OpenAL32.dll" "$(OutDir)" /D /Y
-</Command>
-      <Message>Installing Extern DLLs...</Message>
+xcopy "$(OPENAL_PATH)\Win32\OpenAL32.dll" "$(OutDir)" /D</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup />

@@ -836,14 +836,14 @@ bool ConfigureWindow(
 
 int NativeWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, int argc, const char **argv, int nCmdShow) {
 
-	ChangeDisplaySettings(0, 0);
+//	ChangeDisplaySettings(0, 0);
 
 	s_hInstance = hInstance;
 
 	rt::Initialize();
 	RAD_DEBUG_ONLY(file::EnforcePortablePaths(false));
 
-	COut(C_Info) << "NativeAppMain..." << std::endl;
+	COut(C_Info) << "NativeWinMain..." << std::endl;
 	COut(C_Info) << "echo command line: ";
 
 	for (int i = 0; i < argc; ++i) {
@@ -852,11 +852,28 @@ int NativeWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, int argc, const 
 
 	COut(C_Info) << std::endl;
 
-	App *app = App::Get();
+	App *app = App::Get(argc, argv);
+
+	if (!app->PreInit()) {
+		MessageBoxA(0, "Initialization failed! See log.txt for details.", "Error", MB_OK);
+		return 1;
+	}
+
+#if !defined(RAD_OPT_PC_TOOLS)
+	if (!app->FindArg("-go")) {
+		int r = app->DoLauncher();
+		if (r != 0)
+			return r;
+		app->Finalize();
+		App::DestroyInstance();
+		rt::Finalize();
+		return 0;
+	}
+#endif
 
 	MyRegisterClass(hInstance);
 
-	if (!app->PreInit()) {
+	if (!app->InitWindow()) {
 		app->ResetDisplayDevice();
 		MessageBoxA(0, "Initialization failed! See log.txt for details.", "Error", MB_OK);
 		return 1;

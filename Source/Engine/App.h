@@ -31,7 +31,9 @@ public:
 	virtual ~App();
 
 	virtual bool PreInit();
+	virtual bool InitWindow() = 0;
 	virtual bool Initialize();
+	virtual int DoLauncher() = 0;
 	virtual void Finalize();
 	virtual float Tick();
 

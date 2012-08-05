@@ -94,17 +94,16 @@ bool Engine::PreInit()
 
 	m_comTable.globals = Persistence::Load("globals.data");
 
-	return true;
-}
-
-bool Engine::Initialize()
-{
 	bool r = sys->packages->Initialize();
 	asset::RegisterParsers(*this);
 #if defined(RAD_OPT_TOOLS)
 	asset::RegisterCookers(*this);
 #endif
 	return r;
+}
+
+bool Engine::Initialize() {
+	return true;
 }
 
 void Engine::Finalize()

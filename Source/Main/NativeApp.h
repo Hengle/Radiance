@@ -24,12 +24,12 @@ public:
 	typedef zone_vector<Ref, ZEngineT>::type Vec;
 
 	RAD_BEGIN_FLAGS
-		kMatchDisposition_Upsize,
-		kMatchDisposition_Downsize,
-		kMatchDisposition_AllowAspectChange,
-		kMatchDisposition_AllowAspect4x3,
-		kMatchDisposition_AllowAspect16x9,
-		kMatchDisposition_AllowAspect16x10
+		RAD_FLAG(kMatchDisposition_Upsize),
+		RAD_FLAG(kMatchDisposition_Downsize),
+		RAD_FLAG(kMatchDisposition_AllowAspectChange),
+		RAD_FLAG(kMatchDisposition_AllowAspect4x3),
+		RAD_FLAG(kMatchDisposition_AllowAspect16x9),
+		RAD_FLAG(kMatchDisposition_AllowAspect16x10)
 	RAD_END_FLAGS(MatchDisposition)
 
 	bool IsVidModeSupported(const r::VidMode &mode);

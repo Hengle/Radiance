@@ -9,8 +9,6 @@
       <Command>xcopy "$(VLD_PATH)\Win64\dbghelp.dll" "$(OutDir)" /D /Y
 xcopy "$(VLD_PATH)\Win64\Microsoft.DTfW.DHL.manifest" "$(OutDir)" /D /Y
 xcopy "$(VLD_PATH)\Win64\vld_x64.dll" "$(OutDir)" /D /Y
-xcopy "$(CG_PATH)\x64\cg.dll" "$(OutDir)" /D /Y
-xcopy "$(CG_PATH)\x64\cgGL.dll" "$(OutDir)" /D /Y
 xcopy "$(QT_PATH)\bin\QtCored4.dll" "$(OutDir)" /D /Y
 xcopy "$(QT_PATH)\bin\QtGuid4.dll" "$(OutDir)" /D /Y
 xcopy "$(QT_PATH)\bin\QtOpenGLd4.dll" "$(OutDir)" /D /Y

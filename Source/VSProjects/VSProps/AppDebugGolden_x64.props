@@ -2,9 +2,9 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets">
     <Import Project="EngineDebug.props" />
-    <Import Project="EngineShip.props" />
-    <Import Project="QtSupport_x32.props" />
-    <Import Project="LinkEngineShipDebug_x32.props" />
+    <Import Project="EngineGolden.props" />
+    <Import Project="QtSupport_x64.props" />
+    <Import Project="LinkEngineGoldenDebug_x64.props" />
     <Import Project="LinkAdditionalWindowsLibs.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />

@@ -9,12 +9,11 @@
       <Command>xcopy "$(VLD_PATH)\Win64\dbghelp.dll" "$(OutDir)" /D /Y
 xcopy "$(VLD_PATH)\Win64\Microsoft.DTfW.DHL.manifest" "$(OutDir)" /D /Y
 xcopy "$(VLD_PATH)\Win64\vld_x64.dll" "$(OutDir)" /D /Y
-xcopy "$(CG_PATH)\x64\cg.dll" "$(OutDir)" /D /Y
-xcopy "$(CG_PATH)\x64\cgGL.dll" "$(OutDir)" /D /Y
 xcopy "$(QT_PATH)\bin\QtCore4.dll" "$(OutDir)" /D /Y
 xcopy "$(QT_PATH)\bin\QtGui4.dll" "$(OutDir)" /D /Y
 xcopy "$(QT_PATH)\bin\QtOpenGL4.dll" "$(OutDir)" /D /Y
-xcopy "$(OPENAL_PATH)\Win64\OpenAL64.dll" "$(OutDir)" /D /Y</Command>
+xcopy "$(OPENAL_PATH)\Win64\OpenAL64.dll" "$(OutDir)" /D /Y
+</Command>
       <Message>Installing Extern DLLs...</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
