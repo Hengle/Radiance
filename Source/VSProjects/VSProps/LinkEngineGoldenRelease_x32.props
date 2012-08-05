@@ -3,6 +3,7 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="LinkOpenALSoft_x32.props" />
     <Import Project="LinkQtRelease.props" />
+    <Import Project="LinkVisualLeakDetector_x32.props" />
     <Import Project="CopyEngineDeveloperReleaseDLLs_x32.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
