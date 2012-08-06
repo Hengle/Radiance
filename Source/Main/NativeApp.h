@@ -41,6 +41,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(DisplayDevice, primary, bool);
 	RAD_DECLARE_READONLY_PROPERTY(DisplayDevice, vidModes, const r::VidModeVec*);
 	RAD_DECLARE_READONLY_PROPERTY(DisplayDevice, curVidMode, const r::VidMode*);
+	RAD_DECLARE_READONLY_PROPERTY(DisplayDevice, defVidMode, const r::VidMode*);
 	RAD_DECLARE_READONLY_PROPERTY(DisplayDevice, maxMSAA, int);
 	RAD_DECLARE_READONLY_PROPERTY(DisplayDevice, maxAnisotropy, int);
 
@@ -54,6 +55,7 @@ private:
 	RAD_DECLARE_GET(primary, bool);
 	RAD_DECLARE_GET(vidModes, const r::VidModeVec*);
 	RAD_DECLARE_GET(curVidMode, const r::VidMode*);
+	RAD_DECLARE_GET(defVidMode, const r::VidMode*);
 	RAD_DECLARE_GET(maxMSAA, int);
 	RAD_DECLARE_GET(maxAnisotropy, int);
 

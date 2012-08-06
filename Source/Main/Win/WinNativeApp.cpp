@@ -274,9 +274,6 @@ bool NativeApp::PreInit() {
 			if (dm.dmBitsPerPel < 32)
 				continue;
 			r::VidMode m = VidModeFromDevMode(dm);
-			
-			if (!m.SameAspect(dd->m_defMode)) // don't allow stretched modes.
-				continue;
 
 			r::VidModeVec::iterator it;
 			for (it = dd->m_vidModes.begin(); it != dd->m_vidModes.end(); ++it) {
@@ -860,7 +857,7 @@ int NativeWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, int argc, const 
 	}
 
 #if !defined(RAD_OPT_PC_TOOLS)
-	if (!app->FindArg("-go")) {
+	if (!app->FindArg("-nolauncher")) {
 		int r = app->DoLauncher();
 		if (r != 0)
 			return r;

@@ -172,6 +172,12 @@ Persistence::Ref Persistence::New(const char *name)
 	return Ref(new (ZEngine) Persistence(name));
 }
 
+Persistence::Ref Persistence::Clone() {
+	Persistence::Ref r(new Persistence(0));
+	r->m_keys = m_keys;
+	return r;
+}
+
 bool Persistence::Read(const char *name)
 {
 	if (!name)
