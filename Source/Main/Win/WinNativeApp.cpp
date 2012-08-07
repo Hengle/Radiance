@@ -856,6 +856,9 @@ int NativeWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, int argc, const 
 		return 1;
 	}
 
+	if (!app->DoLauncher())
+		return 0;
+
 	MyRegisterClass(hInstance);
 
 	if (!app->InitWindow()) {
