@@ -49,38 +49,9 @@ extern "C" int main(int argc, char *argv[]) {
 #if defined(RAD_OPT_PC_TOOLS)
 	return QtAppMain(argc, (const char **)argv);
 #else
-	bool launcher = true;
-	for (int i = 0; i < argc; ++i) {
-		if (!strcmp("-nolauncher", argv[i])) {
-			launcher = false;
-			break;
-		}
-	}
-	
-	if (launcher)
-		return App::DoLauncher(argc, (const char**)argv);
-	
 	return NSApplicationMain(argc, (const char **)argv);
 #endif
 	
-}
-
-void __OSX_SpawnSandboxed(const char *application) {
-	NSString *bundleId = [NSString stringWithUTF8String: application];
-	
-	NSURL *url = [[NSWorkspace sharedWorkspace] URLForApplicationWithBundleIdentifier: bundleId];
-	
-	NSError *error = 0;
-	
-	[[NSWorkspace sharedWorkspace] launchApplicationAtURL: url options: NSWorkspaceLaunchAsync|NSWorkspaceLaunchNewInstance configuration: nil error: &error];
-	
-	if (error) {
-		NSString *s = [error localizedDescription];
-		if (s) {
-			const char *sz = [s cStringUsingEncoding: NSUTF8StringEncoding];
-			COut(C_Error) << sz << std::endl;
-		}
-	}
 }
 
 void __OSX_BundlePath(char *dst) {

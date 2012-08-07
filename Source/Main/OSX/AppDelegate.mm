@@ -160,6 +160,9 @@ static int s_vkeys_en[256] = {
 		[NSApp terminate:nil];
 	}
 	
+	if (!app->DoLauncher())
+		[NSApp terminate: nil];
+	
 	if (!app->InitWindow()) {
 		app->ResetDisplayDevice();
 		NSRunAlertPanel(@"Error", @"Initialization failed! See log.txt for details.", nil, nil, nil);
