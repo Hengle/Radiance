@@ -856,18 +856,6 @@ int NativeWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, int argc, const 
 		return 1;
 	}
 
-#if !defined(RAD_OPT_PC_TOOLS)
-	if (!app->FindArg("-nolauncher")) {
-		int r = app->DoLauncher();
-		if (r != 0)
-			return r;
-		app->Finalize();
-		App::DestroyInstance();
-		rt::Finalize();
-		return 0;
-	}
-#endif
-
 	MyRegisterClass(hInstance);
 
 	if (!app->InitWindow()) {

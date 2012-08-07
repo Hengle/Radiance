@@ -6,6 +6,8 @@
 */
 
 #include RADPCH
+#include <Engine/App.h>
+
 #if !defined(RAD_OPT_SHIP)
 #include <VLD/vld.h>
 #endif
@@ -129,6 +131,17 @@ int APIENTRY WinMain(
 	SetNativeWinInstance(hInstance);
 	return QtAppMain(args.argc, args.argv);
 #else
+	bool launcher = true;
+	for (int i = 0; i < args.argc; ++i) {
+		if (!strcmp("-nolauncher", args.argv[i])) {
+			launcher = false;
+			break;
+		}
+	}
+
+	if (launcher)
+		return App::DoLauncher(args.argc, args.argv);
+
 	return NativeWinMain(hInstance, hPrevInstance, args.argc, args.argv, nCmdShow);
 #endif
 }
