@@ -33,7 +33,9 @@
 #include <Runtime/ImageCodec/Png.h>
 #endif
 #if defined(RAD_OPT_PC_TOOLS)
+#if defined(RAD_OPT_WINX)
 #define _WINDLL_IMPORT 1
+#endif
 #include <PVRTexLib/PVRTTexture.h>
 #include <PVRTexLib/PVRTextureHeader.h>
 #include <PVRTexLib/PVRTextureUtilities.h>

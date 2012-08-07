@@ -56,6 +56,7 @@ void SetDefaultAliases()
 			__IOS_BundlePath(buff);
 #elif defined(RAD_OPT_OSX) && defined(RAD_OPT_SHIP)
 			__OSX_BundlePath(buff);
+			strcat(buff, "/Contents/Resources");
 #else
 			getcwd(buff, MaxFilePathLen);
 #endif

@@ -197,6 +197,7 @@ private AtomicRefCount
 	volatile bool m_threadExit;
 
 	DPakReader();
+	~DPakReader();
 
 	void AssertInit() const;
 

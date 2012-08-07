@@ -279,10 +279,11 @@ bool NativeApp::PreInit() {
 			
 			x.push_back(0);
 			
-			pf = [[[NSOpenGLPixelFormat alloc] initWithAttributes:&x[0]] autorelease];
+			pf = [[NSOpenGLPixelFormat alloc] initWithAttributes:&x[0]];
 			if (pf)
 				break;
 			
+			[pf release];
 			RAD_ASSERT(msaa > 0);
 			
 			msaa >>= 1;
@@ -292,6 +293,7 @@ bool NativeApp::PreInit() {
 		
 		// make a GL context and figure out max anisotropy.
 		NSOpenGLContext *glCtx = [[NSOpenGLContext alloc] initWithFormat: pf shareContext: nil];
+		[pf release];
 		if (!glCtx) {
 			COut(C_Warn) << "WARNING: Unable to create an openGL context!" << std::endl;
 			if (dd->m_primary) {
@@ -554,13 +556,14 @@ GLDeviceContext::Ref NativeApp::CreateOpenGLContext(const GLPixelFormat &pf) {
 	
 	NSOpenGLPixelFormat *nspf = 0;
 	
-	nspf = [[[NSOpenGLPixelFormat alloc] initWithAttributes:&attribs[0]] autorelease];
+	nspf = [[NSOpenGLPixelFormat alloc] initWithAttributes:&attribs[0]];
 	if (!nspf) {
 		COut(C_Error) << "Failed to create pixel format!" << std::endl;
 		return GLDeviceContext::Ref();
 	}
 	
 	NSOpenGLContext *glCtx = [[NSOpenGLContext alloc] initWithFormat: nspf shareContext: nil];
+	[nspf release];
 	if (!glCtx) {
 		COut(C_Error) << "Failed to OpenGL context!" << std::endl;
 		return GLDeviceContext::Ref();

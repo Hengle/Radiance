@@ -502,6 +502,10 @@ m_threadExit(true),
 m_openFileCount(0)
 {
 }
+	
+DPakReader::~DPakReader() {
+	Join();
+}
 
 inline void DPakReader::AssertInit() const
 {

@@ -36,7 +36,7 @@ RADENG_API int RADENG_CALL QtAppMain(int argc, const char **argv) {
 
 	COut(C_Info) << std::endl;
 
-	App *app = App::Get();
+	App *app = App::Get(argc, argv);
 
 	QCoreApplication::setOrganizationName(app->company.get());
 	QCoreApplication::setOrganizationDomain(app->website.get());

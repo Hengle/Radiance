@@ -4,3 +4,4 @@
 // See Radiance/LICENSE for licensing terms.
 
 EXTERN_PATH = $(GLOBAL_PROJECT_ROOT)/Extern
+QT_MOC = $(EXTERN_PATH)/Qt-4.8.2/moc

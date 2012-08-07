@@ -150,11 +150,17 @@ static int s_vkeys_en[256] = {
 	
 	COut(C_Info) << std::endl;
 	
-	App *app = App::Get();
+	App *app = App::Get(argc, argv);
 	
 	[NSApp activateIgnoringOtherApps:YES];
 	
 	if (!app->PreInit()) {
+		app->ResetDisplayDevice();
+		NSRunAlertPanel(@"Error", @"Initialization failed! See log.txt for details.", nil, nil, nil);
+		[NSApp terminate:nil];
+	}
+	
+	if (!app->InitWindow()) {
 		app->ResetDisplayDevice();
 		NSRunAlertPanel(@"Error", @"Initialization failed! See log.txt for details.", nil, nil, nil);
 		[NSApp terminate:nil];
