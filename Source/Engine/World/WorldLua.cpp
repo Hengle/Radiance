@@ -218,6 +218,7 @@ bool WorldLua::Init()
 		{ "SystemLanguage", lua_System_SystemLanguage },
 		{ "GetLangString", lua_System_GetLangString },
 		{ "LaunchURL", lua_System_LaunchURL },
+		{ "Fullscreen", lua_System_Fullscreen },
 		{ 0, 0 }
 	};
 
@@ -763,6 +764,17 @@ int WorldLua::lua_System_LaunchURL(lua_State *L) {
 	const char *sz = luaL_checkstring(L, 1);
 	App::Get()->LaunchURL(sz);
 	return 0;
+}
+
+int WorldLua::lua_System_Fullscreen(lua_State *L) {
+	bool fullscreen = false;
+	App *app = App::Get();
+
+	if (app->activeDisplay.get())
+		fullscreen = app->activeDisplay->curVidMode->fullscreen;
+
+	lua_pushboolean(L, fullscreen);
+	return 1;
 }
 
 int WorldLua::lua_SysCalls_CreatePrecacheTask(lua_State *L)
