@@ -104,7 +104,8 @@ bool RBackend::CheckCaps() {
 		gl.EXT_texture_compression_s3tc &&
 		gl.ARB_multitexture &&
 		gl.SGIS_generate_mipmap &&
-		gl.ARB_texture_non_power_of_two;
+		gl.ARB_texture_non_power_of_two &&
+		(gl.maxTextureSize >= 2048);
 }
 
 HContext RBackend::CreateContext(

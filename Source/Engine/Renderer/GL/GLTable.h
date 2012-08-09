@@ -75,6 +75,7 @@ struct RADENG_CLASS GLTable
 	int vMaj;
 	int maxTextures;
 	int maxVertexAttribs;
+	int maxTextureSize;
 	int chip;
 	int matrixOps;
 	int colorOps;

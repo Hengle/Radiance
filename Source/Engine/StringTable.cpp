@@ -149,8 +149,7 @@ int StringTable::Load(const char *name, const char *root, StringTable::Ref &_r, 
 			return pkg::SR_ScriptError;
 		}
 
-		if (lua_pcall(L->L, 0, 0, 0))
-		{
+		if (lua_pcall(L->L, 0, 0, 0)) {
 			COut(C_Error) << "StringTable::Load(run): " << lua_tostring(L->L, -1) << std::endl;
 			r.reset();
 			return pkg::SR_ScriptError;
