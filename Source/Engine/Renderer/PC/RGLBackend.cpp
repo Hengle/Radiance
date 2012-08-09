@@ -87,6 +87,7 @@ bool RBackend::VidBind() {
 	gl.Load();
 
 	COut(C_Info) << "MaxTextures: " << gl.maxTextures << std::endl;
+	COut(C_Info) << "MaxTextureSize: " << gl.maxTextureSize << std::endl;
 	COut(C_Info) << "MaxVertexAttribs: " << gl.maxVertexAttribs << std::endl;
 
 	return true;
