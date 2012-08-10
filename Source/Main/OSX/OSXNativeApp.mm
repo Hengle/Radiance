@@ -136,7 +136,7 @@ struct DDVars : public DisplayDevice::NativeVars {
 			fadeState = DDVars::kFadeState_Normal;
 			
 			CGDisplayFadeReservationToken token;
-			while (CGAcquireDisplayFadeReservation(2.f, &token) != kCGErrorSuccess) {}
+			while (CGAcquireDisplayFadeReservation(1.5f, &token) != kCGErrorSuccess) {}
 			
 			CGDisplayFade(token, (timing==kFadeTiming_Immediate) ? 0.f : 1.f, 1.f, 0.f, 0.f, 0.f, 0.f, true);
 			CGReleaseDisplayFadeReservation(token);
@@ -148,7 +148,7 @@ struct DDVars : public DisplayDevice::NativeVars {
 			fadeState = DDVars::kFadeState_Black;
 			
 			CGDisplayFadeReservationToken token;
-			while (CGAcquireDisplayFadeReservation(2.f, &token) != kCGErrorSuccess) {}
+			while (CGAcquireDisplayFadeReservation(1.5f, &token) != kCGErrorSuccess) {}
 			
 			CGDisplayFade(token, 1.f, 0.f, 1.f, 0.f, 0.f, 0.f, true);
 		}
