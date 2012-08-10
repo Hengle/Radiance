@@ -330,7 +330,6 @@
 		330A997A15BCA097002A81EC /* GameNetwork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887BD15B9BA470089BA08 /* GameNetwork.cpp */; };
 		330A997B15BCA097002A81EC /* GameNetwork.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887BE15B9BA470089BA08 /* GameNetwork.h */; };
 		330A997C15BCA097002A81EC /* GameNetworkDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887BF15B9BA470089BA08 /* GameNetworkDef.h */; };
-		330A997D15BCA097002A81EC /* GameNetworkNull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887C015B9BA470089BA08 /* GameNetworkNull.cpp */; };
 		330A997E15BCA097002A81EC /* Gestures.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887C115B9BA470089BA08 /* Gestures.cpp */; };
 		330A997F15BCA097002A81EC /* GSLoadMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887C215B9BA470089BA08 /* GSLoadMap.cpp */; };
 		330A998015BCA097002A81EC /* GSLoadMap.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887C315B9BA470089BA08 /* GSLoadMap.h */; };
@@ -385,6 +384,7 @@
 		330A99B115BCA101002A81EC /* TextureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8871C15B9B9ED0089BA08 /* TextureParser.h */; };
 		330A99B215BCA101002A81EC /* TypefaceParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8871F15B9B9ED0089BA08 /* TypefaceParser.cpp */; };
 		330A99B315BCA101002A81EC /* TypefaceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8872015B9B9ED0089BA08 /* TypefaceParser.h */; };
+		336836D515D43BA800EE9472 /* GameNetworkNull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 336836D415D43BA800EE9472 /* GameNetworkNull.cpp */; };
 		337AE55215BF214F00AD1617 /* Runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8867515B9AD160089BA08 /* Runtime.cpp */; };
 		337AE55315BF214F00AD1617 /* Time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8865A15B9ACFA0089BA08 /* Time.cpp */; };
 		337AE55415BF214F00AD1617 /* Locks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8864215B9ACF10089BA08 /* Locks.cpp */; };
@@ -512,7 +512,6 @@
 		337AE5CE15BF214F00AD1617 /* LuaRuntime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887CC15B9BA470089BA08 /* LuaRuntime.cpp */; };
 		337AE5CF15BF214F00AD1617 /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887BB15B9BA470089BA08 /* Game.cpp */; };
 		337AE5D015BF214F00AD1617 /* GameNetwork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887BD15B9BA470089BA08 /* GameNetwork.cpp */; };
-		337AE5D115BF214F00AD1617 /* GameNetworkNull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887C015B9BA470089BA08 /* GameNetworkNull.cpp */; };
 		337AE5D215BF214F00AD1617 /* Gestures.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887C115B9BA470089BA08 /* Gestures.cpp */; };
 		337AE5D315BF214F00AD1617 /* GSLoadMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887C215B9BA470089BA08 /* GSLoadMap.cpp */; };
 		337AE5D415BF214F00AD1617 /* GSPlay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887C415B9BA470089BA08 /* GSPlay.cpp */; };
@@ -1835,8 +1834,6 @@
 		33E8891C15B9BA4B0089BA08 /* GameNetwork.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887BE15B9BA470089BA08 /* GameNetwork.h */; };
 		33E8891D15B9BA4B0089BA08 /* GameNetworkDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887BF15B9BA470089BA08 /* GameNetworkDef.h */; };
 		33E8891E15B9BA4B0089BA08 /* GameNetworkDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887BF15B9BA470089BA08 /* GameNetworkDef.h */; };
-		33E8891F15B9BA4B0089BA08 /* GameNetworkNull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887C015B9BA470089BA08 /* GameNetworkNull.cpp */; };
-		33E8892015B9BA4B0089BA08 /* GameNetworkNull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887C015B9BA470089BA08 /* GameNetworkNull.cpp */; };
 		33E8892115B9BA4B0089BA08 /* Gestures.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887C115B9BA470089BA08 /* Gestures.cpp */; };
 		33E8892215B9BA4B0089BA08 /* Gestures.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887C115B9BA470089BA08 /* Gestures.cpp */; };
 		33E8892315B9BA4B0089BA08 /* GSLoadMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887C215B9BA470089BA08 /* GSLoadMap.cpp */; };
@@ -2302,6 +2299,7 @@
 		335ED5B215BF22BC008DDBD9 /* libRadianceDeveloper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRadianceDeveloper.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		335ED5B315BF22BC008DDBD9 /* libRadianceShipiOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRadianceShipiOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		335ED5B415BF22BC008DDBD9 /* libRadianceShipOSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRadianceShipOSX.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		336836D415D43BA800EE9472 /* GameNetworkNull.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameNetworkNull.cpp; sourceTree = "<group>"; };
 		337AE54A15BF20B900AD1617 /* EngineGolden.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = EngineGolden.xcconfig; path = XCConfig/EngineGolden.xcconfig; sourceTree = "<group>"; };
 		337AE54C15BF20D300AD1617 /* RadianceGoldenDebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceGoldenDebugiOS.xcconfig; path = XCConfig/RadianceGoldenDebugiOS.xcconfig; sourceTree = "<group>"; };
 		337AE54D15BF20D300AD1617 /* RadianceGoldenDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceGoldenDebugOSX.xcconfig; path = XCConfig/RadianceGoldenDebugOSX.xcconfig; sourceTree = "<group>"; };
@@ -2799,7 +2797,6 @@
 		33E887BD15B9BA470089BA08 /* GameNetwork.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameNetwork.cpp; sourceTree = "<group>"; };
 		33E887BE15B9BA470089BA08 /* GameNetwork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameNetwork.h; sourceTree = "<group>"; };
 		33E887BF15B9BA470089BA08 /* GameNetworkDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameNetworkDef.h; sourceTree = "<group>"; };
-		33E887C015B9BA470089BA08 /* GameNetworkNull.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameNetworkNull.cpp; sourceTree = "<group>"; };
 		33E887C115B9BA470089BA08 /* Gestures.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Gestures.cpp; sourceTree = "<group>"; };
 		33E887C215B9BA470089BA08 /* GSLoadMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GSLoadMap.cpp; sourceTree = "<group>"; };
 		33E887C315B9BA470089BA08 /* GSLoadMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSLoadMap.h; sourceTree = "<group>"; };
@@ -3976,8 +3973,8 @@
 				33E887BC15B9BA470089BA08 /* Game.h */,
 				33E887BD15B9BA470089BA08 /* GameNetwork.cpp */,
 				33E887BE15B9BA470089BA08 /* GameNetwork.h */,
+				336836D415D43BA800EE9472 /* GameNetworkNull.cpp */,
 				33E887BF15B9BA470089BA08 /* GameNetworkDef.h */,
-				33E887C015B9BA470089BA08 /* GameNetworkNull.cpp */,
 				33E887C115B9BA470089BA08 /* Gestures.cpp */,
 				33E887C215B9BA470089BA08 /* GSLoadMap.cpp */,
 				33E887C315B9BA470089BA08 /* GSLoadMap.h */,
@@ -6410,7 +6407,6 @@
 				330A997415BCA08C002A81EC /* LuaRuntime.cpp in Sources */,
 				330A997815BCA097002A81EC /* Game.cpp in Sources */,
 				330A997A15BCA097002A81EC /* GameNetwork.cpp in Sources */,
-				330A997D15BCA097002A81EC /* GameNetworkNull.cpp in Sources */,
 				330A997E15BCA097002A81EC /* Gestures.cpp in Sources */,
 				330A997F15BCA097002A81EC /* GSLoadMap.cpp in Sources */,
 				330A998115BCA097002A81EC /* GSPlay.cpp in Sources */,
@@ -6570,7 +6566,6 @@
 				337AE5CE15BF214F00AD1617 /* LuaRuntime.cpp in Sources */,
 				337AE5CF15BF214F00AD1617 /* Game.cpp in Sources */,
 				337AE5D015BF214F00AD1617 /* GameNetwork.cpp in Sources */,
-				337AE5D115BF214F00AD1617 /* GameNetworkNull.cpp in Sources */,
 				337AE5D215BF214F00AD1617 /* Gestures.cpp in Sources */,
 				337AE5D315BF214F00AD1617 /* GSLoadMap.cpp in Sources */,
 				337AE5D415BF214F00AD1617 /* GSPlay.cpp in Sources */,
@@ -6683,7 +6678,6 @@
 				33E887B815B9BA1F0089BA08 /* FileSystemReflectMap.cpp in Sources */,
 				33E8891515B9BA4B0089BA08 /* Game.cpp in Sources */,
 				33E8891915B9BA4B0089BA08 /* GameNetwork.cpp in Sources */,
-				33E8891F15B9BA4B0089BA08 /* GameNetworkNull.cpp in Sources */,
 				33E8892115B9BA4B0089BA08 /* Gestures.cpp in Sources */,
 				33E8892315B9BA4B0089BA08 /* GSLoadMap.cpp in Sources */,
 				33E8892715B9BA4B0089BA08 /* GSPlay.cpp in Sources */,
@@ -6827,6 +6821,7 @@
 				33836C3E15B9CF590030EAEC /* Persistence.cpp in Sources */,
 				33836C4215B9CF590030EAEC /* StringTable.cpp in Sources */,
 				33836C4A15B9CF590030EAEC /* Zones.cpp in Sources */,
+				336836D515D43BA800EE9472 /* GameNetworkNull.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6901,7 +6896,6 @@
 				33E887B915B9BA1F0089BA08 /* FileSystemReflectMap.cpp in Sources */,
 				33E8891615B9BA4B0089BA08 /* Game.cpp in Sources */,
 				33E8891A15B9BA4B0089BA08 /* GameNetwork.cpp in Sources */,
-				33E8892015B9BA4B0089BA08 /* GameNetworkNull.cpp in Sources */,
 				33E8892215B9BA4B0089BA08 /* Gestures.cpp in Sources */,
 				33E8892415B9BA4B0089BA08 /* GSLoadMap.cpp in Sources */,
 				33E8892815B9BA4B0089BA08 /* GSPlay.cpp in Sources */,

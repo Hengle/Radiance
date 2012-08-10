@@ -136,7 +136,7 @@ struct DDVars : public DisplayDevice::NativeVars {
 			fadeState = DDVars::kFadeState_Normal;
 			
 			CGDisplayFadeReservationToken token;
-			while (CGAcquireDisplayFadeReservation(1.f, &token) != kCGErrorSuccess) {}
+			while (CGAcquireDisplayFadeReservation(2.f, &token) != kCGErrorSuccess) {}
 			
 			CGDisplayFade(token, (timing==kFadeTiming_Immediate) ? 0.f : 1.f, 1.f, 0.f, 0.f, 0.f, 0.f, true);
 			CGReleaseDisplayFadeReservation(token);
@@ -148,10 +148,9 @@ struct DDVars : public DisplayDevice::NativeVars {
 			fadeState = DDVars::kFadeState_Black;
 			
 			CGDisplayFadeReservationToken token;
-			while (CGAcquireDisplayFadeReservation(1.f, &token) != kCGErrorSuccess) {}
+			while (CGAcquireDisplayFadeReservation(2.f, &token) != kCGErrorSuccess) {}
 			
 			CGDisplayFade(token, 1.f, 0.f, 1.f, 0.f, 0.f, 0.f, true);
-			CGReleaseDisplayFadeReservation(token);
 		}
 	}
 	
@@ -160,8 +159,7 @@ struct DDVars : public DisplayDevice::NativeVars {
 	}
 };
 
-NativeApp::NativeApp()
-{
+NativeApp::NativeApp() {
 }
 
 bool NativeApp::PreInit() {
@@ -210,6 +208,8 @@ bool NativeApp::PreInit() {
 			r::VidMode m = VidModeFromCGMode(cgMode);
 			if (m.bpp < 32)
 				continue; // we don't like anything less than 32 bpp.
+			if (s_appd->isAtLeastOSX_10_8 && (m.h < 640))
+				continue; // this resolution is too small to show game center dialogs.
 			
 			// don't allow duplicates.
 			r::VidModeVec::iterator it;
@@ -334,7 +334,7 @@ void NativeApp::Finalize() {
 bool NativeApp::BindDisplayDevice(const ::DisplayDeviceRef &display, const r::VidMode &mode) {
 	RAD_ASSERT(display);
 	
-	bool capture = true;
+	bool capture = s_appd->useDisplayCapture;
 	if (m_activeDisplay) {
 		if (m_activeDisplay.get() != display.get()) {
 			ResetDisplayDevice();
@@ -412,7 +412,7 @@ bool NativeApp::BindDisplayDevice(const ::DisplayDeviceRef &display, const r::Vi
 		[s_appd->window setStyleMask: style];
 		[s_appd->window setFrame: r display: TRUE];
 	} else {
-		s_appd->window = [[NSWindow alloc] initWithContentRect: windowRect styleMask: style backing: NSBackingStoreBuffered defer: NO screen: nil];
+		s_appd->window = [[BorderlessKeyWindow alloc] initWithContentRect: windowRect styleMask: style backing: NSBackingStoreBuffered defer: NO screen: nil];
 		
 		NSString *title = [NSString stringWithUTF8String: App::Get()->title.get()];
 		[s_appd->window setTitle: title];
@@ -423,12 +423,16 @@ bool NativeApp::BindDisplayDevice(const ::DisplayDeviceRef &display, const r::Vi
 	}
 	
 	if (mode.fullscreen) {
-		[s_appd->window setLevel: CGShieldingWindowLevel()+1];
+		int windowLevel = NSMainMenuWindowLevel + 1;
+		if (s_appd->useDisplayCapture)
+			windowLevel = CGShieldingWindowLevel() + 1;
+		[s_appd->window setLevel: windowLevel];
 	} else {
 		[s_appd->window setLevel: NSNormalWindowLevel];
 	}
 	
-	[s_appd->window orderFront: nil];
+	s_appd->fullscreen = mode.fullscreen;
+	[s_appd->window makeKeyAndOrderFront: nil];
 #else
 	}
 #endif
@@ -457,9 +461,12 @@ void NativeApp::ResetDisplayDevice() {
 			if (!m_activeDisplay->curVidMode->SameSize(m_activeDisplay->m_imp.m_defMode))
 				CGDisplaySetDisplayMode(ddv->displayId, ddv->defModeRef, 0);
 			
-			CGReleaseAllDisplays();
+			if (s_appd->useDisplayCapture)
+				CGReleaseAllDisplays();
 			
 #if !defined(RAD_OPT_PC_TOOLS)
+			s_appd->fullscreen = false;
+			
 			if (s_appd->window) {
 				if (App::Get()->exit) {
 					[s_appd->window close];
@@ -529,8 +536,6 @@ GLDeviceContext::Ref NativeApp::CreateOpenGLContext(const GLPixelFormat &pf) {
 	attribs.reserve(128);
 	
 	attribs.push_back(NSOpenGLPFAMinimumPolicy);
-	/*if (m_activeDisplay->curVidMode->fullscreen)
-		attribs.push_back(NSOpenGLPFAFullScreen);*/
 	attribs.push_back(NSOpenGLPFAAccelerated);
 	if (pf.doubleBuffer)
 		attribs.push_back(NSOpenGLPFADoubleBuffer);
