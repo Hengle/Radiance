@@ -19,11 +19,6 @@
 @interface AppDelegate : NSObject <NSApplicationDelegate> {
 @public
 	BorderlessKeyWindow *window;
-	SInt32 OSXMajor;
-	SInt32 OSXMinor;
-	SInt32 OSXPatch;
-	bool isAtLeastOSX_10_8;
-	bool useDisplayCapture;
 	bool fullscreen;
 	bool reclaimWindowLevel;
 @private

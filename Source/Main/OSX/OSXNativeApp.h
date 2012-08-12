@@ -21,6 +21,59 @@ class DisplayDevice;
 
 namespace details {
 
+#define RAD_MAKE_OSX_VERSION(_major, _minor, _revision) \
+	((_major<<16) | (_minor<<8) | _revision)
+
+enum OSXVersion {
+	kOSXVersion_10_7 = RAD_MAKE_OSX_VERSION(10, 7, 0),
+	kOSXVersion_10_8 = RAD_MAKE_OSX_VERSION(10, 8, 0),
+	kOSXVersion_MountainLion = kOSXVersion_10_8
+};
+
+class SystemVersion {
+public:
+
+	static int Major() {
+		return (int)Get().m_major;
+	}
+	
+	static int Minor() {
+		return (int)Get().m_minor;
+	}
+	
+	static int Revision() {
+		return (int)Get().m_revision;
+	}
+	
+	static int Version() {
+		const SystemVersion &v = Get();
+		return (int)RAD_MAKE_OSX_VERSION(v.m_major, v.m_minor, v.m_revision);
+	}
+	
+	static bool GEqual(int version) {
+		return Version() >= version;
+	}
+	
+	static bool Less(int version) {
+		return Version() < version;
+	}
+	
+	static bool HasGameCenter() {
+		return GEqual(kOSXVersion_10_8);
+	}
+	
+private:
+
+	SystemVersion();
+	SystemVersion(const OSXVersion &);
+
+	S32 m_major;
+	S32 m_minor;
+	S32 m_revision;
+	
+	static const SystemVersion &Get();
+};
+
 class NativeApp;
 
 class RADENG_CLASS DisplayDevice {
@@ -115,6 +168,7 @@ private:
 	::DisplayDeviceRef m_primaryDisplay;
 	::DisplayDeviceRef m_activeDisplay;
 	::DisplayDeviceVec m_displayDevices;
+	bool m_useDisplayCapture;
 #endif
 };
 

@@ -71,6 +71,17 @@ NSScreen *NSScreenForCGDirectDisplayID(CGDirectDisplayID displayId) {
 
 namespace details {
 
+SystemVersion::SystemVersion() {
+	Gestalt(gestaltSystemVersionMajor, &m_major);
+	Gestalt(gestaltSystemVersionMinor, &m_minor);
+	Gestalt(gestaltSystemVersionBugFix, &m_revision);
+}
+
+const SystemVersion &SystemVersion::Get() {
+	static SystemVersion s_v;
+	return s_v;
+}
+
 #if !defined(RAD_OPT_PC_TOOSL)
 	
 bool ConfigureWindow(
@@ -160,6 +171,7 @@ struct DDVars : public DisplayDevice::NativeVars {
 };
 
 NativeApp::NativeApp() {
+	m_useDisplayCapture = SystemVersion::Less(kOSXVersion_10_8);
 }
 
 bool NativeApp::PreInit() {
@@ -208,9 +220,10 @@ bool NativeApp::PreInit() {
 			r::VidMode m = VidModeFromCGMode(cgMode);
 			if (m.bpp < 32)
 				continue; // we don't like anything less than 32 bpp.
-			if (s_appd->isAtLeastOSX_10_8 && (m.h < 640))
+
+			if (SystemVersion::HasGameCenter() && (m.h < 640))
 				continue; // this resolution is too small to show game center dialogs.
-			
+
 			// don't allow duplicates.
 			r::VidModeVec::iterator it;
 			for (it = dd->m_vidModes.begin(); it != dd->m_vidModes.end(); ++it) {
@@ -334,7 +347,7 @@ void NativeApp::Finalize() {
 bool NativeApp::BindDisplayDevice(const ::DisplayDeviceRef &display, const r::VidMode &mode) {
 	RAD_ASSERT(display);
 	
-	bool capture = s_appd->useDisplayCapture;
+	bool capture = m_useDisplayCapture;
 	if (m_activeDisplay) {
 		if (m_activeDisplay.get() != display.get()) {
 			ResetDisplayDevice();
@@ -424,7 +437,7 @@ bool NativeApp::BindDisplayDevice(const ::DisplayDeviceRef &display, const r::Vi
 	
 	if (mode.fullscreen) {
 		int windowLevel = NSMainMenuWindowLevel + 1;
-		if (s_appd->useDisplayCapture)
+		if (m_useDisplayCapture)
 			windowLevel = CGShieldingWindowLevel() + 1;
 		[s_appd->window setLevel: windowLevel];
 	} else {
@@ -461,7 +474,7 @@ void NativeApp::ResetDisplayDevice() {
 			if (!m_activeDisplay->curVidMode->SameSize(m_activeDisplay->m_imp.m_defMode))
 				CGDisplaySetDisplayMode(ddv->displayId, ddv->defModeRef, 0);
 			
-			if (s_appd->useDisplayCapture)
+			if (m_useDisplayCapture)
 				CGReleaseAllDisplays();
 			
 #if !defined(RAD_OPT_PC_TOOLS)

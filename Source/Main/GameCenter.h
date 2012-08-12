@@ -6,7 +6,7 @@
 
 #include <Runtime/Base.h>
 #if defined(RAD_OPT_OSX)
-#import <AppKit/NSImage.h>
+#import <AppKit/AppKit.h>
 #endif
 #import <GameKit/GameKit.h>
 

@@ -111,12 +111,6 @@ static int s_vkeys_en[256] = {
 	m_vKeys = s_vkeys_en;
 	s_appd = self;
 	
-	Gestalt(gestaltSystemVersionMajor, &OSXMajor);
-	Gestalt(gestaltSystemVersionMinor, &OSXMinor);
-	Gestalt(gestaltSystemVersionBugFix, &OSXPatch);
-	
-	isAtLeastOSX_10_8 = (OSXMajor > 10) || ((OSXMajor == 10) && OSXMinor >= 8);
-	useDisplayCapture = !isAtLeastOSX_10_8;
 	fullscreen = false;
 	reclaimWindowLevel = false;
 	
@@ -442,7 +436,7 @@ static int s_vkeys_en[256] = {
 }
 
 -(void)checkWindowLevel {
-	if (!(isAtLeastOSX_10_8 && fullscreen))
+	if (!(details::SystemVersion::HasGameCenter() && fullscreen))
 		return;
 		
 	if (reclaimWindowLevel) {

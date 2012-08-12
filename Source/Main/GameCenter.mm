@@ -9,6 +9,7 @@
 #import "GameCenter.h"
 #if defined(RAD_OPT_OSX)
 #import "OSX/AppDelegate.h"
+#include "NativeApp.h"
 #endif
 #if defined(FLURRY)
 #import "FlurryAnalytics/FlurryAnalytics.h"
@@ -98,7 +99,7 @@ static GameCenter *s_gameCenter = 0;
 			NSString *curVer = [[UIDevice currentDevice] systemVersion];
 			BOOL supported = [curVer compare: reqVer options: NSNumericSearch] != NSOrderedAscending;
 #else
-			BOOL supported = (s_appd->OSXMajor >= 10) && (s_appd->OSXMinor >= 8);
+			BOOL supported = details::SystemVersion::HasGameCenter();
 #endif
 			if (supported)
 				s_gameCenter = [[GameCenter alloc] init];
