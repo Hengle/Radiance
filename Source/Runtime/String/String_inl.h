@@ -62,7 +62,7 @@ inline const typename CharBuf<Traits>::T *CharBuf<Traits>::RAD_IMPLEMENT_GET(beg
 
 template <typename Traits>
 inline const typename CharBuf<Traits>::T *CharBuf<Traits>::RAD_IMPLEMENT_GET(end) {
-	return c_str.get() + size.get();
+	return c_str.get() + numChars.get();
 }
 
 template <typename Traits>
@@ -661,7 +661,7 @@ inline String &String::TrimRightBytes(int count) {
 }
 
 inline String &String::Append(const String &str) {
-	return NAppend(str, str.length);
+	return NAppendBytes(str, str.length);
 }
 
 inline String &String::Append(const char *sz) {
@@ -687,7 +687,7 @@ inline String &String::NAppend(const String &str, int len) {
 }
 
 inline String &String::NAppend(const char *sz, int len) {
-	return NAppend(String(sz, RefTag), len);
+	return NAppendBytes(String(sz, RefTag), len);
 }
 
 inline String &String::NAppend(const wchar_t *sz, int len) {
