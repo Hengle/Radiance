@@ -971,6 +971,10 @@
 		33836C4C15B9CF590030EAEC /* Zones.h in Headers */ = {isa = PBXBuildFile; fileRef = 33836C1915B9CF590030EAEC /* Zones.h */; };
 		33836C4D15B9CF590030EAEC /* Zones.h in Headers */ = {isa = PBXBuildFile; fileRef = 33836C1915B9CF590030EAEC /* Zones.h */; };
 		3383820015B736F600A28CCF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 338381FF15B736F600A28CCF /* Foundation.framework */; };
+		338A45FD15DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 338A45FC15DE8B9500B0B9B7 /* GameNetworkDef.h */; };
+		338A45FE15DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 338A45FC15DE8B9500B0B9B7 /* GameNetworkDef.h */; };
+		338A45FF15DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 338A45FC15DE8B9500B0B9B7 /* GameNetworkDef.h */; };
+		338A460015DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 338A45FC15DE8B9500B0B9B7 /* GameNetworkDef.h */; };
 		338CDF2215BC94A40058DFF5 /* Runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8867515B9AD160089BA08 /* Runtime.cpp */; };
 		338CDF2315BC94A40058DFF5 /* Base.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8867715B9AD1D0089BA08 /* Base.h */; };
 		338CDF2415BC94A40058DFF5 /* Endian.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8867815B9AD200089BA08 /* Endian.h */; };
@@ -2333,6 +2337,7 @@
 		33836C1815B9CF590030EAEC /* Zones.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Zones.cpp; path = ../Engine/Zones.cpp; sourceTree = "<group>"; };
 		33836C1915B9CF590030EAEC /* Zones.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Zones.h; path = ../Engine/Zones.h; sourceTree = "<group>"; };
 		338381FF15B736F600A28CCF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		338A45FC15DE8B9500B0B9B7 /* GameNetworkDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameNetworkDef.h; sourceTree = "<group>"; };
 		338CDF0515BC8F140058DFF5 /* RadianceDeveloperDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceDeveloperDebugOSX.xcconfig; path = XCConfig/RadianceDeveloperDebugOSX.xcconfig; sourceTree = "<group>"; };
 		338CDF0615BC8F140058DFF5 /* RadianceDeveloperReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceDeveloperReleaseOSX.xcconfig; path = XCConfig/RadianceDeveloperReleaseOSX.xcconfig; sourceTree = "<group>"; };
 		338CDF0715BC8F140058DFF5 /* RadianceShipDebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceShipDebugiOS.xcconfig; path = XCConfig/RadianceShipDebugiOS.xcconfig; sourceTree = "<group>"; };
@@ -3973,6 +3978,7 @@
 				33E887BC15B9BA470089BA08 /* Game.h */,
 				33E887BD15B9BA470089BA08 /* GameNetwork.cpp */,
 				33E887BE15B9BA470089BA08 /* GameNetwork.h */,
+				338A45FC15DE8B9500B0B9B7 /* GameNetworkDef.h */,
 				336836D415D43BA800EE9472 /* GameNetworkNull.cpp */,
 				33E887BF15B9BA470089BA08 /* GameNetworkDef.h */,
 				33E887C115B9BA470089BA08 /* Gestures.cpp */,
@@ -4348,10 +4354,12 @@
 		33E888B815B9BA4A0089BA08 /* World */ = {
 			isa = PBXGroup;
 			children = (
+				33E888BC15B9BA4A0089BA08 /* Entities */,
+				33E888D215B9BA4A0089BA08 /* Lua */,
+				33E888F715B9BA4A0089BA08 /* MapBuilder */,
 				33E888B915B9BA4A0089BA08 /* BSPFile.cpp */,
 				33E888BA15B9BA4A0089BA08 /* BSPFile.h */,
 				33E888BB15B9BA4A0089BA08 /* BSPFile.inl */,
-				33E888BC15B9BA4A0089BA08 /* Entities */,
 				33E888CB15B9BA4A0089BA08 /* Entity.cpp */,
 				33E888CC15B9BA4A0089BA08 /* Entity.h */,
 				33E888CD15B9BA4A0089BA08 /* EntityDef.h */,
@@ -4359,8 +4367,6 @@
 				33E888CF15B9BA4A0089BA08 /* Event.h */,
 				33E888D015B9BA4A0089BA08 /* Keys.cpp */,
 				33E888D115B9BA4A0089BA08 /* Keys.h */,
-				33E888D215B9BA4A0089BA08 /* Lua */,
-				33E888F715B9BA4A0089BA08 /* MapBuilder */,
 				33E8890015B9BA4A0089BA08 /* MBatchDraw.h */,
 				33E8890115B9BA4A0089BA08 /* MT_Fly.cpp */,
 				33E8890215B9BA4A0089BA08 /* MT_Spline.cpp */,
@@ -4861,6 +4867,7 @@
 				330A99AF15BCA101002A81EC /* StringTableParser.h in Headers */,
 				330A99B115BCA101002A81EC /* TextureParser.h in Headers */,
 				330A99B315BCA101002A81EC /* TypefaceParser.h in Headers */,
+				338A45FF15DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5249,6 +5256,7 @@
 				337AE76715BF214F00AD1617 /* StringTableParser.h in Headers */,
 				337AE76815BF214F00AD1617 /* TextureParser.h in Headers */,
 				337AE76915BF214F00AD1617 /* TypefaceParser.h in Headers */,
+				338A460015DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5713,6 +5721,7 @@
 				33836C4615B9CF590030EAEC /* Tickable.h in Headers */,
 				33836C4815B9CF590030EAEC /* Types.h in Headers */,
 				33836C4C15B9CF590030EAEC /* Zones.h in Headers */,
+				338A45FD15DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6099,6 +6108,7 @@
 				33836C4715B9CF590030EAEC /* Tickable.h in Headers */,
 				33836C4915B9CF590030EAEC /* Types.h in Headers */,
 				33836C4D15B9CF590030EAEC /* Zones.h in Headers */,
+				338A45FE15DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

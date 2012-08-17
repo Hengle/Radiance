@@ -443,10 +443,17 @@ GCNetwork::GCNetwork(GameNetworkEventQueue *queue) : m_reportOnClose(true), m_re
 void GCNetwork::AuthenticateLocalPlayer() {
 	[GameCenter Initialize];
 	
-	if (!s_gameCenter)
+	if (!s_gameCenter) {
+		OnAuthenticated.Trigger(gn::NR_Success);
 		return;
+	}
 	
-	[[GKLocalPlayer localPlayer] authenticateWithCompletionHandler:nil];
+	[[GKLocalPlayer localPlayer] authenticateWithCompletionHandler:^(NSError *error) {
+		if (error) {
+			if (GCNetwork::s_instance)
+				GCNetwork::s_instance->OnAuthenticated.Trigger(gn::NR_Success);
+		}
+	}];
 }
 
 void GCNetwork::SendScore(const char *leaderboardId, int score) {
