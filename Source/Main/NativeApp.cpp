@@ -118,6 +118,9 @@ bool DisplayDevice::MatchVidMode(
 		}
 
 		if (exact) {
+			if (m.w != list[bestX].w)
+				continue;
+				
 			if (disposition&kMatchDisposition_Upsize) {
 				if (m.h < mode.h)
 					continue;
