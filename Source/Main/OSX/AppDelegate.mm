@@ -270,7 +270,17 @@ static int s_vkeys_en[256] = {
 		[NSApp terminate:nil];
 	}
 	
+	xtime::TimeVal last = xtime::ReadMilliseconds();
+	
 	while (!app->exit) {
+	
+		// 30 FPS frame limit
+		xtime::TimeVal now = xtime::ReadMilliseconds();
+		xtime::TimeVal dt = now - last;
+		if (dt < 33)
+			continue;
+		last = now;
+		
 		[self processEvents];
 		app->Tick();
 		[pool release];
