@@ -558,5 +558,8 @@ const LocalPlayer::Ref &GCNetwork::RAD_IMPLEMENT_GET(localPlayer) {
 }
 
 GameNetwork::Ref GameNetwork::Create(GameNetworkEventQueue *queue) {
-	return GameNetwork::Ref(new GCNetwork(queue));
+	GameNetwork::Ref r;
+	if (s_gameCenter)
+		r.reset(new GCNetwork(queue));
+	return r;
 }
