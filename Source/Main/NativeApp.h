@@ -29,7 +29,9 @@ public:
 		RAD_FLAG(kMatchDisposition_AllowAspectChange),
 		RAD_FLAG(kMatchDisposition_AllowAspect4x3),
 		RAD_FLAG(kMatchDisposition_AllowAspect16x9),
-		RAD_FLAG(kMatchDisposition_AllowAspect16x10)
+		RAD_FLAG(kMatchDisposition_AllowAspect16x10),
+		kMatchDisposition_Any = kMatchDisposition_AllowAspectChange|kMatchDisposition_AllowAspect4x3|
+			kMatchDisposition_AllowAspect16x9|kMatchDisposition_AllowAspect16x10
 	RAD_END_FLAGS(MatchDisposition)
 
 	bool IsVidModeSupported(const r::VidMode &mode);
