@@ -27,6 +27,7 @@ RADENG_API int RADENG_CALL QtAppMain(int argc, const char **argv) {
 	RAD_DEBUG_ONLY(file::EnforcePortablePaths(false));
 
 	QApplication qApp(argc, (char**)argv);
+	QCoreApplication::setLibraryPaths(QStringList());
 
 	COut(C_Info) << "QtAppMain..." << std::endl;
 	COut(C_Info) << "echo command line: ";
