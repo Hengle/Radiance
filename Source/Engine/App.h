@@ -25,12 +25,14 @@ class RADENG_CLASS App : public NativeApp
 public:
 
 	typedef Tickable<App> Tickable;
-
+	
 	App(int argc, const char **argv);
 
 	virtual ~App();
 
 	virtual bool PreInit();
+	virtual int DoLauncher() = 0;
+	virtual bool InitWindow() = 0;
 	virtual bool Initialize();
 	virtual void Finalize();
 	virtual float Tick();

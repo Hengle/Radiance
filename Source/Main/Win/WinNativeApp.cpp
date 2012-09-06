@@ -274,9 +274,6 @@ bool NativeApp::PreInit() {
 			if (dm.dmBitsPerPel < 32)
 				continue;
 			r::VidMode m = VidModeFromDevMode(dm);
-			
-			if (!m.SameAspect(dd->m_defMode)) // don't allow stretched modes.
-				continue;
 
 			r::VidModeVec::iterator it;
 			for (it = dd->m_vidModes.begin(); it != dd->m_vidModes.end(); ++it) {
@@ -836,14 +833,14 @@ bool ConfigureWindow(
 
 int NativeWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, int argc, const char **argv, int nCmdShow) {
 
-	ChangeDisplaySettings(0, 0);
+//	ChangeDisplaySettings(0, 0);
 
 	s_hInstance = hInstance;
 
 	rt::Initialize();
 	RAD_DEBUG_ONLY(file::EnforcePortablePaths(false));
 
-	COut(C_Info) << "NativeAppMain..." << std::endl;
+	COut(C_Info) << "NativeWinMain..." << std::endl;
 	COut(C_Info) << "echo command line: ";
 
 	for (int i = 0; i < argc; ++i) {
@@ -852,11 +849,19 @@ int NativeWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, int argc, const 
 
 	COut(C_Info) << std::endl;
 
-	App *app = App::Get();
+	App *app = App::Get(argc, argv);
+
+	if (!app->PreInit()) {
+		MessageBoxA(0, "Initialization failed! See log.txt for details.", "Error", MB_OK);
+		return 1;
+	}
+
+	if (!app->DoLauncher())
+		return 0;
 
 	MyRegisterClass(hInstance);
 
-	if (!app->PreInit()) {
+	if (!app->InitWindow()) {
 		app->ResetDisplayDevice();
 		MessageBoxA(0, "Initialization failed! See log.txt for details.", "Error", MB_OK);
 		return 1;

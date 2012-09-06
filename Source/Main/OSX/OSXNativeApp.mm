@@ -71,6 +71,17 @@ NSScreen *NSScreenForCGDirectDisplayID(CGDirectDisplayID displayId) {
 
 namespace details {
 
+SystemVersion::SystemVersion() {
+	Gestalt(gestaltSystemVersionMajor, &m_major);
+	Gestalt(gestaltSystemVersionMinor, &m_minor);
+	Gestalt(gestaltSystemVersionBugFix, &m_revision);
+}
+
+const SystemVersion &SystemVersion::Get() {
+	static SystemVersion s_v;
+	return s_v;
+}
+
 #if !defined(RAD_OPT_PC_TOOSL)
 	
 bool ConfigureWindow(
@@ -136,7 +147,7 @@ struct DDVars : public DisplayDevice::NativeVars {
 			fadeState = DDVars::kFadeState_Normal;
 			
 			CGDisplayFadeReservationToken token;
-			while (CGAcquireDisplayFadeReservation(1.f, &token) != kCGErrorSuccess) {}
+			while (CGAcquireDisplayFadeReservation(1.5f, &token) != kCGErrorSuccess) {}
 			
 			CGDisplayFade(token, (timing==kFadeTiming_Immediate) ? 0.f : 1.f, 1.f, 0.f, 0.f, 0.f, 0.f, true);
 			CGReleaseDisplayFadeReservation(token);
@@ -148,10 +159,9 @@ struct DDVars : public DisplayDevice::NativeVars {
 			fadeState = DDVars::kFadeState_Black;
 			
 			CGDisplayFadeReservationToken token;
-			while (CGAcquireDisplayFadeReservation(1.f, &token) != kCGErrorSuccess) {}
+			while (CGAcquireDisplayFadeReservation(1.5f, &token) != kCGErrorSuccess) {}
 			
 			CGDisplayFade(token, 1.f, 0.f, 1.f, 0.f, 0.f, 0.f, true);
-			CGReleaseDisplayFadeReservation(token);
 		}
 	}
 	
@@ -160,8 +170,8 @@ struct DDVars : public DisplayDevice::NativeVars {
 	}
 };
 
-NativeApp::NativeApp()
-{
+NativeApp::NativeApp() {
+	m_useDisplayCapture = SystemVersion::Less(kOSXVersion_10_8);
 }
 
 bool NativeApp::PreInit() {
@@ -210,7 +220,10 @@ bool NativeApp::PreInit() {
 			r::VidMode m = VidModeFromCGMode(cgMode);
 			if (m.bpp < 32)
 				continue; // we don't like anything less than 32 bpp.
-			
+
+			if (SystemVersion::HasGameCenter() && (m.h < 640))
+				continue; // this resolution is too small to show game center dialogs.
+
 			// don't allow duplicates.
 			r::VidModeVec::iterator it;
 			for (it = dd->m_vidModes.begin(); it != dd->m_vidModes.end(); ++it) {
@@ -279,10 +292,11 @@ bool NativeApp::PreInit() {
 			
 			x.push_back(0);
 			
-			pf = [[[NSOpenGLPixelFormat alloc] initWithAttributes:&x[0]] autorelease];
+			pf = [[NSOpenGLPixelFormat alloc] initWithAttributes:&x[0]];
 			if (pf)
 				break;
 			
+			[pf release];
 			RAD_ASSERT(msaa > 0);
 			
 			msaa >>= 1;
@@ -292,6 +306,7 @@ bool NativeApp::PreInit() {
 		
 		// make a GL context and figure out max anisotropy.
 		NSOpenGLContext *glCtx = [[NSOpenGLContext alloc] initWithFormat: pf shareContext: nil];
+		[pf release];
 		if (!glCtx) {
 			COut(C_Warn) << "WARNING: Unable to create an openGL context!" << std::endl;
 			if (dd->m_primary) {
@@ -332,7 +347,7 @@ void NativeApp::Finalize() {
 bool NativeApp::BindDisplayDevice(const ::DisplayDeviceRef &display, const r::VidMode &mode) {
 	RAD_ASSERT(display);
 	
-	bool capture = true;
+	bool capture = m_useDisplayCapture;
 	if (m_activeDisplay) {
 		if (m_activeDisplay.get() != display.get()) {
 			ResetDisplayDevice();
@@ -410,7 +425,7 @@ bool NativeApp::BindDisplayDevice(const ::DisplayDeviceRef &display, const r::Vi
 		[s_appd->window setStyleMask: style];
 		[s_appd->window setFrame: r display: TRUE];
 	} else {
-		s_appd->window = [[NSWindow alloc] initWithContentRect: windowRect styleMask: style backing: NSBackingStoreBuffered defer: NO screen: nil];
+		s_appd->window = [[BorderlessKeyWindow alloc] initWithContentRect: windowRect styleMask: style backing: NSBackingStoreBuffered defer: NO screen: nil];
 		
 		NSString *title = [NSString stringWithUTF8String: App::Get()->title.get()];
 		[s_appd->window setTitle: title];
@@ -421,12 +436,16 @@ bool NativeApp::BindDisplayDevice(const ::DisplayDeviceRef &display, const r::Vi
 	}
 	
 	if (mode.fullscreen) {
-		[s_appd->window setLevel: CGShieldingWindowLevel()+1];
+		int windowLevel = NSMainMenuWindowLevel + 1;
+		if (m_useDisplayCapture)
+			windowLevel = CGShieldingWindowLevel() + 1;
+		[s_appd->window setLevel: windowLevel];
 	} else {
 		[s_appd->window setLevel: NSNormalWindowLevel];
 	}
 	
-	[s_appd->window orderFront: nil];
+	s_appd->fullscreen = mode.fullscreen;
+	[s_appd->window makeKeyAndOrderFront: nil];
 #else
 	}
 #endif
@@ -455,9 +474,12 @@ void NativeApp::ResetDisplayDevice() {
 			if (!m_activeDisplay->curVidMode->SameSize(m_activeDisplay->m_imp.m_defMode))
 				CGDisplaySetDisplayMode(ddv->displayId, ddv->defModeRef, 0);
 			
-			CGReleaseAllDisplays();
+			if (m_useDisplayCapture)
+				CGReleaseAllDisplays();
 			
 #if !defined(RAD_OPT_PC_TOOLS)
+			s_appd->fullscreen = false;
+			
 			if (s_appd->window) {
 				if (App::Get()->exit) {
 					[s_appd->window close];
@@ -527,8 +549,6 @@ GLDeviceContext::Ref NativeApp::CreateOpenGLContext(const GLPixelFormat &pf) {
 	attribs.reserve(128);
 	
 	attribs.push_back(NSOpenGLPFAMinimumPolicy);
-	/*if (m_activeDisplay->curVidMode->fullscreen)
-		attribs.push_back(NSOpenGLPFAFullScreen);*/
 	attribs.push_back(NSOpenGLPFAAccelerated);
 	if (pf.doubleBuffer)
 		attribs.push_back(NSOpenGLPFADoubleBuffer);
@@ -554,13 +574,14 @@ GLDeviceContext::Ref NativeApp::CreateOpenGLContext(const GLPixelFormat &pf) {
 	
 	NSOpenGLPixelFormat *nspf = 0;
 	
-	nspf = [[[NSOpenGLPixelFormat alloc] initWithAttributes:&attribs[0]] autorelease];
+	nspf = [[NSOpenGLPixelFormat alloc] initWithAttributes:&attribs[0]];
 	if (!nspf) {
 		COut(C_Error) << "Failed to create pixel format!" << std::endl;
 		return GLDeviceContext::Ref();
 	}
 	
 	NSOpenGLContext *glCtx = [[NSOpenGLContext alloc] initWithFormat: nspf shareContext: nil];
+	[nspf release];
 	if (!glCtx) {
 		COut(C_Error) << "Failed to OpenGL context!" << std::endl;
 		return GLDeviceContext::Ref();

@@ -4,7 +4,7 @@
 	\author Joe Riedel
 	\ingroup Main
  */
-
+ 
 #include "../NativeApp.h"
 #include <Engine/App.h>
 #include <Engine/COut.h>
@@ -23,6 +23,7 @@
 #endif
 
 #import "AppDelegate.h"
+#import "../GameCenter.h"
 #import <AppKit/NSWorkspace.h>
 
 AppDelegate *s_appd = 0;
@@ -49,6 +50,32 @@ static int s_vkeys_en[256] = {
 /*0x78*/ kKeyCode_F2, kKeyCode_PageDown, kKeyCode_F1, kKeyCode_Left, kKeyCode_Right, kKeyCode_Down, kKeyCode_Up, '?'
 };
 
+@implementation BorderlessKeyWindow
+
+- (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)windowStyle backing:(NSBackingStoreType)bufferingType defer:(BOOL)deferCreation {
+	return [super initWithContentRect: contentRect styleMask: windowStyle backing: bufferingType defer: deferCreation];
+}
+
+- (BOOL) canBecomeKeyWindow {
+	return TRUE;
+}
+
+- (BOOL) canBecomeMainWindow {
+	return TRUE;
+}
+
+- (void) resignKeyWindow {
+	COut(C_Info) << "resignKeyWindow" << std::endl;
+	[super resignKeyWindow];
+}
+
+- (void) becomeKeyWindow {
+	[super becomeKeyWindow];
+	COut(C_Info) << "becomeKeyWindow" << std::endl;
+}
+
+@end
+
 @interface AppDelegate (Private)
 -(void)appMain;
 -(const char**)getArgs:(int&)argc;
@@ -59,6 +86,7 @@ static int s_vkeys_en[256] = {
 -(void)handleModifierKeys:(NSEvent*)event;
 -(void)postModifierKeys:(int)x type:(InputEvent::Type)type;
 -(void)handleMouseButtons:(NSEvent*)event;
+-(void)checkWindowLevel;
 @end
 
 @implementation AppDelegate
@@ -82,6 +110,10 @@ static int s_vkeys_en[256] = {
 	m_mPos.y = 0;
 	m_vKeys = s_vkeys_en;
 	s_appd = self;
+	
+	fullscreen = false;
+	reclaimWindowLevel = false;
+	
 	[self appMain];
 }
 
@@ -97,8 +129,49 @@ static int s_vkeys_en[256] = {
 	rt::Finalize();
 }
 
-- (void)showHelp:(id)sender {
-	COut(C_Debug) << "showHelp" << std::endl;
+-(int)checkWindowLevel:(NSInteger)level {
+
+	CFArrayRef windowList = CGWindowListCopyWindowInfo(
+		kCGWindowListOptionOnScreenOnly|kCGWindowListExcludeDesktopElements,
+		kCGNullWindowID
+	);
+	
+	if (!windowList)
+		return 0;
+	
+	int num = 0;
+	
+	const CFIndex kSize = CFArrayGetCount(windowList);
+	
+	for (CFIndex i = 0; i < kSize; ++i) {
+		CFDictionaryRef d = (CFDictionaryRef)CFArrayGetValueAtIndex(windowList, i);
+		CFNumberRef numRef = (CFNumberRef)CFDictionaryGetValue(d, kCGWindowLayer);
+		if (numRef) {
+			int val;
+			CFNumberGetValue(numRef, kCFNumberIntType, &val);
+			if (val == level) {
+				// not owned by me...
+				numRef = (CFNumberRef)CFDictionaryGetValue(d, kCGWindowOwnerPID);
+				if (numRef) {
+					CFNumberGetValue(numRef, kCFNumberIntType, &val);
+					if (val != getpid())
+						++num;
+				}
+			}
+		}
+	}
+	
+	CFRelease(windowList);
+	
+	return num;
+}
+
+-(void)notifyGameCenterDialogDone {
+	if (!fullscreen)
+		return;
+		
+	// Game center dialogs demote our window level put it back.
+	reclaimWindowLevel = true;
 }
 
 @end
@@ -132,6 +205,8 @@ static int s_vkeys_en[256] = {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	[NSApp setServicesProvider:self];
 	
+	[GameCenter Create];
+	
 	// Pull out arguments.
 	int argc;
 	const char **argv;
@@ -150,11 +225,20 @@ static int s_vkeys_en[256] = {
 	
 	COut(C_Info) << std::endl;
 	
-	App *app = App::Get();
+	App *app = App::Get(argc, argv);
 	
 	[NSApp activateIgnoringOtherApps:YES];
 	
 	if (!app->PreInit()) {
+		app->ResetDisplayDevice();
+		NSRunAlertPanel(@"Error", @"Initialization failed! See log.txt for details.", nil, nil, nil);
+		[NSApp terminate:nil];
+	}
+	
+	if (!app->DoLauncher())
+		[NSApp terminate: nil];
+	
+	if (!app->InitWindow()) {
 		app->ResetDisplayDevice();
 		NSRunAlertPanel(@"Error", @"Initialization failed! See log.txt for details.", nil, nil, nil);
 		[NSApp terminate:nil];
@@ -186,7 +270,17 @@ static int s_vkeys_en[256] = {
 		[NSApp terminate:nil];
 	}
 	
+	xtime::TimeVal last = xtime::ReadMilliseconds();
+	
 	while (!app->exit) {
+	
+		// 30 FPS frame limit
+		xtime::TimeVal now = xtime::ReadMilliseconds();
+		xtime::TimeVal dt = now - last;
+		if (dt < 33)
+			continue;
+		last = now;
+		
 		[self processEvents];
 		app->Tick();
 		[pool release];
@@ -202,71 +296,72 @@ static int s_vkeys_en[256] = {
 	while ((e=[NSApp nextEventMatchingMask: NSAnyEventMask untilDate: nil inMode: NSDefaultRunLoopMode dequeue: YES])) {
 		[self dispatchEvent: e];
 	}
+	
+	[self checkWindowLevel];
 }
 
 -(void)dispatchEvent: (NSEvent*) event {
 	NSEventType type = [event type];
 	App *app = App::Get();
 	
-	switch (type) {
-			
-	case NSLeftMouseDown:
-	case NSLeftMouseUp:
-	case NSRightMouseDown:
-	case NSRightMouseUp:
-		break; // these also come through NSSystemDefined and give us more mouse buttons.
-			
-	case NSMouseMoved: 
-	case NSLeftMouseDragged:
+	if ([window isKeyWindow]) {
+		switch (type) {
+				
+		case NSMouseMoved: 
+		case NSLeftMouseDragged:
 		case NSRightMouseDragged:
-		{
-			m_mPos = [event locationInWindow];
-			if (window) {
-				m_mPos = [[window contentView] convertPoint: m_mPos fromView: nil];
-				NSRect r = [[window contentView] bounds];
-				m_mPos.y = r.size.height - m_mPos.y; // why?
-			}
-			InputEvent e;
-			e.type = InputEvent::T_MouseMove;
-			e.data[0] = (int)m_mPos.x;
-			e.data[1] = (int)m_mPos.y;
-			e.data[2] = m_mButtons;
-			e.time = xtime::ReadMilliseconds();
-			app->PostInputEvent(e);
-		} break;
-			
-	case NSKeyDown:
-		if ([event modifierFlags] & NSCommandKeyMask)// ignore command key combinations, they won't get NSKeyUp messages.
+			{
+				m_mPos = [event locationInWindow];
+				if (window) {
+					m_mPos = [[window contentView] convertPoint: m_mPos fromView: nil];
+					NSRect r = [[window contentView] bounds];
+					m_mPos.y = r.size.height - m_mPos.y; // why?
+				}
+				InputEvent e;
+				e.type = InputEvent::T_MouseMove;
+				e.data[0] = (int)m_mPos.x;
+				e.data[1] = (int)m_mPos.y;
+				e.data[2] = m_mButtons;
+				e.time = xtime::ReadMilliseconds();
+				app->PostInputEvent(e);
+			} break;
+				
+		case NSKeyDown:
+			if ([event modifierFlags] & NSCommandKeyMask)// ignore command key combinations, they won't get NSKeyUp messages.
+				break;
+			[self handleKeyEvent: event];
+			return; // NOTE: eats key event!
+		case NSKeyUp:
+			[self handleKeyEvent: event];
+			return; // NOTE: eats key event!
+				
+		case NSFlagsChanged:
+			[self handleModifierKeys: event];
 			break;
-		[self handleKeyEvent: event];
-		break;
-	case NSKeyUp:
-		[self handleKeyEvent: event];
-		break;
-			
-	case NSFlagsChanged:
-		[self handleModifierKeys: event];
-		break;
-			
-	case NSSystemDefined:
-		[self handleMouseButtons: event];
-		break;
-			
-	case NSScrollWheel:
-		{
-			NSPoint p = [event locationInWindow];
-			InputEvent e;
-			e.type = InputEvent::T_MouseWheel;
-			e.data[0] = (int)p.x;
-			e.data[1] = (int)p.y;
-			e.data[2] = (int)[event deltaY]; // TODO: scaling?
-			e.time = xtime::ReadMilliseconds();
-			app->PostInputEvent(e);
-		} break;
-	default:
-		[NSApp sendEvent: event];
-		break;
+				
+		case NSSystemDefined:
+			[self handleMouseButtons: event];
+			break;
+				
+		case NSScrollWheel:
+			{
+				NSPoint p = [event locationInWindow];
+				InputEvent e;
+				e.type = InputEvent::T_MouseWheel;
+				e.data[0] = (int)p.x;
+				e.data[1] = (int)p.y;
+				e.data[2] = (int)[event deltaY]; // TODO: scaling?
+				e.time = xtime::ReadMilliseconds();
+				app->PostInputEvent(e);
+			} break;
+		default:
+			break;
+		}
+	} else {
+		COut(C_Info) << "Ignoring event (not key window)" << std::endl;
 	}
+	
+	[NSApp sendEvent: event];
 }
 
 -(void)handleKeyEvent: (NSEvent*)event {
@@ -348,6 +443,32 @@ static int s_vkeys_en[256] = {
 	}
 	
 	m_mButtons = buttons;
+}
+
+-(void)checkWindowLevel {
+	if (!(details::SystemVersion::HasGameCenter() && fullscreen))
+		return;
+		
+	if (reclaimWindowLevel) {
+		int numModalWindows = [s_appd checkWindowLevel: NSModalPanelWindowLevel];
+		if (numModalWindows < 1) {
+			const int kWindowLevel = NSMainMenuWindowLevel + 1;
+			if ([window level] != kWindowLevel)
+				[window setLevel: kWindowLevel];
+			COut(C_Info) << "Resuming fullscreen window layer." << std::endl;
+			reclaimWindowLevel = false;
+		}
+	} else {
+		if (!window || [window isKeyWindow])
+			return;
+		int numModalWindows = [s_appd checkWindowLevel: NSModalPanelWindowLevel];
+		if (numModalWindows > 0) {
+			if ([window level] != NSNormalWindowLevel)
+				[window setLevel: NSNormalWindowLevel];
+			reclaimWindowLevel = true;
+			COut(C_Info) << "Dialog detected, exiting fullscreen window layer." << std::endl;
+		}
+	}
 }
 
 @end

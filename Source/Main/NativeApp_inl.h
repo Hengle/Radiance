@@ -17,6 +17,10 @@ inline const r::VidMode *DisplayDevice::RAD_IMPLEMENT_GET(curVidMode) {
 	return m_imp.curVidMode;
 }
 
+inline const r::VidMode *DisplayDevice::RAD_IMPLEMENT_GET(defVidMode) {
+	return m_imp.defVidMode;
+}
+
 inline int DisplayDevice::RAD_IMPLEMENT_GET(maxMSAA) {
 	return m_imp.maxMSAA;
 }

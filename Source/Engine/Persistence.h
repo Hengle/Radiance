@@ -54,6 +54,8 @@ public:
 	static Ref Load(stream::InputStream &is);
 	static Ref New(const char *name);
 
+	Ref Clone();
+
 	bool Read(const char *name);
 	bool Read(stream::InputStream &is);
 

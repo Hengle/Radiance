@@ -48,7 +48,7 @@ bool __IOS_IPad();
 #endif
 
 #if defined(RAD_OPT_TOOLS)
-#include "../../../../../Extern/glsl-optimizer-v1/src/glsl/glsl_optimizer.h"
+#include "../../../../../Extern/aras-p-glsl-optimizer-f2217b0/src/glsl/glsl_optimizer.h"
 #endif
 
 namespace r {
@@ -149,6 +149,8 @@ void GLTable::Reset()
 
 	vMin = vMaj = 0;
 	maxTextures = 0;
+	maxTextureSize = 0;
+	maxVertexAttribs = 0;
 
 	SGIS_generate_mipmap = false;
 	ARB_texture_non_power_of_two = false;
@@ -403,6 +405,8 @@ void GLTable::Load()
 #if !defined(RAD_OPT_OGLES2)
 	glMatrixMode(s_mm);
 #endif
+
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
 	
 #if defined(RAD_OPT_OGLES)
 #if defined(RAD_OPT_OGLES1_AND_2)

@@ -13,6 +13,8 @@
 
 #if defined(RAD_OPT_IOS)
 FILE *__IOS_OpenPersistence(const char *name, const char *mode);
+#elif defined(RAD_OPT_OSX)
+FILE *__OSX_OpenPersistence(const char *name, const char *mode);
 #endif
 
 namespace {
@@ -76,6 +78,8 @@ bool LoadStorage(const char *name, world::Keys &keys)
 	FILE *fp = 0;
 #if defined(RAD_OPT_IOS)
 	fp = __IOS_OpenPersistence(name, "rb");
+#elif defined(RAD_OPT_OSX) && defined(RAD_OPT_SHIP)
+	fp = __OSX_OpenPersistence(name, "rb");
 #else
 	String path(CStr("@r:/") + name);
 	fp = App::Get()->engine->sys->files->fopen(path.c_str, "rb");
@@ -124,6 +128,8 @@ bool SaveStorage(const char *name, const world::Keys &keys)
 	FILE *fp = 0;
 #if defined(RAD_OPT_IOS)
 	fp = __IOS_OpenPersistence(name, "wb");
+#elif defined(RAD_OPT_OSX) && defined(RAD_OPT_SHIP)
+	fp = __OSX_OpenPersistence(name, "wb");
 #else
 	String path(CStr("@r:/") + name);
 	fp = App::Get()->engine->sys->files->fopen(path.c_str, "wb");
@@ -160,6 +166,12 @@ Persistence::Ref Persistence::New(const char *name)
 {
 	RAD_ASSERT(name);
 	return Ref(new (ZEngine) Persistence(name));
+}
+
+Persistence::Ref Persistence::Clone() {
+	Persistence::Ref r(new Persistence(0));
+	r->m_keys = m_keys;
+	return r;
 }
 
 bool Persistence::Read(const char *name)

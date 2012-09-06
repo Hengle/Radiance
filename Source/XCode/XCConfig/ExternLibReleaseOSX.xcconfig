@@ -8,3 +8,5 @@
 #include "EngineRoot.xcconfig"
 #include "ExternPath.xcconfig"
 #include "DisablePCH.xcconfig"
+
+SKIP_INSTALL = YES

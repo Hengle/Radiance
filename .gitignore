@@ -23,6 +23,7 @@ BuildLog.htm
 *.pbxuser
 *.a
 *.mode1v3
+*.tlog
 pbxindex.header
 *.pbxsymbols
 build-state.dat

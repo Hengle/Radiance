@@ -11,6 +11,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QMessageBox>
 #include <Engine/Tools/Editor/EditorMainWindow.h>
+#include <Engine/Tools/Editor/EditorUtils.h>
 #include <Engine/COut.h>
 #include <Engine/App.h>
 #include <Engine/Engine.h>
@@ -25,6 +26,7 @@ RADENG_API int RADENG_CALL QtAppMain(int argc, const char **argv) {
 	rt::Initialize();
 
 	QApplication qApp(argc, (char**)argv);
+	QCoreApplication::setLibraryPaths(QStringList());
 
 	COut(C_Info) << "QtAppMain..." << std::endl;
 	COut(C_Info) << "echo command line: ";
@@ -35,7 +37,7 @@ RADENG_API int RADENG_CALL QtAppMain(int argc, const char **argv) {
 
 	COut(C_Info) << std::endl;
 
-	App *app = App::Get();
+	App *app = App::Get(argc, argv);
 
 	QCoreApplication::setOrganizationName(app->company.get());
 	QCoreApplication::setOrganizationDomain(app->website.get());
@@ -43,6 +45,10 @@ RADENG_API int RADENG_CALL QtAppMain(int argc, const char **argv) {
 
 	if (!app->PreInit())
 		return 1;
+
+#if defined(RAD_OPT_WIN)
+	qApp.setWindowIcon(tools::editor::LoadIcon("icon.tga"));
+#endif
 
 	tools::editor::MainWindow *mainWin = new (ZEditor) tools::editor::MainWindow(*app);
 

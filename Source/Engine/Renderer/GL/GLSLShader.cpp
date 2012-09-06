@@ -20,9 +20,7 @@
 
 #if defined(RAD_OPT_TOOLS)
 #define LOG_DUMP
-#if defined(RAD_OPT_DEBUG)
 #define LOG_SAVE
-#endif
 #endif
 
 #undef min

@@ -46,7 +46,7 @@ bool DisplayDevice::MatchVidMode(
 		disposition |= kMatchDisposition_AllowAspectChange;
 	}
 
-	size_t bestX = std::numeric_limits<size_t>::max();
+	size_t best = std::numeric_limits<size_t>::max();
 	int bestDiff = std::numeric_limits<int>::max();
 	for (size_t i = 0; i < list.size(); ++i) {
 		const r::VidMode &m = list[i];
@@ -69,81 +69,33 @@ bool DisplayDevice::MatchVidMode(
 		}
 
 		if (disposition&kMatchDisposition_Upsize) {
-			if (m.w < mode.w)
+			if ((m.w < mode.w) && (m.h < mode.h))
 				continue;
 		} else if(disposition&kMatchDisposition_Downsize) {
-			if (m.w > mode.w)
+			if ((m.w > mode.w) && (m.h > mode.h))
 				continue;
-		} else if (m.w != mode.w) {
+		} else if ((m.w != mode.w) || (m.h != mode.h)) {
 			continue;
 		}
 
-		int diff = m.w - mode.w;
-		if (diff < 0)
-			diff = -diff;
-
+		int diffX = m.w-mode.w;
+		diffX *= diffX;
+		int diffY = m.h-mode.h;
+		diffY *= diffY;
+		
+		int diff = diffX + diffY;
+		
 		if (diff < bestDiff) {
 			bestDiff = diff;
-			bestX = i;
+			best = i;
 		}
 	}
 
-	if (bestX == std::numeric_limits<size_t>::max())
-		return false; // no matching on X.
-
-	bool exact = list[bestX].w == mode.w;
-
-	// found best match on X, find match on Y
-	size_t bestY = std::numeric_limits<size_t>::max();
-	bestDiff = std::numeric_limits<int>::max();
-
-	for (size_t i = 0; i < list.size(); ++i) {
-		const r::VidMode &m = list[i];
-
-		if (!(disposition&kMatchDisposition_AllowAspectChange)) {
-			if (!m.SameAspect(mode))
-				continue;
-		} else if(m.Is4x3()) {
-			if (!(disposition&kMatchDisposition_AllowAspect4x3))
-				continue;
-		} else if (m.Is16x9()) {
-			if (!(disposition&kMatchDisposition_AllowAspect16x9))
-				continue;
-		} else if (m.Is16x10()) {
-			if (!(disposition&kMatchDisposition_AllowAspect16x10))
-				continue;
-		} else {
-			COut(C_Warn) << "WARNING: Video mode " << m.w << "x" << m.h << " has non-standard aspect ratio, mode ignored." << std::endl;
-			continue;
-		}
-
-		if (exact) {
-			if (disposition&kMatchDisposition_Upsize) {
-				if (m.h < mode.h)
-					continue;
-			} else if(disposition&kMatchDisposition_Downsize) {
-				if (m.h > mode.h)
-					continue;
-			} else if (m.h != mode.h) {
-				continue;
-			}
-		}
-
-		int diff = m.h - mode.h;
-		if (diff < 0)
-			diff = -diff;
-
-		if (diff < bestDiff) {
-			bestDiff = diff;
-			bestY = i;
-		}
-	}
-
-	if (bestY == std::numeric_limits<size_t>::max())
+	if (best == std::numeric_limits<size_t>::max())
 		return false;
 
 	bool fullscreen = mode.fullscreen;
-	mode = list[bestY];
+	mode = list[best];
 	mode.fullscreen = fullscreen;
 
 	return true;

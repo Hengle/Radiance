@@ -47,6 +47,12 @@
 		331949F615BA34BC00458F43 /* NativeDeviceContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E615BA34BC00458F43 /* NativeDeviceContext.h */; };
 		331949F715BA34BC00458F43 /* null_CloudStorage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949E715BA34BC00458F43 /* null_CloudStorage.cpp */; };
 		33194A2615BA4F4A00458F43 /* OSXMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33194A2515BA4F4A00458F43 /* OSXMain.mm */; };
+		336836CB15D41E8D00EE9472 /* GameCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 336836C915D41E8D00EE9472 /* GameCenter.h */; };
+		336836CC15D41E8D00EE9472 /* GameCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 336836C915D41E8D00EE9472 /* GameCenter.h */; };
+		336836CD15D41E8D00EE9472 /* GameCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 336836C915D41E8D00EE9472 /* GameCenter.h */; };
+		336836CE15D41E8D00EE9472 /* GameCenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336836CA15D41E8D00EE9472 /* GameCenter.mm */; };
+		336836CF15D41E8D00EE9472 /* GameCenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336836CA15D41E8D00EE9472 /* GameCenter.mm */; };
+		336836D015D41E8D00EE9472 /* GameCenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336836CA15D41E8D00EE9472 /* GameCenter.mm */; };
 		337AE54715BF033700AD1617 /* GLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 337AE54615BF033700AD1617 /* GLContext.h */; };
 		337AE54815BF033700AD1617 /* GLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 337AE54615BF033700AD1617 /* GLContext.h */; };
 		337AE54915BF033700AD1617 /* GLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 337AE54615BF033700AD1617 /* GLContext.h */; };
@@ -91,6 +97,10 @@
 		335ED5AC15BF22BB008DDBD9 /* libMainShipOSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainShipOSX.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		335ED5AD15BF22BB008DDBD9 /* libMainiOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainiOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		335ED5AE15BF22BB008DDBD9 /* libMainDeveloper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainDeveloper.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		336836C715D41CB400EE9472 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
+		336836C915D41E8D00EE9472 /* GameCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameCenter.h; path = ../Main/GameCenter.h; sourceTree = "<group>"; };
+		336836CA15D41E8D00EE9472 /* GameCenter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = GameCenter.mm; path = ../Main/GameCenter.mm; sourceTree = "<group>"; };
+		336836E315D471C700EE9472 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		337AE54615BF033700AD1617 /* GLContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GLContext.h; path = ../Main/GL/GLContext.h; sourceTree = "<group>"; };
 		337AE78315BF217000AD1617 /* libMainGoldenOSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainGoldenOSX.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		337AE78415BF21A600AD1617 /* MainGoldenDebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainGoldenDebugiOS.xcconfig; path = XCConfig/MainGoldenDebugiOS.xcconfig; sourceTree = "<group>"; };
@@ -145,6 +155,8 @@
 		331949A715BA343700458F43 = {
 			isa = PBXGroup;
 			children = (
+				336836E315D471C700EE9472 /* Carbon.framework */,
+				336836C715D41CB400EE9472 /* GameKit.framework */,
 				331949DE15BA34BC00458F43 /* Source */,
 				331949FC15BA352400458F43 /* XCConfig */,
 				331949C415BA344A00458F43 /* Frameworks */,
@@ -169,10 +181,12 @@
 			children = (
 				337AE54415BF032900AD1617 /* GL */,
 				331949DF15BA34BC00458F43 /* OSX */,
+				336836C915D41E8D00EE9472 /* GameCenter.h */,
+				336836CA15D41E8D00EE9472 /* GameCenter.mm */,
 				331949E015BA34BC00458F43 /* IntMain.h */,
-				331949E115BA34BC00458F43 /* NativeApp_inl.h */,
 				331949E215BA34BC00458F43 /* NativeApp.cpp */,
 				331949E315BA34BC00458F43 /* NativeApp.h */,
+				331949E115BA34BC00458F43 /* NativeApp_inl.h */,
 				331949E415BA34BC00458F43 /* NativeAppBackend.h */,
 				331949E515BA34BC00458F43 /* NativeAppDef.h */,
 				331949E615BA34BC00458F43 /* NativeDeviceContext.h */,
@@ -248,6 +262,7 @@
 				331949F615BA34BC00458F43 /* NativeDeviceContext.h in Headers */,
 				330A99C915BCA1BE002A81EC /* AppDelegate.h in Headers */,
 				337AE54715BF033700AD1617 /* GLContext.h in Headers */,
+				336836CB15D41E8D00EE9472 /* GameCenter.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,6 +277,7 @@
 				330A99B915BCA114002A81EC /* NativeAppDef.h in Headers */,
 				330A99BA15BCA114002A81EC /* NativeDeviceContext.h in Headers */,
 				337AE54815BF033700AD1617 /* GLContext.h in Headers */,
+				336836CC15D41E8D00EE9472 /* GameCenter.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -294,6 +310,7 @@
 				337AE77D15BF217000AD1617 /* NativeDeviceContext.h in Headers */,
 				337AE77E15BF217000AD1617 /* AppDelegate.h in Headers */,
 				337AE77F15BF217000AD1617 /* GLContext.h in Headers */,
+				336836CD15D41E8D00EE9472 /* GameCenter.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -406,6 +423,7 @@
 				331949F715BA34BC00458F43 /* null_CloudStorage.cpp in Sources */,
 				33194A2615BA4F4A00458F43 /* OSXMain.mm in Sources */,
 				330A99CA15BCA1BE002A81EC /* AppDelegate.mm in Sources */,
+				336836CE15D41E8D00EE9472 /* GameCenter.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -416,6 +434,7 @@
 				330A99B615BCA114002A81EC /* NativeApp.cpp in Sources */,
 				330A99BB15BCA114002A81EC /* null_CloudStorage.cpp in Sources */,
 				330A99C615BCA125002A81EC /* OSXNativeApp.mm in Sources */,
+				336836CF15D41E8D00EE9472 /* GameCenter.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -440,6 +459,7 @@
 				337AE77215BF217000AD1617 /* null_CloudStorage.cpp in Sources */,
 				337AE77315BF217000AD1617 /* OSXMain.mm in Sources */,
 				337AE77415BF217000AD1617 /* AppDelegate.mm in Sources */,
+				336836D015D41E8D00EE9472 /* GameCenter.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -500,6 +520,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../Extern/Qt-4.8.2\"",
 					"\"$(SRCROOT)/../../../Extern/Cg-3.1.0013\"",
+					"\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Versions/A/Frameworks\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -514,6 +535,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../Extern/Qt-4.8.2\"",
 					"\"$(SRCROOT)/../../../Extern/Cg-3.1.0013\"",
+					"\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Versions/A/Frameworks\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

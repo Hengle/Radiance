@@ -3,15 +3,14 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="EngineDebug.props" />
     <Import Project="EngineShip.props" />
+    <Import Project="QtSupport_x32.props" />
     <Import Project="LinkEngineShipDebug_x32.props" />
     <Import Project="LinkAdditionalWindowsLibs.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
   <ItemDefinitionGroup>
-    <ClCompile>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-    </ClCompile>
+    <ClCompile />
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

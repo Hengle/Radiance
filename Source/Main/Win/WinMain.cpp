@@ -6,6 +6,8 @@
 */
 
 #include RADPCH
+#include <Engine/App.h>
+
 #if !defined(RAD_OPT_SHIP)
 #include <VLD/vld.h>
 #endif

@@ -149,8 +149,7 @@ int StringTable::Load(const char *name, const char *root, StringTable::Ref &_r, 
 			return pkg::SR_ScriptError;
 		}
 
-		if (lua_pcall(L->L, 0, 0, 0))
-		{
+		if (lua_pcall(L->L, 0, 0, 0)) {
 			COut(C_Error) << "StringTable::Load(run): " << lua_tostring(L->L, -1) << std::endl;
 			r.reset();
 			return pkg::SR_ScriptError;
@@ -297,7 +296,10 @@ bool StringTable::SaveText(const char *name, const char *path, int saveMask) con
 				String mod;
 				String slashes(CStr("\\\\"));
 
-				for (string::UTF32Buf::const_iterator x = utf.begin; x != utf.end; ++x) {
+				string::UTF32Buf::const_iterator begin = utf.begin;
+				string::UTF32Buf::const_iterator end = utf.end;
+
+				for (string::UTF32Buf::const_iterator x = begin; x < end; ++x) {
 					if (*x == '\\') {
 						mod += slashes;
 					} else {
