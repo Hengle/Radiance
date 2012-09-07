@@ -8,7 +8,7 @@
 #include "App.h"
 #include "Engine.h"
 #include "SkAnim/SkAnim.h"
-#include "Utils/Tokenizer.h"
+#include <Runtime/Tokenizer.h>
 #include <Runtime/File.h>
 #include <Runtime/Time.h>
 
@@ -99,42 +99,32 @@ StringTable::LangId App::LoadLangId(int *enabledLangMask, StringTable::LangId de
 	if (enabledLangMask)
 		*enabledLangMask = StringTable::LangFlag_EN;
 
-	FILE *fp = engine->sys->files->fopen("@r:/languages.txt", "rb");
-	if (!fp)	
+	file::MMFileInputBuffer::Ref ib = engine->sys->files->OpenInputBuffer("@r:/languages.txt", ZEngine);
+	if (!ib)	
 		return ErrLang;
-	fseek(fp, 0, SEEK_END);
-	size_t size = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-	void *data = safe_zone_malloc(ZEngine, size);
-	if (fread(data, 1, size, fp) != size) {
-		fclose(fp);
-		zone_free(data);
-		return ErrLang;
-	}
-	fclose(fp);
-
-	Tokenizer script;
-	script.InitParsing((const char *)data, (int)size);
-	zone_free(data);
+	
+	stream::InputStream is(*ib);
+	
+	Tokenizer script(is);
 
 	int validLangBits = StringTable::LangFlag_EN;
 	StringTable::LangId defaultLang = StringTable::LangId_EN;
 
 	String token;
-	while (script.GetToken(token)) {
+	while (script.GetToken(token, Tokenizer::kTokenMode_CrossLine)) {
 		if (token == "DEFAULT") {
-			if (!script.IsNextToken("="))
+			if (!script.IsNextToken("=", Tokenizer::kTokenMode_SameLine))
 				return ErrLang;
-			if (!script.GetToken(token))
+			if (!script.GetToken(token, Tokenizer::kTokenMode_SameLine))
 				return ErrLang;
 			token.Lower();
 			int id = StringTable::Map(token.c_str);
 			if (id != -1)
 				defaultLang = (StringTable::LangId)id;
 		} else if (token == "FORCE") {
-			if (!script.IsNextToken("="))
+			if (!script.IsNextToken("=", Tokenizer::kTokenMode_SameLine))
 				return ErrLang;
-			if (!script.GetToken(token))
+			if (!script.GetToken(token, Tokenizer::kTokenMode_SameLine))
 				return ErrLang;
 			token.Lower();
 			int id = StringTable::Map(token.c_str);

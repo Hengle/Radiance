@@ -9,6 +9,7 @@
 #include "../Container/ZoneMap.h"
 #include "../Container/ZoneList.h"
 #include "EventDetails.h"
+#include "../PushPack.h"
 
 RAD_ZONE_DEC(RADRT_API, ZEvents);
 
@@ -146,5 +147,6 @@ public: \
 	} \
 private:
 
+#include "../PopPack.h"
 #include "Event.inl"
 

@@ -139,9 +139,6 @@
     <Filter Include="Source\Engine\UI">
       <UniqueIdentifier>{3665c7c9-b8f3-4f4d-8500-5860b237ff50}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Engine\Utils">
-      <UniqueIdentifier>{73a9e8c0-5bfb-4d04-a4c5-77f843cf7607}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\Engine\Win">
       <UniqueIdentifier>{9861fdd3-1e40-402f-9116-237c12e2d3f0}</UniqueIdentifier>
     </Filter>
@@ -225,9 +222,6 @@
     <ClInclude Include="..\..\Runtime\Runtime.h">
       <Filter>Source\Runtime</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Runtime\SafePointer.h">
-      <Filter>Source\Runtime</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Runtime\SharedLibrary.h">
       <Filter>Source\Runtime</Filter>
     </ClInclude>
@@ -307,12 +301,6 @@
       <Filter>Source\Runtime\Base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Runtime\Base\RefCountDef.h">
-      <Filter>Source\Runtime\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Runtime\Base\SafePointer.h">
-      <Filter>Source\Runtime\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Runtime\Base\SafePointerDef.h">
       <Filter>Source\Runtime\Base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Runtime\Base\SharedLibrary.h">
@@ -1224,9 +1212,6 @@
     <ClInclude Include="..\..\Engine\UI\UIWidgetDef.h">
       <Filter>Source\Engine\UI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\Utils\Tokenizer.h">
-      <Filter>Source\Engine\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\Win\WinOpts.h">
       <Filter>Source\Engine\Win</Filter>
     </ClInclude>
@@ -1385,6 +1370,12 @@
     </ClInclude>
     <ClInclude Include="..\..\Runtime\File\IntFile.h">
       <Filter>Source\Runtime\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Runtime\Base\Tokenizer.h">
+      <Filter>Source\Runtime\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Runtime\Tokenizer.h">
+      <Filter>Source\Runtime</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1919,9 +1910,6 @@
     <ClCompile Include="..\..\Engine\UI\UIWidget.cpp">
       <Filter>Source\Engine\UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\Utils\Tokenizer.cpp">
-      <Filter>Source\Engine\Utils</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Engine\World\BSPFile.cpp">
       <Filter>Source\Engine\World</Filter>
     </ClCompile>
@@ -2054,6 +2042,9 @@
     <ClCompile Include="..\..\Runtime\File\File.cpp">
       <Filter>Source\Runtime\File</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Runtime\Base\Tokenizer.cpp">
+      <Filter>Source\Runtime\Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Runtime\Base\Event.inl">
@@ -2069,9 +2060,6 @@
       <Filter>Source\Runtime\Base</Filter>
     </None>
     <None Include="..\..\Runtime\Base\RefCount.inl">
-      <Filter>Source\Runtime\Base</Filter>
-    </None>
-    <None Include="..\..\Runtime\Base\SafePointer.inl">
       <Filter>Source\Runtime\Base</Filter>
     </None>
     <None Include="..\..\Runtime\Base\ThreadSafeObjectPoolConstruct.inl">

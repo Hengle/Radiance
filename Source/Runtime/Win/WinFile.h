@@ -14,7 +14,7 @@ namespace file {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class WinFileSystem : public FileSystem {
+class RADRT_CLASS WinFileSystem : public FileSystem {
 public:
 
 	WinFileSystem(
@@ -69,7 +69,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class WinMMFile : public MMFile {
+class RADRT_CLASS WinMMFile : public MMFile {
 public:
 
 	~WinMMFile();
@@ -101,7 +101,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class WinMMapping : public MMapping {
+class RADRT_CLASS WinMMapping : public MMapping {
 public:
 
 	~WinMMapping();
@@ -132,7 +132,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class WinFileSearch : public FileSearch {
+class RADRT_CLASS WinFileSearch : public FileSearch {
 public:
 
 	~WinFileSearch();

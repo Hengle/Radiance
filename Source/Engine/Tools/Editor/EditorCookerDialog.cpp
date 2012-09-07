@@ -9,7 +9,7 @@
 #include "EditorMainWindow.h"
 #include "EditorGLWidget.h"
 #include "../../App.h"
-#include "../../Utils/Tokenizer.h"
+#include <Runtime/Tokenizer.h>
 #include <Runtime/DataCodec/ZLib.h>
 #include <Runtime/File.h>
 #include <QtCore/QSignalMapper>
@@ -221,8 +221,8 @@ void CookerDialog::CookClicked()
 
 	pkg::PackageMan::StringVec roots;
 	{
-		FILE *fp = App::Get()->engine->sys->files->fopen("@r:/cook.txt", "rb");
-		if (!fp)
+		file::MMFileInputBuffer::Ref ib = App::Get()->engine->sys->files->OpenInputBuffer("@r:/cook.txt", ZTools);
+		if (!ib)
 		{
 			QMessageBox::critical(
 				this,
@@ -231,32 +231,11 @@ void CookerDialog::CookClicked()
 			);
 			return;
 		}
-		fseek(fp, 0, SEEK_END);
-		size_t size = ftell(fp);
-		fseek(fp, 0, SEEK_SET);
+				
+		Tokenizer script(ib);
 		
-		if (!size)
-		{
-			QMessageBox::critical(
-				this,
-				"Error",
-				"cook.txt is empty"
-			);
-
-			fclose(fp);
-			return;
-		}
-		
-		void *data = safe_zone_malloc(ZEditor, size);
-		fread(data, 1, size, fp);
-		fclose(fp);
-
-		Tokenizer script;
-		script.InitParsing((const char*)data, (int)size);
-		zone_free(data);
-
 		String token;
-		while (script.GetToken(token))
+		while (script.GetToken(token, Tokenizer::kTokenMode_CrossLine))
 			roots.push_back(token);
 
 		if (roots.empty())

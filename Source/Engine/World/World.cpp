@@ -7,7 +7,8 @@
 #include "World.h"
 #include "../Game/Game.h"
 #include "../UI/UIWidget.h"
-#include "../Utils/Tokenizer.h"
+#include <Runtime/Tokenizer.h>
+#include <Runtime/Stream/MemoryStream.h>
 #include "../Packages/PackagesDef.h"
 #include "../App.h"
 #include "../Engine.h"
@@ -338,15 +339,15 @@ void World::TickState(float dt, float unmod_dt)
 Event::Vec World::ParseMultiEvent(const char *string)
 {
 	Event::Vec events;
-	Tokenizer script;
-	String str(string);
-
-	script.InitParsing(string, Tokenizer::WholeFile);
+		
+	stream::MemInputBuffer ib(string, string::len(string));
+	stream::InputStream is(ib);
+	Tokenizer script(is);
 
 	for (;;)
 	{
 		String target;
-		if (!script.GetToken(target))
+		if (!script.GetToken(target, Tokenizer::kTokenMode_CrossLine))
 		{
 			if (events.empty())
 				COut(C_Warn) << "Malformed script command: '" << string << "'" << std::endl;
@@ -363,14 +364,14 @@ Event::Vec World::ParseMultiEvent(const char *string)
 			evTarget = Event::T_PlayerPawn;
 		
 		String cmd;
-		if (!script.GetToken(cmd))
+		if (!script.GetToken(cmd, Tokenizer::kTokenMode_SameLine))
 		{
 			COut(C_Warn) << "Malformed script command: '" << string << "'" << std::endl;
 			return events;
 		}
 
 		String args;
-		script.GetRest(args, false);
+		script.GetRemaining(args, Tokenizer::kFetchMode_RestOfLine);
 
 		Event::Ref event;
 

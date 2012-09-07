@@ -8,7 +8,7 @@
 #include "AssetTypes.h"
 #include "../Packages/Packages.h"
 #include "../World/EntityDef.h"
-#include "../Utils/Tokenizer.h"
+#include <Runtime/Tokenizer.h>
 #include <Runtime/PushPack.h>
 
 class Engine;

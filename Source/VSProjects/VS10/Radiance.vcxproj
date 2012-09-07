@@ -851,7 +851,6 @@
     <ClInclude Include="..\..\Engine\UI\UITextLabel.h" />
     <ClInclude Include="..\..\Engine\UI\UIWidget.h" />
     <ClInclude Include="..\..\Engine\UI\UIWidgetDef.h" />
-    <ClInclude Include="..\..\Engine\Utils\Tokenizer.h" />
     <ClInclude Include="..\..\Engine\Win\WinOpts.h" />
     <ClInclude Include="..\..\Engine\World\BSPFile.h" />
     <ClInclude Include="..\..\Engine\World\Entities\E_Exports.h" />
@@ -968,12 +967,11 @@
     <ClInclude Include="..\..\Runtime\Base\Property.h" />
     <ClInclude Include="..\..\Runtime\Base\RefCount.h" />
     <ClInclude Include="..\..\Runtime\Base\RefCountDef.h" />
-    <ClInclude Include="..\..\Runtime\Base\SafePointer.h" />
-    <ClInclude Include="..\..\Runtime\Base\SafePointerDef.h" />
     <ClInclude Include="..\..\Runtime\Base\SharedLibrary.h" />
     <ClInclude Include="..\..\Runtime\Base\SharedLibraryDef.h" />
     <ClInclude Include="..\..\Runtime\Base\SIMD.h" />
     <ClInclude Include="..\..\Runtime\Base\SIMD_ref.h" />
+    <ClInclude Include="..\..\Runtime\Base\Tokenizer.h" />
     <ClInclude Include="..\..\Runtime\Base\Types.h" />
     <ClInclude Include="..\..\Runtime\Base\Utils.h" />
     <ClInclude Include="..\..\Runtime\Base\Zone.h" />
@@ -1128,7 +1126,6 @@
     <ClInclude Include="..\..\Runtime\Reflect\RTLInterop.h" />
     <ClInclude Include="..\..\Runtime\Reflect\Win\WinOpts.h" />
     <ClInclude Include="..\..\Runtime\Runtime.h" />
-    <ClInclude Include="..\..\Runtime\SafePointer.h" />
     <ClInclude Include="..\..\Runtime\SharedLibrary.h" />
     <ClInclude Include="..\..\Runtime\Stream.h" />
     <ClInclude Include="..\..\Runtime\StreamDef.h" />
@@ -1167,6 +1164,7 @@
     <ClInclude Include="..\..\Runtime\Time\IntTime.h" />
     <ClInclude Include="..\..\Runtime\Time\Time.h" />
     <ClInclude Include="..\..\Runtime\Time\TimeDef.h" />
+    <ClInclude Include="..\..\Runtime\Tokenizer.h" />
     <ClInclude Include="..\..\Runtime\Tuple.h" />
     <ClInclude Include="..\..\Runtime\Tuple\MakeTuple.h" />
     <ClInclude Include="..\..\Runtime\Tuple\Tuple.h" />
@@ -1954,7 +1952,6 @@
     <ClCompile Include="..\..\Engine\UI\UIMatWidget.cpp" />
     <ClCompile Include="..\..\Engine\UI\UITextLabel.cpp" />
     <ClCompile Include="..\..\Engine\UI\UIWidget.cpp" />
-    <ClCompile Include="..\..\Engine\Utils\Tokenizer.cpp" />
     <ClCompile Include="..\..\Engine\World\BSPFile.cpp" />
     <ClCompile Include="..\..\Engine\World\Entities\E_Exports.cpp" />
     <ClCompile Include="..\..\Engine\World\Entities\E_Pawn.cpp" />
@@ -2046,6 +2043,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\Runtime\Base\Tokenizer.cpp" />
     <ClCompile Include="..\..\Runtime\Base\Utils.cpp" />
     <ClCompile Include="..\..\Runtime\Base\Zone.cpp" />
     <ClCompile Include="..\..\Runtime\Container\LWNodeList.cpp" />
@@ -2160,7 +2158,6 @@
     <None Include="..\..\Runtime\Base\ObjectPool.inl" />
     <None Include="..\..\Runtime\Base\ObjectPoolConstruct.inl" />
     <None Include="..\..\Runtime\Base\RefCount.inl" />
-    <None Include="..\..\Runtime\Base\SafePointer.inl" />
     <None Include="..\..\Runtime\Base\ThreadSafeObjectPoolConstruct.inl" />
     <None Include="..\..\Runtime\Base\Utils.inl" />
     <None Include="..\..\Runtime\Base\Zone.inl" />

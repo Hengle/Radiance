@@ -63,7 +63,7 @@ namespace file {
 	Windows does not. When using free-files it is possible to make mistakes in casing of file 
 	names that won't hurt you on windows builds.
 */
-class FileSystem : public boost::noncopyable {
+class RADRT_CLASS FileSystem : public boost::noncopyable {
 public:
 	typedef FileSystemRef Ref;
 
@@ -298,7 +298,7 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 
 //! Memory Mapped File
-class MMFile : public boost::noncopyable, public boost::enable_shared_from_this<MMFile> {
+class RADRT_CLASS MMFile : public boost::noncopyable, public boost::enable_shared_from_this<MMFile> {
 public:
 	typedef MMFileRef Ref;
 
@@ -329,7 +329,7 @@ protected:
 ///////////////////////////////////////////////////////////////////////////////
 
 //! Memory mapping object.
-class MMapping : public boost::noncopyable {
+class RADRT_CLASS MMapping : public boost::noncopyable {
 public:
 	typedef MMappingRef Ref;
 
@@ -377,7 +377,7 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 
 //! File search
-class FileSearch : public boost::noncopyable {
+class RADRT_CLASS FileSearch : public boost::noncopyable {
 public:
 	typedef FileSearchRef Ref;
 
@@ -395,7 +395,7 @@ protected:
 ///////////////////////////////////////////////////////////////////////////////
 
 //! Pak file.
-class PakFile : public boost::noncopyable, public boost::enable_shared_from_this<PakFile> {
+class RADRT_CLASS PakFile : public boost::noncopyable, public boost::enable_shared_from_this<PakFile> {
 public:
 	typedef PakFileRef Ref;
 
@@ -481,7 +481,7 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 
 //! Stream InputBuffer for MMFile's
-class MMFileInputBuffer : public boost::noncopyable, public stream::IInputBuffer {
+class RADRT_CLASS MMFileInputBuffer : public boost::noncopyable, public stream::IInputBuffer {
 public:
 	typedef MMFileInputBufferRef Ref;
 	
@@ -511,7 +511,7 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 
 //! Stream InputBuffer for FILE*
-class FILEInputBuffer : public boost::noncopyable, public stream::IInputBuffer {
+class RADRT_CLASS FILEInputBuffer : public boost::noncopyable, public stream::IInputBuffer {
 public:
 	typedef FILEInputBufferRef Ref;
 
@@ -538,7 +538,7 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 
 //! Stream OutputBuffer for FILE*
-class FILEOutputBuffer : public boost::noncopyable, public stream::IOutputBuffer {
+class RADRT_CLASS FILEOutputBuffer : public boost::noncopyable, public stream::IOutputBuffer {
 public:
 	typedef FILEOutputBufferRef Ref;
 

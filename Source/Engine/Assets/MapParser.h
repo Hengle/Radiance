@@ -11,7 +11,7 @@
 
 #include "../Packages/Packages.h"
 #include "../World/EntityDef.h"
-#include "../Utils/Tokenizer.h"
+#include <Runtime/Tokenizer.h>
 #include <Runtime/File.h>
 
 #include <Runtime/PushPack.h>
@@ -60,13 +60,10 @@ private:
 
 	enum {
 		S_None,
-		S_Loading,
 		S_Done
 	};
 
 	Tokenizer m_script;
-
-	file::MMapping::Ref m_mm;
 	int m_state;
 };
 

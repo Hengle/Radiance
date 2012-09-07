@@ -31,8 +31,7 @@ int MapParser::Process(
 	if (flags&(P_Unload|P_Trim|P_Cancel))
 	{
 		m_state = S_None;
-		m_mm.reset();
-		m_script.FreeScript();
+		m_script.Reset();
 		return SR_Success;
 	}
 
@@ -54,8 +53,7 @@ int MapParser::Process(
 
 	if (r < SR_Success) {
 		m_state = S_None;
-		m_mm.reset();
-		m_script.FreeScript();
+		m_script.Reset();
 	}
 
 	return r;
@@ -69,17 +67,17 @@ int MapParser::ParseEntity(world::EntSpawn &spawn) {
 int MapParser::ParseScript(world::EntSpawn &spawn) {
 	String token, value, temp;
 
-	if (!m_script.GetToken(token))
+	if (!m_script.GetToken(token, Tokenizer::kTokenMode_CrossLine))
 		return SR_End;
 	if (token != "{")
 		return SR_ParseError;
 
 	for (;;) {
-		if (!m_script.GetToken(token))
+		if (!m_script.GetToken(token, Tokenizer::kTokenMode_CrossLine))
 			return SR_ParseError;
 		if (token == "}")
 			break;
-		if (!m_script.GetToken(value))
+		if (!m_script.GetToken(value, Tokenizer::kTokenMode_CrossLine))
 			return SR_ParseError;
 
 		// turn "\n" into '\n'
@@ -113,24 +111,12 @@ int MapParser::Load(
 		if (!name || name->empty)
 			return SR_MetaError;
 
-		m_mm = engine.sys->files->MapFile(name->c_str, ZWorld);
-		if (!m_mm)
+		file::MMFileInputBuffer::Ref ib = engine.sys->files->OpenInputBuffer(name->c_str, ZWorld);
+		if (!ib)
 			return SR_FileNotFound;
-		
-		m_state = S_Loading;
-		if (!time.remaining)
-			return SR_Pending;
-	}
 
-	if (m_state == S_Loading) {
-		RAD_ASSERT(m_mm);
-		
-		m_script.InitParsing(
-			(const char*)m_mm->data.get(),
-			(int)m_mm->size.get()
-		);
+		m_script.Bind(ib);
 
-		m_mm.reset();
 		m_state = S_Done;
 	}
 

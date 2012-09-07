@@ -38,16 +38,12 @@ CookStatus MapCooker::Status(int flags, int allflags) {
 		if (!mapPath || mapPath->empty)
 			return CS_NeedRebuild;
 
-		file::MMapping::Ref mm = engine->sys->files->MapFile(mapPath->c_str, ZTools);
-		if (!mm)
+		file::MMFileInputBuffer::Ref ib = engine->sys->files->OpenInputBuffer(mapPath->c_str, ZTools);
+		if (!ib)
 			return CS_NeedRebuild;
 
-		m_script.InitParsing(
-			(const char *)mm->data.get(),
-			(int)mm->size.get()
-		);
-
-		mm.reset();
+		m_script.Bind(ib);
+		ib.reset();
 
 		int r;
 		CookStatus status = CS_UpToDate;
@@ -93,16 +89,12 @@ int MapCooker::Compile(int flags, int allflags) {
 
 //	cout.get() << "********" << std::endl << "Loading :" << mapPath->c_str() << std::endl;
 
-	file::MMapping::Ref mm = engine->sys->files->MapFile(mapPath->c_str, ZTools);
-	if (!mm)
+	file::MMFileInputBuffer::Ref ib = engine->sys->files->OpenInputBuffer(mapPath->c_str, ZTools);
+	if (!ib)
 		return SR_FileNotFound;
 	
-	m_script.InitParsing(
-		(const char *)mm->data.get(),
-		(int)mm->size.get()
-	);
-
-	mm.reset();
+	m_script.Bind(ib);
+	ib.reset();
 
 	::tools::MapBuilder mapBuilder(*engine.get());
 
@@ -128,7 +120,7 @@ int MapCooker::Compile(int flags, int allflags) {
 	if (r != SR_Success)
 		return r;
 
-	m_script.FreeScript();
+	m_script.Reset();
 
 //	cout.get() << "Compiling..." << std::endl;
 
@@ -164,17 +156,17 @@ int MapCooker::ParseEntity(world::EntSpawn &spawn) {
 int MapCooker::ParseScript(world::EntSpawn &spawn) {
 	String token, value, temp;
 
-	if (!m_script.GetToken(token))
+	if (!m_script.GetToken(token, Tokenizer::kTokenMode_CrossLine))
 		return SR_End;
 	if (token != "{")
 		return SR_ParseError;
 
 	for (;;) {
-		if (!m_script.GetToken(token))
+		if (!m_script.GetToken(token, Tokenizer::kTokenMode_CrossLine))
 			return SR_ParseError;
 		if (token == "}")
 			break;
-		if (!m_script.GetToken(value))
+		if (!m_script.GetToken(value, Tokenizer::kTokenMode_CrossLine))
 			return SR_ParseError;
 
 		// turn "\n" into '\n'
