@@ -5,10 +5,25 @@
 
 utility RadianceUtil "Radiance Tools" width:166 height:643
 (
-
-	GroupBox grp1 "Selection" pos:[6,7] width:155 height:546
-	radiobuttons modelTypeRadio "" pos:[19,27] width:71 height:48 labels:#("Solid", "Detail", "Areaportal") default:0 columns:1
-	checkbox noCollisionCheckBox "No Clip" pos:[96,25] width:60 height:18
+	local s_contentTypes = #("solid", "fog", "detail", "water", "areaportal", "lava")
+	local s_contentTypesUpr = #("Solid", "Fog", "Detail", "Water", "Areaportal", "Lava")
+	
+	function contentsIndex content = (
+		c = 1
+		for x in s_contentTypes do (
+			if (x ==content) then (
+				return c
+			)
+			c = c + 1
+		)
+		
+		throw ("Invalid Contents Type: " + content)
+	)
+	
+	GroupBox grp1 "Selection" pos:[6,3] width:155 height:549
+	radiobuttons modelTypeRadio "" pos:[19,20] width:71 height:48 labels:s_contentTypesUpr default:0 columns:2
+	checkbox noCollisionCheckBox "No Clip" pos:[19,66] width:60 height:18
+	checkbox nodrawCheckbox "No Draw" pos:[93,66] width:60 height:18
 	GroupBox grp4 "Animation" pos:[15,82] width:138 height:270
 	dropdownList animList "" pos:[18,100] width:130 height:21
 	edittext animName "Name:" pos:[18,128] width:130 height:17
@@ -24,7 +39,6 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 	button selectDetailButton "Select Detail" pos:[16,469] width:134 height:21
 	button selectNoCollisionButton "Select No Collision" pos:[16,497] width:134 height:21
 	button selectAreaportalButton "Select Areaportal" pos:[16,525] width:134 height:21
-	checkbox nodrawCheckbox "No Draw" pos:[96,41] width:60 height:18
 	edittext animStart "Start:" pos:[18,152] width:66 height:17
 	edittext animEnd "End:" pos:[86,152] width:66 height:17
 	checkbox animLoop "Looping" pos:[21,231] width:63 height:18
@@ -132,9 +146,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 	function setSelectionType type =
 	(
 		meshes = selectedMeshes()
-		if (type == #Solid) then (RAD_SetObjectProps meshes #(#("Contents", "solid")))
-		if (type == #Detail) then (RAD_SetObjectProps meshes #(#("Contents", "detail")))
-		if (type == #Areaportal) then (RAD_SetObjectProps meshes #(#("Contents", "areaportal")))
+		RAD_SetObjectProps meshes #(#("Contents", type))
 	)
 	
 	function setSelectionCollision val =
@@ -269,24 +281,16 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 		)
 		
 		c = animList.selection
-		print c
 		if (name != animSet[c].name) then
 		(
-			print c
 			if ((RAD_FindAnimIndex animSet name) > 0) then
 			(
 				messagebox "An animation with that name already exists!"
 				return undefined
 			)
 			
-			print c
-			
 			for x in animSel do
 			(
-				print c
-				print animSet.count
-				print animSet[c].name
-				print name
 				RAD_RenameObjAnim x animSet[c].name name
 			)
 			
@@ -410,18 +414,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 			if (vals[1]) then -- all where identical
 			(
 				vals = vals[2][1][2][1] -- pull first one off
-				if (vals == "solid") then
-				(
-					modelTypeRadio.state = 1 -- detail objects
-				)
-				else if (vals == "detail") then
-				(
-					modelTypeRadio.state = 2 -- solid
-				)
-				else
-				(
-					modelTypeRadio.state = 3
-				)
+				modelTypeRadio.state = (contentsIndex vals)
 			)
 			else
 			(
@@ -508,15 +501,8 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 	)
 	on modelTypeRadio changed state do
 	(
-		val = #Solid
-		if (state == 2) then
-		(
-			val = #Detail
-		)
-		else if (state == 3) then
-		(
-			val = #Areaportal
-		)
+		val = s_contentTypes[state]
+		print val
 		setSelectionType val
 	)
 	on noCollisionCheckBox changed state do
