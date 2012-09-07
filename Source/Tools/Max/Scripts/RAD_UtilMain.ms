@@ -120,7 +120,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 	
 	function selectedMeshes = 
 	(
-		meshes = (RAD_ConvertableFilter (getCurrentSelection()) #(Mesh))[2]
+		meshes = (RAD_ConvertableFilter (getCurrentSelection()) #(Mesh))
 		RAD_Exclude meshes #(Bone) -- filter bones
 	)
 	
@@ -400,7 +400,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 	
 	function setupUIForObjects objs =
 	(
-		meshes = RAD_Filter objs #(Mesh, Editable_Mesh)
+		meshes = RAD_ConvertableFilter objs #(Mesh)
 		
 		if meshes.count > 0 then
 		(
@@ -595,14 +595,14 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 		v = RAD_GatherObjectProps #(m) p d
 		v = v[2][1][2] -- pull out mesh properies
 		-- filter scene
-		selectMore (RAD_FilterByProps (RAD_Exclude (RAD_Filter (RAD_FilterVisibleSelected objects  vis:true sel:false) Mesh) Bone) p d v)
+		selectMore (RAD_FilterByProps (RAD_Exclude (RAD_ConvertableFilter (RAD_FilterVisibleSelected objects  vis:true sel:false) Mesh) Bone) p d v)
 	)
 	on selectSolidButton pressed do
 	(
 		p = #("Contents")
 		d = #("solid")
 		-- filter scene
-		selectMore (RAD_FilterByProps (RAD_Exclude (RAD_Filter (RAD_FilterVisibleSelected objects  vis:true sel:false) Mesh) Bone) p d d)
+		selectMore (RAD_FilterByProps (RAD_Exclude (RAD_ConvertableFilter (RAD_FilterVisibleSelected objects  vis:true sel:false) Mesh) Bone) p d d)
 	)
 	on selectDetailButton pressed do
 	(
@@ -610,7 +610,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 		v = #("detail")
 		d = #("solid")
 		-- filter scene
-		selectMore (RAD_FilterByProps (RAD_Exclude (RAD_Filter (RAD_FilterVisibleSelected objects  vis:true sel:false) Mesh) Bone) p d v)
+		selectMore (RAD_FilterByProps (RAD_Exclude (RAD_ConvertableFilter (RAD_FilterVisibleSelected objects  vis:true sel:false) Mesh) Bone) p d v)
 	)
 	on selectNoCollisionButton pressed do
 	(
@@ -618,7 +618,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 		v = #("false")
 		d = #("true")
 		-- filter scene
-		selectMore (RAD_FilterByProps (RAD_Exclude (RAD_Filter (RAD_FilterVisibleSelected objects  vis:true sel:false) Mesh) Bone) p d v)
+		selectMore (RAD_FilterByProps (RAD_Exclude (RAD_ConvertableFilter (RAD_FilterVisibleSelected objects  vis:true sel:false) Mesh) Bone) p d v)
 	)
 	on selectAreaportalButton pressed do
 	(
@@ -626,7 +626,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 		v = #("areaportal")
 		d = #("solid")
 		-- filter scene
-		selectMore (RAD_FilterByProps (RAD_Exclude (RAD_Filter (RAD_FilterVisibleSelected objects  vis:true sel:false) Mesh) Bone) p d v)
+		selectMore (RAD_FilterByProps (RAD_Exclude (RAD_ConvertableFilter (RAD_FilterVisibleSelected objects  vis:true sel:false) Mesh) Bone) p d v)
 	)
 	on nodrawCheckbox changed state do
 	(
