@@ -1,6 +1,6 @@
 --- RAD_UtilMainms
--- Copyright (c) 2010 Pyramind Labs LLC, All Rights Reserved
--- Author: Joe Riedel (joeriedel@hotmail.com)
+-- Copyright (c) 2010 Sunside Inc., All Rights Reserved
+-- Author: Joe Riedel
 -- See Radiance/LICENSE for licensing terms.
 
 utility RadianceUtil "Radiance Tools" width:166 height:643

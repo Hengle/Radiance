@@ -1,6 +1,6 @@
 -- RAD_Mesh.ms
--- Copyright (c) 2010 Pyramind Labs LLC, All Rights Reserved
--- Author: Joe Riedel (joeriedel@hotmail.com)
+-- Copyright (c) 2010 Sunside Inc., All Rights Reserved
+-- Author: Joe Riedel
 -- See Radiance/LICENSE for licensing terms.
 
 -- All meshes may reference a skeleton
