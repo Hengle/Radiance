@@ -6,6 +6,7 @@
 #pragma once
 
 #include "../EditorTypes.h"
+#include "EditorContentAssetThumbDimensionCache.h"
 #include "EditorContentBrowserDef.h"
 #include "../../../Assets/AssetTypes.h"
 #include <QtGui/QWidget>
@@ -80,6 +81,7 @@ private:
 	ContentBrowserView *m_view;
 };
 
+///////////////////////////////////////////////////////////////////////////////
 
 class RADENG_CLASS ContentBrowserView : public QWidget
 {
@@ -185,6 +187,7 @@ public:
 	r::GLTexture::Ref GetIcon(Icon i) const;
 	std::pair<int, int> selectedResolution() const;
 
+	static void LoadCache();
 	static const ViewSet &Views() { return s_views; }
 	static void Tick(float t);
 
@@ -329,7 +332,7 @@ private:
 	r::GLTexture::Ref m_icons[I_Max];
 	mutable Filter m_filter;
 
-	static void AddView(ContentBrowserView *view);
+	static int AddView(ContentBrowserView *view);
 	static void RemoveView(ContentBrowserView *view);
 	static Mutex s_m;
 	static ViewSet s_views;

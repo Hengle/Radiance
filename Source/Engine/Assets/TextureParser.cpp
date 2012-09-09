@@ -310,6 +310,50 @@ int TextureParser::LoadCooked(
 
 #if defined(RAD_OPT_TOOLS)
 
+int TextureParser::SourceModifiedTime(
+	Engine &engine,
+	const pkg::Asset::Ref &asset,
+	int flags,
+	xtime::TimeDate &td
+) {
+	const String *name = asset->entry->KeyValue<String>("Source.File", P_TARGET_FLAGS(flags));
+
+	if (!name)
+		return pkg::SR_MetaError;
+
+	const bool *localized = asset->entry->KeyValue<bool>("Localized", P_TARGET_FLAGS(flags));
+	if (!localized)
+		return pkg::SR_MetaError;
+
+	String sname(*name);
+
+	if (*localized && (m_langId != StringTable::LangId_EN)) {
+		String ext = file::GetFileExtension(sname.c_str);
+		String path = file::SetFileExtension(sname.c_str, 0);
+			
+		sname = path;
+		sname += "_";
+		sname += StringTable::Langs[m_langId];
+		sname += ext;
+	}
+
+	if (!(flags&P_NoDefaultMedia)) {
+		if (sname.empty || !engine.sys->files->FileExists(sname.c_str)) {
+			sname = CStr("Textures/Missing_Texture.tga");
+			if (!engine.sys->files->FileExists(sname.c_str)) {
+				return pkg::SR_FileNotFound;
+			}
+		}
+	}
+
+	String absPath;
+	if (!engine.sys->files->GetAbsolutePath(sname.c_str, absPath, file::kFileMask_Base))
+		return SR_FileNotFound;
+	if (!engine.sys->files->GetFileTime(absPath.c_str, td))
+		return SR_FileNotFound;
+	return SR_Success;
+}
+
 int TextureParser::Load(
 	Engine &engine, 
 	const xtime::TimeSlice &time,

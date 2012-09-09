@@ -69,6 +69,20 @@ TimeDate TimeDate::Now(const universal_time_tag&)
 	return td;
 }
 
+TimeDate TimeDate::Zero() {
+	TimeDate td;
+	td.year = 0;
+	td.millis = 0;
+	td.month = 0;
+	td.month = 0;
+	td.dayOfMonth = 0;
+	td.dayOfWeek = 0;
+	td.hour = 0;
+	td.minute = 0;
+	td.second = 0;
+	return td;
+}
+
 TimeDate TimeDate::FromString(const char *str)
 {
 	int year, millis, month, dayOfMonth, dayOfWeek, hour, minute, second;
@@ -94,6 +108,28 @@ TimeDate TimeDate::FromString(const char *str)
 	td.second = (U8)second;
 
 	return td;
+}
+
+bool TimeDate::Read(stream::InputStream &is, UReg *errorCode) {
+	return is.Read(&year, errorCode) &&
+		is.Read(&millis, errorCode) &&
+		is.Read(&month, errorCode) &&
+		is.Read(&dayOfMonth, errorCode) &&
+		is.Read(&dayOfWeek, errorCode) &&
+		is.Read(&hour, errorCode) &&
+		is.Read(&minute, errorCode) &&
+		is.Read(&second);
+}
+
+bool TimeDate::Write(stream::OutputStream &os, UReg *errorCode) const {
+	return os.Write(year, errorCode) &&
+		os.Write(millis, errorCode) &&
+		os.Write(month, errorCode) &&
+		os.Write(dayOfMonth, errorCode) &&
+		os.Write(dayOfWeek, errorCode) &&
+		os.Write(hour, errorCode) &&
+		os.Write(minute, errorCode) &&
+		os.Write(second);
 }
 
 string::String TimeDate::ToString() const

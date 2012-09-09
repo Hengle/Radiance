@@ -5,6 +5,7 @@
 
 #include RADPCH
 #include "EditorMaterialThumb.h"
+#include "EditorContentAssetThumbDimensionCache.h"
 #include "../EditorUtils.h"
 #include "../../../Assets/MaterialParser.h"
 #include "../../../Assets/TextureParser.h"
@@ -47,22 +48,34 @@ void MaterialThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, in
 {
 	ContentAssetThumb::Dimensions(entry, w, h);
 
-	SizeMap::iterator it = m_sizes.find(entry->id);
-	if (it != m_sizes.end())
-	{
-		w = it->second.w;
-		h = it->second.h;
-		return;
-	}
-
-	ItemSize size;
-	size.w = w;
-	size.h = h;
-	it = m_sizes.insert(SizeMap::value_type(entry->id, size)).first;
-
 	Asset::Ref asset = entry->Asset(pkg::Z_ContentBrowser);
 	if (!asset)
 		return;
+
+	xtime::TimeDate modified;
+	MaterialParser::Ref parser = MaterialParser::Cast(asset);
+	if (!parser)
+		return;
+
+	if (parser->SourceModifiedTime(
+		*App::Get()->engine,
+		asset,
+		0,
+		modified
+	) != SR_Success) {
+		return;
+	}
+
+	const ContentAssetThumbDimensionCache::Info *pinfo = 
+		ContentAssetThumbDimensionCache::Get()->Find(entry->id);
+
+	if (pinfo) {
+		if (modified == pinfo->modified) {
+			w = pinfo->width;
+			h = pinfo->height;
+			return;
+		}
+	}
 
 	MaterialLoader::Ref mL = MaterialLoader::Cast(asset);
 	if (!mL->info)
@@ -97,13 +110,17 @@ void MaterialThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, in
 		}
 	}
 
-	if (mx > 0 && my > 0)
-	{
-		it->second.w = mx;
-		it->second.h = my;
+	if (mx > 0 && my > 0) {
 		w = mx;
 		h = my;
 	}
+
+	ContentAssetThumbDimensionCache::Info info;
+	info.width = w;
+	info.height = h;
+	info.modified = modified;
+	ContentAssetThumbDimensionCache::Get()->Update(entry->id, info);
+	ContentAssetThumbDimensionCache::Get()->Save();
 }
 
 inline float Wrap(float r)
@@ -288,6 +305,8 @@ void MaterialThumb::NotifyContentChanged(const ContentChange::Vec &changed)
 		Thumbnail::Ref t = FindThumbnail(c.entry->id);
 		if (t)
 			t->Evict();
+
+		ContentAssetThumbDimensionCache::Get()->Delete(c.entry->id);
 	}
 }
 
@@ -375,7 +394,6 @@ m_mat(0)
 
 MaterialThumb::Thumbnail::~Thumbnail()
 {
-	m_outer->m_sizes.erase(this->id);
 }
 
 void MaterialThumb::Thumbnail::Request(int w, int h)

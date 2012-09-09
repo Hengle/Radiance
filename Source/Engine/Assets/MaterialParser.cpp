@@ -178,6 +178,68 @@ const char *s_tcModNames[r::Material::NumTcMods] = {
 	"Scroll"
 };
 
+int MaterialParser::SourceModifiedTime(
+	Engine &engine,
+	const pkg::Asset::Ref &asset,
+	int flags,
+	xtime::TimeDate &td
+) {
+	td = xtime::TimeDate::Zero();
+
+	const bool *b = asset->entry->KeyValue<bool>("ProceduralTextures", P_TARGET_FLAGS(flags));
+	if (!b)
+		return SR_MetaError;
+
+	bool procedural = *b;
+
+	String path;
+	for (int i = 0; i < r::MTS_MaxIndices; ++i) {
+		path.Printf("Texture%d.Source.Texture", i+1);
+		const String *s = asset->entry->KeyValue<String>(path.c_str, P_TARGET_FLAGS(flags));
+		if (!s)
+			return SR_MetaError;
+
+		pkg::Asset::Ref texture;
+
+		if (s->empty) {
+			if (procedural && asset->zone != Z_Engine) {
+				int id = engine.sys->packages->ResolveId("Sys/T_Procedural");
+				if (id == -1)
+					return SR_FileNotFound;
+				texture = engine.sys->packages->Asset(id, asset->zone);
+				RAD_ASSERT(texture);
+				if (!texture)
+					return SR_FileNotFound;
+			} else {
+				continue;
+			}
+		} else {
+			pkg::Package::Entry::Ref entry = engine.sys->packages->Resolve(s->c_str);
+			if (!entry && !(flags&P_NoDefaultMedia))
+				entry = engine.sys->packages->Resolve("Sys/T_Missing");
+			if (!entry)
+				return SR_FileNotFound;
+			if (entry->type != asset::AT_Texture)
+				return SR_MetaError; // this must be a texture.
+			texture = entry->Asset(asset->zone);
+		}
+
+		TextureParser::Ref parser = TextureParser::Cast(texture);
+		RAD_ASSERT(parser);
+
+		xtime::TimeDate textureTd;
+
+		int r = parser->SourceModifiedTime(engine, texture, flags, textureTd);
+		if (r != SR_Success)
+			return r;
+
+		if (textureTd > td)
+			td = textureTd; // choose newer.
+	}
+
+	return SR_Success;
+}
+
 int MaterialParser::Load(
 	const xtime::TimeSlice &time,
 	Engine &engine,

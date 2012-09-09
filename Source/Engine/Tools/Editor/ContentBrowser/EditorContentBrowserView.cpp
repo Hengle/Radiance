@@ -4,6 +4,7 @@
 // See Radiance/LICENSE for licensing terms.
 
 #include RADPCH
+#include "EditorContentAssetThumbDimensionCache.h"
 #include "EditorContentBrowserWindow.h"
 #include "EditorContentBrowserView.h"
 #include "EditorContentBrowserModel.h"
@@ -162,10 +163,11 @@ void ContentAssetThumb::Tick(float dt, const xtime::TimeSlice &time)
 ContentBrowserView::ViewSet ContentBrowserView::s_views;
 ContentBrowserView::Mutex ContentBrowserView::s_m;
 
-void ContentBrowserView::AddView(ContentBrowserView *view)
+int ContentBrowserView::AddView(ContentBrowserView *view)
 {
 	Lock L(s_m);
 	s_views.insert(view);
+	return (int)s_views.size();
 }
 
 void ContentBrowserView::RemoveView(ContentBrowserView *view)
@@ -500,11 +502,27 @@ void ContentBrowserView::OnResizeGL(GLWidget&, int, int)
 
 void ContentBrowserView::OnInitializeGL(GLWidget&)
 {
+	int numViews = AddView(this);
+
+	if (numViews == 1) {
+		// The first view that is loaded will load the cached thumb sizes off disk
+		// The first view is also the view that calculates the dimension of all
+		// thumbs for layout, and during this process the thumb cache is built
+		// so we disable saving during this process so we don't save the cache
+		// a billion times (once for each asset).
+		ContentAssetThumbDimensionCache::Get()->Load();
+		ContentAssetThumbDimensionCache::Get()->enableSaves = false;
+	}
+
 	LoadIcons();
-	AddView(this);
 	CreateThumbs(*this);
 	BuildAssetList();
 	RecalcLayout();
+
+	if (numViews == 1) {
+		ContentAssetThumbDimensionCache::Get()->enableSaves = true;
+		ContentAssetThumbDimensionCache::Get()->Save();
+	}
 }
 
 void ContentBrowserView::ThumbChanged()

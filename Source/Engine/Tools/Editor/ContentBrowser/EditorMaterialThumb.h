@@ -84,18 +84,10 @@ private:
 	Thumbnail::Ref FindThumbnail(int id);
 	bool RenderIcon(const Thumbnail::Ref &t, int x, int y, int w, int h);
 
-	struct ItemSize
-	{
-		int w;
-		int h;
-	};
-
 	friend class Thumbnail;
-	typedef zone_map<int, ItemSize, ZEditorT>::type SizeMap;
-
+	
 	int m_lastDraw;
 	ContentThumbCache m_cache;
-	SizeMap m_sizes;
 };
 
 } // editor

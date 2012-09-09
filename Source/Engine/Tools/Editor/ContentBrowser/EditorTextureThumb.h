@@ -96,17 +96,9 @@ private:
 	Thumbnail::Ref FindThumbnail(int id);
 	Thumbnail::Ref RequestThumb(int id, int w, int h);
 
-	struct ItemSize
-	{
-		int w, h;
-	};
-
-	typedef zone_map<int, ItemSize, ZEditorT>::type ItemSizeMap;
-	
 	friend class Thumbnail;
 
 	ContentThumbCache m_cache;
-	ItemSizeMap m_sizes;
 	xtime::TimeVal m_lastDraw;
 };
 

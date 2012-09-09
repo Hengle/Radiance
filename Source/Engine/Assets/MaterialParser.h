@@ -33,6 +33,15 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(MaterialParser, procedural, bool);
 	RAD_DECLARE_READONLY_PROPERTY(MaterialParser, valid, bool);
 
+#if defined(RAD_OPT_TOOLS)
+	int SourceModifiedTime(
+		Engine &engine,
+		const pkg::Asset::Ref &asset,
+		int flags,
+		xtime::TimeDate &td
+	);
+#endif
+
 protected:
 
 	virtual int Process(

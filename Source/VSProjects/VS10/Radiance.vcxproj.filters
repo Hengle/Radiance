@@ -1377,6 +1377,9 @@
     <ClInclude Include="..\..\Runtime\Tokenizer.h">
       <Filter>Source\Runtime</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentAssetThumbDimensionCache.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2044,6 +2047,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Runtime\Base\Tokenizer.cpp">
       <Filter>Source\Runtime\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentAssetThumbDimensionCache.cpp">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,7 @@
 
 #include RADPCH
 #include "EditorTextureThumb.h"
+#include "EditorContentAssetThumbDimensionCache.h"
 #include "EditorContentPropertyGrid.h"
 #include "../EditorUtils.h"
 #include "../../../Renderer/GL/GLState.h"
@@ -45,7 +46,6 @@ m_h(0)
 
 TextureThumb::Thumbnail::~Thumbnail()
 {
-	m_outer->m_sizes.erase(this->id);
 }
 
 void TextureThumb::Thumbnail::Request(int w, int h)
@@ -182,6 +182,8 @@ void TextureThumb::NotifyContentChanged(const ContentChange::Vec &changed)
 		// than just reloading the entire file and binding the new properties
 		// that way.
 		CancelThumb(c.entry->id);
+		
+		ContentAssetThumbDimensionCache::Get()->Delete(c.entry->id);
 
 		// they changed a file, rebuild the property grid.
 		if (c.key && c.key->def && (c.key->def->style&pkg::K_File))
@@ -248,43 +250,61 @@ void TextureThumb::Release()
 void TextureThumb::CancelThumbs()
 {
 	m_cache.EvictAll();
-	m_sizes.clear();
 }
 
 void TextureThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, int &h)
 {
 	ContentAssetThumb::Dimensions(entry, w, h); // default
 
-	ItemSizeMap::const_iterator it = m_sizes.find(entry->id);
-	if (it != m_sizes.end())
-	{
-		w = it->second.w;
-		h = it->second.h;
-	}
-	else
-	{
-		pkg::Asset::Ref asset = Packages()->Asset(entry->id, pkg::Z_ContentBrowser);
-		TextureParser::Ref t = TextureParser::Cast(asset);
-		if (t)
-		{
-			if (!t->headerValid)
-			{
-				// cache image header for dimensions.
-				asset->Process(
-					xtime::TimeSlice::Infinite,
-					pkg::P_Info|pkg::P_Unformatted|pkg::P_NoDefaultMedia
-				);
-			}
+	pkg::Asset::Ref asset = entry->Asset(pkg::Z_ContentBrowser);
+	if (!asset)
+		return;
 
-			if (t->headerValid)
-			{
-				w = t->header->width;
-				h = t->header->height;
-				ItemSize s;
-				s.w = w;
-				s.h = h;
-				RAD_VERIFY(m_sizes.insert(ItemSizeMap::value_type(asset->id, s)).second);
-			}
+	xtime::TimeDate modified;
+	TextureParser::Ref parser = TextureParser::Cast(asset);
+	if (!parser)
+		return;
+
+	if (parser->SourceModifiedTime(
+		*App::Get()->engine,
+		asset,
+		0,
+		modified
+	) != pkg::SR_Success) {
+		return;
+	}
+
+	const ContentAssetThumbDimensionCache::Info *info = 
+		ContentAssetThumbDimensionCache::Get()->Find(entry->id);
+
+	if (info) {
+		if (modified == info->modified) {
+			w = info->width;
+			h = info->height;
+			return;
+		}
+	}
+
+	TextureParser::Ref t = TextureParser::Cast(asset);
+	if (t) {
+		if (!t->headerValid) {
+			// cache image header for dimensions.
+			asset->Process(
+				xtime::TimeSlice::Infinite,
+				pkg::P_Info|pkg::P_Unformatted|pkg::P_NoDefaultMedia
+			);
+		}
+
+		if (t->headerValid) {
+			w = t->header->width;
+			h = t->header->height;
+			
+			ContentAssetThumbDimensionCache::Info info;
+			info.modified = modified;
+			info.width = w;
+			info.height = h;
+			ContentAssetThumbDimensionCache::Get()->Update(entry->id, info);
+			ContentAssetThumbDimensionCache::Get()->Save();
 		}
 	}
 }

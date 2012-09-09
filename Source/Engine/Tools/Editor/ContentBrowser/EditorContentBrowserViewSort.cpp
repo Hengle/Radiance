@@ -227,7 +227,8 @@ void ContentBrowserView::_SortSize(bool sortName)
 		{
 			thumb->Dimensions(entry, w, h);
 		}
-		if (w <=0 || h <=0) continue;
+		if (w <=0 || h <=0) 
+			continue;
 		SizeXMap &xmap = ymap[h];
 		xmap[w].push_back(entry);
 	}

@@ -7,6 +7,7 @@
 
 #include "IntTime.h"
 #include "TimeDef.h"
+#include "../StreamDef.h"
 #include "../String/String.h"
 #include <boost/thread/xtime.hpp>
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
@@ -30,8 +31,13 @@ struct RADRT_CLASS TimeDate
 
 	static TimeDate Now(const local_time_tag&);
 	static TimeDate Now(const universal_time_tag&);
+	static TimeDate Zero();
 	static TimeDate FromString(const char *str);
 	
+	
+	bool Read(stream::InputStream &is, UReg *errorCode = 0);
+	bool Write(stream::OutputStream &os, UReg *errorCode = 0) const;
+
 	string::String ToString() const;
 
 	bool operator == (const TimeDate &td) const;

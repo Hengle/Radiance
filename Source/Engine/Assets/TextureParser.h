@@ -62,6 +62,13 @@ public:
 
 #if defined(RAD_OPT_TOOLS)
 	RAD_DECLARE_PROPERTY(TextureParser, langId, StringTable::LangId, StringTable::LangId);
+
+	int SourceModifiedTime(
+		Engine &engine,
+		const pkg::Asset::Ref &asset,
+		int flags,
+		xtime::TimeDate &td
+	);
 #endif
 
 	RAD_DECLARE_READONLY_PROPERTY(TextureParser, numImages, int);
