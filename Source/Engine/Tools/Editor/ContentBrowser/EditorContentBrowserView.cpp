@@ -502,9 +502,10 @@ void ContentBrowserView::OnResizeGL(GLWidget&, int, int)
 
 void ContentBrowserView::OnInitializeGL(GLWidget&)
 {
-	int numViews = AddView(this);
+	static bool s_first = true;
+	AddView(this);
 
-	if (numViews == 1) {
+	if (s_first) {
 		// The first view that is loaded will load the cached thumb sizes off disk
 		// The first view is also the view that calculates the dimension of all
 		// thumbs for layout, and during this process the thumb cache is built
@@ -519,10 +520,12 @@ void ContentBrowserView::OnInitializeGL(GLWidget&)
 	BuildAssetList();
 	RecalcLayout();
 
-	if (numViews == 1) {
+	if (s_first) {
 		ContentAssetThumbDimensionCache::Get()->enableSaves = true;
 		ContentAssetThumbDimensionCache::Get()->Save();
 	}
+
+	s_first = false;
 }
 
 void ContentBrowserView::ThumbChanged()
