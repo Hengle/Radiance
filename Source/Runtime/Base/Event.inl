@@ -127,7 +127,7 @@ inline void Event<T, TAccess>::Bind(C *instance, void(C::*fn)(const T&), const M
 {
 	typename THandler::Ref handler(new details::EventHandlerClassMethodBindManual<C, T>(instance, fn));
 	TAccess().Lock(this);
-	typename HandlerMMap::iterator it = m_handlers.insert(typename HandlerMMap::value_type(instance, handler));
+	m_handlers.insert(typename HandlerMMap::value_type(instance, handler));
 	TAccess().Unlock(this);
 }
 
@@ -214,7 +214,7 @@ inline void Event<void, TAccess>::Bind(C *instance, void(C::*fn)(), const Manual
 {
 	THandler::Ref handler(new details::EventHandlerClassMethodBindManual<C, void>(instance, fn));
 	TAccess().Lock(this);
-	typename HandlerMMap::iterator it = m_handlers.insert(HandlerMMap::value_type(instance, handler));
+	m_handlers.insert(HandlerMMap::value_type(instance, handler));
 	TAccess().Unlock(this);
 }
 

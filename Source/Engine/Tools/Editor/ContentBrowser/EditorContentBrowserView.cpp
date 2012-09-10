@@ -685,6 +685,8 @@ void ContentBrowserView::RAD_IMPLEMENT_SET(selMode) (SelMode m)
 				DoSelectionChange(SelSet(), unsel, m_sel);
 			}
 			break;
+		default:
+			break;
 		}
 	}
 }

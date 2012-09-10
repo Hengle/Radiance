@@ -75,6 +75,8 @@ void GLMesh::MapSource(
 	case MGS_Weights:
 		source.count = 4;
 		break;
+	default:
+		break;
 	}
 
 }

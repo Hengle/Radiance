@@ -57,6 +57,8 @@ Shader::Ref GLShader::Load(
 				material
 			)
 		);
+	default:
+		break;
 	}
 
 	return Shader::Ref();

@@ -100,6 +100,8 @@ void Material::BindStates(int flags, int blends)
 		case Material::BM_InvColorizeS:
 			blendFlags = BMS_Zero|BMD_InvSrcColor;
 			break;
+		default:
+			break;
 		}
 	}
 	else

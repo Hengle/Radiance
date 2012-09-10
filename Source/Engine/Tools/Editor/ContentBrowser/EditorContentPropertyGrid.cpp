@@ -227,6 +227,8 @@ void ContentPropertyGrid::customEvent(QEvent *e)
 	case EV_RebuildContentPropertyGrid:
 		OnRebuildPropertyGrid();
 		break;
+	default:
+		break;
 	}
 }
 

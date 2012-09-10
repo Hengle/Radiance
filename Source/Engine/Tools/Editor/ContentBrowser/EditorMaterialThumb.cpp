@@ -199,6 +199,8 @@ bool MaterialThumb::Render(const pkg::Package::Entry::Ref &entry, int x, int y, 
 		case Material::BM_InvColorizeS:
 			blendMode = BMS_Zero|BMD_InvSrcColor;
 			break;
+		default:
+			break;
 		}
 
 		gls.Set(DT_Disable|DWM_Disable|CFM_None|CWM_RGBA, blendMode);

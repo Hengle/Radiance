@@ -123,6 +123,7 @@ private:
 	class Event
 	{
 	public:
+		virtual ~Event() {}
 		typedef boost::shared_ptr<Event> Ref;
 		typedef zone_list<Ref, ZWorldT>::type List;
 		virtual void Dispatch(world::World &target) = 0;

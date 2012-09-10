@@ -417,6 +417,8 @@ void Game::PostInputEvent(const InputEvent &e)
 			x.touch = (void*)1;
 			m_inputEvents.push_back(x);
 			break;
+		default:
+			break;
 		}
 	}	
 	else
@@ -792,6 +794,8 @@ TouchState *Game::UpdateState(const InputEvent &e, InputState &is)
 				touchState->SwapCopy(*local);
 			}
 		}
+		break;
+	default:
 		break;
 	}
 

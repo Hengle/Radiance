@@ -861,14 +861,16 @@ const Class::STATICMEMBER *Class::FindStaticMember(const TChar *name, bool findI
 {
 	if (findInSupers)
 	{
-		const Class::MEMBER *member = FindStaticMember(name, false);
-		if (NULL != member) { return member; }
+		const Class::STATICMEMBER *member = FindStaticMember(name, false);
+		if (NULL != member)
+			return member;
 
 		const int NUM_SUPERS = NumSupers();
 		for (int i = 0; i < NUM_SUPERS; i++)
 		{
 			member = Super(i)->Type()->FindStaticMember(name, true);
-			if (NULL != member) { return member; }
+			if (NULL != member)
+				return member;
 		}
 	}
 	else
@@ -923,14 +925,16 @@ const Class::STATICCONSTANT *Class::FindStaticConstant(const TChar *name, bool f
 {
 	if (findInSupers)
 	{
-		const Class::MEMBER *member = FindStaticConstant(name, false);
-		if (NULL != member) { return member; }
+		const Class::STATICCONSTANT *member = FindStaticConstant(name, false);
+		if (NULL != member)
+			return member;
 
 		const int NUM_SUPERS = NumSupers();
 		for (int i = 0; i < NUM_SUPERS; i++)
 		{
 			member = Super(i)->Type()->FindStaticConstant(name, true);
-			if (NULL != member) { return member; }
+			if (NULL != member)
+				return member;
 		}
 	}
 	else

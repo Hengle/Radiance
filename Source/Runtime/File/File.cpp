@@ -333,7 +333,8 @@ RADRT_API UReg RADRT_CALL FileExtLength(
 	if (l > 0)
 	{
 		// find the '.'
-		for (UReg i = l-1; i >= 0; i--)
+		// note odd test i < l because of unsigned wrap.
+		for (UReg i = l-1; i < l; i--)
 		{
 			if (path[i] == L'.')
 			{
@@ -367,7 +368,8 @@ RADRT_API void RADRT_CALL SetFileExt(
 	UReg ofs = 0;
 	while (path[ofs] != L'.' && path[ofs] != 0 && ofs < newPathBufferSize)
 	{
-		newPath[ofs] = path[ofs++];
+		newPath[ofs] = path[ofs];
+		++ofs;
 	}
 
 	if (ext && ext[0])

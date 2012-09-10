@@ -112,6 +112,8 @@ void LogWindow::customEvent(QEvent *e)
 	case EV_LogWindowPrint:
 		OnPrintMsg(*static_cast<PrintMsgEvent*>(e));
 		break;
+	default:
+		break;
 	}
 }
 

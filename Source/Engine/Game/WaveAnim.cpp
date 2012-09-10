@@ -91,6 +91,8 @@ float WaveAnim::Sample(float time) const
 			z = (z-0.5f)*2.0f; // -1 -> 1
 			return m_base + z*m_amplitude;
 		}
+	default:
+		break;
 	}
 
 // T_Noise

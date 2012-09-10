@@ -25,6 +25,8 @@ RADENG_API PropertyList RADENG_CALL CreatePropertiesForAsset(const pkg::Package:
 	case asset::AT_Texture:
 		AddTextureProperties(l, e, flags, widget);
 		break;
+	default:
+		break;
 	}
 
 	return l;

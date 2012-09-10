@@ -481,7 +481,7 @@ inline int Marshal<boost::shared_ptr<T> >::gc(lua_State *L)
 	{
 		boost::shared_ptr<T> *x = reinterpret_cast<boost::shared_ptr<T>*>(lua_touserdata(L, -1));
 		RAD_ASSERT(x);
-		x->boost::shared_ptr<T>::~shared_ptr();
+		x->template shared_ptr<T>::~shared_ptr();
 	}
 	return 0;
 }

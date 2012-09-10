@@ -588,6 +588,8 @@ Entity::Vec World::BBoxTouching(const BBox &bbox, int stypes) const
 			break;
 		case ST_Brush:
 			break;
+		default:
+			break;
 		}
 	}
 
