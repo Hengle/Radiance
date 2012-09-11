@@ -121,31 +121,31 @@ void EditorWindow::CreateLayout(QLayout *centerLayout, QWidget *centerWidget) {
 		outer->addWidget(centerWidget);
 	}
 
-	if (m_btFlags&(BTN_OK|BTN_Cancel|BTN_Apply)) {
+	if (m_btFlags&(kButton_OK|kButton_Cancel|kButton_Apply)) {
 		
 		QHBoxLayout *buttonLayout = new QHBoxLayout();
 		buttonLayout->addStretch(1);
 		
-		if (m_btFlags&BTN_OK) {
+		if (m_btFlags&kButton_OK) {
 			m_buttons[0] = new QPushButton("OK", this);
 			buttonLayout->addWidget(m_buttons[0]);
-			if (m_btFlags&BTN_DefaultOK)
+			if (m_btFlags&kButton_DefaultOK)
 				m_buttons[0]->setDefault(true);
 			RAD_VERIFY(connect(m_buttons[0], SIGNAL(clicked()), SLOT(HandleOK())));
 		}
 
-		if (m_btFlags&BTN_Cancel) {
+		if (m_btFlags&kButton_Cancel) {
 			m_buttons[1] = new QPushButton("Cancel", this);
 			buttonLayout->addWidget(m_buttons[1]);
-			if (m_btFlags&BTN_DefaultCancel)
+			if (m_btFlags&kButton_DefaultCancel)
 				m_buttons[1]->setDefault(true);
 			RAD_VERIFY(connect(m_buttons[1], SIGNAL(clicked()), SLOT(reject())));
 		}
 
-		if (m_btFlags&BTN_Apply) {
+		if (m_btFlags&kButton_Apply) {
 			m_buttons[2] = new QPushButton("Apply", this);
 			buttonLayout->addWidget(m_buttons[2]);
-			if (m_btFlags&BTN_DefaultApply)
+			if (m_btFlags&kButton_DefaultApply)
 				m_buttons[2]->setDefault(true);
 			m_buttons[2]->setEnabled(false);
 			RAD_VERIFY(connect(m_buttons[2], SIGNAL(clicked()), SLOT(HandleApply())));

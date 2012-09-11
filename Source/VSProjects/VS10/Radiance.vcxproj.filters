@@ -1380,6 +1380,15 @@
     <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentAssetThumbDimensionCache.h">
       <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorTypes.h">
+      <Filter>Source\Engine\Tools\Editor\MapEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorRenderer.h">
+      <Filter>Source\Engine\Tools\Editor\MapEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorView.h">
+      <Filter>Source\Engine\Tools\Editor\MapEditor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2426,6 +2435,15 @@
     </QtMOC>
     <QtMOC Include="..\..\Engine\Tools\Editor\PropertyGrid\EditorWidgetPropertyEditors.h">
       <Filter>Source\Engine\Tools\Editor\PropertyGrid</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorWidget.h">
+      <Filter>Source\Engine\Tools\Editor\MapEditor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorObject.h">
+      <Filter>Source\Engine\Tools\Editor\MapEditor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorDatabase.h">
+      <Filter>Source\Engine\Tools\Editor\MapEditor</Filter>
     </QtMOC>
   </ItemGroup>
 </Project>

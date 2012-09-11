@@ -30,6 +30,7 @@
 #include <QtGui/QWidget>
 #include <QtGui/QDialog>
 #include <Engine/Tools/Editor/ContentBrowser/EditorContentProperties.h>
+#include <Engine/Tools/Editor/MapEditor/EditorMapEditorTypes.h>
 #endif
 #include <string>
 #include <map>

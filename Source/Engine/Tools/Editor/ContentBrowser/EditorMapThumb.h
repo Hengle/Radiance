@@ -11,8 +11,7 @@
 namespace tools {
 namespace editor {
 
-class MapThumb : public ContentAssetThumb
-{
+class MapThumb : public ContentAssetThumb {
 	Q_OBJECT
 public:
 	MapThumb(ContentBrowserView &view);
@@ -22,10 +21,12 @@ public:
 private slots:
 
 	void Play();
+	void Edit();
 
 private:
 
 	void Play(const pkg::Package::Entry::Ref &entry);
+	void Edit(const pkg::Package::Entry::Ref &entry);
 
 };
 

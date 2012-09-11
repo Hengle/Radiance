@@ -14,32 +14,35 @@
 namespace tools {
 namespace editor {
 
-MapThumb::MapThumb(ContentBrowserView &view) : ContentAssetThumb(view)
-{
+MapThumb::MapThumb(ContentBrowserView &view) : ContentAssetThumb(view) {
 	PopupMenu *m = CreateMenu(false);
-	m->AddItem("Play", this, SLOT(Play()));
+	QAction *play = m->AddAction("Play...", this, SLOT(Play()));
+	m->AddAction("Edit...", this, SLOT(Edit()));
+	m->qmenu->setDefaultAction(play);
 }
 
-void MapThumb::OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable, bool modal)
-{
-	if (editable && !modal)
-		Play(entry);
+void MapThumb::OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable, bool modal) {
+	if (modal)
+		return;
+
+	Play(entry);
 }
 
-void MapThumb::New(ContentBrowserView &view)
-{
+void MapThumb::New(ContentBrowserView &view) {
 	MapThumb *t = new (ZEditor) MapThumb(view);
 	ContentAssetThumb::Ref self(t);
 	t->Register(self, asset::AT_Map);
 }
 
-void MapThumb::Play()
-{
+void MapThumb::Play() {
 	Play(clickedItem);
 }
 
-void MapThumb::Play(const pkg::Package::Entry::Ref &entry)
-{
+void MapThumb::Edit() {
+	Edit(clickedItem);
+}
+
+void MapThumb::Play(const pkg::Package::Entry::Ref &entry) {
 	RAD_ASSERT(entry);
 
 	std::pair<int, int> res = View().selectedResolution();
@@ -56,14 +59,18 @@ void MapThumb::Play(const pkg::Package::Entry::Ref &entry)
 	w->setAttribute(Qt::WA_DeleteOnClose);
 	w->setWindowTitle(entry->name.get());
 	w->resize(res.first, res.second);
-	//PercentSize(*w, *MainWindow::Get(), 0.85f, 0.85f);
 	CenterWidget(*w, *MainWindow::Get());
 	w->show();
 	w->RunMap(entry->id);
 }
 
-void CreateMapThumb(ContentBrowserView &view)
-{
+void MapThumb::Edit(const pkg::Package::Entry::Ref &entry) {
+	pkg::Asset::Ref asset = entry->Asset(pkg::Z_ContentBrowser);
+	if (asset)
+		EditorWindow::Open<map_editor::MapEditorWindow>(asset, View().parentWidget());
+}
+
+void CreateMapThumb(ContentBrowserView &view) {
 	MapThumb::New(view);
 }
 

@@ -817,6 +817,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorWidget.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorDatabase.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorObject.h" />
+    <ClInclude Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorRenderer.h" />
+    <ClInclude Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorTypes.h" />
+    <ClInclude Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorView.h" />
     <ClInclude Include="..\..\Engine\Tools\Map.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>

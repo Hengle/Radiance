@@ -18,7 +18,7 @@ StringTableEditorWindow::StringTableEditorWindow(
 ) : 
 EditorWindow(
 	style, 
-	EditorWindow::BTN_OK|EditorWindow::BTN_DefaultOK, 
+	EditorWindow::kButton_OK|EditorWindow::kButton_DefaultOK, 
 	true,
 	false, 
 	parent

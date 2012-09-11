@@ -28,14 +28,15 @@ class RADENG_CLASS EditorWindow : public QDialog {
 public:
 
 	enum Button {
-		BTN_OK = 0x1,
-		BTN_Cancel = 0x2,
-		BTN_Apply = 0x4,
-		BTN_DefaultOK = 0x8,
-		BTN_DefaultCancel = 0x10,
-		BTN_DefaultApply = 0x20,
-		BTN_OKCancel = BTN_OK|BTN_Cancel,
-		BTN_OKCancelApply = BTN_OK|BTN_Cancel|BTN_Apply
+		kButton_None = 0,
+		kButton_OK = 0x1,
+		kButton_Cancel = 0x2,
+		kButton_Apply = 0x4,
+		kButton_DefaultOK = 0x8,
+		kButton_DefaultCancel = 0x10,
+		kButton_DefaultApply = 0x20,
+		kButton_OKCancel = kButton_OK|kButton_Cancel,
+		kButton_OKCancelApply = kButton_OK|kButton_Cancel|kButton_Apply
 	};
 
 	Q_DECLARE_FLAGS(ButtonFlags, Button)

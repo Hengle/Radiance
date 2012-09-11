@@ -1,75 +1,36 @@
-// EditorMapEditorWindow.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file EditorMapEditorWindow.cpp
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup map_editor
+*/
 
 #include RADPCH
 #include "EditorMapEditorWindow.h"
-#include "../EditorMainWindow.h"
-#include "../EditorUtils.h"
-#include "../../../Packages/Packages.h"
-#include <QtGui/QDesktopWidget>
 
 namespace tools {
 namespace editor {
+namespace map_editor {
 
-void MapEditorWindow::LaunchEditor(int assetId)
-{
-	(new (ZEditor) MapEditorWindow())->Load(assetId);
+MapEditorWindow::MapEditorWindow(
+	const pkg::Asset::Ref &asset,
+	bool editable,
+	WidgetStyle style,
+	QWidget *parent
+) : 
+EditorWindow(
+	style, 
+	EditorWindow::kButton_None, 
+	true,
+	true, 
+	parent
+) {
 }
 
-MapEditorWindow::MapEditorWindow()
-: QWidget(0, 
-	Qt::Window|
-	Qt::CustomizeWindowHint|
-	Qt::WindowTitleHint|
-	Qt::WindowSystemMenuHint|
-	Qt::WindowMinMaxButtonsHint|
-	Qt::WindowCloseButtonHint
-)
-{
-	setAttribute(Qt::WA_DeleteOnClose);
-	QDesktopWidget *desktop = QApplication::desktop();
-	PercentSize(*this, desktop->screenGeometry(), 0.85f, 0.80f);
-	CenterWidget(*this, desktop->screenGeometry());
-	RAD_VERIFY(connect(MainWindow::Get(), SIGNAL(OnClose(QCloseEvent*)), SLOT(MainWinClose(QCloseEvent*))));
+MapEditorWindow::~MapEditorWindow() {
 }
 
-MapEditorWindow::~MapEditorWindow()
-{
-}
-
-void MapEditorWindow::Load(int id)
-{
-	show();
-
-	pkg::Package::Entry::Ref ref = Packages()->FindEntry(id);
-	if (ref)
-	{
-		setWindowTitle(QString("Map Editor: ") + ref->name.get());
-	}
-}
-
-void MapEditorWindow::closeEvent(QCloseEvent *e)
-{
-	e->accept(); // assume we can close.
-	emit OnClose(e);
-	if (e->isAccepted())
-	{
-		emit Closing();
-		DoClose();
-	}
-}
-
-void MapEditorWindow::MainWinClose(QCloseEvent *e)
-{
-	e->setAccepted(close());
-}
-
-void MapEditorWindow::DoClose()
-{
-}
-
+} // map_editor
 } // editor
 } // tools
 

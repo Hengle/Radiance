@@ -17,20 +17,19 @@ class QAction;
 namespace tools {
 namespace editor {
 
-class RADENG_CLASS PopupMenu : public QWidget
-{
+class RADENG_CLASS PopupMenu : public QWidget {
 	Q_OBJECT
 public:
 	PopupMenu(QWidget *parent = 0);
 	virtual ~PopupMenu();
 
-	void AddItem(
+	QAction *AddAction(
 		const char *path,
 		QObject *receiver,
 		const char *member
 	);
 
-	void AddItem(
+	QAction *AddAction(
 		const QIcon &icon,
 		const char *path,
 		QObject *receiver,
@@ -41,7 +40,13 @@ public:
 
 	QAction *Exec(const QPoint &p, QAction *action = 0);
 
+	RAD_DECLARE_READONLY_PROPERTY(PopupMenu, qmenu, QMenu*);
+
 private:
+
+	RAD_DECLARE_GET(qmenu, QMenu*) {
+		return m_menu;
+	}
 
 	typedef zone_map<QString, QMenu*, ZEditorT>::type MenuMap;
 

@@ -15,7 +15,7 @@ TextEditorDialog::TextEditorDialog(
 	QWidget *parent
 ) : EditorWindow(
 WS_Dialog, 
-EditorWindow::BTN_OKCancel|EditorWindow::BTN_DefaultOK,
+EditorWindow::kButton_OKCancel|EditorWindow::kButton_DefaultOK,
 false,
 false, 
 parent, 
