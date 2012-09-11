@@ -5,6 +5,15 @@
 
 -- [name, origin[3], id, subobjs[], ids[]]
 
+global kSceneFile_Id =  (bit.shift (bit.charAsInt "N") 24) + (bit.shift (bit.charAsInt "C") 16) + (bit.shift (bit.charAsInt "S") 8) + (bit.charAsInt "R")
+global kSceneFile_Version = 4
+global kSceneFlag_HasMaterialFlag = 0x80000000
+global kSceneFlag_HasMesh = 0x00100000
+global kSceneFlag_HasAnim = 0x00200000
+global kSceneFlag_CinematicObject = 0x00080000
+global kSceneFlag_HideUntilRefed = 0x00040000
+global kSceneFlag_HideWhenDone = 0x00010000
+
 function RAD_GatherEntities objs =
 (
 	ents = #()
@@ -43,11 +52,8 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName =
 		
 		-- Header
 		
-		id = (bit.shift (bit.charAsInt "N") 24) + (bit.shift (bit.charAsInt "C") 16) + (bit.shift (bit.charAsInt "S") 8) + (bit.charAsInt "R")
-		version = 3
-		
-		WriteLong file id
-		WriteLong file version
+		WriteLong file kSceneFile_Id
+		WriteLong file kSceneFile_Version
 		
 		-- Materials
 		
@@ -89,7 +95,7 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName =
 				WriteString file x.name
 				flags = 0
 				cinematicObject = getUserProp x "CinematicObject"
-				if (cinematicObject != undefined and cinematicObject == true) then (flags = bit.or flags 0x00080000)
+				if (cinematicObject != undefined and cinematicObject == true) then (flags = bit.or flags kSceneFlag_CinematicObject)
 				WriteLong file flags #unsigned
 				RAD_ExportAnims file false true x
 			)
@@ -127,47 +133,31 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName =
 			
 			WriteLong file x[4].count #unsigned -- # of objects
 			
+			print ("Exporting " + (x[4].count as string) + " object(s) in entity " + x[1])
+			
 			meshNum = 1
 			for m in x[4] do -- mesh
 			(
 				if (getProgressCancel()) then (throw "cancel")
 				
 				WriteLong file x[5][meshNum] #unsigned -- id
+				WriteString file m.name -- name
 				
 				flags = 0
 				
-				if (doMeshes) then (flags = bit.or flags 0x00100000) -- mesh
-				if (doAnims) then (flags = bit.or flags 0x00200000) -- anims
+				if (doMeshes) then (flags = bit.or flags kSceneFlag_HasMesh) -- mesh
+				if (doAnims) then (flags = bit.or flags kSceneFlag_HasAnim) -- anims
 					
-				if (m.material != undefined) then ( flags = bit.or flags 0x80000000 ) -- has a material
-				
-				contents = getUserProp m "Contents"
-				if (contents != undefined) then
-				(
-					if (contents == "detail") then
-					(
-						flags = bit.or flags 0x40000000
-					)
-					else if (contents == "areaportal") then
-					(
-						flags = bit.or flags 0x20000000
-					)
-				)
-				
-				collision = getUserProp m "Collision"
-				if (collision == undefined or collision == true) then ( flags = bit.or flags 0x00800000 )
-				
-				visible = getUserProp m "Visible"
-				if (visible == undefined or visible == true) then ( flags = bit.or flags 0x00400000 )
+				if (m.material != undefined) then ( flags = bit.or flags kSceneFlag_HasMaterialFlag ) -- has a material
 				
 				cinematicObject = getUserProp m "CinematicObject"
-				if (cinematicObject != undefined and cinematicObject == true) then (flags = bit.or flags 0x00080000)
+				if (cinematicObject != undefined and cinematicObject == true) then (flags = bit.or flags kSceneFlag_CinematicObject)
 				
 				hideUntilRef = getUserProp m "HideUtilRef"
-				if (hideUntilRef == undefined or hideUntilRef == true) then ( flags = bit.or flags 0x00040000 )
+				if (hideUntilRef == undefined or hideUntilRef == true) then ( flags = bit.or flags kSceneFlag_HideUntilRefed )
 				
 				hideWhenDone = getUserProp m "HideWhenDone"
-				if (hideWhenDone == undefined or hideWhenDone == true) then ( flags = bit.or flags 0x00010000 )
+				if (hideWhenDone == undefined or hideWhenDone == true) then ( flags = bit.or flags kSceneFlag_HideWhenDone )
 				
 				WriteLong file flags #unsigned
 				-- write skel index

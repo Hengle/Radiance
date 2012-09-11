@@ -19,16 +19,14 @@ namespace bsp_file {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-enum
-{
-	RAD_FLAG(CinematicObj),
-	RAD_FLAG(HideUntilRef),
-	RAD_FLAG(HideWhenDone),
-	MaxUVChannels = 2
+enum {
+	RAD_FLAG(kCinematicObj),
+	RAD_FLAG(kHideUntilRef),
+	RAD_FLAG(kHideWhenDone),
+	kMaxUVChannels = 2
 };
 
-struct BSPNode	
-{
+struct BSPNode {
 	S32 parent;
 	S32 children[2];
 	U32 planenum;
@@ -36,8 +34,7 @@ struct BSPNode
 	float maxs[3];
 };
 
-struct BSPLeaf
-{
+struct BSPLeaf {
 	S32 parent;
 	U32 firstModel;
 	U32 numModels;
@@ -45,11 +42,9 @@ struct BSPLeaf
 	float maxs[3];
 };
 
-struct BSPModel
-{
-	enum
-	{
-		RAD_FLAG(Normals)
+struct BSPModel {
+	enum {
+		RAD_FLAG(kNormals)
 	};
 
 	U32 firstVert;
@@ -61,60 +56,51 @@ struct BSPModel
 	U32 flags;
 };
 
-struct BSPMaterial
-{
+struct BSPMaterial {
 	U32 string;
 };
 
-struct BSPEntity
-{
+struct BSPEntity {
 	U32 firstString;
 	U32 numStrings;
 };
 
-struct BSPPlane
-{
+struct BSPPlane {
 	float p[4];
 };
 
-struct BSPVertex
-{
+struct BSPVertex {
 	float v[3];
-	float st[MaxUVChannels*2];
+	float st[kMaxUVChannels*2];
 };
 
-struct BSPActor
-{
+struct BSPActor {
 	int flags;
 	int initial;
 	int ska;
 };
 
-struct BSPCameraTM
-{
+struct BSPCameraTM {
 	Quat r;
 	Vec3 t;
 	float fov;
 	int tag;
 };
 
-struct BSPCameraTrack
-{
+struct BSPCameraTrack {
 	int name;
 	int firstTM;
 	int numTMs;
 };
 
-struct BSPCinematicTrigger
-{
+struct BSPCinematicTrigger {
 	int frame;
 	int camera;
 	int firstActor;
 	int numActors;
 };
 
-struct BSPCinematic
-{
+struct BSPCinematic {
 	int name;
 	int fps;
 	int firstTrigger;
@@ -123,8 +109,7 @@ struct BSPCinematic
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS BSPFile
-{
+class RADENG_CLASS BSPFile {
 public:
 
 	typedef boost::shared_ptr<BSPFile> Ref;
@@ -188,8 +173,7 @@ protected:
 
 RAD_ZONE_DEC(RADENG_API, ZBSPFile);
 
-class RADENG_CLASS BSPFileParser : public BSPFile
-{
+class RADENG_CLASS BSPFileParser : public BSPFile {
 public:
 
 	typedef boost::shared_ptr<BSPFileParser> Ref;
@@ -267,7 +251,7 @@ private:
 	U32 m_numModels;
 	U32 m_numPlanes;
 	U32 m_numVerts;
-	U32 m_numTexCoords[MaxUVChannels];
+	U32 m_numTexCoords[kMaxUVChannels];
 	U32 m_numIndices;
 	U32 m_numActorIndices;
 	U32 m_numActors;
@@ -284,8 +268,7 @@ private:
 
 RAD_ZONE_DEC(RADENG_API, ZBSPBuilder);
 
-class RADENG_CLASS BSPFileBuilder : public BSPFile
-{
+class RADENG_CLASS BSPFileBuilder : public BSPFile {
 public:
 
 	typedef boost::shared_ptr<BSPFileBuilder> Ref;

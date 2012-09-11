@@ -3,57 +3,34 @@
 -- Author: Joe Riedel
 -- See Radiance/LICENSE for licensing terms.
 
-utility RadianceUtil "Radiance Tools" width:166 height:643
+utility RadianceUtil "Radiance Tools" width:166 height:446
 (
-	local s_contentTypes = #("solid", "fog", "detail", "water", "areaportal", "lava")
-	local s_contentTypesUpr = #("Solid", "Fog", "Detail", "Water", "Areaportal", "Lava")
-	
-	function contentsIndex content = (
-		c = 1
-		for x in s_contentTypes do (
-			if (x ==content) then (
-				return c
-			)
-			c = c + 1
-		)
-		
-		throw ("Invalid Contents Type: " + content)
-	)
-	
-	GroupBox grp1 "Selection" pos:[6,3] width:155 height:549
-	radiobuttons modelTypeRadio "" pos:[19,20] width:71 height:48 labels:s_contentTypesUpr default:0 columns:2
-	checkbox noCollisionCheckBox "No Clip" pos:[19,66] width:60 height:18
-	checkbox nodrawCheckbox "No Draw" pos:[93,66] width:60 height:18
-	GroupBox grp4 "Animation" pos:[15,82] width:138 height:270
-	dropdownList animList "" pos:[18,100] width:130 height:21
-	edittext animName "Name:" pos:[18,128] width:130 height:17
-	GroupBox grp8 "Export" pos:[6,558] width:154 height:79
-	checkbox selectionOnlyCheckbox "Selection Only" pos:[69,573] width:87 height:14
-	checkbox exportHiddenCheckbox "Hidden" pos:[11,573] width:55 height:14
-	button exportSceneButton "Scene..." pos:[11,592] width:65 height:17
-	button exportAnimButton "Anim..." pos:[89,614] width:65 height:17
-	button exportMeshButton "Mesh..." pos:[89,591] width:65 height:17
-	button exportSkelButton "Skel..." pos:[11,614] width:65 height:17
-	button selectOtherLikeThisButton "Select Others Like This" pos:[16,416] width:134 height:21
-	button selectSolidButton "Select Solid" pos:[16,441] width:134 height:21
-	button selectDetailButton "Select Detail" pos:[16,469] width:134 height:21
-	button selectNoCollisionButton "Select No Collision" pos:[16,497] width:134 height:21
-	button selectAreaportalButton "Select Areaportal" pos:[16,525] width:134 height:21
-	edittext animStart "Start:" pos:[18,152] width:66 height:17
-	edittext animEnd "End:" pos:[86,152] width:66 height:17
-	checkbox animLoop "Looping" pos:[21,231] width:63 height:18
-	dropdownList animInitialState "" pos:[22,271] width:123 height:21
-	GroupBox grp32 "Initial State" pos:[19,253] width:129 height:64
-	button animSetStart "Set Start" pos:[20,176] width:61 height:20
-	button animSetEnd "Set End" pos:[87,176] width:61 height:20
-	button animTest "Test" pos:[52,204] width:61 height:20
-	checkbox animExport "Export" pos:[91,231] width:53 height:18
-	button addAnim "Add" pos:[24,328] width:53 height:18
-	button deleteAnim "Delete" pos:[87,328] width:53 height:18
-	button noDefault "None" pos:[53,296] width:54 height:16
-	checkbox cinematicObject "Cinematic Object" pos:[21,359] width:108 height:17
-	checkbox hideUntilRef "Hide Until Referenced" pos:[21,376] width:129 height:17
-	checkbox hideWhenDone "Hide When Done" pos:[21,394] width:129 height:17
+	GroupBox grp1 "Selection" pos:[6,3] width:155 height:355
+	GroupBox grp4 "Animation" pos:[15,20] width:138 height:270
+	dropdownList animList "" pos:[18,38] width:130 height:21
+	edittext animName "Name:" pos:[18,66] width:130 height:17
+	GroupBox grp8 "Export" pos:[6,361] width:154 height:79
+	checkbox selectionOnlyCheckbox "Selection Only" pos:[69,376] width:87 height:14
+	checkbox exportHiddenCheckbox "Hidden" pos:[11,376] width:55 height:14
+	button exportSceneButton "Scene..." pos:[11,395] width:65 height:17
+	button exportAnimButton "Anim..." pos:[89,417] width:65 height:17
+	button exportMeshButton "Mesh..." pos:[89,394] width:65 height:17
+	button exportSkelButton "Skel..." pos:[11,417] width:65 height:17
+	edittext animStart "Start:" pos:[18,90] width:66 height:17
+	edittext animEnd "End:" pos:[86,90] width:66 height:17
+	checkbox animLoop "Looping" pos:[21,169] width:63 height:18
+	dropdownList animInitialState "" pos:[22,209] width:123 height:21
+	GroupBox grp32 "Initial State" pos:[19,191] width:129 height:64
+	button animSetStart "Set Start" pos:[20,114] width:61 height:20
+	button animSetEnd "Set End" pos:[87,114] width:61 height:20
+	button animTest "Test" pos:[52,142] width:61 height:20
+	checkbox animExport "Export" pos:[91,169] width:53 height:18
+	button addAnim "Add" pos:[24,266] width:53 height:18
+	button deleteAnim "Delete" pos:[87,266] width:53 height:18
+	button noDefault "None" pos:[53,234] width:54 height:16
+	checkbox cinematicObject "Cinematic Object" pos:[21,297] width:108 height:17
+	checkbox hideUntilRef "Hide Until Referenced" pos:[21,314] width:129 height:17
+	checkbox hideWhenDone "Hide When Done" pos:[21,332] width:129 height:17
 	
 	local animSel = #() -- selected objects that have animations
 	local animSet = #() -- selected set of animations [struct Animation]
@@ -69,7 +46,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 		oldTime = sliderTime
 		if (selectionOnlyCheckbox.checked) then ( objs = selection )
 		objs = RAD_FilterVisible objs vis:(not hidden)		
-		objs = RAD_Filter objs #(Editable_Mesh, Freecamera)
+		objs = RAD_ConvertableFilter objs #(Editable_Mesh, Freecamera)
 		objs = RAD_Exclude objs Bone -- exclude bones
 		
 		if (objs.count == 0) then
@@ -94,10 +71,6 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 	(
 		exportMeshButton.enabled =val 
 		exportSkelButton.enabled = false 
-		modelTypeRadio.enabled = val
-		noCollisionCheckBox.enabled = val
-		selectOtherLikeThisButton.enabled = val
-		nodrawCheckbox.enabled = val
 	)
 	
 	function enableAnimControls val =
@@ -141,22 +114,6 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 	function selectedAnimatable =
 	(
 		RAD_FilterAnimatable (getCurrentSelection())
-	)
-	
-	function setSelectionType type =
-	(
-		meshes = selectedMeshes()
-		RAD_SetObjectProps meshes #(#("Contents", type))
-	)
-	
-	function setSelectionCollision val =
-	(
-		RAD_SetObjectProps (selectedMeshes()) #(#("Collision", val))
-	)
-	
-	function setSelectionVisible val =
-	(
-		RAD_SetObjectProps (selectedMeshes()) #(#("Visible", val))
 	)
 	
 	function saveAnims =
@@ -409,53 +366,6 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 		if meshes.count > 0 then
 		(
 			enableMeshControls true
-					
-			vals = RAD_GatherObjectProps meshes #("Contents") #("solid")
-			if (vals[1]) then -- all where identical
-			(
-				vals = vals[2][1][2][1] -- pull first one off
-				modelTypeRadio.state = (contentsIndex vals)
-			)
-			else
-			(
-				modelTypeRadio.state = 0 -- undefined
-			)
-			
-			vals = RAD_GatherObjectProps meshes #("Collision") #("true")
-			if (vals[1]) then
-			(
-				vals = vals[2][1][2][1]
-				if (vals as BooleanClass) then
-				(
-					noCollisionCheckBox.triState = 0
-				)
-				else
-				(
-					noCollisionCheckBox.triState = 1
-				)
-			)
-			else
-			(
-				noCollisionCheckBox.triState = 2
-			)
-			
-			vals = RAD_GatherObjectProps meshes #("Visible") #("true")
-			if (vals[1]) then
-			(
-				vals = vals[2][1][2][1]
-				if (vals as BooleanClass) then
-				(
-					nodrawCheckbox.triState = 0
-				)
-				else
-				(
-					nodrawCheckbox.triState = 1
-				)
-			)
-			else
-			(
-				nodrawCheckbox.triState = 2
-			)
 		)
 		
 		setupUIForAnimatable objs
@@ -487,6 +397,11 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 	(
 	)
 	
+	
+	
+
+	
+	
 	on RadianceUtil open do
 	(
 		RadianceUtil.disableAll()
@@ -499,52 +414,6 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 		RAD_RemoveSelChangeHandler #RadianceUtil_SELCHANGE
 		RAD_RemoveFileOpenHandler #RadianceUtil_FILEOPEN
 	)
-	on modelTypeRadio changed state do
-	(
-		val = s_contentTypes[state]
-		print val
-		setSelectionType val
-	)
-	on noCollisionCheckBox changed state do
-	(
-		setSelectionCollision (not state)
-	)
-	on cinematicObject changed state do
-	(
-		if (state) then
-		(
-			RAD_SetObjectProps (selectedAnimatable()) #(#("CinematicObject", "true"))
-		)
-		else
-		(
-			RAD_SetObjectProps (selectedAnimatable()) #(#("CinematicObject", "false"))
-		)
-	)
-	
-	on hideUntilRef changed state do
-	(
-		if (state) then
-		(
-			RAD_SetObjectProps (selectedAnimatable()) #(#("HideUntilRef", "true"))
-		)
-		else
-		(
-			RAD_SetObjectProps (selectedAnimatable()) #(#("HideUntilRef", "false"))
-		)
-	)
-
-	on hideWhenDone changed state do
-	(
-		if (state) then
-		(
-			RAD_SetObjectProps (selectedAnimatable()) #(#("HideWhenDone", "true"))
-		)
-		else
-		(
-			RAD_SetObjectProps (selectedAnimatable()) #(#("HideWhenDone", "false"))
-		)
-	)
-	
 	on animList selected idx do
 	(
 		animName.text = animSet[animList.selection].name
@@ -572,51 +441,6 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 	on exportSkelButton pressed do
 	(
 		exportScene false false
-	)
-	on selectOtherLikeThisButton pressed do
-	(
-		p = #("Contents", "Collision", "Visible")
-		d = #("solid", "true", "true")
-		m = (selectedMeshes())[1]
-		v = RAD_GatherObjectProps #(m) p d
-		v = v[2][1][2] -- pull out mesh properies
-		-- filter scene
-		selectMore (RAD_FilterByProps (RAD_Exclude (RAD_ConvertableFilter (RAD_FilterVisibleSelected objects  vis:true sel:false) Mesh) Bone) p d v)
-	)
-	on selectSolidButton pressed do
-	(
-		p = #("Contents")
-		d = #("solid")
-		-- filter scene
-		selectMore (RAD_FilterByProps (RAD_Exclude (RAD_ConvertableFilter (RAD_FilterVisibleSelected objects  vis:true sel:false) Mesh) Bone) p d d)
-	)
-	on selectDetailButton pressed do
-	(
-		p = #("Contents")
-		v = #("detail")
-		d = #("solid")
-		-- filter scene
-		selectMore (RAD_FilterByProps (RAD_Exclude (RAD_ConvertableFilter (RAD_FilterVisibleSelected objects  vis:true sel:false) Mesh) Bone) p d v)
-	)
-	on selectNoCollisionButton pressed do
-	(
-		p = #("Collision")
-		v = #("false")
-		d = #("true")
-		-- filter scene
-		selectMore (RAD_FilterByProps (RAD_Exclude (RAD_ConvertableFilter (RAD_FilterVisibleSelected objects  vis:true sel:false) Mesh) Bone) p d v)
-	)
-	on selectAreaportalButton pressed do
-	(
-		p = #("Contents")
-		v = #("areaportal")
-		d = #("solid")
-		-- filter scene
-		selectMore (RAD_FilterByProps (RAD_Exclude (RAD_ConvertableFilter (RAD_FilterVisibleSelected objects  vis:true sel:false) Mesh) Bone) p d v)
-	)
-	on nodrawCheckbox changed state do
-	(
-		setSelectionVisible (not state)
 	)
 	on animStart entered newVal do
 	(
@@ -679,6 +503,39 @@ utility RadianceUtil "Radiance Tools" width:166 height:643
 		for x in animSel do
 		(
 			RAD_SetObjInitialAnim x undefined
+		)
+	)
+	on cinematicObject changed state do
+	(
+		if (state) then
+		(
+			RAD_SetObjectProps (selectedAnimatable()) #(#("CinematicObject", "true"))
+		)
+		else
+		(
+			RAD_SetObjectProps (selectedAnimatable()) #(#("CinematicObject", "false"))
+		)
+	)
+	on hideUntilRef changed state do
+	(
+		if (state) then
+		(
+			RAD_SetObjectProps (selectedAnimatable()) #(#("HideUntilRef", "true"))
+		)
+		else
+		(
+			RAD_SetObjectProps (selectedAnimatable()) #(#("HideUntilRef", "false"))
+		)
+	)
+	on hideWhenDone changed state do
+	(
+		if (state) then
+		(
+			RAD_SetObjectProps (selectedAnimatable()) #(#("HideWhenDone", "true"))
+		)
+		else
+		(
+			RAD_SetObjectProps (selectedAnimatable()) #(#("HideWhenDone", "false"))
 		)
 	)
 )

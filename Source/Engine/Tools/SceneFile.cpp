@@ -1,4 +1,4 @@
-// MaxScene.cpp
+// SceneFile.cpp
 // Copyright (c) 2010 Sunside Inc., All Rights Reserved
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
@@ -7,7 +7,7 @@
 
 #if defined(RAD_OPT_TOOLS)
 
-#include "MaxScene.h"
+#include "SceneFile.h"
 #include "../COut.h"
 #include <Runtime/Runtime.h>
 #include <Runtime/Container/ZoneHashMap.h>
@@ -26,34 +26,27 @@ RAD_ZONE_DEF(RADENG_API, Z3DX, "3DX", ZTools);
 
 using namespace stream;
 
-namespace
-{
-	enum
-	{
-		Id = RAD_FOURCC_LE('R', 'S', 'C', 'N'),
-		Version2 = 2,
-		Version = 3,
+namespace {
+	enum {
+		kId = RAD_FOURCC_LE('R', 'S', 'C', 'N'),
+		kVersion2 = 2,
+		kVersion3 = 3,
+		kVersion = 4,
 
-		HasMaterialFlag = 0x80000000,
-		ContentsDetailFlag = 0x40000000,
-		ContentsAreaportalFlag = 0x20000000,
-		ContentsNoClipFlag = 0x00800000,
-		ContentsNoDrawFlag = 0x00400000,
-		HasAnimsFlag = 0x00200000,
-		HasMeshFlag = 0x00100000,
-		CinematicObjectFlag = 0x00080000,
-		HideUntilRefedFlag = 0x00040000,
-		HideWhenDoneFlag = 0x00010000
+		kHasMaterialFlag = 0x80000000,
+		kHasAnimsFlag = 0x00200000,
+		kHasMeshFlag = 0x00100000,
+		kCinematicObjectFlag = 0x00080000,
+		kHideUntilRefedFlag = 0x00040000,
+		kHideWhenDoneFlag = 0x00010000
 	};
 
-	struct Material
-	{
+	struct Material {
 		String name;
 		int flags;
 		int emitId;
 
-		struct Sub
-		{
+		struct Sub {
 			String name;
 			int id;
 			int emitId;
@@ -65,66 +58,59 @@ namespace
 
 	typedef zone_vector<Material, Z3DXT>::type MatVec;
 	
-	String ReadString(InputStream &stream)
-	{
+	String ReadString(InputStream &stream) {
 		String s;
-		for (;;)
-		{
+		for (;;) {
 			S8 c;
 			stream >> c;
-			if (!c) break;
+			if (!c)
+				break;
 			s += (char)c;
 		}
 
 		return s;
 	}
 
-	Map::Vec2 ReadVec2(InputStream &stream)
-	{
+	SceneFile::Vec2 ReadVec2(InputStream &stream) {
 		float v[2];
 		stream >> v[0];
 		stream >> v[1];
-		return Map::Vec2(Map::ValueType(v[0]), Map::ValueType(v[1]));
+		return SceneFile::Vec2(SceneFile::ValueType(v[0]), SceneFile::ValueType(v[1]));
 	}
 
-	Map::Vec3 ReadVec3(InputStream &stream)
-	{
+	SceneFile::Vec3 ReadVec3(InputStream &stream) {
 		float v[3];
 		stream >> v[0];
 		stream >> v[1];
 		stream >> v[2];
-		return Map::Vec3(Map::ValueType(v[0]), Map::ValueType(v[1]), Map::ValueType(v[2]));
+		return SceneFile::Vec3(SceneFile::ValueType(v[0]), SceneFile::ValueType(v[1]), SceneFile::ValueType(v[2]));
 	}
 
-	Map::Mat4 ReadMat3(InputStream &stream)
-	{
+	SceneFile::Mat4 ReadMat3(InputStream &stream) {
 		float v[12];
 		for (int i = 0; i < 12; ++i)
 			stream >> v[i];
-		return Map::Mat4(
-			Map::Vec4(v[0], v[1], v[2],  0.f),
-			Map::Vec4(v[3], v[4], v[5],  0.f),
-			Map::Vec4(v[6], v[7], v[8],  0.f),
-			Map::Vec4(v[9], v[10], v[11], 1.f)
+		return SceneFile::Mat4(
+			SceneFile::Vec4(v[0], v[1], v[2],  0.f),
+			SceneFile::Vec4(v[3], v[4], v[5],  0.f),
+			SceneFile::Vec4(v[6], v[7], v[8],  0.f),
+			SceneFile::Vec4(v[9], v[10], v[11], 1.f)
 		);
 	}
 
-	Map::Quat ReadQuat(InputStream &stream)
-	{
+	SceneFile::Quat ReadQuat(InputStream &stream) {
 		float w, x, y, z;
 		stream >> w >> x >> y >> z;
-		return Map::Quat(x, y, z, w);
+		return SceneFile::Quat(x, y, z, w);
 	}
 
 	
-	void DecompAffine(Map::Vec3 &s, Map::Quat &q, Map::Vec3 &t, const Map::Mat4 &in)
-	{
+	void DecompAffine(SceneFile::Vec3 &s, SceneFile::Quat &q, SceneFile::Vec3 &t, const SceneFile::Mat4 &in) {
 		int i;
 		
-		Map::Mat4 m = in;
+		SceneFile::Mat4 m = in;
 
-		for (i = 0; i < 3; ++i)
-		{
+		for (i = 0; i < 3; ++i) {
 			double d = sqrt(in[i][0] * in[i][0] + in[i][1] * in[i][1] + in[i][2] * in[i][2]);
 			s[i] = (float)d;
 			m[i][0] = (float)(in[i][0] / d);
@@ -134,76 +120,66 @@ namespace
 		
 		q = in.Rotation();
 		
-		for (i = 0; i < 3; ++i)
-		{
+		for (i = 0; i < 3; ++i) {
 			t[i] = m[3][i];
 		}
 	}
 
-	Map::BoneTM ReadBoneTM(InputStream &stream)
-	{
-		Map::BoneTM tm;
-		Map::Mat4 m = ReadMat3(stream);
+	SceneFile::BoneTM ReadBoneTM(InputStream &stream) {
+		SceneFile::BoneTM tm;
+		SceneFile::Mat4 m = ReadMat3(stream);
 		DecompAffine(tm.s, tm.r, tm.t, m);
 		return tm;
 	}
 
-	typedef Map::Vec2 UV;
+	typedef SceneFile::Vec2 UV;
 	typedef zone_set<UReg, Z3DXT>::type TriFaceIdxSet;
-//	typedef zone_set<UReg, Z3DXT>::pool_type TriFaceIdxSetPool;
 	typedef zone_vector<UV, Z3DXT>::type UVVec;
-//	typedef zone_vector<UV, Z3DXT>::pool_type UVVecPool;
 
-	struct TriVert
-	{
-		Map::Vec3 pos;
-		Map::Vec3 orgPos;
+	struct TriVert {
+		SceneFile::Vec3 pos;
+		SceneFile::Vec3 orgPos;
 	};
 
 	typedef zone_vector<TriVert, Z3DXT>::type TriVertVec;
 
-	struct UVFace
-	{
+	struct UVFace {
 		int v[3];
 	};
 
 	typedef zone_vector<UVFace, Z3DXT>::type UVFaceVec;
 
-	struct TriFace
-	{
+	struct TriFace {
 		int v[3];
 		int sm[3];
 		int smg;
 		int mat;
-		Map::Plane plane;
+		SceneFile::Plane plane;
 	};
 
 	typedef zone_vector<TriFace, Z3DXT>::type TriFaceVec;
-//	typedef zone_vector<TriFace, Z3DXT>::pool_type TriFaceVecPool;
 
-	struct TriModel
-	{
-		UVVec      uvs[Map::MaxUVChannels];
-		UVFaceVec  uvtris[Map::MaxUVChannels];
+	struct TriModel {
+		UVVec      uvs[SceneFile::kMaxUVChannels];
+		UVFaceVec  uvtris[SceneFile::kMaxUVChannels];
 		TriVertVec verts;
 		TriFaceVec tris;
-		Map::BBox bounds;
-		int contents;
+		SceneFile::BBox bounds;
+		String name;
 		int id;
 		int skel;
 		int numChannels;
-		Map::SkinRef skin;
-		Map::AnimMap anims;
+		SceneFile::SkinRef skin;
+		SceneFile::AnimMap anims;
 		bool cinematic;
 		bool hideUntilRef;
 		bool hideWhenDone;
 	};
 
-	void ReadTriModel(InputStream &stream, int version, TriModel &mdl, int flags, const Map::SkelVec &skels)
-	{
+	void ReadTriModel(InputStream &stream, int version, TriModel &mdl, int flags, const SceneFile::SkelVec &skels) {
 		U32 nv, nf, nc;
 
-		if (flags&HasMeshFlag)
+		if (flags&kHasMeshFlag)
 		{
 			stream >> nv;
 			stream >> nf;
@@ -212,49 +188,40 @@ namespace
 			mdl.numChannels = nc;
 
 			mdl.verts.reserve(nv);
-			for (U32 i = 0; i < nv; ++i)
-			{
+			for (U32 i = 0; i < nv; ++i) {
 				TriVert v;
 				v.orgPos = ReadVec3(stream);
-				/*v.pos[0] = math::Floor(v.orgPos[0] - Map::ValueType(0.5)) + Map::ValueType(1.0);
-				v.pos[1] = math::Floor(v.orgPos[1] - Map::ValueType(0.5)) + Map::ValueType(1.0);
-				v.pos[2] = math::Floor(v.orgPos[2] - Map::ValueType(0.5)) + Map::ValueType(1.0);*/
 				v.pos = v.orgPos;
 				mdl.bounds.Insert(v.pos);
 				mdl.verts.push_back(v);
 			}
 
-			UVFaceVec  uvtris[Map::MaxUVChannels];
+			UVFaceVec  uvtris[SceneFile::kMaxUVChannels];
 
-			for (U32 i = 0; i < nc; ++i)
-			{
+			for (U32 i = 0; i < nc; ++i) {
 				U32 nuv;
 				stream >> nuv;
 
-				if (i < Map::MaxUVChannels)
-				{
+				if (i < SceneFile::kMaxUVChannels) {
 					mdl.uvs[i].reserve(nuv);
 					mdl.uvtris[i].reserve(nf);
 				}
 
-				for (U32 j = 0; j < nuv; ++j)
-				{
-					Map::Vec2 v = ReadVec2(stream); // ignore
+				for (U32 j = 0; j < nuv; ++j) {
+					SceneFile::Vec2 v = ReadVec2(stream); // ignore
 					
-					if (i < Map::MaxUVChannels)
-					{
+					if (i < SceneFile::kMaxUVChannels) {
 						mdl.uvs[i].push_back(v);
 					}
 				}
-				for (U32 j = 0; j < nf; ++j)
-				{
+
+				for (U32 j = 0; j < nf; ++j) {
 					UVFace f;
 					stream >> f.v[2];
 					stream >> f.v[1];
 					stream >> f.v[0];
 					
-					if (i < Map::MaxUVChannels)
-					{
+					if (i < SceneFile::kMaxUVChannels) {
 						uvtris[i].push_back(f);
 					}
 				}
@@ -262,8 +229,8 @@ namespace
 			
 			mdl.tris.reserve(nf);
 			bool warn = false;
-			for (U32 i = 0; i < nf; ++i)
-			{
+			for (U32 i = 0; i < nf; ++i) {
+
 				TriFace f;
 				stream >> f.v[2];
 				stream >> f.v[1];
@@ -272,23 +239,20 @@ namespace
 				stream >> f.mat;
 
 				int z;
-				for (z = 0; z < 2; ++z)
-				{
+				for (z = 0; z < 2; ++z) {
 					if (mdl.verts[f.v[z]].pos == mdl.verts[f.v[z+1]].pos) 
 						break;
 					if (mdl.verts[f.v[z]].pos == mdl.verts[f.v[(z+2)%3]].pos) 
 						break;
 				}
-				if (z == 2)
-				{
+
+				if (z == 2) {
 					f.plane.Initialize(mdl.verts[f.v[2]].pos, mdl.verts[f.v[1]].pos, mdl.verts[f.v[0]].pos);
 					mdl.tris.push_back(f);
 
-					for (U32 k = 0; k < Map::MaxUVChannels && k < nc; ++k)
+					for (U32 k = 0; k < SceneFile::kMaxUVChannels && k < nc; ++k)
 						mdl.uvtris[k].push_back(uvtris[k][i]);
-				}
-				else if (!warn)
-				{
+				} else if (!warn) {
 					warn = true;
 					COut(C_Warn) << "WARNING: mesh id " << mdl.id << " has degenerate triangles." << std::endl;
 				}
@@ -305,23 +269,20 @@ namespace
 
 		stream >> frameRate;
 
-		if (flags&HasMeshFlag)
-		{
-			mdl.skin.reset(new Map::Skin());
+		if (flags&kHasMeshFlag) {
+			mdl.skin.reset(new SceneFile::Skin());
 			mdl.skin->reserve(nv);
 
 			// skin
-			for (U32 i = 0; i < nv; ++i)
-			{
-				Map::BoneWeights weights;
+			for (U32 i = 0; i < nv; ++i) {
+				SceneFile::BoneWeights weights;
 
 				U32 numWeights;
 				stream >> numWeights;
 				weights.reserve(numWeights);
 
-				for (U32 j = 0; j < numWeights; ++j)
-				{
-					Map::BoneWeight w;
+				for (U32 j = 0; j < numWeights; ++j) {
+					SceneFile::BoneWeight w;
 					stream >> w.weight;
 					stream >> w.bone;
 					if (w.weight > 0.0f)
@@ -333,21 +294,17 @@ namespace
 		}
 
 		// anims
-		for (int i = 0; i < numAnims; ++i)
-		{
-			const Map::Skel::Ref &skel = skels[mdl.skel];
+		for (int i = 0; i < numAnims; ++i) {
+			const SceneFile::Skel::Ref &skel = skels[mdl.skel];
 
-			Map::Anim::Ref a(new Map::Anim());
+			SceneFile::Anim::Ref a(new SceneFile::Anim());
 			a->name = ReadString(stream);
 			
 			U32 flags, numFrames, firstFrame;
 
-			if (version > Version2)
-			{
+			if (version > kVersion2) {
 				stream >> flags >> firstFrame >> numFrames;
-			}
-			else
-			{
+			} else {
 				firstFrame = 0;
 				stream >> flags >> numFrames;
 			}
@@ -357,61 +314,47 @@ namespace
 			a->firstFrame = (int)firstFrame;
 			a->frames.resize(numFrames);
 
-			for (U32 j = 0; j < numFrames; ++j)
-			{
-				Map::BonePoseVec &tms = a->frames[j];
+			for (U32 j = 0; j < numFrames; ++j) {
+				SceneFile::BonePoseVec &tms = a->frames[j];
 				tms.resize(skel->bones.size());
-				for (Map::BonePoseVec::iterator tm = tms.begin(); tm != tms.end(); ++tm)
-				{
+				for (SceneFile::BonePoseVec::iterator tm = tms.begin(); tm != tms.end(); ++tm) {
 					(*tm).fov = 0.f;
 					(*tm).m = ReadBoneTM(stream);
 					(*tm).tag = ReadString(stream);
 				}
 			}
 
-			mdl.anims.insert(Map::AnimMap::value_type(a->name, a));
+			mdl.anims.insert(SceneFile::AnimMap::value_type(a->name, a));
 		}
 	}
 
-	struct SmoothVert : public Map::WeightedTriVert
-	{
+	struct SmoothVert : public SceneFile::WeightedTriVert {
 		TriFaceIdxSet faces;
 		int sm;
 		int id;
 	};
 
 	typedef zone_multimap<SmoothVert, int, Z3DXT>::type SmoothVertIdxMap;
-//	typedef zone_multimap<SmoothVert, int, Z3DXT>::pool_type SmoothVertIdxMapPool;
 	typedef zone_vector<SmoothVert, Z3DXT>::type SmoothVertVec;
-//	typedef zone_vector<SmoothVert, Z3DXT>::pool_type SmoothVertVecPool;
 
-	void AddFaces(const SmoothVert &src, SmoothVert &dst)
-	{
+	void AddFaces(const SmoothVert &src, SmoothVert &dst) {
 		for (TriFaceIdxSet::const_iterator it = src.faces.begin(); it != src.faces.end(); ++it)
 			dst.faces.insert(*it);
 	}
 
-	void CombineFaces(SmoothVert &a, SmoothVert &b)
-	{
+	void CombineFaces(SmoothVert &a, SmoothVert &b) {
 		AddFaces(a, b);
 		a.faces = b.faces;
 	}
 
-//#define SMOOTHING_GROUPS
-
-	int HashVert(const SmoothVert &v, SmoothVertVec &vec, SmoothVertIdxMap &idxMap, bool smooth)
-	{
+	int HashVert(const SmoothVert &v, SmoothVertVec &vec, SmoothVertIdxMap &idxMap, bool smooth) {
 		std::pair<SmoothVertIdxMap::const_iterator,
 		          SmoothVertIdxMap::const_iterator> pair = idxMap.equal_range(v);
 
-		while (pair.first != pair.second)
-		{
-#if defined(SMOOTHING_GROUPS)
-			if (smooth)
-			{
+		while (pair.first != pair.second) {
+			if (smooth) {
 				SmoothVert &x = vec[pair.first->second];
-				if (v.sm & x.sm)
-				{
+				if (v.sm & x.sm) {
 					x.sm |= v.sm;
 					AddFaces(v, x);
 					return pair.first->second;
@@ -419,7 +362,6 @@ namespace
 				++pair.first;
 				continue;
 			}
-#endif
 			return pair.first->second;
 		}
 
@@ -429,25 +371,19 @@ namespace
 		return ofs;
 	}
 
-	void MakeNormals(const TriModel &mdl, SmoothVertVec &vec, bool smooth)
-	{
-#if defined(SMOOTHING_GROUPS)
+	void MakeNormals(const TriModel &mdl, SmoothVertVec &vec, bool smooth) {
 		// some coincedent vertices may not have been combined
 		// because their UV's are different. smooth over these as well.
-		if (smooth)
-		{
-			for (SmoothVertVec::iterator it = vec.begin(); it != vec.end(); ++it)
-			{
+		if (smooth) {
+			for (SmoothVertVec::iterator it = vec.begin(); it != vec.end(); ++it) {
 				SmoothVert &a = *it;
-				for (SmoothVertVec::iterator it2 = vec.begin(); it2 != vec.end(); ++it2)
-				{
+				for (SmoothVertVec::iterator it2 = vec.begin(); it2 != vec.end(); ++it2) {
 					if (it == it2) 
 						continue;
 
 					SmoothVert &b = *it2;
 
-					if (a.sm & b.sm) // smooth?
-					{
+					if (a.sm & b.sm) { // smooth?
 						if (a.pos != b.pos) 
 							continue;
 
@@ -457,32 +393,26 @@ namespace
 				}
 			}
 		}
-#endif
 
-		for (SmoothVertVec::iterator it = vec.begin(); it != vec.end(); ++it)
-		{
+		for (SmoothVertVec::iterator it = vec.begin(); it != vec.end(); ++it) {
 			SmoothVert &v = *it;
-			v.normal = Map::Vec3::Zero;
+			v.normal = SceneFile::Vec3::Zero;
 			
-#if defined(SMOOTHING_GROUPS)
-			for (TriFaceIdxSet::iterator it2 = v.faces.begin(); it2 != v.faces.end(); ++it2)
-			{
+			for (TriFaceIdxSet::iterator it2 = v.faces.begin(); it2 != v.faces.end(); ++it2) {
 				U32 idx = *it2;
 				v.normal += mdl.tris[idx].plane.Normal();
 				v.normal.Normalize();
 			}
-#endif
 		}
 	}
 
 	// apply smoothing groups and build the real trimodel.
-	Map::TriModel::Ref Build(TriModel &mdl, int id, int count, bool smooth)
-	{
+	SceneFile::TriModel::Ref Build(TriModel &mdl, int id, int count, bool smooth) {
 		COut(C_Debug) << "(3DX) processing mesh " << (id+1) << "/" << count << std::endl;
 		
-		Map::TriModel::Ref mmdl(new Map::TriModel());
-		mmdl->contents = mdl.contents;
+		SceneFile::TriModel::Ref mmdl(new SceneFile::TriModel());
 		mmdl->id = mdl.id;
+		mmdl->name = mdl.name;
 		mmdl->skel = mdl.skel;
 		mmdl->anims = mdl.anims;
 		mmdl->numChannels = mdl.numChannels;
@@ -500,12 +430,10 @@ namespace
 		mmdl->tris.reserve(mdl.tris.size());
 
 		UReg idx = 0;
-		for (TriFaceVec::iterator it = mdl.tris.begin(); it != mdl.tris.end(); ++it, ++idx)
-		{
+		for (TriFaceVec::iterator it = mdl.tris.begin(); it != mdl.tris.end(); ++it, ++idx) {
 			TriFace &tri = *it;
 
-			for (int i = 0; i < 3; ++i)
-			{
+			for (int i = 0; i < 3; ++i) {
 				v.faces.clear();
 				v.weights.clear();
 				v.faces.insert(idx);
@@ -516,14 +444,10 @@ namespace
 				v.sm  = tri.smg;
 				v.id = tri.v[i];
 
-				for (int j = 0; j < Map::MaxUVChannels; ++j)
-				{
-					if (uvv[j].empty())
-					{
+				for (int j = 0; j < SceneFile::kMaxUVChannels; ++j) {
+					if (uvv[j].empty()) {
 						v.st[j] = UV::Zero;
-					}
-					else
-					{
+					} else {
 						v.st[j] = uvv[j][uvf[j][idx].v[i]];
 					}
 				}
@@ -531,7 +455,7 @@ namespace
 				tri.sm[i] = HashVert(v, smv, smidxm, smooth);
 			}
 
-			mmdl->tris.push_back(Map::TriFace(tri.sm[0], tri.sm[1], tri.sm[2], tri.mat, tri.plane, mmdl.get()));
+			mmdl->tris.push_back(SceneFile::TriFace(tri.sm[0], tri.sm[1], tri.sm[2], tri.mat, tri.plane, mmdl.get()));
 		}
 
 		MakeNormals(mdl, smv, smooth);
@@ -540,10 +464,9 @@ namespace
 		mmdl->bounds = mdl.bounds;
 
 		if (mdl.skin)
-			mmdl->skin.reset(new Map::Skin());
+			mmdl->skin.reset(new SceneFile::Skin());
 				
-		for (SmoothVertVec::iterator it = smv.begin(); it != smv.end(); ++it)
-		{
+		for (SmoothVertVec::iterator it = smv.begin(); it != smv.end(); ++it) {
 			mmdl->verts.push_back(*it);
 			if (mmdl->skin)
 				mmdl->skin->push_back((*it).weights);
@@ -552,30 +475,20 @@ namespace
 		return mmdl;
 	}
 
-	void CompactStaticPools()
-	{
-//		TriFaceIdxSetPool::release_memory();
-//		UVVecPool::release_memory();
-//		SmoothVertIdxMapPool::release_memory();
-//		SmoothVertVecPool::release_memory();
+	int EmitMaterial(const String &name, SceneFile &map) {
+		for (size_t i = 0; i < map.mats.size(); ++i) {
+			if (map.mats[i].name == name)
+				return (int)i;
+		}
+
+		SceneFile::Material mm;
+		mm.name = name;
+		map.mats.push_back(mm);
+		return (int)(map.mats.size()-1);
 	}
 }
 
-int EmitMaterial(const String &name, Map &map)
-{
-	for (size_t i = 0; i < map.mats.size(); ++i)
-	{
-		if (map.mats[i].name == name)
-			return (int)i;
-	}
-
-	Map::Material mm;
-	mm.name = name;
-	map.mats.push_back(mm);
-	return (int)(map.mats.size()-1);
-}
-
-bool LoadMaxScene(InputStream &nakedstr, Map &map, bool smooth)
+bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth)
 {
 	LittleInputStream stream(nakedstr.Buffer());
 	U32 id, version;
@@ -583,7 +496,9 @@ bool LoadMaxScene(InputStream &nakedstr, Map &map, bool smooth)
 	stream >> id;
 	stream >> version;
 
-	if (id != Id || (version < Version2 || version > Version)) 
+	map.version = version;
+
+	if (id != kId || (version < kVersion2 || version > kVersion)) 
 		return false;
 
 	MatVec mats;
@@ -592,38 +507,32 @@ bool LoadMaxScene(InputStream &nakedstr, Map &map, bool smooth)
 	// materials.
 
 	stream >> n;
-	for (U32 i = 0; i < n; ++i)
-	{
+	for (U32 i = 0; i < n; ++i) {
 		Material m;
 		m.name = ReadString(stream);
 		stream >> m.flags;
-		if (m.flags & 1) // multisub
-		{
+		if (m.flags & 1) { // multisub
 			U32 z;
 			stream >> z;
-			for (U32 j = 0; j < z; ++j)
-			{
+			for (U32 j = 0; j < z; ++j) {
 				Material::Sub s;
 				stream >> s.id;
 				s.name = ReadString(stream);
-				s.emitId = -1;//(UReg)EmitMaterial(s.name, map);
+				s.emitId = -1;
 				m.subs.insert(Material::SubHash::value_type(s.id, s));
 			}
-		}
-		else
-		{
-			m.emitId = -1;//(UReg)EmitMaterial(m.name, map);
+		} else {
+			m.emitId = -1;
 		}
 		mats.push_back(m);
 	}
 
-	if (version > Version2) // load cameras
-	{
+	if (version > kVersion2) { // load cameras
+
 		stream >> n;
 
-		for (U32 i = 0; i < n; ++i)
-		{
-			Map::Camera::Ref cam(new Map::Camera());
+		for (U32 i = 0; i < n; ++i) {
+			SceneFile::Camera::Ref cam(new SceneFile::Camera());
 
 			cam->name = ReadString(stream);
 
@@ -635,9 +544,9 @@ bool LoadMaxScene(InputStream &nakedstr, Map &map, bool smooth)
 
 			stream >> z >> frameRate; // num anims
 
-			for (U32 k = 0; k < z; ++k)
-			{
-				Map::Anim::Ref a(new Map::Anim());
+			for (U32 k = 0; k < z; ++k) {
+
+				SceneFile::Anim::Ref a(new SceneFile::Anim());
 				a->name = ReadString(stream);
 				
 				S32 firstFrame;
@@ -649,19 +558,18 @@ bool LoadMaxScene(InputStream &nakedstr, Map &map, bool smooth)
 				a->firstFrame = (int)firstFrame;
 				a->frames.resize(numFrames);
 
-				for (U32 j = 0; j < numFrames; ++j)
-				{
-					Map::BonePoseVec &tms = a->frames[j];
+				for (U32 j = 0; j < numFrames; ++j) {
+
+					SceneFile::BonePoseVec &tms = a->frames[j];
 					tms.resize(1);
-					for (Map::BonePoseVec::iterator tm = tms.begin(); tm != tms.end(); ++tm)
-					{
+					for (SceneFile::BonePoseVec::iterator tm = tms.begin(); tm != tms.end(); ++tm) {
 						stream >> (*tm).fov;
 						(*tm).m = ReadBoneTM(stream);
 						(*tm).tag = ReadString(stream);
 					}
 				}
 
-				cam->anims.insert(Map::AnimMap::value_type(a->name, a));
+				cam->anims.insert(SceneFile::AnimMap::value_type(a->name, a));
 				map.cameras.push_back(cam);
 			}
 		}
@@ -673,9 +581,8 @@ bool LoadMaxScene(InputStream &nakedstr, Map &map, bool smooth)
 	{
 		TriModel mdl;
 
-		for (U32 i = 0; i < n; ++i)
-		{
-			Map::Entity::Ref ent(new Map::Entity());
+		for (U32 i = 0; i < n; ++i) {
+			SceneFile::Entity::Ref ent(new SceneFile::Entity());
 			ent->maxEnt = true;
 			ent->name = ReadString(stream);
 			stream >> ent->id;
@@ -683,14 +590,13 @@ bool LoadMaxScene(InputStream &nakedstr, Map &map, bool smooth)
 			U32 z;
 			
 			stream >> z;
-			for (U32 j = 0; j < z; ++j) // skels.
-			{
-				Map::Skel::Ref sk(new Map::Skel());
+			for (U32 j = 0; j < z; ++j) { // skels.
+		
+				SceneFile::Skel::Ref sk(new SceneFile::Skel());
 				U32 numBones;
 				stream >> numBones;
-				for (U32 b = 0; b < numBones; ++b)
-				{
-					Map::Bone bone;
+				for (U32 b = 0; b < numBones; ++b) {
+					SceneFile::Bone bone;
 					bone.name = ReadString(stream);
 					stream >> bone.parent;
 					bone.world = ReadMat3(stream);
@@ -701,53 +607,28 @@ bool LoadMaxScene(InputStream &nakedstr, Map &map, bool smooth)
 			}
 
 			stream >> z;
-			for (U32 j = 0; j < z; ++j) // trimodels
-			{
+			for (U32 j = 0; j < z; ++j) { // trimodels
+
 				Material *m = 0;
 				U32 flags;
 
 				stream >> mdl.id;
+				if (version > kVersion3)
+					mdl.name = ReadString(stream);
 				stream >> flags;
 				stream >> mdl.skel;
 
-				if (flags & HasMaterialFlag) // has material
-				{
+				if (flags & kHasMaterialFlag) { // has material
 					U32 idx;
 					stream >> idx;
 					m = &mats[idx];
 				}
 
-				if (flags & ContentsDetailFlag)
-				{
-					mdl.contents = Map::ContentsDetail;
-				}
-				else if (flags & ContentsAreaportalFlag)
-				{
-					mdl.contents = Map::ContentsAreaportal;
-				}
-				else
-				{
-					mdl.contents = Map::ContentsSolid;
-				}
-
-				if (!(flags & ContentsNoClipFlag))
-				{
-					mdl.contents |= Map::ContentsNoClip;
-				}
-
-				if (!(flags & ContentsNoDrawFlag))
-				{
-					mdl.contents |= Map::ContentsNoDraw;
-				}
-
-				if (version > Version2)
-				{
-					mdl.cinematic = (flags&CinematicObjectFlag) ? true : false;
-					mdl.hideUntilRef = (flags&HideUntilRefedFlag) ? true : false;
-					mdl.hideWhenDone = (flags&HideWhenDoneFlag) ? true : false;
-				}
-				else
-				{
+				if (version > kVersion2) {
+					mdl.cinematic = (flags&kCinematicObjectFlag) ? true : false;
+					mdl.hideUntilRef = (flags&kHideUntilRefedFlag) ? true : false;
+					mdl.hideWhenDone = (flags&kHideWhenDoneFlag) ? true : false;
+				} else {
 					mdl.cinematic = false;
 					mdl.hideUntilRef = false;
 					mdl.hideWhenDone = false;
@@ -759,35 +640,27 @@ bool LoadMaxScene(InputStream &nakedstr, Map &map, bool smooth)
 				mdl.anims.clear();
 				mdl.skin.reset();
 				
-				for (int i = 0; i < Map::MaxUVChannels; ++i)
-				{
+				for (int i = 0; i < SceneFile::kMaxUVChannels; ++i) {
 					mdl.uvs[i].clear();
 					mdl.uvtris[i].clear();
 				}
 				
-				if (flags&(HasMeshFlag|HasAnimsFlag))
+				if (flags&(kHasMeshFlag|kHasAnimsFlag))
 					ReadTriModel(stream, version, mdl, flags, ent->skels);
 
-				for (TriFaceVec::iterator it = mdl.tris.begin(); it != mdl.tris.end(); ++it)
-				{
-					if (m)
-					{
+				for (TriFaceVec::iterator it = mdl.tris.begin(); it != mdl.tris.end(); ++it) {
+					if (m) {
 						Material::SubHash::iterator sub = m->subs.find((U32)it->mat);
-						if (sub != m->subs.end())
-						{
+						if (sub != m->subs.end()) {
 							if (sub->second.emitId == -1)
 								sub->second.emitId = EmitMaterial(sub->second.name, map);
 							it->mat = (int)sub->second.emitId;
-						}
-						else
-						{
+						} else {
 							if (m->emitId == -1)
 								m->emitId = EmitMaterial(m->name, map);
 							it->mat = (int)m->emitId;
 						}
-					}
-					else
-					{
+					} else {
 						it->mat = -1;
 					}
 				}
@@ -796,10 +669,8 @@ bool LoadMaxScene(InputStream &nakedstr, Map &map, bool smooth)
 					ent->models.push_back(Build(mdl, j, z, smooth));
 			}
 
-			if (ent->name == "worldspawn")
-			{
-				if (map.worldspawn)
-				{ // move to worldspawn
+			if (ent->name == "worldspawn") {
+				if (map.worldspawn) { // move to worldspawn
 					std::copy(
 						ent->models.begin(), 
 						ent->models.end(), 
@@ -807,20 +678,14 @@ bool LoadMaxScene(InputStream &nakedstr, Map &map, bool smooth)
 					);
 
 					map.worldspawn->skels = ent->skels;
-				}
-				else
-				{
+				} else {
 					map.worldspawn = ent;
 				}
-			}
-			else
-			{
+			} else {
 				map.ents.push_back(ent);
 			}
 		}
 	}
-
-	CompactStaticPools();
 
 	return true;
 }

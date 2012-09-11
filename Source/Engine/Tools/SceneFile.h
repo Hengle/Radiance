@@ -1,7 +1,9 @@
-// Map.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file SceneFile.h
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup tools
+*/
 
 #pragma once
 
@@ -23,32 +25,24 @@ namespace tools {
 
 RAD_ZONE_DEC(RADENG_API, Z3DX);
 
+//! A structure which contains a scene loading from a 3DX file.
+/*! The 3DX format stores objects exported from 3DS Max, consisting of geometry,
+	cinematics, and camera motion data. It's the data container used for importing
+	skeletal animations, and map data.
+*/
 template <typename T>
-class MapT
-{
+class SceneFileT {
 public:
 
 	typedef T ValueType;
 
-	enum
-	{
-		InvalidMatId = -1,
-		MaxUVChannels = 2,
-
-		RAD_FLAG_BIT(ContentsAreaportal, 0),
-		RAD_FLAG(ContentsSolid),
-		RAD_FLAG(ContentsDetail),
-		RAD_FLAG(ContentsNoClip),
-		RAD_FLAG(ContentsNoDraw),
-		FirstVisibleContents = ContentsAreaportal,
-		LastVisibleContents = ContentsSolid,
-		VisibleContents = ContentsSolid|ContentsAreaportal,
-		StructuralContents = ContentsSolid|ContentsAreaportal,
-		SolidContents = ContentsSolid
+	enum {
+		kInvalidMatId = -1,
+		kMaxUVChannels = 2,
 	};
 
-	static const T MaxRange;
-	static const T HalfRange;
+	static const T kMaxRange;
+	static const T kHalfRange;
 
 	typedef math::Plane<T> Plane;
 	typedef math::Vector2<T> Vec2;
@@ -62,34 +56,31 @@ public:
 	typedef typename zone_vector<Vec3, Z3DXT>::type Vec3Vec;
 	typedef typename zone_vector<Mat4, Z3DXT>::type Mat4Vec;
 
-	struct Material
-	{
+	struct Material {
 		String name;
 	};
 
 	typedef typename zone_vector<Material, Z3DXT>::type MatVec;
 	typedef typename zone_vector<String, Z3DXT>::type StringVec;
 
-	struct BoneWeight
-	{
+	struct BoneWeight {
 		int bone;
 		float weight;
 
-		bool operator == (const BoneWeight &w) const
-		{
+		bool operator == (const BoneWeight &w) const {
 			return bone == w.bone && weight == w.weight;
 		}
 
-		bool operator != (const BoneWeight &w) const
-		{
+		bool operator != (const BoneWeight &w) const {
 			return !(*this == w);
 		}
 	};
 
 	typedef typename zone_vector<BoneWeight, Z3DXT>::type BoneWeights;
 
-	struct TriVert
-	{
+	/*! Vertex data is contained in several classes, each with operators to allow spliting rays and polygons specialized
+	    on a particular vertex type. */
+	struct TriVert {
 		typedef T ValueType;
 
 		TriVert() {}
@@ -98,14 +89,12 @@ public:
 
 		// operators that let us specialize ConvexPolygon on this vertex type.
 
-		TriVert operator + (const TriVert &v) const
-		{
+		TriVert operator + (const TriVert &v) const {
 			TriVert x;
 
 			x.pos = pos + v.pos;
 			x.orgPos = orgPos + v.orgPos;
-			for (int i = 0; i < MaxUVChannels; ++i)
-			{
+			for (int i = 0; i < kMaxUVChannels; ++i) {
 				x.st[i] = st[i] + v.st[i];
 			}
 			x.normal = normal + v.normal;
@@ -114,14 +103,12 @@ public:
 			return x;
 		}
 
-		TriVert operator - (const TriVert &v) const
-		{
+		TriVert operator - (const TriVert &v) const {
 			TriVert x;
 
 			x.pos = pos - v.pos;
 			x.orgPos = orgPos - v.orgPos;
-			for (int i = 0; i < MaxUVChannels; ++i)
-			{
+			for (int i = 0; i < kMaxUVChannels; ++i) {
 				x.st[i] = st[i] - v.st[i];
 			}
 			x.normal = normal - v.normal;
@@ -130,14 +117,12 @@ public:
 			return x;
 		}
 
-		TriVert operator * (const TriVert &v) const
-		{
+		TriVert operator * (const TriVert &v) const {
 			TriVert x;
 
 			x.pos = pos * v.pos;
 			x.orgPos = orgPos * v.orgPos;
-			for (int i = 0; i < MaxUVChannels; ++i)
-			{
+			for (int i = 0; i < kMaxUVChannels; ++i) {
 				x.st[i] = st[i] * v.st[i];
 			}
 			x.normal = normal * v.normal;
@@ -146,14 +131,12 @@ public:
 			return x;
 		}
 
-		TriVert operator / (const TriVert &v) const
-		{
+		TriVert operator / (const TriVert &v) const {
 			TriVert x;
 
 			x.pos = pos / v.pos;
 			x.orgPos = orgPos / v.orgPos;
-			for (int i = 0; i < MaxUVChannels; ++i)
-			{
+			for (int i = 0; i < kMaxUVChannels; ++i) {
 				x.st[i] = st[i] / v.st[i];
 			}
 			x.normal = normal / v.normal;
@@ -162,12 +145,10 @@ public:
 			return x;
 		}
 
-		TriVert &operator = (const TriVert &v)
-		{
+		TriVert &operator = (const TriVert &v) {
 			pos = v.pos;
 			orgPos = v.orgPos;
-			for (int i = 0; i < MaxUVChannels; ++i)
-			{
+			for (int i = 0; i < kMaxUVChannels; ++i) {
 				st[i] = v.st[i];
 			}
 
@@ -182,32 +163,27 @@ public:
 			return *this;
 		}
 
-		TriVert &operator -= (const TriVert &v)
-		{
+		TriVert &operator -= (const TriVert &v) {
 			*this = *this - v;
 			return *this;
 		}
 
-		TriVert &operator *= (const TriVert &v)
-		{
+		TriVert &operator *= (const TriVert &v) {
 			*this = *this * v;
 			return *this;
 		}
 
-		TriVert &operator /= (const TriVert &v)
-		{
+		TriVert &operator /= (const TriVert &v) {
 			*this = *this / v;
 			return *this;
 		}
 
-		TriVert operator * (ValueType s) const
-		{
+		TriVert operator * (ValueType s) const {
 			TriVert x;
 
 			x.pos = pos * s;
 			x.orgPos = orgPos * s;
-			for (int i = 0; i < MaxUVChannels; ++i)
-			{
+			for (int i = 0; i < kMaxUVChannels; ++i) {
 				x.st[i] = st[i] * s;
 			}
 			x.normal = normal * s;
@@ -216,14 +192,12 @@ public:
 			return x;
 		}
 
-		TriVert operator / (ValueType s) const
-		{
+		TriVert operator / (ValueType s) const {
 			TriVert x;
 
 			x.pos = pos / s;
 			x.orgPos = orgPos / s;
-			for (int i = 0; i < MaxUVChannels; ++i)
-			{
+			for (int i = 0; i < kMaxUVChannels; ++i) {
 				x.st[i] = st[i] / s;
 			}
 			x.normal = normal / s;
@@ -232,37 +206,29 @@ public:
 			return x;
 		}
 
-		TriVert &operator *= (const ValueType s)
-		{
+		TriVert &operator *= (const ValueType s) {
 			*this = *this * s;
 			return *this;
 		}
 
-		TriVert &operator /= (const ValueType s)
-		{
+		TriVert &operator /= (const ValueType s) {
 			*this = *this / s;
 			return *this;
 		}
 
 		// NOTE: < > <= >= do not take into account the normal.
 
-		bool operator < (const TriVert &v) const
-		{
+		bool operator < (const TriVert &v) const {
 			if (pos[0] < v.pos[0] ||
 				(pos[0] == v.pos[0] && pos[1] < v.pos[1]) ||
-				(pos[0] == v.pos[0] && pos[1] == v.pos[1] && pos[2] < v.pos[2]))
-			{
+				(pos[0] == v.pos[0] && pos[1] == v.pos[1] && pos[2] < v.pos[2])) {
 				return true;
 			}
 
-			if (pos == v.pos)
-			{
-				for (int i = 0; i < MaxUVChannels; ++i)
-				{
-					if (i > 0)
-					{
-						for (int k = 0; k < i; ++k)
-						{
+			if (pos == v.pos) {
+				for (int i = 0; i < kMaxUVChannels; ++i) {
+					if (i > 0) {
+						for (int k = 0; k < i; ++k) {
 							if (st[k][0] != v.st[k][0] ||
 								st[k][1] != v.st[k][1])
 									return false;
@@ -270,8 +236,7 @@ public:
 					}
 
 					if (st[i][0] < v.st[i][0] ||
-						(st[i][0] == v.st[i][0] && st[i][1] < v.st[i][1]))
-					{
+						(st[i][0] == v.st[i][0] && st[i][1] < v.st[i][1])) {
 						return true;
 					}
 				}
@@ -279,28 +244,21 @@ public:
 			return false;
 		}
 
-		bool operator <= (const TriVert &v) const
-		{
+		bool operator <= (const TriVert &v) const {
 			return (*this < v) || (*this == v);
 		}
 
-		bool operator > (const TriVert &v) const
-		{
+		bool operator > (const TriVert &v) const {
 			if (pos[0] > v.pos[0] ||
 				(pos[0] == v.pos[0] && pos[1] > v.pos[1]) ||
-				(pos[0] == v.pos[0] && pos[1] == v.pos[1] && pos[2] > v.pos[2]))
-			{
+				(pos[0] == v.pos[0] && pos[1] == v.pos[1] && pos[2] > v.pos[2])) {
 				return true;
 			}
 
-			if (pos == v.pos)
-			{
-				for (int i = 0; i < MaxUVChannels; ++i)
-				{
-					if (i > 0)
-					{
-						for (int k = 0; k < i; ++k)
-						{
+			if (pos == v.pos) {
+				for (int i = 0; i < kMaxUVChannels; ++i) {
+					if (i > 0) {
+						for (int k = 0; k < i; ++k) {
 							if (st[k][0] != v.st[k][0] ||
 								st[k][1] != v.st[k][1])
 									return false;
@@ -308,8 +266,7 @@ public:
 					}
 
 					if (st[i][0] > v.st[i][0] ||
-						(st[i][0] == v.st[i][0] && st[i][1] > v.st[i][1]))
-					{
+						(st[i][0] == v.st[i][0] && st[i][1] > v.st[i][1])) {
 						return true;
 					}
 				}
@@ -317,18 +274,16 @@ public:
 			return false;
 		}
 
-		bool operator >= (const TriVert &v) const
-		{
+		bool operator >= (const TriVert &v) const {
 			return (*this > v) || (*this == v);
 		}
 
-		bool operator == (const TriVert &v) const
-		{
+		bool operator == (const TriVert &v) const {
 			for (int i = 0; i < 3; i++)
 				if (pos[i] != v.pos[i])
 					return false;
 
-			for (int i = 0; i < MaxUVChannels; ++i)
+			for (int i = 0; i < kMaxUVChannels; ++i)
 				for (int j = 0; j < 2; ++j)
 					if (st[i][j] != v.st[i][j])
 						return false;
@@ -336,36 +291,31 @@ public:
 			return true;
 		}
 
-		bool operator != (const TriVert &v) const
-		{
+		bool operator != (const TriVert &v) const {
 			return !(*this == v);
 		}
 
 		Vec3 pos; // rounded vertex position.
 		Vec3 orgPos; // original vertex position.
-		Vec2 st[MaxUVChannels];
+		Vec2 st[kMaxUVChannels];
 		Vec3 normal;
 		Vec3 color;
 		BoneWeights weights;
 	};
 
 	// adds < > <= >= that test for normal.
-	struct NormalTriVert : public TriVert
-	{
+	struct NormalTriVert : public TriVert {
 		NormalTriVert() {}
 		explicit NormalTriVert(const TriVert &v) : TriVert(v) {}
 
-		bool operator < (const NormalTriVert &v) const
-		{
+		bool operator < (const NormalTriVert &v) const {
 			if (TriVert::operator < (v))
 				return true;
 
-			if (TriVert::operator == (v))
-			{
+			if (TriVert::operator == (v)) {
 				if (this->normal[0] < v.normal[0] ||
 				(this->normal[0] == v.normal[0] && this->normal[1] < v.normal[1]) ||
-				(this->normal[0] == v.normal[0] && this->normal[1] == v.normal[1] && this->normal[2] < v.normal[2]))
-				{
+				(this->normal[0] == v.normal[0] && this->normal[1] == v.normal[1] && this->normal[2] < v.normal[2])) {
 					return true;
 				}
 			}
@@ -373,22 +323,18 @@ public:
 			return false;
 		}
 
-		bool operator <= (const NormalTriVert &v) const
-		{
+		bool operator <= (const NormalTriVert &v) const {
 			return (*this < v) || (*this == v);
 		}
 
-		bool operator > (const NormalTriVert &v) const
-		{
+		bool operator > (const NormalTriVert &v) const {
 			if (TriVert::operator > (v))
 				return true;
 
-			if (TriVert::operator == (v))
-			{
+			if (TriVert::operator == (v)) {
 				if (this->normal[0] > v.normal[0] ||
 				(this->normal[0] == v.normal[0] && this->normal[1] > v.normal[1]) ||
-				(this->normal[0] == v.normal[0] && this->normal[1] == v.normal[1] && this->normal[2] > v.normal[2]))
-				{
+				(this->normal[0] == v.normal[0] && this->normal[1] == v.normal[1] && this->normal[2] > v.normal[2])) {
 					return true;
 				}
 			}
@@ -396,13 +342,11 @@ public:
 			return false;
 		}
 
-		bool operator >= (const NormalTriVert &v) const
-		{
+		bool operator >= (const NormalTriVert &v) const {
 			return (*this > v) || (*this == v);
 		}
 
-		bool operator == (const NormalTriVert &v) const
-		{
+		bool operator == (const NormalTriVert &v) const {
 			if (TriVert::operator != (v))
 				return false;
 
@@ -413,31 +357,25 @@ public:
 			return true;
 		}
 
-		bool operator != (const NormalTriVert &v) const
-		{
+		bool operator != (const NormalTriVert &v) const {
 			return !(*this == v);
 		}
 	};
 
 	// adds < > <= >= that test for bone weights.
-	struct WeightedTriVert : public TriVert
-	{
+	struct WeightedTriVert : public TriVert {
 		WeightedTriVert() {}
 		explicit WeightedTriVert(const TriVert &v) : TriVert(v) {}
 
-		bool operator < (const WeightedTriVert &v) const
-		{
+		bool operator < (const WeightedTriVert &v) const {
 			if (TriVert::operator < (v))
 				return true;
-			if (TriVert::operator == (v))
-			{
+			if (TriVert::operator == (v)) {
 				if (TriVert::weights.size() < v.weights.size())
 					return true;
-				if (TriVert::weights.size() == v.weights.size())
-				{
+				if (TriVert::weights.size() == v.weights.size()) {
 					bool eq = true;
-					for (size_t i = 0; i < TriVert::weights.size() && eq; ++i)
-					{
+					for (size_t i = 0; i < TriVert::weights.size() && eq; ++i) {
 						const BoneWeight &a = TriVert::weights[i];
 						const BoneWeight &b = v.weights[i];
 						if (a.bone < b.bone)
@@ -460,15 +398,12 @@ public:
 		{
 			if (TriVert::operator > (v))
 				return true;
-			if (TriVert::operator == (v))
-			{
+			if (TriVert::operator == (v)) {
 				if (TriVert::weights.size() > v.weights.size())
 					return true;
-				if (TriVert::weights.size() == v.weights.size())
-				{
+				if (TriVert::weights.size() == v.weights.size()) {
 					bool eq = true;
-					for (size_t i = 0; i < TriVert::weights.size() && eq; ++i)
-					{
+					for (size_t i = 0; i < TriVert::weights.size() && eq; ++i) {
 						const BoneWeight &a = TriVert::weights[i];
 						const BoneWeight &b = v.weights[i];
 						if (a.bone > b.bone)
@@ -487,14 +422,10 @@ public:
 			return (*this > v) || (*this == v);
 		}
 
-		bool operator == (const WeightedTriVert &v) const
-		{
-			if (TriVert::operator == (v))
-			{
-				if (TriVert::weights.size() == v.weights.size())
-				{
-					for (size_t i = 0; i < TriVert::weights.size(); ++i)
-					{
+		bool operator == (const WeightedTriVert &v) const {
+			if (TriVert::operator == (v)) {
+				if (TriVert::weights.size() == v.weights.size()) {
+					for (size_t i = 0; i < TriVert::weights.size(); ++i) {
 						const BoneWeight &a = TriVert::weights[i];
 						const BoneWeight &b = v.weights[i];
 						if (a != b)
@@ -508,31 +439,25 @@ public:
 			return false;
 		}
 
-		bool operator != (const WeightedTriVert &v) const
-		{
+		bool operator != (const WeightedTriVert &v) const {
 			return !(*this == v);
 		}
 	};
 
-	struct WeightedNormalTriVert : public NormalTriVert
-	{
+	struct WeightedNormalTriVert : public NormalTriVert {
 		WeightedNormalTriVert() {}
 		explicit WeightedNormalTriVert(const TriVert &v) : NormalTriVert(v) {}
 		explicit WeightedNormalTriVert(const NormalTriVert &v) : NormalTriVert(v) {}
 
-		bool operator < (const WeightedNormalTriVert &v) const
-		{
+		bool operator < (const WeightedNormalTriVert &v) const {
 			if (NormalTriVert::operator < (v))
 				return true;
-			if (NormalTriVert::operator == (v))
-			{
+			if (NormalTriVert::operator == (v)) {
 				if (NormalTriVert::weights.size() < v.weights.size())
 					return true;
-				if (NormalTriVert::weights.size() == v.weights.size())
-				{
+				if (NormalTriVert::weights.size() == v.weights.size()) {
 					bool eq = true;
-					for (size_t i = 0; i < NormalTriVert::weights.size() && eq; ++i)
-					{
+					for (size_t i = 0; i < NormalTriVert::weights.size() && eq; ++i) {
 						const BoneWeight &a = NormalTriVert::weights[i];
 						const BoneWeight &b = v.weights[i];
 						if (a.bone < b.bone)
@@ -546,24 +471,19 @@ public:
 			return false;
 		}
 
-		bool operator <= (const WeightedNormalTriVert &v) const
-		{
+		bool operator <= (const WeightedNormalTriVert &v) const {
 			return (*this < v) || (*this == v);
 		}
 
-		bool operator > (const WeightedNormalTriVert &v) const
-		{
+		bool operator > (const WeightedNormalTriVert &v) const {
 			if (NormalTriVert::operator > (v))
 				return true;
-			if (NormalTriVert::operator == (v))
-			{
+			if (NormalTriVert::operator == (v)) {
 				if (NormalTriVert::weights.size() > v.weights.size())
 					return true;
-				if (NormalTriVert::weights.size() == v.weights.size())
-				{
+				if (NormalTriVert::weights.size() == v.weights.size()) {
 					bool eq = true;
-					for (size_t i = 0; i < NormalTriVert::weights.size() && eq; ++i)
-					{
+					for (size_t i = 0; i < NormalTriVert::weights.size() && eq; ++i) {
 						const BoneWeight &a = NormalTriVert::weights[i];
 						const BoneWeight &b = v.weights[i];
 						if (a.bone > b.bone)
@@ -577,19 +497,14 @@ public:
 			return false;
 		}
 
-		bool operator >= (const WeightedNormalTriVert &v) const
-		{
+		bool operator >= (const WeightedNormalTriVert &v) const {
 			return (*this > v) || (*this == v);
 		}
 
-		bool operator == (const WeightedNormalTriVert &v) const
-		{
-			if (NormalTriVert::operator == (v))
-			{
-				if (NormalTriVert::weights.size() == v.weights.size())
-				{
-					for (size_t i = 0; i < NormalTriVert::weights.size(); ++i)
-					{
+		bool operator == (const WeightedNormalTriVert &v) const {
+			if (NormalTriVert::operator == (v)) {
+				if (NormalTriVert::weights.size() == v.weights.size()) {
+					for (size_t i = 0; i < NormalTriVert::weights.size(); ++i) {
 						const BoneWeight &a = NormalTriVert::weights[i];
 						const BoneWeight &b = v.weights[i];
 						if (a != b)
@@ -603,8 +518,7 @@ public:
 			return false;
 		}
 
-		bool operator != (const WeightedNormalTriVert &v) const
-		{
+		bool operator != (const WeightedNormalTriVert &v) const {
 			return !(*this == v);
 		}
 	};
@@ -613,10 +527,8 @@ public:
 	typedef typename zone_vector<TriVert, Z3DXT>::type TriVertVec;
 	typedef typename zone_vector<NormalTriVert, Z3DXT>::type NormalTriVertVec;
 
-	struct TriFace
-	{
-		TriFace() : outside(true), shared(-1)
-		{
+	struct TriFace {
+		TriFace() : outside(true), shared(-1), contents(0), surface(0) {
 		}
 
 		TriFace(unsigned int a,
@@ -624,8 +536,7 @@ public:
 			unsigned int c,
 			int mat,
 			const Plane &plane,
-			TriModel *model) : outside(true), shared(-1)
-		{
+			TriModel *model) : outside(true), shared(-1) {
 			this->mat = mat;
 			this->plane = plane;
 			this->model = model;
@@ -638,6 +549,8 @@ public:
 		unsigned int v[3];
 		int mat;
 		int shared;
+		int contents;
+		int surface;
 		bool outside;
 		zone_vector<int, Z3DXT>::type areas;
 		TriModel *model;
@@ -648,22 +561,19 @@ public:
 	typedef typename zone_vector<BoneWeights, Z3DXT>::type Skin;
 	typedef boost::shared_ptr<Skin> SkinRef;
 
-	struct BoneTM
-	{
+	struct BoneTM {
 		Quat r;
 		Vec3 s;
 		Vec3 t;
 	};
 
-	struct Bone
-	{
+	struct Bone {
 		String name;
 		int parent;
 		Mat4 world;
 	};
 
-	struct BonePose
-	{
+	struct BonePose {
 		BoneTM m;
 		float fov;
 		String tag;
@@ -671,8 +581,7 @@ public:
 
 	typedef typename zone_vector<Bone, Z3DXT>::type BoneVec;
 
-	struct Skel
-	{
+	struct Skel {
 		typedef boost::shared_ptr<Skel> Ref;
 		BoneVec bones;
 	};
@@ -681,8 +590,7 @@ public:
 	typedef typename zone_vector<BonePose, Z3DXT>::type BonePoseVec;
 	typedef typename zone_vector<BonePoseVec, Z3DXT>::type BoneFrames;
 
-	struct Anim
-	{
+	struct Anim {
 		typedef boost::shared_ptr<Anim> Ref;
 		String name;
 		U32 frameRate;
@@ -693,21 +601,21 @@ public:
 
 	typedef typename zone_map<String, typename Anim::Ref, Z3DXT>::type AnimMap;
 
-	struct TriModel
-	{
+	struct TriModel {
 		typedef boost::shared_ptr<TriModel> Ref;
 		typedef typename zone_vector<Ref, Z3DXT>::type Vec;
 
-		TriModel() : outside(true), cinematic(false), hideUntilRef(false), hideWhenDone(false) {}
+		TriModel() : contents(0), outside(true), cinematic(false), hideUntilRef(false), hideWhenDone(false) {}
 
 		TriVertVec verts;
 		TriFaceVec tris;
 		SkinRef skin;
 		AnimMap anims;
 		BBox bounds;
-		int contents;
+		String name;
 		int id;
 		int skel;
+		int contents;
 		int numChannels;
 		bool outside;
 		bool cinematic;
@@ -715,8 +623,7 @@ public:
 		bool hideWhenDone;
 	};
 
-	struct Entity
-	{
+	struct Entity {
 		typedef boost::shared_ptr<Entity> Ref;
 		typedef typename zone_vector<Ref, Z3DXT>::type Vec;
 
@@ -730,8 +637,7 @@ public:
 		int id;
 	};
 
-	struct Camera
-	{
+	struct Camera {
 		typedef boost::shared_ptr<Camera> Ref;
 		typedef typename zone_vector<Ref, Z3DXT>::type Vec;
 		String name;
@@ -739,15 +645,14 @@ public:
 		AnimMap anims;
 	};
 
+	int version;
 	typename Entity::Vec ents;
 	MatVec               mats;
 	typename Entity::Ref worldspawn;
 	typename Camera::Vec cameras;
 
-	typename Entity::Ref EntForName(const char *name) const
-	{
-		for (typename Entity::Vec::const_iterator it = ents.begin(); it != ents.end(); ++it)
-		{
+	typename Entity::Ref EntForName(const char *name) const {
+		for (typename Entity::Vec::const_iterator it = ents.begin(); it != ents.end(); ++it) {
 			if ((*it)->name == name) return *it;
 		}
 		return typename Entity::Ref();
@@ -755,14 +660,17 @@ public:
 };
 
 template <typename T>
-const T MapT<T>::MaxRange = T(16384);
+const T SceneFileT<T>::kMaxRange = T(16384);
 
 template <typename T>
-const T MapT<T>::HalfRange = T(16384/2);
+const T SceneFileT<T>::kHalfRange = T(16384/2);
 
-typedef MapT<float> Map;
+typedef SceneFileT<float> SceneFile;
+typedef SceneFileT<double> SceneFileD;
 
-typedef boost::shared_ptr<Map> MapRef;
-typedef zone_vector<MapRef, Z3DXT>::type MapVec;
+typedef boost::shared_ptr<SceneFile> SceneFileRef;
+typedef zone_vector<SceneFileRef, Z3DXT>::type SceneFileVec;
+
+bool LoadSceneFile(stream::InputStream &stream, SceneFile &map, bool smooth);
 
 } // tools

@@ -39,7 +39,7 @@ BSPBuilder::~BSPBuilder()
 {
 }
 
-bool BSPBuilder::Build(const Map &map)
+bool BSPBuilder::Build(const SceneFile &map)
 {
 	m_skaSize = 0;
 
@@ -111,12 +111,12 @@ void BSPBuilder::TriModel::AddVertex(const Vert &vert)
 	indices.push_back(ofs);
 }
 
-void BSPBuilder::EmitMaterials(const Map &map)
+void BSPBuilder::EmitMaterials(const SceneFile &map)
 {
 	m_bspFile->ReserveMaterials((int)map.mats.size());
 	m_bspFile->ReserveStrings((int)map.mats.size());
 
-	for (Map::MatVec::const_iterator it = map.mats.begin(); it != map.mats.end(); ++it)
+	for (SceneFile::MatVec::const_iterator it = map.mats.begin(); it != map.mats.end(); ++it)
 	{
 		world::bsp_file::BSPMaterial *m = m_bspFile->AddMaterial();
 		m->string = m_bspFile->numStrings;
@@ -124,22 +124,22 @@ void BSPBuilder::EmitMaterials(const Map &map)
 	}
 }
 
-void BSPBuilder::EmitEntities(const Map &map)
+void BSPBuilder::EmitEntities(const SceneFile &map)
 {
 	EmitEntity(map.worldspawn);
-	for (Map::Entity::Vec::const_iterator it = map.ents.begin(); it != map.ents.end(); ++it)
+	for (SceneFile::Entity::Vec::const_iterator it = map.ents.begin(); it != map.ents.end(); ++it)
 		EmitEntity(*it);
 }
 
-bool BSPBuilder::EmitCinematics(const Map &map)
+bool BSPBuilder::EmitCinematics(const SceneFile &map)
 {
 	// create actor list
 	m_actors.reserve(64);
 
-	const Map::Entity::Ref &world = map.worldspawn;
-	for (Map::TriModel::Vec::const_iterator it = world->models.begin(); it != world->models.end(); ++it)
+	const SceneFile::Entity::Ref &world = map.worldspawn;
+	for (SceneFile::TriModel::Vec::const_iterator it = world->models.begin(); it != world->models.end(); ++it)
 	{
-		const Map::TriModel::Ref &model = *it;
+		const SceneFile::TriModel::Ref &model = *it;
 		if (!model->cinematic || model->skel < 0)
 			continue;
 		Actor a;
@@ -156,10 +156,10 @@ bool BSPBuilder::EmitCinematics(const Map &map)
 
 	// pull names from cameras first...
 
-	for (Map::Camera::Vec::const_iterator it = map.cameras.begin(); it != map.cameras.end(); ++it)
+	for (SceneFile::Camera::Vec::const_iterator it = map.cameras.begin(); it != map.cameras.end(); ++it)
 	{
-		const Map::Camera::Ref &camera = *it;
-		for (Map::AnimMap::const_iterator it = camera->anims.begin(); it != camera->anims.end(); ++it)
+		const SceneFile::Camera::Ref &camera = *it;
+		for (SceneFile::AnimMap::const_iterator it = camera->anims.begin(); it != camera->anims.end(); ++it)
 		{
 			if (!EmitCinematic(map, it->second->name))
 				return false;
@@ -171,8 +171,8 @@ bool BSPBuilder::EmitCinematics(const Map &map)
 	for (Actor::Vec::const_iterator it = m_actors.begin(); it != m_actors.end(); ++it)
 	{
 		const Actor &actor = *it;
-		const Map::TriModel::Ref &model = world->models[actor.index];
-		for (Map::AnimMap::const_iterator it = model->anims.begin(); it != model->anims.end(); ++it)
+		const SceneFile::TriModel::Ref &model = world->models[actor.index];
+		for (SceneFile::AnimMap::const_iterator it = model->anims.begin(); it != model->anims.end(); ++it)
 		{
 			if (!EmitCinematic(map, it->second->name))
 				return false;
@@ -182,7 +182,7 @@ bool BSPBuilder::EmitCinematics(const Map &map)
 	return true;
 }
 
-bool BSPBuilder::EmitCinematic(const Map &map, const String &name)
+bool BSPBuilder::EmitCinematic(const SceneFile &map, const String &name)
 {
 	if (m_cinematics.find(name) != m_cinematics.end())
 		return true;
@@ -193,17 +193,17 @@ bool BSPBuilder::EmitCinematic(const Map &map, const String &name)
 	int fps = 30;
 	Trigger::Map triggers;
 
-	const Map::Entity::Ref &world = map.worldspawn;
+	const SceneFile::Entity::Ref &world = map.worldspawn;
 
 	// gather camera motion first.
-	for (Map::Camera::Vec::const_iterator it = map.cameras.begin(); it != map.cameras.end(); ++it)
+	for (SceneFile::Camera::Vec::const_iterator it = map.cameras.begin(); it != map.cameras.end(); ++it)
 	{
-		const Map::Camera::Ref &camera = *it;
-		Map::AnimMap::const_iterator animIt = camera->anims.find(name);
+		const SceneFile::Camera::Ref &camera = *it;
+		SceneFile::AnimMap::const_iterator animIt = camera->anims.find(name);
 		if (animIt == camera->anims.end())
 			continue;
 
-		const Map::Anim::Ref &anim = animIt->second;
+		const SceneFile::Anim::Ref &anim = animIt->second;
 		fps = (int)anim->frameRate;
 		Trigger::Map::iterator triggerIt = triggers.find(anim->firstFrame);
 
@@ -224,15 +224,15 @@ bool BSPBuilder::EmitCinematic(const Map &map, const String &name)
 	for (Actor::Vec::iterator it = m_actors.begin(); it != m_actors.end(); ++it)
 	{
 		Actor &actor = *it;
-		const Map::TriModel::Ref &model = world->models[actor.index];
-		Map::AnimMap::const_iterator animIt = model->anims.find(name);
+		const SceneFile::TriModel::Ref &model = world->models[actor.index];
+		SceneFile::AnimMap::const_iterator animIt = model->anims.find(name);
 		if (animIt == model->anims.end())
 			continue;
 		
 		if (!EmitActor(map, actor))
 			return false;
 
-		const Map::Anim::Ref &anim = animIt->second;
+		const SceneFile::Anim::Ref &anim = animIt->second;
 		fps = (int)anim->frameRate;
 		Trigger::Map::iterator triggerIt = triggers.find(anim->firstFrame);
 
@@ -278,10 +278,10 @@ bool BSPBuilder::EmitCinematic(const Map &map, const String &name)
 
 		if (trigger.camera > -1)
 		{ // emit camera track
-			const Map::Camera::Ref &camera = map.cameras[trigger.camera];
-			Map::AnimMap::const_iterator animIt = camera->anims.find(name);
+			const SceneFile::Camera::Ref &camera = map.cameras[trigger.camera];
+			SceneFile::AnimMap::const_iterator animIt = camera->anims.find(name);
 			RAD_VERIFY(animIt != camera->anims.end());
-			const Map::Anim::Ref &anim = animIt->second;
+			const SceneFile::Anim::Ref &anim = animIt->second;
 
 			bspTrigger->camera = (int)m_bspFile->numCameraTracks.get();
 			world::bsp_file::BSPCameraTrack *track = m_bspFile->AddCameraTrack();
@@ -292,9 +292,9 @@ bool BSPBuilder::EmitCinematic(const Map &map, const String &name)
 
 			m_bspFile->ReserveCameraTMs((int)anim->frames.size());
 
-			for (Map::BoneFrames::const_iterator it = anim->frames.begin(); it != anim->frames.end(); ++it)
+			for (SceneFile::BoneFrames::const_iterator it = anim->frames.begin(); it != anim->frames.end(); ++it)
 			{
-				const Map::BonePoseVec &pose = *it;
+				const SceneFile::BonePoseVec &pose = *it;
 				RAD_VERIFY(pose.size() == 1);
 				world::bsp_file::BSPCameraTM *tm = m_bspFile->AddCameraTM();
 
@@ -338,7 +338,7 @@ bool BSPBuilder::EmitCinematic(const Map &map, const String &name)
 	return true;
 }
 
-bool BSPBuilder::EmitActor(const Map &map, Actor &actor)
+bool BSPBuilder::EmitActor(const SceneFile &map, Actor &actor)
 {
 	if (actor.emitId > -1)
 		return true;
@@ -378,7 +378,7 @@ bool BSPBuilder::EmitActor(const Map &map, Actor &actor)
 	return true;
 }
 
-void BSPBuilder::EmitEntity(const Map::Entity::Ref &entity)
+void BSPBuilder::EmitEntity(const SceneFile::Entity::Ref &entity)
 {
 	world::bsp_file::BSPEntity *bspEntity = m_bspFile->AddEntity();
 	bspEntity->firstString = m_bspFile->numStrings;
@@ -391,7 +391,7 @@ void BSPBuilder::EmitEntity(const Map::Entity::Ref &entity)
 	}
 }
 
-void BSPBuilder::BuildBSP(const Map &map)
+void BSPBuilder::BuildBSP(const SceneFile &map)
 {
 	m_numNodes = 1;
 	m_numLeafs = 0;
@@ -528,20 +528,20 @@ void BSPBuilder::BoxTree(const Node::Ref &node, int planebits)
 	BoxTree(back, planebits);
 }
 
-BBox BSPBuilder::FindBounds(const Map &map)
+BBox BSPBuilder::FindBounds(const SceneFile &map)
 {
 	BBox bounds;
 	bounds.Initialize();
 
-	for (Map::TriModel::Vec::const_iterator it = map.worldspawn->models.begin(); it != map.worldspawn->models.end(); ++it)
+	for (SceneFile::TriModel::Vec::const_iterator it = map.worldspawn->models.begin(); it != map.worldspawn->models.end(); ++it)
 	{
-		const Map::TriModel::Ref &src = *it;
+		const SceneFile::TriModel::Ref &src = *it;
 		if (src->cinematic)
 			continue; // not here
 
-		for (Map::TriFaceVec::const_iterator it = src->tris.begin(); it != src->tris.end(); ++it)
+		for (SceneFile::TriFaceVec::const_iterator it = src->tris.begin(); it != src->tris.end(); ++it)
 		{
-			const Map::TriFace &tri = *it;
+			const SceneFile::TriFace &tri = *it;
 			if (tri.mat < 0)
 				continue;
 
@@ -604,21 +604,21 @@ BSPBuilder::Node::Ref BSPBuilder::FindBoundingNode(const Node::Ref &node, const 
 	return node;
 }
 
-void BSPBuilder::InsertEntModels(const Node::Ref &root, const Map::Entity::Ref &entity)
+void BSPBuilder::InsertEntModels(const Node::Ref &root, const SceneFile::Entity::Ref &entity)
 {
 	NodeTri nodeTri;
 
-	for (Map::TriModel::Vec::const_iterator it = entity->models.begin(); it != entity->models.end(); ++it)
+	for (SceneFile::TriModel::Vec::const_iterator it = entity->models.begin(); it != entity->models.end(); ++it)
 	{
-		const Map::TriModel::Ref &src = *it;
+		const SceneFile::TriModel::Ref &src = *it;
 		if (src->cinematic)
 			continue; // not here
 
 		Node::Ref node = FindBoundingNode(root, src->bounds);
 				
-		for (Map::TriFaceVec::const_iterator it = src->tris.begin(); it != src->tris.end(); ++it)
+		for (SceneFile::TriFaceVec::const_iterator it = src->tris.begin(); it != src->tris.end(); ++it)
 		{
-			const Map::TriFace &tri = *it;
+			const SceneFile::TriFace &tri = *it;
 			if (tri.mat < 0)
 				continue;
 
@@ -933,25 +933,6 @@ void BSPBuilder::EmitModel(const TriModel &model)
 		RAD_ASSERT(*it < std::numeric_limits<U16>::max());
 		*m_bspFile->AddIndex() = (U16)*it;
 	}
-}
-
-Vec3 RandomColor()
-{
-	static Vec3Vec s_colors;
-	if (s_colors.empty())
-	{
-		for (int i = 0; i < 256; ++i)
-		{
-			s_colors.push_back(
-				Vec3(
-					Vec3::ValueType((((rand() & 0xf) + 1) & 0xf) / 16.0),
-					Vec3::ValueType((((rand() & 0xf) + 1) & 0xf) / 16.0),
-					Vec3::ValueType((((rand() & 0xf) + 1) & 0xf) / 16.0)
-				)
-			);
-		}
-	}
-	return s_colors[rand() & 0xff];
 }
 
 } // box_bsp

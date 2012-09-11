@@ -13,10 +13,9 @@
 namespace world {
 namespace bsp_file {
 
-enum 
-{ 
-	BspTag = RAD_FOURCC('b', 's', 'p', 't'),
-	BspId  = 0x43225561
+enum  { 
+	kBspTag = RAD_FOURCC('b', 's', 'p', 't'),
+	kBspVersion  = 0x1
 };
 
 RAD_ZONE_DEF(RADENG_API, ZBSPFile, "BSPFile", ZWorld);
@@ -56,8 +55,7 @@ m_numActors(0),
 m_numCameraTMs(0),
 m_numCameraTracks(0),
 m_numCinematicTriggers(0),
-m_numCinematics(0)
-{
+m_numCinematics(0) {
 }
 
 BSPFileParser::~BSPFileParser()
@@ -70,8 +68,7 @@ BSPFileParser::~BSPFileParser()
 
 #define CHECK_SIZE(_size) if (((bytes+(_size))-reinterpret_cast<const U8*>(data)) > (int)len) return pkg::SR_CorruptFile
 
-int BSPFileParser::Parse(const void *data, AddrSize len)
-{
+int BSPFileParser::Parse(const void *data, AddrSize len) {
 	// Read header
 	const U8 *bytes = reinterpret_cast<const U8*>(data);
 	CHECK_SIZE(sizeof(U32)*20);
@@ -83,7 +80,7 @@ int BSPFileParser::Parse(const void *data, AddrSize len)
 	bytes += sizeof(U32)*2;
 
 	U32 numChannels = *reinterpret_cast<const U32*>(bytes);
-	if (numChannels > MaxUVChannels)
+	if (numChannels > kMaxUVChannels)
 		return pkg::SR_InvalidFormat;
 
 	bytes += sizeof(U32);
@@ -170,8 +167,7 @@ int BSPFileParser::Parse(const void *data, AddrSize len)
 	m_skas = new (ZBSPFile) ska::DSka[m_numSkas];
 	m_skms = new (ZBSPFile) ska::DSkm[m_numSkas];
 
-	for (U32 i = 0; i < m_numSkas; ++i)
-	{
+	for (U32 i = 0; i < m_numSkas; ++i) {
 		AddrSize sizes[3];
 		const void *ptr[2];
 
@@ -209,8 +205,7 @@ int BSPFileParser::Parse(const void *data, AddrSize len)
 	int ofs = 0;
 	m_stringOfs.reserve(m_numStrings);
 
-	for (U32 i = 0; i < m_numStrings; ++i)
-	{
+	for (U32 i = 0; i < m_numStrings; ++i) {
 		CHECK_SIZE(sizeof(U16));
 		U16 strLen = *reinterpret_cast<const U16*>(bytes);
 		CHECK_SIZE(sizeof(U16)+strLen);
@@ -229,11 +224,10 @@ RAD_ZONE_DEF(RADENG_API, ZBSPBuilder, "BSPBuilder", ZTools);
 
 // NOTE: make support endianess someday
 
-int BSPFileBuilder::Write(stream::OutputStream &os)
-{
+int BSPFileBuilder::Write(stream::OutputStream &os) {
 	// header
-	os << (U32)BspTag << (U32) BspId;
-	os << (U32)MaxUVChannels;
+	os << (U32)kBspTag << (U32) kBspVersion;
+	os << (U32)kMaxUVChannels;
 	os << (U32)m_strings.size();
 	os << (U32)m_mats.size();
 	os << (U32)m_ents.size();
@@ -276,8 +270,7 @@ int BSPFileBuilder::Write(stream::OutputStream &os)
 	len = (stream::SPos)(sizeof(U16)*m_indices.size());
 	if (len && os.Write(&m_indices[0], len, 0) != len)
 		return pkg::SR_IOError;
-	if (m_indices.size()&1)
-	{
+	if (m_indices.size()&1) {
 		if (!os.Write((U16)0))
 			return pkg::SR_IOError;
 	}
@@ -302,8 +295,7 @@ int BSPFileBuilder::Write(stream::OutputStream &os)
 		return pkg::SR_IOError;
 
 	// skas
-	for (size_t i = 0; i < m_skas.size(); ++i)
-	{
+	for (size_t i = 0; i < m_skas.size(); ++i) {
 		const tools::SkaData::Ref &skad = m_skas[i];
 		const tools::SkmData::Ref &skmd = m_skms[i];
 
@@ -320,8 +312,7 @@ int BSPFileBuilder::Write(stream::OutputStream &os)
 			return pkg::SR_IOError;
 
 		len = os.OutPos();
-		if (!IsAligned(len, SIMDDriver::Alignment))
-		{
+		if (!IsAligned(len, SIMDDriver::Alignment)) {
 			U8 padd[SIMDDriver::Alignment-1];
 			len = (SIMDDriver::Alignment) - (len & (SIMDDriver::Alignment-1));
 			if (os.Write(padd, len, 0) != len)
@@ -333,8 +324,7 @@ int BSPFileBuilder::Write(stream::OutputStream &os)
 	}
 
 	// string table.
-	for (size_t i = 0; i < m_strings.size(); ++i)
-	{
+	for (size_t i = 0; i < m_strings.size(); ++i) {
 		if (!os.Write((U16)(m_strings[i].length+1)))
 			return pkg::SR_IOError;
 		if (os.Write(m_strings[i].c_str.get(), (stream::SPos)(m_strings[i].length+1), 0) != (stream::SPos)(m_strings[i].length+1))

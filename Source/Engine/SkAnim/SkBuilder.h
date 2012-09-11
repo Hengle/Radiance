@@ -6,7 +6,7 @@
 #pragma once
 
 #include "../Types.h"
-#include "../Tools/MaxScene.h"
+#include "../Tools/SceneFile.h"
 #include "SkAnim.h"
 #include <Runtime/PushPack.h>
 
@@ -42,19 +42,19 @@ struct SkmData
 
 RADENG_API SkaData::Ref RADENG_CALL CompileSkaData(
 	const char *name,
-	const MapVec &anims,
+	const SceneFileVec &anims,
 	int trimodel
 );
 
 RADENG_API SkaData::Ref RADENG_CALL CompileSkaData(
 	const char *name,
-	const Map &anims,
+	const SceneFile &anims,
 	int trimodel
 );
 
 RADENG_API SkmData::Ref RADENG_CALL CompileSkmData(
 	const char *name, 
-	const Map &map, 
+	const SceneFile &meshes, 
 	int trimodel,
 	ska::SkinType skinType,
 	const ska::DSka &ska

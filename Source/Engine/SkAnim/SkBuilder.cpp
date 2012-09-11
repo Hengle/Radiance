@@ -22,7 +22,7 @@
 #undef min
 #undef max
 
-BOOST_STATIC_ASSERT((int)ska::MaxUVChannels <= (int)tools::Map::MaxUVChannels);
+BOOST_STATIC_ASSERT((int)ska::MaxUVChannels <= (int)tools::SceneFile::kMaxUVChannels);
 
 namespace tools {
 
@@ -45,8 +45,8 @@ public:
 	SkaBuilder();
 	~SkaBuilder();
 
-	bool Compile(const char *name, const MapVec &map, int trimodel, SkaData &sk);
-	bool Compile(const char *name, const Map &map, int trimodel, SkaData &sk);
+	bool Compile(const char *name, const SceneFileVec &map, int trimodel, SkaData &sk);
+	bool Compile(const char *name, const SceneFile &map, int trimodel, SkaData &sk);
 
 private:
 
@@ -94,7 +94,7 @@ private:
 
 	void EndAnim();
 
-	static bool EmitBones(const char *name, int idx, int parent, BoneMap::Vec &map, BoneDef::Vec &bones, const Map::BoneVec &skel);
+	static bool EmitBones(const char *name, int idx, int parent, BoneMap::Vec &map, BoneDef::Vec &bones, const SceneFile::BoneVec &skel);
 
 	BoneDef::Vec m_bones;
 	Anim::Vec m_anims;
@@ -110,10 +110,10 @@ SkaBuilder::~SkaBuilder()
 {
 }
 
-bool SkaBuilder::EmitBones(const char *name, int idx, int parent, BoneMap::Vec &map, BoneDef::Vec &bones, const Map::BoneVec &skel)
+bool SkaBuilder::EmitBones(const char *name, int idx, int parent, BoneMap::Vec &map, BoneDef::Vec &bones, const SceneFile::BoneVec &skel)
 {
 	BoneMap &bm = map[idx];
-	const Map::Bone &mb = skel[idx];
+	const SceneFile::Bone &mb = skel[idx];
 
 	if (bm.idx > -1)
 	{
@@ -139,15 +139,15 @@ bool SkaBuilder::EmitBones(const char *name, int idx, int parent, BoneMap::Vec &
 	return true;
 }
 
-bool SkaBuilder::Compile(const char *name, const MapVec &maps, int trimodel, SkaData &sk)
+bool SkaBuilder::Compile(const char *name, const SceneFileVec &maps, int trimodel, SkaData &sk)
 {
 	RAD_ASSERT(maps.size() == 1 || trimodel == 0);
 
-	Map::Entity::Ref e = maps[0]->worldspawn;
+	SceneFile::Entity::Ref e = maps[0]->worldspawn;
 	if (e->models[trimodel]->skel < 0)
 		return false;
 
-	const Map::Skel &skel = *e->skels[e->models[trimodel]->skel];
+	const SceneFile::Skel &skel = *e->skels[e->models[trimodel]->skel];
 
 	// apply constraint: bones[boneidx].parent < boneidx
 	// since we do not walk the bone heirarchy in max from
@@ -160,7 +160,7 @@ bool SkaBuilder::Compile(const char *name, const MapVec &maps, int trimodel, Ska
 
 	for (int i = 0; i < (int)skel.bones.size(); ++i)
 	{
-		const Map::Bone &b = skel.bones[i];
+		const SceneFile::Bone &b = skel.bones[i];
 		bmap[i].idx = -1;
 
 		if (b.parent >= 0)
@@ -207,13 +207,13 @@ bool SkaBuilder::Compile(const char *name, const MapVec &maps, int trimodel, Ska
 	{
 		badList[i] = true;
 
-		Map::Entity::Ref e = maps[i]->worldspawn;
+		SceneFile::Entity::Ref e = maps[i]->worldspawn;
 		if (e->models[0]->skel < 0)
 		{
 			COut(C_Error) << "BuildAnimData(\"" << name << "\"): anim file " << i << " is missing skel data (skipping)!" << std::endl;
 			continue;
 		}
-		const Map::Skel &otherSkel = *e->skels[e->models[0]->skel];
+		const SceneFile::Skel &otherSkel = *e->skels[e->models[0]->skel];
 		if (otherSkel.bones.size() != skel.bones.size())
 		{
 			COut(C_Error) << "BuildAnimData(\"" << name << "\"): anim file " << i << " has mismatched skel (code 1, skipping)!" << std::endl;
@@ -243,11 +243,11 @@ bool SkaBuilder::Compile(const char *name, const MapVec &maps, int trimodel, Ska
 		if (badList[i])
 			continue;
 
-		const Map::TriModel::Ref &m = maps[i]->worldspawn->models[trimodel];
+		const SceneFile::TriModel::Ref &m = maps[i]->worldspawn->models[trimodel];
 
-		for (Map::AnimMap::const_iterator it = m->anims.begin(); it != m->anims.end(); ++it)
+		for (SceneFile::AnimMap::const_iterator it = m->anims.begin(); it != m->anims.end(); ++it)
 		{
-			const Map::Anim &anim = *(it->second.get());
+			const SceneFile::Anim &anim = *(it->second.get());
 			if (anim.frames.empty())
 				continue;
 
@@ -261,9 +261,9 @@ bool SkaBuilder::Compile(const char *name, const MapVec &maps, int trimodel, Ska
 			BoneTMVec tms;
 			tms.resize(skel.bones.size());
 
-			for (Map::BoneFrames::const_iterator it = anim.frames.begin(); it != anim.frames.end(); ++it)
+			for (SceneFile::BoneFrames::const_iterator it = anim.frames.begin(); it != anim.frames.end(); ++it)
 			{
-				const Map::BonePoseVec &frame = *it;
+				const SceneFile::BonePoseVec &frame = *it;
 
 				// TODO: dynamic remap bones by name, would be pretty 
 				// useful to decouple animation from a skeleton.
@@ -275,9 +275,9 @@ bool SkaBuilder::Compile(const char *name, const MapVec &maps, int trimodel, Ska
 					return false;
 				}
 
-				for (Map::BonePoseVec::const_iterator it = frame.begin(); it != frame.end(); ++it)
+				for (SceneFile::BonePoseVec::const_iterator it = frame.begin(); it != frame.end(); ++it)
 				{
-					const Map::BonePose &mtm = *it;
+					const SceneFile::BonePose &mtm = *it;
 					BoneTM &tm = tms[bmap[it-frame.begin()].idx];
 
 					tm.tm.r = mtm.m.r;
@@ -307,13 +307,13 @@ bool SkaBuilder::Compile(const char *name, const MapVec &maps, int trimodel, Ska
 	return true;
 }
 
-bool SkaBuilder::Compile(const char *name, const Map &map, int trimodel, SkaData &sk)
+bool SkaBuilder::Compile(const char *name, const SceneFile &map, int trimodel, SkaData &sk)
 {
-	Map::Entity::Ref e = map.worldspawn;
+	SceneFile::Entity::Ref e = map.worldspawn;
 	if (e->models[trimodel]->skel < 0)
 		return false;
 
-	const Map::Skel &skel = *e->skels[e->models[trimodel]->skel];
+	const SceneFile::Skel &skel = *e->skels[e->models[trimodel]->skel];
 
 	// apply constraint: bones[boneidx].parent < boneidx
 	// since we do not walk the bone heirarchy in max from
@@ -326,7 +326,7 @@ bool SkaBuilder::Compile(const char *name, const Map &map, int trimodel, SkaData
 
 	for (int i = 0; i < (int)skel.bones.size(); ++i)
 	{
-		const Map::Bone &b = skel.bones[i];
+		const SceneFile::Bone &b = skel.bones[i];
 		bmap[i].idx = -1;
 
 		if (b.parent >= 0)
@@ -365,11 +365,11 @@ bool SkaBuilder::Compile(const char *name, const Map &map, int trimodel, SkaData
 	SetBones(bones);
 
 
-	const Map::TriModel::Ref &m = map.worldspawn->models[trimodel];
+	const SceneFile::TriModel::Ref &m = map.worldspawn->models[trimodel];
 
-	for (Map::AnimMap::const_iterator it = m->anims.begin(); it != m->anims.end(); ++it)
+	for (SceneFile::AnimMap::const_iterator it = m->anims.begin(); it != m->anims.end(); ++it)
 	{
-		const Map::Anim &anim = *(it->second.get());
+		const SceneFile::Anim &anim = *(it->second.get());
 		if (anim.frames.empty())
 			continue;
 
@@ -383,9 +383,9 @@ bool SkaBuilder::Compile(const char *name, const Map &map, int trimodel, SkaData
 		BoneTMVec tms;
 		tms.resize(skel.bones.size());
 
-		for (Map::BoneFrames::const_iterator it = anim.frames.begin(); it != anim.frames.end(); ++it)
+		for (SceneFile::BoneFrames::const_iterator it = anim.frames.begin(); it != anim.frames.end(); ++it)
 		{
-			const Map::BonePoseVec &frame = *it;
+			const SceneFile::BonePoseVec &frame = *it;
 
 			// TODO: dynamic remap bones by name, would be pretty 
 			// useful to decouple animation from a skeleton.
@@ -397,9 +397,9 @@ bool SkaBuilder::Compile(const char *name, const Map &map, int trimodel, SkaData
 				return false;
 			}
 
-			for (Map::BonePoseVec::const_iterator it = frame.begin(); it != frame.end(); ++it)
+			for (SceneFile::BonePoseVec::const_iterator it = frame.begin(); it != frame.end(); ++it)
 			{
-				const Map::BonePose &mtm = *it;
+				const SceneFile::BonePose &mtm = *it;
 				BoneTM &tm = tms[bmap[it-frame.begin()].idx];
 
 				tm.tm.r = mtm.m.r;
@@ -974,7 +974,7 @@ void SkaBuilder::EndAnim()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-typedef Map::WeightedNormalTriVert TriVert;
+typedef SceneFile::WeightedNormalTriVert TriVert;
 typedef zone_vector<TriVert, ZToolsT>::type TriVertVec;
 typedef zone_map<TriVert, int, ZToolsT>::type TriVertMap;
 
@@ -1009,7 +1009,7 @@ struct SkTriModel
 	static TriVert CleanWeights(const TriVert &v)
 	{
 		TriVert z(v);
-		Map::BoneWeights w;
+		SceneFile::BoneWeights w;
 
 		// drop tiny weights
 		for (size_t i = 0; i < z.weights.size(); ++i)
@@ -1033,7 +1033,7 @@ struct SkTriModel
 				}
 			}
 
-			Map::BoneWeights x;
+			SceneFile::BoneWeights x;
 			x.swap(w);
 
 			for (size_t i = 0; i < x.size(); ++i)
@@ -1061,7 +1061,7 @@ struct SkTriModel
 
 		if (w.empty())
 		{
-			Map::BoneWeight x;
+			SceneFile::BoneWeight x;
 			x.bone = 0;
 			x.weight = 1.0f;
 			w.push_back(x);
@@ -1102,11 +1102,11 @@ struct SkTriModel
 		indices.push_back(VertIndex(mapIdx, ofs));
 	}
 
-	void AddTriangles(const Map::TriModel::Ref &m)
+	void AddTriangles(const SceneFile::TriModel::Ref &m)
 	{
-		for (Map::TriFaceVec::const_iterator it = m->tris.begin(); it != m->tris.end(); ++it)
+		for (SceneFile::TriFaceVec::const_iterator it = m->tris.begin(); it != m->tris.end(); ++it)
 		{
-			const Map::TriFace &tri = *it;
+			const SceneFile::TriFace &tri = *it;
 			if (tri.mat < 0)
 				continue;
 			if (tri.mat != mat)
@@ -1172,14 +1172,14 @@ struct SkTriModel
 	}
 };
 
-bool CompileCpuSkmData(const char *name, const Map &map, int trimodel, SkmData &sk, const ska::DSka &ska)
+bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, SkmData &sk, const ska::DSka &ska)
 {
 	SkTriModel::Ref m(new (ZTools) SkTriModel());
 	SkTriModel::Vec models;
 
-	Map::Entity::Ref e = map.worldspawn;
-	Map::TriModel::Ref r = e->models[trimodel];
-	const Map::Skel &skel = *e->skels[r->skel].get();
+	SceneFile::Entity::Ref e = map.worldspawn;
+	SceneFile::TriModel::Ref r = e->models[trimodel];
+	const SceneFile::Skel &skel = *e->skels[r->skel].get();
 
 	for (int i = 0; i < (int)map.mats.size(); ++i)
 	{
@@ -1385,7 +1385,7 @@ bool CompileCpuSkmData(const char *name, const Map &map, int trimodel, SkmData &
 
 RADENG_API SkaData::Ref RADENG_CALL CompileSkaData(
 	const char *name, 
-	const MapVec &anims,
+	const SceneFileVec &anims,
 	int trimodel
 )
 {
@@ -1404,7 +1404,7 @@ RADENG_API SkaData::Ref RADENG_CALL CompileSkaData(
 
 RADENG_API SkaData::Ref RADENG_CALL CompileSkaData(
 	const char *name, 
-	const Map &anims,
+	const SceneFile &anims,
 	int trimodel
 )
 {
@@ -1423,7 +1423,7 @@ RADENG_API SkaData::Ref RADENG_CALL CompileSkaData(
 
 RADENG_API SkmData::Ref RADENG_CALL CompileSkmData(
 	const char *name, 
-	const Map &map, 
+	const SceneFile &map, 
 	int trimodel,
 	ska::SkinType skinType,
 	const ska::DSka &ska

@@ -17,65 +17,53 @@
 namespace tools {
 
 MapBuilder::MapBuilder(Engine &engine)
-: m_e(engine)
-{
+: m_e(engine) {
 }
 
-MapBuilder::~MapBuilder()
-{
+MapBuilder::~MapBuilder() {
 }
 
-bool MapBuilder::LoadEntSpawn(const world::EntSpawn &spawn)
-{
+bool MapBuilder::LoadEntSpawn(const world::EntSpawn &spawn) {
 	const char *sz = spawn.keys.StringForKey("classname");
-	if (!sz)
-	{
+	if (!sz) {
 		COut(C_Error) << "ERROR: Entity missing classname." << std::endl;
 		return false;
 	}
 
 	String classname(sz);
 
-	if (classname == "worldspawn")
-	{
+	if (classname == "worldspawn") {
 		return ParseWorldSpawn(spawn);
-	}
-	else if (classname == "static_mesh_scene")
-	{
+	} else if (classname == "static_mesh_scene") {
 		return LoadScene(spawn);
 	}
 
 	return ParseEntity(spawn);
 }
 
-bool MapBuilder::Compile()
-{
+bool MapBuilder::Compile() {
 	return m_bspBuilder.Build(m_map);
 }
 
-bool MapBuilder::ParseWorldSpawn(const world::EntSpawn &spawn)
-{
+bool MapBuilder::ParseWorldSpawn(const world::EntSpawn &spawn) {
 	if (!m_map.worldspawn) // may be spawned by static_mesh_scene
-		m_map.worldspawn.reset(new (ZTools) Map::Entity());
+		m_map.worldspawn.reset(new (ZTools) SceneFile::Entity());
 	m_map.worldspawn->keys = spawn.keys;
 	return true;
 }
 
-bool MapBuilder::ParseEntity(const world::EntSpawn &spawn)
-{
-	Map::Entity::Ref entity(new (ZTools) Map::Entity());
+bool MapBuilder::ParseEntity(const world::EntSpawn &spawn) {
+	SceneFile::Entity::Ref entity(new (ZTools) SceneFile::Entity());
 	entity->keys = spawn.keys;
 	Vec3 org(spawn.keys.Vec3ForKey("origin"));
-	entity->origin = Map::Vec3(org.X(), org.Y(), org.Z());
+	entity->origin = SceneFile::Vec3(org.X(), org.Y(), org.Z());
 	m_map.ents.push_back(entity);
 	return true;
 }
 
-bool MapBuilder::LoadScene(const world::EntSpawn &spawn)
-{
+bool MapBuilder::LoadScene(const world::EntSpawn &spawn) {
 	const char *sz = spawn.keys.StringForKey("file");
-	if (!sz || !sz[0])
-	{
+	if (!sz || !sz[0]) {
 		COut(C_Error) << "ERROR: static_mesh_scene missing file key!" << std::endl;
 		return false;
 	}
@@ -84,15 +72,14 @@ bool MapBuilder::LoadScene(const world::EntSpawn &spawn)
 	path += ".3dx";
 
 	file::MMFileInputBuffer::Ref ib = m_e.sys->files->OpenInputBuffer(path.c_str, ZTools);
-	if (!ib)
-	{
+	if (!ib) {
 		COut(C_Error) << "ERROR: unable to open '" << sz << "'" << std::endl;
 		return false;
 	}
 
 	stream::InputStream is(*ib);
 
-	return LoadMaxScene(is, m_map, false);
+	return LoadSceneFile(is, m_map, false);
 }
 
 } // tools

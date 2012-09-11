@@ -157,6 +157,9 @@
     <Filter Include="Source\Engine\World\MapBuilder\BoxBSP">
       <UniqueIdentifier>{99a02863-d289-486b-8454-9c6fcddc1bfd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Engine\World\MapBuilder\SolidBSP">
+      <UniqueIdentifier>{77f088f1-1e9a-48da-a224-963f2d7e042f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Runtime\Base.h">
@@ -1167,12 +1170,6 @@
     <ClInclude Include="..\..\Engine\Sound\SoundDef.h">
       <Filter>Source\Engine\Sound</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\Map.h">
-      <Filter>Source\Engine\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\MaxScene.h">
-      <Filter>Source\Engine\Tools</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\Tools\Progress.h">
       <Filter>Source\Engine\Tools</Filter>
     </ClInclude>
@@ -1388,6 +1385,21 @@
     </ClInclude>
     <ClInclude Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorView.h">
       <Filter>Source\Engine\Tools\Editor\MapEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\World\MapBuilder\SolidBSP\MapTypes.h">
+      <Filter>Source\Engine\World\MapBuilder\SolidBSP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\World\MapBuilder\SolidBSP\PlaneHash.h">
+      <Filter>Source\Engine\World\MapBuilder\SolidBSP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSP.h">
+      <Filter>Source\Engine\World\MapBuilder\SolidBSP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\World\MapBuilder\SolidBSP\VecHash.h">
+      <Filter>Source\Engine\World\MapBuilder\SolidBSP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Tools\SceneFile.h">
+      <Filter>Source\Engine\Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1763,9 +1775,6 @@
     <ClCompile Include="..\..\Engine\Sound\Sound.cpp">
       <Filter>Source\Engine\Sound</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\Tools\MaxScene.cpp">
-      <Filter>Source\Engine\Tools</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Progress.cpp">
       <Filter>Source\Engine\Tools</Filter>
     </ClCompile>
@@ -2059,6 +2068,21 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentAssetThumbDimensionCache.cpp">
       <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSP.cpp">
+      <Filter>Source\Engine\World\MapBuilder\SolidBSP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\SceneFile.cpp">
+      <Filter>Source\Engine\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\Portals.cpp">
+      <Filter>Source\Engine\World\MapBuilder\SolidBSP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\Sectors.cpp">
+      <Filter>Source\Engine\World\MapBuilder\SolidBSP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\Flood.cpp">
+      <Filter>Source\Engine\World\MapBuilder\SolidBSP</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

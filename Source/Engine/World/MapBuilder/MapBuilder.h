@@ -8,16 +8,15 @@
 #include "../../Types.h"
 #include "../Entity.h"
 #include "../WorldDef.h"
-#include "BoxBSP/BoxBSP.h"
-#include "../../Tools/Map.h"
+#include "SolidBSP/SolidBSP.h"
+#include "../../Tools/SceneFile.h"
 #include <Runtime/PushPack.h>
 
 class Engine;
 
 namespace tools {
 
-class RADENG_CLASS MapBuilder
-{
+class RADENG_CLASS MapBuilder {
 public:
 	typedef boost::shared_ptr<MapBuilder> Ref;
 
@@ -39,9 +38,9 @@ private:
 	bool ParseEntity(const world::EntSpawn &spawn);
 	bool LoadScene(const world::EntSpawn &spawn);
 
-	Map m_map;
+	SceneFile m_map;
 	Engine &m_e;
-	box_bsp::BSPBuilder m_bspBuilder;
+	solid_bsp::BSPBuilder m_bspBuilder;
 };
 
 } // tools

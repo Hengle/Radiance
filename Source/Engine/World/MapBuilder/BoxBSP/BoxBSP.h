@@ -6,7 +6,7 @@
 #pragma once
 
 #include "../../../Types.h"
-#include "../../../Tools/Map.h"
+#include "../../../Tools/SceneFile.h"
 #include "../../BSPFile.h"
 #include "MapTypes.h"
 #include "VecHash.h"
@@ -24,10 +24,6 @@ namespace box_bsp {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Vec3 RandomColor();
-
-///////////////////////////////////////////////////////////////////////////////
-
 //#define BOXBSP_NORMALS
 
 class RADENG_CLASS BSPBuilder
@@ -38,7 +34,7 @@ public:
 	BSPBuilder();
 	~BSPBuilder();
 
-	bool Build(const Map &map);
+	bool Build(const SceneFile &map);
 
 	RAD_DECLARE_READONLY_PROPERTY(BSPBuilder, bspFile, world::bsp_file::BSPFile::Ref);
 	RAD_DECLARE_READONLY_PROPERTY(BSPBuilder, bspFileBuilder, world::bsp_file::BSPFileBuilder::Ref);
@@ -49,12 +45,12 @@ private:
 	RAD_DECLARE_GET(bspFileBuilder, world::bsp_file::BSPFileBuilder::Ref) { return m_bspFile; }
 
 #if defined(BOXBSP_NORMALS)
-	typedef Map::NormalTriVert Vert;
+	typedef SceneFile::NormalTriVert Vert;
 #else
-	typedef Map::TriVert Vert;
+	typedef SceneFile::TriVert Vert;
 #endif
 
-	typedef Map::TriVertVec VertVec;
+	typedef SceneFile::TriVertVec VertVec;
 
 	typedef zone_vector<int, world::bsp_file::ZBSPBuilderT>::type IntVec;
 	typedef zone_map<Vert, int, world::bsp_file::ZBSPBuilderT>::type VertMap;
@@ -122,19 +118,19 @@ private:
 		int emitId;
 	};
 
-	void EmitMaterials(const Map &map);
-	void EmitEntities(const Map &map);
-	bool EmitCinematics(const Map &map);
-	bool EmitCinematic(const Map &map, const String &name);
-	bool EmitActor(const Map &map, Actor &actor);
-	void EmitEntity(const Map::Entity::Ref &entity);
+	void EmitMaterials(const SceneFile &map);
+	void EmitEntities(const SceneFile &map);
+	bool EmitCinematics(const SceneFile &map);
+	bool EmitCinematic(const SceneFile &map, const String &name);
+	bool EmitActor(const SceneFile &map, Actor &actor);
+	void EmitEntity(const SceneFile::Entity::Ref &entity);
 
-	void BuildBSP(const Map &map);
-	BBox FindBounds(const Map &map);
+	void BuildBSP(const SceneFile &map);
+	BBox FindBounds(const SceneFile &map);
 	int SplitBounds(int axis, float distance, const BBox &bounds, BBox &front, BBox &back);
 	Node::Ref FindBoundingNode(const Node::Ref &node, const BBox &bounds);
 	void BoxTree(const Node::Ref &node, int planebits);
-	void InsertEntModels(const Node::Ref &root, const Map::Entity::Ref &entity);
+	void InsertEntModels(const Node::Ref &root, const SceneFile::Entity::Ref &entity);
 	void InsertModelTri(const Node::Ref &node, const NodeTri &tri);
 	void BoundTree(const Node::Ref &node);
 	void OptimizeTree(Node::Ref &node);

@@ -823,17 +823,7 @@
     <ClInclude Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorRenderer.h" />
     <ClInclude Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorTypes.h" />
     <ClInclude Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorView.h" />
-    <ClInclude Include="..\..\Engine\Tools\Map.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Tools\MaxScene.h">
+    <ClInclude Include="..\..\Engine\Tools\SceneFile.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
@@ -939,6 +929,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\World\MapBuilder\SolidBSP\MapTypes.h" />
+    <ClInclude Include="..\..\Engine\World\MapBuilder\SolidBSP\PlaneHash.h" />
+    <ClInclude Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSP.h" />
+    <ClInclude Include="..\..\Engine\World\MapBuilder\SolidBSP\VecHash.h" />
     <ClInclude Include="..\..\Engine\World\MBatchDraw.h" />
     <ClInclude Include="..\..\Engine\World\PostProcess.h" />
     <ClInclude Include="..\..\Engine\World\ScreenOverlay.h" />
@@ -1937,7 +1931,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\Tools\MaxScene.cpp">
+    <ClCompile Include="..\..\Engine\Tools\SceneFile.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
@@ -2008,6 +2002,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\Flood.cpp" />
+    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\Portals.cpp" />
+    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\Sectors.cpp" />
+    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSP.cpp" />
     <ClCompile Include="..\..\Engine\World\MT_Fly.cpp" />
     <ClCompile Include="..\..\Engine\World\MT_Spline.cpp" />
     <ClCompile Include="..\..\Engine\World\PostProcess.cpp" />

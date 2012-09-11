@@ -6,17 +6,17 @@
 namespace tools {
 namespace box_bsp {
 
-typedef Map::ValueType ValueType;
-typedef Map::Plane Plane;
-typedef Map::Vec2  Vec2;
-typedef Map::Vec3  Vec3;
-typedef Map::Vec4  Vec4;
-typedef Map::Mat4 Mat4;
-typedef Map::Quat Quat;
-typedef Map::Winding Winding;
-typedef Map::BBox BBox;
+typedef SceneFile::ValueType ValueType;
+typedef SceneFile::Plane Plane;
+typedef SceneFile::Vec2  Vec2;
+typedef SceneFile::Vec3  Vec3;
+typedef SceneFile::Vec4  Vec4;
+typedef SceneFile::Mat4 Mat4;
+typedef SceneFile::Quat Quat;
+typedef SceneFile::Winding Winding;
+typedef SceneFile::BBox BBox;
 
-typedef Map::Vec3Vec Vec3Vec;
+typedef SceneFile::Vec3Vec Vec3Vec;
 
 } // box_bsp
 } // tools
