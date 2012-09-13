@@ -93,7 +93,7 @@ int DMeshBundle::Parse(const void *data, AddrSize len)
 namespace tools {
 namespace {
 
-typedef Map::NormalTriVert TriVert;
+typedef SceneFile::NormalTriVert TriVert;
 typedef zone_vector<TriVert, ZToolsT>::type TriVertVec;
 typedef zone_map<TriVert, int, ZToolsT>::type TriVertMap;
 typedef zone_vector<String, ZToolsT>::type StringVec;
@@ -132,7 +132,7 @@ struct TriModel
 
 bool DoCompileMeshBundle(
 	const char *name,
-	const MapVec &maps,
+	const SceneFileVec &maps,
 	DMeshBundleData::Ref &bundle
 )
 {
@@ -142,9 +142,9 @@ bool DoCompileMeshBundle(
 	StringVec mats;
 
 	// gather materials
-	for (MapVec::const_iterator it = maps.begin(); it != maps.end(); ++it)
+	for (SceneFileVec::const_iterator it = maps.begin(); it != maps.end(); ++it)
 	{
-		const Map &map = (*(*it));
+		const SceneFile &map = (*(*it));
 
 		for (int i = 0; i < (int)map.mats.size(); ++i)
 		{
@@ -166,20 +166,20 @@ bool DoCompileMeshBundle(
 			m->mat = i;
 			m->numChannels = c;
 			
-			for (MapVec::const_iterator it = maps.begin(); it != maps.end(); ++it)
+			for (SceneFileVec::const_iterator it = maps.begin(); it != maps.end(); ++it)
 			{
-				const Map &map = (*(*it));
-				const Map::Entity::Ref &e = map.worldspawn;
+				const SceneFile &map = (*(*it));
+				const SceneFile::Entity::Ref &e = map.worldspawn;
 
-				for (Map::TriModel::Vec::const_iterator it = e->models.begin(); it != e->models.end(); ++it)
+				for (SceneFile::TriModel::Vec::const_iterator it = e->models.begin(); it != e->models.end(); ++it)
 				{
-					const Map::TriModel::Ref &src = *it;
+					const SceneFile::TriModel::Ref &src = *it;
 					if (src->numChannels != c)
 						continue;
 					
-					for (Map::TriFaceVec::const_iterator it = src->tris.begin(); it != src->tris.end(); ++it)
+					for (SceneFile::TriFaceVec::const_iterator it = src->tris.begin(); it != src->tris.end(); ++it)
 					{
-						const Map::TriFace &tri = *it;
+						const SceneFile::TriFace &tri = *it;
 						if (tri.mat < 0)
 							continue;
 						int mat = matMap[String(map.mats[tri.mat].name)];
@@ -314,7 +314,7 @@ DMeshBundleData::~DMeshBundleData()
 
 RADENG_API DMeshBundleData::Ref RADENG_CALL CompileMeshBundle(
 	const char *name,
-	const tools::MapVec &maps
+	const tools::SceneFileVec &maps
 )
 {
 	DMeshBundleData::Ref bundle(new (ZTools) DMeshBundleData());

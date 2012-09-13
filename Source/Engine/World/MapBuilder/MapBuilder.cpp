@@ -1,7 +1,9 @@
-// MapBuilder.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file MapBuilder.cpp
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup map_builder
+*/
 
 #include RADPCH
 
@@ -9,23 +11,43 @@
 
 #include "MapBuilder.h"
 #include "../World.h"
-#include "../../Tools/MaxScene.h"
+#include "../../Tools/SceneFile.h"
 #include "../../COut.h"
 #include "../../Engine.h"
+#include "../../Packages/PackagesDef.h"
 #include <Runtime/Stream.h>
+
+using namespace pkg;
 
 namespace tools {
 
 MapBuilder::MapBuilder(Engine &engine)
-: m_e(engine) {
+: m_e(engine), m_ui(0), m_debugUI(0), m_result(SR_Success), m_compiling(false) {
 }
 
 MapBuilder::~MapBuilder() {
 }
 
+void MapBuilder::SetProgressIndicator(UIProgress &ui) {
+	m_ui = &ui;
+}
+
+void MapBuilder::SetDebugUI(MapBuilderDebugUI &ui) {
+	m_debugUI = &ui;
+}
+
+void MapBuilder::DebugDraw(float time, float dt) {
+	m_bspBuilder.DebugDraw(time, dt);
+}
+
+void MapBuilder::OnDebugMenu(const QVariant &data) {
+	m_bspBuilder.OnDebugMenu(data);
+}
+
 bool MapBuilder::LoadEntSpawn(const world::EntSpawn &spawn) {
 	const char *sz = spawn.keys.StringForKey("classname");
 	if (!sz) {
+		m_result = SR_ParseError;
 		COut(C_Error) << "ERROR: Entity missing classname." << std::endl;
 		return false;
 	}
@@ -33,16 +55,31 @@ bool MapBuilder::LoadEntSpawn(const world::EntSpawn &spawn) {
 	String classname(sz);
 
 	if (classname == "worldspawn") {
+		m_result = SR_Success;
 		return ParseWorldSpawn(spawn);
 	} else if (classname == "static_mesh_scene") {
-		return LoadScene(spawn);
+		m_spawn = spawn;
+		m_result = SR_Pending;
+		Run();
+		return true;
 	}
 
+	m_result = SR_Success;
 	return ParseEntity(spawn);
 }
 
-bool MapBuilder::Compile() {
-	return m_bspBuilder.Build(m_map);
+bool MapBuilder::SpawnCompile() {
+	RAD_ASSERT(Thread::exited);
+	m_compiling = true;
+	return m_bspBuilder.SpawnCompile(m_map, m_ui, m_debugUI, &COut(C_Debug));
+}
+
+void MapBuilder::WaitForCompletion() {
+	if (m_compiling) {
+		m_bspBuilder.WaitForCompletion();
+	} else {
+		Join();
+	}
 }
 
 bool MapBuilder::ParseWorldSpawn(const world::EntSpawn &spawn) {
@@ -73,13 +110,37 @@ bool MapBuilder::LoadScene(const world::EntSpawn &spawn) {
 
 	file::MMFileInputBuffer::Ref ib = m_e.sys->files->OpenInputBuffer(path.c_str, ZTools);
 	if (!ib) {
-		COut(C_Error) << "ERROR: unable to open '" << sz << "'" << std::endl;
+		COut(C_Error) << "ERROR: unable to open '" << path << "'" << std::endl;
 		return false;
 	}
 
-	stream::InputStream is(*ib);
+	if (m_ui) {
+		String title(CStr("Loading Scene '") + path + CStr("'"));
+		m_ui->title = title.c_str;
+	}
 
-	return LoadSceneFile(is, m_map, false);
+	stream::InputStream is(*ib);
+	return LoadSceneFile(is, m_map, true, m_ui);
+}
+
+int MapBuilder::ThreadProc() {
+	if (LoadScene(m_spawn)) {
+		m_result = SR_Success;
+	} else {
+		m_result = SR_ParseError;
+	}
+
+	return 0;
+}
+
+int MapBuilder::RAD_IMPLEMENT_GET(result) {
+	if (m_compiling)
+		return m_bspBuilder.result;
+	if (Thread::exited) {
+		Join();
+		return m_result;
+	}
+	return SR_Pending;
 }
 
 } // tools

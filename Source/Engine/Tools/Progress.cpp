@@ -13,15 +13,13 @@ namespace tools {
 
 RADENG_API NullUIProgress_t NullUIProgress;
 
-boost::thread_specific_ptr<UIProgress::UIStringBuf> UIProgress::s_uiStringBufPtr[S_Max];
-boost::thread_specific_ptr<std::ostream> UIProgress::s_ostreamPtr[S_Max];
+boost::thread_specific_ptr<UIProgress::UIStringBuf> UIProgress::s_uiStringBufPtr[C_Max];
+boost::thread_specific_ptr<std::ostream> UIProgress::s_ostreamPtr[C_Max];
 
-std::ostream &UIProgress::Out(Severity s)
-{
-	RAD_ASSERT(s >= 0 && s < S_Max);
+std::ostream &UIProgress::Out(COutLevel s) {
+	RAD_ASSERT(s >= 0 && s < C_Max);
 
-	if (s_ostreamPtr[s].get() == 0)
-	{
+	if (s_ostreamPtr[s].get() == 0) {
 		RAD_ASSERT(s_uiStringBufPtr[s].get() == 0);
 		s_uiStringBufPtr[s].reset(new UIStringBuf(*this, s));
 		s_ostreamPtr[s].reset(new std::ostream(s_uiStringBufPtr[s].get()));

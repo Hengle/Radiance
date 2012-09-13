@@ -9,6 +9,7 @@
 
 #include "../Types.h"
 #include "../World/Keys.h"
+#include "Progress.h"
 #include <Runtime/Math/Math.h>
 #include <Runtime/Math/Vector.h>
 #include <Runtime/Math/Plane.h>
@@ -605,7 +606,14 @@ public:
 		typedef boost::shared_ptr<TriModel> Ref;
 		typedef typename zone_vector<Ref, Z3DXT>::type Vec;
 
-		TriModel() : contents(0), outside(true), cinematic(false), hideUntilRef(false), hideWhenDone(false) {}
+		TriModel() : 
+			contents(0), 
+			ignore(false),
+			outside(true), 
+			cinematic(false), 
+			hideUntilRef(false), 
+			hideWhenDone(false) {
+		}
 
 		TriVertVec verts;
 		TriFaceVec tris;
@@ -617,6 +625,7 @@ public:
 		int skel;
 		int contents;
 		int numChannels;
+		bool ignore;
 		bool outside;
 		bool cinematic;
 		bool hideUntilRef;
@@ -671,6 +680,6 @@ typedef SceneFileT<double> SceneFileD;
 typedef boost::shared_ptr<SceneFile> SceneFileRef;
 typedef zone_vector<SceneFileRef, Z3DXT>::type SceneFileVec;
 
-bool LoadSceneFile(stream::InputStream &stream, SceneFile &map, bool smooth);
+bool LoadSceneFile(stream::InputStream &stream, SceneFile &map, bool smooth, UIProgress *ui = 0);
 
 } // tools

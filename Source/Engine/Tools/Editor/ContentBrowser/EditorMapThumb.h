@@ -21,12 +21,12 @@ public:
 private slots:
 
 	void Play();
-	void Edit();
+	void Debug();
 
 private:
 
 	void Play(const pkg::Package::Entry::Ref &entry);
-	void Edit(const pkg::Package::Entry::Ref &entry);
+	void Debug(const pkg::Package::Entry::Ref &entry);
 
 };
 

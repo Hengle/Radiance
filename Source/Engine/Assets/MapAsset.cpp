@@ -20,6 +20,10 @@ using namespace pkg;
 namespace asset {
 
 MapAsset::MapAsset() : m_game(0), m_slot(0), m_spawning(false) {
+#if defined(RAD_OPT_TOOLS)
+	m_ui = 0;
+	m_debugUI = 0;
+#endif
 }
 
 MapAsset::~MapAsset() {
@@ -34,6 +38,7 @@ int MapAsset::Process(
 	if (flags&P_Unload) {
 #if defined(RAD_OPT_TOOLS)
 		m_mapBuilder.reset();
+		m_parser.reset();
 #endif
 		m_bspFile.reset();
 		m_bspData.reset();
@@ -45,10 +50,8 @@ int MapAsset::Process(
 	if (!(flags&P_Load))
 		return SR_Success;
 
-	RAD_ASSERT(m_game);
-
 #if defined(RAD_OPT_TOOLS)
-	if (!asset->cooked && !(flags&P_FastPath)) {
+	if (!asset->cooked && (!(flags&P_FastPath) || m_debugUI)) {
 		int r = SpawnTool(
 			time,
 			engine,
@@ -59,6 +62,7 @@ int MapAsset::Process(
 		if (r < SR_Success) {
 			m_world.reset();
 			m_mapBuilder.reset();
+			m_parser.reset();
 		}
 
 		return r;
@@ -142,6 +146,8 @@ int MapAsset::SpawnCooked(
 #endif
 	}
 
+	RAD_ASSERT(m_game);
+
 	SoundContext::Ref sound = SoundContext::New(App::Get()->engine->sys->alDriver);
 
 	m_world = world::World::New(*m_game, m_slot, sound, asset->zone);
@@ -160,75 +166,113 @@ int MapAsset::SpawnCooked(
 }
 
 #if defined(RAD_OPT_TOOLS)
+
+void MapAsset::SetProgressIndicator(tools::UIProgress &ui) {
+	m_ui = &ui;
+}
+
+void MapAsset::SetDebugUI(tools::MapBuilderDebugUI &ui) {
+	m_debugUI = &ui;
+}
+
+void MapAsset::DebugDraw(float time, float dt) {
+	if (m_mapBuilder)
+		m_mapBuilder->DebugDraw(time, dt);
+}
+
+void MapAsset::OnDebugMenu(const QVariant &data) {
+	if (m_mapBuilder)
+		m_mapBuilder->OnDebugMenu(data);
+}
+
 int MapAsset::SpawnTool(
 	const xtime::TimeSlice &time,
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
 ) {
-	if (m_world) {
-		if (m_spawning) {
-			RAD_ASSERT(m_mapBuilder);
-			
-			int r = m_world->Spawn(
-				asset->path,
-				m_mapBuilder->bspFile,
-				time,
-				flags
-			);
+	if (m_parser) {
 
-			if (r == SR_Success) {
-				m_mapBuilder.reset();
-				m_spawning = false;
+		int r = m_mapBuilder->result;
+		if (r != SR_Success)
+			return r;
+
+		world::EntSpawn spawn;
+		r = m_parser->ParseEntity(spawn);
+		if (r != SR_Success) {
+			if (r == MapParser::SR_End) {
+				r = SR_Pending;
+				m_parser.reset();
+				if (!m_mapBuilder->SpawnCompile())
+					return SR_ParseError;
+			}
+
+			return r;
+		}
+
+		if (!m_mapBuilder->LoadEntSpawn(spawn))
+			return SR_ParseError;
+		return SR_Pending;
+	}
+
+	if (m_mapBuilder) {
+
+		int r = m_mapBuilder->result;
+		if (r != SR_Success) {
+			if (r == SR_Pending) {
+				if (time.infinite)
+					m_mapBuilder->WaitForCompletion();
+			}
+		}
+				
+		return r;
+	}
+
+	m_mapBuilder.reset(new (ZTools) tools::MapBuilder(engine));
+
+	if (m_ui)
+		m_mapBuilder->SetProgressIndicator(*m_ui);
+	if (m_debugUI)
+		m_mapBuilder->SetDebugUI(*m_debugUI);
+
+	m_parser = MapParser::Cast(asset);
+	if (!m_parser)
+		return SR_ParseError;
+
+	for (;;) {
+		world::EntSpawn spawn;
+		int r = m_parser->ParseEntity(spawn);
+		if (r != SR_Success) {
+			if (r == MapParser::SR_End) {
+				m_parser.reset();
+				if (!m_mapBuilder->SpawnCompile())
+					return SR_ParseError;
+				return SR_Pending;
 			}
 			return r;
 		}
-		return SR_Success;
-	}
 
-	m_mapBuilder.reset(new ::tools::MapBuilder(engine));
-
-	// we don't do this inside any timeslice.
-	MapParser::Ref parser(MapParser::Cast(asset));
-	if (!parser)
-		return SR_ParseError;
-
-	world::EntSpawn spawn;
-	int r;
-	while ((r=parser->ParseEntity(spawn)) == SR_Success) {
 		if (!m_mapBuilder->LoadEntSpawn(spawn))
 			return SR_ParseError;
-	}
 
-	r = r == MapParser::SR_End ? SR_Success : r;
+		r = m_mapBuilder->result;
 
-	if (r == SR_Success) {
-		if (!m_mapBuilder->Compile())
-			return SR_CompilerError;
-
-		SoundContext::Ref sound = SoundContext::New(App::Get()->engine->sys->alDriver);
-
-		m_world = world::World::New(*m_game, m_slot, sound, asset->zone);
-
-		r = m_world->Init();
-		if (r < SR_Success)
-			return r;
-
-		r = m_world->Spawn(
-			asset->path,
-			m_mapBuilder->bspFile,
-			time,
-			flags
-		);
-		
-		if (r == SR_Success) {
-			m_mapBuilder.reset();
+		if (r != SR_Pending) {
+			if (r == SR_Success) {
+				if (!time.remaining)
+					return SR_Pending;
+				// else spawn next entity.
+			} else {
+				return r; // error code.
+			}
 		} else {
-			m_spawning = true;
+			if (!time.infinite)
+				return SR_Pending;
+			m_mapBuilder->WaitForCompletion();
 		}
 	}
 
-	return r;
+	return SR_Pending;
 }
 #endif
 

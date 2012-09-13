@@ -96,7 +96,7 @@ int MapCooker::Compile(int flags, int allflags) {
 	m_script.Bind(ib);
 	ib.reset();
 
-	::tools::MapBuilder mapBuilder(*engine.get());
+	tools::MapBuilder mapBuilder(*engine.get());
 
 	int r;
 	world::EntSpawn spawn;
@@ -124,8 +124,11 @@ int MapCooker::Compile(int flags, int allflags) {
 
 //	cout.get() << "Compiling..." << std::endl;
 
-	if (!mapBuilder.Compile())
+	if (!mapBuilder.SpawnCompile())
 		return SR_CompilerError;
+	mapBuilder.WaitForCompletion();
+	if (mapBuilder.result != SR_Success)
+		return mapBuilder.result;
 
 	String path(CStr(asset->path));
 	path += ".bsp";

@@ -1401,6 +1401,9 @@
     <ClInclude Include="..\..\Engine\Tools\SceneFile.h">
       <Filter>Source\Engine\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\World\MapBuilder\MapBuilderDebugUI.h">
+      <Filter>Source\Engine\World\MapBuilder</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2084,6 +2087,9 @@
     <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\Flood.cpp">
       <Filter>Source\Engine\World\MapBuilder\SolidBSP</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorBSPDebugWidget.cpp">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Runtime\Base\Event.inl">
@@ -2468,6 +2474,9 @@
     </QtMOC>
     <QtMOC Include="..\..\Engine\Tools\Editor\MapEditor\EditorMapEditorDatabase.h">
       <Filter>Source\Engine\Tools\Editor\MapEditor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorBSPDebugWidget.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
     </QtMOC>
   </ItemGroup>
 </Project>

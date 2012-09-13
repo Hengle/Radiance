@@ -488,7 +488,7 @@ namespace {
 	}
 }
 
-bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth)
+bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth, UIProgress *ui)
 {
 	LittleInputStream stream(nakedstr.Buffer());
 	U32 id, version;
@@ -607,6 +607,13 @@ bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth)
 			}
 
 			stream >> z;
+
+			if (ui) {
+				ui->total = z;
+				ui->totalProgress = 0;
+				ui->Refresh();
+			}
+
 			for (U32 j = 0; j < z; ++j) { // trimodels
 
 				Material *m = 0;
@@ -667,6 +674,11 @@ bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth)
 
 				if (!mdl.tris.empty())
 					ent->models.push_back(Build(mdl, j, z, smooth));
+
+				if (ui) {
+					ui->Step();
+					ui->Refresh();
+				}
 			}
 
 			if (ent->name == "worldspawn") {

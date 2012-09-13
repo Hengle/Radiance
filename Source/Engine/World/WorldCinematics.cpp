@@ -50,7 +50,7 @@ int WorldCinematics::Spawn(
 
 		Actor::Ref actor(new (ZWorld) Actor());
 		actor->flags = bspActor->flags;
-		actor->visible = (actor->flags&HideUntilRef) ? false : true;
+		actor->visible = (actor->flags&kHideUntilRef) ? false : true;
 		actor->loop = false;
 		actor->frame = -1;
 
@@ -138,7 +138,7 @@ void WorldCinematics::Tick(int frame, float dt)
 #if !defined(RAD_TARGET_GOLDEN)
 					COut(C_Debug) << "Cinematics(" << c.name << ") actor(" << *it2 << ") done." << std::endl;
 #endif
-					if (actor->flags&HideWhenDone)
+					if (actor->flags&kHideWhenDone)
 					{
 						actor->visible = false;
 						actor->m->ska->root = ska::Controller::Ref();
@@ -329,7 +329,7 @@ void WorldCinematics::Tick(int frame, float dt)
 						const Actor::Ref &actor = m_actors[*it2];
 						RAD_ASSERT(actor->loop);
 
-						if (actor->flags&HideWhenDone)
+						if (actor->flags&kHideWhenDone)
 						{
 							actor->visible = false;
 							actor->frame = -1;
@@ -432,7 +432,7 @@ void WorldCinematics::StopCinematic(const char *name)
 		for (IntSet::iterator it2 = c.actors.begin(); it2 != c.actors.end(); ++it2)
 		{
 			const Actor::Ref &a = m_actors[*it2];
-			if (a->flags&HideWhenDone)
+			if (a->flags&kHideWhenDone)
 			{
 				a->visible = false;
 				a->frame = -1;
@@ -514,7 +514,7 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time)
 #if !defined(RAD_TARGET_GOLDEN)
 					COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << *it << ") done." << std::endl;
 #endif
-					if (actor->flags&HideWhenDone)
+					if (actor->flags&kHideWhenDone)
 					{
 						actor->visible = false;
 						actor->m->ska->root = ska::Controller::Ref();
@@ -623,7 +623,7 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time)
 				{
 					// only trigger this animation if it won't be complete after it's played or
 					// the actor is not hidden when done.
-					if (loop || (animIt->second->length >= tickDelta) || !(actor->flags&HideWhenDone))
+					if (loop || (animIt->second->length >= tickDelta) || !(actor->flags&kHideWhenDone))
 					{
 						actor->loop = loop;
 						actor->visible = true;

@@ -145,11 +145,11 @@ bool BSPBuilder::EmitCinematics(const SceneFile &map)
 		Actor a;
 		a.emitId = -1;
 		a.index = (int)(it-world->models.begin());
-		a.flags = world::bsp_file::CinematicObj;
+		a.flags = world::bsp_file::kCinematicObj;
 		if (model->hideUntilRef)
-			a.flags |= world::bsp_file::HideUntilRef;
+			a.flags |= world::bsp_file::kHideUntilRef;
 		if (model->hideWhenDone)
-			a.flags |= world::bsp_file::HideWhenDone;
+			a.flags |= world::bsp_file::kHideWhenDone;
 		
 		m_actors.push_back(a);
 	}
@@ -858,7 +858,7 @@ void BSPBuilder::EmitModels(const Node::Ref &node, world::bsp_file::BSPLeaf *lea
 	leaf->firstModel = (U32)m_bspFile->numModels.get();
 	leaf->numModels = 0;
 
-	for (int c = 1; c <= world::bsp_file::MaxUVChannels; ++c)
+	for (int c = 1; c <= world::bsp_file::kMaxUVChannels; ++c)
 	{
 		for (int mat = 0; mat < numMaterials; ++mat)
 		{
@@ -918,13 +918,13 @@ void BSPBuilder::EmitModel(const TriModel &model)
 		for (i = 0; i < 3; ++i)
 			bspV->v[i] = (float)v.pos[i];
 
-		for (i = 0; i < model.numChannels && i < world::bsp_file::MaxUVChannels; ++i)
+		for (i = 0; i < model.numChannels && i < world::bsp_file::kMaxUVChannels; ++i)
 		{
 			bspV->st[i*2+0] = (float)v.st[i][0];
 			bspV->st[i*2+1] = (float)v.st[i][1];
 		}
 
-		for (; i < world::bsp_file::MaxUVChannels; ++i)
+		for (; i < world::bsp_file::kMaxUVChannels; ++i)
 			bspV->st[i*2+0] = bspV->st[i*2+1] = 0.f;
 	}
 

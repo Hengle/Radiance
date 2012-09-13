@@ -192,8 +192,10 @@ template <typename T>
 template <typename TVector3>
 bool Plane<T>::LineSegmentIntersect(TVector3 &result, const TVector3 &a, const T &distA, const TVector3 &b, const T &distB, const T &tolerance)
 {
-	if ((Abs(distA) <= tolerance) || (Abs(distB) <= tolerance)) return false; // doesn't cross.
-	if (SignBits(distA) == SignBits(distB)) return false; // doesn't cross.
+	if ((Abs(distA) <= tolerance) || (Abs(distB) <= tolerance)) 
+		return false; // doesn't cross.
+	if (SignBits(distA) == SignBits(distB)) 
+		return false; // doesn't cross.
 	result = LineSegmentIntersect(a, distA, b, distB);
 	return true;
 }
@@ -210,9 +212,11 @@ template <typename TVector3>
 bool Plane<T>::RayIntersect(TVector3 &result, const TVector3 &rayDirection, const TVector3 &rayOrigin, const T &tolerance) const
 {
     const T NdotV = m_normal.Dot(rayDirection);
-    if (math::NearlyZero(NdotV, tolerance)) { return false; }
+    if (math::NearlyZero(NdotV, tolerance)) 
+		return false;
     T t = (m_d - rayOrigin.Dot(m_normal)) / NdotV;
-    if (t < T(0.0)) { return false; }
+    if (t < T(0.0))
+		return false;
     result = t * rayDirection + rayOrigin;
     return true;
 }
@@ -227,8 +231,10 @@ template <typename T>
 inline typename Plane<T>::SideType Plane<T>::Side(const  Vector3<T> &v, const T &tolerance) const
 {
 	T distance = Distance(v);
-	if (distance > tolerance) { return Front; }
-	if (distance < -tolerance) { return Back; }
+	if (distance > tolerance)
+		return Front;
+	if (distance < -tolerance)
+		return Back;
 	return On;
 }
 
@@ -274,9 +280,12 @@ inline typename Plane<T>::SideType Plane<T>::Side(const AABB3<T> &bounds, const 
 	SideType a = Side(pts[0], tolerance);
 	SideType b = Side(pts[1], tolerance);
 
-	if (a == b) return a;
-	if (a == On) return b;
-	if (b == On) return a;
+	if (a == b) 
+		return a;
+	if (a == On) 
+		return b;
+	if (b == On) 
+		return a;
 	return Cross;
 }
 

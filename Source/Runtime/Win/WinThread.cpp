@@ -385,10 +385,11 @@ PriorityClass Thread::Priority()
 	return p;
 }
 
-bool Thread::Join(U32 maxWaitTime)
+bool Thread::Join(U32 maxWaitTime) const
 {
-	// i don't think it's necessary to wrap this in a crit.
-	return (::WaitForSingleObject(m_exitEvent, maxWaitTime) == WAIT_OBJECT_0) ? true : false;
+	if (::WaitForSingleObject(m_exitEvent, maxWaitTime) == WAIT_OBJECT_0)
+		return true;
+	return false;
 }
 
 DWORD WINAPI Thread::ThreadProc(void* parm)

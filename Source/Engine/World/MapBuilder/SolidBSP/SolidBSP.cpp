@@ -1,7 +1,9 @@
-// BSPBuilder.cpp
-// Copyright (c) 2012 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file SolidBSP.cpp
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup map_builder
+*/
 
 #include RADPCH
 
@@ -9,11 +11,16 @@
 
 #include "SolidBSP.h"
 #include "../../../SkAnim/SkBuilder.h"
+#include "../../../Packages/Packages.h"
 #include "../../../COut.h"
+#include "../../../App.h"
+#include "../../../Engine.h"
 #include <Runtime/Base/Utils.h>
 #include <algorithm>
 #undef min
 #undef max
+
+using namespace pkg;
 
 namespace tools {
 namespace solid_bsp {
@@ -28,9 +35,73 @@ int BSPBuilder::WindingPlane::s_num = 0;
 int BSPBuilder::TriModelFrag::s_num = 0;
 int BSPBuilder::Poly::s_num = 0;
 
+BSPBuilder::BSPBuilder() : 
+m_map(0), 
+m_cout(0), 
+m_ui(0), 
+m_debugUI(0),
+m_numStructural(0),
+m_numDetail(0),
+m_numNodes(0),
+m_numLeafs(0),
+m_numPortals(0),
+m_progress(0),
+m_numOutsideNodes(0),
+m_numOutsideTris(0),
+m_numOutsideModels(0),
+m_numInsideNodes(0),
+m_numInsideModels(0),
+m_numInsideTris(0),
+m_validContents(0),
+m_numSectors(0),
+m_numSharedSectors(0),
+m_flood(false) {
+	m_result = SR_Success;
+}
+
+BSPBuilder::~BSPBuilder() {
+}
+
+bool BSPBuilder::SpawnCompile(
+	SceneFile &map, 
+	tools::UIProgress *ui, 
+	MapBuilderDebugUI *debugUI,
+	std::ostream *cout
+) {
+	m_map = &map;
+	m_result = SR_Pending;
+	m_cout = cout;
+	m_ui = ui;
+	m_debugUI = debugUI;
+
+	if (!m_ui)
+		m_ui = &NullUIProgress;
+
+	Run();
+
+	return true;
+}
+
+void BSPBuilder::DebugDraw(float time, float dt) {
+}
+
+void BSPBuilder::OnDebugMenu(const QVariant &data) {
+}
+
+void BSPBuilder::WaitForCompletion() const {
+	Join();
+}
+
+int BSPBuilder::ThreadProc() {
+	Build();
+	return 0;
+}
+
 void BSPBuilder::Build()
 {
-	m_validContents = kContentsFlag_VisibleContents;
+	m_validContents = 0xffffffff;
+	if (!LoadMaterials())
+		return;
 	CreateRootNode();
 	Log("------------\n");
 	Log("BSPBuilder (%d structural tri(s), %d detail tri(s), %d total)\n", m_numStructural, m_numDetail, m_numStructural+m_numDetail);
@@ -64,6 +135,27 @@ void BSPBuilder::EmitProgress() {
 	if (++m_progress % 60 == 0) 
 		Log("\n");
 	Log(".");
+}
+
+void BSPBuilder::Log(const char *fmt, ...) {
+	va_list args;
+	va_start(args, fmt);
+	String s;
+	s.PrintfASCII_valist(fmt, args);
+	va_end(args);
+	COut() << s << std::flush;
+}
+
+void BSPBuilder::SetResult(int result) {
+	m_result = result;
+}
+
+int BSPBuilder::RAD_IMPLEMENT_GET(result) {
+	if (Thread::exited) {
+		Join();
+		return m_result;
+	}
+	return SR_Pending;
 }
 
 BSPBuilder::Node *BSPBuilder::LeafForPoint(const Vec3 &pos, Node *node)
@@ -244,7 +336,8 @@ void BSPBuilder::LeafNode(Node *node) {
 			PolyVec::const_iterator polyIt;
 
 			for (polyIt = m->polys.begin(); polyIt != m->polys.end(); ++polyIt) {
-				if (!(*polyIt)->onNode) break;
+				if (!(*polyIt)->onNode) 
+					break;
 			}
 
 			if (polyIt == m->polys.end()) {
@@ -257,6 +350,51 @@ void BSPBuilder::LeafNode(Node *node) {
 	}
 }
 
+bool BSPBuilder::LoadMaterials() {
+	for (SceneFile::TriModel::Vec::iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
+		SceneFile::TriModel::Ref &trim = *m;
+
+		// gather contents.
+		SceneFile::TriFaceVec::iterator f;
+		for (f = trim->tris.begin(); f != trim->tris.end(); ++f) {
+			SceneFile::TriFace &trif = *f;
+			if (trif.mat == -1)
+				break;
+			const SceneFile::Material &mat = m_map->mats[(*f).mat];
+			pkg::Package::Entry::Ref material = App::Get()->engine->sys->packages->Resolve(mat.name.c_str);
+			if (!material) {
+				Log("WARNING: no material named '%s'!\n", mat.name.c_str.get());
+				break;
+			}
+
+			const String *s = material->KeyValue<String>("BSP.Contents", 0);
+			if (!s) {
+				Log("WARNING: meta-data error on material '%s'", mat.name.c_str.get());
+				break;
+			}
+
+			trif.contents = ContentsForString(*s);
+			if (!trim->contents)
+				trim->contents = trif.contents;
+			if (trim->contents != trif.contents) {
+				Log("ERROR: mixed contents on model %d, material '%s', this needs to be corrected.", mat.name.c_str.get());
+				trim->contents |= trif.contents;
+			}
+
+			s = material->KeyValue<String>("BSP.Surface", 0);
+			if (s)
+				trif.surface = SurfaceForString(*s);
+		}
+
+		if (f != trim->tris.end()) {
+			trim->ignore = true;
+			Log("ERROR: model %d has a face or faces without a material, this model will be discarded from the BSP.\n", trim->id);
+		}
+	}
+
+	return true;
+}
+
 void BSPBuilder::CreateRootNode() {
 	RAD_ASSERT(!m_root);
 
@@ -264,10 +402,14 @@ void BSPBuilder::CreateRootNode() {
 	m_numDetail = 0;
 
 	Node *node = new Node();
-	node->models.reserve(m_map.worldspawn->models.size());
+	node->models.reserve(m_map->worldspawn->models.size());
 
-	for (SceneFile::TriModel::Vec::const_iterator m = m_map.worldspawn->models.begin(); m != m_map.worldspawn->models.end(); ++m) {
+	for (SceneFile::TriModel::Vec::const_iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
 		const SceneFile::TriModel::Ref &trim = *m;
+
+		// gather contents.
+		if (trim->ignore)
+			continue;
 
 		if (trim->contents & kContentsFlag_Structural) {
 			m_numStructural += (int)trim->tris.size();
@@ -285,9 +427,10 @@ void BSPBuilder::CreateRootNode() {
 		frag->polys.reserve(trim->tris.size());
 		node->numPolys += (int)trim->tris.size();
 
-		for (SceneFile::TriFaceVec::const_iterator f = trim->tris.begin(); f != trim->tris.end(); ++f)
-		{
+		for (SceneFile::TriFaceVec::const_iterator f = trim->tris.begin(); f != trim->tris.end(); ++f) {
 			const SceneFile::TriFace &trif = *f;
+			if (trif.mat == -1)
+				continue; // no material discard.
 			PolyRef poly(new Poly());
 			poly->original = (SceneFile::TriFace*)&trif;
 			poly->contents = trim->contents;
@@ -558,7 +701,7 @@ void BSPBuilder::DisplayTree(Node *node,
 {
 	GLNavWindow win;
 	GLCamera &c = win.Camera();
-	SceneFile::EntityRef e = m_map.EntForName("sp_player_start");
+	SceneFile::EntityRef e = m_map->EntForName("sp_player_start");
 	if (e)
 	{
 		c.SetPos(
@@ -627,6 +770,80 @@ Vec3 BSPBuilder::WindingCenter(const Winding &winding) {
 	}
 	p /= ValueType(winding.Vertices().size());
 	return p;
+}
+
+int BSPBuilder::ContentsForString(const String &s) {
+	if (s == "Clip")
+		return kContentsFlag_Clip;
+	if (s == "Detail")
+		return kContentsFlag_Detail;
+	if (s == "Fog")
+		return kContentsFlag_Fog;
+	if (s == "Water")
+		return kContentsFlag_Water;
+	if (s == "Areaportal")
+		return kContentsFlag_Areaportal;
+	return kContentsFlag_Solid;
+}
+
+int BSPBuilder::SurfaceForString(const String &s) {
+	if (s == "No Draw")
+		return kSurfaceFlag_NoDraw;
+	return 0;
+}
+
+Vec2 BSPBuilder::ToBSPType(const SceneFile::Vec2 &vec) {
+	return Vec2(
+		(ValueType)vec[0],
+		(ValueType)vec[1]
+	);
+}
+
+Vec3 BSPBuilder::ToBSPType(const SceneFile::Vec3 &vec) {
+	return Vec3(
+		(ValueType)vec[0],
+		(ValueType)vec[1],
+		(ValueType)vec[2]
+	);
+}
+
+SceneFileD::TriVert BSPBuilder::ToBSPType(const SceneFile::TriVert &vec) {
+	SceneFileD::TriVert v;
+
+	v.pos = ToBSPType(vec.pos);
+	v.orgPos = ToBSPType(vec.orgPos);
+	v.normal = ToBSPType(vec.normal);
+	v.color = ToBSPType(vec.color);
+
+	for (int i = 0; i < SceneFile::kMaxUVChannels; ++i) {
+		v.st[i] = ToBSPType(vec.st[i]);
+	}
+
+	// NOTE: We don't transfer bone weights (not used in BSP).
+	return v;
+}
+
+BBox BSPBuilder::ToBSPType(const SceneFile::BBox &bbox) {
+	return BBox(
+		ToBSPType(bbox.Mins()),
+		ToBSPType(bbox.Maxs())
+	);
+}
+
+Plane BSPBuilder::ToBSPType(const SceneFile::Plane &plane) {
+	return Plane(
+		ToBSPType(plane.Normal()),
+		(ValueType)plane.D()
+	);
+}
+
+SceneFile::Plane BSPBuilder::FromBSPType(const Plane &plane) {
+	return SceneFile::Plane(
+		(SceneFile::ValueType)plane.A(),
+		(SceneFile::ValueType)plane.B(),
+		(SceneFile::ValueType)plane.C(),
+		(SceneFile::ValueType)plane.D()
+	);
 }
 
 Vec3 RandomColor() {

@@ -115,7 +115,7 @@ inline PriorityClass Thread::RAD_IMPLEMENT_GET(priority)
 	return m_imp.Priority();
 }
 
-inline bool Thread::Join(U32 maxWaitTime)
+inline bool Thread::Join(U32 maxWaitTime) const
 {
 	return m_imp.Join(maxWaitTime);
 }

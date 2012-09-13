@@ -9,7 +9,7 @@
 #include <Runtime/Container/ZoneVector.h>
 
 #if defined(RAD_OPT_TOOLS)
-#include "../Tools/MaxScene.h"
+#include "../Tools/SceneFile.h"
 #endif
 
 #include <Runtime/PushPack.h>
@@ -66,7 +66,7 @@ struct DMeshBundleData {
 
 RADENG_API DMeshBundleData::Ref RADENG_CALL CompileMeshBundle(
 	const char *name,
-	const MapVec &maps
+	const SceneFileVec &maps
 );
 
 } // tools

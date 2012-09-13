@@ -525,6 +525,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </QtMOC>
     <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentAssetThumbDimensionCache.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorBSPDebugWidget.h" />
     <ClInclude Include="..\..\Engine\Tools\Editor\EditorEventRegistry.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
@@ -929,6 +930,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\World\MapBuilder\MapBuilderDebugUI.h" />
     <ClInclude Include="..\..\Engine\World\MapBuilder\SolidBSP\MapTypes.h" />
     <ClInclude Include="..\..\Engine\World\MapBuilder\SolidBSP\PlaneHash.h" />
     <ClInclude Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSP.h" />
@@ -1641,6 +1643,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorBSPDebugWidget.cpp" />
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorComboCheckBox.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>

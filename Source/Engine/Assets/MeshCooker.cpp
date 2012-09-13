@@ -7,7 +7,7 @@
 #include "MeshCooker.h"
 #include "MeshBundle.h"
 #include "../Engine.h"
-#include "../Tools/MaxScene.h"
+#include "../Tools/SceneFile.h"
 #include <Runtime/Stream.h>
 
 using namespace pkg;
@@ -72,10 +72,10 @@ int MeshCooker::Compile(int flags, int allflags)
 
 	stream::InputStream is(*ib);
 
-	tools::MapRef map(new (ZTools) tools::Map());
-	tools::MapVec vec;
+	tools::SceneFileRef map(new (ZTools) tools::SceneFile());
+	tools::SceneFileVec vec;
 
-	if (!tools::LoadMaxScene(is, *map, false))
+	if (!tools::LoadSceneFile(is, *map, false))
 		return SR_ParseError;
 
 	ib.reset();

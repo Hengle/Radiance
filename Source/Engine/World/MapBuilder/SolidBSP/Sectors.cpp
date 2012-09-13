@@ -1,7 +1,9 @@
-// Sectors.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file Sectors.cpp
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup map_builder
+*/
 
 #include RADPCH
 
@@ -22,7 +24,7 @@ void BSPBuilder::BuildSectors() {
 	m_numInsideModels = 0;
 	m_work = 0;
 
-	for (SceneFile::TriModel::Vec::const_iterator it = m_map.worldspawn->models.begin(); it != m_map.worldspawn->models.end(); ++it) {
+	for (SceneFile::TriModel::Vec::const_iterator it = m_map->worldspawn->models.begin(); it != m_map->worldspawn->models.end(); ++it) {
 		DecomposeAreaModel(*(*it).get());
 	}
 
@@ -206,7 +208,11 @@ void BSPBuilder::DecomposeAreaModel(const SceneFile::TriModel &model) {
 			EmitProgress();
 
 		const SceneFile::TriFace &tri = *it;
+		if (tri.outside)
+			continue;
+
 		AreaPoly *poly = new AreaPoly();
+		poly->planenum = m_planes.FindPlaneNum(ToBSPType(tri.plane));
 		poly->winding.Initialize(
 			ToBSPType(model.verts[tri.v[0]].pos), 
 			ToBSPType(model.verts[tri.v[1]].pos), 
@@ -246,6 +252,16 @@ void BSPBuilder::DecomposeAreaPoly(Node *node, AreaPoly *poly) {
 			poly->tri->model->outside = false;
 		}
 		delete poly;
+		return;
+	}
+
+	if (poly->planenum == node->planenum) {
+		DecomposeAreaPoly(node->children[0].get(), poly);
+		return;
+	}
+
+	if (poly->planenum == (node->planenum^1)) {
+		DecomposeAreaPoly(node->children[1].get(), poly);
 		return;
 	}
 

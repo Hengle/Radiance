@@ -315,8 +315,8 @@ int SkModelParser::Load(
 
 	stream::InputStream is(*ib);
 
-	tools::Map map;
-	if (!tools::LoadMaxScene(is, map, false))
+	tools::SceneFile map;
+	if (!tools::LoadSceneFile(is, map, false))
 		return SR_ParseError;
 
 	ib.reset();

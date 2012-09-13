@@ -13,22 +13,22 @@
 namespace tools {
 namespace editor {
 
-class RADENG_CLASS GLNavWidget : public GLWidget
-{
+class RADENG_CLASS GLNavWidget : public GLWidget {
 	Q_OBJECT
 public:
 
 	GLNavWidget(QWidget *parent = 0, Qt::WindowFlags f = 0);
 	virtual ~GLNavWidget();
 
-	enum OrbitMode
-	{
-		OM_LeftButton,
-		OM_MiddleButton
+	enum OrbitMode {
+		kOrbitMode_LeftButton,
+		kOrbitMode_MiddleButton
 	};
 
 	void SetOrbitMode(const Vec3 &pos, OrbitMode mode);
-	void SetRotateMode();
+	void SetFreeMode();
+	void TickCamera(float dt);
+
 	virtual void CameraMoved();
 
 	RAD_DECLARE_READONLY_PROPERTY(GLNavWidget, camera, Camera*);
@@ -49,25 +49,57 @@ protected:
 	virtual void mousePressEvent(QMouseEvent *e);
 	virtual void mouseReleaseEvent(QMouseEvent *e);
 	virtual void keyPressEvent(QKeyEvent *e);
+	virtual void keyReleaseEvent(QKeyEvent *e);
 
 private:
 
-	RAD_DECLARE_GET(camera, Camera*) { return &const_cast<GLNavWidget*>(this)->m_c; }
-	RAD_DECLARE_GET(orbitSpeed, float) { return m_orbit; }
-	RAD_DECLARE_SET(orbitSpeed, float) { m_orbit = value; }
-	RAD_DECLARE_GET(lookSpeed, float) { return m_look; }
-	RAD_DECLARE_SET(lookSpeed, float) { m_look = value; }
-	RAD_DECLARE_GET(mouseSpeed, float) { return m_mouse; }
-	RAD_DECLARE_SET(mouseSpeed, float) { m_mouse = value; }
-	RAD_DECLARE_GET(wheelSpeed, float) { return m_wheel; }
-	RAD_DECLARE_SET(wheelSpeed, float) { m_wheel = value; }
-	RAD_DECLARE_GET(kbSpeed, float) { return m_kb; }
-	RAD_DECLARE_SET(kbSpeed, float) { m_kb = value; }
+	RAD_DECLARE_GET(camera, Camera*) { 
+		return &const_cast<GLNavWidget*>(this)->m_c; 
+	}
 
-	enum Mode
-	{
-		M_Orbit,
-		M_Rotate
+	RAD_DECLARE_GET(orbitSpeed, float) { 
+		return m_orbit; 
+	}
+
+	RAD_DECLARE_SET(orbitSpeed, float) { 
+		m_orbit = value; 
+	}
+
+	RAD_DECLARE_GET(lookSpeed, float) { 
+		return m_look; 
+	}
+
+	RAD_DECLARE_SET(lookSpeed, float) { 
+		m_look = value; 
+	}
+
+	RAD_DECLARE_GET(mouseSpeed, float) { 
+		return m_mouse; 
+	}
+
+	RAD_DECLARE_SET(mouseSpeed, float) { 
+		m_mouse = value; 
+	}
+
+	RAD_DECLARE_GET(wheelSpeed, float) { 
+		return m_wheel; 
+	}
+
+	RAD_DECLARE_SET(wheelSpeed, float) { 
+		m_wheel = value; 
+	}
+
+	RAD_DECLARE_GET(kbSpeed, float) { 
+		return m_kb; 
+	}
+
+	RAD_DECLARE_SET(kbSpeed, float) { 
+		m_kb = value; 
+	}
+
+	enum Mode {
+		kMode_Orbit,
+		kMode_Free
 	};
 
 	Camera m_c;
@@ -76,6 +108,8 @@ private:
 	float m_mouse;
 	float m_wheel;
 	float m_kb;
+	float m_fwdMotion;
+	float m_leftMotion;
 	Mode m_mode;
 	QPoint m_p;
 	Vec3 m_orbitPos;

@@ -1,13 +1,16 @@
-// BSPBuilder.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file SolidBSP.h
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup map_builder
+*/
 
 #pragma once
 
 #include "../../../Types.h"
 #include "../../../COut.h"
 #include "../../../Tools/SceneFile.h"
+#include "../MapBuilderDebugUI.h"
 #include "../../BSPFile.h"
 #include "MapTypes.h"
 #include "VecHash.h"
@@ -16,6 +19,8 @@
 #include <Runtime/Container/ZoneSet.h>
 #include <Runtime/Container/ZoneHashSet.h>
 #include <Runtime/Container/ZoneHashMap.h>
+#include <Runtime/Thread.h>
+#include <QtCore/QVariant>
 #include <vector>
 
 #include <Runtime/PushPack.h>
@@ -31,42 +36,65 @@ Vec3 RandomColor();
 
 #define SOLID_BSP_ICE() RAD_FAIL("SolidBSP Internal Compiler Error: file: "__FILE__" function: "__FUNCTION__" line: " RAD_STRINGIZE(__LINE__))
 
-class RADENG_CLASS BSPBuilder
-{
+///////////////////////////////////////////////////////////////////////////////
+
+class RADENG_CLASS BSPBuilder : protected thread::Thread {
 public:
 	typedef boost::shared_ptr<BSPBuilder> Ref;
 
 	BSPBuilder();
 	~BSPBuilder();
 
-	bool Build(const SceneFile &map, std::ostream *cout = 0);
+	bool SpawnCompile(
+		SceneFile &map, 
+		tools::UIProgress *ui = 0, 
+		MapBuilderDebugUI *debugUI = 0, // if non-null debugging is enabled.
+		std::ostream *cout = 0
+	);
 
 	RAD_DECLARE_READONLY_PROPERTY(BSPBuilder, bspFile, world::bsp_file::BSPFile::Ref);
 	RAD_DECLARE_READONLY_PROPERTY(BSPBuilder, bspFileBuilder, world::bsp_file::BSPFileBuilder::Ref);
+	RAD_DECLARE_READONLY_PROPERTY(BSPBuilder, result, int); // SR_ result
 
-	void BuildDebug(const SceneFile &map, std::ostream *cout = 0);
 	void DebugDraw(float time, float dt);
+	void OnDebugMenu(const QVariant &data);
+
+	void WaitForCompletion() const;
 
 private:
 
-	RAD_DECLARE_GET(bspFile, world::bsp_file::BSPFile::Ref) { return boost::static_pointer_cast<world::bsp_file::BSPFile>(m_bspFile); }
-	RAD_DECLARE_GET(bspFileBuilder, world::bsp_file::BSPFileBuilder::Ref) { return m_bspFile; }
+	RAD_DECLARE_GET(bspFile, world::bsp_file::BSPFile::Ref) { 
+		return boost::static_pointer_cast<world::bsp_file::BSPFile>(m_bspFile); 
+	}
+
+	RAD_DECLARE_GET(bspFileBuilder, world::bsp_file::BSPFileBuilder::Ref) { 
+		return m_bspFile; 
+	}
 
 	typedef SceneFile::NormalTriVert Vert;
 	typedef SceneFile::NormalTriVertVec VertVec;
 
+	///////////////////////////////////////////////////////////////////////////////
+
 	enum ContentsFlags {
-		RAD_FLAG(kContentsFlag_Solid),
+		RAD_FLAG(kContentsFlag_Solid), // solid splits first, all other contents are detail splitters
+		RAD_FLAG(kContentsFlag_Clip),
+		RAD_FLAG(kContentsFlag_Detail),
 		RAD_FLAG(kContentsFlag_Fog),
 		RAD_FLAG(kContentsFlag_Water),
 		RAD_FLAG(kContentsFlag_Areaportal),
-		RAD_FLAG(kContentsFlag_Detail),
 		kContentsFlag_VisibleContents = kContentsFlag_Solid|kContentsFlag_Areaportal|kContentsFlag_Fog|kContentsFlag_Water,
 		kContentsFlag_FirstVisibleContents = kContentsFlag_Solid,
 		kContentsFlag_LastVisibleContents = kContentsFlag_Areaportal,
-		kContentsFlag_Structural = kContentsFlag_Solid|kContentsFlag_Areaportal,
-		kContentsFlag_SolidContents = kContentsFlag_Solid
+		kContentsFlag_Structural = kContentsFlag_Solid|kContentsFlag_Areaportal, // just used for classification
+		kContentsFlag_SolidContents = kContentsFlag_Solid // blocks portal flood
 	};
+
+	enum SurfaceFlags {
+		RAD_FLAG(kSurfaceFlag_NoDraw)
+	};
+
+	///////////////////////////////////////////////////////////////////////////////
 
 	struct Poly {
 		Poly() {
@@ -101,6 +129,8 @@ private:
 	typedef boost::shared_ptr<Poly> PolyRef;
 	typedef std::vector<PolyRef> PolyVec;
 
+	///////////////////////////////////////////////////////////////////////////////
+
 	struct TriModelFrag {
 		TriModelFrag() {
 			original = 0;
@@ -121,6 +151,8 @@ private:
 
 	typedef boost::shared_ptr<TriModelFrag> TriModelFragRef;
 	typedef std::vector<TriModelFragRef> TriModelFragVec;
+
+	///////////////////////////////////////////////////////////////////////////////
 
 	struct WindingPlane {
 		WindingPlane() {
@@ -150,6 +182,8 @@ private:
 	typedef boost::shared_ptr<Portal> PortalRef;
 
 	typedef std::vector<SceneFile::TriFace*> TriFacePtrVec;
+
+	///////////////////////////////////////////////////////////////////////////////
 
 	struct Portal {
 		Portal() {
@@ -193,15 +227,21 @@ private:
 
 	typedef math::ConvexPolygon<SceneFileD::TriVert, Plane> SectorWinding;
 
+	///////////////////////////////////////////////////////////////////////////////
+
 	struct AreaPoly {
 		AreaPoly() {}
 		AreaPoly(const AreaPoly &p) {
 			tri = p.tri;
+			planenum = p.planenum;
 		}
 
+		int planenum;
 		Winding winding;
 		SceneFile::TriFace *tri;
 	};
+
+	///////////////////////////////////////////////////////////////////////////////
 
 	struct SectorPoly {
 		SectorPoly() {}
@@ -215,6 +255,8 @@ private:
 
 	typedef boost::shared_ptr<SectorPoly> SectorPolyRef;
 	typedef std::vector<SectorPolyRef> SectorPolyVec;
+
+	///////////////////////////////////////////////////////////////////////////////
 
 	struct Sector {
 		BBox bounds;
@@ -232,6 +274,8 @@ private:
 	typedef std::vector<SharedSectorRef> SharedSectorVec;
 	typedef std::vector<SceneFile::TriFace*> TriFacePtrVec;
 
+	///////////////////////////////////////////////////////////////////////////////
+
 	struct Area {
 		Area() : area(-1) {
 		}
@@ -248,6 +292,8 @@ private:
 	typedef std::vector<AreaRef> AreaVec;
 
 	typedef container::hash_set<int>::type PlaneNumHash;
+
+	///////////////////////////////////////////////////////////////////////////////
 
 	struct Node {
 		Node() {
@@ -278,6 +324,8 @@ private:
 		static int s_num;
 	};
 
+	///////////////////////////////////////////////////////////////////////////////
+
 	std::ostream &COut() {
 		if (m_cout)
 			return *m_cout;
@@ -286,34 +334,41 @@ private:
 
 	void Log(const char *fmt, ...);
 
-	SceneFile &m_map;
+	RAD_DECLARE_GET(result, int);
+
+	SceneFile *m_map;
 	SceneFile::Entity::Ref m_leakEnt;
 	PlaneHash m_planes;
+	world::bsp_file::BSPFileBuilder::Ref m_bspFile;
 	NodeRef m_root;
 	Node m_outside;
 	Vec3Vec m_leakpts;
 	AreaVec m_areas;
 	SharedSectorVec m_sharedSectors;
 	std::ostream *m_cout;
-	int  m_numStructural;
-	int  m_numDetail;
-	int  m_numNodes;
-	int  m_numLeafs;
-	int  m_numPortals;
-	int  m_progress;
-	int  m_numOutsideNodes;
-	int  m_numOutsideTris;
-	int  m_numOutsideModels;
-	int  m_numInsideTris;
-	int  m_numInsideNodes;
-	int  m_numInsideModels;
-	int  m_validContents;
-	int  m_numSectors;
-	int  m_numSharedSectors;
-	int  m_work;
+	tools::UIProgress *m_ui;
+	MapBuilderDebugUI *m_debugUI;
+	int m_numStructural;
+	int m_numDetail;
+	int m_numNodes;
+	int m_numLeafs;
+	int m_numPortals;
+	int m_progress;
+	int m_numOutsideNodes;
+	int m_numOutsideTris;
+	int m_numOutsideModels;
+	int m_numInsideTris;
+	int m_numInsideNodes;
+	int m_numInsideModels;
+	int m_validContents;
+	int m_numSectors;
+	int m_numSharedSectors;
+	int m_work;
+	int m_result;
 	bool m_flood;
 
 	void Build();
+	bool LoadMaterials();
 	void CreateRootNode();
 
 	void DisplayTree(
@@ -358,20 +413,24 @@ private:
 
 	void ResetProgress();
 	void EmitProgress();
+	void SetResult(int result);
+
+	virtual int ThreadProc();
 
 	static void BBoxPlanes(const BBox &bounds, Plane *planes);
 	static void BBoxWindings(const BBox &bounds, WindingVec &out);
 	static void WindingBounds(const Winding &winding, BBox &bounds);
 	static Vec3 WindingCenter(const Winding &winding);
+	static int ContentsForString(const String &s);
+	static int SurfaceForString(const String &s);
 
 	// Converts to BSP precision types.
+	static Vec2 ToBSPType(const SceneFile::Vec2 &vec);
 	static Vec3 ToBSPType(const SceneFile::Vec3 &vec);
 	static SceneFileD::TriVert ToBSPType(const SceneFile::TriVert &vec);
 	static BBox ToBSPType(const SceneFile::BBox &bbox);
 	static Plane ToBSPType(const SceneFile::Plane &plane);
 	static SceneFile::Plane FromBSPType(const Plane &plane);
-
-	world::bsp_file::BSPFileBuilder::Ref m_bspFile;
 };
 
 } // solid_bsp

@@ -128,7 +128,7 @@ int SkAnimSetParser::Load(
 	if (!fp)
 		return SR_FileNotFound;
 
-	tools::MapVec maps;
+	tools::SceneFileVec maps;
 	char name[256];
 
 	while (fgets(name, 256, fp) != 0) {
@@ -148,9 +148,9 @@ int SkAnimSetParser::Load(
 		}
 
 		stream::InputStream is(*ib);
-		tools::MapRef map(new (ZTools) tools::Map());
+		tools::SceneFileRef map(new (ZTools) tools::SceneFile());
 
-		if (!tools::LoadMaxScene(is, *map, false)) {
+		if (!tools::LoadSceneFile(is, *map, false)) {
 			fclose(fp);
 			return SR_ParseError;
 		}

@@ -1,7 +1,9 @@
-// Flood.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file Flood.cpp
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup map_builder
+*/
 
 #include RADPCH
 
@@ -21,9 +23,9 @@ bool BSPBuilder::FloodFill() {
 	Log("------------\n");
 	Log("Flood Fill...\n");
 	
-	for (SceneFile::Entity::Vec::iterator it = m_map.ents.begin(); it != m_map.ents.end(); ++it) {
+	for (SceneFile::Entity::Vec::iterator it = m_map->ents.begin(); it != m_map->ents.end(); ++it) {
 		const SceneFile::Entity::Ref &ent = *it;
-		if (ent == m_map.worldspawn) 
+		if (ent == m_map->worldspawn) 
 			continue;
 		Node *leaf = LeafForPoint(ToBSPType(ent->origin));
 		if (!leaf) {
@@ -66,7 +68,7 @@ void BSPBuilder::FillOutside() {
 
 	MarkOccupiedNodeFaces(m_root.get());
 
-	for (SceneFile::TriModel::Vec::iterator m = m_map.worldspawn->models.begin(); m != m_map.worldspawn->models.end(); ++m) {
+	for (SceneFile::TriModel::Vec::iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
 		if (!((*m)->contents & kContentsFlag_Solid)) 
 			continue; // skip non solids for outside
 
@@ -80,11 +82,10 @@ void BSPBuilder::FillOutside() {
 			}
 		}
 
-		(*m)->outside = outside;
-
 		if (outside) {
 			++m_numOutsideModels;
 		} else {
+			(*m)->outside = false;
 			++m_numInsideModels;			
 		}
 	}

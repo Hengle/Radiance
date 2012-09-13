@@ -134,7 +134,7 @@ void SkModelEditorWindow::Load(int id)
 	m_glw->camera->pos = Vec3(300.f, 0.f, 0.f);
 	m_glw->camera->LookAt(Vec3::Zero);
 	m_glw->camera->fov = 70.f;
-	m_glw->SetOrbitMode(Vec3::Zero, GLNavWidget::OM_LeftButton);
+	m_glw->SetOrbitMode(Vec3::Zero, GLNavWidget::kOrbitMode_LeftButton);
 	m_glw->orbitSpeed = 1.f;
 	m_glw->lookSpeed = 0.5f;
 	m_glw->wheelSpeed = 4.f;

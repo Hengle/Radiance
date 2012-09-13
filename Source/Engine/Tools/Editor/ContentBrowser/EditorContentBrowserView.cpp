@@ -916,7 +916,8 @@ void ContentBrowserView::OnWheelEvent(QWheelEvent *e)
 
 void ContentBrowserView::OnMouseMoveEvent(QMouseEvent *e)
 {
-	if (m_selMode == SelNone) return;
+	if (m_selMode == SelNone)
+		return;
 
 	int id = HitTestId(e->x(), e->y());
 	if (id != m_hoverId)
@@ -928,7 +929,8 @@ void ContentBrowserView::OnMouseMoveEvent(QMouseEvent *e)
 
 void ContentBrowserView::OnMousePressEvent(QMouseEvent *e)
 {
-	if (m_selMode == SelNone) return;
+	if (m_selMode == SelNone)
+		return;
 
 	bool redraw = false;
 

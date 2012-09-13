@@ -73,8 +73,8 @@ int BSPFileParser::Parse(const void *data, AddrSize len) {
 	const U8 *bytes = reinterpret_cast<const U8*>(data);
 	CHECK_SIZE(sizeof(U32)*20);
 	U32 tag = *reinterpret_cast<const U32*>(bytes);
-	U32 id  = *reinterpret_cast<const U32*>(bytes+sizeof(U32));
-	if (tag != BspTag || id != BspId)
+	U32 version  = *reinterpret_cast<const U32*>(bytes+sizeof(U32));
+	if (tag != kBspTag || version != kBspVersion)
 		return pkg::SR_InvalidFormat;
 
 	bytes += sizeof(U32)*2;

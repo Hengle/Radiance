@@ -38,8 +38,7 @@ public:
 	virtual void Step();
 	virtual void SubStep();
 
-	virtual Ref Child(const char *title, bool progressBar)
-	{
+	virtual Ref Child(const char *title, bool progressBar) {
 		return Ref(new NullUIProgress_t());
 	}
 
@@ -61,24 +60,22 @@ protected:
 	virtual RAD_DECLARE_SET(subTotal, int);
 	virtual RAD_DECLARE_GET(subProgress, int);
 	virtual RAD_DECLARE_SET(subProgress, int);
+	virtual RAD_DECLARE_GET(canceled, bool) {
+		return wasCanceled();
+	}
 
 	virtual void EmitString(int level, const std::string &str);
 
 	virtual void customEvent(QEvent *e);
 private:
 
-	struct State
-	{
+	struct State {
 		int total[2];
 		QString title;
 	};
 
-	struct RefreshEvent : public QEvent
-	{
-		RefreshEvent() : QEvent((QEvent::Type)EV_ProgressDialog)
-		{
-		}
-
+	struct RefreshEvent : public QEvent {
+		RefreshEvent() : QEvent((QEvent::Type)EV_ProgressDialog) {}
 		State s;
 	};
 

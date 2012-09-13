@@ -9,6 +9,7 @@
 #include "../EditorPopupMenu.h"
 #include "../MapEditor/EditorMapEditorWindow.h"
 #include "../EditorPIEWidget.h"
+#include "../EditorBSPDebugWidget.h"
 #include "../EditorUtils.h"
 
 namespace tools {
@@ -17,15 +18,14 @@ namespace editor {
 MapThumb::MapThumb(ContentBrowserView &view) : ContentAssetThumb(view) {
 	PopupMenu *m = CreateMenu(false);
 	QAction *play = m->AddAction("Play...", this, SLOT(Play()));
-	m->AddAction("Edit...", this, SLOT(Edit()));
-	m->qmenu->setDefaultAction(play);
+	QAction *debug = m->AddAction("Debug BSP...", this, SLOT(Debug()));
+	m->qmenu->setDefaultAction(debug);
 }
 
 void MapThumb::OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable, bool modal) {
 	if (modal)
 		return;
-
-	Play(entry);
+	Debug(entry);
 }
 
 void MapThumb::New(ContentBrowserView &view) {
@@ -38,8 +38,8 @@ void MapThumb::Play() {
 	Play(clickedItem);
 }
 
-void MapThumb::Edit() {
-	Edit(clickedItem);
+void MapThumb::Debug() {
+	Debug(clickedItem);
 }
 
 void MapThumb::Play(const pkg::Package::Entry::Ref &entry) {
@@ -64,10 +64,26 @@ void MapThumb::Play(const pkg::Package::Entry::Ref &entry) {
 	w->RunMap(entry->id);
 }
 
-void MapThumb::Edit(const pkg::Package::Entry::Ref &entry) {
-	pkg::Asset::Ref asset = entry->Asset(pkg::Z_ContentBrowser);
-	if (asset)
-		EditorWindow::Open<map_editor::MapEditorWindow>(asset, View().parentWidget());
+void MapThumb::Debug(const pkg::Package::Entry::Ref &entry) {
+	RAD_ASSERT(entry);
+
+	std::pair<int, int> res = View().selectedResolution();
+
+	BSPDebugWidget *w = new (ZEditor) BSPDebugWidget(0, 
+		Qt::Window|
+		Qt::CustomizeWindowHint|
+		Qt::WindowTitleHint|
+		Qt::WindowSystemMenuHint|
+		Qt::WindowCloseButtonHint|
+		Qt::WindowMinimizeButtonHint|
+		Qt::MSWindowsFixedSizeDialogHint
+	);
+	w->setAttribute(Qt::WA_DeleteOnClose);
+	w->setWindowTitle(entry->name.get());
+	w->resize(res.first, res.second);
+	CenterWidget(*w, *MainWindow::Get());
+	w->show();
+	w->DebugMap(entry->id);
 }
 
 void CreateMapThumb(ContentBrowserView &view) {
