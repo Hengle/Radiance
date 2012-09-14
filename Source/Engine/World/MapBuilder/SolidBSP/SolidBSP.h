@@ -78,16 +78,17 @@ private:
 
 	enum ContentsFlags {
 		RAD_FLAG(kContentsFlag_Solid), // solid splits first, all other contents are detail splitters
+		RAD_FLAG(kContentsFlag_Detail), // never in the BSP.
 		RAD_FLAG(kContentsFlag_Clip),
-		RAD_FLAG(kContentsFlag_Detail),
 		RAD_FLAG(kContentsFlag_Fog),
 		RAD_FLAG(kContentsFlag_Water),
 		RAD_FLAG(kContentsFlag_Areaportal),
-		kContentsFlag_VisibleContents = kContentsFlag_Solid|kContentsFlag_Areaportal|kContentsFlag_Fog|kContentsFlag_Water,
+		kContentsFlag_VisibleContents = kContentsFlag_Solid|kContentsFlag_Detail|kContentsFlag_Clip|kContentsFlag_Fog|kContentsFlag_Water|kContentsFlag_Areaportal,
 		kContentsFlag_FirstVisibleContents = kContentsFlag_Solid,
 		kContentsFlag_LastVisibleContents = kContentsFlag_Areaportal,
 		kContentsFlag_Structural = kContentsFlag_Solid|kContentsFlag_Areaportal, // just used for classification
-		kContentsFlag_SolidContents = kContentsFlag_Solid // blocks portal flood
+		kContentsFlag_SolidContents = kContentsFlag_Solid, // blocks portal flood
+		kContentsFlag_BSPContents = 0xffffffff & ~kContentsFlag_Detail
 	};
 
 	enum SurfaceFlags {
@@ -127,7 +128,7 @@ private:
 	};
 
 	typedef boost::shared_ptr<Poly> PolyRef;
-	typedef std::vector<PolyRef> PolyVec;
+	typedef zone_vector<PolyRef, ZToolsT>::type PolyVec;
 
 	///////////////////////////////////////////////////////////////////////////////
 
@@ -150,7 +151,7 @@ private:
 	};
 
 	typedef boost::shared_ptr<TriModelFrag> TriModelFragRef;
-	typedef std::vector<TriModelFragRef> TriModelFragVec;
+	typedef zone_vector<TriModelFragRef, ZToolsT>::type TriModelFragVec;
 
 	///////////////////////////////////////////////////////////////////////////////
 
@@ -170,7 +171,7 @@ private:
 	};
 
 	typedef boost::shared_ptr<WindingPlane> WindingPlaneRef;
-	typedef std::vector<WindingPlaneRef> WindingPlaneVec;
+	typedef zone_vector<WindingPlaneRef, ZToolsT>::type WindingPlaneVec;
 
 	enum {
 		kPlaneNumLeaf = -1
@@ -181,7 +182,7 @@ private:
 	struct Portal;
 	typedef boost::shared_ptr<Portal> PortalRef;
 
-	typedef std::vector<SceneFile::TriFace*> TriFacePtrVec;
+	typedef zone_vector<SceneFile::TriFace*, ZToolsT>::type TriFacePtrVec;
 
 	///////////////////////////////////////////////////////////////////////////////
 
@@ -254,25 +255,20 @@ private:
 	};
 
 	typedef boost::shared_ptr<SectorPoly> SectorPolyRef;
-	typedef std::vector<SectorPolyRef> SectorPolyVec;
+	typedef zone_vector<SectorPolyRef, ZToolsT>::type SectorPolyVec;
+	typedef zone_vector<int, ZToolsT>::type AreaNumVec;
 
 	///////////////////////////////////////////////////////////////////////////////
 
 	struct Sector {
 		BBox bounds;
 		SectorPolyVec polys;
-	};
-
-	struct SharedSector : public Sector {
-		std::vector<int> areas;
+		AreaNumVec areas;
 	};
 
 	typedef boost::shared_ptr<Sector> SectorRef;
-	typedef std::vector<SectorRef> SectorVec;
-
-	typedef boost::shared_ptr<SharedSector> SharedSectorRef;
-	typedef std::vector<SharedSectorRef> SharedSectorVec;
-	typedef std::vector<SceneFile::TriFace*> TriFacePtrVec;
+	typedef zone_vector<SectorRef, ZToolsT>::type SectorVec;
+	typedef zone_vector<SceneFile::TriFace*, ZToolsT>::type TriFacePtrVec;
 
 	///////////////////////////////////////////////////////////////////////////////
 
@@ -285,13 +281,12 @@ private:
 		BBox bounds;
 		TriFacePtrVec tris;
 		SectorVec  sectors;
-		SharedSectorVec shared;
 	};
 
 	typedef boost::shared_ptr<Area> AreaRef;
-	typedef std::vector<AreaRef> AreaVec;
+	typedef zone_vector<AreaRef, ZToolsT>::type AreaVec;
 
-	typedef container::hash_set<int>::type PlaneNumHash;
+	//typedef container::hash_set<int>::type PlaneNumHash;
 
 	///////////////////////////////////////////////////////////////////////////////
 
@@ -344,7 +339,6 @@ private:
 	Node m_outside;
 	Vec3Vec m_leakpts;
 	AreaVec m_areas;
-	SharedSectorVec m_sharedSectors;
 	std::ostream *m_cout;
 	tools::UIProgress *m_ui;
 	MapBuilderDebugUI *m_debugUI;
@@ -360,7 +354,6 @@ private:
 	int m_numInsideTris;
 	int m_numInsideNodes;
 	int m_numInsideModels;
-	int m_validContents;
 	int m_numSectors;
 	int m_numSharedSectors;
 	int m_work;
@@ -405,7 +398,7 @@ private:
 	void DecomposeAreaPoly(Node *node, AreaPoly *poly);
 	void BuildAreaSectors();
 	void BuildAreaSectors(Area &area);
-	void SubdivideSector(Area &area, Sector *sector);
+	void SubdivideSector(Sector *sector);
 	void SplitSector(const Plane &p, Sector &sector, Sector &front, Sector &back);
 	void BuildSharedSectors();
 	int FindSplitPlane(Node *node, int &boxAxis);

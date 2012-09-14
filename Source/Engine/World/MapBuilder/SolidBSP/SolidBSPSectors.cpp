@@ -25,28 +25,34 @@ void BSPBuilder::BuildSectors() {
 	m_work = 0;
 
 	for (SceneFile::TriModel::Vec::const_iterator it = m_map->worldspawn->models.begin(); it != m_map->worldspawn->models.end(); ++it) {
+		if ((*it)->ignore)
+			continue;
 		DecomposeAreaModel(*(*it).get());
 	}
 
-	m_work=m_numSectors=m_numSharedSectors=0;
+	Log("------------\n");
+	Log("Inside : %d model(s), %d tri(s)\n", m_numInsideModels, m_numInsideTris);
+	Log("Outside: %d model(s), %d tri(s)\n", m_numOutsideModels, m_numOutsideTris);
+	Log("Total  : %d model(s), %d tri(s)\n", m_numInsideModels+m_numOutsideModels, m_numInsideTris+m_numOutsideTris);
+
+	m_work=m_numInsideTris=m_numSectors=m_numSharedSectors=0;
 
 	BuildAreaSectors();
 	BuildSharedSectors();
 
+	Log("------------\n");
 	Log("\nSectors (area/shared/total): %d/%d/%d\n", m_numSectors, m_numSharedSectors, m_numSectors+m_numSharedSectors);
 	for (AreaVec::iterator it = m_areas.begin(); it != m_areas.end(); ++it) {
 		AreaRef area = *it;
 		Log("Area (%d): %d sector(s), %d tri(s)\n", area->area, area->sectors.size(), area->tris.size());
 	}
 	Log("------------\n");
-	Log("Inside : %d model(s), %d tri(s)\n", m_numInsideModels, m_numInsideTris);
-	Log("Outside: %d model(s), %d tri(s)\n", m_numOutsideModels, m_numOutsideTris);
-	Log("Total  : %d model(s), %d tri(s)\n", m_numInsideModels+m_numOutsideModels, m_numInsideTris+m_numOutsideTris);
+	Log("%d Tri(s) in %d Area(s)\n", m_numInsideTris, (int)m_areas.size());
 }
 
 void BSPBuilder::BuildAreaSectors() {
 	for (AreaVec::iterator it = m_areas.begin(); it != m_areas.end(); ++it) {
-		AreaRef area = *it;
+		const AreaRef &area = *it;
 		BuildAreaSectors(*(area.get()));
 	}
 }
@@ -54,9 +60,12 @@ void BSPBuilder::BuildAreaSectors() {
 void BSPBuilder::BuildAreaSectors(Area &area) {
 	area.bounds.Initialize();
 	Sector *root = new Sector();
+	root->areas.push_back(area.area);
 
 	for (TriFacePtrVec::iterator it = area.tris.begin(); it != area.tris.end(); ++it) {
 		SceneFile::TriFace *tri = *it;
+		RAD_ASSERT(!(tri->contents & kContentsFlag_Areaportal));
+
 		if (tri->areas.size() == 1) { // only use tris that aren't shared by any other areas.
 			area.bounds.Insert(ToBSPType(tri->model->verts[tri->v[0]].pos));
 			area.bounds.Insert(ToBSPType(tri->model->verts[tri->v[1]].pos));
@@ -75,10 +84,49 @@ void BSPBuilder::BuildAreaSectors(Area &area) {
 	}
 
 	root->bounds = area.bounds;
-	SubdivideSector(area, root);
+	SubdivideSector(root);
 }
 
-void BSPBuilder::SubdivideSector(Area &area, Sector *sector) {
+void BSPBuilder::BuildSharedSectors() {
+
+	Sector *root = new Sector();
+	root->bounds.Initialize();
+
+	for (SceneFile::TriModel::Vec::iterator it = m_map->worldspawn->models.begin(); it != m_map->worldspawn->models.end(); ++it) { 
+		SceneFile::TriModel::Ref &m = *it;
+		if (m->ignore)
+			continue;
+		if (!(m->contents & kContentsFlag_VisibleContents)) 
+			continue;
+		if (m->contents & kContentsFlag_Areaportal)
+			continue;
+
+		for (SceneFile::TriFaceVec::iterator it2 = m->tris.begin(); it2 != m->tris.end(); ++it2) {
+			SceneFile::TriFace &tri = *it2;
+
+			if (tri.areas.size() < 2)
+				continue; // only gather tris with multiple areas set.
+
+			root->bounds.Insert(ToBSPType(tri.model->verts[tri.v[0]].pos));
+			root->bounds.Insert(ToBSPType(tri.model->verts[tri.v[1]].pos));
+			root->bounds.Insert(ToBSPType(tri.model->verts[tri.v[2]].pos));
+
+			SectorPolyRef poly(new SectorPoly());
+			poly->tri = &tri;
+			poly->winding.Initialize(
+				ToBSPType(tri.model->verts[tri.v[0]]), 
+				ToBSPType(tri.model->verts[tri.v[1]]), 
+				ToBSPType(tri.model->verts[tri.v[2]]),
+				ToBSPType(tri.plane)
+			);
+			root->polys.push_back(poly);
+		}
+	}
+
+	SubdivideSector(root);
+}
+
+void BSPBuilder::SubdivideSector(Sector *sector) {
 	const ValueType kMaxSectorSize = ValueType(512);
 
 	Vec3 size = sector->bounds.Size();
@@ -106,7 +154,7 @@ void BSPBuilder::SubdivideSector(Area &area, Sector *sector) {
 				delete sector;
 				sector = back;
 				delete front;
-				SubdivideSector(area, sector);
+				SubdivideSector(sector);
 				return;
 			}
 
@@ -114,13 +162,13 @@ void BSPBuilder::SubdivideSector(Area &area, Sector *sector) {
 				delete sector;
 				sector = front;
 				delete back;
-				SubdivideSector(area, sector);
+				SubdivideSector(sector);
 				return;
 			}
 
 			delete sector;
-			SubdivideSector(area, front);
-			SubdivideSector(area, back);
+			SubdivideSector(front);
+			SubdivideSector(back);
 			return;
 		}
 	}
@@ -130,8 +178,37 @@ void BSPBuilder::SubdivideSector(Area &area, Sector *sector) {
 		return;
 	}
 
-	area.sectors.push_back(SectorRef(sector));
-	++m_numSectors;
+	m_numInsideTris += (int)sector->polys.size();
+
+	SectorRef ref(sector);
+
+	// add area(s) to sector
+	for (SectorPolyVec::const_iterator polyIt = sector->polys.begin(); polyIt != sector->polys.end(); ++polyIt) {
+		const SectorPolyRef &poly = *polyIt;
+		const SceneFile::TriFace *tri = poly->tri;
+
+		for (SceneFile::AreaNumVec::const_iterator triAreaNum = tri->areas.begin(); triAreaNum != tri->areas.end(); ++triAreaNum) {
+			AreaNumVec::const_iterator sectorAreaNum;
+			for (sectorAreaNum = sector->areas.begin(); sectorAreaNum != sector->areas.end(); ++sectorAreaNum) {
+				if (*triAreaNum == *sectorAreaNum)
+					break;
+			}
+
+			if (sectorAreaNum == sector->areas.end())
+				sector->areas.push_back(*triAreaNum);
+		}
+	}
+
+	for (AreaNumVec::const_iterator it = sector->areas.begin(); it != sector->areas.end(); ++it) {
+		m_areas[*it]->sectors.push_back(ref);
+	}
+
+	if (sector->areas.size() > 1) {
+		++m_numSharedSectors;
+	} else {
+		++m_numSectors;
+	}
+
 	if (m_numSectors % 100 == 0)
 		EmitProgress();
 }
@@ -185,9 +262,6 @@ void BSPBuilder::SplitSector(const Plane &p, Sector &sector, Sector &front, Sect
 	}
 }
 
-void BSPBuilder::BuildSharedSectors() {
-}
-
 void BSPBuilder::DecomposeAreaModel(const SceneFile::TriModel &model) {
 	if (model.contents&kContentsFlag_Areaportal)
 		return;
@@ -221,8 +295,11 @@ void BSPBuilder::DecomposeAreaModel(const SceneFile::TriModel &model) {
 		poly->tri = const_cast<SceneFile::TriFace*>(&tri);
 		DecomposeAreaPoly(m_root.get(), poly);
 
+		RAD_ASSERT(!tri.areas.empty());
+
 		if (tri.areas.empty()) {
 			++m_numOutsideTris;
+			Log("WARNING: Triangle is inside map but did not get assigned an area!\n");
 		} else {
 			++m_numInsideTris;
 		}

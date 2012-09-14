@@ -69,6 +69,9 @@ void BSPBuilder::FillOutside() {
 	MarkOccupiedNodeFaces(m_root.get());
 
 	for (SceneFile::TriModel::Vec::iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
+		if ((*m)->ignore)
+			continue;
+
 		if (!((*m)->contents & kContentsFlag_Solid)) 
 			continue; // skip non solids for outside
 
@@ -242,7 +245,8 @@ void BSPBuilder::AreaFlood(Node *leaf, Area *area) {
 	RAD_ASSERT(!(leaf->contents&kContentsFlag_Solid));
 	
 	if (leaf->contents&kContentsFlag_Areaportal) {
-		if (!leaf->area) leaf->area = area;
+		if (!leaf->area) 
+			leaf->area = area;
 		return;
 	}
 

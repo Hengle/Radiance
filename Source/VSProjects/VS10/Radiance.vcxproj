@@ -2005,9 +2005,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\Flood.cpp" />
-    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\Portals.cpp" />
-    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\Sectors.cpp" />
+    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSPFlood.cpp" />
+    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSPPortals.cpp" />
+    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSPSectors.cpp" />
     <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSP.cpp" />
     <ClCompile Include="..\..\Engine\World\MT_Fly.cpp" />
     <ClCompile Include="..\..\Engine\World\MT_Spline.cpp" />

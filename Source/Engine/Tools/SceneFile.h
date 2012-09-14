@@ -527,6 +527,7 @@ public:
 	struct TriModel;
 	typedef typename zone_vector<TriVert, Z3DXT>::type TriVertVec;
 	typedef typename zone_vector<NormalTriVert, Z3DXT>::type NormalTriVertVec;
+	typedef typename zone_vector<int, Z3DXT>::type AreaNumVec;
 
 	struct TriFace {
 		TriFace() : outside(true), shared(-1), contents(0), surface(0) {
@@ -553,7 +554,7 @@ public:
 		int contents;
 		int surface;
 		bool outside;
-		zone_vector<int, Z3DXT>::type areas;
+		AreaNumVec areas;
 		TriModel *model;
 	};
 

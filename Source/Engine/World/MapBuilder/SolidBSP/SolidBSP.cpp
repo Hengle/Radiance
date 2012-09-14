@@ -26,7 +26,7 @@ namespace tools {
 namespace solid_bsp {
 
 namespace {
-	const ValueType kMaxBoxExtents = ValueType(1024); // subdivision helps fend off numeric imprecision
+	const ValueType kMaxBoxExtents = ValueType(1024);
 };
 
 int BSPBuilder::Node::s_num = 0;
@@ -52,7 +52,6 @@ m_numOutsideModels(0),
 m_numInsideNodes(0),
 m_numInsideModels(0),
 m_numInsideTris(0),
-m_validContents(0),
 m_numSectors(0),
 m_numSharedSectors(0),
 m_flood(false) {
@@ -99,7 +98,6 @@ int BSPBuilder::ThreadProc() {
 
 void BSPBuilder::Build()
 {
-	m_validContents = 0xffffffff;
 	if (!LoadMaterials())
 		return;
 	CreateRootNode();
@@ -417,7 +415,7 @@ void BSPBuilder::CreateRootNode() {
 			m_numDetail += (int)trim->tris.size();
 		}
 
-		if (!(trim->contents & m_validContents)) 
+		if (!(trim->contents & kContentsFlag_BSPContents)) 
 			continue;
 		
 		TriModelFragRef frag(new TriModelFrag());
@@ -500,7 +498,7 @@ int BSPBuilder::FindSplitPlane(Node *node, int &boxAxis)
 
 	for (int outside = 0; outside <= 1; ++outside) {
 		for (int contents = kContentsFlag_FirstVisibleContents; contents <= kContentsFlag_LastVisibleContents; contents <<= 1) {
-			if (!(contents & m_validContents)) 
+			if (!(contents & kContentsFlag_BSPContents)) 
 				continue;
 
 			for (TriModelFragVec::const_iterator it = node->models.begin(); it != node->models.end(); ++it) {

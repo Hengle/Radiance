@@ -270,7 +270,9 @@ void BSPBuilder::FindPortalNodeFaces(Node *node)
 		//		p->plane.winding.Vertices()[i] += org;
 		//	}*/
 		//}
-		if (p->bounding || !p->original.empty()) continue;
+		if (p->bounding || !p->original.empty()) 
+			continue;
+
 		int contents = p->nodes[0]->contents ^ p->nodes[1]->contents;
 		if (contents&kContentsFlag_VisibleContents) {
 			int planenum = p->plane.planenum;
