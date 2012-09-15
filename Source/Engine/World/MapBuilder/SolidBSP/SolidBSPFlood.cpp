@@ -70,8 +70,15 @@ void BSPBuilder::FillOutside() {
 		if ((*m)->ignore)
 			continue;
 
-		if (!((*m)->contents & kContentsFlag_Solid)) 
-			continue; // skip non solids for outside
+		(*m)->outside = false;
+		if ((*m)->contents & kContentsFlag_Detail) {
+			++m_numInsideModels;
+			m_numInsideTris += (int)(*m)->tris.size();
+			for (SceneFile::TriFaceVec::iterator f = (*m)->tris.begin(); f != (*m)->tris.end(); ++f) {
+				(*f).outside = false;
+			}
+			continue; // details area never outside.
+		}
 
 		bool outside = true;
 		for (SceneFile::TriFaceVec::iterator f = (*m)->tris.begin(); f != (*m)->tris.end(); ++f) {
@@ -85,6 +92,11 @@ void BSPBuilder::FillOutside() {
 
 		if (outside) {
 			++m_numOutsideModels;
+			(*m)->outside = true;
+			(*m)->contents = kContentsFlag_Solid;
+			for (SceneFile::TriFaceVec::iterator f = (*m)->tris.begin(); f != (*m)->tris.end(); ++f) {
+				(*f).contents = kContentsFlag_Solid;
+			}
 		} else {
 			(*m)->outside = false;
 			++m_numInsideModels;			

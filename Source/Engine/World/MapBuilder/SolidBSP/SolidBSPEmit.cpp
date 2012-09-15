@@ -207,7 +207,6 @@ void BSPBuilder::EmitBSPAreaportals(Node *leaf, int areaNum, BSPArea &area) {
 			Log("WARNING: Areaportal touches more than 2 areas (%d, %d, %d), map will not render correctly.\n", areaNum, other->area->area, p->areas[side]);
 		} else {
 			p->areas[side] = areaNum;
-			p->emitId = (int)m_bspFile->numAreaportals.get();
 			if (area.firstPortal == std::numeric_limits<U32>::max()) {
 				area.firstPortal = m_bspFile->numAreaportalIndices;
 			}
