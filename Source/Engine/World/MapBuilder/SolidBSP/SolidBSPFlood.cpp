@@ -1,4 +1,4 @@
-/*! \file Flood.cpp
+/*! \file SolidBSPFlood.cpp
 	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
 	\copyright See Radiance/LICENSE for licensing terms.
 	\author Joe Riedel
@@ -6,9 +6,6 @@
 */
 
 #include RADPCH
-
-#if defined(RAD_OPT_TOOLS)
-
 #include "SolidBSP.h"
 #include <deque>
 
@@ -30,6 +27,7 @@ bool BSPBuilder::FloodFill() {
 		Node *leaf = LeafForPoint(ToBSPType(ent->origin));
 		if (!leaf) {
 			SOLID_BSP_ICE();
+			return false;
 		}
 
 		if (leaf->contents & kContentsFlag_Solid) {
@@ -220,6 +218,7 @@ void BSPBuilder::AreaFlood() {
 
 void BSPBuilder::FindAreas(Node *node) {
 	if (node->planenum != kPlaneNumLeaf) {
+		// move all the way down to the leafs
 		FindAreas(node->children[0].get());
 		FindAreas(node->children[1].get());
 		return;
@@ -266,5 +265,3 @@ void BSPBuilder::AreaFlood(Node *leaf, Area *area) {
 
 } // solid_bsp
 } // tools
-
-#endif // RAD_OPT_TOOLS

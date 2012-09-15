@@ -1,4 +1,4 @@
-/*! \file Portals.cpp
+/*! \file SolidBSPPortals.cpp
 	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
 	\copyright See Radiance/LICENSE for licensing terms.
 	\author Joe Riedel
@@ -6,9 +6,6 @@
 */
 
 #include RADPCH
-
-#if defined(RAD_OPT_TOOLS)
-
 #include "SolidBsp.h"
 
 namespace tools {
@@ -275,12 +272,13 @@ void BSPBuilder::FindPortalNodeFaces(Node *node)
 
 		int contents = p->nodes[0]->contents ^ p->nodes[1]->contents;
 		if (contents&kContentsFlag_VisibleContents) {
-			int planenum = p->plane.planenum;
+			// matching always faces away from the leaf
+			int planenum = p->plane.planenum ^ (side^1);
+
 			for (TriModelFragVec::iterator it = node->models.begin(); it != node->models.end(); ++it) {
 				for (PolyVec::iterator poly = (*it)->polys.begin(); poly != (*it)->polys.end(); ++poly) {
-					// because we have inward facing geometry, any matching planenum will work, we don't dictate
-					// which direction the faces must point.
-					if ((*poly)->planenum == planenum || (*poly)->planenum == (planenum^1)) {
+					
+					if ((*poly)->planenum == planenum) {
 						p->contents |= contents;
 						p->original.push_back((*poly)->original);
 						p->poly = (*poly).get();
@@ -304,5 +302,3 @@ void BSPBuilder::MakeTreePortals(Node *node) {
 
 } // solid_bsp
 } // tools
-
-#endif // RAD_OPT_TOOLS

@@ -1,4 +1,4 @@
-/*! \file Sectors.cpp
+/*! \file SolidBSPSectors.cpp
 	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
 	\copyright See Radiance/LICENSE for licensing terms.
 	\author Joe Riedel
@@ -6,9 +6,6 @@
 */
 
 #include RADPCH
-
-#if defined(RAD_OPT_TOOLS)
-
 #include "SolidBsp.h"
 
 namespace tools {
@@ -66,6 +63,9 @@ void BSPBuilder::BuildAreaSectors(Area &area) {
 		SceneFile::TriFace *tri = *it;
 		RAD_ASSERT(!(tri->contents & kContentsFlag_Areaportal));
 
+		if (tri->surface & kSurfaceFlag_NoDraw)
+			continue;
+
 		if (tri->areas.size() == 1) { // only use tris that aren't shared by any other areas.
 			area.bounds.Insert(ToBSPType(tri->model->verts[tri->v[0]].pos));
 			area.bounds.Insert(ToBSPType(tri->model->verts[tri->v[1]].pos));
@@ -74,9 +74,9 @@ void BSPBuilder::BuildAreaSectors(Area &area) {
 			SectorPolyRef poly(new SectorPoly());
 			poly->tri = tri;
 			poly->winding.Initialize(
-				ToBSPType(tri->model->verts[tri->v[0]]), 
-				ToBSPType(tri->model->verts[tri->v[1]]), 
-				ToBSPType(tri->model->verts[tri->v[2]]),
+				SectorWinding::VertexType(ToBSPType(tri->model->verts[tri->v[0]])), 
+				SectorWinding::VertexType(ToBSPType(tri->model->verts[tri->v[1]])), 
+				SectorWinding::VertexType(ToBSPType(tri->model->verts[tri->v[2]])),
 				ToBSPType(tri->plane)
 			);
 			root->polys.push_back(poly);
@@ -104,9 +104,11 @@ void BSPBuilder::BuildSharedSectors() {
 		for (SceneFile::TriFaceVec::iterator it2 = m->tris.begin(); it2 != m->tris.end(); ++it2) {
 			SceneFile::TriFace &tri = *it2;
 
+			if (tri.surface & kSurfaceFlag_NoDraw)
+				continue;
 			if (tri.areas.size() < 2)
 				continue; // only gather tris with multiple areas set.
-
+			
 			root->bounds.Insert(ToBSPType(tri.model->verts[tri.v[0]].pos));
 			root->bounds.Insert(ToBSPType(tri.model->verts[tri.v[1]].pos));
 			root->bounds.Insert(ToBSPType(tri.model->verts[tri.v[2]].pos));
@@ -114,9 +116,9 @@ void BSPBuilder::BuildSharedSectors() {
 			SectorPolyRef poly(new SectorPoly());
 			poly->tri = &tri;
 			poly->winding.Initialize(
-				ToBSPType(tri.model->verts[tri.v[0]]), 
-				ToBSPType(tri.model->verts[tri.v[1]]), 
-				ToBSPType(tri.model->verts[tri.v[2]]),
+				SectorWinding::VertexType(ToBSPType(tri.model->verts[tri.v[0]])), 
+				SectorWinding::VertexType(ToBSPType(tri.model->verts[tri.v[1]])), 
+				SectorWinding::VertexType(ToBSPType(tri.model->verts[tri.v[2]])),
 				ToBSPType(tri.plane)
 			);
 			root->polys.push_back(poly);
@@ -214,6 +216,7 @@ void BSPBuilder::SubdivideSector(Sector *sector) {
 }
 
 void BSPBuilder::SplitSector(const Plane &p, Sector &sector, Sector &front, Sector &back) {
+	
 	while (!sector.polys.empty()) {
 		SectorPolyRef poly = sector.polys.back();
 		sector.polys.pop_back();
@@ -295,7 +298,7 @@ void BSPBuilder::DecomposeAreaModel(const SceneFile::TriModel &model) {
 		poly->tri = const_cast<SceneFile::TriFace*>(&tri);
 		DecomposeAreaPoly(m_root.get(), poly);
 
-		RAD_ASSERT(!tri.areas.empty());
+		//RAD_ASSERT(!tri.areas.empty());
 
 		if (tri.areas.empty()) {
 			++m_numOutsideTris;
@@ -348,6 +351,10 @@ void BSPBuilder::DecomposeAreaPoly(Node *node, AreaPoly *poly) {
 	{
 		Winding f, b;
 		poly->winding.Split(m_planes.Plane(node->planenum), &f, &b, ValueType(0));
+
+		if (f.Empty() && b.Empty()) {
+			Log("WARNING: DecomposeAreaPoly triangle clipped away.\n");
+		}
 		
 		if (!f.Empty()) {
 			front = new AreaPoly(*poly);
@@ -372,5 +379,3 @@ void BSPBuilder::DecomposeAreaPoly(Node *node, AreaPoly *poly) {
 
 } // solid_bsp
 } // tools
-
-#endif // RAD_OPT_TOOLS

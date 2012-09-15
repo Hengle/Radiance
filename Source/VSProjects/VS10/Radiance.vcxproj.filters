@@ -154,9 +154,6 @@
     <Filter Include="Source\Engine\World\MapBuilder">
       <UniqueIdentifier>{4c5f4c53-3d67-40fb-815c-c75311d989ef}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Engine\World\MapBuilder\BoxBSP">
-      <UniqueIdentifier>{99a02863-d289-486b-8454-9c6fcddc1bfd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\Engine\World\MapBuilder\SolidBSP">
       <UniqueIdentifier>{77f088f1-1e9a-48da-a224-963f2d7e042f}</UniqueIdentifier>
     </Filter>
@@ -1338,18 +1335,6 @@
     <ClInclude Include="..\..\Engine\World\MapBuilder\MapBuilder.h">
       <Filter>Source\Engine\World\MapBuilder</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\World\MapBuilder\BoxBSP\BoxBSP.h">
-      <Filter>Source\Engine\World\MapBuilder\BoxBSP</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\World\MapBuilder\BoxBSP\MapTypes.h">
-      <Filter>Source\Engine\World\MapBuilder\BoxBSP</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\World\MapBuilder\BoxBSP\PlaneHash.h">
-      <Filter>Source\Engine\World\MapBuilder\BoxBSP</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\World\MapBuilder\BoxBSP\VecHash.h">
-      <Filter>Source\Engine\World\MapBuilder\BoxBSP</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\Renderer\GL\GLRenderer.h">
       <Filter>Source\Engine\Renderer\GL</Filter>
     </ClInclude>
@@ -1402,6 +1387,9 @@
       <Filter>Source\Engine\Tools</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Engine\World\MapBuilder\MapBuilderDebugUI.h">
+      <Filter>Source\Engine\World\MapBuilder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\World\MapBuilder\CinematicsBuilder.h">
       <Filter>Source\Engine\World\MapBuilder</Filter>
     </ClInclude>
   </ItemGroup>
@@ -2051,9 +2039,6 @@
     <ClCompile Include="..\..\Engine\World\MapBuilder\MapBuilder.cpp">
       <Filter>Source\Engine\World\MapBuilder</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\World\MapBuilder\BoxBSP\BoxBSP.cpp">
-      <Filter>Source\Engine\World\MapBuilder\BoxBSP</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Engine\Renderer\PC\RBGLAssets.cpp">
       <Filter>Source\Engine\Renderer\PC</Filter>
     </ClCompile>
@@ -2088,6 +2073,12 @@
       <Filter>Source\Engine\World\MapBuilder\SolidBSP</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSPSectors.cpp">
+      <Filter>Source\Engine\World\MapBuilder\SolidBSP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\MapBuilder\CinematicsBuilder.cpp">
+      <Filter>Source\Engine\World\MapBuilder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSPEmit.cpp">
       <Filter>Source\Engine\World\MapBuilder\SolidBSP</Filter>
     </ClCompile>
   </ItemGroup>

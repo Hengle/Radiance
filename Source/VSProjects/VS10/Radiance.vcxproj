@@ -880,46 +880,7 @@
     <ClInclude Include="..\..\Engine\World\Lua\T_TempSpawn.h" />
     <ClInclude Include="..\..\Engine\World\Lua\T_Tick.h" />
     <ClInclude Include="..\..\Engine\World\Lua\T_TypefacePrecache.h" />
-    <ClInclude Include="..\..\Engine\World\MapBuilder\BoxBSP\BoxBSP.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\World\MapBuilder\BoxBSP\MapTypes.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\World\MapBuilder\BoxBSP\PlaneHash.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\World\MapBuilder\BoxBSP\VecHash.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="..\..\Engine\World\MapBuilder\CinematicsBuilder.h" />
     <ClInclude Include="..\..\Engine\World\MapBuilder\MapBuilder.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
@@ -1562,7 +1523,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentAssetThumbDimensionCache.cpp" />
+    <ClCompile Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentAssetThumbDimensionCache.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorMapThumb.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
@@ -1643,7 +1609,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\Tools\Editor\EditorBSPDebugWidget.cpp" />
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorBSPDebugWidget.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorComboCheckBox.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
@@ -1985,15 +1956,11 @@
     <ClCompile Include="..\..\Engine\World\Lua\T_TempSpawn.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\T_Tick.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\T_TypefacePrecache.cpp" />
-    <ClCompile Include="..\..\Engine\World\MapBuilder\BoxBSP\BoxBSP.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+    <ClCompile Include="..\..\Engine\World\MapBuilder\CinematicsBuilder.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\Engine\World\MapBuilder\MapBuilder.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
@@ -2005,10 +1972,36 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSPFlood.cpp" />
-    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSPPortals.cpp" />
-    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSPSectors.cpp" />
-    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSP.cpp" />
+    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSPEmit.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSPFlood.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSPPortals.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSPSectors.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSP.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\Engine\World\MT_Fly.cpp" />
     <ClCompile Include="..\..\Engine\World\MT_Spline.cpp" />
     <ClCompile Include="..\..\Engine\World\PostProcess.cpp" />

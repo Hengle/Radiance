@@ -5,8 +5,6 @@
 
 #include RADPCH
 
-#if defined(RAD_OPT_TOOLS)
-
 #include "BoxBSP.h"
 #include "../../../SkAnim/SkBuilder.h"
 #include "../../../COut.h"
@@ -937,5 +935,3 @@ void BSPBuilder::EmitModel(const TriModel &model)
 
 } // box_bsp
 } // tools
-
-#endif // RAD_OPT_TOOLS

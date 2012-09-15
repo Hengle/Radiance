@@ -15,12 +15,12 @@ namespace bsp_file {
 
 enum  { 
 	kBspTag = RAD_FOURCC('b', 's', 'p', 't'),
-	kBspVersion  = 0x1
+	kBspVersion  = 0x2
 };
 
 RAD_ZONE_DEF(RADENG_API, ZBSPFile, "BSPFile", ZWorld);
 
-BOOST_STATIC_ASSERT(sizeof(BSPVertex)==28);
+BOOST_STATIC_ASSERT(sizeof(BSPVertex)==40);
 BOOST_STATIC_ASSERT(sizeof(BSPCameraTM)==9*4);
 
 BSPFileParser::BSPFileParser() :
@@ -29,9 +29,15 @@ m_ents(0),
 m_mats(0),
 m_nodes(0),
 m_leafs(0),
+m_areas(0),
+m_areaportals(0),
+m_sectors(0),
 m_models(0),
+m_clipSurfaces(0),
 m_planes(0),
 m_verts(0),
+m_areaportalIndices(0),
+m_sectorIndices(0),
 m_indices(0),
 m_actorIndices(0),
 m_actors(0),
@@ -49,6 +55,8 @@ m_numLeafs(0),
 m_numModels(0),
 m_numPlanes(0),
 m_numVerts(0),
+m_numAreaportalIndices(0),
+m_numSectorIndices(0),
 m_numIndices(0),
 m_numActorIndices(0),
 m_numActors(0),
@@ -71,7 +79,7 @@ BSPFileParser::~BSPFileParser()
 int BSPFileParser::Parse(const void *data, AddrSize len) {
 	// Read header
 	const U8 *bytes = reinterpret_cast<const U8*>(data);
-	CHECK_SIZE(sizeof(U32)*20);
+	CHECK_SIZE(sizeof(U32)*25);
 	U32 tag = *reinterpret_cast<const U32*>(bytes);
 	U32 version  = *reinterpret_cast<const U32*>(bytes+sizeof(U32));
 	if (tag != kBspTag || version != kBspVersion)
@@ -94,11 +102,23 @@ int BSPFileParser::Parse(const void *data, AddrSize len) {
 	bytes += sizeof(U32);
 	m_numLeafs = *reinterpret_cast<const U32*>(bytes);
 	bytes += sizeof(U32);
+	m_numAreas = *reinterpret_cast<const U32*>(bytes);
+	bytes += sizeof(U32);
+	m_numAreaportals = *reinterpret_cast<const U32*>(bytes);
+	bytes += sizeof(U32);
+	m_numSectors = *reinterpret_cast<const U32*>(bytes);
+	bytes += sizeof(U32);
 	m_numModels = *reinterpret_cast<const U32*>(bytes);
+	bytes += sizeof(U32);
+	m_numClipSurfaces = *reinterpret_cast<const U32*>(bytes);
 	bytes += sizeof(U32);
 	m_numPlanes = *reinterpret_cast<const U32*>(bytes);
 	bytes += sizeof(U32);
 	m_numVerts = *reinterpret_cast<const U32*>(bytes);
+	bytes += sizeof(U32);
+	m_numAreaportalIndices = *reinterpret_cast<const U32*>(bytes);
+	bytes += sizeof(U32);
+	m_numSectorIndices = *reinterpret_cast<const U32*>(bytes);
 	bytes += sizeof(U32);
 	m_numIndices = *reinterpret_cast<const U32*>(bytes);
 	bytes += sizeof(U32);
@@ -130,19 +150,37 @@ int BSPFileParser::Parse(const void *data, AddrSize len) {
 	CHECK_SIZE(sizeof(BSPLeaf)*m_numLeafs);
 	m_leafs = reinterpret_cast<const BSPLeaf*>(bytes);
 	bytes += sizeof(BSPLeaf)*m_numLeafs;
+	CHECK_SIZE(sizeof(BSPArea)*m_numAreas);
+	m_areas = reinterpret_cast<const BSPArea*>(bytes);
+	bytes += sizeof(BSPArea)*m_numAreas;
+	CHECK_SIZE(sizeof(BSPAreaportal)*m_numAreaportals);
+	m_areaportals = reinterpret_cast<const BSPAreaportal*>(bytes);
+	bytes += sizeof(BSPAreaportal)*m_numAreaportals;
+	CHECK_SIZE(sizeof(BSPSector)*m_numSectors);
+	m_sectors = reinterpret_cast<const BSPSector*>(bytes);
+	bytes += sizeof(BSPSector)*m_numSectors;
 	CHECK_SIZE(sizeof(BSPModel)*m_numModels);
 	m_models = reinterpret_cast<const BSPModel*>(bytes);
 	bytes += sizeof(BSPModel)*m_numModels;
+	CHECK_SIZE(sizeof(BSPClipSurface)*m_numClipSurfaces);
+	m_clipSurfaces = reinterpret_cast<const BSPClipSurface*>(bytes);
+	bytes += sizeof(BSPClipSurface)*m_numClipSurfaces;
 	CHECK_SIZE(sizeof(BSPPlane)*m_numPlanes);
 	m_planes = reinterpret_cast<const BSPPlane*>(bytes);
 	bytes += sizeof(BSPPlane)*m_numPlanes;
 	CHECK_SIZE(sizeof(BSPVertex)*m_numVerts);
 	m_verts = reinterpret_cast<const BSPVertex*>(bytes);
 	bytes += sizeof(BSPVertex)*m_numVerts;
+	CHECK_SIZE(sizeof(U16)*m_numAreaportalIndices);
+	m_areaportalIndices = reinterpret_cast<const U16*>(bytes);
+	bytes += sizeof(U16)*m_numAreaportalIndices;
+	CHECK_SIZE(sizeof(U16)*m_numSectorIndices);
+	m_sectorIndices = reinterpret_cast<const U16*>(bytes);
+	bytes += sizeof(U16)*m_numSectorIndices;
 	CHECK_SIZE(sizeof(U16)*m_numIndices);
 	m_indices = reinterpret_cast<const U16*>(bytes);
 	bytes += sizeof(U16)*m_numIndices;
-	if (m_numIndices&1) // align?
+	if ((m_numAreaportalIndices+m_numSectorIndices+m_numIndices)&1) // align?
 		bytes += sizeof(U16);
 	CHECK_SIZE(sizeof(U32)*m_numActorIndices);
 	m_actorIndices = reinterpret_cast<const U32*>(bytes);
@@ -233,9 +271,15 @@ int BSPFileBuilder::Write(stream::OutputStream &os) {
 	os << (U32)m_ents.size();
 	os << (U32)m_nodes.size();
 	os << (U32)m_leafs.size();
+	os << (U32)m_areas.size();
+	os << (U32)m_areaportals.size();
+	os << (U32)m_sectors.size();
 	os << (U32)m_models.size();
+	os << (U32)m_clipSurfaces.size();
 	os << (U32)m_planes.size();
 	os << (U32)m_vertices.size();
+	os << (U32)m_areaportalIndices.size();
+	os << (U32)m_sectorIndices.size();
 	os << (U32)m_indices.size();
 	os << (U32)m_actorIndices.size();
 	os << (U32)m_actors.size();
@@ -258,8 +302,20 @@ int BSPFileBuilder::Write(stream::OutputStream &os) {
 	len = (stream::SPos)(sizeof(BSPLeaf)*m_leafs.size());
 	if (len && os.Write(&m_leafs[0], len, 0) != len)
 		return pkg::SR_IOError;
+	len = (stream::SPos)(sizeof(BSPArea)*m_areas.size());
+	if (len && os.Write(&m_areas[0], len, 0) != len)
+		return pkg::SR_IOError;
+	len = (stream::SPos)(sizeof(BSPAreaportal)*m_areaportals.size());
+	if (len && os.Write(&m_areaportals[0], len, 0) != len)
+		return pkg::SR_IOError;
+	len = (stream::SPos)(sizeof(BSPSector)*m_sectors.size());
+	if (len && os.Write(&m_sectors[0], len, 0) != len)
+		return pkg::SR_IOError;
 	len = (stream::SPos)(sizeof(BSPModel)*m_models.size());
 	if (len && os.Write(&m_models[0], len, 0) != len)
+		return pkg::SR_IOError;
+	len = (stream::SPos)(sizeof(BSPClipSurface)*m_clipSurfaces.size());
+	if (len && os.Write(&m_clipSurfaces[0], len, 0) != len)
 		return pkg::SR_IOError;
 	len = (stream::SPos)(sizeof(BSPPlane)*m_planes.size());
 	if (len && os.Write(&m_planes[0], len, 0) != len)
@@ -267,11 +323,17 @@ int BSPFileBuilder::Write(stream::OutputStream &os) {
 	len = (stream::SPos)(sizeof(BSPVertex)*m_vertices.size());
 	if (len && os.Write(&m_vertices[0], len, 0) != len)
 		return pkg::SR_IOError;
+	len = (stream::SPos)(sizeof(U16)*m_areaportalIndices.size());
+	if (len && os.Write(&m_areaportalIndices[0], len, 0) != len)
+		return pkg::SR_IOError;
+	len = (stream::SPos)(sizeof(U16)*m_sectorIndices.size());
+	if (len && os.Write(&m_sectorIndices[0], len, 0) != len)
+		return pkg::SR_IOError;
 	len = (stream::SPos)(sizeof(U16)*m_indices.size());
 	if (len && os.Write(&m_indices[0], len, 0) != len)
 		return pkg::SR_IOError;
-	if (m_indices.size()&1) {
-		if (!os.Write((U16)0))
+	if ((m_areaportalIndices.size()+m_sectorIndices.size()+m_indices.size())&1) {
+		if (!os.Write((U16)0)) // padd
 			return pkg::SR_IOError;
 	}
 	len = (stream::SPos)(sizeof(U32)*m_actorIndices.size());

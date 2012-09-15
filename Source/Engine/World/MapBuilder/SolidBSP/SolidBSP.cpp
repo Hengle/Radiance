@@ -7,10 +7,7 @@
 
 #include RADPCH
 
-#if defined(RAD_OPT_TOOLS)
-
 #include "SolidBSP.h"
-#include "../../../SkAnim/SkBuilder.h"
 #include "../../../Packages/Packages.h"
 #include "../../../COut.h"
 #include "../../../App.h"
@@ -121,6 +118,7 @@ void BSPBuilder::Build()
 
 	AreaFlood();
 	BuildSectors();
+	EmitBSPFile();
 
 	//if (g_glDebug) { DisplayTree(0, !m_flood); }
 }
@@ -359,19 +357,27 @@ bool BSPBuilder::LoadMaterials() {
 			if (trif.mat == -1)
 				break;
 			const SceneFile::Material &mat = m_map->mats[(*f).mat];
-			pkg::Package::Entry::Ref material = App::Get()->engine->sys->packages->Resolve(mat.name.c_str);
-			if (!material) {
-				Log("WARNING: no material named '%s'!\n", mat.name.c_str.get());
-				break;
+			pkg::Package::Entry::Ref material = App::Get()->engine->sys->packages->Resolve(mat.name.c_str, 0);
+
+			// assume detail.
+			int contents = kContentsFlag_Detail;
+			int surface = 0;
+
+			if (material) {
+				const String *s = material->KeyValue<String>("BSP.Contents", 0);
+				if (!s) {
+					Log("WARNING: meta-data error on material '%s'", mat.name.c_str.get());
+					break;
+				}
+
+				contents = ContentsForString(*s);
+
+				s = material->KeyValue<String>("BSP.Surface", 0);
+				if (s)
+					surface = SurfaceForString(*s);
 			}
 
-			const String *s = material->KeyValue<String>("BSP.Contents", 0);
-			if (!s) {
-				Log("WARNING: meta-data error on material '%s'", mat.name.c_str.get());
-				break;
-			}
-
-			trif.contents = ContentsForString(*s);
+			trif.contents = contents;
 			if (!trim->contents)
 				trim->contents = trif.contents;
 			if (trim->contents != trif.contents) {
@@ -379,9 +385,7 @@ bool BSPBuilder::LoadMaterials() {
 				trim->contents |= trif.contents;
 			}
 
-			s = material->KeyValue<String>("BSP.Surface", 0);
-			if (s)
-				trif.surface = SurfaceForString(*s);
+			trif.surface = surface;
 		}
 
 		if (f != trim->tris.end()) {
@@ -518,6 +522,7 @@ int BSPBuilder::FindSplitPlane(Node *node, int &boxAxis)
 						int front = 0;
 						int back  = 0;
 						int split = 0;
+						int areaportal = 0;
 
 //						testedPlanes.insert(planenum);
 						const Plane &p = m_planes.Plane(planenum);
@@ -534,12 +539,12 @@ int BSPBuilder::FindSplitPlane(Node *node, int &boxAxis)
 							case Plane::Back:
 								back += (int)mdl->polys.size();
 								break;
-#if 0
 							case Plane::Cross:
 								for (PolyVec::iterator poly = mdl->polys.begin(); poly != mdl->polys.end(); ++poly)
 								{
-									if (((*poly)->planenum&~1) == planenum) continue;
-									s = (*poly)->winding->Side(p, SplitEpsilon);
+									if (((*poly)->planenum&~1) == planenum) 
+										continue;
+									s = (*poly)->winding->Side(p, kSplitEpsilon);
 									switch (s)
 									{
 									case Plane::Front:
@@ -550,6 +555,8 @@ int BSPBuilder::FindSplitPlane(Node *node, int &boxAxis)
 										break;
 									case Plane::Cross:
 										++split;
+										if (mdl->original->contents == kContentsFlag_Areaportal)
+											++areaportal;
 										break;
 									}
 								}
@@ -558,12 +565,11 @@ int BSPBuilder::FindSplitPlane(Node *node, int &boxAxis)
 							case Plane::On:
 								break;
 							default:
-								INTERNAL_COMPILER_ERROR();
-#endif
+								SOLID_BSP_ICE();
 							}
 						}
 
-						int val = math::Abs(front-back) + split*1000;
+						int val = math::Abs(front-back) + split*1000 + areaportal*10000;
 
 						if (val < bestVal) {
 							bestNum = planenum;
@@ -785,9 +791,22 @@ int BSPBuilder::ContentsForString(const String &s) {
 }
 
 int BSPBuilder::SurfaceForString(const String &s) {
-	if (s == "No Draw")
-		return kSurfaceFlag_NoDraw;
-	return 0;
+	struct Flags {
+		const char *sz;
+		int flag;
+	};
+	static Flags kFlags[] = {
+		{ "No Draw", kSurfaceFlag_NoDraw },
+		{ 0, }
+	};
+	int flags = 0;
+
+	for (int i = 0; kFlags[i].sz; ++i) {
+		if (s.StrStr(CStr(kFlags[i].sz)))
+			flags |= kFlags[i].flag;
+	}
+
+	return flags;
 }
 
 Vec2 BSPBuilder::ToBSPType(const SceneFile::Vec2 &vec) {
@@ -862,5 +881,3 @@ Vec3 RandomColor() {
 
 } // box_bsp
 } // tools
-
-#endif // RAD_OPT_TOOLS

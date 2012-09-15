@@ -17,8 +17,6 @@
 #include "PlaneHash.h"
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/Container/ZoneSet.h>
-#include <Runtime/Container/ZoneHashSet.h>
-#include <Runtime/Container/ZoneHashMap.h>
 #include <Runtime/Thread.h>
 #include <QtCore/QVariant>
 #include <vector>
@@ -38,6 +36,19 @@ Vec3 RandomColor();
 
 ///////////////////////////////////////////////////////////////////////////////
 
+//! Builds a solid sectorized BSP.
+/*! This is pretty similiar in function to Quake style BSP, a solid skin mesh
+	is created by the artist, although any arbitrary enclosed shape bounded
+	by triangles will work as a brush primitive (non-convexity is supported).
+
+	The primary goal here is to automatically divide the map into areas seperated
+	by portals for rendering. Each area is then further divided into sectors, which
+	are square MxMxM in dimension and contain triangle lists for any geometry contained.
+
+	The BSP iteself is used for collision, but not really for rendering. At rendering time
+	the BSP is used to locate the camera's area and the sector list is rendered with
+	frustum clipping.
+ */
 class RADENG_CLASS BSPBuilder : protected thread::Thread {
 public:
 	typedef boost::shared_ptr<BSPBuilder> Ref;
@@ -71,18 +82,15 @@ private:
 		return m_bspFile; 
 	}
 
-	typedef SceneFile::NormalTriVert Vert;
-	typedef SceneFile::NormalTriVertVec VertVec;
-
 	///////////////////////////////////////////////////////////////////////////////
 
 	enum ContentsFlags {
 		RAD_FLAG(kContentsFlag_Solid), // solid splits first, all other contents are detail splitters
+		RAD_FLAG(kContentsFlag_Areaportal),
 		RAD_FLAG(kContentsFlag_Detail), // never in the BSP.
 		RAD_FLAG(kContentsFlag_Clip),
 		RAD_FLAG(kContentsFlag_Fog),
 		RAD_FLAG(kContentsFlag_Water),
-		RAD_FLAG(kContentsFlag_Areaportal),
 		kContentsFlag_VisibleContents = kContentsFlag_Solid|kContentsFlag_Detail|kContentsFlag_Clip|kContentsFlag_Fog|kContentsFlag_Water|kContentsFlag_Areaportal,
 		kContentsFlag_FirstVisibleContents = kContentsFlag_Solid,
 		kContentsFlag_LastVisibleContents = kContentsFlag_Areaportal,
@@ -128,7 +136,7 @@ private:
 	};
 
 	typedef boost::shared_ptr<Poly> PolyRef;
-	typedef zone_vector<PolyRef, ZToolsT>::type PolyVec;
+	typedef zone_vector<PolyRef, world::bsp_file::ZBSPBuilderT>::type PolyVec;
 
 	///////////////////////////////////////////////////////////////////////////////
 
@@ -151,7 +159,7 @@ private:
 	};
 
 	typedef boost::shared_ptr<TriModelFrag> TriModelFragRef;
-	typedef zone_vector<TriModelFragRef, ZToolsT>::type TriModelFragVec;
+	typedef zone_vector<TriModelFragRef, world::bsp_file::ZBSPBuilderT>::type TriModelFragVec;
 
 	///////////////////////////////////////////////////////////////////////////////
 
@@ -171,7 +179,7 @@ private:
 	};
 
 	typedef boost::shared_ptr<WindingPlane> WindingPlaneRef;
-	typedef zone_vector<WindingPlaneRef, ZToolsT>::type WindingPlaneVec;
+	typedef zone_vector<WindingPlaneRef, world::bsp_file::ZBSPBuilderT>::type WindingPlaneVec;
 
 	enum {
 		kPlaneNumLeaf = -1
@@ -182,13 +190,15 @@ private:
 	struct Portal;
 	typedef boost::shared_ptr<Portal> PortalRef;
 
-	typedef zone_vector<SceneFile::TriFace*, ZToolsT>::type TriFacePtrVec;
+	typedef zone_vector<SceneFile::TriFace*, world::bsp_file::ZBSPBuilderT>::type TriFacePtrVec;
 
 	///////////////////////////////////////////////////////////////////////////////
 
 	struct Portal {
 		Portal() {
+			emitId = -1;
 			onNode = 0;
+			areas[0] = areas[1] = -1;
 			nodes[0] = nodes[1] = 0;
 			contents = 0;
 			poly = 0;
@@ -201,6 +211,8 @@ private:
 			original = p.original;
 			onNode = p.onNode;
 			plane.planenum = p.plane.planenum;
+			emitId = -1;
+			areas[0] = areas[1] = -1;
 			nodes[0] = nodes[1] = 0;
 			contents = 0;
 			poly = 0;
@@ -215,6 +227,8 @@ private:
 
 		WindingPlane plane;
 		int contents; // bounded contents.
+		int areas[2];
+		int emitId;
 		TriFacePtrVec original;
 		Poly *poly;
 		Node *onNode; // null means outside node
@@ -255,20 +269,22 @@ private:
 	};
 
 	typedef boost::shared_ptr<SectorPoly> SectorPolyRef;
-	typedef zone_vector<SectorPolyRef, ZToolsT>::type SectorPolyVec;
-	typedef zone_vector<int, ZToolsT>::type AreaNumVec;
+	typedef zone_vector<SectorPolyRef, world::bsp_file::ZBSPBuilderT>::type SectorPolyVec;
+	typedef zone_vector<int, world::bsp_file::ZBSPBuilderT>::type AreaNumVec;
 
 	///////////////////////////////////////////////////////////////////////////////
 
 	struct Sector {
+		Sector() : emitId(-1) {}
+		int emitId;
 		BBox bounds;
 		SectorPolyVec polys;
 		AreaNumVec areas;
 	};
 
 	typedef boost::shared_ptr<Sector> SectorRef;
-	typedef zone_vector<SectorRef, ZToolsT>::type SectorVec;
-	typedef zone_vector<SceneFile::TriFace*, ZToolsT>::type TriFacePtrVec;
+	typedef zone_vector<SectorRef, world::bsp_file::ZBSPBuilderT>::type SectorVec;
+	typedef zone_vector<SceneFile::TriFace*, world::bsp_file::ZBSPBuilderT>::type TriFacePtrVec;
 
 	///////////////////////////////////////////////////////////////////////////////
 
@@ -284,7 +300,7 @@ private:
 	};
 
 	typedef boost::shared_ptr<Area> AreaRef;
-	typedef zone_vector<AreaRef, ZToolsT>::type AreaVec;
+	typedef zone_vector<AreaRef, world::bsp_file::ZBSPBuilderT>::type AreaVec;
 
 	//typedef container::hash_set<int>::type PlaneNumHash;
 
@@ -317,6 +333,30 @@ private:
 		int occupied;
 		Area *area;
 		static int s_num;
+	};
+
+	///////////////////////////////////////////////////////////////////////////////
+
+	struct EmitTriModel
+	{
+		typedef boost::shared_ptr<EmitTriModel> Ref;
+		typedef SceneFileD::NormalTriVert Vert;
+		typedef SceneFileD::NormalTriVertVec VertVec;
+		typedef zone_map<Vert, int, world::bsp_file::ZBSPBuilderT>::type VertMap;
+		typedef zone_vector<Ref, world::bsp_file::ZBSPBuilderT>::type Vec;
+		typedef zone_vector<int, world::bsp_file::ZBSPBuilderT>::type Indices;
+		VertVec verts;
+		Indices indices;
+		VertMap vmap;
+		int mat;
+		int numChannels;
+
+		void AddVertex(const Vert &vert);
+		void Clear() {
+			verts.clear();
+			indices.clear();
+			vmap.clear();
+		}
 	};
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -403,6 +443,22 @@ private:
 	void BuildSharedSectors();
 	int FindSplitPlane(Node *node, int &boxAxis);
 	int BoxPlaneNum(Node *node, int &boxAxis);
+
+	// Emit BSP
+	void EmitBSPFile();
+	void EmitBSPMaterials();
+	void EmitBSPEntities();
+	void EmitBSPEntity(const SceneFile::Entity::Ref &entity);
+	void EmitBSPAreas();
+	void EmitBSPAreaportals(Node *leaf, int areaNum, world::bsp_file::BSPArea &area);
+	void EmitBSPSector(Sector &s);
+	void EmitBSPModel(const EmitTriModel &model);
+	S32 EmitBSPNodes(const Node *node, S32 parent);
+	void EmitBSPClipSurfaces(const Node *node, world::bsp_file::BSPLeaf *leaf);
+	void EmitBSPClipBevels(world::bsp_file::BSPLeaf *leaf);
+	void EmitBSPPlanes();
+	U32 FindBSPMaterial(const char *name);
+	int EmitBSPCinematics();
 
 	void ResetProgress();
 	void EmitProgress();

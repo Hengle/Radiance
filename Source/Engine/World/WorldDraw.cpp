@@ -171,8 +171,6 @@ void WorldDraw::Init(const bsp_file::BSPFile::Ref &bsp)
 		const bsp_file::BSPLeaf *x = bsp->Leafs() + i;
 		Leaf l;
 		l.parent = (int)x->parent;
-		l.firstModel = (int)x->firstModel;
-		l.numModels = (int)x->numModels;
 		l.bounds.Initialize(x->mins[0], x->mins[1], x->mins[2], x->maxs[0], x->maxs[1], x->maxs[2]);
 		m_leafs.push_back(l);
 	}
