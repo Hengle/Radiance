@@ -42,6 +42,11 @@ m_inFlight(0) {
 	setAttribute(Qt::WA_DeleteOnClose);
 	setMinimumDuration(0);
 	setModal(true);
+	setWindowFlags(
+		Qt::Dialog|
+		Qt::CustomizeWindowHint|
+		Qt::WindowTitleHint
+	);
 }
 
 ProgressDialog::~ProgressDialog() {

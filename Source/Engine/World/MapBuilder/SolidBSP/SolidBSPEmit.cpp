@@ -43,7 +43,6 @@ void BSPBuilder::EmitBSPFile() {
 	Log("\t%8d Nodes\n", m_bspFile->numNodes.get());
 	Log("\t%8d Leafs\n", m_bspFile->numLeafs.get());
 	Log("\t%8d Areas\n", m_bspFile->numAreas.get());
-	Log("\t%8d Sectors\n", m_bspFile->numSectors.get());
 	Log("\t%8d Planes\n", m_bspFile->numPlanes.get());
 	Log("\t%8d Models\n", m_bspFile->numModels.get());
 	Log("\t%8d ClipSurfaces\n", m_bspFile->numClipSurfaces.get());
@@ -116,34 +115,114 @@ void BSPBuilder::EmitBSPAreas() {
 	for (AreaVec::const_iterator it = m_areas.begin(); it != m_areas.end(); ++it) {
 		const AreaRef &area = *it;
 
-		BSPArea *e = m_bspFile->AddArea();
+		BSPArea *bspArea = m_bspFile->AddArea();
 
 		for (int i = 0; i < 3; ++i) {
-			e->mins[i] = (float)area->bounds.Mins()[i];
-			e->maxs[i] = (float)area->bounds.Maxs()[i];
+			bspArea->mins[i] = (float)area->bounds.Mins()[i];
+			bspArea->maxs[i] = (float)area->bounds.Maxs()[i];
 		}
 
-		e->firstPortal = std::numeric_limits<U32>::max();
-		e->numPortals = 0;
+		bspArea->firstPortal = std::numeric_limits<U32>::max();
+		bspArea->numPortals = 0;
 
-		EmitBSPAreaportals(m_root.get(), area->area, *e);
+		EmitBSPAreaportals(m_root.get(), area->area, *bspArea);
 
-		e->firstSector = std::numeric_limits<U32>::max();
-		e->numSectors = 0;
+		bspArea->rootNode = -1;
 
-		for (SectorVec::const_iterator it2 = area->sectors.begin(); it2 != area->sectors.end(); ++it2) {
-			const SectorRef &sector = *it2;
+		if (area->root)
+			bspArea->rootNode = EmitBSPAreaNode(area->root.get(), *bspArea);
+	}
+}
 
-			if (sector->emitId == -1)
-				EmitBSPSector(*sector);
+S32 BSPBuilder::EmitBSPAreaNode(AreaNode *node, world::bsp_file::BSPArea &area) {
 
-			if (e->firstSector == std::numeric_limits<U32>::max())
-				e->firstSector = m_bspFile->numSectorIndices;
-			
-			*m_bspFile->AddSectorIndex() = (U32)sector->emitId;
-			++e->numSectors;
+	if (node->planenum == kPlaneNumLeaf)
+		return EmitBSPAreaLeaf(node, area);
+
+	node->emitId = (int)m_bspFile->numAreaNodes.get();
+	BSPAreaNode *bspNode = m_bspFile->AddAreaNode();
+
+	for (int i = 0; i < 3; ++i) {
+		bspNode->mins[i] = (float)node->bounds.Mins()[i];
+		bspNode->maxs[i] = (float)node->bounds.Maxs()[i];
+	}
+
+	bspNode->parent = (S32)(node->parent ? node->parent->emitId : -1);
+	bspNode->planenum = node->planenum;
+
+	S32 front = EmitBSPAreaNode(node->children[0].get(), area);
+	S32 back = EmitBSPAreaNode(node->children[1].get(), area);
+
+	bspNode = const_cast<BSPAreaNode*>(m_bspFile->AreaNodes() + node->emitId);
+	bspNode->children[0] = front;
+	bspNode->children[1] = back;
+
+	return (S32)node->emitId;
+}
+
+S32 BSPBuilder::EmitBSPAreaLeaf(AreaNode *leaf, world::bsp_file::BSPArea &area) {
+
+	leaf->emitId = (int)m_bspFile->numAreaLeafs.get();
+
+	BSPAreaLeaf *bspLeaf = m_bspFile->AddAreaLeaf();
+
+	for (int i = 0; i < 3; ++i) {
+		bspLeaf->mins[i] = (float)leaf->bounds.Mins()[i];
+		bspLeaf->maxs[i] = (float)leaf->bounds.Maxs()[i];
+	}
+	
+	typedef zone_set<int, ZBSPBuilderT>::type IntSet;
+	IntSet mats;
+
+	// gather materials.
+
+	for (AreaNodePolyVec::const_iterator it = leaf->tris.begin(); it != leaf->tris.end(); ++it) {
+		const AreaNodePolyRef &poly = *it;
+		RAD_ASSERT(poly->tri);
+		mats.insert(poly->tri->mat);
+	}
+
+	bspLeaf->firstModel = m_bspFile->numModels;
+	bspLeaf->numModels = 0;
+
+	for (int c = 1; c <= kMaxUVChannels; ++c){
+		for (IntSet::const_iterator it = mats.begin(); it != mats.end(); ++it) {
+			EmitTriModel m;
+			m.mat = *it;
+			m.numChannels = c;
+
+			for (AreaNodePolyVec::const_iterator it = leaf->tris.begin(); it != leaf->tris.end(); ++it) {
+				const AreaNodePolyRef &poly = *it;
+
+				RAD_ASSERT(poly->tri);
+
+				if (poly->tri->mat != m.mat)
+					continue;
+				if (poly->tri->model->numChannels != c)
+					continue;
+
+				int numVerts = (int)poly->winding.Vertices().size();
+
+				if (((int)m.indices.size() >= kMaxBatchElements-numVerts) ||
+					((int)m.verts.size() >= kMaxBatchElements-numVerts)) {
+					EmitBSPModel(m);
+					m.Clear();
+					++bspLeaf->numModels;
+				}
+
+				for (AreaNodeWinding::VertexListType::const_iterator it = poly->winding.Vertices().begin(); it != poly->winding.Vertices().end(); ++it) {
+					m.AddVertex(EmitTriModel::Vert(*it));
+				}
+			}
+
+			if (!m.verts.empty()) {
+				EmitBSPModel(m);
+				++bspLeaf->numModels;
+			}
 		}
 	}
+
+	return -(leaf->emitId + 1);
 }
 
 void BSPBuilder::EmitBSPAreaportals(Node *leaf, int areaNum, BSPArea &area) {
@@ -215,71 +294,6 @@ void BSPBuilder::EmitBSPAreaportals(Node *leaf, int areaNum, BSPArea &area) {
 
 			BSPAreaportal *areaportal = const_cast<BSPAreaportal*>(m_bspFile->Areaportals() + p->emitId);
 			areaportal->areas[side] = (U32)areaNum;
-		}
-	}
-}
-
-void BSPBuilder::EmitBSPSector(Sector &s) {
-
-	s.emitId = (int)m_bspFile->numSectors.get();
-
-	BSPSector *sector = m_bspFile->AddSector();
-
-	sector->firstModel = std::numeric_limits<U32>::max();
-	sector->numModels = 0;
-
-	for (int i = 0; i < 3; ++i) {
-		sector->mins[i] = (float)s.bounds.Mins()[i];
-		sector->maxs[i] = (float)s.bounds.Maxs()[i];
-	}
-	
-	typedef zone_set<int, ZBSPBuilderT>::type IntSet;
-	IntSet mats;
-
-	// gather materials.
-
-	for (SectorPolyVec::const_iterator it = s.polys.begin(); it != s.polys.end(); ++it) {
-		const SectorPolyRef &poly = *it;
-		mats.insert(poly->tri->mat);
-	}
-
-	sector->firstModel = m_bspFile->numModels;
-	sector->numModels = 0;
-
-	for (int c = 1; c <= kMaxUVChannels; ++c){
-		for (IntSet::const_iterator it = mats.begin(); it != mats.end(); ++it) {
-			EmitTriModel m;
-			m.mat = *it;
-			m.numChannels = c;
-
-			for (SectorPolyVec::const_iterator it = s.polys.begin(); it != s.polys.end(); ++it) {
-				const SectorPolyRef &poly = *it;
-
-				RAD_ASSERT(poly->tri);
-
-				if (poly->tri->mat != m.mat)
-					continue;
-				if (poly->tri->model->numChannels != c)
-					continue;
-
-				int numVerts = (int)poly->winding.Vertices().size();
-
-				if (((int)m.indices.size() >= kMaxBatchElements-numVerts) ||
-					((int)m.verts.size() >= kMaxBatchElements-numVerts)) {
-					EmitBSPModel(m);
-					m.Clear();
-					++sector->numModels;
-				}
-
-				for (SectorWinding::VertexListType::const_iterator it = poly->winding.Vertices().begin(); it != poly->winding.Vertices().end(); ++it) {
-					m.AddVertex(EmitTriModel::Vert(*it));
-				}
-			}
-
-			if (!m.verts.empty()) {
-				EmitBSPModel(m);
-				++sector->numModels;
-			}
 		}
 	}
 }

@@ -49,8 +49,8 @@ m_numOutsideModels(0),
 m_numInsideNodes(0),
 m_numInsideModels(0),
 m_numInsideTris(0),
-m_numSectors(0),
-m_numSharedSectors(0),
+m_numAreaNodes(0),
+m_numAreaLeafs(0),
 m_flood(false) {
 	m_result = SR_Success;
 }
@@ -99,7 +99,15 @@ void BSPBuilder::Build()
 		return;
 	CreateRootNode();
 	Log("------------\n");
-	Log("BSPBuilder (%d structural tri(s), %d detail tri(s), %d total)\n", m_numStructural, m_numDetail, m_numStructural+m_numDetail);
+	Log("Building Hull (%d structural tri(s), %d detail tri(s), %d total)\n", m_numStructural, m_numDetail, m_numStructural+m_numDetail);
+
+	if (m_ui) {
+		m_ui->title = "Building Hull...";
+		m_ui->total = 0.f;
+		m_ui->totalProgress = 0;
+		m_ui->Refresh();
+	}
+
 	ResetProgress();
 	EmitProgress();
 	Split(m_root.get(), 0);
@@ -117,9 +125,10 @@ void BSPBuilder::Build()
 	}
 
 	AreaFlood();
-	BuildSectors();
+	CompileAreas();
 	EmitBSPFile();
 
+	SetResult(SR_Success);
 	//if (g_glDebug) { DisplayTree(0, !m_flood); }
 }
 
@@ -350,6 +359,9 @@ bool BSPBuilder::LoadMaterials() {
 	for (SceneFile::TriModel::Vec::iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
 		SceneFile::TriModel::Ref &trim = *m;
 
+		if (trim->cinematic)
+			continue;
+
 		// gather contents.
 		SceneFile::TriFaceVec::iterator f;
 		for (f = trim->tris.begin(); f != trim->tris.end(); ++f) {
@@ -381,7 +393,7 @@ bool BSPBuilder::LoadMaterials() {
 			if (!trim->contents)
 				trim->contents = trif.contents;
 			if (trim->contents != trif.contents) {
-				Log("ERROR: mixed contents on model %d, material '%s', this needs to be corrected.", mat.name.c_str.get());
+				Log("WARNING: mixed contents on '%s', material '%s', this needs to be corrected.", trim->name.c_str.get(), mat.name.c_str.get());
 				trim->contents |= trif.contents;
 			}
 
@@ -390,7 +402,7 @@ bool BSPBuilder::LoadMaterials() {
 
 		if (f != trim->tris.end()) {
 			trim->ignore = true;
-			Log("ERROR: model %d has a face or faces without a material, this model will be discarded from the BSP.\n", trim->id);
+			Log("WARNING: '%s' has a face or faces without a material, it will be discarded from the BSP.\n", trim->name.c_str.get(), trim->id);
 		}
 	}
 
@@ -410,7 +422,7 @@ void BSPBuilder::CreateRootNode() {
 		const SceneFile::TriModel::Ref &trim = *m;
 
 		// gather contents.
-		if (trim->ignore)
+		if (trim->ignore || trim->cinematic)
 			continue;
 
 		if (trim->contents & kContentsFlag_Structural) {

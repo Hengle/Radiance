@@ -27,16 +27,21 @@ inline const BSPLeaf *BSPFileParser::Leafs() const {
 	return m_leafs;
 }
 
+
+inline const BSPAreaNode *BSPFileParser::AreaNodes() const {
+	return m_areaNodes;
+}
+
+inline const BSPAreaLeaf *BSPFileParser::AreaLeafs() const {
+	return m_areaLeafs;
+}
+
 inline const BSPArea *BSPFileParser::Areas() const {
 	return m_areas;
 }
 
 inline const BSPAreaportal *BSPFileParser::Areaportals() const {
 	return m_areaportals;
-}
-
-inline const BSPSector *BSPFileParser::Sectors() const {
-	return m_sectors;
 }
 
 inline const BSPModel *BSPFileParser::Models() const {
@@ -61,10 +66,6 @@ inline const BSPActor *BSPFileParser::Actors() const {
 
 inline const U16 *BSPFileParser::AreaportalIndices() const {
 	return m_areaportalIndices;
-}
-
-inline const U16 *BSPFileParser::SectorIndices() const {
-	return m_sectorIndices;
 }
 
 inline const U16 *BSPFileParser::Indices() const {
@@ -126,16 +127,20 @@ inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numLeafs) {
 	return m_numLeafs;
 }
 
+inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numAreaNodes) {
+	return m_numAreaNodes;
+}
+
+inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numAreaLeafs) {
+	return m_numAreaLeafs;
+}
+
 inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numAreas) {
 	return m_numAreas;
 }
 
 inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numAreaportals) {
 	return m_numAreaportals;
-}
-
-inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numSectors) {
-	return m_numSectors;
 }
 
 inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numModels) {
@@ -152,10 +157,6 @@ inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numVerts) {
 
 inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numAreaportalIndices) {
 	return m_numAreaportalIndices;
-}
-
-inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numSectorIndices) {
-	return m_numSectorIndices;
 }
 
 inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numIndices) {
@@ -216,16 +217,20 @@ inline const BSPLeaf *BSPFileBuilder::Leafs() const {
 	return &m_leafs[0];
 }
 
+inline const BSPAreaNode *BSPFileBuilder::AreaNodes() const {
+	return &m_areaNodes[0];
+}
+
+inline const BSPAreaLeaf *BSPFileBuilder::AreaLeafs() const {
+	return &m_areaLeafs[0];
+}
+
 inline const BSPArea *BSPFileBuilder::Areas() const {
 	return &m_areas[0];
 }
 
 inline const BSPAreaportal *BSPFileBuilder::Areaportals() const {
 	return &m_areaportals[0];
-}
-
-inline const BSPSector *BSPFileBuilder::Sectors() const {
-	return &m_sectors[0];
 }
 
 inline const BSPModel *BSPFileBuilder::Models() const {
@@ -246,10 +251,6 @@ inline const BSPVertex *BSPFileBuilder::Vertices() const {
 
 inline const U16 *BSPFileBuilder::AreaportalIndices() const {
 	return &m_areaportalIndices[0];
-}
-
-inline const U16 *BSPFileBuilder::SectorIndices() const {
-	return &m_sectorIndices[0];
 }
 
 inline const U16 *BSPFileBuilder::Indices() const {
@@ -294,15 +295,15 @@ inline void BSPFileBuilder::Clear() {
 	m_ents.clear();
 	m_nodes.clear();
 	m_leafs.clear();
+	m_areaNodes.clear();
+	m_areaLeafs.clear();
 	m_areas.clear();
 	m_areaportals.clear();
-	m_sectors.clear();
 	m_models.clear();
 	m_clipSurfaces.clear();
 	m_planes.clear();
 	m_vertices.clear();
 	m_areaportalIndices.clear();
-	m_sectorIndices.clear();
 	m_indices.clear();
 	m_actorIndices.clear();
 	m_cameraTMs.clear();
@@ -334,16 +335,20 @@ inline void BSPFileBuilder::ReserveLeafs(int num) {
 	m_leafs.reserve(m_leafs.size()+(size_t)num);
 }
 
+inline void BSPFileBuilder::ReserveAreaNodes(int num) {
+	m_areaNodes.reserve(m_areaNodes.size()+(size_t)num);
+}
+
+inline void BSPFileBuilder::ReserveAreaLeafs(int num) {
+	m_areaLeafs.reserve(m_areaLeafs.size()+(size_t)num);
+}
+
 inline void BSPFileBuilder::ReserveAreas(int num) {
 	m_areas.reserve(m_areas.size()+(size_t)num);
 }
 
 inline void BSPFileBuilder::ReserveAreaportals(int num) {
 	m_areaportals.reserve(m_areaportals.size()+(size_t)num);
-}
-
-inline void BSPFileBuilder::ReserveSectors(int num) {
-	m_sectors.reserve(m_sectors.size()+(size_t)num);
 }
 
 inline void BSPFileBuilder::ReserveModels(int num) {
@@ -364,10 +369,6 @@ inline void BSPFileBuilder::ReserveVertices(int num) {
 
 inline void BSPFileBuilder::ReserveAreaportalIndices(int num) {
 	m_areaportalIndices.reserve(m_areaportalIndices.size()+(size_t)num);
-}
-
-inline void BSPFileBuilder::ReserveSectorIndices(int num) {
-	m_sectorIndices.reserve(m_sectorIndices.size()+(size_t)num);
 }
 
 inline void BSPFileBuilder::ReserveIndices(int num) {
@@ -428,6 +429,16 @@ inline BSPLeaf *BSPFileBuilder::AddLeaf() {
 	return &m_leafs.back();
 }
 
+inline BSPAreaNode *BSPFileBuilder::AddAreaNode() {
+	m_areaNodes.resize(m_areaNodes.size()+1);
+	return &m_areaNodes.back();
+}
+
+inline BSPAreaLeaf *BSPFileBuilder::AddAreaLeaf() {
+	m_areaLeafs.resize(m_areaLeafs.size()+1);
+	return &m_areaLeafs.back();
+}
+
 inline BSPArea *BSPFileBuilder::AddArea() {
 	m_areas.resize(m_areas.size()+1);
 	return &m_areas.back();
@@ -436,11 +447,6 @@ inline BSPArea *BSPFileBuilder::AddArea() {
 inline BSPAreaportal *BSPFileBuilder::AddAreaportal() {
 	m_areaportals.resize(m_areaportals.size()+1);
 	return &m_areaportals.back();
-}
-
-inline BSPSector *BSPFileBuilder::AddSector() {
-	m_sectors.resize(m_sectors.size()+1);
-	return &m_sectors.back();
 }
 
 inline BSPModel *BSPFileBuilder::AddModel() {
@@ -471,11 +477,6 @@ inline BSPActor *BSPFileBuilder::AddActor() {
 inline U16 *BSPFileBuilder::AddAreaportalIndex() {
 	m_areaportalIndices.resize(m_areaportalIndices.size()+1);
 	return &m_areaportalIndices.back();
-}
-
-inline U16 *BSPFileBuilder::AddSectorIndex() {
-	m_sectorIndices.resize(m_sectorIndices.size()+1);
-	return &m_sectorIndices.back();
 }
 
 inline U16 *BSPFileBuilder::AddIndex() {
@@ -537,16 +538,20 @@ inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numLeafs) {
 	return (U32)m_leafs.size();
 }
 
+inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numAreaNodes) {
+	return (U32)m_areaNodes.size();
+}
+
+inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numAreaLeafs) {
+	return (U32)m_areaLeafs.size();
+}
+
 inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numAreas) {
 	return (U32)m_areas.size();
 }
 
 inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numAreaportals) {
 	return (U32)m_areaportals.size();
-}
-
-inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numSectors) {
-	return (U32)m_sectors.size();
 }
 
 inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numModels) {
@@ -563,10 +568,6 @@ inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numVerts) {
 
 inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numAreaportalIndices) {
 	return (U32)m_areaportalIndices.size();
-}
-
-inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numSectorIndices) {
-	return (U32)m_sectorIndices.size();
 }
 
 inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numIndices) {

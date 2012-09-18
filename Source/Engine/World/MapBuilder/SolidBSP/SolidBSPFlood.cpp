@@ -67,17 +67,18 @@ void BSPBuilder::FillOutside() {
 	MarkOccupiedNodeFaces(m_root.get());
 
 	for (SceneFile::TriModel::Vec::iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
-		if ((*m)->ignore)
+		if ((*m)->ignore || (*m)->cinematic)
 			continue;
 
-		(*m)->outside = false;
 		if ((*m)->contents & kContentsFlag_Detail) {
+			// details area never outside (they aren't in the tree).
+			(*m)->outside = false;
 			++m_numInsideModels;
 			m_numInsideTris += (int)(*m)->tris.size();
 			for (SceneFile::TriFaceVec::iterator f = (*m)->tris.begin(); f != (*m)->tris.end(); ++f) {
 				(*f).outside = false;
 			}
-			continue; // details area never outside.
+			continue;
 		}
 
 		bool outside = true;
@@ -224,8 +225,14 @@ void BSPBuilder::AreaFlood() {
 	ResetProgress();
 	Log("------------\n");
 	Log("Area Flood...\n");
+
+	// NOTE: Reserve area 0 for "shared" area space.
+	AreaRef area(new Area());
+	area->area = 0;
+	m_areas.push_back(area);
+
 	FindAreas(m_root.get());	
-	Log("Set %d area(s).\n", m_areas.size());
+	Log("Set %d area(s).\n", m_areas.size() - 1);
 }
 
 void BSPBuilder::FindAreas(Node *node) {

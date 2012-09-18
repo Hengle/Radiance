@@ -240,63 +240,77 @@ private:
 		static int s_num;
 	};
 
-	typedef math::ConvexPolygon<SceneFileD::TriVert, Plane> SectorWinding;
+	typedef math::ConvexPolygon<SceneFileD::TriVert, Plane> AreaNodeWinding;
 
 	///////////////////////////////////////////////////////////////////////////////
 
-	struct AreaPoly {
+	struct AreaPoly { // used in decompose
 		AreaPoly() {}
 		AreaPoly(const AreaPoly &p) {
 			tri = p.tri;
-			planenum = p.planenum;
+			plane = p.plane;
 		}
 
-		int planenum;
+		Plane plane;
 		Winding winding;
 		SceneFile::TriFace *tri;
 	};
 
-	///////////////////////////////////////////////////////////////////////////////
-
-	struct SectorPoly {
-		SectorPoly() {}
-		SectorPoly(const SectorPoly &p) {
+	struct AreaNodePoly {
+		AreaNodePoly() {}
+		AreaNodePoly(const AreaNodePoly &p) {
 			tri = p.tri;
+			plane = p.plane;
 		}
 
-		SectorWinding  winding;
-		SceneFile::TriFace  *tri;
+		Plane plane;
+		AreaNodeWinding winding;
+		SceneFile::TriFace *tri;
 	};
 
-	typedef boost::shared_ptr<SectorPoly> SectorPolyRef;
-	typedef zone_vector<SectorPolyRef, world::bsp_file::ZBSPBuilderT>::type SectorPolyVec;
+	typedef boost::shared_ptr<AreaNodePoly> AreaNodePolyRef;
+	typedef zone_vector<AreaNodePolyRef, world::bsp_file::ZBSPBuilderT>::type AreaNodePolyVec;
+
+	
 	typedef zone_vector<int, world::bsp_file::ZBSPBuilderT>::type AreaNumVec;
-
-	///////////////////////////////////////////////////////////////////////////////
-
-	struct Sector {
-		Sector() : emitId(-1) {}
-		int emitId;
-		BBox bounds;
-		SectorPolyVec polys;
-		AreaNumVec areas;
-	};
-
-	typedef boost::shared_ptr<Sector> SectorRef;
-	typedef zone_vector<SectorRef, world::bsp_file::ZBSPBuilderT>::type SectorVec;
+	typedef zone_set<int, world::bsp_file::ZBSPBuilderT>::type AreaNumSet;
 	typedef zone_vector<SceneFile::TriFace*, world::bsp_file::ZBSPBuilderT>::type TriFacePtrVec;
 
 	///////////////////////////////////////////////////////////////////////////////
 
+	struct AreaNode;
+	typedef boost::shared_ptr<AreaNode> AreaNodeRef;
+
+	struct AreaNode {
+		AreaNode() : emitId(-1) {
+			parent = 0;
+		}
+
+		AreaNode *parent;
+
+		int emitId;
+		BBox bounds;
+		AreaNodePolyVec tris;
+		int planenum;
+		AreaNodeRef children[2];
+	};
+
 	struct Area {
 		Area() : area(-1) {
+			numTris[0] = numTris[1] = 0;
+			numNodes = 0;
+			numLeafs = 0;
 		}
 
 		int area;
-	
+		int numTris[2];
+		int numNodes;
+		int numLeafs;
+
 		BBox bounds;
 		TriFacePtrVec tris;
-		SectorVec  sectors;
+		AreaNodeRef root;
+		AreaNumSet spanned;
 	};
 
 	typedef boost::shared_ptr<Area> AreaRef;
@@ -394,8 +408,8 @@ private:
 	int m_numInsideTris;
 	int m_numInsideNodes;
 	int m_numInsideModels;
-	int m_numSectors;
-	int m_numSharedSectors;
+	int m_numAreaNodes;
+	int m_numAreaLeafs;
 	int m_work;
 	int m_result;
 	bool m_flood;
@@ -433,14 +447,15 @@ private:
 	void AreaFlood();
 	void AreaFlood(Node *leaf, Area *area);
 	void FindAreas(Node *node);
-	void BuildSectors();
-	void DecomposeAreaModel(const SceneFile::TriModel &model);
+	void CompileAreas();
+	void BuildAreaTree(Area &area);
+	void MakeAreaRootNode(Area &area);
+	void AreaBoxBSP(Area &area, const AreaNodeRef &node, int planebits);
+	void PartitionAreaTris(Area &area, const AreaNodeRef &node, bool split);
+	void OptimizeAreaTree(Area &area, AreaNodeRef &node);
+	int SplitBounds(int axis, float distance, const BBox &bounds, BBox &front, BBox &back);
+	void DecomposeAreaModel(SceneFile::TriModel &model);
 	void DecomposeAreaPoly(Node *node, AreaPoly *poly);
-	void BuildAreaSectors();
-	void BuildAreaSectors(Area &area);
-	void SubdivideSector(Sector *sector);
-	void SplitSector(const Plane &p, Sector &sector, Sector &front, Sector &back);
-	void BuildSharedSectors();
 	int FindSplitPlane(Node *node, int &boxAxis);
 	int BoxPlaneNum(Node *node, int &boxAxis);
 
@@ -450,8 +465,9 @@ private:
 	void EmitBSPEntities();
 	void EmitBSPEntity(const SceneFile::Entity::Ref &entity);
 	void EmitBSPAreas();
+	S32 EmitBSPAreaNode(AreaNode *node, world::bsp_file::BSPArea &area);
+	S32 EmitBSPAreaLeaf(AreaNode *leaf, world::bsp_file::BSPArea &area);
 	void EmitBSPAreaportals(Node *leaf, int areaNum, world::bsp_file::BSPArea &area);
-	void EmitBSPSector(Sector &s);
 	void EmitBSPModel(const EmitTriModel &model);
 	S32 EmitBSPNodes(const Node *node, S32 parent);
 	void EmitBSPClipSurfaces(const Node *node, world::bsp_file::BSPLeaf *leaf);
