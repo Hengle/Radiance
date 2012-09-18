@@ -21,6 +21,14 @@ enum {
 }
 
 void BSPBuilder::EmitBSPFile() {
+
+	if (m_ui) {
+		m_ui->title = "Writing BSP File...";
+		m_ui->total = 0;
+		m_ui->totalProgress = 0;
+		m_ui->Refresh();
+	}
+
 	m_bspFile.reset(new world::bsp_file::BSPFileBuilder());
 
 	Log("------------\n");
@@ -43,6 +51,8 @@ void BSPBuilder::EmitBSPFile() {
 	Log("\t%8d Nodes\n", m_bspFile->numNodes.get());
 	Log("\t%8d Leafs\n", m_bspFile->numLeafs.get());
 	Log("\t%8d Areas\n", m_bspFile->numAreas.get());
+	Log("\t%8d AreaNodes\n", m_bspFile->numAreaNodes.get());
+	Log("\t%8d AreaLeafs\n", m_bspFile->numAreaLeafs.get());
 	Log("\t%8d Planes\n", m_bspFile->numPlanes.get());
 	Log("\t%8d Models\n", m_bspFile->numModels.get());
 	Log("\t%8d ClipSurfaces\n", m_bspFile->numClipSurfaces.get());
