@@ -99,6 +99,7 @@ bool BSPBuilder::BuildAreaTree(Area &area) {
 	for (int i = 0; i < 3; ++i) {
 		if (area.bounds.Size()[i] > SceneFileD::kMaxRange) {
 			Log("ERROR: Area %d is HUGE! Its bounds (%dx%dx%d) exceeds the limit of %dx%dx%d!\n", 
+				area.area,
 				(int)area.bounds.Size()[0], 
 				(int)area.bounds.Size()[1], 
 				(int)area.bounds.Size()[2], 
