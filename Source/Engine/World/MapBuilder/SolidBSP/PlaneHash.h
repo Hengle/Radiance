@@ -136,24 +136,15 @@ private:
 		return b & (NumBuckets-1);
 	}
 
-#define PLANE_NORMAL_WELD ValueType(0.099999999999)
-#define PLANE_DIST_WELD   ValueType(0.999999999999)
-
 	bool PlaneEqual(const ::tools::solid_bsp::Plane &a, const ::tools::solid_bsp::Plane &b)
 	{
-		if (math::Abs(a.A()-b.A()) < PLANE_NORMAL_WELD &&
-			math::Abs(a.B()-b.B()) < PLANE_NORMAL_WELD &&
-			math::Abs(a.C()-b.C()) < PLANE_NORMAL_WELD &&
-			math::Abs(a.D()-b.D()) < PLANE_DIST_WELD)
-		{
-			return true;
+		if (a.Normal().Dot(b.Normal()) > ValueType(0.95)) {
+			if (math::Abs(a.D()-b.D()) < ValueType(0.1))
+				return true;
 		}
 
 		return false;
 	}
-
-#undef PLANE_NORMAL_WELD
-#undef PLANE_DIST_WELD
 
 	HashPlane *m_hash[NumBuckets];
 	PlaneVec m_planes;

@@ -57,7 +57,15 @@ void BSPBuilder::Portalize() {
 	Log("------------\n");
 	Log("Portalize...\n");
 	EmitProgress();
+	m_numPortalSplits = 0;
+	m_numPortalFaces = 0;
 
+	m_outside.portals.reset();
+	m_outside.children[0].reset();
+	m_outside.children[1].reset();
+	m_outside.models.clear();
+	m_outside.occupied = false;
+	m_outside.area = 0;
 	m_outside.planenum = kPlaneNumLeaf;
 	m_outside.bounds = m_root->bounds;
 	m_outside.contents = 0;
@@ -77,7 +85,7 @@ void BSPBuilder::Portalize() {
 
 	MakeTreePortals(m_root.get());
 	FindPortalNodeFaces(m_root.get());
-	Log("\n%d portal(s)\n", m_numPortals);
+	Log("\n%d portal faces(s)\n", m_numPortalFaces);
 	//if (g_glDebug) { DisplayPortals(0, 0, 0, false, Map::VisibleContents); }
 }
 
@@ -88,50 +96,44 @@ void BSPBuilder::MakeNodePortal(Node *node) {
 	p->plane.winding.Initialize(m_planes.Plane(node->planenum), SceneFile::kMaxRange);
 
 	// split portal by all bounding portals that look into the node.
-	int bside;
-	for (PortalRef bounding = node->portals; bounding; bounding = bounding->next[bside]) {
+	int side;
+	for (PortalRef bounding = node->portals; bounding; bounding = bounding->next[side]) {
 		RAD_ASSERT((bounding->plane.planenum&~1) != (node->planenum&~1));
-		bside = bounding->nodes[1] == node;
-		p->plane.winding.Split(
+		
+		side = bounding->nodes[1] == node;
+
+		Plane::SideType s = p->plane.winding.Side(
 			m_planes.Plane(bounding->plane.planenum),
-			&f,
-			&b,
-			kSplitEpsilon
+			kPortalSplitEpsilon
 		);
 
-		if (bside == 1) {
-			std::swap(f, b);
+		if (s == Plane::On) {
+			// portal is too small to split, put on both sides
+			continue;
+		} else if (s == Plane::Front && side) {
+			// portal clipped away.
+			continue;
+		} else if (s == Plane::Back && !side) {
+			// portal clipped awway.
+			continue;
+		} else if (s == Plane::Cross) {
+			p->plane.winding.Split(
+				m_planes.Plane(bounding->plane.planenum),
+				&f,
+				&b,
+				kPortalSplitEpsilon
+			);
+
+			if (f.Empty())
+				Log("WARNING: portal clipped away (front)!\n");
+			if (b.Empty())
+				Log("WARNING: portal clipped away (back)!\n");
+
+			if (side)
+				std::swap(f, b);
+
+			p->plane.winding = f;
 		}
-
-		//if (f.Empty() && b.Empty()) // winding is *on* plane
-		//{
-		//	continue;
-		////}
-
-		if (f.Empty()) {
-#if defined(RAD_OPT_DEBUG)
-			ValueType d[4];
-			const Plane &temp = m_planes.Plane(p->plane.planenum);
-			const Plane &plane = m_planes.Plane(bounding->plane.planenum);
-			d[0] = math::Abs(temp.A()-plane.A());
-			d[1] = math::Abs(temp.B()-plane.B());
-			d[2] = math::Abs(temp.C()-plane.C());
-			d[3] = math::Abs(temp.D()-plane.D());
-			if (0)
-			{
-//				DisplayPortals(0, bounding.get(), p.get());
-			}
-#endif
-			return;
-			//if (bounding->bounding) return; // clipped by bounding plane.
-
-			// this portal no longer has a valid winding, but needs to be kept as a splitter.
-			//p->bounding = true;
-			//p->plane.winding.Initialize(m_planes.Plane(node->planenum), Map::MaxRange);
-			break;
-		}
-
-		p->plane.winding = f;
 	}
 
 	p->onNode = node;
@@ -139,8 +141,9 @@ void BSPBuilder::MakeNodePortal(Node *node) {
 }
 
 void BSPBuilder::SplitNodePortals(Node *node) {
-	// partition the nodes bounding portals by its plane, and assign them to
+	// split bounding portals by node, and assign them to
 	// the nodes children.
+
 	Winding f, b;
 	const Plane &plane = m_planes.Plane(node->planenum);
 
@@ -152,68 +155,23 @@ void BSPBuilder::SplitNodePortals(Node *node) {
 		RemovePortalFromNode(p, p->nodes[0]);
 		RemovePortalFromNode(p, p->nodes[1]);
 
-		//if (p->bounding) continue;
+		p->plane.winding.Split(plane, &f, &b, kPortalSplitEpsilon);
 
-		p->plane.winding.Split(plane, &f, &b, kSplitEpsilon);
-
-		if (!f.Empty() && !b.Empty()) {
-			if (++m_numPortals % 1000 == 0)
-				EmitProgress();
-		}
-
+		if (++m_numPortalSplits % 1000 == 0)
+			EmitProgress();
+		
 		if (f.Empty() && b.Empty()) {
-#if defined(RAD_OPT_DEBUG)
-			Portal z;
-			z.plane.winding.Initialize(plane, 1024.0f);
-			ValueType d[4];
-			const Plane &temp = m_planes.Plane(p->plane.planenum);
-			d[0] = math::Abs(temp.A()-plane.A());
-			d[1] = math::Abs(temp.B()-plane.B());
-			d[2] = math::Abs(temp.C()-plane.C());
-			d[3] = math::Abs(temp.D()-plane.D());
-			if (0)
-			{
-//				DisplayPortals(0, &z, p.get());
-			}
-#endif
-			continue;
-
-			// put on both sides
-	//		Plane::SideType s = p->plane.winding.MajorSide(plane, ValueType(0));
-	////		p->bounding = true;
-	//		switch (s)
-	//		{
-	//		case Plane::Front:
-	//			if (side == 0)
-	//				AddPortalToNodes(p, node->children[0].get(), other);
-	//			else
-	//				AddPortalToNodes(p, other, node->children[0].get());
-	//			break;
-	//		case Plane::Back:
-	//			if (side == 0)
-	//				AddPortalToNodes(p, node->children[1].get(), other);
-	//			else
-	//				AddPortalToNodes(p, other, node->children[1].get());
-	//			break;
-	//		case Plane::On:
-	//			INTERNAL_COMPILER_ERROR();
-	//			break;
-	//		}
-
-			/*PortalRef z(new Portal(*p));
+			// put on both sides.
+			PortalRef z(new Portal(*p));
 			z->plane.winding = p->plane.winding;
-			z->bounding = p->bounding = true;
 			
-			if (side == 0)
-			{
+			if (side == 0) {
 				AddPortalToNodes(p, node->children[0].get(), other);
 				AddPortalToNodes(z, node->children[1].get(), other);
-			}
-			else
-			{
+			} else {
 				AddPortalToNodes(p, other, node->children[0].get());
 				AddPortalToNodes(z, other, node->children[1].get());
-			}*/
+			}
 		}
 		else if (!f.Empty() && !b.Empty()) {
 			PortalRef z(new Portal(*p));
@@ -257,17 +215,8 @@ void BSPBuilder::FindPortalNodeFaces(Node *node)
 	int side;
 	for (PortalRef p = node->portals; p; p = p->next[side]) {
 		side = p->nodes[1] == node;
-		//if (p->bounding)
-		//{
-		//	p->bounding = false;
-		//	Vec3 org = WindingCenter(p->plane.winding);
-		//	p->plane.winding.Initialize(m_planes.Plane(p->plane.planenum), 600.0);
-		//	/*for (size_t i = 0; i < p->plane.winding.Vertices().size(); ++i)
-		//	{
-		//		p->plane.winding.Vertices()[i] += org;
-		//	}*/
-		//}
-		if (p->bounding || !p->original.empty()) 
+		
+		if (!p->original.empty()) 
 			continue;
 
 		int contents = p->nodes[0]->contents ^ p->nodes[1]->contents;
@@ -282,6 +231,7 @@ void BSPBuilder::FindPortalNodeFaces(Node *node)
 						p->contents |= contents;
 						p->original.push_back((*poly)->original);
 						p->poly = (*poly).get();
+						++m_numPortalFaces;
 					}
 				}
 			}

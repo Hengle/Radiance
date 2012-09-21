@@ -41,7 +41,8 @@ m_numStructural(0),
 m_numDetail(0),
 m_numNodes(0),
 m_numLeafs(0),
-m_numPortals(0),
+m_numPortalFaces(0),
+m_numPortalSplits(0),
 m_progress(0),
 m_numOutsideNodes(0),
 m_numOutsideTris(0),
@@ -92,6 +93,7 @@ void BSPBuilder::DebugDraw(float time, float dt, const QRect &viewport) {
 		if (!m_paint->Paint(time, dt, viewport, *m_debugUI, *this)) {
 			m_debugUI->enabled = false;
 			m_paint.reset();
+			m_debugUI->SetDebugMenu(0);
 		}
 	}
 }
@@ -102,6 +104,7 @@ void BSPBuilder::OnDebugMenu(const QVariant &data) {
 		if (!m_paint->OnMenu(data, *m_debugUI, *this)) {
 			m_debugUI->enabled = false;
 			m_paint.reset();
+			m_debugUI->SetDebugMenu(0);
 		}
 	}
 }
@@ -152,6 +155,7 @@ void BSPBuilder::Build()
 		m_ui->Refresh();
 	}
 
+	MarkDetail();
 	CreateRootNode();
 	Log("------------\n");
 	Log("Building Hull (%d structural tri(s), %d detail tri(s), %d total)\n", m_numStructural, m_numDetail, m_numStructural+m_numDetail);
@@ -181,15 +185,60 @@ void BSPBuilder::Build()
 	if (FloodFill()) {
 		m_flood = true;
 		FillOutside();
+
+		if (m_ui) {
+			m_ui->title = "Building Optimized Hull...";
+			m_ui->total = 0.f;
+			m_ui->totalProgress = 0;
+			m_ui->Refresh();
+		}
+
+		// make a better tree.
+		m_root.reset();
+
+		CreateRootNode();
+		Log("------------\n");
+		Log("Building Optimized Hull (%d structural tri(s), %d detail tri(s), %d total)\n", m_numStructural, m_numDetail, m_numStructural+m_numDetail);
+
+		m_numNodes = 0;
+		m_numLeafs = 0;
+
+		ResetProgress();
+		EmitProgress();
+		Split(m_root.get(), 0);
+		Log("\n%d node(s), %d leaf(s)\n", m_numNodes, m_numLeafs);
+		Portalize();
+		if (!FloodFill()) {
+			Log("ERROR: map leaked after fill pass!\n");
+			SetResult(SR_CompilerError);
+			return;
+		}
+		FillOutside();
 	}
 	
 	AreaFlood();
-	CompileAreas();
+	if (!CompileAreas())
+		return;
 	EmitBSPFile();
 
 	if (m_debugUI)
 		DisplayPaintHandler(new (world::bsp_file::ZBSPBuilder) AreaBSPDraw());
 	SetResult(SR_Success);
+}
+
+void BSPBuilder::MarkDetail() {
+	for (SceneFile::TriModel::Vec::iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
+		if ((*m)->ignore || (*m)->cinematic)
+			continue;
+
+		if ((*m)->contents & kContentsFlag_Detail) {
+			// details area never outside (they aren't in the BSP).
+			(*m)->outside = false;
+			for (SceneFile::TriFaceVec::iterator f = (*m)->tris.begin(); f != (*m)->tris.end(); ++f) {
+				(*f).outside = false;
+			}
+		}
+	}
 }
 
 void BSPBuilder::ResetProgress() {
@@ -340,39 +389,49 @@ void BSPBuilder::Split(
 	for (PolyVec::const_iterator f = model->polys.begin(); f != model->polys.end(); ++f) {
 		const PolyRef &poly = *f;
 
+		Plane::SideType s;
+
 		if (poly->planenum == planenum) {
+			s = Plane::Back;
 			RAD_ASSERT(poly->onNode);
+		} else if (poly->planenum == (planenum^1)) {
+			s = Plane::Front;
+			RAD_ASSERT(poly->onNode);
+		} else {
+			s = poly->winding->Side(p, kBSPSplitEpsilon);
+		}
+
+		if (s == Plane::Back || s == Plane::On) {
 			back->polys.push_back(poly);
 			WindingBounds(*poly->winding.get(), back->bounds);
-		} else if ((poly->planenum^1) == planenum) {
-			RAD_ASSERT(poly->onNode);
+		}
+		
+		if (s == Plane::Front || s == Plane::On) {
 			front->polys.push_back(poly);
 			WindingBounds(*poly->winding.get(), front->bounds);
-		} else {
+		}
+		
+		if (s == Plane::Cross) {
+
 			PolyRef f(new Poly(*poly.get()));
 			f->winding.reset(new Winding());
 			PolyRef b(new Poly(*poly.get()));
 			b->winding.reset(new Winding());
 
-			poly->winding->Split(p, f->winding.get(), b->winding.get(), kSplitEpsilon);
+			poly->winding->Split(p, f->winding.get(), b->winding.get(), ValueType(0));
 
-			if (f->winding->Empty() && b->winding->Empty()) { // tiny winding, put on both sides
-				/*f->winding->Initialize(*poly->winding.get());
-				front->polys.push_back(f);
-				b->winding->Initialize(*poly->winding.get());
-				back->polys.push_back(b);
-				WindingBounds(*poly->winding.get(), front->bounds);
-				WindingBounds(*poly->winding.get(), back->bounds);*/
+			if (f->winding->Empty()) {
+				Log("WARNING: winding clipped away (front).\n");
 			} else {
-				if (!f->winding->Empty()) {
-					front->polys.push_back(f);
-					WindingBounds(*f->winding.get(), front->bounds);
-				}
+				front->polys.push_back(f);
+				WindingBounds(*f->winding.get(), front->bounds);
+			}
 
-				if (!b->winding->Empty()) {
-					back->polys.push_back(b);
-					WindingBounds(*b->winding.get(), back->bounds);
-				}
+			if (b->winding->Empty()) {
+				Log("WARNING: winding clipped away (back).\n");
+			} else {
+				back->polys.push_back(b);
+				WindingBounds(*b->winding.get(), back->bounds);
 			}
 		}
 	}
@@ -563,7 +622,7 @@ int BSPBuilder::FindSplitPlane(Node *node, int &boxAxis)
 	if (node->models.empty()) 
 		return kPlaneNumLeaf;
 
-	int num = kPlaneNumLeaf;//BoxPlaneNum(node, boxAxis);
+	int num = kPlaneNumLeaf;
 	if (num != kPlaneNumLeaf) 
 		return num;
 
@@ -572,8 +631,6 @@ int BSPBuilder::FindSplitPlane(Node *node, int &boxAxis)
 	int split = 0;
 	int bestNum = kPlaneNumLeaf;
 	int bestVal = std::numeric_limits<int>::max();
-
-//	PlaneNumHash testedPlanes;
 
 	for (int outside = 0; outside <= 1; ++outside) {
 		for (int contents = kContentsFlag_FirstVisibleContents; contents <= kContentsFlag_LastVisibleContents; contents <<= 1) {
@@ -592,18 +649,15 @@ int BSPBuilder::FindSplitPlane(Node *node, int &boxAxis)
 						continue;
 
 					int planenum = (*polyIt)->planenum&~1;
-//					if (testedPlanes.find(planenum) == testedPlanes.end())
 					{
 						int front = 0;
 						int back  = 0;
 						int split = 0;
 						int areaportal = 0;
 
-//						testedPlanes.insert(planenum);
 						const Plane &p = m_planes.Plane(planenum);
 
 						for (TriModelFragVec::const_iterator test = node->models.begin(); test != node->models.end(); ++test) {
-							//if (test == it) continue;
 							const TriModelFragRef &mdl = *test;
 							Plane::SideType s = p.Side(mdl->bounds, ValueType(0));
 
@@ -619,7 +673,7 @@ int BSPBuilder::FindSplitPlane(Node *node, int &boxAxis)
 								{
 									if (((*poly)->planenum&~1) == planenum) 
 										continue;
-									s = (*poly)->winding->Side(p, kSplitEpsilon);
+									s = (*poly)->winding->Side(p, kBSPSplitEpsilon);
 									switch (s)
 									{
 									case Plane::Front:
@@ -632,6 +686,10 @@ int BSPBuilder::FindSplitPlane(Node *node, int &boxAxis)
 										++split;
 										if (mdl->original->contents == kContentsFlag_Areaportal)
 											++areaportal;
+										break;
+									case Plane::On:
+										++front;
+										++back;
 										break;
 									}
 								}

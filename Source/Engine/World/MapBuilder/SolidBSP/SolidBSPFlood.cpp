@@ -42,7 +42,7 @@ bool BSPBuilder::FloodFill() {
 		if (m_outside.occupied) {
 			m_leakEnt = ent;
 			MarkLeakTrail();
-			Log("\n!!!!!!!!!!!\nMAP LEAKED, level will not be optimized (entity named '%s' id %d can see outside)!\n!!!!!!!!!!!\n", ent->name.c_str.get(), ent->id);
+			Log("\n!!!!!!!!!!!\nMAP LEAKED, hull will not be optimized (entity '%s' id %d can see outside)!\n!!!!!!!!!!!\n", ent->keys.StringForKey("classname"), ent->id);
 			//if (g_glDebug) { DisplayPortals(0, 0, 0, true, SceneFile::VisibleContents); }
 			DumpLeakFile();
 			return false;
@@ -73,12 +73,8 @@ void BSPBuilder::FillOutside() {
 
 		if ((*m)->contents & kContentsFlag_Detail) {
 			// details area never outside (they aren't in the tree).
-			(*m)->outside = false;
 			++m_numInsideModels;
 			m_numInsideTris += (int)(*m)->tris.size();
-			for (SceneFile::TriFaceVec::iterator f = (*m)->tris.begin(); f != (*m)->tris.end(); ++f) {
-				(*f).outside = false;
-			}
 			continue;
 		}
 
@@ -95,10 +91,10 @@ void BSPBuilder::FillOutside() {
 		if (outside) {
 			++m_numOutsideModels;
 			(*m)->outside = true;
-			(*m)->contents = kContentsFlag_Solid;
+			/*(*m)->contents = kContentsFlag_Solid;
 			for (SceneFile::TriFaceVec::iterator f = (*m)->tris.begin(); f != (*m)->tris.end(); ++f) {
 				(*f).contents = kContentsFlag_Solid;
-			}
+			}*/
 		} else {
 			(*m)->outside = false;
 			++m_numInsideModels;			

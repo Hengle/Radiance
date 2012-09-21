@@ -18,7 +18,7 @@ namespace {
 	};
 }
 
-void BSPBuilder::CompileAreas() {
+bool BSPBuilder::CompileAreas() {
 	ResetProgress();
 	m_numOutsideTris = 0;
 	m_numOutsideModels = 0;
@@ -67,7 +67,8 @@ void BSPBuilder::CompileAreas() {
 		ResetProgress();
 		m_work = 0;
 		Log("Compiling Area %d...\n", area->area);
-		BuildAreaTree(*area);
+		if (!BuildAreaTree(*area))
+			return false;
 		if (m_ui) {
 			m_ui->Step();
 			m_ui->Refresh();
@@ -81,17 +82,36 @@ void BSPBuilder::CompileAreas() {
 			area->area, area->numNodes, area->numLeafs, area->numTris[0], area->numTris[1], 
 			(int)area->bounds.Size()[0], (int)area->bounds.Size()[1], (int)area->bounds.Size()[2]);
 	}
+
+	return true;
 }
 
-void BSPBuilder::BuildAreaTree(Area &area) {
-	if (area.tris.empty() && area.area != 0) {
+bool BSPBuilder::BuildAreaTree(Area &area) {
+	MakeAreaRootNode(area);
+
+	if (area.root->tris.empty()) {
 		area.bounds.SetMins(Vec3::Zero);
 		area.bounds.SetMaxs(Vec3::Zero);
-		Log("WARNING: Area %d has no visible surfaces.\n", area.area);
-		return;
+		area.root.reset();
+		return true;
 	}
 
-	MakeAreaRootNode(area);
+	for (int i = 0; i < 3; ++i) {
+		if (area.bounds.Size()[i] > SceneFileD::kMaxRange) {
+			Log("ERROR: Area %d is HUGE! Its bounds (%dx%dx%d) exceeds the limit of %dx%dx%d!\n", 
+				(int)area.bounds.Size()[0], 
+				(int)area.bounds.Size()[1], 
+				(int)area.bounds.Size()[2], 
+				(int)SceneFileD::kMaxRange,
+				(int)SceneFileD::kMaxRange,
+				(int)SceneFileD::kMaxRange
+			);
+
+			SetResult(pkg::SR_CompilerError);
+			return false;
+		}
+	}
+
 	AreaNodePolyVec tris(area.root->tris);
 
 	AreaBoxBSP(area, area.root, 0);
@@ -101,6 +121,7 @@ void BSPBuilder::BuildAreaTree(Area &area) {
 
 	area.root->tris.swap(tris);
 	PartitionAreaTris(area, area.root, true);
+	return true;
 }
 
 void BSPBuilder::MakeAreaRootNode(Area &area) {
@@ -357,7 +378,7 @@ void BSPBuilder::PartitionAreaTris(Area &area, const AreaNodeRef &node, bool spl
 		AreaNodePolyRef tri = node->tris.back();
 		node->tris.pop_back();
 
-		Plane::SideType s = tri->winding.Side(p, kSplitEpsilon);
+		Plane::SideType s = tri->winding.Side(p, kAreaPartitionEpsilon);
 
 		if (s == Plane::On) {
 			ValueType d = tri->plane.Normal().Dot(p.Normal());
@@ -382,14 +403,14 @@ void BSPBuilder::PartitionAreaTris(Area &area, const AreaNodeRef &node, bool spl
 			AreaNodePolyRef f(new (world::bsp_file::ZBSPBuilder) AreaNodePoly(*tri));
 			AreaNodePolyRef b(new (world::bsp_file::ZBSPBuilder) AreaNodePoly(*tri));
 
-			tri->winding.Split(p, &f->winding, &b->winding, kSplitEpsilon);
+			tri->winding.Split(p, &f->winding, &b->winding, kAreaPartitionEpsilon);
 
 			if (!f->winding.Empty())
 				front.push_back(f);
 			if (!b->winding.Empty())
 				back.push_back(b);
 		} else {
-			s = tri->winding.MajorSide(p, 0.0);
+			s = tri->winding.MajorSide(p, kAreaPartitionEpsilon);
 			if (s == Plane::Front) {
 				front.push_back(tri);
 			} else if (s == Plane::Back) {

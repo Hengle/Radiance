@@ -204,7 +204,6 @@ private:
 			nodes[0] = nodes[1] = 0;
 			contents = 0;
 			poly = 0;
-			bounding = false;
 			color = RandomColor();
 			++s_num;
 		}
@@ -218,7 +217,6 @@ private:
 			nodes[0] = nodes[1] = 0;
 			contents = 0;
 			poly = 0;
-			bounding = p.bounding;
 			color = p.color;
 			++s_num;
 		}
@@ -237,7 +235,6 @@ private:
 		PortalRef next[2];
 		Node   *nodes[2];
 		Vec3 color;
-		bool bounding;
 
 		static int s_num;
 	};
@@ -484,7 +481,8 @@ private:
 	int m_numDetail;
 	int m_numNodes;
 	int m_numLeafs;
-	int m_numPortals;
+	int m_numPortalFaces;
+	int m_numPortalSplits;
 	int m_progress;
 	int m_numOutsideNodes;
 	int m_numOutsideTris;
@@ -515,6 +513,7 @@ private:
 	void Split(Node *node, int boxAxis);
 	void Split(const TriModelFragRef &model, const Plane &p, int planenum, TriModelFragRef &front, TriModelFragRef &back);
 	bool MarkNodePolys(int planenum, const TriModelFragRef &m);
+	void MarkDetail();
 	void Portalize();
 	void SplitNodePortals(Node *node);
 	void MakeNodePortal(Node *node);
@@ -533,8 +532,8 @@ private:
 	void AreaFlood();
 	void AreaFlood(Node *leaf, Area *area);
 	void FindAreas(Node *node);
-	void CompileAreas();
-	void BuildAreaTree(Area &area);
+	bool CompileAreas();
+	bool BuildAreaTree(Area &area);
 	void MakeAreaRootNode(Area &area);
 	void AreaBoxBSP(Area &area, const AreaNodeRef &node, int planebits);
 	void PartitionAreaTris(Area &area, const AreaNodeRef &node, bool split);
