@@ -48,7 +48,7 @@ public:
 #if defined(RAD_OPT_TOOLS)
 	void SetProgressIndicator(tools::UIProgress &ui);
 	void SetDebugUI(tools::MapBuilderDebugUI &ui);
-	void DebugDraw(float time, float dt);
+	void DebugDraw(float time, float dt, const QRect &viewport);
 	void OnDebugMenu(const QVariant &data);
 #endif
 

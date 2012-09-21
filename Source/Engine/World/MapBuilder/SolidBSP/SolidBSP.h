@@ -12,12 +12,14 @@
 #include "../../../Tools/SceneFile.h"
 #include "../MapBuilderDebugUI.h"
 #include "../../BSPFile.h"
+#include "../../../Packages/Packages.h"
 #include "MapTypes.h"
 #include "VecHash.h"
 #include "PlaneHash.h"
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/Container/ZoneSet.h>
 #include <Runtime/Thread.h>
+#include <Runtime/Thread/Locks.h>
 #include <QtCore/QVariant>
 #include <vector>
 
@@ -28,7 +30,7 @@ namespace solid_bsp {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Vec3 RandomColor();
+Vec3 RandomColor(int index = -1);
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -67,7 +69,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(BSPBuilder, bspFileBuilder, world::bsp_file::BSPFileBuilder::Ref);
 	RAD_DECLARE_READONLY_PROPERTY(BSPBuilder, result, int); // SR_ result
 
-	void DebugDraw(float time, float dt);
+	void DebugDraw(float time, float dt, const QRect &viewport);
 	void OnDebugMenu(const QVariant &data);
 
 	void WaitForCompletion() const;
@@ -351,8 +353,7 @@ private:
 
 	///////////////////////////////////////////////////////////////////////////////
 
-	struct EmitTriModel
-	{
+	struct EmitTriModel {
 		typedef boost::shared_ptr<EmitTriModel> Ref;
 		typedef SceneFileD::NormalTriVert Vert;
 		typedef SceneFileD::NormalTriVertVec VertVec;
@@ -375,6 +376,82 @@ private:
 
 	///////////////////////////////////////////////////////////////////////////////
 
+	class PaintHandler {
+	public:
+		typedef boost::shared_ptr<PaintHandler> Ref;
+
+		virtual ~PaintHandler() {}
+
+		// return false from either of these to exit the paint handler.
+
+		virtual void Init(MapBuilderDebugUI &ui, BSPBuilder &bsp);
+		virtual bool Paint(float time, float dt, const QRect &viewport, MapBuilderDebugUI &ui, BSPBuilder &bsp) = 0;
+		virtual bool OnMenu(const QVariant &data, MapBuilderDebugUI &ui, BSPBuilder &bsp) { return true; }
+
+	protected:
+
+		void EnableSmoothShading();
+		void DisableSmoothShading();
+		void BeginPaint(const QRect &viewport, MapBuilderDebugUI &ui, bool backfaces = false);
+		void EndPaint();
+		void BeginWireframe(bool backfaces = false);
+		void EndWireframe();
+		void SetMaterialColor(int id);
+	};
+
+	///////////////////////////////////////////////////////////////////////////////
+
+	class AreaDraw;
+	friend class AreaBSPDraw;
+
+	class AreaBSPDraw : public PaintHandler {
+	public:
+
+		AreaBSPDraw();
+
+		virtual bool Paint(float time, float dt, const QRect &viewport, MapBuilderDebugUI &ui, BSPBuilder &bsp);
+		virtual bool OnMenu(const QVariant &data, MapBuilderDebugUI &ui, BSPBuilder &bsp);
+		
+
+	private:
+
+		void FindCameraArea(MapBuilderDebugUI &ui, BSPBuilder &bsp);
+		void DrawAreaNode(BSPBuilder &bsp, S32 node);
+		void DrawAreaLeaf(BSPBuilder &bsp, S32 leaf);
+		void DrawModel(BSPBuilder &bsp, U32 model);
+
+		int m_area;
+		Node *m_leaf;
+	};
+
+	///////////////////////////////////////////////////////////////////////////////
+
+	class LeafFacesDraw;
+	friend class LeafFacesDraw;
+
+	class LeafFacesDraw : public PaintHandler {
+	public:
+
+		LeafFacesDraw();
+
+		virtual bool Paint(float time, float dt, const QRect &viewport, MapBuilderDebugUI &ui, BSPBuilder &bsp);
+		virtual bool OnMenu(const QVariant &data, MapBuilderDebugUI &ui, BSPBuilder &bsp);
+
+	private:
+
+		void FindCameraLeaf(MapBuilderDebugUI &ui, BSPBuilder &bsp);
+		void DrawNodes(Node *node, bool wireframe);
+		
+		Node *m_leaf;
+		bool m_isolate;
+		bool m_lock;
+		tools::editor::PopupMenu *m_menu;
+		QAction *m_isolateAction;
+		QAction *m_lockAction;
+	};
+
+	///////////////////////////////////////////////////////////////////////////////
+
 	std::ostream &COut() {
 		if (m_cout)
 			return *m_cout;
@@ -383,7 +460,12 @@ private:
 
 	void Log(const char *fmt, ...);
 
+	void DisplayPaintHandler(PaintHandler *handler);
+
 	RAD_DECLARE_GET(result, int);
+
+	typedef boost::mutex Mutex;
+	typedef boost::lock_guard<Mutex> Lock;
 
 	SceneFile *m_map;
 	SceneFile::Entity::Ref m_leakEnt;
@@ -393,6 +475,8 @@ private:
 	Node m_outside;
 	Vec3Vec m_leakpts;
 	AreaVec m_areas;
+	Mutex m_paintMutex;
+	PaintHandler::Ref m_paint;
 	std::ostream *m_cout;
 	tools::UIProgress *m_ui;
 	MapBuilderDebugUI *m_debugUI;
@@ -413,6 +497,7 @@ private:
 	int m_work;
 	int m_result;
 	bool m_flood;
+	bool m_abort;
 
 	void Build();
 	bool LoadMaterials();
@@ -443,6 +528,7 @@ private:
 	void MarkLeakTrail();
 	void DumpLeakFile();
 	void FillOutside();
+	void FillOutsideNodes(Node *node);
 	void MarkOccupiedNodeFaces(Node *node);
 	void AreaFlood();
 	void AreaFlood(Node *leaf, Area *area);

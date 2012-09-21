@@ -15,6 +15,7 @@
 #include "../../Tools/Progress.h"
 #include "MapBuilderDebugUI.h"
 #include <QtCore/QVariant>
+#include <QtCore/QRect>
 #include <Runtime/Thread.h>
 #include <Runtime/PushPack.h>
 
@@ -34,7 +35,7 @@ public:
 	bool LoadEntSpawn(const world::EntSpawn &spawn);
 	bool SpawnCompile();
 	void WaitForCompletion();
-	void DebugDraw(float time, float dt);
+	void DebugDraw(float time, float dt, const QRect &viewport);
 	void OnDebugMenu(const QVariant &data);
 	
 	RAD_DECLARE_READONLY_PROPERTY(MapBuilder, bspFile, world::bsp_file::BSPFile::Ref);

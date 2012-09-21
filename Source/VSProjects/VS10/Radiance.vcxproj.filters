@@ -2081,6 +2081,9 @@
     <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSPAreas.cpp">
       <Filter>Source\Engine\World\MapBuilder\SolidBSP</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSPDraw.cpp">
+      <Filter>Source\Engine\World\MapBuilder\SolidBSP</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Runtime\Base\Event.inl">

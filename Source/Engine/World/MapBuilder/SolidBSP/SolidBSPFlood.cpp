@@ -64,6 +64,7 @@ void BSPBuilder::FillOutside() {
 	m_numOutsideNodes = m_numInsideNodes = m_numOutsideModels = m_numInsideModels = 0;
 	m_numInsideTris = m_numOutsideTris = 0;
 
+	FillOutsideNodes(m_root.get());
 	MarkOccupiedNodeFaces(m_root.get());
 
 	for (SceneFile::TriModel::Vec::iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
@@ -109,6 +110,19 @@ void BSPBuilder::FillOutside() {
 	Log("Total  : %d node(s), %d model(s), %d tri(s)\n", m_numInsideNodes+m_numOutsideNodes, m_numInsideModels+m_numOutsideModels, m_numInsideTris+m_numOutsideTris);
 }
 
+void BSPBuilder::FillOutsideNodes(Node *node) {
+	if (node->planenum != kPlaneNumLeaf) {
+		FillOutsideNodes(node->children[0].get());
+		FillOutsideNodes(node->children[1].get());
+		return;
+	}
+
+	if (!node->occupied) {
+		++m_numOutsideNodes;
+		node->contents = kContentsFlag_Solid;
+	}
+}
+
 void BSPBuilder::MarkOccupiedNodeFaces(Node *node) {
 	if (node->planenum != kPlaneNumLeaf) {
 		MarkOccupiedNodeFaces(node->children[0].get());
@@ -139,8 +153,6 @@ void BSPBuilder::MarkOccupiedNodeFaces(Node *node) {
 				}
 			}
 		}
-	} else {
-		++m_numOutsideNodes;
 	}
 }
 

@@ -36,8 +36,8 @@ void MapBuilder::SetDebugUI(MapBuilderDebugUI &ui) {
 	m_debugUI = &ui;
 }
 
-void MapBuilder::DebugDraw(float time, float dt) {
-	m_bspBuilder.DebugDraw(time, dt);
+void MapBuilder::DebugDraw(float time, float dt, const QRect &viewport) {
+	m_bspBuilder.DebugDraw(time, dt, viewport);
 }
 
 void MapBuilder::OnDebugMenu(const QVariant &data) {

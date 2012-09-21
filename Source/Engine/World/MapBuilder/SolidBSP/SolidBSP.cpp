@@ -51,11 +51,19 @@ m_numInsideModels(0),
 m_numInsideTris(0),
 m_numAreaNodes(0),
 m_numAreaLeafs(0),
-m_flood(false) {
+m_flood(false),
+m_abort(false) {
 	m_result = SR_Success;
 }
 
 BSPBuilder::~BSPBuilder() {
+	{
+		Lock L(m_paintMutex);
+		m_paint.reset();
+	}
+
+	m_abort = true;
+	WaitForCompletion();
 }
 
 bool BSPBuilder::SpawnCompile(
@@ -78,10 +86,42 @@ bool BSPBuilder::SpawnCompile(
 	return true;
 }
 
-void BSPBuilder::DebugDraw(float time, float dt) {
+void BSPBuilder::DebugDraw(float time, float dt, const QRect &viewport) {
+	Lock L(m_paintMutex);
+	if (m_paint && m_debugUI) {
+		if (!m_paint->Paint(time, dt, viewport, *m_debugUI, *this)) {
+			m_debugUI->enabled = false;
+			m_paint.reset();
+		}
+	}
 }
 
 void BSPBuilder::OnDebugMenu(const QVariant &data) {
+	Lock L(m_paintMutex);
+	if (m_paint && m_debugUI) {
+		if (!m_paint->OnMenu(data, *m_debugUI, *this)) {
+			m_debugUI->enabled = false;
+			m_paint.reset();
+		}
+	}
+}
+
+void BSPBuilder::DisplayPaintHandler(PaintHandler *handler) {
+	RAD_ASSERT(handler);
+	RAD_ASSERT(m_debugUI);
+
+	m_paintMutex.lock();
+	m_paint.reset(handler);
+	handler->Init(*m_debugUI, *this);
+	m_debugUI->enabled = true;
+	m_paintMutex.unlock();
+
+	for (;;) {
+		thread::Sleep(500);
+		Lock L(m_paintMutex);
+		if (!m_paint)
+			break;
+	}
 }
 
 void BSPBuilder::WaitForCompletion() const {
@@ -95,11 +135,15 @@ int BSPBuilder::ThreadProc() {
 
 void BSPBuilder::Build()
 {
+	if (m_ui) {
+		m_ui->title = "Loading Materials...";
+		m_ui->total = 0.f;
+		m_ui->totalProgress = 0;
+		m_ui->Refresh();
+	}
+
 	if (!LoadMaterials())
 		return;
-	CreateRootNode();
-	Log("------------\n");
-	Log("Building Hull (%d structural tri(s), %d detail tri(s), %d total)\n", m_numStructural, m_numDetail, m_numStructural+m_numDetail);
 
 	if (m_ui) {
 		m_ui->title = "Building Hull...";
@@ -108,28 +152,44 @@ void BSPBuilder::Build()
 		m_ui->Refresh();
 	}
 
+	CreateRootNode();
+	Log("------------\n");
+	Log("Building Hull (%d structural tri(s), %d detail tri(s), %d total)\n", m_numStructural, m_numDetail, m_numStructural+m_numDetail);
+
+	if (m_numStructural == 0) {
+		SetResult(SR_CompilerError);
+		Log("ERROR: map has no structural hull!\n");
+		return;
+	}
+
 	ResetProgress();
 	EmitProgress();
 	Split(m_root.get(), 0);
 	Log("\n%d node(s), %d leaf(s)\n", m_numNodes, m_numLeafs);
 	
-	/*if (g_glDebug) { 
-		DisplayTree(0); 
-	}*/
+	if (m_debugUI)
+		DisplayPaintHandler(new (world::bsp_file::ZBSPBuilder) LeafFacesDraw());
+
+	if (m_abort)
+		return;
 
 	Portalize();
+
+	if (m_abort)
+		return;
 
 	if (FloodFill()) {
 		m_flood = true;
 		FillOutside();
 	}
-
+	
 	AreaFlood();
 	CompileAreas();
 	EmitBSPFile();
 
+	if (m_debugUI)
+		DisplayPaintHandler(new (world::bsp_file::ZBSPBuilder) AreaBSPDraw());
 	SetResult(SR_Success);
-	//if (g_glDebug) { DisplayTree(0, !m_flood); }
 }
 
 void BSPBuilder::ResetProgress() {
@@ -393,8 +453,9 @@ bool BSPBuilder::LoadMaterials() {
 			if (!trim->contents)
 				trim->contents = trif.contents;
 			if (trim->contents != trif.contents) {
-				Log("WARNING: mixed contents on '%s', material '%s', this needs to be corrected.", trim->name.c_str.get(), mat.name.c_str.get());
-				trim->contents |= trif.contents;
+				Log("ERROR: mixed contents on '%s', material '%s', this has to be corrected.\n", trim->name.c_str.get(), mat.name.c_str.get());
+				SetResult(SR_CompilerError);
+				return false;
 			}
 
 			trif.surface = surface;
@@ -433,6 +494,8 @@ void BSPBuilder::CreateRootNode() {
 
 		if (!(trim->contents & kContentsFlag_BSPContents)) 
 			continue;
+		//if (trim->contents & kContentsFlag_Areaportal)
+		//	continue;
 		
 		TriModelFragRef frag(new TriModelFrag());
 		frag->original = trim.get();
@@ -602,144 +665,6 @@ int BSPBuilder::FindSplitPlane(Node *node, int &boxAxis)
 	return bestNum;
 }
 
-/*
-void BSPBuilder::DrawTreeHandler::OnPaint(GLNavWindow &w)
-{
-	GLState &s = w.BeginFrame();
-	w.Camera().Bind(s);
-	glClearColor(0, 0, 0, 0);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	s.SetState(DT_Less|CFM_Back|CFM_CCW|CWM_All|NoArrays, BM_Off);
-	s.DisableAllTMUs();
-	s.Commit();
-
-	glEnable(GL_LIGHTING);
-	glEnable(GL_COLOR_MATERIAL);
-	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-	glShadeModel( GL_SMOOTH );
-
-	float dir0[4]  = { 0.4f, 0.7f, 1.0f, 0.0f };
-	float amb0[4]  = { 0.2f, 0.2f, 0.2f, 1.0f };
-	float diff0[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	
-	glLightfv( GL_LIGHT0, GL_POSITION, dir0 );
-	glLightfv( GL_LIGHT0, GL_DIFFUSE, diff0 );
-	glEnable(GL_LIGHT0);
-
-	float dir1[4]  = { -0.4f, -0.7f, -1.0f, 0.0f };
-	float diff1[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	
-	glLightfv( GL_LIGHT1, GL_POSITION, dir1 );
-	glLightfv( GL_LIGHT1, GL_DIFFUSE, diff1 );
-	glEnable(GL_LIGHT1);
-
-	glLightModeli( GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE );
-
-	float c[4] = {1, 1, 1, 1};
-	glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, c );
-	glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, c );
-
-	glColor3f(0.6f, 0.1f, 0.1f);
-
-	DrawNode(m_root, s);
-
-	if (!m_target)
-	{
-		glDisable(GL_LIGHTING);
-		glDisable(GL_LIGHT0);
-		glDisable(GL_LIGHT1);
-		glDisable(GL_COLOR_MATERIAL);
-
-		s.SetState(DT_Disable, 0);
-		s.Commit();
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glColor3f(1, 1, 1);
-		DrawNode(m_root, s);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
-
-	w.EndFrame();
-}
-
-void BSPBuilder::DrawTreeHandler::DrawNode(const Node *node, GLState &s)
-{
-	if (!node) return; // partial tree
-
-	if (m_target)
-	{
-		if (node == m_target)
-		{
-			s.SetState(DT_Less, 0);
-			s.Commit();
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		}
-		else
-		{
-			s.SetState(DT_Disable, 0);
-			s.Commit();
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		}
-	}
-
-	for (TriModelFragVec::const_iterator it = node->models.begin(); it != node->models.end(); ++it)
-	{
-		if (!m_outside && (*it)->original->outside) continue;
-
-		for (PolyVec::const_iterator polyIt = (*it)->polys.begin(); polyIt != (*it)->polys.end(); ++polyIt)
-		{
-			if (!m_outside && (*polyIt)->original->outside) continue;
-
-			glColor3d((*polyIt)->color[0], (*polyIt)->color[1], (*polyIt)->color[2]);
-			glBegin(GL_POLYGON);
-
-			for (Winding::VertexListType::const_iterator v = (*polyIt)->winding->Vertices().begin(); v != (*polyIt)->winding->Vertices().end(); ++v)
-			{
-				glVertex3d((*v).X(), (*v).Y(), (*v).Z());
-			}
-
-			glEnd();
-		}
-	}
-
-	if (m_target) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
-
-	if (node->planenum != PlaneNumLeaf)
-	{
-		DrawNode(node->children[0].get(), s);
-		DrawNode(node->children[1].get(), s);
-		return;
-	}
-}
-
-void BSPBuilder::DisplayTree(Node *node, 
-		bool outside,
-		const Node *target)
-{
-	GLNavWindow win;
-	GLCamera &c = win.Camera();
-	SceneFile::EntityRef e = m_map->EntForName("sp_player_start");
-	if (e)
-	{
-		c.SetPos(
-			GLVec3(
-				GLVec3::ValueType(e->origin.X()), 
-				GLVec3::ValueType(e->origin.Y()), 
-				GLVec3::ValueType(e->origin.Z())
-			)
-		);
-	}
-	else
-	{
-		c.SetPos(GLVec3::Zero);
-	}
-	if (!node) { node = m_root.get(); }
-	DrawTreeHandler p(node, outside, target);
-	win.SetPaintHandler(&p);
-	win.Open(L"BSPBuilder", -1, -1, 1280, 1024, true);
-	win.WaitForClose();
-}
-*/
-
 void BSPBuilder::BBoxPlanes(const BBox &bounds, Plane *planes) {
 	planes[0] = Plane(-Plane::X.Normal(), -bounds.Mins().X());
 	planes[1] = Plane(Plane::X.Normal(), bounds.Maxs().X());
@@ -875,7 +800,7 @@ SceneFile::Plane BSPBuilder::FromBSPType(const Plane &plane) {
 	);
 }
 
-Vec3 RandomColor() {
+Vec3 RandomColor(int index) {
 	static Vec3Vec s_colors;
 	if (s_colors.empty()) {
 		for (int i = 0; i < 256; ++i) {
@@ -888,8 +813,10 @@ Vec3 RandomColor() {
 			);
 		}
 	}
-	return s_colors[rand() & 0xff];
+	if (index == -1)
+		index = rand();
+	return s_colors[index & 0xff];
 }
 
-} // box_bsp
+} // solid_bsp
 } // tools

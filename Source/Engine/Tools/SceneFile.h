@@ -663,7 +663,8 @@ public:
 
 	typename Entity::Ref EntForName(const char *name) const {
 		for (typename Entity::Vec::const_iterator it = ents.begin(); it != ents.end(); ++it) {
-			if ((*it)->name == name) return *it;
+			if ((*it)->name == name) 
+				return *it;
 		}
 		return typename Entity::Ref();
 	}

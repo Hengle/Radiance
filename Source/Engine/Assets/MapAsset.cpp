@@ -175,9 +175,9 @@ void MapAsset::SetDebugUI(tools::MapBuilderDebugUI &ui) {
 	m_debugUI = &ui;
 }
 
-void MapAsset::DebugDraw(float time, float dt) {
+void MapAsset::DebugDraw(float time, float dt, const QRect &viewport) {
 	if (m_mapBuilder)
-		m_mapBuilder->DebugDraw(time, dt);
+		m_mapBuilder->DebugDraw(time, dt, viewport);
 }
 
 void MapAsset::OnDebugMenu(const QVariant &data) {

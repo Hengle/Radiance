@@ -211,18 +211,25 @@ S32 BSPBuilder::EmitBSPAreaLeaf(AreaNode *leaf, world::bsp_file::BSPArea &area) 
 				if (poly->tri->model->numChannels != c)
 					continue;
 
-				int numVerts = (int)poly->winding.Vertices().size();
+				int numElems = (int)(poly->winding.Vertices().size() - 2) * 3;
 
-				if (((int)m.indices.size() >= kMaxBatchElements-numVerts) ||
-					((int)m.verts.size() >= kMaxBatchElements-numVerts)) {
+				if (((int)m.indices.size() >= kMaxBatchElements-numElems) ||
+					((int)m.verts.size() >= kMaxBatchElements-numElems)) {
 					EmitBSPModel(m);
 					m.Clear();
 					++bspLeaf->numModels;
 				}
 
-				for (AreaNodeWinding::VertexListType::const_iterator it = poly->winding.Vertices().begin(); it != poly->winding.Vertices().end(); ++it) {
-					m.AddVertex(EmitTriModel::Vert(*it));
+				// fan triangles.
+				size_t numVerts = poly->winding.Vertices().size();
+				for (size_t i = 0; i+1 < numVerts - 1; ++i) {
+					m.AddVertex(EmitTriModel::Vert(poly->winding.Vertices()[numVerts - 1]));
+					m.AddVertex(EmitTriModel::Vert(poly->winding.Vertices()[i]));
+					m.AddVertex(EmitTriModel::Vert(poly->winding.Vertices()[i+1]));
 				}
+				/*for (AreaNodeWinding::VertexListType::const_iterator it = poly->winding.Vertices().begin(); it != poly->winding.Vertices().end(); ++it) {
+					m.AddVertex(EmitTriModel::Vert(*it));
+				}*/
 			}
 
 			if (!m.verts.empty()) {

@@ -30,7 +30,7 @@ void BSPBuilder::CompileAreas() {
 	Log("Compiling Objects...\n");
 
 	if (m_ui) {
-		m_ui->title = "Compiling Objects...";
+		m_ui->title = "Compiling Models...";
 		m_ui->total = (int)m_map->worldspawn->models.size();
 		m_ui->totalProgress = 0;
 		m_ui->Refresh();

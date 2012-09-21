@@ -32,18 +32,28 @@ public:
 
 	virtual void SetDebugMenu(PopupMenu *menu);
 
+	virtual QAction *AddDebugMenuAction(
+		PopupMenu &menu,
+		const char *path
+	);
+
+	virtual QAction *AddDebugMenuAction(
+		PopupMenu &menu,
+		const QIcon &icon,
+		const char *path
+	);
+
 protected:
 
 	virtual void renderGL();
 	virtual void mousePressEvent(QMouseEvent *e);
-		
-	virtual RAD_DECLARE_GET(enable, bool) {
+	virtual void mouseMoveEvent(QMouseEvent *e);
+
+	virtual RAD_DECLARE_GET(enabled, bool) {
 		return m_enabled;
 	}
 
-	virtual RAD_DECLARE_SET(enable, bool) {
-		m_enabled = value;
-	}
+	virtual RAD_DECLARE_SET(enabled, bool);
 
 	virtual RAD_DECLARE_GET(camera, Camera*) { 
 		return GLNavWidget::camera;

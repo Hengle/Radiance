@@ -90,40 +90,35 @@ private:
 
 	void Clamp(::tools::solid_bsp::Plane &p)
 	{
-		if (p.Normal().X() > ValueType(0.99999999))
+		if (p.Normal().X() > ValueType(0.995))
 		{
 			p.Initialize(Vec3(ValueType(1), ValueType(0), ValueType(0)), p.D());
 		}
-		else if (p.Normal().X() < ValueType(-0.99999999))
+		else if (p.Normal().X() < ValueType(-0.995))
 		{
 			p.Initialize(Vec3(ValueType(-1), ValueType(0), ValueType(0)), p.D());
 		}
-		else if (p.Normal().Y() > ValueType(0.99999999))
+		else if (p.Normal().Y() > ValueType(0.995))
 		{
 			p.Initialize(Vec3(ValueType(0), ValueType(1), ValueType(0)), p.D());
 		}
-		else if (p.Normal().Y() < ValueType(-0.99999999))
+		else if (p.Normal().Y() < ValueType(-0.995))
 		{
 			p.Initialize(Vec3(ValueType(0), ValueType(-1), ValueType(0)), p.D());
 		}
-		else if (p.Normal().Z() > ValueType(0.99999999))
+		else if (p.Normal().Z() > ValueType(0.995))
 		{
 			p.Initialize(Vec3(ValueType(0), ValueType(0), ValueType(1)), p.D());
 		}
-		else if (p.Normal().Z() < ValueType(-0.99999999))
+		else if (p.Normal().Z() < ValueType(-0.995))
 		{
 			p.Initialize(Vec3(ValueType(0), ValueType(0), ValueType(-1)), p.D());
 		}
 
 		ValueType f = math::Floor(p.D()+ValueType(0.5));
-		ValueType c = math::Floor(p.D()+ValueType(0.5));
 		if (math::Abs(f-p.D()) < ValueType(0.0009999999999))
 		{
 			p.Initialize(p.Normal(), f);
-		}
-		else if (math::Abs(c-p.D()) < ValueType(0.0009999999999))
-		{
-			p.Initialize(p.Normal(), c);
 		}
 	}
 
@@ -141,8 +136,8 @@ private:
 		return b & (NumBuckets-1);
 	}
 
-#define PLANE_NORMAL_WELD ValueType(0.00099999999999)
-#define PLANE_DIST_WELD   ValueType(0.00199999999999)
+#define PLANE_NORMAL_WELD ValueType(0.099999999999)
+#define PLANE_DIST_WELD   ValueType(0.999999999999)
 
 	bool PlaneEqual(const ::tools::solid_bsp::Plane &a, const ::tools::solid_bsp::Plane &b)
 	{
