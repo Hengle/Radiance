@@ -529,7 +529,7 @@ private:
 	void FillOutside();
 	void FillOutsideNodes(Node *node);
 	void MarkOccupiedNodeFaces(Node *node);
-	void AreaFlood();
+	bool AreaFlood();
 	void AreaFlood(Node *leaf, Area *area);
 	void FindAreas(Node *node);
 	bool CompileAreas();

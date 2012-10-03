@@ -1,5 +1,5 @@
 // World.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
@@ -21,6 +21,7 @@
 #include "../Game/GameNetworkDef.h"
 #include <Runtime/Container/ZoneList.h>
 #include <Runtime/Container/ZoneMap.h>
+#include <Runtime/Container/ZoneVector.h>
 #include <Runtime/PushPack.h>
 
 class Game;
@@ -28,17 +29,9 @@ class Engine;
 
 namespace world {
 
-class RADENG_CLASS World
-{
+class WorldDraw;
+class RADENG_CLASS World {
 public:
-
-	enum
-	{
-		MaxEnts = 1024,
-		MaxTempEnts = 64,
-		MaxStaticEnts = MaxEnts-MaxTempEnts,
-		FirstTempEntId = MaxStaticEnts
-	};
 
 	typedef WorldRef Ref;
 	typedef WorldWRef WRef;
@@ -72,7 +65,7 @@ public:
 		const xtime::TimeSlice &time
 	);
 
-	void SetGameSpeed(float speed, float time);
+	void SetGameSpeed(float speed, float duration);
 
 	void Tick(float dt);
 	void Draw();
@@ -109,11 +102,25 @@ public:
 	void OnShowLeaderboard(bool show);
 	void OnShowAchievements(bool show);
 
+	void SetAreaportalState(int areaportalNum, bool open, bool relinkOccupants);
+
 	Entity::Ref FindEntityId(int id) const;
 	Entity::Vec FindEntityClass(const char *classname) const;
 	Entity::Vec FindEntityTargets(const char *targetname) const;
 	Entity::Vec BBoxTouching(const BBox &bbox, int stypes) const;
 	ZoneTagRef ZoneTag(int id) const;
+
+	//! Clips a volume into the world, and returns a mask indicating visible areas.
+	//! Set toArea to -1 to find all areas seen within the volume, otherwise the mask 
+	//! may only indicate areas through which toArea was seen.
+	bool OccupantVolumeCanSeeArea(
+		const Vec3 &pos,
+		const WindingVec &volume,
+		WindingVec *clipped,
+		int fromArea,
+		int toArea,
+		AreaBits &visible
+	);
 	
 	RAD_DECLARE_PROPERTY(World, viewController, Entity::Ref, Entity::Ref);
 	RAD_DECLARE_PROPERTY(World, playerPawn, Entity::Ref, Entity::Ref);
@@ -138,11 +145,24 @@ public:
 
 private:
 
+	friend class WorldDraw;
+	typedef zone_list<Event::Ref, ZWorldT>::type EventList;
+	typedef zone_map<int, ZoneTagRef, ZWorldT>::type ZoneIdMap;
+
+	struct Areaportal {
+		typedef zone_vector<Areaportal, ZWorldT>::type Vec;
+
+		bool open;
+		int areas[2];
+		int planenum;
+		Winding winding;
+	};
+
 	World(Game &game, int slot, const SoundContextRef &sound, pkg::Zone zone);
 
-	enum
-	{
+	enum {
 		SS_None,
+		SS_BSP,
 		SS_SoundEmitter,
 		SS_Draw,
 		SS_Materials,
@@ -226,35 +246,176 @@ private:
 	void DispatchEvents();
 	void FlushEvents();
 	int PostSpawn(const xtime::TimeSlice &time, int flags);
+	void LoadBSP(const bsp_file::BSPFile &bsp);
+	void LinkEntity(Entity *entity, const BBox &bounds);
+	void UnlinkEntity(Entity *entity);
 
-	RAD_DECLARE_GET(viewController, Entity::Ref) { return m_viewController; }
-	RAD_DECLARE_GET(playerPawn, Entity::Ref) { return m_playerPawn; }
-	RAD_DECLARE_GET(worldspawn, Entity::Ref) { return m_worldspawn; }
-	RAD_DECLARE_SET(viewController, Entity::Ref) { m_viewController = value; }
-	RAD_DECLARE_SET(playerPawn, Entity::Ref) { m_playerPawn = value; }
-	RAD_DECLARE_SET(worldspawn, Entity::Ref) { m_worldspawn = value; }
-	RAD_DECLARE_GET(time, float) { return m_time; }
-	RAD_DECLARE_GET(gameTime, float) { return m_gameTime; }
-	RAD_DECLARE_GET(dt, float) { return m_dt; }
-	RAD_DECLARE_GET(camera, Camera*) { return &const_cast<World*>(this)->m_cam; }
-	RAD_DECLARE_GET(game, Game*) { return m_game; }
-	RAD_DECLARE_GET(lua, WorldLua*) { return m_lua.get(); }
-	RAD_DECLARE_GET(draw, WorldDraw*) { return m_draw.get(); }
-	RAD_DECLARE_GET(cinematics, WorldCinematics*) { return m_cinematics.get(); }
-	RAD_DECLARE_GET(pkgZone, pkg::Zone) { return m_pkgZone; }
-	RAD_DECLARE_GET(uiRoot, const ui::RootRef&) { return m_uiRoot; }
-	RAD_DECLARE_GET(destroy, bool) { return m_destroy; }
-	RAD_DECLARE_GET(pauseState, int) { return m_pauseState; }
-	RAD_DECLARE_SET(pauseState, int) { m_pauseState = value; }
-	RAD_DECLARE_GET(sound, SoundContext*) { return m_sound.get(); }
-	RAD_DECLARE_GET(slot, int) { return m_slot; }
-	RAD_DECLARE_GET(enabledGestures, int) { return m_gestures; }
+	struct LinkEntityParms {
+
+		LinkEntityParms(
+			Entity *_entity,
+			const BBox &_bounds,
+			const WindingVec &_bbox,
+			AreaBits &_tested,
+			AreaBits &_visible
+		) : entity(_entity),
+		    bounds(_bounds),
+			bbox(_bbox),
+			tested(_tested),
+			visible(_visible) {
+		}
+
+		Entity *entity;
+		const BBox &bounds;
+		const WindingVec &bbox;
+		AreaBits &tested;
+		AreaBits &visible;
+	};
+
+	void LinkEntity(const LinkEntityParms &constArgs, int nodeNum);
+
+	struct OccupantVolumeClipParms {
+
+		OccupantVolumeClipParms(
+			const Vec3 &_pos,
+			WindingVec *_clipped,
+			int _toArea,
+			AreaBits &_visible,
+			AreaBits &_stack
+		) : pos(_pos), 
+		    clipped(_clipped), 
+			toArea(_toArea), 
+			visible(_visible),
+			stack(_stack) {
+		}
+		
+		const Vec3 &pos;
+		WindingVec *clipped;
+		int toArea;
+		AreaBits &visible;
+		AreaBits &stack;
+	};
+
+	bool OccupantVolumeCanSeeArea(
+		const OccupantVolumeClipParms &constArgs,
+		const WindingVec &volume,
+		int fromArea
+	);
+
+	dBSPLeaf *LeafForPoint(const Vec3 &pos);
+	dBSPLeaf *LeafForPoint(const Vec3 &pos, int nodeNum);
+
+	static void BoundWindings(const BBox &bounds, WindingVec &windings);
+	static bool ChopWindingToVolume(const WindingVec &volume, Winding &out);
+	static bool ChopVolume(WindingVec &volume, const Plane &p);
+	static bool ChopVolume(WindingVec &volume, const PlaneVec &planes);
+	static bool IntersectVolumes(const WindingVec &a, WindingVec &out);
+	static void MakeVolume(const Plane *planes, int num, WindingVec &volume);
+	static void MakeBoundingPlanes(const Vec3 &pos, const Winding &portal, PlaneVec &planes);
+
+	void BBoxTouching(
+		const BBox &bbox,
+		int stypes,
+		int nodeNum,
+		Entity::Vec &out,
+		EntityBits &bits
+	) const;
+
+	RAD_DECLARE_GET(viewController, Entity::Ref) { 
+		return m_viewController; 
+	}
+
+	RAD_DECLARE_GET(playerPawn, Entity::Ref) { 
+		return m_playerPawn; 
+	}
+
+	RAD_DECLARE_GET(worldspawn, Entity::Ref) { 
+		return m_worldspawn; 
+	}
+
+	RAD_DECLARE_SET(viewController, Entity::Ref) { 
+		m_viewController = value; 
+	}
+
+	RAD_DECLARE_SET(playerPawn, Entity::Ref) { 
+		m_playerPawn = value; 
+	}
+
+	RAD_DECLARE_SET(worldspawn, Entity::Ref) { 
+		m_worldspawn = value; 
+	}
+
+	RAD_DECLARE_GET(time, float) { 
+		return m_time; 
+	}
+
+	RAD_DECLARE_GET(gameTime, float) { 
+		return m_gameTime; 
+	}
+
+	RAD_DECLARE_GET(dt, float) { 
+		return m_dt; 
+	}
+
+	RAD_DECLARE_GET(camera, Camera*) { 
+		return &const_cast<World*>(this)->m_cam; 
+	}
+
+	RAD_DECLARE_GET(game, Game*) { 
+		return m_game; 
+	}
+
+	RAD_DECLARE_GET(lua, WorldLua*) { 
+		return m_lua.get(); 
+	}
+
+	RAD_DECLARE_GET(draw, WorldDraw*) { 
+		return m_draw.get(); 
+	}
+
+	RAD_DECLARE_GET(cinematics, WorldCinematics*) { 
+		return m_cinematics.get(); 
+	}
+
+	RAD_DECLARE_GET(pkgZone, pkg::Zone) { 
+		return m_pkgZone; 
+	}
+
+	RAD_DECLARE_GET(uiRoot, const ui::RootRef&) { 
+		return m_uiRoot; 
+	}
+
+	RAD_DECLARE_GET(destroy, bool) { 
+		return m_destroy; 
+	}
+
+	RAD_DECLARE_GET(pauseState, int) { 
+		return m_pauseState; 
+	}
+
+	RAD_DECLARE_SET(pauseState, int) { 
+		m_pauseState = value; 
+	}
+
+	RAD_DECLARE_GET(sound, SoundContext*) { 
+		return m_sound.get();
+	}
+
+	RAD_DECLARE_GET(slot, int) { 
+		return m_slot; 
+	}
+
+	RAD_DECLARE_GET(enabledGestures, int) { 
+		return m_gestures; 
+	}
+
 	RAD_DECLARE_SET(enabledGestures, int);
-	RAD_DECLARE_GET(drawCounters, const WorldDraw::Counters*) { return &m_drawCounters; }
+
+	RAD_DECLARE_GET(drawCounters, const WorldDraw::Counters*) { 
+		return &m_drawCounters; 
+	}
+
 	RAD_DECLARE_GET(listenerPos, const Vec3&);
-	
-	typedef zone_list<Event::Ref, ZWorldT>::type EventList;
-	typedef zone_map<int, ZoneTagRef, ZWorldT>::type ZoneIdMap;
 
 	EventList m_events;
 	ZoneRef m_zone;
@@ -262,7 +423,7 @@ private:
 	Keys m_spawnKeys;
 	pkg::Asset::Ref m_spawnAsset;
 	pkg::Asset::Vec m_bspMaterials;
-	r::Mesh::Vec m_staticMeshes;
+	bsp_file::BSPFile::Ref m_bsp;
 	Entity::IdMap m_ents;
 	Entity::StringMMap m_classnames;
 	Entity::StringMMap m_targetnames;
@@ -279,6 +440,10 @@ private:
 	ui::RootRef m_uiRoot;
 	SoundContextRef m_sound;
 	WorldDraw::Counters m_drawCounters;
+	dBSPNode::Vec m_nodes;
+	dBSPLeaf::Vec m_leafs;
+	Areaportal::Vec m_areaportals;
+	PlaneVec m_planes;
 	U32 m_spawnOfs;
 	int m_frame;
 	int m_spawnState;
@@ -289,8 +454,8 @@ private:
 	float m_gameTime;
 	float m_dt;
 	String m_mapPath;
-	bool m_destroy;
 	String m_loadMap;
+	bool m_destroy;
 	bool m_loadReq;
 	bool m_loadScreen;
 	UnloadDisposition m_unloadDisp;
@@ -308,8 +473,7 @@ private:
 	int m_gestures;
 };
 
-class RADENG_CLASS Zone
-{
+class RADENG_CLASS Zone {
 public:
 
 	typedef ZoneRef Ref;
@@ -320,15 +484,17 @@ public:
 private:
 
 	explicit Zone(const World::Ref &world) : m_world(world) {}
-	RAD_DECLARE_GET(world, World*) { return m_world.lock().get(); }
+	
+	RAD_DECLARE_GET(world, World*) { 
+		return m_world.lock().get(); 
+	}
 	
 	friend class World;
 
 	World::WRef m_world;
 };
 
-class RADENG_CLASS ZoneTag
-{
+class RADENG_CLASS ZoneTag {
 public:
 
 	typedef ZoneTagRef Ref;
@@ -341,8 +507,14 @@ private:
 
 	friend class World;
 	ZoneTag(const Zone::Ref &zone, Game &game) : m_zone(zone), m_game(&game) {}
-	RAD_DECLARE_GET(zone, Zone::Ref) { return m_zone.lock(); }
-	RAD_DECLARE_GET(game, Game*) { return m_game; }
+
+	RAD_DECLARE_GET(zone, Zone::Ref) { 
+		return m_zone.lock(); 
+	}
+
+	RAD_DECLARE_GET(game, Game*) { 
+		return m_game; 
+	}
 
 	Zone::WRef m_zone;
 	Game *m_game;

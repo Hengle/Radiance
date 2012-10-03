@@ -72,7 +72,7 @@ struct BSPClipSurface {
 struct BSPArea {
 	U32 firstPortal;
 	U32 numPortals;
-	U32 rootNode;
+	S32 rootNode;
 	float mins[3];
 	float maxs[3];
 };

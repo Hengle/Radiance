@@ -15,7 +15,7 @@ class World;
 class WorldDraw;
 class RB_WorldDraw;
 class MBatchDraw;
-typedef zone_list<MBatchDraw*, ZWorldT>::type MBatchDrawPtrList;
+typedef zone_vector<MBatchDraw*, ZWorldT>::type MBatchDrawPtrVec;
 
 namespace details {
 

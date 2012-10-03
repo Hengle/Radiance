@@ -8,12 +8,10 @@
 
 namespace world {
 
-E_PlayerPawn::E_PlayerPawn()
-{
+E_PlayerPawn::E_PlayerPawn() {
 }
 
-E_PlayerPawn::~E_PlayerPawn()
-{
+E_PlayerPawn::~E_PlayerPawn() {
 }
 
 } // world

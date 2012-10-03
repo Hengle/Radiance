@@ -30,8 +30,7 @@ class RADENG_CLASS Material
 {
 public:
 
-	enum Sort
-	{
+	enum Sort {
 		S_Solid,
 		S_Translucent,
 		S_Translucent2,

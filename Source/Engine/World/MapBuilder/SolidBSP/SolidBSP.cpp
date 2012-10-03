@@ -216,7 +216,8 @@ void BSPBuilder::Build()
 		FillOutside();
 	}
 	
-	AreaFlood();
+	if (!AreaFlood())
+		return;
 	if (!CompileAreas())
 		return;
 	EmitBSPFile();

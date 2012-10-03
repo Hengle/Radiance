@@ -8,17 +8,43 @@
 #include "../Renderer/Mesh.h"
 #include "../Renderer/Material.h"
 #include "../Assets/MaterialParser.h"
+#include "../Camera.h"
 #include "BSPFile.h"
+#include "WorldDef.h"
 #include "WorldDrawDef.h"
 #include "MBatchDraw.h"
-#include "ViewModel.h"
+#include "DrawModel.h"
 #include "ScreenOverlay.h"
 #include "PostProcess.h"
-#include <Runtime/Container/ZoneVector.h>
 #include <Runtime/Container/ZoneMap.h>
+#include <Runtime/Base/ObjectPool.h>
+#include <bitset>
 #include <Runtime/PushPack.h>
 
+
 namespace world {
+
+///////////////////////////////////////////////////////////////////////////////
+
+class ViewDef {
+public:
+	enum {
+		kNumFrustumPlanes = 6
+	};
+	
+	ViewDef() : mirror(false) {
+	}
+
+	Camera camera;
+	PlaneVec frustum;
+
+	dBSPLeaf *bspLeaf;
+	dBSPAreaLeaf *areaLeaf;
+	bool mirror;
+
+	EntityBits marked;
+	details::MBatchIdMap batches;
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -47,8 +73,8 @@ public:
 	virtual void SetWorldStates() = 0;
 	virtual void SetPerspectiveMatrix() = 0;
 	virtual void SetScreenLocalMatrix() = 0;
-	virtual void RotateForCamera() = 0;
-	virtual void RotateForCameraBasis() = 0;
+	virtual void RotateForView(const ViewDef &view) = 0;
+	virtual void RotateForViewBasis() = 0;
 	virtual void PushMatrix(const Vec3 &pos, const Vec3 &scale, const Vec3 &angles) = 0;
 	virtual void PopMatrix() = 0;
 	virtual void ReleaseArrayStates() = 0;
@@ -92,10 +118,8 @@ public:
 	WorldDraw(World *w);
 	~WorldDraw();
 
-	struct Counters
-	{
-		Counters()
-		{
+	struct Counters {
+		Counters() {
 			Clear();
 		}
 
@@ -114,41 +138,33 @@ public:
 	void Init(const bsp_file::BSPFile::Ref &bsp);
 	int Precache();
 	void AddEffect(int id, const PostProcessEffect::Ref &fx);
-	bool AddBatch(const MBatchDraw::Ref &draw, bool worldRef=false);
 	bool AddMaterial(int matId);
 	void RemoveMaterial(int matId);
-	void SwapMaterial(int src, int dst);
-	void AttachViewModel(const ViewModel::Ref &ref);
-	void RemoveViewModel(const ViewModel::Ref &ref);
-
+	
 	ScreenOverlay::Ref CreateScreenOverlay(int matId);
 	
 	void Tick(float dt);
 	void Draw(Counters *counters = 0);
 	
-	bool Project(const Vec3 &p, Vec3 &out) { return m_rb->Project(p, out); }
-	Vec3 Unproject(const Vec3 &p) { return m_rb->Unproject(p); }
+	bool Project(const Vec3 &p, Vec3 &out) { 
+		return m_rb->Project(p, out); 
+	}
 
-	const PostProcessEffect::Ref &PostFX(int idx)
-	{
+	Vec3 Unproject(const Vec3 &p) { 
+		return m_rb->Unproject(p); 
+	}
+
+	const PostProcessEffect::Ref &PostFX(int idx) {
 		return m_postFX[idx];
 	}
 
 	RAD_DECLARE_READONLY_PROPERTY(WorldDraw, rb, const RB_WorldDraw::Ref&);
 	RAD_DECLARE_PROPERTY(WorldDraw, wireframe, bool, bool);
-	RAD_DECLARE_READONLY_PROPERTY(WorldDraw, viewModels, const ViewModel::Map&);
-
+	
 private:
 
 	friend class ScreenOverlay;
 	friend class World;
-
-	bool AddStaticWorldMesh(const r::Mesh::Ref &m, int matId);
-
-	RAD_DECLARE_GET(rb, const RB_WorldDraw::Ref&) { return m_rb; }
-	RAD_DECLARE_GET(wireframe, bool) { return m_wireframe; }
-	RAD_DECLARE_SET(wireframe, bool) { m_wireframe = value; }
-	RAD_DECLARE_GET(viewModels, const ViewModel::Map&) { return m_viewModels; }
 
 	class MStaticWorldMeshBatch : public MBatchDraw
 	{
@@ -158,87 +174,85 @@ private:
 
 		MStaticWorldMeshBatch(const r::Mesh::Ref &m, int matId);
 
-		void Mark(int frame) { m_frame = frame; }
-
 	protected:
 		virtual void Bind(r::Shader *shader);
 		virtual void CompileArrayStates(r::Shader &shader);
 		virtual void FlushArrayStates(r::Shader *shader);
 		virtual void Draw();
-		virtual bool VisMarked(int frame) const { return this->visible && (m_frame == frame); }
-		virtual RAD_DECLARE_GET(visible, bool) { return true; }
-		virtual RAD_DECLARE_GET(rgba, const Vec4&) { return s_rgba; }
-		virtual RAD_DECLARE_GET(scale, const Vec3&) { return s_scale; }
-		virtual RAD_DECLARE_GET(xform, bool) { return true; }
+
+		virtual RAD_DECLARE_GET(visible, bool) { 
+			return true; 
+		}
+
+		virtual RAD_DECLARE_GET(rgba, const Vec4&) { 
+			return s_rgba; 
+		}
+
+		virtual RAD_DECLARE_GET(scale, const Vec3&) { 
+			return s_scale; 
+		}
+
+		virtual RAD_DECLARE_GET(xform, bool) { 
+			return true; 
+		}
+
 	private:
 		r::Mesh::Ref m_m;
 
-		int m_frame;
 		static Vec4 s_rgba;
 		static Vec3 s_scale;
 	};
 
-	struct Node
-	{
-		typedef zone_vector<Node, ZWorldT>::type Vec;
-		BBox bounds;
-		int parent;
-		int planenum;
-		int children[2];
-	};
+	RAD_DECLARE_GET(rb, const RB_WorldDraw::Ref&) { return m_rb; }
+	RAD_DECLARE_GET(wireframe, bool) { return m_wireframe; }
+	RAD_DECLARE_SET(wireframe, bool) { m_wireframe = value; }
 
-	struct Leaf
-	{
-		typedef zone_vector<Leaf, ZWorldT>::type Vec;
-		BBox bounds;
-		int parent;
-		int firstModel;
-		int numModels;
-	};
+	static void DeleteBatch(details::MBatch *batch);
 
-	typedef zone_vector<Plane, ZWorldT>::type PlaneVec;
+	void AddStaticWorldMesh(const r::Mesh::Ref &m, int matId);
 
-	details::MBatchRef AddMaterialBatch(int id);
+	details::MBatchRef AllocateBatch();
+	details::MBatchRef AddMaterialRef(int id);
+	details::MBatchRef AddViewBatch(ViewDef &view, int id);
 
-	enum
-	{
-		NumFrustumPlanes = 6
-	};
-
-	void SetupFrustumPlanes();
-	void VisMark(int node);
-	bool ClipBounds(const BBox &bounds);
-	int BoundsOnPlaneSide(const BBox &bounds, const Plane &p);
+	void FindViewArea(ViewDef &view);
+	void SetupFrustumPlanes(ViewDef &view);
+	void VisMarkArea(ViewDef &view, int nodeNum);
+	void VisMarkAreaFlood(ViewDef &view, const PlaneVec &frustum, int areaNum);
+	
+	bool ClipBounds(const ViewDef &view, const BBox &bounds);
 	void DrawView();
-	void DrawViewModels();
+	void DrawView(ViewDef &view);
 	void DrawUI();
 	void DrawOverlays();
-	void DrawBatches(bool xform, bool wireframe);
+	void DrawBatches(ViewDef &view, bool wireframe);
 	void PostProcess();
-	void DrawBatches(r::Material::Sort sort, bool xform, bool wireframe);
-	void DrawBatch(const details::MBatch &batch, bool xform, bool wireframe);
+	void DrawBatches(ViewDef &view, r::Material::Sort sort, bool wireframe);
+	void DrawBatch(const details::MBatch &batch, bool wireframe);
 	void DrawOverlay(ScreenOverlay &overlay);
 	void AddScreenOverlay(ScreenOverlay &overlay);
 	void RemoveScreenOverlay(ScreenOverlay &overlay);
+	void LinkEntity(Entity *entity, const BBox &bounds);
+	void UnlinkEntity(Entity *entity);
+	void LinkEntity(Entity *entity, const BBox &bounds, int nodeNum);
+	dBSPAreaLeaf *LeafForPoint(const Vec3 &pos, int areaNum);
+	dBSPAreaLeaf *LeafForPoint_r(const Vec3 &pos, int nodeNum);
 
 	int m_frame;
 	bool m_wireframe;
 	Counters m_counters;
-	Plane m_frustum[NumFrustumPlanes];
 	PostProcessEffect::Map m_postFX;
-	MBatchDraw::RefVec m_drawRefs;
-	details::MBatchIdMap m_batches;
 	MStaticWorldMeshBatch::RefVec m_worldModels;
 	pkg::Asset::Ref m_wireframeAsset;
 	r::Material *m_wireframeMat;
-	PlaneVec m_planes;
-	Node::Vec m_nodes;
-	Leaf::Vec m_leafs;
+	dBSPAreaNode::Vec m_nodes;
+	dBSPAreaLeaf::Vec m_leafs;
 	ScreenOverlay::List m_overlays;
 	RB_WorldDraw::Ref m_rb;
 	Vec3 m_viewPos;
+	details::MBatchIdMap m_refMats;
+	ObjectPool<details::MBatch> m_batchPool;
 	World *m_world;
-	ViewModel::Map m_viewModels;
 };
 
 } // world

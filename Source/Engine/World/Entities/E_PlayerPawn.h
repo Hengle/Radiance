@@ -10,8 +10,7 @@
 
 namespace world {
 
-class RADENG_CLASS E_PlayerPawn : public E_Pawn
-{
+class RADENG_CLASS E_PlayerPawn : public E_Pawn {
 public:
 	E_PlayerPawn();
 	virtual ~E_PlayerPawn();

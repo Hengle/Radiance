@@ -13,7 +13,7 @@
 #include "../Lua/LuaRuntime.h"
 #include "../Tickable.h"
 #include "../MathUtils.h"
-#include "ViewModel.h"
+#include "DrawModel.h"
 #include "../SkAnim/SkAnim.h"
 #include "../Physics/Spring.h"
 #include "../Sound/SoundDef.h"
@@ -177,7 +177,9 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Entity, classname, const char*);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, targetname, const char*);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, scripted, bool);
-	RAD_DECLARE_READONLY_PROPERTY(Entity, viewModels, const ViewModel::Map&);
+	RAD_DECLARE_READONLY_PROPERTY(Entity, models, const DrawModel::Map&);
+	RAD_DECLARE_READONLY_PROPERTY(Entity, bspLeafs, const dBSPLeaf::PtrVec*);
+	RAD_DECLARE_READONLY_PROPERTY(Entity, areaLeafs, const dBSPAreaLeaf::PtrVec*);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, ps, PState*);
 	RAD_DECLARE_PROPERTY(Entity, gc, bool, bool);
 	
@@ -187,8 +189,8 @@ public:
 	void QueueScriptTask(const Tickable::Ref &task);
 
 	void CleanLuaState();
-	void AttachViewModel(const ViewModel::Ref &ref);
-	void RemoveViewModel(const ViewModel::Ref &ref);
+	void AttachDrawModel(const DrawModel::Ref &ref);
+	void RemoveDrawModel(const DrawModel::Ref &ref);
 
 	void PushEntityFrame();
 	void PushEntityFrame(lua_State *L);
@@ -213,6 +215,11 @@ public:
 		const Ref &src, // inflictor
 		float damage
 	);
+
+	// Link and Unlink add/remove the entity from collision and visibility sets
+	// in the world.
+	void Link();
+	void Unlink();
 
 protected:
 
@@ -288,14 +295,14 @@ protected:
 
 private:
 
-	enum
-	{
+	enum {
 		MaxLuaCallbacks = 32,
 		NumLuaCallbackBuckets = (MaxLuaCallbacks+31)/32
 	};
 
 	friend class World;
 	friend class WorldLua;
+	friend class WorldDraw;
 
 	static Ref Create(const char *classname);
 
@@ -366,19 +373,53 @@ private:
 	ENT_DECL_GETSET(Flags);
 	ENT_DECL_GETSET(NextThink);
 
-	RAD_DECLARE_GET(zoneTag, ZoneTagRef) { return m_zoneTag.lock(); }
-	RAD_DECLARE_GET(id, int) { return m_id; }
-	RAD_DECLARE_GET(classname, const char*) { return m_classname.c_str; }
-	RAD_DECLARE_GET(targetname, const char*) { return m_targetname.empty ? 0 : (const char*)m_targetname.c_str; }
-	RAD_DECLARE_GET(world, World*);
-	RAD_DECLARE_GET(scripted, bool) { return m_scripted; }
-	RAD_DECLARE_GET(viewModels, const ViewModel::Map&) { return m_models; }
-	RAD_DECLARE_GET(ps, PState*) { return &const_cast<Entity*>(this)->m_ps; }
-	RAD_DECLARE_GET(gc, bool) { return m_gc; }
-	RAD_DECLARE_SET(gc, bool) { m_gc = value; }
+	RAD_DECLARE_GET(zoneTag, ZoneTagRef) { 
+		return m_zoneTag.lock(); 
+	}
 
-	enum SpawnState
-	{
+	RAD_DECLARE_GET(id, int) { 
+		return m_id; 
+	}
+
+	RAD_DECLARE_GET(classname, const char*) { 
+		return m_classname.c_str; 
+	}
+
+	RAD_DECLARE_GET(targetname, const char*) { 
+		return m_targetname.empty ? 0 : (const char*)m_targetname.c_str; 
+	}
+
+	RAD_DECLARE_GET(world, World*);
+
+	RAD_DECLARE_GET(scripted, bool) { 
+		return m_scripted; 
+	}
+
+	RAD_DECLARE_GET(models, const DrawModel::Map&) { 
+		return m_models; 
+	}
+
+	RAD_DECLARE_GET(ps, PState*) { 
+		return &const_cast<Entity*>(this)->m_ps; 
+	}
+
+	RAD_DECLARE_GET(gc, bool) { 
+		return m_gc; 
+	}
+
+	RAD_DECLARE_SET(gc, bool) { 
+		m_gc = value; 
+	}
+
+	RAD_DECLARE_GET(bspLeafs, const dBSPLeaf::PtrVec*) {
+		return &m_bspLeafs;
+	}
+
+	RAD_DECLARE_GET(areaLeafs, const dBSPAreaLeaf::PtrVec*) {
+		return &m_areaLeafs;
+	}
+
+	enum SpawnState {
 		S_LuaCreate,
 		S_Native,
 		S_LuaCoSpawn,
@@ -395,7 +436,10 @@ private:
 	boost::array<int, NumLuaCallbackBuckets> m_luaCallbacks;
 	TickQueue<Entity> m_tasks;
 	TickQueue<Entity> m_scriptTasks;
-	ViewModel::Map m_models;
+	DrawModel::Map m_models;
+	dBSPLeaf::PtrVec m_bspLeafs;
+	dBSPAreaLeaf::PtrVec m_areaLeafs;
+	dBSPLeaf *m_leaf;
 	SoundMap m_sounds;
 	ZoneTagWRef m_zoneTag;
 	String m_targetname;

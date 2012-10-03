@@ -5,26 +5,86 @@
 
 #pragma once
 #include "../Types.h"
+#include <Runtime/Container/ZoneVector.h>
+#include <Runtime/Container/ZoneSet.h>
+#include <Runtime/Math/ConvexPolygon.h>
+#include <bitset>
 
 namespace world {
 
-enum UnloadDisposition
-{
-	UD_None,
-	UD_Slot,
-	UD_All
+class Entity;
+
+enum UnloadDisposition {
+	kUD_None,
+	kUD_Slot,
+	kUD_All
 };
 
-enum PauseFlags
-{
-	RAD_FLAG(PauseGame),
-	RAD_FLAG(PauseUI),
-	RAD_FLAG(PauseCinematics),
-	PauseAll = PauseGame|PauseUI|PauseCinematics
+enum PauseFlags {
+	RAD_FLAG(kPauseGame),
+	RAD_FLAG(kPauseUI),
+	RAD_FLAG(kPauseCinematics),
+	kPauseAll = kPauseGame|kPauseUI|kPauseCinematics
+};
+
+enum {
+	kMaxEnts = 1024,
+	kMaxTempEnts = 64,
+	kMaxStaticEnts = kMaxEnts-kMaxTempEnts,
+	kFirstTempEntId = kMaxStaticEnts,
+	kMaxAreas = 256
+};
+
+typedef zone_vector<Plane, ZWorldT>::type PlaneVec;
+typedef zone_set<Entity*, ZWorldT>::type EntityPtrSet;
+typedef zone_set<int, ZWorldT>::type IntSet;
+typedef std::bitset<kMaxEnts> EntityBits;
+typedef std::bitset<kMaxAreas> AreaBits;
+typedef math::ConvexPolygon<Vec3, Plane, zone_allocator<Vec3, ZWorldT> > Winding;
+typedef zone_vector<Winding, ZWorldT>::type WindingVec;
+
+struct dBSPNode {
+	typedef zone_vector<dBSPNode, ZWorldT>::type Vec;
+	BBox bounds;
+	int parent;
+	int planenum;
+	int children[2];
+};
+
+struct dBSPLeaf {
+	typedef zone_vector<dBSPLeaf, ZWorldT>::type Vec;
+	typedef zone_vector<dBSPLeaf*, ZWorldT>::type PtrVec;
+	BBox bounds;
+	int parent;
+	int area;
+	int contents;
+	int firstClipSurface;
+	int numClipSurfaces;
+
+	EntityPtrSet occupants;
+};
+
+struct dBSPAreaNode {
+	typedef zone_vector<dBSPAreaNode, ZWorldT>::type Vec;
+	BBox bounds;
+	int parent;
+	int planenum;
+	int children[2];
+};
+
+struct dBSPAreaLeaf {
+	typedef zone_vector<dBSPAreaLeaf, ZWorldT>::type Vec;
+	typedef zone_vector<dBSPAreaLeaf*, ZWorldT>::type PtrVec;
+	BBox bounds;
+	int firstModel;
+	int numModels;
+
+	EntityPtrSet occupants;
 };
 
 class World;
 class WorldLua;
+class WorldDraw;
 class Zone;
 class ZoneTag;
 

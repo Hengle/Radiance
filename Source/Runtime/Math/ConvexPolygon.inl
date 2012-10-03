@@ -513,12 +513,17 @@ bool ConvexPolygon<TVertex, TPlane, TAllocator>::IsConvex(const ValueType &epsil
 }
 
 template<typename TVertex, typename TPlane, typename TAllocator>
-void ConvexPolygon<TVertex, TPlane, TAllocator>::Swap(SelfType &p)
+inline void ConvexPolygon<TVertex, TPlane, TAllocator>::Swap(SelfType &p)
 {
 	PlaneType temp = m_plane;
 	m_plane = p.m_plane;
 	p.m_plane = temp;
 	m_verts.swap(p.m_verts);
+}
+
+template<typename TVertex, typename TPlane, typename TAllocator>
+inline void ConvexPolygon<TVertex, TPlane, TAllocator>::Clear() {
+	m_verts.clear();
 }
 
 template<typename TVertex, typename TPlane, typename TAllocator>

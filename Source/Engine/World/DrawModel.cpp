@@ -1,18 +1,18 @@
-// ViewModel.cpp
+// DrawModel.cpp
 // Copyright (c) 2010 Sunside Inc., All Rights Reserved
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
 #include RADPCH
 #include "../MathUtils.h"
-#include "ViewModel.h"
+#include "DrawModel.h"
 #include "Entity.h"
 #include "World.h"
 #include "../Assets/SkMaterialLoader.h"
 
 namespace world {
 
-ViewModel::ViewModel(Entity *entity) : 
+DrawModel::DrawModel(Entity *entity) : 
 m_entity(entity), 
 m_r(Vec3::Zero), 
 m_p(Vec3::Zero),
@@ -24,16 +24,16 @@ m_fade(false)
 	m_fadeTime[0] = m_fadeTime[1] = 0.f;
 }
 
-ViewModel::~ViewModel()
+DrawModel::~DrawModel()
 {
 }
 
-void ViewModel::RefBatch(const MBatchDraw::Ref &batch)
+void DrawModel::RefBatch(const MBatchDraw::Ref &batch)
 {
 	m_batches.push_back(batch);
 }
 
-bool ViewModel::GetTransform(Vec3 &pos, Vec3 &angles) const
+bool DrawModel::GetTransform(Vec3 &pos, Vec3 &angles) const
 {
 	if (!m_entity)
 		return false;
@@ -62,7 +62,7 @@ bool ViewModel::GetTransform(Vec3 &pos, Vec3 &angles) const
 	return true;
 }
 
-void ViewModel::Tick(float time, float dt)
+void DrawModel::Tick(float time, float dt)
 {
 	if (m_fade)
 	{
@@ -82,7 +82,7 @@ void ViewModel::Tick(float time, float dt)
 	OnTick(time, dt);
 }
 
-void ViewModel::Fade(const Vec4 &rgba, float time)
+void DrawModel::Fade(const Vec4 &rgba, float time)
 {
 	if (time <= 0.f)
 	{
@@ -99,25 +99,25 @@ void ViewModel::Fade(const Vec4 &rgba, float time)
 	}
 }
 
-ViewModel::ViewBatch::ViewBatch(ViewModel &model, int matId) : MBatchDraw(matId), m_model(&model)
+DrawModel::DrawBatch::DrawBatch(DrawModel &model, int matId) : MBatchDraw(matId), m_model(&model)
 {
 }
 
-bool ViewModel::ViewBatch::GetTransform(Vec3 &pos, Vec3 &angles) const
+bool DrawModel::DrawBatch::GetTransform(Vec3 &pos, Vec3 &angles) const
 {
 	return m_model ? m_model->GetTransform(pos, angles) : false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-MeshViewModel::Ref MeshViewModel::New(
+MeshDrawModel::Ref MeshDrawModel::New(
 	WorldDraw &draw, 
 	Entity *entity, 
 	const r::Mesh::Ref &m, 
 	int matId
 )
 {
-	Ref r(new (ZWorld) MeshViewModel(entity));
+	Ref r(new (ZWorld) MeshDrawModel(entity));
 	r->m_mesh = m;
 
 	Batch::Ref b(new (ZWorld) Batch(*r, m, matId));
@@ -128,48 +128,48 @@ MeshViewModel::Ref MeshViewModel::New(
 	return r;
 }
 
-MeshViewModel::MeshViewModel(Entity *entity) : ViewModel(entity)
+MeshDrawModel::MeshDrawModel(Entity *entity) : DrawModel(entity)
 {
 }
 
-MeshViewModel::~MeshViewModel()
+MeshDrawModel::~MeshDrawModel()
 {
 }
 
-MeshViewModel::Batch::Batch(ViewModel &model, const r::Mesh::Ref &m, int matId) : 
-ViewModel::ViewBatch(model, matId), m_m(m)
+MeshDrawModel::Batch::Batch(DrawModel &model, const r::Mesh::Ref &m, int matId) : 
+DrawModel::DrawBatch(model, matId), m_m(m)
 {
 }
 
-void MeshViewModel::Batch::Bind(r::Shader *shader)
+void MeshDrawModel::Batch::Bind(r::Shader *shader)
 {
 	m_m->BindAll(shader);
 }
 
-void MeshViewModel::Batch::CompileArrayStates(r::Shader &shader)
+void MeshDrawModel::Batch::CompileArrayStates(r::Shader &shader)
 {
 	m_m->CompileArrayStates(shader);
 }
 
-void MeshViewModel::Batch::FlushArrayStates(r::Shader *shader)
+void MeshDrawModel::Batch::FlushArrayStates(r::Shader *shader)
 {
 	m_m->FlushArrayStates(shader);
 }
 
-void MeshViewModel::Batch::Draw()
+void MeshDrawModel::Batch::Draw()
 {
 	m_m->Draw();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-MeshBundleViewModel::Ref MeshBundleViewModel::New(
+MeshBundleDrawModel::Ref MeshBundleDrawModel::New(
 	WorldDraw &draw, 
 	Entity *entity, 
 	const r::MeshBundle::Ref &bundle
 )
 {
-	Ref r(new (ZWorld) MeshBundleViewModel(entity));
+	Ref r(new (ZWorld) MeshBundleDrawModel(entity));
 	r->m_bundle = bundle;
 
 	for (int i = 0; i < bundle->numMeshes; ++i)
@@ -184,48 +184,48 @@ MeshBundleViewModel::Ref MeshBundleViewModel::New(
 	return r;
 }
 
-MeshBundleViewModel::MeshBundleViewModel(Entity *entity) : ViewModel(entity)
+MeshBundleDrawModel::MeshBundleDrawModel(Entity *entity) : DrawModel(entity)
 {
 }
 
-MeshBundleViewModel::~MeshBundleViewModel()
+MeshBundleDrawModel::~MeshBundleDrawModel()
 {
 }
 
-MeshBundleViewModel::Batch::Batch(ViewModel &model, const r::Mesh::Ref &m, int matId) : 
-ViewModel::ViewBatch(model, matId), m_m(m)
+MeshBundleDrawModel::Batch::Batch(DrawModel &model, const r::Mesh::Ref &m, int matId) : 
+DrawModel::DrawBatch(model, matId), m_m(m)
 {
 }
 
-void MeshBundleViewModel::Batch::Bind(r::Shader *shader)
+void MeshBundleDrawModel::Batch::Bind(r::Shader *shader)
 {
 	m_m->BindAll(shader);
 }
 
-void MeshBundleViewModel::Batch::CompileArrayStates(r::Shader &shader)
+void MeshBundleDrawModel::Batch::CompileArrayStates(r::Shader &shader)
 {
 	m_m->CompileArrayStates(shader);
 }
 
-void MeshBundleViewModel::Batch::FlushArrayStates(r::Shader *shader)
+void MeshBundleDrawModel::Batch::FlushArrayStates(r::Shader *shader)
 {
 	m_m->FlushArrayStates(shader);
 }
 
-void MeshBundleViewModel::Batch::Draw()
+void MeshBundleDrawModel::Batch::Draw()
 {
 	m_m->Draw();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SkMeshViewModel::Ref SkMeshViewModel::New(
+SkMeshDrawModel::Ref SkMeshDrawModel::New(
 	WorldDraw &draw, 
 	Entity *entity, 
 	const r::SkMesh::Ref &m
 )
 {
-	Ref r(new (ZWorld) SkMeshViewModel(entity, m));
+	Ref r(new (ZWorld) SkMeshDrawModel(entity, m));
 
 	asset::SkMaterialLoader::Ref loader = asset::SkMaterialLoader::Cast(m->asset);
 	if (!loader)
@@ -247,18 +247,18 @@ SkMeshViewModel::Ref SkMeshViewModel::New(
 	return r;
 }
 
-SkMeshViewModel::SkMeshViewModel(Entity *entity, const r::SkMesh::Ref &m) : 
-ViewModel(entity),
+SkMeshDrawModel::SkMeshDrawModel(Entity *entity, const r::SkMesh::Ref &m) : 
+DrawModel(entity),
 m_mesh(m),
 m_motionType(ska::Ska::MT_None)
 {
 }
 
-SkMeshViewModel::~SkMeshViewModel()
+SkMeshDrawModel::~SkMeshDrawModel()
 {
 }
 
-void SkMeshViewModel::OnTick(float time, float dt)
+void SkMeshDrawModel::OnTick(float time, float dt)
 {
 	if (visible)
 	{
@@ -273,12 +273,12 @@ void SkMeshViewModel::OnTick(float time, float dt)
 	}
 }
 
-SkMeshViewModel::Batch::Batch(ViewModel &model, const r::SkMesh::Ref &m, int idx, int matId) :
-ViewModel::ViewBatch(model, matId), m_idx(idx), m_m(m)
+SkMeshDrawModel::Batch::Batch(DrawModel &model, const r::SkMesh::Ref &m, int idx, int matId) :
+DrawModel::DrawBatch(model, matId), m_idx(idx), m_m(m)
 {
 }
 
-Vec3 SkMeshViewModel::BonePos(int idx) const
+Vec3 SkMeshDrawModel::BonePos(int idx) const
 {
 	if (idx >= 0 && idx < m_mesh->ska->numBones)
 	{
@@ -295,24 +295,24 @@ Vec3 SkMeshViewModel::BonePos(int idx) const
 	return Vec3::Zero;
 }
 	
-void SkMeshViewModel::Batch::Bind(r::Shader *shader)
+void SkMeshDrawModel::Batch::Bind(r::Shader *shader)
 {
 	m_m->Skin(m_idx);
 	r::Mesh &m = m_m->Mesh(m_idx);
 	m.BindAll(shader);
 }
 
-void SkMeshViewModel::Batch::CompileArrayStates(r::Shader &shader)
+void SkMeshDrawModel::Batch::CompileArrayStates(r::Shader &shader)
 {
 	m_m->Mesh(m_idx).CompileArrayStates(shader);
 }
 
-void SkMeshViewModel::Batch::FlushArrayStates(r::Shader *shader)
+void SkMeshDrawModel::Batch::FlushArrayStates(r::Shader *shader)
 {
 	m_m->Mesh(m_idx).FlushArrayStates(shader);
 }
 
-void SkMeshViewModel::Batch::Draw()
+void SkMeshDrawModel::Batch::Draw()
 {
 	m_m->Mesh(m_idx).Draw();
 }

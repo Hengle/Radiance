@@ -87,6 +87,7 @@ public:
 	void Chop(const PlaneType &p, SideType side, SelfType &poly, const ValueType &epsilon) const;
 	void Split(const PlaneType &p, SelfType *front, SelfType *back, const ValueType &epsilon) const;
 	void Swap(SelfType &p);
+	void Clear();
 
 	struct DefaultEquals
 	{

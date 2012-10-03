@@ -7,6 +7,7 @@
 
 #include RADPCH
 #include "SolidBSP.h"
+#include "../../WorldDef.h"
 #include <deque>
 
 namespace tools {
@@ -229,7 +230,7 @@ void BSPBuilder::DumpLeakFile() {
 	fclose(fp);*/
 }
 
-void BSPBuilder::AreaFlood() {
+bool BSPBuilder::AreaFlood() {
 	ResetProgress();
 	Log("------------\n");
 	Log("Area Flood...\n");
@@ -239,8 +240,16 @@ void BSPBuilder::AreaFlood() {
 	area->area = 0;
 	m_areas.push_back(area);
 
-	FindAreas(m_root.get());	
+	FindAreas(m_root.get());
+
+	if (world::kMaxAreas < (int)m_areas.size()) {
+		Log("ERROR: Map exceed area limit of %d areas (map has %d), contact a programmer to increase this limit.\n", world::kMaxAreas, m_areas.size());
+		SetResult(SR_CompilerError);
+		return false;
+	}
+
 	Log("Set %d area(s).\n", m_areas.size() - 1);
+	return true;
 }
 
 void BSPBuilder::FindAreas(Node *node) {

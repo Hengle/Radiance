@@ -8,7 +8,7 @@
 #include "../Game/Game.h"
 #include "../App.h"
 #include "../Assets/MaterialParser.h"
-#include "ViewModel.h"
+#include "DrawModel.h"
 
 using namespace pkg;
 
@@ -19,11 +19,12 @@ int World::Spawn(
 	const bsp_file::BSPFile::Ref &bsp,
 	const xtime::TimeSlice &time,
 	int flags
-)
-{
+) {
 	RAD_ASSERT(mapName);
 	if (m_mapPath.empty)
 		m_mapPath = mapName;
+	if (!m_bsp)
+		m_bsp = bsp;
 
 	if (m_spawnState == SS_Done)
 		return SR_Success;
@@ -36,10 +37,13 @@ int World::Spawn(
 
 	int r = SR_Pending;
 
-	while (m_spawnState != SS_Done && time.remaining)
-	{
-		switch (m_spawnState)
-		{
+	while (m_spawnState != SS_Done && time.remaining) {
+		switch (m_spawnState) {
+		case SS_BSP:
+			LoadBSP(*bsp);
+			r = SR_Success;
+			++m_spawnState;
+			break;
 		case SS_SoundEmitter:
 			r = SpawnSoundEntities(
 				*bsp,
@@ -111,14 +115,11 @@ int World::SpawnMaterials(
 	const bsp_file::BSPFile &bsp,
 	const xtime::TimeSlice &time,
 	int flags
-)
-{
+) {
 	int r = SR_Success;
 
-	while (time.remaining)
-	{
-		if (m_spawnOfs >= bsp.numMaterials)
-		{
+	while (time.remaining) {
+		if (m_spawnOfs >= bsp.numMaterials) {
 			++m_spawnState;
 			m_spawnOfs = 0;
 			break;
@@ -146,10 +147,8 @@ int World::SpawnMaterial(
 	U32 matNum,
 	const xtime::TimeSlice &time,
 	int flags
-)
-{
-	if (!m_spawnAsset)
-	{
+) {
+	if (!m_spawnAsset) {
 		const char *name = bsp.String((bsp.Materials()+matNum)->string);
 		m_spawnAsset = App::Get()->engine->sys->packages->Resolve(name, m_pkgZone);
 #if defined(RAD_OPT_TOOLS)
@@ -171,13 +170,10 @@ int World::SpawnMaterial(
 	if (r == SR_Pending)
 		return r;
 
-	if (r != SR_Success)
-	{
+	if (r != SR_Success) {
 		COut(C_Warn) << "Failed to spawn material '" << m_spawnAsset->path.get() << "'" << std::endl;
 		m_spawnAsset.reset();
-	}
-	else
-	{
+	} else {
 		m_spawnAsset->Process(
 			xtime::TimeSlice::Infinite,
 			P_Trim
@@ -195,12 +191,9 @@ int World::SpawnModels(
 	const bsp_file::BSPFile &bsp,
 	const xtime::TimeSlice &time,
 	int flags
-)
-{
-	while (time.remaining)
-	{
-		if (m_spawnOfs >= bsp.numModels)
-		{
+) {
+	while (time.remaining) {
+		if (m_spawnOfs >= bsp.numModels) {
 			++m_spawnState;
 			m_spawnOfs = 0;
 			return SR_Success;
@@ -220,11 +213,10 @@ int World::SpawnModels(
 void World::SpawnModel(
 	const bsp_file::BSPFile &bsp,
 	U32 modelNum
-)
-{
+) {
 	const bsp_file::BSPModel *model = bsp.Models()+modelNum;
 
-	// bsp vertex stream is interleaved : xyz + st[2] (2 pairs of uvs).
+	// bsp vertex stream is interleaved : xyz + n + st[2] (2 pairs of uvs).
 	r::Mesh::Ref mesh(new (r::ZRender) r::Mesh());
 
 	int streamIndex = mesh->AllocateStream(
@@ -247,8 +239,7 @@ void World::SpawnModel(
 		0
 	);
 
-	if (model->numChannels > 0)
-	{
+	if (model->numChannels > 0) {
 		mesh->MapSource(
 			streamIndex,
 			r::MGS_TexCoords,
@@ -258,8 +249,7 @@ void World::SpawnModel(
 		);
 	}
 
-	if (model->numChannels > 1)
-	{
+	if (model->numChannels > 1) {
 		mesh->MapSource(
 			streamIndex,
 			r::MGS_TexCoords,
@@ -275,8 +265,6 @@ void World::SpawnModel(
 	memcpy(vb->ptr, bsp.Indices()+model->firstIndex, vb->size.get());
 	vb.reset();
 
-	m_staticMeshes.push_back(mesh);
-
 	pkg::Asset::Ref material = m_bspMaterials[model->material];
 	if (material)
 		m_draw->AddStaticWorldMesh(mesh, material->id);
@@ -286,13 +274,11 @@ int World::SpawnSpecials(
 	const bsp_file::BSPFile &bsp,
 	const xtime::TimeSlice &time,
 	int flags
-)
-{
+) {
 	Keys keys;
 	keys.pairs[String("classname")] = String("view_controller");
 	Entity::Ref e = m_lua->CreateEntity(keys);
-	if (e)
-	{
+	if (e) {
 		SetupEntity(e, m_nextEntId);
 
 		int r = e->PrivateSpawn(
@@ -312,24 +298,21 @@ int World::SpawnSpecials(
 	return SR_Success;
 }
 
-void World::SetupEntity(const Entity::Ref &entity, int id)
-{
+void World::SetupEntity(const Entity::Ref &entity, int id) {
 	entity->m_id = id;
 	ZoneTagRef zoneTag(new (ZWorld) world::ZoneTag(m_zone, *m_game));
 	entity->m_zoneTag = zoneTag;
 	m_zoneTags[(int)id] = zoneTag;
 }
 
-void World::MapEntity(const Entity::Ref &entity)
-{
+void World::MapEntity(const Entity::Ref &entity) {
 	m_ents.insert(Entity::IdMap::value_type(entity->m_id, entity));
 	m_classnames.insert(Entity::StringMMap::value_type(CStr(entity->classname), entity));
 	if (entity->targetname.get() != 0)
 		m_targetnames.insert(Entity::StringMMap::value_type(CStr(entity->targetname), entity));
 }
 
-void World::UnmapEntity(const Entity::Ref &entity)
-{
+void World::UnmapEntity(const Entity::Ref &entity) {
 	m_lua->DeleteEntId(*entity);
 
 	m_ents.erase(entity->m_id);
@@ -351,14 +334,11 @@ int World::SpawnSoundEntities(
 	const bsp_file::BSPFile &bsp,
 	const xtime::TimeSlice &time,
 	int flags
-)
-{
+) {
 	int r = SR_Success;
 
-	while (time.remaining)
-	{
-		if (m_spawnOfs >= bsp.numEntities)
-		{
+	while (time.remaining) {
+		if (m_spawnOfs >= bsp.numEntities) {
 			++m_spawnState;
 			m_spawnOfs = 0;
 			break;
@@ -385,14 +365,11 @@ int World::SpawnNonSoundEntities(
 	const bsp_file::BSPFile &bsp,
 	const xtime::TimeSlice &time,
 	int flags
-)
-{
+) {
 	int r = SR_Success;
 
-	while (time.remaining)
-	{
-		if (m_spawnOfs >= bsp.numEntities)
-		{
+	while (time.remaining) {
+		if (m_spawnOfs >= bsp.numEntities) {
 			++m_spawnState;
 			m_spawnOfs = 0;
 			break;
@@ -419,13 +396,10 @@ int World::SpawnEntity(
 	Entity::Ref &entity,
 	const Keys &keys,
 	const xtime::TimeSlice &time
-)
-{
-	if (!entity)
-	{
-		if (m_nextEntId >= MaxStaticEnts)
-		{
-			COut(C_Warn) << "MaxStaticEnts" << std::endl;
+) {
+	if (!entity) {
+		if (m_nextEntId >= kMaxStaticEnts) {
+			COut(C_Warn) << "kMaxStaticEnts" << std::endl;
 			return SR_ErrorGeneric;
 		}
 
@@ -443,13 +417,10 @@ int World::SpawnEntity(
 
 	if (r == SR_Pending)
 		return r;
-	if (r == SR_Success)
-	{
+	if (r == SR_Success) {
 		COut(C_Debug) << "Spawned '" << entity->classname.get() << "'" << std::endl;
 		MapEntity(entity);
-	}
-	else
-	{
+	} else {
 		COut(C_Warn) << "Failed to spawn '" << entity->classname.get() << "'" << std::endl;
 	}
 
@@ -460,23 +431,18 @@ int World::SpawnTempEntity(
 	Entity::Ref &entity,
 	const Keys &keys,
 	const xtime::TimeSlice &time
-)
-{
-	if (!entity)
-	{
+) {
+	if (!entity) {
 		int i;
-		for (i = 0; i < MaxTempEnts; ++i)
-		{
-			int id = (m_nextTempEntId+i)&(MaxTempEnts-1);
-			if (m_ents.find(id+FirstTempEntId) == m_ents.end())
-			{
+		for (i = 0; i < kMaxTempEnts; ++i) {
+			int id = (m_nextTempEntId+i)&(kMaxTempEnts-1);
+			if (m_ents.find(id+kFirstTempEntId) == m_ents.end()) {
 				m_nextTempEntId = id;
 				break;
 			}
 		}
 
-		if (i == MaxTempEnts)
-		{
+		if (i == kMaxTempEnts) {
 			COut(C_Warn) << "MaxTempEnts" << std::endl;
 			return SR_ErrorGeneric;
 		}
@@ -484,8 +450,8 @@ int World::SpawnTempEntity(
 		entity = m_lua->CreateEntity(keys);
 		if (!entity)
 			return SR_ErrorGeneric;
-		SetupEntity(entity, m_nextTempEntId+FirstTempEntId);
-		m_nextTempEntId = (m_nextTempEntId+1)&(MaxTempEnts-1);
+		SetupEntity(entity, m_nextTempEntId+kFirstTempEntId);
+		m_nextTempEntId = (m_nextTempEntId+1)&(kMaxTempEnts-1);
 	}
 
 	int r = entity->PrivateSpawn(
@@ -496,13 +462,11 @@ int World::SpawnTempEntity(
 
 	if (r == SR_Pending)
 		return r;
-	if (r == SR_Success)
-	{
+
+	if (r == SR_Success) {
 		COut(C_Debug) << "Spawned '" << entity->classname.get() << "'" << std::endl;
 		MapEntity(entity);
-	}
-	else
-	{
+	} else {
 		COut(C_Warn) << "Failed to spawn '" << entity->classname.get() << "'" << std::endl;
 	}
 
@@ -513,8 +477,7 @@ int World::SpawnTempEntity(
 int World::PostSpawnEntity(
 	const Entity::Ref &entity,
 	const xtime::TimeSlice &time
-)
-{
+) {
 	return entity->PrivatePostSpawn(time, P_Load);
 }
 
@@ -523,13 +486,10 @@ int World::SpawnEntity(
 	U32 entityNum,
 	const xtime::TimeSlice &time,
 	int flags
-)
-{
-	if (!m_spawnEnt)
-	{
-		if (m_nextEntId >= MaxStaticEnts)
-		{
-			COut(C_Warn) << "MaxStaticEnts" << std::endl;
+) {
+	if (!m_spawnEnt) {
+		if (m_nextEntId >= kMaxStaticEnts) {
+			COut(C_Warn) << "kMaxStaticEnts" << std::endl;
 			return SR_ErrorGeneric;
 		}
 
@@ -548,13 +508,10 @@ int World::SpawnEntity(
 
 	if (r == SR_Pending)
 		return r;
-	if (r == SR_Success)
-	{
+	if (r == SR_Success) {
 		COut(C_Debug) << "Spawned '" << m_spawnEnt->classname.get() << "'" << std::endl;
 		MapEntity(m_spawnEnt);
-	}
-	else
-	{
+	} else {
 		COut(C_Warn) << "Failed to spawn '" << m_spawnEnt->classname.get() << "'" << std::endl;
 	}
 
@@ -569,12 +526,9 @@ int World::SpawnSoundEmitter(
 	U32 entityNum,
 	const xtime::TimeSlice &time,
 	int flags
-)
-{
-	if (!m_spawnEnt)
-	{
-		if (m_nextEntId >= MaxStaticEnts)
-		{
+) {
+	if (!m_spawnEnt) {
+		if (m_nextEntId >= kMaxStaticEnts) {
 			COut(C_Warn) << "MaxStaticEnts" << std::endl;
 			return SR_ErrorGeneric;
 		}
@@ -599,13 +553,10 @@ int World::SpawnSoundEmitter(
 
 	if (r == SR_Pending)
 		return r;
-	if (r == SR_Success)
-	{
+	if (r == SR_Success) {
 		COut(C_Debug) << "Spawned '" << m_spawnEnt->classname.get() << "'" << std::endl;
 		MapEntity(m_spawnEnt);
-	}
-	else
-	{
+	} else {
 		COut(C_Warn) << "Failed to spawn '" << m_spawnEnt->classname.get() << "'" << std::endl;
 	}
 
@@ -620,13 +571,10 @@ int World::SpawnNonSoundEmitter(
 	U32 entityNum,
 	const xtime::TimeSlice &time,
 	int flags
-)
-{
-	if (!m_spawnEnt)
-	{
-		if (m_nextEntId >= MaxStaticEnts)
-		{
-			COut(C_Warn) << "MaxStaticEnts" << std::endl;
+) {
+	if (!m_spawnEnt) {
+		if (m_nextEntId >= kMaxStaticEnts) {
+			COut(C_Warn) << "kMaxStaticEnts" << std::endl;
 			return SR_ErrorGeneric;
 		}
 
@@ -650,13 +598,10 @@ int World::SpawnNonSoundEmitter(
 
 	if (r == SR_Pending)
 		return r;
-	if (r == SR_Success)
-	{
+	if (r == SR_Success) {
 		COut(C_Debug) << "Spawned '" << m_spawnEnt->classname.get() << "'" << std::endl;
 		MapEntity(m_spawnEnt);
-	}
-	else
-	{
+	} else {
 		COut(C_Warn) << "Failed to spawn '" << m_spawnEnt->classname.get() << "'" << std::endl;
 	}
 
@@ -666,19 +611,17 @@ int World::SpawnNonSoundEmitter(
 	return r;
 }
 
-Keys World::LoadEntityKeys(const bsp_file::BSPFile &bsp, U32 entityNum)
-{
+Keys World::LoadEntityKeys(const bsp_file::BSPFile &bsp, U32 entityNum) {
 	Keys keys;
 	const bsp_file::BSPEntity *bspEnt = bsp.Entities()+entityNum;
-	for (U32 i = 0; i < bspEnt->numStrings; ++i)
-	{
+	for (U32 i = 0; i < bspEnt->numStrings; ++i) {
 		// 2 strings per iteration
 		const char *key = bsp.String(bspEnt->firstString+(i*2));
 		const char *value = bsp.String(bspEnt->firstString+(i*2)+1);
 		keys.pairs.insert(Keys::Pairs::value_type(String(key), String(value)));
 
-		if (!string::cmp(key, "classname") && !string::cmp(value, "worldspawn"))
-		{ // insert mapname key
+		if (!string::cmp(key, "classname") && !string::cmp(value, "worldspawn")) { 
+			// insert mapname key
 			keys.pairs.insert(Keys::Pairs::value_type(String("mappath"), m_mapPath));
 		}
 	}
@@ -686,24 +629,20 @@ Keys World::LoadEntityKeys(const bsp_file::BSPFile &bsp, U32 entityNum)
 	return keys;
 }
 
-int World::CreateEntity(const Keys &keys)
-{
+int World::CreateEntity(const Keys &keys) {
 	m_spawnEnt = m_lua->CreateEntity(keys);
 	return m_spawnEnt ? SR_Success : SR_ParseError;
 }
 
-int World::CreateEntity(const bsp_file::BSPFile &bsp, U32 entityNum)
-{
+int World::CreateEntity(const bsp_file::BSPFile &bsp, U32 entityNum) {
 	m_spawnKeys = LoadEntityKeys(bsp, entityNum);
 	return CreateEntity(m_spawnKeys);
 }
 
-int World::PostSpawn(const xtime::TimeSlice &time, int flags)
-{
+int World::PostSpawn(const xtime::TimeSlice &time, int flags) {
 	int r = SR_Success;
 
-	for (Entity::IdMap::const_iterator it = m_ents.begin(); it != m_ents.end(); ++it)
-	{
+	for (Entity::IdMap::const_iterator it = m_ents.begin(); it != m_ents.end(); ++it) {
 		bool pending = r == SR_Pending;
 		r = it->second->PrivatePostSpawn(time, flags);
 		if (r < SR_Success)
@@ -715,6 +654,67 @@ int World::PostSpawn(const xtime::TimeSlice &time, int flags)
 	if (r == SR_Success)
 		++m_spawnState;
 	return r;
+}
+
+void World::LoadBSP(const bsp_file::BSPFile &bsp) {
+	
+	int num = (int)bsp.numPlanes.get();
+	m_planes.reserve(num);
+
+	for (int i = 0; i < num; ++i) {
+		const bsp_file::BSPPlane *x = bsp.Planes() + i;
+		Plane pl(x->p[0], x->p[1], x->p[2], x->p[3]);
+		m_planes.push_back(pl);
+	}
+
+	num = (int)bsp.numNodes.get();
+	m_nodes.reserve(num);
+	for (int i = 0; i < num; ++i) {
+		const bsp_file::BSPNode *x = bsp.Nodes() + i;
+		dBSPNode n;
+		n.parent = (int)x->parent;
+		n.children[0] = x->children[0];
+		n.children[1] = x->children[1];
+		n.planenum = x->planenum;
+		n.bounds.Initialize(x->mins[0], x->mins[1], x->mins[2], x->maxs[0], x->maxs[1], x->maxs[2]);
+		m_nodes.push_back(n);
+	}
+
+	num = (int)bsp.numLeafs.get();
+	m_leafs.reserve(num);
+	for (int i = 0; i < num; ++i) {
+		const bsp_file::BSPLeaf *x = bsp.Leafs() + i;
+		dBSPLeaf l;
+		l.parent = (int)x->parent;
+		l.bounds.Initialize(x->mins[0], x->mins[1], x->mins[2], x->maxs[0], x->maxs[1], x->maxs[2]);
+		m_leafs.push_back(l);
+	}
+
+	num = (int)bsp.numAreaportals.get();
+	m_areaportals.reserve(num);
+	Winding::VertexListType verts;
+	for (int i = 0; i < num; ++i) {
+		const bsp_file::BSPAreaportal *x = bsp.Areaportals() + i;
+		
+		verts.reserve(x->numVerts);
+
+		for (int k = 0; k < x->numVerts; ++k) {
+			const bsp_file::BSPVertex *v = bsp.Vertices() + x->firstVert + k;
+			verts.push_back(Vec3(v->v[0], v->v[1], v->v[2]));
+		}
+
+		Areaportal portal;
+
+		portal.open = true;
+		portal.areas[0] = x->areas[0];
+		portal.areas[1] = x->areas[1];
+		portal.planenum = x->planenum;
+
+		Winding p(&verts[0], (UReg)verts.size(), m_planes[x->planenum]);
+		portal.winding.Swap(p);
+		m_areaportals.push_back(portal);
+		verts.clear();
+	}
 }
 
 } // world

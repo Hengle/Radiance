@@ -88,14 +88,14 @@ int World::Init()
 	return m_game->OnWorldInit(*this);
 }
 
-void World::SetGameSpeed(float speed, float time)
+void World::SetGameSpeed(float speed, float duration)
 {
-	if (time > 0.f)
+	if (duration > 0.f)
 	{
 		m_gameSpeed[1] = m_gameSpeed[0];
 		m_gameSpeed[2] = speed;
 		m_gameSpeedTime[0] = 0.f;
-		m_gameSpeedTime[1] = time;
+		m_gameSpeedTime[1] = duration;
 	}
 	else
 	{
@@ -565,34 +565,6 @@ Entity::Ref World::FindEntityId(int id) const
 	if (it != m_ents.end())
 		return it->second;
 	return Entity::Ref();
-}
-
-Entity::Vec World::BBoxTouching(const BBox &bbox, int stypes) const
-{
-	Entity::Vec touching;
-
-	for (Entity::IdMap::const_iterator it = m_ents.begin(); it != m_ents.end(); ++it)
-	{
-		const Entity::Ref &r = it->second;
-		if (!(r->ps->stype&stypes))
-			continue;
-
-		switch (r->ps->stype)
-		{
-		case ST_BBox:
-			{
-				BBox b(r->ps->bbox);
-				b.Translate(r->ps->worldPos);
-				if (bbox.Touches(b))
-					touching.push_back(r);
-			}
-			break;
-		case ST_Brush:
-			break;
-		}
-	}
-
-	return touching;
 }
 
 ZoneTagRef World::ZoneTag(int id) const
