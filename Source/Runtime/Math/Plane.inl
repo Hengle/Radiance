@@ -183,33 +183,33 @@ inline TVector3 Plane<T>::Project(const TVector3 &v) const
 
 template <typename T>
 template <typename TVector3>
-bool Plane<T>::LineSegmentIntersect(TVector3 &result, const TVector3 &a, const TVector3 &b, const T &tolerance) const
+bool Plane<T>::IntersectLineSegment(TVector3 &result, const TVector3 &a, const TVector3 &b, const T &tolerance) const
 {
-	return LineSegmentIntersect(result, a, Distance(a), b, Distance(b), tolerance);
+	return IntersectLineSegment(result, a, Distance(a), b, Distance(b), tolerance);
 }
 
 template <typename T>
 template <typename TVector3>
-bool Plane<T>::LineSegmentIntersect(TVector3 &result, const TVector3 &a, const T &distA, const TVector3 &b, const T &distB, const T &tolerance)
+bool Plane<T>::IntersectLineSegment(TVector3 &result, const TVector3 &a, const T &distA, const TVector3 &b, const T &distB, const T &tolerance)
 {
 	if ((Abs(distA) <= tolerance) || (Abs(distB) <= tolerance)) 
 		return false; // doesn't cross.
 	if (SignBits(distA) == SignBits(distB)) 
 		return false; // doesn't cross.
-	result = LineSegmentIntersect(a, distA, b, distB);
+	result = IntersectLineSegment(a, distA, b, distB);
 	return true;
 }
 
 template <typename T>
 template <typename TVector3>
-TVector3 Plane<T>::LineSegmentIntersect(const TVector3 &a, const T &distA, const TVector3 &b, const T &distB)
+TVector3 Plane<T>::IntersectLineSegment(const TVector3 &a, const T &distA, const TVector3 &b, const T &distB)
 {
 	return Lerp(a, b, distA / (distA - distB));
 }
 
 template <typename T>
 template <typename TVector3>
-bool Plane<T>::RayIntersect(TVector3 &result, const TVector3 &rayDirection, const TVector3 &rayOrigin, const T &tolerance) const
+bool Plane<T>::IntersectRay(TVector3 &result, const TVector3 &rayDirection, const TVector3 &rayOrigin, const T &tolerance) const
 {
     const T NdotV = m_normal.Dot(rayDirection);
     if (math::NearlyZero(NdotV, tolerance)) 

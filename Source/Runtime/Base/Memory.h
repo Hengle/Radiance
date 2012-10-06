@@ -27,44 +27,38 @@
 #include <stdlib.h>
 
 template <typename T>
-inline bool IsAligned(T src, AddrSize align)
-{
+inline bool IsAligned(T src, AddrSize align) {
 	RAD_ASSERT((align & (align-1)) == 0);
 	AddrSize z = (AddrSize)src;
 	return (z & (align-1)) == 0;
 }
 
 template <typename T>
-inline T Align(T src, AddrSize align, AddrSize headerSize=0)
-{
+inline T Align(T src, AddrSize align, AddrSize headerSize=0) {
 	AddrSize z = (AddrSize)src + headerSize;
 	return (T)((z+(align-1)) & ~(align-1));
 }
 
-inline void *safe_malloc(size_t size)
-{
+inline void *safe_malloc(size_t size) {
 	void *p = malloc(size);
 	RAD_OUT_OF_MEM(p);
 	return p;
 }
 
-inline void *safe_calloc(size_t numElms, size_t elmSize)
-{
+inline void *safe_calloc(size_t numElms, size_t elmSize) {
 	void *p = calloc(numElms, elmSize);
 	RAD_OUT_OF_MEM(p);
 	return p;
 }
 
-inline void *safe_realloc(void *p, size_t size)
-{
+inline void *safe_realloc(void *p, size_t size) {
 	void *r = realloc(p, size);
 	RAD_OUT_OF_MEM(r);
 	return r;
 }
 
 #if !defined(RAD_OPT_APPLE) // mac implements malloc_size
-inline AddrSize malloc_size(const void *p)
-{
+inline AddrSize malloc_size(const void *p) {
 	if (!p) 
 		return 0;
 #if defined(RAD_OPT_WINX)
@@ -84,42 +78,36 @@ void *aligned_realloc(void *p, AddrSize size, AddrSize headerSize, AddrSize alig
 void aligned_free(void *p);
 AddrSize aligned_malloc_size(const void *p);
 
-inline void *aligned_malloc(AddrSize size, AddrSize headerSize, AddrSize align)
-{
+inline void *aligned_malloc(AddrSize size, AddrSize headerSize, AddrSize align) {
 	return aligned_realloc(0, size, headerSize, align);
 }
 
-inline void *aligned_calloc(AddrSize numElms, AddrSize elmSize, AddrSize headerSize, AddrSize align)
-{
+inline void *aligned_calloc(AddrSize numElms, AddrSize elmSize, AddrSize headerSize, AddrSize align) {
 	void *p = aligned_malloc(numElms*elmSize, headerSize, align);
 	if (p) { memset(p, 0, numElms*elmSize+headerSize); }
 	return p;
 }
 
-inline void *safe_aligned_malloc(AddrSize size, AddrSize headerSize, AddrSize align)
-{
+inline void *safe_aligned_malloc(AddrSize size, AddrSize headerSize, AddrSize align) {
 	void *p = aligned_malloc(size, headerSize, align);
 	RAD_OUT_OF_MEM(p||!(size+headerSize));
 	return p;
 }
 
-inline void *safe_aligned_calloc(AddrSize numElms, AddrSize elmSize, AddrSize headerSize, AddrSize align)
-{
+inline void *safe_aligned_calloc(AddrSize numElms, AddrSize elmSize, AddrSize headerSize, AddrSize align) {
 	void *p = aligned_calloc(numElms, elmSize, headerSize, align);
 	RAD_OUT_OF_MEM(p||!(numElms*elmSize+headerSize));
 	return p;
 }
 
-inline void *safe_aligned_realloc(void *p, AddrSize size, AddrSize headerSize, AddrSize align)
-{
+inline void *safe_aligned_realloc(void *p, AddrSize size, AddrSize headerSize, AddrSize align) {
 	p = aligned_realloc(p, size, headerSize, align);
 	RAD_OUT_OF_MEM(p||!(size+headerSize));
 	return p;
 }
 
 template <typename T>
-class malloc_allocator
-{
+class malloc_allocator {
 public:
 	typedef T value_type;
 	typedef value_type *pointer;
@@ -141,8 +129,7 @@ public:
 	static const_pointer address(const_reference s) { return &s; }
 	static size_type max_size()	{ return (std::numeric_limits<size_type>::max)(); }
 	static void construct(const pointer ptr, const value_type & t) { new (ptr) T(t); }
-	static void destroy(const pointer ptr)
-	{
+	static void destroy(const pointer ptr) {
 		ptr->~T();
 		(void) ptr;
 	}
@@ -150,15 +137,13 @@ public:
 	bool operator==(const malloc_allocator &) const { return true; }
 	bool operator!=(const malloc_allocator &) const { return false; }
 
-	static pointer allocate(const size_type n)
-	{
+	static pointer allocate(const size_type n) {
 		return (pointer)malloc(n*sizeof(T));
 	}
 
 	static pointer allocate(const size_type n, const void * const) { return allocate(n); }
 
-	static void deallocate(const pointer ptr, const size_type n)
-	{
+	static void deallocate(const pointer ptr, const size_type n) {
 #ifdef BOOST_NO_PROPER_STL_DEALLOCATE
 		if (ptr == 0 || n == 0)
 			return;
@@ -166,3 +151,44 @@ public:
 		free(ptr);
 	}
 };
+
+// Aligned memory block
+
+// VS2010 __declspec(align(N)), N must be an immediate, doesn't understand template args or anything else.
+// So we specialize it here.
+
+template <size_t TSize, size_t TAlignment>
+class aligned_block {};
+
+#define DECL_ALIGNED_BLOCK(_Alignment) \
+	template <size_t TSize> \
+	class aligned_block<TSize, _Alignment> { \
+	public: \
+		enum { \
+			Size = TSize, \
+			Alignment = _Alignment \
+		}; \
+		\
+		RAD_ALIGN(_Alignment) U8 data[TSize]; \
+		operator const U8 * () const { return data; } \
+		operator U8 * () { return data; } \
+		U8 operator [] (int idx) const { RAD_ASSERT(idx < Size); return data[idx]; } \
+		U8 &operator [] (int idx) { RAD_ASSERT(idx < Size); return data[idx]; } \
+	}
+
+DECL_ALIGNED_BLOCK(1);
+DECL_ALIGNED_BLOCK(2);
+DECL_ALIGNED_BLOCK(4);
+DECL_ALIGNED_BLOCK(8);
+DECL_ALIGNED_BLOCK(16);
+DECL_ALIGNED_BLOCK(32);
+DECL_ALIGNED_BLOCK(64);
+DECL_ALIGNED_BLOCK(128);
+DECL_ALIGNED_BLOCK(256);
+DECL_ALIGNED_BLOCK(512);
+DECL_ALIGNED_BLOCK(1024);
+DECL_ALIGNED_BLOCK(2048);
+DECL_ALIGNED_BLOCK(4096);
+
+#undef DECL_ALIGNED_BLOCK
+

@@ -239,7 +239,7 @@ private:
 		static int s_num;
 	};
 
-	typedef math::ConvexPolygon<SceneFileD::TriVert, Plane> AreaNodeWinding;
+	typedef math::Winding<SceneFileD::TriVert, Plane> AreaNodeWinding;
 
 	///////////////////////////////////////////////////////////////////////////////
 

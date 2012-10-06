@@ -101,16 +101,16 @@ public:
 	TVector3 Project(const TVector3 &v) const;
 
 	template <typename TVector3>
-	bool LineSegmentIntersect(TVector3 &result, const TVector3 &a, const TVector3 &b, const T &tolerance = Epsilon<T>()) const;
+	bool IntersectLineSegment(TVector3 &result, const TVector3 &a, const TVector3 &b, const T &tolerance = Epsilon<T>()) const;
 
 	template <typename TVector3>
-	static bool LineSegmentIntersect(TVector3 &result, const TVector3 &a, const T &distA, const TVector3 &b, const T &distB, const T &tolerance = Epsilon<T>());
+	static bool IntersectLineSegment(TVector3 &result, const TVector3 &a, const T &distA, const TVector3 &b, const T &distB, const T &tolerance = Epsilon<T>());
 
 	template <typename TVector3>
-	static TVector3 LineSegmentIntersect(const TVector3 &a, const T &distA, const TVector3 &b, const T &distB);
+	static TVector3 IntersectLineSegment(const TVector3 &a, const T &distA, const TVector3 &b, const T &distB);
 
     template <typename TVector3>
-    bool RayIntersect(TVector3 &result, const TVector3 &rayDirection, const TVector3 &rayOrigin, const T &tolerance = Epsilon<T>()) const;
+    bool IntersectRay(TVector3 &result, const TVector3 &rayDirection, const TVector3 &rayOrigin, const T &tolerance = Epsilon<T>()) const;
 
 	T Distance(const Vector3<T> &v) const;
 	SideType Side(const Vector3<T> &v, const T &tolerance = Epsilon<T>()) const;

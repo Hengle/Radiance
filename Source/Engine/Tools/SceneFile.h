@@ -15,7 +15,7 @@
 #include <Runtime/Math/Plane.h>
 #include <Runtime/Math/Quaternion.h>
 #include <Runtime/Math/Matrix.h>
-#include <Runtime/Math/ConvexPolygon.h>
+#include <Runtime/Math/Winding.h>
 #include <Runtime/Math/AABB.h>
 #include <Runtime/Container/ZoneMap.h>
 #include <Runtime/Container/ZoneVector.h>
@@ -51,7 +51,7 @@ public:
 	typedef math::Vector4<T> Vec4;
 	typedef math::Matrix4X4<T> Mat4;
 	typedef math::Quaternion<T> Quat;
-	typedef math::ConvexPolygon<Vec3, Plane> Winding;
+	typedef math::Winding<Vec3, Plane> Winding;
 	typedef math::AABB3<T> BBox;
 
 	typedef typename zone_vector<Vec3, Z3DXT>::type Vec3Vec;
@@ -88,7 +88,7 @@ public:
 		explicit TriVert(const Vec3 &v) : pos(v) {}
 		operator Vec3 () const { return pos; }
 
-		// operators that let us specialize ConvexPolygon on this vertex type.
+		// operators that let us specialize Winding on this vertex type.
 
 		TriVert operator + (const TriVert &v) const {
 			TriVert x;

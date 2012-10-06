@@ -7,7 +7,8 @@
 #include "../Types.h"
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/Container/ZoneSet.h>
-#include <Runtime/Math/ConvexPolygon.h>
+#include <Runtime/Container/StackVector.h>
+#include <Runtime/Math/Winding.h>
 #include <bitset>
 
 namespace world {
@@ -38,10 +39,17 @@ enum {
 typedef zone_vector<Plane, ZWorldT>::type PlaneVec;
 typedef zone_set<Entity*, ZWorldT>::type EntityPtrSet;
 typedef zone_set<int, ZWorldT>::type IntSet;
+typedef zone_set<int, ZWorldT>::type IntVec;
 typedef std::bitset<kMaxEnts> EntityBits;
 typedef std::bitset<kMaxAreas> AreaBits;
-typedef math::ConvexPolygon<Vec3, Plane, zone_allocator<Vec3, ZWorldT> > Winding;
+typedef math::Winding<Vec3, Plane, zone_allocator<Vec3, ZWorldT> > Winding;
 typedef zone_vector<Winding, ZWorldT>::type WindingVec;
+typedef math::Winding<Vec3, Plane, math::stack_tag<16> > StackWinding;
+typedef zone_vector<StackWinding, ZWorldT>::type StackWindingVec;
+typedef std::pair<int, StackWindingVec> ClippedAreaVolume;
+typedef zone_vector<ClippedAreaVolume, ZWorldT>::type ClippedAreaVolumeVec;
+
+STACKIFY_TYPE(ClippedAreaVolumeVec, StackClippedAreaVolumeVec, 8);
 
 struct dBSPNode {
 	typedef zone_vector<dBSPNode, ZWorldT>::type Vec;

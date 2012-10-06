@@ -249,7 +249,6 @@ private:
 	dBSPAreaLeaf::Vec m_leafs;
 	ScreenOverlay::List m_overlays;
 	RB_WorldDraw::Ref m_rb;
-	Vec3 m_viewPos;
 	details::MBatchIdMap m_refMats;
 	ObjectPool<details::MBatch> m_batchPool;
 	World *m_world;

@@ -18,8 +18,7 @@
 
 namespace world {
 
-World::Ref World::New(Game &game, int slot, const SoundContext::Ref &sound, pkg::Zone zone)
-{
+World::Ref World::New(Game &game, int slot, const SoundContext::Ref &sound, pkg::Zone zone) {
 	World::Ref w(new (ZEngine) World(game, slot, sound, zone));
 	w->m_zone.reset(new (ZEngine) Zone(w));
 	return w;
@@ -51,16 +50,14 @@ m_unloadSlotReq(false),
 m_switchLoad(false),
 m_switchLoadScreen(false),
 m_levelStart(true),
-m_gestures(0)
-{
+m_gestures(0) {
 	m_draw.reset(new (ZWorld) WorldDraw(this));
 	m_cinematics.reset(new (ZWorld) WorldCinematics(this));
 	m_gameSpeed[0] = m_gameSpeed[1] = m_gameSpeed[2] = 1.f;
 	m_gameSpeedTime[0] = m_gameSpeedTime[1] = 0.f;
 }
 
-World::~World()
-{
+World::~World() {
 	m_destroy = true;
 	m_classnames.clear();
 	m_targetnames.clear();
@@ -74,8 +71,7 @@ World::~World()
 	m_draw.reset();
 }
 
-int World::Init()
-{
+int World::Init() {
 	int r = m_draw->LoadMaterials();
 	if (r != pkg::SR_Success)
 		return r;
@@ -88,34 +84,25 @@ int World::Init()
 	return m_game->OnWorldInit(*this);
 }
 
-void World::SetGameSpeed(float speed, float duration)
-{
-	if (duration > 0.f)
-	{
+void World::SetGameSpeed(float speed, float duration) {
+	if (duration > 0.f) {
 		m_gameSpeed[1] = m_gameSpeed[0];
 		m_gameSpeed[2] = speed;
 		m_gameSpeedTime[0] = 0.f;
 		m_gameSpeedTime[1] = duration;
-	}
-	else
-	{
+	} else {
 		m_gameSpeed[0] = speed;
 		m_gameSpeedTime[1] = 0.f;
 	}
 }
 
-void World::Tick(float dt)
-{
-	if (m_gameSpeedTime[1] > 0.f)
-	{
+void World::Tick(float dt) {
+	if (m_gameSpeedTime[1] > 0.f) {
 		m_gameSpeedTime[0] += dt;
-		if (m_gameSpeedTime[0] >= m_gameSpeedTime[1])
-		{
+		if (m_gameSpeedTime[0] >= m_gameSpeedTime[1]) {
 			m_gameSpeed[0] = m_gameSpeed[2];
 			m_gameSpeedTime[1] = 0.f;
-		}
-		else
-		{
+		} else {
 			m_gameSpeed[0] = math::Lerp(m_gameSpeed[1], m_gameSpeed[2], m_gameSpeedTime[0]/m_gameSpeedTime[1]);
 		}
 	}
@@ -127,42 +114,35 @@ void World::Tick(float dt)
 	TickState(dt, unmod_dt);
 
 	// tick game materials?
-	if ((m_pauseState&(PauseGame|PauseCinematics)) != (PauseGame|PauseCinematics))
-	{
+	if ((m_pauseState&(kPauseGame|kPauseCinematics)) != (kPauseGame|kPauseCinematics)) {
 		m_draw->Tick(
 			unmod_dt
 		);
 	}
 }
 
-void World::Draw()
-{
+void World::Draw() {
 	m_draw->Draw(&m_drawCounters);
 }
 
-void World::NotifyBackground()
-{
+void World::NotifyBackground() {
 	m_lua->NotifyBackground();
 	DispatchEvents();
 }
 
-void World::NotifyResume()
-{
+void World::NotifyResume() {
 	m_lua->NotifyResume();
 }
 
-void World::SaveApplicationState()
-{
+void World::SaveApplicationState() {
 	m_lua->SaveApplicationState();
 }
 
-void World::RestoreApplicationState()
-{
+void World::RestoreApplicationState() {
 	m_lua->RestoreApplicationState();
 }
 
-bool World::PendingLoadRequest(String &mapName, UnloadDisposition &ud, bool &loadScreen)
-{
+bool World::PendingLoadRequest(String &mapName, UnloadDisposition &ud, bool &loadScreen) {
 	mapName = m_loadMap;
 	ud = m_unloadDisp;
 	loadScreen = m_loadScreen;
@@ -171,31 +151,27 @@ bool World::PendingLoadRequest(String &mapName, UnloadDisposition &ud, bool &loa
 	return r;
 }
 
-bool World::PendingReturnRequest()
-{
+bool World::PendingReturnRequest() {
 	bool r = m_returnReq;
 	m_returnReq = false;
 	return r;
 }
 
-bool World::PendingUnloadSlot(int &slot)
-{
+bool World::PendingUnloadSlot(int &slot) {
 	slot = m_unloadSlot;
 	bool r = m_unloadSlotReq;
 	m_unloadSlotReq = false;
 	return r;
 }
 
-bool World::PendingSwitch(int &slot)
-{
+bool World::PendingSwitch(int &slot) {
 	slot = m_switchSlot;
 	bool r = m_switchReq;
 	m_switchReq = false;
 	return r;
 }
 
-bool World::PendingSwitchLoadRequest(int &slot, String &mapName, UnloadDisposition &ud, bool &loadScreen)
-{
+bool World::PendingSwitchLoadRequest(int &slot, String &mapName, UnloadDisposition &ud, bool &loadScreen) {
 	slot = m_switchSlot;
 	mapName = m_loadMap;
 	ud = m_unloadDisp;
@@ -205,8 +181,7 @@ bool World::PendingSwitchLoadRequest(int &slot, String &mapName, UnloadDispositi
 	return r;
 }
 
-void World::RequestLoad(const char *map, UnloadDisposition ud, bool loadScreen)
-{
+void World::RequestLoad(const char *map, UnloadDisposition ud, bool loadScreen) {
 	RAD_ASSERT(map);
 	m_loadMap = map;
 	m_unloadDisp = ud;
@@ -214,25 +189,21 @@ void World::RequestLoad(const char *map, UnloadDisposition ud, bool loadScreen)
 	m_loadReq = true;
 }
 
-void World::RequestReturn()
-{
+void World::RequestReturn() {
 	m_returnReq = true;
 }
 
-void World::RequestSwitch(int slot)
-{
+void World::RequestSwitch(int slot) {
 	m_switchSlot = slot;
 	m_switchReq = true;
 }
 
-void World::RequestUnloadSlot(int slot)
-{
+void World::RequestUnloadSlot(int slot) {
 	m_unloadSlotReq = true;
 	m_unloadSlot = slot;
 }
 
-void World::RequestSwitchLoad(int slot, const char *map, UnloadDisposition ud, bool loadScreen)
-{
+void World::RequestSwitchLoad(int slot, const char *map, UnloadDisposition ud, bool loadScreen) {
 	RAD_ASSERT(map);
 	m_switchSlot = slot;
 	m_loadMap = map;
@@ -241,20 +212,16 @@ void World::RequestSwitchLoad(int slot, const char *map, UnloadDisposition ud, b
 	m_switchLoad = true;
 }
 
-void World::TickState(float dt, float unmod_dt)
-{
+void World::TickState(float dt, float unmod_dt) {
 	int frame = m_frame++;
 	bool gc = false;
 
 	int pauseState = m_pauseState;
 
-	if (!(pauseState&PauseGame))
-	{
-		if (m_levelStart)
-		{
+	if (!(kPauseState&kPauseGame)) {
+		if (m_levelStart) {
 			m_levelStart = false;
-			for (Entity::IdMap::const_iterator it = m_ents.begin(); it != m_ents.end(); ++it)
-			{
+			for (Entity::IdMap::const_iterator it = m_ents.begin(); it != m_ents.end(); ++it) {
 				it->second->PrivateLevelStart();
 			}
 		}
@@ -267,8 +234,7 @@ void World::TickState(float dt, float unmod_dt)
 
 		xtime::TimeSlice time(1000/60);
 
-		for (Entity::IdMap::const_iterator it = m_ents.begin(); it != m_ents.end(); ++it)
-		{
+		for (Entity::IdMap::const_iterator it = m_ents.begin(); it != m_ents.end(); ++it) {
 			if (it->second.get() != m_viewController.get())
 				it->second->PrivateTick(frame, dt, time);
 		}
@@ -277,47 +243,41 @@ void World::TickState(float dt, float unmod_dt)
 			m_viewController->PrivateTick(frame, dt, time);
 
 		gc = true;
-	}
-	else if (!m_levelStart)
-	{ // game is paused, must tick world!
+	}else if (!m_levelStart) { 
+		// game is paused, must tick world!
 		xtime::TimeSlice time(1000/60);
 		m_lua->Tick(0.f);
 		if (m_worldspawn)
 			m_worldspawn->PrivateTick(frame, 0.f, time);
 	}
 
-	if (!(pauseState&PauseCinematics))
+	if (!(pauseState&kPauseCinematics))
 		m_cinematics->Tick(frame, dt);
 
 	// update listener position.
 	bool cameraSoundPos = m_cinematics->cameraActive || !m_playerPawn;
 
-	if (cameraSoundPos)
-	{
+	if (cameraSoundPos) {
 		m_sound->pos = m_cam.pos;
 
-		if (m_cam.quatMode)
+		if (m_cam.quatMode) {
 			m_sound->rot = m_cam.rot;
-		else
+		} else {
 			m_sound->rot = QuatFromAngles(m_cam.angles);
-	}
-	else
-	{
+		}
+	} else {
 		m_sound->pos = m_playerPawn->ps->worldPos;
 		m_sound->rot = QuatFromAngles(m_playerPawn->ps->worldAngles);
 	}
 
 	m_sound->Tick(dt, m_time > 0.5f);
 	
-	if (gc)
-	{
+	if (gc) {
 		// garbage collect
-		for (Entity::IdMap::const_iterator it = m_ents.begin(); it != m_ents.end();)
-		{
+		for (Entity::IdMap::const_iterator it = m_ents.begin(); it != m_ents.end();) {
 			Entity::IdMap::const_iterator next = it; ++next;
 
-			if (it->second->gc)
-			{
+			if (it->second->gc) {
 				Entity::Ref r(it->second);
 				UnmapEntity(r);
 			}
@@ -326,29 +286,25 @@ void World::TickState(float dt, float unmod_dt)
 		}
 	}
 
-	if (!(pauseState&PauseUI))
-	{
+	if (!(pauseState&kPauseUI)) {
 		m_uiRoot->Tick(
 			m_time, 
 			unmod_dt,
-			(pauseState&(PauseGame|PauseCinematics))==(PauseGame|PauseCinematics)
+			(pauseState&(kPauseGame|kPauseCinematics))==(kPauseGame|kPauseCinematics)
 		);
 	}
 }
 
-Event::Vec World::ParseMultiEvent(const char *string)
-{
+Event::Vec World::ParseMultiEvent(const char *string) {
 	Event::Vec events;
 		
 	stream::MemInputBuffer ib(string, string::len(string));
 	stream::InputStream is(ib);
 	Tokenizer script(is);
 
-	for (;;)
-	{
+	for (;;) {
 		String target;
-		if (!script.GetToken(target, Tokenizer::kTokenMode_CrossLine))
-		{
+		if (!script.GetToken(target, Tokenizer::kTokenMode_CrossLine)) {
 			if (events.empty())
 				COut(C_Warn) << "Malformed script command: '" << string << "'" << std::endl;
 			return events;
@@ -364,8 +320,7 @@ Event::Vec World::ParseMultiEvent(const char *string)
 			evTarget = Event::T_PlayerPawn;
 		
 		String cmd;
-		if (!script.GetToken(cmd, Tokenizer::kTokenMode_SameLine))
-		{
+		if (!script.GetToken(cmd, Tokenizer::kTokenMode_SameLine)) {
 			COut(C_Warn) << "Malformed script command: '" << string << "'" << std::endl;
 			return events;
 		}
@@ -375,8 +330,7 @@ Event::Vec World::ParseMultiEvent(const char *string)
 
 		Event::Ref event;
 
-		switch (evTarget)
-		{
+		switch (evTarget) {
 		case Event::T_Name:
 			event.reset(new (ZWorld) Event(target.c_str.get(), cmd.c_str.get(), args.c_str.get()));
 			break;
@@ -392,46 +346,39 @@ Event::Vec World::ParseMultiEvent(const char *string)
 	return events;
 }
 
-void World::PostEvent(const char *string)
-{
+void World::PostEvent(const char *string) {
 	Event::Vec events = ParseMultiEvent(string);
 	if (!events.empty())
 		PostEvents(events);
 }
 
-void World::DispatchEvent(const char *string)
-{
+void World::DispatchEvent(const char *string) {
 	Event::Vec events = ParseMultiEvent(string);
 	if (!events.empty())
 		DispatchEvents(events);
 }
 
-void World::PostEvent(const Event::Ref &event)
-{
+void World::PostEvent(const Event::Ref &event) {
 	m_events.push_back(event);
 }
 
-void World::PostEvents(const Event::Vec &events)
-{
+void World::PostEvents(const Event::Vec &events) {
 	for (Event::Vec::const_iterator it = events.begin(); it != events.end(); ++it)
 		PostEvent(*it);
 }
 
-void World::DispatchEvent(const Event::Ref &event)
-{
+void World::DispatchEvent(const Event::Ref &event) {
 	Entity::Vec ents;
 	ents.reserve(8);
 
 	switch (event->target.get())
 	{
-	case Event::T_Id:
-		{
+	case Event::T_Id: {
 			Entity::IdMap::const_iterator it = m_ents.find(event->targetId);
 			if (it != m_ents.end())
 				ents.push_back(it->second);
 		} break;
-	case Event::T_Name:
-		{
+	case Event::T_Name: {
 			ents = FindEntityTargets(event->name);
 		} break;
 	case Event::T_ViewController:
@@ -445,49 +392,41 @@ void World::DispatchEvent(const Event::Ref &event)
 			break;
 	}
 
-	if (ents.empty())
-	{
+	if (ents.empty()) {
 		COut(C_Warn) << "Undeliverable event (no targets found): Id: (" << event->targetId.get() <<
 			"), Name: (" << event->name.get() << "), Command: (" << event->cmd.get() << "), Args: (" <<
 			(event->args.get()?event->args.get():"") << ")" << std::endl;
 		return;
 	}
 
-	for (Entity::Vec::const_iterator it = ents.begin(); it != ents.end(); ++it)
-	{
+	for (Entity::Vec::const_iterator it = ents.begin(); it != ents.end(); ++it) {
 		(*it)->PrivateHandleEvent(event);
 	}
 }
 
-void World::DispatchEvents(const Event::Vec &events)
-{
+void World::DispatchEvents(const Event::Vec &events) {
 	for (Event::Vec::const_iterator it = events.begin(); it != events.end(); ++it)
 		DispatchEvent(*it);
 }
 
-void World::DispatchEvents()
-{
+void World::DispatchEvents() {
 	EventList events;
 	events.swap(m_events);
 
-	while (!events.empty())
-	{
+	while (!events.empty()) {
 		DispatchEvent(events.front());
 		events.pop_front();
 	}
 }
 
-void World::FlushEvents()
-{
+void World::FlushEvents() {
 	m_events.clear();
 }
 
-bool World::HandleInputEvent(const InputEvent &e, const TouchState *touch, const InputState &is)
-{
+bool World::HandleInputEvent(const InputEvent &e, const TouchState *touch, const InputState &is) {
 	bool handled = false;
 
-	if (m_uiRoot->HandleInputEvent(e, touch, is))
-	{
+	if (m_uiRoot->HandleInputEvent(e, touch, is)) {
 		handled = true;
 		// always post cancellations to script.
 		if ((e.type != InputEvent::T_MouseUp) && 
@@ -499,30 +438,25 @@ bool World::HandleInputEvent(const InputEvent &e, const TouchState *touch, const
 	return m_lua->HandleInputEvent(e, touch, is) || handled;
 }
 
-bool World::HandleInputGesture(const InputGesture &g, const TouchState &touch, const InputState &is)
-{
+bool World::HandleInputGesture(const InputGesture &g, const TouchState &touch, const InputState &is) {
 	if (m_uiRoot->HandleInputGesture(g, touch, is))
 		return true;
 	return m_lua->HandleInputGesture(g, touch, is);
 }
 
-void World::OnLocalPlayerAuthenticated(gn::NetResult r)
-{
+void World::OnLocalPlayerAuthenticated(gn::NetResult r) {
 	m_lua->OnLocalPlayerAuthenticated(r);
 }
 
-void World::OnShowLeaderboard(bool show)
-{
+void World::OnShowLeaderboard(bool show) {
 	m_lua->OnShowLeaderboard(show);
 }
 
-void World::OnShowAchievements(bool show)
-{
+void World::OnShowAchievements(bool show) {
 	m_lua->OnShowAchievements(show);
 }
 
-Entity::Vec World::FindEntityClass(const char *classname) const
-{
+Entity::Vec World::FindEntityClass(const char *classname) const {
 	RAD_ASSERT(classname);
 	String s(classname);
 
@@ -531,8 +465,7 @@ Entity::Vec World::FindEntityClass(const char *classname) const
 
 	Entity::Vec vec;
 
-	while (pair.first != pair.second)
-	{
+	while (pair.first != pair.second) {
 		vec.push_back(pair.first->second);
 		++pair.first;
 	}
@@ -540,8 +473,7 @@ Entity::Vec World::FindEntityClass(const char *classname) const
 	return vec;
 }
 
-Entity::Vec World::FindEntityTargets(const char *targetname) const
-{
+Entity::Vec World::FindEntityTargets(const char *targetname) const {
 	RAD_ASSERT(targetname);
 	String s(targetname);
 	
@@ -559,32 +491,28 @@ Entity::Vec World::FindEntityTargets(const char *targetname) const
 	return vec;
 }
 
-Entity::Ref World::FindEntityId(int id) const
-{
+Entity::Ref World::FindEntityId(int id) const {
 	Entity::IdMap::const_iterator it = m_ents.find(id);
 	if (it != m_ents.end())
 		return it->second;
 	return Entity::Ref();
 }
 
-ZoneTagRef World::ZoneTag(int id) const
-{
+ZoneTagRef World::ZoneTag(int id) const {
 	ZoneIdMap::const_iterator it = m_zoneTags.find(id);
 	if (it != m_zoneTags.end())
 		return it->second;
 	return ZoneTagRef();
 }
 
-const Vec3 &World::RAD_IMPLEMENT_GET(listenerPos)
-{
+const Vec3 &World::RAD_IMPLEMENT_GET(listenerPos) {
 	bool cameraSoundPos = m_cinematics->cameraActive || !m_playerPawn;
 	if (cameraSoundPos)
 		return m_cam.pos;
 	return m_playerPawn->ps->worldPos;
 }
 
-void World::RAD_IMPLEMENT_SET(enabledGestures) (int value)
-{
+void World::RAD_IMPLEMENT_SET(enabledGestures) (int value) {
 	m_gestures = value;
 	World::Ref active = m_game->world;
 	if (active && active.get() == this)

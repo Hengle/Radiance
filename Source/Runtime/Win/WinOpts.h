@@ -49,6 +49,11 @@
 	//
 	#define RAD_STRUCT_ALIGN 8
 
+	#define RAD_ALIGN(_a) __declspec(align(_a))
+
+// http://connect.microsoft.com/VisualStudio/feedback/details/682695/c-alignof-fails-to-properly-evalute-alignment-of-dependent-types
+	#define RAD_ALIGNOF(_t) (sizeof(_t) - sizeof(_t) + __alignof(_t))
+
 	//
 	// CLR Enabled?
 	//

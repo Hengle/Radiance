@@ -900,7 +900,7 @@
     <ClInclude Include="..\..\Engine\World\PostProcess.h" />
     <ClInclude Include="..\..\Engine\World\ScreenOverlay.h" />
     <ClInclude Include="..\..\Engine\World\ScreenOverlayDef.h" />
-    <ClInclude Include="..\..\Engine\World\ViewModel.h" />
+    <ClInclude Include="..\..\Engine\World\DrawModel.h" />
     <ClInclude Include="..\..\Engine\World\World.h" />
     <ClInclude Include="..\..\Engine\World\WorldCinematics.h" />
     <ClInclude Include="..\..\Engine\World\WorldDef.h" />
@@ -959,6 +959,8 @@
     <ClInclude Include="..\..\Runtime\Container\PredicateDef.h" />
     <ClInclude Include="..\..\Runtime\Container\RedBlackNodeTree.h" />
     <ClInclude Include="..\..\Runtime\Container\RedBlackNodeTreeDef.h" />
+    <ClInclude Include="..\..\Runtime\Container\StackContainer.h" />
+    <ClInclude Include="..\..\Runtime\Container\StackVector.h" />
     <ClInclude Include="..\..\Runtime\Container\ThreadSafeFIFO.h" />
     <ClInclude Include="..\..\Runtime\Container\ZoneDeque.h" />
     <ClInclude Include="..\..\Runtime\Container\ZoneHashMap.h" />
@@ -1011,7 +1013,8 @@
     <ClInclude Include="..\..\Runtime\Math\AffineMatrix4X4.h" />
     <ClInclude Include="..\..\Runtime\Math\AxisAngle.h" />
     <ClInclude Include="..\..\Runtime\Math\AxisAngleDef.h" />
-    <ClInclude Include="..\..\Runtime\Math\ConvexPolygon.h" />
+    <ClInclude Include="..\..\Runtime\Math\Types.h" />
+    <ClInclude Include="..\..\Runtime\Math\Winding.h" />
     <ClInclude Include="..\..\Runtime\Math\Euler.h" />
     <ClInclude Include="..\..\Runtime\Math\EulerDef.h" />
     <ClInclude Include="..\..\Runtime\Math\Generic\GenericMatrixBackend.h" />
@@ -2012,8 +2015,9 @@
     <ClCompile Include="..\..\Engine\World\MT_Spline.cpp" />
     <ClCompile Include="..\..\Engine\World\PostProcess.cpp" />
     <ClCompile Include="..\..\Engine\World\ScreenOverlay.cpp" />
-    <ClCompile Include="..\..\Engine\World\ViewModel.cpp" />
+    <ClCompile Include="..\..\Engine\World\DrawModel.cpp" />
     <ClCompile Include="..\..\Engine\World\World.cpp" />
+    <ClCompile Include="..\..\Engine\World\WorldBSP.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldCinematics.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldDraw.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldLua.cpp" />
@@ -2188,7 +2192,7 @@
     <None Include="..\..\Runtime\Math\AABB.inl" />
     <None Include="..\..\Runtime\Math\AffineMatrix4X4.inl" />
     <None Include="..\..\Runtime\Math\AxisAngle.inl" />
-    <None Include="..\..\Runtime\Math\ConvexPolygon.inl" />
+    <None Include="..\..\Runtime\Math\Winding.inl" />
     <None Include="..\..\Runtime\Math\Euler.inl" />
     <None Include="..\..\Runtime\Math\Generic\GenericMatrixBackend.inl" />
     <None Include="..\..\Runtime\Math\Math.inl" />

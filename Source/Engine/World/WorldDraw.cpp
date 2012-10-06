@@ -40,7 +40,7 @@ WorldDraw::MStaticWorldMeshBatch::MStaticWorldMeshBatch(const r::Mesh::Ref &m, i
 MBatchDraw(matId), m_m(m) {
 }
 
-void WorldDraw::MStaticWorldMeshBatch::Bind(r::Shader &shader) {
+void WorldDraw::MStaticWorldMeshBatch::Bind(r::Shader *shader) {
 	m_m->BindAll(shader);
 }
 
@@ -48,7 +48,7 @@ void WorldDraw::MStaticWorldMeshBatch::CompileArrayStates(r::Shader &shader) {
 	m_m->CompileArrayStates(shader);
 }
 
-void WorldDraw::MStaticWorldMeshBatch::FlushArrayStates(r::Shader &shader) {
+void WorldDraw::MStaticWorldMeshBatch::FlushArrayStates(r::Shader *shader) {
 	m_m->FlushArrayStates(shader);
 }
 
@@ -201,10 +201,10 @@ int WorldDraw::Precache() {
 			for (MBatchDrawPtrVec::const_iterator it = batch.draws.begin(); it != batch.draws.end(); ++it) {
 				MBatchDraw *draw = *it;
 
-				draw->Bind(batch.mat->shader.get());
+				draw->Bind(batch.mat->shader.get().get());
 				batch.mat->shader->BindStates(true, draw->rgba);
 				m_rb->CommitStates();
-				draw->CompileArrayStates(batch.mat->shader.get());
+				draw->CompileArrayStates(*batch.mat->shader.get());
 				draw->Draw();		
 			}
 
@@ -599,12 +599,34 @@ void WorldDraw::PostProcess() {
 
 void WorldDraw::LinkEntity(Entity *entity, const BBox &bounds) {
 	UnlinkEntity(entity);
+
+	if (entity->m_leaf->area < 0)
+		return;
 	
 	entity->m_areaLeafs.reserve(8);
 	if (m_nodes.empty()) {
 		LinkEntity(entity, bounds, -1);
 	} else {
-		LinkEntity(entity, bounds, 0);
+		StackWindingVec bbox;
+		m_world->BoundWindings(bounds, bbox);
+
+		AreaBits visibleAreas;
+		m_world->OccupantVolumeCanSeeArea(
+			entity->ps->worldPos,
+			bbox,
+			0,
+			entity->m_leaf->area,
+			-1,
+			visibleAreas
+		);
+
+		// NOTE: this sort of sucks, figure out a faster way of doing this.
+		for (int i = 0; kMaxAreas; ++i) {
+			if (visibleAreas.test(i)) {
+				const bsp_file::BSPArea *area = m_world->m_bsp->Areas() + i;
+				LinkEntity(entity, bounds, area->rootNode);
+			}
+		}
 	}
 }
 

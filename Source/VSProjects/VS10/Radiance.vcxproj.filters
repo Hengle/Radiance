@@ -603,9 +603,6 @@
     <ClInclude Include="..\..\Runtime\Math\AxisAngleDef.h">
       <Filter>Source\Runtime\Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Runtime\Math\ConvexPolygon.h">
-      <Filter>Source\Runtime\Math</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Runtime\Math\Euler.h">
       <Filter>Source\Runtime\Math</Filter>
     </ClInclude>
@@ -1236,9 +1233,6 @@
     <ClInclude Include="..\..\Engine\World\ScreenOverlayDef.h">
       <Filter>Source\Engine\World</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\World\ViewModel.h">
-      <Filter>Source\Engine\World</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\World\World.h">
       <Filter>Source\Engine\World</Filter>
     </ClInclude>
@@ -1391,6 +1385,21 @@
     </ClInclude>
     <ClInclude Include="..\..\Engine\World\MapBuilder\CinematicsBuilder.h">
       <Filter>Source\Engine\World\MapBuilder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\World\DrawModel.h">
+      <Filter>Source\Engine\World</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Runtime\Math\Winding.h">
+      <Filter>Source\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Runtime\Math\Types.h">
+      <Filter>Source\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Runtime\Container\StackContainer.h">
+      <Filter>Source\Runtime\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Runtime\Container\StackVector.h">
+      <Filter>Source\Runtime\Container</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1946,9 +1955,6 @@
     <ClCompile Include="..\..\Engine\World\ScreenOverlay.cpp">
       <Filter>Source\Engine\World</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\World\ViewModel.cpp">
-      <Filter>Source\Engine\World</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Engine\World\World.cpp">
       <Filter>Source\Engine\World</Filter>
     </ClCompile>
@@ -2084,6 +2090,12 @@
     <ClCompile Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSPDraw.cpp">
       <Filter>Source\Engine\World\MapBuilder\SolidBSP</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\World\DrawModel.cpp">
+      <Filter>Source\Engine\World</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\WorldBSP.cpp">
+      <Filter>Source\Engine\World</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Runtime\Base\Event.inl">
@@ -2168,9 +2180,6 @@
       <Filter>Source\Runtime\Math</Filter>
     </None>
     <None Include="..\..\Runtime\Math\AxisAngle.inl">
-      <Filter>Source\Runtime\Math</Filter>
-    </None>
-    <None Include="..\..\Runtime\Math\ConvexPolygon.inl">
       <Filter>Source\Runtime\Math</Filter>
     </None>
     <None Include="..\..\Runtime\Math\Euler.inl">
@@ -2331,6 +2340,9 @@
     </None>
     <None Include="..\..\Runtime\File\File.inl">
       <Filter>Source\Runtime\File</Filter>
+    </None>
+    <None Include="..\..\Runtime\Math\Winding.inl">
+      <Filter>Source\Runtime\Math</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

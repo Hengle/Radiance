@@ -68,6 +68,9 @@
 
 	#define RAD_STRUCT_ALIGN 8
 
+	#define RAD_ALIGN(_alignment) __attribute__((aligned(_alignment)))
+	#define RAD_ALIGNOF(_t) __alignof__(_t)
+
 	#if _CPPRTTI
 		#define RAD_OPT_RTTI
 	#endif

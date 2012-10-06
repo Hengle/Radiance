@@ -13,42 +13,35 @@
 namespace details {
 
 #if defined(RAD_OPT_MEMGUARD)
-void CheckMemGuards(void *pp)
-{
+void CheckMemGuards(void *pp) {
 	int  *px = reinterpret_cast<int*>(reinterpret_cast<U8*>(pp)-sizeof(void*)*2-2);
-	for (size_t i = 0; i < sizeof(void*)/sizeof(int); ++i)
-	{
+	for (size_t i = 0; i < sizeof(void*)/sizeof(int); ++i) {
 		// if you assert here, you have memory corruption.
 		RAD_VERIFY_MSG(*(px++) == RAD_MEM_GUARD, "Memory Corruption Detected");
 	}
 
 	px = reinterpret_cast<int*>(reinterpret_cast<U8*>(pp)-sizeof(void*));
 
-	for (size_t i = 0; i < sizeof(void*)/sizeof(int); ++i)
-	{
+	for (size_t i = 0; i < sizeof(void*)/sizeof(int); ++i) {
 		// if you assert here, you have memory corruption.
 		RAD_VERIFY_MSG(*(px++) == RAD_MEM_GUARD, "Memory Corruption Detected");
 	}
 }
 
-void WriteMemGuards(void *pp)
-{
+void WriteMemGuards(void *pp) {
 	int  *px = reinterpret_cast<int*>(((U8*)pp)-sizeof(void*)*2-2);
-	for (size_t i = 0; i < sizeof(void*)/sizeof(int); ++i)
-	{
+	for (size_t i = 0; i < sizeof(void*)/sizeof(int); ++i) {
 		*(px++) = RAD_MEM_GUARD;
 	}
 
 	px = reinterpret_cast<int*>(((U8*)pp)-sizeof(void*));
-	for (size_t i = 0; i < sizeof(void*)/sizeof(int); ++i)
-	{
+	for (size_t i = 0; i < sizeof(void*)/sizeof(int); ++i) {
 		*(px++) = RAD_MEM_GUARD;
 	}
 }
 #endif
 
-inline AddrSize MemBaseOfs(void *pp)
-{
+inline AddrSize MemBaseOfs(void *pp) {
 #if defined(RAD_OPT_MEMGUARD)
 	return (AddrSize)*reinterpret_cast<U16*>(reinterpret_cast<U8*>(pp)-sizeof(void*)-2);
 #else
@@ -56,19 +49,15 @@ inline AddrSize MemBaseOfs(void *pp)
 #endif
 }
 
-inline void *MemBasePtr(void *pp)
-{
+inline void *MemBasePtr(void *pp) {
 	return reinterpret_cast<U8*>(pp) - MemBaseOfs(pp);
 }
 } // details
 
 // returnvalue + headerSize = aligned
-void *aligned_realloc(void *ptr, AddrSize size, AddrSize headerSize, AddrSize align)
-{
-	if (size == 0)
-	{
-		if (ptr)
-		{
+void *aligned_realloc(void *ptr, AddrSize size, AddrSize headerSize, AddrSize align) {
+	if (size == 0) {
+		if (ptr) {
 			aligned_free(ptr);
 		}
 
@@ -84,8 +73,7 @@ void *aligned_realloc(void *ptr, AddrSize size, AddrSize headerSize, AddrSize al
 	AddrSize oldOfs = 0;
 	AddrSize oldSize = 0;
 
-	if (ptr)
-	{
+	if (ptr) {
 #if defined(RAD_OPT_MEMGUARD)
 		details::CheckMemGuards(ptr);
 #endif
@@ -102,8 +90,7 @@ void *aligned_realloc(void *ptr, AddrSize size, AddrSize headerSize, AddrSize al
 	U8 *p = (U8*)::realloc(pptr, size+headerSize+2+align-1);
 #endif
 
-	if (p)
-	{
+	if (p) {
 #if defined(RAD_OPT_MEMGUARD) // basic over/under guards
 		U8 *pp = Align(p, align, sizeof(void*)*2+2+headerSize) - headerSize;
 #else
@@ -113,15 +100,12 @@ void *aligned_realloc(void *ptr, AddrSize size, AddrSize headerSize, AddrSize al
 		RAD_ASSERT(pp > p);
 		AddrSize ofs = pp-p;
 
-		if (ptr && oldOfs != ofs) // realign?
-		{
+		if (ptr && oldOfs != ofs) {
+			// realign?
 			RAD_ASSERT((void*)pp != ptr);
-			if (ofs > oldOfs)
-			{
+			if (ofs > oldOfs) {
 				memmove(pp, pp-(ofs-oldOfs), std::min(oldSize, size)+headerSize);
-			}
-			else
-			{
+			} else {
 				memmove(pp, pp+(oldOfs-ofs), std::min(oldSize, size)+headerSize);
 			}
 		}
@@ -141,10 +125,8 @@ void *aligned_realloc(void *ptr, AddrSize size, AddrSize headerSize, AddrSize al
 	return p;
 }
 
-void aligned_free(void *pp)
-{
-	if (pp)
-	{
+void aligned_free(void *pp) {
+	if (pp) {
 #if defined(RAD_OPT_MEMGUARD) // check over/under guards
 		details::CheckMemGuards(pp);
 #endif
@@ -153,9 +135,9 @@ void aligned_free(void *pp)
 	}
 }
 
-AddrSize aligned_malloc_size(const void *ptr)
-{
-	if (!ptr) return 0;
+AddrSize aligned_malloc_size(const void *ptr) {
+	if (!ptr) 
+		return 0;
 #if defined(RAD_OPT_MEMGUARD) // check over/under guards
 	details::CheckMemGuards(const_cast<void*>(ptr));
 #endif
