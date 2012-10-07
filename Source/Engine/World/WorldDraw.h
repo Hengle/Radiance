@@ -73,8 +73,8 @@ public:
 	virtual void SetWorldStates() = 0;
 	virtual void SetPerspectiveMatrix() = 0;
 	virtual void SetScreenLocalMatrix() = 0;
-	virtual void RotateForView(const ViewDef &view) = 0;
-	virtual void RotateForViewBasis() = 0;
+	virtual void RotateForCamera(const Camera &camera) = 0;
+	virtual void RotateForCameraBasis() = 0;
 	virtual void PushMatrix(const Vec3 &pos, const Vec3 &scale, const Vec3 &angles) = 0;
 	virtual void PopMatrix() = 0;
 	virtual void ReleaseArrayStates() = 0;

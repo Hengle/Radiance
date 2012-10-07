@@ -199,15 +199,6 @@ private:
 	static int lua_DrawCounters(lua_State *L);
 	static int lua_EnableWireframe(lua_State *L);
 	static int lua_EnableColorBufferClear(lua_State *L);
-	static int lua_AttachViewModel(lua_State *L);
-	static int lua_RemoveViewModel(lua_State *L);
-	static int lua_SetViewModelAngles(lua_State *L);
-	static int lua_SetViewModelScale(lua_State *L);
-	static int lua_SetViewModelVisible(lua_State *L);
-	static int lua_ViewModelVisible(lua_State *L);
-	static int lua_FadeViewModel(lua_State *L);
-	static int lua_ViewModelBonePos(lua_State *L);
-	static int lua_ViewModelFindBone(lua_State *L);
 	static int lua_CurrentDateAndTime(lua_State *L);
 	static int lua_QuitGame(lua_State *L);
 	static int lua_gnCreate(lua_State *L);

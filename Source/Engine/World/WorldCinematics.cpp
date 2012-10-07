@@ -74,7 +74,7 @@ int WorldCinematics::Spawn(
 				continue;
 
 			MBatchDraw::Ref batch(new SkActorBatch(actor, i, id));
-			m_world->draw->AddBatch(batch, true);
+//			m_world->draw->AddBatch(batch, true);
 		}
 
 		++m_spawnOfs;

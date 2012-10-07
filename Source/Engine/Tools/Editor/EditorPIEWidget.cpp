@@ -36,7 +36,7 @@ void PIEWidget::RunMap(int id)
 	m_game->SetViewport(0, 0, width(), height());
 
 	if (m_game->LoadEntry())
-		m_game->LoadMap(id, 0, world::UD_Slot, true, true);
+		m_game->LoadMap(id, 0, world::kUD_Slot, true, true);
 }
 
 void PIEWidget::wheelEvent(QWheelEvent *e)

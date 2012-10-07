@@ -87,13 +87,26 @@ private:
 	buffer *m_storage;
 };
 
-template <typename __unused__>
-struct stackify_container;
+//! Creates a version of the specified container which allocates memory from a buffer on the stack.
+/*! STL containers with a short lifetime or who only address a fixed number of elements may benefit
+    from performing allocations from a fixed size buffer located on the stack.
 
-#define STACKIFY_TYPE(_type, _name, _numElms) typedef stackify_container< _type >::container< _numElms >::Type _name
+	This specialization is limited to random access containers. If a containers size exceeds the
+	static limit specified (by TNumElms) then the container allocation moves to the heap.
 
-#define STACKIFY(_type, _var, _numElms) \
-	stack_allocator< stackify_container< _type >::ElementType, _numElms >::buffer _var##_storage; \
-	stackify_container< _type >::allocator< _numElms >::Type _var##_allocator(_var##_storage); \
-	stackify_container< _type >::container< _numElms >::Type _var(_var##_allocator); \
-	_var.reserve(_numElms)
+	Currently only std::vector is supported.
+
+	USAGE: \code{.cpp}
+
+	stackify< std::vector<int>, 1024 > StackInts;
+	StackInts ints;
+
+	for (int i = 0; i < 1024; ++i)
+		ints->push_back(1024);
+
+	\endcode
+
+	\sa StackVector.h
+*/
+template <typename TContainer, size_t TNumElms>
+class stackify;

@@ -37,7 +37,7 @@ public:
 	typedef zone_vector<Ref, ZWorldT>::type RefVec;
 	
 	MBatchDraw(int matId) : m_matId(matId) {}
-	virtual ~MBatchDraw();
+	virtual ~MBatchDraw() {}
 
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, matId, int);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, visible, bool);

@@ -28,39 +28,32 @@ enum {
 	OverlayDiv = 26
 };
 
-RB_WorldDraw::Ref RB_WorldDraw::New(World *world)
-{
+RB_WorldDraw::Ref RB_WorldDraw::New(World *world) {
 	return RB_WorldDraw::Ref(new (ZWorld) GLWorldDraw(world));
 }
 
 GLWorldDraw::GLWorldDraw(World *world) : RB_WorldDraw(world), 
-m_activeRT(-1), m_bank(0), m_clearColorBuffer(true), m_rtFB(false)
-{
+m_activeRT(-1), m_bank(0), m_clearColorBuffer(true), m_rtFB(false) {
 	m_overlaySize[0] = m_overlaySize[1] = 0;
 	m_rtSize[0] = m_rtSize[1] = 0;
 }
 
-GLWorldDraw::~GLWorldDraw()
-{
+GLWorldDraw::~GLWorldDraw() {
 }
 
-void GLWorldDraw::BeginFrame()
-{
+void GLWorldDraw::BeginFrame() {
 }
 
-void GLWorldDraw::EndFrame()
-{
+void GLWorldDraw::EndFrame() {
 	gls.invertCullFace = false;
 }
 
-void GLWorldDraw::ClearDepthBuffer()
-{
+void GLWorldDraw::ClearDepthBuffer() {
 	gls.Set(DWM_Enable, -1, true); // for glClear()
 	glClear(GL_DEPTH_BUFFER_BIT);
 }
 
-void GLWorldDraw::ClearBackBuffer()
-{
+void GLWorldDraw::ClearBackBuffer() {
 	gls.Set(DWM_Enable, -1, true); // for glClear()
 	
 #if defined(RAD_OPT_IOS)
@@ -73,38 +66,32 @@ void GLWorldDraw::ClearBackBuffer()
 		glClear(GL_DEPTH_BUFFER_BIT);
 }
 
-void GLWorldDraw::RAD_IMPLEMENT_SET(clearColorBuffer)(bool value)
-{
+void GLWorldDraw::RAD_IMPLEMENT_SET(clearColorBuffer)(bool value) {
 	m_clearColorBuffer = value;
 }
 
-int GLWorldDraw::LoadMaterials()
-{
+int GLWorldDraw::LoadMaterials() {
 	return pkg::SR_Success;
 }
 
-int GLWorldDraw::Precache()
-{
+int GLWorldDraw::Precache() {
 	CreateScreenOverlay();
 	BindRenderTarget();
 	BindPostFXTargets(false);
 	return pkg::SR_Success;
 }
 
-void GLWorldDraw::BindRenderTarget()
-{
+void GLWorldDraw::BindRenderTarget() {
 	int vpx, vpy, vpw, vph;
 	world->game->Viewport(vpx, vpy, vpw, vph);
 
-	m_bank = (m_bank+1)%NumBanks;
+	m_bank = (m_bank+1)%kNumBanks;
 
-	if (vpw != m_rtSize[0] || vph != m_rtSize[1])
-	{
+	if (vpw != m_rtSize[0] || vph != m_rtSize[1]) {
 		m_rtSize[0] = vpw;
 		m_rtSize[1] = vph;
 		
-		for (int i = 0; i < NumBanks; ++i)
-		{
+		for (int i = 0; i < kNumBanks; ++i) {
 			m_rts[i][0].reset(new GLRenderTarget(
 				GL_TEXTURE_2D,
 				GL_RGBA,
@@ -121,8 +108,7 @@ void GLWorldDraw::BindRenderTarget()
 				TX_Filter
 			));
 
-			for (int k = 1; k < NumRTs; ++k)
-			{
+			for (int k = 1; k < kNumRTs; ++k) {
 				m_rts[i][k].reset(new GLRenderTarget(
 					GL_TEXTURE_2D,
 					GL_RGBA,
@@ -155,8 +141,7 @@ void GLWorldDraw::BindRenderTarget()
 	m_rtFB = true;
 }
 
-void GLWorldDraw::BindRTFB(int num)
-{
+void GLWorldDraw::BindRTFB(int num) {
 	GLuint fb = m_rts[m_bank][num]->id[0];
 	gls.BindBuffer(GL_FRAMEBUFFER_EXT, fb);
 	CHECK_GL_ERRORS();
@@ -169,17 +154,14 @@ void GLWorldDraw::BindRTFB(int num)
 	CHECK_GL_ERRORS();
 }
 
-void GLWorldDraw::BindRTTX(int num)
-{
-	for (int i = 0; i < MTS_MaxIndices; ++i)
-	{
+void GLWorldDraw::BindRTTX(int num) {
+	for (int i = 0; i < MTS_MaxIndices; ++i) {
 		if (!gls.MTSource(MTS_Texture, i))
 			gls.SetMTSource(MTS_Texture, i, m_rts[m_bank][num]->tex);
 	}
 }
 
-void GLWorldDraw::SetScreenLocalMatrix()
-{
+void GLWorldDraw::SetScreenLocalMatrix() {
 	gl.MatrixMode(GL_PROJECTION);
 	gl.LoadIdentity();
 
@@ -192,8 +174,7 @@ void GLWorldDraw::SetScreenLocalMatrix()
 	gl.LoadIdentity();
 }
 
-void GLWorldDraw::SetPerspectiveMatrix()
-{
+void GLWorldDraw::SetPerspectiveMatrix() {
 	gl.MatrixMode(GL_PROJECTION);
 	gl.LoadIdentity();
 
@@ -213,15 +194,14 @@ void GLWorldDraw::SetPerspectiveMatrix()
 
 	gl.Perspective(yfov, xaspect, 4.0, world->camera->farClip.get());
 
-	if (m_rtFB)
-	{ // render target tc's are flipped about Y, so correct for this in the perspective transform.
+	if (m_rtFB) { 
+		// render target tc's are flipped about Y, so correct for this in the perspective transform.
 		gl.Scalef(1.f, -1.f, 1.f);
 		gls.invertCullFace = true;
 	}
 }
 
-void RotateForDebugCamera()
-{
+void RotateForDebugCamera() {
 	gl.MatrixMode(GL_MODELVIEW);
 	gl.LoadIdentity();
 	gl.Rotatef(-90, 1, 0, 0);	    // put Z going up
@@ -235,40 +215,31 @@ void RotateForDebugCamera()
 	gl.Translatef(-pos.X(), -pos.Y(), -pos.Z());
 }
 
-void GLWorldDraw::RotateForCamera()
-{
-	gl.MatrixMode(GL_MODELVIEW);
-	gl.LoadIdentity();
-	gl.Rotatef(-90, 1, 0, 0);	    // put Z going up
-    gl.Rotatef( 90, 0, 0, 1);	    // put Z going up
+void GLWorldDraw::RotateForCamera(const Camera &camera) {
+	RotateForCameraBasis();
 
-	if (world->camera->quatMode)
-	{
-		Mat4 rot = Mat4::Rotation(world->camera->rot.get());
+	if (camera.quatMode) {
+		Mat4 rot = Mat4::Rotation(camera.rot.get());
 		gl.MultMatrix(rot);
-	}
-	else
-	{
-		const Vec3 &angles = world->camera->angles;
+	} else {
+		const Vec3 &angles = camera.angles;
 		gl.Rotatef(-angles.X(), 1, 0, 0);
 		gl.Rotatef(-angles.Y(), 0, 1, 0);
 		gl.Rotatef(-angles.Z(), 0, 0, 1);
 	}
 
-	const Vec3 &pos = world->camera->pos;
+	const Vec3 &pos = camera.pos;
 	gl.Translatef(-pos.X(), -pos.Y(), -pos.Z());
 }
 
-void GLWorldDraw::RotateForCameraBasis()
-{
+void GLWorldDraw::RotateForCameraBasis() {
 	gl.MatrixMode(GL_MODELVIEW);
 	gl.LoadIdentity();
 	gl.Rotatef(-90, 1, 0, 0);	    // put Z going up
     gl.Rotatef( 90, 0, 0, 1);	    // put Z going up
 }
 
-void GLWorldDraw::PushMatrix(const Vec3 &pos, const Vec3 &scale, const Vec3 &angles)
-{
+void GLWorldDraw::PushMatrix(const Vec3 &pos, const Vec3 &scale, const Vec3 &angles) {
 	gl.PushMatrix();
 	gl.Translatef(pos.X(), pos.Y(), pos.Z());
 	gl.Rotatef(angles.Z(), 0, 0, 1);
@@ -277,32 +248,26 @@ void GLWorldDraw::PushMatrix(const Vec3 &pos, const Vec3 &scale, const Vec3 &ang
 	gl.Scalef(scale.X(), scale.Y(), scale.Z());
 }
 
-void GLWorldDraw::PopMatrix()
-{
+void GLWorldDraw::PopMatrix() {
 	gl.PopMatrix();
 }
 
-void GLWorldDraw::ReleaseArrayStates()
-{
+void GLWorldDraw::ReleaseArrayStates() {
 	if (gl.vbos&&gl.vaos)
 		gls.BindVertexArray(GLVertexArrayRef());
 }
 
-void GLWorldDraw::SetWorldStates()
-{
+void GLWorldDraw::SetWorldStates() {
 }
 
-void GLWorldDraw::BindPostFXTargets(bool chain)
-{
-	if (chain)
-	{
-		int d = (m_activeRT+1)%NumRTs;
+void GLWorldDraw::BindPostFXTargets(bool chain) {
+	if (chain) {
+		int d = (m_activeRT+1)%kNumRTs;
 		BindRTFB(d);
 		BindRTTX(m_activeRT);
 		m_activeRT = d;
-	}
-	else
-	{ // write to frame buffer
+	} else { 
+		// write to frame buffer
 		int vpx, vpy, vpw, vph;
 		world->game->Viewport(vpx, vpy, vpw, vph);
 
@@ -316,14 +281,12 @@ void GLWorldDraw::BindPostFXTargets(bool chain)
 	}
 }
 
-void GLWorldDraw::CreateScreenOverlay()
-{
+void GLWorldDraw::CreateScreenOverlay() {
 	int vpx, vpy, vpw, vph;
 	world->game->Viewport(vpx, vpy, vpw, vph);
 
 	if (vpw != m_overlaySize[0] ||
-		vph != m_overlaySize[1])
-	{
+		vph != m_overlaySize[1]) {
 		RAD_ASSERT(vpw&&vph);
 		CreateOverlay(vpw, vph, m_overlayVB[0], m_overlayIB[0], false);
 		CreateOverlay(vpw, vph, m_overlayVB[1], m_overlayIB[1], true);
@@ -332,8 +295,7 @@ void GLWorldDraw::CreateScreenOverlay()
 	}
 }
 
-void GLWorldDraw::BindPostFXQuad()
-{
+void GLWorldDraw::BindPostFXQuad() {
 	CreateScreenOverlay();
 	RAD_ASSERT(m_overlayVB);
 	RAD_ASSERT(m_overlayIB);
@@ -367,14 +329,12 @@ void GLWorldDraw::BindPostFXQuad()
 	);
 }
 
-void GLWorldDraw::DrawPostFXQuad()
-{
+void GLWorldDraw::DrawPostFXQuad() {
 	gl.DrawElements(GL_TRIANGLES, (OverlayDiv-1)*(OverlayDiv-1)*6, GL_UNSIGNED_SHORT, 0);
 	CHECK_GL_ERRORS();
 }
 
-void GLWorldDraw::BindOverlay()
-{
+void GLWorldDraw::BindOverlay() {
 	BOOST_STATIC_ASSERT(sizeof(GLWorldDraw::OverlayVert)==16);
 	
 	CreateScreenOverlay();
@@ -414,8 +374,7 @@ void GLWorldDraw::BindOverlay()
 	);
 }
 
-void GLWorldDraw::DrawOverlay()
-{
+void GLWorldDraw::DrawOverlay() {
 	gl.DrawElements(GL_TRIANGLES, (OverlayDiv-1)*(OverlayDiv-1)*6, GL_UNSIGNED_SHORT, 0);
 	CHECK_GL_ERRORS();
 }
@@ -426,8 +385,7 @@ void GLWorldDraw::CreateOverlay(
 	GLVertexBuffer::Ref &_vb,
 	GLVertexBuffer::Ref &_ib,
 	bool invY
-)
-{
+) {
 	_vb.reset(
 		new GLVertexBuffer(
 			GL_ARRAY_BUFFER_ARB, 
@@ -448,10 +406,8 @@ void GLWorldDraw::CreateOverlay(
 	int x, y;
 	float xf, yf;
 
-	for (y = 0, yf = 0.f; y < OverlayDiv; ++y, yf += yInc)
-	{
-		for (x = 0, xf = 0.f; x < OverlayDiv; ++x, xf += xInc)
-		{
+	for (y = 0, yf = 0.f; y < OverlayDiv; ++y, yf += yInc) {
+		for (x = 0, xf = 0.f; x < OverlayDiv; ++x, xf += xInc) {
 			OverlayVert &v = verts[y*OverlayDiv+x];
 			v.xy[0] = xf;
 			v.xy[1] = yf;
@@ -480,10 +436,8 @@ void GLWorldDraw::CreateOverlay(
 	RAD_ASSERT(vb);
 	U16 *indices = (U16*)vb->ptr.get();
 
-	for (y = 0; y < OverlayDiv-1; ++y)
-	{
-		for (x = 0; x < OverlayDiv-1; ++x)
-		{
+	for (y = 0; y < OverlayDiv-1; ++y) {
+		for (x = 0; x < OverlayDiv-1; ++x) {
 			U16 *idx = &indices[y*(OverlayDiv-1)*6+x*6];
 
 			// glOrtho() inverts the +Z axis (or -Z can't recall), inverting the 
@@ -503,18 +457,15 @@ void GLWorldDraw::CreateOverlay(
 	vb.reset(); // unmap
 }
 
-void GLWorldDraw::CommitStates()
-{
+void GLWorldDraw::CommitStates() {
 	App::Get()->engine->sys->r->CommitStates();
 }
 
-void GLWorldDraw::Finish()
-{
+void GLWorldDraw::Finish() {
 	gls.Set(DWM_Enable, -1, true); // for glClear()
 }
 
-bool GLWorldDraw::Project(const Vec3 &p, Vec3 &out)
-{
+bool GLWorldDraw::Project(const Vec3 &p, Vec3 &out) {
 	int viewport[4];
 	world->game->Viewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
@@ -527,7 +478,7 @@ bool GLWorldDraw::Project(const Vec3 &p, Vec3 &out)
 	m_rtFB = false;
 	
 	SetPerspectiveMatrix();
-	RotateForCamera();
+	RotateForCamera(*world->camera.get());
 
 	m_rtFB = tempRTFB;
 	
@@ -560,7 +511,7 @@ Vec3 GLWorldDraw::Unproject(const Vec3 &p)
 	m_rtFB = false;
 	
 	SetPerspectiveMatrix();
-	RotateForCamera();
+	RotateForCamera(*world->camera.get());
 	
 	m_rtFB = tempRTFB;
 

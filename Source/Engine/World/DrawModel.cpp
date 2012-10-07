@@ -121,8 +121,8 @@ MeshDrawModel::Ref MeshDrawModel::New(
 	r->m_mesh = m;
 
 	Batch::Ref b(new (ZWorld) Batch(*r, m, matId));
-	if (!draw.AddBatch(boost::static_pointer_cast<MBatchDraw>(b)))
-		return Ref();
+//	if (!draw.AddBatch(boost::static_pointer_cast<MBatchDraw>(b)))
+//		return Ref();
 
 	r->RefBatch(b);
 	return r;
@@ -175,8 +175,8 @@ MeshBundleDrawModel::Ref MeshBundleDrawModel::New(
 	for (int i = 0; i < bundle->numMeshes; ++i)
 	{
 		Batch::Ref b(new (ZWorld) Batch(*r, bundle->Mesh(i), bundle->MaterialAsset(i)->id));
-		if (!draw.AddBatch(boost::static_pointer_cast<MBatchDraw>(b)))
-			return Ref();
+//		if (!draw.AddBatch(boost::static_pointer_cast<MBatchDraw>(b)))
+//			return Ref();
 
 		r->RefBatch(b);
 	}
@@ -238,8 +238,8 @@ SkMeshDrawModel::Ref SkMeshDrawModel::New(
 			continue;
 
 		Batch::Ref b(new (ZWorld) Batch(*r, m, i, material->id));
-		if (!draw.AddBatch(boost::static_pointer_cast<MBatchDraw>(b)))
-			continue;
+//		if (!draw.AddBatch(boost::static_pointer_cast<MBatchDraw>(b)))
+//			continue;
 
 		r->RefBatch(b);
 	}

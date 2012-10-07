@@ -119,8 +119,8 @@ public:
 	*/
 	bool OccupantVolumeCanSeeArea(
 		const Vec3 &pos,
-		const StackWindingVec &volume,
-		StackClippedAreaVolumeVec *clipped,
+		const StackWindingStackVec &volume,
+		ClippedAreaVolumeStackVec *clipped,
 		int fromArea,
 		int toArea,
 		AreaBits &visible
@@ -259,7 +259,7 @@ private:
 		LinkEntityParms(
 			Entity *_entity,
 			const BBox &_bounds,
-			const StackWindingVec &_bbox,
+			const StackWindingStackVec &_bbox,
 			AreaBits &_tested,
 			AreaBits &_visible
 		) : entity(_entity),
@@ -271,7 +271,7 @@ private:
 
 		Entity *entity;
 		const BBox &bounds;
-		const StackWindingVec &bbox;
+		const StackWindingStackVec &bbox;
 		AreaBits &tested;
 		AreaBits &visible;
 	};
@@ -282,7 +282,7 @@ private:
 
 		OccupantVolumeClipParms(
 			const Vec3 &_pos,
-			StackClippedAreaVolumeVec *_clipped,
+			ClippedAreaVolumeStackVec *_clipped,
 			int _toArea,
 			AreaBits &_visible,
 			AreaBits &_stack
@@ -294,7 +294,7 @@ private:
 		}
 		
 		const Vec3 &pos;
-		StackClippedAreaVolumeVec *clipped;
+		ClippedAreaVolumeStackVec *clipped;
 		int toArea;
 		AreaBits &visible;
 		AreaBits &stack;
@@ -302,19 +302,19 @@ private:
 
 	bool OccupantVolumeCanSeeArea(
 		const OccupantVolumeClipParms &constArgs,
-		const StackWindingVec &volume,
+		const StackWindingStackVec &volume,
 		int fromArea
 	);
 
 	dBSPLeaf *LeafForPoint(const Vec3 &pos);
 	dBSPLeaf *LeafForPoint(const Vec3 &pos, int nodeNum);
 
-	static void BoundWindings(const BBox &bounds, StackWindingVec &windings);
-	static bool ChopWindingToVolume(const StackWindingVec &volume, StackWinding &out);
-	static bool ChopVolume(StackWindingVec &volume, const Plane &p);
-	static bool ChopVolume(StackWindingVec &volume, const PlaneVec &planes);
-	static bool IntersectVolumes(const StackWindingVec &a, StackWindingVec &out);
-	static void MakeVolume(const Plane *planes, int num, StackWindingVec &volume);
+	static void BoundWindings(const BBox &bounds, StackWindingStackVec &windings);
+	static bool ChopWindingToVolume(const StackWindingStackVec &volume, StackWinding &out);
+	static bool ChopVolume(StackWindingStackVec &volume, const Plane &p);
+	static bool ChopVolume(StackWindingStackVec &volume, const PlaneVec &planes);
+	static bool IntersectVolumes(const StackWindingStackVec &a, StackWindingStackVec &out);
+	static void MakeVolume(const Plane *planes, int num, StackWindingStackVec &volume);
 	static void MakeBoundingPlanes(const Vec3 &pos, const StackWinding &portal, PlaneVec &planes);
 
 	void BBoxTouching(

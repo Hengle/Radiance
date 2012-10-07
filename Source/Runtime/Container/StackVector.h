@@ -9,18 +9,52 @@
 #include <vector>
 #include "StackContainer.h"
 
-// Use the STACKIFY macro: STACKIFY(std::vector<int>, intVec, 1024);
-template <typename T, typename A>
-struct stackify_container< std::vector<T, A> > {
-	typedef T ElementType;
-	
-	template <size_t TNumElms>
-	struct allocator {
-		typedef typename stack_allocator<T, TNumElms> Type;
-	};
+template <typename T, typename A, size_t TNumElms>
+class stackify< std::vector<T, A>, TNumElms > {
+public:
+	typedef stack_allocator<T, TNumElms> allocator_type;
+	typedef std::vector<T, allocator_type> container_type;
+	typedef stackify< std::vector<T, A>, TNumElms > self_type;
+	typedef typename container_type::iterator iterator;
+	typedef typename container_type::const_iterator const_iterator;
+	typedef typename container_type::pointer pointer;
+	typedef typename container_type::difference_type difference_type;
+	typedef typename container_type::const_pointer const_pointer;
+	typedef typename container_type::const_reference const_reference;
 
-	template <size_t TNumElms>
-	struct container {
-		typedef std::vector<T, typename allocator<TNumElms>::Type> Type;
-	};
+	stackify() : m_allocator(m_storage), m_container(m_allocator) {
+		m_container.reserve(TNumElms);
+	}
+
+	stackify(const self_type &other) : m_allocator(m_storage), m_container(m_allocator) {
+		m_container.reserve(TNumElms);
+		m_container = other.m_container;
+	}
+
+	stackify(typename container_type::const_iterator first, typename container_type::const_iterator last) : m_allocator(m_storage), m_container(m_allocator) {
+		m_container.reserve(TNumElms);
+		while (first < last) {
+			m_container.push_back(*first);
+			++first;
+		}
+	}
+
+	container_type * operator -> () {
+		return &m_container;
+	}
+
+	const container_type * operator -> () const {
+		return &m_container;
+	}
+
+	self_type &operator = (const self_type &other) {
+		m_container = other.m_container;
+		return *this;
+	}
+	
+private:
+
+	typename allocator_type::buffer m_storage;
+	allocator_type m_allocator;
+	container_type m_container;
 };

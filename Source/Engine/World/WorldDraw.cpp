@@ -402,7 +402,7 @@ void WorldDraw::SetupFrustumPlanes(ViewDef &view) {
 	}
 }
 
-void WorldDraw::VisMark(ViewDef &view, int nodeNum) {
+/*void WorldDraw::VisMark(ViewDef &view, int nodeNum) {
 
 	RAD_ASSERT(view.areaLeaf);
 
@@ -434,7 +434,7 @@ void WorldDraw::VisMark(ViewDef &view, int nodeNum) {
 
 	VisMark(view, node.children[0]);
 	VisMark(view, node.children[1]);
-}
+}*/
 
 bool WorldDraw::ClipBounds(const ViewDef &view, const BBox &bounds) {
 	if (bounds.Contains(view.camera.pos, 1.f))
@@ -458,12 +458,12 @@ void WorldDraw::DrawView() {
 	FindViewArea(view);
 	SetupFrustumPlanes(view);
 
-	if (m_nodes.empty())
-		VisMark(view, -1); // one leaf
-	else
-		VisMark(view, 0);
+	//if (m_nodes.empty())
+	//	VisMark(view, -1); // one leaf
+	//else
+	//	VisMark(view, 0);
 
-	m_rb->RotateForView(view);
+	m_rb->RotateForCamera(view.camera);
 	m_rb->SetWorldStates();
 
 	m_rb->numTris = 0;
@@ -607,7 +607,7 @@ void WorldDraw::LinkEntity(Entity *entity, const BBox &bounds) {
 	if (m_nodes.empty()) {
 		LinkEntity(entity, bounds, -1);
 	} else {
-		StackWindingVec bbox;
+		/*StackWindingVec bbox;
 		m_world->BoundWindings(bounds, bbox);
 
 		AreaBits visibleAreas;
@@ -626,7 +626,7 @@ void WorldDraw::LinkEntity(Entity *entity, const BBox &bounds) {
 				const bsp_file::BSPArea *area = m_world->m_bsp->Areas() + i;
 				LinkEntity(entity, bounds, area->rootNode);
 			}
-		}
+		}*/
 	}
 }
 
@@ -652,7 +652,7 @@ void WorldDraw::LinkEntity(Entity *entity, const BBox &bounds, int nodeNum) {
 
 	RAD_ASSERT(nodeNum < (int)m_nodes.size());
 	const dBSPAreaNode &node = m_nodes[nodeNum];
-	RAD_ASSERT(node.planenum < (int)m_planes.size());
+	RAD_ASSERT(node.planenum < (int)m_world->m_planes.size());
 	const Plane &p = m_world->m_planes[node.planenum];
 
 	Plane::SideType side = p.Side(bounds, 0.0f);
@@ -666,7 +666,7 @@ void WorldDraw::LinkEntity(Entity *entity, const BBox &bounds, int nodeNum) {
 dBSPAreaLeaf *WorldDraw::LeafForPoint(const Vec3 &pos, int areaNum) {
 	if (m_nodes.empty())
 		return &m_leafs[0];
-	RAD_ASSERT(area < (int)m_world->m_bsp->numAreaNodes.get());
+	RAD_ASSERT(areaNum < (int)m_world->m_bsp->numAreaNodes.get());
 	const bsp_file::BSPArea *area = m_world->m_bsp->Areas() + areaNum;
 	return LeafForPoint(pos, area->rootNode);
 }

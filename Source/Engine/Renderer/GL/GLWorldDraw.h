@@ -30,7 +30,7 @@ public:
 	virtual void SetWorldStates();
 	virtual void SetPerspectiveMatrix();
 	virtual void SetScreenLocalMatrix();
-	virtual void RotateForCamera();
+	virtual void RotateForCamera(const Camera &camera);
 	virtual void RotateForCameraBasis();
 	virtual void PushMatrix(const Vec3 &pos, const Vec3 &scale, const Vec3 &angles);
 	virtual void PopMatrix();
@@ -60,10 +60,9 @@ protected:
 
 private:
 
-	enum
-	{
-		NumRTs = 2,
-		NumBanks = 1
+	enum {
+		kNumRTs = 2,
+		kNumBanks = 1
 	};
 
 	void CreateScreenOverlay();
@@ -72,12 +71,11 @@ private:
 	int m_activeRT;
 	int m_rtSize[2];
 	bool m_rtFB;
-	boost::array<boost::array<r::GLRenderTarget::Ref, NumRTs>, NumBanks> m_rts;
+	boost::array<boost::array<r::GLRenderTarget::Ref, kNumRTs>, kNumBanks> m_rts;
 	void BindRTFB(int num);
 	void BindRTTX(int num);
 
-	struct OverlayVert
-	{
+	struct OverlayVert {
 		float xy[2];
 		float st[2];
 	};

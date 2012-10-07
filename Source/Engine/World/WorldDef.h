@@ -44,12 +44,11 @@ typedef std::bitset<kMaxEnts> EntityBits;
 typedef std::bitset<kMaxAreas> AreaBits;
 typedef math::Winding<Vec3, Plane, zone_allocator<Vec3, ZWorldT> > Winding;
 typedef zone_vector<Winding, ZWorldT>::type WindingVec;
-typedef math::Winding<Vec3, Plane, math::stack_tag<16> > StackWinding;
+typedef math::Winding<Vec3, Plane, math::stack_tag<8> > StackWinding;
 typedef zone_vector<StackWinding, ZWorldT>::type StackWindingVec;
-typedef std::pair<int, StackWindingVec> ClippedAreaVolume;
-typedef zone_vector<ClippedAreaVolume, ZWorldT>::type ClippedAreaVolumeVec;
-
-STACKIFY_TYPE(ClippedAreaVolumeVec, StackClippedAreaVolumeVec, 8);
+typedef stackify<StackWindingVec, 8> StackWindingStackVec;
+typedef std::pair<int, StackWindingStackVec> ClippedAreaVolume;
+typedef stackify< std::vector<ClippedAreaVolume>, 8 > ClippedAreaVolumeStackVec;
 
 struct dBSPNode {
 	typedef zone_vector<dBSPNode, ZWorldT>::type Vec;

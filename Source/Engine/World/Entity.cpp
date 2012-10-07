@@ -264,11 +264,11 @@ void Entity::PrivateTick(
 
 void Entity::TickViewModels(float dt)
 {
-	for (ViewModel::Map::const_iterator it = m_models.begin(); it != m_models.end(); ++it)
+	for (DrawModel::Map::const_iterator it = m_models.begin(); it != m_models.end(); ++it)
 	{
 		it->second->Tick(App::Get()->time, dt);
 
-		SkMeshViewModel::Ref skMesh(boost::dynamic_pointer_cast<SkMeshViewModel>(it->second));
+		SkMeshDrawModel::Ref skMesh(boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second));
 		if (skMesh)
 		{
 			m_psv.motion = skMesh->motion;
@@ -412,6 +412,13 @@ bool Entity::PrivateHandleEvent(const Event::Ref &event)
 	return HandleEvent(event);
 }
 
+void Entity::Link() {
+}
+	
+void Entity::Unlink() {
+}
+
+
 World *Entity::RAD_IMPLEMENT_GET(world)
 {
 	ZoneTagRef tag = m_zoneTag.lock();
@@ -485,12 +492,12 @@ void Entity::PushCallTable(lua_State *L)
 	LUART_REGISTER_GETSET(L, NextThink);
 }
 
-void Entity::AttachViewModel(const ViewModel::Ref &ref)
+void Entity::AttachDrawModel(const DrawModel::Ref &ref)
 {
 	m_models[ref.get()] = ref;
 }
 
-void Entity::RemoveViewModel(const ViewModel::Ref &ref)
+void Entity::RemoveDrawModel(const DrawModel::Ref &ref)
 {
 	m_models.erase(ref.get());
 }
@@ -669,22 +676,22 @@ int Entity::lua_AttachViewModel(lua_State *L)
 		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
 		if (skModel)
 		{ // is there already a view model with this attached?
-			ViewModel::Map::const_iterator it = self->m_models.begin();
+			DrawModel::Map::const_iterator it = self->m_models.begin();
 			for(;it != self->m_models.end(); ++it)
 			{
-				SkMeshViewModel::Ref r = boost::dynamic_pointer_cast<SkMeshViewModel>(it->second);
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
 				if (r && r->mesh.get().get() == skModel->mesh.get().get())
 					break;
 			}
 			if (it == self->m_models.end())
 			{ // nope, create it
-				SkMeshViewModel::Ref r = SkMeshViewModel::New(
+				SkMeshDrawModel::Ref r = SkMeshDrawModel::New(
 					*self->world->draw.get(),
 					self, 
 					skModel->mesh
 				);
 				if (r)
-					self->AttachViewModel(boost::static_pointer_cast<ViewModel>(r));
+					self->AttachDrawModel(boost::static_pointer_cast<DrawModel>(r));
 			}
 
 			return 0;
@@ -694,22 +701,22 @@ int Entity::lua_AttachViewModel(lua_State *L)
 		D_Mesh::Ref dmesh = lua::SharedPtr::Get<D_Mesh>(L, "D_Mesh", 2, false);
 		if (dmesh)
 		{ // already a view model with this attached?
-			ViewModel::Map::const_iterator it = self->m_models.begin();
+			DrawModel::Map::const_iterator it = self->m_models.begin();
 			for (;it != self->m_models.end(); ++it)
 			{
-				MeshBundleViewModel::Ref r = boost::dynamic_pointer_cast<MeshBundleViewModel>(it->second);
+				MeshBundleDrawModel::Ref r = boost::dynamic_pointer_cast<MeshBundleDrawModel>(it->second);
 				if (r && r->bundle.get().get() == dmesh->bundle.get().get())
 					break;
 			}
 			if (it == self->m_models.end())
 			{ // create bundle
-				MeshBundleViewModel::Ref r = MeshBundleViewModel::New(
+				MeshBundleDrawModel::Ref r = MeshBundleDrawModel::New(
 					*self->world->draw.get(), 
 					self, 
 					dmesh->bundle
 				);
 				if (r)
-					self->AttachViewModel(boost::static_pointer_cast<ViewModel>(r));
+					self->AttachDrawModel(boost::static_pointer_cast<DrawModel>(r));
 			}
 
 			return 0;
@@ -728,12 +735,12 @@ int Entity::lua_RemoveViewModel(lua_State *L)
 		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
 		if (skModel)
 		{ // is there a view model with this attached?
-			for (ViewModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
 			{
-				SkMeshViewModel::Ref r = boost::dynamic_pointer_cast<SkMeshViewModel>(it->second);
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
 				if (r && r->mesh.get().get() == skModel->mesh.get().get())
 				{
-					self->RemoveViewModel(boost::static_pointer_cast<ViewModel>(r));
+					self->RemoveDrawModel(boost::static_pointer_cast<DrawModel>(r));
 					break;
 				}
 			}
@@ -745,13 +752,13 @@ int Entity::lua_RemoveViewModel(lua_State *L)
 		D_Mesh::Ref dmesh = lua::SharedPtr::Get<D_Mesh>(L, "D_Mesh", 2, false);
 		if (dmesh)
 		{ // already a view model with this attached?
-			ViewModel::Map::const_iterator it = self->m_models.begin();
+			DrawModel::Map::const_iterator it = self->m_models.begin();
 			for (;it != self->m_models.end(); ++it)
 			{
-				MeshBundleViewModel::Ref r = boost::dynamic_pointer_cast<MeshBundleViewModel>(it->second);
+				MeshBundleDrawModel::Ref r = boost::dynamic_pointer_cast<MeshBundleDrawModel>(it->second);
 				if (r && r->bundle.get().get() == dmesh->bundle.get().get())
 				{
-					self->RemoveViewModel(boost::static_pointer_cast<ViewModel>(r));
+					self->RemoveDrawModel(boost::static_pointer_cast<DrawModel>(r));
 					break;
 				}
 			}
@@ -773,9 +780,9 @@ int Entity::lua_SetViewModelAngles(lua_State *L)
 		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
 		if (skModel)
 		{ // is there a view controller with this attached?
-			for (ViewModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
 			{
-				SkMeshViewModel::Ref r = boost::dynamic_pointer_cast<SkMeshViewModel>(it->second);
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
 				if (r && r->mesh.get().get() == skModel->mesh.get().get())
 				{
 					r->angles = angles;
@@ -790,10 +797,10 @@ int Entity::lua_SetViewModelAngles(lua_State *L)
 		D_Mesh::Ref dmesh = lua::SharedPtr::Get<D_Mesh>(L, "D_Mesh", 2, false);
 		if (dmesh)
 		{ // already a view model with this attached?
-			ViewModel::Map::const_iterator it = self->m_models.begin();
+			DrawModel::Map::const_iterator it = self->m_models.begin();
 			for (;it != self->m_models.end(); ++it)
 			{
-				MeshBundleViewModel::Ref r = boost::dynamic_pointer_cast<MeshBundleViewModel>(it->second);
+				MeshBundleDrawModel::Ref r = boost::dynamic_pointer_cast<MeshBundleDrawModel>(it->second);
 				if (r && r->bundle.get().get() == dmesh->bundle.get().get())
 				{
 					r->angles = angles;
@@ -821,9 +828,9 @@ int Entity::lua_SetViewModelMotionType(lua_State *L)
 		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
 		if (skModel)
 		{ // is there a view controller with this attached?
-			for (ViewModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
 			{
-				SkMeshViewModel::Ref r = boost::dynamic_pointer_cast<SkMeshViewModel>(it->second);
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
 				if (r && r->mesh.get().get() == skModel->mesh.get().get())
 				{
 					r->motionType = (ska::Ska::MotionType)motionType;
@@ -848,9 +855,9 @@ int Entity::lua_SetViewModelScale(lua_State *L)
 		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
 		if (skModel)
 		{ // is there a view controller with this attached?
-			for (ViewModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
 			{
-				SkMeshViewModel::Ref r = boost::dynamic_pointer_cast<SkMeshViewModel>(it->second);
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
 				if (r && r->mesh.get().get() == skModel->mesh.get().get())
 				{
 					r->scale = scale;
@@ -865,10 +872,10 @@ int Entity::lua_SetViewModelScale(lua_State *L)
 		D_Mesh::Ref dmesh = lua::SharedPtr::Get<D_Mesh>(L, "D_Mesh", 2, false);
 		if (dmesh)
 		{ // already a view model with this attached?
-			ViewModel::Map::const_iterator it = self->m_models.begin();
+			DrawModel::Map::const_iterator it = self->m_models.begin();
 			for (;it != self->m_models.end(); ++it)
 			{
-				MeshBundleViewModel::Ref r = boost::dynamic_pointer_cast<MeshBundleViewModel>(it->second);
+				MeshBundleDrawModel::Ref r = boost::dynamic_pointer_cast<MeshBundleDrawModel>(it->second);
 				if (r && r->bundle.get().get() == dmesh->bundle.get().get())
 				{
 					r->scale = scale;
@@ -893,9 +900,9 @@ int Entity::lua_SetViewModelVisible(lua_State *L)
 		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
 		if (skModel)
 		{ // is there a view controller with this attached?
-			for (ViewModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
 			{
-				SkMeshViewModel::Ref r = boost::dynamic_pointer_cast<SkMeshViewModel>(it->second);
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
 				if (r && r->mesh.get().get() == skModel->mesh.get().get())
 				{
 					r->visible = visible;
@@ -910,10 +917,10 @@ int Entity::lua_SetViewModelVisible(lua_State *L)
 		D_Mesh::Ref dmesh = lua::SharedPtr::Get<D_Mesh>(L, "D_Mesh", 2, false);
 		if (dmesh)
 		{ // already a view model with this attached?
-			ViewModel::Map::const_iterator it = self->m_models.begin();
+			DrawModel::Map::const_iterator it = self->m_models.begin();
 			for (;it != self->m_models.end(); ++it)
 			{
-				MeshBundleViewModel::Ref r = boost::dynamic_pointer_cast<MeshBundleViewModel>(it->second);
+				MeshBundleDrawModel::Ref r = boost::dynamic_pointer_cast<MeshBundleDrawModel>(it->second);
 				if (r && r->bundle.get().get() == dmesh->bundle.get().get())
 				{
 					r->visible = visible;
@@ -937,9 +944,9 @@ int Entity::lua_ViewModelVisible(lua_State *L)
 		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
 		if (skModel)
 		{ // is there a view controller with this attached?
-			for (ViewModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
 			{
-				SkMeshViewModel::Ref r = boost::dynamic_pointer_cast<SkMeshViewModel>(it->second);
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
 				if (r && r->mesh.get().get() == skModel->mesh.get().get())
 				{
 					lua_pushboolean(L, r->visible ? 1 : 0);
@@ -954,10 +961,10 @@ int Entity::lua_ViewModelVisible(lua_State *L)
 		D_Mesh::Ref dmesh = lua::SharedPtr::Get<D_Mesh>(L, "D_Mesh", 2, false);
 		if (dmesh)
 		{ // already a view model with this attached?
-			ViewModel::Map::const_iterator it = self->m_models.begin();
+			DrawModel::Map::const_iterator it = self->m_models.begin();
 			for (;it != self->m_models.end(); ++it)
 			{
-				MeshBundleViewModel::Ref r = boost::dynamic_pointer_cast<MeshBundleViewModel>(it->second);
+				MeshBundleDrawModel::Ref r = boost::dynamic_pointer_cast<MeshBundleDrawModel>(it->second);
 				if (r && r->bundle.get().get() == dmesh->bundle.get().get())
 				{
 					lua_pushboolean(L, r->visible ? 1 : 0);
@@ -982,9 +989,9 @@ int Entity::lua_SetViewModelPos(lua_State *L)
 		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
 		if (skModel)
 		{ // is there a view controller with this attached?
-			for (ViewModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
 			{
-				SkMeshViewModel::Ref r = boost::dynamic_pointer_cast<SkMeshViewModel>(it->second);
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
 				if (r && r->mesh.get().get() == skModel->mesh.get().get())
 				{
 					r->pos = pos;
@@ -999,10 +1006,10 @@ int Entity::lua_SetViewModelPos(lua_State *L)
 		D_Mesh::Ref dmesh = lua::SharedPtr::Get<D_Mesh>(L, "D_Mesh", 2, false);
 		if (dmesh)
 		{ // already a view model with this attached?
-			ViewModel::Map::const_iterator it = self->m_models.begin();
+			DrawModel::Map::const_iterator it = self->m_models.begin();
 			for (;it != self->m_models.end(); ++it)
 			{
-				MeshBundleViewModel::Ref r = boost::dynamic_pointer_cast<MeshBundleViewModel>(it->second);
+				MeshBundleDrawModel::Ref r = boost::dynamic_pointer_cast<MeshBundleDrawModel>(it->second);
 				if (r && r->bundle.get().get() == dmesh->bundle.get().get())
 				{
 					r->pos = pos;
@@ -1026,9 +1033,9 @@ int Entity::lua_ViewModelPos(lua_State *L)
 		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
 		if (skModel)
 		{ // is there a view controller with this attached?
-			for (ViewModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
 			{
-				SkMeshViewModel::Ref r = boost::dynamic_pointer_cast<SkMeshViewModel>(it->second);
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
 				if (r && r->mesh.get().get() == skModel->mesh.get().get())
 				{
 					lua::Marshal<Vec3>::Push(L, r->pos);
@@ -1043,10 +1050,10 @@ int Entity::lua_ViewModelPos(lua_State *L)
 		D_Mesh::Ref dmesh = lua::SharedPtr::Get<D_Mesh>(L, "D_Mesh", 2, false);
 		if (dmesh)
 		{ // already a view model with this attached?
-			ViewModel::Map::const_iterator it = self->m_models.begin();
+			DrawModel::Map::const_iterator it = self->m_models.begin();
 			for (;it != self->m_models.end(); ++it)
 			{
-				MeshBundleViewModel::Ref r = boost::dynamic_pointer_cast<MeshBundleViewModel>(it->second);
+				MeshBundleDrawModel::Ref r = boost::dynamic_pointer_cast<MeshBundleDrawModel>(it->second);
 				if (r && r->bundle.get().get() == dmesh->bundle.get().get())
 				{
 					lua::Marshal<Vec3>::Push(L, r->pos);
@@ -1072,9 +1079,9 @@ int Entity::lua_FadeViewModel(lua_State *L)
 		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
 		if (skModel)
 		{ // is there a view controller with this attached?
-			for (ViewModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
 			{
-				SkMeshViewModel::Ref r = boost::dynamic_pointer_cast<SkMeshViewModel>(it->second);
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
 				if (r && r->mesh.get().get() == skModel->mesh.get().get())
 				{
 					r->Fade(rgba, time);
@@ -1089,10 +1096,10 @@ int Entity::lua_FadeViewModel(lua_State *L)
 		D_Mesh::Ref dmesh = lua::SharedPtr::Get<D_Mesh>(L, "D_Mesh", 2, false);
 		if (dmesh)
 		{ // already a view model with this attached?
-			ViewModel::Map::const_iterator it = self->m_models.begin();
+			DrawModel::Map::const_iterator it = self->m_models.begin();
 			for (;it != self->m_models.end(); ++it)
 			{
-				MeshBundleViewModel::Ref r = boost::dynamic_pointer_cast<MeshBundleViewModel>(it->second);
+				MeshBundleDrawModel::Ref r = boost::dynamic_pointer_cast<MeshBundleDrawModel>(it->second);
 				if (r && r->bundle.get().get() == dmesh->bundle.get().get())
 				{
 					r->Fade(rgba, time);
@@ -1117,9 +1124,9 @@ int Entity::lua_ViewModelBonePos(lua_State *L)
 		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
 		if (skModel)
 		{ // is there a view controller with this attached?
-			for (ViewModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
 			{
-				SkMeshViewModel::Ref r = boost::dynamic_pointer_cast<SkMeshViewModel>(it->second);
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
 				if (r && r->mesh.get().get() == skModel->mesh.get().get())
 				{
 					Vec3 p = r->BonePos(idx);
@@ -1143,9 +1150,9 @@ int Entity::lua_ViewModelFindBone(lua_State *L)
 		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
 		if (skModel)
 		{ // is there a view controller with this attached?
-			for (ViewModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
 			{
-				SkMeshViewModel::Ref r = boost::dynamic_pointer_cast<SkMeshViewModel>(it->second);
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
 				if (r && r->mesh.get().get() == skModel->mesh.get().get())
 				{
 					lua_pushinteger(L, r->mesh->ska->FindBone(name));
@@ -1167,9 +1174,9 @@ int Entity::lua_TickViewModel(lua_State *L)
 		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
 		if (skModel)
 		{ // is there a view controller with this attached?
-			for (ViewModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it)
 			{
-				SkMeshViewModel::Ref r = boost::dynamic_pointer_cast<SkMeshViewModel>(it->second);
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
 				if (r && r->mesh.get().get() == skModel->mesh.get().get())
 				{
 					r->Tick(App::Get()->time+0.001f, 0.001f);
@@ -1218,7 +1225,7 @@ int Entity::lua_Delete(lua_State *L)
 {
 	Entity *self = WorldLua::EntFramePtr(L, 1, true);
 
-	if (self->m_id < World::FirstTempEntId)
+	if (self->m_id < kFirstTempEntId)
 		luaL_error(L, "Illegal call to Delete() on non temporary entity!");
 
 	self->gc = true;

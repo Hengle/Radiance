@@ -40,7 +40,7 @@ m_pauseState(0),
 m_sound(sound),
 m_loadReq(false),
 m_loadScreen(false),
-m_unloadDisp(UD_None),
+m_unloadDisp(kUD_None),
 m_returnReq(false),
 m_slot(slot),
 m_switchReq(false),
@@ -218,7 +218,7 @@ void World::TickState(float dt, float unmod_dt) {
 
 	int pauseState = m_pauseState;
 
-	if (!(kPauseState&kPauseGame)) {
+	if (!(pauseState&kPauseGame)) {
 		if (m_levelStart) {
 			m_levelStart = false;
 			for (Entity::IdMap::const_iterator it = m_ents.begin(); it != m_ents.end(); ++it) {

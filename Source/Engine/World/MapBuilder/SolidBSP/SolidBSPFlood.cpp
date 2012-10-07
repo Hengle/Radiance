@@ -244,7 +244,7 @@ bool BSPBuilder::AreaFlood() {
 
 	if (world::kMaxAreas < (int)m_areas.size()) {
 		Log("ERROR: Map exceed area limit of %d areas (map has %d), contact a programmer to increase this limit.\n", world::kMaxAreas, m_areas.size());
-		SetResult(SR_CompilerError);
+		SetResult(pkg::SR_CompilerError);
 		return false;
 	}
 

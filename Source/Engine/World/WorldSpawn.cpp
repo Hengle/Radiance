@@ -698,7 +698,7 @@ void World::LoadBSP(const bsp_file::BSPFile &bsp) {
 		
 		verts.reserve(x->numVerts);
 
-		for (int k = 0; k < x->numVerts; ++k) {
+		for (int k = 0; k < (int)x->numVerts; ++k) {
 			const bsp_file::BSPVertex *v = bsp.Vertices() + x->firstVert + k;
 			verts.push_back(Vec3(v->v[0], v->v[1], v->v[2]));
 		}

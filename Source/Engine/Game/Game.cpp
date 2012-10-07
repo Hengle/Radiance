@@ -101,7 +101,7 @@ void Game::Tick(float dt)
 
 void Game::LoadMap(int id, int slot, world::UnloadDisposition ud, bool play, bool loadScreen)
 {
-	if (ud == world::UD_All)
+	if (ud == world::kUD_All)
 	{
 		App::Get()->engine->sys->r->UnbindStates();
 		m_maps.clear();
@@ -109,7 +109,7 @@ void Game::LoadMap(int id, int slot, world::UnloadDisposition ud, bool play, boo
 
 	MapSlot *s = &m_maps[slot];
 
-	if (ud == world::UD_Slot)
+	if (ud == world::kUD_Slot)
 	{
 		App::Get()->engine->sys->r->UnbindStates();
 		s->queue.clear();
@@ -147,15 +147,14 @@ bool Game::LoadMap(const char *name, int slot, world::UnloadDisposition ud, bool
 
 bool Game::LoadMapSeq(int id, int slot, world::UnloadDisposition ud, bool play)
 {
-	if (ud == world::UD_All)
+	if (ud == world::kUD_All)
 	{
 		App::Get()->engine->sys->r->UnbindStates();
 		m_maps.clear();
 	}
 
 	MapSlot *s = &m_maps[slot];
-
-	if (ud == world::UD_Slot)
+	if (ud == world::kUD_Slot)
 	{
 		App::Get()->engine->sys->r->UnbindStates();
 		s->queue.clear();

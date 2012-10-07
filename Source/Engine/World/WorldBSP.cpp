@@ -94,7 +94,7 @@ void World::LinkEntity(Entity *entity, const BBox &bounds) {
 
 	AreaBits tested;
 	AreaBits visible;
-	StackWindingVec bbox;
+	StackWindingStackVec bbox;
 
 	BoundWindings(bounds, bbox);
 
@@ -172,22 +172,19 @@ void World::LinkEntity(const LinkEntityParms &constArgs, int nodeNum) {
 
 bool World::OccupantVolumeCanSeeArea(
 	const Vec3 &pos,
-	const StackWindingVec &volume,
-	StackClippedAreaVolumeVec *clipped,
+	const StackWindingStackVec &volume,
+	ClippedAreaVolumeStackVec *clipped,
 	int fromArea,
 	int toArea,
 	AreaBits &visible
 ) {
 	if (fromArea == toArea) {
 		if (clipped)
-			clipped->push_back(ClippedAreaVolume(fromArea, volume));
+			(*clipped)->push_back(ClippedAreaVolume(fromArea, volume));
 		return true;
 	}
 
 	visible.set(fromArea);
-
-	if (clipped)
-		clipped->reserve(8);
 
 	AreaBits stack;
 	OccupantVolumeClipParms constArgs(pos, clipped, toArea, visible, stack);
@@ -196,11 +193,11 @@ bool World::OccupantVolumeCanSeeArea(
 
 bool World::OccupantVolumeCanSeeArea(
 	const OccupantVolumeClipParms &constArgs,
-	const StackWindingVec &volume,
+	const StackWindingStackVec &volume,
 	int fromArea
 ) {
-	RAD_ASSERT(parms.fromArea < (int)m_bsp->numAreas.get());
-	RAD_ASSERT(parms.toArea < (int)m_bsp->numAreas.get());
+	RAD_ASSERT(fromArea < (int)m_bsp->numAreas.get());
+	RAD_ASSERT(constArgs.toArea < (int)m_bsp->numAreas.get());
 
 	constArgs.stack.set(fromArea);
 
@@ -255,8 +252,10 @@ bool World::OccupantVolumeCanSeeArea(
 
 		constArgs.visible.set(otherArea);
 
-		if (constArgs.clipped)
-			constArgs.clipped->push_back(areaVolume);
+		// NOTE: this push_back involves a large amount of memory copying due to the use
+		// of these being stackify<> vectors. 
+		if (constArgs.clipped) 
+			(*constArgs.clipped)->push_back(areaVolume);
 
 		canSee = otherArea == constArgs.toArea;
 
@@ -296,7 +295,7 @@ dBSPLeaf *World::LeafForPoint(const Vec3 &pos, int nodeNum) {
 	return LeafForPoint(pos, node.children[0]);
 }
 
-void World::BoundWindings(const BBox &bounds, StackWindingVec &windings) {
+void World::BoundWindings(const BBox &bounds, StackWindingStackVec &windings) {
 	
 	Plane planes[6];
 	int planeNum = 0;
@@ -316,11 +315,11 @@ void World::BoundWindings(const BBox &bounds, StackWindingVec &windings) {
 	MakeVolume(planes, 6, windings);
 }
 
-bool World::ChopWindingToVolume(const StackWindingVec &volume, StackWinding &out) {
+bool World::ChopWindingToVolume(const StackWindingStackVec &volume, StackWinding &out) {
 
 	StackWinding f;
 
-	for (StackWindingVec::const_iterator it = volume.begin(); it != volume.end(); ++it) {
+	for (StackWindingStackVec::const_iterator it = volume->begin(); it != volume->end(); ++it) {
 		const StackWinding &w = *it;
 
 		f.Clear();
@@ -334,26 +333,24 @@ bool World::ChopWindingToVolume(const StackWindingVec &volume, StackWinding &out
 	return !out.Empty();
 }
 
-bool World::ChopVolume(StackWindingVec &volume, const Plane &p) {
+bool World::ChopVolume(StackWindingStackVec &volume, const Plane &p) {
 
-	StackWindingVec src;
-	src.swap(volume);
-
-	volume.reserve(src.size());
+	StackWindingStackVec src(volume);
+	volume->clear();
 
 	StackWinding f;
-	for (StackWindingVec::const_iterator it = src.begin(); it != src.end(); ++it) {
+	for (StackWindingStackVec::const_iterator it = src->begin(); it != src->end(); ++it) {
 		const StackWinding &w = *it;
 
 		f.Clear();
 		w.Chop(p, Plane::Back, f, 0.f);
 		if (!f.Empty())
-			volume.push_back(f);
+			volume->push_back(f);
 	}
 
 	StackWinding pw(p, 32767.f);
 
-	for (StackWindingVec::const_iterator it = volume.begin(); it != volume.end(); ++it) {
+	for (StackWindingStackVec::const_iterator it = volume->begin(); it != volume->end(); ++it) {
 		const StackWinding &w = *it;
 
 		f.Clear();
@@ -364,12 +361,12 @@ bool World::ChopVolume(StackWindingVec &volume, const Plane &p) {
 	}
 
 	if (!pw.Empty())
-		volume.push_back(pw);
+		volume->push_back(pw);
 
-	return !volume.empty();
+	return !volume->empty();
 }
 
-bool World::ChopVolume(StackWindingVec &volume, const PlaneVec &planes) {
+bool World::ChopVolume(StackWindingStackVec &volume, const PlaneVec &planes) {
 
 	for (PlaneVec::const_iterator it = planes.begin(); it != planes.end(); ++it) {
 		const Plane &p = *it;
@@ -377,23 +374,23 @@ bool World::ChopVolume(StackWindingVec &volume, const PlaneVec &planes) {
 			return false;
 	}
 
-	return !volume.empty();
+	return !volume->empty();
 }
 
-bool World::IntersectVolumes(const StackWindingVec &a, StackWindingVec &out) {
+bool World::IntersectVolumes(const StackWindingStackVec &a, StackWindingStackVec &out) {
 
-	for (StackWindingVec::const_iterator it = a.begin(); it != a.end(); ++it) {
+	for (StackWindingStackVec::const_iterator it = a->begin(); it != a->end(); ++it) {
 		const StackWinding &w = *it;
 		if (!ChopVolume(out, w.Plane()))
 			return false;
 	}
 
-	return !out.empty();
+	return !out->empty();
 }
 
-void World::MakeVolume(const Plane *planes, int num, StackWindingVec &volume) {
-	volume.clear();
-	volume.reserve(num);
+void World::MakeVolume(const Plane *planes, int num, StackWindingStackVec &volume) {
+	volume->clear();
+	volume->reserve(num);
 
 	StackWinding f;
 
@@ -411,7 +408,7 @@ void World::MakeVolume(const Plane *planes, int num, StackWindingVec &volume) {
 		}
 
 		if (!w.Empty())
-			volume.push_back(w);
+			volume->push_back(w);
 	}
 }
 
