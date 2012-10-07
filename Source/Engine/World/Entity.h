@@ -179,7 +179,6 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Entity, scripted, bool);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, models, const DrawModel::Map&);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, bspLeafs, const dBSPLeaf::PtrVec*);
-	RAD_DECLARE_READONLY_PROPERTY(Entity, areaLeafs, const dBSPAreaLeaf::PtrVec*);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, ps, PState*);
 	RAD_DECLARE_PROPERTY(Entity, gc, bool, bool);
 	
@@ -415,10 +414,6 @@ private:
 		return &m_bspLeafs;
 	}
 
-	RAD_DECLARE_GET(areaLeafs, const dBSPAreaLeaf::PtrVec*) {
-		return &m_areaLeafs;
-	}
-
 	enum SpawnState {
 		S_LuaCreate,
 		S_Native,
@@ -438,7 +433,6 @@ private:
 	TickQueue<Entity> m_scriptTasks;
 	DrawModel::Map m_models;
 	dBSPLeaf::PtrVec m_bspLeafs;
-	dBSPAreaLeaf::PtrVec m_areaLeafs;
 	dBSPLeaf *m_leaf;
 	SoundMap m_sounds;
 	ZoneTagWRef m_zoneTag;

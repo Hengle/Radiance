@@ -116,30 +116,6 @@ int WorldDraw::LoadMaterials() {
 void WorldDraw::Init(const bsp_file::BSPFile::Ref &bsp) {
 
 	m_batchPool.Create(ZWorld, "world-draw-batch", 64);
-
-	int num = (int)bsp->numAreaNodes.get();
-	m_nodes.reserve(num);
-	for (int i = 0; i < num; ++i) {
-		const bsp_file::BSPAreaNode *x = bsp->AreaNodes() + i;
-		dBSPAreaNode n;
-		n.parent = (int)x->parent;
-		n.children[0] = x->children[0];
-		n.children[1] = x->children[1];
-		n.planenum = x->planenum;
-		n.bounds.Initialize(x->mins[0], x->mins[1], x->mins[2], x->maxs[0], x->maxs[1], x->maxs[2]);
-		m_nodes.push_back(n);
-	}
-
-	num = (int)bsp->numAreaLeafs.get();
-	m_leafs.reserve(num);
-	for (int i = 0; i < num; ++i) {
-		const bsp_file::BSPAreaLeaf *x = bsp->AreaLeafs() + i;
-		dBSPAreaLeaf l;
-		l.firstModel = x->firstModel;
-		l.numModels = x->numModels;
-		l.bounds.Initialize(x->mins[0], x->mins[1], x->mins[2], x->maxs[0], x->maxs[1], x->maxs[2]);
-		m_leafs.push_back(l);
-	}
 }
 
 int WorldDraw::Precache() {
@@ -149,34 +125,34 @@ int WorldDraw::Precache() {
 
 	// gather/sort all materials into batches array.
 	
-	for (dBSPAreaLeaf::Vec::const_iterator it = m_leafs.begin(); it != m_leafs.end(); ++it) {
-		const dBSPAreaLeaf &leaf = *it;
+	//for (dBSPAreaLeaf::Vec::const_iterator it = m_leafs.begin(); it != m_leafs.end(); ++it) {
+	//	const dBSPAreaLeaf &leaf = *it;
 
-		// add static meshes
-		for (int i = 0; i < leaf.numModels; ++i) {
-			RAD_ASSERT((i+leaf.firstModel) < (int)m_worldModels.size());
-			const MStaticWorldMeshBatch::Ref &m = m_worldModels[i + leaf.firstModel];
-			details::MBatchRef batch = AddMaterialRef(m->m_matId);
-			batch->draws.push_back(m.get());
-		}
+	//	// add static meshes
+	//	for (int i = 0; i < leaf.numModels; ++i) {
+	//		RAD_ASSERT((i+leaf.firstModel) < (int)m_worldModels.size());
+	//		const MStaticWorldMeshBatch::Ref &m = m_worldModels[i + leaf.firstModel];
+	//		details::MBatchRef batch = AddMaterialRef(m->m_matId);
+	//		batch->draws.push_back(m.get());
+	//	}
 
-		// add any occupants.
-		for (EntityPtrSet::const_iterator it = leaf.occupants.begin(); it != leaf.occupants.end(); ++it) {
-			Entity *e = *it;
+	//	// add any occupants.
+	//	for (EntityPtrSet::const_iterator it = leaf.occupants.begin(); it != leaf.occupants.end(); ++it) {
+	//		Entity *e = *it;
 
-			const DrawModel::Map &models = e->models;
-			for (DrawModel::Map::const_iterator it2 = models.begin(); it2 != models.end(); ++it2) {
-				const DrawModel::Ref &model = it2->second;
+	//		const DrawModel::Map &models = e->models;
+	//		for (DrawModel::Map::const_iterator it2 = models.begin(); it2 != models.end(); ++it2) {
+	//			const DrawModel::Ref &model = it2->second;
 
-				for (MBatchDraw::RefVec::const_iterator it3 = model->m_batches.begin(); it3 != model->m_batches.end(); ++it3) {
-					const MBatchDraw::Ref &draw = *it3;
-					
-					details::MBatchRef batch = AddMaterialRef(draw->m_matId);
-					batch->draws.push_back(draw.get());
-				}
-			}
-		}
-	}
+	//			for (MBatchDraw::RefVec::const_iterator it3 = model->m_batches.begin(); it3 != model->m_batches.end(); ++it3) {
+	//				const MBatchDraw::Ref &draw = *it3;
+	//				
+	//				details::MBatchRef batch = AddMaterialRef(draw->m_matId);
+	//				batch->draws.push_back(draw.get());
+	//			}
+	//		}
+	//	}
+	//}
 
 	// Precache materials & meshes.
 	ScreenOverlay::Ref overlay;
@@ -345,14 +321,7 @@ void WorldDraw::Draw(Counters *counters) {
 }
 
 void WorldDraw::FindViewArea(ViewDef &view) {
-
 	view.bspLeaf = m_world->LeafForPoint(view.camera.pos);
-
-	if (view.bspLeaf && (view.bspLeaf->area > -1)) {
-		view.areaLeaf = LeafForPoint(view.camera.pos, view.bspLeaf->area);
-	} else {
-		view.areaLeaf = 0;
-	}
 }
 
 void WorldDraw::SetupFrustumPlanes(ViewDef &view) {
@@ -599,95 +568,12 @@ void WorldDraw::PostProcess() {
 
 void WorldDraw::LinkEntity(Entity *entity, const BBox &bounds) {
 	UnlinkEntity(entity);
-
-	if (entity->m_leaf->area < 0)
-		return;
-	
-	entity->m_areaLeafs.reserve(8);
-	if (m_nodes.empty()) {
-		LinkEntity(entity, bounds, -1);
-	} else {
-		/*StackWindingVec bbox;
-		m_world->BoundWindings(bounds, bbox);
-
-		AreaBits visibleAreas;
-		m_world->OccupantVolumeCanSeeArea(
-			entity->ps->worldPos,
-			bbox,
-			0,
-			entity->m_leaf->area,
-			-1,
-			visibleAreas
-		);
-
-		// NOTE: this sort of sucks, figure out a faster way of doing this.
-		for (int i = 0; kMaxAreas; ++i) {
-			if (visibleAreas.test(i)) {
-				const bsp_file::BSPArea *area = m_world->m_bsp->Areas() + i;
-				LinkEntity(entity, bounds, area->rootNode);
-			}
-		}*/
-	}
 }
 
 void WorldDraw::UnlinkEntity(Entity *entity) {
-	
-	for (dBSPAreaLeaf::PtrVec::const_iterator it = entity->m_areaLeafs.begin(); it != entity->m_areaLeafs.end(); ++it) {
-		dBSPAreaLeaf *leaf = *it;
-		leaf->occupants.erase(entity);
-	}
-
-	entity->m_areaLeafs.clear();
 }
 
 void WorldDraw::LinkEntity(Entity *entity, const BBox &bounds, int nodeNum) {
-	if (nodeNum < 0) {
-		nodeNum = -(nodeNum + 1);
-		RAD_ASSERT(nodeNum < (int)m_leafs.size());
-		dBSPAreaLeaf &leaf = m_leafs[nodeNum];
-		leaf.occupants.insert(entity);
-		entity->m_areaLeafs.push_back(&leaf);
-		return;
-	}
-
-	RAD_ASSERT(nodeNum < (int)m_nodes.size());
-	const dBSPAreaNode &node = m_nodes[nodeNum];
-	RAD_ASSERT(node.planenum < (int)m_world->m_planes.size());
-	const Plane &p = m_world->m_planes[node.planenum];
-
-	Plane::SideType side = p.Side(bounds, 0.0f);
-	
-	if ((side == Plane::Cross) || (side == Plane::Front))
-		LinkEntity(entity, bounds, node.children[0]);
-	if ((side == Plane::Cross) || (side == Plane::Back))
-		LinkEntity(entity, bounds, node.children[1]);
-}
-
-dBSPAreaLeaf *WorldDraw::LeafForPoint(const Vec3 &pos, int areaNum) {
-	if (m_nodes.empty())
-		return &m_leafs[0];
-	RAD_ASSERT(areaNum < (int)m_world->m_bsp->numAreaNodes.get());
-	const bsp_file::BSPArea *area = m_world->m_bsp->Areas() + areaNum;
-	return LeafForPoint(pos, area->rootNode);
-}
-
-dBSPAreaLeaf *WorldDraw::LeafForPoint_r(const Vec3 &pos, int nodeNum) {
-	if (nodeNum < 0) {
-		nodeNum = -(nodeNum + 1);
-		RAD_ASSERT(nodeNum < (int)m_leafs.size());
-		dBSPAreaLeaf &leaf = m_leafs[nodeNum];
-		return &leaf;
-	}
-
-	RAD_ASSERT(nodeNum < (int)m_nodes.size());
-	dBSPAreaNode &node = m_nodes[nodeNum];
-
-	const Plane &plane = m_world->m_planes[node.planenum];
-	Plane::SideType side = plane.Side(pos, 0.f);
-
-	if (side == Plane::Back)
-		return LeafForPoint_r(pos, node.children[1]);
-	return LeafForPoint_r(pos, node.children[0]);
 }
 
 } // world

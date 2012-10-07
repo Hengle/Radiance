@@ -86,10 +86,14 @@ public:
 	Vector2<T> &operator/=(const Vector2<T> &v);
 
 	// Comparison operations
-
 	bool NearlyEquals(const Vector2<T>& v, const T &epsilon = Epsilon<T>()) const;
+	int Compare(const Vector2<T> &v) const;
 	bool operator==(const Vector2<T> &v) const;
 	bool operator!=(const Vector2<T> &v) const;
+	bool operator <(const Vector2<T> &v) const;
+	bool operator >(const Vector2<T> &v) const;
+	bool operator <=(const Vector2<T> &v) const;
+	bool operator >=(const Vector2<T> &v) const;
 
 	// Scalar binary operations
 
@@ -210,8 +214,13 @@ public:
 	// Comparison operations
 	
 	bool NearlyEquals(const Vector3<T>& v, const T& epsilon = Epsilon<T>()) const;
+	int Compare(const Vector3<T> &v) const;
 	bool operator==(const Vector3<T> &v) const;
 	bool operator!=(const Vector3<T> &v) const;
+	bool operator <(const Vector3<T> &v) const;
+	bool operator >(const Vector3<T> &v) const;
+	bool operator <=(const Vector3<T> &v) const;
+	bool operator >=(const Vector3<T> &v) const;
 
 	// Scalar binary operations
 
@@ -334,8 +343,13 @@ public:
 	// Comparison operations
 	
 	bool NearlyEquals(const Vector4<T>& v, const T& epsilon = Epsilon<T>()) const;
+	int Compare(const Vector4<T> &v) const;
 	bool operator==(const Vector4<T> &v) const;
 	bool operator!=(const Vector4<T> &v) const;
+	bool operator <(const Vector4<T> &v) const;
+	bool operator >(const Vector4<T> &v) const;
+	bool operator <=(const Vector4<T> &v) const;
+	bool operator >=(const Vector4<T> &v) const;
 
 	// Scalar binary operations
 

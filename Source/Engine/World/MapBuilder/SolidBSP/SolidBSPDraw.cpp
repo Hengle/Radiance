@@ -150,9 +150,9 @@ bool BSPBuilder::AreaBSPDraw::Paint(float time, float dt, const QRect &viewport,
 	
 	BeginPaint(viewport, ui);
 
-	for (U32 i = 0; i < bsp.m_bspFile->numAreas; ++i) {
+	for (U32 i = 0; i < bsp.m_bspFile->numModels; ++i) {
 		const world::bsp_file::BSPArea *area = bsp.m_bspFile->Areas() + i;
-		DrawAreaNode(bsp, area->rootNode);
+		DrawModel(bsp, i);
 	}
 
 	EndPaint();
@@ -162,24 +162,6 @@ bool BSPBuilder::AreaBSPDraw::Paint(float time, float dt, const QRect &viewport,
 
 bool BSPBuilder::AreaBSPDraw::OnMenu(const QVariant &data, MapBuilderDebugUI &ui, BSPBuilder &bsp) {
 	return true;
-}
-
-void BSPBuilder::AreaBSPDraw::DrawAreaNode(BSPBuilder &bsp, S32 nodeNum) {
-	if (nodeNum < 0) {
-		DrawAreaLeaf(bsp, -(nodeNum + 1));
-		return;
-	}
-
-	const world::bsp_file::BSPAreaNode *node = bsp.m_bspFile->AreaNodes() + nodeNum;
-	DrawAreaNode(bsp, node->children[0]);
-	DrawAreaNode(bsp, node->children[1]);
-}
-
-void BSPBuilder::AreaBSPDraw::DrawAreaLeaf(BSPBuilder &bsp, S32 leafNum) {
-	const world::bsp_file::BSPAreaLeaf *leaf = bsp.m_bspFile->AreaLeafs() + leafNum;
-
-	for (U32 i = 0; i < leaf->numModels; ++i)
-		DrawModel(bsp, i + leaf->firstModel);
 }
 
 void BSPBuilder::AreaBSPDraw::DrawModel(BSPBuilder &bsp, U32 modelNum) {

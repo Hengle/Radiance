@@ -27,15 +27,6 @@ inline const BSPLeaf *BSPFileParser::Leafs() const {
 	return m_leafs;
 }
 
-
-inline const BSPAreaNode *BSPFileParser::AreaNodes() const {
-	return m_areaNodes;
-}
-
-inline const BSPAreaLeaf *BSPFileParser::AreaLeafs() const {
-	return m_areaLeafs;
-}
-
 inline const BSPArea *BSPFileParser::Areas() const {
 	return m_areas;
 }
@@ -66,6 +57,10 @@ inline const BSPActor *BSPFileParser::Actors() const {
 
 inline const U16 *BSPFileParser::AreaportalIndices() const {
 	return m_areaportalIndices;
+}
+
+inline const U16 *BSPFileParser::ModelIndices() const {
+	return m_modelIndices;
 }
 
 inline const U16 *BSPFileParser::Indices() const {
@@ -127,14 +122,6 @@ inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numLeafs) {
 	return m_numLeafs;
 }
 
-inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numAreaNodes) {
-	return m_numAreaNodes;
-}
-
-inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numAreaLeafs) {
-	return m_numAreaLeafs;
-}
-
 inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numAreas) {
 	return m_numAreas;
 }
@@ -157,6 +144,10 @@ inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numVerts) {
 
 inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numAreaportalIndices) {
 	return m_numAreaportalIndices;
+}
+
+inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numModelIndices) {
+	return m_numModelIndices;
 }
 
 inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numIndices) {
@@ -217,14 +208,6 @@ inline const BSPLeaf *BSPFileBuilder::Leafs() const {
 	return &m_leafs[0];
 }
 
-inline const BSPAreaNode *BSPFileBuilder::AreaNodes() const {
-	return &m_areaNodes[0];
-}
-
-inline const BSPAreaLeaf *BSPFileBuilder::AreaLeafs() const {
-	return &m_areaLeafs[0];
-}
-
 inline const BSPArea *BSPFileBuilder::Areas() const {
 	return &m_areas[0];
 }
@@ -251,6 +234,10 @@ inline const BSPVertex *BSPFileBuilder::Vertices() const {
 
 inline const U16 *BSPFileBuilder::AreaportalIndices() const {
 	return &m_areaportalIndices[0];
+}
+
+inline const U16 *BSPFileBuilder::ModelIndices() const {
+	return &m_modelIndices[0];
 }
 
 inline const U16 *BSPFileBuilder::Indices() const {
@@ -295,8 +282,6 @@ inline void BSPFileBuilder::Clear() {
 	m_ents.clear();
 	m_nodes.clear();
 	m_leafs.clear();
-	m_areaNodes.clear();
-	m_areaLeafs.clear();
 	m_areas.clear();
 	m_areaportals.clear();
 	m_models.clear();
@@ -304,6 +289,7 @@ inline void BSPFileBuilder::Clear() {
 	m_planes.clear();
 	m_vertices.clear();
 	m_areaportalIndices.clear();
+	m_modelIndices.clear();
 	m_indices.clear();
 	m_actorIndices.clear();
 	m_cameraTMs.clear();
@@ -335,14 +321,6 @@ inline void BSPFileBuilder::ReserveLeafs(int num) {
 	m_leafs.reserve(m_leafs.size()+(size_t)num);
 }
 
-inline void BSPFileBuilder::ReserveAreaNodes(int num) {
-	m_areaNodes.reserve(m_areaNodes.size()+(size_t)num);
-}
-
-inline void BSPFileBuilder::ReserveAreaLeafs(int num) {
-	m_areaLeafs.reserve(m_areaLeafs.size()+(size_t)num);
-}
-
 inline void BSPFileBuilder::ReserveAreas(int num) {
 	m_areas.reserve(m_areas.size()+(size_t)num);
 }
@@ -369,6 +347,10 @@ inline void BSPFileBuilder::ReserveVertices(int num) {
 
 inline void BSPFileBuilder::ReserveAreaportalIndices(int num) {
 	m_areaportalIndices.reserve(m_areaportalIndices.size()+(size_t)num);
+}
+
+inline void BSPFileBuilder::ReserveModelIndices(int num) {
+	m_modelIndices.reserve(m_modelIndices.size()+(size_t)num);
 }
 
 inline void BSPFileBuilder::ReserveIndices(int num) {
@@ -429,16 +411,6 @@ inline BSPLeaf *BSPFileBuilder::AddLeaf() {
 	return &m_leafs.back();
 }
 
-inline BSPAreaNode *BSPFileBuilder::AddAreaNode() {
-	m_areaNodes.resize(m_areaNodes.size()+1);
-	return &m_areaNodes.back();
-}
-
-inline BSPAreaLeaf *BSPFileBuilder::AddAreaLeaf() {
-	m_areaLeafs.resize(m_areaLeafs.size()+1);
-	return &m_areaLeafs.back();
-}
-
 inline BSPArea *BSPFileBuilder::AddArea() {
 	m_areas.resize(m_areas.size()+1);
 	return &m_areas.back();
@@ -477,6 +449,11 @@ inline BSPActor *BSPFileBuilder::AddActor() {
 inline U16 *BSPFileBuilder::AddAreaportalIndex() {
 	m_areaportalIndices.resize(m_areaportalIndices.size()+1);
 	return &m_areaportalIndices.back();
+}
+
+inline U16 *BSPFileBuilder::AddModelIndex() {
+	m_modelIndices.resize(m_modelIndices.size()+1);
+	return &m_modelIndices.back();
 }
 
 inline U16 *BSPFileBuilder::AddIndex() {
@@ -538,14 +515,6 @@ inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numLeafs) {
 	return (U32)m_leafs.size();
 }
 
-inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numAreaNodes) {
-	return (U32)m_areaNodes.size();
-}
-
-inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numAreaLeafs) {
-	return (U32)m_areaLeafs.size();
-}
-
 inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numAreas) {
 	return (U32)m_areas.size();
 }
@@ -568,6 +537,10 @@ inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numVerts) {
 
 inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numAreaportalIndices) {
 	return (U32)m_areaportalIndices.size();
+}
+
+inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numModelIndices) {
+	return (U32)m_modelIndices.size();
 }
 
 inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numIndices) {

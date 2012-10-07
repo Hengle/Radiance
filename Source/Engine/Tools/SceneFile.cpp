@@ -398,10 +398,86 @@ namespace {
 			SmoothVert &v = *it;
 			v.normal = SceneFile::Vec3::Zero;
 			
+			for (int i = 0; i < SceneFile::kMaxUVChannels; ++i) {
+				v.tangent[i] = SceneFile::Vec4::Zero;
+			}
+			
 			for (TriFaceIdxSet::iterator it2 = v.faces.begin(); it2 != v.faces.end(); ++it2) {
 				U32 idx = *it2;
 				v.normal += mdl.tris[idx].plane.Normal();
 				v.normal.Normalize();
+			}
+		}
+
+		// calculate tangents.
+
+		zone_vector<SceneFile::Vec3, Z3DXT>::type tan2[SceneFile::kMaxUVChannels];
+
+		for (int i = 0; i < SceneFile::kMaxUVChannels; ++i)
+			tan2[i].resize(vec.size(), SceneFile::Vec3::Zero);
+
+		for (TriFaceVec::const_iterator it = mdl.tris.begin(); it != mdl.tris.end(); ++it) {
+			const TriFace &tri = *it;
+
+			SmoothVert &v1 = vec[tri.sm[0]];
+			SmoothVert &v2 = vec[tri.sm[1]];
+			SmoothVert &v3 = vec[tri.sm[2]];
+
+			SceneFile::Vec3 x = v2.pos - v1.pos;
+			SceneFile::Vec3 y = v3.pos - v1.pos;
+				
+			for (int i = 0; i < SceneFile::kMaxUVChannels; ++i) {
+
+				SceneFile::Vec3 &m0 = tan2[i][tri.sm[0]];
+				SceneFile::Vec3 &m1 = tan2[i][tri.sm[1]];
+				SceneFile::Vec3 &m2 = tan2[i][tri.sm[2]];
+
+				SceneFile::Vec2 s = v2.st[i] - v1.st[i];
+				SceneFile::Vec2 t = v3.st[i] - v1.st[i];
+
+				SceneFile::ValueType r = (s[0] * t[1] - s[1] * t[0]);
+				if (r != 0.f) {
+					r = SceneFile::ValueType(1) / r;
+				} else {
+					r = 1.f;
+				}
+
+				SceneFile::Vec4 udir(
+					(t[1] * x[0] - s[1] * y[0]) * r,
+					(t[1] * x[1] - s[1] * y[1]) * r,
+					(t[1] * x[2] - s[1] * y[2]) * r,
+					0.f
+				);
+
+				SceneFile::Vec3 vdir(
+					(s[0] * y[0] - t[0] * x[0]) * r,
+					(s[0] * y[1] - t[0] * x[1]) * r,
+					(s[0] * y[2] - t[0] * x[2]) * r
+				);
+
+				v1.tangent[i] += udir;
+				v2.tangent[i] += udir;
+				v3.tangent[i] += udir;
+				m0 += vdir;
+				m1 += vdir;
+				m2 += vdir;
+			}
+		}
+
+		int mOfs = 0;
+
+		for (SmoothVertVec::iterator it = vec.begin(); it != vec.end(); ++it, ++mOfs) {
+			SmoothVert &v = *it;
+			
+			for (int i = 0; i < SceneFile::kMaxUVChannels; ++i) {
+				const Vec3 &m = tan2[i][mOfs];
+
+				SceneFile::Vec3 t = v.tangent[i];
+				t = t - (v.normal * v.normal.Dot(t));
+				t.Normalize();
+				v.tangent[i] = Vec4(t, 0.f);
+				// determinant
+				v.tangent[i][3] = (v.normal.Cross(t).Dot(m) < 0.f) ? -1.f : 1.f;
 			}
 		}
 	}
@@ -445,6 +521,8 @@ namespace {
 				v.id = tri.v[i];
 
 				for (int j = 0; j < SceneFile::kMaxUVChannels; ++j) {
+					v.tangent[j] = SceneFile::Vec4::Zero;
+
 					if (uvv[j].empty()) {
 						v.st[j] = UV::Zero;
 					} else {

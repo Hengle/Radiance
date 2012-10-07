@@ -235,11 +235,6 @@ bool BSPBuilder::AreaFlood() {
 	Log("------------\n");
 	Log("Area Flood...\n");
 
-	// NOTE: Reserve area 0 for "shared" area space.
-	AreaRef area(new Area());
-	area->area = 0;
-	m_areas.push_back(area);
-
 	FindAreas(m_root.get());
 
 	if (world::kMaxAreas < (int)m_areas.size()) {

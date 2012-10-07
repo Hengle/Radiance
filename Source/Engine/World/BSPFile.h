@@ -44,21 +44,6 @@ struct BSPLeaf {
 	float maxs[3];
 };
 
-struct BSPAreaNode {
-	S32 parent;
-	S32 children[2];
-	U32 planenum;
-	float mins[3];
-	float maxs[3];
-};
-
-struct BSPAreaLeaf {
-	U32 firstModel;
-	U32 numModels;
-	float mins[3];
-	float maxs[3];
-};
-
 struct BSPClipSurface {
 	enum {
 		RAD_FLAG(kFlag_Bevel)
@@ -72,7 +57,8 @@ struct BSPClipSurface {
 struct BSPArea {
 	U32 firstPortal;
 	U32 numPortals;
-	S32 rootNode;
+	U32 firstModel;
+	U32 numModels;
 	float mins[3];
 	float maxs[3];
 };
@@ -91,6 +77,8 @@ struct BSPModel {
 	U32 numIndices;
 	U32 material;
 	U32 numChannels;
+	float mins[3];
+	float maxs[3];
 };
 
 struct BSPMaterial {
@@ -110,6 +98,7 @@ struct BSPVertex {
 	float v[3];
 	float n[3];
 	float st[kMaxUVChannels*2];
+	float t[kMaxUVChannels*4];
 };
 
 struct BSPActor {
@@ -156,14 +145,13 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numStrings, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numNodes, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numLeafs, U32);
-	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numAreaNodes, U32);
-	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numAreaLeafs, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numAreas, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numAreaportals, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numModels, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numClipSurfaces, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numVerts, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numAreaportalIndices, U32);
+	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numModelIndices, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numIndices, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numMaterials, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numPlanes, U32);
@@ -179,8 +167,6 @@ public:
 	virtual const BSPEntity *Entities() const = 0;
 	virtual const BSPNode *Nodes() const = 0;
 	virtual const BSPLeaf *Leafs() const = 0;
-	virtual const BSPAreaNode *AreaNodes() const = 0;
-	virtual const BSPAreaLeaf *AreaLeafs() const = 0;
 	virtual const BSPArea *Areas() const = 0;
 	virtual const BSPAreaportal *Areaportals() const = 0;
 	virtual const BSPModel *Models() const = 0;
@@ -188,6 +174,7 @@ public:
 	virtual const BSPPlane *Planes() const = 0;
 	virtual const BSPVertex *Vertices() const = 0;
 	virtual const U16 *AreaportalIndices() const = 0;
+	virtual const U16 *ModelIndices() const = 0;
 	virtual const U16 *Indices() const = 0;
 	virtual const BSPActor *Actors() const = 0;
 	virtual const U32 *ActorIndices() const = 0;
@@ -205,14 +192,13 @@ protected:
 	virtual RAD_DECLARE_GET(numStrings, U32) = 0;
 	virtual RAD_DECLARE_GET(numNodes, U32) = 0;
 	virtual RAD_DECLARE_GET(numLeafs, U32) = 0;
-	virtual RAD_DECLARE_GET(numAreaNodes, U32) = 0;
-	virtual RAD_DECLARE_GET(numAreaLeafs, U32) = 0;
 	virtual RAD_DECLARE_GET(numAreas, U32) = 0;
 	virtual RAD_DECLARE_GET(numAreaportals, U32) = 0;
 	virtual RAD_DECLARE_GET(numClipSurfaces, U32) = 0;
 	virtual RAD_DECLARE_GET(numModels, U32) = 0;
 	virtual RAD_DECLARE_GET(numVerts, U32) = 0;
 	virtual RAD_DECLARE_GET(numAreaportalIndices, U32) = 0;
+	virtual RAD_DECLARE_GET(numModelIndices, U32) = 0;
 	virtual RAD_DECLARE_GET(numIndices, U32) = 0;
 	virtual RAD_DECLARE_GET(numMaterials, U32) = 0;
 	virtual RAD_DECLARE_GET(numPlanes, U32) = 0;
@@ -244,8 +230,6 @@ public:
 	virtual const BSPMaterial *Materials() const;
 	virtual const BSPNode *Nodes() const;
 	virtual const BSPLeaf *Leafs() const;
-	virtual const BSPAreaNode *AreaNodes() const;
-	virtual const BSPAreaLeaf *AreaLeafs() const;
 	virtual const BSPArea *Areas() const;
 	virtual const BSPAreaportal *Areaportals() const;
 	virtual const BSPModel *Models() const;
@@ -254,6 +238,7 @@ public:
 	virtual const BSPVertex *Vertices() const;
 	virtual const BSPActor *Actors() const;
 	virtual const U16 *AreaportalIndices() const;
+	virtual const U16 *ModelIndices() const;
 	virtual const U16 *Indices() const;
 	virtual const U32 *ActorIndices() const;
 	virtual const BSPCameraTM *CameraTMs() const;
@@ -272,14 +257,13 @@ private:
 	virtual RAD_DECLARE_GET(numMaterials, U32);
 	virtual RAD_DECLARE_GET(numNodes, U32);
 	virtual RAD_DECLARE_GET(numLeafs, U32);
-	virtual RAD_DECLARE_GET(numAreaNodes, U32);
-	virtual RAD_DECLARE_GET(numAreaLeafs, U32);
 	virtual RAD_DECLARE_GET(numAreas, U32);
 	virtual RAD_DECLARE_GET(numAreaportals, U32);
 	virtual RAD_DECLARE_GET(numClipSurfaces, U32);
 	virtual RAD_DECLARE_GET(numModels, U32);
 	virtual RAD_DECLARE_GET(numVerts, U32);
 	virtual RAD_DECLARE_GET(numAreaportalIndices, U32);
+	virtual RAD_DECLARE_GET(numModelIndices, U32);
 	virtual RAD_DECLARE_GET(numIndices, U32);
 	virtual RAD_DECLARE_GET(numActorIndices, U32);
 	virtual RAD_DECLARE_GET(numActors, U32);
@@ -298,8 +282,6 @@ private:
 	const BSPMaterial *m_mats;
 	const BSPNode *m_nodes;
 	const BSPLeaf *m_leafs;
-	const BSPAreaNode *m_areaNodes;
-	const BSPAreaLeaf *m_areaLeafs;
 	const BSPArea *m_areas;
 	const BSPAreaportal *m_areaportals;
 	const BSPModel *m_models;
@@ -308,6 +290,7 @@ private:
 	const BSPVertex *m_verts;
 	const BSPVertex *m_normals;
 	const U16 *m_areaportalIndices;
+	const U16 *m_modelIndices;
 	const U16 *m_indices;
 	const U32 *m_actorIndices;
 	const BSPActor *m_actors;
@@ -322,8 +305,6 @@ private:
 	U32 m_numMats;
 	U32 m_numNodes;
 	U32 m_numLeafs;
-	U32 m_numAreaNodes;
-	U32 m_numAreaLeafs;
 	U32 m_numAreas;
 	U32 m_numAreaportals;
 	U32 m_numClipSurfaces;
@@ -332,6 +313,7 @@ private:
 	U32 m_numVerts;
 	U32 m_numTexCoords[kMaxUVChannels];
 	U32 m_numAreaportalIndices;
+	U32 m_numModelIndices;
 	U32 m_numIndices;
 	U32 m_numActorIndices;
 	U32 m_numActors;
@@ -358,8 +340,6 @@ public:
 	virtual const BSPMaterial *Materials() const;
 	virtual const BSPNode *Nodes() const;
 	virtual const BSPLeaf *Leafs() const;
-	virtual const BSPAreaNode *AreaNodes() const;
-	virtual const BSPAreaLeaf *AreaLeafs() const;
 	virtual const BSPArea *Areas() const;
 	virtual const BSPAreaportal *Areaportals() const;
 	virtual const BSPModel *Models() const;
@@ -367,6 +347,7 @@ public:
 	virtual const BSPPlane *Planes() const;
 	virtual const BSPVertex *Vertices() const;
 	virtual const U16 *AreaportalIndices() const;
+	virtual const U16 *ModelIndices() const;
 	virtual const U16 *Indices() const;
 	virtual const U32 *ActorIndices() const;
 	virtual const BSPCameraTM *CameraTMs() const;
@@ -384,8 +365,6 @@ public:
 	void ReserveMaterials(int num);
 	void ReserveNodes(int num);
 	void ReserveLeafs(int num);
-	void ReserveAreaNodes(int num);
-	void ReserveAreaLeafs(int num);
 	void ReserveAreas(int num);
 	void ReserveAreaportals(int num);
 	void ReserveClipSurfaces(int num);
@@ -393,6 +372,7 @@ public:
 	void ReservePlanes(int num);
 	void ReserveVertices(int num);
 	void ReserveAreaportalIndices(int num);
+	void ReserveModelIndices(int num);
 	void ReserveIndices(int num);
 	void ReserveActorIndices(int num);
 	void ReserveCameraTMs(int num);
@@ -407,8 +387,6 @@ public:
 	BSPMaterial *AddMaterial();
 	BSPNode *AddNode();
 	BSPLeaf *AddLeaf();
-	BSPAreaNode *AddAreaNode();
-	BSPAreaLeaf *AddAreaLeaf();
 	BSPArea *AddArea();
 	BSPAreaportal *AddAreaportal();
 	BSPClipSurface *AddClipSurface();
@@ -417,6 +395,7 @@ public:
 	BSPVertex *AddVertex();
 	BSPActor *AddActor();
 	U16 *AddAreaportalIndex();
+	U16 *AddModelIndex();
 	U16 *AddIndex();
 	U32 *AddActorIndex();
 	BSPCameraTM *AddCameraTM();
@@ -438,14 +417,13 @@ protected:
 	virtual RAD_DECLARE_GET(numMaterials, U32);
 	virtual RAD_DECLARE_GET(numNodes, U32);
 	virtual RAD_DECLARE_GET(numLeafs, U32);
-	virtual RAD_DECLARE_GET(numAreaNodes, U32);
-	virtual RAD_DECLARE_GET(numAreaLeafs, U32);
 	virtual RAD_DECLARE_GET(numAreas, U32);
 	virtual RAD_DECLARE_GET(numAreaportals, U32);
 	virtual RAD_DECLARE_GET(numModels, U32);
 	virtual RAD_DECLARE_GET(numClipSurfaces, U32);
 	virtual RAD_DECLARE_GET(numVerts, U32);
 	virtual RAD_DECLARE_GET(numAreaportalIndices, U32);
+	virtual RAD_DECLARE_GET(numModelIndices, U32);
 	virtual RAD_DECLARE_GET(numIndices, U32);
 	virtual RAD_DECLARE_GET(numPlanes, U32);
 	virtual RAD_DECLARE_GET(numCameraTMs, U32);
@@ -461,8 +439,6 @@ protected:
 	typedef zone_vector<BSPMaterial, ZBSPBuilderT>::type BSPMaterialVec;
 	typedef zone_vector<BSPNode, ZBSPBuilderT>::type BSPNodeVec;
 	typedef zone_vector<BSPLeaf, ZBSPBuilderT>::type BSPLeafVec;
-	typedef zone_vector<BSPAreaNode, ZBSPBuilderT>::type BSPAreaNodeVec;
-	typedef zone_vector<BSPAreaLeaf, ZBSPBuilderT>::type BSPAreaLeafVec;
 	typedef zone_vector<BSPArea, ZBSPBuilderT>::type BSPAreaVec;
 	typedef zone_vector<BSPAreaportal, ZBSPBuilderT>::type BSPAreaportalVec;
 	typedef zone_vector<BSPModel, ZBSPBuilderT>::type BSPModelVec;
@@ -484,8 +460,6 @@ protected:
 	BSPEntityVec m_ents;
 	BSPNodeVec m_nodes;
 	BSPLeafVec m_leafs;
-	BSPAreaNodeVec m_areaNodes;
-	BSPAreaLeafVec m_areaLeafs;
 	BSPAreaVec m_areas;
 	BSPAreaportalVec m_areaportals;
 	BSPModelVec m_models;
@@ -493,6 +467,7 @@ protected:
 	BSPPlaneVec m_planes;
 	BSPVertexVec m_vertices;
 	BSPIndexVec m_areaportalIndices;
+	BSPIndexVec m_modelIndices;
 	BSPIndexVec m_indices;
 	BSPActorIndexVec m_actorIndices;
 	BSPCameraTMVec m_cameraTMs;

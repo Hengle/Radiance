@@ -33,7 +33,7 @@ enum {
 	kMaxTempEnts = 64,
 	kMaxStaticEnts = kMaxEnts-kMaxTempEnts,
 	kFirstTempEntId = kMaxStaticEnts,
-	kMaxAreas = 256
+	kMaxAreas = 64
 };
 
 typedef zone_vector<Plane, ZWorldT>::type PlaneVec;
@@ -67,24 +67,6 @@ struct dBSPLeaf {
 	int contents;
 	int firstClipSurface;
 	int numClipSurfaces;
-
-	EntityPtrSet occupants;
-};
-
-struct dBSPAreaNode {
-	typedef zone_vector<dBSPAreaNode, ZWorldT>::type Vec;
-	BBox bounds;
-	int parent;
-	int planenum;
-	int children[2];
-};
-
-struct dBSPAreaLeaf {
-	typedef zone_vector<dBSPAreaLeaf, ZWorldT>::type Vec;
-	typedef zone_vector<dBSPAreaLeaf*, ZWorldT>::type PtrVec;
-	BBox bounds;
-	int firstModel;
-	int numModels;
 
 	EntityPtrSet occupants;
 };

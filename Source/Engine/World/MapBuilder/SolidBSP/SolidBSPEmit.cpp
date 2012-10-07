@@ -37,6 +37,7 @@ void BSPBuilder::EmitBSPFile() {
 	EmitBSPMaterials();
 	EmitBSPNodes(m_root.get(), -1);
 	EmitBSPPlanes();
+	EmitBSPModels();
 	EmitBSPAreas();
 	EmitBSPEntities();
 
@@ -51,8 +52,6 @@ void BSPBuilder::EmitBSPFile() {
 	Log("\t%8d Nodes\n", m_bspFile->numNodes.get());
 	Log("\t%8d Leafs\n", m_bspFile->numLeafs.get());
 	Log("\t%8d Areas\n", m_bspFile->numAreas.get());
-	Log("\t%8d AreaNodes\n", m_bspFile->numAreaNodes.get());
-	Log("\t%8d AreaLeafs\n", m_bspFile->numAreaLeafs.get());
 	Log("\t%8d Planes\n", m_bspFile->numPlanes.get());
 	Log("\t%8d Models\n", m_bspFile->numModels.get());
 	Log("\t%8d ClipSurfaces\n", m_bspFile->numClipSurfaces.get());
@@ -119,7 +118,7 @@ void BSPBuilder::EmitBSPEntity(const SceneFile::Entity::Ref &entity)
 	}
 }
 
-void BSPBuilder::EmitBSPAreas() {
+bool BSPBuilder::EmitBSPAreas() {
 	m_bspFile->ReserveAreas((int)m_areas.size());
 
 	for (AreaVec::const_iterator it = m_areas.begin(); it != m_areas.end(); ++it) {
@@ -127,119 +126,114 @@ void BSPBuilder::EmitBSPAreas() {
 
 		BSPArea *bspArea = m_bspFile->AddArea();
 
-		for (int i = 0; i < 3; ++i) {
-			bspArea->mins[i] = (float)area->bounds.Mins()[i];
-			bspArea->maxs[i] = (float)area->bounds.Maxs()[i];
-		}
+		SceneFile::BBox bounds;
+		bounds.Initialize();
 
 		bspArea->firstPortal = std::numeric_limits<U32>::max();
 		bspArea->numPortals = 0;
 
 		EmitBSPAreaportals(m_root.get(), area->area, *bspArea);
 
-		bspArea->rootNode = -1;
+		bspArea->firstModel = m_bspFile->numModelIndices;
+		bspArea->numModels = 0;
 
-		if (area->root)
-			bspArea->rootNode = EmitBSPAreaNode(area->root.get(), *bspArea);
+		for (SceneFile::TriModel::Vec::const_iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
+			const SceneFile::TriModel::Ref &trim = *m;
+
+			if (trim->areas.find(area->area) == trim->areas.end())
+				continue; // not in this area.
+			if (trim->emitIds.empty())
+				continue;
+			
+			bounds.Insert(trim->bounds);
+
+			// NOTE this indexes all model fragments, even if they are isolated in other areas they still
+			// belong to a model that touches this area.
+
+			m_bspFile->ReserveModelIndices((int)trim->emitIds.size());
+
+			for (SceneFile::IntVec::const_iterator id = trim->emitIds.begin(); id != trim->emitIds.end(); ++id) {
+				if (*id > std::numeric_limits<U16>::max()) {
+					Log("ERROR: there are too many models in this map (exceeds 32k)!\n");
+					SetResult(pkg::SR_CompilerError);
+					return false;
+				}
+
+				*(m_bspFile->AddModelIndex()) = (U16)*id;
+			}
+		}
+
+		for (int i = 0; i < 3; ++i) {
+			bspArea->mins[i] = (float)bounds.Mins()[i];
+			bspArea->maxs[i] = (float)bounds.Maxs()[i];
+		}
+	}
+
+	return true;
+}
+
+void BSPBuilder::EmitBSPModels() {
+
+	for (SceneFile::TriModel::Vec::const_iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
+		const SceneFile::TriModel::Ref &trim = *m;
+
+		if (trim->ignore)
+			continue;
+
+		if (trim->areas.empty())
+			continue;
+
+		EmitBSPModel(trim);
 	}
 }
 
-S32 BSPBuilder::EmitBSPAreaNode(AreaNode *node, world::bsp_file::BSPArea &area) {
+void BSPBuilder::EmitBSPModel(const SceneFile::TriModel::Ref &triModel) {
 
-	if (node->planenum == kPlaneNumLeaf)
-		return EmitBSPAreaLeaf(node, area);
-
-	node->emitId = (int)m_bspFile->numAreaNodes.get();
-	BSPAreaNode *bspNode = m_bspFile->AddAreaNode();
-
-	for (int i = 0; i < 3; ++i) {
-		bspNode->mins[i] = (float)node->bounds.Mins()[i];
-		bspNode->maxs[i] = (float)node->bounds.Maxs()[i];
-	}
-
-	bspNode->parent = (S32)(node->parent ? node->parent->emitId : -1);
-	bspNode->planenum = node->planenum;
-
-	S32 front = EmitBSPAreaNode(node->children[0].get(), area);
-	S32 back = EmitBSPAreaNode(node->children[1].get(), area);
-
-	bspNode = const_cast<BSPAreaNode*>(m_bspFile->AreaNodes() + node->emitId);
-	bspNode->children[0] = front;
-	bspNode->children[1] = back;
-
-	return (S32)node->emitId;
-}
-
-S32 BSPBuilder::EmitBSPAreaLeaf(AreaNode *leaf, world::bsp_file::BSPArea &area) {
-
-	leaf->emitId = (int)m_bspFile->numAreaLeafs.get();
-
-	BSPAreaLeaf *bspLeaf = m_bspFile->AddAreaLeaf();
-
-	for (int i = 0; i < 3; ++i) {
-		bspLeaf->mins[i] = (float)leaf->bounds.Mins()[i];
-		bspLeaf->maxs[i] = (float)leaf->bounds.Maxs()[i];
-	}
-	
 	typedef zone_set<int, ZBSPBuilderT>::type IntSet;
 	IntSet mats;
 
 	// gather materials.
 
-	for (AreaNodePolyVec::const_iterator it = leaf->tris.begin(); it != leaf->tris.end(); ++it) {
-		const AreaNodePolyRef &poly = *it;
-		RAD_ASSERT(poly->tri);
-		mats.insert(poly->tri->mat);
+	for (SceneFile::TriFaceVec::const_iterator f = triModel->tris.begin(); f != triModel->tris.end(); ++f) {
+		const SceneFile::TriFace &trif = *f;
+		if (trif.areas.empty())
+			continue;
+		mats.insert(trif.mat);
 	}
-
-	bspLeaf->firstModel = m_bspFile->numModels;
-	bspLeaf->numModels = 0;
 
 	for (int c = 1; c <= kMaxUVChannels; ++c){
 		for (IntSet::const_iterator it = mats.begin(); it != mats.end(); ++it) {
 			EmitTriModel m;
 			m.mat = *it;
 			m.numChannels = c;
+			m.bounds.Initialize();
 
-			for (AreaNodePolyVec::const_iterator it = leaf->tris.begin(); it != leaf->tris.end(); ++it) {
-				const AreaNodePolyRef &poly = *it;
+			for (SceneFile::TriFaceVec::const_iterator f = triModel->tris.begin(); f != triModel->tris.end(); ++f) {
+				const SceneFile::TriFace &trif = *f;
 
-				RAD_ASSERT(poly->tri);
-
-				if (poly->tri->mat != m.mat)
+				if (trif.mat != m.mat)
 					continue;
-				if (poly->tri->model->numChannels != c)
+				if (trif.model->numChannels != c)
+					continue;
+				if (trif.areas.empty())
 					continue;
 
-				int numElems = (int)(poly->winding.Vertices().size() - 2) * 3;
-
-				if (((int)m.indices.size() >= kMaxBatchElements-numElems) ||
-					((int)m.verts.size() >= kMaxBatchElements-numElems)) {
-					EmitBSPModel(m);
+				if (((int)m.indices.size() >= kMaxBatchElements-3) ||
+					((int)m.verts.size() >= kMaxBatchElements-3)) {
+					triModel->emitIds.push_back(EmitBSPModel(m));
 					m.Clear();
-					++bspLeaf->numModels;
 				}
 
-				// fan triangles.
-				size_t numVerts = poly->winding.Vertices().size();
-				for (size_t i = 0; i+1 < numVerts - 1; ++i) {
-					m.AddVertex(EmitTriModel::Vert(poly->winding.Vertices()[numVerts - 1]));
-					m.AddVertex(EmitTriModel::Vert(poly->winding.Vertices()[i]));
-					m.AddVertex(EmitTriModel::Vert(poly->winding.Vertices()[i+1]));
-				}
-				/*for (AreaNodeWinding::VertexListType::const_iterator it = poly->winding.Vertices().begin(); it != poly->winding.Vertices().end(); ++it) {
-					m.AddVertex(EmitTriModel::Vert(*it));
-				}*/
+				m.AddVertex(EmitTriModel::Vert(ToBSPType(triModel->verts[trif.v[0]])));
+				m.AddVertex(EmitTriModel::Vert(ToBSPType(triModel->verts[trif.v[1]])));
+				m.AddVertex(EmitTriModel::Vert(ToBSPType(triModel->verts[trif.v[2]])));
 			}
 
 			if (!m.verts.empty()) {
-				EmitBSPModel(m);
-				++bspLeaf->numModels;
+				triModel->emitIds.push_back(EmitBSPModel(m));
 			}
 		}
 	}
-
-	return -(leaf->emitId + 1);
 }
 
 void BSPBuilder::EmitBSPAreaportals(Node *leaf, int areaNum, BSPArea &area) {
@@ -325,17 +319,23 @@ void BSPBuilder::EmitTriModel::AddVertex(const Vert &vert) {
 	verts.push_back(vert);
 	vmap.insert(VertMap::value_type(vert, ofs));
 	indices.push_back(ofs);
+	bounds.Insert(vert.pos);
 }
 
-void BSPBuilder::EmitBSPModel(const EmitTriModel &model) {
+int BSPBuilder::EmitBSPModel(const EmitTriModel &model) {
 	
 	BSPModel *bspModel = m_bspFile->AddModel();
 	bspModel->firstVert = m_bspFile->numVerts;
 	bspModel->numVerts = (U32)model.verts.size();
 	bspModel->firstIndex = m_bspFile->numIndices;
 	bspModel->numIndices = (U32)model.indices.size();
-	bspModel->material = (U32)model.mat;
+	bspModel->material = FindBSPMaterial(m_map->mats[model.mat].name.c_str);
 	bspModel->numChannels = (U32)model.numChannels;
+
+	for (int i = 0; i < 3; ++i) {
+		bspModel->mins[i] = (float)model.bounds.Mins()[i];
+		bspModel->maxs[i] = (float)model.bounds.Maxs()[i];
+	}
 	
 	m_bspFile->ReserveVertices((int)model.verts.size());
 	m_bspFile->ReserveIndices((int)model.indices.size());
@@ -352,12 +352,18 @@ void BSPBuilder::EmitBSPModel(const EmitTriModel &model) {
 		}
 
 		for (i = 0; i < model.numChannels && i < world::bsp_file::kMaxUVChannels; ++i) {
-			bspV->st[i*2+0] = (float)v.st[i][0];
-			bspV->st[i*2+1] = (float)v.st[i][1];
+			for (int k = 0; k < 2; ++k)
+				bspV->st[i*2+k] = (float)v.st[i][k];
+			for (int k = 0; k < 4; ++k)
+				bspV->t[i*4+k] = (float)v.tangent[i][k];
 		}
 
-		for (; i < world::bsp_file::kMaxUVChannels; ++i)
-			bspV->st[i*2+0] = bspV->st[i*2+1] = 0.f;
+		for (; i < world::bsp_file::kMaxUVChannels; ++i) {
+			for (int k = 0; k < 2; ++k)
+				bspV->st[i*2+k] = 0.f;
+			for (int k = 0; k < 4; ++k)
+				bspV->t[i*4+k] = 0.f;
+		}
 	}
 
 	for (EmitTriModel::Indices::const_iterator it = model.indices.begin(); it != model.indices.end(); ++it) { 
@@ -365,6 +371,8 @@ void BSPBuilder::EmitBSPModel(const EmitTriModel &model) {
 		RAD_ASSERT(*it < std::numeric_limits<U16>::max());
 		*m_bspFile->AddIndex() = (U16)*it;
 	}
+
+	return (int)(m_bspFile->numModels - 1);
 }
 
 S32 BSPBuilder::EmitBSPNodes(const Node *node, S32 parent) {
@@ -396,8 +404,8 @@ S32 BSPBuilder::EmitBSPNodes(const Node *node, S32 parent) {
 	bspNode->planenum = (U32)node->planenum;
 
 	for (int i = 0; i < 3; ++i) {
-		bspNode->mins[i] = node->bounds.Mins()[i];
-		bspNode->maxs[i] = node->bounds.Maxs()[i];
+		bspNode->mins[i] = (float)node->bounds.Mins()[i];
+		bspNode->maxs[i] = (float)node->bounds.Maxs()[i];
 	}
 
 	U32 left = EmitBSPNodes(node->children[0].get(), index);

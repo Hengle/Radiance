@@ -20,7 +20,7 @@ enum  {
 
 RAD_ZONE_DEF(RADENG_API, ZBSPFile, "BSPFile", ZWorld);
 
-BOOST_STATIC_ASSERT(sizeof(BSPVertex)==40);
+BOOST_STATIC_ASSERT(sizeof(BSPVertex)==72);
 BOOST_STATIC_ASSERT(sizeof(BSPCameraTM)==9*4);
 
 BSPFileParser::BSPFileParser() :
@@ -29,8 +29,6 @@ m_ents(0),
 m_mats(0),
 m_nodes(0),
 m_leafs(0),
-m_areaNodes(0),
-m_areaLeafs(0),
 m_areas(0),
 m_areaportals(0),
 m_models(0),
@@ -56,6 +54,7 @@ m_numModels(0),
 m_numPlanes(0),
 m_numVerts(0),
 m_numAreaportalIndices(0),
+m_numModelIndices(0),
 m_numIndices(0),
 m_numActorIndices(0),
 m_numActors(0),
@@ -65,8 +64,7 @@ m_numCinematicTriggers(0),
 m_numCinematics(0) {
 }
 
-BSPFileParser::~BSPFileParser()
-{
+BSPFileParser::~BSPFileParser() {
 	if (m_skas)
 		delete [] m_skas;
 	if (m_skms)
@@ -78,7 +76,7 @@ BSPFileParser::~BSPFileParser()
 int BSPFileParser::Parse(const void *data, AddrSize len) {
 	// Read header
 	const U8 *bytes = reinterpret_cast<const U8*>(data);
-	CHECK_SIZE(sizeof(U32)*25);
+	CHECK_SIZE(sizeof(U32)*24);
 	U32 tag = *reinterpret_cast<const U32*>(bytes);
 	U32 version  = *reinterpret_cast<const U32*>(bytes+sizeof(U32));
 	if (tag != kBspTag || version != kBspVersion)
@@ -89,8 +87,8 @@ int BSPFileParser::Parse(const void *data, AddrSize len) {
 	U32 numChannels = *reinterpret_cast<const U32*>(bytes);
 	if (numChannels > kMaxUVChannels)
 		return pkg::SR_InvalidFormat;
-
 	bytes += sizeof(U32);
+
 	m_numStrings = *reinterpret_cast<const U32*>(bytes);
 	bytes += sizeof(U32);
 	m_numMats = *reinterpret_cast<const U32*>(bytes);
@@ -100,11 +98,6 @@ int BSPFileParser::Parse(const void *data, AddrSize len) {
 	m_numNodes = *reinterpret_cast<const U32*>(bytes);
 	bytes += sizeof(U32);
 	m_numLeafs = *reinterpret_cast<const U32*>(bytes);
-	bytes += sizeof(U32);
-	bytes += sizeof(U32);
-	m_numAreaNodes = *reinterpret_cast<const U32*>(bytes);
-	bytes += sizeof(U32);
-	m_numAreaLeafs = *reinterpret_cast<const U32*>(bytes);
 	bytes += sizeof(U32);
 	m_numAreas = *reinterpret_cast<const U32*>(bytes);
 	bytes += sizeof(U32);
@@ -119,6 +112,8 @@ int BSPFileParser::Parse(const void *data, AddrSize len) {
 	m_numVerts = *reinterpret_cast<const U32*>(bytes);
 	bytes += sizeof(U32);
 	m_numAreaportalIndices = *reinterpret_cast<const U32*>(bytes);
+	bytes += sizeof(U32);
+	m_numModelIndices = *reinterpret_cast<const U32*>(bytes);
 	bytes += sizeof(U32);
 	m_numIndices = *reinterpret_cast<const U32*>(bytes);
 	bytes += sizeof(U32);
@@ -150,12 +145,6 @@ int BSPFileParser::Parse(const void *data, AddrSize len) {
 	CHECK_SIZE(sizeof(BSPLeaf)*m_numLeafs);
 	m_leafs = reinterpret_cast<const BSPLeaf*>(bytes);
 	bytes += sizeof(BSPLeaf)*m_numLeafs;
-	CHECK_SIZE(sizeof(BSPAreaNode)*m_numAreaNodes);
-	m_areaNodes = reinterpret_cast<const BSPAreaNode*>(bytes);
-	bytes += sizeof(BSPAreaNode)*m_numAreaNodes;
-	CHECK_SIZE(sizeof(BSPAreaLeaf)*m_numAreaLeafs);
-	m_areaLeafs = reinterpret_cast<const BSPAreaLeaf*>(bytes);
-	bytes += sizeof(BSPAreaLeaf)*m_numAreaLeafs;
 	CHECK_SIZE(sizeof(BSPArea)*m_numAreas);
 	m_areas = reinterpret_cast<const BSPArea*>(bytes);
 	bytes += sizeof(BSPArea)*m_numAreas;
@@ -177,10 +166,13 @@ int BSPFileParser::Parse(const void *data, AddrSize len) {
 	CHECK_SIZE(sizeof(U16)*m_numAreaportalIndices);
 	m_areaportalIndices = reinterpret_cast<const U16*>(bytes);
 	bytes += sizeof(U16)*m_numAreaportalIndices;
+	CHECK_SIZE(sizeof(U16)*m_numModelIndices);
+	m_modelIndices = reinterpret_cast<const U16*>(bytes);
+	bytes += sizeof(U16)*m_numModelIndices;
 	CHECK_SIZE(sizeof(U16)*m_numIndices);
 	m_indices = reinterpret_cast<const U16*>(bytes);
 	bytes += sizeof(U16)*m_numIndices;
-	if ((m_numAreaportalIndices+m_numIndices)&1) // align?
+	if ((m_numAreaportalIndices+m_numModelIndices+m_numIndices)&1) // align?
 		bytes += sizeof(U16);
 	CHECK_SIZE(sizeof(U32)*m_numActorIndices);
 	m_actorIndices = reinterpret_cast<const U32*>(bytes);
@@ -271,8 +263,6 @@ int BSPFileBuilder::Write(stream::OutputStream &os) {
 	os << (U32)m_ents.size();
 	os << (U32)m_nodes.size();
 	os << (U32)m_leafs.size();
-	os << (U32)m_areaNodes.size();
-	os << (U32)m_areaLeafs.size();
 	os << (U32)m_areas.size();
 	os << (U32)m_areaportals.size();
 	os << (U32)m_models.size();
@@ -280,6 +270,7 @@ int BSPFileBuilder::Write(stream::OutputStream &os) {
 	os << (U32)m_planes.size();
 	os << (U32)m_vertices.size();
 	os << (U32)m_areaportalIndices.size();
+	os << (U32)m_modelIndices.size();
 	os << (U32)m_indices.size();
 	os << (U32)m_actorIndices.size();
 	os << (U32)m_actors.size();
@@ -302,12 +293,6 @@ int BSPFileBuilder::Write(stream::OutputStream &os) {
 	len = (stream::SPos)(sizeof(BSPLeaf)*m_leafs.size());
 	if (len && os.Write(&m_leafs[0], len, 0) != len)
 		return pkg::SR_IOError;
-	len = (stream::SPos)(sizeof(BSPAreaNode)*m_nodes.size());
-	if (len && os.Write(&m_areaNodes[0], len, 0) != len)
-		return pkg::SR_IOError;
-	len = (stream::SPos)(sizeof(BSPAreaLeaf)*m_leafs.size());
-	if (len && os.Write(&m_areaLeafs[0], len, 0) != len)
-		return pkg::SR_IOError;
 	len = (stream::SPos)(sizeof(BSPArea)*m_areas.size());
 	if (len && os.Write(&m_areas[0], len, 0) != len)
 		return pkg::SR_IOError;
@@ -329,10 +314,13 @@ int BSPFileBuilder::Write(stream::OutputStream &os) {
 	len = (stream::SPos)(sizeof(U16)*m_areaportalIndices.size());
 	if (len && os.Write(&m_areaportalIndices[0], len, 0) != len)
 		return pkg::SR_IOError;
+	len = (stream::SPos)(sizeof(U16)*m_modelIndices.size());
+	if (len && os.Write(&m_modelIndices[0], len, 0) != len)
+		return pkg::SR_IOError;
 	len = (stream::SPos)(sizeof(U16)*m_indices.size());
 	if (len && os.Write(&m_indices[0], len, 0) != len)
 		return pkg::SR_IOError;
-	if ((m_areaportalIndices.size()+m_indices.size())&1) {
+	if ((m_areaportalIndices.size()+m_modelIndices.size()+m_indices.size())&1) {
 		if (!os.Write((U16)0)) // padd
 			return pkg::SR_IOError;
 	}

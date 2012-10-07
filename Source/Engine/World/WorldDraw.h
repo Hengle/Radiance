@@ -39,7 +39,6 @@ public:
 	PlaneVec frustum;
 
 	dBSPLeaf *bspLeaf;
-	dBSPAreaLeaf *areaLeaf;
 	bool mirror;
 
 	EntityBits marked;
@@ -235,9 +234,7 @@ private:
 	void LinkEntity(Entity *entity, const BBox &bounds);
 	void UnlinkEntity(Entity *entity);
 	void LinkEntity(Entity *entity, const BBox &bounds, int nodeNum);
-	dBSPAreaLeaf *LeafForPoint(const Vec3 &pos, int areaNum);
-	dBSPAreaLeaf *LeafForPoint_r(const Vec3 &pos, int nodeNum);
-
+	
 	int m_frame;
 	bool m_wireframe;
 	Counters m_counters;
@@ -245,8 +242,6 @@ private:
 	MStaticWorldMeshBatch::RefVec m_worldModels;
 	pkg::Asset::Ref m_wireframeAsset;
 	r::Material *m_wireframeMat;
-	dBSPAreaNode::Vec m_nodes;
-	dBSPAreaLeaf::Vec m_leafs;
 	ScreenOverlay::List m_overlays;
 	RB_WorldDraw::Ref m_rb;
 	details::MBatchIdMap m_refMats;

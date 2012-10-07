@@ -18,6 +18,7 @@
 #include <Runtime/Math/Winding.h>
 #include <Runtime/Math/AABB.h>
 #include <Runtime/Container/ZoneMap.h>
+#include <Runtime/Container/ZoneSet.h>
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/StringBase.h>
 #include <string>
@@ -85,6 +86,10 @@ public:
 		typedef T ValueType;
 
 		TriVert() {}
+		TriVert(const TriVert &v) {
+			*this = v;
+		}
+
 		explicit TriVert(const Vec3 &v) : pos(v) {}
 		operator Vec3 () const { return pos; }
 
@@ -97,6 +102,7 @@ public:
 			x.orgPos = orgPos + v.orgPos;
 			for (int i = 0; i < kMaxUVChannels; ++i) {
 				x.st[i] = st[i] + v.st[i];
+				x.tangent[i] = Vec4(x.tangent[i] + v.tangent[i], x.tangent[i].W());
 			}
 			x.normal = normal + v.normal;
 			x.color = color + v.color;
@@ -111,6 +117,7 @@ public:
 			x.orgPos = orgPos - v.orgPos;
 			for (int i = 0; i < kMaxUVChannels; ++i) {
 				x.st[i] = st[i] - v.st[i];
+				x.tangent[i] = Vec4(x.tangent[i] - v.tangent[i], x.tangent[i].W());
 			}
 			x.normal = normal - v.normal;
 			x.color = color - v.color;
@@ -125,6 +132,7 @@ public:
 			x.orgPos = orgPos * v.orgPos;
 			for (int i = 0; i < kMaxUVChannels; ++i) {
 				x.st[i] = st[i] * v.st[i];
+				x.tangent[i] = Vec4(x.tangent[i] * v.tangent[i], x.tangent[i].W());
 			}
 			x.normal = normal * v.normal;
 			x.color = color * v.color;
@@ -139,6 +147,7 @@ public:
 			x.orgPos = orgPos / v.orgPos;
 			for (int i = 0; i < kMaxUVChannels; ++i) {
 				x.st[i] = st[i] / v.st[i];
+				x.tangent[i] = Vec4(x.tangent[i] / v.tangent[i], x.tangent[i].W());
 			}
 			x.normal = normal / v.normal;
 			x.color = color / v.color;
@@ -151,6 +160,7 @@ public:
 			orgPos = v.orgPos;
 			for (int i = 0; i < kMaxUVChannels; ++i) {
 				st[i] = v.st[i];
+				tangent[i] = v.tangent[i];
 			}
 
 			normal = v.normal;
@@ -186,6 +196,7 @@ public:
 			x.orgPos = orgPos * s;
 			for (int i = 0; i < kMaxUVChannels; ++i) {
 				x.st[i] = st[i] * s;
+				x.tangent[i] = Vec4(x.tangent[i] * s, x.tangent[i].W());
 			}
 			x.normal = normal * s;
 			x.color = color * s;
@@ -200,6 +211,7 @@ public:
 			x.orgPos = orgPos / s;
 			for (int i = 0; i < kMaxUVChannels; ++i) {
 				x.st[i] = st[i] / s;
+				x.tangent[i] = Vec4(x.tangent[i] / s, x.tangent[i].W());
 			}
 			x.normal = normal / s;
 			x.color = color / s;
@@ -220,28 +232,23 @@ public:
 		// NOTE: < > <= >= do not take into account the normal.
 
 		bool operator < (const TriVert &v) const {
-			if (pos[0] < v.pos[0] ||
-				(pos[0] == v.pos[0] && pos[1] < v.pos[1]) ||
-				(pos[0] == v.pos[0] && pos[1] == v.pos[1] && pos[2] < v.pos[2])) {
+			if (pos < v.pos)
 				return true;
-			}
 
 			if (pos == v.pos) {
 				for (int i = 0; i < kMaxUVChannels; ++i) {
 					if (i > 0) {
 						for (int k = 0; k < i; ++k) {
-							if (st[k][0] != v.st[k][0] ||
-								st[k][1] != v.st[k][1])
-									return false;
+							if (st[k] != v.st[k])
+								return false;
 						}
 					}
 
-					if (st[i][0] < v.st[i][0] ||
-						(st[i][0] == v.st[i][0] && st[i][1] < v.st[i][1])) {
+					if (st[i] < v.st[i])
 						return true;
-					}
 				}
 			}
+
 			return false;
 		}
 
@@ -250,26 +257,21 @@ public:
 		}
 
 		bool operator > (const TriVert &v) const {
-			if (pos[0] > v.pos[0] ||
-				(pos[0] == v.pos[0] && pos[1] > v.pos[1]) ||
-				(pos[0] == v.pos[0] && pos[1] == v.pos[1] && pos[2] > v.pos[2])) {
+
+			if (pos > v.pos)
 				return true;
-			}
 
 			if (pos == v.pos) {
 				for (int i = 0; i < kMaxUVChannels; ++i) {
 					if (i > 0) {
 						for (int k = 0; k < i; ++k) {
-							if (st[k][0] != v.st[k][0] ||
-								st[k][1] != v.st[k][1])
-									return false;
+							if (st[k] != v.st[k])
+								return false;
 						}
 					}
 
-					if (st[i][0] > v.st[i][0] ||
-						(st[i][0] == v.st[i][0] && st[i][1] > v.st[i][1])) {
+					if (st[i] > v.st[i])
 						return true;
-					}
 				}
 			}
 			return false;
@@ -280,14 +282,13 @@ public:
 		}
 
 		bool operator == (const TriVert &v) const {
-			for (int i = 0; i < 3; i++)
-				if (pos[i] != v.pos[i])
-					return false;
+			if (pos != v.pos)
+				return false;
 
-			for (int i = 0; i < kMaxUVChannels; ++i)
-				for (int j = 0; j < 2; ++j)
-					if (st[i][j] != v.st[i][j])
-						return false;
+			for (int i = 0; i < kMaxUVChannels; ++i) {
+				if(st[i] != v.st[i])
+					return false;
+			}
 
 			return true;
 		}
@@ -299,12 +300,15 @@ public:
 		Vec3 pos; // rounded vertex position.
 		Vec3 orgPos; // original vertex position.
 		Vec2 st[kMaxUVChannels];
+		// NOTE: from Eric Lengyel's book, tangent.w stores sign of bitangent
+		// which can be found via: bitangent = tangent.w * (normal.Cross(tangent))
+		Vec4 tangent[kMaxUVChannels];
 		Vec3 normal;
 		Vec3 color;
 		BoneWeights weights;
 	};
 
-	// adds < > <= >= that test for normal.
+	// adds < > <= >= that test for normal & tangent
 	struct NormalTriVert : public TriVert {
 		NormalTriVert() {}
 		explicit NormalTriVert(const TriVert &v) : TriVert(v) {}
@@ -314,10 +318,20 @@ public:
 				return true;
 
 			if (TriVert::operator == (v)) {
-				if (this->normal[0] < v.normal[0] ||
-				(this->normal[0] == v.normal[0] && this->normal[1] < v.normal[1]) ||
-				(this->normal[0] == v.normal[0] && this->normal[1] == v.normal[1] && this->normal[2] < v.normal[2])) {
+				
+				if (normal < v.normal)
 					return true;
+				
+				for (int i = 0; i < kMaxUVChannels; ++i) {
+					if (i > 0) {
+						for (int k = 0; k < i; ++k) {
+							if (tangent[k] != v.tangent[k])
+								return false;
+						}
+					}
+
+					if (tangent[i] < v.tangent[i])
+						return true;
 				}
 			}
 
@@ -333,10 +347,20 @@ public:
 				return true;
 
 			if (TriVert::operator == (v)) {
-				if (this->normal[0] > v.normal[0] ||
-				(this->normal[0] == v.normal[0] && this->normal[1] > v.normal[1]) ||
-				(this->normal[0] == v.normal[0] && this->normal[1] == v.normal[1] && this->normal[2] > v.normal[2])) {
+
+				if (normal > v.normal)
 					return true;
+
+				for (int i = 0; i < kMaxUVChannels; ++i) {
+					if (i > 0) {
+						for (int k = 0; k < i; ++k) {
+							if (tangent[k] != v.tangent[k])
+								return false;
+						}
+					}
+
+					if (tangent[i] > v.tangent[i])
+						return true;
 				}
 			}
 
@@ -351,9 +375,13 @@ public:
 			if (TriVert::operator != (v))
 				return false;
 
-			for (int i = 0; i < 3; i++)
-				if (this->normal[i] != v.normal[i])
+			if (this->normal != v.normal)
+				return false;
+			
+			for (int i = 0; i < kMaxUVChannels; ++i) {
+				if (tangent[i] != v.tangent[i])
 					return false;
+			}
 
 			return true;
 		}
@@ -527,7 +555,8 @@ public:
 	struct TriModel;
 	typedef typename zone_vector<TriVert, Z3DXT>::type TriVertVec;
 	typedef typename zone_vector<NormalTriVert, Z3DXT>::type NormalTriVertVec;
-	typedef typename zone_vector<int, Z3DXT>::type AreaNumVec;
+	typedef typename zone_set<int, Z3DXT>::type AreaNumSet;
+	typedef typename zone_vector<int, Z3DXT>::type IntVec;
 
 	struct TriFace {
 		TriFace() : outside(true), shared(-1), contents(0), surface(0) {
@@ -548,13 +577,13 @@ public:
 		}
 
 		Plane plane;
+		AreaNumSet areas;
 		unsigned int v[3];
 		int mat;
 		int shared;
 		int contents;
 		int surface;
 		bool outside;
-		AreaNumVec areas;
 		TriModel *model;
 	};
 
@@ -622,6 +651,8 @@ public:
 		AnimMap anims;
 		BBox bounds;
 		String name;
+		AreaNumSet areas;
+		IntVec emitIds;
 		int id;
 		int skel;
 		int contents;
