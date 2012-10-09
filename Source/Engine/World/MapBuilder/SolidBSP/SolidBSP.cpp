@@ -685,8 +685,11 @@ int BSPBuilder::FindSplitPlane(Node *node, int &boxAxis)
 										break;
 									case Plane::Cross:
 										++split;
-										if (mdl->original->contents == kContentsFlag_Areaportal)
-											++areaportal;
+										if (mdl->original->contents == kContentsFlag_Areaportal) {
+											// areaportals don't get penalized for splitting eachother
+											if (!((*polyIt)->contents & kContentsFlag_Areaportal)) 
+												++areaportal;
+										}
 										break;
 									case Plane::On:
 										++front;
@@ -714,8 +717,11 @@ int BSPBuilder::FindSplitPlane(Node *node, int &boxAxis)
 			}
 
 			if (bestNum != -1) 
-				break; // don't split using outside unless we have no inside
+				break; // idealized splitter
 		}
+
+		if (bestNum != -1) 
+			break; // don't split using outside unless we have no inside
 
 		if (!m_flood) 
 			break; // don't do 2 passes unless we filled outside.

@@ -34,8 +34,9 @@ public:
 	RAD_DECLARE_PROPERTY(DrawModel, angles, const Vec3&, const Vec3&);
 	RAD_DECLARE_PROPERTY(DrawModel, scale, const Vec3&, const Vec3&);
 	RAD_DECLARE_PROPERTY(DrawModel, visible, bool, bool);
+	RAD_DECLARE_PROPERTY(DrawModel, bounds, const BBox&, const BBox&);
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, rgba, const Vec4&);
-	
+
 protected:
 
 	void RefBatch(const MBatchDraw::Ref &batch);
@@ -50,6 +51,7 @@ protected:
 		virtual RAD_DECLARE_GET(visible, bool) { return m_model->visible; }
 		virtual RAD_DECLARE_GET(rgba, const Vec4&) { return m_model->rgba; }
 		virtual RAD_DECLARE_GET(scale, const Vec3&) { return m_model->scale; }
+		virtual RAD_DECLARE_GET(bounds, const BBox&) { return m_model->bounds; }
 	private:
 		DrawModel *m_model;
 	};
@@ -60,20 +62,58 @@ private:
 
 	friend class WorldDraw;
 
-	RAD_DECLARE_GET(entity, Entity*) { return m_entity; }
-	RAD_DECLARE_GET(pos, const Vec3&) { return m_p; }
-	RAD_DECLARE_SET(pos, const Vec3&) { m_p = value; }
-	RAD_DECLARE_GET(angles, const Vec3&) { return m_r; }
-	RAD_DECLARE_SET(angles, const Vec3&) { m_r = value; }
-	RAD_DECLARE_GET(scale, const Vec3&) { return m_scale; }
-	RAD_DECLARE_SET(scale, const Vec3&) { m_scale = value; }
-	RAD_DECLARE_GET(visible, bool) { return m_visible && m_rgba[0][3] > 0.f; }
-	RAD_DECLARE_SET(visible, bool) { m_visible = value; }
-	RAD_DECLARE_GET(rgba, const Vec4&) { return m_rgba[0]; }
+	RAD_DECLARE_GET(entity, Entity*) { 
+		return m_entity; 
+	}
+
+	RAD_DECLARE_GET(pos, const Vec3&) { 
+		return m_p; 
+	}
+
+	RAD_DECLARE_SET(pos, const Vec3&) { 
+		m_p = value; 
+	}
+
+	RAD_DECLARE_GET(angles, const Vec3&) { 
+		return m_r; 
+	}
+
+	RAD_DECLARE_SET(angles, const Vec3&) { 
+		m_r = value; 
+	}
+
+	RAD_DECLARE_GET(scale, const Vec3&) { 
+		return m_scale; 
+	}
+
+	RAD_DECLARE_SET(scale, const Vec3&) { 
+		m_scale = value; 
+	}
+
+	RAD_DECLARE_GET(visible, bool) { 
+		return m_visible && m_rgba[0][3] > 0.f; 
+	}
+
+	RAD_DECLARE_SET(visible, bool) { 
+		m_visible = value; 
+	}
+
+	RAD_DECLARE_GET(rgba, const Vec4&) { 
+		return m_rgba[0]; 
+	}
+	
+	RAD_DECLARE_GET(bounds, const BBox&) {
+		return m_bounds;
+	}
+
+	RAD_DECLARE_SET(bounds, const BBox&) {
+		m_bounds = value;
+	}
 	
 	Vec3 m_r;
 	Vec3 m_p;
 	Vec3 m_scale;
+	BBox m_bounds;
 	Entity *m_entity;
 	MBatchDraw::RefVec m_batches;
 	Vec4 m_rgba[3];

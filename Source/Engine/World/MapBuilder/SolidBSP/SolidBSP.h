@@ -87,15 +87,15 @@ private:
 	///////////////////////////////////////////////////////////////////////////////
 
 	enum ContentsFlags {
-		RAD_FLAG(kContentsFlag_Solid), // solid splits first, all other contents are detail splitters
-		RAD_FLAG(kContentsFlag_Areaportal),
+		RAD_FLAG(kContentsFlag_Areaportal), // areaportal splits first, all other contents are detail splitters
+		RAD_FLAG(kContentsFlag_Solid), 
 		RAD_FLAG(kContentsFlag_Detail), // never in the BSP.
 		RAD_FLAG(kContentsFlag_Clip),
 		RAD_FLAG(kContentsFlag_Fog),
 		RAD_FLAG(kContentsFlag_Water),
 		kContentsFlag_VisibleContents = kContentsFlag_Solid|kContentsFlag_Detail|kContentsFlag_Clip|kContentsFlag_Fog|kContentsFlag_Water|kContentsFlag_Areaportal,
 		kContentsFlag_FirstVisibleContents = kContentsFlag_Solid,
-		kContentsFlag_LastVisibleContents = kContentsFlag_Areaportal,
+		kContentsFlag_LastVisibleContents = kContentsFlag_Water,
 		kContentsFlag_Structural = kContentsFlag_Solid|kContentsFlag_Areaportal, // just used for classification
 		kContentsFlag_SolidContents = kContentsFlag_Solid, // blocks portal flood
 		kContentsFlag_BSPContents = 0xffffffff & ~kContentsFlag_Detail

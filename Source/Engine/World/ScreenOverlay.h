@@ -33,10 +33,8 @@ private:
 
 	friend class WorldDraw;
 
-	ScreenOverlay(WorldDraw *draw, const details::MBatchRef &mbatch);
+	ScreenOverlay(WorldDraw *draw, const details::MatRef &mat);
 
-	RAD_DECLARE_READONLY_PROPERTY(ScreenOverlay, mbatch, const details::MBatchRef&);
-	RAD_DECLARE_GET(mbatch, const details::MBatchRef&) { return m_mbatch; }
 	RAD_DECLARE_GET(alpha, float) { return m_alpha; }
 	RAD_DECLARE_GET(fading, bool) { return m_time != 0.f; }
 
@@ -45,7 +43,7 @@ private:
 	bool m_fade;
 	List::iterator m_it;
 	WorldDraw *m_draw;
-	details::MBatchRef m_mbatch;
+	const details::MatRef *m_mat;
 };
 
 } // world

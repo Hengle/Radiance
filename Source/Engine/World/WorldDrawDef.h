@@ -15,11 +15,15 @@ class World;
 class WorldDraw;
 class RB_WorldDraw;
 class MBatchDraw;
-typedef zone_vector<MBatchDraw*, ZWorldT>::type MBatchDrawPtrVec;
 
 namespace details {
 
-class MBatch;
+struct MBatchDrawLink;
+
+struct MatRef;
+typedef zone_map<int, MatRef, ZWorldT>::type MatRefMap;
+
+struct MBatch;
 typedef boost::shared_ptr<MBatch> MBatchRef;
 typedef zone_map<int, MBatchRef, ZWorldT>::type MBatchIdMap;
 

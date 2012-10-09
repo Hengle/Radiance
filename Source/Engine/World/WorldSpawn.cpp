@@ -245,7 +245,7 @@ void World::SpawnModel(
 			r::MGS_TexCoords,
 			0,
 			sizeof(bsp_file::BSPVertex),
-			sizeof(float)*3
+			sizeof(float)*6
 		);
 	}
 
@@ -255,7 +255,7 @@ void World::SpawnModel(
 			r::MGS_TexCoords,
 			1,
 			sizeof(bsp_file::BSPVertex),
-			sizeof(float)*5
+			sizeof(float)*8
 		);
 	}
 
@@ -265,9 +265,11 @@ void World::SpawnModel(
 	memcpy(vb->ptr, bsp.Indices()+model->firstIndex, vb->size.get());
 	vb.reset();
 
+	BBox bounds(model->mins[0], model->mins[1], model->mins[2], model->maxs[0], model->maxs[1], model->maxs[2]);
+
 	pkg::Asset::Ref material = m_bspMaterials[model->material];
 	if (material)
-		m_draw->AddStaticWorldMesh(mesh, material->id);
+		m_draw->AddStaticWorldMesh(mesh, bounds, material->id);
 }
 
 int World::SpawnSpecials(
@@ -690,6 +692,19 @@ void World::LoadBSP(const bsp_file::BSPFile &bsp) {
 		m_leafs.push_back(l);
 	}
 
+	num = (int)bsp.numAreas.get();
+	m_areas.reserve(num);
+	for (int i = 0; i < num; ++i) {
+		const bsp_file::BSPArea *x = bsp.Areas() + i;
+		dBSPArea area;
+		area.firstPortal = (int)x->firstPortal;
+		area.numPortals = (int)x->numPortals;
+		area.firstModel = (int)x->firstModel;
+		area.numModels = (int)x->numModels;
+		area.bounds.Initialize(x->mins[0], x->mins[1], x->mins[2], x->maxs[0], x->maxs[1], x->maxs[2]);
+		m_areas.push_back(area);
+	}
+
 	num = (int)bsp.numAreaportals.get();
 	m_areaportals.reserve(num);
 	Winding::VertexListType verts;
@@ -698,12 +713,15 @@ void World::LoadBSP(const bsp_file::BSPFile &bsp) {
 		
 		verts.reserve(x->numVerts);
 
+		Areaportal portal;
+		portal.bounds.Initialize();
+
 		for (int k = 0; k < (int)x->numVerts; ++k) {
 			const bsp_file::BSPVertex *v = bsp.Vertices() + x->firstVert + k;
-			verts.push_back(Vec3(v->v[0], v->v[1], v->v[2]));
+			Vec3 p(v->v[0], v->v[1], v->v[2]);
+			portal.bounds.Insert(p);
+			verts.push_back(p);
 		}
-
-		Areaportal portal;
 
 		portal.open = true;
 		portal.areas[0] = x->areas[0];

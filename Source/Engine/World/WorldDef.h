@@ -47,7 +47,18 @@ typedef zone_vector<Winding, ZWorldT>::type WindingVec;
 typedef math::Winding<Vec3, Plane, math::stack_tag<8> > StackWinding;
 typedef zone_vector<StackWinding, ZWorldT>::type StackWindingVec;
 typedef stackify<StackWindingVec, 8> StackWindingStackVec;
-typedef std::pair<int, StackWindingStackVec> ClippedAreaVolume;
+
+struct ClippedAreaVolume {
+
+	ClippedAreaVolume(int _area, const StackWindingStackVec &_volume, const BBox &_bounds) :
+		area(_area), volume(_volume), bounds(_bounds) {
+	}
+
+	int area;
+	StackWindingStackVec volume;
+	BBox bounds;
+};
+
 typedef stackify< std::vector<ClippedAreaVolume>, 8 > ClippedAreaVolumeStackVec;
 
 struct dBSPNode {
@@ -67,6 +78,19 @@ struct dBSPLeaf {
 	int contents;
 	int firstClipSurface;
 	int numClipSurfaces;
+
+	EntityPtrSet occupants;
+};
+
+struct dBSPArea {
+	typedef zone_vector<dBSPArea, ZWorldT>::type Vec;
+	typedef zone_vector<dBSPArea*, ZWorldT>::type PtrVec;
+
+	BBox bounds;
+	int firstPortal;
+	int numPortals;
+	int firstModel;
+	int numModels;
 
 	EntityPtrSet occupants;
 };

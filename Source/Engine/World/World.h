@@ -117,9 +117,10 @@ public:
 		\remarks NOTE: clipped may contain multiple volumes for each area (if there were
 		multiple portals into the area in question.
 	*/
-	bool OccupantVolumeCanSeeArea(
-		const Vec3 &pos,
-		const StackWindingStackVec &volume,
+	bool ClipOccupantVolume(
+		const Vec3 *pos, // if null just bounding volume test
+		const StackWindingStackVec *volume,  // if null just bounding volume test
+		const BBox &volumeBounds,
 		ClippedAreaVolumeStackVec *clipped,
 		int fromArea,
 		int toArea,
@@ -160,6 +161,7 @@ private:
 		int areas[2];
 		int planenum;
 		Winding winding;
+		BBox bounds;
 	};
 
 	World(Game &game, int slot, const SoundContextRef &sound, pkg::Zone zone);
@@ -259,29 +261,23 @@ private:
 		LinkEntityParms(
 			Entity *_entity,
 			const BBox &_bounds,
-			const StackWindingStackVec &_bbox,
-			AreaBits &_tested,
 			AreaBits &_visible
 		) : entity(_entity),
 		    bounds(_bounds),
-			bbox(_bbox),
-			tested(_tested),
 			visible(_visible) {
 		}
 
 		Entity *entity;
 		const BBox &bounds;
-		const StackWindingStackVec &bbox;
-		AreaBits &tested;
 		AreaBits &visible;
 	};
 
 	void LinkEntity(const LinkEntityParms &constArgs, int nodeNum);
 
-	struct OccupantVolumeClipParms {
+	struct ClipOccupantVolumeParms {
 
-		OccupantVolumeClipParms(
-			const Vec3 &_pos,
+		ClipOccupantVolumeParms(
+			const Vec3 *_pos,
 			ClippedAreaVolumeStackVec *_clipped,
 			int _toArea,
 			AreaBits &_visible,
@@ -293,16 +289,17 @@ private:
 			stack(_stack) {
 		}
 		
-		const Vec3 &pos;
+		const Vec3 *pos;
 		ClippedAreaVolumeStackVec *clipped;
 		int toArea;
 		AreaBits &visible;
 		AreaBits &stack;
 	};
 
-	bool OccupantVolumeCanSeeArea(
-		const OccupantVolumeClipParms &constArgs,
-		const StackWindingStackVec &volume,
+	bool ClipOccupantVolume(
+		const ClipOccupantVolumeParms &constArgs,
+		const StackWindingStackVec *volume,
+		const BBox &volumeBounds,
 		int fromArea
 	);
 
@@ -311,10 +308,10 @@ private:
 
 	static void BoundWindings(const BBox &bounds, StackWindingStackVec &windings);
 	static bool ChopWindingToVolume(const StackWindingStackVec &volume, StackWinding &out);
-	static bool ChopVolume(StackWindingStackVec &volume, const Plane &p);
-	static bool ChopVolume(StackWindingStackVec &volume, const PlaneVec &planes);
-	static bool IntersectVolumes(const StackWindingStackVec &a, StackWindingStackVec &out);
-	static void MakeVolume(const Plane *planes, int num, StackWindingStackVec &volume);
+	static bool ChopVolume(StackWindingStackVec &volume, BBox &bounds, const Plane &p);
+	static bool ChopVolume(StackWindingStackVec &volume, BBox &bounds, const PlaneVec &planes);
+	static bool IntersectVolumes(const StackWindingStackVec &a, StackWindingStackVec &out, BBox &bounds);
+	static void MakeVolume(const Plane *planes, int num, StackWindingStackVec &volume, BBox &bounds);
 	static void MakeBoundingPlanes(const Vec3 &pos, const StackWinding &portal, PlaneVec &planes);
 
 	void BBoxTouching(
@@ -446,6 +443,7 @@ private:
 	WorldDraw::Counters m_drawCounters;
 	dBSPNode::Vec m_nodes;
 	dBSPLeaf::Vec m_leafs;
+	dBSPArea::Vec m_areas;
 	Areaportal::Vec m_areaportals;
 	PlaneVec m_planes;
 	U32 m_spawnOfs;

@@ -32,8 +32,7 @@ m_world(w),
 m_spawnOfs(0),
 m_cameraActive(false),
 m_cameraEnabled(false),
-m_inUpdate(false)
-{
+m_inUpdate(false) {
 }
 
 int WorldCinematics::Spawn(
@@ -44,8 +43,7 @@ int WorldCinematics::Spawn(
 {
 	m_bspFile = bsp;
 
-	while ((m_spawnOfs < (int)bsp->numActors.get()) && time.remaining)
-	{
+	while ((m_spawnOfs < (int)bsp->numActors.get()) && time.remaining) {
 		const BSPActor *bspActor = bsp->Actors()+m_spawnOfs;
 
 		Actor::Ref actor(new (ZWorld) Actor());
@@ -64,8 +62,7 @@ int WorldCinematics::Spawn(
 
 		// create material batches
 		const ska::DSkm &dskm = bsp->DSkm(bspActor->ska);
-		for (int i = 0; i < (int)dskm.meshes.size(); ++i)
-		{
+		for (int i = 0; i < (int)dskm.meshes.size(); ++i) {
 			int id = App::Get()->engine->sys->packages->ResolveId(
 				dskm.meshes[i].material
 			);
@@ -74,7 +71,7 @@ int WorldCinematics::Spawn(
 				continue;
 
 			MBatchDraw::Ref batch(new SkActorBatch(actor, i, id));
-//			m_world->draw->AddBatch(batch, true);
+			m_world->draw->AddMaterial(id);
 		}
 
 		++m_spawnOfs;
@@ -83,8 +80,7 @@ int WorldCinematics::Spawn(
 	return (m_spawnOfs < (int)bsp->numActors.get()) ? SR_Pending : SR_Success;
 }
 
-void WorldCinematics::Tick(int frame, float dt)
-{
+void WorldCinematics::Tick(int frame, float dt) {
 	ska::BoneTM tm;
 
 	m_cameraActive = false;
@@ -92,18 +88,15 @@ void WorldCinematics::Tick(int frame, float dt)
 
 	bool active;
 
-	do
-	{
-		// I need to tick any cinematics that were started by events
-		// to make sure we get an updated camera position before cuts occur
+	do {
+		// Tick any cinematics that were started by events to make sure we 
+		// get an updated camera position before cuts occur
 		active = false;
 
-		for (Cinematic::List::iterator it = m_cinematics.begin(); it != m_cinematics.end();)
-		{
+		for (Cinematic::List::iterator it = m_cinematics.begin(); it != m_cinematics.end();) {
 			Cinematic &c = *(*it);
 
-			if (c.updateFrame == frame)
-			{
+			if (c.updateFrame == frame) {
 				++it;
 				continue;
 			}
@@ -114,8 +107,7 @@ void WorldCinematics::Tick(int frame, float dt)
 			c.updateFrame = frame;
 
 			// tick actors
-			for (IntSet::iterator it2 = c.actors.begin(); it2 != c.actors.end();)
-			{
+			for (IntSet::iterator it2 = c.actors.begin(); it2 != c.actors.end();) {
 				const Actor::Ref &actor = m_actors[*it2];
 
 				RAD_ASSERT(actor->m);
@@ -133,13 +125,11 @@ void WorldCinematics::Tick(int frame, float dt)
 
 				bool remove = false;
 
-				if (!source || source->finished)
-				{
+				if (!source || source->finished) {
 #if !defined(RAD_TARGET_GOLDEN)
 					COut(C_Debug) << "Cinematics(" << c.name << ") actor(" << *it2 << ") done." << std::endl;
 #endif
-					if (actor->flags&kHideWhenDone)
-					{
+					if (actor->flags&kHideWhenDone) {
 						actor->visible = false;
 						actor->m->ska->root = ska::Controller::Ref();
 					}
@@ -147,15 +137,12 @@ void WorldCinematics::Tick(int frame, float dt)
 					remove = true;
 				}
 
-				if (remove)
-				{
+				if (remove) {
 					actor->frame = -1;
 					IntSet::iterator next = it2; ++next;
 					c.actors.erase(it2);
 					it2 = next;
-				}
-				else
-				{
+				} else {
 					if (!actor->loop)
 						++numActive;
 
@@ -167,14 +154,12 @@ void WorldCinematics::Tick(int frame, float dt)
 			
 			int rootFrame = (int)c.frame[0];
 
-			while (c.trigger && rootFrame >= c.trigger->frame)
-			{
+			while (c.trigger && rootFrame >= c.trigger->frame) {
 				const BSPCameraTrack *track = 0;
 				if (c.trigger->camera > -1)
 					track = m_bspFile->CameraTracks() + c.trigger->camera;
 
-				if (track && track != c.track && (c.flags&CF_AnimateCamera))
-				{
+				if (track && track != c.track && (c.flags&CF_AnimateCamera)) {
 					if (c.track)
 						EmitCameraTags(c);
 					c.track = track;
@@ -189,8 +174,7 @@ void WorldCinematics::Tick(int frame, float dt)
 				if (tickDelta < 0.001f)
 					tickDelta = 0.001f;
 
-				for (int i = 0; i < c.trigger->numActors; ++i)
-				{
+				for (int i = 0; i < c.trigger->numActors; ++i) {
 					int actorIdx = (int)(m_bspFile->ActorIndices()+c.trigger->firstActor)[i];
 					bool loop = actorIdx & 0x10000000 ? true : false;
 					actorIdx &= 0x00ffffff;
@@ -201,17 +185,14 @@ void WorldCinematics::Tick(int frame, float dt)
 					// always direct an actor on first play of a cinematic, or if they are
 					// not doing anything.
 
-					if (c.loopCount == 0 || actor->frame == -1)
-					{
+					if (c.loopCount == 0 || actor->frame == -1) {
 						// first, pull this actor out of any executing cinematic, we are taking him over!
-						for (Cinematic::List::iterator it2 = m_cinematics.begin(); it2 != m_cinematics.end(); ++it2)
-						{
+						for (Cinematic::List::iterator it2 = m_cinematics.begin(); it2 != m_cinematics.end(); ++it2) {
 							if (it == it2)
 								continue;
 							Cinematic &c2 = *(*it2);
 #if !defined(RAD_TARGET_GOLDEN)
-							if (c2.actors.find(actorIdx) != c2.actors.end())
-							{
+							if (c2.actors.find(actorIdx) != c2.actors.end()) {
 								COut(C_Debug) << "Cinematics(" << c.name << ") is taking over directing actor (" << actorIdx << ") from cinematic (" << c2.name << ")." << std::endl;
 							}
 #endif
@@ -221,8 +202,7 @@ void WorldCinematics::Tick(int frame, float dt)
 						// play cinematic animation.
 						ska::Animation::Map::const_iterator animIt = actor->m->ska->anims->find(c.name);
 
-						if (animIt != actor->m->ska->anims->end())
-						{
+						if (animIt != actor->m->ska->anims->end()) {
 							actor->visible = true;
 							actor->loop = loop;
 							actor->frame = c.trigger->frame;
@@ -262,19 +242,15 @@ void WorldCinematics::Tick(int frame, float dt)
 					}
 				}
 
-				if (++c.triggerNum < c.cinematic->numTriggers)
-				{
+				if (++c.triggerNum < c.cinematic->numTriggers) {
 					++c.trigger;
-				}
-				else
-				{
+				} else {
 					c.trigger = 0; // no more triggers
 				}
 			}
 
 			// update camera
-			if (c.track)
-			{
+			if (c.track) {
 				c.xfade[0] += dt;
 				EmitCameraTags(c);
 				BlendCameraFrame(c);
@@ -287,15 +263,13 @@ void WorldCinematics::Tick(int frame, float dt)
 			bool suppress = c.suppressFinish;
 			c.suppressFinish = false;
 
-			if (!c.trigger && !c.camera && (c.actors.empty() || !numActive) && !suppress)
-			{
+			if (!c.trigger && !c.camera && (c.actors.empty() || !numActive) && !suppress) {
 				// Cinematic is completed (no upcoming triggers).
 				// Some looping actors may remain.
 
 				// If we are a looping cinematic, then all we want to do is reset our
 				// time and start over.
-				if (c.flags&CF_Loop)
-				{
+				if (c.flags&CF_Loop) {
 #if !defined(RAD_TARGET_GOLDEN)
 					COut(C_Debug) << "Cinematic(" << c.name << ") looping." << std::endl;
 #endif
@@ -315,22 +289,18 @@ void WorldCinematics::Tick(int frame, float dt)
 					// NOTE: it may now be invalid since OnComplete() may have stopped us.
 					it = m_cinematics.begin();
 					continue; // jump to start.
-				}
-				else if (!(c.flags&CF_CanPlayForever) && !numActive)
-				{
+				} else if (!(c.flags&CF_CanPlayForever) && !numActive) {
 #if !defined(RAD_TARGET_GOLDEN)
 					COut(C_Debug) << "Cinematic(" << c.name << ") finished." << std::endl;
 #endif
 					// no non-looping actors are playing and we are not a play forever cinematic
 					// so clean up and stop.
 
-					for (IntSet::iterator it2 = c.actors.begin(); it2 != c.actors.end(); ++it2)
-					{
+					for (IntSet::iterator it2 = c.actors.begin(); it2 != c.actors.end(); ++it2) {
 						const Actor::Ref &actor = m_actors[*it2];
 						RAD_ASSERT(actor->loop);
 
-						if (actor->flags&kHideWhenDone)
-						{
+						if (actor->flags&kHideWhenDone) {
 							actor->visible = false;
 							actor->frame = -1;
 							actor->m->ska->root = ska::Controller::Ref();
@@ -367,10 +337,8 @@ bool WorldCinematics::PlayCinematic(
 	int flags,
 	float xfadeCamera,
 	const Notify::Ref &notify
-)
-{
-	for(Cinematic::List::const_iterator it = m_cinematics.begin(); it != m_cinematics.end(); ++it)
-	{
+) {
+	for(Cinematic::List::const_iterator it = m_cinematics.begin(); it != m_cinematics.end(); ++it) {
 		if (!strcmp(name, (*it)->name.c_str) && !(*it)->done)
 			return true;
 	}
@@ -392,8 +360,7 @@ bool WorldCinematics::PlayCinematic(
 	c->xfade[1] = xfadeCamera;
 	c->suppressFinish = m_inUpdate; // keep us from infinite looping.
 
-	for (int i = 0; i < (int)m_bspFile->numCinematics.get(); ++i)
-	{
+	for (int i = 0; i < (int)m_bspFile->numCinematics.get(); ++i) {
 		const BSPCinematic *bspC = m_bspFile->Cinematics()+i;
 		const char *sz = m_bspFile->String(bspC->name);
 		if (strcmp(name, sz))
@@ -416,10 +383,8 @@ bool WorldCinematics::PlayCinematic(
 	return true;
 }
 
-void WorldCinematics::StopCinematic(const char *name)
-{
-	for (Cinematic::List::iterator it = m_cinematics.begin(); it != m_cinematics.end(); ++it)
-	{
+void WorldCinematics::StopCinematic(const char *name) {
+	for (Cinematic::List::iterator it = m_cinematics.begin(); it != m_cinematics.end(); ++it) {
 		Cinematic &c = *(*it);
 		if (strcmp(name, c.name.c_str))
 			continue;
@@ -429,11 +394,9 @@ void WorldCinematics::StopCinematic(const char *name)
 #endif
 
 		// reset actors?
-		for (IntSet::iterator it2 = c.actors.begin(); it2 != c.actors.end(); ++it2)
-		{
+		for (IntSet::iterator it2 = c.actors.begin(); it2 != c.actors.end(); ++it2) {
 			const Actor::Ref &a = m_actors[*it2];
-			if (a->flags&kHideWhenDone)
-			{
+			if (a->flags&kHideWhenDone) {
 				a->visible = false;
 				a->frame = -1;
 				a->m->ska->root = ska::Controller::Ref();
@@ -448,10 +411,8 @@ void WorldCinematics::StopCinematic(const char *name)
 	}
 }
 
-float WorldCinematics::CinematicTime(const char *name)
-{
-	for (Cinematic::List::iterator it = m_cinematics.begin(); it != m_cinematics.end(); ++it)
-	{
+float WorldCinematics::CinematicTime(const char *name) {
+	for (Cinematic::List::iterator it = m_cinematics.begin(); it != m_cinematics.end(); ++it) {
 		Cinematic &c = *(*it);
 		if (strcmp(name, c.name.c_str))
 			continue;
@@ -461,14 +422,11 @@ float WorldCinematics::CinematicTime(const char *name)
 	return -1.f;
 }
 
-bool WorldCinematics::SetCinematicTime(const char *name, float time)
-{
+bool WorldCinematics::SetCinematicTime(const char *name, float time) {
 	Cinematic *c = 0;
-	for (Cinematic::List::iterator it = m_cinematics.begin(); it != m_cinematics.end(); ++it)
-	{
+	for (Cinematic::List::iterator it = m_cinematics.begin(); it != m_cinematics.end(); ++it) {
 		Cinematic &x = *(*it);
-		if (!strcmp(name, x.name.c_str))
-		{
+		if (!strcmp(name, x.name.c_str)) {
 			c = &x;
 			break;
 		}
@@ -483,15 +441,13 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time)
 	float frame = time * c->cinematic->fps;
 	int intFrame = (int)frame;
 
-	if ((intFrame == (int)c->frame[0]) && (frame >= c->frame[0]))
-	{ // advance fractional frames
+	if ((intFrame == (int)c->frame[0]) && (frame >= c->frame[0])) { 
+		// advance fractional frames
 
 		float timeDelta = (frame - c->frame[0]);
-		if (timeDelta > 0)
-		{
+		if (timeDelta > 0) {
 			// no new triggers but we need to advance fractional frames
-			for (IntSet::iterator it = c->actors.begin(); it != c->actors.end();)
-			{
+			for (IntSet::iterator it = c->actors.begin(); it != c->actors.end();) {
 				const Actor::Ref &actor = m_actors[*it];
 
 				RAD_ASSERT(actor->m);
@@ -509,13 +465,11 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time)
 
 				bool remove = false;
 
-				if (!source || source->finished)
-				{
+				if (!source || source->finished) {
 #if !defined(RAD_TARGET_GOLDEN)
 					COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << *it << ") done." << std::endl;
 #endif
-					if (actor->flags&kHideWhenDone)
-					{
+					if (actor->flags&kHideWhenDone) {
 						actor->visible = false;
 						actor->m->ska->root = ska::Controller::Ref();
 					}
@@ -523,15 +477,12 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time)
 					remove = true;
 				}
 
-				if (remove)
-				{
+				if (remove) {
 					actor->frame = -1;
 					IntSet::iterator next = it; ++next;
 					c->actors.erase(it);
 					it = next;
-				}
-				else
-				{
+				} else {
 					++it;
 				}
 			}
@@ -544,12 +495,10 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time)
 	// any actors triggered at or after our target frame need to be removed.
 	// any other actors will have their time set when we build our trigger state
 
-	for (IntSet::iterator it = c->actors.begin(); it != c->actors.end();)
-	{
+	for (IntSet::iterator it = c->actors.begin(); it != c->actors.end();) {
 		const Actor::Ref &actor = m_actors[*it];
 
-		if (actor->frame >= intFrame)
-		{
+		if (actor->frame >= intFrame) {
 #if !defined(RAD_TARGET_GOLDEN)
 			COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << *it << ") done." << std::endl;
 #endif
@@ -560,9 +509,7 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time)
 			IntSet::iterator next = it; ++next;
 			c->actors.erase(it);
 			it = next;
-		}
-		else
-		{
+		} else {
 			++it;
 		}
 	}
@@ -586,10 +533,8 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time)
 		if (c->trigger->camera > -1)
 			track = m_bspFile->CameraTracks() + c->trigger->camera;
 
-		if (track && (c->flags&CF_AnimateCamera))
-		{
-			if (triggerDelta <= (float)(track->numTMs-1))
-			{
+		if (track && (c->flags&CF_AnimateCamera)) {
+			if (triggerDelta <= (float)(track->numTMs-1)) {
 				c->track = track;
 				c->camera = true;
 				c->frame[1] = (float)c->trigger->frame;
@@ -603,8 +548,7 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time)
 		if (tickDelta < 0.001f)
 			tickDelta = 0.001f;
 
-		for (int i = 0; i < c->trigger->numActors; ++i)
-		{
+		for (int i = 0; i < c->trigger->numActors; ++i) {
 			int actorIdx = (int)(m_bspFile->ActorIndices()+c->trigger->firstActor)[i];
 			bool loop = actorIdx & 0x10000000 ? true : false;
 			actorIdx &= 0x00ffffff;
@@ -614,17 +558,14 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time)
 
 			// is this actor just standing around?
 
-			if (actor->frame == -1)
-			{
+			if (actor->frame == -1) {
 				// play cinematic animation.
 				ska::Animation::Map::const_iterator animIt = actor->m->ska->anims->find(c->name);
 
-				if (animIt != actor->m->ska->anims->end())
-				{
+				if (animIt != actor->m->ska->anims->end()) {
 					// only trigger this animation if it won't be complete after it's played or
 					// the actor is not hidden when done.
-					if (loop || (animIt->second->length >= tickDelta) || !(actor->flags&kHideWhenDone))
-					{
+					if (loop || (animIt->second->length >= tickDelta) || !(actor->flags&kHideWhenDone)) {
 						actor->loop = loop;
 						actor->visible = true;
 						actor->frame = c->trigger->frame;
@@ -656,22 +597,17 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time)
 #endif
 					}
 				}
-			}
-			else
-			{
+			} else {
 				RAD_ASSERT(actor->m);
 				ska::AnimationSource::Ref source = 
 					boost::static_pointer_cast<ska::AnimationSource>(actor->m->ska->root.get());
 
-				if (source)
-				{
+				if (source) {
 #if !defined(RAD_TARGET_GOLDEN)
 					COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << actorIdx << ") time-seek." << std::endl;
 #endif
 					source->SetTime(tickDelta);
-				}
-				else
-				{
+				} else {
 #if !defined(RAD_TARGET_GOLDEN)
 					COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << actorIdx << ") invalidated." << std::endl;
 #endif
@@ -680,12 +616,9 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time)
 			}
 		}
 
-		if (++c->triggerNum < c->cinematic->numTriggers)
-		{
+		if (++c->triggerNum < c->cinematic->numTriggers) {
 			++c->trigger;
-		}
-		else
-		{
+		} else {
 			c->trigger = 0; // no more triggers
 		}
 	}
@@ -693,18 +626,15 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time)
 	return true;
 }
 
-void WorldCinematics::Skip()
-{
-	for (Cinematic::List::const_iterator it = m_cinematics.begin(); it != m_cinematics.end(); ++it)
-	{
+void WorldCinematics::Skip() {
+	for (Cinematic::List::const_iterator it = m_cinematics.begin(); it != m_cinematics.end(); ++it) {
 		const Cinematic &c = *(*it);
 		if (c.notify)
 			c.notify->OnSkip();
 	}
 }
 
-void WorldCinematics::EmitCameraTags(Cinematic &c)
-{
+void WorldCinematics::EmitCameraTags(Cinematic &c) {
 	if (!c.track || !c.notify)
 		return;
 
@@ -712,26 +642,20 @@ void WorldCinematics::EmitCameraTags(Cinematic &c)
 	if (frame > c.track->numTMs-1)
 		frame = c.track->numTMs-1;
 
-	for (; c.emitFrame <= frame; ++c.emitFrame)
-	{
+	for (; c.emitFrame <= frame; ++c.emitFrame) {
 		const BSPCameraTM *tm = m_bspFile->CameraTMs() + c.track->firstTM + c.emitFrame;
-		if (tm->tag > -1)
-		{
+		if (tm->tag > -1) {
 			const char *tag = m_bspFile->String(tm->tag);
 
 			// emit string, splitup multiples.
 			String x;
 
-			while (*tag)
-			{
-				if (*tag < 32 || *tag > 126)
-				{
+			while (*tag) {
+				if (*tag < 32 || *tag > 126) {
 					if (!x.empty)
 						c.notify->OnTag(x.c_str);
 					x.Clear();
-				}
-				else
-				{
+				} else {
 					x += *tag;
 				}
 
@@ -744,8 +668,7 @@ void WorldCinematics::EmitCameraTags(Cinematic &c)
 	}
 }
 
-void WorldCinematics::BlendCameraFrame(Cinematic &c)
-{
+void WorldCinematics::BlendCameraFrame(Cinematic &c) {
 	if (!c.track)
 		return;
 
@@ -754,16 +677,13 @@ void WorldCinematics::BlendCameraFrame(Cinematic &c)
 	int src, dst;
 	bool end = false;
 
-	if (frame >= (float)(c.track->numTMs))
-	{
+	if (frame >= (float)(c.track->numTMs)) {
 		frame = (float)(c.track->numTMs);
 		src = c.track->numTMs-1;
 		dst = src;
 		lerp = 0.f;
 		end = true;
-	}
-	else
-	{
+	} else {
 		math::ModF(baseFrame, lerp, frame);
 		src = (int)baseFrame;
 		dst = src+1;
@@ -795,8 +715,7 @@ void WorldCinematics::BlendCameraFrame(Cinematic &c)
 	if (c.xfade[0] > c.xfade[1])
 		c.xfade[0] = c.xfade[1];
 
-	if (m_cameraActive && c.xfade[0] < c.xfade[1])
-	{
+	if (m_cameraActive && c.xfade[0] < c.xfade[1]) {
 		ska::BoneTM temp(tmOut);
 
 		float blend = c.xfade[0] / c.xfade[1];
@@ -813,8 +732,7 @@ void WorldCinematics::BlendCameraFrame(Cinematic &c)
 	c.camera = !end;
 }
 
-void WorldCinematics::SkaNotify::OnTag(const ska::AnimTagEventData &data)
-{
+void WorldCinematics::SkaNotify::OnTag(const ska::AnimTagEventData &data) {
 	if (m_c->notify)
 		m_c->notify->OnTag(data.tag.c_str);
 	else
@@ -823,31 +741,27 @@ void WorldCinematics::SkaNotify::OnTag(const ska::AnimTagEventData &data)
 
 Vec4 WorldCinematics::SkActorBatch::s_rgba(1, 1, 1, 1);
 Vec3 WorldCinematics::SkActorBatch::s_scale(1, 1, 1);
+BBox WorldCinematics::SkActorBatch::s_bounds(Vec3::Zero, Vec3::Zero);
 
 WorldCinematics::SkActorBatch::SkActorBatch(const Actor::Ref &actor, int idx, int matId) :
-MBatchDraw(matId), m_idx(idx), m_actor(actor)
-{
+MBatchDraw(matId), m_idx(idx), m_actor(actor) {
 }
 
-void WorldCinematics::SkActorBatch::Bind(r::Shader *shader)
-{
+void WorldCinematics::SkActorBatch::Bind(r::Shader *shader) {
 	m_actor->m->Skin(m_idx);
 	r::Mesh &m = m_actor->m->Mesh(m_idx);
 	m.BindAll(shader);
 }
 
-void WorldCinematics::SkActorBatch::CompileArrayStates(r::Shader &shader)
-{
+void WorldCinematics::SkActorBatch::CompileArrayStates(r::Shader &shader) {
 	m_actor->m->Mesh(m_idx).CompileArrayStates(shader);
 }
 
-void WorldCinematics::SkActorBatch::FlushArrayStates(r::Shader *shader)
-{
+void WorldCinematics::SkActorBatch::FlushArrayStates(r::Shader *shader) {
 	m_actor->m->Mesh(m_idx).FlushArrayStates(shader);
 }
 
-void WorldCinematics::SkActorBatch::Draw()
-{
+void WorldCinematics::SkActorBatch::Draw() {
 	m_actor->m->Mesh(m_idx).Draw();
 }
 

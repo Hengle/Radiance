@@ -14,19 +14,32 @@
 #include <Runtime/PushPack.h>
 
 namespace world {
+
+class Entity;
+
 namespace details {
 
-class MBatch {
-public:
+struct MBatchDrawLink {
+	MBatchDrawLink *next;
+	MBatchDraw *draw;
+};
+
+struct MatRef {
+	r::Material *mat;
+	pkg::Asset::Ref asset;
+	asset::MaterialLoader::Ref loader;
+};
+
+struct MBatch {
 	MBatch();
+	~MBatch();
 
 	void AddDraw(MBatchDraw &draw);
 	
 	WorldDraw *owner;
-	r::Material *mat;
-	pkg::Asset::Ref asset;
-	asset::MaterialLoader::Ref loader;
-	MBatchDrawPtrVec draws;
+	const MatRef *matRef;
+	MBatchDrawLink *head;
+	MBatchDrawLink *tail;
 };
 
 } // details
@@ -36,13 +49,14 @@ public:
 	typedef boost::shared_ptr<MBatchDraw> Ref;
 	typedef zone_vector<Ref, ZWorldT>::type RefVec;
 	
-	MBatchDraw(int matId) : m_matId(matId) {}
+	MBatchDraw(int matId) : m_matId(matId), m_markFrame(-1) {}
 	virtual ~MBatchDraw() {}
 
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, matId, int);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, visible, bool);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, rgba, const Vec4&);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, scale, const Vec3&);
+	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, bounds, const BBox&);
 
 protected:
 
@@ -58,7 +72,8 @@ protected:
 	virtual RAD_DECLARE_GET(visible, bool) = 0;
 	virtual RAD_DECLARE_GET(rgba, const Vec4&) = 0;
 	virtual RAD_DECLARE_GET(scale, const Vec3&) = 0;
-	
+	virtual RAD_DECLARE_GET(bounds, const BBox&) = 0;
+
 	void SetMatId(int id) {
 		m_matId = id;
 	}
@@ -66,13 +81,14 @@ protected:
 private:
 	
 	friend class WorldDraw;
-	friend class details::MBatch;
+	friend struct details::MBatch;
 
 	RAD_DECLARE_GET(matId, int) { 
 		return m_matId; 
 	}
 
 	int m_matId;
+	int m_markFrame;
 };
 
 } // world

@@ -22,11 +22,30 @@ void RotateForDebugCamera();
 
 namespace details {
 
-MBatch::MBatch() : mat(0) {
+MBatch::MBatch() : matRef(0), head(0), tail(0) {
+}
+
+MBatch::~MBatch() {
+	RAD_ASSERT(owner);
+	while (head) {
+		tail = head->next;
+		owner->m_linkPool.Destroy(head);
+		head = tail;
+	}
 }
 
 void MBatch::AddDraw(MBatchDraw &draw) {
-	draws.push_back(&draw);
+	RAD_ASSERT(owner);
+	MBatchDrawLink *link = owner->m_linkPool.Construct();
+	link->draw = &draw;
+	link->next = 0;
+
+	if (tail)
+		tail->next = link;
+	tail = link;
+
+	if (!head)
+		head = link;
 }
 
 } // details
@@ -36,8 +55,8 @@ void MBatch::AddDraw(MBatchDraw &draw) {
 Vec4 WorldDraw::MStaticWorldMeshBatch::s_rgba(Vec4(1, 1, 1, 1));
 Vec3 WorldDraw::MStaticWorldMeshBatch::s_scale(Vec3(1, 1, 1));
 
-WorldDraw::MStaticWorldMeshBatch::MStaticWorldMeshBatch(const r::Mesh::Ref &m, int matId) :
-MBatchDraw(matId), m_m(m) {
+WorldDraw::MStaticWorldMeshBatch::MStaticWorldMeshBatch(const r::Mesh::Ref &m, const BBox &bounds, int matId) :
+MBatchDraw(matId), m_m(m), m_bounds(bounds) {
 }
 
 void WorldDraw::MStaticWorldMeshBatch::Bind(r::Shader *shader) {
@@ -71,6 +90,7 @@ void WorldDraw::Counters::Clear() {
 WorldDraw::WorldDraw(World *w) : 
 m_world(w), 
 m_frame(-1), 
+m_markFrame(-1),
 m_wireframe(false), 
 m_wireframeMat(0) {
 	m_rb = RB_WorldDraw::New(w);
@@ -83,6 +103,8 @@ WorldDraw::~WorldDraw() {
 	m_refMats.clear();
 	RAD_ASSERT(m_batchPool.NumUsedObjects() == 0);
 	m_batchPool.Destroy();
+	RAD_ASSERT(m_linkPool.NumUsedObjects() == 0);
+	m_linkPool.Destroy();
 }
 
 int WorldDraw::LoadMaterials() {
@@ -116,6 +138,8 @@ int WorldDraw::LoadMaterials() {
 void WorldDraw::Init(const bsp_file::BSPFile::Ref &bsp) {
 
 	m_batchPool.Create(ZWorld, "world-draw-batch", 64);
+	m_linkPool.Create(ZWorld, "world-draw-link", 64);
+
 }
 
 int WorldDraw::Precache() {
@@ -123,72 +147,20 @@ int WorldDraw::Precache() {
 	if (r != pkg::SR_Success)
 		return r;
 
-	// gather/sort all materials into batches array.
-	
-	//for (dBSPAreaLeaf::Vec::const_iterator it = m_leafs.begin(); it != m_leafs.end(); ++it) {
-	//	const dBSPAreaLeaf &leaf = *it;
-
-	//	// add static meshes
-	//	for (int i = 0; i < leaf.numModels; ++i) {
-	//		RAD_ASSERT((i+leaf.firstModel) < (int)m_worldModels.size());
-	//		const MStaticWorldMeshBatch::Ref &m = m_worldModels[i + leaf.firstModel];
-	//		details::MBatchRef batch = AddMaterialRef(m->m_matId);
-	//		batch->draws.push_back(m.get());
-	//	}
-
-	//	// add any occupants.
-	//	for (EntityPtrSet::const_iterator it = leaf.occupants.begin(); it != leaf.occupants.end(); ++it) {
-	//		Entity *e = *it;
-
-	//		const DrawModel::Map &models = e->models;
-	//		for (DrawModel::Map::const_iterator it2 = models.begin(); it2 != models.end(); ++it2) {
-	//			const DrawModel::Ref &model = it2->second;
-
-	//			for (MBatchDraw::RefVec::const_iterator it3 = model->m_batches.begin(); it3 != model->m_batches.end(); ++it3) {
-	//				const MBatchDraw::Ref &draw = *it3;
-	//				
-	//				details::MBatchRef batch = AddMaterialRef(draw->m_matId);
-	//				batch->draws.push_back(draw.get());
-	//			}
-	//		}
-	//	}
-	//}
-
-	// Precache materials & meshes.
+	// Precache materials.
 	ScreenOverlay::Ref overlay;
 
-	for (details::MBatchIdMap::iterator it = m_refMats.begin(); it != m_refMats.end(); ++it) {
-		details::MBatch &batch = *it->second;
+	for (details::MatRefMap::const_iterator it = m_refMats.begin(); it != m_refMats.end(); ++it) {
+		const details::MatRef &mat = it->second;
 
-		if (batch.draws.empty()) { 
-			// make sure texures get precached (i.e. UI materials may be in here)
-			if (overlay)
-				overlay->m_mbatch = it->second;
-			else
-				overlay = CreateScreenOverlay(batch.asset->id);
-
-			RAD_ASSERT(overlay);
-			DrawOverlay(*overlay);
+		if (overlay) {
+			overlay->m_mat = &mat;
 		} else {
-			batch.mat->BindStates();
-			batch.mat->BindTextures(batch.loader);
-			batch.mat->shader->Begin(r::Shader::P_Default, *batch.mat);
-
-			for (MBatchDrawPtrVec::const_iterator it = batch.draws.begin(); it != batch.draws.end(); ++it) {
-				MBatchDraw *draw = *it;
-
-				draw->Bind(batch.mat->shader.get().get());
-				batch.mat->shader->BindStates(true, draw->rgba);
-				m_rb->CommitStates();
-				draw->CompileArrayStates(*batch.mat->shader.get());
-				draw->Draw();		
-			}
-
-			m_rb->ReleaseArrayStates();
-			batch.mat->shader->End();
+			overlay = CreateScreenOverlay(mat.asset->id);
 		}
 
-		batch.draws.clear();
+		RAD_ASSERT(overlay);
+		DrawOverlay(*overlay);
 	}
 
 	m_rb->Finish();
@@ -204,8 +176,8 @@ void WorldDraw::AddEffect(int id, const PostProcessEffect::Ref &fx) {
 
 void WorldDraw::Tick(float dt) {
 
-	for (details::MBatchIdMap::const_iterator it = m_refMats.begin(); it != m_refMats.end(); ++it)
-		it->second->mat->Sample(m_world->time, dt);
+	for (details::MatRefMap::const_iterator it = m_refMats.begin(); it != m_refMats.end(); ++it)
+		it->second.mat->Sample(m_world->time, dt);
 
 	for (ScreenOverlay::List::const_iterator it = m_overlays.begin(); it != m_overlays.end(); ++it)
 		(*it)->Tick(dt);
@@ -226,26 +198,26 @@ details::MBatchRef WorldDraw::AllocateBatch() {
 	return details::MBatchRef(batch, &WorldDraw::DeleteBatch);
 }
 
-details::MBatchRef WorldDraw::AddMaterialRef(int id) {
-	details::MBatchIdMap::iterator it = m_refMats.find(id);
+details::MatRef *WorldDraw::AddMaterialRef(int id) {
+	details::MatRefMap::iterator it = m_refMats.find(id);
 	if (it != m_refMats.end())
-		return it->second;
+		return &it->second;
 
 	pkg::Asset::Ref asset = App::Get()->engine->sys->packages->Asset(id, pkg::Z_Engine);
 	if (!asset)
-		return details::MBatchRef();
+		return 0;
 
 	asset::MaterialParser::Ref parser = asset::MaterialParser::Cast(asset);
 	RAD_VERIFY(parser);
 
-	details::MBatchRef b(AllocateBatch());
-	b->asset = asset;
-	b->mat = parser->material;
-	b->loader = asset::MaterialLoader::Cast(asset);
-	RAD_VERIFY(b->loader);
+	details::MatRef r;
+	r.asset = asset;
+	r.mat = parser->material;
+	r.loader = asset::MaterialLoader::Cast(asset);
+	RAD_VERIFY(r.loader);
 
-	m_refMats.insert(details::MBatchIdMap::value_type(id, b));
-	return b;
+	std::pair<details::MatRefMap::iterator, bool> p = m_refMats.insert(details::MatRefMap::value_type(id, r));
+	return &p.first->second;
 }
 
 details::MBatchRef WorldDraw::AddViewBatch(ViewDef &view, int id) {
@@ -253,13 +225,12 @@ details::MBatchRef WorldDraw::AddViewBatch(ViewDef &view, int id) {
 	if (it != view.batches.end())
 		return it->second;
 
-	details::MBatchRef src = AddMaterialRef(id);
+	details::MatRef *matRef = AddMaterialRef(id);
+	if (!matRef)
+		return details::MBatchRef();
 
 	details::MBatchRef b(AllocateBatch());
-	b->asset = src->asset;
-	b->mat = src->mat;
-	b->loader = src->loader;
-
+	b->matRef = matRef;
 	view.batches.insert(details::MBatchIdMap::value_type(id, b));
 	return b;
 }
@@ -268,21 +239,17 @@ bool WorldDraw::AddMaterial(int id) {
 	return AddMaterialRef(id);
 }
 
-void WorldDraw::RemoveMaterial(int id) {
-	m_refMats.erase(id);
-}
-
 ScreenOverlay::Ref WorldDraw::CreateScreenOverlay(int matId)
 {
-	details::MBatchRef mbatch = AddMaterialRef(matId);
-	if (!mbatch)
+	details::MatRef *matRef = AddMaterialRef(matId);
+	if (!matRef)
 		return ScreenOverlay::Ref();
-	return ScreenOverlay::Ref(new (ZWorld) ScreenOverlay(this, mbatch));
+	return ScreenOverlay::Ref(new (ZWorld) ScreenOverlay(this, *matRef));
 }
 
-void WorldDraw::AddStaticWorldMesh(const r::Mesh::Ref &m, int matId) {
+void WorldDraw::AddStaticWorldMesh(const r::Mesh::Ref &m, const BBox &bounds, int matId) {
 	RAD_ASSERT(m);
-	MStaticWorldMeshBatch::Ref r(new (ZWorld) MStaticWorldMeshBatch(m, matId));
+	MStaticWorldMeshBatch::Ref r(new (ZWorld) MStaticWorldMeshBatch(m, bounds, matId));
 	m_worldModels.push_back(r);
 }
 
@@ -321,7 +288,8 @@ void WorldDraw::Draw(Counters *counters) {
 }
 
 void WorldDraw::FindViewArea(ViewDef &view) {
-	view.bspLeaf = m_world->LeafForPoint(view.camera.pos);
+	dBSPLeaf *leaf = m_world->LeafForPoint(view.camera.pos);
+	view.area = leaf ? leaf->area : -1;
 }
 
 void WorldDraw::SetupFrustumPlanes(ViewDef &view) {
@@ -371,48 +339,78 @@ void WorldDraw::SetupFrustumPlanes(ViewDef &view) {
 	}
 }
 
-/*void WorldDraw::VisMark(ViewDef &view, int nodeNum) {
+void WorldDraw::VisMarkAreas(ViewDef &view) {
 
-	RAD_ASSERT(view.areaLeaf);
+	if (view.area < 0)
+		return; // no area set.
 
-	if (nodeNum < 0) {
-		nodeNum = -(nodeNum + 1);
-		const Leaf &leaf = m_leafs[nodeNum];
-		if (!leaf.numModels)
-			return;
+	StackWindingStackVec frustumVolume;
+	BBox frustumBounds;
 
-		++m_counters.testedLeafs;
-		if (!ClipBounds(view, leaf.bounds))
-			return;
-		++m_counters.drawnLeafs;
+	World::MakeVolume(&view.frustum[0], (int)view.frustum.size(), frustumVolume, frustumBounds);
 
-		for (int i = 0; i < leaf.numModels; ++i)
-			m_worldModels[i+leaf.firstModel]->Mark(m_frame);
+	AreaBits areas;
+	ClippedAreaVolumeStackVec frustumAreas;
+	m_world->ClipOccupantVolume(
+		&view.camera.pos.get(),
+		&frustumVolume,
+		frustumBounds,
+		&frustumAreas,
+		view.area,
+		-1,
+		areas
+	);
 
-		return;
+	++m_markFrame;
+
+	// add occupants from area the view is in.
+	VisMarkArea(view, view.area, frustumVolume, frustumBounds);
+
+	for (ClippedAreaVolumeStackVec::const_iterator it = frustumAreas->begin(); it != frustumAreas->end(); ++it) {
+		const ClippedAreaVolume &volume = *it;
+		VisMarkArea(view, volume.area, volume.volume, volume.bounds);
 	}
 
-	const Node &node = m_nodes[nodeNum];
+}
 
-	++m_counters.testedNodes;
+void WorldDraw::VisMarkArea(
+	ViewDef &view,
+	int areaNum, 
+	const StackWindingStackVec &volume, 
+	const BBox &volumeBounds
+) {
 
-	if (!ClipBounds(view, node.bounds))
-		return;
+	RAD_ASSERT(areaNum > -1);
+	RAD_ASSERT(areaNum < (int)m_world->m_areas.size());
+	const dBSPArea &area = m_world->m_areas[areaNum];
 
-	++m_counters.drawnNodes;
+	for (int i = 0; i < area.numModels; ++i) {
+		U16 modelNum = *(m_world->m_bsp->ModelIndices() + i + area.firstModel);
+		RAD_ASSERT(modelNum < (U16)m_worldModels.size());
 
-	VisMark(view, node.children[0]);
-	VisMark(view, node.children[1]);
-}*/
+		const MStaticWorldMeshBatch::Ref &m = m_worldModels[modelNum];
+		if (m->m_markFrame != m_markFrame) {
+			if (ClipBounds(volume, volumeBounds, m->bounds)) {
+				m->m_markFrame = m_markFrame;
+				details::MBatchRef batch = AddViewBatch(view, m->m_matId);
+				if (batch)
+					batch->AddDraw(*m);
+			}
+		}
+	}
+}
 
-bool WorldDraw::ClipBounds(const ViewDef &view, const BBox &bounds) {
-	if (bounds.Contains(view.camera.pos, 1.f))
-		return true;
+bool WorldDraw::ClipBounds(const StackWindingStackVec &volume, const BBox &volumeBounds, const BBox &bounds) {
+	
+	// volume is convex.
 
-	for (int i = 0; i < ViewDef::kNumFrustumPlanes; ++i) {
-		Plane::SideType side = view.frustum[i].Side(bounds, 0.f);
-		if (side == Plane::Back)
-			return false; // clipped away.
+	if (!volumeBounds.Touches(bounds))
+		return false;
+
+	for (StackWindingStackVec::const_iterator it = volume->begin(); it != volume->end(); ++it) {
+		const StackWinding &w = *it;
+		if (w.Plane().Side(bounds) == Plane::Back)
+			return false;
 	}
 
 	// TODO: better frustum clipping
@@ -427,23 +425,20 @@ void WorldDraw::DrawView() {
 	FindViewArea(view);
 	SetupFrustumPlanes(view);
 
-	//if (m_nodes.empty())
-	//	VisMark(view, -1); // one leaf
-	//else
-	//	VisMark(view, 0);
+	VisMarkAreas(view);
 
 	m_rb->RotateForCamera(view.camera);
 	m_rb->SetWorldStates();
 
 	m_rb->numTris = 0;
 
-	DrawBatches(view, false);
+	DrawViewBatches(view, false);
 
 	m_counters.numTris += m_rb->numTris;
 
 	if (m_wireframe) {
 		m_rb->wireframe = true;
-		DrawBatches(view, true);
+		DrawViewBatches(view, true);
 		m_rb->wireframe = false;
 	}
 }
@@ -457,14 +452,14 @@ void WorldDraw::DrawUI() {
 	m_world->uiRoot->Draw();
 }
 
-void WorldDraw::DrawBatches(ViewDef &view, bool wireframe) {
+void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 	for (int i = r::Material::S_Solid; i < r::Material::NumSorts; ++i)
-		DrawBatches(view, (r::Material::Sort)i, wireframe);
+		DrawViewBatches(view, (r::Material::Sort)i, wireframe);
 }
 
-void WorldDraw::DrawBatches(ViewDef &view, r::Material::Sort sort, bool wireframe) {
+void WorldDraw::DrawViewBatches(ViewDef &view, r::Material::Sort sort, bool wireframe) {
 	for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
-		if (it->second->mat->sort != sort)
+		if (it->second->matRef->mat->sort != sort)
 			continue;
 		DrawBatch(*it->second, wireframe);
 	}
@@ -472,22 +467,22 @@ void WorldDraw::DrawBatches(ViewDef &view, r::Material::Sort sort, bool wirefram
 
 void WorldDraw::DrawBatch(const details::MBatch &batch, bool wireframe) {
 
-	if (batch.draws.empty())
+	if (!batch.head)
 		return;
 
 	Vec3 pos;
 	Vec3 angles;
-	r::Material *mat = (wireframe) ? m_wireframeMat : batch.mat;
+	r::Material *mat = (wireframe) ? m_wireframeMat : batch.matRef->mat;
 	bool first = true;
 
 	mat->BindStates();
 	if (!wireframe)
-		mat->BindTextures(batch.loader);
+		mat->BindTextures(batch.matRef->loader);
 	mat->shader->Begin(r::Shader::P_Default, *mat);
 
-	for (MBatchDrawPtrVec::const_iterator it = batch.draws.begin(); it != batch.draws.end(); ++it) {
-		MBatchDraw *draw = *it;
-		
+	for (details::MBatchDrawLink *link = batch.head; link; link = link->next) {
+		MBatchDraw *draw = link->draw;
+
 		bool tx = draw->GetTransform(pos, angles);
 		if (tx)
 			m_rb->PushMatrix(pos, draw->scale, angles);
@@ -518,16 +513,16 @@ void WorldDraw::DrawOverlay(ScreenOverlay &overlay) {
 	if (overlay.alpha <= 0.f)
 		return;
 
-	const details::MBatchRef &mbatch = overlay.mbatch;
-	mbatch->mat->BindStates();
-	mbatch->mat->BindTextures(mbatch->loader);
-	mbatch->mat->shader->Begin(r::Shader::P_Default, *mbatch->mat);
+	const details::MatRef *matRef = overlay.m_mat;
+	matRef->mat->BindStates();
+	matRef->mat->BindTextures(matRef->loader);
+	matRef->mat->shader->Begin(r::Shader::P_Default, *matRef->mat);
 	m_rb->BindOverlay();
 	Vec4 c(1, 1, 1, overlay.alpha);	
-	mbatch->mat->shader->BindStates(true, c);
+	matRef->mat->shader->BindStates(true, c);
 	m_rb->CommitStates();
 	m_rb->DrawOverlay();
-	mbatch->mat->shader->End();
+	matRef->mat->shader->End();
 }
 
 void WorldDraw::AddScreenOverlay(ScreenOverlay &overlay) {

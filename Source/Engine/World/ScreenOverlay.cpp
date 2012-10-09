@@ -9,9 +9,9 @@
 
 namespace world {
 
-ScreenOverlay::ScreenOverlay(WorldDraw *draw, const details::MBatchRef &mbatch) :
+ScreenOverlay::ScreenOverlay(WorldDraw *draw, const details::MatRef &mat) :
 m_draw(draw),
-m_mbatch(mbatch),
+m_mat(&mat),
 m_alpha(0.f),
 m_time(0.f),
 m_fade(false)

@@ -38,7 +38,7 @@ public:
 	Camera camera;
 	PlaneVec frustum;
 
-	dBSPLeaf *bspLeaf;
+	int area;
 	bool mirror;
 
 	EntityBits marked;
@@ -138,8 +138,7 @@ public:
 	int Precache();
 	void AddEffect(int id, const PostProcessEffect::Ref &fx);
 	bool AddMaterial(int matId);
-	void RemoveMaterial(int matId);
-	
+		
 	ScreenOverlay::Ref CreateScreenOverlay(int matId);
 	
 	void Tick(float dt);
@@ -164,6 +163,7 @@ private:
 
 	friend class ScreenOverlay;
 	friend class World;
+	friend struct details::MBatch;
 
 	class MStaticWorldMeshBatch : public MBatchDraw
 	{
@@ -171,13 +171,21 @@ private:
 		typedef boost::shared_ptr<MStaticWorldMeshBatch> Ref;
 		typedef zone_vector<Ref, ZWorldT>::type RefVec;
 
-		MStaticWorldMeshBatch(const r::Mesh::Ref &m, int matId);
+		MStaticWorldMeshBatch(
+			const r::Mesh::Ref &m,
+			const BBox &bounds,
+			int matId
+		);
 
 	protected:
 		virtual void Bind(r::Shader *shader);
 		virtual void CompileArrayStates(r::Shader &shader);
 		virtual void FlushArrayStates(r::Shader *shader);
 		virtual void Draw();
+
+		virtual RAD_DECLARE_GET(entity, Entity*) {
+			return 0;
+		}
 
 		virtual RAD_DECLARE_GET(visible, bool) { 
 			return true; 
@@ -195,8 +203,13 @@ private:
 			return true; 
 		}
 
+		virtual RAD_DECLARE_GET(bounds, const BBox&) {
+			return m_bounds;
+		}
+
 	private:
 		r::Mesh::Ref m_m;
+		BBox m_bounds;
 
 		static Vec4 s_rgba;
 		static Vec3 s_scale;
@@ -208,25 +221,31 @@ private:
 
 	static void DeleteBatch(details::MBatch *batch);
 
-	void AddStaticWorldMesh(const r::Mesh::Ref &m, int matId);
+	void AddStaticWorldMesh(const r::Mesh::Ref &m, const BBox &bounds, int matId);
 
 	details::MBatchRef AllocateBatch();
-	details::MBatchRef AddMaterialRef(int id);
+	details::MatRef *AddMaterialRef(int id);
 	details::MBatchRef AddViewBatch(ViewDef &view, int id);
 
 	void FindViewArea(ViewDef &view);
 	void SetupFrustumPlanes(ViewDef &view);
-	void VisMarkArea(ViewDef &view, int nodeNum);
-	void VisMarkAreaFlood(ViewDef &view, const PlaneVec &frustum, int areaNum);
-	
-	bool ClipBounds(const ViewDef &view, const BBox &bounds);
+	void VisMarkAreas(ViewDef &view);
+
+	void VisMarkArea(
+		ViewDef &view, 
+		int area, 
+		const StackWindingStackVec &volume, 
+		const BBox &volumeBounds
+	);
+		
+	bool ClipBounds(const StackWindingStackVec &volume, const BBox &volumeBounds, const BBox &bounds);
 	void DrawView();
 	void DrawView(ViewDef &view);
 	void DrawUI();
 	void DrawOverlays();
-	void DrawBatches(ViewDef &view, bool wireframe);
+	void DrawViewBatches(ViewDef &view, bool wireframe);
 	void PostProcess();
-	void DrawBatches(ViewDef &view, r::Material::Sort sort, bool wireframe);
+	void DrawViewBatches(ViewDef &view, r::Material::Sort sort, bool wireframe);
 	void DrawBatch(const details::MBatch &batch, bool wireframe);
 	void DrawOverlay(ScreenOverlay &overlay);
 	void AddScreenOverlay(ScreenOverlay &overlay);
@@ -236,6 +255,7 @@ private:
 	void LinkEntity(Entity *entity, const BBox &bounds, int nodeNum);
 	
 	int m_frame;
+	int m_markFrame;
 	bool m_wireframe;
 	Counters m_counters;
 	PostProcessEffect::Map m_postFX;
@@ -244,8 +264,9 @@ private:
 	r::Material *m_wireframeMat;
 	ScreenOverlay::List m_overlays;
 	RB_WorldDraw::Ref m_rb;
-	details::MBatchIdMap m_refMats;
+	details::MatRefMap m_refMats;
 	ObjectPool<details::MBatch> m_batchPool;
+	ObjectPool<details::MBatchDrawLink> m_linkPool;
 	World *m_world;
 };
 

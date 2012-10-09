@@ -22,15 +22,13 @@ class RADENG_CLASS WorldCinematics
 public:
 	typedef boost::shared_ptr<WorldCinematics> Ref;
 
-	enum CinematicFlags
-	{
+	enum CinematicFlags {
 		RAD_FLAG(CF_AnimateCamera),
 		RAD_FLAG(CF_CanPlayForever),
 		RAD_FLAG(CF_Loop)
 	};
 
-	class RADENG_CLASS Notify
-	{
+	class RADENG_CLASS Notify {
 	public:
 		typedef boost::shared_ptr<Notify> Ref;
 		virtual ~Notify () {}
@@ -65,8 +63,7 @@ private:
 
 	int Spawn(const bsp_file::BSPFile::Ref &bsp, const xtime::TimeSlice &time, int flags);
 
-	class Actor
-	{
+	class Actor {
 	public:
 		typedef boost::shared_ptr<Actor> Ref;
 		typedef zone_vector<Ref, ZWorldT>::type Vec;
@@ -78,8 +75,7 @@ private:
 		bool loop;
 	};
 
-	class SkActorBatch : public MBatchDraw
-	{
+	class SkActorBatch : public MBatchDraw {
 	public:
 		typedef boost::shared_ptr<SkActorBatch> Ref;
 
@@ -94,11 +90,13 @@ private:
 		virtual RAD_DECLARE_GET(rgba, const Vec4&) { return s_rgba; }
 		virtual RAD_DECLARE_GET(scale, const Vec3&) { return s_scale; }
 		virtual RAD_DECLARE_GET(xform, bool) { return true; }
+		virtual RAD_DECLARE_GET(bounds, const BBox&) { return s_bounds; }
 
 	private:
 
 		static Vec4 s_rgba;
 		static Vec3 s_scale;
+		static BBox s_bounds;
 
 		Actor::Ref m_actor;
 		int m_idx;
@@ -106,8 +104,7 @@ private:
 
 	typedef zone_set<int, ZWorldT>::type IntSet;
 
-	struct Cinematic
-	{
+	struct Cinematic {
 		typedef boost::shared_ptr<Cinematic> Ref;
 		typedef zone_list<Ref, ZWorldT>::type List;
 
@@ -131,8 +128,7 @@ private:
 
 	friend struct SkaNotify;
 
-	struct SkaNotify : public ska::Notify
-	{
+	struct SkaNotify : public ska::Notify {
 	public:
 
 		SkaNotify(WorldCinematics &w, Cinematic &c) : m_w(&w), m_c(&c) {}

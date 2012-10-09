@@ -56,7 +56,7 @@ enum MoveType
 enum SolidType
 {
 	RAD_FLAG(ST_BBox),
-	RAD_FLAG(ST_Brush),
+	RAD_FLAG(ST_Volume),
 	ST_None = 0, 
 	ST_All = 0xff
 };
@@ -433,6 +433,7 @@ private:
 	TickQueue<Entity> m_scriptTasks;
 	DrawModel::Map m_models;
 	dBSPLeaf::PtrVec m_bspLeafs;
+	IntSet m_areas;
 	dBSPLeaf *m_leaf;
 	SoundMap m_sounds;
 	ZoneTagWRef m_zoneTag;
