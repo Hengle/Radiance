@@ -541,7 +541,19 @@ utility RadianceUtil "Radiance Tools" width:166 height:569
 		mat = meditMaterials[activeMeditSlot]
 		
 		if (classof(mat) != MultiMaterial) then (
-			messagebox "Autoname Failed: The material selected in the Material Editor is not a Multi/Sub-Object!"
+			if (classof(mat) != StandardMaterial) then (
+				messagebox "Autoname Failed: The material selected in the Material Editor is not supported by the autorename feature!"
+				return undefined
+			)
+			
+			diffuseBitmap = mat.maps[2]
+			if (diffuseBitmap == undefined) then (
+				print ("WARNING: Material '" + mat.name + "' has no diffuse map... ignored.")
+				continue
+			)
+			x = getFilenameFile diffuseBitmap.filename
+			mat.name = autonamePackage.text + "/" + x + "_M"
+			
 			return undefined
 		)
 		
