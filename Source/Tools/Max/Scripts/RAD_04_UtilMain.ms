@@ -3,34 +3,37 @@
 -- Author: Joe Riedel
 -- See Radiance/LICENSE for licensing terms.
 
-utility RadianceUtil "Radiance Tools" width:166 height:446
+utility RadianceUtil "Radiance Tools" width:166 height:569
 (
-	GroupBox grp1 "Selection" pos:[6,3] width:155 height:355
-	GroupBox grp4 "Animation" pos:[15,20] width:138 height:270
-	dropdownList animList "" pos:[18,38] width:130 height:21
-	edittext animName "Name:" pos:[18,66] width:130 height:17
-	GroupBox grp8 "Export" pos:[6,361] width:154 height:79
-	checkbox selectionOnlyCheckbox "Selection Only" pos:[69,376] width:87 height:14
-	checkbox exportHiddenCheckbox "Hidden" pos:[11,376] width:55 height:14
-	button exportSceneButton "Scene..." pos:[11,395] width:65 height:17
-	button exportAnimButton "Anim..." pos:[89,417] width:65 height:17
-	button exportMeshButton "Mesh..." pos:[89,394] width:65 height:17
-	button exportSkelButton "Skel..." pos:[11,417] width:65 height:17
-	edittext animStart "Start:" pos:[18,90] width:66 height:17
-	edittext animEnd "End:" pos:[86,90] width:66 height:17
-	checkbox animLoop "Looping" pos:[21,169] width:63 height:18
-	dropdownList animInitialState "" pos:[22,209] width:123 height:21
-	GroupBox grp32 "Initial State" pos:[19,191] width:129 height:64
-	button animSetStart "Set Start" pos:[20,114] width:61 height:20
-	button animSetEnd "Set End" pos:[87,114] width:61 height:20
-	button animTest "Test" pos:[52,142] width:61 height:20
-	checkbox animExport "Export" pos:[91,169] width:53 height:18
-	button addAnim "Add" pos:[24,266] width:53 height:18
-	button deleteAnim "Delete" pos:[87,266] width:53 height:18
-	button noDefault "None" pos:[53,234] width:54 height:16
-	checkbox cinematicObject "Cinematic Object" pos:[21,297] width:108 height:17
-	checkbox hideUntilRef "Hide Until Referenced" pos:[21,314] width:129 height:17
-	checkbox hideWhenDone "Hide When Done" pos:[21,332] width:129 height:17
+	GroupBox grp1 "Selected Geo && Bones" pos:[6,83] width:155 height:355
+	GroupBox grp4 "Animation" pos:[15,100] width:138 height:270
+	dropdownList animList "" pos:[18,118] width:130 height:21
+	edittext animName "Name:" pos:[18,146] width:130 height:17
+	GroupBox grp8 "Export" pos:[6,441] width:154 height:79
+	checkbox selectionOnlyCheckbox "Selection Only" pos:[69,456] width:87 height:14
+	checkbox exportHiddenCheckbox "Hidden" pos:[11,456] width:55 height:14
+	button exportSceneButton "Scene..." pos:[11,475] width:65 height:17
+	button exportAnimButton "Anim..." pos:[89,497] width:65 height:17
+	button exportMeshButton "Mesh..." pos:[89,474] width:65 height:17
+	button exportSkelButton "Skel..." pos:[11,497] width:65 height:17
+	edittext animStart "Start:" pos:[18,170] width:66 height:17
+	edittext animEnd "End:" pos:[86,170] width:66 height:17
+	checkbox animLoop "Looping" pos:[21,249] width:63 height:18
+	dropdownList animInitialState "" pos:[22,289] width:123 height:21
+	GroupBox grp32 "Initial State" pos:[19,271] width:129 height:64
+	button animSetStart "Set Start" pos:[20,194] width:61 height:20
+	button animSetEnd "Set End" pos:[87,194] width:61 height:20
+	button animTest "Test" pos:[52,222] width:61 height:20
+	checkbox animExport "Export" pos:[91,249] width:53 height:18
+	button addAnim "Add" pos:[24,346] width:53 height:18
+	button deleteAnim "Delete" pos:[87,346] width:53 height:18
+	button noDefault "None" pos:[53,314] width:54 height:16
+	checkbox cinematicObject "Cinematic Object" pos:[21,377] width:108 height:17
+	checkbox hideUntilRef "Hide Until Referenced" pos:[21,394] width:129 height:17
+	checkbox hideWhenDone "Hide When Done" pos:[21,412] width:129 height:17
+	GroupBox grp5 "Selected Material" pos:[8,4] width:153 height:74
+	button nameCompleteMapsButton "Autoname Complete Maps" pos:[14,49] width:138 height:22
+	editText autonamePackage "Package:" pos:[18,25] width:132 height:15
 	
 	local animSel = #() -- selected objects that have animations
 	local animSet = #() -- selected set of animations [struct Animation]
@@ -396,12 +399,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:446
 	function fileOpen =
 	(
 	)
-	
-	
-	
-
-	
-	
+		
 	on RadianceUtil open do
 	(
 		RadianceUtil.disableAll()
@@ -536,6 +534,30 @@ utility RadianceUtil "Radiance Tools" width:166 height:446
 		else
 		(
 			RAD_SetObjectProps (selectedAnimatable()) #(#("HideWhenDone", "false"))
+		)
+	)
+	on nameCompleteMapsButton pressed do
+	(
+		mat = meditMaterials[activeMeditSlot]
+		
+		if (classof(mat) != MultiMaterial) then (
+			messagebox "Autoname Failed: The material selected in the Material Editor is not a Multi/Sub-Object!"
+			return undefined
+		)
+		
+		for sub in mat.materialList do (
+			if (classof(sub) != StandardMaterial) then (
+				print ("WARNING: Multi/Sub-Object material '" + mat.name + "' sub-material '" + sub.name + "' is not a standard material... ignored.")
+				continue
+			)
+			
+			diffuseBitmap = sub.maps[2]
+			if (diffuseBitmap == undefined) then (
+				print ("WARNING: Multi/Sub-Object material '" + mat.name + "' sub-material '" + sub.name + "' has no diffuse map... ignored.")
+				continue
+			)
+			x = getFilenameFile diffuseBitmap.filename
+			sub.name = autonamePackage.text + "/" + x + "_M"
 		)
 	)
 )
