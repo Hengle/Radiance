@@ -117,7 +117,7 @@ public:
 		float maxDistance,
 		float frequency,
 		float angleSpeed, // how fast we rotate in a 360
-		const Vec2 &scale // scaleing factor
+		const Vec2 &scale // scaling factor
 	);
 
 	void SetCameraFov(
