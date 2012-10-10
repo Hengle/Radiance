@@ -55,11 +55,9 @@ namespace world {
 
 namespace {
 
-class FileSrcBuffer : public lua::SrcBuffer
-{
+class FileSrcBuffer : public lua::SrcBuffer {
 public:
-	FileSrcBuffer(const char *name, const file::MMapping::Ref &mm) : m_name(name), m_mm(mm)
-	{ 
+	FileSrcBuffer(const char *name, const file::MMapping::Ref &mm) : m_name(name), m_mm(mm) { 
 		m_name += ".lua";
 	}
 
@@ -74,19 +72,16 @@ protected:
 
 }
 
-WorldLua::WorldLua(World *w) : m_world(w)
-{
+WorldLua::WorldLua(World *w) : m_world(w) {
 }
 
-WorldLua::~WorldLua() 
-{
+WorldLua::~WorldLua()  {
 #if defined(LUA_EDIT_SUPPORT)
 	StopLuaEditRemoteDebugger();
 #endif
 }
 
-bool WorldLua::Init()
-{
+bool WorldLua::Init() {
 	m_L = lua::State::Ref(new (ZWorld) lua::State("GameScript"));
 	lua_State *L = m_L->L;
 
@@ -128,93 +123,85 @@ bool WorldLua::Init()
 	lua_pushlightuserdata(L, this);
 	lua_setfield(L, LUA_REGISTRYINDEX, SELF);
 
-	luaL_Reg worldRegs [] =
-	{
-		{ "FindEntityId", lua_FindEntityId },
-		{ "FindEntityClass", lua_FindEntityClass },
-		{ "FindEntityTargets", lua_FindEntityTargets },
-		{ "BBoxTouching", lua_BBoxTouching },
-		{ "CreateScreenOverlay", lua_CreateScreenOverlay },
-		{ "PostEvent", lua_PostEvent },
-		{ "DispatchEvent", lua_DispatchEvent },
-		{ "Project", lua_Project },
-		{ "Unproject", lua_Unproject },
-		{ "SetUIViewport", lua_SetUIViewport },
-		{ "SetRootWidget", lua_SetRootWidget },
-		{ "CreateWidget", lua_CreateWidget },
-		{ "AddWidgetTickMaterial", lua_AddWidgetTickMaterial },
-		{ "CreatePostProcessEffect", lua_CreatePostProcessEffect },
-		{ "FadePostProcessEffect", lua_FadePostProcessEffect },
-		{ "EnablePostProcessEffect", lua_EnablePostProcessEffect },
-		{ "PlayCinematic", lua_PlayCinematic },
-		{ "StopCinematic", lua_StopCinematic },
-		{ "CinematicTime", lua_CinematicTime },
-		{ "SetCinematicTime", lua_SetCinematicTime },
-		{ "SoundFadeMasterVolume", lua_SoundFadeMasterVolume },
-		{ "SoundFadeChannelVolume", lua_SoundFadeChannelVolume },
-		{ "SoundChannelVolume", lua_SoundChannelVolume },
-		{ "SoundPauseChannel", lua_SoundPauseChannel },
-		{ "SoundChannelIsPaused", lua_SoundChannelIsPaused },
-		{ "SoundPauseAll", lua_SoundPauseAll },
-		{ "SoundStopAll", lua_SoundStopAll },
-		{ "SoundSetDoppler", lua_SoundSetDoppler },
-		{ "RequestLoad", lua_RequestLoad },
-		{ "RequestReturn", lua_RequestReturn },
-		{ "RequestSwitch", lua_RequestSwitch },
-		{ "RequestUnloadSlot", lua_RequestUnloadSlot },
-		{ "RequestSwitchLoad", lua_RequestSwitchLoad },
-		{ "SetGameSpeed", lua_SetGameSpeed },
-		{ "SetPauseState", lua_SetPauseState },
-		{ "SwapMaterial", lua_SwapMaterial },
-		{ "PlayerPawn", lua_PlayerPawn },
-		{ "SetPlayerPawn", lua_SetPlayerPawn },
-		{ "Worldspawn", lua_Worldspawn },
-		{ "SetWorldspawn", lua_SetWorldspawn },
-		{ "ViewController", lua_ViewController },
-		{ "SetViewController", lua_SetViewController },
-		{ "Time", lua_Time },
-		{ "SysTime", lua_SysTime },
-		{ "DeltaTime", lua_DeltaTime },
-		{ "Viewport", lua_Viewport },
-		{ "CameraPos", lua_CameraPos },
-		{ "CameraFarClip", lua_CameraFarClip },
-		{ "SetCameraFarClip", lua_SetCameraFarClip },
-		{ "CameraAngles", lua_CameraAngles },
-		{ "CameraFOV", lua_CameraFOV },
-		{ "CameraFwd", lua_CameraFwd },
-		{ "CameraLeft", lua_CameraLeft },
-		{ "CameraUp", lua_CameraUp },
-		{ "SetEnabledGestures", lua_SetEnabledGestures },
-		{ "FlushInput", lua_FlushInput },
-		{ "DrawCounters", lua_DrawCounters },
-		{ "EnableWireframe", lua_EnableWireframe },
-		{ "EnableColorBufferClear", lua_EnableColorBufferClear },
-		{ "CurrentDateAndTime", lua_CurrentDateAndTime },
-		{ "QuitGame", lua_QuitGame },
+	luaL_Reg worldRegs [] = {
+		{ "FindEntityId", lua_World_FindEntityId },
+		{ "FindEntityClass", lua_World_FindEntityClass },
+		{ "FindEntityTargets", lua_World_FindEntityTargets },
+		{ "BBoxTouching", lua_World_BBoxTouching },
+		{ "CreateScreenOverlay", lua_World_CreateScreenOverlay },
+		{ "PostEvent", lua_World_PostEvent },
+		{ "DispatchEvent", lua_World_DispatchEvent },
+		{ "Project", lua_World_Project },
+		{ "Unproject", lua_World_Unproject },
+		{ "SetUIViewport", lua_World_SetUIViewport },
+		{ "SetRootWidget", lua_World_SetRootWidget },
+		{ "CreateWidget", lua_World_CreateWidget },
+		{ "AddWidgetTickMaterial", lua_World_AddWidgetTickMaterial },
+		{ "CreatePostProcessEffect", lua_World_CreatePostProcessEffect },
+		{ "FadePostProcessEffect", lua_World_FadePostProcessEffect },
+		{ "EnablePostProcessEffect", lua_World_EnablePostProcessEffect },
+		{ "PlayCinematic", lua_World_PlayCinematic },
+		{ "StopCinematic", lua_World_StopCinematic },
+		{ "CinematicTime", lua_World_CinematicTime },
+		{ "SetCinematicTime", lua_World_SetCinematicTime },
+		{ "SoundFadeMasterVolume", lua_World_SoundFadeMasterVolume },
+		{ "SoundFadeChannelVolume", lua_World_SoundFadeChannelVolume },
+		{ "SoundChannelVolume", lua_World_SoundChannelVolume },
+		{ "SoundPauseChannel", lua_World_SoundPauseChannel },
+		{ "SoundChannelIsPaused", lua_World_SoundChannelIsPaused },
+		{ "SoundPauseAll", lua_World_SoundPauseAll },
+		{ "SoundStopAll", lua_World_SoundStopAll },
+		{ "SoundSetDoppler", lua_World_SoundSetDoppler },
+		{ "RequestLoad", lua_World_RequestLoad },
+		{ "RequestReturn", lua_World_RequestReturn },
+		{ "RequestSwitch", lua_World_RequestSwitch },
+		{ "RequestUnloadSlot", lua_World_RequestUnloadSlot },
+		{ "RequestSwitchLoad", lua_World_RequestSwitchLoad },
+		{ "SetGameSpeed", lua_World_SetGameSpeed },
+		{ "SetPauseState", lua_World_SetPauseState },
+		{ "SwapMaterial", lua_World_SwapMaterial },
+		{ "PlayerPawn", lua_World_PlayerPawn },
+		{ "SetPlayerPawn", lua_World_SetPlayerPawn },
+		{ "Worldspawn", lua_World_Worldspawn },
+		{ "SetWorldspawn", lua_World_SetWorldspawn },
+		{ "ViewController", lua_World_ViewController },
+		{ "SetViewController", lua_World_SetViewController },
+		{ "GameTime", lua_World_GameTime },
+		{ "SysTime", lua_World_SysTime },
+		{ "DeltaTime", lua_World_DeltaTime },
+		{ "Viewport", lua_World_Viewport },
+		{ "CameraPos", lua_World_CameraPos },
+		{ "CameraFarClip", lua_World_CameraFarClip },
+		{ "SetCameraFarClip", lua_World_SetCameraFarClip },
+		{ "CameraAngles", lua_World_CameraAngles },
+		{ "CameraFOV", lua_World_CameraFOV },
+		{ "CameraFwd", lua_World_CameraFwd },
+		{ "CameraLeft", lua_World_CameraLeft },
+		{ "CameraUp", lua_World_CameraUp },
+		{ "SetEnabledGestures", lua_World_SetEnabledGestures },
+		{ "FlushInput", lua_World_FlushInput },
+		{ "DrawCounters", lua_World_DrawCounters },
+		{ "EnableWireframe", lua_World_EnableWireframe },
+		{ "EnableColorBufferClear", lua_World_EnableColorBufferClear },
+		{ "QuitGame", lua_World_QuitGame },
 		{ 0, 0 }
 	};
 
-	luaL_Reg sysCallsRegs [] =
-	{
-		{ "CreatePrecacheTask", lua_SysCalls_CreatePrecacheTask },
-		{ "CreateSpawnTask", lua_CreateSpawnTask },
-		{ "CreateTempSpawnTask", lua_CreateTempSpawnTask },
-		{ "COut", lua_SysCalls_COut },
-		{ 0, 0 }
-	};
-
-	luaL_Reg systemCalls [] =
-	{
+	luaL_Reg systemCalls [] = {
 		{ "Platform", lua_System_Platform },
 		{ "SystemLanguage", lua_System_SystemLanguage },
 		{ "GetLangString", lua_System_GetLangString },
 		{ "LaunchURL", lua_System_LaunchURL },
 		{ "Fullscreen", lua_System_Fullscreen },
+		{ "CreatePrecacheTask", lua_System_CreatePrecacheTask },
+		{ "CreateSpawnTask", lua_System_CreateSpawnTask },
+		{ "CreateTempSpawnTask", lua_System_CreateTempSpawnTask },
+		{ "COut", lua_System_COut },
+		{ "CurrentDateAndTime", lua_System_CurrentDateAndTime },
 		{ 0, 0 }
 	};
 
-	luaL_Reg gameNetworkCalls [] =
-	{
+	luaL_Reg gameNetworkCalls [] = {
 		{ "Create", lua_gnCreate },
 		{ "AuthenticateLocalPlayer", lua_gnAuthenticateLocalPlayer },
 		{ "LocalPlayerId", lua_gnLocalPlayerId },
@@ -233,7 +220,6 @@ bool WorldLua::Init()
 	};
 
 	lua::RegisterGlobals(L, "World", worldRegs);
-	lua::RegisterGlobals(L, "SysCalls", sysCallsRegs);
 	lua::RegisterGlobals(L, "System", systemCalls);
 	lua::RegisterGlobals(L, "GameNetwork", gameNetworkCalls);
 	
@@ -245,9 +231,9 @@ bool WorldLua::Init()
 	lua_createtable(L, 0, 3);
 	PushKeysTable(L, *keys);
 	lua_setfield(L, -2, "keys");
-	lua_pushcfunction(L, lua_SaveGlobals);
+	lua_pushcfunction(L, lua_System_SaveGlobals);
 	lua_setfield(L, -2, "Save");
-	lua_pushcfunction(L, lua_LoadGlobals);
+	lua_pushcfunction(L, lua_System_LoadGlobals);
 	lua_setfield(L, -2, "Load");
 	lua_setglobal(L, "Globals");
 
@@ -255,9 +241,9 @@ bool WorldLua::Init()
 	lua_createtable(L, 0, 3);
 	PushKeysTable(L, *keys);
 	lua_setfield(L, -2, "keys");
-	lua_pushcfunction(L, lua_SaveSession);
+	lua_pushcfunction(L, lua_System_SaveSession);
 	lua_setfield(L, -2, "Save");
-	lua_pushcfunction(L, lua_LoadSession);
+	lua_pushcfunction(L, lua_System_LoadSession);
 	lua_setfield(L, -2, "Load");
 	lua_setglobal(L, "Session");
 
@@ -265,27 +251,27 @@ bool WorldLua::Init()
 	lua_createtable(L, 0, 12);
 	PushKeysTable(L, *keys);
 	lua_setfield(L, -2, "keys");
-	lua_pushcfunction(L, lua_CreateSaveGame);
+	lua_pushcfunction(L, lua_System_CreateSaveGame);
 	lua_setfield(L, -2, "Create");
-	lua_pushcfunction(L, lua_LoadSavedGame);
+	lua_pushcfunction(L, lua_System_LoadSavedGame);
 	lua_setfield(L, -2, "LoadSavedGame");
-	lua_pushcfunction(L, lua_LoadSaveTable);
+	lua_pushcfunction(L, lua_System_LoadSaveTable);
 	lua_setfield(L, -2, "Load");
-	lua_pushcfunction(L, lua_SaveGame);
+	lua_pushcfunction(L, lua_System_SaveGame);
 	lua_setfield(L, -2, "Save");
-	lua_pushcfunction(L, lua_NumSavedGameConflicts);
+	lua_pushcfunction(L, lua_System_NumSavedGameConflicts);
 	lua_setfield(L, -2, "NumConflicts");
-	lua_pushcfunction(L, lua_LoadSavedGameConflict);
+	lua_pushcfunction(L, lua_System_LoadSavedGameConflict);
 	lua_setfield(L, -2, "LoadConflict");
-	lua_pushcfunction(L, lua_ResolveSavedGameConflict);
+	lua_pushcfunction(L, lua_System_ResolveSavedGameConflict);
 	lua_setfield(L, -2, "ResolveConflict");
-	lua_pushcfunction(L, lua_EnableCloudStorage);
+	lua_pushcfunction(L, lua_System_EnableCloudStorage);
 	lua_setfield(L, -2, "EnableCloudStorage");
-	lua_pushcfunction(L, lua_CloudFileStatus);
+	lua_pushcfunction(L, lua_System_CloudFileStatus);
 	lua_setfield(L, -2, "CloudFileStatus");
-	lua_pushcfunction(L, lua_StartDownloadingLatestSaveVersion);
+	lua_pushcfunction(L, lua_System_StartDownloadingLatestSaveVersion);
 	lua_setfield(L, -2, "StartDownloadingLatestVersion");
-	lua_pushcfunction(L, lua_CloudStorageAvailable);
+	lua_pushcfunction(L, lua_System_CloudStorageAvailable);
 	lua_setfield(L, -2, "CloudStorageAvailable");
 	lua_setglobal(L, "SaveGame");
 
@@ -295,8 +281,7 @@ bool WorldLua::Init()
 	return true;
 }
 
-Entity::Ref WorldLua::CreateEntity(const Keys &keys)
-{
+Entity::Ref WorldLua::CreateEntity(const Keys &keys) {
 	const char *classname = keys.StringForKey("classname", 0);
 	if (!classname)
 		return Entity::Ref();
@@ -311,8 +296,7 @@ Entity::Ref WorldLua::CreateEntity(const Keys &keys)
 	return Entity::LuaCreate(classname);
 }
 
-bool WorldLua::PushGlobalCall(const char *name)
-{
+bool WorldLua::PushGlobalCall(const char *name) {
 #if LUA_VERSION_NUM >= 502
 	lua_pushglobaltable(L);
 	bool r = lua::GetFieldExt(L, -1, name);
@@ -327,15 +311,12 @@ bool WorldLua::PushGlobalCall(const char *name)
 	return r;
 }
 
-bool WorldLua::Call(const char *context, int nargs, int nresults, int errfunc)
-{
+bool WorldLua::Call(const char *context, int nargs, int nresults, int errfunc) {
 	return Call(L, context, nargs, nresults, errfunc);
 }
 
-bool WorldLua::Call(lua_State *L, const char *context, int nargs, int nresults, int errfunc)
-{
-	if (lua_pcall(L, nargs, nresults, errfunc))
-	{
+bool WorldLua::Call(lua_State *L, const char *context, int nargs, int nresults, int errfunc) {
+	if (lua_pcall(L, nargs, nresults, errfunc)) {
 		COut(C_Error) << "ScriptError(" << context << "): " << lua_tostring(L, -1) << std::endl;
 		lua_pop(L, 1);
 		return false;
@@ -344,14 +325,12 @@ bool WorldLua::Call(lua_State *L, const char *context, int nargs, int nresults, 
 	return true;
 }
 
-bool WorldLua::CreateEntity(Entity &ent, int id, const char *classname)
-{
+bool WorldLua::CreateEntity(Entity &ent, int id, const char *classname) {
 	lua_State *L = m_L->L;
 	lua_getfield(L, LUA_REGISTRYINDEX, ENTREF_TABLE);	
 	lua_pushinteger(L, id);
 
-	if (!PushGlobalCall("SysCalls.CreateEntity"))
-	{
+	if (!PushGlobalCall("World.CreateEntity")) {
 		lua_pop(L, 2);
 		return false;
 	}
@@ -364,15 +343,13 @@ bool WorldLua::CreateEntity(Entity &ent, int id, const char *classname)
 		char path[256];
 		string::cpy(path, classname);
 		strcat(path, ".New");
-		if (!PushGlobalCall(path))
-		{
+		if (!PushGlobalCall(path)) {
 			lua_pop(L, 3);
 			return false;
 		}
 		// locate self parameter
 		lua_getglobal(L, classname);
-		if (!Call("WorldLua::CreateEntity()", 1, 1, 0))
-		{
+		if (!Call("WorldLua::CreateEntity()", 1, 1, 0)) {
 			lua_pop(L, 2);
 			return false;
 		}
@@ -383,8 +360,7 @@ bool WorldLua::CreateEntity(Entity &ent, int id, const char *classname)
 	lua_pushinteger(L, id);
 	lua_pushlightuserdata(L, &ent);
 	
-	if (!Call("SysCalls.CreateEntity", 3, 1, 0))
-	{
+	if (!Call("World.CreateEntity", 3, 1, 0)) {
 		lua_pop(L, 2);
 		return false;
 	}
@@ -395,8 +371,7 @@ bool WorldLua::CreateEntity(Entity &ent, int id, const char *classname)
 	return true;
 }
 
-bool WorldLua::HandleInputEvent(const InputEvent &e, const TouchState *touch, const InputState &is)
-{
+bool WorldLua::HandleInputEvent(const InputEvent &e, const TouchState *touch, const InputState &is) {
 	if (!PushGlobalCall("World.OnInputEvent"))
 		return false;
 	lua_State *L = m_L->L;
@@ -404,8 +379,7 @@ bool WorldLua::HandleInputEvent(const InputEvent &e, const TouchState *touch, co
 	lua::Marshal<InputEvent>::Push(L, e, touch);	
 
 	bool r = false;
-	if (Call("WorldLua::HandleInputEvent", 1, 1, 0))
-	{
+	if (Call("WorldLua::HandleInputEvent", 1, 1, 0)) {
 		r = lua_toboolean(L, -1) ? true : false;
 		lua_pop(L, 1);
 	}
@@ -413,8 +387,7 @@ bool WorldLua::HandleInputEvent(const InputEvent &e, const TouchState *touch, co
 	return r;
 }
 
-bool WorldLua::HandleInputGesture(const InputGesture &g, const TouchState &touch, const InputState &is)
-{
+bool WorldLua::HandleInputGesture(const InputGesture &g, const TouchState &touch, const InputState &is) {
 	if (!PushGlobalCall("World.OnInputGesture"))
 		return false;
 	lua_State *L = m_L->L;
@@ -422,8 +395,7 @@ bool WorldLua::HandleInputGesture(const InputGesture &g, const TouchState &touch
 	lua::Marshal<InputGesture>::Push(L, g, touch);
 
 	bool r = false;
-	if (Call("World::HandleInputGesture", 1, 1, 0))
-	{
+	if (Call("World::HandleInputGesture", 1, 1, 0)) {
 		r = lua_toboolean(L, -1) ? true : false;
 		lua_pop(L, 1);
 	}
@@ -431,43 +403,37 @@ bool WorldLua::HandleInputGesture(const InputGesture &g, const TouchState &touch
 	return r;
 }
 
-void WorldLua::NotifyBackground()
-{
+void WorldLua::NotifyBackground() {
 	if (!PushGlobalCall("World.NotifyBackground"))
 		return;
 	Call("World::NotifyBackground", 0, 0, 0);
 }
 
-void WorldLua::NotifyResume()
-{
+void WorldLua::NotifyResume() {
 	if (!PushGlobalCall("World.NotifyResume"))
 		return;
 	Call("World::NotifyResume", 0, 0, 0);
 }
 
-void WorldLua::SaveApplicationState()
-{
+void WorldLua::SaveApplicationState() {
 	if (!PushGlobalCall("World.SaveApplicationState"))
 		return;
 	Call("World::SaveApplicationState", 0, 0, 0);
 }
 
-void WorldLua::RestoreApplicationState()
-{
+void WorldLua::RestoreApplicationState() {
 	if (!PushGlobalCall("World.RestoreApplicationState"))
 		return;
 	Call("World::RestoreApplicationState", 0, 0, 0);
 }
 
-void WorldLua::PostSpawn()
-{
+void WorldLua::PostSpawn() {
 	lua_gc(m_L->L, LUA_GCCOLLECT, 0);
 	lua_gc(m_L->L, LUA_GCSTOP, 0);
 	lua::State::CompactPools();
 }
 
-void WorldLua::DeleteEntId(Entity &ent)
-{
+void WorldLua::DeleteEntId(Entity &ent) {
 	lua_State *L = m_L->L;
 	lua_getfield(L, LUA_REGISTRYINDEX, ENTREF_TABLE);
 	lua_pushinteger(L, ent.m_id);
@@ -476,31 +442,26 @@ void WorldLua::DeleteEntId(Entity &ent)
 	lua_pop(L, -1);
 }
 
-void WorldLua::PushEntityFrame(lua_State *L, Entity &ent)
-{
+void WorldLua::PushEntityFrame(lua_State *L, Entity &ent) {
 	lua_getfield(L, LUA_REGISTRYINDEX, ENTREF_TABLE);
 	lua_pushinteger(L, ent.m_id);
 	lua_gettable(L, -2);
 	lua_remove(L, -2);
 }
 
-void WorldLua::PushEntityFrame(Entity &ent)
-{
+void WorldLua::PushEntityFrame(Entity &ent) {
 	PushEntityFrame(m_L->L, ent);
 }
 
-bool WorldLua::PushEntityCall(Entity &ent, const char *name)
-{
+bool WorldLua::PushEntityCall(Entity &ent, const char *name) {
 	return PushEntityCall(m_L->L, ent, name);
 }
 
-bool WorldLua::PushEntityCall(lua_State *L, Entity &ent, const char *name)
-{
+bool WorldLua::PushEntityCall(lua_State *L, Entity &ent, const char *name) {
 	PushEntityFrame(L, ent);
 
 	lua_getfield(L, -1, name);
-	if (lua_type(L, -1) != LUA_TFUNCTION)
-	{
+	if (lua_type(L, -1) != LUA_TFUNCTION) {
 		lua_pop(L, 2);
 		return false;
 	}
@@ -510,42 +471,43 @@ bool WorldLua::PushEntityCall(lua_State *L, Entity &ent, const char *name)
 	return true;
 }
 
-bool WorldLua::CoSpawn(Entity &ent, const Keys &keys)
-{
-	if (!PushGlobalCall("SysCalls.CoSpawn"))
+bool WorldLua::CoSpawn(Entity &ent, const Keys &keys) {
+	if (!PushGlobalCall("World.CoSpawn"))
 		return false;
 	PushEntityFrame(ent);
 	PushKeysTable(keys);
 	return Call("WorldLua::CoSpawn()", 2, 0, 0);
 }
 
-bool WorldLua::CoPostSpawn(Entity &ent)
-{
-	if (!PushGlobalCall("SysCalls.CoPostSpawn"))
+bool WorldLua::CoPostSpawn(Entity &ent) {
+	if (!PushGlobalCall("World.CoPostSpawn"))
 		return false;
 	PushEntityFrame(ent);
 	return Call("WorldLua::CoPostSpawn()", 1, 0, 0);
 }
 
-bool WorldLua::CoThink(Entity &ent)
-{
-	if (!PushGlobalCall("SysCalls.CoThink"))
+bool WorldLua::CoThink(Entity &ent) {
+	if (!PushGlobalCall("World.CoThink"))
 		return false;
 	PushEntityFrame(ent);
 	return Call("WorldLua::CoThink", 1, 0, 0);
 }
 
-bool WorldLua::RunCo(Entity &ent, bool &complete)
-{
+bool WorldLua::RunCo(Entity &ent, bool &complete) {
 	lua_State *L = m_L->L;
 
-	if (!PushGlobalCall("SysCalls.RunCo"))
+	if (!PushGlobalCall("World.RunCo"))
 		return false;
 	
 	PushEntityFrame(ent);
 	
-	if (Call("WorldLua::RunCo()", 1, 1, 0))
-	{ // returns: 0 for pending, 1 for complete, 2 for error
+	if (Call("WorldLua::RunCo()", 1, 1, 0)) { 
+		// returns: 0 for pending, 1 for complete, 2 for error
+		if (lua_type(L, -1) != LUA_TNUMBER) {
+			COut(C_Error) << "WorldLua::RunCo() no value returned from World.RunCo in lua script!" << std::endl;
+			return false;
+		}
+
 		int r = (int)luaL_checkinteger(L, -1);
 		lua_pop(L, 1);
 		complete = (r==2||r==1); // error or success
@@ -556,29 +518,24 @@ bool WorldLua::RunCo(Entity &ent, bool &complete)
 	return false;
 }
 
-void WorldLua::PushKeysTable(const Keys &keys)
-{
+void WorldLua::PushKeysTable(const Keys &keys) {
 	PushKeysTable(m_L->L, keys);
 }
 
-void WorldLua::PushKeysTable(lua_State *L, const Keys &keys)
-{
+void WorldLua::PushKeysTable(lua_State *L, const Keys &keys) {
 	lua_createtable(L, 0, (int)keys.pairs.size());
-	for (Keys::Pairs::const_iterator it = keys.pairs.begin(); it != keys.pairs.end(); ++it)
-	{
+	for (Keys::Pairs::const_iterator it = keys.pairs.begin(); it != keys.pairs.end(); ++it) {
 		lua_pushstring(L, it->first.c_str);
 		lua_pushstring(L, it->second.c_str);
 		lua_settable(L, -3);
 	}
 }
 
-bool WorldLua::ParseKeysTable(Keys &keys, int index, bool luaError)
-{
+bool WorldLua::ParseKeysTable(Keys &keys, int index, bool luaError) {
 	return ParseKeysTable(m_L->L, keys, index, luaError);
 }
 
-bool WorldLua::ParseKeysTable(lua_State *L, Keys &keys, int index, bool luaError)
-{
+bool WorldLua::ParseKeysTable(lua_State *L, Keys &keys, int index, bool luaError) {
 	if (luaError)
 		luaL_checktype(L, index, LUA_TTABLE);
 	else if (lua_type(L, index) != LUA_TTABLE)
@@ -586,15 +543,12 @@ bool WorldLua::ParseKeysTable(lua_State *L, Keys &keys, int index, bool luaError
 
 	lua_checkstack(L, 3);
 	lua_pushnil(L);
-	while (lua_next(L, (index<0) ? (index-1) : index) != 0)
-	{
+	while (lua_next(L, (index<0) ? (index-1) : index) != 0) {
 		const char *key = lua_tolstring(L, -2, 0);
 		const char *val = lua_tolstring(L, -1, 0);
 
-		if (!key || !val)
-		{
-			if (luaError)
-			{
+		if (!key || !val) {
+			if (luaError) {
 				luaL_checktype(L, -1, LUA_TSTRING);
 				luaL_checktype(L, -2, LUA_TSTRING);
 			}
@@ -609,15 +563,12 @@ bool WorldLua::ParseKeysTable(lua_State *L, Keys &keys, int index, bool luaError
 	return true;
 }
 
-Entity *WorldLua::EntFramePtr(int index, bool luaError)
-{
+Entity *WorldLua::EntFramePtr(int index, bool luaError) {
 	return EntFramePtr(L, index, luaError);
 }
 
-Entity *WorldLua::EntFramePtr(lua_State *L, int index, bool luaError)
-{
-	if (!lua::GetFieldExt(L, index, "sys.ptr"))
-	{
+Entity *WorldLua::EntFramePtr(lua_State *L, int index, bool luaError) {
+	if (!lua::GetFieldExt(L, index, "sys.ptr")) {
 		if (luaError)
 			luaL_typerror(L, index, "Entity Frame Ptr");
 		return 0;
@@ -631,13 +582,11 @@ Entity *WorldLua::EntFramePtr(lua_State *L, int index, bool luaError)
 	return (Entity*)p;
 }
 
-void WorldLua::Tick(float dt)
-{
+void WorldLua::Tick(float dt) {
 	GarbageCollect();
 }
 
-void WorldLua::GarbageCollect()
-{
+void WorldLua::GarbageCollect() {
 	// lua gc
 	enum { MaxGCTicks = 3 };
 
@@ -651,8 +600,7 @@ void WorldLua::GarbageCollect()
 	xtime::TimeVal delta;
 	int numSteps = 0;
 
-	do
-	{
+	do {
 		++numSteps;
 		luaC_step(L);
 		delta = xtime::ReadMilliseconds()-start;
@@ -665,15 +613,13 @@ void WorldLua::GarbageCollect()
 		COut(C_Debug) << "GC cycle overflow (" << delta << "/" << numSteps << ")" << std::endl;
 }
 
-bool WorldLua::PostSpawn(Entity &ent)
-{
+bool WorldLua::PostSpawn(Entity &ent) {
 	if (!PushEntityCall(ent, "PostSpawn"))
 		return true; // not an error to have no PostSpawn
 	return Call("PostSpawn", 1, 0, 0);
 }
 
-void WorldLua::OnLocalPlayerAuthenticated(gn::NetResult r)
-{
+void WorldLua::OnLocalPlayerAuthenticated(gn::NetResult r) {
 	if (r != gn::NR_Success)
 		return;
 	RAD_ASSERT(m_world->game->gameNetwork);
@@ -684,26 +630,22 @@ void WorldLua::OnLocalPlayerAuthenticated(gn::NetResult r)
 	Call("GameNetwork.OnLocalPlayerAuthenticated", 1, 0, 0);
 }
 
-void WorldLua::OnShowLeaderboard(bool show)
-{
+void WorldLua::OnShowLeaderboard(bool show) {
 	if (!PushGlobalCall("GameNetwork.OnShowLeaderboard"))
 		return;
 	lua_pushboolean(m_L->L, show ? 1 : 0);
 	Call("GameNetwork.OnShowLeaderboard", 1, 0, 0);
 }
 
-void WorldLua::OnShowAchievements(bool show)
-{
+void WorldLua::OnShowAchievements(bool show) {
 	if (!PushGlobalCall("GameNetwork.OnShowAchievements"))
 		return;
 	lua_pushboolean(m_L->L, show ? 1 : 0);
 	Call("GameNetwork.OnShowAchievements", 1, 0, 0);
 }
 
-int WorldLua::lua_System_Platform(lua_State *L)
-{
-	enum
-	{
+int WorldLua::lua_System_Platform(lua_State *L) {
+	enum {
 		PlatMac,
 		PlatWin,
 		PlatIPad,
@@ -768,8 +710,7 @@ int WorldLua::lua_System_Fullscreen(lua_State *L) {
 	return 1;
 }
 
-int WorldLua::lua_SysCalls_CreatePrecacheTask(lua_State *L)
-{
+int WorldLua::lua_System_CreatePrecacheTask(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -784,14 +725,10 @@ int WorldLua::lua_SysCalls_CreatePrecacheTask(lua_State *L)
 		(int)lua_tointeger(L, 4)
 	);
 	
-	if (task)
-	{
-		if (lua_toboolean(L, 5) == 1)
-		{
+	if (task) {
+		if (lua_toboolean(L, 5) == 1) {
 			e->QueueScriptTask(boost::static_pointer_cast<Entity::Tickable>(task));
-		}
-		else
-		{
+		} else {
 			// tick until loaded!
 			while (task->Tick(*e, 0.001f, xtime::TimeSlice::Infinite, 0) == TickNext) {}
 		}
@@ -802,8 +739,7 @@ int WorldLua::lua_SysCalls_CreatePrecacheTask(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_CreateSpawnTask(lua_State *L)
-{
+int WorldLua::lua_System_CreateSpawnTask(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -813,8 +749,7 @@ int WorldLua::lua_CreateSpawnTask(lua_State *L)
 	ParseKeysTable(L, keys, 2, true);
 	
 	T_Spawn::Ref spawn = T_Spawn::New(self->m_world, keys);
-	if (spawn)
-	{
+	if (spawn) {
 		e->QueueScriptTask(boost::static_pointer_cast<Entity::Tickable>(spawn));
 		spawn->Push(L);
 		return 1;
@@ -823,8 +758,7 @@ int WorldLua::lua_CreateSpawnTask(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_CreateTempSpawnTask(lua_State *L)
-{
+int WorldLua::lua_System_CreateTempSpawnTask(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -834,8 +768,7 @@ int WorldLua::lua_CreateTempSpawnTask(lua_State *L)
 	ParseKeysTable(L, keys, 2, true);
 	
 	T_TempSpawn::Ref spawn = T_TempSpawn::New(self->m_world, keys);
-	if (spawn)
-	{
+	if (spawn) {
 		e->QueueScriptTask(boost::static_pointer_cast<Entity::Tickable>(spawn));
 		spawn->Push(L);
 		return 1;
@@ -844,52 +777,42 @@ int WorldLua::lua_CreateTempSpawnTask(lua_State *L)
 	return 0;
 }
 
- int WorldLua::lua_SysCalls_COut(lua_State *L)
- {
+ int WorldLua::lua_System_COut(lua_State *L) {
 	 int level = (int)luaL_checkinteger(L, 1);
 	 const char *string = luaL_checkstring(L, 2);
 	 COut(level) << "(Script):" << string << std::flush;
 	 return 0;
  }
 
-int WorldLua::lua_FindEntityId(lua_State *L)
-{
+int WorldLua::lua_World_FindEntityId(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
 	int id = (int)luaL_checkinteger(L, 1);
 	Entity::Ref ref = self->m_world->FindEntityId(id);
 
-	if (ref)
-	{
+	if (ref) {
 		ref->PushEntityFrame(L);
-	}
-	else
-	{
+	} else {
 		lua_pushnil(L);
 	}
 
 	return 1;
 }
 
-int WorldLua::lua_FindEntityClass(lua_State *L)
-{
+int WorldLua::lua_World_FindEntityClass(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
 	const char *classname = luaL_checkstring(L, 1);
 	Entity::Vec ents = self->m_world->FindEntityClass(classname);
 	
-	if (ents.empty())
-	{
+	if (ents.empty()) {
 		lua_pushnil(L);
-	}
-	else
-	{
+	} else {
 		int c = 1;
 		lua_createtable(L, (int)ents.size(), 0);
-		for (Entity::Vec::const_iterator it = ents.begin(); it != ents.end(); ++it, ++c)
-		{
+		for (Entity::Vec::const_iterator it = ents.begin(); it != ents.end(); ++it, ++c) {
 			lua_pushinteger(L, c);
 			(*it)->PushEntityFrame(L);
 			lua_settable(L, -3);
@@ -899,36 +822,29 @@ int WorldLua::lua_FindEntityClass(lua_State *L)
 	return 1;
 }
 
-int WorldLua::lua_FindEntityTargets(lua_State *L)
-{
+int WorldLua::lua_World_FindEntityTargets(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
 	const char *targetname = luaL_checkstring(L, 1);
 	Entity::Vec ents = self->m_world->FindEntityTargets(targetname);
 	
-	if (ents.empty())
-	{
+	if (ents.empty()) {
 		lua_pushnil(L);
-	}
-	else
-	{
+	} else {
 		int c = 1;
 		lua_createtable(L, (int)ents.size(), 0);
-		for (Entity::Vec::const_iterator it = ents.begin(); it != ents.end(); ++it, ++c)
-		{
+		for (Entity::Vec::const_iterator it = ents.begin(); it != ents.end(); ++it, ++c) {
 			lua_pushinteger(L, c);
 			(*it)->PushEntityFrame(L);
 			lua_settable(L, -3);
 		}
 	}
 
-
 	return 1;
 }
 
-int WorldLua::lua_BBoxTouching(lua_State *L)
-{
+int WorldLua::lua_World_BBoxTouching(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -940,16 +856,12 @@ int WorldLua::lua_BBoxTouching(lua_State *L)
 	int stypes = (int)luaL_checknumber(L, 3);
 	Entity::Vec ents = self->m_world->BBoxTouching(bbox, stypes);
 
-	if (ents.empty())
-	{
+	if (ents.empty()) {
 		lua_pushnil(L);
-	}
-	else
-	{
+	} else {
 		int c = 1;
 		lua_createtable(L, (int)ents.size(), 0);
-		for (Entity::Vec::const_iterator it = ents.begin(); it != ents.end(); ++it, ++c)
-		{
+		for (Entity::Vec::const_iterator it = ents.begin(); it != ents.end(); ++it, ++c) {
 			lua_pushinteger(L, c);
 			(*it)->PushEntityFrame(L);
 			lua_settable(L, -3);
@@ -959,8 +871,7 @@ int WorldLua::lua_BBoxTouching(lua_State *L)
 	return 1;
 }
 
-int WorldLua::lua_CreateScreenOverlay(lua_State *L)
-{
+int WorldLua::lua_World_CreateScreenOverlay(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -976,8 +887,7 @@ int WorldLua::lua_CreateScreenOverlay(lua_State *L)
 	return 1;
 }
 
-int WorldLua::lua_PostEvent(lua_State *L)
-{
+int WorldLua::lua_World_PostEvent(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	const char *event = luaL_checkstring(L, 1);
@@ -985,8 +895,7 @@ int WorldLua::lua_PostEvent(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_DispatchEvent(lua_State *L)
-{
+int WorldLua::lua_World_DispatchEvent(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	const char *event = luaL_checkstring(L, 1);
@@ -994,8 +903,7 @@ int WorldLua::lua_DispatchEvent(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_Project(lua_State *L)
-{
+int WorldLua::lua_World_Project(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1009,8 +917,7 @@ int WorldLua::lua_Project(lua_State *L)
 	return 2;
 }
 
-int WorldLua::lua_Unproject(lua_State *L)
-{
+int WorldLua::lua_World_Unproject(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1019,8 +926,7 @@ int WorldLua::lua_Unproject(lua_State *L)
 	return 1;
 }
 
-int WorldLua::lua_SetUIViewport(lua_State *L)
-{
+int WorldLua::lua_World_SetUIViewport(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1034,19 +940,15 @@ int WorldLua::lua_SetUIViewport(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_SetRootWidget(lua_State *L)
-{
+int WorldLua::lua_World_SetRootWidget(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
 	int layer = (int)luaL_checkinteger(L, 1);
 
-	if (lua_isnil(L, 2))
-	{
+	if (lua_isnil(L, 2)) {
 		self->m_world->uiRoot->SetRootWidget(layer, ui::Widget::Ref());
-	}
-	else
-	{
+	} else {
 		self->m_world->uiRoot->SetRootWidget(
 			layer, 
 			ui::Widget::GetRef<ui::Widget>(L, "Widget", 2, true)
@@ -1056,8 +958,7 @@ int WorldLua::lua_SetRootWidget(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_CreateWidget(lua_State *L)
-{
+int WorldLua::lua_World_CreateWidget(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1066,20 +967,13 @@ int WorldLua::lua_CreateWidget(lua_State *L)
 
 	ui::Widget::Ref w;
 
-	if (type == "Widget")
-	{
+	if (type == "Widget") {
 		w.reset(new (ui::ZUI) ui::Widget());
-	}
-	else if(type == "MatWidget")
-	{
+	} else if(type == "MatWidget") {
 		w.reset(new (ui::ZUI) ui::MatWidget());
-	}
-	else if(type == "TextLabel")
-	{
+	} else if(type == "TextLabel") {
 		w.reset(new (ui::ZUI) ui::TextLabel());
-	}
-	else
-	{
+	} else {
 		luaL_argerror(L, 1, "Invalid widget type!");
 	}
 
@@ -1090,8 +984,7 @@ int WorldLua::lua_CreateWidget(lua_State *L)
 	return 1;
 }
 
-int WorldLua::lua_AddWidgetTickMaterial(lua_State *L)
-{
+int WorldLua::lua_World_AddWidgetTickMaterial(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1102,8 +995,7 @@ int WorldLua::lua_AddWidgetTickMaterial(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_CreatePostProcessEffect(lua_State *L)
-{
+int WorldLua::lua_World_CreatePostProcessEffect(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1117,8 +1009,7 @@ int WorldLua::lua_CreatePostProcessEffect(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_FadePostProcessEffect(lua_State *L)
-{
+int WorldLua::lua_World_FadePostProcessEffect(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1132,8 +1023,7 @@ int WorldLua::lua_FadePostProcessEffect(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_EnablePostProcessEffect(lua_State *L)
-{
+int WorldLua::lua_World_EnablePostProcessEffect(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1150,12 +1040,10 @@ WorldLua::CinematicsNotify::CinematicsNotify(World *world, Entity &entity, int c
 m_world(world),
 m_entity(entity.shared_from_this()),
 m_callbackId(callbackId),
-m_masked(false)
-{
+m_masked(false) {
 }
 
-WorldLua::CinematicsNotify::~CinematicsNotify()
-{
+WorldLua::CinematicsNotify::~CinematicsNotify() {
 	if (m_world->destroy) // don't clean ents up (done by world).
 		return;
 
@@ -1164,14 +1052,12 @@ WorldLua::CinematicsNotify::~CinematicsNotify()
 		entity->ReleaseLuaCallback(m_callbackId, lua::InvalidIndex);
 }
 
-void WorldLua::CinematicsNotify::PushElements(lua_State *L)
-{
+void WorldLua::CinematicsNotify::PushElements(lua_State *L) {
 	lua_pushcfunction(L, lua_SetMasked);
 	lua_setfield(L, -2, "SetMasked");
 }
 
-void WorldLua::CinematicsNotify::OnTag(const char *str)
-{
+void WorldLua::CinematicsNotify::OnTag(const char *str) {
 	Entity::Ref entity = m_entity.lock();
 	if (!entity)
 		return;
@@ -1181,8 +1067,7 @@ void WorldLua::CinematicsNotify::OnTag(const char *str)
 	lua_State *L = entity->world->lua->L;
 
 	lua_getfield(L, -1, "OnTag");
-	if (lua_type(L, -1) != LUA_TFUNCTION)
-	{
+	if (lua_type(L, -1) != LUA_TFUNCTION) {
 		lua_pop(L, 2);
 		return;
 	}
@@ -1193,8 +1078,7 @@ void WorldLua::CinematicsNotify::OnTag(const char *str)
 	lua_pop(L, 1); // pop callback table
 }
 
-void WorldLua::CinematicsNotify::OnComplete()
-{
+void WorldLua::CinematicsNotify::OnComplete() {
 	Entity::Ref entity = m_entity.lock();
 	if (!entity)
 		return;
@@ -1204,8 +1088,7 @@ void WorldLua::CinematicsNotify::OnComplete()
 	lua_State *L = entity->world->lua->L;
 
 	lua_getfield(L, -1, "OnComplete");
-	if (lua_type(L, -1) != LUA_TFUNCTION)
-	{
+	if (lua_type(L, -1) != LUA_TFUNCTION) {
 		lua_pop(L, 2);
 		return;
 	}
@@ -1215,8 +1098,7 @@ void WorldLua::CinematicsNotify::OnComplete()
 	lua_pop(L, 1); // pop callback table
 }
 
-void WorldLua::CinematicsNotify::OnSkip()
-{
+void WorldLua::CinematicsNotify::OnSkip() {
 	Entity::Ref entity = m_entity.lock();
 	if (!entity)
 		return;
@@ -1226,8 +1108,7 @@ void WorldLua::CinematicsNotify::OnSkip()
 	lua_State *L = entity->world->lua->L;
 
 	lua_getfield(L, -1, "OnSkip");
-	if (lua_type(L, -1) != LUA_TFUNCTION)
-	{
+	if (lua_type(L, -1) != LUA_TFUNCTION) {
 		lua_pop(L, 2);
 		return;
 	}
@@ -1237,8 +1118,7 @@ void WorldLua::CinematicsNotify::OnSkip()
 	lua_pop(L, 1); // pop callback table
 }
 
-int WorldLua::CinematicsNotify::lua_SetMasked(lua_State *L)
-{
+int WorldLua::CinematicsNotify::lua_SetMasked(lua_State *L) {
 	Ref self = lua::SharedPtr::Get<CinematicsNotify>(L, "WorldLua::CinematicsNotify", 1, true);
 	bool wasMasked = self->m_masked;
 	self->m_masked = lua_toboolean(L, 2) ? true : false;
@@ -1246,16 +1126,14 @@ int WorldLua::CinematicsNotify::lua_SetMasked(lua_State *L)
 	return 1;
 }
 
-int WorldLua::lua_PlayCinematic(lua_State *L)
-{
+int WorldLua::lua_World_PlayCinematic(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
 	WorldCinematics::Notify::Ref notify;
 
 	Entity *entity = EntFramePtr(L, 4, false);
-	if (entity && lua_gettop(L) > 4) // passed in callbacks?
-	{
+	if (entity && lua_gettop(L) > 4) { // passed in callbacks?
 		int callbackId = entity->StoreLuaCallback(L, 5, 4);
 		RAD_ASSERT(callbackId != -1);
 		notify.reset(new CinematicsNotify(self->m_world, *entity, callbackId));
@@ -1272,8 +1150,7 @@ int WorldLua::lua_PlayCinematic(lua_State *L)
 	return 1;
 }
 
-int WorldLua::lua_StopCinematic(lua_State *L)
-{
+int WorldLua::lua_World_StopCinematic(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1284,8 +1161,7 @@ int WorldLua::lua_StopCinematic(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_SkipCinematics(lua_State *L)
-{
+int WorldLua::lua_World_SkipCinematics(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1293,8 +1169,7 @@ int WorldLua::lua_SkipCinematics(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_CinematicTime(lua_State *L)
-{
+int WorldLua::lua_World_CinematicTime(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1303,8 +1178,7 @@ int WorldLua::lua_CinematicTime(lua_State *L)
 	return 1;
 }
 
-int WorldLua::lua_SetCinematicTime(lua_State *L)
-{
+int WorldLua::lua_World_SetCinematicTime(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1317,8 +1191,7 @@ int WorldLua::lua_SetCinematicTime(lua_State *L)
 	return 1;
 }
 
-int WorldLua::lua_SoundFadeMasterVolume(lua_State *L)
-{
+int WorldLua::lua_World_SoundFadeMasterVolume(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1329,8 +1202,7 @@ int WorldLua::lua_SoundFadeMasterVolume(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_SoundFadeChannelVolume(lua_State *L)
-{
+int WorldLua::lua_World_SoundFadeChannelVolume(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1345,8 +1217,7 @@ int WorldLua::lua_SoundFadeChannelVolume(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_SoundChannelVolume(lua_State *L)
-{
+int WorldLua::lua_World_SoundChannelVolume(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1357,8 +1228,7 @@ int WorldLua::lua_SoundChannelVolume(lua_State *L)
 	return 1;
 }
 
-int WorldLua::lua_SoundPauseChannel(lua_State *L)
-{
+int WorldLua::lua_World_SoundPauseChannel(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1369,8 +1239,7 @@ int WorldLua::lua_SoundPauseChannel(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_SoundChannelIsPaused(lua_State *L)
-{
+int WorldLua::lua_World_SoundChannelIsPaused(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1381,8 +1250,7 @@ int WorldLua::lua_SoundChannelIsPaused(lua_State *L)
 	return 1;
 }
 
-int WorldLua::lua_SoundPauseAll(lua_State *L)
-{
+int WorldLua::lua_World_SoundPauseAll(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1390,8 +1258,7 @@ int WorldLua::lua_SoundPauseAll(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_SoundStopAll(lua_State *L)
-{
+int WorldLua::lua_World_SoundStopAll(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1399,8 +1266,7 @@ int WorldLua::lua_SoundStopAll(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_SoundSetDoppler(lua_State *L)
-{
+int WorldLua::lua_World_SoundSetDoppler(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1411,8 +1277,7 @@ int WorldLua::lua_SoundSetDoppler(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_RequestLoad(lua_State *L)
-{
+int WorldLua::lua_World_RequestLoad(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	self->m_world->RequestLoad(
@@ -1423,32 +1288,28 @@ int WorldLua::lua_RequestLoad(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_RequestReturn(lua_State *L)
-{
+int WorldLua::lua_World_RequestReturn(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	self->m_world->RequestReturn();
 	return 0;
 }
 
-int WorldLua::lua_RequestSwitch(lua_State *L)
-{
+int WorldLua::lua_World_RequestSwitch(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	self->m_world->RequestSwitch((int)luaL_checkinteger(L, 1));
 	return 0;
 }
 
-int WorldLua::lua_RequestUnloadSlot(lua_State *L)
-{
+int WorldLua::lua_World_RequestUnloadSlot(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	self->m_world->RequestUnloadSlot((int)luaL_checkinteger(L, 1));
 	return 0;
 }
 
-int WorldLua::lua_RequestSwitchLoad(lua_State *L)
-{
+int WorldLua::lua_World_RequestSwitchLoad(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	self->m_world->RequestSwitchLoad(
@@ -1460,8 +1321,7 @@ int WorldLua::lua_RequestSwitchLoad(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_SaveSession(lua_State *L)
-{
+int WorldLua::lua_System_SaveSession(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua_pop(L, 1);
@@ -1480,8 +1340,7 @@ int WorldLua::lua_SaveSession(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_LoadSession(lua_State *L)
-{
+int WorldLua::lua_System_LoadSession(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua_pop(L, 1);
@@ -1493,8 +1352,7 @@ int WorldLua::lua_LoadSession(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_SaveGlobals(lua_State *L)
-{
+int WorldLua::lua_System_SaveGlobals(lua_State *L) {
 	Keys x;
 	Keys *keys = App::Get()->engine->sys->globals->keys;
 	
@@ -1509,8 +1367,7 @@ int WorldLua::lua_SaveGlobals(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_LoadGlobals(lua_State *L)
-{
+int WorldLua::lua_System_LoadGlobals(lua_State *L) {
 	luaL_checktype(L, 1, LUA_TTABLE);
 	Keys *keys = App::Get()->engine->sys->globals->keys;
 	PushKeysTable(L, *keys);
@@ -1518,8 +1375,7 @@ int WorldLua::lua_LoadGlobals(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_CreateSaveGame(lua_State *L)
-{
+int WorldLua::lua_System_CreateSaveGame(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua_pop(L, 1);
@@ -1531,8 +1387,7 @@ int WorldLua::lua_CreateSaveGame(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_LoadSavedGame(lua_State *L)
-{
+int WorldLua::lua_System_LoadSavedGame(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua_pop(L, 1);
@@ -1544,8 +1399,7 @@ int WorldLua::lua_LoadSavedGame(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_LoadSaveTable(lua_State *L)
-{
+int WorldLua::lua_System_LoadSaveTable(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua_pop(L, 1);
@@ -1555,8 +1409,7 @@ int WorldLua::lua_LoadSaveTable(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_SaveGame(lua_State *L)
-{
+int WorldLua::lua_System_SaveGame(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua_pop(L, 1);
@@ -1573,8 +1426,7 @@ int WorldLua::lua_SaveGame(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_NumSavedGameConflicts(lua_State *L)
-{
+int WorldLua::lua_System_NumSavedGameConflicts(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua_pop(L, 1);
@@ -1584,8 +1436,7 @@ int WorldLua::lua_NumSavedGameConflicts(lua_State *L)
 	return 1;
 }
 
-int WorldLua::lua_LoadSavedGameConflict(lua_State *L)
-{
+int WorldLua::lua_System_LoadSavedGameConflict(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua_pop(L, 1);
@@ -1597,8 +1448,7 @@ int WorldLua::lua_LoadSavedGameConflict(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_ResolveSavedGameConflict(lua_State *L)
-{
+int WorldLua::lua_System_ResolveSavedGameConflict(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua_pop(L, 1);
@@ -1608,8 +1458,7 @@ int WorldLua::lua_ResolveSavedGameConflict(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_EnableCloudStorage(lua_State *L)
-{
+int WorldLua::lua_System_EnableCloudStorage(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua_pop(L, 1);
@@ -1619,43 +1468,33 @@ int WorldLua::lua_EnableCloudStorage(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_CloudFileStatus(lua_State *L)
-{
+int WorldLua::lua_System_CloudFileStatus(lua_State *L) {
 	luaL_checktype(L, 1, LUA_TTABLE);
-	if (CloudStorage::Enabled())
-	{
+	if (CloudStorage::Enabled()) {
 		lua_pushnumber(L, CloudStorage::FileStatus(luaL_checkstring(L, 2)));
-	}
-	else
-	{
+	} else {
 		lua_pushnumber(L, CloudFile::Ready);
 	}
 	return 1;
 }
 
-int WorldLua::lua_StartDownloadingLatestSaveVersion(lua_State *L)
-{
+int WorldLua::lua_System_StartDownloadingLatestSaveVersion(lua_State *L) {
 	luaL_checktype(L, 1, LUA_TTABLE);
-	if (CloudStorage::Enabled())
-	{
+	if (CloudStorage::Enabled()) {
 		lua_pushboolean(L, CloudStorage::StartDownloadingLatestVersion(luaL_checkstring(L, 2))?1:0);
-	}
-	else
-	{
+	} else {
 		lua_pushboolean(L, 1);
 	}
 	return 1;
 }
 
-int WorldLua::lua_CloudStorageAvailable(lua_State *L)
-{
+int WorldLua::lua_System_CloudStorageAvailable(lua_State *L) {
 	luaL_checktype(L, 1, LUA_TTABLE);
 	lua_pushboolean(L, CloudStorage::Enabled() ? 1 : 0);
 	return 1;
 }
 
-int WorldLua::lua_SetGameSpeed(lua_State *L)
-{
+int WorldLua::lua_World_SetGameSpeed(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	self->m_world->SetGameSpeed(
@@ -1665,16 +1504,14 @@ int WorldLua::lua_SetGameSpeed(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_SetPauseState(lua_State *L)
-{
+int WorldLua::lua_World_SetPauseState(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	self->m_world->pauseState = (int)luaL_checkinteger(L, 1);
 	return 0;
 }
 
-int WorldLua::lua_SwapMaterial(lua_State *L)
-{
+int WorldLua::lua_World_SwapMaterial(lua_State *L) {
 	D_Asset::Ref src = lua::SharedPtr::Get<D_Asset>(L, "D_Asset", 1, true);
 	if (src->asset->type != asset::AT_Material)
 		return 0;
@@ -1688,134 +1525,109 @@ int WorldLua::lua_SwapMaterial(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_PlayerPawn(lua_State *L)
-{
+int WorldLua::lua_World_PlayerPawn(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	Entity::Ref r = self->m_world->playerPawn;
-	if (r)
-	{
+	if (r) {
 		r->PushEntityFrame(L);
-	}
-	else
-	{
+	} else {
 		lua_pushnil(L);
 	}
 
 	return 1;
 }
 
-int WorldLua::lua_SetPlayerPawn(lua_State *L)
-{
+int WorldLua::lua_World_SetPlayerPawn(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
-	if (lua_isnil(L, 1))
-	{
+	if (lua_isnil(L, 1)) {
 		self->m_world->playerPawn = Entity::Ref();
-	}
-	else
-	{
+	} else {
 		self->m_world->playerPawn = EntFramePtr(L, 1, true)->shared_from_this();
 	}
 
 	return 0;
 }
 
-int WorldLua::lua_Worldspawn(lua_State *L)
-{
+int WorldLua::lua_World_Worldspawn(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	Entity::Ref r = self->m_world->worldspawn;
-	if (r)
-	{
+	if (r) {
 		r->PushEntityFrame(L);
-	}
-	else
-	{
+	} else {
 		lua_pushnil(L);
 	}
 
 	return 1;
 }
 
-int WorldLua::lua_SetWorldspawn(lua_State *L)
+int WorldLua::lua_World_SetWorldspawn(lua_State *L)
 {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
-	if (lua_isnil(L, 1))
-	{
+	if (lua_isnil(L, 1)) {
 		self->m_world->worldspawn = Entity::Ref();
-	}
-	else
-	{
+	} else {
 		self->m_world->worldspawn = EntFramePtr(L, 1, true)->shared_from_this();
 	}
 
 	return 0;
 }
 
-int WorldLua::lua_ViewController(lua_State *L)
+int WorldLua::lua_World_ViewController(lua_State *L)
 {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	Entity::Ref r = self->m_world->viewController;
-	if (r)
-	{
+	if (r) {
 		r->PushEntityFrame(L);
-	}
-	else
-	{
+	} else {
 		lua_pushnil(L);
 	}
 
 	return 1;
 }
 
-int WorldLua::lua_SetViewController(lua_State *L)
+int WorldLua::lua_World_SetViewController(lua_State *L)
 {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
-	if (lua_isnil(L, 1))
-	{
+	if (lua_isnil(L, 1)) {
 		self->m_world->viewController = Entity::Ref();
-	}
-	else
-	{
+	} else {
 		self->m_world->viewController = EntFramePtr(L, 1, true)->shared_from_this();
 	}
 
 	return 0;
 }
 
-int WorldLua::lua_Time(lua_State *L)
-{
+int WorldLua::lua_World_GameTime(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua_pushnumber(L, self->m_world->gameTime.get()*1000.f);
 	return 1;
 }
 
-int WorldLua::lua_SysTime(lua_State *L)
-{
+int WorldLua::lua_World_SysTime(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua_pushnumber(L, self->m_world->time.get()*1000.f);
 	return 1;
 }
 
-int WorldLua::lua_DeltaTime(lua_State *L)
-{
+int WorldLua::lua_World_DeltaTime(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua_pushnumber(L, self->m_world->dt.get()*1000.f);
 	return 1;
 }
 
-int WorldLua::lua_Viewport(lua_State *L)
-{
+int WorldLua::lua_World_Viewport(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1825,88 +1637,77 @@ int WorldLua::lua_Viewport(lua_State *L)
 	return 1;
 }
 
-int WorldLua::lua_CameraPos(lua_State *L)
-{
+int WorldLua::lua_World_CameraPos(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua::Marshal<Vec3>::Push(L, self->m_world->camera->pos);
 	return 1;
 }
 
-int WorldLua::lua_CameraFarClip(lua_State *L)
-{
+int WorldLua::lua_World_CameraFarClip(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua_pushnumber(L, (lua_Number)self->m_world->camera->farClip.get());
 	return 1;
 }
 
-int WorldLua::lua_SetCameraFarClip(lua_State *L)
-{
+int WorldLua::lua_World_SetCameraFarClip(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	self->m_world->camera->farClip = (float)luaL_checknumber(L, 1);
 	return 0;
 }
 
-int WorldLua::lua_CameraAngles(lua_State *L)
-{
+int WorldLua::lua_World_CameraAngles(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua::Marshal<Vec3>::Push(L, self->m_world->camera->angles);
 	return 1;
 }
 
-int WorldLua::lua_CameraFOV(lua_State *L)
-{
+int WorldLua::lua_World_CameraFOV(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua_pushnumber(L, (lua_Number)self->m_world->camera->fov.get());
 	return 1;
 }
 
-int WorldLua::lua_CameraFwd(lua_State *L)
-{
+int WorldLua::lua_World_CameraFwd(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua::Marshal<Vec3>::Push(L, self->m_world->camera->fwd);
 	return 1;
 }
 
-int WorldLua::lua_CameraLeft(lua_State *L)
-{
+int WorldLua::lua_World_CameraLeft(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua::Marshal<Vec3>::Push(L, self->m_world->camera->left);
 	return 1;
 }
 
-int WorldLua::lua_CameraUp(lua_State *L)
-{
+int WorldLua::lua_World_CameraUp(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua::Marshal<Vec3>::Push(L, self->m_world->camera->up);
 	return 1;
 }
 	
-int WorldLua::lua_SetEnabledGestures(lua_State *L)
-{
+int WorldLua::lua_World_SetEnabledGestures(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	self->m_world->enabledGestures = (int)luaL_checkinteger(L, 1);
 	return 0;
 }
 
-int WorldLua::lua_FlushInput(lua_State *L)
-{
+int WorldLua::lua_World_FlushInput(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	self->m_world->game->FlushInput(lua_toboolean(L, 1) ? true : false);
 	return 0;
 }
 
-int WorldLua::lua_DrawCounters(lua_State *L)
-{
+int WorldLua::lua_World_DrawCounters(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	const WorldDraw::Counters *counters = self->m_world->drawCounters;
@@ -1930,24 +1731,21 @@ int WorldLua::lua_DrawCounters(lua_State *L)
 	return 1;
 }
 
-int WorldLua::lua_EnableWireframe(lua_State *L)
-{
+int WorldLua::lua_World_EnableWireframe(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	self->m_world->draw->wireframe = lua_toboolean(L, 1) ? true : false;
 	return 0;
 }
 
-int WorldLua::lua_EnableColorBufferClear(lua_State *L)
-{
+int WorldLua::lua_World_EnableColorBufferClear(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	self->m_world->draw->rb->clearColorBuffer = lua_toboolean(L, 1) ? true : false;
 	return 0;
 }
 
-int WorldLua::lua_CurrentDateAndTime(lua_State *L)
-{
+int WorldLua::lua_System_CurrentDateAndTime(lua_State *L) {
 	xtime::TimeDate ct = xtime::TimeDate::Now(xtime::TimeDate::local_time_tag());
 
 	lua_createtable(L, 0, 8);
@@ -1971,15 +1769,14 @@ int WorldLua::lua_CurrentDateAndTime(lua_State *L)
 	return 1;
 }
 
-int WorldLua::lua_QuitGame(lua_State *L) {
+int WorldLua::lua_World_QuitGame(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	self->m_world->game->quit = true;
 	return 0;
 }
 
-int WorldLua::lua_gnCreate(lua_State *L)
-{
+int WorldLua::lua_gnCreate(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1987,8 +1784,7 @@ int WorldLua::lua_gnCreate(lua_State *L)
 	return 1;
 }
 
-int WorldLua::lua_gnAuthenticateLocalPlayer(lua_State *L)
-{
+int WorldLua::lua_gnAuthenticateLocalPlayer(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -1999,17 +1795,14 @@ int WorldLua::lua_gnAuthenticateLocalPlayer(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_gnLocalPlayerId(lua_State *L)
-{
+int WorldLua::lua_gnLocalPlayerId(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
 	gn::GameNetwork *network = self->m_world->game->gameNetwork;
-	if (network)
-	{
+	if (network) {
 		const char *id = network->localPlayer->id;
-		if (id)
-		{
+		if (id) {
 			lua_pushstring(L, id);
 			return 1;
 		}
@@ -2018,49 +1811,41 @@ int WorldLua::lua_gnLocalPlayerId(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_gnSendScore(lua_State *L)
-{
+int WorldLua::lua_gnSendScore(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
 	gn::GameNetwork *network = self->m_world->game->gameNetwork;
-	if (network && network->localPlayer->authenticated)
-	{
+	if (network && network->localPlayer->authenticated) {
 		const char *leaderboardId = luaL_checkstring(L, 1);
 		int score = (int)luaL_checknumber(L, 2);
-
 		network->SendScore(leaderboardId, score);
 	}
 
 	return 0;
 }
 
-int WorldLua::lua_gnSendAchievement(lua_State *L)
-{
+int WorldLua::lua_gnSendAchievement(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua_pop(L, 1);
 
 	gn::GameNetwork *network = self->m_world->game->gameNetwork;
-	if (network && network->localPlayer->authenticated)
-	{
+	if (network && network->localPlayer->authenticated) {
 		const char *achievementId = luaL_checkstring(L, 1);
 		float percent = (lua_gettop(L) > 1) ? (float)luaL_checknumber(L, 2) : 100.f;
-
 		network->SendAchievement(achievementId, percent);
 	}
 
 	return 0;
 }
 
-int WorldLua::lua_gnShowLeaderboard(lua_State *L)
-{
+int WorldLua::lua_gnShowLeaderboard(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
 	gn::GameNetwork *network = self->m_world->game->gameNetwork;
-	if (network)
-	{
+	if (network) {
 		const char *leaderboardId = luaL_checkstring(L, 1);
 		network->ShowLeaderboard(leaderboardId);
 	}
@@ -2068,8 +1853,7 @@ int WorldLua::lua_gnShowLeaderboard(lua_State *L)
 	return 0;
 }
 	
-int WorldLua::lua_gnShowAchievements(lua_State *L)
-{
+int WorldLua::lua_gnShowAchievements(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	
@@ -2080,21 +1864,18 @@ int WorldLua::lua_gnShowAchievements(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_gnLogEvent(lua_State *L)
-{
+int WorldLua::lua_gnLogEvent(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua_pop(L, 1);
 
 	gn::GameNetwork *network = self->m_world->game->gameNetwork;
-	if (network)
-	{
+	if (network) {
 		const char *eventName = luaL_checkstring(L, 1);
 		Keys *keys = 0;
 		Keys _keys;
 
-		if (lua_gettop(L) > 1)
-		{
+		if (lua_gettop(L) > 1) {
 			ParseKeysTable(L, _keys, 2, true);
 			keys = &_keys;
 		}
@@ -2107,22 +1888,19 @@ int WorldLua::lua_gnLogEvent(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_gnEndTimedEvent(lua_State *L)
-{
+int WorldLua::lua_gnEndTimedEvent(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	lua_pop(L, 1);
 
 	gn::GameNetwork *network = self->m_world->game->gameNetwork;
-	if (network)
-	{
+	if (network) {
 		const char *eventName = luaL_checkstring(L, 1);
 		
 		Keys *keys = 0;
 		Keys _keys;
 
-		if (lua_gettop(L) > 1)
-		{
+		if (lua_gettop(L) > 1) {
 			ParseKeysTable(L, _keys, 2, true);
 			keys = &_keys;
 		}
@@ -2133,14 +1911,12 @@ int WorldLua::lua_gnEndTimedEvent(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_gnLogError(lua_State *L)
-{
+int WorldLua::lua_gnLogError(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
 	gn::GameNetwork *network = self->m_world->game->gameNetwork;
-	if (network)
-	{
+	if (network) {
 		const char *eventName = luaL_checkstring(L, 1);
 		const char *message = luaL_checkstring(L, 2);
 		network->LogError(eventName, message);
@@ -2149,26 +1925,21 @@ int WorldLua::lua_gnLogError(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_gnSessionReportOnAppClose(lua_State *L)
-{
+int WorldLua::lua_gnSessionReportOnAppClose(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
 	gn::GameNetwork *network = self->m_world->game->gameNetwork;
-	if (network)
-	{
+	if (network) {
 		lua_pushboolean(L, network->sessionReportOnAppClose ? 1 : 0);
-	}
-	else
-	{
+	} else {
 		lua_pushboolean(L, 0);
 	}
 
 	return 1;
 }
 
-int WorldLua::lua_gnSetSessionReportOnAppClose(lua_State *L)
-{
+int WorldLua::lua_gnSetSessionReportOnAppClose(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -2179,26 +1950,21 @@ int WorldLua::lua_gnSetSessionReportOnAppClose(lua_State *L)
 	return 0;
 }
 
-int WorldLua::lua_gnSessionReportOnAppPause(lua_State *L)
-{
+int WorldLua::lua_gnSessionReportOnAppPause(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
 	gn::GameNetwork *network = self->m_world->game->gameNetwork;
-	if (network)
-	{
+	if (network) {
 		lua_pushboolean(L, network->sessionReportOnAppPause ? 1 : 0);
-	}
-	else
-	{
+	} else {
 		lua_pushboolean(L, 0);
 	}
 
 	return 1;
 }
 
-int WorldLua::lua_gnSetSessionReportOnAppPause(lua_State *L)
-{
+int WorldLua::lua_gnSetSessionReportOnAppPause(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 
@@ -2209,8 +1975,7 @@ int WorldLua::lua_gnSetSessionReportOnAppPause(lua_State *L)
 	return 0;
 }
 
-lua::SrcBuffer::Ref WorldLua::ImportLoader::Load(lua_State *L, const char *name)
-{
+lua::SrcBuffer::Ref WorldLua::ImportLoader::Load(lua_State *L, const char *name) {
 	String path(CStr("Scripts/"));
 	path += name;
 	path += ".lua";

@@ -214,7 +214,7 @@ bool World::ClipOccupantVolume(
 		int side = areaportal.areas[1] == fromArea;
 		RAD_ASSERT(areaportal.areas[side] == fromArea);
 		int otherArea = areaportal.areas[!side];
-		int planenum = areaportal.planenum ^ side; // put fromArea on front (we want to clip away volume in our area).
+		int planenum = areaportal.planenum ^ side ^ 1; // put fromArea on back (we want to clip away volume in our area).
 		const Plane &portalPlane = m_planes[planenum];
 
 		if (constArgs.stack.test(otherArea))
@@ -237,7 +237,7 @@ bool World::ClipOccupantVolume(
 		} else {
 
 			float planeDist = portalPlane.Distance(*constArgs.pos);
-			if (planeDist < -1.f)
+			if (planeDist > 1.f)
 				continue; // on wrong side of portal.
 
 			// quick reject, bounds touches this portal?
@@ -253,7 +253,7 @@ bool World::ClipOccupantVolume(
 				areaportal.winding.Plane()
 			);
 
-			if (planeDist > 4.f) { // avoid clipping away this portal due to numerical issues
+			if (planeDist < -4.f) { // avoid clipping away this portal due to numerical issues
 				if (!ChopWindingToVolume(*volume, winding))
 					continue; // portal clipped away.
 			}
@@ -322,6 +322,8 @@ dBSPLeaf *World::LeafForPoint(const Vec3 &pos, int nodeNum) {
 
 void World::BoundWindings(const BBox &bounds, StackWindingStackVec &windings) {
 	
+	// make bounding windings that face inward
+
 	Plane planes[6];
 	int planeNum = 0;
 
@@ -329,8 +331,8 @@ void World::BoundWindings(const BBox &bounds, StackWindingStackVec &windings) {
 		for (int k = 0; k < 3; ++k) {
 
 			Vec3 normal(Vec3::Zero);
-			normal[k] = (i==0) ? -1.f : 1.f;
-			float dist = (i==0) ? (-bounds.Mins()[k]) : (bounds.Maxs()[k]);
+			normal[k] = (i==0) ? 1.f : -1.f;
+			float dist = (i==0) ? (bounds.Mins()[k]) : (-bounds.Maxs()[k]);
 
 			planes[planeNum] = Plane(normal, dist);
 			++planeNum;
@@ -349,8 +351,8 @@ bool World::ChopWindingToVolume(const StackWindingStackVec &volume, StackWinding
 		const StackWinding &w = *it;
 
 		f.Clear();
-		out.Chop(w.Plane(), Plane::Back, f, 0.f);
-		out.Swap(f);
+		out.Chop(w.Plane(), Plane::Front, f, 0.f);
+		out = f;
 
 		if (out.Empty())
 			break;
@@ -376,7 +378,7 @@ bool World::ChopVolume(StackWindingStackVec &volume, BBox &bounds, const Plane &
 		const StackWinding &w = *it;
 
 		f.Clear();
-		w.Chop(p, Plane::Back, f, 0.f);
+		w.Chop(p, Plane::Front, f, 0.f);
 		if (!f.Empty()) {
 			for (int i = 0; i < f.NumVertices(); ++i)
 				bounds.Insert(f.Vertices()[i]);
@@ -390,8 +392,8 @@ bool World::ChopVolume(StackWindingStackVec &volume, BBox &bounds, const Plane &
 		const StackWinding &w = *it;
 
 		f.Clear();
-		pw.Chop(w.Plane(), Plane::Back, f, 0.f);
-		pw.Swap(f);
+		pw.Chop(w.Plane(), Plane::Front, f, 0.f);
+		pw = f;
 		if (pw.Empty())
 			break;
 	}
@@ -441,8 +443,8 @@ void World::MakeVolume(const Plane *planes, int num, StackWindingStackVec &volum
 				continue;
 			
 			f.Clear();
-			w.Chop(planes[k], Plane::Back, f, 0.f);
-			w.Swap(f);
+			w.Chop(planes[k], Plane::Front, f, 0.f);
+			w = f;
 			if (w.Empty())
 				break;
 		}
@@ -476,7 +478,7 @@ void World::MakeBoundingPlanes(const Vec3 &pos, const StackWinding &portal, Plan
 		const Vec3 &c = portal.Vertices()[j];
 
 		Plane p(a, b, pos);
-		if (p.Side(c, 0.f) == Plane::Front) {
+		if (p.Side(c, 0.f) == Plane::Back) {
 			p = -p;
 		}
 

@@ -19,13 +19,13 @@ MapThumb::MapThumb(ContentBrowserView &view) : ContentAssetThumb(view) {
 	PopupMenu *m = CreateMenu(false);
 	QAction *play = m->AddAction("Play...", this, SLOT(Play()));
 	QAction *debug = m->AddAction("Debug BSP...", this, SLOT(Debug()));
-	m->qmenu->setDefaultAction(debug);
+	m->qmenu->setDefaultAction(play);
 }
 
 void MapThumb::OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable, bool modal) {
 	if (modal)
 		return;
-	Debug(entry);
+	Play(entry);
 }
 
 void MapThumb::New(ContentBrowserView &view) {

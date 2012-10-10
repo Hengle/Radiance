@@ -71,7 +71,7 @@ void MeshEditorWindow::Load(int id)
 		
 		int r = asset->Process(
 			xtime::TimeSlice::Infinite,
-			pkg::P_Load
+			pkg::P_Load|pkg::P_FastPath
 		);
 
 		if (r != pkg::SR_Success)

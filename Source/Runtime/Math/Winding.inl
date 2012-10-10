@@ -643,7 +643,7 @@ Winding<TVertex, TPlane, stack_tag<TSize> > &Winding<TVertex, TPlane, stack_tag<
 
 template<typename TVertex, typename TPlane, int TSize>
 inline bool Winding<TVertex, TPlane, stack_tag<TSize> >::Empty() const {
-	return m_verts.empty();
+	return m_numVerts == 0;
 }
 
 template<typename TVertex, typename TPlane, int TSize>

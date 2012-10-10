@@ -92,7 +92,8 @@ m_world(w),
 m_frame(-1), 
 m_markFrame(-1),
 m_wireframe(false), 
-m_wireframeMat(0) {
+m_wireframeMat(0),
+m_init(false) {
 	m_rb = RB_WorldDraw::New(w);
 }
 
@@ -101,10 +102,13 @@ WorldDraw::~WorldDraw() {
 	m_overlays.clear();
 	m_rb.reset();
 	m_refMats.clear();
-	RAD_ASSERT(m_batchPool.NumUsedObjects() == 0);
-	m_batchPool.Destroy();
-	RAD_ASSERT(m_linkPool.NumUsedObjects() == 0);
-	m_linkPool.Destroy();
+
+	if (m_init) {
+		RAD_ASSERT(m_batchPool.NumUsedObjects() == 0);
+		m_batchPool.Destroy();
+		RAD_ASSERT(m_linkPool.NumUsedObjects() == 0);
+		m_linkPool.Destroy();
+	}
 }
 
 int WorldDraw::LoadMaterials() {
@@ -140,6 +144,7 @@ void WorldDraw::Init(const bsp_file::BSPFile::Ref &bsp) {
 	m_batchPool.Create(ZWorld, "world-draw-batch", 64);
 	m_linkPool.Create(ZWorld, "world-draw-link", 64);
 
+	m_init = true;
 }
 
 int WorldDraw::Precache() {
@@ -293,6 +298,10 @@ void WorldDraw::FindViewArea(ViewDef &view) {
 }
 
 void WorldDraw::SetupFrustumPlanes(ViewDef &view) {
+
+	// Things on front of frustum planes are outside the frustum
+	// Kind of reversed from normal but easier for convex volume clipping.
+
 	int vpx, vpy, vpw, vph;
 	m_world->game->Viewport(vpx, vpy, vpw, vph);
 	float yaspect = ((float)vph/(float)vpw);
@@ -421,6 +430,7 @@ void WorldDraw::DrawView() {
 	++m_frame;
 	
 	ViewDef view;
+	view.camera = *m_world->camera.get();
 
 	FindViewArea(view);
 	SetupFrustumPlanes(view);

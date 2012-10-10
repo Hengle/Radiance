@@ -243,6 +243,8 @@ private:
 		int flags
 	);
 
+	int LevelStart();
+
 	void SetupEntity(const Entity::Ref &entity, int id);
 	void MapEntity(const Entity::Ref &entity);
 	int CreateEntity(const Keys &keys);

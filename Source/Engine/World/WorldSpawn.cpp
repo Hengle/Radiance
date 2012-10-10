@@ -97,8 +97,11 @@ int World::Spawn(
 			break;
 		case SS_PostSpawn:
 			r = PostSpawn(time, flags);
-			if (r == SR_Success)
-				r = m_draw->Precache();
+			if (r == SR_Success) {
+				r = LevelStart();
+				if (r == SR_Success)
+					r = m_draw->Precache();
+			}
 			break;
 		}
 
@@ -658,6 +661,15 @@ int World::PostSpawn(const xtime::TimeSlice &time, int flags) {
 	return r;
 }
 
+int World::LevelStart() {
+
+	for (Entity::IdMap::const_iterator it = m_ents.begin(); it != m_ents.end(); ++it) {
+		it->second->PrivateLevelStart();
+	}
+
+	return SR_Success;
+}
+
 void World::LoadBSP(const bsp_file::BSPFile &bsp) {
 	
 	int num = (int)bsp.numPlanes.get();
@@ -688,6 +700,10 @@ void World::LoadBSP(const bsp_file::BSPFile &bsp) {
 		const bsp_file::BSPLeaf *x = bsp.Leafs() + i;
 		dBSPLeaf l;
 		l.parent = (int)x->parent;
+		l.area = (int)x->area;
+		l.contents = (int)x->contents;
+		l.firstClipSurface = (int)x->firstClipSurface;
+		l.numClipSurfaces = (int)x->numClipSurfaces;
 		l.bounds.Initialize(x->mins[0], x->mins[1], x->mins[2], x->maxs[0], x->maxs[1], x->maxs[2]);
 		m_leafs.push_back(l);
 	}

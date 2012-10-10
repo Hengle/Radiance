@@ -159,6 +159,10 @@ void Entity::PostSpawn()
 {
 }
 
+void Entity::LevelStart()
+{
+}
+
 bool Entity::HandleEvent(const Event::Ref &event)
 {
 	if (scripted)
@@ -399,12 +403,11 @@ int Entity::PrivatePostSpawn(
 
 void Entity::PrivateLevelStart()
 {
-	if (PushEntityCall("OnLevelStart"))
-	{
+	LevelStart();
+
+	if (PushEntityCall("LevelStart")) {
 		world->lua->Call("Entity::PrivateLevelStart()", 1, 0, 0);
 	}
-
-	LevelStart();
 }
 
 bool Entity::PrivateHandleEvent(const Event::Ref &event)

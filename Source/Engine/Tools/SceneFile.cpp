@@ -328,7 +328,7 @@ namespace {
 		}
 	}
 
-	struct SmoothVert : public SceneFile::WeightedTriVert {
+	struct SmoothVert : public SceneFile::WeightedNormalTriVert {
 		TriFaceIdxSet faces;
 		int sm;
 		int id;

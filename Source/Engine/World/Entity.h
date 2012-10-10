@@ -252,7 +252,7 @@ protected:
 	);
 
 	virtual void PostSpawn();
-	virtual void LevelStart() {}
+	virtual void LevelStart();
 
 	virtual void PushCallTable(lua_State *L);
 	virtual void TickViewModels(float dt);

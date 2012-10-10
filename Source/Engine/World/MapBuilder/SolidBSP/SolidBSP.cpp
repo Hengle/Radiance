@@ -357,6 +357,13 @@ void BSPBuilder::Split(Node *node, int boxAxis) {
 		}
 	}
 
+	// probably should turn bounds into a volume and split it.
+	// but we don't actually use the bounds for anything so...
+	if (node->children[0]->models.empty())
+		node->children[0]->bounds = node->bounds;
+	if (node->children[1]->models.empty())
+		node->children[1]->bounds = node->bounds;
+
 	Split(node->children[0].get(), boxAxis);
 	Split(node->children[1].get(), boxAxis);
 }
@@ -804,7 +811,7 @@ int BSPBuilder::SurfaceForString(const String &s) {
 	int flags = 0;
 
 	for (int i = 0; kFlags[i].sz; ++i) {
-		if (s.StrStr(CStr(kFlags[i].sz)))
+		if (s.StrStr(CStr(kFlags[i].sz)) != -1)
 			flags |= kFlags[i].flag;
 	}
 
@@ -826,6 +833,15 @@ Vec3 BSPBuilder::ToBSPType(const SceneFile::Vec3 &vec) {
 	);
 }
 
+Vec4 BSPBuilder::ToBSPType(const SceneFile::Vec4 &vec) {
+	return Vec4(
+		(ValueType)vec[0],
+		(ValueType)vec[1],
+		(ValueType)vec[2],
+		(ValueType)vec[3]
+	);
+}
+
 SceneFileD::TriVert BSPBuilder::ToBSPType(const SceneFile::TriVert &vec) {
 	SceneFileD::TriVert v;
 
@@ -836,6 +852,7 @@ SceneFileD::TriVert BSPBuilder::ToBSPType(const SceneFile::TriVert &vec) {
 
 	for (int i = 0; i < SceneFile::kMaxUVChannels; ++i) {
 		v.st[i] = ToBSPType(vec.st[i]);
+		v.tangent[i] = ToBSPType(vec.tangent[i]);
 	}
 
 	// NOTE: We don't transfer bone weights (not used in BSP).

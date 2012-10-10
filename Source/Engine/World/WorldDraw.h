@@ -256,6 +256,7 @@ private:
 	
 	int m_frame;
 	int m_markFrame;
+	bool m_init;
 	bool m_wireframe;
 	Counters m_counters;
 	PostProcessEffect::Map m_postFX;

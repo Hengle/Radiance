@@ -529,6 +529,7 @@ private:
 	// Converts to BSP precision types.
 	static Vec2 ToBSPType(const SceneFile::Vec2 &vec);
 	static Vec3 ToBSPType(const SceneFile::Vec3 &vec);
+	static Vec4 ToBSPType(const SceneFile::Vec4 &vec);
 	static SceneFileD::TriVert ToBSPType(const SceneFile::TriVert &vec);
 	static BBox ToBSPType(const SceneFile::BBox &bbox);
 	static Plane ToBSPType(const SceneFile::Plane &plane);

@@ -27,7 +27,7 @@ namespace string {
 
 	To keep the implementation orthogonal and simple short RefTag data is also
 	copied into the object if it fits, avoiding the need to allocate a boost::shared_ptr
-	to track the RefTag. This does mean that a copies of the RefTag data is made
+	to track the RefTag. This does mean that a copy of the RefTag data is made
 	however.
 
 	RefTag data requires special care by the user (it must not change) and because
@@ -123,17 +123,17 @@ private:
     static string data to be used without allocation overhead or copying.
  
     Care must be taken by the user when using certain types of operations on unicode strings.
-    The upper() and lower() functions may not correctly handle all unicode code points
+    The Upper() and Lower() functions may not correctly handle all unicode code points
     depending on your locale and normalization issues. This class does not perform normalization.
     Be aware that normalization issues can also effect sorting. If asthetically correct sort order
-    is important you must manually normalize the string before compare() will do what you want.
+    is important you must manually normalize the string before Compare() will do what you want.
  
     Considerably faster versions of certain functions have been provided that work based on bytes in a 
 	string only. By default one byte corresponds to one character in an ASCII encoded string. If a
 	string contains UTF8 encoded data then a single character may be represented by multiple bytes.
 	It is important to be aware that Byte() versions of functions will only work reliably on ASCII data
-	unless the caller has calculated byte offsets for individual characters. \sa byteForChar() 
-	\sa charForByte()
+	unless the caller has calculated byte offsets for individual characters. \sa ByteForChar() 
+	\sa CharForByte()
  
     Converting to/from a UTF8Buf is free as it constructs a buffer around the underlying string
     data. However converting to any other representation is a relatively expensive operation.
@@ -141,12 +141,12 @@ private:
     using reference (RefTag) semantics.
  
     In general it is safe to assume that doing any operations on a string where the source
-    data is not UTF8 encoded will require encoding the data to utf8 and possibly allocation
-    overhead. upper(), lower(), and substr() all require transcoding to UTF32 and back to
+    data is not UTF8 encoded will require encoding the data to UTF8 and possibly allocation
+    overhead. Upper(), Lower(), and SubStr() all require transcoding to UTF32 and back to
     UTF8. Their ASCII equivelents do not.
  
     Mutable operations on a String object are done in-place if possible (i.e. there are no
-    other references to the string data). Keep in mind that toUTF8() will usually return
+    other references to the string data). Keep in mind that ToUTF8() will usually return
     a reference to the string data, not a copy. Therefore keeping a reference to a returned
     UTF8Buf may force future mutable string operations to create a copy of the data. Additionally
     mutable operations performed on Strings constructed as a RefTag will create a copy of

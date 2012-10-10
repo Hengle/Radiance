@@ -160,6 +160,7 @@ bool BSPBuilder::EmitBSPAreas() {
 				}
 
 				*(m_bspFile->AddModelIndex()) = (U16)*id;
+				++bspArea->numModels;
 			}
 		}
 

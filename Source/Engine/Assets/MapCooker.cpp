@@ -104,6 +104,14 @@ int MapCooker::Compile(int flags, int allflags) {
 		if (!mapBuilder.LoadEntSpawn(spawn))
 			return SR_ParseError;
 
+		if (mapBuilder.result == SR_Pending)
+			mapBuilder.WaitForCompletion();
+
+		if (mapBuilder.result != SR_Success) {
+			r = mapBuilder.result;
+			break;
+		}
+
 		// For static_mesh_scene, cache the 3DX filetime
 		const char *sz = spawn.keys.StringForKey("classname");
 		if (sz && !string::cmp(sz, "static_mesh_scene")) {

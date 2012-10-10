@@ -322,16 +322,18 @@ public:
 				if (normal < v.normal)
 					return true;
 				
-				for (int i = 0; i < kMaxUVChannels; ++i) {
-					if (i > 0) {
-						for (int k = 0; k < i; ++k) {
-							if (tangent[k] != v.tangent[k])
-								return false;
+				if (normal == v.normal) {
+					for (int i = 0; i < kMaxUVChannels; ++i) {
+						if (i > 0) {
+							for (int k = 0; k < i; ++k) {
+								if (tangent[k] != v.tangent[k])
+									return false;
+							}
 						}
-					}
 
-					if (tangent[i] < v.tangent[i])
-						return true;
+						if (tangent[i] < v.tangent[i])
+							return true;
+					}
 				}
 			}
 
@@ -351,16 +353,18 @@ public:
 				if (normal > v.normal)
 					return true;
 
-				for (int i = 0; i < kMaxUVChannels; ++i) {
-					if (i > 0) {
-						for (int k = 0; k < i; ++k) {
-							if (tangent[k] != v.tangent[k])
-								return false;
+				if (normal == v.normal) {
+					for (int i = 0; i < kMaxUVChannels; ++i) {
+						if (i > 0) {
+							for (int k = 0; k < i; ++k) {
+								if (tangent[k] != v.tangent[k])
+									return false;
+							}
 						}
-					}
 
-					if (tangent[i] > v.tangent[i])
-						return true;
+						if (tangent[i] > v.tangent[i])
+							return true;
+					}
 				}
 			}
 
