@@ -87,8 +87,8 @@ private:
 	///////////////////////////////////////////////////////////////////////////////
 
 	enum ContentsFlags {
-		RAD_FLAG(kContentsFlag_Areaportal), // areaportal splits first, all other contents are detail splitters
 		RAD_FLAG(kContentsFlag_Solid), 
+		RAD_FLAG(kContentsFlag_Areaportal),
 		RAD_FLAG(kContentsFlag_Detail), // never in the BSP.
 		RAD_FLAG(kContentsFlag_Clip),
 		RAD_FLAG(kContentsFlag_Fog),
@@ -284,6 +284,10 @@ private:
 			planenum = 0;
 			numPolys = 0;
 			occupied = 0;
+			areaWarned = false;
+			portalAreas[0] = -1;
+			portalAreas[1] = -1;
+			contentsOwner = 0;
 			bounds.Initialize();
 			++s_num;
 		}
@@ -294,6 +298,7 @@ private:
 
 		TriModelFragVec models;
 		BBox bounds;
+		WindingVec windingBounds;
 		Node *parent;
 		PortalRef portals;
 		NodeRef children[2];
@@ -302,6 +307,9 @@ private:
 		int planenum;
 		int occupied;
 		Area *area;
+		SceneFile::TriModel *contentsOwner;
+		bool areaWarned;
+		int portalAreas[2];
 		static int s_num;
 	};
 
@@ -468,7 +476,8 @@ private:
 	void DisplayPortals(const Node *node, Portal *a=0, Portal *b=0, bool leak=false, int contents=0);
 
 	void LeafNode(Node *node);
-	void Split(Node *node, int boxAxis);
+	void Split(Node *node);
+	void SplitNodeBounds(Node *node, const Plane &p, BBox &front, WindingVec &frontVec, BBox &back, WindingVec &backVec);
 	void Split(const TriModelFragRef &model, const Plane &p, int planenum, TriModelFragRef &front, TriModelFragRef &back);
 	bool MarkNodePolys(int planenum, const TriModelFragRef &m);
 	void MarkDetail();
@@ -488,13 +497,14 @@ private:
 	void FillOutsideNodes(Node *node);
 	void MarkOccupiedNodeFaces(Node *node);
 	bool AreaFlood();
-	void AreaFlood(Node *leaf, Area *area);
-	void FindAreas(Node *node);
+	bool AreaFlood(Node *leaf, Area *area);
+	bool CheckAreas(Node *node);
+	bool FindAreas(Node *node);
 	bool CompileAreas();
 	void DecomposeAreaModel(SceneFile::TriModel &model);
 	void DecomposeAreaPoly(Node *node, AreaPoly *poly);
-	int FindSplitPlane(Node *node, int &boxAxis);
-	int BoxPlaneNum(Node *node, int &boxAxis);
+	int FindSplitPlane(Node *node);
+	int BoxPlaneNum(Node *node);
 
 	// Emit BSP
 	void EmitBSPFile();

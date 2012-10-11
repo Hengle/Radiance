@@ -41,7 +41,7 @@ public:
 	int FindPlaneNum(const ::tools::solid_bsp::Plane &p)
 	{
 		::tools::solid_bsp::Plane z = p;
-		Clamp(z);
+		Snap(z);
 		
 		int b = BucketNum(z.D());
 		HashPlane *hp = m_hash[b];
@@ -88,36 +88,27 @@ public:
 
 private:
 
-	void Clamp(::tools::solid_bsp::Plane &p)
-	{
-		if (p.Normal().X() > ValueType(0.995))
-		{
-			p.Initialize(Vec3(ValueType(1), ValueType(0), ValueType(0)), p.D());
-		}
-		else if (p.Normal().X() < ValueType(-0.995))
-		{
-			p.Initialize(Vec3(ValueType(-1), ValueType(0), ValueType(0)), p.D());
-		}
-		else if (p.Normal().Y() > ValueType(0.995))
-		{
-			p.Initialize(Vec3(ValueType(0), ValueType(1), ValueType(0)), p.D());
-		}
-		else if (p.Normal().Y() < ValueType(-0.995))
-		{
-			p.Initialize(Vec3(ValueType(0), ValueType(-1), ValueType(0)), p.D());
-		}
-		else if (p.Normal().Z() > ValueType(0.995))
-		{
-			p.Initialize(Vec3(ValueType(0), ValueType(0), ValueType(1)), p.D());
-		}
-		else if (p.Normal().Z() < ValueType(-0.995))
-		{
-			p.Initialize(Vec3(ValueType(0), ValueType(0), ValueType(-1)), p.D());
+	void Snap(::tools::solid_bsp::Plane &p) {
+		for (int i = 0; i < 3; ++i) {
+			ValueType d = math::Abs(p.Normal()[i] - ValueType(1));
+			if (d < ValueType(0.00001)) {
+				Vec3 normal(Vec3::Zero);
+				normal[i] = ValueType(1);
+				p.Initialize(normal, p.D());
+				break;
+			}
+
+			d = math::Abs(p.Normal()[i] + ValueType(1));
+			if (d < ValueType(0.00001)) {
+				Vec3 normal(Vec3::Zero);
+				normal[i] = ValueType(-1);
+				p.Initialize(normal, p.D());
+				break;
+			}
 		}
 
 		ValueType f = math::Floor(p.D()+ValueType(0.5));
-		if (math::Abs(f-p.D()) < ValueType(0.0009999999999))
-		{
+		if (math::Abs(p.D()-f) < ValueType(0.0001)) {
 			p.Initialize(p.Normal(), f);
 		}
 	}
@@ -138,9 +129,12 @@ private:
 
 	bool PlaneEqual(const ::tools::solid_bsp::Plane &a, const ::tools::solid_bsp::Plane &b)
 	{
-		if (a.Normal().Dot(b.Normal()) > ValueType(0.95)) {
-			if (math::Abs(a.D()-b.D()) < ValueType(0.1))
-				return true;
+		if (math::Abs(a.Normal()[0] - b.Normal()[0]) < ValueType(0.000001)
+			&& math::Abs(a.Normal()[1] - b.Normal()[1]) < ValueType(0.000001)
+			&& math::Abs(a.Normal()[2] - b.Normal()[2]) < ValueType(0.000001)
+			&& math::Abs(a.D() - b.D()) < ValueType(0.0001) 
+		) {
+			return true;
 		}
 
 		return false;

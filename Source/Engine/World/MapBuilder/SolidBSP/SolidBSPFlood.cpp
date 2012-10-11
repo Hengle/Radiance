@@ -235,7 +235,10 @@ bool BSPBuilder::AreaFlood() {
 	Log("------------\n");
 	Log("Area Flood...\n");
 
-	FindAreas(m_root.get());
+	if (!FindAreas(m_root.get())) {
+		SetResult(pkg::SR_CompilerError);
+		return false;
+	}
 
 	if (world::kMaxAreas < (int)m_areas.size()) {
 		Log("ERROR: Map exceed area limit of %d areas (map has %d), contact a programmer to increase this limit.\n", world::kMaxAreas, m_areas.size());
@@ -243,55 +246,110 @@ bool BSPBuilder::AreaFlood() {
 		return false;
 	}
 
-	Log("Set %d area(s).\n", m_areas.size() - 1);
+	Log("Set %d area(s).\n", m_areas.size());
 	return true;
 }
 
-void BSPBuilder::FindAreas(Node *node) {
+bool BSPBuilder::FindAreas(Node *node) {
 	if (node->planenum != kPlaneNumLeaf) {
 		// move all the way down to the leafs
-		FindAreas(node->children[0].get());
-		FindAreas(node->children[1].get());
-		return;
+		if (!FindAreas(node->children[0].get()))
+			return false;
+		if (!FindAreas(node->children[1].get()))
+			return false;
+		return true;
 	}
 
 	if (node->area) 
-		return;
+		return true;
 	if (m_flood && !node->occupied)  
-		return;
+		return true;
 	if (node->contents&kContentsFlag_Solid) 
-		return;
+		return true;
 	if (node->contents&kContentsFlag_Areaportal)
-		return;
+		return true;
 
 	AreaRef area(new Area());
 	area->area = (int)m_areas.size();
 	m_areas.push_back(area);
-	AreaFlood(node, area.get());
+	if (!AreaFlood(node, area.get()))
+		return false;
+	return true;
 }
 
-void BSPBuilder::AreaFlood(Node *leaf, Area *area) {
+bool BSPBuilder::AreaFlood(Node *leaf, Area *area) {
 	RAD_ASSERT(leaf->planenum == kPlaneNumLeaf);
 	RAD_ASSERT(!(leaf->contents&kContentsFlag_Solid));
 	
 	if (leaf->contents&kContentsFlag_Areaportal) {
-		if (!leaf->area) 
+		if (!leaf->area) {
 			leaf->area = area;
-		return;
+			leaf->portalAreas[0] = area->area;
+		} else if (area != leaf->area) {
+			if (leaf->portalAreas[1] == -1) {
+				leaf->portalAreas[1] = area->area;
+			} else if (leaf->portalAreas[1] != area->area) {
+				if (!leaf->areaWarned) {
+					leaf->areaWarned = true;
+					const char *name = "<NULL MODEL>";
+					if (leaf->contentsOwner)
+						name = leaf->contentsOwner->name.c_str;
+					Log(
+						"WARNING: Portal '%s' touches > than 2 areas! (%d, %d, %d)\n", 
+						name, 
+						leaf->portalAreas[0], 
+						leaf->portalAreas[1],
+						area->area
+					);
+				}
+				return true;
+			}
+		}
+		return true;
 	}
 
 	if (leaf->area) 
-		return;
+		return true;
 	leaf->area = area;
 
 	int side;
 	for (PortalRef p = leaf->portals; p; p = p->next[side]) {
 		side = p->nodes[1] == leaf;
 		Node *other = p->nodes[side^1];
-		if (other->contents & kContentsFlag_Solid)
+		if (other->contents & kContentsFlag_SolidContents)
 			continue;
-		AreaFlood(other, area);
+		if (!AreaFlood(other, area))
+			return false;
 	}
+
+	return true;
+}
+
+bool BSPBuilder::CheckAreas(Node *node) {
+
+	if (node->planenum == kPlaneNumLeaf) {
+		if (node->contents&kContentsFlag_Areaportal) {
+			if (node->portalAreas[0] == -1 ||
+				node->portalAreas[1] == -1) {
+				if (!node->areaWarned) {
+					node->areaWarned = true;
+					const char *name = "<NULL MODEL>";
+					if (node->contentsOwner)
+						name = node->contentsOwner->name.c_str;
+					Log("WARNING: Portal '%s' does not seperate areas!\n", name);
+				}
+				return true;
+			}
+		}
+
+		return true;
+	}
+
+	if (!CheckAreas(node->children[0].get()))
+		return false;
+	if (!CheckAreas(node->children[1].get()))
+		return false;
+	return true;
 }
 
 } // solid_bsp

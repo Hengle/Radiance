@@ -23,7 +23,7 @@ namespace tools {
 namespace solid_bsp {
 
 namespace {
-	const ValueType kMaxBoxExtents = ValueType(1024);
+	const ValueType kMaxBoxExtents = ValueType(2048);
 };
 
 int BSPBuilder::Node::s_num = 0;
@@ -157,6 +157,26 @@ void BSPBuilder::Build()
 
 	MarkDetail();
 	CreateRootNode();
+
+	Log(
+		"Map Extents: (%d x %d x %d) x (%d x %d x %d)\n",
+		(int)m_root->bounds.Mins()[0], (int)m_root->bounds.Mins()[1], (int)m_root->bounds.Mins()[2], 
+		(int)m_root->bounds.Maxs()[0], (int)m_root->bounds.Maxs()[1], (int)m_root->bounds.Maxs()[2]
+	);
+
+	// Check extents.
+	for (int i = 0; i < 3; ++i) {
+		if ((m_root->bounds.Mins()[i] < -SceneFile::kMaxRange) ||
+			(m_root->bounds.Maxs()[i] > SceneFile::kMaxRange)) {
+			Log(
+				"ERROR: Map exceeds maximum dimensions of  +/- (%d x %d x %d)\n",
+				(int)SceneFile::kMaxRange, (int)SceneFile::kMaxRange, (int)SceneFile::kMaxRange
+			);
+			SetResult(SR_CompilerError);
+			return;
+		}
+	}
+
 	Log("------------\n");
 	Log("Building Hull (%d structural tri(s), %d detail tri(s), %d total)\n", m_numStructural, m_numDetail, m_numStructural+m_numDetail);
 
@@ -168,7 +188,7 @@ void BSPBuilder::Build()
 
 	ResetProgress();
 	EmitProgress();
-	Split(m_root.get(), 0);
+	Split(m_root.get());
 	Log("\n%d node(s), %d leaf(s)\n", m_numNodes, m_numLeafs);
 	
 	if (m_debugUI)
@@ -205,7 +225,7 @@ void BSPBuilder::Build()
 
 		ResetProgress();
 		EmitProgress();
-		Split(m_root.get(), 0);
+		Split(m_root.get());
 		Log("\n%d node(s), %d leaf(s)\n", m_numNodes, m_numLeafs);
 		Portalize();
 		if (!FloodFill()) {
@@ -288,9 +308,9 @@ BSPBuilder::Node *BSPBuilder::LeafForPoint(const Vec3 &pos, Node *node)
 	return LeafForPoint(pos, node->children[1].get());
 }
 
-void BSPBuilder::Split(Node *node, int boxAxis) {
+void BSPBuilder::Split(Node *node) {
 
-	int planenum = FindSplitPlane(node, boxAxis);
+	int planenum = FindSplitPlane(node);
 	if (planenum == kPlaneNumLeaf) {
 		LeafNode(node);
 		return;
@@ -312,14 +332,23 @@ void BSPBuilder::Split(Node *node, int boxAxis) {
 
 	const Plane &p = m_planes.Plane(planenum);
 
-	node->children[0].reset(new Node());
-	node->children[1].reset(new Node());
+	node->children[0].reset(new (world::bsp_file::ZBSPBuilder) Node());
+	node->children[1].reset(new (world::bsp_file::ZBSPBuilder) Node());
 
 	node->children[0]->parent = node;
 	node->children[1]->parent = node;
 
 	node->children[0]->models.reserve(node->models.size());
 	node->children[1]->models.reserve(node->models.size());
+
+	SplitNodeBounds(
+		node, 
+		p, 
+		node->children[0]->bounds, 
+		node->children[0]->windingBounds,
+		node->children[1]->bounds, 
+		node->children[1]->windingBounds
+	);
 
 	while(!node->models.empty()) {
 		TriModelFragRef m = node->models.back();
@@ -334,21 +363,21 @@ void BSPBuilder::Split(Node *node, int boxAxis) {
 			Split(m, p, planenum, front, back);
 			if (front) {
 				node->children[0]->models.push_back(front);
-				node->children[0]->bounds.Insert(front->bounds);
+//				node->children[0]->bounds.Insert(front->bounds);
 			}
 			if (back) {
 				node->children[1]->models.push_back(back);
-				node->children[1]->bounds.Insert(back->bounds);
+//				node->children[1]->bounds.Insert(back->bounds);
 			}
 		} else {
 			switch (s) {
 			case Plane::Front:
 				node->children[0]->models.push_back(m);
-				node->children[0]->bounds.Insert(m->bounds);
+//				node->children[0]->bounds.Insert(m->bounds);
 				break;
 			case Plane::Back:
 				node->children[1]->models.push_back(m);
-				node->children[1]->bounds.Insert(m->bounds);
+//				node->children[1]->bounds.Insert(m->bounds);
 				break;
 			default:
 				SOLID_BSP_ICE();
@@ -357,15 +386,78 @@ void BSPBuilder::Split(Node *node, int boxAxis) {
 		}
 	}
 
-	// probably should turn bounds into a volume and split it.
-	// but we don't actually use the bounds for anything so...
-	if (node->children[0]->models.empty())
-		node->children[0]->bounds = node->bounds;
-	if (node->children[1]->models.empty())
-		node->children[1]->bounds = node->bounds;
+	Split(node->children[0].get());
+	Split(node->children[1].get());
+}
 
-	Split(node->children[0].get(), boxAxis);
-	Split(node->children[1].get(), boxAxis);
+void BSPBuilder::SplitNodeBounds(Node *node, const Plane &p, BBox &front, WindingVec &frontVec, BBox &back, WindingVec &backVec) {
+
+	for (WindingVec::const_iterator it = node->windingBounds.begin(); it != node->windingBounds.end(); ++it) {
+		const Winding::Ref &w = *it;
+
+		Winding::Ref f(new (world::bsp_file::ZBSPBuilder) Winding());
+		Winding::Ref b(new (world::bsp_file::ZBSPBuilder) Winding());
+
+		w->Split(p, f.get(), b.get(), 0.f);
+		if (!f->Empty())
+			frontVec.push_back(f);
+		if (!b->Empty())
+			backVec.push_back(b);
+
+		if (f->Empty() || b->Empty()) {
+			int bp = 0;
+		}
+	}
+
+	Winding::Ref face(new (world::bsp_file::ZBSPBuilder) Winding(-p, SceneFile::kMaxRange));
+
+	for (WindingVec::const_iterator it = frontVec.begin(); it != frontVec.end(); ++it) {
+		const Winding::Ref &w = *it;
+
+		Winding::Ref f(new (world::bsp_file::ZBSPBuilder) Winding());
+		face->Chop(w->Plane(), Plane::Back, *f, 0.f);
+		face = f;
+		if (face->Empty())
+			break;
+	}
+
+	if (!face->Empty())
+		frontVec.push_back(face);
+
+	face.reset(new (world::bsp_file::ZBSPBuilder) Winding(p, SceneFile::kMaxRange));
+
+	for (WindingVec::const_iterator it = backVec.begin(); it != backVec.end(); ++it) {
+		const Winding::Ref &w = *it;
+
+		Winding::Ref f(new (world::bsp_file::ZBSPBuilder) Winding());
+		face->Chop(w->Plane(), Plane::Back, *f, 0.f);
+		face = f;
+		if (face->Empty())
+			break;
+	}
+
+	if (!face->Empty())
+		backVec.push_back(face);
+
+	if (frontVec.empty()) {
+		front = BBox(Vec3::Zero, Vec3::Zero);
+	} else {
+		front.Initialize();
+		for (WindingVec::const_iterator it = frontVec.begin(); it != frontVec.end(); ++it) {
+			const Winding::Ref &w = *it;
+			WindingBounds(*w, front);
+		}
+	}
+
+	if (backVec.empty()) {
+		back = BBox(Vec3::Zero, Vec3::Zero);
+	} else {
+		back.Initialize();
+		for (WindingVec::const_iterator it = backVec.begin(); it != backVec.end(); ++it) {
+			const Winding::Ref &w = *it;
+			WindingBounds(*w, back);
+		}
+	}
 }
 
 bool BSPBuilder::MarkNodePolys(int planenum, const TriModelFragRef &m) {
@@ -390,8 +482,8 @@ void BSPBuilder::Split(
 	TriModelFragRef &back
 ) {
 
-	front.reset(new TriModelFrag());
-	back.reset(new TriModelFrag());
+	front.reset(new (world::bsp_file::ZBSPBuilder) TriModelFrag());
+	back.reset(new (world::bsp_file::ZBSPBuilder) TriModelFrag());
 	front->original = back->original = model->original;
 
 	for (PolyVec::const_iterator f = model->polys.begin(); f != model->polys.end(); ++f) {
@@ -407,26 +499,33 @@ void BSPBuilder::Split(
 			RAD_ASSERT(poly->onNode);
 		} else {
 			s = poly->winding->Side(p, kBSPSplitEpsilon);
+			if (s == Plane::On) {
+				if (p.Normal().Dot(poly->winding->Plane().Normal()) > ValueType(0)) {
+					s = Plane::Back;
+				} else {
+					s = Plane::Front;
+				}
+			}
 		}
 
-		if (s == Plane::Back || s == Plane::On) {
+		if (s == Plane::Back) {
 			back->polys.push_back(poly);
 			WindingBounds(*poly->winding.get(), back->bounds);
 		}
 		
-		if (s == Plane::Front || s == Plane::On) {
+		if (s == Plane::Front) {
 			front->polys.push_back(poly);
 			WindingBounds(*poly->winding.get(), front->bounds);
 		}
 		
 		if (s == Plane::Cross) {
 
-			PolyRef f(new Poly(*poly.get()));
-			f->winding.reset(new Winding());
-			PolyRef b(new Poly(*poly.get()));
-			b->winding.reset(new Winding());
+			PolyRef f(new (world::bsp_file::ZBSPBuilder) Poly(*poly.get()));
+			f->winding.reset(new (world::bsp_file::ZBSPBuilder) Winding());
+			PolyRef b(new (world::bsp_file::ZBSPBuilder) Poly(*poly.get()));
+			b->winding.reset(new (world::bsp_file::ZBSPBuilder) Winding());
 
-			poly->winding->Split(p, f->winding.get(), b->winding.get(), ValueType(0));
+			poly->winding->Split(p, f->winding.get(), b->winding.get(), kBSPSplitEpsilon);
 
 			if (f->winding->Empty()) {
 				Log("WARNING: winding clipped away (front).\n");
@@ -474,10 +573,12 @@ void BSPBuilder::LeafNode(Node *node) {
 
 			if (polyIt == m->polys.end()) {
 				node->contents = kContentsFlag_Solid;
+				node->contentsOwner = m->original;
 				break;
 			}
 		} else {
 			node->contents |= m->original->contents;
+			node->contentsOwner = m->original;
 		}
 	}
 }
@@ -543,7 +644,7 @@ void BSPBuilder::CreateRootNode() {
 	m_numStructural = 0;
 	m_numDetail = 0;
 
-	Node *node = new Node();
+	Node *node = new (world::bsp_file::ZBSPBuilder) Node();
 	node->models.reserve(m_map->worldspawn->models.size());
 
 	for (SceneFile::TriModel::Vec::const_iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
@@ -561,10 +662,8 @@ void BSPBuilder::CreateRootNode() {
 
 		if (!(trim->contents & kContentsFlag_BSPContents)) 
 			continue;
-		//if (trim->contents & kContentsFlag_Areaportal)
-		//	continue;
-		
-		TriModelFragRef frag(new TriModelFrag());
+				
+		TriModelFragRef frag(new (world::bsp_file::ZBSPBuilder) TriModelFrag());
 		frag->original = trim.get();
 		frag->bounds = ToBSPType(trim->bounds);
 		node->bounds.Insert(frag->bounds);
@@ -575,12 +674,12 @@ void BSPBuilder::CreateRootNode() {
 			const SceneFile::TriFace &trif = *f;
 			if (trif.mat == -1)
 				continue; // no material discard.
-			PolyRef poly(new Poly());
+			PolyRef poly(new (world::bsp_file::ZBSPBuilder) Poly());
 			poly->original = (SceneFile::TriFace*)&trif;
 			poly->contents = trim->contents;
 			poly->onNode = false;
 			poly->planenum = m_planes.FindPlaneNum(ToBSPType(trif.plane));
-			poly->winding.reset(new Winding());
+			poly->winding.reset(new (world::bsp_file::ZBSPBuilder) Winding());
 			poly->winding->Initialize(
 				ToBSPType(trim->verts[trif.v[0]].pos),
 				ToBSPType(trim->verts[trif.v[1]].pos),
@@ -593,46 +692,51 @@ void BSPBuilder::CreateRootNode() {
 		node->models.push_back(frag);
 	}
 
+	BBoxWindings(node->bounds, node->windingBounds);
+
 	m_root.reset(node);
 }
 
-int BSPBuilder::BoxPlaneNum(Node *node, int &boxAxis)
-{
+int BSPBuilder::BoxPlaneNum(Node *node) {
 	Vec3 boundSize = node->bounds.Size();
-	for (int i = 0; i < 3; ++i)
-	{
-		int axis = boxAxis;
-		boxAxis = (boxAxis+1) % 3;
-		if (boundSize[i] > kMaxBoxExtents)
-		{
-			Plane split;
-			switch (i)
-			{
-			case 0:
-				split = Plane::X;
-				break;
-			case 1:
-				split = Plane::Y;
-				break;
-			case 2:
-				split = Plane::Z;
-				break;
-			}
-			split = Plane(split.Normal(), node->bounds.Origin()[i]);
-			return m_planes.FindPlaneNum(split);
+	float maxExtents = 0.f;
+	int bestAxis = -1;
+
+	for (int i = 0; i < 3; ++i) {
+		if (boundSize[i] > maxExtents) {
+			maxExtents = boundSize[i];
+			bestAxis = i;
 		}
 	}
+
+	if (maxExtents > kMaxBoxExtents) {
+		Plane split;
+		switch (bestAxis) {
+		case 0:
+			split = Plane::X;
+			break;
+		case 1:
+			split = Plane::Y;
+			break;
+		case 2:
+			split = Plane::Z;
+			break;
+		}
+		split = Plane(split.Normal(), node->bounds.Origin()[bestAxis]);
+		return m_planes.FindPlaneNum(split);
+	}
+
 	return kPlaneNumLeaf;
 }
 
-int BSPBuilder::FindSplitPlane(Node *node, int &boxAxis)
-{
+int BSPBuilder::FindSplitPlane(Node *node) {
 	if (node->models.empty()) 
 		return kPlaneNumLeaf;
 
-	int num = kPlaneNumLeaf;
+	// find simple splitter
+	/*int num = BoxPlaneNum(node);
 	if (num != kPlaneNumLeaf) 
-		return num;
+		return num;*/
 
 	int front = 0;
 	int back  = 0;
@@ -693,9 +797,7 @@ int BSPBuilder::FindSplitPlane(Node *node, int &boxAxis)
 									case Plane::Cross:
 										++split;
 										if (mdl->original->contents == kContentsFlag_Areaportal) {
-											// areaportals don't get penalized for splitting eachother
-											if (!((*polyIt)->contents & kContentsFlag_Areaportal)) 
-												++areaportal;
+											++areaportal;
 										}
 										break;
 									case Plane::On:
@@ -723,11 +825,11 @@ int BSPBuilder::FindSplitPlane(Node *node, int &boxAxis)
 				}
 			}
 
-			if (bestNum != -1) 
+			if (bestNum != kPlaneNumLeaf) 
 				break; // idealized splitter
 		}
 
-		if (bestNum != -1) 
+		if (bestNum != kPlaneNumLeaf) 
 			break; // don't split using outside unless we have no inside
 
 		if (!m_flood) 
@@ -753,11 +855,12 @@ void BSPBuilder::BBoxWindings(const BBox &bounds, WindingVec &out) {
 	Winding x, t;
 	for (int i = 0; i < 6; ++i) {
 		x.Initialize(planes[i], SceneFile::kMaxRange);
-		for (int y = 0; y < 4; ++y) {
-			int z = ((i/2*2)+y+2) % 6;
+		for (int k = 0; k < 6; ++k) {
+			if (k == i)
+				continue;
 
 			x.Chop(
-				planes[z],
+				planes[k],
 				Plane::Back,
 				t,
 				ValueType(0)
@@ -766,7 +869,7 @@ void BSPBuilder::BBoxWindings(const BBox &bounds, WindingVec &out) {
 			RAD_ASSERT(!x.Empty());
 		}
 
-		out.push_back(WindingRef(new Winding(x)));
+		out.push_back(WindingRef(new (world::bsp_file::ZBSPBuilder) Winding(x)));
 	}
 }
 

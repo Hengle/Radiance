@@ -281,10 +281,19 @@ void BSPBuilder::LeafFacesDraw::FindCameraLeaf(MapBuilderDebugUI &ui, BSPBuilder
 	BSPBuilder::Node *leaf = bsp.LeafForPoint(ToBSPType(ui.camera->pos.get()));
 	
 	if (m_leaf != leaf) {
-		if (leaf)
-			::COut(C_Debug) << "Leaf Changed, Contents = " << leaf->contents << std::endl;
-		else
+		if (leaf) {
+			const char *contents = "Mixed";
+			if (leaf->contents == kContentsFlag_Areaportal) {
+				contents = "Areaportal";
+			} else if (leaf->contents == kContentsFlag_Solid) {
+				contents = "Solid";
+			} else if (leaf->contents == 0) {
+				contents = "Empty";
+			}
+			::COut(C_Debug) << "Leaf Changed, Contents = " << contents << " (" << leaf->contents << ")" << std::endl;
+		} else {
 			::COut(C_Debug) << "Leaf is NULL" << std::endl;
+		}
 		m_leaf = leaf;
 	}
 }
