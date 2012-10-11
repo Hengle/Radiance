@@ -23,7 +23,7 @@ namespace tools {
 namespace solid_bsp {
 
 namespace {
-	const ValueType kMaxBoxExtents = ValueType(2048);
+	const ValueType kMaxBoxExtents = ValueType(1024);
 };
 
 int BSPBuilder::Node::s_num = 0;
@@ -191,18 +191,20 @@ void BSPBuilder::Build()
 	Split(m_root.get());
 	Log("\n%d node(s), %d leaf(s)\n", m_numNodes, m_numLeafs);
 	
+	if (m_abort)
+		return;
+
+	Portalize();
+
+	bool flood = FloodFill();
+
 	if (m_debugUI)
 		DisplayPaintHandler(new (world::bsp_file::ZBSPBuilder) LeafFacesDraw());
 
 	if (m_abort)
 		return;
 
-	Portalize();
-
-	if (m_abort)
-		return;
-
-	if (FloodFill()) {
+	if (flood) {
 		m_flood = true;
 		FillOutside();
 
@@ -734,9 +736,9 @@ int BSPBuilder::FindSplitPlane(Node *node) {
 		return kPlaneNumLeaf;
 
 	// find simple splitter
-	/*int num = BoxPlaneNum(node);
+	int num = BoxPlaneNum(node);
 	if (num != kPlaneNumLeaf) 
-		return num;*/
+		return num;
 
 	int front = 0;
 	int back  = 0;

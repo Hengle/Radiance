@@ -35,9 +35,9 @@ void BSPBuilder::RemovePortalFromNode(const PortalRef &p, Node *node) {
 		{
 			// unlink using previous portal.
 			if (last) {
-				last->next[ls] = test->next[ns];
+				last->next[ls] = test->next[pside];
 			} else {
-				node->portals = test->next[ns];
+				node->portals = test->next[pside];
 			}
 
 			p->nodes[pside] = 0;
@@ -111,10 +111,10 @@ void BSPBuilder::MakeNodePortal(Node *node) {
 			// portal is too small to split, put on both sides
 			continue;
 		} else if (s == Plane::Front && side) {
-			// portal clipped away.
+			Log("WARNING: portal clipped away (back)!\n");
 			continue;
 		} else if (s == Plane::Back && !side) {
-			// portal clipped awway.
+			Log("WARNING: portal clipped away (front)!\n");
 			continue;
 		} else if (s == Plane::Cross) {
 			p->plane.winding.Split(
@@ -131,6 +131,9 @@ void BSPBuilder::MakeNodePortal(Node *node) {
 
 			if (side)
 				std::swap(f, b);
+
+			if (f.Empty())
+				return;
 
 			p->plane.winding = f;
 		}
@@ -161,19 +164,8 @@ void BSPBuilder::SplitNodePortals(Node *node) {
 			EmitProgress();
 		
 		if (f.Empty() && b.Empty()) {
-			// put on both sides.
-			PortalRef z(new Portal(*p));
-			z->plane.winding = p->plane.winding;
-			
-			if (side == 0) {
-				AddPortalToNodes(p, node->children[0].get(), other);
-				AddPortalToNodes(z, node->children[1].get(), other);
-			} else {
-				AddPortalToNodes(p, other, node->children[0].get());
-				AddPortalToNodes(z, other, node->children[1].get());
-			}
-		}
-		else if (!f.Empty() && !b.Empty()) {
+			continue;
+		} else if (!f.Empty() && !b.Empty()) {
 			PortalRef z(new Portal(*p));
 			p->plane.winding = f;
 			z->plane.winding = b;

@@ -240,6 +240,8 @@ bool BSPBuilder::AreaFlood() {
 		return false;
 	}
 
+	CheckAreas(m_root.get());
+
 	if (world::kMaxAreas < (int)m_areas.size()) {
 		Log("ERROR: Map exceed area limit of %d areas (map has %d), contact a programmer to increase this limit.\n", world::kMaxAreas, m_areas.size());
 		SetResult(pkg::SR_CompilerError);
