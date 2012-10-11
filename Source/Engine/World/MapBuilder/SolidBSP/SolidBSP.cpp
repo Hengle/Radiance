@@ -23,7 +23,7 @@ namespace tools {
 namespace solid_bsp {
 
 namespace {
-	const ValueType kMaxBoxExtents = ValueType(1024);
+	const ValueType kMaxBoxExtents = ValueType(4096);
 };
 
 int BSPBuilder::Node::s_num = 0;
@@ -411,7 +411,7 @@ void BSPBuilder::SplitNodeBounds(Node *node, const Plane &p, BBox &front, Windin
 		}
 	}
 
-	Winding::Ref face(new (world::bsp_file::ZBSPBuilder) Winding(-p, SceneFile::kMaxRange));
+	Winding::Ref face(new (world::bsp_file::ZBSPBuilder) Winding(-p, SceneFile::kMaxRange*2));
 
 	for (WindingVec::const_iterator it = frontVec.begin(); it != frontVec.end(); ++it) {
 		const Winding::Ref &w = *it;
@@ -426,7 +426,7 @@ void BSPBuilder::SplitNodeBounds(Node *node, const Plane &p, BBox &front, Windin
 	if (!face->Empty())
 		frontVec.push_back(face);
 
-	face.reset(new (world::bsp_file::ZBSPBuilder) Winding(p, SceneFile::kMaxRange));
+	face.reset(new (world::bsp_file::ZBSPBuilder) Winding(p, SceneFile::kMaxRange*2));
 
 	for (WindingVec::const_iterator it = backVec.begin(); it != backVec.end(); ++it) {
 		const Winding::Ref &w = *it;
@@ -502,11 +502,20 @@ void BSPBuilder::Split(
 		} else {
 			s = poly->winding->Side(p, kBSPSplitEpsilon);
 			if (s == Plane::On) {
-				if (p.Normal().Dot(poly->winding->Plane().Normal()) > ValueType(0)) {
+				//poly->onNode = true;
+
+				/*PolyRef f(new (world::bsp_file::ZBSPBuilder) Poly(*poly.get()));
+				f->winding.reset(new (world::bsp_file::ZBSPBuilder) Winding());
+				PolyRef b(new (world::bsp_file::ZBSPBuilder) Poly(*poly.get()));
+				b->winding.reset(new (world::bsp_file::ZBSPBuilder) Winding());*/
+
+				s = poly->winding->MajorSide(p, ValueType(0));
+				RAD_ASSERT(s != Plane::On);
+				/*if (p.Normal().Dot(poly->winding->Plane().Normal()) > ValueType(0)) {
 					s = Plane::Back;
 				} else {
 					s = Plane::Front;
-				}
+				}*/
 			}
 		}
 
@@ -526,6 +535,9 @@ void BSPBuilder::Split(
 			f->winding.reset(new (world::bsp_file::ZBSPBuilder) Winding());
 			PolyRef b(new (world::bsp_file::ZBSPBuilder) Poly(*poly.get()));
 			b->winding.reset(new (world::bsp_file::ZBSPBuilder) Winding());
+
+			RAD_ASSERT(f->onNode == poly->onNode);
+			RAD_ASSERT(b->onNode == poly->onNode);
 
 			poly->winding->Split(p, f->winding.get(), b->winding.get(), kBSPSplitEpsilon);
 
@@ -694,6 +706,8 @@ void BSPBuilder::CreateRootNode() {
 		node->models.push_back(frag);
 	}
 
+	// avoid null volume leafs.
+	node->bounds.Expand(ValueType(32), ValueType(32), ValueType(32));
 	BBoxWindings(node->bounds, node->windingBounds);
 
 	m_root.reset(node);
@@ -711,7 +725,7 @@ int BSPBuilder::BoxPlaneNum(Node *node) {
 		}
 	}
 
-	if (maxExtents > kMaxBoxExtents) {
+	if (maxExtents > (kMaxBoxExtents+ValueType(64))) {
 		Plane split;
 		switch (bestAxis) {
 		case 0:
@@ -725,7 +739,17 @@ int BSPBuilder::BoxPlaneNum(Node *node) {
 			break;
 		}
 		split = Plane(split.Normal(), node->bounds.Origin()[bestAxis]);
-		return m_planes.FindPlaneNum(split);
+		int planenum = m_planes.FindPlaneNum(split);
+#if defined(RAD_OPT_DEBUG)
+		for (Node *parent = node->parent; parent; parent = parent->parent) {
+			bool alreadySplit = parent->planenum == planenum;
+			if (alreadySplit) {
+				int bp = 0;
+			}
+			RAD_ASSERT(!alreadySplit);
+		}
+#endif
+		return planenum;
 	}
 
 	return kPlaneNumLeaf;
@@ -736,9 +760,9 @@ int BSPBuilder::FindSplitPlane(Node *node) {
 		return kPlaneNumLeaf;
 
 	// find simple splitter
-	int num = BoxPlaneNum(node);
+	/*int num = BoxPlaneNum(node);
 	if (num != kPlaneNumLeaf) 
-		return num;
+		return num;*/
 
 	int front = 0;
 	int back  = 0;
@@ -763,6 +787,16 @@ int BSPBuilder::FindSplitPlane(Node *node) {
 						continue;
 
 					int planenum = (*polyIt)->planenum&~1;
+
+#if defined(RAD_OPT_DEBUG)
+					for (Node *parent = node->parent; parent; parent = parent->parent) {
+						bool alreadySplit = parent->planenum == planenum;
+						if (alreadySplit) {
+							int bp = 0;
+						}
+						RAD_ASSERT(!alreadySplit);
+					}
+#endif
 					{
 						int front = 0;
 						int back  = 0;
@@ -856,7 +890,7 @@ void BSPBuilder::BBoxWindings(const BBox &bounds, WindingVec &out) {
 
 	Winding x, t;
 	for (int i = 0; i < 6; ++i) {
-		x.Initialize(planes[i], SceneFile::kMaxRange);
+		x.Initialize(planes[i], SceneFile::kMaxRange*2);
 		for (int k = 0; k < 6; ++k) {
 			if (k == i)
 				continue;

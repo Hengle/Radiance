@@ -132,7 +132,7 @@ private:
 		if (math::Abs(a.Normal()[0] - b.Normal()[0]) < ValueType(0.000001)
 			&& math::Abs(a.Normal()[1] - b.Normal()[1]) < ValueType(0.000001)
 			&& math::Abs(a.Normal()[2] - b.Normal()[2]) < ValueType(0.000001)
-			&& math::Abs(a.D() - b.D()) < ValueType(0.0001) 
+			&& math::Abs(a.D() - b.D()) < ValueType(0.01) 
 		) {
 			return true;
 		}

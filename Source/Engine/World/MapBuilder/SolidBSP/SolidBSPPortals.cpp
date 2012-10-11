@@ -69,7 +69,7 @@ void BSPBuilder::Portalize() {
 	m_outside.planenum = kPlaneNumLeaf;
 	m_outside.bounds = m_root->bounds;
 	m_outside.contents = 0;
-	m_outside.bounds.Expand(ValueType(16), ValueType(16), ValueType(16)); // avoid null volumes.
+	m_outside.bounds.Expand(ValueType(32), ValueType(32), ValueType(32)); // avoid null volumes.
 	WindingVec windings;
 	
 	// make 6 bounding portals (axis aligned box that contains the world) that
@@ -93,7 +93,7 @@ void BSPBuilder::MakeNodePortal(Node *node) {
 	PortalRef p(new Portal());
 	Winding f, b;
 	p->plane.planenum = node->planenum;
-	p->plane.winding.Initialize(m_planes.Plane(node->planenum), SceneFile::kMaxRange);
+	p->plane.winding.Initialize(m_planes.Plane(node->planenum), SceneFile::kMaxRange*2);
 
 	// split portal by all bounding portals that look into the node.
 	int side;
@@ -108,13 +108,15 @@ void BSPBuilder::MakeNodePortal(Node *node) {
 		);
 
 		if (s == Plane::On) {
-			// portal is too small to split, put on both sides
+			// portal is too small to split
 			continue;
-		} else if (s == Plane::Front && side) {
-			Log("WARNING: portal clipped away (back)!\n");
+		}
+		
+		if (s == Plane::Front && side) {
+//			Log("WARNING: portal clipped away (back)!\n");
 			continue;
 		} else if (s == Plane::Back && !side) {
-			Log("WARNING: portal clipped away (front)!\n");
+//			Log("WARNING: portal clipped away (front)!\n");
 			continue;
 		} else if (s == Plane::Cross) {
 			p->plane.winding.Split(
@@ -125,9 +127,9 @@ void BSPBuilder::MakeNodePortal(Node *node) {
 			);
 
 			if (f.Empty())
-				Log("WARNING: portal clipped away (front)!\n");
+				Log("WARNING: portal clipped away (cross/front)!\n");
 			if (b.Empty())
-				Log("WARNING: portal clipped away (back)!\n");
+				Log("WARNING: portal clipped away (cross/back)!\n");
 
 			if (side)
 				std::swap(f, b);
@@ -164,7 +166,17 @@ void BSPBuilder::SplitNodePortals(Node *node) {
 			EmitProgress();
 		
 		if (f.Empty() && b.Empty()) {
-			continue;
+			// add to both sides
+			PortalRef z(new Portal(*p));
+			z->plane.winding = p->plane.winding;
+			
+			if (side == 0) {
+				AddPortalToNodes(p, node->children[0].get(), other);
+				AddPortalToNodes(z, node->children[1].get(), other);
+			} else {
+				AddPortalToNodes(p, other, node->children[0].get());
+				AddPortalToNodes(z, other, node->children[1].get());
+			}
 		} else if (!f.Empty() && !b.Empty()) {
 			PortalRef z(new Portal(*p));
 			p->plane.winding = f;
