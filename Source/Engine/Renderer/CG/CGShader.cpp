@@ -1302,6 +1302,8 @@ bool Shader::szMaterialInput(char *sz, Channel channel, MSource source, int inde
 			index
 		);
 		return true;
+	default:
+		break;
 	}
 
 	return false;
@@ -1325,6 +1327,8 @@ int Shader::TextureUsageIndex(Channel channel, MSource source, int index) const
 		return ofs;
 	case MS_Framebuffer:
 		return (int)m_usage[channel].s[MS_Texture].size() + ofs;
+	default:
+		break;
 	}
 
 	RAD_FAIL("Invalid texture source");
@@ -1347,6 +1351,8 @@ int Shader::AttribUsageIndex(Channel channel, MSource source, int index) const
 	{
 	case MS_TexCoord:
 		return ofs;
+	default:
+		break;
 	}
 
 	RAD_FAIL("Invalid attrib source");

@@ -106,7 +106,7 @@ t(0)
 , tc(0)
 #endif
 {
-	bb[0] = bb[1] = bb[2] = bb[3] = 0;
+	bb[0] = bb[1] = 0;
 }
 
 inline void GLState::S::SetActiveTexture(int _t, bool force)

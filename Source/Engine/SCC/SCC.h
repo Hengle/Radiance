@@ -14,6 +14,8 @@ class RADENG_CLASS SCC
 public:
 
 	typedef boost::shared_ptr<SCC> Ref;
+	
+	virtual ~SCC() {}
 
 	static Ref Create(const char *name);
 	virtual bool Checkout(const char *filename) = 0;	

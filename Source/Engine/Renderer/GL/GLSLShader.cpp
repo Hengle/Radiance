@@ -1064,6 +1064,8 @@ void GLSLShader::BindAttribLocations(GLhandleARB p, const GLState::MInputMapping
 				CHECK_GL_ERRORS();
 			}
 		break;
+		default:
+			break;
 		}
 	}
 }

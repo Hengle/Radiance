@@ -1300,8 +1300,7 @@ Engine *Cooker::RAD_IMPLEMENT_GET(engine) {
 
 void Cooker::UpdateModifiedTime(int target) {
 	String key(TargetPath(target)+"__cookerModifiedTime");
-	TimeDate td = TimeDate::Now(TimeDate::universal_time_tag());
-
+	
 	world::Keys::Pairs::iterator it = globals->pairs.find(key);
 	if (it == globals->pairs.end()) {
 		globals->pairs[key] = asset->entry->modifiedTime->ToString();

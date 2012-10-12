@@ -70,7 +70,9 @@ void Method<TMethodTraits>::Call(
 	RAD_ASSERT(NULL != this->m_ptr);
 	RAD_ASSERT(NULL != object);
 	ObjectType *obj = (ObjectType *)object;
-	if (this->NumArguments() < args.Size()) { ThrowInvalidArgumentException(this->NumArguments()); }
+	if (this->NumArguments() < args.Size()) { 
+		this->ThrowInvalidArgumentException(this->NumArguments()); 
+	}
 	MethodCaller<ObjectType, PtrType, typename TraitsType::FunctionType>::Call(
 		this,
 		*obj,
@@ -106,7 +108,9 @@ void Method<MethodTraits<TFunction, TOwner, true> >::Call(
 ) const
 {
 	RAD_ASSERT(NULL != this->m_ptr);
-	if (this->NumArguments() < args.Size()) { ThrowInvalidArgumentException(this->NumArguments()); }
+	if (this->NumArguments() < args.Size()) { 
+		this->ThrowInvalidArgumentException(this->NumArguments()); 
+	}
 	MethodCaller<void, PtrType, typename TraitsType::FunctionType>::Call(
 		this,
 		result,

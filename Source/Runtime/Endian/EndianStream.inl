@@ -24,7 +24,7 @@ inline EndianSwapInputStream::~EndianSwapInputStream()
 inline bool EndianSwapInputStream::Read(S8*  var, UReg* errorCode)
 {
 	bool s;
-	if( s=InputStream::Read(var, errorCode) )
+	if((s=InputStream::Read(var, errorCode)))
 	{
 		*var = endian::Swap(*var);
 	}
@@ -35,7 +35,7 @@ inline bool EndianSwapInputStream::Read(S8*  var, UReg* errorCode)
 inline bool EndianSwapInputStream::Read(U8*  var, UReg* errorCode)
 {
 	bool s;
-	if( s=InputStream::Read(var, errorCode) )
+	if((s=InputStream::Read(var, errorCode)))
 	{
 		*var = endian::Swap(*var);
 	}
@@ -46,7 +46,7 @@ inline bool EndianSwapInputStream::Read(U8*  var, UReg* errorCode)
 inline bool EndianSwapInputStream::Read(S16* var, UReg* errorCode)
 {
 	bool s;
-	if( s=InputStream::Read(var, errorCode) )
+	if((s=InputStream::Read(var, errorCode)))
 	{
 		*var = endian::Swap(*var);
 	}
@@ -57,7 +57,7 @@ inline bool EndianSwapInputStream::Read(S16* var, UReg* errorCode)
 inline bool EndianSwapInputStream::Read(U16* var, UReg* errorCode)
 {
 	bool s;
-	if( s=InputStream::Read(var, errorCode) )
+	if((s=InputStream::Read(var, errorCode)))
 	{
 		*var = endian::Swap(*var);
 	}
@@ -68,7 +68,7 @@ inline bool EndianSwapInputStream::Read(U16* var, UReg* errorCode)
 inline bool EndianSwapInputStream::Read(S32* var, UReg* errorCode)
 {
 	bool s;
-	if( s=InputStream::Read(var, errorCode) )
+	if((s=InputStream::Read(var, errorCode)))
 	{
 		*var = endian::Swap(*var);
 	}
@@ -79,7 +79,7 @@ inline bool EndianSwapInputStream::Read(S32* var, UReg* errorCode)
 inline bool EndianSwapInputStream::Read(U32* var, UReg* errorCode)
 {
 	bool s;
-	if( s=InputStream::Read(var, errorCode) )
+	if((s=InputStream::Read(var, errorCode)))
 	{
 		*var = endian::Swap(*var);
 	}
@@ -90,7 +90,7 @@ inline bool EndianSwapInputStream::Read(U32* var, UReg* errorCode)
 inline bool EndianSwapInputStream::Read(S64* var, UReg* errorCode)
 {
 	bool s;
-	if( s=InputStream::Read(var, errorCode) )
+	if((s=InputStream::Read(var, errorCode)))
 	{
 		*var = endian::Swap(*var);
 	}
@@ -101,7 +101,7 @@ inline bool EndianSwapInputStream::Read(S64* var, UReg* errorCode)
 inline bool EndianSwapInputStream::Read(U64* var, UReg* errorCode)
 {
 	bool s;
-	if( s=InputStream::Read(var, errorCode) )
+	if((s=InputStream::Read(var, errorCode)))
 	{
 		*var = endian::Swap(*var);
 	}
@@ -112,7 +112,7 @@ inline bool EndianSwapInputStream::Read(U64* var, UReg* errorCode)
 inline bool EndianSwapInputStream::Read(F32* var, UReg* errorCode)
 {
 	bool s;
-	if( s=InputStream::Read(var, errorCode) )
+	if((s=InputStream::Read(var, errorCode)))
 	{
 		*var = endian::Swap(*var);
 	}
@@ -123,7 +123,7 @@ inline bool EndianSwapInputStream::Read(F32* var, UReg* errorCode)
 inline bool EndianSwapInputStream::Read(F64* var, UReg* errorCode)
 {
 	bool s;
-	if( s=InputStream::Read(var, errorCode) )
+	if((s=InputStream::Read(var, errorCode)))
 	{
 		*var = endian::Swap(*var);
 	}

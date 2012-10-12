@@ -43,8 +43,15 @@ RADRT_API bool RADRT_CALL CalcSeekPos(Seek seekType, SPos dstOfs, SPos curPos, S
 	switch (seekType)
 	{
 	//case StreamBegin: *newOfs = dstOfs; break;
-	case StreamCur: dstOfs += curPos; break;
-	case StreamEnd: if (size < dstOfs) return false; dstOfs = size - dstOfs; break;
+	case StreamCur: dstOfs += curPos;
+		break;
+	case StreamEnd:
+		if (size < dstOfs)
+			return false;
+		dstOfs = size - dstOfs;
+		break;
+	default:
+		break;
 	}
 
 	*newOfs = dstOfs;

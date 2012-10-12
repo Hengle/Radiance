@@ -381,6 +381,8 @@ void CookerDialog::customEvent(QEvent *e)
 	case EV_CookWindowPrint:
 		OnPrintMsg(*static_cast<PrintMsgEvent*>(e));
 		break;
+	default:
+		break;
 	}
 }
 

@@ -54,6 +54,8 @@ T_Precache::Ref T_Precache::New(
 			return Ref(new (ZWorld) T_MaterialPrecache(world, asset));
 		case asset::AT_Typeface:
 			return Ref(new (ZWorld) T_TypefacePrecache(world, asset));
+		default:
+			break;
 		}
 	}
 

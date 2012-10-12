@@ -154,6 +154,8 @@ void ProgressDialog::customEvent(QEvent *e) {
 	case EV_ProgressDialog:
 		OnRefreshEvent(*static_cast<RefreshEvent*>(e));
 		break;
+	default:
+		break;
 	}
 }
 
