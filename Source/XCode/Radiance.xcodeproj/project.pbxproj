@@ -43,15 +43,10 @@
 		330A985815BC9EE7002A81EC /* Font.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E884A715B9AC9E0089BA08 /* Font.h */; };
 		330A985915BC9EE7002A81EC /* FontDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E884A915B9AC9E0089BA08 /* FontDef.h */; };
 		330A985A15BC9EE7002A81EC /* IntFont.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E884AA15B9AC9E0089BA08 /* IntFont.h */; };
-		330A985B15BC9EED002A81EC /* Backend.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830715B999020089BA08 /* Backend.h */; };
 		330A985C15BC9EED002A81EC /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8830815B999020089BA08 /* File.cpp */; };
 		330A985D15BC9EED002A81EC /* File.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830915B999020089BA08 /* File.h */; };
 		330A985E15BC9EED002A81EC /* FileDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830B15B999020089BA08 /* FileDef.h */; };
-		330A985F15BC9EED002A81EC /* FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8830C15B999020089BA08 /* FileStream.cpp */; };
-		330A986015BC9EED002A81EC /* FileStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830D15B999020089BA08 /* FileStream.h */; };
-		330A986115BC9EED002A81EC /* FileStreamDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830F15B999020089BA08 /* FileStreamDef.h */; };
 		330A986215BC9EED002A81EC /* IntFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8831015B999020089BA08 /* IntFile.h */; };
-		330A986315BC9EED002A81EC /* PrivateFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8831115B999020089BA08 /* PrivateFile.h */; };
 		330A986415BC9EF3002A81EC /* Backend.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8849115B9AC940089BA08 /* Backend.h */; };
 		330A986515BC9EF3002A81EC /* Endian.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8849215B9AC940089BA08 /* Endian.cpp */; };
 		330A986615BC9EF3002A81EC /* Endian.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8849315B9AC940089BA08 /* Endian.h */; };
@@ -395,7 +390,6 @@
 		337AE55915BF214F00AD1617 /* ReflectMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E885ED15B9ACD10089BA08 /* ReflectMap.cpp */; };
 		337AE55A15BF214F00AD1617 /* RTLInteropMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E885F015B9ACD10089BA08 /* RTLInteropMap.cpp */; };
 		337AE55B15BF214F00AD1617 /* ReflectPrivate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E885D015B9ACD10089BA08 /* ReflectPrivate.cpp */; };
-		337AE55C15BF214F00AD1617 /* PosixFadvise.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8835915B999680089BA08 /* PosixFadvise.cpp */; };
 		337AE55D15BF214F00AD1617 /* PosixFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8835B15B999680089BA08 /* PosixFile.cpp */; };
 		337AE55E15BF214F00AD1617 /* PosixThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8835E15B999680089BA08 /* PosixThread.cpp */; };
 		337AE55F15BF214F00AD1617 /* ComponentManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E884FA15B9ACB40089BA08 /* ComponentManager.cpp */; };
@@ -409,7 +403,6 @@
 		337AE56715BF214F00AD1617 /* Tga.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E884DA15B9ACAD0089BA08 /* Tga.cpp */; };
 		337AE56815BF214F00AD1617 /* Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E884A615B9AC9E0089BA08 /* Font.cpp */; };
 		337AE56915BF214F00AD1617 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8830815B999020089BA08 /* File.cpp */; };
-		337AE56A15BF214F00AD1617 /* FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8830C15B999020089BA08 /* FileStream.cpp */; };
 		337AE56B15BF214F00AD1617 /* Endian.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8849215B9AC940089BA08 /* Endian.cpp */; };
 		337AE56C15BF214F00AD1617 /* Lmp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8847C15B9AC8D0089BA08 /* Lmp.cpp */; };
 		337AE56D15BF214F00AD1617 /* ZLib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8848015B9AC8D0089BA08 /* ZLib.cpp */; };
@@ -558,7 +551,6 @@
 		337AE5FF15BF214F00AD1617 /* ReflectDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8868915B9AD3F0089BA08 /* ReflectDef.h */; };
 		337AE60015BF214F00AD1617 /* ReflectMap.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8868A15B9AD500089BA08 /* ReflectMap.h */; };
 		337AE60115BF214F00AD1617 /* Runtime.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8868B15B9AD510089BA08 /* Runtime.h */; };
-		337AE60215BF214F00AD1617 /* SafePointer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8867615B9AD190089BA08 /* SafePointer.h */; };
 		337AE60315BF214F00AD1617 /* SharedLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8868C15B9AD520089BA08 /* SharedLibrary.h */; };
 		337AE60415BF214F00AD1617 /* Stream.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8868D15B9AD530089BA08 /* Stream.h */; };
 		337AE60515BF214F00AD1617 /* StreamDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8868E15B9AD540089BA08 /* StreamDef.h */; };
@@ -622,7 +614,6 @@
 		337AE63F15BF214F00AD1617 /* ReflectPrivateMethod.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E885E315B9ACD10089BA08 /* ReflectPrivateMethod.h */; };
 		337AE64015BF214F00AD1617 /* ReflectPrivateSuper.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E885E515B9ACD10089BA08 /* ReflectPrivateSuper.h */; };
 		337AE64115BF214F00AD1617 /* ReflectPrivateUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E885E715B9ACD10089BA08 /* ReflectPrivateUtil.h */; };
-		337AE64215BF214F00AD1617 /* PosixFadvise.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8835A15B999680089BA08 /* PosixFadvise.h */; };
 		337AE64315BF214F00AD1617 /* PosixFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8835C15B999680089BA08 /* PosixFile.h */; };
 		337AE64415BF214F00AD1617 /* PosixInterlocked.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8835D15B999680089BA08 /* PosixInterlocked.h */; };
 		337AE64515BF214F00AD1617 /* PosixThread.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8835F15B999680089BA08 /* PosixThread.h */; };
@@ -706,13 +697,9 @@
 		337AE69315BF214F00AD1617 /* Font.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E884A715B9AC9E0089BA08 /* Font.h */; };
 		337AE69415BF214F00AD1617 /* FontDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E884A915B9AC9E0089BA08 /* FontDef.h */; };
 		337AE69515BF214F00AD1617 /* IntFont.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E884AA15B9AC9E0089BA08 /* IntFont.h */; };
-		337AE69615BF214F00AD1617 /* Backend.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830715B999020089BA08 /* Backend.h */; };
 		337AE69715BF214F00AD1617 /* File.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830915B999020089BA08 /* File.h */; };
 		337AE69815BF214F00AD1617 /* FileDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830B15B999020089BA08 /* FileDef.h */; };
-		337AE69915BF214F00AD1617 /* FileStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830D15B999020089BA08 /* FileStream.h */; };
-		337AE69A15BF214F00AD1617 /* FileStreamDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830F15B999020089BA08 /* FileStreamDef.h */; };
 		337AE69B15BF214F00AD1617 /* IntFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8831015B999020089BA08 /* IntFile.h */; };
-		337AE69C15BF214F00AD1617 /* PrivateFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8831115B999020089BA08 /* PrivateFile.h */; };
 		337AE69D15BF214F00AD1617 /* Backend.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8849115B9AC940089BA08 /* Backend.h */; };
 		337AE69E15BF214F00AD1617 /* Endian.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8849315B9AC940089BA08 /* Endian.h */; };
 		337AE69F15BF214F00AD1617 /* EndianDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8849515B9AC940089BA08 /* EndianDef.h */; };
@@ -997,7 +984,6 @@
 		338CDF3515BC94A40058DFF5 /* ReflectDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8868915B9AD3F0089BA08 /* ReflectDef.h */; };
 		338CDF3615BC94A40058DFF5 /* ReflectMap.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8868A15B9AD500089BA08 /* ReflectMap.h */; };
 		338CDF3715BC94A40058DFF5 /* Runtime.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8868B15B9AD510089BA08 /* Runtime.h */; };
-		338CDF3815BC94A40058DFF5 /* SafePointer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8867615B9AD190089BA08 /* SafePointer.h */; };
 		338CDF3915BC94A40058DFF5 /* SharedLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8868C15B9AD520089BA08 /* SharedLibrary.h */; };
 		338CDF3A15BC94A40058DFF5 /* Stream.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8868D15B9AD530089BA08 /* Stream.h */; };
 		338CDF3B15BC94A40058DFF5 /* StreamDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8868E15B9AD540089BA08 /* StreamDef.h */; };
@@ -1070,8 +1056,6 @@
 		338CDF7E15BC950D0058DFF5 /* ReflectPrivateMethod.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E885E315B9ACD10089BA08 /* ReflectPrivateMethod.h */; };
 		338CDF7F15BC950D0058DFF5 /* ReflectPrivateSuper.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E885E515B9ACD10089BA08 /* ReflectPrivateSuper.h */; };
 		338CDF8015BC950D0058DFF5 /* ReflectPrivateUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E885E715B9ACD10089BA08 /* ReflectPrivateUtil.h */; };
-		338CDF8115BC95130058DFF5 /* PosixFadvise.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8835915B999680089BA08 /* PosixFadvise.cpp */; };
-		338CDF8215BC95130058DFF5 /* PosixFadvise.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8835A15B999680089BA08 /* PosixFadvise.h */; };
 		338CDF8315BC95130058DFF5 /* PosixFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8835B15B999680089BA08 /* PosixFile.cpp */; };
 		338CDF8415BC95130058DFF5 /* PosixFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8835C15B999680089BA08 /* PosixFile.h */; };
 		338CDF8515BC95130058DFF5 /* PosixInterlocked.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8835D15B999680089BA08 /* PosixInterlocked.h */; };
@@ -1150,24 +1134,14 @@
 		33E882F115B993850089BA08 /* QtCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33E882EE15B993850089BA08 /* QtCore.framework */; };
 		33E882F215B993850089BA08 /* QtGui.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33E882EF15B993850089BA08 /* QtGui.framework */; };
 		33E882F315B993850089BA08 /* QtOpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33E882F015B993850089BA08 /* QtOpenGL.framework */; };
-		33E8831215B999020089BA08 /* Backend.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830715B999020089BA08 /* Backend.h */; };
-		33E8831315B999020089BA08 /* Backend.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830715B999020089BA08 /* Backend.h */; };
 		33E8831415B999020089BA08 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8830815B999020089BA08 /* File.cpp */; };
 		33E8831515B999020089BA08 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8830815B999020089BA08 /* File.cpp */; };
 		33E8831615B999020089BA08 /* File.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830915B999020089BA08 /* File.h */; };
 		33E8831715B999020089BA08 /* File.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830915B999020089BA08 /* File.h */; };
 		33E8831815B999020089BA08 /* FileDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830B15B999020089BA08 /* FileDef.h */; };
 		33E8831915B999020089BA08 /* FileDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830B15B999020089BA08 /* FileDef.h */; };
-		33E8831A15B999020089BA08 /* FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8830C15B999020089BA08 /* FileStream.cpp */; };
-		33E8831B15B999020089BA08 /* FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8830C15B999020089BA08 /* FileStream.cpp */; };
-		33E8831C15B999020089BA08 /* FileStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830D15B999020089BA08 /* FileStream.h */; };
-		33E8831D15B999020089BA08 /* FileStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830D15B999020089BA08 /* FileStream.h */; };
-		33E8831E15B999020089BA08 /* FileStreamDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830F15B999020089BA08 /* FileStreamDef.h */; };
-		33E8831F15B999020089BA08 /* FileStreamDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830F15B999020089BA08 /* FileStreamDef.h */; };
 		33E8832015B999020089BA08 /* IntFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8831015B999020089BA08 /* IntFile.h */; };
 		33E8832115B999020089BA08 /* IntFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8831015B999020089BA08 /* IntFile.h */; };
-		33E8832215B999020089BA08 /* PrivateFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8831115B999020089BA08 /* PrivateFile.h */; };
-		33E8832315B999020089BA08 /* PrivateFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8831115B999020089BA08 /* PrivateFile.h */; };
 		33E8832415B999240089BA08 /* IntString.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E882F515B998030089BA08 /* IntString.h */; };
 		33E8832515B999240089BA08 /* IntStringBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E882F615B998030089BA08 /* IntStringBase.h */; };
 		33E8832615B999240089BA08 /* String_inl.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E882F815B998030089BA08 /* String_inl.h */; };
@@ -1194,10 +1168,6 @@
 		33E8833B15B9992A0089BA08 /* checked.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830015B998030089BA08 /* checked.h */; };
 		33E8833C15B9992A0089BA08 /* core.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830115B998030089BA08 /* core.h */; };
 		33E8833D15B9992A0089BA08 /* unchecked.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8830215B998030089BA08 /* unchecked.h */; };
-		33E8836115B999680089BA08 /* PosixFadvise.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8835915B999680089BA08 /* PosixFadvise.cpp */; };
-		33E8836215B999680089BA08 /* PosixFadvise.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8835915B999680089BA08 /* PosixFadvise.cpp */; };
-		33E8836315B999680089BA08 /* PosixFadvise.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8835A15B999680089BA08 /* PosixFadvise.h */; };
-		33E8836415B999680089BA08 /* PosixFadvise.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8835A15B999680089BA08 /* PosixFadvise.h */; };
 		33E8836515B999680089BA08 /* PosixFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8835B15B999680089BA08 /* PosixFile.cpp */; };
 		33E8836615B999680089BA08 /* PosixFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8835B15B999680089BA08 /* PosixFile.cpp */; };
 		33E8836715B999680089BA08 /* PosixFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8835C15B999680089BA08 /* PosixFile.h */; };
@@ -1641,8 +1611,6 @@
 		33E8867415B9AD060089BA08 /* TupleTraits.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8866C15B9AD060089BA08 /* TupleTraits.h */; };
 		33E8869915B9AD660089BA08 /* Runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8867515B9AD160089BA08 /* Runtime.cpp */; };
 		33E8869A15B9AD660089BA08 /* Runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8867515B9AD160089BA08 /* Runtime.cpp */; };
-		33E8869B15B9AD660089BA08 /* SafePointer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8867615B9AD190089BA08 /* SafePointer.h */; };
-		33E8869C15B9AD660089BA08 /* SafePointer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8867615B9AD190089BA08 /* SafePointer.h */; };
 		33E8869D15B9AD660089BA08 /* Base.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8867715B9AD1D0089BA08 /* Base.h */; };
 		33E8869E15B9AD660089BA08 /* Base.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8867715B9AD1D0089BA08 /* Base.h */; };
 		33E8869F15B9AD660089BA08 /* Endian.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8867815B9AD200089BA08 /* Endian.h */; };
@@ -2396,19 +2364,11 @@
 		33E8830215B998030089BA08 /* unchecked.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = unchecked.h; sourceTree = "<group>"; };
 		33E8830315B998030089BA08 /* utf8.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = utf8.h; path = ../Runtime/String/utf8.h; sourceTree = "<group>"; };
 		33E8830515B998400089BA08 /* RadPCH.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RadPCH.h; path = ../RadPCH.h; sourceTree = "<group>"; };
-		33E8830715B999020089BA08 /* Backend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Backend.h; path = ../Runtime/File/Backend.h; sourceTree = "<group>"; };
 		33E8830815B999020089BA08 /* File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = File.cpp; path = ../Runtime/File/File.cpp; sourceTree = "<group>"; };
 		33E8830915B999020089BA08 /* File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = File.h; path = ../Runtime/File/File.h; sourceTree = "<group>"; };
 		33E8830A15B999020089BA08 /* File.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = File.inl; path = ../Runtime/File/File.inl; sourceTree = "<group>"; };
 		33E8830B15B999020089BA08 /* FileDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileDef.h; path = ../Runtime/File/FileDef.h; sourceTree = "<group>"; };
-		33E8830C15B999020089BA08 /* FileStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileStream.cpp; path = ../Runtime/File/FileStream.cpp; sourceTree = "<group>"; };
-		33E8830D15B999020089BA08 /* FileStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileStream.h; path = ../Runtime/File/FileStream.h; sourceTree = "<group>"; };
-		33E8830E15B999020089BA08 /* FileStream.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FileStream.inl; path = ../Runtime/File/FileStream.inl; sourceTree = "<group>"; };
-		33E8830F15B999020089BA08 /* FileStreamDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileStreamDef.h; path = ../Runtime/File/FileStreamDef.h; sourceTree = "<group>"; };
 		33E8831015B999020089BA08 /* IntFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IntFile.h; path = ../Runtime/File/IntFile.h; sourceTree = "<group>"; };
-		33E8831115B999020089BA08 /* PrivateFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PrivateFile.h; path = ../Runtime/File/PrivateFile.h; sourceTree = "<group>"; };
-		33E8835915B999680089BA08 /* PosixFadvise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PosixFadvise.cpp; path = ../Runtime/Posix/PosixFadvise.cpp; sourceTree = "<group>"; };
-		33E8835A15B999680089BA08 /* PosixFadvise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PosixFadvise.h; path = ../Runtime/Posix/PosixFadvise.h; sourceTree = "<group>"; };
 		33E8835B15B999680089BA08 /* PosixFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PosixFile.cpp; path = ../Runtime/Posix/PosixFile.cpp; sourceTree = "<group>"; };
 		33E8835C15B999680089BA08 /* PosixFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PosixFile.h; path = ../Runtime/Posix/PosixFile.h; sourceTree = "<group>"; };
 		33E8835D15B999680089BA08 /* PosixInterlocked.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PosixInterlocked.h; path = ../Runtime/Posix/PosixInterlocked.h; sourceTree = "<group>"; };
@@ -2691,7 +2651,6 @@
 		33E8866B15B9AD060089BA08 /* TupleDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TupleDef.h; sourceTree = "<group>"; };
 		33E8866C15B9AD060089BA08 /* TupleTraits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TupleTraits.h; sourceTree = "<group>"; };
 		33E8867515B9AD160089BA08 /* Runtime.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Runtime.cpp; path = ../Runtime/Runtime.cpp; sourceTree = "<group>"; };
-		33E8867615B9AD190089BA08 /* SafePointer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafePointer.h; path = ../Runtime/SafePointer.h; sourceTree = "<group>"; };
 		33E8867715B9AD1D0089BA08 /* Base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Base.h; path = ../Runtime/Base.h; sourceTree = "<group>"; };
 		33E8867815B9AD200089BA08 /* Endian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Endian.h; path = ../Runtime/Endian.h; sourceTree = "<group>"; };
 		33E8867915B9AD210089BA08 /* EndianStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EndianStream.h; path = ../Runtime/EndianStream.h; sourceTree = "<group>"; };
@@ -3298,7 +3257,6 @@
 				33E8868915B9AD3F0089BA08 /* ReflectDef.h */,
 				33E8868A15B9AD500089BA08 /* ReflectMap.h */,
 				33E8868B15B9AD510089BA08 /* Runtime.h */,
-				33E8867615B9AD190089BA08 /* SafePointer.h */,
 				33E8868C15B9AD520089BA08 /* SharedLibrary.h */,
 				33E8868D15B9AD530089BA08 /* Stream.h */,
 				33E8868E15B9AD540089BA08 /* StreamDef.h */,
@@ -3364,17 +3322,11 @@
 		33E8830615B998EA0089BA08 /* File */ = {
 			isa = PBXGroup;
 			children = (
-				33E8830715B999020089BA08 /* Backend.h */,
 				33E8830815B999020089BA08 /* File.cpp */,
 				33E8830915B999020089BA08 /* File.h */,
 				33E8830A15B999020089BA08 /* File.inl */,
 				33E8830B15B999020089BA08 /* FileDef.h */,
-				33E8830C15B999020089BA08 /* FileStream.cpp */,
-				33E8830D15B999020089BA08 /* FileStream.h */,
-				33E8830E15B999020089BA08 /* FileStream.inl */,
-				33E8830F15B999020089BA08 /* FileStreamDef.h */,
 				33E8831015B999020089BA08 /* IntFile.h */,
-				33E8831115B999020089BA08 /* PrivateFile.h */,
 			);
 			name = File;
 			sourceTree = "<group>";
@@ -3382,8 +3334,6 @@
 		33E8833E15B999370089BA08 /* Posix */ = {
 			isa = PBXGroup;
 			children = (
-				33E8835915B999680089BA08 /* PosixFadvise.cpp */,
-				33E8835A15B999680089BA08 /* PosixFadvise.h */,
 				33E8835B15B999680089BA08 /* PosixFile.cpp */,
 				33E8835C15B999680089BA08 /* PosixFile.h */,
 				33E8835D15B999680089BA08 /* PosixInterlocked.h */,
@@ -4507,7 +4457,6 @@
 				338CDF3515BC94A40058DFF5 /* ReflectDef.h in Headers */,
 				338CDF3615BC94A40058DFF5 /* ReflectMap.h in Headers */,
 				338CDF3715BC94A40058DFF5 /* Runtime.h in Headers */,
-				338CDF3815BC94A40058DFF5 /* SafePointer.h in Headers */,
 				338CDF3915BC94A40058DFF5 /* SharedLibrary.h in Headers */,
 				338CDF3A15BC94A40058DFF5 /* Stream.h in Headers */,
 				338CDF3B15BC94A40058DFF5 /* StreamDef.h in Headers */,
@@ -4571,7 +4520,6 @@
 				338CDF7E15BC950D0058DFF5 /* ReflectPrivateMethod.h in Headers */,
 				338CDF7F15BC950D0058DFF5 /* ReflectPrivateSuper.h in Headers */,
 				338CDF8015BC950D0058DFF5 /* ReflectPrivateUtil.h in Headers */,
-				338CDF8215BC95130058DFF5 /* PosixFadvise.h in Headers */,
 				338CDF8415BC95130058DFF5 /* PosixFile.h in Headers */,
 				338CDF8515BC95130058DFF5 /* PosixInterlocked.h in Headers */,
 				338CDF8715BC95130058DFF5 /* PosixThread.h in Headers */,
@@ -4655,13 +4603,9 @@
 				330A985815BC9EE7002A81EC /* Font.h in Headers */,
 				330A985915BC9EE7002A81EC /* FontDef.h in Headers */,
 				330A985A15BC9EE7002A81EC /* IntFont.h in Headers */,
-				330A985B15BC9EED002A81EC /* Backend.h in Headers */,
 				330A985D15BC9EED002A81EC /* File.h in Headers */,
 				330A985E15BC9EED002A81EC /* FileDef.h in Headers */,
-				330A986015BC9EED002A81EC /* FileStream.h in Headers */,
-				330A986115BC9EED002A81EC /* FileStreamDef.h in Headers */,
 				330A986215BC9EED002A81EC /* IntFile.h in Headers */,
-				330A986315BC9EED002A81EC /* PrivateFile.h in Headers */,
 				330A986415BC9EF3002A81EC /* Backend.h in Headers */,
 				330A986615BC9EF3002A81EC /* Endian.h in Headers */,
 				330A986715BC9EF3002A81EC /* EndianDef.h in Headers */,
@@ -4896,7 +4840,6 @@
 				337AE5FF15BF214F00AD1617 /* ReflectDef.h in Headers */,
 				337AE60015BF214F00AD1617 /* ReflectMap.h in Headers */,
 				337AE60115BF214F00AD1617 /* Runtime.h in Headers */,
-				337AE60215BF214F00AD1617 /* SafePointer.h in Headers */,
 				337AE60315BF214F00AD1617 /* SharedLibrary.h in Headers */,
 				337AE60415BF214F00AD1617 /* Stream.h in Headers */,
 				337AE60515BF214F00AD1617 /* StreamDef.h in Headers */,
@@ -4960,7 +4903,6 @@
 				337AE63F15BF214F00AD1617 /* ReflectPrivateMethod.h in Headers */,
 				337AE64015BF214F00AD1617 /* ReflectPrivateSuper.h in Headers */,
 				337AE64115BF214F00AD1617 /* ReflectPrivateUtil.h in Headers */,
-				337AE64215BF214F00AD1617 /* PosixFadvise.h in Headers */,
 				337AE64315BF214F00AD1617 /* PosixFile.h in Headers */,
 				337AE64415BF214F00AD1617 /* PosixInterlocked.h in Headers */,
 				337AE64515BF214F00AD1617 /* PosixThread.h in Headers */,
@@ -5044,13 +4986,9 @@
 				337AE69315BF214F00AD1617 /* Font.h in Headers */,
 				337AE69415BF214F00AD1617 /* FontDef.h in Headers */,
 				337AE69515BF214F00AD1617 /* IntFont.h in Headers */,
-				337AE69615BF214F00AD1617 /* Backend.h in Headers */,
 				337AE69715BF214F00AD1617 /* File.h in Headers */,
 				337AE69815BF214F00AD1617 /* FileDef.h in Headers */,
-				337AE69915BF214F00AD1617 /* FileStream.h in Headers */,
-				337AE69A15BF214F00AD1617 /* FileStreamDef.h in Headers */,
 				337AE69B15BF214F00AD1617 /* IntFile.h in Headers */,
-				337AE69C15BF214F00AD1617 /* PrivateFile.h in Headers */,
 				337AE69D15BF214F00AD1617 /* Backend.h in Headers */,
 				337AE69E15BF214F00AD1617 /* Endian.h in Headers */,
 				337AE69F15BF214F00AD1617 /* EndianDef.h in Headers */,
@@ -5270,13 +5208,9 @@
 				33E8829815B98EB80089BA08 /* VorbisDef.h in Headers */,
 				33E8829C15B98EB80089BA08 /* Wave.h in Headers */,
 				33E8829E15B98EB80089BA08 /* WaveDef.h in Headers */,
-				33E8831215B999020089BA08 /* Backend.h in Headers */,
 				33E8831615B999020089BA08 /* File.h in Headers */,
 				33E8831815B999020089BA08 /* FileDef.h in Headers */,
-				33E8831C15B999020089BA08 /* FileStream.h in Headers */,
-				33E8831E15B999020089BA08 /* FileStreamDef.h in Headers */,
 				33E8832015B999020089BA08 /* IntFile.h in Headers */,
-				33E8832215B999020089BA08 /* PrivateFile.h in Headers */,
 				33E8832415B999240089BA08 /* IntString.h in Headers */,
 				33E8832515B999240089BA08 /* IntStringBase.h in Headers */,
 				33E8832615B999240089BA08 /* String_inl.h in Headers */,
@@ -5289,7 +5223,6 @@
 				33E8833B15B9992A0089BA08 /* checked.h in Headers */,
 				33E8833C15B9992A0089BA08 /* core.h in Headers */,
 				33E8833D15B9992A0089BA08 /* unchecked.h in Headers */,
-				33E8836315B999680089BA08 /* PosixFadvise.h in Headers */,
 				33E8836715B999680089BA08 /* PosixFile.h in Headers */,
 				33E8836915B999680089BA08 /* PosixInterlocked.h in Headers */,
 				33E8836D15B999680089BA08 /* PosixThread.h in Headers */,
@@ -5473,7 +5406,6 @@
 				33E8866F15B9AD060089BA08 /* Tuple.h in Headers */,
 				33E8867115B9AD060089BA08 /* TupleDef.h in Headers */,
 				33E8867315B9AD060089BA08 /* TupleTraits.h in Headers */,
-				33E8869B15B9AD660089BA08 /* SafePointer.h in Headers */,
 				33E8869D15B9AD660089BA08 /* Base.h in Headers */,
 				33E8869F15B9AD660089BA08 /* Endian.h in Headers */,
 				33E886A115B9AD660089BA08 /* EndianStream.h in Headers */,
@@ -5735,13 +5667,9 @@
 				33E8829915B98EB80089BA08 /* VorbisDef.h in Headers */,
 				33E8829D15B98EB80089BA08 /* Wave.h in Headers */,
 				33E8829F15B98EB80089BA08 /* WaveDef.h in Headers */,
-				33E8831315B999020089BA08 /* Backend.h in Headers */,
 				33E8831715B999020089BA08 /* File.h in Headers */,
 				33E8831915B999020089BA08 /* FileDef.h in Headers */,
-				33E8831D15B999020089BA08 /* FileStream.h in Headers */,
-				33E8831F15B999020089BA08 /* FileStreamDef.h in Headers */,
 				33E8832115B999020089BA08 /* IntFile.h in Headers */,
-				33E8832315B999020089BA08 /* PrivateFile.h in Headers */,
 				33E8832E15B999250089BA08 /* IntString.h in Headers */,
 				33E8832F15B999250089BA08 /* IntStringBase.h in Headers */,
 				33E8833015B999250089BA08 /* String_inl.h in Headers */,
@@ -5754,7 +5682,6 @@
 				33E8833815B999290089BA08 /* checked.h in Headers */,
 				33E8833915B999290089BA08 /* core.h in Headers */,
 				33E8833A15B999290089BA08 /* unchecked.h in Headers */,
-				33E8836415B999680089BA08 /* PosixFadvise.h in Headers */,
 				33E8836815B999680089BA08 /* PosixFile.h in Headers */,
 				33E8836A15B999680089BA08 /* PosixInterlocked.h in Headers */,
 				33E8836E15B999680089BA08 /* PosixThread.h in Headers */,
@@ -5938,7 +5865,6 @@
 				33E8867015B9AD060089BA08 /* Tuple.h in Headers */,
 				33E8867215B9AD060089BA08 /* TupleDef.h in Headers */,
 				33E8867415B9AD060089BA08 /* TupleTraits.h in Headers */,
-				33E8869C15B9AD660089BA08 /* SafePointer.h in Headers */,
 				33E8869E15B9AD660089BA08 /* Base.h in Headers */,
 				33E886A015B9AD660089BA08 /* Endian.h in Headers */,
 				33E886A215B9AD660089BA08 /* EndianStream.h in Headers */,
@@ -6153,10 +6079,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 338381F215B7316B00A28CCF /* Build configuration list for PBXNativeTarget "RadianceDeveloper" */;
 			buildPhases = (
+				33E88B7515B9BEDC0089BA08 /* QtMoc */,
 				338381EA15B7316B00A28CCF /* Sources */,
 				338381EB15B7316B00A28CCF /* Frameworks */,
 				338381EC15B7316B00A28CCF /* Headers */,
-				33E88B7515B9BEDC0089BA08 /* QtMoc */,
 				33836BFF15B9CAFD0030EAEC /* ShellScript */,
 			);
 			buildRules = (
@@ -6300,7 +6226,6 @@
 				338CDF7015BC94E40058DFF5 /* ReflectMap.cpp in Sources */,
 				338CDF7315BC94E40058DFF5 /* RTLInteropMap.cpp in Sources */,
 				338CDF7415BC950D0058DFF5 /* ReflectPrivate.cpp in Sources */,
-				338CDF8115BC95130058DFF5 /* PosixFadvise.cpp in Sources */,
 				338CDF8315BC95130058DFF5 /* PosixFile.cpp in Sources */,
 				338CDF8615BC95130058DFF5 /* PosixThread.cpp in Sources */,
 				330A983715BC9ED3002A81EC /* ComponentManager.cpp in Sources */,
@@ -6314,7 +6239,6 @@
 				330A984D15BC9EDA002A81EC /* Tga.cpp in Sources */,
 				330A985715BC9EE7002A81EC /* Font.cpp in Sources */,
 				330A985C15BC9EED002A81EC /* File.cpp in Sources */,
-				330A985F15BC9EED002A81EC /* FileStream.cpp in Sources */,
 				330A986515BC9EF3002A81EC /* Endian.cpp in Sources */,
 				330A986B15BC9EF8002A81EC /* Lmp.cpp in Sources */,
 				330A986F15BC9EF8002A81EC /* ZLib.cpp in Sources */,
@@ -6459,7 +6383,6 @@
 				337AE55915BF214F00AD1617 /* ReflectMap.cpp in Sources */,
 				337AE55A15BF214F00AD1617 /* RTLInteropMap.cpp in Sources */,
 				337AE55B15BF214F00AD1617 /* ReflectPrivate.cpp in Sources */,
-				337AE55C15BF214F00AD1617 /* PosixFadvise.cpp in Sources */,
 				337AE55D15BF214F00AD1617 /* PosixFile.cpp in Sources */,
 				337AE55E15BF214F00AD1617 /* PosixThread.cpp in Sources */,
 				337AE55F15BF214F00AD1617 /* ComponentManager.cpp in Sources */,
@@ -6473,7 +6396,6 @@
 				337AE56715BF214F00AD1617 /* Tga.cpp in Sources */,
 				337AE56815BF214F00AD1617 /* Font.cpp in Sources */,
 				337AE56915BF214F00AD1617 /* File.cpp in Sources */,
-				337AE56A15BF214F00AD1617 /* FileStream.cpp in Sources */,
 				337AE56B15BF214F00AD1617 /* Endian.cpp in Sources */,
 				337AE56C15BF214F00AD1617 /* Lmp.cpp in Sources */,
 				337AE56D15BF214F00AD1617 /* ZLib.cpp in Sources */,
@@ -6611,9 +6533,7 @@
 				33E8829415B98EB80089BA08 /* Vorbis.cpp in Sources */,
 				33E8829A15B98EB80089BA08 /* Wave.cpp in Sources */,
 				33E8831415B999020089BA08 /* File.cpp in Sources */,
-				33E8831A15B999020089BA08 /* FileStream.cpp in Sources */,
 				33E8832715B999240089BA08 /* String.cpp in Sources */,
-				33E8836115B999680089BA08 /* PosixFadvise.cpp in Sources */,
 				33E8836515B999680089BA08 /* PosixFile.cpp in Sources */,
 				33E8836B15B999680089BA08 /* PosixThread.cpp in Sources */,
 				33E883C715B9AB370089BA08 /* Assert.cpp in Sources */,
@@ -6842,9 +6762,7 @@
 				33E8829515B98EB80089BA08 /* Vorbis.cpp in Sources */,
 				33E8829B15B98EB80089BA08 /* Wave.cpp in Sources */,
 				33E8831515B999020089BA08 /* File.cpp in Sources */,
-				33E8831B15B999020089BA08 /* FileStream.cpp in Sources */,
 				33E8833115B999250089BA08 /* String.cpp in Sources */,
-				33E8836215B999680089BA08 /* PosixFadvise.cpp in Sources */,
 				33E8836615B999680089BA08 /* PosixFile.cpp in Sources */,
 				33E8836C15B999680089BA08 /* PosixThread.cpp in Sources */,
 				33E883C815B9AB370089BA08 /* Assert.cpp in Sources */,

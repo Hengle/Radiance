@@ -1,176 +1,185 @@
-// PosixFile.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file PosixFile.h
+	\copyright Copyright (c) 2010 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup runtime
+*/
 
 #pragma once
 
-#include "../TimeDef.h"
-#include "../Thread/Locks.h"
+#include "../File.h"
+#include "../Container/ZoneDeque.h"
 #include "../PushPack.h"
-
-#if defined(RAD_OPT_POSIXAIO)
-	#include "PosixAIO.h"
-#else
-	#include "PosixFadvise.h"
-#endif
 
 struct dirent;
 
 namespace file {
 
-enum
-{
-	MaxAliasLen    = 255,
-	MaxFilePathLen = 255,
-	MaxExtLen      = 31
-};
+///////////////////////////////////////////////////////////////////////////////
 
-namespace details {
+class RADRT_CLASS PosixFileSystem : public FileSystem {
+public:
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// File searching
-//////////////////////////////////////////////////////////////////////////////////////////
+	PosixFileSystem(
+		const char *root,
+		const char *dvd,
+		AddrSize pageSize
+	);
 
-class RADRT_CLASS Search
-{
+	virtual bool GetFileTime(
+		const char *path,
+		xtime::TimeDate &td,
+		FileOptions options
+	);
+
+	virtual bool DeleteFile(
+		const char *path,
+		FileOptions options
+	);
+
+	virtual bool CreateDirectory(
+		const char *path,
+		FileOptions options
+	);
+
+	virtual bool DeleteDirectory(
+		const char *path,
+		FileOptions options
+	);
+
+protected:
+
+	virtual bool NativeFileExists(const char *path);
+	
+	virtual MMFileRef NativeOpenFile(
+		const char *path,
+		::Zone &zone,
+		FileOptions options
+	);
+
+	virtual FileSearchRef NativeOpenSearch(
+		const char *path,
+		SearchOptions searchOptions,
+		FileOptions options
+	);
+
 private:
-	friend class file::Search;
 
-	Search();
-	~Search();
+	bool DeleteDirectory_r(const char *nativePath);
 
-	bool Open(const char* directory,
-		const char* extWithPeriod,
-		SearchFlags flags
-	);
-
-	bool NextFile(
-		char* filenameBuffer,
-		UReg filenameBufferSize,
-		FileAttributes* fileFlags,
-		xtime::TimeDate* fileTime
-	);
-
-	void Close();
-
-	bool PrivateOpen(
-		const char* root,
-		const char* directory,
-		const char* extWithPeriod,
-		SearchFlags flags
-	);
-
-	bool IsValid();
-
-	size_t  m_trimLen;
-	char m_root[MaxFilePathLen+1];
-	char m_dir[MaxFilePathLen+1];
-	char m_ext[MaxExtLen+1];
-	void *m_sdir;
-	struct dirent *m_cur;
-	Search* m_recursed;
-	SearchFlags m_flags;
+	AddrSize m_pageSize;
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// Asyncronous IO management
-//////////////////////////////////////////////////////////////////////////////////////////
-class File;
-class IO;
-class RADRT_CLASS AsyncIO : public
-#if defined(RAD_OPT_POSIXAIO)
-posix_aio::AIO
-#else
-_posix_fadvise::AIO
-#endif
-{
-	friend class file::AsyncIO;
+///////////////////////////////////////////////////////////////////////////////
 
-	AsyncIO();
-	virtual ~AsyncIO();
+class RADRT_CLASS PosixMMFile : public MMFile {
+public:
 
-	file::Result Result() const { return m_status; }
-	void Cancel() { AIO::Cancel(); m_cancel = true; }
-	bool WaitForCompletion(U32 timeout=thread::Infinite) const;
-	FPos ByteCount() const { return m_bytes; }
-	void TriggerStatusChange(file::Result result, bool force);
-	bool IsCancelled() { return m_cancel; }
-	void SetByteCount(FPos count) { m_bytes = count; }
-	void Go(int bytes);
-	virtual void OnComplete(int bytes, int error);
+	~PosixMMFile();
 
-	volatile FPos               m_bytes;
-	FPos                        m_req;
-	FPos                        m_chunkSize;
-	FPos                        m_ofs;
-	FPos                        m_fsize;
-	int                         m_fd;
-	volatile file::Result  m_status;
-	bool                        m_read;
-	volatile bool               m_cancel;
-	U8*                         m_buffer;
-	mutable thread::Gate   m_gate;
-
-	friend class File;
-	friend class file::details::IO;
-};
-
-//////////////////////////////////////////////////////////////////////////////////////////
-// file::File
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-// This file object operates in two modes: asyncronous IO mode, and
-// syncronous IO mode.
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-
-class RADRT_CLASS File
-{
-	friend class file::File;
-
-	File();
-	~File();
-
-	Result Open(
-		const char* filename,
-		CreationType creationType,
-		AccessMode accessMode,
-		ShareMode shareMode,
-		FileOptions fileOptions,
-		AsyncIO* io
+	virtual MMappingRef MMap(
+		AddrSize ofs, 
+		AddrSize size,
+		::Zone &zone
 	);
 
-	Result Close(AsyncIO* io);
+protected:
 
-	Result Read (
-		void* buffer,
-		FPos bytesToRead,
-		FPos* bytesRead,
-		FPos filePos,
-		AsyncIO* io
+	virtual RAD_DECLARE_GET(size, AddrSize);
+
+private:
+
+	friend class PosixFileSystem;
+
+	PosixMMFile(
+		int fd,
+		AddrSize pageSize
 	);
-
-	Result Write(
-		const void* buffer,
-		FPos bytesToWrite,
-		FPos* bytesWritten,
-		FPos filePos,
-		AsyncIO* io
-	);
-
-	FPos Size() const;
-	FPos SectorSize() const { return m_sectorSize; }
-	bool CancelIO();
-	bool Flush();
 
 	int m_fd;
-	FPos m_sectorSize;
-	FileOptions m_flags;
+	AddrSize m_pageSize;
+	MMapping::Ref m_mm; // only if kFileOption_MapEntireFile is set.
 };
 
-} // details
+///////////////////////////////////////////////////////////////////////////////
+
+class RADRT_CLASS PosixMMapping : public MMapping {
+public:
+
+	~PosixMMapping();
+
+	virtual void Prefetch(
+		AddrSize offset,
+		AddrSize size
+	);
+
+private:
+
+	friend class PosixMMFile;
+	friend class PosixFileSystem;
+
+	PosixMMapping(
+		const MMFile::Ref &file,
+		const void *base,
+		const void *data,
+		AddrSize size,
+		AddrSize offset,
+		AddrSize mappedSize,
+		AddrSize backingSize,
+		::Zone &zone
+	);
+
+	MMFile::Ref m_file; // keeps the file open.
+	const void *m_base;
+	AddrSize m_mappedSize;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+class RADRT_CLASS PosixFileSearch : public FileSearch {
+public:
+
+	~PosixFileSearch();
+
+	static FileSearch::Ref New(
+		const String &path,
+		const String &prefix,
+		SearchOptions options
+	);
+
+	virtual bool NextFile(
+		String &path,
+		FileAttributes *fileAttributes,
+		xtime::TimeDate *fileTime
+	);
+
+private:
+
+	PosixFileSearch(
+		const String &path,
+		const String &prefix,
+		const String &pattern,
+		SearchOptions options
+	);
+
+	enum State {
+		kState_Files,
+		kState_Dirs,
+		kState_Done
+	};
+
+	State NextState();
+
+	String m_path;
+	String m_prefix;
+	String m_pattern;
+	FileSearch::Ref m_subDir;
+	SearchOptions m_options;
+	int m_state;
+	void *m_sdir;
+	struct dirent *m_cur;
+};
+
 } // file
 
-
-#include"../PopPack.h"
+#include "../PopPack.h"

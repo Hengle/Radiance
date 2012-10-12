@@ -642,17 +642,17 @@ inline bool Vector3<T>::NearlyEquals(const Vector3<T>& v, const T& epsilon) cons
 
 template <typename T>
 inline int Vector3<T>::Compare(const Vector3<T> &v) const {
-	if (m_x < v.m_x)
+	if (this->m_x < v.m_x)
 		return -1;
-	if (m_x > v.m_x)
+	if (this->m_x > v.m_x)
 		return 1;
-	if (m_y < v.m_y)
+	if (this->m_y < v.m_y)
 		return -1;
-	if (m_y > v.m_y)
+	if (this->m_y > v.m_y)
 		return 1;
-	if (m_z < v.m_z)
+	if (this->m_z < v.m_z)
 		return -1;
-	if (m_z > v.m_z)
+	if (this->m_z > v.m_z)
 		return 1;
 	return 0;
 }
@@ -1036,21 +1036,21 @@ inline bool Vector4<T>::NearlyEquals(const Vector4<T>& v, const T& epsilon) cons
 
 template <typename T>
 inline int Vector4<T>::Compare(const Vector4<T> &v) const {
-	if (m_x < v.m_x)
+	if (this->m_x < v.m_x)
 		return -1;
-	if (m_x > v.m_x)
+	if (this->m_x > v.m_x)
 		return 1;
-	if (m_y < v.m_y)
+	if (this->m_y < v.m_y)
 		return -1;
-	if (m_y > v.m_y)
+	if (this->m_y > v.m_y)
 		return 1;
-	if (m_z < v.m_z)
+	if (this->m_z < v.m_z)
 		return -1;
-	if (m_z > v.m_z)
+	if (this->m_z > v.m_z)
 		return 1;
-	if (m_w < v.m_w)
+	if (this->m_w < v.m_w)
 		return -1;
-	if (m_w > v.m_w)
+	if (this->m_w > v.m_w)
 		return 1;
 	return 0;
 }

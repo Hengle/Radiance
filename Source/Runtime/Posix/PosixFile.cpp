@@ -1,35 +1,26 @@
-// PosixFile.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file PosixFile.h
+	\copyright Copyright (c) 2010 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup runtime
+*/
 
-#include "../File.h"
-#include "../Thread.h"
-#include "../File/PrivateFile.h"
-#include "../StringBase.h"
-#include "../Utils.h"
-#include "../Time.h"
+#include RADPCH
+#include "PosixFile.h"
+#include "../TimeDef.h"
 #include <unistd.h>
 #include <stdlib.h>
-#if defined(RAD_OPT_APPLE)
-	#include <fcntl.h>
-	#include <sys/statvfs.h>
-#else
-	#include <sys/vfs.h>
-#endif
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/mman.h>
 #include <dirent.h>
+#include <fnmatch.h>
+#include "../PushSystemMacros.h"
 
-#if defined(RAD_OPT_APPLE)
-	#define statfs statvfs
-#endif
-
-#define OVERRIDE_SECTOR_SIZE 512
-
-using namespace string;
 using namespace xtime;
 
+// Pull these in from the front-end OSXMain.mm and IOSMain.mm
 #if defined(RAD_OPT_IOS)
 void __IOS_BundlePath(char*);
 #elif defined(RAD_OPT_OSX)
@@ -38,1130 +29,88 @@ void __OSX_BundlePath(char*);
 
 namespace file {
 
-const char * const NativePathSeparator = "/";
+FileSystem::Ref FileSystem::New() {
 
-namespace details {
+	String cwd;
+
+	{
+		char x[256];
+		getcwd(x, 255);
+		x[255] = 0;
+		cwd = x;
+	}
+
+	cwd.Replace('\\', '/');
+	cwd.Lower();
 	
-namespace {
-
-enum { IO_CHUNK_SIZE = 256*Kilo };
-
-void SetDefaultAliases()
-{
-	{
-		char buff[MaxFilePathLen+1];
-
-		{
-#if defined(RAD_OPT_IOS)
-			__IOS_BundlePath(buff);
-#elif defined(RAD_OPT_OSX) && defined(RAD_OPT_SHIP)
-			__OSX_BundlePath(buff);
-			strcat(buff, "/Contents/Resources");
-#else
-			getcwd(buff, MaxFilePathLen);
-#endif
-			buff[MaxFilePathLen] = 0;
-		}
-
-		{
-			size_t l = len(buff);
-			if (buff[0] != 0 && buff[l-1] != L'/' && buff[l-1] != L'\\')
-			{
-				cat(buff, "/"); // fake directory seperator.
-			}
-		}
-
-		for (UReg i = 0; buff[i] != 0; i++)
-		{
-			if (buff[i] == '\\') buff[i] = '/';
-		}
-
-		// backup and find the last directory separator.
-		if (buff[0] != 0)
-		{
-			bool found = false;
-			UReg l = (UReg)len(buff);
-			while (l-- > 0)
-			{
-				if (buff[l] == '/')
-				{
-					buff[l] = 0; // terminate.
-					found = true;
-					break;
-				}
-			}
-
-			// there was no real command line passed in (just the exe name), so terminate here and use the cwd.
-			if (!found)
-			{
-				buff[0] = '.';
-				buff[1] = 0;
-			}
-		}
-
-#if defined(RAD_OPT_DEBUG)
-		details::UncheckedSetAlias(AliasRoot, buff);
-#else
-		SetAlias(AliasRoot, buff);
-#endif
-	}
-
-
-#if defined(RAD_OPT_DEBUG)
-	details::UncheckedSetAlias(AliasCDDVD, "/media/cdrom");
-#else
-	SetAlias(AliasCDDVD, "/media/cdrom");
-#endif
-
-#if defined(RAD_OPT_DEBUG)
-	details::UncheckedSetAlias(AliasHDD, ""); // this is root '/', user paths start with '/' already
-#else
-	SetAlias(AliasHDD, "");
-#endif
-
-}
-} // namespace
-
-Search::Search() :
-m_sdir(0),
-m_cur(0),
-m_recursed(0),
-m_flags(SearchFlags(0))
-{
-	m_dir[0] = 0;
-	m_ext[0] = 0;
-	m_root[0] = 0;
-}
-
-Search::~Search()
-{
-	if (0 != m_sdir)
-	{
-		Close();
-	}
-}
-
-bool Search::Open(const char* directory,
-	const char* ext,
-	SearchFlags flags
-)
-{
-	RAD_ASSERT(directory && directory[0]);
-	RAD_ASSERT(ext && ext[0]);
-	RAD_ASSERT(m_flags == 0);
-	RAD_ASSERT(m_recursed == 0);
-	RAD_ASSERT(m_root[0] == 0);
-	RAD_ASSERT(m_sdir == 0 && m_cur == 0);
-	RAD_ASSERT_MSG(len(directory) <= MaxFilePathLen, "Directory path exceeds MaxFilePathLen!");
-
-#if defined(RAD_OPT_DEBUG)
-	if (!(flags&NativePath))
-	{
-		AssertExtension(ext);
-		{
-			UReg p, ofs;
-			RAD_ASSERT_MSG(ExtractAlias(directory, &p, &ofs), "Directory path must have an alias!");
-			if (directory[ofs] != 0)
-			{
-				AssertFilePath(directory, true);
-			}
-		}
-	}
-#endif
-
-	return PrivateOpen("", directory, ext, flags);
-}
-
-bool Search::PrivateOpen(
-	const char* root,
-	const char* directory,
-	const char* ext,
-	SearchFlags flags
-)
-{
-	RAD_ASSERT(root);
-	RAD_ASSERT(directory && directory[0]);
-	RAD_ASSERT(ext && ext[0]);
-	RAD_ASSERT(m_flags == 0);
-	RAD_ASSERT(m_recursed == 0);
-	RAD_ASSERT(m_root[0] == 0);
-	RAD_ASSERT(m_sdir == 0 && m_cur == 0);
-	RAD_ASSERT_MSG(len(directory) <= MaxFilePathLen, "Directory path exceeds MaxFilePathLen!");
-	RAD_ASSERT_MSG(len(root) <= MaxFilePathLen, "Root path exceeds MaxFilePathLen!");
-
-#if defined(RAD_OPT_DEBUG)
-	if (!(flags&NativePath))
-	{
-		AssertExtension(ext);
-	}
-#endif
-
-	cpy(m_ext, ext);
-
-	char buff[MaxFilePathLen+1];
-	if (flags & NativePath)
-	{
-		ncpy(buff, directory, MaxFilePathLen+1);
-		// make sure it doesn't end in a '/' or '\\'.
-		UReg l = (UReg)len(buff);
-		if (l > 1 && (buff[l-1] == '\\' || buff[l-1] == '/')) buff[l-1] = 0;
-		//if (l == 1 && buff[0] == '~') { cat(buff, L"/"); }
-	}
-	else
-	{
-		if (!ExpandToNativePath(directory, buff, MaxFilePathLen+1))
-		{
-			return false;
-		}
-	}
-
-	m_trimLen = len(buff);
-	m_sdir = ::opendir(buff);
-
-	if (m_sdir != 0)
-	{
-		m_cur = new dirent;
-		m_flags = flags;
-		ncpy(m_root, root, MaxFilePathLen+1);
-		ncpy(m_dir, directory, MaxFilePathLen+1);
-
-		UReg l = (UReg)len(m_root);
-		if (l > 1 && (m_root[l-1] == L'\\' || m_root[l-1] == L'/')) m_root[l-1] = 0;
-		l = (UReg)len(m_dir);
-		if (l > 1 && (m_dir[l-1] == L'\\' || m_dir[l-1] == L'/')) m_dir[l-1] = 0;
-
-		return true;
-	}
-
-	return false;
-}
-
-bool Search::NextFile(
-	char* filenameBuffer,
-	UReg filenameBufferSize,
-	FileAttributes* fileFlags,
-	xtime::TimeDate* fileTime
-)
-{
-	RAD_ASSERT(filenameBuffer);
-	RAD_ASSERT(filenameBufferSize > 0);
-	RAD_ASSERT(m_sdir != 0);
-
-	if (m_recursed)
-	{
-		if (m_recursed->NextFile(filenameBuffer, filenameBufferSize, fileFlags, fileTime))
-		{
-			return true; // all good.
-		}
-
-		delete m_recursed;
-		m_recursed = 0;
-	}
-
-	RAD_ASSERT(m_recursed == 0);
-	char ext[MaxExtLen+1];
-
-	for (;;)
-	{
-		RAD_ASSERT(m_recursed == 0);
-
-		struct dirent *next;
-		if (readdir_r((DIR*)m_sdir, m_cur, &next) != 0 || 0 == next)
-		{
-			return false;
-		}
-
-		char *filename = &next->d_name[0];
-
-		if (cmp(filename, ".") && cmp(filename, "..")) // skip directory links
-		{
-			// is this a directory?
-			if (next->d_type == DT_DIR)
-			{
-				// what do we do with it?
-				if (m_flags & DirNames)
-				{
-					int l;
-
-					if (m_root[0] != 0)
-					{
-						// search this directory.
-						l = (int)filenameBufferSize;
-						ncpy(filenameBuffer, m_root, l);
-						l -= len(filenameBuffer);
-						ncat(filenameBuffer, "/", l);
-
-						if (l > 0)
-						{
-							--l;
-							ncat(filenameBuffer, filename, l);
-						}
-					}
-					else
-					{
-						ncpy(filenameBuffer, filename, (int)filenameBufferSize);
-					}
-
-					if (fileFlags)
-					{
-						*fileFlags = FileAttributes(Directory|Normal);
-					}
-
-					if (fileTime)
-					{
-						memset(fileTime, 0, sizeof(TimeDate));
-						struct stat s;
-
-						if (stat(next->d_name, &s) == 0)
-						{
-							struct tm t;
-							localtime_r(&s.st_mtime, &t);
-
-							fileTime->dayOfMonth = (U8)t.tm_mday;
-							fileTime->month      = (U8)t.tm_mon;
-							fileTime->year       = (U16)t.tm_year;
-							fileTime->hour       = (U8)t.tm_hour;
-							fileTime->minute     = (U8)t.tm_min;
-							fileTime->second     = (U8)t.tm_sec;
-							fileTime->dayOfWeek  = (U8)t.tm_wday;
-							fileTime->millis     = 0;
-						}
-					}
-
-					if (!(m_flags&Recursive))
-					{
-#if defined (RAD_OPT_DEBUG)
-						if (!(m_flags&NativePath)) AssertFilePath(filenameBuffer, false);
-#endif
-						return true;
-					}
-				}
-				if (m_flags & Recursive)
-				{
-					int l;
-					char root[MaxFilePathLen+1], dir[MaxFilePathLen+1];
-
-					if (m_root[0] != 0)
-					{
-						// search this directory.
-						ncpy(root, m_root, MaxFilePathLen);
-						l = len(root);
-						// not terminated with a '/'?
-						if (root[l-1] != '/')
-							ncat(root, "/", MaxFilePathLen - l);
-						l = MaxFilePathLen - l;
-
-						if (l > 0)
-						{
-							--l;
-							ncat(root, filename, l);
-						}
-					}
-					else
-					{
-						ncpy(root, filename, MaxFilePathLen+1);
-					}
-
-					if (m_dir[0] != 0)
-					{
-						// search this directory.
-						ncpy(dir, m_dir, MaxFilePathLen);
-						l = len(dir);
-						// not terminated with a '/'?
-						if (dir[l-1] != '/')
-							ncat(dir, "/", MaxFilePathLen - l);
-						l = MaxFilePathLen - l;
-
-						if (l > 0)
-						{
-							--l;
-							ncat(dir, filename, l);
-						}
-					}
-					else
-					{
-						ncpy(dir, filename, MaxFilePathLen+1);
-					}
-
-					m_recursed = new Search();
-
-					if (m_recursed->PrivateOpen(root, dir, m_ext, m_flags))
-					{
-						if (m_flags & DirNames) // return the directory name. next time we're here we'll recurse.
-						{
-							return true;
-						}
-
-						if (m_recursed->NextFile(filenameBuffer, filenameBufferSize, fileFlags, fileTime))
-						{
-							return true;
-						}
-					}
-
-					delete m_recursed;
-					m_recursed = 0;
-				}
-			}
-			else if (next->d_type == DT_REG && (m_flags & FileNames))
-			{
-				if (m_ext[1] != '*' || m_ext[2] != 0) // all files
-				{
-					FileExt(filename, ext, MaxExtLen+1);
-					if (icmp(ext, m_ext))
-					{
-						continue; // filtered.
-					}
-				}
-
-				int l;
-
-				if (m_root[0] != 0)
-				{
-					// search this directory.
-					l = (int)filenameBufferSize;
-					ncpy(filenameBuffer, m_root, l);
-					l -= len(filenameBuffer);
-
-					ncat(filenameBuffer, "/", l);
-
-					if (l > 0)
-					{
-						--l;
-						ncat(filenameBuffer, filename, l);
-					}
-				}
-				else
-				{
-					ncpy(filenameBuffer, filename, (int)filenameBufferSize);
-				}
-
-				if (fileFlags)
-				{
-					*fileFlags = Normal;
-				}
-
-				if (fileTime)
-				{
-					memset(fileTime, 0, sizeof(TimeDate));
-					struct stat s;
-
-					if (stat(next->d_name, &s) == 0)
-					{
-						struct tm t;
-						localtime_r(&s.st_mtime, &t);
-
-						fileTime->dayOfMonth = (U8)t.tm_mday;
-						fileTime->month      = (U8)t.tm_mon;
-						fileTime->year       = (U16)t.tm_year;
-						fileTime->hour       = (U8)t.tm_hour;
-						fileTime->minute     = (U8)t.tm_min;
-						fileTime->second     = (U8)t.tm_sec;
-						fileTime->dayOfWeek  = (U8)t.tm_wday;
-						fileTime->millis     = 0;
-					}
-				}
-
-#if defined (RAD_OPT_DEBUG)
-				if (!(m_flags&NativePath)) AssertFilePath(filenameBuffer, false);
-#endif
-				return true;
-			}
-		}
-	}
-}
-
-void Search::Close()
-{
-	RAD_ASSERT(m_sdir != 0);
-
-	if (m_recursed)
-	{
-		delete m_recursed;
-	}
-
-	if (m_cur)
-	{
-		delete m_cur;
-		m_cur = 0;
-	}
-
-	if (m_sdir)
-	{
-		::closedir((DIR*)m_sdir);
-		m_sdir = 0;
-	}
-}
-
-bool Search::IsValid()
-{
-	return m_sdir != 0;
-}
-
-AsyncIO::AsyncIO() :
-m_bytes(0),
-m_req(0),
-m_chunkSize(0),
-m_ofs(0),
-m_fd(0),
-m_status(Success),
-m_read(true),
-m_cancel(false),
-m_buffer(0),
-m_gate(true, false)
-{
-}
-
-AsyncIO::~AsyncIO()
-{
-}
-
-void AsyncIO::Go(int bytes)
-{
-	m_bytes += bytes;
-	m_ofs += bytes;
-
-	file::Result r = Pending;
+	AddrSize pageSize = (AddrSize)sysconf(_SC_PAGE_SIZE);
 	
-	if (m_bytes >= m_req)
-	{
-		r = Success;
-	}
-	else
-	{
-		FPos chunkSize = ((m_bytes+m_chunkSize) < m_req) ? m_chunkSize : (m_req-m_bytes);
-		if (m_read && m_ofs+chunkSize > m_fsize)
-		{
-			RAD_ASSERT(m_fsize >= m_ofs);
-			chunkSize = m_fsize - m_ofs;
-		}
-
-		if (chunkSize > 0)
-		{
-			if (m_read)
-			{
-				if (Read(m_fd, 0, m_buffer+m_bytes, chunkSize, m_ofs, 0) != 0)
-				{
-					r = ErrorGeneric;
-				}
-			}
-			else
-			{
-				if (Write(m_fd, 0, m_buffer+m_bytes, chunkSize, m_ofs, 0) != 0)
-				{
-					r = ErrorGeneric;
-				}
-			}
-		}
-		else
-		{
-			// clients will request reads off the end of the file because
-			// the generic API requires read sizes that are aligned to sector
-			// boundaries.
-			r = ErrorPartial;
-		}
-	}
-
-	if (r != Pending)
-	{
-		TriggerStatusChange(r, true);
-	}
+	return FileSystem::Ref(new PosixFileSystem(cwd.c_str, 0, pageSize);
 }
 
-void AsyncIO::OnComplete(int bytes, int error)
-{
-	switch (error)
-	{
-	case 0:
-		// no error.
-		RAD_ASSERT(bytes>=0);
-		Go(bytes);
-		break;
-	case ECANCELED:
-		TriggerStatusChange(ErrorAborted, false);
-		break;
-	case EISDIR:
-		TriggerStatusChange(ErrorInvalidArguments, false);
-		break;
-	case EIO:
-		TriggerStatusChange(ErrorDriveNotReady, false);
-		break;
-	default:
-		TriggerStatusChange(ErrorGeneric, false);
-		break;
-	}
+PosixFileSystem::PosixFileSystem(
+	const char *root, 
+	const char *dvd,
+	AddrSize pageSize
+) : FileSystem(root, dvd), m_pageSize(pageSize) {
 }
 
-void AsyncIO::TriggerStatusChange(file::Result result, bool force)
-{
-	bool wasPending = m_status == file::Pending;
-	bool isPending  = result == file::Pending;
+MMFile::Ref PosixFileSystem::NativeOpenFile(
+	const char *path,
+	::Zone &zone,
+	FileOptions options
+) {
 
-	if (isPending)
-	{
-		m_cancel = false;
-		m_gate.Close();
-	}
+	int fd = open(path, O_RDONLY, 0);
+	if (fd == -1)
+		return MMFile::Ref();
 
-	if ((wasPending && !isPending) || force)
-	{
-		file::AsyncIO* super = RAD_CLASS_FROM_MEMBER(file::AsyncIO, m_imp, this);
-		super->OnComplete(result);
-		m_status = result;
-		m_gate.Open(); // trigger anyone waiting for completion in WaitForCompletion().
-	}
-	else
-	{
-		m_status = result;
-	}
-}
-	
-bool AsyncIO::WaitForCompletion(U32 timeout) const
-{
-	bool r = m_gate.Wait(timeout);
-	RAD_ASSERT(m_status != Pending);
-	return r;
-}
+	MMFile::Ref r(new (ZFile) PosixMMFile(fd, m_pageSize));
 
-File::File() :
-m_fd(-1),
-m_flags(FileOptions(0))
-{
-}
-
-File::~File()
-{
-	if (m_fd != -1)
-	{
-		Close(0);
-	}
-}
-
-Result File::Open(
-	const char* filename,
-	CreationType creationType,
-	AccessMode accessMode,
-	ShareMode shareMode,
-	FileOptions fileOptions,
-	AsyncIO* io
-)
-{
-	RAD_ASSERT(m_fd == -1);
-	RAD_ASSERT(filename && filename[0]);
-	RAD_DEBUG_ONLY(AssertCreationType(creationType));
-
-	int flags =
-#if defined(O_BINARY)
-		O_BINARY;
-#else
-		0;
-#endif
-
-	char nativeFilename[MaxFilePathLen+1];
-
-	if (fileOptions&NativePath)
-	{
-		cpy(nativeFilename, filename);
-	}
-	else
-	{
-		if (!ExpandToNativePath(filename, nativeFilename, MaxFilePathLen+1)) 
-			return ErrorExpansionFailed;
-	}
-
-	if ((accessMode&(AccessRead|AccessWrite)) == (AccessRead|AccessWrite))
-	{
-		flags |= O_RDWR;
-	}
-	else if (accessMode&AccessRead)
-	{
-		flags |= O_RDONLY;
-	}
-	else if (accessMode&AccessWrite)
-	{
-		flags |= O_WRONLY;
-	}
-
-	switch (creationType)
-	{
-	case CreateNew:
-		flags |= O_CREAT|O_EXCL;
-		break;
-	case CreateAlways:
-		flags |= O_CREAT|O_TRUNC;
-		break;
-	case TruncateExisting:
-		flags |= O_CREAT|O_EXCL|O_TRUNC;
-		break;
-	case OpenAlways:
-		flags |= O_CREAT;
-		break;
-	default:
-		if (creationType != OpenExisting) 
-			return ErrorInvalidArguments;
-		break;
-	}
-
-	m_fd = open(nativeFilename, flags, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
-	if (m_fd != -1)
-	{
-		m_flags = fileOptions;
-		m_sectorSize = DeviceSectorSize(nativeFilename, (fileOptions&MiscFlagsAll)|NativePath);
-		RAD_ASSERT(m_sectorSize != 0);
-
-		if (io)
-		{
-			io->TriggerStatusChange(Success, true);
-		}
-		return Success;
-	}
-
-	if (io)
-	{
-		io->TriggerStatusChange(ErrorGeneric, true);
-	}
-
-	return ErrorGeneric;
-}
-
-Result File::Close(AsyncIO* io)
-{
-	RAD_ASSERT(m_fd != -1);
-#if defined(RAD_OPT_DEBUG)
-	if (io)
-	{
-		RAD_ASSERT_MSG((m_flags&Async), "Async IO object used on a file that was not opened in Async mode!");
-	}
-#endif
-	::close(m_fd);
-	m_fd = -1;
-	m_flags = FileOptions(0);
-	return Success;
-}
-
-Result File::Read (
-	void* buffer,
-	FPos bytesToRead,
-	FPos* bytesRead,
-	FPos filePos,
-	AsyncIO* io
-)
-{
-	RAD_ASSERT(m_fd != -1);
-	RAD_ASSERT(m_sectorSize != 0);
-
-#if defined(RAD_OPT_DEBUG)
-	if (m_flags & Async) // this is done for consistency on other platforms.
-	{
-		RAD_ASSERT_MSG(((m_sectorSize-1)&filePos) == 0, "File accesses must be sector size aligned (filePos)!");
-		RAD_ASSERT_MSG(((m_sectorSize-1)&bytesToRead) == 0, "File accesses must be sector size aligned (bytesToRead)!");
-		RAD_ASSERT_MSG((((AddrSize)(m_sectorSize-1))&((AddrSize)buffer)) == 0, "Buffer for read operations must be aligned to a sector-size boundary.");
-	}
-#endif
-
-	Result r;
-
-	if (m_flags & Async)
-	{
-		file::AsyncIO _io;
-		if (!io)
-			io = &_io.m_imp;
-		io->TriggerStatusChange(Pending, false);
-		io->m_cancel = false;
-		io->m_bytes = 0;
-		io->m_ofs = filePos;
-		io->m_req = bytesToRead;
-		io->m_chunkSize = (bytesToRead>IO_CHUNK_SIZE)?IO_CHUNK_SIZE:bytesToRead;
-		io->m_read = true;
-		io->m_buffer = (U8*)buffer;
-		io->m_fd = m_fd;
-		io->m_fsize = Size();
-		io->Go(0);
-		if (io == &_io.m_imp)
-		{
-			io->WaitForCompletion();
-			r = io->Result();
-			RAD_ASSERT(r != Pending);
-			if ((r == Success || r == ErrorPartial) && bytesRead)
-			{
-				*bytesRead = io->ByteCount();
-			}
-		}
-		else
-		{
-			r = Pending;
-		}
-	}
-	else
-	{
-		RAD_ASSERT(!io);
-		ssize_t rd = 0;
-
-		if ((::lseek(m_fd, (off_t)filePos, SEEK_SET) == (off_t)filePos) &&
-			 ((rd=::read(m_fd, buffer, bytesToRead)) != -1))
-		{
-			r = (rd == bytesToRead) ? Success : ErrorPartial;
-			if (bytesRead) *bytesRead = (FPos)rd;
-		}
-		else
-		{
-			r = ErrorGeneric;
+	if (options & kFileOption_MapEntireFile) {
+		MMapping::Ref mm = r->MMap(0, 0, zone);
+		if (mm) {
+			static_cast<PosixMMFile*>(r.get())->m_mm = mm;
+			// important otherwise we have a circular reference.
+			static_cast<PosixMMapping*>(mm.get())->m_file.reset();
 		}
 	}
 
 	return r;
 }
 
-Result File::Write(
-	const void* buffer,
-	FPos bytesToWrite,
-	FPos* bytesWritten,
-	FPos filePos,
-	AsyncIO* io
-)
-{
-	RAD_ASSERT(m_fd != -1);
-	RAD_ASSERT(m_sectorSize != 0);
-
-#if defined(RAD_OPT_DEBUG)
-	if (m_flags & Async) // this is done for consistency on other platforms.
-	{
-		RAD_ASSERT_MSG(((m_sectorSize-1)&filePos) == 0, "File accesses must be sector size aligned (filePos)!");
-		RAD_ASSERT_MSG((((AddrSize)(m_sectorSize-1))&((AddrSize)buffer)) == 0, "Buffer for read operations must be aligned to a sector-size boundary.");
-	}
-#endif
-
-	Result r;
-
-	if (m_flags & Async)
-	{
-		file::AsyncIO _io;
-		if (!io)
-			io = &_io.m_imp;
-		io->TriggerStatusChange(Pending, false);
-		io->m_cancel = false;
-		io->m_bytes = 0;
-		io->m_ofs = filePos;
-		io->m_req = bytesToWrite;
-		io->m_chunkSize = (bytesToWrite>IO_CHUNK_SIZE)?IO_CHUNK_SIZE:bytesToWrite;
-		io->m_read = false;
-		io->m_buffer = (U8*)buffer;
-		io->m_fd = m_fd;
-		io->m_fsize = Size();
-		io->Go(0);
-		if (io == &_io.m_imp)
-		{
-			io->WaitForCompletion();
-			r = io->Result();
-			RAD_ASSERT(r != Pending);
-			if ((r == Success || r == ErrorPartial) && bytesWritten)
-			{
-				*bytesWritten = io->ByteCount();
-			}
-		}
-		else
-		{
-			r = Pending;
-		}
-	}
-	else
-	{
-		RAD_ASSERT(!io);
-		ssize_t rd = 0;
-
-		if ((::lseek(m_fd, (off_t)filePos, SEEK_SET) == (off_t)filePos) &&
-			 ((rd=::write(m_fd, buffer, bytesToWrite)) != -1))
-		{
-			r = (rd == bytesToWrite) ? Success : ErrorPartial;
-			if (bytesWritten) *bytesWritten = (FPos)rd;
-		}
-		else
-		{
-			r = ErrorGeneric;
-		}
-	}
-
-	return r;
+FileSearch::Ref PosixFileSystem::NativeOpenSearch(
+	const char *path,
+	SearchOptions searchOptions,
+	FileOptions fileOptions
+) {
+	return PosixFileSearch::New(
+		String(path), // not CStr since this string persists outside the scope of this function.
+		String(),
+		searchOptions
+	);
 }
 
-FPos File::Size() const
-{
-	RAD_ASSERT(m_fd != -1);
-	struct stat s;
-	if (fstat(m_fd, &s) == 0)
-	{
-		return (FPos)s.st_size;
-	}
-	return 0;
-}
-
-bool File::CancelIO()
-{
-	RAD_ASSERT(m_fd != -1);
-#if defined(RAD_OPT_POSIXAIO)
-	return posix_aio::AIO::Cancel(m_fd) == 0;
-#else
-	return _posix_fadvise::AIO::Cancel(m_fd) == 0;
-#endif
-}
-
-bool File::Flush()
-{
-	RAD_ASSERT(m_fd != -1);
-#if defined(RAD_OPT_POSIXAIO)
-	return posix_aio::AIO::Flush(m_fd) == 0;
-#else
-	return _posix_fadvise::AIO::Flush(m_fd) == 0;
-#endif
-}
-
-} // details
-
-RADRT_API bool RADRT_CALL ExpandToNativePath(const char *portablePath, char *nativePath, UReg nativePathBufferSize)
-{
-	RAD_ASSERT(portablePath);
-	RAD_ASSERT(nativePath);
-	RAD_ASSERT(nativePathBufferSize > 0);
-
-#if defined(RAD_OPT_DEBUG)
-	{
-		UReg p, ofs;
-		RAD_ASSERT_MSG(details::ExtractAlias(portablePath, &p, &ofs), "Path must have an alias!");
-		if (portablePath[ofs] != 0) // not just an alias?
-		{
-			details::AssertFilePath(portablePath, true);
-		}
-	}
-#endif
-
-	return ExpandAliases(portablePath, nativePath, nativePathBufferSize);
-}
-
-// returns number of characters that would be written to buffer via ExpandPath if successful (excluding null terminator),
-// or 0 if error (or path is a null string).
-
-RADRT_API UReg RADRT_CALL ExpandToNativePathLength(const char *portablePath)
-{
-	RAD_ASSERT(portablePath);
-
-#if defined(RAD_OPT_DEBUG)
-	details::AssertFilePath(portablePath, true);
-#endif
-	return ExpandAliasesLength(portablePath);
-}
-
-// Returns the sector size of the device that the given file path resides on. Note this
-// doesn't have to be a filename, it can be a path, or an alias.
-
-RADRT_API FPos RADRT_CALL DeviceSectorSize(const char *path, int flags)
-{
+bool PosixFileSystem::GetFileTime(
+	const char *path,
+	xtime::TimeDate &td,
+	FileOptions options
+) {
 	RAD_ASSERT(path);
+	String nativePath;
 
-	char buff[MaxFilePathLen+1];
-
-	if (flags & NativePath)
-	{
-		::string::cpy(buff, path);
-	}
-	else
-	{
-		if (!ExpandAliases(path, buff, MaxFilePathLen+1))
-		{
-			return 0;
-		}
-	}
-
-	struct statfs sfs;
-	if (statfs(path, &sfs) != 0)
-	{
-		sfs.f_bsize = 0;
-	}
-
-#if defined(OVERRIDE_SECTOR_SIZE)
-	return OVERRIDE_SECTOR_SIZE;
-#else
-	return (FPos)sfs.f_bsize;
-#endif
-}
-
-RADRT_API bool RADRT_CALL DeleteFile(const char *path, int flags)
-{
-	RAD_ASSERT(path);
-
-	if (flags & NativePath)
-	{
-		return ::unlink(path) == 0;
-	}
-	else
-	{
-#if defined(RAD_OPT_DEBUG)
-		details::AssertFilePath(path, true);
-#endif
-
-		char buff[MaxFilePathLen+1];
-		if (ExpandToNativePath(path, buff, MaxFilePathLen+1))
-		{
-			return ::unlink(buff) == 0;
-		}
-		else
-		{
+	if (options & kFileOption_NativePath) {
+		nativePath = CStr(path);
+	} else {
+		if (!GetNativePath(path, nativePath))
 			return false;
-		}
 	}
-}
-
-static bool PrivateCreateDirectory(const char *nativePath)
-{
-	RAD_ASSERT(nativePath);
-	char buff[MaxFilePathLen+1];
-
-	int ofs = 0;
-	while (nativePath[ofs])
-	{
-		if (nativePath[ofs] == '/')
-		{
-			::string::ncpy(buff, nativePath, ofs+1);
-			buff[ofs] = 0;
-			if ((buff[0] && buff[0] != L'/') || ofs > 1) // not root
-			{
-				if (mkdir(buff, 0777) == -1)
-				{
-					if (errno != EEXIST)
-					{
-						return false;
-					}
-				}
-			}
-		}
-		++ofs;
-	}
-
-	bool b = true;
-
-	if (nativePath[0] != L'/' || nativePath[1] != 0 > 1)
-	{
-		b = mkdir(nativePath, 0777) == 0;
-		if (!b)
-		{
-			b = errno == EEXIST;
-		}
-	}
-	return b;
-}
-
-#undef CreateDirectory
-RADRT_API bool RADRT_CALL CreateDirectory(const char *path, int flags)
-{
-	RAD_ASSERT(path);
-
-	if (flags & NativePath)
-	{
-		return PrivateCreateDirectory(path);
-	}
-	else
-	{
-		char buff[MaxFilePathLen+1];
-		if (ExpandToNativePath(path, buff, MaxFilePathLen+1))
-		{
-			return PrivateCreateDirectory(buff);
-		}
-		else
-		{
-			return false;
-		}
-	}
-}
-
-static bool DeleteDirectory_r(const char *nativePath)
-{
-	RAD_ASSERT(nativePath);
-
-	Search s;
-
-	size_t l = ::string::len(nativePath);
-
-	if (s.Open(nativePath, ".*", SearchFlags(NativePath|FileNames|DirNames)))
-	{
-		char file[MaxFilePathLen+1], path[MaxFilePathLen+1];
-		FileAttributes fa;
-		while (s.NextFile(file, MaxFilePathLen+1, &fa, 0))
-		{
-			::string::cpy(path, nativePath);
-			if (nativePath[l] != L'/') 
-				::string::cat(path, "/");
-			::string::cat(path, file);
-
-			if (fa & Directory)
-			{
-				// recurse!
-				if (!DeleteDirectory_r(path)) 
-					return false;
-			}
-			else
-			{
-				if (::unlink(path) != 0) 
-					return false;
-			}
-		}
-
-		s.Close();
-	}
-
-	return ::rmdir(nativePath) == 0;
-}
-
-RADRT_API bool RADRT_CALL DeleteDirectory(const char *path, int flags)
-{
-	RAD_ASSERT(path);
-
-	if (flags & NativePath)
-	{
-		return DeleteDirectory_r(path);
-	}
-	else
-	{
-		char buff[MaxFilePathLen+1];
-		if (ExpandToNativePath(path, buff, MaxFilePathLen+1))
-		{
-			return DeleteDirectory_r(buff);
-		}
-		else
-		{
-			return false;
-		}
-	}
-}
-
-
-RADRT_API bool RADRT_CALL FileTime(const char *path, xtime::TimeDate* td, int flags)
-{
-	RAD_ASSERT(path && td);
 
 	struct stat s;
-
-	if (flags & NativePath)
-	{
-		if (::stat(path, &s) != 0)
-		{
-			return false;
-		}
-	}
-	else
-	{
-		#if defined(RAD_OPT_DEBUG)
-			details::AssertFilePath(path, true);
-		#endif
-
-		char buff[MaxFilePathLen+1];
-		if (ExpandToNativePath(path, buff, MaxFilePathLen+1))
-		{
-			if (::stat(buff, &s) != 0)
-			{
-				return false;
-			}
-		}
-	}
-
-
+	
+	if (::stat(nativePath.c_str, &s) != 0)
+		return false;
+	
 	struct tm t;
 	localtime_r(&s.st_mtime, &t);
 
@@ -1177,57 +126,381 @@ RADRT_API bool RADRT_CALL FileTime(const char *path, xtime::TimeDate* td, int fl
 	return true;
 }
 
-RADRT_API bool RADRT_CALL FileExists(const char *path, int flags)
-{
+bool PosixFileSystem::DeleteFile(
+	const char *path,
+	FileOptions options
+) {
 	RAD_ASSERT(path);
+	String nativePath;
 
-	struct stat s;
-
-	if (flags & NativePath)
-	{
-		return ::stat(path, &s) == 0;
-	}
-	else
-	{
-		RAD_DEBUG_ONLY(details::AssertFilePath(path, true));
-
-		char buff[MaxFilePathLen+1];
-		if (ExpandToNativePath(path, buff, MaxFilePathLen+1))
-		{
-			return ::stat(buff, &s) == 0;
-		}
-        else
-		{
+	if (options & kFileOption_NativePath) {
+		nativePath = CStr(path);
+	} else {
+		if (!GetNativePath(path, nativePath))
 			return false;
+	}
+
+	return unlink(nativePath.c_str) == 0;
+}
+
+bool PosixFileSystem::CreateDirectory(
+	const char *path,
+	FileOptions options
+) {
+	RAD_ASSERT(path);
+	String nativePath;
+
+	if (options & kFileOption_NativePath) {
+		nativePath = CStr(path);
+	} else {
+		if (!GetNativePath(path, nativePath))
+			return false;
+	}
+
+	// create intermediate directory structure.
+
+	path = nativePath.c_str;
+	for (int i = 0; path[i]; ++i) {
+		if ((path[i] == '/') && (i > 2)) {
+			char dir[256];
+			string::ncpy(dir, path, i+1);
+			if (mkdir(dir, 0777) == -1) {
+				if (errno != EEXIST)
+					return false;
+			}
+		}
+	}
+
+	if (nativePath[0] != '/' || (nativePath.length > 2)) {
+		if (mkdir(nativePath.c_str, 0777) == -1) {
+			if (errno != EEXIST)
+				return false;
+		}
+	}
+
+	return true;
+}
+
+bool PosixFileSystem::DeleteDirectory_r(const char *nativePath) {
+
+	RAD_ASSERT(nativePath);
+
+	String basePath(CStr(nativePath));
+	if (basePath.empty)
+		return false;
+
+	FileSearch::Ref s = OpenSearch(
+		(basePath + "/*.*").c_str, 
+		kSearchOption_Recursive,
+		kFileOption_NativePath, 
+		0
+	);
+	
+	if (s) {
+		if (*(basePath.end.get()-1) != '/')
+			basePath += '/';
+
+		String name;
+		FileAttributes fa;
+
+		while (s->NextFile(name, &fa, 0)) {
+			String path = basePath + name;
+
+			if (fa & kFileAttribute_Directory) {
+				if (!DeleteDirectory_r(path.c_str))
+					return false;
+			} else {
+				if (unlink(path.c_str) != 0)
+					return false;
+			}
+		}
+
+		s.reset();
+	}
+
+	return unlink(nativePath) == 0;
+}
+
+bool PosixFileSystem::DeleteDirectory(
+	const char *path,
+	FileOptions options
+) {
+	RAD_ASSERT(path);
+	String nativePath;
+
+	if (options & kFileOption_NativePath) {
+		nativePath = CStr(path);
+	} else {
+		if (!GetNativePath(path, nativePath))
+			return false;
+	}
+
+	return DeleteDirectory_r(nativePath.c_str);
+}
+
+bool PosixFileSystem::NativeFileExists(const char *path) {
+	RAD_ASSERT(path);
+	struct stat s;
+	return ::stat(path, &s) == 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+PosixMMFile::PosixMMFile(int fd, AddrSize pageSize) : m_fd(fd), m_pageSize(pageSize) {
+}
+
+PosixMMFile::~PosixMMFile() {
+	if (m_fd != -1)
+		close(fd);
+}
+
+MMapping::Ref PosixMMFile::MMap(AddrSize ofs, AddrSize size, ::Zone &zone) {
+	if (size == 0 || (size > this->size.get()))
+		size = this->size.get();
+	RAD_ASSERT(size > 0);
+	RAD_ASSERT(ofs+size <= this->size.get());
+
+	AddrSize base = ofs & ~(m_pageSize-1);
+	AddrSize padd = ofs - base;
+	AddrSize backingSize = (size+padd) - base;
+
+	if (m_mm) {
+		// we mapped the whole file just return the Posixdow
+		const void *data = reinterpret_cast<const U8*>(m_mm->data.get()) + ofs;
+		return MMapping::Ref(new (ZFile) PosixMMapping(shared_from_this(), 0, data, size, ofs, backingSize, zone));
+	}
+	
+	const void pbase = mmap(
+		0,
+		(size_t)(size + padd),
+		PROT_READ,
+		MAP_PRIVATE,
+		m_fd,
+		(off_t)base
+	);
+	
+	if (!pbase)
+		return MMapping::Ref();
+
+	const void *data = reinterpret_cast<const U8*>(pbase) + padd;
+	return MMapping::Ref(new (ZFile) PosixMMapping(
+		shared_from_this(),
+		pbase,
+		data,
+		size,
+		ofs,
+		size + padd,
+		backingSize,
+		zone
+	));
+}
+
+AddrSize PosixMMFile::RAD_IMPLEMENT_GET(size) {
+	return (AddrSize)GetFileSize(m_f, 0);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+PosixMMapping::PosixMMapping(
+	const MMFile::Ref &file,
+	const void *base,
+	const void *data,
+	AddrSize size,
+	AddrSize offset,
+	AddrSize mappedSize,
+	AddrSize backingSize,
+	::Zone &zone
+) : MMapping(data, size, offset, backingSize, zone), m_file(file), m_base(base), m_mappedSize(mappedSize) {
+}
+
+PosixMMapping::~PosixMMapping() {
+	if (m_base)
+		munmap(m_base, m_mappedSize);
+}
+
+void PosixMMapping::Prefetch(AddrSize offset, AddrSize size) {
+	RAD_NOT_USED(offset);
+	RAD_NOT_USED(size);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+FileSearch::Ref PosixFileSearch::New(
+	const String &path,
+	const String &prefix,
+	SearchOptions options
+) {
+	String dir, pattern;
+
+	// split the pattern out of the directory
+	const char *sz = path.c_str;
+	for (int i = path.length - 1; i >= 0; --i) {
+		if (sz[i] == '/') {
+			dir = String(sz, i, string::CopyTag);
+			pattern = path.SubStr(i+1); // no leading /
+			break;
+		}
+	}
+
+	if (dir.empty || pattern.empty)
+		return FileSearch::Ref();
+
+	PosixFileSearch *s = new (ZFile) PosixFileSearch(dir, prefix, pattern, options);
+
+	s->m_sdir = opendir(path.c_str);
+	if (!s->m_sdir) {
+		delete s;
+		return FileSearch::Ref();
+	}
+	
+	s->m_cur = new (ZFile) dirent;
+	s->m_cur->d_name[0] = 0;
+	
+	// must see if a file exists that matches our pattern (prime the search).
+	for (;;) {
+		struct dirent *next;
+		if ((readdir_r((DIR*)s->m_sdir, s->m_cur, &next) != 0) || (next == 0)) {
+			::closedir(s->m_sdir);
+			s->m_sdir = 0;
+			break;
+		}
+		if (next->d_type == DT_REG) {
+			if (fnmatch(pattern.c_str, &next->d_name[0], 0) != FNM_NOMATCH)
+				break;
+		}
+	}
+	
+	if (!s->m_sdir) {
+		if (s->NextState() == kState_Done) {
+			delete s;
+			return FileSearch::Ref();
+		}
+	}
+
+	return FileSearch::Ref(s);
+}
+
+PosixFileSearch::PosixFileSearch(
+	const String &path,
+	const String &prefix,
+	const String &pattern,
+	SearchOptions options
+) : m_path(path), 
+    m_prefix(prefix), 
+	m_pattern(pattern), 
+	m_options(options), 
+	m_state(kState_Files), 
+	m_sdir(0),
+	m_cur(0)
+{
+}
+
+PosixFileSearch::~PosixFileSearch() {
+	if (m_sdir)
+		::closedir(m_sdir);
+	if (m_cur)
+		delete m_cur;
+}
+
+bool PosixFileSearch::NextFile(
+	String &path,
+	FileAttributes *fileAttributes,
+	xtime::TimeDate *fileTime
+) {
+	if (m_subDir) {
+		if (m_subDir->NextFile(path, fileAttributes, fileTime))
+			return true;
+		m_subDir.reset();
+	}
+
+	for (;;) {
+		if (m_cur->d_name[0] == 0) {
+			for (;;) {
+				struct dirent *next;
+				if ((readdir_r((DIR*)m_sdir, m_cur, &next) != 0) || (next == 0)) {
+					if (NextState() == kState_Done)
+						return false;
+					RAD_ASSERT(m_cur.d_name[0] != 0); // nextState() *must* fill this in.
+					break;
+				}
+				if (next->d_type == DT_REG) {
+					if (fnmatch(m_pattern.c_str, &next->d_name[0], 0) != FNM_NOMATCH)
+						break;
+				} else {
+					break;
+				}
+			}
+		}
+
+		char kszFileName[256];
+		string::cpy(kszFileName, &m_cur->d_name[0]);
+		const String kFileName(CStr(kszFileName));
+		m_cur->d_name[0] = 0;
+
+		if (kFileName == "." || kFileName == "..")
+			continue;
+
+		if (m_cur->d_type == DT_DIR) {
+			if (m_state == kState_Dirs) {
+				path = m_path + "/" + kFileName;
+				m_subDir = New(path "/" + m_pattern, m_prefix + kFileName + "/", m_options);
+				if (m_subDir && m_subDir->NextFile(path, fileAttributes, fileTime))
+					return true;
+				m_subDir.reset();
+			}
+		} else if((m_cur->d_type == DT_REG) && (m_state == kState_Files)) {
+
+			if (m_prefix.empty) {
+				path = String(kFileName, string::CopyTag); // move off of stack.
+			} else {
+				path = m_prefix + kFileName;
+			}
+
+			if (fileAttributes)
+				*fileAttributes = kFileAttribute_Normal;
+
+			if (fileTime) {
+				struct stat s;
+				
+				if (::stat(m_cur->d_name, &s) == 0) {
+					struct tm t;
+					localtime_r(&s.st_mtime, &t);
+
+					fileTime->dayOfMonth = (U8)t.tm_mday;
+					fileTime->month      = (U8)t.tm_mon;
+					fileTime->year       = (U16)t.tm_year;
+					fileTime->hour       = (U8)t.tm_hour;
+					fileTime->minute     = (U8)t.tm_min;
+					fileTime->second     = (U8)t.tm_sec;
+					fileTime->dayOfWeek  = (U8)t.tm_wday;
+					fileTime->millis     = 0;
+				}
+			}
+
+			return true;
 		}
 	}
 }
 
-namespace details {
+PosixFileSearch::State PosixFileSearch::NextState() {
+	if (m_state == kState_Files) {
+		++m_state;
+		// move onto directories? (recursive)
+		if (!(m_options & kSearchOption_Recursive))
+			++m_state; // skip directory state.
 
-void InitializeAliasTable();
-
-void Initialize()
-{
-	InitializeAliasTable();
-	SetDefaultAliases();
+		if (m_state == kState_Dirs) {
+			if (m_sdir)
+				closedir(m_sdir);
+			String path(m_path);
+			m_sdir = opendir(m_path.c_str);
+			if (m_sdir == 0)
+				++m_state;
+		}
+	} else if (m_state == kState_Dirs) {
+		++m_state;
+	}
+	return (State)m_state;
 }
 
-void Finalize()
-{
-}
-
-void ThreadInitialize()
-{
-}
-
-void ThreadFinalize()
-{
-}
-
-void ProcessTasks()
-{
-}
-
-} // details
 } // file
