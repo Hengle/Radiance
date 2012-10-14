@@ -58,7 +58,7 @@ public:
 	explicit Plane(const Vector3<T> &normal, T d);
 	explicit Plane(const Vector3<T> &normal, const Vector3<T> &p);
 	explicit Plane(const Vector3<T> &normal, const Vector3<T> &p, UnitHint u);
-	// expects a clock-wise wound triangle.
+	// expects a counter-clock-wise wound triangle.
 	explicit Plane(const Vector3<T> &p1, const Vector3<T> &p2, const Vector3<T> &p3);
 	
 	// Destructor

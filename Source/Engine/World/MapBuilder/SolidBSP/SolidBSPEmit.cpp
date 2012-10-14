@@ -53,6 +53,8 @@ void BSPBuilder::EmitBSPFile() {
 	Log("\t%8d Leafs\n", m_bspFile->numLeafs.get());
 	Log("\t%8d Areas\n", m_bspFile->numAreas.get());
 	Log("\t%8d Planes\n", m_bspFile->numPlanes.get());
+	Log("\t%8d Areaportals\n", m_bspFile->numAreaportals.get());
+	Log("\t%8d AreaportalIndices\n", m_bspFile->numAreaportalIndices.get());
 	Log("\t%8d Models\n", m_bspFile->numModels.get());
 	Log("\t%8d ClipSurfaces\n", m_bspFile->numClipSurfaces.get());
 	Log("\t%8d Verts\n", m_bspFile->numVerts.get());

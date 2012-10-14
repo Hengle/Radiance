@@ -297,7 +297,7 @@ bool BSPBuilder::AreaFlood(Node *leaf, Area *area) {
 					if (leaf->contentsOwner)
 						name = leaf->contentsOwner->name.c_str;
 					Log(
-						"WARNING: Portal '%s' touches > than 2 areas! (%d, %d, %d)\n", 
+						"WARNING: Portal '%s' touches > than 2 areas! (%d, %d, %d), map will not render correctly!\n", 
 						name, 
 						leaf->portalAreas[0], 
 						leaf->portalAreas[1],
@@ -338,7 +338,7 @@ bool BSPBuilder::CheckAreas(Node *node) {
 					const char *name = "<NULL MODEL>";
 					if (node->contentsOwner)
 						name = node->contentsOwner->name.c_str;
-					Log("WARNING: Portal '%s' does not seperate areas!\n", name);
+					Log("WARNING: Portal '%s' does not seperate areas (it will not constrain visibility)!\n", name);
 				}
 				return true;
 			}

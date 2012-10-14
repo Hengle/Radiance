@@ -91,7 +91,7 @@ private:
 	void Snap(::tools::solid_bsp::Plane &p) {
 		for (int i = 0; i < 3; ++i) {
 			ValueType d = math::Abs(p.Normal()[i] - ValueType(1));
-			if (d < ValueType(0.00001)) {
+			if (d < ValueType(0.00000001)) {
 				Vec3 normal(Vec3::Zero);
 				normal[i] = ValueType(1);
 				p.Initialize(normal, p.D());
@@ -99,7 +99,7 @@ private:
 			}
 
 			d = math::Abs(p.Normal()[i] + ValueType(1));
-			if (d < ValueType(0.00001)) {
+			if (d < ValueType(0.00000001)) {
 				Vec3 normal(Vec3::Zero);
 				normal[i] = ValueType(-1);
 				p.Initialize(normal, p.D());
@@ -108,7 +108,7 @@ private:
 		}
 
 		ValueType f = math::Floor(p.D()+ValueType(0.5));
-		if (math::Abs(p.D()-f) < ValueType(0.0001)) {
+		if (math::Abs(p.D()-f) < ValueType(0.0000001)) {
 			p.Initialize(p.Normal(), f);
 		}
 	}
@@ -129,10 +129,10 @@ private:
 
 	bool PlaneEqual(const ::tools::solid_bsp::Plane &a, const ::tools::solid_bsp::Plane &b)
 	{
-		if (math::Abs(a.Normal()[0] - b.Normal()[0]) < ValueType(0.000001)
-			&& math::Abs(a.Normal()[1] - b.Normal()[1]) < ValueType(0.000001)
-			&& math::Abs(a.Normal()[2] - b.Normal()[2]) < ValueType(0.000001)
-			&& math::Abs(a.D() - b.D()) < ValueType(0.01) 
+		if (math::Abs(a.Normal()[0] - b.Normal()[0]) < ValueType(0.00000001)
+			&& math::Abs(a.Normal()[1] - b.Normal()[1]) < ValueType(0.00000001)
+			&& math::Abs(a.Normal()[2] - b.Normal()[2]) < ValueType(0.00000001)
+			&& math::Abs(a.D() - b.D()) < ValueType(0.0000001) 
 		) {
 			return true;
 		}

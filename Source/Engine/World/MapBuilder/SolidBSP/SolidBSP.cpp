@@ -692,14 +692,14 @@ void BSPBuilder::CreateRootNode() {
 			poly->original = (SceneFile::TriFace*)&trif;
 			poly->contents = trim->contents;
 			poly->onNode = false;
-			poly->planenum = m_planes.FindPlaneNum(ToBSPType(trif.plane));
 			poly->winding.reset(new (world::bsp_file::ZBSPBuilder) Winding());
 			poly->winding->Initialize(
-				ToBSPType(trim->verts[trif.v[0]].pos),
-				ToBSPType(trim->verts[trif.v[1]].pos),
-				ToBSPType(trim->verts[trif.v[2]].pos),
-				m_planes.Plane(poly->planenum)
+				SnapVertex(ToBSPType(trim->verts[trif.v[0]].pos)),
+				SnapVertex(ToBSPType(trim->verts[trif.v[1]].pos)),
+				SnapVertex(ToBSPType(trim->verts[trif.v[2]].pos))
 			);
+			// find plane-num from snapped verts.
+			poly->planenum = m_planes.FindPlaneNum(poly->winding->Plane());
 			frag->polys.push_back(poly);
 		}
 
@@ -955,6 +955,14 @@ int BSPBuilder::SurfaceForString(const String &s) {
 	}
 
 	return flags;
+}
+
+Vec3 BSPBuilder::SnapVertex(const Vec3 &_v) {
+	Vec3 v(_v);
+	v[0] = math::Floor(v[0] + ValueType(0.5));
+	v[1] = math::Floor(v[1] + ValueType(0.5));
+	v[2] = math::Floor(v[2] + ValueType(0.5));
+	return v;
 }
 
 Vec2 BSPBuilder::ToBSPType(const SceneFile::Vec2 &vec) {

@@ -144,6 +144,9 @@ void BSPBuilder::PaintHandler::SetMaterialColor(int id) {
 BSPBuilder::AreaBSPDraw::AreaBSPDraw() : m_area(-1), m_leaf(0) {
 }
 
+BSPBuilder::AreaBSPDraw::~AreaBSPDraw() {
+}
+
 bool BSPBuilder::AreaBSPDraw::Paint(float time, float dt, const QRect &viewport, MapBuilderDebugUI &ui, BSPBuilder &bsp) {
 
 	FindCameraArea(ui, bsp);
@@ -216,6 +219,11 @@ void BSPBuilder::AreaBSPDraw::FindCameraArea(MapBuilderDebugUI &ui, BSPBuilder &
 ///////////////////////////////////////////////////////////////////////////////
 
 BSPBuilder::LeafFacesDraw::LeafFacesDraw() : m_leaf(0), m_isolate(false), m_lock(false), m_menu(0), m_isolateAction(0) {
+}
+
+BSPBuilder::LeafFacesDraw::~LeafFacesDraw() {
+	if (m_menu)
+		delete m_menu;
 }
 
 bool BSPBuilder::LeafFacesDraw::Paint(float time, float dt, const QRect &viewport, MapBuilderDebugUI &ui, BSPBuilder &bsp) {

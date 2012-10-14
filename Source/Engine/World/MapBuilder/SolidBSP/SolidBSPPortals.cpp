@@ -104,7 +104,7 @@ void BSPBuilder::MakeNodePortal(Node *node) {
 
 		Plane::SideType s = p->plane.winding.Side(
 			m_planes.Plane(bounding->plane.planenum),
-			kPortalSplitEpsilon
+			kBSPSplitEpsilon
 		);
 
 		if (s == Plane::On) {
@@ -113,17 +113,17 @@ void BSPBuilder::MakeNodePortal(Node *node) {
 		}
 		
 		if (s == Plane::Front && side) {
-//			Log("WARNING: portal clipped away (back)!\n");
-			continue;
+			Log("WARNING: portal clipped away (back)!\n");
+			return;
 		} else if (s == Plane::Back && !side) {
-//			Log("WARNING: portal clipped away (front)!\n");
-			continue;
+			Log("WARNING: portal clipped away (front)!\n");
+			return;
 		} else if (s == Plane::Cross) {
 			p->plane.winding.Split(
 				m_planes.Plane(bounding->plane.planenum),
 				&f,
 				&b,
-				kPortalSplitEpsilon
+				kBSPSplitEpsilon
 			);
 
 			if (f.Empty())
@@ -160,7 +160,7 @@ void BSPBuilder::SplitNodePortals(Node *node) {
 		RemovePortalFromNode(p, p->nodes[0]);
 		RemovePortalFromNode(p, p->nodes[1]);
 
-		p->plane.winding.Split(plane, &f, &b, kPortalSplitEpsilon);
+		p->plane.winding.Split(plane, &f, &b, kBSPSplitEpsilon);
 
 		if (++m_numPortalSplits % 1000 == 0)
 			EmitProgress();

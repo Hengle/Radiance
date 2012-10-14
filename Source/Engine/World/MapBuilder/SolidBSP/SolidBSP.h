@@ -87,7 +87,7 @@ private:
 	///////////////////////////////////////////////////////////////////////////////
 
 	enum ContentsFlags {
-		RAD_FLAG(kContentsFlag_Solid), 
+		RAD_FLAG(kContentsFlag_Solid),
 		RAD_FLAG(kContentsFlag_Areaportal),
 		RAD_FLAG(kContentsFlag_Detail), // never in the BSP.
 		RAD_FLAG(kContentsFlag_Clip),
@@ -373,6 +373,7 @@ private:
 	public:
 
 		AreaBSPDraw();
+		~AreaBSPDraw();
 
 		virtual bool Paint(float time, float dt, const QRect &viewport, MapBuilderDebugUI &ui, BSPBuilder &bsp);
 		virtual bool OnMenu(const QVariant &data, MapBuilderDebugUI &ui, BSPBuilder &bsp);
@@ -396,6 +397,7 @@ private:
 	public:
 
 		LeafFacesDraw();
+		~LeafFacesDraw();
 
 		virtual bool Paint(float time, float dt, const QRect &viewport, MapBuilderDebugUI &ui, BSPBuilder &bsp);
 		virtual bool OnMenu(const QVariant &data, MapBuilderDebugUI &ui, BSPBuilder &bsp);
@@ -535,6 +537,8 @@ private:
 	static Vec3 WindingCenter(const Winding &winding);
 	static int ContentsForString(const String &s);
 	static int SurfaceForString(const String &s);
+
+	static Vec3 SnapVertex(const Vec3 &v);
 
 	// Converts to BSP precision types.
 	static Vec2 ToBSPType(const SceneFile::Vec2 &vec);

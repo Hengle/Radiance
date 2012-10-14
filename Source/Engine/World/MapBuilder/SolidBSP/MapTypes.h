@@ -27,8 +27,7 @@ typedef SceneFileD::Vec3Vec Vec3Vec;
 typedef boost::shared_ptr<Winding> WindingRef;
 typedef std::vector<WindingRef> WindingVec;
 
-const ValueType kBSPSplitEpsilon = ValueType(1);
-const ValueType kPortalSplitEpsilon = ValueType(1);
+const ValueType kBSPSplitEpsilon = ValueType(0.000001);
 
 } // solid_bsp
 } // tools
