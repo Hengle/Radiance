@@ -229,6 +229,10 @@ void BSPBuilder::FindPortalNodeFaces(Node *node)
 			int planenum = p->plane.planenum ^ (side^1);
 
 			for (TriModelFragVec::iterator it = node->models.begin(); it != node->models.end(); ++it) {
+
+				if (!(node->contents & (*it)->original->contents))
+					continue;
+
 				for (PolyVec::iterator poly = (*it)->polys.begin(); poly != (*it)->polys.end(); ++poly) {
 					
 					if ((*poly)->planenum == planenum) {

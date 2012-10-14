@@ -84,8 +84,14 @@ void BSPBuilder::EmitBSPMaterials() {
 		if (trim->ignore)
 			continue;
 
+		if (!(trim->contents & kContentsFlag_EmitContents))
+			continue;
+
 		for (SceneFile::TriFaceVec::const_iterator f = trim->tris.begin(); f != trim->tris.end(); ++f) {
 			const SceneFile::TriFace &trif = *f;
+
+			if (!(trif.contents & kContentsFlag_EmitContents))
+				continue;
 
 			const SceneFile::Material &mat = m_map->mats[(*f).mat];
 			mats.insert(mat.name);
@@ -172,6 +178,23 @@ bool BSPBuilder::EmitBSPAreas() {
 		}
 	}
 
+	for (SceneFile::TriModel::Vec::const_iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
+		const SceneFile::TriModel::Ref &trim = *m;
+
+		// check portal seperation
+
+		if (!(trim->contents & kContentsFlag_Areaportal))
+			continue;
+
+		if (trim->areas.empty())
+			continue;
+
+		if (trim->portalAreas[0] == -1 ||
+			trim->portalAreas[1] == -1) {
+			Log("WARNING: Areaportal '%s' does not seperate areas!\n", trim->name.c_str.get());
+		}
+	}
+
 	return true;
 }
 
@@ -184,6 +207,9 @@ void BSPBuilder::EmitBSPModels() {
 			continue;
 
 		if (trim->areas.empty())
+			continue;
+
+		if (!(trim->contents & kContentsFlag_EmitContents))
 			continue;
 
 		EmitBSPModel(trim);
@@ -259,6 +285,35 @@ void BSPBuilder::EmitBSPAreaportals(Node *leaf, int areaNum, BSPArea &area) {
 
 		RAD_ASSERT(!p->plane.winding.Vertices().empty());
 
+		if (p->original.empty()) {
+			//Log("WARNING: portal fragment with no original!");
+			continue;
+		}
+
+		SceneFile::TriFace *original = 0;
+		for (TriFacePtrVec::const_iterator it = p->original.begin(); it != p->original.end(); ++it) {
+			if ((*it)->contents & kContentsFlag_Areaportal) {
+				original = *it;
+				break;
+			}
+		}
+
+		if (!original) {
+			Log("WARNING: portal fragment bounds area but is not an area portal!\n");
+			continue;
+		}
+
+		if (original->model->portalAreas[0] == -1) {
+			original->model->portalAreas[0] = areaNum;
+		} else if (original->model->portalAreas[0] != areaNum) {
+			if (original->model->portalAreas[1] == -1) {
+				original->model->portalAreas[1] = areaNum;
+			} else if (original->model->portalAreas[1] != areaNum) {
+				Log("WARNING: Areaportal '%s' touches more than 2 areas (%d, %d, %d), map will not render correctly.\n", original->model->name.c_str.get(),areaNum, other->area->area, p->areas[side]);
+				continue;
+			}
+		}
+
 		// NOTE: areaportals are somewhat a casualty of war here.
 		// Our original map skin is made of triangle mesh, not quads or other ngons.
 		// This means that referecing the original model triangles that contributed 
@@ -275,6 +330,7 @@ void BSPBuilder::EmitBSPAreaportals(Node *leaf, int areaNum, BSPArea &area) {
 
 		if (p->emitId == -1) {
 			p->emitId = (int)m_bspFile->numAreaportals.get();
+			original->model->portalIds.push_back(p->emitId);
 
 			BSPAreaportal *areaportal = m_bspFile->AddAreaportal();
 			areaportal->firstVert = m_bspFile->numVerts;
@@ -297,7 +353,8 @@ void BSPBuilder::EmitBSPAreaportals(Node *leaf, int areaNum, BSPArea &area) {
 		}
 
 		if (p->areas[side] != -1) {
-			Log("WARNING: Areaportal touches more than 2 areas (%d, %d, %d), map will not render correctly.\n", areaNum, other->area->area, p->areas[side]);
+			// This should never-ever happen.
+			Log("WARNING: Areaportal fragment touches more than 2 areas (%d, %d, %d), map will not render correctly.\n", areaNum, other->area->area, p->areas[side]);
 		} else {
 			p->areas[side] = areaNum;
 			if (area.firstPortal == std::numeric_limits<U32>::max()) {
