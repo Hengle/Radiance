@@ -98,7 +98,7 @@ class GCC4(Backend):
 			p.append('-O0') # no optimizations
 
 		if self.build.osx():
-			p.append(['-arch', 'i386', '-mmacosx-version-min=10.4'])
+			p.append(['-arch', 'i386', '-mmacosx-version-min=10.7'])
 		if self.build.ios():
 			p.append(['-isysroot', self.ios_sdk])
 		if self.build.switches.ios_iphone_simulator():
@@ -138,7 +138,7 @@ class GCC4(Backend):
 			p.append('-shared-libgcc')
 
 		if self.build.osx():
-			p.append(['-arch', 'i386', '-mmacosx-version-min=10.4', '-headerpad_max_install_names'])
+			p.append(['-arch', 'i386', '-mmacosx-version-min=10.7', '-headerpad_max_install_names'])
 		if self.build.ios():
 			p.append(['-isysroot', self.ios_sdk])
 		if self.build.switches.ios_simulator():
