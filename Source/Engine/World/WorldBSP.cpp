@@ -11,7 +11,7 @@ namespace world {
 
 void World::SetAreaportalState(int areaportalNum, bool open, bool relinkOccupants) {
 	RAD_ASSERT(areaportalNum < (int)m_bsp->numAreaportals.get());
-	Areaportal &areaportal = m_areaportals[areaportalNum];
+	dAreaportal &areaportal = m_areaportals[areaportalNum];
 	areaportal.open = open;
 
 	if (!relinkOccupants)
@@ -206,7 +206,7 @@ bool World::ClipOccupantVolume(
 
 		U32 areaportalNum = *(m_bsp->AreaportalIndices() + area->firstPortal + i);
 		RAD_ASSERT(areaportalNum < m_areaportals.size());
-		const Areaportal &areaportal = m_areaportals[areaportalNum];
+		const dAreaportal &areaportal = m_areaportals[areaportalNum];
 
 		if (!areaportal.open)
 			continue;

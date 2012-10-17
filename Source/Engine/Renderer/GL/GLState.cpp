@@ -142,32 +142,6 @@ void GLState::CommitSB(S &s, bool f)
 		else// if (ss&DWM_Enable) (implied by ss&DWM_Flags)
 		{
 			glDepthMask(GL_TRUE);
-
-			//if (!(ss&DT_Flags))
-			//{ // always set depth test if re-enabling depth writes.
-			//	int df = 0;
-			//	switch (s.s.s&DT_Flags)
-			//	{
-			//	case DT_Always: df = GL_ALWAYS; break;
-			//	case DT_Less: df = GL_LESS; break;
-			//	case DT_Greater : df = GL_GREATER; break;
-			//	case DT_LEqual : df = GL_LEQUAL; break;
-			//	case DT_GEqual : df = GL_GEQUAL; break;
-			//	case DT_Equal : df = GL_EQUAL; break;
-			//	case DT_Never : df = GL_NEVER; break;
-			//	}
-
-			//	if (df)
-			//	{
-			//		glDepthFunc(df);
-			//		CHECK_GL_ERRORS_EXTRA();
-			//	}
-			//	else
-			//	{
-			//		glDisable(GL_DEPTH_TEST);
-			//		CHECK_GL_ERRORS_EXTRA();
-			//	}
-			//}
 		}
 
 		CHECK_GL_ERRORS_EXTRA();

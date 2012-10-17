@@ -154,16 +154,6 @@ private:
 	typedef zone_list<Event::Ref, ZWorldT>::type EventList;
 	typedef zone_map<int, ZoneTagRef, ZWorldT>::type ZoneIdMap;
 
-	struct Areaportal {
-		typedef zone_vector<Areaportal, ZWorldT>::type Vec;
-
-		bool open;
-		int areas[2];
-		int planenum;
-		Winding winding;
-		BBox bounds;
-	};
-
 	World(Game &game, int slot, const SoundContextRef &sound, pkg::Zone zone);
 
 	enum {
@@ -446,7 +436,7 @@ private:
 	dBSPNode::Vec m_nodes;
 	dBSPLeaf::Vec m_leafs;
 	dBSPArea::Vec m_areas;
-	Areaportal::Vec m_areaportals;
+	dAreaportal::Vec m_areaportals;
 	PlaneVec m_planes;
 	U32 m_spawnOfs;
 	int m_frame;

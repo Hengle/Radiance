@@ -223,24 +223,32 @@ void BSPBuilder::FindPortalNodeFaces(Node *node)
 		if (!p->original.empty()) 
 			continue;
 
-		int contents = p->nodes[0]->contents ^ p->nodes[1]->contents;
-		if (contents&kContentsFlag_VisibleContents) {
-			// matching always faces away from the leaf
-			int planenum = p->plane.planenum ^ (side^1);
+		int contents = (p->nodes[0]->contents ^ p->nodes[1]->contents) & kContentsFlag_VisibleContents;
+		for (int i = kContentsFlag_FirstVisibleContents; i <= kContentsFlag_LastVisibleContents; i <<= 1) {
+			if (i & contents) {
+				contents = i;
+				break;
+			}
+		}
 
-			for (TriModelFragVec::iterator it = node->models.begin(); it != node->models.end(); ++it) {
+		if (!contents)
+			continue;
 
-				if (!(node->contents & (*it)->original->contents))
-					continue;
+		// matching always faces away from the leaf
+		int planenum = p->plane.planenum ^ (side^1);
 
-				for (PolyVec::iterator poly = (*it)->polys.begin(); poly != (*it)->polys.end(); ++poly) {
+		for (TriModelFragVec::iterator it = node->models.begin(); it != node->models.end(); ++it) {
+
+			if (!(contents & (*it)->original->contents))
+				continue;
+
+			for (PolyVec::iterator poly = (*it)->polys.begin(); poly != (*it)->polys.end(); ++poly) {
 					
-					if ((*poly)->planenum == planenum) {
-						p->contents |= contents;
-						p->original.push_back((*poly)->original);
-						p->poly = (*poly).get();
-						++m_numPortalFaces;
-					}
+				if ((*poly)->planenum == planenum) {
+					p->contents |= contents;
+					p->original.push_back((*poly)->original);
+					p->poly = (*poly).get();
+					++m_numPortalFaces;
 				}
 			}
 		}

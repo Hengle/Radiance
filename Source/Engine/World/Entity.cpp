@@ -405,7 +405,7 @@ void Entity::PrivateLevelStart()
 {
 	LevelStart();
 
-	if (PushEntityCall("LevelStart")) {
+	if (PushEntityCall("OnLevelStart")) {
 		world->lua->Call("Entity::PrivateLevelStart()", 1, 0, 0);
 	}
 }

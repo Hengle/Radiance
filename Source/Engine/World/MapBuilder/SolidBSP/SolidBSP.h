@@ -93,8 +93,8 @@ private:
 		RAD_FLAG(kContentsFlag_Clip),
 		RAD_FLAG(kContentsFlag_Fog),
 		RAD_FLAG(kContentsFlag_Water),
-		kContentsFlag_VisibleContents = kContentsFlag_Solid|kContentsFlag_Detail|kContentsFlag_Clip|kContentsFlag_Fog|kContentsFlag_Water|kContentsFlag_Areaportal,
-		kContentsFlag_FirstVisibleContents = kContentsFlag_Solid,
+		kContentsFlag_VisibleContents = kContentsFlag_Areaportal|kContentsFlag_Solid|kContentsFlag_Detail|kContentsFlag_Clip|kContentsFlag_Fog|kContentsFlag_Water,
+		kContentsFlag_FirstVisibleContents = kContentsFlag_Areaportal,
 		kContentsFlag_LastVisibleContents = kContentsFlag_Water,
 		kContentsFlag_Structural = kContentsFlag_Solid|kContentsFlag_Areaportal, // just used for classification
 		kContentsFlag_SolidContents = kContentsFlag_Solid, // blocks portal flood
@@ -358,7 +358,13 @@ private:
 
 		void EnableSmoothShading();
 		void DisableSmoothShading();
-		void BeginPaint(const QRect &viewport, MapBuilderDebugUI &ui, bool backfaces = false);
+		void BeginPaint(
+			const QRect &viewport, 
+			MapBuilderDebugUI &ui, 
+			int state = 0,
+			int blend = 0,
+			bool backfaces = false
+		);
 		void EndPaint();
 		void BeginWireframe(bool backfaces = false);
 		void EndWireframe();
@@ -384,6 +390,8 @@ private:
 
 		void FindCameraArea(MapBuilderDebugUI &ui, BSPBuilder &bsp);
 		void DrawModel(BSPBuilder &bsp, U32 model);
+		void DrawAreaportals(BSPBuilder &bsp, int area);
+		void DrawAreaportal(BSPBuilder &bsp, int portal);
 
 		int m_area;
 		Node *m_leaf;

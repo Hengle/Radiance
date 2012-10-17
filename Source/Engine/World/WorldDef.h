@@ -44,9 +44,9 @@ typedef std::bitset<kMaxEnts> EntityBits;
 typedef std::bitset<kMaxAreas> AreaBits;
 typedef math::Winding<Vec3, Plane, zone_allocator<Vec3, ZWorldT> > Winding;
 typedef zone_vector<Winding, ZWorldT>::type WindingVec;
-typedef math::Winding<Vec3, Plane, math::stack_tag<8> > StackWinding;
+typedef math::Winding<Vec3, Plane, math::stack_tag<24> > StackWinding;
 typedef zone_vector<StackWinding, ZWorldT>::type StackWindingVec;
-typedef stackify<StackWindingVec, 8> StackWindingStackVec;
+typedef stackify<StackWindingVec, 12> StackWindingStackVec;
 
 struct ClippedAreaVolume {
 
@@ -93,6 +93,16 @@ struct dBSPArea {
 	int numModels;
 
 	EntityPtrSet occupants;
+};
+
+struct dAreaportal {
+	typedef zone_vector<dAreaportal, ZWorldT>::type Vec;
+
+	bool open;
+	int areas[2];
+	int planenum;
+	Winding winding;
+	BBox bounds;
 };
 
 class World;

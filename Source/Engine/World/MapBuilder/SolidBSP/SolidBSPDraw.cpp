@@ -80,7 +80,7 @@ void BSPBuilder::PaintHandler::DisableSmoothShading() {
 	glDisable(GL_LIGHT1);
 }
 
-void BSPBuilder::PaintHandler::BeginPaint(const QRect &viewport, MapBuilderDebugUI &ui, bool backfaces) {
+void BSPBuilder::PaintHandler::BeginPaint(const QRect &viewport, MapBuilderDebugUI &ui, int state, int blend, bool backfaces) {
 	float vpw = viewport.width();
 	float vph = viewport.height();
 
@@ -103,7 +103,13 @@ void BSPBuilder::PaintHandler::BeginPaint(const QRect &viewport, MapBuilderDebug
 	gls.DisableVertexAttribArrays();
 
 	int cfm = backfaces ? CFM_Back : CFM_Front;
-	gls.Set(DT_Less|cfm|CFM_CCW|CWM_RGBA, BM_Off);
+
+	if (!state)
+		state = DT_Less|cfm|CFM_CCW|CWM_RGBA;
+	if (!blend)
+		blend = BM_Off;
+
+	gls.Set(state, blend);
 
 	gls.Commit();
 
@@ -158,6 +164,9 @@ bool BSPBuilder::AreaBSPDraw::Paint(float time, float dt, const QRect &viewport,
 		DrawModel(bsp, i);
 	}
 
+	if (m_area > -1)
+		DrawAreaportals(bsp, m_area);
+
 	EndPaint();
 
 	return true;
@@ -185,6 +194,33 @@ void BSPBuilder::AreaBSPDraw::DrawModel(BSPBuilder &bsp, U32 modelNum) {
 	glEnd();
 }
 
+void BSPBuilder::AreaBSPDraw::DrawAreaportals(BSPBuilder &bsp, int areaNum) {
+
+	gl.Color4f(0., 0.f, 1.f, 0.5f);
+	gls.Set(DT_Disable|CFM_None, BMS_SrcAlpha|BMD_InvSrcAlpha);
+	gls.DisableVertexAttribArrays();
+	gls.DisableTextures();
+	gls.Commit();
+
+	const world::bsp_file::BSPArea *area = bsp.m_bspFile->Areas() + areaNum;
+
+	for (U32 i = 0; i < area->numPortals; ++i) {
+		U16 portal = *(bsp.m_bspFile->AreaportalIndices() + area->firstPortal + i);
+		DrawAreaportal(bsp, (int)portal);
+	}
+}
+
+void BSPBuilder::AreaBSPDraw::DrawAreaportal(BSPBuilder &bsp, int portalNum) {
+	const world::bsp_file::BSPAreaportal *portal = bsp.m_bspFile->Areaportals() + portalNum;
+	const world::bsp_file::BSPVertex *vertices = bsp.m_bspFile->Vertices() + portal->firstVert;
+	glBegin(GL_POLYGON);
+	for(U32 i = 0; i < portal->numVerts; ++i) {
+		const world::bsp_file::BSPVertex *v = vertices + i;
+		glVertex3f(v->v[0], v->v[1], v->v[2]);
+	}
+	glEnd();
+}
+
 void BSPBuilder::AreaBSPDraw::FindCameraArea(MapBuilderDebugUI &ui, BSPBuilder &bsp) {
 	int area = -1;
 
@@ -194,7 +230,11 @@ void BSPBuilder::AreaBSPDraw::FindCameraArea(MapBuilderDebugUI &ui, BSPBuilder &
 	}
 
 	if (m_area != area) {
-		::COut(C_Debug) << "Camera Area: " << area << std::endl;
+		if (area > -1) {
+			::COut(C_Debug) << "Camera Area: " << area << ", " << (bsp.m_bspFile->Areas()[area].numPortals) << " portal(s)" << std::endl;
+		} else {
+			::COut(C_Debug) << "Camera Area: " << area << std::endl;
+		}
 		m_area = area;
 	}
 
@@ -251,7 +291,7 @@ bool BSPBuilder::LeafFacesDraw::Paint(float time, float dt, const QRect &viewpor
 	if (!m_lock)
 		FindCameraLeaf(ui, bsp);
 	
-	BeginPaint(viewport, ui, m_isolate);
+	BeginPaint(viewport, ui, 0, 0, m_isolate);
 
 	if (m_isolate && m_leaf) {
 		DrawNodes(m_leaf, false);
