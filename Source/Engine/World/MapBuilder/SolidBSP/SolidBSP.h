@@ -48,12 +48,12 @@ Vec3 RandomColor(int index = -1);
 	by triangles will work as a brush primitive (non-convexity is supported).
 
 	The primary goal here is to automatically divide the map into areas seperated
-	by portals for rendering. Each area is then further divided into sectors, which
-	are square MxMxM in dimension and contain triangle lists for any geometry contained.
+	by portals for rendering. Detail models are the inserted into the BSP and indexed
+	by area (no splitting of detail surfaces occurs).
 
 	The BSP iteself is used for collision, but not really for rendering. At rendering time
-	the BSP is used to locate the camera's area and the sector list is rendered with
-	frustum clipping.
+	the BSP is used to locate the camera's area and the model list is rendered with
+	frustum clipping. The model list is generated from visible areas.
  */
 class RADENG_CLASS BSPBuilder : protected thread::Thread {
 public:
