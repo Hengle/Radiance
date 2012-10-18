@@ -42,10 +42,11 @@ Vec3 RandomColor(int index = -1);
 
 ///////////////////////////////////////////////////////////////////////////////
 
-//! Builds a solid sectorized BSP.
+//! Builds a solid area-based BSP.
 /*! This is pretty similiar in function to Quake style BSP, a solid skin mesh
-	is created by the artist, although any arbitrary enclosed shape bounded
-	by triangles will work as a brush primitive (non-convexity is supported).
+	is created by the artist, although any arbitrary enclosed shape will work.
+	Typically this is just a big triangle skin (Quake brushes would work but 
+	aren't necessary).
 
 	The primary goal here is to automatically divide the map into areas seperated
 	by portals for rendering. Detail models are the inserted into the BSP and indexed
