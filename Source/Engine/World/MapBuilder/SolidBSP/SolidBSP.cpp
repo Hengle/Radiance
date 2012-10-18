@@ -764,9 +764,6 @@ int BSPBuilder::FindSplitPlane(Node *node) {
 	if (num != kPlaneNumLeaf) 
 		return num;*/
 
-	int front = 0;
-	int back  = 0;
-	int split = 0;
 	int bestNum = kPlaneNumLeaf;
 	int bestVal = std::numeric_limits<int>::max();
 
