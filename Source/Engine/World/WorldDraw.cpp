@@ -461,7 +461,7 @@ void WorldDraw::DrawView() {
 	m_counters.numTris += m_rb->numTris;
 
 #if defined(RAD_OPT_PC)
-	DebugDrawPortals(view);
+//	DebugDrawPortals(view);
 #endif
 
 	if (m_wireframe) {

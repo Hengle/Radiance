@@ -335,7 +335,7 @@ void BSPBuilder::EmitBSPAreaportals(Node *leaf, int areaNum, BSPArea &area) {
 			BSPAreaportal *areaportal = m_bspFile->AddAreaportal();
 			areaportal->firstVert = m_bspFile->numVerts;
 			areaportal->numVerts = 0;
-			areaportal->planenum = p->plane.planenum ^ side;
+			areaportal->planenum = p->plane.planenum;
 
 			for (Winding::VertexListType::const_iterator it = p->plane.winding.Vertices().begin(); it != p->plane.winding.Vertices().end(); ++it) {
 				BSPVertex *v = m_bspFile->AddVertex();

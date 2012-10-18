@@ -213,7 +213,7 @@ bool World::ClipOccupantVolume(
 
 		int side = areaportal.areas[1] == fromArea;
 		RAD_ASSERT(areaportal.areas[side] == fromArea);
-		int otherArea = areaportal.areas[!side];
+		int otherArea = areaportal.areas[side ^ 1];
 		int planenum = areaportal.planenum ^ side ^ 1; // put fromArea on back (we want to clip away volume in our area).
 		const Plane &portalPlane = m_planes[planenum];
 
