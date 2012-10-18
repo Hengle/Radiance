@@ -54,8 +54,7 @@ protected:
 		_Tidy();
 		_Init(0, 0, _Getstate(m_mode));
 #else // GCC
-		this->_M_string.clear();
-		this->_M_stringbuf_init(this->_M_mode);
+		this->str(StringType());
 #endif
 		return Flush(x);
 	}

@@ -34,7 +34,11 @@ Vec3 RandomColor(int index = -1);
 
 ///////////////////////////////////////////////////////////////////////////////
 
+#if defined(RAD_OPT_LLVM)
+#define SOLID_BSP_ICE() RAD_FAIL("SolidBSP Internal Compiler Error")
+#else
 #define SOLID_BSP_ICE() RAD_FAIL("SolidBSP Internal Compiler Error: file: "__FILE__" function: "__FUNCTION__" line: " RAD_STRINGIZE(__LINE__))
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -257,7 +261,6 @@ private:
 
 	typedef zone_vector<int, world::bsp_file::ZBSPBuilderT>::type AreaNumVec;
 	typedef zone_set<int, world::bsp_file::ZBSPBuilderT>::type AreaNumSet;
-	typedef zone_vector<SceneFile::TriFace*, world::bsp_file::ZBSPBuilderT>::type TriFacePtrVec;
 
 	///////////////////////////////////////////////////////////////////////////////
 

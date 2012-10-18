@@ -41,11 +41,10 @@ FileSystem::Ref FileSystem::New() {
 	}
 
 	cwd.Replace('\\', '/');
-	cwd.Lower();
 	
 	AddrSize pageSize = (AddrSize)sysconf(_SC_PAGE_SIZE);
 	
-	return FileSystem::Ref(new PosixFileSystem(cwd.c_str, 0, pageSize);
+	return FileSystem::Ref(new PosixFileSystem(cwd.c_str, 0, pageSize));
 }
 
 PosixFileSystem::PosixFileSystem(
@@ -114,14 +113,14 @@ bool PosixFileSystem::GetFileTime(
 	struct tm t;
 	localtime_r(&s.st_mtime, &t);
 
-	td->dayOfMonth = (U8)t.tm_mday;
-	td->month      = (U8)t.tm_mon;
-	td->year       = (U16)t.tm_year;
-	td->hour       = (U8)t.tm_hour;
-	td->minute     = (U8)t.tm_min;
-	td->second     = (U8)t.tm_sec;
-	td->dayOfWeek  = (U8)t.tm_wday;
-	td->millis     = 0;
+	td.dayOfMonth = (U8)t.tm_mday;
+	td.month      = (U8)t.tm_mon;
+	td.year       = (U16)t.tm_year;
+	td.hour       = (U8)t.tm_hour;
+	td.minute     = (U8)t.tm_min;
+	td.second     = (U8)t.tm_sec;
+	td.dayOfWeek  = (U8)t.tm_wday;
+	td.millis     = 0;
 
 	return true;
 }
@@ -251,7 +250,7 @@ PosixMMFile::PosixMMFile(int fd, AddrSize pageSize) : m_fd(fd), m_pageSize(pageS
 
 PosixMMFile::~PosixMMFile() {
 	if (m_fd != -1)
-		close(fd);
+		close(m_fd);
 }
 
 MMapping::Ref PosixMMFile::MMap(AddrSize ofs, AddrSize size, ::Zone &zone) {
@@ -267,10 +266,10 @@ MMapping::Ref PosixMMFile::MMap(AddrSize ofs, AddrSize size, ::Zone &zone) {
 	if (m_mm) {
 		// we mapped the whole file just return the Posixdow
 		const void *data = reinterpret_cast<const U8*>(m_mm->data.get()) + ofs;
-		return MMapping::Ref(new (ZFile) PosixMMapping(shared_from_this(), 0, data, size, ofs, backingSize, zone));
+		return MMapping::Ref(new (ZFile) PosixMMapping(shared_from_this(), 0, data, size, ofs, 0, backingSize, zone));
 	}
 	
-	const void pbase = mmap(
+	const void *pbase = mmap(
 		0,
 		(size_t)(size + padd),
 		PROT_READ,
@@ -296,7 +295,11 @@ MMapping::Ref PosixMMFile::MMap(AddrSize ofs, AddrSize size, ::Zone &zone) {
 }
 
 AddrSize PosixMMFile::RAD_IMPLEMENT_GET(size) {
-	return (AddrSize)GetFileSize(m_f, 0);
+	RAD_ASSERT(m_fd != -1);
+	struct stat s;
+	if (fstat(m_fd, &s) == 0)
+		return (AddrSize)s.st_size;
+	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -315,12 +318,10 @@ PosixMMapping::PosixMMapping(
 
 PosixMMapping::~PosixMMapping() {
 	if (m_base)
-		munmap(m_base, m_mappedSize);
+		munmap((void*)m_base, m_mappedSize);
 }
 
 void PosixMMapping::Prefetch(AddrSize offset, AddrSize size) {
-	RAD_NOT_USED(offset);
-	RAD_NOT_USED(size);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -347,7 +348,7 @@ FileSearch::Ref PosixFileSearch::New(
 
 	PosixFileSearch *s = new (ZFile) PosixFileSearch(dir, prefix, pattern, options);
 
-	s->m_sdir = opendir(path.c_str);
+	s->m_sdir = opendir(dir.c_str);
 	if (!s->m_sdir) {
 		delete s;
 		return FileSearch::Ref();
@@ -360,7 +361,7 @@ FileSearch::Ref PosixFileSearch::New(
 	for (;;) {
 		struct dirent *next;
 		if ((readdir_r((DIR*)s->m_sdir, s->m_cur, &next) != 0) || (next == 0)) {
-			::closedir(s->m_sdir);
+			::closedir((DIR*)s->m_sdir);
 			s->m_sdir = 0;
 			break;
 		}
@@ -390,14 +391,14 @@ PosixFileSearch::PosixFileSearch(
 	m_pattern(pattern), 
 	m_options(options), 
 	m_state(kState_Files), 
-	m_sdir(0),
+	m_sdir((DIR*)0),
 	m_cur(0)
 {
 }
 
 PosixFileSearch::~PosixFileSearch() {
 	if (m_sdir)
-		::closedir(m_sdir);
+		::closedir((DIR*)m_sdir);
 	if (m_cur)
 		delete m_cur;
 }
@@ -420,7 +421,7 @@ bool PosixFileSearch::NextFile(
 				if ((readdir_r((DIR*)m_sdir, m_cur, &next) != 0) || (next == 0)) {
 					if (NextState() == kState_Done)
 						return false;
-					RAD_ASSERT(m_cur.d_name[0] != 0); // nextState() *must* fill this in.
+					RAD_ASSERT(m_cur->d_name[0] != 0); // nextState() *must* fill this in.
 					break;
 				}
 				if (next->d_type == DT_REG) {
@@ -443,7 +444,7 @@ bool PosixFileSearch::NextFile(
 		if (m_cur->d_type == DT_DIR) {
 			if (m_state == kState_Dirs) {
 				path = m_path + "/" + kFileName;
-				m_subDir = New(path "/" + m_pattern, m_prefix + kFileName + "/", m_options);
+				m_subDir = New(path + "/" + m_pattern, m_prefix + kFileName + "/", m_options);
 				if (m_subDir && m_subDir->NextFile(path, fileAttributes, fileTime))
 					return true;
 				m_subDir.reset();
@@ -491,7 +492,7 @@ PosixFileSearch::State PosixFileSearch::NextState() {
 
 		if (m_state == kState_Dirs) {
 			if (m_sdir)
-				closedir(m_sdir);
+				closedir((DIR*)m_sdir);
 			String path(m_path);
 			m_sdir = opendir(m_path.c_str);
 			if (m_sdir == 0)

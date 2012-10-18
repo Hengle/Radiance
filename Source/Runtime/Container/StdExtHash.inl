@@ -53,9 +53,9 @@ struct hash<std::basic_string<A, B, C> >
 };
 
 template <>
-struct hash<string::String>
+struct hash< ::string::String >
 {
-	size_t operator () (const string::String &str) const
+	size_t operator () (const ::string::String &str) const
 	{
 		hash<const char*> x;
 		return x(str.c_str.get());

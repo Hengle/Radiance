@@ -112,8 +112,6 @@
 		330A98A215BC9F59002A81EC /* Property.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883AF15B9AB370089BA08 /* Property.h */; };
 		330A98A315BC9F59002A81EC /* RefCount.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B015B9AB370089BA08 /* RefCount.h */; };
 		330A98A415BC9F59002A81EC /* RefCountDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B215B9AB370089BA08 /* RefCountDef.h */; };
-		330A98A515BC9F59002A81EC /* SafePointer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B315B9AB370089BA08 /* SafePointer.h */; };
-		330A98A615BC9F59002A81EC /* SafePointerDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B515B9AB370089BA08 /* SafePointerDef.h */; };
 		330A98A715BC9F59002A81EC /* SharedLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E883B615B9AB370089BA08 /* SharedLibrary.cpp */; };
 		330A98A815BC9F59002A81EC /* SharedLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B715B9AB370089BA08 /* SharedLibrary.h */; };
 		330A98A915BC9F59002A81EC /* SharedLibraryDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B815B9AB370089BA08 /* SharedLibraryDef.h */; };
@@ -226,8 +224,6 @@
 		330A991415BC9FC1002A81EC /* ScreenOverlay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8890515B9BA4A0089BA08 /* ScreenOverlay.cpp */; };
 		330A991515BC9FC1002A81EC /* ScreenOverlay.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890615B9BA4A0089BA08 /* ScreenOverlay.h */; };
 		330A991615BC9FC1002A81EC /* ScreenOverlayDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890715B9BA4A0089BA08 /* ScreenOverlayDef.h */; };
-		330A991715BC9FC1002A81EC /* ViewModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8890815B9BA4A0089BA08 /* ViewModel.cpp */; };
-		330A991815BC9FC1002A81EC /* ViewModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890915B9BA4A0089BA08 /* ViewModel.h */; };
 		330A991915BC9FC1002A81EC /* World.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8890A15B9BA4A0089BA08 /* World.cpp */; };
 		330A991A15BC9FC1002A81EC /* World.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890B15B9BA4A0089BA08 /* World.h */; };
 		330A991B15BC9FC1002A81EC /* WorldCinematics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8890C15B9BA4A0089BA08 /* WorldCinematics.cpp */; };
@@ -239,8 +235,6 @@
 		330A992115BC9FC1002A81EC /* WorldLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8891215B9BA4A0089BA08 /* WorldLua.cpp */; };
 		330A992215BC9FC1002A81EC /* WorldLua.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891315B9BA4A0089BA08 /* WorldLua.h */; };
 		330A992315BC9FC1002A81EC /* WorldSpawn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8891415B9BA4A0089BA08 /* WorldSpawn.cpp */; };
-		330A992415BC9FC9002A81EC /* Tokenizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E888B615B9BA4A0089BA08 /* Tokenizer.cpp */; };
-		330A992515BC9FC9002A81EC /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888B715B9BA4A0089BA08 /* Tokenizer.h */; };
 		330A992615BC9FCD002A81EC /* UIMatWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E888AE15B9BA4A0089BA08 /* UIMatWidget.cpp */; };
 		330A992715BC9FCD002A81EC /* UIMatWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888AF15B9BA4A0089BA08 /* UIMatWidget.h */; };
 		330A992815BC9FCD002A81EC /* UITextLabel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E888B015B9BA4A0089BA08 /* UITextLabel.cpp */; };
@@ -333,15 +327,6 @@
 		330A998315BCA097002A81EC /* GSPriority.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887C615B9BA470089BA08 /* GSPriority.h */; };
 		330A998415BCA097002A81EC /* WaveAnim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887C715B9BA470089BA08 /* WaveAnim.cpp */; };
 		330A998515BCA097002A81EC /* WaveAnim.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887C815B9BA470089BA08 /* WaveAnim.h */; };
-		330A998615BCA0A0002A81EC /* DPak.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8879F15B9BA1F0089BA08 /* DPak.cpp */; };
-		330A998715BCA0A0002A81EC /* DPak.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A015B9BA1F0089BA08 /* DPak.h */; };
-		330A998815BCA0A0002A81EC /* FileSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887A115B9BA1F0089BA08 /* FileSystem.cpp */; };
-		330A998915BCA0A0002A81EC /* FileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A215B9BA1F0089BA08 /* FileSystem.h */; };
-		330A998A15BCA0A0002A81EC /* DPak.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A315B9BA1F0089BA08 /* DPak.h */; };
-		330A998B15BCA0A0002A81EC /* DPakDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A415B9BA1F0089BA08 /* DPakDef.h */; };
-		330A998C15BCA0A0002A81EC /* FileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A515B9BA1F0089BA08 /* FileSystem.h */; };
-		330A998D15BCA0A0002A81EC /* FileSystemDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A615B9BA1F0089BA08 /* FileSystemDef.h */; };
-		330A998E15BCA0A0002A81EC /* FileSystemReflectMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887A715B9BA1F0089BA08 /* FileSystemReflectMap.cpp */; };
 		330A998F15BCA0DD002A81EC /* Assets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E886E415B9B9ED0089BA08 /* Assets.cpp */; };
 		330A999015BCA0DD002A81EC /* Assets.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E886E515B9B9ED0089BA08 /* Assets.h */; };
 		330A999115BCA0DD002A81EC /* AssetTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E886E615B9B9ED0089BA08 /* AssetTypes.h */; };
@@ -465,13 +450,11 @@
 		337AE5A615BF214F00AD1617 /* MT_Spline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8890215B9BA4A0089BA08 /* MT_Spline.cpp */; };
 		337AE5A715BF214F00AD1617 /* PostProcess.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8890315B9BA4A0089BA08 /* PostProcess.cpp */; };
 		337AE5A815BF214F00AD1617 /* ScreenOverlay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8890515B9BA4A0089BA08 /* ScreenOverlay.cpp */; };
-		337AE5A915BF214F00AD1617 /* ViewModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8890815B9BA4A0089BA08 /* ViewModel.cpp */; };
 		337AE5AA15BF214F00AD1617 /* World.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8890A15B9BA4A0089BA08 /* World.cpp */; };
 		337AE5AB15BF214F00AD1617 /* WorldCinematics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8890C15B9BA4A0089BA08 /* WorldCinematics.cpp */; };
 		337AE5AC15BF214F00AD1617 /* WorldDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8890F15B9BA4A0089BA08 /* WorldDraw.cpp */; };
 		337AE5AD15BF214F00AD1617 /* WorldLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8891215B9BA4A0089BA08 /* WorldLua.cpp */; };
 		337AE5AE15BF214F00AD1617 /* WorldSpawn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8891415B9BA4A0089BA08 /* WorldSpawn.cpp */; };
-		337AE5AF15BF214F00AD1617 /* Tokenizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E888B615B9BA4A0089BA08 /* Tokenizer.cpp */; };
 		337AE5B015BF214F00AD1617 /* UIMatWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E888AE15B9BA4A0089BA08 /* UIMatWidget.cpp */; };
 		337AE5B115BF214F00AD1617 /* UITextLabel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E888B015B9BA4A0089BA08 /* UITextLabel.cpp */; };
 		337AE5B215BF214F00AD1617 /* UIWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E888B215B9BA4A0089BA08 /* UIWidget.cpp */; };
@@ -509,9 +492,6 @@
 		337AE5D315BF214F00AD1617 /* GSLoadMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887C215B9BA470089BA08 /* GSLoadMap.cpp */; };
 		337AE5D415BF214F00AD1617 /* GSPlay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887C415B9BA470089BA08 /* GSPlay.cpp */; };
 		337AE5D515BF214F00AD1617 /* WaveAnim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887C715B9BA470089BA08 /* WaveAnim.cpp */; };
-		337AE5D615BF214F00AD1617 /* DPak.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8879F15B9BA1F0089BA08 /* DPak.cpp */; };
-		337AE5D715BF214F00AD1617 /* FileSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887A115B9BA1F0089BA08 /* FileSystem.cpp */; };
-		337AE5D815BF214F00AD1617 /* FileSystemReflectMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887A715B9BA1F0089BA08 /* FileSystemReflectMap.cpp */; };
 		337AE5D915BF214F00AD1617 /* Assets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E886E415B9B9ED0089BA08 /* Assets.cpp */; };
 		337AE5DA15BF214F00AD1617 /* FontParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E886E915B9B9ED0089BA08 /* FontParser.cpp */; };
 		337AE5DB15BF214F00AD1617 /* MapAsset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E886EB15B9B9ED0089BA08 /* MapAsset.cpp */; };
@@ -753,8 +733,6 @@
 		337AE6CF15BF214F00AD1617 /* Property.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883AF15B9AB370089BA08 /* Property.h */; };
 		337AE6D015BF214F00AD1617 /* RefCount.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B015B9AB370089BA08 /* RefCount.h */; };
 		337AE6D115BF214F00AD1617 /* RefCountDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B215B9AB370089BA08 /* RefCountDef.h */; };
-		337AE6D215BF214F00AD1617 /* SafePointer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B315B9AB370089BA08 /* SafePointer.h */; };
-		337AE6D315BF214F00AD1617 /* SafePointerDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B515B9AB370089BA08 /* SafePointerDef.h */; };
 		337AE6D415BF214F00AD1617 /* SharedLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B715B9AB370089BA08 /* SharedLibrary.h */; };
 		337AE6D515BF214F00AD1617 /* SharedLibraryDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B815B9AB370089BA08 /* SharedLibraryDef.h */; };
 		337AE6D615BF214F00AD1617 /* SIMD.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883BA15B9AB370089BA08 /* SIMD.h */; };
@@ -817,14 +795,12 @@
 		337AE70F15BF214F00AD1617 /* PostProcess.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890415B9BA4A0089BA08 /* PostProcess.h */; };
 		337AE71015BF214F00AD1617 /* ScreenOverlay.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890615B9BA4A0089BA08 /* ScreenOverlay.h */; };
 		337AE71115BF214F00AD1617 /* ScreenOverlayDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890715B9BA4A0089BA08 /* ScreenOverlayDef.h */; };
-		337AE71215BF214F00AD1617 /* ViewModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890915B9BA4A0089BA08 /* ViewModel.h */; };
 		337AE71315BF214F00AD1617 /* World.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890B15B9BA4A0089BA08 /* World.h */; };
 		337AE71415BF214F00AD1617 /* WorldCinematics.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890D15B9BA4A0089BA08 /* WorldCinematics.h */; };
 		337AE71515BF214F00AD1617 /* WorldDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890E15B9BA4A0089BA08 /* WorldDef.h */; };
 		337AE71615BF214F00AD1617 /* WorldDraw.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891015B9BA4A0089BA08 /* WorldDraw.h */; };
 		337AE71715BF214F00AD1617 /* WorldDrawDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891115B9BA4A0089BA08 /* WorldDrawDef.h */; };
 		337AE71815BF214F00AD1617 /* WorldLua.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891315B9BA4A0089BA08 /* WorldLua.h */; };
-		337AE71915BF214F00AD1617 /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888B715B9BA4A0089BA08 /* Tokenizer.h */; };
 		337AE71A15BF214F00AD1617 /* UIMatWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888AF15B9BA4A0089BA08 /* UIMatWidget.h */; };
 		337AE71B15BF214F00AD1617 /* UITextLabel.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888B115B9BA4A0089BA08 /* UITextLabel.h */; };
 		337AE71C15BF214F00AD1617 /* UIWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888B315B9BA4A0089BA08 /* UIWidget.h */; };
@@ -880,12 +856,6 @@
 		337AE74E15BF214F00AD1617 /* GSPlay.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887C515B9BA470089BA08 /* GSPlay.h */; };
 		337AE74F15BF214F00AD1617 /* GSPriority.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887C615B9BA470089BA08 /* GSPriority.h */; };
 		337AE75015BF214F00AD1617 /* WaveAnim.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887C815B9BA470089BA08 /* WaveAnim.h */; };
-		337AE75115BF214F00AD1617 /* DPak.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A015B9BA1F0089BA08 /* DPak.h */; };
-		337AE75215BF214F00AD1617 /* FileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A215B9BA1F0089BA08 /* FileSystem.h */; };
-		337AE75315BF214F00AD1617 /* DPak.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A315B9BA1F0089BA08 /* DPak.h */; };
-		337AE75415BF214F00AD1617 /* DPakDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A415B9BA1F0089BA08 /* DPakDef.h */; };
-		337AE75515BF214F00AD1617 /* FileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A515B9BA1F0089BA08 /* FileSystem.h */; };
-		337AE75615BF214F00AD1617 /* FileSystemDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A615B9BA1F0089BA08 /* FileSystemDef.h */; };
 		337AE75715BF214F00AD1617 /* Assets.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E886E515B9B9ED0089BA08 /* Assets.h */; };
 		337AE75815BF214F00AD1617 /* AssetTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E886E615B9B9ED0089BA08 /* AssetTypes.h */; };
 		337AE75915BF214F00AD1617 /* FontParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E886EA15B9B9ED0089BA08 /* FontParser.h */; };
@@ -1115,6 +1085,48 @@
 		338CDFBB15BC9B970058DFF5 /* PlaneDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8853315B9ACBE0089BA08 /* PlaneDef.h */; };
 		338CDFBC15BC9B970058DFF5 /* Quaternion.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8853415B9ACBE0089BA08 /* Quaternion.h */; };
 		338CDFBD15BC9B970058DFF5 /* QuaternionDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8853615B9ACBE0089BA08 /* QuaternionDef.h */; };
+		33DB15771627E31F00963A33 /* SceneFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB15751627E31F00963A33 /* SceneFile.cpp */; };
+		33DB15781627E31F00963A33 /* SceneFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB15761627E31F00963A33 /* SceneFile.h */; };
+		33DB157A1627E36900963A33 /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB15791627E36900963A33 /* Tokenizer.h */; };
+		33DB157B1627E36900963A33 /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB15791627E36900963A33 /* Tokenizer.h */; };
+		33DB157C1627E36900963A33 /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB15791627E36900963A33 /* Tokenizer.h */; };
+		33DB157D1627E36900963A33 /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB15791627E36900963A33 /* Tokenizer.h */; };
+		33DB15801627E37B00963A33 /* Tokenizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB157E1627E37B00963A33 /* Tokenizer.cpp */; };
+		33DB15811627E37B00963A33 /* Tokenizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB157E1627E37B00963A33 /* Tokenizer.cpp */; };
+		33DB15821627E37B00963A33 /* Tokenizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB157E1627E37B00963A33 /* Tokenizer.cpp */; };
+		33DB15831627E37B00963A33 /* Tokenizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB157E1627E37B00963A33 /* Tokenizer.cpp */; };
+		33DB15841627E37B00963A33 /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB157F1627E37B00963A33 /* Tokenizer.h */; };
+		33DB15851627E37B00963A33 /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB157F1627E37B00963A33 /* Tokenizer.h */; };
+		33DB15861627E37B00963A33 /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB157F1627E37B00963A33 /* Tokenizer.h */; };
+		33DB15871627E37B00963A33 /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB157F1627E37B00963A33 /* Tokenizer.h */; };
+		33DB158A1627E4BD00963A33 /* DrawModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB15881627E4BD00963A33 /* DrawModel.cpp */; };
+		33DB158B1627E4BD00963A33 /* DrawModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB15881627E4BD00963A33 /* DrawModel.cpp */; };
+		33DB158C1627E4BD00963A33 /* DrawModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB15881627E4BD00963A33 /* DrawModel.cpp */; };
+		33DB158D1627E4BD00963A33 /* DrawModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB15881627E4BD00963A33 /* DrawModel.cpp */; };
+		33DB158E1627E4BD00963A33 /* DrawModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB15891627E4BD00963A33 /* DrawModel.h */; };
+		33DB158F1627E4BD00963A33 /* DrawModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB15891627E4BD00963A33 /* DrawModel.h */; };
+		33DB15901627E4BD00963A33 /* DrawModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB15891627E4BD00963A33 /* DrawModel.h */; };
+		33DB15911627E4BD00963A33 /* DrawModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB15891627E4BD00963A33 /* DrawModel.h */; };
+		33DB159D1627E4D100963A33 /* MapTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB15931627E4D100963A33 /* MapTypes.h */; };
+		33DB15A11627E4D100963A33 /* PlaneHash.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB15941627E4D100963A33 /* PlaneHash.h */; };
+		33DB15A51627E4D100963A33 /* SolidBSP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB15951627E4D100963A33 /* SolidBSP.cpp */; };
+		33DB15A91627E4D100963A33 /* SolidBSP.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB15961627E4D100963A33 /* SolidBSP.h */; };
+		33DB15AD1627E4D100963A33 /* SolidBSPAreas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB15971627E4D100963A33 /* SolidBSPAreas.cpp */; };
+		33DB15B11627E4D100963A33 /* SolidBSPDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB15981627E4D100963A33 /* SolidBSPDraw.cpp */; };
+		33DB15B51627E4D100963A33 /* SolidBSPEmit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB15991627E4D100963A33 /* SolidBSPEmit.cpp */; };
+		33DB15B91627E4D100963A33 /* SolidBSPFlood.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB159A1627E4D100963A33 /* SolidBSPFlood.cpp */; };
+		33DB15BD1627E4D100963A33 /* SolidBSPPortals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB159B1627E4D100963A33 /* SolidBSPPortals.cpp */; };
+		33DB15C11627E4D100963A33 /* VecHash.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB159C1627E4D100963A33 /* VecHash.h */; };
+		33DB15E6162FA55500963A33 /* CinematicsBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB15E4162FA55400963A33 /* CinematicsBuilder.cpp */; };
+		33DB15E7162FA55500963A33 /* CinematicsBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB15E5162FA55400963A33 /* CinematicsBuilder.h */; };
+		33DB15E9162FA56A00963A33 /* WorldBSP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB15E8162FA56A00963A33 /* WorldBSP.cpp */; };
+		33DB15EA162FA56A00963A33 /* WorldBSP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB15E8162FA56A00963A33 /* WorldBSP.cpp */; };
+		33DB15EB162FA56A00963A33 /* WorldBSP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB15E8162FA56A00963A33 /* WorldBSP.cpp */; };
+		33DB15EC162FA56A00963A33 /* WorldBSP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB15E8162FA56A00963A33 /* WorldBSP.cpp */; };
+		33DB1607162FB05800963A33 /* EditorContentAssetThumbDimensionCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB1605162FB05800963A33 /* EditorContentAssetThumbDimensionCache.cpp */; };
+		33DB1608162FB05800963A33 /* EditorContentAssetThumbDimensionCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB1606162FB05800963A33 /* EditorContentAssetThumbDimensionCache.h */; };
+		33DB160B162FB28700963A33 /* EditorBSPDebugWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB1609162FB28700963A33 /* EditorBSPDebugWidget.cpp */; };
+		33DB160C162FB28700963A33 /* EditorBSPDebugWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB160A162FB28700963A33 /* EditorBSPDebugWidget.h */; };
 		33E8829015B98EB80089BA08 /* IntAudioCodec.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8828815B98EB80089BA08 /* IntAudioCodec.h */; };
 		33E8829115B98EB80089BA08 /* IntAudioCodec.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8828815B98EB80089BA08 /* IntAudioCodec.h */; };
 		33E8829215B98EB80089BA08 /* SoundHeader.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8828915B98EB80089BA08 /* SoundHeader.h */; };
@@ -1221,10 +1233,6 @@
 		33E883EC15B9AB370089BA08 /* RefCount.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B015B9AB370089BA08 /* RefCount.h */; };
 		33E883ED15B9AB370089BA08 /* RefCountDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B215B9AB370089BA08 /* RefCountDef.h */; };
 		33E883EE15B9AB370089BA08 /* RefCountDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B215B9AB370089BA08 /* RefCountDef.h */; };
-		33E883EF15B9AB370089BA08 /* SafePointer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B315B9AB370089BA08 /* SafePointer.h */; };
-		33E883F015B9AB370089BA08 /* SafePointer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B315B9AB370089BA08 /* SafePointer.h */; };
-		33E883F115B9AB370089BA08 /* SafePointerDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B515B9AB370089BA08 /* SafePointerDef.h */; };
-		33E883F215B9AB370089BA08 /* SafePointerDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B515B9AB370089BA08 /* SafePointerDef.h */; };
 		33E883F315B9AB370089BA08 /* SharedLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E883B615B9AB370089BA08 /* SharedLibrary.cpp */; };
 		33E883F415B9AB370089BA08 /* SharedLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E883B615B9AB370089BA08 /* SharedLibrary.cpp */; };
 		33E883F515B9AB370089BA08 /* SharedLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B715B9AB370089BA08 /* SharedLibrary.h */; };
@@ -1778,24 +1786,6 @@
 		33E8879A15B9B9ED0089BA08 /* TypefaceParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8871F15B9B9ED0089BA08 /* TypefaceParser.cpp */; };
 		33E8879B15B9B9ED0089BA08 /* TypefaceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8872015B9B9ED0089BA08 /* TypefaceParser.h */; };
 		33E8879C15B9B9ED0089BA08 /* TypefaceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8872015B9B9ED0089BA08 /* TypefaceParser.h */; };
-		33E887A815B9BA1F0089BA08 /* DPak.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8879F15B9BA1F0089BA08 /* DPak.cpp */; };
-		33E887A915B9BA1F0089BA08 /* DPak.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8879F15B9BA1F0089BA08 /* DPak.cpp */; };
-		33E887AA15B9BA1F0089BA08 /* DPak.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A015B9BA1F0089BA08 /* DPak.h */; };
-		33E887AB15B9BA1F0089BA08 /* DPak.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A015B9BA1F0089BA08 /* DPak.h */; };
-		33E887AC15B9BA1F0089BA08 /* FileSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887A115B9BA1F0089BA08 /* FileSystem.cpp */; };
-		33E887AD15B9BA1F0089BA08 /* FileSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887A115B9BA1F0089BA08 /* FileSystem.cpp */; };
-		33E887AE15B9BA1F0089BA08 /* FileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A215B9BA1F0089BA08 /* FileSystem.h */; };
-		33E887AF15B9BA1F0089BA08 /* FileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A215B9BA1F0089BA08 /* FileSystem.h */; };
-		33E887B015B9BA1F0089BA08 /* DPak.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A315B9BA1F0089BA08 /* DPak.h */; };
-		33E887B115B9BA1F0089BA08 /* DPak.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A315B9BA1F0089BA08 /* DPak.h */; };
-		33E887B215B9BA1F0089BA08 /* DPakDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A415B9BA1F0089BA08 /* DPakDef.h */; };
-		33E887B315B9BA1F0089BA08 /* DPakDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A415B9BA1F0089BA08 /* DPakDef.h */; };
-		33E887B415B9BA1F0089BA08 /* FileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A515B9BA1F0089BA08 /* FileSystem.h */; };
-		33E887B515B9BA1F0089BA08 /* FileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A515B9BA1F0089BA08 /* FileSystem.h */; };
-		33E887B615B9BA1F0089BA08 /* FileSystemDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A615B9BA1F0089BA08 /* FileSystemDef.h */; };
-		33E887B715B9BA1F0089BA08 /* FileSystemDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887A615B9BA1F0089BA08 /* FileSystemDef.h */; };
-		33E887B815B9BA1F0089BA08 /* FileSystemReflectMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887A715B9BA1F0089BA08 /* FileSystemReflectMap.cpp */; };
-		33E887B915B9BA1F0089BA08 /* FileSystemReflectMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887A715B9BA1F0089BA08 /* FileSystemReflectMap.cpp */; };
 		33E8891515B9BA4B0089BA08 /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887BB15B9BA470089BA08 /* Game.cpp */; };
 		33E8891615B9BA4B0089BA08 /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887BB15B9BA470089BA08 /* Game.cpp */; };
 		33E8891715B9BA4B0089BA08 /* Game.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887BC15B9BA470089BA08 /* Game.h */; };
@@ -2072,9 +2062,6 @@
 		33E88AA515B9BA4B0089BA08 /* EditorPropertyGridModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888A415B9BA490089BA08 /* EditorPropertyGridModel.h */; };
 		33E88AA715B9BA4B0089BA08 /* EditorWidgetPropertyEditors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E888A515B9BA490089BA08 /* EditorWidgetPropertyEditors.cpp */; };
 		33E88AA915B9BA4B0089BA08 /* EditorWidgetPropertyEditors.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888A615B9BA490089BA08 /* EditorWidgetPropertyEditors.h */; };
-		33E88AAB15B9BA4B0089BA08 /* Map.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888A815B9BA490089BA08 /* Map.h */; };
-		33E88AAD15B9BA4B0089BA08 /* MaxScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E888A915B9BA490089BA08 /* MaxScene.cpp */; };
-		33E88AAF15B9BA4B0089BA08 /* MaxScene.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888AA15B9BA490089BA08 /* MaxScene.h */; };
 		33E88AB115B9BA4B0089BA08 /* Progress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E888AB15B9BA490089BA08 /* Progress.cpp */; };
 		33E88AB315B9BA4B0089BA08 /* Progress.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888AC15B9BA490089BA08 /* Progress.h */; };
 		33E88AB515B9BA4B0089BA08 /* UIMatWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E888AE15B9BA4A0089BA08 /* UIMatWidget.cpp */; };
@@ -2091,10 +2078,6 @@
 		33E88AC015B9BA4B0089BA08 /* UIWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888B315B9BA4A0089BA08 /* UIWidget.h */; };
 		33E88AC115B9BA4B0089BA08 /* UIWidgetDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888B415B9BA4A0089BA08 /* UIWidgetDef.h */; };
 		33E88AC215B9BA4B0089BA08 /* UIWidgetDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888B415B9BA4A0089BA08 /* UIWidgetDef.h */; };
-		33E88AC315B9BA4B0089BA08 /* Tokenizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E888B615B9BA4A0089BA08 /* Tokenizer.cpp */; };
-		33E88AC415B9BA4B0089BA08 /* Tokenizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E888B615B9BA4A0089BA08 /* Tokenizer.cpp */; };
-		33E88AC515B9BA4B0089BA08 /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888B715B9BA4A0089BA08 /* Tokenizer.h */; };
-		33E88AC615B9BA4B0089BA08 /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888B715B9BA4A0089BA08 /* Tokenizer.h */; };
 		33E88AC715B9BA4B0089BA08 /* BSPFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E888B915B9BA4A0089BA08 /* BSPFile.cpp */; };
 		33E88AC815B9BA4B0089BA08 /* BSPFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E888B915B9BA4A0089BA08 /* BSPFile.cpp */; };
 		33E88AC915B9BA4B0089BA08 /* BSPFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888BA15B9BA4A0089BA08 /* BSPFile.h */; };
@@ -2211,11 +2194,6 @@
 		33E88B3815B9BA4B0089BA08 /* T_TypefacePrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E888F515B9BA4A0089BA08 /* T_TypefacePrecache.cpp */; };
 		33E88B3915B9BA4B0089BA08 /* T_TypefacePrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888F615B9BA4A0089BA08 /* T_TypefacePrecache.h */; };
 		33E88B3A15B9BA4B0089BA08 /* T_TypefacePrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888F615B9BA4A0089BA08 /* T_TypefacePrecache.h */; };
-		33E88B3B15B9BA4B0089BA08 /* BoxBSP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E888F915B9BA4A0089BA08 /* BoxBSP.cpp */; };
-		33E88B3D15B9BA4B0089BA08 /* BoxBSP.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888FA15B9BA4A0089BA08 /* BoxBSP.h */; };
-		33E88B3F15B9BA4B0089BA08 /* MapTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888FB15B9BA4A0089BA08 /* MapTypes.h */; };
-		33E88B4115B9BA4B0089BA08 /* PlaneHash.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888FC15B9BA4A0089BA08 /* PlaneHash.h */; };
-		33E88B4315B9BA4B0089BA08 /* VecHash.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888FD15B9BA4A0089BA08 /* VecHash.h */; };
 		33E88B4515B9BA4B0089BA08 /* MapBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E888FE15B9BA4A0089BA08 /* MapBuilder.cpp */; };
 		33E88B4715B9BA4B0089BA08 /* MapBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888FF15B9BA4A0089BA08 /* MapBuilder.h */; };
 		33E88B4915B9BA4B0089BA08 /* MBatchDraw.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890015B9BA4A0089BA08 /* MBatchDraw.h */; };
@@ -2234,10 +2212,6 @@
 		33E88B5615B9BA4B0089BA08 /* ScreenOverlay.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890615B9BA4A0089BA08 /* ScreenOverlay.h */; };
 		33E88B5715B9BA4B0089BA08 /* ScreenOverlayDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890715B9BA4A0089BA08 /* ScreenOverlayDef.h */; };
 		33E88B5815B9BA4B0089BA08 /* ScreenOverlayDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890715B9BA4A0089BA08 /* ScreenOverlayDef.h */; };
-		33E88B5915B9BA4B0089BA08 /* ViewModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8890815B9BA4A0089BA08 /* ViewModel.cpp */; };
-		33E88B5A15B9BA4B0089BA08 /* ViewModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8890815B9BA4A0089BA08 /* ViewModel.cpp */; };
-		33E88B5B15B9BA4B0089BA08 /* ViewModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890915B9BA4A0089BA08 /* ViewModel.h */; };
-		33E88B5C15B9BA4B0089BA08 /* ViewModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890915B9BA4A0089BA08 /* ViewModel.h */; };
 		33E88B5D15B9BA4B0089BA08 /* World.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8890A15B9BA4A0089BA08 /* World.cpp */; };
 		33E88B5E15B9BA4B0089BA08 /* World.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8890A15B9BA4A0089BA08 /* World.cpp */; };
 		33E88B5F15B9BA4B0089BA08 /* World.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890B15B9BA4A0089BA08 /* World.h */; };
@@ -2312,6 +2286,30 @@
 		338CDF0815BC8F140058DFF5 /* RadianceShipDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceShipDebugOSX.xcconfig; path = XCConfig/RadianceShipDebugOSX.xcconfig; sourceTree = "<group>"; };
 		338CDF0915BC8F140058DFF5 /* RadianceShipReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceShipReleaseiOS.xcconfig; path = XCConfig/RadianceShipReleaseiOS.xcconfig; sourceTree = "<group>"; };
 		338CDF0A15BC8F140058DFF5 /* RadianceShipReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceShipReleaseOSX.xcconfig; path = XCConfig/RadianceShipReleaseOSX.xcconfig; sourceTree = "<group>"; };
+		33DB15751627E31F00963A33 /* SceneFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SceneFile.cpp; sourceTree = "<group>"; };
+		33DB15761627E31F00963A33 /* SceneFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneFile.h; sourceTree = "<group>"; };
+		33DB15791627E36900963A33 /* Tokenizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Tokenizer.h; path = ../Runtime/Tokenizer.h; sourceTree = "<group>"; };
+		33DB157E1627E37B00963A33 /* Tokenizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tokenizer.cpp; sourceTree = "<group>"; };
+		33DB157F1627E37B00963A33 /* Tokenizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tokenizer.h; sourceTree = "<group>"; };
+		33DB15881627E4BD00963A33 /* DrawModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DrawModel.cpp; sourceTree = "<group>"; };
+		33DB15891627E4BD00963A33 /* DrawModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawModel.h; sourceTree = "<group>"; };
+		33DB15931627E4D100963A33 /* MapTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapTypes.h; sourceTree = "<group>"; };
+		33DB15941627E4D100963A33 /* PlaneHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaneHash.h; sourceTree = "<group>"; };
+		33DB15951627E4D100963A33 /* SolidBSP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SolidBSP.cpp; sourceTree = "<group>"; };
+		33DB15961627E4D100963A33 /* SolidBSP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SolidBSP.h; sourceTree = "<group>"; };
+		33DB15971627E4D100963A33 /* SolidBSPAreas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SolidBSPAreas.cpp; sourceTree = "<group>"; };
+		33DB15981627E4D100963A33 /* SolidBSPDraw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SolidBSPDraw.cpp; sourceTree = "<group>"; };
+		33DB15991627E4D100963A33 /* SolidBSPEmit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SolidBSPEmit.cpp; sourceTree = "<group>"; };
+		33DB159A1627E4D100963A33 /* SolidBSPFlood.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SolidBSPFlood.cpp; sourceTree = "<group>"; };
+		33DB159B1627E4D100963A33 /* SolidBSPPortals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SolidBSPPortals.cpp; sourceTree = "<group>"; };
+		33DB159C1627E4D100963A33 /* VecHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VecHash.h; sourceTree = "<group>"; };
+		33DB15E4162FA55400963A33 /* CinematicsBuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CinematicsBuilder.cpp; sourceTree = "<group>"; };
+		33DB15E5162FA55400963A33 /* CinematicsBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CinematicsBuilder.h; sourceTree = "<group>"; };
+		33DB15E8162FA56A00963A33 /* WorldBSP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldBSP.cpp; sourceTree = "<group>"; };
+		33DB1605162FB05800963A33 /* EditorContentAssetThumbDimensionCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorContentAssetThumbDimensionCache.cpp; sourceTree = "<group>"; };
+		33DB1606162FB05800963A33 /* EditorContentAssetThumbDimensionCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorContentAssetThumbDimensionCache.h; sourceTree = "<group>"; };
+		33DB1609162FB28700963A33 /* EditorBSPDebugWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorBSPDebugWidget.cpp; sourceTree = "<group>"; };
+		33DB160A162FB28700963A33 /* EditorBSPDebugWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorBSPDebugWidget.h; sourceTree = "<group>"; };
 		33E8823415B8C90C0089BA08 /* Common.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Common.xcconfig; path = XCConfig/Common.xcconfig; sourceTree = "<group>"; };
 		33E8823515B8C90C0089BA08 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = XCConfig/Debug.xcconfig; sourceTree = "<group>"; };
 		33E8823615B8C90C0089BA08 /* DebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = DebugiOS.xcconfig; path = XCConfig/DebugiOS.xcconfig; sourceTree = "<group>"; };
@@ -2401,9 +2399,6 @@
 		33E883B015B9AB370089BA08 /* RefCount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RefCount.h; sourceTree = "<group>"; };
 		33E883B115B9AB370089BA08 /* RefCount.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = RefCount.inl; sourceTree = "<group>"; };
 		33E883B215B9AB370089BA08 /* RefCountDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RefCountDef.h; sourceTree = "<group>"; };
-		33E883B315B9AB370089BA08 /* SafePointer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafePointer.h; sourceTree = "<group>"; };
-		33E883B415B9AB370089BA08 /* SafePointer.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SafePointer.inl; sourceTree = "<group>"; };
-		33E883B515B9AB370089BA08 /* SafePointerDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafePointerDef.h; sourceTree = "<group>"; };
 		33E883B615B9AB370089BA08 /* SharedLibrary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SharedLibrary.cpp; sourceTree = "<group>"; };
 		33E883B715B9AB370089BA08 /* SharedLibrary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharedLibrary.h; sourceTree = "<group>"; };
 		33E883B815B9AB370089BA08 /* SharedLibraryDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharedLibraryDef.h; sourceTree = "<group>"; };
@@ -2747,15 +2742,6 @@
 		33E8871E15B9B9ED0089BA08 /* TypefaceCooker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TypefaceCooker.h; sourceTree = "<group>"; };
 		33E8871F15B9B9ED0089BA08 /* TypefaceParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TypefaceParser.cpp; sourceTree = "<group>"; };
 		33E8872015B9B9ED0089BA08 /* TypefaceParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TypefaceParser.h; sourceTree = "<group>"; };
-		33E8879F15B9BA1F0089BA08 /* DPak.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DPak.cpp; sourceTree = "<group>"; };
-		33E887A015B9BA1F0089BA08 /* DPak.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPak.h; sourceTree = "<group>"; };
-		33E887A115B9BA1F0089BA08 /* FileSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileSystem.cpp; sourceTree = "<group>"; };
-		33E887A215B9BA1F0089BA08 /* FileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileSystem.h; sourceTree = "<group>"; };
-		33E887A315B9BA1F0089BA08 /* DPak.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPak.h; sourceTree = "<group>"; };
-		33E887A415B9BA1F0089BA08 /* DPakDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPakDef.h; sourceTree = "<group>"; };
-		33E887A515B9BA1F0089BA08 /* FileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileSystem.h; sourceTree = "<group>"; };
-		33E887A615B9BA1F0089BA08 /* FileSystemDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileSystemDef.h; sourceTree = "<group>"; };
-		33E887A715B9BA1F0089BA08 /* FileSystemReflectMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileSystemReflectMap.cpp; sourceTree = "<group>"; };
 		33E887BB15B9BA470089BA08 /* Game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Game.cpp; sourceTree = "<group>"; };
 		33E887BC15B9BA470089BA08 /* Game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Game.h; sourceTree = "<group>"; };
 		33E887BD15B9BA470089BA08 /* GameNetwork.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameNetwork.cpp; sourceTree = "<group>"; };
@@ -2968,9 +2954,6 @@
 		33E888A515B9BA490089BA08 /* EditorWidgetPropertyEditors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorWidgetPropertyEditors.cpp; sourceTree = "<group>"; };
 		33E888A615B9BA490089BA08 /* EditorWidgetPropertyEditors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorWidgetPropertyEditors.h; sourceTree = "<group>"; };
 		33E888A715B9BA490089BA08 /* EditorWidgetPropertyEditors.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = EditorWidgetPropertyEditors.inl; sourceTree = "<group>"; };
-		33E888A815B9BA490089BA08 /* Map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Map.h; sourceTree = "<group>"; };
-		33E888A915B9BA490089BA08 /* MaxScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MaxScene.cpp; sourceTree = "<group>"; };
-		33E888AA15B9BA490089BA08 /* MaxScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MaxScene.h; sourceTree = "<group>"; };
 		33E888AB15B9BA490089BA08 /* Progress.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Progress.cpp; sourceTree = "<group>"; };
 		33E888AC15B9BA490089BA08 /* Progress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Progress.h; sourceTree = "<group>"; };
 		33E888AE15B9BA4A0089BA08 /* UIMatWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIMatWidget.cpp; sourceTree = "<group>"; };
@@ -2980,8 +2963,6 @@
 		33E888B215B9BA4A0089BA08 /* UIWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIWidget.cpp; sourceTree = "<group>"; };
 		33E888B315B9BA4A0089BA08 /* UIWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIWidget.h; sourceTree = "<group>"; };
 		33E888B415B9BA4A0089BA08 /* UIWidgetDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIWidgetDef.h; sourceTree = "<group>"; };
-		33E888B615B9BA4A0089BA08 /* Tokenizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tokenizer.cpp; sourceTree = "<group>"; };
-		33E888B715B9BA4A0089BA08 /* Tokenizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tokenizer.h; sourceTree = "<group>"; };
 		33E888B915B9BA4A0089BA08 /* BSPFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BSPFile.cpp; sourceTree = "<group>"; };
 		33E888BA15B9BA4A0089BA08 /* BSPFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BSPFile.h; sourceTree = "<group>"; };
 		33E888BB15B9BA4A0089BA08 /* BSPFile.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BSPFile.inl; sourceTree = "<group>"; };
@@ -3042,11 +3023,6 @@
 		33E888F415B9BA4A0089BA08 /* T_Tick.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = T_Tick.h; sourceTree = "<group>"; };
 		33E888F515B9BA4A0089BA08 /* T_TypefacePrecache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = T_TypefacePrecache.cpp; sourceTree = "<group>"; };
 		33E888F615B9BA4A0089BA08 /* T_TypefacePrecache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = T_TypefacePrecache.h; sourceTree = "<group>"; };
-		33E888F915B9BA4A0089BA08 /* BoxBSP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BoxBSP.cpp; sourceTree = "<group>"; };
-		33E888FA15B9BA4A0089BA08 /* BoxBSP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoxBSP.h; sourceTree = "<group>"; };
-		33E888FB15B9BA4A0089BA08 /* MapTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapTypes.h; sourceTree = "<group>"; };
-		33E888FC15B9BA4A0089BA08 /* PlaneHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaneHash.h; sourceTree = "<group>"; };
-		33E888FD15B9BA4A0089BA08 /* VecHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VecHash.h; sourceTree = "<group>"; };
 		33E888FE15B9BA4A0089BA08 /* MapBuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MapBuilder.cpp; sourceTree = "<group>"; };
 		33E888FF15B9BA4A0089BA08 /* MapBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapBuilder.h; sourceTree = "<group>"; };
 		33E8890015B9BA4A0089BA08 /* MBatchDraw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBatchDraw.h; sourceTree = "<group>"; };
@@ -3057,8 +3033,6 @@
 		33E8890515B9BA4A0089BA08 /* ScreenOverlay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScreenOverlay.cpp; sourceTree = "<group>"; };
 		33E8890615B9BA4A0089BA08 /* ScreenOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenOverlay.h; sourceTree = "<group>"; };
 		33E8890715B9BA4A0089BA08 /* ScreenOverlayDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenOverlayDef.h; sourceTree = "<group>"; };
-		33E8890815B9BA4A0089BA08 /* ViewModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ViewModel.cpp; sourceTree = "<group>"; };
-		33E8890915B9BA4A0089BA08 /* ViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewModel.h; sourceTree = "<group>"; };
 		33E8890A15B9BA4A0089BA08 /* World.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = World.cpp; sourceTree = "<group>"; };
 		33E8890B15B9BA4A0089BA08 /* World.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = World.h; sourceTree = "<group>"; };
 		33E8890C15B9BA4A0089BA08 /* WorldCinematics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldCinematics.cpp; sourceTree = "<group>"; };
@@ -3163,6 +3137,23 @@
 			name = XCConfig;
 			sourceTree = "<group>";
 		};
+		33DB15921627E4D100963A33 /* SolidBSP */ = {
+			isa = PBXGroup;
+			children = (
+				33DB15931627E4D100963A33 /* MapTypes.h */,
+				33DB15941627E4D100963A33 /* PlaneHash.h */,
+				33DB15951627E4D100963A33 /* SolidBSP.cpp */,
+				33DB15961627E4D100963A33 /* SolidBSP.h */,
+				33DB15971627E4D100963A33 /* SolidBSPAreas.cpp */,
+				33DB15981627E4D100963A33 /* SolidBSPDraw.cpp */,
+				33DB15991627E4D100963A33 /* SolidBSPEmit.cpp */,
+				33DB159A1627E4D100963A33 /* SolidBSPFlood.cpp */,
+				33DB159B1627E4D100963A33 /* SolidBSPPortals.cpp */,
+				33DB159C1627E4D100963A33 /* VecHash.h */,
+			);
+			path = SolidBSP;
+			sourceTree = "<group>";
+		};
 		33E8822D15B8C8F10089BA08 /* XCConfig_Common */ = {
 			isa = PBXGroup;
 			children = (
@@ -3235,6 +3226,7 @@
 				33E8863D15B9ACEE0089BA08 /* Thread */,
 				33E8865815B9ACF60089BA08 /* Time */,
 				33E8866615B9AD020089BA08 /* Tuple */,
+				33DB15791627E36900963A33 /* Tokenizer.h */,
 				33E8867515B9AD160089BA08 /* Runtime.cpp */,
 				33E8867715B9AD1D0089BA08 /* Base.h */,
 				33E8867815B9AD200089BA08 /* Endian.h */,
@@ -3347,6 +3339,8 @@
 		33E8839915B9AB360089BA08 /* Base */ = {
 			isa = PBXGroup;
 			children = (
+				33DB157E1627E37B00963A33 /* Tokenizer.cpp */,
+				33DB157F1627E37B00963A33 /* Tokenizer.h */,
 				33E8839A15B9AB370089BA08 /* Assert.cpp */,
 				33E8839B15B9AB370089BA08 /* Assert.h */,
 				33E8839C15B9AB370089BA08 /* Base.h */,
@@ -3372,9 +3366,6 @@
 				33E883B015B9AB370089BA08 /* RefCount.h */,
 				33E883B115B9AB370089BA08 /* RefCount.inl */,
 				33E883B215B9AB370089BA08 /* RefCountDef.h */,
-				33E883B315B9AB370089BA08 /* SafePointer.h */,
-				33E883B415B9AB370089BA08 /* SafePointer.inl */,
-				33E883B515B9AB370089BA08 /* SafePointerDef.h */,
 				33E883B615B9AB370089BA08 /* SharedLibrary.cpp */,
 				33E883B715B9AB370089BA08 /* SharedLibrary.h */,
 				33E883B815B9AB370089BA08 /* SharedLibraryDef.h */,
@@ -3782,7 +3773,6 @@
 			isa = PBXGroup;
 			children = (
 				33E886E215B9B9ED0089BA08 /* Assets */,
-				33E8879D15B9BA1E0089BA08 /* FileSystem */,
 				33E887BA15B9BA470089BA08 /* Game */,
 				33E887C915B9BA470089BA08 /* GCC */,
 				33E887CB15B9BA470089BA08 /* Lua */,
@@ -3794,7 +3784,6 @@
 				33E8883515B9BA490089BA08 /* Sound */,
 				33E8883C15B9BA490089BA08 /* Tools */,
 				33E888AD15B9BA490089BA08 /* UI */,
-				33E888B515B9BA4A0089BA08 /* Utils */,
 				33E888B815B9BA4A0089BA08 /* World */,
 				33836C0015B9CF580030EAEC /* App.cpp */,
 				33836C0115B9CF580030EAEC /* App.h */,
@@ -3894,31 +3883,6 @@
 			);
 			name = Assets;
 			path = ../Engine/Assets;
-			sourceTree = "<group>";
-		};
-		33E8879D15B9BA1E0089BA08 /* FileSystem */ = {
-			isa = PBXGroup;
-			children = (
-				33E8879E15B9BA1F0089BA08 /* Backend */,
-				33E887A315B9BA1F0089BA08 /* DPak.h */,
-				33E887A415B9BA1F0089BA08 /* DPakDef.h */,
-				33E887A515B9BA1F0089BA08 /* FileSystem.h */,
-				33E887A615B9BA1F0089BA08 /* FileSystemDef.h */,
-				33E887A715B9BA1F0089BA08 /* FileSystemReflectMap.cpp */,
-			);
-			name = FileSystem;
-			path = ../Engine/FileSystem;
-			sourceTree = "<group>";
-		};
-		33E8879E15B9BA1F0089BA08 /* Backend */ = {
-			isa = PBXGroup;
-			children = (
-				33E8879F15B9BA1F0089BA08 /* DPak.cpp */,
-				33E887A015B9BA1F0089BA08 /* DPak.h */,
-				33E887A115B9BA1F0089BA08 /* FileSystem.cpp */,
-				33E887A215B9BA1F0089BA08 /* FileSystem.h */,
-			);
-			path = Backend;
 			sourceTree = "<group>";
 		};
 		33E887BA15B9BA470089BA08 /* Game */ = {
@@ -4132,9 +4096,8 @@
 			isa = PBXGroup;
 			children = (
 				33E8883D15B9BA490089BA08 /* Editor */,
-				33E888A815B9BA490089BA08 /* Map.h */,
-				33E888A915B9BA490089BA08 /* MaxScene.cpp */,
-				33E888AA15B9BA490089BA08 /* MaxScene.h */,
+				33DB15751627E31F00963A33 /* SceneFile.cpp */,
+				33DB15761627E31F00963A33 /* SceneFile.h */,
 				33E888AB15B9BA490089BA08 /* Progress.cpp */,
 				33E888AC15B9BA490089BA08 /* Progress.h */,
 			);
@@ -4148,6 +4111,8 @@
 				33E8883E15B9BA490089BA08 /* ContentBrowser */,
 				33E8889415B9BA490089BA08 /* MapEditor */,
 				33E8889715B9BA490089BA08 /* PropertyGrid */,
+				33DB1609162FB28700963A33 /* EditorBSPDebugWidget.cpp */,
+				33DB160A162FB28700963A33 /* EditorBSPDebugWidget.h */,
 				33E8886715B9BA490089BA08 /* EditorComboCheckBox.cpp */,
 				33E8886815B9BA490089BA08 /* EditorComboCheckBox.h */,
 				33E8886915B9BA490089BA08 /* EditorCookerDialog.cpp */,
@@ -4200,6 +4165,8 @@
 		33E8883E15B9BA490089BA08 /* ContentBrowser */ = {
 			isa = PBXGroup;
 			children = (
+				33DB1605162FB05800963A33 /* EditorContentAssetThumbDimensionCache.cpp */,
+				33DB1606162FB05800963A33 /* EditorContentAssetThumbDimensionCache.h */,
 				33E8883F15B9BA490089BA08 /* EditorContentBrowserDef.h */,
 				33E8884015B9BA490089BA08 /* EditorContentBrowserModel.cpp */,
 				33E8884115B9BA490089BA08 /* EditorContentBrowserModel.h */,
@@ -4291,22 +4258,14 @@
 			path = ../Engine/UI;
 			sourceTree = "<group>";
 		};
-		33E888B515B9BA4A0089BA08 /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				33E888B615B9BA4A0089BA08 /* Tokenizer.cpp */,
-				33E888B715B9BA4A0089BA08 /* Tokenizer.h */,
-			);
-			name = Utils;
-			path = ../Engine/Utils;
-			sourceTree = "<group>";
-		};
 		33E888B815B9BA4A0089BA08 /* World */ = {
 			isa = PBXGroup;
 			children = (
 				33E888BC15B9BA4A0089BA08 /* Entities */,
 				33E888D215B9BA4A0089BA08 /* Lua */,
 				33E888F715B9BA4A0089BA08 /* MapBuilder */,
+				33DB15881627E4BD00963A33 /* DrawModel.cpp */,
+				33DB15891627E4BD00963A33 /* DrawModel.h */,
 				33E888B915B9BA4A0089BA08 /* BSPFile.cpp */,
 				33E888BA15B9BA4A0089BA08 /* BSPFile.h */,
 				33E888BB15B9BA4A0089BA08 /* BSPFile.inl */,
@@ -4325,10 +4284,9 @@
 				33E8890515B9BA4A0089BA08 /* ScreenOverlay.cpp */,
 				33E8890615B9BA4A0089BA08 /* ScreenOverlay.h */,
 				33E8890715B9BA4A0089BA08 /* ScreenOverlayDef.h */,
-				33E8890815B9BA4A0089BA08 /* ViewModel.cpp */,
-				33E8890915B9BA4A0089BA08 /* ViewModel.h */,
 				33E8890A15B9BA4A0089BA08 /* World.cpp */,
 				33E8890B15B9BA4A0089BA08 /* World.h */,
+				33DB15E8162FA56A00963A33 /* WorldBSP.cpp */,
 				33E8890C15B9BA4A0089BA08 /* WorldCinematics.cpp */,
 				33E8890D15B9BA4A0089BA08 /* WorldCinematics.h */,
 				33E8890E15B9BA4A0089BA08 /* WorldDef.h */,
@@ -4410,23 +4368,13 @@
 		33E888F715B9BA4A0089BA08 /* MapBuilder */ = {
 			isa = PBXGroup;
 			children = (
-				33E888F815B9BA4A0089BA08 /* BoxBSP */,
+				33DB15921627E4D100963A33 /* SolidBSP */,
+				33DB15E4162FA55400963A33 /* CinematicsBuilder.cpp */,
+				33DB15E5162FA55400963A33 /* CinematicsBuilder.h */,
 				33E888FE15B9BA4A0089BA08 /* MapBuilder.cpp */,
 				33E888FF15B9BA4A0089BA08 /* MapBuilder.h */,
 			);
 			path = MapBuilder;
-			sourceTree = "<group>";
-		};
-		33E888F815B9BA4A0089BA08 /* BoxBSP */ = {
-			isa = PBXGroup;
-			children = (
-				33E888F915B9BA4A0089BA08 /* BoxBSP.cpp */,
-				33E888FA15B9BA4A0089BA08 /* BoxBSP.h */,
-				33E888FB15B9BA4A0089BA08 /* MapTypes.h */,
-				33E888FC15B9BA4A0089BA08 /* PlaneHash.h */,
-				33E888FD15B9BA4A0089BA08 /* VecHash.h */,
-			);
-			path = BoxBSP;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -4659,8 +4607,6 @@
 				330A98A215BC9F59002A81EC /* Property.h in Headers */,
 				330A98A315BC9F59002A81EC /* RefCount.h in Headers */,
 				330A98A415BC9F59002A81EC /* RefCountDef.h in Headers */,
-				330A98A515BC9F59002A81EC /* SafePointer.h in Headers */,
-				330A98A615BC9F59002A81EC /* SafePointerDef.h in Headers */,
 				330A98A815BC9F59002A81EC /* SharedLibrary.h in Headers */,
 				330A98A915BC9F59002A81EC /* SharedLibraryDef.h in Headers */,
 				330A98AB15BC9F59002A81EC /* SIMD.h in Headers */,
@@ -4723,14 +4669,12 @@
 				330A991315BC9FC1002A81EC /* PostProcess.h in Headers */,
 				330A991515BC9FC1002A81EC /* ScreenOverlay.h in Headers */,
 				330A991615BC9FC1002A81EC /* ScreenOverlayDef.h in Headers */,
-				330A991815BC9FC1002A81EC /* ViewModel.h in Headers */,
 				330A991A15BC9FC1002A81EC /* World.h in Headers */,
 				330A991C15BC9FC1002A81EC /* WorldCinematics.h in Headers */,
 				330A991D15BC9FC1002A81EC /* WorldDef.h in Headers */,
 				330A991F15BC9FC1002A81EC /* WorldDraw.h in Headers */,
 				330A992015BC9FC1002A81EC /* WorldDrawDef.h in Headers */,
 				330A992215BC9FC1002A81EC /* WorldLua.h in Headers */,
-				330A992515BC9FC9002A81EC /* Tokenizer.h in Headers */,
 				330A992715BC9FCD002A81EC /* UIMatWidget.h in Headers */,
 				330A992915BC9FCD002A81EC /* UITextLabel.h in Headers */,
 				330A992B15BC9FCD002A81EC /* UIWidget.h in Headers */,
@@ -4786,12 +4730,6 @@
 				330A998215BCA097002A81EC /* GSPlay.h in Headers */,
 				330A998315BCA097002A81EC /* GSPriority.h in Headers */,
 				330A998515BCA097002A81EC /* WaveAnim.h in Headers */,
-				330A998715BCA0A0002A81EC /* DPak.h in Headers */,
-				330A998915BCA0A0002A81EC /* FileSystem.h in Headers */,
-				330A998A15BCA0A0002A81EC /* DPak.h in Headers */,
-				330A998B15BCA0A0002A81EC /* DPakDef.h in Headers */,
-				330A998C15BCA0A0002A81EC /* FileSystem.h in Headers */,
-				330A998D15BCA0A0002A81EC /* FileSystemDef.h in Headers */,
 				330A999015BCA0DD002A81EC /* Assets.h in Headers */,
 				330A999115BCA0DD002A81EC /* AssetTypes.h in Headers */,
 				330A999315BCA0DD002A81EC /* FontParser.h in Headers */,
@@ -4812,6 +4750,9 @@
 				330A99B115BCA101002A81EC /* TextureParser.h in Headers */,
 				330A99B315BCA101002A81EC /* TypefaceParser.h in Headers */,
 				338A45FF15DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */,
+				33DB157C1627E36900963A33 /* Tokenizer.h in Headers */,
+				33DB15861627E37B00963A33 /* Tokenizer.h in Headers */,
+				33DB15901627E4BD00963A33 /* DrawModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5042,8 +4983,6 @@
 				337AE6CF15BF214F00AD1617 /* Property.h in Headers */,
 				337AE6D015BF214F00AD1617 /* RefCount.h in Headers */,
 				337AE6D115BF214F00AD1617 /* RefCountDef.h in Headers */,
-				337AE6D215BF214F00AD1617 /* SafePointer.h in Headers */,
-				337AE6D315BF214F00AD1617 /* SafePointerDef.h in Headers */,
 				337AE6D415BF214F00AD1617 /* SharedLibrary.h in Headers */,
 				337AE6D515BF214F00AD1617 /* SharedLibraryDef.h in Headers */,
 				337AE6D615BF214F00AD1617 /* SIMD.h in Headers */,
@@ -5106,14 +5045,12 @@
 				337AE70F15BF214F00AD1617 /* PostProcess.h in Headers */,
 				337AE71015BF214F00AD1617 /* ScreenOverlay.h in Headers */,
 				337AE71115BF214F00AD1617 /* ScreenOverlayDef.h in Headers */,
-				337AE71215BF214F00AD1617 /* ViewModel.h in Headers */,
 				337AE71315BF214F00AD1617 /* World.h in Headers */,
 				337AE71415BF214F00AD1617 /* WorldCinematics.h in Headers */,
 				337AE71515BF214F00AD1617 /* WorldDef.h in Headers */,
 				337AE71615BF214F00AD1617 /* WorldDraw.h in Headers */,
 				337AE71715BF214F00AD1617 /* WorldDrawDef.h in Headers */,
 				337AE71815BF214F00AD1617 /* WorldLua.h in Headers */,
-				337AE71915BF214F00AD1617 /* Tokenizer.h in Headers */,
 				337AE71A15BF214F00AD1617 /* UIMatWidget.h in Headers */,
 				337AE71B15BF214F00AD1617 /* UITextLabel.h in Headers */,
 				337AE71C15BF214F00AD1617 /* UIWidget.h in Headers */,
@@ -5169,12 +5106,6 @@
 				337AE74E15BF214F00AD1617 /* GSPlay.h in Headers */,
 				337AE74F15BF214F00AD1617 /* GSPriority.h in Headers */,
 				337AE75015BF214F00AD1617 /* WaveAnim.h in Headers */,
-				337AE75115BF214F00AD1617 /* DPak.h in Headers */,
-				337AE75215BF214F00AD1617 /* FileSystem.h in Headers */,
-				337AE75315BF214F00AD1617 /* DPak.h in Headers */,
-				337AE75415BF214F00AD1617 /* DPakDef.h in Headers */,
-				337AE75515BF214F00AD1617 /* FileSystem.h in Headers */,
-				337AE75615BF214F00AD1617 /* FileSystemDef.h in Headers */,
 				337AE75715BF214F00AD1617 /* Assets.h in Headers */,
 				337AE75815BF214F00AD1617 /* AssetTypes.h in Headers */,
 				337AE75915BF214F00AD1617 /* FontParser.h in Headers */,
@@ -5195,6 +5126,9 @@
 				337AE76815BF214F00AD1617 /* TextureParser.h in Headers */,
 				337AE76915BF214F00AD1617 /* TypefaceParser.h in Headers */,
 				338A460015DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */,
+				33DB157D1627E36900963A33 /* Tokenizer.h in Headers */,
+				33DB15871627E37B00963A33 /* Tokenizer.h in Headers */,
+				33DB15911627E4BD00963A33 /* DrawModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5242,8 +5176,6 @@
 				33E883E915B9AB370089BA08 /* Property.h in Headers */,
 				33E883EB15B9AB370089BA08 /* RefCount.h in Headers */,
 				33E883ED15B9AB370089BA08 /* RefCountDef.h in Headers */,
-				33E883EF15B9AB370089BA08 /* SafePointer.h in Headers */,
-				33E883F115B9AB370089BA08 /* SafePointerDef.h in Headers */,
 				33E883F515B9AB370089BA08 /* SharedLibrary.h in Headers */,
 				33E883F715B9AB370089BA08 /* SharedLibraryDef.h in Headers */,
 				33E883FB15B9AB370089BA08 /* SIMD.h in Headers */,
@@ -5471,12 +5403,6 @@
 				33E8879315B9B9ED0089BA08 /* TextureParser.h in Headers */,
 				33E8879715B9B9ED0089BA08 /* TypefaceCooker.h in Headers */,
 				33E8879B15B9B9ED0089BA08 /* TypefaceParser.h in Headers */,
-				33E887AA15B9BA1F0089BA08 /* DPak.h in Headers */,
-				33E887AE15B9BA1F0089BA08 /* FileSystem.h in Headers */,
-				33E887B015B9BA1F0089BA08 /* DPak.h in Headers */,
-				33E887B215B9BA1F0089BA08 /* DPakDef.h in Headers */,
-				33E887B415B9BA1F0089BA08 /* FileSystem.h in Headers */,
-				33E887B615B9BA1F0089BA08 /* FileSystemDef.h in Headers */,
 				33E8891715B9BA4B0089BA08 /* Game.h in Headers */,
 				33E8891B15B9BA4B0089BA08 /* GameNetwork.h in Headers */,
 				33E8891D15B9BA4B0089BA08 /* GameNetworkDef.h in Headers */,
@@ -5584,14 +5510,11 @@
 				33E88AA115B9BA4B0089BA08 /* EditorPropertyGridItemDelegate.h in Headers */,
 				33E88AA515B9BA4B0089BA08 /* EditorPropertyGridModel.h in Headers */,
 				33E88AA915B9BA4B0089BA08 /* EditorWidgetPropertyEditors.h in Headers */,
-				33E88AAB15B9BA4B0089BA08 /* Map.h in Headers */,
-				33E88AAF15B9BA4B0089BA08 /* MaxScene.h in Headers */,
 				33E88AB315B9BA4B0089BA08 /* Progress.h in Headers */,
 				33E88AB715B9BA4B0089BA08 /* UIMatWidget.h in Headers */,
 				33E88ABB15B9BA4B0089BA08 /* UITextLabel.h in Headers */,
 				33E88ABF15B9BA4B0089BA08 /* UIWidget.h in Headers */,
 				33E88AC115B9BA4B0089BA08 /* UIWidgetDef.h in Headers */,
-				33E88AC515B9BA4B0089BA08 /* Tokenizer.h in Headers */,
 				33E88AC915B9BA4B0089BA08 /* BSPFile.h in Headers */,
 				33E88ACD15B9BA4B0089BA08 /* E_Exports.h in Headers */,
 				33E88AD115B9BA4B0089BA08 /* E_Pawn.h in Headers */,
@@ -5622,16 +5545,11 @@
 				33E88B3115B9BA4B0089BA08 /* T_TempSpawn.h in Headers */,
 				33E88B3515B9BA4B0089BA08 /* T_Tick.h in Headers */,
 				33E88B3915B9BA4B0089BA08 /* T_TypefacePrecache.h in Headers */,
-				33E88B3D15B9BA4B0089BA08 /* BoxBSP.h in Headers */,
-				33E88B3F15B9BA4B0089BA08 /* MapTypes.h in Headers */,
-				33E88B4115B9BA4B0089BA08 /* PlaneHash.h in Headers */,
-				33E88B4315B9BA4B0089BA08 /* VecHash.h in Headers */,
 				33E88B4715B9BA4B0089BA08 /* MapBuilder.h in Headers */,
 				33E88B4915B9BA4B0089BA08 /* MBatchDraw.h in Headers */,
 				33E88B5115B9BA4B0089BA08 /* PostProcess.h in Headers */,
 				33E88B5515B9BA4B0089BA08 /* ScreenOverlay.h in Headers */,
 				33E88B5715B9BA4B0089BA08 /* ScreenOverlayDef.h in Headers */,
-				33E88B5B15B9BA4B0089BA08 /* ViewModel.h in Headers */,
 				33E88B5F15B9BA4B0089BA08 /* World.h in Headers */,
 				33E88B6315B9BA4B0089BA08 /* WorldCinematics.h in Headers */,
 				33E88B6515B9BA4B0089BA08 /* WorldDef.h in Headers */,
@@ -5654,6 +5572,17 @@
 				33836C4815B9CF590030EAEC /* Types.h in Headers */,
 				33836C4C15B9CF590030EAEC /* Zones.h in Headers */,
 				338A45FD15DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */,
+				33DB15781627E31F00963A33 /* SceneFile.h in Headers */,
+				33DB157A1627E36900963A33 /* Tokenizer.h in Headers */,
+				33DB15841627E37B00963A33 /* Tokenizer.h in Headers */,
+				33DB158E1627E4BD00963A33 /* DrawModel.h in Headers */,
+				33DB159D1627E4D100963A33 /* MapTypes.h in Headers */,
+				33DB15A11627E4D100963A33 /* PlaneHash.h in Headers */,
+				33DB15A91627E4D100963A33 /* SolidBSP.h in Headers */,
+				33DB15C11627E4D100963A33 /* VecHash.h in Headers */,
+				33DB15E7162FA55500963A33 /* CinematicsBuilder.h in Headers */,
+				33DB1608162FB05800963A33 /* EditorContentAssetThumbDimensionCache.h in Headers */,
+				33DB160C162FB28700963A33 /* EditorBSPDebugWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5701,8 +5630,6 @@
 				33E883EA15B9AB370089BA08 /* Property.h in Headers */,
 				33E883EC15B9AB370089BA08 /* RefCount.h in Headers */,
 				33E883EE15B9AB370089BA08 /* RefCountDef.h in Headers */,
-				33E883F015B9AB370089BA08 /* SafePointer.h in Headers */,
-				33E883F215B9AB370089BA08 /* SafePointerDef.h in Headers */,
 				33E883F615B9AB370089BA08 /* SharedLibrary.h in Headers */,
 				33E883F815B9AB370089BA08 /* SharedLibraryDef.h in Headers */,
 				33E883FC15B9AB370089BA08 /* SIMD.h in Headers */,
@@ -5918,12 +5845,6 @@
 				33E8878C15B9B9ED0089BA08 /* StringTableParser.h in Headers */,
 				33E8879415B9B9ED0089BA08 /* TextureParser.h in Headers */,
 				33E8879C15B9B9ED0089BA08 /* TypefaceParser.h in Headers */,
-				33E887AB15B9BA1F0089BA08 /* DPak.h in Headers */,
-				33E887AF15B9BA1F0089BA08 /* FileSystem.h in Headers */,
-				33E887B115B9BA1F0089BA08 /* DPak.h in Headers */,
-				33E887B315B9BA1F0089BA08 /* DPakDef.h in Headers */,
-				33E887B515B9BA1F0089BA08 /* FileSystem.h in Headers */,
-				33E887B715B9BA1F0089BA08 /* FileSystemDef.h in Headers */,
 				33E8891815B9BA4B0089BA08 /* Game.h in Headers */,
 				33E8891C15B9BA4B0089BA08 /* GameNetwork.h in Headers */,
 				33E8891E15B9BA4B0089BA08 /* GameNetworkDef.h in Headers */,
@@ -5977,7 +5898,6 @@
 				33E88ABC15B9BA4B0089BA08 /* UITextLabel.h in Headers */,
 				33E88AC015B9BA4B0089BA08 /* UIWidget.h in Headers */,
 				33E88AC215B9BA4B0089BA08 /* UIWidgetDef.h in Headers */,
-				33E88AC615B9BA4B0089BA08 /* Tokenizer.h in Headers */,
 				33E88ACA15B9BA4B0089BA08 /* BSPFile.h in Headers */,
 				33E88ACE15B9BA4B0089BA08 /* E_Exports.h in Headers */,
 				33E88AD215B9BA4B0089BA08 /* E_Pawn.h in Headers */,
@@ -6012,7 +5932,6 @@
 				33E88B5215B9BA4B0089BA08 /* PostProcess.h in Headers */,
 				33E88B5615B9BA4B0089BA08 /* ScreenOverlay.h in Headers */,
 				33E88B5815B9BA4B0089BA08 /* ScreenOverlayDef.h in Headers */,
-				33E88B5C15B9BA4B0089BA08 /* ViewModel.h in Headers */,
 				33E88B6015B9BA4B0089BA08 /* World.h in Headers */,
 				33E88B6415B9BA4B0089BA08 /* WorldCinematics.h in Headers */,
 				33E88B6615B9BA4B0089BA08 /* WorldDef.h in Headers */,
@@ -6035,6 +5954,9 @@
 				33836C4915B9CF590030EAEC /* Types.h in Headers */,
 				33836C4D15B9CF590030EAEC /* Zones.h in Headers */,
 				338A45FE15DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */,
+				33DB157B1627E36900963A33 /* Tokenizer.h in Headers */,
+				33DB15851627E37B00963A33 /* Tokenizer.h in Headers */,
+				33DB158F1627E4BD00963A33 /* DrawModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6301,13 +6223,11 @@
 				330A991115BC9FC1002A81EC /* MT_Spline.cpp in Sources */,
 				330A991215BC9FC1002A81EC /* PostProcess.cpp in Sources */,
 				330A991415BC9FC1002A81EC /* ScreenOverlay.cpp in Sources */,
-				330A991715BC9FC1002A81EC /* ViewModel.cpp in Sources */,
 				330A991915BC9FC1002A81EC /* World.cpp in Sources */,
 				330A991B15BC9FC1002A81EC /* WorldCinematics.cpp in Sources */,
 				330A991E15BC9FC1002A81EC /* WorldDraw.cpp in Sources */,
 				330A992115BC9FC1002A81EC /* WorldLua.cpp in Sources */,
 				330A992315BC9FC1002A81EC /* WorldSpawn.cpp in Sources */,
-				330A992415BC9FC9002A81EC /* Tokenizer.cpp in Sources */,
 				330A992615BC9FCD002A81EC /* UIMatWidget.cpp in Sources */,
 				330A992815BC9FCD002A81EC /* UITextLabel.cpp in Sources */,
 				330A992A15BC9FCD002A81EC /* UIWidget.cpp in Sources */,
@@ -6345,9 +6265,6 @@
 				330A997F15BCA097002A81EC /* GSLoadMap.cpp in Sources */,
 				330A998115BCA097002A81EC /* GSPlay.cpp in Sources */,
 				330A998415BCA097002A81EC /* WaveAnim.cpp in Sources */,
-				330A998615BCA0A0002A81EC /* DPak.cpp in Sources */,
-				330A998815BCA0A0002A81EC /* FileSystem.cpp in Sources */,
-				330A998E15BCA0A0002A81EC /* FileSystemReflectMap.cpp in Sources */,
 				330A998F15BCA0DD002A81EC /* Assets.cpp in Sources */,
 				330A999215BCA0DD002A81EC /* FontParser.cpp in Sources */,
 				330A999415BCA0DD002A81EC /* MapAsset.cpp in Sources */,
@@ -6366,6 +6283,9 @@
 				330A99AE15BCA101002A81EC /* StringTableParser.cpp in Sources */,
 				330A99B015BCA101002A81EC /* TextureParser.cpp in Sources */,
 				330A99B215BCA101002A81EC /* TypefaceParser.cpp in Sources */,
+				33DB15821627E37B00963A33 /* Tokenizer.cpp in Sources */,
+				33DB158C1627E4BD00963A33 /* DrawModel.cpp in Sources */,
+				33DB15EB162FA56A00963A33 /* WorldBSP.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6458,13 +6378,11 @@
 				337AE5A615BF214F00AD1617 /* MT_Spline.cpp in Sources */,
 				337AE5A715BF214F00AD1617 /* PostProcess.cpp in Sources */,
 				337AE5A815BF214F00AD1617 /* ScreenOverlay.cpp in Sources */,
-				337AE5A915BF214F00AD1617 /* ViewModel.cpp in Sources */,
 				337AE5AA15BF214F00AD1617 /* World.cpp in Sources */,
 				337AE5AB15BF214F00AD1617 /* WorldCinematics.cpp in Sources */,
 				337AE5AC15BF214F00AD1617 /* WorldDraw.cpp in Sources */,
 				337AE5AD15BF214F00AD1617 /* WorldLua.cpp in Sources */,
 				337AE5AE15BF214F00AD1617 /* WorldSpawn.cpp in Sources */,
-				337AE5AF15BF214F00AD1617 /* Tokenizer.cpp in Sources */,
 				337AE5B015BF214F00AD1617 /* UIMatWidget.cpp in Sources */,
 				337AE5B115BF214F00AD1617 /* UITextLabel.cpp in Sources */,
 				337AE5B215BF214F00AD1617 /* UIWidget.cpp in Sources */,
@@ -6502,9 +6420,6 @@
 				337AE5D315BF214F00AD1617 /* GSLoadMap.cpp in Sources */,
 				337AE5D415BF214F00AD1617 /* GSPlay.cpp in Sources */,
 				337AE5D515BF214F00AD1617 /* WaveAnim.cpp in Sources */,
-				337AE5D615BF214F00AD1617 /* DPak.cpp in Sources */,
-				337AE5D715BF214F00AD1617 /* FileSystem.cpp in Sources */,
-				337AE5D815BF214F00AD1617 /* FileSystemReflectMap.cpp in Sources */,
 				337AE5D915BF214F00AD1617 /* Assets.cpp in Sources */,
 				337AE5DA15BF214F00AD1617 /* FontParser.cpp in Sources */,
 				337AE5DB15BF214F00AD1617 /* MapAsset.cpp in Sources */,
@@ -6523,6 +6438,9 @@
 				337AE5E815BF214F00AD1617 /* StringTableParser.cpp in Sources */,
 				337AE5E915BF214F00AD1617 /* TextureParser.cpp in Sources */,
 				337AE5EA15BF214F00AD1617 /* TypefaceParser.cpp in Sources */,
+				33DB15831627E37B00963A33 /* Tokenizer.cpp in Sources */,
+				33DB158D1627E4BD00963A33 /* DrawModel.cpp in Sources */,
+				33DB15EC162FA56A00963A33 /* WorldBSP.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6603,9 +6521,6 @@
 				33E8879115B9B9ED0089BA08 /* TextureParser.cpp in Sources */,
 				33E8879515B9B9ED0089BA08 /* TypefaceCooker.cpp in Sources */,
 				33E8879915B9B9ED0089BA08 /* TypefaceParser.cpp in Sources */,
-				33E887A815B9BA1F0089BA08 /* DPak.cpp in Sources */,
-				33E887AC15B9BA1F0089BA08 /* FileSystem.cpp in Sources */,
-				33E887B815B9BA1F0089BA08 /* FileSystemReflectMap.cpp in Sources */,
 				33E8891515B9BA4B0089BA08 /* Game.cpp in Sources */,
 				33E8891915B9BA4B0089BA08 /* GameNetwork.cpp in Sources */,
 				33E8892115B9BA4B0089BA08 /* Gestures.cpp in Sources */,
@@ -6694,12 +6609,10 @@
 				33E88A9F15B9BA4B0089BA08 /* EditorPropertyGridItemDelegate.cpp in Sources */,
 				33E88AA315B9BA4B0089BA08 /* EditorPropertyGridModel.cpp in Sources */,
 				33E88AA715B9BA4B0089BA08 /* EditorWidgetPropertyEditors.cpp in Sources */,
-				33E88AAD15B9BA4B0089BA08 /* MaxScene.cpp in Sources */,
 				33E88AB115B9BA4B0089BA08 /* Progress.cpp in Sources */,
 				33E88AB515B9BA4B0089BA08 /* UIMatWidget.cpp in Sources */,
 				33E88AB915B9BA4B0089BA08 /* UITextLabel.cpp in Sources */,
 				33E88ABD15B9BA4B0089BA08 /* UIWidget.cpp in Sources */,
-				33E88AC315B9BA4B0089BA08 /* Tokenizer.cpp in Sources */,
 				33E88AC715B9BA4B0089BA08 /* BSPFile.cpp in Sources */,
 				33E88ACB15B9BA4B0089BA08 /* E_Exports.cpp in Sources */,
 				33E88ACF15B9BA4B0089BA08 /* E_Pawn.cpp in Sources */,
@@ -6728,13 +6641,11 @@
 				33E88B2F15B9BA4B0089BA08 /* T_TempSpawn.cpp in Sources */,
 				33E88B3315B9BA4B0089BA08 /* T_Tick.cpp in Sources */,
 				33E88B3715B9BA4B0089BA08 /* T_TypefacePrecache.cpp in Sources */,
-				33E88B3B15B9BA4B0089BA08 /* BoxBSP.cpp in Sources */,
 				33E88B4515B9BA4B0089BA08 /* MapBuilder.cpp in Sources */,
 				33E88B4B15B9BA4B0089BA08 /* MT_Fly.cpp in Sources */,
 				33E88B4D15B9BA4B0089BA08 /* MT_Spline.cpp in Sources */,
 				33E88B4F15B9BA4B0089BA08 /* PostProcess.cpp in Sources */,
 				33E88B5315B9BA4B0089BA08 /* ScreenOverlay.cpp in Sources */,
-				33E88B5915B9BA4B0089BA08 /* ViewModel.cpp in Sources */,
 				33E88B5D15B9BA4B0089BA08 /* World.cpp in Sources */,
 				33E88B6115B9BA4B0089BA08 /* WorldCinematics.cpp in Sources */,
 				33E88B6715B9BA4B0089BA08 /* WorldDraw.cpp in Sources */,
@@ -6752,6 +6663,19 @@
 				33836C4215B9CF590030EAEC /* StringTable.cpp in Sources */,
 				33836C4A15B9CF590030EAEC /* Zones.cpp in Sources */,
 				336836D515D43BA800EE9472 /* GameNetworkNull.cpp in Sources */,
+				33DB15771627E31F00963A33 /* SceneFile.cpp in Sources */,
+				33DB15801627E37B00963A33 /* Tokenizer.cpp in Sources */,
+				33DB158A1627E4BD00963A33 /* DrawModel.cpp in Sources */,
+				33DB15A51627E4D100963A33 /* SolidBSP.cpp in Sources */,
+				33DB15AD1627E4D100963A33 /* SolidBSPAreas.cpp in Sources */,
+				33DB15B11627E4D100963A33 /* SolidBSPDraw.cpp in Sources */,
+				33DB15B51627E4D100963A33 /* SolidBSPEmit.cpp in Sources */,
+				33DB15B91627E4D100963A33 /* SolidBSPFlood.cpp in Sources */,
+				33DB15BD1627E4D100963A33 /* SolidBSPPortals.cpp in Sources */,
+				33DB15E6162FA55500963A33 /* CinematicsBuilder.cpp in Sources */,
+				33DB15E9162FA56A00963A33 /* WorldBSP.cpp in Sources */,
+				33DB1607162FB05800963A33 /* EditorContentAssetThumbDimensionCache.cpp in Sources */,
+				33DB160B162FB28700963A33 /* EditorBSPDebugWidget.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6819,9 +6743,6 @@
 				33E8878A15B9B9ED0089BA08 /* StringTableParser.cpp in Sources */,
 				33E8879215B9B9ED0089BA08 /* TextureParser.cpp in Sources */,
 				33E8879A15B9B9ED0089BA08 /* TypefaceParser.cpp in Sources */,
-				33E887A915B9BA1F0089BA08 /* DPak.cpp in Sources */,
-				33E887AD15B9BA1F0089BA08 /* FileSystem.cpp in Sources */,
-				33E887B915B9BA1F0089BA08 /* FileSystemReflectMap.cpp in Sources */,
 				33E8891615B9BA4B0089BA08 /* Game.cpp in Sources */,
 				33E8891A15B9BA4B0089BA08 /* GameNetwork.cpp in Sources */,
 				33E8892215B9BA4B0089BA08 /* Gestures.cpp in Sources */,
@@ -6857,7 +6778,6 @@
 				33E88AB615B9BA4B0089BA08 /* UIMatWidget.cpp in Sources */,
 				33E88ABA15B9BA4B0089BA08 /* UITextLabel.cpp in Sources */,
 				33E88ABE15B9BA4B0089BA08 /* UIWidget.cpp in Sources */,
-				33E88AC415B9BA4B0089BA08 /* Tokenizer.cpp in Sources */,
 				33E88AC815B9BA4B0089BA08 /* BSPFile.cpp in Sources */,
 				33E88ACC15B9BA4B0089BA08 /* E_Exports.cpp in Sources */,
 				33E88AD015B9BA4B0089BA08 /* E_Pawn.cpp in Sources */,
@@ -6890,7 +6810,6 @@
 				33E88B4E15B9BA4B0089BA08 /* MT_Spline.cpp in Sources */,
 				33E88B5015B9BA4B0089BA08 /* PostProcess.cpp in Sources */,
 				33E88B5415B9BA4B0089BA08 /* ScreenOverlay.cpp in Sources */,
-				33E88B5A15B9BA4B0089BA08 /* ViewModel.cpp in Sources */,
 				33E88B5E15B9BA4B0089BA08 /* World.cpp in Sources */,
 				33E88B6215B9BA4B0089BA08 /* WorldCinematics.cpp in Sources */,
 				33E88B6815B9BA4B0089BA08 /* WorldDraw.cpp in Sources */,
@@ -6907,6 +6826,9 @@
 				33836C3F15B9CF590030EAEC /* Persistence.cpp in Sources */,
 				33836C4315B9CF590030EAEC /* StringTable.cpp in Sources */,
 				33836C4B15B9CF590030EAEC /* Zones.cpp in Sources */,
+				33DB15811627E37B00963A33 /* Tokenizer.cpp in Sources */,
+				33DB158B1627E4BD00963A33 /* DrawModel.cpp in Sources */,
+				33DB15EA162FA56A00963A33 /* WorldBSP.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

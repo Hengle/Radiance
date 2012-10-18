@@ -83,7 +83,7 @@ inline AABB3<T>& AABB3<T>::Initialize(const T& minX, const T& minY, const T& min
 template<typename T>
 inline AABB3<T>& AABB3<T>::Expand(const Vector3<T>& ex)
 {
-	Vector3<T>& half = ex / 2.0f;
+	Vector3<T> half = ex / 2.0f;
 	m_mins -= half;
 	m_maxs += half;
 	m_org = (m_maxs + m_mins) / T(2);

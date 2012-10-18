@@ -533,10 +533,10 @@ String operator + (const String &b, wchar_t s);
 	the lifetime of the returned string. */
 string::String CStr(const char *sz);
 
-namespace std {
+RAD_BEGIN_STD_NAMESPACE
 template <class C, class T> class basic_istream;
 template <class C, class T> class basic_ostream;
-}
+RAD_END_STD_NAMESPACE
 
 namespace string {
 

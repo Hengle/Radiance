@@ -47,14 +47,21 @@ void ContentAssetThumbDimensionCache::Load() {
 	U32 id;
 	U32 version;
 
-	if (!(is.Read(&id) && is.Read(&version)))
-		goto close;
-	if (id != kId || version != kVersion)
-		goto close;
+	if (!(is.Read(&id) && is.Read(&version))) {
+		fclose(fp);
+		return;
+	}
+		
+	if (id != kId || version != kVersion) {
+		fclose(fp);
+		return;
+	}
 
 	U32 num;
-	if (!is.Read(&num))
-		goto close;
+	if (!is.Read(&num)) {
+		fclose(fp);
+		return;
+	}
 
 	App *app = App::Get();
 
@@ -62,14 +69,25 @@ void ContentAssetThumbDimensionCache::Load() {
 		Info info;
 		String s;
 
-		if (!is.Read(&s))
-			goto close;
-		if (!info.modified.Read(is))
-			goto close;
-		if (!is.Read(&info.width))
-			goto close;
-		if (!is.Read(&info.height))
-			goto close;
+		if (!is.Read(&s)) {
+			fclose(fp);
+			return;
+		}
+		
+		if (!info.modified.Read(is)) {
+			fclose(fp);
+			return;
+		}
+		
+		if (!is.Read(&info.width)) {
+			fclose(fp);
+			return;
+		}
+		
+		if (!is.Read(&info.height)) {
+			fclose(fp);
+			return;
+		}
 
 		int id = app->engine->sys->packages->ResolveId(s.c_str);
 		if (id == -1)
@@ -77,8 +95,6 @@ void ContentAssetThumbDimensionCache::Load() {
 
 		m_map[id] = info;
 	}
-
-close:
 
 	fclose(fp);
 }

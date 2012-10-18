@@ -9,6 +9,7 @@ function m() {
 
 BASE=$ROOT
 
+m "EditorBSPDebugWidget"
 m "EditorComboCheckBox"
 m "EditorCookerDialog"
 m "EditorGLNavWidget"

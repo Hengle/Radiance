@@ -114,6 +114,9 @@
 
 	#define RAD_THREAD_VAR __declspec(thread)
 
+	#define RAD_BEGIN_STD_NAMESPACE namespace std {
+	#define RAD_END_STD_NAMESPACE }
+
 	#define RAD_FORCEINLINE        __forceinline
 	#define RAD_SYMIMPORT          __declspec(dllimport)
 	#define RAD_SYMEXPORT          __declspec(dllexport)

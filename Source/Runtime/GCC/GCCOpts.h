@@ -75,6 +75,15 @@
 		#define RAD_OPT_RTTI
 	#endif
 
+	#if defined(__llvm__)
+		#define RAD_OPT_LLVM
+		#define RAD_BEGIN_STD_NAMESPACE _LIBCPP_BEGIN_NAMESPACE_STD
+		#define RAD_END_STD_NAMESPACE _LIBCPP_END_NAMESPACE_STD
+	#else
+		#define RAD_BEGIN_STD_NAMESPACE namespace std {
+		#define RAD_END_STD_NAMESPACE }
+	#endif
+
 	#ifdef _CPPUNWIND
 		#define RAD_OPT_EXCEPTIONS
 	#endif

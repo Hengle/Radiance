@@ -281,8 +281,11 @@ void Winding<TVertex, TPlane, TAllocator>::Split(const PlaneType &p, SelfType *f
 	if (backVerts) 
 		backVerts->clear();
 
-	std::vector<SideType, TAllocator> sides(TAllocator::template rebind<SideType>::other(m_verts.get_allocator())); // rebind to same allocator.
-	std::vector<ValueType, TAllocator> dots(TAllocator::template rebind<ValueType>::other(m_verts.get_allocator()));
+	typedef typename TAllocator::template rebind<SideType>::other SideAllocator;
+	typedef typename TAllocator::template rebind<ValueType>::other ValueAllocator;
+	
+	std::vector<SideType, SideAllocator> sides(SideAllocator(m_verts.get_allocator())); // rebind to same allocator.
+	std::vector<ValueType, ValueAllocator> dots(ValueAllocator(m_verts.get_allocator()));
 	size_t counts[PlaneType::NumSides];
 
 	memset(counts, 0, sizeof(counts));

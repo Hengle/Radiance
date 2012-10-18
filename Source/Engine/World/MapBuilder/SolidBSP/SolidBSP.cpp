@@ -596,18 +596,13 @@ void BSPBuilder::CreateRootNode() {
 	m_root.reset(node);
 }
 
-int BSPBuilder::BoxPlaneNum(Node *node, int &boxAxis)
-{
+int BSPBuilder::BoxPlaneNum(Node *node, int &boxAxis) {
 	Vec3 boundSize = node->bounds.Size();
-	for (int i = 0; i < 3; ++i)
-	{
-		int axis = boxAxis;
+	for (int i = 0; i < 3; ++i) {
 		boxAxis = (boxAxis+1) % 3;
-		if (boundSize[i] > kMaxBoxExtents)
-		{
+		if (boundSize[i] > kMaxBoxExtents) {
 			Plane split;
-			switch (i)
-			{
+			switch (i) {
 			case 0:
 				split = Plane::X;
 				break;
@@ -677,13 +672,11 @@ int BSPBuilder::FindSplitPlane(Node *node, int &boxAxis)
 								back += (int)mdl->polys.size();
 								break;
 							case Plane::Cross:
-								for (PolyVec::iterator poly = mdl->polys.begin(); poly != mdl->polys.end(); ++poly)
-								{
+								for (PolyVec::iterator poly = mdl->polys.begin(); poly != mdl->polys.end(); ++poly) {
 									if (((*poly)->planenum&~1) == planenum) 
 										continue;
 									s = (*poly)->winding->Side(p, kBSPSplitEpsilon);
-									switch (s)
-									{
+									switch (s) {
 									case Plane::Front:
 										++front;
 										break;
@@ -701,6 +694,8 @@ int BSPBuilder::FindSplitPlane(Node *node, int &boxAxis)
 									case Plane::On:
 										++front;
 										++back;
+										break;
+									default:
 										break;
 									}
 								}
