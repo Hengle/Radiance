@@ -35,9 +35,9 @@ void BSPBuilder::RemovePortalFromNode(const PortalRef &p, Node *node) {
 		{
 			// unlink using previous portal.
 			if (last) {
-				last->next[ls] = test->next[ns];
+				last->next[ls] = test->next[pside];
 			} else {
-				node->portals = test->next[ns];
+				node->portals = test->next[pside];
 			}
 
 			p->nodes[pside] = 0;
@@ -69,7 +69,7 @@ void BSPBuilder::Portalize() {
 	m_outside.planenum = kPlaneNumLeaf;
 	m_outside.bounds = m_root->bounds;
 	m_outside.contents = 0;
-	m_outside.bounds.Expand(ValueType(16), ValueType(16), ValueType(16)); // avoid null volumes.
+	m_outside.bounds.Expand(ValueType(32), ValueType(32), ValueType(32)); // avoid null volumes.
 	WindingVec windings;
 	
 	// make 6 bounding portals (axis aligned box that contains the world) that
@@ -93,7 +93,7 @@ void BSPBuilder::MakeNodePortal(Node *node) {
 	PortalRef p(new Portal());
 	Winding f, b;
 	p->plane.planenum = node->planenum;
-	p->plane.winding.Initialize(m_planes.Plane(node->planenum), SceneFile::kMaxRange);
+	p->plane.winding.Initialize(m_planes.Plane(node->planenum), SceneFile::kMaxRange*2);
 
 	// split portal by all bounding portals that look into the node.
 	int side;
@@ -104,33 +104,38 @@ void BSPBuilder::MakeNodePortal(Node *node) {
 
 		Plane::SideType s = p->plane.winding.Side(
 			m_planes.Plane(bounding->plane.planenum),
-			kPortalSplitEpsilon
+			kBSPSplitEpsilon
 		);
 
 		if (s == Plane::On) {
-			// portal is too small to split, put on both sides
+			// portal is too small to split
 			continue;
-		} else if (s == Plane::Front && side) {
-			// portal clipped away.
-			continue;
+		}
+		
+		if (s == Plane::Front && side) {
+			Log("WARNING: portal clipped away (back)!\n");
+			return;
 		} else if (s == Plane::Back && !side) {
-			// portal clipped awway.
-			continue;
+			Log("WARNING: portal clipped away (front)!\n");
+			return;
 		} else if (s == Plane::Cross) {
 			p->plane.winding.Split(
 				m_planes.Plane(bounding->plane.planenum),
 				&f,
 				&b,
-				kPortalSplitEpsilon
+				kBSPSplitEpsilon
 			);
 
 			if (f.Empty())
-				Log("WARNING: portal clipped away (front)!\n");
+				Log("WARNING: portal clipped away (cross/front)!\n");
 			if (b.Empty())
-				Log("WARNING: portal clipped away (back)!\n");
+				Log("WARNING: portal clipped away (cross/back)!\n");
 
 			if (side)
 				std::swap(f, b);
+
+			if (f.Empty())
+				return;
 
 			p->plane.winding = f;
 		}
@@ -155,13 +160,13 @@ void BSPBuilder::SplitNodePortals(Node *node) {
 		RemovePortalFromNode(p, p->nodes[0]);
 		RemovePortalFromNode(p, p->nodes[1]);
 
-		p->plane.winding.Split(plane, &f, &b, kPortalSplitEpsilon);
+		p->plane.winding.Split(plane, &f, &b, kBSPSplitEpsilon);
 
 		if (++m_numPortalSplits % 1000 == 0)
 			EmitProgress();
 		
 		if (f.Empty() && b.Empty()) {
-			// put on both sides.
+			// add to both sides
 			PortalRef z(new Portal(*p));
 			z->plane.winding = p->plane.winding;
 			
@@ -172,8 +177,7 @@ void BSPBuilder::SplitNodePortals(Node *node) {
 				AddPortalToNodes(p, other, node->children[0].get());
 				AddPortalToNodes(z, other, node->children[1].get());
 			}
-		}
-		else if (!f.Empty() && !b.Empty()) {
+		} else if (!f.Empty() && !b.Empty()) {
 			PortalRef z(new Portal(*p));
 			p->plane.winding = f;
 			z->plane.winding = b;
@@ -219,20 +223,32 @@ void BSPBuilder::FindPortalNodeFaces(Node *node)
 		if (!p->original.empty()) 
 			continue;
 
-		int contents = p->nodes[0]->contents ^ p->nodes[1]->contents;
-		if (contents&kContentsFlag_VisibleContents) {
-			// matching always faces away from the leaf
-			int planenum = p->plane.planenum ^ (side^1);
+		int contents = (p->nodes[0]->contents ^ p->nodes[1]->contents) & kContentsFlag_VisibleContents;
+		for (int i = kContentsFlag_FirstVisibleContents; i <= kContentsFlag_LastVisibleContents; i <<= 1) {
+			if (i & contents) {
+				contents = i;
+				break;
+			}
+		}
 
-			for (TriModelFragVec::iterator it = node->models.begin(); it != node->models.end(); ++it) {
-				for (PolyVec::iterator poly = (*it)->polys.begin(); poly != (*it)->polys.end(); ++poly) {
+		if (!contents)
+			continue;
+
+		// matching always faces away from the leaf
+		int planenum = p->plane.planenum ^ (side^1);
+
+		for (TriModelFragVec::iterator it = node->models.begin(); it != node->models.end(); ++it) {
+
+			if (!(contents & (*it)->original->contents))
+				continue;
+
+			for (PolyVec::iterator poly = (*it)->polys.begin(); poly != (*it)->polys.end(); ++poly) {
 					
-					if ((*poly)->planenum == planenum) {
-						p->contents |= contents;
-						p->original.push_back((*poly)->original);
-						p->poly = (*poly).get();
-						++m_numPortalFaces;
-					}
+				if ((*poly)->planenum == planenum) {
+					p->contents |= contents;
+					p->original.push_back((*poly)->original);
+					p->poly = (*poly).get();
+					++m_numPortalFaces;
 				}
 			}
 		}

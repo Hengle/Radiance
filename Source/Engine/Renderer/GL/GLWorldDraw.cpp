@@ -497,8 +497,7 @@ bool GLWorldDraw::Project(const Vec3 &p, Vec3 &out) {
 	return r;
 }
 
-Vec3 GLWorldDraw::Unproject(const Vec3 &p)
-{
+Vec3 GLWorldDraw::Unproject(const Vec3 &p) {
 	int viewport[4];
 	world->game->Viewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
@@ -528,5 +527,83 @@ Vec3 GLWorldDraw::Unproject(const Vec3 &p)
 
 	return z;
 }
+
+#if !defined(RAD_OPT_SHIP)
+
+void GLWorldDraw::AllocateDebugVerts() {
+	if (m_debugVerts)
+		return;
+
+	m_debugVerts.reset(
+		new r::GLVertexBuffer(
+			GL_ARRAY_BUFFER_ARB, 
+			GL_STREAM_DRAW_ARB, 
+			kDebugVertSize
+		)
+	);
+	m_debugIndices.reset(
+		new r::GLVertexBuffer(
+			GL_ELEMENT_ARRAY_BUFFER_ARB,
+			GL_STREAM_DRAW_ARB,
+			kNumDebugIndices * sizeof(U16)
+		)
+	);
+}
+
+void GLWorldDraw::DebugUploadVerts(
+	const Vec3 *verts, 
+	int numVerts
+) {
+	gls.DisableAllMGSources();
+	RAD_VERIFY((sizeof(Vec3)*numVerts) <= kDebugVertSize);
+	AllocateDebugVerts();
+
+	r::GLVertexBuffer::Ptr::Ref vb = m_debugVerts->Map();
+	memcpy(vb->ptr, verts, sizeof(Vec3)*numVerts);
+	vb.reset();
+
+	gls.SetMGSource(
+		r::MGS_Vertices, 
+		0, 
+		m_debugVerts,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		sizeof(Vec3),
+		0
+	);
+}
+
+int GLWorldDraw::DebugUploadAutoTessTriIndices(int numVerts) {
+
+	int numTris = numVerts - 2;
+	RAD_VERIFY(numTris > 0);
+	RAD_VERIFY((numTris*3) < kNumDebugIndices);
+	AllocateDebugVerts();
+
+	r::GLVertexBuffer::Ptr::Ref ib = m_debugIndices->Map();
+	U16 *indices = (U16*)ib->ptr.get();
+
+	for (int i = 1; i < numVerts-1; ++i) {
+		indices[0] = i;
+		indices[1] = i+1;
+		indices[2] = 0;
+		indices += 3;
+	}
+
+	ib.reset();
+	gls.BindBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, m_debugIndices, false);
+	return numTris * 3;
+}
+
+void GLWorldDraw::DebugDrawLineLoop(int numVerts) {
+	glDrawArrays(GL_LINE_LOOP, 0, (GLsizei)numVerts);
+}
+
+void GLWorldDraw::DebugDrawIndexedTris(int numIndices) {
+	gl.DrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
+}
+
+#endif
 
 } // world

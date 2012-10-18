@@ -1003,8 +1003,10 @@ inline bool Winding<TVertex, TPlane, stack_tag<TSize> >::DefaultEquals::operator
 template<typename TVertex, typename TPlane, int TSize>
 inline void Winding<TVertex, TPlane, stack_tag<TSize> >::push_back(const VertexType &v) {
 	RAD_ASSERT(m_numVerts < TSize);
-	m_verts[m_numVerts] = v;
-	++m_numVerts;
+	if (m_numVerts < TSize) {
+		m_verts[m_numVerts] = v;
+		++m_numVerts;
+	}
 }
 
 template<typename TVertex, typename TPlane, int TSize>

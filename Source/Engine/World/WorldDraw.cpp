@@ -91,8 +91,7 @@ WorldDraw::WorldDraw(World *w) :
 m_world(w), 
 m_frame(-1), 
 m_markFrame(-1),
-m_wireframe(false), 
-m_wireframeMat(0),
+m_wireframe(false),
 m_init(false) {
 	m_rb = RB_WorldDraw::New(w);
 }
@@ -112,31 +111,47 @@ WorldDraw::~WorldDraw() {
 }
 
 int WorldDraw::LoadMaterials() {
-	m_wireframeAsset = App::Get()->engine->sys->packages->Resolve("Sys/DebugWireframe_M", pkg::Z_Engine);
-	if (!m_wireframeAsset || m_wireframeAsset->type != asset::AT_Material) {
-		COut(C_Error) << "Error: Unable to load Sys/DebugWireframe_M." << std::endl;
+	
+	int r = LoadMaterial("Sys/DebugWireframe_M", m_debugWireframe);
+	if (r != pkg::SR_Success)
+		return r;
+
+	r = LoadMaterial("Sys/DebugPortalEdge_M", m_debugPortal[0]);
+	if (r != pkg::SR_Success)
+		return r;
+
+	r = LoadMaterial("Sys/DebugPortal_M", m_debugPortal[1]);
+	if (r != pkg::SR_Success)
+		return r;
+
+	return m_rb->LoadMaterials();
+}
+
+int WorldDraw::LoadMaterial(const char *name, LocalMaterial &mat) {
+	mat.asset = App::Get()->engine->sys->packages->Resolve(name, pkg::Z_Engine);
+	if (!mat.asset || mat.asset->type != asset::AT_Material) {
+		COut(C_Error) << "Error: Unable to load '" << name << "'." << std::endl;
 		return pkg::SR_FileNotFound;
 	}
 	
-	int r = m_wireframeAsset->Process(
+	int r = mat.asset->Process(
 		xtime::TimeSlice::Infinite,
 		pkg::P_Load | pkg::P_FastPath
 	);
 
 	if (r != pkg::SR_Success) {
-		COut(C_Error) << "Error: Unable to load Sys/DebugWireframe_M." << std::endl;
+		COut(C_Error) << "Error: Unable to load '" << name << "'." << std::endl;
 		return (r != pkg::SR_Pending) ? r : pkg::SR_MetaError;
 	}
 
-	asset::MaterialParser::Ref parser = asset::MaterialParser::Cast(m_wireframeAsset);
+	asset::MaterialParser::Ref parser = asset::MaterialParser::Cast(mat.asset);
 	if (!parser || !parser->valid) {
-		COut(C_Error) << "Error: Unable to load Sys/DebugWireframe_M." << std::endl;
+		COut(C_Error) << "Error: Unable to load '" << name << "'." << std::endl;
 		return pkg::SR_MetaError;
 	}
 
-	m_wireframeMat = parser->material;
-
-	return m_rb->LoadMaterials();
+	mat.mat = parser->material;
+	return pkg::SR_Success;
 }
 
 void WorldDraw::Init(const bsp_file::BSPFile::Ref &bsp) {
@@ -283,7 +298,7 @@ void WorldDraw::Draw(Counters *counters) {
 
 	if (postFX)
 		PostProcess();
-	
+
 	DrawUI();
 	m_rb->Finish();
 	m_rb->EndFrame();
@@ -358,7 +373,6 @@ void WorldDraw::VisMarkAreas(ViewDef &view) {
 
 	World::MakeVolume(&view.frustum[0], (int)view.frustum.size(), frustumVolume, frustumBounds);
 
-	AreaBits areas;
 	ClippedAreaVolumeStackVec frustumAreas;
 	m_world->ClipOccupantVolume(
 		&view.camera.pos.get(),
@@ -367,7 +381,7 @@ void WorldDraw::VisMarkAreas(ViewDef &view) {
 		&frustumAreas,
 		view.area,
 		-1,
-		areas
+		view.areas
 	);
 
 	++m_markFrame;
@@ -446,6 +460,10 @@ void WorldDraw::DrawView() {
 
 	m_counters.numTris += m_rb->numTris;
 
+#if defined(RAD_OPT_PC)
+//	DebugDrawPortals(view);
+#endif
+
 	if (m_wireframe) {
 		m_rb->wireframe = true;
 		DrawViewBatches(view, true);
@@ -482,7 +500,7 @@ void WorldDraw::DrawBatch(const details::MBatch &batch, bool wireframe) {
 
 	Vec3 pos;
 	Vec3 angles;
-	r::Material *mat = (wireframe) ? m_wireframeMat : batch.matRef->mat;
+	r::Material *mat = (wireframe) ? m_debugWireframe.mat : batch.matRef->mat;
 	bool first = true;
 
 	mat->BindStates();
@@ -580,5 +598,55 @@ void WorldDraw::UnlinkEntity(Entity *entity) {
 
 void WorldDraw::LinkEntity(Entity *entity, const BBox &bounds, int nodeNum) {
 }
+
+#if !defined(RAD_OPT_SHIP)
+void WorldDraw::DebugDrawPortals(ViewDef &view) {
+	for (int i = 0; i < kMaxAreas; ++i) {
+		if (view.areas.test(i))
+			DebugDrawAreaportals(i);
+	}
+}
+
+void WorldDraw::DebugDrawAreaportals(int areaNum) { 
+
+	RAD_ASSERT(areaNum < (int)m_world->m_areas.size());
+
+	for (int style = 0; style < 2; ++style) {
+		m_debugPortal[style].mat->BindStates();
+		m_debugPortal[style].mat->BindTextures(asset::MaterialLoader::Ref());
+		m_debugPortal[style].mat->shader->Begin(r::Shader::P_Default, *m_debugPortal[style].mat);
+
+
+		const dBSPArea &area = m_world->m_areas[areaNum];
+
+		for(int i = 0; i < area.numPortals; ++i) {
+
+			int areaportalNum = (int)*(m_world->m_bsp->AreaportalIndices() + area.firstPortal + i);
+			const dAreaportal &portal = m_world->m_areaportals[areaportalNum];
+
+			m_rb->DebugUploadVerts(
+				&portal.winding.Vertices()[0],
+				portal.winding.NumVertices()
+			);
+
+			int numIndices = 0;
+			if (style == 1)
+				numIndices = m_rb->DebugUploadAutoTessTriIndices(portal.winding.NumVertices());
+
+			m_debugPortal[style].mat->shader->BindStates(true);
+			m_rb->CommitStates();
+
+			if (style == 0) {
+				m_rb->DebugDrawLineLoop(portal.winding.NumVertices());
+			} else {
+				m_rb->DebugDrawIndexedTris(numIndices);
+			}
+		}
+
+		m_debugPortal[style].mat->shader->End();
+	}
+}
+
+#endif
 
 } // world

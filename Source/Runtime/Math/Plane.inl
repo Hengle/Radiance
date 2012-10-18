@@ -130,7 +130,7 @@ inline Plane<T> &Plane<T>::Initialize(const Vector3<T> &normal, const Vector3<T>
 template <typename T>
 inline Plane<T> &Plane<T>::Initialize(const Vector3<T> &p1, const Vector3<T> &p2, const Vector3<T> &p3)
 {
-	m_normal = p1 - p3;
+	m_normal = p3 - p1;
 	m_normal = m_normal.Cross(p2 - p1);
 	m_normal.Normalize();
 	m_d = m_normal.Dot(p1);

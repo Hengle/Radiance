@@ -729,7 +729,7 @@ void World::LoadBSP(const bsp_file::BSPFile &bsp) {
 		
 		verts.reserve(x->numVerts);
 
-		Areaportal portal;
+		dAreaportal portal;
 		portal.bounds.Initialize();
 
 		for (int k = 0; k < (int)x->numVerts; ++k) {

@@ -247,7 +247,7 @@ namespace {
 				}
 
 				if (z == 2) {
-					f.plane.Initialize(mdl.verts[f.v[2]].pos, mdl.verts[f.v[1]].pos, mdl.verts[f.v[0]].pos);
+					f.plane.Initialize(mdl.verts[f.v[0]].pos, mdl.verts[f.v[1]].pos, mdl.verts[f.v[2]].pos);
 					mdl.tris.push_back(f);
 
 					for (U32 k = 0; k < SceneFile::kMaxUVChannels && k < nc; ++k)

@@ -647,6 +647,8 @@ public:
 			cinematic(false), 
 			hideUntilRef(false), 
 			hideWhenDone(false) {
+			portalAreas[0] = -1;
+			portalAreas[1] = -1;
 		}
 
 		TriVertVec verts;
@@ -657,10 +659,12 @@ public:
 		String name;
 		AreaNumSet areas;
 		IntVec emitIds;
+		IntVec portalIds;
 		int id;
 		int skel;
 		int contents;
 		int numChannels;
+		int portalAreas[2];
 		bool ignore;
 		bool outside;
 		bool cinematic;

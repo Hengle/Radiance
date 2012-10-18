@@ -40,6 +40,7 @@ public:
 
 	int area;
 	bool mirror;
+	AreaBits areas;
 
 	EntityBits marked;
 	details::MBatchIdMap batches;
@@ -77,6 +78,19 @@ public:
 	virtual void PushMatrix(const Vec3 &pos, const Vec3 &scale, const Vec3 &angles) = 0;
 	virtual void PopMatrix() = 0;
 	virtual void ReleaseArrayStates() = 0;
+
+#if !defined(RAD_OPT_SHIP)
+	virtual void DebugUploadVerts(
+		const Vec3 *verts, 
+		int numVerts
+	) = 0;
+
+	virtual int DebugUploadAutoTessTriIndices(int numVerts) = 0;
+
+	virtual void DebugDrawLineLoop(int numVerts) = 0;
+	virtual void DebugDrawIndexedTris(int numIndices) = 0;
+
+#endif
 
 	// Post Process FX
 	virtual void BindPostFXTargets(bool chain) = 0;
@@ -253,6 +267,18 @@ private:
 	void LinkEntity(Entity *entity, const BBox &bounds);
 	void UnlinkEntity(Entity *entity);
 	void LinkEntity(Entity *entity, const BBox &bounds, int nodeNum);
+
+#if !defined(RAD_OPT_SHIP)
+	void DebugDrawPortals(ViewDef &view);
+	void DebugDrawAreaportals(int area);
+#endif
+
+	struct LocalMaterial {
+		pkg::Asset::Ref asset;
+		r::Material *mat;
+	};
+
+	int LoadMaterial(const char *name, LocalMaterial &mat);
 	
 	int m_frame;
 	int m_markFrame;
@@ -261,8 +287,8 @@ private:
 	Counters m_counters;
 	PostProcessEffect::Map m_postFX;
 	MStaticWorldMeshBatch::RefVec m_worldModels;
-	pkg::Asset::Ref m_wireframeAsset;
-	r::Material *m_wireframeMat;
+	LocalMaterial m_debugWireframe;
+	LocalMaterial m_debugPortal[2];
 	ScreenOverlay::List m_overlays;
 	RB_WorldDraw::Ref m_rb;
 	details::MatRefMap m_refMats;

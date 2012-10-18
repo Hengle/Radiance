@@ -14,8 +14,7 @@
 
 namespace world {
 
-class RADENG_CLASS GLWorldDraw : public RB_WorldDraw
-{
+class RADENG_CLASS GLWorldDraw : public RB_WorldDraw {
 public:
 	GLWorldDraw(World *world);
 	virtual ~GLWorldDraw();
@@ -36,6 +35,18 @@ public:
 	virtual void PopMatrix();
 	virtual void ReleaseArrayStates();
 
+#if !defined(RAD_OPT_SHIP)
+	virtual void DebugUploadVerts(
+		const Vec3 *verts, 
+		int numVerts
+	);
+
+	virtual int DebugUploadAutoTessTriIndices(int numVerts);
+
+	virtual void DebugDrawLineLoop(int numVerts);
+	virtual void DebugDrawIndexedTris(int numIndices);
+#endif
+
 	virtual void BindPostFXTargets(bool chain);
 	virtual void BindPostFXQuad();
 	virtual void DrawPostFXQuad();
@@ -51,11 +62,26 @@ public:
 
 protected:
 
-	virtual RAD_DECLARE_GET(wireframe, bool) { return r::gl.wireframe; }
-	virtual RAD_DECLARE_SET(wireframe, bool) { r::gl.wireframe = value; }
-	virtual RAD_DECLARE_GET(numTris, int) { return r::gl.numTris; }
-	virtual RAD_DECLARE_SET(numTris, int) { r::gl.numTris = value; }
-	virtual RAD_DECLARE_GET(clearColorBuffer, bool) { return m_clearColorBuffer; }
+	virtual RAD_DECLARE_GET(wireframe, bool) { 
+		return r::gl.wireframe; 
+	}
+
+	virtual RAD_DECLARE_SET(wireframe, bool) { 
+		r::gl.wireframe = value; 
+	}
+
+	virtual RAD_DECLARE_GET(numTris, int) { 
+		return r::gl.numTris; 
+	}
+
+	virtual RAD_DECLARE_SET(numTris, int) { 
+		r::gl.numTris = value; 
+	}
+
+	virtual RAD_DECLARE_GET(clearColorBuffer, bool) { 
+		return m_clearColorBuffer; 
+	}
+
 	virtual RAD_DECLARE_SET(clearColorBuffer, bool);
 
 private:
@@ -87,6 +113,16 @@ private:
 		r::GLVertexBuffer::Ref &ib,
 		bool invY
 	);
+
+#if !defined(RAD_OPT_SHIP)
+	enum {
+		kNumDebugIndices = Kilo,
+		kDebugVertSize = sizeof(Vec3) * Kilo
+	};
+	void AllocateDebugVerts();
+	r::GLVertexBuffer::Ref m_debugVerts;
+	r::GLVertexBuffer::Ref m_debugIndices;
+#endif
 
 	int m_overlaySize[2];
 	r::GLVertexBuffer::Ref m_overlayVB[2];
