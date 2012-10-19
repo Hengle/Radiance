@@ -6153,10 +6153,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 338381F215B7316B00A28CCF /* Build configuration list for PBXNativeTarget "RadianceDeveloper" */;
 			buildPhases = (
+				33E88B7515B9BEDC0089BA08 /* QtMoc */,
 				338381EA15B7316B00A28CCF /* Sources */,
 				338381EB15B7316B00A28CCF /* Frameworks */,
 				338381EC15B7316B00A28CCF /* Headers */,
-				33E88B7515B9BEDC0089BA08 /* QtMoc */,
 				33836BFF15B9CAFD0030EAEC /* ShellScript */,
 			);
 			buildRules = (
