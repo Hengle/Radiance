@@ -78,12 +78,6 @@ protected:
 		r::gl.numTris = value; 
 	}
 
-	virtual RAD_DECLARE_GET(clearColorBuffer, bool) { 
-		return m_clearColorBuffer; 
-	}
-
-	virtual RAD_DECLARE_SET(clearColorBuffer, bool);
-
 private:
 
 	enum {
@@ -127,7 +121,6 @@ private:
 	int m_overlaySize[2];
 	r::GLVertexBuffer::Ref m_overlayVB[2];
 	r::GLVertexBuffer::Ref m_overlayIB[2];
-	bool m_clearColorBuffer;
 };
 
 } // world

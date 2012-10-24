@@ -20,7 +20,7 @@
 #include "ContentBrowser/EditorContentBrowserView.h"
 #include "PropertyGrid/EditorPropertyGrid.h"
 #include "../../App.h"
-#include "../../Renderer/PC/RGLBackend.h"
+#include "../../Renderer/GL/RGLBackend.h"
 #include "../../Renderer/GL/GLTable.h"
 #include "../../Sound/Sound.h"
 

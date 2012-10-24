@@ -48,9 +48,7 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 
 		m_mapAsset->SetGame(game, m_slot);
 		
-#if defined(RAD_OPT_IOS)
-		__IOS_Throttle(false);
-#endif
+		App::Get()->throttleFramerate = false; // tick loading as fast as possible.
 	}
 
 	int r = pkg::SR_Pending;
@@ -86,9 +84,7 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 
 	if (r != pkg::SR_Pending)
 	{
-#if defined(RAD_OPT_IOS)
-		__IOS_Throttle(true);
-#endif
+		App::Get()->throttleFramerate = true; // frame limit if supported.
 		
 		if (r == pkg::SR_Success)
 		{

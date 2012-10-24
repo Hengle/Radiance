@@ -1,6 +1,9 @@
-// CrowApp.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
+/*! \file EAGLView.h
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup main
+*/
 
 #import <UIKit/UIKit.h>
 #import <OpenGLES/EAGLDrawable.h>
@@ -22,21 +25,19 @@
 @public
 	
     /* The pixel dimensions of the backbuffer */
-    GLint backingWidth;
-    GLint backingHeight;
+    GLint width;
+    GLint height;
 	
 @private
 	
-	bool created;
-	
-    EAGLContext *context;
+	bool m_initialized;
     
-    /* OpenGL names for the renderbuffer and framebuffers used to render to this view */
-    GLuint viewRenderbuffer, viewFramebuffer;
-    
-    /* OpenGL name for the depth buffer that is attached to viewFramebuffer, if it exists (0 if it does not exist) */
-    GLuint depthRenderbuffer;
+    GLuint m_viewRenderbuffer;
+	GLuint m_viewFramebuffer;
+    GLuint m_depthRenderbuffer;
 }
+
+@property (nonatomic, retain) EAGLContext *context;
 
 - (void)bindFramebuffer;
 - (void)presentScene;

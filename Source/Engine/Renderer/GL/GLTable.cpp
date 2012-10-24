@@ -38,7 +38,6 @@ void *aglGetProcAddress(const char *name)
 #include <GL/glx.h>
 #define GL_GetProcAddress(_x) glXGetProcAddress((const GLubyte*)(_x))
 #elif defined(RAD_OPT_IOS)
-void __IOS_ScreenSize(int &w, int &h);
 bool __IOS_IPhone();
 bool __IOS_IPhone4();
 bool __IOS_IPad();
@@ -377,7 +376,6 @@ void GLTable::Reset()
 void GLTable::Load()
 {
 	LoadGLVersion();
-	DetectHardware();
 
 	v1_1 = CheckVer("1.1");
 	v1_2 = CheckVer("1.2");
@@ -872,19 +870,6 @@ void GLTable::LoadGLVersion()
 
 	vMaj = high;
 	vMin = low;
-#endif
-}
-
-void GLTable::DetectHardware()
-{
-	chip = D_Unknown;
-#if defined(RAD_OPT_IOS)
-	if (__IOS_IPhone4())
-		chip = D_IPhone4;
-	else if(__IOS_IPad())
-		chip = D_IPad;
-	else
-		chip = D_IPhone;
 #endif
 }
 

@@ -7,13 +7,13 @@
 
 #include "../Types.h"
 #include "AssetTypes.h"
-#include "MapParser.h"
 #include "../Packages/Packages.h"
 #include "../World/Entity.h"
 #include "../World/WorldDef.h"
 #include "../World/BSPFile.h"
 
 #if defined(RAD_OPT_TOOLS)
+#include "MapParser.h"
 #include "../World/MapBuilder/MapBuilder.h"
 #include "../Tools/Progress.h"
 #endif

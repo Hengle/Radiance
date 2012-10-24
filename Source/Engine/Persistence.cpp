@@ -11,10 +11,8 @@
 #include <Runtime/File.h>
 #include <stdio.h>
 
-#if defined(RAD_OPT_IOS)
-FILE *__IOS_OpenPersistence(const char *name, const char *mode);
-#elif defined(RAD_OPT_OSX)
-FILE *__OSX_OpenPersistence(const char *name, const char *mode);
+#if defined(RAD_OPT_APPLE)
+FILE *AppleOpenPersistence(const char *name, const char *mode);
 #endif
 
 namespace {
@@ -76,10 +74,8 @@ bool LoadStorage(stream::InputStream &is, world::Keys &keys)
 bool LoadStorage(const char *name, world::Keys &keys)
 {
 	FILE *fp = 0;
-#if defined(RAD_OPT_IOS)
-	fp = __IOS_OpenPersistence(name, "rb");
-#elif defined(RAD_OPT_OSX) && defined(RAD_OPT_SHIP)
-	fp = __OSX_OpenPersistence(name, "rb");
+#if defined(RAD_OPT_APPLE)
+	fp = AppleOpenPersistence(name, "rb");
 #else
 	String path(CStr("@r:/") + name);
 	fp = App::Get()->engine->sys->files->fopen(path.c_str, "rb");
@@ -126,10 +122,8 @@ bool SaveStorage(stream::OutputStream &os, const world::Keys &keys)
 bool SaveStorage(const char *name, const world::Keys &keys)
 {
 	FILE *fp = 0;
-#if defined(RAD_OPT_IOS)
-	fp = __IOS_OpenPersistence(name, "wb");
-#elif defined(RAD_OPT_OSX) && defined(RAD_OPT_SHIP)
-	fp = __OSX_OpenPersistence(name, "wb");
+#if defined(RAD_OPT_APPLE)
+	fp = AppleOpenPersistence(name, "wb");
 #else
 	String path(CStr("@r:/") + name);
 	fp = App::Get()->engine->sys->files->fopen(path.c_str, "wb");

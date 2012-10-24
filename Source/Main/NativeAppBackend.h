@@ -13,6 +13,8 @@
 #include "Win/WinNativeApp.h"
 #elif defined(RAD_OPT_OSX)
 #include "OSX/OSXNativeApp.h"
+#elif defined(RAD_OPT_IOS)
+#include "iOS/iOSNativeApp.h"
 #else
 #error RAD_ERROR_UNSUP_PLAT
 #endif

@@ -92,6 +92,9 @@ public:
 	//! Creates an alDriver object.
 	static Ref New(ALDRIVER_PARAMS const char *deviceName);
 
+	//! Enables/Disables the alDriver (shuts off calls to al* function).
+	void Enable(bool enable = true);
+
 	//! Adds a processing callback.
 	void AddCallback(Callback &callback);
 	
@@ -248,6 +251,7 @@ private:
 	CallbackSet m_callbacks;
 	Mutex m_m, m_mcb;
 	thread::Semaphore m_sema;
+	thread::Gate m_enabled;
 	Command *m_head;
 	Command *m_tail;
 	ALCdevice *m_ald;

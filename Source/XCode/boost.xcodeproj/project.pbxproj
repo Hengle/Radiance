@@ -285,11 +285,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33F199C815B89901006D8DCC /* BoostDebugiOS.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				DSTROOT = /tmp/boostiOS.dst;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
@@ -297,11 +294,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33F199CB15B89901006D8DCC /* BoostReleaseiOS.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				DSTROOT = /tmp/boostiOS.dst;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};

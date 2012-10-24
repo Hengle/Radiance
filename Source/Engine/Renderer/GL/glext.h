@@ -5493,6 +5493,9 @@ extern "C" {
 typedef char GLchar;
 #endif
 
+#if defined(RAD_OPT_IOS)
+typedef float GLclampd;
+#else
 #ifndef GL_VERSION_1_5
 /* GL types for handling large vertex buffer objects */
 typedef ptrdiff_t GLintptr;
@@ -5503,6 +5506,7 @@ typedef ptrdiff_t GLsizeiptr;
 /* GL types for handling large vertex buffer objects */
 typedef ptrdiff_t GLintptrARB;
 typedef ptrdiff_t GLsizeiptrARB;
+#endif
 #endif
 
 #ifndef GL_ARB_shader_objects

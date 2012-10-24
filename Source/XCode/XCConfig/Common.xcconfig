@@ -5,7 +5,7 @@
 
 GCC_STRICT_ALIASING = NO
 GCC_VERSION = com.apple.compilers.llvm.clang.1_0
-CLANG_CXX_LIBRARY = libc++
+CLANG_CXX_LIBRARY = libstdc++
 CLANG_CXX_LANGUAGE_STANDARD = gnu++0x
 
 USE_HEADERMAP = NO

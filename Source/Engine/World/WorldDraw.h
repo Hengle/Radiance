@@ -61,7 +61,6 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(RB_WorldDraw, world, World*);
 	RAD_DECLARE_PROPERTY(RB_WorldDraw, wireframe, bool, bool);
 	RAD_DECLARE_PROPERTY(RB_WorldDraw, numTris, int, int);
-	RAD_DECLARE_PROPERTY(RB_WorldDraw, clearColorBuffer, bool, bool);
 
 	virtual void BeginFrame() = 0;
 	virtual void EndFrame() = 0;
@@ -112,8 +111,6 @@ protected:
 	virtual RAD_DECLARE_SET(wireframe, bool) = 0;
 	virtual RAD_DECLARE_GET(numTris, int) = 0; 
 	virtual RAD_DECLARE_SET(numTris, int) = 0;
-	virtual RAD_DECLARE_GET(clearColorBuffer, bool) = 0;
-	virtual RAD_DECLARE_SET(clearColorBuffer, bool) = 0;
 
 private:
 

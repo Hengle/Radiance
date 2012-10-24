@@ -147,7 +147,7 @@ Material::ShaderInstance::Ref Material::ShaderInstance::FindOrCreate(Engine &eng
 		String path;
 		path.Printf("Shaders/%d.bin", m.shaderId.get());
 
-		file::MMFileInputBuffer::Ref ib = engine.sys->files->OpenInputBuffer(path.c_str, ZTools);
+		file::MMFileInputBuffer::Ref ib = engine.sys->files->OpenInputBuffer(path.c_str, ZRender);
 		if (!ib)
 			return Ref();
 

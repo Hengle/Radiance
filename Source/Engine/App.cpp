@@ -71,8 +71,7 @@ m_ticks(0),
 m_exit(false),
 m_time(0.f),
 m_frameHistoryIdx(0),
-m_langId(StringTable::LangId_EN)
-{
+m_langId(StringTable::LangId_EN) {
 	m_e = Engine::New();
 #if defined(FRAME_SMOOTH)
 	m_frameHistory.reserve(FrameHistorySize);

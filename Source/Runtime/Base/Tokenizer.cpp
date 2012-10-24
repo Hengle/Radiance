@@ -8,6 +8,7 @@
 #include RADPCH
 #include "Tokenizer.h"
 #include "../Stream.h"
+#include "../File.h"
 
 namespace {
 enum {

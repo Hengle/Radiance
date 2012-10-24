@@ -1,19 +1,24 @@
-/*! \file GameCenter.mm
- \copyright Copyright (c) 2010 Sunside Inc., All Rights Reserved.
- \copyright See Radiance/LICENSE for licensing terms.
- \author Joe Riedel
- */
+/*! \file AppleGameCenter.mm
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup main
+*/
 
-//#define FLURRY
+#import "AppleGameCenter.h"
 
-#import "GameCenter.h"
+#if defined(RAD_OPT_IOS)
+	#define FLURRY
+#endif
+
 #if defined(RAD_OPT_OSX)
 #import "OSX/AppDelegate.h"
-#include "NativeApp.h"
 #endif
 #if defined(FLURRY)
 #import "FlurryAnalytics/FlurryAnalytics.h"
 #endif
+
+#include <Engine/App.h>
 #include <Engine/Game/GameNetwork.h>
 #include <Engine/COut.h>
 
@@ -95,7 +100,7 @@ static GameCenter *s_gameCenter = 0;
 		// make sure game center is actually available.
 		if (NSClassFromString(@"GKLocalPlayer")) {
 #if defined(RAD_OPT_IOS)
-			NSString *reqVer = "4.1";
+			NSString *reqVer = @"4.1";
 			NSString *curVer = [[UIDevice currentDevice] systemVersion];
 			BOOL supported = [curVer compare: reqVer options: NSNumericSearch] != NSOrderedAscending;
 #else
@@ -204,7 +209,7 @@ static GameCenter *s_gameCenter = 0;
 #if defined(RAD_OPT_IOS)
 	[gcViewController dismissModalViewControllerAnimated:YES];
 	
-	if (__IOS_IPad()) {
+	if (App::Get()->deviceFamily == plat::kDeviceFamily_iPad) {
 		[gcViewController.view removeFromSuperview];
 	}
 	else {
@@ -224,7 +229,7 @@ static GameCenter *s_gameCenter = 0;
 #if defined(RAD_OPT_IOS)
 	[gcViewController dismissModalViewControllerAnimated:YES];
 	
-	if (__IOS_IPad()) {
+	if (App::Get()->deviceFamily == plat::kDeviceFamily_iPad) {
 		[gcViewController.view removeFromSuperview];
 	}
 	else {

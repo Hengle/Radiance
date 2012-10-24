@@ -40,7 +40,8 @@ inline void *zone_calloc(
 )
 {
 	void *p = zone_malloc(zone, numElms*elmSize, headerSize, alignment);
-	if (p) { memset(p, 0, numElms*elmSize); }
+	if (p)
+		memset(p, 0, numElms*elmSize);
 	return p;
 }
 

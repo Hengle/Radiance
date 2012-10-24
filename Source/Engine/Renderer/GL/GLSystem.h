@@ -25,7 +25,7 @@
 	#define RAD_OPT_OGLES2
 	#include <OpenGLES/ES2/gl.h>
 	#include <OpenGLES/ES2/glext.h>
-	#include "../IOS/GLPrototypes.h"
+	#include "iOSGLPrototypes.h"
 #else
 #error RAD_ERROR_UNSUP_PLAT
 #endif
@@ -39,6 +39,6 @@
 #include "glext.h"
 
 #if defined(RAD_OPT_WINX)
-#include "../PC/wglext.h"
+#include "wglext.h"
 #endif
 

@@ -537,7 +537,7 @@ int PackageMan::PakDirectory(
 	String path(CStr(_path));
 
 	file::FileSearch::Ref s = m_engine.sys->files->OpenSearch(
-		(path + "*.*").c_str,
+		(path + "/*.*").c_str,
 		file::kSearchOption_Recursive,
 		file::kFileOptions_None,
 		file::kFileMask_Base

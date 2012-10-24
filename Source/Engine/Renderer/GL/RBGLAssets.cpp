@@ -1,10 +1,10 @@
-// RBAssets.cpp
+// RBGLAssets.cpp
 // Copyright (c) 2010 Sunside Inc., All Rights Reserved
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
 #include RADPCH
-#include "../GL/GLTexture.h"
+#include "GLTexture.h"
 
 namespace asset {
 

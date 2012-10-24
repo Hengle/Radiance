@@ -4,7 +4,7 @@
 // See Radiance/LICENSE for licensing terms.
 
 #include "EngineDebugiOS.xcconfig"
-#include "EngineGolden.xcconfig"
+#include "EngineGoldeniOS.xcconfig"
 
 OPTIONAL_EXTERNLIB_INCLUDES =
 

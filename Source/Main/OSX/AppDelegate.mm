@@ -23,7 +23,7 @@
 #endif
 
 #import "AppDelegate.h"
-#import "../GameCenter.h"
+#import "../AppleGameCenter.h"
 #import <AppKit/NSWorkspace.h>
 
 AppDelegate *s_appd = 0;
@@ -245,7 +245,7 @@ static int s_vkeys_en[256] = {
 	}
 	
 	if (!app->engine->sys->r->ctx.get()) {
-		COut(C_Error) << "Rendering system was not initialized (Developer note your custom PreInit method must set the rendering context before returning!" << std::endl;
+		COut(C_Error) << "Rendering system was not initialized (Developer note your custom InitWindow method must set the rendering context before returning!" << std::endl;
 		NSRunAlertPanel(@"Error", @"Rendering system was not initialized! See log.txt for details.", nil, nil, nil);
 		[NSApp terminate:nil];
 	}
@@ -277,7 +277,7 @@ static int s_vkeys_en[256] = {
 		// 30 FPS frame limit
 		xtime::TimeVal now = xtime::ReadMilliseconds();
 		xtime::TimeVal dt = now - last;
-		if (dt < 33)
+		if ((app->throttleFramerate) && (dt < 33))
 			continue;
 		last = now;
 		

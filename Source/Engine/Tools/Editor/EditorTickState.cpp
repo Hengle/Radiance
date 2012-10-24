@@ -9,7 +9,7 @@
 #include "EditorLogWindow.h"
 #include "EditorUtils.h"
 #include "../../App.h"
-#include "../../Renderer/PC/RBackend.h"
+#include "../../Renderer/GL/RBackend.h"
 #include <QtGui/QMessageBox.h>
 
 namespace tools {

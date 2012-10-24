@@ -4,7 +4,7 @@
 // See Radiance/LICENSE for licensing terms.
 
 #include "EngineDebugOSX.xcconfig"
-#include "EngineGolden.xcconfig"
+#include "EngineGoldenOSX.xcconfig"
 
 OPTIONAL_EXTERNLIB_INCLUDES =
 

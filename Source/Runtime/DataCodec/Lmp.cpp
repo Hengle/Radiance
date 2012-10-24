@@ -15,7 +15,6 @@
 
 #include <algorithm>
 
-
 namespace data_codec {
 namespace lmp {
 
@@ -528,8 +527,9 @@ U32 StreamReader::NumLumps() const
 
 const StreamReader::Lump* StreamReader::GetByIndex(U32 i) const
 {
-	if (i >= m_numLumps) return 0;
-	return &m_lumps[i];
+	if (i < m_numLumps)
+		return &m_lumps[i];
+	return 0;
 }
 
 inline bool StreamReader::FindLumpFn::operator() (const char* e1, Lump& e2)
@@ -552,14 +552,17 @@ const StreamReader::Lump* StreamReader::GetByName(const char* name) const
 {
 	RAD_ASSERT(name&&name[0]);
 
-	if (m_numLumps == 0) return 0;
+	if (m_numLumps == 0)
+		return 0;
 
 	Lump* start = m_lumps;
 	Lump* end   = m_lumps+m_numLumps;
 
 	Lump* l = std::upper_bound(start, end, name, FindLumpFn());
-	if (l != start) --l;
-	if (!string::cmp(l->m_name, name)) return l;
+	if (l != start)
+		--l;
+	if (!string::cmp(l->m_name, name))
+		return l;
 
 	return 0;
 }

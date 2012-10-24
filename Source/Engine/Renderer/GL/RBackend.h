@@ -1,6 +1,5 @@
 // RBackend.h
 // Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// PC Rendering Backend
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
@@ -14,9 +13,12 @@ namespace r {
 
 RAD_REFLECTED_INTERFACE_BEGIN(IRBackend, IInterface, r.IRBackend)
 
+#if defined(RAD_OPT_PC)
 	virtual void VidReset() = 0;
-	virtual bool VidBind() = 0;
 	virtual bool CheckCaps() = 0;
+#endif
+	
+	virtual bool VidBind() = 0;
 
 	virtual HContext CreateContext(
 		const NativeDeviceContext::Ref &nativeContext

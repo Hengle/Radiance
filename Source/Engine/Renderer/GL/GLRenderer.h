@@ -21,8 +21,8 @@ public:
 	virtual void ClearBackBuffer();
 	virtual void ClearDepthBuffer();
 	virtual void CommitStates();
-	virtual void BindFramebuffer();
 	virtual void UnbindStates();
+
 };
 
 } // r

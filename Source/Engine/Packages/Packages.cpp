@@ -497,7 +497,7 @@ void PackageMan::LoadBin(
 		ZPackages,
 		1*Meg,
 		file::kFileOptions_None,
-		file::kFileMask_Base
+		file::kFileMask_PakFiles
 	);
 
 	if (!ib) {

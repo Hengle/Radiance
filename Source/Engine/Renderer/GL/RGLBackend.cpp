@@ -7,8 +7,8 @@
 #include RADPCH
 #include "RGLBackend.h"
 #include "../../COut.h"
-#include "../GL/GLTable.h"
-#include "../GL/GLState.h"
+#include "GLTable.h"
+#include "GLState.h"
 #include <Runtime/Interface/ComponentManager.h>
 
 #if defined(RAD_OPT_PC_TOOLS)
@@ -51,13 +51,17 @@ RADENG_API void RADENG_CALL SetQGLFormat(QGLFormat &fmt) {
 RAD_IMPLEMENT_COMPONENT(RBackend, r.RBackend);
 RAD_IMPLEMENT_COMPONENT(RBContext, r.RBContext);
 
+#if defined(RAD_OPT_PC)
 boost::thread_specific_ptr<HContext> RBackend::s_ctx;
+#endif
 
 RBackend::RBackend() {
 }
 
 RBackend::~RBackend() {
+#if defined(RAD_OPT_PC)
 	VidReset();
+#endif
 }
 
 void RBackend::Initialize(int version) {
@@ -66,15 +70,15 @@ void RBackend::Initialize(int version) {
 
 #if !defined(RAD_OPT_PC_TOOLS)
 void RBackend::SwapBuffers() {
+#if defined(RAD_OPT_PC)
 	RAD_ASSERT(*s_ctx.get());
 	InterfaceComponent<RBContext>(*s_ctx.get())->m_glCtx->SwapBuffers();
+#else
+	RAD_ASSERT(m_ctx);
+	InterfaceComponent<RBContext>(m_ctx)->m_glCtx->SwapBuffers();
+#endif
 }
 #endif
-
-void RBackend::VidReset() {
-	COut(C_Info) << "VidReset..." << std::endl;
-	gl.Reset();
-}
 
 bool RBackend::VidBind() {
 
@@ -93,6 +97,22 @@ bool RBackend::VidBind() {
 	return true;
 }
 
+void RBackend::BindFramebuffer() {
+#if defined(RAD_OPT_PC)
+	RAD_ASSERT(*s_ctx.get());
+	InterfaceComponent<RBContext>(*s_ctx.get())->m_glCtx->BindFramebuffer();
+#else
+	RAD_ASSERT(m_ctx);
+	InterfaceComponent<RBContext>(m_ctx)->m_glCtx->BindFramebuffer();
+#endif
+}
+
+#if defined(RAD_OPT_PC)
+void RBackend::VidReset() {
+	COut(C_Info) << "VidReset..." << std::endl;
+	gl.Reset();
+}
+
 bool RBackend::CheckCaps() {
 	return gl.v1_2 && 
 		gl.ARB_vertex_buffer_object &&
@@ -108,6 +128,7 @@ bool RBackend::CheckCaps() {
 		gl.ARB_texture_non_power_of_two &&
 		(gl.maxTextureSize >= 2048);
 }
+#endif
 
 HContext RBackend::CreateContext(
 	const NativeDeviceContext::Ref &nativeContext
@@ -116,25 +137,29 @@ HContext RBackend::CreateContext(
 }
 
 const HContext &RBackend::RAD_IMPLEMENT_GET(ctx) {
+#if defined(RAD_OPT_PC)
 	if (!s_ctx.get())
 		s_ctx.reset(new HContext());
 	return *s_ctx.get();
+#else
+	return m_ctx;
+#endif
 }
 
 void RBackend::RAD_IMPLEMENT_SET(ctx) (const HContext & ctx) {
-	if (!s_ctx.get())
-	{
+#if defined(RAD_OPT_PC)
+	if (!s_ctx.get()) {
 		s_ctx.reset(new HContext());
 	}
 
 	*s_ctx.get() = ctx;
+#else
+	m_ctx = ctx;
+#endif
 
-	if (ctx)
-	{
+	if (ctx) {
 		gls.Bind(InterfaceComponent<RBContext>(ctx)->m_s);
-	}
-	else
-	{
+	} else {
 		gls.Bind(GLState::Ref());
 	}
 

@@ -272,12 +272,12 @@ void *Zone::Realloc(void *ptr, size_t size, AddrSize headerSize, AddrSize alignm
 		m_small = (AddrSize)std::min(m_small, (AddrSize)size);
 		m_large = (AddrSize)std::max(m_large, (AddrSize)size);
 
+		*reinterpret_cast<U16*>(p) = (U16)headerSize;
+		p += sizeof(U16);
 		*reinterpret_cast<Zone**>(p) = this;
 		p += sizeof(Zone*);
 		*reinterpret_cast<AddrSize*>(p) = size;
 		p += sizeof(AddrSize);
-		*reinterpret_cast<U16*>(p) = (U16)headerSize;
-		p += sizeof(U16);
 #if defined(RAD_OPT_ZONE_MEMGUARD)
 		p = (U8*)WriteMemGuards(p);
 #endif

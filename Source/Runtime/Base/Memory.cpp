@@ -92,9 +92,9 @@ void *aligned_realloc(void *ptr, AddrSize size, AddrSize headerSize, AddrSize al
 
 	if (p) {
 #if defined(RAD_OPT_MEMGUARD) // basic over/under guards
-		U8 *pp = Align(p, align, sizeof(void*)*2+2+headerSize) - headerSize;
+		U8 *pp = Align(p+sizeof(void*)*2+2, align, headerSize) - headerSize;
 #else
-		U8 *pp = Align(p, align, headerSize+2) - headerSize;
+		U8 *pp = Align(p+2, align, headerSize) - headerSize;
 #endif
 
 		RAD_ASSERT(pp > p);

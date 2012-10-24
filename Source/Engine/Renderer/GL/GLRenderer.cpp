@@ -30,11 +30,6 @@ void GLRenderer::CommitStates() {
 	gls.Commit();
 }
 
-void GLRenderer::BindFramebuffer() {
-	gls.BindBuffer(GL_FRAMEBUFFER_EXT, 0);
-	gls.BindBuffer(GL_RENDERBUFFER_EXT, 0);
-}
-
 void GLRenderer::UnbindStates() {
 	gls.DisableTextures();
 	gls.DisableVertexAttribArrays(true);
@@ -48,6 +43,5 @@ void GLRenderer::UnbindStates() {
 	gls.BindBuffer(GL_FRAMEBUFFER_EXT, 0);
 	gls.BindBuffer(GL_RENDERBUFFER_EXT, 0);
 }
-
 
 } // r

@@ -7,8 +7,8 @@
 #pragma once
 
 #include <Main/GL/GLContext.h>
-#include "../GL/GLRenderer.h"
-#include "../GL/GLState.h"
+#include "GLRenderer.h"
+#include "GLState.h"
 #include "RBackend.h"
 #include <Runtime/Interface/ComponentBuilder.h>
 #include <Runtime/PushPack.h>
@@ -26,8 +26,7 @@ RADENG_API void RADENG_CALL SetQGLFormat(QGLFormat &fmt);
 class RBackend : 
 	public GLRenderer, 
 	public IRBackend, 
-	private AtomicRefCount 
-{
+	private AtomicRefCount  {
 public:
 
 	RBackend();
@@ -39,9 +38,13 @@ public:
 	virtual void SwapBuffers();
 #endif
 	
-	virtual void VidReset();
 	virtual bool VidBind();
+	virtual void BindFramebuffer();
+
+#if defined(RAD_OPT_PC)
+	virtual void VidReset();
 	virtual bool CheckCaps();
+#endif
 
 	virtual HContext CreateContext(
 		const NativeDeviceContext::Ref &nativeContext
@@ -61,19 +64,21 @@ protected:
 
 private:
 
+#if defined(RAD_OPT_PC)
 	static boost::thread_specific_ptr<HContext> s_ctx;
+#else
+	HContext m_ctx;
+#endif
 };
 
 class RBContext : 
 	public IContext, 
-	private AtomicRefCount
-{
+	private AtomicRefCount {
 public:
 
 	RBContext(
 		const GLDeviceContext::Ref &context
-	) : m_glCtx(context) 
-	{
+	) : m_glCtx(context)  {
 		m_s = gls.New(true);
 		RAD_ASSERT(m_s);
 	}

@@ -20,11 +20,9 @@
 
 using namespace xtime;
 
-// Pull these in from the front-end OSXMain.mm and IOSMain.mm
-#if defined(RAD_OPT_IOS)
-void __IOS_BundlePath(char*);
-#elif defined(RAD_OPT_OSX)
-void __OSX_BundlePath(char*);
+// In the Main project.
+#if defined(RAD_OPT_APPLE)
+String AppleGetBundlePath();
 #endif
 
 namespace file {
@@ -33,14 +31,16 @@ FileSystem::Ref FileSystem::New() {
 
 	String cwd;
 
+#if defined(RAD_OPT_IOS) || (defined(RAD_OPT_OSX) && defined(RAD_OPT_SHIP))
+	cwd = AppleGetBundlePath();
+#else
 	{
 		char x[256];
 		getcwd(x, 255);
 		x[255] = 0;
 		cwd = x;
 	}
-
-	cwd.Replace('\\', '/');
+#endif
 	
 	AddrSize pageSize = (AddrSize)sysconf(_SC_PAGE_SIZE);
 	
@@ -254,8 +254,8 @@ PosixMMFile::~PosixMMFile() {
 }
 
 MMapping::Ref PosixMMFile::MMap(AddrSize ofs, AddrSize size, ::Zone &zone) {
-	if (size == 0 || (size > this->size.get()))
-		size = this->size.get();
+	if (size == 0)
+		size = this->size.get() - ofs;
 	RAD_ASSERT(size > 0);
 	RAD_ASSERT(ofs+size <= this->size.get());
 

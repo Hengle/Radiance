@@ -12,6 +12,5 @@
 namespace r {
 
 RAD_DECLARE_INTERFACE(HRBackend, IRBackend);
-RAD_DECLARE_INTERFACE(HRBState, IRBState);
 
 } // r

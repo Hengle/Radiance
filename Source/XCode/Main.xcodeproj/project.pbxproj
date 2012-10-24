@@ -23,12 +23,8 @@
 		330A99C215BCA115002A81EC /* NativeAppDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E515BA34BC00458F43 /* NativeAppDef.h */; };
 		330A99C315BCA115002A81EC /* NativeDeviceContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E615BA34BC00458F43 /* NativeDeviceContext.h */; };
 		330A99C415BCA115002A81EC /* null_CloudStorage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949E715BA34BC00458F43 /* null_CloudStorage.cpp */; };
-		330A99C615BCA125002A81EC /* OSXNativeApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 331949EC15BA34BC00458F43 /* OSXNativeApp.mm */; };
 		330A99C715BCA126002A81EC /* OSXNativeApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949EB15BA34BC00458F43 /* OSXNativeApp.h */; };
 		330A99C815BCA126002A81EC /* OSXNativeApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 331949EC15BA34BC00458F43 /* OSXNativeApp.mm */; };
-		330A99C915BCA1BE002A81EC /* AppDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 33194B2715BC8A6700458F43 /* AppDelegate.h */; };
-		330A99CA15BCA1BE002A81EC /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33194B2815BC8A6700458F43 /* AppDelegate.mm */; };
-		330A99CB15BCA1C9002A81EC /* OSXMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33194A2515BA4F4A00458F43 /* OSXMain.mm */; };
 		330A99CC15BCA1D6002A81EC /* QtAppMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949E815BA34BC00458F43 /* QtAppMain.cpp */; };
 		330A99CD15BCA1D6002A81EC /* QtAppMain.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E915BA34BC00458F43 /* QtAppMain.h */; };
 		33188E9B15BCA6D900C69D36 /* Cg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33194A0715BA36A900458F43 /* Cg.framework */; };
@@ -36,8 +32,6 @@
 		33188E9E15BCA6E800C69D36 /* QtGui.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33194A0215BA368300458F43 /* QtGui.framework */; };
 		33188E9F15BCA6E800C69D36 /* QtOpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33194A0315BA368300458F43 /* QtOpenGL.framework */; };
 		331949C615BA344A00458F43 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 331949C515BA344A00458F43 /* Foundation.framework */; };
-		331949EE15BA34BC00458F43 /* OSXNativeApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949EB15BA34BC00458F43 /* OSXNativeApp.h */; };
-		331949EF15BA34BC00458F43 /* OSXNativeApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 331949EC15BA34BC00458F43 /* OSXNativeApp.mm */; };
 		331949F015BA34BC00458F43 /* IntMain.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E015BA34BC00458F43 /* IntMain.h */; };
 		331949F115BA34BC00458F43 /* NativeApp_inl.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E115BA34BC00458F43 /* NativeApp_inl.h */; };
 		331949F215BA34BC00458F43 /* NativeApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949E215BA34BC00458F43 /* NativeApp.cpp */; };
@@ -46,13 +40,12 @@
 		331949F515BA34BC00458F43 /* NativeAppDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E515BA34BC00458F43 /* NativeAppDef.h */; };
 		331949F615BA34BC00458F43 /* NativeDeviceContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E615BA34BC00458F43 /* NativeDeviceContext.h */; };
 		331949F715BA34BC00458F43 /* null_CloudStorage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949E715BA34BC00458F43 /* null_CloudStorage.cpp */; };
-		33194A2615BA4F4A00458F43 /* OSXMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33194A2515BA4F4A00458F43 /* OSXMain.mm */; };
-		336836CB15D41E8D00EE9472 /* GameCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 336836C915D41E8D00EE9472 /* GameCenter.h */; };
-		336836CC15D41E8D00EE9472 /* GameCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 336836C915D41E8D00EE9472 /* GameCenter.h */; };
-		336836CD15D41E8D00EE9472 /* GameCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 336836C915D41E8D00EE9472 /* GameCenter.h */; };
-		336836CE15D41E8D00EE9472 /* GameCenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336836CA15D41E8D00EE9472 /* GameCenter.mm */; };
-		336836CF15D41E8D00EE9472 /* GameCenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336836CA15D41E8D00EE9472 /* GameCenter.mm */; };
-		336836D015D41E8D00EE9472 /* GameCenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336836CA15D41E8D00EE9472 /* GameCenter.mm */; };
+		336836CB15D41E8D00EE9472 /* AppleGameCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 336836C915D41E8D00EE9472 /* AppleGameCenter.h */; };
+		336836CC15D41E8D00EE9472 /* AppleGameCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 336836C915D41E8D00EE9472 /* AppleGameCenter.h */; };
+		336836CD15D41E8D00EE9472 /* AppleGameCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 336836C915D41E8D00EE9472 /* AppleGameCenter.h */; };
+		336836CE15D41E8D00EE9472 /* AppleGameCenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336836CA15D41E8D00EE9472 /* AppleGameCenter.mm */; };
+		336836CF15D41E8D00EE9472 /* AppleGameCenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336836CA15D41E8D00EE9472 /* AppleGameCenter.mm */; };
+		336836D015D41E8D00EE9472 /* AppleGameCenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336836CA15D41E8D00EE9472 /* AppleGameCenter.mm */; };
 		337AE54715BF033700AD1617 /* GLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 337AE54615BF033700AD1617 /* GLContext.h */; };
 		337AE54815BF033700AD1617 /* GLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 337AE54615BF033700AD1617 /* GLContext.h */; };
 		337AE54915BF033700AD1617 /* GLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 337AE54615BF033700AD1617 /* GLContext.h */; };
@@ -70,6 +63,49 @@
 		337AE77D15BF217000AD1617 /* NativeDeviceContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E615BA34BC00458F43 /* NativeDeviceContext.h */; };
 		337AE77E15BF217000AD1617 /* AppDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 33194B2715BC8A6700458F43 /* AppDelegate.h */; };
 		337AE77F15BF217000AD1617 /* GLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 337AE54615BF033700AD1617 /* GLContext.h */; };
+		33BF3FFB163378D0006DEAAE /* AppDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 33BF3FF9163378D0006DEAAE /* AppDelegate.h */; };
+		33BF3FFC163378D0006DEAAE /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33BF3FFA163378D0006DEAAE /* AppDelegate.mm */; };
+		33BF400216338420006DEAAE /* EAGLView.h in Headers */ = {isa = PBXBuildFile; fileRef = 33BF400016338420006DEAAE /* EAGLView.h */; };
+		33BF400316338420006DEAAE /* EAGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33BF400116338420006DEAAE /* EAGLView.mm */; };
+		33BF4007163396BF006DEAAE /* MainViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 33BF4005163396BE006DEAAE /* MainViewController.h */; };
+		33BF4008163396BF006DEAAE /* MainViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33BF4006163396BF006DEAAE /* MainViewController.mm */; };
+		33BF400C163398BD006DEAAE /* iOSNativeApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 33BF400A163398BC006DEAAE /* iOSNativeApp.h */; };
+		33BF400D163398BD006DEAAE /* iOSNativeApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33BF400B163398BD006DEAAE /* iOSNativeApp.mm */; };
+		33BF4010163398C6006DEAAE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 33BF400F163398C6006DEAAE /* main.m */; };
+		33FA7E1616339AE8002603A5 /* AppleHelpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33FA7E1516339AE8002603A5 /* AppleHelpers.mm */; };
+		33FA7E1716339AE8002603A5 /* AppleHelpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33FA7E1516339AE8002603A5 /* AppleHelpers.mm */; };
+		33FA7E7F1633AF7E002603A5 /* UIDevice-Hardware.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FA7E7D1633AF7E002603A5 /* UIDevice-Hardware.h */; };
+		33FA7E801633AF7E002603A5 /* UIDevice-Hardware.m in Sources */ = {isa = PBXBuildFile; fileRef = 33FA7E7E1633AF7E002603A5 /* UIDevice-Hardware.m */; };
+		33FA7EA21633C9BB002603A5 /* AppleHelpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33FA7E1516339AE8002603A5 /* AppleHelpers.mm */; };
+		33FA7EA71633C9F2002603A5 /* NativeApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949E215BA34BC00458F43 /* NativeApp.cpp */; };
+		33FA7EA81633C9F2002603A5 /* null_CloudStorage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949E715BA34BC00458F43 /* null_CloudStorage.cpp */; };
+		33FA7EAA1633C9F2002603A5 /* AppleGameCenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336836CA15D41E8D00EE9472 /* AppleGameCenter.mm */; };
+		33FA7EAB1633C9F2002603A5 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33BF3FFA163378D0006DEAAE /* AppDelegate.mm */; };
+		33FA7EAC1633C9F2002603A5 /* EAGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33BF400116338420006DEAAE /* EAGLView.mm */; };
+		33FA7EAD1633C9F2002603A5 /* MainViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33BF4006163396BF006DEAAE /* MainViewController.mm */; };
+		33FA7EAE1633C9F2002603A5 /* iOSNativeApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33BF400B163398BD006DEAAE /* iOSNativeApp.mm */; };
+		33FA7EAF1633C9F2002603A5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 33BF400F163398C6006DEAAE /* main.m */; };
+		33FA7EB01633C9F2002603A5 /* AppleHelpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33FA7E1516339AE8002603A5 /* AppleHelpers.mm */; };
+		33FA7EB11633C9F2002603A5 /* UIDevice-Hardware.m in Sources */ = {isa = PBXBuildFile; fileRef = 33FA7E7E1633AF7E002603A5 /* UIDevice-Hardware.m */; };
+		33FA7EB31633C9F2002603A5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 331949C515BA344A00458F43 /* Foundation.framework */; };
+		33FA7EB51633C9F2002603A5 /* IntMain.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E015BA34BC00458F43 /* IntMain.h */; };
+		33FA7EB61633C9F2002603A5 /* NativeApp_inl.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E115BA34BC00458F43 /* NativeApp_inl.h */; };
+		33FA7EB71633C9F2002603A5 /* NativeApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E315BA34BC00458F43 /* NativeApp.h */; };
+		33FA7EB81633C9F2002603A5 /* NativeAppBackend.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E415BA34BC00458F43 /* NativeAppBackend.h */; };
+		33FA7EB91633C9F2002603A5 /* NativeAppDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E515BA34BC00458F43 /* NativeAppDef.h */; };
+		33FA7EBA1633C9F2002603A5 /* NativeDeviceContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E615BA34BC00458F43 /* NativeDeviceContext.h */; };
+		33FA7EBB1633C9F2002603A5 /* GLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 337AE54615BF033700AD1617 /* GLContext.h */; };
+		33FA7EBC1633C9F2002603A5 /* AppleGameCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 336836C915D41E8D00EE9472 /* AppleGameCenter.h */; };
+		33FA7EBD1633C9F2002603A5 /* AppDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 33BF3FF9163378D0006DEAAE /* AppDelegate.h */; };
+		33FA7EBE1633C9F2002603A5 /* EAGLView.h in Headers */ = {isa = PBXBuildFile; fileRef = 33BF400016338420006DEAAE /* EAGLView.h */; };
+		33FA7EBF1633C9F2002603A5 /* MainViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 33BF4005163396BE006DEAAE /* MainViewController.h */; };
+		33FA7EC01633C9F2002603A5 /* iOSNativeApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 33BF400A163398BC006DEAAE /* iOSNativeApp.h */; };
+		33FA7EC11633C9F2002603A5 /* UIDevice-Hardware.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FA7E7D1633AF7E002603A5 /* UIDevice-Hardware.h */; };
+		33FA81531633DD35002603A5 /* AppleHelpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33FA7E1516339AE8002603A5 /* AppleHelpers.mm */; };
+		33FA82A2163542E0002603A5 /* AppDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 33194B2715BC8A6700458F43 /* AppDelegate.h */; };
+		33FA82A3163542E0002603A5 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33194B2815BC8A6700458F43 /* AppDelegate.mm */; };
+		33FA82A516354763002603A5 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33FA82A416354762002603A5 /* QuartzCore.framework */; };
+		33FA82A61635477B002603A5 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33FA82A416354762002603A5 /* QuartzCore.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -94,15 +130,11 @@
 		33194A2515BA4F4A00458F43 /* OSXMain.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = OSXMain.mm; path = ../Main/OSX/OSXMain.mm; sourceTree = "<group>"; };
 		33194B2715BC8A6700458F43 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = ../Main/OSX/AppDelegate.h; sourceTree = "<group>"; };
 		33194B2815BC8A6700458F43 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = ../Main/OSX/AppDelegate.mm; sourceTree = "<group>"; };
-		335ED5AC15BF22BB008DDBD9 /* libMainShipOSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainShipOSX.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		335ED5AD15BF22BB008DDBD9 /* libMainiOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainiOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		335ED5AE15BF22BB008DDBD9 /* libMainDeveloper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainDeveloper.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		336836C715D41CB400EE9472 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
-		336836C915D41E8D00EE9472 /* GameCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameCenter.h; path = ../Main/GameCenter.h; sourceTree = "<group>"; };
-		336836CA15D41E8D00EE9472 /* GameCenter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = GameCenter.mm; path = ../Main/GameCenter.mm; sourceTree = "<group>"; };
+		336836C915D41E8D00EE9472 /* AppleGameCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppleGameCenter.h; path = ../Main/AppleGameCenter.h; sourceTree = "<group>"; };
+		336836CA15D41E8D00EE9472 /* AppleGameCenter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppleGameCenter.mm; path = ../Main/AppleGameCenter.mm; sourceTree = "<group>"; };
 		336836E315D471C700EE9472 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		337AE54615BF033700AD1617 /* GLContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GLContext.h; path = ../Main/GL/GLContext.h; sourceTree = "<group>"; };
-		337AE78315BF217000AD1617 /* libMainGoldenOSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainGoldenOSX.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		337AE78415BF21A600AD1617 /* MainGoldenDebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainGoldenDebugiOS.xcconfig; path = XCConfig/MainGoldenDebugiOS.xcconfig; sourceTree = "<group>"; };
 		337AE78515BF21A600AD1617 /* MainGoldenDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainGoldenDebugOSX.xcconfig; path = XCConfig/MainGoldenDebugOSX.xcconfig; sourceTree = "<group>"; };
 		337AE78615BF21A600AD1617 /* MainGoldenReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainGoldenReleaseiOS.xcconfig; path = XCConfig/MainGoldenReleaseiOS.xcconfig; sourceTree = "<group>"; };
@@ -113,6 +145,26 @@
 		338CDF0E15BC8F820058DFF5 /* MainShipDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainShipDebugOSX.xcconfig; path = XCConfig/MainShipDebugOSX.xcconfig; sourceTree = "<group>"; };
 		338CDF0F15BC8F820058DFF5 /* MainShipReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainShipReleaseiOS.xcconfig; path = XCConfig/MainShipReleaseiOS.xcconfig; sourceTree = "<group>"; };
 		338CDF1015BC8F820058DFF5 /* MainShipReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainShipReleaseOSX.xcconfig; path = XCConfig/MainShipReleaseOSX.xcconfig; sourceTree = "<group>"; };
+		33BF3FF9163378D0006DEAAE /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		33BF3FFA163378D0006DEAAE /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
+		33BF3FFE16337A49006DEAAE /* ViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ViewController_iPad.xib; sourceTree = "<group>"; };
+		33BF3FFF16337A49006DEAAE /* ViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ViewController_iPhone.xib; sourceTree = "<group>"; };
+		33BF400016338420006DEAAE /* EAGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EAGLView.h; sourceTree = "<group>"; };
+		33BF400116338420006DEAAE /* EAGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = EAGLView.mm; sourceTree = "<group>"; };
+		33BF4005163396BE006DEAAE /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
+		33BF4006163396BF006DEAAE /* MainViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MainViewController.mm; sourceTree = "<group>"; };
+		33BF400A163398BC006DEAAE /* iOSNativeApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iOSNativeApp.h; sourceTree = "<group>"; };
+		33BF400B163398BD006DEAAE /* iOSNativeApp.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = iOSNativeApp.mm; sourceTree = "<group>"; };
+		33BF400F163398C6006DEAAE /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		33FA7E1516339AE8002603A5 /* AppleHelpers.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppleHelpers.mm; path = ../Main/AppleHelpers.mm; sourceTree = "<group>"; };
+		33FA7E7D1633AF7E002603A5 /* UIDevice-Hardware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice-Hardware.h"; sourceTree = "<group>"; };
+		33FA7E7E1633AF7E002603A5 /* UIDevice-Hardware.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice-Hardware.m"; sourceTree = "<group>"; };
+		33FA81001633CBC5002603A5 /* libMainShipOSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainShipOSX.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		33FA81011633CBC5002603A5 /* libMainShipiOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainShipiOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		33FA81021633CBC5002603A5 /* libMainGoldenOSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainGoldenOSX.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		33FA81031633CBC5002603A5 /* libMainDeveloper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainDeveloper.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		33FA81041633CBC5002603A5 /* libMainGoldeniOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMainGoldeniOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		33FA82A416354762002603A5 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.0.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +179,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				33FA82A516354763002603A5 /* QuartzCore.framework in Frameworks */,
 				331949C615BA344A00458F43 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -149,24 +202,34 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		33FA7EB21633C9F2002603A5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33FA82A61635477B002603A5 /* QuartzCore.framework in Frameworks */,
+				33FA7EB31633C9F2002603A5 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		331949A715BA343700458F43 = {
 			isa = PBXGroup;
 			children = (
-				336836E315D471C700EE9472 /* Carbon.framework */,
-				336836C715D41CB400EE9472 /* GameKit.framework */,
 				331949DE15BA34BC00458F43 /* Source */,
 				331949FC15BA352400458F43 /* XCConfig */,
 				331949C415BA344A00458F43 /* Frameworks */,
-				335ED5EB15BF2348008DDBD9 /* Products */,
+				33FA813D1633CBEB002603A5 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
 		331949C415BA344A00458F43 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				33FA82A416354762002603A5 /* QuartzCore.framework */,
+				336836E315D471C700EE9472 /* Carbon.framework */,
+				336836C715D41CB400EE9472 /* GameKit.framework */,
 				33194A0715BA36A900458F43 /* Cg.framework */,
 				33194A0115BA368300458F43 /* QtCore.framework */,
 				33194A0215BA368300458F43 /* QtGui.framework */,
@@ -181,8 +244,10 @@
 			children = (
 				337AE54415BF032900AD1617 /* GL */,
 				331949DF15BA34BC00458F43 /* OSX */,
-				336836C915D41E8D00EE9472 /* GameCenter.h */,
-				336836CA15D41E8D00EE9472 /* GameCenter.mm */,
+				33BF3FF8163378D0006DEAAE /* iOS */,
+				336836C915D41E8D00EE9472 /* AppleGameCenter.h */,
+				336836CA15D41E8D00EE9472 /* AppleGameCenter.mm */,
+				33FA7E1516339AE8002603A5 /* AppleHelpers.mm */,
 				331949E015BA34BC00458F43 /* IntMain.h */,
 				331949E215BA34BC00458F43 /* NativeApp.cpp */,
 				331949E315BA34BC00458F43 /* NativeApp.h */,
@@ -227,23 +292,45 @@
 			name = XCConfig;
 			sourceTree = "<group>";
 		};
-		335ED5EB15BF2348008DDBD9 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				337AE78315BF217000AD1617 /* libMainGoldenOSX.a */,
-				335ED5AC15BF22BB008DDBD9 /* libMainShipOSX.a */,
-				335ED5AD15BF22BB008DDBD9 /* libMainiOS.a */,
-				335ED5AE15BF22BB008DDBD9 /* libMainDeveloper.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		337AE54415BF032900AD1617 /* GL */ = {
 			isa = PBXGroup;
 			children = (
 				337AE54615BF033700AD1617 /* GLContext.h */,
 			);
 			name = GL;
+			sourceTree = "<group>";
+		};
+		33BF3FF8163378D0006DEAAE /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				33BF3FFE16337A49006DEAAE /* ViewController_iPad.xib */,
+				33BF3FFF16337A49006DEAAE /* ViewController_iPhone.xib */,
+				33BF3FF9163378D0006DEAAE /* AppDelegate.h */,
+				33BF3FFA163378D0006DEAAE /* AppDelegate.mm */,
+				33BF400016338420006DEAAE /* EAGLView.h */,
+				33BF400116338420006DEAAE /* EAGLView.mm */,
+				33BF400A163398BC006DEAAE /* iOSNativeApp.h */,
+				33BF400B163398BD006DEAAE /* iOSNativeApp.mm */,
+				33BF400F163398C6006DEAAE /* main.m */,
+				33BF4005163396BE006DEAAE /* MainViewController.h */,
+				33BF4006163396BF006DEAAE /* MainViewController.mm */,
+				33FA7E7D1633AF7E002603A5 /* UIDevice-Hardware.h */,
+				33FA7E7E1633AF7E002603A5 /* UIDevice-Hardware.m */,
+			);
+			name = iOS;
+			path = ../Main/iOS;
+			sourceTree = "<group>";
+		};
+		33FA813D1633CBEB002603A5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				33FA81001633CBC5002603A5 /* libMainShipOSX.a */,
+				33FA81011633CBC5002603A5 /* libMainShipiOS.a */,
+				33FA81021633CBC5002603A5 /* libMainGoldenOSX.a */,
+				33FA81031633CBC5002603A5 /* libMainDeveloper.a */,
+				33FA81041633CBC5002603A5 /* libMainGoldeniOS.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -253,16 +340,14 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				331949EE15BA34BC00458F43 /* OSXNativeApp.h in Headers */,
 				331949F015BA34BC00458F43 /* IntMain.h in Headers */,
 				331949F115BA34BC00458F43 /* NativeApp_inl.h in Headers */,
 				331949F315BA34BC00458F43 /* NativeApp.h in Headers */,
 				331949F415BA34BC00458F43 /* NativeAppBackend.h in Headers */,
 				331949F515BA34BC00458F43 /* NativeAppDef.h in Headers */,
 				331949F615BA34BC00458F43 /* NativeDeviceContext.h in Headers */,
-				330A99C915BCA1BE002A81EC /* AppDelegate.h in Headers */,
 				337AE54715BF033700AD1617 /* GLContext.h in Headers */,
-				336836CB15D41E8D00EE9472 /* GameCenter.h in Headers */,
+				336836CB15D41E8D00EE9472 /* AppleGameCenter.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -277,7 +362,12 @@
 				330A99B915BCA114002A81EC /* NativeAppDef.h in Headers */,
 				330A99BA15BCA114002A81EC /* NativeDeviceContext.h in Headers */,
 				337AE54815BF033700AD1617 /* GLContext.h in Headers */,
-				336836CC15D41E8D00EE9472 /* GameCenter.h in Headers */,
+				336836CC15D41E8D00EE9472 /* AppleGameCenter.h in Headers */,
+				33BF3FFB163378D0006DEAAE /* AppDelegate.h in Headers */,
+				33BF400216338420006DEAAE /* EAGLView.h in Headers */,
+				33BF4007163396BF006DEAAE /* MainViewController.h in Headers */,
+				33BF400C163398BD006DEAAE /* iOSNativeApp.h in Headers */,
+				33FA7E7F1633AF7E002603A5 /* UIDevice-Hardware.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -294,6 +384,7 @@
 				330A99C715BCA126002A81EC /* OSXNativeApp.h in Headers */,
 				330A99CD15BCA1D6002A81EC /* QtAppMain.h in Headers */,
 				337AE54915BF033700AD1617 /* GLContext.h in Headers */,
+				33FA82A2163542E0002603A5 /* AppDelegate.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -310,7 +401,27 @@
 				337AE77D15BF217000AD1617 /* NativeDeviceContext.h in Headers */,
 				337AE77E15BF217000AD1617 /* AppDelegate.h in Headers */,
 				337AE77F15BF217000AD1617 /* GLContext.h in Headers */,
-				336836CD15D41E8D00EE9472 /* GameCenter.h in Headers */,
+				336836CD15D41E8D00EE9472 /* AppleGameCenter.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		33FA7EB41633C9F2002603A5 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33FA7EB51633C9F2002603A5 /* IntMain.h in Headers */,
+				33FA7EB61633C9F2002603A5 /* NativeApp_inl.h in Headers */,
+				33FA7EB71633C9F2002603A5 /* NativeApp.h in Headers */,
+				33FA7EB81633C9F2002603A5 /* NativeAppBackend.h in Headers */,
+				33FA7EB91633C9F2002603A5 /* NativeAppDef.h in Headers */,
+				33FA7EBA1633C9F2002603A5 /* NativeDeviceContext.h in Headers */,
+				33FA7EBB1633C9F2002603A5 /* GLContext.h in Headers */,
+				33FA7EBC1633C9F2002603A5 /* AppleGameCenter.h in Headers */,
+				33FA7EBD1633C9F2002603A5 /* AppDelegate.h in Headers */,
+				33FA7EBE1633C9F2002603A5 /* EAGLView.h in Headers */,
+				33FA7EBF1633C9F2002603A5 /* MainViewController.h in Headers */,
+				33FA7EC01633C9F2002603A5 /* iOSNativeApp.h in Headers */,
+				33FA7EC11633C9F2002603A5 /* UIDevice-Hardware.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -331,12 +442,12 @@
 			);
 			name = MainShipOSX;
 			productName = Main;
-			productReference = 335ED5AC15BF22BB008DDBD9 /* libMainShipOSX.a */;
+			productReference = 33FA81001633CBC5002603A5 /* libMainShipOSX.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		331949C215BA344A00458F43 /* MainiOS */ = {
+		331949C215BA344A00458F43 /* MainShipiOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 331949CD15BA344A00458F43 /* Build configuration list for PBXNativeTarget "MainiOS" */;
+			buildConfigurationList = 331949CD15BA344A00458F43 /* Build configuration list for PBXNativeTarget "MainShipiOS" */;
 			buildPhases = (
 				331949BF15BA344A00458F43 /* Sources */,
 				331949C015BA344A00458F43 /* Frameworks */,
@@ -346,9 +457,9 @@
 			);
 			dependencies = (
 			);
-			name = MainiOS;
+			name = MainShipiOS;
 			productName = MainiOS;
-			productReference = 335ED5AD15BF22BB008DDBD9 /* libMainiOS.a */;
+			productReference = 33FA81011633CBC5002603A5 /* libMainShipiOS.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		33194B2D15BC8A8400458F43 /* MainDeveloper */ = {
@@ -365,7 +476,7 @@
 			);
 			name = MainDeveloper;
 			productName = MainDeveloper;
-			productReference = 335ED5AE15BF22BB008DDBD9 /* libMainDeveloper.a */;
+			productReference = 33FA81031633CBC5002603A5 /* libMainDeveloper.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		337AE76E15BF217000AD1617 /* MainGoldenOSX */ = {
@@ -382,7 +493,24 @@
 			);
 			name = MainGoldenOSX;
 			productName = Main;
-			productReference = 337AE78315BF217000AD1617 /* libMainGoldenOSX.a */;
+			productReference = 33FA81021633CBC5002603A5 /* libMainGoldenOSX.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		33FA7EA51633C9F2002603A5 /* MainGoldeniOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 33FA7EC21633C9F2002603A5 /* Build configuration list for PBXNativeTarget "MainGoldeniOS" */;
+			buildPhases = (
+				33FA7EA61633C9F2002603A5 /* Sources */,
+				33FA7EB21633C9F2002603A5 /* Frameworks */,
+				33FA7EB41633C9F2002603A5 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MainGoldeniOS;
+			productName = MainiOS;
+			productReference = 33FA81041633CBC5002603A5 /* libMainGoldeniOS.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -406,9 +534,10 @@
 			projectRoot = "";
 			targets = (
 				331949B115BA343800458F43 /* MainShipOSX */,
-				331949C215BA344A00458F43 /* MainiOS */,
-				33194B2D15BC8A8400458F43 /* MainDeveloper */,
+				331949C215BA344A00458F43 /* MainShipiOS */,
 				337AE76E15BF217000AD1617 /* MainGoldenOSX */,
+				33194B2D15BC8A8400458F43 /* MainDeveloper */,
+				33FA7EA51633C9F2002603A5 /* MainGoldeniOS */,
 			);
 		};
 /* End PBXProject section */
@@ -418,12 +547,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				331949EF15BA34BC00458F43 /* OSXNativeApp.mm in Sources */,
 				331949F215BA34BC00458F43 /* NativeApp.cpp in Sources */,
 				331949F715BA34BC00458F43 /* null_CloudStorage.cpp in Sources */,
-				33194A2615BA4F4A00458F43 /* OSXMain.mm in Sources */,
-				330A99CA15BCA1BE002A81EC /* AppDelegate.mm in Sources */,
-				336836CE15D41E8D00EE9472 /* GameCenter.mm in Sources */,
+				336836CE15D41E8D00EE9472 /* AppleGameCenter.mm in Sources */,
+				33FA7E1616339AE8002603A5 /* AppleHelpers.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -433,8 +560,14 @@
 			files = (
 				330A99B615BCA114002A81EC /* NativeApp.cpp in Sources */,
 				330A99BB15BCA114002A81EC /* null_CloudStorage.cpp in Sources */,
-				330A99C615BCA125002A81EC /* OSXNativeApp.mm in Sources */,
-				336836CF15D41E8D00EE9472 /* GameCenter.mm in Sources */,
+				336836CF15D41E8D00EE9472 /* AppleGameCenter.mm in Sources */,
+				33BF3FFC163378D0006DEAAE /* AppDelegate.mm in Sources */,
+				33BF400316338420006DEAAE /* EAGLView.mm in Sources */,
+				33BF4008163396BF006DEAAE /* MainViewController.mm in Sources */,
+				33BF400D163398BD006DEAAE /* iOSNativeApp.mm in Sources */,
+				33BF4010163398C6006DEAAE /* main.m in Sources */,
+				33FA7E1716339AE8002603A5 /* AppleHelpers.mm in Sources */,
+				33FA7E801633AF7E002603A5 /* UIDevice-Hardware.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -445,8 +578,9 @@
 				330A99BF15BCA115002A81EC /* NativeApp.cpp in Sources */,
 				330A99C415BCA115002A81EC /* null_CloudStorage.cpp in Sources */,
 				330A99C815BCA126002A81EC /* OSXNativeApp.mm in Sources */,
-				330A99CB15BCA1C9002A81EC /* OSXMain.mm in Sources */,
 				330A99CC15BCA1D6002A81EC /* QtAppMain.cpp in Sources */,
+				33FA81531633DD35002603A5 /* AppleHelpers.mm in Sources */,
+				33FA82A3163542E0002603A5 /* AppDelegate.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -459,7 +593,25 @@
 				337AE77215BF217000AD1617 /* null_CloudStorage.cpp in Sources */,
 				337AE77315BF217000AD1617 /* OSXMain.mm in Sources */,
 				337AE77415BF217000AD1617 /* AppDelegate.mm in Sources */,
-				336836D015D41E8D00EE9472 /* GameCenter.mm in Sources */,
+				336836D015D41E8D00EE9472 /* AppleGameCenter.mm in Sources */,
+				33FA7EA21633C9BB002603A5 /* AppleHelpers.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		33FA7EA61633C9F2002603A5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33FA7EA71633C9F2002603A5 /* NativeApp.cpp in Sources */,
+				33FA7EA81633C9F2002603A5 /* null_CloudStorage.cpp in Sources */,
+				33FA7EAA1633C9F2002603A5 /* AppleGameCenter.mm in Sources */,
+				33FA7EAB1633C9F2002603A5 /* AppDelegate.mm in Sources */,
+				33FA7EAC1633C9F2002603A5 /* EAGLView.mm in Sources */,
+				33FA7EAD1633C9F2002603A5 /* MainViewController.mm in Sources */,
+				33FA7EAE1633C9F2002603A5 /* iOSNativeApp.mm in Sources */,
+				33FA7EAF1633C9F2002603A5 /* main.m in Sources */,
+				33FA7EB01633C9F2002603A5 /* AppleHelpers.mm in Sources */,
+				33FA7EB11633C9F2002603A5 /* UIDevice-Hardware.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -547,7 +699,6 @@
 			buildSettings = {
 				DSTROOT = /tmp/MainiOS.dst;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
@@ -557,7 +708,6 @@
 			buildSettings = {
 				DSTROOT = /tmp/MainiOS.dst;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
@@ -624,6 +774,24 @@
 			};
 			name = Release;
 		};
+		33FA7EC31633C9F2002603A5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 337AE78415BF21A600AD1617 /* MainGoldenDebugiOS.xcconfig */;
+			buildSettings = {
+				DSTROOT = /tmp/MainiOS.dst;
+				PRODUCT_NAME = MainGoldeniOS;
+			};
+			name = Debug;
+		};
+		33FA7EC41633C9F2002603A5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 337AE78615BF21A600AD1617 /* MainGoldenReleaseiOS.xcconfig */;
+			buildSettings = {
+				DSTROOT = /tmp/MainiOS.dst;
+				PRODUCT_NAME = MainGoldeniOS;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -645,7 +813,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		331949CD15BA344A00458F43 /* Build configuration list for PBXNativeTarget "MainiOS" */ = {
+		331949CD15BA344A00458F43 /* Build configuration list for PBXNativeTarget "MainShipiOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				331949CE15BA344A00458F43 /* Debug */,
@@ -668,6 +836,15 @@
 			buildConfigurations = (
 				337AE78115BF217000AD1617 /* Debug */,
 				337AE78215BF217000AD1617 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		33FA7EC21633C9F2002603A5 /* Build configuration list for PBXNativeTarget "MainGoldeniOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33FA7EC31633C9F2002603A5 /* Debug */,
+				33FA7EC41633C9F2002603A5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

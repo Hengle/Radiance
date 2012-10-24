@@ -1,4 +1,4 @@
-/*! \file WinNativeApp.cpp
+/*! \file OSXNativeApp.mm
 	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
 	\copyright See Radiance/LICENSE for licensing terms.
 	\author Joe Riedel
@@ -8,19 +8,10 @@
 #include "../NativeApp.h"
 #include <Engine/App.h>
 #include <Engine/COut.h>
-#include <Engine/Engine.h>
 #include <Engine/Zones.h>
-#include <Engine/Input.h>
-#include <Engine/Renderer/PC/RBackend.h>
-#include <Runtime/Base.h>
-#include <Runtime/File.h>
-#include <Runtime/Thread.h>
-#include <Runtime/Time.h>
-#include <Runtime/Runtime.h>
-
-#if defined(RAD_OPT_GL)
-#include <Engine/Renderer/GL/GLTable.h>
-#endif
+#include <Engine/Renderer/GL/RBackend.h>
+#include <Engine/Renderer/GL/GLState.h>
+#include "../GL/GLContext.h"
 
 #import <AppKit/AppKit.h>
 #import <AppKit/NSWorkspace.h>
@@ -31,6 +22,8 @@
 #if !defined(RAD_OPT_PC_TOOLS)
 #import "AppDelegate.h"
 #endif
+
+StringTable::LangId AppleGetLangId(); // See AppleLanguage.mm
 
 namespace {
 r::VidMode VidModeFromCGMode(CGDisplayModeRef cgMode) {
@@ -82,7 +75,7 @@ const SystemVersion &SystemVersion::Get() {
 	return s_v;
 }
 
-#if !defined(RAD_OPT_PC_TOOSL)
+#if !defined(RAD_OPT_PC_TOOLS)
 	
 bool ConfigureWindow(
 	int width,
@@ -175,6 +168,8 @@ NativeApp::NativeApp() {
 }
 
 bool NativeApp::PreInit() {
+
+	m_langId = AppleGetLangId();
 	
 	COut(C_Info) << "Detecting video system..." << std::endl;
 	
@@ -513,6 +508,9 @@ void NativeApp::LaunchURL(const char *sz) {
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithUTF8String:sz]]];
 }
 
+void NativeApp::SetThrottleFramerate(bool throttle) {
+}
+
 #if defined(RAD_OPT_GL) && !defined(RAD_OPT_PC_TOOLS)
 
 struct wGLContext : public GLDeviceContext {
@@ -537,6 +535,11 @@ struct wGLContext : public GLDeviceContext {
 	
 	virtual void SwapBuffers() {
 		[glCtx flushBuffer];
+	}
+	
+	virtual void BindFramebuffer() {
+		r::gls.BindBuffer(GL_FRAMEBUFFER_EXT, 0);
+		r::gls.BindBuffer(GL_RENDERBUFFER_EXT, 0);
 	}
 };
 
@@ -608,7 +611,7 @@ GLDeviceContext::Ref NativeApp::CreateOpenGLContext(const GLPixelFormat &pf) {
 #endif
 
 StringTable::LangId NativeApp::RAD_IMPLEMENT_GET(systemLangId) {
-	return StringTable::LangId_EN;
+	return m_langId;
 }
 
 } // details

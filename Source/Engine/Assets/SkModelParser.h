@@ -88,7 +88,7 @@ private:
 	pkg::Cooker::Ref m_cooker;
 #else
 	RAD_DECLARE_GET(valid, bool) { 
-		return m_buf[1] && m_ska && m_ska->valid && m_states && m_states->valid; 
+		return m_mm[1] && m_ska && m_ska->valid && m_states && m_states->valid;
 	}
 	RAD_DECLARE_GET(dskm, const ska::DSkm*) { 
 		return &m_dskm; 

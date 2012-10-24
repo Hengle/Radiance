@@ -16,10 +16,6 @@
 #undef min
 #undef max
 
-#if defined(RAD_OPT_IOS)
-void __IOS_SetDiscardColorHint(bool value);
-#endif
-
 using namespace r;
 
 namespace world {
@@ -33,7 +29,7 @@ RB_WorldDraw::Ref RB_WorldDraw::New(World *world) {
 }
 
 GLWorldDraw::GLWorldDraw(World *world) : RB_WorldDraw(world), 
-m_activeRT(-1), m_bank(0), m_clearColorBuffer(true), m_rtFB(false) {
+m_activeRT(-1), m_bank(0), m_rtFB(false) {
 	m_overlaySize[0] = m_overlaySize[1] = 0;
 	m_rtSize[0] = m_rtSize[1] = 0;
 }
@@ -55,19 +51,12 @@ void GLWorldDraw::ClearDepthBuffer() {
 
 void GLWorldDraw::ClearBackBuffer() {
 	gls.Set(DWM_Enable, -1, true); // for glClear()
-	
+
 #if defined(RAD_OPT_IOS)
-	__IOS_SetDiscardColorHint(m_clearColorBuffer);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+#else
+	glClear(GL_DEPTH_BUFFER_BIT);
 #endif
-
-	if (m_clearColorBuffer)
-		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	else
-		glClear(GL_DEPTH_BUFFER_BIT);
-}
-
-void GLWorldDraw::RAD_IMPLEMENT_SET(clearColorBuffer)(bool value) {
-	m_clearColorBuffer = value;
 }
 
 int GLWorldDraw::LoadMaterials() {

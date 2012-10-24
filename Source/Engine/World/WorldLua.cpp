@@ -182,7 +182,6 @@ bool WorldLua::Init() {
 		{ "FlushInput", lua_World_FlushInput },
 		{ "DrawCounters", lua_World_DrawCounters },
 		{ "EnableWireframe", lua_World_EnableWireframe },
-		{ "EnableColorBufferClear", lua_World_EnableColorBufferClear },
 		{ "QuitGame", lua_World_QuitGame },
 		{ 0, 0 }
 	};
@@ -659,7 +658,7 @@ int WorldLua::lua_System_Platform(lua_State *L) {
 #elif defined(RAD_OPT_WIN)
 	lua_pushinteger(L, PlatWin);
 #elif defined(RAD_OPT_IOS)
-	lua_pushinteger(L, __IOS_IPhone() ? PlatIPhone : PlatIPad);
+	lua_pushinteger(L, (App::Get()->deviceFamily == plat::kDeviceFamily_iPhone) ? PlatIPhone : PlatIPad);
 #else
 	#error RAD_ERROR_UNSUP_PLAT
 #endif
@@ -1735,13 +1734,6 @@ int WorldLua::lua_World_EnableWireframe(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	self->m_world->draw->wireframe = lua_toboolean(L, 1) ? true : false;
-	return 0;
-}
-
-int WorldLua::lua_World_EnableColorBufferClear(lua_State *L) {
-	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
-	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
-	self->m_world->draw->rb->clearColorBuffer = lua_toboolean(L, 1) ? true : false;
 	return 0;
 }
 

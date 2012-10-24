@@ -86,7 +86,8 @@ public:
 
 	static void Delete(void *p)
 	{
-		if (!p) return;
+		if (!p)
+			return;
 		U8 *pp = (U8*)p;
 		pp -= EHeaderSize;
 		Zone *zone = FromPtr(p);
@@ -96,31 +97,34 @@ public:
 
 	static AddrSize AllocSize(void *p)
 	{
-		if (!p) return 0;
+		if (!p)
+			return 0;
 		U8 *pp = (U8*)p;
-		pp -= EHeaderSize-sizeof(Zone*);
+		pp -= EHeaderSize-sizeof(Zone*)-2;
 		RAD_ASSERT(FromPtr(p)); // check guards
 		return *reinterpret_cast<AddrSize*>(pp);
 	}
 
 	static AddrSize HeaderSize(void *p)
 	{
-		if (!p) return 0;
+		if (!p)
+			return 0;
 		U8 *pp = (U8*)p;
-		pp -= EHeaderSize-sizeof(Zone*)-sizeof(AddrSize);
+		pp -= EHeaderSize;
 		RAD_ASSERT(FromPtr(p)); // check guards
 		return (AddrSize)*reinterpret_cast<U16*>(pp);
 	}
 
 	static Zone *FromPtr(void *p)
 	{
-		if (!p) return 0;
+		if (!p)
+			return 0;
 #if defined(RAD_OPT_ZONE_MEMGUARD)
 		CheckMemGuards(p);
 #endif
 		U8 *pp = (U8*)p;
 		pp -= EHeaderSize;
-		Zone *zone = *reinterpret_cast<Zone**>(pp);
+		Zone *zone = *reinterpret_cast<Zone**>(pp+2);
 		RAD_ASSERT(zone);
 #if defined(RAD_OPT_ZONE_MEMGUARD)
 		// make sure we didn't just deref bullshit.
@@ -154,17 +158,17 @@ private:
 	enum
 	{
 #if defined (RAD_OPT_ZONE_MEMGUARD)
-		EHeaderSize = sizeof(Zone*) + sizeof(AddrSize) + sizeof(U16) + sizeof(void*)
+		EHeaderSize = sizeof(U16) + sizeof(Zone*) + sizeof(AddrSize) + sizeof(void*)
 #else
-		EHeaderSize = sizeof(Zone*) + sizeof(AddrSize) + sizeof(U16)
+		EHeaderSize = sizeof(U16) + sizeof(Zone*) + sizeof(AddrSize)
 #endif
 	};
 
 	void _Delete(U8 *p)
 	{
 		--m_numAllocs;
-		m_numBytes -= *reinterpret_cast<AddrSize*>(p+sizeof(Zone*));
-		m_overhead -= EHeaderSize + *reinterpret_cast<U16*>(p+sizeof(Zone*)+sizeof(AddrSize));
+		m_numBytes -= *reinterpret_cast<AddrSize*>(p+sizeof(Zone*)+2);
+		m_overhead -= EHeaderSize + *reinterpret_cast<U16*>(p);
 		aligned_free(p);
 	}
 

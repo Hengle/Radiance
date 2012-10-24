@@ -7,7 +7,7 @@
 #include "EditorMainWindow.h"
 #include "EditorGLWidget.h"
 #include "EditorUtils.h"
-#include "../../Renderer/PC/RBackend.h"
+#include "../../Renderer/GL/RBackend.h"
 #include "../../Renderer/GL/GLTable.h"
 
 namespace tools {

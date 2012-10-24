@@ -30,26 +30,6 @@ class RBackend;
 	#define CLEAR_GL_ERRORS() ((void)0)
 #endif
 
-enum // device types
-{
-	D_NV20,
-	D_NV30,
-	D_NV35,
-	D_NV40,
-	D_NV45,
-	D_NV50,
-	D_R200,
-	D_R250,
-	D_R300,
-	D_R400,
-	D_R500,
-	D_R600,
-	D_IPhone,
-	D_IPhone4,
-	D_IPad,
-	D_Unknown
-};
-
 class RADENG_CLASS GLMatrixStack
 {
 public:
@@ -76,7 +56,6 @@ struct RADENG_CLASS GLTable
 	int maxTextures;
 	int maxVertexAttribs;
 	int maxTextureSize;
-	int chip;
 	int matrixOps;
 	int colorOps;
 	int eyeOps;
@@ -363,7 +342,6 @@ private:
 	void Load();
 	void Reset();
 	void LoadGLVersion();
-	void DetectHardware();
 };
 
 extern RADENG_API GLTable gl;

@@ -596,12 +596,19 @@ PakFile::MMPakEntry::MMPakEntry(
 }
 
 MMapping::Ref PakFile::MMPakEntry::MMap(AddrSize ofs, AddrSize size, ::Zone &zone) {
+	if (size == 0)
+		size = ((AddrSize)m_lump.Size()) - ofs;
 	RAD_ASSERT(ofs+size <= (AddrSize)m_lump.Size());
-	return m_pakFile->m_file->MMap(
+	MMapping::Ref mm = m_pakFile->m_file->MMap(
 		(AddrSize)m_lump.Ofs() + ofs,
 		size,
 		zone
 	);
+	
+	if (!mm)
+		return MMapping::Ref();
+		
+	return MMapping::Ref(new (ZFile) MMappedPakEntry(mm, ofs));
 }
 
 AddrSize PakFile::MMPakEntry::RAD_IMPLEMENT_GET(size) {
@@ -663,7 +670,7 @@ MMFileInputBuffer::MMFileInputBuffer(
 	const MMFile::Ref &file,
 	AddrSize mappedSize,
 	::Zone &zone
-) : m_file(file), m_bufSize(mappedSize), m_pos(0), m_zone(zone) {
+) : m_file(file), m_bufSize((stream::SPos)mappedSize), m_pos(0), m_zone(zone) {
 	RAD_ASSERT(mappedSize);
 }
 

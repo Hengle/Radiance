@@ -116,7 +116,7 @@ ALDriver::Ref ALDriver::New(ALDRIVER_PARAMS const char *deviceName) {
 }
 
 ALDriver::ALDriver() : 
-m_head(0), m_tail(0), m_quit(false), m_suspended(false), m_alc(0), m_ald(0) {
+m_head(0), m_tail(0), m_quit(false), m_suspended(false), m_alc(0), m_ald(0), m_enabled(true, false) {
 	m_cmdPool.Create(ZSound, "alDriverCmds", 64);
 }
 
@@ -124,6 +124,14 @@ ALDriver::~ALDriver() {
 	m_quit = true;
 	Wake();
 	Join();
+}
+
+void ALDriver::Enable(bool enabled) {
+	if (enabled) {
+		m_enabled.Open();
+	} else {
+		m_enabled.Close();
+	}
 }
 
 int ALDriver::ThreadProc() {
@@ -141,6 +149,7 @@ int ALDriver::ThreadProc() {
 
 		Exec(head);
 		DoCallbacks();
+		m_enabled.Wait();
 	}
 
 	alcMakeContextCurrent(0);

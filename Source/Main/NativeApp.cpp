@@ -103,7 +103,7 @@ bool DisplayDevice::MatchVidMode(
 
 ///////////////////////////////////////////////////////////////////////////////
 
-NativeApp::NativeApp(int argc, const char **argv) : m_argc(argc), m_argv(argv) {
+NativeApp::NativeApp(int argc, const char **argv) : m_argc(argc), m_argv(argv), m_throttle(false) {
 	m_mainThreadId = thread::ThreadId();
 }
 

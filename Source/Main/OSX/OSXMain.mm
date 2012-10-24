@@ -54,22 +54,3 @@ extern "C" int main(int argc, char *argv[]) {
 	
 }
 
-void __OSX_BundlePath(char *dst) {
-	NSString *bPath = [[NSBundle mainBundle] bundlePath];
-	strcpy(dst, [bPath cStringUsingEncoding:NSASCIIStringEncoding]);
-}
-	
-FILE *__OSX_OpenPersistence(const char *name, const char *mode) {
-	static char s_basePath[1024] = {0};
-	
-	if (s_basePath[0] == 0) {
-		NSString *path = NSHomeDirectory();
-		strcpy(s_basePath, [path cStringUsingEncoding:NSASCIIStringEncoding]);
-	}
-	
-	String x(s_basePath);
-	x += '/';
-	x += name;
-	
-	return fopen(x.c_str, mode);
-}

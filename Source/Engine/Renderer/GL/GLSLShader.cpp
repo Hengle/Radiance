@@ -835,7 +835,7 @@ void GLSLShader::Begin(Shader::Pass _p, const Material &material)
 	{
 		GLchar *log = (GLchar*)stack_alloc(logLen);
 		glGetProgramInfoLog(p.p->id, logLen, &logLen, log);
-		COut(C_Debug) << "GLSLShader: '" << m_name.c_str() << "': Validate Log: " << log << std::endl;
+		COut(C_Debug) << "GLSLShader: '" << m_name.c_str.get() << "': Validate Log: " << log << std::endl;
 	}
 	
 	glGetProgramiv(p.p->id, GL_VALIDATE_STATUS, &status);

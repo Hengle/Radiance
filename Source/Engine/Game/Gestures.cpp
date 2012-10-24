@@ -6,6 +6,7 @@
 #include RADPCH
 #include "../Engine.h"
 #include "Game.h"
+#include "../App.h"
 #include <algorithm>
 #undef min
 #undef max
@@ -42,7 +43,7 @@ struct GConstants
 	{
 		int scale = 1;
 #if defined(RAD_OPT_IOS)
-		if (__IOS_IPad3())
+		if ((App::Get()->deviceFamily == plat::kDeviceFamily_iPad) && (App::Get()->deviceType >= plat::kDeviceType_iPad3))
 			scale = 4;
 #endif
 		return x*scale;

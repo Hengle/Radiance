@@ -360,7 +360,7 @@ protected:
 		AddrSize backingSize,
 		::Zone &zone
 	);
-
+	
 private:
 
 	RAD_DECLARE_GET(data, const void*);
@@ -435,6 +435,25 @@ private:
 
 		PakFileRef m_pakFile;
 		const data_codec::lmp::StreamReader::Lump &m_lump;
+	};
+	
+	class MMappedPakEntry : public MMapping {
+	public:
+		MMappedPakEntry(
+			const MMapping::Ref &mm,
+			AddrSize offset
+		) : MMapping(mm->data, mm->size, offset, 0, ZFile), m_mm(mm) {}
+		
+		virtual void Prefetch(
+			AddrSize offset,
+			AddrSize size
+		) {
+			m_mm->Prefetch(offset, size);
+		}
+		
+	private:
+	
+		MMapping::Ref m_mm;
 	};
 
 	class PakSearch : public FileSearch {

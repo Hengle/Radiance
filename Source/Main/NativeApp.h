@@ -64,7 +64,7 @@ private:
 	details::DisplayDevice m_imp;
 }; 
 
-class RADENG_CLASS NativeApp : public boost::shared_ptr<NativeApp> {
+class RADENG_CLASS NativeApp {
 public:
 
 	NativeApp(int argc, const char **argv);
@@ -91,11 +91,14 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(NativeApp, mainThreadId, thread::Id);
 	RAD_DECLARE_READONLY_PROPERTY(NativeApp, argc, int);
 	RAD_DECLARE_READONLY_PROPERTY(NativeApp, argv, const char**);
-#if !defined(RAD_OPT_CONSOLE) || defined(RAD_OPT_IOS)
+	RAD_DECLARE_READONLY_PROPERTY(NativeApp, deviceFamily, plat::DeviceFamily);
+	RAD_DECLARE_READONLY_PROPERTY(NativeApp, deviceType, plat::DeviceType);
+	RAD_DECLARE_READONLY_PROPERTY(NativeApp, osType, plat::OSType);
+	RAD_DECLARE_READONLY_PROPERTY(NativeApp, osVersion, int);
 	RAD_DECLARE_READONLY_PROPERTY(NativeApp, primaryDisplay, const DisplayDevice::Ref&);
 	RAD_DECLARE_READONLY_PROPERTY(NativeApp, activeDisplay, const DisplayDevice::Ref&);
 	RAD_DECLARE_READONLY_PROPERTY(NativeApp, displayDevices, const DisplayDevice::Vec&);
-#endif
+	RAD_DECLARE_PROPERTY(NativeApp, throttleFramerate, bool, bool);
 
 private:
 		
@@ -103,16 +106,21 @@ private:
 	RAD_DECLARE_GET(mainThreadId, thread::Id);
 	RAD_DECLARE_GET(argc, int);
 	RAD_DECLARE_GET(argv, const char**);
-#if !defined(RAD_OPT_CONSOLE) || defined(RAD_OPT_IOS)
+	RAD_DECLARE_GET(deviceFamily, plat::DeviceFamily);
+	RAD_DECLARE_GET(deviceType, plat::DeviceType);
+	RAD_DECLARE_GET(osType, plat::OSType);
+	RAD_DECLARE_GET(osVersion, int);
 	RAD_DECLARE_GET(primaryDisplay, const DisplayDevice::Ref&);
 	RAD_DECLARE_GET(activeDisplay, const DisplayDevice::Ref&);
 	RAD_DECLARE_GET(displayDevices, const DisplayDevice::Vec&);
-#endif
-
+	RAD_DECLARE_GET(throttleFramerate, bool);
+	RAD_DECLARE_SET(throttleFramerate, bool);
+	
 	details::NativeApp m_imp;
 	thread::Id m_mainThreadId;
 	int m_argc;
 	const char **m_argv;
+	bool m_throttle;
 };
 
 #include <Runtime/PopPack.h>

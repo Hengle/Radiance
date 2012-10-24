@@ -12,5 +12,6 @@
 #include "ZLibPaths.xcconfig"
 #include "PVRTexLibPaths.xcconfig"
 #include "OpenALPaths.xcconfig"
+#include "FlurryPaths.xcconfig"
 
-EXTERNLIB_INCLUDES = "$(BOOST_PATH)" "$(FREETYPE_PATH)" "$(LIBJPEG_PATH)" "$(LIBOGG_PATH)" "$(LIBVORBIS_PATH)" "$(LIBPNG_PATH)" "$(LUA_PATH)" "$(ZLIB_PATH)" "$(OPENAL_PATH)"
+EXTERNLIB_INCLUDES = "$(BOOST_PATH)" "$(FREETYPE_PATH)" "$(LIBJPEG_PATH)" "$(LIBOGG_PATH)" "$(LIBVORBIS_PATH)" "$(LIBPNG_PATH)" "$(LUA_PATH)" "$(ZLIB_PATH)" "$(OPENAL_PATH)" "$(FLURRY_PATH)"
