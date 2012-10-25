@@ -63,6 +63,8 @@
 		337AE77D15BF217000AD1617 /* NativeDeviceContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E615BA34BC00458F43 /* NativeDeviceContext.h */; };
 		337AE77E15BF217000AD1617 /* AppDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 33194B2715BC8A6700458F43 /* AppDelegate.h */; };
 		337AE77F15BF217000AD1617 /* GLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 337AE54615BF033700AD1617 /* GLContext.h */; };
+		338BD5061638DCF600468A4D /* AppleGameCenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336836CA15D41E8D00EE9472 /* AppleGameCenter.mm */; };
+		338BD50A1638DDD800468A4D /* OSXMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33194A2515BA4F4A00458F43 /* OSXMain.mm */; };
 		33BF3FFB163378D0006DEAAE /* AppDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 33BF3FF9163378D0006DEAAE /* AppDelegate.h */; };
 		33BF3FFC163378D0006DEAAE /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33BF3FFA163378D0006DEAAE /* AppDelegate.mm */; };
 		33BF400216338420006DEAAE /* EAGLView.h in Headers */ = {isa = PBXBuildFile; fileRef = 33BF400016338420006DEAAE /* EAGLView.h */; };
@@ -581,6 +583,8 @@
 				330A99CC15BCA1D6002A81EC /* QtAppMain.cpp in Sources */,
 				33FA81531633DD35002603A5 /* AppleHelpers.mm in Sources */,
 				33FA82A3163542E0002603A5 /* AppDelegate.mm in Sources */,
+				338BD5061638DCF600468A4D /* AppleGameCenter.mm in Sources */,
+				338BD50A1638DDD800468A4D /* OSXMain.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

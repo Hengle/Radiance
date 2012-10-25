@@ -6,21 +6,18 @@
  */
  
 #include "../NativeApp.h"
+#include <Runtime/Base.h>
+#include <Runtime/Runtime.h>
 #include <Engine/App.h>
 #include <Engine/COut.h>
 #include <Engine/Engine.h>
 #include <Engine/Zones.h>
 #include <Engine/Input.h>
-#include <Engine/Renderer/PC/RBackend.h>
-#include <Runtime/Base.h>
 #include <Runtime/File.h>
 #include <Runtime/Thread.h>
 #include <Runtime/Time.h>
-#include <Runtime/Runtime.h>
-
-#if defined(RAD_OPT_GL)
+#include <Engine/Renderer/GL/RBackend.h>
 #include <Engine/Renderer/GL/GLTable.h>
-#endif
 
 #import "AppDelegate.h"
 #import "../AppleGameCenter.h"
@@ -214,7 +211,6 @@ static int s_vkeys_en[256] = {
 	argv = [self getArgs:argc]; // these are leaked.
 	
 	rt::Initialize();
-	RAD_DEBUG_ONLY(file::EnforcePortablePaths(false));
 	
 	COut(C_Info) << "NativeAppMain..." << std::endl;
 	COut(C_Info) << "echo command line: ";
