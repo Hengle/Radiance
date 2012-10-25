@@ -85,19 +85,39 @@ private:
 	bool BindDisplayDevice(const ::DisplayDeviceRef &display, const r::VidMode &mode);
 	void ResetDisplayDevice();
 	void LaunchURL(const char *sz);
+	void SetThrottleFramerate(bool throttle);
 
 #if defined(RAD_OPT_GL) && !defined(RAD_OPT_PC_TOOLS)
 	GLDeviceContext::Ref CreateOpenGLContext(const GLPixelFormat &pf);
 #endif
 
 	RAD_DECLARE_READONLY_PROPERTY(NativeApp, systemLangId, StringTable::LangId);
+	RAD_DECLARE_READONLY_PROPERTY(NativeApp, deviceFamily, plat::DeviceFamily);
+	RAD_DECLARE_READONLY_PROPERTY(NativeApp, deviceType, plat::DeviceType);
+	RAD_DECLARE_READONLY_PROPERTY(NativeApp, osType, plat::OSType);
+	RAD_DECLARE_READONLY_PROPERTY(NativeApp, osVersion, int);
 
-#if !defined(RAD_OPT_CONSOLE) || defined(RAD_OPT_IOS)
+	RAD_DECLARE_GET(systemLangId, StringTable::LangId);
+
+	RAD_DECLARE_GET(deviceFamily, plat::DeviceFamily) {
+		return plat::kDeviceFamily_PC;
+	}
+
+	RAD_DECLARE_GET(deviceType, plat::DeviceType) {
+		return plat::kDeviceType_PC;
+	}
+
+	RAD_DECLARE_GET(osType, plat::OSType) {
+		return plat::kOSType_Windows;
+	}
+
+	RAD_DECLARE_GET(osVersion, int) {
+		return 0;
+	}
+
 	RAD_DECLARE_READONLY_PROPERTY(NativeApp, primaryDisplay, const ::DisplayDeviceRef&);
 	RAD_DECLARE_READONLY_PROPERTY(NativeApp, activeDisplay, const ::DisplayDeviceRef&);
 	RAD_DECLARE_READONLY_PROPERTY(NativeApp, displayDevices, const ::DisplayDeviceVec&);
-	
-	RAD_DECLARE_GET(systemLangId, StringTable::LangId);
 	
 	RAD_DECLARE_GET(primaryDisplay, const ::DisplayDeviceRef&) {
 		return m_primaryDisplay;
@@ -114,7 +134,6 @@ private:
 	::DisplayDeviceRef m_primaryDisplay;
 	::DisplayDeviceRef m_activeDisplay;
 	::DisplayDeviceVec m_displayDevices;
-#endif
 };
 
 } // details

@@ -13,6 +13,21 @@
 namespace tools {
 namespace editor {
 
+class UnboundDeviceContext : public GLDeviceContext {
+public:
+	virtual void Bind() {}
+	virtual void Unbind() {}
+	virtual void SwapBuffers() {}
+	virtual void BindFramebuffer() {
+		r::gls.BindBuffer(GL_FRAMEBUFFER_EXT, 0);
+		r::gls.BindBuffer(GL_RENDERBUFFER_EXT, 0);
+	}
+};
+
+NativeDeviceContext::Ref CreateUnboundDeviceContext() {
+	return NativeDeviceContext::Ref(new (ZTools) UnboundDeviceContext());
+}
+
 GLWidget::GLWidget(QWidget *parent, Qt::WindowFlags f) :
 QGLWidget(parent, MainWindow::Get()->glBase
 #if defined(RAD_OPT_WIN)
@@ -42,7 +57,7 @@ void GLWidget::bindGL(bool makeCurrent)
 		return;
 
 	if (!m_ctx)
-		m_ctx = Renderer().Cast<r::IRBackend>()->CreateContext(NativeDeviceContext::Ref());
+		m_ctx = Renderer().Cast<r::IRBackend>()->CreateContext(CreateUnboundDeviceContext());
 
 	Renderer()->ctx = m_ctx;
 }

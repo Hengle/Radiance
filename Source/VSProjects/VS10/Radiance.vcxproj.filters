@@ -109,9 +109,6 @@
     <Filter Include="Source\Engine\Renderer\GL">
       <UniqueIdentifier>{ae3162c6-9fb2-4349-946d-61f54bc00077}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Engine\Renderer\PC">
-      <UniqueIdentifier>{b0e2aff2-15df-450c-bbd3-ed8a96344134}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\Engine\SCC">
       <UniqueIdentifier>{2380d0de-b7b6-4fb9-9d3a-46344ba7760d}</UniqueIdentifier>
     </Filter>
@@ -1125,15 +1122,6 @@
     <ClInclude Include="..\..\Engine\Renderer\GL\GLSLTool.h">
       <Filter>Source\Engine\Renderer\GL</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\Renderer\PC\RBackend.h">
-      <Filter>Source\Engine\Renderer\PC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Renderer\PC\RBackendDef.h">
-      <Filter>Source\Engine\Renderer\PC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Renderer\PC\wglext.h">
-      <Filter>Source\Engine\Renderer\PC</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\SCC\SCC.h">
       <Filter>Source\Engine\SCC</Filter>
     </ClInclude>
@@ -1332,9 +1320,6 @@
     <ClInclude Include="..\..\Engine\Renderer\GL\GLRenderer.h">
       <Filter>Source\Engine\Renderer\GL</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\Renderer\PC\RGLBackend.h">
-      <Filter>Source\Engine\Renderer\PC</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Runtime\Base\EnumFlags.h">
       <Filter>Source\Runtime\Base</Filter>
     </ClInclude>
@@ -1400,6 +1385,18 @@
     </ClInclude>
     <ClInclude Include="..\..\Runtime\Container\StackVector.h">
       <Filter>Source\Runtime\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Renderer\GL\wglext.h">
+      <Filter>Source\Engine\Renderer\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Renderer\GL\RBackend.h">
+      <Filter>Source\Engine\Renderer\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Renderer\GL\RBackendDef.h">
+      <Filter>Source\Engine\Renderer\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Renderer\GL\RGLBackend.h">
+      <Filter>Source\Engine\Renderer\GL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2045,14 +2042,8 @@
     <ClCompile Include="..\..\Engine\World\MapBuilder\MapBuilder.cpp">
       <Filter>Source\Engine\World\MapBuilder</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\Renderer\PC\RBGLAssets.cpp">
-      <Filter>Source\Engine\Renderer\PC</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Engine\Renderer\GL\GLRenderer.cpp">
       <Filter>Source\Engine\Renderer\GL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\Renderer\PC\RGLBackend.cpp">
-      <Filter>Source\Engine\Renderer\PC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Runtime\File\File.cpp">
       <Filter>Source\Runtime\File</Filter>
@@ -2095,6 +2086,12 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\World\WorldBSP.cpp">
       <Filter>Source\Engine\World</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Renderer\GL\RBGLAssets.cpp">
+      <Filter>Source\Engine\Renderer\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Renderer\GL\RGLBackend.cpp">
+      <Filter>Source\Engine\Renderer\GL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

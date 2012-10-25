@@ -7,6 +7,7 @@
 
 #include "EditorTypes.h"
 #include "../../Renderer/Renderer.h"
+#include <Main/GL/GLContext.h>
 #define __glext_h_
 #include <QtOpenGL/QGLContext>
 #include <QtOpenGL/QGLWidget>
@@ -19,6 +20,8 @@ class QKeyEvent;
 
 namespace tools {
 namespace editor {
+
+NativeDeviceContext::Ref CreateUnboundDeviceContext();
 
 class RADENG_CLASS GLWidget : public QGLWidget
 {

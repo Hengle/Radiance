@@ -12,7 +12,6 @@
 #include <Engine/Engine.h>
 #include <Engine/Zones.h>
 #include <Engine/Input.h>
-#include <Engine/Renderer/PC/RBackend.h>
 #include <Runtime/Base.h>
 #include <Runtime/File.h>
 #include <Runtime/Thread.h>
@@ -24,8 +23,9 @@
 #include <tchar.h>
 
 #if defined(RAD_OPT_GL)
+#include <Engine/Renderer/GL/RBackend.h>
 #include <Engine/Renderer/GL/GLTable.h>
-#include <Engine/Renderer/PC/wglext.h>
+#include <Engine/Renderer/GL/wglext.h>
 #endif
 
 #if !defined(RAD_OPT_PC_TOOLS)
@@ -509,6 +509,9 @@ void NativeApp::ResetDisplayDevice() {
 void NativeApp::LaunchURL(const char *sz) {
 	RAD_ASSERT(sz);
 	ShellExecuteA(0, "open", sz, 0, 0, SW_SHOWNORMAL);
+}
+
+void NativeApp::SetThrottleFramerate(bool throttle) {
 }
 
 #if defined(RAD_OPT_GL) && !defined(RAD_OPT_PC_TOOLS)

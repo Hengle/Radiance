@@ -121,7 +121,7 @@ bool MainWindow::Show()
 	m_glBase = new (ZEditor) QGLWidget(this);
 
 	m_glBase->makeCurrent();
-	m_glBaseCtx = m_app->engine->sys->r.Cast<r::IRBackend>()->CreateContext(NativeDeviceContext::Ref());
+	m_glBaseCtx = m_app->engine->sys->r.Cast<r::IRBackend>()->CreateContext(CreateUnboundDeviceContext());
 	RAD_ASSERT(m_glBaseCtx);
 	m_app->engine->sys->r->ctx = m_glBaseCtx;
 	BindGL();
