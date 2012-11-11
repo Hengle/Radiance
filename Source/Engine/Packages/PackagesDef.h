@@ -61,8 +61,7 @@ enum Zone
 //! Common asset sink results. \sa file::Result
 /*! Sink results are integers and can therfore take on any integer value.
 	
-	Sink result codes that are less than (<) pkg::SR_Success are error codes. The first 11 negative error
-	codes -1 to -11 are file system error codes.
+	Sink result codes that are less than (<) pkg::SR_Success are error codes.
 
 	Sink result codes that are greater than (>) pkg::SR_Pending are custom user return codes and should not
 	be exposed to general engine systems as result codes as they will not be handled.

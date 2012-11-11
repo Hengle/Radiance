@@ -57,6 +57,9 @@ bool MapBuilder::LoadEntSpawn(const world::EntSpawn &spawn) {
 	if (classname == "worldspawn") {
 		m_result = SR_Success;
 		return ParseWorldSpawn(spawn);
+	} else if (classname == "waypoint") {
+		m_result = SR_Success;
+		return ParseWaypoint(spawn);
 	} else if (classname == "static_mesh_scene") {
 		m_spawn = spawn;
 		m_result = SR_Pending;
@@ -70,6 +73,7 @@ bool MapBuilder::LoadEntSpawn(const world::EntSpawn &spawn) {
 
 bool MapBuilder::SpawnCompile() {
 	RAD_ASSERT(Thread::exited);
+	ConnectWaypoints();
 	m_compiling = true;
 	return m_bspBuilder.SpawnCompile(m_map, m_ui, m_debugUI, &COut(C_Debug));
 }
@@ -98,6 +102,50 @@ bool MapBuilder::ParseEntity(const world::EntSpawn &spawn) {
 	return true;
 }
 
+bool MapBuilder::ParseWaypoint(const world::EntSpawn &spawn) {
+	SceneFile::Waypoint::Ref waypoint(new (ZTools) SceneFile::Waypoint());
+
+	Vec3 org(spawn.keys.Vec3ForKey("origin"));
+	waypoint->pos = SceneFile::Vec3(org.X(), org.Y(), org.Z());
+	waypoint->id = spawn.keys.IntForKey("uid");
+
+	const char *sz = spawn.keys.StringForKey("floor");
+	if (sz)
+		waypoint->floorName = sz;
+
+	sz = spawn.keys.StringForKey("transition_animation");
+	if (sz)
+		waypoint->transitionAnimation = sz;
+
+	for (int i = 0; ; ++i) {
+		String key;
+		key.PrintfASCII("connection %i", i);
+		world::Keys::Pairs::const_iterator it = spawn.keys.pairs.find(key);
+		if (it == spawn.keys.pairs.end())
+			break;
+
+		SceneFile::WaypointConnection::Ref connection(new (ZTools) SceneFile::WaypointConnection());
+		connection->waypoints.head = waypoint.get();
+		connection->waypoints.headId = waypoint->id;
+		connection->waypoints.tail = 0;
+
+		float ctrls[2][3];
+		sscanf(
+			it->second.c_str.get(),
+			"%d ( %f %f %f ) ( %f %f %f )", 
+			&connection->waypoints.tailId, 
+			&ctrls[0][0], &ctrls[0][1], &ctrls[0][2],
+			&ctrls[1][0], &ctrls[1][1], &ctrls[1][2]
+		);
+
+		waypoint->connections.insert(SceneFile::WaypointConnection::Map::value_type(connection->waypoints, connection));
+		m_map.waypointConnections.insert(SceneFile::WaypointConnection::Map::value_type(connection->waypoints, connection));
+	}
+
+	m_map.waypoints.insert(SceneFile::Waypoint::Map::value_type(waypoint->id, waypoint));
+	return true;
+}
+
 bool MapBuilder::LoadScene(const world::EntSpawn &spawn) {
 	const char *sz = spawn.keys.StringForKey("file");
 	if (!sz || !sz[0]) {
@@ -121,6 +169,17 @@ bool MapBuilder::LoadScene(const world::EntSpawn &spawn) {
 
 	stream::InputStream is(*ib);
 	return LoadSceneFile(is, m_map, true, m_ui);
+}
+
+void MapBuilder::ConnectWaypoints() {
+	for (SceneFile::WaypointConnection::Map::iterator it = m_map.waypointConnections.begin(); it != m_map.waypointConnections.end(); ++it) {
+		const SceneFile::WaypointConnection::Ref &connection = it->second;
+		SceneFile::Waypoint::Map::iterator wpIt = m_map.waypoints.find(connection->waypoints.tailId);
+		if (wpIt != m_map.waypoints.end()) {
+			connection->waypoints.tail = wpIt->second.get();
+			connection->waypoints.tail->connections.insert(SceneFile::WaypointConnection::Map::value_type(connection->waypoints, connection));
+		}
+	}
 }
 
 int MapBuilder::ThreadProc() {

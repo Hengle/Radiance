@@ -89,21 +89,29 @@ private:
 		return m_bspFile; 
 	}
 
-	///////////////////////////////////////////////////////////////////////////////
+	/*
+	==============================================================================
+	Contents & Surface Flags
+	==============================================================================
+	*/
 
 	enum ContentsFlags {
 		RAD_FLAG(kContentsFlag_Areaportal),
 		RAD_FLAG(kContentsFlag_Solid),
-		RAD_FLAG(kContentsFlag_Detail), // never in the BSP.
 		RAD_FLAG(kContentsFlag_Clip),
 		RAD_FLAG(kContentsFlag_Fog),
 		RAD_FLAG(kContentsFlag_Water),
-		kContentsFlag_VisibleContents = kContentsFlag_Areaportal|kContentsFlag_Solid|kContentsFlag_Detail|kContentsFlag_Clip|kContentsFlag_Fog|kContentsFlag_Water,
+
+		// Not in BSP
+		RAD_FLAG(kContentsFlag_Detail),
+		RAD_FLAG(kContentsFlag_Floor),
+
+		kContentsFlag_VisibleContents = kContentsFlag_Areaportal|kContentsFlag_Solid|kContentsFlag_Clip|kContentsFlag_Fog|kContentsFlag_Water,
 		kContentsFlag_FirstVisibleContents = kContentsFlag_Areaportal,
 		kContentsFlag_LastVisibleContents = kContentsFlag_Water,
 		kContentsFlag_Structural = kContentsFlag_Solid|kContentsFlag_Areaportal, // just used for classification
 		kContentsFlag_SolidContents = kContentsFlag_Solid, // blocks portal flood
-		kContentsFlag_BSPContents = 0xffffffff & ~kContentsFlag_Detail,
+		kContentsFlag_BSPContents = kContentsFlag_Areaportal|kContentsFlag_Solid|kContentsFlag_Clip|kContentsFlag_Fog|kContentsFlag_Water,
 		kContentsFlag_EmitContents = kContentsFlag_Detail
 	};
 
@@ -111,7 +119,15 @@ private:
 		RAD_FLAG(kSurfaceFlag_NoDraw)
 	};
 
-	///////////////////////////////////////////////////////////////////////////////
+	enum {
+		kPlaneNumLeaf = -1
+	};
+
+	/*
+	==============================================================================
+	BSP Polygon
+	==============================================================================
+	*/
 
 	struct Poly {
 		Poly() {
@@ -146,7 +162,11 @@ private:
 	typedef boost::shared_ptr<Poly> PolyRef;
 	typedef zone_vector<PolyRef, world::bsp_file::ZBSPBuilderT>::type PolyVec;
 
-	///////////////////////////////////////////////////////////////////////////////
+	/*
+	==============================================================================
+	BSP Original TriModel Polygon Fragment
+	==============================================================================
+	*/
 
 	struct TriModelFrag {
 		TriModelFrag() {
@@ -169,7 +189,11 @@ private:
 	typedef boost::shared_ptr<TriModelFrag> TriModelFragRef;
 	typedef zone_vector<TriModelFragRef, world::bsp_file::ZBSPBuilderT>::type TriModelFragVec;
 
-	///////////////////////////////////////////////////////////////////////////////
+	/*
+	==============================================================================
+	Winding Plane
+	==============================================================================
+	*/
 
 	struct WindingPlane {
 		WindingPlane() {
@@ -189,9 +213,11 @@ private:
 	typedef boost::shared_ptr<WindingPlane> WindingPlaneRef;
 	typedef zone_vector<WindingPlaneRef, world::bsp_file::ZBSPBuilderT>::type WindingPlaneVec;
 
-	enum {
-		kPlaneNumLeaf = -1
-	};
+	/*
+	==============================================================================
+	Forwards
+	==============================================================================
+	*/
 
 	struct Node;
 	typedef boost::shared_ptr<Node> NodeRef;
@@ -200,7 +226,11 @@ private:
 
 	typedef zone_vector<SceneFile::TriFace*, world::bsp_file::ZBSPBuilderT>::type TriFacePtrVec;
 
-	///////////////////////////////////////////////////////////////////////////////
+	/*
+	==============================================================================
+	Portals
+	==============================================================================
+	*/
 
 	struct Portal {
 		Portal() {
@@ -247,7 +277,11 @@ private:
 
 	typedef math::Winding<SceneFileD::TriVert, Plane> AreaNodeWinding;
 
-	///////////////////////////////////////////////////////////////////////////////
+	/*
+	==============================================================================
+	Areas
+	==============================================================================
+	*/
 
 	struct AreaPoly { // used in decompose
 		AreaPoly() {}
@@ -277,9 +311,11 @@ private:
 	typedef boost::shared_ptr<Area> AreaRef;
 	typedef zone_vector<AreaRef, world::bsp_file::ZBSPBuilderT>::type AreaVec;
 
-	//typedef container::hash_set<int>::type PlaneNumHash;
-
-	///////////////////////////////////////////////////////////////////////////////
+	/*
+	==============================================================================
+	Nodes
+	==============================================================================
+	*/
 
 	struct Node {
 		Node() {
@@ -318,7 +354,11 @@ private:
 		static int s_num;
 	};
 
-	///////////////////////////////////////////////////////////////////////////////
+	/*
+	==============================================================================
+	TriModel emit helper
+	==============================================================================
+	*/
 
 	struct EmitTriModel {
 		typedef boost::shared_ptr<EmitTriModel> Ref;
@@ -344,7 +384,89 @@ private:
 		}
 	};
 
-	///////////////////////////////////////////////////////////////////////////////
+	/*
+	==============================================================================
+	Floors
+	==============================================================================
+	*/
+
+	struct FloorBuilder {
+		typedef SceneFile::Vec3 Vert;
+		typedef SceneFile::Vec3Vec VertVec;
+		typedef zone_map<Vert, int, world::bsp_file::ZBSPBuilderT>::type VertMap;
+
+		FloorBuilder(
+			const SceneFile::TriModel &_original,
+			BSPBuilder *_bspBuilder
+		) : original(_original), bspBuilder(_bspBuilder) {
+		}
+		
+		struct Edge {
+			typedef zone_vector<Edge, world::bsp_file::ZBSPBuilderT>::type Vec;
+			typedef zone_map<Edge, int, world::bsp_file::ZBSPBuilderT>::type Map;
+
+			int v[2];
+			int t[2];
+
+			Edge() { 
+				t[0] = -1;
+				t[1] = -1;
+			}
+
+			int Compare(const Edge &e) const;
+
+			bool operator == (const Edge &e) const {
+				return Compare(e) == 0;
+			}
+
+			bool operator != (const Edge &e) const {
+				return Compare(e) != 0;
+			}
+
+			bool operator > (const Edge &e) const {
+				return Compare(e) > 0;
+			}
+
+			bool operator >= (const Edge &e) const {
+				return Compare(e) >= 0;
+			}
+
+			bool operator < (const Edge &e) const {
+				return Compare(e) < 0;
+			}
+
+			bool operator <= (const Edge &e) const {
+				return Compare(e) <= 0;
+			}
+		};
+
+		struct Tri {
+			typedef zone_vector<Tri, world::bsp_file::ZBSPBuilderT>::type Vec;
+			
+			int v[3];
+			int e[3];
+		};
+
+		VertVec verts;
+		VertMap vmap;
+		Edge::Vec edges;
+		Edge::Map edgeMap;
+		Tri::Vec tris;
+		const SceneFile::TriModel &original;
+		BSPBuilder *bspBuilder;
+		
+		int AddVert(const Vert &v);
+		int AddEdge(int v0, int v1, int triNum);
+		bool AddTri(const Vert &v0, const Vert &v1, const Vert &v2);
+	};
+
+	friend struct FloorBuilder;
+
+	/*
+	==============================================================================
+	Debugging
+	==============================================================================
+	*/
 
 	class PaintHandler {
 	public:
@@ -428,7 +550,11 @@ private:
 		QAction *m_lockAction;
 	};
 
-	///////////////////////////////////////////////////////////////////////////////
+	/*
+	==============================================================================
+	COut/Log
+	==============================================================================
+	*/
 
 	std::ostream &COut() {
 		if (m_cout)
@@ -441,6 +567,12 @@ private:
 	void DisplayPaintHandler(PaintHandler *handler);
 
 	RAD_DECLARE_GET(result, int);
+
+	/*
+	==============================================================================
+	Members
+	==============================================================================
+	*/
 
 	typedef boost::mutex Mutex;
 	typedef boost::lock_guard<Mutex> Lock;
@@ -477,6 +609,12 @@ private:
 	int m_result;
 	bool m_flood;
 	bool m_abort;
+
+	/*
+	==============================================================================
+	Methods
+	==============================================================================
+	*/
 
 	void Build();
 	bool LoadMaterials();
@@ -521,8 +659,13 @@ private:
 	int FindSplitPlane(Node *node);
 	int BoxPlaneNum(Node *node);
 
-	// Emit BSP
-	void EmitBSPFile();
+	/*
+	==============================================================================
+	Emit
+	==============================================================================
+	*/
+
+	bool EmitBSPFile();
 	void EmitBSPMaterials();
 	void EmitBSPEntities();
 	void EmitBSPEntity(const SceneFile::Entity::Ref &entity);
@@ -535,7 +678,11 @@ private:
 	void EmitBSPClipSurfaces(const Node *node, world::bsp_file::BSPLeaf *leaf);
 	void EmitBSPClipBevels(world::bsp_file::BSPLeaf *leaf);
 	void EmitBSPPlanes();
+	bool EmitBSPFloors();
+	void EmitBSPWaypoints();
+	bool EmitBSPWaypoint(SceneFile::Waypoint &waypoint);
 	U32 FindBSPMaterial(const char *name);
+	int FindBSPFloor(const char *name);
 	int EmitBSPCinematics();
 
 	void ResetProgress();
@@ -543,6 +690,12 @@ private:
 	void SetResult(int result);
 
 	virtual int ThreadProc();
+
+	/*
+	==============================================================================
+	Helpers
+	==============================================================================
+	*/
 
 	static void BBoxPlanes(const BBox &bounds, Plane *planes);
 	static void BBoxWindings(const BBox &bounds, WindingVec &out);

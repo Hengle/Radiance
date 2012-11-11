@@ -27,15 +27,23 @@ namespace tools {
 
 RAD_ZONE_DEC(RADENG_API, Z3DX);
 
-//! A structure which contains a scene loading from a 3DX file.
+//! A structure which contains a scene loaded from a 3DX file.
 /*! The 3DX format stores objects exported from 3DS Max, consisting of geometry,
 	cinematics, and camera motion data. It's the data container used for importing
 	skeletal animations, and map data.
+
+	The MapBuilder class also loads certain fields in this structure that are not present
+	in the 3DX file, like certain types of entities and waypoints.
 */
 template <typename T>
 class SceneFileT {
 public:
 
+	/*
+	==============================================================================
+	Basic types
+	==============================================================================
+	*/
 	typedef T ValueType;
 
 	enum {
@@ -58,6 +66,11 @@ public:
 	typedef typename zone_vector<Vec3, Z3DXT>::type Vec3Vec;
 	typedef typename zone_vector<Mat4, Z3DXT>::type Mat4Vec;
 
+	/*
+	==============================================================================
+	   Materials
+	==============================================================================
+	*/
 	struct Material {
 		String name;
 	};
@@ -65,6 +78,11 @@ public:
 	typedef typename zone_vector<Material, Z3DXT>::type MatVec;
 	typedef typename zone_vector<String, Z3DXT>::type StringVec;
 
+	/*
+	==============================================================================
+	Bone Weights
+	==============================================================================
+	*/
 	struct BoneWeight {
 		int bone;
 		float weight;
@@ -80,8 +98,23 @@ public:
 
 	typedef typename zone_vector<BoneWeight, Z3DXT>::type BoneWeights;
 
-	/*! Vertex data is contained in several classes, each with operators to allow spliting rays and polygons specialized
-	    on a particular vertex type. */
+	/*
+	==============================================================================
+	Vertices
+	==============================================================================
+	*/
+
+	//! Vertex data is contained in several classes, each with operators to allow spliting rays and polygons specialized
+	//! on a particular vertex type.
+	/*! The basic vertex contains fields for everything: position, tangents, uvs, colors etc. Tangents are computed
+		during scene loading. The vertex defines operators to allow specializations of a Winding to do proper
+		splitting of polygons.
+
+		Additionally the vertex defines operators for comparison < <= > >= == !=. This allows the object to be used
+		in associative containers like set, map.
+
+		Comparison operators on this class only take into account the position and uvs.
+	*/ 
 	struct TriVert {
 		typedef T ValueType;
 
@@ -308,7 +341,7 @@ public:
 		BoneWeights weights;
 	};
 
-	// adds < > <= >= that test for normal & tangent
+	//! A vertex class that modifies the comparison operators to include the vertex normals & tangents.
 	struct NormalTriVert : public TriVert {
 		NormalTriVert() {}
 		explicit NormalTriVert(const TriVert &v) : TriVert(v) {}
@@ -395,7 +428,7 @@ public:
 		}
 	};
 
-	// adds < > <= >= that test for bone weights.
+	//! A vertex class that modified the comparison operators to include bone weights, normals & tangents.
 	struct WeightedTriVert : public TriVert {
 		WeightedTriVert() {}
 		explicit WeightedTriVert(const TriVert &v) : TriVert(v) {}
@@ -477,6 +510,7 @@ public:
 		}
 	};
 
+	//! A vertx class that modified the comparison operators to include bone weights and vertex normals.
 	struct WeightedNormalTriVert : public NormalTriVert {
 		WeightedNormalTriVert() {}
 		explicit WeightedNormalTriVert(const TriVert &v) : NormalTriVert(v) {}
@@ -556,12 +590,19 @@ public:
 		}
 	};
 
+	/*
+	==============================================================================
+	Triangles & Models
+	==============================================================================
+	*/
+
 	struct TriModel;
 	typedef typename zone_vector<TriVert, Z3DXT>::type TriVertVec;
 	typedef typename zone_vector<NormalTriVert, Z3DXT>::type NormalTriVertVec;
 	typedef typename zone_set<int, Z3DXT>::type AreaNumSet;
 	typedef typename zone_vector<int, Z3DXT>::type IntVec;
 
+	//! Contains a single triangle in a model. Indices are indexes into the models vertex array.
 	struct TriFace {
 		TriFace() : outside(true), shared(-1), contents(0), surface(0) {
 		}
@@ -592,6 +633,12 @@ public:
 	};
 
 	typedef typename zone_vector<TriFace, Z3DXT>::type TriFaceVec;
+
+	/*
+	==============================================================================
+	Bones & Skeletons
+	==============================================================================
+	*/
 
 	typedef typename zone_vector<BoneWeights, Z3DXT>::type Skin;
 	typedef boost::shared_ptr<Skin> SkinRef;
@@ -625,6 +672,12 @@ public:
 	typedef typename zone_vector<BonePose, Z3DXT>::type BonePoseVec;
 	typedef typename zone_vector<BonePoseVec, Z3DXT>::type BoneFrames;
 
+	/*
+	==============================================================================
+	Animations
+	==============================================================================
+	*/
+
 	struct Anim {
 		typedef boost::shared_ptr<Anim> Ref;
 		String name;
@@ -635,6 +688,12 @@ public:
 	};
 
 	typedef typename zone_map<String, typename Anim::Ref, Z3DXT>::type AnimMap;
+
+	/*
+	==============================================================================
+	Models
+	==============================================================================
+	*/
 
 	struct TriModel {
 		typedef boost::shared_ptr<TriModel> Ref;
@@ -672,6 +731,12 @@ public:
 		bool hideWhenDone;
 	};
 
+	/*
+	==============================================================================
+	Entities & Camera Motion
+	==============================================================================
+	*/
+
 	struct Entity {
 		typedef boost::shared_ptr<Entity> Ref;
 		typedef typename zone_vector<Ref, Z3DXT>::type Vec;
@@ -694,11 +759,96 @@ public:
 		AnimMap anims;
 	};
 
+	/*
+	==============================================================================
+	Waypoints
+	==============================================================================
+	*/
+	struct WaypointConnection;
+	typedef boost::shared_ptr<WaypointConnection> WaypointConnectionRef;
+
+	struct Waypoint;
+	typedef boost::shared_ptr<Waypoint> WaypointRef;
+
+	struct WaypointPair {
+		Waypoint *head;
+		Waypoint *tail;
+
+		int headId;
+		int tailId;
+
+		int Compare(const WaypointPair &p) const {
+			if (headId < p.headId)
+				return -1;
+			if (headId > p.headId)
+				return 1;
+			if (tailId < p.tailId)
+				return -1;
+			if (tailId > p.tailId)
+				return 1;
+			return 0;
+		}
+
+		bool operator == (const WaypointPair &p) const {
+			return Compare(p) == 0;
+		}
+
+		bool operator != (const WaypointPair &p) const {
+			return Compare(p) != 0;
+		}
+
+		bool operator < (const WaypointPair &p) const {
+			return Compare(p) < 0;
+		}
+
+		bool operator > (const WaypointPair &p) const {
+			return Compare(p) > 0;
+		}
+
+		bool operator <= (const WaypointPair &p) const {
+			return Compare(p) <= 0;
+		}
+
+		bool operator >= (const WaypointPair &p) const {
+			return Compare(p) >= 0;
+		}
+	};
+
+	struct WaypointConnection {
+		typedef boost::shared_ptr<WaypointConnection> Ref;
+		typedef typename zone_map<WaypointPair, Ref, Z3DXT>::type Map;
+
+		WaypointConnection() : emitId(-1) {
+		}
+
+		WaypointPair waypoints;
+		Vec3 ctrls[2];
+		int flags;
+		int emitId;
+	};
+
+	struct Waypoint {
+		typedef boost::shared_ptr<Waypoint> Ref;
+		typedef typename zone_map<int, Ref, Z3DXT>::type Map;
+
+		Waypoint() : emitId(-1) {
+		}
+
+		String floorName;
+		String transitionAnimation;
+		typename WaypointConnection::Map connections;
+		Vec3 pos;
+		int id;
+		int emitId;
+	};
+
 	int version;
 	typename Entity::Vec ents;
 	MatVec               mats;
 	typename Entity::Ref worldspawn;
 	typename Camera::Vec cameras;
+	typename WaypointConnection::Map waypointConnections;
+	typename Waypoint::Map waypoints;
 
 	typename Entity::Ref EntForName(const char *name) const {
 		for (typename Entity::Vec::const_iterator it = ents.begin(); it != ents.end(); ++it) {

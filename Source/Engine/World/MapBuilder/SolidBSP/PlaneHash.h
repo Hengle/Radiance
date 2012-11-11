@@ -18,19 +18,15 @@ class PlaneHash
 public:
 	typedef zone_vector< ::tools::solid_bsp::Plane, ZToolsT>::type PlaneVec;
 
-	PlaneHash()
-	{
+	PlaneHash() {
 		m_planes.reserve(4*Kilo);
 		memset(m_hash, 0, sizeof(HashPlane*)*NumBuckets);
 	}
 
-	~PlaneHash()
-	{
-		for (int i = 0; i < NumBuckets; ++i)
-		{
+	~PlaneHash() {
+		for (int i = 0; i < NumBuckets; ++i) {
 			HashPlane *head = m_hash[i];
-			while (head)
-			{
+			while (head) {
 				HashPlane *next = head->next;
 				delete head;
 				head = next;
@@ -38,18 +34,15 @@ public:
 		}
 	}
 	
-	int FindPlaneNum(const ::tools::solid_bsp::Plane &p)
-	{
+	int FindPlaneNum(const ::tools::solid_bsp::Plane &p) {
 		::tools::solid_bsp::Plane z = p;
 		Snap(z);
 		
 		int b = BucketNum(z.D());
 		HashPlane *hp = m_hash[b];
 
-		while (hp)
-		{
-			if (PlaneEqual(m_planes[hp->num], z))
-			{
+		while (hp) {
+			if (PlaneEqual(m_planes[hp->num], z)) {
 				break;
 			}
 
@@ -76,13 +69,11 @@ public:
 		return x;
 	}
 
-	const ::tools::solid_bsp::Plane &Plane(int num) const
-	{
+	const ::tools::solid_bsp::Plane &Plane(int num) const {
 		return m_planes[num];
 	}
 
-	const PlaneVec &Planes() const
-	{
+	const PlaneVec &Planes() const {
 		return m_planes;
 	}
 
@@ -113,22 +104,21 @@ private:
 		}
 	}
 
-	struct HashPlane
-	{
+	struct HashPlane {
 		HashPlane *next;
 		int num;
 	};
 
-	enum { NumBuckets = 4096 };
+	enum { 
+		NumBuckets = 4096 
+	};
 	
-	int BucketNum(ValueType x)
-	{
+	int BucketNum(ValueType x) {
 		int b = math::Abs((int)(x / ValueType(8)));
 		return b & (NumBuckets-1);
 	}
 
-	bool PlaneEqual(const ::tools::solid_bsp::Plane &a, const ::tools::solid_bsp::Plane &b)
-	{
+	bool PlaneEqual(const ::tools::solid_bsp::Plane &a, const ::tools::solid_bsp::Plane &b) {
 		if (math::Abs(a.Normal()[0] - b.Normal()[0]) < ValueType(0.00000001)
 			&& math::Abs(a.Normal()[1] - b.Normal()[1]) < ValueType(0.00000001)
 			&& math::Abs(a.Normal()[2] - b.Normal()[2]) < ValueType(0.00000001)

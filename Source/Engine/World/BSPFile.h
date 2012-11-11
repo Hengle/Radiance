@@ -115,23 +115,55 @@ struct BSPCameraTM {
 };
 
 struct BSPCameraTrack {
-	int name;
-	int firstTM;
-	int numTMs;
+	S32 name;
+	S32 firstTM;
+	S32 numTMs;
 };
 
 struct BSPCinematicTrigger {
-	int frame;
-	int camera;
-	int firstActor;
-	int numActors;
+	S32 frame;
+	S32 camera;
+	S32 firstActor;
+	S32 numActors;
 };
 
 struct BSPCinematic {
-	int name;
-	int fps;
-	int firstTrigger;
-	int numTriggers;
+	S32 name;
+	S32 fps;
+	S32 firstTrigger;
+	S32 numTriggers;
+};
+
+struct BSPWaypoint {
+	float pos[3];
+	U32 floorNum;
+	U32 firstConnection;
+	U32 numConnections;
+	S32 transitionAnimation;
+};
+
+struct BSPWaypointConnection {
+	S32 flags;
+	U32 waypoints[2];
+	float ctrls[2][3]; // curve
+};
+
+struct BSPFloor { // walkable surface
+	U32 firstTri;
+	U32 numTris;
+	U32 firstWaypoint;
+	U32 numWaypoints;
+};
+
+struct BSPFloorTri {
+	U32 verts[3];
+	U32 edges[3];
+};
+
+struct BSPFloorEdge {
+	U32 verts[2];
+	S32 tris[2];
+	U32 planenum;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -147,13 +179,19 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numLeafs, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numAreas, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numAreaportals, U32);
+	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numAreaportalIndices, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numModels, U32);
+	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numModelIndices, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numClipSurfaces, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numVerts, U32);
-	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numAreaportalIndices, U32);
-	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numModelIndices, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numIndices, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numMaterials, U32);
+	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numWaypoints, U32);
+	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numWaypointConnections, U32);
+	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numWaypointConnectionIndices, U32);
+	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numFloors, U32);
+	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numFloorTris, U32);
+	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numFloorEdges, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numPlanes, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numActors, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numActorIndices, U32);
@@ -169,12 +207,18 @@ public:
 	virtual const BSPLeaf *Leafs() const = 0;
 	virtual const BSPArea *Areas() const = 0;
 	virtual const BSPAreaportal *Areaportals() const = 0;
+	virtual const U16 *AreaportalIndices() const = 0;
 	virtual const BSPModel *Models() const = 0;
+	virtual const U16 *ModelIndices() const = 0;
 	virtual const BSPClipSurface *ClipSurfaces() const = 0;
+	virtual const BSPWaypoint *Waypoints() const = 0;
+	virtual const BSPWaypointConnection *WaypointConnections() const = 0;
+	virtual const U16 *WaypointConnectionIndices() const = 0;
+	virtual const BSPFloor *Floors() const = 0;
+	virtual const BSPFloorTri *FloorTris() const = 0;
+	virtual const BSPFloorEdge *FloorEdges() const = 0;
 	virtual const BSPPlane *Planes() const = 0;
 	virtual const BSPVertex *Vertices() const = 0;
-	virtual const U16 *AreaportalIndices() const = 0;
-	virtual const U16 *ModelIndices() const = 0;
 	virtual const U16 *Indices() const = 0;
 	virtual const BSPActor *Actors() const = 0;
 	virtual const U32 *ActorIndices() const = 0;
@@ -194,13 +238,19 @@ protected:
 	virtual RAD_DECLARE_GET(numLeafs, U32) = 0;
 	virtual RAD_DECLARE_GET(numAreas, U32) = 0;
 	virtual RAD_DECLARE_GET(numAreaportals, U32) = 0;
+	virtual RAD_DECLARE_GET(numAreaportalIndices, U32) = 0;
 	virtual RAD_DECLARE_GET(numClipSurfaces, U32) = 0;
 	virtual RAD_DECLARE_GET(numModels, U32) = 0;
-	virtual RAD_DECLARE_GET(numVerts, U32) = 0;
-	virtual RAD_DECLARE_GET(numAreaportalIndices, U32) = 0;
 	virtual RAD_DECLARE_GET(numModelIndices, U32) = 0;
+	virtual RAD_DECLARE_GET(numVerts, U32) = 0;
 	virtual RAD_DECLARE_GET(numIndices, U32) = 0;
 	virtual RAD_DECLARE_GET(numMaterials, U32) = 0;
+	virtual RAD_DECLARE_GET(numWaypoints, U32) = 0;
+	virtual RAD_DECLARE_GET(numWaypointConnections, U32) = 0;
+	virtual RAD_DECLARE_GET(numWaypointConnectionIndices, U32) = 0;
+	virtual RAD_DECLARE_GET(numFloors, U32) = 0;
+	virtual RAD_DECLARE_GET(numFloorTris, U32) = 0;
+	virtual RAD_DECLARE_GET(numFloorEdges, U32) = 0;
 	virtual RAD_DECLARE_GET(numPlanes, U32) = 0;
 	virtual RAD_DECLARE_GET(numActors, U32) = 0;
 	virtual RAD_DECLARE_GET(numActorIndices, U32) = 0;
@@ -232,13 +282,19 @@ public:
 	virtual const BSPLeaf *Leafs() const;
 	virtual const BSPArea *Areas() const;
 	virtual const BSPAreaportal *Areaportals() const;
+	virtual const U16 *AreaportalIndices() const;
 	virtual const BSPModel *Models() const;
+	virtual const U16 *ModelIndices() const;
 	virtual const BSPClipSurface *ClipSurfaces() const;
+	virtual const BSPWaypoint *Waypoints() const;
+	virtual const BSPWaypointConnection *WaypointConnections() const;
+	virtual const U16 *WaypointConnectionIndices() const;
+	virtual const BSPFloor *Floors() const;
+	virtual const BSPFloorTri *FloorTris() const;
+	virtual const BSPFloorEdge *FloorEdges() const;
 	virtual const BSPPlane *Planes() const;
 	virtual const BSPVertex *Vertices() const;
 	virtual const BSPActor *Actors() const;
-	virtual const U16 *AreaportalIndices() const;
-	virtual const U16 *ModelIndices() const;
 	virtual const U16 *Indices() const;
 	virtual const U32 *ActorIndices() const;
 	virtual const BSPCameraTM *CameraTMs() const;
@@ -259,12 +315,18 @@ private:
 	virtual RAD_DECLARE_GET(numLeafs, U32);
 	virtual RAD_DECLARE_GET(numAreas, U32);
 	virtual RAD_DECLARE_GET(numAreaportals, U32);
+	virtual RAD_DECLARE_GET(numAreaportalIndices, U32);
 	virtual RAD_DECLARE_GET(numClipSurfaces, U32);
 	virtual RAD_DECLARE_GET(numModels, U32);
-	virtual RAD_DECLARE_GET(numVerts, U32);
-	virtual RAD_DECLARE_GET(numAreaportalIndices, U32);
 	virtual RAD_DECLARE_GET(numModelIndices, U32);
+	virtual RAD_DECLARE_GET(numVerts, U32);
 	virtual RAD_DECLARE_GET(numIndices, U32);
+	virtual RAD_DECLARE_GET(numWaypoints, U32);
+	virtual RAD_DECLARE_GET(numWaypointConnections, U32);
+	virtual RAD_DECLARE_GET(numWaypointConnectionIndices, U32);
+	virtual RAD_DECLARE_GET(numFloors, U32);
+	virtual RAD_DECLARE_GET(numFloorTris, U32);
+	virtual RAD_DECLARE_GET(numFloorEdges, U32);
 	virtual RAD_DECLARE_GET(numActorIndices, U32);
 	virtual RAD_DECLARE_GET(numActors, U32);
 	virtual RAD_DECLARE_GET(numPlanes, U32);
@@ -284,13 +346,19 @@ private:
 	const BSPLeaf *m_leafs;
 	const BSPArea *m_areas;
 	const BSPAreaportal *m_areaportals;
+	const U16 *m_areaportalIndices;
 	const BSPModel *m_models;
+	const U16 *m_modelIndices;
 	const BSPClipSurface *m_clipSurfaces;
 	const BSPPlane *m_planes;
 	const BSPVertex *m_verts;
 	const BSPVertex *m_normals;
-	const U16 *m_areaportalIndices;
-	const U16 *m_modelIndices;
+	const BSPWaypoint *m_waypoints;
+	const BSPWaypointConnection *m_waypointConnections;
+	const U16 *m_waypointConnectionIndices;
+	const BSPFloor *m_floors;
+	const BSPFloorTri *m_floorTris;
+	const BSPFloorEdge *m_floorEdges;
 	const U16 *m_indices;
 	const U32 *m_actorIndices;
 	const BSPActor *m_actors;
@@ -307,14 +375,20 @@ private:
 	U32 m_numLeafs;
 	U32 m_numAreas;
 	U32 m_numAreaportals;
+	U32 m_numAreaportalIndices;
 	U32 m_numClipSurfaces;
 	U32 m_numModels;
+	U32 m_numModelIndices;
 	U32 m_numPlanes;
 	U32 m_numVerts;
 	U32 m_numTexCoords[kMaxUVChannels];
-	U32 m_numAreaportalIndices;
-	U32 m_numModelIndices;
 	U32 m_numIndices;
+	U32 m_numWaypoints;
+	U32 m_numWaypointConnections;
+	U32 m_numWaypointConnectionIndices;
+	U32 m_numFloors;
+	U32 m_numFloorTris;
+	U32 m_numFloorEdges;
 	U32 m_numActorIndices;
 	U32 m_numActors;
 	U32 m_numSkas;
@@ -342,12 +416,18 @@ public:
 	virtual const BSPLeaf *Leafs() const;
 	virtual const BSPArea *Areas() const;
 	virtual const BSPAreaportal *Areaportals() const;
+	virtual const U16 *AreaportalIndices() const;
 	virtual const BSPModel *Models() const;
+	virtual const U16 *ModelIndices() const;
 	virtual const BSPClipSurface *ClipSurfaces() const;
+	virtual const BSPWaypoint *Waypoints() const;
+	virtual const BSPWaypointConnection *WaypointConnections() const;
+	virtual const U16 *WaypointConnectionIndices() const;
+	virtual const BSPFloor *Floors() const;
+	virtual const BSPFloorTri *FloorTris() const;
+	virtual const BSPFloorEdge *FloorEdges() const;
 	virtual const BSPPlane *Planes() const;
 	virtual const BSPVertex *Vertices() const;
-	virtual const U16 *AreaportalIndices() const;
-	virtual const U16 *ModelIndices() const;
 	virtual const U16 *Indices() const;
 	virtual const U32 *ActorIndices() const;
 	virtual const BSPCameraTM *CameraTMs() const;
@@ -357,7 +437,7 @@ public:
 	virtual const ska::DSka &DSka(int idx) const;
 	virtual const ska::DSkm &DSkm(int idx) const;
 	virtual const BSPActor *Actors() const;
-
+		
 	void Clear();
 
 	void ReserveStrings(int num);
@@ -367,13 +447,19 @@ public:
 	void ReserveLeafs(int num);
 	void ReserveAreas(int num);
 	void ReserveAreaportals(int num);
+	void ReserveAreaportalIndices(int num);
 	void ReserveClipSurfaces(int num);
 	void ReserveModels(int num);
+	void ReserveModelIndices(int num);
 	void ReservePlanes(int num);
 	void ReserveVertices(int num);
-	void ReserveAreaportalIndices(int num);
-	void ReserveModelIndices(int num);
 	void ReserveIndices(int num);
+	void ReserveWaypoints(int num);
+	void ReserveWaypointConnections(int num);
+	void ReserveWaypointConnectionIndices(int num);
+	void ReserveFloors(int num);
+	void ReserveFloorTris(int num);
+	void ReserveFloorEdges(int num);
 	void ReserveActorIndices(int num);
 	void ReserveCameraTMs(int num);
 	void ReserveCameraTracks(int num);
@@ -389,13 +475,19 @@ public:
 	BSPLeaf *AddLeaf();
 	BSPArea *AddArea();
 	BSPAreaportal *AddAreaportal();
+	U16 *AddAreaportalIndex();
 	BSPClipSurface *AddClipSurface();
 	BSPModel *AddModel();
+	U16 *AddModelIndex();
 	BSPPlane *AddPlane();
 	BSPVertex *AddVertex();
 	BSPActor *AddActor();
-	U16 *AddAreaportalIndex();
-	U16 *AddModelIndex();
+	BSPWaypoint *AddWaypoint();
+	BSPWaypointConnection *AddWaypointConnection();
+	U16 *AddWaypointConnectionIndex();
+	BSPFloor *AddFloor();
+	BSPFloorTri *AddFloorTri();
+	BSPFloorEdge *AddFloorEdge();
 	U16 *AddIndex();
 	U32 *AddActorIndex();
 	BSPCameraTM *AddCameraTM();
@@ -425,6 +517,12 @@ protected:
 	virtual RAD_DECLARE_GET(numAreaportalIndices, U32);
 	virtual RAD_DECLARE_GET(numModelIndices, U32);
 	virtual RAD_DECLARE_GET(numIndices, U32);
+	virtual RAD_DECLARE_GET(numWaypoints, U32);
+	virtual RAD_DECLARE_GET(numWaypointConnections, U32);
+	virtual RAD_DECLARE_GET(numWaypointConnectionIndices, U32);
+	virtual RAD_DECLARE_GET(numFloors, U32);
+	virtual RAD_DECLARE_GET(numFloorTris, U32);
+	virtual RAD_DECLARE_GET(numFloorEdges, U32);
 	virtual RAD_DECLARE_GET(numPlanes, U32);
 	virtual RAD_DECLARE_GET(numCameraTMs, U32);
 	virtual RAD_DECLARE_GET(numCameraTracks, U32);
@@ -445,6 +543,11 @@ protected:
 	typedef zone_vector<BSPClipSurface, ZBSPBuilderT>::type BSPClipSurfaceVec;
 	typedef zone_vector<BSPPlane, ZBSPBuilderT>::type BSPPlaneVec;
 	typedef zone_vector<BSPVertex, ZBSPBuilderT>::type BSPVertexVec;
+	typedef zone_vector<BSPWaypoint, ZBSPBuilderT>::type BSPWaypointVec;
+	typedef zone_vector<BSPWaypointConnection, ZBSPBuilderT>::type BSPWaypointConnectionVec;
+	typedef zone_vector<BSPFloor, ZBSPBuilderT>::type BSPFloorVec;
+	typedef zone_vector<BSPFloorTri, ZBSPBuilderT>::type BSPFloorTriVec;
+	typedef zone_vector<BSPFloorEdge, ZBSPBuilderT>::type BSPFloorEdgeVec;
 	typedef zone_vector<U16, ZBSPBuilderT>::type BSPIndexVec;
 	typedef zone_vector<U32, ZBSPBuilderT>::type BSPActorIndexVec;
 	typedef zone_vector<BSPCameraTM, ZBSPBuilderT>::type BSPCameraTMVec;
@@ -462,12 +565,18 @@ protected:
 	BSPLeafVec m_leafs;
 	BSPAreaVec m_areas;
 	BSPAreaportalVec m_areaportals;
+	BSPIndexVec m_areaportalIndices;
 	BSPModelVec m_models;
+	BSPIndexVec m_modelIndices;
 	BSPClipSurfaceVec m_clipSurfaces;
 	BSPPlaneVec m_planes;
 	BSPVertexVec m_vertices;
-	BSPIndexVec m_areaportalIndices;
-	BSPIndexVec m_modelIndices;
+	BSPWaypointVec m_waypoints;
+	BSPWaypointConnectionVec m_waypointConnections;
+	BSPIndexVec m_waypointConnectionIndices;
+	BSPFloorVec m_floors;
+	BSPFloorTriVec m_floorTris;
+	BSPFloorEdgeVec m_floorEdges;
 	BSPIndexVec m_indices;
 	BSPActorIndexVec m_actorIndices;
 	BSPCameraTMVec m_cameraTMs;

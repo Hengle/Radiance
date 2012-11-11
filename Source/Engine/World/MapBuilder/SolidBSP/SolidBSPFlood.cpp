@@ -140,10 +140,6 @@ void BSPBuilder::MarkOccupiedNodeFaces(Node *node) {
 			if (c & kContentsFlag_Areaportal)
 				continue;
 
-			//if (p->nodes[0]->area != -1 && p->nodes[1]->area != -1 &&
-			//	p->nodes[0]->area != p->nodes[1]->area) continue;
-
-			
 			if (!p->original.empty()) {
 				for (TriFacePtrVec::iterator it = p->original.begin(); it != p->original.end(); ++it) {
 					(*it)->outside = false;

@@ -262,8 +262,6 @@ BSPBuilder::LeafFacesDraw::LeafFacesDraw() : m_leaf(0), m_isolate(false), m_lock
 }
 
 BSPBuilder::LeafFacesDraw::~LeafFacesDraw() {
-	if (m_menu)
-		delete m_menu;
 }
 
 bool BSPBuilder::LeafFacesDraw::Paint(float time, float dt, const QRect &viewport, MapBuilderDebugUI &ui, BSPBuilder &bsp) {

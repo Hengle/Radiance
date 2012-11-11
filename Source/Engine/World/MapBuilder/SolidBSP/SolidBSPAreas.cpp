@@ -34,6 +34,9 @@ bool BSPBuilder::CompileAreas() {
 
 		if (m->ignore || m->cinematic)
 			continue;
+		if (m->contents&kContentsFlag_Floor)
+			continue;
+
 		DecomposeAreaModel(*m);
 		if (m_ui) {
 			m_ui->Step();
@@ -71,6 +74,7 @@ void BSPBuilder::DecomposeAreaModel(SceneFile::TriModel &model) {
 	}
 
 	bool foundArea = false;
+	//int numNoDrawFaces = 0;
 
 	for (SceneFile::TriFaceVec::const_iterator it = model.tris.begin(); it != model.tris.end(); ++it) {
 		if (++m_work % 1000 == 0)
@@ -79,8 +83,10 @@ void BSPBuilder::DecomposeAreaModel(SceneFile::TriModel &model) {
 		const SceneFile::TriFace &tri = *it;
 		if (tri.outside)
 			continue;
-		if (tri.surface & kSurfaceFlag_NoDraw)
+		/*if (tri.surface & kSurfaceFlag_NoDraw) {
+			++numNoDrawFaces;
 			continue;
+		}*/
 
 		AreaPoly *poly = new (world::bsp_file::ZBSPBuilder) AreaPoly();
 		poly->plane = ToBSPType(tri.plane);
@@ -134,9 +140,9 @@ void BSPBuilder::DecomposeAreaPoly(Node *node, AreaPoly *poly) {
 	if (s == Plane::On) {
 		float d = poly->plane.Normal().Dot(m_planes.Plane(node->planenum).Normal());
 		if (d > ValueType(0)) {
-			s = Plane::Back;
-		} else {
 			s = Plane::Front;
+		} else {
+			s = Plane::Back;
 		}
 	}
 

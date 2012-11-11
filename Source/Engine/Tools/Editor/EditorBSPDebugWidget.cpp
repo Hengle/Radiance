@@ -90,8 +90,13 @@ QAction *BSPDebugWidget::AddDebugMenuAction(
 
 void BSPDebugWidget::mousePressEvent(QMouseEvent *e) {
 	if (e->button() == Qt::RightButton) {
-		if (m_enabled && m_menu)
+		if (m_enabled && m_menu) {
 			m_menu->Exec(e->globalPos());
+			if (!m_enabled) {
+				delete m_menu;
+				m_menu = 0;
+			}
+		}
 		return;
 	}
 
@@ -157,8 +162,13 @@ void BSPDebugWidget::OnMenuItem() {
 
 void BSPDebugWidget::renderGL() {
 	if (m_loaded || m_enabled) {
-		if (m_enabled && (m_dt > 0.f))
+		if (m_enabled && (m_dt > 0.f)) {
 			m_map->DebugDraw(m_time, m_dt, rect());
+			if (!m_enabled && m_menu) {
+				delete m_menu;
+				m_menu = 0;
+			}
+		}
 		m_dt = 0.f;
 	} else {
 		glClearColor(0.f, 0.f, 0.f, 0.f);

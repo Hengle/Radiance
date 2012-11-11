@@ -20,7 +20,7 @@ enum {
 };
 }
 
-void BSPBuilder::EmitBSPFile() {
+bool BSPBuilder::EmitBSPFile() {
 
 	if (m_ui) {
 		m_ui->title = "Writing BSP File...";
@@ -36,41 +36,59 @@ void BSPBuilder::EmitBSPFile() {
 
 	EmitBSPMaterials();
 	EmitBSPNodes(m_root.get(), -1);
-	EmitBSPPlanes();
 	EmitBSPModels();
 	EmitBSPAreas();
 	EmitBSPEntities();
 
+	if (!EmitBSPFloors())
+		return false;
+
+	EmitBSPWaypoints();
+	EmitBSPPlanes();
+
 	int skaSize = EmitBSPCinematics();
 	if (m_result < pkg::SR_Success)
-		return;
+		return false;
 
 	// Stats:
 	Log("------------\n");
-	Log("\t%8d Strings\n", m_bspFile->numStrings.get());
+	Log("\t%8d String(s)\n", m_bspFile->numStrings.get());
 	Log("\t%8d Entities\n", m_bspFile->numEntities.get());
-	Log("\t%8d Nodes\n", m_bspFile->numNodes.get());
-	Log("\t%8d Leafs\n", m_bspFile->numLeafs.get());
-	Log("\t%8d Areas\n", m_bspFile->numAreas.get());
-	Log("\t%8d Planes\n", m_bspFile->numPlanes.get());
-	Log("\t%8d Areaportals\n", m_bspFile->numAreaportals.get());
-	Log("\t%8d AreaportalIndices\n", m_bspFile->numAreaportalIndices.get());
-	Log("\t%8d Models\n", m_bspFile->numModels.get());
-	Log("\t%8d ClipSurfaces\n", m_bspFile->numClipSurfaces.get());
-	Log("\t%8d Verts\n", m_bspFile->numVerts.get());
+	Log("\t%8d Node(s)\n", m_bspFile->numNodes.get());
+	Log("\t%8d Leaf(s)\n", m_bspFile->numLeafs.get());
+	Log("\t%8d Area(s)\n", m_bspFile->numAreas.get());
+	Log("\t%8d Plane(s)\n", m_bspFile->numPlanes.get());
+	Log("\t%8d Areaportal(s)\n", m_bspFile->numAreaportals.get());
+	Log("\t%8d AreaportalIndice(s)\n", m_bspFile->numAreaportalIndices.get());
+	Log("\t%8d Model(s)\n", m_bspFile->numModels.get());
+	Log("\t%8d ClipSurface(s)\n", m_bspFile->numClipSurfaces.get());
+	Log("\t%8d Vert(s)\n", m_bspFile->numVerts.get());
+	Log("\t%8d Waypoint(s)\n", m_bspFile->numWaypoints.get());
+	Log("\t%8d WaypointConnection(s)\n", m_bspFile->numWaypointConnections.get());
+	Log("\t%8d Floor(s)\n", m_bspFile->numFloors.get());
+	Log("\t%8d FloorTri(s)\n", m_bspFile->numFloorTris.get());
+	Log("\t%8d FloorEdge(s)\n", m_bspFile->numFloorEdges.get());
 	Log("\t%8d Indices\n", m_bspFile->numIndices.get());
-	Log("\t%8d Camera TMs\n", m_bspFile->numCameraTMs.get());
-	Log("\t%8d Camera Tracks\n", m_bspFile->numCameraTracks.get());
-	Log("\t%8d Cinematic Triggers\n", m_bspFile->numCinematicTriggers.get());
-	Log("\t%8d Cinematics\n", m_bspFile->numCinematics.get());
-	Log("\t%8d Skas\n", m_bspFile->numSkas.get());
-	Log("\t%8d Actors\n", m_bspFile->numActors.get());
+	Log("\t%8d Camera TM(s)\n", m_bspFile->numCameraTMs.get());
+	Log("\t%8d Camera Track(s)\n", m_bspFile->numCameraTracks.get());
+	Log("\t%8d Cinematic Trigger(s)\n", m_bspFile->numCinematicTriggers.get());
+	Log("\t%8d Cinematic(s)\n", m_bspFile->numCinematics.get());
+	Log("\t%8d Ska(s)\n", m_bspFile->numSkas.get());
+	Log("\t%8d Actor(s)\n", m_bspFile->numActors.get());
 	Log("\t%8d Actor Indices\n", m_bspFile->numActorIndices.get());
 	
 	SizeBuffer memSize;
 	FormatSize(memSize, skaSize);
 	Log("\t%s Ska Data\n", memSize);
+
+	return true;
 }
+
+/*
+==============================================================================
+Materials
+==============================================================================
+*/
 
 void BSPBuilder::EmitBSPMaterials() {
 
@@ -108,6 +126,12 @@ void BSPBuilder::EmitBSPMaterials() {
 	}
 }
 
+/*
+==============================================================================
+Entities
+==============================================================================
+*/
+
 void BSPBuilder::EmitBSPEntities() {
 	EmitBSPEntity(m_map->worldspawn);
 	for (SceneFile::Entity::Vec::const_iterator it = m_map->ents.begin(); it != m_map->ents.end(); ++it)
@@ -125,6 +149,12 @@ void BSPBuilder::EmitBSPEntity(const SceneFile::Entity::Ref &entity)
 		*m_bspFile->AddString() = it->second;
 	}
 }
+
+/*
+==============================================================================
+Areas
+==============================================================================
+*/
 
 bool BSPBuilder::EmitBSPAreas() {
 	m_bspFile->ReserveAreas((int)m_areas.size());
@@ -198,72 +228,11 @@ bool BSPBuilder::EmitBSPAreas() {
 	return true;
 }
 
-void BSPBuilder::EmitBSPModels() {
-
-	for (SceneFile::TriModel::Vec::const_iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
-		const SceneFile::TriModel::Ref &trim = *m;
-
-		if (trim->ignore)
-			continue;
-
-		if (trim->areas.empty())
-			continue;
-
-		if (!(trim->contents & kContentsFlag_EmitContents))
-			continue;
-
-		EmitBSPModel(trim);
-	}
-}
-
-void BSPBuilder::EmitBSPModel(const SceneFile::TriModel::Ref &triModel) {
-
-	typedef zone_set<int, ZBSPBuilderT>::type IntSet;
-	IntSet mats;
-
-	// gather materials.
-
-	for (SceneFile::TriFaceVec::const_iterator f = triModel->tris.begin(); f != triModel->tris.end(); ++f) {
-		const SceneFile::TriFace &trif = *f;
-		if (trif.areas.empty())
-			continue;
-		mats.insert(trif.mat);
-	}
-
-	for (int c = 1; c <= kMaxUVChannels; ++c){
-		for (IntSet::const_iterator it = mats.begin(); it != mats.end(); ++it) {
-			EmitTriModel m;
-			m.mat = *it;
-			m.numChannels = c;
-			m.bounds.Initialize();
-
-			for (SceneFile::TriFaceVec::const_iterator f = triModel->tris.begin(); f != triModel->tris.end(); ++f) {
-				const SceneFile::TriFace &trif = *f;
-
-				if (trif.mat != m.mat)
-					continue;
-				if (trif.model->numChannels != c)
-					continue;
-				if (trif.areas.empty())
-					continue;
-
-				if (((int)m.indices.size() >= kMaxBatchElements-3) ||
-					((int)m.verts.size() >= kMaxBatchElements-3)) {
-					triModel->emitIds.push_back(EmitBSPModel(m));
-					m.Clear();
-				}
-
-				m.AddVertex(EmitTriModel::Vert(ToBSPType(triModel->verts[trif.v[0]])));
-				m.AddVertex(EmitTriModel::Vert(ToBSPType(triModel->verts[trif.v[1]])));
-				m.AddVertex(EmitTriModel::Vert(ToBSPType(triModel->verts[trif.v[2]])));
-			}
-
-			if (!m.verts.empty()) {
-				triModel->emitIds.push_back(EmitBSPModel(m));
-			}
-		}
-	}
-}
+/*
+==============================================================================
+Portals
+==============================================================================
+*/
 
 void BSPBuilder::EmitBSPAreaportals(Node *leaf, int areaNum, BSPArea &area) {
 	if (leaf->planenum != kPlaneNumLeaf) {
@@ -314,20 +283,6 @@ void BSPBuilder::EmitBSPAreaportals(Node *leaf, int areaNum, BSPArea &area) {
 			}
 		}
 
-		// NOTE: areaportals are somewhat a casualty of war here.
-		// Our original map skin is made of triangle mesh, not quads or other ngons.
-		// This means that referecing the original model triangles that contributed 
-		// to an area portal ends up producing triangle shaped portals, instead of
-		// quads and ngons which cleanly seperate areas. 
-		
-		// By using the leaf portals as area portals directly we can sum contributing
-		// areas easily, but the downside is we may end up with many portal "fragments"
-		// being turned into area portals instead of one clean ngon, however in my
-		// estimation by penalizing for areaportal splits, we may get better coverage
-		// from portals at the leaf level (since they are at least probably not triangles).
-
-		// crosses area.
-
 		if (p->emitId == -1) {
 			p->emitId = (int)m_bspFile->numAreaportals.get();
 			original->model->portalIds.push_back(p->emitId);
@@ -366,6 +321,83 @@ void BSPBuilder::EmitBSPAreaportals(Node *leaf, int areaNum, BSPArea &area) {
 
 			BSPAreaportal *areaportal = const_cast<BSPAreaportal*>(m_bspFile->Areaportals() + p->emitId);
 			areaportal->areas[side] = (U32)areaNum;
+		}
+	}
+}
+
+/*
+==============================================================================
+Models
+==============================================================================
+*/
+
+void BSPBuilder::EmitBSPModels() {
+
+	for (SceneFile::TriModel::Vec::const_iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
+		const SceneFile::TriModel::Ref &trim = *m;
+
+		if (trim->ignore)
+			continue;
+
+		if (trim->areas.empty())
+			continue;
+
+		if (!(trim->contents & kContentsFlag_EmitContents))
+			continue;
+
+		EmitBSPModel(trim);
+	}
+}
+
+void BSPBuilder::EmitBSPModel(const SceneFile::TriModel::Ref &triModel) {
+
+	typedef zone_set<int, ZBSPBuilderT>::type IntSet;
+	IntSet mats;
+
+	// gather materials.
+
+	for (SceneFile::TriFaceVec::const_iterator f = triModel->tris.begin(); f != triModel->tris.end(); ++f) {
+		const SceneFile::TriFace &trif = *f;
+		if (trif.areas.empty())
+			continue;
+		if (trif.surface&kSurfaceFlag_NoDraw)
+			continue;
+		mats.insert(trif.mat);
+	}
+
+	for (int c = 1; c <= kMaxUVChannels; ++c){
+		for (IntSet::const_iterator it = mats.begin(); it != mats.end(); ++it) {
+			EmitTriModel m;
+			m.mat = *it;
+			m.numChannels = c;
+			m.bounds.Initialize();
+
+			for (SceneFile::TriFaceVec::const_iterator f = triModel->tris.begin(); f != triModel->tris.end(); ++f) {
+				const SceneFile::TriFace &trif = *f;
+
+				if (trif.mat != m.mat)
+					continue;
+				if (trif.model->numChannels != c)
+					continue;
+				if (trif.areas.empty())
+					continue;
+				if (trif.surface&kSurfaceFlag_NoDraw)
+					continue;
+
+				if (((int)m.indices.size() >= kMaxBatchElements-3) ||
+					((int)m.verts.size() >= kMaxBatchElements-3)) {
+					triModel->emitIds.push_back(EmitBSPModel(m));
+					m.Clear();
+				}
+
+				m.AddVertex(EmitTriModel::Vert(ToBSPType(triModel->verts[trif.v[0]])));
+				m.AddVertex(EmitTriModel::Vert(ToBSPType(triModel->verts[trif.v[1]])));
+				m.AddVertex(EmitTriModel::Vert(ToBSPType(triModel->verts[trif.v[2]])));
+			}
+
+			if (!m.verts.empty()) {
+				triModel->emitIds.push_back(EmitBSPModel(m));
+			}
 		}
 	}
 }
@@ -436,6 +468,12 @@ int BSPBuilder::EmitBSPModel(const EmitTriModel &model) {
 	return (int)(m_bspFile->numModels - 1);
 }
 
+/*
+==============================================================================
+Tree
+==============================================================================
+*/
+
 S32 BSPBuilder::EmitBSPNodes(const Node *node, S32 parent) {
 	if (node->planenum == kPlaneNumLeaf) {
 		S32 index = m_bspFile->numLeafs;
@@ -478,6 +516,12 @@ S32 BSPBuilder::EmitBSPNodes(const Node *node, S32 parent) {
 	bspNode->children[1] = right;
 	return index;
 }
+
+/*
+==============================================================================
+Clip Hull (unused)
+==============================================================================
+*/
 
 void BSPBuilder::EmitBSPClipSurfaces(const Node *node, world::bsp_file::BSPLeaf *leaf) {
 	return;
@@ -550,6 +594,12 @@ void BSPBuilder::EmitBSPClipBevels(world::bsp_file::BSPLeaf *leaf) {
 
 }
 
+/*
+==============================================================================
+Planes
+==============================================================================
+*/
+
 void BSPBuilder::EmitBSPPlanes() {
 	m_bspFile->ReservePlanes((int)m_planes.Planes().size());
 
@@ -563,6 +613,12 @@ void BSPBuilder::EmitBSPPlanes() {
 		bspPlane->p[3] = pl.D();
 	}
 }
+
+/*
+==============================================================================
+Utils
+==============================================================================
+*/
 
 U32 BSPBuilder::FindBSPMaterial(const char *name) {
 
@@ -591,6 +647,356 @@ int BSPBuilder::EmitBSPCinematics() {
 	}
 
 	return b.skaSize;
+}
+
+/*
+==============================================================================
+Floors
+==============================================================================
+*/
+
+int BSPBuilder::FloorBuilder::Edge::Compare(const Edge &e) const {
+	for (int i = 0; i < 2; ++i) {
+		if (v[i] < e.v[i])
+			return -1;
+		if (v[i] > e.v[i])
+			return 1;
+	}
+
+	return 0;
+}
+
+int BSPBuilder::FloorBuilder::AddVert(const Vert &v) {
+	VertMap::const_iterator it = vmap.find(v);
+	if (it != vmap.end())
+		return it->second;
+
+	int vertNum = (int)verts.size();
+	vmap.insert(VertMap::value_type(v, vertNum));
+	verts.push_back(v);
+
+	return vertNum;
+}
+
+int BSPBuilder::FloorBuilder::AddEdge(int v0, int v1, int triNum) {
+	Edge e;
+	e.v[0] = v0;
+	e.v[1] = v1;
+
+	Edge::Map::iterator it = edgeMap.find(e);
+	if (it == edgeMap.end()) {
+		e.v[0] = v1;
+		e.v[1] = v0;
+		it = edgeMap.find(e);
+		if (it == edgeMap.end()) {
+			e.v[0] = v0;
+			e.v[1] = v1;
+			e.t[0] = triNum;
+			int edgeNum = (int)(edges.size());
+			edges.push_back(e);
+			edgeMap.insert(Edge::Map::value_type(e, edgeNum));
+			return edgeNum;
+		}
+
+		Edge &x = edges[it->second];
+		if (x.t[1] != -1) {
+			bspBuilder->Log(
+				"ERROR: Floor \"%s\" has an edge that is connected to > 2 triangles!\n", 
+				original.name.c_str.get()
+			);
+			bspBuilder->SetResult(pkg::SR_CompilerError);
+			return -1;
+		}
+
+		x.t[1] = triNum;
+		return it->second;
+	}
+
+	const Edge &x = edges[it->second];
+	RAD_ASSERT(x.t[0] != -1);
+
+	bspBuilder->Log(
+		"ERROR: Floor \"%s\" has an edge that is connected to > 2 triangles!\n",
+		original.name.c_str.get()
+	);
+	bspBuilder->SetResult(pkg::SR_CompilerError);
+	return -1;
+}
+
+bool BSPBuilder::FloorBuilder::AddTri(const Vert &v0, const Vert &v1, const Vert &v2) {
+	Tri tri;
+
+	int triNum = (int)tris.size();
+
+	tri.v[0] = AddVert(v0);
+	tri.v[1] = AddVert(v1);
+	tri.v[2] = AddVert(v2);
+
+	tri.e[0] = AddEdge(tri.v[0], tri.v[1], triNum);
+	if (tri.e[0] == -1)
+		return false;
+
+	tri.e[1] = AddEdge(tri.v[1], tri.v[2], triNum);
+	if (tri.e[1] == -1)
+		return false;
+
+	tri.e[2] = AddEdge(tri.v[2], tri.v[0], triNum);
+	if (tri.e[2] == -1)
+		return false;
+
+	tris.push_back(tri);
+	return true;
+}
+
+bool BSPBuilder::EmitBSPFloors() {
+
+	const SceneFile::Vec3 kZAxis(0, 0, 1);
+
+	for (SceneFile::TriModel::Vec::const_iterator it = m_map->worldspawn->models.begin(); it != m_map->worldspawn->models.end(); ++it) {
+		const SceneFile::TriModel::Ref &m = *it;
+
+		if (!(m->contents&kContentsFlag_Floor))
+			continue;
+
+		FloorBuilder builder(*m, this);
+
+		for (SceneFile::TriFaceVec::const_iterator fIt = m->tris.begin(); fIt != m->tris.end(); ++fIt) {
+			const SceneFile::TriFace &f = *fIt;
+
+			if (!builder.AddTri(
+				m->verts[f.v[0]].pos,
+				m->verts[f.v[1]].pos,
+				m->verts[f.v[2]].pos
+			)) {
+				return false;
+			}
+		}
+
+		if (builder.tris.empty())
+			continue;
+
+		int emitId = (int)m_bspFile->numFloors;
+		U32 firstVert = m_bspFile->numVerts;
+		U32 firstTri  = m_bspFile->numFloorTris;
+		U32 firstEdge = m_bspFile->numFloorEdges;
+		
+		BSPFloor *bspFloor = m_bspFile->AddFloor();
+		bspFloor->firstTri = std::numeric_limits<U32>::max();
+		bspFloor->numTris = (U32)builder.tris.size();
+		bspFloor->firstWaypoint = std::numeric_limits<U32>::max();
+		bspFloor->numWaypoints = 0;
+
+		for (FloorBuilder::VertVec::const_iterator vIt = builder.verts.begin(); vIt != builder.verts.end(); ++vIt) {
+			BSPVertex *v = m_bspFile->AddVertex();
+			memset(v, 0, sizeof(BSPVertex));
+
+			v->v[0] = (*vIt)[0];
+			v->v[1] = (*vIt)[1];
+			v->v[2] = (*vIt)[2];
+		}
+
+		for (FloorBuilder::Edge::Vec::const_iterator eIt = builder.edges.begin(); eIt != builder.edges.end(); ++eIt) {
+			const FloorBuilder::Edge &edge = *eIt;
+
+			BSPFloorEdge *e = m_bspFile->AddFloorEdge();
+			e->verts[0] = firstVert + (U32)edge.v[0];
+			e->verts[1] = firstVert + (U32)edge.v[1];
+			e->tris[0] = -1;
+			e->tris[1] = -1;
+			
+			if (edge.t[0] != -1)
+				e->tris[0] = firstTri + (U32)edge.t[0];
+			if (edge.t[1] != -1)
+				e->tris[1] = firstTri + (U32)edge.t[1];
+
+			const FloorBuilder::Vert &v0 = builder.verts[edge.v[0]];
+			const FloorBuilder::Vert &v1 = builder.verts[edge.v[1]];
+
+			SceneFile::Vec3 vedge(v1 - v0);
+			vedge.Normalize();
+
+			if (math::Abs(vedge.Dot(kZAxis)) > 0.99) {
+				Log("ERROR: Floor \"%s\" has vertical surfaces (unsupported)!\n", m->name.c_str.get());
+				SetResult(pkg::SR_CompilerError);
+				return false;
+			}
+
+			SceneFile::Vec3 normal(vedge.Cross(kZAxis));
+
+			Plane plane(
+				ToBSPType(normal),
+				ToBSPType(v0)
+			);
+
+			e->planenum = (U32)m_planes.FindPlaneNum(plane);
+		}
+
+		for (FloorBuilder::Tri::Vec::const_iterator tIt = builder.tris.begin(); tIt != builder.tris.end(); ++tIt) {
+			const FloorBuilder::Tri &tri = *tIt;
+
+			BSPFloorTri *t = m_bspFile->AddFloorTri();
+			t->edges[0] = firstEdge + (U32)tri.e[0];
+			t->edges[1] = firstEdge + (U32)tri.e[1];
+			t->edges[2] = firstEdge + (U32)tri.e[2];
+
+			t->verts[0] = firstVert + (U32)tri.v[0];
+			t->verts[1] = firstVert + (U32)tri.v[1];
+			t->verts[2] = firstVert + (U32)tri.v[2];
+		}
+
+		m->emitIds.push_back(emitId);
+	}
+
+	return true;
+}
+
+void BSPBuilder::EmitBSPWaypoints() {
+
+	// only emit connected waypoints
+
+	// pass 1: emit waypoint structure, and connection
+
+	for (SceneFile::WaypointConnection::Map::const_iterator it = m_map->waypointConnections.begin(); it != m_map->waypointConnections.end(); ++it) {
+		const SceneFile::WaypointConnection::Ref &connection = it->second;
+		RAD_ASSERT(connection->waypoints.head);
+
+		if (!connection->waypoints.tail) {
+			Log("WARNING: waypoint connection is missing tail (head = %d) (connection removed).\n", connection->waypoints.head->id);
+			continue;
+		}
+
+		RAD_ASSERT(connection->waypoints.tail);
+
+		if (connection->waypoints.head->floorName.empty) {
+			Log("WARNING: waypoint %d has no floor name (connection removed).\n", connection->waypoints.head->id);
+			continue;
+		}
+
+		if (connection->waypoints.tail->floorName.empty) {
+			Log("WARNING: waypoint %d has no floor name (connection removed).\n", connection->waypoints.tail->id);
+			continue;
+		}
+
+		// valid connection? must connect floors
+		if (connection->waypoints.head->floorName ==
+			connection->waypoints.tail->floorName) {
+			// does not connect floors
+			Log(
+				"WARNING: waypoints connect the same floor \"%s\" (connection removed).\n", 
+				connection->waypoints.head->floorName.c_str.get()
+			);
+			continue;
+		}
+
+		if (m_bspFile->numWaypointConnections.get() > std::numeric_limits<U16>::max()) {
+			Log("WARNING: too many waypoint connections (internal error, contact programmer to increase limit)!\n");
+			continue;
+		}
+
+		if (!EmitBSPWaypoint(*connection->waypoints.head) ||
+			!EmitBSPWaypoint(*connection->waypoints.tail)) {
+			continue;
+		}
+
+		connection->emitId = (int)m_bspFile->numWaypointConnections.get();
+		BSPWaypointConnection *c = m_bspFile->AddWaypointConnection();
+
+		c->flags = (S32)connection->flags;
+		c->waypoints[0] = (U32)connection->waypoints.head->emitId;
+		c->waypoints[1] = (U32)connection->waypoints.tail->emitId;
+
+		for (int i = 0; i < 2; ++i) {
+			for (int k = 0; k < 3; ++k) {
+				c->ctrls[i][k] = connection->ctrls[i][k];
+			}
+		}
+	}
+
+	// pass 2: emit waypoint connection indices
+
+	for (SceneFile::Waypoint::Map::const_iterator it = m_map->waypoints.begin(); it != m_map->waypoints.end(); ++it) {
+		const SceneFile::Waypoint::Ref &waypoint = it->second;
+
+		if (waypoint->emitId < 0)
+			continue;
+
+		BSPWaypoint *w = const_cast<BSPWaypoint*>(m_bspFile->Waypoints() + waypoint->emitId);
+
+		m_bspFile->ReserveWaypointConnectionIndices((int)waypoint->connections.size());
+
+		for (SceneFile::WaypointConnection::Map::const_iterator it = waypoint->connections.begin(); it != waypoint->connections.end(); ++it) {
+			const SceneFile::WaypointConnection::Ref &connection = it->second;
+			if (!connection->waypoints.tail)
+				continue; // bad connection (skipped in pass 1 as well).
+
+			if (connection->waypoints.head->emitId == -1 ||
+				connection->waypoints.tail->emitId == -1) {
+				continue; // bad data (skipped in pass 1 as well).
+			}
+
+			if (connection->emitId < 0)
+				continue;
+
+			if (w->firstConnection == std::numeric_limits<U32>::max())
+				w->firstConnection = m_bspFile->numWaypointConnectionIndices;
+
+			*m_bspFile->AddWaypointConnectionIndex() = (U16)connection->emitId;
+			++w->numConnections;
+		}
+	}
+
+}
+
+bool BSPBuilder::EmitBSPWaypoint(SceneFile::Waypoint &waypoint) {
+
+	if (waypoint.emitId > -1)
+		return true; // already emitted.
+
+	if (waypoint.floorName.empty) {
+		Log("WARNING: waypoint id %d does not have a floor name set (waypoint removed).\n", waypoint.id);
+		return false;
+	}
+
+	int floorNum = FindBSPFloor(waypoint.floorName.c_str);
+	if (floorNum < 0) {
+		Log("WARNING: Floor \"%s\" does not exist (waypoint removed).\n", waypoint.floorName.c_str.get());
+		return false;
+	}
+
+	waypoint.emitId = (int)m_bspFile->numWaypoints.get();
+
+	BSPWaypoint *w = m_bspFile->AddWaypoint();
+	w->floorNum = (U32)floorNum;
+	w->pos[0] = waypoint.pos[0];
+	w->pos[1] = waypoint.pos[1];
+	w->pos[2] = waypoint.pos[2];
+
+	w->firstConnection = std::numeric_limits<U32>::max();
+	w->numConnections = 0;
+	w->transitionAnimation = -1;
+
+	if (!waypoint.transitionAnimation.empty) {
+		w->transitionAnimation = (S32)m_bspFile->numStrings.get();
+		*m_bspFile->AddString() = waypoint.transitionAnimation;
+	}
+
+	return true;
+}
+
+int BSPBuilder::FindBSPFloor(const char *name) {
+	const String kName(CStr(name));
+
+	for (SceneFile::TriModel::Vec::const_iterator it = m_map->worldspawn->models.begin(); it != m_map->worldspawn->models.end(); ++it) {
+		const SceneFile::TriModel::Ref &m = *it;
+
+		if (!(m->contents&kContentsFlag_Floor))
+			continue;
+
+		if (m->name == kName)
+			return m->emitIds[0];
+	}
+
+	return -1;
 }
 
 } // solid_bsp

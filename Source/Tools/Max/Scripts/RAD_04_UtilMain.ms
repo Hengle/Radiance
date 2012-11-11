@@ -62,7 +62,10 @@ utility RadianceUtil "Radiance Tools" width:166 height:569
 		file = getSaveFileName caption:"Scene Export..." filename:RadianceUtil_lastSceneFile types:"3DX Files (*.3dx)|*.3dx|All Files (*.*)|*.*"
 		if (file == undefined) then return undefined
 		RadianceUtil_lastSceneFile = file
+		
+		disableSceneRedraw()
 		RAD_ExportObjectsToSceneFile objs doMeshes doAnims file
+		enableSceneRedraw()
 		clearSelection()
 		select oldSelection
 		max utility mode

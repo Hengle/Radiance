@@ -93,7 +93,6 @@ void BSPBuilder::DebugDraw(float time, float dt, const QRect &viewport) {
 		if (!m_paint->Paint(time, dt, viewport, *m_debugUI, *this)) {
 			m_debugUI->enabled = false;
 			m_paint.reset();
-			m_debugUI->SetDebugMenu(0);
 		}
 	}
 }
@@ -104,7 +103,6 @@ void BSPBuilder::OnDebugMenu(const QVariant &data) {
 		if (!m_paint->OnMenu(data, *m_debugUI, *this)) {
 			m_debugUI->enabled = false;
 			m_paint.reset();
-			m_debugUI->SetDebugMenu(0);
 		}
 	}
 }
@@ -242,7 +240,8 @@ void BSPBuilder::Build()
 		return;
 	if (!CompileAreas())
 		return;
-	EmitBSPFile();
+	if (!EmitBSPFile())
+		return;
 
 	if (m_debugUI)
 		DisplayPaintHandler(new (world::bsp_file::ZBSPBuilder) AreaBSPDraw());
@@ -318,8 +317,6 @@ void BSPBuilder::Split(Node *node) {
 		return;
 	}
 
-//	DisplayTree(m_root.get(), true, node);
-
 #if defined(RAD_OPT_DEBUG)
 	for (Node *parent = node->parent; parent; parent = parent->parent) {
 		RAD_ASSERT(parent->planenum != planenum);
@@ -365,21 +362,17 @@ void BSPBuilder::Split(Node *node) {
 			Split(m, p, planenum, front, back);
 			if (front) {
 				node->children[0]->models.push_back(front);
-//				node->children[0]->bounds.Insert(front->bounds);
 			}
 			if (back) {
 				node->children[1]->models.push_back(back);
-//				node->children[1]->bounds.Insert(back->bounds);
 			}
 		} else {
 			switch (s) {
 			case Plane::Front:
 				node->children[0]->models.push_back(m);
-//				node->children[0]->bounds.Insert(m->bounds);
 				break;
 			case Plane::Back:
 				node->children[1]->models.push_back(m);
-//				node->children[1]->bounds.Insert(m->bounds);
 				break;
 			default:
 				SOLID_BSP_ICE();
@@ -406,9 +399,11 @@ void BSPBuilder::SplitNodeBounds(Node *node, const Plane &p, BBox &front, Windin
 		if (!b->Empty())
 			backVec.push_back(b);
 
+#if defined(RAD_OPT_DEBUG)
 		if (f->Empty() || b->Empty()) {
 			int bp = 0;
 		}
+#endif
 	}
 
 	Winding::Ref face(new (world::bsp_file::ZBSPBuilder) Winding(-p, SceneFile::kMaxRange*2));
@@ -502,20 +497,8 @@ void BSPBuilder::Split(
 		} else {
 			s = poly->winding->Side(p, kBSPSplitEpsilon);
 			if (s == Plane::On) {
-				//poly->onNode = true;
-
-				/*PolyRef f(new (world::bsp_file::ZBSPBuilder) Poly(*poly.get()));
-				f->winding.reset(new (world::bsp_file::ZBSPBuilder) Winding());
-				PolyRef b(new (world::bsp_file::ZBSPBuilder) Poly(*poly.get()));
-				b->winding.reset(new (world::bsp_file::ZBSPBuilder) Winding());*/
-
 				s = poly->winding->MajorSide(p, ValueType(0));
 				RAD_ASSERT(s != Plane::On);
-				/*if (p.Normal().Dot(poly->winding->Plane().Normal()) > ValueType(0)) {
-					s = Plane::Back;
-				} else {
-					s = Plane::Front;
-				}*/
 			}
 		}
 
@@ -570,8 +553,6 @@ void BSPBuilder::LeafNode(Node *node) {
 	++m_numLeafs;
 	node->planenum = kPlaneNumLeaf;
 	node->contents = 0;
-
-//	if (!node->models.empty()) { DisplayTree(m_root.get(), true, node); }
 
 	for (TriModelFragVec::const_iterator it = node->models.begin(); it != node->models.end(); ++it) {
 		const TriModelFragRef &m = *it;
@@ -661,8 +642,8 @@ void BSPBuilder::CreateRootNode() {
 	Node *node = new (world::bsp_file::ZBSPBuilder) Node();
 	node->models.reserve(m_map->worldspawn->models.size());
 
-	for (SceneFile::TriModel::Vec::const_iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
-		const SceneFile::TriModel::Ref &trim = *m;
+	for (SceneFile::TriModel::Vec::iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
+		SceneFile::TriModel::Ref &trim = *m;
 
 		// gather contents.
 		if (trim->ignore || trim->cinematic)
@@ -670,13 +651,13 @@ void BSPBuilder::CreateRootNode() {
 
 		if (trim->contents & kContentsFlag_Structural) {
 			m_numStructural += (int)trim->tris.size();
-		} else {
+		} else if (!(trim->contents & kContentsFlag_Floor)) {
 			m_numDetail += (int)trim->tris.size();
 		}
 
-		if (!(trim->contents & kContentsFlag_BSPContents)) 
+		if (!(trim->contents&kContentsFlag_BSPContents)) 
 			continue;
-				
+					
 		TriModelFragRef frag(new (world::bsp_file::ZBSPBuilder) TriModelFrag());
 		frag->original = trim.get();
 		frag->bounds = ToBSPType(trim->bounds);
@@ -684,12 +665,13 @@ void BSPBuilder::CreateRootNode() {
 		frag->polys.reserve(trim->tris.size());
 		node->numPolys += (int)trim->tris.size();
 
-		for (SceneFile::TriFaceVec::const_iterator f = trim->tris.begin(); f != trim->tris.end(); ++f) {
-			const SceneFile::TriFace &trif = *f;
+		for (SceneFile::TriFaceVec::iterator f = trim->tris.begin(); f != trim->tris.end(); ++f) {
+			SceneFile::TriFace &trif = *f;
 			if (trif.mat == -1)
-				continue; // no material discard.
+				continue; // no material.
+			
 			PolyRef poly(new (world::bsp_file::ZBSPBuilder) Poly());
-			poly->original = (SceneFile::TriFace*)&trif;
+			poly->original = &trif;
 			poly->contents = trim->contents;
 			poly->onNode = false;
 			poly->winding.reset(new (world::bsp_file::ZBSPBuilder) Winding());
@@ -932,6 +914,8 @@ int BSPBuilder::ContentsForString(const String &s) {
 		return kContentsFlag_Water;
 	if (s == "Areaportal")
 		return kContentsFlag_Areaportal;
+	if (s == "Floor")
+		return kContentsFlag_Floor;
 	return kContentsFlag_Solid;
 }
 

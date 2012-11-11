@@ -60,7 +60,9 @@ private:
 
 	bool ParseWorldSpawn(const world::EntSpawn &spawn);
 	bool ParseEntity(const world::EntSpawn &spawn);
+	bool ParseWaypoint(const world::EntSpawn &spawn);
 	bool LoadScene(const world::EntSpawn &spawn);
+	void ConnectWaypoints();
 
 	SceneFile m_map;
 	Engine &m_e;
