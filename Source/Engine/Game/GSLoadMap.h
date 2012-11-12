@@ -10,14 +10,26 @@
 #include "../Assets/MapAsset.h"
 #include <Runtime/PushPack.h>
 
-class RADENG_CLASS GSLoadMap : public Game::Tickable
-{
+#if defined(RAD_OPT_PC_TOOLS)
+class QWidget;
+namespace tools {
+namespace editor {
+class ProgressDialog;
+} // editor
+} // tools
+#endif
+
+class RADENG_CLASS GSLoadMap : public Game::Tickable {
 public:
 	static Game::Tickable::Ref New(int mapId, int slot, bool play, bool loadScreen);
 	enum { Priority = GSP_Default };
 	GSLoadMap(int mapId, int slot, bool play, bool loadScreen);
 
 	virtual int Tick(Game &game, float dt, const xtime::TimeSlice &time, int flags);
+
+#if defined(RAD_OPT_PC_TOOLS)
+	void EnableProgressIndicator(QWidget *parent);
+#endif
 
 protected:
 
@@ -28,8 +40,13 @@ protected:
 
 private:
 
-	RAD_DECLARE_GET(loadScreen, bool) { return m_loadScreen; }
-	RAD_DECLARE_GET(mapAsset, const asset::MapAsset::Ref&) { return m_mapAsset; }
+	RAD_DECLARE_GET(loadScreen, bool) { 
+		return m_loadScreen; 
+	}
+
+	RAD_DECLARE_GET(mapAsset, const asset::MapAsset::Ref&) { 
+		return m_mapAsset; 
+	}
 
 	int m_mapId;
 	int m_slot;
@@ -37,6 +54,11 @@ private:
 	bool m_loadScreen;
 	pkg::Asset::Ref m_map;
 	asset::MapAsset::Ref m_mapAsset;
+
+#if defined(RAD_OPT_PC_TOOLS)
+	QWidget *m_progressIndicatorParent;
+	tools::editor::ProgressDialog *m_progress;
+#endif
 };
 
 #include <Runtime/PopPack.h>

@@ -1354,7 +1354,7 @@ int Cooker::CompareModifiedTime(int target, bool updateIfNewer) {
 
 	TimeDate td = TimeDate::FromString(it->second.c_str);
 	int r = td.Compare(*asset->entry->modifiedTime.get());
-	if (r < 0 && updateIfNewer) {
+	if ((r < 0 && updateIfNewer) || (r > 0)) {
 		globals->pairs[key] = asset->entry->modifiedTime->ToString();
 	}
 
@@ -1395,8 +1395,10 @@ int Cooker::CompareCachedFileTime(int target, const char *key, const char *path,
 	if (force)
 		c = -1;
 
-	if (c < 0 && updateIfNewer)
+	if ((c < 0 && updateIfNewer) || (c > 0)) { 
+		// this can happen from DST or someone reverted a file version.
 		globals->pairs[skey] = fileTime.ToString();
+	}
 
 	return c;
 }

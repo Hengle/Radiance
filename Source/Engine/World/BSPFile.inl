@@ -79,8 +79,8 @@ inline const U16 *BSPFileParser::AreaportalIndices() const {
 	return m_areaportalIndices;
 }
 
-inline const U16 *BSPFileParser::WaypointConnectionIndices() const {
-	return m_waypointConnectionIndices;
+inline const U16 *BSPFileParser::WaypointIndices() const {
+	return m_waypointIndices;
 }
 
 inline const U16 *BSPFileParser::ModelIndices() const {
@@ -146,8 +146,8 @@ inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numWaypointConnections) {
 	return m_numWaypointConnections;
 }
 
-inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numWaypointConnectionIndices) {
-	return m_numWaypointConnectionIndices;
+inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numWaypointIndices) {
+	return m_numWaypointIndices;
 }
 
 inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numFloors) {
@@ -288,8 +288,8 @@ inline const BSPWaypointConnection *BSPFileBuilder::WaypointConnections() const 
 	return &m_waypointConnections[0];
 }
 
-inline const U16 *BSPFileBuilder::WaypointConnectionIndices() const {
-	return &m_waypointConnectionIndices[0];
+inline const U16 *BSPFileBuilder::WaypointIndices() const {
+	return &m_waypointIndices[0];
 }
 
 inline const BSPFloor *BSPFileBuilder::Floors() const {
@@ -363,8 +363,8 @@ inline void BSPFileBuilder::Clear() {
 	m_planes.clear();
 	m_vertices.clear();
 	m_waypoints.clear();
+	m_waypointIndices.clear();
 	m_waypointConnections.clear();
-	m_waypointConnectionIndices.clear();
 	m_floors.clear();
 	m_floorTris.clear();
 	m_floorEdges.clear();
@@ -435,12 +435,12 @@ inline void BSPFileBuilder::ReserveWaypoints(int num) {
 	m_waypoints.reserve(m_waypoints.size()+(size_t)num);
 }
 
-inline void BSPFileBuilder::ReserveWaypointConnections(int num) {
-	m_waypointConnections.reserve(m_waypointConnections.size()+(size_t)num);
+inline void BSPFileBuilder::ReserveWaypointIndices(int num) {
+	m_waypointIndices.reserve(m_waypointIndices.size()+(size_t)num);
 }
 
-inline void BSPFileBuilder::ReserveWaypointConnectionIndices(int num) {
-	m_waypointConnectionIndices.reserve(m_waypointConnectionIndices.size()+(size_t)num);
+inline void BSPFileBuilder::ReserveWaypointConnections(int num) {
+	m_waypointConnections.reserve(m_waypointConnections.size()+(size_t)num);
 }
 
 inline void BSPFileBuilder::ReserveFloors(int num) {
@@ -553,9 +553,9 @@ inline BSPWaypointConnection *BSPFileBuilder::AddWaypointConnection() {
 	return &m_waypointConnections.back();
 }
 
-inline U16 *BSPFileBuilder::AddWaypointConnectionIndex() {
-	m_waypointConnectionIndices.resize(m_waypointConnectionIndices.size()+1);
-	return &m_waypointConnectionIndices.back();
+inline U16 *BSPFileBuilder::AddWaypointIndex() {
+	m_waypointIndices.resize(m_waypointIndices.size()+1);
+	return &m_waypointIndices.back();
 }
 
 inline BSPFloor *BSPFileBuilder::AddFloor() {
@@ -691,8 +691,8 @@ inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numAreaportalIndices) {
 	return (U32)m_areaportalIndices.size();
 }
 
-inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numWaypointConnectionIndices) {
-	return (U32)m_waypointConnectionIndices.size();
+inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numWaypointIndices) {
+	return (U32)m_waypointIndices.size();
 }
 
 inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numModelIndices) {

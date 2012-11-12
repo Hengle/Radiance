@@ -52,8 +52,8 @@ void BSPDebugWidget::DebugMap(int id) {
 	m_progress->setMinimumDuration(500);
 
 	m_map = asset::MapAsset::Cast(asset);
-	m_map->SetProgressIndicator(*m_progress);
-	m_map->SetDebugUI(*this);
+	m_map->SetProgressIndicator(m_progress);
+	m_map->SetDebugUI(this);
 
 	int r = asset->Process(
 		xtime::TimeSlice(100),

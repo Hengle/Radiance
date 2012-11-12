@@ -13,6 +13,7 @@
 
 #if defined(RAD_OPT_TOOLS)
 #include "MapParser.h"
+#include "MapCooker.h"
 #endif
 
 using namespace pkg;
@@ -109,27 +110,46 @@ int MapAsset::SpawnCooked(
 	if (!m_bspData) {
 #if defined(RAD_OPT_TOOLS)
 		if (!asset->cooked) {
-			Cooker::Ref cooker = asset->AllocateIntermediateCooker();
-			CookStatus status = cooker->Status(0, P_TARGET_FLAGS(flags));
-
-			if (status == CS_Ignore)
-				return SR_CompilerError;
-
-			if (status == CS_NeedRebuild) {
-				COut(C_Info) << asset->path.get() << " is out of date, rebuilding..." << std::endl;
-				int r = cooker->Cook(0, P_TARGET_FLAGS(flags));
+			if (m_cooker) {
+				int r = m_cooker->Cook(0, P_TARGET_FLAGS(flags));
 				if (r != SR_Success)
 					return r;
+
+				// load BSP file
+
+				String path(CStr(asset->path));
+				path += ".bsp";
+
+				m_bspData = m_cooker->MapFile(path.c_str, 0, ZWorld);
+				if (!m_bspData)
+					return SR_FileNotFound;
+				m_cooker.reset();
+
 			} else {
-				COut(C_Info) << asset->path.get() << " is up to date, using cache." << std::endl;
+				m_cooker = asset->AllocateIntermediateCooker();
+				CookStatus status = m_cooker->Status(0, P_TARGET_FLAGS(flags));
+
+				if (status == CS_Ignore)
+					return SR_CompilerError;
+
+				if (status == CS_NeedRebuild) {
+					COut(C_Info) << asset->path.get() << " is out of date, rebuilding..." << std::endl;
+					static_cast<MapCooker*>(m_cooker.get())->SetProgressIndicator(m_ui);
+					int r = m_cooker->Cook(0, P_TARGET_FLAGS(flags));
+					if (r != SR_Success)
+						return r;
+				} else {
+					COut(C_Info) << asset->path.get() << " is up to date, using cache." << std::endl;
+				}
+
+				String path(CStr(asset->path));
+				path += ".bsp";
+
+				m_bspData = m_cooker->MapFile(path.c_str, 0, ZWorld);
+				if (!m_bspData)
+					return SR_FileNotFound;
+				m_cooker.reset();
 			}
-
-			String path(CStr(asset->path));
-			path += ".bsp";
-
-			m_bspData = cooker->MapFile(path.c_str, 0, ZWorld);
-			if (!m_bspData)
-				return SR_FileNotFound;
 		}
 		else {
 #endif
@@ -167,12 +187,12 @@ int MapAsset::SpawnCooked(
 
 #if defined(RAD_OPT_TOOLS)
 
-void MapAsset::SetProgressIndicator(tools::UIProgress &ui) {
-	m_ui = &ui;
+void MapAsset::SetProgressIndicator(tools::UIProgress *ui) {
+	m_ui = ui;
 }
 
-void MapAsset::SetDebugUI(tools::MapBuilderDebugUI &ui) {
-	m_debugUI = &ui;
+void MapAsset::SetDebugUI(tools::MapBuilderDebugUI *ui) {
+	m_debugUI = ui;
 }
 
 void MapAsset::DebugDraw(float time, float dt, const QRect &viewport) {
@@ -230,10 +250,8 @@ int MapAsset::SpawnTool(
 
 	m_mapBuilder.reset(new (ZTools) tools::MapBuilder(engine));
 
-	if (m_ui)
-		m_mapBuilder->SetProgressIndicator(*m_ui);
-	if (m_debugUI)
-		m_mapBuilder->SetDebugUI(*m_debugUI);
+	m_mapBuilder->SetProgressIndicator(m_ui);
+	m_mapBuilder->SetDebugUI(m_debugUI);
 
 	m_parser = MapParser::Cast(asset);
 	if (!m_parser)

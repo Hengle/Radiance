@@ -46,10 +46,12 @@ public:
 	}
 
 #if defined(RAD_OPT_TOOLS)
-	void SetProgressIndicator(tools::UIProgress &ui);
-	void SetDebugUI(tools::MapBuilderDebugUI &ui);
+	void SetProgressIndicator(tools::UIProgress *ui);
+	void SetDebugUI(tools::MapBuilderDebugUI *ui);
 	void DebugDraw(float time, float dt, const QRect &viewport);
 	void OnDebugMenu(const QVariant &data);
+
+	RAD_DECLARE_READONLY_PROPERTY(MapAsset, compiling, bool);
 #endif
 
 	RAD_DECLARE_READONLY_PROPERTY(MapAsset, world, ::world::WorldRef);
@@ -95,6 +97,12 @@ private:
 	tools::MapBuilderDebugUI *m_debugUI;
 	tools::MapBuilder::Ref m_mapBuilder;
 	MapParser::Ref m_parser;
+	pkg::Cooker::Ref m_cooker;
+
+	RAD_DECLARE_GET(compiling, bool) {
+		return m_cooker;
+	}
+
 #endif
 
 };

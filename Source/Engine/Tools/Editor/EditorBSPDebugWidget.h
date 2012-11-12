@@ -20,8 +20,7 @@ class QKeyEvent;
 namespace tools {
 namespace editor {
 
-class RADENG_CLASS BSPDebugWidget : public GLNavWidget, public MapBuilderDebugUI
-{
+class RADENG_CLASS BSPDebugWidget : public GLNavWidget, public MapBuilderDebugUI {
 	Q_OBJECT
 public:
 

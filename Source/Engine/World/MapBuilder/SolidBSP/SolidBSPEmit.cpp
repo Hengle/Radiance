@@ -757,6 +757,10 @@ bool BSPBuilder::EmitBSPFloors() {
 
 		if (!(m->contents&kContentsFlag_Floor))
 			continue;
+		if (m->name.empty) {
+			Log("WARNING: floor mesh has no name (floor removed).\n");
+			continue;
+		}
 
 		FloorBuilder builder(*m, this);
 
@@ -781,6 +785,8 @@ bool BSPBuilder::EmitBSPFloors() {
 		U32 firstEdge = m_bspFile->numFloorEdges;
 		
 		BSPFloor *bspFloor = m_bspFile->AddFloor();
+		bspFloor->name = m_bspFile->numStrings;
+		*m_bspFile->AddString() = m->name;
 		bspFloor->firstTri = std::numeric_limits<U32>::max();
 		bspFloor->numTris = (U32)builder.tris.size();
 		bspFloor->firstWaypoint = std::numeric_limits<U32>::max();
@@ -827,6 +833,25 @@ bool BSPBuilder::EmitBSPFloors() {
 				ToBSPType(normal),
 				ToBSPType(v0)
 			);
+
+			// validate: should put t[0] on front, t[1] on back:
+			const FloorBuilder::Tri &tri = builder.tris[edge.t[0]];
+			int vertNum;
+			for (vertNum = 0; vertNum < 3; ++vertNum) {
+				if (tri.v[vertNum] != edge.v[0] &&
+					tri.v[vertNum] != edge.v[1]) {
+						break;
+				}
+			}
+
+			RAD_ASSERT(vertNum < 3);
+			const SceneFile::Vec3 &vert = builder.verts[tri.v[vertNum]];
+			Plane::SideType side = plane.Side(ToBSPType(vert));
+			if (side == Plane::Back) {
+				Log("WARNING: floor %s has a winding direction error!\n", m->name.c_str.get());
+				SetResult(pkg::SR_CompilerError);
+				return false;
+			}
 
 			e->planenum = (U32)m_planes.FindPlaneNum(plane);
 		}
@@ -922,7 +947,7 @@ void BSPBuilder::EmitBSPWaypoints() {
 
 		BSPWaypoint *w = const_cast<BSPWaypoint*>(m_bspFile->Waypoints() + waypoint->emitId);
 
-		m_bspFile->ReserveWaypointConnectionIndices((int)waypoint->connections.size());
+		m_bspFile->ReserveWaypointIndices((int)waypoint->connections.size());
 
 		for (SceneFile::WaypointConnection::Map::const_iterator it = waypoint->connections.begin(); it != waypoint->connections.end(); ++it) {
 			const SceneFile::WaypointConnection::Ref &connection = it->second;
@@ -938,13 +963,31 @@ void BSPBuilder::EmitBSPWaypoints() {
 				continue;
 
 			if (w->firstConnection == std::numeric_limits<U32>::max())
-				w->firstConnection = m_bspFile->numWaypointConnectionIndices;
+				w->firstConnection = m_bspFile->numWaypointIndices;
 
-			*m_bspFile->AddWaypointConnectionIndex() = (U16)connection->emitId;
+			*m_bspFile->AddWaypointIndex() = (U16)connection->emitId;
 			++w->numConnections;
 		}
 	}
 
+	// pass 3: emit floor waypoint indexes
+	for (U32 i = 0; i < m_bspFile->numFloors; ++i) {
+		BSPFloor *floor = const_cast<BSPFloor*>(m_bspFile->Floors() + i);
+		
+		floor->firstWaypoint = std::numeric_limits<U32>::max();
+		floor->numWaypoints = 0;
+
+		for (U32 k = 0; k < m_bspFile->numWaypoints; ++k) {
+			const BSPWaypoint *waypoint = m_bspFile->Waypoints() + k;
+
+			if (waypoint->floorNum == i) {
+				if (floor->firstWaypoint == std::numeric_limits<U32>::max())
+					floor->firstWaypoint = m_bspFile->numWaypointIndices;
+				*m_bspFile->AddWaypointIndex() = (U16)k;
+				++floor->numWaypoints;
+			}
+		}
+	}
 }
 
 bool BSPBuilder::EmitBSPWaypoint(SceneFile::Waypoint &waypoint) {

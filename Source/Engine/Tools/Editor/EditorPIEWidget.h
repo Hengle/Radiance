@@ -16,8 +16,7 @@ class QKeyEvent;
 namespace tools {
 namespace editor {
 
-class RADENG_CLASS PIEWidget : public GLWidget, public IToolsCallbacks
-{
+class RADENG_CLASS PIEWidget : public GLWidget, public IToolsCallbacks {
 	Q_OBJECT
 public:
 
@@ -27,8 +26,7 @@ public:
 	void RunMap(int id);
 
 	// IToolsCallback
-	virtual void SwapBuffers()
-	{
+	virtual void SwapBuffers() {
 		swapBuffers();
 	}
 

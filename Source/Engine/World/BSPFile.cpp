@@ -37,7 +37,7 @@ m_planes(0),
 m_verts(0),
 m_waypoints(0),
 m_waypointConnections(0),
-m_waypointConnectionIndices(0),
+m_waypointIndices(0),
 m_floors(0),
 m_floorTris(0),
 m_floorEdges(0),
@@ -65,7 +65,7 @@ m_numFloors(0),
 m_numFloorTris(0),
 m_numFloorEdges(0),
 m_numAreaportalIndices(0),
-m_numWaypointConnectionIndices(0),
+m_numWaypointIndices(0),
 m_numModelIndices(0),
 m_numIndices(0),
 m_numActorIndices(0),
@@ -155,7 +155,7 @@ int BSPFileParser::Parse(const void *data, AddrSize len) {
 	m_numModelIndices = *reinterpret_cast<const U32*>(bytes);
 	bytes += sizeof(U32);
 
-	m_numWaypointConnectionIndices = *reinterpret_cast<const U32*>(bytes);
+	m_numWaypointIndices = *reinterpret_cast<const U32*>(bytes);
 	bytes += sizeof(U32);
 	
 	m_numIndices = *reinterpret_cast<const U32*>(bytes);
@@ -251,15 +251,15 @@ int BSPFileParser::Parse(const void *data, AddrSize len) {
 	m_modelIndices = reinterpret_cast<const U16*>(bytes);
 	bytes += sizeof(U16)*m_numModelIndices;
 
-	CHECK_SIZE(sizeof(U16)*m_numWaypointConnectionIndices);
-	m_waypointConnectionIndices = reinterpret_cast<const U16*>(bytes);
-	bytes += sizeof(U16)*m_numWaypointConnectionIndices;
+	CHECK_SIZE(sizeof(U16)*m_numWaypointIndices);
+	m_waypointIndices = reinterpret_cast<const U16*>(bytes);
+	bytes += sizeof(U16)*m_numWaypointIndices;
 	
 	CHECK_SIZE(sizeof(U16)*m_numIndices);
 	m_indices = reinterpret_cast<const U16*>(bytes);
 	bytes += sizeof(U16)*m_numIndices;
 
-	if ((m_numAreaportalIndices+m_numModelIndices+m_numWaypointConnectionIndices+m_numIndices)&1) // align?
+	if ((m_numAreaportalIndices+m_numModelIndices+m_numWaypointIndices+m_numIndices)&1) // align?
 		bytes += sizeof(U16);
 	
 	CHECK_SIZE(sizeof(U32)*m_numActorIndices);
@@ -368,7 +368,7 @@ int BSPFileBuilder::Write(stream::OutputStream &os) {
 	os << (U32)m_vertices.size();
 	os << (U32)m_areaportalIndices.size();
 	os << (U32)m_modelIndices.size();
-	os << (U32)m_waypointConnectionIndices.size();
+	os << (U32)m_waypointIndices.size();
 	os << (U32)m_indices.size();
 	os << (U32)m_actorIndices.size();
 	os << (U32)m_actors.size();
@@ -447,15 +447,15 @@ int BSPFileBuilder::Write(stream::OutputStream &os) {
 	if (len && os.Write(&m_modelIndices[0], len, 0) != len)
 		return pkg::SR_IOError;
 
-	len = (stream::SPos)(sizeof(U16)*m_waypointConnectionIndices.size());
-	if (len && os.Write(&m_waypointConnectionIndices[0], len, 0) != len)
+	len = (stream::SPos)(sizeof(U16)*m_waypointIndices.size());
+	if (len && os.Write(&m_waypointIndices[0], len, 0) != len)
 		return pkg::SR_IOError;
 	
 	len = (stream::SPos)(sizeof(U16)*m_indices.size());
 	if (len && os.Write(&m_indices[0], len, 0) != len)
 		return pkg::SR_IOError;
 
-	if ((m_areaportalIndices.size()+m_modelIndices.size()+m_waypointConnectionIndices.size()+m_indices.size())&1) {
+	if ((m_areaportalIndices.size()+m_modelIndices.size()+m_waypointIndices.size()+m_indices.size())&1) {
 		if (!os.Write((U16)0)) // padd
 			return pkg::SR_IOError;
 	}

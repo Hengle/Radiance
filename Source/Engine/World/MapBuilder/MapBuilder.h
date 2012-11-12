@@ -30,8 +30,8 @@ public:
 	MapBuilder(Engine &engine);
 	~MapBuilder();
 
-	void SetProgressIndicator(UIProgress &ui);
-	void SetDebugUI(MapBuilderDebugUI &ui);
+	void SetProgressIndicator(UIProgress *ui);
+	void SetDebugUI(MapBuilderDebugUI *ui);
 	bool LoadEntSpawn(const world::EntSpawn &spawn);
 	bool SpawnCompile();
 	void WaitForCompletion();

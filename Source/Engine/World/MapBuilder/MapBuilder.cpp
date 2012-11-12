@@ -28,12 +28,12 @@ MapBuilder::MapBuilder(Engine &engine)
 MapBuilder::~MapBuilder() {
 }
 
-void MapBuilder::SetProgressIndicator(UIProgress &ui) {
-	m_ui = &ui;
+void MapBuilder::SetProgressIndicator(UIProgress *ui) {
+	m_ui = ui;
 }
 
-void MapBuilder::SetDebugUI(MapBuilderDebugUI &ui) {
-	m_debugUI = &ui;
+void MapBuilder::SetDebugUI(MapBuilderDebugUI *ui) {
+	m_debugUI = ui;
 }
 
 void MapBuilder::DebugDraw(float time, float dt, const QRect &viewport) {

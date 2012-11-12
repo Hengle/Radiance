@@ -53,7 +53,7 @@ bool BSPBuilder::CompileAreas() {
 		AreaRef area = *it;
 		Log("Area %d: %d model(s)\n", area->area, area->numModels);
 	}
-	Log("\n------------\n");
+	Log("------------\n");
 
 	return true;
 }

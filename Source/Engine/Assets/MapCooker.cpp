@@ -14,7 +14,7 @@ using namespace pkg;
 
 namespace asset {
 
-MapCooker::MapCooker() : Cooker(14) {
+MapCooker::MapCooker() : Cooker(14), m_parsing(false), m_ui(0) {
 }
 
 MapCooker::~MapCooker() {
@@ -27,8 +27,7 @@ CookStatus MapCooker::Status(int flags, int allflags) {
 	if (flags == 0) {
 		if (CompareVersion(flags) ||
 			CompareModifiedTime(flags) ||
-			CompareCachedFileTimeKey(flags, "Source.File"))
-		{
+			CompareCachedFileTimeKey(flags, "Source.File")) {
 			return CS_NeedRebuild;
 		}
 
@@ -76,8 +75,85 @@ CookStatus MapCooker::Status(int flags, int allflags) {
 }
 
 int MapCooker::Compile(int flags, int allflags) {
+
+	if (m_ui) // progress indicator makes cooker a tickable object
+		return TickCompile(flags, allflags);
+
+	int r;
+	while((r=TickCompile(flags, allflags)) == SR_Pending) {
+		if (m_mapBuilder)
+			m_mapBuilder->WaitForCompletion();
+	}
+
+	return r;
+}
+
+int MapCooker::TickCompile(int flags, int allflags) {
 	RAD_ASSERT((flags&P_AllTargets)==0);
 
+	if (m_parsing) {
+		int r = m_mapBuilder->result;
+		if (r != SR_Success)
+			return r;
+
+		world::EntSpawn spawn;
+		r = ParseEntity(spawn);
+		if ((r != SR_Success) && (r != SR_End))
+			return r;
+
+		if (r == SR_End) {
+			m_parsing = false;
+			if (!m_mapBuilder->SpawnCompile())
+				return SR_ParseError;
+			m_script.Reset();
+		} else {
+			RAD_ASSERT(r == SR_Success);
+			// For static_mesh_scene, cache the 3DX filetime
+			const char *sz = spawn.keys.StringForKey("classname");
+			if (sz && !string::cmp(sz, "static_mesh_scene")) {
+				sz = spawn.keys.StringForKey("file");
+				if (sz) {
+					String path(sz);
+					path += ".3dx";
+					CompareCachedFileTime(flags, path.c_str, path.c_str);
+				}
+			}
+
+			if (!m_mapBuilder->LoadEntSpawn(spawn))
+				return SR_ParseError;
+
+			return SR_Pending;
+		}
+	}
+
+	if (m_mapBuilder) {
+		int r = m_mapBuilder->result;
+		if (r != SR_Success)
+			return r;
+
+		String path(CStr(asset->path));
+		path += ".bsp";
+		BinFile::Ref fp = OpenWrite(path.c_str, flags);
+		if (!fp)
+			return SR_IOError;
+
+		stream::OutputStream os(fp->ob);
+		if (m_mapBuilder->bspFileBuilder->Write(os) != pkg::SR_Success)
+			return SR_IOError;
+
+		world::bsp_file::BSPFile::Ref bspFile = m_mapBuilder->bspFile;
+		RAD_ASSERT(bspFile);
+
+		for (U32 i = 0; i < bspFile->numMaterials; ++i) { 
+			// import materials.
+			AddImport(bspFile->String((bspFile->Materials()+i)->string), flags);
+		}
+
+		return SR_Success;
+	}
+
+	m_parsing = true;
+	
 	// Make sure these get updated
 	CompareVersion(flags);
 	CompareModifiedTime(flags);
@@ -87,7 +163,7 @@ int MapCooker::Compile(int flags, int allflags) {
 	if (!mapPath || mapPath->empty)
 		return SR_MetaError;
 
-//	cout.get() << "********" << std::endl << "Loading :" << mapPath->c_str() << std::endl;
+	//	cout.get() << "********" << std::endl << "Loading :" << mapPath->c_str() << std::endl;
 
 	file::MMFileInputBuffer::Ref ib = engine->sys->files->OpenInputBuffer(mapPath->c_str, ZTools);
 	if (!ib)
@@ -95,68 +171,15 @@ int MapCooker::Compile(int flags, int allflags) {
 	
 	m_script.Bind(ib);
 	ib.reset();
+		
+	m_mapBuilder.reset(new (ZTools) tools::MapBuilder(*engine.get()));
+	m_mapBuilder->SetProgressIndicator(m_ui);
 
-	tools::MapBuilder mapBuilder(*engine.get());
+	return SR_Pending;
+}
 
-	int r;
-	world::EntSpawn spawn;
-	while ((r=ParseEntity(spawn))==SR_Success) {
-		if (!mapBuilder.LoadEntSpawn(spawn))
-			return SR_ParseError;
-
-		if (mapBuilder.result == SR_Pending)
-			mapBuilder.WaitForCompletion();
-
-		if (mapBuilder.result != SR_Success) {
-			r = mapBuilder.result;
-			break;
-		}
-
-		// For static_mesh_scene, cache the 3DX filetime
-		const char *sz = spawn.keys.StringForKey("classname");
-		if (sz && !string::cmp(sz, "static_mesh_scene")) {
-			sz = spawn.keys.StringForKey("file");
-			if (sz) {
-				String path(sz);
-				path += ".3dx";
-				CompareCachedFileTime(flags, path.c_str, path.c_str);
-			}
-		}
-	}
-
-	r = r == SR_End ? SR_Success : r;
-	if (r != SR_Success)
-		return r;
-
-	m_script.Reset();
-
-//	cout.get() << "Compiling..." << std::endl;
-
-	if (!mapBuilder.SpawnCompile())
-		return SR_CompilerError;
-	mapBuilder.WaitForCompletion();
-	if (mapBuilder.result != SR_Success)
-		return mapBuilder.result;
-
-	String path(CStr(asset->path));
-	path += ".bsp";
-	BinFile::Ref fp = OpenWrite(path.c_str, flags);
-	if (!fp)
-		return SR_IOError;
-
-	stream::OutputStream os(fp->ob);
-	if (mapBuilder.bspFileBuilder->Write(os) != pkg::SR_Success)
-		return SR_IOError;
-
-	world::bsp_file::BSPFile::Ref bspFile = mapBuilder.bspFile;
-	RAD_ASSERT(bspFile);
-
-	for (U32 i = 0; i < bspFile->numMaterials; ++i) { 
-		// import materials.
-		AddImport(bspFile->String((bspFile->Materials()+i)->string), flags);
-	}
-
-	return SR_Success;
+void MapCooker::SetProgressIndicator(tools::UIProgress *ui) {
+	m_ui = ui;
 }
 
 int MapCooker::ParseEntity(world::EntSpawn &spawn) {

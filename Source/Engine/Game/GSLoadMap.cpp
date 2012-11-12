@@ -14,8 +14,9 @@
 #undef min
 #undef max
 
-#if defined(RAD_OPT_IOS)
-void __IOS_Throttle(bool);
+#if defined(RAD_OPT_PC_TOOLS)
+#include <QtGui/QWidget>
+#include "../Tools/Editor/EditorProgressDialog.h"
 #endif
 
 GSLoadMap::GSLoadMap(int mapId, int slot, bool play, bool loadScreen) : 
@@ -24,24 +25,23 @@ m_mapId(mapId),
 m_slot(slot), 
 m_play(play),
 m_loadScreen(loadScreen)
+#if defined(RAD_OPT_PC_TOOLS)
+, m_progressIndicatorParent(0), m_progress(0)
+#endif
 {
 }
 
-int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int flags)
-{
-	if (!m_map)
-	{
+int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int flags) {
+	if (!m_map) {
 		m_map = App::Get()->engine->sys->packages->Asset(m_mapId, pkg::Z_Engine);
-		if (!m_map)
-		{
+		if (!m_map) {
 			// TODO: handle failed loading
 			COut(C_ErrMsgBox) << "Error loading map!" << std::endl;
 			return TickPop;
 		}
 
 		m_mapAsset = asset::MapAsset::Cast(m_map);
-		if (!m_mapAsset)
-		{
+		if (!m_mapAsset) {
 			COut(C_ErrMsgBox) << "Error loading map!" << std::endl;
 			return TickPop;
 		}
@@ -49,6 +49,21 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 		m_mapAsset->SetGame(game, m_slot);
 		
 		App::Get()->throttleFramerate = false; // tick loading as fast as possible.
+
+#if defined(RAD_OPT_PC_TOOLS)
+		if (m_progressIndicatorParent) {
+			m_progress = new (ZEditor) tools::editor::ProgressDialog(
+				"Compiling",
+				QString(),
+				QString(),
+				0,
+				0,
+				m_progressIndicatorParent
+			);
+			m_progress->setMinimumDuration(500);
+			m_mapAsset->SetProgressIndicator(m_progress);
+		}
+#endif
 	}
 
 	int r = pkg::SR_Pending;
@@ -58,8 +73,7 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 
 	bool first = firstTick;
 
-	while (r == pkg::SR_Pending && time.remaining)
-	{
+	while ((r == pkg::SR_Pending) && time.remaining) {
 		xtime::TimeVal start = xtime::ReadMilliseconds();
 		
 		r = m_map->Process(
@@ -69,25 +83,40 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 
 		xtime::TimeVal elapsed = xtime::ReadMilliseconds() - start;
 
-		if (elapsed > 0 || first)
-		{
+		if (elapsed > 0 || first) {
 			first = false;
 			game.FlushInput();
 			world::World::Ref world = m_mapAsset->world;
-			if (world)
-			{
+			if (world) {
 				world->sound->Tick(elapsed/1000.f, false);
 				Draw(game, elapsed/1000.f);
 			}
 		}
+
+#if defined(RAD_OPT_PC_TOOLS)
+		if (!m_mapAsset->compiling) {
+			if (m_progress) {
+				m_progress->close();
+				m_progress = 0;
+				m_mapAsset->SetProgressIndicator(0);
+			}
+		}
+		if (m_progress)
+			break;
+#endif
 	}
 
-	if (r != pkg::SR_Pending)
-	{
+	if (r != pkg::SR_Pending) {
+#if defined(RAD_OPT_PC_TOOLS)
+		if (m_progress) {
+			m_progress->close();
+			m_progress = 0;
+			m_mapAsset->SetProgressIndicator(0);
+		}
+#endif
 		App::Get()->throttleFramerate = true; // frame limit if supported.
 		
-		if (r == pkg::SR_Success)
-		{
+		if (r == pkg::SR_Success) {
 			COut(C_Info) << "Map loaded successfully." << std::endl;
 
 			Game::Map::Ref map(new (ZWorld) Game::Map());
@@ -102,11 +131,15 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 				game.Play();
 			
 			App::DumpMemStats(C_Debug);
-		}
-		else
-		{
+		} else {
 			// TODO: handle failed loading
 			COut(C_ErrMsgBox) << "Error loading map!" << std::endl;
+#if defined(RAD_OPT_PC_TOOLS)
+		if (m_progressIndicatorParent) {
+			m_progressIndicatorParent->close();
+			m_progressIndicatorParent = 0;
+		}
+#endif
 		}
 
 		return TickPop;
@@ -114,3 +147,9 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 
 	return TickNext;
 }
+
+#if defined(RAD_OPT_PC_TOOLS)
+void GSLoadMap::EnableProgressIndicator(QWidget *parent) {
+	m_progressIndicatorParent = parent;
+}
+#endif

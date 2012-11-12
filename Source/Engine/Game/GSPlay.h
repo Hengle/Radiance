@@ -9,8 +9,7 @@
 #include "GSPriority.h"
 #include <Runtime/PushPack.h>
 
-class RADENG_CLASS GSPlay : public Game::Tickable
-{
+class RADENG_CLASS GSPlay : public Game::Tickable {
 public:
 	static Game::Tickable::Ref New();
 	enum { Priority = GSP_Default };

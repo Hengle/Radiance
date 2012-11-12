@@ -19,28 +19,30 @@
 #include <Runtime/Container/ZoneMap.h>
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/Container/ZoneSet.h>
+
+#if defined(RAD_OPT_PC_TOOLS)
+class QWidget;
+#endif 
+
 #include <Runtime/PushPack.h>
 
 class App;
 class GSLoadMap;
 
 #if defined(RAD_OPT_PC_TOOLS)
-class IToolsCallbacks
-{
+class IToolsCallbacks {
 public:
 	virtual void SwapBuffers() = 0;
 };
 #endif
 
-class RADENG_CLASS Game
-{
+class RADENG_CLASS Game {
 public:
 
 	typedef boost::shared_ptr<Game> Ref;
 	typedef Tickable<Game> Tickable;
 
-	struct Map
-	{
+	struct Map {
 		typedef boost::shared_ptr<Map> Ref;
 		typedef zone_vector<Ref, ZEngineT>::type Vec;
 		::world::World::Ref world;
@@ -102,6 +104,7 @@ public:
 	RAD_DECLARE_PROPERTY(Game, quit, bool, bool);
 
 #if defined(RAD_OPT_PC_TOOLS)
+	void EnableProgressIndicator(QWidget *parent);
 	RAD_DECLARE_READONLY_PROPERTY(Game, toolsCallback, IToolsCallbacks*);
 #endif
 
@@ -148,8 +151,7 @@ private:
 	friend class world::World;
 	friend class GSLoadMap;
 
-	struct MapSlot
-	{
+	struct MapSlot {
 		typedef zone_map<int, MapSlot, ZEngineT>::type Map;
 		Game::Map::Vec queue;
 		Game::Map::Ref active;
@@ -210,8 +212,11 @@ private:
 	}
 
 #if defined(RAD_OPT_PC_TOOLS)
-	RAD_DECLARE_GET(toolsCallback, IToolsCallbacks*) { return m_toolsCallback; }
+	RAD_DECLARE_GET(toolsCallback, IToolsCallbacks*) { 
+		return m_toolsCallback; 
+	}
 	IToolsCallbacks *m_toolsCallback;
+	QWidget *m_progressIndicatorParent;
 #endif
 
 	TickQueue<Game> m_tickable;

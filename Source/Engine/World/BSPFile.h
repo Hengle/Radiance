@@ -149,6 +149,7 @@ struct BSPWaypointConnection {
 };
 
 struct BSPFloor { // walkable surface
+	U32 name;
 	U32 firstTri;
 	U32 numTris;
 	U32 firstWaypoint;
@@ -187,8 +188,8 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numIndices, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numMaterials, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numWaypoints, U32);
+	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numWaypointIndices, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numWaypointConnections, U32);
-	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numWaypointConnectionIndices, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numFloors, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numFloorTris, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numFloorEdges, U32);
@@ -212,8 +213,8 @@ public:
 	virtual const U16 *ModelIndices() const = 0;
 	virtual const BSPClipSurface *ClipSurfaces() const = 0;
 	virtual const BSPWaypoint *Waypoints() const = 0;
+	virtual const U16 *WaypointIndices() const = 0;
 	virtual const BSPWaypointConnection *WaypointConnections() const = 0;
-	virtual const U16 *WaypointConnectionIndices() const = 0;
 	virtual const BSPFloor *Floors() const = 0;
 	virtual const BSPFloorTri *FloorTris() const = 0;
 	virtual const BSPFloorEdge *FloorEdges() const = 0;
@@ -246,8 +247,8 @@ protected:
 	virtual RAD_DECLARE_GET(numIndices, U32) = 0;
 	virtual RAD_DECLARE_GET(numMaterials, U32) = 0;
 	virtual RAD_DECLARE_GET(numWaypoints, U32) = 0;
+	virtual RAD_DECLARE_GET(numWaypointIndices, U32) = 0;
 	virtual RAD_DECLARE_GET(numWaypointConnections, U32) = 0;
-	virtual RAD_DECLARE_GET(numWaypointConnectionIndices, U32) = 0;
 	virtual RAD_DECLARE_GET(numFloors, U32) = 0;
 	virtual RAD_DECLARE_GET(numFloorTris, U32) = 0;
 	virtual RAD_DECLARE_GET(numFloorEdges, U32) = 0;
@@ -287,8 +288,8 @@ public:
 	virtual const U16 *ModelIndices() const;
 	virtual const BSPClipSurface *ClipSurfaces() const;
 	virtual const BSPWaypoint *Waypoints() const;
+	virtual const U16 *WaypointIndices() const;
 	virtual const BSPWaypointConnection *WaypointConnections() const;
-	virtual const U16 *WaypointConnectionIndices() const;
 	virtual const BSPFloor *Floors() const;
 	virtual const BSPFloorTri *FloorTris() const;
 	virtual const BSPFloorEdge *FloorEdges() const;
@@ -322,8 +323,8 @@ private:
 	virtual RAD_DECLARE_GET(numVerts, U32);
 	virtual RAD_DECLARE_GET(numIndices, U32);
 	virtual RAD_DECLARE_GET(numWaypoints, U32);
+	virtual RAD_DECLARE_GET(numWaypointIndices, U32);
 	virtual RAD_DECLARE_GET(numWaypointConnections, U32);
-	virtual RAD_DECLARE_GET(numWaypointConnectionIndices, U32);
 	virtual RAD_DECLARE_GET(numFloors, U32);
 	virtual RAD_DECLARE_GET(numFloorTris, U32);
 	virtual RAD_DECLARE_GET(numFloorEdges, U32);
@@ -354,8 +355,8 @@ private:
 	const BSPVertex *m_verts;
 	const BSPVertex *m_normals;
 	const BSPWaypoint *m_waypoints;
+	const U16 *m_waypointIndices;
 	const BSPWaypointConnection *m_waypointConnections;
-	const U16 *m_waypointConnectionIndices;
 	const BSPFloor *m_floors;
 	const BSPFloorTri *m_floorTris;
 	const BSPFloorEdge *m_floorEdges;
@@ -384,8 +385,8 @@ private:
 	U32 m_numTexCoords[kMaxUVChannels];
 	U32 m_numIndices;
 	U32 m_numWaypoints;
+	U32 m_numWaypointIndices;
 	U32 m_numWaypointConnections;
-	U32 m_numWaypointConnectionIndices;
 	U32 m_numFloors;
 	U32 m_numFloorTris;
 	U32 m_numFloorEdges;
@@ -421,8 +422,8 @@ public:
 	virtual const U16 *ModelIndices() const;
 	virtual const BSPClipSurface *ClipSurfaces() const;
 	virtual const BSPWaypoint *Waypoints() const;
+	virtual const U16 *WaypointIndices() const;
 	virtual const BSPWaypointConnection *WaypointConnections() const;
-	virtual const U16 *WaypointConnectionIndices() const;
 	virtual const BSPFloor *Floors() const;
 	virtual const BSPFloorTri *FloorTris() const;
 	virtual const BSPFloorEdge *FloorEdges() const;
@@ -455,8 +456,8 @@ public:
 	void ReserveVertices(int num);
 	void ReserveIndices(int num);
 	void ReserveWaypoints(int num);
+	void ReserveWaypointIndices(int num);
 	void ReserveWaypointConnections(int num);
-	void ReserveWaypointConnectionIndices(int num);
 	void ReserveFloors(int num);
 	void ReserveFloorTris(int num);
 	void ReserveFloorEdges(int num);
@@ -483,8 +484,8 @@ public:
 	BSPVertex *AddVertex();
 	BSPActor *AddActor();
 	BSPWaypoint *AddWaypoint();
+	U16 *AddWaypointIndex();
 	BSPWaypointConnection *AddWaypointConnection();
-	U16 *AddWaypointConnectionIndex();
 	BSPFloor *AddFloor();
 	BSPFloorTri *AddFloorTri();
 	BSPFloorEdge *AddFloorEdge();
@@ -518,8 +519,8 @@ protected:
 	virtual RAD_DECLARE_GET(numModelIndices, U32);
 	virtual RAD_DECLARE_GET(numIndices, U32);
 	virtual RAD_DECLARE_GET(numWaypoints, U32);
+	virtual RAD_DECLARE_GET(numWaypointIndices, U32);
 	virtual RAD_DECLARE_GET(numWaypointConnections, U32);
-	virtual RAD_DECLARE_GET(numWaypointConnectionIndices, U32);
 	virtual RAD_DECLARE_GET(numFloors, U32);
 	virtual RAD_DECLARE_GET(numFloorTris, U32);
 	virtual RAD_DECLARE_GET(numFloorEdges, U32);
@@ -572,8 +573,8 @@ protected:
 	BSPPlaneVec m_planes;
 	BSPVertexVec m_vertices;
 	BSPWaypointVec m_waypoints;
+	BSPIndexVec m_waypointIndices;
 	BSPWaypointConnectionVec m_waypointConnections;
-	BSPIndexVec m_waypointConnectionIndices;
 	BSPFloorVec m_floors;
 	BSPFloorTriVec m_floorTris;
 	BSPFloorEdgeVec m_floorEdges;

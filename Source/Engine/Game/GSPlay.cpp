@@ -11,14 +11,11 @@
 #include "../Sound/Sound.h"
 #include "../UI/UIWidget.h"
 
-GSPlay::GSPlay() : Game::Tickable(Priority)
-{
+GSPlay::GSPlay() : Game::Tickable(Priority) {
 }
 
-int GSPlay::Tick(Game &game, float dt, const xtime::TimeSlice &time, int flags)
-{
-	if (firstTick)
-	{
+int GSPlay::Tick(Game &game, float dt, const xtime::TimeSlice &time, int flags) {
+	if (firstTick) {
 		App::Get()->ClearFrameHistory();
 		dt = 0.001f;
 	}
@@ -35,14 +32,12 @@ int GSPlay::Tick(Game &game, float dt, const xtime::TimeSlice &time, int flags)
 	world::UnloadDisposition ud;
 	bool loadScreen;
 
-	if (game.world->PendingLoadRequest(name, ud, loadScreen))
-	{
+	if (game.world->PendingLoadRequest(name, ud, loadScreen)) {
 		game.LoadMap(name.c_str, game.world->slot, ud, true, loadScreen);
 		return TickPop;
 	}
 
-	if (game.world->PendingSwitchLoadRequest(slot, name, ud, loadScreen))
-	{
+	if (game.world->PendingSwitchLoadRequest(slot, name, ud, loadScreen)) {
 		game.Switch(slot);
 		game.LoadMap(name.c_str, game.world->slot, ud, true, loadScreen);
 		return TickPop;
