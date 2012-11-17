@@ -57,10 +57,12 @@ public:
 	Vector2<T> &Initialize();
 	Vector2<T> &Initialize(const T *v);
 	Vector2<T> &Initialize(T x, T y);
-	Vector2<T> &Normalize();
 	Vector2<T> &Reverse();
 	Vector2<T> Reflect(const Vector2<T> &v) const;
-		
+
+	// Returns length.
+	T Normalize();
+
 	// Unary operations
 
 	Vector2<T> operator-() const;
@@ -177,8 +179,10 @@ public:
 	Vector3<T> &Initialize(const T *v);
 	Vector3<T> &Initialize(T x, T y, T z);
 	Vector3<T> &Initialize(const Vector2<T> &v, T z);
-	Vector3<T> &Normalize();
 	Vector3<T> &Reverse();
+
+	// Returns length.
+	T Normalize();
 
 	// Unary operations
 
@@ -313,9 +317,11 @@ public:
 	Vector4<T> &Initialize(T x, T y, T z, T w);
 	Vector4<T> &Initialize(const Vector2<T> &v, T zz, T ww);
 	Vector4<T> &Initialize(const Vector3<T> &v, T ww);
-	Vector4<T> &Normalize();
 	Vector4<T> &Reverse();
-		
+
+	// Returns length.
+	T Normalize();
+
 	// Unary operations
 
 	Vector4<T> operator-() const;

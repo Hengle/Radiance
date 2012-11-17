@@ -88,7 +88,7 @@ public:
 
     // Operates on this
 
-    Plane<T> &Reverse();
+    Plane<T> &Flip();
 	Plane<T> &Translate(T d);
 	Plane<T> &Translate(const Vector3<T> &t);
 

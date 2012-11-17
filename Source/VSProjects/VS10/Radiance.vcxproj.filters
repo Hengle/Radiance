@@ -1398,6 +1398,15 @@
     <ClInclude Include="..\..\Engine\Renderer\GL\RGLBackend.h">
       <Filter>Source\Engine\Renderer\GL</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\World\Floors.h">
+      <Filter>Source\Engine\World</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Physics\BezierSpline.h">
+      <Filter>Source\Engine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Physics\BezierSpline_inl.h">
+      <Filter>Source\Engine\Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2092,6 +2101,12 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\Renderer\GL\RGLBackend.cpp">
       <Filter>Source\Engine\Renderer\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\Floors.cpp">
+      <Filter>Source\Engine\World</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Physics\BezierSpline.cpp">
+      <Filter>Source\Engine\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

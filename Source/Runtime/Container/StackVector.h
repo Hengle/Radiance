@@ -18,6 +18,7 @@ public:
 	typedef typename container_type::iterator iterator;
 	typedef typename container_type::const_iterator const_iterator;
 	typedef typename container_type::pointer pointer;
+	typedef typename container_type::reference reference;
 	typedef typename container_type::difference_type difference_type;
 	typedef typename container_type::const_pointer const_pointer;
 	typedef typename container_type::const_reference const_reference;
@@ -50,6 +51,14 @@ public:
 	self_type &operator = (const self_type &other) {
 		m_container = other.m_container;
 		return *this;
+	}
+
+	reference operator [] (int i) {
+		return m_container[i];
+	}
+
+	const_reference operator [] (int i) const {
+		return m_container[i];
 	}
 	
 private:

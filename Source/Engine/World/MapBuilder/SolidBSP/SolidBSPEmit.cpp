@@ -8,6 +8,8 @@
 #include RADPCH
 #include "SolidBSP.h"
 #include "../CinematicsBuilder.h"
+#include "../../Floors.h"
+#include <algorithm>
 
 using namespace world::bsp_file;
 
@@ -692,6 +694,7 @@ int BSPBuilder::FloorBuilder::AddEdge(int v0, int v1, int triNum) {
 			e.v[0] = v0;
 			e.v[1] = v1;
 			e.t[0] = triNum;
+			e.mid = (verts[v1] + verts[v0]) * 0.5f;
 			int edgeNum = (int)(edges.size());
 			edges.push_back(e);
 			edgeMap.insert(Edge::Map::value_type(e, edgeNum));
@@ -744,8 +747,99 @@ bool BSPBuilder::FloorBuilder::AddTri(const Vert &v0, const Vert &v1, const Vert
 	if (tri.e[2] == -1)
 		return false;
 
+	//// sort edges
+	//for (int i = 0; i < 3; ++i) {
+	//	const Edge &e = edges[tri.e[i]];
+
+	//	int ia = (i+1)%3;
+	//	int ib = (i+2)%3;
+
+	//	const Edge &a = edges[tri.e[ia]];
+	//	const Edge &b = edges[tri.e[ib]];
+
+	//	float da = (a.mid - e.mid).MagnitudeSquared();
+	//	float db = (b.mid - e.mid).MagnitudeSquared();
+
+	//	if (da < db) {
+	//		tri.sorted[i] = ia;
+	//	} else {
+	//		tri.sorted[i] = ib;
+	//	}
+	//}
+
 	tris.push_back(tri);
 	return true;
+}
+
+bool BSPBuilder::FloorBuilder::ValidateTopology() {
+	TriBits visited;
+	visited.resize(tris.size());
+
+	// done without recursion so we can handle large floors
+
+	struct Stack {
+		typedef zone_vector<Stack, ZBSPBuilderT>::type Vec;
+		int triNum;
+		int edgeIdx;
+	};
+
+	Stack::Vec stack;
+
+	Stack cur;
+	cur.triNum = 0;
+	cur.edgeIdx = 0;
+
+	int numVisited = 1;
+
+	for(;;) {
+		
+		const Tri *tri = &tris[cur.triNum];
+
+		for (;cur.edgeIdx < 3; ++cur.edgeIdx) {
+			const Edge &edge = edges[tri->e[cur.edgeIdx]];
+			int other = edge.t[0] == cur.triNum;
+			if (edge.t[other] == -1)
+				continue;
+
+			if (!visited.test(edge.t[other])) {
+				++numVisited;
+				visited.set(edge.t[other]);
+				++cur.edgeIdx; // done this edge.
+				stack.push_back(cur);
+				cur.edgeIdx = 0;
+				cur.triNum = edge.t[other];
+				tri = 0;
+				break;
+			}
+		}
+
+		if (!tri)
+			continue; // stack changed.
+
+		if (stack.empty())
+			break;
+
+		cur = stack.back();
+		stack.pop_back();
+	}
+
+	return numVisited == (int)tris.size();
+}
+
+void BSPBuilder::FloorBuilder::Flood(int triNum, int &numVisited, TriBits &visited) {
+	++numVisited;
+	visited.set(triNum);
+
+	const Tri &tri = tris[triNum];
+
+	for (int i = 0; i < 3; ++i) {
+		const Edge &edge = edges[tri.e[i]];
+		int side = edge.t[1] == triNum;
+
+		// cross?
+		if (!visited.test(edge.t[!side]))
+			Flood(edge.t[!side], numVisited, visited);
+	}
 }
 
 bool BSPBuilder::EmitBSPFloors() {
@@ -779,6 +873,24 @@ bool BSPBuilder::EmitBSPFloors() {
 		if (builder.tris.empty())
 			continue;
 
+		if (builder.tris.size() >= world::kMaxFloorTris) {
+			Log("ERROR: Maximum of %d floor triangles (per-floor-limit) exceeded, contact a programmer to increase limit.\n", world::kMaxFloorTris);
+			SetResult(pkg::SR_CompilerError);
+			return false;
+		}
+
+		if (m_bspFile->numFloors >= world::kMaxFloors) {
+			Log("ERROR: Maximum of %d floors exceeded, contact a programmer to increase limit.\n", world::kMaxFloors);
+			SetResult(pkg::SR_CompilerError);
+			return false;
+		}
+
+		if (!builder.ValidateTopology()) {
+			Log("ERROR: Floor \"%s\" has an invalid configuration, all triangles must be connected and reachable.\n", m->name.c_str.get());
+			SetResult(pkg::SR_CompilerError);
+			return false;
+		}
+
 		int emitId = (int)m_bspFile->numFloors;
 		U32 firstVert = m_bspFile->numVerts;
 		U32 firstTri  = m_bspFile->numFloorTris;
@@ -809,7 +921,7 @@ bool BSPBuilder::EmitBSPFloors() {
 			e->verts[1] = firstVert + (U32)edge.v[1];
 			e->tris[0] = -1;
 			e->tris[1] = -1;
-			
+						
 			if (edge.t[0] != -1)
 				e->tris[0] = firstTri + (U32)edge.t[0];
 			if (edge.t[1] != -1)
@@ -817,6 +929,10 @@ bool BSPBuilder::EmitBSPFloors() {
 
 			const FloorBuilder::Vert &v0 = builder.verts[edge.v[0]];
 			const FloorBuilder::Vert &v1 = builder.verts[edge.v[1]];
+			const FloorBuilder::Vert  mid = (v0 + v1) * 0.5f;
+
+			for (int i = 0; i < 3; ++i)
+				e->midpoint[i] = mid[i];
 
 			SceneFile::Vec3 vedge(v1 - v0);
 			vedge.Normalize();
@@ -860,13 +976,19 @@ bool BSPBuilder::EmitBSPFloors() {
 			const FloorBuilder::Tri &tri = *tIt;
 
 			BSPFloorTri *t = m_bspFile->AddFloorTri();
-			t->edges[0] = firstEdge + (U32)tri.e[0];
-			t->edges[1] = firstEdge + (U32)tri.e[1];
-			t->edges[2] = firstEdge + (U32)tri.e[2];
 
-			t->verts[0] = firstVert + (U32)tri.v[0];
-			t->verts[1] = firstVert + (U32)tri.v[1];
-			t->verts[2] = firstVert + (U32)tri.v[2];
+			for (int i = 0; i < 3; ++i) {
+				t->edges[i] = firstEdge + (U32)tri.e[i];
+				t->verts[i] = firstVert + (U32)tri.v[i];
+			}
+
+			const Plane kPlane(
+				ToBSPType(builder.verts[tri.v[0]]),
+				ToBSPType(builder.verts[tri.v[1]]),
+				ToBSPType(builder.verts[tri.v[2]])
+			);
+
+			t->planenum = m_planes.FindPlaneNum(kPlane);
 		}
 
 		m->emitIds.push_back(emitId);
@@ -949,6 +1071,20 @@ void BSPBuilder::EmitBSPWaypoints() {
 
 		m_bspFile->ReserveWaypointIndices((int)waypoint->connections.size());
 
+		struct WaypointCost {
+			typedef zone_vector<WaypointCost, ZBSPBuilderT>::type Vec;
+			float distance;
+			int id;
+
+			bool operator < (const WaypointCost &other) const {
+				return distance < other.distance;
+			}
+		};
+
+		// sort waypoints connections by distance (for pathfinding).
+
+		WaypointCost::Vec sortedWaypoints;
+
 		for (SceneFile::WaypointConnection::Map::const_iterator it = waypoint->connections.begin(); it != waypoint->connections.end(); ++it) {
 			const SceneFile::WaypointConnection::Ref &connection = it->second;
 			if (!connection->waypoints.tail)
@@ -962,10 +1098,27 @@ void BSPBuilder::EmitBSPWaypoints() {
 			if (connection->emitId < 0)
 				continue;
 
+			SceneFile::Waypoint *otherWaypoint = connection->waypoints.tail;
+			if (connection->waypoints.tail == waypoint.get()) {
+				otherWaypoint = connection->waypoints.head;
+			}
+
+			SceneFile::Vec3 v(otherWaypoint->pos - waypoint->pos);
+			WaypointCost cost;
+			cost.distance = v.MagnitudeSquared();
+			cost.id = connection->emitId;
+			sortedWaypoints.push_back(cost);
+		}
+
+		std::sort(sortedWaypoints.begin(), sortedWaypoints.end());
+
+		for (WaypointCost::Vec::const_iterator it = sortedWaypoints.begin(); it != sortedWaypoints.end(); ++it) {
+			const WaypointCost &connection = *it;
+
 			if (w->firstConnection == std::numeric_limits<U32>::max())
 				w->firstConnection = m_bspFile->numWaypointIndices;
 
-			*m_bspFile->AddWaypointIndex() = (U16)connection->emitId;
+			*m_bspFile->AddWaypointIndex() = (U16)connection.id;
 			++w->numConnections;
 		}
 	}
@@ -1006,10 +1159,18 @@ bool BSPBuilder::EmitBSPWaypoint(SceneFile::Waypoint &waypoint) {
 		return false;
 	}
 
+	int floorTriNum = PutWaypointOnFloor(waypoint, floorNum);
+
+	if (floorTriNum < 0) {
+		Log("WARNING: Waypoint is not on or above floor \"%s\" (waypoint removed).\n", waypoint.floorName.c_str.get());
+		return false;
+	}
+
 	waypoint.emitId = (int)m_bspFile->numWaypoints.get();
 
 	BSPWaypoint *w = m_bspFile->AddWaypoint();
 	w->floorNum = (U32)floorNum;
+	w->triNum = (U32)floorTriNum;
 	w->pos[0] = waypoint.pos[0];
 	w->pos[1] = waypoint.pos[1];
 	w->pos[2] = waypoint.pos[2];
@@ -1040,6 +1201,60 @@ int BSPBuilder::FindBSPFloor(const char *name) {
 	}
 
 	return -1;
+}
+
+int BSPBuilder::PutWaypointOnFloor(SceneFile::Waypoint &waypoint, int floorNum) {
+	const BSPFloor *floor = m_bspFile->Floors() + floorNum;
+
+	RAD_ASSERT(floor->numTris > 0);
+
+	int bestTri = -1;
+
+	SceneFile::Vec3 end(waypoint.pos - SceneFile::Vec3(0, 0, 512));
+	float bestDistSq = std::numeric_limits<float>::max();
+
+	for (U32 i = 0; i < floor->numTris; ++i) {
+		U32 triNum = floor->firstTri + i;
+		const BSPFloorTri *tri = m_bspFile->FloorTris() + triNum;
+
+		const BSPPlane *plane = m_bspFile->Planes() + tri->planenum;
+		const SceneFile::Plane kTriPlane(plane->p[0], plane->p[1], plane->p[2], plane->p[3]);
+
+		SceneFile::Vec3 clip;
+
+		if (!kTriPlane.IntersectLineSegment(clip, waypoint.pos, end, 0.f))
+			continue;
+
+		float distSq = (clip-waypoint.pos).MagnitudeSquared();
+		if (distSq >= bestDistSq) // can't be better
+			continue;
+
+		int k;
+		
+		for (k = 0; k < 3; ++k) {
+			const BSPFloorEdge *edge = m_bspFile->FloorEdges() + tri->edges[k];
+			plane = m_bspFile->Planes() + edge->planenum;
+
+			int side = edge->tris[1] == triNum;
+
+			SceneFile::Plane edgePlane(plane->p[0], plane->p[1], plane->p[2], plane->p[3]);
+
+			if (side)
+				edgePlane.Flip();
+
+			if (edgePlane.Side(clip) == Plane::Back) {
+				break;
+			}
+		}
+
+		if (k == 3) {
+			// inside triangle hull
+			bestDistSq = distSq;
+			waypoint.pos = clip;
+		}
+	}
+
+	return bestTri;
 }
 
 } // solid_bsp

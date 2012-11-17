@@ -135,9 +135,11 @@ inline Vector2<T> &Vector2<T>::Initialize(T x, T y)
 }
 
 template <typename T>
-inline Vector2<T> &Vector2<T>::Normalize()
+inline T Vector2<T>::Normalize()
 {
-	return (*this /= Magnitude());
+	T m = Magnitude();
+	*this /= m;
+	return m;
 }
 
 template <typename T>
@@ -476,9 +478,11 @@ inline Vector3<T> &Vector3<T>::Initialize(const Vector2<T> &v, T z)
 }
 
 template <typename T>
-inline Vector3<T> &Vector3<T>::Normalize()
+inline T Vector3<T>::Normalize()
 {
-	return (*this /= Magnitude());
+	T m = Magnitude();
+	*this /= m;
+	return m;
 }
 
 template <typename T>
@@ -915,9 +919,11 @@ inline Vector4<T> &Vector4<T>::Initialize(const Vector3<T> &v, T w)
 }
 
 template <typename T>
-inline Vector4<T> &Vector4<T>::Normalize()
+inline T Vector4<T>::Normalize()
 {
-	return (*this /= Magnitude());
+	T m = Magnitude();
+	*this /= m;
+	return m;
 }
 
 template <typename T>

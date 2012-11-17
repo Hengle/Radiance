@@ -48,8 +48,7 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS RB_WorldDraw
-{
+class RADENG_CLASS RB_WorldDraw {
 public:
 	typedef boost::shared_ptr<RB_WorldDraw> Ref;
 
@@ -121,8 +120,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS WorldDraw
-{
+class RADENG_CLASS WorldDraw {
 public:
 	typedef boost::shared_ptr<WorldDraw> Ref;
 	WorldDraw(World *w);

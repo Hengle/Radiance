@@ -138,7 +138,7 @@ inline Plane<T> &Plane<T>::Initialize(const Vector3<T> &p1, const Vector3<T> &p2
 }
 	
 template <typename T>
-inline Plane<T> &Plane<T>::Reverse()
+inline Plane<T> &Plane<T>::Flip()
 {
 	m_normal = -m_normal;
 	m_d = -m_d;
@@ -177,8 +177,8 @@ template <typename T>
 template <typename TVector3>
 inline TVector3 Plane<T>::Project(const TVector3 &v) const
 {
-	TVector3 c(m_normal);
-	return c.Project(v);
+	TVector3 t = m_normal * -(m_normal.Dot(v) - m_d);
+	return v + t;
 }
 
 template <typename T>

@@ -22,7 +22,7 @@
 #include <Runtime/Thread/Locks.h>
 #include <QtCore/QVariant>
 #include <vector>
-
+#include <boost/dynamic_bitset.hpp>
 #include <Runtime/PushPack.h>
 
 namespace tools {
@@ -407,6 +407,7 @@ private:
 
 			int v[2];
 			int t[2];
+			Vert mid;
 
 			Edge() { 
 				t[0] = -1;
@@ -458,6 +459,13 @@ private:
 		int AddVert(const Vert &v);
 		int AddEdge(int v0, int v1, int triNum);
 		bool AddTri(const Vert &v0, const Vert &v1, const Vert &v2);
+		bool ValidateTopology();
+
+	private:
+
+		typedef boost::dynamic_bitset<> TriBits;
+
+		void Flood(int triNum, int &numVisited, TriBits &visited);
 	};
 
 	friend struct FloorBuilder;
@@ -683,6 +691,7 @@ private:
 	bool EmitBSPWaypoint(SceneFile::Waypoint &waypoint);
 	U32 FindBSPMaterial(const char *name);
 	int FindBSPFloor(const char *name);
+	int PutWaypointOnFloor(SceneFile::Waypoint &waypoint, int floorNum);
 	int EmitBSPCinematics();
 
 	void ResetProgress();

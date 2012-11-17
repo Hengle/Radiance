@@ -15,7 +15,7 @@ namespace bsp_file {
 
 enum  { 
 	kBspTag = RAD_FOURCC('b', 's', 'p', 't'),
-	kBspVersion  = 0x3
+	kBspVersion  = 0x4
 };
 
 RAD_ZONE_DEF(RADENG_API, ZBSPFile, "BSPFile", ZWorld);

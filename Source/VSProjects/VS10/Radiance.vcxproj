@@ -213,6 +213,8 @@
     <ClInclude Include="..\..\Engine\Packages\Packages.h" />
     <ClInclude Include="..\..\Engine\Packages\PackagesDef.h" />
     <ClInclude Include="..\..\Engine\Persistence.h" />
+    <ClInclude Include="..\..\Engine\Physics\BezierSpline.h" />
+    <ClInclude Include="..\..\Engine\Physics\BezierSpline_inl.h" />
     <ClInclude Include="..\..\Engine\Physics\Spring.h" />
     <ClInclude Include="..\..\Engine\Renderer\CG\CGShader.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
@@ -861,6 +863,7 @@
     <ClInclude Include="..\..\Engine\World\Entity.h" />
     <ClInclude Include="..\..\Engine\World\EntityDef.h" />
     <ClInclude Include="..\..\Engine\World\Event.h" />
+    <ClInclude Include="..\..\Engine\World\Floors.h" />
     <ClInclude Include="..\..\Engine\World\Keys.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_Asset.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_Material.h" />
@@ -1340,6 +1343,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\Engine\Persistence.cpp" />
+    <ClCompile Include="..\..\Engine\Physics\BezierSpline.cpp" />
     <ClCompile Include="..\..\Engine\Physics\Spring.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\CG\CGShader.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
@@ -1941,6 +1945,7 @@
     <ClCompile Include="..\..\Engine\World\Entities\E_Worldspawn.cpp" />
     <ClCompile Include="..\..\Engine\World\Entity.cpp" />
     <ClCompile Include="..\..\Engine\World\EntityPhysics.cpp" />
+    <ClCompile Include="..\..\Engine\World\Floors.cpp" />
     <ClCompile Include="..\..\Engine\World\Keys.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_Asset.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_Material.cpp" />
