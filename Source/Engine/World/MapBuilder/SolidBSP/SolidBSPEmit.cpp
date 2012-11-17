@@ -790,6 +790,7 @@ bool BSPBuilder::FloorBuilder::ValidateTopology() {
 	cur.edgeIdx = 0;
 
 	int numVisited = 1;
+	visited.set(0);
 
 	for(;;) {
 		
@@ -899,7 +900,7 @@ bool BSPBuilder::EmitBSPFloors() {
 		BSPFloor *bspFloor = m_bspFile->AddFloor();
 		bspFloor->name = m_bspFile->numStrings;
 		*m_bspFile->AddString() = m->name;
-		bspFloor->firstTri = std::numeric_limits<U32>::max();
+		bspFloor->firstTri = firstTri;
 		bspFloor->numTris = (U32)builder.tris.size();
 		bspFloor->firstWaypoint = std::numeric_limits<U32>::max();
 		bspFloor->numWaypoints = 0;

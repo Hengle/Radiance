@@ -15,7 +15,6 @@
 #include <Runtime/PushPack.h>
 
 class QWidget;
-class QKeyEvent;
 
 namespace tools {
 namespace editor {

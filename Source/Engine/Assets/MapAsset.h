@@ -52,9 +52,10 @@ public:
 	void OnDebugMenu(const QVariant &data);
 
 	RAD_DECLARE_READONLY_PROPERTY(MapAsset, compiling, bool);
+	RAD_DECLARE_READONLY_PROPERTY(MapAsset, bspFile, const world::bsp_file::BSPFile*);
 #endif
 
-	RAD_DECLARE_READONLY_PROPERTY(MapAsset, world, ::world::WorldRef);
+	RAD_DECLARE_READONLY_PROPERTY(MapAsset, world, world::WorldRef);
 
 protected:
 
@@ -101,6 +102,12 @@ private:
 
 	RAD_DECLARE_GET(compiling, bool) {
 		return m_cooker;
+	}
+
+	RAD_DECLARE_GET(bspFile, const world::bsp_file::BSPFile*) {
+		if (m_mapBuilder)
+			return m_mapBuilder->bspFile.get().get();
+		return m_bspFile.get();
 	}
 
 #endif

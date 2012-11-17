@@ -2108,6 +2108,9 @@
     <ClCompile Include="..\..\Engine\Physics\BezierSpline.cpp">
       <Filter>Source\Engine\Physics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorPathfindingDebugWidget.cpp">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Runtime\Base\Event.inl">
@@ -2494,6 +2497,9 @@
       <Filter>Source\Engine\Tools\Editor\MapEditor</Filter>
     </QtMOC>
     <QtMOC Include="..\..\Engine\Tools\Editor\EditorBSPDebugWidget.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorPathfindingDebugWidget.h">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </QtMOC>
   </ItemGroup>

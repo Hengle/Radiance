@@ -48,7 +48,7 @@ int MapAsset::Process(
 		return SR_Success;
 	}
 
-	if (!(flags&P_Load))
+	if (!(flags&(P_Load|P_Parse)))
 		return SR_Success;
 
 #if defined(RAD_OPT_TOOLS)
@@ -165,6 +165,11 @@ int MapAsset::SpawnCooked(
 		}
 #endif
 	}
+
+#if defined(RAD_OPT_TOOLS)
+	if (flags&P_Parse)
+		return SR_Success; // done, not spawning world.
+#endif
 
 	RAD_ASSERT(m_game);
 

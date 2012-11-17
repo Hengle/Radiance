@@ -33,12 +33,22 @@ class RADENG_CLASS FloorPosition {
 public:
 
 	RAD_DECLARE_READONLY_PROPERTY(FloorPosition, pos, const Vec3&);
+	RAD_DECLARE_READONLY_PROPERTY(FloorPosition, floor, int);
+	RAD_DECLARE_READONLY_PROPERTY(FloorPosition, tri, int);
 
 private:
 	friend class Floors;
 
 	RAD_DECLARE_GET(pos, const Vec3 &) {
 		return m_pos;
+	}
+
+	RAD_DECLARE_GET(floor, int) {
+		return m_floor;
+	}
+
+	RAD_DECLARE_GET(tri, int) {
+		return m_tri;
 	}
 
 	Vec3 m_pos;

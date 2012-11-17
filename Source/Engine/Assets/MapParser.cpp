@@ -38,7 +38,7 @@ int MapParser::Process(
 	if (asset->cooked || (flags&P_FastPath))
 		return SR_Success;
 
-	if (!(flags&(P_Load)))
+	if (!(flags&(P_Load|P_Parse)))
 		return SR_Success;
 
 	if (m_state == S_Done)

@@ -8,11 +8,9 @@
 #include "EditorBSPDebugWidget.h"
 #include "EditorUtils.h"
 #include "../../Packages/Packages.h"
-#include "../../Persistence.h"
 #include "../../App.h"
 #include "../../Engine.h"
 #include <QtCore/QPoint>
-#include <QtGui/QCursor>
 #include <QtGui/QMessageBox>
 #include <QtGui/QAction>
 

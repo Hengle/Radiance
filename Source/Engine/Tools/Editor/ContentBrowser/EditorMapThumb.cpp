@@ -10,6 +10,7 @@
 #include "../MapEditor/EditorMapEditorWindow.h"
 #include "../EditorPIEWidget.h"
 #include "../EditorBSPDebugWidget.h"
+#include "../EditorPathfindingDebugWidget.h"
 #include "../EditorUtils.h"
 
 namespace tools {
@@ -18,7 +19,9 @@ namespace editor {
 MapThumb::MapThumb(ContentBrowserView &view) : ContentAssetThumb(view) {
 	PopupMenu *m = CreateMenu(false);
 	QAction *play = m->AddAction("Play...", this, SLOT(Play()));
-	QAction *debug = m->AddAction("Debug BSP...", this, SLOT(Debug()));
+	QAction *debugBSP = m->AddAction("Debug BSP...", this, SLOT(DebugBSP()));
+	QAction *debugPathfinding = m->AddAction("Debug Pathfinding...", this, SLOT(DebugPathfinding()));
+
 	m->qmenu->setDefaultAction(play);
 }
 
@@ -38,8 +41,12 @@ void MapThumb::Play() {
 	Play(clickedItem);
 }
 
-void MapThumb::Debug() {
-	Debug(clickedItem);
+void MapThumb::DebugBSP() {
+	DebugBSP(clickedItem);
+}
+
+void MapThumb::DebugPathfinding() {
+	DebugPathfinding(clickedItem);
 }
 
 void MapThumb::Play(const pkg::Package::Entry::Ref &entry) {
@@ -64,12 +71,35 @@ void MapThumb::Play(const pkg::Package::Entry::Ref &entry) {
 	w->RunMap(entry->id);
 }
 
-void MapThumb::Debug(const pkg::Package::Entry::Ref &entry) {
+void MapThumb::DebugBSP(const pkg::Package::Entry::Ref &entry) {
 	RAD_ASSERT(entry);
 
 	std::pair<int, int> res = View().selectedResolution();
 
 	BSPDebugWidget *w = new (ZEditor) BSPDebugWidget(0, 
+		Qt::Window|
+		Qt::CustomizeWindowHint|
+		Qt::WindowTitleHint|
+		Qt::WindowSystemMenuHint|
+		Qt::WindowCloseButtonHint|
+		Qt::WindowMinimizeButtonHint|
+		Qt::MSWindowsFixedSizeDialogHint
+	);
+	w->setAttribute(Qt::WA_DeleteOnClose);
+	w->setWindowTitle(entry->name.get());
+	w->resize(res.first, res.second);
+	CenterWidget(*w, *MainWindow::Get());
+	w->show();
+	w->DebugMap(entry->id);
+}
+
+
+void MapThumb::DebugPathfinding(const pkg::Package::Entry::Ref &entry) {
+	RAD_ASSERT(entry);
+
+	std::pair<int, int> res = View().selectedResolution();
+
+	PathfindingDebugWidget *w = new (ZEditor) PathfindingDebugWidget(0, 
 		Qt::Window|
 		Qt::CustomizeWindowHint|
 		Qt::WindowTitleHint|

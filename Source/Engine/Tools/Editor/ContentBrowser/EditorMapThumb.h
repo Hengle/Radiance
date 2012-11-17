@@ -21,12 +21,14 @@ public:
 private slots:
 
 	void Play();
-	void Debug();
+	void DebugBSP();
+	void DebugPathfinding();
 
 private:
 
 	void Play(const pkg::Package::Entry::Ref &entry);
-	void Debug(const pkg::Package::Entry::Ref &entry);
+	void DebugBSP(const pkg::Package::Entry::Ref &entry);
+	void DebugPathfinding(const pkg::Package::Entry::Ref &entry);
 
 };
 
