@@ -50,6 +50,13 @@ public:
 		kNumPts = tNumPts
 	};
 
+	struct Point {
+		Vec3 pos;
+		Vec3 tangent;
+		float length;
+		float offset;
+	};
+
 	CachedCubicBZSpline();
 	CachedCubicBZSpline(const CachedCubicBZSpline &s);
 	
@@ -59,6 +66,7 @@ public:
 	CachedCubicBZSpline &operator = (const CachedCubicBZSpline &s);
 	
 	RAD_DECLARE_READONLY_PROPERTY(CachedCubicBZSpline, length, float);
+	RAD_DECLARE_READONLY_PROPERTY(CachedCubicBZSpline, points, const Point*);
 
 	// Smooth velocity functions:
 	// The motion through a bezier spline with respect to T is
@@ -89,14 +97,11 @@ private:
 		return m_length;
 	}
 
-	struct SplinePoint {
-		Vec3 pos;
-		Vec3 tangent;
-		float length;
-		float offset;
-	};
+	RAD_DECLARE_GET(points, const Point*) {
+		return &m_pts[0];
+	}
 
-	boost::array<SplinePoint, kNumPts> m_pts;
+	boost::array<Point, kNumPts> m_pts;
 	float m_length;
 };
 

@@ -13,6 +13,7 @@
 #include "../../App.h"
 #include "../../Engine.h"
 #include "../../Renderer/GL/GLState.h"
+#include "../../MathUtils.h"
 #include <QtCore/QPoint>
 #include <QtGui/QMessageBox>
 
@@ -95,10 +96,35 @@ void PathfindingDebugWidget::renderGL() {
 	gls.Commit();
 
 	DrawFloors();
+
+	if (m_move)
+		DrawMove(m_move, Vec4(0.f, 1.f, 0.f, 1.f));
 }
 
 void PathfindingDebugWidget::mousePressEvent(QMouseEvent *e) {
-	GLNavWidget::mousePressEvent(e);
+
+	if (!m_loaded)
+		return;
+
+	if (e->modifiers() & Qt::ControlModifier) {
+		int idx = (e->button() == Qt::LeftButton) ? 0 : 1;
+
+		Vec3 start;
+		Vec3 end;
+
+		Project(e->pos().x(), e->pos().y(), start, end);
+
+		world::FloorPosition pos;
+		if (m_floors.ClipToFloor(start, end, pos)) {
+			m_validPos[idx] = true;
+			m_pos[idx] = pos;
+
+			if (m_validPos[0] && m_validPos[1])
+				m_move = m_floors.CreateMove(m_pos[0], m_pos[1]);
+		}
+	} else {
+		GLNavWidget::mousePressEvent(e);
+	}
 }
 
 void PathfindingDebugWidget::OnTick(float dt) {
@@ -118,6 +144,8 @@ void PathfindingDebugWidget::OnTick(float dt) {
 		);
 
 		if (r == pkg::SR_Success) {
+			m_bsp = m_map->bspFile;
+			m_floors.Load(m_bsp);
 			LoadPlayerStart();
 			m_loaded = true;
 			m_progress->close();
@@ -151,7 +179,7 @@ void PathfindingDebugWidget::LoadPlayerStart() {
 int PathfindingDebugWidget::FindEntityByClass(const char *classname) {
 	const String kClass(CStr(classname));
 
-	for (U32 i = 0; i < m_map->bspFile->numEntities; ++i) {
+	for (U32 i = 0; i < m_bsp->numEntities; ++i) {
 		const char *sz = StringForKey(i, "classname");
 		if (sz && (CStr(sz) == kClass))
 			return (int)i;
@@ -161,13 +189,13 @@ int PathfindingDebugWidget::FindEntityByClass(const char *classname) {
 }
 
 const char *PathfindingDebugWidget::StringForKey(int entityNum, const char *key) {
-	const world::bsp_file::BSPEntity *entity = m_map->bspFile->Entities() + entityNum;
+	const world::bsp_file::BSPEntity *entity = m_bsp->Entities() + entityNum;
 
 	const String kKey(CStr(key));
 
 	for (U32 i = 0; i < entity->numStrings; ++i) {
-		const char *name = m_map->bspFile->String(entity->firstString + (i*2));
-		const char *value = m_map->bspFile->String(entity->firstString + (i*2) + 1);
+		const char *name = m_bsp->String(entity->firstString + (i*2));
+		const char *value = m_bsp->String(entity->firstString + (i*2) + 1);
 		
 		const String kName(CStr(name));
 		if (kName == kKey)
@@ -182,41 +210,86 @@ void PathfindingDebugWidget::DrawFloors() {
 	const Vec4 normal(1, 0, 0, 1);
 	const Vec4 highlight(1, 1, 0, 1);
 
-	for (U32 i = 0; i < m_map->bspFile->numFloors; ++i)
+	for (U32 i = 0; i < m_bsp->numFloors; ++i)
 		DrawFloor(i, normal);
 
 	if (m_validPos[0]) {
-		const world::bsp_file::BSPFloor *floor = m_map->bspFile->Floors() + m_pos[0].floor;
-		DrawFloorTri((int)(m_pos[0].tri + floor->firstTri), highlight);
+		const world::bsp_file::BSPFloor *floor = m_bsp->Floors() + m_pos[0].floor;
+		DrawFloorTri(m_pos[0].tri, highlight);
 	}
 
 	if (m_validPos[1]) {
-		const world::bsp_file::BSPFloor *floor = m_map->bspFile->Floors() + m_pos[1].floor;
-		DrawFloorTri((int)(m_pos[1].tri + floor->firstTri), highlight);
+		const world::bsp_file::BSPFloor *floor = m_bsp->Floors() + m_pos[1].floor;
+		DrawFloorTri(m_pos[1].tri, highlight);
 	}
 }
 
 void PathfindingDebugWidget::DrawFloor(int floorNum, const Vec4 &color) {
-	const world::bsp_file::BSPFloor *floor = m_map->bspFile->Floors() + floorNum;
+	const world::bsp_file::BSPFloor *floor = m_bsp->Floors() + floorNum;
 
 	for (U32 i = 0; i < floor->numTris; ++i)
 		DrawFloorTri((int)(floor->firstTri) + i, color);
 }
 
 void PathfindingDebugWidget::DrawFloorTri(int triNum, const Vec4 &color) {
-	const world::bsp_file::BSPFloorTri *tri = m_map->bspFile->FloorTris() + triNum;
+	const world::bsp_file::BSPFloorTri *tri = m_bsp->FloorTris() + triNum;
 
 	glColor4f(color[0], color[1], color[2], color[3]);
 
 	glBegin(GL_LINE_LOOP);
 	for (int i = 0; i < 3; ++i) {
-		const world::bsp_file::BSPVertex *v = m_map->bspFile->Vertices() + tri->verts[i];
+		const world::bsp_file::BSPVertex *v = m_bsp->Vertices() + tri->verts[i];
 		glVertex3f(v->v[0], v->v[1], v->v[2]);
 	}
 	glEnd();
 }
 
+void PathfindingDebugWidget::DrawMove(const ::world::FloorMove::Ref &move, const Vec4 &color) {
+	glColor4f(color[0], color[1], color[2], color[3]);
+
+	const world::FloorMove::Route *route = move->route;
+	for (world::FloorMove::Step::Vec::const_iterator it = route->steps->begin(); it != route->steps->end(); ++it) {
+		DrawSpline((*it).path);
+	}
+}
+
 void PathfindingDebugWidget::DrawSpline(const ::world::FloorMove::Spline &spline) {
+	const world::FloorMove::Spline::Point *points = spline.points;
+
+	glBegin(GL_LINES);
+	for (int i = 0; i < world::FloorMove::Spline::kNumPts-1; ++i) {
+		glVertex3f(points[i].pos[0], points[i].pos[1], points[i].pos[2]);
+		glVertex3f(points[i+1].pos[0], points[i+1].pos[1], points[i+1].pos[2]);
+	}
+	glEnd();
+}
+
+void PathfindingDebugWidget::Project(int x, int y, Vec3 &start, Vec3 &end) {
+	float vpw = width();
+	float vph = height();
+
+	gl.RotateForCamera(
+		camera->pos,
+		Mat4::Rotation(camera->rot.get()),
+		1.f,
+		16384.f,
+		camera->fov,
+		vph/vpw
+	);
+
+	int viewport[4] = {0, 0, (int)vpw, (int)vph};
+
+	start = ::Unproject(
+		gl.GetModelViewProjectionMatrix(),
+		viewport,
+		Vec3((float)x, (float)y, 0.f)
+	);
+
+	end = ::Unproject(
+		gl.GetModelViewProjectionMatrix(),
+		viewport,
+		Vec3((float)x, (float)y, 1.f)
+	);
 }
 
 } // editor

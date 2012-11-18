@@ -39,10 +39,6 @@ private slots:
 
 private:
 
-	::world::FloorPosition m_pos[2];
-	::world::FloorMove::Ref m_move;
-	bool m_validPos[2];
-
 	void LoadPlayerStart();
 
 	int FindEntityByClass(const char *classname);
@@ -52,11 +48,18 @@ private:
 	void DrawFloors();
 	void DrawFloor(int floor, const Vec4 &color);
 	void DrawFloorTri(int tri, const Vec4 &color);
+	void DrawMove(const ::world::FloorMove::Ref &move, const Vec4 &color);
 	void DrawSpline(const ::world::FloorMove::Spline &spline);
+	void Project(int x, int y, Vec3 &start, Vec3 &end);
 
+	::world::FloorPosition m_pos[2];
+	::world::FloorMove::Ref m_move;
 	pkg::Asset::Ref m_asset;
 	asset::MapAsset::Ref m_map;
+	world::Floors m_floors;
+	world::bsp_file::BSPFile::Ref m_bsp;
 	bool m_loaded;
+	bool m_validPos[2];
 	ProgressDialog *m_progress;
 };
 

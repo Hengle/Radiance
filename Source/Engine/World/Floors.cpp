@@ -164,6 +164,12 @@ void Floors::WalkFloor(
 	cur.edgeNum = 0;
 	cur.distance = 0.f;
 	cur.numVisited = 0;
+
+	{
+		WalkStep step;
+		step.pos = cur.pos.m_pos;
+		routeSoFar->push_back(step);
+	}
 	
 	const bsp_file::BSPFloorTri *tri = m_bsp->FloorTris() + start.m_tri;
 
@@ -179,7 +185,7 @@ void Floors::WalkFloor(
 
 	std::sort(cur.edges.begin(), cur.edges.end());
 
-	visited.set(cur.pos.m_tri);
+	visited.set(cur.pos.m_tri - (int)floor->firstTri);
 
 	for (;;) {
 
@@ -199,7 +205,7 @@ void Floors::WalkFloor(
 			if (stack->empty())
 				break; // done
 			routeSoFar->pop_back();
-			visited.reset(cur.pos.m_tri);
+			visited.reset(cur.pos.m_tri - (int)floor->firstTri);
 			cur = stack->back();
 			stack->pop_back();
 			tri = m_bsp->FloorTris() + cur.pos.m_tri;
@@ -207,18 +213,19 @@ void Floors::WalkFloor(
 		}
 
 		while (cur.numVisited < 3) {
-			if (!cur.edges[cur.edgeNum].visited) {
+			int curEdge = cur.edgeNum++;
+
+			if (!cur.edges[curEdge].visited) {
 				++cur.numVisited;
-				cur.edges[cur.edgeNum].visited = true;
+				cur.edges[curEdge].visited = true;
 
-				int edgeNum = tri->edges[cur.edges[cur.edgeNum].idx];
-				++cur.edgeNum;
-
+				int edgeNum = tri->edges[cur.edges[curEdge].idx];
+				
 				const bsp_file::BSPFloorEdge *edge = m_bsp->FloorEdges() + edgeNum;
 				int otherSide = edge->tris[0] == cur.pos.m_tri;
-				int otherTri = edge->tris[otherSide];
+				int otherTri = (int)edge->tris[otherSide];
 
-				if ((otherTri != -1) && !visited.test(otherTri)) {
+				if ((otherTri != -1) && !visited.test(otherTri - (int)floor->firstTri)) {
 					Vec3 mid(edge->midpoint[0], edge->midpoint[1], edge->midpoint[2]);
 					
 					float d = (mid - cur.pos.m_pos).MagnitudeSquared();
@@ -227,20 +234,19 @@ void Floors::WalkFloor(
 					if ((cur.distance+d+cost) < bestDistance) { // valid
 
 						// cross to next triangle.
-						visited.set(otherTri);
+						visited.set(otherTri - (int)floor->firstTri);
 
 						stack->push_back(cur);
-
-						WalkStep step;
-						step.pos = cur.pos.m_pos;
-
-						routeSoFar->push_back(step);
 
 						cur.distance += d;
 						cur.pos.m_pos = mid;
 						cur.pos.m_tri = otherTri;
 						cur.edgeNum = 0;
 						cur.numVisited = 1;
+
+						WalkStep step;
+						step.pos = cur.pos.m_pos;
+						routeSoFar->push_back(step);
 
 						tri = m_bsp->FloorTris() + cur.pos.m_tri;
 						
@@ -463,7 +469,7 @@ bool Floors::ClipToFloor(
 			bestDistSq = distSq;
 			pos.m_pos = clip;
 			pos.m_floor = (int)floorNum;
-			bestTri = (int)i;
+			bestTri = triNum;
 			pos.m_tri = bestTri;
 		}
 	}
