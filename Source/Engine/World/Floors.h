@@ -130,6 +130,9 @@ private:
 	struct WalkStep {
 		typedef stackify<std::vector<WalkStep>, 64> Vec;
 		Vec3 pos;
+		int connection;
+		int waypoints[2];
+		int floors[2];
 		bool required;
 	};
 
@@ -143,13 +146,13 @@ private:
 	void WalkConnection(
 		int waypoint,
 		int connection,
-		FloorMove::Route &route
+		WalkStep::Vec &route
 	);
 
 	bool FindDirectRoute(const FloorPosition &start, const FloorPosition &end, WalkStep::Vec &route);
 	void OptimizeRoute(const FloorPosition &start, WalkStep::Vec &route);
-	void AddWalkRoute(int floor, const WalkStep::Vec &steps, FloorMove::Route &route);
-	void SmoothRoute(FloorMove::Route &route);
+	
+	void GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route &moveRoute);
 
 	//! A step in a planned move
 	struct MoveStep {

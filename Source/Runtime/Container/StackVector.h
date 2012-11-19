@@ -48,6 +48,14 @@ public:
 		return &m_container;
 	}
 
+	container_type &operator * () {
+		return m_container;
+	}
+
+	const container_type &operator * () const {
+		return m_container;
+	}
+
 	self_type &operator = (const self_type &other) {
 		m_container = other.m_container;
 		return *this;

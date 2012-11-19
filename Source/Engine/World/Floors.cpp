@@ -71,16 +71,14 @@ FloorMove::Ref Floors::CreateMove(
 	MovePlan plan;
 	MovePlan planStack;
 	FloorBits stack;
-	WalkStep::Vec walkRoute;
 	float bestDistance = std::numeric_limits<float>::max();
 
 	if (!PlanMove(start, end, 0.f, plan, planStack, stack, bestDistance))
 		return FloorMove::Ref(); // there is no path between these points.
 
 	// We have a rough movement plan from start->end, build the walk commands
-
-	FloorMove::Ref move(new (ZWorld) FloorMove());
-	move->m_pos = start;
+	WalkStep::Vec route;
+	WalkStep::Vec workRoute;
 
 	FloorPosition current(start);
 
@@ -96,12 +94,12 @@ FloorMove::Ref Floors::CreateMove(
 		waypointPos.m_pos = Vec3(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
 
 		RAD_ASSERT(current.m_floor == waypointPos.m_floor);
-		walkRoute->clear();
-		WalkFloor(current, waypointPos, walkRoute);
-		AddWalkRoute(current.m_floor, walkRoute, move->m_route);
-		
+		workRoute->clear();
+		WalkFloor(current, waypointPos, workRoute);
+		std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*route));
+
 		// walk from waypoint->waypoint (through connection)
-		WalkConnection(step.waypoint, step.connection, move->m_route);
+		WalkConnection(step.waypoint, step.connection, route);
 
 		const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + step.connection;
 		int otherIdx = connection->waypoints[0] == step.waypoint;
@@ -115,11 +113,14 @@ FloorMove::Ref Floors::CreateMove(
 	// walk.
 
 	RAD_ASSERT(current.m_floor == end.m_floor);
-	walkRoute->clear();
-	WalkFloor(current, end, walkRoute);
-	AddWalkRoute(current.m_floor, walkRoute, move->m_route);
+	workRoute->clear();
+	WalkFloor(current, end, workRoute);
+	std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*route));
 
-	SmoothRoute(move->m_route);
+	FloorMove::Ref move(new (ZWorld) FloorMove());
+	move->m_pos = start;
+
+	GenerateFloorMove(route, move->m_route);
 
 	return move;
 }
@@ -170,6 +171,9 @@ void Floors::WalkFloor(
 
 	WalkStep step;
 	step.pos = cur.pos.m_pos;
+	step.waypoints[0] = step.waypoints[1] = -1;
+	step.floors[0] = step.floors[1] = cur.pos.m_floor;
+	step.connection = -1;
 	step.required = true;
 	routeSoFar->push_back(step);
 		
@@ -282,30 +286,23 @@ void Floors::WalkFloor(
 void Floors::WalkConnection(
 	int waypointNum,
 	int connectionNum,
-	FloorMove::Route &route
+	WalkStep::Vec &route
 ) {
-	const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + waypointNum;
 	const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + connectionNum;
+	const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + waypointNum;
 
-	int side = connection->waypoints[1] == waypointNum;
+	int otherWaypointNum = (int)connection->waypoints[(connection->waypoints[1] == waypointNum) ? 0 : 1];
+	const bsp_file::BSPWaypoint *otherWaypoint = m_bsp->Waypoints() + otherWaypointNum;
 
-	const bsp_file::BSPWaypoint *otherWaypoint = m_bsp->Waypoints() + connection->waypoints[!side];
-
-	const Vec3 kWaypointPos(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
-	const Vec3 kOtherWaypointPos(otherWaypoint->pos[0], otherWaypoint->pos[1], otherWaypoint->pos[2]);
-	const Vec3 kWaypointCtrl(connection->ctrls[side][0], connection->ctrls[side][1], connection->ctrls[side][2]);
-	const Vec3 kOtherWaypointCtrl(connection->ctrls[!side][0], connection->ctrls[!side][1], connection->ctrls[!side][2]);
-
-	physics::CubicBZSpline spline(kWaypointPos, kWaypointCtrl, kOtherWaypointCtrl, kOtherWaypointPos);
-
-	FloorMove::Step step;
+	WalkStep step;
+	step.pos = Vec3(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
+	step.connection = connectionNum;
+	step.waypoints[0] = waypointNum;
+	step.waypoints[1] = otherWaypointNum;
 	step.floors[0] = (int)waypoint->floorNum;
 	step.floors[1] = (int)otherWaypoint->floorNum;
-	step.waypoints[0] = waypointNum;
-	step.waypoints[1] = (int)connection->waypoints[!side];
-	step.path.Load(spline);
-
-	route.steps->push_back(step);
+	step.required = true;
+	route->push_back(step);
 }
 
 bool Floors::FindDirectRoute(const FloorPosition &start, const FloorPosition &end, WalkStep::Vec &route) {
@@ -315,6 +312,9 @@ bool Floors::FindDirectRoute(const FloorPosition &start, const FloorPosition &en
 	// follow the ray to the destination.
 	WalkStep step;
 	step.pos = start.m_pos;
+	step.connection = -1;
+	step.floors[0] = step.floors[1] = start.m_floor;
+	step.waypoints[0] = step.waypoints[1] = -1;
 	step.required = true;
 	route->push_back(step);
 	int skipEdge = -1;
@@ -377,25 +377,148 @@ bool Floors::FindDirectRoute(const FloorPosition &start, const FloorPosition &en
 void Floors::OptimizeRoute(const FloorPosition &start, WalkStep::Vec &route) {
 }
 
-void Floors::AddWalkRoute(int floor, const WalkStep::Vec &steps, FloorMove::Route &route) {
-	const size_t kSize = steps->size();
+void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route &moveRoute) {
+	if (walkRoute->empty())
+		return;
+
+	const float kSmoothness = 32.f;
+
+	const size_t kSize = walkRoute->size();
 
 	for (size_t i = 0; i < kSize - 1; ++i) {
+		const WalkStep &cur = walkRoute[i];
+		const WalkStep &next = walkRoute[i+1];
+
 		FloorMove::Step step;
-		step.floors[0] = step.floors[1] = floor;
-		step.waypoints[0] = step.waypoints[1] = -1;
 
-		const WalkStep &step0 = steps[i];
-		const WalkStep &step1 = steps[i+1];
-		const Vec3 kMid((step0.pos + step1.pos) * 0.5f);
+		if (cur.waypoints[0] != -1) { // waypoint move
+			step.waypoints[0] = cur.waypoints[0];
+			step.waypoints[1] = cur.waypoints[1];
+			step.floors[0] = cur.floors[0];
+			step.floors[1] = cur.floors[1];
+
+			const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + cur.waypoints[1];
+			const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + cur.connection;
+			int self = connection->waypoints[1] == cur.waypoints[0];
+
+			physics::CubicBZSpline spline(
+				cur.pos,
+				Vec3(connection->ctrls[self][0], connection->ctrls[self][1], connection->ctrls[self][2]),
+				Vec3(connection->ctrls[!self][0], connection->ctrls[!self][1], connection->ctrls[!self][2]),
+				Vec3(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2])
+			);
+
+			step.path.Load(spline);
+			moveRoute.steps->push_back(step);
+			continue;
+		}
+
+		Vec3 ctrls[2];
+
+		Vec3 vNext(next.pos - cur.pos);
+		float nextLen = vNext.Normalize();
 		
-		physics::CubicBZSpline spline(step0.pos, kMid, kMid, step1.pos);
-		step.path.Load(spline);
-		route.steps->push_back(step);
-	}
-}
+		// make move continous in X, Y. Preserve motion exactly in Z (don't want to float above/below
+		// floor).
+		if (i > 0) {
+			const WalkStep &prev = walkRoute[i-1];
+			Vec3 prevPos;
 
-void Floors::SmoothRoute(FloorMove::Route &route) {
+			if (prev.waypoints[0] != -1) {
+				const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + prev.waypoints[1];
+				prevPos.Initialize(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
+			} else {
+				prevPos = prev.pos;
+			}
+
+			Vec3 vPrev(cur.pos - prevPos);
+			float prevLen = vPrev.Normalize();
+
+			ctrls[0] = vPrev + vNext;
+			// isolate Z
+			ctrls[0][2] = 0.f;
+			ctrls[0].Normalize();
+			ctrls[0][2] = vNext[2]; // no longer normalized
+				
+			if (prev.waypoints[0] != -1) { // connect with previous waypoint move
+				const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + prev.waypoints[1];
+				const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + prev.connection;
+				int other = connection->waypoints[0] == prev.waypoints[0];
+
+				Vec3 bzCtrls[4];
+				bzCtrls[0] = Vec3(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
+				
+				// invert ctrl point.
+				Vec3 z(connection->ctrls[other][0], connection->ctrls[other][1], connection->ctrls[other][2]);
+				z = z - bzCtrls[0];
+				z[2] = 0.f; // isolate Z
+				z.Normalize();
+				z[2] = vPrev[2];
+
+				float len = std::min(prevLen / 4.f, kSmoothness);
+
+				bzCtrls[1] = bzCtrls[0] - (z*len);
+			
+				bzCtrls[2][0] = -ctrls[0][0];
+				bzCtrls[2][1] = -ctrls[0][1];
+				bzCtrls[2][3] = -vPrev[2];
+
+				bzCtrls[2] = cur.pos + (bzCtrls[2] * len);
+				bzCtrls[3] = cur.pos;
+
+				physics::CubicBZSpline spline(bzCtrls);
+				step.waypoints[0] = step.waypoints[1] = -1;
+				step.floors[0] = step.floors[1] = cur.floors[0];
+				step.path.Load(spline);
+				moveRoute.steps->push_back(step);
+			}		
+		} else {
+			ctrls[0] = vNext;
+		}
+
+		float len = std::min(nextLen / 4.f, kSmoothness);
+		ctrls[0] = cur.pos + (ctrls[0] * len);
+
+		if (next.waypoints[0] != -1) { // connect to waypoint
+			const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + next.waypoints[0];
+			const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + next.connection;
+			int self = connection->waypoints[1] == next.waypoints[0];
+
+			// invert ctrl point.
+			Vec3 z(connection->ctrls[self][0], connection->ctrls[self][1], connection->ctrls[self][2]);
+			z = z - next.pos;
+			z[2] = 0.f; // isolate Z
+			z.Normalize();
+			z[2] = vNext[2]; // no longer normalized
+
+			ctrls[1] = -z;
+
+		} else if (i < (kSize-2)) {
+			const WalkStep &nextNext = walkRoute[i+2];
+			Vec3 vNextNext(nextNext.pos - next.pos);
+
+			float nnLen = vNextNext.Normalize();
+
+			ctrls[1] = vNextNext + vNext;
+			// isolate Z
+			ctrls[1][2] = 0.f;
+			ctrls[1].Normalize();
+			ctrls[1][2] = vNext[2]; // no longer normalized
+				
+			ctrls[1] = -ctrls[1];
+		} else {
+			ctrls[1] = -vNext;
+		}
+
+		ctrls[1] = next.pos + (ctrls[1]*len);
+
+		physics::CubicBZSpline spline(cur.pos, ctrls[0], ctrls[1], next.pos);
+		step.floors[0] = step.floors[1] = cur.floors[0];
+		step.waypoints[0] = step.waypoints[1] = -1;
+		step.path.Load(spline);
+
+		moveRoute.steps->push_back(step);
+	}
 }
 
 bool Floors::PlanMove(
