@@ -171,10 +171,11 @@ void Floors::WalkFloor(
 
 	WalkStep step;
 	step.pos = cur.pos.m_pos;
+	step.tri = cur.pos.m_tri;
 	step.waypoints[0] = step.waypoints[1] = -1;
 	step.floors[0] = step.floors[1] = cur.pos.m_floor;
 	step.connection = -1;
-	step.required = true;
+	step.slopeChange = false;
 	routeSoFar->push_back(step);
 		
 	const bsp_file::BSPFloorTri *tri = m_bsp->FloorTris() + start.m_tri;
@@ -204,7 +205,8 @@ void Floors::WalkFloor(
 					route = routeSoFar;
 
 					step.pos = end.m_pos;
-					step.required = true;
+					step.tri = end.m_tri;
+					step.slopeChange = false;
 					route->push_back(step);
 				}
 			}
@@ -253,7 +255,8 @@ void Floors::WalkFloor(
 						cur.numVisited = 1;
 
 						step.pos = cur.pos.m_pos;
-						step.required = false;
+						step.tri = cur.pos.m_tri;
+						step.slopeChange = tri->planenum != otherTri->planenum; // preserve slopes
 						routeSoFar->push_back(step);
 
 						tri = m_bsp->FloorTris() + cur.pos.m_tri;
@@ -280,7 +283,7 @@ void Floors::WalkFloor(
 		}
 	}
 
-	OptimizeRoute(start, route);
+	OptimizeRoute(route);
 }
 
 void Floors::WalkConnection(
@@ -301,7 +304,8 @@ void Floors::WalkConnection(
 	step.waypoints[1] = otherWaypointNum;
 	step.floors[0] = (int)waypoint->floorNum;
 	step.floors[1] = (int)otherWaypoint->floorNum;
-	step.required = true;
+	step.tri = -1;
+	step.slopeChange = false;
 	route->push_back(step);
 }
 
@@ -312,10 +316,11 @@ bool Floors::FindDirectRoute(const FloorPosition &start, const FloorPosition &en
 	// follow the ray to the destination.
 	WalkStep step;
 	step.pos = start.m_pos;
+	step.tri = start.m_tri;
 	step.connection = -1;
 	step.floors[0] = step.floors[1] = start.m_floor;
 	step.waypoints[0] = step.waypoints[1] = -1;
-	step.required = true;
+	step.slopeChange = false;
 	route->push_back(step);
 	int skipEdge = -1;
 
@@ -347,6 +352,10 @@ bool Floors::FindDirectRoute(const FloorPosition &start, const FloorPosition &en
 			}
 		}
 
+		if (bestEdge == -1) {
+			int b = 0;
+		}
+
 		RAD_ASSERT(bestEdge != -1);
 		const bsp_file::BSPFloorEdge *edge = m_bsp->FloorEdges() + tri->edges[bestEdge];
 		int otherTriNum = (edge->tris[0] == cur.m_tri) ? edge->tris[1] : edge->tris[0];
@@ -359,7 +368,9 @@ bool Floors::FindDirectRoute(const FloorPosition &start, const FloorPosition &en
 		// have to add this if there is a slope change
 		if (tri->planenum != otherTri->planenum) {
 			step.pos = bestPos;
-			step.required = true;
+			step.tri = otherTriNum;
+			step.slopeChange = true;
+			route->push_back(step);
 		}
 
 		skipEdge = tri->edges[bestEdge]; // don't test this edge.
@@ -368,13 +379,62 @@ bool Floors::FindDirectRoute(const FloorPosition &start, const FloorPosition &en
 	}
 
 	step.pos = end.m_pos;
-	step.required = true;
+	step.slopeChange = false;
 	route->push_back(step);
 
 	return true;
 }
 
-void Floors::OptimizeRoute(const FloorPosition &start, WalkStep::Vec &route) {
+void Floors::OptimizeRoute(WalkStep::Vec &route) {
+	if (route->empty())
+		return;
+
+	WalkStep::Vec original(route);
+	route->clear();
+	
+	const size_t kSize = original->size();
+
+	for (size_t i = 0; i < kSize - 1; ++i) {
+		const WalkStep &curStep = original[i];
+
+		FloorPosition curPos;
+		curPos.m_floor = curStep.floors[0];
+		curPos.m_tri = curStep.tri;
+		curPos.m_pos = curStep.pos;
+		
+		for (size_t k = kSize-1; k > i; --k) {
+			const WalkStep &testStep = original[k];
+
+			if (k == (i+1)) {
+				// always a direct line between adjacent waypoints
+				route->push_back(curStep);
+				break;
+			} else {
+				
+				FloorPosition testPos;
+				testPos.m_floor = testStep.floors[0];
+				testPos.m_tri = testStep.tri;
+				testPos.m_pos = curPos.m_pos + (testStep.pos - curPos.m_pos)*2.f;
+
+				WalkStep::Vec testRoute;
+				if (FindDirectRoute(curPos, testPos, testRoute)) {
+					// direct connection between cur -> test through testRoute
+					if (testRoute->size() > 2) {
+						std::copy(testRoute->begin(), testRoute->end() - 1, std::back_inserter(*route));
+					} else {
+						route->push_back(curStep);
+					}
+
+					// advance to test pos.
+					i = k - 1; // ++ in loop
+					break;
+				}
+			}
+		}
+	}
+
+	// always emit end-point
+	route->push_back(original->back());
 }
 
 void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route &moveRoute) {
