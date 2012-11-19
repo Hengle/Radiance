@@ -130,6 +130,7 @@ private:
 	struct WalkStep {
 		typedef stackify<std::vector<WalkStep>, 64> Vec;
 		Vec3 pos;
+		bool required;
 	};
 
 	//! Finds a route from start->end when start and end are on the same floor.
@@ -145,6 +146,7 @@ private:
 		FloorMove::Route &route
 	);
 
+	bool FindDirectRoute(const FloorPosition &start, const FloorPosition &end, WalkStep::Vec &route);
 	void OptimizeRoute(const FloorPosition &start, WalkStep::Vec &route);
 	void AddWalkRoute(int floor, const WalkStep::Vec &steps, FloorMove::Route &route);
 	void SmoothRoute(FloorMove::Route &route);

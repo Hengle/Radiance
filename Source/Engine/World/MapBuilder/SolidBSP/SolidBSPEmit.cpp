@@ -668,7 +668,12 @@ int BSPBuilder::FloorBuilder::Edge::Compare(const Edge &e) const {
 	return 0;
 }
 
-int BSPBuilder::FloorBuilder::AddVert(const Vert &v) {
+int BSPBuilder::FloorBuilder::AddVert(const Vert &_v) {
+
+	Vert v;
+	for (int i = 0; i < 3; ++i)
+		v[i] = math::Floor(_v[i] + 0.5f); // round.
+
 	VertMap::const_iterator it = vmap.find(v);
 	if (it != vmap.end())
 		return it->second;

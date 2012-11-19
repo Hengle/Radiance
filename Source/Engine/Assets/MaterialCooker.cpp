@@ -250,9 +250,6 @@ int MaterialCooker::MatchTargetKeys(int flags, int allflags)
 		x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
 	}
 
-	if (!x)
-		return 0;
-
 	return x;
 }
 
