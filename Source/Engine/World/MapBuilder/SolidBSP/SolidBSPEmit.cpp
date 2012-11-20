@@ -700,6 +700,11 @@ int BSPBuilder::FloorBuilder::AddEdge(int v0, int v1, int triNum) {
 			e.v[1] = v1;
 			e.t[0] = triNum;
 			e.mid = (verts[v1] + verts[v0]) * 0.5f;
+			e.vec = (verts[v1] - verts[v0]);
+			e.vec.Normalize();
+			e.dist[0] = e.vec.Dot(verts[v0]);
+			e.dist[1] = e.vec.Dot(verts[v1]);
+
 			int edgeNum = (int)(edges.size());
 			edges.push_back(e);
 			edgeMap.insert(Edge::Map::value_type(e, edgeNum));
@@ -935,10 +940,13 @@ bool BSPBuilder::EmitBSPFloors() {
 
 			const FloorBuilder::Vert &v0 = builder.verts[edge.v[0]];
 			const FloorBuilder::Vert &v1 = builder.verts[edge.v[1]];
-			const FloorBuilder::Vert  mid = (v0 + v1) * 0.5f;
+			
+			for (int i = 0; i < 3; ++i) {
+				e->vec[i] = edge.vec[i];
+			}
 
-			for (int i = 0; i < 3; ++i)
-				e->midpoint[i] = mid[i];
+			e->dist[0] = edge.dist[0];
+			e->dist[1] = edge.dist[1];
 
 			SceneFile::Vec3 vedge(v1 - v0);
 			vedge.Normalize();

@@ -166,7 +166,8 @@ struct BSPFloorTri {
 struct BSPFloorEdge {
 	U32 verts[2];
 	S32 tris[2];
-	float midpoint[3];
+	float vec[3];
+	float dist[2];
 	U32 planenum;
 };
 

@@ -184,7 +184,7 @@ void Floors::WalkFloor(
 	
 	for (int i = 0; i < 3; ++i) {
 		const bsp_file::BSPFloorEdge *edge = m_bsp->FloorEdges() + tri->edges[i];
-		const Vec3 kMid(edge->midpoint[0], edge->midpoint[1], edge->midpoint[2]);
+		const Vec3 kMid = FindEdgePoint(cur.pos.m_pos, edge);
 		cur.edges[i].distance = (kMid-end.m_pos).MagnitudeSquared();
 		cur.edges[i].idx = i;
 		cur.edges[i].visited = false;
@@ -234,7 +234,7 @@ void Floors::WalkFloor(
 				int otherTriNum = (int)edge->tris[otherSide];
 
 				if ((otherTriNum != -1) && !visited.test(otherTriNum - (int)floor->firstTri)) {
-					Vec3 mid(edge->midpoint[0], edge->midpoint[1], edge->midpoint[2]);
+					Vec3 mid = FindEdgePoint(cur.pos.m_pos, edge);
 					
 					float d = (mid - cur.pos.m_pos).MagnitudeSquared();
 					float cost = (mid - end.m_pos).MagnitudeSquared();
@@ -268,7 +268,7 @@ void Floors::WalkFloor(
 								cur.edges[i].distance = std::numeric_limits<float>::max();
 							} else {
 								edge = m_bsp->FloorEdges() + tri->edges[i];
-								mid.Initialize(edge->midpoint[0], edge->midpoint[1], edge->midpoint[2]);
+								mid = FindEdgePoint(cur.pos.m_pos, edge);
 								cur.edges[i].visited = false;
 								cur.edges[i].distance = (mid - end.m_pos).MagnitudeSquared();
 							}
@@ -284,6 +284,29 @@ void Floors::WalkFloor(
 	}
 
 	OptimizeRoute(route);
+}
+
+Vec3 Floors::FindEdgePoint(const Vec3 &pos, const bsp_file::BSPFloorEdge *edge) {
+	
+	const Vec3 kVec(edge->vec[0], edge->vec[1], edge->vec[2]);
+	const bsp_file::BSPVertex *v0 = m_bsp->Vertices() + edge->verts[0];
+	const bsp_file::BSPVertex *v1 = m_bsp->Vertices() + edge->verts[1];
+
+	float dist = kVec.Dot(pos);
+
+	const float kPad = 8.f;
+
+	if (dist < edge->dist[0] + kPad)
+		dist = edge->dist[0] + kPad;
+	if (dist > edge->dist[1] - kPad)
+		dist = edge->dist[1] - kPad;
+
+	if ((dist < edge->dist[0]) ||
+		(dist > edge->dist[1])) { // edge is < kPad units
+			dist = (edge->dist[0] + edge->dist[1]) / 2.f;
+	}
+
+	return Vec3(v0->v[0], v0->v[1], v0->v[2]) + (kVec * (dist-edge->dist[0]));
 }
 
 void Floors::WalkConnection(
@@ -342,7 +365,7 @@ bool Floors::FindDirectRoute(const FloorPosition &start, const FloorPosition &en
 			const Plane kPlane(plane->p[0], plane->p[1], plane->p[2], plane->p[3]);
 
 			Vec3 x;
-			if (kPlane.IntersectLineSegment(x, cur.m_pos, end.m_pos)) {
+			if (kPlane.IntersectLineSegment(x, cur.m_pos, end.m_pos, 1.f)) {
 				float d = (x - cur.m_pos).MagnitudeSquared();
 				if (d < bestDist) {
 					bestDist = d;
@@ -353,7 +376,8 @@ bool Floors::FindDirectRoute(const FloorPosition &start, const FloorPosition &en
 		}
 
 		if (bestEdge == -1) {
-			int b = 0;
+			return false;
+			//FindDirectRoute(start, end, route);
 		}
 
 		RAD_ASSERT(bestEdge != -1);
@@ -414,7 +438,11 @@ void Floors::OptimizeRoute(WalkStep::Vec &route) {
 				FloorPosition testPos;
 				testPos.m_floor = testStep.floors[0];
 				testPos.m_tri = testStep.tri;
-				testPos.m_pos = curPos.m_pos + (testStep.pos - curPos.m_pos)*2.f;
+				
+				Vec3 vec(testStep.pos - curPos.m_pos);
+				vec.Normalize();
+
+				testPos.m_pos = curPos.m_pos + vec*16384.f; // ensure it crosses edges.
 
 				WalkStep::Vec testRoute;
 				if (FindDirectRoute(curPos, testPos, testRoute)) {
@@ -435,6 +463,61 @@ void Floors::OptimizeRoute(WalkStep::Vec &route) {
 
 	// always emit end-point
 	route->push_back(original->back());
+}
+
+void Floors::OptimizeRoute2(WalkStep::Vec &route) {
+	if (route->empty())
+		return;
+	
+	bool optimized = false;
+
+	do {
+		const size_t kSize = route->size();
+
+		if (kSize > 2) {
+			WalkStep::Vec original(route);
+			route->clear();
+
+			size_t i;
+			for (i = 0; i < kSize - 2; i += 2) {
+				// test direct connection between i -> (i+2) (optimize out i+1)
+				const WalkStep &curStep = original[i];
+				const WalkStep &skipStep = original[i+1];
+				const WalkStep &testStep = original[i+2];
+
+				FloorPosition curPos;
+				curPos.m_floor = curStep.floors[0];
+				curPos.m_tri = curStep.tri;
+				curPos.m_pos = curStep.pos;
+
+				FloorPosition testPos;
+				testPos.m_floor = testStep.floors[0];
+				testPos.m_tri = testStep.tri;
+
+				Vec3 vec(testStep.pos - curPos.m_pos);
+				vec.Normalize();
+
+				testPos.m_pos = curPos.m_pos + vec*16384.f; // ensure it crosses edges.
+
+				WalkStep::Vec testRoute;
+
+				if (FindDirectRoute(curPos, testPos, testRoute)) {
+					std::copy(testRoute->begin(), testRoute->end() - 1, std::back_inserter(*route));
+				} else {
+					route->push_back(curStep);
+					route->push_back(skipStep);
+				}
+			}
+
+			for (;i < kSize; ++i)
+				route->push_back(original[i]);
+
+			optimized = route->size() < original->size();
+		} else {
+			break;
+		}
+
+	} while (optimized);
 }
 
 void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route &moveRoute) {

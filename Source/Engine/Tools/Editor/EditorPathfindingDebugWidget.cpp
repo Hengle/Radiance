@@ -234,12 +234,21 @@ void PathfindingDebugWidget::DrawFloor(int floorNum, const Vec4 &color) {
 void PathfindingDebugWidget::DrawFloorTri(int triNum, const Vec4 &color) {
 	const world::bsp_file::BSPFloorTri *tri = m_bsp->FloorTris() + triNum;
 
-	glColor4f(color[0], color[1], color[2], color[3]);
-
-	glBegin(GL_LINE_LOOP);
+	glBegin(GL_LINES);
 	for (int i = 0; i < 3; ++i) {
-		const world::bsp_file::BSPVertex *v = m_bsp->Vertices() + tri->verts[i];
-		glVertex3f(v->v[0], v->v[1], v->v[2]);
+		int n = (i+1) % 3;
+		const world::bsp_file::BSPVertex *v0 = m_bsp->Vertices() + tri->verts[i];
+		const world::bsp_file::BSPVertex *v1 = m_bsp->Vertices() + tri->verts[n];
+		const world::bsp_file::BSPFloorEdge *edge = m_bsp->FloorEdges() + tri->edges[i];
+
+		if ((edge->tris[0] == -1 || edge->tris[1] == -1)) {
+			glColor4f(0.f, 0.f, 1.f, 1.f);
+		} else {
+			glColor4f(color[0], color[1], color[2], color[3]);
+		}
+
+		glVertex3f(v0->v[0], v0->v[1], v0->v[2]);
+		glVertex3f(v1->v[0], v1->v[1], v1->v[2]);
 	}
 	glEnd();
 }

@@ -152,6 +152,8 @@ private:
 
 	bool FindDirectRoute(const FloorPosition &start, const FloorPosition &end, WalkStep::Vec &route);
 	void OptimizeRoute(WalkStep::Vec &route);
+	void OptimizeRoute2(WalkStep::Vec &route);
+	Vec3 FindEdgePoint(const Vec3 &pos, const bsp_file::BSPFloorEdge *edge);
 	
 	void GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route &moveRoute);
 

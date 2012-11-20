@@ -408,6 +408,8 @@ private:
 			int v[2];
 			int t[2];
 			Vert mid;
+			Vert vec;
+			Vert::ValueType dist[2];
 
 			Edge() { 
 				t[0] = -1;
