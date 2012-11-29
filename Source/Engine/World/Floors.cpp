@@ -51,7 +51,7 @@ bool Floors::ClipToFloor(
 	const Vec3 &start,
 	const Vec3 &end,
 	FloorPosition &pos
-) {
+) const {
 	float bestDistSq = std::numeric_limits<float>::max();
 	bool r = false;
 
@@ -67,7 +67,7 @@ bool Floors::ClipToFloor(
 FloorMove::Ref Floors::CreateMove(
 	const FloorPosition &start,
 	const FloorPosition &end
-) {
+) const {
 	MovePlan plan;
 	MovePlan planStack;
 	FloorBits stack;
@@ -129,7 +129,7 @@ void Floors::WalkFloor(
 	const FloorPosition &start,
 	const FloorPosition &end,
 	WalkStep::Vec &route
-) {
+) const {
 	RAD_ASSERT(start.m_floor == end.m_floor);
 
 	if (FindDirectRoute(start, end, route))
@@ -286,7 +286,7 @@ void Floors::WalkFloor(
 	OptimizeRoute(route);
 }
 
-Vec3 Floors::FindEdgePoint(const Vec3 &pos, const bsp_file::BSPFloorEdge *edge) {
+Vec3 Floors::FindEdgePoint(const Vec3 &pos, const bsp_file::BSPFloorEdge *edge) const {
 	
 	const Vec3 kVec(edge->vec[0], edge->vec[1], edge->vec[2]);
 	const bsp_file::BSPVertex *v0 = m_bsp->Vertices() + edge->verts[0];
@@ -313,7 +313,7 @@ void Floors::WalkConnection(
 	int waypointNum,
 	int connectionNum,
 	WalkStep::Vec &route
-) {
+) const {
 	const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + connectionNum;
 	const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + waypointNum;
 
@@ -332,7 +332,7 @@ void Floors::WalkConnection(
 	route->push_back(step);
 }
 
-bool Floors::FindDirectRoute(const FloorPosition &start, const FloorPosition &end, WalkStep::Vec &route) {
+bool Floors::FindDirectRoute(const FloorPosition &start, const FloorPosition &end, WalkStep::Vec &route) const {
 
 	RAD_ASSERT(start.m_floor == end.m_floor);
 
@@ -409,7 +409,7 @@ bool Floors::FindDirectRoute(const FloorPosition &start, const FloorPosition &en
 	return true;
 }
 
-void Floors::OptimizeRoute(WalkStep::Vec &route) {
+void Floors::OptimizeRoute(WalkStep::Vec &route) const {
 	if (route->empty())
 		return;
 
@@ -465,7 +465,7 @@ void Floors::OptimizeRoute(WalkStep::Vec &route) {
 	route->push_back(original->back());
 }
 
-void Floors::OptimizeRoute2(WalkStep::Vec &route) {
+void Floors::OptimizeRoute2(WalkStep::Vec &route) const {
 	if (route->empty())
 		return;
 	
@@ -520,7 +520,7 @@ void Floors::OptimizeRoute2(WalkStep::Vec &route) {
 	} while (optimized);
 }
 
-void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route &moveRoute) {
+void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route &moveRoute) const {
 	if (walkRoute->empty())
 		return;
 
@@ -672,7 +672,7 @@ bool Floors::PlanMove(
 	MovePlan &planSoFar,
 	FloorBits stack,
 	float &bestDistance
-) {
+) const {
 	RAD_ASSERT(!stack.test(start.m_floor));
 	
 	if (start.m_floor == end.m_floor) {
@@ -757,7 +757,7 @@ bool Floors::ClipToFloor(
 	const Vec3 &end,
 	FloorPosition &pos,
 	float &bestDistSq
-) {
+) const {
 	// TODO: optimize this with a AA BSP
 	
 	const bsp_file::BSPFloor *floor = m_bsp->Floors() + floorNum;
@@ -814,3 +814,58 @@ bool Floors::ClipToFloor(
 }
 
 } // world
+
+namespace lua {
+
+void Marshal<world::FloorPosition>::Push(lua_State *L, const world::FloorPosition &val) {
+	RAD_ASSERT(L);
+	lua_createtable(L, 0, 3);
+	Marshal<Vec3>::Push(L, val.m_pos);
+	lua_setfield(L, -2, "@pos");
+	lua_pushinteger(L, (int)val.m_floor);
+	lua_setfield(L, -2, "@floor");
+	lua_pushinteger(L, (int)val.m_tri);
+	lua_setfield(L, -2, "@tri");
+}
+
+world::FloorPosition Marshal<world::FloorPosition>::Get(lua_State *L, int index, bool luaError) {
+	world::FloorPosition p;
+
+	if (lua_type(L, index) != LUA_TTABLE) {
+		if (luaError)
+			luaL_typerror(L, index, "table");
+		return p;
+	}
+
+	lua_getfield(L, index, "@pos");
+	p.m_pos = Marshal<Vec3>::Get(L, -1, luaError);
+	lua_pop(L, 1);
+
+	lua_getfield(L, index, "@floor");
+	if (lua_type(L, -1) != LUA_TNUMBER) {
+		lua_pop(L, 1);
+		if (luaError)
+			luaL_typerror(L, index, "number");
+		return p;
+	}
+	p.m_floor = (int)lua_tointeger(L, -1);
+	lua_pop(L, 1);
+
+	lua_getfield(L, index, "@tri");
+	if (lua_type(L, -1) != LUA_TNUMBER) {
+		lua_pop(L, 1);
+		if (luaError)
+			luaL_typerror(L, index, "tri");
+		return p;
+	}
+
+	p.m_tri = (int)lua_tointeger(L, -1);
+	lua_pop(L, 1);
+	return p;
+}
+
+bool Marshal<world::FloorPosition>::IsA(lua_State *L, int index) {
+	return lua_type(L, index) == LUA_TTABLE;
+}
+
+} // lua

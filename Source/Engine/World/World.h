@@ -13,6 +13,7 @@
 #include "WorldDraw.h"
 #include "WorldLua.h"
 #include "WorldCinematics.h"
+#include "Floors.h"
 #include "../Engine.h"
 #include "../Renderer/Mesh.h"
 #include "../Renderer/Material.h"
@@ -126,6 +127,9 @@ public:
 		int toArea,
 		AreaBits &visible
 	);
+
+	//! Trace a line through the world BSP.
+	bool LineTrace(Trace &trace);
 	
 	RAD_DECLARE_PROPERTY(World, viewController, Entity::Ref, Entity::Ref);
 	RAD_DECLARE_PROPERTY(World, playerPawn, Entity::Ref, Entity::Ref);
@@ -140,6 +144,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(World, lua, WorldLua*);
 	RAD_DECLARE_READONLY_PROPERTY(World, draw, WorldDraw*);
 	RAD_DECLARE_READONLY_PROPERTY(World, cinematics, WorldCinematics*);
+	RAD_DECLARE_READONLY_PROPERTY(World, floors, const Floors*);
 	RAD_DECLARE_READONLY_PROPERTY(World, pkgZone, pkg::Zone);
 	RAD_DECLARE_READONLY_PROPERTY(World, uiRoot, const ui::RootRef&);
 	RAD_DECLARE_READONLY_PROPERTY(World, destroy, bool);
@@ -295,6 +300,8 @@ private:
 		int fromArea
 	);
 
+	bool LineTrace(Trace &trace, int node);
+
 	dBSPLeaf *LeafForPoint(const Vec3 &pos);
 	dBSPLeaf *LeafForPoint(const Vec3 &pos, int nodeNum);
 
@@ -370,6 +377,10 @@ private:
 		return m_cinematics.get(); 
 	}
 
+	RAD_DECLARE_GET(floors, const Floors*) {
+		return &m_floors;
+	}
+
 	RAD_DECLARE_GET(pkgZone, pkg::Zone) { 
 		return m_pkgZone; 
 	}
@@ -427,6 +438,7 @@ private:
 	Camera m_cam;
 	WorldDraw::Ref m_draw;
 	WorldCinematics::Ref m_cinematics;
+	Floors m_floors;
 	Game *m_game;
 	WorldLua::Ref m_lua;
 	pkg::Zone m_pkgZone;

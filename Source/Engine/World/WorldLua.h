@@ -143,6 +143,9 @@ private:
 	static int lua_World_FindEntityClass(lua_State *L);
 	static int lua_World_FindEntityTargets(lua_State *L);
 	static int lua_World_BBoxTouching(lua_State *L);
+	static int lua_World_LineTrace(lua_State *L);
+	static int lua_World_ClipToFloor(lua_State *L);
+	static int lua_World_CreateFloorMove(lua_State *L);
 	static int lua_World_CreateScreenOverlay(lua_State *L);
 	static int lua_World_PostEvent(lua_State *L);
 	static int lua_World_DispatchEvent(lua_State *L);
@@ -222,5 +225,16 @@ private:
 };
 
 } // world
+
+namespace lua {
+
+template <>
+struct Marshal<world::Trace> {
+	static void Push(lua_State *L, const world::Trace &val);
+	static world::Trace Get(lua_State *L, int index, bool luaError);
+	static bool IsA(lua_State *L, int index);
+};
+
+} // lua
 
 #include <Runtime/PopPack.h>

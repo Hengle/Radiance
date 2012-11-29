@@ -89,36 +89,6 @@ private:
 		return m_bspFile; 
 	}
 
-	/*
-	==============================================================================
-	Contents & Surface Flags
-	==============================================================================
-	*/
-
-	enum ContentsFlags {
-		RAD_FLAG(kContentsFlag_Areaportal),
-		RAD_FLAG(kContentsFlag_Solid),
-		RAD_FLAG(kContentsFlag_Clip),
-		RAD_FLAG(kContentsFlag_Fog),
-		RAD_FLAG(kContentsFlag_Water),
-
-		// Not in BSP
-		RAD_FLAG(kContentsFlag_Detail),
-		RAD_FLAG(kContentsFlag_Floor),
-
-		kContentsFlag_VisibleContents = kContentsFlag_Areaportal|kContentsFlag_Solid|kContentsFlag_Clip|kContentsFlag_Fog|kContentsFlag_Water,
-		kContentsFlag_FirstVisibleContents = kContentsFlag_Areaportal,
-		kContentsFlag_LastVisibleContents = kContentsFlag_Water,
-		kContentsFlag_Structural = kContentsFlag_Solid|kContentsFlag_Areaportal, // just used for classification
-		kContentsFlag_SolidContents = kContentsFlag_Solid, // blocks portal flood
-		kContentsFlag_BSPContents = kContentsFlag_Areaportal|kContentsFlag_Solid|kContentsFlag_Clip|kContentsFlag_Fog|kContentsFlag_Water,
-		kContentsFlag_EmitContents = kContentsFlag_Detail
-	};
-
-	enum SurfaceFlags {
-		RAD_FLAG(kSurfaceFlag_NoDraw)
-	};
-
 	enum {
 		kPlaneNumLeaf = -1
 	};

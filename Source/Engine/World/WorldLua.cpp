@@ -128,6 +128,9 @@ bool WorldLua::Init() {
 		{ "FindEntityClass", lua_World_FindEntityClass },
 		{ "FindEntityTargets", lua_World_FindEntityTargets },
 		{ "BBoxTouching", lua_World_BBoxTouching },
+		{ "LineTrace", lua_World_LineTrace },
+		{ "ClipToFloor", lua_World_ClipToFloor },
+		{ "CreateFloorMove", lua_World_CreateFloorMove },
 		{ "CreateScreenOverlay", lua_World_CreateScreenOverlay },
 		{ "PostEvent", lua_World_PostEvent },
 		{ "DispatchEvent", lua_World_DispatchEvent },
@@ -868,6 +871,45 @@ int WorldLua::lua_World_BBoxTouching(lua_State *L) {
 	}
 
 	return 1;
+}
+
+int WorldLua::lua_World_LineTrace(lua_State *L) {
+	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
+	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
+
+	Trace t = lua::Marshal<Trace>::Get(L, 1, true);
+	lua_pushboolean(L, self->m_world->LineTrace(t) ? 1 : 0);
+	return 1;
+}
+
+int WorldLua::lua_World_ClipToFloor(lua_State *L) {
+
+	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
+	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
+
+	Vec3 start = lua::Marshal<Vec3>::Get(L, 1, true);
+	Vec3 end = lua::Marshal<Vec3>::Get(L, 2, true);
+
+	FloorPosition p;
+	bool r = self->m_world->floors->ClipToFloor(start, end, p);
+	lua_pushboolean(L, r ? 1 : 0);
+	if (r)
+		lua::Marshal<FloorPosition>::Push(L, p);
+	return r ? 2 : 1;
+}
+
+int WorldLua::lua_World_CreateFloorMove(lua_State *L) {
+
+	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
+	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
+
+	FloorPosition start = lua::Marshal<FloorPosition>::Get(L, 1, true);
+	FloorPosition end   = lua::Marshal<FloorPosition>::Get(L, 2, true);
+
+	FloorMove::Ref move = self->m_world->floors->CreateMove(start, end);
+	if (move)
+		move->Push(L);
+	return move ? 1 : 0;
 }
 
 int WorldLua::lua_World_CreateScreenOverlay(lua_State *L) {
@@ -1980,3 +2022,50 @@ lua::SrcBuffer::Ref WorldLua::ImportLoader::Load(lua_State *L, const char *name)
 }
 
 } // world
+
+namespace lua {
+
+void Marshal<world::Trace>::Push(lua_State *L, const world::Trace &val) {
+	lua_createtable(L, 0, 6);
+	Marshal<Vec3>::Push(L, val.start);
+	lua_setfield(L, -2, "start");
+	Marshal<Vec3>::Push(L, val.end);
+	lua_setfield(L, -2, "end");
+	Marshal<Vec3>::Push(L, val.result);
+	lua_setfield(L, -2, "result");
+	lua_pushinteger(L, val.contents);
+	lua_setfield(L, -2, "contents");
+	lua_pushnumber(L, val.frac);
+	lua_setfield(L, -2, "frac");
+	lua_pushboolean(L, val.startSolid ? 1 : 0);
+	lua_setfield(L, -2, "startSolid");
+}
+
+world::Trace Marshal<world::Trace>::Get(lua_State *L, int index, bool luaError) {
+	world::Trace t;
+	t.startSolid = false;
+	t.frac = 1.f;
+	t.contents = world::bsp_file::kContentsFlag_Solid;
+
+	lua_getfield(L, index, "start");
+	t.start = Marshal<Vec3>::Get(L, -1, luaError);
+	lua_pop(L, 1);
+
+	lua_getfield(L, index, "end");
+	t.end = Marshal<Vec3>::Get(L, -1, luaError);
+	lua_pop(L, 1);
+
+	lua_getfield(L, index, "contents");
+	if (lua_type(L, -1) == LUA_TNUMBER)
+		t.contents = (int)lua_tointeger(L, -1);
+	lua_pop(L, 1);
+
+	// we do not marshal frac or startSolid (output params only).
+	return t;
+}
+
+bool Marshal<world::Trace>::IsA(lua_State *L, int index) {
+	return lua_type(L, index) == LUA_TTABLE;
+}
+
+} // lua

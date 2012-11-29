@@ -5,8 +5,6 @@
 
 #include RADPCH
 
-#if defined(RAD_OPT_TOOLS)
-
 #include "SceneFile.h"
 #include "../COut.h"
 #include <Runtime/Runtime.h>
@@ -781,5 +779,3 @@ bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth, UIProgres
 }
 
 } // tools
-
-#endif // RAD_OPT_TOOLS

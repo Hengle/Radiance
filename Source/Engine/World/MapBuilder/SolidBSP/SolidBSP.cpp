@@ -18,6 +18,7 @@
 #undef max
 
 using namespace pkg;
+using namespace world::bsp_file;
 
 namespace tools {
 namespace solid_bsp {

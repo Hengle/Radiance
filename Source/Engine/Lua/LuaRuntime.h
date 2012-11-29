@@ -29,14 +29,13 @@ namespace lua {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS State
-{
+//! Lua State Object
+class RADENG_CLASS State {
 public:
 
 	typedef StateRef Ref;
 
-	struct Metrics
-	{
+	struct Metrics {
 		int numAllocs;
 		int smallest;
 		int biggest;
@@ -63,8 +62,8 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS SrcBuffer
-{
+//! Lua Source Code Buffer
+class RADENG_CLASS SrcBuffer {
 public:
 	typedef boost::shared_ptr<SrcBuffer> Ref;
 	virtual ~SrcBuffer() {}
@@ -79,8 +78,8 @@ protected:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS ImportLoader
-{
+//! Import resolver
+class RADENG_CLASS ImportLoader {
 public:
 	virtual ~ImportLoader() {}
 	virtual SrcBuffer::Ref Load(lua_State *L, const char *name) = 0;
@@ -94,20 +93,18 @@ struct DynamicMemTag {};
 template <int _BufSize, typename T>
 class StreamLoader;
 
+//! Loads lua code using a fixed size buffer
 template <int _BufSize>
-class StreamLoader<_BufSize, StackMemTag>
-{
+class StreamLoader<_BufSize, StackMemTag> {
 public:
 	typedef StreamLoader<_BufSize, StackMemTag> SelfType;
 	enum { BufSize = _BufSize };
 
 	StreamLoader(stream::InputStream &stream) 
-		: m_stream(&stream)
-	{
+		: m_stream(&stream) {
 	}
 
-	static const char *Read(lua_State *L, void *ud, size_t *sz)
-	{
+	static const char *Read(lua_State *L, void *ud, size_t *sz) {
 		SelfType *self = (SelfType*)ud;
 		*sz = (size_t)self->m_stream->Read(self->m_data, BufSize, 0);
 		return self->m_data;
@@ -118,26 +115,23 @@ private:
 	char m_data[BufSize];
 };
 
+//! Loads lua code using heap.
 template <int _BufSize>
-class StreamLoader<_BufSize, DynamicMemTag>
-{
+class StreamLoader<_BufSize, DynamicMemTag> {
 public:
 	typedef StreamLoader<_BufSize, DynamicMemTag> SelfType;
 	enum { BufSize = _BufSize };
 
 	StreamLoader(stream::InputStream &stream) 
-		: m_stream(&stream)
-	{
+		: m_stream(&stream) {
 		m_data = new char[BufSize];
 	}
 
-	~StreamLoader()
-	{
+	~StreamLoader() {
 		delete[] m_data;
 	}
 
-	static const char *Read(lua_State *L, void *ud, size_t *sz)
-	{
+	static const char *Read(lua_State *L, void *ud, size_t *sz) {
 		SelfType *self = (SelfType*)ud;
 		*sz = (size_t)self->m_stream->Read(self->m_data, BufSize, 0);
 		return self->m_data;
@@ -150,8 +144,13 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class Variant
-{ // int, bool, string
+//! Lua variant class using C++ reflection
+/*! A C++ type wrapped in a variant class using the Radiance reflection library. Lua tables
+    containing ints, bools, and strings can be marshalled into a Variant map and parsed by
+	the C++ runtime. This class is not designed to be performant and should be restricted to
+	tools. Variant and Variant::Map are designed to load data stored in lua files. */
+class Variant { 
+  // int, bool, string
   // does shallow copy by default, use Clone() to make a copy
 public:
 
@@ -184,8 +183,11 @@ typedef std::map<String, String> SymbolMap;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class SharedPtr : public boost::enable_shared_from_this<SharedPtr>
-{
+//! Support for shared pointer object marshaling
+/*! Objects that are contained in a boost shared pointer can derrive from this class
+    to enable type-safe marshaling to and from the lua runtime. Marshaling this object
+	from lua requires a dynamic_cast. */
+class SharedPtr : public boost::enable_shared_from_this<SharedPtr> {
 public:
 	typedef boost::shared_ptr<SharedPtr> Ref;
 
@@ -232,63 +234,57 @@ RADENG_API void RADENG_CALL UnmapUserData(lua_State *L, void *data);
 // Marshal
 //////////////////////////////////////////////////////////////////////////////////////////
 
+// You can specialize the Marshal<> struct for your custom type.
+
 template <typename T>
-struct Marshal
-{
+struct Marshal {
 	static void Push(lua_State *L, const T &val);
 	static T Get(lua_State *L, int index, bool forceType);
 	static bool IsA(lua_State *L, int index);
 };
 
 template <>
-struct Marshal<const char *>
-{
+struct Marshal<const char *> {
 	static void Push(lua_State *L, const char *val);
 	static const char *Get(lua_State *L, int index, bool forceType);
 	static bool IsA(lua_State *L, int index);
 };
 
 template <>
-struct Marshal<const wchar_t *>
-{
+struct Marshal<const wchar_t *> {
 	static void Push(lua_State *L, const wchar_t *val);
 };
 
 template <>
-struct Marshal<String>
-{
+struct Marshal<String> {
 	static void Push(lua_State *L, const String &val);
 	static String Get(lua_State *L, int index, bool forceType);
 	static bool IsA(lua_State *L, int index);
 };
 
 template <>
-struct Marshal<std::string>
-{
+struct Marshal<std::string> {
 	static void Push(lua_State *L, const std::string &val);
 	static std::string Get(lua_State *L, int index, bool forceType);
 	static bool IsA(lua_State *L, int index);
 };
 
 template <>
-struct Marshal<std::wstring>
-{
+struct Marshal<std::wstring> {
 	static void Push(lua_State *L, const std::wstring &val);
 	static std::wstring Get(lua_State *L, int index, bool forceType);
 	static bool IsA(lua_State *L, int index);
 };
 
 template <>
-struct Marshal<bool>
-{
+struct Marshal<bool> {
 	static void Push(lua_State *L, bool val);
 	static bool Get(lua_State *L, int index, bool forceType);
 	static bool IsA(lua_State *L, int index);
 };
 
 template <>
-struct Marshal<S8>
-{
+struct Marshal<S8> {
 	static void Push(lua_State *L, S8 val);
 	static S8 Get(lua_State *L, int index, bool forceType);
 	static bool IsA(lua_State *L, int index);
@@ -296,104 +292,91 @@ struct Marshal<S8>
 };
 
 template <>
-struct Marshal<U8>
-{
+struct Marshal<U8> {
 	static void Push(lua_State *L, U8 val);
 	static U8 Get(lua_State *L, int index, bool forceType);
 	static bool IsA(lua_State *L, int index);
 };
 
 template <>
-struct Marshal<S16>
-{
+struct Marshal<S16> {
 	static void Push(lua_State *L, S16 val);
 	static S16 Get(lua_State *L, int index, bool forceType);
 	static bool IsA(lua_State *L, int index);
 };
 
 template <>
-struct Marshal<U16>
-{
+struct Marshal<U16> {
 	static void Push(lua_State *L, U16 val);
 	static U16 Get(lua_State *L, int index, bool forceType);
 	static bool IsA(lua_State *L, int index);
 };
 
 template <>
-struct Marshal<S32>
-{
+struct Marshal<S32> {
 	static void Push(lua_State *L, S32 val);
 	static S32 Get(lua_State *L, int index, bool forceType);
 	static bool IsA(lua_State *L, int index);
 };
 
 template <>
-struct Marshal<U32>
-{
+struct Marshal<U32> {
 	static void Push(lua_State *L, U32 val);
 	static U32 Get(lua_State *L, int index, bool forceType);
 	static bool IsA(lua_State *L, int index);
 };
 
 template <>
-struct Marshal<S64>
-{
+struct Marshal<S64> {
 	static void Push(lua_State *L, S64 val);
 	static S64 Get(lua_State *L, int index, bool forceType);
 	static bool IsA(lua_State *L, int index);
 };
 
 template <>
-struct Marshal<U64>
-{
+struct Marshal<U64> {
 	static void Push(lua_State *L, U64 val);
 	static U64 Get(lua_State *L, int index, bool forceType);
 	static bool IsA(lua_State *L, int index);
 };
 
 template <>
-struct Marshal<F32>
-{
+struct Marshal<F32> {
 	static void Push(lua_State *L, F32 val);
 	static F32 Get(lua_State *L, int index, bool forceType);
 	static bool IsA(lua_State *L, int index);
 };
 
 template <>
-struct Marshal<F64>
-{
+struct Marshal<F64> {
 	static void Push(lua_State *L, F64 val);
 	static F64 Get(lua_State *L, int index, bool forceType);
 	static bool IsA(lua_State *L, int index);
 };
 
 template <>
-struct Marshal<Vec2>
-{
+struct Marshal<Vec2> {
 	static void Push(lua_State *L, const Vec2 &val);
 	static Vec2 Get(lua_State *L, int index, bool luaError);
 	static bool IsA(lua_State *L, int index);
 };
 
 template <>
-struct Marshal<Vec3>
-{
+struct Marshal<Vec3> {
 	static void Push(lua_State *L, const Vec3 &val);
 	static Vec3 Get(lua_State *L, int index, bool luaError);
 	static bool IsA(lua_State *L, int index);
 };
 
 template <>
-struct Marshal<Vec4>
-{
+struct Marshal<Vec4> {
 	static void Push(lua_State *L, const Vec4 &val);
 	static Vec4 Get(lua_State *L, int index, bool luaError);
 	static bool IsA(lua_State *L, int index);
 };
 
 template <typename T>
-struct Marshal<boost::shared_ptr<T> >
-{
+struct Marshal<boost::shared_ptr<T> > {
 	static void Push(lua_State *L, const boost::shared_ptr<T> &ptr, int id);
 	static boost::shared_ptr<T> Get(lua_State *L, int index, int id, bool luaError);
 	static bool IsA(lua_State *L, int index, int id);
@@ -402,8 +385,7 @@ private:
 };
 
 template <>
-struct Marshal< ::reflect::Reflected>
-{
+struct Marshal< ::reflect::Reflected> {
 	static void Push(lua_State *L, const ::reflect::Reflected &val);
 	static ::reflect::Reflected Get(lua_State *L, int index);
 };

@@ -10,6 +10,7 @@
 #include "../Types.h"
 #include "BSPFile.h"
 #include "../Physics/BezierSpline.h"
+#include "../Lua/LuaRuntime.h"
 #include <Runtime/Container/StackVector.h>
 #include <Runtime/PushPack.h>
 #include <bitset>
@@ -18,6 +19,7 @@ namespace world {
 
 class World;
 class Floors;
+class FloorPosition;
 
 enum {
 	kMaxFloors = 64,
@@ -26,6 +28,21 @@ enum {
 
 typedef std::bitset<kMaxFloors> FloorBits;
 typedef std::bitset<kMaxFloorTris> FloorTriBits;
+
+} // world
+
+namespace lua {
+
+template <>
+struct Marshal<world::FloorPosition> {
+	static void Push(lua_State *L, const world::FloorPosition &val);
+	static world::FloorPosition Get(lua_State *L, int index, bool luaError);
+	static bool IsA(lua_State *L, int index);
+};
+
+} // lua
+
+namespace world {
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -38,6 +55,7 @@ public:
 
 private:
 	friend class Floors;
+	friend struct lua::Marshal<FloorPosition>;
 
 	RAD_DECLARE_GET(pos, const Vec3 &) {
 		return m_pos;
@@ -58,7 +76,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS FloorMove {
+class RADENG_CLASS FloorMove : public lua::SharedPtr {
 public:
 	typedef boost::shared_ptr<FloorMove> Ref;
 	typedef physics::CachedCubicBZSpline<8> Spline;
@@ -118,12 +136,12 @@ public:
 		const Vec3 &start,
 		const Vec3 &end,
 		FloorPosition &pos
-	);
+	) const;
 
 	FloorMove::Ref CreateMove(
 		const FloorPosition &start,
 		const FloorPosition &end
-	);
+	) const;
 
 private:
 
@@ -142,20 +160,20 @@ private:
 		const FloorPosition &start,
 		const FloorPosition &end,
 		WalkStep::Vec &route
-	);
+	) const;
 
 	void WalkConnection(
 		int waypoint,
 		int connection,
 		WalkStep::Vec &route
-	);
+	) const;
 
-	bool FindDirectRoute(const FloorPosition &start, const FloorPosition &end, WalkStep::Vec &route);
-	void OptimizeRoute(WalkStep::Vec &route);
-	void OptimizeRoute2(WalkStep::Vec &route);
-	Vec3 FindEdgePoint(const Vec3 &pos, const bsp_file::BSPFloorEdge *edge);
+	bool FindDirectRoute(const FloorPosition &start, const FloorPosition &end, WalkStep::Vec &route) const;
+	void OptimizeRoute(WalkStep::Vec &route) const;
+	void OptimizeRoute2(WalkStep::Vec &route) const;
+	Vec3 FindEdgePoint(const Vec3 &pos, const bsp_file::BSPFloorEdge *edge) const;
 	
-	void GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route &moveRoute);
+	void GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route &moveRoute) const;
 
 	//! A step in a planned move
 	struct MoveStep {
@@ -179,7 +197,7 @@ private:
 		MovePlan &planSoFar,
 		FloorBits stack,
 		float &bestDistance
-	);
+	) const;
 
 	//! Clips a ray to the specified floor.
 	/*! Returns true and the position of the closest intersection with the floor, otherwise false. */
@@ -189,7 +207,7 @@ private:
 		const Vec3 &end,
 		FloorPosition &pos,
 		float &bestDistSq
-	);
+	) const;
 
 	bsp_file::BSPFile::Ref m_bsp;
 };

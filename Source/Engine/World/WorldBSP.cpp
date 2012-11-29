@@ -6,6 +6,7 @@
 #include RADPCH
 #include "World.h"
 #include "../MathUtils.h"
+#include <algorithm>
 
 namespace world {
 
@@ -484,6 +485,98 @@ void World::MakeBoundingPlanes(const Vec3 &pos, const StackWinding &portal, Plan
 
 		planes.push_back(p);
 	}
+}
+
+bool World::LineTrace(Trace &trace) {
+
+	const dBSPLeaf *leaf = LeafForPoint(trace.start);
+	if (!leaf) {
+		trace.startSolid = true;
+		trace.contents = bsp_file::kContentsFlag_Solid;
+		trace.result = trace.start;
+		trace.frac = 0.f;
+		return false;
+	}
+
+	if (leaf->contents & trace.contents) {
+		trace.contents = leaf->contents;
+		trace.startSolid = true;
+		trace.result = trace.start;
+		trace.frac = 0.f;
+		return false;
+	}
+
+	trace.startSolid = false;
+	trace.result = trace.start;
+	trace.frac = 1.f;
+
+	if (m_nodes.empty())
+		return LineTrace(trace, -1);
+	return LineTrace(trace, 0);
+}
+
+bool World::LineTrace(Trace &trace, int nodeNum) {
+	if (nodeNum < 0) {
+		int leafNum = -(nodeNum + 1);
+		const dBSPLeaf &leaf = m_leafs[leafNum];
+
+		// it's gonna hit this leaf.
+		if (leaf.contents&trace.contents) {
+			trace.contents = leaf.contents;
+		} else {
+			trace.contents = 0;
+			trace.frac = 1.f;
+			trace.result = trace.end;
+		}
+
+		return trace.frac == 1.f;
+	}
+
+	// trace from result->end
+	const dBSPNode &node = m_nodes[nodeNum];
+	const Plane &plane = m_planes[node.planenum];
+
+	Plane::SideType sides[2];
+	sides[0] = plane.Side(trace.result);
+	sides[1] = plane.Side(trace.end);
+
+	if (sides[0] == Plane::On)
+		sides[0] = sides[1];
+	if (sides[1] == Plane::On)
+		sides[1] = sides[0];
+
+	if (sides[0] == sides[1]) {
+		if (sides[0] == Plane::On) {
+			sides[0] = Plane::Front;
+			sides[1] = Plane::Front;
+		} else {
+			// all on one side
+			return LineTrace(trace, node.children[sides[0] == Plane::Back]);
+		}
+	}
+
+	if (!LineTrace(trace, node.children[sides[0] == Plane::Back]))
+		return false; // hit on result side
+	
+	if (sides[1] != sides[0]) {
+		// cross
+		Vec3 result;
+		if (plane.IntersectLineSegment(result, trace.result, trace.end)) {
+			float l = (trace.end - trace.start).MagnitudeSquared();
+			float d = (result - trace.start).MagnitudeSquared();
+			float frac = (l != 0.f) ? (d / l) : 1.f;
+			std::swap(trace.result, result);
+			std::swap(trace.frac, frac);
+			bool r = LineTrace(trace, node.children[sides[1] == Plane::Back]);
+			if (r) { // did not intersect
+				trace.result = result; // restore.
+				trace.frac = frac;
+			}
+			return r;
+		}
+	}
+
+	return true;
 }
 
 

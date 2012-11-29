@@ -105,6 +105,15 @@ struct dAreaportal {
 	BBox bounds;
 };
 
+struct Trace {
+	Vec3 start;
+	Vec3 end;
+	Vec3 result;
+	int contents;
+	float frac;
+	bool startSolid;
+};
+
 class World;
 class WorldLua;
 class WorldDraw;

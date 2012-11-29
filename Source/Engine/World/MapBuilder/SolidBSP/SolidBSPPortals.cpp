@@ -8,6 +8,8 @@
 #include RADPCH
 #include "SolidBsp.h"
 
+using namespace world::bsp_file;
+
 namespace tools {
 namespace solid_bsp {
 
