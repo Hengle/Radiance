@@ -288,9 +288,14 @@ void Floors::WalkFloor(
 
 Vec3 Floors::FindEdgePoint(const Vec3 &pos, const bsp_file::BSPFloorEdge *edge) const {
 	
+#if 0
 	const Vec3 kVec(edge->vec[0], edge->vec[1], edge->vec[2]);
 	const bsp_file::BSPVertex *v0 = m_bsp->Vertices() + edge->verts[0];
-	const bsp_file::BSPVertex *v1 = m_bsp->Vertices() + edge->verts[1];
+
+	return Vec3(v0->v[0], v0->v[1], v0->v[2]) + (kVec * (edge->dist[1]-edge->dist[0]) * 0.5f);
+#else
+	const Vec3 kVec(edge->vec[0], edge->vec[1], edge->vec[2]);
+	const bsp_file::BSPVertex *v0 = m_bsp->Vertices() + edge->verts[0];
 
 	float dist = kVec.Dot(pos);
 
@@ -303,10 +308,11 @@ Vec3 Floors::FindEdgePoint(const Vec3 &pos, const bsp_file::BSPFloorEdge *edge) 
 
 	if ((dist < edge->dist[0]) ||
 		(dist > edge->dist[1])) { // edge is < kPad units
-			dist = (edge->dist[0] + edge->dist[1]) / 2.f;
+			dist = (edge->dist[0] + edge->dist[1]) * 0.5f;
 	}
 
 	return Vec3(v0->v[0], v0->v[1], v0->v[2]) + (kVec * (dist-edge->dist[0]));
+#endif
 }
 
 void Floors::WalkConnection(
