@@ -114,7 +114,7 @@ inline float CachedCubicBZSpline<tNumPts>::SmoothMotion::Eval(const CachedCubicB
 	m_d += distance;
 	float d = m_d;
 
-	const SplinePoint *point = &spline.m_pts[m_idx];
+	const Point *point = &spline.m_pts[m_idx];
 
 	while (d >= (point->offset+point->length)) {
 		d -= point->offset;

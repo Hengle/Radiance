@@ -1075,6 +1075,33 @@
 		338CDFBB15BC9B970058DFF5 /* PlaneDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8853315B9ACBE0089BA08 /* PlaneDef.h */; };
 		338CDFBC15BC9B970058DFF5 /* Quaternion.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8853415B9ACBE0089BA08 /* Quaternion.h */; };
 		338CDFBD15BC9B970058DFF5 /* QuaternionDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8853615B9ACBE0089BA08 /* QuaternionDef.h */; };
+		33988F9816684EA60018C3E6 /* Floors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988F9616684EA60018C3E6 /* Floors.cpp */; };
+		33988F9916684EA60018C3E6 /* Floors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988F9616684EA60018C3E6 /* Floors.cpp */; };
+		33988F9A16684EA60018C3E6 /* Floors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988F9616684EA60018C3E6 /* Floors.cpp */; };
+		33988F9B16684EA60018C3E6 /* Floors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988F9616684EA60018C3E6 /* Floors.cpp */; };
+		33988F9C16684EA60018C3E6 /* Floors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988F9616684EA60018C3E6 /* Floors.cpp */; };
+		33988F9D16684EA60018C3E6 /* Floors.h in Headers */ = {isa = PBXBuildFile; fileRef = 33988F9716684EA60018C3E6 /* Floors.h */; };
+		33988F9E16684EA60018C3E6 /* Floors.h in Headers */ = {isa = PBXBuildFile; fileRef = 33988F9716684EA60018C3E6 /* Floors.h */; };
+		33988F9F16684EA60018C3E6 /* Floors.h in Headers */ = {isa = PBXBuildFile; fileRef = 33988F9716684EA60018C3E6 /* Floors.h */; };
+		33988FA016684EA60018C3E6 /* Floors.h in Headers */ = {isa = PBXBuildFile; fileRef = 33988F9716684EA60018C3E6 /* Floors.h */; };
+		33988FA116684EA60018C3E6 /* Floors.h in Headers */ = {isa = PBXBuildFile; fileRef = 33988F9716684EA60018C3E6 /* Floors.h */; };
+		33988FA616684F1C0018C3E6 /* BezierSpline_inl.h in Headers */ = {isa = PBXBuildFile; fileRef = 33988FA316684F1C0018C3E6 /* BezierSpline_inl.h */; };
+		33988FA716684F1C0018C3E6 /* BezierSpline_inl.h in Headers */ = {isa = PBXBuildFile; fileRef = 33988FA316684F1C0018C3E6 /* BezierSpline_inl.h */; };
+		33988FA816684F1C0018C3E6 /* BezierSpline_inl.h in Headers */ = {isa = PBXBuildFile; fileRef = 33988FA316684F1C0018C3E6 /* BezierSpline_inl.h */; };
+		33988FA916684F1C0018C3E6 /* BezierSpline_inl.h in Headers */ = {isa = PBXBuildFile; fileRef = 33988FA316684F1C0018C3E6 /* BezierSpline_inl.h */; };
+		33988FAA16684F1C0018C3E6 /* BezierSpline_inl.h in Headers */ = {isa = PBXBuildFile; fileRef = 33988FA316684F1C0018C3E6 /* BezierSpline_inl.h */; };
+		33988FAB16684F1C0018C3E6 /* BezierSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988FA416684F1C0018C3E6 /* BezierSpline.cpp */; };
+		33988FAC16684F1C0018C3E6 /* BezierSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988FA416684F1C0018C3E6 /* BezierSpline.cpp */; };
+		33988FAD16684F1C0018C3E6 /* BezierSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988FA416684F1C0018C3E6 /* BezierSpline.cpp */; };
+		33988FAE16684F1C0018C3E6 /* BezierSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988FA416684F1C0018C3E6 /* BezierSpline.cpp */; };
+		33988FAF16684F1C0018C3E6 /* BezierSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988FA416684F1C0018C3E6 /* BezierSpline.cpp */; };
+		33988FB016684F1C0018C3E6 /* BezierSpline.h in Headers */ = {isa = PBXBuildFile; fileRef = 33988FA516684F1C0018C3E6 /* BezierSpline.h */; };
+		33988FB116684F1C0018C3E6 /* BezierSpline.h in Headers */ = {isa = PBXBuildFile; fileRef = 33988FA516684F1C0018C3E6 /* BezierSpline.h */; };
+		33988FB216684F1C0018C3E6 /* BezierSpline.h in Headers */ = {isa = PBXBuildFile; fileRef = 33988FA516684F1C0018C3E6 /* BezierSpline.h */; };
+		33988FB316684F1C0018C3E6 /* BezierSpline.h in Headers */ = {isa = PBXBuildFile; fileRef = 33988FA516684F1C0018C3E6 /* BezierSpline.h */; };
+		33988FB416684F1C0018C3E6 /* BezierSpline.h in Headers */ = {isa = PBXBuildFile; fileRef = 33988FA516684F1C0018C3E6 /* BezierSpline.h */; };
+		33988FB716684F980018C3E6 /* EditorPathfindingDebugWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988FB516684F980018C3E6 /* EditorPathfindingDebugWidget.cpp */; };
+		33988FB816684F980018C3E6 /* EditorPathfindingDebugWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 33988FB616684F980018C3E6 /* EditorPathfindingDebugWidget.h */; };
 		339BA57F1636F3000017FD79 /* SIMD_neon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339BA57E1636F3000017FD79 /* SIMD_neon.cpp */; };
 		339BA5801636F3000017FD79 /* SIMD_neon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339BA57E1636F3000017FD79 /* SIMD_neon.cpp */; };
 		33DB15771627E31F00963A33 /* SceneFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33DB15751627E31F00963A33 /* SceneFile.cpp */; };
@@ -2813,6 +2840,13 @@
 		338CDF0815BC8F140058DFF5 /* RadianceShipDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceShipDebugOSX.xcconfig; path = XCConfig/RadianceShipDebugOSX.xcconfig; sourceTree = "<group>"; };
 		338CDF0915BC8F140058DFF5 /* RadianceShipReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceShipReleaseiOS.xcconfig; path = XCConfig/RadianceShipReleaseiOS.xcconfig; sourceTree = "<group>"; };
 		338CDF0A15BC8F140058DFF5 /* RadianceShipReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceShipReleaseOSX.xcconfig; path = XCConfig/RadianceShipReleaseOSX.xcconfig; sourceTree = "<group>"; };
+		33988F9616684EA60018C3E6 /* Floors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Floors.cpp; sourceTree = "<group>"; };
+		33988F9716684EA60018C3E6 /* Floors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Floors.h; sourceTree = "<group>"; };
+		33988FA316684F1C0018C3E6 /* BezierSpline_inl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BezierSpline_inl.h; sourceTree = "<group>"; };
+		33988FA416684F1C0018C3E6 /* BezierSpline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierSpline.cpp; sourceTree = "<group>"; };
+		33988FA516684F1C0018C3E6 /* BezierSpline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BezierSpline.h; sourceTree = "<group>"; };
+		33988FB516684F980018C3E6 /* EditorPathfindingDebugWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorPathfindingDebugWidget.cpp; sourceTree = "<group>"; };
+		33988FB616684F980018C3E6 /* EditorPathfindingDebugWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorPathfindingDebugWidget.h; sourceTree = "<group>"; };
 		339BA57E1636F3000017FD79 /* SIMD_neon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SIMD_neon.cpp; sourceTree = "<group>"; };
 		33DB15751627E31F00963A33 /* SceneFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SceneFile.cpp; sourceTree = "<group>"; };
 		33DB15761627E31F00963A33 /* SceneFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneFile.h; sourceTree = "<group>"; };
@@ -4489,6 +4523,9 @@
 		33E887D815B9BA480089BA08 /* Physics */ = {
 			isa = PBXGroup;
 			children = (
+				33988FA316684F1C0018C3E6 /* BezierSpline_inl.h */,
+				33988FA416684F1C0018C3E6 /* BezierSpline.cpp */,
+				33988FA516684F1C0018C3E6 /* BezierSpline.h */,
 				33E887D915B9BA480089BA08 /* Spring.cpp */,
 				33E887DA15B9BA480089BA08 /* Spring.h */,
 			);
@@ -4647,6 +4684,8 @@
 				33E8889715B9BA490089BA08 /* PropertyGrid */,
 				33DB1609162FB28700963A33 /* EditorBSPDebugWidget.cpp */,
 				33DB160A162FB28700963A33 /* EditorBSPDebugWidget.h */,
+				33988FB516684F980018C3E6 /* EditorPathfindingDebugWidget.cpp */,
+				33988FB616684F980018C3E6 /* EditorPathfindingDebugWidget.h */,
 				33E8886715B9BA490089BA08 /* EditorComboCheckBox.cpp */,
 				33E8886815B9BA490089BA08 /* EditorComboCheckBox.h */,
 				33E8886915B9BA490089BA08 /* EditorCookerDialog.cpp */,
@@ -4808,6 +4847,8 @@
 				33E888CD15B9BA4A0089BA08 /* EntityDef.h */,
 				33E888CE15B9BA4A0089BA08 /* EntityPhysics.cpp */,
 				33E888CF15B9BA4A0089BA08 /* Event.h */,
+				33988F9616684EA60018C3E6 /* Floors.cpp */,
+				33988F9716684EA60018C3E6 /* Floors.h */,
 				33E888D015B9BA4A0089BA08 /* Keys.cpp */,
 				33E888D115B9BA4A0089BA08 /* Keys.h */,
 				33E8890015B9BA4A0089BA08 /* MBatchDraw.h */,
@@ -5300,6 +5341,9 @@
 				33FA7E8D1633B97D002603A5 /* RBackendDef.h in Headers */,
 				33FA7E9B1633B97D002603A5 /* RGLBackend.h in Headers */,
 				33FA82B01635489F002603A5 /* Tokenizer.h in Headers */,
+				33988F9F16684EA60018C3E6 /* Floors.h in Headers */,
+				33988FA816684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
+				33988FB216684F1C0018C3E6 /* BezierSpline.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5677,6 +5721,9 @@
 				33FA7E8E1633B97D002603A5 /* RBackendDef.h in Headers */,
 				33FA7E9C1633B97D002603A5 /* RGLBackend.h in Headers */,
 				33FA82B11635489F002603A5 /* Tokenizer.h in Headers */,
+				33988FA016684EA60018C3E6 /* Floors.h in Headers */,
+				33988FA916684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
+				33988FB316684F1C0018C3E6 /* BezierSpline.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6132,6 +6179,10 @@
 				33FA7E8B1633B97D002603A5 /* RBackendDef.h in Headers */,
 				33FA7E991633B97D002603A5 /* RGLBackend.h in Headers */,
 				33FA82AE1635489F002603A5 /* Tokenizer.h in Headers */,
+				33988F9D16684EA60018C3E6 /* Floors.h in Headers */,
+				33988FA616684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
+				33988FB016684F1C0018C3E6 /* BezierSpline.h in Headers */,
+				33988FB816684F980018C3E6 /* EditorPathfindingDebugWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6509,6 +6560,9 @@
 				33FA7E8C1633B97D002603A5 /* RBackendDef.h in Headers */,
 				33FA7E9A1633B97D002603A5 /* RGLBackend.h in Headers */,
 				33FA82AF1635489F002603A5 /* Tokenizer.h in Headers */,
+				33988F9E16684EA60018C3E6 /* Floors.h in Headers */,
+				33988FA716684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
+				33988FB116684F1C0018C3E6 /* BezierSpline.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6886,6 +6940,9 @@
 				33FA80CF1633CA28002603A5 /* RBackendDef.h in Headers */,
 				33FA80D01633CA28002603A5 /* RGLBackend.h in Headers */,
 				33FA82B21635489F002603A5 /* Tokenizer.h in Headers */,
+				33988FA116684EA60018C3E6 /* Floors.h in Headers */,
+				33988FAA16684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
+				33988FB416684F1C0018C3E6 /* BezierSpline.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7234,6 +7291,8 @@
 				33FA7E911633B97D002603A5 /* RBGLAssets.cpp in Sources */,
 				33FA7E961633B97D002603A5 /* RGLBackend.cpp in Sources */,
 				33FA82AB1635489F002603A5 /* Tokenizer.cpp in Sources */,
+				33988F9A16684EA60018C3E6 /* Floors.cpp in Sources */,
+				33988FAD16684F1C0018C3E6 /* BezierSpline.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7390,6 +7449,8 @@
 				33FA7E921633B97D002603A5 /* RBGLAssets.cpp in Sources */,
 				33FA7E971633B97D002603A5 /* RGLBackend.cpp in Sources */,
 				33FA82AC1635489F002603A5 /* Tokenizer.cpp in Sources */,
+				33988F9B16684EA60018C3E6 /* Floors.cpp in Sources */,
+				33988FAE16684F1C0018C3E6 /* BezierSpline.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7626,6 +7687,9 @@
 				33FA7E8F1633B97D002603A5 /* RBGLAssets.cpp in Sources */,
 				33FA7E941633B97D002603A5 /* RGLBackend.cpp in Sources */,
 				33FA82A91635489F002603A5 /* Tokenizer.cpp in Sources */,
+				33988F9816684EA60018C3E6 /* Floors.cpp in Sources */,
+				33988FAB16684F1C0018C3E6 /* BezierSpline.cpp in Sources */,
+				33988FB716684F980018C3E6 /* EditorPathfindingDebugWidget.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7782,6 +7846,8 @@
 				33FA7E951633B97D002603A5 /* RGLBackend.cpp in Sources */,
 				33FA82AA1635489F002603A5 /* Tokenizer.cpp in Sources */,
 				339BA57F1636F3000017FD79 /* SIMD_neon.cpp in Sources */,
+				33988F9916684EA60018C3E6 /* Floors.cpp in Sources */,
+				33988FAC16684F1C0018C3E6 /* BezierSpline.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7938,6 +8004,8 @@
 				33FA7F5B1633CA28002603A5 /* RGLBackend.cpp in Sources */,
 				33FA82AD1635489F002603A5 /* Tokenizer.cpp in Sources */,
 				339BA5801636F3000017FD79 /* SIMD_neon.cpp in Sources */,
+				33988F9C16684EA60018C3E6 /* Floors.cpp in Sources */,
+				33988FAF16684F1C0018C3E6 /* BezierSpline.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
