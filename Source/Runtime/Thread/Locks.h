@@ -27,20 +27,20 @@ public:
 
 		Sync(EventMutex &m);
 
-		void wait();
+		void Wait();
 
-		bool timedWait(const boost::system_time &wait_until);
-		bool timedWait(const boost::xtime &wait_until);
+		bool TimedWait(const boost::system_time &wait_until);
+		bool TimedWait(const boost::xtime &wait_until);
 
 		template <typename duration_type>
-		bool timedWait(const duration_type &wait_duration);
+		bool TimedWait(const duration_type &wait_duration);
 	
 	private:
 
 		typedef boost::unique_lock<boost::mutex> Lock;
 
-		void inc();
-		bool ready();
+		void Inc();
+		bool Ready();
 
 		Lock L;
 		EventMutex &m_x;
@@ -50,15 +50,15 @@ public:
 
 	// Do not call the notify functions while you have a Sync object you will deadlock.
 
-	void notifyOne();
-	void notifyAll();
+	void NotifyOne();
+	void NotifyAll();
 
 private:
 	
 	typedef boost::unique_lock<boost::mutex> Lock;
 
-	void inc();
-	bool ready();
+	void Inc();
+	bool Ready();
 
 	friend class Sync;
 
@@ -88,7 +88,7 @@ public:
 	//
 	// Wait for gate to be "opened".
 	//
-	bool Wait(UReg timeout = Infinite) const;
+	bool Wait(U32 timeout = Infinite) const;
 
 	//
 	// Open the gate. If "autoCloseSingleRelease" is true, then one waiting thread will
@@ -134,7 +134,7 @@ public:
 	Semaphore(int count = 0);
 
 	void Put();
-	int Get(UReg timeout = Infinite, bool clear=false); // returns count obtained (useful on clear).
+	int Get(U32 timeout = Infinite, bool clear=false); // returns count obtained (useful on clear).
 	int Reset(); // returns count at time of reset.
 
 private:
@@ -253,6 +253,39 @@ public:
         return source!=0;
     }
 };
+
+///////////////////////////////////////////////////////////////////////////////
+// no concept in boost for a optionally scoped guards
+///////////////////////////////////////////////////////////////////////////////
+
+template <typename Mutex>
+class scoped_lock_guard {
+private:
+    Mutex* m;
+    explicit scoped_lock_guard(const scoped_lock_guard&);
+    scoped_lock_guard& operator=(scoped_lock_guard&);
+
+public:
+	scoped_lock_guard() : m(0) {}
+
+    ~scoped_lock_guard()
+    {
+		if (m)
+			m->unlock();
+    }
+
+	void lock(Mutex &_m)
+	{
+		adopt(_m);
+		_m.lock();
+	}
+
+	void adopt(Mutex &_m)
+	{
+		m = &_m;
+	}
+};
+
 
 } // thread
 

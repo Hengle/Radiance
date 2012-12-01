@@ -77,7 +77,7 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 			world::World::Ref world = m_mapAsset->world;
 			if (world)
 			{
-				world->sound->tick(elapsed/1000.f, false);
+				world->sound->Tick(elapsed/1000.f, false);
 				Draw(game, elapsed/1000.f);
 			}
 		}

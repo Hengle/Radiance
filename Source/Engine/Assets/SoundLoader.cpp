@@ -31,7 +31,7 @@ int SoundLoader::Process(
 	{
 		if (m_id)
 		{
-			engine.sys->alDriver->sync_deleteBuffers(ALDRIVER_SIG 1, &m_id);
+			engine.sys->alDriver->SyncDeleteBuffers(ALDRIVER_SIG 1, &m_id);
 			ZSound.Get().Dec(m_size, 0);
 		}
 		m_id = 0;
@@ -45,7 +45,7 @@ int SoundLoader::Process(
 			if (!parser || !parser->header)
 				return SR_ParseError;
 
-			if (!engine.sys->alDriver->sync_genBuffers(ALDRIVER_SIG 1, &m_id))
+			if (!engine.sys->alDriver->SyncGenBuffers(ALDRIVER_SIG 1, &m_id))
 				return SR_ErrorGeneric;
 
 			RAD_ASSERT(m_id);
@@ -69,7 +69,7 @@ int SoundLoader::Process(
 			
 			m_size = parser->header->numBytes;
 			
-			bool r = engine.sys->alDriver->sync_bufferData(
+			bool r = engine.sys->alDriver->SyncBufferData(
 				ALDRIVER_SIG
 				m_id,
 				alFormat,

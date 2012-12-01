@@ -208,7 +208,7 @@ bool Game::LoadMapSeq(int id, int slot, world::UnloadDisposition ud, bool play)
 		{ // tick music
 			world::World::Ref world = mapAsset->world;
 			if (world)
-				world->sound->tick(elapsed/1000.f, false);
+				world->sound->Tick(elapsed/1000.f, false);
 		}
 	}
 

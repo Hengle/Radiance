@@ -25,7 +25,7 @@ int T_SoundPrecache::PushResult(lua_State *L)
 	if (result != pkg::SR_Success)
 		return 0;
 
-	Sound::Ref sound = world->sound->newSound(
+	Sound::Ref sound = world->sound->NewSound(
 		asset,
 		m_maxInstances
 	);

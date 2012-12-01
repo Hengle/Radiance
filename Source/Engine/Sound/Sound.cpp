@@ -32,13 +32,12 @@ SoundContext::StreamCallback::StreamCallback(SoundContext &ctx) :
 ALDriver::Callback(ctx.m_alDriver), m_ctx(ctx) {
 }
 
-void SoundContext::StreamCallback::tick(ALDriver &alDriver) {
-	if (m_ctx.tickStreams(alDriver))
-		alDriver.wake(); // don't sleep we are still working.
+void SoundContext::StreamCallback::Tick(ALDriver &alDriver) {
+	if (m_ctx.TickStreams(alDriver))
+		alDriver.Wake(); // don't sleep we are still working.
 }
 
-
-SoundContext::Ref SoundContext::create(const ALDriver::Ref &driver) {
+SoundContext::Ref SoundContext::New(const ALDriver::Ref &driver) {
 	return SoundContext::Ref(new (ZSound) SoundContext(driver));
 }
 
@@ -59,17 +58,17 @@ m_distanceModel(AL_INVERSE_DISTANCE_CLAMPED) {
 	distanceModel = AL_LINEAR_DISTANCE_CLAMPED; // set distance model.
 
 	float f[6] = { 1, 0, 0, 0, 0, 1 };
-	driver->listenerfv(ALDRIVER_SIG AL_ORIENTATION, f);
+	driver->Listenerfv(ALDRIVER_SIG AL_ORIENTATION, f);
 
 	m_streamCallback.reset(new (ZSound) StreamCallback(*this));
-	driver->addCallback(*m_streamCallback);
+	driver->AddCallback(*m_streamCallback);
 }
 
 SoundContext::~SoundContext() {
 	m_streamCallback.reset(); // make sure we aren't in tickStreams before we start cleaning up.
 }
 
-void SoundContext::pauseAll(bool pause) {
+void SoundContext::PauseAll(bool pause) {
 	for (int i = 0; i < SC_Max; ++i) {
 		Channel &channel = m_channels[i];
 
@@ -86,13 +85,13 @@ void SoundContext::pauseAll(bool pause) {
 				Source *source = *it2;
 				RAD_ASSERT(source&&source->sound);
 				if (source->paused != pause)
-					source->sound->pause(*source, pause);
+					source->sound->Pause(*source, pause);
 			}
 		}
 	}
 }
 
-void SoundContext::stopAll() {
+void SoundContext::StopAll() {
 
 	for (int i = 0; i < SC_Max; ++i) {
 		Channel &channel = m_channels[i];
@@ -104,7 +103,7 @@ void SoundContext::stopAll() {
 			for (Source::List::iterator it = list.begin(); it != list.end();) {
 				Source *source = *it;
 				RAD_ASSERT(source&&source->sound);
-				source->sound->stop(*source);
+				source->sound->Stop(*source);
 				Source::List::iterator next = it; ++next;
 				list.erase(it);
 				it = next;
@@ -117,7 +116,7 @@ void SoundContext::stopAll() {
 	}
 }
 
-void SoundContext::tick(float dt, bool positional)
+void SoundContext::Tick(float dt, bool positional)
 {
 	if (m_alDriver->suspended)
 		return;
@@ -135,17 +134,17 @@ void SoundContext::tick(float dt, bool positional)
 	{
 		if (m_volume[3] != m_volume[0]) {
 			m_volume[3] = m_volume[0];
-			m_alDriver->listenerf(ALDRIVER_SIG AL_GAIN, m_volume[0]);
+			m_alDriver->Listenerf(ALDRIVER_SIG AL_GAIN, m_volume[0]);
 		}
 
 		if (m_pos[1] != m_pos[0]) {
 			m_pos[1] = m_pos[0];
-			m_alDriver->listener3f(ALDRIVER_SIG AL_POSITION, m_pos[0][0], m_pos[0][1], m_pos[0][2]);
+			m_alDriver->Listener3f(ALDRIVER_SIG AL_POSITION, m_pos[0][0], m_pos[0][1], m_pos[0][2]);
 		}
 
 		if (m_vel[1] != m_vel[0]) {
 			m_vel[1] = m_vel[0];
-			m_alDriver->listener3f(ALDRIVER_SIG AL_VELOCITY, m_vel[0][0], m_vel[0][1], m_vel[0][2]);
+			m_alDriver->Listener3f(ALDRIVER_SIG AL_VELOCITY, m_vel[0][0], m_vel[0][1], m_vel[0][2]);
 		}
 
 		if (m_rot[1] != m_rot[0]) {
@@ -162,7 +161,7 @@ void SoundContext::tick(float dt, bool positional)
 				 up[0],  up[1],  up[2]
 			};
 
-			m_alDriver->listenerfv(ALDRIVER_SIG AL_ORIENTATION, f);
+			m_alDriver->Listenerfv(ALDRIVER_SIG AL_ORIENTATION, f);
 		}
 	}
 
@@ -191,12 +190,12 @@ void SoundContext::tick(float dt, bool positional)
 				RAD_ASSERT(source&&source->sound);
 
 				if (!source->paused && source->play && !source->stream) {
-					m_alDriver->sourcePlay(ALDRIVER_SIG source->source);
+					m_alDriver->SourcePlay(ALDRIVER_SIG source->source);
 					source->play = false;
 					source->status = AL_PLAYING;
 				}
 
-				if (source->sound->tick(dt, channel, *source, positional)) {
+				if (source->sound->Tick(dt, channel, *source, positional)) {
 					UpgradeToWriteLock WL(L);
 					Source::List::iterator next = it; ++next;
 					list.erase(it);
@@ -213,7 +212,7 @@ void SoundContext::tick(float dt, bool positional)
 	}
 }
 
-int SoundContext::tickStreams(ALDriver &driver)
+int SoundContext::TickStreams(ALDriver &driver)
 {
 	int numBusy = 0;
 
@@ -222,10 +221,10 @@ int SoundContext::tickStreams(ALDriver &driver)
 	for (Source::List::const_iterator it = m_streams.begin(); it != m_streams.end();) {
 		Source *s = *it; ++it; // we may unmap this and invalidate it
 		RAD_ASSERT(s->stream);
-		Sound::StreamResult r = s->sound->tickStream(*s);
+		Sound::StreamResult r = s->sound->TickStream(*s);
 		if (r == Sound::kStreamResult_Finished) {
 			UpgradeToWriteLock WL(L);
-			unmapSource(*s);
+			UnmapSource(*s);
 		} else if (r == Sound::kStreamResult_Decoding) {
 			++numBusy;
 		}
@@ -234,7 +233,7 @@ int SoundContext::tickStreams(ALDriver &driver)
 	return numBusy;
 }
 
-void SoundContext::fadeMasterVolume(float volume, float time) {
+void SoundContext::FadeMasterVolume(float volume, float time) {
 	if (time > 0.f) {
 		m_volume[1] = m_volume[0];
 		m_volume[2] = volume;
@@ -246,7 +245,7 @@ void SoundContext::fadeMasterVolume(float volume, float time) {
 	}
 }
 
-void SoundContext::fadeChannelVolume(SoundChannel c, float volume, float time) {
+void SoundContext::FadeChannelVolume(SoundChannel c, float volume, float time) {
 	Channel &channel = m_channels[c];
 
 	if (time > 0.f) {
@@ -260,7 +259,7 @@ void SoundContext::fadeChannelVolume(SoundChannel c, float volume, float time) {
 	}
 }
 
-void SoundContext::pauseChannel(SoundChannel c, bool pause) {
+void SoundContext::PauseChannel(SoundChannel c, bool pause) {
 	const Source::Map &map = m_channels[c].sources;
 
 	for (Source::Map::const_iterator it = map.begin(); it != map.end(); ++it) {
@@ -269,14 +268,14 @@ void SoundContext::pauseChannel(SoundChannel c, bool pause) {
 		for (Source::List::const_iterator it = list.begin(); it != list.end(); ++it) {
 			Source *source = *it;
 			if (source->paused != pause)
-				source->sound->pause(*source, pause);
+				source->sound->Pause(*source, pause);
 		}
 	}
 }
 
-void SoundContext::setDoppler(float dopplerFactor, float speedOfSound) {
-	m_alDriver->dopplerFactor(ALDRIVER_SIG dopplerFactor);
-	m_alDriver->speedOfSound(ALDRIVER_SIG speedOfSound);
+void SoundContext::SetDoppler(float dopplerFactor, float speedOfSound) {
+	m_alDriver->DopplerFactor(ALDRIVER_SIG dopplerFactor);
+	m_alDriver->SpeedOfSound(ALDRIVER_SIG speedOfSound);
 }
 
 void SoundContext::RAD_IMPLEMENT_SET(distanceModel)(ALenum value) {
@@ -284,16 +283,16 @@ void SoundContext::RAD_IMPLEMENT_SET(distanceModel)(ALenum value) {
 		return;
 	m_distanceModel = value;
 
-	m_alDriver->distanceModel(ALDRIVER_SIG value);
+	m_alDriver->DistanceModel(ALDRIVER_SIG value);
 }
 
-bool SoundContext::evict(int priority) {
+bool SoundContext::Evict(int priority) {
 	Source::Map::iterator end = m_sources.lower_bound(priority);
 
 	for (Source::Map::iterator it = m_sources.begin(); it != end; ++it) {
 		Source::List &list = it->second;
 		if (!list.empty()) {
-			unmapSource(**list.begin());
+			UnmapSource(**list.begin());
 			return true;
 		}
 	}
@@ -301,14 +300,14 @@ bool SoundContext::evict(int priority) {
 	return false;
 }
 
-bool SoundContext::mapSource(Source &source) {
+bool SoundContext::MapSource(Source &source) {
 	RAD_ASSERT(!source.mapped);
 	RAD_ASSERT(source.channel >= SC_First && source.channel < SC_Max);
 
 	WriteLock L(m_m);
 	
 	if (m_numSources >= kMaxSimultaneousSounds) {
-		if (!evict(source.priority))
+		if (!Evict(source.priority))
 			return false;
 	}
 	
@@ -334,7 +333,7 @@ bool SoundContext::mapSource(Source &source) {
 	return true;
 }
 
-void SoundContext::unmapSource(Source &source) {
+void SoundContext::UnmapSource(Source &source) {
 	RAD_ASSERT(m_numSources>0);
 	RAD_ASSERT(source.mapped);
 	
@@ -344,29 +343,29 @@ void SoundContext::unmapSource(Source &source) {
 		 m_streams.erase(source.it[2]);
 
 	source.mapped = false;
-	source.sound->stop(source);
+	source.sound->Stop(source);
 	--m_numSources;
 }
 
-Sound::Ref SoundContext::newSound(ALuint buffer, int maxInstances) {
+Sound::Ref SoundContext::NewSound(ALuint buffer, int maxInstances) {
 	RAD_ASSERT(maxInstances>0);
 	Sound::Ref s(new (ZSound) Sound());
-	if (!s->init(shared_from_this(), buffer, maxInstances))
+	if (!s->Init(shared_from_this(), buffer, maxInstances))
 		return Sound::Ref();
 	return s;
 }
 
-Sound::Ref SoundContext::newSound(const pkg::AssetRef &sound, int maxInstances)
+Sound::Ref SoundContext::NewSound(const pkg::AssetRef &sound, int maxInstances)
 {
 	ClearALErrors();
 	RAD_ASSERT(maxInstances>0);
 	Sound::Ref s(new (ZSound) Sound());
 
 	if (sound->type == asset::AT_Sound) {
-		if (!s->init(shared_from_this(), sound, maxInstances))
+		if (!s->Init(shared_from_this(), sound, maxInstances))
 			return Sound::Ref();
 	} else {
-		if (!s->initStreaming(shared_from_this(), sound))
+		if (!s->InitStreaming(shared_from_this(), sound))
 			return Sound::Ref();
 	}
 
@@ -414,19 +413,19 @@ Sound::~Sound() {
 			SoundContext::Source &source = *it;
 			if (source.mapped) {
 				SoundContext::WriteLock L(ctx->m_m);
-				ctx->unmapSource(source);
+				ctx->UnmapSource(source);
 			}
 
 			if (source.source)
-				m_alDriver->sync_deleteSources(ALDRIVER_SIG 1, &source.source);
+				m_alDriver->SyncDeleteSources(ALDRIVER_SIG 1, &source.source);
 		}
 
 		for (int i = 0; i < kNumStreamingBuffers; ++i) {
 			if (m_sbufs[i])
-				m_alDriver->sync_deleteBuffers(ALDRIVER_SIG 1, &m_sbufs[i]);
+				m_alDriver->SyncDeleteBuffers(ALDRIVER_SIG 1, &m_sbufs[i]);
 		}
 
-		// NOTE: in Sound::tick we issue a custom ALDriver command that queries that status
+		// NOTE: in Sound::Tick we issue a custom ALDriver command that queries the status
 		// of the source (alSourcei(AL_SOURCE_STATUS). This is an asynchronous command that
 		// writes to a member of a Source object contained in the m_sources[] vector of this
 		// object.
@@ -434,7 +433,7 @@ Sound::~Sound() {
 		// There is no chance of contention here (or crashing because we write to this
 		// data after the destructor is finished) because in order for us to issue this command
 		// the source must have a valid openAL source/buffer attached. That means we call
-		// ALDriver::deleteSources() & ALDriver::deleteBuffers() which are both synchronous operations
+		// ALDriver::DeleteSources() & ALDriver::DeleteBuffers() which are both synchronous operations
 		// and therefore our custom command is guaranteed to be executed before the destructor returns
 
 	}
@@ -451,7 +450,7 @@ Sound::~Sound() {
 		zone_free(m_blockData);
 }
 
-bool Sound::init(
+bool Sound::Init(
 	const SoundContext::Ref &ctx,
 	ALuint buffer,
 	int maxInstances
@@ -465,10 +464,10 @@ bool Sound::init(
 		source.idx = i;
 		source.sound = this;
 		
-		if (!m_alDriver->sync_genSources(ALDRIVER_SIG 1, &source.source))
+		if (!m_alDriver->SyncGenSources(ALDRIVER_SIG 1, &source.source))
 			return false;
-		m_alDriver->sourcei(ALDRIVER_SIG source.source, AL_BUFFER, buffer);
-		m_alDriver->sourcei(ALDRIVER_SIG source.source, AL_SOURCE_RELATIVE, AL_TRUE);
+		m_alDriver->Sourcei(ALDRIVER_SIG source.source, AL_BUFFER, buffer);
+		m_alDriver->Sourcei(ALDRIVER_SIG source.source, AL_SOURCE_RELATIVE, AL_TRUE);
 	}
 
 	m_ctx = ctx;
@@ -479,7 +478,7 @@ bool Sound::init(
 	return true;
 }
 
-bool Sound::init(
+bool Sound::Init(
 	const SoundContext::Ref &ctx,
 	const pkg::AssetRef &asset,
 	int maxInstances
@@ -487,13 +486,13 @@ bool Sound::init(
 	if (asset->type != asset::AT_Sound)
 		return false;
 	asset::SoundLoader::Ref loader = asset::SoundLoader::Cast(asset);
-	if (!init(ctx, loader->id, maxInstances))
+	if (!Init(ctx, loader->id, maxInstances))
 		return false;
 	m_asset = asset;
 	return true;
 }
 
-bool Sound::initStreaming(
+bool Sound::InitStreaming(
 	const SoundContext::Ref &ctx,
 	const pkg::AssetRef &asset
 ) {
@@ -522,7 +521,7 @@ bool Sound::initStreaming(
 	m_eos = false;
 	m_alDriver = ctx->m_alDriver;
 
-	if (!m_alDriver->sync_genBuffers(ALDRIVER_SIG kNumStreamingBuffers, m_sbufs))
+	if (!m_alDriver->SyncGenBuffers(ALDRIVER_SIG kNumStreamingBuffers, m_sbufs))
 		return false;
 	ZMusic.Get().Inc(kNumStreamingBuffers*kStreamingBufferSize, 0);
 
@@ -539,9 +538,9 @@ bool Sound::initStreaming(
 	source.sound = this;
 	source.stream = true;
 
-	if (!m_alDriver->sync_genSources(ALDRIVER_SIG 1, &source.source))
+	if (!m_alDriver->SyncGenSources(ALDRIVER_SIG 1, &source.source))
 		return false;
-	m_alDriver->sourcei(ALDRIVER_SIG source.source, AL_SOURCE_RELATIVE, AL_TRUE);
+	m_alDriver->Sourcei(ALDRIVER_SIG source.source, AL_SOURCE_RELATIVE, AL_TRUE);
 	
 	m_ctx = ctx;
 	m_asset = asset;
@@ -552,7 +551,7 @@ bool Sound::initStreaming(
 	return true;
 }
 
-void Sound::fadeVolume(float volume, float time)
+void Sound::FadeVolume(float volume, float time)
 {
 	if (time > 0.f) {
 		m_volume[1] = m_volume[0];
@@ -565,11 +564,11 @@ void Sound::fadeVolume(float volume, float time)
 	}
 }
 
-bool Sound::play(SoundChannel c, int priority) {
+bool Sound::Play(SoundChannel c, int priority) {
 	SoundContext::Ref ctx = m_ctx.lock();
 	if (!ctx)
 		return false;
-	if (ctx->channelIsPaused(c))
+	if (ctx->ChannelIsPaused(c))
 		return false;
 	if(m_loop && m_playing>0)
 		return true; // already playing.
@@ -582,7 +581,7 @@ bool Sound::play(SoundChannel c, int priority) {
 			source.priority = priority;
 			source.channel = c;
 			source.paused = false;
-			if (!ctx->mapSource(source))
+			if (!ctx->MapSource(source))
 				return false;
 			source.play = true;
 			++m_playing; // will start playing via SoundContext::Tick
@@ -593,7 +592,7 @@ bool Sound::play(SoundChannel c, int priority) {
 	return m_playing>0;
 }
 
-void Sound::pause(bool pause) {
+void Sound::Pause(bool pause) {
 	SoundContext::Ref ctx = m_ctx.lock();
 	if (!ctx)
 		return;
@@ -601,13 +600,13 @@ void Sound::pause(bool pause) {
 	for (SourceVec::iterator it = m_sources.begin(); it != m_sources.end(); ++it) {
 		SoundContext::Source &source = *it;
 		if (source.mapped && source.paused != pause) {
-			if (!ctx->channelIsPaused(source.channel) || pause)
-				this->pause(source, pause);
+			if (!ctx->ChannelIsPaused(source.channel) || pause)
+				this->Pause(source, pause);
 		}
 	}
 }
 
-void Sound::rewind() {
+void Sound::Rewind() {
 	SoundContext::Ref ctx = m_ctx.lock();
 	if (!ctx)
 		return;
@@ -616,7 +615,7 @@ void Sound::rewind() {
 		SoundContext::Source &source = *it;
 		if (source.mapped) {
 			SoundContext::WriteLock L(ctx->m_m);
-			ctx->unmapSource(source);
+			ctx->UnmapSource(source);
 		}
 
 		if (!source.source)
@@ -629,10 +628,10 @@ void Sound::rewind() {
 
 			// iOS5 bug, just delete the source entirely.
 			if (source.source) {
-				m_alDriver->sync_deleteSources(ALDRIVER_SIG 1, &source.source);
-				m_alDriver->sync_genSources(ALDRIVER_SIG 1, &source.source);
+				m_alDriver->SyncDeleteSources(ALDRIVER_SIG 1, &source.source);
+				m_alDriver->SyncGenSources(ALDRIVER_SIG 1, &source.source);
 				RAD_ASSERT(source.source);
-				m_alDriver->sourcei(
+				m_alDriver->Sourcei(
 					ALDRIVER_SIG 
 					source.source, 
 					AL_SOURCE_RELATIVE, 
@@ -645,12 +644,12 @@ void Sound::rewind() {
 			memcpy(m_rbufs, m_sbufs, sizeof(ALuint)*kNumStreamingBuffers);
 			m_eos = false;
 		} else {
-			m_alDriver->sourceRewind(ALDRIVER_SIG source.source);
+			m_alDriver->SourceRewind(ALDRIVER_SIG source.source);
 		}
 	}
 }
 
-void Sound::stop() {
+void Sound::Stop() {
 	SoundContext::Ref ctx = m_ctx.lock();
 	if (!ctx)
 		return;
@@ -659,12 +658,12 @@ void Sound::stop() {
 		SoundContext::Source &source = *it;
 		if (source.mapped) {
 			SoundContext::WriteLock L(ctx->m_m);
-			ctx->unmapSource(source);
+			ctx->UnmapSource(source);
 		}
 	}
 }
 
-bool Sound::tick(
+bool Sound::Tick(
 	float dt, 
 	const SoundContext::Channel &channel,
 	SoundContext::Source &source,
@@ -681,7 +680,7 @@ bool Sound::tick(
 		for (SourceVec::iterator it = m_sources.begin(); it != m_sources.end(); ++it) {
 			SoundContext::Source &source = *it;
 			if (source.source) {
-				m_alDriver->source3f(
+				m_alDriver->Source3f(
 					ALDRIVER_SIG 
 					source.source, 
 					AL_POSITION,
@@ -698,7 +697,7 @@ bool Sound::tick(
 		for (SourceVec::iterator it = m_sources.begin(); it != m_sources.end(); ++it) {
 			SoundContext::Source &source = *it;
 			if (source.source) {
-				m_alDriver->source3f(
+				m_alDriver->Source3f(
 					ALDRIVER_SIG
 					source.source, 
 					AL_VELOCITY, 
@@ -719,7 +718,7 @@ bool Sound::tick(
 		for (SourceVec::iterator it = m_sources.begin(); it != m_sources.end(); ++it) {
 			SoundContext::Source &source = *it;
 			if (source.source) {
-				m_alDriver->source3f(
+				m_alDriver->Source3f(
 					ALDRIVER_SIG 
 					source.source, 
 					AL_DIRECTION, 
@@ -746,7 +745,7 @@ bool Sound::tick(
 		for (SourceVec::iterator it = m_sources.begin(); it != m_sources.end(); ++it) {
 			SoundContext::Source &source = *it;
 			if (source.source)
-				m_alDriver->sourcef(ALDRIVER_SIG source.source, AL_GAIN, m_volume[3]);
+				m_alDriver->Sourcef(ALDRIVER_SIG source.source, AL_GAIN, m_volume[3]);
 		}
 	}
 
@@ -764,28 +763,28 @@ bool Sound::tick(
 	}
 
 	if (source.status == AL_PAUSED && !m_paused && !channel.paused) {
-		m_alDriver->sourcePlay(ALDRIVER_SIG source.source);
+		m_alDriver->SourcePlay(ALDRIVER_SIG source.source);
 		source.status = AL_PLAYING;
 	} else {
-		ALDriver::Command *cmd = m_alDriver->createCommand(&fn_getSourceStatus);
+		ALDriver::Command *cmd = m_alDriver->CreateCommand(&fn_GetSourceStatus);
 		ALDRIVER_CMD_SIG_SRC(*cmd);
 		cmd->args.pvoid = &source;
-		m_alDriver->submit(*cmd);
+		m_alDriver->Submit(*cmd);
 	}
 
 	return false;
 }
 
-void Sound::fn_getSourceStatus(ALDriver &driver, ALDriver::Command *cmd) {
+void Sound::fn_GetSourceStatus(ALDriver &driver, ALDriver::Command *cmd) {
 	SoundContext::Source *source = reinterpret_cast<SoundContext::Source*>(cmd->args.pvoid);
 	ALint status;
 	alGetSourcei(source->source, AL_SOURCE_STATE, &status);
 	source->status = status;
 	CHECK_AL_ERRORS(*cmd);
-	driver.destroyCommand(cmd);
+	driver.DestroyCommand(cmd);
 }
 
-Sound::StreamResult Sound::tickStream(SoundContext::Source &source)
+Sound::StreamResult Sound::TickStream(SoundContext::Source &source)
 { // NOTE: Called on ALDriver thread, safe to call OpenAL directly in this function.
 	SoundContext::Ref ctx = m_ctx.lock();
 	if (!ctx)
@@ -886,7 +885,7 @@ Sound::StreamResult Sound::tickStream(SoundContext::Source &source)
 	return kStreamResult_Decoding;
 }
 
-void Sound::pause(SoundContext::Source &source, bool pause)
+void Sound::Pause(SoundContext::Source &source, bool pause)
 {
 	RAD_ASSERT(source.source);
 	RAD_ASSERT(source.paused != pause);
@@ -895,14 +894,14 @@ void Sound::pause(SoundContext::Source &source, bool pause)
 	if (pause) {
 		++m_paused;
 		if (source.source)
-			m_alDriver->sourcePause(ALDRIVER_SIG source.source);
+			m_alDriver->SourcePause(ALDRIVER_SIG source.source);
 	} else {
 		--m_paused;
 		// will resume in SoundContext::Tick();
 	}
 }
 
-void Sound::stop(SoundContext::Source &source)
+void Sound::Stop(SoundContext::Source &source)
 {
 	RAD_ASSERT(source.source);
 	RAD_ASSERT(m_playing>0);
@@ -912,7 +911,7 @@ void Sound::stop(SoundContext::Source &source)
 	}
 	
 	if (source.source)
-		m_alDriver->sourceStop(ALDRIVER_SIG source.source);
+		m_alDriver->SourceStop(ALDRIVER_SIG source.source);
 
 	--m_playing;
 }
@@ -933,7 +932,7 @@ void Sound::RAD_IMPLEMENT_SET(loop)(bool value)
 	for (SourceVec::iterator it = m_sources.begin(); it != m_sources.end(); ++it) {
 		SoundContext::Source &source = *it;
 		if (source.source) {
-			m_alDriver->sourcei(
+			m_alDriver->Sourcei(
 				ALDRIVER_SIG 
 				source.source, 
 				AL_LOOPING, 
@@ -956,15 +955,17 @@ void Sound::RAD_IMPLEMENT_SET(sourceRelative)(bool value)
 	for (SourceVec::iterator it = m_sources.begin(); it != m_sources.end(); ++it) {
 		SoundContext::Source &source = *it;
 		if (source.source) {
-			m_alDriver->sourcei(
+			m_alDriver->Sourcei(
 				ALDRIVER_SIG
 				source.source, 
 				AL_SOURCE_RELATIVE, 
 				value ? AL_TRUE : AL_FALSE
 			);
 			
-			if (!value) // force muted until we tick
-				m_alDriver->sourcef(ALDRIVER_SIG source.source, AL_GAIN, 0.f);
+			if (!value) { // force muted until we tick
+				m_alDriver->Sourcef(ALDRIVER_SIG source.source, AL_GAIN, 0.f);
+				m_volume[3] = 0.f;
+			}
 		}
 	}
 }
@@ -981,7 +982,7 @@ void Sound::RAD_IMPLEMENT_SET(innerAngle)(float value) {
 	for (SourceVec::iterator it = m_sources.begin(); it != m_sources.end(); ++it) {
 		SoundContext::Source &source = *it;
 		if (source.source) {
-			m_alDriver->sourcef(
+			m_alDriver->Sourcef(
 				ALDRIVER_SIG 
 				source.source, 
 				AL_CONE_INNER_ANGLE, 
@@ -1003,7 +1004,7 @@ void Sound::RAD_IMPLEMENT_SET(outerAngle)(float value) {
 	for (SourceVec::iterator it = m_sources.begin(); it != m_sources.end(); ++it) {
 		SoundContext::Source &source = *it;
 		if (source.source)
-			m_alDriver->sourcef(ALDRIVER_SIG source.source, AL_CONE_OUTER_ANGLE, value);
+			m_alDriver->Sourcef(ALDRIVER_SIG source.source, AL_CONE_OUTER_ANGLE, value);
 	}
 }
 
@@ -1019,7 +1020,7 @@ void Sound::RAD_IMPLEMENT_SET(outerVolume)(float value) {
 	for (SourceVec::iterator it = m_sources.begin(); it != m_sources.end(); ++it) {
 		SoundContext::Source &source = *it;
 		if (source.source)
-			m_alDriver->sourcef(ALDRIVER_SIG source.source, AL_CONE_OUTER_GAIN, value);
+			m_alDriver->Sourcef(ALDRIVER_SIG source.source, AL_CONE_OUTER_GAIN, value);
 	}
 }
 
@@ -1035,7 +1036,7 @@ void Sound::RAD_IMPLEMENT_SET(minVolume)(float value) {
 	for (SourceVec::iterator it = m_sources.begin(); it != m_sources.end(); ++it) {
 		SoundContext::Source &source = *it;
 		if (source.source) {
-			m_alDriver->sourcef(
+			m_alDriver->Sourcef(
 				ALDRIVER_SIG 
 				source.source, 
 				AL_MIN_GAIN, 
@@ -1057,7 +1058,7 @@ void Sound::RAD_IMPLEMENT_SET(maxVolume)(float value) {
 	for (SourceVec::iterator it = m_sources.begin(); it != m_sources.end(); ++it) {
 		SoundContext::Source &source = *it;
 		if (source.source) {
-			m_alDriver->sourcef(
+			m_alDriver->Sourcef(
 				ALDRIVER_SIG
 				source.source, 
 				AL_MAX_GAIN, 
@@ -1079,7 +1080,7 @@ void Sound::RAD_IMPLEMENT_SET(pitch)(float value) {
 	for (SourceVec::iterator it = m_sources.begin(); it != m_sources.end(); ++it) {
 		SoundContext::Source &source = *it;
 		if (source.source)
-			m_alDriver->sourcef(ALDRIVER_SIG source.source, AL_PITCH, value);
+			m_alDriver->Sourcef(ALDRIVER_SIG source.source, AL_PITCH, value);
 	}
 }
 
@@ -1095,7 +1096,7 @@ void Sound::RAD_IMPLEMENT_SET(rolloff)(float value) {
 	for (SourceVec::iterator it = m_sources.begin(); it != m_sources.end(); ++it) {
 		SoundContext::Source &source = *it;
 		if (source.source)
-			m_alDriver->sourcef(ALDRIVER_SIG source.source, AL_ROLLOFF_FACTOR, value);
+			m_alDriver->Sourcef(ALDRIVER_SIG source.source, AL_ROLLOFF_FACTOR, value);
 	}
 }
 
@@ -1111,7 +1112,7 @@ void Sound::RAD_IMPLEMENT_SET(refDistance)(float value) {
 	for (SourceVec::iterator it = m_sources.begin(); it != m_sources.end(); ++it) {
 		SoundContext::Source &source = *it;
 		if (source.source)
-			m_alDriver->sourcef(ALDRIVER_SIG source.source, AL_REFERENCE_DISTANCE, value);
+			m_alDriver->Sourcef(ALDRIVER_SIG source.source, AL_REFERENCE_DISTANCE, value);
 	}
 }
 
@@ -1127,6 +1128,6 @@ void Sound::RAD_IMPLEMENT_SET(maxDistance)(float value) {
 	for (SourceVec::iterator it = m_sources.begin(); it != m_sources.end(); ++it) {
 		SoundContext::Source &source = *it;
 		if (source.source)
-			m_alDriver->sourcef(ALDRIVER_SIG source.source, AL_MAX_DISTANCE, value);
+			m_alDriver->Sourcef(ALDRIVER_SIG source.source, AL_MAX_DISTANCE, value);
 	}
 }

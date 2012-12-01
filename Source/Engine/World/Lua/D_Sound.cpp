@@ -145,7 +145,7 @@ int D_Sound::lua_Paused(lua_State *L)
 int D_Sound::lua_FadeVolume(lua_State *L)
 {
 	Ref self = Get<D_Sound>(L, "D_Sound", 1, true);
-	self->sound->fadeVolume(
+	self->sound->FadeVolume(
 		(float)luaL_checknumber(L, 2),
 		(float)luaL_checknumber(L, 3)
 	);
@@ -159,7 +159,7 @@ int D_Sound::lua_Play(lua_State *L)
 	if (c < SC_First || c >= SC_Max)
 		luaL_error(L, "Invalid sound channel number %d", c);
 
-	bool r = self->sound->play(
+	bool r = self->sound->Play(
 		(SoundChannel)c,
 		(int)luaL_checkinteger(L, 3)
 	);
@@ -171,21 +171,21 @@ int D_Sound::lua_Play(lua_State *L)
 int D_Sound::lua_Pause(lua_State *L)
 {
 	Ref self = Get<D_Sound>(L, "D_Sound", 1, true);
-	self->sound->pause(lua_toboolean(L, 2) ? true : false);
+	self->sound->Pause(lua_toboolean(L, 2) ? true : false);
 	return 0;
 }
 
 int D_Sound::lua_Rewind(lua_State *L)
 {
 	Ref self = Get<D_Sound>(L, "D_Sound", 1, true);
-	self->sound->rewind();
+	self->sound->Rewind();
 	return 0;
 }
 
 int D_Sound::lua_Stop(lua_State *L)
 {
 	Ref self = Get<D_Sound>(L, "D_Sound", 1, true);
-	self->sound->stop();
+	self->sound->Stop();
 	return 0;
 }
 

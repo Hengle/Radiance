@@ -237,14 +237,12 @@ void __IOS_SoundSessionCallback(void *ud, UInt32 state)
 	if (kAudioSessionBeginInterruption == state)
 	{
 		AudioSessionSetActive(NO);
-		App::Get()->engine->sys->soundDevice->Unbind();
 	}
 	else if (kAudioSessionEndInterruption == state)
 	{
 		UInt32 category = kAudioSessionCategory_SoloAmbientSound;
 		AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(category), &category);
 		AudioSessionSetActive(YES);
-		App::Get()->engine->sys->soundDevice->Bind();
 	}
 }
 

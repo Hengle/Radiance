@@ -82,7 +82,7 @@ bool Engine::PreInit()
 	sys->paks->Initialize(sys->files);
 
 	sys->r->Initialize();
-	m_comTable.alDriver = ALDriver::create(ALDRIVER_SIG 0);
+	m_comTable.alDriver = ALDriver::New(ALDRIVER_SIG 0);
 
 	if (!m_comTable.alDriver)
 	{

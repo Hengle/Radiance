@@ -8,12 +8,11 @@
 
 using xtime::duration;
 
-
 namespace thread {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void EventMutex::notifyOne() {
+void EventMutex::NotifyOne() {
 	Lock L(m_m);
 	if (m_waiting < 1)
 		return;
@@ -22,7 +21,7 @@ void EventMutex::notifyOne() {
 	m_c.notify_one();
 }
 
-void EventMutex::notifyAll() {
+void EventMutex::NotifyAll() {
 	Lock L(m_m);
 	if (m_waiting < 1 )
 		return;
@@ -36,7 +35,7 @@ void EventMutex::notifyAll() {
 //
 // Wait for gate to be "opened".
 //
-bool Gate::Wait(UReg timeout) const
+bool Gate::Wait(U32 timeout) const
 {
 	Lock l(m_x);
 
@@ -165,7 +164,7 @@ void Semaphore::Put()
 	m_gate.Open();
 }
 
-int Semaphore::Get(UReg timeout, bool clear)
+int Semaphore::Get(U32 timeout, bool clear)
 {
 	xtime::TimeVal start = xtime::ReadMilliseconds();
 	int r = 0;

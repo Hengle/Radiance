@@ -13,7 +13,6 @@
 #include <OpenAL/al.h>
 #include <OpenAL/alc.h>
 
-
 #if defined(RAD_OPT_ALERRORS)
 
 #define ALDRIVER_SIG __FILE__, __LINE__,
@@ -53,12 +52,10 @@ bool CheckALErrors(const char *file, int line);
 
 
 //! Multithreaded OpenAL driver command stream.
-/*! Some platforms have problems when AL functions are issued from different threads even
-	when the API is properly synchronized. This class encapsulates an openAL device & context
-	and issues all API commands from one thread. A mechanism is provided to do periodic
-	processing to perform streaming buffer operations (music). 
-	
-	All functions are asychrnous except for addCallback() and functions that start with sync_ .
+/*! This class is designed to minimize the locking and thread contention during music
+	streaming. Streaming sounds must be decoded and queued on a seperate thread forcing
+	all calls into OpenAL to be synchronized. The ALDriver is an AL command stream that
+	runs on its own thread where all AL commands are submitted and music streaming occurs.
 */
 class ALDriver : protected thread::Thread {
 public:
@@ -83,7 +80,7 @@ public:
 		Callback(const ALDriver::Ref &driver);
 		~Callback();
 		
-		virtual void tick(ALDriver &driver) = 0;
+		virtual void Tick(ALDriver &driver) = 0;
 
 	private:
 
@@ -93,38 +90,38 @@ public:
 	~ALDriver();
 
 	//! Creates an alDriver object.
-	static Ref create(ALDRIVER_PARAMS const char *deviceName);
+	static Ref New(ALDRIVER_PARAMS const char *deviceName);
 
 	//! Adds a processing callback.
-	void addCallback(Callback &callback);
+	void AddCallback(Callback &callback);
 	
 	//! alcProcessContext
-	void sync_process(ALDRIVER_VOID_PARAMS);
+	void SyncProcess(ALDRIVER_VOID_PARAMS);
 	//! alcSuspectContext
-	void sync_suspend(ALDRIVER_VOID_PARAMS);
+	void SyncSuspend(ALDRIVER_VOID_PARAMS);
 	//! Flushes the driver command buffer.
-	void sync_flush(ALDRIVER_VOID_PARAMS);
+	void SyncFlush(ALDRIVER_VOID_PARAMS);
 
 	//! alDopplerFactor
-	void dopplerFactor(ALDRIVER_PARAMS ALfloat factor);
+	void DopplerFactor(ALDRIVER_PARAMS ALfloat factor);
 	//! alSpeedOfSound
-	void speedOfSound(ALDRIVER_PARAMS ALfloat speed);
+	void SpeedOfSound(ALDRIVER_PARAMS ALfloat speed);
 	//! alDistanceModel
-	void distanceModel(ALDRIVER_PARAMS ALenum value);
+	void DistanceModel(ALDRIVER_PARAMS ALenum value);
 
 	//! alListenerfv
-	void listenerfv(ALDRIVER_PARAMS ALenum param, ALfloat *values);
+	void Listenerfv(ALDRIVER_PARAMS ALenum param, ALfloat *values);
 	//! alListenerf
-	void listenerf(ALDRIVER_PARAMS ALenum param, ALfloat value);
+	void Listenerf(ALDRIVER_PARAMS ALenum param, ALfloat value);
 	//! alListener3f
-	void listener3f(ALDRIVER_PARAMS ALenum param, ALfloat x, ALfloat y, ALfloat z);
+	void Listener3f(ALDRIVER_PARAMS ALenum param, ALfloat x, ALfloat y, ALfloat z);
 
 	//! alGenBuffers
-	bool sync_genBuffers(ALDRIVER_PARAMS ALsizei n, ALuint *buffers);
+	bool SyncGenBuffers(ALDRIVER_PARAMS ALsizei n, ALuint *buffers);
 	//! alDeleteBuffers
-	void sync_deleteBuffers(ALDRIVER_PARAMS ALsizei n, ALuint *buffers);
+	void SyncDeleteBuffers(ALDRIVER_PARAMS ALsizei n, ALuint *buffers);
 	//! alBufferData
-	bool sync_bufferData(
+	bool SyncBufferData(
 		ALDRIVER_PARAMS 
 		ALuint buffer, 
 		ALenum format, 
@@ -134,23 +131,23 @@ public:
 	);
 	
 	//! alGenSources
-	bool sync_genSources(ALDRIVER_PARAMS ALsizei n, ALuint *sources);
+	bool SyncGenSources(ALDRIVER_PARAMS ALsizei n, ALuint *sources);
 	//! alDeleteSources
-	void sync_deleteSources(ALDRIVER_PARAMS ALsizei n, ALuint *sources);
+	void SyncDeleteSources(ALDRIVER_PARAMS ALsizei n, ALuint *sources);
 	//! alSourcePlay
-	void sourcePlay(ALDRIVER_PARAMS ALuint source);
+	void SourcePlay(ALDRIVER_PARAMS ALuint source);
 	//! alSourcePause
-	void sourcePause(ALDRIVER_PARAMS ALuint source);
+	void SourcePause(ALDRIVER_PARAMS ALuint source);
 	//! alSourceStop
-	void sourceStop(ALDRIVER_PARAMS ALuint source);
+	void SourceStop(ALDRIVER_PARAMS ALuint source);
 	//! alSourcei
-	void sourcei(ALDRIVER_PARAMS ALuint source, ALenum param, ALint value);
+	void Sourcei(ALDRIVER_PARAMS ALuint source, ALenum param, ALint value);
 	//! alSourcef
-	void sourcef(ALDRIVER_PARAMS ALuint source, ALenum param, ALfloat value);
+	void Sourcef(ALDRIVER_PARAMS ALuint source, ALenum param, ALfloat value);
 	//! alSource3f
-	void source3f(ALDRIVER_PARAMS ALuint source, ALenum param, ALfloat x, ALfloat y, ALfloat z);
+	void Source3f(ALDRIVER_PARAMS ALuint source, ALenum param, ALfloat x, ALfloat y, ALfloat z);
 	//! alSourceRewind
-	void sourceRewind(ALDRIVER_PARAMS ALuint source);
+	void SourceRewind(ALDRIVER_PARAMS ALuint source);
 
 	//! Command class.
 	/*! Driver commands are executed on the OpenAL thread. They should call OpenAL API methods
@@ -190,15 +187,15 @@ public:
 	};
 
 	//! Creates a command object from an object pool.
-	Command *createCommand(Command::FN fn);
+	Command *CreateCommand(Command::FN fn);
 	//! Destroys a command object and returns it to its object pool.
-	void destroyCommand(Command *cmd);
+	void DestroyCommand(Command *cmd);
 
 	//! Submits a command. The command is responsible for releasing itself after execution.
-	void submit(Command &command);
+	void Submit(Command &command);
 
 	//! Wakes the driver to do processing.
-	void wake();
+	void Wake();
 
 	RAD_DECLARE_READONLY_PROPERTY(ALDriver, device, ALCdevice*);
 	RAD_DECLARE_READONLY_PROPERTY(ALDriver, context, ALCcontext*);
@@ -239,9 +236,9 @@ private:
 	};
 
 	ALDriver();
-	void removeCallback(Callback &callback);
-	void exec(Command *head);
-	void doCallbacks();
+	void RemoveCallback(Callback &callback);
+	void Exec(Command *head);
+	void DoCallbacks();
 
 	RAD_DECLARE_GET(device, ALCdevice*) { return m_ald; }
 	RAD_DECLARE_GET(context, ALCcontext*) { return m_alc; }
@@ -258,26 +255,26 @@ private:
 	bool m_quit;
 	bool m_suspended;
 
-	static void fn_create(ALDriver &driver, Command *cmd);
-	static void fn_process(ALDriver &driver, Command *cmd);
-	static void fn_suspend(ALDriver &driver, Command *cmd);
-	static void fn_flush(ALDriver &driver, Command *cmd);
-	static void fn_dopplerFactor(ALDriver &driver, Command *cmd);
-	static void fn_speedOfSound(ALDriver &driver, Command *cmd);
-	static void fn_distanceModel(ALDriver &driver, Command *cmd);
-	static void fn_listenerfv(ALDriver &driver, Command *cmd);
-	static void fn_listenerf(ALDriver &driver, Command *cmd);
-	static void fn_listener3f(ALDriver &driver, Command *cmd);
-	static void fn_genBuffers(ALDriver &driver, Command *cmd);
-	static void fn_deleteBuffers(ALDriver &driver, Command *cmd);
-	static void fn_bufferData(ALDriver &driver, Command *cmd);
-	static void fn_genSources(ALDriver &driver, Command *cmd);
-	static void fn_deleteSources(ALDriver &driver, Command *cmd);
-	static void fn_sourcePlay(ALDriver &driver, Command *cmd);
-	static void fn_sourcePause(ALDriver &driver, Command *cmd);
-	static void fn_sourceStop(ALDriver &driver, Command *cmd);
-	static void fn_sourcei(ALDriver &driver, Command *cmd);
-	static void fn_sourcef(ALDriver &driver, Command *cmd);
-	static void fn_source3f(ALDriver &driver, Command *cmd);
-	static void fn_sourceRewind(ALDriver &driver, Command *cmd);
+	static void fn_Create(ALDriver &driver, Command *cmd);
+	static void fn_Process(ALDriver &driver, Command *cmd);
+	static void fn_Suspend(ALDriver &driver, Command *cmd);
+	static void fn_Flush(ALDriver &driver, Command *cmd);
+	static void fn_DopplerFactor(ALDriver &driver, Command *cmd);
+	static void fn_SpeedOfSound(ALDriver &driver, Command *cmd);
+	static void fn_DistanceModel(ALDriver &driver, Command *cmd);
+	static void fn_Listenerfv(ALDriver &driver, Command *cmd);
+	static void fn_Listenerf(ALDriver &driver, Command *cmd);
+	static void fn_Listener3f(ALDriver &driver, Command *cmd);
+	static void fn_GenBuffers(ALDriver &driver, Command *cmd);
+	static void fn_DeleteBuffers(ALDriver &driver, Command *cmd);
+	static void fn_BufferData(ALDriver &driver, Command *cmd);
+	static void fn_GenSources(ALDriver &driver, Command *cmd);
+	static void fn_DeleteSources(ALDriver &driver, Command *cmd);
+	static void fn_SourcePlay(ALDriver &driver, Command *cmd);
+	static void fn_SourcePause(ALDriver &driver, Command *cmd);
+	static void fn_SourceStop(ALDriver &driver, Command *cmd);
+	static void fn_Sourcei(ALDriver &driver, Command *cmd);
+	static void fn_Sourcef(ALDriver &driver, Command *cmd);
+	static void fn_Source3f(ALDriver &driver, Command *cmd);
+	static void fn_SourceRewind(ALDriver &driver, Command *cmd);
 };
