@@ -43,7 +43,7 @@ bool CheckALErrors(const char *file, int line)
 
 		if (!found)
 		{
-			str.Printf(
+			str.format(
 				"AL Errors (file: %s, line: %d):\n",
 				file,
 				line
@@ -76,7 +76,7 @@ bool CheckALErrors(const char *file, int line)
 	ClearALErrors();
 	if (found)
 	{
-		COut(C_Debug) << str.c_str.get() << std::endl;
+		COut(C_Debug) << str.c_str() << std::endl;
 	}
 
 	return found;
