@@ -21,11 +21,11 @@ void SoundThumb::OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable
 	{ // restart sound.
 		if (m_sound->playing)
 		{
-			m_sound->stop();
+			m_sound->Stop();
 		}
 		else
 		{
-			m_sound->play(SC_FX, 0);
+			m_sound->Play(SC_FX, 0);
 		}
 	}
 	else
@@ -56,9 +56,9 @@ void SoundThumb::OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable
 			pkg::P_Trim
 		);
 
-		m_sound = MainWindow::Get()->soundContext->newSound(asset);
+		m_sound = MainWindow::Get()->soundContext->NewSound(asset);
 		if (m_sound)
-			m_sound->play(SC_FX, 0);
+			m_sound->Play(SC_FX, 0);
 	}
 }
 

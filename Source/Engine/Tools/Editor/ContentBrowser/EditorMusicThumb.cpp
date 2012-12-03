@@ -21,11 +21,11 @@ void MusicThumb::OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable
 	{
 		if (m_sound->playing)
 		{
-			m_sound->pause(!m_sound->paused);
+			m_sound->Pause(!m_sound->paused);
 		}
 		else
 		{
-			m_sound->play(SC_Music, 0);
+			m_sound->Play(SC_Music, 0);
 		}
 	}
 	else
@@ -48,11 +48,11 @@ void MusicThumb::OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable
 			pkg::P_Trim
 		);
 
-		m_sound = MainWindow::Get()->soundContext->newSound(asset);
+		m_sound = MainWindow::Get()->soundContext->NewSound(asset);
 		if (m_sound)
 		{
 			m_sound->loop = true;
-			m_sound->play(SC_Music, 0);
+			m_sound->Play(SC_Music, 0);
 		}
 	}
 }
