@@ -410,7 +410,7 @@ int PackageMan::BuildPak0(int compression) {
 
 	{
 		String path;
-		if (!m_engine.sys->files->GetAbsolutePath("Scripts", path, file::kFileMask_Base)) {
+		if (!m_engine.sys->files->GetAbsolutePath("@r:/Source/Scripts", path, file::kFileMask_Base)) {
 			*m_cookState->cout << "ERROR GetAbsolutePath failed." << std::endl;
 			return SR_IOError;
 		}

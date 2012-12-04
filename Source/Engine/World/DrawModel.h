@@ -118,6 +118,7 @@ private:
 	MBatchDraw::RefVec m_batches;
 	Vec4 m_rgba[3];
 	float m_fadeTime[2];
+	int m_markFrame;
 	bool m_fade;
 	bool m_visible;
 };

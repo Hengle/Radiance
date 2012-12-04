@@ -177,7 +177,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Entity, classname, const char*);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, targetname, const char*);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, scripted, bool);
-	RAD_DECLARE_READONLY_PROPERTY(Entity, models, const DrawModel::Map&);
+	RAD_DECLARE_READONLY_PROPERTY(Entity, models, const DrawModel::Map*);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, bspLeafs, const dBSPLeaf::PtrVec*);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, ps, PState*);
 	RAD_DECLARE_PROPERTY(Entity, gc, bool, bool);
@@ -394,8 +394,8 @@ private:
 		return m_scripted; 
 	}
 
-	RAD_DECLARE_GET(models, const DrawModel::Map&) { 
-		return m_models; 
+	RAD_DECLARE_GET(models, const DrawModel::Map*) { 
+		return &m_models; 
 	}
 
 	RAD_DECLARE_GET(ps, PState*) { 
@@ -444,6 +444,7 @@ private:
 	int m_id;
 	int m_nextLuaThink;
 	int m_lastLuaThink;
+	int m_markFrame;
 	bool m_scripted;
 	bool m_gc;
 };

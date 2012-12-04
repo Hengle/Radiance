@@ -92,18 +92,22 @@ public:
 		Step::Vec steps;
 	};
 
+	class State {
+	public:
+		FloorPosition pos;
+		String anim;
+		Vec3 facing;
+		int flags;
+	private:
+		friend class FloorMove;
+		int m_stepIdx;
+		float m_t;
+	};
+
 	FloorMove();
 
-	void InitMove(
-		FloorPosition &pos,
-		String &animState
-	);
-
-	bool Move(
-		FloorPosition &pos,
-		float velocity,
-		String &animState
-	);
+	void InitMove(State &state);
+	bool Move(State &state, float velocity);
 
 	RAD_DECLARE_READONLY_PROPERTY(FloorMove, busy, bool);
 	RAD_DECLARE_READONLY_PROPERTY(FloorMove, route, const Route*);
@@ -118,7 +122,6 @@ private:
 		return &m_route;
 	}
 
-	FloorPosition m_pos;
 	Route m_route;
 };
 

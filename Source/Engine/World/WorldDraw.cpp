@@ -421,6 +421,30 @@ void WorldDraw::VisMarkArea(
 			}
 		}
 	}
+
+	// add entities.
+
+	for (EntityPtrSet::const_iterator it = area.occupants.begin(); it != area.occupants.end(); ++it) {
+		Entity *e = *it;
+		if (e->m_markFrame != m_markFrame) {
+			e->m_markFrame = m_markFrame;
+			for (DrawModel::Map::const_iterator it = e->models->begin(); it != e->models->end(); ++it) {
+				const DrawModel::Ref &m = it->second;
+				if (m->m_markFrame != m_markFrame) {
+					m->m_markFrame = m_markFrame;
+					for (MBatchDraw::RefVec::const_iterator it = m->m_batches.begin(); it != m->m_batches.end(); ++it) {
+						const MBatchDraw::Ref &draw = *it;
+						if (draw->m_markFrame != m_markFrame) {
+							draw->m_markFrame = m_markFrame;
+							details::MBatchRef batch = AddViewBatch(view, draw->m_matId);
+							if (batch)
+								batch->AddDraw(*draw);
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 bool WorldDraw::ClipBounds(const StackWindingStackVec &volume, const BBox &volumeBounds, const BBox &bounds) {

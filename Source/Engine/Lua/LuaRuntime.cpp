@@ -1187,7 +1187,7 @@ RADENG_API bool RADENG_CALL ImportModule(lua_State *L, const char *name)
 	SrcBuffer::Ref code = l->Load(L, name);
 	if (!code) // load failed
 	{
-		luaL_error(L, "Import: could not find file '%s'.", name);
+		COut(C_Error) << "Import: could not find file " << name << std::endl;
 		return false;
 	}
 
@@ -1195,7 +1195,7 @@ RADENG_API bool RADENG_CALL ImportModule(lua_State *L, const char *name)
 
 	if (luaL_loadbuffer(L, (const char *)((const void*)code->ptr), code->size, code->name))
 	{
-		luaL_error(L, "Error importing '%s'(%s):\n\t%s", name, (const char*)code->name, lua_tostring(L, -1));
+		COut(C_Error) << "Error importing '%s'(%s):\n\t%s" << name << (const char*)code->name << lua_tostring(L, -1) << std::endl;
 		return false;
 	}
 

@@ -42,7 +42,6 @@ public:
 	bool mirror;
 	AreaBits areas;
 
-	EntityBits marked;
 	details::MBatchIdMap batches;
 };
 

@@ -112,7 +112,8 @@ m_lastLuaThink(0),
 m_scripted(false),
 m_frame(-1),
 m_luaCallbackIdx(0),
-m_gc(false)
+m_gc(false),
+m_markFrame(-1)
 {
 	for (int i = 0; i < NumLuaCallbackBuckets; ++i)
 		m_luaCallbacks[i] = 0;

@@ -16,17 +16,10 @@ namespace world {
 FloorMove::FloorMove() {
 }
 
-void FloorMove::InitMove(
-	FloorPosition &pos,
-	String &animState
-) {
+void FloorMove::InitMove(State &state) {
 }
 
-bool FloorMove::Move(
-	FloorPosition &pos,
-	float velocity,
-	String &animState
-) {
+bool FloorMove::Move(State &state, float velocity) {
 	return false;
 }
 
@@ -118,8 +111,6 @@ FloorMove::Ref Floors::CreateMove(
 	std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*route));
 
 	FloorMove::Ref move(new (ZWorld) FloorMove());
-	move->m_pos = start;
-
 	GenerateFloorMove(route, move->m_route);
 
 	return move;
