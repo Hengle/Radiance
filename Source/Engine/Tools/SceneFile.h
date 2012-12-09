@@ -198,6 +198,7 @@ public:
 
 			normal = v.normal;
 			color = v.color;
+			weights = v.weights;
 			return *this;
 		}
 
