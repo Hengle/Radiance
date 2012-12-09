@@ -30,15 +30,13 @@ namespace {
 
 typedef zone_vector<int, ZToolsT>::type IntVec;
 typedef zone_set<int, ZToolsT>::type IntSet;
-struct BoneMap
-{
+struct BoneMap {
 	typedef zone_vector<BoneMap, ZToolsT>::type Vec;
 	int idx;
 	IntVec children;
 };
 
-class SkaBuilder
-{
+class SkaBuilder {
 public:
 	typedef SkaBuilder Ref;
 
@@ -50,16 +48,14 @@ public:
 
 private:
 
-	struct BoneTM
-	{
+	struct BoneTM {
 		ska::BoneTM tm;
 		String tag;
 	};
 
 	typedef zone_vector<BoneTM, ZToolsT>::type BoneTMVec;
 
-	struct BoneDef
-	{
+	struct BoneDef {
 		typedef zone_vector<BoneDef, ZToolsT>::type Vec;
 
 		String name;
@@ -70,8 +66,7 @@ private:
 
 	typedef zone_vector<BoneTMVec, ZToolsT>::type FrameVec;
 
-	struct Anim
-	{
+	struct Anim {
 		typedef zone_vector<Anim, ZToolsT>::type Vec;
 		String name;
 		float fps;
@@ -102,21 +97,17 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SkaBuilder::SkaBuilder()
-{
+SkaBuilder::SkaBuilder() {
 }
 
-SkaBuilder::~SkaBuilder()
-{
+SkaBuilder::~SkaBuilder() {
 }
 
-bool SkaBuilder::EmitBones(const char *name, int idx, int parent, BoneMap::Vec &map, BoneDef::Vec &bones, const SceneFile::BoneVec &skel)
-{
+bool SkaBuilder::EmitBones(const char *name, int idx, int parent, BoneMap::Vec &map, BoneDef::Vec &bones, const SceneFile::BoneVec &skel) {
 	BoneMap &bm = map[idx];
 	const SceneFile::Bone &mb = skel[idx];
 
-	if (bm.idx > -1)
-	{
+	if (bm.idx > -1) {
 		COut(C_Error) << "EmitBones(\"" << name << "\"): \"" << skel[idx].name << "\" has multiple parent bones!" << std::endl;
 		return false;
 	}
@@ -130,8 +121,7 @@ bool SkaBuilder::EmitBones(const char *name, int idx, int parent, BoneMap::Vec &
 	bone.invWorld = mb.world.Inverse();
 	bones.push_back(bone);
 
-	for (IntVec::const_iterator it = bm.children.begin(); it != bm.children.end(); ++it)
-	{
+	for (IntVec::const_iterator it = bm.children.begin(); it != bm.children.end(); ++it) {
 		if (!EmitBones(name, *it, bm.idx, map, bones, skel))
 			return false;
 	}
@@ -139,8 +129,7 @@ bool SkaBuilder::EmitBones(const char *name, int idx, int parent, BoneMap::Vec &
 	return true;
 }
 
-bool SkaBuilder::Compile(const char *name, const SceneFileVec &maps, int trimodel, SkaData &sk)
-{
+bool SkaBuilder::Compile(const char *name, const SceneFileVec &maps, int trimodel, SkaData &sk) {
 	RAD_ASSERT(maps.size() == 1 || trimodel == 0);
 
 	SceneFile::Entity::Ref e = maps[0]->worldspawn;
@@ -158,19 +147,14 @@ bool SkaBuilder::Compile(const char *name, const SceneFileVec &maps, int trimode
 	bmap.resize(skel.bones.size());
 	int root = -1;
 
-	for (int i = 0; i < (int)skel.bones.size(); ++i)
-	{
+	for (int i = 0; i < (int)skel.bones.size(); ++i) {
 		const SceneFile::Bone &b = skel.bones[i];
 		bmap[i].idx = -1;
 
-		if (b.parent >= 0)
-		{
+		if (b.parent >= 0) {
 			bmap[b.parent].children.push_back(i);
-		}
-		else
-		{
-			if (root != -1)
-			{
+		} else {
+			if (root != -1) {
 				COut(C_Error) << "BuildAnimData(\"" << name << "\"): has multiple root bones!" << std::endl;
 				return false;
 			}
@@ -178,8 +162,7 @@ bool SkaBuilder::Compile(const char *name, const SceneFileVec &maps, int trimode
 		}
 	}
 
-	if (root == -1)
-	{
+	if (root == -1) {
 		COut(C_Error) << "BuildAnimData(\"" << name << "\"): no root bone found!" << std::endl;
 		return false;
 	}
@@ -188,8 +171,7 @@ bool SkaBuilder::Compile(const char *name, const SceneFileVec &maps, int trimode
 	if (!EmitBones(name, root, -1, bmap, bones, skel.bones))
 		return false;
 
-	for (BoneDef::Vec::iterator it = bones.begin(); it != bones.end(); ++it)
-	{
+	for (BoneDef::Vec::iterator it = bones.begin(); it != bones.end(); ++it) {
 		BoneDef &bone = *it;
 		if (bone.parent >= 0)
 			bone.invWorld = bones[bone.parent].invWorld * bone.invWorld;
@@ -203,29 +185,25 @@ bool SkaBuilder::Compile(const char *name, const SceneFileVec &maps, int trimode
 	badList[0] = false;
 
 	// ensure identical skels
-	for (size_t i = 1; i < maps.size(); ++i)
-	{
+	for (size_t i = 1; i < maps.size(); ++i) {
 		badList[i] = true;
 
 		SceneFile::Entity::Ref e = maps[i]->worldspawn;
-		if (e->models[0]->skel < 0)
-		{
+		if (e->models[0]->skel < 0) {
 			COut(C_Error) << "BuildAnimData(\"" << name << "\"): anim file " << i << " is missing skel data (skipping)!" << std::endl;
 			continue;
 		}
+
 		const SceneFile::Skel &otherSkel = *e->skels[e->models[0]->skel];
-		if (otherSkel.bones.size() != skel.bones.size())
-		{
+		if (otherSkel.bones.size() != skel.bones.size()) {
 			COut(C_Error) << "BuildAnimData(\"" << name << "\"): anim file " << i << " has mismatched skel (code 1, skipping)!" << std::endl;
 			continue;
 		}
 
 		size_t k;
-		for (k = 0; k < skel.bones.size(); ++k)
-		{
+		for (k = 0; k < skel.bones.size(); ++k) {
 			if (skel.bones[k].name != otherSkel.bones[k].name ||
-				skel.bones[k].parent != otherSkel.bones[k].parent)
-			{
+				skel.bones[k].parent != otherSkel.bones[k].parent) {
 				COut(C_Error) << "BuildAnimData(\"" << name << "\"): anim file " << i << " has mismatched skel (code 2, skipping)!" << std::endl;
 				break;
 			}
@@ -238,15 +216,13 @@ bool SkaBuilder::Compile(const char *name, const SceneFileVec &maps, int trimode
 	}
 	
 	// build animation data
-	for (size_t i = 0; i < maps.size(); ++i)
-	{
+	for (size_t i = 0; i < maps.size(); ++i) {
 		if (badList[i])
 			continue;
 
 		const SceneFile::TriModel::Ref &m = maps[i]->worldspawn->models[trimodel];
 
-		for (SceneFile::AnimMap::const_iterator it = m->anims.begin(); it != m->anims.end(); ++it)
-		{
+		for (SceneFile::AnimMap::const_iterator it = m->anims.begin(); it != m->anims.end(); ++it) {
 			const SceneFile::Anim &anim = *(it->second.get());
 			if (anim.frames.empty())
 				continue;
@@ -261,22 +237,19 @@ bool SkaBuilder::Compile(const char *name, const SceneFileVec &maps, int trimode
 			BoneTMVec tms;
 			tms.resize(skel.bones.size());
 
-			for (SceneFile::BoneFrames::const_iterator it = anim.frames.begin(); it != anim.frames.end(); ++it)
-			{
+			for (SceneFile::BoneFrames::const_iterator it = anim.frames.begin(); it != anim.frames.end(); ++it) {
 				const SceneFile::BonePoseVec &frame = *it;
 
 				// TODO: dynamic remap bones by name, would be pretty 
 				// useful to decouple animation from a skeleton.
 
-				if (frame.size() != skel.bones.size())
-				{
+				if (frame.size() != skel.bones.size()) {
 					COut(C_Error) << "BuildAnimData(\"" << name << "\"): animation \"" << anim.name << "\" frame " << 
 						(it-anim.frames.begin()) << " has mismatched bone count." << std::endl;
 					return false;
 				}
 
-				for (SceneFile::BonePoseVec::const_iterator it = frame.begin(); it != frame.end(); ++it)
-				{
+				for (SceneFile::BonePoseVec::const_iterator it = frame.begin(); it != frame.end(); ++it) {
 					const SceneFile::BonePose &mtm = *it;
 					BoneTM &tm = tms[bmap[it-frame.begin()].idx];
 
@@ -307,8 +280,7 @@ bool SkaBuilder::Compile(const char *name, const SceneFileVec &maps, int trimode
 	return true;
 }
 
-bool SkaBuilder::Compile(const char *name, const SceneFile &map, int trimodel, SkaData &sk)
-{
+bool SkaBuilder::Compile(const char *name, const SceneFile &map, int trimodel, SkaData &sk) {
 	SceneFile::Entity::Ref e = map.worldspawn;
 	if (e->models[trimodel]->skel < 0)
 		return false;
@@ -324,19 +296,14 @@ bool SkaBuilder::Compile(const char *name, const SceneFile &map, int trimodel, S
 	bmap.resize(skel.bones.size());
 	int root = -1;
 
-	for (int i = 0; i < (int)skel.bones.size(); ++i)
-	{
+	for (int i = 0; i < (int)skel.bones.size(); ++i) {
 		const SceneFile::Bone &b = skel.bones[i];
 		bmap[i].idx = -1;
 
-		if (b.parent >= 0)
-		{
+		if (b.parent >= 0) {
 			bmap[b.parent].children.push_back(i);
-		}
-		else
-		{
-			if (root != -1)
-			{
+		} else {
+			if (root != -1) {
 				COut(C_Error) << "BuildAnimData(\"" << name << "\"): has multiple root bones!" << std::endl;
 				return false;
 			}
@@ -344,8 +311,7 @@ bool SkaBuilder::Compile(const char *name, const SceneFile &map, int trimodel, S
 		}
 	}
 
-	if (root == -1)
-	{
+	if (root == -1) {
 		COut(C_Error) << "BuildAnimData(\"" << name << "\"): no root bone found!" << std::endl;
 		return false;
 	}
@@ -354,8 +320,7 @@ bool SkaBuilder::Compile(const char *name, const SceneFile &map, int trimodel, S
 	if (!EmitBones(name, root, -1, bmap, bones, skel.bones))
 		return false;
 
-	for (BoneDef::Vec::iterator it = bones.begin(); it != bones.end(); ++it)
-	{
+	for (BoneDef::Vec::iterator it = bones.begin(); it != bones.end(); ++it) {
 		BoneDef &bone = *it;
 		if (bone.parent >= 0)
 			bone.invWorld = bones[bone.parent].invWorld * bone.invWorld;
@@ -367,8 +332,7 @@ bool SkaBuilder::Compile(const char *name, const SceneFile &map, int trimodel, S
 
 	const SceneFile::TriModel::Ref &m = map.worldspawn->models[trimodel];
 
-	for (SceneFile::AnimMap::const_iterator it = m->anims.begin(); it != m->anims.end(); ++it)
-	{
+	for (SceneFile::AnimMap::const_iterator it = m->anims.begin(); it != m->anims.end(); ++it) {
 		const SceneFile::Anim &anim = *(it->second.get());
 		if (anim.frames.empty())
 			continue;
@@ -383,22 +347,19 @@ bool SkaBuilder::Compile(const char *name, const SceneFile &map, int trimodel, S
 		BoneTMVec tms;
 		tms.resize(skel.bones.size());
 
-		for (SceneFile::BoneFrames::const_iterator it = anim.frames.begin(); it != anim.frames.end(); ++it)
-		{
+		for (SceneFile::BoneFrames::const_iterator it = anim.frames.begin(); it != anim.frames.end(); ++it) {
 			const SceneFile::BonePoseVec &frame = *it;
 
 			// TODO: dynamic remap bones by name, would be pretty 
 			// useful to decouple animation from a skeleton.
 
-			if (frame.size() != skel.bones.size())
-			{
+			if (frame.size() != skel.bones.size()) {
 				COut(C_Error) << "BuildAnimData(\"" << name << "\"): animation \"" << anim.name << "\" frame " << 
 					(it-anim.frames.begin()) << " has mismatched bone count." << std::endl;
 				return false;
 			}
 
-			for (SceneFile::BonePoseVec::const_iterator it = frame.begin(); it != frame.end(); ++it)
-			{
+			for (SceneFile::BonePoseVec::const_iterator it = frame.begin(); it != frame.end(); ++it) {
 				const SceneFile::BonePose &mtm = *it;
 				BoneTM &tm = tms[bmap[it-frame.begin()].idx];
 
@@ -431,23 +392,20 @@ bool SkaBuilder::Compile(const char *name, const SceneFile &map, int trimodel, S
 typedef zone_vector<float, ZToolsT>::type FloatVec;
 typedef zone_vector<String, ZToolsT>::type StringVec;
 
-struct Tables
-{
+struct Tables {
 	FloatVec rTable;
 	FloatVec sTable;
 	FloatVec tTable;
 	StringVec strings;
 
-	Tables() : tAbsMax(-1.0f), sAbsMax(-1.0f)
-	{
+	Tables() : tAbsMax(-1.0f), sAbsMax(-1.0f) {
 		strings.reserve(64);
 	}
 
 	float tAbsMax;
 	float sAbsMax;
 
-	static S16 QuantFloat(float f, float absMax)
-	{
+	static S16 QuantFloat(float f, float absMax) {
 		if (absMax <= 0.f)
 			return 0;
 		const int shortMax = std::numeric_limits<S16>::max();
@@ -460,12 +418,9 @@ struct Tables
 		return (S16)val;
 	}
 
-	bool AddRotate(const Quat &r, int &out)
-	{
-		for (size_t i = 0; i+4 <= rTable.size(); i += 4)
-		{
-			if (QuatEq(*((const Quat*)&rTable[i]), r))
-			{
+	bool AddRotate(const Quat &r, int &out) {
+		for (size_t i = 0; i+4 <= rTable.size(); i += 4) {
+			if (QuatEq(*((const Quat*)&rTable[i]), r)) {
 				out = (int)(i/4);
 				return true;
 			}
@@ -480,30 +435,25 @@ struct Tables
 		return true;
 	}
 
-	bool AddScale(const Vec3 &s, int &out)
-	{
+	bool AddScale(const Vec3 &s, int &out) {
 		return AddVec3(sTable, s, out, sAbsMax, 0.01f);
 	}
 
-	bool AddTranslate(const Vec3 &t, int &out)
-	{
+	bool AddTranslate(const Vec3 &t, int &out) {
 		return AddVec3(tTable, t, out, tAbsMax, 0.005f);
 	}
 
-	int AddString(const String &str)
-	{
+	int AddString(const String &str) {
 		if (str.empty)
 			return -1;
 
-		for (StringVec::const_iterator it = strings.begin(); it != strings.end(); ++it)
-		{
+		for (StringVec::const_iterator it = strings.begin(); it != strings.end(); ++it) {
 			if (str == *it)
 				return (int)(it-strings.begin());
 		}
 
 		int ofs = (int)strings.size();
-		if (ofs > 254)
-		{
+		if (ofs > 254) {
 			COut(C_Error) << "SkaBuilder::Tables: string table exceeds 255 elements!" << std::endl;
 			return -1;
 		}
@@ -513,16 +463,14 @@ struct Tables
 
 private:
 
-	bool QuatEq(const Quat &a, const Quat &b)
-	{
+	bool QuatEq(const Quat &a, const Quat &b) {
 		static const float s_minDeg = 0.03f;
 		static const float s_eqDist = (float)(sin(s_minDeg*3.1415926535f/180)*sin(s_minDeg*3.1415926535f/180));
 
 		Mat4 ma = Mat4::Rotation(a);
 		Mat4 mb = Mat4::Rotation(b);
 
-		for (int row = 0; row < 3; ++row)
-		{
+		for (int row = 0; row < 3; ++row) {
 			Vec3 d(
 				(ma[row][0] - mb[row][0]), 
 				(ma[row][1] - mb[row][1]), 
@@ -536,17 +484,14 @@ private:
 		return true;
 	}
 
-	bool VecEq(const Vec3 &a, const Vec3 &b, float max)
-	{
+	bool VecEq(const Vec3 &a, const Vec3 &b, float max) {
 		return (a-b).MagnitudeSquared() < max;
 	}
 
-	bool AddVec3(FloatVec &table, const Vec3 &v, int &out, float &outMax, float max)
-	{
-		for (size_t i = 0; i+3 <= table.size(); i += 3)
-		{
-			if (VecEq(*((const Vec3*)&table[i]), v, max))
-			{
+	bool AddVec3(FloatVec &table, const Vec3 &v, int &out, float &outMax, float max) {
+
+		for (size_t i = 0; i+3 <= table.size(); i += 3) {
+			if (VecEq(*((const Vec3*)&table[i]), v, max)) {
 				out = (int)(i/3);
 				return true;
 			}
@@ -555,23 +500,21 @@ private:
 		if ((table.size()/3) == ska::EncMask)
 			return false;	
 
-		for (size_t i = 0; i < 3; ++i)
-		{
+		for (size_t i = 0; i < 3; ++i) {
 			table.push_back(v[(int)i]);
 			outMax = std::max(math::Abs(v[(int)i]), outMax);
 		}
+
 		out = (int)(table.size()/3)-1;
 		return true;
 	}
 };
 
 typedef zone_vector<int, ZToolsT>::type IntVec;
-struct AnimTables
-{
+struct AnimTables {
 	typedef zone_vector<AnimTables, ZToolsT>::type Vec;
 
-	AnimTables() : totalTags(0)
-	{
+	AnimTables() : totalTags(0) {
 	}
 
 	IntVec rFrames;
@@ -581,9 +524,10 @@ struct AnimTables
 	int totalTags;
 };
 	
-bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
-{
+bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const {
+	
 	stream::LittleOutputStream os(ob);
+
 	{
 		const U32 id  = ska::SkaTag;
 		const U32 ver = ska::SkaVersion;
@@ -594,10 +538,8 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 	if (!os.Write((U16)m_bones.size()) || !os.Write((U16)m_anims.size()))
 		return false;
 
-	for (BoneDef::Vec::const_iterator it = m_bones.begin(); it != m_bones.end(); ++it)
-	{
-		if ((*it).name.length > ska::DNameLen)
-		{
+	for (BoneDef::Vec::const_iterator it = m_bones.begin(); it != m_bones.end(); ++it) {
+		if ((*it).name.length > ska::DNameLen) {
 			COut(C_ErrMsgBox) << "ska::DNameLen exceeded, contact a programmer to increase." << std::endl;
 			return false;
 		}
@@ -608,8 +550,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 			return false;
 	}
 
-	for (BoneDef::Vec::const_iterator it = m_bones.begin(); it != m_bones.end(); ++it)
-	{
+	for (BoneDef::Vec::const_iterator it = m_bones.begin(); it != m_bones.end(); ++it) {
 		if (!os.Write((*it).parent))
 			return false;
 	}
@@ -618,8 +559,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 		if (!os.Write((S16)0xffff))
 			return false;
 
-	for (BoneDef::Vec::const_iterator it = m_bones.begin(); it != m_bones.end(); ++it)
-	{
+	for (BoneDef::Vec::const_iterator it = m_bones.begin(); it != m_bones.end(); ++it) {
 		const BoneDef &b = *it;
 		for (int i = 0; i < 4; ++i)
 			for (int j = 0; j < 3; ++j)
@@ -638,8 +578,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 	prevBoneTFrame.resize(m_bones.size());
 	at.resize(m_anims.size());
 
-	for (Anim::Vec::const_iterator it = m_anims.begin(); it != m_anims.end(); ++it)
-	{
+	for (Anim::Vec::const_iterator it = m_anims.begin(); it != m_anims.end(); ++it) {
 		AnimTables &ct = at[it-m_anims.begin()];
 		const Anim &anim = *it;
 
@@ -649,14 +588,12 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 		ct.tags.reserve(anim.frames.size()*m_bones.size());
 
 		FrameVec::const_iterator last = anim.frames.end();
-		for(FrameVec::const_iterator fit = anim.frames.begin(); fit != anim.frames.end(); ++fit)
-		{
+		for(FrameVec::const_iterator fit = anim.frames.begin(); fit != anim.frames.end(); ++fit) {
 			const BoneTMVec &frame = *fit;
 
 			bool tag = false;
 
-			for (size_t boneIdx = 0; boneIdx < m_bones.size(); ++boneIdx)
-			{
+			for (size_t boneIdx = 0; boneIdx < m_bones.size(); ++boneIdx) {
 				RAD_ASSERT(frame.size() == m_bones.size());
 				const BoneTM &tm = frame[boneIdx];
 				const BoneTM *prevTM = 0;
@@ -674,48 +611,38 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 
 				int tagId = t.AddString(tm.tag);
 				ct.tags.push_back(tagId);
-				if (!tag && tagId > -1)
-				{
+				if (!tag && tagId > -1) {
 					tag = true;
 					++ct.totalTags;
 				}
 
-				if (emitR)
-				{
+				if (emitR) {
 					int idx;
 					if (!t.AddRotate(tm.tm.r, idx))
 						return false;
 					ct.rFrames.push_back(idx);
 					prevBoneRFrame[boneIdx] = idx;
-				}
-				else
-				{
+				} else {
 					ct.rFrames.push_back(prevBoneRFrame[boneIdx]);
 				}
 
-				if (emitS)
-				{
+				if (emitS) {
 					int idx;
 					if (!t.AddScale(tm.tm.s, idx))
 						return false;
 					ct.sFrames.push_back(idx);
 					prevBoneSFrame[boneIdx] = idx;
-				}
-				else
-				{
+				} else {
 					ct.sFrames.push_back(prevBoneSFrame[boneIdx]);
 				}
 
-				if (emitT)
-				{
+				if (emitT) {
 					int idx;
 					if (!t.AddTranslate(tm.tm.t, idx))
 						return false;
 					ct.tFrames.push_back(idx);
 					prevBoneTFrame[boneIdx] = idx;
-				}
-				else
-				{
+				} else {
 					ct.tFrames.push_back(prevBoneTFrame[boneIdx]);
 				}
 			}
@@ -726,8 +653,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 
 	if (!os.Write((U32)(t.rTable.size())) ||
 		!os.Write((U32)(t.sTable.size())) ||
-		!os.Write((U32)(t.tTable.size())))
-	{
+		!os.Write((U32)(t.tTable.size()))) {
 		return false;
 	}
 	
@@ -737,22 +663,19 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 		return false;
 
 	// Encode float tables.
-	for (size_t i = 0; i < t.rTable.size(); ++i)
-	{
+	for (size_t i = 0; i < t.rTable.size(); ++i) {
 		S16 enc = Tables::QuantFloat(t.rTable[i], 1.0f);
 		if (!os.Write(enc))
 			return false;
 	}
 
-	for (size_t i = 0; i < t.sTable.size(); ++i)
-	{
+	for (size_t i = 0; i < t.sTable.size(); ++i) {
 		S16 enc = Tables::QuantFloat(t.sTable[i], t.sAbsMax);
 		if (!os.Write(enc))
 			return false;
 	}
 
-	for (size_t i = 0; i < t.tTable.size(); ++i)
-	{
+	for (size_t i = 0; i < t.tTable.size(); ++i) {
 		S16 enc = Tables::QuantFloat(t.tTable[i], t.tAbsMax);
 		if (!os.Write(enc))
 			return false;
@@ -763,8 +686,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 		(int)(t.sTable.size()*2)+
 		(int)(t.tTable.size()*2);
 
-	if (bytes&3)
-	{
+	if (bytes&3) {
 		bytes &= 3;
 		U8 pad[3] = { 0, 0, 0 };
 		if (os.Write(pad, 4-bytes, 0) != (4-bytes))
@@ -775,8 +697,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 
 	RAD_ASSERT(at.size() == m_anims.size());
 
-	for (size_t i = 0; i < at.size(); ++i)
-	{
+	for (size_t i = 0; i < at.size(); ++i) {
 		char name[ska::DNameLen+1];
 		string::ncpy(name, m_anims[i].name.c_str.get(), ska::DNameLen+1);
 		if (os.Write(name, ska::DNameLen+1, 0) != (ska::DNameLen+1))
@@ -797,14 +718,12 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 	// Write table indexes.
 	bytes = 0;
 	
-	for (size_t i = 0; i < at.size(); ++i)
-	{
+	for (size_t i = 0; i < at.size(); ++i) {
 		const AnimTables &tables = at[i];
 
 		RAD_ASSERT(tables.rFrames.size() == (m_bones.size()*m_anims[i].frames.size()));
 		
-		for (IntVec::const_iterator it = tables.rFrames.begin(); it != tables.rFrames.end(); ++it)
-		{
+		for (IntVec::const_iterator it = tables.rFrames.begin(); it != tables.rFrames.end(); ++it) {
 			int i = endian::SwapLittle((*it)&ska::EncMask);
 			if (os.Write(&i, ska::EncBytes, 0) != ska::EncBytes)
 				return false;
@@ -813,8 +732,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 
 		RAD_ASSERT(tables.sFrames.size() == (m_bones.size()*m_anims[i].frames.size()));
 		
-		for (IntVec::const_iterator it = tables.sFrames.begin(); it != tables.sFrames.end(); ++it)
-		{
+		for (IntVec::const_iterator it = tables.sFrames.begin(); it != tables.sFrames.end(); ++it) {
 			int i = endian::SwapLittle((*it)&ska::EncMask);
 			if (os.Write(&i, ska::EncBytes, 0) != ska::EncBytes)
 				return false;
@@ -823,8 +741,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 
 		RAD_ASSERT(tables.tFrames.size() == (m_bones.size()*m_anims[i].frames.size()));
 		
-		for (IntVec::const_iterator it = tables.tFrames.begin(); it != tables.tFrames.end(); ++it)
-		{
+		for (IntVec::const_iterator it = tables.tFrames.begin(); it != tables.tFrames.end(); ++it) {
 			int i = endian::SwapLittle((*it)&ska::EncMask);
 			if (os.Write(&i, ska::EncBytes, 0) != ska::EncBytes)
 				return false;
@@ -838,12 +755,10 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 		int boneTagOfs = 0;
 
 		IntVec::const_iterator tagIt = tables.tags.begin();
-		for (size_t j = 0; j < m_anims[i].frames.size(); ++j)
-		{
+		for (size_t j = 0; j < m_anims[i].frames.size(); ++j) {
 			int numBones = 0;
 
-			for (size_t k = 0; k < m_bones.size(); ++k, ++tagIt)
-			{
+			for (size_t k = 0; k < m_bones.size(); ++k, ++tagIt) {
 				int tagIdx = *tagIt;
 				if (tagIdx > -1)
 					++numBones;
@@ -862,8 +777,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 			bytes += (int)sizeof(U16) * 3;
 
 			boneTagOfs += numBones * 3;
-			if (boneTagOfs > std::numeric_limits<U16>::max())
-			{
+			if (boneTagOfs > std::numeric_limits<U16>::max()) {
 				COut(C_Error) << "SkaBuilder: Bone tag table exceeds 64k!" << std::endl;
 				return false;
 			}
@@ -875,13 +789,10 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 
 		// build bone tag data.
 		tagIt = tables.tags.begin();
-		for (size_t j = 0; j < m_anims[i].frames.size(); ++j)
-		{
-			for (size_t k = 0; k < m_bones.size(); ++k, ++tagIt)
-			{
+		for (size_t j = 0; j < m_anims[i].frames.size(); ++j) {
+			for (size_t k = 0; k < m_bones.size(); ++k, ++tagIt) {
 				int tagIdx = *tagIt;
-				if (tagIdx > -1)
-				{
+				if (tagIdx > -1) {
 					if (!os.Write((U16)k))
 						return false;
 					if (!os.Write((U8)tagIdx))
@@ -899,31 +810,27 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 
 	// compile string indexes.
 	int stringIdx = 0;
-	for (StringVec::const_iterator it = t.strings.begin(); it != t.strings.end(); ++it)
-	{
+	for (StringVec::const_iterator it = t.strings.begin(); it != t.strings.end(); ++it) {
 		if (!os.Write((U16)stringIdx))
 			return false;
 		bytes += 2;
 		const String &str = *it;
 		stringIdx += (int)str.length+1;
-		if (stringIdx > std::numeric_limits<U16>::max())
-		{
+		if (stringIdx > std::numeric_limits<U16>::max()) {
 			COut(C_Error) << "SkaBuilder: String table exceeds 64k in size!" << std::endl;
 			return false;
 		}
 	}
 
 	// compile strings
-	for (StringVec::const_iterator it = t.strings.begin(); it != t.strings.end(); ++it)
-	{
+	for (StringVec::const_iterator it = t.strings.begin(); it != t.strings.end(); ++it) {
 		const String &str = *it;
 		if (os.Write(str.c_str.get(), (stream::SPos)(str.length+1), 0) != (stream::SPos)(str.length+1))
 			return false;
 		bytes += (int)str.length+1;
 	}
 	
-	if (bytes&3)
-	{ // padd to 4 byte alignment.
+	if (bytes&3) { // padd to 4 byte alignment.
 		bytes &= 3;
 		U8 pad[3] = { 0, 0, 0 };
 		if (os.Write(pad, 4-bytes, 0) != (4-bytes))
@@ -933,8 +840,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const
 	return true;
 }
 
-void SkaBuilder::SetBones(const BoneDef::Vec &bones)
-{
+void SkaBuilder::SetBones(const BoneDef::Vec &bones) {
 	m_bones = bones;
 }
 
@@ -943,8 +849,7 @@ void SkaBuilder::BeginAnim(
 	float fps,
 	int numFrames,
 	bool removeMotion
-)
-{
+) {
 	RAD_ASSERT(name);
 	RAD_ASSERT(numFrames>0);
 
@@ -956,8 +861,7 @@ void SkaBuilder::BeginAnim(
 	a.frames.reserve((size_t)numFrames);
 }
 
-void SkaBuilder::AddFrame(const BoneTM *bones)
-{
+void SkaBuilder::AddFrame(const BoneTM *bones) {
 	RAD_ASSERT(bones);
 	Anim &a = m_anims.back();
 	if (a.frames.empty())
@@ -968,8 +872,7 @@ void SkaBuilder::AddFrame(const BoneTM *bones)
 		a.frames.back().push_back(bones[i]);
 }
 
-void SkaBuilder::EndAnim()
-{
+void SkaBuilder::EndAnim() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -978,16 +881,14 @@ typedef SceneFile::WeightedNormalTriVert TriVert;
 typedef zone_vector<TriVert, ZToolsT>::type TriVertVec;
 typedef zone_map<TriVert, int, ZToolsT>::type TriVertMap;
 
-struct SkTriModel
-{
+struct SkTriModel {
 	typedef boost::shared_ptr<SkTriModel> Ref;
 	typedef zone_vector<Ref, ZToolsT>::type Vec;
 	typedef zone_vector<Vec4, ZToolsT>::type Vec4Vec;
 	typedef zone_vector<Vec3, ZToolsT>::type Vec3Vec;
 	typedef zone_vector<Vec2, ZToolsT>::type Vec2Vec;
 
-	struct VertIndex
-	{
+	struct VertIndex {
 		typedef zone_vector<VertIndex, ZToolsT>::type Vec;
 
 		VertIndex(int _numBones, int _idx) : numBones(_numBones), index(_idx) {}
@@ -1006,28 +907,23 @@ struct SkTriModel
 	Vec2Vec uvs[ska::MaxUVChannels];
 	IntVec sortedIndices;
 
-	static TriVert CleanWeights(const TriVert &v)
-	{
+	static TriVert CleanWeights(const TriVert &v) {
 		TriVert z(v);
 		SceneFile::BoneWeights w;
 
 		// drop tiny weights
-		for (size_t i = 0; i < z.weights.size(); ++i)
-		{
+		for (size_t i = 0; i < z.weights.size(); ++i) {
 			if (z.weights[i].weight < 0.009999999f)
 				continue;
 			w.push_back(z.weights[i]);
 		}
 
-		while (w.size() > ska::BonesPerVert)
-		{ // drop smallest.
+		while (w.size() > ska::BonesPerVert) { // drop smallest.
 			size_t best = 0;
 			float bestw = w[0].weight;
 
-			for (size_t i = 1; i < w.size(); ++i)
-			{
-				if (w[i].weight < bestw)
-				{
+			for (size_t i = 1; i < w.size(); ++i) {
+				if (w[i].weight < bestw) {
 					bestw = w[i].weight;
 					best = i;
 				}
@@ -1036,8 +932,7 @@ struct SkTriModel
 			SceneFile::BoneWeights x;
 			x.swap(w);
 
-			for (size_t i = 0; i < x.size(); ++i)
-			{
+			for (size_t i = 0; i < x.size(); ++i) {
 				if (i != best)
 					w.push_back(x[i]);
 			}
@@ -1045,8 +940,7 @@ struct SkTriModel
 
 		float total = 0.f;
 
-		for (size_t i = 0; i < w.size(); ++i)
-		{
+		for (size_t i = 0; i < w.size(); ++i) {
 			total += w[i].weight;
 		}
 
@@ -1054,13 +948,11 @@ struct SkTriModel
 			w.clear(); // bad
 
 		// renormalize
-		for (size_t i = 0; i < w.size(); ++i)
-		{
+		for (size_t i = 0; i < w.size(); ++i) {
 			w[i].weight = w[i].weight / total;
 		}
 
-		if (w.empty())
-		{
+		if (w.empty()) {
 			SceneFile::BoneWeight x;
 			x.bone = 0;
 			x.weight = 1.0f;
@@ -1071,8 +963,7 @@ struct SkTriModel
 		return z;
 	}
 
-	void AddVertex(const TriVert &v)
-	{
+	void AddVertex(const TriVert &v) {
 		TriVert z = CleanWeights(v);
 
 		RAD_ASSERT(!z.weights.empty());
@@ -1080,14 +971,12 @@ struct SkTriModel
 		int mapIdx = (int)z.weights.size()-1;
 
 		TriVertMap::iterator it = vmap[mapIdx].find(z);
-		if (it != vmap[mapIdx].end())
-		{
+		if (it != vmap[mapIdx].end()) {
 #if defined(RAD_OPT_DEBUG)
 			RAD_ASSERT(z.weights.size() == it->first.weights.size());
 			RAD_ASSERT(z.pos == it->first.pos);
 			RAD_ASSERT(z.st[0] == it->first.st[0]);
-			for (size_t i = 0; i < z.weights.size(); ++i)
-			{
+			for (size_t i = 0; i < z.weights.size(); ++i) {
 				RAD_ASSERT(z.weights[i].weight == it->first.weights[i].weight);
 				RAD_ASSERT(z.weights[i].bone == it->first.weights[i].bone);
 			}
@@ -1102,10 +991,8 @@ struct SkTriModel
 		indices.push_back(VertIndex(mapIdx, ofs));
 	}
 
-	void AddTriangles(const SceneFile::TriModel::Ref &m)
-	{
-		for (SceneFile::TriFaceVec::const_iterator it = m->tris.begin(); it != m->tris.end(); ++it)
-		{
+	void AddTriangles(const SceneFile::TriModel::Ref &m) {
+		for (SceneFile::TriFaceVec::const_iterator it = m->tris.begin(); it != m->tris.end(); ++it) {
 			const SceneFile::TriFace &tri = *it;
 			if (tri.mat < 0)
 				continue;
@@ -1116,14 +1003,12 @@ struct SkTriModel
 		}
 	}
 
-	void Compile()
-	{
+	void Compile() {
 		// figure out how many final verts we'll have.
 		int numWeightedVerts = 0;
 		totalVerts = 0;
 
-		for (int i = 0; i < ska::BonesPerVert; ++i)
-		{
+		for (int i = 0; i < ska::BonesPerVert; ++i) {
 			int c = (int)vmap[i].size();
 
 			totalVerts += c;
@@ -1143,11 +1028,9 @@ struct SkTriModel
 			idxRemap[i].reserve(verts[i].size());
 
 		// emit vertices premultiplied by bone weights
-		for (int i = 0; i < ska::BonesPerVert; ++i)
-		{
+		for (int i = 0; i < ska::BonesPerVert; ++i) {
 			const TriVertVec &vec = verts[i];
-			for (TriVertVec::const_iterator it = vec.begin(); it != vec.end(); ++it)
-			{
+			for (TriVertVec::const_iterator it = vec.begin(); it != vec.end(); ++it) {
 				const TriVert &v = *it;
 				RAD_ASSERT((i+1) == (int)v.weights.size());
 
@@ -1156,24 +1039,21 @@ struct SkTriModel
 				for (int k = 0; k < ska::MaxUVChannels; ++k)
 					uvs[k].push_back(v.st[k]);
 
-				for (int k = 0; k <= i; ++k)
-				{
+				for (int k = 0; k <= i; ++k) {
 					Vec4 z(v.pos * v.weights[k].weight, v.weights[k].weight);
 					weightedVerts.push_back(z);
 				}
 			}
 		}
 
-		for (VertIndex::Vec::const_iterator it = indices.begin(); it != indices.end(); ++it)
-		{
+		for (VertIndex::Vec::const_iterator it = indices.begin(); it != indices.end(); ++it) {
 			const VertIndex &idx = *it;
 			sortedIndices.push_back(idxRemap[idx.numBones][idx.index]);
 		}
 	}
 };
 
-bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, SkmData &sk, const ska::DSka &ska)
-{
+bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, SkmData &sk, const ska::DSka &ska) {
 	SkTriModel::Ref m(new (ZTools) SkTriModel());
 	SkTriModel::Vec models;
 
@@ -1181,12 +1061,10 @@ bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 	SceneFile::TriModel::Ref r = e->models[trimodel];
 	const SceneFile::Skel &skel = *e->skels[r->skel].get();
 
-	for (int i = 0; i < (int)map.mats.size(); ++i)
-	{
+	for (int i = 0; i < (int)map.mats.size(); ++i){
 		m->mat = i;
 		m->AddTriangles(r);
-		if (!m->indices.empty())
-		{
+		if (!m->indices.empty()) {
 			m->Compile();
 			models.push_back(m);
 			m.reset(new (ZTools) SkTriModel());
@@ -1197,11 +1075,9 @@ bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 	remap.reserve(skel.bones.size());
 
 	// build bone remap table
-	for (size_t i = 0; i < skel.bones.size(); ++i)
-	{
+	for (size_t i = 0; i < skel.bones.size(); ++i) {
 		U16 k;
-		for (k = 0; k < ska.numBones; ++k)
-		{
+		for (k = 0; k < ska.numBones; ++k) {
 			if (!string::cmp(skel.bones[i].name.c_str.get(), &ska.boneNames[k*(ska::DNameLen+1)]))
 				break;
 		}
@@ -1226,8 +1102,7 @@ bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 		if (!os.Write((U16)0))
 			return false;
 
-		for (SkTriModel::Vec::const_iterator it = models.begin(); it != models.end(); ++it)
-		{
+		for (SkTriModel::Vec::const_iterator it = models.begin(); it != models.end(); ++it) {
 			const SkTriModel::Ref &m = *it;
 
 			if (m->totalVerts > std::numeric_limits<U16>::max())
@@ -1238,8 +1113,7 @@ bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 			if (!os.Write((U16)m->totalVerts))
 				return false;
 
-			for (int i = 0; i < ska::BonesPerVert; ++i)
-			{
+			for (int i = 0; i < ska::BonesPerVert; ++i) {
 				if (m->verts[i].size() > std::numeric_limits<U16>::max())
 					return false;
 				if (!os.Write((U16)m->verts[i].size()))
@@ -1253,8 +1127,7 @@ bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 				if (!os.Write((U16)0))
 					return false;
 
-			if (map.mats[m->mat].name.length > ska::DNameLen)
-			{
+			if (map.mats[m->mat].name.length > ska::DNameLen) {
 				COut(C_ErrMsgBox) << "ska::DNameLen exceeded, contact a programmer to increase." << std::endl;
 				return false;
 			}
@@ -1265,14 +1138,11 @@ bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 				return false;
 
 			// texcoords
-			for (int i = 0; i < ska::MaxUVChannels; ++i)
-			{
+			for (int i = 0; i < ska::MaxUVChannels; ++i) {
 				const SkTriModel::Vec2Vec &uvs = m->uvs[i];
-				for (SkTriModel::Vec2Vec::const_iterator it = uvs.begin(); it != uvs.end(); ++it)
-				{
+				for (SkTriModel::Vec2Vec::const_iterator it = uvs.begin(); it != uvs.end(); ++it) {
 					const Vec2 &v = *it;
-					for (int k = 0; k < 2; ++k)
-					{
+					for (int k = 0; k < 2; ++k) {
 						if (!os.Write(v[k]))
 							return false;
 					}
@@ -1280,14 +1150,12 @@ bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 			}
 
 			// tris (indices)
-			for (IntVec::const_iterator it = m->sortedIndices.begin(); it != m->sortedIndices.end(); ++it)
-			{
+			for (IntVec::const_iterator it = m->sortedIndices.begin(); it != m->sortedIndices.end(); ++it) {
 				if (!os.Write((U16)*it))
 					return false;
 			}
 
-			if (m->sortedIndices.size()&1) // align ?
-			{
+			if (m->sortedIndices.size()&1) { // align
 				RAD_ASSERT((m->sortedIndices.size()/3)&1);
 				if (!os.Write((U16)0))
 					return false;
@@ -1308,12 +1176,10 @@ bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 
 		int bytes = 8;
 
-		for (SkTriModel::Vec::const_iterator it = models.begin(); it != models.end(); ++it)
-		{
+		for (SkTriModel::Vec::const_iterator it = models.begin(); it != models.end(); ++it) {
 			const SkTriModel::Ref &m = *it;
 
-			if (bytes&(SIMDDriver::Alignment-1)) // SIMD padd
-			{
+			if (bytes&(SIMDDriver::Alignment-1))  { // SIMD padd
 				U8 padd[(SIMDDriver::Alignment-1)];
 				if (os.Write(padd, SIMDDriver::Alignment-(bytes&(SIMDDriver::Alignment-1)), 0) != (SIMDDriver::Alignment-(bytes&(SIMDDriver::Alignment-1))))
 					return false;
@@ -1321,14 +1187,12 @@ bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 			}
 
 			// verts
-			for (SkTriModel::Vec4Vec::const_iterator it = m->weightedVerts.begin(); it != m->weightedVerts.end(); ++it)
-			{
+			for (SkTriModel::Vec4Vec::const_iterator it = m->weightedVerts.begin(); it != m->weightedVerts.end(); ++it) {
 				const Vec4 &v = *it;
 				if (!os.Write(v[0]) ||
 					!os.Write(v[1]) ||
 					!os.Write(v[2]) ||
-					!os.Write(v[3]))
-				{
+					!os.Write(v[3])) {
 					return false;
 				}
 
@@ -1337,10 +1201,8 @@ bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 
 			// bone indices
 
-			for (int i = 0; i < ska::BonesPerVert; ++i)
-			{
-				if (bytes&(SIMDDriver::Alignment-1)) // SIMD padd
-				{
+			for (int i = 0; i < ska::BonesPerVert; ++i) {
+				if (bytes&(SIMDDriver::Alignment-1)) { // SIMD padd
 					U8 padd[(SIMDDriver::Alignment-1)];
 					if (os.Write(padd, SIMDDriver::Alignment-(bytes&(SIMDDriver::Alignment-1)), 0) != (SIMDDriver::Alignment-(bytes&(SIMDDriver::Alignment-1))))
 						return false;
@@ -1348,11 +1210,9 @@ bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 				}
 
 				const TriVertVec &verts = m->verts[i];
-				for (TriVertVec::const_iterator it = verts.begin(); it != verts.end(); ++it)
-				{
+				for (TriVertVec::const_iterator it = verts.begin(); it != verts.end(); ++it) {
 					const TriVert &v = *it;
-					for (int k = 0; k <= i; ++k)
-					{
+					for (int k = 0; k <= i; ++k) {
 						RAD_ASSERT(k <= (int)v.weights.size());
 						int b = remap[v.weights[k].bone];
 						if (!os.Write((U16)b))
@@ -1387,8 +1247,7 @@ RADENG_API SkaData::Ref RADENG_CALL CompileSkaData(
 	const char *name, 
 	const SceneFileVec &anims,
 	int trimodel
-)
-{
+) {
 	SkaData::Ref sk(new (ZTools) SkaData());
 
 	SkaBuilder b;
@@ -1406,8 +1265,7 @@ RADENG_API SkaData::Ref RADENG_CALL CompileSkaData(
 	const char *name, 
 	const SceneFile &anims,
 	int trimodel
-)
-{
+) {
 	SkaData::Ref sk(new (ZTools) SkaData());
 
 	SkaBuilder b;
@@ -1427,8 +1285,7 @@ RADENG_API SkmData::Ref RADENG_CALL CompileSkmData(
 	int trimodel,
 	ska::SkinType skinType,
 	const ska::DSka &ska
-)
-{
+) {
 	SkmData::Ref sk(new (ZTools) SkmData());
 	sk->skinType = skinType;
 
@@ -1447,27 +1304,23 @@ RADENG_API SkmData::Ref RADENG_CALL CompileSkmData(
 
 SkaData::SkaData() :
 skaData(0),
-skaSize(0)
-{
+skaSize(0) {
 	dska.Clear();
 }
 
-SkaData::~SkaData()
-{
+SkaData::~SkaData() {
 	if (skaData)
 		zone_free(skaData);
 }
 
 SkmData::SkmData() :
-skinType(ska::SkinCpu)
-{
+skinType(ska::SkinCpu) {
 	skmData[0] = skmData[1] = 0;
 	skmSize[0] = skmSize[1] = 0;
 	dskm.Clear();
 }
 
-SkmData::~SkmData()
-{
+SkmData::~SkmData() {
 	if (skmData[0])
 		zone_free(skmData[0]);
 	if (skmData[1])
