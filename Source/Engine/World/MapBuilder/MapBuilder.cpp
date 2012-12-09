@@ -107,42 +107,67 @@ bool MapBuilder::ParseWaypoint(const world::EntSpawn &spawn) {
 
 	Vec3 org(spawn.keys.Vec3ForKey("origin"));
 	waypoint->pos = SceneFile::Vec3(org.X(), org.Y(), org.Z());
-	waypoint->id = spawn.keys.IntForKey("uid");
+	waypoint->uid = spawn.keys.IntForKey("uid");
 
 	const char *sz = spawn.keys.StringForKey("floor");
 	if (sz)
 		waypoint->floorName = sz;
 
-	sz = spawn.keys.StringForKey("transition_animation");
+	sz = spawn.keys.StringForKey("targetname");
 	if (sz)
-		waypoint->transitionAnimation = sz;
+		waypoint->targetName = sz;
+
+	sz = spawn.keys.StringForKey("userid");
+	if (sz)
+		waypoint->userId = sz;
 
 	for (int i = 0; ; ++i) {
 		String key;
 		key.PrintfASCII("connection %i", i);
-		world::Keys::Pairs::const_iterator it = spawn.keys.pairs.find(key);
-		if (it == spawn.keys.pairs.end())
+		sz = spawn.keys.StringForKey(key.c_str);
+		if (!sz)
 			break;
 
 		SceneFile::WaypointConnection::Ref connection(new (ZTools) SceneFile::WaypointConnection());
 		connection->waypoints.head = waypoint.get();
-		connection->waypoints.headId = waypoint->id;
+		connection->waypoints.headId = waypoint->uid;
 		connection->waypoints.tail = 0;
 
 		float ctrls[2][3];
 		sscanf(
-			it->second.c_str.get(),
-			"%d ( %f %f %f ) ( %f %f %f )", 
+			sz,
+			"%d %d ( %f %f %f ) ( %f %f %f )", 
 			&connection->waypoints.tailId, 
+			&connection->flags,
 			&ctrls[0][0], &ctrls[0][1], &ctrls[0][2],
 			&ctrls[1][0], &ctrls[1][1], &ctrls[1][2]
 		);
+
+		key.PrintfASCII("connection_fwd_start %i", i);
+		sz = spawn.keys.StringForKey(key.c_str);
+		if (sz)
+			connection->cmds[0] = sz;
+
+		key.PrintfASCII("connection_fwd_end %i", i);
+		sz = spawn.keys.StringForKey(key.c_str);
+		if (sz)
+			connection->cmds[1] = sz;
+
+		key.PrintfASCII("connection_back_start %i", i);
+		sz = spawn.keys.StringForKey(key.c_str);
+		if (sz)
+			connection->cmds[2] = sz;
+
+		key.PrintfASCII("connection_back_end %i", i);
+		sz = spawn.keys.StringForKey(key.c_str);
+		if (sz)
+			connection->cmds[3] = sz;
 
 		waypoint->connections.insert(SceneFile::WaypointConnection::Map::value_type(connection->waypoints, connection));
 		m_map.waypointConnections.insert(SceneFile::WaypointConnection::Map::value_type(connection->waypoints, connection));
 	}
 
-	m_map.waypoints.insert(SceneFile::Waypoint::Map::value_type(waypoint->id, waypoint));
+	m_map.waypoints.insert(SceneFile::Waypoint::Map::value_type(waypoint->uid, waypoint));
 	return true;
 }
 

@@ -1407,6 +1407,9 @@
     <ClInclude Include="..\..\Engine\Physics\BezierSpline_inl.h">
       <Filter>Source\Engine\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\World\FloorsDef.h">
+      <Filter>Source\Engine\World</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">

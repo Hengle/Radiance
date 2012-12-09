@@ -166,15 +166,18 @@ struct BSPCinematic {
 
 struct BSPWaypoint {
 	float pos[3];
-	U32 floorNum;
-	U32 triNum;
 	U32 firstConnection;
 	U32 numConnections;
-	S32 transitionAnimation;
+	S32 floorNum;
+	S32 triNum;
+	S32 targetName;
+	S32 userId;
+	S32 flags;
 };
 
 struct BSPWaypointConnection {
 	S32 flags;
+	S32 cmds[4];
 	U32 waypoints[2];
 	float ctrls[2][3]; // curve
 };
@@ -183,8 +186,8 @@ struct BSPFloor { // walkable surface
 	U32 name;
 	U32 firstTri;
 	U32 numTris;
-	U32 firstWaypoint;
-	U32 numWaypoints;
+	S32 firstWaypoint;
+	S32 numWaypoints;
 };
 
 struct BSPFloorTri {

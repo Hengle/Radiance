@@ -1022,25 +1022,16 @@ void BSPBuilder::EmitBSPWaypoints() {
 		RAD_ASSERT(connection->waypoints.head);
 
 		if (!connection->waypoints.tail) {
-			Log("WARNING: waypoint connection is missing tail (head = %d) (connection removed).\n", connection->waypoints.head->id);
+			Log("WARNING: waypoint connection is missing tail (head = %d) (connection removed).\n", connection->waypoints.head->uid);
 			continue;
 		}
 
 		RAD_ASSERT(connection->waypoints.tail);
 
-		if (connection->waypoints.head->floorName.empty) {
-			Log("WARNING: waypoint %d has no floor name (connection removed).\n", connection->waypoints.head->id);
-			continue;
-		}
-
-		if (connection->waypoints.tail->floorName.empty) {
-			Log("WARNING: waypoint %d has no floor name (connection removed).\n", connection->waypoints.tail->id);
-			continue;
-		}
-
-		// valid connection? must connect floors
-		if (connection->waypoints.head->floorName ==
-			connection->waypoints.tail->floorName) {
+		// floor connections must seperate floors
+		if (!connection->waypoints.head->floorName.empty && 
+			(connection->waypoints.head->floorName ==
+			connection->waypoints.tail->floorName)) {
 			// does not connect floors
 			Log(
 				"WARNING: waypoints connect the same floor \"%s\" (connection removed).\n", 
@@ -1162,40 +1153,53 @@ bool BSPBuilder::EmitBSPWaypoint(SceneFile::Waypoint &waypoint) {
 	if (waypoint.emitId > -1)
 		return true; // already emitted.
 
-	if (waypoint.floorName.empty) {
-		Log("WARNING: waypoint id %d does not have a floor name set (waypoint removed).\n", waypoint.id);
-		return false;
+	int floorNum = -1;
+	int floorTriNum = -1;
+
+	if (!waypoint.floorName.empty) {
+		floorNum = FindBSPFloor(waypoint.floorName.c_str);
+		if (floorNum < 0) {
+			Log("WARNING: Floor \"%s\" does not exist (waypoint removed).\n", waypoint.floorName.c_str.get());
+			return false;
+		}
+
+		floorTriNum = PutWaypointOnFloor(waypoint, floorNum);
+
+		if (floorTriNum < 0) {
+			Log("WARNING: Waypoint is not on or above floor \"%s\" (waypoint removed).\n", waypoint.floorName.c_str.get());
+			return false;
+		}
 	}
 
-	int floorNum = FindBSPFloor(waypoint.floorName.c_str);
-	if (floorNum < 0) {
-		Log("WARNING: Floor \"%s\" does not exist (waypoint removed).\n", waypoint.floorName.c_str.get());
-		return false;
-	}
-
-	int floorTriNum = PutWaypointOnFloor(waypoint, floorNum);
-
-	if (floorTriNum < 0) {
-		Log("WARNING: Waypoint is not on or above floor \"%s\" (waypoint removed).\n", waypoint.floorName.c_str.get());
+	if (m_bspFile->numWaypoints >= world::kMaxWaypoints) {
+		Log("ERROR: Maximum number of waypoints exceeded (%d), contact a programmer to increase limit!\n", world::kMaxWaypoints);
+		SetResult(pkg::SR_CompilerError);
 		return false;
 	}
 
 	waypoint.emitId = (int)m_bspFile->numWaypoints.get();
 
 	BSPWaypoint *w = m_bspFile->AddWaypoint();
-	w->floorNum = (U32)floorNum;
-	w->triNum = (U32)floorTriNum;
+	w->floorNum = (S32)floorNum;
+	w->triNum = (S32)floorTriNum;
 	w->pos[0] = waypoint.pos[0];
 	w->pos[1] = waypoint.pos[1];
 	w->pos[2] = waypoint.pos[2];
 
 	w->firstConnection = std::numeric_limits<U32>::max();
 	w->numConnections = 0;
-	w->transitionAnimation = -1;
+	
+	w->targetName = -1;
+	w->userId = -1;
 
-	if (!waypoint.transitionAnimation.empty) {
-		w->transitionAnimation = (S32)m_bspFile->numStrings.get();
-		*m_bspFile->AddString() = waypoint.transitionAnimation;
+	if (!waypoint.targetName.empty) {
+		w->targetName = (S32)m_bspFile->numStrings.get();
+		*m_bspFile->AddString() = waypoint.targetName;
+	}
+
+	if (!waypoint.userId.empty) {
+		w->userId = (S32)m_bspFile->numStrings.get();
+		*m_bspFile->AddString() = waypoint.userId;
 	}
 
 	return true;

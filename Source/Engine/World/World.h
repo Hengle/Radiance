@@ -144,7 +144,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(World, lua, WorldLua*);
 	RAD_DECLARE_READONLY_PROPERTY(World, draw, WorldDraw*);
 	RAD_DECLARE_READONLY_PROPERTY(World, cinematics, WorldCinematics*);
-	RAD_DECLARE_READONLY_PROPERTY(World, floors, const Floors*);
+	RAD_DECLARE_READONLY_PROPERTY(World, floors, Floors*);
 	RAD_DECLARE_READONLY_PROPERTY(World, pkgZone, pkg::Zone);
 	RAD_DECLARE_READONLY_PROPERTY(World, uiRoot, const ui::RootRef&);
 	RAD_DECLARE_READONLY_PROPERTY(World, destroy, bool);
@@ -358,7 +358,7 @@ private:
 	}
 
 	RAD_DECLARE_GET(camera, Camera*) { 
-		return &const_cast<World*>(this)->m_cam; 
+		return const_cast<Camera*>(&m_cam); 
 	}
 
 	RAD_DECLARE_GET(game, Game*) { 
@@ -377,8 +377,8 @@ private:
 		return m_cinematics.get(); 
 	}
 
-	RAD_DECLARE_GET(floors, const Floors*) {
-		return &m_floors;
+	RAD_DECLARE_GET(floors, Floors*) {
+		return const_cast<Floors*>(&m_floors);
 	}
 
 	RAD_DECLARE_GET(pkgZone, pkg::Zone) { 

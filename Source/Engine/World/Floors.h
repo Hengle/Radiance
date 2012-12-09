@@ -7,29 +7,14 @@
 
 #pragma once
 
-#include "../Types.h"
+#include "FloorsDef.h"
+#include "WorldDef.h"
 #include "BSPFile.h"
 #include "../Physics/BezierSpline.h"
 #include "../Lua/LuaRuntime.h"
 #include <Runtime/Container/StackVector.h>
+#include <Runtime/Container/ZoneMap.h>
 #include <Runtime/PushPack.h>
-#include <bitset>
-
-namespace world {
-
-class World;
-class Floors;
-class FloorPosition;
-
-enum {
-	kMaxFloors = 64,
-	kMaxFloorTris = 2048
-};
-
-typedef std::bitset<kMaxFloors> FloorBits;
-typedef std::bitset<kMaxFloorTris> FloorTriBits;
-
-} // world
 
 namespace lua {
 
@@ -52,6 +37,8 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(FloorPosition, pos, const Vec3&);
 	RAD_DECLARE_READONLY_PROPERTY(FloorPosition, floor, int);
 	RAD_DECLARE_READONLY_PROPERTY(FloorPosition, tri, int);
+	RAD_DECLARE_READONLY_PROPERTY(FloorPosition, waypoint, int);
+	RAD_DECLARE_READONLY_PROPERTY(FloorPosition, nextWaypoint, int);
 
 private:
 	friend class Floors;
@@ -69,9 +56,19 @@ private:
 		return m_tri;
 	}
 
+	RAD_DECLARE_GET(waypoint, int) {
+		return m_waypoint;
+	}
+
+	RAD_DECLARE_GET(nextWaypoint, int) {
+		return m_nextWaypoint;
+	}
+
 	Vec3 m_pos;
 	int m_floor;
 	int m_tri;
+	int m_waypoint;
+	int m_nextWaypoint;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -146,6 +143,17 @@ public:
 		const FloorPosition &end
 	) const;
 
+	enum {
+		RAD_FLAG(kWaypointState_Enabled)
+	};
+
+	FloorPosition WaypointPosition(int waypoint) const;
+	int WaypointState(int waypointId) const;
+	void SetWaypointState(int waypointId, int state);
+
+	IntVec WaypointsForTargetname(const char *targetname) const;
+	IntVec WaypointsForUserId(const char *userId) const;
+
 private:
 
 	struct WalkStep {
@@ -192,13 +200,36 @@ private:
 	};
 
 	//! Find shortest path from start->end
-	bool PlanMove(
+	bool Floors::PlanMove(
 		const FloorPosition &start,
 		const FloorPosition &end,
 		float distance,
 		MovePlan &plan,
 		MovePlan &planSoFar,
-		FloorBits stack,
+		FloorBits &floors,
+		WaypointBits &waypoints,
+		float &bestDistance
+	) const;
+
+	bool Floors::PlanFloorMove(
+		const FloorPosition &start,
+		const FloorPosition &end,
+		float distance,
+		MovePlan &plan,
+		MovePlan &planSoFar,
+		FloorBits &floors,
+		WaypointBits &waypoints,
+		float &bestDistance
+	) const;
+
+	bool Floors::PlanWaypointMove(
+		const FloorPosition &start,
+		const FloorPosition &end,
+		float distance,
+		MovePlan &plan,
+		MovePlan &planSoFar,
+		FloorBits &floors,
+		WaypointBits &waypoints,
 		float &bestDistance
 	) const;
 
@@ -212,6 +243,19 @@ private:
 		float &bestDistSq
 	) const;
 
+	struct Waypoint {
+		typedef zone_multimap<String, int, ZWorldT>::type MMap;
+		typedef zone_vector<Waypoint, ZWorldT>::type Vec;
+
+		String targetName;
+		String userId;
+		int waypointId;
+		int flags;
+	};
+
+	Waypoint::Vec m_waypoints;
+	Waypoint::MMap m_waypointTargets;
+	Waypoint::MMap m_waypointUserIds;
 	bsp_file::BSPFile::Ref m_bsp;
 };
 

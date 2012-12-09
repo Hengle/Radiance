@@ -458,7 +458,7 @@ void World::OnShowAchievements(bool show) {
 
 Entity::Vec World::FindEntityClass(const char *classname) const {
 	RAD_ASSERT(classname);
-	String s(classname);
+	String s(CStr(classname));
 
 	std::pair<Entity::StringMMap::const_iterator, 
 	          Entity::StringMMap::const_iterator> pair = m_classnames.equal_range(s);
@@ -475,7 +475,7 @@ Entity::Vec World::FindEntityClass(const char *classname) const {
 
 Entity::Vec World::FindEntityTargets(const char *targetname) const {
 	RAD_ASSERT(targetname);
-	String s(targetname);
+	String s(CStr(targetname));
 	
 	std::pair<Entity::StringMMap::const_iterator, 
 	          Entity::StringMMap::const_iterator> pair = m_targetnames.equal_range(s);

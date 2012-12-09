@@ -865,6 +865,7 @@
     <ClInclude Include="..\..\Engine\World\EntityDef.h" />
     <ClInclude Include="..\..\Engine\World\Event.h" />
     <ClInclude Include="..\..\Engine\World\Floors.h" />
+    <ClInclude Include="..\..\Engine\World\FloorsDef.h" />
     <ClInclude Include="..\..\Engine\World\Keys.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_Asset.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_Material.h" />

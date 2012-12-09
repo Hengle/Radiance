@@ -823,6 +823,7 @@ public:
 
 		WaypointPair waypoints;
 		Vec3 ctrls[2];
+		String cmds[4];
 		int flags;
 		int emitId;
 	};
@@ -834,11 +835,13 @@ public:
 		Waypoint() : emitId(-1) {
 		}
 
+		String targetName;
+		String userId;
 		String floorName;
-		String transitionAnimation;
+		int flags;
 		typename WaypointConnection::Map connections;
 		Vec3 pos;
-		int id;
+		int uid;
 		int emitId;
 	};
 
