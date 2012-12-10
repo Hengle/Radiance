@@ -19,22 +19,19 @@ class Engine;
 
 namespace ska {
 
-struct AnimTagEventData
-{
+struct AnimTagEventData {
 	Ska* ska;
 	Animation* anim;
 	String tag;
 	int bone;
 };
 
-struct AnimStateEventData
-{
+struct AnimStateEventData {
 	Ska *ska;
 	Animation *anim;
 };
 
-class RADENG_CLASS Notify
-{
+class RADENG_CLASS Notify {
 public:
 	typedef NotifyRef Ref;
 
@@ -43,20 +40,17 @@ public:
 	// If masked, will not emit events.
 	RAD_DECLARE_PROPERTY(Notify, masked, bool, bool);
 
-	void EmitTag(const AnimTagEventData &data)
-	{
+	void EmitTag(const AnimTagEventData &data) {
 		if (!m_masked)
 			OnTag(data);
 	}
 
-	void EmitEndFrame(const AnimStateEventData &data)
-	{
+	void EmitEndFrame(const AnimStateEventData &data) {
 		if (!m_masked)
 			OnEndFrame(data);
 	}
 
-	void EmitFinish(const AnimStateEventData &data, bool masked)
-	{
+	void EmitFinish(const AnimStateEventData &data, bool masked) {
 		if (!m_masked)
 			OnFinish(data, masked);
 	}
@@ -68,14 +62,18 @@ protected:
 
 private:
 
-	RAD_DECLARE_GET(masked, bool) { return m_masked; }
-	RAD_DECLARE_SET(masked, bool) { m_masked = value; }
+	RAD_DECLARE_GET(masked, bool) { 
+		return m_masked; 
+	}
+
+	RAD_DECLARE_SET(masked, bool) { 
+		m_masked = value; 
+	}
 
 	bool m_masked;
 };
 
-struct BoneTM
-{
+struct BoneTM {
 	typedef boost::shared_array<BoneTM> Ref;
 	Quat r;
 	Vec3 s;
@@ -94,15 +92,13 @@ struct BoneTM
 // all N bones. Indexes from N*2 to N*2+N are the indexes for N bones for
 // frame 1, etc.
 
-struct DTag
-{
+struct DTag {
 	U16 frame; // frame that tag should be emitted on.
 	U16 numBones; // number of bones with tags on this frame.
 	U16 tagOfs; // offset into boneTags
 };
 
-struct DAnim
-{
+struct DAnim {
 	typedef zone_vector<DAnim, ZSkaT>::type Vec;
 	typedef zone_vector<int, ZSkaT>::type IntVec;
 
@@ -118,8 +114,7 @@ struct DAnim
 	const U8 *boneTags; // (U16) bone index, + (U8) string index (3 bytes per bone in this field).
 };
 
-struct RADENG_CLASS DSka
-{
+struct RADENG_CLASS DSka {
 	U16 numBones;
 
 	const char *boneNames;
@@ -143,8 +138,7 @@ struct RADENG_CLASS DSka
 	int Parse(const void *data, AddrSize len);
 };
 
-struct DMesh
-{
+struct DMesh {
 	typedef zone_vector<DMesh, ZSkaT>::type Vec;
 	
 	U16 totalVerts;
@@ -165,8 +159,7 @@ struct DMesh
 	const U16 *indices;
 };
 
-struct RADENG_CLASS DSkm
-{
+struct RADENG_CLASS DSkm {
 	DMesh::Vec meshes;
 
 	void Clear();
@@ -179,8 +172,7 @@ struct RADENG_CLASS DSkm
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS Animation
-{ // animation
+class RADENG_CLASS Animation {
 public:
 
 	typedef zone_map<String, Animation*, ZSkaT>::type Map;
@@ -233,8 +225,8 @@ private:
 struct ColumnMajorTag {};
 struct RowMajorTag {};
 
-class RADENG_CLASS Ska
-{ // skeletal model
+// skeletal model
+class RADENG_CLASS Ska {
 	RAD_EVENT_CLASS(EventNoAccess)
 public:
 

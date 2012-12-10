@@ -916,6 +916,9 @@ bool Floors::PlanWaypointMove(
 			if (waypoints.test(otherWaypointIdx)) // came from here.
 				continue;
 
+			if (!(m_waypoints[otherWaypointIdx].flags&kWaypointState_Enabled))
+				continue; // waypoint is disabled right now.
+
 			const bsp_file::BSPWaypoint *otherWaypoint = m_bsp->Waypoints() + otherWaypointIdx;
 
 			if (otherWaypoint->floorNum >= 0) {
