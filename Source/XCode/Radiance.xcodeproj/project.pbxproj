@@ -1075,6 +1075,11 @@
 		338CDFBB15BC9B970058DFF5 /* PlaneDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8853315B9ACBE0089BA08 /* PlaneDef.h */; };
 		338CDFBC15BC9B970058DFF5 /* Quaternion.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8853415B9ACBE0089BA08 /* Quaternion.h */; };
 		338CDFBD15BC9B970058DFF5 /* QuaternionDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8853615B9ACBE0089BA08 /* QuaternionDef.h */; };
+		339805941676D544002758B1 /* FloorsDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 339805931676D544002758B1 /* FloorsDef.h */; };
+		339805951676D544002758B1 /* FloorsDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 339805931676D544002758B1 /* FloorsDef.h */; };
+		339805961676D544002758B1 /* FloorsDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 339805931676D544002758B1 /* FloorsDef.h */; };
+		339805971676D544002758B1 /* FloorsDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 339805931676D544002758B1 /* FloorsDef.h */; };
+		339805981676D544002758B1 /* FloorsDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 339805931676D544002758B1 /* FloorsDef.h */; };
 		33988F9816684EA60018C3E6 /* Floors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988F9616684EA60018C3E6 /* Floors.cpp */; };
 		33988F9916684EA60018C3E6 /* Floors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988F9616684EA60018C3E6 /* Floors.cpp */; };
 		33988F9A16684EA60018C3E6 /* Floors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988F9616684EA60018C3E6 /* Floors.cpp */; };
@@ -2840,6 +2845,7 @@
 		338CDF0815BC8F140058DFF5 /* RadianceShipDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceShipDebugOSX.xcconfig; path = XCConfig/RadianceShipDebugOSX.xcconfig; sourceTree = "<group>"; };
 		338CDF0915BC8F140058DFF5 /* RadianceShipReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceShipReleaseiOS.xcconfig; path = XCConfig/RadianceShipReleaseiOS.xcconfig; sourceTree = "<group>"; };
 		338CDF0A15BC8F140058DFF5 /* RadianceShipReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceShipReleaseOSX.xcconfig; path = XCConfig/RadianceShipReleaseOSX.xcconfig; sourceTree = "<group>"; };
+		339805931676D544002758B1 /* FloorsDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FloorsDef.h; sourceTree = "<group>"; };
 		33988F9616684EA60018C3E6 /* Floors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Floors.cpp; sourceTree = "<group>"; };
 		33988F9716684EA60018C3E6 /* Floors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Floors.h; sourceTree = "<group>"; };
 		33988FA316684F1C0018C3E6 /* BezierSpline_inl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BezierSpline_inl.h; sourceTree = "<group>"; };
@@ -4849,6 +4855,7 @@
 				33E888CF15B9BA4A0089BA08 /* Event.h */,
 				33988F9616684EA60018C3E6 /* Floors.cpp */,
 				33988F9716684EA60018C3E6 /* Floors.h */,
+				339805931676D544002758B1 /* FloorsDef.h */,
 				33E888D015B9BA4A0089BA08 /* Keys.cpp */,
 				33E888D115B9BA4A0089BA08 /* Keys.h */,
 				33E8890015B9BA4A0089BA08 /* MBatchDraw.h */,
@@ -5344,6 +5351,7 @@
 				33988F9F16684EA60018C3E6 /* Floors.h in Headers */,
 				33988FA816684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
 				33988FB216684F1C0018C3E6 /* BezierSpline.h in Headers */,
+				339805961676D544002758B1 /* FloorsDef.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5724,6 +5732,7 @@
 				33988FA016684EA60018C3E6 /* Floors.h in Headers */,
 				33988FA916684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
 				33988FB316684F1C0018C3E6 /* BezierSpline.h in Headers */,
+				339805971676D544002758B1 /* FloorsDef.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6183,6 +6192,7 @@
 				33988FA616684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
 				33988FB016684F1C0018C3E6 /* BezierSpline.h in Headers */,
 				33988FB816684F980018C3E6 /* EditorPathfindingDebugWidget.h in Headers */,
+				339805941676D544002758B1 /* FloorsDef.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6563,6 +6573,7 @@
 				33988F9E16684EA60018C3E6 /* Floors.h in Headers */,
 				33988FA716684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
 				33988FB116684F1C0018C3E6 /* BezierSpline.h in Headers */,
+				339805951676D544002758B1 /* FloorsDef.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6943,6 +6954,7 @@
 				33988FA116684EA60018C3E6 /* Floors.h in Headers */,
 				33988FAA16684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
 				33988FB416684F1C0018C3E6 /* BezierSpline.h in Headers */,
+				339805981676D544002758B1 /* FloorsDef.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
