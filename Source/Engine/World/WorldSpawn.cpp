@@ -32,8 +32,11 @@ int World::Spawn(
 	if (!time.remaining)
 		return SR_Pending;
 
-	if (m_spawnState == SS_None)
+	if (m_spawnState == SS_None) {
+		m_spawnOfs = 0;
 		++m_spawnState;
+		m_builtIns = m_lua->GetBuiltIns();
+	}
 
 	int r = SR_Pending;
 
@@ -80,6 +83,9 @@ int World::Spawn(
 			);
 			if (r == SR_Success)
 				++m_spawnState;
+			break;
+		case SS_BuiltIns:
+			r = SpawnBuiltIns(time, flags);
 			break;
 		case SS_Ents:
 			r = SpawnNonSoundEntities(
@@ -589,6 +595,81 @@ int World::SpawnNonSoundEmitter(
 			return SR_Success; // skip sound emitters
 
 		int r = CreateEntity(m_spawnKeys);
+		if (r != SR_Success) // don't fail on not finding a class factory.
+			return SR_Success;
+		RAD_ASSERT(m_spawnEnt);
+		SetupEntity(m_spawnEnt, m_nextEntId++);
+	}
+
+	int r = m_spawnEnt->PrivateSpawn(
+		m_spawnKeys,
+		time,
+		flags
+	);
+
+	if (r == SR_Pending)
+		return r;
+	if (r == SR_Success) {
+		COut(C_Debug) << "Spawned '" << m_spawnEnt->classname.get() << "'" << std::endl;
+		MapEntity(m_spawnEnt);
+	} else {
+		COut(C_Warn) << "Failed to spawn '" << m_spawnEnt->classname.get() << "'" << std::endl;
+	}
+
+	m_spawnEnt.reset();
+	m_spawnKeys.pairs.clear();
+
+	return r;
+}
+
+int World::SpawnBuiltIns(
+	const xtime::TimeSlice &time,
+	int flags
+) {
+	int r = SR_Success;
+
+	while (time.remaining) {
+		if (m_spawnOfs >= (U32)m_builtIns.size()) {
+			++m_spawnState;
+			m_spawnOfs = 0;
+			StringVec v;
+			v.swap(m_builtIns); // deallocate builtins.
+			break;
+		}
+
+		r = SpawnBuiltIn(
+			m_spawnOfs, 
+			time,
+			flags
+		);
+
+		if (r != SR_Success)
+			break;
+
+		++m_spawnOfs;
+		r = SR_Pending;
+	}
+
+	return r;
+}
+
+int World::SpawnBuiltIn(
+	U32 entityNum,
+	const xtime::TimeSlice &time,
+	int flags
+) {
+	if (!m_spawnEnt) {
+		if (m_nextEntId >= kMaxStaticEnts) {
+			COut(C_Warn) << "kMaxStaticEnts" << std::endl;
+			return SR_ErrorGeneric;
+		}
+
+		const String kClassName(CStr("classname"));
+
+		Keys keys;
+		keys.pairs.insert(Keys::Pairs::value_type(kClassName, m_builtIns[entityNum]));
+
+		int r = CreateEntity(keys);
 		if (r != SR_Success) // don't fail on not finding a class factory.
 			return SR_Success;
 		RAD_ASSERT(m_spawnEnt);

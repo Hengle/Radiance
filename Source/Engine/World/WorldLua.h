@@ -46,6 +46,8 @@ public:
 	bool HandleInputEvent(const InputEvent &e, const TouchState *touch, const InputState &is);
 	bool HandleInputGesture(const InputGesture &g, const TouchState &touch, const InputState &is);
 
+	StringVec GetBuiltIns();
+
 	void NotifyBackground();
 	void NotifyResume();
 	void SaveApplicationState();
@@ -118,6 +120,7 @@ private:
 	static int lua_System_GetLangString(lua_State *L);
 	static int lua_System_LaunchURL(lua_State *L);
 	static int lua_System_Fullscreen(lua_State *L);
+	static int lua_System_ScreenSize(lua_State *L);
 	static int lua_System_COut(lua_State *L);
 	static int lua_System_CurrentDateAndTime(lua_State *L);
 	static int lua_System_CreatePrecacheTask(lua_State *L);

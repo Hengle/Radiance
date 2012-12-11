@@ -195,6 +195,7 @@ bool WorldLua::Init() {
 		{ "GetLangString", lua_System_GetLangString },
 		{ "LaunchURL", lua_System_LaunchURL },
 		{ "Fullscreen", lua_System_Fullscreen },
+		{ "ScreenSize", lua_System_ScreenSize },
 		{ "CreatePrecacheTask", lua_System_CreatePrecacheTask },
 		{ "CreateSpawnTask", lua_System_CreateSpawnTask },
 		{ "CreateTempSpawnTask", lua_System_CreateTempSpawnTask },
@@ -403,6 +404,32 @@ bool WorldLua::HandleInputGesture(const InputGesture &g, const TouchState &touch
 	}
 
 	return r;
+}
+
+StringVec WorldLua::GetBuiltIns() {
+	if (!PushGlobalCall("World.BuiltIns"))
+		return StringVec();
+	lua_State *L = m_L->L;
+
+	StringVec v;
+
+	if (Call("World.BuiltIns", 0, 1, 0)) {
+		if (lua_type(L, -1) == LUA_TTABLE) {
+			lua_checkstack(L, 3);
+			lua_pushnil(L); // iterate table from start
+			while (lua_next(L, -2) != 0) {
+				if (lua_type(L, -1) == LUA_TSTRING) { // value is not string!
+					v.push_back(String(lua_tolstring(L, -1, 0)));
+				} else {
+					COut(C_Error) << "WorldLua::GetBuiltIns: value in table is not a string!" << std::endl;
+				}
+				lua_pop(L, 1); // remove value, key tells lua_next where to start.
+			}
+		}
+		lua_pop(L, 1);
+	}
+
+	return v;
 }
 
 void WorldLua::NotifyBackground() {
@@ -665,6 +692,32 @@ int WorldLua::lua_System_Platform(lua_State *L) {
 #else
 	#error RAD_ERROR_UNSUP_PLAT
 #endif
+
+	return 1;
+}
+
+int WorldLua::lua_System_ScreenSize(lua_State *L) {
+	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
+	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
+
+	int vpx, vpy, vpw, vph;
+	self->m_world->game->Viewport(vpx, vpy, vpw, vph);
+
+	lua_createtable(L, 0, 2);
+	lua_pushinteger(L, vpw);
+	lua_setfield(L, -2, "width");
+	lua_pushinteger(L, vph);
+	lua_setfield(L, -2, "height");
+
+	r::VidMode m(vpw, vph, 32, 60, true);
+	if (m.Is4x3()) {
+		lua_pushstring(L, "4x3");
+	} else if (m.Is16x9()) {
+		lua_pushstring(L, "16x9");
+	} else {
+		lua_pushstring(L, "16x10");
+	}
+	lua_setfield(L, -2, "aspect");
 
 	return 1;
 }

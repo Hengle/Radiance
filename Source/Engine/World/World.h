@@ -169,6 +169,7 @@ private:
 		SS_Materials,
 		SS_Models,
 		SS_Cinematics,
+		SS_BuiltIns,
 		SS_Ents,
 		SS_Specials,
 		SS_PostSpawn,
@@ -233,6 +234,17 @@ private:
 
 	int SpawnNonSoundEmitter(
 		const bsp_file::BSPFile &bsp,
+		U32 entityNum,
+		const xtime::TimeSlice &time,
+		int flags
+	);
+
+	int SpawnBuiltIns(
+		const xtime::TimeSlice &time,
+		int flags
+	);
+
+	int SpawnBuiltIn(
 		U32 entityNum,
 		const xtime::TimeSlice &time,
 		int flags
@@ -448,6 +460,7 @@ private:
 	dBSPNode::Vec m_nodes;
 	dBSPLeaf::Vec m_leafs;
 	dBSPArea::Vec m_areas;
+	StringVec m_builtIns;
 	dAreaportal::Vec m_areaportals;
 	PlaneVec m_planes;
 	U32 m_spawnOfs;

@@ -40,6 +40,7 @@ typedef zone_vector<Plane, ZWorldT>::type PlaneVec;
 typedef zone_vector<int, ZWorldT>::type IntVec;
 typedef zone_set<Entity*, ZWorldT>::type EntityPtrSet;
 typedef zone_set<int, ZWorldT>::type IntSet;
+typedef zone_vector<String, ZWorldT>::type StringVec;
 typedef std::bitset<kMaxEnts> EntityBits;
 typedef std::bitset<kMaxAreas> AreaBits;
 typedef math::Winding<Vec3, Plane, zone_allocator<Vec3, ZWorldT> > Winding;
