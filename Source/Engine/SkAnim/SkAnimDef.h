@@ -11,8 +11,6 @@
 
 namespace ska {
 
-//#define SKA_NORMALS
-
 class Animation;
 class Ska;
 typedef boost::shared_ptr<Ska> SkaRef;
@@ -33,27 +31,25 @@ struct DSka;
 struct DMesh;
 struct DSkm;
 
-enum
-{
-	EncBytes = 3,
-	EncMask = 0x00ffffff
+enum {
+	kEncBytes = 3,
+	kEncMask = 0x00ffffff
 };
 
-enum SkinType
-{
-	SkinCpu
+enum SkinType {
+	kSkinType_CPU
 };
 
 enum
 {
-	SkaTag = RAD_FOURCC_LE('S', 'K', 'A', 'X'),
-	SkaVersion = 1,
-	SkmxTag = RAD_FOURCC_LE('S', 'K', 'M', 'X'),
-	SkmpTag = RAD_FOURCC_LE('S', 'K', 'M', 'P'),
-	SkmVersion = 1,
-	DNameLen = 63, 
-	BonesPerVert = 4,
-	MaxUVChannels = 1
+	kSkaTag = RAD_FOURCC_LE('S', 'K', 'A', 'X'),
+	kSkaVersion = 1,
+	kSkmxTag = RAD_FOURCC_LE('S', 'K', 'M', 'X'),
+	kSkmpTag = RAD_FOURCC_LE('S', 'K', 'M', 'P'),
+	kSkmVersion = 2,
+	kDNameLen = 63, 
+	kBonesPerVert = 4,
+	kMaxUVChannels = 1
 };
 
 } // ska

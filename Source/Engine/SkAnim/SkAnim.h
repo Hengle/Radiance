@@ -142,31 +142,39 @@ struct DMesh {
 	typedef zone_vector<DMesh, ZSkaT>::type Vec;
 	
 	U16 totalVerts;
-	U16 numVerts[BonesPerVert]; // 4,3,2,1 bone counts
+	U16 numVerts[kBonesPerVert]; // 4,3,2,1 bone counts
 	U16 numTris;
+	U16 numChannels;
+
 	const char *material;
 
 	const float *verts; // prescaled by weights, N copies per bone
-#if defined(SKA_NORMALS)
-	const float *normals;
-#endif
-	const float *texCoords;
+						// this is a packed field:
+						// floats:
+						// 0-3   -> vertex
+						// 4-7   -> normal
+						// 8-11  -> tangent 1
+						// 12-15 -> tangent 2
+
+	const float *texCoords; // 2 floats * numChannels
 
 	// see r::SkMesh::BonesPerVert (Renderer/SkMesh.h)
 
-	const U16 *bones[BonesPerVert]; // N per vert, depending on how many bones the vertex has.
+	const U16 *bones[kBonesPerVert]; // N per vert, depending on how many bones the vertex has.
 
 	const U16 *indices;
 };
 
 struct RADENG_CLASS DSkm {
+
+	BBox bounds;
 	DMesh::Vec meshes;
 
 	void Clear();
 
-	// if SkinType == SkinCpu then:
+	// if SkinType == kSkinType_CPU then:
 	// data[0] == non-persisted data: material names, texCoords, tris
-	// data[1] == persisted data: vertices, normals, weights, bone indices
+	// data[1] == persisted data: vertices, normals, tangents, weights, bone indices
 	int Parse(const void * const *data, const AddrSize *len, SkinType type);
 };
 

@@ -26,8 +26,7 @@ namespace r {
 	into those buffers. The mesh itself is implemented in the rendering backend.
 	\sa r::GLMesh
 */
-class RADENG_CLASS Mesh
-{
+class RADENG_CLASS Mesh {
 public:
 #if defined(RAD_OPT_GL)
 	typedef GLMesh RB;
@@ -122,8 +121,7 @@ private:
 };
 
 //! Defines a group of meshes and their associated materials.
-class RADENG_CLASS MeshBundle
-{
+class RADENG_CLASS MeshBundle {
 public:
 	typedef boost::shared_ptr<MeshBundle> Ref;
 
@@ -132,13 +130,11 @@ public:
 	MeshBundle() {}
 	~MeshBundle() {}
 
-	const r::Mesh::Ref &Mesh(int idx)
-	{ 
+	const r::Mesh::Ref &Mesh(int idx) { 
 		return m_meshes[idx]; 
 	}
 	
-	pkg::AssetRef MaterialAsset(int idx)
-	{
+	pkg::AssetRef MaterialAsset(int idx) {
 		RAD_ASSERT(m_loader);
 		return m_loader->MaterialAsset(idx);
 	}

@@ -16,12 +16,11 @@
 
 //#define MESH_NORMALS
 
-enum
-{
-	MeshTag = RAD_FOURCC_LE('M', 'E', 'S', 'H'),
-	MeshVersion = 1,
-	MaxBatchElements = Kilo*64,
-	MaxUVChannels = 2
+enum {
+	kMeshTag = RAD_FOURCC_LE('M', 'E', 'S', 'H'),
+	kMeshVersion = 2,
+	kMaxBatchElements = Kilo*64,
+	kMaxUVChannels = ska::kMaxUVChannels
 };
 
 namespace asset {
@@ -30,8 +29,7 @@ RAD_ZONE_DEF(RADENG_API, ZMesh, "Mesh", ZEngine);
 
 #define CHECK_SIZE(_size) if (((bytes+(_size))-reinterpret_cast<const U8*>(data)) > (int)len) return pkg::SR_CorruptFile;
 
-int DMeshBundle::Parse(const void *data, AddrSize len)
-{
+int DMeshBundle::Parse(const void *data, AddrSize len) {
 	meshes.clear();
 
 	if (len < 12)
@@ -40,7 +38,7 @@ int DMeshBundle::Parse(const void *data, AddrSize len)
 	const U8 *bytes = reinterpret_cast<const U8*>(data);
 	const U32 *header = reinterpret_cast<const U32*>(data);
 
-	if (header[0] != MeshTag || header[1] != MeshVersion)
+	if (header[0] != kMeshTag || header[1] != kMeshVersion)
 		return pkg::SR_InvalidFormat;
 
 	U32 numModels = header[2];
@@ -48,36 +46,33 @@ int DMeshBundle::Parse(const void *data, AddrSize len)
 
 	meshes.resize(numModels);
 
-	for (U32 i = 0; i < numModels; ++i)
-	{
+	for (U32 i = 0; i < numModels; ++i) {
 		DMesh &m = meshes[i];
 
-		CHECK_SIZE(ska::DNameLen+1);
+		CHECK_SIZE(ska::kDNameLen+1);
 		m.material = reinterpret_cast<const char*>(bytes);
-		bytes += ska::DNameLen+1;
+		bytes += ska::kDNameLen+1;
 
-		CHECK_SIZE(sizeof(U16)*2);
-		m.flags = *reinterpret_cast<const U16*>(bytes);
+		CHECK_SIZE(sizeof(U16)*4);
+		m.numVerts = *reinterpret_cast<const U16*>(bytes);
 		bytes += sizeof(U16);
-		m.vertSize = *reinterpret_cast<const U16*>(bytes);
+		m.numIndices = *reinterpret_cast<const U16*>(bytes);
 		bytes += sizeof(U16);
-		
-		CHECK_SIZE(sizeof(U32)*2);
-		m.numVerts = *reinterpret_cast<const U32*>(bytes);
-		bytes += sizeof(U32);
-		m.numIndices = *reinterpret_cast<const U32*>(bytes);
-		bytes += sizeof(U32);
+		m.numChannels = *reinterpret_cast<const U16*>(bytes);
+		bytes += sizeof(U16);
 
-		CHECK_SIZE(((U32)m.vertSize)*m.numVerts);
+		// padd bytes
+		bytes += sizeof(U16);
+
+		CHECK_SIZE((m.numVerts*2*3)+(m.numVerts*4*(m.numChannels+1)) * sizeof(float));
 		m.vertices = reinterpret_cast<const void*>(bytes);
-		bytes += ((U32)m.vertSize)*m.numVerts;
+		bytes += (m.numVerts*2*3)+(m.numVerts*4*(m.numChannels+1)) * sizeof(float);
 		
 		CHECK_SIZE(sizeof(U16)*m.numIndices);
 		m.indices = bytes;
 		bytes += sizeof(U16)*m.numIndices;
 
-		if (m.numIndices&1)
-		{ // padd
+		if (m.numIndices&1) { // padd
 			CHECK_SIZE(sizeof(U16));
 			bytes += sizeof(U16);
 		}
@@ -99,8 +94,7 @@ typedef zone_map<TriVert, int, ZToolsT>::type TriVertMap;
 typedef zone_vector<String, ZToolsT>::type StringVec;
 typedef zone_map<String, int, ZToolsT>::type StringMap;
 
-struct TriModel
-{
+struct TriModel {
 	typedef boost::shared_ptr<TriModel> Ref;
 	typedef zone_vector<Ref, ZToolsT>::type Vec;
 	typedef zone_vector<int, ZToolsT>::type IntVec;
@@ -111,14 +105,16 @@ struct TriModel
 	IntVec indices;
 	TriVertMap vmap;
 
-	void AddVertex(const TriVert &v)
-	{
+	void AddVertex(const TriVert &v) {
 		TriVertMap::iterator it = vmap.find(v);
-		if (it != vmap.end())
-		{
+		if (it != vmap.end()) {
 #if defined(RAD_OPT_DEBUG)
 			RAD_ASSERT(v.pos == it->first.pos);
 			RAD_ASSERT(v.st[0] == it->first.st[0]);
+			for (int i = 0; i < SceneFile::kMaxUVChannels; ++i) {
+				RAD_ASSERT(v.st[i] == it->first.st[i]);
+				RAD_ASSERT(v.tangent[i] == it->first.tangent[i]);
+			}
 #endif
 			indices.push_back(it->second);
 			return;
@@ -134,51 +130,42 @@ bool DoCompileMeshBundle(
 	const char *name,
 	const SceneFileVec &maps,
 	DMeshBundleData::Ref &bundle
-)
-{
+) {
 	TriModel::Vec models;
 	TriModel::Ref m;
 	StringMap matMap;
 	StringVec mats;
 
 	// gather materials
-	for (SceneFileVec::const_iterator it = maps.begin(); it != maps.end(); ++it)
-	{
+	for (SceneFileVec::const_iterator it = maps.begin(); it != maps.end(); ++it) {
 		const SceneFile &map = (*(*it));
 
-		for (int i = 0; i < (int)map.mats.size(); ++i)
-		{
+		for (int i = 0; i < (int)map.mats.size(); ++i) {
 			String s(map.mats[i].name);
 			StringMap::iterator it = matMap.find(s);
-			if (it == matMap.end())
-			{
+			if (it == matMap.end()) {
 				matMap[s] = (int)mats.size();
 				mats.push_back(s);
 			}
 		}
 	}
 
-	for (int c = 1; c <= MaxUVChannels; ++c)
-	{
-		for (int i = 0; i < (int)mats.size(); ++i)
-		{
+	for (int c = 1; c <= kMaxUVChannels; ++c) {
+		for (int i = 0; i < (int)mats.size(); ++i) {
 			m.reset(new (ZTools) TriModel());
 			m->mat = i;
 			m->numChannels = c;
 			
-			for (SceneFileVec::const_iterator it = maps.begin(); it != maps.end(); ++it)
-			{
+			for (SceneFileVec::const_iterator it = maps.begin(); it != maps.end(); ++it) {
 				const SceneFile &map = (*(*it));
 				const SceneFile::Entity::Ref &e = map.worldspawn;
 
-				for (SceneFile::TriModel::Vec::const_iterator it = e->models.begin(); it != e->models.end(); ++it)
-				{
+				for (SceneFile::TriModel::Vec::const_iterator it = e->models.begin(); it != e->models.end(); ++it) {
 					const SceneFile::TriModel::Ref &src = *it;
 					if (src->numChannels != c)
 						continue;
 					
-					for (SceneFile::TriFaceVec::const_iterator it = src->tris.begin(); it != src->tris.end(); ++it)
-					{
+					for (SceneFile::TriFaceVec::const_iterator it = src->tris.begin(); it != src->tris.end(); ++it) {
 						const SceneFile::TriFace &tri = *it;
 						if (tri.mat < 0)
 							continue;
@@ -186,9 +173,9 @@ bool DoCompileMeshBundle(
 						if (mat != m->mat)
 							continue;
 
-						if (m->indices.size() >= MaxBatchElements-3 ||
-							m->verts.size() >= MaxBatchElements-3)
-						{ // flush
+						if (m->indices.size() >= kMaxBatchElements-3 ||
+							m->verts.size() >= kMaxBatchElements-3) { 
+							// flush
 							models.push_back(m);
 							m.reset(new (ZTools) TriModel());
 							m->mat = i;
@@ -212,79 +199,73 @@ bool DoCompileMeshBundle(
 	stream::DynamicMemOutputBuffer ob(asset::ZMesh);
 	stream::LittleOutputStream os(ob);
 
-	if (!os.Write((U32)MeshTag) || !os.Write((U32)MeshVersion))
+	if (!os.Write((U32)kMeshTag) || !os.Write((U32)kMeshVersion))
 		return false;
 	if (!os.Write((U32)models.size()))
 		return false;
 
-	for (TriModel::Vec::const_iterator it = models.begin(); it != models.end(); ++it)
-	{
+	for (TriModel::Vec::const_iterator it = models.begin(); it != models.end(); ++it) {
 		const TriModel::Ref &m = *it;
 
-		if (mats[m->mat].length > ska::DNameLen)
-		{
-			COut(C_ErrMsgBox) << "ska::DNameLen exceeded, contact a programmer to increase." << std::endl;
+		if (mats[m->mat].length > ska::kDNameLen) {
+			COut(C_ErrMsgBox) << "ska::kDNameLen exceeded, contact a programmer to increase." << std::endl;
 			return false;
 		}
 
-		char name[ska::DNameLen+1];
-		string::ncpy(name, mats[m->mat].c_str.get(), ska::DNameLen+1);
-		if (!os.Write(name, ska::DNameLen+1, 0))
+		char name[ska::kDNameLen+1];
+		string::ncpy(name, mats[m->mat].c_str.get(), ska::kDNameLen+1);
+		if (!os.Write(name, ska::kDNameLen+1, 0))
 			return false;
 
-		U16 flags = asset::DMesh::Vertices|asset::DMesh::Texture1;
-		U16 vertSize = sizeof(float)*5;
-
-		if (m->numChannels > 1)
-		{
-			flags |= asset::DMesh::Texture2;
-			vertSize += sizeof(float)*2;
-		}
-
-		if (!os.Write(flags))
+		
+		if (!os.Write((U16)m->verts.size()))
 			return false;
-		if (!os.Write(vertSize))
+		if (!os.Write((U16)m->indices.size()))
 			return false;
-		if (!os.Write((U32)m->verts.size()))
+		if (!os.Write((U16)m->numChannels))
 			return false;
-		if (!os.Write((U32)m->indices.size()))
+		if (!os.Write((U16)0))
 			return false;
 
-		for (TriVertVec::const_iterator it = m->verts.begin(); it != m->verts.end(); ++it)
-		{
+		for (TriVertVec::const_iterator it = m->verts.begin(); it != m->verts.end(); ++it) {
 			const TriVert &v = *it;
-			float floats[7];
 
-			int i;
-			for (i = 0; i < 3; ++i)
-				floats[i] = v.pos[i];
-			for (i = 0; i < 2; ++i)
-				floats[3+i] = v.st[0][i];
-
-			if (flags&asset::DMesh::Texture2)
-			{
-				for (i = 0; i < 2; ++i)
-					floats[5+i] = v.st[1][i];
-				if (os.Write(floats, sizeof(float)*7, 0) != sizeof(float)*7)
+			for (int i = 0; i < 3; ++i) {
+				if (!os.Write(v.pos[i]))
 					return false;
 			}
-			else
-			{
-				if (os.Write(floats, sizeof(float)*5, 0) != sizeof(float)*5)
+
+			for (int i = 0; i < 3; ++i) {
+				if (!os.Write(v.normal[i]))
 					return false;
+			}
+
+			RAD_STATIC_ASSERT(SceneFile::kMaxUVChannels == 2);
+
+			for (int i = 0; i < SceneFile::kMaxUVChannels; ++i) {
+				for (int k = 0; k < 2; ++k) {
+					if (!os.Write(v.st[i][k]))
+						return false;
+				}
+			}
+
+			for (int i = 0; i < m->numChannels; ++i) {
+				for (int k = 0; k < 4; ++k) {
+					if (!os.Write(v.tangent[i][k]))
+						return false;
+				}
 			}
 		}
 
 		// write indices
 
-		for (size_t i = 0; i < m->indices.size(); ++i)
-		{
+		for (size_t i = 0; i < m->indices.size(); ++i) {
 			if (!os.Write((U16)m->indices[i]))
 				return false;
 		}
 
-		if (m->indices.size()&1)
-		{ // pad
+		if (m->indices.size()&1) { 
+			// pad
 			if (!os.Write((U16)0))
 				return false;
 		}
@@ -302,12 +283,10 @@ bool DoCompileMeshBundle(
 
 DMeshBundleData::DMeshBundleData() :
 data(0),
-size(0)
-{
+size(0) {
 }
 
-DMeshBundleData::~DMeshBundleData()
-{
+DMeshBundleData::~DMeshBundleData() {
 	if (data)
 		zone_free(data);
 }
@@ -315,8 +294,7 @@ DMeshBundleData::~DMeshBundleData()
 RADENG_API DMeshBundleData::Ref RADENG_CALL CompileMeshBundle(
 	const char *name,
 	const tools::SceneFileVec &maps
-)
-{
+) {
 	DMeshBundleData::Ref bundle(new (ZTools) DMeshBundleData());
 	if (!DoCompileMeshBundle(name, maps, bundle))
 		bundle.reset();

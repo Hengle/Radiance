@@ -65,7 +65,9 @@ private:
 
 	void AddUMatRef(const pkg::Asset::Ref &m);
 
-	RAD_DECLARE_GET(numUniqueMaterials, int) { return (int)m_umatRefs.size(); }
+	RAD_DECLARE_GET(numUniqueMaterials, int) { 
+		return (int)m_umatRefs.size(); 
+	}
 
 	pkg::Asset::Vec m_matRefs;
 	pkg::Asset::Vec m_umatRefs;

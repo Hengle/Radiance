@@ -19,8 +19,7 @@ namespace world {
 
 class World;
 
-class RADENG_CLASS WorldLua
-{
+class RADENG_CLASS WorldLua {
 public:
 
 	typedef boost::shared_ptr<WorldLua> Ref;

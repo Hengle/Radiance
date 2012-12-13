@@ -15,8 +15,7 @@
 
 namespace r {
 
-class RADENG_CLASS SkMesh
-{
+class RADENG_CLASS SkMesh {
 public:
 	typedef boost::shared_ptr<SkMesh> Ref;
 
@@ -50,13 +49,11 @@ private:
 	RAD_DECLARE_GET(states, const ska::AnimState::Map*) { return m_parser ? m_parser->states.get() : 0; }
 	RAD_DECLARE_GET(asset, const pkg::AssetRef&) { return m_asset; }
 
-	enum
-	{
-		SkinFrames = 2
+	enum {
+		kSkinFrames = 2
 	};
 
-	struct DefMesh
-	{
+	struct DefMesh {
 		typedef zone_vector<DefMesh, ZEngineT>::type Vec;
 		r::Mesh m;
 		int boneFrame;

@@ -247,7 +247,7 @@ int SkModelParser::LoadCooked(
 		size[0] = m_mm[0]->size;
 		size[1] = m_mm[1]->size;
 
-		int r = m_dskm.Parse(data, size, ska::SkinCpu);
+		int r = m_dskm.Parse(data, size, ska::kSkinType_CPU);
 		if (r < SR_Success)
 			return r;
 
@@ -325,7 +325,7 @@ int SkModelParser::Load(
 		asset->name,
 		map,
 		0,
-		ska::SkinCpu,
+		ska::kSkinType_CPU,
 		*m_ska->dska.get()
 	);
 

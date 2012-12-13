@@ -310,13 +310,13 @@ int BSPFileParser::Parse(const void *data, AddrSize len) {
 		ptr[0] = bytes;
 		bytes += sizes[1];
 
-		bytes = Align(bytes, SIMDDriver::Alignment);
+		bytes = Align(bytes, SIMDDriver::kAlignment);
 
 		CHECK_SIZE(sizes[2]);
 		ptr[1] = bytes;
 		bytes += sizes[2];
 
-		r = m_skms[i].Parse(ptr, &sizes[1], ska::SkinCpu);
+		r = m_skms[i].Parse(ptr, &sizes[1], ska::kSkinType_CPU);
 		if (r != pkg::SR_Success)
 			return r;
 	}
@@ -502,9 +502,9 @@ int BSPFileBuilder::Write(stream::OutputStream &os) {
 			return pkg::SR_IOError;
 
 		len = os.OutPos();
-		if (!IsAligned(len, SIMDDriver::Alignment)) {
-			U8 padd[SIMDDriver::Alignment-1];
-			len = (SIMDDriver::Alignment) - (len & (SIMDDriver::Alignment-1));
+		if (!IsAligned(len, SIMDDriver::kAlignment)) {
+			U8 padd[SIMDDriver::kAlignment-1];
+			len = (SIMDDriver::kAlignment) - (len & (SIMDDriver::kAlignment-1));
 			if (os.Write(padd, len, 0) != len)
 				return false;
 		}

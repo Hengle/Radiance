@@ -22,7 +22,7 @@
 #undef min
 #undef max
 
-BOOST_STATIC_ASSERT((int)ska::MaxUVChannels <= (int)tools::SceneFile::kMaxUVChannels);
+BOOST_STATIC_ASSERT((int)ska::kMaxUVChannels <= (int)tools::SceneFile::kMaxUVChannels);
 
 namespace tools {
 
@@ -70,6 +70,7 @@ private:
 		typedef zone_vector<Anim, ZToolsT>::type Vec;
 		String name;
 		float fps;
+		float distance;
 		bool removeMotion;
 		FrameVec frames;
 	};
@@ -87,7 +88,7 @@ private:
 
 	void AddFrame(const BoneTM *bones);
 
-	void EndAnim();
+	void EndAnim(int motionBone);
 
 	static bool EmitBones(const char *name, int idx, int parent, BoneMap::Vec &map, BoneDef::Vec &bones, const SceneFile::BoneVec &skel);
 
@@ -262,7 +263,7 @@ bool SkaBuilder::Compile(const char *name, const SceneFileVec &maps, int trimode
 				AddFrame(&tms[0]);
 			}
 
-			EndAnim();
+			EndAnim(root);
 		}
 	}
 
@@ -372,7 +373,7 @@ bool SkaBuilder::Compile(const char *name, const SceneFile &map, int trimodel, S
 			AddFrame(&tms[0]);
 		}
 
-		EndAnim();
+		EndAnim(root);
 	}
 
 	// compile.
@@ -426,7 +427,7 @@ struct Tables {
 			}
 		}
 
-		if ((rTable.size()/4) == ska::EncMask)
+		if ((rTable.size()/4) == ska::kEncMask)
 			return false;
 		
 		for (size_t i = 0; i < 4; ++i)
@@ -497,7 +498,7 @@ private:
 			}
 		}
 
-		if ((table.size()/3) == ska::EncMask)
+		if ((table.size()/3) == ska::kEncMask)
 			return false;	
 
 		for (size_t i = 0; i < 3; ++i) {
@@ -529,8 +530,8 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const {
 	stream::LittleOutputStream os(ob);
 
 	{
-		const U32 id  = ska::SkaTag;
-		const U32 ver = ska::SkaVersion;
+		const U32 id  = ska::kSkaTag;
+		const U32 ver = ska::kSkaVersion;
 		if (!os.Write(id) || !os.Write(ver))
 			return false;
 	}
@@ -539,14 +540,14 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const {
 		return false;
 
 	for (BoneDef::Vec::const_iterator it = m_bones.begin(); it != m_bones.end(); ++it) {
-		if ((*it).name.length > ska::DNameLen) {
+		if ((*it).name.length > ska::kDNameLen) {
 			COut(C_ErrMsgBox) << "ska::DNameLen exceeded, contact a programmer to increase." << std::endl;
 			return false;
 		}
 
-		char name[ska::DNameLen+1];
-		string::ncpy(name, (*it).name.c_str.get(), ska::DNameLen+1);
-		if (!os.Write(name, ska::DNameLen+1, 0))
+		char name[ska::kDNameLen+1];
+		string::ncpy(name, (*it).name.c_str.get(), ska::kDNameLen+1);
+		if (!os.Write(name, ska::kDNameLen+1, 0))
 			return false;
 	}
 
@@ -698,11 +699,11 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const {
 	RAD_ASSERT(at.size() == m_anims.size());
 
 	for (size_t i = 0; i < at.size(); ++i) {
-		char name[ska::DNameLen+1];
-		string::ncpy(name, m_anims[i].name.c_str.get(), ska::DNameLen+1);
-		if (os.Write(name, ska::DNameLen+1, 0) != (ska::DNameLen+1))
+		char name[ska::kDNameLen+1];
+		string::ncpy(name, m_anims[i].name.c_str.get(), ska::kDNameLen+1);
+		if (os.Write(name, ska::kDNameLen+1, 0) != (ska::kDNameLen+1))
 			return false;
-		if (!os.Write(0.0f))
+		if (!os.Write(m_anims[i].distance))
 			return false;
 		U16 fps = (U16)(floorf(m_anims[i].fps+0.5f));
 		if (!os.Write(fps))
@@ -724,28 +725,28 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const {
 		RAD_ASSERT(tables.rFrames.size() == (m_bones.size()*m_anims[i].frames.size()));
 		
 		for (IntVec::const_iterator it = tables.rFrames.begin(); it != tables.rFrames.end(); ++it) {
-			int i = endian::SwapLittle((*it)&ska::EncMask);
-			if (os.Write(&i, ska::EncBytes, 0) != ska::EncBytes)
+			int i = endian::SwapLittle((*it)&ska::kEncMask);
+			if (os.Write(&i, ska::kEncBytes, 0) != ska::kEncBytes)
 				return false;
-			bytes += ska::EncBytes;
+			bytes += ska::kEncBytes;
 		}
 
 		RAD_ASSERT(tables.sFrames.size() == (m_bones.size()*m_anims[i].frames.size()));
 		
 		for (IntVec::const_iterator it = tables.sFrames.begin(); it != tables.sFrames.end(); ++it) {
-			int i = endian::SwapLittle((*it)&ska::EncMask);
-			if (os.Write(&i, ska::EncBytes, 0) != ska::EncBytes)
+			int i = endian::SwapLittle((*it)&ska::kEncMask);
+			if (os.Write(&i, ska::kEncBytes, 0) != ska::kEncBytes)
 				return false;
-			bytes += ska::EncBytes;
+			bytes += ska::kEncBytes;
 		}
 
 		RAD_ASSERT(tables.tFrames.size() == (m_bones.size()*m_anims[i].frames.size()));
 		
 		for (IntVec::const_iterator it = tables.tFrames.begin(); it != tables.tFrames.end(); ++it) {
-			int i = endian::SwapLittle((*it)&ska::EncMask);
-			if (os.Write(&i, ska::EncBytes, 0) != ska::EncBytes)
+			int i = endian::SwapLittle((*it)&ska::kEncMask);
+			if (os.Write(&i, ska::kEncBytes, 0) != ska::kEncBytes)
 				return false;
-			bytes += ska::EncBytes;
+			bytes += ska::kEncBytes;
 		}
 
 		RAD_ASSERT(tables.tags.size() == (m_bones.size()*m_anims[i].frames.size()));
@@ -859,6 +860,7 @@ void SkaBuilder::BeginAnim(
 	a.fps = fps;
 	a.removeMotion = removeMotion;
 	a.frames.reserve((size_t)numFrames);
+	a.distance = 0.f;
 }
 
 void SkaBuilder::AddFrame(const BoneTM *bones) {
@@ -872,7 +874,18 @@ void SkaBuilder::AddFrame(const BoneTM *bones) {
 		a.frames.back().push_back(bones[i]);
 }
 
-void SkaBuilder::EndAnim() {
+void SkaBuilder::EndAnim(int motionBone) {
+	if (motionBone < -1)
+		return;
+	Anim &a = m_anims.back();
+	if (motionBone >= (int)a.frames.front().size())
+		return;
+
+	const BoneTMVec &start = a.frames.front();
+	const BoneTMVec &end = a.frames.back();
+
+	Vec3 d = end[motionBone].tm.t - start[motionBone].tm.t;
+	a.distance = d.Magnitude();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -899,12 +912,14 @@ struct SkTriModel {
 
 	int mat;
 	int totalVerts;
-	TriVertVec verts[ska::BonesPerVert];
-	TriVertMap vmap[ska::BonesPerVert];
+	TriVertVec verts[ska::kBonesPerVert];
+	TriVertMap vmap[ska::kBonesPerVert];
 	VertIndex::Vec indices;
 
 	Vec4Vec weightedVerts;
-	Vec2Vec uvs[ska::MaxUVChannels];
+	Vec4Vec weightedNormals;
+	Vec4Vec weightedTangents[ska::kMaxUVChannels];
+	Vec2Vec uvs[ska::kMaxUVChannels];
 	IntVec sortedIndices;
 
 	static TriVert CleanWeights(const TriVert &v) {
@@ -918,7 +933,7 @@ struct SkTriModel {
 			w.push_back(z.weights[i]);
 		}
 
-		while (w.size() > ska::BonesPerVert) { // drop smallest.
+		while (w.size() > ska::kBonesPerVert) { // drop smallest.
 			size_t best = 0;
 			float bestw = w[0].weight;
 
@@ -967,7 +982,7 @@ struct SkTriModel {
 		TriVert z = CleanWeights(v);
 
 		RAD_ASSERT(!z.weights.empty());
-		RAD_ASSERT(z.weights.size() <= ska::BonesPerVert);
+		RAD_ASSERT(z.weights.size() <= ska::kBonesPerVert);
 		int mapIdx = (int)z.weights.size()-1;
 
 		TriVertMap::iterator it = vmap[mapIdx].find(z);
@@ -975,6 +990,10 @@ struct SkTriModel {
 #if defined(RAD_OPT_DEBUG)
 			RAD_ASSERT(z.weights.size() == it->first.weights.size());
 			RAD_ASSERT(z.pos == it->first.pos);
+			for (int i = 0; i < SceneFile::kMaxUVChannels; ++i) {
+				RAD_ASSERT(z.st[i] == it->first.st[i]);
+				RAD_ASSERT(z.tangent[i] == it->first.tangent[i]);
+			}
 			RAD_ASSERT(z.st[0] == it->first.st[0]);
 			for (size_t i = 0; i < z.weights.size(); ++i) {
 				RAD_ASSERT(z.weights[i].weight == it->first.weights[i].weight);
@@ -1008,7 +1027,7 @@ struct SkTriModel {
 		int numWeightedVerts = 0;
 		totalVerts = 0;
 
-		for (int i = 0; i < ska::BonesPerVert; ++i) {
+		for (int i = 0; i < ska::kBonesPerVert; ++i) {
 			int c = (int)vmap[i].size();
 
 			totalVerts += c;
@@ -1017,18 +1036,21 @@ struct SkTriModel {
 
 		sortedIndices.reserve(indices.size());
 		weightedVerts.reserve(numWeightedVerts);
+		weightedNormals.reserve(numWeightedVerts);
 
-		for (int i = 0; i < ska::MaxUVChannels; ++i)
+		for (int i = 0; i < ska::kMaxUVChannels; ++i) {
 			uvs[i].reserve(totalVerts);
+			weightedTangents[i].reserve(numWeightedVerts);
+		}
 
 		int vertIndex = 0;
-		IntVec idxRemap[ska::BonesPerVert];
+		IntVec idxRemap[ska::kBonesPerVert];
 
-		for (int i = 0; i < ska::BonesPerVert; ++i)
+		for (int i = 0; i < ska::kBonesPerVert; ++i)
 			idxRemap[i].reserve(verts[i].size());
 
 		// emit vertices premultiplied by bone weights
-		for (int i = 0; i < ska::BonesPerVert; ++i) {
+		for (int i = 0; i < ska::kBonesPerVert; ++i) {
 			const TriVertVec &vec = verts[i];
 			for (TriVertVec::const_iterator it = vec.begin(); it != vec.end(); ++it) {
 				const TriVert &v = *it;
@@ -1036,12 +1058,22 @@ struct SkTriModel {
 
 				idxRemap[i].push_back(vertIndex++);
 
-				for (int k = 0; k < ska::MaxUVChannels; ++k)
+				for (int k = 0; k < ska::kMaxUVChannels; ++k) {
 					uvs[k].push_back(v.st[k]);
+					for (int j = 0; j <= i; ++j) {
+						Vec4 z(v.tangent[k] * v.weights[j].weight);
+						weightedTangents[k].push_back(z);
+					}
+				}
 
 				for (int k = 0; k <= i; ++k) {
 					Vec4 z(v.pos * v.weights[k].weight, v.weights[k].weight);
 					weightedVerts.push_back(z);
+				}
+
+				for (int k = 0; k <= i; ++k) {
+					Vec4 z(v.normal * v.weights[k].weight, 1.f);
+					weightedNormals.push_back(z);
 				}
 			}
 		}
@@ -1053,7 +1085,7 @@ struct SkTriModel {
 	}
 };
 
-bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, SkmData &sk, const ska::DSka &ska) {
+bool CompileCPUSkmData(const char *name, const SceneFile &map, int trimodel, SkmData &sk, const ska::DSka &ska) {
 	SkTriModel::Ref m(new (ZTools) SkTriModel());
 	SkTriModel::Vec models;
 
@@ -1078,7 +1110,7 @@ bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 	for (size_t i = 0; i < skel.bones.size(); ++i) {
 		U16 k;
 		for (k = 0; k < ska.numBones; ++k) {
-			if (!string::cmp(skel.bones[i].name.c_str.get(), &ska.boneNames[k*(ska::DNameLen+1)]))
+			if (!string::cmp(skel.bones[i].name.c_str.get(), &ska.boneNames[k*(ska::kDNameLen+1)]))
 				break;
 		}
 
@@ -1094,8 +1126,18 @@ bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 		stream::DynamicMemOutputBuffer ob(ska::ZSka);
 		stream::LittleOutputStream os(ob);
 
-		if (!os.Write((U32)ska::SkmxTag) || !os.Write((U32)ska::SkmVersion))
+		if (!os.Write((U32)ska::kSkmxTag) || !os.Write((U32)ska::kSkmVersion))
 			return false;
+
+		// bounds
+		for (int i = 0; i < 3; ++i) {
+			if (!os.Write((float)r->bounds.Mins()[i]))
+				return false;
+		}
+		for (int i = 0; i < 3; ++i) {
+			if (!os.Write((float)r->bounds.Maxs()[i]))
+				return false;
+		}
 
 		if (!os.Write((U16)models.size()))
 			return false;
@@ -1113,7 +1155,7 @@ bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 			if (!os.Write((U16)m->totalVerts))
 				return false;
 
-			for (int i = 0; i < ska::BonesPerVert; ++i) {
+			for (int i = 0; i < ska::kBonesPerVert; ++i) {
 				if (m->verts[i].size() > std::numeric_limits<U16>::max())
 					return false;
 				if (!os.Write((U16)m->verts[i].size()))
@@ -1123,22 +1165,25 @@ bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 			if (!os.Write((U16)(m->sortedIndices.size()/3)))
 				return false;
 
-			if ((ska::BonesPerVert+2)&1) // align?
+			if (!os.Write((U16)(r->numChannels)))
+				return false;
+
+			if ((ska::kBonesPerVert+3)&1) // align?
 				if (!os.Write((U16)0))
 					return false;
 
-			if (map.mats[m->mat].name.length > ska::DNameLen) {
+			if (map.mats[m->mat].name.length > ska::kDNameLen) {
 				COut(C_ErrMsgBox) << "ska::DNameLen exceeded, contact a programmer to increase." << std::endl;
 				return false;
 			}
 
-			char name[ska::DNameLen+1];
-			string::ncpy(name, map.mats[m->mat].name.c_str.get(), ska::DNameLen+1);
-			if (!os.Write(name, ska::DNameLen+1, 0))
+			char name[ska::kDNameLen+1];
+			string::ncpy(name, map.mats[m->mat].name.c_str.get(), ska::kDNameLen+1);
+			if (!os.Write(name, ska::kDNameLen+1, 0))
 				return false;
 
 			// texcoords
-			for (int i = 0; i < ska::MaxUVChannels; ++i) {
+			for (int i = 0; i < r->numChannels; ++i) {
 				const SkTriModel::Vec2Vec &uvs = m->uvs[i];
 				for (SkTriModel::Vec2Vec::const_iterator it = uvs.begin(); it != uvs.end(); ++it) {
 					const Vec2 &v = *it;
@@ -1168,10 +1213,10 @@ bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 		sk.skmData[0] = zone_realloc(ska::ZSka, sk.skmData[0], sk.skmSize[0]);
 	}
 	{ // file 2: persisted data (prescaled vertices, prescaled normals, bone indices)
-		stream::DynamicMemOutputBuffer ob(ska::ZSka, SIMDDriver::Alignment);
+		stream::DynamicMemOutputBuffer ob(ska::ZSka, SIMDDriver::kAlignment);
 		stream::LittleOutputStream os(ob);
 
-		if (!os.Write((U32)ska::SkmpTag) || !os.Write((U32)ska::SkmVersion))
+		if (!os.Write((U32)ska::kSkmpTag) || !os.Write((U32)ska::kSkmVersion))
 			return false;
 
 		int bytes = 8;
@@ -1179,34 +1224,60 @@ bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 		for (SkTriModel::Vec::const_iterator it = models.begin(); it != models.end(); ++it) {
 			const SkTriModel::Ref &m = *it;
 
-			if (bytes&(SIMDDriver::Alignment-1))  { // SIMD padd
-				U8 padd[(SIMDDriver::Alignment-1)];
-				if (os.Write(padd, SIMDDriver::Alignment-(bytes&(SIMDDriver::Alignment-1)), 0) != (SIMDDriver::Alignment-(bytes&(SIMDDriver::Alignment-1))))
+			if (bytes&(SIMDDriver::kAlignment-1))  { // SIMD padd
+				U8 padd[(SIMDDriver::kAlignment-1)];
+				if (os.Write(padd, SIMDDriver::kAlignment-(bytes&(SIMDDriver::kAlignment-1)), 0) != (SIMDDriver::kAlignment-(bytes&(SIMDDriver::kAlignment-1))))
 					return false;
-				bytes = Align(bytes, SIMDDriver::Alignment);
+				bytes = Align(bytes, SIMDDriver::kAlignment);
 			}
 
-			// verts
-			for (SkTriModel::Vec4Vec::const_iterator it = m->weightedVerts.begin(); it != m->weightedVerts.end(); ++it) {
-				const Vec4 &v = *it;
-				if (!os.Write(v[0]) ||
-					!os.Write(v[1]) ||
-					!os.Write(v[2]) ||
-					!os.Write(v[3])) {
+			RAD_ASSERT(m->weightedVerts.size() == m->weightedNormals.size());
+			RAD_ASSERT(m->weightedVerts.size() == m->weightedTangents[0].size());
+
+			for (size_t i = 0; i < m->weightedVerts.size(); ++i) {
+				const Vec4 *v = &m->weightedVerts[i];
+
+				if (!os.Write((*v)[0]) ||
+					!os.Write((*v)[1]) ||
+					!os.Write((*v)[2]) ||
+					!os.Write((*v)[3])) {
 					return false;
 				}
 
 				bytes += 16;
+
+				v = &m->weightedNormals[i];
+
+				if (!os.Write((*v)[0]) ||
+					!os.Write((*v)[1]) ||
+					!os.Write((*v)[2]) ||
+					!os.Write((*v)[3])) {
+					return false;
+				}
+
+				bytes += 16;
+
+				for (int k = 0; k < r->numChannels; ++k) {
+					v = &m->weightedTangents[k][i];
+					if (!os.Write((*v)[0]) ||
+						!os.Write((*v)[1]) ||
+						!os.Write((*v)[2]) ||
+						!os.Write((*v)[3])) {
+						return false;
+					}
+
+					bytes += 16;
+				}
 			}
 
 			// bone indices
 
-			for (int i = 0; i < ska::BonesPerVert; ++i) {
-				if (bytes&(SIMDDriver::Alignment-1)) { // SIMD padd
-					U8 padd[(SIMDDriver::Alignment-1)];
-					if (os.Write(padd, SIMDDriver::Alignment-(bytes&(SIMDDriver::Alignment-1)), 0) != (SIMDDriver::Alignment-(bytes&(SIMDDriver::Alignment-1))))
+			for (int i = 0; i < ska::kBonesPerVert; ++i) {
+				if (bytes&(SIMDDriver::kAlignment-1)) { // SIMD padd
+					U8 padd[(SIMDDriver::kAlignment-1)];
+					if (os.Write(padd, SIMDDriver::kAlignment-(bytes&(SIMDDriver::kAlignment-1)), 0) != (SIMDDriver::kAlignment-(bytes&(SIMDDriver::kAlignment-1))))
 						return false;
-					bytes = Align(bytes, SIMDDriver::Alignment);
+					bytes = Align(bytes, SIMDDriver::kAlignment);
 				}
 
 				const TriVertVec &verts = m->verts[i];
@@ -1231,11 +1302,11 @@ bool CompileCpuSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 			sk.skmData[1], 
 			sk.skmSize[1],
 			0,
-			SIMDDriver::Alignment
+			SIMDDriver::kAlignment
 		);
 	}
 
-	RAD_VERIFY(sk.dskm.Parse(sk.skmData, sk.skmSize, ska::SkinCpu) == pkg::SR_Success);
+	RAD_VERIFY(sk.dskm.Parse(sk.skmData, sk.skmSize, ska::kSkinType_CPU) == pkg::SR_Success);
 	return true;
 }
 
@@ -1289,7 +1360,7 @@ RADENG_API SkmData::Ref RADENG_CALL CompileSkmData(
 	SkmData::Ref sk(new (ZTools) SkmData());
 	sk->skinType = skinType;
 
-	if (!CompileCpuSkmData(name, map, trimodel, *sk, ska))
+	if (!CompileCPUSkmData(name, map, trimodel, *sk, ska))
 		return SkmData::Ref();
 
 	SizeBuffer memSize[2];
@@ -1314,7 +1385,7 @@ SkaData::~SkaData() {
 }
 
 SkmData::SkmData() :
-skinType(ska::SkinCpu) {
+skinType(ska::kSkinType_CPU) {
 	skmData[0] = skmData[1] = 0;
 	skmSize[0] = skmSize[1] = 0;
 	dskm.Clear();

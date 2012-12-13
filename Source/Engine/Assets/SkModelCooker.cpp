@@ -14,7 +14,7 @@ using namespace pkg;
 
 namespace asset {
 
-SkModelCooker::SkModelCooker() : Cooker(2) {
+SkModelCooker::SkModelCooker() : Cooker(3) {
 }
 
 SkModelCooker::~SkModelCooker() {
@@ -110,7 +110,7 @@ int SkModelCooker::Compile(int flags, int allflags) {
 		asset->name,
 		map,
 		0,
-		ska::SkinCpu,
+		ska::kSkinType_CPU,
 		*ska->dska.get()
 	);
 

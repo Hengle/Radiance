@@ -225,7 +225,7 @@ bool CinematicsBuilder::EmitActor(const SceneFile &map, Actor &actor) {
 		"BSPBuilder",
 		map,
 		actor.index,
-		ska::SkinCpu,
+		ska::kSkinType_CPU,
 		ska->dska
 	);
 

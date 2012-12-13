@@ -1030,13 +1030,6 @@ void GLSLShader::BindAttribLocations(GLhandleARB p, const GLState::MInputMapping
 				CHECK_GL_ERRORS();
 			}
 		break;
-		case MGS_Binormals:
-			if (idx == 0)
-			{
-				gl.BindAttribLocationARB(p, loc, "in_binormal");
-				CHECK_GL_ERRORS();
-			}
-		break;
 		case MGS_Tangents:
 			if (idx == 0)
 			{
@@ -1049,18 +1042,6 @@ void GLSLShader::BindAttribLocations(GLhandleARB p, const GLState::MInputMapping
 				char name[64];
 				string::sprintf(name, "in_tc%d", (int)m.attributes[i][2]);
 				gl.BindAttribLocationARB(p, loc, name);
-				CHECK_GL_ERRORS();
-			}
-		break;
-		case MGS_Weights:
-			if (idx == 0)
-			{
-				gl.BindAttribLocationARB(p, loc, "in_weights");
-				CHECK_GL_ERRORS();
-			}
-			if (idx == 1)
-			{
-				gl.BindAttribLocationARB(p, loc, "in_indices");
 				CHECK_GL_ERRORS();
 			}
 		break;

@@ -79,7 +79,7 @@ private:
 #if defined(RAD_OPT_TOOLS)
 	RAD_DECLARE_GET(valid, bool);
 	RAD_DECLARE_GET(skinType, ska::SkinType) { 
-		return m_skmd ? m_skmd->skinType : ska::SkinCpu; 
+		return m_skmd ? m_skmd->skinType : ska::kSkinType_CPU; 
 	}
 	RAD_DECLARE_GET(dskm, const ska::DSkm*) { 
 		return m_skmd ? &m_skmd->dskm : &m_dskm; 

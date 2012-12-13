@@ -328,6 +328,9 @@ MMapping::Ref WinMMFile::MMap(AddrSize ofs, AddrSize size, ::Zone &zone) {
 		(DWORD)(size + padd)
 	);
 
+	if (!pbase)
+		return MMapping::Ref();
+
 	const void *data = reinterpret_cast<const U8*>(pbase) + padd;
 	return MMapping::Ref(new (ZFile) WinMMapping(shared_from_this(), pbase, data, size, ofs, backingSize, zone));
 }

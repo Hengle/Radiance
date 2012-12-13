@@ -17,6 +17,17 @@ namespace thread {
 ///////////////////////////////////////////////////////////////////////////////
 
 //! A mutex with event functionality (wait & notify).
+/*! The difference between an EventMutex and a Gate is subtle but important.
+    A Gate allows the control of access to a resource based on some condition
+	(gate is open or closed) however a Gate does not provide a mechanism to
+	serialize access to a resource it may be gate'ing.
+
+	The EventMutex class serves as an Event, like a Gate, but also provides
+	mutex style synchronization to a resource.
+
+	Any callers with an EventMutex::Sync object in scope will serialize eachother.
+	When an EventMutex::Sync::Wait call returns the callers has exclusive access
+	to the EventMutex's resource after the object has been signaled. */
 class EventMutex : private boost::noncopyable {
 public:
 	

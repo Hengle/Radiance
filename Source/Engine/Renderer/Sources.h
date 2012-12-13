@@ -30,12 +30,10 @@ enum MGSource // Material Geometry Sources
 	MGS_First,
 	MGS_Vertices = MGS_First,
 	MGS_Normals,
-	MGS_Binormals,
 	MGS_Tangents,
 	MGS_TexCoords,
-	MGS_Weights,
 	MGS_Max,
-	MGS_MaxIndices = 6
+	MGS_MaxIndices = 2
 };
 
 } // r

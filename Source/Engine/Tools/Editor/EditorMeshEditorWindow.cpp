@@ -23,8 +23,7 @@ using namespace r;
 namespace tools {
 namespace editor {
 
-void MeshEditorWindow::LaunchEditor(int assetId)
-{
+void MeshEditorWindow::LaunchEditor(int assetId) {
 	(new (ZEditor) MeshEditorWindow())->Load(assetId);
 }
 
@@ -36,8 +35,7 @@ MeshEditorWindow::MeshEditorWindow()
 	Qt::WindowSystemMenuHint|
 	Qt::WindowMinMaxButtonsHint|
 	Qt::WindowCloseButtonHint
-)
-{
+) {
 	setAttribute(Qt::WA_DeleteOnClose);
 	PercentSize(*this, *MainWindow::Get(), 0.85f, 0.85f);
 	CenterWidget(*this, *MainWindow::Get());
@@ -54,19 +52,16 @@ MeshEditorWindow::MeshEditorWindow()
 	l->addWidget(m_glw, 0, 0);
 }
 
-MeshEditorWindow::~MeshEditorWindow()
-{
+MeshEditorWindow::~MeshEditorWindow() {
 }
 
-void MeshEditorWindow::Load(int id)
-{
+void MeshEditorWindow::Load(int id) {
 	show();
 
 	m_glw->bindGL(true);
 
 	pkg::Asset::Ref asset = Packages()->Asset(id, pkg::Z_Unique);
-	if (asset)
-	{
+	if (asset) {
 		setWindowTitle(QString("Viewing ") + asset->path.get());
 		
 		int r = asset->Process(
@@ -74,8 +69,7 @@ void MeshEditorWindow::Load(int id)
 			pkg::P_Load|pkg::P_FastPath
 		);
 
-		if (r != pkg::SR_Success)
-		{
+		if (r != pkg::SR_Success) {
 			QMessageBox::critical(
 				this,
 				"Error",
@@ -99,8 +93,7 @@ void MeshEditorWindow::Load(int id)
 	m_glw->wheelSpeed = 4.f;
 }
 
-void MeshEditorWindow::OnRenderGL(GLWidget &src)
-{
+void MeshEditorWindow::OnRenderGL(GLWidget &src) {
 	if (!m_bundle)
 		return;
 
@@ -119,8 +112,7 @@ void MeshEditorWindow::OnRenderGL(GLWidget &src)
 		vph/vpw
 	);
 
-	for (int i = r::Material::S_Solid; i < r::Material::NumSorts; ++i)
-	{
+	for (int i = r::Material::S_Solid; i < r::Material::NumSorts; ++i) {
 		Draw((r::Material::Sort)i);
 	}
 
@@ -128,10 +120,8 @@ void MeshEditorWindow::OnRenderGL(GLWidget &src)
 	gls.Commit();
 }
 
-void MeshEditorWindow::Draw(Material::Sort sort)
-{
-	for (int i = 0; i < m_bundle->numMeshes; ++i)
-	{
+void MeshEditorWindow::Draw(Material::Sort sort) {
+	for (int i = 0; i < m_bundle->numMeshes; ++i) {
 		asset::MaterialLoader::Ref loader = asset::MaterialLoader::Cast(
 			m_bundle->MaterialAsset(i)
 		);
@@ -161,16 +151,13 @@ void MeshEditorWindow::Draw(Material::Sort sort)
 	}
 }
 
-void MeshEditorWindow::OnResizeGL(GLWidget &src, int width, int height)
-{
+void MeshEditorWindow::OnResizeGL(GLWidget &src, int width, int height) {
 }
 
-void MeshEditorWindow::OnInitializeGL(GLWidget &src)
-{
+void MeshEditorWindow::OnInitializeGL(GLWidget &src) {
 }
 
-void MeshEditorWindow::OnTick(float dt)
-{
+void MeshEditorWindow::OnTick(float dt) {
 	if (!m_bundle)
 		return;
 
@@ -191,8 +178,7 @@ void MeshEditorWindow::OnTick(float dt)
 }
 
 
-void MeshEditorWindow::closeEvent(QCloseEvent *e)
-{
+void MeshEditorWindow::closeEvent(QCloseEvent *e) {
 	e->accept(); // assume we can close.
 	emit OnClose(e);
 	if (e->isAccepted())
@@ -202,13 +188,11 @@ void MeshEditorWindow::closeEvent(QCloseEvent *e)
 	}
 }
 
-void MeshEditorWindow::MainWinClose(QCloseEvent *e)
-{
+void MeshEditorWindow::MainWinClose(QCloseEvent *e) {
 	e->setAccepted(close());
 }
 
-void MeshEditorWindow::DoClose()
-{
+void MeshEditorWindow::DoClose() {
 }
 
 } // editor

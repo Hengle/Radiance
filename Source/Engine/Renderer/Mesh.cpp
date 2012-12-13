@@ -9,56 +9,72 @@
 
 namespace r {
 
-MeshBundle::Ref MeshBundle::New(const pkg::AssetRef &asset)
-{
+MeshBundle::Ref MeshBundle::New(const pkg::AssetRef &asset) {
 	asset::MeshParser::Ref parser = asset::MeshParser::Cast(asset);
 	if (!parser || !parser->valid || parser->bundle->meshes.empty())
 		return Ref();
 
 	Ref r(new (ZRender) MeshBundle());
 
-	for (size_t i = 0; i < parser->bundle->meshes.size(); ++i)
-	{
+	for (size_t i = 0; i < parser->bundle->meshes.size(); ++i) {
 		r::Mesh::Ref m(new (ZRender) r::Mesh());
 		const asset::DMesh &dm = parser->bundle->meshes[i];
+		const int kVertSize = 6+(4*dm.numChannels)*sizeof(float);
 
 		// Mesh bundle data is interleaved
 
-		int streamIdx = m->AllocateStream(SU_Static, (int)dm.vertSize, (int)dm.numVerts);
+		int streamIdx = m->AllocateStream(SU_Static, kVertSize, (int)dm.numVerts);
 		r::Mesh::StreamPtr::Ref vb = m->Map(streamIdx);
 		memcpy(vb->ptr, dm.vertices, vb->size.get());
 		vb.reset();
 
-		if (dm.flags & asset::DMesh::Vertices)
-		{
-			m->MapSource(
-				streamIdx,
-				MGS_Vertices,
-				0,
-				(int)dm.vertSize,
-				0
-			);
-		}
+		m->MapSource(
+			streamIdx,
+			MGS_Vertices,
+			0,
+			kVertSize,
+			0
+		);
+		
+		m->MapSource(
+			streamIdx,
+			MGS_Normals,
+			0,
+			kVertSize,
+			sizeof(float)*3
+		);
 
-		if (dm.flags & asset::DMesh::Texture1)
-		{
+		if (dm.numChannels > 0) {
 			m->MapSource(
 				streamIdx,
 				MGS_TexCoords,
 				0,
-				(int)dm.vertSize,
-				sizeof(float)*3
+				kVertSize,
+				sizeof(float)*6
+			);
+			m->MapSource(
+				streamIdx,
+				MGS_Tangents,
+				0,
+				kVertSize,
+				sizeof(float)*10
 			);
 		}
 
-		if (dm.flags & asset::DMesh::Texture2)
-		{
+		if (dm.numChannels > 1) {
 			m->MapSource(
 				streamIdx,
 				MGS_TexCoords,
 				1,
-				(int)dm.vertSize,
-				sizeof(float)*5
+				kVertSize,
+				sizeof(float)*8
+			);
+			m->MapSource(
+				streamIdx,
+				MGS_Tangents,
+				1,
+				kVertSize,
+				sizeof(float)*14
 			);
 		}
 		

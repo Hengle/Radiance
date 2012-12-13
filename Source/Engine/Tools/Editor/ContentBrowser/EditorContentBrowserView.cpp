@@ -263,7 +263,6 @@ QWidget(parent, f),
 m_vscroll(vscroll),
 m_editable(editable),
 m_modal(modal),
-m_font("Courier New"),
 m_hoverId(-1),
 m_selMode(selMode),
 m_loadedIcons(false),
@@ -271,7 +270,7 @@ m_inTick(false),
 m_tickRedraw(false)
 {
 	m_resolution = MainWindow::Get()->userPrefs->value("contentBrowser/resolution", 1).toInt();
-	m_font.setPixelSize(12);
+	m_font.setPixelSize(10);
 
 	QGridLayout *l = new (ZEditor) QGridLayout(this);
 	
@@ -1358,6 +1357,8 @@ void ContentBrowserView::DrawThumb(ContentAssetThumb *thumb, const pkg::Package:
 	}
 }
 
+static char s_label[256];
+
 void ContentBrowserView::OnRenderGL(GLWidget&)
 {
 	glClearColor(0, 0, 0, 0);
@@ -1374,8 +1375,7 @@ void ContentBrowserView::OnRenderGL(GLWidget&)
 	Row::Map::const_iterator it = m_rows.lower_bound(m_y[0]);
 	if (it != m_rows.end())
 	{
-		for (ContentAssetThumb::Map::const_iterator tit = m_thumbs.begin(); tit != m_thumbs.end(); ++tit)
-		{
+		for (ContentAssetThumb::Map::const_iterator tit = m_thumbs.begin(); tit != m_thumbs.end(); ++tit) {
 			tit->second->Begin();
 		}
 
@@ -1384,13 +1384,16 @@ void ContentBrowserView::OnRenderGL(GLWidget&)
 		for (;it != m_rows.end(); ++it)
 		{
 			const Row &r = it->second;
-			if (r.y[0]-m_y[0] > vh) break;
+			if (r.y[0]-m_y[0] > vh) 
+				break;
 
 			for (AssetInfoVec::const_iterator it = r.assets.begin(); it != r.assets.end(); ++it)
 			{
 				const AssetInfo &info = *it;
 				pkg::Package::Entry::Ref asset = Packages()->FindEntry(info.id);
-				if (!asset) { continue; }
+				if (!asset)
+					continue;
+
 				ContentAssetThumb *thumb = ThumbForType(asset->type);
 
 				int maxy = m_maxs[1] ? std::min(m_maxs[1], info.ih) : info.ih;
@@ -1462,11 +1465,12 @@ void ContentBrowserView::OnRenderGL(GLWidget&)
 				}
 
 				glColor4f(1.f, 1.f, 1.f, 1.f);
+
 				m_glw->renderText(
 					info.x+info.w/2-info.tw/2, 
-					r.y[0]+r.y[1]+VLabelBorder+VLabelBorder/2+fh/2,
+					r.y[0]+r.y[1]+VLabelBorder+VLabelBorder/2+fh/2+1,
 					0.0,
-					QString(asset->path),
+					asset->path.get(),
 					m_font
 				);
 			}

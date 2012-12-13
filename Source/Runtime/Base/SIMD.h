@@ -10,18 +10,17 @@
 #include "Base.h"
 
 //! Implements single instruction multiple data optimized routines
-struct SIMDDriver
-{
-	enum 
-	{ 
-		Alignment = 16,
-		NumBoneFloats = 16
+struct SIMDDriver {
+	enum { 
+		kAlignment = 16,
+		kNumBoneFloats = 16
 	};
 
 	static void Select();
 
 	//! Skins N weighed verts. The number of bone weights depends on the specific function bound.
-	/*! \param outVerts 4 floats per vertex (numVerts*4 floats will be written)
+	/*! \param outVerts 4 floats per vertex elements (numVerts*4 floats will be written)
+						elements: vertex, normal, tangents
 		\param bones 4x4 row-major matrix (16 floats)
 		\param vertices 4 floats per vertex, preweighted by bone weight (N prescaled verts per vertex)
 		\param boneIndices index into bone array (N indices per vertex)
@@ -35,8 +34,8 @@ struct SIMDDriver
 		int numVerts
 	);
 
-	FSkinVerts SkinVerts[4];
-
+	FSkinVerts SkinVerts[4][2]; // [numBones][numTangents]
+	
 	char name[16];
 
 };

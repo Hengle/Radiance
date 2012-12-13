@@ -55,7 +55,7 @@ int WorldCinematics::Spawn(
 		actor->m = r::SkMesh::New(
 			bsp->DSka(bspActor->ska),
 			bsp->DSkm(bspActor->ska),
-			ska::SkinCpu
+			ska::kSkinType_CPU
 		);
 
 		m_actors.push_back(actor);

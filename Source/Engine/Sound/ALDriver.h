@@ -100,7 +100,7 @@ public:
 	
 	//! alcProcessContext
 	void SyncProcess(ALDRIVER_VOID_PARAMS);
-	//! alcSuspectContext
+	//! alcSuspendContext
 	void SyncSuspend(ALDRIVER_VOID_PARAMS);
 	//! Flushes the driver command buffer.
 	void SyncFlush(ALDRIVER_VOID_PARAMS);

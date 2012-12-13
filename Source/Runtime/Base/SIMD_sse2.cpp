@@ -24,19 +24,19 @@ void SkinVerts4(
 	int numVerts
 )
 {
-	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(bones, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(vertices, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::Alignment));
+	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(bones, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(vertices, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::kAlignment));
 
 	for (int i = 0; i < numVerts; ++i)
 	{
 
 #if defined(RAD_OPT_WINX)
-		const float *bone0 = bones + boneIndices[0]*SIMDDriver::NumBoneFloats;
-		const float *bone1 = bones + boneIndices[1]*SIMDDriver::NumBoneFloats;
-		const float *bone2 = bones + boneIndices[2]*SIMDDriver::NumBoneFloats;
-		const float *bone3 = bones + boneIndices[3]*SIMDDriver::NumBoneFloats;
+		const float *bone0 = bones + boneIndices[0]*SIMDDriver::kNumBoneFloats;
+		const float *bone1 = bones + boneIndices[1]*SIMDDriver::kNumBoneFloats;
+		const float *bone2 = bones + boneIndices[2]*SIMDDriver::kNumBoneFloats;
+		const float *bone3 = bones + boneIndices[3]*SIMDDriver::kNumBoneFloats;
 		__asm {
 			mov      esi, vertices   // 1 cycles (issued same cycle)
 			mov      edi, outVerts   // 1 cycles (issued same cycle)
@@ -202,18 +202,18 @@ void SkinVerts3(
 	int numVerts
 )
 {
-	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(bones, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(vertices, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::Alignment));
+	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(bones, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(vertices, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::kAlignment));
 
 	for (int i = 0; i < numVerts; ++i)
 	{
 
 #if defined(RAD_OPT_WINX)
-		const float *bone0 = bones + boneIndices[0]*SIMDDriver::NumBoneFloats;
-		const float *bone1 = bones + boneIndices[1]*SIMDDriver::NumBoneFloats;
-		const float *bone2 = bones + boneIndices[2]*SIMDDriver::NumBoneFloats;
+		const float *bone0 = bones + boneIndices[0]*SIMDDriver::kNumBoneFloats;
+		const float *bone1 = bones + boneIndices[1]*SIMDDriver::kNumBoneFloats;
+		const float *bone2 = bones + boneIndices[2]*SIMDDriver::kNumBoneFloats;
 		__asm {
 			mov      esi, vertices   // 1 cycles (issued same cycle)
 			mov      edi, outVerts   // 1 cycles (issued same cycle)
@@ -345,17 +345,17 @@ void SkinVerts2(
 	int numVerts
 )
 {
-	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(bones, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(vertices, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::Alignment));
+	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(bones, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(vertices, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::kAlignment));
 
 	for (int i = 0; i < numVerts; ++i)
 	{
 
 #if defined(RAD_OPT_WINX)
-		const float *bone0 = bones + boneIndices[0]*SIMDDriver::NumBoneFloats;
-		const float *bone1 = bones + boneIndices[1]*SIMDDriver::NumBoneFloats;
+		const float *bone0 = bones + boneIndices[0]*SIMDDriver::kNumBoneFloats;
+		const float *bone1 = bones + boneIndices[1]*SIMDDriver::kNumBoneFloats;
 		__asm {
 			mov      esi, vertices   // 1 cycles (issued same cycle)
 			mov      edi, outVerts   // 1 cycles (issued same cycle)
@@ -452,14 +452,14 @@ void SkinVerts1(
 	int numVerts
 )
 {
-	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(bones, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(vertices, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::Alignment));
+	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(bones, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(vertices, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::kAlignment));
 
 	for (int i = 0; i < numVerts; ++i)
 	{
-		const float *bone0 = bones + boneIndices[0]*SIMDDriver::NumBoneFloats;
+		const float *bone0 = bones + boneIndices[0]*SIMDDriver::kNumBoneFloats;
 #if defined(RAD_OPT_WINX)
 		__asm {
 			mov      esi, vertices   // 1 cycles (issued same cycle)
@@ -514,10 +514,10 @@ const SIMDDriver *SIMD_sse2_bind()
 {
 	static SIMDDriver d;
 
-	d.SkinVerts[3] = &SkinVerts4;
+	/*d.SkinVerts[3] = &SkinVerts4;
 	d.SkinVerts[2] = &SkinVerts3;
 	d.SkinVerts[1] = &SkinVerts2;
-	d.SkinVerts[0] = &SkinVerts1;
+	d.SkinVerts[0] = &SkinVerts1;*/
 
 	string::cpy(d.name, "SIMD_sse2");
 	return &d;

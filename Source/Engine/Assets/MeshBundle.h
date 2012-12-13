@@ -21,19 +21,18 @@ RAD_ZONE_DEC(RADENG_API, ZMesh);
 struct RADENG_CLASS DMesh {
 	typedef zone_vector<DMesh, ZMeshT>::type Vec;
 
-	enum {
-		RAD_FLAG(Vertices),
-		RAD_FLAG(Texture1),
-		RAD_FLAG(Texture2)
-	};
-
-	U16 flags;
-	U16 vertSize;
-	U32 numVerts;
-	U32 numIndices;
+	U16 numVerts;
+	U16 numIndices;
+	U16 numChannels;
 
 	const char *material;
-	const void *vertices;
+	const void *vertices; // vertex packing not the same as ska's
+						  // floats:
+						  // 0-2   -> vertex (3 floats)
+						  // 4-6   -> normal (3 floats)
+						  // 6-9   -> st (always has 2 channels) (4 floats)
+						  // 10-13 -> tangent 1 (4 floats)
+						  // 14-17 -> tangent 2 (4 floats)
 	const void *indices;
 };
 

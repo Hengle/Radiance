@@ -16,7 +16,7 @@ const SIMDDriver *SIMD_neon_bind();
 void SIMDDriver::Select()
 {
 #if defined(RAD_OPT_WINX) && !defined(_WIN64)
-	SIMD = SIMD_sse2_bind();
+	SIMD = SIMD_ref_bind();
 #elif defined(__ARM_NEON__)
 	SIMD = SIMD_neon_bind();
 #else

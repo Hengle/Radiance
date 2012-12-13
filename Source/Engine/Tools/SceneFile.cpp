@@ -29,14 +29,16 @@ namespace {
 		kId = RAD_FOURCC_LE('R', 'S', 'C', 'N'),
 		kVersion2 = 2,
 		kVersion3 = 3,
-		kVersion = 4,
+		kVersion4 = 4,
+		kVersion = 5,
 
 		kHasMaterialFlag = 0x80000000,
 		kHasAnimsFlag = 0x00200000,
 		kHasMeshFlag = 0x00100000,
 		kCinematicObjectFlag = 0x00080000,
 		kHideUntilRefedFlag = 0x00040000,
-		kHideWhenDoneFlag = 0x00010000
+		kHideWhenDoneFlag = 0x00010000,
+		kSetBBoxFlag = 0x00008000
 	};
 
 	struct Material {
@@ -190,8 +192,10 @@ namespace {
 				TriVert v;
 				v.orgPos = ReadVec3(stream);
 				v.pos = v.orgPos;
-				mdl.bounds.Insert(v.pos);
 				mdl.verts.push_back(v);
+
+				if (!(flags & kSetBBoxFlag))
+					mdl.bounds.Insert(v.pos);
 			}
 
 			UVFaceVec  uvtris[SceneFile::kMaxUVChannels];
@@ -707,6 +711,22 @@ bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth, UIProgres
 					m = &mats[idx];
 				}
 
+				if ((version > kVersion4) && (flags & kSetBBoxFlag)) { // bbox provided
+					String bboxString = ReadString(stream);
+					float mins[3];
+					float maxs[3];
+					sscanf(bboxString.c_str, "%f %f %f %f %f %f",
+						&mins[0], &mins[1], &mins[2],
+						&maxs[0], &maxs[1], &maxs[2]
+					);
+					mdl.bounds.Initialize(
+						(SceneFile::ValueType)mins[0], (SceneFile::ValueType)mins[1], (SceneFile::ValueType)mins[2],
+						(SceneFile::ValueType)maxs[0], (SceneFile::ValueType)maxs[2], (SceneFile::ValueType)maxs[2]
+					);
+				} else {
+					mdl.bounds.Initialize();
+				}
+
 				if (version > kVersion2) {
 					mdl.cinematic = (flags&kCinematicObjectFlag) ? true : false;
 					mdl.hideUntilRef = (flags&kHideUntilRefedFlag) ? true : false;
@@ -719,7 +739,6 @@ bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth, UIProgres
 
 				mdl.verts.clear();
 				mdl.tris.clear();
-				mdl.bounds.Initialize();
 				mdl.anims.clear();
 				mdl.skin.reset();
 				

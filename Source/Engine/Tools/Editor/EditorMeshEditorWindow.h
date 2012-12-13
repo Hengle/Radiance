@@ -21,8 +21,7 @@ namespace editor {
 class GLWidget;
 class GLNavWidget;
 
-class RADENG_CLASS MeshEditorWindow : public QWidget
-{
+class RADENG_CLASS MeshEditorWindow : public QWidget {
 	Q_OBJECT
 public:
 
