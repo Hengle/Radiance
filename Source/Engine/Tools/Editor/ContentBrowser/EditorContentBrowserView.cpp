@@ -268,9 +268,20 @@ m_selMode(selMode),
 m_loadedIcons(false),
 m_inTick(false),
 m_tickRedraw(false)
+#if defined(RAD_OPT_OSX)
+, m_font("Courier New")
+#endif
 {
 	m_resolution = MainWindow::Get()->userPrefs->value("contentBrowser/resolution", 1).toInt();
+	
+// These font shenanigans need to be talked about:
+// Qt renderText has a segv bug where it will overwrite some internal buffer. This may have to do with rendered glyph size?
+// On the PC, using Courier New crashes in renderText, on Mac OSX NOT using Courier New crashes in renderText. Go Figure.
+#if defined(RAD_OPT_OSX)
+	m_font.setPixelSize(12);
+#else
 	m_font.setPixelSize(10);
+#endif
 
 	QGridLayout *l = new (ZEditor) QGridLayout(this);
 	
@@ -1356,8 +1367,6 @@ void ContentBrowserView::DrawThumb(ContentAssetThumb *thumb, const pkg::Package:
 		);
 	}
 }
-
-static char s_label[256];
 
 void ContentBrowserView::OnRenderGL(GLWidget&)
 {

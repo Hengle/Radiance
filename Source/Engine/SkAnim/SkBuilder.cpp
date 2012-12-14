@@ -500,7 +500,7 @@ struct Tables {
 		int best = -1;
 		float bestError = eqDist*3.f;
 
-		for (size_t i = 0; i+4 <= rTable.size(); i += 4) {
+		for (int i = 0; i+4 <= (int)rTable.size(); i += 4) {
 			if (QuatEq(*((const Quat*)&rTable[i]), r, eqDist, bestError)) {
 				best = i;
 			}
