@@ -32,14 +32,14 @@ int MapParser::Process(
 	int flags
 ) {
 #if defined(RAD_OPT_TOOLS)
-	if (asset->cooked || (flags&P_FastPath))
-		return SR_Success;
-
 	if (flags&(P_Unload|P_Trim|P_Cancel)) {
 		m_state = S_None;
 		m_script.Reset();
 		return SR_Success;
 	}
+
+	if (asset->cooked || (flags&P_FastPath))
+		return SR_Success;
 
 	if (!(flags&(P_Load|P_Parse)))
 		return SR_Success;
