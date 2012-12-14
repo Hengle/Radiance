@@ -215,7 +215,8 @@ bool CinematicsBuilder::EmitActor(const SceneFile &map, Actor &actor) {
 	tools::SkaData::Ref ska = tools::CompileSkaData(
 		"BSPBuilder",
 		map,
-		actor.index
+		actor.index,
+		1.f
 	);
 
 	if (!ska)

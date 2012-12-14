@@ -74,7 +74,7 @@ void SkMesh::Load(
 		if (kSkinFrames > 1)
 			m.m.AllocateSwapChains(kSkinFrames);
 
-		const int kVertSize = 8+(4*dm.numChannels)*sizeof(float);
+		const int kVertSize = (8+(4*dm.numChannels))*sizeof(float);
 
 		m.vertStreamIdx = m.m.AllocateStream(SU_Stream, kVertSize, dm.totalVerts, true);
 		
@@ -117,10 +117,10 @@ void SkMesh::Load(
 		int uvStreamIndex = -1;
 
 		if (dm.numChannels > 1) {
-			int streamIdx = m.m.AllocateStream(SU_Static, sizeof(float)*4, dm.totalVerts);
+			uvStreamIndex = m.m.AllocateStream(SU_Static, sizeof(float)*4, dm.totalVerts);
 		
 			m.m.MapSource(
-				streamIdx,
+				uvStreamIndex,
 				MGS_TexCoords,
 				0,
 				sizeof(float) * 4,
@@ -128,7 +128,7 @@ void SkMesh::Load(
 			);
 
 			m.m.MapSource(
-				streamIdx,
+				uvStreamIndex,
 				MGS_TexCoords,
 				1,
 				sizeof(float) * 4,
@@ -137,10 +137,10 @@ void SkMesh::Load(
 
 		} else if (dm.numChannels > 0) {
 
-			int streamIdx = m.m.AllocateStream(SU_Static, sizeof(float)*2, dm.totalVerts);
+			uvStreamIndex = m.m.AllocateStream(SU_Static, sizeof(float)*2, dm.totalVerts);
 		
 			m.m.MapSource(
-				streamIdx,
+				uvStreamIndex,
 				MGS_TexCoords,
 				0,
 				0,
@@ -180,8 +180,10 @@ void SkMesh::Skin(int mesh) {
 		int numVerts = (int)m.dm->numVerts[i];
 		const U16 *boneIndices = m.dm->bones[i];
 
-		if ((numVerts > 0) && (m.dm->numChannels < 2)) {
-			SIMD->SkinVerts[i][m.dm->numChannels](
+		RAD_ASSERT(m.dm->numChannels < 2);
+
+		if (numVerts > 0) {
+			SIMD->SkinVerts[i][m.dm->numChannels-1](
 				outVerts,
 				bones,
 				srcVerts,
@@ -190,8 +192,8 @@ void SkMesh::Skin(int mesh) {
 			);
 		}
 
-		outVerts += numVerts*4;
-		srcVerts += numVerts*4*(i+1);
+		outVerts += numVerts*(8+(4*m.dm->numChannels));
+		srcVerts += numVerts*(i+1)*(8+(4*m.dm->numChannels));
 	}
 
 	vb.reset();

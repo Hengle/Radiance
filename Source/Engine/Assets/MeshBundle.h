@@ -29,7 +29,7 @@ struct RADENG_CLASS DMesh {
 	const void *vertices; // vertex packing not the same as ska's
 						  // floats:
 						  // 0-2   -> vertex (3 floats)
-						  // 4-6   -> normal (3 floats)
+						  // 3-5   -> normal (3 floats)
 						  // 6-9   -> st (always has 2 channels) (4 floats)
 						  // 10-13 -> tangent 1 (4 floats)
 						  // 14-17 -> tangent 2 (4 floats)

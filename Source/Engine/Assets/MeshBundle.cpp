@@ -64,9 +64,9 @@ int DMeshBundle::Parse(const void *data, AddrSize len) {
 		// padd bytes
 		bytes += sizeof(U16);
 
-		CHECK_SIZE((m.numVerts*2*3)+(m.numVerts*4*(m.numChannels+1)) * sizeof(float));
+		CHECK_SIZE(((m.numVerts*2*3)+(m.numVerts*4*(m.numChannels+1))) * sizeof(float));
 		m.vertices = reinterpret_cast<const void*>(bytes);
-		bytes += (m.numVerts*2*3)+(m.numVerts*4*(m.numChannels+1)) * sizeof(float);
+		bytes += ((m.numVerts*2*3)+(m.numVerts*4*(m.numChannels+1))) * sizeof(float);
 		
 		CHECK_SIZE(sizeof(U16)*m.numIndices);
 		m.indices = bytes;

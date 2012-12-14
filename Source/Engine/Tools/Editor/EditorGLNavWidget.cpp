@@ -57,10 +57,10 @@ void GLNavWidget::CameraMoved() {
 }
 
 void GLNavWidget::wheelEvent(QWheelEvent *e) {
-	if (e->orientation() == Qt::Vertical)
-	{
+	if (e->orientation() == Qt::Vertical) {
 		float move = m_wheel * e->delta() / 8.f;
 		if (move != 0.f) {
+			setFocus();
 			if (m_mode == kMode_Orbit) { // don't move through orbit center
 				Vec3 v = m_orbitPos - m_c.pos.get();
 				move = std::min(move, v.Magnitude()-10.f);
@@ -138,6 +138,7 @@ void GLNavWidget::mouseMoveEvent(QMouseEvent *e) {
 void GLNavWidget::mousePressEvent(QMouseEvent *e)
 {
 	GLWidget::mousePressEvent(e); // do signal
+	setFocus();
 
 	bool capture=false;
 

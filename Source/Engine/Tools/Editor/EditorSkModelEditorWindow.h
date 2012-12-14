@@ -21,8 +21,7 @@ namespace editor {
 class GLWidget;
 class GLNavWidget;
 
-class RADENG_CLASS SkModelEditorWindow : public QWidget
-{
+class RADENG_CLASS SkModelEditorWindow : public QWidget {
 	Q_OBJECT
 public:
 

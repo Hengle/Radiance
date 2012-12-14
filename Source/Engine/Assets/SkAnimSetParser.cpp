@@ -160,10 +160,19 @@ int SkAnimSetParser::Load(
 
 	fclose(fp);
 
+	s = asset->entry->KeyValue<String>("Compression", P_TARGET_FLAGS(flags));
+	if (!s)
+		return SR_MetaError;
+
+	float compression = 1.f;
+	sscanf(s->c_str, "%f", &compression);
+	compression = std::max(0.f, std::min(compression, 1.f));
+
 	m_skad = tools::CompileSkaData(
 		asset->name,
 		maps,
-		0
+		0,
+		compression
 	);
 
 	return m_skad ? SR_Success : SR_ParseError;

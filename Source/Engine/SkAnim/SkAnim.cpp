@@ -827,8 +827,6 @@ int DSkm::Parse(const void * const *_data, const AddrSize *_len, SkinType type) 
 		maxs[0], maxs[1], maxs[2]
 	);
 
-	bytes += sizeof(float)*6;
-
 	CHECK_SIZE(sizeof(U16)*2);
 	U16 numMeshes = *reinterpret_cast<const U16*>(bytes);
 	bytes += sizeof(U16)*2;

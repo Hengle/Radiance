@@ -43,13 +43,15 @@ struct SkmData
 RADENG_API SkaData::Ref RADENG_CALL CompileSkaData(
 	const char *name,
 	const SceneFileVec &anims,
-	int trimodel
+	int trimodel,
+	float compressionLevel // 1.0 = max 0.0 = uncompressed
 );
 
 RADENG_API SkaData::Ref RADENG_CALL CompileSkaData(
 	const char *name,
 	const SceneFile &anims,
-	int trimodel
+	int trimodel,
+	float compressionLevel // 1.0 = max 0.0 = uncompressed
 );
 
 RADENG_API SkmData::Ref RADENG_CALL CompileSkmData(

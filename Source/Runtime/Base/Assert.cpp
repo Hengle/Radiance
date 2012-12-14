@@ -33,6 +33,16 @@ RADRT_API void RADRT_CALL __rad_assert(
 	mbstowcs(wmessage, message, msgLen);
 	mbstowcs(wfile, file, fileLen);
 
+	char szNum[256];
+	sprintf(szNum, "%d", line);
+	OutputDebugStringA("ASSERTION FAILURE: ");
+	OutputDebugStringA(message);
+	OutputDebugStringA("\nFILE: ");
+	OutputDebugStringA(file);
+	OutputDebugStringA("\nLINE: ");
+	OutputDebugStringA(szNum);
+	OutputDebugStringA("\n");
+
 	_wassert(wmessage, wfile, line);
 #elif defined(RAD_OPT_APPLE)
 	__assert_rtn(function, file, line, message);

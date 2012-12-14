@@ -66,7 +66,7 @@ void MeshEditorWindow::Load(int id) {
 		
 		int r = asset->Process(
 			xtime::TimeSlice::Infinite,
-			pkg::P_Load|pkg::P_FastPath
+			pkg::P_Load/*|pkg::P_FastPath*/
 		);
 
 		if (r != pkg::SR_Success) {
@@ -86,11 +86,12 @@ void MeshEditorWindow::Load(int id) {
 	m_glw->unbindGL();
 	m_glw->camera->pos = Vec3(300.f, 0.f, 0.f);
 	m_glw->camera->LookAt(Vec3::Zero);
-	m_glw->camera->fov = 70.f;
-	m_glw->SetOrbitMode(Vec3::Zero, GLNavWidget::kOrbitMode_LeftButton);
-	m_glw->orbitSpeed = 1.f;
-	m_glw->lookSpeed = 0.5f;
-	m_glw->wheelSpeed = 4.f;
+	m_glw->camera->fov = 90.f;
+	
+	m_glw->SetFreeMode();
+	m_glw->kbSpeed = 8.f;
+	m_glw->mouseSpeed = 0.3f;
+	m_glw->camera->fov = 90.f;
 }
 
 void MeshEditorWindow::OnRenderGL(GLWidget &src) {
@@ -174,6 +175,7 @@ void MeshEditorWindow::OnTick(float dt) {
 		parser->material->Sample(App::Get()->time, dt);
 	}
 
+	m_glw->TickCamera(dt);
 	m_glw->updateGL();
 }
 

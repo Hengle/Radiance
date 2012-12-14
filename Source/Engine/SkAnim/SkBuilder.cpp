@@ -28,6 +28,22 @@ namespace tools {
 
 namespace {
 
+// [0] = compression floor
+// [1] = quat zero_children basis
+// [2] = compression basis
+
+// compression = max(compression_floor, compression_basis / (numchildren+1))
+
+static const float kQuatCompressionBasis[3] = {0.01f, 0.7f, 1.f};
+
+// [0] = compression floor
+// [1] = compression basis
+
+// compression = max(compression_floor, compression_basis / (numchildren+1))
+
+static const float kScaleCompressionBasis[2] = {0.1f*0.1f, 0.5f*0.5f}; // units squared
+static const float kTranslationCompressionBasis[2] = {0.5f*0.5f, 1.f*1.f};
+
 typedef zone_vector<int, ZToolsT>::type IntVec;
 typedef zone_set<int, ZToolsT>::type IntSet;
 struct BoneMap {
@@ -43,8 +59,21 @@ public:
 	SkaBuilder();
 	~SkaBuilder();
 
-	bool Compile(const char *name, const SceneFileVec &map, int trimodel, SkaData &sk);
-	bool Compile(const char *name, const SceneFile &map, int trimodel, SkaData &sk);
+	bool Compile(
+		const char *name, 
+		const SceneFileVec &map, 
+		int trimodel, 
+		float compressionLevel, 
+		SkaData &sk
+	);
+
+	bool Compile(
+		const char *name, 
+		const SceneFile &map, 
+		int trimodel, 
+		float compressionLevel, 
+		SkaData &sk
+	);
 
 private:
 
@@ -60,8 +89,12 @@ private:
 
 		String name;
 		int remap;
+		int childDepth; // deepest child branch
 		S16 parent;
 		Mat4 invWorld;
+		float quatCompression;
+		float scaleCompression;
+		float translateCompression;
 	};
 
 	typedef zone_vector<BoneTMVec, ZToolsT>::type FrameVec;
@@ -119,8 +152,25 @@ bool SkaBuilder::EmitBones(const char *name, int idx, int parent, BoneMap::Vec &
 	bone.name = mb.name;
 	bone.parent = (S16)parent;
 	bone.remap = idx;
+	bone.childDepth = 0;
 	bone.invWorld = mb.world.Inverse();
+	bone.quatCompression = 0.f;
+	bone.scaleCompression = 0.f;
+	bone.translateCompression = 0.f;
 	bones.push_back(bone);
+
+	// propogate depth.
+	int depth = 1;
+
+	while (parent > -1) {
+		if (bones[parent].childDepth < depth) {
+			bones[parent].childDepth = depth;
+			++depth;
+			parent = bones[parent].parent;
+		} else {
+			break;
+		}
+	}
 
 	for (IntVec::const_iterator it = bm.children.begin(); it != bm.children.end(); ++it) {
 		if (!EmitBones(name, *it, bm.idx, map, bones, skel))
@@ -130,7 +180,13 @@ bool SkaBuilder::EmitBones(const char *name, int idx, int parent, BoneMap::Vec &
 	return true;
 }
 
-bool SkaBuilder::Compile(const char *name, const SceneFileVec &maps, int trimodel, SkaData &sk) {
+bool SkaBuilder::Compile(
+	const char *name, 
+	const SceneFileVec &maps, 
+	int trimodel, 
+	float compressionLevel,
+	SkaData &sk
+) {
 	RAD_ASSERT(maps.size() == 1 || trimodel == 0);
 
 	SceneFile::Entity::Ref e = maps[0]->worldspawn;
@@ -176,6 +232,24 @@ bool SkaBuilder::Compile(const char *name, const SceneFileVec &maps, int trimode
 		BoneDef &bone = *it;
 		if (bone.parent >= 0)
 			bone.invWorld = bones[bone.parent].invWorld * bone.invWorld;
+
+		bone.quatCompression = std::max(
+			kQuatCompressionBasis[0],
+			kQuatCompressionBasis[std::min(1, bone.childDepth)+1] / (float)(std::max(1, bone.childDepth)) * compressionLevel
+		);
+
+		float qsin = sin(bone.quatCompression*3.1415926535f/180);
+		bone.quatCompression = qsin*qsin;
+
+		bone.scaleCompression = std::max(
+			kScaleCompressionBasis[0],
+			kScaleCompressionBasis[1] / (float)(std::max(1, bone.childDepth)) * compressionLevel
+		);
+
+		bone.translateCompression = std::max(
+			kTranslationCompressionBasis[0],
+			kTranslationCompressionBasis[1] / (float)(std::max(1, bone.childDepth)) * compressionLevel
+		);
 	}
 
 	// bones is now a vector of bones sorted in parent->children order.
@@ -281,7 +355,13 @@ bool SkaBuilder::Compile(const char *name, const SceneFileVec &maps, int trimode
 	return true;
 }
 
-bool SkaBuilder::Compile(const char *name, const SceneFile &map, int trimodel, SkaData &sk) {
+bool SkaBuilder::Compile(
+	const char *name, 
+	const SceneFile &map, 
+	int trimodel, 
+	float compressionLevel,
+	SkaData &sk
+) {
 	SceneFile::Entity::Ref e = map.worldspawn;
 	if (e->models[trimodel]->skel < 0)
 		return false;
@@ -325,6 +405,24 @@ bool SkaBuilder::Compile(const char *name, const SceneFile &map, int trimodel, S
 		BoneDef &bone = *it;
 		if (bone.parent >= 0)
 			bone.invWorld = bones[bone.parent].invWorld * bone.invWorld;
+
+		bone.quatCompression = std::max(
+			kQuatCompressionBasis[0],
+			kQuatCompressionBasis[std::min(1, bone.childDepth)+1] / (float)(std::max(1, bone.childDepth)) * compressionLevel
+		);
+
+		float qsin = sin(bone.quatCompression*3.1415926535f/180);
+		bone.quatCompression = qsin*qsin;
+
+		bone.scaleCompression = std::max(
+			kScaleCompressionBasis[0],
+			kScaleCompressionBasis[1] / (float)(std::max(1, bone.childDepth)) * compressionLevel
+		);
+
+		bone.translateCompression = std::max(
+			kTranslationCompressionBasis[0],
+			kTranslationCompressionBasis[1] / (float)(std::max(1, bone.childDepth)) * compressionLevel
+		);
 	}
 
 	// bones is now a vector of bones sorted in parent->children order.
@@ -403,6 +501,8 @@ struct Tables {
 		strings.reserve(64);
 	}
 
+	// building these tables is all slow and linear, need to figure out how to speed this up.
+
 	float tAbsMax;
 	float sAbsMax;
 
@@ -419,12 +519,20 @@ struct Tables {
 		return (S16)val;
 	}
 
-	bool AddRotate(const Quat &r, int &out) {
+	bool AddRotate(const Quat &r, float eqDist, int &out) {
+		
+		int best = -1;
+		float bestError = eqDist*3.f;
+
 		for (size_t i = 0; i+4 <= rTable.size(); i += 4) {
-			if (QuatEq(*((const Quat*)&rTable[i]), r)) {
-				out = (int)(i/4);
-				return true;
+			if (QuatEq(*((const Quat*)&rTable[i]), r, eqDist, bestError)) {
+				best = i;
 			}
+		}
+
+		if (best != -1) {
+			out = best / 4;
+			return true;
 		}
 
 		if ((rTable.size()/4) == ska::kEncMask)
@@ -436,12 +544,12 @@ struct Tables {
 		return true;
 	}
 
-	bool AddScale(const Vec3 &s, int &out) {
-		return AddVec3(sTable, s, out, sAbsMax, 0.01f);
+	bool AddScale(const Vec3 &s, float max, int &out) {
+		return AddVec3(sTable, s, out, sAbsMax, max);
 	}
 
-	bool AddTranslate(const Vec3 &t, int &out) {
-		return AddVec3(tTable, t, out, tAbsMax, 0.005f);
+	bool AddTranslate(const Vec3 &t, float max, int &out) {
+		return AddVec3(tTable, t, out, tAbsMax, max);
 	}
 
 	int AddString(const String &str) {
@@ -464,12 +572,12 @@ struct Tables {
 
 private:
 
-	bool QuatEq(const Quat &a, const Quat &b) {
-		static const float s_minDeg = 0.03f;
-		static const float s_eqDist = (float)(sin(s_minDeg*3.1415926535f/180)*sin(s_minDeg*3.1415926535f/180));
-
+	bool QuatEq(const Quat &a, const Quat &b, float max, float &error) {
+		
 		Mat4 ma = Mat4::Rotation(a);
 		Mat4 mb = Mat4::Rotation(b);
+
+		float e = 0.f;
 
 		for (int row = 0; row < 3; ++row) {
 			Vec3 d(
@@ -478,24 +586,42 @@ private:
 				(ma[row][2] - mb[row][2]) 
 			);
 
-			if (d.MagnitudeSquared() >= s_eqDist)
+			float m = d.MagnitudeSquared();
+			e += m;
+
+			if (m >= max)
+				return false;
+			if (e >= error)
 				return false;
 		}
+
+		RAD_ASSERT(e < error);
+		error = e;
 
 		return true;
 	}
 
-	bool VecEq(const Vec3 &a, const Vec3 &b, float max) {
-		return (a-b).MagnitudeSquared() < max;
+	float VecEq(const Vec3 &a, const Vec3 &b) {
+		return (a-b).MagnitudeSquared();
 	}
 
 	bool AddVec3(FloatVec &table, const Vec3 &v, int &out, float &outMax, float max) {
 
-		for (size_t i = 0; i+3 <= table.size(); i += 3) {
-			if (VecEq(*((const Vec3*)&table[i]), v, max)) {
-				out = (int)(i/3);
-				return true;
+		int best = -1;
+		
+		for (int i = 0; i+3 <= (int)table.size(); i += 3) {
+			const Vec3 &a = *((const Vec3*)&table[i]);
+			float d = (a-v).MagnitudeSquared();
+
+			if (d < max) {
+				max = d;
+				best = i;
 			}
+		}
+
+		if (best != -1) {
+			out = best / 3;
+			return true;
 		}
 
 		if ((table.size()/3) == ska::kEncMask)
@@ -594,6 +720,10 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const {
 
 			bool tag = false;
 
+			// apply progressive compression.
+			// bones deeper in the hierarchy are compressed less
+			// with the theory that don't contribute as much to noticable wobble.
+
 			for (size_t boneIdx = 0; boneIdx < m_bones.size(); ++boneIdx) {
 				RAD_ASSERT(frame.size() == m_bones.size());
 				const BoneTM &tm = frame[boneIdx];
@@ -619,7 +749,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const {
 
 				if (emitR) {
 					int idx;
-					if (!t.AddRotate(tm.tm.r, idx))
+					if (!t.AddRotate(tm.tm.r, m_bones[boneIdx].quatCompression, idx))
 						return false;
 					ct.rFrames.push_back(idx);
 					prevBoneRFrame[boneIdx] = idx;
@@ -629,7 +759,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const {
 
 				if (emitS) {
 					int idx;
-					if (!t.AddScale(tm.tm.s, idx))
+					if (!t.AddScale(tm.tm.s, m_bones[boneIdx].scaleCompression, idx))
 						return false;
 					ct.sFrames.push_back(idx);
 					prevBoneSFrame[boneIdx] = idx;
@@ -639,7 +769,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const {
 
 				if (emitT) {
 					int idx;
-					if (!t.AddTranslate(tm.tm.t, idx))
+					if (!t.AddTranslate(tm.tm.t, m_bones[boneIdx].translateCompression, idx))
 						return false;
 					ct.tFrames.push_back(idx);
 					prevBoneTFrame[boneIdx] = idx;
@@ -1234,39 +1364,53 @@ bool CompileCPUSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 			RAD_ASSERT(m->weightedVerts.size() == m->weightedNormals.size());
 			RAD_ASSERT(m->weightedVerts.size() == m->weightedTangents[0].size());
 
-			for (size_t i = 0; i < m->weightedVerts.size(); ++i) {
-				const Vec4 *v = &m->weightedVerts[i];
+			int ofs = 0;
+			for (int i = 0; i < ska::kBonesPerVert; ++i) {
+				const int kBoneVertCount = (int)m->verts[i].size();
+				
+				for (int z = 0; z < kBoneVertCount; ++z) {
+					for (int k = 0; k <= i; ++k) {
+						const Vec4 *v = &m->weightedVerts[k+ofs];
 
-				if (!os.Write((*v)[0]) ||
-					!os.Write((*v)[1]) ||
-					!os.Write((*v)[2]) ||
-					!os.Write((*v)[3])) {
-					return false;
-				}
+						if (!os.Write((*v)[0]) ||
+							!os.Write((*v)[1]) ||
+							!os.Write((*v)[2]) ||
+							!os.Write((*v)[3])) {
+							return false;
+						}
 
-				bytes += 16;
-
-				v = &m->weightedNormals[i];
-
-				if (!os.Write((*v)[0]) ||
-					!os.Write((*v)[1]) ||
-					!os.Write((*v)[2]) ||
-					!os.Write((*v)[3])) {
-					return false;
-				}
-
-				bytes += 16;
-
-				for (int k = 0; k < r->numChannels; ++k) {
-					v = &m->weightedTangents[k][i];
-					if (!os.Write((*v)[0]) ||
-						!os.Write((*v)[1]) ||
-						!os.Write((*v)[2]) ||
-						!os.Write((*v)[3])) {
-						return false;
+						bytes += 16;
 					}
 
-					bytes += 16;
+					for (int k = 0; k <= i; ++k) {
+						const Vec4 *v = &m->weightedNormals[k+ofs];
+
+						if (!os.Write((*v)[0]) ||
+							!os.Write((*v)[1]) ||
+							!os.Write((*v)[2]) ||
+							!os.Write((*v)[3])) {
+							return false;
+						}
+
+						bytes += 16;
+					}
+
+					for (int j = 0; j < r->numChannels; ++j) {
+						for (int k = 0; k <= i; ++k) {
+							const Vec4 *v = &m->weightedTangents[j][k+ofs];
+
+							if (!os.Write((*v)[0]) ||
+								!os.Write((*v)[1]) ||
+								!os.Write((*v)[2]) ||
+								!os.Write((*v)[3])) {
+								return false;
+							}
+
+							bytes += 16;
+						}
+					}
+
+					ofs += (i+1);
 				}
 			}
 
@@ -1317,12 +1461,13 @@ bool CompileCPUSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 RADENG_API SkaData::Ref RADENG_CALL CompileSkaData(
 	const char *name, 
 	const SceneFileVec &anims,
-	int trimodel
+	int trimodel,
+	float compressionLevel // 1.0 = max 0.0 = uncompressed
 ) {
 	SkaData::Ref sk(new (ZTools) SkaData());
 
 	SkaBuilder b;
-	if (!b.Compile(name, anims, trimodel, *sk))
+	if (!b.Compile(name, anims, trimodel, compressionLevel, *sk))
 		return SkaData::Ref();
 
 	SizeBuffer memSize;
@@ -1335,12 +1480,13 @@ RADENG_API SkaData::Ref RADENG_CALL CompileSkaData(
 RADENG_API SkaData::Ref RADENG_CALL CompileSkaData(
 	const char *name, 
 	const SceneFile &anims,
-	int trimodel
+	int trimodel,
+	float compressionLevel // 1.0 = max 0.0 = uncompressed
 ) {
 	SkaData::Ref sk(new (ZTools) SkaData());
 
 	SkaBuilder b;
-	if (!b.Compile(name, anims, trimodel, *sk))
+	if (!b.Compile(name, anims, trimodel, compressionLevel, *sk))
 		return SkaData::Ref();
 	
 	SizeBuffer memSize;

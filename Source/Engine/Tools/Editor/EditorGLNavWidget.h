@@ -38,18 +38,16 @@ public:
 	RAD_DECLARE_PROPERTY(GLNavWidget, wheelSpeed, float, float);
 	RAD_DECLARE_PROPERTY(GLNavWidget, kbSpeed, float, float);
 
-signals:
-
-	void OnCameraMoved();
-
-protected:
-
 	virtual void wheelEvent(QWheelEvent *e);
 	virtual void mouseMoveEvent(QMouseEvent *e);
 	virtual void mousePressEvent(QMouseEvent *e);
 	virtual void mouseReleaseEvent(QMouseEvent *e);
 	virtual void keyPressEvent(QKeyEvent *e);
 	virtual void keyReleaseEvent(QKeyEvent *e);
+
+signals:
+
+	void OnCameraMoved();
 
 private:
 
