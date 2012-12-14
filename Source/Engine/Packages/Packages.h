@@ -346,9 +346,10 @@ protected:
 
 	int CompareVersion(int target, bool updateIfNewer=true);
 	int CompareModifiedTime(int target, bool updateIfNewer=true);
-	int CompareCachedFileTime(int target, const char *key, const char *path, bool updateIfNewer=true);
-	int CompareCachedFileTimeKey(int target, const char *key, const char *localized = 0, bool updateIfNewer=true);
+	int CompareCachedFileTime(int target, const char *key, const char *path, bool updateIfNewer=true, bool optional=false);
+	int CompareCachedFileTimeKey(int target, const char *key, const char *localized = 0, bool updateIfNewer=true, bool optional=false);
 	int CompareCachedStringKey(int target, const char *key);
+	int CompareCachedString(int target, const char *key, const char *string);
 	int CompareCachedLocalizeKey(int target, const char *key);
 	bool ModifiedTime(int target, xtime::TimeDate &td) const;
 	bool TimeForKey(int target, const char *key, xtime::TimeDate &td) const;

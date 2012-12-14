@@ -34,7 +34,7 @@ namespace {
 
 // compression = max(compression_floor, compression_basis / (numchildren+1))
 
-static const float kQuatCompressionBasis[3] = {0.01f, 0.7f, 1.f};
+static const float kQuatCompressionBasis[3] = {0.01f, 2.0f, 1.0f};
 
 // [0] = compression floor
 // [1] = compression basis
@@ -63,7 +63,7 @@ public:
 		const char *name, 
 		const SceneFileVec &map, 
 		int trimodel, 
-		float compressionLevel, 
+		const SkaCompressionMap *compression,
 		SkaData &sk
 	);
 
@@ -71,7 +71,7 @@ public:
 		const char *name, 
 		const SceneFile &map, 
 		int trimodel, 
-		float compressionLevel, 
+		const SkaCompressionMap *compression,
 		SkaData &sk
 	);
 
@@ -92,6 +92,10 @@ private:
 		int childDepth; // deepest child branch
 		S16 parent;
 		Mat4 invWorld;
+	};
+
+	struct Compression {
+		typedef zone_vector<Compression, ZToolsT>::type Vec;
 		float quatCompression;
 		float scaleCompression;
 		float translateCompression;
@@ -106,6 +110,7 @@ private:
 		float distance;
 		bool removeMotion;
 		FrameVec frames;
+		Compression::Vec boneCompression;
 	};
 
 	bool Compile(stream::IOutputBuffer &ob) const;
@@ -116,14 +121,22 @@ private:
 		const char *name,
 		float fps,
 		int numFrames,
-		bool removeMotion
+		bool removeMotion,
+		const SkaCompressionMap *compression
 	);
 
 	void AddFrame(const BoneTM *bones);
 
 	void EndAnim(int motionBone);
 
-	static bool EmitBones(const char *name, int idx, int parent, BoneMap::Vec &map, BoneDef::Vec &bones, const SceneFile::BoneVec &skel);
+	static bool EmitBones(
+		const char *name, 
+		int idx, 
+		int parent, 
+		BoneMap::Vec &map, 
+		BoneDef::Vec &bones, 
+		const SceneFile::BoneVec &skel
+	);
 
 	BoneDef::Vec m_bones;
 	Anim::Vec m_anims;
@@ -154,9 +167,6 @@ bool SkaBuilder::EmitBones(const char *name, int idx, int parent, BoneMap::Vec &
 	bone.remap = idx;
 	bone.childDepth = 0;
 	bone.invWorld = mb.world.Inverse();
-	bone.quatCompression = 0.f;
-	bone.scaleCompression = 0.f;
-	bone.translateCompression = 0.f;
 	bones.push_back(bone);
 
 	// propogate depth.
@@ -183,8 +193,8 @@ bool SkaBuilder::EmitBones(const char *name, int idx, int parent, BoneMap::Vec &
 bool SkaBuilder::Compile(
 	const char *name, 
 	const SceneFileVec &maps, 
-	int trimodel, 
-	float compressionLevel,
+	int trimodel,
+	const SkaCompressionMap *compression,
 	SkaData &sk
 ) {
 	RAD_ASSERT(maps.size() == 1 || trimodel == 0);
@@ -232,24 +242,6 @@ bool SkaBuilder::Compile(
 		BoneDef &bone = *it;
 		if (bone.parent >= 0)
 			bone.invWorld = bones[bone.parent].invWorld * bone.invWorld;
-
-		bone.quatCompression = std::max(
-			kQuatCompressionBasis[0],
-			kQuatCompressionBasis[std::min(1, bone.childDepth)+1] / (float)(std::max(1, bone.childDepth)) * compressionLevel
-		);
-
-		float qsin = sin(bone.quatCompression*3.1415926535f/180);
-		bone.quatCompression = qsin*qsin;
-
-		bone.scaleCompression = std::max(
-			kScaleCompressionBasis[0],
-			kScaleCompressionBasis[1] / (float)(std::max(1, bone.childDepth)) * compressionLevel
-		);
-
-		bone.translateCompression = std::max(
-			kTranslationCompressionBasis[0],
-			kTranslationCompressionBasis[1] / (float)(std::max(1, bone.childDepth)) * compressionLevel
-		);
 	}
 
 	// bones is now a vector of bones sorted in parent->children order.
@@ -306,7 +298,8 @@ bool SkaBuilder::Compile(
 				anim.name.c_str,
 				(float)anim.frameRate,
 				(int)anim.frames.size(),
-				false
+				false,
+				compression
 			);
 
 			BoneTMVec tms;
@@ -359,7 +352,7 @@ bool SkaBuilder::Compile(
 	const char *name, 
 	const SceneFile &map, 
 	int trimodel, 
-	float compressionLevel,
+	const SkaCompressionMap *compression,
 	SkaData &sk
 ) {
 	SceneFile::Entity::Ref e = map.worldspawn;
@@ -405,24 +398,6 @@ bool SkaBuilder::Compile(
 		BoneDef &bone = *it;
 		if (bone.parent >= 0)
 			bone.invWorld = bones[bone.parent].invWorld * bone.invWorld;
-
-		bone.quatCompression = std::max(
-			kQuatCompressionBasis[0],
-			kQuatCompressionBasis[std::min(1, bone.childDepth)+1] / (float)(std::max(1, bone.childDepth)) * compressionLevel
-		);
-
-		float qsin = sin(bone.quatCompression*3.1415926535f/180);
-		bone.quatCompression = qsin*qsin;
-
-		bone.scaleCompression = std::max(
-			kScaleCompressionBasis[0],
-			kScaleCompressionBasis[1] / (float)(std::max(1, bone.childDepth)) * compressionLevel
-		);
-
-		bone.translateCompression = std::max(
-			kTranslationCompressionBasis[0],
-			kTranslationCompressionBasis[1] / (float)(std::max(1, bone.childDepth)) * compressionLevel
-		);
 	}
 
 	// bones is now a vector of bones sorted in parent->children order.
@@ -440,7 +415,8 @@ bool SkaBuilder::Compile(
 			anim.name.c_str,
 			(float)anim.frameRate,
 			(int)anim.frames.size(),
-			false
+			false,
+			compression
 		);
 
 		BoneTMVec tms;
@@ -749,7 +725,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const {
 
 				if (emitR) {
 					int idx;
-					if (!t.AddRotate(tm.tm.r, m_bones[boneIdx].quatCompression, idx))
+					if (!t.AddRotate(tm.tm.r, anim.boneCompression[boneIdx].quatCompression, idx))
 						return false;
 					ct.rFrames.push_back(idx);
 					prevBoneRFrame[boneIdx] = idx;
@@ -759,7 +735,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const {
 
 				if (emitS) {
 					int idx;
-					if (!t.AddScale(tm.tm.s, m_bones[boneIdx].scaleCompression, idx))
+					if (!t.AddScale(tm.tm.s, anim.boneCompression[boneIdx].scaleCompression, idx))
 						return false;
 					ct.sFrames.push_back(idx);
 					prevBoneSFrame[boneIdx] = idx;
@@ -769,7 +745,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const {
 
 				if (emitT) {
 					int idx;
-					if (!t.AddTranslate(tm.tm.t, m_bones[boneIdx].translateCompression, idx))
+					if (!t.AddTranslate(tm.tm.t, anim.boneCompression[boneIdx].translateCompression, idx))
 						return false;
 					ct.tFrames.push_back(idx);
 					prevBoneTFrame[boneIdx] = idx;
@@ -979,7 +955,8 @@ void SkaBuilder::BeginAnim(
 	const char *name,
 	float fps,
 	int numFrames,
-	bool removeMotion
+	bool removeMotion,
+	const SkaCompressionMap *compression
 ) {
 	RAD_ASSERT(name);
 	RAD_ASSERT(numFrames>0);
@@ -991,6 +968,39 @@ void SkaBuilder::BeginAnim(
 	a.removeMotion = removeMotion;
 	a.frames.reserve((size_t)numFrames);
 	a.distance = 0.f;
+	a.boneCompression.resize(m_bones.size());
+
+	float compressionLevel = 1.f;
+	if (compression) {
+		SkaCompressionMap::const_iterator it = compression->find(CStr(name));
+		if (it != compression->end())
+			compressionLevel = it->second;
+	}
+
+	for (size_t i = 0; i < m_bones.size(); ++i) {
+		Compression &c = a.boneCompression[i];
+		const BoneDef &bone = m_bones[i];
+
+		const float kFactor = math::Pow(0.7f, (float)bone.childDepth);
+
+		c.quatCompression = std::max(
+			kQuatCompressionBasis[0],
+			kQuatCompressionBasis[std::min(1, bone.childDepth)+1] * kFactor * compressionLevel
+		);
+
+		float qsin = sin(c.quatCompression*3.1415926535f/180);
+		c.quatCompression = qsin*qsin;
+
+		c.scaleCompression = std::max(
+			kScaleCompressionBasis[0],
+			kScaleCompressionBasis[1] * kFactor * compressionLevel
+		);
+
+		c.translateCompression = std::max(
+			kTranslationCompressionBasis[0],
+			kTranslationCompressionBasis[1] * kFactor * compressionLevel
+		);
+	}
 }
 
 void SkaBuilder::AddFrame(const BoneTM *bones) {
@@ -1462,12 +1472,12 @@ RADENG_API SkaData::Ref RADENG_CALL CompileSkaData(
 	const char *name, 
 	const SceneFileVec &anims,
 	int trimodel,
-	float compressionLevel // 1.0 = max 0.0 = uncompressed
+	const SkaCompressionMap *compression
 ) {
 	SkaData::Ref sk(new (ZTools) SkaData());
 
 	SkaBuilder b;
-	if (!b.Compile(name, anims, trimodel, compressionLevel, *sk))
+	if (!b.Compile(name, anims, trimodel, compression, *sk))
 		return SkaData::Ref();
 
 	SizeBuffer memSize;
@@ -1481,12 +1491,12 @@ RADENG_API SkaData::Ref RADENG_CALL CompileSkaData(
 	const char *name, 
 	const SceneFile &anims,
 	int trimodel,
-	float compressionLevel // 1.0 = max 0.0 = uncompressed
+	const SkaCompressionMap *compression
 ) {
 	SkaData::Ref sk(new (ZTools) SkaData());
 
 	SkaBuilder b;
-	if (!b.Compile(name, anims, trimodel, compressionLevel, *sk))
+	if (!b.Compile(name, anims, trimodel, compression, *sk))
 		return SkaData::Ref();
 	
 	SizeBuffer memSize;

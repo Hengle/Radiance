@@ -13,10 +13,12 @@
 #include "SolidBSP/SolidBSP.h"
 #include "../../Tools/SceneFile.h"
 #include "../../Tools/Progress.h"
+#include "../../SkAnim/SkAnimDef.h"
 #include "MapBuilderDebugUI.h"
 #include <QtCore/QVariant>
 #include <QtCore/QRect>
 #include <Runtime/Thread.h>
+#include <Runtime/Container/ZoneMap.h>
 #include <Runtime/PushPack.h>
 
 class Engine;
@@ -32,6 +34,7 @@ public:
 
 	void SetProgressIndicator(UIProgress *ui);
 	void SetDebugUI(MapBuilderDebugUI *ui);
+	void SetCinematicActorCompression(const CinematicActorCompressionMap &map);
 	bool LoadEntSpawn(const world::EntSpawn &spawn);
 	bool SpawnCompile();
 	void WaitForCompletion();
@@ -67,10 +70,11 @@ private:
 	SceneFile m_map;
 	Engine &m_e;
 	UIProgress *m_ui;
+	MapBuilderDebugUI *m_debugUI;
 	int m_result;
 	bool m_compiling;
 	world::EntSpawn m_spawn;
-	MapBuilderDebugUI *m_debugUI;
+	CinematicActorCompressionMap m_caMap;
 	solid_bsp::BSPBuilder m_bspBuilder;
 };
 

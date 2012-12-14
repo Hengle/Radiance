@@ -13,6 +13,7 @@
 #include "../MapBuilderDebugUI.h"
 #include "../../BSPFile.h"
 #include "../../../Packages/Packages.h"
+#include "../../../SkAnim/SkAnimDef.h"
 #include "MapTypes.h"
 #include "VecHash.h"
 #include "PlaneHash.h"
@@ -65,6 +66,7 @@ public:
 
 	bool SpawnCompile(
 		SceneFile &map, 
+		CinematicActorCompressionMap &caMap,
 		tools::UIProgress *ui = 0, 
 		MapBuilderDebugUI *debugUI = 0, // if non-null debugging is enabled.
 		std::ostream *cout = 0
@@ -570,6 +572,7 @@ private:
 	std::ostream *m_cout;
 	tools::UIProgress *m_ui;
 	MapBuilderDebugUI *m_debugUI;
+	CinematicActorCompressionMap m_caMap;
 	int m_numStructural;
 	int m_numDetail;
 	int m_numNodes;

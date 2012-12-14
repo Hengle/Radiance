@@ -1361,7 +1361,7 @@ int Cooker::CompareModifiedTime(int target, bool updateIfNewer) {
 	return r;
 }
 
-int Cooker::CompareCachedFileTime(int target, const char *key, const char *path, bool updateIfNewer) {
+int Cooker::CompareCachedFileTime(int target, const char *key, const char *path, bool updateIfNewer, bool optional) {
 	RAD_ASSERT(key);
 	RAD_ASSERT(path);
 	
@@ -1381,15 +1381,17 @@ int Cooker::CompareCachedFileTime(int target, const char *key, const char *path,
 	TimeDate selfTime;
 	bool m = TimeForKey(target, key, selfTime);
 
-	if (!m && !updateIfNewer)
-		return -1; // always older
-
 	TimeDate fileTime;
 
 	engine->sys->files->GetAbsolutePath(path, spath, file::kFileMask_Base);
 
-	if (!engine->sys->files->GetFileTime(spath.c_str, fileTime))
+	if (!engine->sys->files->GetFileTime(spath.c_str, fileTime)) {
+		if (optional && !m) // we don't have a record of this either
+			return 0;
+		if (m) // remove from cache, no longer a record of this file.
+			globals->pairs.erase(skeyFile);
 		return -1; // always older
+	}
 
 	int c = m ? selfTime.Compare(fileTime) : -1;
 	if (force)
@@ -1403,7 +1405,7 @@ int Cooker::CompareCachedFileTime(int target, const char *key, const char *path,
 	return c;
 }
 
-int Cooker::CompareCachedFileTimeKey(int target, const char *key, const char *localized, bool updateIfNewer) {
+int Cooker::CompareCachedFileTimeKey(int target, const char *key, const char *localized, bool updateIfNewer, bool optional) {
 	RAD_ASSERT(key);
 
 	const String *s = asset->entry->KeyValue<String>(key, target);
@@ -1413,7 +1415,7 @@ int Cooker::CompareCachedFileTimeKey(int target, const char *key, const char *lo
 	}
 
 	if (!localized)
-		return CompareCachedFileTime(target, key, s->c_str, updateIfNewer);
+		return CompareCachedFileTime(target, key, s->c_str, updateIfNewer, optional);
 
 	String sKey(CStr(key));
 	String sPath(*s);
@@ -1444,7 +1446,7 @@ int Cooker::CompareCachedFileTimeKey(int target, const char *key, const char *lo
 		}
 
 		// don't early out here just record the newest value. we need to cache all file times for all versions.
-		int z = CompareCachedFileTime(target, k.c_str, x.c_str, updateIfNewer);
+		int z = CompareCachedFileTime(target, k.c_str, x.c_str, updateIfNewer, optional);
 		r = ((r<z)&&(r!=0)) ? r : z;
 	}
 
@@ -1461,16 +1463,23 @@ int Cooker::CompareCachedStringKey(int target, const char *key) {
 		return -1; // key is missing!
 	}
 	
-	String skey(TargetPath(target)+key);
+	return CompareCachedString(target, key, s->c_str);
+}
+
+int Cooker::CompareCachedString(int target, const char *key, const char *string) {
+	RAD_ASSERT(key);
+
+	const String skey(TargetPath(target)+key);
+	const String sstring(CStr(string));
 
 	world::Keys::Pairs::const_iterator it = globals->pairs.find(skey);
 	if (it != globals->pairs.end()) {
-		if (it->second != *s) {
-			globals->pairs[skey] = *s;
+		if (it->second != sstring) {
+			globals->pairs[skey] = sstring;
 			return -1; // changed!
 		}
 	} else {
-		globals->pairs[skey] = *s;
+		globals->pairs[skey] = sstring;
 		return -1; // doesn't exist!
 	}
 

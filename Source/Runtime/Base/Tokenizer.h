@@ -37,8 +37,8 @@ public:
 	void Bind(stream::InputStream &is);
 	void Bind(const file::MMFileInputBufferRef &ib);
 
-	bool Skip(int numTokens, TokenMode mode);
-	bool GetToken(String &token, TokenMode mode);
+	bool Skip(int numTokens, TokenMode mode = kTokenMode_CrossLine);
+	bool GetToken(String &token, TokenMode mode = kTokenMode_CrossLine);
 
 	enum FetchMode {
 		kFetchMode_RestOfLine,
@@ -48,16 +48,16 @@ public:
 	//! Gets the remaining text in the token stream.
 	bool GetRemaining(String &token, FetchMode mode);
 
-	bool GetFloat(float &f, TokenMode mode);
-	bool GetInt(int &i, TokenMode mode);
+	bool GetFloat(float &f, TokenMode mode = kTokenMode_CrossLine);
+	bool GetInt(int &i, TokenMode mode = kTokenMode_CrossLine);
 
 	void UngetToken();
 
-	bool FindToken(const char *token, TokenMode mode);
-	bool FindTokeni(const char *token, TokenMode mode);
+	bool FindToken(const char *token, TokenMode mode = kTokenMode_CrossLine);
+	bool FindTokeni(const char *token, TokenMode mode = kTokenMode_CrossLine);
 
-	bool IsNextToken(const char *token, TokenMode mode);
-	bool IsNextTokeni(const char *token, TokenMode mode);
+	bool IsNextToken(const char *token, TokenMode mode = kTokenMode_CrossLine);
+	bool IsNextTokeni(const char *token, TokenMode mode = kTokenMode_CrossLine);
 
 	void Restart();
 	void Reset();

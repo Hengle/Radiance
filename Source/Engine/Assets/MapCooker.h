@@ -42,8 +42,10 @@ private:
 
 	int ParseEntity(world::EntSpawn &spawn);
 	int ParseScript(world::EntSpawn &spawn);
+	int ParseCinematicCompressionMap(int flags);
 
 	Tokenizer m_script;
+	tools::CinematicActorCompressionMap m_caMap;
 	tools::UIProgress *m_ui;
 	MapParser::Ref m_parser;
 	tools::MapBuilder::Ref m_mapBuilder;

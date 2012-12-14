@@ -16,7 +16,10 @@ using namespace pkg;
 namespace asset {
 
 MapParser::MapParser()
-: m_state(S_None) {
+#if defined(RAD_OPT_TOOLS)
+: m_state(S_None) 
+#endif
+{
 }
 
 MapParser::~MapParser() {
@@ -28,15 +31,15 @@ int MapParser::Process(
 	const AssetRef &asset,
 	int flags
 ) {
-	if (flags&(P_Unload|P_Trim|P_Cancel))
-	{
+#if defined(RAD_OPT_TOOLS)
+	if (asset->cooked || (flags&P_FastPath))
+		return SR_Success;
+
+	if (flags&(P_Unload|P_Trim|P_Cancel)) {
 		m_state = S_None;
 		m_script.Reset();
 		return SR_Success;
 	}
-
-	if (asset->cooked || (flags&P_FastPath))
-		return SR_Success;
 
 	if (!(flags&(P_Load|P_Parse)))
 		return SR_Success;
@@ -57,7 +60,13 @@ int MapParser::Process(
 	}
 
 	return r;
+#else
+	RAD_ASSERT(asset->cooked);
+	return SR_Success;
+#endif
 }
+
+#if defined(RAD_OPT_TOOLS)
 
 int MapParser::ParseEntity(world::EntSpawn &spawn) {
 	spawn.keys.pairs.clear();
@@ -111,17 +120,91 @@ int MapParser::Load(
 		if (!name || name->empty)
 			return SR_MetaError;
 
-		file::MMFileInputBuffer::Ref ib = engine.sys->files->OpenInputBuffer(name->c_str, ZWorld);
+		file::MMFileInputBuffer::Ref ib = engine.sys->files->OpenInputBuffer(
+			name->c_str, 
+			ZWorld,
+			1*Meg,
+			file::kFileOptions_None,
+			file::kFileMask_Base
+		);
+
 		if (!ib)
 			return SR_FileNotFound;
 
 		m_script.Bind(ib);
+
+		int r = ParseCinematicCompressionMap(
+			engine,
+			asset,
+			flags
+		);
+
+		if (r != SR_Success)
+			return r;
 
 		m_state = S_Done;
 	}
 
 	return SR_Success;
 }
+
+int MapParser::ParseCinematicCompressionMap(
+	Engine &engine,
+	const pkg::Asset::Ref &asset,
+	int flags
+) {
+	m_caMap.clear();
+
+	const String *name = asset->entry->KeyValue<String>("Source.File", P_TARGET_FLAGS(flags));
+	if (!name || name->empty)
+		return SR_MetaError;
+
+	String file = file::SetFileExtension(name->c_str, ".actors");
+	file::MMFileInputBuffer::Ref ib = engine.sys->files->OpenInputBuffer(
+		file.c_str, 
+		ZWorld,
+		1*Meg,
+		file::kFileOptions_None,
+		file::kFileMask_Base
+	);
+
+	if (!ib)
+		return SR_Success; // not a required file.
+
+	Tokenizer script(ib);
+	String token;
+
+	for (;;) {
+		if (!script.GetToken(token))
+			break;
+		if (!script.IsNextToken("{"))
+			return SR_InvalidFormat;
+
+		String anim, value;
+		tools::SkaCompressionMap animMap;
+
+		for (;;) {
+			if (!script.GetToken(anim))
+				return SR_InvalidFormat;
+			if (anim == "}")
+				break;
+			if (!script.IsNextToken("=", Tokenizer::kTokenMode_SameLine))
+				return SR_InvalidFormat;
+			if (!script.GetToken(value, Tokenizer::kTokenMode_SameLine))
+				return SR_InvalidFormat;
+
+			float fval;
+			sscanf(value.c_str, "%f", &fval);
+			animMap.insert(tools::SkaCompressionMap::value_type(anim, fval));
+		}
+
+		if (!animMap.empty())
+			m_caMap.insert(tools::CinematicActorCompressionMap::value_type(token, animMap));
+	}
+
+	return SR_Success;
+}
+#endif
 
 void MapParser::Register(Engine &engine) {
 	static pkg::Binding::Ref r = engine.sys->packages->Bind<MapParser>();

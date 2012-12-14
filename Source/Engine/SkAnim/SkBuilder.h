@@ -8,12 +8,12 @@
 #include "../Types.h"
 #include "../Tools/SceneFile.h"
 #include "SkAnim.h"
+#include <Runtime/Container/ZoneMap.h>
 #include <Runtime/PushPack.h>
 
 namespace tools {
 
-struct SkaData
-{
+struct SkaData {
 	// cleans itself up when destructed.
 	typedef boost::shared_ptr<SkaData> Ref;
 
@@ -26,8 +26,8 @@ struct SkaData
 	AddrSize skaSize;
 };
 
-struct SkmData
-{ // cleans itself up when destructed.
+struct SkmData { 
+	// cleans itself up when destructed.
 	typedef boost::shared_ptr<SkmData> Ref;
 
 	SkmData();
@@ -44,14 +44,14 @@ RADENG_API SkaData::Ref RADENG_CALL CompileSkaData(
 	const char *name,
 	const SceneFileVec &anims,
 	int trimodel,
-	float compressionLevel // 1.0 = max 0.0 = uncompressed
+	const SkaCompressionMap *compression
 );
 
 RADENG_API SkaData::Ref RADENG_CALL CompileSkaData(
 	const char *name,
 	const SceneFile &anims,
 	int trimodel,
-	float compressionLevel // 1.0 = max 0.0 = uncompressed
+	const SkaCompressionMap *compression
 );
 
 RADENG_API SkmData::Ref RADENG_CALL CompileSkmData(

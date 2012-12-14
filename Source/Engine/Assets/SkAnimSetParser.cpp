@@ -8,6 +8,7 @@
 #include "../SkAnim/SkAnim.h"
 #include "../Engine.h"
 #include <Runtime/File.h>
+#include <Runtime/Tokenizer.h>
 
 using namespace pkg;
 
@@ -118,61 +119,85 @@ int SkAnimSetParser::Load(
 	if (!s)
 		return SR_MetaError;
 
-	FILE *fp = engine.sys->files->fopen(
+	file::MMFileInputBuffer::Ref ib = engine.sys->files->OpenInputBuffer(
 		s->c_str.get(), 
-		"rt", 
+		ska::ZSka, 
+		1*Meg,
 		file::kFileOptions_None, 
 		file::kFileMask_Base
 	);
 
-	if (!fp)
+	if (!ib)
 		return SR_FileNotFound;
 
-	tools::SceneFileVec maps;
-	char name[256];
+	Tokenizer script(ib);
+	ib.reset();
 
-	while (fgets(name, 256, fp) != 0) {
+	tools::SceneFileVec sources;
+	tools::SkaCompressionMap compression;
+	String token;
+	const String kFiles("files");
+	const String kCompression("compression");
 
-		for (char *c = name; *c; ++c) {
-			if (*c < 20) {
-				*c = 0;
-				break;
+	while (script.GetToken(token)) {
+		if (token == kFiles) {
+			if (!script.IsNextToken("{"))
+				return SR_InvalidFormat;
+			for (;;) {
+				if (!script.GetToken(token))
+					return SR_InvalidFormat;
+				if (token == "}")
+					break;
+
+				file::MMFileInputBuffer::Ref scene = engine.sys->files->OpenInputBuffer(token.c_str, ZTools);
+
+				if (!scene)
+					return SR_FileNotFound;
+
+				stream::InputStream is(*scene);
+				tools::SceneFileRef source(new (ZTools) tools::SceneFile());
+
+				if (!tools::LoadSceneFile(is, *source, false))
+					return SR_ParseError;
+
+				sources.push_back(source);
 			}
+		} else if (token == kCompression) {
+			if (!script.IsNextToken("{"))
+				return SR_InvalidFormat;
+			for (;;) {
+				if (!script.GetToken(token))
+					return SR_InvalidFormat;
+				if (token == "}")
+					break;
+
+				if (compression.find(token) != compression.end())
+					return SR_InvalidFormat;
+
+				if (!script.IsNextToken("=", Tokenizer::kTokenMode_SameLine))
+					return SR_InvalidFormat;
+				
+				String level;
+				if (!script.GetToken(level, Tokenizer::kTokenMode_SameLine))
+					return SR_InvalidFormat;
+
+				float flevel;
+				sscanf(level.c_str, "%f", &flevel);
+				flevel = std::max(0.f, std::min(1.f, flevel));
+				compression.insert(tools::SkaCompressionMap::value_type(token, flevel));
+			}
+		} else {
+			return SR_InvalidFormat;
 		}
-
-		file::MMFileInputBuffer::Ref ib = engine.sys->files->OpenInputBuffer(name, ZTools);
-
-		if (!ib) {
-			fclose(fp);
-			return SR_FileNotFound;
-		}
-
-		stream::InputStream is(*ib);
-		tools::SceneFileRef map(new (ZTools) tools::SceneFile());
-
-		if (!tools::LoadSceneFile(is, *map, false)) {
-			fclose(fp);
-			return SR_ParseError;
-		}
-
-		maps.push_back(map);
 	}
 
-	fclose(fp);
-
-	s = asset->entry->KeyValue<String>("Compression", P_TARGET_FLAGS(flags));
-	if (!s)
-		return SR_MetaError;
-
-	float compression = 1.f;
-	sscanf(s->c_str, "%f", &compression);
-	compression = std::max(0.f, std::min(compression, 1.f));
+	script.Reset();
 
 	m_skad = tools::CompileSkaData(
 		asset->name,
-		maps,
+		sources,
 		0,
-		compression
+		&compression
 	);
 
 	return m_skad ? SR_Success : SR_ParseError;

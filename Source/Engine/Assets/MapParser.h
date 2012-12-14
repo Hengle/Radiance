@@ -11,6 +11,7 @@
 
 #include "../Packages/Packages.h"
 #include "../World/EntityDef.h"
+#include "../SkAnim/SkAnimDef.h"
 #include <Runtime/Tokenizer.h>
 #include <Runtime/File.h>
 
@@ -36,7 +37,11 @@ public:
 	MapParser();
 	virtual ~MapParser();
 
+#if defined(RAD_OPT_TOOLS)
 	int ParseEntity(world::EntSpawn &spawn);
+
+	RAD_DECLARE_READONLY_PROPERTY(MapParser, caMap, const tools::CinematicActorCompressionMap*);
+#endif
 
 protected:
 
@@ -49,7 +54,14 @@ protected:
 
 private:
 
+#if defined(RAD_OPT_TOOLS)
 	int ParseScript(world::EntSpawn &spawn);
+
+	int ParseCinematicCompressionMap(
+		Engine &engine,
+		const pkg::Asset::Ref &asset,
+		int flags
+	);
 
 	int Load(
 		const xtime::TimeSlice &time,
@@ -58,13 +70,19 @@ private:
 		int flags
 	);
 
+	RAD_DECLARE_GET(caMap, const tools::CinematicActorCompressionMap*) {
+		return &m_caMap;
+	}
+
 	enum {
 		S_None,
 		S_Done
 	};
 
+	tools::CinematicActorCompressionMap m_caMap;
 	Tokenizer m_script;
 	int m_state;
+#endif
 };
 
 } // asset

@@ -36,6 +36,10 @@ void MapBuilder::SetDebugUI(MapBuilderDebugUI *ui) {
 	m_debugUI = ui;
 }
 
+void MapBuilder::SetCinematicActorCompression(const CinematicActorCompressionMap &map) {
+	m_caMap = map;
+}
+
 void MapBuilder::DebugDraw(float time, float dt, const QRect &viewport) {
 	m_bspBuilder.DebugDraw(time, dt, viewport);
 }
@@ -75,7 +79,7 @@ bool MapBuilder::SpawnCompile() {
 	RAD_ASSERT(Thread::exited);
 	ConnectWaypoints();
 	m_compiling = true;
-	return m_bspBuilder.SpawnCompile(m_map, m_ui, m_debugUI, &COut(C_Debug));
+	return m_bspBuilder.SpawnCompile(m_map, m_caMap, m_ui, m_debugUI, &COut(C_Debug));
 }
 
 void MapBuilder::WaitForCompletion() {

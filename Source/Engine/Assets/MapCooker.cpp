@@ -14,7 +14,7 @@ using namespace pkg;
 
 namespace asset {
 
-MapCooker::MapCooker() : Cooker(18), m_parsing(false), m_ui(0) {
+MapCooker::MapCooker() : Cooker(19), m_parsing(false), m_ui(0) {
 }
 
 MapCooker::~MapCooker() {
@@ -35,6 +35,10 @@ CookStatus MapCooker::Status(int flags, int allflags) {
 
 		const String *mapPath = asset->entry->KeyValue<String>("Source.File", flags);
 		if (!mapPath || mapPath->empty)
+			return CS_NeedRebuild;
+
+		String actorPath = file::SetFileExtension(mapPath->c_str, ".actors");
+		if (CompareCachedFileTime(flags, "Source.File.Actors", actorPath.c_str, true, true))
 			return CS_NeedRebuild;
 
 		file::MMFileInputBuffer::Ref ib = engine->sys->files->OpenInputBuffer(mapPath->c_str, ZTools);
@@ -103,6 +107,10 @@ int MapCooker::TickCompile(int flags, int allflags) {
 
 		if (r == SR_End) {
 			m_parsing = false;
+			r = ParseCinematicCompressionMap(flags);
+			if (r != SR_Success)
+				return r;
+			m_mapBuilder->SetCinematicActorCompression(m_caMap);
 			if (!m_mapBuilder->SpawnCompile())
 				return SR_ParseError;
 			m_script.Reset();
@@ -163,6 +171,9 @@ int MapCooker::TickCompile(int flags, int allflags) {
 	if (!mapPath || mapPath->empty)
 		return SR_MetaError;
 
+	String actorPath = file::SetFileExtension(mapPath->c_str, ".actors");
+	CompareCachedFileTime(flags, "Source.File.Actors", actorPath.c_str, true, true);
+
 	//	cout.get() << "********" << std::endl << "Loading :" << mapPath->c_str() << std::endl;
 
 	file::MMFileInputBuffer::Ref ib = engine->sys->files->OpenInputBuffer(mapPath->c_str, ZTools);
@@ -190,17 +201,17 @@ int MapCooker::ParseEntity(world::EntSpawn &spawn) {
 int MapCooker::ParseScript(world::EntSpawn &spawn) {
 	String token, value, temp;
 
-	if (!m_script.GetToken(token, Tokenizer::kTokenMode_CrossLine))
+	if (!m_script.GetToken(token))
 		return SR_End;
 	if (token != "{")
 		return SR_ParseError;
 
 	for (;;) {
-		if (!m_script.GetToken(token, Tokenizer::kTokenMode_CrossLine))
+		if (!m_script.GetToken(token))
 			return SR_ParseError;
 		if (token == "}")
 			break;
-		if (!m_script.GetToken(value, Tokenizer::kTokenMode_CrossLine))
+		if (!m_script.GetToken(value))
 			return SR_ParseError;
 
 		// turn "\n" into '\n'
@@ -218,6 +229,59 @@ int MapCooker::ParseScript(world::EntSpawn &spawn) {
 		}
 
 		spawn.keys.pairs[token] = temp;
+	}
+
+	return SR_Success;
+}
+
+int MapCooker::ParseCinematicCompressionMap(int flags) {
+	m_caMap.clear();
+
+	const String *name = asset->entry->KeyValue<String>("Source.File", P_TARGET_FLAGS(flags));
+	if (!name || name->empty)
+		return SR_MetaError;
+
+	String file = file::SetFileExtension(name->c_str, ".actors");
+	file::MMFileInputBuffer::Ref ib = engine->sys->files->OpenInputBuffer(
+		file.c_str, 
+		ZWorld,
+		1*Meg,
+		file::kFileOptions_None,
+		file::kFileMask_Base
+	);
+
+	if (!ib)
+		return SR_Success; // not a required file.
+
+	Tokenizer script(ib);
+	String token;
+
+	for (;;) {
+		if (!script.GetToken(token))
+			break;
+		if (!script.IsNextToken("{"))
+			return SR_InvalidFormat;
+
+		String anim, value;
+		tools::SkaCompressionMap animMap;
+
+		for (;;) {
+			if (!script.GetToken(anim))
+				return SR_InvalidFormat;
+			if (anim == "}")
+				break;
+			if (!script.IsNextToken("=", Tokenizer::kTokenMode_SameLine))
+				return SR_InvalidFormat;
+			if (!script.GetToken(value, Tokenizer::kTokenMode_SameLine))
+				return SR_InvalidFormat;
+
+			float fval;
+			sscanf(value.c_str, "%f", &fval);
+			animMap.insert(tools::SkaCompressionMap::value_type(anim, fval));
+		}
+
+		if (!animMap.empty())
+			m_caMap.insert(tools::CinematicActorCompressionMap::value_type(token, animMap));
 	}
 
 	return SR_Success;

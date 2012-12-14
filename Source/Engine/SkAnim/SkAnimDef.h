@@ -7,6 +7,9 @@
 #pragma once
 
 #include "../Types.h"
+#if defined(RAD_OPT_TOOLS)
+#include <Runtime/Container/ZoneMap.h>
+#endif
 #include <Runtime/PushPack.h>
 
 namespace ska {
@@ -40,8 +43,7 @@ enum SkinType {
 	kSkinType_CPU
 };
 
-enum
-{
+enum {
 	kSkaTag = RAD_FOURCC_LE('S', 'K', 'A', 'X'),
 	kSkaVersion = 1,
 	kSkmxTag = RAD_FOURCC_LE('S', 'K', 'M', 'X'),
@@ -53,6 +55,13 @@ enum
 };
 
 } // ska
+
+#if defined(RAD_OPT_TOOLS)
+namespace tools {
+typedef zone_map<String, float, ZToolsT>::type SkaCompressionMap;
+typedef zone_map<String, SkaCompressionMap, ZToolsT>::type CinematicActorCompressionMap;
+}
+#endif
 
 #include <Runtime/PopPack.h>
 

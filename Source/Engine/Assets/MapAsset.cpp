@@ -257,10 +257,12 @@ int MapAsset::SpawnTool(
 
 	m_mapBuilder->SetProgressIndicator(m_ui);
 	m_mapBuilder->SetDebugUI(m_debugUI);
-
+	
 	m_parser = MapParser::Cast(asset);
 	if (!m_parser)
 		return SR_ParseError;
+
+	m_mapBuilder->SetCinematicActorCompression(*m_parser->caMap.get());
 
 	for (;;) {
 		world::EntSpawn spawn;

@@ -8,6 +8,7 @@
 #pragma once
 
 #include "../BSPFile.h"
+#include "../../SkAnim/SkAnimDef.h"
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/Container/ZoneSet.h>
 #include <Runtime/PushPack.h>
@@ -21,6 +22,7 @@ public:
 
 	bool Compile(
 		const SceneFile &map,
+		const CinematicActorCompressionMap &caMap,
 		const world::bsp_file::BSPFileBuilder::Ref &bspFile
 	);
 
@@ -51,8 +53,8 @@ private:
 		return m_skaSize;
 	}
 
-	bool EmitActor(const SceneFile &map, Actor &actor);
-	bool EmitCinematic(const SceneFile &map, const String &name);
+	bool EmitActor(const SceneFile &map, const SkaCompressionMap *compression, Actor &actor);
+	bool EmitCinematic(const SceneFile &map, const CinematicActorCompressionMap &caMap, const String &name);
 
 	StringSet m_cinematics;
 	Actor::Vec m_actors;

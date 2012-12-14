@@ -12,6 +12,7 @@ namespace tools {
 
 bool CinematicsBuilder::Compile(
 	const SceneFile &map,
+	const CinematicActorCompressionMap &caMap,
 	const world::bsp_file::BSPFileBuilder::Ref &bspFile
 ) {
 	m_bspFile = bspFile;
@@ -42,7 +43,7 @@ bool CinematicsBuilder::Compile(
 	for (SceneFile::Camera::Vec::const_iterator it = map.cameras.begin(); it != map.cameras.end(); ++it) {
 		const SceneFile::Camera::Ref &camera = *it;
 		for (SceneFile::AnimMap::const_iterator it = camera->anims.begin(); it != camera->anims.end(); ++it) {
-			if (!EmitCinematic(map, it->second->name))
+			if (!EmitCinematic(map, caMap, it->second->name))
 				return false;
 		}
 	}
@@ -53,7 +54,7 @@ bool CinematicsBuilder::Compile(
 		const Actor &actor = *it;
 		const SceneFile::TriModel::Ref &model = world->models[actor.index];
 		for (SceneFile::AnimMap::const_iterator it = model->anims.begin(); it != model->anims.end(); ++it) {
-			if (!EmitCinematic(map, it->second->name))
+			if (!EmitCinematic(map, caMap, it->second->name))
 				return false;
 		}
 	}
@@ -61,7 +62,7 @@ bool CinematicsBuilder::Compile(
 	return true;
 }
 
-bool CinematicsBuilder::EmitCinematic(const SceneFile &map, const String &name) {
+bool CinematicsBuilder::EmitCinematic(const SceneFile &map, const CinematicActorCompressionMap &caMap, const String &name) {
 	if (m_cinematics.find(name) != m_cinematics.end())
 		return true;
 
@@ -102,7 +103,12 @@ bool CinematicsBuilder::EmitCinematic(const SceneFile &map, const String &name) 
 		if (animIt == model->anims.end())
 			continue;
 		
-		if (!EmitActor(map, actor))
+		const SkaCompressionMap *compressionMap = 0;
+		CinematicActorCompressionMap::const_iterator caMapIt = caMap.find(model->name);
+		if (caMapIt != caMap.end())
+			compressionMap = &caMapIt->second;
+
+		if (!EmitActor(map, compressionMap, actor))
 			return false;
 
 		const SceneFile::Anim::Ref &anim = animIt->second;
@@ -201,7 +207,7 @@ bool CinematicsBuilder::EmitCinematic(const SceneFile &map, const String &name) 
 	return true;
 }
 
-bool CinematicsBuilder::EmitActor(const SceneFile &map, Actor &actor) {
+bool CinematicsBuilder::EmitActor(const SceneFile &map, const SkaCompressionMap *compression, Actor &actor) {
 	if (actor.emitId > -1)
 		return true;
 
@@ -216,7 +222,7 @@ bool CinematicsBuilder::EmitActor(const SceneFile &map, Actor &actor) {
 		"BSPBuilder",
 		map,
 		actor.index,
-		1.f
+		compression
 	);
 
 	if (!ska)

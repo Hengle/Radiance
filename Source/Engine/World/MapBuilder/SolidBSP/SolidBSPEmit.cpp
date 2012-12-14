@@ -643,7 +643,7 @@ U32 BSPBuilder::FindBSPMaterial(const char *name) {
 int BSPBuilder::EmitBSPCinematics() {
 	CinematicsBuilder b;
 
-	if (!b.Compile(*m_map, m_bspFile)) {
+	if (!b.Compile(*m_map, m_caMap, m_bspFile)) {
 		SetResult(pkg::SR_CompilerError);
 		return 0;
 	}

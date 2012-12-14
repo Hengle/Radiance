@@ -70,11 +70,13 @@ BSPBuilder::~BSPBuilder() {
 
 bool BSPBuilder::SpawnCompile(
 	SceneFile &map, 
+	CinematicActorCompressionMap &caMap,
 	tools::UIProgress *ui, 
 	MapBuilderDebugUI *debugUI,
 	std::ostream *cout
 ) {
 	m_map = &map;
+	m_caMap = caMap;
 	m_result = SR_Pending;
 	m_cout = cout;
 	m_ui = ui;
