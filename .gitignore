@@ -1,4 +1,6 @@
 # contains files to ignore for this directory and all subdirectories
+.DS_Store
+xcuserdata
 *.pyc
 *.obj
 *.suo
