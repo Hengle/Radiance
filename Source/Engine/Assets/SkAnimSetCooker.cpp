@@ -6,6 +6,7 @@
 #include RADPCH
 #include "SkAnimSetCooker.h"
 #include "SkAnimSetParser.h"
+#include <Runtime/Tokenizer.h>
 #include <Runtime/Stream.h>
 #include "../Engine.h"
 
@@ -33,36 +34,26 @@ CookStatus SkAnimSetCooker::CheckRebuildFiles(int flags, int allflags) {
 	if (!s)
 		return CS_NeedRebuild;
 
-	FILE *fp = engine->sys->files->fopen(
-		s->c_str.get(), 
-		"rt", 
-		file::kFileOptions_None, 
-		file::kFileMask_Base
+	SkAnimSetParser::StringVec sources;
+	int r = SkAnimSetParser::LoadToolsFile(
+		s->c_str,
+		*engine.get(),
+		&sources,
+		0
 	);
 
-	if (fp == 0)
-		return CS_NeedRebuild;
+	if (r != SR_Success)
+		return CS_NeedRebuild; // will fail
 
-	char name[256];
+	CookStatus x = CS_UpToDate;
 
-	CookStatus r = CS_UpToDate;
-
-	while (fgets(name, 256, fp) != 0) {
-
-		for (char *c = name; *c; ++c) {
-			if (*c < 20) {
-				*c = 0;
-				break;
-			}
-		}
-
-		if (CompareCachedFileTime(flags, name, name)) {
-			r = CS_NeedRebuild; // NOTE: no break here because we must cache all times
+	for (SkAnimSetParser::StringVec::const_iterator it = sources.begin(); it != sources.end(); ++it) {
+		if (CompareCachedFileTime(flags, (*it).c_str, (*it).c_str)) {
+			x = CS_NeedRebuild; // cache all file times.
 		}
 	}
 
-	fclose(fp);
-	return r;
+	return x;
 }
 
 CookStatus SkAnimSetCooker::Status(int flags, int allflags) {

@@ -11,6 +11,7 @@
 
 #if defined(RAD_OPT_TOOLS)
 #include "../SkAnim/SkBuilder.h"
+#include <Runtime/Container/ZoneVector.h>
 #endif
 
 #include <Runtime/File.h>
@@ -37,6 +38,17 @@ public:
 
 	RAD_DECLARE_READONLY_PROPERTY(SkAnimSetParser, dska, const ska::DSka*);
 	RAD_DECLARE_READONLY_PROPERTY(SkAnimSetParser, valid, bool);
+
+#if defined(RAD_OPT_TOOLS)
+	typedef zone_vector<String, ZToolsT>::type StringVec;
+
+	static int LoadToolsFile(
+		const char *path,
+		Engine &engine,
+		StringVec *sources,
+		tools::SkaCompressionMap *compression
+	);
+#endif
 
 protected:
 

@@ -11,8 +11,7 @@
 namespace tools {
 namespace editor {
 
-class SkModelThumb : public ContentAssetThumb
-{
+class SkModelThumb : public ContentAssetThumb {
 	Q_OBJECT
 public:
 	SkModelThumb(ContentBrowserView &view);

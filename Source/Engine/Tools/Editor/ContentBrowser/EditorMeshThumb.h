@@ -11,8 +11,7 @@
 namespace tools {
 namespace editor {
 
-class MeshThumb : public ContentAssetThumb
-{
+class MeshThumb : public ContentAssetThumb {
 	Q_OBJECT
 public:
 	MeshThumb(ContentBrowserView &view);

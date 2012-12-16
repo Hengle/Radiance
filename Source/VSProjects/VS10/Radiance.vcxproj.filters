@@ -1790,9 +1790,6 @@
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorMainWindow.cpp">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\Tools\Editor\EditorMeshEditorWindow.cpp">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorPIEWidget.cpp">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </ClCompile>
@@ -1803,9 +1800,6 @@
       <Filter>Source\Engine\Tools\Editor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorSearchLineWidget.cpp">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\Tools\Editor\EditorSkModelEditorWindow.cpp">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorStringTableEditorWindow.cpp">
@@ -2114,6 +2108,12 @@
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorPathfindingDebugWidget.cpp">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorModelEditorWidget.cpp">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorModelEditorWindow.cpp">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Runtime\Base\Event.inl">
@@ -2382,9 +2382,6 @@
     <QtMOC Include="..\..\Engine\Tools\Editor\EditorStringTableEditorWindow.h">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </QtMOC>
-    <QtMOC Include="..\..\Engine\Tools\Editor\EditorSkModelEditorWindow.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </QtMOC>
     <QtMOC Include="..\..\Engine\Tools\Editor\EditorSearchLineWidget.h">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </QtMOC>
@@ -2392,9 +2389,6 @@
       <Filter>Source\Engine\Tools\Editor</Filter>
     </QtMOC>
     <QtMOC Include="..\..\Engine\Tools\Editor\EditorPIEWidget.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </QtMOC>
-    <QtMOC Include="..\..\Engine\Tools\Editor\EditorMeshEditorWindow.h">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </QtMOC>
     <QtMOC Include="..\..\Engine\Tools\Editor\EditorLogWindow.h">
@@ -2503,6 +2497,12 @@
       <Filter>Source\Engine\Tools\Editor</Filter>
     </QtMOC>
     <QtMOC Include="..\..\Engine\Tools\Editor\EditorPathfindingDebugWidget.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorModelEditorWidget.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorModelEditorWindow.h">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </QtMOC>
   </ItemGroup>

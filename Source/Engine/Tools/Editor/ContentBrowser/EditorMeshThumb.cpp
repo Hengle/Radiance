@@ -5,34 +5,39 @@
 
 #include RADPCH
 #include "EditorMeshThumb.h"
-#include "../EditorMeshEditorWindow.h"
+#include "../EditorModelEditorWindow.h"
 #include "../EditorUtils.h"
+#include <Runtime/PushSystemMacros.h>
 
 namespace tools {
 namespace editor {
 
-MeshThumb::MeshThumb(ContentBrowserView &view) : ContentAssetThumb(view)
-{
+MeshThumb::MeshThumb(ContentBrowserView &view) : ContentAssetThumb(view) {
 }
 
-void MeshThumb::OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable, bool modal)
-{
-	// TODO: Change legacy viewers over to EditorWindow subclasses
-	// and use EditorWindow::CreateDialog for modal cases
+void MeshThumb::OpenEditor(const pkg::Package::Entry::Ref &entry, bool editable, bool modal) {
+	pkg::Asset::Ref asset = entry->Asset(pkg::Z_ContentBrowser);
+	ModelEditorWindow *w;
 
-	if (!modal)
-		MeshEditorWindow::LaunchEditor(entry->id);
+	if (modal) {
+		w = EditorWindow::CreateDialog<ModelEditorWindow>(asset, editable, View().parentWidget());
+	} else {
+		w = EditorWindow::Open<ModelEditorWindow>(asset, View().parentWidget());
+	}
+
+	if (w) {
+		if (!w->Load())
+			w->close();
+	}
 }
 
-void MeshThumb::New(ContentBrowserView &view)
-{
+void MeshThumb::New(ContentBrowserView &view) {
 	MeshThumb *t = new (ZEditor) MeshThumb(view);
 	ContentAssetThumb::Ref self(t);
 	t->Register(self, asset::AT_Mesh);
 }
 
-void CreateMeshThumb(ContentBrowserView &view)
-{
+void CreateMeshThumb(ContentBrowserView &view) {
 	MeshThumb::New(view);
 }
 
