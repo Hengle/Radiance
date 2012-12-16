@@ -149,11 +149,11 @@ enum PFlags
 	RAD_FLAG(P_VidReset),     /*!< A video reset has occurred and sinks should release any video related state. */
 	RAD_FLAG(P_VidBind),      /*!< A video rebind has occurred and sinks should recreate any video related state. */
 	RAD_FLAG(P_Cancel),       /*!< Cancel an outstanding command. */
-	RAD_FLAG(P_FastPath),      /*!< Load data from cached data (on-the-fly cooking). (Does nothing in golden builds). */
+	RAD_FLAG(P_FastPath),     /*!< Load data from cached data (on-the-fly cooking). (Does nothing in golden builds). */
 	RAD_FLAG(P_TargetPC),     /*!< PC target. */
 	RAD_FLAG(P_TargetIPhone), /*!< IPhone target. */
 	RAD_FLAG(P_TargetIPad),   /*!< IPad target. */
-	RAD_FLAG(P_TargetXBox360),/*!< XBox260 target. */
+	RAD_FLAG(P_TargetXBox360),/*!< XBox360 target. */
 	RAD_FLAG(P_TargetPS3),    /*!< PS3 target. */
 
 #if defined(RAD_OPT_TOOLS)

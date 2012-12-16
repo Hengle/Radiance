@@ -20,10 +20,8 @@ namespace pkg {
 
 namespace {
 
-const char *ErrorString(int r)
-{
-	switch (r)
-	{
+const char *ErrorString(int r) {
+	switch (r) {
 	case SR_ErrorGeneric:
 		return "SR_ErrorGeneric";
 	case SR_FileNotFound:
