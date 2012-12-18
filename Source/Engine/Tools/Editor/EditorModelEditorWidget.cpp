@@ -193,10 +193,16 @@ bool ModelEditorWidget::Load() {
 
 pkg::Asset::Ref ModelEditorWidget::LoadMaterial(const char *m) {
 	pkg::Asset::Ref asset = Packages()->Resolve(m, pkg::Z_ContentBrowser);
-	if (!asset)
+	
+	if (!asset) {
+		QMessageBox::critical(this, "Error", QString("Failed to load '") + m + QString("'"));
 		return asset;
-	if (asset->type != asset::AT_Material)
+	}
+	
+	if (asset->type != asset::AT_Material) {
+		QMessageBox::critical(this, "Error", QString("Failed to load '") + m + QString("'"));
 		return pkg::Asset::Ref();
+	}
 
 	int r = asset->Process(xtime::TimeSlice::Infinite, pkg::P_Load);
 	RAD_ASSERT(r != pkg::SR_Pending);

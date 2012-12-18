@@ -918,6 +918,10 @@
 		33836C4C15B9CF590030EAEC /* Zones.h in Headers */ = {isa = PBXBuildFile; fileRef = 33836C1915B9CF590030EAEC /* Zones.h */; };
 		33836C4D15B9CF590030EAEC /* Zones.h in Headers */ = {isa = PBXBuildFile; fileRef = 33836C1915B9CF590030EAEC /* Zones.h */; };
 		3383820015B736F600A28CCF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 338381FF15B736F600A28CCF /* Foundation.framework */; };
+		33872E27167FFB15007448EE /* EditorModelEditorWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33872E23167FFB15007448EE /* EditorModelEditorWidget.cpp */; };
+		33872E28167FFB15007448EE /* EditorModelEditorWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 33872E24167FFB15007448EE /* EditorModelEditorWidget.h */; };
+		33872E29167FFB15007448EE /* EditorModelEditorWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33872E25167FFB15007448EE /* EditorModelEditorWindow.cpp */; };
+		33872E2A167FFB15007448EE /* EditorModelEditorWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = 33872E26167FFB15007448EE /* EditorModelEditorWindow.h */; };
 		338A45FD15DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 338A45FC15DE8B9500B0B9B7 /* GameNetworkDef.h */; };
 		338A45FE15DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 338A45FC15DE8B9500B0B9B7 /* GameNetworkDef.h */; };
 		338A45FF15DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 338A45FC15DE8B9500B0B9B7 /* GameNetworkDef.h */; };
@@ -2034,8 +2038,6 @@
 		33E88A4B15B9BA4B0089BA08 /* EditorLogWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8887315B9BA490089BA08 /* EditorLogWindow.h */; };
 		33E88A4D15B9BA4B0089BA08 /* EditorMainWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8887415B9BA490089BA08 /* EditorMainWindow.cpp */; };
 		33E88A4F15B9BA4B0089BA08 /* EditorMainWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8887515B9BA490089BA08 /* EditorMainWindow.h */; };
-		33E88A5115B9BA4B0089BA08 /* EditorMeshEditorWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8887615B9BA490089BA08 /* EditorMeshEditorWindow.cpp */; };
-		33E88A5315B9BA4B0089BA08 /* EditorMeshEditorWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8887715B9BA490089BA08 /* EditorMeshEditorWindow.h */; };
 		33E88A5515B9BA4B0089BA08 /* EditorPIEWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8887815B9BA490089BA08 /* EditorPIEWidget.cpp */; };
 		33E88A5715B9BA4B0089BA08 /* EditorPIEWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8887915B9BA490089BA08 /* EditorPIEWidget.h */; };
 		33E88A5915B9BA4B0089BA08 /* EditorPopupMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8887A15B9BA490089BA08 /* EditorPopupMenu.cpp */; };
@@ -2044,8 +2046,6 @@
 		33E88A5F15B9BA4B0089BA08 /* EditorProgressDialog.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8887D15B9BA490089BA08 /* EditorProgressDialog.h */; };
 		33E88A6115B9BA4B0089BA08 /* EditorSearchLineWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8887E15B9BA490089BA08 /* EditorSearchLineWidget.cpp */; };
 		33E88A6315B9BA4B0089BA08 /* EditorSearchLineWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8887F15B9BA490089BA08 /* EditorSearchLineWidget.h */; };
-		33E88A6515B9BA4B0089BA08 /* EditorSkModelEditorWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8888015B9BA490089BA08 /* EditorSkModelEditorWindow.cpp */; };
-		33E88A6715B9BA4B0089BA08 /* EditorSkModelEditorWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8888115B9BA490089BA08 /* EditorSkModelEditorWindow.h */; };
 		33E88A6915B9BA4B0089BA08 /* EditorStringTableEditorWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8888215B9BA490089BA08 /* EditorStringTableEditorWindow.cpp */; };
 		33E88A6B15B9BA4B0089BA08 /* EditorStringTableEditorWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8888315B9BA490089BA08 /* EditorStringTableEditorWindow.h */; };
 		33E88A6D15B9BA4B0089BA08 /* EditorStringTableWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8888415B9BA490089BA08 /* EditorStringTableWidget.cpp */; };
@@ -2838,6 +2838,10 @@
 		33836C1815B9CF590030EAEC /* Zones.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Zones.cpp; path = ../Engine/Zones.cpp; sourceTree = "<group>"; };
 		33836C1915B9CF590030EAEC /* Zones.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Zones.h; path = ../Engine/Zones.h; sourceTree = "<group>"; };
 		338381FF15B736F600A28CCF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		33872E23167FFB15007448EE /* EditorModelEditorWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorModelEditorWidget.cpp; sourceTree = "<group>"; };
+		33872E24167FFB15007448EE /* EditorModelEditorWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorModelEditorWidget.h; sourceTree = "<group>"; };
+		33872E25167FFB15007448EE /* EditorModelEditorWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorModelEditorWindow.cpp; sourceTree = "<group>"; };
+		33872E26167FFB15007448EE /* EditorModelEditorWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorModelEditorWindow.h; sourceTree = "<group>"; };
 		338A45FC15DE8B9500B0B9B7 /* GameNetworkDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameNetworkDef.h; sourceTree = "<group>"; };
 		338CDF0515BC8F140058DFF5 /* RadianceDeveloperDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceDeveloperDebugOSX.xcconfig; path = XCConfig/RadianceDeveloperDebugOSX.xcconfig; sourceTree = "<group>"; };
 		338CDF0615BC8F140058DFF5 /* RadianceDeveloperReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceDeveloperReleaseOSX.xcconfig; path = XCConfig/RadianceDeveloperReleaseOSX.xcconfig; sourceTree = "<group>"; };
@@ -3468,8 +3472,6 @@
 		33E8887315B9BA490089BA08 /* EditorLogWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorLogWindow.h; sourceTree = "<group>"; };
 		33E8887415B9BA490089BA08 /* EditorMainWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorMainWindow.cpp; sourceTree = "<group>"; };
 		33E8887515B9BA490089BA08 /* EditorMainWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorMainWindow.h; sourceTree = "<group>"; };
-		33E8887615B9BA490089BA08 /* EditorMeshEditorWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorMeshEditorWindow.cpp; sourceTree = "<group>"; };
-		33E8887715B9BA490089BA08 /* EditorMeshEditorWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorMeshEditorWindow.h; sourceTree = "<group>"; };
 		33E8887815B9BA490089BA08 /* EditorPIEWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorPIEWidget.cpp; sourceTree = "<group>"; };
 		33E8887915B9BA490089BA08 /* EditorPIEWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorPIEWidget.h; sourceTree = "<group>"; };
 		33E8887A15B9BA490089BA08 /* EditorPopupMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorPopupMenu.cpp; sourceTree = "<group>"; };
@@ -3478,8 +3480,6 @@
 		33E8887D15B9BA490089BA08 /* EditorProgressDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorProgressDialog.h; sourceTree = "<group>"; };
 		33E8887E15B9BA490089BA08 /* EditorSearchLineWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorSearchLineWidget.cpp; sourceTree = "<group>"; };
 		33E8887F15B9BA490089BA08 /* EditorSearchLineWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorSearchLineWidget.h; sourceTree = "<group>"; };
-		33E8888015B9BA490089BA08 /* EditorSkModelEditorWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorSkModelEditorWindow.cpp; sourceTree = "<group>"; };
-		33E8888115B9BA490089BA08 /* EditorSkModelEditorWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorSkModelEditorWindow.h; sourceTree = "<group>"; };
 		33E8888215B9BA490089BA08 /* EditorStringTableEditorWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorStringTableEditorWindow.cpp; sourceTree = "<group>"; };
 		33E8888315B9BA490089BA08 /* EditorStringTableEditorWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorStringTableEditorWindow.h; sourceTree = "<group>"; };
 		33E8888415B9BA490089BA08 /* EditorStringTableWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorStringTableWidget.cpp; sourceTree = "<group>"; };
@@ -4707,8 +4707,10 @@
 				33E8887315B9BA490089BA08 /* EditorLogWindow.h */,
 				33E8887415B9BA490089BA08 /* EditorMainWindow.cpp */,
 				33E8887515B9BA490089BA08 /* EditorMainWindow.h */,
-				33E8887615B9BA490089BA08 /* EditorMeshEditorWindow.cpp */,
-				33E8887715B9BA490089BA08 /* EditorMeshEditorWindow.h */,
+				33872E23167FFB15007448EE /* EditorModelEditorWidget.cpp */,
+				33872E24167FFB15007448EE /* EditorModelEditorWidget.h */,
+				33872E25167FFB15007448EE /* EditorModelEditorWindow.cpp */,
+				33872E26167FFB15007448EE /* EditorModelEditorWindow.h */,
 				33E8887815B9BA490089BA08 /* EditorPIEWidget.cpp */,
 				33E8887915B9BA490089BA08 /* EditorPIEWidget.h */,
 				33E8887A15B9BA490089BA08 /* EditorPopupMenu.cpp */,
@@ -4717,8 +4719,6 @@
 				33E8887D15B9BA490089BA08 /* EditorProgressDialog.h */,
 				33E8887E15B9BA490089BA08 /* EditorSearchLineWidget.cpp */,
 				33E8887F15B9BA490089BA08 /* EditorSearchLineWidget.h */,
-				33E8888015B9BA490089BA08 /* EditorSkModelEditorWindow.cpp */,
-				33E8888115B9BA490089BA08 /* EditorSkModelEditorWindow.h */,
 				33E8888215B9BA490089BA08 /* EditorStringTableEditorWindow.cpp */,
 				33E8888315B9BA490089BA08 /* EditorStringTableEditorWindow.h */,
 				33E8888415B9BA490089BA08 /* EditorStringTableWidget.cpp */,
@@ -6088,12 +6088,10 @@
 				33E88A4715B9BA4B0089BA08 /* EditorLineEditDialog.h in Headers */,
 				33E88A4B15B9BA4B0089BA08 /* EditorLogWindow.h in Headers */,
 				33E88A4F15B9BA4B0089BA08 /* EditorMainWindow.h in Headers */,
-				33E88A5315B9BA4B0089BA08 /* EditorMeshEditorWindow.h in Headers */,
 				33E88A5715B9BA4B0089BA08 /* EditorPIEWidget.h in Headers */,
 				33E88A5B15B9BA4B0089BA08 /* EditorPopupMenu.h in Headers */,
 				33E88A5F15B9BA4B0089BA08 /* EditorProgressDialog.h in Headers */,
 				33E88A6315B9BA4B0089BA08 /* EditorSearchLineWidget.h in Headers */,
-				33E88A6715B9BA4B0089BA08 /* EditorSkModelEditorWindow.h in Headers */,
 				33E88A6B15B9BA4B0089BA08 /* EditorStringTableEditorWindow.h in Headers */,
 				33E88A6F15B9BA4B0089BA08 /* EditorStringTableWidget.h in Headers */,
 				33E88A7315B9BA4B0089BA08 /* EditorStringTableWidgetItemModel.h in Headers */,
@@ -6193,6 +6191,8 @@
 				33988FB016684F1C0018C3E6 /* BezierSpline.h in Headers */,
 				33988FB816684F980018C3E6 /* EditorPathfindingDebugWidget.h in Headers */,
 				339805941676D544002758B1 /* FloorsDef.h in Headers */,
+				33872E28167FFB15007448EE /* EditorModelEditorWidget.h in Headers */,
+				33872E2A167FFB15007448EE /* EditorModelEditorWindow.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7607,12 +7607,10 @@
 				33E88A4515B9BA4B0089BA08 /* EditorLineEditDialog.cpp in Sources */,
 				33E88A4915B9BA4B0089BA08 /* EditorLogWindow.cpp in Sources */,
 				33E88A4D15B9BA4B0089BA08 /* EditorMainWindow.cpp in Sources */,
-				33E88A5115B9BA4B0089BA08 /* EditorMeshEditorWindow.cpp in Sources */,
 				33E88A5515B9BA4B0089BA08 /* EditorPIEWidget.cpp in Sources */,
 				33E88A5915B9BA4B0089BA08 /* EditorPopupMenu.cpp in Sources */,
 				33E88A5D15B9BA4B0089BA08 /* EditorProgressDialog.cpp in Sources */,
 				33E88A6115B9BA4B0089BA08 /* EditorSearchLineWidget.cpp in Sources */,
-				33E88A6515B9BA4B0089BA08 /* EditorSkModelEditorWindow.cpp in Sources */,
 				33E88A6915B9BA4B0089BA08 /* EditorStringTableEditorWindow.cpp in Sources */,
 				33E88A6D15B9BA4B0089BA08 /* EditorStringTableWidget.cpp in Sources */,
 				33E88A7115B9BA4B0089BA08 /* EditorStringTableWidgetItemModel.cpp in Sources */,
@@ -7702,6 +7700,8 @@
 				33988F9816684EA60018C3E6 /* Floors.cpp in Sources */,
 				33988FAB16684F1C0018C3E6 /* BezierSpline.cpp in Sources */,
 				33988FB716684F980018C3E6 /* EditorPathfindingDebugWidget.cpp in Sources */,
+				33872E27167FFB15007448EE /* EditorModelEditorWidget.cpp in Sources */,
+				33872E29167FFB15007448EE /* EditorModelEditorWindow.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
