@@ -24,15 +24,26 @@ public:
 	static Ref New(const pkg::AssetRef &asset);
 	static Ref New(const ska::DSka &dska, const ska::DSkm &dskm, ska::SkinType skinType);
 
-	r::Mesh &Mesh(int idx) { return m_meshes[idx].m; }
+	r::Mesh &Mesh(int idx) { 
+		return m_meshes[idx].m; 
+	}
 
 	// skin verts, uploads. does nothing if gpu skin
 	void Skin(int mesh);
+
+	void SkinToBuffer(int mesh, void *buffer);
 
 	RAD_DECLARE_READONLY_PROPERTY(SkMesh, numMeshes, int);
 	RAD_DECLARE_READONLY_PROPERTY(SkMesh, ska, ska::Ska*);
 	RAD_DECLARE_READONLY_PROPERTY(SkMesh, states, const ska::AnimState::Map*);
 	RAD_DECLARE_READONLY_PROPERTY(SkMesh, asset, const pkg::AssetRef&);
+
+#if defined(RAD_OPT_PC_TOOLS)
+	const ska::DMesh *DMesh(int idx) {
+		return m_meshes[idx].dm;
+	}
+#endif
+
 
 private:
 
@@ -44,10 +55,21 @@ private:
 		ska::SkinType type
 	);
 
-	RAD_DECLARE_GET(numMeshes, int)  { return (int)m_meshes.size(); }
-	RAD_DECLARE_GET(ska, ska::Ska*) { return m_ska.get(); }
-	RAD_DECLARE_GET(states, const ska::AnimState::Map*) { return m_parser ? m_parser->states.get() : 0; }
-	RAD_DECLARE_GET(asset, const pkg::AssetRef&) { return m_asset; }
+	RAD_DECLARE_GET(numMeshes, int)  { 
+		return (int)m_meshes.size(); 
+	}
+
+	RAD_DECLARE_GET(ska, ska::Ska*) { 
+		return m_ska.get(); 
+	}
+
+	RAD_DECLARE_GET(states, const ska::AnimState::Map*) { 
+		return m_parser ? m_parser->states.get() : 0; 
+	}
+
+	RAD_DECLARE_GET(asset, const pkg::AssetRef&) {
+		return m_asset; 
+	}
 
 	enum {
 		kSkinFrames = 2

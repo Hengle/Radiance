@@ -142,7 +142,7 @@ struct DMesh {
 	typedef zone_vector<DMesh, ZSkaT>::type Vec;
 	
 	U16 totalVerts;
-	U16 numVerts[kBonesPerVert]; // 4,3,2,1 bone counts
+	U16 numVerts[kBonesPerVert]; // 1,2,3,4 bone counts
 	U16 numTris;
 	U16 numChannels;
 
@@ -163,6 +163,10 @@ struct DMesh {
 	const U16 *bones[kBonesPerVert]; // N per vert, depending on how many bones the vertex has.
 
 	const U16 *indices;
+
+	int NumVertexFloats() const {
+		return 8+(4*((int)numChannels));
+	}
 };
 
 struct RADENG_CLASS DSkm {

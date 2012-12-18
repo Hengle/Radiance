@@ -5,8 +5,7 @@
 
 -- All meshes may reference a skeleton
 
-function RAD_WriteTriMesh file mesh =
-(
+function RAD_WriteTriMesh file mesh = (
 	nummaps = (meshop.getNumMaps mesh)-1
 	c = 0
 	for i=1 to nummaps do
@@ -58,4 +57,20 @@ function RAD_WriteTriMesh file mesh =
 		WriteLong file (getFaceSmoothGroup mesh i) #unsigned
 		WriteLong file (getFaceMatId mesh i) #unsigned
 	)
+)
+
+function RAD_MeshBBox mesh = (
+	mn = [1.0e+37, 1.0e+37, 1.0e+37]
+	mx = [1.0e-37, 1.0e-37, 1.0e-37]
+	
+	for i=1 to mesh.numverts do (
+		v = getVert mesh i
+		
+		for k=1 to 3 do (
+			if (v[k] < mn[k]) then (mn[k] = v[k])
+			if (v[k] > mx[k]) then (mx[k] = v[k])
+		)
+	)
+	
+	#(mn, mx)
 )

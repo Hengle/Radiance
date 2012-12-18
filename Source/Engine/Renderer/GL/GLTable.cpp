@@ -106,7 +106,7 @@ void GLTable::DrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid
 
 			// lines
 			for (GLsizei i = 0; i <= count-3; i += 3, ofs += size)
-				glDrawElements(GL_LINE_STRIP, 3, type, ofs);
+				glDrawElements(GL_LINE_LOOP, 3, type, ofs);
 		}
 		else
 		{

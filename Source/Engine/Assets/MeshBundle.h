@@ -34,6 +34,10 @@ struct RADENG_CLASS DMesh {
 						  // 10-13 -> tangent 1 (4 floats)
 						  // 14-17 -> tangent 2 (4 floats)
 	const void *indices;
+
+	int NumVertexFloats() const {
+		return 6+(4*((int)numChannels+1));
+	}
 };
 
 struct RADENG_CLASS DMeshBundle {

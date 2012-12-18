@@ -6,13 +6,14 @@
 -- [name, origin[3], id, subobjs[], ids[]]
 
 global kSceneFile_Id =  (bit.shift (bit.charAsInt "N") 24) + (bit.shift (bit.charAsInt "C") 16) + (bit.shift (bit.charAsInt "S") 8) + (bit.charAsInt "R")
-global kSceneFile_Version = 4
+global kSceneFile_Version = 5
 global kSceneFlag_HasMaterialFlag = 0x80000000
 global kSceneFlag_HasMesh = 0x00100000
 global kSceneFlag_HasAnim = 0x00200000
 global kSceneFlag_CinematicObject = 0x00080000
 global kSceneFlag_HideUntilRefed = 0x00040000
 global kSceneFlag_HideWhenDone = 0x00010000
+global kSceneFlag_SetBBox = 0x00008000
 
 function RAD_GatherEntities objs =
 (
@@ -145,29 +146,54 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName =
 				
 				flags = 0
 				
-				if (doMeshes) then (flags = bit.or flags kSceneFlag_HasMesh) -- mesh
-				if (doAnims) then (flags = bit.or flags kSceneFlag_HasAnim) -- anims
+				if (doMeshes) then (-- mesh
+					flags = bit.or flags kSceneFlag_HasMesh
+				)
+				
+				if (doAnims) then (-- anims
+					flags = bit.or flags kSceneFlag_HasAnim
+				) 
 					
-				if (m.material != undefined) then ( flags = bit.or flags kSceneFlag_HasMaterialFlag ) -- has a material
+				if (m.material != undefined) then ( -- has a material
+					flags = bit.or flags kSceneFlag_HasMaterialFlag 
+				) 
 				
 				cinematicObject = getUserProp m "CinematicObject"
-				if (cinematicObject != undefined and cinematicObject == true) then (flags = bit.or flags kSceneFlag_CinematicObject)
+				if (cinematicObject != undefined and cinematicObject == true) then (
+					flags = bit.or flags kSceneFlag_CinematicObject
+				)
 				
 				hideUntilRef = getUserProp m "HideUtilRef"
-				if (hideUntilRef == undefined or hideUntilRef == true) then ( flags = bit.or flags kSceneFlag_HideUntilRefed )
+				if (hideUntilRef == undefined or hideUntilRef == true) then (
+					flags = bit.or flags kSceneFlag_HideUntilRefed
+				)
 				
 				hideWhenDone = getUserProp m "HideWhenDone"
-				if (hideWhenDone == undefined or hideWhenDone == true) then ( flags = bit.or flags kSceneFlag_HideWhenDone )
+				if (hideWhenDone == undefined or hideWhenDone == true) then (
+					flags = bit.or flags kSceneFlag_HideWhenDone
+				)
+				
+				setBBox = getUserProp m "SetBBox"
+				if (setBBox != undefined and setBBox == "true") then (
+					flags = bit.or flags kSceneFlag_SetBBox
+				)
 				
 				WriteLong file flags #unsigned
 				-- write skel index
 				WriteLong file (skels[2][meshNum][1]-1)
 				
-				if (m.material != undefined) then
-				(
+				if (m.material != undefined) then (
 					idx = findItem sceneMaterials m.material
 					if (idx == 0) then (throw "Invalid material index!")
 					WriteLong file (idx-1) #unsigned
+				)
+				
+				if (setBBox != undefined and setBBox == "true") then (
+					bboxSize = getUserProp m "BBox"
+					if (bboxSize == undefined) then (
+						bboxSize = "-24 -24 -24 24 24 24" -- default
+					)
+					WriteString file bboxSize
 				)
 				
 				skinEnabled = false
@@ -180,19 +206,19 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName =
 				print ("Exporting " + m.name)
 				trim = snapshotAsMesh m
 				
-				if (m.modifiers[#skin] != undefined) then m.skin.enabled = true
+				if (m.modifiers[#skin] != undefined) then (
+					m.skin.enabled = true
+				)
 				
 				numtris = numtris + trim.numfaces
 				
-				if (doMeshes) then
-				(
+				if (doMeshes) then (
 					RAD_WriteTriMesh file trim
 				)
 				
 				RAD_ExportAnims file doMeshes doAnims m
 								
-				if (not skinEnabled and (m.modifiers[#skin] != undefined)) then
-				(
+				if (not skinEnabled and (m.modifiers[#skin] != undefined)) then (
 					m.skin.enabled = false
 				)
 				

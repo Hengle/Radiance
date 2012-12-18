@@ -10,6 +10,8 @@
 #include "EditorMainWindow.h"
 #include "EditorUtils.h"
 #include "EditorGLNavWidget.h"
+#include "../../Assets/MeshParser.h"
+#include "../../Assets/SkModelParser.h"
 #include "../../Renderer/GL/GLState.h"
 #include "../../Renderer/GL/GLTexture.h"
 #include "../../Renderer/Shader.h"
@@ -23,23 +25,37 @@
 #include <QtGui/QGridLayout>
 #include <QtGui/QSplitter>
 #include <QtGui/QWidget>
+#include <QtGui/QBoxLayout.h>
+#include <QtGui/QGroupBox.h>
+#include <QtGui/QCheckBox.h>
 #include <QtGui/QTreeWidget>
 #include <QtGui/QMessageBox>
+#include <Runtime/Base/SIMD.h>
 
 using namespace r;
 
 namespace tools {
 namespace editor {
 
+static const float s_kNormalLen = 10.f;
+
 ModelEditorWidget::ModelEditorWidget(
 	const pkg::Asset::Ref &asset,
 	bool editable,
 	QWidget *parent
-) : QWidget(parent), m_asset(asset), m_tree(0), m_glw(0) {
+) : QWidget(parent), m_asset(asset), m_tree(0), m_glw(0), m_skVerts(0) {
 	
 }
 
 ModelEditorWidget::~ModelEditorWidget() {
+	if (m_skVerts) {
+		RAD_ASSERT(m_skModel);
+		for (int i = 0; i < m_skModel->numMeshes; ++i) {
+			zone_free(m_skVerts[i]);
+		}
+
+		delete [] m_skVerts;
+	}
 }
 
 
@@ -56,13 +72,32 @@ void ModelEditorWidget::resizeEvent(QResizeEvent *event) {
 	s->setOpaqueResize(false);
 	s->setOrientation(Qt::Horizontal);
 
-	m_tree = new QTreeWidget(this);
+	QWidget *w = new QWidget();
+
+	QVBoxLayout *vblOuter = new QVBoxLayout(w);
+
+	QGroupBox *group = new QGroupBox("Options");
+	
+	QVBoxLayout *vbl = new QVBoxLayout(group);
+	m_wireframe = new QCheckBox("Wireframe");
+	m_normals = new QCheckBox("Normals");
+	m_tangents = new QCheckBox("Tangents");
+
+	vbl->addWidget(m_wireframe);
+	vbl->addWidget(m_normals);
+	vbl->addWidget(m_tangents);
+
+	vblOuter->addWidget(group);
+	
+	m_tree = new QTreeWidget();
 	m_tree->resize(left, m_tree->height());
 	m_tree->setSelectionMode(QAbstractItemView::SingleSelection);
 	RAD_VERIFY(connect(m_tree, SIGNAL(itemSelectionChanged()), SLOT(ItemSelectionChanged())));
-	s->addWidget(m_tree);
+	vblOuter->addWidget(m_tree);
+
+	s->addWidget(w);
 	
-	m_glw = new (ZEditor) GLNavWidget(this);
+	m_glw = new (ZEditor) GLNavWidget();
 	RAD_VERIFY(connect(m_glw, SIGNAL(OnRenderGL(GLWidget&)), SLOT(OnRenderGL(GLWidget&))));
 	
 	m_glw->resize(right, m_glw->height());
@@ -122,9 +157,27 @@ bool ModelEditorWidget::Load() {
 
 		m_tree->addTopLevelItems(items);
 		m_tree->setHeaderLabel("AnimStates");
+
+		m_skVerts = new float*[m_skModel->numMeshes];
+
+		for (int i = 0; i < m_skModel->numMeshes; ++i) {
+			const ska::DMesh *m = m_skModel->DMesh(i);
+			m_skVerts[i] = (float*)safe_zone_malloc(ZTools, m->NumVertexFloats() * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
+		}
+
 	} else {
 		m_tree->setHeaderLabel("N/A");
 	}
+
+	m_wireframeMat = LoadMaterial("Sys/DebugWireframe_M");
+	if (!m_wireframeMat)
+		return false;
+	m_normalMat = LoadMaterial("Sys/DebugNormals_M");
+	if (!m_normalMat)
+		return false;
+	m_tangentMat = LoadMaterial("Sys/DebugTangents_M");
+	if (!m_tangentMat)
+		return false;
 
 	m_glw->unbindGL();
 	m_glw->camera->pos = Vec3(300.f, 0.f, 0.f);
@@ -136,6 +189,25 @@ bool ModelEditorWidget::Load() {
 	m_glw->camera->fov = 90.f;
 
 	return true;
+}
+
+pkg::Asset::Ref ModelEditorWidget::LoadMaterial(const char *m) {
+	pkg::Asset::Ref asset = Packages()->Resolve(m, pkg::Z_ContentBrowser);
+	if (!asset)
+		return asset;
+	if (asset->type != asset::AT_Material)
+		return pkg::Asset::Ref();
+
+	int r = asset->Process(xtime::TimeSlice::Infinite, pkg::P_Load);
+	RAD_ASSERT(r != pkg::SR_Pending);
+	if (r != pkg::SR_Success) {
+		QMessageBox::critical(this, "Error", QString("Failed to load '") + m + QString("'"));
+		return pkg::Asset::Ref();
+	}
+
+	asset->Process(xtime::TimeSlice::Infinite, pkg::P_Trim);
+
+	return asset;
 }
 
 void ModelEditorWidget::OnRenderGL(GLWidget &src) {
@@ -161,6 +233,11 @@ void ModelEditorWidget::OnRenderGL(GLWidget &src) {
 		Draw((r::Material::Sort)i);
 	}
 
+	if (m_wireframe->isChecked())
+		DrawWireframe();
+	if (m_normals->isChecked() || m_tangents->isChecked())
+		DrawNormals(m_normals->isChecked(), m_tangents->isChecked());
+	
 	gls.Set(DWM_Enable, -1); // for glClear()
 	gls.Commit();
 }
@@ -229,6 +306,178 @@ void ModelEditorWidget::Draw(Material::Sort sort) {
 			gls.Commit();
 			m.Draw();
 			mat->shader->End();
+		}
+	}
+}
+
+void ModelEditorWidget::DrawWireframe() {
+
+	r::gl.wireframe = true;
+
+	asset::MaterialLoader::Ref loader = asset::MaterialLoader::Cast(m_wireframeMat);
+	asset::MaterialParser::Ref parser = asset::MaterialParser::Cast(m_wireframeMat);
+
+	r::Material *mat = parser->material;
+
+	if (m_skModel) {
+		asset::SkMaterialLoader::Ref skMaterials = asset::SkMaterialLoader::Cast(m_skModel->asset);
+		RAD_ASSERT(skMaterials);
+	
+		for (int i = 0; i < m_skModel->numMeshes; ++i) {
+			m_skModel->Skin(i);
+
+			mat->BindTextures(loader);
+			mat->BindStates();
+			mat->shader->Begin(Shader::P_Default, *mat);
+			Mesh &m = m_skModel->Mesh(i);
+			m.BindAll(0);
+			mat->shader->BindStates();
+			gls.Commit();
+			m.Draw();
+			mat->shader->End();
+		}
+	} else {
+		for (int i = 0; i < m_bundle->numMeshes; ++i) {
+			mat->BindTextures(loader);
+			mat->BindStates();
+			mat->shader->Begin(Shader::P_Default, *mat);
+			Mesh &m = *m_bundle->Mesh(i);
+			m.BindAll(0);
+			mat->shader->BindStates();
+			gls.Commit();
+			m.Draw();
+			mat->shader->End();
+		}
+	}
+
+	r::gl.wireframe = false;
+}
+
+void ModelEditorWidget::DrawNormals(bool normals, bool tangents) {
+	if (m_skModel) {
+		DrawSkaNormals(normals, tangents);
+	} else {
+		DrawMeshNormals(normals, tangents);
+	}
+}
+
+void ModelEditorWidget::DrawSkaNormals(bool normals, bool tangents) {
+	
+	gls.DisableAllMGSources();
+	gls.DisableAllMTSources();
+	gls.DisableTextures();
+	gls.DisableVertexAttribArrays();
+	gls.UseProgram(0);
+	gls.Set(r::DT_Less|r::DWM_Disable, r::BM_Off);
+	gls.Commit();
+
+	for (int i = 0; i < m_skModel->numMeshes; ++i) {
+		const ska::DMesh *m = m_skModel->DMesh(i);
+
+		m_skModel->SkinToBuffer(i, m_skVerts[i]);
+
+		const int kNumVertexFloats = m->NumVertexFloats();
+		const float *verts = (const float*)m_skVerts[i];
+
+		for (int i = 0; i < (int)m->totalVerts; ++i) {
+			Vec3 v(verts[0], verts[1], verts[2]);
+			Vec3 n(verts[4], verts[5], verts[6]);
+			
+			if (tangents) {
+				const float *f = verts + 8;
+
+				for (U16 k = 0; k < m->numChannels; ++k) {
+					Vec3 t(f[0], f[1], f[2]);
+					Vec3 b = f[3] * n.Cross(t);
+					
+					t = v + (t*s_kNormalLen);
+					b = v + (b*s_kNormalLen);
+
+					glBegin(GL_LINES);
+					glColor4f(1.f, 0.f, 0.f, 1.f);
+					glVertex3f(v[0], v[1], v[2]);
+					glVertex3f(t[0], t[1],t[2]);
+					glColor4f(0.f, 0.f, 1.f, 1.f);
+					glVertex3f(v[0], v[1], v[2]);
+					glVertex3f(b[0], b[1],b[2]);
+					glEnd();
+
+					f += 4;
+				}
+			}
+
+			if (normals) {
+				glColor4f(0.f, 1.f, 0.f, 1.f);
+				n = v + (n*s_kNormalLen);
+				glBegin(GL_LINES);
+				glVertex3f(v[0], v[1], v[2]);
+				glVertex3f(n[0], n[1], n[2]);
+				glEnd();
+			}
+
+			verts += kNumVertexFloats;
+		}
+	}
+}
+
+void ModelEditorWidget::DrawMeshNormals(bool normals, bool tangents) {
+	asset::MeshParser::Ref parser = asset::MeshParser::Cast(m_asset);
+	if (!parser)
+		return;
+
+	const asset::DMeshBundle *bundle = parser->bundle;
+
+	gls.DisableAllMGSources();
+	gls.DisableAllMTSources();
+	gls.DisableTextures();
+	gls.DisableVertexAttribArrays();
+	gls.UseProgram(0);
+	gls.Set(r::DT_Less|r::DWM_Disable, r::BM_Off);
+	gls.Commit();
+
+	for (asset::DMesh::Vec::const_iterator it = bundle->meshes.begin(); it != bundle->meshes.end(); ++it) {
+		const asset::DMesh &m = *it;
+
+		const int kNumVertexFloats = m.NumVertexFloats();
+		const float *verts = (const float*)m.vertices;
+
+		for (int i = 0; i < (int)m.numVerts; ++i) {
+			Vec3 v(verts[0], verts[1], verts[2]);
+			Vec3 n(verts[3], verts[4], verts[5]);
+			
+			if (tangents) {
+				const float *f = verts + 10;
+
+				for (U16 k = 0; k < m.numChannels; ++k) {
+					Vec3 t(f[0], f[1], f[2]);
+					Vec3 b = f[3] * n.Cross(t);
+					
+					t = v + (t*s_kNormalLen);
+					b = v + (b*s_kNormalLen);
+
+					glBegin(GL_LINES);
+					glColor4f(1.f, 0.f, 0.f, 1.f);
+					glVertex3f(v[0], v[1], v[2]);
+					glVertex3f(t[0], t[1],t[2]);
+					glColor4f(0.f, 0.f, 1.f, 1.f);
+					glVertex3f(v[0], v[1], v[2]);
+					glVertex3f(b[0], b[1],b[2]);
+					glEnd();
+
+					f += 4;
+				}
+			}
+
+			if (normals) {
+				glColor4f(0.f, 1.f, 0.f, 1.f);
+				n = v + (n*s_kNormalLen);
+				glBegin(GL_LINES);
+				glVertex3f(v[0], v[1], v[2]);
+				glVertex3f(n[0], n[1], n[2]);
+				glEnd();
+			}
+
+			verts += kNumVertexFloats;
 		}
 	}
 }

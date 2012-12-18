@@ -16,6 +16,7 @@
 
 class QTreeWidget;
 class QTreeWidgetItem;
+class QCheckBox;
 
 namespace tools {
 namespace editor {
@@ -47,8 +48,15 @@ private slots:
 
 private:
 
-	void Draw(r::Material::Sort sort);
+	pkg::Asset::Ref LoadMaterial(const char *m);
 
+	void Draw(r::Material::Sort sort);
+	void DrawWireframe();
+	void DrawNormals(bool normals, bool tangents);
+	
+	void DrawSkaNormals(bool normals, bool tangents);
+	void DrawMeshNormals(bool normals, bool tangents);
+	
 	ModelEditorWidget();
 	virtual ~ModelEditorWidget();
 
@@ -58,8 +66,15 @@ private:
 	r::SkMesh::Ref m_skModel;
 	r::MeshBundle::Ref m_bundle;
 	pkg::Asset::Ref m_asset;
+	pkg::Asset::Ref m_wireframeMat;
+	pkg::Asset::Ref m_normalMat;
+	pkg::Asset::Ref m_tangentMat;
 	GLNavWidget *m_glw;
 	QTreeWidget *m_tree;
+	QCheckBox *m_wireframe;
+	QCheckBox *m_normals;
+	QCheckBox *m_tangents;
+	float **m_skVerts;
 };
 
 } // editor

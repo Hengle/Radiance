@@ -74,7 +74,7 @@ void SkMesh::Load(
 		if (kSkinFrames > 1)
 			m.m.AllocateSwapChains(kSkinFrames);
 
-		const int kVertSize = (8+(4*dm.numChannels))*sizeof(float);
+		const int kVertSize = dm.NumVertexFloats()*sizeof(float);
 
 		m.vertStreamIdx = m.m.AllocateStream(SU_Stream, kVertSize, dm.totalVerts, true);
 		
@@ -167,14 +167,21 @@ void SkMesh::Skin(int mesh) {
 		return;
 	m.boneFrame = m_ska->boneFrame;
 
-	const float *srcVerts = m.dm->verts;
-	const float *bones = m_ska->BoneTMs(ska::RowMajorTag());
-
 	m.m.SwapChain();
 	Mesh::StreamPtr::Ref vb = m.m.Map(m.vertStreamIdx);
 
-	float *outVerts = reinterpret_cast<float*>(vb->ptr.get());
-	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
+	SkinToBuffer(mesh, vb->ptr);
+
+	vb.reset();
+}
+
+void SkMesh::SkinToBuffer(int mesh, void *buffer) {
+	DefMesh &m = m_meshes[mesh];
+	
+	const float *srcVerts = m.dm->verts;
+	const float *bones = m_ska->BoneTMs(ska::RowMajorTag());
+
+	float *outVerts = (float*)buffer;
 
 	for (int i = 0; i < ska::kBonesPerVert; ++i) {
 		int numVerts = (int)m.dm->numVerts[i];
@@ -195,8 +202,7 @@ void SkMesh::Skin(int mesh) {
 		outVerts += numVerts*(8+(4*m.dm->numChannels));
 		srcVerts += numVerts*(i+1)*(8+(4*m.dm->numChannels));
 	}
-
-	vb.reset();
 }
+
 
 } // r

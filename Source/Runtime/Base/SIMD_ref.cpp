@@ -134,7 +134,7 @@ void SkinVerts(
 			for (int b = 0; b < numBones; ++b) {
 				const float *bone = &bones[boneIndices[b] * SIMDDriver::kNumBoneFloats];
 				Transform3x3(out, bone, vertices);
-				AddVec3(acc, acc, out);
+				AddVec4(acc, acc, out);
 				vertices += 4;
 			}
 

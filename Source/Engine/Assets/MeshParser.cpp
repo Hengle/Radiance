@@ -26,10 +26,10 @@ int MeshParser::Process(
 	if (!(flags&(P_Load|P_Unload|P_Parse|P_Info|P_Trim)))
 		return SR_Success;
 
-	if (m_valid && (flags&(P_Load|P_Parse|P_Info|P_Trim)))
+	if (m_valid && (flags&(P_Load|P_Parse|P_Info)))
 		return SR_Success;
 
-	if (flags&P_Unload) {
+	if (flags&(P_Unload|P_Trim)) {
 #if defined(RAD_OPT_TOOLS)
 		m_bundleData.reset();
 #endif

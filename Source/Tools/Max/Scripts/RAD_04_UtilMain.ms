@@ -3,19 +3,19 @@
 -- Author: Joe Riedel
 -- See Radiance/LICENSE for licensing terms.
 
-utility RadianceUtil "Radiance Tools" width:166 height:569
+utility RadianceUtil "Radiance Tools" width:166 height:600
 (
-	GroupBox grp1 "Selected Geo && Bones" pos:[6,83] width:155 height:355
+	GroupBox grp1 "Selected Geo && Bones" pos:[6,83] width:155 height:427
 	GroupBox grp4 "Animation" pos:[15,100] width:138 height:270
 	dropdownList animList "" pos:[18,118] width:130 height:21
 	edittext animName "Name:" pos:[18,146] width:130 height:17
-	GroupBox grp8 "Export" pos:[6,441] width:154 height:79
-	checkbox selectionOnlyCheckbox "Selection Only" pos:[69,456] width:87 height:14
-	checkbox exportHiddenCheckbox "Hidden" pos:[11,456] width:55 height:14
-	button exportSceneButton "Scene..." pos:[11,475] width:65 height:17
-	button exportAnimButton "Anim..." pos:[89,497] width:65 height:17
-	button exportMeshButton "Mesh..." pos:[89,474] width:65 height:17
-	button exportSkelButton "Skel..." pos:[11,497] width:65 height:17
+	GroupBox grp8 "Export" pos:[6,512] width:154 height:79
+	checkbox selectionOnlyCheckbox "Selection Only" pos:[69,527] width:87 height:14
+	checkbox exportHiddenCheckbox "Hidden" pos:[11,527] width:55 height:14
+	button exportSceneButton "Scene..." pos:[11,546] width:65 height:17
+	button exportAnimButton "Anim..." pos:[89,569] width:65 height:17
+	button exportMeshButton "Mesh..." pos:[89,546] width:65 height:17
+	button exportSkelButton "Skel..." pos:[11,568] width:65 height:17
 	edittext animStart "Start:" pos:[18,170] width:66 height:17
 	edittext animEnd "End:" pos:[86,170] width:66 height:17
 	checkbox animLoop "Looping" pos:[21,249] width:63 height:18
@@ -28,12 +28,16 @@ utility RadianceUtil "Radiance Tools" width:166 height:569
 	button addAnim "Add" pos:[24,346] width:53 height:18
 	button deleteAnim "Delete" pos:[87,346] width:53 height:18
 	button noDefault "None" pos:[53,314] width:54 height:16
-	checkbox cinematicObject "Cinematic Object" pos:[21,377] width:108 height:17
-	checkbox hideUntilRef "Hide Until Referenced" pos:[21,394] width:129 height:17
-	checkbox hideWhenDone "Hide When Done" pos:[21,412] width:129 height:17
+	checkbox cinematicObject "Cinematic Object" pos:[21,452] width:108 height:17
+	checkbox hideUntilRef "Hide Until Referenced" pos:[21,469] width:129 height:17
+	checkbox hideWhenDone "Hide When Done" pos:[21,487] width:129 height:17
 	GroupBox grp5 "Selected Material" pos:[8,4] width:153 height:74
 	button nameCompleteMapsButton "Autoname Complete Maps" pos:[14,49] width:138 height:22
-	editText autonamePackage "Package:" pos:[18,25] width:132 height:15
+	edittext autonamePackage "Package:" pos:[18,25] width:132 height:15
+	GroupBox grp6 "" pos:[14,374] width:139 height:71
+	edittext bboxSize "" pos:[24,395] width:113 height:17
+	button calcBBoxSize "Calculate" pos:[38,420] width:86 height:17
+	checkbox setBBox "Set BBox" pos:[25,373] width:64 height:15
 	
 	local animSel = #() -- selected objects that have animations
 	local animSet = #() -- selected set of animations [struct Animation]
@@ -49,7 +53,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:569
 		oldTime = sliderTime
 		if (selectionOnlyCheckbox.checked) then ( objs = selection )
 		objs = RAD_FilterVisible objs vis:(not hidden)		
-		objs = RAD_ConvertableFilter objs #(Editable_Mesh, Freecamera)
+		objs = RAD_ConvertableFilter objs #(Mesh, Freecamera)
 		objs = RAD_Exclude objs Bone -- exclude bones
 		
 		if (objs.count == 0) then
@@ -94,7 +98,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:569
 		addAnim.enabled = val
 		deleteAnim.enabled = val
 		noDefault.enabled = val
-		exportAnimButton.enabled = val 
+		exportAnimButton.enabled = val
 	)
 	
 	function enableAnimObjControls val =
@@ -272,8 +276,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:569
 		animSel = RAD_FilterAnimatable objs
 		animSet = RAD_GatherAnims animSel
 		
-		if (animSet.count > 0) then
-		(
+		if (animSet.count > 0) then (
 			items = (for x in animSet collect x.name)
 			animList.items = items
 			animList.selection = 1
@@ -282,8 +285,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:569
 			enableAnimControls true
 			setupUIForSelAnim()
 		)
-		else if (animSel.count > 0) then
-		(
+		else if (animSel.count > 0) then (
 			animList.items = #()
 			animList.enabled = false
 			animInitialState.items = #()
@@ -298,70 +300,97 @@ utility RadianceUtil "Radiance Tools" width:166 height:569
 			addAnim.enabled = true
 			deleteAnim.enabled = false
 		)
+		
+		bboxEnable = (animSel.count > 0)
+		setBBox.enabled = bboxEnable
+		
+		if (bboxEnable) then (
+			bboxEnabled = false
+			vals = RAD_GatherObjectProps animSel #("SetBBox") #("false")
+			if (vals[1]) then (
+				bboxEnabled = vals[2][1][2][1] as BooleanClass
+				if (bboxEnabled) then (
+					setBBox.triState = 1
+				) else (
+					setBBox.triState = 0
+				)
+			) else (
+				-- undefined
+				setBBox.state = 2
+			)
+			
+			if (bboxEnabled) then (
+				vals = RAD_GatherObjectProps animSel #("BBox") #("-24 -24 -24 24 24 24")
+				if (vals[1]) then (
+					bboxSize.text = vals[2][1][2][1]
+				) else (
+					bboxSize.text = ""
+				)
+			)			
+		)
+		
+		if (not bboxEnabled) then (
+			bboxSize.enabled = false
+			calcBBoxSize.enabled = false
+			bboxSize.text = ""
+		)
 	)
 	
 	function setupUIForAnimatable objs = 
 	(
 		setupUIForAnims objs
 		
-		if (animSel.count > 0) then
+		enableAnimObjControls true
+		
+		vals = RAD_GatherObjectProps objs #("CinematicObject") #("false")
+		if (vals[1]) then
 		(
-			enableAnimObjControls true
-			
-			vals = RAD_GatherObjectProps objs #("CinematicObject") #("false")
-			if (vals[1]) then
+			if (vals[2][1][2][1] as BooleanClass) then
 			(
-				if (vals[2][1][2][1] as BooleanClass) then
-				(
-					cinematicObject.triState = 1 -- checked
-				)
-				else
-				(
-					cinematicObject.triState = 0
-				)
+				cinematicObject.triState = 1 -- checked
 			)
 			else
 			(
-				cinematicObject.state = 2 -- undefined
-			)
-			
-			vals = RAD_GatherObjectProps objs #("HideUntilRef") #("true")
-			if (vals[1]) then
-			(
-				if (vals[2][1][2][1] as BooleanClass) then
-				(
-					hideUntilRef.triState = 1 -- checked
-				)
-				else
-				(
-					hideUntilRef.triState = 0
-				)
-			)
-			else
-			(
-				hideUntilRef.state = 2 -- undefined
-			)
-			
-			vals = RAD_GatherObjectProps objs #("HideWhenDone") #("true")
-			if (vals[1]) then
-			(
-				if (vals[2][1][2][1] as BooleanClass) then
-				(
-					hideWhenDone.triState = 1 -- checked
-				)
-				else
-				(
-					hideWhenDone.triState = 0
-				)
-			)
-			else
-			(
-				hideWhenDone.state = 2 -- undefined
+				cinematicObject.triState = 0
 			)
 		)
 		else
 		(
-			enableAnimObjControls false
+			cinematicObject.state = 2 -- undefined
+		)
+		
+		vals = RAD_GatherObjectProps objs #("HideUntilRef") #("true")
+		if (vals[1]) then
+		(
+			if (vals[2][1][2][1] as BooleanClass) then
+			(
+				hideUntilRef.triState = 1 -- checked
+			)
+			else
+			(
+				hideUntilRef.triState = 0
+			)
+		)
+		else
+		(
+			hideUntilRef.state = 2 -- undefined
+		)
+		
+		vals = RAD_GatherObjectProps objs #("HideWhenDone") #("true")
+		if (vals[1]) then
+		(
+			if (vals[2][1][2][1] as BooleanClass) then
+			(
+				hideWhenDone.triState = 1 -- checked
+			)
+			else
+			(
+				hideWhenDone.triState = 0
+			)
+		)
+		else
+		(
+			hideWhenDone.state = 2 -- undefined
 		)
 	)
 	
@@ -395,6 +424,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:569
 			animEnd.text = ""
 			animLoop.checked = false
 			animExport.checked = false
+			bboxSize.text = ""
 			disableAll()
 		)
 	)
@@ -510,33 +540,33 @@ utility RadianceUtil "Radiance Tools" width:166 height:569
 	(
 		if (state) then
 		(
-			RAD_SetObjectProps (selectedAnimatable()) #(#("CinematicObject", "true"))
+			RAD_SetObjectProps (selectedMeshes()) #(#("CinematicObject", "true"))
 		)
 		else
 		(
-			RAD_SetObjectProps (selectedAnimatable()) #(#("CinematicObject", "false"))
+			RAD_SetObjectProps (selectedMeshes()) #(#("CinematicObject", "false"))
 		)
 	)
 	on hideUntilRef changed state do
 	(
 		if (state) then
 		(
-			RAD_SetObjectProps (selectedAnimatable()) #(#("HideUntilRef", "true"))
+			RAD_SetObjectProps (selectedMeshes()) #(#("HideUntilRef", "true"))
 		)
 		else
 		(
-			RAD_SetObjectProps (selectedAnimatable()) #(#("HideUntilRef", "false"))
+			RAD_SetObjectProps (selectedMeshes()) #(#("HideUntilRef", "false"))
 		)
 	)
 	on hideWhenDone changed state do
 	(
 		if (state) then
 		(
-			RAD_SetObjectProps (selectedAnimatable()) #(#("HideWhenDone", "true"))
+			RAD_SetObjectProps (selectedMeshes()) #(#("HideWhenDone", "true"))
 		)
 		else
 		(
-			RAD_SetObjectProps (selectedAnimatable()) #(#("HideWhenDone", "false"))
+			RAD_SetObjectProps (selectedMeshes()) #(#("HideWhenDone", "false"))
 		)
 	)
 	on nameCompleteMapsButton pressed do
@@ -573,6 +603,38 @@ utility RadianceUtil "Radiance Tools" width:166 height:569
 			)
 			x = getFilenameFile diffuseBitmap.filename
 			sub.name = autonamePackage.text + "/" + x + "_M"
+		)
+	)
+	on setBBoxSize changed state do (
+		if (state) then (
+			RAD_SetObjectProps (selectedAnimatable()) #(#("SetBBox", "true"))
+		) else (
+			RAD_SetObjectProps (selectedAnimatable()) #(#("SetBBox", "false"))
+		)
+	)
+	on bboxSize entered newVal do
+	(
+		RAD_SetObjectProps (selectedAnimatable()) #(#("BBox", newVal))
+	)
+	on calcBBoxSize pressed do
+	(
+		objs = selectedAnimatable()
+		for i=1 to objs.count do (
+			bbox = RAD_MeshBBox (snapshotAsMesh objs[i])
+			s = ""
+			for k=1 to 2 do (
+				for z=1 to 3 do (
+					s = s + (bbox[k][z] as string) + " "
+				)
+			)
+			RAD_SetObjectProps (#(objs[i])) #(#("BBox", s))
+		)
+		
+		vals = RAD_GatherObjectProps objs #("BBox") #("-24 -24 -24 24 24 24")
+		if ((animSel.count > 0) and vals[1]) then (
+			bboxSize.text = vals[2][1][2][1]
+		) else (
+			bboxSize.text = ""
 		)
 	)
 )

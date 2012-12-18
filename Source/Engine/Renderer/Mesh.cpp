@@ -19,7 +19,7 @@ MeshBundle::Ref MeshBundle::New(const pkg::AssetRef &asset) {
 	for (size_t i = 0; i < parser->bundle->meshes.size(); ++i) {
 		r::Mesh::Ref m(new (ZRender) r::Mesh());
 		const asset::DMesh &dm = parser->bundle->meshes[i];
-		const int kVertSize = (6+(4*(dm.numChannels+1)))*sizeof(float);
+		const int kVertSize = dm.NumVertexFloats()*sizeof(float);
 
 		// Mesh bundle data is interleaved
 
