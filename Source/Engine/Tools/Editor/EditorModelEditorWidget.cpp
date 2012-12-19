@@ -32,7 +32,9 @@
 #include <QtGui/QMessageBox>
 #include <Runtime/Base/SIMD.h>
 
+#if defined(RAD_OPT_DEBUG)
 #define VALIDATE_SIMD_SKIN
+#endif
 
 #if defined(VALIDATE_SIMD_SKIN)
 const SIMDDriver *SIMD_ref_bind();
