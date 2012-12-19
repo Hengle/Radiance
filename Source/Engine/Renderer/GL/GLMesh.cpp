@@ -65,8 +65,10 @@ void GLMesh::MapSource(
 	{
 	case MGS_Vertices:
 	case MGS_Normals:
-	case MGS_Tangents:
 		source.count = 3;
+		break;
+	case MGS_Tangents:
+		source.count = 4;
 		break;
 	case MGS_TexCoords:
 		source.count = 2;

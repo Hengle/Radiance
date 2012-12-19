@@ -10,501 +10,141 @@
 #include RADPCH
 #include "SIMD.h"
 
+const SIMDDriver *SIMD_ref_bind();
+
 #if defined(RAD_OPT_WINX)
 
 #include "../StringBase.h"
 
 namespace {
 
-void SkinVerts4(
+#define MUL_BONE_4x3(_vofs, _bofs) \
+	
+
+
+#define LOAD_MUL_YYYY(_vofs, _bofs) \
+	movaps   xmm1, [esi+_vofs] \
+	movaps   xmm7, [edx+_bofs+0x10] \
+	unpcklps xmm1, xmm1 \
+	movlhps  xmm1, xmm1 \
+	mulps    xmm1, xmm7
+
+#define LOAD_MUL_ZZZZ(_vofs, _bofs) \
+	movaps   xmm2, [esi+_vofs] \
+	movaps   xmm7, [edx+_bofs+0x20] \
+	unpckhps xmm2, xmm2 \
+	movlhps  xmm2, xmm2 \
+	mulps    xmm2, xmm7
+
+#define LOAD_MUL_WWWW(_vofs, _bofs) \
+	movaps   xmm3, [esi+_vofs] \
+	movaps   xmm7, [edx+_bofs+0x30] \
+	unpckhps xmm3, xmm3 \
+	movhlps  xmm3, xmm3 \
+	mulps    xmm3, xmm7
+
+#define LOAD_WWWW(_vofs) \
+	movaps   xmm3, [esi+_vofs] \
+
+#define STORE_WWWW \
+
+
+void SkinVerts1B1T(
 	float *outVerts, 
 	const float *bones, 
 	const float *vertices,
 	const U16 *boneIndices,
 	int numVerts
-)
-{
+) {
 	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
 	RAD_ASSERT(IsAligned(bones, SIMDDriver::kAlignment));
 	RAD_ASSERT(IsAligned(vertices, SIMDDriver::kAlignment));
 	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::kAlignment));
 
-	for (int i = 0; i < numVerts; ++i)
-	{
-
-#if defined(RAD_OPT_WINX)
+	for (int i = 0; i < numVerts; ++i) {
 		const float *bone0 = bones + boneIndices[0]*SIMDDriver::kNumBoneFloats;
-		const float *bone1 = bones + boneIndices[1]*SIMDDriver::kNumBoneFloats;
-		const float *bone2 = bones + boneIndices[2]*SIMDDriver::kNumBoneFloats;
-		const float *bone3 = bones + boneIndices[3]*SIMDDriver::kNumBoneFloats;
-		__asm {
-			mov      esi, vertices   // 1 cycles (issued same cycle)
-			mov      edi, outVerts   // 1 cycles (issued same cycle)
-			mov      edx, bone0      // 1 cycles (issued same cycle)
-
-			movaps   xmm4, [esi] // xyzw 2 cycles (1 issue)
-			movaps   xmm5, [esi] // xyzw 2 cycles (1 issue)
-			movaps   xmm6, [esi] // xyzw 2 cycles (1 issue)
-			movaps   xmm7, [esi] // xyzw 2 cycles (1 issue)
-			movaps   xmm0, [edx] // 2 cycles (1 issue)
-			movaps   xmm1, [edx+0x10] // 2 cycles (1 issue)
-			movaps   xmm2, [edx+0x20] // 2 cycles (1 issue)
-			movaps   xmm3, [edx+0x30] // 2 cycles (1 issue)
-
-			unpcklps xmm4, xmm4 // xxyy (xmm4 ready) 1 cycle (1 issue)
-			unpcklps xmm5, xmm5 // xxyy (xmm5 ready) 1 cycle (1 issue)
-			unpckhps xmm7, xmm7 // zzww (xmm7 ready) 1 cycle (1 issue)
-			unpckhps xmm6, xmm6 // zzww (xmm6 ready) 1 cycle (1 issue)
-			
-			movhlps  xmm7, xmm7 // wwww 1 cycle (1 issue)
-			movlhps  xmm4, xmm4 // xxxx 1 cycle (1 issue)
-			movhlps  xmm5, xmm5 // yyyy 1 cycle (1 issue)
-			movlhps  xmm6, xmm6 // zzzz 1 cycle (1 issue)
-			
-			mulps    xmm3, xmm7 // translation * weight 4 cycles (1 issue)
-			mulps    xmm4, xmm0 // xxxx * row0 4 cycles (1 issue)
-			mulps    xmm5, xmm1 // yyyy * row1 4 cycles (1 issue)
-			mulps    xmm6, xmm2 // zzzz * row2 4 cycles (1 issue)
-			
-			mov      edx, bone1      // 1 cycles (issued same cycle)
-
-			addps    xmm3, xmm4 // 3 cycles (1 issue)
-			movaps   xmm0, [edx] // 2 cycles (1 issue)
-
-			addps    xmm5, xmm6 // 3 cycles (1 issue)
-			
-			movaps   xmm1, [edx+0x10] // 2 cycles (1 issue)
-			movaps   xmm2, [edx+0x20] // 2 cycles (1 issue)
-			movaps   xmm7, [edx+0x30] // 2 cycles (1 issue)
-		
-			addps    xmm3, xmm5 // 3 cycles (1 issue)
-
-			// xmm3 contains result of previous bone
-
-			movaps   xmm4, [esi+0x10] // xyzw 2 cycles (1 issue)
-			movaps   xmm5, [esi+0x10] // xyzw 2 cycles (1 issue)
-			movaps   xmm6, [esi+0x10] // xyzw 2 cycles (1 issue)
-
-			unpcklps xmm4, xmm4 // xxyy (xmm4 ready) 1 cycle (1 issue)
-			unpcklps xmm5, xmm5 // xxyy (xmm5 ready) 1 cycle (1 issue)
-			unpckhps xmm6, xmm6 // zzww (xmm6 ready) 1 cycle (1 issue)
-			
-			movlhps  xmm4, xmm4 // xxxx 1 cycle (1 issue)
-			movhlps  xmm5, xmm5 // yyyy 1 cycle (1 issue)
-			movlhps  xmm6, xmm6 // zzzz 1 cycle (1 issue)
-
-			mulps    xmm4, xmm0 // xxxx * row0 4 cycles (1 issue)
-			movaps   xmm0, [esi+0x10] // xyzw 2 cycles (1 issue)
-			mulps    xmm5, xmm1 // yyyy * row1 4 cycles (1 issue)
-			mulps    xmm6, xmm2 // zzzz * row2 4 cycles (1 issue)
-			unpckhps xmm0, xmm0 // zzww (xmm0 ready) 1 cycle (1 issue)
-			movhlps  xmm0, xmm0 // wwww 1 cycle (1 issue)
-
-			addps    xmm5, xmm4 // 3 cycles (1 issue)
-			mov      edx, bone2 // 1 cycles (issued same cycle)
-			mulps    xmm7, xmm0 // translation * weight 4 cycles (1 issue)
-			addps    xmm5, xmm6 // 3 cycles (1 issue)
-
-			movaps   xmm0, [edx] // 2 cycles (1 issue)
-			movaps   xmm1, [edx+0x10] // 2 cycles (1 issue)
-
-			addps    xmm7, xmm5 // 3 cycles (1 issue)
-
-			movaps   xmm2, [edx+0x20] // 2 cycles (1 issue)
-			movaps   xmm6, [edx+0x30] // 2 cycles (1 issue)
-
-			addps    xmm3, xmm7
-
-			movaps   xmm4, [esi+0x20] // xyzw 2 cycles (1 issue)
-			movaps   xmm5, [esi+0x20] // xyzw 2 cycles (1 issue)
-			movaps   xmm7, [esi+0x20] // xyzw 2 cycles (1 issue)
-
-			unpcklps xmm4, xmm4 // xxyy (xmm4 ready) 1 cycle (1 issue)
-			unpcklps xmm5, xmm5 // xxyy (xmm5 ready) 1 cycle (1 issue)
-			unpckhps xmm7, xmm7 // zzww (xmm6 ready) 1 cycle (1 issue)
-			
-			movlhps  xmm4, xmm4 // xxxx 1 cycle (1 issue)
-			movhlps  xmm5, xmm5 // yyyy 1 cycle (1 issue)
-			movlhps  xmm7, xmm7 // zzzz 1 cycle (1 issue)
-
-			mulps    xmm4, xmm0 // xxxx * row0 4 cycles (1 issue)
-			movaps   xmm0, [esi+0x20] // xyzw 2 cycles (1 issue)
-			mulps    xmm5, xmm1 // yyyy * row1 4 cycles (1 issue)
-			mulps    xmm7, xmm2 // zzzz * row2 4 cycles (1 issue)
-			unpckhps xmm0, xmm0 // zzww (xmm0 ready) 1 cycle (1 issue)
-			movhlps  xmm0, xmm0 // wwww 1 cycle (1 issue)
-			
-			addps    xmm5, xmm4 // 3 cycles (1 issue)
-			mulps    xmm6, xmm0 // translation * weight 4 cycles (1 issue)
-				
-			mov      edx, bone3 // 1 cycles (issued same cycle)
-			addps    xmm5, xmm7 // 3 cycles (1 issue)
-			movaps   xmm0, [edx] // 2 cycles (1 issue)
-			movaps   xmm1, [edx+0x10] // 2 cycles (1 issue)
-			
-			addps    xmm5, xmm6 // 3 cycles (1 issue)
-
-			movaps   xmm2, [edx+0x20] // 2 cycles (1 issue)
-			movaps   xmm7, [edx+0x30] // 2 cycles (1 issue)
-
-			addps    xmm3, xmm5 // 3 cycles (1 issue)
-
-			movaps   xmm4, [esi+0x30] // xyzw 2 cycles (1 issue)
-			movaps   xmm5, [esi+0x30] // xyzw 2 cycles (1 issue)
-			movaps   xmm6, [esi+0x30] // xyzw 2 cycles (1 issue)
-
-			unpcklps xmm4, xmm4 // xxyy (xmm4 ready) 1 cycle (1 issue)
-			unpcklps xmm5, xmm5 // xxyy (xmm5 ready) 1 cycle (1 issue)
-			unpckhps xmm6, xmm6 // zzww (xmm6 ready) 1 cycle (1 issue)
-			
-			movlhps  xmm4, xmm4 // xxxx 1 cycle (1 issue)
-			movhlps  xmm5, xmm5 // yyyy 1 cycle (1 issue)
-			movlhps  xmm6, xmm6 // zzzz 1 cycle (1 issue)
-			
-			mulps    xmm4, xmm0 // xxxx * row0 4 cycles (1 issue)
-			movaps   xmm0, [esi+0x30] // xyzw 2 cycles (1 issue)
-			mulps    xmm5, xmm1 // yyyy * row1 4 cycles (1 issue)
-			mulps    xmm6, xmm2 // zzzz * row2 4 cycles (1 issue)
-			unpckhps xmm0, xmm0 // zzww (xmm0 ready) 1 cycle (1 issue)
-			movhlps  xmm0, xmm0 // wwww 1 cycle (1 issue)
-
-			addps    xmm5, xmm4 // 3 cycles (1 issue)
-			mulps    xmm7, xmm0 // translation * weight 4 cycles (1 issue)
-
-			// 2 cycle stall waiting for xmm5 
-			addps    xmm5, xmm6 // 3 cycles (1 issue)
-
-			// 3 cycle stall waiting for xmm5
-			addps    xmm7, xmm5 // 3 cycles (1 issue)
-
-			// 3 cycle stall waiting for xmm7
-			addps    xmm3, xmm7
-			
-			// 3 cycle stall waiting for xmm3
-			movaps  [edi], xmm3
-			
-		}
-#else
-#error "implement me!"
-#endif
-
-		vertices += 16;
-		boneIndices += 4;
-		outVerts += 4;
-	}
-}
-
-void SkinVerts3(
-	float *outVerts, 
-	const float *bones, 
-	const float *vertices,
-	const U16 *boneIndices,
-	int numVerts
-)
-{
-	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
-	RAD_ASSERT(IsAligned(bones, SIMDDriver::kAlignment));
-	RAD_ASSERT(IsAligned(vertices, SIMDDriver::kAlignment));
-	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::kAlignment));
-
-	for (int i = 0; i < numVerts; ++i)
-	{
-
 #if defined(RAD_OPT_WINX)
-		const float *bone0 = bones + boneIndices[0]*SIMDDriver::kNumBoneFloats;
-		const float *bone1 = bones + boneIndices[1]*SIMDDriver::kNumBoneFloats;
-		const float *bone2 = bones + boneIndices[2]*SIMDDriver::kNumBoneFloats;
 		__asm {
-			mov      esi, vertices   // 1 cycles (issued same cycle)
-			mov      edi, outVerts   // 1 cycles (issued same cycle)
-			mov      edx, bone0      // 1 cycles (issued same cycle)
+			// movaps r,m m,r = 3
+			// movaps r,r = 1
+			// addps = 3
+			// mulps = 5
+			// unpack = 1
+			// movhl/lh = 1
 
-			movaps   xmm4, [esi] // xyzw 2 cycles (1 issue)
-			movaps   xmm5, [esi] // xyzw 2 cycles (1 issue)
-			movaps   xmm6, [esi] // xyzw 2 cycles (1 issue)
-			movaps   xmm7, [esi] // xyzw 2 cycles (1 issue)
-			movaps   xmm0, [edx] // 2 cycles (1 issue)
-			movaps   xmm1, [edx+0x10] // 2 cycles (1 issue)
-			movaps   xmm2, [edx+0x20] // 2 cycles (1 issue)
-			movaps   xmm3, [edx+0x30] // 2 cycles (1 issue)
+			mov esi, vertices
+			mov edi, outVerts
+			mov edx, bone0
 
-			unpcklps xmm4, xmm4 // xxyy (xmm4 ready) 1 cycle (1 issue)
-			unpcklps xmm5, xmm5 // xxyy (xmm5 ready) 1 cycle (1 issue)
-			unpckhps xmm7, xmm7 // zzww (xmm7 ready) 1 cycle (1 issue)
-			unpckhps xmm6, xmm6 // zzww (xmm6 ready) 1 cycle (1 issue)
+			movaps  xmm0, [esi] // v xyzw
+			movaps  xmm4, [esi+0x10] // n xyzw
+
+			// stall xmm0 (1)
+
+			movaps   xmm2, xmm0
+			unpcklps xmm0, xmm0 // v xxyy
+			unpckhps xmm2, xmm2 // v zzww
+			movaps   xmm1, xmm0
+			movlhps  xmm0, xmm0 // v xxxx
+			movhlps  xmm1, xmm1 // v yyyy
 			
-			movhlps  xmm7, xmm7 // wwww 1 cycle (1 issue)
-			movlhps  xmm4, xmm4 // xxxx 1 cycle (1 issue)
-			movhlps  xmm5, xmm5 // yyyy 1 cycle (1 issue)
-			movlhps  xmm6, xmm6 // zzzz 1 cycle (1 issue)
-			
-			mulps    xmm3, xmm7 // translation * weight 4 cycles (1 issue)
-			mulps    xmm4, xmm0 // xxxx * row0 4 cycles (1 issue)
-			mulps    xmm5, xmm1 // yyyy * row1 4 cycles (1 issue)
-			mulps    xmm6, xmm2 // zzzz * row2 4 cycles (1 issue)
-			
-			mov      edx, bone1      // 1 cycles (issued same cycle)
+			mulps    xmm0, [edx] // v xxxx * row0
+			movlhps  xmm2, xmm2  // v zzzz
+			mulps    xmm1, [edx+0x10] // v yyyy * row1
+			mulps    xmm2, [edx+0x20] // v zzzz * row2
 
-			addps    xmm3, xmm4 // 3 cycles (1 issue)
-			movaps   xmm0, [edx] // 2 cycles (1 issue)
+			movaps   xmm6, xmm4
+			unpcklps xmm4, xmm4 // n xxyy
+			unpckhps xmm6, xmm6 // n zzww
+			movaps   xmm5, xmm4
+			addps    xmm1, xmm0 // v xxxx + yyyy
+			movlhps  xmm4, xmm4 // n xxxx
+			movhlps  xmm5, xmm5 // n yyyy
+			mulps    xmm4, [edx] // n xxxx * row0
+			mulps    xmm5, [edx+0x10] // n yyyy * row1
+			addps    xmm1, xmm2 // v xxxx + yyyy + zzzz
+			movlhps  xmm6, xmm6 // n zzzz
+			movaps   xmm0, [esi+0x20] // t xyzw
+			mulps    xmm6, [edx+0x20] // n zzzz * row2
+			addps    xmm1, [edx+0x30] // v xxxx + yyyy + zzzz + row3
+			addps    xmm4, xmm5 // n xxxx + yyyyy
 
-			addps    xmm5, xmm6 // 3 cycles (1 issue)
-			
-			movaps   xmm1, [edx+0x10] // 2 cycles (1 issue)
-			movaps   xmm2, [edx+0x20] // 2 cycles (1 issue)
-			movaps   xmm7, [edx+0x30] // 2 cycles (1 issue)
-		
-			addps    xmm3, xmm5 // 3 cycles (1 issue)
+			// t xyzw
+			movaps   xmm2, xmm0
+			unpcklps xmm0, xmm0 // t xxyy
+			movaps  [edi], xmm1 // [store] vertex
+			movaps   xmm1, xmm0
+			addps    xmm4, xmm6 // n xxxx + yyyy + zzzz
+			unpckhps xmm2, xmm2 // t zzww
+			movlhps  xmm0, xmm0 // t xxxx
+			movhlps  xmm1, xmm1 // t yyyy
+			mulps    xmm0, [edx] // t xxxx * row0
+			mulps    xmm1, [edx+0x10] // t yyyy * row1
+			movaps   xmm7, xmm2 // store off zzww
+			movlhps  xmm2, xmm2 // t zzzz
+			movhlps  xmm7, xmm7 // t wwww
+			mulps    xmm2, [edx+0x20] // t zzzz * row2
+			movaps   [edi+0x10], xmm4 // [store] normal
+			addps    xmm0, xmm1 // t xxxx + yyyy
 
-			// xmm3 contains result of previous bone
-
-			movaps   xmm4, [esi+0x10] // xyzw 2 cycles (1 issue)
-			movaps   xmm5, [esi+0x10] // xyzw 2 cycles (1 issue)
-			movaps   xmm6, [esi+0x10] // xyzw 2 cycles (1 issue)
-
-			unpcklps xmm4, xmm4 // xxyy (xmm4 ready) 1 cycle (1 issue)
-			unpcklps xmm5, xmm5 // xxyy (xmm5 ready) 1 cycle (1 issue)
-			unpckhps xmm6, xmm6 // zzww (xmm6 ready) 1 cycle (1 issue)
-			
-			movlhps  xmm4, xmm4 // xxxx 1 cycle (1 issue)
-			movhlps  xmm5, xmm5 // yyyy 1 cycle (1 issue)
-			movlhps  xmm6, xmm6 // zzzz 1 cycle (1 issue)
-
-			mulps    xmm4, xmm0 // xxxx * row0 4 cycles (1 issue)
-			movaps   xmm0, [esi+0x10] // xyzw 2 cycles (1 issue)
-			mulps    xmm5, xmm1 // yyyy * row1 4 cycles (1 issue)
-			mulps    xmm6, xmm2 // zzzz * row2 4 cycles (1 issue)
-			unpckhps xmm0, xmm0 // zzww (xmm0 ready) 1 cycle (1 issue)
-			movhlps  xmm0, xmm0 // wwww 1 cycle (1 issue)
-
-			addps    xmm5, xmm4 // 3 cycles (1 issue)
-			mov      edx, bone2 // 1 cycles (issued same cycle)
-			mulps    xmm7, xmm0 // translation * weight 4 cycles (1 issue)
-			addps    xmm5, xmm6 // 3 cycles (1 issue)
-
-			movaps   xmm0, [edx] // 2 cycles (1 issue)
-			movaps   xmm1, [edx+0x10] // 2 cycles (1 issue)
-
-			addps    xmm7, xmm5 // 3 cycles (1 issue)
-
-			movaps   xmm2, [edx+0x20] // 2 cycles (1 issue)
-			movaps   xmm6, [edx+0x30] // 2 cycles (1 issue)
-
-			addps    xmm3, xmm7
-
-			movaps   xmm4, [esi+0x20] // xyzw 2 cycles (1 issue)
-			movaps   xmm5, [esi+0x20] // xyzw 2 cycles (1 issue)
-			movaps   xmm7, [esi+0x20] // xyzw 2 cycles (1 issue)
-
-			unpcklps xmm4, xmm4 // xxyy (xmm4 ready) 1 cycle (1 issue)
-			unpcklps xmm5, xmm5 // xxyy (xmm5 ready) 1 cycle (1 issue)
-			unpckhps xmm7, xmm7 // zzww (xmm6 ready) 1 cycle (1 issue)
-			
-			movlhps  xmm4, xmm4 // xxxx 1 cycle (1 issue)
-			movhlps  xmm5, xmm5 // yyyy 1 cycle (1 issue)
-			movlhps  xmm7, xmm7 // zzzz 1 cycle (1 issue)
-
-			mulps    xmm4, xmm0 // xxxx * row0 4 cycles (1 issue)
-			movaps   xmm0, [esi+0x20] // xyzw 2 cycles (1 issue)
-			mulps    xmm5, xmm1 // yyyy * row1 4 cycles (1 issue)
-			mulps    xmm7, xmm2 // zzzz * row2 4 cycles (1 issue)
-			unpckhps xmm0, xmm0 // zzww (xmm0 ready) 1 cycle (1 issue)
-			movhlps  xmm0, xmm0 // wwww 1 cycle (1 issue)
-			
-			addps    xmm5, xmm4 // 3 cycles (1 issue)
-			mulps    xmm6, xmm0 // translation * weight 4 cycles (1 issue)
-				
-			// 2 cycle stall waiting for xmm5 
-			addps    xmm5, xmm7 // 3 cycles (1 issue)
-
-			// 3 cycle stall waiting for xmm5
-			addps    xmm5, xmm6 // 3 cycles (1 issue)
-
-			// 3 cycle stall waiting for xmm5
-			addps    xmm3, xmm5 // 3 cycles (1 issue)
-			
-			// 3 cycle stall waiting for xmm3
-			movaps  [edi], xmm3
-			
+			// stall xmm2 (3)
+			addps    xmm0, xmm2 // t xxxx + yyyy + zzzz
+			// stall xmm0 (1)
+			shufps   xmm0, xmm0, 93h // wxyz
+			// stall xmm0 (2)
+			movss    xmm0, xmm7 // (w)xyz
+			// stall xmm0 (1)
+			shufps   xmm0, xmm0, 39h // xyzw
+			// stall xmm0 (2)
+			movaps  [edi+0x20], xmm0 // store tangent
 		}
 #else
 #error "implement me!"
 #endif
 
 		vertices += 12;
-		boneIndices += 3;
-		outVerts += 4;
-	}
-}
-
-void SkinVerts2(
-	float *outVerts, 
-	const float *bones, 
-	const float *vertices,
-	const U16 *boneIndices,
-	int numVerts
-)
-{
-	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
-	RAD_ASSERT(IsAligned(bones, SIMDDriver::kAlignment));
-	RAD_ASSERT(IsAligned(vertices, SIMDDriver::kAlignment));
-	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::kAlignment));
-
-	for (int i = 0; i < numVerts; ++i)
-	{
-
-#if defined(RAD_OPT_WINX)
-		const float *bone0 = bones + boneIndices[0]*SIMDDriver::kNumBoneFloats;
-		const float *bone1 = bones + boneIndices[1]*SIMDDriver::kNumBoneFloats;
-		__asm {
-			mov      esi, vertices   // 1 cycles (issued same cycle)
-			mov      edi, outVerts   // 1 cycles (issued same cycle)
-			mov      edx, bone0      // 1 cycles (issued same cycle)
-
-			movaps   xmm4, [esi] // xyzw 2 cycles (1 issue)
-			movaps   xmm5, [esi] // xyzw 2 cycles (1 issue)
-			movaps   xmm6, [esi] // xyzw 2 cycles (1 issue)
-			movaps   xmm7, [esi] // xyzw 2 cycles (1 issue)
-			movaps   xmm0, [edx] // 2 cycles (1 issue)
-			movaps   xmm1, [edx+0x10] // 2 cycles (1 issue)
-			movaps   xmm2, [edx+0x20] // 2 cycles (1 issue)
-			movaps   xmm3, [edx+0x30] // 2 cycles (1 issue)
-
-			unpcklps xmm4, xmm4 // xxyy (xmm4 ready) 1 cycle (1 issue)
-			unpcklps xmm5, xmm5 // xxyy (xmm5 ready) 1 cycle (1 issue)
-			unpckhps xmm7, xmm7 // zzww (xmm7 ready) 1 cycle (1 issue)
-			unpckhps xmm6, xmm6 // zzww (xmm6 ready) 1 cycle (1 issue)
-			
-			movhlps  xmm7, xmm7 // wwww 1 cycle (1 issue)
-			movlhps  xmm4, xmm4 // xxxx 1 cycle (1 issue)
-			movhlps  xmm5, xmm5 // yyyy 1 cycle (1 issue)
-			movlhps  xmm6, xmm6 // zzzz 1 cycle (1 issue)
-			
-			mulps    xmm3, xmm7 // translation * weight 4 cycles (1 issue)
-			mulps    xmm4, xmm0 // xxxx * row0 4 cycles (1 issue)
-			mulps    xmm5, xmm1 // yyyy * row1 4 cycles (1 issue)
-			mulps    xmm6, xmm2 // zzzz * row2 4 cycles (1 issue)
-			
-			mov      edx, bone1      // 1 cycles (issued same cycle)
-
-			addps    xmm3, xmm4 // 3 cycles (1 issue)
-			movaps   xmm0, [edx] // 2 cycles (1 issue)
-
-			addps    xmm5, xmm6 // 3 cycles (1 issue)
-			
-			movaps   xmm1, [edx+0x10] // 2 cycles (1 issue)
-			movaps   xmm2, [edx+0x20] // 2 cycles (1 issue)
-			movaps   xmm7, [edx+0x30] // 2 cycles (1 issue)
-		
-			addps    xmm3, xmm5 // 3 cycles (1 issue)
-
-			// xmm3 contains result of previous bone
-
-			movaps   xmm4, [esi+0x10] // xyzw 2 cycles (1 issue)
-			movaps   xmm5, [esi+0x10] // xyzw 2 cycles (1 issue)
-			movaps   xmm6, [esi+0x10] // xyzw 2 cycles (1 issue)
-
-			unpcklps xmm4, xmm4 // xxyy (xmm4 ready) 1 cycle (1 issue)
-			unpcklps xmm5, xmm5 // xxyy (xmm5 ready) 1 cycle (1 issue)
-			unpckhps xmm6, xmm6 // zzww (xmm6 ready) 1 cycle (1 issue)
-			
-			movlhps  xmm4, xmm4 // xxxx 1 cycle (1 issue)
-			movhlps  xmm5, xmm5 // yyyy 1 cycle (1 issue)
-			movlhps  xmm6, xmm6 // zzzz 1 cycle (1 issue)
-
-			mulps    xmm4, xmm0 // xxxx * row0 4 cycles (1 issue)
-			movaps   xmm0, [esi+0x10] // xyzw 2 cycles (1 issue)
-			mulps    xmm5, xmm1 // yyyy * row1 4 cycles (1 issue)
-			mulps    xmm6, xmm2 // zzzz * row2 4 cycles (1 issue)
-			unpckhps xmm0, xmm0 // zzww (xmm0 ready) 1 cycle (1 issue)
-			movhlps  xmm0, xmm0 // wwww 1 cycle (1 issue)
-
-			addps    xmm5, xmm4 // 3 cycles (1 issue)
-			mulps    xmm7, xmm0 // translation * weight 4 cycles (1 issue)
-
-			// 2 cycle stall waiting for xmm5 
-			addps    xmm5, xmm6 // 3 cycles (1 issue)
-
-			// 3 cycle stall waiting for xmm5
-			addps    xmm7, xmm5 // 3 cycles (1 issue)
-
-			// 3 cycle stall waiting for xmm7
-			addps    xmm3, xmm7
-			
-			// 3 cycle stall waiting for xmm3
-			movaps  [edi], xmm3
-		}
-#else
-#error "implement me!"
-#endif
-		
-		vertices += 8;
-		boneIndices += 2;
-		outVerts += 4;
-	}
-}
-
-void SkinVerts1(
-	float *outVerts, 
-	const float *bones, 
-	const float *vertices,
-	const U16 *boneIndices,
-	int numVerts
-)
-{
-	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
-	RAD_ASSERT(IsAligned(bones, SIMDDriver::kAlignment));
-	RAD_ASSERT(IsAligned(vertices, SIMDDriver::kAlignment));
-	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::kAlignment));
-
-	for (int i = 0; i < numVerts; ++i)
-	{
-		const float *bone0 = bones + boneIndices[0]*SIMDDriver::kNumBoneFloats;
-#if defined(RAD_OPT_WINX)
-		__asm {
-			mov      esi, vertices   // 1 cycles (issued same cycle)
-			mov      edi, outVerts   // 1 cycles (issued same cycle)
-			mov      edx, bone0      // 1 cycles (issued same cycle)
-
-			movaps   xmm4, [esi] // xyzw 2 cycles (1 issue)
-			movaps   xmm5, [esi] // xyzw 2 cycles (1 issue)
-			movaps   xmm6, [esi] // xyzw 2 cycles (1 issue)
-			movaps   xmm0, [edx] // 2 cycles (1 issue)
-			movaps   xmm1, [edx+0x10] // 2 cycles (1 issue)
-			movaps   xmm2, [edx+0x20] // 2 cycles (1 issue)
-			movaps   xmm3, [edx+0x30] // 2 cycles (1 issue)
-
-			unpcklps xmm4, xmm4 // xxyy (xmm4 ready) 1 cycle (1 issue)
-			unpcklps xmm5, xmm5 // xxyy (xmm5 ready) 1 cycle (1 issue)
-			unpckhps xmm6, xmm6 // zzww (xmm6 ready) 1 cycle (1 issue)
-			
-			movlhps  xmm4, xmm4 // xxxx 1 cycle (1 issue)
-			movhlps  xmm5, xmm5 // yyyy 1 cycle (1 issue)
-			movlhps  xmm6, xmm6 // zzzz 1 cycle (1 issue)
-
-			mulps    xmm4, xmm0 // xxxx * row0 4 cycles (1 issue)
-			mulps    xmm5, xmm1 // yyyy * row1 4 cycles (1 issue)
-			mulps    xmm6, xmm2 // zzzz * row2 4 cycles (1 issue)
-		
-			// 1 cycle stall waiting for xmm4
-			addps    xmm3, xmm4 // 3 cycles (1 issue)
-			
-			// 2 cycle stall waiting for xmm6 
-			addps    xmm5, xmm6 // 3 cycles (1 issue)
-
-			// 3 cycle stall waiting for xmm5
-			addps    xmm3, xmm5 // 3 cycles (1 issue)
-			
-			// 3 cycle stall waiting for xmm3
-			movaps  [edi], xmm3
-		}
-#else
-#error "implement me!"
-#endif
-
-		vertices += 4;
+		outVerts += 12;
 		++boneIndices;
-		outVerts += 4;
 	}
 }
 
@@ -514,10 +154,8 @@ const SIMDDriver *SIMD_sse2_bind()
 {
 	static SIMDDriver d;
 
-	/*d.SkinVerts[3] = &SkinVerts4;
-	d.SkinVerts[2] = &SkinVerts3;
-	d.SkinVerts[1] = &SkinVerts2;
-	d.SkinVerts[0] = &SkinVerts1;*/
+	d = *SIMD_ref_bind();
+	d.SkinVerts[0][0] = &SkinVerts1B1T;
 
 	string::cpy(d.name, "SIMD_sse2");
 	return &d;
