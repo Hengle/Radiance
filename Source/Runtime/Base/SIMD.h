@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Base.h"
+#include <iostream>
 
 //! Implements single instruction multiple data optimized routines
 struct SIMDDriver {
@@ -15,6 +16,10 @@ struct SIMDDriver {
 		kAlignment = 16,
 		kNumBoneFloats = 16
 	};
+
+	SIMDDriver() {
+		name[0] = 0;
+	}
 
 	static void Select();
 
@@ -41,4 +46,8 @@ struct SIMDDriver {
 };
 
 extern RADRT_API const SIMDDriver *SIMD;
+
+#if defined(RAD_OPT_TOOLS)
+void SIMDSkinTest(std::ostream &out);
+#endif
 

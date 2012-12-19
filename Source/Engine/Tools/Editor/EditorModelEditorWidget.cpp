@@ -32,6 +32,12 @@
 #include <QtGui/QMessageBox>
 #include <Runtime/Base/SIMD.h>
 
+#define VALIDATE_SIMD_SKIN
+
+#if defined(VALIDATE_SIMD_SKIN)
+const SIMDDriver *SIMD_ref_bind();
+#endif
+
 using namespace r;
 
 namespace tools {
@@ -43,18 +49,21 @@ ModelEditorWidget::ModelEditorWidget(
 	const pkg::Asset::Ref &asset,
 	bool editable,
 	QWidget *parent
-) : QWidget(parent), m_asset(asset), m_tree(0), m_glw(0), m_skVerts(0) {
-	
+) : QWidget(parent), m_asset(asset), m_tree(0), m_glw(0) {
+	m_skVerts[0] = 0;
+	m_skVerts[1] = 0;
 }
 
 ModelEditorWidget::~ModelEditorWidget() {
-	if (m_skVerts) {
-		RAD_ASSERT(m_skModel);
-		for (int i = 0; i < m_skModel->numMeshes; ++i) {
-			zone_free(m_skVerts[i]);
-		}
+	for (int i = 0; i < 2; ++i) {
+		if (m_skVerts[i]) {
+			RAD_ASSERT(m_skModel);
+			for (int k = 0; k < m_skModel->numMeshes; ++k) {
+				zone_free(m_skVerts[i][k]);
+			}
 
-		delete [] m_skVerts;
+			delete [] m_skVerts[i];
+		}
 	}
 }
 
@@ -158,11 +167,18 @@ bool ModelEditorWidget::Load() {
 		m_tree->addTopLevelItems(items);
 		m_tree->setHeaderLabel("AnimStates");
 
-		m_skVerts = new float*[m_skModel->numMeshes];
+		m_skVerts[0] = new float*[m_skModel->numMeshes];
+
+#if defined(VALIDATE_SIMD_SKIN)
+		m_skVerts[1] = new float*[m_skModel->numMeshes];
+#endif
 
 		for (int i = 0; i < m_skModel->numMeshes; ++i) {
 			const ska::DMesh *m = m_skModel->DMesh(i);
-			m_skVerts[i] = (float*)safe_zone_malloc(ZTools, m->NumVertexFloats() * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
+			m_skVerts[0][i] = (float*)safe_zone_malloc(ZTools, m->NumVertexFloats() * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
+#if defined(VALIDATE_SIMD_SKIN)
+			m_skVerts[1][i] = (float*)safe_zone_malloc(ZTools, m->NumVertexFloats() * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
+#endif
 		}
 
 	} else {
@@ -380,10 +396,59 @@ void ModelEditorWidget::DrawSkaNormals(bool normals, bool tangents) {
 	for (int i = 0; i < m_skModel->numMeshes; ++i) {
 		const ska::DMesh *m = m_skModel->DMesh(i);
 
-		m_skModel->SkinToBuffer(i, m_skVerts[i]);
+		m_skModel->SkinToBuffer(SIMD, i, m_skVerts[0][i]);
+#if defined(VALIDATE_SIMD_SKIN)
+		static const SIMDDriver *SIMD_ref = SIMD_ref_bind();
+		m_skModel->SkinToBuffer(SIMD_ref, i, m_skVerts[1][i]);
+		const float *src = m_skVerts[0][i];
+		const float *cmp = m_skVerts[1][i];
+		for (int z = 0; z < (int)m->totalVerts; ++z) {
+			float d[4];
+
+			for (int j = 0; j < 3; ++j)
+				d[j] = math::Abs(src[j]-cmp[j]);
+
+			if (d[0] > 0.1f ||
+				d[1] > 0.1f ||
+				d[2] > 0.1f) {
+					int b = 0; // vertex
+			}
+
+			src += 4;
+			cmp += 4;
+
+			for (int j = 0; j < 3; ++j)
+				d[j] = math::Abs(src[j]-cmp[j]);
+
+			if (d[0] > 0.1f ||
+				d[1] > 0.1f ||
+				d[2] > 0.1f) {
+					int b = 0; // normal
+			}
+
+			src += 4;
+			cmp += 4;
+
+			for (int k = 0; k < m->numChannels; ++k) {
+				for (int j = 0; j < 4; ++j) {
+					d[j] = math::Abs(src[j]-cmp[j]);
+				}
+
+				if (d[0] > 0.1f ||
+					d[1] > 0.1f ||
+					d[2] > 0.1f ||
+					d[3] != 0.f) {
+						int b = 0; // tangent
+				}
+
+				src += 4;
+				cmp += 4;
+			}
+		}
+#endif
 
 		const int kNumVertexFloats = m->NumVertexFloats();
-		const float *verts = (const float*)m_skVerts[i];
+		const float *verts = (const float*)m_skVerts[0][i];
 
 		for (int i = 0; i < (int)m->totalVerts; ++i) {
 			Vec3 v(verts[0], verts[1], verts[2]);

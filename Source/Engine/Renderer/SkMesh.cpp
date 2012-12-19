@@ -7,7 +7,6 @@
 #include "SkMesh.h"
 #include "Sources.h"
 #include "../Assets/SkModelParser.h"
-#include <Runtime/Base/SIMD.h>
 #include <limits>
 #undef max
 
@@ -170,12 +169,12 @@ void SkMesh::Skin(int mesh) {
 	m.m.SwapChain();
 	Mesh::StreamPtr::Ref vb = m.m.Map(m.vertStreamIdx);
 
-	SkinToBuffer(mesh, vb->ptr);
+	SkinToBuffer(SIMD, mesh, vb->ptr);
 
 	vb.reset();
 }
 
-void SkMesh::SkinToBuffer(int mesh, void *buffer) {
+void SkMesh::SkinToBuffer(const SIMDDriver *driver, int mesh, void *buffer) {
 	DefMesh &m = m_meshes[mesh];
 	
 	const float *srcVerts = m.dm->verts;
@@ -190,7 +189,7 @@ void SkMesh::SkinToBuffer(int mesh, void *buffer) {
 		RAD_ASSERT(m.dm->numChannels < 2);
 
 		if (numVerts > 0) {
-			SIMD->SkinVerts[i][m.dm->numChannels-1](
+			driver->SkinVerts[i][m.dm->numChannels-1](
 				outVerts,
 				bones,
 				srcVerts,

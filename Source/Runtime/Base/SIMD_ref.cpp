@@ -129,12 +129,13 @@ void SkinVerts(
 		outVerts += 4;
 
 		for (int k = 0; k < numTangents; ++k) {
-			ZeroVec4(acc);
+			ZeroVec3(acc);
 
 			for (int b = 0; b < numBones; ++b) {
 				const float *bone = &bones[boneIndices[b] * SIMDDriver::kNumBoneFloats];
 				Transform3x3(out, bone, vertices);
-				AddVec4(acc, acc, out);
+				AddVec3(acc, acc, out);
+				acc[3] = out[3];
 				vertices += 4;
 			}
 
@@ -230,6 +231,9 @@ void SkinVerts4B2T(
 
 const SIMDDriver *SIMD_ref_bind() {
 	static SIMDDriver d;
+
+	if (d.name[0])
+		return &d;
 
 	d.SkinVerts[0][0] = &SkinVerts1B1T;
 	d.SkinVerts[0][1] = &SkinVerts1B2T;

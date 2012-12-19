@@ -14,8 +14,7 @@ inline void *zone_realloc(
 	AddrSize size,
 	AddrSize headerSize,
 	AddrSize alignment
-)
-{
+) {
 	Zone *z = p ? Zone::FromPtr(p) : &zone;
 	RAD_ASSERT(z==&zone);
 	return z->Realloc(p, size, headerSize, alignment);
@@ -26,8 +25,7 @@ inline void *zone_malloc(
 	AddrSize size,
 	AddrSize headerSize,
 	AddrSize alignment
-)
-{
+) {
 	return zone.Realloc(0, size, headerSize, alignment);
 }
 
@@ -37,8 +35,7 @@ inline void *zone_calloc(
 	AddrSize elmSize,
 	AddrSize headerSize,
 	AddrSize alignment
-)
-{
+) {
 	void *p = zone_malloc(zone, numElms*elmSize, headerSize, alignment);
 	if (p)
 		memset(p, 0, numElms*elmSize);
@@ -51,8 +48,7 @@ inline void *safe_zone_realloc(
 	AddrSize size,
 	AddrSize headerSize,
 	AddrSize alignment
-)
-{
+) {
 	p = zone_realloc(zone, p, size, headerSize, alignment);
 	RAD_OUT_OF_MEM(p||!(size+headerSize));
 	return p;
@@ -63,8 +59,7 @@ inline void *safe_zone_malloc(
 	AddrSize size,
 	AddrSize headerSize,
 	AddrSize alignment
-)
-{
+) {
 	void *p = zone_malloc(zone, size, headerSize, alignment);
 	RAD_OUT_OF_MEM(p||!(size+headerSize));
 	return p;
@@ -76,15 +71,13 @@ inline void *safe_zone_calloc(
 	AddrSize elmSize,
 	AddrSize headerSize,
 	AddrSize alignment
-)
-{
+) {
 	void *p = zone_calloc(zone, numElms, elmSize, headerSize, alignment);
 	RAD_OUT_OF_MEM(p||!(numElms*elmSize+headerSize));
 	return p;
 }
 
-inline void zone_free(void *p)
-{
+inline void zone_free(void *p) {
 	Zone::Delete(p);
 }
 

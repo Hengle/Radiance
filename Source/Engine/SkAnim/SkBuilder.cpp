@@ -1201,7 +1201,7 @@ struct SkTriModel {
 				for (int k = 0; k < ska::kMaxUVChannels; ++k) {
 					uvs[k].push_back(v.st[k]);
 					for (int j = 0; j <= i; ++j) {
-						Vec4 z(v.tangent[k] * v.weights[j].weight);
+						Vec4 z(Vec3(v.tangent[k]) * v.weights[j].weight, v.tangent[k][3]);
 						weightedTangents[k].push_back(z);
 					}
 				}

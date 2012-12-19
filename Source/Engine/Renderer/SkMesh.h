@@ -10,6 +10,7 @@
 #include "../SkAnim/SkControllers.h"
 #include "../Packages/PackagesDef.h"
 #include "../Assets/SkModelParser.h"
+#include <Runtime/Base/SIMD.h>
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/PushPack.h>
 
@@ -31,7 +32,7 @@ public:
 	// skin verts, uploads. does nothing if gpu skin
 	void Skin(int mesh);
 
-	void SkinToBuffer(int mesh, void *buffer);
+	void SkinToBuffer(const SIMDDriver *driver, int mesh, void *buffer);
 
 	RAD_DECLARE_READONLY_PROPERTY(SkMesh, numMeshes, int);
 	RAD_DECLARE_READONLY_PROPERTY(SkMesh, ska, ska::Ska*);

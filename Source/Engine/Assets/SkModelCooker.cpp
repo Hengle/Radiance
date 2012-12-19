@@ -14,7 +14,7 @@ using namespace pkg;
 
 namespace asset {
 
-SkModelCooker::SkModelCooker() : Cooker(3) {
+SkModelCooker::SkModelCooker() : Cooker(4) {
 }
 
 SkModelCooker::~SkModelCooker() {

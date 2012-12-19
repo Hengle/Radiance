@@ -19,15 +19,13 @@
 	#define RAD_OPT_ZONE_MEMGUARD
 #endif
 
-enum
-{
+enum {
 	DefaultZoneAlignment = sizeof(double)
 };
 
 void aligned_free(void*);
 
-class Zone
-{
+class Zone {
 public:
 	Zone(void*, const char *_name) :
 		 m_parent(0),
@@ -84,8 +82,7 @@ public:
 	void Inc(AddrSize size, AddrSize overhead);
 	void Dec(AddrSize size, AddrSize overhead);
 
-	static void Delete(void *p)
-	{
+	static void Delete(void *p) {
 		if (!p)
 			return;
 		U8 *pp = (U8*)p;
@@ -95,8 +92,7 @@ public:
 		zone->_Delete(pp);
 	}
 
-	static AddrSize AllocSize(void *p)
-	{
+	static AddrSize AllocSize(void *p) {
 		if (!p)
 			return 0;
 		U8 *pp = (U8*)p;
@@ -105,8 +101,7 @@ public:
 		return *reinterpret_cast<AddrSize*>(pp);
 	}
 
-	static AddrSize HeaderSize(void *p)
-	{
+	static AddrSize HeaderSize(void *p) {
 		if (!p)
 			return 0;
 		U8 *pp = (U8*)p;
@@ -115,8 +110,7 @@ public:
 		return (AddrSize)*reinterpret_cast<U16*>(pp);
 	}
 
-	static Zone *FromPtr(void *p)
-	{
+	static Zone *FromPtr(void *p) {
 		if (!p)
 			return 0;
 #if defined(RAD_OPT_ZONE_MEMGUARD)
@@ -155,8 +149,7 @@ private:
 	RAD_DECLARE_GET(totalLarge, AddrSize);
 	RAD_DECLARE_GET(totalHigh, AddrSize);
 
-	enum
-	{
+	enum {
 #if defined (RAD_OPT_ZONE_MEMGUARD)
 		EHeaderSize = sizeof(U16) + sizeof(Zone*) + sizeof(AddrSize) + sizeof(void*)
 #else
@@ -164,11 +157,9 @@ private:
 #endif
 	};
 
-	void _Delete(U8 *p)
-	{
+	void _Delete(U8 *p) {
 		--m_numAllocs;
-		m_numBytes -= *reinterpret_cast<AddrSize*>(p+sizeof(Zone*)+2);
-		m_overhead -= EHeaderSize + *reinterpret_cast<U16*>(p);
+		Dec(*reinterpret_cast<AddrSize*>(p+sizeof(Zone*)+2), EHeaderSize + *reinterpret_cast<U16*>(p));
 		aligned_free(p);
 	}
 
@@ -247,8 +238,7 @@ void *safe_zone_calloc(
 void zone_free(void *p);
 
 template <typename T, typename Z>
-class zone_allocator
-{
+class zone_allocator {
 public:
 	typedef Z zone_type;
 	typedef T value_type;
@@ -271,8 +261,7 @@ public:
 	static const_pointer address(const_reference s) { return &s; }
 	static size_type max_size()	{ return (std::numeric_limits<size_type>::max)(); }
 	static void construct(const pointer ptr, const value_type & t) { new (ptr) T(t); }
-	static void destroy(const pointer ptr)
-	{
+	static void destroy(const pointer ptr) {
 		ptr->~T();
 		(void) ptr;
 	}
@@ -280,15 +269,13 @@ public:
 	bool operator==(const zone_allocator &) const { return true; }
 	bool operator!=(const zone_allocator &) const { return false; }
 
-	static pointer allocate(const size_type n)
-	{
+	static pointer allocate(const size_type n) {
 		return (pointer)safe_zone_malloc(zone_type::Get(), n*sizeof(T));
 	}
 
 	static pointer allocate(const size_type n, const void * const) { return allocate(n); }
 
-	static void deallocate(const pointer ptr, const size_type n)
-	{
+	static void deallocate(const pointer ptr, const size_type n) {
 #ifdef BOOST_NO_PROPER_STL_DEALLOCATE
 		if (ptr == 0 || n == 0)
 			return;
@@ -298,8 +285,7 @@ public:
 };
 
 template <typename Z>
-class zone_allocator<void, Z>
-{
+class zone_allocator<void, Z> {
 public:
 	typedef Z zone_type;
 	typedef void value_type;

@@ -74,7 +74,7 @@ private:
 	QCheckBox *m_wireframe;
 	QCheckBox *m_normals;
 	QCheckBox *m_tangents;
-	float **m_skVerts;
+	float **m_skVerts[2];
 };
 
 } // editor

@@ -12,43 +12,35 @@
 #include <boost/thread/locks.hpp>
 
 #if defined(RAD_OVERLOAD_STD_NEW)
-void * RAD_ANSICALL operator new(size_t s, const std::nothrow_t&) throw()
-{
+void * RAD_ANSICALL operator new(size_t s, const std::nothrow_t&) throw() {
 	return operator new(s, ZUnknown);
 }
 
-void * RAD_ANSICALL operator new(size_t s)
-{
+void * RAD_ANSICALL operator new(size_t s) {
 	return operator new(s, std::nothrow);
 }
 
-void * RAD_ANSICALL operator new[](size_t s, const std::nothrow_t&) throw()
-{
+void * RAD_ANSICALL operator new[](size_t s, const std::nothrow_t&) throw() {
 	return operator new(s, std::nothrow);
 }
 
-void * RAD_ANSICALL operator new[](size_t s)
-{
+void * RAD_ANSICALL operator new[](size_t s) {
 	return operator new(s, std::nothrow);
 }
 
-void  RAD_ANSICALL operator delete(void *p, const std::nothrow_t&) throw()
-{
+void  RAD_ANSICALL operator delete(void *p, const std::nothrow_t&) throw() {
 	operator delete(p, ZUnknown);
 }
 
-void  RAD_ANSICALL operator delete(void *p)
-{
+void  RAD_ANSICALL operator delete(void *p) {
 	operator delete(p, std::nothrow);
 }
 
-void  RAD_ANSICALL operator delete[](void *p, const std::nothrow_t&) throw()
-{
+void  RAD_ANSICALL operator delete[](void *p, const std::nothrow_t&) throw() {
 	operator delete(p, std::nothrow);
 }
 
-void  RAD_ANSICALL operator delete[](void *p)
-{
+void  RAD_ANSICALL operator delete[](void *p) {
 	operator delete(p, std::nothrow);
 }
 #endif
@@ -80,24 +72,19 @@ namespace {
 static U8 hashMem[sizeof(ZonePtrHash)];
 static U8 mutexMem[sizeof(ZonePtrMutex)];
 
-struct StaticHash
-{
-	StaticHash() : init(true), destructed(false)
-	{
+struct StaticHash {
+	StaticHash() : init(true), destructed(false) {
 		hash = new (hashMem) ZonePtrHash();
 		mutex = new (mutexMem) ZonePtrMutex();
 	};
 
-	~StaticHash()
-	{
+	~StaticHash() {
 		destructed = true;
 		CheckFree();
 	}
 
-	void CheckFree()
-	{
-		if (destructed && hash->empty())
-		{
+	void CheckFree() {
+		if (destructed && hash->empty()) {
 			hash->~set();
 			mutex->~mutex();
 			init = false;
@@ -110,8 +97,7 @@ struct StaticHash
 	ZonePtrMutex *mutex;
 };
 
-StaticHash &PtrHash()
-{
+StaticHash &PtrHash() {
 	static StaticHash s_hash;
 	return s_hash;
 }
@@ -120,8 +106,7 @@ StaticHash &PtrHash()
 
 #endif
 
-void * RAD_ANSICALL operator new(size_t s, Zone &zone) throw()
-{
+void * RAD_ANSICALL operator new(size_t s, Zone &zone) throw() {
 
 #if defined(RAD_OVERLOAD_STD_NEW)
 	void *p = safe_zone_malloc(zone, s, 0, DefaultZoneAlignment);
@@ -138,8 +123,7 @@ void * RAD_ANSICALL operator new(size_t s, Zone &zone) throw()
 	return p;
 }
 
-void * RAD_ANSICALL operator new[](size_t s, Zone &zone) throw()
-{
+void * RAD_ANSICALL operator new[](size_t s, Zone &zone) throw() {
 #if defined(RAD_OVERLOAD_STD_NEW)
 	return operator new (s, zone);
 #else
@@ -147,11 +131,9 @@ void * RAD_ANSICALL operator new[](size_t s, Zone &zone) throw()
 #endif
 }
 
-void  RAD_ANSICALL operator delete(void *p, Zone &) throw()
-{
+void  RAD_ANSICALL operator delete(void *p, Zone &) throw() {
 #if defined(RAD_OVERLOAD_STD_NEW)
-	if (p)
-	{
+	if (p) {
 #if defined(RAD_OPT_ZONE_PTR_HASH)
 		PtrHash().mutex->lock();
 		ZonePtrHash::iterator it = PtrHash().hash->find(p);
@@ -174,8 +156,7 @@ void  RAD_ANSICALL operator delete(void *p, Zone &) throw()
 #endif
 }
 
-void RAD_ANSICALL operator delete[](void *p, Zone &z) throw()
-{
+void RAD_ANSICALL operator delete[](void *p, Zone &z) throw() {
 #if defined(RAD_OVERLOAD_STD_NEW)
 	operator delete(p, z);
 #else
@@ -196,8 +177,7 @@ Mutex s_m;
 RAD_ZONE_DEF(RADRT_API, ZUnknown, "Unknown", 0);
 RAD_ZONE_DEF(RADRT_API, ZRuntime, "Runtime", 0);
 
-void Zone::Init()
-{
+void Zone::Init() {
 #if defined(RAD_OPT_ZONE_MEMGUARD)
 	m_frontGuard[0]=RAD_MEM_GUARD;
 	m_frontGuard[1]=RAD_MEM_GUARD;
@@ -205,8 +185,7 @@ void Zone::Init()
 	m_backGuard[1]=RAD_MEM_GUARD;
 #endif
 
-	if (m_parent)
-	{
+	if (m_parent) {
 #if defined(NEED_LOCKS)
 		Lock l(s_m);
 #endif
@@ -215,8 +194,7 @@ void Zone::Init()
 	}
 }
 
-void Zone::Inc(AddrSize size, AddrSize overhead)
-{
+void Zone::Inc(AddrSize size, AddrSize overhead) {
 	m_numBytes += size;
 	m_overhead += overhead;
 	m_high = (AddrSize)std::max(m_numBytes, m_high);
@@ -224,18 +202,15 @@ void Zone::Inc(AddrSize size, AddrSize overhead)
 	m_large = (AddrSize)std::max(m_large, (AddrSize)size);
 }
 
-void Zone::Dec(AddrSize size, AddrSize overhead)
-{
+void Zone::Dec(AddrSize size, AddrSize overhead) {
 	m_numBytes -= size;
 	m_overhead -= overhead;
 }
 
-void *Zone::Realloc(void *ptr, size_t size, AddrSize headerSize, AddrSize alignment)
-{
+void *Zone::Realloc(void *ptr, size_t size, AddrSize headerSize, AddrSize alignment) {
 	RAD_ASSERT(headerSize <= std::numeric_limits<U16>::max());
 #if defined(RAD_OPT_ZONE_MEMGUARD)
-	if (ptr)
-	{
+	if (ptr) {
 		RAD_VERIFY(FromPtr(ptr) == this);
 	}
 #endif
@@ -247,8 +222,7 @@ void *Zone::Realloc(void *ptr, size_t size, AddrSize headerSize, AddrSize alignm
 	U8 *pptr = (U8*)ptr - EHeaderSize;
 	U8 *p = (U8*)aligned_realloc(ptr ? pptr : 0, size, EHeaderSize+headerSize, alignment);
 
-	if (ptr && (p||!size))
-	{
+	if (ptr && (p||!size)) {
 		if (!p)
 			--m_numAllocs;
 
@@ -259,19 +233,14 @@ void *Zone::Realloc(void *ptr, size_t size, AddrSize headerSize, AddrSize alignm
 		m_overhead -= oldHeaderSize+EHeaderSize;
 	}
 
-	if (p)
-	{
-		size += EHeaderSize + headerSize; // count this as well.
+	if (p) {
+		AddrSize actualSize = size + EHeaderSize + headerSize; // count this as well.
 
 		if (!ptr) // make another alloc.
 			++m_numAllocs;
 
-		m_numBytes += size;
-		m_overhead += EHeaderSize + headerSize;
-		m_high = (AddrSize)std::max(m_numBytes, m_high);
-		m_small = (AddrSize)std::min(m_small, (AddrSize)size);
-		m_large = (AddrSize)std::max(m_large, (AddrSize)size);
-
+		Inc(actualSize, EHeaderSize + headerSize);
+		
 		*reinterpret_cast<U16*>(p) = (U16)headerSize;
 		p += sizeof(U16);
 		*reinterpret_cast<Zone**>(p) = this;
@@ -288,79 +257,67 @@ void *Zone::Realloc(void *ptr, size_t size, AddrSize headerSize, AddrSize alignm
 	return p;
 }
 
-AddrSize Zone::RAD_IMPLEMENT_GET(totalBytes)
-{
+AddrSize Zone::RAD_IMPLEMENT_GET(totalBytes) {
 #if defined(NEED_LOCKS)
 	Lock l(s_m);
 #endif
 	AddrSize total = m_numBytes;
-	for (Zone *z = m_head; z; z = z->next)
-	{
+	for (Zone *z = m_head; z; z = z->next) {
 		total += z->totalBytes;
 	}
 	return total;
 }
 
-AddrSize Zone::RAD_IMPLEMENT_GET(totalOverhead)
-{
+AddrSize Zone::RAD_IMPLEMENT_GET(totalOverhead) {
 #if defined(NEED_LOCKS)
 	Lock l(s_m);
 #endif
 	AddrSize total = m_overhead;
-	for (Zone *z = m_head; z; z = z->next)
-	{
+	for (Zone *z = m_head; z; z = z->next) {
 		total += z->m_overhead;
 	}
 	return total;
 }
 
-AddrSize Zone::RAD_IMPLEMENT_GET(totalCount)
-{
+AddrSize Zone::RAD_IMPLEMENT_GET(totalCount) {
 #if defined(NEED_LOCKS)
 	Lock l(s_m);
 #endif
 	AddrSize total = m_numAllocs;
-	for (Zone *z = m_head; z; z = z->next)
-	{
+	for (Zone *z = m_head; z; z = z->next) {
 		total += z->totalCount;
 	}
 	return total;
 }
 
-AddrSize Zone::RAD_IMPLEMENT_GET(totalSmall)
-{
+AddrSize Zone::RAD_IMPLEMENT_GET(totalSmall) {
 #if defined(NEED_LOCKS)
 	Lock l(s_m);
 #endif
 	AddrSize total = m_small;
-	for (Zone *z = m_head; z; z = z->next)
-	{
+	for (Zone *z = m_head; z; z = z->next) {
 		total = std::min<AddrSize>(z->totalSmall, total);
 	}
 	return total;
 }
 
-AddrSize Zone::RAD_IMPLEMENT_GET(totalLarge)
-{
+AddrSize Zone::RAD_IMPLEMENT_GET(totalLarge) {
 #if defined(NEED_LOCKS)
 	Lock l(s_m);
 #endif
 	AddrSize total = m_large;
-	for (Zone *z = m_head; z; z = z->next)
-	{
+	for (Zone *z = m_head; z; z = z->next) {
 		total = std::max<AddrSize>(z->totalLarge, total);
 	}
 	return total;
 }
 
-AddrSize Zone::RAD_IMPLEMENT_GET(totalHigh)
-{
+AddrSize Zone::RAD_IMPLEMENT_GET(totalHigh) {
 #if defined(NEED_LOCKS)
 	Lock l(s_m);
 #endif
 	AddrSize total = m_high;
-	for (Zone *z = m_head; z; z = z->next)
-	{
+	for (Zone *z = m_head; z; z = z->next) {
 		total = std::max<AddrSize>(z->totalHigh, total);
 	}
 	return total;
@@ -368,29 +325,24 @@ AddrSize Zone::RAD_IMPLEMENT_GET(totalHigh)
 
 #if defined (RAD_OPT_ZONE_MEMGUARD)
 
-void Zone::CheckMemGuards(void *ptr)
-{
+void Zone::CheckMemGuards(void *ptr) {
 	U8 *pp = (U8*)ptr;
 	int *px = reinterpret_cast<int*>(pp-sizeof(void*));
-	for (size_t i = 0; i < sizeof(void*)/sizeof(int); ++i)
-	{
+	for (size_t i = 0; i < sizeof(void*)/sizeof(int); ++i) {
 		// if you assert here, you have memory corruption.
 		RAD_VERIFY_MSG(*(px++) == RAD_MEM_GUARD, "Memory Corruption Detected");
 	}
 }
 
-void *Zone::WriteMemGuards(void *ptr)
-{
+void *Zone::WriteMemGuards(void *ptr) {
 	int *px = reinterpret_cast<int*>(ptr);
-	for (size_t i = 0; i < sizeof(void*)/sizeof(int); ++i)
-	{
+	for (size_t i = 0; i < sizeof(void*)/sizeof(int); ++i) {
 		*(px++) = RAD_MEM_GUARD;
 	}
 	return ((U8*)ptr) + sizeof(void*);
 }
 
-void Zone::CheckGuards()
-{
+void Zone::CheckGuards() {
 	RAD_VERIFY_MSG(m_frontGuard[0]==RAD_MEM_GUARD, "Memory Corruption Detected");
 	RAD_VERIFY_MSG(m_frontGuard[1]==RAD_MEM_GUARD, "Memory Corruption Detected");
 	RAD_VERIFY_MSG(m_backGuard[0]==RAD_MEM_GUARD, "Memory Corruption Detected");
