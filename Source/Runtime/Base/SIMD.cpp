@@ -59,7 +59,7 @@ struct SkinTestData {
 		memset(bones, 0, zone_malloc_size(bones));
 		vertices = (float*)safe_zone_malloc(ZRuntime, sizeof(float)*(8+(4*((int)numChannels)))*numVerts*bonesPerVert, 0, SIMDDriver::kAlignment);
 		memset(vertices, 0, zone_malloc_size(vertices));
-		boneIndices = (U16*)safe_zone_malloc(ZRuntime, sizeof(U16)*numVerts, 0, SIMDDriver::kAlignment);
+		boneIndices = (U16*)safe_zone_malloc(ZRuntime, sizeof(U16)*numVerts*bonesPerVert, 0, SIMDDriver::kAlignment);
 
 		for (int i = 0; i < numVerts; ++i)
 			boneIndices[i] = (U16)(rand() % numBones);
@@ -118,6 +118,36 @@ void SIMDSkinTest(std::ostream &out) {
 	SIMD->SkinVerts[0][1](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
 	simdTime.Stop();
 	out << "(1B2T) " << ref->name << ": " << VertsPerSecond(refTime, kNumVerts) << " (vps), " << SIMD->name << ": " << VertsPerSecond(simdTime, kNumVerts) << " (vps)." << std::endl;
+
+	// 2B1T
+	skinData.Create(kNumVerts, 2, kNumBones, 1);
+	refTime.Start();
+	ref->SkinVerts[1][0](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+	refTime.Stop();
+	simdTime.Start();
+	SIMD->SkinVerts[1][0](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+	simdTime.Stop();
+	out << "(2B1T) " << ref->name << ": " << VertsPerSecond(refTime, kNumVerts) << " (vps), " << SIMD->name << ": " << VertsPerSecond(simdTime, kNumVerts) << " (vps)." << std::endl;
+
+	// 2B2T
+	skinData.Create(kNumVerts, 2, kNumBones, 2);
+	refTime.Start();
+	ref->SkinVerts[1][1](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+	refTime.Stop();
+	simdTime.Start();
+	SIMD->SkinVerts[1][1](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+	simdTime.Stop();
+	out << "(2B2T) " << ref->name << ": " << VertsPerSecond(refTime, kNumVerts) << " (vps), " << SIMD->name << ": " << VertsPerSecond(simdTime, kNumVerts) << " (vps)." << std::endl;
+
+	// 3B1T
+	skinData.Create(kNumVerts, 3, kNumBones, 1);
+	refTime.Start();
+	ref->SkinVerts[2][0](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+	refTime.Stop();
+	simdTime.Start();
+	SIMD->SkinVerts[2][0](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+	simdTime.Stop();
+	out << "(3B1T) " << ref->name << ": " << VertsPerSecond(refTime, kNumVerts) << " (vps), " << SIMD->name << ": " << VertsPerSecond(simdTime, kNumVerts) << " (vps)." << std::endl;
 
 	out << "******************************" << std::endl;
 }
