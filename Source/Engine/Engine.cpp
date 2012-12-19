@@ -48,7 +48,7 @@ bool Engine::PreInit() {
 	COut(C_Info) << SIMD->name << " driver bound." << std::endl;
 
 #if defined(RAD_OPT_TOOLS)
-	SIMDSkinTest(COut(C_Info));
+//	SIMDSkinTest(COut(C_Info));
 #endif
 
 	const char *baseDir = App::Get()->ArgArg("-base");
