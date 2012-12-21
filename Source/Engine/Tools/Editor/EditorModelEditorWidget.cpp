@@ -400,6 +400,7 @@ void ModelEditorWidget::DrawSkaNormals(bool normals, bool tangents) {
 
 		m_skModel->SkinToBuffer(SIMD, i, m_skVerts[0][i]);
 #if defined(VALIDATE_SIMD_SKIN)
+		// Compare the C reference implementation with optimized path:
 		static const SIMDDriver *SIMD_ref = SIMD_ref_bind();
 		m_skModel->SkinToBuffer(SIMD_ref, i, m_skVerts[1][i]);
 		const float *src = m_skVerts[0][i];
@@ -413,7 +414,7 @@ void ModelEditorWidget::DrawSkaNormals(bool normals, bool tangents) {
 			if (d[0] > 0.1f ||
 				d[1] > 0.1f ||
 				d[2] > 0.1f) {
-					int b = 0; // vertex
+					int b = 0; // bad vertex
 			}
 
 			src += 4;
@@ -425,7 +426,7 @@ void ModelEditorWidget::DrawSkaNormals(bool normals, bool tangents) {
 			if (d[0] > 0.1f ||
 				d[1] > 0.1f ||
 				d[2] > 0.1f) {
-					int b = 0; // normal
+					int b = 0; // bad normal
 			}
 
 			src += 4;
@@ -440,7 +441,7 @@ void ModelEditorWidget::DrawSkaNormals(bool normals, bool tangents) {
 					d[1] > 0.1f ||
 					d[2] > 0.1f ||
 					d[3] != 0.f) {
-						int b = 0; // tangent
+						int b = 0; // bad tangent
 				}
 
 				src += 4;
