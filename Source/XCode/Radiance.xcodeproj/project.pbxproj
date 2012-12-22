@@ -922,10 +922,6 @@
 		33872E28167FFB15007448EE /* EditorModelEditorWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 33872E24167FFB15007448EE /* EditorModelEditorWidget.h */; };
 		33872E29167FFB15007448EE /* EditorModelEditorWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33872E25167FFB15007448EE /* EditorModelEditorWindow.cpp */; };
 		33872E2A167FFB15007448EE /* EditorModelEditorWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = 33872E26167FFB15007448EE /* EditorModelEditorWindow.h */; };
-		338A45FD15DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 338A45FC15DE8B9500B0B9B7 /* GameNetworkDef.h */; };
-		338A45FE15DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 338A45FC15DE8B9500B0B9B7 /* GameNetworkDef.h */; };
-		338A45FF15DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 338A45FC15DE8B9500B0B9B7 /* GameNetworkDef.h */; };
-		338A460015DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 338A45FC15DE8B9500B0B9B7 /* GameNetworkDef.h */; };
 		338CDF2215BC94A40058DFF5 /* Runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8867515B9AD160089BA08 /* Runtime.cpp */; };
 		338CDF2315BC94A40058DFF5 /* Base.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8867715B9AD1D0089BA08 /* Base.h */; };
 		338CDF2415BC94A40058DFF5 /* Endian.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8867815B9AD200089BA08 /* Endian.h */; };
@@ -2781,23 +2777,12 @@
 		33FA80C71633CA28002603A5 /* Tickable.h in Headers */ = {isa = PBXBuildFile; fileRef = 33836C1615B9CF590030EAEC /* Tickable.h */; };
 		33FA80C81633CA28002603A5 /* Types.h in Headers */ = {isa = PBXBuildFile; fileRef = 33836C1715B9CF590030EAEC /* Types.h */; };
 		33FA80C91633CA28002603A5 /* Zones.h in Headers */ = {isa = PBXBuildFile; fileRef = 33836C1915B9CF590030EAEC /* Zones.h */; };
-		33FA80CA1633CA28002603A5 /* GameNetworkDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 338A45FC15DE8B9500B0B9B7 /* GameNetworkDef.h */; };
 		33FA80CB1633CA28002603A5 /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB15791627E36900963A33 /* Tokenizer.h */; };
 		33FA80CC1633CA28002603A5 /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB157F1627E37B00963A33 /* Tokenizer.h */; };
 		33FA80CD1633CA28002603A5 /* DrawModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 33DB15891627E4BD00963A33 /* DrawModel.h */; };
 		33FA80CE1633CA28002603A5 /* RBackend.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FA7E821633B97C002603A5 /* RBackend.h */; };
 		33FA80CF1633CA28002603A5 /* RBackendDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FA7E831633B97C002603A5 /* RBackendDef.h */; };
 		33FA80D01633CA28002603A5 /* RGLBackend.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FA7E861633B97D002603A5 /* RGLBackend.h */; };
-		33FA82A91635489F002603A5 /* Tokenizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FA82A71635489E002603A5 /* Tokenizer.cpp */; };
-		33FA82AA1635489F002603A5 /* Tokenizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FA82A71635489E002603A5 /* Tokenizer.cpp */; };
-		33FA82AB1635489F002603A5 /* Tokenizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FA82A71635489E002603A5 /* Tokenizer.cpp */; };
-		33FA82AC1635489F002603A5 /* Tokenizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FA82A71635489E002603A5 /* Tokenizer.cpp */; };
-		33FA82AD1635489F002603A5 /* Tokenizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FA82A71635489E002603A5 /* Tokenizer.cpp */; };
-		33FA82AE1635489F002603A5 /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FA82A81635489E002603A5 /* Tokenizer.h */; };
-		33FA82AF1635489F002603A5 /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FA82A81635489E002603A5 /* Tokenizer.h */; };
-		33FA82B01635489F002603A5 /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FA82A81635489E002603A5 /* Tokenizer.h */; };
-		33FA82B11635489F002603A5 /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FA82A81635489E002603A5 /* Tokenizer.h */; };
-		33FA82B21635489F002603A5 /* Tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FA82A81635489E002603A5 /* Tokenizer.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -5340,14 +5325,12 @@
 				330A99AF15BCA101002A81EC /* StringTableParser.h in Headers */,
 				330A99B115BCA101002A81EC /* TextureParser.h in Headers */,
 				330A99B315BCA101002A81EC /* TypefaceParser.h in Headers */,
-				338A45FF15DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */,
 				33DB157C1627E36900963A33 /* Tokenizer.h in Headers */,
 				33DB15861627E37B00963A33 /* Tokenizer.h in Headers */,
 				33DB15901627E4BD00963A33 /* DrawModel.h in Headers */,
 				33FA7E891633B97D002603A5 /* RBackend.h in Headers */,
 				33FA7E8D1633B97D002603A5 /* RBackendDef.h in Headers */,
 				33FA7E9B1633B97D002603A5 /* RGLBackend.h in Headers */,
-				33FA82B01635489F002603A5 /* Tokenizer.h in Headers */,
 				33988F9F16684EA60018C3E6 /* Floors.h in Headers */,
 				33988FA816684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
 				33988FB216684F1C0018C3E6 /* BezierSpline.h in Headers */,
@@ -5721,14 +5704,12 @@
 				337AE76715BF214F00AD1617 /* StringTableParser.h in Headers */,
 				337AE76815BF214F00AD1617 /* TextureParser.h in Headers */,
 				337AE76915BF214F00AD1617 /* TypefaceParser.h in Headers */,
-				338A460015DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */,
 				33DB157D1627E36900963A33 /* Tokenizer.h in Headers */,
 				33DB15871627E37B00963A33 /* Tokenizer.h in Headers */,
 				33DB15911627E4BD00963A33 /* DrawModel.h in Headers */,
 				33FA7E8A1633B97D002603A5 /* RBackend.h in Headers */,
 				33FA7E8E1633B97D002603A5 /* RBackendDef.h in Headers */,
 				33FA7E9C1633B97D002603A5 /* RGLBackend.h in Headers */,
-				33FA82B11635489F002603A5 /* Tokenizer.h in Headers */,
 				33988FA016684EA60018C3E6 /* Floors.h in Headers */,
 				33988FA916684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
 				33988FB316684F1C0018C3E6 /* BezierSpline.h in Headers */,
@@ -6170,7 +6151,6 @@
 				33836C4615B9CF590030EAEC /* Tickable.h in Headers */,
 				33836C4815B9CF590030EAEC /* Types.h in Headers */,
 				33836C4C15B9CF590030EAEC /* Zones.h in Headers */,
-				338A45FD15DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */,
 				33DB15781627E31F00963A33 /* SceneFile.h in Headers */,
 				33DB157A1627E36900963A33 /* Tokenizer.h in Headers */,
 				33DB15841627E37B00963A33 /* Tokenizer.h in Headers */,
@@ -6185,7 +6165,6 @@
 				33FA7E871633B97D002603A5 /* RBackend.h in Headers */,
 				33FA7E8B1633B97D002603A5 /* RBackendDef.h in Headers */,
 				33FA7E991633B97D002603A5 /* RGLBackend.h in Headers */,
-				33FA82AE1635489F002603A5 /* Tokenizer.h in Headers */,
 				33988F9D16684EA60018C3E6 /* Floors.h in Headers */,
 				33988FA616684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
 				33988FB016684F1C0018C3E6 /* BezierSpline.h in Headers */,
@@ -6562,14 +6541,12 @@
 				33836C4715B9CF590030EAEC /* Tickable.h in Headers */,
 				33836C4915B9CF590030EAEC /* Types.h in Headers */,
 				33836C4D15B9CF590030EAEC /* Zones.h in Headers */,
-				338A45FE15DE8B9500B0B9B7 /* GameNetworkDef.h in Headers */,
 				33DB157B1627E36900963A33 /* Tokenizer.h in Headers */,
 				33DB15851627E37B00963A33 /* Tokenizer.h in Headers */,
 				33DB158F1627E4BD00963A33 /* DrawModel.h in Headers */,
 				33FA7E881633B97D002603A5 /* RBackend.h in Headers */,
 				33FA7E8C1633B97D002603A5 /* RBackendDef.h in Headers */,
 				33FA7E9A1633B97D002603A5 /* RGLBackend.h in Headers */,
-				33FA82AF1635489F002603A5 /* Tokenizer.h in Headers */,
 				33988F9E16684EA60018C3E6 /* Floors.h in Headers */,
 				33988FA716684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
 				33988FB116684F1C0018C3E6 /* BezierSpline.h in Headers */,
@@ -6943,14 +6920,12 @@
 				33FA80C71633CA28002603A5 /* Tickable.h in Headers */,
 				33FA80C81633CA28002603A5 /* Types.h in Headers */,
 				33FA80C91633CA28002603A5 /* Zones.h in Headers */,
-				33FA80CA1633CA28002603A5 /* GameNetworkDef.h in Headers */,
 				33FA80CB1633CA28002603A5 /* Tokenizer.h in Headers */,
 				33FA80CC1633CA28002603A5 /* Tokenizer.h in Headers */,
 				33FA80CD1633CA28002603A5 /* DrawModel.h in Headers */,
 				33FA80CE1633CA28002603A5 /* RBackend.h in Headers */,
 				33FA80CF1633CA28002603A5 /* RBackendDef.h in Headers */,
 				33FA80D01633CA28002603A5 /* RGLBackend.h in Headers */,
-				33FA82B21635489F002603A5 /* Tokenizer.h in Headers */,
 				33988FA116684EA60018C3E6 /* Floors.h in Headers */,
 				33988FAA16684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
 				33988FB416684F1C0018C3E6 /* BezierSpline.h in Headers */,
@@ -7054,7 +7029,7 @@
 		338381E515B7316B00A28CCF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0430;
+				LastUpgradeCheck = 0450;
 			};
 			buildConfigurationList = 338381E815B7316B00A28CCF /* Build configuration list for PBXProject "Radiance" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -7302,7 +7277,6 @@
 				33DB15EB162FA56A00963A33 /* WorldBSP.cpp in Sources */,
 				33FA7E911633B97D002603A5 /* RBGLAssets.cpp in Sources */,
 				33FA7E961633B97D002603A5 /* RGLBackend.cpp in Sources */,
-				33FA82AB1635489F002603A5 /* Tokenizer.cpp in Sources */,
 				33988F9A16684EA60018C3E6 /* Floors.cpp in Sources */,
 				33988FAD16684F1C0018C3E6 /* BezierSpline.cpp in Sources */,
 			);
@@ -7460,7 +7434,6 @@
 				33DB15EC162FA56A00963A33 /* WorldBSP.cpp in Sources */,
 				33FA7E921633B97D002603A5 /* RBGLAssets.cpp in Sources */,
 				33FA7E971633B97D002603A5 /* RGLBackend.cpp in Sources */,
-				33FA82AC1635489F002603A5 /* Tokenizer.cpp in Sources */,
 				33988F9B16684EA60018C3E6 /* Floors.cpp in Sources */,
 				33988FAE16684F1C0018C3E6 /* BezierSpline.cpp in Sources */,
 			);
@@ -7696,7 +7669,6 @@
 				33DB160B162FB28700963A33 /* EditorBSPDebugWidget.cpp in Sources */,
 				33FA7E8F1633B97D002603A5 /* RBGLAssets.cpp in Sources */,
 				33FA7E941633B97D002603A5 /* RGLBackend.cpp in Sources */,
-				33FA82A91635489F002603A5 /* Tokenizer.cpp in Sources */,
 				33988F9816684EA60018C3E6 /* Floors.cpp in Sources */,
 				33988FAB16684F1C0018C3E6 /* BezierSpline.cpp in Sources */,
 				33988FB716684F980018C3E6 /* EditorPathfindingDebugWidget.cpp in Sources */,
@@ -7856,7 +7828,6 @@
 				33DB15EA162FA56A00963A33 /* WorldBSP.cpp in Sources */,
 				33FA7E901633B97D002603A5 /* RBGLAssets.cpp in Sources */,
 				33FA7E951633B97D002603A5 /* RGLBackend.cpp in Sources */,
-				33FA82AA1635489F002603A5 /* Tokenizer.cpp in Sources */,
 				339BA57F1636F3000017FD79 /* SIMD_neon.cpp in Sources */,
 				33988F9916684EA60018C3E6 /* Floors.cpp in Sources */,
 				33988FAC16684F1C0018C3E6 /* BezierSpline.cpp in Sources */,
@@ -8014,7 +7985,6 @@
 				33FA7F591633CA28002603A5 /* WorldBSP.cpp in Sources */,
 				33FA7F5A1633CA28002603A5 /* RBGLAssets.cpp in Sources */,
 				33FA7F5B1633CA28002603A5 /* RGLBackend.cpp in Sources */,
-				33FA82AD1635489F002603A5 /* Tokenizer.cpp in Sources */,
 				339BA5801636F3000017FD79 /* SIMD_neon.cpp in Sources */,
 				33988F9C16684EA60018C3E6 /* Floors.cpp in Sources */,
 				33988FAF16684F1C0018C3E6 /* BezierSpline.cpp in Sources */,

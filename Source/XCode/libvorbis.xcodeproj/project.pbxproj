@@ -238,7 +238,7 @@
 		334B546415B89AA300EEFC92 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0430;
+				LastUpgradeCheck = 0450;
 			};
 			buildConfigurationList = 334B546715B89AA300EEFC92 /* Build configuration list for PBXProject "libvorbis" */;
 			compatibilityVersion = "Xcode 3.2";

@@ -268,7 +268,7 @@
 		334B557A15B8A74D00EEFC92 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0430;
+				LastUpgradeCheck = 0450;
 			};
 			buildConfigurationList = 334B557D15B8A74D00EEFC92 /* Build configuration list for PBXProject "lua" */;
 			compatibilityVersion = "Xcode 3.2";

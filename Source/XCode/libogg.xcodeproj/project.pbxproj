@@ -156,7 +156,7 @@
 		338384A615B7882100A28CCF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0430;
+				LastUpgradeCheck = 0450;
 			};
 			buildConfigurationList = 338384A915B7882100A28CCF /* Build configuration list for PBXProject "libogg" */;
 			compatibilityVersion = "Xcode 3.2";
