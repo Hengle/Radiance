@@ -22,7 +22,7 @@
 	#if TARGET_OS_MAC==1
 		#if TARGET_OS_IPHONE==1
 			#define RAD_OPT_IOS
-			#if defined(TARGET_IPHONE_SIMULATOR)
+			#if TARGET_IPHONE_SIMULATOR==1
 				#define RAD_OPT_IOS_SIMULATOR
 			#else
 				#define RAD_OPT_IOS_DEVICE

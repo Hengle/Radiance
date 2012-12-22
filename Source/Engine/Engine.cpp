@@ -47,10 +47,6 @@ bool Engine::PreInit() {
 	COut(C_Info) << "hyper-threading enabled: " << (thread::details::IsHyperThreadingOn() ? "true" : "false") << std::endl;
 	COut(C_Info) << SIMD->name << " driver bound." << std::endl;
 
-#if defined(RAD_OPT_TOOLS)
-//	SIMDSkinTest(COut(C_Info));
-#endif
-
 	const char *baseDir = App::Get()->ArgArg("-base");
 	if (!baseDir)
 		baseDir = "Base";

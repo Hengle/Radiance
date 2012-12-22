@@ -39,7 +39,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(SkMesh, states, const ska::AnimState::Map*);
 	RAD_DECLARE_READONLY_PROPERTY(SkMesh, asset, const pkg::AssetRef&);
 
-#if defined(RAD_OPT_PC_TOOLS)
+#if !defined(RAD_OPT_SHIP)
 	const ska::DMesh *DMesh(int idx) {
 		return m_meshes[idx].dm;
 	}

@@ -47,7 +47,7 @@ struct SIMDDriver {
 
 extern RADRT_API const SIMDDriver *SIMD;
 
-#if defined(RAD_OPT_TOOLS)
+#if defined(RAD_OPT_TOOLS) || (defined(RAD_OPT_IOS_DEVICE) && !defined(RAD_OPT_SHIP))
 void SIMDSkinTest(std::ostream &out);
 #endif
 
