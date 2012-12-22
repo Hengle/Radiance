@@ -2063,7 +2063,7 @@ int WorldLua::lua_gnSetSessionReportOnAppPause(lua_State *L) {
 }
 
 lua::SrcBuffer::Ref WorldLua::ImportLoader::Load(lua_State *L, const char *name) {
-#if defined(RAD_OPT_GOLDEN)
+#if defined(RAD_TARGET_GOLDEN)
 	String path(CStr("Scripts/"));
 #else
 	String path(CStr("@r:/Source/Scripts/"));

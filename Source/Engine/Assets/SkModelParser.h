@@ -94,7 +94,7 @@ private:
 		return &m_dskm; 
 	}
 	RAD_DECLARE_GET(skinType, ska::SkinType) { 
-		return ska::SkinCpu; 
+		return ska::kSkinType_CPU;
 	}
 #endif
 

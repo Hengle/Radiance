@@ -39,3 +39,4 @@ ui_*.h
 .sconsign.dblite
 Bin/*
 Documentation/*
+Source/XCode/build/*

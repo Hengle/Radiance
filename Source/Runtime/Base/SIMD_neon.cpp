@@ -27,10 +27,10 @@ void SkinVerts4(
 	int numVerts
 )
 {
-	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(bones, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(vertices, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::Alignment));
+	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(bones, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(vertices, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::kAlignment));
 
 	for (int i = 0; i < numVerts; ++i)
 	{		
@@ -123,10 +123,10 @@ void SkinVerts3(
 	int numVerts
 )
 {
-	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(bones, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(vertices, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::Alignment));
+	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(bones, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(vertices, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::kAlignment));
 
 	for (int i = 0; i < numVerts; ++i)
 	{
@@ -201,10 +201,10 @@ void SkinVerts2(
 	int numVerts
 )
 {
-	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(bones, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(vertices, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::Alignment));
+	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(bones, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(vertices, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::kAlignment));
 
 	for (int i = 0; i < numVerts; ++i)
 	{
@@ -260,10 +260,10 @@ void SkinVerts1(
 	int numVerts
 )
 {
-	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(bones, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(vertices, SIMDDriver::Alignment));
-	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::Alignment));
+	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(bones, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(vertices, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::kAlignment));
 	
 // Most verts are 1 bone verts so I'm trying to keep the load store and fp pipes
 // full on the neon by interleaving and hoping for dual issue to be happening.
@@ -444,10 +444,11 @@ const SIMDDriver *SIMD_neon_bind()
 {
 	static SIMDDriver d;
 
-	d.SkinVerts[3] = &SkinVerts4;
+// disabled until updated for new skin formats.
+	/*d.SkinVerts[3] = &SkinVerts4;
 	d.SkinVerts[2] = &SkinVerts3;
 	d.SkinVerts[1] = &SkinVerts2;
-	d.SkinVerts[0] = &SkinVerts1;
+	d.SkinVerts[0] = &SkinVerts1;*/
 
 	string::cpy(d.name, "SIMD_neon");
 	return &d;
