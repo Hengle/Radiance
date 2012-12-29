@@ -39,7 +39,7 @@ struct SIMDDriver {
 		int numVerts
 	);
 
-	FSkinVerts SkinVerts[4][2]; // [numBones][numTangents]
+	FSkinVerts SkinVerts[4]; // [numBones]
 	
 	char name[16];
 

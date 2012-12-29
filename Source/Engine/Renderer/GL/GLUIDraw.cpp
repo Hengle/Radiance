@@ -15,35 +15,30 @@ namespace ui {
 
 namespace {
 
-struct OverlayVert
-{
+struct OverlayVert {
 	float xy[2];
 	float st[2];
 };
 
-enum
-{
+enum {
 	BaseRectSize = 64,
 	OverlayDiv = 8
 };
 
 }
 
-RBDraw::Ref RBDraw::New()
-{
+RBDraw::Ref RBDraw::New() {
 	return RBDraw::Ref(new (ZUI) GLDraw());
 }
 
-GLDraw::GLDraw()
-{
+GLDraw::GLDraw() {
 	InitRectVerts(BaseRectSize, BaseRectSize);
 }
 
 void GLDraw::SetViewport(
 	int src[4],
 	int dst[4]
-)
-{
+) {
 	gl.MatrixMode(GL_PROJECTION);
 	gl.LoadIdentity();
 	gl.Ortho((double)src[0], (double)(src[0]+src[2]), (double)(src[1]+src[3]), (double)src[1], -1.0, 1.0);
@@ -62,8 +57,7 @@ void GLDraw::DrawRect(
 	const asset::MaterialLoader::Ref &l,
 	bool sampleMaterialColor,
 	const Vec4 &rgba
-)
-{
+) {
 	gl.MatrixMode(GL_MODELVIEW);
 	gl.PushMatrix();
 	gl.Translatef((float)r.x, (float)r.y, 0.f);
@@ -71,11 +65,11 @@ void GLDraw::DrawRect(
 
 	m.BindStates();
 	m.BindTextures(l);
-	m.shader->Begin(r::Shader::P_Default, m);
+	m.shader->Begin(r::Shader::kPass_Default, m);
 
 	gls.DisableAllMGSources();
 	gls.SetMGSource(
-		r::MGS_Vertices,
+		r::kMaterialGeometrySource_Vertices,
 		0,
 		m_rectVB,
 		2,
@@ -85,7 +79,7 @@ void GLDraw::DrawRect(
 		0
 	);
 	gls.SetMGSource(
-		r::MGS_TexCoords,
+		r::kMaterialGeometrySource_TexCoords,
 		0,
 		m_rectVB,
 		2,
@@ -99,7 +93,8 @@ void GLDraw::DrawRect(
 		m_rectIB
 	);
 
-	m.shader->BindStates(sampleMaterialColor, rgba);
+	Shader::Uniforms u(rgba);
+	m.shader->BindStates(u, sampleMaterialColor);
 	gls.Commit();
 	gl.DrawElements(GL_TRIANGLES, (OverlayDiv-1)*(OverlayDiv-1)*6, GL_UNSIGNED_SHORT, 0);
 	CHECK_GL_ERRORS();
@@ -115,13 +110,11 @@ void GLDraw::DrawTextModel(
 	r::TextModel &model,
 	bool sampleMaterialColor,
 	const Vec4 &rgba
-)
-{
+) {
 	int flags = 0;
 
-	if (clip)
-	{
-		flags |= SCT_Enable;
+	if (clip) {
+		flags |= kScissorTest_Enable;
 		gls.Scissor(
 			FloorFastInt(clip->x),
 			FloorFastInt(m_vp[3]-clip->y),
@@ -141,13 +134,11 @@ void GLDraw::BeginBatchText(
 	const Rect &r,
 	const Rect *clip,
 	r::Material &material
-)
-{
+) {
 	int flags = 0;
 
-	if (clip)
-	{
-		flags |= SCT_Enable;
+	if (clip) {
+		flags |= kScissorTest_Enable;
 		gls.Scissor(
 			FloorFastInt(clip->x),
 			FloorFastInt(m_vp[3]-clip->y),
@@ -166,19 +157,16 @@ void GLDraw::BeginBatchText(
 void GLDraw::BatchDrawTextModel(
 	r::Material &material,
 	r::TextModel &model
-)
-{
+) {
 	model.BatchDraw(material);
 }
 
-void GLDraw::EndBatchText()
-{
+void GLDraw::EndBatchText() {
 	gl.MatrixMode(GL_MODELVIEW);
 	gl.PopMatrix();
 }
 
-void GLDraw::InitRectVerts(int vpw, int vph)
-{
+void GLDraw::InitRectVerts(int vpw, int vph) {
 	m_rectVB.reset(
 		new GLVertexBuffer(
 			GL_ARRAY_BUFFER_ARB, 
@@ -199,10 +187,8 @@ void GLDraw::InitRectVerts(int vpw, int vph)
 	int x, y;
 	float xf, yf;
 
-	for (y = 0, yf = 0.f; y < OverlayDiv; ++y, yf += yInc)
-	{
-		for (x = 0, xf = 0.f; x < OverlayDiv; ++x, xf += xInc)
-		{
+	for (y = 0, yf = 0.f; y < OverlayDiv; ++y, yf += yInc) {
+		for (x = 0, xf = 0.f; x < OverlayDiv; ++x, xf += xInc) {
 			OverlayVert &v = verts[y*OverlayDiv+x];
 			v.xy[0] = xf;
 			v.xy[1] = yf;
@@ -227,10 +213,8 @@ void GLDraw::InitRectVerts(int vpw, int vph)
 	RAD_ASSERT(vb);
 	U16 *indices = (U16*)vb->ptr.get();
 
-	for (y = 0; y < OverlayDiv-1; ++y)
-	{
-		for (x = 0; x < OverlayDiv-1; ++x)
-		{
+	for (y = 0; y < OverlayDiv-1; ++y) {
+		for (x = 0; x < OverlayDiv-1; ++x) {
 			U16 *idx = &indices[y*(OverlayDiv-1)*6+x*6];
 
 			// glOrtho() inverts the +Z axis (or -Z can't recall), inverting the 

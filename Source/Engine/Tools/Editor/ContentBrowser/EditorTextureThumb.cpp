@@ -39,19 +39,15 @@ m_time(0),
 m_rot(0.f),
 m_idx(0),
 m_w(0),
-m_h(0)
-{
+m_h(0) {
 	m_tex = m_outer->View().GetIcon(ContentBrowserView::I_OneDisk);
 }
 
-TextureThumb::Thumbnail::~Thumbnail()
-{
+TextureThumb::Thumbnail::~Thumbnail() {
 }
 
-void TextureThumb::Thumbnail::Request(int w, int h)
-{
-	if (m_w != w || m_h != h)
-	{
+void TextureThumb::Thumbnail::Request(int w, int h) {
+	if (m_w != w || m_h != h) {
 		Cancel();
 		Resize(w*h*4);
 		m_w = w;
@@ -60,31 +56,27 @@ void TextureThumb::Thumbnail::Request(int w, int h)
 	}
 }
 
-ThumbResult TextureThumb::Thumbnail::Tick(float dt, const xtime::TimeSlice &time)
-{
+ThumbResult TextureThumb::Thumbnail::Tick(float dt, const xtime::TimeSlice &time) {
 	RAD_ASSERT(m_load && active);
 	
 	if (!m_asset)
 		m_asset = Packages()->Asset(this->id, pkg::Z_ContentBrowser);
 
-	if (!m_asset)
-	{
+	if (!m_asset) {
 		m_load = false;
 		m_icon = true;
 		m_tex = m_outer->View().errorIcon;
 		return TR_Complete;
 	}
 
-	if (m_icon)
-	{
+	if (m_icon) {
 		m_rot += dt;
 
 		xtime::TimeVal now = xtime::ReadMilliseconds();
 		if (m_time == 0)
 			m_time = now;
 
-		if (now-m_time > 750)
-		{
+		if (now-m_time > 750) {
 			m_time = now;
 			m_idx = (m_idx+1)%ContentBrowserView::I_AnimRange;
 		}
@@ -105,8 +97,7 @@ ThumbResult TextureThumb::Thumbnail::Tick(float dt, const xtime::TimeSlice &time
 
 	m_load = false;
 
-	if (r != pkg::SR_Success)
-	{
+	if (r != pkg::SR_Success) {
 		m_icon = true;
 		m_tex = m_outer->View().errorIcon;
 		return TR_Complete;
@@ -122,12 +113,9 @@ ThumbResult TextureThumb::Thumbnail::Tick(float dt, const xtime::TimeSlice &time
 
 	m_asset.reset();
 
-	if (m_tex)
-	{
+	if (m_tex) {
 		m_icon = false;
-	}
-	else
-	{
+	} else {
 		m_icon = true;
 		m_tex = m_outer->View().errorIcon;
 	}
@@ -135,15 +123,12 @@ ThumbResult TextureThumb::Thumbnail::Tick(float dt, const xtime::TimeSlice &time
 	return TR_Complete;
 }
 
-bool TextureThumb::Thumbnail::CheckActivate() const
-{
+bool TextureThumb::Thumbnail::CheckActivate() const {
 	return m_load;
 }
 
-void TextureThumb::Thumbnail::Cancel()
-{
-	if (m_asset)
-	{
+void TextureThumb::Thumbnail::Cancel() {
+	if (m_asset) {
 		m_asset->Process(
 			xtime::TimeSlice::Infinite,
 			pkg::P_Cancel
@@ -153,27 +138,20 @@ void TextureThumb::Thumbnail::Cancel()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void TextureThumb::New(ContentBrowserView &view)
-{
+void TextureThumb::New(ContentBrowserView &view) {
 	TextureThumb *t = new (ZEditor) TextureThumb(view);
 	ContentAssetThumb::Ref self(t);
 	t->Register(self, AT_Texture);
 }
 
-void TextureThumb::NotifyAddRemovePackages()
-{
-//	CancelThumbs();
+void TextureThumb::NotifyAddRemovePackages() {
 }
 
-void TextureThumb::NotifyAddRemoveContent(const pkg::IdVec &, const pkg::IdVec &)
-{
-//	CancelThumbs();
+void TextureThumb::NotifyAddRemoveContent(const pkg::IdVec &, const pkg::IdVec &) {
 }
 
-void TextureThumb::NotifyContentChanged(const ContentChange::Vec &changed)
-{
-	for (ContentChange::Vec::const_iterator it = changed.begin(); it != changed.end(); ++it)
-	{
+void TextureThumb::NotifyContentChanged(const ContentChange::Vec &changed) {
+	for (ContentChange::Vec::const_iterator it = changed.begin(); it != changed.end(); ++it) {
 		const ContentChange &c = *it;
 		if (c.entry->type != asset::AT_Texture)
 			continue;
@@ -191,48 +169,40 @@ void TextureThumb::NotifyContentChanged(const ContentChange::Vec &changed)
 	}
 }
 
-void TextureThumb::CancelThumb(int id)
-{
+void TextureThumb::CancelThumb(int id) {
 	Thumbnail::Ref t = FindThumbnail(id);
 	if (t)
 		t->Evict();
 }
 
-void TextureThumb::Tick(float t, const xtime::TimeSlice &time)
-{
+void TextureThumb::Tick(float t, const xtime::TimeSlice &time) {
 	bool vis = false;
 	bool notify = m_cache.Tick(t, time, vis);
 	xtime::TimeVal now = xtime::ReadMilliseconds();
-	if (notify || (vis && (now-m_lastDraw) > 1000/5))
-	{
+	if (notify || (vis && (now-m_lastDraw) > 1000/5)) {
 		m_lastDraw = now;
 		ThumbChanged();
 	}
 }
 
-void TextureThumb::Begin()
-{
+void TextureThumb::Begin() {
 	m_cache.BeginRefresh();
 }
 
-void TextureThumb::End()
-{
+void TextureThumb::End() {
 	m_cache.EndRefresh();
 }
 
-TextureThumb::Thumbnail::Ref TextureThumb::FindThumbnail(int id)
-{
+TextureThumb::Thumbnail::Ref TextureThumb::FindThumbnail(int id) {
 	ContentThumbCache::Item::Ref i = m_cache.Find(id);
 	if (i)
 		return boost::static_pointer_cast<Thumbnail>(i);
 	return Thumbnail::Ref();
 }
 
-TextureThumb::Thumbnail::Ref TextureThumb::RequestThumb(int id, int w, int h)
-{
+TextureThumb::Thumbnail::Ref TextureThumb::RequestThumb(int id, int w, int h) {
 	Thumbnail::Ref t = FindThumbnail(id);
-	if (!t)
-	{
+	if (!t) {
 		t.reset(new Thumbnail(id, this));
 		m_cache.Insert(boost::static_pointer_cast<ContentThumbCache::Item>(t));
 	}
@@ -242,18 +212,15 @@ TextureThumb::Thumbnail::Ref TextureThumb::RequestThumb(int id, int w, int h)
 	return t;
 }
 
-void TextureThumb::Release()
-{
+void TextureThumb::Release() {
 	CancelThumbs();
 }
 
-void TextureThumb::CancelThumbs()
-{
+void TextureThumb::CancelThumbs() {
 	m_cache.EvictAll();
 }
 
-void TextureThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, int &h)
-{
+void TextureThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, int &h) {
 	ContentAssetThumb::Dimensions(entry, w, h); // default
 
 	pkg::Asset::Ref asset = entry->Asset(pkg::Z_ContentBrowser);
@@ -309,29 +276,32 @@ void TextureThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, int
 	}
 }
 
-inline float Wrap(float r)
-{
+inline float Wrap(float r) {
 	float z = floorf(r);
 	int side = (int)z;
 
 	r -= z;
 
-	if (side&1)
-	{
+	if (side&1) {
 		return -1.0f + r*2;
 	}
 
 	return 1.0f - r*2;
 }
 
-bool TextureThumb::Render(const pkg::Package::Entry::Ref &asset, int x, int y, int w, int h)
-{
+bool TextureThumb::Render(const pkg::Package::Entry::Ref &asset, int x, int y, int w, int h) {
 	Thumbnail::Ref t = RequestThumb(asset->id, w, h);
 	if (t)
 	{
 		gl.Color4f(1.f, 1.f, 1.f, 1.f, true); // force=true, who knows what Qt does behind our backs.
 		gls.DisableTextures();
-		gls.Set(DT_Disable|DWM_Disable|CFM_None|CWM_RGBA, BMS_SrcAlpha|BMD_InvSrcAlpha);
+		gls.Set(
+			kDepthTest_Disable|
+			kDepthWriteMask_Disable|
+			kCullFaceMode_None|
+			kColorWriteMask_RGBA, 
+			kBlendModeSource_SrcAlpha|kBlendModeDest_InvSrcAlpha
+		);
 		gls.SetTexture(0, t->texture);
 		gls.Commit();
 
@@ -342,20 +312,16 @@ bool TextureThumb::Render(const pkg::Package::Entry::Ref &asset, int x, int y, i
 		int tw;
 		int th;
 
-		if (t->isIcon)
-		{
+		if (t->isIcon) {
 			tw = w / 3 * 2;
 			th = h / 3 * 2;
-		}
-		else
-		{
+		} else {
 			tw = w; // scale.
 			th = h;
 		}
 
 		gl.Translatef(x + w/2, y + h/2, 0.0f);
-		if (t->active && t->isIcon)
-		{
+		if (t->active && t->isIcon) {
 			gl.Rotatef(Wrap(t->rot)*20.0f, 0.0f, 0.0f, 1.0f);
 		}
 
@@ -375,19 +341,17 @@ bool TextureThumb::Render(const pkg::Package::Entry::Ref &asset, int x, int y, i
 
 		gl.PopMatrix();
 
-		gls.Set(0, BM_Off);
+		gls.Set(0, kBlendMode_Off);
 		gls.Commit();
 	}
 
 	return true;
 }
 
-void TextureThumb::OpenEditor(const pkg::Package::Entry::Ref &asset, bool editable, bool modal)
-{
+void TextureThumb::OpenEditor(const pkg::Package::Entry::Ref &asset, bool editable, bool modal) {
 }
 
-void CreateTextureThumb(ContentBrowserView &view)
-{
+void CreateTextureThumb(ContentBrowserView &view) {
 	TextureThumb::New(view);
 }
 

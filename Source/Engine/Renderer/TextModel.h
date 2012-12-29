@@ -15,8 +15,7 @@
 
 namespace r {
 
-class RADENG_CLASS TextModel
-{
+class RADENG_CLASS TextModel {
 public:
 
 	typedef boost::shared_ptr<TextModel> Ref;
@@ -24,8 +23,7 @@ public:
 	// implemented by RB
 	static Ref New();
 
-	class RADENG_CLASS String
-	{
+	class RADENG_CLASS String {
 	public:
 
 		String() {}
@@ -38,8 +36,7 @@ public:
 			float kernScale = 1.0f, 
 			float scaleX = 1.0f, 
 			float scaleY = 1.0f
-		)
-		{
+		) {
 			this->utf8String = utf8String;
 			this->x         = x;
 			this->y         = y;
@@ -59,8 +56,7 @@ public:
 			float kernScale = 1.0f, 
 			float scaleX = 1.0f, 
 			float scaleY = 1.0f
-		)
-		{
+		) {
 			this->utf8String = utf8String;
 			this->x         = x;
 			this->y         = y;
@@ -81,8 +77,7 @@ public:
 
 	virtual ~TextModel();
 
-	font::GlyphCache &GlyphCache() const
-	{
+	font::GlyphCache &GlyphCache() const {
 		return m_fontInstance->cache;
 	}
 
@@ -140,8 +135,7 @@ protected:
 	TextModel();
 	TextModel(const pkg::AssetRef &font, int fontWidth, int fontHeight);
 
-	struct VertexType
-	{
+	struct VertexType {
 		float x, y;
 		float s, t;
 	};
@@ -156,8 +150,7 @@ protected:
 
 private:
 
-	struct Pass
-	{
+	struct Pass {
 		int ofs;
 		int num;
 		font::IGlyphPage *page;
@@ -165,35 +158,26 @@ private:
 
 	typedef zone_vector<Pass, ZFontsT>::type PassVec;
 
-	struct FontKey
-	{
+	struct FontKey {
 		FontKey(int _id, int _width, int _height)
-			: id(_id), width(_width), height(_height)
-		{
+			: id(_id), width(_width), height(_height) {
 		}
 
 		int id, width, height;
 
-		bool operator < (const FontKey &key) const
-		{
-			if (width < key.width)
-			{
+		bool operator < (const FontKey &key) const {
+			if (width < key.width) {
 				return true;
-			}
-			else if (width == key.width && height < key.height)
-			{
+			} else if (width == key.width && height < key.height) {
 				return true;
-			}
-			else if (width == key.width && height == key.height && id < key.id)
-			{
+			} else if (width == key.width && height == key.height && id < key.id) {
 				return true;
 			}
 
 			return false;
 		}
 
-		bool operator == (const FontKey &key)
-		{
+		bool operator == (const FontKey &key) {
 			return (width == key.width) && 
 				(height == key.height) &&
 				(id == key.id);
@@ -206,8 +190,7 @@ private:
 
 	typedef zone_map<FontKey, FontInstanceWRef, ZFontsT>::type FontInstanceHash;
 
-	struct FontInstance
-	{
+	struct FontInstance {
 		typedef FontInstanceRef Ref;
 
 		~FontInstance();
@@ -217,8 +200,7 @@ private:
 		FontInstanceHash::iterator it;
 	};
 
-	struct GlyphPageFactory : public font::IGlyphPageFactory
-	{
+	struct GlyphPageFactory : public font::IGlyphPageFactory {
 		virtual font::IGlyphPage::Ref AllocatePage(int width, int height);
 		static void NoopDelete(font::IGlyphPageFactory *f);
 	};

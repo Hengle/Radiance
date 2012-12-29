@@ -10,5 +10,24 @@
 namespace r {
 
 int Shader::s_guid = 0;
+const Shader::Uniforms Shader::Uniforms::kDefault = Shader::Uniforms(Shader::Uniforms::defaultTag());
+
+bool Shader::Requires(MaterialTextureSource source, int index) const {
+	for (int i = 0; i < kNumPasses; ++i) {
+		if (Requires((Shader::Pass)i, source, index))
+			return true;
+	}
+
+	return false;
+}
+
+bool Shader::Requires(MaterialGeometrySource source, int index) const {
+	for (int i = 0; i < kNumPasses; ++i) {
+		if (Requires((Shader::Pass)i, source, index))
+			return true;
+	}
+
+	return false;
+}
 
 } // r

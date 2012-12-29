@@ -1338,8 +1338,8 @@ void ContentBrowserView::DrawThumb(ContentAssetThumb *thumb, const pkg::Package:
 	{
 		r::gls.DisableTextures();
 		r::gls.Set(
-			r::DT_Disable|r::DWM_Disable, 
-			r::BMS_One|r::BMD_InvSrcAlpha
+			r::kDepthTest_Disable|r::kDepthWriteMask_Disable, 
+			r::kBlendModeSource_One|r::kBlendModeDest_InvSrcAlpha
 		);
 		r::gls.Commit();
 
@@ -1412,8 +1412,8 @@ void ContentBrowserView::OnRenderGL(GLWidget&)
 				{
 					r::gls.DisableTextures();
 					r::gls.Set(
-						r::DT_Disable|r::DWM_Disable, 
-						r::BMS_One|r::BMD_InvSrcAlpha
+						r::kDepthTest_Disable|r::kDepthWriteMask_Disable, 
+						r::kBlendModeSource_One|r::kBlendModeDest_InvSrcAlpha
 					);
 					r::gls.Commit();
 
@@ -1446,8 +1446,8 @@ void ContentBrowserView::OnRenderGL(GLWidget&)
 
 				r::gls.DisableTextures();
 				r::gls.Set(
-					r::DT_Disable|r::DWM_Disable, 
-					r::BMS_One|r::BMD_InvSrcAlpha
+					r::kDepthTest_Disable|r::kDepthWriteMask_Disable, 
+					r::kBlendModeSource_One|r::kBlendModeDest_InvSrcAlpha
 				);
 				r::gls.Commit();
 

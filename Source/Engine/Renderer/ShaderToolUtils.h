@@ -1,30 +1,33 @@
-// CGUtils.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file ShaderToolUtils.h
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup renderer
+*/
 
 #pragma once
 
-#include "../../Engine.h"
+#include "../Engine.h"
 #include <Runtime/Stream/STLStream.h>
 #include <iostream>
 #include <Runtime/PushPack.h>
 
-namespace cg {
+namespace tools {
+namespace shader_utils {
+
+	// Various free functions for assembling shader files.
 
 	typedef boost::shared_ptr<std::istream> istreamRef;
-	typedef boost::shared_ptr<stream::basic_streambuf<char> > streamBufRef;
+	typedef boost::shared_ptr<stream::basic_streambuf<char> > streambufRef;
 
-	class IncludeSource
-	{
+	class IncludeSource {
 	public:
 		virtual bool AddInclude(const char *name, std::ostream &out) = 0;
 	};
 
-	struct File
-	{
+	struct File {
 		file::MMFileInputBuffer::Ref ib;
-		streamBufRef sb;
+		streambufRef sb;
 		istreamRef is;
 	};
 
@@ -60,6 +63,7 @@ namespace cg {
 		const char *sz
 	);
 
-} // cg
+} // shader_utils
+} // tools
 
 #include <Runtime/PopPack.h>

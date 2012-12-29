@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../Renderer/Sources.h"
+#include "../Renderer/Common.h"
 #include <Runtime/Container/ZoneVector.h>
 
 #if defined(RAD_OPT_TOOLS)
@@ -21,6 +21,10 @@ RAD_ZONE_DEC(RADENG_API, ZMesh);
 struct RADENG_CLASS DMesh {
 	typedef zone_vector<DMesh, ZMeshT>::type Vec;
 
+	enum {
+		kNumVertexFloats = 12
+	};
+
 	U16 numVerts;
 	U16 numIndices;
 	U16 numChannels;
@@ -30,14 +34,10 @@ struct RADENG_CLASS DMesh {
 						  // floats:
 						  // 0-2   -> vertex (3 floats)
 						  // 3-5   -> normal (3 floats)
-						  // 6-9   -> st (always has 2 channels) (4 floats)
-						  // 10-13 -> tangent 1 (4 floats)
-						  // 14-17 -> tangent 2 (4 floats)
-	const void *indices;
+						  // 6-9   -> tangent (4 floats)
+	                      // 10-13 -> st (always has 2 channels) (4 floats)
 
-	int NumVertexFloats() const {
-		return 6+(4*((int)numChannels+1));
-	}
+	const void *indices;
 };
 
 struct RADENG_CLASS DMeshBundle {

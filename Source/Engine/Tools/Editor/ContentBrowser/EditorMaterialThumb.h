@@ -19,8 +19,7 @@ namespace editor {
 class MaterialThumbCache;
 typedef boost::shared_ptr<MaterialThumbCache> MaterialThumbCacheRef;
 
-class RADENG_CLASS MaterialThumb : public ContentAssetThumb
-{
+class RADENG_CLASS MaterialThumb : public ContentAssetThumb {
 	Q_OBJECT
 public:
 
@@ -41,8 +40,7 @@ private:
 
 	static void ScaleSize(int &w, int &h, int rw, int rh);
 
-	class Thumbnail : public ContentThumbCache::Item
-	{
+	class Thumbnail : public ContentThumbCache::Item {
 	public:
 		typedef boost::shared_ptr<Thumbnail> Ref;
 		Thumbnail(int id, MaterialThumb *outer);
@@ -53,7 +51,7 @@ private:
 		RAD_DECLARE_READONLY_PROPERTY(Thumbnail, rot, float);
 		RAD_DECLARE_READONLY_PROPERTY(Thumbnail, vb, r::GLVertexBuffer::Ref);
 		RAD_DECLARE_READONLY_PROPERTY(Thumbnail, ib, r::GLVertexBuffer::Ref);
-		r::GLTexture::Ref Texture(r::MTSource source, int index);
+		r::GLTexture::Ref Texture(int index);
 	protected:
 		virtual RAD_DECLARE_GET(size, int)  { return m_w*m_h*4; }
 		virtual ThumbResult Tick(float dt, const xtime::TimeSlice &time);
@@ -75,7 +73,7 @@ private:
 		pkg::Asset::Ref m_asset;
 		r::Material *m_mat;
 		MaterialThumb *m_outer;
-		r::GLTexture::Vec m_texs[r::MTS_Max][r::MTS_MaxIndices];
+		boost::array<r::GLTexture::Vec, r::kMaterialTextureSource_MaxIndices> m_texs;
 		r::GLVertexBuffer::Ref m_vb;
 		r::GLVertexBuffer::Ref m_ib;
 	};

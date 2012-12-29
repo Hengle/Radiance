@@ -64,9 +64,9 @@ int DMeshBundle::Parse(const void *data, AddrSize len) {
 		// padd bytes
 		bytes += sizeof(U16);
 
-		CHECK_SIZE(((m.numVerts*2*3)+(m.numVerts*4*(m.numChannels+1))) * sizeof(float));
+		CHECK_SIZE(m.numVerts * DMesh::kNumVertexFloats * sizeof(float));
 		m.vertices = reinterpret_cast<const void*>(bytes);
-		bytes += ((m.numVerts*2*3)+(m.numVerts*4*(m.numChannels+1))) * sizeof(float);
+		bytes += m.numVerts * DMesh::kNumVertexFloats * sizeof(float);
 		
 		CHECK_SIZE(sizeof(U16)*m.numIndices);
 		m.indices = bytes;
@@ -240,18 +240,16 @@ bool DoCompileMeshBundle(
 					return false;
 			}
 
+			for (int i = 0; i < 4; ++i) {
+				if (!os.Write(v.tangent[0][i]))
+					return false;
+			}
+
 			RAD_STATIC_ASSERT(SceneFile::kMaxUVChannels == 2);
 
 			for (int i = 0; i < SceneFile::kMaxUVChannels; ++i) {
 				for (int k = 0; k < 2; ++k) {
 					if (!os.Write(v.st[i][k]))
-						return false;
-				}
-			}
-
-			for (int i = 0; i < m->numChannels; ++i) {
-				for (int k = 0; k < 4; ++k) {
-					if (!os.Write(v.tangent[i][k]))
 						return false;
 				}
 			}

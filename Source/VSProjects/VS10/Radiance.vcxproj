@@ -216,26 +216,6 @@
     <ClInclude Include="..\..\Engine\Physics\BezierSpline.h" />
     <ClInclude Include="..\..\Engine\Physics\BezierSpline_inl.h" />
     <ClInclude Include="..\..\Engine\Physics\Spring.h" />
-    <ClInclude Include="..\..\Engine\Renderer\CG\CGShader.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Renderer\CG\CGUtils.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\Renderer\GL\glext.h" />
     <ClInclude Include="..\..\Engine\Renderer\GL\GLMesh.h" />
     <ClInclude Include="..\..\Engine\Renderer\GL\GLRenderTarget.h" />
@@ -274,8 +254,10 @@
     <ClInclude Include="..\..\Engine\Renderer\Renderer.h" />
     <ClInclude Include="..\..\Engine\Renderer\RendererDef.h" />
     <ClInclude Include="..\..\Engine\Renderer\Shader.h" />
+    <ClInclude Include="..\..\Engine\Renderer\ShaderTool.h" />
+    <ClInclude Include="..\..\Engine\Renderer\ShaderToolUtils.h" />
     <ClInclude Include="..\..\Engine\Renderer\SkMesh.h" />
-    <ClInclude Include="..\..\Engine\Renderer\Sources.h" />
+    <ClInclude Include="..\..\Engine\Renderer\Common.h" />
     <ClInclude Include="..\..\Engine\Renderer\TextModel.h" />
     <ClInclude Include="..\..\Engine\SCC\SCC.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
@@ -1338,26 +1320,6 @@
     <ClCompile Include="..\..\Engine\Persistence.cpp" />
     <ClCompile Include="..\..\Engine\Physics\BezierSpline.cpp" />
     <ClCompile Include="..\..\Engine\Physics\Spring.cpp" />
-    <ClCompile Include="..\..\Engine\Renderer\CG\CGShader.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\Renderer\CG\CGUtils.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\..\Engine\Renderer\GL\GLMaterial.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\GL\GLMesh.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\GL\GLRenderTarget.cpp" />
@@ -1386,6 +1348,18 @@
     <ClCompile Include="..\..\Engine\Renderer\Mesh.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\Renderer.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\Shader.cpp" />
+    <ClCompile Include="..\..\Engine\Renderer\ShaderTool.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Renderer\ShaderToolUtils.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\Engine\Renderer\SkMesh.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\TextModel.cpp" />
     <ClCompile Include="..\..\Engine\SCC\SCC.cpp">
@@ -2093,16 +2067,6 @@
   <ItemGroup>
     <None Include="..\..\Engine\Lua\LuaRuntime.inl" />
     <None Include="..\..\Engine\Packages\Packages.inl" />
-    <None Include="..\..\Engine\Renderer\CG\CGShader.inl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
-    </None>
     <None Include="..\..\Engine\Renderer\GL\GLMesh.inl" />
     <None Include="..\..\Engine\Renderer\GL\GLSLShader.inl" />
     <None Include="..\..\Engine\Renderer\GL\GLState.inl" />
@@ -2112,6 +2076,7 @@
     <None Include="..\..\Engine\Renderer\GL\GLVertexBuffer.inl" />
     <None Include="..\..\Engine\Renderer\Material.inl" />
     <None Include="..\..\Engine\Renderer\Mesh.inl" />
+    <None Include="..\..\Engine\Renderer\ShaderTool.inl" />
     <None Include="..\..\Engine\Tickable.inl" />
     <None Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserModel.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>

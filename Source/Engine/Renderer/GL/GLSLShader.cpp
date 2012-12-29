@@ -29,22 +29,21 @@
 namespace r {
 
 #if defined(RAD_OPT_TOOLS)
-class GLSLShaderLink : public GLSLTool
+class GLSLShaderLink : public tools::shader_utils::GLSLTool
 {
 public:
 	GLSLShaderLink(
 		Engine &engine,
-		cg::Shader::Channel channel, 
-		const cg::Shader::Ref &m,
+		const Material &material,
+		Shader::Pass pass, 
+		const tools::shader_utils::Shader::Ref &shader,
 		bool fragment
-	) : m_engine(&engine), m_channel(channel), m_m(m), m_fragment(fragment) {}
+	) : m_engine(&engine), m_material(&material), m_pass(pass), m_shader(shader), m_fragment(fragment) {}
 
-	virtual bool AddInclude(const char *name, std::ostream &out)
-	{
-		if (m_fragment && !string::cmp(name, "fragment"))
-		{
-			return m_m->EmitFunctions(*m_engine, out) &&
-				m_m->EmitShader("_Material", m_channel, out);
+	virtual bool AddInclude(const char *name, std::ostream &out) {
+		if (m_fragment && !string::cmp(name, "fragment")) {
+			return m_shader->EmitFunctions(*m_engine, out) &&
+				m_shader->EmitShader("_Material", m_pass, *m_material, out);
 		}
 			
 		return true;
@@ -52,118 +51,101 @@ public:
 
 private:
 	Engine *m_engine;
-	cg::Shader::Channel m_channel;
-	cg::Shader::Ref m_m;
+	const Material *m_material;
+	Shader::Pass m_pass;
+	tools::shader_utils::Shader::Ref m_shader;
 	bool m_fragment;
 };
 
 GLSLShader::Ref GLSLShader::Load(
 	Engine &engine, 
 	const char *name,
-	bool skinned,
 	const Material &material
-)
-{
-	cg::Shader::Ref shader = GLShader::Cache()->Load(engine, name);
-	if (shader)
-	{
+) {
+	tools::shader_utils::Shader::Ref shader = GLShader::Cache()->Load(engine, name);
+	if (shader) {
 		GLSLShader::Ref r(new (ZRender) GLSLShader());
 		r->m_name = name;
-		bool b = r->CompilePass(
-			engine,
-			r->m_passes[Shader::P_Default],
-			skinned,
-			shader,
-			cg::Shader::C_Default,
-			material
-		);
-
-		if (b)
+		if (r->Compile(engine, shader, material))
 			return r;
 	}
 
 	return Ref();
 }
 
+bool GLSLShader::Compile(
+	Engine &e,
+	const tools::shader_utils::Shader::Ref &shader,
+	const Material &material
+) {
+	int numPasses = 0;
+
+	for (int i = 0; i < Shader::kNumPasses; ++i) {
+		if (shader->Exists((Shader::Pass)i)) {
+
+		}
+	}
+
+	return numPasses > 0;
+}
+
 bool GLSLShader::CompilePass(
 	Engine &engine,
-	Pass &p,
-	bool skinned,
-	const cg::Shader::Ref &s,
-	cg::Shader::Channel channel,
+	Shader::Pass pass,
+	const tools::shader_utils::Shader::Ref &shader,
 	const Material &material
-)
-{
-	p.m = s->InputMappings(channel);
-	p.outputs = s->ChannelOutputs(channel);
+) {
+	Pass &p = m_passes[pass];
+
+	if (!shader->BuildInputMappings(material, pass, p.m))
+		return false;
+	p.outputs = shader->PassOutputs(pass);
 
 #if defined(RAD_OPT_OGLES)
-	const bool GLES = true;
+	const tools::shader_utils::GLSLTool::AssembleFlags kGLESFlag = tools::shader_utils::GLSLTool::kAssemble_GLES;
 #else
-	const bool GLES = false;
+	const tools::shader_utils::GLSLTool::AssembleFlags kGLESFlag = tools::shader_utils::GLSLTool::kAssemble_None;
 #endif
 
 	GLSLShaderObj::Ref vs;
 	GLSLShaderObj::Ref fs;
 
-	GLSLTool::StringVec textureTypes;
-	// figure out texture types...
-	for (int i = 0; i < GLState::MaxTextures; ++i)
-	{
-		if (p.m.textures[i][0] == InvalidMapping)
-			break;
-		switch(p.m.textures[i][0])
-		{
-		case MTS_Texture:
-		case MTS_Framebuffer:
-			textureTypes.push_back(String("sampler2D"));
-		break;
-		}
-	}
-
 	{
 		std::stringstream ss;
 
-		GLSLShaderLink builder(engine, channel, s, false);
+		GLSLShaderLink builder(engine, material, pass, shader, false);
 		if (!builder.Assemble(
 			engine, 
-			true,
-			skinned,
-			GLES,
-			textureTypes,
-			s->TexCoordUsage(channel),
-			s->ColorUsage(channel),
-			0,
-			s->NormalUsage(channel),
-			&material,
-			&p.m,
-			true,
-			ss)
-		)
-		{
-
-			COut(C_Error) << "GLSLShader::CompilePass('" << s->name.get() << "', " <<
-				channel << ", Vertex): Failed to emit shader code, SHADER ERROR!" << std::endl;
+			material,
+			shader,
+			p.m,
+			pass,
+			tools::shader_utils::GLSLTool::kAssemble_VertexShader|
+				tools::shader_utils::GLSLTool::kAssemble_Optimize|kGLESFlag,
+			ss
+		)) {
+			COut(C_Error) << "GLSLShader::CompilePass('" << shader->name.get() << "', " <<
+				pass << ", VertexShader): Failed to emit shader code, SHADER ERROR!" << std::endl;
 			return false;
 		}
 
-		String shader(ss.str().c_str());
+		String shaderSource(ss.str().c_str());
 
 #if defined(LOG_DUMP)
-		COut(C_Info) << "GLSLShader::CompilePass('" << s->name.get() << "', " <<
-			channel << ", Vertex): " << std::endl << shader << std::endl;
+		COut(C_Info) << "GLSLShader::CompilePass('" << shader->name.get() << "', " <<
+			pass << ", VertexShader): " << std::endl << shaderSource << std::endl;
 #if !defined(RAD_OPT_IOS) && defined(LOG_SAVE)
 		{
-			String path(CStr("Shaders/"));
-			path += s->name;
+			String path(CStr("@r:/Source/Shaders/"));
+			path += shader->name;
 			path += ".vert.glsl";
-			cg::SaveText(engine, path.c_str, shader.c_str);
+			tools::shader_utils::SaveText(engine, path.c_str, shaderSource.c_str);
 		}
 #endif
 #endif
 
 		vs.reset(new (ZRender) GLSLShaderObj(GL_VERTEX_SHADER_ARB));
-		const char *sz = shader.c_str;
+		const char *sz = shaderSource.c_str;
 		gl.ShaderSourceARB(vs->id, 1, &sz, 0);
 		CHECK_GL_ERRORS();
 		gl.CompileShaderARB(vs->id);
@@ -171,61 +153,55 @@ bool GLSLShader::CompilePass(
 		
 		GLint status;
 		gl.GetObjectParameterivARB(vs->id, GL_OBJECT_COMPILE_STATUS_ARB, &status);
-		if (!status)
-		{ // error. 
-			COut(C_ErrMsgBox) << "GLSLShader::CompilePass('" << s->name.get() << "', " <<
-				channel << ", Vertex) Error: \n" << ShaderLog(vs->id) << std::endl;
+		if (!status) { 
+			// error. 
+			COut(C_ErrMsgBox) << "GLSLShader::CompilePass('" << shader->name.get() << "', " <<
+				pass << ", VertexShader) Error: \n" << ShaderLog(vs->id) << std::endl;
 			return false;
 		}
 
 #if defined(RAD_OPT_DEBUG)
-		COut(C_Debug) << "GLSLShader::CompilePass('" << s->name.get() << "', " << channel <<
-			", Vertex) Successfully Compiled. " << std::endl;
+		COut(C_Debug) << "GLSLShader::CompilePass('" << shader->name.get() << "', " << pass <<
+			", VertexShader) Successfully Compiled. " << std::endl;
 #endif
 	}
 
 	{
 		std::stringstream ss;
-		GLSLShaderLink builder(engine, channel, s, true);
 
+		GLSLShaderLink builder(engine, material, pass, shader, false);
 		if (!builder.Assemble(
 			engine, 
-			false,
-			false,
-			GLES,
-			textureTypes,
-			s->TexCoordUsage(channel),
-			s->ColorUsage(channel),
-			0,
-			s->NormalUsage(channel),
-			0,
-			0,
-			true,
+			material,
+			shader,
+			p.m,
+			pass,
+			tools::shader_utils::GLSLTool::kAssemble_PixelShader|
+				tools::shader_utils::GLSLTool::kAssemble_Optimize|kGLESFlag,
 			ss
-		))
-		{
-			COut(C_Error) << "GLSLShader::CompilePass('" << s->name.get() << "', " <<
-				channel << ", Fragment): Failed to emit shader code, SHADER ERROR!" << std::endl;
+		)) {
+			COut(C_Error) << "GLSLShader::CompilePass('" << shader->name.get() << "', " <<
+				pass << ", PixelShader): Failed to emit shader code, SHADER ERROR!" << std::endl;
 			return false;
 		}
 
-		String shader(ss.str().c_str());
+		String shaderSource(ss.str().c_str());
 
 #if defined(LOG_DUMP)
-		COut(C_Info) << "GLSLShader::CompilePass('" << s->name.get() << "', " <<
-			channel << ", Fragment): " << std::endl << shader << std::endl;
+		COut(C_Info) << "GLSLShader::CompilePass('" << shader->name.get() << "', " <<
+			pass << ", PixelShader): " << std::endl << shaderSource << std::endl;
 #if !defined(RAD_OPT_IOS) && defined(LOG_SAVE)
 		{
 			String path(CStr("Shaders/"));
-			path += s->name;
+			path += shader->name;
 			path += ".frag.glsl";
-			cg::SaveText(engine, path.c_str, shader.c_str);
+			tools::shader_utils::SaveText(engine, path.c_str, shaderSource.c_str);
 		}
 #endif
 #endif
 
 		fs.reset(new (ZRender) GLSLShaderObj(GL_FRAGMENT_SHADER_ARB));
-		const char *sz = shader.c_str;
+		const char *sz = shaderSource.c_str;
 		gl.ShaderSourceARB(fs->id, 1, &sz, 0);
 		CHECK_GL_ERRORS();
 		gl.CompileShaderARB(fs->id);
@@ -233,16 +209,16 @@ bool GLSLShader::CompilePass(
 
 		GLint status;
 		gl.GetObjectParameterivARB(fs->id, GL_OBJECT_COMPILE_STATUS_ARB, &status);
-		if (!status)
-		{ // error. 
-			COut(C_ErrMsgBox) << "GLSLShader::CompilePass('" << s->name.get() << "', " <<
-				channel << ", Fragment) Error: \n" << ShaderLog(fs->id) << std::endl;
+		if (!status) { 
+			// error. 
+			COut(C_ErrMsgBox) << "GLSLShader::CompilePass('" << shader->name.get() << "', " <<
+				pass << ", PixelShader) Error: \n" << ShaderLog(fs->id) << std::endl;
 			return false;
 		}
 
 #if defined(RAD_OPT_DEBUG)
-		COut(C_Debug) << "GLSLShader::CompilePass('" << s->name.get() << "', " << channel <<
-			", Fragment) Successfully Compiled. " << std::endl;
+		COut(C_Debug) << "GLSLShader::CompilePass('" << shader->name.get() << "', " << pass <<
+			", PixelShader) Successfully Compiled. " << std::endl;
 #endif
 	}
 
@@ -267,20 +243,19 @@ bool GLSLShader::CompilePass(
 #endif
 		if (!status)
 		{
-			COut(C_ErrMsgBox) << "GLSLShader::CompilePass('" << s->name.get() << "', " <<
-				channel << ", Link) Error: " << ProgramLog(r->id) << std::endl;
+			COut(C_ErrMsgBox) << "GLSLShader::CompilePass('" << shader->name.get() << "', " <<
+				pass << ", Link) Error: " << ProgramLog(r->id) << std::endl;
 			return false;
 		}
 	}
 
 	p.p = r;
 
-	if (!MapInputs(p, material))
-	{
+	if (!MapInputs(p, material)) {
 		gls.UseProgram(0, true);
 		p.p.reset();
-		COut(C_ErrMsgBox) << "GLSLShader::CompilePass('" << s->name.get() << "', " <<
-			channel << ", Program) MapInputs() failed." << std::endl;
+		COut(C_ErrMsgBox) << "GLSLShader::CompilePass('" << shader->name.get() << "', " <<
+			pass << ", Program) MapInputs() failed." << std::endl;
 		return false;
 	}
 
@@ -298,78 +273,54 @@ bool GLSLShader::CompileShaderSource(
 	stream::OutputStream &os, 
 	int pflags,
 	const Material &material
-)
-{
-	cg::Shader::Ref s = GLShader::Cache()->Load(engine, m_name.c_str);
-	if (!s)
+) {
+	tools::shader_utils::Shader::Ref shader = GLShader::Cache()->Load(engine, m_name.c_str);
+	if (!shader)
 		return false;
 
 	int numPasses = 0;
-	for (int i = 0; i < Shader::NumPasses; ++i)
-	{
+	for (int i = 0; i < Shader::kNumPasses; ++i) {
+		if (i == Shader::kPass_Preview)
+			continue; // don't cook this.
 		if (m_passes[i].p)
 			++numPasses;
 	}
 
-	const U8 MaxTextures = (pflags&(pkg::P_TargetIOS)) ? GLState::MaxIOSTextures : GLState::MaxTextures;
-	const U8 MaxAttribs  = (pflags&(pkg::P_TargetIOS)) ? GLState::MaxIOSAttribArrays : GLState::MaxAttribArrays;
-
-	os << (U8)GLShader::GLSL;
+	os << (U8)GLShader::kBackend_GLSL;
 	os << (U8)numPasses;
-
+	
 	String vertexSource;
 	String fragmentSource;
 
-	const bool GLES = (pflags&(pkg::P_TargetIPhone|pkg::P_TargetIPad)) ? true : false;
+	tools::shader_utils::GLSLTool::AssembleFlags kGLESFlag = tools::shader_utils::GLSLTool::kAssemble_None;
+	if (pflags&pkg::P_TargetIOS)
+		kGLESFlag = tools::shader_utils::GLSLTool::kAssemble_GLES;
 
-	for (int i = 0; i < Shader::NumPasses; ++i)
-	{
-		cg::Shader::Channel channel = (cg::Shader::Channel)(cg::Shader::C_Default+i);
+	for (int i = 0; i < Shader::kNumPasses; ++i) {
+		if (i == Shader::kPass_Preview)
+			continue; // don't cook this.
 
 		Pass &p = m_passes[i];
 
 		if (!p.p)
 			continue;
 
-		GLSLTool::StringVec textureTypes;
-
-		// figure out texture types...
-		for (int k = 0; k < GLState::MaxAttribArrays; ++k)
-		{
-			if (p.m.textures[k][0] == InvalidMapping)
-				break;
-			switch(p.m.textures[k][0])
-			{
-			case MTS_Texture:
-			case MTS_Framebuffer:
-				textureTypes.push_back(String("sampler2D"));
-			break;
-			}
-		}
-
 		{
 			std::stringstream ss;
 
-			GLSLShaderLink builder(engine, channel, s, false);
+			GLSLShaderLink builder(engine, material, (Shader::Pass)i, shader, false);
 			if (!builder.Assemble(
 				engine, 
-				true,
-				false,
-				GLES,
-				textureTypes,
-				s->TexCoordUsage(channel),
-				s->ColorUsage(channel),
-				0,
-				s->NormalUsage(channel),
-				&material,
-				&p.m,
-				true,
-				ss)
-			)
-			{
-
-				COut(C_Error) << "GLSLShader::CompileShaderSource('" << s->name.get() << "', " <<
-					channel << ", Vertex): Failed to emit shader code, SHADER ERROR!" << std::endl;
+				material,
+				shader,
+				p.m,
+				(Shader::Pass)i,
+				tools::shader_utils::GLSLTool::kAssemble_VertexShader|
+					tools::shader_utils::GLSLTool::kAssemble_Optimize|kGLESFlag,
+				ss
+			)) {
+				COut(C_Error) << "GLSLShader::CompilePass('" << shader->name.get() << "', " <<
+					i << ", VertexShader): Failed to emit shader code, SHADER ERROR!" << std::endl;
 				return false;
 			}
 
@@ -378,26 +329,20 @@ bool GLSLShader::CompileShaderSource(
 
 		{
 			std::stringstream ss;
-			GLSLShaderLink builder(engine, channel, s, true);
 
+			GLSLShaderLink builder(engine, material, (Shader::Pass)i, shader, false);
 			if (!builder.Assemble(
 				engine, 
-				false,
-				false,
-				GLES,
-				textureTypes,
-				s->TexCoordUsage(channel),
-				s->ColorUsage(channel),
-				0,
-				s->NormalUsage(channel),
-				0,
-				0,
-				true,
+				material,
+				shader,
+				p.m,
+				(Shader::Pass)i,
+				tools::shader_utils::GLSLTool::kAssemble_PixelShader|
+					tools::shader_utils::GLSLTool::kAssemble_Optimize|kGLESFlag,
 				ss
-			))
-			{
-				COut(C_Error) << "GLSLShader::CompileShaderSource('" << s->name.get() << "', " <<
-					channel << ", Fragment): Failed to emit shader code, SHADER ERROR!" << std::endl;
+			)) {
+				COut(C_Error) << "GLSLShader::CompilePass('" << shader->name.get() << "', " <<
+					i << ", PixelShader): Failed to emit shader code, SHADER ERROR!" << std::endl;
 				return false;
 			}
 
@@ -406,25 +351,24 @@ bool GLSLShader::CompileShaderSource(
 
 		os << (U8)i;
 		os << (U8)p.outputs;
-		os << p.m.numTexs;
-		os << p.m.numAttrs;
-		os << MaxTextures;
-		os << MaxAttribs;
 
-		for (int i = 0; i < MTS_Max; ++i)
+		for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
+			os << p.m.tcMods[i];
 			os << p.m.numMTSources[i];
-		for (int i = 0; i < MGS_Max; ++i)
+		}
+
+		for (int i = 0; i < kMaterialGeometrySource_MaxIndices; ++i) {
 			os << p.m.numMGSources[i];
-		for (int i = 0; i < MaxTextures; ++i)
-		{
+		}
+
+		for (int i = 0; i < kMaxTextures; ++i) {
 			os << p.m.textures[i][0];
 			os << p.m.textures[i][1];
 		}
-		for (int i = 0; i < MaxAttribs; ++i)
-		{
+		
+		for (int i = 0; i < kMaxAttribArrays; ++i) {
 			os << p.m.attributes[i][0];
 			os << p.m.attributes[i][1];
-			os << p.m.attributes[i][2];
 		}
 
 		os << (U32)(vertexSource.length+1);
@@ -440,16 +384,14 @@ bool GLSLShader::CompileShaderSource(
 
 #endif
 
-String GLSLShader::ShaderLog(GLhandleARB s)
-{
+String GLSLShader::ShaderLog(GLhandleARB s) {
 	enum { MaxLen = Kilo*8 };
 	char sz[MaxLen];
 	gl.GetInfoLogARB(s, MaxLen, 0, sz);
 	return String(sz);
 }
 
-String GLSLShader::ProgramLog(GLhandleARB s)
-{
+String GLSLShader::ProgramLog(GLhandleARB s) {
 #if defined(RAD_OPT_OGLES)
 	enum { MaxLen = Kilo*8 };
 	char sz[MaxLen];
@@ -463,10 +405,8 @@ String GLSLShader::ProgramLog(GLhandleARB s)
 GLSLShader::Ref GLSLShader::LoadCooked(
 	const char *name,
 	stream::InputStream &is,
-	bool skinned,
 	const Material &material
-)
-{
+) {
 	// first byte peeled off by GLShader to select GLSL backend.
 
 	GLSLShader::Ref r(new (ZRender) GLSLShader());
@@ -475,10 +415,8 @@ GLSLShader::Ref GLSLShader::LoadCooked(
 	U8 numPasses;
 	is >> numPasses;
 
-	for (U8 i = 0; i < numPasses; ++i)
-	{
-		if (!r->LoadPass(name, is, skinned, material))
-		{
+	for (U8 i = 0; i < numPasses; ++i) {
+		if (!r->LoadPass(name, is, material)) {
 			r.reset();
 			break;
 		}
@@ -490,50 +428,38 @@ GLSLShader::Ref GLSLShader::LoadCooked(
 bool GLSLShader::LoadPass(
 	const char *name,
 	stream::InputStream &is,
-	bool skinned,
 	const Material &material
-)
-{
+) {
 	U8 passNum;
 	is >> passNum;
-	if (passNum >= Shader::NumPasses)
+	if (passNum >= Shader::kNumPasses)
 		return false;
 
 	Pass &p = m_passes[passNum];
 	memset(&p.m, 0, sizeof(p.m));
 
-	U8 outputs, unused;
-	U8 MaxTextures, MaxAttribs, MaxTextureOverRead, MaxAttribsOverRead;
-
+	U8 outputs;
+	
 	is >> outputs; p.outputs = outputs;
-	is >> p.m.numTexs >> p.m.numAttrs;
-	is >> MaxTextures >> MaxAttribs;
 
-	MaxTextureOverRead = (MaxTextures>GLState::MaxTextures) ? MaxTextures-GLState::MaxTextures : 0;
-	MaxAttribsOverRead  = (MaxAttribs>GLState::MaxAttribArrays) ? MaxAttribs-GLState::MaxAttribArrays : 0;
-
-	MaxTextures = std::min<U8>(MaxTextures, GLState::MaxTextures);
-	MaxAttribs  = std::min<U8>(MaxAttribs, GLState::MaxAttribArrays);
-
-	for (int i = 0; i < MTS_Max; ++i)
+	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
+		is >> p.m.tcMods[i];
 		is >> p.m.numMTSources[i];
-	for (int i = 0; i < MGS_Max; ++i)
+	}
+
+	for (int i = 0; i < kMaterialGeometrySource_MaxIndices; ++i) {
 		is >> p.m.numMGSources[i];
-	for (int i = 0; i < MaxTextures; ++i)
-	{
+	}
+
+	for (int i = 0; i < kMaxTextures; ++i) {
 		is >> p.m.textures[i][0];
 		is >> p.m.textures[i][1];
 	}
-	for (U8 i = 0; i < MaxTextureOverRead; ++i)
-		is >> unused;
-	for (int i = 0; i < MaxAttribs; ++i)
-	{
+
+	for (int i = 0; i < kMaxAttribArrays; ++i) {
 		is >> p.m.attributes[i][0];
 		is >> p.m.attributes[i][1];
-		is >> p.m.attributes[i][2];
 	}
-	for (U8 i = 0; i < MaxAttribsOverRead; ++i)
-		is >> unused;
 
 	U32 programLength[2];
 	is >> programLength[0] >> programLength[1];
@@ -559,9 +485,9 @@ bool GLSLShader::LoadPass(
 		
 	GLint status;
 	gl.GetObjectParameterivARB(vs->id, GL_OBJECT_COMPILE_STATUS_ARB, &status);
-	if (!status)
-	{ // error. 
-		COut(C_Error) << "GLSLShader::CompilePass('" << name << "', Vertex) Error:" << std::endl << ShaderLog(vs->id) << std::endl;
+	if (!status) { 
+		// error. 
+		COut(C_Error) << "GLSLShader::LoadPass('" << name << "', Vertex) Error:" << std::endl << ShaderLog(vs->id) << std::endl;
 		return false;
 	}
 
@@ -577,9 +503,9 @@ bool GLSLShader::LoadPass(
 	CHECK_GL_ERRORS();
 
 	gl.GetObjectParameterivARB(fs->id, GL_OBJECT_COMPILE_STATUS_ARB, &status);
-	if (!status)
-	{ // error. 
-		COut(C_Error) << "GLSLShader::CompilePass('" << name << "', Fragment) Error:" << std::endl << ShaderLog(fs->id) << std::endl;
+	if (!status) { 
+		// error. 
+		COut(C_Error) << "GLSLShader::LoadPass('" << name << "', Fragment) Error:" << std::endl << ShaderLog(fs->id) << std::endl;
 		return false;
 	}
 
@@ -604,30 +530,27 @@ bool GLSLShader::LoadPass(
 		gl.GetObjectParameterivARB(r->id, GL_OBJECT_LINK_STATUS_ARB, &status);
 		CHECK_GL_ERRORS();
 #endif
-		if (!status)
-		{
-			COut(C_Error) << "GLSLShader::CompilePass('" << name << "', Link) Error: " << std::endl << ProgramLog(r->id) << std::endl;
+		if (!status) {
+			COut(C_Error) << "GLSLShader::LoadPass('" << name << "', Link) Error: " << std::endl << ProgramLog(r->id) << std::endl;
 			return false;
 		}
 	}
 
 	p.p = r;
 
-	if (!MapInputs(p, material))
-	{
+	if (!MapInputs(p, material)) {
 		gls.UseProgram(0, true);
 		p.p.reset();
-		COut(C_Error) << "GLSLShader::CompilePass('" << name << "', Program) MapInputs() failed." << std::endl;
+		COut(C_Error) << "GLSLShader::LoadPass('" << name << "', Program) MapInputs() failed." << std::endl;
 		return false;
 	}
-
-//	gls.UseProgram(0, true);
 
 	return true;
 }
 
-bool GLSLShader::MapInputs(Pass &p, const Material &material)
-{
+bool GLSLShader::MapInputs(Pass &p, const Material &material) {
+	gls.UseProgram(p.p->id, true);
+
 #if defined(RAD_OPT_OGLES2)
 	p.u.matrixOps = 0;
 	p.u.mvp = gl.GetUniformLocationARB(p.p->id, "U_mvp");
@@ -640,113 +563,114 @@ bool GLSLShader::MapInputs(Pass &p, const Material &material)
 		p.u.mvpfloats[i] = 0.f;
 #endif
 
-	gls.UseProgram(p.p->id, true);
+	const float kFloatMax = std::numeric_limits<float>::max();
 
-	for (int i = 0; i < GLState::MaxTextures; ++i)
-	{
-		if (p.m.textures[i][0] != InvalidMapping)
-		{
-			char sz[64];
-			string::sprintf(sz, "U_t%d", i);
-			p.u.textures[i] = gl.GetUniformLocationARB(p.p->id, sz);
+	p.u.eye = gl.GetUniformLocationARB(p.p->id, "U_eye");
+	p.u.eyeOps = 0;
+	p.u.eyePos[0] = p.u.eyePos[1] = p.u.eyePos[2] = kFloatMax;
 
-			if (p.u.textures[i] != -1)
-			{ // bind texture units
-				gl.Uniform1iARB(p.u.textures[i], i);
+	p.u.lights.numLights = 0;
+
+	for (int i = 0; i < kMaxLights; ++i) {
+		p.u.lights.lights[i].diffuse = Vec4(kFloatMax, kFloatMax, kFloatMax, kFloatMax);
+		p.u.lights.lights[i].specular = Vec4(kFloatMax, kFloatMax, kFloatMax, kFloatMax);
+		p.u.lights.lights[i].pos = Vec3(kFloatMax, kFloatMax, kFloatMax);
+		p.u.lights.lights[i].flags = 0;
+	}
+	
+	for (int i = 0; i < kMaxLights; ++i) {
+		char sz[64];
+
+		string::sprintf(sz, "U_light%d_pos", i);
+		p.u.lightPos[i] = gl.GetUniformLocationARB(p.p->id, sz);
+
+		string::sprintf(sz, "U_light%d_diffuseColor", sz);
+		p.u.lightDiffuse[i] = gl.GetUniformLocationARB(p.p->id, sz);
+
+		string::sprintf(sz, "U_light%d_specularColor", sz);
+		p.u.lightSpecular[i] = gl.GetUniformLocationARB(p.p->id, sz);
+
+		if (p.u.lightPos[i] == -1 &&
+			p.u.lightDiffuse[i] == -1 &&
+			p.u.lightSpecular[i] == -1) {
+			for (int k = i+1; k < kMaxLights; ++k) {
+				p.u.lightPos[k] = -1;
+				p.u.lightDiffuse[k] = -1;
+				p.u.lightSpecular[k] = -1;
 			}
-
-			// find texture coordinate index
-			int tcIndex = 0;
-			for (int k = 0; k < GLState::MaxAttribArrays; ++k)
-			{
-				if (p.m.attributes[k][0] == InvalidMapping)
-					break;
-				if (p.m.attributes[k][0] != MGS_TexCoords)
-					continue;
-				if (p.m.attributes[k][1] == p.m.textures[i][1])
-				{
-					tcIndex = p.m.attributes[k][2];
-					break;
-				}
-			}
-
-			p.u.tcMods[i][Material::NumTcMods] = -1;
-			int tcModUsage = material.TcModFlags((MTSource)p.m.textures[i][0], p.m.textures[i][1]);
-
-			for (int k = 0; k < Material::NumTcMods; ++k)
-			{
-				if (!(tcModUsage&(1<<k)))
-				{ // TcMod is unused by shader.
-					p.u.tcMods[i][k] = -1;
-					continue;
-				}
-
-				string::sprintf(sz, "U_tcmod%d[%d]", tcIndex, k);
-				p.u.tcMods[i][k] = gl.GetUniformLocationARB(p.p->id, sz);
-				if (p.u.tcMods[i][k] != -1)
-				{
-					gl.Uniform4fARB(p.u.tcMods[i][k], 0.f, 0.f, 0.f, 0.f);
-
-					for (int j = 0; j < Material::NumTcModVals; ++j)
-						p.u.tcModsVals[i][k][j] = 0.f;
-
-					if (k == Material::TcMod_Turb)
-					{
-						string::sprintf(sz, "U_tcmod%d[%d]", tcIndex, Material::NumTcMods);
-						p.u.tcMods[i][Material::NumTcMods] = gl.GetUniformLocationARB(p.p->id, sz);
-						RAD_VERIFY(p.u.tcMods[i][Material::NumTcMods] != -1);
-						gl.Uniform4fARB(p.u.tcMods[i][Material::NumTcMods], 0.f, 0.f, 0.f, 0.f);
-					}
-				}
-			}
+			break;
+		} else {
+			++p.u.lights.numLights;
 		}
-		else
-		{
-			p.u.textures[i] = -1;
-			for (int k = 0; k < Material::NumTcMods; ++k)
+	}
+
+	for (int i = 0; i < kMaxTextures; ++i) {
+		if (p.m.textures[i][0] == kInvalidMapping)
+			break;
+
+		char sz[64];
+		string::sprintf(sz, "U_t%d", i);
+		p.u.textures[i] = gl.GetUniformLocationARB(p.p->id, sz);
+
+		if (p.u.textures[i] != -1) { 
+			// bind texture units
+			gl.Uniform1iARB(p.u.textures[i], i);
+		}
+	}
+
+	for (int i = 0; i < kMaxTextures; ++i) {
+		
+		p.u.tcMods[i][Material::kNumTCMods] = -1;
+
+		if (p.m.tcMods[i] == kInvalidMapping) {
+			for (int k = i; k < kMaxTextures; ++k) {
+				for (int j = 0; j < Material::kNumTCMods; ++j) {
+					p.u.tcMods[k][j] = -1;
+				}
+			}
+			break;
+		}
+
+		int tcIndex = (int)p.m.tcMods[i];
+		int tcModFlags = material.TCModFlags(tcIndex);
+
+		for (int k = 0; k < Material::kNumTCMods; ++k) {
+			if (!(tcModFlags&(1<<k))) { 
+				// TcMod is unused by shader.
 				p.u.tcMods[i][k] = -1;
+				continue;
+			}
+
+			char sz[64];
+			string::sprintf(sz, "U_tcmod%d[%d]", tcIndex, k);
+			p.u.tcMods[i][k] = gl.GetUniformLocationARB(p.p->id, sz);
+			if (p.u.tcMods[i][k] != -1) {
+				gl.Uniform4fARB(p.u.tcMods[i][k], 0.f, 0.f, 0.f, 0.f);
+
+				for (int j = 0; j < Material::kNumTCModVals; ++j) {
+					p.u.tcModVals[i][k][j] = 0.f;
+				}
+
+				if (k == Material::kTCMod_Turb) {
+					string::sprintf(sz, "U_tcmod%d[%d]", tcIndex, Material::kNumTCMods);
+					p.u.tcMods[i][Material::kNumTCMods] = gl.GetUniformLocationARB(p.p->id, sz);
+					RAD_VERIFY(p.u.tcMods[i][Material::kNumTCMods] != -1);
+					gl.Uniform4fARB(p.u.tcMods[i][Material::kNumTCMods], 0.f, 0.f, 0.f, 0.f);
+				}
+			}
 		}
 	}
 
 	return true;
 }
 
-GLSLShader::GLSLShader() : m_curMat(0)
-{
-}
-
-int GLSLShader::Usage(Shader::Pass p, MTSource source) const
-{
-	RAD_ASSERT(source >= 0 && source < MTS_Max);
-	return HasPass(p) ? m_passes[p].m.numMTSources[source] : 0;
-}
-
-int GLSLShader::Usage(Shader::Pass p, MGSource source) const
-{
-	RAD_ASSERT(source >= 0 && source < MGS_Max);
-	return HasPass(p) ? m_passes[p].m.numMGSources[source] : 0;
-}
-
-int GLSLShader::Outputs(Shader::Pass p) const
-{
-	return HasPass(p) ? m_passes[p].outputs : 0;
-}
-
-bool GLSLShader::HasPass(Shader::Pass p) const
-{
-	RAD_ASSERT(p >= 0 && p < Shader::NumPasses);
-	return m_passes[p].p;
-}
-
-bool GLSLShader::Requires(Shader::Pass _p, MTSource source, int index) const
-{
+bool GLSLShader::Requires(Shader::Pass _p, MaterialTextureSource source, int index) const {
 	if (!HasPass(_p))
 		return false;
 	const Pass &p = m_passes[_p];
 
-	for (int i = 0; i < GLState::MaxTextures; ++i)
-	{
-		if (p.m.textures[i][0] == InvalidMapping)
+	for (int i = 0; i < kMaxTextures; ++i) {
+		if (p.m.textures[i][0] == kInvalidMapping)
 			break;
 		if (p.m.textures[i][0] == source && p.m.textures[i][1] == index)
 			return true;
@@ -755,15 +679,13 @@ bool GLSLShader::Requires(Shader::Pass _p, MTSource source, int index) const
 	return false;
 }
 
-bool GLSLShader::Requires(Shader::Pass _p, MGSource source, int index) const
-{
+bool GLSLShader::Requires(Shader::Pass _p, MaterialGeometrySource source, int index) const {
 	if (!HasPass(_p))
 		return false;
 	const Pass &p = m_passes[_p];
 
-	for (int i = 0; i < GLState::MaxAttribArrays; ++i)
-	{
-		if (p.m.attributes[i][0] == InvalidMapping)
+	for (int i = 0; i < kMaxAttribArrays; ++i) {
+		if (p.m.attributes[i][0] == kInvalidMapping)
 			break;
 		if (p.m.attributes[i][0] == source && p.m.attributes[i][1] == index)
 			return true;
@@ -773,9 +695,7 @@ bool GLSLShader::Requires(Shader::Pass _p, MGSource source, int index) const
 }
 
 
-void GLSLShader::Begin(Shader::Pass _p, const Material &material)
-{
-	RAD_ASSERT(_p >= Shader::P_First && _p < Shader::NumPasses);
+void GLSLShader::Begin(Shader::Pass _p, const Material &material) {
 	Pass &p = m_passes[_p];
 	RAD_ASSERT(p.p);
 	m_curPass = _p;
@@ -785,29 +705,33 @@ void GLSLShader::Begin(Shader::Pass _p, const Material &material)
 
 	// bind material textures
 	gls.DisableTextures();
-	for (int i = 0; i < GLState::MaxTextures; ++i)
-	{
-		if (p.m.textures[i][0] == InvalidMapping)
+	for (int i = 0; i < kMaxTextures; ++i) {
+		if (p.m.textures[i][0] == kInvalidMapping)
 			break;
 
-		GLTextureRef r = gls.MTSource((MTSource)p.m.textures[i][0], (int)p.m.textures[i][1]);
+		GLTextureRef r = gls.MaterialTextureSource((MaterialTextureSource)p.m.textures[i][0], (int)p.m.textures[i][1]);
 		if (r)
 			gls.SetTexture(i, r);
+	}
+
+	for (int i = 0 ;i < kMaterialTextureSource_MaxIndices; ++i) {
+		if (p.m.tcMods[i] == kInvalidMapping)
+			break;
+
+		int tcIndex = (int)p.m.tcMods[i];
 
 		// material contains animated tcMods.
-		for (int k = 0; k < Material::NumTcMods; ++k)
-		{
+		for (int k = 0; k < Material::kNumTCMods; ++k) {
 			if (p.u.tcMods[i][k] == -1)
 				continue; // unreferenced by shader
 
-			float st[Material::NumTcModVals];
-			float *src = p.u.tcModsVals[i][k];
+			float st[Material::kNumTCModVals];
+			float *src = &p.u.tcModVals[i][k][0];
 			int ops;
 
-			material.Sample((MTSource)p.m.textures[i][0], (int)p.m.textures[i][1], k, ops, st);
+			material.Sample(tcIndex, k, ops, st);
 
-			if (src[0] != st[0] || src[1] != st[1] || src[2] != st[2] || src[3] != st[3])
-			{
+			if (src[0] != st[0] || src[1] != st[1] || src[2] != st[2] || src[3] != st[3]) {
 				RAD_ASSERT(p.u.tcMods[i][k] != -1);
 				gl.Uniform4fARB(p.u.tcMods[i][k], st[0], st[1], st[2], st[3]);
 				src[0] = st[0];
@@ -817,10 +741,9 @@ void GLSLShader::Begin(Shader::Pass _p, const Material &material)
 			}
 
 			// pack in extra turb arguments
-			if (k == Material::TcMod_Turb && (src[4] != st[4] || src[5] != st[5]))
-			{
-				RAD_ASSERT(p.u.tcMods[i][Material::NumTcMods] != -1);
-				gl.Uniform4fARB(p.u.tcMods[i][Material::NumTcMods], st[4], st[5], 0.f, 0.f);
+			if (k == Material::kTCMod_Turb && (src[4] != st[4] || src[5] != st[5])) {
+				RAD_ASSERT(p.u.tcMods[i][Material::kNumTCMods] != -1);
+				gl.Uniform4fARB(p.u.tcMods[i][Material::kNumTCMods], st[4], st[5], 0.f, 0.f);
 				src[4] = st[4];
 				src[5] = st[5];
 			}
@@ -831,8 +754,7 @@ void GLSLShader::Begin(Shader::Pass _p, const Material &material)
 	GLint logLen, status;
 	glValidateProgram(p.p->id);
 	glGetProgramiv(p.p->id, GL_INFO_LOG_LENGTH, &logLen);
-	if (logLen > 0)
-	{
+	if (logLen > 0) {
 		GLchar *log = (GLchar*)stack_alloc(logLen);
 		glGetProgramInfoLog(p.p->id, logLen, &logLen, log);
 		COut(C_Debug) << "GLSLShader: '" << m_name.c_str.get() << "': Validate Log: " << log << std::endl;
@@ -846,38 +768,73 @@ void GLSLShader::Begin(Shader::Pass _p, const Material &material)
 // NVIDIA cards reserve index 3 for gl_Color and will produce an error if it's used
 // Remap this.
 
-inline int RemapIndex(int idx)
-{
+inline int RemapIndex(int idx) {
 #if defined(RAD_OPT_PC)
 	if (idx == 3)
-		return GLState::MaxAttribArrays-1;
+		return kMaxAttribArrays-1;
 #endif
 	return idx;
 }
 
-void GLSLShader::BindStates(bool sampleMaterialColor, const Vec4 &rgba)
-{
+void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMaterialColor) {
 	RAD_ASSERT(m_curMat);
 	Pass &p = m_passes[m_curPass];
 	
 	float c[4];
 
-	if (sampleMaterialColor)
-	{
-		m_curMat->SampleColor(Material::Color0, c);
-		c[0] *= rgba[0];
-		c[1] *= rgba[1];
-		c[2] *= rgba[2];
-		c[3] *= rgba[3];
+	if (sampleMaterialColor) {
+		m_curMat->SampleColor(Material::kColor0, c);
+		c[0] *= uniforms.blendColor[0];
+		c[1] *= uniforms.blendColor[1];
+		c[2] *= uniforms.blendColor[2];
+		c[3] *= uniforms.blendColor[3];
 
 #if defined(RAD_OPT_PC)
 		gl.Color4f(c[0], c[1], c[2], c[3]);
 #else
-	}
-	else
-	{
+	} else {
 		gl.GetColor4fv(c);
 #endif
+	}
+
+	if ((p.u.eye != -1) && (p.u.eyeOps != gl.eyeOps)) {
+		p.u.eyeOps = gl.eyeOps;
+
+		float eye[3];
+		gl.GetEye(eye);
+
+		if (eye[0] != p.u.eyePos[0] ||
+			eye[1] != p.u.eyePos[1] ||
+			eye[2] != p.u.eyePos[2]) {
+
+		}
+	}
+
+	// shader has to be provided all inputs!
+	RAD_ASSERT(p.u.lights.numLights == uniforms.lights.numLights);
+
+	for (int i = 0; i < uniforms.lights.numLights; ++i) {
+		const LightDef &srcLight = uniforms.lights.lights[i];
+		LightDef &dstLight = p.u.lights.lights[i];
+
+		if ((p.u.lightPos[i] != -1) && (srcLight.pos != dstLight.pos)) {
+			dstLight.pos = srcLight.pos;
+			gl.Uniform3fvARB(p.u.lightPos[i], 1, &srcLight.pos[0]);
+		}
+
+		if ((p.u.lightDiffuse[i] != -1) && (srcLight.diffuse != dstLight.diffuse)) {
+			RAD_ASSERT(srcLight.flags & LightDef::kFlag_Diffuse);
+			dstLight.diffuse = srcLight.diffuse;
+			gl.Uniform4fvARB(p.u.lightDiffuse[i], 1, &srcLight.diffuse[0]);
+		}
+
+		if ((p.u.lightSpecular[i] != -1) && (srcLight.specular != dstLight.specular)) {
+			RAD_ASSERT(srcLight.flags & LightDef::kFlag_Specular);
+			dstLight.specular = srcLight.specular;
+			gl.Uniform4fvARB(p.u.lightSpecular[i], 1, &srcLight.specular[0]);
+		}
+
+		dstLight.flags = srcLight.flags;
 	}
 	
 #if defined(RAD_OPT_OGLES2)
@@ -885,21 +842,18 @@ void GLSLShader::BindStates(bool sampleMaterialColor, const Vec4 &rgba)
 	{ // matrix has changed
 		p.u.matrixOps = gl.matrixOps;
 		// track modelview projection matrix?
-		if (p.u.mvp != -1)
-		{
+		if (p.u.mvp != -1) {
 			float floats[16];
 			Mat4 *x = reinterpret_cast<Mat4*>(floats);
 			*x = gl.GetModelViewProjectionMatrix();
 			x->Transpose();
-			if (memcmp(floats, p.u.mvpfloats, 16*sizeof(float)))
-			{
+			if (memcmp(floats, p.u.mvpfloats, 16*sizeof(float))) {
 				memcpy(p.u.mvpfloats, floats, 16*sizeof(float));
 				gl.UniformMatrix4fvARB(p.u.mvp, 1, GL_FALSE, floats);
 			}
 		}
 	}
-	if (p.u.color != -1)
-	{
+	if (p.u.color != -1) {
 		if (p.u.rgba[0] != c[0] ||
 			p.u.rgba[1] != c[1] ||
 			p.u.rgba[2] != c[2] ||
@@ -909,7 +863,7 @@ void GLSLShader::BindStates(bool sampleMaterialColor, const Vec4 &rgba)
 			p.u.rgba[1] = c[1];
 			p.u.rgba[2] = c[2];
 			p.u.rgba[3] = c[3];
-			gl.Uniform4fARB(p.u.color, c[0], c[1], c[2], c[3]);
+			gl.Uniform4fvARB(p.u.color, 1, &c[0]);
 		}
 	}
 #endif
@@ -933,17 +887,16 @@ void GLSLShader::BindStates(bool sampleMaterialColor, const Vec4 &rgba)
 	GLboolean sourceNormalized;
 	GLsizei sourceStride;
 	GLuint sourceOfs;
-	MGSource lastSource = MGS_Max;
+	MaterialGeometrySource lastSource = kNumMaterialGeometrySources;
 
 	gls.DisableVertexAttribArrays();
 	
-	for (int i = 0 ; i < GLState::MaxAttribArrays; ++i)
-	{
-		if (p.m.attributes[i][0] == InvalidMapping)
+	for (int i = 0 ; i < kMaxAttribArrays; ++i) {
+		if (p.m.attributes[i][0] == kInvalidMapping)
 			break;
 
-		gls.MGSource(
-			(MGSource)p.m.attributes[i][0],
+		gls.MaterialGeometrySource(
+			(MaterialGeometrySource)p.m.attributes[i][0],
 			(int)p.m.attributes[i][1],
 			vb,
 			size,
@@ -953,9 +906,8 @@ void GLSLShader::BindStates(bool sampleMaterialColor, const Vec4 &rgba)
 			ofs
 		);
 
-		if (lastSource != p.m.attributes[i][0])
-		{
-			lastSource = (MGSource)p.m.attributes[i][0];
+		if (lastSource != p.m.attributes[i][0]) {
+			lastSource = (MaterialGeometrySource)p.m.attributes[i][0];
 			sourceVB = vb;
 			sourceSize = size;
 			sourceType = type;
@@ -966,8 +918,7 @@ void GLSLShader::BindStates(bool sampleMaterialColor, const Vec4 &rgba)
 
 		int loc = RemapIndex(i);
 
-		if (vb)
-		{
+		if (vb) {
 			gls.EnableVertexAttribArray(loc, true);
 			gls.VertexAttribPointer(
 				loc,
@@ -978,9 +929,8 @@ void GLSLShader::BindStates(bool sampleMaterialColor, const Vec4 &rgba)
 				stride,
 				ofs
 			);
-		}
-		else if (sourceVB)
-		{ // some values like 2nd UV channel aren't provided
+		} else if (sourceVB) { 
+			// some values like 2nd UV channel aren't provided
 			// so pass in the 1st UV channel
 			gls.EnableVertexAttribArray(loc, true);
 			gls.VertexAttribPointer(
@@ -996,51 +946,44 @@ void GLSLShader::BindStates(bool sampleMaterialColor, const Vec4 &rgba)
 	}
 }
 
-void GLSLShader::End()
-{
+void GLSLShader::End() {
 	m_curMat = 0;
 	gls.UseProgram(0);
 }
 
-void GLSLShader::BindAttribLocations(GLhandleARB p, const GLState::MInputMappings &m)
-{
-	for (int i = 0; i < GLState::MaxAttribArrays; ++i)
-	{
-		if (m.attributes[i][0] == InvalidMapping)
+void GLSLShader::BindAttribLocations(GLhandleARB p, const MaterialInputMappings &m) {
+	for (int i = 0; i < kMaxAttribArrays; ++i) {
+		if (m.attributes[i][0] == kInvalidMapping)
 			break;
 
-		MGSource s = (MGSource)m.attributes[i][0];
+		MaterialGeometrySource s = (MaterialGeometrySource)m.attributes[i][0];
 		GLint idx  = (int)m.attributes[i][1];
 
 		int loc = RemapIndex(i);
 
-		switch (s)
-		{
-		case MGS_Vertices:
-			if (idx == 0)
-			{
+		switch (s) {
+		case kMaterialGeometrySource_Vertices:
+			if (idx == 0) {
 				gl.BindAttribLocationARB(p, loc, "in_position");
 				CHECK_GL_ERRORS();
 			}
 		break;
-		case MGS_Normals:
-			if (idx == 0)
-			{
+		case kMaterialGeometrySource_Normals:
+			if (idx == 0) {
 				gl.BindAttribLocationARB(p, loc, "in_normal");
 				CHECK_GL_ERRORS();
 			}
 		break;
-		case MGS_Tangents:
-			if (idx == 0)
-			{
+		case kMaterialGeometrySource_Tangents:
+			if (idx == 0) {
 				gl.BindAttribLocationARB(p, loc, "in_tangent");
 				CHECK_GL_ERRORS();
 			}
 		break;
-		case MGS_TexCoords:
+		case kMaterialGeometrySource_TexCoords: 
 			{
 				char name[64];
-				string::sprintf(name, "in_tc%d", (int)m.attributes[i][2]);
+				string::sprintf(name, "in_tc%d", idx);
 				gl.BindAttribLocationARB(p, loc, name);
 				CHECK_GL_ERRORS();
 			}

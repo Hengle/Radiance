@@ -12,7 +12,7 @@
 	\par Example
 	\code
 	RAD_BEGIN_FLAGS
-		RAD_FLAG(kSystemOption_OPtion1),
+		RAD_FLAG(kSystemOption_Option1),
 		RAD_FLAG(kSystemOption_Option2)
 	RAD_END_FLAGS(SystemOptions)
 
@@ -146,6 +146,12 @@ inline _type operator | (_type::Enum a, _type::Enum b) { \
 } \
 inline _type operator & (_type::Enum a, _type::Enum b) { \
 	return _type(a) & b; \
+} \
+inline _type operator | (_type::Enum a, _type b) { \
+	return _type(b) | a; \
+} \
+inline _type operator & (_type::Enum a, _type b) { \
+	return _type(b) & a; \
 }
 
 

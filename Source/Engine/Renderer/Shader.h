@@ -1,12 +1,14 @@
-// Shader.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file Shader.h
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup renderer
+*/
 
 #pragma once
 
 #include "../Types.h"
-#include "Sources.h"
+#include "Common.h"
 #include <Runtime/StreamDef.h>
 
 class Engine;
@@ -15,21 +17,44 @@ namespace r {
 
 class Material;
 
-class Shader
-{
+class Shader {
 public:
 
-	enum Pass
-	{
-		P_First,
-		P_Default = P_First,
-		NumPasses
+	enum Pass {
+		kPass_First,
+		kPass_Diffuse,
+		kPass_Specular,
+		kPass_DiffuseSpecular,
+		kPass_Default, // blend is controlled by material
+#if defined(RAD_OPT_PC_TOOLS)
+		kPass_Preview, // material preview
+#endif
+		kNumPasses
 	};
 
-	enum OutputFlags
-	{
-		RAD_FLAG(OF_Color),
-		RAD_FLAG(OF_Depth)
+	enum Output {
+		kOutput_First,
+		kOutput_Color = kOutput_First,
+		kOutput_Depth,
+		kNumOutputs
+	};
+
+	struct Uniforms {
+		LightEnv lights;
+		Vec4 blendColor;
+
+		struct defaultTag {};
+
+		Uniforms() {}
+		Uniforms(const Uniforms &u) : lights(u.lights), blendColor(u.blendColor) {}
+		explicit Uniforms(const defaultTag&) : blendColor(1.f, 1.f, 1.f, 1.f) {
+			lights.numLights = 0;
+		}
+		explicit Uniforms(const Vec4 &color) : blendColor(color) {
+			lights.numLights = 0;
+		}
+
+		static const Uniforms kDefault;
 	};
 
 	typedef boost::shared_ptr<Shader> Ref;
@@ -37,17 +62,23 @@ public:
 	Shader() : m_guid(s_guid++) {}
 	virtual ~Shader() {}
 
-	virtual int Usage(Pass p, MTSource source) const = 0;
-	virtual int Usage(Pass p, MGSource source) const = 0;
-	virtual bool Requires(Pass p, MTSource source, int index) const = 0;
-	virtual bool Requires(Pass p, MGSource source, int index) const = 0;
+	bool Requires(MaterialTextureSource source, int index) const;
+	bool Requires(MaterialGeometrySource source, int index) const;
+
+	virtual int Usage(Pass p, MaterialTextureSource source) const = 0;
+	virtual int Usage(Pass p, MaterialGeometrySource source) const = 0;
+	virtual bool Requires(Pass p, MaterialTextureSource source, int index) const = 0;
+	virtual bool Requires(Pass p, MaterialGeometrySource source, int index) const = 0;
 	virtual int Outputs(Pass p) const = 0;
 	virtual bool HasPass(Pass p) const = 0;
 
 	// Bind the shader, and required textures
 	virtual void Begin(Pass p, const Material &material) = 0;
 	// Bind the geometry states
-	virtual void BindStates(bool sampleMaterialColor = true, const Vec4 &rgba = Vec4(1, 1, 1, 1)) = 0;
+	virtual void BindStates(
+		const Uniforms &uniforms = Uniforms::kDefault,
+		bool sampleMaterialColor = true
+	) = 0;
 	virtual void End() = 0;
 
 #if defined(RAD_OPT_PC_TOOLS)

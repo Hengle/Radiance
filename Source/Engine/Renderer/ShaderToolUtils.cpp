@@ -1,31 +1,31 @@
-// CGUtils.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file ShaderToolUtils.cpp
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup renderer
+*/
 
 #include RADPCH
 
-#if defined(RAD_OPT_TOOLS)
-
-#include "CGUtils.h"
-#include "../../COut.h"
-#include "../RendererDef.h"
+#include "ShadertoolUtils.h"
+#include "../COut.h"
+#include "RendererDef.h"
 #include <Runtime/StringBase.h>
 #include <Runtime/File.h>
 #include <stdio.h>
 
-namespace cg {
+namespace tools {
+namespace shader_utils {
 
 bool OpenFile(
 	Engine &e,
 	const char *filename, 
 	File &out
-)
-{
+) {
 	out.ib = e.sys->files->OpenInputBuffer(filename, ZTools);
 
 	if (!out.ib) {
-		COut(C_ErrMsgBox) << "GLSLTool: Error opening \"" << filename << "\"" << std::endl;
+		COut(C_ErrMsgBox) << "ShaderTool: Error opening \"" << filename << "\"" << std::endl;
 		return false;
 	}
 
@@ -38,17 +38,15 @@ void Copy(
 	std::istream &is,
 	std::ostream &out,
 	bool resetIn
-)
-{
-	enum { MaxLineLength = Kilo*4 };
-	char lineBuf[MaxLineLength];
+) {
+	enum { kMaxLineLength = Kilo*4 };
+	char lineBuf[kMaxLineLength];
 
 	if (resetIn)
 		is.seekg(0);
 
-	for (;;)
-	{
-		is.read(lineBuf, MaxLineLength);
+	for (;;) {
+		is.read(lineBuf, kMaxLineLength);
 		out.write(lineBuf, is.gcount());
 		if (is.bad() || is.fail())
 			break;
@@ -59,8 +57,7 @@ bool Inject(
 	Engine &e,
 	const char *filename,
 	std::ostream &out
-)
-{
+) {
 	File f;
 	if (!OpenFile(e, filename, f))
 		return false;
@@ -68,8 +65,7 @@ bool Inject(
 	return true;
 }
 
-bool ParseInclude(const char *line, String &filename)
-{
+bool ParseInclude(const char *line, String &filename) {
 	while (*line && *line != '#') {
 		++line;
 	}
@@ -85,8 +81,7 @@ bool ParseInclude(const char *line, String &filename)
 		return false;
 	// skip " or <
 	++line;
-	while (*line && *line != '"' && *line != '>')
-	{
+	while (*line && *line != '"' && *line != '>') {
 		filename += *line;
 		++line;
 	}
@@ -97,27 +92,22 @@ bool ExpandIncludes(
 	IncludeSource &isrc,
 	std::istream &is,
 	std::ostream &os
-)
-{
-	enum { MaxLineLength = Kilo*4 };
-	char lineBuf[MaxLineLength];
+) {
+	enum { kMaxLineLength = Kilo*4 };
+	char lineBuf[kMaxLineLength];
 
 	is.seekg(0);
 
-	for(;;)
-	{
-		is.getline(lineBuf, MaxLineLength, '\n');
+	for(;;) {
+		is.getline(lineBuf, kMaxLineLength, '\n');
 		if (is.bad() || is.fail())
 			break;
 
 		String include;
-		if (ParseInclude(lineBuf, include))
-		{
+		if (ParseInclude(lineBuf, include)) {
 			if (!isrc.AddInclude(include.c_str, os))
 				return false;
-		}
-		else
-		{
+		} else {
 			os << lineBuf << '\n';
 		}
 	}
@@ -129,8 +119,7 @@ void SaveText(
 	Engine &engine,
 	const char *filename,
 	const char *sz
-)
-{
+) {
 	FILE *fp = engine.sys->files->fopen(filename, "wb", file::kFileOptions_None, file::kFileMask_Base);
 	if (fp) {
 		fwrite(sz, 1, string::len(sz), fp);
@@ -138,7 +127,6 @@ void SaveText(
 	}
 }
 
-} // cg
-
-#endif // RAD_OPT_TOOLS
+} // shader_utils
+} // tools
 

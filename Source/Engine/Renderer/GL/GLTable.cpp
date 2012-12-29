@@ -74,14 +74,7 @@ namespace r {
 
 RADENG_API GLTable gl;
 
-int GLTable::s_mm;
-GLMatrixStack GLTable::s_mv;
-GLMatrixStack GLTable::s_prj;
-
-float GLTable::s_color[4] = { 0.f, 0.f, 0.f, 1.f };
-
-GLTable::GLTable()
-{
+GLTable::GLTable() {
 #if defined(RAD_OPT_PC_TOOLS)
 	cgc = 0;
 #endif
@@ -92,55 +85,43 @@ GLTable::GLTable()
 	Reset();
 }
 
-void GLTable::DrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices)
-{
+void GLTable::DrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices) {
 	if (mode == GL_TRIANGLES)
 		numTris += count / 3;
 
-	if (vbos)
-	{
-		if (wireframe && mode == GL_TRIANGLES)
-		{
+	if (vbos) {
+		if (wireframe && mode == GL_TRIANGLES) {
 			const U8 *ofs = reinterpret_cast<const U8*>(indices);
 			int size = (type == GL_UNSIGNED_BYTE) ? 3 : (type == GL_UNSIGNED_SHORT) ? 6 : 12;
 
 			// lines
 			for (GLsizei i = 0; i <= count-3; i += 3, ofs += size)
 				glDrawElements(GL_LINE_LOOP, 3, type, ofs);
-		}
-		else
-		{
+		} else {
 			glDrawElements(mode, count, type, indices);
 		}
-	}
-	else
-	{
+	} else {
 		GLVertexBuffer::Ref ib = gls.VertexBufferBinding(GL_ELEMENT_ARRAY_BUFFER_ARB);
 		if (ib)
 			indices = (const GLvoid*)(static_cast<U8*>(ib->m_ptr.m_p)+reinterpret_cast<AddrSize>(indices));		
 		RAD_ASSERT(indices);
 
-		if (wireframe && mode == GL_TRIANGLES)
-		{
+		if (wireframe && mode == GL_TRIANGLES) {
 			const U8 *ofs = reinterpret_cast<const U8*>(indices);
 			int size = (type == GL_UNSIGNED_BYTE) ? 3 : (type == GL_UNSIGNED_SHORT) ? 6 : 12;
 
 			// lines
 			for (GLsizei i = 0; i <= count-3; i += 3, ofs += size)
 				glDrawElements(GL_LINE_STRIP, 3, type, ofs);
-		}
-		else
-		{
+		} else {
 			glDrawElements(mode, count, type, indices);
 		}
 	}
 }
 
-void GLTable::Reset()
-{
+void GLTable::Reset() {
 #if defined(RAD_OPT_PC_TOOLS)
-	if (cgc)
-	{
+	if (cgc) {
 		cgDestroyContext(cgc);
 		cgc = 0;
 	}
@@ -154,7 +135,15 @@ void GLTable::Reset()
 	SGIS_generate_mipmap = false;
 	ARB_texture_non_power_of_two = false;
 	
-	s_mm = GL_PROJECTION;
+	color[0] = 1.f;
+	color[1] = 1.f;
+	color[2] = 1.f;
+	color[3] = 1.f;
+	eye[0] = 0.f;
+	eye[1] = 0.f;
+	eye[2] = 0.f;
+
+	mm = GL_PROJECTION;
 	matrixOps = 0;
 	colorOps = 0;
 	eyeOps = 0;
@@ -168,13 +157,11 @@ void GLTable::Reset()
 	numTris = 0;
 
 #if defined(RAD_OPT_TOOLS)
-	if (glslopt)
-	{
+	if (glslopt) {
 		glslopt_cleanup(glslopt);
 		glslopt = 0;
 	}
-	if (glslopt_es)
-	{
+	if (glslopt_es) {
 		glslopt_cleanup(glslopt_es);
 		glslopt_es = 0;
 	}
@@ -373,8 +360,7 @@ void GLTable::Reset()
 	SetSwapInterval = 0;
 }
 
-void GLTable::Load()
-{
+void GLTable::Load() {
 	LoadGLVersion();
 
 	v1_1 = CheckVer("1.1");
@@ -393,15 +379,23 @@ void GLTable::Load()
 	glslopt_es = glslopt_initialize(true);
 #endif
 
-	s_mm = GL_PROJECTION;
+	mm = GL_PROJECTION;
 	matrixOps = 0;
 	colorOps = 0;
 	eyeOps = 0;
 	wireframe = false;
 	numTris = 0;
 
+	color[0] = 1.f;
+	color[1] = 1.f;
+	color[2] = 1.f;
+	color[3] = 1.f;
+	eye[0] = 0.f;
+	eye[1] = 0.f;
+	eye[2] = 0.f;
+
 #if !defined(RAD_OPT_OGLES2)
-	glMatrixMode(s_mm);
+	glMatrixMode(mm);
 #endif
 
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
@@ -729,15 +723,13 @@ void GLTable::Load()
 	SetSwapInterval = &_SetSwapInterval;
 #elif defined(RAD_OPT_WIN)
 	EXT_swap_control = CheckExt("WGL_EXT_swap_control");
-	if (EXT_swap_control)
-	{
+	if (EXT_swap_control) {
 		SetSwapInterval = (int (APIENTRYP)(int))GL_GetProcAddress("wglSwapIntervalEXT");
 		EXT_swap_control = SetSwapInterval != 0;
 	}
 #elif defined(RAD_OPT_LINUX)
 	EXT_swap_control = true; // assume. some vendors messed up the swap control extension strings
-	if (EXT_swap_control)
-	{
+	if (EXT_swap_control) {
 		SetSwapInterval = (int (APIENTRYP)(int))GL_GetProcAddress("glXSwapIntervalSGI");
 		EXT_swap_control = SetSwapInterval != 0;
 	}
@@ -749,8 +741,7 @@ void GLTable::Load()
 }
 
 #if defined(RAD_OPT_APPLE)
-int GLTable::_SetSwapInterval(int i)
-{
+int GLTable::_SetSwapInterval(int i) {
 #if !defined(RAD_OPT_OGLES)
 #if defined(CGL_VERSION_1_2)
 	const GLint sync = i;
@@ -763,8 +754,7 @@ int GLTable::_SetSwapInterval(int i)
 }
 #endif
 
-bool GLTable::CheckVer(const char *ver)
-{
+bool GLTable::CheckVer(const char *ver) {
 	int min = 0, maj = 0;
 #define CAWARN_DISABLE 6031 // return value ignored
 #include <Runtime/PushCAWarnings.h>
@@ -773,8 +763,7 @@ bool GLTable::CheckVer(const char *ver)
 	return (vMaj > maj) || (vMaj == maj && vMin >= min);
 }
 
-bool GLTable::CheckExt(const char* ext)
-{
+bool GLTable::CheckExt(const char* ext) {
 	int i, k;
 	int len_ext, len_glstring;
 	const char* glstring;
@@ -790,8 +779,7 @@ bool GLTable::CheckExt(const char* ext)
 
 	len_glstring = (int)string::len( glstring );
 
-	for(i = 0; i < len_glstring; i++)
-	{
+	for(i = 0; i < len_glstring; i++) {
 		if(glstring[i] == ' ')
 			continue;
 
@@ -801,14 +789,12 @@ bool GLTable::CheckExt(const char* ext)
 		mac doesn't have strcmp?
 		*/
 
-		for(k = 0; k < len_ext; k++)
-		{
+		for(k = 0; k < len_ext; k++) {
 			if( string::tolower( ext[k] ) != string::tolower( glstring[i+k] ) )
 				break;
 		}
 
-		if(k == len_ext)	/* found? */
-		{
+		if(k == len_ext) {	/* found? */
 			/*
 			the next char in the glstring better
 			be a space or a null otherwise we just
@@ -822,8 +808,7 @@ bool GLTable::CheckExt(const char* ext)
 	return false;
 }
 
-void GLTable::LoadGLVersion()
-{
+void GLTable::LoadGLVersion() {
 #if defined(RAD_OPT_IOS)
 	vMaj = 1;
 	vMin = 1;
@@ -873,14 +858,12 @@ void GLTable::LoadGLVersion()
 #endif
 }
 
-void GLTable::SetActiveTexture(int num)
-{
+void GLTable::SetActiveTexture(int num) {
 	if (ActiveTextureARB)
 		ActiveTextureARB(GL_TEXTURE0_ARB+num);
 }
 
-void GLTable::SetActiveTexCoord(int num)
-{
+void GLTable::SetActiveTexCoord(int num) {
 #if defined(RAD_OPT_OGLES)
 	SetActiveTexture(num);
 #else
@@ -889,8 +872,7 @@ void GLTable::SetActiveTexCoord(int num)
 #endif
 }
 
-bool GLTable::CheckErrors(const char *file, const char *function, int line)
-{
+bool GLTable::CheckErrors(const char *file, const char *function, int line) {
 #if defined(RAD_OPT_IOS) || defined(RAD_OPT_OSX)
 	return glGetError() != GL_NO_ERROR;
 #else
@@ -898,13 +880,11 @@ bool GLTable::CheckErrors(const char *file, const char *function, int line)
 	bool found = false;
 	int count = 0;
 
-	for (GLenum err = glGetError(); err != GL_NO_ERROR; err = glGetError())
-	{
+	for (GLenum err = glGetError(); err != GL_NO_ERROR; err = glGetError()) {
 		if (++count > 256)
 			break;
 
-		if (!found)
-		{
+		if (!found) {
 			str.Printf(
 				"GL Errors (file: %s, function: %s, line: %d):\n",
 				file,
@@ -919,8 +899,7 @@ bool GLTable::CheckErrors(const char *file, const char *function, int line)
 	}
 
 	ClearErrors();
-	if (found)
-	{
+	if (found) {
 		MessageBox("GL Errors Detected", str.c_str, MBStyleOk);
 	}
 
@@ -928,17 +907,14 @@ bool GLTable::CheckErrors(const char *file, const char *function, int line)
 #endif
 }
 
-void GLTable::ClearErrors()
-{
+void GLTable::ClearErrors() {
 	int c = 0;
-	while (glGetError() != GL_NO_ERROR && (c<64))
-	{
+	while (glGetError() != GL_NO_ERROR && (c<64)) {
 		++c;
 	}
 }
 
-void GLTable::OrthoViewport(int x, int y, int w, int h)
-{
+void GLTable::OrthoViewport(int x, int y, int w, int h) {
 	MatrixMode(GL_PROJECTION);
 	LoadIdentity();
 	Ortho((double)x, (double)w, (double)(y+h), (double)y, -1.0, 1.0);
@@ -949,16 +925,14 @@ void GLTable::OrthoViewport(int x, int y, int w, int h)
 #undef near
 #undef far
 
-void GLTable::RotateForCamera(const Vec3 &pos, const Mat4 &rot, float near, float far, float fov, float yaspect)
-{
+void GLTable::RotateForCamera(const Vec3 &pos, const Mat4 &rot, float near, float far, float fov, float yaspect) {
 	MatrixMode(GL_PROJECTION);
 	LoadIdentity();
 	Perspective(fov*yaspect, 1.0/yaspect, near, far);
 	RotateForCamera(pos, rot);
 }
 
-void GLTable::RotateForCamera(const Vec3 &pos, const Mat4 &rot)
-{
+void GLTable::RotateForCamera(const Vec3 &pos, const Mat4 &rot) {
 	MatrixMode(GL_MODELVIEW);
 	LoadIdentity();
 #if defined(RAD_OPT_IOS)

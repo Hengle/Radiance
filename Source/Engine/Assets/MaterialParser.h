@@ -96,7 +96,9 @@ public:
 	MaterialLoader();
 	virtual ~MaterialLoader();
 
-	pkg::Asset::Ref Texture(r::MTSource source, int index);
+	pkg::Asset::Ref Texture(int index) {
+		return m_textures[index];
+	}
 
 	RAD_DECLARE_READONLY_PROPERTY(MaterialLoader, loaded, bool);
 	RAD_DECLARE_READONLY_PROPERTY(MaterialLoader, parsed, bool);
@@ -123,13 +125,21 @@ private:
 		Done = -4
 	};
 
-	RAD_DECLARE_GET(loaded, bool) { return m_current == Done; }
-	RAD_DECLARE_GET(parsed, bool) { return m_current == Done || m_current == Parsed; }
-	RAD_DECLARE_GET(info, bool) { return m_current == Done || m_current == Parsed || m_current == Info; }
+	RAD_DECLARE_GET(loaded, bool) { 
+		return m_index == Done; 
+	}
 
-	int m_current;
+	RAD_DECLARE_GET(parsed, bool) { 
+		return m_index == Done || m_index == Parsed; 
+	}
+
+	RAD_DECLARE_GET(info, bool) { 
+		return m_index == Done || m_index == Parsed || m_index == Info; 
+	}
+
 	int m_index;
-	pkg::Asset::Ref m_textures[r::MTS_Max][r::MTS_MaxIndices];
+
+	boost::array<pkg::Asset::Ref, r::kMaterialTextureSource_MaxIndices> m_textures;
 };
 
 } // asset

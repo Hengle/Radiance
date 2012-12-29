@@ -1,7 +1,9 @@
-// GLMaterial.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file GLMaterial.cpp
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup renderer
+*/
 
 #include RADPCH
 #include "../Material.h"
@@ -12,146 +14,107 @@
 
 namespace r {
 
-void Material::BindStates(int flags, int blends)
-{
-	int drawFlags = flags|CFM_CCW|CWM_RGBA;
+void Material::BindStates(int flags, int blends) {
+	int drawFlags = flags;
 
-	if (!(flags&r::DWM_Flags))
-	{
+	if (!(flags&kColorWriteMask_Flags)) {
+		drawFlags |= kColorWriteMask_RGBA;
+	}
+
+	if (!(flags&kDepthWriteMask_Flags)) {
 		if (this->depthWrite)
-			drawFlags |= r::DWM_Enable;
+			drawFlags |= kDepthWriteMask_Enable;
 		else
-			drawFlags |= r::DWM_Disable;
+			drawFlags |= kDepthWriteMask_Disable;
 	}
 
-	if (!(flags&r::DT_Flags))
-	{
-		switch (this->depthFunc)
-		{
-		case Material::DT_None:
-			drawFlags |= r::DT_Disable;
+	if (!(flags&kDepthTest_Flags)) {
+		switch (this->depthFunc) {
+		case Material::kDepthFunc_None:
+			drawFlags |= kDepthTest_Disable;
 			break;
-		case Material::DT_Less:
-			drawFlags |= r::DT_Less;
+		case Material::kDepthFunc_Less:
+			drawFlags |= kDepthTest_Less;
 			break;
-		case Material::DT_LEqual:
-			drawFlags |= r::DT_LEqual;
+		case Material::kDepthFunc_LEqual:
+			drawFlags |= kDepthTest_LEqual;
 			break;
-		case Material::DT_Greater:
-			drawFlags |= r::DT_Greater;
+		case Material::kDepthFunc_Greater:
+			drawFlags |= kDepthTest_Greater;
 			break;
-		case Material::DT_GEqual:
-			drawFlags |= r::DT_GEqual;
+		case Material::kDepthFunc_GEqual:
+			drawFlags |= kDepthTest_GEqual;
 			break;
 		}
 	}
 
-	if (!(flags&r::AT_Flags))
-	{
-		switch (this->alphaTest)
-		{
-		case Material::AT_None:
-			drawFlags |= r::AT_Disable;
-			break;
-		case Material::AT_Less:
-			drawFlags |= r::AT_Less;
-			break;
-		case Material::AT_LEqual:
-			drawFlags |= r::AT_LEqual;
-			break;
-		case Material::AT_Greater:
-			drawFlags |= r::AT_Greater;
-			break;
-		case Material::AT_GEqual:
-			drawFlags |= r::AT_GEqual;
-			break;
-		}
-	}
+	if (!(flags&kScissorTest_Flags))
+		flags |= kScissorTest_Disable; // disable scissor test unless requested.
 
-	gls.AlphaRef(this->alphaVal.get() / 255.f);
+	int blendFlags = kBlendMode_Off;
 
-	if (!(flags&r::SCT_Flags))
-		flags |= SCT_Disable; // disable scissor test unless requested.
-
-	int blendFlags = r::BM_Off;
-
-	if (!(blends&r::BM_Flags))
-	{
-		switch (this->blendMode)
-		{
-		case Material::BM_Alpha:
-			blendFlags = BMS_SrcAlpha|BMD_InvSrcAlpha;
+	if (!(blends&kBlendMode_Flags)) {
+		switch (this->blendMode) {
+		case Material::kBlendMode_Alpha:
+			blendFlags = kBlendModeSource_SrcAlpha|kBlendModeDest_InvSrcAlpha;
 			break;
-		case Material::BM_InvAlpha:
-			blendFlags = BMS_InvSrcAlpha|BMD_SrcAlpha;
+		case Material::kBlendMode_InvAlpha:
+			blendFlags = kBlendModeSource_InvSrcAlpha|kBlendModeDest_SrcAlpha;
 			break;
-		case Material::BM_Additive:
-			blendFlags = BMS_One|BMD_One;
+		case Material::kBlendMode_Additive:
+			blendFlags = kBlendModeSource_One|kBlendModeDest_One;
 			break;
-		case Material::BM_AddBlend:
-			blendFlags = BMS_SrcAlpha|BMD_One;
+		case Material::kBlendMode_AddBlend:
+			blendFlags = kBlendModeSource_SrcAlpha|kBlendModeDest_One;
 			break;
-		case Material::BM_Colorize:
-			blendFlags = BMS_DstColor|BMD_Zero;
+		case Material::kBlendMode_Colorize:
+			blendFlags = kBlendModeSource_DstColor|kBlendModeDest_Zero;
 			break;
-		case Material::BM_InvColorizeD:
-			blendFlags = BMS_InvDstColor|BMD_Zero;
+		case Material::kBlendMode_InvColorizeD:
+			blendFlags = kBlendModeSource_InvDstColor|kBlendModeDest_Zero;
 			break;
-		case Material::BM_InvColorizeS:
-			blendFlags = BMS_Zero|BMD_InvSrcColor;
+		case Material::kBlendMode_InvColorizeS:
+			blendFlags = kBlendModeSource_Zero|kBlendModeDest_InvSrcColor;
 			break;
 		default:
 			break;
 		}
-	}
-	else
-	{
+	} else {
 		blendFlags = blends;
 	}
 
-	if (!(flags&r::CFM_Flags))
-	{
+	if (!(flags&kCullFaceMode_Flags)) {
 		if (this->doubleSided)
-			drawFlags |= r::CFM_None;
+			drawFlags |= kCullFaceMode_None;
 		else
-			drawFlags |= r::CFM_Front;
+			drawFlags |= kCullFaceMode_Front|kCullFaceMode_CCW;
 	}
 
 	gls.Set(drawFlags, blendFlags);
 }
 
-void Material::BindTextures(const asset::MaterialLoader::Ref &loader)
-{
+void Material::BindTextures(const asset::MaterialLoader::Ref &loader) {
 	gls.DisableAllMTSources();
 	if (!loader)
 		return;
 
-	for (int i = 0; i < MTS_Max; ++i)
-	{
-		for (int k = 0; k < MTS_MaxIndices; ++k)
-		{
-			pkg::Asset::Ref a = loader->Texture((MTSource)i, k);
-			if (!a)
-			{
-				if (i == MTS_Texture)
-					continue; // allows gaps here (may be procedural texture)
-				break;
-			}
-			GLTextureAsset::Ref tex = GLTextureAsset::Cast(a);
-			RAD_ASSERT(tex);
+	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
+		pkg::Asset::Ref a = loader->Texture(i);
+		if (!a)
+			continue; // allows gaps here (may be a procedural texture)
+		GLTextureAsset::Ref tex = GLTextureAsset::Cast(a);
+		RAD_ASSERT(tex);
 
-			int index = 0;
-			if (tex->numTextures > 1)
-			{	
-				index = FloatToInt(time.get() * TextureFPS((MTSource)i, k));
-				if ((timingMode == TM_Relative) && ClampTextureFrames((MTSource)i, k))
-					index = std::min(index, tex->numTextures.get()-1);
-				else
-					index = index % tex->numTextures.get();
-			}
-			
-			gls.SetMTSource((MTSource)i, k, tex->Texture(index));
+		int index = 0;
+		if (tex->numTextures > 1) {	
+			index = FloatToInt(time.get() * TextureFPS(i));
+			if ((timingMode == kTimingMode_Relative) && ClampTextureFrames(i))
+				index = std::min(index, tex->numTextures.get()-1);
+			else
+				index = index % tex->numTextures.get();
 		}
+			
+		gls.SetMTSource(kMaterialTextureSource_Texture, i, tex->Texture(index));
 	}
 }
 
@@ -159,14 +122,11 @@ Shader::Ref Material::ShaderInstance::LoadCooked(
 	Engine &engine,
 	const char *shaderName,
 	stream::InputStream &is,
-	bool skinned,
 	const Material &material
-)
-{
+) {
 	return GLShader::LoadCooked(
 		shaderName,
 		is,
-		skinned,
 		material
 	);
 }
@@ -174,16 +134,13 @@ Shader::Ref Material::ShaderInstance::LoadCooked(
 #if defined(RAD_OPT_TOOLS)
 Shader::Ref Material::ShaderInstance::Load(
 	Engine &engine, 
-	bool skinned,
 	const Material &material
-)
-{
+) {
 	return GLShader::Load(
 		engine, 
 		material.shaderName, 
-		skinned, 
 		material, 
-		GLShader::GLSL
+		GLShader::kBackend_GLSL
 	);
 }
 #endif

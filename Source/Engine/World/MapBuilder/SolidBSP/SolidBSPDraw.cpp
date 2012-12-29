@@ -103,12 +103,12 @@ void BSPBuilder::PaintHandler::BeginPaint(const QRect &viewport, MapBuilderDebug
 	gls.DisableAllMTSources();
 	gls.DisableVertexAttribArrays();
 
-	int cfm = backfaces ? CFM_Back : CFM_Front;
+	int cfm = backfaces ? kCullFaceMode_Back : kCullFaceMode_Front;
 
 	if (!state)
-		state = DT_Less|cfm|CFM_CCW|CWM_RGBA;
+		state = kDepthTest_Less|cfm|kCullFaceMode_CCW|kColorWriteMask_RGBA;
 	if (!blend)
-		blend = BM_Off;
+		blend = kBlendMode_Off;
 
 	gls.Set(state, blend);
 
@@ -120,15 +120,15 @@ void BSPBuilder::PaintHandler::BeginPaint(const QRect &viewport, MapBuilderDebug
 void BSPBuilder::PaintHandler::EndPaint() {
 	DisableSmoothShading();
 	
-	gls.Set(DWM_Enable, -1); // for glClear()
+	gls.Set(kDepthWriteMask_Enable, -1); // for glClear()
 	gls.Commit();
 }
 
 void BSPBuilder::PaintHandler::BeginWireframe(bool backfaces) {
 	
-	int cfm = backfaces ? CFM_Back : CFM_Front;
+	int cfm = backfaces ? kCullFaceMode_Back : kCullFaceMode_Front;
 
-	gls.Set(DT_Disable|cfm|CFM_CCW|CWM_RGBA, BM_Off);
+	gls.Set(kDepthTest_Disable|cfm|kCullFaceMode_CCW|kColorWriteMask_RGBA, kBlendMode_Off);
 	gls.Commit();
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -136,7 +136,7 @@ void BSPBuilder::PaintHandler::BeginWireframe(bool backfaces) {
 }
 
 void BSPBuilder::PaintHandler::EndWireframe() {
-	gls.Set(DWM_Enable, -1); // for glClear()
+	gls.Set(kDepthWriteMask_Enable, -1); // for glClear()
 	gls.Commit();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
@@ -198,7 +198,7 @@ void BSPBuilder::AreaBSPDraw::DrawModel(BSPBuilder &bsp, U32 modelNum) {
 void BSPBuilder::AreaBSPDraw::DrawAreaportals(BSPBuilder &bsp, int areaNum) {
 
 	gl.Color4f(0., 0.f, 1.f, 0.5f);
-	gls.Set(DT_Disable|CFM_None, BMS_SrcAlpha|BMD_InvSrcAlpha);
+	gls.Set(kDepthTest_Disable|kCullFaceMode_None, kBlendModeSource_SrcAlpha|kBlendModeDest_InvSrcAlpha);
 	gls.DisableVertexAttribArrays();
 	gls.DisableTextures();
 	gls.Commit();

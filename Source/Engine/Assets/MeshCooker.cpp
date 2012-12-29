@@ -14,16 +14,13 @@ using namespace pkg;
 
 namespace asset {
 
-MeshCooker::MeshCooker() : Cooker(1)
-{
+MeshCooker::MeshCooker() : Cooker(2) {
 }
 
-MeshCooker::~MeshCooker()
-{
+MeshCooker::~MeshCooker() {
 }
 
-CookStatus MeshCooker::CheckRebuild(int flags, int allflags)
-{
+CookStatus MeshCooker::CheckRebuild(int flags, int allflags) {
 	if (CompareVersion(flags) || 
 		CompareModifiedTime(flags) || 
 		CompareCachedFileTimeKey(flags, "Source.File"))
@@ -31,8 +28,7 @@ CookStatus MeshCooker::CheckRebuild(int flags, int allflags)
 	return CS_UpToDate;
 }
 
-CookStatus MeshCooker::Status(int flags, int allflags)
-{
+CookStatus MeshCooker::Status(int flags, int allflags) {
 	flags &= P_AllTargets;
 	allflags &= P_AllTargets;
 
@@ -55,8 +51,7 @@ CookStatus MeshCooker::Status(int flags, int allflags)
 	return CheckRebuild(flags, allflags);
 }
 
-int MeshCooker::Compile(int flags, int allflags)
-{
+int MeshCooker::Compile(int flags, int allflags) {
 	// Make sure these get updated
 	CompareVersion(flags);
 	CompareModifiedTime(flags);

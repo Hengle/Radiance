@@ -104,114 +104,58 @@ void SIMDSkinTest(std::ostream &out) {
 	skinData.Create(kNumVerts, 1, kNumBones, 1);
 	refTime.Start();
 	for (int i = 0; i < kMultiplier; ++i) {
-		ref->SkinVerts[0][0](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+		ref->SkinVerts[0](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
 	}
 	refTime.Stop();
 	simdTime.Start();
 	for (int i = 0; i < kMultiplier; ++i) {
-		SIMD->SkinVerts[0][0](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+		SIMD->SkinVerts[0](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
 	}
 	simdTime.Stop();
 	out << "(1B1T) " << ref->name << ": " << VertsPerSecond(refTime, kNumVerts*kMultiplier) << " (vps), " << SIMD->name << ": " << VertsPerSecond(simdTime, kNumVerts*kMultiplier) << " (vps)." << std::endl;
-
-	// 1B2T
-	skinData.Create(kNumVerts, 1, kNumBones, 2);
-	refTime.Start();
-	for (int i = 0; i < kMultiplier; ++i) {
-		ref->SkinVerts[0][1](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
-	}
-	refTime.Stop();
-	simdTime.Start();
-	for (int i = 0; i < kMultiplier; ++i) {
-		SIMD->SkinVerts[0][1](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
-	}
-	simdTime.Stop();
-	out << "(1B2T) " << ref->name << ": " << VertsPerSecond(refTime, kNumVerts*kMultiplier) << " (vps), " << SIMD->name << ": " << VertsPerSecond(simdTime, kNumVerts*kMultiplier) << " (vps)." << std::endl;
 
 	// 2B1T
 	skinData.Create(kNumVerts, 2, kNumBones, 1);
 	refTime.Start();
 	for (int i = 0; i < kMultiplier; ++i) {
-		ref->SkinVerts[1][0](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+		ref->SkinVerts[1](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
 	}
 	refTime.Stop();
 	simdTime.Start();
 	for (int i = 0; i < kMultiplier; ++i) {
-		SIMD->SkinVerts[1][0](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+		SIMD->SkinVerts[1](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
 	}
 	simdTime.Stop();
 	out << "(2B1T) " << ref->name << ": " << VertsPerSecond(refTime, kNumVerts*kMultiplier) << " (vps), " << SIMD->name << ": " << VertsPerSecond(simdTime, kNumVerts*kMultiplier) << " (vps)." << std::endl;
-
-	// 2B2T
-	skinData.Create(kNumVerts, 2, kNumBones, 2);
-	refTime.Start();
-	for (int i = 0; i < kMultiplier; ++i) {
-		ref->SkinVerts[1][1](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
-	}
-	refTime.Stop();
-	simdTime.Start();
-	for (int i = 0; i < kMultiplier; ++i) {
-		SIMD->SkinVerts[1][1](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
-	}
-	simdTime.Stop();
-	out << "(2B2T) " << ref->name << ": " << VertsPerSecond(refTime, kNumVerts*kMultiplier) << " (vps), " << SIMD->name << ": " << VertsPerSecond(simdTime, kNumVerts*kMultiplier) << " (vps)." << std::endl;
 
 	// 3B1T
 	skinData.Create(kNumVerts, 3, kNumBones, 1);
 	refTime.Start();
 	for (int i = 0; i < kMultiplier; ++i) {
-		ref->SkinVerts[2][0](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+		ref->SkinVerts[2](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
 	}
 	refTime.Stop();
 	simdTime.Start();
 	for (int i = 0; i < kMultiplier; ++i) {
-		SIMD->SkinVerts[2][0](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+		SIMD->SkinVerts[2](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
 	}
 	simdTime.Stop();
 	out << "(3B1T) " << ref->name << ": " << VertsPerSecond(refTime, kNumVerts*kMultiplier) << " (vps), " << SIMD->name << ": " << VertsPerSecond(simdTime, kNumVerts*kMultiplier) << " (vps)." << std::endl;
-	
-	// 3B2T
-	skinData.Create(kNumVerts, 3, kNumBones, 2);
-	refTime.Start();
-	for (int i = 0; i < kMultiplier; ++i) {
-		ref->SkinVerts[2][1](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
-	}
-	refTime.Stop();
-	simdTime.Start();
-	for (int i = 0; i < kMultiplier; ++i) {
-		SIMD->SkinVerts[2][1](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
-	}
-	simdTime.Stop();
-	out << "(3B2T) " << ref->name << ": " << VertsPerSecond(refTime, kNumVerts*kMultiplier) << " (vps), " << SIMD->name << ": " << VertsPerSecond(simdTime, kNumVerts*kMultiplier) << " (vps)." << std::endl;
 	
 	// 4B1T
 	skinData.Create(kNumVerts, 4, kNumBones, 1);
 	refTime.Start();
 	for (int i = 0; i < kMultiplier; ++i) {
-		ref->SkinVerts[3][0](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+		ref->SkinVerts[3](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
 	}
 	refTime.Stop();
 	simdTime.Start();
 	for (int i = 0; i < kMultiplier; ++i) {
-		SIMD->SkinVerts[3][0](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+		SIMD->SkinVerts[3](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
 	}
 	simdTime.Stop();
 	out << "(4B1T) " << ref->name << ": " << VertsPerSecond(refTime, kNumVerts*kMultiplier) << " (vps), " << SIMD->name << ": " << VertsPerSecond(simdTime, kNumVerts*kMultiplier) << " (vps)." << std::endl;
 	
-	// 4B2T
-	skinData.Create(kNumVerts, 4, kNumBones, 3);
-	refTime.Start();
-	for (int i = 0; i < kMultiplier; ++i) {
-		ref->SkinVerts[3][1](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
-	}
-	refTime.Stop();
-	simdTime.Start();
-	for (int i = 0; i < kMultiplier; ++i) {
-		SIMD->SkinVerts[3][1](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
-	}
-	simdTime.Stop();
-	out << "(4B2T) " << ref->name << ": " << VertsPerSecond(refTime, kNumVerts*kMultiplier) << " (vps), " << SIMD->name << ": " << VertsPerSecond(simdTime, kNumVerts*kMultiplier) << " (vps)." << std::endl;
-
 	out << "******************************" << std::endl;
 }
 

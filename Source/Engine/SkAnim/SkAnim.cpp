@@ -894,7 +894,7 @@ int DSkm::Parse(const void * const *_data, const AddrSize *_len, SkinType type) 
 			m.verts = reinterpret_cast<const float*>(bytes);
 
 			for (int k = 0; k < kBonesPerVert; ++k) {
-				const int kNumFloats = ((int)m.numVerts[k])*(k+1)*(2+m.numChannels)*4;
+				const int kNumFloats = ((int)m.numVerts[k])*(k+1)*DMesh::kNumVertexFloats;
 				CHECK_SIZE(kNumFloats * sizeof(float));
 				bytes += kNumFloats * sizeof(float);
 			}

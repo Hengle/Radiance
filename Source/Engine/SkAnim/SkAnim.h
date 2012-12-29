@@ -141,6 +141,10 @@ struct RADENG_CLASS DSka {
 struct DMesh {
 	typedef zone_vector<DMesh, ZSkaT>::type Vec;
 	
+	enum {
+		kNumVertexFloats = 12
+	};
+
 	U16 totalVerts;
 	U16 numVerts[kBonesPerVert]; // 1,2,3,4 bone counts
 	U16 numTris;
@@ -153,8 +157,7 @@ struct DMesh {
 						// floats:
 						// 0-3   -> vertex
 						// 4-7   -> normal
-						// 8-11  -> tangent 1
-						// 12-15 -> tangent 2
+						// 8-11  -> tangent
 
 	const float *texCoords; // 2 floats * numChannels
 
@@ -163,10 +166,6 @@ struct DMesh {
 	const U16 *bones[kBonesPerVert]; // N per vert, depending on how many bones the vertex has.
 
 	const U16 *indices;
-
-	int NumVertexFloats() const {
-		return 8+(4*((int)numChannels));
-	}
 };
 
 struct RADENG_CLASS DSkm {

@@ -18,10 +18,8 @@ namespace r {
 
 namespace {
 
-struct GlyphPage : public font::IGlyphPage
-{
-	GlyphPage(int _width, int _height)
-	{
+struct GlyphPage : public font::IGlyphPage {
+	GlyphPage(int _width, int _height) {
 		width = _width;
 		height = _height;
 		data = safe_zone_malloc(ZFonts, width*height);
@@ -34,19 +32,16 @@ struct GlyphPage : public font::IGlyphPage
 		GLTexture::SetFlags(tex, TX_Filter);
 	}
 
-	virtual ~GlyphPage()
-	{
+	virtual ~GlyphPage() {
 		zone_free(data);
 	}
 
-	virtual void *Lock(AddrSize &stride)
-	{
+	virtual void *Lock(AddrSize &stride) {
 		stride = width;
 		return data;
 	}
 
-	virtual void Unlock()
-	{
+	virtual void Unlock() {
 		gls.SetTexture(0, tex, true);
 		glTexImage2D(
 			tex->target,
@@ -77,21 +72,17 @@ struct GlyphPage : public font::IGlyphPage
 
 } // namespace
 
-TextModel::Ref TextModel::New()
-{
+TextModel::Ref TextModel::New() {
 	return TextModel::Ref(new (ZFonts) GLTextModel());
 }
 
-font::IGlyphPage::Ref TextModel::AllocatePage(int width, int height)
-{
+font::IGlyphPage::Ref TextModel::AllocatePage(int width, int height) {
 	return font::IGlyphPage::Ref(new (ZFonts) GlyphPage(width, height));
 }
 
-GLTextModel::VertexType *GLTextModel::LockVerts(int num)
-{
+GLTextModel::VertexType *GLTextModel::LockVerts(int num) {
 	AddrSize size = sizeof(VertexType)*num;
-	if (!m_vb || m_vb->size != size)
-	{
+	if (!m_vb || m_vb->size != size) {
 		RAD_ASSERT(!m_lock);
 		m_vb.reset(new GLVertexBuffer(GL_ARRAY_BUFFER_ARB, GL_DYNAMIC_DRAW, size));
 	}
@@ -100,18 +91,16 @@ GLTextModel::VertexType *GLTextModel::LockVerts(int num)
 	return (VertexType*)m_lock->ptr.get();
 }
 
-void GLTextModel::UnlockVerts()
-{
+void GLTextModel::UnlockVerts() {
 	m_lock.reset();
 }
 
-void GLTextModel::BindStates(int ofs, int count, font::IGlyphPage &page)
-{
+void GLTextModel::BindStates(int ofs, int count, font::IGlyphPage &page) {
 	gls.DisableAllMGSources();
 	gls.DisableAllMTSources();
 
 	gls.SetMGSource(
-		MGS_Vertices,
+		kMaterialGeometrySource_Vertices,
 		0,
 		m_vb,
 		2,
@@ -122,7 +111,7 @@ void GLTextModel::BindStates(int ofs, int count, font::IGlyphPage &page)
 	);
 
 	gls.SetMGSource(
-		MGS_TexCoords,
+		kMaterialGeometrySource_TexCoords,
 		0,
 		m_vb,
 		2,
@@ -133,14 +122,13 @@ void GLTextModel::BindStates(int ofs, int count, font::IGlyphPage &page)
 	);
 
 	gls.SetMTSource(
-		MTS_Texture,
+		kMaterialTextureSource_Texture,
 		0,
 		static_cast<GlyphPage&>(page).tex
 	);
 }
 
-void GLTextModel::DrawVerts(int ofs, int count)
-{
+void GLTextModel::DrawVerts(int ofs, int count) {
 	glDrawArrays(GL_TRIANGLES, ofs*6, count*6);
 }
 

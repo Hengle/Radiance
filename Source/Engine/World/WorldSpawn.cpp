@@ -229,7 +229,7 @@ void World::SpawnModel(
 	r::Mesh::Ref mesh(new (r::ZRender) r::Mesh());
 
 	int streamIndex = mesh->AllocateStream(
-		r::SU_Static, 
+		r::kStreamUsage_Static, 
 		sizeof(bsp_file::BSPVertex),
 		(int)model->numVerts
 	);
@@ -242,7 +242,7 @@ void World::SpawnModel(
 
 	mesh->MapSource(
 		streamIndex,
-		r::MGS_Vertices,
+		r::kMaterialGeometrySource_Vertices,
 		0,
 		sizeof(bsp_file::BSPVertex),
 		0
@@ -251,7 +251,7 @@ void World::SpawnModel(
 	if (model->numChannels > 0) {
 		mesh->MapSource(
 			streamIndex,
-			r::MGS_TexCoords,
+			r::kMaterialGeometrySource_TexCoords,
 			0,
 			sizeof(bsp_file::BSPVertex),
 			sizeof(float)*6
@@ -261,7 +261,7 @@ void World::SpawnModel(
 	if (model->numChannels > 1) {
 		mesh->MapSource(
 			streamIndex,
-			r::MGS_TexCoords,
+			r::kMaterialGeometrySource_TexCoords,
 			1,
 			sizeof(bsp_file::BSPVertex),
 			sizeof(float)*8
@@ -270,7 +270,7 @@ void World::SpawnModel(
 
 	// Upload model indices
 
-	vb = mesh->MapIndices(r::SU_Static, sizeof(U16), (int)model->numIndices);
+	vb = mesh->MapIndices(r::kStreamUsage_Static, sizeof(U16), (int)model->numIndices);
 	memcpy(vb->ptr, bsp.Indices()+model->firstIndex, vb->size.get());
 	vb.reset();
 

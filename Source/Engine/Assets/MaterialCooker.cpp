@@ -13,18 +13,15 @@ using namespace pkg;
 
 namespace asset {
 
-extern const char *s_tcModNames[r::Material::NumTcMods]; // defined in MaterialParser.cpp
+extern const char *s_tcModNames[r::Material::kNumTCMods]; // defined in MaterialParser.cpp
 
-MaterialCooker::MaterialCooker() : Cooker(1)
-{
+MaterialCooker::MaterialCooker() : Cooker(2) {
 }
 
-MaterialCooker::~MaterialCooker()
-{
+MaterialCooker::~MaterialCooker() {
 }
 
-CookStatus MaterialCooker::Status(int flags, int allflags)
-{
+CookStatus MaterialCooker::Status(int flags, int allflags) {
 	flags &= P_AllTargets;
 	allflags &= P_AllTargets;
 
@@ -39,8 +36,7 @@ CookStatus MaterialCooker::Status(int flags, int allflags)
 	// them seperately.
 
 	// only build ipad if different from iphone
-	if ((flags&P_TargetIPad) && (allflags&P_TargetIPhone))
-	{
+	if ((flags&P_TargetIPad) && (allflags&P_TargetIPhone)) {
 		if (MatchTargetKeys(P_TargetIPad, P_TargetIPhone))
 			return CS_Ignore;
 		return CS_NeedRebuild;
@@ -50,8 +46,7 @@ CookStatus MaterialCooker::Status(int flags, int allflags)
 	if ((allflags&(P_TargetIPhone|P_TargetIPad)) && (allflags&~(P_TargetIPhone|P_TargetIPad)))
 		return CS_NeedRebuild; // all different
 
-	if (flags == 0)
-	{ 
+	if (flags == 0) { 
 		// only build generics if all platforms are identical to eachother.
 		// && we have all GLES or non GLES targets.
 		if ((allflags&(P_TargetIPhone|P_TargetIPad)) && (allflags&~(P_TargetIPhone|P_TargetIPad)))
@@ -65,8 +60,7 @@ CookStatus MaterialCooker::Status(int flags, int allflags)
 	return CS_NeedRebuild;
 }
 
-int MaterialCooker::Compile(int flags, int allflags)
-{
+int MaterialCooker::Compile(int flags, int allflags) {
 	int r = asset->Process(
 		xtime::TimeSlice::Infinite, 
 		flags|P_Parse|P_TargetDefault|P_NoDefaultMedia
@@ -80,8 +74,8 @@ int MaterialCooker::Compile(int flags, int allflags)
 		return SR_ParseError;
 	
 	int shaderTarget = flags&pkg::P_AllTargets;
-	if (shaderTarget == 0)
-	{   // if we are cooking the generics path, we need to explicity set the target
+	if (shaderTarget == 0) {   
+		// if we are cooking the generics path, we need to explicity set the target
 		// for GLES variants.
 		// NOTE: we will never cook the generics path if we have mixed GLES/non ES targets
 		// See Status() above for that logic.
@@ -110,36 +104,30 @@ int MaterialCooker::Compile(int flags, int allflags)
 	os << (U8)parser->material->sort.get();
 	os << (U8)parser->material->blendMode.get();
 	os << (U8)parser->material->depthFunc.get();
-	os << (U8)parser->material->alphaTest.get();
-	os << (U8)parser->material->alphaVal.get();
 	os << (U8)(parser->material->doubleSided.get() ? 1 : 0);
 	os << (U8)(parser->material->depthWrite.get() ? 1 : 0);
 
-	for (int i = 0; i < r::MTS_MaxIndices; ++i)
-	{
+	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
 		String path;
 		path.Printf("Texture%d.Source.Texture", i+1);
 		const String *s = asset->entry->KeyValue<String>(path.c_str, flags);
 		if (!s)
 			return SR_MetaError;
 
-		if (s->empty)
-		{
+		if (s->empty) {
 			os << (U8)255;
-		}
-		else
-		{
+		} else {
 			os << (U8)AddImport(s->c_str, flags);
 		}
 
-		os << parser->material->TextureFPS(r::MTS_Texture, i);
-		os << (U8)parser->material->ClampTextureFrames(r::MTS_Texture, i);
-		os << (U8)parser->material->TcGen(r::MTS_Texture, i);
+		os << (U8)parser->material->TCUVIndex(i);
+		os << parser->material->TextureFPS(i);
+		os << (U8)parser->material->ClampTextureFrames(i);
+		os << (U8)parser->material->TCGen(i);
 
-		for (int k = 0; k < r::Material::NumTcMods; ++k)
-		{
-			const WaveAnim &S = parser->material->Wave(r::MTS_Texture, i, k, r::Material::S);
-			const WaveAnim &T = parser->material->Wave(r::MTS_Texture, i, k, r::Material::T);
+		for (int k = 0; k < r::Material::kNumTCMods; ++k) {
+			const WaveAnim &S = parser->material->Wave(i, k, r::Material::kTexCoord_S);
+			const WaveAnim &T = parser->material->Wave(i, k, r::Material::kTexCoord_T);
 
 			os << (U8)S.type.get();
 			os << (U8)T.type.get();
@@ -154,10 +142,8 @@ int MaterialCooker::Compile(int flags, int allflags)
 		}
 	}
 
-	for (int i = r::Material::Color0; i < r::Material::NumColors; ++i)
-	{
-		for (int k = r::Material::ColorA; k < r::Material::NumColorIndices; ++k)
-		{
+	for (int i = r::Material::kColor0; i < r::Material::kNumColors; ++i) {
+		for (int k = r::Material::kColorA; k < r::Material::kNumColorIndices; ++k) {
 			float rgba[4];
 			parser->material->Color(i, k, rgba);
 			os << (U8)(rgba[0]*255.f);
@@ -178,12 +164,9 @@ int MaterialCooker::Compile(int flags, int allflags)
 	return SR_Success;
 }
 
-int MaterialCooker::MatchTargetKeys(int flags, int allflags)
-{
+int MaterialCooker::MatchTargetKeys(int flags, int allflags) {
 	int x = asset->entry->MatchTargetKeys<String>("Source.Shader", flags, allflags)&
 		asset->entry->MatchTargetKeys<String>("Sort", flags, allflags)&
-		asset->entry->MatchTargetKeys<String>("AlphaTest", flags, allflags)&
-		asset->entry->MatchTargetKeys<String>("AlphaTestVal", flags, allflags)&
 		asset->entry->MatchTargetKeys<String>("BlendMode", flags, allflags)&
 		asset->entry->MatchTargetKeys<bool>("DoubleSided", flags, allflags)&
 		asset->entry->MatchTargetKeys<bool>("DepthWrite", flags, allflags)&
@@ -195,9 +178,10 @@ int MaterialCooker::MatchTargetKeys(int flags, int allflags)
 	String path;
 	String z;
 
-	for (int i = 0; i < r::MTS_MaxIndices; ++i)
-	{
+	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
 		path.Printf("Texture%d.Source.Texture", i+1);
+		x &= asset->entry->MatchTargetKeys<String>(path.c_str, flags, allflags);
+		path.Printf("Texture%d.Source.uvChannel", i+1);
 		x &= asset->entry->MatchTargetKeys<String>(path.c_str, flags, allflags);
 		path.Printf("Texture%d.Source.FramesPerSecond", i+1);
 		x &= asset->entry->MatchTargetKeys<String>(path.c_str, flags, allflags);
@@ -207,8 +191,7 @@ int MaterialCooker::MatchTargetKeys(int flags, int allflags)
 		if (!x)
 			return 0;
 
-		for (int k = 0; k < r::Material::NumTcMods; ++k)
-		{
+		for (int k = 0; k < r::Material::kNumTCMods; ++k) {
 			path.Printf("Texture%d.tcMod.%s", i+1, s_tcModNames[k]);
 			z = path + ".Type";
 			x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
@@ -226,10 +209,8 @@ int MaterialCooker::MatchTargetKeys(int flags, int allflags)
 		}
 	}
 
-	for (int i = r::Material::Color0; i < r::Material::NumColors; ++i)
-	{
-		for (int k = r::Material::ColorA; k < r::Material::NumColorIndices; ++k)
-		{
+	for (int i = r::Material::kColor0; i < r::Material::kNumColors; ++i) {
+		for (int k = r::Material::kColorA; k < r::Material::kNumColorIndices; ++k) {
 			path.Printf("Color%d.%c", i, 'A'+k);
 			x &= asset->entry->MatchTargetKeys<String>(path.c_str, flags, allflags);
 		}

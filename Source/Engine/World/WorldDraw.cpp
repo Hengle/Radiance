@@ -505,7 +505,7 @@ void WorldDraw::DrawUI() {
 }
 
 void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
-	for (int i = r::Material::S_Solid; i < r::Material::NumSorts; ++i)
+	for (int i = 0; i < r::Material::kNumSorts; ++i)
 		DrawViewBatches(view, (r::Material::Sort)i, wireframe);
 }
 
@@ -530,7 +530,7 @@ void WorldDraw::DrawBatch(const details::MBatch &batch, bool wireframe) {
 	mat->BindStates();
 	if (!wireframe)
 		mat->BindTextures(batch.matRef->loader);
-	mat->shader->Begin(r::Shader::P_Default, *mat);
+	mat->shader->Begin(r::Shader::kPass_Default, *mat);
 
 	for (details::MBatchDrawLink *link = batch.head; link; link = link->next) {
 		MBatchDraw *draw = link->draw;
@@ -548,7 +548,8 @@ void WorldDraw::DrawBatch(const details::MBatch &batch, bool wireframe) {
 			++m_counters.numModels;
 
 		draw->Bind(mat->shader.get().get());
-		mat->shader->BindStates(true, draw->rgba);
+		Shader::Uniforms u(draw->rgba.get());
+		mat->shader->BindStates(u);
 		m_rb->CommitStates();
 		draw->CompileArrayStates(*mat->shader.get());
 		draw->Draw();
@@ -568,10 +569,10 @@ void WorldDraw::DrawOverlay(ScreenOverlay &overlay) {
 	const details::MatRef *matRef = overlay.m_mat;
 	matRef->mat->BindStates();
 	matRef->mat->BindTextures(matRef->loader);
-	matRef->mat->shader->Begin(r::Shader::P_Default, *matRef->mat);
+	matRef->mat->shader->Begin(r::Shader::kPass_Default, *matRef->mat);
 	m_rb->BindOverlay();
-	Vec4 c(1, 1, 1, overlay.alpha);	
-	matRef->mat->shader->BindStates(true, c);
+	Shader::Uniforms u(Vec4(1, 1, 1, overlay.alpha));
+	matRef->mat->shader->BindStates(u);
 	m_rb->CommitStates();
 	m_rb->DrawOverlay();
 	matRef->mat->shader->End();
@@ -604,9 +605,10 @@ void WorldDraw::PostProcess() {
 		m->BindStates();
 		m->BindTextures(fx->loader);
 		m_rb->BindPostFXTargets(--num > 0);
-		m->shader->Begin(r::Shader::P_Default, *m);
+		m->shader->Begin(r::Shader::kPass_Default, *m);
 		m_rb->BindPostFXQuad();
-		m->shader->BindStates(true, fx->color);
+		Shader::Uniforms u(fx->color.get());
+		m->shader->BindStates(u);
 		m_rb->CommitStates();
 		m_rb->DrawPostFXQuad();
 		m->shader->End();
@@ -638,7 +640,7 @@ void WorldDraw::DebugDrawAreaportals(int areaNum) {
 	for (int style = 0; style < 2; ++style) {
 		m_debugPortal[style].mat->BindStates();
 		m_debugPortal[style].mat->BindTextures(asset::MaterialLoader::Ref());
-		m_debugPortal[style].mat->shader->Begin(r::Shader::P_Default, *m_debugPortal[style].mat);
+		m_debugPortal[style].mat->shader->Begin(r::Shader::kPass_Default, *m_debugPortal[style].mat);
 
 
 		const dBSPArea &area = m_world->m_areas[areaNum];
@@ -657,7 +659,7 @@ void WorldDraw::DebugDrawAreaportals(int areaNum) {
 			if (style == 1)
 				numIndices = m_rb->DebugUploadAutoTessTriIndices(portal.winding.NumVertices());
 
-			m_debugPortal[style].mat->shader->BindStates(true);
+			m_debugPortal[style].mat->shader->BindStates();
 			m_rb->CommitStates();
 
 			if (style == 0) {

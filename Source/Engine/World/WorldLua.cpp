@@ -53,25 +53,6 @@ bool __IOS_IPhone();
 
 namespace world {
 
-namespace {
-
-class FileSrcBuffer : public lua::SrcBuffer {
-public:
-	FileSrcBuffer(const char *name, const file::MMapping::Ref &mm) : m_name(name), m_mm(mm) { 
-		m_name += ".lua";
-	}
-
-protected:
-	RAD_DECLARE_GET(ptr, const void *) { return m_mm->data; }
-	RAD_DECLARE_GET(size, AddrSize) { return m_mm->size; }
-	RAD_DECLARE_GET(name, const char *) { return m_name.c_str; }
-
-	file::MMapping::Ref m_mm;
-	String m_name;
-};
-
-}
-
 WorldLua::WorldLua(World *w) : m_world(w) {
 }
 
@@ -2076,7 +2057,7 @@ lua::SrcBuffer::Ref WorldLua::ImportLoader::Load(lua_State *L, const char *name)
 	if (!mm)
 		return lua::SrcBuffer::Ref();
 
-	return lua::SrcBuffer::Ref(new FileSrcBuffer(name, mm));
+	return lua::SrcBuffer::Ref(new lua::FileSrcBuffer((CStr(name) + ".lua").c_str, mm));
 }
 
 } // world

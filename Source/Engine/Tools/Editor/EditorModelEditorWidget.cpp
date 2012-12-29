@@ -33,7 +33,7 @@
 #include <Runtime/Base/SIMD.h>
 
 #if defined(RAD_OPT_DEBUG)
-#define VALIDATE_SIMD_SKIN
+//#define VALIDATE_SIMD_SKIN
 #endif
 
 #if defined(VALIDATE_SIMD_SKIN)
@@ -177,9 +177,9 @@ bool ModelEditorWidget::Load() {
 
 		for (int i = 0; i < m_skModel->numMeshes; ++i) {
 			const ska::DMesh *m = m_skModel->DMesh(i);
-			m_skVerts[0][i] = (float*)safe_zone_malloc(ZTools, m->NumVertexFloats() * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
+			m_skVerts[0][i] = (float*)safe_zone_malloc(ZTools, ska::DMesh::kNumVertexFloats * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
 #if defined(VALIDATE_SIMD_SKIN)
-			m_skVerts[1][i] = (float*)safe_zone_malloc(ZTools, m->NumVertexFloats() * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
+			m_skVerts[1][i] = (float*)safe_zone_malloc(ZTools, ska::DMesh::kNumVertexFloats * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
 #endif
 		}
 
@@ -253,7 +253,7 @@ void ModelEditorWidget::OnRenderGL(GLWidget &src) {
 		vph/vpw
 	);
 
-	for (int i = r::Material::S_Solid; i < r::Material::NumSorts; ++i) {
+	for (int i = 0; i < r::Material::kNumSorts; ++i) {
 		Draw((r::Material::Sort)i);
 	}
 
@@ -262,7 +262,7 @@ void ModelEditorWidget::OnRenderGL(GLWidget &src) {
 	if (m_normals->isChecked() || m_tangents->isChecked())
 		DrawNormals(m_normals->isChecked(), m_tangents->isChecked());
 	
-	gls.Set(DWM_Enable, -1); // for glClear()
+	gls.Set(kDepthWriteMask_Enable, -1); // for glClear()
 	gls.Commit();
 }
 
@@ -294,7 +294,7 @@ void ModelEditorWidget::Draw(Material::Sort sort) {
 
 			mat->BindTextures(loader);
 			mat->BindStates();
-			mat->shader->Begin(Shader::P_Default, *mat);
+			mat->shader->Begin(Shader::kPass_Preview, *mat);
 			Mesh &m = m_skModel->Mesh(i);
 			m.BindAll(0);
 			mat->shader->BindStates();
@@ -323,7 +323,7 @@ void ModelEditorWidget::Draw(Material::Sort sort) {
 
 			mat->BindTextures(loader);
 			mat->BindStates();
-			mat->shader->Begin(Shader::P_Default, *mat);
+			mat->shader->Begin(Shader::kPass_Preview, *mat);
 			Mesh &m = *m_bundle->Mesh(i);
 			m.BindAll(0);
 			mat->shader->BindStates();
@@ -352,7 +352,7 @@ void ModelEditorWidget::DrawWireframe() {
 
 			mat->BindTextures(loader);
 			mat->BindStates();
-			mat->shader->Begin(Shader::P_Default, *mat);
+			mat->shader->Begin(Shader::kPass_Preview, *mat);
 			Mesh &m = m_skModel->Mesh(i);
 			m.BindAll(0);
 			mat->shader->BindStates();
@@ -364,7 +364,7 @@ void ModelEditorWidget::DrawWireframe() {
 		for (int i = 0; i < m_bundle->numMeshes; ++i) {
 			mat->BindTextures(loader);
 			mat->BindStates();
-			mat->shader->Begin(Shader::P_Default, *mat);
+			mat->shader->Begin(Shader::kPass_Preview, *mat);
 			Mesh &m = *m_bundle->Mesh(i);
 			m.BindAll(0);
 			mat->shader->BindStates();
@@ -392,7 +392,7 @@ void ModelEditorWidget::DrawSkaNormals(bool normals, bool tangents) {
 	gls.DisableTextures();
 	gls.DisableVertexAttribArrays();
 	gls.UseProgram(0);
-	gls.Set(r::DT_Less|r::DWM_Disable, r::BM_Off);
+	gls.Set(r::kDepthTest_Less|r::kDepthWriteMask_Disable, r::kBlendMode_Off);
 	gls.Commit();
 
 	for (int i = 0; i < m_skModel->numMeshes; ++i) {
@@ -432,25 +432,22 @@ void ModelEditorWidget::DrawSkaNormals(bool normals, bool tangents) {
 			src += 4;
 			cmp += 4;
 
-			for (int k = 0; k < m->numChannels; ++k) {
-				for (int j = 0; j < 4; ++j) {
-					d[j] = math::Abs(src[j]-cmp[j]);
-				}
-
-				if (d[0] > 0.1f ||
-					d[1] > 0.1f ||
-					d[2] > 0.1f ||
-					d[3] != 0.f) {
-						int b = 0; // bad tangent
-				}
-
-				src += 4;
-				cmp += 4;
+			for (int j = 0; j < 4; ++j) {
+				d[j] = math::Abs(src[j]-cmp[j]);
 			}
+
+			if (d[0] > 0.1f ||
+				d[1] > 0.1f ||
+				d[2] > 0.1f ||
+				d[3] != 0.f) {
+					int b = 0; // bad tangent
+			}
+
+			src += 4;
+			cmp += 4;
 		}
 #endif
 
-		const int kNumVertexFloats = m->NumVertexFloats();
 		const float *verts = (const float*)m_skVerts[0][i];
 
 		for (int i = 0; i < (int)m->totalVerts; ++i) {
@@ -489,7 +486,7 @@ void ModelEditorWidget::DrawSkaNormals(bool normals, bool tangents) {
 				glEnd();
 			}
 
-			verts += kNumVertexFloats;
+			verts += ska::DMesh::kNumVertexFloats;
 		}
 	}
 }
@@ -506,13 +503,12 @@ void ModelEditorWidget::DrawMeshNormals(bool normals, bool tangents) {
 	gls.DisableTextures();
 	gls.DisableVertexAttribArrays();
 	gls.UseProgram(0);
-	gls.Set(r::DT_Less|r::DWM_Disable, r::BM_Off);
+	gls.Set(r::kDepthTest_Less|r::kDepthWriteMask_Disable, r::kBlendMode_Off);
 	gls.Commit();
 
 	for (asset::DMesh::Vec::const_iterator it = bundle->meshes.begin(); it != bundle->meshes.end(); ++it) {
 		const asset::DMesh &m = *it;
 
-		const int kNumVertexFloats = m.NumVertexFloats();
 		const float *verts = (const float*)m.vertices;
 
 		for (int i = 0; i < (int)m.numVerts; ++i) {
@@ -551,7 +547,7 @@ void ModelEditorWidget::DrawMeshNormals(bool normals, bool tangents) {
 				glEnd();
 			}
 
-			verts += kNumVertexFloats;
+			verts += ska::DMesh::kNumVertexFloats;
 		}
 	}
 }

@@ -5,7 +5,7 @@
 
 #include RADPCH
 #include "SkMesh.h"
-#include "Sources.h"
+#include "Common.h"
 #include "../Assets/SkModelParser.h"
 #include <limits>
 #undef max
@@ -60,6 +60,8 @@ void SkMesh::Load(
 	m_meshes.clear();
 	m_meshes.resize(dskm.meshes.size());
 
+	const int kVertSize = ska::DMesh::kNumVertexFloats*sizeof(float);
+
 	for (size_t i = 0; i < m_meshes.size(); ++i)
 	{
 		DefMesh &m = m_meshes[i];
@@ -73,13 +75,11 @@ void SkMesh::Load(
 		if (kSkinFrames > 1)
 			m.m.AllocateSwapChains(kSkinFrames);
 
-		const int kVertSize = dm.NumVertexFloats()*sizeof(float);
-
-		m.vertStreamIdx = m.m.AllocateStream(SU_Stream, kVertSize, dm.totalVerts, true);
+		m.vertStreamIdx = m.m.AllocateStream(kStreamUsage_Stream, kVertSize, dm.totalVerts, true);
 		
 		m.m.MapSource(
 			m.vertStreamIdx,
-			MGS_Vertices,
+			kMaterialGeometrySource_Vertices,
 			0,
 			kVertSize,
 			0
@@ -87,7 +87,7 @@ void SkMesh::Load(
 
 		m.m.MapSource(
 			m.vertStreamIdx,
-			MGS_Normals,
+			kMaterialGeometrySource_Normals,
 			0,
 			kVertSize,
 			sizeof(float) * 4
@@ -96,31 +96,21 @@ void SkMesh::Load(
 		if (dm.numChannels > 0) {
 			m.m.MapSource(
 				m.vertStreamIdx,
-				MGS_Tangents,
+				kMaterialGeometrySource_Tangents,
 				0,
 				kVertSize,
 				sizeof(float) * 8
 			);
 		}
 
-		if (dm.numChannels > 1) {
-			m.m.MapSource(
-				m.vertStreamIdx,
-				MGS_Tangents,
-				1,
-				kVertSize,
-				sizeof(float) * 12
-			);
-		}
-
 		int uvStreamIndex = -1;
 
 		if (dm.numChannels > 1) {
-			uvStreamIndex = m.m.AllocateStream(SU_Static, sizeof(float)*4, dm.totalVerts);
+			uvStreamIndex = m.m.AllocateStream(kStreamUsage_Static, sizeof(float)*4, dm.totalVerts);
 		
 			m.m.MapSource(
 				uvStreamIndex,
-				MGS_TexCoords,
+				kMaterialGeometrySource_TexCoords,
 				0,
 				sizeof(float) * 4,
 				0
@@ -128,7 +118,7 @@ void SkMesh::Load(
 
 			m.m.MapSource(
 				uvStreamIndex,
-				MGS_TexCoords,
+				kMaterialGeometrySource_TexCoords,
 				1,
 				sizeof(float) * 4,
 				sizeof(float) * 2
@@ -136,11 +126,11 @@ void SkMesh::Load(
 
 		} else if (dm.numChannels > 0) {
 
-			uvStreamIndex = m.m.AllocateStream(SU_Static, sizeof(float)*2, dm.totalVerts);
+			uvStreamIndex = m.m.AllocateStream(kStreamUsage_Static, sizeof(float)*2, dm.totalVerts);
 		
 			m.m.MapSource(
 				uvStreamIndex,
-				MGS_TexCoords,
+				kMaterialGeometrySource_TexCoords,
 				0,
 				0,
 				0
@@ -153,7 +143,7 @@ void SkMesh::Load(
 			vb.reset();
 		}
 
-		Mesh::StreamPtr::Ref vb = m.m.MapIndices(SU_Static, sizeof(U16), (int)dm.numTris * 3);
+		Mesh::StreamPtr::Ref vb = m.m.MapIndices(kStreamUsage_Static, sizeof(U16), (int)dm.numTris * 3);
 		memcpy(vb->ptr, dm.indices, vb->size.get());
 		vb.reset();
 	}
@@ -189,7 +179,7 @@ void SkMesh::SkinToBuffer(const SIMDDriver *driver, int mesh, void *buffer) {
 		RAD_ASSERT(m.dm->numChannels < 2);
 
 		if (numVerts > 0) {
-			driver->SkinVerts[i][m.dm->numChannels-1](
+			driver->SkinVerts[i](
 				outVerts,
 				bones,
 				srcVerts,
@@ -198,8 +188,8 @@ void SkMesh::SkinToBuffer(const SIMDDriver *driver, int mesh, void *buffer) {
 			);
 		}
 
-		outVerts += numVerts*(8+(4*m.dm->numChannels));
-		srcVerts += numVerts*(i+1)*(8+(4*m.dm->numChannels));
+		outVerts += numVerts*ska::DMesh::kNumVertexFloats;
+		srcVerts += numVerts*(i+1)*ska::DMesh::kNumVertexFloats;
 	}
 }
 

@@ -45,12 +45,12 @@ void GLWorldDraw::EndFrame() {
 }
 
 void GLWorldDraw::ClearDepthBuffer() {
-	gls.Set(DWM_Enable, -1, true); // for glClear()
+	gls.Set(kDepthWriteMask_Enable, -1, true); // for glClear()
 	glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 void GLWorldDraw::ClearBackBuffer() {
-	gls.Set(DWM_Enable, -1, true); // for glClear()
+	gls.Set(kDepthWriteMask_Enable, -1, true); // for glClear()
 
 #if defined(RAD_OPT_IOS)
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -144,9 +144,9 @@ void GLWorldDraw::BindRTFB(int num) {
 }
 
 void GLWorldDraw::BindRTTX(int num) {
-	for (int i = 0; i < MTS_MaxIndices; ++i) {
-		if (!gls.MTSource(MTS_Texture, i))
-			gls.SetMTSource(MTS_Texture, i, m_rts[m_bank][num]->tex);
+	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
+		if (!gls.MaterialTextureSource(kMaterialTextureSource_Texture, i))
+			gls.SetMTSource(kMaterialTextureSource_Texture, i, m_rts[m_bank][num]->tex);
 	}
 }
 
@@ -219,6 +219,7 @@ void GLWorldDraw::RotateForCamera(const Camera &camera) {
 
 	const Vec3 &pos = camera.pos;
 	gl.Translatef(-pos.X(), -pos.Y(), -pos.Z());
+	gl.SetEye(&pos[0]);
 }
 
 void GLWorldDraw::RotateForCameraBasis() {
@@ -291,7 +292,7 @@ void GLWorldDraw::BindPostFXQuad() {
 
 	gls.DisableAllMGSources();
 	gls.SetMGSource(
-		MGS_Vertices,
+		kMaterialGeometrySource_Vertices,
 		0,
 		m_rtFB ? m_overlayVB[1] : m_overlayVB[0],
 		2,
@@ -302,7 +303,7 @@ void GLWorldDraw::BindPostFXQuad() {
 	);
 
 	gls.SetMGSource(
-		MGS_TexCoords,
+		kMaterialGeometrySource_TexCoords,
 		0,
 		m_rtFB ? m_overlayVB[1] : m_overlayVB[0],
 		2,
@@ -336,7 +337,7 @@ void GLWorldDraw::BindOverlay() {
 
 	gls.DisableAllMGSources();
 	gls.SetMGSource(
-		MGS_Vertices,
+		kMaterialGeometrySource_Vertices,
 		0,
 		vb,
 		2,
@@ -347,7 +348,7 @@ void GLWorldDraw::BindOverlay() {
 	);
 
 	gls.SetMGSource(
-		MGS_TexCoords,
+		kMaterialGeometrySource_TexCoords,
 		0,
 		vb,
 		2,
@@ -451,7 +452,7 @@ void GLWorldDraw::CommitStates() {
 }
 
 void GLWorldDraw::Finish() {
-	gls.Set(DWM_Enable, -1, true); // for glClear()
+	gls.Set(kDepthWriteMask_Enable, -1, true); // for glClear()
 }
 
 bool GLWorldDraw::Project(const Vec3 &p, Vec3 &out) {
@@ -552,7 +553,7 @@ void GLWorldDraw::DebugUploadVerts(
 	vb.reset();
 
 	gls.SetMGSource(
-		r::MGS_Vertices, 
+		kMaterialGeometrySource_Vertices, 
 		0, 
 		m_debugVerts,
 		3,

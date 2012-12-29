@@ -18,8 +18,7 @@ public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
+	enum {
 		AssetType = AT_Material
 	};
 

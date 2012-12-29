@@ -13,21 +13,17 @@ namespace r {
 Shader::Ref GLShader::LoadCooked(
 	const char *name,
 	stream::InputStream &is,
-	bool skinned,
 	const Material &material
-)
-{
+) {
 	U8 backend;
 	is >> backend;
 
-	switch (backend)
-	{
-	case GLSL:
+	switch (backend) {
+	case kBackend_GLSL:
 		return boost::static_pointer_cast<Shader>(
 			GLSLShader::LoadCooked(
 				name,
 				is,
-				skinned,
 				material
 			)
 		);
@@ -41,19 +37,16 @@ Shader::Ref GLShader::LoadCooked(
 Shader::Ref GLShader::Load(
 	Engine &engine, 
 	const char *name,
-	bool skinned,
 	const Material &material,
 	Backend backend
-)
-{
+) {
 	switch (backend)
 	{
-	case GLSL:
+	case kBackend_GLSL:
 		return boost::static_pointer_cast<Shader>(
 			GLSLShader::Load(
 				engine, 
 				name,
-				skinned,
 				material
 			)
 		);
@@ -64,9 +57,8 @@ Shader::Ref GLShader::Load(
 	return Shader::Ref();
 }
 
-const cg::ShaderCache::Ref &GLShader::Cache()
-{
-	static cg::ShaderCache::Ref s_cache(new cg::ShaderCache());
+const tools::shader_utils::ShaderCache::Ref &GLShader::Cache() {
+	static tools::shader_utils::ShaderCache::Ref s_cache(new tools::shader_utils::ShaderCache());
 	return s_cache;
 }
 #endif

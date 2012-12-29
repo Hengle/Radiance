@@ -81,17 +81,15 @@ int MaterialParser::LoadCooked(
 		is >> temp; m_m.sort = (r::Material::Sort)temp;
 		is >> temp; m_m.blendMode = (r::Material::BlendMode)temp;
 		is >> temp; m_m.depthFunc = (r::Material::DepthFunc)temp;
-		is >> temp; m_m.alphaTest = (r::Material::AlphaTest)temp;
-		is >> temp; m_m.alphaVal = temp;
 		is >> temp; m_m.doubleSided.set(temp?true:false);
 		is >> temp; m_m.depthWrite.set(temp?true:false);
 
 		m_m.animated = false;
 
-		for (int i = 0; i < r::MTS_MaxIndices; ++i) {
+		for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
 			is >> temp;
 			if (temp == 255) {
-				m_m.SetTextureId(r::MTS_Texture, i, -1);
+				m_m.SetTextureId(i, -1);
 			} else {
 				const Package::Entry::Import *imp = asset->entry->Resolve(temp);
 				if (!imp)
@@ -99,21 +97,24 @@ int MaterialParser::LoadCooked(
 				int id = asset->entry->ResolveId(*imp);
 				if (id < 0)
 					return SR_FileNotFound;
-				m_m.SetTextureId(r::MTS_Texture, i, id);
+				m_m.SetTextureId(i, id);
 			}
 
+			is >> temp;
+			m_m.SetTCUVIndex(i, (int)temp);
+
 			is >> f;
-			m_m.SetTextureFPS(r::MTS_Texture, i, f);
+			m_m.SetTextureFPS(i, f);
 			
 			is >> temp;
-			m_m.SetClampTextureFrames(r::MTS_Texture, i, temp ? true : false);
+			m_m.SetClampTextureFrames(i, temp ? true : false);
 
 			is >> temp;
-			m_m.SetTcGen(r::MTS_Texture, i, temp);
+			m_m.SetTCGen(i, temp);
 
-			for (int k = 0; k < r::Material::NumTcMods; ++k) {
-				WaveAnim &S = m_m.Wave(r::MTS_Texture, i, k, r::Material::S);
-				WaveAnim &T = m_m.Wave(r::MTS_Texture, i, k, r::Material::T);
+			for (int k = 0; k < r::Material::kNumTCMods; ++k) {
+				WaveAnim &S = m_m.Wave(i, k, r::Material::kTexCoord_S);
+				WaveAnim &T = m_m.Wave(i, k, r::Material::kTexCoord_T);
 
 				is >> temp; S.type = (WaveAnim::Type)temp;
 				is >> temp; T.type = (WaveAnim::Type)temp;
@@ -131,8 +132,8 @@ int MaterialParser::LoadCooked(
 			}
 		}
 
-		for (int i = r::Material::Color0; i < r::Material::NumColors; ++i) {
-			for (int k = r::Material::ColorA; k < r::Material::NumColorIndices; ++k) {
+		for (int i = r::Material::kColor0; i < r::Material::kNumColors; ++i) {
+			for (int k = r::Material::kColorA; k < r::Material::kNumColorIndices; ++k) {
 				U8 rgba[4];
 				is >> rgba[0];
 				is >> rgba[1];
@@ -170,7 +171,7 @@ int MaterialParser::LoadCooked(
 
 #if defined(RAD_OPT_TOOLS)
 
-const char *s_tcModNames[r::Material::NumTcMods] = {
+const char *s_tcModNames[r::Material::kNumTCMods] = {
 	"Rotate",
 	"Turb",
 	"Scale",
@@ -193,7 +194,7 @@ int MaterialParser::SourceModifiedTime(
 	bool procedural = *b;
 
 	String path;
-	for (int i = 0; i < r::MTS_MaxIndices; ++i) {
+	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
 		path.Printf("Texture%d.Source.Texture", i+1);
 		const String *s = asset->entry->KeyValue<String>(path.c_str, P_TARGET_FLAGS(flags));
 		if (!s)
@@ -246,9 +247,8 @@ int MaterialParser::Load(
 	const pkg::Asset::Ref &asset,
 	int flags
 ) {
-	for (int i = 0; i < r::MTS_Max; ++i)
-		for (int k = 0; k < r::MTS_MaxIndices; ++k)
-			m_m.SetTextureId((r::MTSource)i, k, -1);
+	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i)
+		m_m.SetTextureId(i, -1);
 
 	const String *s = asset->entry->KeyValue<String>("Source.Shader", P_TARGET_FLAGS(flags));
 	if (!s)
@@ -261,63 +261,40 @@ int MaterialParser::Load(
 		return SR_MetaError;
 
 	if (*s == "Solid")
-		m_m.sort = r::Material::S_Solid;
+		m_m.sort = r::Material::kSort_Solid;
 	else if (*s == "Translucent")
-		m_m.sort = r::Material::S_Translucent;
+		m_m.sort = r::Material::kSort_Translucent;
 	else if (*s == "Translucent2")
-		m_m.sort = r::Material::S_Translucent2;
+		m_m.sort = r::Material::kSort_Translucent2;
 	else if (*s == "Translucent3")
-		m_m.sort = r::Material::S_Translucent3;
+		m_m.sort = r::Material::kSort_Translucent3;
 	else if (*s == "Translucent4")
-		m_m.sort = r::Material::S_Translucent4;
+		m_m.sort = r::Material::kSort_Translucent4;
 	else if (*s == "Translucent5")
-		m_m.sort = r::Material::S_Translucent5;
+		m_m.sort = r::Material::kSort_Translucent5;
 	else
 		return SR_MetaError;
-
-	s = asset->entry->KeyValue<String>("AlphaTest", P_TARGET_FLAGS(flags));
-	if (!s)
-		return SR_MetaError;
-
-	if (*s == "None")
-		m_m.alphaTest = r::Material::AT_None;
-	else if (*s == "Less")
-		m_m.alphaTest = r::Material::AT_Less;
-	else if (*s == "LEqual")
-		m_m.alphaTest = r::Material::AT_LEqual;
-	else if (*s == "Greater")
-		m_m.alphaTest = r::Material::AT_Greater;
-	else if (*s == "GEqual")
-		m_m.alphaTest = r::Material::AT_GEqual;
-	else
-		return SR_MetaError;
-
-	const int *n = asset->entry->KeyValue<int>("AlphaTestVal", P_TARGET_FLAGS(flags));
-	if (!n)
-		return SR_MetaError;
-
-	m_m.alphaVal = (U8)std::max(std::min(*n, 255), 0);
 
 	s = asset->entry->KeyValue<String>("BlendMode", P_TARGET_FLAGS(flags));
 	if (!s)
 		return SR_MetaError;
 
 	if (*s == "None")
-		m_m.blendMode = r::Material::BM_None;
+		m_m.blendMode = r::Material::kBlendMode_None;
 	else if (*s == "Alpha")
-		m_m.blendMode = r::Material::BM_Alpha;
+		m_m.blendMode = r::Material::kBlendMode_Alpha;
 	else if (*s == "InvAlpha")
-		m_m.blendMode = r::Material::BM_InvAlpha;
+		m_m.blendMode = r::Material::kBlendMode_InvAlpha;
 	else if (*s == "Additive")
-		m_m.blendMode = r::Material::BM_Additive;
+		m_m.blendMode = r::Material::kBlendMode_Additive;
 	else if (*s == "AddBlend")
-		m_m.blendMode = r::Material::BM_AddBlend;
+		m_m.blendMode = r::Material::kBlendMode_AddBlend;
 	else if (*s == "Colorize")
-		m_m.blendMode = r::Material::BM_Colorize;
+		m_m.blendMode = r::Material::kBlendMode_Colorize;
 	else if (*s == "InvColorizeD")
-		m_m.blendMode = r::Material::BM_InvColorizeD;
+		m_m.blendMode = r::Material::kBlendMode_InvColorizeD;
 	else if (*s == "InvColorizeS")
-		m_m.blendMode = r::Material::BM_InvColorizeS;
+		m_m.blendMode = r::Material::kBlendMode_InvColorizeS;
 	else
 		return SR_MetaError;
 
@@ -338,15 +315,15 @@ int MaterialParser::Load(
 		return SR_MetaError;
 
 	if (*s == "None")
-		m_m.depthFunc = r::Material::DT_None;
+		m_m.depthFunc = r::Material::kDepthFunc_None;
 	else if (*s == "Less")
-		m_m.depthFunc = r::Material::DT_Less;
+		m_m.depthFunc = r::Material::kDepthFunc_Less;
 	else if (*s == "LEqual")
-		m_m.depthFunc = r::Material::DT_LEqual;
+		m_m.depthFunc = r::Material::kDepthFunc_LEqual;
 	else if (*s == "Greater")
-		m_m.depthFunc = r::Material::DT_Greater;
+		m_m.depthFunc = r::Material::kDepthFunc_Greater;
 	else if (*s == "GEqual")
-		m_m.depthFunc = r::Material::DT_GEqual;
+		m_m.depthFunc = r::Material::kDepthFunc_GEqual;
 	else
 		return SR_MetaError;
 
@@ -361,7 +338,7 @@ int MaterialParser::Load(
 	String path;
 	String z;
 
-	for (int i = 0; i < r::MTS_MaxIndices; ++i) {
+	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
 		path.Printf("Texture%d.Source.Texture", i+1);
 		s = asset->entry->KeyValue<String>(path.c_str, P_TARGET_FLAGS(flags));
 		if (!s)
@@ -372,9 +349,9 @@ int MaterialParser::Load(
 				int id = engine.sys->packages->ResolveId("Sys/T_Procedural");
 				if (id == -1)
 					return SR_FileNotFound;
-				m_m.SetTextureId(r::MTS_Texture, i, id);
+				m_m.SetTextureId(i, id);
 			} else {
-				m_m.SetTextureId(r::MTS_Texture, i, -1);
+				m_m.SetTextureId(i, -1);
 			}
 		} else {
 			pkg::Package::Entry::Ref entry = engine.sys->packages->Resolve(s->c_str);
@@ -384,7 +361,7 @@ int MaterialParser::Load(
 				return SR_FileNotFound;
 			if (entry->type != asset::AT_Texture)
 				return SR_MetaError; // this must be a texture.
-			m_m.SetTextureId(r::MTS_Texture, i, entry->id);
+			m_m.SetTextureId(i, entry->id);
 		}
 
 		path.Printf("Texture%d.Source.FramesPerSecond", i+1);
@@ -393,13 +370,13 @@ int MaterialParser::Load(
 			return SR_MetaError;
 		float fps;
 		sscanf(s->c_str, "%f", &fps);
-		m_m.SetTextureFPS(r::MTS_Texture, i, fps);
+		m_m.SetTextureFPS(i, fps);
 
 		path.Printf("Texture%d.Source.ClampTextureFrames", i+1);
 		b = asset->entry->KeyValue<bool>(path.c_str, P_TARGET_FLAGS(flags));
 		if (!b)
 			return SR_MetaError;
-		m_m.SetClampTextureFrames(r::MTS_Texture, i, *b);
+		m_m.SetClampTextureFrames(i, *b);
 
 		path.Printf("Texture%d.tcGen", i+1);
 		s = asset->entry->KeyValue<String>(path.c_str, P_TARGET_FLAGS(flags));
@@ -407,29 +384,40 @@ int MaterialParser::Load(
 			return SR_MetaError;
 
 		if (*s == "Vertex") {
-			m_m.SetTcGen(r::MTS_Texture, i, r::Material::TcGen_Vertex);
+			m_m.SetTCGen(i, r::Material::kTCGen_Vertex);
 		} else if (*s == "EnvMap") {
-			m_m.SetTcGen(r::MTS_Texture, i, r::Material::TcGen_EnvMap);
+			m_m.SetTCGen(i, r::Material::kTCGen_EnvMap);
 		} else {
 			return SR_MetaError;
 		}
 
-		for (int k = 0; k < r::Material::NumTcMods; ++k) {
+		path.Printf("Texture%d.Source.uvChannel", i+1);
+		s = asset->entry->KeyValue<String>(path.c_str, P_TARGET_FLAGS(flags));
+		if (!s)
+			return SR_MetaError;
+
+		int uvChannel = 0;
+		sscanf(s->c_str, "%d", &uvChannel);
+		--uvChannel; // was one based.
+		if (uvChannel < 0 || uvChannel >= r::kMaterialTextureSource_MaxIndices)
+			return SR_MetaError;
+
+		m_m.SetTCUVIndex(i, uvChannel);
+
+		for (int k = 0; k < r::Material::kNumTCMods; ++k) {
 			path.Printf("Texture%d.tcMod.%s", i+1, s_tcModNames[k]);
 			z = path + ".Type";
 
 			WaveAnim &S = m_m.Wave(
-				r::MTS_Texture,
 				i,
 				k,
-				r::Material::S
+				r::Material::kTexCoord_S
 			);
 
 			WaveAnim &T = m_m.Wave(
-				r::MTS_Texture,
 				i,
 				k,
-				r::Material::T
+				r::Material::kTexCoord_T
 			);
 
 			s = asset->entry->KeyValue<String>(z.c_str, P_TARGET_FLAGS(flags));
@@ -494,8 +482,8 @@ int MaterialParser::Load(
 		}
 	}
 	// color
-	for (int i = r::Material::Color0; i < r::Material::NumColors; ++i) {
-		for (int k = r::Material::ColorA; k < r::Material::NumColorIndices; ++k) {
+	for (int i = r::Material::kColor0; i < r::Material::kNumColors; ++i) {
+		for (int k = r::Material::kColorA; k < r::Material::kNumColorIndices; ++k) {
 			path.Printf("Color%d.%c", i, 'A'+k);
 			s = asset->entry->KeyValue<String>(path.c_str, P_TARGET_FLAGS(flags));
 			if (!s)
@@ -590,15 +578,10 @@ void MaterialParser::Register(Engine &engine) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-MaterialLoader::MaterialLoader() : m_current(Unloaded), m_index(0) {
+MaterialLoader::MaterialLoader() : m_index(Unloaded) {
 }
 
 MaterialLoader::~MaterialLoader() {
-}
-
-pkg::Asset::Ref MaterialLoader::Texture(r::MTSource source, int index) {
-	RAD_ASSERT(source < r::MTS_Max && index < r::MTS_MaxIndices);
-	return m_textures[source][index];
 }
 
 int MaterialLoader::Process(
@@ -620,19 +603,19 @@ int MaterialLoader::Process(
 	if (flags&P_Parse)
 		flags &= ~P_Info;
 	
-	if (m_current == Done && (flags&P_Load))
+	if (m_index == Done && (flags&P_Load))
 		return SR_Success;
-	if ((m_current == Done || m_current == Parsed) && (flags&P_Parse))
+	if ((m_index == Done || m_index == Parsed) && (flags&P_Parse))
 		return SR_Success;
-	if ((m_current == Done || m_current == Parsed || m_current == Info) && (flags&P_Info))
+	if ((m_index == Done || m_index == Parsed || m_index == Info) && (flags&P_Info))
 		return SR_Success;
-	if ((m_current == Parsed || m_current == Info) && (flags&P_Load))
-		m_current = Unloaded; // fully load.
-	if (m_current == Info && (flags&P_Parse))
-		m_current = Unloaded; // fully load.
-	if (m_current == Unloaded && (flags&P_Unload))
+	if ((m_index == Parsed || m_index == Info) && (flags&P_Load))
+		m_index = Unloaded; // fully load.
+	if (m_index == Info && (flags&P_Parse))
+		m_index = Unloaded; // fully load.
+	if (m_index == Unloaded && (flags&P_Unload))
 		return SR_Success;
-	if ((m_current == Unloaded || m_current == Info) && (flags&P_Trim))
+	if ((m_index == Unloaded || m_index == Info) && (flags&P_Trim))
 		return SR_Success;
 
 	if (flags&P_Unload) {
@@ -644,7 +627,7 @@ int MaterialLoader::Process(
 	if (!parser)
 		return SR_ParseError;
 
-	if (m_current == Unloaded) {
+	if (m_index == Unloaded) {
 		if (flags&(P_Parse|P_Load)) {
 			int r = parser->material->LoadShader(
 				time,
@@ -658,7 +641,6 @@ int MaterialLoader::Process(
 				return r;
 
 			m_index = 0;
-			m_current = 0;
 
 			if (!time.remaining)
 				return SR_Pending;
@@ -667,24 +649,22 @@ int MaterialLoader::Process(
 			// skip shader loading
 			RAD_ASSERT(flags&(P_Info|P_Trim));
 			m_index = 0;
-			m_current = 0;
 		}
 	} else if (flags&(P_Info|P_Trim)) {
 		m_index = 0;
-		m_current = 0;
 	}
 
 	do {
 		bool load = true;
-		pkg::Asset::Ref &tex = m_textures[m_current][m_index];
+		pkg::Asset::Ref &tex = m_textures[m_index];
 
 		if (!tex) {
-			int id = parser->material->TextureId((r::MTSource)m_current, m_index);
+			int id = parser->material->TextureId(m_index);
 			if (id < 0) {
 				load = false;
 #if defined(RAD_OPT_TOOLS)
 				if (flags&(P_Parse|P_Load)) {
-					if (!parser->procedural && parser->material->shader->Requires(r::Shader::P_Default, (r::MTSource)m_current, m_index))
+					if (!parser->procedural && parser->material->shader->Requires(r::kMaterialTextureSource_Texture, m_index))
 						return SR_FileNotFound;
 				}
 #endif
@@ -695,7 +675,7 @@ int MaterialLoader::Process(
 				
 #if defined(RAD_OPT_TOOLS)
 				if (!tex && (flags&(P_Parse|P_Load))) {
-					if (parser->material->shader->Requires(r::Shader::P_Default, (r::MTSource)m_current, m_index))
+					if (parser->material->shader->Requires(r::kMaterialTextureSource_Texture, m_index))
 						return SR_FileNotFound;
 				}
 #endif
@@ -715,18 +695,14 @@ int MaterialLoader::Process(
 			TextureParser::Ref texParser = TextureParser::Cast(tex);
 			if (!texParser)
 				return SR_MetaError;
-			if (texParser->numImages > 0 && (parser->material->TextureFPS((r::MTSource)m_current, m_index)>0.f))
+			if (texParser->numImages > 0 && (parser->material->TextureFPS(m_index)>0.f))
 				parser->material->animated = true;
 		}
 
 		++m_index;
-		if (m_index >= r::MTS_MaxIndices) {
-			m_index = 0;
-			++m_current;
-			if (m_current >= r::MTS_Max) {
-				m_current = (flags&(P_Load|P_Trim)) ? Done : (flags&P_Parse) ? Parsed : Info;
-				return SR_Success; // done loading.
-			}
+		if (m_index >= r::kMaterialTextureSource_MaxIndices) {
+			m_index = (flags&(P_Load|P_Trim)) ? Done : (flags&P_Parse) ? Parsed : Info;
+			return SR_Success; // done loading.
 		}
 
 	} while (time.remaining);
@@ -735,29 +711,27 @@ int MaterialLoader::Process(
 }
 
 void MaterialLoader::Cancel() {
-	if (m_current <= Unloaded)
+	if (m_index <= Unloaded)
 		return;
 
-	m_current = Unloaded;
+	m_index = Unloaded;
 
-	for (int i = 0; i < r::MTS_Max; ++i) {
-		for (int k = 0; k < r::MTS_MaxIndices; ++k) {
-			if (!m_textures[i][k])
-				break;
-			m_textures[i][k]->Process(
-				xtime::TimeSlice::Infinite,
-				P_Cancel
-			);
-		}
+	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
+		if (!m_textures[i])
+			break;
+		m_textures[i]->Process(
+			xtime::TimeSlice::Infinite,
+			P_Cancel
+		);
 	}
 }
 
 void MaterialLoader::Unload() {
-	for (int i = 0; i < r::MTS_Max; ++i)
-		for (int k = 0; k < r::MTS_MaxIndices; ++k)
-			m_textures[i][k].reset();
+	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
+		m_textures[i].reset();
+	}
 
-	m_current = Unloaded;
+	m_index = Unloaded;
 }
 
 void MaterialLoader::Register(Engine &engine) {

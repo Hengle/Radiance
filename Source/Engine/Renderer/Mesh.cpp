@@ -16,21 +16,22 @@ MeshBundle::Ref MeshBundle::New(const pkg::AssetRef &asset) {
 
 	Ref r(new (ZRender) MeshBundle());
 
+	const int kVertSize = asset::DMesh::kNumVertexFloats*sizeof(float);
+
 	for (size_t i = 0; i < parser->bundle->meshes.size(); ++i) {
 		r::Mesh::Ref m(new (ZRender) r::Mesh());
 		const asset::DMesh &dm = parser->bundle->meshes[i];
-		const int kVertSize = dm.NumVertexFloats()*sizeof(float);
-
+		
 		// Mesh bundle data is interleaved
 
-		int streamIdx = m->AllocateStream(SU_Static, kVertSize, (int)dm.numVerts);
+		int streamIdx = m->AllocateStream(kStreamUsage_Static, kVertSize, (int)dm.numVerts);
 		r::Mesh::StreamPtr::Ref vb = m->Map(streamIdx);
 		memcpy(vb->ptr, dm.vertices, vb->size.get());
 		vb.reset();
 
 		m->MapSource(
 			streamIdx,
-			MGS_Vertices,
+			kMaterialGeometrySource_Vertices,
 			0,
 			kVertSize,
 			0
@@ -38,7 +39,7 @@ MeshBundle::Ref MeshBundle::New(const pkg::AssetRef &asset) {
 		
 		m->MapSource(
 			streamIdx,
-			MGS_Normals,
+			kMaterialGeometrySource_Normals,
 			0,
 			kVertSize,
 			sizeof(float)*3
@@ -47,14 +48,14 @@ MeshBundle::Ref MeshBundle::New(const pkg::AssetRef &asset) {
 		if (dm.numChannels > 0) {
 			m->MapSource(
 				streamIdx,
-				MGS_TexCoords,
+				kMaterialGeometrySource_Tangents,
 				0,
 				kVertSize,
 				sizeof(float)*6
 			);
 			m->MapSource(
 				streamIdx,
-				MGS_Tangents,
+				kMaterialGeometrySource_TexCoords,
 				0,
 				kVertSize,
 				sizeof(float)*10
@@ -64,21 +65,14 @@ MeshBundle::Ref MeshBundle::New(const pkg::AssetRef &asset) {
 		if (dm.numChannels > 1) {
 			m->MapSource(
 				streamIdx,
-				MGS_TexCoords,
+				kMaterialGeometrySource_TexCoords,
 				1,
 				kVertSize,
-				sizeof(float)*8
-			);
-			m->MapSource(
-				streamIdx,
-				MGS_Tangents,
-				1,
-				kVertSize,
-				sizeof(float)*14
+				sizeof(float)*12
 			);
 		}
 		
-		vb = m->MapIndices(SU_Static, sizeof(U16), (int)dm.numIndices);
+		vb = m->MapIndices(kStreamUsage_Static, sizeof(U16), (int)dm.numIndices);
 		memcpy(vb->ptr, dm.indices, vb->size.get());
 		vb.reset();
 

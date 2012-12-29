@@ -16,8 +16,7 @@ class Material;
 
 namespace world {
 
-class RADENG_CLASS D_Material : public D_Asset
-{
+class RADENG_CLASS D_Material : public D_Asset {
 public:
 	typedef boost::shared_ptr<D_Material> Ref;
 

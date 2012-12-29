@@ -9,7 +9,7 @@
 #include "../Types.h"
 #include "../Packages/PackagesDef.h"
 #include "../Assets/MeshMaterialLoader.h"
-#include "Sources.h"
+#include "Common.h"
 #include "Shader.h"
 #include <Runtime/Container/ZoneVector.h>
 
@@ -22,7 +22,7 @@
 namespace r {
 
 //! Renderable Mesh.
-/*! A mesh serves as a container for vertex buffers and the mappings of r::MGSource descriptors
+/*! A mesh serves as a container for vertex buffers and the mappings of r::MaterialGeometrySource descriptors
 	into those buffers. The mesh itself is implemented in the rendering backend.
 	\sa r::GLMesh
 */
@@ -59,7 +59,7 @@ public:
 
 	void MapSource(
 		int stream, 
-		MGSource s, 
+		MaterialGeometrySource s, 
 		int index,
 		int stride,
 		int ofs
@@ -67,8 +67,8 @@ public:
 
 	StreamPtr::Ref MapIndices(StreamUsage usage, int elemSize, int count);
 
-	void Bind(MGSource source, int index);
-	void BindAll(MGSource source);
+	void Bind(MaterialGeometrySource source, int index);
+	void BindAll(MaterialGeometrySource source);
 	void BindIndices();
 
 	//! Binds all array states for this mesh, including indices. 

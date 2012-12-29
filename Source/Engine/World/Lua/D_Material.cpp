@@ -9,48 +9,37 @@
 
 namespace world {
 
-D_Material::Ref D_Material::New(const pkg::AssetRef &asset)
-{
+D_Material::Ref D_Material::New(const pkg::AssetRef &asset) {
 	return Ref(new (ZWorld) D_Material(asset));
 }
 
 D_Material::D_Material(const pkg::AssetRef &asset) : D_Asset(asset),
-m_asset(asset)
-{
+m_asset(asset) {
 	m_parser = asset::MaterialParser::Cast(asset);
 }
 
-void D_Material::PushElements(lua_State *L)
-{
+void D_Material::PushElements(lua_State *L) {
 	D_Asset::PushElements(L);
 	lua_pushcfunction(L, lua_SetState);
 	lua_setfield(L, -2, "SetState");
 }
 
-int D_Material::lua_SetState(lua_State *L)
-{
+int D_Material::lua_SetState(lua_State *L) {
 	D_Material::Ref self = lua::SharedPtr::Get<D_Material>(L, "D_Material", 1, true);
 	
 	const char *state = luaL_checkstring(L, 2);
-	if (!strcmp(state, "Color0.A"))
-	{
+	if (!strcmp(state, "Color0.A")) {
 		Vec4 c = lua::Marshal<Vec4>::Get(L, 3, true);
-		self->material->SetColor(r::Material::Color0, r::Material::ColorA, &c[0]);
+		self->material->SetColor(r::Material::kColor0, r::Material::kColorA, &c[0]);
 		return 0;
-	}
-	else if(!strcmp(state, "Color0.B"))
-	{
+	} else if(!strcmp(state, "Color0.B")) {
 		Vec4 c = lua::Marshal<Vec4>::Get(L, 3, true);
-		self->material->SetColor(r::Material::Color0, r::Material::ColorB, &c[0]);
+		self->material->SetColor(r::Material::kColor0, r::Material::kColorB, &c[0]);
 		return 0;
-	}
-	else if(!strcmp(state, "Time"))
-	{
+	} else if(!strcmp(state, "Time")) {
 		self->material->time = (float)luaL_checknumber(L, 3);
 		return 0;
-	}
-	else if(!strcmp(state, "TimingMode"))
-	{
+	} else if(!strcmp(state, "TimingMode")) {
 		self->material->timingMode = (r::Material::TimingMode)luaL_checkinteger(L, 3);
 		return 0;
 	}
@@ -65,21 +54,18 @@ int D_Material::lua_SetState(lua_State *L)
 	const String kPhase(CStr("Phase"));
 	const String kType(CStr("Type"));
 
-	for (int i = 0; i < 6; ++i)
-	{
-		for (int k = 0;; ++k)
-		{
+	for (int i = 0; i < 6; ++i) {
+		for (int k = 0;; ++k) {
 			if (!waves[k])
 				break;
 
 			base.Printf("Texture%d.tcMod.%s.", i+1, waves[k]);
 
 			s = base + kAmplitude;
-			if (s == state)
-			{
+			if (s == state) {
 				Vec2 c = lua::Marshal<Vec2>::Get(L, 3, true);
-				WaveAnim &s = self->material->Wave(r::MTS_Texture, i, r::Material::TcMod_Rotate+k, r::Material::S);
-				WaveAnim &t = self->material->Wave(r::MTS_Texture, i, r::Material::TcMod_Rotate+k, r::Material::T);
+				WaveAnim &s = self->material->Wave(i, r::Material::kTCMod_Rotate+k, r::Material::kTexCoord_S);
+				WaveAnim &t = self->material->Wave(i, r::Material::kTCMod_Rotate+k, r::Material::kTexCoord_T);
 
 				s.amplitude = (float)c[0];
 				t.amplitude = (float)c[1];
@@ -87,11 +73,10 @@ int D_Material::lua_SetState(lua_State *L)
 			}
 
 			s = base + kBase;
-			if (s == state)
-			{
+			if (s == state) {
 				Vec2 c = lua::Marshal<Vec2>::Get(L, 3, true);
-				WaveAnim &s = self->material->Wave(r::MTS_Texture, i, r::Material::TcMod_Rotate+k, r::Material::S);
-				WaveAnim &t = self->material->Wave(r::MTS_Texture, i, r::Material::TcMod_Rotate+k, r::Material::T);
+				WaveAnim &s = self->material->Wave(i, r::Material::kTCMod_Rotate+k, r::Material::kTexCoord_S);
+				WaveAnim &t = self->material->Wave(i, r::Material::kTCMod_Rotate+k, r::Material::kTexCoord_T);
 
 				s.base = (float)c[0];
 				t.base = (float)c[1];
@@ -99,11 +84,10 @@ int D_Material::lua_SetState(lua_State *L)
 			}
 
 			s = base + kFrequency;
-			if (s == state)
-			{
+			if (s == state) {
 				Vec2 c = lua::Marshal<Vec2>::Get(L, 3, true);
-				WaveAnim &s = self->material->Wave(r::MTS_Texture, i, r::Material::TcMod_Rotate+k, r::Material::S);
-				WaveAnim &t = self->material->Wave(r::MTS_Texture, i, r::Material::TcMod_Rotate+k, r::Material::T);
+				WaveAnim &s = self->material->Wave(i, r::Material::kTCMod_Rotate+k, r::Material::kTexCoord_S);
+				WaveAnim &t = self->material->Wave(i, r::Material::kTCMod_Rotate+k, r::Material::kTexCoord_T);
 
 				s.freq = (float)c[0];
 				t.freq = (float)c[1];
@@ -111,11 +95,10 @@ int D_Material::lua_SetState(lua_State *L)
 			}
 
 			s = base + kPhase;
-			if (s == state)
-			{
+			if (s == state) {
 				Vec2 c = lua::Marshal<Vec2>::Get(L, 3, true);
-				WaveAnim &s = self->material->Wave(r::MTS_Texture, i, r::Material::TcMod_Rotate+k, r::Material::S);
-				WaveAnim &t = self->material->Wave(r::MTS_Texture, i, r::Material::TcMod_Rotate+k, r::Material::T);
+				WaveAnim &s = self->material->Wave(i, r::Material::kTCMod_Rotate+k, r::Material::kTexCoord_S);
+				WaveAnim &t = self->material->Wave(i, r::Material::kTCMod_Rotate+k, r::Material::kTexCoord_T);
 
 				s.phase = (float)c[0];
 				t.phase = (float)c[1];
@@ -123,45 +106,31 @@ int D_Material::lua_SetState(lua_State *L)
 			}
 
 			s = base + kType;
-			if (s == state)
-			{
+			if (s == state) {
 				const char *type = luaL_checkstring(L, 3);
 
-				WaveAnim &s = self->material->Wave(r::MTS_Texture, i, r::Material::TcMod_Rotate+k, r::Material::S);
-				WaveAnim &t = self->material->Wave(r::MTS_Texture, i, r::Material::TcMod_Rotate+k, r::Material::T);
+				WaveAnim &s = self->material->Wave(i, r::Material::kTCMod_Rotate+k, r::Material::kTexCoord_S);
+				WaveAnim &t = self->material->Wave(i, r::Material::kTCMod_Rotate+k, r::Material::kTexCoord_T);
 
-				if (!strcmp(type, "Identity"))
-				{
+				if (!strcmp(type, "Identity")) {
 					s.type = WaveAnim::T_Identity;
 					t.type = WaveAnim::T_Identity;
-				}
-				else if (!strcmp(type, "Constant"))
-				{
+				} else if (!strcmp(type, "Constant")) {
 					s.type = WaveAnim::T_Constant;
 					t.type = WaveAnim::T_Constant;
-				}
-				else if (!strcmp(type, "Square"))
-				{
+				} else if (!strcmp(type, "Square")) {
 					s.type = WaveAnim::T_Square;
 					t.type = WaveAnim::T_Square;
-				}
-				else if (!strcmp(type, "Sawtooth"))
-				{
+				} else if (!strcmp(type, "Sawtooth")) {
 					s.type = WaveAnim::T_Sawtooth;
 					t.type = WaveAnim::T_Sawtooth;
-				}
-				else if (!strcmp(type, "Triangle"))
-				{
+				} else if (!strcmp(type, "Triangle")) {
 					s.type = WaveAnim::T_Triangle;
 					t.type = WaveAnim::T_Triangle;
-				}
-				else if (!strcmp(type, "Noise"))
-				{
+				} else if (!strcmp(type, "Noise")) {
 					s.type = WaveAnim::T_Noise;
 					t.type = WaveAnim::T_Noise;
-				}
-				else
-				{
+				} else {
 					luaL_argerror(L, 3, "Invalid material wave type!");
 				}
 

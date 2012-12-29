@@ -11,8 +11,7 @@
 
 namespace r {
 
-class RADENG_CLASS GLTextModel : public TextModel
-{
+class RADENG_CLASS GLTextModel : public TextModel {
 public:
 	typedef boost::shared_ptr<GLTextModel> Ref;
 

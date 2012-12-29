@@ -11,6 +11,7 @@
 #include <Runtime/Stream.h>
 #include "LuaRuntimeDef.h"
 #include <Runtime/String.h>
+#include <Runtime/FileDef.h>
 #include <Runtime/Container/ZoneMap.h>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
@@ -74,6 +75,19 @@ protected:
 	virtual RAD_DECLARE_GET(ptr, const void*) = 0;
 	virtual RAD_DECLARE_GET(size, AddrSize) = 0;
 	virtual RAD_DECLARE_GET(name, const char*) = 0;
+};
+
+class FileSrcBuffer : public SrcBuffer {
+public:
+	FileSrcBuffer(const char *name, const file::MMappingRef &mm) : m_name(name), m_mm(mm) {}
+
+protected:
+	RAD_DECLARE_GET(ptr, const void *);
+	RAD_DECLARE_GET(size, AddrSize);
+	RAD_DECLARE_GET(name, const char *);
+
+	file::MMappingRef m_mm;
+	String m_name;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////

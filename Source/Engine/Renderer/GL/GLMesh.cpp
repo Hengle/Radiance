@@ -8,8 +8,7 @@
 
 namespace r {
 
-int GLMesh::AllocateStream(StreamUsage usage, int vertexSize, int vertexCount, bool swapChain)
-{
+int GLMesh::AllocateStream(StreamUsage usage, int vertexSize, int vertexCount, bool swapChain) {
 	m_streams.resize(m_streams.size()+1);
 	Stream &stream = m_streams.back();
 	stream.size = vertexSize;
@@ -19,16 +18,15 @@ int GLMesh::AllocateStream(StreamUsage usage, int vertexSize, int vertexCount, b
 	
 	stream.vbs.reserve(numVBs);
 
-	for (int i = 0; i < numVBs; ++i)
-	{
+	for (int i = 0; i < numVBs; ++i) {
 		GLVertexBuffer::Ref vb(
 			new (ZRender) GLVertexBuffer(
 				GL_ARRAY_BUFFER_ARB,
-				(usage==SU_Static) ? GL_STATIC_DRAW_ARB : (usage==SU_Dynamic) ? GL_DYNAMIC_DRAW_ARB : GL_STREAM_DRAW_ARB,
+				(usage==kStreamUsage_Static) ? GL_STATIC_DRAW_ARB : (usage==kStreamUsage_Dynamic) ? GL_DYNAMIC_DRAW_ARB : GL_STREAM_DRAW_ARB,
 				vertexSize*vertexCount
 			)
 		);
-		if (usage != SU_Static)
+		if (usage != kStreamUsage_Static)
 			vb->Map(); // make sure to allocate space.
 		stream.vbs.push_back(vb);
 	}
@@ -36,8 +34,7 @@ int GLMesh::AllocateStream(StreamUsage usage, int vertexSize, int vertexCount, b
 	return (int)(m_streams.size()-1);
 }
 
-GLMesh::StreamPtr::Ref GLMesh::Map(int s)
-{
+GLMesh::StreamPtr::Ref GLMesh::Map(int s) {
 	RAD_ASSERT(s >= 0 && s < (int)m_streams.size());
 	Stream &stream = m_streams[s];
 	int vb = std::min((int)(stream.vbs.size()-1), m_swapChain);
@@ -47,13 +44,11 @@ GLMesh::StreamPtr::Ref GLMesh::Map(int s)
 
 void GLMesh::MapSource(
 	int stream, 
-	MGSource s, 
+	MaterialGeometrySource s, 
 	int index,
 	int stride,
 	int ofs
-)
-{
-	RAD_ASSERT(s >= MGS_Vertices && s < MGS_Max);
+) {
 	Source &source = m_sources[s][index];
 
 	source.stream = stream;
@@ -61,16 +56,15 @@ void GLMesh::MapSource(
 	source.stride = stride;
 	source.ofs = (GLuint)ofs;
 
-	switch (s)
-	{
-	case MGS_Vertices:
-	case MGS_Normals:
+	switch (s) {
+	case kMaterialGeometrySource_Vertices:
+	case kMaterialGeometrySource_Normals:
 		source.count = 3;
 		break;
-	case MGS_Tangents:
+	case kMaterialGeometrySource_Tangents:
 		source.count = 4;
 		break;
-	case MGS_TexCoords:
+	case kMaterialGeometrySource_TexCoords:
 		source.count = 2;
 		break;
 	default:
@@ -79,10 +73,9 @@ void GLMesh::MapSource(
 
 }
 
-GLMesh::StreamPtr::Ref GLMesh::MapIndices(StreamUsage _usage, int elemSize, int count)
-{
+GLMesh::StreamPtr::Ref GLMesh::MapIndices(StreamUsage _usage, int elemSize, int count) {
 	RAD_ASSERT(elemSize==2||elemSize==4);
-	GLenum usage = (_usage == SU_Static) ? GL_STATIC_DRAW_ARB : GL_DYNAMIC_DRAW_ARB;
+	GLenum usage = (_usage == kStreamUsage_Static) ? GL_STATIC_DRAW_ARB : GL_DYNAMIC_DRAW_ARB;
 	GLenum type = (elemSize == 2) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
 	if (m_i.vb && (m_i.count == count) && (m_i.usage == usage))
@@ -96,14 +89,10 @@ GLMesh::StreamPtr::Ref GLMesh::MapIndices(StreamUsage _usage, int elemSize, int 
 	return m_i.vb->Map();
 }
 
-void GLMesh::Bind(MGSource s, int index)
-{
-	RAD_ASSERT(s >= MGS_Vertices && s < MGS_Max);
-	RAD_ASSERT(index >= 0 && index < MGS_MaxIndices);
+void GLMesh::Bind(MaterialGeometrySource s, int index) {
 	Source &source = m_sources[s][index];
 
-	if (source.stream >= 0)
-	{
+	if (source.stream >= 0) {
 		RAD_ASSERT(source.stream < (int)m_streams.size());
 
 		const Stream &stream = m_streams[source.stream];
@@ -124,17 +113,12 @@ void GLMesh::Bind(MGSource s, int index)
 	}
 }
 
-void GLMesh::BindAll(Shader *shader)
-{
-	if (m_shader != shader)
-	{
+void GLMesh::BindAll(Shader *shader) {
+	if (m_shader != shader) {
 		m_shader = shader;
-		if (shader)
-		{
+		if (shader) {
 			m_va = m_shaderStates.Find(shader->guid);
-		}
-		else
-		{
+		} else {
 			m_va = 0;
 		}
 	}
@@ -142,32 +126,29 @@ void GLMesh::BindAll(Shader *shader)
 	if (m_va && !m_va->at(m_swapChain))
 		m_va = 0;
 
-	if (m_va)
-	{ // we have compiled vertex states.
+	if (m_va) { 
+		// we have compiled vertex states.
 		gls.BindVertexArray(m_va->at(m_swapChain));
-	}
-	else if (shader && (gl.vbos&&gl.vaos))
-	{
+	} else if (shader && (gl.vbos&&gl.vaos)) {
 		m_va = m_shaderStates.Create(shader->guid, m_swapChain);
 		RAD_ASSERT(m_va);
 		gls.BindVertexArray(m_va->at(m_swapChain));
 		BindIndices(true); // must force this binding to be set.
-	}
-	else
-	{
+	} else {
 		if (gl.vbos&&gl.vaos)
 			gls.BindVertexArray(GLVertexArrayRef());
 		BindIndices();
 	}
 
 	ResetStreamState();
-	for (int s = 0; s < MGS_Max; ++s)
-		for (int i = 0; i < MGS_MaxIndices; ++i)
-			Bind((MGSource)s, i);
+	for (int s = 0; s < kNumMaterialGeometrySources; ++s) {
+		for (int i = 0; i < kMaterialGeometrySource_MaxIndices; ++i) {
+			Bind((MaterialGeometrySource)s, i);
+		}
+	}
 }
 
-void GLMesh::Release()
-{
+void GLMesh::Release() {
 	m_va = 0;
 	m_shader = 0;
 	m_swapChain = 0;
@@ -175,9 +156,11 @@ void GLMesh::Release()
 	m_i.vb.reset();
 	m_streams.clear();
 
-	for (int s = 0; s < MGS_Max; ++s)
-		for (int i = 0; i < MGS_MaxIndices; ++i)
+	for (int s = 0; s < kNumMaterialGeometrySources; ++s) {
+		for (int i = 0; i < kMaterialGeometrySource_MaxIndices; ++i) {
 			m_sources[s][i].stream = -1;
+		}
+	}
 }
 
 } // r

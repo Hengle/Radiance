@@ -1058,7 +1058,7 @@ struct SkTriModel {
 
 	Vec4Vec weightedVerts;
 	Vec4Vec weightedNormals;
-	Vec4Vec weightedTangents[ska::kMaxUVChannels];
+	Vec4Vec weightedTangents;
 	Vec2Vec uvs[ska::kMaxUVChannels];
 	IntVec sortedIndices;
 
@@ -1177,10 +1177,10 @@ struct SkTriModel {
 		sortedIndices.reserve(indices.size());
 		weightedVerts.reserve(numWeightedVerts);
 		weightedNormals.reserve(numWeightedVerts);
+		weightedTangents.reserve(numWeightedVerts);
 
 		for (int i = 0; i < ska::kMaxUVChannels; ++i) {
 			uvs[i].reserve(totalVerts);
-			weightedTangents[i].reserve(numWeightedVerts);
 		}
 
 		int vertIndex = 0;
@@ -1200,10 +1200,6 @@ struct SkTriModel {
 
 				for (int k = 0; k < ska::kMaxUVChannels; ++k) {
 					uvs[k].push_back(v.st[k]);
-					for (int j = 0; j <= i; ++j) {
-						Vec4 z(Vec3(v.tangent[k]) * v.weights[j].weight, v.tangent[k][3]);
-						weightedTangents[k].push_back(z);
-					}
 				}
 
 				for (int k = 0; k <= i; ++k) {
@@ -1214,6 +1210,11 @@ struct SkTriModel {
 				for (int k = 0; k <= i; ++k) {
 					Vec4 z(v.normal * v.weights[k].weight, 1.f);
 					weightedNormals.push_back(z);
+				}
+
+				for (int k = 0; k <= i; ++k) {
+					Vec4 z(Vec3(v.tangent[0]) * v.weights[k].weight, v.tangent[0][3]);
+					weightedTangents.push_back(z);
 				}
 			}
 		}
@@ -1372,7 +1373,7 @@ bool CompileCPUSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 			}
 
 			RAD_ASSERT(m->weightedVerts.size() == m->weightedNormals.size());
-			RAD_ASSERT(m->weightedVerts.size() == m->weightedTangents[0].size());
+			RAD_ASSERT(m->weightedVerts.size() == m->weightedTangents.size());
 
 			int ofs = 0;
 			for (int i = 0; i < ska::kBonesPerVert; ++i) {
@@ -1405,21 +1406,19 @@ bool CompileCPUSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 						bytes += 16;
 					}
 
-					for (int j = 0; j < r->numChannels; ++j) {
-						for (int k = 0; k <= i; ++k) {
-							const Vec4 *v = &m->weightedTangents[j][k+ofs];
+					for (int k = 0; k <= i; ++k) {
+						const Vec4 *v = &m->weightedTangents[k+ofs];
 
-							if (!os.Write((*v)[0]) ||
-								!os.Write((*v)[1]) ||
-								!os.Write((*v)[2]) ||
-								!os.Write((*v)[3])) {
-								return false;
-							}
-
-							bytes += 16;
+						if (!os.Write((*v)[0]) ||
+							!os.Write((*v)[1]) ||
+							!os.Write((*v)[2]) ||
+							!os.Write((*v)[3])) {
+							return false;
 						}
-					}
 
+						bytes += 16;
+					}
+					
 					ofs += (i+1);
 				}
 			}

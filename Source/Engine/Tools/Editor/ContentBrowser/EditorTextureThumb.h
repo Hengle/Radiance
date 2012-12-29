@@ -13,26 +13,22 @@
 namespace tools {
 namespace editor {
 
-class TextureThumb : public ContentAssetThumb
-{
+class TextureThumb : public ContentAssetThumb {
 	Q_OBJECT
 public:
 
-	enum
-	{
-		MaxCacheSize = 16*Meg,
-		MaxLoading = 16
+	enum {
+		kMaxCacheSize = 16*Meg,
+		kMaxLoading = 16
 	};
 
 	TextureThumb(ContentBrowserView &view) :
 	  ContentAssetThumb(view),
 	  m_lastDraw(0),
-	  m_cache(MaxLoading, MaxCacheSize)
-	{
+	  m_cache(kMaxLoading, kMaxCacheSize) {
 	}
 
-	~TextureThumb()
-	{
+	~TextureThumb() {
 		Release();
 	}
 
@@ -54,8 +50,7 @@ public:
 
 private:
 
-	class Thumbnail : public ContentThumbCache::Item
-	{
+	class Thumbnail : public ContentThumbCache::Item {
 	public:
 		typedef boost::shared_ptr<Thumbnail> Ref;
 		Thumbnail(int id, TextureThumb *outer);

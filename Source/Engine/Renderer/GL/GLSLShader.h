@@ -20,8 +20,7 @@ namespace r {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class GLSLShaderObj
-{
+class GLSLShaderObj {
 public:
 	typedef boost::shared_ptr<GLSLShaderObj> Ref;
 	GLSLShaderObj(GLenum type);
@@ -34,8 +33,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class GLSLProgramObj
-{
+class GLSLProgramObj {
 public:
 	typedef boost::shared_ptr<GLSLProgramObj> Ref;
 	GLSLProgramObj();
@@ -49,8 +47,7 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 
 class GLSLShaderLink;
-class RADENG_CLASS GLSLShader : public GLShader
-{
+class RADENG_CLASS GLSLShader : public GLShader {
 public:
 	typedef boost::shared_ptr<GLSLShader> Ref;
 
@@ -58,7 +55,6 @@ public:
 	static Ref Load(
 		Engine &engine, 
 		const char *name,
-		bool skinned,
 		const Material &material
 	);
 #endif
@@ -66,18 +62,17 @@ public:
 	static Ref LoadCooked(
 		const char *name,
 		stream::InputStream &is,
-		bool skinned,
 		const Material &material
 	);
 
-	virtual int Usage(Shader::Pass p, MTSource source) const;
-	virtual int Usage(Shader::Pass p, MGSource source) const;
-	virtual bool Requires(Shader::Pass p, MTSource source, int index) const;
-	virtual bool Requires(Shader::Pass p, MGSource source, int index) const;
+	virtual int Usage(Shader::Pass p, MaterialTextureSource source) const;
+	virtual int Usage(Shader::Pass p, MaterialGeometrySource source) const;
+	virtual bool Requires(Shader::Pass p, MaterialTextureSource source, int index) const;
+	virtual bool Requires(Shader::Pass p, MaterialGeometrySource source, int index) const;
 	virtual int Outputs(Shader::Pass p) const;
 	virtual bool HasPass(Shader::Pass p) const;
 	virtual void Begin(Shader::Pass p, const Material &material);
-	virtual void BindStates(bool sampleMaterialColor, const Vec4 &rgba);
+	virtual void BindStates(const r::Shader::Uniforms &uniforms, bool sampleMaterialColor = true);
 	virtual void End();
 
 #if defined(RAD_OPT_PC_TOOLS)
@@ -97,8 +92,15 @@ private:
 
 	typedef zone_vector<int, ZRenderT>::type IntVec;
 
-	struct Uniforms
-	{
+	struct Uniforms {
+		boost::array<boost::array<GLint, Material::kNumTCMods+1>, kMaterialTextureSource_MaxIndices> tcMods;
+		boost::array<
+			boost::array<
+				boost::array<float, Material::kNumTCModVals>,
+			Material::kNumTCMods>,
+		kMaterialTextureSource_MaxIndices> tcModVals;
+		
+		boost::array<GLint, kMaxTextures> textures;
 #if defined(RAD_OPT_OGLES2)
 		GLint mvp;
 		GLint color;
@@ -106,35 +108,42 @@ private:
 		float rgba[4];
 		float mvpfloats[16];
 #endif
-		GLint tcMods[GLState::MaxTextures][Material::NumTcMods+1];
-		float tcModsVals[GLState::MaxTextures][Material::NumTcMods][Material::NumTcModVals];
-		GLint textures[GLState::MaxTextures];
+		LightEnv lights;
+		GLint lightPos[kMaxLights];
+		GLint lightDiffuse[kMaxLights];
+		GLint lightSpecular[kMaxLights];
+
+		GLint eye;
+		float eyePos[3];
+		int eyeOps;
 	};
 
-	struct Pass
-	{
+	struct Pass {
 		GLSLProgramObj::Ref p;
 		Uniforms u;
 		int outputs;
-		GLState::MInputMappings m;
+		MaterialInputMappings m;
 	};
 
 	bool LoadPass(
 		const char *name,
 		stream::InputStream &is,
-		bool skinned,
 		const Material &material
 	);
 
 	bool MapInputs(Pass &p, const Material &material);
 
 #if defined(RAD_OPT_TOOLS)
+	bool Compile(
+		Engine &e,
+		const tools::shader_utils::Shader::Ref &shader,
+		const Material &material
+	);
+
 	bool CompilePass(
 		Engine &e,
-		Pass &p,
-		bool skinned,
-		const cg::Shader::Ref &s,
-		cg::Shader::Channel channel,
+		Shader::Pass pass,
+		const tools::shader_utils::Shader::Ref &shader,
 		const Material &material
 	);
 #endif
@@ -142,12 +151,13 @@ private:
 	String ShaderLog(GLhandleARB s);
 	String ProgramLog(GLhandleARB s);
 
-	void BindAttribLocations(GLhandleARB p, const GLState::MInputMappings &m);
+	void BindAttribLocations(GLhandleARB p, const MaterialInputMappings &m);
 
 	String m_name;
 	Shader::Pass m_curPass;
 	const r::Material *m_curMat;
-	Pass m_passes[GLShader::NumPasses];
+
+	boost::array<Pass, Shader::kNumPasses> m_passes;
 };
 
 } // r

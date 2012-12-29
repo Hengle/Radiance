@@ -21,31 +21,26 @@ using namespace pkg;
 namespace tools {
 namespace editor {
 
-enum
-{
+enum {
 	MaxSize = 16*Meg,
 	MaxLoading = 8,
 	OverlayDiv = 8
 };
 
-struct OverlayVert
-{
+struct OverlayVert {
 	float xy[2];
 	float st[2];
 };
 
 MaterialThumb::MaterialThumb(ContentBrowserView &view) :
-ContentAssetThumb(view), m_cache(MaxLoading, MaxSize), m_lastDraw(0)
-{
+ContentAssetThumb(view), m_cache(MaxLoading, MaxSize), m_lastDraw(0) {
 }
 
-MaterialThumb::~MaterialThumb()
-{
+MaterialThumb::~MaterialThumb() {
 	m_cache.EvictAll();
 }
 
-void MaterialThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, int &h)
-{
+void MaterialThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, int &h) {
 	ContentAssetThumb::Dimensions(entry, w, h);
 
 	Asset::Ref asset = entry->Asset(pkg::Z_ContentBrowser);
@@ -78,8 +73,7 @@ void MaterialThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, in
 	}
 
 	MaterialLoader::Ref mL = MaterialLoader::Cast(asset);
-	if (!mL->info)
-	{
+	if (!mL->info) {
 		int r = asset->Process(
 			xtime::TimeSlice::Infinite,
 			P_Info|P_Unformatted|P_NoDefaultMedia
@@ -96,20 +90,16 @@ void MaterialThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, in
 	int my = 0;
 
 	// find the largest texture.
-	for (int i = 0; i < MTS_Max; ++i)
-	{
-		for (int k = 0; k < MTS_MaxIndices; ++k)
-		{
-			TextureParser::Ref t = TextureParser::Cast(mL->Texture((r::MTSource)i, k));
-			if (!t)
-				break;
-			if (!t->headerValid)
-				break;
-			mx = std::max(mx, t->header->width);
-			my = std::max(my, t->header->height);
-		}
+	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
+		TextureParser::Ref t = TextureParser::Cast(mL->Texture(i));
+		if (!t)
+			break;
+		if (!t->headerValid)
+			break;
+		mx = std::max(mx, t->header->width);
+		my = std::max(my, t->header->height);
 	}
-
+	
 	if (mx > 0 && my > 0) {
 		w = mx;
 		h = my;
@@ -123,23 +113,20 @@ void MaterialThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, in
 	ContentAssetThumbDimensionCache::Get()->Save();
 }
 
-inline float Wrap(float r)
-{
+inline float Wrap(float r) {
 	float z = floorf(r);
 	int side = (int)z;
 
 	r -= z;
 
-	if (side&1)
-	{
+	if (side&1) {
 		return -1.0f + r*2;
 	}
 
 	return 1.0f - r*2;
 }
 
-bool MaterialThumb::RenderIcon(const Thumbnail::Ref &t, int x, int y, int w, int h)
-{
+bool MaterialThumb::RenderIcon(const Thumbnail::Ref &t, int x, int y, int w, int h) {
 	GLTexture::Ref icon = t->icon;
 	if (!icon)
 		return false;
@@ -147,7 +134,7 @@ bool MaterialThumb::RenderIcon(const Thumbnail::Ref &t, int x, int y, int w, int
 	gls.BindBuffer(GL_ARRAY_BUFFER_ARB, GLVertexBufferRef());
 	gls.BindBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, GLVertexBufferRef());
 	gls.DisableTextures();
-	gls.Set(DT_Disable|DWM_Disable|CFM_None|CWM_RGBA, BM_Off);
+	gls.Set(kDepthTest_Disable|kDepthWriteMask_Disable|kCullFaceMode_None|kColorWriteMask_RGBA, kBlendMode_Off);
 	gls.SetTexture(0, icon);
 	gls.Commit();
 
@@ -182,63 +169,30 @@ bool MaterialThumb::RenderIcon(const Thumbnail::Ref &t, int x, int y, int w, int
 	return true;
 }
 
-bool MaterialThumb::Render(const pkg::Package::Entry::Ref &entry, int x, int y, int w, int h)
-{
+bool MaterialThumb::Render(const pkg::Package::Entry::Ref &entry, int x, int y, int w, int h) {
 	Thumbnail::Ref t = RequestThumbnail(entry->id, w, h);
-	if (t)
-	{
+	if (t) {
 		if (RenderIcon(t, x, y, w, h))
 			return true;
 
 		gl.Color4f(1.f, 1.f, 1.f, 1.f, true); // force=true, who knows what Qt does behind our backs.
-		int blendMode = BM_Off;
 
-		switch (t->material->blendMode)
-		{
-		case Material::BM_Alpha:
-			blendMode = BMS_SrcAlpha|BMD_InvSrcAlpha;
-			break;
-		case Material::BM_InvAlpha:
-			blendMode = BMS_InvSrcAlpha|BMD_SrcAlpha;
-			break;
-		case Material::BM_Additive:
-			blendMode = BMS_One|BMD_One;
-			break;
-		case Material::BM_AddBlend:
-			blendMode = BMS_SrcAlpha|BMD_One;
-			break;
-		case Material::BM_Colorize:
-			blendMode = BMS_DstColor|BMD_Zero;
-			break;
-		case Material::BM_InvColorizeD:
-			blendMode = BMS_InvDstColor|BMD_Zero;
-			break;
-		case Material::BM_InvColorizeS:
-			blendMode = BMS_Zero|BMD_InvSrcColor;
-			break;
-		default:
-			break;
-		}
-
-		gls.Set(DT_Disable|DWM_Disable|CFM_None|CWM_RGBA, blendMode);
+		t->material->BindStates(kDepthTest_Disable|kDepthWriteMask_Disable|kCullFaceMode_None, 0);
 
 		gls.DisableAllMTSources();
 		gls.DisableAllMGSources();
 
 		// bind our thumbnail textures.
-		for (int i = 0; i < MTS_Max; ++i)
-		{
-			for (int k = 0; k < MTS_MaxIndices; ++k)
-			{
-				GLTexture::Ref tex = t->Texture((MTSource)i, k);
-				if (!tex)
-					break;
-				gls.SetMTSource((MTSource)i, k, tex);
-			}
+		for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
+			GLTexture::Ref tex = t->Texture(i);
+			if (!tex)
+				break;
+			gls.SetMTSource(kMaterialTextureSource_Texture, i, tex);
 		}
+		
 
 		gls.SetMGSource(
-			MGS_Vertices,
+			kMaterialGeometrySource_Vertices,
 			0,
 			t->vb,
 			2,
@@ -249,7 +203,7 @@ bool MaterialThumb::Render(const pkg::Package::Entry::Ref &entry, int x, int y, 
 		);
 
 		gls.SetMGSource(
-			MGS_TexCoords,
+			kMaterialGeometrySource_TexCoords,
 			0,
 			t->vb,
 			2, 
@@ -266,7 +220,7 @@ bool MaterialThumb::Render(const pkg::Package::Entry::Ref &entry, int x, int y, 
 		gl.LoadIdentity();
 		gl.Translatef(x + w/2, y + h/2, 0.0f);
 
-		t->material->shader->Begin(Shader::P_Default, *t->material.get());
+		t->material->shader->Begin(Shader::kPass_Preview, *t->material.get());
 		t->material->shader->BindStates();
 		gls.Commit();
 		
@@ -277,7 +231,7 @@ bool MaterialThumb::Render(const pkg::Package::Entry::Ref &entry, int x, int y, 
 		t->material->shader->End();
 		gls.DisableTextures();
 		gls.DisableVertexAttribArrays();
-		gls.Set(0, BM_Off);
+		gls.Set(0, kBlendMode_Off);
 		gls.Commit();
 		gls.BindBuffer(GL_ARRAY_BUFFER_ARB, GLVertexBufferRef());
 		gls.BindBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, GLVertexBufferRef());
@@ -288,18 +242,14 @@ bool MaterialThumb::Render(const pkg::Package::Entry::Ref &entry, int x, int y, 
 	return true;
 }
 
-void MaterialThumb::NotifyAddRemovePackages()
-{
+void MaterialThumb::NotifyAddRemovePackages() {
 }
 
-void MaterialThumb::NotifyAddRemoveContent(const pkg::IdVec &added, const pkg::IdVec &removed)
-{
+void MaterialThumb::NotifyAddRemoveContent(const pkg::IdVec &added, const pkg::IdVec &removed) {
 }
 
-void MaterialThumb::NotifyContentChanged(const ContentChange::Vec &changed)
-{
-	for (ContentChange::Vec::const_iterator it = changed.begin(); it != changed.end(); ++it)
-	{
+void MaterialThumb::NotifyContentChanged(const ContentChange::Vec &changed) {
+	for (ContentChange::Vec::const_iterator it = changed.begin(); it != changed.end(); ++it) {
 		const ContentChange &c = *it;
 		if (c.entry->type != asset::AT_Material)
 			continue;
@@ -312,18 +262,15 @@ void MaterialThumb::NotifyContentChanged(const ContentChange::Vec &changed)
 	}
 }
 
-void MaterialThumb::Begin()
-{
+void MaterialThumb::Begin() {
 	m_cache.BeginRefresh();
 }
 
-void MaterialThumb::End()
-{
+void MaterialThumb::End() {
 	m_cache.EndRefresh();
 }
 
-void MaterialThumb::Tick(float t, const xtime::TimeSlice &time)
-{
+void MaterialThumb::Tick(float t, const xtime::TimeSlice &time) {
 	bool vis = false;
 	bool notify = m_cache.Tick(t, time, vis);
 	xtime::TimeVal now = xtime::ReadMilliseconds();
@@ -334,11 +281,9 @@ void MaterialThumb::Tick(float t, const xtime::TimeSlice &time)
 	}
 }
 
-MaterialThumb::Thumbnail::Ref MaterialThumb::RequestThumbnail(int id, int w, int h)
-{
+MaterialThumb::Thumbnail::Ref MaterialThumb::RequestThumbnail(int id, int w, int h) {
 	Thumbnail::Ref t = FindThumbnail(id);
-	if (!t)
-	{
+	if (!t) {
 		t.reset(new Thumbnail(id, this));
 		m_cache.Insert(boost::static_pointer_cast<ContentThumbCache::Item>(t));
 	}
@@ -347,33 +292,26 @@ MaterialThumb::Thumbnail::Ref MaterialThumb::RequestThumbnail(int id, int w, int
 	return t;
 }
 
-MaterialThumb::Thumbnail::Ref MaterialThumb::FindThumbnail(int id)
-{
+MaterialThumb::Thumbnail::Ref MaterialThumb::FindThumbnail(int id) {
 	return boost::static_pointer_cast<Thumbnail>(m_cache.Find(id));
 }
 
-void MaterialThumb::New(ContentBrowserView &view)
-{
+void MaterialThumb::New(ContentBrowserView &view) {
 	MaterialThumb *t = new (ZEditor) MaterialThumb(view);
 	ContentAssetThumb::Ref self(t);
 	t->Register(self, asset::AT_Material);
 }
 
-void CreateMaterialThumb(ContentBrowserView &view)
-{
+void CreateMaterialThumb(ContentBrowserView &view) {
 	MaterialThumb::New(view);
 }
 
-void MaterialThumb::ScaleSize(int &w, int &h, int rw, int rh)
-{
-	if (w > h)
-	{
+void MaterialThumb::ScaleSize(int &w, int &h, int rw, int rh) {
+	if (w > h) {
 		float s = rw / ((float)w);
 		h = (int)(s * h);
 		w = rw;
-	}
-	else
-	{
+	} else {
 		float s = rh / ((float)h);
 		w = (int)(s * w);
 		h = rh;
@@ -390,16 +328,13 @@ m_time(0),
 m_rot(0.f),
 m_load(false),
 m_icon(true),
-m_mat(0)
-{
+m_mat(0) {
 }
 
-MaterialThumb::Thumbnail::~Thumbnail()
-{
+MaterialThumb::Thumbnail::~Thumbnail() {
 }
 
-void MaterialThumb::Thumbnail::Request(int w, int h)
-{
+void MaterialThumb::Thumbnail::Request(int w, int h) {
 	if (m_w == w && m_h == h)
 		return;
 	Cancel();
@@ -431,10 +366,8 @@ void MaterialThumb::Thumbnail::Request(int w, int h)
 	int x, y;
 	float xf, yf;
 
-	for (y = 0, yf = 0.f; y < OverlayDiv; ++y, yf += yInc)
-	{
-		for (x = 0, xf = 0.f; x < OverlayDiv; ++x, xf += xInc)
-		{
+	for (y = 0, yf = 0.f; y < OverlayDiv; ++y, yf += yInc) {
+		for (x = 0, xf = 0.f; x < OverlayDiv; ++x, xf += xInc) {
 			OverlayVert &v = verts[y*OverlayDiv+x];
 			v.xy[0] = xf-w/2;
 			v.xy[1] = yf-h/2;
@@ -459,10 +392,8 @@ void MaterialThumb::Thumbnail::Request(int w, int h)
 	RAD_ASSERT(vb);
 	U16 *indices = (U16*)vb->ptr.get();
 
-	for (y = 0; y < OverlayDiv-1; ++y)
-	{
-		for (x = 0; x < OverlayDiv-1; ++x)
-		{
+	for (y = 0; y < OverlayDiv-1; ++y) {
+		for (x = 0; x < OverlayDiv-1; ++x) {
 			U16 *idx = &indices[y*(OverlayDiv-1)*6+x*6];
 
 			// glOrtho() inverts the +Z axis (or -Z can't recall), inverting the 
@@ -484,15 +415,12 @@ void MaterialThumb::Thumbnail::Request(int w, int h)
 	m_load = true;
 }
 
-GLTexture::Ref MaterialThumb::Thumbnail::RAD_IMPLEMENT_GET(icon)
-{
+GLTexture::Ref MaterialThumb::Thumbnail::RAD_IMPLEMENT_GET(icon) {
 	return m_icon ? m_outer->View().GetIcon((ContentBrowserView::Icon)m_idx) : GLTexture::Ref();
 }
 
-GLTexture::Ref MaterialThumb::Thumbnail::Texture(r::MTSource source, int index)
-{
-	RAD_ASSERT(source >= 0 && source < MTS_Max && index >= 0 && index < MTS_MaxIndices);
-	const GLTexture::Vec &texs = m_texs[source][index];
+GLTexture::Ref MaterialThumb::Thumbnail::Texture(int index) {
+	const GLTexture::Vec &texs = m_texs[index];
 	if (texs.empty())
 		return GLTexture::Ref();
 
@@ -500,10 +428,9 @@ GLTexture::Ref MaterialThumb::Thumbnail::Texture(r::MTSource source, int index)
 	float fps = 0.f;
 
 	if (m_mat)
-		fps = m_mat->TextureFPS(source, index);
+		fps = m_mat->TextureFPS(index);
 
-	if ((texs.size() > 1) && (fps > 0.f))
-	{
+	if ((texs.size() > 1) && (fps > 0.f)) {
 		image = FloatToInt(m_mat->time.get()*fps);
 		image = image % (int)texs.size();
 	}
@@ -511,15 +438,13 @@ GLTexture::Ref MaterialThumb::Thumbnail::Texture(r::MTSource source, int index)
 	return texs[image];
 }
 
-ThumbResult MaterialThumb::Thumbnail::Tick(float dt, const xtime::TimeSlice &time)
-{
+ThumbResult MaterialThumb::Thumbnail::Tick(float dt, const xtime::TimeSlice &time) {
 	RAD_ASSERT(m_load && active);
 
 	if (!m_asset)
 		m_asset = Packages()->Asset(this->id, Z_Unique);
 
-	if (!m_asset)
-	{
+	if (!m_asset) {
 		m_load = false;
 		m_icon = true;
 		m_idx = ContentBrowserView::I_Error;
@@ -528,22 +453,19 @@ ThumbResult MaterialThumb::Thumbnail::Tick(float dt, const xtime::TimeSlice &tim
 
 	xtime::TimeVal now = xtime::ReadMilliseconds();
 
-	if (m_icon)
-	{
+	if (m_icon) {
 		m_rot += dt;
 
 		if (m_time == 0)
 			m_time = now;
 
-		if (now-m_time > 750)
-		{
+		if (now-m_time > 750) {
 			m_time = now;
 			m_idx = (m_idx+1)%ContentBrowserView::I_AnimRange;
 		}
 	}
 
-	if (m_mat && m_mat->animated)
-	{
+	if (m_mat && m_mat->animated) {
 		m_mat->Sample(App::Get()->time, dt);
 		if (!m_icon)
 			m_outer->ThumbChanged();
@@ -562,8 +484,7 @@ ThumbResult MaterialThumb::Thumbnail::Tick(float dt, const xtime::TimeSlice &tim
 
 	m_load = false;
 
-	if (r != SR_Success)
-	{
+	if (r != SR_Success) {
 		m_icon = true;
 		m_idx = ContentBrowserView::I_Error;
 		return TR_Complete;
@@ -574,8 +495,7 @@ ThumbResult MaterialThumb::Thumbnail::Tick(float dt, const xtime::TimeSlice &tim
 	MaterialParser::Ref mP = MaterialParser::Cast(m_asset);
 	MaterialLoader::Ref mL = MaterialLoader::Cast(m_asset);
 
-	if (!mP || !mL || !mP->valid || !mL->parsed)
-	{
+	if (!mP || !mL || !mP->valid || !mL->parsed) {
 		m_icon = true;
 		m_idx = ContentBrowserView::I_Error;
 		return TR_Complete;
@@ -583,74 +503,60 @@ ThumbResult MaterialThumb::Thumbnail::Tick(float dt, const xtime::TimeSlice &tim
 
 	m_mat = mP->material;
 
-	for (int i = 0; i < MTS_Max; ++i)
-	{
-		for (int k = 0; k < MTS_MaxIndices; ++k)
-		{
-			m_texs[i][k].clear();
-		}
+	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
+		m_texs[i].clear();
 	}
-
+	
 	// make the thumbnails.
 	// NOTE: I should make this honor the TimeSlice
 	// at some point...
-	for (int i = 0; i < MTS_Max; ++i)
-	{
-		for (int k = 0; k < MTS_MaxIndices; ++k)
-		{
-			Asset::Ref a = mL->Texture((MTSource)i, k);
-			if (!a)
-				break;
+	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
+		Asset::Ref a = mL->Texture(i);
+		if (!a)
+			break;
 
-			TextureParser::Ref t = TextureParser::Cast(a);
-			const bool *wrapS = a->entry->KeyValue<bool>("Wrap.S", P_TARGET_PLATFORM);
-			const bool *wrapT = a->entry->KeyValue<bool>("Wrap.T", P_TARGET_PLATFORM);
-			const bool *wrapR = a->entry->KeyValue<bool>("Wrap.R", P_TARGET_PLATFORM);
-			const bool *filter = a->entry->KeyValue<bool>("Filter", P_TARGET_PLATFORM);
-			const bool *mipmap = a->entry->KeyValue<bool>("Mipmap", P_TARGET_PLATFORM);
+		TextureParser::Ref t = TextureParser::Cast(a);
+		const bool *wrapS = a->entry->KeyValue<bool>("Wrap.S", P_TARGET_PLATFORM);
+		const bool *wrapT = a->entry->KeyValue<bool>("Wrap.T", P_TARGET_PLATFORM);
+		const bool *wrapR = a->entry->KeyValue<bool>("Wrap.R", P_TARGET_PLATFORM);
+		const bool *filter = a->entry->KeyValue<bool>("Filter", P_TARGET_PLATFORM);
+		const bool *mipmap = a->entry->KeyValue<bool>("Mipmap", P_TARGET_PLATFORM);
 
-			if (!t || !t->imgValid || !wrapS || !wrapT || !wrapR || !filter || !mipmap)
-			{
-				for (int i = 0; i < MTS_Max; ++i)
-				{
-					for (int k = 0; k < MTS_MaxIndices; ++k)
-					{
-						m_texs[i][k].clear();
-					}
-				}
-
-				m_asset.reset();
-				m_mat = 0;
-				m_icon = true;
-				m_idx = ContentBrowserView::I_Error;
-				return TR_Complete;
+		if (!t || !t->imgValid || !wrapS || !wrapT || !wrapR || !filter || !mipmap) {
+			for (int k = 0; k < kMaterialTextureSource_MaxIndices; ++k) {
+				m_texs[k].clear();
 			}
 
-			int flags = 0;
+			m_asset.reset();
+			m_mat = 0;
+			m_icon = true;
+			m_idx = ContentBrowserView::I_Error;
+			return TR_Complete;
+		}
 
-			if (*wrapS) 
-				flags |= TX_WrapS;
-			if (*wrapS) 
-				flags |= TX_WrapT;
-			if (*wrapS) 
-				flags |= TX_WrapR;
-			if (*filter) 
-				flags |= TX_Filter;
-			if (*mipmap) 
-				flags |= TX_Mipmap;
+		int flags = 0;
 
-			int w = t->header->width;
-			int h = t->header->height;
+		if (*wrapS) 
+			flags |= TX_WrapS;
+		if (*wrapS) 
+			flags |= TX_WrapT;
+		if (*wrapS) 
+			flags |= TX_WrapR;
+		if (*filter) 
+			flags |= TX_Filter;
+		if (*mipmap) 
+			flags |= TX_Mipmap;
 
-			MaterialThumb::ScaleSize(w, h, m_w, m_h);
+		int w = t->header->width;
+		int h = t->header->height;
 
-			const int numImages = t->numImages;
-			for (int j = 0; j < numImages; ++j)
-			{
-				GLTexture::Ref tex = GLTextureAsset::CreateThumbnail(a, j, flags, w, h);
-				RAD_ASSERT(tex);
-				m_texs[i][k].push_back(tex);
-			}
+		MaterialThumb::ScaleSize(w, h, m_w, m_h);
+
+		const int numImages = t->numImages;
+		for (int j = 0; j < numImages; ++j) {
+			GLTexture::Ref tex = GLTextureAsset::CreateThumbnail(a, j, flags, w, h);
+			RAD_ASSERT(tex);
+			m_texs[i].push_back(tex);
 		}
 	}
 
@@ -664,20 +570,16 @@ ThumbResult MaterialThumb::Thumbnail::Tick(float dt, const xtime::TimeSlice &tim
 	return TR_Complete;
 }
 
-void MaterialThumb::Thumbnail::InactiveTick(float dt)
-{
-	if (m_mat && m_mat->animated)
-	{
+void MaterialThumb::Thumbnail::InactiveTick(float dt) {
+	if (m_mat && m_mat->animated) {
 		m_mat->Sample(App::Get()->time, dt);
 		if (!m_icon)
 			m_outer->ThumbChanged();
 	}
 }
 
-void MaterialThumb::Thumbnail::Cancel()
-{
-	if (m_asset)
-	{
+void MaterialThumb::Thumbnail::Cancel() {
+	if (m_asset) {
 		m_asset->Process(
 			xtime::TimeSlice::Infinite,
 			P_Cancel
@@ -685,8 +587,7 @@ void MaterialThumb::Thumbnail::Cancel()
 	}
 }
 
-bool MaterialThumb::Thumbnail::CheckActivate() const
-{
+bool MaterialThumb::Thumbnail::CheckActivate() const {
 	return m_load;
 }
 

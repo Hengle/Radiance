@@ -87,8 +87,7 @@ void SkinVerts(
 	const float *vertices,
 	const U16 *boneIndices,
 	int numVerts,
-	int numBones,
-	int numTangents
+	int numBones
 )
 {
 	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
@@ -128,103 +127,62 @@ void SkinVerts(
 		StoreVec4(outVerts, acc);
 		outVerts += 4;
 
-		for (int k = 0; k < numTangents; ++k) {
-			ZeroVec3(acc);
+		// tangents
+		ZeroVec3(acc);
 
-			for (int b = 0; b < numBones; ++b) {
-				const float *bone = &bones[boneIndices[b] * SIMDDriver::kNumBoneFloats];
-				Transform3x3(out, bone, vertices);
-				AddVec3(acc, acc, out);
-				acc[3] = out[3];
-				vertices += 4;
-			}
-
-			StoreVec4(outVerts, acc);
-			outVerts += 4;
+		for (int b = 0; b < numBones; ++b) {
+			const float *bone = &bones[boneIndices[b] * SIMDDriver::kNumBoneFloats];
+			Transform3x3(out, bone, vertices);
+			AddVec3(acc, acc, out);
+			acc[3] = out[3];
+			vertices += 4;
 		}
-		
+
+		StoreVec4(outVerts, acc);
+		outVerts += 4;
+				
 		boneIndices += numBones;
 	}
 }
 
-void SkinVerts1B1T(
+void SkinVerts1B(
 	float *outVerts, 
 	const float *bones, 
 	const float *vertices,
 	const U16 *boneIndices,
 	int numVerts
 ) {
-	SkinVerts(outVerts, bones, vertices, boneIndices, numVerts, 1, 1);
+	SkinVerts(outVerts, bones, vertices, boneIndices, numVerts, 1);
 }
 
-void SkinVerts1B2T(
+void SkinVerts2B(
 	float *outVerts, 
 	const float *bones, 
 	const float *vertices,
 	const U16 *boneIndices,
 	int numVerts
 ) {
-	SkinVerts(outVerts, bones, vertices, boneIndices, numVerts, 1, 2);
+	SkinVerts(outVerts, bones, vertices, boneIndices, numVerts, 2);
 }
 
-void SkinVerts2B1T(
+void SkinVerts3B(
 	float *outVerts, 
 	const float *bones, 
 	const float *vertices,
 	const U16 *boneIndices,
 	int numVerts
 ) {
-	SkinVerts(outVerts, bones, vertices, boneIndices, numVerts, 2, 1);
+	SkinVerts(outVerts, bones, vertices, boneIndices, numVerts, 3);
 }
 
-void SkinVerts2B2T(
+void SkinVerts4B(
 	float *outVerts, 
 	const float *bones, 
 	const float *vertices,
 	const U16 *boneIndices,
 	int numVerts
 ) {
-	SkinVerts(outVerts, bones, vertices, boneIndices, numVerts, 2, 2);
-}
-
-void SkinVerts3B1T(
-	float *outVerts, 
-	const float *bones, 
-	const float *vertices,
-	const U16 *boneIndices,
-	int numVerts
-) {
-	SkinVerts(outVerts, bones, vertices, boneIndices, numVerts, 3, 1);
-}
-
-void SkinVerts3B2T(
-	float *outVerts, 
-	const float *bones, 
-	const float *vertices,
-	const U16 *boneIndices,
-	int numVerts
-) {
-	SkinVerts(outVerts, bones, vertices, boneIndices, numVerts, 3, 2);
-}
-
-void SkinVerts4B1T(
-	float *outVerts, 
-	const float *bones, 
-	const float *vertices,
-	const U16 *boneIndices,
-	int numVerts
-) {
-	SkinVerts(outVerts, bones, vertices, boneIndices, numVerts, 4, 1);
-}
-
-void SkinVerts4B2T(
-	float *outVerts, 
-	const float *bones, 
-	const float *vertices,
-	const U16 *boneIndices,
-	int numVerts
-) {
-	SkinVerts(outVerts, bones, vertices, boneIndices, numVerts, 4, 2);
+	SkinVerts(outVerts, bones, vertices, boneIndices, numVerts, 4);
 }
 
 }
@@ -235,15 +193,11 @@ const SIMDDriver *SIMD_ref_bind() {
 	if (d.name[0])
 		return &d;
 
-	d.SkinVerts[0][0] = &SkinVerts1B1T;
-	d.SkinVerts[0][1] = &SkinVerts1B2T;
-	d.SkinVerts[1][0] = &SkinVerts2B1T;
-	d.SkinVerts[1][1] = &SkinVerts2B2T;
-	d.SkinVerts[2][0] = &SkinVerts3B1T;
-	d.SkinVerts[2][1] = &SkinVerts3B2T;
-	d.SkinVerts[3][0] = &SkinVerts4B1T;
-	d.SkinVerts[3][1] = &SkinVerts4B2T;
-
+	d.SkinVerts[0] = &SkinVerts1B;
+	d.SkinVerts[1] = &SkinVerts2B;
+	d.SkinVerts[2] = &SkinVerts3B;
+	d.SkinVerts[3] = &SkinVerts4B;
+	
 	string::cpy(d.name, "SIMD_ref");
 	return &d;
 }

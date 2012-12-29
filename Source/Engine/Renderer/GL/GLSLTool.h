@@ -6,43 +6,53 @@
 #pragma once
 
 #include "../../Types.h"
-#include "../CG/CGUtils.h"
-#include "GLState.h"
-#include <Runtime/Container/ZoneVector.h>
+#include "../Shader.h"
+#include "../ShaderTool.h"
+#include "../ShaderToolUtils.h"
 #include <iostream>
 #include <Runtime/PushPack.h>
 
 class Engine;
 
 namespace r {
-
 class Material;
+struct MaterialInputMappings;
+}
 
-class RADENG_CLASS GLSLTool : public cg::IncludeSource
-{
+namespace tools {
+namespace shader_utils {
+
+//! Assembles and compiles a GLSL shader from a tool shader object.
+class RADENG_CLASS GLSLTool : public IncludeSource {
 public:
 
-	typedef zone_vector<String, ZEngineT>::type StringVec;
+	RAD_BEGIN_FLAGS
+		RAD_FLAG(kAssemble_VertexShader),
+		RAD_FLAG(kAssemble_PixelShader),
+		RAD_FLAG(kAssemble_GLES),
+		RAD_FLAG(kAssemble_Optimize),
+		kAssemble_None = 0
+	RAD_END_FLAGS(AssembleFlags)
 
 	bool Assemble(
 		Engine &engine,
-		bool vertex,
-		bool skinned,
-		bool gles,
-		const StringVec &textureTypes,
-		int numTexCoords,
-		int numColors,
-		int numUColors,
-		int numNormals,
-		const Material *material,
-		const GLState::MInputMappings *mapping,
-		bool optimize,
+		const r::Material &material,
+		const Shader::Ref &shader,
+		const r::MaterialInputMappings &mapping,
+		r::Shader::Pass pass,
+		AssembleFlags flags,
 		std::ostream &out
 	);
 
-	virtual bool AddInclude(const char *name, std::ostream &out) { return true; }
+	virtual bool AddInclude(const char *name, std::ostream &out) { 
+		return true; 
+	}
+
 };
 
-} // r
+} // shader_utils
+} // tools
+
+RAD_IMPLEMENT_FLAGS(tools::shader_utils::GLSLTool::AssembleFlags)
 
 #include <Runtime/PopPack.h>

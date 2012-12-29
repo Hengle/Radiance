@@ -34,8 +34,7 @@ m_width(0.f),
 m_height(0.f),
 m_fontWidth(10),
 m_fontHeight(10),
-m_curPass(0)
-{
+m_curPass(0) {
 }
 
 TextModel::TextModel(
@@ -49,17 +48,14 @@ m_width(0.f),
 m_height(0.f),
 m_fontWidth(10),
 m_fontHeight(10),
-m_curPass(0)
-{
+m_curPass(0) {
 	SetFont(font, fontWidth, fontHeight);
 }
 
-TextModel::~TextModel()
-{
+TextModel::~TextModel() {
 }
 
-void TextModel::SetFont(const pkg::AssetRef &font, int fontWidth, int fontHeight)
-{
+void TextModel::SetFont(const pkg::AssetRef &font, int fontWidth, int fontHeight) {
 	RAD_ASSERT(font);
 	m_font = font;
 	if (fontWidth == 0)
@@ -69,21 +65,18 @@ void TextModel::SetFont(const pkg::AssetRef &font, int fontWidth, int fontHeight
 	BindFont(fontWidth, fontHeight);
 }
 
-void TextModel::SetSize(int fontWidth, int fontHeight)
-{
+void TextModel::SetSize(int fontWidth, int fontHeight) {
 	if (m_fontWidth != fontWidth || m_fontHeight != fontHeight)
 		BindFont(fontWidth, fontHeight);
 }
 
-void TextModel::Clear()
-{
+void TextModel::Clear() {
 	m_passes.clear();
 	m_width = 0;
 	m_height = 0;
 }
 
-void TextModel::Dimensions(float &x, float &y, float &w, float &h)
-{
+void TextModel::Dimensions(float &x, float &y, float &w, float &h) {
 	x = m_orgX;
 	y = m_orgY;
 	w = m_width;
@@ -92,16 +85,14 @@ void TextModel::Dimensions(float &x, float &y, float &w, float &h)
 
 void TextModel::SetText(
 	const String &string
-)
-{
+) {
 	BuildTextVerts(&string, 1);
 }
 
 void TextModel::SetText(
 	const String *strings,
 	int numStrings
-)
-{
+) {
 	BuildTextVerts(strings, numStrings);
 }
 
@@ -114,25 +105,21 @@ void TextModel::SetText(
 	float kernScale, 
 	float scaleX, 
 	float scaleY
-)
-{
+) {
 	String s(utf8String, x, y, z, kern, kernScale, scaleX, scaleY);
 	BuildTextVerts(&s, 1);
 }
 
-void TextModel::BuildTextVerts(const String *strings, int numStrings)
-{
+void TextModel::BuildTextVerts(const String *strings, int numStrings) {
 	BOOST_STATIC_ASSERT(sizeof(VertexType)==16);
 	RAD_ASSERT(m_fontInstance);
 	m_passes.clear();
 	m_width = 0;
 	m_height = 0;
 
-	if (numStrings)
-	{
+	if (numStrings) {
 		int len = 0;
-		for (int i = 0; i < numStrings ; ++i)
-		{
+		for (int i = 0; i < numStrings ; ++i) {
 			if (!strings[i].utf8String)
 				continue;
 			len += (int)::string::len(strings[i].utf8String);
@@ -142,8 +129,7 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings)
 			return; // null string.
 
 		VertexType *ptr = LockVerts(len*6);
-		if (!ptr)
-		{
+		if (!ptr) {
 			RAD_OUT_OF_MEM(ptr);
 			return;
 		}
@@ -157,8 +143,7 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings)
 		ys[0] = xs[0] = std::numeric_limits<float>::max();
 		ys[1] = xs[1] = -std::numeric_limits<float>::max();
 
-		for (int i = 0; i < numStrings ; ++i)
-		{
+		for (int i = 0; i < numStrings ; ++i) {
 			const String &string = strings[i];
 			if (!string.utf8String || string.utf8String[0] == 0)
 				continue;
@@ -171,16 +156,14 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings)
 				string.kernScale
 			);
 
-			while (b)
-			{
+			while (b) {
 				RAD_ASSERT(ptr);
 				Pass pass;
 
 				pass.ofs = ofs;
 				pass.page = b->page;
 
-				for (int i = 0; i < (int)b->numChars; ++i)
-				{
+				for (int i = 0; i < (int)b->numChars; ++i) {
 					const ::font::GlyphCache::Metrics *m = b->chars[i];
 
 					// two triangles per character.
@@ -276,22 +259,18 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings)
 	}
 }
 
-TextModel::FontInstance::~FontInstance()
-{
+TextModel::FontInstance::~FontInstance() {
 	TextModel::s_fontHash.erase(it);
 }
 
-font::IGlyphPage::Ref TextModel::GlyphPageFactory::AllocatePage(int width, int height)
-{
+font::IGlyphPage::Ref TextModel::GlyphPageFactory::AllocatePage(int width, int height) {
 	return TextModel::AllocatePage(width, height);
 }
 
-void TextModel::GlyphPageFactory::NoopDelete(font::IGlyphPageFactory*)
-{
+void TextModel::GlyphPageFactory::NoopDelete(font::IGlyphPageFactory*) {
 }
 
-void TextModel::BindFont(int fontWidth, int fontHeight)
-{
+void TextModel::BindFont(int fontWidth, int fontHeight) {
 	Clear();
 
 	if (m_fontInstance)
@@ -302,8 +281,7 @@ void TextModel::BindFont(int fontWidth, int fontHeight)
 
 	FontKey key(m_font->id, fontWidth, fontHeight);
 	FontInstanceHash::iterator it = s_fontHash.find(key);
-	if (it != s_fontHash.end())
-	{
+	if (it != s_fontHash.end()) {
 		m_fontInstance = it->second.lock();
 		if (m_fontInstance)
 			return;
@@ -331,8 +309,7 @@ void TextModel::BindFont(int fontWidth, int fontHeight)
 	m_fontInstance->it = s_fontHash.insert(FontInstanceHash::value_type(key, m_fontInstance)).first;
 }
 
-void TextModel::BeginPass(int i)
-{
+void TextModel::BeginPass(int i) {
 	RAD_ASSERT(i < (int)m_passes.size());
 	Pass &p = m_passes[i];
 	RAD_ASSERT(p.page);
@@ -340,30 +317,27 @@ void TextModel::BeginPass(int i)
 	m_curPass = &p;
 }
 
-void TextModel::Draw()
-{
+void TextModel::Draw() {
 	RAD_ASSERT(m_curPass);
 	DrawVerts(m_curPass->ofs, m_curPass->num);
 }
 
-void TextModel::EndPass()
-{
+void TextModel::EndPass() {
 	m_curPass = 0;
 }
 
-void TextModel::Draw(r::Material &material, bool sampleMaterialColor, const Vec4 &rgba, int flags, int blends)
-{
+void TextModel::Draw(r::Material &material, bool sampleMaterialColor, const Vec4 &rgba, int flags, int blends) {
 	material.BindStates(flags, blends);
 	BatchDraw(material, sampleMaterialColor, rgba);
 }
 
-void TextModel::BatchDraw(r::Material &material, bool sampleMaterialColor, const Vec4 &rgba)
-{
-	for (int i = 0; i < numPasses; ++i)
-	{
+void TextModel::BatchDraw(r::Material &material, bool sampleMaterialColor, const Vec4 &rgba) {
+	Shader::Uniforms u(rgba);
+
+	for (int i = 0; i < numPasses; ++i) {
 		BeginPass(i);
-		material.shader->Begin(Shader::P_Default, material);
-		material.shader->BindStates(sampleMaterialColor, rgba);
+		material.shader->Begin(Shader::kPass_Default, material);
+		material.shader->BindStates(u, sampleMaterialColor);
 		App::Get()->engine->sys->r->CommitStates();
 		Draw();
 		material.shader->End();

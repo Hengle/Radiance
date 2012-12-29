@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../Sources.h"
+#include "../Common.h"
 #include "../Shader.h"
 #include "GLState.h"
 #include "GLVertexBuffer.h"
@@ -32,7 +32,7 @@ public:
 
 	void MapSource(
 		int stream, 
-		MGSource source, 
+		MaterialGeometrySource source, 
 		int index,
 		int stride,
 		int ofs
@@ -44,7 +44,7 @@ public:
 	void CompileArrayStates(Shader &shader);
 	void FlushArrayStates(Shader *shader);
 
-	void Bind(MGSource source, int index);
+	void Bind(MaterialGeometrySource source, int index);
 	void BindIndices(bool force=false);
 	void Draw();
 
@@ -54,8 +54,7 @@ public:
 
 private:
 
-	struct Source
-	{
+	struct Source {
 		Source() : stream(-1) {}
 		int stream;
 		GLint count;
@@ -64,29 +63,33 @@ private:
 		GLuint ofs;
 	};
 
-	struct Indices
-	{
+	struct Indices {
 		GLint count;
 		GLenum type;
 		GLenum usage;
 		GLVertexBuffer::Ref vb;
 	};
 	
-	struct Stream
-	{
+	struct Stream {
 		typedef zone_vector<Stream, ZRenderT>::type Vec;
 		GLVertexBuffer::Vec vbs;
 		int size;
 		int count;
 	};
 
+	boost::array<
+		boost::array<
+			Source, 
+			kMaterialGeometrySource_MaxIndices>, 
+	kNumMaterialGeometrySources> m_sources;
+
+	Stream::Vec m_streams;
+	GLShaderVertexArrayMap m_shaderStates;
+
 	int m_swapChain;
 	int m_numVerts;
 	int m_numSwapChains;
-	Source m_sources[MGS_Max][MGS_MaxIndices];
-	Stream::Vec m_streams;
 	Indices m_i;
-	GLShaderVertexArrayMap m_shaderStates;
 	GLVertexArray::Vec *m_va;
 	Shader *m_shader;
 };

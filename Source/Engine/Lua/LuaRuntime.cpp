@@ -12,6 +12,7 @@
 #include <Runtime/Thread.h>
 #include <Runtime/Container/HashMap.h>
 #include <Runtime/Base/MemoryPool.h>
+#include <Runtime/File.h>
 #include "../Zones.h"
 #include "../COut.h"
 #include <set>
@@ -40,22 +41,19 @@ RADENG_API int RADENG_CALL luaL_typerror (lua_State *L, int narg, const char *tn
 
 namespace lua {
 
-struct LuaPools
-{
-	enum
-	{
-		NumPools = 10,
-		BasePoolSize = 8,
-		MaxPoolSize = BasePoolSize<<(NumPools-1)
+struct LuaPools {
+	enum {
+		kNumPools = 10,
+		kBasePoolSize = 8,
+		kMaxPoolSize = kBasePoolSize<<(kNumPools-1)
 	};
 
-	static inline int PoolIndex(size_t size)
-	{
-		if (size > MaxPoolSize)
+	static inline int PoolIndex(size_t size) {
+		if (size > kMaxPoolSize)
 			return -1;
 
-		BOOST_STATIC_ASSERT(NumPools==10);
-		BOOST_STATIC_ASSERT(BasePoolSize==8);
+		BOOST_STATIC_ASSERT(kNumPools==10);
+		BOOST_STATIC_ASSERT(kBasePoolSize==8);
 
 		if (size <= 8)
 			return 0;
@@ -79,12 +77,9 @@ struct LuaPools
 		return 9;
 	}
 
-	static void *Alloc(void *ptr, size_t osize, size_t nsize)
-	{
-		if (!nsize)
-		{
-			if (ptr&&osize)
-			{
+	static void *Alloc(void *ptr, size_t osize, size_t nsize) {
+		if (!nsize) {
+			if (ptr&&osize) {
 				--s_numAllocs;
 
 				int opool = PoolIndex(osize);
@@ -103,13 +98,13 @@ struct LuaPools
 
 		int npool = PoolIndex(nsize);
 		
-		if (ptr&&osize)
-		{ // existing allocation
+		if (ptr&&osize) { 
+			// existing allocation
 			int opool = PoolIndex(osize);
-			if (npool < 0)
-			{ // heap
-				if (opool < 0)
-				{ // heap
+			if (npool < 0) { 
+				// heap
+				if (opool < 0) { 
+					// heap
 					return safe_zone_realloc(ZLuaRuntime, ptr, nsize);
 				}
 
@@ -117,18 +112,16 @@ struct LuaPools
 				memcpy(nptr, ptr, std::min(osize, nsize));
 				s_pools[opool].ReturnChunk(ptr);
 				return nptr;
-			}
-			else
-			{ // pool
-				if (opool < 0)
-				{ // heap
+			} else { 
+				// pool
+				if (opool < 0) { 
+					// heap
 					void *nptr = s_pools[npool].SafeGetChunk();
 					memcpy(nptr, ptr, nsize);
 					zone_free(ptr);
 					return nptr;
-				}
-				else if (npool != opool) // moving pools
-				{
+				} else if (npool != opool) { 
+					// moving pools
 					void *nptr = s_pools[npool].SafeGetChunk();
 					memcpy(nptr, ptr, std::min(osize, nsize));
 					s_pools[opool].ReturnChunk(ptr);
@@ -137,9 +130,8 @@ struct LuaPools
 
 				return ptr;
 			}
-		}
-		else
-		{ // new allocation
+		} else { 
+			// new allocation
 			++s_numAllocs;
 			if (npool < 0)
 				return safe_zone_malloc(ZLuaRuntime, nsize);
@@ -147,13 +139,10 @@ struct LuaPools
 		}
 	}
 
-	static void Open()
-	{
-		if (++s_refs == 1)
-		{
-			for (int i = 0; i < NumPools; ++i)
-			{
-				AddrSize chunkSize = BasePoolSize<<i;
+	static void Open() {
+		if (++s_refs == 1) {
+			for (int i = 0; i < kNumPools; ++i) {
+				AddrSize chunkSize = kBasePoolSize<<i;
 
 				char sz[64];
 				sprintf(sz, "lua_pool_%d", (int)chunkSize);
@@ -168,30 +157,25 @@ struct LuaPools
 		}
 	}
 
-	static void Close()
-	{
+	static void Close() {
 		RAD_ASSERT(s_refs>0);
-		if (--s_refs == 0)
-		{
-			for (int i = 0; i < NumPools; ++i)
+		if (--s_refs == 0) {
+			for (int i = 0; i < kNumPools; ++i)
 				s_pools[i].Destroy();
-		}
-		else
-		{
+		} else {
 			Compact();
 		}
 	}
 
-	static void Compact()
-	{
-		for (int i = 0; i < NumPools; ++i)
+	static void Compact() {
+		for (int i = 0; i < kNumPools; ++i)
 			s_pools[i].Compact();
 	}
 	
 #if defined(RAD_OPT_IOS)
-	typedef boost::array<MemoryPool, NumPools> PoolsArray;
+	typedef boost::array<MemoryPool, kNumPools> PoolsArray;
 #else
-	typedef boost::array<ThreadSafeMemoryPool, NumPools> PoolsArray;
+	typedef boost::array<ThreadSafeMemoryPool, kNumPools> PoolsArray;
 #endif
 	
 	static int s_refs;
@@ -207,8 +191,7 @@ size_t LuaPools::s_max = std::numeric_limits<size_t>::min();
 size_t LuaPools::s_min = std::numeric_limits<size_t>::max();
 LuaPools::PoolsArray LuaPools::s_pools;
 
-State::State(const char *name)
-{
+State::State(const char *name) {
 	string::ncpy(m_sz, name, 64);
 
 	m_m.numAllocs = 0;
@@ -220,28 +203,22 @@ State::State(const char *name)
 	RAD_ASSERT(m_s);
 }
 
-State::~State()
-{
+State::~State() {
 	if (m_s)
 		::lua_close(m_s);
 	LuaPools::Close();
 }
 
-void State::CompactPools()
-{
+void State::CompactPools() {
 	LuaPools::Compact();
 }
 
-void *State::LuaAlloc(void *ud, void *ptr, size_t osize, size_t nsize)
-{
+void *State::LuaAlloc(void *ud, void *ptr, size_t osize, size_t nsize) {
 	State *s = reinterpret_cast<State*>(ud);
-	if (!nsize)
-	{
+	if (!nsize) {
 		if (ptr&&osize)
 			--s->m_m.numAllocs;
-	}
-	else
-	{
+	} else {
 		if ((int)nsize < s->m_m.smallest)
 			s->m_m.smallest = (int)nsize;
 		if ((int)nsize > s->m_m.biggest)
@@ -292,16 +269,14 @@ typedef ::reflect::IFunction IFunction;
 // Type Helpers
 //////////////////////////////////////////////////////////////////////////////////////////
 
-bool IsVisible(const Class *type)
-{
+bool IsVisible(const Class *type) {
 	VisibleAttr vis(false);
 	bool isVis = type->AttributeValue(vis) && vis;
 
-	if (!isVis) // make handles inherit their interfaces visiblity (they are hidden by default)
-	{
+	if (!isVis) { 
+		// make handles inherit their interfaces visiblity (they are hidden by default)
 		RTLInterfaceHandle h(0);
-		if (type->AttributeValue(h) && h.InterfaceType())
-		{
+		if (type->AttributeValue(h) && h.InterfaceType()) {
 			isVis = h.InterfaceType()->AttributeValue(vis) && vis;
 		}
 	}
@@ -309,20 +284,16 @@ bool IsVisible(const Class *type)
 	return isVis;
 }
 
-bool IsEnum(const Class *type)
-{
+bool IsEnum(const Class *type) {
 	return type->FindAttribute(::reflect::Type<EnumAttr>()) != 0;
 }
 
-int NumEnumVals(const Class *type)
-{
+int NumEnumVals(const Class *type) {
 	int c = 0;
 	const int NumAttrs = type->NumAttributes();
-	for (int i = 0; i < NumAttrs; ++i)
-	{
+	for (int i = 0; i < NumAttrs; ++i) {
 		const ::reflect::ATTRIBUTE *attr = type->Attribute(i);
-		if (attr->Type() == ::reflect::Type<EnumValue>())
-		{
+		if (attr->Type() == ::reflect::Type<EnumValue>()) {
 			++c;
 		}
 	}
@@ -330,13 +301,11 @@ int NumEnumVals(const Class *type)
 	return c;
 }
 
-bool IsInterface(const Class *type)
-{
+bool IsInterface(const Class *type) {
 	return type->FindAttribute(::reflect::Type<RTLInterface>()) != 0;
 }
 
-bool IsInterfaceHandle(const Class *type)
-{
+bool IsInterfaceHandle(const Class *type) {
 	return type->FindAttribute(::reflect::Type<RTLInterfaceHandle>()) != 0;
 }
 
@@ -344,8 +313,7 @@ bool IsInterfaceHandle(const Class *type)
 // import
 //////////////////////////////////////////////////////////////////////////////////////////
 
-bool FileIsLoaded(lua_State *L, const char *name)
-{
+bool FileIsLoaded(lua_State *L, const char *name) {
 	RAD_ASSERT(name);
 	lua_getfield(L, LUA_REGISTRYINDEX, MODULES_KEY);
 	lua_getfield(L, -1, name);
@@ -354,8 +322,7 @@ bool FileIsLoaded(lua_State *L, const char *name)
 	return loaded;
 }
 
-void MarkFileLoaded(lua_State *L, const char *name)
-{
+void MarkFileLoaded(lua_State *L, const char *name) {
 	RAD_ASSERT(name);
 	lua_getfield(L, LUA_REGISTRYINDEX, MODULES_KEY);
 	lua_pushboolean(L, 1);
@@ -363,8 +330,7 @@ void MarkFileLoaded(lua_State *L, const char *name)
 	lua_pop(L, 1);
 }
 
-int lua_Import(lua_State *L)
-{
+int lua_Import(lua_State *L) {
 	const char *name = Marshal<const char*>::Get(L, -1, true);
 	if (FileIsLoaded(L, name)) 
 		return 0;
@@ -375,15 +341,13 @@ int lua_Import(lua_State *L)
 	RAD_ASSERT(l);
 
 	SrcBuffer::Ref code = l->Load(L, name);
-	if (!code) // load failed
-	{
+	if (!code) { // load failed
 		luaL_error(L, "Import: could not find file '%s'.", name);
 	}
 
 	MarkFileLoaded(L, name);
 
-	if (luaL_loadbuffer(L, (const char *)((const void*)code->ptr), code->size, code->name))
-	{
+	if (luaL_loadbuffer(L, (const char *)((const void*)code->ptr), code->size, code->name)) {
 		luaL_error(L, "Error importing '%s'(%s):\n\t%s", name, (const char*)code->name, lua_tostring(L, -1));
 	}
 
@@ -392,13 +356,11 @@ int lua_Import(lua_State *L)
 	return 0;
 }
 
-int lua_NativeClass(lua_State *L)
-{
+int lua_NativeClass(lua_State *L) {
 	const char *name = Marshal<const char*>::Get(L, -1, true);
 	const Class *type = reflect::Class::Find<char>(name);
 
-	if (!type)
-	{
+	if (!type) {
 		luaL_error(L, "NativeClass: unable to find '%s' for import.", name);
 	}
 
@@ -410,18 +372,13 @@ int lua_NativeClass(lua_State *L)
 // Reflection Interop Support
 //////////////////////////////////////////////////////////////////////////////////////////
 
-std::string FormatNamespace(const char *ns)
-{
+std::string FormatNamespace(const char *ns) {
 	std::string x = "@"; // anything that starts with this means native.
-	for (;*ns;++ns)
-	{
-		if (*ns == ':')
-		{
+	for (;*ns;++ns) {
+		if (*ns == ':') {
 			x += '_';
 			++ns; // skip extra char.
-		}
-		else
-		{
+		} else {
 			x += *ns;
 		}
 	}
@@ -429,10 +386,8 @@ std::string FormatNamespace(const char *ns)
 	return x;
 }
 
-struct RCMethod
-{
-	enum MethodType
-	{
+struct RCMethod {
+	enum MethodType {
 		Static,
 		Const,
 		Mutable
@@ -442,17 +397,14 @@ struct RCMethod
 	const Class *type;
 	const Class::MEMBER *iface;
 
-	union
-	{
+	union {
 		const Class::MUTABLEMETHOD *m;
 		const Class::CONSTMETHOD   *c;
 		const Class::STATICMETHOD  *s;
 	} x;
 
-	const Class::METHOD *M() const
-	{
-		switch (methodType)
-		{
+	const Class::METHOD *M() const {
+		switch (methodType) {
 		case Static: return x.s;
 		case Const: return x.c;
 		case Mutable: return x.m;
@@ -461,22 +413,18 @@ struct RCMethod
 	}
 };
 
-void ExportClassFn(lua_State *L, const Class *type, const RCMethod *rcm)
-{
+void ExportClassFn(lua_State *L, const Class *type, const RCMethod *rcm) {
 	luaL_getmetatable(L, RCALL_KEY);
 	lua_setmetatable(L, -2); // assign reflected method call metatable.
 	lua_setfield(L, -2, rcm->M()->Name<char>()); // pops udata
 }
 
-bool HasMutableMethodNamed(const Class *type, const char *name)
-{
+bool HasMutableMethodNamed(const Class *type, const char *name) {
 	const int NumMethods = type->NumMethods();
-	for (int i = 0; i < NumMethods; ++i)
-	{
+	for (int i = 0; i < NumMethods; ++i) {
 		VisibleAttr flag;
 		const Class::MUTABLEMETHOD *m = type->Method(i);
-		if (!strcmp(name, m->Name<char>()) && (!m->AttributeValue(flag) || flag))
-		{
+		if (!strcmp(name, m->Name<char>()) && (!m->AttributeValue(flag) || flag)) {
 			return true;
 		}
 	}
@@ -484,8 +432,7 @@ bool HasMutableMethodNamed(const Class *type, const char *name)
 	return false;
 }
 
-void ExportClassHelper(lua_State *L, const Class *type, const Class::MEMBER *iface)
-{
+void ExportClassHelper(lua_State *L, const Class *type, const Class::MEMBER *iface) {
 	std::string name = FormatNamespace(type->Name<char>());
 
 	// NOTE: this wastes a bit of space if there are a lot of const methods
@@ -496,8 +443,7 @@ void ExportClassHelper(lua_State *L, const Class *type, const Class::MEMBER *ifa
 
 	bool create = lua_isnil(L, -1);
 
-	if (create)
-	{
+	if (create) {
 		lua_pop(L, 1);
 		lua_createtable(L, 0,
 			type->NumStaticMethods() +
@@ -509,15 +455,12 @@ void ExportClassHelper(lua_State *L, const Class *type, const Class::MEMBER *ifa
 	// Static
 	{
 		const int NumMethods = type->NumStaticMethods();
-		for (int i = 0; i < NumMethods; ++i)
-		{
+		for (int i = 0; i < NumMethods; ++i) {
 			VisibleAttr flag;
 			const Class::STATICMETHOD *m = type->StaticMethod(i);
-			if (!m->AttributeValue(flag) || flag)
-			{
+			if (!m->AttributeValue(flag) || flag) {
 				RCMethod *rcm = new (lua_newuserdata(L, sizeof(RCMethod))) RCMethod;
-				if (rcm)
-				{
+				if (rcm) {
 					rcm->methodType = RCMethod::Static;
 					rcm->x.s = m;
 					rcm->type = type;
@@ -531,15 +474,12 @@ void ExportClassHelper(lua_State *L, const Class *type, const Class::MEMBER *ifa
 	// Const (only if there is no mutable with the same name)
 	{
 		const int NumMethods = type->NumConstMethods();
-		for (int i = 0; i < NumMethods; ++i)
-		{
+		for (int i = 0; i < NumMethods; ++i) {
 			VisibleAttr flag;
 			const Class::CONSTMETHOD *m = type->ConstMethod(i);
-			if (!HasMutableMethodNamed(type, m->Name<char>()) && (!m->AttributeValue(flag) || flag))
-			{
+			if (!HasMutableMethodNamed(type, m->Name<char>()) && (!m->AttributeValue(flag) || flag)) {
 				RCMethod *rcm = new (lua_newuserdata(L, sizeof(RCMethod))) RCMethod;
-				if (rcm)
-				{
+				if (rcm) {
 					rcm->methodType = RCMethod::Const;
 					rcm->x.c = m;
 					rcm->type = type;
@@ -553,15 +493,12 @@ void ExportClassHelper(lua_State *L, const Class *type, const Class::MEMBER *ifa
 	// Mutable
 	{
 		const int NumMethods = type->NumMethods();
-		for (int i = 0; i < NumMethods; ++i)
-		{
+		for (int i = 0; i < NumMethods; ++i) {
 			VisibleAttr flag;
 			const Class::MUTABLEMETHOD *m = type->Method(i);
-			if (!m->AttributeValue(flag) || flag)
-			{
+			if (!m->AttributeValue(flag) || flag) {
 				RCMethod *rcm = new (lua_newuserdata(L, sizeof(RCMethod))) RCMethod;
-				if (rcm)
-				{
+				if (rcm) {
 					rcm->methodType = RCMethod::Mutable;
 					rcm->x.m = m;
 					rcm->type = type;
@@ -572,52 +509,43 @@ void ExportClassHelper(lua_State *L, const Class *type, const Class::MEMBER *ifa
 		}
 	}
 
-	if (create)
-	{
+	if (create) {
 		lua_setglobal(L, name.c_str());
-	}
-	else
-	{
+	} else {
 		lua_pop(L, 1);
 	}
 }
 
-int lua_gcReflected(lua_State *L)
-{
+int lua_gcReflected(lua_State *L) {
 	ReflectedRef *ref = reinterpret_cast<ReflectedRef*>(luaL_checkudata(L, 1, INTEROP_GC_KEY));
 	RAD_ASSERT(ref);
 	ref->~ReflectedRef();
 	return 0; // lua will free memory.
 }
 
-int lua_gcReflectedCall(lua_State *L)
-{
+int lua_gcReflectedCall(lua_State *L) {
 	RCMethod *m = reinterpret_cast<RCMethod*>(luaL_checkudata(L, 1, RCALL_KEY));
 	RAD_ASSERT(m);
 	m->~RCMethod();
 	return 0; // lua will free memory.
 }
 
-struct ArgRef
-{
+struct ArgRef {
 	virtual ~ArgRef() {}
 };
 
 typedef boost::shared_ptr<ArgRef> ArgRefRef;
 
 template<typename T>
-struct TArgRef : public ArgRef
-{
+struct TArgRef : public ArgRef {
 	T storage;
 };
 
 typedef std::vector<ArgRefRef> ArgRefs;
 
 template <typename T>
-inline bool MarshalGetBasicHelper(lua_State *L, int index, const IFunction::ARGUMENT *arg, ArgumentList &list, void *basic)
-{
-	if (arg->Type() == ::reflect::Type<T>())
-	{
+inline bool MarshalGetBasicHelper(lua_State *L, int index, const IFunction::ARGUMENT *arg, ArgumentList &list, void *basic) {
+	if (arg->Type() == ::reflect::Type<T>()) {
 		*reinterpret_cast<T*>(basic) = Marshal<T>::Get(L, index, true);
 		list.PushBack(::reflect::Reflect(basic, ::reflect::Type<T>()));
 		return true;
@@ -626,10 +554,8 @@ inline bool MarshalGetBasicHelper(lua_State *L, int index, const IFunction::ARGU
 }
 
 template <typename T>
-inline bool MarshalPushBasicHelper(lua_State *L, const ::reflect::Reflected &reflected)
-{
-	if (reflected.Type() == ::reflect::Type<T>())
-	{
+inline bool MarshalPushBasicHelper(lua_State *L, const ::reflect::Reflected &reflected) {
+	if (reflected.Type() == ::reflect::Type<T>()) {
 		T val = *static_cast<const T*>(reflected);
 		Marshal<T>::Push(L, val);
 		return true;
@@ -637,8 +563,7 @@ inline bool MarshalPushBasicHelper(lua_State *L, const ::reflect::Reflected &ref
 	return false;
 }
 
-bool MarshalGetBasic(lua_State *L, int index, const IFunction::ARGUMENT *arg, ArgumentList &list, void *basic)
-{
+bool MarshalGetBasic(lua_State *L, int index, const IFunction::ARGUMENT *arg, ArgumentList &list, void *basic) {
 	return MarshalGetBasicHelper<S8>(L, index, arg, list, basic) ||
 		MarshalGetBasicHelper<U8>(L, index, arg, list, basic) ||
 		MarshalGetBasicHelper<S16>(L, index, arg, list, basic) ||
@@ -651,8 +576,8 @@ bool MarshalGetBasic(lua_State *L, int index, const IFunction::ARGUMENT *arg, Ar
 		MarshalGetBasicHelper<F64>(L, index, arg, list, basic);
 }
 
-bool MarshalPushBasicOrString(lua_State *L, const ::reflect::Reflected &reflected)
-{// we can do the strings here because we don't have generate temporary storage for the arguments
+bool MarshalPushBasicOrString(lua_State *L, const ::reflect::Reflected &reflected) {
+	// we can do the strings here because we don't have generate temporary storage for the arguments
 	return MarshalPushBasicHelper<S8>(L, reflected) ||
 		MarshalPushBasicHelper<U8>(L, reflected) ||
 		MarshalPushBasicHelper<S16>(L, reflected) ||
@@ -670,16 +595,14 @@ bool MarshalPushBasicOrString(lua_State *L, const ::reflect::Reflected &reflecte
 		MarshalPushBasicHelper< String >(L, reflected);
 }
 
-bool MarshalGetString(lua_State *L, int index, const IFunction::ARGUMENT *arg, ArgumentList &list, ArgRefs &refs, void *basic)
-{
-	if (arg->Type() == ::reflect::Type<const char*>())
-	{
+bool MarshalGetString(lua_State *L, int index, const IFunction::ARGUMENT *arg, ArgumentList &list, ArgRefs &refs, void *basic) {
+	if (arg->Type() == ::reflect::Type<const char*>()) {
 		*reinterpret_cast<const char**>(basic) = Marshal<const char*>::Get(L, index, true);
 		list.PushBack(Reflect(basic, ::reflect::Type<const char*>()));
 		return true;
 	}
-	if (arg->Type() == ::reflect::Type<const wchar_t*>())
-	{
+
+	if (arg->Type() == ::reflect::Type<const wchar_t*>()) {
 		// marshal as std::wstring
 		TArgRef<std::wstring> *sref = new (ZLuaRuntime) TArgRef<std::wstring>();
 		refs.push_back(ArgRefRef(sref)); // avoid type exceptions causing leak.
@@ -688,24 +611,24 @@ bool MarshalGetString(lua_State *L, int index, const IFunction::ARGUMENT *arg, A
 		list.PushBack(::reflect::Reflect(basic, ::reflect::Type<const wchar_t*>()));
 		return true;
 	}
-	if (arg->Type() == ::reflect::Type<std::string>())
-	{
+
+	if (arg->Type() == ::reflect::Type<std::string>()) {
 		TArgRef<std::string> *sref = new (ZLuaRuntime) TArgRef<std::string>();
 		refs.push_back(ArgRefRef(sref)); // avoid type exceptions causing leak.
 		sref->storage = Marshal<std::string>::Get(L, index, true);
 		list.PushBack(::reflect::Reflect(&sref->storage, ::reflect::Type<std::string>()));
 		return true;
 	}
-	if (arg->Type() == ::reflect::Type<std::wstring>())
-	{
+
+	if (arg->Type() == ::reflect::Type<std::wstring>()) {
 		TArgRef<std::wstring> *sref = new (ZLuaRuntime) TArgRef<std::wstring>();
 		refs.push_back(ArgRefRef(sref)); // avoid type exceptions causing leak.
 		sref->storage = Marshal<std::wstring>::Get(L, index, true);
 		list.PushBack(::reflect::Reflect(&sref->storage, ::reflect::Type<std::wstring>()));
 		return true;
 	}
-	if (arg->Type() == ::reflect::Type<String>())
-	{
+
+	if (arg->Type() == ::reflect::Type<String>()) {
 		TArgRef<String> *sref = new (ZLuaRuntime) TArgRef<String>();
 		refs.push_back(ArgRefRef(sref)); // avoid type exceptions causing leak.
 		sref->storage = Marshal<String>::Get(L, index, true);
@@ -716,20 +639,16 @@ bool MarshalGetString(lua_State *L, int index, const IFunction::ARGUMENT *arg, A
 	return false;
 }
 
-bool MarshalGetEnum(lua_State *L, int index, const IFunction::ARGUMENT *arg, ArgumentList &list, void *basic)
-{
-	if (IsEnum(arg->Type()))
-	{
+bool MarshalGetEnum(lua_State *L, int index, const IFunction::ARGUMENT *arg, ArgumentList &list, void *basic) {
+	if (IsEnum(arg->Type())) {
 		*reinterpret_cast<S32*>(basic) = Marshal<S32>::Get(L, index, true);
 		list.PushBack(::reflect::Reflect(basic, arg->Type()));
 	}
 	return false;
 }
 
-bool MarshalPushEnum(lua_State *L, const ::reflect::Reflected &reflected)
-{
-	if (IsEnum(reflected.Type()))
-	{
+bool MarshalPushEnum(lua_State *L, const ::reflect::Reflected &reflected) {
+	if (IsEnum(reflected.Type())) {
 		// we can't cast to an S32, since that will cause a cast exception, since
 		// the reflection system doesn't know an enum is an integral type.
 		S32 x = *reinterpret_cast<S32*>(reflected.Data());
@@ -739,8 +658,7 @@ bool MarshalPushEnum(lua_State *L, const ::reflect::Reflected &reflected)
 	return false;
 }
 
-void MarshalGetArgument(lua_State *L, int index, const Class::METHOD *m, ArgumentList &list, ArgRefs &refs, void *basic)
-{
+void MarshalGetArgument(lua_State *L, int index, const Class::METHOD *m, ArgumentList &list, ArgRefs &refs, void *basic) {
 	const IFunction::ARGUMENT *arg = m->Argument(index);
 	RAD_ASSERT(arg);
 
@@ -748,20 +666,17 @@ void MarshalGetArgument(lua_State *L, int index, const Class::METHOD *m, Argumen
 		!MarshalGetEnum(L, index, arg, list, basic) &&
 		!MarshalGetString(L, index, arg, list, refs, basic);
 
-	if (generic)
-	{
+	if (generic) {
 		// just do reflected marshal
 		list.PushBack(Marshal< ::reflect::Reflected>::Get(L, index));
 	}
 }
 
-bool MarshalPushArgument(lua_State *L, const ::reflect::Reflected &reflected)
-{
+bool MarshalPushArgument(lua_State *L, const ::reflect::Reflected &reflected) {
 	bool free = true;
 	bool generic = !MarshalPushBasicOrString(L, reflected) && !MarshalPushEnum(L, reflected);
 
-	if (generic)
-	{
+	if (generic) {
 		free = false;
 		// just do reflected marshal (it's a C++ object or whatever, it's opaque to lua).
 		Marshal< ::reflect::Reflected>::Push(L, reflected);
@@ -771,8 +686,7 @@ bool MarshalPushArgument(lua_State *L, const ::reflect::Reflected &reflected)
 }
 
 // stack: metatable, thisptr (if not static), args...
-int lua_ReflectedCall(lua_State *L)
-{
+int lua_ReflectedCall(lua_State *L) {
 	const int numArgs = lua_gettop(L);
 	RCMethod *m = reinterpret_cast<RCMethod*>(luaL_checkudata(L, 1, RCALL_KEY));
 	RAD_ASSERT(m);
@@ -780,18 +694,16 @@ int lua_ReflectedCall(lua_State *L)
 	::reflect::Reflected self;
 	int argOfs = 2;
 
-	if (m->methodType != RCMethod::Static)
-	{
+	if (m->methodType != RCMethod::Static) {
 		self = Marshal< ::reflect::Reflected>::Get(L, argOfs++);
 		RAD_ASSERT(self.IsValid());
 
-		if (m->iface)
-		{	// marshal an InterfaceHandle into an IInterface derived class.
+		if (m->iface) {	
+			// marshal an InterfaceHandle into an IInterface derived class.
 			// type check
 			RTLInterfaceHandle attr(0);
 
-			if (!self.Type()->AttributeValue(attr) || !attr.InterfaceType()->IsA(m->type))
-			{
+			if (!self.Type()->AttributeValue(attr) || !attr.InterfaceType()->IsA(m->type)) {
 				luaL_error(L, "Type Error: expected an HInterface for %s got %s. Class %s, Function %s, (Function %s, File %s, Line %d)",
 					m->type->Name<char>(),
 					self.Type()->Name<char>(),
@@ -813,8 +725,7 @@ int lua_ReflectedCall(lua_State *L)
 	ArgRefs refs; // <-- this holds shared_ptrs to complex arguments.
 	ArgumentList args;
 
-	for (;argOfs < numArgs; ++argOfs)
-	{
+	for (;argOfs < numArgs; ++argOfs) {
 #define CAWARN_DISABLE 6263
 #include <Runtime/PushCAWarnings.h>
 		MarshalGetArgument(L, argOfs, method, args, refs, stack_alloc(8));
@@ -823,17 +734,15 @@ int lua_ReflectedCall(lua_State *L)
 
 	::reflect::Reflected result;
 
-	if (method->ReturnType()) // non-void return
-	{
+	if (method->ReturnType()) { 
+		// non-void return
 		// TODO: we need to pool this for built-in types.
 		result = ::reflect::Reflected::New(ZLuaRuntime, method->ReturnType(), ::reflect::NullArgs());
 		RAD_ASSERT(result.IsValid());
 	}
 
-	try
-	{
-		switch(m->methodType)
-		{
+	try {
+		switch(m->methodType) {
 		case RCMethod::Static:
 			m->x.s->Call(result, args);
 			break;
@@ -844,11 +753,8 @@ int lua_ReflectedCall(lua_State *L)
 			self.CallConstMethod(result, m->x.c, args);
 			break;
 		}
-	}
-	catch (::reflect::IFunction::InvalidArgumentExceptionType &e)
-	{
-		if (method->ReturnType())
-		{
+	} catch (::reflect::IFunction::InvalidArgumentExceptionType &e) {
+		if (method->ReturnType()) {
 			result.Delete();
 		}
 
@@ -861,11 +767,8 @@ int lua_ReflectedCall(lua_State *L)
 			__FILE__,
 			__LINE__
 		);
-	}
-	catch (::reflect::IFunction::MissingArgumentExceptionType &e)
-	{
-		if (method->ReturnType())
-		{
+	} catch (::reflect::IFunction::MissingArgumentExceptionType &e) {
+		if (method->ReturnType()) {
 			result.Delete();
 		}
 
@@ -878,11 +781,8 @@ int lua_ReflectedCall(lua_State *L)
 			__FILE__,
 			__LINE__
 		);
-	}
-	catch (::reflect::InvalidCastException &)
-	{
-		if (method->ReturnType())
-		{
+	} catch (::reflect::InvalidCastException &) {
+		if (method->ReturnType()) {
 			result.Delete();
 		}
 
@@ -893,11 +793,8 @@ int lua_ReflectedCall(lua_State *L)
 			__FILE__,
 			__LINE__
 		);
-	}
-	catch (exception &e)
-	{
-		if (method->ReturnType())
-		{
+	} catch (exception &e) {
+		if (method->ReturnType()) {
 			result.Delete();
 		}
 
@@ -915,8 +812,7 @@ int lua_ReflectedCall(lua_State *L)
 		);
 	}
 
-	if (method->ReturnType() && MarshalPushArgument(L, result))
-	{
+	if (method->ReturnType() && MarshalPushArgument(L, result)) {
 		// since the Reflected object is a reference to the object,
 		// it's a pointer to the type which is allocated on the heap.
 		// These pointers are marshaled by value to lua and can be freed.
@@ -931,14 +827,12 @@ int lua_ReflectedCall(lua_State *L)
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-RADENG_API boost::mutex &RADENG_CALL TypeRegisterLock()
-{
+RADENG_API boost::mutex &RADENG_CALL TypeRegisterLock() {
 	static boost::mutex m;
 	return m;
 }
 
-ReflectedRef *ReflectedRef::PushNew(lua_State *L, const ::reflect::Reflected &r)
-{
+ReflectedRef *ReflectedRef::PushNew(lua_State *L, const ::reflect::Reflected &r) {
 	RAD_ASSERT(L);
 	ReflectedRef *ref = new (lua_newuserdata(L, sizeof(ReflectedRef))) ReflectedRef(r);
 	luaL_getmetatable(L, INTEROP_GC_KEY);
@@ -946,12 +840,10 @@ ReflectedRef *ReflectedRef::PushNew(lua_State *L, const ::reflect::Reflected &r)
 	return ref;
 }
 
-ReflectedRef *ReflectedRef::Get(lua_State *L, int index)
-{
+ReflectedRef *ReflectedRef::Get(lua_State *L, int index) {
 	RAD_ASSERT(L);
 	ReflectedRef *ref = reinterpret_cast<ReflectedRef*>(luaL_checkudata(L, index, INTEROP_GC_KEY));
-	if (!ref)
-	{
+	if (!ref) {
 		luaL_error(L, "Argument %d is not a C++ object. (Function %s, File %s, Line %d).",
 			index,
 			__FUNCTION__, __FILE__, __LINE__
@@ -960,14 +852,12 @@ ReflectedRef *ReflectedRef::Get(lua_State *L, int index)
 	return ref;
 }
 
-RADENG_API void RADENG_CALL PushUserData(lua_State *L, void *data)
-{
+RADENG_API void RADENG_CALL PushUserData(lua_State *L, void *data) {
 	lua_pushlightuserdata(L, data);
 	lua_gettable(L, LUA_REGISTRYINDEX);
 }
 
-RADENG_API void RADENG_CALL MapUserData(lua_State *L)
-{
+RADENG_API void RADENG_CALL MapUserData(lua_State *L) {
 	lua_pushvalue(L, -1); // copy user data. s+2
 	lua_pushvalue(L, -1); // s+3, 4
 	void *x = lua_touserdata(L, -1);
@@ -977,8 +867,7 @@ RADENG_API void RADENG_CALL MapUserData(lua_State *L)
 	lua_settable(L, LUA_REGISTRYINDEX); // t[k] = v
 }
 
-RADENG_API void RADENG_CALL UnmapUserData(lua_State *L, void *data)
-{
+RADENG_API void RADENG_CALL UnmapUserData(lua_State *L, void *data) {
 	lua_pushlightuserdata(L, data);
 	lua_pushnil(L);
 	lua_settable(L, LUA_REGISTRYINDEX);
@@ -986,19 +875,16 @@ RADENG_API void RADENG_CALL UnmapUserData(lua_State *L, void *data)
 
 namespace {
 
-void ExportEnum(lua_State *L, const Class *type)
-{
+void ExportEnum(lua_State *L, const Class *type) {
 	// create global table with enum name.
 	// for each value in enum
 	//   make a table field, assign value.
 	std::string name = FormatNamespace(type->Name<char>());
 	lua_createtable(L, 0, NumEnumVals(type));
 	const int NumAttrs = type->NumAttributes();
-	for (int i = 0; i < NumAttrs; ++i)
-	{
+	for (int i = 0; i < NumAttrs; ++i) {
 		const Attribute *attr = type->Attribute(i);
-		if (attr->Type() == ::reflect::Type<EnumValue>())
-		{
+		if (attr->Type() == ::reflect::Type<EnumValue>()) {
 			const EnumValue *val = (const EnumValue*)attr->Value();
 			lua_pushnumber(L, (lua_Number)val->value);
 			lua_setfield(L, -2, attr->Name<char>());
@@ -1007,19 +893,16 @@ void ExportEnum(lua_State *L, const Class *type)
 	lua_setglobal(L, name.c_str());
 }
 
-void ExportClass(lua_State *L, const Class *type)
-{
+void ExportClass(lua_State *L, const Class *type) {
 	ExportClassHelper(L, type, 0);
 }
 
-void ExportInterface(lua_State *L, const Class *type)
-{
+void ExportInterface(lua_State *L, const Class *type) {
 	static const Class::MEMBER *ifacePtr = 0;
-	if (!ifacePtr) // cache iinterface data pointer.
-	{
+	if (!ifacePtr) { 
+		// cache iinterface data pointer.
 		boost::lock_guard<boost::mutex> l(TypeRegisterLock());
-		if (!ifacePtr)
-		{
+		if (!ifacePtr) {
 			const Class *iinterface = ::reflect::Type<HInterface>();
 			RAD_ASSERT(iinterface);
 			ifacePtr = iinterface->FindMember<char>("Data");
@@ -1031,15 +914,25 @@ void ExportInterface(lua_State *L, const Class *type)
 
 } // namespace
 
-RADENG_API void RADENG_CALL ExportType(lua_State *L, const Class *type)
-{
+const void *FileSrcBuffer::RAD_IMPLEMENT_GET(ptr) { 
+	return m_mm->data; 
+}
+
+AddrSize FileSrcBuffer::RAD_IMPLEMENT_GET(size) { 
+	return m_mm->size; 
+}
+
+const char *FileSrcBuffer::RAD_IMPLEMENT_GET(name) { 
+	return m_name.c_str; 
+}
+
+RADENG_API void RADENG_CALL ExportType(lua_State *L, const Class *type) {
 	RAD_ASSERT(L && type);
 
 	lua_getfield(L, LUA_REGISTRYINDEX, NATIVE_CLASS_KEY);
 	RAD_ASSERT(lua_isnil(L, -1) || lua_istable(L, -1));
 
-	if (lua_isnil(L, -1))
-	{
+	if (lua_isnil(L, -1)) {
 		lua_pop(L, 1);
 		lua_newtable(L);
 		lua_pushvalue(L, -1);
@@ -1047,8 +940,7 @@ RADENG_API void RADENG_CALL ExportType(lua_State *L, const Class *type)
 	}
 
 	lua_getfield(L, -1, type->Name<char>());
-	if (!lua_isnil(L, -1))
-	{
+	if (!lua_isnil(L, -1)) {
 		lua_pop(L, 2);
 		return; // already been done.
 	}
@@ -1057,32 +949,25 @@ RADENG_API void RADENG_CALL ExportType(lua_State *L, const Class *type)
 	lua_setfield(L, -3, type->Name<char>());
 	lua_pop(L, 2);
 
-	if (IsEnum(type))
-	{
+	if (IsEnum(type)) {
 		ExportEnum(L, type);
-	}
-	else if (IsInterface(type))
-	{
+	} else if (IsInterface(type)) {
 		ExportInterface(L, type);
-	}
-	else if (!IsInterfaceHandle(type))
-	{
+	} else if (!IsInterfaceHandle(type)) {
 		ExportClass(L, type);
 	}
 }
 
-RADENG_API void RADENG_CALL ExportTypes(lua_State *L, const ::reflect::Class **types, int num)
-{
-	if (num == 0) return;
+RADENG_API void RADENG_CALL ExportTypes(lua_State *L, const ::reflect::Class **types, int num) {
+	if (num == 0) 
+		return;
 
 	int ofs = 0;
-	while (num > 0 || (num==-1 && types[ofs]))
-	{
+	while (num > 0 || (num==-1 && types[ofs])) {
 		ExportType(L, types[ofs]);
 
 		++ofs;
-		if (num > 0)
-		{
+		if (num > 0) {
 			--num;
 		}
 	}
@@ -1090,18 +975,15 @@ RADENG_API void RADENG_CALL ExportTypes(lua_State *L, const ::reflect::Class **t
 
 namespace {
 
-void AddNativeGCHandlers(lua_State *L)
-{
+void AddNativeGCHandlers(lua_State *L) {
 	// interop type collector for gc
-	if (luaL_newmetatable(L, INTEROP_GC_KEY))
-	{
+	if (luaL_newmetatable(L, INTEROP_GC_KEY)) {
 		lua_pushcfunction(L, lua_gcReflected);
 		lua_setfield(L, -2, "__gc");
 	}
 
 	// interop reflected methodcall
-	if (luaL_newmetatable(L, RCALL_KEY))
-	{
+	if (luaL_newmetatable(L, RCALL_KEY)) {
 		lua_pushcfunction(L, lua_gcReflectedCall);
 		lua_setfield(L, -2, "__gc");
 		lua_pushcfunction(L, lua_ReflectedCall);
@@ -1113,8 +995,7 @@ void AddNativeGCHandlers(lua_State *L)
 
 }
 
-RADENG_API void RADENG_CALL EnableModuleImport(lua_State *L, ImportLoader &loader)
-{
+RADENG_API void RADENG_CALL EnableModuleImport(lua_State *L, ImportLoader &loader) {
 	lua_pushlightuserdata(L, &loader);
 	lua_setfield(L, LUA_REGISTRYINDEX, LOADER_KEY);
 
@@ -1122,8 +1003,7 @@ RADENG_API void RADENG_CALL EnableModuleImport(lua_State *L, ImportLoader &loade
 	lua_createtable(L, 0, 0); // make table to hold imported modules.
 	lua_setfield(L, LUA_REGISTRYINDEX, MODULES_KEY);
 
-	luaL_Reg regs [] =
-	{
+	luaL_Reg regs [] = {
 		{ "Import", lua_Import },
 		{ 0, 0 }
 	};
@@ -1132,20 +1012,16 @@ RADENG_API void RADENG_CALL EnableModuleImport(lua_State *L, ImportLoader &loade
 	AddNativeGCHandlers(L);
 }
 
-RADENG_API bool RADENG_CALL GetFieldExt(lua_State *L, int index, const char *k)
-{
+RADENG_API bool RADENG_CALL GetFieldExt(lua_State *L, int index, const char *k) {
 	RAD_ASSERT(k);
 	char path[256];
 	char *t = path;
 	*t = 0;
 	bool first = true;
 
-	for (;;)
-	{
-		if (!*k || *k == '.')
-		{
-			if (*path)
-			{
+	for (;;) {
+		if (!*k || *k == '.') {
+			if (*path) {
 				*t++ = 0;
 
 				if (lua_type(L, index) != LUA_TTABLE)
@@ -1162,9 +1038,7 @@ RADENG_API bool RADENG_CALL GetFieldExt(lua_State *L, int index, const char *k)
 
 			if (!*k)
 				break;
-		}
-		else
-		{
+		} else {
 			*t++ = *k;
 		}
 
@@ -1174,8 +1048,7 @@ RADENG_API bool RADENG_CALL GetFieldExt(lua_State *L, int index, const char *k)
 	return true;
 }
 
-RADENG_API bool RADENG_CALL ImportModule(lua_State *L, const char *name)
-{
+RADENG_API bool RADENG_CALL ImportModule(lua_State *L, const char *name) {
 	if (FileIsLoaded(L, name)) 
 		return true;
 
@@ -1185,22 +1058,20 @@ RADENG_API bool RADENG_CALL ImportModule(lua_State *L, const char *name)
 	RAD_ASSERT(l);
 
 	SrcBuffer::Ref code = l->Load(L, name);
-	if (!code) // load failed
-	{
+	if (!code) { 
+		// load failed
 		COut(C_Error) << "Import: could not find file " << name << std::endl;
 		return false;
 	}
 
 	MarkFileLoaded(L, name);
 
-	if (luaL_loadbuffer(L, (const char *)((const void*)code->ptr), code->size, code->name))
-	{
+	if (luaL_loadbuffer(L, (const char *)((const void*)code->ptr), code->size, code->name)) {
 		COut(C_Error) << "Error importing '%s'(%s):\n\t%s" << name << (const char*)code->name << lua_tostring(L, -1) << std::endl;
 		return false;
 	}
 
-	if (lua_pcall(L, 0, 0, 0))
-	{
+	if (lua_pcall(L, 0, 0, 0)) {
 		COut(C_Error) << "ScriptError(" << name << "): " << lua_tostring(L, -1) << std::endl;
 		return false;
 	}
@@ -1208,10 +1079,8 @@ RADENG_API bool RADENG_CALL ImportModule(lua_State *L, const char *name)
 	return true;
 }
 
-RADENG_API void RADENG_CALL EnableNativeClassImport(lua_State *L)
-{
-	luaL_Reg regs [] =
-	{
+RADENG_API void RADENG_CALL EnableNativeClassImport(lua_State *L) {
+	luaL_Reg regs [] = {
 		{ "NativeClass", lua_NativeClass },
 		{ 0, 0 }
 	};
@@ -1220,8 +1089,7 @@ RADENG_API void RADENG_CALL EnableNativeClassImport(lua_State *L)
 	AddNativeGCHandlers(L);
 }
 
-RADENG_API void RADENG_CALL RegisterGlobals(lua_State *L, const char *table, luaL_Reg *r)
-{
+RADENG_API void RADENG_CALL RegisterGlobals(lua_State *L, const char *table, luaL_Reg *r) {
 	RAD_ASSERT(L);
 #if LUA_VERSION_NUM >= 502
 	int index = -1000;
@@ -1229,16 +1097,14 @@ RADENG_API void RADENG_CALL RegisterGlobals(lua_State *L, const char *table, lua
 	int index = LUA_GLOBALSINDEX;
 #endif
 
-	if (table != 0)
-	{
+	if (table != 0) {
 		int size = 0;
 		for (luaL_Reg *x = r; x->name && x->func; ++x, ++size) {}
 		lua_createtable(L, 0, size);
 		index = -2;
 	}
 
-	while (r->name && r->func)
-	{
+	while (r->name && r->func) {
 		lua_pushcfunction(L, r->func);
 #if LUA_VERSION_NUM >= 502
 		if (index == -1000) {
@@ -1252,26 +1118,20 @@ RADENG_API void RADENG_CALL RegisterGlobals(lua_State *L, const char *table, lua
 		++r;
 	}
 
-	if (table != 0)
-	{
+	if (table != 0) {
 		lua_setglobal(L, table);
 	}
 }
 
-RADENG_API bool RADENG_CALL ParseVariantTable(lua_State *L, Variant::Map &map, bool luaError)
-{
-	if (lua_type(L, -1) != LUA_TTABLE)
-	{
-		if (luaError)
-		{
+RADENG_API bool RADENG_CALL ParseVariantTable(lua_State *L, Variant::Map &map, bool luaError) {
+	if (lua_type(L, -1) != LUA_TTABLE) {
+		if (luaError) {
 			luaL_error(L, "Expected table, (Function %s, File %s, Line %d).",
 				__FUNCTION__,
 				__FILE__,
 				__LINE__
 			);
-		}
-		else
-		{
+		} else {
 			COut(C_Error) << "ParseVariantTable: error expected table!" << std::endl;
 			return false;
 		}
@@ -1279,41 +1139,31 @@ RADENG_API bool RADENG_CALL ParseVariantTable(lua_State *L, Variant::Map &map, b
 
 	lua_checkstack(L, 3);
 	lua_pushnil(L);
-	while (lua_next(L, -2) != 0)
-	{
+	while (lua_next(L, -2) != 0) {
 		String key;
 
-		if (lua_type(L, -2) == LUA_TNUMBER)
-		{
+		if (lua_type(L, -2) == LUA_TNUMBER) {
 			lua_Number n = lua_tonumber(L, -2);
 			char x[256];
 			string::sprintf(x, "%i", (int)n);
 			key = x;
-		}
-		else if (lua_type(L, -2) == LUA_TSTRING)
-		{
+		} else if (lua_type(L, -2) == LUA_TSTRING) {
 			key = lua_tolstring(L, -2, 0);
-		}
-		else
-		{
-			if (luaError)
-			{
+		} else {
+			if (luaError) {
 				luaL_error(L, "Invalid key type for variant table, (Function %s, File %s, Line %d).",
 					__FUNCTION__,
 					__FILE__,
 					__LINE__
 				);
-			}
-			else
-			{
+			} else {
 				lua_pop(L, 2);
 				COut(C_Error) << "ParseVariantTable: Invalid key type for variant table!" << std::endl;
 				return false;
 			}
 		}
 
-		switch (lua_type(L, -1))
-		{
+		switch (lua_type(L, -1)) {
 		case LUA_TTABLE:
 			{
 				reflect::SharedReflected::Ref table(
@@ -1326,10 +1176,8 @@ RADENG_API bool RADENG_CALL ParseVariantTable(lua_State *L, Variant::Map &map, b
 					)
 				);
 				RAD_ASSERT(table);
-				if(map.insert(Variant::Map::value_type(key, Variant(table))).second)
-				{
-					if (!ParseVariantTable(L, *static_cast<Variant::Map*>(*table), luaError))
-					{
+				if(map.insert(Variant::Map::value_type(key, Variant(table))).second) {
+					if (!ParseVariantTable(L, *static_cast<Variant::Map*>(*table), luaError)) {
 						return false;
 					}
 				}
@@ -1387,16 +1235,13 @@ RADENG_API bool RADENG_CALL ParseVariantTable(lua_State *L, Variant::Map &map, b
 				map.insert(Variant::Map::value_type(key, Variant(ptr)));
 			} break;
 		default:
-			if (luaError)
-			{
+			if (luaError) {
 				luaL_error(L, "Invalid value type for variant, (Function %s, File %s, Line %d).",
 					__FUNCTION__,
 					__FILE__,
 					__LINE__
 				);
-			}
-			else
-			{
+			} else {
 				COut(C_Error) << "ParseVariantTable: Invalid value type for variant!" << std::endl;
 				return false;
 			}
@@ -1409,31 +1254,26 @@ RADENG_API bool RADENG_CALL ParseVariantTable(lua_State *L, Variant::Map &map, b
 	return true;
 }
 
-void Marshal<Vec2>::Push(lua_State *L, const Vec2 &val)
-{
+void Marshal<Vec2>::Push(lua_State *L, const Vec2 &val) {
 	RAD_ASSERT(L);
 	lua_createtable(L, 2, 0);
 	
-	for (int i = 0; i < 2; ++i)
-	{
+	for (int i = 0; i < 2; ++i) {
 		lua_pushinteger(L, i+1);
 		lua_pushnumber(L, val[i]);
 		lua_settable(L, -3);
 	}
 }
 
-Vec2 Marshal<Vec2>::Get(lua_State *L, int index, bool luaError)
-{
-	if (lua_type(L, index) != LUA_TTABLE)
-	{
+Vec2 Marshal<Vec2>::Get(lua_State *L, int index, bool luaError) {
+	if (lua_type(L, index) != LUA_TTABLE) {
 		if (luaError)
 			luaL_typerror(L, index, "Vec2");
 		return Vec2::Zero;
 	}
 
 	Vec2 v;
-	for (int i = 0; i < 2; ++i)
-	{
+	for (int i = 0; i < 2; ++i) {
 		lua_pushinteger(L, i+1);
 		lua_gettable(L, index < 0 ? index-1 : index);
 		if (luaError && lua_type(L, -1) != LUA_TNUMBER)
@@ -1445,31 +1285,26 @@ Vec2 Marshal<Vec2>::Get(lua_State *L, int index, bool luaError)
 	return v;
 }
 
-void Marshal<Vec3>::Push(lua_State *L, const Vec3 &val)
-{
+void Marshal<Vec3>::Push(lua_State *L, const Vec3 &val) {
 	RAD_ASSERT(L);
 	lua_createtable(L, 3, 0);
 	
-	for (int i = 0; i < 3; ++i)
-	{
+	for (int i = 0; i < 3; ++i) {
 		lua_pushinteger(L, i+1);
 		lua_pushnumber(L, val[i]);
 		lua_settable(L, -3);
 	}
 }
 
-Vec3 Marshal<Vec3>::Get(lua_State *L, int index, bool luaError)
-{
-	if (lua_type(L, index) != LUA_TTABLE)
-	{
+Vec3 Marshal<Vec3>::Get(lua_State *L, int index, bool luaError) {
+	if (lua_type(L, index) != LUA_TTABLE) {
 		if (luaError)
 			luaL_typerror(L, index, "Vec3");
 		return Vec3::Zero;
 	}
 
 	Vec3 v;
-	for (int i = 0; i < 3; ++i)
-	{
+	for (int i = 0; i < 3; ++i) {
 		lua_pushinteger(L, i+1);
 		lua_gettable(L, index < 0 ? index-1 : index);
 		if (luaError && lua_type(L, -1) != LUA_TNUMBER)
@@ -1481,31 +1316,26 @@ Vec3 Marshal<Vec3>::Get(lua_State *L, int index, bool luaError)
 	return v;
 }
 
-void Marshal<Vec4>::Push(lua_State *L, const Vec4 &val)
-{
+void Marshal<Vec4>::Push(lua_State *L, const Vec4 &val) {
 	RAD_ASSERT(L);
 	lua_createtable(L, 4, 0);
 	
-	for (int i = 0; i < 4; ++i)
-	{
+	for (int i = 0; i < 4; ++i) {
 		lua_pushinteger(L, i+1);
 		lua_pushnumber(L, val[i]);
 		lua_settable(L, -3);
 	}
 }
 
-Vec4 Marshal<Vec4>::Get(lua_State *L, int index, bool luaError)
-{
-	if (lua_type(L, index) != LUA_TTABLE)
-	{
+Vec4 Marshal<Vec4>::Get(lua_State *L, int index, bool luaError) {
+	if (lua_type(L, index) != LUA_TTABLE) {
 		if (luaError)
 			luaL_typerror(L, index, "Vec4");
 		return Vec4::Zero;
 	}
 
 	Vec4 v;
-	for (int i = 0; i < 4; ++i)
-	{
+	for (int i = 0; i < 4; ++i) {
 		lua_pushinteger(L, i+1);
 		lua_gettable(L, index < 0 ? index-1 : index);
 		if (luaError && lua_type(L, -1) != LUA_TNUMBER)
@@ -1516,35 +1346,6 @@ Vec4 Marshal<Vec4>::Get(lua_State *L, int index, bool luaError)
 
 	return v;
 }
-
-
-#if 0
-void test()
-{
-	Marshal<bool>::Push(0, true);
-	std::string  stds;
-	std::wstring stdw;
-	::string::string <> s;
-	::string::wstring <> w;
-
-	Marshal<std::string>::Push(0, stds);
-	stds = Marshal<std::string>::Get(0, 0, false);
-
-	Marshal<std::wstring>::Push(0, stdw);
-	stdw = Marshal<std::wstring>::Get(0, 0, false);
-
-	Marshal<::string::string<> >::Push(0, s);
-	s = Marshal<::string::string<> >::Get(0, 0, false);
-
-	Marshal<::string::wstring<> >::Push(0, w);
-	w = Marshal<::string::wstring<> >::Get(0, 0, false);
-
-	State::Ref ref;
-	Marshal<State::Ref>::Push(0, ref);
-}
-
-LUA_REGISTER_TYPE(xyz, int)
-#endif
 
 } // lua
 

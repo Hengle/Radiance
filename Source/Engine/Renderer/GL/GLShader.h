@@ -10,7 +10,7 @@
 #include "GLState.h"
 
 #if defined(RAD_OPT_TOOLS)
-	#include "../CG/CGShader.h"
+	#include "../ShaderTool.h"
 #endif
 
 #include <Runtime/PushPack.h>
@@ -19,19 +19,15 @@ class Engine;
 
 namespace r {
 
-class GLShader : public Shader
-{
+class GLShader : public Shader {
 public:
-	enum Backend
-	{
-		ARB,
-		GLSL
+	enum Backend {
+		kBackend_GLSL
 	};
 
 	static Shader::Ref LoadCooked(
 		const char *name,
 		stream::InputStream &is,
-		bool skinned,
 		const Material &material
 	);
 
@@ -39,12 +35,11 @@ public:
 	static Shader::Ref Load(
 		Engine &engine, 
 		const char *name,
-		bool skinned,
 		const Material &material,
 		Backend backend
 	);
 
-	static const cg::ShaderCache::Ref &Cache();
+	static const tools::shader_utils::ShaderCache::Ref &Cache();
 #endif
 };
 

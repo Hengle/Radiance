@@ -60,8 +60,7 @@ bool Engine::PreInit() {
 	sys->r->Initialize();
 	m_comTable.alDriver = ALDriver::New(ALDRIVER_SIG 0);
 
-	if (!m_comTable.alDriver)
-	{
+	if (!m_comTable.alDriver) {
 		COut(C_Info) << "Error initializing sound system!" << std::endl;
 		return false;
 	}

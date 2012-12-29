@@ -84,7 +84,6 @@ private:
 
 	class ImportLoader : public lua::ImportLoader {
 	public:
-		ImportLoader() {}
 		virtual lua::SrcBuffer::Ref Load(lua_State *L, const char *name);
 	};
 

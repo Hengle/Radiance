@@ -103,9 +103,6 @@
     <Filter Include="Source\Engine\Renderer">
       <UniqueIdentifier>{5bc4e5d5-424f-4b7d-b338-ae38b76dcbc9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Engine\Renderer\CG">
-      <UniqueIdentifier>{b069e516-171f-45f9-9973-a68644fea27b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\Engine\Renderer\GL">
       <UniqueIdentifier>{ae3162c6-9fb2-4349-946d-61f54bc00077}</UniqueIdentifier>
     </Filter>
@@ -1053,17 +1050,8 @@
     <ClInclude Include="..\..\Engine\Renderer\SkMesh.h">
       <Filter>Source\Engine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\Renderer\Sources.h">
-      <Filter>Source\Engine\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\Renderer\TextModel.h">
       <Filter>Source\Engine\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Renderer\CG\CGShader.h">
-      <Filter>Source\Engine\Renderer\CG</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Renderer\CG\CGUtils.h">
-      <Filter>Source\Engine\Renderer\CG</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Engine\Renderer\GL\GLState.h">
       <Filter>Source\Engine\Renderer\GL</Filter>
@@ -1410,6 +1398,15 @@
     <ClInclude Include="..\..\Engine\World\FloorsDef.h">
       <Filter>Source\Engine\World</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\Renderer\Common.h">
+      <Filter>Source\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Renderer\ShaderTool.h">
+      <Filter>Source\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Renderer\ShaderToolUtils.h">
+      <Filter>Source\Engine\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -1723,12 +1720,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\Renderer\TextModel.cpp">
       <Filter>Source\Engine\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\Renderer\CG\CGShader.cpp">
-      <Filter>Source\Engine\Renderer\CG</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\Renderer\CG\CGUtils.cpp">
-      <Filter>Source\Engine\Renderer\CG</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Engine\Renderer\GL\GLState.cpp">
       <Filter>Source\Engine\Renderer\GL</Filter>
@@ -2114,6 +2105,12 @@
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorModelEditorWindow.cpp">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\Renderer\ShaderTool.cpp">
+      <Filter>Source\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Renderer\ShaderToolUtils.cpp">
+      <Filter>Source\Engine\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Runtime\Base\Event.inl">
@@ -2311,9 +2308,6 @@
     <None Include="..\..\Engine\Renderer\Mesh.inl">
       <Filter>Source\Engine\Renderer</Filter>
     </None>
-    <None Include="..\..\Engine\Renderer\CG\CGShader.inl">
-      <Filter>Source\Engine\Renderer\CG</Filter>
-    </None>
     <None Include="..\..\Engine\Renderer\GL\GLState.inl">
       <Filter>Source\Engine\Renderer\GL</Filter>
     </None>
@@ -2361,6 +2355,9 @@
     </None>
     <None Include="..\..\Runtime\Math\Winding.inl">
       <Filter>Source\Runtime\Math</Filter>
+    </None>
+    <None Include="..\..\Engine\Renderer\ShaderTool.inl">
+      <Filter>Source\Engine\Renderer</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

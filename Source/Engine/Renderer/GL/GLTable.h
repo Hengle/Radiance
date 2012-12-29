@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../../Types.h"
+#include "../Common.h"
 #include <Runtime/Math/Matrix.h>
 #include <Runtime/Container/ZoneVector.h>
 
@@ -30,8 +30,7 @@ class RBackend;
 	#define CLEAR_GL_ERRORS() ((void)0)
 #endif
 
-class RADENG_CLASS GLMatrixStack
-{
+class RADENG_CLASS GLMatrixStack {
 public:
 	GLMatrixStack();
 
@@ -44,8 +43,7 @@ private:
 	Stack m_s;
 };
 
-struct RADENG_CLASS GLTable
-{
+struct RADENG_CLASS GLTable {
 	GLTable();
 	
 	bool CheckVer(const char *ver);
@@ -317,8 +315,8 @@ struct RADENG_CLASS GLTable
 	void Color4f(float r, float g, float b, float a, bool force=false);
 	void GetColor4fv(float *v);
 
-	void EyeVec(float *eye, float *look);
-	void GetEyeVec(float *eye, float *look);
+	void SetEye(const float *eye);
+	void GetEye(float *eye);
 
 	void RotateForCamera(const Vec3 &pos, const Mat4 &rot, float near, float far, float fov, float yaspect);
 	void RotateForCamera(const Vec3 &pos, const Mat4 &rot);
@@ -329,14 +327,13 @@ private:
 	static int _SetSwapInterval(int i);
 #endif
 
-	static int s_mm;
-	static GLMatrixStack s_mv;
-	static GLMatrixStack s_prj;
+	int mm;
+	GLMatrixStack mv;
+	GLMatrixStack prj;
 
-	static float s_color[4];
-	static float s_eye[3];
-	static float s_look[3];
-
+	float color[4];
+	float eye[3];
+	
 	friend class RBackend;
 
 	void Load();

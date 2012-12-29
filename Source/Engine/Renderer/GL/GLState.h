@@ -1,13 +1,14 @@
-// GLState.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// OGL state management.
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file GLState.h
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup renderer
+*/
 
 #pragma once
 
 #include "../RendererDef.h"
-#include "../Sources.h"
+#include "../Common.h"
 #include "GLTable.h"
 #include "GLTextureDef.h"
 #include "GLVertexBufferDef.h"
@@ -18,125 +19,93 @@
 
 namespace r {
 
-enum
-{
+enum {
 	// Depth Test
 
-	DT_Disable = 0x1,
-	DT_Always = 0x2,
-	DT_Less = 0x4,
-	DT_Greater = 0x8,
-	DT_LEqual = 0x10,
-	DT_GEqual = 0x20,
-	DT_Equal = 0x40,
-	DT_Never = 0x80,
-	DT_Flags = (DT_Disable|DT_Always|DT_Less|DT_Greater|DT_LEqual|DT_GEqual|DT_Equal|DT_Never),
+	kDepthTest_Disable = 0x1,
+	kDepthTest_Always = 0x2,
+	kDepthTest_Less = 0x4,
+	kDepthTest_Greater = 0x8,
+	kDepthTest_LEqual = 0x10,
+	kDepthTest_GEqual = 0x20,
+	kDepthTest_Equal = 0x40,
+	kDepthTest_Never = 0x80,
+	kDepthTest_Flags = 
+		kDepthTest_Disable|kDepthTest_Always|
+		kDepthTest_Less|kDepthTest_Greater|
+		kDepthTest_LEqual|kDepthTest_GEqual|
+		kDepthTest_Equal|kDepthTest_Never,
 
 	// Depth Write Mask
 
-	DWM_Enable = 0x100,
-	DWM_Disable = 0x200,
-	DWM_Flags = (DWM_Enable|DWM_Disable),
+	kDepthWriteMask_Enable = 0x100,
+	kDepthWriteMask_Disable = 0x200,
+	kDepthWriteMask_Flags = kDepthWriteMask_Enable|kDepthWriteMask_Disable,
 
 	// Cull Face Mode
 
-	CFM_Front = 0x400,
-	CFM_Back = 0x800,
-	CFM_None = 0x1000,
-	CFM_CW = 0x2000,
-	CFM_CCW = 0x4000,
-	CFM_Flags = (CFM_Front|CFM_Back|CFM_None|CFM_CW|CFM_CCW),
-	CFM_ModeFlags = (CFM_Front|CFM_Back|CFM_None),
-	CFM_DirFlags = (CFM_CW|CFM_CCW),
+	kCullFaceMode_Front = 0x400,
+	kCullFaceMode_Back = 0x800,
+	kCullFaceMode_None = 0x1000,
+	kCullFaceMode_CW = 0x2000,
+	kCullFaceMode_CCW = 0x4000,
+	kCullFaceMode_Flags = kCullFaceMode_Front|kCullFaceMode_Back|kCullFaceMode_None|kCullFaceMode_CW|kCullFaceMode_CCW,
+	kCullFaceMode_ModeFlags = kCullFaceMode_Front|kCullFaceMode_Back|kCullFaceMode_None,
+	kCullFaceMode_DirFlags = kCullFaceMode_CW|kCullFaceMode_CCW,
 
 	// Color Write Mask
 
-	CWM_R = 0x8000,
-	CWM_G = 0x10000,
-	CWM_B = 0x20000,
-	CWM_A = 0x40000,
-	CWM_Off = 0x80000,
-	CWM_RGBA = (CWM_R|CWM_G|CWM_B|CWM_A),
-	CWM_RGB = (CWM_R|CWM_G|CWM_B),
-	CWM_Flags = (CWM_RGBA|CWM_Off),
-
-	// Alpha Test
-
-	AT_Disable = 0x100000,
-	AT_Less = 0x200000,
-	AT_Greater = 0x400000,
-	AT_LEqual = 0x800000,
-	AT_GEqual = 0x1000000,
-	AT_Flags = (AT_Disable|AT_Less|AT_Greater|AT_LEqual|AT_GEqual),
+	kColorWriteMask_R = 0x8000,
+	kColorWriteMask_G = 0x10000,
+	kColorWriteMask_B = 0x20000,
+	kColorWriteMask_A = 0x40000,
+	kColorWriteMask_Off = 0x80000,
+	kColorWriteMask_RGBA = (kColorWriteMask_R|kColorWriteMask_G|kColorWriteMask_B|kColorWriteMask_A),
+	kColorWriteMask_RGB = (kColorWriteMask_R|kColorWriteMask_G|kColorWriteMask_B),
+	kColorWriteMask_Flags = (kColorWriteMask_RGBA|kColorWriteMask_Off),
 
 	// Scissor Test
-	SCT_Enable = 0x2000000,
-	SCT_Disable = 0x4000000,
-	SCT_Flags = (SCT_Enable|SCT_Disable),
+	kScissorTest_Enable = 0x2000000,
+	kScissorTest_Disable = 0x4000000,
+	kScissorTest_Flags = kScissorTest_Enable|kScissorTest_Disable,
 
 	// Blend Mode Source
 
-	BMS_One = 0x20,
-	BMS_DstColor = 0x40,
-	BMS_InvDstColor = 0x80,
-	BMS_SrcAlpha = 0x100,
-	BMS_InvSrcAlpha = 0x200,
-	BMS_DstAlpha = 0x400,
-	BMS_InvDstAlpha = 0x800,
-	BMS_SrcAlphaSaturate = 0x1000,
-	BMS_Zero = 0x2000,
-	BMS_Flags = (BMS_One|BMS_DstColor|BMS_InvDstColor|BMS_SrcAlpha|BMS_InvSrcAlpha|
-                 BMS_DstAlpha|BMS_InvDstAlpha|BMS_SrcAlphaSaturate|BMS_Zero),
+	kBlendModeSource_One = 0x20,
+	kBlendModeSource_DstColor = 0x40,
+	kBlendModeSource_InvDstColor = 0x80,
+	kBlendModeSource_SrcAlpha = 0x100,
+	kBlendModeSource_InvSrcAlpha = 0x200,
+	kBlendModeSource_DstAlpha = 0x400,
+	kBlendModeSource_InvDstAlpha = 0x800,
+	kBlendModeSource_SrcAlphaSaturate = 0x1000,
+	kBlendModeSource_Zero = 0x2000,
+	kBlendModeSource_Flags = kBlendModeSource_One|kBlendModeSource_DstColor|kBlendModeSource_InvDstColor|
+		kBlendModeSource_SrcAlpha|kBlendModeSource_InvSrcAlpha|
+		kBlendModeSource_DstAlpha|kBlendModeSource_InvDstAlpha|
+		kBlendModeSource_SrcAlphaSaturate|kBlendModeSource_Zero,
 
 	// Blend Mode Destination
 
-	BMD_Zero = 0x40000,
-	BMD_One = 0x80000,
-	BMD_SrcColor = 0x100000,
-	BMD_InvSrcColor = 0x200000,
-	BMD_SrcAlpha = 0x400000,
-	BMD_InvSrcAlpha = 0x800000,
-	BMD_DstAlpha = 0x1000000,
-	BMD_InvDstAlpha = 0x2000000,
-	BMD_Flags = (BMD_Zero|BMD_One|BMD_SrcColor|BMD_InvSrcColor|BMD_SrcAlpha|BMD_InvSrcAlpha|
-                 BMD_DstAlpha|BMD_InvDstAlpha),
+	kBlendModeDest_Zero = 0x40000,
+	kBlendModeDest_One = 0x80000,
+	kBlendModeDest_SrcColor = 0x100000,
+	kBlendModeDest_InvSrcColor = 0x200000,
+	kBlendModeDest_SrcAlpha = 0x400000,
+	kBlendModeDest_InvSrcAlpha = 0x800000,
+	kBlendModeDest_DstAlpha = 0x1000000,
+	kBlendModeDest_InvDstAlpha = 0x2000000,
+	kBlendModeDest_Flags = kBlendModeDest_Zero|kBlendModeDest_One|kBlendModeDest_SrcColor|kBlendModeDest_InvSrcColor|
+		kBlendModeDest_SrcAlpha|kBlendModeDest_InvSrcAlpha|
+		kBlendModeDest_DstAlpha|kBlendModeDest_InvDstAlpha,
 	
-    BM_Off = (BMS_One|BMD_Zero),
-	BM_Flags = (BMS_Flags|BMD_Flags),
-
-	//
-	// TexUnit States
-	//
-
-	// Texture Environment Mode
-
-	TEM_Modulate = 0x1,
-	TEM_Decal = 0x2,
-	TEM_Blend = 0x4,
-	TEM_Replace = 0x8,
-	TEM_Combine = 0x10,
-	TEM_Flags = (TEM_Modulate|TEM_Decal|TEM_Blend|TEM_Replace|TEM_Combine),
-
-	InvalidMapping = 255
+    kBlendMode_Off = (kBlendModeSource_One|kBlendModeDest_Zero),
+	kBlendMode_Flags = (kBlendModeSource_Flags|kBlendModeDest_Flags)
 };
 
 class GLState
 {
 public:
-
-	enum 
-	{
-#if defined(RAD_OPT_IOS)
-		MaxTextures = 6,
-		MaxAttribArrays = 8,
-#else
-		MaxIOSTextures = 6,
-		MaxIOSAttribArrays = 8,
-		MaxTextures = 6,
-		MaxAttribArrays = 8,
-#endif
-		NumSkinArrays = 0 // weights/indexes
-	};
 
 	GLState();
 
@@ -152,7 +121,6 @@ public:
 	void DisableTextures();
 	void DisableTexture(int num);
 	void SetTexture(int num, const GLTextureRef &tex, bool immediate=false, bool force=false);
-	void SetTextureState(int num, int state, bool immediate=false, bool force=false);
 	
 	void DisableVertexAttribArrays(bool immediate=false, bool force=false);
 	void EnableVertexAttribArray(int num, bool enable, bool immediate=false, bool force=false);
@@ -187,13 +155,13 @@ public:
 	// Shader States
 	// These are not GL states and are not cached for commit.
 
-	void SetMTSource(r::MTSource id, int index, const GLTextureRef &tex);
-	void DisableMTSource(r::MTSource id, int index);
+	void SetMTSource(r::MaterialTextureSource id, int index, const GLTextureRef &tex);
+	void DisableMTSource(r::MaterialTextureSource id, int index);
 	void DisableAllMTSources();
-	GLTextureRef MTSource(r::MTSource id, int index) const;
+	GLTextureRef MaterialTextureSource(r::MaterialTextureSource id, int index) const;
 
 	void SetMGSource(
-		r::MGSource id, 
+		r::MaterialGeometrySource id, 
 		int index,
 		const GLVertexBufferRef &vb,
 		GLint size,
@@ -203,8 +171,8 @@ public:
 		GLuint ofs
 	);
 
-	void MGSource(
-		r::MGSource id,
+	void MaterialGeometrySource(
+		r::MaterialGeometrySource id,
 		int index,
 		GLVertexBufferRef &vb,
 		GLint &size,
@@ -214,32 +182,19 @@ public:
 		GLuint &ofs
 	);
 
-	void DisableMGSource(r::MGSource id, int index);
+	void DisableMGSource(r::MaterialGeometrySource id, int index);
 	void DisableAllMGSources();
 
 	RAD_DECLARE_PROPERTY(GLState, invertCullFace, bool, bool);
 
-	struct MInputMappings
-	{ // material input mappings
-		U8 numTexs;
-		U8 numAttrs;
-		U8 numMTSources[MTS_Max];
-		U8 numMGSources[MGS_Max];
-		U8 textures[MaxTextures][2];
-		U8 attributes[MaxAttribArrays][3];
-	};
-
 private:
 
-	struct T
-	{
+	struct T {
 		T();
-		int s;
 		GLTextureRef tex;
 	};
 
-	struct AA
-	{
+	struct AA {
 		AA();
 		bool e;
 		GLVertexBufferRef vb;
@@ -253,15 +208,12 @@ private:
 		bool operator != (const AA &aa) const;
 	};
 
-	struct MTS
-	{
-		GLTextureRef t[MTS_MaxIndices];
+	struct MTS {
+		boost::array<GLTextureRef, kMaterialTextureSource_MaxIndices> t;
 	};
 
-	struct MGS
-	{
-		struct G
-		{
+	struct MGS {
+		struct G {
 			GLVertexBufferRef vb;
 			GLint size;
 			GLenum type;
@@ -270,36 +222,34 @@ private:
 			GLuint ofs;
 		};
 
-		G g[MGS_MaxIndices];
+		boost::array<G, kMaterialGeometrySource_MaxIndices> g;
 	};
 
-	struct _S
-	{
+	struct _S {
 		_S();
-		T  t[MaxTextures];
-		AA aa[MaxAttribArrays];
+		boost::array<T, kMaxTextures> t;
+		boost::array<AA, kMaxAttribArrays> aa;
 		int b;
 		int s;
 		GLclampf aref;
 		GLhandleARB p;
 		bool invertCullFace;
-		int scissor[4];
+		boost::array<int, 4> scissor;
 	};
 
 public:
 
-	struct S
-	{
+	struct S {
 	private:
 		friend class GLState;
 		S();
-		MTS mts[MTS_Max];
-		MGS mgs[MGS_Max];
+		boost::array<MTS, kNumMaterialTextureSources> mts;
+		boost::array<MGS, kNumMaterialGeometrySources> mgs;
 		_S s;
 		_S d;
 		int t;
-		GLuint bb[2];
-		GLVertexBufferRef vbb[2];
+		boost::array<GLuint, 2> bb;
+		boost::array<GLVertexBufferRef, 2> vbb;
 		GLVertexArrayRef vao;
 		bool vaoBound;
 #if !defined(RAD_OPT_OGLES)
@@ -327,8 +277,7 @@ private:
 	RAD_DECLARE_GET(invertCullFace, bool);
 	RAD_DECLARE_SET(invertCullFace, bool);
 
-	struct X
-	{
+	struct X {
 #if defined(RAD_OPT_IOS)
 		static Ref s;
 #else

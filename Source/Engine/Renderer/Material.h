@@ -1,7 +1,9 @@
-// Material.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file Material.h
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup renderer
+*/
 
 #pragma once
 
@@ -9,7 +11,7 @@
 #include "../Game/WaveAnim.h"
 #include "../Packages/PackagesDef.h"
 #include "../Engine.h"
-#include "Sources.h"
+#include "Common.h"
 #include "Shader.h"
 #include <Runtime/Thread/Locks.h>
 #include <Runtime/Container/ZoneList.h>
@@ -31,83 +33,69 @@ class RADENG_CLASS Material
 public:
 
 	enum Sort {
-		S_Solid,
-		S_Translucent,
-		S_Translucent2,
-		S_Translucent3,
-		S_Translucent4,
-		S_Translucent5,
-		NumSorts
+		kSort_Solid,
+		kSort_Translucent,
+		kSort_Translucent2,
+		kSort_Translucent3,
+		kSort_Translucent4,
+		kSort_Translucent5,
+		kNumSorts
 	};
 
-	enum DepthFunc
-	{
-		DT_None,
-		DT_Less,
-		DT_LEqual,
-		DT_Greater,
-		DT_GEqual
+	enum DepthFunc {
+		kDepthFunc_None,
+		kDepthFunc_Less,
+		kDepthFunc_LEqual,
+		kDepthFunc_Greater,
+		kDepthFunc_GEqual
 	};
 
-	enum AlphaTest
-	{
-		AT_None,
-		AT_Less,
-		AT_LEqual,
-		AT_Greater,
-		AT_GEqual
+	enum BlendMode {
+		kBlendMode_None,
+		kBlendMode_Alpha,
+		kBlendMode_InvAlpha,
+		kBlendMode_Additive,
+		kBlendMode_AddBlend,
+		kBlendMode_Colorize,
+		kBlendMode_InvColorizeD,
+		kBlendMode_InvColorizeS
 	};
 
-	enum BlendMode
-	{
-		BM_None,
-		BM_Alpha,
-		BM_InvAlpha,
-		BM_Additive,
-		BM_AddBlend,
-		BM_Colorize,
-		BM_InvColorizeD,
-		BM_InvColorizeS
-	};
-
-	enum
-	{
+	enum {
 		// TcGen
-		TcGen_Vertex = 0,
-		TcGen_EnvMap,
-		NumTcGens,
+		kTCGen_Vertex = 0,
+		kTCGen_EnvMap,
+		kNumTCGens,
 		// TcMod
-		RAD_FLAG_BIT(TcModFlag_Rotate, 0),
-		RAD_FLAG(TcModFlag_Turb),
-		RAD_FLAG(TcModFlag_Scale),
-		RAD_FLAG(TcModFlag_Shift),
-		RAD_FLAG(TcModFlag_Scroll),
-		TcMod_Rotate = 0,
-		TcMod_Turb,
-		TcMod_Scale,
-		TcMod_Shift,
-		TcMod_Scroll,
-		NumTcMods,
-		NumTcModVals = 6,
-		Color0 = 0,
-		Color1,
-		NumColors,
-		ColorA = 0,
-		ColorB,
-		NumColorIndices
+		RAD_FLAG_BIT(kTCModFlag_Rotate, 0),
+		RAD_FLAG(kTCModFlag_Turb),
+		RAD_FLAG(kTCModFlag_Scale),
+		RAD_FLAG(kTCModFlag_Shift),
+		RAD_FLAG(kTCModFlag_Scroll),
+		kTCMod_Rotate = 0,
+		kTCMod_Turb,
+		kTCMod_Scale,
+		kTCMod_Shift,
+		kTCMod_Scroll,
+		kNumTCMods,
+		kNumTCModVals = 6,
+		kColor0 = 0,
+		kColor1,
+		kNumColors,
+		kColorA = 0,
+		kColorB,
+		kNumColorIndices
 	};
 
-	enum TexCoord
-	{
-		S,
-		T,
-		NumCoords
+	enum TexCoord {
+		kTexCoord_S,
+		kTexCoord_T,
+		kNumTexCoordDimensions
 	};
 
-	enum TimingMode
-	{
-		TM_Absolute,
-		TM_Relative
+	enum TimingMode {
+		kTimingMode_Absolute,
+		kTimingMode_Relative
 	};
 
 	typedef boost::shared_ptr<Material> Ref;
@@ -119,8 +107,6 @@ public:
 	RAD_DECLARE_PROPERTY(Material, sort, Sort, Sort);
 	RAD_DECLARE_PROPERTY(Material, blendMode, BlendMode, BlendMode);
 	RAD_DECLARE_PROPERTY(Material, depthFunc, DepthFunc, DepthFunc);
-	RAD_DECLARE_PROPERTY(Material, alphaTest, AlphaTest, AlphaTest);
-	RAD_DECLARE_PROPERTY(Material, alphaVal, U8, U8);
 	RAD_DECLARE_PROPERTY(Material, doubleSided, bool, bool);
 	RAD_DECLARE_PROPERTY(Material, depthWrite, bool, bool);
 	RAD_DECLARE_PROPERTY(Material, shaderId, int, int);
@@ -138,21 +124,24 @@ public:
 	const WaveAnim &ColorWave(int num) const;
 	WaveAnim &ColorWave(int num);
 
-	int TcGen(MTSource source, int index) const;
-	void SetTcGen(MTSource source, int index, int gen);
+	int TCUVIndex(int index) const;
+	void SetTCUVIndex(int index, int uvIndex);
+
+	int TCGen(int index) const;
+	void SetTCGen(int index, int gen);
 	
-	WaveAnim &Wave(MTSource source, int index, int tcMod, TexCoord tc);
-	const WaveAnim &Wave(MTSource source, int index, int tcMod, TexCoord tc) const;
-	int TcModFlags(MTSource source, int index) const;
+	WaveAnim &Wave(int index, int tcMod, TexCoord tc);
+	const WaveAnim &Wave(int index, int tcMod, TexCoord tc) const;
+	int TCModFlags(int index) const;
 
-	void SetTextureId(MTSource source, int index, int id);
-	int TextureId(MTSource source, int index) const;
+	void SetTextureId(int index, int id);
+	int TextureId(int index) const;
 
-	void SetTextureFPS(MTSource source, int index, float fps);
-	float TextureFPS(MTSource source, int index) const;
+	void SetTextureFPS(int index, float fps);
+	float TextureFPS(int index) const;
 
-	void SetClampTextureFrames(MTSource, int index, bool clamp);
-	bool ClampTextureFrames(MTSource, int index) const;
+	void SetClampTextureFrames(int index, bool clamp);
+	bool ClampTextureFrames(int index) const;
 
 	int LoadShader(
 		const xtime::TimeSlice &time,
@@ -166,14 +155,13 @@ public:
 	void Clear();
 
 	// Returns 6 floats (st sampled + accumulated + ex)
-	void Sample(MTSource source, int index, int tcMod, int &ops, float *out) const;
+	void Sample(int index, int tcMod, int &ops, float *out) const;
 	void SampleColor(int num, float *out) const; // returns 4 floats
 
 	// Apply rendering states
 	// See RB for implementation.
 	void BindStates(int flags=0, int blends=0);
 	void BindTextures(const asset::MaterialLoaderRef &loader);
-
 
 #if defined(RAD_OPT_PC_TOOLS)
 	int CookShader(const char *path, Engine &engine, int pflags);
@@ -184,16 +172,21 @@ public:
 private:
 
 #if defined(RAD_OPT_TOOLS)
-	RAD_DECLARE_GET(shaderName, const char*) { return m_shaderName.c_str; }
-	RAD_DECLARE_SET(shaderName, const char*) { if (value) { m_shaderName = value; } else { m_shaderName.Clear(); } }
+	RAD_DECLARE_GET(shaderName, const char*) { 
+		return m_shaderName.c_str; 
+	}
+
+	RAD_DECLARE_SET(shaderName, const char*) { 
+		if (value) { 
+			m_shaderName = value; 
+		} else { 
+			m_shaderName.Clear(); 
+		} 
+	}
 #endif
 	RAD_DECLARE_GET(shader, Shader::Ref) { return m_shader->shader; }
 	RAD_DECLARE_GET(sort, Sort) { return m_sort; }
 	RAD_DECLARE_SET(sort, Sort) { m_sort = value; }
-	RAD_DECLARE_GET(alphaTest, AlphaTest) { return m_alphaTest; }
-	RAD_DECLARE_SET(alphaTest, AlphaTest) { m_alphaTest = value; }
-	RAD_DECLARE_GET(alphaVal, U8) { return m_alphaVal; }
-	RAD_DECLARE_SET(alphaVal, U8) { m_alphaVal = value; }
 	RAD_DECLARE_GET(depthFunc, DepthFunc) { return m_depthFunc; }
 	RAD_DECLARE_SET(depthFunc, DepthFunc) { m_depthFunc = value; }
 	RAD_DECLARE_GET(animated, bool) { return m_animated; }
@@ -215,8 +208,7 @@ private:
 	// the cost of material changes (i.e. I can sort materials by shader and
 	// not incur a GLSL/HLSL program change for every material).
 
-	struct ShaderInstance
-	{
+	struct ShaderInstance {
 		typedef boost::shared_ptr<ShaderInstance> Ref;
 		typedef boost::weak_ptr<ShaderInstance> WRef;
 		typedef zone_list<Ref, ZEngineT>::type RefList;
@@ -234,7 +226,6 @@ private:
 			Engine &engine,
 			const char *shaderName,
 			stream::InputStream &is,
-			bool skinned,
 			const Material &material
 		);
 
@@ -243,14 +234,18 @@ private:
 		// Implemented by RB
 		static Shader::Ref Load(
 			Engine &engine, 
-			bool skinned,
 			const Material &material
 		);
 
 		bool CanShare(const Material &m) const;
-		void CopyWaveTypes(const Material &m);
+		void CopySharedData(const Material &m);
 
-		WaveAnim::Type types[MTS_Max][MTS_MaxIndices][NumTcMods];
+		boost::array<
+			boost::array<WaveAnim::Type, kNumTCMods>,
+		kMaterialTextureSource_MaxIndices> types;
+
+		boost::array<int, kMaxTextures> uvIndices;
+
 		String shaderName;
 		WRefList::iterator it;
 		int pflags;
@@ -272,16 +267,45 @@ private:
 #endif
 	};
 
-	WaveAnim m_waves[MTS_Max][MTS_MaxIndices][NumTcMods][NumCoords];
-	WaveAnim m_colorWaves[NumColors];
-	int m_tcGen[MTS_Max][MTS_MaxIndices];
-	int m_ids[MTS_Max][MTS_MaxIndices];
-	int m_waveOps[MTS_Max][MTS_MaxIndices][NumTcMods];
-	float m_waveSamples[MTS_Max][MTS_MaxIndices][NumTcMods][NumCoords][3];
-	float m_colors[NumColors][NumColorIndices][4];
-	float m_sampledColor[NumColors][4];
-	float m_textureFPS[MTS_Max][MTS_MaxIndices];
-	bool m_textureClamp[MTS_Max][MTS_MaxIndices];
+	boost::array<
+		boost::array<
+			boost::array<WaveAnim, kNumTexCoordDimensions>,
+		kNumTCMods>,
+	kMaterialTextureSource_MaxIndices> m_waves;
+
+	boost::array<WaveAnim, kNumColors> m_colorWaves;
+	
+	boost::array<
+		boost::array<int, kNumTCMods>, 
+	kMaterialTextureSource_MaxIndices> m_waveOps;
+
+	boost::array<
+		boost::array<
+			boost::array<
+				boost::array<float, 3>,
+			kNumTexCoordDimensions>,
+		kNumTCMods>,
+	kMaterialTextureSource_MaxIndices> m_waveSamples;
+
+	boost::array<
+		boost::array<
+			boost::array<float, 4>,
+		kNumColorIndices>,
+	kNumColors> m_colors;
+	
+	boost::array<
+		boost::array<float, 4>,
+	kNumColors> m_sampledColor;
+
+	boost::array<float, kMaterialTextureSource_MaxIndices> m_textureFPS;
+	boost::array<U8, kMaterialTextureSource_MaxIndices> m_textureClamp;
+	typedef boost::array<int, kMaterialTextureSource_MaxIndices> MTSInts;
+	typedef boost::array<int, kMaterialTextureSource_MaxIndices> MTSU8;
+
+	MTSInts m_ids;
+	MTSU8 m_tcGen;
+	MTSU8 m_tcUVIndex;
+
 	float m_time;
 	TimingMode m_timingMode;
 	ShaderInstance::Ref m_shader;
@@ -291,7 +315,6 @@ private:
 	int m_shaderId;
 	Sort m_sort;
 	DepthFunc m_depthFunc;
-	AlphaTest m_alphaTest;
 	BlendMode m_blendMode;
 	bool m_animated;
 	bool m_doubleSided;

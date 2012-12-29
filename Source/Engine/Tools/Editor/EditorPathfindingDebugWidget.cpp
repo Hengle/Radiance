@@ -92,7 +92,7 @@ void PathfindingDebugWidget::renderGL() {
 		vph/vpw
 	);
 
-	gls.Set(DT_Disable, BM_Off);
+	gls.Set(kDepthTest_Disable, kBlendMode_Off);
 	gls.Commit();
 
 	DrawFloors();
