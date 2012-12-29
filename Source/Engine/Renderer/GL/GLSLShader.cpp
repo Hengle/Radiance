@@ -26,6 +26,8 @@
 #undef min
 #undef max
 
+#include <Runtime/PushSystemMacros.h>
+
 namespace r {
 
 #if defined(RAD_OPT_TOOLS)
@@ -74,7 +76,7 @@ GLSLShader::Ref GLSLShader::Load(
 }
 
 bool GLSLShader::Compile(
-	Engine &e,
+	Engine &engine,
 	const tools::shader_utils::Shader::Ref &shader,
 	const Material &material
 ) {
@@ -82,7 +84,9 @@ bool GLSLShader::Compile(
 
 	for (int i = 0; i < Shader::kNumPasses; ++i) {
 		if (shader->Exists((Shader::Pass)i)) {
-
+			if (!CompilePass(engine, (Shader::Pass)i, shader, material))
+				return false;
+			++numPasses;
 		}
 	}
 
@@ -136,7 +140,8 @@ bool GLSLShader::CompilePass(
 			pass << ", VertexShader): " << std::endl << shaderSource << std::endl;
 #if !defined(RAD_OPT_IOS) && defined(LOG_SAVE)
 		{
-			String path(CStr("@r:/Source/Shaders/"));
+			engine.sys->files->CreateDirectory("@r:/Source/Shaders/Logs");
+			String path(CStr("@r:/Source/Shaders/Logs/"));
 			path += shader->name;
 			path += ".vert.glsl";
 			tools::shader_utils::SaveText(engine, path.c_str, shaderSource.c_str);
@@ -169,7 +174,7 @@ bool GLSLShader::CompilePass(
 	{
 		std::stringstream ss;
 
-		GLSLShaderLink builder(engine, material, pass, shader, false);
+		GLSLShaderLink builder(engine, material, pass, shader, true);
 		if (!builder.Assemble(
 			engine, 
 			material,
@@ -192,7 +197,8 @@ bool GLSLShader::CompilePass(
 			pass << ", PixelShader): " << std::endl << shaderSource << std::endl;
 #if !defined(RAD_OPT_IOS) && defined(LOG_SAVE)
 		{
-			String path(CStr("Shaders/"));
+			engine.sys->files->CreateDirectory("@r:/Source/Shaders/Logs");
+			String path(CStr("@r:/Source/Shaders/Logs/"));
 			path += shader->name;
 			path += ".frag.glsl";
 			tools::shader_utils::SaveText(engine, path.c_str, shaderSource.c_str);
@@ -354,10 +360,13 @@ bool GLSLShader::CompileShaderSource(
 
 		for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
 			os << p.m.tcMods[i];
+		}
+
+		for (int i = 0; i < kNumMaterialTextureSources; ++i) {
 			os << p.m.numMTSources[i];
 		}
 
-		for (int i = 0; i < kMaterialGeometrySource_MaxIndices; ++i) {
+		for (int i = 0; i < kNumMaterialGeometrySources; ++i) {
 			os << p.m.numMGSources[i];
 		}
 
@@ -444,10 +453,13 @@ bool GLSLShader::LoadPass(
 
 	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
 		is >> p.m.tcMods[i];
+	}
+
+	for (int i = 0; i < kNumMaterialTextureSources; ++i) {
 		is >> p.m.numMTSources[i];
 	}
 
-	for (int i = 0; i < kMaterialGeometrySource_MaxIndices; ++i) {
+	for (int i = 0; i < kNumMaterialGeometrySources; ++i) {
 		is >> p.m.numMGSources[i];
 	}
 

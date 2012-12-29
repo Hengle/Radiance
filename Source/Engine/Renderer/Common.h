@@ -44,8 +44,8 @@ enum MaterialGeometrySource {
 
 struct MaterialInputMappings {
 	boost::array<U8, kMaterialTextureSource_MaxIndices> tcMods;
-	boost::array<U8, kMaterialTextureSource_MaxIndices> numMTSources;
-	boost::array<U8, kMaterialGeometrySource_MaxIndices> numMGSources;
+	boost::array<U8, kNumMaterialTextureSources> numMTSources;
+	boost::array<U8, kNumMaterialGeometrySources> numMGSources;
 	boost::array<boost::array<U8, 2>, kMaxTextures> textures;
 	boost::array<boost::array<U8, 2>, kMaxAttribArrays> attributes;
 };

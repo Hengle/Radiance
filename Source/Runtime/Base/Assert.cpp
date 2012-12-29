@@ -16,8 +16,8 @@ RADRT_API void RADRT_CALL __rad_assert(
 	const __RAD_ASSERT_CHAR *message,
 	const __RAD_ASSERT_CHAR *file,
 	const __RAD_ASSERT_CHAR *function,
-	unsigned int line)
-{
+	unsigned int line
+) {
 #if defined(RAD_OPT_WIN)
 	RAD_NOT_USED(function);
 
@@ -89,4 +89,18 @@ RADRT_API void RADRT_CALL DebugString(const char* message, ...)
 	fflush(stderr);
 #endif
 }
+#endif
+
+#if defined(BOOST_ENABLE_ASSERT_HANDLER)
+namespace boost {
+	void assertion_failed_msg(char const * expr, char const * msg, char const * function, char const * file, long line) {
+		char sz[1024];
+		sprintf(sz, "%s, %s", expr, msg);
+		__rad_assert(sz, file, function, (int)line);
+	}
+
+	void assertion_failed(char const * expr, char const * function, char const * file, long line) {
+		__rad_assert(expr, file, function, (int)line);
+	}
+} // boost
 #endif

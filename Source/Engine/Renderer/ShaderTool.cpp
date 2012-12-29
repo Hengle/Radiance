@@ -75,7 +75,7 @@ Shader::Ref Shader::Load(Engine &e, const char *name) {
 
 	file::MMapping::Ref mm = e.sys->files->MapFile(path.c_str, ZTools);
 	if (!mm) {
-		COut(C_ErrMsgBox) << "cg::Shader::Load(): failed to load '" << name << "'" << std::endl;
+		COut(C_ErrMsgBox) << "tools::shader_utils::Shader::Load(): failed to load '" << name << "'" << std::endl;
 		return Ref();
 	}
 
@@ -88,12 +88,12 @@ Shader::Ref Shader::Load(Engine &e, const char *name) {
 		mm->size,
 		name
 	) != 0) {
-		COut(C_ErrMsgBox) << "cg::Shader::Load(): " << lua_tostring(L->L, -1) << std::endl;
+		COut(C_ErrMsgBox) << "tools::shader_utils::Shader::Load(): " << lua_tostring(L->L, -1) << std::endl;
 		return Shader::Ref();
 	}
 
 	if (lua_pcall(L->L, 0, 0, 0)) {
-		COut(C_ErrMsgBox) << "cg::Shader::Load(): " << lua_tostring(L->L, -1) << std::endl;
+		COut(C_ErrMsgBox) << "tools::shader_utils::Shader::Load(): " << lua_tostring(L->L, -1) << std::endl;
 		return Shader::Ref();
 	}
 
@@ -208,7 +208,7 @@ int Shader::lua_Compile(lua_State *L) {
 
 	self->ParseShaderPass(L, "Preview", r::Shader::kPass_Preview, map);
 	if (!self->Exists(r::Shader::kPass_Preview))
-		self->m_nodes[r::Shader::kPass_Preview] = self->m_nodes[r::Shader::kPass_Default];
+		self->ParseShaderPass(L, "Default", r::Shader::kPass_Preview, map);
 	self->BuildInputMappings(L, r::Shader::kPass_Preview);
 
 	return 0;
@@ -534,11 +534,11 @@ Shader::Node::Ref Shader::LoadNode(Engine &e, lua_State *L, const char *type) {
 
 	String path(CStr("@r:/Source/Shaders/Nodes/"));
 	path += type;
-	path += ".n";
+	path += ".node";
 
 	file::MMapping::Ref mm = e.sys->files->MapFile(path.c_str, ZTools);
 	if (!mm) {
-		luaL_error(L, "cg::Shader::LoadNode(): Error loading %s, (Function %s, File %s, Line %d).",
+		luaL_error(L, "tools::shader_utils::Shader::LoadNode(): Error loading %s, (Function %s, File %s, Line %d).",
 			type,
 			__FUNCTION__,
 			__FILE__,
@@ -556,7 +556,7 @@ Shader::Node::Ref Shader::LoadNode(Engine &e, lua_State *L, const char *type) {
 		mm->size,
 		type
 	) != 0) {
-		luaL_error(L, "cg::Shader::LoadNode(): Error loading %s (%s), (Function %s, File %s, Line %d).",
+		luaL_error(L, "tools::shader_utils::Shader::LoadNode(): Error loading %s (%s), (Function %s, File %s, Line %d).",
 			type,
 			lua_tostring(S->L, -1),
 			__FUNCTION__,
@@ -566,7 +566,7 @@ Shader::Node::Ref Shader::LoadNode(Engine &e, lua_State *L, const char *type) {
 	}
 
 	if (lua_pcall(S->L, 0, 0, 0)) {
-		luaL_error(L, "cg::Shader::LoadNode(): Error loading %s (%s), (Function %s, File %s, Line %d).",
+		luaL_error(L, "tools::shader_utils::Shader::LoadNode(): Error loading %s (%s), (Function %s, File %s, Line %d).",
 			type,
 			lua_tostring(S->L, -1),
 			__FUNCTION__,
@@ -970,11 +970,6 @@ void Shader::BuildInputMappings(lua_State *L, r::Shader::Pass pass) {
 	r::MaterialInputMappings &mapping = m_mapping[pass];
 	memset(&mapping, 0, sizeof(mapping));
 
-	// Vertex shader code is always generated to xform vertex by mvp.
-	// NOTE: other vertex fields (normal, tangent, bitangent, lightdir) are optional and
-	// not produced unless read by shader.
-	usage.s[kMaterialSource_Vertex].insert(0);
-
 	BuildTextureSourceMapping(
 		L, 
 		numTexs, 
@@ -986,6 +981,9 @@ void Shader::BuildInputMappings(lua_State *L, r::Shader::Pass pass) {
 	for (;numTexs < r::kMaxTextures; ++numTexs) {
 		mapping.textures[numTexs][0] = mapping.textures[numTexs][1] = r::kInvalidMapping;
 	}
+
+	// vertex shader always needs vertices
+	usage.s[kMaterialSource_Vertex].insert(0);
 
 	// The only data contained in geometry souces are:
 	// Vertex, Normal, Tangent, TexCoords
@@ -1033,7 +1031,7 @@ void Shader::BuildInputMappings(lua_State *L, r::Shader::Pass pass) {
 		mapping.tcMods[i] = r::kInvalidMapping;
 
 	for (;numAttrs < r::kMaxAttribArrays; ++numAttrs) {
-		mapping.attributes[numAttrs][0] = mapping.attributes[numAttrs][1] = mapping.attributes[numAttrs][2] = r::kInvalidMapping;
+		mapping.attributes[numAttrs][0] = mapping.attributes[numAttrs][1] = r::kInvalidMapping;
 	}
 }
 
@@ -1042,7 +1040,7 @@ bool Shader::BuildInputMappings(
 	r::Shader::Pass pass,
 	r::MaterialInputMappings &mapping
 ) const {
-	r::MaterialInputMappings m = m_mapping[pass];
+	mapping = m_mapping[pass];
 	TexCoordMapping tcMapping = BuildTexCoordMapping(material, pass);
 
 	if (tcMapping.size() >= r::kMaterialTextureSource_MaxIndices) {
@@ -1054,40 +1052,40 @@ bool Shader::BuildInputMappings(
 	for (TexCoordMapping::const_iterator it = tcMapping.begin(); it != tcMapping.end(); ++it) {
 		int i;
 		for (i = 0; i < ofs; ++i) {
-			if (m.tcMods[i] == (*it).second)
+			if (mapping.tcMods[i] == (*it).second)
 				break;
 		}
 
 		if (i == ofs) {
-			m.tcMods[ofs++] = (*it).second;
+			mapping.tcMods[ofs++] = (*it).second;
 		}
 	}
 
 	for (; ofs < r::kMaxTextures; ++ofs)
-		m.tcMods[ofs] = r::kInvalidMapping;
+		mapping.tcMods[ofs] = r::kInvalidMapping;
 
 	// pack texcoord inputs in canonical order
 
 	int numAttribs;
 
 	for (numAttribs = 0; numAttribs < r::kMaxAttribArrays; ++numAttribs) {
-		if (m.attributes[numAttribs][0] == r::kInvalidMapping)
+		if (mapping.attributes[numAttribs][0] == r::kInvalidMapping)
 			break;
 	}
 
 	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
 		for (int k = 0; k < r::kMaterialTextureSource_MaxIndices; ++k) {
-			if (m.tcMods[k] == r::kInvalidMapping)
+			if (mapping.tcMods[k] == r::kInvalidMapping)
 				break;
-			int uvIndex = material.TCUVIndex((int)m.tcMods[k]);
+			int uvIndex = material.TCUVIndex((int)mapping.tcMods[k]);
 			if (uvIndex == i) { // UV channel is referenced in material.
 				if (numAttribs >= r::kMaxAttribArrays) {
 					COut(C_Error) << "ERROR: tcInput register overflow!" << std::endl;
 					return false;
 				}
-				m.attributes[numAttribs][0] = r::kMaterialGeometrySource_TexCoords;
-				m.attributes[numAttribs][1] = (U8)uvIndex;
-				++m.numMGSources[r::kMaterialGeometrySource_TexCoords];
+				mapping.attributes[numAttribs][0] = r::kMaterialGeometrySource_TexCoords;
+				mapping.attributes[numAttribs][1] = (U8)uvIndex;
+				++mapping.numMGSources[r::kMaterialGeometrySource_TexCoords];
 				++numAttribs;
 				break;
 			}
@@ -1205,7 +1203,7 @@ bool Shader::EmitFunctions(Engine &engine, std::ostream &out) const {
 
 		String path(CStr("@r:/Source/Shaders/Nodes/"));
 		path += it->first;
-		path += ".f";
+		path += ".code";
 		out << "// " << path << "\r\n";
 		if (!Inject(engine, path.c_str, out)) {
 			return false;
@@ -1483,13 +1481,15 @@ int Shader::TextureUsageIndex(r::Shader::Pass pass, MaterialSource source, int i
 	RAD_ASSERT(source >= kMaterialSource_Texture);
 	RAD_ASSERT(source <= kMaterialSource_Framebuffer);
 
-	int ofs = 0;
+	int ofs = -1;
 	const IntSet &usage = m_usage[pass].s[source];
 	for (IntSet::const_iterator it = usage.begin(); it != usage.end(); ++it) {
+		++ofs;
 		if (*it == index)
 			break;
-		++ofs;
 	}
+
+	RAD_VERIFY(ofs != -1);
 
 	switch (source)
 	{
@@ -1509,13 +1509,15 @@ int Shader::AttribUsageIndex(r::Shader::Pass pass, MaterialSource source, int in
 	RAD_ASSERT(source >= kMaterialSource_Vertex);
 	RAD_ASSERT(source <= kMaterialSource_TexCoord);
 
-	int ofs = 0;
+	int ofs = -1;
 	const IntSet &usage = m_usage[pass].s[source];
 	for (IntSet::const_iterator it = usage.begin(); it != usage.end(); ++it) {
+		++ofs;
 		if (*it == index)
 			break;
-		++ofs;
 	}
+
+	RAD_VERIFY(ofs != -1);
 
 	return ofs;
 }

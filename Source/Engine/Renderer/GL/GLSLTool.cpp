@@ -13,6 +13,7 @@
 #include <Runtime/StringBase.h>
 #include "../../../../../Extern/aras-p-glsl-optimizer-f2217b0/src/glsl/glsl_optimizer.h"
 #include <sstream>
+#include <Runtime/PushSystemMacros.h>
 
 namespace tools {
 namespace shader_utils {
@@ -39,6 +40,9 @@ bool GLSLTool::Assemble(
 		ss << "#define FRAGMENT" << "\r\n";
 		ss << "#define MATERIAL" << "\r\n";
 	}
+
+//	if (shader->MaterialSourceUsage(pass, Shader::kMaterialSource_Vertex) > 0)
+//		ss << "#define SHADER_POSITION\r\n";
 
 	int numTextures = 0;
 	for (int i = 0; i < r::kMaxTextures; ++i) {
@@ -184,11 +188,11 @@ bool GLSLTool::Assemble(
 	if (GLES)
 		ss << "#define _GLES\r\n";
 	
-	if (!Inject(engine, "Shaders/Nodes/GLSL.cg", ss))
+	if (!Inject(engine, "@r:/Source/Shaders/Nodes/GLSL.c", ss))
 		return false;
-	if (!Inject(engine, "Shaders/Nodes/Common.cg", ss))
+	if (!Inject(engine, "@r:/Source/Shaders/Nodes/Common.c", ss))
 		return false;
-	if (!Inject(engine, "Shaders/Nodes/Shader.cg", ss))
+	if (!Inject(engine, "@r:/Source/Shaders/Nodes/Shader.c", ss))
 		return false;
 
 	std::stringstream ex;
@@ -198,22 +202,26 @@ bool GLSLTool::Assemble(
 	if (flags & kAssemble_Optimize) {
 		String in(ex.str());
 
-		glslopt_shader *shader = glslopt_optimize(
+		glslopt_shader *opt_shader = glslopt_optimize(
 			GLES ? r::gl.glslopt_es : r::gl.glslopt,
 			vertexShader ? kGlslOptShaderVertex : kGlslOptShaderFragment,
 			in.c_str, 
 			0
 		);
 
-		if (!glslopt_get_status(shader)) {
-			COut(C_Error) << "Error optimizing shader: " << std::endl << in << std::endl << glslopt_get_log(shader) << std::endl;
-			std::stringstream ss;
-			ss << "Error optimizing shader: " << std::endl << in << std::endl << glslopt_get_log(shader) << std::endl;
-			for (int i = 0; ; ++i) {
-				String path;
-				path.PrintfASCII("@r:/Source/");
+		if (!glslopt_get_status(opt_shader)) {
+			COut(C_Error) << "Error optimizing shader: " << std::endl << in << std::endl << glslopt_get_log(opt_shader) << std::endl;
+			engine.sys->files->CreateDirectory("@r:/Source/Shaders/Logs");
+
+			String path;
+			for (int i = 0;; ++i) {
+				path.PrintfASCII("@r:/Source/Shaders/Logs/%s_error_%d.log", shader->name.get(), i);
+				if (!engine.sys->files->FileExists(path.c_str)) {
+					SaveText(engine, path.c_str, in.c_str);
+					break;
+				}
 			}
-			glslopt_shader_delete(shader);
+			glslopt_shader_delete(opt_shader);
 			return false;
 		}
 
@@ -224,8 +232,8 @@ bool GLSLTool::Assemble(
 			else
 				z << "precision lowp float;\r\n";
 		}
-		z << glslopt_get_output(shader);
-		glslopt_shader_delete(shader);
+		z << glslopt_get_output(opt_shader);
+		glslopt_shader_delete(opt_shader);
 
 		Copy(z, out);
 	} else {
