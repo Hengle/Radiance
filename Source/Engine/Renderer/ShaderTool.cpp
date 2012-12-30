@@ -982,17 +982,18 @@ void Shader::BuildInputMappings(lua_State *L, r::Shader::Pass pass) {
 		mapping.textures[numTexs][0] = mapping.textures[numTexs][1] = r::kInvalidMapping;
 	}
 
-	// vertex shader always needs vertices
-	usage.s[kMaterialSource_Vertex].insert(0);
+	// do this so we don't pollute MaterialSourceUsage()
+	IntSet vertexUsage = usage.s[kMaterialSource_Vertex];
 
-	// The only data contained in geometry souces are:
-	// Vertex, Normal, Tangent, TexCoords
-
+	// force mapping to contain vertex stream 0, otherwise no vertex
+	// data will be passed to shader.
+	vertexUsage.insert(0);
+	
 	BuildAttributeSourceMapping(
 		L, 
 		numAttrs, 
 		r::kMaterialGeometrySource_Vertices, 
-		usage.s[kMaterialSource_Vertex], 
+		vertexUsage, 
 		mapping
 	);
 
