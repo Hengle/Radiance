@@ -391,7 +391,7 @@ int MaterialParser::Load(
 			return SR_MetaError;
 		}
 
-		path.Printf("Texture%d.Source.uvChannel", i+1);
+		path.Printf("Texture%d.Source.UVChannel", i+1);
 		s = asset->entry->KeyValue<String>(path.c_str, P_TARGET_FLAGS(flags));
 		if (!s)
 			return SR_MetaError;

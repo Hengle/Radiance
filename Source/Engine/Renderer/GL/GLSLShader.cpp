@@ -140,8 +140,8 @@ bool GLSLShader::CompilePass(
 			pass << ", VertexShader): " << std::endl << shaderSource << std::endl;
 #if !defined(RAD_OPT_IOS) && defined(LOG_SAVE)
 		{
-			engine.sys->files->CreateDirectory("@r:/Source/Shaders/Logs");
-			String path(CStr("@r:/Source/Shaders/Logs/"));
+			engine.sys->files->CreateDirectory("@r:/Temp/Shaders/Logs");
+			String path(CStr("@r:/Temp/Shaders/Logs/"));
 			path += shader->name;
 			path += ".vert.glsl";
 			tools::shader_utils::SaveText(engine, path.c_str, shaderSource.c_str);
@@ -197,8 +197,8 @@ bool GLSLShader::CompilePass(
 			pass << ", PixelShader): " << std::endl << shaderSource << std::endl;
 #if !defined(RAD_OPT_IOS) && defined(LOG_SAVE)
 		{
-			engine.sys->files->CreateDirectory("@r:/Source/Shaders/Logs");
-			String path(CStr("@r:/Source/Shaders/Logs/"));
+			engine.sys->files->CreateDirectory("@r:/Temp/Shaders/Logs");
+			String path(CStr("@r:/Temp/Shaders/Logs/"));
 			path += shader->name;
 			path += ".frag.glsl";
 			tools::shader_utils::SaveText(engine, path.c_str, shaderSource.c_str);

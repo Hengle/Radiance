@@ -216,11 +216,11 @@ bool GLSLTool::Assemble(
 
 		if (!glslopt_get_status(opt_shader)) {
 			COut(C_Error) << "Error optimizing shader: " << std::endl << in << std::endl << glslopt_get_log(opt_shader) << std::endl;
-			engine.sys->files->CreateDirectory("@r:/Source/Shaders/Logs");
+			engine.sys->files->CreateDirectory("@r:/Temp/Shaders/Logs");
 
 			String path;
 			for (int i = 0;; ++i) {
-				path.PrintfASCII("@r:/Source/Shaders/Logs/%s_error_%d.log", shader->name.get(), i);
+				path.PrintfASCII("@r:/Temp/Shaders/Logs/%s_error_%d.log", shader->name.get(), i);
 				if (!engine.sys->files->FileExists(path.c_str)) {
 					SaveText(engine, path.c_str, in.c_str);
 					break;
