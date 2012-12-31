@@ -123,6 +123,9 @@ private:
 		Uniforms u;
 		int outputs;
 		MaterialInputMappings m;
+#if defined(RAD_OPT_TOOLS)
+		tools::shader_utils::Shader::TexCoordMapping tcMapping;
+#endif
 	};
 
 	bool LoadPass(

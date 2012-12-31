@@ -23,6 +23,7 @@ bool GLSLTool::Assemble(
 	const r::Material &material,
 	const Shader::Ref &shader,
 	const r::MaterialInputMappings &mapping,
+	const Shader::TexCoordMapping &tcMapping,
 	r::Shader::Pass pass,
 	AssembleFlags flags,
 	std::ostream &out
@@ -85,18 +86,15 @@ bool GLSLTool::Assemble(
 
 		ss << "#define TEXCOORDS " << numTCMods << "\r\n";
 
+		RAD_VERIFY(tcUsage.size() == tcMapping.size());
+
 		int ofs = 0;
 		for (Shader::IntSet::const_iterator it = tcUsage.begin(); it != tcUsage.end(); ++it, ++ofs) {
-			int tcIndex;
 			if (vertexShader) {
-				tcIndex = material.TCUVIndex(*it);
+				ss << "#define TEXCOORD" << ofs << " tc" << material.TCUVIndex(*it) << "\r\n";
 			} else {
-				tcIndex = (int)mapping.tcMods[ofs];
-				if (tcIndex == r::kInvalidMapping)
-					tcIndex = material.TCUVIndex(*it);
+				ss << "#define TEXCOORD" << ofs << " tc" << tcMapping[ofs].first << "\r\n";
 			}
-
-			ss << "#define TEXCOORD" << ofs << " tc" << tcIndex << "\r\n";
 		}
 
 		if (vertexShader) {

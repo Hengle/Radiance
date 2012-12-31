@@ -39,6 +39,7 @@ public:
 		const r::Material &material,
 		const Shader::Ref &shader,
 		const r::MaterialInputMappings &mapping,
+		const Shader::TexCoordMapping &tcMapping,
 		r::Shader::Pass pass,
 		AssembleFlags flags,
 		std::ostream &out

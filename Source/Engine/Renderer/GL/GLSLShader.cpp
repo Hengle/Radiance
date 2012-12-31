@@ -101,7 +101,7 @@ bool GLSLShader::CompilePass(
 ) {
 	Pass &p = m_passes[pass];
 
-	if (!shader->BuildInputMappings(material, pass, p.m))
+	if (!shader->BuildInputMappings(material, pass, p.m, p.tcMapping))
 		return false;
 	p.outputs = shader->PassOutputs(pass);
 
@@ -123,6 +123,7 @@ bool GLSLShader::CompilePass(
 			material,
 			shader,
 			p.m,
+			p.tcMapping,
 			pass,
 			tools::shader_utils::GLSLTool::kAssemble_VertexShader|
 				tools::shader_utils::GLSLTool::kAssemble_Optimize|kGLESFlag,
@@ -180,6 +181,7 @@ bool GLSLShader::CompilePass(
 			material,
 			shader,
 			p.m,
+			p.tcMapping,
 			pass,
 			tools::shader_utils::GLSLTool::kAssemble_PixelShader|
 				tools::shader_utils::GLSLTool::kAssemble_Optimize|kGLESFlag,
@@ -320,6 +322,7 @@ bool GLSLShader::CompileShaderSource(
 				material,
 				shader,
 				p.m,
+				p.tcMapping,
 				(Shader::Pass)i,
 				tools::shader_utils::GLSLTool::kAssemble_VertexShader|
 					tools::shader_utils::GLSLTool::kAssemble_Optimize|kGLESFlag,
@@ -342,6 +345,7 @@ bool GLSLShader::CompileShaderSource(
 				material,
 				shader,
 				p.m,
+				p.tcMapping,
 				(Shader::Pass)i,
 				tools::shader_utils::GLSLTool::kAssemble_PixelShader|
 					tools::shader_utils::GLSLTool::kAssemble_Optimize|kGLESFlag,
@@ -633,22 +637,30 @@ bool GLSLShader::MapInputs(Pass &p, const Material &material) {
 	for (int i = 0; i < kMaxTextures; ++i) {
 		
 		p.u.tcMods[i][Material::kNumTCMods] = -1;
+		int tcModFlags = material.TCModFlags(i);
 
-		if (p.m.tcMods[i] == kInvalidMapping) {
-			for (int k = i; k < kMaxTextures; ++k) {
-				for (int j = 0; j < Material::kNumTCMods; ++j) {
-					p.u.tcMods[k][j] = -1;
+		int tcIndex = -1;
+		if (tcModFlags != 0) {  // find matching tc index
+			for (int k = 0; k < kMaxTextures; ++k) {
+				if (p.m.tcMods[k] == kInvalidMapping)
+					break;
+				if (p.m.tcMods[k] == i) {
+					tcIndex = k;
+					break;
 				}
 			}
-			break;
 		}
 
-		int tcIndex = (int)p.m.tcMods[i];
-		int tcModFlags = material.TCModFlags(tcIndex);
+		if (tcIndex == -1) {
+			for (int k = 0; k < Material::kNumTCMods; ++k) {
+				p.u.tcMods[i][k] = -1;
+			}
+			continue;
+		}
 
 		for (int k = 0; k < Material::kNumTCMods; ++k) {
 			if (!(tcModFlags&(1<<k))) { 
-				// TcMod is unused by shader.
+				// TCMod is unused by shader.
 				p.u.tcMods[i][k] = -1;
 				continue;
 			}
@@ -734,18 +746,18 @@ void GLSLShader::Begin(Shader::Pass _p, const Material &material) {
 
 		// material contains animated tcMods.
 		for (int k = 0; k < Material::kNumTCMods; ++k) {
-			if (p.u.tcMods[i][k] == -1)
+			if (p.u.tcMods[tcIndex][k] == -1)
 				continue; // unreferenced by shader
 
 			float st[Material::kNumTCModVals];
-			float *src = &p.u.tcModVals[i][k][0];
+			float *src = &p.u.tcModVals[tcIndex][k][0];
 			int ops;
 
 			material.Sample(tcIndex, k, ops, st);
 
 			if (src[0] != st[0] || src[1] != st[1] || src[2] != st[2] || src[3] != st[3]) {
-				RAD_ASSERT(p.u.tcMods[i][k] != -1);
-				gl.Uniform4fARB(p.u.tcMods[i][k], st[0], st[1], st[2], st[3]);
+				RAD_ASSERT(p.u.tcMods[tcIndex][k] != -1);
+				gl.Uniform4fARB(p.u.tcMods[tcIndex][k], st[0], st[1], st[2], st[3]);
 				src[0] = st[0];
 				src[1] = st[1];
 				src[2] = st[2];
@@ -754,8 +766,8 @@ void GLSLShader::Begin(Shader::Pass _p, const Material &material) {
 
 			// pack in extra turb arguments
 			if (k == Material::kTCMod_Turb && (src[4] != st[4] || src[5] != st[5])) {
-				RAD_ASSERT(p.u.tcMods[i][Material::kNumTCMods] != -1);
-				gl.Uniform4fARB(p.u.tcMods[i][Material::kNumTCMods], st[4], st[5], 0.f, 0.f);
+				RAD_ASSERT(p.u.tcMods[tcIndex][Material::kNumTCMods] != -1);
+				gl.Uniform4fARB(p.u.tcMods[tcIndex][Material::kNumTCMods], st[4], st[5], 0.f, 0.f);
 				src[4] = st[4];
 				src[5] = st[5];
 			}

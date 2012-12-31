@@ -1039,10 +1039,11 @@ void Shader::BuildInputMappings(lua_State *L, r::Shader::Pass pass) {
 bool Shader::BuildInputMappings(
 	const r::Material &material, 
 	r::Shader::Pass pass,
-	r::MaterialInputMappings &mapping
+	r::MaterialInputMappings &mapping,
+	TexCoordMapping &tcMapping
 ) const {
 	mapping = m_mapping[pass];
-	TexCoordMapping tcMapping = BuildTexCoordMapping(material, pass);
+	tcMapping = BuildTexCoordMapping(material, pass);
 
 	if (tcMapping.size() >= r::kMaterialTextureSource_MaxIndices) {
 		COut(C_Error) << "ERROR: tcMapping register overflow!" << std::endl;

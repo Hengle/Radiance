@@ -48,7 +48,8 @@ public:
 	typedef boost::shared_ptr<Shader> Ref;
 
 	typedef zone_set<int, ZToolsT>::type IntSet;
-	
+	typedef zone_vector<std::pair<int, int>, ZToolsT>::type TexCoordMapping;
+
 	//////////////////////////////////////////////////////////////////////////////////////////
 
 	class Input;
@@ -270,7 +271,8 @@ public:
 	bool BuildInputMappings(
 		const r::Material &material, 
 		r::Shader::Pass pass,
-		r::MaterialInputMappings &mapping
+		r::MaterialInputMappings &mapping,
+		TexCoordMapping &tcMapping
 	) const;
 
 	//! Returns attribute usage map.
@@ -282,7 +284,6 @@ private:
 	typedef zone_map<String, Node::Ref, ZToolsT>::type NodeMap;
 	typedef zone_vector<Node::Ref, ZToolsT>::type NodeVec;
 	typedef zone_map<void*, int, ZToolsT>::type VarMap;
-	typedef zone_vector<std::pair<int, int>, ZToolsT>::type TexCoordMapping;
 
 	struct Usage {
 		boost::array<IntSet, kNumMaterialSources> s;
