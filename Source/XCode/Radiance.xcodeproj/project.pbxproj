@@ -264,7 +264,6 @@
 		330A994315BCA002002A81EC /* Shader.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882315B9BA480089BA08 /* Shader.h */; };
 		330A994415BCA002002A81EC /* SkMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8882415B9BA480089BA08 /* SkMesh.cpp */; };
 		330A994515BCA002002A81EC /* SkMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882515B9BA480089BA08 /* SkMesh.h */; };
-		330A994615BCA002002A81EC /* Sources.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882615B9BA480089BA08 /* Sources.h */; };
 		330A994715BCA002002A81EC /* TextModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8882715B9BA480089BA08 /* TextModel.cpp */; };
 		330A994815BCA002002A81EC /* TextModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882815B9BA480089BA08 /* TextModel.h */; };
 		330A994E15BCA060002A81EC /* glext.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887E315B9BA480089BA08 /* glext.h */; };
@@ -359,6 +358,15 @@
 		330A99B115BCA101002A81EC /* TextureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8871C15B9B9ED0089BA08 /* TextureParser.h */; };
 		330A99B215BCA101002A81EC /* TypefaceParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8871F15B9B9ED0089BA08 /* TypefaceParser.cpp */; };
 		330A99B315BCA101002A81EC /* TypefaceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8872015B9B9ED0089BA08 /* TypefaceParser.h */; };
+		334315F116914D8E00AABCEE /* ShaderTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334315EC16914D8E00AABCEE /* ShaderTool.cpp */; };
+		334315F216914D8E00AABCEE /* ShaderTool.h in Headers */ = {isa = PBXBuildFile; fileRef = 334315ED16914D8E00AABCEE /* ShaderTool.h */; };
+		334315F316914D8E00AABCEE /* ShaderToolUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334315EF16914D8E00AABCEE /* ShaderToolUtils.cpp */; };
+		334315F416914D8E00AABCEE /* ShaderToolUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 334315F016914D8E00AABCEE /* ShaderToolUtils.h */; };
+		334315F616914DB200AABCEE /* Common.h in Headers */ = {isa = PBXBuildFile; fileRef = 334315F516914DB200AABCEE /* Common.h */; };
+		334315F716914DB200AABCEE /* Common.h in Headers */ = {isa = PBXBuildFile; fileRef = 334315F516914DB200AABCEE /* Common.h */; };
+		334315F816914DB200AABCEE /* Common.h in Headers */ = {isa = PBXBuildFile; fileRef = 334315F516914DB200AABCEE /* Common.h */; };
+		334315F916914DB200AABCEE /* Common.h in Headers */ = {isa = PBXBuildFile; fileRef = 334315F516914DB200AABCEE /* Common.h */; };
+		334315FA16914DB200AABCEE /* Common.h in Headers */ = {isa = PBXBuildFile; fileRef = 334315F516914DB200AABCEE /* Common.h */; };
 		336836D515D43BA800EE9472 /* GameNetworkNull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 336836D415D43BA800EE9472 /* GameNetworkNull.cpp */; };
 		337AE55215BF214F00AD1617 /* Runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8867515B9AD160089BA08 /* Runtime.cpp */; };
 		337AE55315BF214F00AD1617 /* Time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8865A15B9ACFA0089BA08 /* Time.cpp */; };
@@ -811,7 +819,6 @@
 		337AE72815BF214F00AD1617 /* RendererDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882115B9BA480089BA08 /* RendererDef.h */; };
 		337AE72915BF214F00AD1617 /* Shader.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882315B9BA480089BA08 /* Shader.h */; };
 		337AE72A15BF214F00AD1617 /* SkMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882515B9BA480089BA08 /* SkMesh.h */; };
-		337AE72B15BF214F00AD1617 /* Sources.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882615B9BA480089BA08 /* Sources.h */; };
 		337AE72C15BF214F00AD1617 /* TextModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882815B9BA480089BA08 /* TextModel.h */; };
 		337AE73015BF214F00AD1617 /* glext.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887E315B9BA480089BA08 /* glext.h */; };
 		337AE73115BF214F00AD1617 /* GLMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887E615B9BA480089BA08 /* GLMesh.h */; };
@@ -1858,10 +1865,6 @@
 		33E8894615B9BA4B0089BA08 /* Spring.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887D915B9BA480089BA08 /* Spring.cpp */; };
 		33E8894715B9BA4B0089BA08 /* Spring.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887DA15B9BA480089BA08 /* Spring.h */; };
 		33E8894815B9BA4B0089BA08 /* Spring.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887DA15B9BA480089BA08 /* Spring.h */; };
-		33E8894915B9BA4B0089BA08 /* CGShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887DD15B9BA480089BA08 /* CGShader.cpp */; };
-		33E8894B15B9BA4B0089BA08 /* CGShader.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887DE15B9BA480089BA08 /* CGShader.h */; };
-		33E8894D15B9BA4B0089BA08 /* CGUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887E015B9BA480089BA08 /* CGUtils.cpp */; };
-		33E8894F15B9BA4B0089BA08 /* CGUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887E115B9BA480089BA08 /* CGUtils.h */; };
 		33E8895115B9BA4B0089BA08 /* glext.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887E315B9BA480089BA08 /* glext.h */; };
 		33E8895215B9BA4B0089BA08 /* glext.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887E315B9BA480089BA08 /* glext.h */; };
 		33E8895315B9BA4B0089BA08 /* GLMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887E415B9BA480089BA08 /* GLMaterial.cpp */; };
@@ -1948,8 +1951,6 @@
 		33E889BE15B9BA4B0089BA08 /* SkMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8882415B9BA480089BA08 /* SkMesh.cpp */; };
 		33E889BF15B9BA4B0089BA08 /* SkMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882515B9BA480089BA08 /* SkMesh.h */; };
 		33E889C015B9BA4B0089BA08 /* SkMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882515B9BA480089BA08 /* SkMesh.h */; };
-		33E889C115B9BA4B0089BA08 /* Sources.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882615B9BA480089BA08 /* Sources.h */; };
-		33E889C215B9BA4B0089BA08 /* Sources.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882615B9BA480089BA08 /* Sources.h */; };
 		33E889C315B9BA4B0089BA08 /* TextModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8882715B9BA480089BA08 /* TextModel.cpp */; };
 		33E889C415B9BA4B0089BA08 /* TextModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8882715B9BA480089BA08 /* TextModel.cpp */; };
 		33E889C515B9BA4B0089BA08 /* TextModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882815B9BA480089BA08 /* TextModel.h */; };
@@ -2709,7 +2710,6 @@
 		33FA80831633CA28002603A5 /* RendererDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882115B9BA480089BA08 /* RendererDef.h */; };
 		33FA80841633CA28002603A5 /* Shader.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882315B9BA480089BA08 /* Shader.h */; };
 		33FA80851633CA28002603A5 /* SkMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882515B9BA480089BA08 /* SkMesh.h */; };
-		33FA80861633CA28002603A5 /* Sources.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882615B9BA480089BA08 /* Sources.h */; };
 		33FA80871633CA28002603A5 /* TextModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882815B9BA480089BA08 /* TextModel.h */; };
 		33FA80881633CA28002603A5 /* SkAnim.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882F15B9BA490089BA08 /* SkAnim.h */; };
 		33FA80891633CA28002603A5 /* SkAnimDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8883015B9BA490089BA08 /* SkAnimDef.h */; };
@@ -2791,6 +2791,12 @@
 		3319498415B9FB0600458F43 /* AppReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppReleaseiOS.xcconfig; path = XCConfig/AppReleaseiOS.xcconfig; sourceTree = "<group>"; };
 		3319498515B9FB0600458F43 /* AppReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppReleaseOSX.xcconfig; path = XCConfig/AppReleaseOSX.xcconfig; sourceTree = "<group>"; };
 		3319498615B9FC3200458F43 /* AppRoot.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppRoot.xcconfig; path = XCConfig/AppRoot.xcconfig; sourceTree = "<group>"; };
+		334315EC16914D8E00AABCEE /* ShaderTool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderTool.cpp; sourceTree = "<group>"; };
+		334315ED16914D8E00AABCEE /* ShaderTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShaderTool.h; sourceTree = "<group>"; };
+		334315EE16914D8E00AABCEE /* ShaderTool.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ShaderTool.inl; sourceTree = "<group>"; };
+		334315EF16914D8E00AABCEE /* ShaderToolUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderToolUtils.cpp; sourceTree = "<group>"; };
+		334315F016914D8E00AABCEE /* ShaderToolUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShaderToolUtils.h; sourceTree = "<group>"; };
+		334315F516914DB200AABCEE /* Common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Common.h; sourceTree = "<group>"; };
 		336836D415D43BA800EE9472 /* GameNetworkNull.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameNetworkNull.cpp; sourceTree = "<group>"; };
 		337AE54C15BF20D300AD1617 /* RadianceGoldenDebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceGoldenDebugiOS.xcconfig; path = XCConfig/RadianceGoldenDebugiOS.xcconfig; sourceTree = "<group>"; };
 		337AE54D15BF20D300AD1617 /* RadianceGoldenDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceGoldenDebugOSX.xcconfig; path = XCConfig/RadianceGoldenDebugOSX.xcconfig; sourceTree = "<group>"; };
@@ -3325,11 +3331,6 @@
 		33E887D715B9BA480089BA08 /* PackageTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PackageTools.cpp; sourceTree = "<group>"; };
 		33E887D915B9BA480089BA08 /* Spring.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Spring.cpp; sourceTree = "<group>"; };
 		33E887DA15B9BA480089BA08 /* Spring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Spring.h; sourceTree = "<group>"; };
-		33E887DD15B9BA480089BA08 /* CGShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CGShader.cpp; sourceTree = "<group>"; };
-		33E887DE15B9BA480089BA08 /* CGShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CGShader.h; sourceTree = "<group>"; };
-		33E887DF15B9BA480089BA08 /* CGShader.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CGShader.inl; sourceTree = "<group>"; };
-		33E887E015B9BA480089BA08 /* CGUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CGUtils.cpp; sourceTree = "<group>"; };
-		33E887E115B9BA480089BA08 /* CGUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CGUtils.h; sourceTree = "<group>"; };
 		33E887E315B9BA480089BA08 /* glext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glext.h; sourceTree = "<group>"; };
 		33E887E415B9BA480089BA08 /* GLMaterial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLMaterial.cpp; sourceTree = "<group>"; };
 		33E887E515B9BA480089BA08 /* GLMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLMesh.cpp; sourceTree = "<group>"; };
@@ -3383,7 +3384,6 @@
 		33E8882315B9BA480089BA08 /* Shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shader.h; sourceTree = "<group>"; };
 		33E8882415B9BA480089BA08 /* SkMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SkMesh.cpp; sourceTree = "<group>"; };
 		33E8882515B9BA480089BA08 /* SkMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkMesh.h; sourceTree = "<group>"; };
-		33E8882615B9BA480089BA08 /* Sources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sources.h; sourceTree = "<group>"; };
 		33E8882715B9BA480089BA08 /* TextModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextModel.cpp; sourceTree = "<group>"; };
 		33E8882815B9BA480089BA08 /* TextModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextModel.h; sourceTree = "<group>"; };
 		33E8882A15B9BA480089BA08 /* SCC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SCC.cpp; sourceTree = "<group>"; };
@@ -4527,8 +4527,8 @@
 		33E887DB15B9BA480089BA08 /* Renderer */ = {
 			isa = PBXGroup;
 			children = (
-				33E887DC15B9BA480089BA08 /* CG */,
 				33E887E215B9BA480089BA08 /* GL */,
+				334315F516914DB200AABCEE /* Common.h */,
 				33E8881215B9BA480089BA08 /* Material.cpp */,
 				33E8881315B9BA480089BA08 /* Material.h */,
 				33E8881415B9BA480089BA08 /* Material.inl */,
@@ -4540,26 +4540,18 @@
 				33E8882115B9BA480089BA08 /* RendererDef.h */,
 				33E8882215B9BA480089BA08 /* Shader.cpp */,
 				33E8882315B9BA480089BA08 /* Shader.h */,
+				334315EC16914D8E00AABCEE /* ShaderTool.cpp */,
+				334315ED16914D8E00AABCEE /* ShaderTool.h */,
+				334315EE16914D8E00AABCEE /* ShaderTool.inl */,
+				334315EF16914D8E00AABCEE /* ShaderToolUtils.cpp */,
+				334315F016914D8E00AABCEE /* ShaderToolUtils.h */,
 				33E8882415B9BA480089BA08 /* SkMesh.cpp */,
 				33E8882515B9BA480089BA08 /* SkMesh.h */,
-				33E8882615B9BA480089BA08 /* Sources.h */,
 				33E8882715B9BA480089BA08 /* TextModel.cpp */,
 				33E8882815B9BA480089BA08 /* TextModel.h */,
 			);
 			name = Renderer;
 			path = ../Engine/Renderer;
-			sourceTree = "<group>";
-		};
-		33E887DC15B9BA480089BA08 /* CG */ = {
-			isa = PBXGroup;
-			children = (
-				33E887DD15B9BA480089BA08 /* CGShader.cpp */,
-				33E887DE15B9BA480089BA08 /* CGShader.h */,
-				33E887DF15B9BA480089BA08 /* CGShader.inl */,
-				33E887E015B9BA480089BA08 /* CGUtils.cpp */,
-				33E887E115B9BA480089BA08 /* CGUtils.h */,
-			);
-			path = CG;
 			sourceTree = "<group>";
 		};
 		33E887E215B9BA480089BA08 /* GL */ = {
@@ -5271,7 +5263,6 @@
 				330A994115BCA002002A81EC /* RendererDef.h in Headers */,
 				330A994315BCA002002A81EC /* Shader.h in Headers */,
 				330A994515BCA002002A81EC /* SkMesh.h in Headers */,
-				330A994615BCA002002A81EC /* Sources.h in Headers */,
 				330A994815BCA002002A81EC /* TextModel.h in Headers */,
 				330A994E15BCA060002A81EC /* glext.h in Headers */,
 				330A995115BCA060002A81EC /* GLMesh.h in Headers */,
@@ -5335,6 +5326,7 @@
 				33988FA816684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
 				33988FB216684F1C0018C3E6 /* BezierSpline.h in Headers */,
 				339805961676D544002758B1 /* FloorsDef.h in Headers */,
+				334315F816914DB200AABCEE /* Common.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5650,7 +5642,6 @@
 				337AE72815BF214F00AD1617 /* RendererDef.h in Headers */,
 				337AE72915BF214F00AD1617 /* Shader.h in Headers */,
 				337AE72A15BF214F00AD1617 /* SkMesh.h in Headers */,
-				337AE72B15BF214F00AD1617 /* Sources.h in Headers */,
 				337AE72C15BF214F00AD1617 /* TextModel.h in Headers */,
 				337AE73015BF214F00AD1617 /* glext.h in Headers */,
 				337AE73115BF214F00AD1617 /* GLMesh.h in Headers */,
@@ -5714,6 +5705,7 @@
 				33988FA916684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
 				33988FB316684F1C0018C3E6 /* BezierSpline.h in Headers */,
 				339805971676D544002758B1 /* FloorsDef.h in Headers */,
+				334315F916914DB200AABCEE /* Common.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6002,8 +5994,6 @@
 				33E8893F15B9BA4B0089BA08 /* Packages.h in Headers */,
 				33E8894115B9BA4B0089BA08 /* PackagesDef.h in Headers */,
 				33E8894715B9BA4B0089BA08 /* Spring.h in Headers */,
-				33E8894B15B9BA4B0089BA08 /* CGShader.h in Headers */,
-				33E8894F15B9BA4B0089BA08 /* CGUtils.h in Headers */,
 				33E8895115B9BA4B0089BA08 /* glext.h in Headers */,
 				33E8895715B9BA4B0089BA08 /* GLMesh.h in Headers */,
 				33E8895B15B9BA4B0089BA08 /* GLRenderer.h in Headers */,
@@ -6030,7 +6020,6 @@
 				33E889B715B9BA4B0089BA08 /* RendererDef.h in Headers */,
 				33E889BB15B9BA4B0089BA08 /* Shader.h in Headers */,
 				33E889BF15B9BA4B0089BA08 /* SkMesh.h in Headers */,
-				33E889C115B9BA4B0089BA08 /* Sources.h in Headers */,
 				33E889C515B9BA4B0089BA08 /* TextModel.h in Headers */,
 				33E889C915B9BA4B0089BA08 /* SCC.h in Headers */,
 				33E889CB15B9BA4B0089BA08 /* SCC_null.h in Headers */,
@@ -6172,6 +6161,9 @@
 				339805941676D544002758B1 /* FloorsDef.h in Headers */,
 				33872E28167FFB15007448EE /* EditorModelEditorWidget.h in Headers */,
 				33872E2A167FFB15007448EE /* EditorModelEditorWindow.h in Headers */,
+				334315F216914D8E00AABCEE /* ShaderTool.h in Headers */,
+				334315F416914D8E00AABCEE /* ShaderToolUtils.h in Headers */,
+				334315F616914DB200AABCEE /* Common.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6473,7 +6465,6 @@
 				33E889B815B9BA4B0089BA08 /* RendererDef.h in Headers */,
 				33E889BC15B9BA4B0089BA08 /* Shader.h in Headers */,
 				33E889C015B9BA4B0089BA08 /* SkMesh.h in Headers */,
-				33E889C215B9BA4B0089BA08 /* Sources.h in Headers */,
 				33E889C615B9BA4B0089BA08 /* TextModel.h in Headers */,
 				33E889D015B9BA4B0089BA08 /* SkAnim.h in Headers */,
 				33E889D215B9BA4B0089BA08 /* SkAnimDef.h in Headers */,
@@ -6551,6 +6542,7 @@
 				33988FA716684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
 				33988FB116684F1C0018C3E6 /* BezierSpline.h in Headers */,
 				339805951676D544002758B1 /* FloorsDef.h in Headers */,
+				334315F716914DB200AABCEE /* Common.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6852,7 +6844,6 @@
 				33FA80831633CA28002603A5 /* RendererDef.h in Headers */,
 				33FA80841633CA28002603A5 /* Shader.h in Headers */,
 				33FA80851633CA28002603A5 /* SkMesh.h in Headers */,
-				33FA80861633CA28002603A5 /* Sources.h in Headers */,
 				33FA80871633CA28002603A5 /* TextModel.h in Headers */,
 				33FA80881633CA28002603A5 /* SkAnim.h in Headers */,
 				33FA80891633CA28002603A5 /* SkAnimDef.h in Headers */,
@@ -6930,6 +6921,7 @@
 				33988FAA16684F1C0018C3E6 /* BezierSpline_inl.h in Headers */,
 				33988FB416684F1C0018C3E6 /* BezierSpline.h in Headers */,
 				339805981676D544002758B1 /* FloorsDef.h in Headers */,
+				334315FA16914DB200AABCEE /* Common.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7527,8 +7519,6 @@
 				33E8893D15B9BA4B0089BA08 /* Packages.cpp in Sources */,
 				33E8894315B9BA4B0089BA08 /* PackageTools.cpp in Sources */,
 				33E8894515B9BA4B0089BA08 /* Spring.cpp in Sources */,
-				33E8894915B9BA4B0089BA08 /* CGShader.cpp in Sources */,
-				33E8894D15B9BA4B0089BA08 /* CGUtils.cpp in Sources */,
 				33E8895315B9BA4B0089BA08 /* GLMaterial.cpp in Sources */,
 				33E8895515B9BA4B0089BA08 /* GLMesh.cpp in Sources */,
 				33E8895915B9BA4B0089BA08 /* GLRenderer.cpp in Sources */,
@@ -7674,6 +7664,8 @@
 				33988FB716684F980018C3E6 /* EditorPathfindingDebugWidget.cpp in Sources */,
 				33872E27167FFB15007448EE /* EditorModelEditorWidget.cpp in Sources */,
 				33872E29167FFB15007448EE /* EditorModelEditorWindow.cpp in Sources */,
+				334315F116914D8E00AABCEE /* ShaderTool.cpp in Sources */,
+				334315F316914D8E00AABCEE /* ShaderToolUtils.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
