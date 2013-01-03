@@ -21,16 +21,16 @@ void Entity::Tick_MT_Spline(
 	if (!spline)
 		return;
 
-	if (spline->id != m_psv.splineId || (m_ps.flags&PF_ResetSpline))
+	if (spline->id != m_psv.splineId || (m_ps.flags&kPhysicsFlag_ResetSpline))
 	{
 		m_psv.splineId = spline->id;
 		m_psv.splineIdx = 0;
-		if (m_ps.flags&PF_ResetSpline)
+		if (m_ps.flags&kPhysicsFlag_ResetSpline)
 			m_ps.splineDistance = 0.f;
-		m_ps.flags &= ~PF_ResetSpline;
+		m_ps.flags &= ~kPhysicsFlag_ResetSpline;
 	}
 
-	m_ps.flags &= ~PF_OnGround; // flying
+	m_ps.flags &= ~kPhysicsFlag_OnGround; // flying
 
 	UpdateVelocity(dt);
 
@@ -49,7 +49,7 @@ void Entity::Tick_MT_Spline(
 		events
 	);
 
-	if (m_ps.flags&PF_SplineEvents)
+	if (m_ps.flags&kPhysicsFlag_SplineEvents)
 	{
 		for (E_SplineTrack::StringVec::const_iterator it = events.begin(); it != events.end(); ++it)
 		{
@@ -84,7 +84,7 @@ void Entity::Tick_MT_Spline(
 			m_ps.parent = nextSpline;
 			m_psv.splineId = nextSpline->id;
 			m_psv.splineIdx = 0;
-			m_ps.flags &= ~PF_ResetSpline;
+			m_ps.flags &= ~kPhysicsFlag_ResetSpline;
 			
 			nextSpline->Eval(
 				m_psv.splineIdx,
@@ -97,7 +97,7 @@ void Entity::Tick_MT_Spline(
 		}
 		else if (!nextSpline)
 		{
-			if (m_ps.flags&PF_LoopSpline)
+			if (m_ps.flags&kPhysicsFlag_LoopSpline)
 			{
 				m_psv.splineIdx = 0;
 				// note that m_psv.splineDistance contains the amount off the end...
@@ -116,7 +116,7 @@ void Entity::Tick_MT_Spline(
 	m_ps.origin = Vec3::Zero;
 	m_ps.pos = pos;
 	
-	if (m_ps.flags&(PF_SplineBank|PF_FlipSplineBank))
+	if (m_ps.flags&(kPhysicsFlag_SplineBank|kPhysicsFlag_FlipSplineBank))
 	{
 		float oldBank = m_ps.angles.pos[0];
 		m_ps.originAngles = Vec3::Zero;
@@ -140,7 +140,7 @@ void Entity::Tick_MT_Spline(
 		float bank = -math::RadToDeg(math::ArcTan2(bankVec[1], bankVec[0]))*m_ps.splineBankScale;
 		bank = math::Clamp(bank, -m_ps.maxSplineBank, m_ps.maxSplineBank);
 
-		if (m_ps.flags&PF_FlipSplineBank)
+		if (m_ps.flags&kPhysicsFlag_FlipSplineBank)
 			bank = -bank;
 
 		if (m_ps.splineBankLerp > 0.f)
@@ -163,7 +163,7 @@ void Entity::Tick_MT_Spline(
 	m_ps.cameraPos = m_ps.worldPos;
 	m_ps.cameraAngles = m_ps.worldAngles;
 
-	if (m_ps.flags&PF_SplineEvents)
+	if (m_ps.flags&kPhysicsFlag_SplineEvents)
 	{
 		for (E_SplineTrack::StringVec::const_iterator it = events.begin(); it != events.end(); ++it)
 		{

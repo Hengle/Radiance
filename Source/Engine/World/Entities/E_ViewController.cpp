@@ -10,8 +10,7 @@
 
 namespace world {
 
-void E_ViewController::Blend::Init(float _in, float _out, float _hold)
-{
+void E_ViewController::Blend::Init(float _in, float _out, float _hold) {
 	in[0] = 0.f;
 	in[1] = _in;
 	out[0] = 0.f;
@@ -19,87 +18,57 @@ void E_ViewController::Blend::Init(float _in, float _out, float _hold)
 	hold[0] = 0.f;
 	hold[1] = _hold;
 	
-	if (_in > 0.f)
-	{
-		step = S_In;
+	if (_in > 0.f) {
+		step = kStep_In;
 		frac = 0.f;
-	}
-	else if (_hold != 0.f)
-	{
+	} else if (_hold != 0.f) {
 		frac = 1.f;
-		step = S_Hold;
-	}
-	else if (_out > 0.f)
-	{
+		step = kStep_Hold;
+	} else if (_out > 0.f) {
 		frac = 1.f;
-		step = S_Out;
-	}
-	else
-	{
+		step = kStep_Out;
+	} else {
 		frac = 0.f;
-		step = S_Done;
+		step = kStep_Done;
 	}
 }
 
-void E_ViewController::Blend::Tick(float dt)
-{
-	if (step == S_In)
-	{
+void E_ViewController::Blend::Tick(float dt) {
+	if (step == kStep_In) {
 		in[0] += dt;
-		if (in[0] >= in[1])
-		{
+		if (in[0] >= in[1]) {
 			frac = 1.f;
-			if (hold[1] == 0.f)
-			{
-				if (out[1] <= 0.f)
-				{
+			if (hold[1] == 0.f) {
+				if (out[1] <= 0.f) {
 					frac = 0.f;
-					step = S_Done;
+					step = kStep_Done;
+				} else {
+					step = kStep_Out;
 				}
-				else
-				{
-					step = S_Out;
-				}
+			} else {
+				step = kStep_Hold;
 			}
-			else
-			{
-				step = S_Hold;
-			}
-		}
-		else
-		{
+		} else {
 			frac = in[0] / in[1];
 		}
-	}
-	else if (step == S_Hold)
-	{
-		if (hold[1] > 0.f)
-		{
+	} else if (step == kStep_Hold) {
+		if (hold[1] > 0.f) {
 			hold[0] += dt;
-			if (hold[0] >= hold[1])
-			{
-				if (out[1] <= 0.f)
-				{
+			if (hold[0] >= hold[1]) {
+				if (out[1] <= 0.f) {
 					frac = 0.f;
-					step = S_Done;
-				}
-				else
-				{
-					step = S_Out;
+					step = kStep_Done;
+				} else {
+					step = kStep_Out;
 				}
 			}
 		}
-	}
-	else if (step == S_Out)
-	{
+	} else if (step == kStep_Out) {
 		out[0] += dt;
-		if (out[0] >= out[1])
-		{
+		if (out[0] >= out[1]) {
 			frac = 0.f;
-			step = S_Done;
-		}
-		else
-		{
+			step = kStep_Done;
+		} else {
 			frac = 1.f - (out[0]/out[1]);
 		}
 	}
@@ -118,8 +87,7 @@ void E_ViewController::VecAnim::Start(
 	float angleSpeed,      
 	float angleLag,    
 	bool useTargetPitch
-)
-{
+) {
 	m_blend.Init(in, out, hold);
 	m_distance[0] = minDistance;
 	m_distance[1] = maxDistance;
@@ -141,17 +109,15 @@ Vec3 E_ViewController::VecAnim::Tick(
 	const Vec3 &targetAngles,
 	float *_roll,
 	bool sync
-)
-{
+) {
 	// Tick / Expire blends
 	{
-		for (List::iterator it = list.begin(); it != list.end();)
-		{
+		for (List::iterator it = list.begin(); it != list.end();) {
 			List::iterator next = it; ++next;
 
 			VecAnim &x = *it;
 			x.m_blend.Tick(dt);
-			if (x.m_blend.step == Blend::S_Done)
+			if (x.m_blend.step == Blend::kStep_Done)
 				list.erase(it);
 			
 			it = next;
@@ -164,8 +130,7 @@ Vec3 E_ViewController::VecAnim::Tick(
 	// find blocking value
 	List::iterator block = list.begin();
 
-	for (; block != list.end(); ++block)
-	{
+	for (; block != list.end(); ++block) {
 		const VecAnim &x = *block;
 		if (x.m_blend.frac == 1.f)
 			break;
@@ -180,12 +145,10 @@ Vec3 E_ViewController::VecAnim::Tick(
 
 	List::iterator it = block;
 
-	for(;;)
-	{
+	for(;;) {
 		VecAnim &x = *it;
 
-		if (it == block)
-		{
+		if (it == block) {
 			pos = x.Tick(
 				dt,
 				targetPos,
@@ -193,9 +156,7 @@ Vec3 E_ViewController::VecAnim::Tick(
 				&roll,
 				sync
 			);
-		}
-		else
-		{
+		} else {
 			float blendRoll;
 
 			Vec3 blendPos = x.Tick(
@@ -226,8 +187,7 @@ Vec3 E_ViewController::VecAnim::Tick(
 	const Vec3 &targetAngles,
 	float *roll,
 	bool sync
-)
-{
+) {
 	sync = sync || !m_sync;
 	m_sync = true;
 
@@ -247,13 +207,10 @@ Vec3 E_ViewController::VecAnim::Tick(
 	angles = WrapAngles(angles + targetAngles);
 
 	// apply target angle frac lerp
-	if (m_aspeed[1] > 0.f && !sync)
-	{
+	if (m_aspeed[1] > 0.f && !sync) {
 		lerp = math::Clamp(m_aspeed[1]*dt, 0.f, 0.9999f);
 		curAngles = LerpAngles(curAngles, angles, lerp);
-	}
-	else
-	{
+	} else {
 		curAngles = angles;
 	}
 
@@ -265,31 +222,26 @@ Vec3 E_ViewController::VecAnim::Tick(
 
 	Vec3 vec = m * Vec3(1, 0, 0);
 
-	if (m_dspeed[1] > 0.f && !sync)
-	{
+	if (m_dspeed[1] > 0.f && !sync) {
 		// apply target pos frac lerp
 		lerp = math::Clamp(m_dspeed[1]*dt, 0.f, 0.9999f);
 		curPos = math::Lerp(curPos, targetPos, lerp);
-	}
-	else
-	{
+	} else {
 		curPos = targetPos;
 	}
 
 	return curPos - vec*distance;
 }
 
-Vec3 E_ViewController::Sway::Tick(List &list, float dt, const Vec3 &fwd)
-{
+Vec3 E_ViewController::Sway::Tick(List &list, float dt, const Vec3 &fwd) {
 	// Tick / Expire blends
 	{
-		for (List::iterator it = list.begin(); it != list.end();)
-		{
+		for (List::iterator it = list.begin(); it != list.end();) {
 			List::iterator next = it; ++next;
 
 			Sway &x = *it;
 			x.blend.Tick(dt);
-			if (x.blend.step == Blend::S_Done)
+			if (x.blend.step == Blend::kStep_Done)
 				list.erase(it);
 			
 			it = next;
@@ -302,8 +254,7 @@ Vec3 E_ViewController::Sway::Tick(List &list, float dt, const Vec3 &fwd)
 	// find blocking value
 	List::iterator block = list.begin();
 
-	for (; block != list.end(); ++block)
-	{
+	for (; block != list.end(); ++block) {
 		const Sway &x = *block;
 		if (x.blend.frac == 1.f)
 			break;
@@ -317,21 +268,17 @@ Vec3 E_ViewController::Sway::Tick(List &list, float dt, const Vec3 &fwd)
 
 	List::iterator it = block;
 
-	for(;;)
-	{
+	for(;;) {
 		Sway &x = *it;
 
-		if (it == block)
-		{
+		if (it == block) {
 			pos = x.Tick(
 				dt,
 				fwd
 			);
 
 			pos *= x.blend.frac; // fade-in
-		}
-		else
-		{
+		} else {
 			Vec3 blendPos = x.Tick(
 				dt,
 				fwd
@@ -348,8 +295,7 @@ Vec3 E_ViewController::Sway::Tick(List &list, float dt, const Vec3 &fwd)
 	return pos;
 }
 
-Vec3 E_ViewController::Sway::Tick(float dt, const Vec3 &fwd)
-{
+Vec3 E_ViewController::Sway::Tick(float dt, const Vec3 &fwd) {
 	if (freq == 0.f)
 		freq = 1.f;
 
@@ -377,17 +323,15 @@ Vec3 E_ViewController::Sway::Tick(float dt, const Vec3 &fwd)
 	return shift * d;
 }
 
-float E_ViewController::Fov::Tick(List &list, float dt, float distance)
-{
+float E_ViewController::FOV::Tick(List &list, float dt, float distance) {
 	// Tick / Expire blends
 	{
-		for (List::iterator it = list.begin(); it != list.end();)
-		{
+		for (List::iterator it = list.begin(); it != list.end();) {
 			List::iterator next = it; ++next;
 
-			Fov &x = *it;
+			FOV &x = *it;
 			x.blend.Tick(dt);
-			if (x.blend.step == Blend::S_Done)
+			if (x.blend.step == Blend::kStep_Done)
 				list.erase(it);
 			
 			it = next;
@@ -400,9 +344,8 @@ float E_ViewController::Fov::Tick(List &list, float dt, float distance)
 	// find blocking value
 	List::iterator block = list.begin();
 
-	for (; block != list.end(); ++block)
-	{
-		const Fov &x = *block;
+	for (; block != list.end(); ++block) {
+		const FOV &x = *block;
 		if (x.blend.frac == 1.f)
 			break;
 	}
@@ -415,16 +358,12 @@ float E_ViewController::Fov::Tick(List &list, float dt, float distance)
 
 	List::iterator it = block;
 
-	for(;;)
-	{
-		Fov &x = *it;
+	for(;;) {
+		FOV &x = *it;
 
-		if (it == block)
-		{
+		if (it == block) {
 			fov = x.Tick(dt, distance);
-		}
-		else
-		{
+		} else {
 			float blendFov = x.Tick(dt, distance);
 			fov = math::Lerp(fov, blendFov, x.blend.frac);
 		}
@@ -437,15 +376,14 @@ float E_ViewController::Fov::Tick(List &list, float dt, float distance)
 	return fov;
 }
 
-float E_ViewController::Fov::Tick(float dt, float distance)
-{
+float E_ViewController::FOV::Tick(float dt, float distance) {
 	if (freq == 0.f)
 		freq = 1.f;
 
 	time += dt;
 
-	if (fov[0] != 0.f) // not distance controlled
-	{
+	if (fov[0] != 0.f) {
+		// not distance controlled
 		return fov[0] - fov[1] + (fov[2]+fov[1])*LerpSin(time/freq);
 	}
 
@@ -467,27 +405,24 @@ float E_ViewController::Fov::Tick(float dt, float distance)
 
 E_ViewController::E_ViewController() : 
 E_CONSTRUCT_BASE,
-m_mode(M_Fixed),
+m_mode(kMode_Fixed),
 m_pos(Vec3::Zero),
 m_angles(Vec3::Zero),
 m_targetPos(Vec3::Zero),
 m_targetLook(Vec3::Zero),
-m_sync(true)
-{
+m_sync(true) {
 	m_blendTime[0] = m_blendTime[1] = 0.f;
 	m_fovShift[0] = m_fovShift[1] = m_fovShift[2] = m_fovShift[3] = 0.f;
 }
 
-E_ViewController::~E_ViewController()
-{
+E_ViewController::~E_ViewController() {
 }
 
 int E_ViewController::Spawn(
 	const Keys &keys,
 	const xtime::TimeSlice &time,
 	int flags
-)
-{
+) {
 	E_SPAWN_BASE();
 	return pkg::SR_Success;
 }
@@ -496,46 +431,35 @@ void E_ViewController::Tick(
 	int frame,
 	float dt, 
 	const xtime::TimeSlice &time
-)
-{
+) {
 	Entity::Ref target = m_target.lock();
-	if (!target || m_mode == M_Fixed)
-	{
-		Vec3 fwd = Mat4::Rotation(QuatFromAngles(m_angles)) * Vec3(1, 0, 0);
-		world->camera->pos = m_pos + Sway::Tick(m_sways, dt, fwd);
-		world->camera->angles = m_angles;
-
-		float fov = m_fovShift[1];
-	
-		if (m_fovShift[3] > 0.f)
-		{
-			m_fovShift[2] += dt;
-			if (m_fovShift[2] < m_fovShift[3])
-			{
-				fov = math::Lerp(m_fovShift[0], m_fovShift[1], LerpSin((m_fovShift[2]/m_fovShift[3])*0.5f));
-			}
-			else
-			{
-				m_fovShift[3] = 0.f;
-				fov = m_fovShift[1];
-			}
-		}
-		
-		fov += Fov::Tick(m_fovs, dt, 0.f);
-		fov = math::Clamp(fov, 0.f, 360.f);
-
-		world->camera->fov = fov;
+	if (!target || m_mode == kMode_Fixed) {
+		TickFixedMode(frame, dt, target);
 		return;
 	}
 
-	// HACK:
-	// ScreenView entities set worldPos but we don't want to track that, we want
-	// the "origin".
+	switch (m_mode) {
+	case kMode_Distance:
+		TickDistanceMode(frame, dt, target);
+		break;
+	case kMode_Rail:
+		TickRailMode(frame, dt, target);
+		break;
+	}
+}
 
+void E_ViewController::TickFixedMode(int frame, float dt, const Entity::Ref &target) {
+	Vec3 fwd = Mat4::Rotation(QuatFromAngles(m_angles)) * Vec3(1, 0, 0);
+	world->camera->pos = m_pos + Sway::Tick(m_sways, dt, fwd);
+	world->camera->angles = m_angles;
+	world->camera->fov = TickFOV(frame, dt, 0.f);;
+}
+
+void E_ViewController::TickDistanceMode(int frame, float dt, const Entity::Ref &target) {
 	float roll;
 
 	Vec3 mPos = VecAnim::Tick(
-		m_anims[TM_Distance],
+		m_anims[kTargetMode_Distance],
 		dt,
 		target->ps->cameraPos,
 		target->ps->worldAngles,
@@ -544,7 +468,7 @@ void E_ViewController::Tick(
 	);
 
 	Vec3 mLook = VecAnim::Tick(
-		m_anims[TM_Look],
+		m_anims[kTargetMode_Look],
 		dt,
 		target->ps->cameraPos,
 		target->ps->worldAngles,
@@ -558,8 +482,7 @@ void E_ViewController::Tick(
 	Vec3 mAngles = LookAngles(fwd);
 	mAngles[0] = roll;
 
-	if (m_blendTime[1] > 0.f)
-	{
+	if (m_blendTime[1] > 0.f) {
 		m_blendTime[0] += dt;
 		if (m_blendTime[0] > m_blendTime[1])
 			m_blendTime[0] = m_blendTime[1];
@@ -572,30 +495,162 @@ void E_ViewController::Tick(
 
 	mPos += Sway::Tick(m_sways, dt, fwd);
 		
-	float fov = m_fovShift[1];
-	
-	if (m_fovShift[3] > 0.f)
-	{
-		m_fovShift[2] += dt;
-		if (m_fovShift[2] < m_fovShift[3])
-		{
-			fov = math::Lerp(m_fovShift[0], m_fovShift[1], LerpSin((m_fovShift[2]/m_fovShift[3])*0.5f));
-		}
-		else
-		{
-			m_fovShift[3] = 0.f;
-			fov = m_fovShift[1];
-		}
-	}
-	
-	fov += Fov::Tick(m_fovs, dt, lookVec.Magnitude());
-	fov = math::Clamp(fov, 0.f, 360.f);
+	float fov = TickFOV(frame, dt, lookVec.Magnitude());
 	
 	world->camera->pos = mPos;
 	world->camera->angles = mAngles;
 	world->camera->fov = fov;
 	world->camera->quatMode = false;
 	m_sync = false;
+}
+
+void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &target) {
+
+	Vec3 vTarget = VecAnim::Tick(
+		m_anims[kTargetMode_Look],
+		dt,
+		target->ps->cameraPos,
+		target->ps->worldAngles,
+		0,
+		m_sync
+	);
+
+	UpdateRailTarget(vTarget);
+	if (!m_rail.tm)
+		return;
+
+	if (m_sync) {
+		m_rail.pos = m_rail.tm->t;
+		m_rail.rot = m_rail.tm->r;
+		m_rail.fov = m_rail.tm->fov;
+	}
+	
+	Vec3 fwd = vTarget - m_rail.pos;
+	float distance = fwd.Normalize();
+
+	if (m_sync)
+		m_rail.fwd = fwd;
+
+	if (!m_sync) {
+		// blend to new pos/look
+		if (m_rail.trackLag > 0.f) {
+			float lerp = math::Clamp(m_rail.trackLag*dt, 0.f, 0.9999f);
+			m_rail.pos = math::Lerp(m_rail.pos, m_rail.tm->t, lerp);
+			m_rail.rot = math::Lerp(m_rail.rot, m_rail.tm->r, lerp);
+			m_rail.fov = math::Lerp(m_rail.fov, m_rail.tm->fov, lerp);
+		}
+		if (m_rail.turnLag > 0.f) {
+			float lerp = math::Clamp(m_rail.turnLag*dt, 0.f, 0.9999f);
+			m_rail.fwd = math::Lerp(m_rail.fwd, fwd, lerp);
+		}
+	}
+
+	float fov = m_rail.fov;
+
+	if (!m_rail.cinematicFOV) {
+		fov = TickFOV(frame, dt, distance);
+	}
+
+	// special case (unrestricted camera)
+	if (m_rail.clamp[1] >= 180.f && m_rail.clamp[2] >= 180.f) {
+		Vec3 angles = LookAngles(m_rail.fwd);
+		world->camera->pos = m_rail.pos;
+		world->camera->angles = angles;
+		world->camera->fov = fov;
+		world->camera->quatMode = false;
+	// special case (fully restricted camera)
+	} else if (m_rail.clamp[1] == 0.f && m_rail.clamp[2] == 0.f) {
+		Vec3 angles = LookAngles(m_rail.fwd);
+		world->camera->pos = m_rail.pos;
+		world->camera->rot = m_rail.rot;
+		world->camera->fov = fov;
+		world->camera->quatMode = true;
+	} else {
+		// we can drift +/- clamp angles from the cinematic camera orientation.
+		Vec3 qAngles = AnglesFromQuat(m_rail.rot);
+		Vec3 fAngles = LookAngles(m_rail.fwd);
+		
+		for (int i = 1; i < 3; ++i) {
+			// shortest path.
+			float d = fAngles[i] - qAngles[i];
+			if (d < -180.f) {
+				d += 360.f;
+			} else if (d > 180.f) {
+				d -= 360.f;
+			}
+
+			if (d > m_rail.clamp[i])
+				fAngles[i] = qAngles[i] + m_rail.clamp[i];
+			if (d < -m_rail.clamp[i])
+				fAngles[i] = qAngles[i] - m_rail.clamp[i];
+
+			if (fAngles[i] < 0.f)
+				fAngles[i] += 360.f;
+			if (fAngles[i] >= 360.f)
+				fAngles[i] -= 360.f;
+		}
+
+		fAngles[0] = qAngles[0]; // preserve roll
+
+		world->camera->pos = m_rail.pos;
+		world->camera->angles = fAngles;
+		world->camera->fov = fov;
+		world->camera->quatMode = false;
+	}
+
+	m_sync = false;
+}
+
+void E_ViewController::UpdateRailTarget(const Vec3 &target) {
+	Vec3 v;
+
+	if (m_rail.tm && !m_rail.strict) {
+		v = target - m_rail.tm->t;
+		float d = v.MagnitudeSquared();
+		if (d <= m_rail.distance)
+			return;
+	}
+
+	const bsp_file::BSPFile *bspFile = world->bspFile;
+	float bestDist = std::numeric_limits<float>::max();
+	
+	const bsp_file::BSPCameraTM *best = bspFile->CameraTMs() + m_rail.track->firstTM;
+
+	for (S32 i = 0; i < m_rail.track->numTMs; ++i) {
+		const bsp_file::BSPCameraTM *tm = bspFile->CameraTMs() + m_rail.track->firstTM + i;
+
+		v = target - tm->t;
+		float d = v.MagnitudeSquared();
+
+		if (d <= m_rail.distance) {
+			float dd = m_rail.distance - d;
+			if (dd < bestDist) {
+				bestDist = dd;
+				best = tm;
+			}
+		}
+	}
+
+	m_rail.tm = best;
+}
+
+float E_ViewController::TickFOV(int frame, float dt, float distance) {
+	float fov = m_fovShift[1];
+	
+	if (m_fovShift[3] > 0.f) {
+		m_fovShift[2] += dt;
+		if (m_fovShift[2] < m_fovShift[3]) {
+			fov = math::Lerp(m_fovShift[0], m_fovShift[1], LerpSin((m_fovShift[2]/m_fovShift[3])*0.5f));
+		} else {
+			m_fovShift[3] = 0.f;
+			fov = m_fovShift[1];
+		}
+	}
+	
+	fov += FOV::Tick(m_fovs, dt, distance);
+	fov = math::Clamp(fov, 0.f, 360.f);
+
+	return fov;
 }
 
 void E_ViewController::SetTargetMode(
@@ -612,9 +667,8 @@ void E_ViewController::SetTargetMode(
 	float angleSpeed,      // speed to lerp between min/max angles
 	float angleLagTime,    // fraction time to blend between current angles and desired angles
 	bool useTargetPitch
-)
-{
-	RAD_ASSERT(mode < TM_Max);
+) {
+	RAD_ASSERT(mode < kNumTargetModes);
 
 	VecAnim anim;
 	anim.Start(
@@ -632,20 +686,50 @@ void E_ViewController::SetTargetMode(
 		useTargetPitch
 	);
 
-	if (mode == TM_Distance)
-		m_mode = M_Target;
+	if (mode == kTargetMode_Distance)
+		m_mode = kMode_Distance;
 
 	m_anims[mode].push_front(anim);
 }
 
-void E_ViewController::SetCamera(
+void E_ViewController::SetFixedCamera(
 	const Vec3 &pos,
 	const Vec3 &angles
-)
-{
-	m_mode = M_Fixed;
+) {
+	m_mode = kMode_Fixed;
 	m_pos = pos;
 	m_angles = angles;
+}
+
+void E_ViewController::SetRailMode(
+	const char *cinematicName,
+	float distance,
+	bool strict,
+	float trackingLag,
+	float lookAtLag,
+	bool useCinematicFOV, // true = uses embedded fov from cinematic
+	const Vec3 &angleClamp // how much camera can "turn" from its rail-track to look at target
+) {
+	const bsp_file::BSPCinematic *cinematic = world->cinematics->FindCinematic(cinematicName);
+	if (!cinematic)
+		return;
+
+	// find camera track to use.
+	for (S32 i = 0; i < cinematic->numTriggers; ++i) {
+		const bsp_file::BSPCinematicTrigger *trigger = world->bspFile->CinematicTriggers() + cinematic->firstTrigger + i;
+		if (trigger->camera < 0)
+			continue;
+		m_rail.track = world->bspFile->CameraTracks() + trigger->camera;
+		m_rail.distance = distance*distance;
+		m_rail.strict = strict;
+		m_rail.trackLag = trackingLag;
+		m_rail.turnLag = lookAtLag;
+		m_rail.tm = 0;
+		// found a camera.
+		m_sync = true;
+		m_mode = kMode_Rail;
+		break;
+	}
 }
 
 void E_ViewController::SetCameraSway(
@@ -657,8 +741,7 @@ void E_ViewController::SetCameraSway(
 	float frequency,
 	float angleSpeed,
 	const Vec2 &scale
-)
-{
+) {
 	Sway sway;
 	sway.blend.Init(in, out, hold);
 	sway.time = 0.f;
@@ -672,7 +755,7 @@ void E_ViewController::SetCameraSway(
 	m_sways.push_front(sway);
 }
 
-void E_ViewController::SetCameraFov(
+void E_ViewController::SetCameraFOV(
 	float in, // blend in time
 	float out, // blend out time
 	float hold, // hold time, 0 for infinite
@@ -684,9 +767,8 @@ void E_ViewController::SetCameraFov(
 	float maxFov,
 	float minDistance,
 	float maxDistance
-)
-{
-	Fov fov;
+) {
+	FOV fov;
 
 	fov.blend.Init(in, out, hold);
 	fov.fov[0] = _fov;
@@ -702,14 +784,11 @@ void E_ViewController::SetCameraFov(
 	m_fovs.push_front(fov);
 }
 	
-void E_ViewController::LerpCameraFovShift(float fov, float time)
-{
+void E_ViewController::LerpCameraFOVShift(float fov, float time) {
 	float curFOV = m_fovShift[1];
 	
-	if (m_fovShift[3] > 0.f)
-	{
-		if (m_fovShift[2] < m_fovShift[3])
-		{
+	if (m_fovShift[3] > 0.f) {
+		if (m_fovShift[2] < m_fovShift[3]) {
 			curFOV = math::Lerp(m_fovShift[0], m_fovShift[1], LerpSin((m_fovShift[2]/m_fovShift[3])*0.5f));
 		}
 	}
@@ -720,14 +799,12 @@ void E_ViewController::LerpCameraFovShift(float fov, float time)
 	m_fovShift[3] = time;
 }
 
-void E_ViewController::BlendToTarget(float time)
-{
+void E_ViewController::BlendToTarget(float time) {
 	m_blendTime[0] = 0.f;
 	m_blendTime[1] = time;
 }
 
-int E_ViewController::lua_SetTargetMode(lua_State *L)
-{
+int E_ViewController::lua_SetTargetMode(lua_State *L) {
 	E_ViewController *self = static_cast<E_ViewController*>(WorldLua::EntFramePtr(L, 1, true));
 	int mode = (int)luaL_checkinteger(L, 2);
 	float in = (float)luaL_checknumber(L, 3);
@@ -762,19 +839,17 @@ int E_ViewController::lua_SetTargetMode(lua_State *L)
 	return 0;
 }
 
-int E_ViewController::lua_SetCamera(lua_State *L)
-{
+int E_ViewController::lua_SetFixedCamera(lua_State *L) {
 	E_ViewController *self = static_cast<E_ViewController*>(WorldLua::EntFramePtr(L, 1, true));
 	Vec3 pos = lua::Marshal<Vec3>::Get(L, 2, true);
 	Vec3 angles = lua::Marshal<Vec3>::Get(L, 3, true);
 
-	self->SetCamera(pos, angles);
+	self->SetFixedCamera(pos, angles);
 
 	return 0;
 }
 
-int E_ViewController::lua_SetCameraSway(lua_State *L)
-{
+int E_ViewController::lua_SetCameraSway(lua_State *L) {
 	E_ViewController *self = static_cast<E_ViewController*>(WorldLua::EntFramePtr(L, 1, true));
 	float in = (float)luaL_checknumber(L, 2);
 	float out = (float)luaL_checknumber(L, 3);
@@ -799,8 +874,7 @@ int E_ViewController::lua_SetCameraSway(lua_State *L)
 	return 0;
 }
 
-int E_ViewController::lua_SetCameraFov(lua_State *L)
-{
+int E_ViewController::lua_SetCameraFOV(lua_State *L) {
 	E_ViewController *self = static_cast<E_ViewController*>(WorldLua::EntFramePtr(L, 1, true));
 	float in = (float)luaL_checknumber(L, 2);
 	float out = (float)luaL_checknumber(L, 3);
@@ -814,7 +888,7 @@ int E_ViewController::lua_SetCameraFov(lua_State *L)
 	float mind = (float)luaL_checknumber(L, 11);
 	float maxd = (float)luaL_checknumber(L, 12);
 
-	self->SetCameraFov(
+	self->SetCameraFOV(
 		in,
 		out,
 		hold,
@@ -831,10 +905,9 @@ int E_ViewController::lua_SetCameraFov(lua_State *L)
 	return 0;
 }
 	
-int E_ViewController::lua_LerpCameraFovShift(lua_State *L)
-{
+int E_ViewController::lua_LerpCameraFOVShift(lua_State *L) {
 	E_ViewController *self = static_cast<E_ViewController*>(WorldLua::EntFramePtr(L, 1, true));
-	self->LerpCameraFovShift(
+	self->LerpCameraFOVShift(
 		(float)luaL_checknumber(L, 2),
 		(float)luaL_checknumber(L, 3)
 	);
@@ -842,8 +915,7 @@ int E_ViewController::lua_LerpCameraFovShift(lua_State *L)
 	return 0;
 }
 
-int E_ViewController::lua_BlendToTarget(lua_State *L)
-{
+int E_ViewController::lua_BlendToTarget(lua_State *L) {
 	E_ViewController *self = static_cast<E_ViewController*>(WorldLua::EntFramePtr(L, 1, true));
 	float time = (float)luaL_checknumber(L, 2);
 
@@ -852,8 +924,7 @@ int E_ViewController::lua_BlendToTarget(lua_State *L)
 	return 0;
 }
 
-int E_ViewController::lua_Sync(lua_State *L)
-{
+int E_ViewController::lua_Sync(lua_State *L) {
 	E_ViewController *self = static_cast<E_ViewController*>(WorldLua::EntFramePtr(L, 1, true));
 	self->m_sync = true;
 	return 0;
@@ -861,8 +932,7 @@ int E_ViewController::lua_Sync(lua_State *L)
 
 ENT_GET_WEAK_ENT(E_ViewController, Target, m_target);
 
-int E_ViewController::LUART_SETFN(Target)(lua_State *L)
-{
+int E_ViewController::LUART_SETFN(Target)(lua_State *L) {
 	E_ViewController *self = static_cast<E_ViewController*>(WorldLua::EntFramePtr(L, 1, true));
 	Entity *ent = WorldLua::EntFramePtr(L, 2, false);
 	Entity::Ref target = ent ? ent->shared_from_this() : Entity::Ref();
@@ -875,19 +945,18 @@ int E_ViewController::LUART_SETFN(Target)(lua_State *L)
 	return 0;
 }
 
-void E_ViewController::PushCallTable(lua_State *L)
-{
+void E_ViewController::PushCallTable(lua_State *L) {
 	Entity::PushCallTable(L);
 	lua_pushcfunction(L, lua_SetTargetMode);
 	lua_setfield(L, -2, "SetTargetMode");
-	lua_pushcfunction(L, lua_SetCamera);
-	lua_setfield(L, -2, "SetCamera");
+	lua_pushcfunction(L, lua_SetFixedCamera);
+	lua_setfield(L, -2, "SetFixedCamera");
 	lua_pushcfunction(L, lua_SetCameraSway);
 	lua_setfield(L, -2, "SetCameraSway");
-	lua_pushcfunction(L, lua_SetCameraFov);
-	lua_setfield(L, -2, "SetCameraFov");
-	lua_pushcfunction(L, lua_LerpCameraFovShift);
-	lua_setfield(L, -2, "LerpCameraFovShift");
+	lua_pushcfunction(L, lua_SetCameraFOV);
+	lua_setfield(L, -2, "SetCameraFOV");
+	lua_pushcfunction(L, lua_LerpCameraFOVShift);
+	lua_setfield(L, -2, "LerpCameraFOVShift");
 	lua_pushcfunction(L, lua_BlendToTarget);
 	lua_setfield(L, -2, "BlendToTarget");
 	lua_pushcfunction(L, lua_Sync);

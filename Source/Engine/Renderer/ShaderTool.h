@@ -68,7 +68,7 @@ public:
 		kMaterialSource_Color, // constant
 		kMaterialSource_LightDiffuseColor, // constant
 		kMaterialSource_LightSpecularColor, // constant
-		kMaterialSource_LightPos, // world space constant (xyz) + w == brightness
+		kMaterialSource_LightPos, // model space constant (xyz) + w == brightness
 		kMaterialSource_Vertex,
 		kMaterialSource_Normal,
 		kMaterialSource_Tangent,

@@ -164,6 +164,12 @@ bool WorldLua::Init() {
 		{ "CameraUp", lua_World_CameraUp },
 		{ "SetEnabledGestures", lua_World_SetEnabledGestures },
 		{ "FlushInput", lua_World_FlushInput },
+		{ "WaypointPosition", lua_World_WaypointPosition },
+		{ "WaypointFloorPosition", lua_World_WaypointFloorPosition },
+		{ "WaypointState", lua_World_WaypointState },
+		{ "SetWaypointState", lua_World_SetWaypointState },
+		{ "WaypointsForTargetname", lua_World_WaypointsForTargetname },
+		{ "WaypointsForUserId", lua_World_WaypointsForUserId },
 		{ "DrawCounters", lua_World_DrawCounters },
 		{ "EnableWireframe", lua_World_EnableWireframe },
 		{ "QuitGame", lua_World_QuitGame },
@@ -1780,6 +1786,91 @@ int WorldLua::lua_World_FlushInput(lua_State *L) {
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	self->m_world->game->FlushInput(lua_toboolean(L, 1) ? true : false);
 	return 0;
+}
+
+int WorldLua::lua_World_WaypointPosition(lua_State *L) {
+	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
+	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
+
+	FloorPosition pos;
+	if (self->m_world->floors->WaypointPosition(luaL_checkinteger(L, 1), pos)) {
+		lua::Marshal<FloorPosition>::Push(L, pos);
+		return 1;
+	}
+
+	return 0;
+}
+
+int WorldLua::lua_World_WaypointFloorPosition(lua_State *L) {
+	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
+	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
+
+	FloorPosition pos;
+	if (self->m_world->floors->WaypointPosition(luaL_checkinteger(L, 1), pos)) {
+		lua::Marshal<Vec3>::Push(L, pos.pos);
+		return 1;
+	}
+
+	return 0;
+}
+
+int WorldLua::lua_World_WaypointState(lua_State *L) {
+	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
+	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
+
+	lua_pushinteger(L, self->m_world->floors->WaypointState(luaL_checkinteger(L, 1)));
+	return 1;
+}
+
+int WorldLua::lua_World_SetWaypointState(lua_State *L) {
+	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
+	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
+
+	self->m_world->floors->SetWaypointState(luaL_checkinteger(L, 1), luaL_checkinteger(L, 2));
+	return 0;
+}
+
+int WorldLua::lua_World_WaypointsForTargetname(lua_State *L) {
+
+	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
+	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
+
+	IntVec vec = self->m_world->floors->WaypointsForTargetname(luaL_checkstring(L, 1));
+	if (!vec.empty()) {
+		lua_createtable(L, (int)vec.size(), 0);
+		int ofs = 0;
+		for (IntVec::const_iterator it = vec.begin(); it != vec.end(); ++it, ++ofs) {
+			lua_pushinteger(L, ofs);
+			lua_pushinteger(L, *it);
+			lua_settable(L, -3);
+		}
+
+		return 1;
+	}
+
+	return 0;
+}
+
+int WorldLua::lua_World_WaypointsForUserId(lua_State *L) {
+
+	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
+	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
+
+	IntVec vec = self->m_world->floors->WaypointsForTargetname(luaL_checkstring(L, 1));
+	if (!vec.empty()) {
+		lua_createtable(L, (int)vec.size(), 0);
+		int ofs = 0;
+		for (IntVec::const_iterator it = vec.begin(); it != vec.end(); ++it, ++ofs) {
+			lua_pushinteger(L, ofs);
+			lua_pushinteger(L, *it);
+			lua_settable(L, -3);
+		}
+
+		return 1;
+	}
+
+	return 0;
+
 }
 
 int WorldLua::lua_World_DrawCounters(lua_State *L) {

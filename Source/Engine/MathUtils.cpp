@@ -137,15 +137,15 @@ RADENG_API Vec3 RADENG_CALL DeltaAngles(const Vec3 &start, const Vec3 &end, int 
 			e += 360.f;
 		}
 
-		if ((f&(1<<(bit+2))) || (!f && e > s && (e-s) > 180.f)) {
+		if ((f&(1<<(bit+2))) || (!f && (e > s) && (e-s) > 180.f)) {
 			of |= 1<<(bit+2);
-			e -= 360.f;
-		} else if ((f&(1<<(bit+3))) || (!f && s > e && (s-e) > 180.f)) {
+			v[i] = 360.f - (e-s);
+		} else if ((f&(1<<(bit+3))) || (!f && (s > e) && (s-e) > 180.f)) {
 			of |= 1<<(bit+3);
-			s -= 360.f;
+			v[i] = 360.f - (s-e);
+		} else {
+			v[i] = e-s;
 		}
-
-		v[i] = e-s;
 	}
 
 	of |= 0x10000000; // non-zero so we know we've recorded state

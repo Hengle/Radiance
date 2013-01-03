@@ -150,6 +150,59 @@ FloorMove::Ref Floors::CreateMove(
 	return move;
 }
 
+bool Floors::WaypointPosition(int waypoint, FloorPosition &pos) const {
+	if (waypoint < 0 || (waypoint >= (int)m_waypoints.size()))
+		return false;
+	const bsp_file::BSPWaypoint *bspWaypoint = m_bsp->Waypoints() + waypoint;
+
+	pos.m_waypoint = waypoint;
+	pos.m_floor = (int)bspWaypoint->floorNum;
+	pos.m_tri = (int)bspWaypoint->triNum;
+	pos.m_nextWaypoint = -1;
+	pos.m_pos = Vec3(bspWaypoint->pos[0], bspWaypoint->pos[1], bspWaypoint->pos[2]);
+	return true;
+}
+
+int Floors::WaypointState(int waypoint) const {
+	if (waypoint < 0 || (waypoint >= (int)m_waypoints.size()))
+		return false;
+	return m_waypoints[waypoint].flags;
+}
+
+void Floors::SetWaypointState(int waypoint, int state) {
+	if (waypoint < 0 || (waypoint >= (int)m_waypoints.size()))
+		return;
+	m_waypoints[waypoint].flags = state;
+}
+
+IntVec Floors::WaypointsForTargetname(const char *targetname) const {
+	String s(CStr(targetname));
+	std::pair<Waypoint::MMap::const_iterator,
+		      Waypoint::MMap::const_iterator> pair = m_waypointTargets.equal_range(s);
+
+	IntVec vec;
+	while (pair.first != pair.second) {
+		vec.push_back(pair.first->second);
+		++pair.first;
+	}
+
+	return vec;
+}
+
+IntVec Floors::WaypointsForUserId(const char *userId) const {
+	String s(CStr(userId));
+	std::pair<Waypoint::MMap::const_iterator,
+		      Waypoint::MMap::const_iterator> pair = m_waypointTargets.equal_range(s);
+
+	IntVec vec;
+	while (pair.first != pair.second) {
+		vec.push_back(pair.first->second);
+		++pair.first;
+	}
+
+	return vec;
+}
+
 void Floors::WalkFloor(
 	const FloorPosition &start,
 	const FloorPosition &end,
@@ -1037,6 +1090,8 @@ namespace lua {
 void Marshal<world::FloorPosition>::Push(lua_State *L, const world::FloorPosition &val) {
 	RAD_ASSERT(L);
 	lua_createtable(L, 0, 3);
+	Marshal<Vec3>::Push(L, val.m_pos);
+	lua_setfield(L, -2, "pos"); // <-- public
 	Marshal<Vec3>::Push(L, val.m_pos);
 	lua_setfield(L, -2, "@pos");
 	lua_pushinteger(L, (int)val.m_floor);

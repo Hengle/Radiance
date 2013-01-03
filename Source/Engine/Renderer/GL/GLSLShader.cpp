@@ -144,7 +144,7 @@ bool GLSLShader::CompilePass(
 			engine.sys->files->CreateDirectory("@r:/Temp/Shaders/Logs");
 			String path(CStr("@r:/Temp/Shaders/Logs/"));
 			path += shader->name;
-			path += ".vert.glsl";
+			path += "_optimized.vert.glsl";
 			tools::shader_utils::SaveText(engine, path.c_str, shaderSource.c_str);
 		}
 #endif
@@ -202,7 +202,7 @@ bool GLSLShader::CompilePass(
 			engine.sys->files->CreateDirectory("@r:/Temp/Shaders/Logs");
 			String path(CStr("@r:/Temp/Shaders/Logs/"));
 			path += shader->name;
-			path += ".frag.glsl";
+			path += "_optimized.frag.glsl";
 			tools::shader_utils::SaveText(engine, path.c_str, shaderSource.c_str);
 		}
 #endif

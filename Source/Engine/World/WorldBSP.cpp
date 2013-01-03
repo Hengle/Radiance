@@ -38,8 +38,7 @@ void World::SetAreaportalState(int areaportalNum, bool open, bool relinkOccupant
 	}
 }
 
-Entity::Vec World::BBoxTouching(const BBox &bbox, int stypes) const
-{
+Entity::Vec World::BBoxTouching(const BBox &bbox, int stypes) const {
 	Entity::Vec touching;
 	EntityBits touched;
 
@@ -72,8 +71,8 @@ void World::BBoxTouching(
 				continue;
 		
 			switch (entity->ps->stype) {
-			case ST_BBox: 
-			case ST_Volume: {
+			case kSolidType_BBox:
+				{
 					BBox b(entity->ps->bbox);
 					b.Translate(entity->ps->worldPos);
 					bits.set(entity->m_id);
@@ -89,19 +88,24 @@ void World::BBoxTouching(
 void World::LinkEntity(Entity *entity, const BBox &bounds) {
 	UnlinkEntity(entity);
 
+	if (entity->ps->otype == kOccupantType_None)
+		return;
+
 	entity->m_leaf = LeafForPoint(entity->ps->worldPos);
-	RAD_ASSERT(entity->m_leaf);
+	if (!entity->m_leaf)
+		return;
 
 	AreaBits visible;
 	
 	if (entity->m_leaf->area > -1) {
 		visible.set(entity->m_leaf->area);
 
-		if (entity->ps->stype == ST_Volume) {
+		if (entity->ps->otype == kOccupantType_Volume) {
 			StackWindingStackVec bbox;
 			BoundWindings(bounds, bbox);
 			ClipOccupantVolume(&entity->ps->pos, &bbox, bounds, 0, entity->m_leaf->area, -1, visible);
 		} else {
+			RAD_ASSERT(entity->ps->otype == kOccupantType_BBox);
 			ClipOccupantVolume(0, 0, bounds, 0, entity->m_leaf->area, -1, visible);
 		}
 	}
@@ -147,6 +151,7 @@ void World::LinkEntity(const LinkEntityParms &constArgs, int nodeNum) {
 			constArgs.entity->m_bspLeafs.push_back(&leaf);
 			constArgs.entity->m_areas.insert(leaf.area);
 			m_areas[leaf.area].occupants.insert(constArgs.entity);
+			m_draw->LinkEntity(constArgs.entity, constArgs.bounds, nodeNum);
 		}
 
 		return;

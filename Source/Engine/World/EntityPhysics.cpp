@@ -12,7 +12,7 @@ namespace world {
 void Entity::UpdateVelocity(float dt)
 {
 	// velocity
-	if (m_ps.flags&PF_Friction)
+	if (m_ps.flags&kPhysicsFlag_Friction)
 	{
 		float mag = m_ps.velocity.Magnitude();
 		if (mag > 0.f)
@@ -121,16 +121,16 @@ void Entity::TickPhysics(
 {
 	switch (m_ps.mtype)
 	{
-	case MT_None:
+	case kMoveType_None:
 		m_ps.worldPos = m_ps.origin + m_ps.pos;
 		m_ps.worldAngles = WrapAngles(m_ps.originAngles + m_ps.angles.pos);
-		m_ps.cameraPos = m_ps.worldPos;
+		m_ps.cameraPos = m_ps.worldPos + m_ps.cameraShift;
 		m_ps.cameraAngles = m_ps.worldAngles;
 		break;
-	case MT_Fly:
+	case kMoveType_Fly:
 		Tick_MT_Fly(frame, dt, time);
 		break;
-	case MT_Spline:
+	case kMoveType_Spline:
 		Tick_MT_Spline(frame, dt, time);
 		break;
 	}

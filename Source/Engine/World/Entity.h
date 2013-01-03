@@ -27,8 +27,7 @@ namespace world {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct EntSpawn
-{
+struct EntSpawn {
 	Keys keys;
 };
 
@@ -39,43 +38,43 @@ class EntityFactoryAttribute {};
 
 ///////////////////////////////////////////////////////////////////////////////
 
-enum TickFlags
-{
-	RAD_FLAG(TF_PreTick),
-	RAD_FLAG(TF_PostTick),
-	RAD_FLAG(TF_PostPhysics)
+enum TickFlags {
+	RAD_FLAG(kTickFlag_PreTick),
+	RAD_FLAG(kTickFlag_PostTick),
+	RAD_FLAG(kTickFlag_PostPhysics)
 };
 
-enum MoveType
-{
-	MT_None,
-	MT_Fly,
-	MT_Spline // ps.ground points to spline track.
+enum MoveType {
+	kMoveType_None,
+	kMoveType_Fly,
+	kMoveType_Spline // ps.ground points to spline track.
 };
 
-enum SolidType
-{
-	RAD_FLAG(ST_BBox),
-	RAD_FLAG(ST_Volume),
-	ST_None = 0, 
-	ST_All = 0xff
+enum SolidType {
+	kSolidType_None,
+	kSolidType_BBox,
+	kSolidType_All = 0xff
 };
 
-enum PhysicsFlags
-{
-	RAD_FLAG(PF_OnGround),
-	RAD_FLAG(PF_AutoFace), // for MT_Fly, will adjust velocity for angles
-	RAD_FLAG(PF_Friction),
-	RAD_FLAG(PF_SeekAngles), // Physics will seek to targetAngles.
-	RAD_FLAG(PF_ResetSpline), // Reset spline to beginning
-	RAD_FLAG(PF_LoopSpline), // Loop on spline
-	RAD_FLAG(PF_SplineEvents),
-	RAD_FLAG(PF_SplineBank),
-	RAD_FLAG(PF_FlipSplineBank),
+enum OccupantType {
+	kOccupantType_None,
+	kOccupantType_BBox,
+	kOccupantType_Volume
 };
 
-struct PState
-{
+enum PhysicsFlags {
+	RAD_FLAG(kPhysicsFlag_OnGround),
+	RAD_FLAG(kPhysicsFlag_AutoFace), // for MT_Fly, will adjust velocity for angles
+	RAD_FLAG(kPhysicsFlag_Friction),
+	RAD_FLAG(kPhysicsFlag_SeekAngles), // Physics will seek to targetAngles.
+	RAD_FLAG(kPhysicsFlag_ResetSpline), // Reset spline to beginning
+	RAD_FLAG(kPhysicsFlag_LoopSpline), // Loop on spline
+	RAD_FLAG(kPhysicsFlag_SplineEvents),
+	RAD_FLAG(kPhysicsFlag_SplineBank),
+	RAD_FLAG(kPhysicsFlag_FlipSplineBank),
+};
+
+struct PState {
 // I haven't been able to figure out how I want to represent physics.
 // Will improve when I have time to think more. Right now we need to ship Crow.
 	PState();
@@ -84,8 +83,9 @@ struct PState
 
 	Vec3 pos;
 	Vec3 origin;
-	Vec3 worldPos;
-	Vec3 cameraPos;
+	Vec3 worldPos; // origin + pos
+	Vec3 cameraPos; // worldPos + cameraShift
+	Vec3 cameraShift;
 	Vec3 originAngles;
 	Vec3 worldAngles;
 	Vec3 targetAngles;
@@ -105,6 +105,7 @@ struct PState
 	float splineBankLerp;
 	MoveType mtype;
 	SolidType stype;
+	OccupantType otype;
 	int flags; // physics flags
 };
 
@@ -156,8 +157,7 @@ struct PState
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class Entity : public boost::enable_shared_from_this<Entity>
-{
+class Entity : public boost::enable_shared_from_this<Entity> {
 public:
 	typedef EntityRef Ref;
 	typedef EntityWRef WRef;
@@ -222,8 +222,7 @@ public:
 
 protected:
 
-	struct PSVars
-	{
+	struct PSVars {
 		PSVars();
 		Vec3 splineFwd;
 		ska::BoneTM motion;
@@ -255,7 +254,7 @@ protected:
 	virtual void LevelStart();
 
 	virtual void PushCallTable(lua_State *L);
-	virtual void TickViewModels(float dt);
+	virtual void TickDrawModels(float dt);
 	virtual void TickSounds(float dt);
 
 	virtual void TickPhysics(
@@ -295,8 +294,8 @@ protected:
 private:
 
 	enum {
-		MaxLuaCallbacks = 32,
-		NumLuaCallbackBuckets = (MaxLuaCallbacks+31)/32
+		kMaxLuaCallbacks = 32,
+		kNumLuaCallbackBuckets = (kMaxLuaCallbacks+31)/32
 	};
 
 	friend class World;
@@ -327,22 +326,24 @@ private:
 	int FindLuaCallbackSlot();
 
 	// ------------- Lua Calls --------------
-	static int lua_AttachViewModel(lua_State *L);
-	static int lua_RemoveViewModel(lua_State *L);
-	static int lua_SetViewModelAngles(lua_State *L);
-	static int lua_SetViewModelScale(lua_State *L);
-	static int lua_SetViewModelMotionType(lua_State *L);
-	static int lua_SetViewModelVisible(lua_State *L);
-	static int lua_ViewModelVisible(lua_State *L);
-	static int lua_SetViewModelPos(lua_State *L);
-	static int lua_ViewModelPos(lua_State *L);
-	static int lua_FadeViewModel(lua_State *L);
-	static int lua_ViewModelBonePos(lua_State *L);
-	static int lua_ViewModelFindBone(lua_State *L);
-	static int lua_TickViewModel(lua_State *L);
+	static int lua_AttachDrawModel(lua_State *L);
+	static int lua_RemoveDrawModel(lua_State *L);
+	static int lua_SetDrawModelAngles(lua_State *L);
+	static int lua_SetDrawModelScale(lua_State *L);
+	static int lua_SetDrawModelMotionType(lua_State *L);
+	static int lua_SetDrawModelVisible(lua_State *L);
+	static int lua_DrawModelVisible(lua_State *L);
+	static int lua_SetDrawModelPos(lua_State *L);
+	static int lua_DrawModelPos(lua_State *L);
+	static int lua_FadeDrawModel(lua_State *L);
+	static int lua_DrawModelBonePos(lua_State *L);
+	static int lua_DrawModelFindBone(lua_State *L);
+	static int lua_TickDrawModel(lua_State *L);
 	static int lua_AttachSound(lua_State *L);
 	static int lua_RemoveSound(lua_State *L);
 	static int lua_AddTickable(lua_State *L);
+	static int lua_Link(lua_State *L);
+	static int lua_Unlink(lua_State *L);
 	static int lua_Delete(lua_State *L);
 
 	ENT_DECL_GETSET(Parent);
@@ -350,6 +351,7 @@ private:
 	ENT_DECL_GETSET(Origin);
 	ENT_DECL_GETSET(WorldPos);
 	ENT_DECL_GETSET(CameraPos);
+	ENT_DECL_GETSET(CameraShift);
 	ENT_DECL_GETSET(Angles);
 	ENT_DECL_GETSET(OriginAngles);
 	ENT_DECL_GETSET(WorldAngles);
@@ -369,6 +371,7 @@ private:
 	ENT_DECL_GETSET(SplineBankLerp);
 	ENT_DECL_GETSET(MoveType);
 	ENT_DECL_GETSET(SolidType);
+	ENT_DECL_GETSET(OccupantType);
 	ENT_DECL_GETSET(Flags);
 	ENT_DECL_GETSET(NextThink);
 
@@ -428,7 +431,7 @@ private:
 	typedef zone_map<Sound*, SoundRef, ZWorldT>::type SoundMap;
 
 	int m_luaCallbackIdx;
-	boost::array<int, NumLuaCallbackBuckets> m_luaCallbacks;
+	boost::array<int, kNumLuaCallbackBuckets> m_luaCallbacks;
 	TickQueue<Entity> m_tasks;
 	TickQueue<Entity> m_scriptTasks;
 	DrawModel::Map m_models;

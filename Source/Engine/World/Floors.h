@@ -147,9 +147,9 @@ public:
 		RAD_FLAG(kWaypointState_Enabled)
 	};
 
-	FloorPosition WaypointPosition(int waypoint) const;
-	int WaypointState(int waypointId) const;
-	void SetWaypointState(int waypointId, int state);
+	bool WaypointPosition(int waypoint, FloorPosition &pos) const;
+	int WaypointState(int waypoint) const;
+	void SetWaypointState(int waypoint, int state);
 
 	IntVec WaypointsForTargetname(const char *targetname) const;
 	IntVec WaypointsForUserId(const char *userId) const;

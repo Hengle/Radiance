@@ -279,6 +279,7 @@ void World::TickState(float dt, float unmod_dt) {
 
 			if (it->second->gc) {
 				Entity::Ref r(it->second);
+				UnlinkEntity(r.get());
 				UnmapEntity(r);
 			}
 			
@@ -482,8 +483,7 @@ Entity::Vec World::FindEntityTargets(const char *targetname) const {
 
 	Entity::Vec vec;
 
-	while (pair.first != pair.second)
-	{
+	while (pair.first != pair.second) {
 		vec.push_back(pair.first->second);
 		++pair.first;
 	}

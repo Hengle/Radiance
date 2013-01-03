@@ -152,10 +152,12 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(World, slot, int);
 	RAD_DECLARE_READONLY_PROPERTY(World, drawCounters, const WorldDraw::Counters*);
 	RAD_DECLARE_READONLY_PROPERTY(World, listenerPos, const Vec3&);
+	RAD_DECLARE_READONLY_PROPERTY(World, bspFile, const bsp_file::BSPFile*);
 
 private:
 
 	friend class WorldDraw;
+	friend class Entity;
 	typedef zone_list<Event::Ref, ZWorldT>::type EventList;
 	typedef zone_map<int, ZoneTagRef, ZWorldT>::type ZoneIdMap;
 
@@ -431,6 +433,10 @@ private:
 		return &m_drawCounters; 
 	}
 
+	RAD_DECLARE_GET(bspFile, const bsp_file::BSPFile*) {
+		return m_bsp.get();
+	}
+	
 	RAD_DECLARE_GET(listenerPos, const Vec3&);
 
 	EventList m_events;

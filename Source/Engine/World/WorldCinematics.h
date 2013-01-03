@@ -55,6 +55,8 @@ public:
 	bool SetCinematicTime(const char *name, float time);
 	void Skip();
 
+	const bsp_file::BSPCinematic *FindCinematic(const char *name);
+
 	RAD_DECLARE_READONLY_PROPERTY(WorldCinematics, cameraActive, bool);
 
 private:

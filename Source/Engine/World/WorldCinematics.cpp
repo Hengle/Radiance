@@ -343,6 +343,10 @@ bool WorldCinematics::PlayCinematic(
 			return true;
 	}
 
+	const BSPCinematic *bspC = FindCinematic(name);
+	if (!bspC || (bspC->numTriggers < 1))
+		return false;
+
 	Cinematic::Ref c(new (ZWorld) Cinematic());
 	c->name = name;
 	c->flags = flags;
@@ -359,20 +363,8 @@ bool WorldCinematics::PlayCinematic(
 	c->xfade[0] = 0.f;
 	c->xfade[1] = xfadeCamera;
 	c->suppressFinish = m_inUpdate; // keep us from infinite looping.
-
-	for (int i = 0; i < (int)m_bspFile->numCinematics.get(); ++i) {
-		const BSPCinematic *bspC = m_bspFile->Cinematics()+i;
-		const char *sz = m_bspFile->String(bspC->name);
-		if (strcmp(name, sz))
-			continue;
-
-		c->cinematic = bspC;
-		break;
-	}
-
-	if (!c->cinematic || c->cinematic->numTriggers < 1)
-		return false;
-
+	c->cinematic = bspC;
+	
 	c->trigger = m_bspFile->CinematicTriggers()+c->cinematic->firstTrigger;
 	m_cinematics.push_back(c);
 
@@ -632,6 +624,18 @@ void WorldCinematics::Skip() {
 		if (c.notify)
 			c.notify->OnSkip();
 	}
+}
+
+const bsp_file::BSPCinematic *WorldCinematics::FindCinematic(const char *name) {
+	for (int i = 0; i < (int)m_bspFile->numCinematics.get(); ++i) {
+		const BSPCinematic *bspC = m_bspFile->Cinematics()+i;
+		const char *sz = m_bspFile->String(bspC->name);
+		if (strcmp(name, sz))
+			continue;
+		return bspC;
+	}
+
+	return 0;
 }
 
 void WorldCinematics::EmitCameraTags(Cinematic &c) {

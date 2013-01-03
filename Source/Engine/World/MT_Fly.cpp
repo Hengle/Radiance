@@ -14,12 +14,12 @@ void Entity::Tick_MT_Fly(
 	const xtime::TimeSlice &time
 )
 {
-	m_ps.flags &= ~PF_OnGround; // flying
+	m_ps.flags &= ~kPhysicsFlag_OnGround; // flying
 
-	if (m_ps.flags&PF_SeekAngles)
+	if (m_ps.flags&kPhysicsFlag_SeekAngles)
 		SeekAngles(dt);
 
-	if (m_ps.flags&PF_AutoFace)
+	if (m_ps.flags&kPhysicsFlag_AutoFace)
 		AutoFace(dt);
 
 	UpdateVelocity(dt);

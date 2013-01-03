@@ -211,6 +211,19 @@ bool GLSLTool::Assemble(
 			in.c_str, 
 			0
 		);
+		
+		{
+			engine.sys->files->CreateDirectory("@r:/Temp/Shaders/Logs");
+			String path(CStr("@r:/Temp/Shaders/Logs/"));
+			path += shader->name;
+			path += "_unoptimized";
+			if (vertexShader) {
+				path += ".vert.glsl";
+			} else {
+				path += ".frag.glsl";
+			}
+			tools::shader_utils::SaveText(engine, path.c_str, in.c_str);
+		}
 
 		if (!glslopt_get_status(opt_shader)) {
 			COut(C_Error) << "Error optimizing shader: " << std::endl << in << std::endl << glslopt_get_log(opt_shader) << std::endl;
