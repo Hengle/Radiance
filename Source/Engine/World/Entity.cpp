@@ -406,6 +406,10 @@ void Entity::PushCallTable(lua_State *L) {
 	lua_setfield(L, -2, "SetDrawModelPos");
 	lua_pushcfunction(L, lua_DrawModelPos);
 	lua_setfield(L, -2, "DrawModelPos");
+	lua_pushcfunction(L, lua_SetDrawModelBounds);
+	lua_setfield(L, -2, "SetDrawModelBounds");
+	lua_pushcfunction(L, lua_DrawModelBounds);
+	lua_setfield(L, -2, "DrawModelBounds");
 	lua_pushcfunction(L, lua_FadeDrawModel);
 	lua_setfield(L, -2, "FadeDrawModel");
 	lua_pushcfunction(L, lua_DrawModelBonePos);
@@ -958,6 +962,88 @@ int Entity::lua_DrawModelPos(lua_State *L) {
 				if (r && r->bundle.get().get() == dmesh->bundle.get().get()) {
 					lua::Marshal<Vec3>::Push(L, r->pos);
 					return 1;
+				}
+			}
+			
+			return 0;
+		}
+	}
+
+	return 0;
+}
+
+int Entity::lua_SetDrawModelBounds(lua_State *L) {
+	Entity *self = WorldLua::EntFramePtr(L, 1, true);
+	Vec3 mins = lua::Marshal<Vec3>::Get(L, 3, true);
+	Vec3 maxs = lua::Marshal<Vec3>::Get(L, 4, true);
+
+	// figure out what kind of model is attached:
+	{
+		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
+		if (skModel) { 
+			// is there a view controller with this attached?
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it) {
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
+				if (r && r->mesh.get().get() == skModel->mesh.get().get()) {
+					r->bounds = BBox(mins, maxs);
+					break;
+				}
+			}
+			
+			return 0;
+		}
+	}
+	{
+		D_Mesh::Ref dmesh = lua::SharedPtr::Get<D_Mesh>(L, "D_Mesh", 2, false);
+		if (dmesh) { 
+			// already a view model with this attached?
+			DrawModel::Map::const_iterator it = self->m_models.begin();
+			for (;it != self->m_models.end(); ++it) {
+				MeshBundleDrawModel::Ref r = boost::dynamic_pointer_cast<MeshBundleDrawModel>(it->second);
+				if (r && r->bundle.get().get() == dmesh->bundle.get().get()) {
+					r->bounds = BBox(mins, maxs);
+					break;
+				}
+			}
+			
+			return 0;
+		}
+	}
+
+	return 0;
+}
+
+int Entity::lua_DrawModelBounds(lua_State *L) {
+	Entity *self = WorldLua::EntFramePtr(L, 1, true);
+
+	// figure out what kind of model is attached:
+	{
+		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
+		if (skModel) { 
+			// is there a view controller with this attached?
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it) {
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
+				if (r && r->mesh.get().get() == skModel->mesh.get().get()) {
+					lua::Marshal<Vec3>::Push(L, r->bounds.get().Mins());
+					lua::Marshal<Vec3>::Push(L, r->bounds.get().Maxs());
+					return 2;
+				}
+			}
+			
+			return 0;
+		}
+	}
+	{
+		D_Mesh::Ref dmesh = lua::SharedPtr::Get<D_Mesh>(L, "D_Mesh", 2, false);
+		if (dmesh) { 
+			// already a view model with this attached?
+			DrawModel::Map::const_iterator it = self->m_models.begin();
+			for (;it != self->m_models.end(); ++it) {
+				MeshBundleDrawModel::Ref r = boost::dynamic_pointer_cast<MeshBundleDrawModel>(it->second);
+				if (r && r->bundle.get().get() == dmesh->bundle.get().get()) {
+					lua::Marshal<Vec3>::Push(L, r->bounds.get().Mins());
+					lua::Marshal<Vec3>::Push(L, r->bounds.get().Maxs());
+					return 2;
 				}
 			}
 			

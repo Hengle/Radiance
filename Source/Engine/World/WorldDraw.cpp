@@ -413,8 +413,8 @@ void WorldDraw::VisMarkArea(
 
 		const MStaticWorldMeshBatch::Ref &m = m_worldModels[modelNum];
 		if (m->m_markFrame != m_markFrame) {
+			m->m_markFrame = m_markFrame;
 			if (ClipBounds(volume, volumeBounds, m->bounds)) {
-				m->m_markFrame = m_markFrame;
 				details::MBatchRef batch = AddViewBatch(view, m->m_matId);
 				if (batch)
 					batch->AddDraw(*m);
@@ -432,13 +432,17 @@ void WorldDraw::VisMarkArea(
 				const DrawModel::Ref &m = it->second;
 				if (m->m_markFrame != m_markFrame) {
 					m->m_markFrame = m_markFrame;
-					for (MBatchDraw::RefVec::const_iterator it = m->m_batches.begin(); it != m->m_batches.end(); ++it) {
-						const MBatchDraw::Ref &draw = *it;
-						if (draw->m_markFrame != m_markFrame) {
-							draw->m_markFrame = m_markFrame;
-							details::MBatchRef batch = AddViewBatch(view, draw->m_matId);
-							if (batch)
-								batch->AddDraw(*draw);
+					BBox bounds(m->bounds);
+					bounds.Translate(e->ps->worldPos);
+					if (ClipBounds(volume, volumeBounds, bounds)) {
+						for (MBatchDraw::RefVec::const_iterator it = m->m_batches.begin(); it != m->m_batches.end(); ++it) {
+							const MBatchDraw::Ref &draw = *it;
+							if (draw->m_markFrame != m_markFrame) {
+								draw->m_markFrame = m_markFrame;
+								details::MBatchRef batch = AddViewBatch(view, draw->m_matId);
+								if (batch)
+									batch->AddDraw(*draw);
+							}
 						}
 					}
 				}

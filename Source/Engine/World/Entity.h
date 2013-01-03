@@ -335,6 +335,8 @@ private:
 	static int lua_DrawModelVisible(lua_State *L);
 	static int lua_SetDrawModelPos(lua_State *L);
 	static int lua_DrawModelPos(lua_State *L);
+	static int lua_SetDrawModelBounds(lua_State *L);
+	static int lua_DrawModelBounds(lua_State *L);
 	static int lua_FadeDrawModel(lua_State *L);
 	static int lua_DrawModelBonePos(lua_State *L);
 	static int lua_DrawModelFindBone(lua_State *L);
