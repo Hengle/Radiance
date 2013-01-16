@@ -164,6 +164,9 @@ bool WorldLua::Init() {
 		{ "CameraUp", lua_World_CameraUp },
 		{ "SetEnabledGestures", lua_World_SetEnabledGestures },
 		{ "FlushInput", lua_World_FlushInput },
+		{ "FindFloor", lua_World_FindFloor },
+		{ "FloorState", lua_World_FloorState },
+		{ "SetFloorState", lua_World_SetFloorState },
 		{ "WaypointPosition", lua_World_WaypointPosition },
 		{ "WaypointFloorPosition", lua_World_WaypointFloorPosition },
 		{ "WaypointState", lua_World_WaypointState },
@@ -1785,6 +1788,30 @@ int WorldLua::lua_World_FlushInput(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
 	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
 	self->m_world->game->FlushInput(lua_toboolean(L, 1) ? true : false);
+	return 0;
+}
+
+int WorldLua::lua_World_FindFloor(lua_State *L) {
+	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
+	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
+
+	lua_pushinteger(L, self->m_world->floors->FindFloor(luaL_checkstring(L, 1)));
+	return 1;
+}
+
+int WorldLua::lua_World_FloorState(lua_State *L) {
+	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
+	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
+
+	lua_pushinteger(L, self->m_world->floors->FloorState(luaL_checkinteger(L, 1)));
+	return 1;
+}
+
+int WorldLua::lua_World_SetFloorState(lua_State *L) {
+	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
+	WorldLua *self = (WorldLua*)lua_touserdata(L, -1);
+
+	self->m_world->floors->SetFloorState(luaL_checkinteger(L, 1), luaL_checkinteger(L, 2));
 	return 0;
 }
 

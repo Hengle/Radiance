@@ -17,6 +17,7 @@ FloorMove::FloorMove() {
 }
 
 void FloorMove::InitMove(State &state) {
+
 }
 
 bool FloorMove::Move(State &state, float velocity) {
@@ -25,6 +26,9 @@ bool FloorMove::Move(State &state, float velocity) {
 
 bool FloorMove::RAD_IMPLEMENT_GET(busy) {
 	return false;
+}
+
+void FloorMove::Merge(const Ref &old, State &state) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -59,6 +63,8 @@ bool Floors::Load(const bsp_file::BSPFile::Ref &bsp) {
 		m_waypoints.push_back(w);
 	}
 
+	m_floorState.resize(m_bsp->numFloors, 0);
+
 	return true;
 }
 
@@ -71,6 +77,8 @@ bool Floors::ClipToFloor(
 	bool r = false;
 
 	for (U32 i = 0; i < m_bsp->numFloors; ++i) {
+		if (!(m_floorState[i] & kFloorState_Enabled))
+			continue;
 		if (ClipToFloor(i, start, end, pos, bestDistSq)) {
 			r = true;
 		}
@@ -146,7 +154,6 @@ FloorMove::Ref Floors::CreateMove(
 
 	FloorMove::Ref move(new (ZWorld) FloorMove());
 	GenerateFloorMove(route, move->m_route);
-
 	return move;
 }
 
@@ -201,6 +208,30 @@ IntVec Floors::WaypointsForUserId(const char *userId) const {
 	}
 
 	return vec;
+}
+
+int Floors::FindFloor(const char *name) const {
+	const String kName(CStr(name));
+
+	for (U32 i = 0; i < m_bsp->numFloors; ++i) {
+		const bsp_file::BSPFloor *floor = m_bsp->Floors() + i;
+		const char *floorName = m_bsp->String(floor->name);
+		if (kName == floorName)
+			return (int)i;
+	}
+
+	return -1;
+}
+
+int Floors::FloorState(int floor) const {
+	if (floor < 0 || (floor >= (int)m_floorState.size()))
+		return 0;
+	return m_floorState[floor];
+}
+
+void Floors::SetFloorState(int floor, int state) {
+	if (floor >= 0 && (floor < (int)m_floorState.size()))
+		m_floorState[floor] = state;
 }
 
 void Floors::WalkFloor(
@@ -623,6 +654,7 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 			step.waypoints[1] = cur.waypoints[1];
 			step.floors[0] = cur.floors[0];
 			step.floors[1] = cur.floors[1];
+			step.connection = cur.connection;
 
 			const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + cur.waypoints[1];
 			const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + cur.connection;
@@ -695,6 +727,7 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 
 				physics::CubicBZSpline spline(bzCtrls);
 				step.waypoints[0] = step.waypoints[1] = -1;
+				step.connection = -1;
 				step.floors[0] = step.floors[1] = cur.floors[0];
 				step.path.Load(spline);
 				moveRoute.steps->push_back(step);
@@ -742,6 +775,7 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 		physics::CubicBZSpline spline(cur.pos, ctrls[0], ctrls[1], next.pos);
 		step.floors[0] = step.floors[1] = cur.floors[0];
 		step.waypoints[0] = step.waypoints[1] = -1;
+		step.connection = -1;
 		step.path.Load(spline);
 
 		moveRoute.steps->push_back(step);

@@ -51,6 +51,11 @@ int GSPlay::Tick(Game &game, float dt, const xtime::TimeSlice &time, int flags) 
 
 	if(game.world->PendingSwitch(slot))
 		game.Switch(slot);
+
+#if !defined(RAD_OPT_SHIP)
+	if (game.m_dbgServer)
+		game.m_dbgServer->ProcessClients();
+#endif
 	
 	return TickNext;
 }

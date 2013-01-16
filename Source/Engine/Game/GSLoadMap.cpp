@@ -10,6 +10,7 @@
 #include "../Engine.h"
 #include "../World/World.h"
 #include "../Sound/Sound.h"
+#include "../Packages/Packages.h"
 #include <algorithm>
 #undef min
 #undef max
@@ -39,6 +40,16 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 			COut(C_ErrMsgBox) << "Error loading map!" << std::endl;
 			return TickPop;
 		}
+
+#if !defined(RAD_OPT_SHIP)
+		String dbgServerDescription;
+		dbgServerDescription.PrintfASCII("(%s) %s", net::GetHostName(), m_map->path.get());
+		if (!game.m_dbgServer) {
+			game.m_dbgServer = tools::DebugConsoleServer::Start(dbgServerDescription.c_str, &game.m_cvarZone);
+		} else {
+			game.m_dbgServer->SetDescription(dbgServerDescription.c_str);
+		}
+#endif
 
 		m_mapAsset = asset::MapAsset::Cast(m_map);
 		if (!m_mapAsset) {
@@ -92,6 +103,11 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 				Draw(game, elapsed/1000.f);
 			}
 		}
+
+#if !defined(RAD_OPT_SHIP)
+		if (game.m_dbgServer)
+			game.m_dbgServer->ProcessClients();
+#endif
 
 #if defined(RAD_OPT_PC_TOOLS)
 		if (!m_mapAsset->compiling) {

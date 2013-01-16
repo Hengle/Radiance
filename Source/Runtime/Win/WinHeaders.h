@@ -13,7 +13,7 @@
 	#error "Include error, this file only works under windows!"
 #endif
 
-#define RAD_REQ_WINVER 0x500
+#define RAD_REQ_WINVER 0x502
 
 //
 // Is windows already included?

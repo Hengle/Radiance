@@ -56,6 +56,14 @@ enum SurfaceFlags {
 	RAD_FLAG(kSurfaceFlag_NoDraw)
 };
 
+enum WaypointConnectionFlags {
+	RAD_FLAG(kWaypointConnectionFlag_AtoB),
+	RAD_FLAG(kWaypointConnectionFlag_BtoA),
+	RAD_FLAG(kWaypointConnectionFlag_BtoAUseAtoBScript),
+	RAD_FLAG(kWaypointConnectionFlag_AutoFace),
+	RAD_FLAG(kWaypointConnectionFlag_Interruptable)
+};
+
 struct BSPNode {
 	S32 parent;
 	S32 children[2];

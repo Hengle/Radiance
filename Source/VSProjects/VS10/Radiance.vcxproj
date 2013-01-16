@@ -193,7 +193,9 @@
     <ClInclude Include="..\..\Engine\Assets\TypefaceParser.h" />
     <ClInclude Include="..\..\Engine\Camera.h" />
     <ClInclude Include="..\..\Engine\ComponentExports.h" />
+    <ClInclude Include="..\..\Engine\Console.h" />
     <ClInclude Include="..\..\Engine\COut.h" />
+    <ClInclude Include="..\..\Engine\CVars.h" />
     <ClInclude Include="..\..\Engine\Engine.h" />
     <ClInclude Include="..\..\Engine\Game\Game.h" />
     <ClInclude Include="..\..\Engine\Game\GameNetwork.h" />
@@ -298,6 +300,9 @@
     <ClInclude Include="..\..\Engine\Sound\SoundDef.h" />
     <ClInclude Include="..\..\Engine\StringTable.h" />
     <ClInclude Include="..\..\Engine\Tickable.h" />
+    <ClInclude Include="..\..\Engine\Tools\DebugConsoleClient.h" />
+    <ClInclude Include="..\..\Engine\Tools\DebugConsoleCommon.h" />
+    <ClInclude Include="..\..\Engine\Tools\DebugConsoleServer.h" />
     <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserDef.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
@@ -510,6 +515,18 @@
     </QtMOC>
     <ClInclude Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentAssetThumbDimensionCache.h" />
     <QtMOC Include="..\..\Engine\Tools\Editor\EditorBSPDebugWidget.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorDebugConsoleWidget.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorDebugConsoleMenuBuilder.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
+    </QtMOC>
     <ClInclude Include="..\..\Engine\Tools\Editor\EditorEventRegistry.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
@@ -1040,6 +1057,7 @@
     <ClInclude Include="..\..\Runtime\Meta\TypeTraits\TypeSelect.h" />
     <ClInclude Include="..\..\Runtime\Meta\TypeTraits\TypeTraits.h" />
     <ClInclude Include="..\..\Runtime\Meta\TypeTraits\VolatileTraits.h" />
+    <ClInclude Include="..\..\Runtime\Net\Socket.h" />
     <ClInclude Include="..\..\Runtime\PopCAWarnings.h" />
     <ClInclude Include="..\..\Runtime\PopPack.h" />
     <ClInclude Include="..\..\Runtime\PopSystemMacros.h" />
@@ -1283,9 +1301,12 @@
     <ClCompile Include="..\..\Engine\Assets\TypefaceParser.cpp" />
     <ClCompile Include="..\..\Engine\Camera.cpp" />
     <ClCompile Include="..\..\Engine\ComponentExports.cpp" />
+    <ClCompile Include="..\..\Engine\Console.cpp" />
     <ClCompile Include="..\..\Engine\COut.cpp" />
+    <ClCompile Include="..\..\Engine\CVars.cpp" />
     <ClCompile Include="..\..\Engine\Engine.cpp" />
     <ClCompile Include="..\..\Engine\Game\Game.cpp" />
+    <ClCompile Include="..\..\Engine\Game\GameCVars.cpp" />
     <ClCompile Include="..\..\Engine\Game\GameNetwork.cpp" />
     <ClCompile Include="..\..\Engine\Game\GameNetworkNull.cpp" />
     <ClCompile Include="..\..\Engine\Game\Gestures.cpp" />
@@ -1387,6 +1408,14 @@
     <ClCompile Include="..\..\Engine\Sound\ALDriver.cpp" />
     <ClCompile Include="..\..\Engine\Sound\Sound.cpp" />
     <ClCompile Include="..\..\Engine\StringTable.cpp" />
+    <ClCompile Include="..\..\Engine\Tools\DebugConsoleClient.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\DebugConsoleServer.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserModel.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
@@ -1608,6 +1637,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorDebugConsoleMenuBuilder.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorDebugConsoleWidget.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorGLNavWidget.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
@@ -2050,6 +2091,7 @@
     <ClCompile Include="..\..\Runtime\Interface\ComponentManager.cpp" />
     <ClCompile Include="..\..\Runtime\Interface\ComponentManagerReflectMap.cpp" />
     <ClCompile Include="..\..\Runtime\Interface\InterfaceReflectMap.cpp" />
+    <ClCompile Include="..\..\Runtime\Net\Socket.cpp" />
     <ClCompile Include="..\..\Runtime\Reflect\Private\ReflectPrivate.cpp" />
     <ClCompile Include="..\..\Runtime\Reflect\Reflect.cpp" />
     <ClCompile Include="..\..\Runtime\Reflect\ReflectMap.cpp" />
@@ -2065,6 +2107,7 @@
     <ClCompile Include="..\..\Runtime\Win\WinThread.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Engine\CVars.inl" />
     <None Include="..\..\Engine\Lua\LuaRuntime.inl" />
     <None Include="..\..\Engine\Packages\Packages.inl" />
     <None Include="..\..\Engine\Renderer\GL\GLMesh.inl" />
@@ -2078,6 +2121,7 @@
     <None Include="..\..\Engine\Renderer\Mesh.inl" />
     <None Include="..\..\Engine\Renderer\ShaderTool.inl" />
     <None Include="..\..\Engine\Tickable.inl" />
+    <None Include="..\..\Engine\Tools\DebugConsoleClient.inl" />
     <None Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorContentBrowserModel.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>

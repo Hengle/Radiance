@@ -12,6 +12,7 @@
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/Container/ZoneList.h>
 #include <Runtime/Container/ZoneSet.h>
+#include <Runtime/PushPack.h>
 
 namespace world {
 
@@ -160,3 +161,5 @@ private:
 };
 
 } // world
+
+#include <Runtime/PopPack.h>

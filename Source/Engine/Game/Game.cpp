@@ -1,7 +1,9 @@
-// Game.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file Game.cpp
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup world
+*/
 
 #include RADPCH
 #include "../App.h"
@@ -28,7 +30,12 @@ enum {
 };
 
 
-Game::Game() : m_slot(0), m_pinch(0), m_pinchDelay(0), m_cloudStorage(false), m_quit(false)
+Game::Game() : 
+m_slot(0), 
+m_pinch(0), 
+m_pinchDelay(0), 
+m_cloudStorage(false),
+m_quit(false)
 #if defined(RAD_OPT_PC_TOOLS)
 , m_toolsCallback(0), m_progressIndicatorParent(0)
 #endif
@@ -36,9 +43,17 @@ Game::Game() : m_slot(0), m_pinch(0), m_pinchDelay(0), m_cloudStorage(false), m_
 	m_vp[0] = m_vp[1] = m_vp[2] = m_vp[3] = 0;
 	m_session = Persistence::Load(0);
 	m_saveGame = Persistence::Load(0);
+
+	m_cvarZone.Open(0);
+	m_cvars = new CVars(*this, m_cvarZone);
 }
 
 Game::~Game() {
+#if !defined(RAD_OPT_SHIP)
+	m_dbgServer.reset();
+#endif
+	m_cvarZone.Close();
+	delete m_cvars;
 }
 
 bool Game::LoadEntry() {

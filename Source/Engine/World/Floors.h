@@ -82,6 +82,7 @@ public:
 		typedef stackify<std::vector<Step>, 8> Vec;
 		Spline path;
 		int waypoints[2];
+		int connection;
 		int floors[2];
 	};
 
@@ -97,6 +98,7 @@ public:
 		int flags;
 	private:
 		friend class FloorMove;
+		friend class Floors;
 		int m_stepIdx;
 		float m_t;
 	};
@@ -105,9 +107,11 @@ public:
 
 	void InitMove(State &state);
 	bool Move(State &state, float velocity);
-
+	
 	RAD_DECLARE_READONLY_PROPERTY(FloorMove, busy, bool);
 	RAD_DECLARE_READONLY_PROPERTY(FloorMove, route, const Route*);
+
+	void Merge(const Ref &old, State &state);
 
 private:
 
@@ -142,6 +146,14 @@ public:
 		const FloorPosition &start,
 		const FloorPosition &end
 	) const;
+
+	enum {
+		RAD_FLAG(kFloorState_Enabled)
+	};
+
+	int FindFloor(const char *name) const;
+	int FloorState(int floor) const;
+	void SetFloorState(int floor, int state);
 
 	enum {
 		RAD_FLAG(kWaypointState_Enabled)
@@ -200,7 +212,7 @@ private:
 	};
 
 	//! Find shortest path from start->end
-	bool Floors::PlanMove(
+	bool PlanMove(
 		const FloorPosition &start,
 		const FloorPosition &end,
 		float distance,
@@ -211,7 +223,7 @@ private:
 		float &bestDistance
 	) const;
 
-	bool Floors::PlanFloorMove(
+	bool PlanFloorMove(
 		const FloorPosition &start,
 		const FloorPosition &end,
 		float distance,
@@ -222,7 +234,7 @@ private:
 		float &bestDistance
 	) const;
 
-	bool Floors::PlanWaypointMove(
+	bool PlanWaypointMove(
 		const FloorPosition &start,
 		const FloorPosition &end,
 		float distance,
@@ -256,6 +268,7 @@ private:
 	Waypoint::Vec m_waypoints;
 	Waypoint::MMap m_waypointTargets;
 	Waypoint::MMap m_waypointUserIds;
+	IntVec m_floorState;
 	bsp_file::BSPFile::Ref m_bsp;
 };
 

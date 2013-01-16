@@ -151,6 +151,9 @@
     <Filter Include="Source\Engine\World\MapBuilder\SolidBSP">
       <UniqueIdentifier>{77f088f1-1e9a-48da-a224-963f2d7e042f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Runtime\Socket">
+      <UniqueIdentifier>{d82b3f48-1c99-4118-b8bd-c7ad1eb7e604}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Runtime\Base.h">
@@ -1407,6 +1410,24 @@
     <ClInclude Include="..\..\Engine\Renderer\ShaderToolUtils.h">
       <Filter>Source\Engine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\CVars.h">
+      <Filter>Source\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Runtime\Net\Socket.h">
+      <Filter>Source\Runtime\Socket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Console.h">
+      <Filter>Source\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Tools\DebugConsoleServer.h">
+      <Filter>Source\Engine\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Tools\DebugConsoleCommon.h">
+      <Filter>Source\Engine\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Tools\DebugConsoleClient.h">
+      <Filter>Source\Engine\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2111,6 +2132,30 @@
     <ClCompile Include="..\..\Engine\Renderer\ShaderToolUtils.cpp">
       <Filter>Source\Engine\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\CVars.cpp">
+      <Filter>Source\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Runtime\Net\Socket.cpp">
+      <Filter>Source\Runtime\Socket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Console.cpp">
+      <Filter>Source\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\DebugConsoleServer.cpp">
+      <Filter>Source\Engine\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\DebugConsoleClient.cpp">
+      <Filter>Source\Engine\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Game\GameCVars.cpp">
+      <Filter>Source\Engine\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorDebugConsoleWidget.cpp">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorDebugConsoleMenuBuilder.cpp">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Runtime\Base\Event.inl">
@@ -2359,6 +2404,12 @@
     <None Include="..\..\Engine\Renderer\ShaderTool.inl">
       <Filter>Source\Engine\Renderer</Filter>
     </None>
+    <None Include="..\..\Engine\CVars.inl">
+      <Filter>Source\Engine</Filter>
+    </None>
+    <None Include="..\..\Engine\Tools\DebugConsoleClient.inl">
+      <Filter>Source\Engine\Tools</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <QtMOC Include="..\..\Engine\Tools\Editor\EditorMainWindow.h">
@@ -2500,6 +2551,12 @@
       <Filter>Source\Engine\Tools\Editor</Filter>
     </QtMOC>
     <QtMOC Include="..\..\Engine\Tools\Editor\EditorModelEditorWindow.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorDebugConsoleWidget.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorDebugConsoleMenuBuilder.h">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </QtMOC>
   </ItemGroup>

@@ -14,6 +14,10 @@
 
 DECLARE(thread)
 
+namespace net {
+void SocketStart();
+} // net
+
 namespace rt {
 
 namespace details
@@ -86,6 +90,8 @@ namespace details
 RADRT_API void RADRT_CALL Initialize(RuntimeFlags flags, thread::IThreadContext *context)
 {
 	details::s_flags = flags;
+
+	net::SocketStart();
 
 	SIMDDriver::Select();
 

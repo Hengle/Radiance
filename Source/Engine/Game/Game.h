@@ -1,11 +1,14 @@
-// Game.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file Game.h
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup world
+*/
 
 #pragma once
 
 #include "../Types.h"
+#include "../CVars.h"
 #include "../Engine.h"
 #include "../Tickable.h"
 #include "../Input.h"
@@ -19,6 +22,10 @@
 #include <Runtime/Container/ZoneMap.h>
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/Container/ZoneSet.h>
+
+#if !defined(RAD_OPT_SHIP)
+#include "../Tools/DebugConsoleServer.h"
+#endif
 
 #if defined(RAD_OPT_PC_TOOLS)
 class QWidget;
@@ -48,6 +55,14 @@ public:
 		::world::World::Ref world;
 		pkg::AssetRef asset;
 		int id;
+	};
+
+	class CVars {
+	public:
+		CVarBool r_showtris;
+	private:
+		friend class Game;
+		CVars(Game &game, CVarZone &zone);
 	};
 
 	static Ref New();
@@ -100,6 +115,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Game, numSavedGameConflicts, int);
 	RAD_DECLARE_READONLY_PROPERTY(Game, gameNetwork, gn::GameNetwork *);
 	RAD_DECLARE_READONLY_PROPERTY(Game, stringTable, const StringTable*);
+	RAD_DECLARE_READONLY_PROPERTY(Game, cvars, CVars*);
 	RAD_DECLARE_PROPERTY(Game, cloudStorage, bool, bool);
 	RAD_DECLARE_PROPERTY(Game, quit, bool, bool);
 
@@ -150,6 +166,7 @@ private:
 
 	friend class world::World;
 	friend class GSLoadMap;
+	friend class GSPlay;
 
 	struct MapSlot {
 		typedef zone_map<int, MapSlot, ZEngineT>::type Map;
@@ -211,6 +228,10 @@ private:
 		m_quit = value;
 	}
 
+	RAD_DECLARE_GET(cvars, CVars*) {
+		return m_cvars;
+	}
+
 #if defined(RAD_OPT_PC_TOOLS)
 	RAD_DECLARE_GET(toolsCallback, IToolsCallbacks*) { 
 		return m_toolsCallback; 
@@ -219,6 +240,7 @@ private:
 	QWidget *m_progressIndicatorParent;
 #endif
 
+	CVarZone m_cvarZone;
 	TickQueue<Game> m_tickable;
 	InputEventList m_inputEvents;
 	InputEventList m_delayedEvents;
@@ -234,9 +256,14 @@ private:
 	CloudFile::Vec m_cloudVersions;
 	gn::GameNetworkRef m_gameNetwork;
 	gn::GameNetworkEventQueue m_gameNetworkEventQueue;
+	CVars *m_cvars;
 	bool m_cloudStorage;
 	bool m_quit;
 	int m_vp[4];
+
+#if !defined(RAD_OPT_SHIP)
+	tools::DebugConsoleServer::Ref m_dbgServer;
+#endif
 };
 
 

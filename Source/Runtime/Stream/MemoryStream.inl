@@ -12,7 +12,7 @@ inline MemInputBuffer::MemInputBuffer() : m_ptr(0), m_size(0), m_pos(0)
 
 inline MemInputBuffer::MemInputBuffer(const void* buff, SPos size) : m_ptr(buff), m_size(size), m_pos(0)
 {
-	RAD_ASSERT(buff && size);
+	RAD_ASSERT(buff);
 }
 
 inline MemInputBuffer::~MemInputBuffer()

@@ -6,6 +6,7 @@
 #include RADPCH
 #include "App.h"
 #include "Engine.h"
+#include "CVars.h"
 #include "ComponentExports.h"
 #include "World/Entities/E_Exports.h"
 #include <Runtime/Thread.h>
@@ -35,6 +36,7 @@ Engine::~Engine() {
 }
 
 bool Engine::PreInit() {
+	
 #if defined(RAD_OPT_PC_TOOLS)
 	m_scc = SCC::Create("null");
 	RAD_ASSERT(m_scc);
@@ -56,6 +58,8 @@ bool Engine::PreInit() {
 		sys->files->SetAlias('r', root);
 
 	sys->files->AddDirectory((CStr("@r:/") + baseDir).c_str, file::kFileMask_Base);
+
+	CVarZone::Globals().Open("@r:/cvars.dat");
 
 	sys->r->Initialize();
 	m_comTable.alDriver = ALDriver::New(ALDRIVER_SIG 0);
@@ -90,6 +94,8 @@ void Engine::Finalize()
 
 	m_comTable.r.Close();
 	m_comTable.files.reset();
+
+	CVarZone::Globals().Close();
 }
 
 void Engine::Tick(float elapsed)

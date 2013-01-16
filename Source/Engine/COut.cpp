@@ -12,6 +12,7 @@
 #include <boost/thread/tss.hpp>
 
 #if defined(RAD_OPT_PC_TOOLS)
+#include "Tools/DebugConsoleServer.h"
 #include "Tools/Editor/EditorLogWindow.h"
 #include "Tools/Editor/EditorCookerDialog.h"
 #endif
@@ -35,6 +36,7 @@ protected:
 	{
 #if defined(RAD_OPT_PC_TOOLS)
 		tools::editor::CookerDialog::SPrint(str.c_str());
+		tools::DebugConsoleServer::BroadcastLogMessage(str.c_str());
 		bool dialog = tools::editor::LogWindow::SPrint(m_level, str.c_str());
 #endif
 #if !defined(RAD_OPT_DEBUG) && (defined(RAD_OPT_SHIP) || defined(RAD_OPT_ADHOC))

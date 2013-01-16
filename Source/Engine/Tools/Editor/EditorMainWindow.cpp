@@ -16,9 +16,11 @@
 #include "EditorUtils.h"
 #include "EditorGLWidget.h"
 #include "EditorCookerDialog.h"
+#include "EditorDebugConsoleMenuBuilder.h"
 #include "ContentBrowser/EditorContentBrowserWindow.h"
 #include "ContentBrowser/EditorContentBrowserView.h"
 #include "PropertyGrid/EditorPropertyGrid.h"
+#include "../DebugConsoleClient.h"
 #include "../../App.h"
 #include "../../Renderer/GL/RGLBackend.h"
 #include "../../Renderer/GL/GLTable.h"
@@ -29,8 +31,7 @@ namespace editor {
 
 MainWindow *MainWindow::s_instance = 0;
 
-MainWindow *MainWindow::Get()
-{
+MainWindow *MainWindow::Get() {
 	return s_instance;
 }
 
@@ -45,6 +46,8 @@ m_logWinShowHide(0),
 m_zoneWinShowHide(0),
 m_zoneWin(0),
 m_logWin(0),
+m_dbgServersMenu(0),
+m_dbgServersMenuBuilder(0),
 m_tickEnabled(true),
 #if defined(RAD_OPT_WIN)
 m_userSettings(
@@ -75,26 +78,23 @@ m_userSettings(
 	CenterWidget(*this, desktop->screenGeometry());
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
 	s_instance = 0;
 	m_app->engine->sys->r->ctx = r::HContext();
+	DebugConsoleClient::StaticStop();
 }
 
-void MainWindow::BindGL()
-{
+void MainWindow::BindGL() {
 	m_glBase->makeCurrent();
 	m_app->engine->sys->r->ctx = m_glBaseCtx;
 }
 
-void MainWindow::UnbindGL()
-{
+void MainWindow::UnbindGL() {
 	m_app->engine->sys->r->ctx = r::HContext();
 	m_glBase->doneCurrent();
 }
 
-bool MainWindow::Init()
-{
+bool MainWindow::Init() {
 	setWindowTitle(QString(m_app->title.get()) + ": Content Browser");
 	m_logWin = new (ZEditor) LogWindow(this);
 	m_logWin->setWindowTitle(QString(m_app->title.get()) + QString(": Starting Editor..."));
@@ -104,8 +104,7 @@ bool MainWindow::Init()
 	return true;
 }
 
-bool MainWindow::Show()
-{
+bool MainWindow::Show() {
 	show();
 	m_logWin->show();
 
@@ -143,50 +142,49 @@ bool MainWindow::Show()
 	RAD_VERIFY(connect(openCookerDialog, SIGNAL(triggered(bool)), SLOT(OpenCookerDialog())));
 
 	QMenuBar *menuBar = new (ZEditor) QMenuBar(this);
+
+	m_dbgServersMenu = menuBar->addMenu("Debug");
+
 	QMenu *toolsMenu = menuBar->addMenu("Tools");
 	toolsMenu->addAction(openCookerDialog);
 	QMenu *viewMenu = menuBar->addMenu("View");
 	viewMenu->addAction(m_logWinShowHide);
 	viewMenu->addAction(m_zoneWinShowHide);
+
 	setMenuBar(menuBar);
+
+	m_dbgServersMenuBuilder = new (ZEditor) DebugConsoleMenuBuilder(this);
+	DebugConsoleClient::StaticStart();
 
 	return true;
 }
 
-void MainWindow::ShowHideLogWindowTriggered(bool checked)
-{
+void MainWindow::ShowHideLogWindowTriggered(bool checked) {
 	m_logWin->setVisible(checked);
 }
 
-void MainWindow::ShowHideZoneWindowTriggered(bool checked)
-{
-	if (checked)
-	{
+void MainWindow::ShowHideZoneWindowTriggered(bool checked) {
+	if (checked) {
 		m_zoneWin = new (ZEditor) ZoneViewWindow(this);
 		m_zoneWin->show();
-	}
-	else
-	{
+	} else {
 		if (m_zoneWin)
 			m_zoneWin->close();
 		m_zoneWin = 0;
 	}
 }
 
-void MainWindow::OpenCookerDialog()
-{
+void MainWindow::OpenCookerDialog() {
 	(new CookerDialog(this))->show();
 }
 
-void MainWindow::Run()
-{
+void MainWindow::Run() {
 	m_app->Push(TickInit::New());
 	m_run = true;
 	startTimer(1);
 }
 
-void MainWindow::PostInit()
-{
+void MainWindow::PostInit() {
 	m_app->Run();
 	setEnabled(true);
 	m_logWin->EnableCloseButton();
@@ -194,8 +192,7 @@ void MainWindow::PostInit()
 	m_logWin->hide();
 }
 
-void MainWindow::PostLoad()
-{
+void MainWindow::PostLoad() {
 	QApplication::restoreOverrideCursor();
 	UnbindGL();
 
@@ -203,36 +200,30 @@ void MainWindow::PostLoad()
 	setCentralWidget(m_contentBrowser);
 }
 
-void MainWindow::timerEvent(QTimerEvent*)
-{
+void MainWindow::timerEvent(QTimerEvent*) {
 	AppTick();
 }
 
-void MainWindow::closeEvent(QCloseEvent *e)
-{
+void MainWindow::closeEvent(QCloseEvent *e) {
 	e->accept();
 	emit OnClose(e);
-	if (e->isAccepted())
-	{
+	if (e->isAccepted()) {
 		emit Closing();
 		DoClosing();
 	}
 }
 
-void MainWindow::DoClosing()
-{
+void MainWindow::DoClosing() {
 	setCentralWidget(0);
 	m_contentBrowser = 0;
 	delete m_logWin;
 }
 
-bool MainWindow::CheckExit()
-{
+bool MainWindow::CheckExit() {
 	if (m_exitPosted) 
 		return true;
 
-	if (m_app->exit)
-	{
+	if (m_app->exit) {
 		m_exitPosted = true;
 		close();
 		return true;
@@ -241,19 +232,19 @@ bool MainWindow::CheckExit()
 	return false;
 }
 
-void MainWindow::AppTick()
-{
+void MainWindow::AppTick() {
 	BindGL();
 
 	if (CheckExit()) 
 		return;
 
-	if (m_tickEnabled)
-	{
+	if (m_tickEnabled) {
 		float elapsed = m_app->Tick();
 		emit OnTick(elapsed);
 		ContentBrowserView::Tick(elapsed);
 		m_sound->Tick(elapsed, true);
+		DebugConsoleClient::ProcessMessages();
+		m_dbgServersMenuBuilder->RefreshServers(m_dbgServersMenu);
 	}
 
 	CheckExit();

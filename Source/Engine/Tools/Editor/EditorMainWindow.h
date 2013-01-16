@@ -13,10 +13,12 @@
 #include <QtGui/QMdiArea>
 #include <QtCore/QSettings>
 #include <QtGui/QCloseEvent>
+#include <Runtime/Container/ZoneVector.h>
 #include <Runtime/PushPack.h>
 
 class App;
 class QAction;
+class QMenu;
 
 namespace tools {
 namespace editor {
@@ -24,9 +26,9 @@ namespace editor {
 class LogWindow;
 class ZoneViewWindow;
 class ContentBrowserWindow;
+class DebugConsoleMenuBuilder;
 
-class RADENG_CLASS MainWindow : public QMainWindow
-{
+class RADENG_CLASS MainWindow : public QMainWindow {
 	Q_OBJECT
 public:
 
@@ -78,6 +80,7 @@ private:
 	void AppTick();
 	bool CheckExit();
 	void DoClosing();
+	void UpdateDebugServers();
 
 	RAD_DECLARE_GET(logWindow, LogWindow*) { return m_logWin; }
 	RAD_DECLARE_GET(app, ::App*) { return m_app; }
@@ -91,8 +94,7 @@ private:
 	RAD_DECLARE_GET(zoneWinShowHideAction, QAction*) { return m_zoneWinShowHide; }
 	RAD_DECLARE_GET(soundContext, SoundContext*) { return m_sound.get(); }
 
-	RAD_DECLARE_GET(mdiArea, QMdiArea*)
-	{
+	RAD_DECLARE_GET(mdiArea, QMdiArea*) {
 		return qobject_cast<QMdiArea*>(centralWidget());
 	}
 
@@ -104,6 +106,8 @@ private:
 	ContentBrowserWindow *m_contentBrowser;
 	QAction *m_logWinShowHide;
 	QAction *m_zoneWinShowHide;
+	QMenu *m_dbgServersMenu;
+	DebugConsoleMenuBuilder *m_dbgServersMenuBuilder;
 	::App *m_app;
 	mutable QSettings m_userSettings;
 	bool m_run;

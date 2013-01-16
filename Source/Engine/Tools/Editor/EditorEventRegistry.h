@@ -15,7 +15,8 @@ enum EventRegistry
 	EV_LogWindowPrint = QEvent::User,
 	EV_ProgressDialog,
 	EV_RebuildContentPropertyGrid,
-	EV_CookWindowPrint
+	EV_CookWindowPrint,
+	EV_DebugConsoleMenuBuilderConnectWindow
 };
 
 } // editor

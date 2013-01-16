@@ -3,9 +3,9 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
+#pragma once
 #include "Stream.h"
 #include "../PushPack.h"
-
 
 namespace stream {
 

@@ -7,6 +7,7 @@
 
 #include "WorldDef.h"
 #include "EntityDef.h"
+#include "Floors.h"
 #include "Event.h"
 #include "Keys.h"
 #include "../Packages/Packages.h"
@@ -47,7 +48,8 @@ enum TickFlags {
 enum MoveType {
 	kMoveType_None,
 	kMoveType_Fly,
-	kMoveType_Spline // ps.ground points to spline track.
+	kMoveType_Spline, // ps.ground points to spline track.
+	kMoveType_Floor // Floor move system
 };
 
 enum SolidType {
