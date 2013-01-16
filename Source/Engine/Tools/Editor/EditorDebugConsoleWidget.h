@@ -31,6 +31,8 @@ public:
 	bool Connect(const DebugConsoleServerId &id, bool connectToMainMenu);
 	void Disconnect();
 
+	virtual void setVisible(bool visibile);
+
 private slots:
 
 	void ReturnPressed();
@@ -71,6 +73,7 @@ private:
 	QLineEdit *m_lineEdit;
 	QPlainTextEdit *m_textArea;
 	QPushButton *m_exec;
+	QPushButton *m_cls;
 	bool m_fromMainMenu;
 };
 

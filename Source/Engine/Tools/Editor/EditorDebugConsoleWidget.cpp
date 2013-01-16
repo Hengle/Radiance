@@ -57,6 +57,12 @@ void DebugConsoleWidget::Disconnect() {
 	}
 }
 
+void DebugConsoleWidget::setVisible(bool visible) {
+	if (!visible)
+		DebugConsoleMenuBuilder::Hidden(this);
+	QWidget::setVisible(visible);
+}
+
 void DebugConsoleWidget::ReturnPressed() {
 	QString s = m_lineEdit->text();
 	m_lineEdit->setText("");
@@ -89,9 +95,9 @@ void DebugConsoleWidget::CreateUI() {
 
 	QHBoxLayout *hbl = new (ZEditor) QHBoxLayout();
 
-	QPushButton *b = new (ZEditor) QPushButton("CLS");
-	RAD_VERIFY(connect(b, SIGNAL(clicked()), SLOT(ClearScrollback())));
-	hbl->addWidget(b);
+	m_cls = new (ZEditor) QPushButton("CLS");
+	RAD_VERIFY(connect(m_cls, SIGNAL(clicked()), SLOT(ClearScrollback())));
+	hbl->addWidget(m_cls);
 
 	m_lineEdit = new (ZEditor) QLineEdit();
 	m_lineEdit->setPlaceholderText("enter command");
@@ -110,6 +116,7 @@ void DebugConsoleWidget::EnableUI(bool enable) {
 	m_textArea->setEnabled(enable);
 	m_lineEdit->setEnabled(enable);
 	m_exec->setEnabled(enable);
+	m_cls->setEnabled(enable);
 }
 
 void DebugConsoleWidget::Print(const String &msg) {

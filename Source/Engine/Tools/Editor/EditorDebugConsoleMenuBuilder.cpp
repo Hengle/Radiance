@@ -27,6 +27,12 @@ DebugConsoleMenuBuilder::DebugConsoleMenuBuilder(QObject *parent) : QObject(pare
 
 DebugConsoleMenuBuilder::~DebugConsoleMenuBuilder() {
 	s_instance = 0;
+
+	for (DebugServerItem::Vec::iterator it = m_dbgServers.begin(); it != m_dbgServers.end(); ++it) {
+		DebugServerItem &item = *it;
+		if (item.window)
+			delete item.window;
+	}
 }
 
 void DebugConsoleMenuBuilder::OnMenuItem() {
@@ -36,25 +42,13 @@ void DebugConsoleMenuBuilder::OnMenuItem() {
 	for (DebugServerItem::Vec::iterator it = m_dbgServers.begin(); it != m_dbgServers.end(); ++it) {
 		DebugServerItem &item = *it;
 		if (item.action == action) {
-			if (!item.window) {
-				DebugConsoleWidget *window = new (ZEditor) DebugConsoleWidget(
-					0,
-					Qt::Window|
-					Qt::CustomizeWindowHint|
-					Qt::WindowTitleHint|
-					Qt::WindowMinimizeButtonHint|
-					Qt::WindowMaximizeButtonHint|
-					Qt::WindowCloseButtonHint
-				);
-				window->setAttribute(Qt::WA_DeleteOnClose);
-				window->setWindowTitle(action->text());
-				PercentSize(*window, *MainWindow::Get(), 0.65f, 0.85f);
-				CenterWidget(*window, *MainWindow::Get());
-				RAD_VERIFY(connect(MainWindow::Get(), SIGNAL(Closing()), window, SLOT(close())));
-				window->show();
-				QCoreApplication::postEvent(this, new (ZEditor) ConnectEvent(window, item.id));
-			} else {
-				item.window->raise();
+			if (item.window) {
+				if (item.window->isVisible()) {
+					item.window->raise();
+				} else {
+					item.window->show();
+				}
+				item.action->setChecked(true);
 			}
 
 			break;
@@ -87,14 +81,31 @@ void DebugConsoleMenuBuilder::RefreshServers(QMenu *base) {
 			DebugServerItem item;
 			item.id = id;
 			item.window = 0;
-
 			item.action = new (ZEditor) QAction(description.c_str.get(), this);
 			item.action->setCheckable(true);
 			item.action->setChecked(false);
 			RAD_VERIFY(connect(item.action, SIGNAL(triggered(bool)), SLOT(OnMenuItem())));
 
+			DebugConsoleWidget *window = new (ZEditor) DebugConsoleWidget(
+				0,
+				Qt::Window|
+				Qt::CustomizeWindowHint|
+				Qt::WindowTitleHint|
+				Qt::WindowMinimizeButtonHint|
+				Qt::WindowMaximizeButtonHint|
+				Qt::WindowCloseButtonHint
+			);
+
+			window->setWindowTitle(item.action->text());
+			PercentSize(*window, *MainWindow::Get(), 0.65f, 0.85f);
+			CenterWidget(*window, *MainWindow::Get());
+			RAD_VERIFY(connect(MainWindow::Get(), SIGNAL(Closing()), window, SLOT(close())));
+			window->hide();
+			
 			base->addAction(item.action);
 			m_dbgServers.push_back(item);
+
+			QCoreApplication::postEvent(this, new (ZEditor) ConnectEvent(window, item.id));
 
 		} else {
 			DebugServerItem &item = *it2;
@@ -110,10 +121,21 @@ void DebugConsoleMenuBuilder::RefreshServers(QMenu *base) {
 	// expire invalid servers
 
 	for (DebugServerItem::Vec::iterator it = m_dbgServers.begin(); it != m_dbgServers.end();) {
-		if (!DebugConsoleServerId::Contains((*it).id, servers)) {
-			base->removeAction((*it).action);
-			delete (*it).action;
+		DebugServerItem &item = *it;
+		if (!DebugConsoleServerId::Contains(item.id, servers)) {
+			base->removeAction(item.action);
+			delete item.action;
+			DebugConsoleWidget *window = item.window;
 			it = m_dbgServers.erase(it);
+			if (window) {
+				if (window->isVisible()) {
+					window->setAttribute(Qt::WA_DeleteOnClose);
+					window->Disconnect();
+				} else {
+					delete window;
+				}
+			}
+			
 		} else {
 			++it;
 		}
@@ -153,7 +175,6 @@ void DebugConsoleMenuBuilder::Register(DebugConsoleWidget *window, const DebugCo
 			RAD_ASSERT(item.window == 0);
 			item.window = window;
 			RAD_ASSERT(item.action);
-			item.action->setChecked(true);
 			break;
 		}
 	}
@@ -169,6 +190,18 @@ void DebugConsoleMenuBuilder::Unregister(DebugConsoleWidget *window) {
 			item.action->setChecked(false);
 			item.window = 0;
 			break;
+		}
+	}
+}
+
+void DebugConsoleMenuBuilder::Hidden(DebugConsoleWidget *window) {
+	if (!s_instance)
+		return;
+
+	for (DebugServerItem::Vec::iterator it = s_instance->m_dbgServers.begin(); it != s_instance->m_dbgServers.end(); ++it) {
+		DebugServerItem &item = *it;
+		if (item.window == window) {
+			item.action->setChecked(false);
 		}
 	}
 }

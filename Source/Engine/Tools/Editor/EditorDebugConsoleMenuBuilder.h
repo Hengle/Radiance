@@ -64,6 +64,7 @@ private:
 
 	static void Register(DebugConsoleWidget *window, const DebugConsoleServerId &id);
 	static void Unregister(DebugConsoleWidget *window);
+	static void Hidden(DebugConsoleWidget *window);
 
 	static DebugConsoleMenuBuilder *s_instance;
 };

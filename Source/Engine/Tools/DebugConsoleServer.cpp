@@ -195,6 +195,7 @@ bool DebugConsoleServer::SessionServer::Register(DebugConsoleServer *sv) {
 	}
 
 	++m_numActiveServers;
+	DoBroadcast(); // update server list immediately.
 
 	return true;
 }
@@ -204,6 +205,7 @@ void DebugConsoleServer::SessionServer::Unregister(DebugConsoleServer *sv) {
 	RAD_ASSERT(m_numActiveServers > 0);
 	--m_numActiveServers;
 	m_servers.erase(sv->m_sessionId);
+	DoBroadcast(); // update server list immediately.
 }
 
 void DebugConsoleServer::SessionServer::BroadcastLogMessage(const char *_msg) {
