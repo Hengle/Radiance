@@ -16,8 +16,11 @@ RAD_ZONE_DEC(RADENG_API, ZMusic);
 RAD_ZONE_DEC(RADENG_API, ZMeshes);
 RAD_ZONE_DEC(RADENG_API, ZStringTables);
 
-#if defined(RAD_OPT_TOOLS)
+#if !defined(RAD_OPT_SHIP)
 RAD_ZONE_DEC(RADENG_API, ZTools);
+#endif
+
+#if defined(RAD_OPT_TOOLS)
 RAD_ZONE_DEC(RADENG_API, ZEditor);
 #endif
 

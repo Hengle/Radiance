@@ -48,8 +48,11 @@ void SocketStart() {
 					U8 mask = z->h_addr_list[i][0];
 
 					if (i < 1 || (mask == 192) || (mask == 10))
+#if defined(RAD_OPT_WINX)
 						s_localIP.s_addr = *((ulong*)z->h_addr_list[i]);
-					
+#else
+						s_localIP.s_addr = *((in_addr_t*)z->h_addr_list[i]);
+#endif
 					if (mask == 192)
 						break; // 192 is best (local intranet).
 				}

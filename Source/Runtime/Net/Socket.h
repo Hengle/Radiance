@@ -11,8 +11,16 @@
 
 #if defined(RAD_OPT_WIN)
 #include "../Win/WinHeaders.h"
+typedef int socklen_t;
 #else
+#include <sys/types.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+inline void closesocket(int sd) {
+	close(sd);
+}
 #endif
 
 #include "../PushPack.h"

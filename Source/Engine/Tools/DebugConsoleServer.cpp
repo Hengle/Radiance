@@ -61,7 +61,7 @@ void DebugConsoleServer::ProcessClientCmds() {
 
 	while (cmds) {
 		cmds = false;
-		for (Client::Vec::const_iterator it = m_clients.begin(); it != m_clients.end();) {
+		for (Client::Vec::iterator it = m_clients.begin(); it != m_clients.end();) {
 			int z = ProcessClient(*(*it));
 
 			if (z >= 0) {
@@ -406,7 +406,7 @@ void DebugConsoleServer::SessionServer::Accept() {
 	} else if (z > 0) {
 		// accept is waiting.
 		sockaddr_in addr;
-		int len = sizeof(addr);
+		socklen_t len = sizeof(addr);
 		sd = accept(*m_listen, (sockaddr*)&addr, &len);
 		if (sd >= 0)
 			ConnectClient(sd, addr.sin_addr);
@@ -472,9 +472,9 @@ void DebugConsoleServer::SessionServer::DoBroadcast() {
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = net::GetLocalIP().s_addr;
-	addr.sin_addr.S_un.S_un_b.s_b4 = 255; // broadcast address
+	addr.sin_addr.s_addr |= (0xffu<<24U); // broadcast address
 	addr.sin_port = htons(kDebugConsoleNetBroadcastPort);
-
+	
 	if (sendto(*m_broadcast, (const char*)buf, (int)os.OutPos(), 0, (const sockaddr*)&addr, sizeof(addr)) != (int)os.OutPos()) {
 		COut(C_Error) << "ERROR: DebugConsoleServer: broadcast failed." << std::endl;
 	}

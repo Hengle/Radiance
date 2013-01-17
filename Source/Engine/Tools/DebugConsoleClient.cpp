@@ -262,12 +262,16 @@ void DebugConsoleClient::StaticStart() {
 
 	if (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt))) {
 		COut(C_Error) << "ERROR: DebugConsoleClient: broadcast SO_REUSEADDR failure." << std::endl;
+		return;
 	}
 
 	sockaddr_in addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = net::GetLocalIP().s_addr;
+#if defined(RAD_OPT_OSX) // mac needs to bind to the broadcast address
+	addr.sin_addr.s_addr |= (0xffu << 24U); // broadcast
+#endif
 	addr.sin_port = htons(kDebugConsoleNetBroadcastPort);
 
 	if (bind(sd, (const sockaddr*)&addr, sizeof(addr))) {
@@ -300,7 +304,7 @@ int DebugConsoleClient::ReadBroadcastPacket(void *buf, int maxLen, sockaddr_in &
 		COut(C_Error) << "ERROR: DebugConsoleServer: select failed on broadcast socket." << std::endl;
 		return 0;
 	} else if (z > 0) { // data is waiting
-		int addrsize = sizeof(addr);
+		socklen_t addrsize = sizeof(addr);
 		z = recvfrom(sd, (char*)buf, maxLen, 0, (sockaddr*)&addr, &addrsize);
 		return z;
 	}

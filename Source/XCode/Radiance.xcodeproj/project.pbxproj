@@ -1087,6 +1087,86 @@
 		339805961676D544002758B1 /* FloorsDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 339805931676D544002758B1 /* FloorsDef.h */; };
 		339805971676D544002758B1 /* FloorsDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 339805931676D544002758B1 /* FloorsDef.h */; };
 		339805981676D544002758B1 /* FloorsDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 339805931676D544002758B1 /* FloorsDef.h */; };
+		33982DAF16A8840900C2ED49 /* Socket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DAD16A8840900C2ED49 /* Socket.cpp */; };
+		33982DB016A8840900C2ED49 /* Socket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DAD16A8840900C2ED49 /* Socket.cpp */; };
+		33982DB116A8840900C2ED49 /* Socket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DAD16A8840900C2ED49 /* Socket.cpp */; };
+		33982DB216A8840900C2ED49 /* Socket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DAD16A8840900C2ED49 /* Socket.cpp */; };
+		33982DB316A8840900C2ED49 /* Socket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DAD16A8840900C2ED49 /* Socket.cpp */; };
+		33982DB416A8840900C2ED49 /* Socket.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DAE16A8840900C2ED49 /* Socket.h */; };
+		33982DB516A8840900C2ED49 /* Socket.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DAE16A8840900C2ED49 /* Socket.h */; };
+		33982DB616A8840900C2ED49 /* Socket.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DAE16A8840900C2ED49 /* Socket.h */; };
+		33982DB716A8840900C2ED49 /* Socket.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DAE16A8840900C2ED49 /* Socket.h */; };
+		33982DB816A8840900C2ED49 /* Socket.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DAE16A8840900C2ED49 /* Socket.h */; };
+		33982DCB16A8960900C2ED49 /* DebugConsoleClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DC516A8960900C2ED49 /* DebugConsoleClient.cpp */; };
+		33982DCE16A8960900C2ED49 /* DebugConsoleClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DC616A8960900C2ED49 /* DebugConsoleClient.h */; };
+		33982DD116A8960900C2ED49 /* DebugConsoleCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DC816A8960900C2ED49 /* DebugConsoleCommon.h */; };
+		33982DD216A8960900C2ED49 /* DebugConsoleCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DC816A8960900C2ED49 /* DebugConsoleCommon.h */; };
+		33982DD316A8960900C2ED49 /* DebugConsoleCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DC816A8960900C2ED49 /* DebugConsoleCommon.h */; };
+		33982DD416A8960900C2ED49 /* DebugConsoleServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DC916A8960900C2ED49 /* DebugConsoleServer.cpp */; };
+		33982DD516A8960900C2ED49 /* DebugConsoleServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DC916A8960900C2ED49 /* DebugConsoleServer.cpp */; };
+		33982DD616A8960900C2ED49 /* DebugConsoleServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DC916A8960900C2ED49 /* DebugConsoleServer.cpp */; };
+		33982DD716A8960900C2ED49 /* DebugConsoleServer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DCA16A8960900C2ED49 /* DebugConsoleServer.h */; };
+		33982DD816A8960900C2ED49 /* DebugConsoleServer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DCA16A8960900C2ED49 /* DebugConsoleServer.h */; };
+		33982DD916A8960900C2ED49 /* DebugConsoleServer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DCA16A8960900C2ED49 /* DebugConsoleServer.h */; };
+		33982DDE16A8962F00C2ED49 /* EditorDebugConsoleMenuBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DDA16A8962F00C2ED49 /* EditorDebugConsoleMenuBuilder.cpp */; };
+		33982DDF16A8962F00C2ED49 /* EditorDebugConsoleMenuBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DDB16A8962F00C2ED49 /* EditorDebugConsoleMenuBuilder.h */; };
+		33982DE016A8962F00C2ED49 /* EditorDebugConsoleWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DDC16A8962F00C2ED49 /* EditorDebugConsoleWidget.cpp */; };
+		33982DE116A8962F00C2ED49 /* EditorDebugConsoleWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DDD16A8962F00C2ED49 /* EditorDebugConsoleWidget.h */; };
+		33982DE416A8970500C2ED49 /* Console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE216A8970500C2ED49 /* Console.cpp */; };
+		33982DE516A8970500C2ED49 /* Console.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DE316A8970500C2ED49 /* Console.h */; };
+		33982DEB16A89C0900C2ED49 /* WorldLuaCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DE616A89C0900C2ED49 /* WorldLuaCommon.h */; };
+		33982DEC16A89C0900C2ED49 /* WorldLuaCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DE616A89C0900C2ED49 /* WorldLuaCommon.h */; };
+		33982DED16A89C0900C2ED49 /* WorldLuaCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DE616A89C0900C2ED49 /* WorldLuaCommon.h */; };
+		33982DEE16A89C0900C2ED49 /* WorldLuaCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DE616A89C0900C2ED49 /* WorldLuaCommon.h */; };
+		33982DEF16A89C0900C2ED49 /* WorldLuaCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DE616A89C0900C2ED49 /* WorldLuaCommon.h */; };
+		33982DF016A89C0900C2ED49 /* WorldLuaCVars.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE716A89C0900C2ED49 /* WorldLuaCVars.cpp */; };
+		33982DF116A89C0900C2ED49 /* WorldLuaCVars.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE716A89C0900C2ED49 /* WorldLuaCVars.cpp */; };
+		33982DF216A89C0900C2ED49 /* WorldLuaCVars.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE716A89C0900C2ED49 /* WorldLuaCVars.cpp */; };
+		33982DF316A89C0900C2ED49 /* WorldLuaCVars.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE716A89C0900C2ED49 /* WorldLuaCVars.cpp */; };
+		33982DF416A89C0900C2ED49 /* WorldLuaCVars.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE716A89C0900C2ED49 /* WorldLuaCVars.cpp */; };
+		33982DF516A89C0900C2ED49 /* WorldLuaGameNetwork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE816A89C0900C2ED49 /* WorldLuaGameNetwork.cpp */; };
+		33982DF616A89C0900C2ED49 /* WorldLuaGameNetwork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE816A89C0900C2ED49 /* WorldLuaGameNetwork.cpp */; };
+		33982DF716A89C0900C2ED49 /* WorldLuaGameNetwork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE816A89C0900C2ED49 /* WorldLuaGameNetwork.cpp */; };
+		33982DF816A89C0900C2ED49 /* WorldLuaGameNetwork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE816A89C0900C2ED49 /* WorldLuaGameNetwork.cpp */; };
+		33982DF916A89C0900C2ED49 /* WorldLuaGameNetwork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE816A89C0900C2ED49 /* WorldLuaGameNetwork.cpp */; };
+		33982DFA16A89C0900C2ED49 /* WorldLuaSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE916A89C0900C2ED49 /* WorldLuaSystem.cpp */; };
+		33982DFB16A89C0900C2ED49 /* WorldLuaSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE916A89C0900C2ED49 /* WorldLuaSystem.cpp */; };
+		33982DFC16A89C0900C2ED49 /* WorldLuaSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE916A89C0900C2ED49 /* WorldLuaSystem.cpp */; };
+		33982DFD16A89C0900C2ED49 /* WorldLuaSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE916A89C0900C2ED49 /* WorldLuaSystem.cpp */; };
+		33982DFE16A89C0900C2ED49 /* WorldLuaSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE916A89C0900C2ED49 /* WorldLuaSystem.cpp */; };
+		33982DFF16A89C0900C2ED49 /* WorldLuaWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DEA16A89C0900C2ED49 /* WorldLuaWorld.cpp */; };
+		33982E0016A89C0900C2ED49 /* WorldLuaWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DEA16A89C0900C2ED49 /* WorldLuaWorld.cpp */; };
+		33982E0116A89C0900C2ED49 /* WorldLuaWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DEA16A89C0900C2ED49 /* WorldLuaWorld.cpp */; };
+		33982E0216A89C0900C2ED49 /* WorldLuaWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DEA16A89C0900C2ED49 /* WorldLuaWorld.cpp */; };
+		33982E0316A89C0900C2ED49 /* WorldLuaWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DEA16A89C0900C2ED49 /* WorldLuaWorld.cpp */; };
+		33982E0716A89C3B00C2ED49 /* CVars.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E0416A89C3B00C2ED49 /* CVars.cpp */; };
+		33982E0816A89C3B00C2ED49 /* CVars.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E0416A89C3B00C2ED49 /* CVars.cpp */; };
+		33982E0916A89C3B00C2ED49 /* CVars.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E0416A89C3B00C2ED49 /* CVars.cpp */; };
+		33982E0A16A89C3B00C2ED49 /* CVars.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E0416A89C3B00C2ED49 /* CVars.cpp */; };
+		33982E0B16A89C3B00C2ED49 /* CVars.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E0416A89C3B00C2ED49 /* CVars.cpp */; };
+		33982E0C16A89C3B00C2ED49 /* CVars.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982E0516A89C3B00C2ED49 /* CVars.h */; };
+		33982E0D16A89C3B00C2ED49 /* CVars.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982E0516A89C3B00C2ED49 /* CVars.h */; };
+		33982E0E16A89C3B00C2ED49 /* CVars.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982E0516A89C3B00C2ED49 /* CVars.h */; };
+		33982E0F16A89C3B00C2ED49 /* CVars.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982E0516A89C3B00C2ED49 /* CVars.h */; };
+		33982E1016A89C3B00C2ED49 /* CVars.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982E0516A89C3B00C2ED49 /* CVars.h */; };
+		33982E1316A89C8100C2ED49 /* GameCVars.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E1116A89C8100C2ED49 /* GameCVars.cpp */; };
+		33982E1416A89C8100C2ED49 /* GameCVars.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E1116A89C8100C2ED49 /* GameCVars.cpp */; };
+		33982E1516A89C8100C2ED49 /* GameCVars.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E1116A89C8100C2ED49 /* GameCVars.cpp */; };
+		33982E1616A89C8100C2ED49 /* GameCVars.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E1116A89C8100C2ED49 /* GameCVars.cpp */; };
+		33982E1716A89C8100C2ED49 /* GameCVars.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E1116A89C8100C2ED49 /* GameCVars.cpp */; };
+		33982E1816A89C8100C2ED49 /* GameCVars.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982E1216A89C8100C2ED49 /* GameCVars.h */; };
+		33982E1916A89C8100C2ED49 /* GameCVars.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982E1216A89C8100C2ED49 /* GameCVars.h */; };
+		33982E1A16A89C8100C2ED49 /* GameCVars.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982E1216A89C8100C2ED49 /* GameCVars.h */; };
+		33982E1B16A89C8100C2ED49 /* GameCVars.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982E1216A89C8100C2ED49 /* GameCVars.h */; };
+		33982E1C16A89C8100C2ED49 /* GameCVars.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982E1216A89C8100C2ED49 /* GameCVars.h */; };
+		33982E1D16A8ABB500C2ED49 /* Console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE216A8970500C2ED49 /* Console.cpp */; };
+		33982E1E16A8ABB500C2ED49 /* Console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE216A8970500C2ED49 /* Console.cpp */; };
+		33982E1F16A8ABB700C2ED49 /* Console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE216A8970500C2ED49 /* Console.cpp */; };
+		33982E2016A8ABB700C2ED49 /* Console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982DE216A8970500C2ED49 /* Console.cpp */; };
+		33982E2116A8ABBC00C2ED49 /* Console.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DE316A8970500C2ED49 /* Console.h */; };
+		33982E2216A8ABBC00C2ED49 /* Console.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DE316A8970500C2ED49 /* Console.h */; };
+		33982E2316A8ABBC00C2ED49 /* Console.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DE316A8970500C2ED49 /* Console.h */; };
+		33982E2416A8ABBD00C2ED49 /* Console.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DE316A8970500C2ED49 /* Console.h */; };
 		33988F9816684EA60018C3E6 /* Floors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988F9616684EA60018C3E6 /* Floors.cpp */; };
 		33988F9916684EA60018C3E6 /* Floors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988F9616684EA60018C3E6 /* Floors.cpp */; };
 		33988F9A16684EA60018C3E6 /* Floors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988F9616684EA60018C3E6 /* Floors.cpp */; };
@@ -2841,6 +2921,30 @@
 		338CDF0915BC8F140058DFF5 /* RadianceShipReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceShipReleaseiOS.xcconfig; path = XCConfig/RadianceShipReleaseiOS.xcconfig; sourceTree = "<group>"; };
 		338CDF0A15BC8F140058DFF5 /* RadianceShipReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceShipReleaseOSX.xcconfig; path = XCConfig/RadianceShipReleaseOSX.xcconfig; sourceTree = "<group>"; };
 		339805931676D544002758B1 /* FloorsDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FloorsDef.h; sourceTree = "<group>"; };
+		33982DAD16A8840900C2ED49 /* Socket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Socket.cpp; sourceTree = "<group>"; };
+		33982DAE16A8840900C2ED49 /* Socket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Socket.h; sourceTree = "<group>"; };
+		33982DC516A8960900C2ED49 /* DebugConsoleClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DebugConsoleClient.cpp; sourceTree = "<group>"; };
+		33982DC616A8960900C2ED49 /* DebugConsoleClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugConsoleClient.h; sourceTree = "<group>"; };
+		33982DC716A8960900C2ED49 /* DebugConsoleClient.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = DebugConsoleClient.inl; sourceTree = "<group>"; };
+		33982DC816A8960900C2ED49 /* DebugConsoleCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugConsoleCommon.h; sourceTree = "<group>"; };
+		33982DC916A8960900C2ED49 /* DebugConsoleServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DebugConsoleServer.cpp; sourceTree = "<group>"; };
+		33982DCA16A8960900C2ED49 /* DebugConsoleServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugConsoleServer.h; sourceTree = "<group>"; };
+		33982DDA16A8962F00C2ED49 /* EditorDebugConsoleMenuBuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorDebugConsoleMenuBuilder.cpp; sourceTree = "<group>"; };
+		33982DDB16A8962F00C2ED49 /* EditorDebugConsoleMenuBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorDebugConsoleMenuBuilder.h; sourceTree = "<group>"; };
+		33982DDC16A8962F00C2ED49 /* EditorDebugConsoleWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorDebugConsoleWidget.cpp; sourceTree = "<group>"; };
+		33982DDD16A8962F00C2ED49 /* EditorDebugConsoleWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorDebugConsoleWidget.h; sourceTree = "<group>"; };
+		33982DE216A8970500C2ED49 /* Console.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Console.cpp; path = ../Engine/Console.cpp; sourceTree = "<group>"; };
+		33982DE316A8970500C2ED49 /* Console.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Console.h; path = ../Engine/Console.h; sourceTree = "<group>"; };
+		33982DE616A89C0900C2ED49 /* WorldLuaCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldLuaCommon.h; sourceTree = "<group>"; };
+		33982DE716A89C0900C2ED49 /* WorldLuaCVars.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldLuaCVars.cpp; sourceTree = "<group>"; };
+		33982DE816A89C0900C2ED49 /* WorldLuaGameNetwork.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldLuaGameNetwork.cpp; sourceTree = "<group>"; };
+		33982DE916A89C0900C2ED49 /* WorldLuaSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldLuaSystem.cpp; sourceTree = "<group>"; };
+		33982DEA16A89C0900C2ED49 /* WorldLuaWorld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldLuaWorld.cpp; sourceTree = "<group>"; };
+		33982E0416A89C3B00C2ED49 /* CVars.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CVars.cpp; path = ../Engine/CVars.cpp; sourceTree = "<group>"; };
+		33982E0516A89C3B00C2ED49 /* CVars.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CVars.h; path = ../Engine/CVars.h; sourceTree = "<group>"; };
+		33982E0616A89C3B00C2ED49 /* CVars.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CVars.inl; path = ../Engine/CVars.inl; sourceTree = "<group>"; };
+		33982E1116A89C8100C2ED49 /* GameCVars.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameCVars.cpp; sourceTree = "<group>"; };
+		33982E1216A89C8100C2ED49 /* GameCVars.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameCVars.h; sourceTree = "<group>"; };
 		33988F9616684EA60018C3E6 /* Floors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Floors.cpp; sourceTree = "<group>"; };
 		33988F9716684EA60018C3E6 /* Floors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Floors.h; sourceTree = "<group>"; };
 		33988FA316684F1C0018C3E6 /* BezierSpline_inl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BezierSpline_inl.h; sourceTree = "<group>"; };
@@ -3698,6 +3802,16 @@
 			name = XCConfig;
 			sourceTree = "<group>";
 		};
+		33982DAC16A8840900C2ED49 /* Net */ = {
+			isa = PBXGroup;
+			children = (
+				33982DAD16A8840900C2ED49 /* Socket.cpp */,
+				33982DAE16A8840900C2ED49 /* Socket.h */,
+			);
+			name = Net;
+			path = ../Runtime/Net;
+			sourceTree = "<group>";
+		};
 		33DB15921627E4D100963A33 /* SolidBSP */ = {
 			isa = PBXGroup;
 			children = (
@@ -3783,6 +3897,7 @@
 				33E884F815B9ACB20089BA08 /* Interface */,
 				33E8851815B9ACBA0089BA08 /* Math */,
 				33E8857115B9ACC40089BA08 /* Meta */,
+				33982DAC16A8840900C2ED49 /* Net */,
 				33E8833E15B999370089BA08 /* Posix */,
 				33E885CC15B9ACCF0089BA08 /* Reflect */,
 				33E8862115B9ACE40089BA08 /* Stream */,
@@ -4358,8 +4473,13 @@
 				33836C0315B9CF580030EAEC /* Camera.h */,
 				33836C0415B9CF580030EAEC /* ComponentExports.cpp */,
 				33836C0515B9CF580030EAEC /* ComponentExports.h */,
+				33982DE216A8970500C2ED49 /* Console.cpp */,
+				33982DE316A8970500C2ED49 /* Console.h */,
 				33836C0615B9CF580030EAEC /* COut.cpp */,
 				33836C0715B9CF580030EAEC /* COut.h */,
+				33982E0416A89C3B00C2ED49 /* CVars.cpp */,
+				33982E0516A89C3B00C2ED49 /* CVars.h */,
+				33982E0616A89C3B00C2ED49 /* CVars.inl */,
 				33836C0815B9CF580030EAEC /* Engine.cpp */,
 				33836C0915B9CF580030EAEC /* Engine.h */,
 				33836C0A15B9CF580030EAEC /* Input.cpp */,
@@ -4457,6 +4577,8 @@
 			children = (
 				33E887BB15B9BA470089BA08 /* Game.cpp */,
 				33E887BC15B9BA470089BA08 /* Game.h */,
+				33982E1116A89C8100C2ED49 /* GameCVars.cpp */,
+				33982E1216A89C8100C2ED49 /* GameCVars.h */,
 				33E887BD15B9BA470089BA08 /* GameNetwork.cpp */,
 				33E887BE15B9BA470089BA08 /* GameNetwork.h */,
 				338A45FC15DE8B9500B0B9B7 /* GameNetworkDef.h */,
@@ -4650,6 +4772,12 @@
 			isa = PBXGroup;
 			children = (
 				33E8883D15B9BA490089BA08 /* Editor */,
+				33982DC516A8960900C2ED49 /* DebugConsoleClient.cpp */,
+				33982DC616A8960900C2ED49 /* DebugConsoleClient.h */,
+				33982DC716A8960900C2ED49 /* DebugConsoleClient.inl */,
+				33982DC816A8960900C2ED49 /* DebugConsoleCommon.h */,
+				33982DC916A8960900C2ED49 /* DebugConsoleServer.cpp */,
+				33982DCA16A8960900C2ED49 /* DebugConsoleServer.h */,
 				33DB15751627E31F00963A33 /* SceneFile.cpp */,
 				33DB15761627E31F00963A33 /* SceneFile.h */,
 				33E888AB15B9BA490089BA08 /* Progress.cpp */,
@@ -4673,6 +4801,10 @@
 				33E8886815B9BA490089BA08 /* EditorComboCheckBox.h */,
 				33E8886915B9BA490089BA08 /* EditorCookerDialog.cpp */,
 				33E8886A15B9BA490089BA08 /* EditorCookerDialog.h */,
+				33982DDA16A8962F00C2ED49 /* EditorDebugConsoleMenuBuilder.cpp */,
+				33982DDB16A8962F00C2ED49 /* EditorDebugConsoleMenuBuilder.h */,
+				33982DDC16A8962F00C2ED49 /* EditorDebugConsoleWidget.cpp */,
+				33982DDD16A8962F00C2ED49 /* EditorDebugConsoleWidget.h */,
 				33E8886B15B9BA490089BA08 /* EditorEventRegistry.h */,
 				33E8886C15B9BA490089BA08 /* EditorGLNavWidget.cpp */,
 				33E8886D15B9BA490089BA08 /* EditorGLNavWidget.h */,
@@ -4854,6 +4986,11 @@
 				33E8891115B9BA4A0089BA08 /* WorldDrawDef.h */,
 				33E8891215B9BA4A0089BA08 /* WorldLua.cpp */,
 				33E8891315B9BA4A0089BA08 /* WorldLua.h */,
+				33982DE616A89C0900C2ED49 /* WorldLuaCommon.h */,
+				33982DE716A89C0900C2ED49 /* WorldLuaCVars.cpp */,
+				33982DE816A89C0900C2ED49 /* WorldLuaGameNetwork.cpp */,
+				33982DE916A89C0900C2ED49 /* WorldLuaSystem.cpp */,
+				33982DEA16A89C0900C2ED49 /* WorldLuaWorld.cpp */,
 				33E8891415B9BA4A0089BA08 /* WorldSpawn.cpp */,
 			);
 			name = World;
@@ -5327,6 +5464,11 @@
 				33988FB216684F1C0018C3E6 /* BezierSpline.h in Headers */,
 				339805961676D544002758B1 /* FloorsDef.h in Headers */,
 				334315F816914DB200AABCEE /* Common.h in Headers */,
+				33982DB616A8840900C2ED49 /* Socket.h in Headers */,
+				33982DED16A89C0900C2ED49 /* WorldLuaCommon.h in Headers */,
+				33982E0E16A89C3B00C2ED49 /* CVars.h in Headers */,
+				33982E1A16A89C8100C2ED49 /* GameCVars.h in Headers */,
+				33982E2216A8ABBC00C2ED49 /* Console.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5706,6 +5848,13 @@
 				33988FB316684F1C0018C3E6 /* BezierSpline.h in Headers */,
 				339805971676D544002758B1 /* FloorsDef.h in Headers */,
 				334315F916914DB200AABCEE /* Common.h in Headers */,
+				33982DB716A8840900C2ED49 /* Socket.h in Headers */,
+				33982DD216A8960900C2ED49 /* DebugConsoleCommon.h in Headers */,
+				33982DD816A8960900C2ED49 /* DebugConsoleServer.h in Headers */,
+				33982DEE16A89C0900C2ED49 /* WorldLuaCommon.h in Headers */,
+				33982E0F16A89C3B00C2ED49 /* CVars.h in Headers */,
+				33982E1B16A89C8100C2ED49 /* GameCVars.h in Headers */,
+				33982E2316A8ABBC00C2ED49 /* Console.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6164,6 +6313,16 @@
 				334315F216914D8E00AABCEE /* ShaderTool.h in Headers */,
 				334315F416914D8E00AABCEE /* ShaderToolUtils.h in Headers */,
 				334315F616914DB200AABCEE /* Common.h in Headers */,
+				33982DB416A8840900C2ED49 /* Socket.h in Headers */,
+				33982DCE16A8960900C2ED49 /* DebugConsoleClient.h in Headers */,
+				33982DD116A8960900C2ED49 /* DebugConsoleCommon.h in Headers */,
+				33982DD716A8960900C2ED49 /* DebugConsoleServer.h in Headers */,
+				33982DDF16A8962F00C2ED49 /* EditorDebugConsoleMenuBuilder.h in Headers */,
+				33982DE116A8962F00C2ED49 /* EditorDebugConsoleWidget.h in Headers */,
+				33982DE516A8970500C2ED49 /* Console.h in Headers */,
+				33982DEB16A89C0900C2ED49 /* WorldLuaCommon.h in Headers */,
+				33982E0C16A89C3B00C2ED49 /* CVars.h in Headers */,
+				33982E1816A89C8100C2ED49 /* GameCVars.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6543,6 +6702,11 @@
 				33988FB116684F1C0018C3E6 /* BezierSpline.h in Headers */,
 				339805951676D544002758B1 /* FloorsDef.h in Headers */,
 				334315F716914DB200AABCEE /* Common.h in Headers */,
+				33982DB516A8840900C2ED49 /* Socket.h in Headers */,
+				33982DEC16A89C0900C2ED49 /* WorldLuaCommon.h in Headers */,
+				33982E0D16A89C3B00C2ED49 /* CVars.h in Headers */,
+				33982E1916A89C8100C2ED49 /* GameCVars.h in Headers */,
+				33982E2116A8ABBC00C2ED49 /* Console.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6922,6 +7086,13 @@
 				33988FB416684F1C0018C3E6 /* BezierSpline.h in Headers */,
 				339805981676D544002758B1 /* FloorsDef.h in Headers */,
 				334315FA16914DB200AABCEE /* Common.h in Headers */,
+				33982DB816A8840900C2ED49 /* Socket.h in Headers */,
+				33982DD316A8960900C2ED49 /* DebugConsoleCommon.h in Headers */,
+				33982DD916A8960900C2ED49 /* DebugConsoleServer.h in Headers */,
+				33982DEF16A89C0900C2ED49 /* WorldLuaCommon.h in Headers */,
+				33982E1016A89C3B00C2ED49 /* CVars.h in Headers */,
+				33982E1C16A89C8100C2ED49 /* GameCVars.h in Headers */,
+				33982E2416A8ABBD00C2ED49 /* Console.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7271,6 +7442,14 @@
 				33FA7E961633B97D002603A5 /* RGLBackend.cpp in Sources */,
 				33988F9A16684EA60018C3E6 /* Floors.cpp in Sources */,
 				33988FAD16684F1C0018C3E6 /* BezierSpline.cpp in Sources */,
+				33982DB116A8840900C2ED49 /* Socket.cpp in Sources */,
+				33982DF216A89C0900C2ED49 /* WorldLuaCVars.cpp in Sources */,
+				33982DF716A89C0900C2ED49 /* WorldLuaGameNetwork.cpp in Sources */,
+				33982DFC16A89C0900C2ED49 /* WorldLuaSystem.cpp in Sources */,
+				33982E0116A89C0900C2ED49 /* WorldLuaWorld.cpp in Sources */,
+				33982E0916A89C3B00C2ED49 /* CVars.cpp in Sources */,
+				33982E1516A89C8100C2ED49 /* GameCVars.cpp in Sources */,
+				33982E1F16A8ABB700C2ED49 /* Console.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7428,6 +7607,15 @@
 				33FA7E971633B97D002603A5 /* RGLBackend.cpp in Sources */,
 				33988F9B16684EA60018C3E6 /* Floors.cpp in Sources */,
 				33988FAE16684F1C0018C3E6 /* BezierSpline.cpp in Sources */,
+				33982DB216A8840900C2ED49 /* Socket.cpp in Sources */,
+				33982DD516A8960900C2ED49 /* DebugConsoleServer.cpp in Sources */,
+				33982DF316A89C0900C2ED49 /* WorldLuaCVars.cpp in Sources */,
+				33982DF816A89C0900C2ED49 /* WorldLuaGameNetwork.cpp in Sources */,
+				33982DFD16A89C0900C2ED49 /* WorldLuaSystem.cpp in Sources */,
+				33982E0216A89C0900C2ED49 /* WorldLuaWorld.cpp in Sources */,
+				33982E0A16A89C3B00C2ED49 /* CVars.cpp in Sources */,
+				33982E1616A89C8100C2ED49 /* GameCVars.cpp in Sources */,
+				33982E1D16A8ABB500C2ED49 /* Console.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7666,6 +7854,18 @@
 				33872E29167FFB15007448EE /* EditorModelEditorWindow.cpp in Sources */,
 				334315F116914D8E00AABCEE /* ShaderTool.cpp in Sources */,
 				334315F316914D8E00AABCEE /* ShaderToolUtils.cpp in Sources */,
+				33982DAF16A8840900C2ED49 /* Socket.cpp in Sources */,
+				33982DCB16A8960900C2ED49 /* DebugConsoleClient.cpp in Sources */,
+				33982DD416A8960900C2ED49 /* DebugConsoleServer.cpp in Sources */,
+				33982DDE16A8962F00C2ED49 /* EditorDebugConsoleMenuBuilder.cpp in Sources */,
+				33982DE016A8962F00C2ED49 /* EditorDebugConsoleWidget.cpp in Sources */,
+				33982DE416A8970500C2ED49 /* Console.cpp in Sources */,
+				33982DF016A89C0900C2ED49 /* WorldLuaCVars.cpp in Sources */,
+				33982DF516A89C0900C2ED49 /* WorldLuaGameNetwork.cpp in Sources */,
+				33982DFA16A89C0900C2ED49 /* WorldLuaSystem.cpp in Sources */,
+				33982DFF16A89C0900C2ED49 /* WorldLuaWorld.cpp in Sources */,
+				33982E0716A89C3B00C2ED49 /* CVars.cpp in Sources */,
+				33982E1316A89C8100C2ED49 /* GameCVars.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7823,6 +8023,14 @@
 				339BA57F1636F3000017FD79 /* SIMD_neon.cpp in Sources */,
 				33988F9916684EA60018C3E6 /* Floors.cpp in Sources */,
 				33988FAC16684F1C0018C3E6 /* BezierSpline.cpp in Sources */,
+				33982DB016A8840900C2ED49 /* Socket.cpp in Sources */,
+				33982DF116A89C0900C2ED49 /* WorldLuaCVars.cpp in Sources */,
+				33982DF616A89C0900C2ED49 /* WorldLuaGameNetwork.cpp in Sources */,
+				33982DFB16A89C0900C2ED49 /* WorldLuaSystem.cpp in Sources */,
+				33982E0016A89C0900C2ED49 /* WorldLuaWorld.cpp in Sources */,
+				33982E0816A89C3B00C2ED49 /* CVars.cpp in Sources */,
+				33982E1416A89C8100C2ED49 /* GameCVars.cpp in Sources */,
+				33982E2016A8ABB700C2ED49 /* Console.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7980,6 +8188,15 @@
 				339BA5801636F3000017FD79 /* SIMD_neon.cpp in Sources */,
 				33988F9C16684EA60018C3E6 /* Floors.cpp in Sources */,
 				33988FAF16684F1C0018C3E6 /* BezierSpline.cpp in Sources */,
+				33982DB316A8840900C2ED49 /* Socket.cpp in Sources */,
+				33982DD616A8960900C2ED49 /* DebugConsoleServer.cpp in Sources */,
+				33982DF416A89C0900C2ED49 /* WorldLuaCVars.cpp in Sources */,
+				33982DF916A89C0900C2ED49 /* WorldLuaGameNetwork.cpp in Sources */,
+				33982DFE16A89C0900C2ED49 /* WorldLuaSystem.cpp in Sources */,
+				33982E0316A89C0900C2ED49 /* WorldLuaWorld.cpp in Sources */,
+				33982E0B16A89C3B00C2ED49 /* CVars.cpp in Sources */,
+				33982E1716A89C8100C2ED49 /* GameCVars.cpp in Sources */,
+				33982E1E16A8ABB500C2ED49 /* Console.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
