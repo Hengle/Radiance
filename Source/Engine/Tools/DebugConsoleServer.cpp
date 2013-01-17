@@ -166,6 +166,34 @@ int DebugConsoleServer::NetMsg_Cmd(const Client &client, stream::InputStream &is
 	return 0;
 }
 
+int DebugConsoleServer::NetMsg_GetCVarList(const Client &client) {
+	stream::DynamicMemOutputBuffer ob(ZTools);
+	stream::OutputStream os(ob);
+
+	// how many are there going to be?
+	U32 count = (U32)CVarZone::Globals().cvars->size();
+	if (m_cvars)
+		count += (U32)m_cvars->cvars->size();
+
+	os << count;
+
+	if (m_cvars) {
+		for (CVarMap::const_iterator it = m_cvars->cvars->begin(); it != m_cvars->cvars->end(); ++it) {
+			os.Write(CStr(it->second->name.get()));
+		}
+	}
+
+	for (CVarMap::const_iterator it = CVarZone::Globals().cvars->begin(); it != CVarZone::Globals().cvars->end(); ++it) {
+		os.Write(CStr(it->second->name.get()));
+	}
+
+	U32 msgSize = (U32)os.OutPos();
+	int z = client.sd->send((const char*)&msgSize, sizeof(msgSize), 0);
+	if (z >= 0)
+		z = client.sd->send((const char *)ob.OutputBuffer().Ptr(), (int)msgSize, 0);
+	return z;
+}
+
 void DebugConsoleServer::Register(const Client::Ref &client) {
 	Lock L(m_m);
 	m_clients.push_back(client);

@@ -95,6 +95,7 @@ private:
 	void Register(const Client::Ref &client);
 	
 	int NetMsg_Cmd(const Client &client, stream::InputStream &is);
+	int NetMsg_GetCVarList(const Client &client);
 	
 	int m_sessionId;
 	CVarZone *m_cvars;

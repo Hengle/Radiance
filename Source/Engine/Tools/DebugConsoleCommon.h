@@ -25,7 +25,8 @@ enum {
 enum DebugConsoleNetMessageId {
 	kDebugConsoleNetMessageId_Broadcast,
 	kDebugConsoleNetMessageId_Log,
-	kDebugConsoleNetMessageId_Cmd
+	kDebugConsoleNetMessageId_Cmd,
+	kDebugConsoleNetMessageId_GetCVarList
 };
 
 }

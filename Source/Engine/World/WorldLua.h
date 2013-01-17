@@ -1,18 +1,21 @@
-// WorldLua.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file WorldLua.h
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup world
+*/
 
 #pragma once
 
 #include "../Types.h"
+#include "../CVars.h"
 #include "../Input.h"
 #include "../Lua/LuaRuntime.h"
 #include "../Packages/PackagesDef.h"
 #include "../Game/GameNetworkDef.h"
 #include "WorldCinematics.h"
 #include "Entity.h"
-#include "Lua/LuaTask.h"
+#include <Runtime/Container/ZoneSet.h>
 #include <Runtime/PushPack.h>
 
 namespace world {
@@ -63,6 +66,7 @@ public:
 	static Entity *EntFramePtr(lua_State *L, int index, bool luaError);
 	static void PushEntityFrame(lua_State *L, Entity &ent);
 	static bool PushEntityCall(lua_State *L, Entity &ent, const char *name);
+	static bool PushGlobalCall(lua_State *L, const char *name);
 	static bool Call(lua_State *L, const char *context, int nargs, int nresults, int errfunc);
 
 	// --------- Script Callbacks, some ents don't have 'em but these are safe to call even if they don't
@@ -80,7 +84,9 @@ private:
 	void GarbageCollect();
 	Entity::Ref CreateEntity(const Keys &keys);
 
-	RAD_DECLARE_GET(L, lua_State*) { return m_L->L; }
+	RAD_DECLARE_GET(L, lua_State*) { 
+		return m_L->L; 
+	}
 
 	class ImportLoader : public lua::ImportLoader {
 	public:
@@ -112,7 +118,12 @@ private:
 		int m_callbackId;
 	};
 
-	// ----------- Native Calls -----------
+	/*
+	==============================================================================
+	System
+	==============================================================================
+	*/
+
 	static int lua_System_Platform(lua_State *L);
 	static int lua_System_SystemLanguage(lua_State *L);
 	static int lua_System_GetLangString(lua_State *L);
@@ -139,6 +150,12 @@ private:
 	static int lua_System_CloudFileStatus(lua_State *L);
 	static int lua_System_StartDownloadingLatestSaveVersion(lua_State *L);
 	static int lua_System_CloudStorageAvailable(lua_State *L);
+
+	/*
+	==============================================================================
+	World
+	==============================================================================
+	*/
 
 	static int lua_World_FindEntityId(lua_State *L);
 	static int lua_World_FindEntityClass(lua_State *L);
@@ -179,7 +196,6 @@ private:
 	static int lua_World_RequestSwitchLoad(lua_State *L);
 	static int lua_World_SetGameSpeed(lua_State *L);
 	static int lua_World_SetPauseState(lua_State *L);
-	static int lua_World_SwapMaterial(lua_State *L);
 	static int lua_World_PlayerPawn(lua_State *L);
 	static int lua_World_SetPlayerPawn(lua_State *L);
 	static int lua_World_Worldspawn(lua_State *L);
@@ -212,6 +228,13 @@ private:
 	static int lua_World_DrawCounters(lua_State *L);
 	static int lua_World_EnableWireframe(lua_State *L);
 	static int lua_World_QuitGame(lua_State *L);
+
+	/*
+	==============================================================================
+	Game Network
+	==============================================================================
+	*/
+
 	static int lua_gnCreate(lua_State *L);
 	static int lua_gnAuthenticateLocalPlayer(lua_State *L);
 	static int lua_gnLocalPlayerId(lua_State *L);
@@ -226,9 +249,58 @@ private:
 	static int lua_gnSetSessionReportOnAppClose(lua_State *L);
 	static int lua_gnSessionReportOnAppPause(lua_State *L);
 	static int lua_gnSetSessionReportOnAppPause(lua_State *L);
-	
+
+	/*
+	==============================================================================
+	CVar Support
+	==============================================================================
+	*/
+
+	static int lua_CVar(lua_State *L);
+	static int lua_PkgCVar(lua_State *L, CVarString *cvar);
+	static int lua_PkgCVar(lua_State *L, CVarInt *cvar);
+	static int lua_PkgCVar(lua_State *L, CVarBool *cvar);
+	static int lua_PkgCVar(lua_State *L, CVarFloat *cvar);
+	static int lua_PkgNativeFunc(lua_State *L, CVarFunc *cvar);
+	static int lua_PkgLuaFunc(lua_State *L, CVarFunc *cvar);
+
+	static int lua_CVarString(lua_State *L);
+	static int lua_CVarStringGet(lua_State *L);
+	static int lua_CVarStringSet(lua_State *L);
+
+	static int lua_CVarInt(lua_State *L);
+	static int lua_CVarIntGet(lua_State *L);
+	static int lua_CVarIntSet(lua_State *L);
+
+	static int lua_CVarBool(lua_State *L);
+	static int lua_CVarBoolGet(lua_State *L);
+	static int lua_CVarBoolSet(lua_State *L);
+
+	static int lua_CVarFloat(lua_State *L);
+	static int lua_CVarFloatGet(lua_State *L);
+	static int lua_CVarFloatSet(lua_State *L);
+
+	static int lua_CVarFunc(lua_State *L);
+	static int lua_CVarFuncNativeCall(lua_State *L);
+	static int lua_CVarFuncLuaCall(lua_State *L);
+
+	class LuaCVarFunc : public CVarFunc {
+	public:
+		typedef zone_set<LuaCVarFunc*, ZWorldT>::type Set;
+		LuaCVarFunc(Game &game, const char *name, const char *fnCall);
+
+		virtual void Execute(const char *cmdline);
+		void Execute(lua_State *L, const char *cmdline, bool pcall);
+
+	private:
+
+		Game *m_game;
+		String m_fnCall;
+	};
+		
 	friend class ImportLoader;
 
+	LuaCVarFunc::Set m_luaCVars;
 	ImportLoader m_impLoader;
 	lua::State::Ref m_L;
 	World *m_world;

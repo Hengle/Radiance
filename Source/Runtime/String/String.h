@@ -125,7 +125,7 @@ private:
     Care must be taken by the user when using certain types of operations on unicode strings.
     The Upper() and Lower() functions may not correctly handle all unicode code points
     depending on your locale and normalization issues. This class does not perform normalization.
-    Be aware that normalization issues can also effect sorting. If asthetically correct sort order
+    Be aware that normalization issues can also effect sorting. If aesthetically correct sort order
     is important you must manually normalize the string before Compare() will do what you want.
  
     Considerably faster versions of certain functions have been provided that work based on bytes in a 

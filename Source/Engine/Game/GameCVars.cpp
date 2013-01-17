@@ -6,9 +6,10 @@
 */
 
 #include RADPCH
-#include "Game.h"
+#include "GameCVars.h"
 
 // cvar defaults
-Game::CVars::CVars(Game &game, CVarZone &zone) 
+GameCVars::GameCVars(Game &game, CVarZone &zone) 
 : r_showtris(zone, "r_showtris", false, false) {
 }
+

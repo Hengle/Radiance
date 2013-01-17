@@ -28,13 +28,17 @@ typedef zone_map<String, CVar*, ZEngineT>::type CVarMap;
 //! Defines a collection of CVars.
 class CVarZone {
 public:
+	enum FindScope {
+		kFindScope_LocalOnly,
+		kFindScope_IncludingGlobals
+	};
 	
 	CVarZone();
 
 	void Open(const char *path);
 	void Close();
 	void Flush();
-	CVar *Find(const char *name) const;
+	CVar *Find(const char *name, FindScope scope) const;
 	CVarVec StartsWith(const char *name) const;
 	
 	RAD_DECLARE_READONLY_PROPERTY(CVarZone, cvars, const CVarMap*);
@@ -66,7 +70,8 @@ private:
 //! CVars can be set from the debug console
 class CVar : public boost::noncopyable {
 public:
-	
+	typedef boost::shared_ptr<CVar> Ref;
+
 	enum Type {
 		kType_String,
 		kType_Int,
@@ -125,6 +130,7 @@ private:
 
 class CVarString : public CVar {
 public:
+	static const CVar::Type kType = CVar::kType_String;
 	
 	CVarString(const char *name, const char *value, bool save);
 	CVarString(CVarZone &zone, const char *name, const char *value, bool save);
@@ -132,7 +138,7 @@ public:
 	virtual String ToString() const;
 	virtual bool Parse(const char *value);
 
-	RAD_DECLARE_READONLY_PROPERTY(CVarString, value, const char*);
+	RAD_DECLARE_PROPERTY(CVarString, value, const String&, const String&);
 
 protected:
 
@@ -141,8 +147,12 @@ protected:
 
 private:
 
-	RAD_DECLARE_GET(value, const char*) {
-		return m_value.c_str;
+	RAD_DECLARE_GET(value, const String&) {
+		return m_value;
+	}
+
+	RAD_DECLARE_SET(value, const String&) {
+		m_value = value;
 	}
 
 	String m_value;
@@ -153,13 +163,15 @@ private:
 class CVarInt : public CVar {
 public:
 
+	static const CVar::Type kType = CVar::kType_Int;
+
 	CVarInt(const char *name, int value, bool save);
 	CVarInt(CVarZone &zone, const char *name, int value, bool save);
 
 	virtual String ToString() const;
 	virtual bool Parse(const char *value);
 
-	RAD_DECLARE_READONLY_PROPERTY(CVarInt, value, int);
+	RAD_DECLARE_PROPERTY(CVarInt, value, int, int);
 
 protected:
 
@@ -172,6 +184,10 @@ private:
 		return m_value;
 	}
 
+	RAD_DECLARE_SET(value, int) {
+		m_value = value;
+	}
+
 	int m_value;
 };
 
@@ -180,13 +196,15 @@ private:
 class CVarBool : public CVar {
 public:
 
+	static const CVar::Type kType = CVar::kType_Bool;
+
 	CVarBool(const char *name, bool value, bool save);
 	CVarBool(CVarZone &zone, const char *name, bool value, bool save);
 
 	virtual String ToString() const;
 	virtual bool Parse(const char *value);
 
-	RAD_DECLARE_READONLY_PROPERTY(CVarBool, value, bool);
+	RAD_DECLARE_PROPERTY(CVarBool, value, bool, bool);
 
 protected:
 
@@ -199,6 +217,10 @@ private:
 		return m_value;
 	}
 
+	RAD_DECLARE_SET(value, bool) {
+		m_value = value;
+	}
+
 	bool m_value;
 };
 
@@ -207,13 +229,15 @@ private:
 class CVarFloat : public CVar {
 public:
 
+	static const CVar::Type kType = CVar::kType_Float;
+
 	CVarFloat(const char *name, float value, bool save);
 	CVarFloat(CVarZone &zone, const char *name, float value, bool save);
 
 	virtual String ToString() const;
 	virtual bool Parse(const char *value);
 
-	RAD_DECLARE_READONLY_PROPERTY(CVarFloat, value, float);
+	RAD_DECLARE_PROPERTY(CVarFloat, value, float, float);
 
 protected:
 
@@ -226,6 +250,10 @@ private:
 		return m_value;
 	}
 
+	RAD_DECLARE_SET(value, float) {
+		m_value = value;
+	}
+
 	float m_value;
 };
 
@@ -234,10 +262,13 @@ private:
 class CVarFunc : public CVar {
 public:
 
+	static const CVar::Type kType = CVar::kType_Func;
+
 	CVarFunc(const char *name);
 	CVarFunc(CVarZone &zone, const char *name);
 
-	virtual void Execute() = 0;
+	//! Executes the cvar, cmdline can be null.
+	virtual void Execute(const char *cmdline) = 0;
 
 	virtual String ToString() const;
 	virtual bool Parse(const char *value);

@@ -38,6 +38,7 @@ inline bool CVarString::Parse(const char *value) {
 	m_value = value;
 	if (saves)
 		zone->Flush();
+	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

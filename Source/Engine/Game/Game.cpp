@@ -9,6 +9,7 @@
 #include "../App.h"
 #include "../Engine.h"
 #include "Game.h"
+#include "GameCVars.h"
 #include "GSLoadMap.h"
 #include "GSPlay.h"
 #include "../World/World.h"
@@ -45,7 +46,7 @@ m_quit(false)
 	m_saveGame = Persistence::Load(0);
 
 	m_cvarZone.Open(0);
-	m_cvars = new CVars(*this, m_cvarZone);
+	m_cvars = new GameCVars(*this, m_cvarZone);
 }
 
 Game::~Game() {

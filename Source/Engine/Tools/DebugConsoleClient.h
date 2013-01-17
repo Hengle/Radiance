@@ -70,6 +70,7 @@ private:
 class DebugConsoleClient : public boost::noncopyable {
 public:
 	typedef boost::shared_ptr<DebugConsoleClient> Ref;
+	typedef zone_vector<String, ZToolsT>::type StringVec;
 
 	~DebugConsoleClient();
 
@@ -82,6 +83,8 @@ public:
 	static const DebugConsoleServerId::Vec &ServerList();
 
 	bool Exec(const char *cmd);
+
+	StringVec GetCVarList();
 
 protected:
 

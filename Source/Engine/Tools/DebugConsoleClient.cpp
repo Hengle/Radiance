@@ -159,6 +159,55 @@ bool DebugConsoleClient::Exec(const char *cmd) {
 	return z >= 0;
 }
 
+DebugConsoleClient::StringVec DebugConsoleClient::GetCVarList() {
+	StringVec v;
+
+	if (!m_sd)
+		return v;
+
+	U32 cmds[2];
+	cmds[0] = kDebugConsoleNetMessageId_GetCVarList;
+	cmds[1] = 0;
+
+	int z = m_sd->send((const char*)cmds, sizeof(cmds), 0);
+	if (z < 0) {
+		COut(C_Error) << "ERROR: DebugConsoleClient::Exec() socket send failure -> " << inet_ntoa(m_id.m_ip) << std::endl;
+		return v;
+	}
+
+	z = recv(*m_sd, (char*)&cmds[0], sizeof(U32), MSG_WAITALL);
+	if (z >= 0) {
+		// sanity check
+		if (cmds[0] < Meg) {
+			void *data = safe_zone_malloc(ZTools, cmds[0]);
+			z = recv(*m_sd, (char*)data, (int)cmds[0], MSG_WAITALL);
+			if (z >= 0) {
+				stream::MemInputBuffer ib(data, (stream::SPos)cmds[0]);
+				stream::InputStream is(ib);
+
+				U32 count;
+				is >> count;
+
+				String s;
+				while (count-- > 0) {
+					if (is.Read(&s))
+						v.push_back(s);
+				}
+			}
+			zone_free(data);
+		} else {
+			COut(C_Error) << "ERROR: message size too big for cvarlist." << std::endl;
+			return v;
+		}
+	}
+
+	if (z < 0) {
+		COut(C_Error) << "ERROR: DebugConsoleClient::Exec() socket read failure -> " << inet_ntoa(m_id.m_ip) << std::endl;
+	}
+
+	return v;
+}
+
 int DebugConsoleClient::ConnectClient(const DebugConsoleServerId &id) {
 	Ref r;
 	net::Socket sd = (int)socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);

@@ -52,7 +52,7 @@ PROJECT_LOGO           =
 # If a relative path is entered, it will be relative to the location 
 # where doxygen was started. If left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = C:/Crow/Radiance/Documentation
+OUTPUT_DIRECTORY       = ./Documentation
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 
 # 4096 sub-directories (in 2 levels) under the output directory of each output 
@@ -638,7 +638,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = C:/Crow/Radiance/Source
+INPUT                  = ./Source
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
@@ -689,13 +689,13 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories 
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = */Source/Tools/* \
-                         */Source/XCode/* \
-                         */Source/VS8Projects/* \
+EXCLUDE_PATTERNS       = */Source/XCode/* \
                          */Source/UnitTests/* \
                          */Source/Runtime/DataCodec/zlib123/* \
                          */Source/Runtime/ImageCodec/jpeg-6b/* \
-                         */Source/Runtime/ImageCodec/lpng1216/*
+                         */Source/Runtime/ImageCodec/lpng1216/* \
+                         */Source/VSProjects/* \
+                         */Source/MaxScripts/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names 
 # (namespaces, classes, functions, etc.) that should be excluded from the 
@@ -1495,15 +1495,14 @@ INCLUDE_FILE_PATTERNS  =
 # instead of the = operator.
 
 PREDEFINED             = WIN32 \
-                         _MSC_VER=1400 \
                          _UNICODE \
                          RAD_TARGET_DEVELOPER \
-                         RAD_OVERLOAD_STD_NEW \
                          RAD_OPT_TOOLS \
                          RAD_OPT_PC_TOOLS \
                          RAD_OPT_GL \
                          _WINDOWS \
-                         _DOXYGEN
+                         _DOXYGEN \
+                         _MSC_VER=1600
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 

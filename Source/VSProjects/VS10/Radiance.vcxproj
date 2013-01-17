@@ -198,6 +198,7 @@
     <ClInclude Include="..\..\Engine\CVars.h" />
     <ClInclude Include="..\..\Engine\Engine.h" />
     <ClInclude Include="..\..\Engine\Game\Game.h" />
+    <ClInclude Include="..\..\Engine\Game\GameCVars.h" />
     <ClInclude Include="..\..\Engine\Game\GameNetwork.h" />
     <ClInclude Include="..\..\Engine\Game\GameNetworkDef.h" />
     <ClInclude Include="..\..\Engine\Game\GSLoadMap.h" />
@@ -902,6 +903,7 @@
     <ClInclude Include="..\..\Engine\World\WorldDraw.h" />
     <ClInclude Include="..\..\Engine\World\WorldDrawDef.h" />
     <ClInclude Include="..\..\Engine\World\WorldLua.h" />
+    <ClInclude Include="..\..\Engine\World\WorldLuaCommon.h" />
     <ClInclude Include="..\..\Engine\Zones.h" />
     <ClInclude Include="..\..\RadPCH.h" />
     <ClInclude Include="..\..\Runtime\AudioCodec\IntAudioCodec.h" />
@@ -2036,6 +2038,10 @@
     <ClCompile Include="..\..\Engine\World\WorldCinematics.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldDraw.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldLua.cpp" />
+    <ClCompile Include="..\..\Engine\World\WorldLuaCVars.cpp" />
+    <ClCompile Include="..\..\Engine\World\WorldLuaGameNetwork.cpp" />
+    <ClCompile Include="..\..\Engine\World\WorldLuaSystem.cpp" />
+    <ClCompile Include="..\..\Engine\World\WorldLuaWorld.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldSpawn.cpp" />
     <ClCompile Include="..\..\Engine\Zones.cpp" />
     <ClCompile Include="..\..\RadPCH.cpp">

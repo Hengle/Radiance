@@ -86,7 +86,7 @@ public:
 
 		To draw a mesh using vertex array states:
 
-		\vertbatim
+		\verbatim
 
 		Material->BindStates();
 		Material->BindTextures(...);

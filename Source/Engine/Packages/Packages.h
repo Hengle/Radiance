@@ -12,7 +12,7 @@
 	One of the primary differences between the design of this package system versus others
 	is that it is not designed or intended to be a container for binary data, except in
 	cooked form. Package files are lua scripts which describe the contents of the package
-	and can be automaticalled merged by most version control systems, or merged with
+	and can be automatically merged by most version control systems, or merged with
 	text merge tools in the case of conflicts. This allows users to modify packages and
 	assets without having to coordinate to avoid overwriting modifications to binary files.
 	

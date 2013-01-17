@@ -71,10 +71,12 @@ void CVarZone::Flush() {
 	Save(os);
 }
 
-CVar *CVarZone::Find(const char *name) const {
+CVar *CVarZone::Find(const char *name, FindScope scope) const {
 	CVarMap::const_iterator it = m_cvars.find(CStr(name));
 	if (it != m_cvars.end())
 		return it->second;
+	if ((scope == kFindScope_IncludingGlobals) && (this != &Globals()))
+		return Globals().Find(name, kFindScope_LocalOnly);
 	return 0;
 }
 
@@ -114,7 +116,7 @@ void CVarZone::Load(stream::InputStream &is) {
 		if (!is.Read(&size))
 			return;
 
-		CVar *cvar = Find(name.c_str);
+		CVar *cvar = Find(name.c_str, kFindScope_LocalOnly);
 		if (cvar && cvar->m_save) {
 #if defined(RAD_OPT_DEBUG)
 			stream::SPos startPos = is.InPos();
@@ -188,7 +190,7 @@ void CVarZone::Register(CVar *cvar) {
 #if defined(RAD_OPT_DEBUG)
 	if (this != &Globals()) {
 		RAD_ASSERT_MSG(!cvar->m_save, "Only Global CVars can be marked for serialize!");
-		RAD_ASSERT_MSG(Globals().Find(cvar->m_name.c_str) == 0, "A CVar with this name already exists!");
+		RAD_ASSERT_MSG(Globals().Find(cvar->m_name.c_str, kFindScope_LocalOnly) == 0, "A CVar with this name already exists!");
 	}
 #endif
 

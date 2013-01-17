@@ -35,6 +35,7 @@ class QWidget;
 
 class App;
 class GSLoadMap;
+class GameCVars;
 
 #if defined(RAD_OPT_PC_TOOLS)
 class IToolsCallbacks {
@@ -55,14 +56,6 @@ public:
 		::world::World::Ref world;
 		pkg::AssetRef asset;
 		int id;
-	};
-
-	class CVars {
-	public:
-		CVarBool r_showtris;
-	private:
-		friend class Game;
-		CVars(Game &game, CVarZone &zone);
 	};
 
 	static Ref New();
@@ -115,7 +108,8 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Game, numSavedGameConflicts, int);
 	RAD_DECLARE_READONLY_PROPERTY(Game, gameNetwork, gn::GameNetwork *);
 	RAD_DECLARE_READONLY_PROPERTY(Game, stringTable, const StringTable*);
-	RAD_DECLARE_READONLY_PROPERTY(Game, cvars, CVars*);
+	RAD_DECLARE_READONLY_PROPERTY(Game, cvars, GameCVars*);
+	RAD_DECLARE_READONLY_PROPERTY(Game, cvarZone, CVarZone*);
 	RAD_DECLARE_PROPERTY(Game, cloudStorage, bool, bool);
 	RAD_DECLARE_PROPERTY(Game, quit, bool, bool);
 
@@ -228,8 +222,12 @@ private:
 		m_quit = value;
 	}
 
-	RAD_DECLARE_GET(cvars, CVars*) {
+	RAD_DECLARE_GET(cvars, GameCVars*) {
 		return m_cvars;
+	}
+
+	RAD_DECLARE_GET(cvarZone, CVarZone*) {
+		return const_cast<CVarZone*>(&m_cvarZone);
 	}
 
 #if defined(RAD_OPT_PC_TOOLS)
@@ -256,7 +254,7 @@ private:
 	CloudFile::Vec m_cloudVersions;
 	gn::GameNetworkRef m_gameNetwork;
 	gn::GameNetworkEventQueue m_gameNetworkEventQueue;
-	CVars *m_cvars;
+	GameCVars *m_cvars;
 	bool m_cloudStorage;
 	bool m_quit;
 	int m_vp[4];

@@ -28,12 +28,14 @@ void Console::Exec(const char *sz, CVarZone *cvars) {
 		return;
 	}
 
+	if (cmd == "cvarlist") {
+		ListCVars(cvars);
+		return;
+	}
+
 	CVar *cvar = 0;
 	if (cvars)
-		cvar = cvars->Find(cmd.c_str);
-
-	if (!cvar)
-		cvar = CVarZone::Globals().Find(cmd.c_str);
+		cvar = cvars->Find(cmd.c_str, CVarZone::kFindScope_IncludingGlobals);
 
 	if (!cvar) {
 		COut(C_Error) << "There is no cvar with that name." << std::endl;
@@ -43,7 +45,8 @@ void Console::Exec(const char *sz, CVarZone *cvars) {
 	if (cvar->type == CVar::kType_Func) {
 		// ECHO
 		COut(C_Info) << sz << std::endl;
-		static_cast<CVarFunc*>(cvar)->Execute();
+		cmdline.GetRemaining(cmd, Tokenizer::kFetchMode_RestOfLine);
+		static_cast<CVarFunc*>(cvar)->Execute(cmd.c_str);
 		return;
 	}
 
@@ -61,12 +64,18 @@ void Console::Exec(const char *sz, CVarZone *cvars) {
 }
 
 void Console::ListCVars(CVarZone *cvars) {
+
+	COut(C_Info) << "*************************************************************" << std::endl;
+
 	if (cvars) {
 		for (CVarMap::const_iterator it = cvars->cvars->begin(); it != cvars->cvars->end(); ++it) {
 			COut(C_Info) << it->second->name.get() << std::endl;
 		}
 	}
 
-	if (cvars != &CVarZone::Globals())
-		ListCVars(&CVarZone::Globals());
+	if (cvars != &CVarZone::Globals()) {
+		for (CVarMap::const_iterator it = CVarZone::Globals().cvars->begin(); it != CVarZone::Globals().cvars->end(); ++it) {
+			COut(C_Info) << it->second->name.get() << std::endl;
+		}
+	}
 }

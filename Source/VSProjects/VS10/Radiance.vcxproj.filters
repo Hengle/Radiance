@@ -1428,6 +1428,12 @@
     <ClInclude Include="..\..\Engine\Tools\DebugConsoleClient.h">
       <Filter>Source\Engine\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\Game\GameCVars.h">
+      <Filter>Source\Engine\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\World\WorldLuaCommon.h">
+      <Filter>Source\Engine\World</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2155,6 +2161,18 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorDebugConsoleMenuBuilder.cpp">
       <Filter>Source\Engine\Tools\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\WorldLuaGameNetwork.cpp">
+      <Filter>Source\Engine\World</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\WorldLuaSystem.cpp">
+      <Filter>Source\Engine\World</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\WorldLuaWorld.cpp">
+      <Filter>Source\Engine\World</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\WorldLuaCVars.cpp">
+      <Filter>Source\Engine\World</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
