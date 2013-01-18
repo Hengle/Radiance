@@ -79,10 +79,9 @@ void SocketStart() {
 			}
 		}
 		
-		freeifaddrs((interfaces));
-	}
+		freeifaddrs(interfaces);
 #endif
-
+	}
 }
 
 const in_addr &GetLocalIP() {
