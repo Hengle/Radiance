@@ -132,11 +132,16 @@ public:
 
 		void Clear();
 
-		int drawnLeafs;
-		int testedLeafs;
-		int drawnNodes;
-		int testedNodes;
-		int numModels;
+		float fps;
+		int drawnAreas;
+		int testedPortals;
+		int drawnPortals;
+		int testedWorldModels;
+		int drawnWorldModels;
+		int drawnEntities;
+		int testedEntityModels;
+		int drawnEntityModels;
+		int numBatches;
 		int numTris;
 		int numMaterials;
 	};
@@ -165,7 +170,6 @@ public:
 	}
 
 	RAD_DECLARE_READONLY_PROPERTY(WorldDraw, rb, const RB_WorldDraw::Ref&);
-	RAD_DECLARE_PROPERTY(WorldDraw, wireframe, bool, bool);
 	
 private:
 
@@ -224,9 +228,7 @@ private:
 	};
 
 	RAD_DECLARE_GET(rb, const RB_WorldDraw::Ref&) { return m_rb; }
-	RAD_DECLARE_GET(wireframe, bool) { return m_wireframe; }
-	RAD_DECLARE_SET(wireframe, bool) { m_wireframe = value; }
-
+	
 	static void DeleteBatch(details::MBatch *batch);
 
 	void AddStaticWorldMesh(const r::Mesh::Ref &m, const BBox &bounds, int matId);
@@ -277,7 +279,6 @@ private:
 	int m_frame;
 	int m_markFrame;
 	bool m_init;
-	bool m_wireframe;
 	Counters m_counters;
 	PostProcessEffect::Map m_postFX;
 	MStaticWorldMeshBatch::RefVec m_worldModels;

@@ -9,7 +9,8 @@
 #include "GameCVars.h"
 
 // cvar defaults
-GameCVars::GameCVars(Game &game, CVarZone &zone) 
-: r_showtris(zone, "r_showtris", false, false) {
+GameCVars::GameCVars(Game &game, CVarZone &zone) : 
+r_showtris(zone, "r_showtris", false, false),
+r_showportals(zone, "r_showportals", false, false) {
 }
 

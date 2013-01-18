@@ -14,6 +14,7 @@ class Game;
 class GameCVars {
 public:
 	CVarBool r_showtris;
+	CVarBool r_showportals;
 
 	void AddRef(const CVar::Ref &cvar) {
 		m_vec.push_back(cvar);

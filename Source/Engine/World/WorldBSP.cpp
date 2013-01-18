@@ -177,7 +177,8 @@ bool World::ClipOccupantVolume(
 	ClippedAreaVolumeStackVec *clipped,
 	int fromArea,
 	int toArea,
-	AreaBits &visible
+	AreaBits &visible,
+	WorldDraw::Counters *counters
 ) {
 	if (fromArea == toArea) {
 		if (clipped && volume)
@@ -188,7 +189,7 @@ bool World::ClipOccupantVolume(
 	visible.set(fromArea);
 
 	AreaBits stack;
-	ClipOccupantVolumeParms constArgs(pos, clipped, toArea, visible, stack);
+	ClipOccupantVolumeParms constArgs(pos, clipped, toArea, visible, stack, counters);
 	return ClipOccupantVolume(constArgs, volume, volumeBounds, fromArea) || (toArea == -1);
 }
 
@@ -226,7 +227,11 @@ bool World::ClipOccupantVolume(
 		if (constArgs.stack.test(otherArea))
 			continue; // came from here.
 
+		if (constArgs.counters)
+			++constArgs.counters->testedPortals;
+
 		if (!constArgs.pos || !volume) {
+			
 			// trivial rejection only.
 			if (!volumeBounds.Touches(areaportal.bounds))
 				continue;
@@ -237,6 +242,9 @@ bool World::ClipOccupantVolume(
 			constArgs.visible.set(otherArea);
 
 			canSee = otherArea == constArgs.toArea;
+
+			if (constArgs.counters)
+				++constArgs.counters->drawnPortals;
 
 			if (!canSee)
 				canSee = ClipOccupantVolume(constArgs, volume, volumeBounds, otherArea);
@@ -286,6 +294,9 @@ bool World::ClipOccupantVolume(
 			// of these being stackify<> vectors. 
 			if (constArgs.clipped) 
 				(*constArgs.clipped)->push_back(areaVolume);
+
+			if (constArgs.counters)
+				++constArgs.counters->drawnPortals;
 
 			canSee = otherArea == constArgs.toArea;
 

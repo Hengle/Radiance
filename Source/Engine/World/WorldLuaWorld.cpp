@@ -918,29 +918,33 @@ int WorldLua::lua_World_DrawCounters(lua_State *L) {
 	LOAD_SELF
 	const WorldDraw::Counters *counters = self->m_world->drawCounters;
 
-	lua_createtable(L, 0, 7);
-	lua_pushinteger(L, counters->drawnLeafs);
-	lua_setfield(L, -2, "drawnLeafs");
-	lua_pushinteger(L, counters->testedLeafs);
-	lua_setfield(L, -2, "testedLeafs");
-	lua_pushinteger(L, counters->drawnNodes);
-	lua_setfield(L, -2, "drawnNodes");
-	lua_pushinteger(L, counters->testedNodes);
-	lua_setfield(L, -2, "testedNodes");
-	lua_pushinteger(L, counters->numModels);
-	lua_setfield(L, -2, "numModels");
+	lua_createtable(L, 0, 12);
+	lua_pushnumber(L, counters->fps);
+	lua_setfield(L, -2, "fps");
+	lua_pushinteger(L, counters->drawnAreas);
+	lua_setfield(L, -2, "drawnAreas");
+	lua_pushinteger(L, counters->testedPortals);
+	lua_setfield(L, -2, "testedPortals");
+	lua_pushinteger(L, counters->drawnPortals);
+	lua_setfield(L, -2, "drawnPortals");
+	lua_pushinteger(L, counters->testedWorldModels);
+	lua_setfield(L, -2, "testedWorldModels");
+	lua_pushinteger(L, counters->drawnWorldModels);
+	lua_setfield(L, -2, "drawnWorldModels");
+	lua_pushinteger(L, counters->drawnEntities);
+	lua_setfield(L, -2, "drawnEntities");
+	lua_pushinteger(L, counters->testedEntityModels);
+	lua_setfield(L, -2, "testedEntityModels");
+	lua_pushinteger(L, counters->drawnEntityModels);
+	lua_setfield(L, -2, "drawnEntityModels");
+	lua_pushinteger(L, counters->numBatches);
+	lua_setfield(L, -2, "numBatches");
 	lua_pushinteger(L, counters->numTris);
 	lua_setfield(L, -2, "numTris");
 	lua_pushinteger(L, counters->numMaterials);
 	lua_setfield(L, -2, "numMaterials");
 
 	return 1;
-}
-
-int WorldLua::lua_World_EnableWireframe(lua_State *L) {
-	LOAD_SELF
-	self->m_world->draw->wireframe = lua_toboolean(L, 1) ? true : false;
-	return 0;
 }
 
 int WorldLua::lua_System_CurrentDateAndTime(lua_State *L) {

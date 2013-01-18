@@ -33,6 +33,7 @@ public:
 
 	DebugConsoleServerId(const DebugConsoleServerId &id);
 
+	RAD_DECLARE_READONLY_PROPERTY(DebugConsoleServerId, name, const char*);
 	RAD_DECLARE_READONLY_PROPERTY(DebugConsoleServerId, description, const char*);
 	RAD_DECLARE_READONLY_PROPERTY(DebugConsoleServerId, id, int);
 	RAD_DECLARE_READONLY_PROPERTY(DebugConsoleServerId, addr, const in_addr*);
@@ -46,6 +47,10 @@ private:
 
 	friend class DebugConsoleClient;
 
+	RAD_DECLARE_GET(name, const char*) {
+		return m_name.c_str;
+	}
+
 	RAD_DECLARE_GET(description, const char*) {
 		return m_description.c_str;
 	}
@@ -58,6 +63,7 @@ private:
 		return &m_ip;
 	}
 
+	String m_name;
 	String m_description;
 	in_addr m_ip;
 	int m_id;

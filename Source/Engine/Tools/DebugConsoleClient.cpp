@@ -48,6 +48,7 @@ DebugConsoleServerId::DebugConsoleServerId(const DebugConsoleServerId &id) {
 DebugConsoleServerId &DebugConsoleServerId::operator = (const DebugConsoleServerId &id) {
 	m_id = id.m_id;
 	m_ip = id.m_ip;
+	m_name = id.m_name;
 	m_description = id.m_description;
 	m_expiry = id.m_expiry;
 	return *this;
@@ -314,8 +315,11 @@ int DebugConsoleClient::ReadBroadcastPacket(void *buf, int maxLen, sockaddr_in &
 
 void DebugConsoleClient::HandleBroadcast(stream::InputStream &is, const sockaddr_in &addr) {
 	U32 numServers;
-	
+	String serverName;
+
 	if (!is.Read(&numServers))
+		return;
+	if (!is.Read(&serverName))
 		return;
 
 	int id;
@@ -333,6 +337,7 @@ void DebugConsoleClient::HandleBroadcast(stream::InputStream &is, const sockaddr
 		sid.m_ip = addr.sin_addr;
 		sid.m_id = id;
 		sid.m_expiry = expiry;
+		sid.m_name = serverName;
 		sid.m_description = str;
 
 		DebugConsoleServerId *_sid = DebugConsoleServerId::Find(sid, s_servers);

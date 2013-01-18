@@ -462,6 +462,7 @@ void DebugConsoleServer::SessionServer::DoBroadcast() {
 	os << (U32)kDebugConsoleNetServerVersion;
 	os << (U32)kDebugConsoleNetMessageId_Broadcast;
 	os << (U32)m_servers.size();
+	os << CStr(net::GetHostName());
 
 	for (Map::const_iterator it = m_servers.begin(); it != m_servers.end(); ++it) {
 		os << (U32)(it->second->m_sessionId);

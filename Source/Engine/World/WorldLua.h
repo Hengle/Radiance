@@ -150,6 +150,7 @@ private:
 	static int lua_System_CloudFileStatus(lua_State *L);
 	static int lua_System_StartDownloadingLatestSaveVersion(lua_State *L);
 	static int lua_System_CloudStorageAvailable(lua_State *L);
+	static int lua_System_BuildConfig(lua_State *L);
 
 	/*
 	==============================================================================
@@ -226,7 +227,6 @@ private:
 	static int lua_World_WaypointsForTargetname(lua_State *L);
 	static int lua_World_WaypointsForUserId(lua_State *L);
 	static int lua_World_DrawCounters(lua_State *L);
-	static int lua_World_EnableWireframe(lua_State *L);
 	static int lua_World_QuitGame(lua_State *L);
 
 	/*

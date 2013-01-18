@@ -331,4 +331,16 @@ int WorldLua::lua_System_CloudStorageAvailable(lua_State *L) {
 	return 1;
 }
 
+int WorldLua::lua_System_BuildConfig(lua_State *L) {
+#if defined(RAD_OPT_SHIP)
+	const char *sz = "ship";
+#elif defined(RAD_OPT_GOLDEN)
+	const char *sz = "golden";
+#else
+	const char *sz = "tools";
+#endif
+	lua_pushstring(L, sz);
+	return 1;
+}
+
 } // world

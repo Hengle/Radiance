@@ -8,6 +8,7 @@
 #include "../Engine.h"
 #include "World.h"
 #include "../Game/Game.h"
+#include "../Game/GameCVars.h"
 #include "ScreenOverlay.h"
 #include "../Renderer/Shader.h"
 #include "../Packages/Packages.h"
@@ -78,11 +79,16 @@ void WorldDraw::MStaticWorldMeshBatch::Draw() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void WorldDraw::Counters::Clear() {
-	drawnLeafs = 0;
-	testedLeafs = 0;
-	drawnNodes = 0;
-	testedNodes = 0;
-	numModels = 0;
+	fps = 0.f;
+	drawnAreas = 0;
+	testedPortals = 0;
+	drawnPortals = 0;
+	testedWorldModels = 0;
+	drawnWorldModels = 0;
+	drawnEntities = 0;
+	testedEntityModels = 0;
+	drawnEntityModels = 0;
+	numBatches = 0;
 	numTris = 0;
 	numMaterials = 0;
 }
@@ -91,7 +97,6 @@ WorldDraw::WorldDraw(World *w) :
 m_world(w), 
 m_frame(-1), 
 m_markFrame(-1),
-m_wireframe(false),
 m_init(false) {
 	m_rb = RB_WorldDraw::New(w);
 }
@@ -381,7 +386,8 @@ void WorldDraw::VisMarkAreas(ViewDef &view) {
 		&frustumAreas,
 		view.area,
 		-1,
-		view.areas
+		view.areas,
+		&m_counters
 	);
 
 	++m_markFrame;
@@ -407,6 +413,8 @@ void WorldDraw::VisMarkArea(
 	RAD_ASSERT(areaNum < (int)m_world->m_areas.size());
 	const dBSPArea &area = m_world->m_areas[areaNum];
 
+	++m_counters.drawnAreas;
+
 	for (int i = 0; i < area.numModels; ++i) {
 		U16 modelNum = *(m_world->m_bsp->ModelIndices() + i + area.firstModel);
 		RAD_ASSERT(modelNum < (U16)m_worldModels.size());
@@ -414,7 +422,9 @@ void WorldDraw::VisMarkArea(
 		const MStaticWorldMeshBatch::Ref &m = m_worldModels[modelNum];
 		if (m->m_markFrame != m_markFrame) {
 			m->m_markFrame = m_markFrame;
+			++m_counters.testedWorldModels;
 			if (ClipBounds(volume, volumeBounds, m->bounds)) {
+				++m_counters.drawnWorldModels;
 				details::MBatchRef batch = AddViewBatch(view, m->m_matId);
 				if (batch)
 					batch->AddDraw(*m);
@@ -428,13 +438,16 @@ void WorldDraw::VisMarkArea(
 		Entity *e = *it;
 		if (e->m_markFrame != m_markFrame) {
 			e->m_markFrame = m_markFrame;
+			++m_counters.drawnEntities;
 			for (DrawModel::Map::const_iterator it = e->models->begin(); it != e->models->end(); ++it) {
 				const DrawModel::Ref &m = it->second;
 				if (m->m_markFrame != m_markFrame) {
 					m->m_markFrame = m_markFrame;
+					++m_counters.testedEntityModels;
 					BBox bounds(m->bounds);
 					bounds.Translate(e->ps->worldPos);
 					if (ClipBounds(volume, volumeBounds, bounds)) {
+						++m_counters.drawnEntityModels;
 						for (MBatchDraw::RefVec::const_iterator it = m->m_batches.begin(); it != m->m_batches.end(); ++it) {
 							const MBatchDraw::Ref &draw = *it;
 							if (draw->m_markFrame != m_markFrame) {
@@ -488,11 +501,12 @@ void WorldDraw::DrawView() {
 
 	m_counters.numTris += m_rb->numTris;
 
-#if defined(RAD_OPT_PC)
-//	DebugDrawPortals(view);
+#if !defined(RAD_OPT_SHIP)
+	if (m_world->game->cvars->r_showportals.value)
+		DebugDrawPortals(view);
 #endif
 
-	if (m_wireframe) {
+	if (m_world->game->cvars->r_showtris.value) {
 		m_rb->wireframe = true;
 		DrawViewBatches(view, true);
 		m_rb->wireframe = false;
@@ -509,6 +523,8 @@ void WorldDraw::DrawUI() {
 }
 
 void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
+	if (!wireframe)
+		m_counters.numMaterials += (int)view.batches.size();
 	for (int i = 0; i < r::Material::kNumSorts; ++i)
 		DrawViewBatches(view, (r::Material::Sort)i, wireframe);
 }
@@ -549,7 +565,7 @@ void WorldDraw::DrawBatch(const details::MBatch &batch, bool wireframe) {
 		}
 
 		if (!wireframe)
-			++m_counters.numModels;
+			++m_counters.numBatches;
 
 		draw->Bind(mat->shader.get().get());
 		Shader::Uniforms u(draw->rgba.get());

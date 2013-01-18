@@ -42,12 +42,10 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 		}
 
 #if !defined(RAD_OPT_SHIP)
-		String dbgServerDescription;
-		dbgServerDescription.PrintfASCII("(%s) %s", net::GetHostName(), m_map->path.get());
 		if (!game.m_dbgServer) {
-			game.m_dbgServer = tools::DebugConsoleServer::Start(dbgServerDescription.c_str, &game.m_cvarZone);
+			game.m_dbgServer = tools::DebugConsoleServer::Start(m_map->path, &game.m_cvarZone);
 		} else {
-			game.m_dbgServer->SetDescription(dbgServerDescription.c_str);
+			game.m_dbgServer->SetDescription(m_map->path);
 		}
 #endif
 

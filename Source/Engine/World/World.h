@@ -125,7 +125,8 @@ public:
 		ClippedAreaVolumeStackVec *clipped,
 		int fromArea,
 		int toArea,
-		AreaBits &visible
+		AreaBits &visible,
+		WorldDraw::Counters *counters = 0
 	);
 
 	//! Trace a line through the world BSP.
@@ -292,12 +293,14 @@ private:
 			ClippedAreaVolumeStackVec *_clipped,
 			int _toArea,
 			AreaBits &_visible,
-			AreaBits &_stack
+			AreaBits &_stack,
+			WorldDraw::Counters *_counters
 		) : pos(_pos), 
 		    clipped(_clipped), 
 			toArea(_toArea), 
 			visible(_visible),
-			stack(_stack) {
+			stack(_stack),
+			counters(_counters) {
 		}
 		
 		const Vec3 *pos;
@@ -305,6 +308,7 @@ private:
 		int toArea;
 		AreaBits &visible;
 		AreaBits &stack;
+		WorldDraw::Counters *counters;
 	};
 
 	bool ClipOccupantVolume(

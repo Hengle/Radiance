@@ -57,7 +57,7 @@ void DebugConsoleMenuBuilder::OnMenuItem() {
 }
 
 void DebugConsoleMenuBuilder::RefreshServers(QMenu *base) {
-	const String kLocalHost(CStr("(localhost) "));
+	const String kLocalHost(CStr("(local) "));
 	const DebugConsoleServerId::Vec &servers = DebugConsoleClient::ServerList();
 
 	// add any new servers that don't exist
@@ -74,6 +74,8 @@ void DebugConsoleMenuBuilder::RefreshServers(QMenu *base) {
 		String description(CStr(id.description.get()));
 		if (id.addr->s_addr == net::GetLocalIP().s_addr) {
 			description = kLocalHost + description;
+		} else {
+			description.PrintfASCII("(%s) %s", id.name.get(), id.description.get());
 		}
 		
 		if (it2 == m_dbgServers.end()) {

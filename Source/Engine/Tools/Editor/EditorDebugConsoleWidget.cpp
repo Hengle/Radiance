@@ -54,6 +54,7 @@ void DebugConsoleWidget::Disconnect() {
 		m_lineEdit->setText("");
 		Print(CStr("Disconnected.\n"));
 		EnableUI(false);
+		setWindowTitle(QString("(Disconnected) ") + windowTitle());
 	}
 }
 

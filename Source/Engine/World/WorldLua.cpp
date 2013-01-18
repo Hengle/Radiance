@@ -148,7 +148,6 @@ bool WorldLua::Init() {
 		{ "WaypointsForTargetname", lua_World_WaypointsForTargetname },
 		{ "WaypointsForUserId", lua_World_WaypointsForUserId },
 		{ "DrawCounters", lua_World_DrawCounters },
-		{ "EnableWireframe", lua_World_EnableWireframe },
 		{ "QuitGame", lua_World_QuitGame },
 		{ 0, 0 }
 	};
@@ -165,6 +164,7 @@ bool WorldLua::Init() {
 		{ "CreateTempSpawnTask", lua_System_CreateTempSpawnTask },
 		{ "COut", lua_System_COut },
 		{ "CurrentDateAndTime", lua_System_CurrentDateAndTime },
+		{ "BuildConfig", lua_System_BuildConfig },
 		{ 0, 0 }
 	};
 

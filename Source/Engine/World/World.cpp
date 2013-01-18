@@ -6,6 +6,7 @@
 #include RADPCH
 #include "World.h"
 #include "../Game/Game.h"
+#include "../Game/GameCVars.h"
 #include "../UI/UIWidget.h"
 #include <Runtime/Tokenizer.h>
 #include <Runtime/Stream/MemoryStream.h>
@@ -123,6 +124,12 @@ void World::Tick(float dt) {
 
 void World::Draw() {
 	m_draw->Draw(&m_drawCounters);
+
+	if (dt != 0.f) {
+		m_drawCounters.fps = 1.f / dt;
+	} else {
+		m_drawCounters.fps = 0.f;
+	}
 }
 
 void World::NotifyBackground() {
