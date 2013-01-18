@@ -11,7 +11,7 @@
 #include <Runtime/String.h>
 #include <boost/thread/tss.hpp>
 
-#if defined(RAD_OPT_TOOLS)
+#if !defined(RAD_OPT_SHIP)
 #include "Tools/DebugConsoleServer.h"
 #endif
 
@@ -37,7 +37,7 @@ protected:
 
 	virtual int Flush(const StringType &str)
 	{
-#if defined(RAD_OPT_TOOLS)
+#if !defined(RAD_OPT_SHIP)
 	tools::DebugConsoleServer::BroadcastLogMessage(str.c_str());
 #endif
 #if defined(RAD_OPT_PC_TOOLS)
