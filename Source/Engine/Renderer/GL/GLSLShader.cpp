@@ -339,7 +339,7 @@ bool GLSLShader::CompileShaderSource(
 		{
 			std::stringstream ss;
 
-			GLSLShaderLink builder(engine, material, (Shader::Pass)i, shader, false);
+			GLSLShaderLink builder(engine, material, (Shader::Pass)i, shader, true);
 			if (!builder.Assemble(
 				engine, 
 				material,
