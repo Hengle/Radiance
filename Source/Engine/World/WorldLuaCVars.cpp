@@ -128,7 +128,7 @@ int WorldLua::lua_PkgLuaFunc(lua_State *L, CVarFunc *cvar) {
 			luaL_error(L, "cvar '%s' exists but is of type %d (tried to create with type %d)", name, checkcvar->type.get(), _class::kType); \
 		return lua_PkgCVar(L, static_cast<_class*>(checkcvar)); \
 	} \
-	_data value = _marshal(L, 1); \
+	_data value = _marshal(L, 2); \
 	_class *cvar = new (ZWorld) _class(zone, name, value, false); \
 	CVar::Ref r(cvar); \
 	self->m_world->game->cvars->AddRef(r); \
