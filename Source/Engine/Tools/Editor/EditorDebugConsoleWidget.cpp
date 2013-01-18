@@ -114,7 +114,6 @@ void DebugConsoleWidget::CreateUI() {
 }
 
 void DebugConsoleWidget::EnableUI(bool enable) {
-	m_textArea->setEnabled(enable);
 	m_lineEdit->setEnabled(enable);
 	m_exec->setEnabled(enable);
 	m_cls->setEnabled(enable);

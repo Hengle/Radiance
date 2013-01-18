@@ -7,6 +7,9 @@
 
 #include RADPCH
 #include "Socket.h"
+#if !defined(RAD_OPT_WINX)
+#include <ifaddrs.h>
+#endif
 
 namespace net {
 
@@ -41,31 +44,45 @@ void SocketStart() {
 	s_szHost[0] = 0;
 
 	if (gethostname(s_szHost, sizeof(s_szHost)) == 0) {
-#if defined(RAD_OPT_IOS)
-		char szHost[256];
-		strcpy(szHost, s_szHost);
-		strcat(szHost, ".local");
-		const hostent *z = gethostbyname(szHost);
-#else
+#if defined(RAD_OPT_WIN)
 		const hostent *z = gethostbyname(s_szHost);
-#endif
 		if (z) {
 			if (z->h_addrtype == AF_INET) {
 				for (int i = 0; z->h_addr_list[i]; ++i) {
 					U8 mask = z->h_addr_list[i][0];
 					
 					if (i < 1 || (mask == 192) || (mask == 10))
-#if defined(RAD_OPT_WINX)
 						s_localIP.s_addr = *((ulong*)z->h_addr_list[i]);
-#else
-						s_localIP.s_addr = *((in_addr_t*)z->h_addr_list[i]);
-#endif
 					if (mask == 192)
 						break; // 192 is best (local intranet).
 				}
 			}
 		}
+#else
+		// find a 192, or 10 interface (ideal)
+		struct ifaddrs *interfaces = 0;
+		if (getifaddrs(&interfaces))
+			return;
+		
+		int c = 0;
+		for (struct ifaddrs *cur = interfaces; cur; cur = cur->ifa_next) {
+			if (cur->ifa_addr && (cur->ifa_addr->sa_family == AF_INET)) {
+				U8 mask = (((sockaddr_in*)cur->ifa_addr)->sin_addr.s_addr) & 0xff;
+				
+				if ((c < 1) || (mask == 192) || (mask == 10))
+					s_localIP.s_addr = ((sockaddr_in*)cur->ifa_addr)->sin_addr.s_addr;
+					
+				++c;
+				
+				if (mask == 192)
+					break; // best case.
+			}
+		}
+		
+		freeifaddrs((interfaces));
 	}
+#endif
+
 }
 
 const in_addr &GetLocalIP() {
