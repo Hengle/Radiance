@@ -11,8 +11,11 @@
 #include <Runtime/String.h>
 #include <boost/thread/tss.hpp>
 
-#if defined(RAD_OPT_PC_TOOLS)
+#if defined(RAD_OPT_TOOLS)
 #include "Tools/DebugConsoleServer.h"
+#endif
+
+#if defined(RAD_OPT_PC_TOOLS)
 #include "Tools/Editor/EditorLogWindow.h"
 #include "Tools/Editor/EditorCookerDialog.h"
 #endif
@@ -34,9 +37,11 @@ protected:
 
 	virtual int Flush(const StringType &str)
 	{
+#if defined(RAD_OPT_TOOLS)
+	tools::DebugConsoleServer::BroadcastLogMessage(str.c_str());
+#endif
 #if defined(RAD_OPT_PC_TOOLS)
 		tools::editor::CookerDialog::SPrint(str.c_str());
-		tools::DebugConsoleServer::BroadcastLogMessage(str.c_str());
 		bool dialog = tools::editor::LogWindow::SPrint(m_level, str.c_str());
 #endif
 #if !defined(RAD_OPT_DEBUG) && (defined(RAD_OPT_SHIP) || defined(RAD_OPT_ADHOC))

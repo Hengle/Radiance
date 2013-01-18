@@ -186,6 +186,14 @@ bool Game::LoadMapSeq(int id, int slot, world::UnloadDisposition ud, bool play) 
 		COut(C_ErrMsgBox) << "Error loading map!" << std::endl;
 		return false;
 	}
+	
+#if !defined(RAD_OPT_SHIP)
+	if (!m_dbgServer) {
+		m_dbgServer = tools::DebugConsoleServer::Start(map->path, &m_cvarZone);
+	} else {
+		m_dbgServer->SetDescription(map->path);
+	}
+#endif
 
 	mapAsset->SetGame(*this, slot);
 

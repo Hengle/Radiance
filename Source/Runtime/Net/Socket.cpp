@@ -41,12 +41,19 @@ void SocketStart() {
 	s_szHost[0] = 0;
 
 	if (gethostname(s_szHost, sizeof(s_szHost)) == 0) {
+#if defined(RAD_OPT_IOS)
+		char szHost[256];
+		strcpy(szHost, s_szHost);
+		strcat(szHost, ".local");
+		const hostent *z = gethostbyname(szHost);
+#else
 		const hostent *z = gethostbyname(s_szHost);
+#endif
 		if (z) {
 			if (z->h_addrtype == AF_INET) {
 				for (int i = 0; z->h_addr_list[i]; ++i) {
 					U8 mask = z->h_addr_list[i][0];
-
+					
 					if (i < 1 || (mask == 192) || (mask == 10))
 #if defined(RAD_OPT_WINX)
 						s_localIP.s_addr = *((ulong*)z->h_addr_list[i]);

@@ -230,6 +230,8 @@ bool DebugConsoleServer::SessionServer::Register(DebugConsoleServer *sv) {
 
 void DebugConsoleServer::SessionServer::Unregister(DebugConsoleServer *sv) {
 	Lock L(m_m);
+	if (m_servers.empty())
+		return;
 	RAD_ASSERT(m_numActiveServers > 0);
 	--m_numActiveServers;
 	m_servers.erase(sv->m_sessionId);
@@ -269,7 +271,8 @@ void DebugConsoleServer::SessionServer::BroadcastLogMessage(const char *_msg) {
 
 		sockaddr_in addr;
 		addr.sin_family = AF_INET;
-		addr.sin_addr.s_addr = inet_addr("255.255.255.255");
+		addr.sin_addr.s_addr = net::GetLocalIP().s_addr;
+		addr.sin_addr.s_addr |= (0xffu<<24U); // broadcast address
 		addr.sin_port = htons(kDebugConsoleNetBroadcastPort);
 
 		if (sendto(*m_broadcast, (const char*)buf, (int)os.OutPos(), 0, (const sockaddr*)&addr, sizeof(addr)) != (int)os.OutPos()) {
@@ -453,6 +456,9 @@ void DebugConsoleServer::SessionServer::ConnectClient(int sd, const in_addr &add
 }
 
 void DebugConsoleServer::SessionServer::DoBroadcast() {
+	if (!m_broadcast)
+		return;
+		
 	// build broadcast packet.
 	U8 buf[kDebugConsoleBroadcastPacketSize];
 	stream::FixedMemOutputBuffer ob(buf, sizeof(buf));
