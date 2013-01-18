@@ -15,7 +15,6 @@
 #include "../Game/GameNetworkDef.h"
 #include "WorldCinematics.h"
 #include "Entity.h"
-#include <Runtime/Container/ZoneSet.h>
 #include <Runtime/PushPack.h>
 
 namespace world {
@@ -286,7 +285,6 @@ private:
 
 	class LuaCVarFunc : public CVarFunc {
 	public:
-		typedef zone_set<LuaCVarFunc*, ZWorldT>::type Set;
 		LuaCVarFunc(Game &game, const char *name, const char *fnCall);
 
 		virtual void Execute(const char *cmdline);
@@ -300,7 +298,6 @@ private:
 		
 	friend class ImportLoader;
 
-	LuaCVarFunc::Set m_luaCVars;
 	ImportLoader m_impLoader;
 	lua::State::Ref m_L;
 	World *m_world;
