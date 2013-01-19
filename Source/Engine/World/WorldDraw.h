@@ -17,10 +17,12 @@
 #include "ScreenOverlay.h"
 #include "PostProcess.h"
 #include <Runtime/Container/ZoneMap.h>
+#include <Runtime/Container/ZoneVector.h>
 #include <Runtime/Base/ObjectPool.h>
 #include <bitset>
 #include <Runtime/PushPack.h>
 
+#define WORLD_DEBUG_DRAW
 
 namespace world {
 
@@ -57,7 +59,6 @@ public:
 	virtual ~RB_WorldDraw() {}
 
 	RAD_DECLARE_READONLY_PROPERTY(RB_WorldDraw, world, World*);
-	RAD_DECLARE_PROPERTY(RB_WorldDraw, wireframe, bool, bool);
 	RAD_DECLARE_PROPERTY(RB_WorldDraw, numTris, int, int);
 
 	virtual void BeginFrame() = 0;
@@ -76,19 +77,6 @@ public:
 	virtual void PopMatrix() = 0;
 	virtual void ReleaseArrayStates() = 0;
 
-#if !defined(RAD_OPT_SHIP)
-	virtual void DebugUploadVerts(
-		const Vec3 *verts, 
-		int numVerts
-	) = 0;
-
-	virtual int DebugUploadAutoTessTriIndices(int numVerts) = 0;
-
-	virtual void DebugDrawLineLoop(int numVerts) = 0;
-	virtual void DebugDrawIndexedTris(int numIndices) = 0;
-
-#endif
-
 	// Post Process FX
 	virtual void BindPostFXTargets(bool chain) = 0;
 	virtual void BindPostFXQuad() = 0;
@@ -103,12 +91,38 @@ public:
 	virtual bool Project(const Vec3 &p, Vec3 &out) = 0;
 	virtual Vec3 Unproject(const Vec3 &p) = 0;
 
+
+#if defined(WORLD_DEBUG_DRAW)
+	RAD_DECLARE_PROPERTY(RB_WorldDraw, wireframe, bool, bool);
+
+	virtual void DebugUploadVerts(
+		const Vec3 *verts, 
+		int numVerts
+	) = 0;
+
+	virtual void DebugUploadIndices(
+		const U16 *indices,
+		int numIndices
+	) = 0;
+
+	virtual int DebugUploadAutoTessTriIndices(int numVerts) = 0;
+	virtual void DebugDrawLineLoop(int numVerts) = 0;
+	virtual void DebugDrawLineStrip(int numVerts) = 0;
+	virtual void DebugDrawIndexedTris(int numIndices) = 0;
+	virtual void DebugDrawIndexedLineLoop(int numIndices) = 0;
+	virtual void DebugDrawIndexedLineStrip(int numIndices) = 0;
+	virtual void DebugDrawTris(int num) = 0;
+#endif
+
 protected:
 
-	virtual RAD_DECLARE_GET(wireframe, bool) = 0;
-	virtual RAD_DECLARE_SET(wireframe, bool) = 0;
 	virtual RAD_DECLARE_GET(numTris, int) = 0; 
 	virtual RAD_DECLARE_SET(numTris, int) = 0;
+
+#if defined(WORLD_DEBUG_DRAW)
+	virtual RAD_DECLARE_GET(wireframe, bool) = 0;
+	virtual RAD_DECLARE_SET(wireframe, bool) = 0;
+#endif
 
 private:
 
@@ -176,6 +190,13 @@ private:
 	friend class ScreenOverlay;
 	friend class World;
 	friend struct details::MBatch;
+	typedef zone_vector<BBox, ZWorldT>::type BBoxVec;
+
+	struct LocalMaterial {
+		pkg::Asset::Ref asset;
+		asset::MaterialLoader::Ref loader;
+		r::Material *mat;
+	};
 
 	class MStaticWorldMeshBatch : public MBatchDraw
 	{
@@ -264,32 +285,42 @@ private:
 	void UnlinkEntity(Entity *entity);
 	void LinkEntity(Entity *entity, const BBox &bounds, int nodeNum);
 
-#if !defined(RAD_OPT_SHIP)
-	void DebugDrawPortals(ViewDef &view);
-	void DebugDrawAreaportals(int area);
-#endif
-
-	struct LocalMaterial {
-		pkg::Asset::Ref asset;
-		r::Material *mat;
-	};
-
 	int LoadMaterial(const char *name, LocalMaterial &mat);
 	
-	int m_frame;
-	int m_markFrame;
-	bool m_init;
+	ObjectPool<details::MBatch> m_batchPool;
+	ObjectPool<details::MBatchDrawLink> m_linkPool;
+	
 	Counters m_counters;
 	PostProcessEffect::Map m_postFX;
 	MStaticWorldMeshBatch::RefVec m_worldModels;
-	LocalMaterial m_debugWireframe;
-	LocalMaterial m_debugPortal[2];
 	ScreenOverlay::List m_overlays;
 	RB_WorldDraw::Ref m_rb;
 	details::MatRefMap m_refMats;
-	ObjectPool<details::MBatch> m_batchPool;
-	ObjectPool<details::MBatchDrawLink> m_linkPool;
 	World *m_world;
+	int m_frame;
+	int m_markFrame;
+	bool m_init;
+
+#if defined(WORLD_DEBUG_DRAW)
+
+	struct DebugVars {
+		BBoxVec debugEntityBBoxes;
+		BBoxVec debugWorldBBoxes;
+		LocalMaterial debugWireframe;
+		LocalMaterial debugPortal[2];
+		LocalMaterial debugWorldBBox;
+		LocalMaterial debugEntityBBox;
+	};
+	
+	int  LoadDebugMaterials();
+	void DebugDrawPortals(ViewDef &view);
+	void DebugDrawAreaportals(int area);
+	void DebugDrawBBoxes(const LocalMaterial &material, const BBoxVec &bboxes);
+	void DebugDrawBBox(const LocalMaterial &material, const BBox &bbox);
+
+	DebugVars m_dbgVars;
+#endif
+	
 };
 
 } // world

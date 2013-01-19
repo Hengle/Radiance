@@ -89,9 +89,6 @@ struct RADENG_CLASS GLTable {
 	bool IMG_texture_compression_pvrtc;
 #endif
 
-	// Supports VBO's or CSA paths.
-	void DrawElements (GLenum mode, GLsizei count, GLenum type, const GLvoid *indices);
-
 	PFNGLACTIVETEXTUREPROC ActiveTextureARB;
 	
 	bool ARB_vertex_buffer_object;
@@ -290,6 +287,10 @@ struct RADENG_CLASS GLTable {
 	PFNGLISPROGRAMARBPROC IsProgramARB;
 	PFNGLGETVERTEXATTRIBPOINTERVARBPROC GetVertexAttribPointervARB;
 #endif
+
+	// Supports VBO's or CSA paths.
+	void DrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices);
+	void DrawArrays(GLenum mode, GLint first, GLsizei count);
 	
 	void SetActiveTexture(int num);
 	void SetActiveTexCoord(int num);

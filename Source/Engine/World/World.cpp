@@ -526,4 +526,8 @@ void World::RAD_IMPLEMENT_SET(enabledGestures) (int value) {
 		m_game->FlushInput(true); // flush input if gesture types change
 }
 
+GameCVars* World::RAD_IMPLEMENT_GET(cvars) {
+	return m_game->cvars;
+}
+
 } // world

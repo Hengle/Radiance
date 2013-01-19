@@ -11,6 +11,8 @@
 // cvar defaults
 GameCVars::GameCVars(Game &game, CVarZone &zone) : 
 r_showtris(zone, "r_showtris", false, false),
-r_showportals(zone, "r_showportals", false, false) {
+r_showportals(zone, "r_showportals", false, false),
+r_showentitybboxes(zone, "r_showentitybboxes", false, false),
+r_showworldbboxes(zone, "r_showworldbboxes", false, false) {
 }
 

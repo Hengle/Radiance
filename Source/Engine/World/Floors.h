@@ -41,8 +41,18 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(FloorPosition, nextWaypoint, int);
 
 private:
+
 	friend class Floors;
+	friend class FloorMove;
 	friend struct lua::Marshal<FloorPosition>;
+
+	void MakeNull() {
+		m_pos = Vec3::Zero;
+		m_floor = -1;
+		m_tri = -1;
+		m_waypoint = -1;
+		m_nextWaypoint = -1;
+	}
 
 	RAD_DECLARE_GET(pos, const Vec3 &) {
 		return m_pos;
@@ -83,6 +93,7 @@ public:
 		Spline path;
 		int waypoints[2];
 		int connection;
+		int flags;
 		int floors[2];
 	};
 
@@ -92,6 +103,11 @@ public:
 
 	class State {
 	public:
+		enum {
+			RAD_FLAG(kStateFlag_AutoFace),
+			RAD_FLAG(kStateFlag_Interruptable)
+		};
+
 		FloorPosition pos;
 		String anim;
 		Vec3 facing;
@@ -99,16 +115,15 @@ public:
 	private:
 		friend class FloorMove;
 		friend class Floors;
+		Spline::SmoothMotion m_m;
 		int m_stepIdx;
-		float m_t;
 	};
 
 	FloorMove();
 
 	void InitMove(State &state);
-	bool Move(State &state, float velocity);
+	float Move(State &state, float distance);
 	
-	RAD_DECLARE_READONLY_PROPERTY(FloorMove, busy, bool);
 	RAD_DECLARE_READONLY_PROPERTY(FloorMove, route, const Route*);
 
 	void Merge(const Ref &old, State &state);
@@ -173,6 +188,7 @@ private:
 		Vec3 pos;
 		int tri;
 		int connection;
+		int flags;
 		int waypoints[2];
 		int floors[2];
 		bool slopeChange;

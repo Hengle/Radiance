@@ -12,10 +12,6 @@
 #undef max
 #undef emit
 
-#if defined(RAD_OPT_IOS)
-bool __IOS_IPad3();
-#endif
-
 namespace {
 
 enum

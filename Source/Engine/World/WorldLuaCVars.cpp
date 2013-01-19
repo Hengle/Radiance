@@ -22,7 +22,7 @@ int WorldLua::lua_CVar(lua_State *L) {
 	CVar *cvar = self->m_world->game->cvarZone->Find(sz, CVarZone::kFindScope_IncludingGlobals);
 	if (!cvar)
 		luaL_error(L, "no variable exists with that name (while trying to bind cvar named %s)", sz);
-	if (self->m_world->game->cvars->IsLuaVar(cvar)) {
+	if (self->m_world->cvars->IsLuaVar(cvar)) {
 		luaL_error(L, "cvar %s is a luacvar, use the lua reference instead!", sz);
 		return 0;
 	}
@@ -127,7 +127,7 @@ int WorldLua::lua_PkgLuaFunc(lua_State *L, CVarFunc *cvar) {
 	_data value = _marshal(L, 2); \
 	_class *cvar = new (ZWorld) _class(zone, name, value, false); \
 	CVar::Ref r(cvar); \
-	self->m_world->game->cvars->AddLuaVar(r); \
+	self->m_world->cvars->AddLuaVar(r); \
 	return lua_PkgCVar(L, cvar);
 
 int WorldLua::lua_CVarString(lua_State *L) {
@@ -204,7 +204,7 @@ int WorldLua::lua_CVarFunc(lua_State *L) {
 	if (checkcvar) {
 		if (checkcvar->type != CVarFunc::kType)
 			luaL_error(L, "cvar '%s' exists but is of type %d (tried to create with type %d)", name, checkcvar->type.get(), CVarFunc::kType);
-		if (self->m_world->game->cvars->IsLuaVar(checkcvar)) {
+		if (self->m_world->cvars->IsLuaVar(checkcvar)) {
 			return lua_PkgLuaFunc(L, static_cast<LuaCVarFunc*>(checkcvar));
 		}
 		luaL_error(L, "cvar '%s' is a native C++ cvar func and cannot be bound this way, use CVar(name) instead", name);
@@ -216,7 +216,7 @@ int WorldLua::lua_CVarFunc(lua_State *L) {
 	LuaCVarFunc *cvar = new (ZWorld) LuaCVarFunc(*self->m_world->game.get(), name, fnCall);
 	CVar::Ref r(cvar);
 
-	self->m_world->game->cvars->AddLuaVar(r);
+	self->m_world->cvars->AddLuaVar(r);
 	return lua_PkgLuaFunc(L, cvar);
 }
 

@@ -1363,6 +1363,7 @@
     <ClCompile Include="..\..\Engine\Renderer\GL\GLTextModel.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\GL\GLTexture.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\GL\GLUIDraw.cpp" />
+    <ClCompile Include="..\..\Engine\Renderer\GL\GLWorldDebugDraw.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\GL\GLWorldDraw.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\GL\GLRenderer.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\GL\RBGLAssets.cpp" />
@@ -2036,6 +2037,7 @@
     <ClCompile Include="..\..\Engine\World\World.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldBSP.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldCinematics.cpp" />
+    <ClCompile Include="..\..\Engine\World\WorldDebugDraw.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldDraw.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldLua.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldLuaCVars.cpp" />

@@ -117,17 +117,11 @@ WorldDraw::~WorldDraw() {
 
 int WorldDraw::LoadMaterials() {
 	
-	int r = LoadMaterial("Sys/DebugWireframe_M", m_debugWireframe);
+#if defined(WORLD_DEBUG_DRAW)
+	int r = LoadDebugMaterials();
 	if (r != pkg::SR_Success)
 		return r;
-
-	r = LoadMaterial("Sys/DebugPortalEdge_M", m_debugPortal[0]);
-	if (r != pkg::SR_Success)
-		return r;
-
-	r = LoadMaterial("Sys/DebugPortal_M", m_debugPortal[1]);
-	if (r != pkg::SR_Success)
-		return r;
+#endif
 
 	return m_rb->LoadMaterials();
 }
@@ -156,6 +150,7 @@ int WorldDraw::LoadMaterial(const char *name, LocalMaterial &mat) {
 	}
 
 	mat.mat = parser->material;
+	mat.loader = asset::MaterialLoader::Cast(mat.asset);
 	return pkg::SR_Success;
 }
 
@@ -423,6 +418,10 @@ void WorldDraw::VisMarkArea(
 		if (m->m_markFrame != m_markFrame) {
 			m->m_markFrame = m_markFrame;
 			++m_counters.testedWorldModels;
+#if defined(WORLD_DEBUG_DRAW)
+			if (m_world->cvars->r_showworldbboxes.value)
+				m_dbgVars.debugWorldBBoxes.push_back(m->bounds);
+#endif
 			if (ClipBounds(volume, volumeBounds, m->bounds)) {
 				++m_counters.drawnWorldModels;
 				details::MBatchRef batch = AddViewBatch(view, m->m_matId);
@@ -446,6 +445,10 @@ void WorldDraw::VisMarkArea(
 					++m_counters.testedEntityModels;
 					BBox bounds(m->bounds);
 					bounds.Translate(e->ps->worldPos);
+#if defined(WORLD_DEBUG_DRAW)
+					if (m_world->cvars->r_showentitybboxes.value)
+						m_dbgVars.debugEntityBBoxes.push_back(bounds);
+#endif
 					if (ClipBounds(volume, volumeBounds, bounds)) {
 						++m_counters.drawnEntityModels;
 						for (MBatchDraw::RefVec::const_iterator it = m->m_batches.begin(); it != m->m_batches.end(); ++it) {
@@ -501,16 +504,27 @@ void WorldDraw::DrawView() {
 
 	m_counters.numTris += m_rb->numTris;
 
-#if !defined(RAD_OPT_SHIP)
-	if (m_world->game->cvars->r_showportals.value)
-		DebugDrawPortals(view);
-#endif
+#if defined(WORLD_DEBUG_DRAW)
 
-	if (m_world->game->cvars->r_showtris.value) {
+	if (m_world->cvars->r_showportals.value)
+		DebugDrawPortals(view);
+	if (m_world->cvars->r_showtris.value) {
 		m_rb->wireframe = true;
 		DrawViewBatches(view, true);
 		m_rb->wireframe = false;
 	}
+
+	if (m_world->cvars->r_showentitybboxes.value) {
+		DebugDrawBBoxes(m_dbgVars.debugEntityBBox, m_dbgVars.debugEntityBBoxes);
+		m_dbgVars.debugEntityBBoxes.clear();
+	}
+	
+	if (m_world->cvars->r_showworldbboxes.value) {
+		DebugDrawBBoxes(m_dbgVars.debugWorldBBox, m_dbgVars.debugWorldBBoxes);
+		m_dbgVars.debugWorldBBoxes.clear();
+	}
+
+#endif
 }
 
 void WorldDraw::DrawOverlays() {
@@ -544,7 +558,11 @@ void WorldDraw::DrawBatch(const details::MBatch &batch, bool wireframe) {
 
 	Vec3 pos;
 	Vec3 angles;
-	r::Material *mat = (wireframe) ? m_debugWireframe.mat : batch.matRef->mat;
+#if defined(WORLD_DEBUG_DRAW)
+	r::Material *mat = (wireframe) ? m_dbgVars.debugWireframe.mat : batch.matRef->mat;
+#else
+	r::Material *mat = batch.matRef->mat;
+#endif
 	bool first = true;
 
 	mat->BindStates();
@@ -644,55 +662,5 @@ void WorldDraw::UnlinkEntity(Entity *entity) {
 
 void WorldDraw::LinkEntity(Entity *entity, const BBox &bounds, int nodeNum) {
 }
-
-#if !defined(RAD_OPT_SHIP)
-void WorldDraw::DebugDrawPortals(ViewDef &view) {
-	for (int i = 0; i < kMaxAreas; ++i) {
-		if (view.areas.test(i))
-			DebugDrawAreaportals(i);
-	}
-}
-
-void WorldDraw::DebugDrawAreaportals(int areaNum) { 
-
-	RAD_ASSERT(areaNum < (int)m_world->m_areas.size());
-
-	for (int style = 0; style < 2; ++style) {
-		m_debugPortal[style].mat->BindStates();
-		m_debugPortal[style].mat->BindTextures(asset::MaterialLoader::Ref());
-		m_debugPortal[style].mat->shader->Begin(r::Shader::kPass_Default, *m_debugPortal[style].mat);
-
-
-		const dBSPArea &area = m_world->m_areas[areaNum];
-
-		for(int i = 0; i < area.numPortals; ++i) {
-
-			int areaportalNum = (int)*(m_world->m_bsp->AreaportalIndices() + area.firstPortal + i);
-			const dAreaportal &portal = m_world->m_areaportals[areaportalNum];
-
-			m_rb->DebugUploadVerts(
-				&portal.winding.Vertices()[0],
-				portal.winding.NumVertices()
-			);
-
-			int numIndices = 0;
-			if (style == 1)
-				numIndices = m_rb->DebugUploadAutoTessTriIndices(portal.winding.NumVertices());
-
-			m_debugPortal[style].mat->shader->BindStates();
-			m_rb->CommitStates();
-
-			if (style == 0) {
-				m_rb->DebugDrawLineLoop(portal.winding.NumVertices());
-			} else {
-				m_rb->DebugDrawIndexedTris(numIndices);
-			}
-		}
-
-		m_debugPortal[style].mat->shader->End();
-	}
-}
-
-#endif
 
 } // world

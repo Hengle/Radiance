@@ -119,6 +119,19 @@ void GLTable::DrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid
 	}
 }
 
+void GLTable::DrawArrays(GLenum mode, GLint first, GLsizei count) {
+	if (mode == GL_TRIANGLES)
+		numTris += count / 3;
+
+	if (wireframe && mode == GL_TRIANGLES) {
+		// lines
+		for (GLint i = 0; i <= count-3; i += 3)
+			glDrawArrays(GL_LINE_LOOP, i+first, 3);
+	} else {
+		glDrawArrays(mode, first, count);
+	}
+}
+
 void GLTable::Reset() {
 #if defined(RAD_OPT_PC_TOOLS)
 	if (cgc) {

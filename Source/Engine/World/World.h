@@ -26,6 +26,7 @@
 #include <Runtime/PushPack.h>
 
 class Game;
+class GameCVars;
 class Engine;
 
 namespace world {
@@ -154,6 +155,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(World, drawCounters, const WorldDraw::Counters*);
 	RAD_DECLARE_READONLY_PROPERTY(World, listenerPos, const Vec3&);
 	RAD_DECLARE_READONLY_PROPERTY(World, bspFile, const bsp_file::BSPFile*);
+	RAD_DECLARE_READONLY_PROPERTY(World, cvars, GameCVars*);
 
 private:
 
@@ -440,7 +442,8 @@ private:
 	RAD_DECLARE_GET(bspFile, const bsp_file::BSPFile*) {
 		return m_bsp.get();
 	}
-	
+
+	RAD_DECLARE_GET(cvars, GameCVars*);
 	RAD_DECLARE_GET(listenerPos, const Vec3&);
 
 	EventList m_events;

@@ -11,21 +11,63 @@
 
 namespace world {
 
+namespace {
+inline int BSPConnectionFlagsToStateFlags(int flags) {
+	int z = 0;
+
+	if (flags&bsp_file::kWaypointConnectionFlag_AutoFace)
+		z |= FloorMove::State::kStateFlag_AutoFace;
+	if (flags&bsp_file::kWaypointConnectionFlag_Interruptable)
+		z |= FloorMove::State::kStateFlag_Interruptable;
+
+	return z;
+}
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 FloorMove::FloorMove() {
 }
 
 void FloorMove::InitMove(State &state) {
+	state.m_stepIdx = 0;
+	state.flags = 0;
+	state.pos.MakeNull();
+	state.facing = Vec3::Zero;
+	state.anim.Clear();
+	state.m_m.Init();
 
+	if (!m_route.steps->empty()) {
+		const Step &step = m_route.steps[0];
+		step.path.Eval(0.f, state.pos.m_pos, &state.facing);
+		state.pos.m_waypoint = step.waypoints[0];
+		state.pos.m_nextWaypoint = step.waypoints[1];
+		if (state.pos.m_waypoint == -1) {
+			state.pos.m_floor = step.floors[0];
+		}
+	}
 }
 
-bool FloorMove::Move(State &state, float velocity) {
-	return false;
-}
+float FloorMove::Move(State &state, float distance) {
+	float moved = 0.f;
+	
+	while (moved < distance) {
+		if (state.m_stepIdx >= (int)m_route.steps->size())
+			break;
+		const Step &step = m_route.steps[state.m_stepIdx];
+		
+		float dd = distance - moved;
 
-bool FloorMove::RAD_IMPLEMENT_GET(busy) {
-	return false;
+		float dx = state.m_m.Eval(step.path, dd, state.pos.m_pos, &state.facing);
+		moved += dx;
+
+		if (dx < dd) {
+			++state.m_stepIdx;
+			state.m_m.Init();
+		}
+	}
+
+	return moved;
 }
 
 void FloorMove::Merge(const Ref &old, State &state) {
@@ -285,6 +327,7 @@ void Floors::WalkFloor(
 	step.floors[0] = step.floors[1] = cur.pos.m_floor;
 	step.connection = -1;
 	step.slopeChange = false;
+	step.flags = bsp_file::kWaypointConnectionFlag_AutoFace;
 	routeSoFar->push_back(step);
 		
 	const bsp_file::BSPFloorTri *tri = m_bsp->FloorTris() + start.m_tri;
@@ -438,6 +481,7 @@ void Floors::WalkConnection(
 	WalkStep step;
 	step.pos = Vec3(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
 	step.connection = connectionNum;
+	step.flags = connection->flags;
 	step.waypoints[0] = waypointNum;
 	step.waypoints[1] = otherWaypointNum;
 	step.floors[0] = (int)waypoint->floorNum;
@@ -655,6 +699,7 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 			step.floors[0] = cur.floors[0];
 			step.floors[1] = cur.floors[1];
 			step.connection = cur.connection;
+			step.flags = BSPConnectionFlagsToStateFlags(cur.flags);
 
 			const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + cur.waypoints[1];
 			const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + cur.connection;
@@ -728,6 +773,7 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 				physics::CubicBZSpline spline(bzCtrls);
 				step.waypoints[0] = step.waypoints[1] = -1;
 				step.connection = -1;
+				step.flags = BSPConnectionFlagsToStateFlags(cur.flags);
 				step.floors[0] = step.floors[1] = cur.floors[0];
 				step.path.Load(spline);
 				moveRoute.steps->push_back(step);
@@ -776,6 +822,7 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 		step.floors[0] = step.floors[1] = cur.floors[0];
 		step.waypoints[0] = step.waypoints[1] = -1;
 		step.connection = -1;
+		step.flags = BSPConnectionFlagsToStateFlags(cur.flags);
 		step.path.Load(spline);
 
 		moveRoute.steps->push_back(step);
@@ -843,6 +890,16 @@ bool Floors::PlanFloorMove(
 			const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + connectionNum;
 
 			int otherIdx = connection->waypoints[0] == waypointNum;
+
+			if (otherIdx == 0) {
+				if (!(connection->flags&bsp_file::kWaypointConnectionFlag_BtoA))
+					continue; // not connected this way.
+			} else {
+				RAD_ASSERT(otherIdx == 1);
+				if (!(connection->flags&bsp_file::kWaypointConnectionFlag_AtoB))
+					continue; // not connected this way.
+			}
+
 			U32 otherWaypointIdx = connection->waypoints[otherIdx];
 
 			if (!(m_waypoints[otherWaypointIdx].flags&kWaypointState_Enabled))
@@ -945,6 +1002,16 @@ bool Floors::PlanWaypointMove(
 		const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + connectionNum;
 
 		int otherIdx = connection->waypoints[0] == start.m_waypoint;
+
+		if (otherIdx == 0) {
+			if (!(connection->flags&bsp_file::kWaypointConnectionFlag_BtoA))
+				continue; // not connected this way.
+		} else {
+			RAD_ASSERT(otherIdx == 1);
+			if (!(connection->flags&bsp_file::kWaypointConnectionFlag_AtoB))
+				continue; // not connected this way.
+		}
+
 		U32 otherWaypointIdx = connection->waypoints[otherIdx];
 
 		if (!(m_waypoints[otherWaypointIdx].flags&kWaypointState_Enabled))

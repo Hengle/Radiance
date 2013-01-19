@@ -35,18 +35,6 @@ public:
 	virtual void PopMatrix();
 	virtual void ReleaseArrayStates();
 
-#if !defined(RAD_OPT_SHIP)
-	virtual void DebugUploadVerts(
-		const Vec3 *verts, 
-		int numVerts
-	);
-
-	virtual int DebugUploadAutoTessTriIndices(int numVerts);
-
-	virtual void DebugDrawLineLoop(int numVerts);
-	virtual void DebugDrawIndexedTris(int numIndices);
-#endif
-
 	virtual void BindPostFXTargets(bool chain);
 	virtual void BindPostFXQuad();
 	virtual void DrawPostFXQuad();
@@ -60,15 +48,28 @@ public:
 	virtual bool Project(const Vec3 &p, Vec3 &out);
 	virtual Vec3 Unproject(const Vec3 &p);
 
+
+#if defined(WORLD_DEBUG_DRAW)
+	virtual void DebugUploadVerts(
+		const Vec3 *verts, 
+		int numVerts
+	);
+
+	virtual void DebugUploadIndices(
+		const U16 *indices,
+		int numIndices
+	);
+
+	virtual int DebugUploadAutoTessTriIndices(int numVerts);
+	virtual void DebugDrawLineLoop(int numVerts);
+	virtual void DebugDrawLineStrip(int numVerts);
+	virtual void DebugDrawIndexedTris(int numIndices);
+	virtual void DebugDrawIndexedLineLoop(int numIndices);
+	virtual void DebugDrawIndexedLineStrip(int numIndices);
+	virtual void DebugDrawTris(int num);
+#endif
+
 protected:
-
-	virtual RAD_DECLARE_GET(wireframe, bool) { 
-		return r::gl.wireframe; 
-	}
-
-	virtual RAD_DECLARE_SET(wireframe, bool) { 
-		r::gl.wireframe = value; 
-	}
 
 	virtual RAD_DECLARE_GET(numTris, int) { 
 		return r::gl.numTris; 
@@ -77,6 +78,16 @@ protected:
 	virtual RAD_DECLARE_SET(numTris, int) { 
 		r::gl.numTris = value; 
 	}
+
+#if defined(WORLD_DEBUG_DRAW)
+	virtual RAD_DECLARE_GET(wireframe, bool) { 
+		return r::gl.wireframe; 
+	}
+
+	virtual RAD_DECLARE_SET(wireframe, bool) { 
+		r::gl.wireframe = value; 
+	}
+#endif
 
 private:
 
@@ -108,19 +119,21 @@ private:
 		bool invY
 	);
 
-#if !defined(RAD_OPT_SHIP)
-	enum {
-		kNumDebugIndices = Kilo,
-		kDebugVertSize = sizeof(Vec3) * Kilo
-	};
-	void AllocateDebugVerts();
-	r::GLVertexBuffer::Ref m_debugVerts;
-	r::GLVertexBuffer::Ref m_debugIndices;
-#endif
-
 	int m_overlaySize[2];
 	r::GLVertexBuffer::Ref m_overlayVB[2];
 	r::GLVertexBuffer::Ref m_overlayIB[2];
+
+#if defined(WORLD_DEBUG_DRAW)
+	enum {
+		kDebugVertSize = sizeof(Vec3)
+	};
+	int m_numDebugVerts;
+	int m_numDebugIndices;
+	void AllocateDebugVerts(int num);
+	void AllocateDebugIndices(int num);
+	r::GLVertexBuffer::Ref m_debugVerts;
+	r::GLVertexBuffer::Ref m_debugIndices;
+#endif
 };
 
 } // world

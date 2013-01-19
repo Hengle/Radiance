@@ -16,7 +16,9 @@ class GameCVars {
 public:
 	CVarBool r_showtris;
 	CVarBool r_showportals;
-
+	CVarBool r_showentitybboxes;
+	CVarBool r_showworldbboxes;
+	
 	void AddLuaVar(const CVar::Ref &cvar) {
 		m_vec.push_back(cvar);
 		m_set.insert(cvar.get());

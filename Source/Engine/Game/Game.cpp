@@ -214,6 +214,11 @@ bool Game::LoadMapSeq(int id, int slot, world::UnloadDisposition ud, bool play) 
 			world::World::Ref world = mapAsset->world;
 			if (world)
 				world->sound->Tick(elapsed/1000.f, false);
+
+#if !defined(RAD_OPT_SHIP)
+			if (m_dbgServer)
+				m_dbgServer->ProcessClients();
+#endif
 		}
 	}
 

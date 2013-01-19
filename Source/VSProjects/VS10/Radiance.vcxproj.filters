@@ -2174,6 +2174,12 @@
     <ClCompile Include="..\..\Engine\World\WorldLuaCVars.cpp">
       <Filter>Source\Engine\World</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\World\WorldDebugDraw.cpp">
+      <Filter>Source\Engine\World</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Renderer\GL\GLWorldDebugDraw.cpp">
+      <Filter>Source\Engine\Renderer\GL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Runtime\Base\Event.inl">
