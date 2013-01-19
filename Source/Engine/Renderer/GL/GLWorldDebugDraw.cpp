@@ -80,7 +80,7 @@ void GLWorldDraw::DebugUploadIndices(
 	ib.reset();
 }
 
-int GLWorldDraw::DebugUploadAutoTessTriIndices(int numVerts) {
+int GLWorldDraw::DebugTesselateVerts(int numVerts) {
 
 	int numTris = numVerts - 2;
 	RAD_VERIFY(numTris > 0);
@@ -123,6 +123,11 @@ void GLWorldDraw::DebugDrawIndexedLineStrip(int numIndices) {
 
 void GLWorldDraw::DebugDrawTris(int num) {
 	gl.DrawArrays(GL_TRIANGLES, 0, (GLsizei)num);
+}
+
+void GLWorldDraw::DebugDrawPoly(int num) {
+	int numIndices = DebugTesselateVerts(num);
+	gl.DrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
 }
 
 } // world

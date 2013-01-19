@@ -18,7 +18,8 @@ public:
 	CVarBool r_showportals;
 	CVarBool r_showentitybboxes;
 	CVarBool r_showworldbboxes;
-	
+	CVarBool r_showwaypoints;
+
 	void AddLuaVar(const CVar::Ref &cvar) {
 		m_vec.push_back(cvar);
 		m_set.insert(cvar.get());

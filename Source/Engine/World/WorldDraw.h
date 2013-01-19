@@ -105,13 +105,14 @@ public:
 		int numIndices
 	) = 0;
 
-	virtual int DebugUploadAutoTessTriIndices(int numVerts) = 0;
+	virtual int DebugTesselateVerts(int numVerts) = 0;
 	virtual void DebugDrawLineLoop(int numVerts) = 0;
 	virtual void DebugDrawLineStrip(int numVerts) = 0;
 	virtual void DebugDrawIndexedTris(int numIndices) = 0;
 	virtual void DebugDrawIndexedLineLoop(int numIndices) = 0;
 	virtual void DebugDrawIndexedLineStrip(int numIndices) = 0;
 	virtual void DebugDrawTris(int num) = 0;
+	virtual void DebugDrawPoly(int num) = 0;
 #endif
 
 protected:
@@ -306,17 +307,19 @@ private:
 	struct DebugVars {
 		BBoxVec debugEntityBBoxes;
 		BBoxVec debugWorldBBoxes;
-		LocalMaterial debugWireframe;
-		LocalMaterial debugPortal[2];
-		LocalMaterial debugWorldBBox;
-		LocalMaterial debugEntityBBox;
+		LocalMaterial debugWireframe_M;
+		LocalMaterial debugPortal_M[2];
+		LocalMaterial debugWorldBBox_M;
+		LocalMaterial debugEntityBBox_M;
+		LocalMaterial debugWaypoint_M;
 	};
 	
 	int  LoadDebugMaterials();
 	void DebugDrawPortals(ViewDef &view);
 	void DebugDrawAreaportals(int area);
-	void DebugDrawBBoxes(const LocalMaterial &material, const BBoxVec &bboxes);
-	void DebugDrawBBox(const LocalMaterial &material, const BBox &bbox);
+	void DebugDrawBBoxes(const LocalMaterial &material, const BBoxVec &bboxes, bool wireframe);
+	void DebugDrawBBox(const LocalMaterial &material, const BBox &bbox, bool wireframe);
+	void DebugDrawActiveWaypoints();
 
 	DebugVars m_dbgVars;
 #endif

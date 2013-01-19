@@ -60,13 +60,14 @@ public:
 		int numIndices
 	);
 
-	virtual int DebugUploadAutoTessTriIndices(int numVerts);
+	virtual int DebugTesselateVerts(int numVerts);
 	virtual void DebugDrawLineLoop(int numVerts);
 	virtual void DebugDrawLineStrip(int numVerts);
 	virtual void DebugDrawIndexedTris(int numIndices);
 	virtual void DebugDrawIndexedLineLoop(int numIndices);
 	virtual void DebugDrawIndexedLineStrip(int numIndices);
 	virtual void DebugDrawTris(int num);
+	virtual void DebugDrawPoly(int num);
 #endif
 
 protected:

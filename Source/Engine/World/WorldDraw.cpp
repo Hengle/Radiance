@@ -515,12 +515,12 @@ void WorldDraw::DrawView() {
 	}
 
 	if (m_world->cvars->r_showentitybboxes.value) {
-		DebugDrawBBoxes(m_dbgVars.debugEntityBBox, m_dbgVars.debugEntityBBoxes);
+		DebugDrawBBoxes(m_dbgVars.debugEntityBBox_M, m_dbgVars.debugEntityBBoxes, true);
 		m_dbgVars.debugEntityBBoxes.clear();
 	}
 	
 	if (m_world->cvars->r_showworldbboxes.value) {
-		DebugDrawBBoxes(m_dbgVars.debugWorldBBox, m_dbgVars.debugWorldBBoxes);
+		DebugDrawBBoxes(m_dbgVars.debugWorldBBox_M, m_dbgVars.debugWorldBBoxes, true);
 		m_dbgVars.debugWorldBBoxes.clear();
 	}
 
@@ -559,7 +559,7 @@ void WorldDraw::DrawBatch(const details::MBatch &batch, bool wireframe) {
 	Vec3 pos;
 	Vec3 angles;
 #if defined(WORLD_DEBUG_DRAW)
-	r::Material *mat = (wireframe) ? m_dbgVars.debugWireframe.mat : batch.matRef->mat;
+	r::Material *mat = (wireframe) ? m_dbgVars.debugWireframe_M.mat : batch.matRef->mat;
 #else
 	r::Material *mat = batch.matRef->mat;
 #endif

@@ -16,23 +16,27 @@ namespace world {
 
 int WorldDraw::LoadDebugMaterials() {
 	
-	int r = LoadMaterial("Sys/DebugWireframe_M", m_dbgVars.debugWireframe);
+	int r = LoadMaterial("Sys/DebugWireframe_M", m_dbgVars.debugWireframe_M);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/DebugPortalEdge_M", m_dbgVars.debugPortal[0]);
+	r = LoadMaterial("Sys/DebugPortalEdge_M", m_dbgVars.debugPortal_M[0]);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/DebugPortal_M", m_dbgVars.debugPortal[1]);
+	r = LoadMaterial("Sys/DebugPortal_M", m_dbgVars.debugPortal_M[1]);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/DebugWorldBBox_M", m_dbgVars.debugWorldBBox);
+	r = LoadMaterial("Sys/DebugWorldBBox_M", m_dbgVars.debugWorldBBox_M);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/DebugEntityBBox_M", m_dbgVars.debugEntityBBox);
+	r = LoadMaterial("Sys/DebugEntityBBox_M", m_dbgVars.debugEntityBBox_M);
+	if (r != pkg::SR_Success)
+		return r;
+
+	r = LoadMaterial("Sys/DebugWaypoint_M", m_dbgVars.debugWaypoint_M);
 	if (r != pkg::SR_Success)
 		return r;
 
@@ -51,9 +55,9 @@ void WorldDraw::DebugDrawAreaportals(int areaNum) {
 	RAD_ASSERT(areaNum < (int)m_world->m_areas.size());
 
 	for (int style = 0; style < 2; ++style) {
-		m_dbgVars.debugPortal[style].mat->BindStates();
-		m_dbgVars.debugPortal[style].mat->BindTextures(m_dbgVars.debugPortal[style].loader);
-		m_dbgVars.debugPortal[style].mat->shader->Begin(r::Shader::kPass_Default, *m_dbgVars.debugPortal[style].mat);
+		m_dbgVars.debugPortal_M[style].mat->BindStates();
+		m_dbgVars.debugPortal_M[style].mat->BindTextures(m_dbgVars.debugPortal_M[style].loader);
+		m_dbgVars.debugPortal_M[style].mat->shader->Begin(r::Shader::kPass_Default, *m_dbgVars.debugPortal_M[style].mat);
 
 
 		const dBSPArea &area = m_world->m_areas[areaNum];
@@ -70,9 +74,9 @@ void WorldDraw::DebugDrawAreaportals(int areaNum) {
 
 			int numIndices = 0;
 			if (style == 1)
-				numIndices = m_rb->DebugUploadAutoTessTriIndices(portal.winding.NumVertices());
+				numIndices = m_rb->DebugTesselateVerts(portal.winding.NumVertices());
 
-			m_dbgVars.debugPortal[style].mat->shader->BindStates();
+			m_dbgVars.debugPortal_M[style].mat->shader->BindStates();
 			m_rb->CommitStates();
 
 			if (style == 0) {
@@ -82,11 +86,11 @@ void WorldDraw::DebugDrawAreaportals(int areaNum) {
 			}
 		}
 
-		m_dbgVars.debugPortal[style].mat->shader->End();
+		m_dbgVars.debugPortal_M[style].mat->shader->End();
 	}
 }
 
-void WorldDraw::DebugDrawBBoxes(const LocalMaterial &material, const BBoxVec &bboxes) {
+void WorldDraw::DebugDrawBBoxes(const LocalMaterial &material, const BBoxVec &bboxes, bool wireframe) {
 	if (bboxes.empty())
 		return;
 
@@ -95,12 +99,12 @@ void WorldDraw::DebugDrawBBoxes(const LocalMaterial &material, const BBoxVec &bb
 	material.mat->shader->Begin(r::Shader::kPass_Default, *material.mat);
 
 	for (BBoxVec::const_iterator it = bboxes.begin(); it != bboxes.end(); ++it)
-		DebugDrawBBox(material, *it);
+		DebugDrawBBox(material, *it, wireframe);
 
 	material.mat->shader->End();
 }
 
-void WorldDraw::DebugDrawBBox(const LocalMaterial &material, const BBox &bbox) {
+void WorldDraw::DebugDrawBBox(const LocalMaterial &material, const BBox &bbox, bool wireframe) {
 	typedef stackify<std::vector<Vec3>, 4> StackVec;
 	StackVec v;
 
@@ -116,7 +120,11 @@ void WorldDraw::DebugDrawBBox(const LocalMaterial &material, const BBox &bbox) {
 	m_rb->DebugUploadVerts(&v[0], 4);
 	material.mat->shader->BindStates();
 	m_rb->CommitStates();
-	m_rb->DebugDrawLineLoop(4);
+	if (wireframe) {
+		m_rb->DebugDrawLineLoop(4);
+	} else {
+		m_rb->DebugDrawPoly(4);
+	}
 	v->clear();
 	
 	// -X
@@ -128,7 +136,11 @@ void WorldDraw::DebugDrawBBox(const LocalMaterial &material, const BBox &bbox) {
 	m_rb->DebugUploadVerts(&v[0], 4);
 	material.mat->shader->BindStates();
 	m_rb->CommitStates();
-	m_rb->DebugDrawLineLoop(4);
+	if (wireframe) {
+		m_rb->DebugDrawLineLoop(4);
+	} else {
+		m_rb->DebugDrawPoly(4);
+	}
 	v->clear();
 
 	// +Y
@@ -140,7 +152,11 @@ void WorldDraw::DebugDrawBBox(const LocalMaterial &material, const BBox &bbox) {
 	m_rb->DebugUploadVerts(&v[0], 4);
 	material.mat->shader->BindStates();
 	m_rb->CommitStates();
-	m_rb->DebugDrawLineLoop(4);
+	if (wireframe) {
+		m_rb->DebugDrawLineLoop(4);
+	} else {
+		m_rb->DebugDrawPoly(4);
+	}
 	v->clear();
 
 	// -Y
@@ -152,7 +168,11 @@ void WorldDraw::DebugDrawBBox(const LocalMaterial &material, const BBox &bbox) {
 	m_rb->DebugUploadVerts(&v[0], 4);
 	material.mat->shader->BindStates();
 	m_rb->CommitStates();
-	m_rb->DebugDrawLineLoop(4);
+	if (wireframe) {
+		m_rb->DebugDrawLineLoop(4);
+	} else {
+		m_rb->DebugDrawPoly(4);
+	}
 	v->clear();
 
 	// +Z
@@ -164,7 +184,11 @@ void WorldDraw::DebugDrawBBox(const LocalMaterial &material, const BBox &bbox) {
 	m_rb->DebugUploadVerts(&v[0], 4);
 	material.mat->shader->BindStates();
 	m_rb->CommitStates();
-	m_rb->DebugDrawLineLoop(4);
+	if (wireframe) {
+		m_rb->DebugDrawLineLoop(4);
+	} else {
+		m_rb->DebugDrawPoly(4);
+	}
 	v->clear();
 	
 	// -Z
@@ -176,9 +200,24 @@ void WorldDraw::DebugDrawBBox(const LocalMaterial &material, const BBox &bbox) {
 	m_rb->DebugUploadVerts(&v[0], 4);
 	material.mat->shader->BindStates();
 	m_rb->CommitStates();
-	m_rb->DebugDrawLineLoop(4);
+	if (wireframe) {
+		m_rb->DebugDrawLineLoop(4);
+	} else {
+		m_rb->DebugDrawPoly(4);
+	}
 	v->clear();
 
+}
+
+void WorldDraw::DebugDrawActiveWaypoints() {
+	for (U32 i = 0; i < m_world->bspFile->numWaypoints; ++i) {
+		if (!(m_world->floors->WaypointState((int)i) & Floors::kWaypointState_Enabled))
+			continue;
+		const bsp_file::BSPWaypoint *waypoint = m_world->bspFile->Waypoints() + i;
+		const Vec3 kPos(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
+		const BBox kBox(kPos - Vec3(12, 12, 12), kPos + Vec3(12, 12, 12));
+		DebugDrawBBox(m_dbgVars.debugWaypoint_M, kBox, false);
+	}
 }
 
 } // world
