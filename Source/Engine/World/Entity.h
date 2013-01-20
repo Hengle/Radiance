@@ -1,7 +1,9 @@
-// Entity.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file Entity.h
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup world
+*/
 
 #pragma once
 
@@ -97,8 +99,11 @@ struct PState {
 	Vec3 targetAngles;
 	Vec3 cameraAngles;
 	Vec3 velocity;
-	BBox bbox;
 	Vec3 accel;
+	BBox bbox;
+	FloorMove::Ref activeMove;
+	FloorMove::Ref desiredMove;
+	FloorMove::State moveState;
 	physics::Spring angleSpring;
 	physics::SpringVertex angles;
 	float groundFriction; // units per second on ground
@@ -109,6 +114,7 @@ struct PState {
 	float maxSplineBank;
 	float splineBankScale;
 	float splineBankLerp;
+	float autoDecelDistance;
 	MoveType mtype;
 	SolidType stype;
 	OccupantType otype;
@@ -282,6 +288,12 @@ protected:
 		const xtime::TimeSlice &time
 	);
 
+	virtual void Tick_MT_Floor(
+		int frame, 
+		float dt, 
+		const xtime::TimeSlice &time
+	);
+
 	void TickOther(
 		Entity &entity,
 		int frame,
@@ -294,6 +306,7 @@ protected:
 	void AutoFace(float dt);
 	Vec3 ApplyVelocity(float dt);
 	void Move(bool touch, bool clip);
+	void TransitionFloorMove();
 	void SetNextTick(int millis);
 
 	PState m_ps;
@@ -370,6 +383,9 @@ private:
 	ENT_DECL_GETSET(Velocity);
 	ENT_DECL_GETSET(Mins);
 	ENT_DECL_GETSET(Maxs);
+	ENT_DECL_GET(ActiveMove);
+	ENT_DECL_GETSET(DesiredMove);
+	ENT_DECL_GETSET(FloorPosition);
 	ENT_DECL_GETSET(Accel);
 	ENT_DECL_GETSET(GroundFriction);
 	ENT_DECL_GETSET(AirFriction);
@@ -379,6 +395,7 @@ private:
 	ENT_DECL_GETSET(MaxSplineBank);
 	ENT_DECL_GETSET(SplineBankScale);
 	ENT_DECL_GETSET(SplineBankLerp);
+	ENT_DECL_GETSET(AutoDecelDistance);
 	ENT_DECL_GETSET(MoveType);
 	ENT_DECL_GETSET(SolidType);
 	ENT_DECL_GETSET(OccupantType);

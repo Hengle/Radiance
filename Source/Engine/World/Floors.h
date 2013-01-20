@@ -14,18 +14,8 @@
 #include "../Lua/LuaRuntime.h"
 #include <Runtime/Container/StackVector.h>
 #include <Runtime/Container/ZoneMap.h>
+#include <Runtime/Container/ZoneVector.h>
 #include <Runtime/PushPack.h>
-
-namespace lua {
-
-template <>
-struct Marshal<world::FloorPosition> {
-	static void Push(lua_State *L, const world::FloorPosition &val);
-	static world::FloorPosition Get(lua_State *L, int index, bool luaError);
-	static bool IsA(lua_State *L, int index);
-};
-
-} // lua
 
 namespace world {
 
@@ -87,6 +77,7 @@ class RADENG_CLASS FloorMove : public lua::SharedPtr {
 public:
 	typedef boost::shared_ptr<FloorMove> Ref;
 	typedef physics::CachedCubicBZSpline<8> Spline;
+	typedef zone_vector<String, ZWorldT>::type StringVec;
 
 	struct Step {
 		typedef stackify<std::vector<Step>, 8> Vec;
@@ -95,6 +86,7 @@ public:
 		int connection;
 		int flags;
 		int floors[2];
+		String events[2];
 	};
 
 	struct Route {
@@ -109,7 +101,6 @@ public:
 		};
 
 		FloorPosition pos;
-		String anim;
 		Vec3 facing;
 		int flags;
 	private:
@@ -117,12 +108,18 @@ public:
 		friend class Floors;
 		Spline::SmoothMotion m_m;
 		int m_stepIdx;
+		bool m_first;
 	};
 
 	FloorMove();
 
 	void InitMove(State &state);
-	float Move(State &state, float distance);
+	float Move(
+		State &state, 
+		float distance, 
+		float &distanceRemainingAfterMove,
+		StringVec &events
+	);
 	
 	RAD_DECLARE_READONLY_PROPERTY(FloorMove, route, const Route*);
 
@@ -180,6 +177,13 @@ public:
 
 	IntVec WaypointsForTargetname(const char *targetname) const;
 	IntVec WaypointsForUserId(const char *userId) const;
+
+	int PickWaypoint(
+		World &world,
+		float x,
+		float y,
+		float d
+	);
 
 private:
 
@@ -289,5 +293,16 @@ private:
 };
 
 } // world
+
+namespace lua {
+
+template <>
+struct Marshal<world::FloorPosition> {
+	static void Push(lua_State *L, const world::FloorPosition &val);
+	static world::FloorPosition Get(lua_State *L, int index, bool luaError);
+	static bool IsA(lua_State *L, int index);
+};
+
+} // lua
 
 #include <Runtime/PopPack.h>

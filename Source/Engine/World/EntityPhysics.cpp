@@ -1,7 +1,9 @@
-// EntityPhysics.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file EntityPhysics.cpp
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup world
+*/
 
 #include RADPCH
 #include "Entity.h"
@@ -9,36 +11,45 @@
 
 namespace world {
 
-void Entity::UpdateVelocity(float dt)
-{
+void Entity::UpdateVelocity(float dt) {
 	// velocity
-	if (m_ps.flags&kPhysicsFlag_Friction)
-	{
+	if (m_ps.flags&kPhysicsFlag_Friction) {
 		float mag = m_ps.velocity.Magnitude();
-		if (mag > 0.f)
-		{
-			float decel = mag < m_ps.airFriction ? mag : m_ps.airFriction;
+		if (mag > 0.f) {
+			float decel;
+			if (m_ps.mtype == kMoveType_Floor) {
+				decel = mag < m_ps.groundFriction ? mag : m_ps.groundFriction;
+			} else {
+				decel = mag < m_ps.airFriction ? mag : m_ps.airFriction;
+			}
+
 			decel = mag - dt*decel;
 			if (decel < 0.f)
 				decel = 0.f;
 			decel /= mag;
 			m_ps.velocity *= decel;
 		}
-	}
-	else
-	{
+	} else {
 		m_ps.velocity += m_ps.accel * dt;
+
 		float mag = m_ps.velocity.MagnitudeSquared();
-		if (mag > m_ps.maxAirSpeed*m_ps.maxAirSpeed)
-		{ // clamp
+		float max;
+
+		if (m_ps.mtype == kMoveType_Floor) {
+			max = m_ps.maxGroundSpeed;
+		} else {
+			max = m_ps.maxAirSpeed;
+		}
+			
+		if (mag > max*max) { 
+			// clamp
 			m_ps.velocity.Normalize();
-			m_ps.velocity *= m_ps.maxAirSpeed;
+			m_ps.velocity *= max;
 		}
 	}
 }
 
-void Entity::AutoFace(float dt)
-{
+void Entity::AutoFace(float dt) {
 	Mat4 m = Mat4::Rotation(QuatFromAngles(m_ps.worldAngles));
 	float mag = m_ps.velocity.Magnitude();
 	m_ps.velocity = Vec3(1, 0, 0) * m;
@@ -49,17 +60,14 @@ void Entity::AutoFace(float dt)
 	m_ps.accel *= mag;
 }
 
-Vec3 Entity::ApplyVelocity(float dt)
-{
+Vec3 Entity::ApplyVelocity(float dt) {
 	return m_ps.pos + m_ps.velocity * dt;
 }
 
-void Entity::Move(bool touch, bool clip)
-{
+void Entity::Move(bool touch, bool clip) {
 	Vec3 newPos;
 
-	switch (m_psv.motionType)
-	{
+	switch (m_psv.motionType) {
 	case ska::Ska::MT_Relative:
 		m_ps.angles.pos = WrapAngles(AnglesFromQuat(m_psv.motion.r) + m_ps.angles.pos);
 		m_ps.worldAngles = WrapAngles(m_ps.angles.pos + m_ps.originAngles);
@@ -78,10 +86,13 @@ void Entity::Move(bool touch, bool clip)
 
 	// TODO: touch / collision
 	m_ps.worldPos = newPos;
+	m_ps.cameraPos = m_ps.worldPos + m_ps.cameraShift;
+	m_ps.cameraAngles = m_ps.worldAngles;
+
+	Link();
 }
 
-void Entity::SeekAngles(float dt)
-{
+void Entity::SeekAngles(float dt) {
 	// Need to do some stuff to fixup so the spring system works here
 	// Because angles need to lerp shortest path.
 
@@ -117,10 +128,8 @@ void Entity::TickPhysics(
 	int frame, 
 	float dt, 
 	const xtime::TimeSlice &time
-)
-{
-	switch (m_ps.mtype)
-	{
+) {
+	switch (m_ps.mtype) {
 	case kMoveType_None:
 		m_ps.worldPos = m_ps.origin + m_ps.pos;
 		m_ps.worldAngles = WrapAngles(m_ps.originAngles + m_ps.angles.pos);
@@ -132,6 +141,9 @@ void Entity::TickPhysics(
 		break;
 	case kMoveType_Spline:
 		Tick_MT_Spline(frame, dt, time);
+		break;
+	case kMoveType_Floor:
+		Tick_MT_Floor(frame, dt, time);
 		break;
 	}
 }

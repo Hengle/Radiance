@@ -108,7 +108,7 @@ inline void CachedCubicBZSpline<tNumPts>::SmoothMotion::Init() {
 }
 
 template <int tNumPts>
-inline float CachedCubicBZSpline<tNumPts>::SmoothMotion::Eval(const CachedCubicBZSpline &spline, float distance, Vec3 &pos, Vec3 *tangent, float *t) {
+inline float CachedCubicBZSpline<tNumPts>::SmoothMotion::Eval(const CachedCubicBZSpline &spline, float distance, Vec3 &pos, Vec3 *tangent, float *distanceRemaining, float *t) {
 	const float kStep = 1.f / (kNumPts-1);
 
 	m_d += distance;
@@ -145,6 +145,9 @@ inline float CachedCubicBZSpline<tNumPts>::SmoothMotion::Eval(const CachedCubicB
 		if (t)
 			*t = 1.f;
 	}
+
+	if (distanceRemaining)
+		*distanceRemaining = spline.m_length - m_d;
 
 	return distance;
 }

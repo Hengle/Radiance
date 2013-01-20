@@ -81,7 +81,7 @@ public:
 
 		//! Returns distance moved, if less than requested then end of spline was hit.
 		//! Optional arguments returns tangent vector, and the T of the new position.
-		float Eval(const CachedCubicBZSpline &spline, float distance, Vec3 &pos, Vec3 *tangent = 0, float *t = 0);
+		float Eval(const CachedCubicBZSpline &spline, float distance, Vec3 &pos, Vec3 *tangent = 0, float *distanceRemaining = 0, float *t = 0);
 
 	private:
 

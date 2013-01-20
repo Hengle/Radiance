@@ -1,7 +1,9 @@
-// Entity.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file Entity.cpp
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup world
+*/
 
 #include RADPCH
 #include "../App.h"
@@ -38,6 +40,7 @@ splineDistance(0.f),
 maxSplineBank(0.f),
 splineBankScale(0.f),
 splineBankLerp(-1.f),
+autoDecelDistance(0.f),
 mtype(kMoveType_None),
 stype(kSolidType_None),
 otype(kOccupantType_None),
@@ -451,6 +454,9 @@ void Entity::PushCallTable(lua_State *L) {
 	LUART_REGISTER_GETSET(L, Velocity);
 	LUART_REGISTER_GETSET(L, Mins);
 	LUART_REGISTER_GETSET(L, Maxs);
+	LUART_REGISTER_GET(L, ActiveMove);
+	LUART_REGISTER_GETSET(L, DesiredMove);
+	LUART_REGISTER_GETSET(L, FloorPosition);
 	LUART_REGISTER_GETSET(L, Accel);
 	LUART_REGISTER_GETSET(L, GroundFriction);
 	LUART_REGISTER_GETSET(L, AirFriction);
@@ -460,6 +466,7 @@ void Entity::PushCallTable(lua_State *L) {
 	LUART_REGISTER_GETSET(L, MaxSplineBank);
 	LUART_REGISTER_GETSET(L, SplineBankScale);
 	LUART_REGISTER_GETSET(L, SplineBankLerp);
+	LUART_REGISTER_GETSET(L, AutoDecelDistance);
 	LUART_REGISTER_GETSET(L, MoveType);
 	LUART_REGISTER_GETSET(L, SolidType);
 	LUART_REGISTER_GETSET(L, OccupantType);
@@ -1251,9 +1258,38 @@ int Entity::LUART_SETFN(SplineDistance)(lua_State *L) {
 	return 0;
 }
 
+int Entity::LUART_GETFN(ActiveMove)(lua_State *L) {
+	Entity *self = WorldLua::EntFramePtr(L, 1, true);
+	if (self->ps->activeMove) {
+		self->ps->activeMove->Push(L);
+		return 1;
+	}
+
+	return 0;
+}
+
+int Entity::LUART_GETFN(DesiredMove)(lua_State *L) {
+	Entity *self = WorldLua::EntFramePtr(L, 1, true);
+	if (self->ps->desiredMove) {
+		self->ps->desiredMove->Push(L);
+		return 1;
+	}
+
+	return 0;
+}
+
+int Entity::LUART_SETFN(DesiredMove)(lua_State *L) {
+	Entity *self = WorldLua::EntFramePtr(L, 1, true);
+	self->ps->desiredMove = lua::SharedPtr::Get<FloorMove>(L, "FloorMove", 2, false);
+	return 0;
+}
+
+ENT_GETSET(Entity, FloorPosition, FloorPosition, m_ps.moveState.pos);
+
 ENT_GETSET(Entity, MaxSplineBank, float, m_ps.maxSplineBank);
 ENT_GETSET(Entity, SplineBankScale, float, m_ps.splineBankScale);
 ENT_GETSET(Entity, SplineBankLerp, float, m_ps.splineBankLerp);
+ENT_GETSET(Entity, AutoDecelDistance, float, m_ps.autoDecelDistance);
 ENT_GET(Entity, MoveType, int, m_ps.mtype);
 ENT_SET_CUSTOM(Entity, MoveType, self->m_ps.mtype = (MoveType)luaL_checkinteger(L, 2));
 ENT_GET(Entity, SolidType, int, m_ps.stype);

@@ -2186,6 +2186,9 @@
     <ClCompile Include="..\..\Engine\World\Entities\E_TouchTrigger.cpp">
       <Filter>Source\Engine\World\Entities</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\World\MT_Floor.cpp">
+      <Filter>Source\Engine\World</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Runtime\Base\Event.inl">

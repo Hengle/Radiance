@@ -7,6 +7,7 @@
 
 #include RADPCH
 #include "Floors.h"
+#include "World.h"
 #include <limits>
 
 namespace world {
@@ -34,8 +35,8 @@ void FloorMove::InitMove(State &state) {
 	state.flags = 0;
 	state.pos.MakeNull();
 	state.facing = Vec3::Zero;
-	state.anim.Clear();
 	state.m_m.Init();
+	state.m_first = true;
 
 	if (!m_route.steps->empty()) {
 		const Step &step = m_route.steps[0];
@@ -48,23 +49,42 @@ void FloorMove::InitMove(State &state) {
 	}
 }
 
-float FloorMove::Move(State &state, float distance) {
+float FloorMove::Move(
+	State &state, 
+	float distance, 
+	float &distanceRemainingAfterMove,
+	StringVec &events
+) {
+	distanceRemainingAfterMove = 0.f;
+	if (m_route.steps->empty())
+		return 0.f;
 	float moved = 0.f;
-	
+
 	while (moved < distance) {
 		if (state.m_stepIdx >= (int)m_route.steps->size())
 			break;
 		const Step &step = m_route.steps[state.m_stepIdx];
+
+		if (state.m_first) {
+			state.m_first = false;
+			events.push_back(step.events[0]);
+		}
 		
 		float dd = distance - moved;
 
-		float dx = state.m_m.Eval(step.path, dd, state.pos.m_pos, &state.facing);
+		float dx = state.m_m.Eval(step.path, dd, state.pos.m_pos, &state.facing, &distanceRemainingAfterMove);
 		moved += dx;
 
 		if (dx < dd) {
+			events.push_back(step.events[1]);
 			++state.m_stepIdx;
 			state.m_m.Init();
+			state.m_first = true;
 		}
+	}
+
+	for (int i = state.m_stepIdx+1; i < (int)m_route.steps->size(); ++i) {
+		distanceRemainingAfterMove += m_route.steps[i].path.length;
 	}
 
 	return moved;
@@ -250,6 +270,42 @@ IntVec Floors::WaypointsForUserId(const char *userId) const {
 	}
 
 	return vec;
+}
+
+int Floors::PickWaypoint(
+	World &world,
+	float x,
+	float y,
+	float d
+) {
+	d = d*d; // squared distances.
+
+	int best = -1;
+	float bestDist = std::numeric_limits<float>::max();
+
+	for (U32 i = 0; i < m_bsp->numWaypoints; ++i) {
+		if (!(m_waypoints[i].flags&kWaypointState_Enabled))
+			continue;
+		const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + i;
+		const Vec3 kPos(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
+
+		Vec3 out;
+		if (!world.draw->Project(kPos, out))
+			continue;
+
+		float dx = out[0]-x;
+		float dy = out[1]-y;
+		float dd = dx*dx + dy*dy;
+
+		if (dd <= d) {
+			if (dd < bestDist) {
+				bestDist = dd;
+				best = (int)i;
+			}
+		}
+	}
+
+	return best;
 }
 
 int Floors::FindFloor(const char *name) const {
@@ -475,7 +531,8 @@ void Floors::WalkConnection(
 	const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + connectionNum;
 	const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + waypointNum;
 
-	int otherWaypointNum = (int)connection->waypoints[(connection->waypoints[1] == waypointNum) ? 0 : 1];
+	int dir = connection->waypoints[0] == waypointNum ? 0 : 1;
+	int otherWaypointNum = (int)connection->waypoints[dir ^ 1];
 	const bsp_file::BSPWaypoint *otherWaypoint = m_bsp->Waypoints() + otherWaypointNum;
 
 	WalkStep step;
@@ -488,6 +545,7 @@ void Floors::WalkConnection(
 	step.floors[1] = (int)otherWaypoint->floorNum;
 	step.tri = -1;
 	step.slopeChange = false;
+
 	route->push_back(step);
 }
 
@@ -703,12 +761,23 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 
 			const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + cur.waypoints[1];
 			const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + cur.connection;
-			int self = connection->waypoints[1] == cur.waypoints[0];
+			int dir = connection->waypoints[1] == cur.waypoints[0];
+
+			int cmdSet = dir;
+			if (dir == 1) {
+				if (connection->flags&bsp_file::kWaypointConnectionFlag_BtoAUseAtoBScript)
+					cmdSet = 0;
+			}
+
+			if (connection->cmds[cmdSet*2+0] != -1)
+				step.events[0] = String(m_bsp->String(connection->cmds[cmdSet*2+0]));
+			if (connection->cmds[cmdSet*2+1] != -1)
+				step.events[1] = String(m_bsp->String(connection->cmds[cmdSet*2+1]));
 
 			physics::CubicBZSpline spline(
 				cur.pos,
-				Vec3(connection->ctrls[self][0], connection->ctrls[self][1], connection->ctrls[self][2]),
-				Vec3(connection->ctrls[!self][0], connection->ctrls[!self][1], connection->ctrls[!self][2]),
+				Vec3(connection->ctrls[dir][0], connection->ctrls[dir][1], connection->ctrls[dir][2]),
+				Vec3(connection->ctrls[!dir][0], connection->ctrls[!dir][1], connection->ctrls[!dir][2]),
 				Vec3(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2])
 			);
 
@@ -1199,6 +1268,10 @@ void Marshal<world::FloorPosition>::Push(lua_State *L, const world::FloorPositio
 	lua_setfield(L, -2, "@floor");
 	lua_pushinteger(L, (int)val.m_tri);
 	lua_setfield(L, -2, "@tri");
+	lua_pushinteger(L, (int)val.m_waypoint);
+	lua_setfield(L, -2, "@waypoint");
+	lua_pushinteger(L, (int)val.m_nextWaypoint);
+	lua_setfield(L, -2, "@nextWaypoint");
 }
 
 world::FloorPosition Marshal<world::FloorPosition>::Get(lua_State *L, int index, bool luaError) {
@@ -1233,6 +1306,28 @@ world::FloorPosition Marshal<world::FloorPosition>::Get(lua_State *L, int index,
 	}
 
 	p.m_tri = (int)lua_tointeger(L, -1);
+	lua_pop(L, 1);
+
+	lua_getfield(L, index, "@waypoint");
+	if (lua_type(L, -1) != LUA_TNUMBER) {
+		lua_pop(L, 1);
+		if (luaError)
+			luaL_typerror(L, index, "waypoint");
+		return p;
+	}
+
+	p.m_waypoint = (int)lua_tointeger(L, -1);
+	lua_pop(L, 1);
+
+	lua_getfield(L, index, "@nextWaypoint");
+	if (lua_type(L, -1) != LUA_TNUMBER) {
+		lua_pop(L, 1);
+		if (luaError)
+			luaL_typerror(L, index, "nextWaypoint");
+		return p;
+	}
+
+	p.m_nextWaypoint = (int)lua_tointeger(L, -1);
 	lua_pop(L, 1);
 	return p;
 }

@@ -2031,6 +2031,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\World\MT_Floor.cpp" />
     <ClCompile Include="..\..\Engine\World\MT_Fly.cpp" />
     <ClCompile Include="..\..\Engine\World\MT_Spline.cpp" />
     <ClCompile Include="..\..\Engine\World\PostProcess.cpp" />

@@ -1116,6 +1116,15 @@ void BSPBuilder::EmitBSPWaypoints() {
 				c->ctrls[i][k] = connection->ctrls[i][k];
 			}
 		}
+
+		for (int i = 0; i < 4; ++i) {
+			if (connection->cmds[i].empty) {
+				c->cmds[i] = m_bspFile->numStrings;
+				*m_bspFile->AddString() = connection->cmds[i];
+			} else {
+				c->cmds[i] = -1;
+			}
+		}
 	}
 
 	// pass 2: emit waypoint connection indices
