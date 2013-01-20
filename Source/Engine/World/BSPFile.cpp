@@ -15,7 +15,7 @@ namespace bsp_file {
 
 enum  { 
 	kBspTag = RAD_FOURCC('b', 's', 'p', 't'),
-	kBspVersion  = 0x4
+	kBspVersion  = 4
 };
 
 RAD_ZONE_DEF(RADENG_API, ZBSPFile, "BSPFile", ZWorld);
@@ -32,6 +32,7 @@ m_leafs(0),
 m_areas(0),
 m_areaportals(0),
 m_models(0),
+m_brushes(0),
 m_clipSurfaces(0),
 m_planes(0),
 m_verts(0),
@@ -57,6 +58,7 @@ m_numMats(0),
 m_numNodes(0),
 m_numLeafs(0),
 m_numModels(0),
+m_numBrushes(0),
 m_numPlanes(0),
 m_numVerts(0),
 m_numWaypoints(0),
@@ -88,7 +90,7 @@ BSPFileParser::~BSPFileParser() {
 int BSPFileParser::Parse(const void *data, AddrSize len) {
 	// Read header
 	const U8 *bytes = reinterpret_cast<const U8*>(data);
-	CHECK_SIZE(sizeof(U32)*30);
+	CHECK_SIZE(sizeof(U32)*31);
 	U32 tag = *reinterpret_cast<const U32*>(bytes);
 	U32 version  = *reinterpret_cast<const U32*>(bytes+sizeof(U32));
 	if (tag != kBspTag || version != kBspVersion)
@@ -123,6 +125,9 @@ int BSPFileParser::Parse(const void *data, AddrSize len) {
 	bytes += sizeof(U32);
 	
 	m_numModels = *reinterpret_cast<const U32*>(bytes);
+	bytes += sizeof(U32);
+
+	m_numBrushes = *reinterpret_cast<const U32*>(bytes);
 	bytes += sizeof(U32);
 	
 	m_numClipSurfaces = *reinterpret_cast<const U32*>(bytes);
@@ -210,6 +215,10 @@ int BSPFileParser::Parse(const void *data, AddrSize len) {
 	CHECK_SIZE(sizeof(BSPModel)*m_numModels);
 	m_models = reinterpret_cast<const BSPModel*>(bytes);
 	bytes += sizeof(BSPModel)*m_numModels;
+
+	CHECK_SIZE(sizeof(BSPBrush)*m_numBrushes);
+	m_brushes = reinterpret_cast<const BSPBrush*>(bytes);
+	bytes += sizeof(BSPBrush)*m_numBrushes;
 	
 	CHECK_SIZE(sizeof(BSPClipSurface)*m_numClipSurfaces);
 	m_clipSurfaces = reinterpret_cast<const BSPClipSurface*>(bytes);
@@ -358,6 +367,7 @@ int BSPFileBuilder::Write(stream::OutputStream &os) {
 	os << (U32)m_areas.size();
 	os << (U32)m_areaportals.size();
 	os << (U32)m_models.size();
+	os << (U32)m_brushes.size();
 	os << (U32)m_clipSurfaces.size();
 	os << (U32)m_waypoints.size();
 	os << (U32)m_waypointConnections.size();
@@ -405,6 +415,10 @@ int BSPFileBuilder::Write(stream::OutputStream &os) {
 	
 	len = (stream::SPos)(sizeof(BSPModel)*m_models.size());
 	if (len && os.Write(&m_models[0], len, 0) != len)
+		return pkg::SR_IOError;
+
+	len = (stream::SPos)(sizeof(BSPBrush)*m_brushes.size());
+	if (len && os.Write(&m_brushes[0], len, 0) != len)
 		return pkg::SR_IOError;
 	
 	len = (stream::SPos)(sizeof(BSPClipSurface)*m_clipSurfaces.size());

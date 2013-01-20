@@ -22,7 +22,7 @@ namespace solid_bsp {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void BSPBuilder::PaintHandler::Init(MapBuilderDebugUI &ui, BSPBuilder &bsp) {
+void BSPBuilder::PaintHandler::Init(tools::map_builder::DebugUI &ui, BSPBuilder &bsp) {
 	// find info_player_start
 	const String k_info_player_start(CStr("info_player_start"));
 
@@ -81,7 +81,7 @@ void BSPBuilder::PaintHandler::DisableSmoothShading() {
 	glDisable(GL_LIGHT1);
 }
 
-void BSPBuilder::PaintHandler::BeginPaint(const QRect &viewport, MapBuilderDebugUI &ui, int state, int blend, bool backfaces) {
+void BSPBuilder::PaintHandler::BeginPaint(const QRect &viewport, tools::map_builder::DebugUI &ui, int state, int blend, bool backfaces) {
 	float vpw = viewport.width();
 	float vph = viewport.height();
 
@@ -154,7 +154,7 @@ BSPBuilder::AreaBSPDraw::AreaBSPDraw() : m_area(-1), m_leaf(0) {
 BSPBuilder::AreaBSPDraw::~AreaBSPDraw() {
 }
 
-bool BSPBuilder::AreaBSPDraw::Paint(float time, float dt, const QRect &viewport, MapBuilderDebugUI &ui, BSPBuilder &bsp) {
+bool BSPBuilder::AreaBSPDraw::Paint(float time, float dt, const QRect &viewport, tools::map_builder::DebugUI &ui, BSPBuilder &bsp) {
 
 	FindCameraArea(ui, bsp);
 	
@@ -173,7 +173,7 @@ bool BSPBuilder::AreaBSPDraw::Paint(float time, float dt, const QRect &viewport,
 	return true;
 }
 
-bool BSPBuilder::AreaBSPDraw::OnMenu(const QVariant &data, MapBuilderDebugUI &ui, BSPBuilder &bsp) {
+bool BSPBuilder::AreaBSPDraw::OnMenu(const QVariant &data, tools::map_builder::DebugUI &ui, BSPBuilder &bsp) {
 	return true;
 }
 
@@ -222,7 +222,7 @@ void BSPBuilder::AreaBSPDraw::DrawAreaportal(BSPBuilder &bsp, int portalNum) {
 	glEnd();
 }
 
-void BSPBuilder::AreaBSPDraw::FindCameraArea(MapBuilderDebugUI &ui, BSPBuilder &bsp) {
+void BSPBuilder::AreaBSPDraw::FindCameraArea(tools::map_builder::DebugUI &ui, BSPBuilder &bsp) {
 	int area = -1;
 
 	BSPBuilder::Node *leaf = bsp.LeafForPoint(ToBSPType(ui.camera->pos.get()));
@@ -265,7 +265,7 @@ BSPBuilder::LeafFacesDraw::LeafFacesDraw() : m_leaf(0), m_isolate(false), m_lock
 BSPBuilder::LeafFacesDraw::~LeafFacesDraw() {
 }
 
-bool BSPBuilder::LeafFacesDraw::Paint(float time, float dt, const QRect &viewport, MapBuilderDebugUI &ui, BSPBuilder &bsp) {
+bool BSPBuilder::LeafFacesDraw::Paint(float time, float dt, const QRect &viewport, tools::map_builder::DebugUI &ui, BSPBuilder &bsp) {
 
 	if (!m_menu) {
 		m_menu = new (world::bsp_file::ZBSPBuilder) tools::editor::PopupMenu();
@@ -312,7 +312,7 @@ bool BSPBuilder::LeafFacesDraw::Paint(float time, float dt, const QRect &viewpor
 	return true;
 }
 
-bool BSPBuilder::LeafFacesDraw::OnMenu(const QVariant &data, MapBuilderDebugUI &ui, BSPBuilder &bsp) {
+bool BSPBuilder::LeafFacesDraw::OnMenu(const QVariant &data, tools::map_builder::DebugUI &ui, BSPBuilder &bsp) {
 	switch(data.toInt()) {
 	case 0:
 		{
@@ -332,7 +332,7 @@ bool BSPBuilder::LeafFacesDraw::OnMenu(const QVariant &data, MapBuilderDebugUI &
 	return true;
 }
 
-void BSPBuilder::LeafFacesDraw::FindCameraLeaf(MapBuilderDebugUI &ui, BSPBuilder &bsp) {
+void BSPBuilder::LeafFacesDraw::FindCameraLeaf(tools::map_builder::DebugUI &ui, BSPBuilder &bsp) {
 
 	BSPBuilder::Node *leaf = bsp.LeafForPoint(ToBSPType(ui.camera->pos.get()));
 	

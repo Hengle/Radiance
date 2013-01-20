@@ -60,7 +60,7 @@ public:
 	typedef math::Vector4<T> Vec4;
 	typedef math::Matrix4X4<T> Mat4;
 	typedef math::Quaternion<T> Quat;
-	typedef math::Winding<Vec3, Plane> Winding;
+	typedef math::Winding<Vec3, Plane, zone_allocator<Vec3, Z3DXT>> Winding;
 	typedef math::AABB3<T> BBox;
 
 	typedef typename zone_vector<Vec3, Z3DXT>::type Vec3Vec;
@@ -97,6 +97,244 @@ public:
 	};
 
 	typedef typename zone_vector<BoneWeight, Z3DXT>::type BoneWeights;
+
+	/*
+	==============================================================================
+	Brushes
+	==============================================================================
+	*/
+
+	struct BrushPlane {
+		typedef typename zone_vector<BrushPlane, Z3DXT>::type Vec;
+		Plane plane;
+	};
+
+	struct BrushWinding {
+		typedef typename zone_vector<BrushWinding, Z3DXT>::type Vec;
+		bool bevel;
+		Winding winding;
+		Plane plane;
+	};
+
+	class Brush {
+	public:
+		typedef typename zone_vector<Brush, Z3DXT>::type Vec;
+
+		RAD_DECLARE_READONLY_PROPERTY(Brush, bounds, const BBox*);
+		RAD_DECLARE_READONLY_PROPERTY(Brush, windings, const typename BrushWinding::Vec*);
+	
+		static bool FromPlanes(const typename BrushPlane::Vec &planes, Brush &brush) {
+			brush.m_windings.clear();
+			brush.m_bounds.Initialize();
+
+			for (typename BrushPlane::Vec::const_iterator it = planes.begin(); it != planes.end(); ++it) {
+				const BrushPlane &plane = *it;
+				BrushWinding w;
+				w.bevel = false;
+				w.winding.Initialize(plane.plane, 32767.f);
+				w.plane = plane.plane;
+
+				for (typename BrushPlane::Vec::const_iterator it2 = planes.begin(); it2 != planes.end(); ++it2) {
+					if (it2 == it)
+						continue; // skip same side.
+					const BrushPlane &plane2 = *it2;
+					w.winding.ChopInPlace(plane2.plane, Plane::Back, 0.f);
+					if (w.winding.Empty())
+						break;
+				}
+
+				if (!w.winding.Empty()) {
+					for (typename Winding::VertexListType::const_iterator it2 = w.winding.Vertices().begin(); it2 != w.winding.Vertices().end(); ++it2) {
+						const typename Winding::VertexType &v = *it2;
+						brush.m_bounds.Insert(v);
+					}
+					brush.m_windings.push_back(w);
+				}
+			}
+
+			if (brush.m_windings.size() < 4) {
+				brush.m_windings.clear(); // bad brush.
+			} else {
+				AddBrushBevels(brush);
+			}
+
+			return !brush.m_windings.empty();
+		}
+
+		/*
+		==============================================================================
+		Fast brush collision (using expanded hulls against a point) requires capping 
+		planes (termed bevels inherited from Quake) which trim excess hull expansion:
+
+		When we reduce AABB->brush collision testing to a "point inside planes" test
+		what we are actually doing is expanding the hull of the brush by the size of
+		the box.
+		
+		For simplicity a brush is "expanded" at runtime by the size of the AABB but
+		overexpansion occurs at vertexes that are formed by the intersection of
+		planes that are not at right angles to eachother.
+
+		To correct the over-expansion of these vertices they are surrounded by extra
+		planes that are at right angles to the vertex (specifically planes are added
+		that surround the vertex at right angles to all edges the vertex lies on).
+		This corrects the vertices expansion by constraining it to at most, the right
+		angle formed between the vertex edge and the bevel plane.
+
+		Bevel planes that are axis aligned with respect to the world are also added
+		if not present in the brush. 
+
+		Interestingly enough (although I have no advanced mathematics study or proof)
+		I believe that the right-angle constraint is due to the diagonal length of the 
+		AABB (i.e. box origin -> bbox vertex is the intersection of orthogonal planes). 
+		This means that this particular error is a product of the primitive type. 
+		Capsuls or sphere's would require a different method of calculating bevel planes.
+
+		==============================================================================
+		*/
+
+		static void AddBrushBevels(Brush &brush) {
+			AddAxialBevels(brush);
+			AddTangentBevels(brush);
+		}
+
+	private:
+
+		static void AddAxialBevels(Brush &brush) {
+
+			int order = 0;
+
+			for (int axis = 0; axis < 3; ++axis) {
+				for (int dir = -1; dir <= 1; dir += 2, ++order) {
+					typename BrushWinding::Vec::const_iterator it;
+					int sideNum;
+					for (sideNum = 0; sideNum < (int)brush.m_windings.size(); ++sideNum) {
+						const BrushWinding &w = brush.m_windings[sideNum];
+						const Plane &p = w.winding.Plane();
+						if (p.Normal()[axis] == (ValueType)dir)
+							break;
+					}
+
+					if (sideNum == (int)brush.m_windings.size()) {
+						// didn't find this plane, add new side.
+						BrushWinding w;
+						w.bevel = true;
+						
+						Vec3 normal(Vec3::Zero);
+						normal[axis] = (ValueType)dir;
+
+						ValueType dist;
+
+						if (dir > 0) {
+							dist = brush.m_bounds.Maxs()[axis];
+						} else {
+							dist = -brush.m_bounds.Mins()[axis];
+						}
+
+						w.plane = Plane(normal, dist);
+						brush.m_windings.push_back(w);
+					}
+
+					if (sideNum != order) {
+						// not in canonical order, swap with whatever is in our spot.
+						std::swap(brush.m_windings[sideNum], brush.m_windings[order]);
+					}
+				}
+			}
+		}
+
+		static void AddTangentBevels(Brush &brush) {
+			// assumes we've called AddAxialBevels
+			if (brush.m_windings.size() == 6) // pure axial brush
+				return;
+
+			for (int i = 6; i < (int)brush.m_windings.size(); ++i) {
+				const BrushWinding *w = &brush.m_windings[i];
+				if (w->bevel)
+					continue; // bevel planes have no winding.
+				const typename Winding::VertexListType *vertices = &w->winding.Vertices();
+				for (int k = 0; k < (int)vertices->size(); ++k) {
+					int j = (k+1)%(int)vertices->size();
+					
+					Vec3 edge = (*vertices)[j] - (*vertices)[k];
+					if (edge.Normalize() < 0.5) // small edge
+						continue;
+
+					// axial edge?
+					int z;
+					for (z = 0; z < 3; ++z) {
+						if (edge[z] > ValueType(0.999)) {
+							break;
+						} else if (edge[z] < ValueType(-0.999)) {
+							break;
+						}
+					}
+
+					if (z != 3) // this is an axial edge
+						continue; // we only want edges that are an an angle.
+
+					// bound this vertex by planes that form a right angle with the
+					// edge this vertex is on. by doing this for all edges/vertices
+					// every vertex that lies on a non-axial edge will be bound by
+					// planes at right angles.
+
+					for (int axis = 0; axis < 3; ++axis) {
+						for (int dir = -1; dir <= 1; dir += 2) {
+							// take axial planes [axis]->dir and make it orthogonal to vertex edge
+							Vec3 normal(Vec3::Zero);
+							normal[axis] = (float)dir;
+							
+							normal = edge.Cross(normal);
+							if (normal.Normalize() < 0.9)
+								continue; // (edge, normal) damn near equal
+							
+							Plane p(normal, (*vertices)[k]);
+							
+							for (z = 0; z < (int)brush.m_windings.size(); ++z) {
+								const BrushWinding &ww = brush.m_windings[z];
+								if (ww.plane.NearlyEquals(p, ValueType(0.05), ValueType(1)))
+									break;
+
+								const typename Winding::VertexListType &vv = ww.winding.Vertices();
+								int n;
+								for (n = 0; n < (int)vv.size(); ++n) {
+									const Vec3 &v = vv[n];
+									if (p.Distance(v) > ValueType(0.1))
+										break;
+								}
+
+								if (n != (int)vv.size())
+									break; // plane splits brush.
+							}
+
+							if (z != (int)brush.m_windings.size())
+								continue; // brush already contains plane OR plane splits brush (does't lie on hull)
+
+							// valid plane.
+							BrushWinding ww;
+							ww.bevel = true;
+							ww.plane = p;
+							brush.m_windings.push_back(ww);
+
+							// push_back can move these.
+							w = &brush.m_windings[i];
+							vertices = &w->winding.Vertices();
+						}
+					}
+				}
+			}
+		}
+
+		RAD_DECLARE_GET(bounds, const BBox*) {
+			return &m_bounds;
+		}
+
+		RAD_DECLARE_GET(windings, const typename BrushWinding::Vec*) {
+			return &m_windings;
+		}
+
+		BBox m_bounds;
+		typename BrushWinding::Vec m_windings;
+	};
 
 	/*
 	==============================================================================
@@ -747,6 +985,7 @@ public:
 		world::Keys keys;
 		Vec3 origin;
 		typename TriModel::Vec models;
+		typename Brush::Vec brushes;
 		SkelVec skels;
 		bool maxEnt;
 		int id;

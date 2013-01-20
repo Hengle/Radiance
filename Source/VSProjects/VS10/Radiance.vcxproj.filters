@@ -1434,6 +1434,9 @@
     <ClInclude Include="..\..\Engine\World\WorldLuaCommon.h">
       <Filter>Source\Engine\World</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\World\Entities\E_TouchTrigger.h">
+      <Filter>Source\Engine\World\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2179,6 +2182,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\Renderer\GL\GLWorldDebugDraw.cpp">
       <Filter>Source\Engine\Renderer\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\Entities\E_TouchTrigger.cpp">
+      <Filter>Source\Engine\World\Entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

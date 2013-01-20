@@ -296,9 +296,9 @@ inline bool Plane<T>::IsOn(const  Vector3<T> &v, const T &tolerance) const
 }
 
 template <typename T>
-inline bool Plane<T>::NearlyEquals(const Plane<T> &p, const T &epsilon) const
+inline bool Plane<T>::NearlyEquals(const Plane<T> &p, const T &normalEpsilon, const T &distanceEpsilon) const
 {
-	return m_normal.NearlyEquals(p.m_normal, epsilon) && math::NearlyEquals(m_d, p.m_d, epsilon);
+	return m_normal.NearlyEquals(p.m_normal, normalEpsilon) && math::NearlyEquals(m_d, p.m_d, distanceEpsilon);
 }
 
 template <typename T>

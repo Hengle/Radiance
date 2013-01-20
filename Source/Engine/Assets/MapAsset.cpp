@@ -196,7 +196,7 @@ void MapAsset::SetProgressIndicator(tools::UIProgress *ui) {
 	m_ui = ui;
 }
 
-void MapAsset::SetDebugUI(tools::MapBuilderDebugUI *ui) {
+void MapAsset::SetDebugUI(tools::map_builder::DebugUI *ui) {
 	m_debugUI = ui;
 }
 
@@ -222,7 +222,7 @@ int MapAsset::SpawnTool(
 		if (r != SR_Success)
 			return r;
 
-		world::EntSpawn spawn;
+		tools::map_builder::EntSpawn spawn;
 		r = m_parser->ParseEntity(spawn);
 		if (r != SR_Success) {
 			if (r == MapParser::SR_End) {
@@ -253,7 +253,7 @@ int MapAsset::SpawnTool(
 		return r;
 	}
 
-	m_mapBuilder.reset(new (ZTools) tools::MapBuilder(engine));
+	m_mapBuilder.reset(new (ZTools) tools::map_builder::MapBuilder(engine));
 
 	m_mapBuilder->SetProgressIndicator(m_ui);
 	m_mapBuilder->SetDebugUI(m_debugUI);
@@ -265,7 +265,7 @@ int MapAsset::SpawnTool(
 	m_mapBuilder->SetCinematicActorCompression(*m_parser->caMap.get());
 
 	for (;;) {
-		world::EntSpawn spawn;
+		tools::map_builder::EntSpawn spawn;
 		int r = m_parser->ParseEntity(spawn);
 		if (r != SR_Success) {
 			if (r == MapParser::SR_End) {

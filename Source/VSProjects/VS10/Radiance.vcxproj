@@ -850,6 +850,7 @@
     <ClInclude Include="..\..\Engine\World\Entities\E_PlayerPawn.h" />
     <ClInclude Include="..\..\Engine\World\Entities\E_SoundEmitter.h" />
     <ClInclude Include="..\..\Engine\World\Entities\E_SplineTrack.h" />
+    <ClInclude Include="..\..\Engine\World\Entities\E_TouchTrigger.h" />
     <ClInclude Include="..\..\Engine\World\Entities\E_ViewController.h" />
     <ClInclude Include="..\..\Engine\World\Entities\E_Worldspawn.h" />
     <ClInclude Include="..\..\Engine\World\Entity.h" />
@@ -1954,6 +1955,7 @@
     <ClCompile Include="..\..\Engine\World\Entities\E_PlayerPawn.cpp" />
     <ClCompile Include="..\..\Engine\World\Entities\E_SoundEmitter.cpp" />
     <ClCompile Include="..\..\Engine\World\Entities\E_SplineTrack.cpp" />
+    <ClCompile Include="..\..\Engine\World\Entities\E_TouchTrigger.cpp" />
     <ClCompile Include="..\..\Engine\World\Entities\E_ViewController.cpp" />
     <ClCompile Include="..\..\Engine\World\Entities\E_Worldspawn.cpp" />
     <ClCompile Include="..\..\Engine\World\Entity.cpp" />

@@ -241,7 +241,7 @@ IntVec Floors::WaypointsForTargetname(const char *targetname) const {
 IntVec Floors::WaypointsForUserId(const char *userId) const {
 	String s(CStr(userId));
 	std::pair<Waypoint::MMap::const_iterator,
-		      Waypoint::MMap::const_iterator> pair = m_waypointTargets.equal_range(s);
+		      Waypoint::MMap::const_iterator> pair = m_waypointUserIds.equal_range(s);
 
 	IntVec vec;
 	while (pair.first != pair.second) {

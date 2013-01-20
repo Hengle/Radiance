@@ -38,14 +38,14 @@ void World::SetAreaportalState(int areaportalNum, bool open, bool relinkOccupant
 	}
 }
 
-Entity::Vec World::BBoxTouching(const BBox &bbox, int stypes) const {
+Entity::Vec World::BBoxTouching(const BBox &bbox, int classbits) const {
 	Entity::Vec touching;
 	EntityBits touched;
 
 	if (m_nodes.empty()) {
-		BBoxTouching(bbox, stypes, -1, touching, touched);
+		BBoxTouching(bbox, classbits, -1, touching, touched);
 	} else {
-		BBoxTouching(bbox, stypes, 0, touching, touched);
+		BBoxTouching(bbox, classbits, 0, touching, touched);
 	}
 
 	return touching;
@@ -53,7 +53,7 @@ Entity::Vec World::BBoxTouching(const BBox &bbox, int stypes) const {
 
 void World::BBoxTouching(
 	const BBox &bbox,
-	int stypes,
+	int classbits,
 	int nodeNum,
 	Entity::Vec &out,
 	EntityBits &bits
@@ -65,22 +65,20 @@ void World::BBoxTouching(
 
 		for (EntityPtrSet::const_iterator it = leaf.occupants.begin(); it != leaf.occupants.end(); ++it) {
 			Entity *entity = *it;
-			if (!(entity->ps->stype&stypes))
-				continue;
 			if (bits[entity->m_id])
 				continue;
-		
-			switch (entity->ps->stype) {
-			case kSolidType_BBox:
-				{
-					BBox b(entity->ps->bbox);
-					b.Translate(entity->ps->worldPos);
-					bits.set(entity->m_id);
-					if (bbox.Touches(b))
-						out.push_back(entity->shared_from_this());
-				}
-				break;
-			}
+			bits.set(entity->m_id);
+			if (!entity->classbits)
+				continue;
+			if ((classbits != kEntityClassBits_Any) && !(classbits&entity->classbits))
+				continue;
+			
+
+			BBox b(entity->ps->bbox);
+			b.Translate(entity->ps->worldPos);
+					
+			if (bbox.Touches(b))
+				out.push_back(entity->shared_from_this());
 		}
 	}
 }
@@ -595,5 +593,74 @@ bool World::LineTrace(Trace &trace, int nodeNum) {
 	return true;
 }
 
+Entity::Vec World::EntitiesTouchingBrush(int classbits, int brushNum) const {
+	RAD_ASSERT(brushNum >= 0 && brushNum < (int)m_bsp->numBrushes);
+	const bsp_file::BSPBrush *brush = m_bsp->Brushes() + brushNum;
+
+	const BBox kBrushBBox(
+		Vec3(brush->mins[0], brush->mins[1], brush->mins[2]),
+		Vec3(brush->maxs[0], brush->maxs[1], brush->maxs[2])
+	);
+
+	Entity::Vec bboxTouching = BBoxTouching(kBrushBBox, classbits);
+	Entity::Vec touching;
+	touching.reserve(bboxTouching.size());
+
+	for (Entity::Vec::const_iterator it = bboxTouching.begin(); it != bboxTouching.end(); ++it) {
+		const Entity::Ref &entity = *it;
+		BBox bbox(entity->ps->bbox);
+		bbox.Translate(entity->ps->worldPos);
+
+		if (IsBBoxInsideBrushHull(bbox, brush))
+			touching.push_back(entity);
+	}
+
+	return touching;
+}
+
+bool World::EntityTouchesBrush(const Entity &entity, int brushNum) const {
+	RAD_ASSERT(brushNum >= 0 && brushNum < (int)m_bsp->numBrushes);
+	const bsp_file::BSPBrush *brush = m_bsp->Brushes() + brushNum;
+
+	const BBox kBrushBBox(
+		Vec3(brush->mins[0], brush->mins[1], brush->mins[2]),
+		Vec3(brush->maxs[0], brush->maxs[1], brush->maxs[2])
+	);
+
+	BBox bbox(entity.ps->bbox);
+	bbox.Translate(entity.ps->worldPos);
+
+	if (!kBrushBBox.Instersects(bbox))
+		return false;
+
+	return IsBBoxInsideBrushHull(bbox, brush);
+}
+
+bool World::IsBBoxInsideBrushHull(const BBox &bbox, const bsp_file::BSPBrush *brush) const {
+
+	for (U32 i = 0; i < brush->numPlanes; ++i) {
+		const bsp_file::BSPPlane *bspPlane = m_bsp->Planes() + brush->firstPlane + i;
+		const Plane kPlane(bspPlane->p[0], bspPlane->p[1], bspPlane->p[2], bspPlane->p[3]);
+
+		Vec3 p;
+
+		// find bbox corner closest to or behind plane.
+		for (int k = 0; k < 3; ++k) {
+			if (kPlane.Normal()[k] < 0) {
+				p[k] = bbox.Maxs()[k];
+			} else {
+				p[k] = bbox.Mins()[k];
+			}
+		}
+
+		float d = kPlane.Normal().Dot(p);
+		float dd = kPlane.Distance(bbox.Origin()) + d;
+
+		if (dd >= 0.f) // on front of plane
+			return false;
+	}
+
+	return true;
+}
 
 } // world

@@ -320,12 +320,13 @@ Event::Vec World::ParseMultiEvent(const char *string) {
 
 		Event::Target evTarget = Event::T_Name;
 
-		if (target == "@world")
+		if (target == "@world") {
 			evTarget = Event::T_World;
-		else if (target == "@view")
+		} else if (target == "@view") {
 			evTarget = Event::T_ViewController;
-		else if (target == "@player")
+		} else if (target == "@player") {
 			evTarget = Event::T_PlayerPawn;
+		}
 		
 		String cmd;
 		if (!script.GetToken(cmd, Tokenizer::kTokenMode_SameLine)) {

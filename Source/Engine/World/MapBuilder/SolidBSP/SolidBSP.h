@@ -68,7 +68,7 @@ public:
 		SceneFile &map, 
 		CinematicActorCompressionMap &caMap,
 		tools::UIProgress *ui = 0, 
-		MapBuilderDebugUI *debugUI = 0, // if non-null debugging is enabled.
+		tools::map_builder::DebugUI *debugUI = 0, // if non-null debugging is enabled.
 		std::ostream *cout = 0
 	);
 
@@ -458,9 +458,9 @@ private:
 
 		// return false from either of these to exit the paint handler.
 
-		virtual void Init(MapBuilderDebugUI &ui, BSPBuilder &bsp);
-		virtual bool Paint(float time, float dt, const QRect &viewport, MapBuilderDebugUI &ui, BSPBuilder &bsp) = 0;
-		virtual bool OnMenu(const QVariant &data, MapBuilderDebugUI &ui, BSPBuilder &bsp) { return true; }
+		virtual void Init(tools::map_builder::DebugUI &ui, BSPBuilder &bsp);
+		virtual bool Paint(float time, float dt, const QRect &viewport, tools::map_builder::DebugUI &ui, BSPBuilder &bsp) = 0;
+		virtual bool OnMenu(const QVariant &data, tools::map_builder::DebugUI &ui, BSPBuilder &bsp) { return true; }
 
 	protected:
 
@@ -468,7 +468,7 @@ private:
 		void DisableSmoothShading();
 		void BeginPaint(
 			const QRect &viewport, 
-			MapBuilderDebugUI &ui, 
+			tools::map_builder::DebugUI &ui, 
 			int state = 0,
 			int blend = 0,
 			bool backfaces = false
@@ -490,13 +490,13 @@ private:
 		AreaBSPDraw();
 		~AreaBSPDraw();
 
-		virtual bool Paint(float time, float dt, const QRect &viewport, MapBuilderDebugUI &ui, BSPBuilder &bsp);
-		virtual bool OnMenu(const QVariant &data, MapBuilderDebugUI &ui, BSPBuilder &bsp);
+		virtual bool Paint(float time, float dt, const QRect &viewport, tools::map_builder::DebugUI &ui, BSPBuilder &bsp);
+		virtual bool OnMenu(const QVariant &data, tools::map_builder::DebugUI &ui, BSPBuilder &bsp);
 		
 
 	private:
 
-		void FindCameraArea(MapBuilderDebugUI &ui, BSPBuilder &bsp);
+		void FindCameraArea(tools::map_builder::DebugUI &ui, BSPBuilder &bsp);
 		void DrawModel(BSPBuilder &bsp, U32 model);
 		void DrawAreaportals(BSPBuilder &bsp, int area);
 		void DrawAreaportal(BSPBuilder &bsp, int portal);
@@ -516,12 +516,12 @@ private:
 		LeafFacesDraw();
 		~LeafFacesDraw();
 
-		virtual bool Paint(float time, float dt, const QRect &viewport, MapBuilderDebugUI &ui, BSPBuilder &bsp);
-		virtual bool OnMenu(const QVariant &data, MapBuilderDebugUI &ui, BSPBuilder &bsp);
+		virtual bool Paint(float time, float dt, const QRect &viewport, tools::map_builder::DebugUI &ui, BSPBuilder &bsp);
+		virtual bool OnMenu(const QVariant &data, tools::map_builder::DebugUI &ui, BSPBuilder &bsp);
 
 	private:
 
-		void FindCameraLeaf(MapBuilderDebugUI &ui, BSPBuilder &bsp);
+		void FindCameraLeaf(tools::map_builder::DebugUI &ui, BSPBuilder &bsp);
 		void DrawNodes(Node *node, bool wireframe);
 		
 		Node *m_leaf;
@@ -571,7 +571,7 @@ private:
 	PaintHandler::Ref m_paint;
 	std::ostream *m_cout;
 	tools::UIProgress *m_ui;
-	MapBuilderDebugUI *m_debugUI;
+	tools::map_builder::DebugUI *m_debugUI;
 	CinematicActorCompressionMap m_caMap;
 	int m_numStructural;
 	int m_numDetail;
@@ -656,6 +656,7 @@ private:
 	void EmitBSPAreaportals(Node *leaf, int areaNum, world::bsp_file::BSPArea &area);
 	void EmitBSPModels();
 	void EmitBSPModel(const SceneFile::TriModel::Ref &triModel);
+	int EmitBSPBrush(const SceneFile::Brush &brush);
 	int EmitBSPModel(const EmitTriModel &model);
 	S32 EmitBSPNodes(const Node *node, S32 parent);
 	void EmitBSPClipSurfaces(const Node *node, world::bsp_file::BSPLeaf *leaf);

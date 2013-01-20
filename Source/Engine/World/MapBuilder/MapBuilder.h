@@ -18,14 +18,19 @@
 #include <QtCore/QVariant>
 #include <QtCore/QRect>
 #include <Runtime/Thread.h>
-#include <Runtime/Container/ZoneMap.h>
 #include <Runtime/PushPack.h>
 
 class Engine;
 
 namespace tools {
+namespace map_builder {
 
-class RADENG_CLASS MapBuilder : thread::Thread {
+struct EntSpawn {
+	world::Keys keys;
+	SceneFile::Brush::Vec brushes;
+};
+
+class RADENG_CLASS MapBuilder : private thread::Thread {
 public:
 	typedef boost::shared_ptr<MapBuilder> Ref;
 
@@ -33,9 +38,9 @@ public:
 	~MapBuilder();
 
 	void SetProgressIndicator(UIProgress *ui);
-	void SetDebugUI(MapBuilderDebugUI *ui);
+	void SetDebugUI(DebugUI *ui);
 	void SetCinematicActorCompression(const CinematicActorCompressionMap &map);
-	bool LoadEntSpawn(const world::EntSpawn &spawn);
+	bool LoadEntSpawn(const EntSpawn &spawn);
 	bool SpawnCompile();
 	void WaitForCompletion();
 	void DebugDraw(float time, float dt, const QRect &viewport);
@@ -61,23 +66,24 @@ private:
 
 	RAD_DECLARE_GET(result, int);
 
-	bool ParseWorldSpawn(const world::EntSpawn &spawn);
-	bool ParseEntity(const world::EntSpawn &spawn);
-	bool ParseWaypoint(const world::EntSpawn &spawn);
-	bool LoadScene(const world::EntSpawn &spawn);
+	bool ParseWorldSpawn(const EntSpawn &spawn);
+	bool ParseEntity(const EntSpawn &spawn);
+	bool ParseWaypoint(const EntSpawn &spawn);
+	bool LoadScene(const EntSpawn &spawn);
 	void ConnectWaypoints();
 
 	SceneFile m_map;
 	Engine &m_e;
 	UIProgress *m_ui;
-	MapBuilderDebugUI *m_debugUI;
+	DebugUI *m_debugUI;
 	int m_result;
 	bool m_compiling;
-	world::EntSpawn m_spawn;
+	EntSpawn m_spawn;
 	CinematicActorCompressionMap m_caMap;
 	solid_bsp::BSPBuilder m_bspBuilder;
 };
 
+} // map_builder
 } // tools
 
 #include <Runtime/PopPack.h>

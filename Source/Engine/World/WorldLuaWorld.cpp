@@ -847,7 +847,7 @@ int WorldLua::lua_World_WaypointPosition(lua_State *L) {
 	LOAD_SELF
 	FloorPosition pos;
 	if (self->m_world->floors->WaypointPosition(luaL_checkinteger(L, 1), pos)) {
-		lua::Marshal<FloorPosition>::Push(L, pos);
+		lua::Marshal<Vec3>::Push(L, pos.pos);
 		return 1;
 	}
 
@@ -858,7 +858,7 @@ int WorldLua::lua_World_WaypointFloorPosition(lua_State *L) {
 	LOAD_SELF
 	FloorPosition pos;
 	if (self->m_world->floors->WaypointPosition(luaL_checkinteger(L, 1), pos)) {
-		lua::Marshal<Vec3>::Push(L, pos.pos);
+		lua::Marshal<FloorPosition>::Push(L, pos);
 		return 1;
 	}
 
@@ -882,7 +882,7 @@ int WorldLua::lua_World_WaypointsForTargetname(lua_State *L) {
 	IntVec vec = self->m_world->floors->WaypointsForTargetname(luaL_checkstring(L, 1));
 	if (!vec.empty()) {
 		lua_createtable(L, (int)vec.size(), 0);
-		int ofs = 0;
+		int ofs = 1; // lua is 1 based
 		for (IntVec::const_iterator it = vec.begin(); it != vec.end(); ++it, ++ofs) {
 			lua_pushinteger(L, ofs);
 			lua_pushinteger(L, *it);
@@ -897,10 +897,10 @@ int WorldLua::lua_World_WaypointsForTargetname(lua_State *L) {
 
 int WorldLua::lua_World_WaypointsForUserId(lua_State *L) {
 	LOAD_SELF
-	IntVec vec = self->m_world->floors->WaypointsForTargetname(luaL_checkstring(L, 1));
+	IntVec vec = self->m_world->floors->WaypointsForUserId(luaL_checkstring(L, 1));
 	if (!vec.empty()) {
 		lua_createtable(L, (int)vec.size(), 0);
-		int ofs = 0;
+		int ofs = 1; // lua is 1 based
 		for (IntVec::const_iterator it = vec.begin(); it != vec.end(); ++it, ++ofs) {
 			lua_pushinteger(L, ofs);
 			lua_pushinteger(L, *it);

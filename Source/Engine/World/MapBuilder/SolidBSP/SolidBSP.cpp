@@ -72,7 +72,7 @@ bool BSPBuilder::SpawnCompile(
 	SceneFile &map, 
 	CinematicActorCompressionMap &caMap,
 	tools::UIProgress *ui, 
-	MapBuilderDebugUI *debugUI,
+	tools::map_builder::DebugUI *debugUI,
 	std::ostream *cout
 ) {
 	m_map = &map;

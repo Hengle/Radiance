@@ -99,12 +99,20 @@ void WorldDraw::DebugDrawBBoxes(const LocalMaterial &material, const BBoxVec &bb
 	material.mat->shader->Begin(r::Shader::kPass_Default, *material.mat);
 
 	for (BBoxVec::const_iterator it = bboxes.begin(); it != bboxes.end(); ++it)
-		DebugDrawBBox(material, *it, wireframe);
+		DebugDrawBBoxBatch(material, *it, wireframe);
 
 	material.mat->shader->End();
 }
 
 void WorldDraw::DebugDrawBBox(const LocalMaterial &material, const BBox &bbox, bool wireframe) {
+	material.mat->BindStates();
+	material.mat->BindTextures(material.loader);
+	material.mat->shader->Begin(r::Shader::kPass_Default, *material.mat);
+	DebugDrawBBoxBatch(material, bbox, wireframe);
+	material.mat->shader->End();
+}
+
+void WorldDraw::DebugDrawBBoxBatch(const LocalMaterial &material, const BBox &bbox, bool wireframe) {
 	typedef stackify<std::vector<Vec3>, 4> StackVec;
 	StackVec v;
 
@@ -210,13 +218,27 @@ void WorldDraw::DebugDrawBBox(const LocalMaterial &material, const BBox &bbox, b
 }
 
 void WorldDraw::DebugDrawActiveWaypoints() {
+	bool begin = false;
+
 	for (U32 i = 0; i < m_world->bspFile->numWaypoints; ++i) {
 		if (!(m_world->floors->WaypointState((int)i) & Floors::kWaypointState_Enabled))
 			continue;
+
+		if (!begin) {
+			begin = true;
+			m_dbgVars.debugWaypoint_M.mat->BindStates();
+			m_dbgVars.debugWaypoint_M.mat->BindTextures(m_dbgVars.debugWaypoint_M.loader);
+			m_dbgVars.debugWaypoint_M.mat->shader->Begin(r::Shader::kPass_Default, *m_dbgVars.debugWaypoint_M.mat);
+		}
+
 		const bsp_file::BSPWaypoint *waypoint = m_world->bspFile->Waypoints() + i;
 		const Vec3 kPos(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
 		const BBox kBox(kPos - Vec3(12, 12, 12), kPos + Vec3(12, 12, 12));
-		DebugDrawBBox(m_dbgVars.debugWaypoint_M, kBox, false);
+		DebugDrawBBoxBatch(m_dbgVars.debugWaypoint_M, kBox, false);
+	}
+
+	if (begin) {
+		m_dbgVars.debugWaypoint_M.mat->shader->End();
 	}
 }
 

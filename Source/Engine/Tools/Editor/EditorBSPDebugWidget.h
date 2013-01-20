@@ -19,7 +19,7 @@ class QWidget;
 namespace tools {
 namespace editor {
 
-class RADENG_CLASS BSPDebugWidget : public GLNavWidget, public MapBuilderDebugUI {
+class RADENG_CLASS BSPDebugWidget : public GLNavWidget, public tools::map_builder::DebugUI {
 	Q_OBJECT
 public:
 

@@ -23,14 +23,15 @@ class PopupMenu;
 } // tools
 
 namespace tools {
+namespace map_builder {
 
-class RADENG_CLASS MapBuilderDebugUI {
+class RADENG_CLASS DebugUI {
 public:
 
-	virtual ~MapBuilderDebugUI() {}
+	virtual ~DebugUI() {}
 
-	RAD_DECLARE_PROPERTY(MapBuilderDebugUI, enabled, bool, bool);
-	RAD_DECLARE_READONLY_PROPERTY(MapBuilderDebugUI, camera, Camera*);
+	RAD_DECLARE_PROPERTY(DebugUI, enabled, bool, bool);
+	RAD_DECLARE_READONLY_PROPERTY(DebugUI, camera, Camera*);
 
 	virtual void SetDebugMenu(editor::PopupMenu *menu) = 0;
 
@@ -54,6 +55,7 @@ protected:
 
 };
 
+} // map_builder
 } // tools
 
 #include <Runtime/PopPack.h>

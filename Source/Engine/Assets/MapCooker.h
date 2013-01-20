@@ -40,15 +40,13 @@ private:
 
 	int TickCompile(int flags, int allflags);
 
-	int ParseEntity(world::EntSpawn &spawn);
-	int ParseScript(world::EntSpawn &spawn);
 	int ParseCinematicCompressionMap(int flags);
 
 	Tokenizer m_script;
 	tools::CinematicActorCompressionMap m_caMap;
 	tools::UIProgress *m_ui;
 	MapParser::Ref m_parser;
-	tools::MapBuilder::Ref m_mapBuilder;
+	tools::map_builder::MapBuilder::Ref m_mapBuilder;
 	bool m_parsing;
 };
 

@@ -12,9 +12,9 @@
 #include "../Packages/Packages.h"
 #include "../World/EntityDef.h"
 #include "../SkAnim/SkAnimDef.h"
+#include "../World/MapBuilder/MapBuilder.h"
 #include <Runtime/Tokenizer.h>
 #include <Runtime/File.h>
-
 #include <Runtime/PushPack.h>
 
 class Engine;
@@ -38,9 +38,19 @@ public:
 	virtual ~MapParser();
 
 #if defined(RAD_OPT_TOOLS)
-	int ParseEntity(world::EntSpawn &spawn);
-
+	int ParseEntity(tools::map_builder::EntSpawn &spawn);
 	RAD_DECLARE_READONLY_PROPERTY(MapParser, caMap, const tools::CinematicActorCompressionMap*);
+
+	static int ParseEntity(
+		Tokenizer &script,
+		tools::map_builder::EntSpawn &spawn
+	);
+
+	static int ParseCinematicCompressionMap(
+		Tokenizer &script,
+		tools::CinematicActorCompressionMap &caMap
+	);
+
 #endif
 
 protected:
@@ -55,8 +65,12 @@ protected:
 private:
 
 #if defined(RAD_OPT_TOOLS)
-	int ParseScript(world::EntSpawn &spawn);
 
+	static int ParseBrush(
+		Tokenizer &script,
+		tools::SceneFile::Brush &brush
+	);
+	
 	int ParseCinematicCompressionMap(
 		Engine &engine,
 		const pkg::Asset::Ref &asset,

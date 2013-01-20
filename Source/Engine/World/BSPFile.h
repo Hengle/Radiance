@@ -132,6 +132,13 @@ struct BSPPlane {
 	float p[4];
 };
 
+struct BSPBrush {
+	U32 firstPlane;
+	U32 numPlanes;
+	float mins[3];
+	float maxs[3];
+};
+
 struct BSPVertex {
 	float v[3];
 	float n[3];
@@ -228,6 +235,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numAreaportalIndices, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numModels, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numModelIndices, U32);
+	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numBrushes, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numClipSurfaces, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numVerts, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numIndices, U32);
@@ -256,6 +264,7 @@ public:
 	virtual const U16 *AreaportalIndices() const = 0;
 	virtual const BSPModel *Models() const = 0;
 	virtual const U16 *ModelIndices() const = 0;
+	virtual const BSPBrush *Brushes() const = 0;
 	virtual const BSPClipSurface *ClipSurfaces() const = 0;
 	virtual const BSPWaypoint *Waypoints() const = 0;
 	virtual const U16 *WaypointIndices() const = 0;
@@ -288,6 +297,7 @@ protected:
 	virtual RAD_DECLARE_GET(numClipSurfaces, U32) = 0;
 	virtual RAD_DECLARE_GET(numModels, U32) = 0;
 	virtual RAD_DECLARE_GET(numModelIndices, U32) = 0;
+	virtual RAD_DECLARE_GET(numBrushes, U32) = 0;
 	virtual RAD_DECLARE_GET(numVerts, U32) = 0;
 	virtual RAD_DECLARE_GET(numIndices, U32) = 0;
 	virtual RAD_DECLARE_GET(numMaterials, U32) = 0;
@@ -331,6 +341,7 @@ public:
 	virtual const U16 *AreaportalIndices() const;
 	virtual const BSPModel *Models() const;
 	virtual const U16 *ModelIndices() const;
+	virtual const BSPBrush *Brushes() const;
 	virtual const BSPClipSurface *ClipSurfaces() const;
 	virtual const BSPWaypoint *Waypoints() const;
 	virtual const U16 *WaypointIndices() const;
@@ -365,6 +376,7 @@ private:
 	virtual RAD_DECLARE_GET(numClipSurfaces, U32);
 	virtual RAD_DECLARE_GET(numModels, U32);
 	virtual RAD_DECLARE_GET(numModelIndices, U32);
+	virtual RAD_DECLARE_GET(numBrushes, U32);
 	virtual RAD_DECLARE_GET(numVerts, U32);
 	virtual RAD_DECLARE_GET(numIndices, U32);
 	virtual RAD_DECLARE_GET(numWaypoints, U32);
@@ -395,6 +407,7 @@ private:
 	const U16 *m_areaportalIndices;
 	const BSPModel *m_models;
 	const U16 *m_modelIndices;
+	const BSPBrush *m_brushes;
 	const BSPClipSurface *m_clipSurfaces;
 	const BSPPlane *m_planes;
 	const BSPVertex *m_verts;
@@ -425,6 +438,7 @@ private:
 	U32 m_numClipSurfaces;
 	U32 m_numModels;
 	U32 m_numModelIndices;
+	U32 m_numBrushes;
 	U32 m_numPlanes;
 	U32 m_numVerts;
 	U32 m_numTexCoords[kMaxUVChannels];
@@ -465,6 +479,7 @@ public:
 	virtual const U16 *AreaportalIndices() const;
 	virtual const BSPModel *Models() const;
 	virtual const U16 *ModelIndices() const;
+	virtual const BSPBrush *Brushes() const;
 	virtual const BSPClipSurface *ClipSurfaces() const;
 	virtual const BSPWaypoint *Waypoints() const;
 	virtual const U16 *WaypointIndices() const;
@@ -497,6 +512,7 @@ public:
 	void ReserveClipSurfaces(int num);
 	void ReserveModels(int num);
 	void ReserveModelIndices(int num);
+	void ReserveBrushes(int num);
 	void ReservePlanes(int num);
 	void ReserveVertices(int num);
 	void ReserveIndices(int num);
@@ -515,6 +531,7 @@ public:
 	void ReserveActors(int num);
 	
 	::String *AddString();
+	void SetString(U32 idx, const ::String &value);
 	BSPEntity *AddEntity();
 	BSPMaterial *AddMaterial();
 	BSPNode *AddNode();
@@ -525,6 +542,7 @@ public:
 	BSPClipSurface *AddClipSurface();
 	BSPModel *AddModel();
 	U16 *AddModelIndex();
+	BSPBrush *AddBrush();
 	BSPPlane *AddPlane();
 	BSPVertex *AddVertex();
 	BSPActor *AddActor();
@@ -558,6 +576,7 @@ protected:
 	virtual RAD_DECLARE_GET(numAreas, U32);
 	virtual RAD_DECLARE_GET(numAreaportals, U32);
 	virtual RAD_DECLARE_GET(numModels, U32);
+	virtual RAD_DECLARE_GET(numBrushes, U32);
 	virtual RAD_DECLARE_GET(numClipSurfaces, U32);
 	virtual RAD_DECLARE_GET(numVerts, U32);
 	virtual RAD_DECLARE_GET(numAreaportalIndices, U32);
@@ -586,6 +605,7 @@ protected:
 	typedef zone_vector<BSPArea, ZBSPBuilderT>::type BSPAreaVec;
 	typedef zone_vector<BSPAreaportal, ZBSPBuilderT>::type BSPAreaportalVec;
 	typedef zone_vector<BSPModel, ZBSPBuilderT>::type BSPModelVec;
+	typedef zone_vector<BSPBrush, ZBSPBuilderT>::type BSPBrushVec;
 	typedef zone_vector<BSPClipSurface, ZBSPBuilderT>::type BSPClipSurfaceVec;
 	typedef zone_vector<BSPPlane, ZBSPBuilderT>::type BSPPlaneVec;
 	typedef zone_vector<BSPVertex, ZBSPBuilderT>::type BSPVertexVec;
@@ -614,6 +634,7 @@ protected:
 	BSPIndexVec m_areaportalIndices;
 	BSPModelVec m_models;
 	BSPIndexVec m_modelIndices;
+	BSPBrushVec m_brushes;
 	BSPClipSurfaceVec m_clipSurfaces;
 	BSPPlaneVec m_planes;
 	BSPVertexVec m_vertices;

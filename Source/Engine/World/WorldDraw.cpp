@@ -524,6 +524,10 @@ void WorldDraw::DrawView() {
 		m_dbgVars.debugWorldBBoxes.clear();
 	}
 
+	if (m_world->cvars->r_showwaypoints.value) {
+		DebugDrawActiveWaypoints();
+	}
+
 #endif
 }
 

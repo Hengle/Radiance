@@ -47,7 +47,7 @@ public:
 
 #if defined(RAD_OPT_TOOLS)
 	void SetProgressIndicator(tools::UIProgress *ui);
-	void SetDebugUI(tools::MapBuilderDebugUI *ui);
+	void SetDebugUI(tools::map_builder::DebugUI *ui);
 	void DebugDraw(float time, float dt, const QRect &viewport);
 	void OnDebugMenu(const QVariant &data);
 
@@ -95,8 +95,8 @@ private:
 
 #if defined(RAD_OPT_TOOLS)
 	tools::UIProgress *m_ui;
-	tools::MapBuilderDebugUI *m_debugUI;
-	tools::MapBuilder::Ref m_mapBuilder;
+	tools::map_builder::DebugUI *m_debugUI;
+	tools::map_builder::MapBuilder::Ref m_mapBuilder;
 	MapParser::Ref m_parser;
 	pkg::Cooker::Ref m_cooker;
 

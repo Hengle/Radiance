@@ -53,9 +53,9 @@ enum MoveType {
 };
 
 enum SolidType {
-	kSolidType_None,
-	kSolidType_BBox,
-	kSolidType_All = 0xff
+	RAD_FLAG(kSolidType_BBox),
+	kSolidType_All = 0xff,
+	kSolidType_None = 0
 };
 
 enum OccupantType {
@@ -74,6 +74,10 @@ enum PhysicsFlags {
 	RAD_FLAG(kPhysicsFlag_SplineEvents),
 	RAD_FLAG(kPhysicsFlag_SplineBank),
 	RAD_FLAG(kPhysicsFlag_FlipSplineBank),
+};
+
+enum {
+	kEntityClassBits_Any = 0
 };
 
 struct PState {
@@ -181,6 +185,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Entity, scripted, bool);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, models, const DrawModel::Map*);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, bspLeafs, const dBSPLeaf::PtrVec*);
+	RAD_DECLARE_READONLY_PROPERTY(Entity, classbits, int);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, ps, PState*);
 	RAD_DECLARE_PROPERTY(Entity, gc, bool, bool);
 	
@@ -289,6 +294,7 @@ protected:
 	void AutoFace(float dt);
 	Vec3 ApplyVelocity(float dt);
 	void Move(bool touch, bool clip);
+	void SetNextTick(int millis);
 
 	PState m_ps;
 	PSVars m_psv;
@@ -378,6 +384,7 @@ private:
 	ENT_DECL_GETSET(OccupantType);
 	ENT_DECL_GETSET(Flags);
 	ENT_DECL_GETSET(NextThink);
+	ENT_DECL_GETSET(ClassBits);
 
 	RAD_DECLARE_GET(zoneTag, ZoneTagRef) { 
 		return m_zoneTag.lock(); 
@@ -421,6 +428,10 @@ private:
 		return &m_bspLeafs;
 	}
 
+	RAD_DECLARE_GET(classbits, int) {
+		return m_classbits;
+	}
+
 	enum SpawnState {
 		S_LuaCreate,
 		S_Native,
@@ -451,7 +462,10 @@ private:
 	int m_id;
 	int m_nextLuaThink;
 	int m_lastLuaThink;
+	int m_nextTick;
+	int m_lastTick;
 	int m_markFrame;
+	int m_classbits;
 	bool m_scripted;
 	bool m_gc;
 };

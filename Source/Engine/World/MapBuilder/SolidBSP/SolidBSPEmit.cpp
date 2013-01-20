@@ -146,10 +146,64 @@ void BSPBuilder::EmitBSPEntity(const SceneFile::Entity::Ref &entity)
 	bspEntity->firstString = m_bspFile->numStrings;
 	bspEntity->numStrings = (int)entity->keys.pairs.size();
 
+	m_bspFile->ReserveStrings((int)entity->keys.pairs.size() * 2);
+
 	for (world::Keys::Pairs::const_iterator it = entity->keys.pairs.begin(); it != entity->keys.pairs.end(); ++it) {
 		*m_bspFile->AddString() = it->first;
 		*m_bspFile->AddString() = it->second;
 	}
+
+	U32 firstBrushStringOfs = m_bspFile->numStrings;
+
+	if (!entity->brushes.empty()) {
+		bspEntity->numStrings += 2;
+		m_bspFile->ReserveStrings(4);
+
+		*m_bspFile->AddString() = CStr("firstBrush");
+		*m_bspFile->AddString() = CStr("0");
+		*m_bspFile->AddString() = CStr("numBrushes");
+
+		String x;
+		x.PrintfASCII("%d", entity->brushes.size());
+		*m_bspFile->AddString() = x;
+	}
+
+	for (SceneFile::Brush::Vec::const_iterator it = entity->brushes.begin(); it != entity->brushes.end(); ++it) {
+		int idx = EmitBSPBrush(*it);
+		if (it == entity->brushes.begin()) {
+			String x;
+			x.PrintfASCII("%d", idx);
+			m_bspFile->SetString(firstBrushStringOfs+1, x);
+		}
+	}
+}
+
+/*
+==============================================================================
+Brushes
+==============================================================================
+*/
+
+int BSPBuilder::EmitBSPBrush(const SceneFile::Brush &brush) {
+	int idx = (int)m_bspFile->numBrushes.get();
+	BSPBrush *bspBrush = m_bspFile->AddBrush();
+	bspBrush->firstPlane = 0;
+	bspBrush->numPlanes = 0;
+
+	for (int i = 0; i < 3; ++i) {
+		bspBrush->mins[i] = brush.bounds->Mins()[i];
+		bspBrush->maxs[i] = brush.bounds->Maxs()[i];
+	}
+
+	for (SceneFile::BrushWinding::Vec::const_iterator it = brush.windings->begin(); it != brush.windings->end(); ++it) {
+		int planeNum = m_planes.FindPlaneNum(ToBSPType((*it).winding.Plane()));
+
+		if (it == brush.windings->begin())
+			bspBrush->firstPlane = (U32)planeNum;
+		++bspBrush->numPlanes;
+	}
+
+	return idx;
 }
 
 /*

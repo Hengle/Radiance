@@ -68,45 +68,10 @@ int MapParser::Process(
 
 #if defined(RAD_OPT_TOOLS)
 
-int MapParser::ParseEntity(world::EntSpawn &spawn) {
+int MapParser::ParseEntity(tools::map_builder::EntSpawn &spawn) {
 	spawn.keys.pairs.clear();
-	return ParseScript(spawn);
-}
-
-int MapParser::ParseScript(world::EntSpawn &spawn) {
-	String token, value, temp;
-
-	if (!m_script.GetToken(token, Tokenizer::kTokenMode_CrossLine))
-		return SR_End;
-	if (token != "{")
-		return SR_ParseError;
-
-	for (;;) {
-		if (!m_script.GetToken(token, Tokenizer::kTokenMode_CrossLine))
-			return SR_ParseError;
-		if (token == "}")
-			break;
-		if (!m_script.GetToken(value, Tokenizer::kTokenMode_CrossLine))
-			return SR_ParseError;
-
-		// turn "\n" into '\n'
-		const char *sz = value.c_str;
-		temp.Clear();
-
-		while (*sz) {
-			if (sz[0] == '\\' && sz[1] == 'n') {
-				temp += '\n';
-				++sz;
-			} else {
-				temp += *sz;
-			}
-			++sz;
-		}
-
-		spawn.keys.pairs[token] = temp;
-	}
-
-	return SR_Success;
+	spawn.brushes.clear();
+	return ParseEntity(m_script, spawn);
 }
 
 int MapParser::Load(
@@ -172,6 +137,109 @@ int MapParser::ParseCinematicCompressionMap(
 		return SR_Success; // not a required file.
 
 	Tokenizer script(ib);
+	return ParseCinematicCompressionMap(script, m_caMap);
+}
+
+int MapParser::ParseEntity(
+	Tokenizer &script,
+	tools::map_builder::EntSpawn &spawn
+) {
+	String token, value, temp;
+
+	if (!script.GetToken(token, Tokenizer::kTokenMode_CrossLine))
+		return SR_End;
+	if (token != "{")
+		return SR_ParseError;
+
+	for (;;) {
+		if (!script.GetToken(token, Tokenizer::kTokenMode_CrossLine))
+			return SR_ParseError;
+		if (token == "}")
+			break;
+		if (token == "{") { // brush
+			tools::SceneFile::Brush brush;
+			int r = ParseBrush(script, brush);
+			if (r != SR_Success)
+				return r;
+			if (!brush.windings->empty())
+				spawn.brushes.push_back(brush);
+			continue;
+		}
+		if (!script.GetToken(value, Tokenizer::kTokenMode_CrossLine))
+			return SR_ParseError;
+
+		// turn "\n" into '\n'
+		const char *sz = value.c_str;
+		temp.Clear();
+
+		while (*sz) {
+			if (sz[0] == '\\' && sz[1] == 'n') {
+				temp += '\n';
+				++sz;
+			} else {
+				temp += *sz;
+			}
+			++sz;
+		}
+
+		spawn.keys.pairs[token] = temp;
+	}
+
+	return SR_Success;
+}
+
+int MapParser::ParseBrush(
+	Tokenizer &script,
+	tools::SceneFile::Brush &brush
+) {
+	String token;
+	tools::SceneFile::BrushPlane::Vec planes;
+
+	for (;;) {
+		if (!script.GetToken(token))
+			return SR_ParseError;
+		if (token == "}")
+			break;
+
+		script.UngetToken();
+
+		Vec3 pts[3];
+
+		for (int i = 0; i < 3; ++i) {
+			float f[3];
+			if (!script.Skip(1, Tokenizer::kTokenMode_SameLine))
+				return SR_ParseError;
+
+			for (int k = 0; k < 3; ++k) {
+				if (!script.GetFloat(f[k], Tokenizer::kTokenMode_SameLine))
+					return SR_ParseError;
+			}
+
+			if (!script.Skip(1, Tokenizer::kTokenMode_SameLine))
+				return SR_ParseError;
+
+			pts[i] = Vec3(f[0], f[1], f[2]);
+		}
+
+		if (!script.Skip(5, Tokenizer::kTokenMode_SameLine))
+			return SR_ParseError;
+
+		tools::SceneFile::BrushPlane bp;
+		bp.plane = Plane(pts[0], pts[1], pts[2]);
+		planes.push_back(bp);
+	}
+
+	if (planes.size() < 4)
+		return SR_ParseError;
+
+	tools::SceneFile::Brush::FromPlanes(planes, brush);
+	return SR_Success;
+}
+
+int MapParser::ParseCinematicCompressionMap(
+	Tokenizer &script,
+	tools::CinematicActorCompressionMap &caMap
+) {
 	String token;
 
 	for (;;) {
@@ -199,11 +267,12 @@ int MapParser::ParseCinematicCompressionMap(
 		}
 
 		if (!animMap.empty())
-			m_caMap.insert(tools::CinematicActorCompressionMap::value_type(token, animMap));
+			caMap.insert(tools::CinematicActorCompressionMap::value_type(token, animMap));
 	}
 
 	return SR_Success;
 }
+
 #endif
 
 void MapParser::Register(Engine &engine) {

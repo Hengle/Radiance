@@ -109,7 +109,7 @@ public:
 	Entity::Ref FindEntityId(int id) const;
 	Entity::Vec FindEntityClass(const char *classname) const;
 	Entity::Vec FindEntityTargets(const char *targetname) const;
-	Entity::Vec BBoxTouching(const BBox &bbox, int stypes) const;
+	Entity::Vec BBoxTouching(const BBox &bbox, int classbits) const;
 	ZoneTagRef ZoneTag(int id) const;
 
 	//! Clips a volume into the world, and returns a mask indicating visible areas.
@@ -132,6 +132,9 @@ public:
 
 	//! Trace a line through the world BSP.
 	bool LineTrace(Trace &trace);
+
+	Entity::Vec EntitiesTouchingBrush(int classbits, int brushNum) const;
+	bool EntityTouchesBrush(const Entity &entity, int brushNum) const;
 	
 	RAD_DECLARE_PROPERTY(World, viewController, Entity::Ref, Entity::Ref);
 	RAD_DECLARE_PROPERTY(World, playerPawn, Entity::Ref, Entity::Ref);
@@ -269,6 +272,7 @@ private:
 	void LoadBSP(const bsp_file::BSPFile &bsp);
 	void LinkEntity(Entity *entity, const BBox &bounds);
 	void UnlinkEntity(Entity *entity);
+	bool IsBBoxInsideBrushHull(const BBox &bbox, const bsp_file::BSPBrush *brush) const;
 
 	struct LinkEntityParms {
 
@@ -335,7 +339,7 @@ private:
 
 	void BBoxTouching(
 		const BBox &bbox,
-		int stypes,
+		int classbits,
 		int nodeNum,
 		Entity::Vec &out,
 		EntityBits &bits

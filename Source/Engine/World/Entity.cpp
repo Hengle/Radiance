@@ -30,7 +30,6 @@ velocity(Vec3::Zero),
 targetAngles(Vec3::Zero),
 cameraAngles(Vec3::Zero),
 accel(Vec3::Zero),
-bbox(Vec3::Zero, Vec3::Zero),
 groundFriction(0.f),
 airFriction(0.f),
 maxGroundSpeed(0.f),
@@ -43,6 +42,8 @@ mtype(kMoveType_None),
 stype(kSolidType_None),
 otype(kOccupantType_None),
 flags(0) {
+	// avoid null bbox volumes
+	bbox.Initialize(-Vec3(8.f, 8.f, 8.f), Vec3(8.f, 8.f, 8.f));
 }
 
 Entity::PSVars::PSVars() :
@@ -103,9 +104,12 @@ m_spawnState(S_LuaCreate),
 m_id(-1),
 m_nextLuaThink(1000), 
 m_lastLuaThink(0),
+m_nextTick(0),
+m_lastTick(0),
 m_scripted(false),
 m_frame(-1),
 m_luaCallbackIdx(0),
+m_classbits(0),
 m_gc(false),
 m_markFrame(-1) {
 	for (int i = 0; i < kNumLuaCallbackBuckets; ++i)
@@ -236,7 +240,10 @@ void Entity::PrivateTick(
 	}
 
 	m_tasks.Tick(*this, dt, xtime::TimeSlice::Infinite, kTickFlag_PreTick);
-	Tick(frame, dt, time);
+	if ((worldTime-m_lastTick) >= m_nextTick) {
+		Tick(frame, (worldTime - m_lastTick) / 1000.f, time);
+		m_lastTick = worldTime;
+	}
 	m_tasks.Tick(*this, dt, xtime::TimeSlice::Infinite, kTickFlag_PostTick);
 	TickDrawModels(dt); // before physics, for motion
 	TickPhysics(frame, dt, time);
@@ -458,6 +465,7 @@ void Entity::PushCallTable(lua_State *L) {
 	LUART_REGISTER_GETSET(L, OccupantType);
 	LUART_REGISTER_GETSET(L, Flags);
 	LUART_REGISTER_GETSET(L, NextThink);
+	LUART_REGISTER_GETSET(L, ClassBits);
 }
 
 void Entity::AttachDrawModel(const DrawModel::Ref &ref) {
@@ -1254,6 +1262,11 @@ ENT_GET(Entity, OccupantType, int, m_ps.otype);
 ENT_SET_CUSTOM(Entity, OccupantType, self->m_ps.otype = (OccupantType)luaL_checkinteger(L, 2));
 ENT_GETSET(Entity, Flags, int, m_ps.flags);
 ENT_GETSET(Entity, NextThink, int, m_nextLuaThink);
+ENT_GETSET(Entity, ClassBits, int, m_classbits);
+
+void Entity::SetNextTick(int millis) {
+	m_nextTick = millis;
+}
 
 } // world
 

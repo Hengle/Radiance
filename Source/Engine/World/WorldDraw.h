@@ -319,6 +319,7 @@ private:
 	void DebugDrawAreaportals(int area);
 	void DebugDrawBBoxes(const LocalMaterial &material, const BBoxVec &bboxes, bool wireframe);
 	void DebugDrawBBox(const LocalMaterial &material, const BBox &bbox, bool wireframe);
+	void DebugDrawBBoxBatch(const LocalMaterial &material, const BBox &bbox, bool wireframe);
 	void DebugDrawActiveWaypoints();
 
 	DebugVars m_dbgVars;

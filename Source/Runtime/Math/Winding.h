@@ -79,6 +79,7 @@ public:
 	ValueType MaxPlaneDist(const PlaneType &p) const;
 
 	void Chop(const PlaneType &p, SideType side, SelfType &poly, const ValueType &epsilon) const;
+	void ChopInPlace(const PlaneType &p, SideType side, const ValueType &epsilon);
 	void Split(const PlaneType &p, SelfType *front, SelfType *back, const ValueType &epsilon) const;
 	void Swap(SelfType &p);
 	void Clear();

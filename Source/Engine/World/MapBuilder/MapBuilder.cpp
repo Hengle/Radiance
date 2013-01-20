@@ -20,6 +20,7 @@
 using namespace pkg;
 
 namespace tools {
+namespace map_builder {
 
 MapBuilder::MapBuilder(Engine &engine)
 : m_e(engine), m_ui(0), m_debugUI(0), m_result(SR_Success), m_compiling(false) {
@@ -32,7 +33,7 @@ void MapBuilder::SetProgressIndicator(UIProgress *ui) {
 	m_ui = ui;
 }
 
-void MapBuilder::SetDebugUI(MapBuilderDebugUI *ui) {
+void MapBuilder::SetDebugUI(DebugUI *ui) {
 	m_debugUI = ui;
 }
 
@@ -48,7 +49,7 @@ void MapBuilder::OnDebugMenu(const QVariant &data) {
 	m_bspBuilder.OnDebugMenu(data);
 }
 
-bool MapBuilder::LoadEntSpawn(const world::EntSpawn &spawn) {
+bool MapBuilder::LoadEntSpawn(const EntSpawn &spawn) {
 	const char *sz = spawn.keys.StringForKey("classname");
 	if (!sz) {
 		m_result = SR_ParseError;
@@ -90,23 +91,25 @@ void MapBuilder::WaitForCompletion() {
 	}
 }
 
-bool MapBuilder::ParseWorldSpawn(const world::EntSpawn &spawn) {
+bool MapBuilder::ParseWorldSpawn(const EntSpawn &spawn) {
 	if (!m_map.worldspawn) // may be spawned by static_mesh_scene
 		m_map.worldspawn.reset(new (ZTools) SceneFile::Entity());
 	m_map.worldspawn->keys = spawn.keys;
+	// NOTE: worldspawn doesn't get brushes
 	return true;
 }
 
-bool MapBuilder::ParseEntity(const world::EntSpawn &spawn) {
+bool MapBuilder::ParseEntity(const EntSpawn &spawn) {
 	SceneFile::Entity::Ref entity(new (ZTools) SceneFile::Entity());
 	entity->keys = spawn.keys;
+	entity->brushes = spawn.brushes;
 	Vec3 org(spawn.keys.Vec3ForKey("origin"));
 	entity->origin = SceneFile::Vec3(org.X(), org.Y(), org.Z());
 	m_map.ents.push_back(entity);
 	return true;
 }
 
-bool MapBuilder::ParseWaypoint(const world::EntSpawn &spawn) {
+bool MapBuilder::ParseWaypoint(const EntSpawn &spawn) {
 	SceneFile::Waypoint::Ref waypoint(new (ZTools) SceneFile::Waypoint());
 
 	Vec3 org(spawn.keys.Vec3ForKey("origin"));
@@ -175,7 +178,7 @@ bool MapBuilder::ParseWaypoint(const world::EntSpawn &spawn) {
 	return true;
 }
 
-bool MapBuilder::LoadScene(const world::EntSpawn &spawn) {
+bool MapBuilder::LoadScene(const EntSpawn &spawn) {
 	const char *sz = spawn.keys.StringForKey("file");
 	if (!sz || !sz[0]) {
 		COut(C_Error) << "ERROR: static_mesh_scene missing file key!" << std::endl;
@@ -231,6 +234,7 @@ int MapBuilder::RAD_IMPLEMENT_GET(result) {
 	return SR_Pending;
 }
 
+} // map_builder
 } // tools
 
 #endif // RAD_OPT_TOOLS

@@ -7,6 +7,7 @@
 #include "MapCooker.h"
 #include "../World/World.h"
 #include "../World/MapBuilder/MapBuilder.h"
+#include "MapParser.h"
 #include "../Engine.h"
 #include <Runtime/Stream.h>
 
@@ -14,7 +15,7 @@ using namespace pkg;
 
 namespace asset {
 
-MapCooker::MapCooker() : Cooker(20), m_parsing(false), m_ui(0) {
+MapCooker::MapCooker() : Cooker(21), m_parsing(false), m_ui(0) {
 }
 
 MapCooker::~MapCooker() {
@@ -50,9 +51,9 @@ CookStatus MapCooker::Status(int flags, int allflags) {
 
 		int r;
 		CookStatus status = CS_UpToDate;
-		world::EntSpawn spawn;
+		tools::map_builder::EntSpawn spawn;
 
-		while ((r=ParseEntity(spawn))==SR_Success) {
+		while ((r=MapParser::ParseEntity(m_script, spawn))==SR_Success) {
 			const char *sz = spawn.keys.StringForKey("classname");
 			if (!sz)
 				continue;
@@ -100,8 +101,8 @@ int MapCooker::TickCompile(int flags, int allflags) {
 		if (r != SR_Success)
 			return r;
 
-		world::EntSpawn spawn;
-		r = ParseEntity(spawn);
+		tools::map_builder::EntSpawn spawn;
+		r = MapParser::ParseEntity(m_script, spawn);
 		if ((r != SR_Success) && (r != SR_End))
 			return r;
 
@@ -183,7 +184,7 @@ int MapCooker::TickCompile(int flags, int allflags) {
 	m_script.Bind(ib);
 	ib.reset();
 		
-	m_mapBuilder.reset(new (ZTools) tools::MapBuilder(*engine.get()));
+	m_mapBuilder.reset(new (ZTools) tools::map_builder::MapBuilder(*engine.get()));
 	m_mapBuilder->SetProgressIndicator(m_ui);
 
 	return SR_Pending;
@@ -191,47 +192,6 @@ int MapCooker::TickCompile(int flags, int allflags) {
 
 void MapCooker::SetProgressIndicator(tools::UIProgress *ui) {
 	m_ui = ui;
-}
-
-int MapCooker::ParseEntity(world::EntSpawn &spawn) {
-	spawn.keys.pairs.clear();
-	return ParseScript(spawn);
-}
-
-int MapCooker::ParseScript(world::EntSpawn &spawn) {
-	String token, value, temp;
-
-	if (!m_script.GetToken(token))
-		return SR_End;
-	if (token != "{")
-		return SR_ParseError;
-
-	for (;;) {
-		if (!m_script.GetToken(token))
-			return SR_ParseError;
-		if (token == "}")
-			break;
-		if (!m_script.GetToken(value))
-			return SR_ParseError;
-
-		// turn "\n" into '\n'
-		const char *sz = value.c_str;
-		temp.Clear();
-
-		while (*sz) {
-			if (sz[0] == '\\' && sz[1] == 'n') {
-				temp += '\n';
-				++sz;
-			} else {
-				temp += *sz;
-			}
-			++sz;
-		}
-
-		spawn.keys.pairs[token] = temp;
-	}
-
-	return SR_Success;
 }
 
 int MapCooker::ParseCinematicCompressionMap(int flags) {
@@ -254,37 +214,7 @@ int MapCooker::ParseCinematicCompressionMap(int flags) {
 		return SR_Success; // not a required file.
 
 	Tokenizer script(ib);
-	String token;
-
-	for (;;) {
-		if (!script.GetToken(token))
-			break;
-		if (!script.IsNextToken("{"))
-			return SR_InvalidFormat;
-
-		String anim, value;
-		tools::SkaCompressionMap animMap;
-
-		for (;;) {
-			if (!script.GetToken(anim))
-				return SR_InvalidFormat;
-			if (anim == "}")
-				break;
-			if (!script.IsNextToken("=", Tokenizer::kTokenMode_SameLine))
-				return SR_InvalidFormat;
-			if (!script.GetToken(value, Tokenizer::kTokenMode_SameLine))
-				return SR_InvalidFormat;
-
-			float fval;
-			sscanf(value.c_str, "%f", &fval);
-			animMap.insert(tools::SkaCompressionMap::value_type(anim, fval));
-		}
-
-		if (!animMap.empty())
-			m_caMap.insert(tools::CinematicActorCompressionMap::value_type(token, animMap));
-	}
-
-	return SR_Success;
+	return MapParser::ParseCinematicCompressionMap(script, m_caMap);
 }
 
 void MapCooker::Register(Engine &engine) {

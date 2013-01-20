@@ -39,6 +39,10 @@ inline const BSPModel *BSPFileParser::Models() const {
 	return m_models;
 }
 
+inline const BSPBrush *BSPFileParser::Brushes() const {
+	return m_brushes;
+}
+
 inline const BSPClipSurface *BSPFileParser::ClipSurfaces() const {
 	return m_clipSurfaces;
 }
@@ -190,6 +194,10 @@ inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numModelIndices) {
 	return m_numModelIndices;
 }
 
+inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numBrushes) {
+	return m_numBrushes;
+}
+
 inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numClipSurfaces) {
 	return m_numClipSurfaces;
 }
@@ -276,6 +284,10 @@ inline const U16 *BSPFileBuilder::ModelIndices() const {
 	return &m_modelIndices[0];
 }
 
+inline const BSPBrush *BSPFileBuilder::Brushes() const {
+	return &m_brushes[0];
+}
+
 inline const BSPClipSurface *BSPFileBuilder::ClipSurfaces() const {
 	return &m_clipSurfaces[0];
 }
@@ -359,6 +371,7 @@ inline void BSPFileBuilder::Clear() {
 	m_areaportalIndices.clear();
 	m_models.clear();
 	m_modelIndices.clear();
+	m_brushes.clear();
 	m_clipSurfaces.clear();
 	m_planes.clear();
 	m_vertices.clear();
@@ -417,6 +430,10 @@ inline void BSPFileBuilder::ReserveModels(int num) {
 
 inline void BSPFileBuilder::ReserveModelIndices(int num) {
 	m_modelIndices.reserve(m_modelIndices.size()+(size_t)num);
+}
+
+inline void BSPFileBuilder::ReserveBrushes(int num) {
+	m_brushes.reserve(m_brushes.size()+(size_t)num);
 }
 
 inline void BSPFileBuilder::ReserveClipSurfaces(int num) {
@@ -488,9 +505,13 @@ inline void BSPFileBuilder::ReserveActorIndices(int num) {
 	m_actorIndices.reserve(m_actorIndices.size()+(size_t)num);
 }
 
-inline String *BSPFileBuilder::AddString() {
+inline ::String *BSPFileBuilder::AddString() {
 	m_strings.resize(m_strings.size()+1);
 	return &m_strings.back();
+}
+
+inline void BSPFileBuilder::SetString(U32 idx, const ::String &value) {
+	m_strings[idx] = value;
 }
 
 inline BSPEntity *BSPFileBuilder::AddEntity() {
@@ -536,6 +557,11 @@ inline BSPModel *BSPFileBuilder::AddModel() {
 inline U16 *BSPFileBuilder::AddModelIndex() {
 	m_modelIndices.resize(m_modelIndices.size()+1);
 	return &m_modelIndices.back();
+}
+
+inline BSPBrush *BSPFileBuilder::AddBrush() {
+	m_brushes.resize(m_brushes.size()+1);
+	return &m_brushes.back();
 }
 
 inline BSPClipSurface *BSPFileBuilder::AddClipSurface() {
@@ -657,6 +683,10 @@ inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numAreaportals) {
 
 inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numModels) {
 	return (U32)m_models.size();
+}
+
+inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numBrushes) {
+	return (U32)m_brushes.size();
 }
 
 inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numWaypoints) {

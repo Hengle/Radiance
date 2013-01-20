@@ -119,7 +119,7 @@ public:
 
 	// Comparison operations
 	
-	bool NearlyEquals(const Plane<T> &p, const T &epsilon = Epsilon<T>()) const;
+	bool NearlyEquals(const Plane<T> &p, const T &normalEpsilon = Epsilon<T>() , const T &distanceEpsilon = Epsilon<T>()) const;
 	bool operator==(const Plane<T> &p) const;
 	bool operator!=(const Plane<T> &p) const;
 	

@@ -278,6 +278,7 @@ private:
 	void UpdateRailTarget(const Vec3 &target);
 
 	static int lua_SetTargetMode(lua_State *L);
+	static int lua_SetRailMode(lua_State *L);
 	static int lua_SetFixedCamera(lua_State *L);
 	static int lua_SetCameraSway(lua_State *L);
 	static int lua_SetCameraFOV(lua_State *L);

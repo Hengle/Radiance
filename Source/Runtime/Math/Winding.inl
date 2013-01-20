@@ -264,6 +264,13 @@ inline void Winding<TVertex, TPlane, TAllocator>::Chop(const PlaneType &p, SideT
 }
 
 template<typename TVertex, typename TPlane, typename TAllocator>
+inline void Winding<TVertex, TPlane, TAllocator>::ChopInPlace(const PlaneType &p, SideType side, const ValueType &epsilon) {
+	SelfType result;
+	Chop(p, side, result, epsilon);
+	*this = result;
+}
+
+template<typename TVertex, typename TPlane, typename TAllocator>
 void Winding<TVertex, TPlane, TAllocator>::Split(const PlaneType &p, SelfType *front, SelfType *back, const ValueType &epsilon) const {
 	
 	if (!front && !back) 

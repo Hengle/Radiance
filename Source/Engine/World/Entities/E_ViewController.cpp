@@ -515,7 +515,7 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 		m_sync
 	);
 
-	UpdateRailTarget(vTarget);
+	UpdateRailTarget(target->ps->cameraPos);
 	if (!m_rail.tm)
 		return;
 
@@ -550,18 +550,20 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 	if (!m_rail.cinematicFOV) {
 		fov = TickFOV(frame, dt, distance);
 	}
-
+	
+	Vec3 pos = m_rail.pos + Sway::Tick(m_sways, dt, fwd);
+	
 	// special case (unrestricted camera)
 	if (m_rail.clamp[1] >= 180.f && m_rail.clamp[2] >= 180.f) {
 		Vec3 angles = LookAngles(m_rail.fwd);
-		world->camera->pos = m_rail.pos;
+		world->camera->pos = pos;
 		world->camera->angles = angles;
 		world->camera->fov = fov;
 		world->camera->quatMode = false;
 	// special case (fully restricted camera)
 	} else if (m_rail.clamp[1] == 0.f && m_rail.clamp[2] == 0.f) {
 		Vec3 angles = LookAngles(m_rail.fwd);
-		world->camera->pos = m_rail.pos;
+		world->camera->pos = pos;
 		world->camera->rot = m_rail.rot;
 		world->camera->fov = fov;
 		world->camera->quatMode = true;
@@ -592,7 +594,7 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 
 		fAngles[0] = qAngles[0]; // preserve roll
 
-		world->camera->pos = m_rail.pos;
+		world->camera->pos = pos;
 		world->camera->angles = fAngles;
 		world->camera->fov = fov;
 		world->camera->quatMode = false;
@@ -611,6 +613,11 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target) {
 			return;
 	}
 
+	Vec3 fwd(Vec3::Zero);
+	if (m_rail.tm) {
+		fwd = target - m_rail.tm->t;
+	}
+
 	const bsp_file::BSPFile *bspFile = world->bspFile;
 	float bestDist = std::numeric_limits<float>::max();
 	
@@ -620,14 +627,20 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target) {
 		const bsp_file::BSPCameraTM *tm = bspFile->CameraTMs() + m_rail.track->firstTM + i;
 
 		v = target - tm->t;
+		if (m_rail.tm) {
+			// new position must be on same side as old
+			if (fwd.Dot(v) < 0.f)
+				continue;
+		}
+
 		float d = v.MagnitudeSquared();
 
-		if (d <= m_rail.distance) {
-			float dd = m_rail.distance - d;
-			if (dd < bestDist) {
-				bestDist = dd;
-				best = tm;
-			}
+		float dd = m_rail.distance - d;
+		float abs = math::Abs(dd);
+
+		if (abs < bestDist) {
+			bestDist = abs;
+			best = tm;
 		}
 	}
 
@@ -724,6 +737,8 @@ void E_ViewController::SetRailMode(
 		m_rail.strict = strict;
 		m_rail.trackLag = trackingLag;
 		m_rail.turnLag = lookAtLag;
+		m_rail.cinematicFOV = useCinematicFOV;
+		m_rail.clamp = angleClamp;
 		m_rail.tm = 0;
 		// found a camera.
 		m_sync = true;
@@ -839,6 +854,29 @@ int E_ViewController::lua_SetTargetMode(lua_State *L) {
 	return 0;
 }
 
+int E_ViewController::lua_SetRailMode(lua_State *L) {
+	E_ViewController *self = static_cast<E_ViewController*>(WorldLua::EntFramePtr(L, 1, true));
+	const char *name = luaL_checkstring(L, 2);
+	float distance = (float)luaL_checknumber(L, 3);
+	bool strict = lua_toboolean(L, 4) != 0;
+	float trackLag = (float)luaL_checknumber(L, 5);
+	float lookLag  = (float)luaL_checknumber(L, 6);
+	bool useFOV = lua_toboolean(L, 7) != 0;
+	Vec3 clamp = lua::Marshal<Vec3>::Get(L, 8, true);
+
+	self->SetRailMode(
+		name,
+		distance,
+		strict,
+		trackLag,
+		lookLag,
+		useFOV,
+		clamp
+	);
+
+	return 0;
+}
+
 int E_ViewController::lua_SetFixedCamera(lua_State *L) {
 	E_ViewController *self = static_cast<E_ViewController*>(WorldLua::EntFramePtr(L, 1, true));
 	Vec3 pos = lua::Marshal<Vec3>::Get(L, 2, true);
@@ -949,6 +987,8 @@ void E_ViewController::PushCallTable(lua_State *L) {
 	Entity::PushCallTable(L);
 	lua_pushcfunction(L, lua_SetTargetMode);
 	lua_setfield(L, -2, "SetTargetMode");
+	lua_pushcfunction(L, lua_SetRailMode);
+	lua_setfield(L, -2, "SetRailMode");
 	lua_pushcfunction(L, lua_SetFixedCamera);
 	lua_setfield(L, -2, "SetFixedCamera");
 	lua_pushcfunction(L, lua_SetCameraSway);
