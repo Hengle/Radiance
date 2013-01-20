@@ -206,7 +206,7 @@ private:
 	) const;
 
 	void WalkConnection(
-		int waypoint,
+		int targetWaypoint,
 		int connection,
 		WalkStep::Vec &route
 	) const;

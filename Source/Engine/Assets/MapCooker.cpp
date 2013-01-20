@@ -15,7 +15,7 @@ using namespace pkg;
 
 namespace asset {
 
-MapCooker::MapCooker() : Cooker(22), m_parsing(false), m_ui(0) {
+MapCooker::MapCooker() : Cooker(23), m_parsing(false), m_ui(0) {
 }
 
 MapCooker::~MapCooker() {

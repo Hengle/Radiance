@@ -47,10 +47,12 @@ void Entity::Tick_MT_Floor(
 	FloorMove::StringVec events;
 
 	float moved = m_ps.activeMove->Move(m_ps.moveState, moveLen, distanceRemaining, events);
+	m_ps.origin = m_ps.moveState.pos.pos;
 
 	if (!events.empty()) {
 		for (FloorMove::StringVec::const_iterator it = events.begin(); it != events.end(); ++it) {
-			world->PostEvent((*it).c_str);
+			if (!(*it).empty)
+				world->PostEvent((*it).c_str);
 		}
 	}
 

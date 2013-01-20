@@ -61,13 +61,26 @@ float FloorMove::Move(
 	float moved = 0.f;
 
 	while (moved < distance) {
-		if (state.m_stepIdx >= (int)m_route.steps->size())
+		if (state.m_stepIdx >= (int)m_route.steps->size()) {
+			const Step &step = m_route.steps[state.m_stepIdx-1];
+			state.pos.m_waypoint = step.waypoints[1];
+			state.pos.m_nextWaypoint = -1;
+			if (state.pos.m_waypoint == -1) {
+				state.pos.m_floor = step.floors[0];
+			}
 			break;
+		}
 		const Step &step = m_route.steps[state.m_stepIdx];
 
 		if (state.m_first) {
 			state.m_first = false;
-			events.push_back(step.events[0]);
+			if (!step.events[0].empty)
+				events.push_back(step.events[0]);
+			state.pos.m_waypoint = step.waypoints[0];
+			state.pos.m_nextWaypoint = step.waypoints[0];
+			if (state.pos.m_waypoint == -1) {
+				state.pos.m_floor = step.floors[0];
+			}
 		}
 		
 		float dd = distance - moved;
@@ -206,13 +219,11 @@ FloorMove::Ref Floors::CreateMove(
 		workRoute->clear();
 		WalkFloor(current, end, workRoute);
 		std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*route));
+	} else { // waypoint move didn't generate a plan because we are at our destination waypoint already.
+		if (route->empty())
+			return FloorMove::Ref();
 	}
-#if defined(RAD_OPT_DEBUG)
-	else {
-		RAD_ASSERT(!route->empty()); // if it was not a floor->floor move this has to have been waypoint->waypoint
-		// and those always generate move commands.
-	}
-#endif
+
 
 	FloorMove::Ref move(new (ZWorld) FloorMove());
 	GenerateFloorMove(route, move->m_route);
@@ -524,25 +535,25 @@ Vec3 Floors::FindEdgePoint(const Vec3 &pos, const bsp_file::BSPFloorEdge *edge) 
 }
 
 void Floors::WalkConnection(
-	int waypointNum,
+	int targetWaypointNum,
 	int connectionNum,
 	WalkStep::Vec &route
 ) const {
 	const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + connectionNum;
-	const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + waypointNum;
+	const bsp_file::BSPWaypoint *target = m_bsp->Waypoints() + targetWaypointNum;
 
-	int dir = connection->waypoints[0] == waypointNum ? 0 : 1;
-	int otherWaypointNum = (int)connection->waypoints[dir ^ 1];
-	const bsp_file::BSPWaypoint *otherWaypoint = m_bsp->Waypoints() + otherWaypointNum;
+	int dir = connection->waypoints[0] == targetWaypointNum;
+	int startWaypointNum = (int)connection->waypoints[dir];
+	const bsp_file::BSPWaypoint *start = m_bsp->Waypoints() + startWaypointNum;
 
 	WalkStep step;
-	step.pos = Vec3(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
+	step.pos = Vec3(start->pos[0], start->pos[1], start->pos[2]);
 	step.connection = connectionNum;
 	step.flags = connection->flags;
-	step.waypoints[0] = waypointNum;
-	step.waypoints[1] = otherWaypointNum;
-	step.floors[0] = (int)waypoint->floorNum;
-	step.floors[1] = (int)otherWaypoint->floorNum;
+	step.waypoints[0] = startWaypointNum;
+	step.waypoints[1] = targetWaypointNum;
+	step.floors[0] = (int)start->floorNum;
+	step.floors[1] = (int)target->floorNum;
 	step.tri = -1;
 	step.slopeChange = false;
 
@@ -745,10 +756,9 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 
 	const size_t kSize = walkRoute->size();
 
-	for (size_t i = 0; i < kSize - 1; ++i) {
+	for (size_t i = 0; i < kSize; ++i) {
 		const WalkStep &cur = walkRoute[i];
-		const WalkStep &next = walkRoute[i+1];
-
+		
 		FloorMove::Step step;
 
 		if (cur.waypoints[0] != -1) { // waypoint move
@@ -785,6 +795,13 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 			moveRoute.steps->push_back(step);
 			continue;
 		}
+
+		if (i >= (kSize-1)) {
+			RAD_ASSERT(!moveRoute.steps->empty());
+			break; // no more moves
+		}
+
+		const WalkStep &next = walkRoute[i+1];
 
 		Vec3 ctrls[2];
 

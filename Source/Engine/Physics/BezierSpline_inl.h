@@ -68,6 +68,7 @@ void CachedCubicBZSpline<tNumPts>::Load(const CubicBZSpline &s, bool reverse) {
 		}
 
 		m_pts[i].offset = m_length;
+		m_pts[i].length = 0.f;
 
 		++i;
 	}
@@ -96,6 +97,7 @@ template <int tNumPts>
 inline CachedCubicBZSpline<tNumPts> &CachedCubicBZSpline<tNumPts>::operator = (const CachedCubicBZSpline &s) {
 	for (int i = 0; i < kNumPts; ++i)
 		m_pts[i] = s.m_pts[i];
+	m_length = s.m_length;
 	return *this;
 }
 
@@ -117,7 +119,6 @@ inline float CachedCubicBZSpline<tNumPts>::SmoothMotion::Eval(const CachedCubicB
 	const Point *point = &spline.m_pts[m_idx];
 
 	while (d >= (point->offset+point->length)) {
-		d -= point->offset;
 		++m_idx;
 		if (m_idx == kNumPts) {
 			pos = point->pos;
@@ -125,7 +126,7 @@ inline float CachedCubicBZSpline<tNumPts>::SmoothMotion::Eval(const CachedCubicB
 				*tangent = point->tangent;
 			if (t)
 				*t = 1.f;
-			return (distance - d);
+			return d - point->offset;
 		}
 		point = &spline.m_pts[m_idx];
 	}

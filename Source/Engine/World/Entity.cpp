@@ -47,6 +47,10 @@ otype(kOccupantType_None),
 flags(0) {
 	// avoid null bbox volumes
 	bbox.Initialize(-Vec3(8.f, 8.f, 8.f), Vec3(8.f, 8.f, 8.f));
+	angleSpring.length = 0.07f;
+	angleSpring.tolerance = 0.001f;
+	angles.inner = false;
+	angles.outer = true;
 }
 
 Entity::PSVars::PSVars() :

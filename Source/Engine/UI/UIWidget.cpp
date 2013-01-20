@@ -848,7 +848,7 @@ int Widget::lua_RemoveChild(lua_State *L)
 {
 	Ref w = GetRef<Widget>(L, "Widget", 1, true);
 	Ref x = GetRef<Widget>(L, "Widget", 2, true);
-	w->AddChild(x);
+	w->RemoveChild(x);
 	return 0;
 }
 

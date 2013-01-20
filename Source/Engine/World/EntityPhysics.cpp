@@ -99,11 +99,6 @@ void Entity::SeekAngles(float dt) {
 	// To do this, treat the angles as if they are in a different coordinate
 	// space than the actual spring, and map the spring length to the angle lerp.
 
-	m_ps.angles.inner = false;
-	m_ps.angles.outer = true;
-	m_ps.angleSpring.length = 0.07f;
-	m_ps.angleSpring.tolerance = 0.001f;
-
 	Vec3 x = m_ps.angles.pos;
 	m_ps.angles.pos = DeltaAngles(m_ps.angles.pos, m_ps.targetAngles);
 
@@ -122,6 +117,8 @@ void Entity::SeekAngles(float dt) {
 				m_ps.angles.pos[i] -= 360.f;
 		}
 	}
+
+//	COut(C_Debug) << "Target: (" << m_ps.targetAngles[2] << "), Angles: (" << m_ps.angles.pos[2] << ")" << std::endl;
 }
 
 void Entity::TickPhysics(

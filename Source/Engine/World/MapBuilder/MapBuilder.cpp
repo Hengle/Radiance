@@ -140,14 +140,13 @@ bool MapBuilder::ParseWaypoint(const EntSpawn &spawn) {
 		connection->waypoints.headId = waypoint->uid;
 		connection->waypoints.tail = 0;
 
-		float ctrls[2][3];
 		sscanf(
 			sz,
 			"%d %d ( %f %f %f ) ( %f %f %f )", 
 			&connection->waypoints.tailId, 
 			&connection->flags,
-			&ctrls[0][0], &ctrls[0][1], &ctrls[0][2],
-			&ctrls[1][0], &ctrls[1][1], &ctrls[1][2]
+			&connection->ctrls[0][0], &connection->ctrls[0][1], &connection->ctrls[0][2],
+			&connection->ctrls[1][0], &connection->ctrls[1][1], &connection->ctrls[1][2]
 		);
 
 		key.PrintfASCII("connection_fwd_start %i", i);
