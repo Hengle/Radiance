@@ -99,26 +99,26 @@ void Entity::SeekAngles(float dt) {
 	// To do this, treat the angles as if they are in a different coordinate
 	// space than the actual spring, and map the spring length to the angle lerp.
 
-	Vec3 x = m_ps.angles.pos;
 	m_ps.angles.pos = DeltaAngles(m_ps.angles.pos, m_ps.targetAngles);
 
-	if (!m_ps.angles.Update(dt, Vec3::Zero, m_ps.angleSpring))
-	{
-		m_ps.angles.pos = m_ps.targetAngles;
-	}
-	else
-	{
-		m_ps.angles.pos = WrapAngles(m_ps.targetAngles - m_ps.angles.pos);
-		for (int i = 0; i < 3; ++i)
-		{
-			if (m_ps.angles.pos[i] < 0)
-				m_ps.angles.pos[i] += 360.f;
-			if (m_ps.angles.pos[i] > 360.f)
-				m_ps.angles.pos[i] -= 360.f;
-		}
-	}
+	Vec3 x = m_ps.angles.pos;
 
-//	COut(C_Debug) << "Target: (" << m_ps.targetAngles[2] << "), Angles: (" << m_ps.angles.pos[2] << ")" << std::endl;
+	if (!m_ps.angles.Update(dt, Vec3::Zero, m_ps.angleSpring)) {
+		m_ps.angles.pos = m_ps.targetAngles;
+	} else {
+
+		Vec3 angles = WrapAngles(m_ps.targetAngles - m_ps.angles.pos);
+
+		for (int i = 0; i < 3; ++i) {
+			if (angles[i] < 0)
+				angles[i] += 360.f;
+			if (angles[i] > 360.f)
+				angles[i] -= 360.f;
+		}
+
+		COut(C_Debug) << "Target: (" << m_ps.targetAngles[2] << "), Angles: (" << angles[2] << "), Delta: (" << x[2] << ", " << m_ps.angles.pos[2] << ")" << std::endl;
+		m_ps.angles.pos = angles;
+	}
 }
 
 void Entity::TickPhysics(

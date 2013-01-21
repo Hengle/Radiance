@@ -139,10 +139,10 @@ RADENG_API Vec3 RADENG_CALL DeltaAngles(const Vec3 &start, const Vec3 &end, int 
 
 		if ((f&(1<<(bit+2))) || (!f && (e > s) && (e-s) > 180.f)) {
 			of |= 1<<(bit+2);
-			v[i] = 360.f - (e-s);
+			v[i] = s - (360 - e);
 		} else if ((f&(1<<(bit+3))) || (!f && (s > e) && (s-e) > 180.f)) {
 			of |= 1<<(bit+3);
-			v[i] = 360.f - (s-e);
+			v[i] = e + (360 - s);
 		} else {
 			v[i] = e-s;
 		}

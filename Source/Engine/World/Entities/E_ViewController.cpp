@@ -230,7 +230,7 @@ Vec3 E_ViewController::VecAnim::Tick(
 		curPos = targetPos;
 	}
 
-	return curPos - vec*distance;
+	return curPos + vec*distance;
 }
 
 Vec3 E_ViewController::Sway::Tick(List &list, float dt, const Vec3 &fwd) {
