@@ -16,8 +16,7 @@ namespace ska {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct Variant
-{
+struct Variant {
 	typedef zone_vector<Variant, ZSkaT>::type Vec;
 	float timeScale[2];
 	int loopCount[2];
@@ -27,8 +26,7 @@ struct Variant
 	String name;
 };
 
-struct AnimState
-{
+struct AnimState {
 	typedef zone_map<String, AnimState, ZSkaT>::type Map;
 	String name;
 	Variant::Vec variants;
@@ -36,8 +34,7 @@ struct AnimState
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS BlendTimer
-{
+class RADENG_CLASS BlendTimer {
 public:
 	BlendTimer();
 	~BlendTimer();
@@ -59,8 +56,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS Controller
-{
+class RADENG_CLASS Controller {
 public:
 	typedef ControllerRef Ref;
 	typedef ControllerWRef WRef;
@@ -70,12 +66,15 @@ public:
 
 	virtual bool Tick(
 		float dt,
+		float distance,
 		BoneTM *out,
 		int firstBone,
 		int numBones,
 		bool advance,
 		bool emitTags
 	) = 0;
+
+	virtual void ResetMotion() = 0;
 
 	void Activate(bool active=true);
 
@@ -111,10 +110,21 @@ protected:
 	virtual void OnActivate(bool active=true) {}
 
 	BoneTM::Ref AllocBoneArray();
-	void SetRot(const Quat &q) { m_q = q; }
-	void SetPos(const Vec3 &p) { m_p = p; }
-	void SetDeltaRot(const Quat &q) { m_dq = q; }
-	void SetDeltaPos(const Vec3 &p) { m_dp = p; }
+	void SetRot(const Quat &q) { 
+		m_q = q; 
+	}
+
+	void SetPos(const Vec3 &p) { 
+		m_p = p; 
+	}
+
+	void SetDeltaRot(const Quat &q) { 
+		m_dq = q; 
+	}
+
+	void SetDeltaPos(const Vec3 &p) { 
+		m_dp = p; 
+	}
 
 private:
 
@@ -139,8 +149,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS AnimationSource : public Controller
-{
+class RADENG_CLASS AnimationSource : public Controller {
 public:
 
 	typedef boost::shared_ptr<AnimationSource> Ref;
@@ -161,6 +170,7 @@ public:
 
 	virtual bool Tick(
 		float dt,
+		float distance,
 		BoneTM *out,
 		int firstBone,
 		int numBones,
@@ -168,6 +178,7 @@ public:
 		bool emitTags
 	);
 
+	virtual void ResetMotion();
 	void ResetLoopCount(int loopCount);
 	void SetTime(float dt);
 
@@ -184,9 +195,17 @@ protected:
 
 private:
 
-	RAD_DECLARE_GET(finished, bool) { return m_loopCount > 0 ? (m_loopNum==m_loopCount) : false; }
-	RAD_DECLARE_GET(timeScale, float) { return m_timeScale; }
-	RAD_DECLARE_SET(timeScale, float) { m_timeScale = value; }
+	RAD_DECLARE_GET(finished, bool) { 
+		return m_loopCount > 0 ? (m_loopNum==m_loopCount) : false; 
+	}
+
+	RAD_DECLARE_GET(timeScale, float) { 
+		return m_timeScale; 
+	}
+
+	RAD_DECLARE_SET(timeScale, float) { 
+		m_timeScale = value; 
+	}
 
 	AnimationSource(
 		Animation &anim,
@@ -220,8 +239,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS BlendToController : public Controller
-{
+class RADENG_CLASS BlendToController : public Controller {
 public:
 
 	typedef boost::shared_ptr<BlendToController> Ref;
@@ -238,12 +256,15 @@ public:
 
 	virtual bool Tick(
 		float dt,
+		float distance,
 		BoneTM *out,
 		int firstBone,
 		int numBones,
 		bool advance,
 		bool emitTags
 	);
+
+	virtual void ResetMotion();
 
 	RAD_DECLARE_READONLY_PROPERTY(BlendToController, validRootAnim, bool);
 
@@ -264,14 +285,12 @@ private:
 
 	class Blend;
 	typedef boost::shared_ptr<Blend> BlendRef;
-	struct Union
-	{
+	struct Union {
 		BlendRef blend;
 		Controller::Ref controller;
 	};
 
-	class Blend
-	{
+	class Blend {
 	public:
 		typedef boost::shared_ptr<Blend> Ref;
 		static void Delete(Blend *b);
@@ -280,7 +299,8 @@ private:
 		void Activate(bool activate);
 
 		bool Tick(
-			float dt, 
+			float dt,
+			float distance,
 			BoneTM &tm,
 			BoneTM &delta,
 			BoneTM *out,
@@ -289,6 +309,8 @@ private:
 			bool advance,
 			bool emitTags
 		);
+
+		void ResetMotion();
 
 		RAD_DECLARE_READONLY_PROPERTY(Blend, out, float);
 		RAD_DECLARE_READONLY_PROPERTY(Blend, in, float);
@@ -311,8 +333,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS AnimationVariantsSource : public Controller
-{
+class RADENG_CLASS AnimationVariantsSource : public Controller {
 public:
 
 	typedef boost::shared_ptr<AnimationVariantsSource> Ref;
@@ -329,12 +350,15 @@ public:
 
 	virtual bool Tick(
 		float dt,
+		float distance,
 		BoneTM *out,
 		int firstBone,
 		int numBones,
 		bool advance,
 		bool emitTags
 	);
+
+	virtual void ResetMotion();
 
 	Ref Clone(const Notify::Ref &notify);
 
@@ -358,8 +382,7 @@ private:
 	virtual RAD_DECLARE_GET(in, float) { return m_blend ? m_blend->in : 0.f; }
 	virtual RAD_DECLARE_GET(out, float) { return m_blend ? m_blend->out : 0.f; }
 
-	struct Node
-	{
+	struct Node {
 		typedef zone_map<int, Node, ZSkaT>::type Map;
 		Animation *anim;
 		float in;

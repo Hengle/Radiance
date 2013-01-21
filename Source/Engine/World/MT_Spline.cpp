@@ -158,10 +158,7 @@ void Entity::Tick_MT_Spline(
 		m_ps.angles.pos = LookAngles(fwd);
 	}
 
-	Move(true, false);
-
-	m_ps.cameraPos = m_ps.worldPos;
-	m_ps.cameraAngles = m_ps.worldAngles;
+	Move();
 
 	if (m_ps.flags&kPhysicsFlag_SplineEvents)
 	{

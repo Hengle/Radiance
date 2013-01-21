@@ -211,7 +211,8 @@ SkMeshDrawModel::Ref SkMeshDrawModel::New(
 SkMeshDrawModel::SkMeshDrawModel(Entity *entity, const r::SkMesh::Ref &m) : 
 DrawModel(entity),
 m_mesh(m),
-m_motionType(ska::Ska::MT_None) {
+m_motionScale(1.f),
+m_timeScale(1.f) {
 }
 
 SkMeshDrawModel::~SkMeshDrawModel() {
@@ -221,12 +222,11 @@ void SkMeshDrawModel::OnTick(float time, float dt)
 {
 	if (visible) {
 		m_mesh->ska->Tick(
-			dt, 
+			dt * m_timeScale, 
+			entity->ps->distanceMoved * m_motionScale,
 			true, 
 			true, 
-			Mat4::Identity,
-			m_motionType,
-			m_motion
+			Mat4::Identity
 		);
 	}
 }

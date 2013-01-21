@@ -16,8 +16,7 @@ namespace world {
 class Entity;
 class WorldDraw;
 
-class RADENG_CLASS DrawModel
-{
+class RADENG_CLASS DrawModel {
 public:
 	typedef boost::shared_ptr<DrawModel> Ref;
 	typedef boost::weak_ptr<DrawModel> WRef;
@@ -42,8 +41,7 @@ protected:
 	void RefBatch(const MBatchDraw::Ref &batch);
 	bool GetTransform(Vec3 &pos, Vec3 &angles) const;
 
-	class DrawBatch : public MBatchDraw
-	{
+	class DrawBatch : public MBatchDraw {
 	public:
 		DrawBatch(DrawModel &model, int matId);
 	protected:
@@ -125,8 +123,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS MeshDrawModel : public DrawModel
-{
+class RADENG_CLASS MeshDrawModel : public DrawModel {
 public:
 	typedef boost::shared_ptr<MeshDrawModel> Ref;
 	typedef boost::weak_ptr<MeshDrawModel> WRef;
@@ -138,10 +135,11 @@ public:
 
 private:
 
-	RAD_DECLARE_GET(mesh, const r::Mesh::Ref&) { return m_mesh; }
+	RAD_DECLARE_GET(mesh, const r::Mesh::Ref&) { 
+		return m_mesh; 
+	}
 
-	class Batch : public DrawModel::DrawBatch
-	{
+	class Batch : public DrawModel::DrawBatch {
 	public:
 		typedef boost::shared_ptr<Batch> Ref;
 		Batch(DrawModel &model, const r::Mesh::Ref &m, int matId);
@@ -164,8 +162,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS MeshBundleDrawModel : public DrawModel
-{
+class RADENG_CLASS MeshBundleDrawModel : public DrawModel {
 public:
 	typedef boost::shared_ptr<MeshBundleDrawModel> Ref;
 	typedef boost::weak_ptr<MeshBundleDrawModel> WRef;
@@ -177,10 +174,11 @@ public:
 
 private:
 
-	RAD_DECLARE_GET(bundle, const r::MeshBundle::Ref&) { return m_bundle; }
+	RAD_DECLARE_GET(bundle, const r::MeshBundle::Ref&) { 
+		return m_bundle; 
+	}
 
-	class Batch : public DrawModel::DrawBatch
-	{
+	class Batch : public DrawModel::DrawBatch {
 	public:
 		typedef boost::shared_ptr<Batch> Ref;
 		Batch(DrawModel &model, const r::Mesh::Ref &m, int matId);
@@ -203,8 +201,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS SkMeshDrawModel : public DrawModel
-{
+class RADENG_CLASS SkMeshDrawModel : public DrawModel {
 public:
 	typedef boost::shared_ptr<SkMeshDrawModel> Ref;
 	typedef boost::weak_ptr<SkMeshDrawModel> WRef;
@@ -215,9 +212,11 @@ public:
 	
 	Vec3 BonePos(int idx) const;
 
+	RAD_DECLARE_PROPERTY(SkMeshDrawModel, motionScale, float, float);
+	RAD_DECLARE_PROPERTY(SkMeshDrawModel, timeScale, float, float);
 	RAD_DECLARE_READONLY_PROPERTY(SkMeshDrawModel, mesh, const r::SkMesh::Ref&);
-	RAD_DECLARE_PROPERTY(SkMeshDrawModel, motionType, ska::Ska::MotionType, ska::Ska::MotionType);
-	RAD_DECLARE_READONLY_PROPERTY(SkMeshDrawModel, motion, const ska::BoneTM&);
+	RAD_DECLARE_READONLY_PROPERTY(SkMeshDrawModel, deltaMotion, const ska::BoneTM*);
+	RAD_DECLARE_READONLY_PROPERTY(SkMeshDrawModel, absMotion, const ska::BoneTM*);
 
 protected:
 
@@ -225,13 +224,35 @@ protected:
 
 private:
 
-	RAD_DECLARE_GET(mesh, const r::SkMesh::Ref&) { return m_mesh; }
-	RAD_DECLARE_GET(motionType, ska::Ska::MotionType) { return m_motionType; }
-	RAD_DECLARE_SET(motionType, ska::Ska::MotionType) { m_motionType = value; }
-	RAD_DECLARE_GET(motion, const ska::BoneTM&) { return m_motion; }
+	RAD_DECLARE_GET(motionScale, float) { 
+		return m_motionScale;
+	}
 
-	class Batch : public DrawModel::DrawBatch
-	{
+	RAD_DECLARE_SET(motionScale, float) {
+		m_motionScale = value;
+	}
+
+	RAD_DECLARE_GET(timeScale, float) { 
+		return m_timeScale;
+	}
+
+	RAD_DECLARE_SET(timeScale, float) {
+		m_timeScale = value;
+	}
+
+	RAD_DECLARE_GET(mesh, const r::SkMesh::Ref&) { 
+		return m_mesh; 
+	}
+
+	RAD_DECLARE_GET(deltaMotion, const ska::BoneTM*) { 
+		return m_mesh->ska->deltaMotion; 
+	}
+
+	RAD_DECLARE_GET(absMotion, const ska::BoneTM*) { 
+		return m_mesh->ska->absMotion;
+	}
+
+	class Batch : public DrawModel::DrawBatch {
 	public:
 		typedef boost::shared_ptr<Batch> Ref;
 		Batch(DrawModel &model, const r::SkMesh::Ref &m, int idx, int matId);
@@ -250,9 +271,9 @@ private:
 
 	SkMeshDrawModel(Entity *entity, const r::SkMesh::Ref &m);
 
-	ska::BoneTM m_motion;
 	r::SkMesh::Ref m_mesh;
-	ska::Ska::MotionType m_motionType;
+	float m_motionScale;
+	float m_timeScale;
 };
 
 

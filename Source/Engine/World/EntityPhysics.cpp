@@ -64,31 +64,11 @@ Vec3 Entity::ApplyVelocity(float dt) {
 	return m_ps.pos + m_ps.velocity * dt;
 }
 
-void Entity::Move(bool touch, bool clip) {
-	Vec3 newPos;
-
-	switch (m_psv.motionType) {
-	case ska::Ska::MT_Relative:
-		m_ps.angles.pos = WrapAngles(AnglesFromQuat(m_psv.motion.r) + m_ps.angles.pos);
-		m_ps.worldAngles = WrapAngles(m_ps.angles.pos + m_ps.originAngles);
-		m_ps.pos += RotateVector(m_psv.motion.t, m_ps.worldAngles);
-		newPos = m_ps.pos + m_ps.origin;
-		break;
-	case ska::Ska::MT_Absolute:
-		m_ps.worldAngles = WrapAngles(m_ps.angles.pos + m_ps.originAngles + AnglesFromQuat(m_psv.motion.r));
-		newPos = m_ps.pos + RotateVector(m_psv.motion.t, m_ps.worldAngles) + m_ps.origin;
-		break;
-	default:
-		newPos = m_ps.pos + m_ps.origin;
-		m_ps.worldAngles = WrapAngles(m_ps.angles.pos + m_ps.originAngles);
-		break;
-	}
-
-	// TODO: touch / collision
-	m_ps.worldPos = newPos;
+void Entity::Move() {
+	m_ps.worldAngles = WrapAngles(m_ps.angles.pos + m_ps.originAngles);
+	m_ps.worldPos = m_ps.pos + m_ps.origin;
 	m_ps.cameraPos = m_ps.worldPos + m_ps.cameraShift;
 	m_ps.cameraAngles = m_ps.worldAngles;
-
 	Link();
 }
 
@@ -116,7 +96,7 @@ void Entity::SeekAngles(float dt) {
 				angles[i] -= 360.f;
 		}
 
-		COut(C_Debug) << "Target: (" << m_ps.targetAngles[2] << "), Angles: (" << angles[2] << "), Delta: (" << x[2] << ", " << m_ps.angles.pos[2] << ")" << std::endl;
+//		COut(C_Debug) << "Target: (" << m_ps.targetAngles[2] << "), Angles: (" << angles[2] << "), Delta: (" << x[2] << ", " << m_ps.angles.pos[2] << ")" << std::endl;
 		m_ps.angles.pos = angles;
 	}
 }
@@ -128,6 +108,7 @@ void Entity::TickPhysics(
 ) {
 	switch (m_ps.mtype) {
 	case kMoveType_None:
+		m_ps.distanceMoved = 0.f;
 		m_ps.worldPos = m_ps.origin + m_ps.pos;
 		m_ps.worldAngles = WrapAngles(m_ps.originAngles + m_ps.angles.pos);
 		m_ps.cameraPos = m_ps.worldPos + m_ps.cameraShift;

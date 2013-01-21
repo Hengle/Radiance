@@ -41,6 +41,7 @@ maxSplineBank(0.f),
 splineBankScale(0.f),
 splineBankLerp(-1.f),
 autoDecelDistance(0.f),
+distanceMoved(0.f),
 mtype(kMoveType_None),
 stype(kSolidType_None),
 otype(kOccupantType_None),
@@ -55,12 +56,7 @@ flags(0) {
 
 Entity::PSVars::PSVars() :
 splineFwd(Vec3::Zero),
-lerpFlags(0),
-splineId(-1),
-motionType(ska::Ska::MT_None) {
-	motion.s = Vec3(1, 1, 1);
-	motion.r = Quat::Identity;
-	motion.t = Vec3::Zero;
+splineId(-1) {
 }
 
 Entity::Ref Entity::Create(const char *classname) {
@@ -251,9 +247,10 @@ void Entity::PrivateTick(
 		Tick(frame, (worldTime - m_lastTick) / 1000.f, time);
 		m_lastTick = worldTime;
 	}
+
 	m_tasks.Tick(*this, dt, xtime::TimeSlice::Infinite, kTickFlag_PostTick);
-	TickDrawModels(dt); // before physics, for motion
 	TickPhysics(frame, dt, time);
+	TickDrawModels(dt);
 	m_tasks.Tick(*this, dt, xtime::TimeSlice::Infinite, kTickFlag_PostPhysics);
 	TickSounds(dt);
 }
@@ -261,12 +258,6 @@ void Entity::PrivateTick(
 void Entity::TickDrawModels(float dt) {
 	for (DrawModel::Map::const_iterator it = m_models.begin(); it != m_models.end(); ++it) {
 		it->second->Tick(App::Get()->time, dt);
-
-		SkMeshDrawModel::Ref skMesh(boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second));
-		if (skMesh) {
-			m_psv.motion = skMesh->motion;
-			m_psv.motionType = skMesh->motionType;
-		}
 	}
 }
 
@@ -424,6 +415,14 @@ void Entity::PushCallTable(lua_State *L) {
 	lua_setfield(L, -2, "SetDrawModelBounds");
 	lua_pushcfunction(L, lua_DrawModelBounds);
 	lua_setfield(L, -2, "DrawModelBounds");
+	lua_pushcfunction(L, lua_SetDrawModelTimeScale);
+	lua_setfield(L, -2, "SetDrawModelTimeScale");
+	lua_pushcfunction(L, lua_DrawModelTimeScale);
+	lua_setfield(L, -2, "DrawModelTimeScale");
+	lua_pushcfunction(L, lua_SetDrawModelMotionScale);
+	lua_setfield(L, -2, "SetDrawModelMotionScale");
+	lua_pushcfunction(L, lua_DrawModelMotionScale);
+	lua_setfield(L, -2, "DrawModelMotionScale");
 	lua_pushcfunction(L, lua_FadeDrawModel);
 	lua_setfield(L, -2, "FadeDrawModel");
 	lua_pushcfunction(L, lua_DrawModelBonePos);
@@ -471,6 +470,7 @@ void Entity::PushCallTable(lua_State *L) {
 	LUART_REGISTER_GETSET(L, SplineBankScale);
 	LUART_REGISTER_GETSET(L, SplineBankLerp);
 	LUART_REGISTER_GETSET(L, AutoDecelDistance);
+	LUART_REGISTER_GET(L, DistanceMoved);
 	LUART_REGISTER_GETSET(L, MoveType);
 	LUART_REGISTER_GETSET(L, SolidType);
 	LUART_REGISTER_GETSET(L, OccupantType);
@@ -638,7 +638,7 @@ int Entity::lua_AttachDrawModel(lua_State *L) {
 	{
 		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
 		if (skModel) { 
-			// is there already a view model with this attached?
+			// view model with this attached?
 			DrawModel::Map::const_iterator it = self->m_models.begin();
 			for(;it != self->m_models.end(); ++it) {
 				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
@@ -662,7 +662,7 @@ int Entity::lua_AttachDrawModel(lua_State *L) {
 	{
 		D_Mesh::Ref dmesh = lua::SharedPtr::Get<D_Mesh>(L, "D_Mesh", 2, false);
 		if (dmesh) { 
-			// already a view model with this attached?
+			// view model with this attached?
 			DrawModel::Map::const_iterator it = self->m_models.begin();
 			for (;it != self->m_models.end(); ++it) {
 				MeshBundleDrawModel::Ref r = boost::dynamic_pointer_cast<MeshBundleDrawModel>(it->second);
@@ -694,7 +694,7 @@ int Entity::lua_RemoveDrawModel(lua_State *L) {
 	{
 		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
 		if (skModel) { 
-			// is there a view model with this attached?
+			// view model with this attached?
 			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it) {
 				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
 				if (r && r->mesh.get().get() == skModel->mesh.get().get()) {
@@ -709,7 +709,7 @@ int Entity::lua_RemoveDrawModel(lua_State *L) {
 	{
 		D_Mesh::Ref dmesh = lua::SharedPtr::Get<D_Mesh>(L, "D_Mesh", 2, false);
 		if (dmesh) { 
-			// already a view model with this attached?
+			// view model with this attached?
 			DrawModel::Map::const_iterator it = self->m_models.begin();
 			for (;it != self->m_models.end(); ++it) {
 				MeshBundleDrawModel::Ref r = boost::dynamic_pointer_cast<MeshBundleDrawModel>(it->second);
@@ -734,7 +734,7 @@ int Entity::lua_SetDrawModelAngles(lua_State *L) {
 	{
 		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
 		if (skModel) { 
-			// is there a view controller with this attached?
+			// view model with this attached?
 			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it) {
 				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
 				if (r && r->mesh.get().get() == skModel->mesh.get().get()) {
@@ -749,7 +749,7 @@ int Entity::lua_SetDrawModelAngles(lua_State *L) {
 	{
 		D_Mesh::Ref dmesh = lua::SharedPtr::Get<D_Mesh>(L, "D_Mesh", 2, false);
 		if (dmesh) { 
-			// already a view model with this attached?
+			// view model with this attached?
 			DrawModel::Map::const_iterator it = self->m_models.begin();
 			for (;it != self->m_models.end(); ++it) {
 				MeshBundleDrawModel::Ref r = boost::dynamic_pointer_cast<MeshBundleDrawModel>(it->second);
@@ -766,26 +766,38 @@ int Entity::lua_SetDrawModelAngles(lua_State *L) {
 	return 0;
 }
 
-int Entity::lua_SetDrawModelMotionType(lua_State *L) {
+int Entity::lua_DrawModelAngles(lua_State *L) {
 	Entity *self = WorldLua::EntFramePtr(L, 1, true);
-	int motionType = (int)luaL_checkinteger(L, 3);
-
-	if (motionType < ska::Ska::MT_None || motionType > ska::Ska::MT_Absolute)
-		luaL_argerror(L, 3, "motion type out of range");
-
+	
 	// figure out what kind of model is attached:
 	{
 		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
 		if (skModel) { 
-			// is there a view controller with this attached?
+			// view model with this attached?
 			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it) {
 				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
 				if (r && r->mesh.get().get() == skModel->mesh.get().get()) {
-					r->motionType = (ska::Ska::MotionType)motionType;
-					break;
+					lua::Marshal<Vec3>::Push(L, r->angles);
+					return 1;
 				}
 			}
 
+			return 0;
+		}
+	}
+	{
+		D_Mesh::Ref dmesh = lua::SharedPtr::Get<D_Mesh>(L, "D_Mesh", 2, false);
+		if (dmesh) { 
+			// view model with this attached?
+			DrawModel::Map::const_iterator it = self->m_models.begin();
+			for (;it != self->m_models.end(); ++it) {
+				MeshBundleDrawModel::Ref r = boost::dynamic_pointer_cast<MeshBundleDrawModel>(it->second);
+				if (r && r->bundle.get().get() == dmesh->bundle.get().get()) {
+					lua::Marshal<Vec3>::Push(L, r->angles);
+					return 1;
+				}
+			}
+			
 			return 0;
 		}
 	}
@@ -801,7 +813,7 @@ int Entity::lua_SetDrawModelScale(lua_State *L) {
 	{
 		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
 		if (skModel) { 
-			// is there a view controller with this attached?
+			// view model with this attached?
 			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it) {
 				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
 				if (r && r->mesh.get().get() == skModel->mesh.get().get()) {
@@ -816,13 +828,52 @@ int Entity::lua_SetDrawModelScale(lua_State *L) {
 	{
 		D_Mesh::Ref dmesh = lua::SharedPtr::Get<D_Mesh>(L, "D_Mesh", 2, false);
 		if (dmesh) { 
-			// already a view model with this attached?
+			// view model with this attached?
 			DrawModel::Map::const_iterator it = self->m_models.begin();
 			for (;it != self->m_models.end(); ++it) {
 				MeshBundleDrawModel::Ref r = boost::dynamic_pointer_cast<MeshBundleDrawModel>(it->second);
 				if (r && r->bundle.get().get() == dmesh->bundle.get().get()) {
 					r->scale = scale;
 					break;
+				}
+			}
+			
+			return 0;
+		}
+	}
+
+	return 0;
+}
+
+int Entity::lua_DrawModelScale(lua_State *L) {
+	Entity *self = WorldLua::EntFramePtr(L, 1, true);
+	
+	// figure out what kind of model is attached:
+	{
+		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
+		if (skModel) { 
+			// view model with this attached?
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it) {
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
+				if (r && r->mesh.get().get() == skModel->mesh.get().get()) {
+					lua::Marshal<Vec3>::Push(L, r->scale);
+					return 1;
+				}
+			}
+			
+			return 0;
+		}
+	}
+	{
+		D_Mesh::Ref dmesh = lua::SharedPtr::Get<D_Mesh>(L, "D_Mesh", 2, false);
+		if (dmesh) { 
+			// view model with this attached?
+			DrawModel::Map::const_iterator it = self->m_models.begin();
+			for (;it != self->m_models.end(); ++it) {
+				MeshBundleDrawModel::Ref r = boost::dynamic_pointer_cast<MeshBundleDrawModel>(it->second);
+				if (r && r->bundle.get().get() == dmesh->bundle.get().get()) {
+					lua::Marshal<Vec3>::Push(L, r->scale);
+					return 1;
 				}
 			}
 			
@@ -1073,6 +1124,100 @@ int Entity::lua_DrawModelBounds(lua_State *L) {
 	return 0;
 }
 
+int Entity::lua_SetDrawModelTimeScale(lua_State *L) {
+	Entity *self = WorldLua::EntFramePtr(L, 1, true);
+	float timeScale = (float)luaL_checknumber(L, 3);
+
+	// figure out what kind of model is attached:
+	{
+		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
+		if (skModel) { 
+			// is there a view controller with this attached?
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it) {
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
+				if (r && r->mesh.get().get() == skModel->mesh.get().get()) {
+					r->timeScale = timeScale;
+					break;
+				}
+			}
+			
+			return 0;
+		}
+	}
+
+	return 0;
+}
+
+int Entity::lua_DrawModelTimeScale(lua_State *L) {
+	Entity *self = WorldLua::EntFramePtr(L, 1, true);
+	
+	// figure out what kind of model is attached:
+	{
+		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
+		if (skModel) { 
+			// is there a view controller with this attached?
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it) {
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
+				if (r && r->mesh.get().get() == skModel->mesh.get().get()) {
+					lua_pushnumber(L, r->timeScale);
+					return 1;
+				}
+			}
+			
+			return 0;
+		}
+	}
+
+	return 0;
+}
+
+int Entity::lua_SetDrawModelMotionScale(lua_State *L) {
+	Entity *self = WorldLua::EntFramePtr(L, 1, true);
+	float motionScale = (float)luaL_checknumber(L, 3);
+
+	// figure out what kind of model is attached:
+	{
+		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
+		if (skModel) { 
+			// is there a view controller with this attached?
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it) {
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
+				if (r && r->mesh.get().get() == skModel->mesh.get().get()) {
+					r->motionScale = motionScale;
+					break;
+				}
+			}
+			
+			return 0;
+		}
+	}
+
+	return 0;
+}
+
+int Entity::lua_DrawModelMotionScale(lua_State *L) {
+	Entity *self = WorldLua::EntFramePtr(L, 1, true);
+	
+	// figure out what kind of model is attached:
+	{
+		D_SkModel::Ref skModel = lua::SharedPtr::Get<D_SkModel>(L, "D_SkModel", 2, false);
+		if (skModel) { 
+			// is there a view controller with this attached?
+			for (DrawModel::Map::const_iterator it = self->m_models.begin(); it != self->m_models.end(); ++it) {
+				SkMeshDrawModel::Ref r = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
+				if (r && r->mesh.get().get() == skModel->mesh.get().get()) {
+					lua_pushnumber(L, r->motionScale);
+					return 1;
+				}
+			}
+			
+			return 0;
+		}
+	}
+
+	return 0;
+}
+
 int Entity::lua_FadeDrawModel(lua_State *L) {
 	Entity *self = WorldLua::EntFramePtr(L, 1, true);
 	Vec4 rgba = lua::Marshal<Vec4>::Get(L, 3, true);
@@ -1294,6 +1439,7 @@ ENT_GETSET(Entity, MaxSplineBank, float, m_ps.maxSplineBank);
 ENT_GETSET(Entity, SplineBankScale, float, m_ps.splineBankScale);
 ENT_GETSET(Entity, SplineBankLerp, float, m_ps.splineBankLerp);
 ENT_GETSET(Entity, AutoDecelDistance, float, m_ps.autoDecelDistance);
+ENT_GET(Entity, DistanceMoved, float, m_ps.distanceMoved);
 ENT_GET(Entity, MoveType, int, m_ps.mtype);
 ENT_SET_CUSTOM(Entity, MoveType, self->m_ps.mtype = (MoveType)luaL_checkinteger(L, 2));
 ENT_GET(Entity, SolidType, int, m_ps.stype);

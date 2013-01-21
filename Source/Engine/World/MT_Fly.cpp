@@ -33,7 +33,7 @@ void Entity::Tick_MT_Fly(
 	}
 
 	m_ps.pos = ApplyVelocity(dt);
-	Move(true, false);
+	Move();
 
 	m_ps.cameraPos = m_ps.pos + m_ps.origin;
 	m_ps.cameraAngles = m_ps.worldAngles;

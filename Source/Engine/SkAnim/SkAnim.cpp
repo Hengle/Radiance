@@ -272,7 +272,7 @@ float Animation::RAD_IMPLEMENT_GET(fps) {
 }
 
 float Animation::RAD_IMPLEMENT_GET(distance) {
-	return 0.0f;
+	return m_danim->distance;
 }
 
 float Animation::RAD_IMPLEMENT_GET(length) {
@@ -316,7 +316,6 @@ void Animation::BlendFrames(int frameSrc, int frameDst, float blend, BoneTM *out
 	RAD_ASSERT(frameSrc < m_danim->numFrames);
 	RAD_ASSERT(frameDst < m_danim->numFrames);
 
-	out += firstBone;
 	const S16 *rTable = dska.rTable;
 	const S16 *sTable = dska.sTable;
 	const S16 *tTable = dska.tTable;
@@ -472,6 +471,14 @@ void Ska::Init() {
 	for (int i = 0; i < m_dska->numBones; ++i)
 		details::Mat4x3Ident(m_boneFloats + i*SIMDDriver::kNumBoneFloats);
 
+	m_deltaMotion.s = Vec3(1, 1, 1);
+	m_deltaMotion.r = Quat::Identity;
+	m_deltaMotion.t = Vec3::Zero;
+
+	m_absMotion.s = Vec3(1, 1, 1);
+	m_absMotion.r = Quat::Identity;
+	m_absMotion.t = Vec3::Zero;
+
 	m_ident = true;
 }
 
@@ -510,11 +517,10 @@ const float *Ska::BoneTMs(const RowMajorTag&) const {
 
 void Ska::Tick(
 	float dt, 
+	float distance,
 	bool advance, 
 	bool emitTags, 
-	const Mat4 &root, 
-	MotionType motionType,
-	BoneTM &outMotion
+	const Mat4 &root
 ) {
 	if (!m_root) {
 		if (!m_ident) {
@@ -536,6 +542,7 @@ void Ska::Tick(
 
 	bool valid = m_root->Tick(
 		dt,
+		distance,
 		m_boneTMs,
 		0,
 		m_dska->numBones,
@@ -560,23 +567,14 @@ void Ska::Tick(
 	++m_boneFrame;
 	m_ident = false;
 
-	outMotion.s = Vec3(1, 1, 1);
-
-	switch (motionType) {
-	case MT_None:
-		outMotion.r = Quat::Identity;
-		outMotion.t = Vec3::Zero;
-		break;
-	case MT_Relative:
-		outMotion.r = m_root->deltaRot;
-		outMotion.t = m_root->deltaPos;
-		break;
-	case MT_Absolute:
-		outMotion.r = m_root->rot;
-		outMotion.t = m_root->pos;
-		break;
-	}
-
+	m_deltaMotion.s = Vec3(1, 1, 1);
+	m_deltaMotion.r = m_root->deltaRot;
+	m_deltaMotion.t = m_root->deltaPos;
+	
+	m_absMotion.s = Vec3(1, 1, 1);
+	m_absMotion.r = m_root->rot;
+	m_absMotion.t = m_root->pos;
+	
 	float tempBoneMtx[2][SIMDDriver::kNumBoneFloats];
 	float *outMat[2] = { tempBoneMtx[0], tempBoneMtx[1] };
 	float *worldBone = m_worldBones+SIMDDriver::kNumBoneFloats;
@@ -589,7 +587,7 @@ void Ska::Tick(
 
 		const float *parent = (m_worldBones+SIMDDriver::kNumBoneFloats) + parentIdx*SIMDDriver::kNumBoneFloats;
 
-		if (i > 0 || motionType == MT_None) {
+		if (i > 0) {
 			Mat4 s = Mat4::Scaling(*reinterpret_cast<const Scale3*>(&tm.s));
 			Mat4 r = Mat4::Rotation(tm.r);
 			Mat4 t = Mat4::Translation(tm.t);

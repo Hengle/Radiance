@@ -27,11 +27,12 @@ void Entity::Tick_MT_Floor(
 	float dt,
 	const xtime::TimeSlice &time
 ) {
+	m_ps.distanceMoved = 0.f;
 	TransitionFloorMove();
 
 	if (!m_ps.activeMove) {
 		m_ps.velocity = Vec3::Zero;
-		Move(false, false);
+		Move();
 		return;
 	}
 
@@ -46,7 +47,7 @@ void Entity::Tick_MT_Floor(
 
 	FloorMove::StringVec events;
 
-	float moved = m_ps.activeMove->Move(m_ps.moveState, moveLen, distanceRemaining, events);
+	m_ps.distanceMoved = m_ps.activeMove->Move(m_ps.moveState, moveLen, distanceRemaining, events);
 	m_ps.origin = m_ps.moveState.pos.pos;
 
 	if (!events.empty()) {
@@ -60,11 +61,15 @@ void Entity::Tick_MT_Floor(
 		m_ps.flags |= kPhysicsFlag_Friction;
 	}
 
+	if (distanceRemaining < 0.01f) {
+		m_ps.activeMove.reset(); // done with this move.
+	}
+
 	m_ps.targetAngles = LookAngles(m_ps.moveState.facing);
 	m_ps.targetAngles[0] = 0.f;
 	m_ps.targetAngles[1] = 0.f;
 	SeekAngles(dt);
-	Move(false, false);
+	Move();
 }
 
 } // world

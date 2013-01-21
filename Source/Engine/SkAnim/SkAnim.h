@@ -241,13 +241,6 @@ class RADENG_CLASS Ska {
 	RAD_EVENT_CLASS(EventNoAccess)
 public:
 
-	enum MotionType
-	{
-		MT_None,
-		MT_Relative,
-		MT_Absolute
-	};
-
 	typedef SkaRef Ref;
 	typedef SkaWRef WRef;
 
@@ -268,16 +261,17 @@ public:
 	// the bone array, and emits animation tags.
 	void Tick(
 		float dt, 
+		float distance,
 		bool advance, 
 		bool emitTags, 
-		const Mat4 &root, 
-		MotionType motionType,
-		BoneTM &outMotion
+		const Mat4 &root
 	);
 
 	RAD_DECLARE_READONLY_PROPERTY(Ska, numBones, int);
 	RAD_DECLARE_READONLY_PROPERTY(Ska, anims, const Animation::Map*);
 	RAD_DECLARE_READONLY_PROPERTY(Ska, boneFrame, int); //++ per Tick()
+	RAD_DECLARE_READONLY_PROPERTY(Ska, deltaMotion, const BoneTM*);
+	RAD_DECLARE_READONLY_PROPERTY(Ska, absMotion, const BoneTM*);
 	RAD_DECLARE_PROPERTY(Ska, root, const ControllerRef&, const ControllerRef&);
 
 	AnimTagEvent OnTag;
@@ -287,11 +281,33 @@ public:
 
 private:
 
-	RAD_DECLARE_GET(numBones, int) { return m_dska->numBones; }
-	RAD_DECLARE_GET(anims, const Animation::Map*) { return &m_anims; }
-	RAD_DECLARE_GET(root, const ControllerRef&) { return m_root; }
-	RAD_DECLARE_SET(root, const ControllerRef&) { m_root = value; }
-	RAD_DECLARE_GET(boneFrame, int) { return m_boneFrame; }
+	RAD_DECLARE_GET(numBones, int) { 
+		return m_dska->numBones; 
+	}
+
+	RAD_DECLARE_GET(anims, const Animation::Map*) { 
+		return &m_anims; 
+	}
+
+	RAD_DECLARE_GET(root, const ControllerRef&) { 
+		return m_root; 
+	}
+
+	RAD_DECLARE_SET(root, const ControllerRef&) { 
+		m_root = value; 
+	}
+
+	RAD_DECLARE_GET(boneFrame, int) { 
+		return m_boneFrame; 
+	}
+
+	RAD_DECLARE_GET(deltaMotion, const BoneTM*) {
+		return &m_deltaMotion;
+	}
+
+	RAD_DECLARE_GET(absMotion, const BoneTM*) {
+		return &m_absMotion;
+	}
 
 	friend class Animation;
 	friend class Controller;
@@ -299,6 +315,8 @@ private:
 	
 	Animation::Map m_anims;
 	ControllerRef m_root;
+	BoneTM m_deltaMotion;
+	BoneTM m_absMotion;
 	float *m_boneFloats;
 	float *m_cmBoneFloats;
 	float *m_worldBones;

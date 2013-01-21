@@ -115,6 +115,7 @@ struct PState {
 	float splineBankScale;
 	float splineBankLerp;
 	float autoDecelDistance;
+	float distanceMoved; // set by physics engine
 	MoveType mtype;
 	SolidType stype;
 	OccupantType otype;
@@ -238,11 +239,8 @@ protected:
 	struct PSVars {
 		PSVars();
 		Vec3 splineFwd;
-		ska::BoneTM motion;
-		int lerpFlags;
 		int splineId;
 		int splineIdx;
-		ska::Ska::MotionType motionType;
 	};
 
 	virtual void PreTick(
@@ -305,7 +303,7 @@ protected:
 	void UpdateVelocity(float dt);
 	void AutoFace(float dt);
 	Vec3 ApplyVelocity(float dt);
-	void Move(bool touch, bool clip);
+	void Move();
 	void TransitionFloorMove();
 	void SetNextTick(int millis);
 
@@ -350,14 +348,19 @@ private:
 	static int lua_AttachDrawModel(lua_State *L);
 	static int lua_RemoveDrawModel(lua_State *L);
 	static int lua_SetDrawModelAngles(lua_State *L);
+	static int lua_DrawModelAngles(lua_State *L);
 	static int lua_SetDrawModelScale(lua_State *L);
-	static int lua_SetDrawModelMotionType(lua_State *L);
+	static int lua_DrawModelScale(lua_State *L);
 	static int lua_SetDrawModelVisible(lua_State *L);
 	static int lua_DrawModelVisible(lua_State *L);
 	static int lua_SetDrawModelPos(lua_State *L);
 	static int lua_DrawModelPos(lua_State *L);
 	static int lua_SetDrawModelBounds(lua_State *L);
 	static int lua_DrawModelBounds(lua_State *L);
+	static int lua_SetDrawModelTimeScale(lua_State *L);
+	static int lua_DrawModelTimeScale(lua_State *L);
+	static int lua_SetDrawModelMotionScale(lua_State *L);
+	static int lua_DrawModelMotionScale(lua_State *L);
 	static int lua_FadeDrawModel(lua_State *L);
 	static int lua_DrawModelBonePos(lua_State *L);
 	static int lua_DrawModelFindBone(lua_State *L);
@@ -396,6 +399,7 @@ private:
 	ENT_DECL_GETSET(SplineBankScale);
 	ENT_DECL_GETSET(SplineBankLerp);
 	ENT_DECL_GETSET(AutoDecelDistance);
+	ENT_DECL_GET(DistanceMoved);
 	ENT_DECL_GETSET(MoveType);
 	ENT_DECL_GETSET(SolidType);
 	ENT_DECL_GETSET(OccupantType);

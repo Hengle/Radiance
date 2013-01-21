@@ -556,13 +556,12 @@ void ModelEditorWidget::Tick(float dt) {
 	
 	if (m_skModel) {
 		ska::BoneTM unused;
-		m_skModel->ska->Tick(dt, true, true, Mat4::Identity, ska::Ska::MT_None, unused);
+		m_skModel->ska->Tick(dt, -1.f, true, true, Mat4::Identity);
 
 		asset::SkMaterialLoader::Ref skMaterials = asset::SkMaterialLoader::Cast(m_skModel->asset);
 		RAD_ASSERT(skMaterials);
 
-		for (int i = 0; i < m_skModel->numMeshes; ++i)
-		{
+		for (int i = 0; i < m_skModel->numMeshes; ++i) {
 			asset::MaterialParser::Ref parser = asset::MaterialParser::Cast(
 				skMaterials->MaterialAsset(i)
 			);
@@ -574,8 +573,7 @@ void ModelEditorWidget::Tick(float dt) {
 		asset::MeshMaterialLoader::Ref meshMaterials = asset::MeshMaterialLoader::Cast(m_bundle->asset);
 		RAD_ASSERT(meshMaterials);
 
-		for (int i = 0; i < meshMaterials->numUniqueMaterials; ++i)
-		{
+		for (int i = 0; i < meshMaterials->numUniqueMaterials; ++i) {
 			asset::MaterialParser::Ref parser = asset::MaterialParser::Cast(
 				meshMaterials->UniqueMaterialAsset(i)
 			);

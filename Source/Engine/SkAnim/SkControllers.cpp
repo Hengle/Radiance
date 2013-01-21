@@ -24,32 +24,26 @@ void IdentBones(BoneTM *out, int first, int num);
 
 ///////////////////////////////////////////////////////////////////////////////
 
-BlendTimer::BlendTimer() : m_time(0.f), m_dt(0.f)
-{
+BlendTimer::BlendTimer() : m_time(0.f), m_dt(0.f) {
 }
 
-BlendTimer::~BlendTimer()
-{
+BlendTimer::~BlendTimer() {
 }
 
-void BlendTimer::Start(float time)
-{
+void BlendTimer::Start(float time) {
 	m_dt = 0.f;
 	m_time = time;
 }
 
-void BlendTimer::Tick(float dt)
-{
+void BlendTimer::Tick(float dt) {
 	m_dt += dt;
 }
 
-bool BlendTimer::RAD_IMPLEMENT_GET(finished)
-{
+bool BlendTimer::RAD_IMPLEMENT_GET(finished) {
 	return m_dt >= m_time;
 }
 
-float BlendTimer::RAD_IMPLEMENT_GET(frac)
-{
+float BlendTimer::RAD_IMPLEMENT_GET(frac) {
 	return finished ? 1.f : m_dt / m_time;
 }
 
@@ -62,24 +56,20 @@ m_p(Vec3::Zero),
 m_dq(Quat::Identity),
 m_dp(Vec3::Zero),
 m_blendTM(false),
-m_active(false)
-{
+m_active(false) {
 }
 
-Controller::~Controller()
-{
+Controller::~Controller() {
 }
 
-void Controller::Activate(bool active)
-{
+void Controller::Activate(bool active) {
 	if (active == m_active)
 		return;
 	m_active = active;
 	OnActivate(active);
 }
 
-BoneTM::Ref Controller::AllocBoneArray()
-{
+BoneTM::Ref Controller::AllocBoneArray() {
 	return BoneTM::Ref(new (ZSka) BoneTM[m_ska->numBones.get()]);
 }
 
@@ -90,13 +80,11 @@ void Controller::Blend(
 	float weight,
 	int firstBone,
 	int numBones
-)
-{
+) {
 	details::BlendBones(out, from, to, weight, firstBone, numBones);
 }
 
-Quat Controller::Slerp(const Quat &from, const Quat &to, float t)
-{
+Quat Controller::Slerp(const Quat &from, const Quat &to, float t) {
 	return details::Slerp(from, to, t);
 }
 
@@ -113,8 +101,7 @@ AnimationSource::Ref AnimationSource::New(
 	bool loopPastEnd,
 	Ska &ska,
 	const Notify::Ref &notify
-)
-{
+) {
 	return Ref(
 		new (s_animationSourcePool.SafeGetChunk()) AnimationSource(
 			anim, 
@@ -129,8 +116,7 @@ AnimationSource::Ref AnimationSource::New(
 	);
 }
 
-void AnimationSource::Delete(AnimationSource *s)
-{
+void AnimationSource::Delete(AnimationSource *s) {
 	s->~AnimationSource();
 	s_animationSourcePool.ReturnChunk(s);
 }
@@ -156,18 +142,14 @@ m_loopNum(0),
 m_frame(0.f),
 m_notify(notify),
 m_emitEndFrame(true),
-m_emitFrame(0)
-{
+m_emitFrame(0) {
 }
 
-AnimationSource::~AnimationSource()
-{
+AnimationSource::~AnimationSource() {
 }
 
-void AnimationSource::OnActivate(bool active)
-{
-	if (active)
-	{
+void AnimationSource::OnActivate(bool active) {
+	if (active) {
 		m_frame = 0.f;
 		m_loopNum = 0;
 
@@ -185,11 +167,8 @@ void AnimationSource::OnActivate(bool active)
 		SetRot(m_tm.r);
 		SetDeltaRot(Quat::Identity);
 		SetDeltaPos(Vec3::Zero);
-	}
-	else
-	{
-		if (m_notify)
-		{
+	} else {
+		if (m_notify) {
 			AnimStateEventData d;
 			d.ska = ska;
 			d.anim = m_anim;
@@ -198,26 +177,22 @@ void AnimationSource::OnActivate(bool active)
 	}
 }
 
-void AnimationSource::EmitTags(int firstBone, int numBones)
-{
+void AnimationSource::EmitTags(int firstBone, int numBones) {
 	int current = FloatToInt(m_frame)+1;
 
-	if (m_emitFrame > current) // wrapped
-	{
+	if (m_emitFrame > current) { // wrapped
 		if (m_emitFrame < m_anim->numFrames)
 			EmitTags(m_emitFrame, (m_anim->numFrames-m_emitFrame), firstBone, numBones);
 		m_emitFrame = 0;
 	}
 
-	if (m_emitFrame < current)
-	{
+	if (m_emitFrame < current) {
 		EmitTags(m_emitFrame, (current-m_emitFrame), firstBone, numBones);
 		m_emitFrame = current;
 	}
 }
 
-void AnimationSource::EmitTags(int frame, int numFrames, int firstBone, int numBones)
-{
+void AnimationSource::EmitTags(int frame, int numFrames, int firstBone, int numBones) {
 	m_anim->EmitTags(
 		frame,
 		numFrames,
@@ -227,32 +202,23 @@ void AnimationSource::EmitTags(int frame, int numFrames, int firstBone, int numB
 	);
 }
 
-void AnimationSource::ResetLoopCount(int loopCount)
-{
+void AnimationSource::ResetLoopCount(int loopCount) {
 	m_loopNum = 0;
 	m_loopCount = loopCount;
 }
 
-void AnimationSource::SetTime(float dt)
-{
+void AnimationSource::SetTime(float dt) {
 	m_frame = (dt*m_timeScale) * m_anim->fps;
 
-	if (m_frame > m_anim->numFrames.get()-1)
-	{
-		if (!m_loopCount || m_loopPastEnd)
-		{
-			if (m_anim->numFrames > 1)
-			{
+	if (m_frame > m_anim->numFrames.get()-1) {
+		if (!m_loopCount || m_loopPastEnd) {
+			if (m_anim->numFrames > 1) {
 				// wrap
 				m_frame = math::Mod(m_frame, (float)m_anim->numFrames.get()-1);
-			}
-			else
-			{
+			} else {
 				m_frame = 0;
 			}
-		}
-		else
-		{
+		} else {
 			m_frame = (float)m_anim->numFrames.get()-1; // clamp to last frame.
 		}
 	}
@@ -260,55 +226,56 @@ void AnimationSource::SetTime(float dt)
 
 bool AnimationSource::Tick(
 	float dt,
+	float distance,
 	BoneTM *out,
 	int firstBone,
 	int numBones,
 	bool advance,
 	bool emitTags
-)
-{
+) {
 	emitTags = emitTags && advance;
-	if (!advance)
+	if (!advance) {
 		dt = 0.f;
+		distance = 0.f;
+	}
 
-	m_frame += (dt*m_timeScale) * m_anim->fps;
+	if ((m_anim->distance > 0.1f) && (distance >= 0.f)) {
+		m_frame += distance * ((float)m_anim->numFrames.get() / (float)m_anim->distance.get());
+	} else {
+		m_frame += (dt*m_timeScale) * m_anim->fps;
+	}
 
-	if (m_frame > m_anim->numFrames.get()-1)
-	{
+	if (m_frame > m_anim->numFrames.get()-1) {
 		bool emit = false;
 
-		if (!m_loopCount || m_loopNum+1 < m_loopCount || m_loopPastEnd)
-		{
-			if (m_loopNum < m_loopCount)
-			{
+		if (!m_loopCount || m_loopNum+1 < m_loopCount || m_loopPastEnd) {
+			if (m_loopNum < m_loopCount) {
 				++m_loopNum;
 			}
 			
-
-			if (m_loopCount && m_loopNum == m_loopCount)
-			{
+			if (m_loopCount && m_loopNum == m_loopCount) {
 				emit = true;
 			}
 
-			if (m_anim->numFrames > 1)
-			{
+			if (m_anim->numFrames > 1) {
 				// wrap
 				m_frame = math::Mod(m_frame, (float)m_anim->numFrames.get()-1);
-			}
-			else
-			{
+
+				// reset delta motion
+				m_tm.r = Quat::Identity;
+				m_tm.s = Vec3(1, 1, 1);
+				m_tm.t = Vec3::Zero;
+
+			} else {
 				m_frame = 0;
 			}
-		}
-		else
-		{
+		} else {
 			m_loopNum = m_loopCount;
 			m_frame = (float)m_anim->numFrames.get()-1; // clamp to last frame.
 			emit = true;
 		}
 
-		if (m_notify && m_emitEndFrame && emit)
-		{
+		if (m_notify && m_emitEndFrame && emit) {
 			AnimStateEventData d;
 			d.ska = ska;
 			d.anim = m_anim;
@@ -329,52 +296,61 @@ bool AnimationSource::Tick(
 	src = FloatToInt(frame);
 	dst = src+1;
 
-	if (dst > m_anim->numFrames-1)
-	{
+	if (dst > m_anim->numFrames-1) {
 		dst = src;
 		lerp = 0.f;
 	}
 
-	if (out)
-	{
+	if (out) {
+		int start = firstBone;
+		int count = numBones;
+		int outOfs = 0;
+		if (start == 0) {
+			// remove motion from motion driven anims.
+			start = 1;
+			outOfs = 1;
+			--count;
+		}
+
 		m_anim->BlendFrames(
 			src,
 			dst,
 			lerp,
-			out,
-			firstBone,
-			numBones
+			out + outOfs,
+			start,
+			count
 		);
+
+		if (firstBone == 0 && numBones > 0) {
+			// never any root motion (recorded seperately).
+			out[0].r = Quat::Identity;
+			out[0].s = Vec3(1, 1, 1);
+			out[0].t = Vec3::Zero;
+		}
 	}
 
-	if (dt > 0.f)
-	{
+	if (dt > 0.f || distance > 0.f) {
 		BoneTM root;
 
-		if (firstBone != 0 || numBones < 1)
-		{
-			m_anim->BlendFrames(
-				0,
-				0,
-				0.f,
-				&root,
-				1,
-				0
-			);
-		}
-		else
-		{
-			root = out[0];
-		}
+		// get root motion.
+		m_anim->BlendFrames(
+			0,
+			0,
+			0.f,
+			&root,
+			0,
+			1
+		);
+		
+		SetDeltaRot(m_tm.r.Inverse() * root.r);
+		SetDeltaPos(root.t - m_tm.t);
+		
+		m_tm = root;
 
 		SetPos(m_tm.t);
 		SetRot(m_tm.r);
-		SetDeltaRot(m_tm.r.Inverse() * root.r);
-		SetDeltaPos(root.t - m_tm.t);
-		m_tm = root;
-	}
-	else
-	{
+
+	} else {
 		SetDeltaRot(Quat::Identity);
 		SetDeltaPos(Vec3::Zero);
 	}
@@ -382,33 +358,36 @@ bool AnimationSource::Tick(
 	return true;
 }
 
+void AnimationSource::ResetMotion() {
+	m_tm.s = Vec3(1, 1, 1);
+	m_tm.t = Vec3::Zero;
+	m_tm.r = Quat::Identity;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 ThreadSafeObjectPool<BlendToController::Blend> BlendToController::s_blendPool(ZSka, "ska-blend-pool", 8);
 
-BlendToController::Ref BlendToController::New(Ska &ska, const Notify::Ref &notify)
-{
+BlendToController::Ref BlendToController::New(Ska &ska, const Notify::Ref &notify) {
 	return Ref(new (ZSka) BlendToController(ska, notify));
 }
 
 BlendToController::BlendToController(Ska &ska, const Notify::Ref &notify)
-: Controller(ska), m_notify(notify)
-{
+: Controller(ska), m_notify(notify) {
 }
 
-BlendToController::~BlendToController()
-{
+BlendToController::~BlendToController() {
 }
 
 bool BlendToController::Tick(
 	float dt,
+	float distance,
 	BoneTM *out,
 	int firstBone,
 	int numBones,
 	bool advance,
 	bool emitTags
-)
-{
+) {
 	if (!m_root)
 		return false;
 
@@ -419,6 +398,7 @@ bool BlendToController::Tick(
 
 	if (!m_root->Tick(
 		dt,
+		distance,
 		tm,
 		delta,
 		out,
@@ -435,14 +415,17 @@ bool BlendToController::Tick(
 	return true;
 }
 
-void BlendToController::OnActivate(bool active)
-{
+void BlendToController::ResetMotion() {
+	if (m_root)
+		m_root->ResetMotion();
+}
+
+void BlendToController::OnActivate(bool active) {
 	m_root.reset();
 	SetDeltaRot(Quat::Identity);
 	SetDeltaPos(Vec3::Zero);
 
-	if (!active && m_notify)
-	{
+	if (!active && m_notify) {
 		AnimStateEventData d;
 		d.ska = ska;
 		d.anim = 0;
@@ -450,18 +433,15 @@ void BlendToController::OnActivate(bool active)
 	}
 }
 
-void BlendToController::Blend::Delete(BlendToController::Blend *b)
-{
+void BlendToController::Blend::Delete(BlendToController::Blend *b) {
 	s_blendPool.Destroy(b);
 }
 
-BlendToController::Blend::Ref BlendToController::Blend::New()
-{
+BlendToController::Blend::Ref BlendToController::Blend::New() {
 	return Ref(s_blendPool.Construct(), &Delete);
 }
 
-void BlendToController::Blend::Activate(bool activate)
-{
+void BlendToController::Blend::Activate(bool activate) {
 	if (b.blend)
 		b.blend->Activate(activate);
 	if (b.controller)
@@ -475,6 +455,7 @@ void BlendToController::Blend::Activate(bool activate)
 
 bool BlendToController::Blend::Tick(
 	float dt, 
+	float distance,
 	BoneTM &tm,
 	BoneTM &delta,
 	BoneTM *out,
@@ -482,10 +463,8 @@ bool BlendToController::Blend::Tick(
 	int numBones,
 	bool advance,
 	bool emitTags
-)
-{
-	if (!a.blend && !a.controller)
-	{
+) {
+	if (!a.blend && !a.controller) {
 		RAD_ASSERT(!b.blend);
 		RAD_ASSERT(!b.controller);
 		return false;
@@ -496,10 +475,8 @@ bool BlendToController::Blend::Tick(
 
 	bool isBlending = false;
 
-	if (b.blend || b.controller)
-	{
-		if (blend.finished)
-		{
+	if (b.blend || b.controller) {
+		if (blend.finished) {
 			Union temp = a;
 
 			a = b;
@@ -515,8 +492,7 @@ bool BlendToController::Blend::Tick(
 			// Activate messages created new blends?
 
 			isBlending = b.blend || b.controller;
-			if (isBlending)
-			{
+			if (isBlending) {
 				if (b.blend)
 					b.blend->Activate(true);
 				if (b.controller)
@@ -525,9 +501,7 @@ bool BlendToController::Blend::Tick(
 				if (advance)
 					blend.Tick(dt);
 			}
-		}
-		else
-		{
+		} else {
 			if (b.blend)
 				b.blend->Activate(true);
 			if (b.controller)
@@ -548,10 +522,9 @@ bool BlendToController::Blend::Tick(
 	bool bValid = false;
 
 	if (b.blend)
-		bValid = b.blend->Tick(dt, btm, bDelta, bones.get(), firstBone, numBones, advance, emitTags);
-	if (b.controller)
-	{
-		bValid = b.controller->Tick(dt, bones.get(), firstBone, numBones, advance, emitTags);
+		bValid = b.blend->Tick(dt, distance, btm, bDelta, bones.get(), firstBone, numBones, advance, emitTags);
+	if (b.controller) {
+		bValid = b.controller->Tick(dt, distance, bones.get(), firstBone, numBones, advance, emitTags);
 		btm.r = b.controller->rot;
 		btm.t = b.controller->pos;
 		bDelta.r = b.controller->deltaRot;
@@ -561,11 +534,11 @@ bool BlendToController::Blend::Tick(
 	// Blend A side.
 	bool aValid = false;
 
-	if (a.blend)
-	{
+	if (a.blend) {
 		a.blend->Activate(true);
 		aValid = a.blend->Tick(
-			dt, 
+			dt,
+			distance,
 			tm,
 			delta, 
 			out, 
@@ -575,11 +548,12 @@ bool BlendToController::Blend::Tick(
 			emitTags && !isBlending
 		);
 	}
-	if (a.controller)
-	{
+
+	if (a.controller) {
 		a.controller->Activate(true);
 		aValid = a.controller->Tick(
-			dt, 
+			dt,
+			distance,
 			out, 
 			firstBone, 
 			numBones, 
@@ -592,17 +566,13 @@ bool BlendToController::Blend::Tick(
 		delta.t = a.controller->deltaPos;
 	}
 
-	if (bValid && (b.blend || b.controller))
-	{
+	if (bValid && (b.blend || b.controller)) {
 		Controller::Blend(out, out, bones.get(), blend.frac, firstBone, numBones);
 
-		if (b.controller->blendTM)
-		{
+		if (b.controller->blendTM) {
 			Controller::Blend(&delta, &delta, &bDelta, blend.frac, 0, 1);
 			Controller::Blend(&tm, &tm, &btm, blend.frac, 0, 1);
-		}
-		else
-		{
+		} else {
 			delta = bDelta;
 			tm = btm;
 		}
@@ -611,8 +581,21 @@ bool BlendToController::Blend::Tick(
 	return aValid && (bValid || !(b.blend&&b.controller));
 }
 
-float BlendToController::Blend::RAD_IMPLEMENT_GET(in)
-{
+void BlendToController::Blend::ResetMotion() {
+	if (a.blend) {
+		a.blend->ResetMotion();
+	} else if (a.controller) {
+		a.controller->ResetMotion();
+	}
+
+	if (b.blend) {
+		b.blend->ResetMotion();
+	} else if(b.controller) {
+		b.controller->ResetMotion();
+	}
+}
+
+float BlendToController::Blend::RAD_IMPLEMENT_GET(in) {
 	if (b.blend)
 		return b.blend->in;
 	if (b.controller)
@@ -625,8 +608,7 @@ float BlendToController::Blend::RAD_IMPLEMENT_GET(in)
 	return a.controller->in;
 }
 
-float BlendToController::Blend::RAD_IMPLEMENT_GET(out)
-{
+float BlendToController::Blend::RAD_IMPLEMENT_GET(out) {
 	if (b.blend)
 		return b.blend->out;
 	if (b.controller)
@@ -639,17 +621,15 @@ float BlendToController::Blend::RAD_IMPLEMENT_GET(out)
 	return a.controller->out;
 }
 
-void BlendToController::BlendTo(const Controller::Ref &to)
-{
-	if (!m_root)
-	{
+void BlendToController::BlendTo(const Controller::Ref &to) {
+	if (!m_root) {
 		m_root = Blend::New();
 		m_root->a.controller = to;
 		return;
 	}
 
-	if (m_root->b.blend || m_root->b.controller)
-	{ // startup another blend.
+	if (m_root->b.blend || m_root->b.controller) { 
+		// startup another blend.
 		Blend::Ref b = Blend::New();
 		b->a.blend = m_root;
 		b->b.controller = to;
@@ -662,9 +642,7 @@ void BlendToController::BlendTo(const Controller::Ref &to)
 			xfade = -xfade;
 		b->blend.Start(xfade);
 		m_root = b;
-	}
-	else
-	{
+	} else {
 		RAD_ASSERT(m_root->a.controller);
 		m_root->b.controller = to;
 		m_root->bones = AllocBoneArray();
@@ -679,13 +657,11 @@ void BlendToController::BlendTo(const Controller::Ref &to)
 	}
 }
 
-float BlendToController::RAD_IMPLEMENT_GET(in)
-{
+float BlendToController::RAD_IMPLEMENT_GET(in) {
 	return m_root ? m_root->in : 0.f;
 }
 
-float BlendToController::RAD_IMPLEMENT_GET(out)
-{
+float BlendToController::RAD_IMPLEMENT_GET(out) {
 	return m_root ? m_root->out : 0.f;
 }
 
@@ -698,20 +674,17 @@ AnimationVariantsSource::Ref AnimationVariantsSource::New(
 	Ska &ska,
 	const Notify::Ref &notify,
 	const char *blendTarget
-)
-{
+) {
 	return Ref(new (s_animationVariantsSourcePool.SafeGetChunk()) AnimationVariantsSource(anims, ska, notify, blendTarget), &Delete);
 }
 
-AnimationVariantsSource::Ref AnimationVariantsSource::Clone(const Notify::Ref &notify)
-{
+AnimationVariantsSource::Ref AnimationVariantsSource::Clone(const Notify::Ref &notify) {
 	Ref r(new (s_animationVariantsSourcePool.SafeGetChunk()) AnimationVariantsSource(*this), &Delete);
 	r->m_notify = notify;
 	return r;
 }
 
-void AnimationVariantsSource::Delete(AnimationVariantsSource *s)
-{
+void AnimationVariantsSource::Delete(AnimationVariantsSource *s) {
 	s->~AnimationVariantsSource();
 	s_animationVariantsSourcePool.ReturnChunk(s);
 }
@@ -721,17 +694,13 @@ AnimationVariantsSource::AnimationVariantsSource(
 	Ska &ska,
 	const Notify::Ref &notify,
 	const char *blendTarget
-) : Controller(ska), m_node(0), m_blendTarget(0), m_notify(notify)
-{
+) : Controller(ska), m_node(0), m_blendTarget(0), m_notify(notify) {
 	Init(anims);
 
-	if (blendTarget)
-	{
-		for (Node::Map::iterator it = m_map.begin(); it != m_map.end(); ++it)
-		{
+	if (blendTarget) {
+		for (Node::Map::iterator it = m_map.begin(); it != m_map.end(); ++it) {
 			Node *node = &it->second;
-			if (!string::cmp(blendTarget, node->anim->name.get()))
-			{
+			if (!string::cmp(blendTarget, node->anim->name.get())) {
 				m_blendTarget = node;
 				break;
 			}
@@ -740,27 +709,22 @@ AnimationVariantsSource::AnimationVariantsSource(
 }
 
 AnimationVariantsSource::AnimationVariantsSource(const AnimationVariantsSource &s)
-: Controller(*s.ska.get()), m_map(s.m_map), m_node(0)
-{
+: Controller(*s.ska.get()), m_map(s.m_map), m_node(0) {
 }
 
-AnimationVariantsSource::~AnimationVariantsSource()
-{
+AnimationVariantsSource::~AnimationVariantsSource() {
 }
 
-void AnimationVariantsSource::Init(const Variant::Vec &anims)
-{
+void AnimationVariantsSource::Init(const Variant::Vec &anims) {
 	float total = 0.f;
-	for (Variant::Vec::const_iterator it = anims.begin(); it != anims.end(); ++it)
-	{
+	for (Variant::Vec::const_iterator it = anims.begin(); it != anims.end(); ++it) {
 		if (ska->anims->find((*it).name) == ska->anims->end())
 			continue;
 		total += (*it).weight;
 	}
 
 	int ofs = 0;
-	for (Variant::Vec::const_iterator it = anims.begin(); it != anims.end(); ++it)
-	{
+	for (Variant::Vec::const_iterator it = anims.begin(); it != anims.end(); ++it) {
 		if ((*it).weight <= 0.f)
 			continue;
 		if (ska->anims->find((*it).name) == ska->anims->end())
@@ -779,16 +743,13 @@ void AnimationVariantsSource::Init(const Variant::Vec &anims)
 	}
 }
 
-void AnimationVariantsSource::OnActivate(bool active)
-{
-	if (m_source)
-	{
+void AnimationVariantsSource::OnActivate(bool active) {
+	if (m_source) {
 		m_source->Activate(false);
 		m_source.reset();
 	}
 
-	if (active)
-	{
+	if (active) {
 		m_node = 0;
 		m_blend = BlendToController::New(*ska.get(), Notify::Ref());
 		SetDeltaRot(Quat::Identity);
@@ -797,20 +758,17 @@ void AnimationVariantsSource::OnActivate(bool active)
 	}
 }
 
-void AnimationVariantsSource::ChooseAnim()
-{
+void AnimationVariantsSource::ChooseAnim() {
 	if (m_map.empty())
 		return;
 
-	for (;;)
-	{
+	for (;;) {
 		Node::Map::iterator it = m_map.upper_bound(rand());
 		if (it != m_map.begin())
 			--it;
 		Node *node = &it->second;
 
-		if (m_blendTarget)
-		{
+		if (m_blendTarget) {
 			node = m_blendTarget;
 			m_blendTarget = 0;
 		}
@@ -829,20 +787,15 @@ void AnimationVariantsSource::ChooseAnim()
 		if (loopCount < 1)
 			loopCount = 1;
 
-		if (node == m_node)
-		{
-			if (node->out > 0.f)
-			{ // nodes with an out time can loop (they don't hold the last frame)
+		if (node == m_node) {
+			if (node->out > 0.f) { 
+				// nodes with an out time can loop (they don't hold the last frame)
 				RAD_ASSERT(m_source);
 				m_source->ResetLoopCount(loopCount);
-			}
-			else if (m_map.size() > 1)
-			{
+			} else if (m_map.size() > 1) {
 				continue; // pick another animation
 			}
-		}
-		else
-		{
+		} else {
 			m_source = AnimationSource::New(
 				*node->anim,
 				node->in,
@@ -864,13 +817,13 @@ void AnimationVariantsSource::ChooseAnim()
 
 bool AnimationVariantsSource::Tick(
 	float dt,
+	float distance,
 	BoneTM *out,
 	int firstBone,
 	int numBones,
 	bool advance,
 	bool emitTags
-)
-{
+) {
 	if (m_map.empty())
 		return false;
 
@@ -879,6 +832,7 @@ bool AnimationVariantsSource::Tick(
 
 	if (!m_blend->Tick(
 		dt,
+		distance,
 		out,
 		firstBone,
 		numBones,
@@ -893,8 +847,12 @@ bool AnimationVariantsSource::Tick(
 	return true;
 }
 
-void AnimationVariantsSource::SetTime(float dt)
-{
+void AnimationVariantsSource::ResetMotion() {
+	if (m_blend)
+		m_blend->ResetMotion();
+}
+
+void AnimationVariantsSource::SetTime(float dt) {
 	if (m_source)
 		m_source->SetTime(dt);
 }

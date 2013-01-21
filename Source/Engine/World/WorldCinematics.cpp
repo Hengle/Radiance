@@ -81,7 +81,6 @@ int WorldCinematics::Spawn(
 }
 
 void WorldCinematics::Tick(int frame, float dt) {
-	ska::BoneTM tm;
 
 	m_cameraActive = false;
 	m_inUpdate = true;
@@ -113,11 +112,10 @@ void WorldCinematics::Tick(int frame, float dt) {
 				RAD_ASSERT(actor->m);
 				actor->m->ska->Tick(
 					dt,
+					0.f,
 					true,
 					true,
-					Mat4::Identity,
-					ska::Ska::MT_None,
-					tm
+					Mat4::Identity
 				);
 
 				ska::AnimationSource::Ref source = 
@@ -222,11 +220,10 @@ void WorldCinematics::Tick(int frame, float dt) {
 							actor->m->ska->root = boost::static_pointer_cast<ska::Controller>(source);
 							actor->m->ska->Tick( // advance delta
 								tickDelta,
+								0.f,
 								true,
 								true,
-								Mat4::Identity,
-								ska::Ska::MT_None,
-								tm
+								Mat4::Identity
 							);
 
 							if (!actor->loop)
@@ -427,8 +424,6 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time) {
 	if (!c)
 		return false;
 
-	ska::BoneTM tm;
-
 	// Stop all actors.
 	float frame = time * c->cinematic->fps;
 	int intFrame = (int)frame;
@@ -445,11 +440,10 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time) {
 				RAD_ASSERT(actor->m);
 				actor->m->ska->Tick(
 					timeDelta,
+					0.f,
 					true,
 					false, // don't emit any events
-					Mat4::Identity,
-					ska::Ska::MT_None,
-					tm
+					Mat4::Identity
 				);
 
 				ska::AnimationSource::Ref source = 
@@ -577,11 +571,10 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time) {
 						actor->m->ska->root = boost::static_pointer_cast<ska::Controller>(source);
 						actor->m->ska->Tick( // advance delta
 							tickDelta,
+							0.f,
 							true,
 							false, // no animation events
-							Mat4::Identity,
-							ska::Ska::MT_None,
-							tm
+							Mat4::Identity
 						);
 
 #if !defined(RAD_TARGET_GOLDEN)
