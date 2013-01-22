@@ -31,6 +31,14 @@ int E_TouchTrigger::Spawn(
 	m_firstBrush = keys.IntForKey("firstBrush");
 	m_numBrushes = keys.IntForKey("numBrushes");
 	m_enabled = keys.BoolForKey("enabled");
+	
+	const char *sz = keys.StringForKey("enter_cmd");
+	if (sz)
+		m_enter = sz;
+
+	sz = keys.StringForKey("exit_cmd");
+	if (sz)
+		m_exit = sz;
 
 	if (m_enter.empty && m_exit.empty)
 		m_enabled = false; // it can never be
@@ -76,11 +84,9 @@ void E_TouchTrigger::CheckEnter() {
 	Entity::Ref instigator;
 
 	for (int i = 0; i < m_numBrushes; ++i) {
-		Entity::Vec touching = world->EntitiesTouchingBrush(m_classbits, m_firstBrush + i);
-		if (!touching.empty()) {
-			instigator = touching.front();
+		instigator = world->FirstEntityTouchingBrush(m_classbits, m_firstBrush + i);
+		if (instigator)
 			break;
-		}
 	}
 
 	if (instigator) {

@@ -40,12 +40,12 @@ void World::SetAreaportalState(int areaportalNum, bool open, bool relinkOccupant
 
 Entity::Vec World::BBoxTouching(const BBox &bbox, int classbits) const {
 	Entity::Vec touching;
-	EntityBits touched;
+	EntityBits checked;
 
 	if (m_nodes.empty()) {
-		BBoxTouching(bbox, classbits, -1, touching, touched);
+		BBoxTouching(bbox, classbits, -1, touching, checked);
 	} else {
-		BBoxTouching(bbox, classbits, 0, touching, touched);
+		BBoxTouching(bbox, classbits, 0, touching, checked);
 	}
 
 	return touching;
@@ -56,6 +56,65 @@ void World::BBoxTouching(
 	int classbits,
 	int nodeNum,
 	Entity::Vec &out,
+	EntityBits &checked
+) const {
+	if (nodeNum < 0) {
+		nodeNum = -(nodeNum + 1);
+		RAD_ASSERT(nodeNum < (int)m_leafs.size());
+		const dBSPLeaf &leaf = m_leafs[nodeNum];
+
+		for (EntityPtrSet::const_iterator it = leaf.occupants.begin(); it != leaf.occupants.end(); ++it) {
+			Entity *entity = *it;
+			if (checked[entity->m_id])
+				continue;
+			checked.set(entity->m_id);
+			if (!entity->classbits)
+				continue;
+			if ((classbits != kEntityClassBits_Any) && !(classbits&entity->classbits))
+				continue;
+			
+			BBox b(entity->ps->bbox);
+			b.Translate(entity->ps->worldPos);
+					
+			if (bbox.Touches(b))
+				out.push_back(entity->shared_from_this());
+		}
+
+		return;
+	}
+
+	const dBSPNode &node = m_nodes[nodeNum];
+	const Plane &plane = m_planes[node.planenum];
+
+	Plane::SideType s = plane.Side(bbox);
+
+	// PERFORMANCE NOTE: since we do not split the box at the node we may end up over-checking the node children
+	// (the portion of the box contained in the half-space of the node would not cross some children
+	// however the unrestricted box does).
+
+	if ((s == Plane::Front) || (s == Plane::Cross))
+		BBoxTouching(bbox, classbits, node.children[0], out, checked);
+	if ((s == Plane::Back) || (s == Plane::Cross))
+		BBoxTouching(bbox, classbits, node.children[1], out, checked);
+}
+
+Entity::Ref World::FirstBBoxTouching(const BBox &bbox, int classbits) const {
+	Entity::Ref touching;
+	EntityBits checked;
+
+	if (m_nodes.empty()) {
+		touching = FirstBBoxTouching(bbox, classbits, -1, checked);
+	} else {
+		touching = FirstBBoxTouching(bbox, classbits, 0, checked);
+	}
+
+	return touching;
+}
+
+Entity::Ref World::FirstBBoxTouching(
+	const BBox &bbox,
+	int classbits,
+	int nodeNum,
 	EntityBits &bits
 ) const {
 	if (nodeNum < 0) {
@@ -78,9 +137,29 @@ void World::BBoxTouching(
 			b.Translate(entity->ps->worldPos);
 					
 			if (bbox.Touches(b))
-				out.push_back(entity->shared_from_this());
+				return entity->shared_from_this();
 		}
+
+		return Entity::Ref();
 	}
+
+	const dBSPNode &node = m_nodes[nodeNum];
+	const Plane &plane = m_planes[node.planenum];
+
+	Plane::SideType s = plane.Side(bbox);
+
+	// PERFORMANCE NOTE: since we do not split the box at the node we may end up over-checking the node children
+	// (the portion of the box contained in the half-space of the node would not cross some children
+	// however the unrestricted box does).
+
+	Entity::Ref touching;
+
+	if ((s == Plane::Front) || (s == Plane::Cross))
+		touching = FirstBBoxTouching(bbox, classbits, node.children[0], bits);
+	if (!touching && ((s == Plane::Back) || (s == Plane::Cross)))
+		touching = FirstBBoxTouching(bbox, classbits, node.children[1], bits);
+
+	return touching;
 }
 
 void World::LinkEntity(Entity *entity, const BBox &bounds) {
@@ -593,6 +672,31 @@ bool World::LineTrace(Trace &trace, int nodeNum) {
 	return true;
 }
 
+Entity::Ref World::FirstEntityTouchingBrush(int classbits, int brushNum) const {
+	RAD_ASSERT(brushNum >= 0 && brushNum < (int)m_bsp->numBrushes);
+	const bsp_file::BSPBrush *brush = m_bsp->Brushes() + brushNum;
+
+	const BBox kBrushBBox(
+		Vec3(brush->mins[0], brush->mins[1], brush->mins[2]),
+		Vec3(brush->maxs[0], brush->maxs[1], brush->maxs[2])
+	);
+
+	Entity::Ref touching = FirstBBoxTouching(kBrushBBox, classbits);
+	
+	if (touching) {
+		if (brush->numPlanes != 6) {
+			// non-axial brush hull, do planes test
+			BBox bbox(touching->ps->bbox);
+			bbox.Translate(touching->ps->worldPos);
+
+			if (!IsBBoxInsideBrushHull(bbox, brush))
+				touching.reset();
+		}
+	}
+
+	return touching;
+}
+
 Entity::Vec World::EntitiesTouchingBrush(int classbits, int brushNum) const {
 	RAD_ASSERT(brushNum >= 0 && brushNum < (int)m_bsp->numBrushes);
 	const bsp_file::BSPBrush *brush = m_bsp->Brushes() + brushNum;
@@ -603,11 +707,18 @@ Entity::Vec World::EntitiesTouchingBrush(int classbits, int brushNum) const {
 	);
 
 	Entity::Vec bboxTouching = BBoxTouching(kBrushBBox, classbits);
+
+	if (brush->numPlanes == 6) {
+		// pure axial brush no planes test necessary
+		return bboxTouching;
+	}
+
 	Entity::Vec touching;
 	touching.reserve(bboxTouching.size());
 
 	for (Entity::Vec::const_iterator it = bboxTouching.begin(); it != bboxTouching.end(); ++it) {
 		const Entity::Ref &entity = *it;
+
 		BBox bbox(entity->ps->bbox);
 		bbox.Translate(entity->ps->worldPos);
 
@@ -633,6 +744,15 @@ bool World::EntityTouchesBrush(const Entity &entity, int brushNum) const {
 	if (!kBrushBBox.Instersects(bbox))
 		return false;
 
+	if (brush->numPlanes == 6)
+		return true; // pure axial brush, bbox test was enough
+
+	return IsBBoxInsideBrushHull(bbox, brush);
+}
+
+bool World::IsBBoxInsideBrushHull(const BBox &bbox, int brushNum) const {
+	RAD_ASSERT(brushNum >= 0 && brushNum < (int)m_bsp->numBrushes);
+	const bsp_file::BSPBrush *brush = m_bsp->Brushes() + brushNum;
 	return IsBBoxInsideBrushHull(bbox, brush);
 }
 

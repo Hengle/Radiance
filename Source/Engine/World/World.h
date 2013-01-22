@@ -104,13 +104,16 @@ public:
 	void OnShowLeaderboard(bool show);
 	void OnShowAchievements(bool show);
 
+	ZoneTagRef ZoneTag(int id) const;
+
 	void SetAreaportalState(int areaportalNum, bool open, bool relinkOccupants);
 
 	Entity::Ref FindEntityId(int id) const;
 	Entity::Vec FindEntityClass(const char *classname) const;
 	Entity::Vec FindEntityTargets(const char *targetname) const;
 	Entity::Vec BBoxTouching(const BBox &bbox, int classbits) const;
-	ZoneTagRef ZoneTag(int id) const;
+	Entity::Ref FirstBBoxTouching(const BBox &bbox, int classbits) const;
+	bool IsBBoxInsideBrushHull(const BBox &bbox, int brushNum) const;
 
 	//! Clips a volume into the world, and returns a mask indicating visible areas.
 	/*! Set toArea to -1 to find all areas seen within the volume, otherwise the mask 
@@ -134,6 +137,7 @@ public:
 	bool LineTrace(Trace &trace);
 
 	Entity::Vec EntitiesTouchingBrush(int classbits, int brushNum) const;
+	Entity::Ref FirstEntityTouchingBrush(int classbits, int brushNum) const;
 	bool EntityTouchesBrush(const Entity &entity, int brushNum) const;
 	
 	RAD_DECLARE_PROPERTY(World, viewController, Entity::Ref, Entity::Ref);
@@ -342,7 +346,14 @@ private:
 		int classbits,
 		int nodeNum,
 		Entity::Vec &out,
-		EntityBits &bits
+		EntityBits &checked
+	) const;
+
+	Entity::Ref FirstBBoxTouching(
+		const BBox &bbox,
+		int classbits,
+		int nodeNum,
+		EntityBits &checked
 	) const;
 
 	RAD_DECLARE_GET(viewController, Entity::Ref) { 

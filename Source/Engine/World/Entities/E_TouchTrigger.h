@@ -52,6 +52,7 @@ private:
 	int m_firstBrush;
 	int m_numBrushes;
 	int m_classbits;
+	bool m_bboxOnly;
 	bool m_enabled;
 	bool m_occupied;
 };

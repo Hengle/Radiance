@@ -670,14 +670,18 @@ String &String::PrintfASCII_valist(const char *fmt, va_list args) {
 	int len = vscprintf(fmt, args);
 	if (len > 1) { // > 1 because NULL is counted
 		char *chars;
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 		if (len > kStackSize) {
+#endif
 			m_data = details::DataBlock::New(kRefType_Copy, len, 0, 0, *m_zone);
 			chars = reinterpret_cast<char*>(m_data->m_buf);
+#if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 		} else {
 			m_stackLen = len;
 			chars = m_stackBytes;
 			m_data.reset();
 		}
+#endif
 		vsprintf(chars, fmt, args);
 	} else {
 		Clear();

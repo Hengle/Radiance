@@ -217,10 +217,7 @@ Vec3 E_ViewController::VecAnim::Tick(
 	if (roll)
 		*roll = curAngles[0];
 
-	Quat q = QuatFromAngles(curAngles);
-	Mat4 m = Mat4::Rotation(q);
-
-	Vec3 vec = m * Vec3(1, 0, 0);
+	Vec3 vec = ForwardFromAngles(curAngles);
 
 	if (m_dspeed[1] > 0.f && !sync) {
 		// apply target pos frac lerp
@@ -515,7 +512,8 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 		m_sync
 	);
 
-	UpdateRailTarget(target->ps->cameraPos);
+	Vec3 targetFwd = ForwardFromAngles(target->ps->worldAngles);
+	UpdateRailTarget(target->ps->cameraPos, targetFwd);
 	if (!m_rail.tm)
 		return;
 
@@ -603,7 +601,7 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 	m_sync = false;
 }
 
-void E_ViewController::UpdateRailTarget(const Vec3 &target) {
+void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFwd) {
 	Vec3 v;
 
 	if (m_rail.tm && !m_rail.strict) {
@@ -616,7 +614,23 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target) {
 	Vec3 fwd(Vec3::Zero);
 	if (m_rail.tm) {
 		fwd = target - m_rail.tm->t;
+
+		if (m_rail.stayBehind <= 0.f) {
+			m_rail.targetFwd = targetFwd;
+			m_rail.lastBehindTime = xtime::ReadMilliseconds();
+		} else {
+			xtime::TimeVal now = xtime::ReadMilliseconds();
+			if ((now-m_rail.lastBehindTime) >= (m_rail.stayBehind*1000)) {
+				m_rail.targetFwd = targetFwd;
+			}
+		}
+
+	} else {
+		m_rail.lastBehindTime = xtime::ReadMilliseconds();
+		m_rail.targetFwd = targetFwd;
 	}
+
+	bool stayBehind = (m_rail.stayBehind >= 0.f);
 
 	const bsp_file::BSPFile *bspFile = world->bspFile;
 	float bestDist = std::numeric_limits<float>::max();
@@ -630,6 +644,12 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target) {
 		if (m_rail.tm) {
 			// new position must be on same side as old
 			if (fwd.Dot(v) < 0.f)
+				continue;
+		}
+
+		if (stayBehind) {
+			// new position must be behind target facing
+			if (m_rail.targetFwd.Dot(v) < 0.f)
 				continue;
 		}
 
@@ -720,9 +740,21 @@ void E_ViewController::SetRailMode(
 	bool strict,
 	float trackingLag,
 	float lookAtLag,
+	float stayBehind,
 	bool useCinematicFOV, // true = uses embedded fov from cinematic
 	const Vec3 &angleClamp // how much camera can "turn" from its rail-track to look at target
 ) {
+	if ((m_mode == kMode_Rail) && (m_rail.name == CStr(cinematicName))) {
+		m_rail.distance = distance*distance;
+		m_rail.strict = strict;
+		m_rail.trackLag = trackingLag;
+		m_rail.turnLag = lookAtLag;
+		m_rail.stayBehind = stayBehind;
+		m_rail.cinematicFOV = useCinematicFOV;
+		m_rail.clamp = angleClamp;
+		return; // already doing this.
+	}
+
 	const bsp_file::BSPCinematic *cinematic = world->cinematics->FindCinematic(cinematicName);
 	if (!cinematic)
 		return;
@@ -737,8 +769,10 @@ void E_ViewController::SetRailMode(
 		m_rail.strict = strict;
 		m_rail.trackLag = trackingLag;
 		m_rail.turnLag = lookAtLag;
+		m_rail.stayBehind = stayBehind;
 		m_rail.cinematicFOV = useCinematicFOV;
 		m_rail.clamp = angleClamp;
+		m_rail.name = cinematicName;
 		m_rail.tm = 0;
 		// found a camera.
 		m_sync = true;
@@ -861,8 +895,9 @@ int E_ViewController::lua_SetRailMode(lua_State *L) {
 	bool strict = lua_toboolean(L, 4) != 0;
 	float trackLag = (float)luaL_checknumber(L, 5);
 	float lookLag  = (float)luaL_checknumber(L, 6);
-	bool useFOV = lua_toboolean(L, 7) != 0;
-	Vec3 clamp = lua::Marshal<Vec3>::Get(L, 8, true);
+	float stayBehind = (float)luaL_checknumber(L, 7);
+	bool useFOV = lua_toboolean(L, 8) != 0;
+	Vec3 clamp = lua::Marshal<Vec3>::Get(L, 9, true);
 
 	self->SetRailMode(
 		name,
@@ -870,6 +905,7 @@ int E_ViewController::lua_SetRailMode(lua_State *L) {
 		strict,
 		trackLag,
 		lookLag,
+		stayBehind,
 		useFOV,
 		clamp
 	);

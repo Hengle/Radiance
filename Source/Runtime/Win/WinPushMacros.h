@@ -20,6 +20,7 @@
 #pragma push_macro("DeleteFile")
 #pragma push_macro("max")
 #pragma push_macro("min")
+#pragma push_macro("small")
 #undef BitScanForward
 #undef BitScanReverse
 #undef Yield
@@ -29,3 +30,4 @@
 #undef DeleteFile
 #undef min
 #undef max
+#undef small

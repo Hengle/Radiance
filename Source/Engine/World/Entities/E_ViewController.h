@@ -112,6 +112,7 @@ public:
 						   // This is a seperate lag control than the target position lag, set by kTargetMode_Look.
 						   // kTargetMode_Look may lag the "look at" point
 		float lookAtLag,   // how quickly the camera turns to look at the target object.
+		float stayBehind,  // >= 0 if we want to stay behind the player and this tells us how often to check.
 		bool useCinematicFOV, // true = uses embedded fov from cinematic
 		const Vec3 &angleClamp // how much camera can "turn" from its rail-track to look at target
 	);
@@ -275,7 +276,7 @@ private:
 
 	float TickFOV(int frame, float dt, float distance);
 
-	void UpdateRailTarget(const Vec3 &target);
+	void UpdateRailTarget(const Vec3 &target, const Vec3 &targetFwd);
 
 	static int lua_SetTargetMode(lua_State *L);
 	static int lua_SetRailMode(lua_State *L);
@@ -297,16 +298,20 @@ private:
 	}
 
 	struct RailCameraState {
+		String name;
 		const bsp_file::BSPCameraTrack *track;
 		const bsp_file::BSPCameraTM *tm;
 		Vec3 pos;
 		Vec3 fwd;
 		Vec3 clamp;
+		Vec3 targetFwd;
 		Quat rot;
 		float distance;
 		float trackLag;
 		float turnLag;
 		float fov;
+		float stayBehind;
+		int lastBehindTime;
 		bool cinematicFOV;
 		bool strict;
 	};
