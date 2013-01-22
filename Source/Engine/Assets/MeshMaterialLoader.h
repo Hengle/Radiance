@@ -32,8 +32,8 @@ public:
 		return m_matRefs[mesh];
 	}
 
-	const pkg::Asset::Ref &UniqueMaterialAsset(int mesh) const {
-		return m_umatRefs[mesh];
+	const pkg::Asset::Ref &UniqueMaterialAsset(int idx) const {
+		return m_umatRefs[idx];
 	}
 
 	RAD_DECLARE_READONLY_PROPERTY(MeshMaterialLoader, numUniqueMaterials, int);

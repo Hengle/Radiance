@@ -347,24 +347,6 @@ private:
 	// ------------- Lua Calls --------------
 	static int lua_AttachDrawModel(lua_State *L);
 	static int lua_RemoveDrawModel(lua_State *L);
-	static int lua_SetDrawModelAngles(lua_State *L);
-	static int lua_DrawModelAngles(lua_State *L);
-	static int lua_SetDrawModelScale(lua_State *L);
-	static int lua_DrawModelScale(lua_State *L);
-	static int lua_SetDrawModelVisible(lua_State *L);
-	static int lua_DrawModelVisible(lua_State *L);
-	static int lua_SetDrawModelPos(lua_State *L);
-	static int lua_DrawModelPos(lua_State *L);
-	static int lua_SetDrawModelBounds(lua_State *L);
-	static int lua_DrawModelBounds(lua_State *L);
-	static int lua_SetDrawModelTimeScale(lua_State *L);
-	static int lua_DrawModelTimeScale(lua_State *L);
-	static int lua_SetDrawModelMotionScale(lua_State *L);
-	static int lua_DrawModelMotionScale(lua_State *L);
-	static int lua_FadeDrawModel(lua_State *L);
-	static int lua_DrawModelBonePos(lua_State *L);
-	static int lua_DrawModelFindBone(lua_State *L);
-	static int lua_TickDrawModel(lua_State *L);
 	static int lua_AttachSound(lua_State *L);
 	static int lua_RemoveSound(lua_State *L);
 	static int lua_AddTickable(lua_State *L);

@@ -7,8 +7,10 @@
 
 #include "../Renderer/Mesh.h"
 #include "../Renderer/SkMesh.h"
+#include "../Lua/LuaRuntime.h"
 #include "MBatchDraw.h"
 #include <Runtime/Container/ZoneMap.h>
+#include <Runtime/Container/ZoneVector.h>
 #include <Runtime/PushPack.h>
 
 namespace world {
@@ -16,17 +18,19 @@ namespace world {
 class Entity;
 class WorldDraw;
 
-class RADENG_CLASS DrawModel {
+class RADENG_CLASS DrawModel : public lua::SharedPtr {
 public:
 	typedef boost::shared_ptr<DrawModel> Ref;
 	typedef boost::weak_ptr<DrawModel> WRef;
 	typedef zone_map<DrawModel*, Ref, ZWorldT>::type Map;
+	typedef zone_map<int, int, ZWorldT>::type IntMap;
 
 	DrawModel(Entity *entity);
 	virtual ~DrawModel();
 
 	void Tick(float time, float dt);
 	void Fade(const Vec4 &rgba, float time);
+	void SwapMaterial(int src, int dst);
 
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, entity, Entity*);
 	RAD_DECLARE_PROPERTY(DrawModel, pos, const Vec3&, const Vec3&);
@@ -38,18 +42,34 @@ public:
 
 protected:
 
+	virtual void PushElements(lua_State *L);
+
 	void RefBatch(const MBatchDraw::Ref &batch);
 	bool GetTransform(Vec3 &pos, Vec3 &angles) const;
 
 	class DrawBatch : public MBatchDraw {
 	public:
 		DrawBatch(DrawModel &model, int matId);
+
 	protected:
 		virtual bool GetTransform(Vec3 &pos, Vec3 &angles) const;
-		virtual RAD_DECLARE_GET(visible, bool) { return m_model->visible; }
-		virtual RAD_DECLARE_GET(rgba, const Vec4&) { return m_model->rgba; }
-		virtual RAD_DECLARE_GET(scale, const Vec3&) { return m_model->scale; }
-		virtual RAD_DECLARE_GET(bounds, const BBox&) { return m_model->bounds; }
+
+		virtual RAD_DECLARE_GET(visible, bool) { return 
+			m_model->visible; 
+		}
+
+		virtual RAD_DECLARE_GET(rgba, const Vec4&) { return 
+			m_model->rgba; 
+		}
+
+		virtual RAD_DECLARE_GET(scale, const Vec3&) { return 
+			m_model->scale; 
+		}
+
+		virtual RAD_DECLARE_GET(bounds, const BBox&) { return 
+			m_model->bounds; 
+		}
+
 	private:
 		DrawModel *m_model;
 	};
@@ -107,6 +127,16 @@ private:
 	RAD_DECLARE_SET(bounds, const BBox&) {
 		m_bounds = value;
 	}
+
+	static int lua_Fade(lua_State *L);
+	static int lua_SwapMaterial(lua_State *L);
+	
+	LUART_DECL_GETSET(Pos);
+	LUART_DECL_GETSET(Angles);
+	LUART_DECL_GETSET(Scale);
+	LUART_DECL_GETSET(Visible);
+	LUART_DECL_GETSET(Bounds);
+	LUART_DECL_GET(RGBA);
 	
 	Vec3 m_r;
 	Vec3 m_p;
@@ -128,10 +158,16 @@ public:
 	typedef boost::shared_ptr<MeshDrawModel> Ref;
 	typedef boost::weak_ptr<MeshDrawModel> WRef;
 
-	static Ref New(WorldDraw &draw, Entity *entity, const r::Mesh::Ref &m, int matId);
+	static Ref New(Entity *entity, const r::Mesh::Ref &m, int matId);
 	virtual ~MeshDrawModel();
 
+	Ref CreateInstance();
+
 	RAD_DECLARE_READONLY_PROPERTY(MeshDrawModel, mesh, const r::Mesh::Ref&);
+
+protected:
+
+	virtual void PushElements(lua_State *L);
 
 private:
 
@@ -155,8 +191,11 @@ private:
 		r::Mesh::Ref m_m;
 	};
 
+	static int lua_CreateInstance(lua_State *L);
+
 	MeshDrawModel(Entity *entity);
 
+	int m_matId;
 	r::Mesh::Ref m_mesh;
 };
 
@@ -167,10 +206,16 @@ public:
 	typedef boost::shared_ptr<MeshBundleDrawModel> Ref;
 	typedef boost::weak_ptr<MeshBundleDrawModel> WRef;
 
-	static Ref New(WorldDraw &draw, Entity *entity, const r::MeshBundle::Ref &bundle);
+	static Ref New(Entity *entity, const r::MeshBundle::Ref &bundle);
 	virtual ~MeshBundleDrawModel();
 
+	Ref CreateInstance();
+
 	RAD_DECLARE_READONLY_PROPERTY(MeshBundleDrawModel, bundle, const r::MeshBundle::Ref&);
+
+protected:
+
+	virtual void PushElements(lua_State *L);
 
 private:
 
@@ -194,6 +239,8 @@ private:
 		r::Mesh::Ref m_m;
 	};
 
+	static int lua_CreateInstance(lua_State *L);
+
 	MeshBundleDrawModel(Entity *entity);
 
 	r::MeshBundle::Ref m_bundle;
@@ -206,9 +253,11 @@ public:
 	typedef boost::shared_ptr<SkMeshDrawModel> Ref;
 	typedef boost::weak_ptr<SkMeshDrawModel> WRef;
 	
-	static Ref New(WorldDraw &draw, Entity *entity, const r::SkMesh::Ref &m);
+	static Ref New(Entity *entity, const r::SkMesh::Ref &m);
 
 	virtual ~SkMeshDrawModel();
+
+	Ref CreateInstance();
 	
 	Vec3 BonePos(int idx) const;
 
@@ -220,6 +269,7 @@ public:
 
 protected:
 
+	virtual void PushElements(lua_State *L);
 	virtual void OnTick(float time, float dt);
 
 private:
@@ -271,9 +321,16 @@ private:
 
 	SkMeshDrawModel(Entity *entity, const r::SkMesh::Ref &m);
 
+	static int lua_CreateInstance(lua_State *L);
+	static int lua_FindBone(lua_State *L);
+
+	LUART_DECL_GETSET(TimeScale);
+	LUART_DECL_GETSET(MotionScale);
+
 	r::SkMesh::Ref m_mesh;
 	float m_motionScale;
 	float m_timeScale;
+	bool m_instanced;
 };
 
 

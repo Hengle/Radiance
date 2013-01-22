@@ -52,7 +52,7 @@ public:
 	MBatchDraw(int matId) : m_matId(matId), m_markFrame(-1) {}
 	virtual ~MBatchDraw() {}
 
-	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, matId, int);
+	RAD_DECLARE_PROPERTY(MBatchDraw, matId, int, int);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, visible, bool);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, rgba, const Vec4&);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, scale, const Vec3&);
@@ -74,10 +74,6 @@ protected:
 	virtual RAD_DECLARE_GET(scale, const Vec3&) = 0;
 	virtual RAD_DECLARE_GET(bounds, const BBox&) = 0;
 
-	void SetMatId(int id) {
-		m_matId = id;
-	}
-
 private:
 	
 	friend class WorldDraw;
@@ -85,6 +81,10 @@ private:
 
 	RAD_DECLARE_GET(matId, int) { 
 		return m_matId; 
+	}
+
+	RAD_DECLARE_SET(matId, int) {
+		m_matId = value;
 	}
 
 	int m_matId;
