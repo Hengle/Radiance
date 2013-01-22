@@ -14,8 +14,7 @@
 
 namespace world {
 
-class RADENG_CLASS D_SkModel : public D_Asset
-{
+class RADENG_CLASS D_SkModel : public D_Asset {
 public:
 	typedef boost::shared_ptr<D_SkModel> Ref;
 
@@ -32,6 +31,8 @@ public:
 		const ska::Notify::Ref &notify
 	);
 
+	virtual bool HasState(const char *state);
+
 protected:
 
 	D_SkModel(const r::SkMesh::Ref &mesh);
@@ -44,8 +45,7 @@ protected:
 
 private:
 
-	class Notify : public ska::Notify, public lua::SharedPtr
-	{
+	class Notify : public ska::Notify, public lua::SharedPtr {
 	public:
 		typedef boost::shared_ptr<Notify> Ref;
 
@@ -67,10 +67,13 @@ private:
 		int m_callbackId;
 	};
 
-	RAD_DECLARE_GET(mesh, const r::SkMesh::Ref&) { return m_mesh; }
+	RAD_DECLARE_GET(mesh, const r::SkMesh::Ref&) { 
+		return m_mesh; 
+	}
 
 	static int lua_BlendToState(lua_State *L);
 	static int lua_SetRootController(lua_State *L);
+	static int lua_HasState(lua_State *L);
 };
 
 } // world

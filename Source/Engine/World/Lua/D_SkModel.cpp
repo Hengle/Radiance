@@ -10,26 +10,23 @@
 namespace world {
 
 D_SkModel::D_SkModel(const r::SkMesh::Ref &mesh) : D_Asset(mesh->asset),
-m_mesh(mesh)
-{
+m_mesh(mesh) {
 	RAD_ASSERT(m_mesh);
 }
 
-void D_SkModel::PushElements(lua_State *L)
-{
+void D_SkModel::PushElements(lua_State *L) {
 	D_Asset::PushElements(L);
 	lua_pushcfunction(L, lua_BlendToState);
 	lua_setfield(L, -2, "BlendToState");
 	lua_pushcfunction(L, lua_SetRootController);
 	lua_setfield(L, -2, "SetRootController");
+	lua_pushcfunction(L, lua_HasState);
+	lua_setfield(L, -2, "HasState");
 }
 
-bool D_SkModel::SetRootController(lua_State *Lerr, Entity *entity, const char *type)
-{
-	if (!string::cmp(type, "BlendToController"))
-	{
-		if (!m_blendTo)
-		{
+bool D_SkModel::SetRootController(lua_State *Lerr, Entity *entity, const char *type) {
+	if (!string::cmp(type, "BlendToController")) {
+		if (!m_blendTo) {
 			m_blendTo = ska::BlendToController::New(*m_mesh->ska.get(), ska::Notify::Ref());
 			m_mesh->ska->root = m_blendTo;
 			m_blendTo->Activate();
@@ -41,12 +38,11 @@ bool D_SkModel::SetRootController(lua_State *Lerr, Entity *entity, const char *t
 	return false;
 }
 
-bool D_SkModel::BlendToState(const char *state, const char *blendTarget, bool restart, const ska::Notify::Ref &notify)
-{
+bool D_SkModel::BlendToState(const char *state, const char *blendTarget, bool restart, const ska::Notify::Ref &notify) {
 	if (!m_blendTo || !m_mesh->ska->root.get())
 		return false;
 	
-	String tname(state);
+	String tname(CStr(state));
 
 	if (m_curState == tname && !restart)
 		return false; // no action taken
@@ -57,8 +53,7 @@ bool D_SkModel::BlendToState(const char *state, const char *blendTarget, bool re
 	{
 		ska::AnimState::Map::const_iterator it = m_mesh->states->find(String(tname));
 
-		if (it != m_mesh->states->end())
-		{
+		if (it != m_mesh->states->end()) {
 			ska::AnimationVariantsSource::Ref animSource = ska::AnimationVariantsSource::New(
 				it->second.variants,
 				*m_mesh->ska.get(),
@@ -70,12 +65,10 @@ bool D_SkModel::BlendToState(const char *state, const char *blendTarget, bool re
 		}
 	}
 
-	if (!target)
-	{
+	if (!target) {
 		ska::Animation::Map::const_iterator it = m_mesh->ska->anims->find(tname);
 		
-		if (it != m_mesh->ska->anims->end())
-		{
+		if (it != m_mesh->ska->anims->end()) {
 			ska::AnimationSource::Ref animSource = ska::AnimationSource::New(
 				*it->second,
 				1.f,
@@ -91,17 +84,37 @@ bool D_SkModel::BlendToState(const char *state, const char *blendTarget, bool re
 		}
 	}
 
-	if (target)
-	{
-		m_curState = tname;
+	if (target) {
+		m_curState = state; // make copy of string.
 		m_blendTo->BlendTo(target);
 	}
 
 	return target ? true : false;
 }
 
-int D_SkModel::lua_BlendToState(lua_State *L)
-{
+bool D_SkModel::HasState(const char *state) {
+	if (!m_blendTo || !m_mesh->ska->root.get())
+		return false;
+	
+	String tname(CStr(state));
+
+	{
+		ska::AnimState::Map::const_iterator it = m_mesh->states->find(String(tname));
+		if (it != m_mesh->states->end())
+			return true;
+	}
+
+	{
+		ska::Animation::Map::const_iterator it = m_mesh->ska->anims->find(tname);
+		
+		if (it != m_mesh->ska->anims->end())
+			return true;
+	}
+
+	return false;
+}
+
+int D_SkModel::lua_BlendToState(lua_State *L) {
 	Ref self = Get<D_SkModel>(L, "D_SkModel", 1, true);
 	const char *string = luaL_checkstring(L, 2);
 	const char *blendTarget = lua_tostring(L, 3);
@@ -110,8 +123,8 @@ int D_SkModel::lua_BlendToState(lua_State *L)
 	ska::Notify::Ref notify;
 
 	Entity *entity = WorldLua::EntFramePtr(L, 5, false);
-	if (entity && lua_gettop(L) > 5) // passed in a callback table?
-	{
+	if (entity && lua_gettop(L) > 5)  {
+		// passed in a callback table
 		int callbackId = entity->StoreLuaCallback(L, 6, 5);
 		RAD_ASSERT(callbackId != -1);
 		notify.reset(new Notify(*entity, callbackId));
@@ -119,8 +132,7 @@ int D_SkModel::lua_BlendToState(lua_State *L)
 
 	bool r = self->BlendToState(string, blendTarget, restart, notify);
 
-	if (notify && r)
-	{
+	if (notify && r) {
 		static_cast<Notify&>(*notify).Push(L);
 		return 1;
 	}
@@ -129,19 +141,15 @@ int D_SkModel::lua_BlendToState(lua_State *L)
 	return 1;
 }
 
-int D_SkModel::lua_SetRootController(lua_State *L)
-{
+int D_SkModel::lua_SetRootController(lua_State *L) {
 	Ref self = Get<D_SkModel>(L, "D_SkModel", 1, true);
 	const char *type;
 	
 	Entity *entity = 0;
 
-	if (lua_type(L, 2) == LUA_TSTRING)
-	{
+	if (lua_type(L, 2) == LUA_TSTRING) {
 		type = lua_tostring(L, 2);
-	}
-	else
-	{
+	} else {
 		entity = WorldLua::EntFramePtr(L, 2, true);
 		type = luaL_checkstring(L, 3);
 	}
@@ -150,29 +158,31 @@ int D_SkModel::lua_SetRootController(lua_State *L)
 	return 0;
 }
 
+int D_SkModel::lua_HasState(lua_State *L) {
+	Ref self = Get<D_SkModel>(L, "D_SkModel", 1, true);
+	lua_pushboolean(L, self->HasState(luaL_checkstring(L, 2)) ? 1 : 0);
+	return 1;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 D_SkModel::Notify::Notify(Entity &entity, int callbackId) :
 m_entity(entity.shared_from_this()),
-m_callbackId(callbackId)
-{
+m_callbackId(callbackId) {
 }
 
-D_SkModel::Notify::~Notify()
-{
+D_SkModel::Notify::~Notify() {
 	Entity::Ref entity = m_entity.lock();
 	if (entity)
 		entity->ReleaseLuaCallback(m_callbackId, lua::InvalidIndex);
 }
 
-void D_SkModel::Notify::PushElements(lua_State *L)
-{
+void D_SkModel::Notify::PushElements(lua_State *L) {
 	lua_pushcfunction(L, lua_SetMasked);
 	lua_setfield(L, -2, "SetMasked");
 }
 
-void D_SkModel::Notify::OnTag(const ska::AnimTagEventData &data)
-{
+void D_SkModel::Notify::OnTag(const ska::AnimTagEventData &data) {
 	Entity::Ref entity = m_entity.lock();
 	if (!entity)
 		return;
@@ -182,8 +192,7 @@ void D_SkModel::Notify::OnTag(const ska::AnimTagEventData &data)
 	lua_State *L = entity->world->lua->L;
 
 	lua_getfield(L, -1, "OnTag");
-	if (lua_type(L, -1) != LUA_TFUNCTION)
-	{
+	if (lua_type(L, -1) != LUA_TFUNCTION) {
 		lua_pop(L, 2);
 		return;
 	}
@@ -194,8 +203,7 @@ void D_SkModel::Notify::OnTag(const ska::AnimTagEventData &data)
 	lua_pop(L, 1); // pop callback table
 }
 
-void D_SkModel::Notify::OnEndFrame(const ska::AnimStateEventData &data)
-{
+void D_SkModel::Notify::OnEndFrame(const ska::AnimStateEventData &data) {
 	Entity::Ref entity = m_entity.lock();
 	if (!entity)
 		return;
@@ -205,8 +213,7 @@ void D_SkModel::Notify::OnEndFrame(const ska::AnimStateEventData &data)
 	lua_State *L = entity->world->lua->L;
 
 	lua_getfield(L, -1, "OnEndFrame");
-	if (lua_type(L, -1) != LUA_TFUNCTION)
-	{
+	if (lua_type(L, -1) != LUA_TFUNCTION) {
 		lua_pop(L, 2);
 		return;
 	}
@@ -216,8 +223,7 @@ void D_SkModel::Notify::OnEndFrame(const ska::AnimStateEventData &data)
 	lua_pop(L, 1); // pop callback table
 }
 
-void D_SkModel::Notify::OnFinish(const ska::AnimStateEventData &data, bool masked)
-{
+void D_SkModel::Notify::OnFinish(const ska::AnimStateEventData &data, bool masked) {
 	Entity::Ref entity = m_entity.lock();
 	if (!entity)
 		return;
@@ -227,8 +233,7 @@ void D_SkModel::Notify::OnFinish(const ska::AnimStateEventData &data, bool maske
 	lua_State *L = entity->world->lua->L;
 
 	lua_getfield(L, -1, "OnFinish");
-	if (lua_type(L, -1) != LUA_TFUNCTION)
-	{
+	if (lua_type(L, -1) != LUA_TFUNCTION) {
 		lua_pop(L, 2);
 		return;
 	}
@@ -238,8 +243,7 @@ void D_SkModel::Notify::OnFinish(const ska::AnimStateEventData &data, bool maske
 	lua_pop(L, 1); // pop callback table
 }
 
-int D_SkModel::Notify::lua_SetMasked(lua_State *L)
-{
+int D_SkModel::Notify::lua_SetMasked(lua_State *L) {
 	Ref self = lua::SharedPtr::Get<Notify>(L, "D_SkModel::Notify", 1, true);
 	bool wasMasked = self->masked;
 	self->masked = lua_toboolean(L, 2) ? true : false;

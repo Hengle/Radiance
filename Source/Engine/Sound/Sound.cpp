@@ -390,6 +390,7 @@ m_vbd(0),
 m_blockData(0),
 m_decodeOfs(0),
 m_eos(false),
+m_fadeOutAndStop(false),
 m_bsi(0) {
 	m_pos[0] = Vec3::Zero;
 	m_pos[1] = Vec3::Zero;
@@ -551,8 +552,7 @@ bool Sound::InitStreaming(
 	return true;
 }
 
-void Sound::FadeVolume(float volume, float time)
-{
+void Sound::FadeVolume(float volume, float time, bool fadeOutAndStop) {
 	if (time > 0.f) {
 		m_volume[1] = m_volume[0];
 		m_volume[2] = volume;
@@ -562,6 +562,11 @@ void Sound::FadeVolume(float volume, float time)
 		m_volume[0] = volume;
 		m_time[1] = 0.f;
 	}
+
+	if (volume > 0.f)
+		fadeOutAndStop = false;
+
+	m_fadeOutAndStop = fadeOutAndStop;
 }
 
 bool Sound::Play(SoundChannel c, int priority) {
@@ -756,6 +761,11 @@ bool Sound::Tick(
 
 	if (m_is)
 		return false;
+
+	if (m_volume[3] == 0.f && m_fadeOutAndStop) {
+		m_alDriver->SourceStop(ALDRIVER_SIG source.source);
+		source.status = AL_STOPPED;
+	}
 
 	if (source.status == AL_STOPPED) {
 		--m_playing;

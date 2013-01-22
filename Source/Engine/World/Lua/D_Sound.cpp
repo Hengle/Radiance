@@ -148,7 +148,8 @@ int D_Sound::lua_FadeVolume(lua_State *L)
 	Ref self = Get<D_Sound>(L, "D_Sound", 1, true);
 	self->sound->FadeVolume(
 		(float)luaL_checknumber(L, 2),
-		(float)luaL_checknumber(L, 3)
+		(float)luaL_checknumber(L, 3),
+		lua_toboolean(L, 4) ? true : false // fade out and stop.
 	);
 	return 0;
 }

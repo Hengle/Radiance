@@ -57,15 +57,39 @@ public:
 
 private:
 
-	RAD_DECLARE_GET(pos, const Vec3&) { return m_pos[0]; }
-	RAD_DECLARE_SET(pos, const Vec3&) { m_pos[0] = value; }
-	RAD_DECLARE_GET(vel, const Vec3&) { return m_vel[0]; }
-	RAD_DECLARE_SET(vel, const Vec3&) { m_vel[0] = value; }
-	RAD_DECLARE_GET(rot, const Quat&) { return m_rot[0]; }
-	RAD_DECLARE_SET(rot, const Quat&) { m_rot[0] = value; }
-	RAD_DECLARE_GET(distanceModel, ALenum) { return m_distanceModel; }
+	RAD_DECLARE_GET(pos, const Vec3&) { 
+		return m_pos[0]; 
+	}
+
+	RAD_DECLARE_SET(pos, const Vec3&) { 
+		m_pos[0] = value; 
+	}
+
+	RAD_DECLARE_GET(vel, const Vec3&) { 
+		return m_vel[0]; 
+	}
+
+	RAD_DECLARE_SET(vel, const Vec3&) { 
+		m_vel[0] = value; 
+	}
+
+	RAD_DECLARE_GET(rot, const Quat&) { 
+		return m_rot[0]; 
+	}
+
+	RAD_DECLARE_SET(rot, const Quat&) { 
+		m_rot[0] = value; 
+	}
+
+	RAD_DECLARE_GET(distanceModel, ALenum) { 
+		return m_distanceModel; 
+	}
+
 	RAD_DECLARE_SET(distanceModel, ALenum);
-	RAD_DECLARE_GET(masterVolume, float) { return m_volume[0]; }
+
+	RAD_DECLARE_GET(masterVolume, float) { 
+		return m_volume[0]; 
+	}
 
 	SoundContext(const ALDriver::Ref &driver);
 
@@ -178,7 +202,12 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Sound, context, SoundContext::Ref);
 	RAD_DECLARE_READONLY_PROPERTY(Sound, asset, const pkg::AssetRef&);
 
-	void FadeVolume(float volume, float time);
+	void FadeVolume(
+		float volume, 
+		float time, 
+		bool fadeOutAndStop = true /* only applies when fading to zero volume */
+	);
+
 	bool Play(SoundChannel c, int priority);
 	void Pause(bool pause = true);
 	void Rewind();
@@ -188,39 +217,114 @@ private:
 
 	friend class SoundContext;
 
-	RAD_DECLARE_GET(pos, const Vec3&) { return m_pos[0]; }
-	RAD_DECLARE_SET(pos, const Vec3&) { m_pos[0] = value; }
-	RAD_DECLARE_GET(vel, const Vec3&) { return m_vel[0]; }
-	RAD_DECLARE_SET(vel, const Vec3&) { m_vel[0] = value; }
-	RAD_DECLARE_GET(rot, const Quat&) { return m_rot[0]; }
-	RAD_DECLARE_SET(rot, const Quat&) { m_rot[0] = value; }
-	RAD_DECLARE_GET(volume, float) { return m_volume[0]; }
-	RAD_DECLARE_GET(loop, bool) { return m_loop; }
+	RAD_DECLARE_GET(pos, const Vec3&) { 
+		return m_pos[0]; }
+
+	RAD_DECLARE_SET(pos, const Vec3&) { 
+		m_pos[0] = value; 
+	}
+
+	RAD_DECLARE_GET(vel, const Vec3&) { 
+		return m_vel[0]; 
+	}
+
+	RAD_DECLARE_SET(vel, const Vec3&) { 
+		m_vel[0] = value; 
+	}
+
+	RAD_DECLARE_GET(rot, const Quat&) { 
+		return m_rot[0]; 
+	}
+
+	RAD_DECLARE_SET(rot, const Quat&) { 
+		m_rot[0] = value; 
+	}
+
+	RAD_DECLARE_GET(volume, float) { 
+		return m_volume[0]; 
+	}
+
+	RAD_DECLARE_GET(loop, bool) { 
+		return m_loop; 
+	}
+
 	RAD_DECLARE_SET(loop, bool);
-	RAD_DECLARE_GET(sourceRelative, bool) { return m_relative; }
+
+	RAD_DECLARE_GET(sourceRelative, bool) { 
+		return m_relative; 
+	}
+
 	RAD_DECLARE_SET(sourceRelative, bool);
-	RAD_DECLARE_GET(innerAngle, float) { return m_angles[0]; }
+
+	RAD_DECLARE_GET(innerAngle, float) { 
+		return m_angles[0]; 
+	}
+
 	RAD_DECLARE_SET(innerAngle, float);
-	RAD_DECLARE_GET(outerAngle, float) { return m_angles[0]; }
+
+	RAD_DECLARE_GET(outerAngle, float) { 
+		return m_angles[0]; 
+	}
+
 	RAD_DECLARE_SET(outerAngle, float);
-	RAD_DECLARE_GET(outerVolume, float) { return m_outerVolume; }
+
+	RAD_DECLARE_GET(outerVolume, float) { 
+		return m_outerVolume; 
+	}
+
 	RAD_DECLARE_SET(outerVolume, float);
-	RAD_DECLARE_GET(minVolume, float) { return m_minMaxVolume[0]; }
+
+	RAD_DECLARE_GET(minVolume, float) { 
+		return m_minMaxVolume[0]; 
+	}
+
 	RAD_DECLARE_SET(minVolume, float);
-	RAD_DECLARE_GET(maxVolume, float) { return m_minMaxVolume[1]; }
+
+	RAD_DECLARE_GET(maxVolume, float) { 
+		return m_minMaxVolume[1]; 
+	}
+
 	RAD_DECLARE_SET(maxVolume, float);
-	RAD_DECLARE_GET(pitch, float) { return m_pitch; }
+
+	RAD_DECLARE_GET(pitch, float) { 
+		return m_pitch; 
+	}
+
 	RAD_DECLARE_SET(pitch, float);
-	RAD_DECLARE_GET(rolloff, float) { return m_rolloff; }
+
+	RAD_DECLARE_GET(rolloff, float) { 
+		return m_rolloff; 
+	}
+
 	RAD_DECLARE_SET(rolloff, float);
-	RAD_DECLARE_GET(refDistance, float) { return m_refDistance; }
+
+	RAD_DECLARE_GET(refDistance, float) {
+		return m_refDistance; 
+	}
+
 	RAD_DECLARE_SET(refDistance, float);
-	RAD_DECLARE_GET(maxDistance, float) { return m_maxDistance; }
+
+	RAD_DECLARE_GET(maxDistance, float) { 
+		return m_maxDistance; 
+	}
+
 	RAD_DECLARE_SET(maxDistance, float);
-	RAD_DECLARE_GET(playing, bool) { return m_playing>0; }
-	RAD_DECLARE_GET(paused, bool) { return m_paused>0; }
-	RAD_DECLARE_GET(context, SoundContext::Ref) { return m_ctx.lock(); }
-	RAD_DECLARE_GET(asset, const pkg::AssetRef&) { return m_asset; }
+
+	RAD_DECLARE_GET(playing, bool) { 
+		return m_playing>0; 
+	}
+
+	RAD_DECLARE_GET(paused, bool) { 
+		return m_paused>0; 
+	}
+
+	RAD_DECLARE_GET(context, SoundContext::Ref) { 
+		return m_ctx.lock(); 
+	}
+
+	RAD_DECLARE_GET(asset, const pkg::AssetRef&) { 
+		return m_asset; 
+	}
 
 	Sound();
 
@@ -285,6 +389,7 @@ private:
 	pkg::AssetRef m_asset;
 	bool m_loop;
 	bool m_relative;
+	bool m_fadeOutAndStop;
 	float m_volume[4];
 	float m_time[2];
 	float m_angles[2];
