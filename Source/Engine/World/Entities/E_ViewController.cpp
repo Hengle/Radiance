@@ -602,15 +602,6 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 }
 
 void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFwd) {
-	Vec3 v;
-
-	if (m_rail.tm && !m_rail.strict) {
-		v = target - m_rail.tm->t;
-		float d = v.MagnitudeSquared();
-		if (d <= m_rail.distance)
-			return;
-	}
-
 	Vec3 fwd(Vec3::Zero);
 	if (m_rail.tm) {
 		fwd = target - m_rail.tm->t;
@@ -633,15 +624,32 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 	bool stayBehind = (m_rail.stayBehind >= 0.f);
 
 	const bsp_file::BSPFile *bspFile = world->bspFile;
-	float bestDist = std::numeric_limits<float>::max();
+	float bestDist[2];
+	bestDist[0] = std::numeric_limits<float>::max();
+	bestDist[1] = bestDist[0];
 	
-	const bsp_file::BSPCameraTM *best = bspFile->CameraTMs() + m_rail.track->firstTM;
+	const bsp_file::BSPCameraTM *best[2];
+	best[0] = m_rail.tm ? m_rail.tm : bspFile->CameraTMs() + m_rail.track->firstTM;
+	best[1] = 0;
 
 	for (S32 i = 0; i < m_rail.track->numTMs; ++i) {
 		const bsp_file::BSPCameraTM *tm = bspFile->CameraTMs() + m_rail.track->firstTM + i;
 
-		v = target - tm->t;
-		if (m_rail.tm) {
+		Vec3 v = target - tm->t;
+		
+		float d = v.MagnitudeSquared();
+
+		float dd = m_rail.distance - d;
+		float abs = math::Abs(dd);
+
+		if ((!m_rail.tm || m_rail.strict) && (abs < bestDist[0])) {
+			bestDist[0] = abs;
+			best[0] = tm;
+		}
+
+		// these are more correct, but may not be available:
+
+		if (m_rail.tm && !stayBehind) {
 			// new position must be on same side as old
 			if (fwd.Dot(v) < 0.f)
 				continue;
@@ -653,18 +661,13 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 				continue;
 		}
 
-		float d = v.MagnitudeSquared();
-
-		float dd = m_rail.distance - d;
-		float abs = math::Abs(dd);
-
-		if (abs < bestDist) {
-			bestDist = abs;
-			best = tm;
+		if (abs < bestDist[1]) {
+			bestDist[1] = abs;
+			best[1] = tm;
 		}
 	}
 
-	m_rail.tm = best;
+	m_rail.tm = best[1] ? best[1] : best[0];
 }
 
 float E_ViewController::TickFOV(int frame, float dt, float distance) {
