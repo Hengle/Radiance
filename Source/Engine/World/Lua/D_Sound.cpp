@@ -48,6 +48,8 @@ void D_Sound::PushElements(lua_State *L)
 	lua_setfield(L, -2, "Paused");
 	lua_pushcfunction(L, lua_FadeVolume);
 	lua_setfield(L, -2, "FadeVolume");
+	lua_pushcfunction(L, lua_FadeOutAndStop);
+	lua_setfield(L, -2, "FadeOutAndStop");
 	lua_pushcfunction(L, lua_Play);
 	lua_setfield(L, -2, "Play");
 	lua_pushcfunction(L, lua_Pause);
@@ -148,9 +150,15 @@ int D_Sound::lua_FadeVolume(lua_State *L)
 	Ref self = Get<D_Sound>(L, "D_Sound", 1, true);
 	self->sound->FadeVolume(
 		(float)luaL_checknumber(L, 2),
-		(float)luaL_checknumber(L, 3),
-		lua_toboolean(L, 4) ? true : false // fade out and stop.
+		(float)luaL_checknumber(L, 3)
 	);
+	return 0;
+}
+
+int D_Sound::lua_FadeOutAndStop(lua_State *L)
+{
+	Ref self = Get<D_Sound>(L, "D_Sound", 1, true);
+	self->sound->FadeOutAndStop((float)luaL_checknumber(L, 2));
 	return 0;
 }
 

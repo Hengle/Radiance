@@ -552,7 +552,7 @@ bool Sound::InitStreaming(
 	return true;
 }
 
-void Sound::FadeVolume(float volume, float time, bool fadeOutAndStop) {
+void Sound::FadeVolume(float volume, float time) {
 	if (time > 0.f) {
 		m_volume[1] = m_volume[0];
 		m_volume[2] = volume;
@@ -562,11 +562,11 @@ void Sound::FadeVolume(float volume, float time, bool fadeOutAndStop) {
 		m_volume[0] = volume;
 		m_time[1] = 0.f;
 	}
+}
 
-	if (volume > 0.f)
-		fadeOutAndStop = false;
-
-	m_fadeOutAndStop = fadeOutAndStop;
+void Sound::FadeOutAndStop(float time) {
+	FadeVolume(0, time);
+	m_fadeOutAndStop = true;
 }
 
 bool Sound::Play(SoundChannel c, int priority) {
@@ -579,6 +579,8 @@ bool Sound::Play(SoundChannel c, int priority) {
 		return true; // already playing.
 	if (m_paused>0)
 		return false; // must unpause first.
+
+	m_fadeOutAndStop = false;
 
 	for (SourceVec::iterator it = m_sources.begin(); it != m_sources.end(); ++it) {
 		SoundContext::Source &source = *it;

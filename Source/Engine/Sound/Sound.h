@@ -202,11 +202,8 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Sound, context, SoundContext::Ref);
 	RAD_DECLARE_READONLY_PROPERTY(Sound, asset, const pkg::AssetRef&);
 
-	void FadeVolume(
-		float volume, 
-		float time, 
-		bool fadeOutAndStop = true /* only applies when fading to zero volume */
-	);
+	void FadeVolume(float volume, float time);
+	void FadeOutAndStop(float time);
 
 	bool Play(SoundChannel c, int priority);
 	void Pause(bool pause = true);

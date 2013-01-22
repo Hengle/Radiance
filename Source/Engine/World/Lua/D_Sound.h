@@ -44,6 +44,7 @@ private:
 	static int lua_Playing(lua_State*L);
 	static int lua_Paused(lua_State *L);
 	static int lua_FadeVolume(lua_State *L);
+	static int lua_FadeOutAndStop(lua_State *L);
 	static int lua_Play(lua_State *L);
 	static int lua_Pause(lua_State *L);
 	static int lua_Rewind(lua_State *L);
