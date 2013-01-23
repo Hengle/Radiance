@@ -667,7 +667,7 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 		}
 	}
 
-	m_rail.tm = best[1] ? best[1] : best[0];
+	m_rail.tm = (best[1] && (!m_rail.strict || (bestDist[1] <= bestDist[0]))) ? best[1] : best[0];
 }
 
 float E_ViewController::TickFOV(int frame, float dt, float distance) {
