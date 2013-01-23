@@ -5,7 +5,9 @@
 
 #include RADPCH
 #include "D_Material.h"
+#include "../../Assets/TextureParser.h"
 #include "../../Renderer/Material.h"
+#include <algorithm>
 
 namespace world {
 
@@ -20,8 +22,42 @@ m_asset(asset) {
 
 void D_Material::PushElements(lua_State *L) {
 	D_Asset::PushElements(L);
+	lua_pushcfunction(L, lua_Dimensions);
+	lua_setfield(L, -2, "Dimensions");
 	lua_pushcfunction(L, lua_SetState);
 	lua_setfield(L, -2, "SetState");
+}
+
+int D_Material::lua_Dimensions(lua_State *L) {
+	D_Material::Ref self = lua::SharedPtr::Get<D_Material>(L, "D_Material", 1, true);
+
+	// this function is not fast:
+
+	asset::MaterialLoader::Ref loader = asset::MaterialLoader::Cast(self->m_asset);
+	if (!loader || !loader->info)
+		return 0;
+
+	int mx = 0;
+	int my = 0;
+
+	// find the largest texture.
+	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
+		asset::TextureParser::Ref t = asset::TextureParser::Cast(loader->Texture(i));
+		if (!t)
+			break;
+		if (!t->headerValid)
+			break;
+		mx = std::max(mx, t->header->width);
+		my = std::max(my, t->header->height);
+	}
+	
+	if (mx > 0 && my > 0) {
+		lua_pushinteger(L, mx);
+		lua_pushinteger(L, my);
+		return 2;
+	}
+
+	return 0;
 }
 
 int D_Material::lua_SetState(lua_State *L) {

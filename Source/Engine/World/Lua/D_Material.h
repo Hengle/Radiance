@@ -34,8 +34,9 @@ private:
 
 	RAD_DECLARE_GET(material, r::Material*) { return m_parser ? m_parser->material.get() : 0; }
 
+	static int lua_Dimensions(lua_State *L);
 	static int lua_SetState(lua_State *L);
-
+	
 	pkg::AssetRef m_asset;
 	asset::MaterialParser::Ref m_parser;
 };

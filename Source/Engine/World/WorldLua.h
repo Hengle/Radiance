@@ -202,6 +202,8 @@ private:
 	static int lua_World_SetWorldspawn(lua_State *L);
 	static int lua_World_ViewController(lua_State *L);
 	static int lua_World_SetViewController(lua_State *L);
+	static int lua_World_GameCode(lua_State *L);
+	static int lua_World_SetGameCode(lua_State *L);
 	static int lua_World_GameTime(lua_State *L);
 	static int lua_World_SysTime(lua_State *L);
 	static int lua_World_DeltaTime(lua_State *L);

@@ -49,7 +49,7 @@ int E_TouchTrigger::Spawn(
 		return pkg::SR_ParseError;
 	}
 
-	SetNextTick(250); // 4hz
+	SetNextTick(1.f/4.f); // 4hz
 
 	return pkg::SR_Success;
 }

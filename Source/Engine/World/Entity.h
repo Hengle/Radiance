@@ -305,7 +305,7 @@ protected:
 	Vec3 ApplyVelocity(float dt);
 	void Move();
 	void TransitionFloorMove();
-	void SetNextTick(int millis);
+	void SetNextTick(float dt);
 
 	PState m_ps;
 	PSVars m_psv;
@@ -463,10 +463,10 @@ private:
 	int m_frame;
 	int m_spawnState;
 	int m_id;
-	int m_nextLuaThink;
-	int m_lastLuaThink;
-	int m_nextTick;
-	int m_lastTick;
+	float m_nextLuaThink;
+	float m_lastLuaThink;
+	float m_nextTick;
+	float m_lastTick;
 	int m_markFrame;
 	int m_classbits;
 	bool m_scripted;

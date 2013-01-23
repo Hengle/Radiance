@@ -382,11 +382,8 @@ void Game::PostInputEvent(const InputEvent &e) {
 	InputEvent x(e);
 
 	// Only translate LEFT mouse button
-	if ((x.type == InputEvent::T_MouseUp || x.type == InputEvent::T_MouseDown || x.type == InputEvent::T_MouseMove) && 
-		(x.data[2]&kMouseButton_Left))
-	{
-		switch (x.type)
-		{
+	if ((x.type == InputEvent::T_MouseUp || x.type == InputEvent::T_MouseDown || x.type == InputEvent::T_MouseMove) && (x.data[2]&kMouseButton_Left)) {
+		switch (x.type) {
 		case InputEvent::T_MouseDown:
 			x.type = InputEvent::T_TouchBegin;
 			x.touch = (void*)1;

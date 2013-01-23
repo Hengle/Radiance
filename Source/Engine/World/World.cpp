@@ -254,8 +254,8 @@ void World::TickState(float dt, float unmod_dt) {
 		// game is paused, must tick world!
 		xtime::TimeSlice time(1000/60);
 		m_lua->Tick(0.f);
-		if (m_worldspawn)
-			m_worldspawn->PrivateTick(frame, 0.f, time);
+		if (m_gameCode)
+			m_gameCode->PrivateTick(frame, 0.f, time);
 	}
 
 	if (!(pauseState&kPauseCinematics))

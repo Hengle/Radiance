@@ -124,6 +124,8 @@ bool WorldLua::Init() {
 		{ "SetWorldspawn", lua_World_SetWorldspawn },
 		{ "ViewController", lua_World_ViewController },
 		{ "SetViewController", lua_World_SetViewController },
+		{ "GameCode", lua_World_GameCode },
+		{ "SetGameCode", lua_World_SetGameCode },
 		{ "GameTime", lua_World_GameTime },
 		{ "SysTime", lua_World_SysTime },
 		{ "DeltaTime", lua_World_DeltaTime },

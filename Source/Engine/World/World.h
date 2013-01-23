@@ -143,6 +143,7 @@ public:
 	RAD_DECLARE_PROPERTY(World, viewController, Entity::Ref, Entity::Ref);
 	RAD_DECLARE_PROPERTY(World, playerPawn, Entity::Ref, Entity::Ref);
 	RAD_DECLARE_PROPERTY(World, worldspawn, Entity::Ref, Entity::Ref);
+	RAD_DECLARE_PROPERTY(World, gameCode, Entity::Ref, Entity::Ref);
 	RAD_DECLARE_PROPERTY(World, pauseState, int, int);
 	RAD_DECLARE_PROPERTY(World, enabledGestures, int, int);
 	RAD_DECLARE_READONLY_PROPERTY(World, time, float);
@@ -368,6 +369,10 @@ private:
 		return m_worldspawn; 
 	}
 
+	RAD_DECLARE_GET(gameCode, Entity::Ref) { 
+		return m_gameCode; 
+	}
+
 	RAD_DECLARE_SET(viewController, Entity::Ref) { 
 		m_viewController = value; 
 	}
@@ -378,6 +383,10 @@ private:
 
 	RAD_DECLARE_SET(worldspawn, Entity::Ref) { 
 		m_worldspawn = value; 
+	}
+
+	RAD_DECLARE_SET(gameCode, Entity::Ref) { 
+		m_gameCode = value; 
 	}
 
 	RAD_DECLARE_GET(time, float) { 
@@ -474,6 +483,7 @@ private:
 	Entity::Ref m_playerPawn;
 	Entity::Ref m_viewController;
 	Entity::Ref m_worldspawn;
+	Entity::Ref m_gameCode;
 	ZoneIdMap m_zoneTags;
 	Camera m_cam;
 	WorldDraw::Ref m_draw;

@@ -738,21 +738,45 @@ int WorldLua::lua_World_SetViewController(lua_State *L) {
 	return 0;
 }
 
+int WorldLua::lua_World_GameCode(lua_State *L) {
+	LOAD_SELF
+	Entity::Ref r = self->m_world->gameCode;
+	if (r) {
+		r->PushEntityFrame(L);
+	} else {
+		lua_pushnil(L);
+	}
+
+	return 1;
+}
+
+int WorldLua::lua_World_SetGameCode(lua_State *L) {
+	LOAD_SELF
+
+	if (lua_isnil(L, 1)) {
+		self->m_world->gameCode = Entity::Ref();
+	} else {
+		self->m_world->gameCode = EntFramePtr(L, 1, true)->shared_from_this();
+	}
+
+	return 0;
+}
+
 int WorldLua::lua_World_GameTime(lua_State *L) {
 	LOAD_SELF
-	lua_pushnumber(L, self->m_world->gameTime.get()*1000.f);
+	lua_pushnumber(L, self->m_world->gameTime.get());
 	return 1;
 }
 
 int WorldLua::lua_World_SysTime(lua_State *L) {
 	LOAD_SELF
-	lua_pushnumber(L, self->m_world->time.get()*1000.f);
+	lua_pushnumber(L, self->m_world->time.get());
 	return 1;
 }
 
 int WorldLua::lua_World_DeltaTime(lua_State *L) {
 	LOAD_SELF
-	lua_pushnumber(L, self->m_world->dt.get()*1000.f);
+	lua_pushnumber(L, self->m_world->dt.get());
 	return 1;
 }
 

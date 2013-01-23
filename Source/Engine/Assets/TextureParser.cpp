@@ -297,6 +297,13 @@ int TextureParser::LoadCooked(
 			}
 		}
 
+		if (m_images.empty()) {
+			m_header.format = img->format;
+			m_header.numMips = (img->frameCount>0) ? img->frames->mipCount : 0;
+			m_header.width = (img->frameCount>0) && (img->frames->mipCount>0) ? img->frames->mipmaps->width : 0;
+			m_header.height = (img->frameCount>0) && (img->frames->mipCount>0) ? img->frames->mipmaps->height : 0;
+		}
+
 		m_images.push_back(img);
 	}
 

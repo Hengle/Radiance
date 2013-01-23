@@ -105,10 +105,10 @@ Entity::Ref Entity::LuaCreate(const char *classname) {
 Entity::Entity() :
 m_spawnState(S_LuaCreate), 
 m_id(-1),
-m_nextLuaThink(1000), 
-m_lastLuaThink(0),
-m_nextTick(0),
-m_lastTick(0),
+m_nextLuaThink(1.f), 
+m_lastLuaThink(0.f),
+m_nextTick(0.f),
+m_lastTick(0.f),
 m_scripted(false),
 m_frame(-1),
 m_luaCallbackIdx(0),
@@ -234,18 +234,18 @@ void Entity::PrivateTick(
 
 	bool think = !m_scriptTasks.Tick(*this, dt, time, 0);
 	
-	int worldTime = (int)(world->gameTime.get()*1000.f);
+	float gameTime = world->gameTime.get();
 
-	if (m_scripted && think && (worldTime-m_lastLuaThink) >= m_nextLuaThink) {
+	if (m_scripted && think && (gameTime-m_lastLuaThink) >= m_nextLuaThink) {
 		bool unused;
 		world->lua->RunCo(*this, unused);
-		m_lastLuaThink = worldTime;
+		m_lastLuaThink = gameTime;
 	}
 
 	m_tasks.Tick(*this, dt, xtime::TimeSlice::Infinite, kTickFlag_PreTick);
-	if ((worldTime-m_lastTick) >= m_nextTick) {
-		Tick(frame, (worldTime - m_lastTick) / 1000.f, time);
-		m_lastTick = worldTime;
+	if ((gameTime-m_lastTick) >= m_nextTick) {
+		Tick(frame, (gameTime - m_lastTick), time);
+		m_lastTick = gameTime;
 	}
 
 	m_tasks.Tick(*this, dt, xtime::TimeSlice::Infinite, kTickFlag_PostTick);
@@ -749,11 +749,11 @@ ENT_SET_CUSTOM(Entity, SolidType, self->m_ps.stype = (SolidType)luaL_checkintege
 ENT_GET(Entity, OccupantType, int, m_ps.otype);
 ENT_SET_CUSTOM(Entity, OccupantType, self->m_ps.otype = (OccupantType)luaL_checkinteger(L, 2));
 ENT_GETSET(Entity, Flags, int, m_ps.flags);
-ENT_GETSET(Entity, NextThink, int, m_nextLuaThink);
+ENT_GETSET(Entity, NextThink, float, m_nextLuaThink);
 ENT_GETSET(Entity, ClassBits, int, m_classbits);
 
-void Entity::SetNextTick(int millis) {
-	m_nextTick = millis;
+void Entity::SetNextTick(float dt) {
+	m_nextTick = dt;
 }
 
 } // world
