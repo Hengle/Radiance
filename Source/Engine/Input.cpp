@@ -74,6 +74,24 @@ void Marshal<InputGesture>::Push(lua_State *L, const InputGesture &g, const Touc
 		lua_settable(L, -3);
 	}
 	lua_setfield(L, -2, "origin");
+
+	lua_createtable(L, 2, 0);
+	for (int i = 0; i < 2; ++i)
+	{
+		lua_pushinteger(L, i+1);
+		lua_pushinteger(L, g.start[i]);
+		lua_settable(L, -3);
+	}
+	lua_setfield(L, -2, "start");
+
+	lua_createtable(L, 2, 0);
+	for (int i = 0; i < 2; ++i)
+	{
+		lua_pushinteger(L, i+1);
+		lua_pushinteger(L, g.end[i]);
+		lua_settable(L, -3);
+	}
+	lua_setfield(L, -2, "finish"); // lua doesn't like us using "end"
 	
 	lua::Marshal<Vec3>::Push(L, g.args);
 	lua_setfield(L, -2, "args");

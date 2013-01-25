@@ -17,7 +17,7 @@ namespace {
 enum {
 	kDoubleClickMs = 150,
 	kDoubleTapMs = 200,
-	kMinLineClockTime = 150,
+	kMinLineClockTime = 50,
 	kLineGestureTime = 200
 };
 
@@ -100,24 +100,26 @@ void IdentifyLineGesture(const InputEvent *e, const TouchState &touch, float n[2
 			n[0] /= m;
 			n[1] /= m;
 
+			float x[2];
+
 			m = n[1];
-			n[1] = n[0];
-			n[0] = -m;
+			x[1] = n[0];
+			x[0] = -m;
 
 			isLine = true;
 
 			if (touch.gid == IG_Line) { 
 				// we already generated a line move with this one, make sure we have reversed direction some
-				float d = n[0]*touch.floats[0] + n[1]*touch.floats[1];
+				float d = x[0]*touch.floats[0] + x[1]*touch.floats[1];
 				if (d > -0.3f)
 					isLine = false;
 			} else {
-				float d = n[0]*start[0] + n[1]*start[1];
+				float d = x[0]*start[0] + x[1]*start[1];
 
 				InputPointVec::const_iterator it;
 				for (it = touch.moves.begin(); it != touch.moves.end(); ++it) {
 					const InputPoint &p = *it;
-					m = (n[0]*p[0] + n[1]*p[1]) - d;
+					m = (x[0]*p[0] + x[1]*p[1]) - d;
 					if (math::Abs(m) > GConstants::MaxLineDrift(scale)) {
 						isLine = false;
 						break;
@@ -185,6 +187,10 @@ bool Game::G_LClick(const InputEvent &e, InputState &is, TouchState &touch, Inpu
 		if (e.data[2] & kMouseButton_Left) {
 			g.id = IG_LClick;
 			g.phase = IGPhase_Begin;
+			g.start[0] = e.data[0];
+			g.start[1] = e.data[1];
+			g.end[0] = e.data[0];
+			g.end[1] = e.data[1];
 		}
 		break;
 	default:
@@ -203,6 +209,10 @@ bool Game::G_RClick(const InputEvent &e, InputState &is, TouchState &touch, Inpu
 		if(e.data[2] & kMouseButton_Right) {
 			g.id = IG_RClick;
 			g.phase = IGPhase_Begin;
+			g.start[0] = e.data[0];
+			g.start[1] = e.data[1];
+			g.end[0] = e.data[0];
+			g.end[1] = e.data[1];
 		}
 		break;
 	default:
@@ -240,6 +250,10 @@ bool Game::G_DoubleTap(const InputEvent &e, InputState &is, TouchState &touch, I
 						g.mins[1] = g.maxs[1] = e.data[1];
 						g.origin[0] = e.data[0];
 						g.origin[1] = e.data[1];
+						g.start[0] = e.data[0];
+						g.start[1] = e.data[1];
+						g.end[0] = e.data[0];
+						g.end[1] = e.data[1];
 					}
 
 					m_doubleTap.type = InputEvent::T_Invalid;
@@ -276,6 +290,10 @@ bool Game::G_Tap(const InputEvent &e, InputState &is, TouchState &touch, InputGe
 				g.maxs[1] = touch.maxs[1];
 				g.origin[0] = touch.e.data[0];
 				g.origin[1] = touch.e.data[1];
+				g.start[0] = touch.e.data[0];
+				g.start[1] = touch.e.data[1];
+				g.end[0] = touch.e.data[0];
+				g.end[1] = touch.e.data[1];
 			}
 		}
 		break;
@@ -333,6 +351,10 @@ bool Game::G_Circle(const InputEvent &e, InputState &is, TouchState &touch, Inpu
 				g.maxs[1] = touch.maxs[1];
 				g.origin[0] = touch.mins[0] + (touch.maxs[0]-touch.mins[0])/2;
 				g.origin[1] = touch.mins[1] + (touch.maxs[1]-touch.mins[1])/2;
+				g.start[0] = g.origin[0];
+				g.start[1] = g.origin[1];
+				g.end[0] = g.origin[0];
+				g.end[1] = g.origin[1];
 			}
 		}
 		break;
@@ -381,8 +403,12 @@ bool Game::G_Line(const InputEvent &e, InputState &is, TouchState &touch, InputG
 				g.args[0] = n[0];
 				g.args[1] = n[1];
 				g.args[2] = 0.f;
+				g.start[0] = touch.moves.front()[0];
+				g.start[1] = touch.moves.front()[1];
 
 				InputPoint p = touch.moves.back();
+				g.end[0] = p[0];
+				g.end[1] = p[1];
 				touch.mins[0] = touch.maxs[0] = p[0];
 				touch.mins[1] = touch.maxs[1] = p[1];
 				touch.moves.clear();
@@ -459,6 +485,10 @@ bool Game::G_Pinch(const InputEvent &e, InputState &is, TouchState &touch, Input
 					g.maxs[1] = std::max(e.data[1], otherTouch.moves[0][1]);
 					g.origin[0] = g.mins[0] + (g.maxs[0]-g.mins[0])/2;
 					g.origin[1] = g.mins[1] + (g.maxs[1]-g.mins[1])/2;
+					g.start[0] = g.origin[0];
+					g.start[1] = g.origin[1];
+					g.end[0] = g.origin[0];
+					g.end[1] = g.origin[1];
 
 					otherTouch.gid = IG_Pinch;
 				} else {

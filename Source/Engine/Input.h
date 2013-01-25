@@ -41,6 +41,8 @@ struct InputGesture
 	InputPoint mins;
 	InputPoint maxs;
 	InputPoint origin;
+	InputPoint start;
+	InputPoint end;
 	Vec3 args;
 	xtime::TimeVal time;
 };
