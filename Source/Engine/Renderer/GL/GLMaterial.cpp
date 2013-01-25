@@ -45,6 +45,9 @@ void Material::BindStates(int flags, int blends) {
 		case Material::kDepthFunc_GEqual:
 			drawFlags |= kDepthTest_GEqual;
 			break;
+		case Material::kDepthFunc_Equal:
+			drawFlags |= kDepthTest_Equal;
+			break;
 		}
 	}
 

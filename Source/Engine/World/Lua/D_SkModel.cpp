@@ -55,7 +55,7 @@ bool D_SkModel::BlendToState(const char *state, const char *blendTarget, bool re
 
 		if (it != m_mesh->states->end()) {
 			ska::AnimationVariantsSource::Ref animSource = ska::AnimationVariantsSource::New(
-				it->second.variants,
+				it->second,
 				*m_mesh->ska.get(),
 				notify,
 				blendTarget
@@ -75,7 +75,6 @@ bool D_SkModel::BlendToState(const char *state, const char *blendTarget, bool re
 				1.f,
 				1.f,
 				0,
-				true,
 				*m_mesh->ska.get(),
 				notify
 			);
@@ -245,9 +244,9 @@ void D_SkModel::Notify::OnFinish(const ska::AnimStateEventData &data, bool maske
 
 int D_SkModel::Notify::lua_SetMasked(lua_State *L) {
 	Ref self = lua::SharedPtr::Get<Notify>(L, "D_SkModel::Notify", 1, true);
-	bool wasMasked = self->masked;
-	self->masked = lua_toboolean(L, 2) ? true : false;
-	lua_pushboolean(L, wasMasked ? 1 : 0);
+	int oldMask = self->masked;
+	self->masked = (int)luaL_checkinteger(L, 2);
+	lua_pushinteger(L, oldMask);
 	return 1;
 }
 

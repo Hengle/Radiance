@@ -75,14 +75,17 @@ int SkAnimStatesParser::LoadCooked(
 
 		for (U16 i = 0; i < numStates; ++i) {
 			ska::AnimState state;
-			is >> state.name;
+			U16 temp;
 
+			is >> state.name;
+			is >> temp; state.loopCount[0] = (int)temp;
+			is >> temp; state.loopCount[1] = (int)temp;
+						
 			U16 numVariants;
 			is >> numVariants;
 
 			for (U16 i = 0; i < numVariants; ++i) {
-				S16 temp;
-
+				
 				ska::Variant v;
 				is >> v.name;
 				is >> v.timeScale[0];
@@ -398,8 +401,82 @@ void SkAnimStatesParser::ParseAnimVariant(lua_State *L, const pkg::Asset::Ref &a
 void SkAnimStatesParser::ParseAnimState(lua_State *L, const pkg::Asset::Ref &asset, const lua::Variant::Map &map, ska::AnimState &state) {
 	state.variants.reserve(map.size());
 
+	lua::Variant::Map::const_iterator it = map.find(CStr("loop"));
+	if (it != map.end()) {
+		const lua::Variant::Map *vars = static_cast<const lua::Variant::Map*>(it->second);
+		if (!vars) {
+			luaL_error(L, "AnimState '%s':'%s':loop expected table, (Function %s, File %s, Line %d)",
+				asset->name.get(),
+				state.name.c_str.get(),
+				__FUNCTION__,
+				__FILE__,
+				__LINE__
+			);
+		}
+
+		it = vars->find(CStr("1"));
+		if (it == vars->end()) {
+			luaL_error(L, "AnimState '%s':'%s':loop expected table, (Function %s, File %s, Line %d)",
+				asset->name.get(),
+				state.name.c_str.get(),
+				__FUNCTION__,
+				__FILE__,
+				__LINE__
+			);
+		}
+
+		const lua_Number *low = static_cast<const lua_Number*>(it->second);
+		if (!low) {
+			luaL_error(L, "AnimState '%s':'%s':loop expected number, (Function %s, File %s, Line %d)",
+				asset->name.get(),
+				state.name.c_str.get(),
+				__FUNCTION__,
+				__FILE__,
+				__LINE__
+			);
+		}
+
+		it = vars->find(CStr("2"));
+		if (it == vars->end()) {
+			luaL_error(L, "AnimState '%s':'%s':loop expected table, (Function %s, File %s, Line %d)",
+				asset->name.get(),
+				state.name.c_str.get(),
+				__FUNCTION__,
+				__FILE__,
+				__LINE__
+			);
+		}
+
+		const lua_Number *high = static_cast<const lua_Number*>(it->second);
+		if (!high) {
+			luaL_error(L, "AnimState '%s':'%s':loop expected number, (Function %s, File %s, Line %d)",
+				asset->name.get(),
+				state.name.c_str.get(),
+				__FUNCTION__,
+				__FILE__,
+				__LINE__
+			);
+		}
+
+		state.loopCount[0] = (int)*low;
+		state.loopCount[1] = (int)*high;
+
+		if (state.loopCount[0] < 0)
+			state.loopCount[0] = 0;
+		if (state.loopCount[1] < 0)
+			state.loopCount[1] = 0;
+		if (state.loopCount[0] > state.loopCount[1])
+			state.loopCount[1] = state.loopCount[0];
+	} else {
+		state.loopCount[0] = state.loopCount[1] = 1;
+	}
+
 	for (lua::Variant::Map::const_iterator it = map.begin(); it != map.end(); ++it) {
 		ska::Variant v;
+
+		if (it->first == CStr("loop"))
+			continue; // special keyword
+
 		v.name = it->first;
 
 		const lua::Variant::Map *vars = static_cast<const lua::Variant::Map*>(it->second);

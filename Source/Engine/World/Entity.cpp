@@ -612,12 +612,20 @@ int Entity::lua_AttachDrawModel(lua_State *L) {
 		}
 	}
 
-	// must be a mesh object
-	D_Mesh::Ref x = lua::SharedPtr::Get<D_Mesh>(L, "Model", 2, true);
-	MeshBundleDrawModel::Ref m = MeshBundleDrawModel::New(self, x->bundle);
-	self->AttachDrawModel(m);
-	m->Push(L);
-	return 1;
+	{
+		D_Mesh::Ref x = lua::SharedPtr::Get<D_Mesh>(L, "Model", 2, false);
+		if (x) {
+			MeshBundleDrawModel::Ref m = MeshBundleDrawModel::New(self, x->bundle);
+			self->AttachDrawModel(m);
+			m->Push(L);
+			return 1;
+		}
+	}
+
+	// must be a draw model.
+	DrawModel::Ref x = lua::SharedPtr::Get<DrawModel>(L, "DrawModel", 2, true);
+	self->AttachDrawModel(x);
+	return 0;
 }
 
 int Entity::lua_RemoveDrawModel(lua_State *L) {
@@ -732,6 +740,8 @@ int Entity::LUART_GETFN(DesiredMove)(lua_State *L) {
 int Entity::LUART_SETFN(DesiredMove)(lua_State *L) {
 	Entity *self = WorldLua::EntFramePtr(L, 1, true);
 	self->ps->desiredMove = lua::SharedPtr::Get<FloorMove>(L, "FloorMove", 2, false);
+	if (!self->ps->desiredMove)
+		self->CancelFloorMove();
 	return 0;
 }
 

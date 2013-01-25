@@ -13,7 +13,7 @@ using namespace pkg;
 
 namespace asset {
 
-SkAnimStatesCooker::SkAnimStatesCooker() : Cooker(0) {
+SkAnimStatesCooker::SkAnimStatesCooker() : Cooker(1) {
 }
 
 SkAnimStatesCooker::~SkAnimStatesCooker() {
@@ -83,6 +83,8 @@ int SkAnimStatesCooker::Compile(int flags, int allflags) {
 		const ska::AnimState &state = it->second;
 
 		os << state.name;
+		os << (U16)state.loopCount[0];
+		os << (U16)state.loopCount[1];
 		os << (U16)state.variants.size();
 
 		for (ska::Variant::Vec::const_iterator it = state.variants.begin(); it != state.variants.end(); ++it) {
@@ -90,8 +92,8 @@ int SkAnimStatesCooker::Compile(int flags, int allflags) {
 			os << v.name;
 			os << v.timeScale[0];
 			os << v.timeScale[1];
-			os << (S16)v.loopCount[0];
-			os << (S16)v.loopCount[1];
+			os << (U16)v.loopCount[0];
+			os << (U16)v.loopCount[1];
 			os << v.weight;
 			os << v.in;
 			os << v.out;

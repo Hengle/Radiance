@@ -14,91 +14,70 @@
 
 namespace {
 
-enum
-{
-	DoubleClickMs = 150,
-	DoubleTapMs = 200,
-	MinLineClockTime = 150,
-	LineGestureTime = 200
+enum {
+	kDoubleClickMs = 150,
+	kDoubleTapMs = 200,
+	kMinLineClockTime = 150,
+	kLineGestureTime = 200
 };
 
-struct GConstants
-{
-	enum
-	{
-		BaseMaxTouchMove = 20, // drift more than 20 pixels and we don't emit an IG_Tap
-		BaseMaxDoubleTapMove = BaseMaxTouchMove+30,
-		BaseMinCircleMove = 50,
-		BaseMinLineMove = 120,
-		BaseMaxCircleEndPointDelta = 64,
-		BaseMaxLineDrift = 50,
-		BaseMinLineEndPointDelta = 128
+struct GConstants {
+	enum {
+		kBaseMaxTouchMove = 20, // drift more than 20 pixels and we don't emit an IG_Tap
+		kBaseMaxDoubleTapMove = kBaseMaxTouchMove+30,
+		kBaseMinCircleMove = 50,
+		kBaseMinLineMove = 120,
+		kBaseMaxCircleEndPointDelta = 64,
+		kBaseMaxLineDrift = 50,
+		kBaseMinLineEndPointDelta = 128
 	};
 	
-	static int ResAdjust(int x)
-	{
-		int scale = 1;
-#if defined(RAD_OPT_IOS)
-		if ((App::Get()->deviceFamily == plat::kDeviceFamily_iPad) && (App::Get()->deviceType >= plat::kDeviceType_iPad3))
-			scale = 4;
-#endif
-		return x*scale;
+	static int MaxTouchMove(float scale) {
+		return FloatToInt(kBaseMaxTouchMove*scale);
 	}
 	
-	static int MaxTouchMove() 
-	{
-		return ResAdjust(BaseMaxTouchMove);
+	static int MaxDoubleTapMove(float scale) {
+		return FloatToInt(kBaseMaxDoubleTapMove*scale);
 	}
 	
-	static int MaxDoubleTapMove()
-	{
-		return ResAdjust(BaseMaxDoubleTapMove);
+	static int MinCircleMove(float scale) {
+		return FloatToInt(kBaseMinCircleMove*scale);
 	}
 	
-	static int MinCircleMove()
-	{
-		return ResAdjust(BaseMinCircleMove);
+	static int MinLineMove(float scale) {
+		return FloatToInt(kBaseMinLineMove*scale);
 	}
 	
-	static int MinLineMove()
-	{
-		return ResAdjust(BaseMinLineMove);
+	static int MaxCircleEndPointDelta(float scale) {
+		return FloatToInt(kBaseMaxCircleEndPointDelta*scale);
 	}
 	
-	static int MaxCircleEndPointDelta()
-	{
-		return ResAdjust(BaseMaxCircleEndPointDelta);
+	static int MaxLineDrift(float scale) {
+		return FloatToInt(kBaseMaxLineDrift*scale);
 	}
 	
-	static int MaxLineDrift()
-	{
-		return ResAdjust(BaseMaxLineDrift);
-	}
-	
-	static int MinLineEndPointDelta()
-	{
-		return ResAdjust(BaseMinLineEndPointDelta);
+	static int MinLineEndPointDelta(float scale) {
+		return FloatToInt(kBaseMinLineEndPointDelta*scale);
 	}
 	
 };
 
 // Helperes
 
-void IdentifyLineGesture(const InputEvent *e, const TouchState &touch, float n[2], bool &minSize, bool &isLine)
-{
+void IdentifyLineGesture(const InputEvent *e, const TouchState &touch, float n[2], bool &minSize, bool &isLine, bool scale) {
 	minSize = false;
 	isLine = false;
 
 	if (touch.moves.size() < 2)
 		return;
-	if (e && ((e->time - touch.startTime) < MinLineClockTime))
+	if (e && ((e->time - touch.startTime) < kMinLineClockTime))
 		return;
 	
 	int dx = touch.maxs[0] - touch.mins[0];
 	int dy = touch.maxs[1] - touch.mins[1];
 	
-	if ((dx*dx+dy*dy) >= GConstants::MaxTouchMove()*GConstants::MaxTouchMove())
-	{ // assume it's a line
+	if ((dx*dx+dy*dy) >= GConstants::MaxTouchMove(scale)*GConstants::MaxTouchMove(scale)) { 
+		// assume it's a line
 		const InputPoint &start = touch.moves.front();
 		const InputPoint &end = touch.moves.back();
 
@@ -106,8 +85,7 @@ void IdentifyLineGesture(const InputEvent *e, const TouchState &touch, float n[2
 		dy = end[1] - start[1];
 		int dd = dx*dx+dy*dy;
 
-		if (dd >= GConstants::MinLineMove()*GConstants::MinLineMove())
-		{
+		if (dd >= GConstants::MinLineMove(scale)*GConstants::MinLineMove(scale)) {
 			minSize = true;
 
 			// figure out if there is a line trend here.
@@ -128,23 +106,19 @@ void IdentifyLineGesture(const InputEvent *e, const TouchState &touch, float n[2
 
 			isLine = true;
 
-			if (touch.gid == IG_Line)
-			{ // we already generated a line move with this one, make sure we have reversed direction some
+			if (touch.gid == IG_Line) { 
+				// we already generated a line move with this one, make sure we have reversed direction some
 				float d = n[0]*touch.floats[0] + n[1]*touch.floats[1];
 				if (d > -0.3f)
 					isLine = false;
-			}
-			else
-			{
+			} else {
 				float d = n[0]*start[0] + n[1]*start[1];
 
 				InputPointVec::const_iterator it;
-				for (it = touch.moves.begin(); it != touch.moves.end(); ++it)
-				{
+				for (it = touch.moves.begin(); it != touch.moves.end(); ++it) {
 					const InputPoint &p = *it;
 					m = (n[0]*p[0] + n[1]*p[1]) - d;
-					if (math::Abs(m) > GConstants::MaxLineDrift())
-					{
+					if (math::Abs(m) > GConstants::MaxLineDrift(scale)) {
 						isLine = false;
 						break;
 					}
@@ -162,8 +136,7 @@ bool Game::GestureInput(
 	InputGesture &g, 
 	TouchState &touch,
 	int enabledGestures
-)
-{
+) {
 	g.id = -1;
 	g.time = e.time;
 	g.mins[0] = g.mins[1] = 0;
@@ -171,29 +144,31 @@ bool Game::GestureInput(
 	g.origin[0] = e.data[0];
 	g.origin[1] = e.data[1];
 
-	if (m_pinchTouches.size() == 2)
-	{ // during a pinch ignore all unrelated input.
+	if (m_pinchTouches.size() == 2) { 
+		// during a pinch ignore all unrelated input.
 		if (touch.gid != IG_Pinch)
 			return false;
 	}
+
+	float scale = (m_vp[2]/1024.f) * (m_vp[3]/768.f);
 	
 	// these must be ordered by precidence
 	bool r = false;
 	
 	if (g.id == -1 && !r && (enabledGestures&IG_Pinch))
-		r = G_Pinch(e, is, touch, g);
+		r = G_Pinch(e, is, touch, g, scale);
 	if (g.id == -1 && !r && (enabledGestures&IG_LClick))
-		r = G_LClick(e, is, touch, g);
+		r = G_LClick(e, is, touch, g, scale);
 	if (g.id == -1 && !r && (enabledGestures&IG_RClick))
-		r = G_RClick(e, is, touch, g);
+		r = G_RClick(e, is, touch, g, scale);
 	if (g.id == -1 && !r && (enabledGestures&IG_DoubleTap))
-		r = G_DoubleTap(e, is, touch, g);
+		r = G_DoubleTap(e, is, touch, g, scale);
 	if (g.id == -1 && !r && (enabledGestures&IG_Tap))
-		r = G_Tap(e, is, touch, g);
+		r = G_Tap(e, is, touch, g, scale);
 	if (g.id == -1 && !r && (enabledGestures&IG_Line))
-		r = G_Line(e, is, touch, g);
+		r = G_Line(e, is, touch, g, scale);
 	if (g.id == -1 && !r && (enabledGestures&IG_Circle))
-		r = G_Circle(e, is, touch, g, (enabledGestures&IG_Line) ? true : false);
+		r = G_Circle(e, is, touch, g, (enabledGestures&IG_Line) ? true : false, scale);
 
 	if (g.id != -1)
 		touch.gid = g.id;
@@ -201,16 +176,13 @@ bool Game::GestureInput(
 	return g.id != -1;
 }
 
-bool Game::G_LClick(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g)
-{
+bool Game::G_LClick(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g, float scale) {
 	if (touch.gid != -1)
 		return false; // this touch state cannot generate a gesture
 
-	switch (e.type)
-	{
+	switch (e.type) {
 	case InputEvent::T_MouseUp:
-		if (e.data[2] & kMouseButton_Left)
-		{
+		if (e.data[2] & kMouseButton_Left) {
 			g.id = IG_LClick;
 			g.phase = IGPhase_Begin;
 		}
@@ -222,17 +194,16 @@ bool Game::G_LClick(const InputEvent &e, InputState &is, TouchState &touch, Inpu
 	return false;
 }
 
-bool Game::G_RClick(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g)
-{
+bool Game::G_RClick(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g, float scale) {
 	if (touch.gid != -1)
 		return false; // this touch state cannot generate a gesture
 
-	switch (e.type)
-	{
+	switch (e.type) {
 	case InputEvent::T_MouseUp:
-		if(e.data[2] & kMouseButton_Right)
+		if(e.data[2] & kMouseButton_Right) {
 			g.id = IG_RClick;
 			g.phase = IGPhase_Begin;
+		}
 		break;
 	default:
 		break;
@@ -241,35 +212,28 @@ bool Game::G_RClick(const InputEvent &e, InputState &is, TouchState &touch, Inpu
 	return false;
 }
 
-bool Game::G_DoubleTap(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g)
-{
+bool Game::G_DoubleTap(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g, float scale) {
 	if (touch.gid != -1)
 		return false; // this touch state cannot generate a gesture
 
-	switch (e.type)
-	{
+	switch (e.type) {
 	case InputEvent::T_MouseDown:
-		if (e.data[2] & kMouseButton_Left)
-		{
+		if (e.data[2] & kMouseButton_Left) {
 			// check double click.
-			if ((e.time-is.ms.time) <= DoubleClickMs)
-			{
+			if ((e.time-is.ms.time) <= kDoubleClickMs) {
 				g.id = IG_DoubleTap;
 				g.phase = IGPhase_Begin;
 			}
 		}
 		break;
 	case InputEvent::T_TouchBegin:
-			if (m_doubleTap.type == InputEvent::T_TouchBegin)
-			{
-				if ((e.time - m_doubleTap.time) <= DoubleTapMs)
-				{
+			if (m_doubleTap.type == InputEvent::T_TouchBegin) {
+				if ((e.time - m_doubleTap.time) <= kDoubleTapMs) {
 					int dx = e.data[0] - m_doubleTap.data[0];
 					int dy = e.data[1] - m_doubleTap.data[1];
 					int dd = dx*dx + dy*dy;
 
-					if (dd <= GConstants::MaxDoubleTapMove()*GConstants::MaxDoubleTapMove())
-					{
+					if (dd <= GConstants::MaxDoubleTapMove(scale)*GConstants::MaxDoubleTapMove(scale)) {
 						g.id = IG_DoubleTap;
 						g.phase = IGPhase_Begin;
 						g.mins[0] = g.maxs[0] = e.data[0];
@@ -279,14 +243,10 @@ bool Game::G_DoubleTap(const InputEvent &e, InputState &is, TouchState &touch, I
 					}
 
 					m_doubleTap.type = InputEvent::T_Invalid;
-				}
-				else
-				{
+				} else {
 					m_doubleTap = e;
 				}
-			}
-			else
-			{
+			} else {
 				m_doubleTap = e;
 			}
 		break;
@@ -297,20 +257,17 @@ bool Game::G_DoubleTap(const InputEvent &e, InputState &is, TouchState &touch, I
 	return false;
 }
 
-bool Game::G_Tap(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g)
-{
+bool Game::G_Tap(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g, float scale) {
 	if (touch.gid != -1)
 		return false; // this touch state cannot generate a gesture
 
-	switch (e.type)
-	{
-	case InputEvent::T_TouchEnd:
+	switch (e.type) {
+	case InputEvent::T_TouchEnd: 
 		{
 			int dx = touch.maxs[0] - touch.mins[0];
 			int dy = touch.maxs[1] - touch.mins[1];
 			
-			if ((dx < GConstants::MaxTouchMove()) && (dy < GConstants::MaxTouchMove()))
-			{
+			if ((dx < GConstants::MaxTouchMove(scale)) && (dy < GConstants::MaxTouchMove(scale))) {
 				g.id = IG_Tap;
 				g.phase = IGPhase_Begin;
 				g.mins[0] = touch.mins[0];
@@ -329,54 +286,45 @@ bool Game::G_Tap(const InputEvent &e, InputState &is, TouchState &touch, InputGe
 	return false;
 }
 
-bool Game::G_Circle(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g, bool lineGestureEnabled)
-{
+bool Game::G_Circle(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g, bool lineGestureEnabled, float scale) {
 	if (touch.gid != -1)
 		return false; // this touch state cannot generate a gesture
 
-	switch (e.type)
-	{
+	switch (e.type) {
 	case InputEvent::T_TouchMoved:
 		{
 			bool emit = false;
 			bool minSize, isLine;
 
-			if (lineGestureEnabled)
-			{
+			if (lineGestureEnabled) {
 				float n[2];
-				IdentifyLineGesture(&e, touch, n, minSize, isLine);
-			}
-			else
-			{
+				IdentifyLineGesture(&e, touch, n, minSize, isLine, scale);
+			} else {
 				minSize = false;
 			}
 
-			if (minSize)
-			{
+			if (minSize) {
 				emit = !isLine;
-			}
-			else
-			{
+			} else {
 				int dx = touch.maxs[0] - touch.mins[0];
 				int dy = touch.maxs[1] - touch.mins[1];
 
-				if ((dx >= GConstants::MinCircleMove()) && (dy >= GConstants::MinCircleMove()))
-				{ // ok we made a big enough move.
+				if ((dx >= GConstants::MinCircleMove(scale)) && (dy >= GConstants::MinCircleMove(scale))) { 
+					// ok we made a big enough move.
 
 					// detect circle when we close the loop.
 					const InputPoint &x = touch.moves[0];
 					dx = e.data[0] - x[0];
 					dy = e.data[1] - x[1];
 
-					if ((dx*dx+dy*dy) <= GConstants::MaxCircleEndPointDelta()*GConstants::MaxCircleEndPointDelta())
-					{ // we met our original point.
+					if ((dx*dx+dy*dy) <= GConstants::MaxCircleEndPointDelta(scale)*GConstants::MaxCircleEndPointDelta(scale)) { 
+						// we met our original point.
 						emit = true;
 					}
 				}
 			}
 
-			if (emit)
-			{
+			if (emit) {
 				g.id = IG_Circle;
 				g.phase = IGPhase_Begin;
 				g.mins[0] = touch.mins[0];
@@ -395,20 +343,17 @@ bool Game::G_Circle(const InputEvent &e, InputState &is, TouchState &touch, Inpu
 	return false;
 }
 
-bool Game::G_Line(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g)
-{
+bool Game::G_Line(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g, float scale) {
 	if (touch.gid != -1 && touch.gid != IG_Line)
 		return false; // this touch state cannot generate a gesture
 
-	switch (e.type)
-	{
+	switch (e.type) {
 	case InputEvent::T_TouchEnd:
 	case InputEvent::T_TouchMoved:
 		{
 			// if we are "moving" don't start analyzing for some time first
-			if (e.type == InputEvent::T_TouchMoved)
-			{
-				if (touch.Age() < LineGestureTime)
+			if (e.type == InputEvent::T_TouchMoved) {
+				if (touch.Age() < kLineGestureTime)
 					return false;
 			}
 			
@@ -420,11 +365,11 @@ bool Game::G_Line(const InputEvent &e, InputState &is, TouchState &touch, InputG
 				touch, 
 				n, 
 				minSize, 
-				isLine
+				isLine,
+				scale
 			);
 
-			if (isLine)
-			{
+			if (isLine) {
 				g.id = IG_Line;
 				g.phase = IGPhase_Begin;
 				g.mins[0] = touch.mins[0];
@@ -433,6 +378,9 @@ bool Game::G_Line(const InputEvent &e, InputState &is, TouchState &touch, InputG
 				g.maxs[1] = touch.maxs[1];
 				g.origin[0] = touch.mins[0] + (touch.maxs[0]-touch.mins[0])/2;
 				g.origin[1] = touch.mins[1] + (touch.maxs[1]-touch.mins[1])/2;
+				g.args[0] = n[0];
+				g.args[1] = n[1];
+				g.args[2] = 0.f;
 
 				InputPoint p = touch.moves.back();
 				touch.mins[0] = touch.maxs[0] = p[0];
@@ -453,47 +401,39 @@ bool Game::G_Line(const InputEvent &e, InputState &is, TouchState &touch, InputG
 	return false;
 }
 
-bool Game::G_Pinch(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g)
-{
+bool Game::G_Pinch(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g, float scale) {
 	if (touch.gid != -1 && touch.gid != IG_Pinch)
 		return false; // not our gestures.
 	
-	switch (e.type)
-	{
+	switch (e.type) {
 	case InputEvent::T_TouchBegin:
 		{
 			// NOTE: T_TouchBegin will have a null TouchState object!
 			
 			bool valid = false;
 			
-			if (m_pinch)
-			{
-				if (m_pinchTouches.size() < 2)
-				{
+			if (m_pinch) {
+				if (m_pinchTouches.size() < 2) {
 					m_pinchTouches.insert(e.touch);
 					valid = m_pinchTouches.size() == 2;
 				}
-			}
-			else
-			{
+			} else {
 				m_pinch = e.time;
 				m_pinchTouches.insert(e.touch);
 			}
 			
-			if (valid) // starting a pinch gesture
-			{
+			if (valid) {
+				// starting a pinch gesture
 				TouchSet::const_iterator it = m_pinchTouches.begin();
 				void *pOtherTouch = *it;
 				
-				if (pOtherTouch == e.touch)
-				{
+				if (pOtherTouch == e.touch) {
 					++it;
 					pOtherTouch = *it;
 				}
 				
 				InputTouchMap::iterator tmIt = is.touches.find(pOtherTouch);
-				if (tmIt == is.touches.end())
-				{
+				if (tmIt == is.touches.end()) {
 					m_pinch = 0;
 					m_pinchTouches.clear();
 					break;
@@ -507,8 +447,7 @@ bool Game::G_Pinch(const InputEvent &e, InputState &is, TouchState &touch, Input
 				
 				float baseLen = (x-y).Magnitude();
 				
-				if (baseLen > 1.f)
-				{
+				if (baseLen > 1.f) {
 					g.id = IG_Pinch;
 					g.phase = IGPhase_Begin;
 					g.args[0] = baseLen;
@@ -522,9 +461,7 @@ bool Game::G_Pinch(const InputEvent &e, InputState &is, TouchState &touch, Input
 					g.origin[1] = g.mins[1] + (g.maxs[1]-g.mins[1])/2;
 
 					otherTouch.gid = IG_Pinch;
-				}
-				else
-				{
+				} else {
 					m_pinch = 0;
 					m_pinchTouches.clear();
 				}
@@ -536,12 +473,10 @@ bool Game::G_Pinch(const InputEvent &e, InputState &is, TouchState &touch, Input
 			bool valid = m_pinchTouches.size() == 2;
 			
 			m_pinchTouches.erase(e.touch);
-			if (m_pinchTouches.size() < 2 && valid)
-			{
+			if (m_pinchTouches.size() < 2 && valid) {
 				m_pinchTouches.clear();
 				
-				if (m_pinch)
-				{
+				if (m_pinch) {
 					m_pinch = 0;
 					g.id = IG_Pinch;
 					g.phase = IGPhase_End;
@@ -557,20 +492,17 @@ bool Game::G_Pinch(const InputEvent &e, InputState &is, TouchState &touch, Input
 		break;
 			
 	case InputEvent::T_TouchMoved:
-			if (m_pinch && (m_pinchTouches.size()==2) && (m_pinchTouches.find(e.touch) != m_pinchTouches.end()))
-			{
+			if (m_pinch && (m_pinchTouches.size()==2) && (m_pinchTouches.find(e.touch) != m_pinchTouches.end())) {
 				TouchSet::const_iterator it = m_pinchTouches.begin();
 				void *pOtherTouch = *it;
 				
-				if (pOtherTouch == e.touch)
-				{
+				if (pOtherTouch == e.touch) {
 					++it;
 					pOtherTouch = *it;
 				}
 				
 				InputTouchMap::iterator tmIt = is.touches.find(pOtherTouch);
-				if (tmIt == is.touches.end())
-				{
+				if (tmIt == is.touches.end()) {
 					m_pinch = 0;
 					m_pinchTouches.clear();
 					g.id = IG_Pinch;

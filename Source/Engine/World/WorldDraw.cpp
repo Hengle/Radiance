@@ -415,6 +415,9 @@ void WorldDraw::VisMarkArea(
 		RAD_ASSERT(modelNum < (U16)m_worldModels.size());
 
 		const MStaticWorldMeshBatch::Ref &m = m_worldModels[modelNum];
+		if (!m->visible)
+			continue;
+
 		if (m->m_markFrame != m_markFrame) {
 			m->m_markFrame = m_markFrame;
 			++m_counters.testedWorldModels;
@@ -440,6 +443,8 @@ void WorldDraw::VisMarkArea(
 			++m_counters.drawnEntities;
 			for (DrawModel::Map::const_iterator it = e->models->begin(); it != e->models->end(); ++it) {
 				const DrawModel::Ref &m = it->second;
+				if (!m->visible)
+					continue;
 				if (m->m_markFrame != m_markFrame) {
 					m->m_markFrame = m_markFrame;
 					++m_counters.testedEntityModels;

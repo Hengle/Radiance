@@ -22,6 +22,10 @@ void Entity::TransitionFloorMove() {
 	m_ps.activeMove->InitMove(m_ps.moveState);
 }
 
+void Entity::CancelFloorMove() {
+	m_ps.activeMove.reset();
+}
+
 void Entity::Tick_MT_Floor(
 	int frame,
 	float dt,

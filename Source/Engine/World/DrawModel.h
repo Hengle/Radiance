@@ -29,7 +29,7 @@ public:
 	virtual ~DrawModel();
 
 	void Tick(float time, float dt);
-	void Fade(const Vec4 &rgba, float time);
+	void BlendTo(const Vec4 &rgba, float time);
 	void SwapMaterial(int src, int dst);
 
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, entity, Entity*);
@@ -128,7 +128,7 @@ private:
 		m_bounds = value;
 	}
 
-	static int lua_Fade(lua_State *L);
+	static int lua_BlendTo(lua_State *L);
 	static int lua_SwapMaterial(lua_State *L);
 	
 	LUART_DECL_GETSET(Pos);

@@ -753,7 +753,7 @@ bool Widget::HandleInputEvent(const InputEvent &e, const TouchState *touch, cons
 			return true;
 	}
 
-	if (!InBounds(e))
+	if (!m_capture && !InBounds(e))
 		return false;
 
 	InputEvent local(e);

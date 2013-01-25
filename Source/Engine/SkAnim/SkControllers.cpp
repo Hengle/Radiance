@@ -93,12 +93,11 @@ Quat Controller::Slerp(const Quat &from, const Quat &to, float t) {
 ThreadSafeMemoryPool s_animationSourcePool(ZSka, "ska-anim-source", sizeof(AnimationSource), 8);
 
 AnimationSource::Ref AnimationSource::New(
-	Animation &anim,
+	const Animation &anim,
 	float in,
 	float out,
 	float timeScale,
 	int loopCount, // 0 == loop forever
-	bool loopPastEnd,
 	Ska &ska,
 	const Notify::Ref &notify
 ) {
@@ -109,7 +108,6 @@ AnimationSource::Ref AnimationSource::New(
 			out, 
 			timeScale, 
 			loopCount,
-			loopPastEnd,
 			ska,
 			notify
 		), &Delete
@@ -122,12 +120,11 @@ void AnimationSource::Delete(AnimationSource *s) {
 }
 
 AnimationSource::AnimationSource(
-	Animation &anim,
+	const Animation &anim,
 	float in,
 	float out,
 	float timeScale,
 	int loopCount, // 0 == loop forever
-	bool loopPastEnd,
 	Ska &ska,
 	const Notify::Ref &notify
 ) : 
@@ -136,13 +133,12 @@ m_anim(&anim),
 m_in(in), 
 m_out(out), 
 m_timeScale(timeScale), 
-m_loopCount(loopCount),
-m_loopPastEnd(loopPastEnd),
-m_loopNum(0),
 m_frame(0.f),
 m_notify(notify),
 m_emitEndFrame(true),
 m_emitFrame(0) {
+	m_loopCount[0] = 0;
+	m_loopCount[1] = loopCount;
 }
 
 AnimationSource::~AnimationSource() {
@@ -151,7 +147,7 @@ AnimationSource::~AnimationSource() {
 void AnimationSource::OnActivate(bool active) {
 	if (active) {
 		m_frame = 0.f;
-		m_loopNum = 0;
+		m_loopCount[0] = 0;
 
 		// get root tm
 		m_anim->BlendFrames(
@@ -203,15 +199,15 @@ void AnimationSource::EmitTags(int frame, int numFrames, int firstBone, int numB
 }
 
 void AnimationSource::ResetLoopCount(int loopCount) {
-	m_loopNum = 0;
-	m_loopCount = loopCount;
+	m_loopCount[0] = 0;
+	m_loopCount[1] = loopCount;
 }
 
 void AnimationSource::SetTime(float dt) {
 	m_frame = (dt*m_timeScale) * m_anim->fps;
 
 	if (m_frame > m_anim->numFrames.get()-1) {
-		if (!m_loopCount || m_loopPastEnd) {
+		if (!m_loopCount) {
 			if (m_anim->numFrames > 1) {
 				// wrap
 				m_frame = math::Mod(m_frame, (float)m_anim->numFrames.get()-1);
@@ -248,29 +244,22 @@ bool AnimationSource::Tick(
 	if (m_frame > m_anim->numFrames.get()-1) {
 		bool emit = false;
 
-		if (!m_loopCount || m_loopNum+1 < m_loopCount || m_loopPastEnd) {
-			if (m_loopNum < m_loopCount) {
-				++m_loopNum;
-			}
-			
-			if (m_loopCount && m_loopNum == m_loopCount) {
-				emit = true;
-			}
-
-			if (m_anim->numFrames > 1) {
-				// wrap
+		if (!m_loopCount[1] || (m_loopCount[0]+1 < m_loopCount[1])) {
+			++m_loopCount[0];
+						
+			if (m_anim->numFrames > 1) { // wrap?
 				m_frame = math::Mod(m_frame, (float)m_anim->numFrames.get()-1);
-
-				// reset delta motion
-				m_tm.r = Quat::Identity;
-				m_tm.s = Vec3(1, 1, 1);
-				m_tm.t = Vec3::Zero;
-
 			} else {
 				m_frame = 0;
 			}
+
+			// reset delta motion
+			m_tm.r = Quat::Identity;
+			m_tm.s = Vec3(1, 1, 1);
+			m_tm.t = Vec3::Zero;
+
 		} else {
-			m_loopNum = m_loopCount;
+			m_loopCount[0] = m_loopCount[1];
 			m_frame = (float)m_anim->numFrames.get()-1; // clamp to last frame.
 			emit = true;
 		}
@@ -670,12 +659,12 @@ float BlendToController::RAD_IMPLEMENT_GET(out) {
 ThreadSafeMemoryPool s_animationVariantsSourcePool(ZSka, "ska-variants-pool", sizeof(AnimationVariantsSource), 8);
 
 AnimationVariantsSource::Ref AnimationVariantsSource::New(
-	const Variant::Vec &anims,
+	const AnimState &variants,
 	Ska &ska,
 	const Notify::Ref &notify,
 	const char *blendTarget
 ) {
-	return Ref(new (s_animationVariantsSourcePool.SafeGetChunk()) AnimationVariantsSource(anims, ska, notify, blendTarget), &Delete);
+	return Ref(new (s_animationVariantsSourcePool.SafeGetChunk()) AnimationVariantsSource(variants, ska, notify, blendTarget), &Delete);
 }
 
 AnimationVariantsSource::Ref AnimationVariantsSource::Clone(const Notify::Ref &notify) {
@@ -690,12 +679,22 @@ void AnimationVariantsSource::Delete(AnimationVariantsSource *s) {
 }
 
 AnimationVariantsSource::AnimationVariantsSource(
-	const Variant::Vec &anims,
+	const AnimState &variants,
 	Ska &ska,
 	const Notify::Ref &notify,
 	const char *blendTarget
-) : Controller(ska), m_node(0), m_blendTarget(0), m_notify(notify) {
-	Init(anims);
+) : Controller(ska), m_node(0), m_blendTarget(0), m_notify(notify), m_emitEndFrame(true) {
+
+	m_loopCount[0] = 0;
+	m_loopCount[1] = variants.loopCount[0];
+
+	if (variants.loopCount[0] != variants.loopCount[1])
+		m_loopCount[1] += (rand() % (variants.loopCount[1]-variants.loopCount[0]));
+
+	if (m_loopCount[1] < 0)
+		m_loopCount[1] = 0;
+
+	Init(variants.variants);
 
 	if (blendTarget) {
 		for (Node::Map::iterator it = m_map.begin(); it != m_map.end(); ++it) {
@@ -745,6 +744,7 @@ void AnimationVariantsSource::Init(const Variant::Vec &anims) {
 
 void AnimationVariantsSource::OnActivate(bool active) {
 	if (m_source) {
+		RAD_ASSERT(!active);
 		m_source->Activate(false);
 		m_source.reset();
 	}
@@ -761,6 +761,19 @@ void AnimationVariantsSource::OnActivate(bool active) {
 void AnimationVariantsSource::ChooseAnim() {
 	if (m_map.empty())
 		return;
+
+	if (m_loopCount[1] && (m_loopCount[0] == m_loopCount[1])) {
+		if (m_emitEndFrame) {
+			m_emitEndFrame = false;
+			if (m_notify && m_source) {
+				AnimStateEventData d;
+				d.ska = ska;
+				d.anim = m_source->animation;
+				m_notify->EmitEndFrame(d);
+			}
+		}
+		return;
+	}
 
 	for (;;) {
 		Node::Map::iterator it = m_map.upper_bound(rand());
@@ -784,17 +797,12 @@ void AnimationVariantsSource::ChooseAnim() {
 		if (node->loopCount[0] != node->loopCount[1])
 			loopCount += (rand() % (node->loopCount[1]-node->loopCount[0]));
 
-		if (loopCount < 1)
-			loopCount = 1;
+		if (loopCount < 0)
+			loopCount = 0;
 
-		if (node == m_node) {
-			if (node->out > 0.f) { 
-				// nodes with an out time can loop (they don't hold the last frame)
-				RAD_ASSERT(m_source);
-				m_source->ResetLoopCount(loopCount);
-			} else if (m_map.size() > 1) {
+		if (node == m_node) { // picked self?
+			if (m_map.size() > 1)
 				continue; // pick another animation
-			}
 		} else {
 			m_source = AnimationSource::New(
 				*node->anim,
@@ -802,7 +810,6 @@ void AnimationVariantsSource::ChooseAnim() {
 				node->out,
 				timeScale,
 				loopCount,
-				node->out>0.f,
 				*ska.get(),
 				m_notify
 			);
@@ -813,6 +820,8 @@ void AnimationVariantsSource::ChooseAnim() {
 		m_node = node;
 		break;
 	}
+
+	++m_loopCount[0];
 }
 
 bool AnimationVariantsSource::Tick(
@@ -830,7 +839,13 @@ bool AnimationVariantsSource::Tick(
 	if (!m_source || m_source->finished)
 		ChooseAnim();
 
-	if (!m_blend->Tick(
+	int oldMask = 0;
+	if (m_notify) {
+		oldMask = m_notify->masked;
+		m_notify->masked = oldMask | Notify::kMaskFlag_EndFrame; // don't emit endFrame in blend Tick
+	}
+
+	bool r = m_blend->Tick(
 		dt,
 		distance,
 		out,
@@ -838,7 +853,13 @@ bool AnimationVariantsSource::Tick(
 		numBones,
 		advance,
 		emitTags
-	)) return false;
+	);
+
+	if (m_notify)
+		m_notify->masked = oldMask;
+
+	if (!r)
+		return false;
 
 	SetRot(m_blend->rot);
 	SetPos(m_blend->pos);

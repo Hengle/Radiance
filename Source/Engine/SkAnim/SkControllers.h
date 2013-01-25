@@ -29,6 +29,7 @@ struct Variant {
 struct AnimState {
 	typedef zone_map<String, AnimState, ZSkaT>::type Map;
 	String name;
+	int loopCount[2];
 	Variant::Vec variants;
 };
 
@@ -158,12 +159,11 @@ public:
 	~AnimationSource();
 
 	static Ref New(
-		Animation &anim,
+		const Animation &anim,
 		float in,
 		float out,
 		float timeScale,
-		int loopCount, // 0 == loop forever
-		bool loopPastEnd, // continue looping after loopCount?
+		int loopCount, // 0 == play forever
 		Ska &ska,
 		const Notify::Ref &notify
 	);
@@ -184,19 +184,25 @@ public:
 
 	// set to true when loopCount has been reached.
 	RAD_DECLARE_READONLY_PROPERTY(AnimationSource, finished, bool);
+	RAD_DECLARE_READONLY_PROPERTY(AnimationSource, animation, const Animation*);
 	RAD_DECLARE_PROPERTY(AnimationSource, timeScale, float, float);
 
 protected:
 
-	virtual RAD_DECLARE_GET(in, float) { return m_in; }
-	virtual RAD_DECLARE_GET(out, float) { return m_out; }
+	virtual RAD_DECLARE_GET(in, float) { 
+		return m_in; 
+	}
+
+	virtual RAD_DECLARE_GET(out, float) { 
+		return m_out; 
+	}
 
 	virtual void OnActivate(bool active=true);
 
 private:
 
 	RAD_DECLARE_GET(finished, bool) { 
-		return m_loopCount > 0 ? (m_loopNum==m_loopCount) : false; 
+		return m_loopCount[1] > 0 ? (m_loopCount[0]==m_loopCount[1]) : false; 
 	}
 
 	RAD_DECLARE_GET(timeScale, float) { 
@@ -207,13 +213,16 @@ private:
 		m_timeScale = value; 
 	}
 
+	RAD_DECLARE_GET(animation, const Animation*) {
+		return m_anim;
+	}
+
 	AnimationSource(
-		Animation &anim,
+		const Animation &anim,
 		float in,
 		float out,
 		float timeScale,
 		int loopCount, // 0 == loop forever
-		bool loopPastEnd,
 		Ska &ska,
 		const Notify::Ref &notify
 	);
@@ -224,15 +233,13 @@ private:
 	static void Delete(AnimationSource *s);
 
 	Notify::Ref m_notify;
-	Animation *m_anim;
+	const Animation *m_anim;
 	float m_frame;
 	float m_in;
 	float m_out;
 	float m_timeScale;
-	int m_loopNum;
-	int m_loopCount;
+	int m_loopCount[2];
 	int m_emitFrame;
-	bool m_loopPastEnd;
 	bool m_emitEndFrame;
 	BoneTM m_tm;
 };
@@ -340,7 +347,7 @@ public:
 	typedef boost::weak_ptr<AnimationVariantsSource> WRef;
 
 	static Ref New(
-		const Variant::Vec &anims,
+		const AnimState &variants,
 		Ska &ska,
 		const Notify::Ref &notify,
 		const char *blendTarget = 0
@@ -364,6 +371,8 @@ public:
 
 	void SetTime(float dt);
 
+	RAD_DECLARE_READONLY_PROPERTY(AnimationVariantsSource, finished, bool);
+
 protected:
 
 	virtual void OnActivate(bool active=true);
@@ -371,7 +380,7 @@ protected:
 private:
 
 	AnimationVariantsSource(
-		const Variant::Vec &anims, 
+		const AnimState &variants,
 		Ska &ska,
 		const Notify::Ref &notify,
 		const char *blendTarget
@@ -379,8 +388,17 @@ private:
 
 	AnimationVariantsSource(const AnimationVariantsSource &s);
 
-	virtual RAD_DECLARE_GET(in, float) { return m_blend ? m_blend->in : 0.f; }
-	virtual RAD_DECLARE_GET(out, float) { return m_blend ? m_blend->out : 0.f; }
+	virtual RAD_DECLARE_GET(in, float) { 
+		return m_blend ? m_blend->in : 0.f; 
+	}
+
+	virtual RAD_DECLARE_GET(out, float) { 
+		return m_blend ? m_blend->out : 0.f; 
+	}
+
+	RAD_DECLARE_GET(finished, bool) { 
+		return m_loopCount[1] > 0 ? (m_loopCount[0]==m_loopCount[1]) : false; 
+	}
 
 	struct Node {
 		typedef zone_map<int, Node, ZSkaT>::type Map;
@@ -401,6 +419,8 @@ private:
 	BoneTM m_tm;
 	Node *m_node;
 	Node *m_blendTarget;
+	bool m_emitEndFrame;
+	int m_loopCount[2];
 	AnimationSource::Ref m_source;
 	BlendToController::Ref m_blend;
 };

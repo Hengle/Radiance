@@ -616,7 +616,6 @@ void ModelEditorWidget::ItemSelectionChanged() {
 				1.f,
 				1.f,
 				0,
-				true,
 				*m_skModel->ska.get(),
 				ska::Notify::Ref()
 			);
@@ -629,10 +628,9 @@ void ModelEditorWidget::ItemSelectionChanged() {
 			String(i->text(0).toAscii().constData())
 		);
 
-		if (it != m_skModel->states->end())
-		{
+		if (it != m_skModel->states->end()) {
 			ska::AnimationVariantsSource::Ref animSource = ska::AnimationVariantsSource::New(
-				it->second.variants,
+				it->second,
 				*m_skModel->ska.get(),
 				ska::Notify::Ref()
 			);

@@ -263,6 +263,9 @@ m_timingMode(kTimingMode_Absolute) {
 	for (int i = 0; i < kNumColors; ++i)
 		for (int k = 0; k < 4; ++k)
 			m_sampledColor[i][k] = 1.f;
+
+	m_blend[0] = m_blend[1] = m_blend[3] = Vec4(1,1,1,1);
+	m_blendTime[0] = m_blendTime[1] = -1.f;
 }
 
 Material::~Material() {
@@ -323,6 +326,16 @@ void Material::Sample(float time, float dt) {
 		m_time = time;
 	} else {
 		m_time += dt;
+	}
+
+	if (m_blendTime[1] > 0.f) {
+		m_blendTime[0] += dt;
+		if (m_blendTime[0] >= m_blendTime[1]) {
+			m_blendTime[0] = m_blendTime[1] = -1.f;
+			m_blend[0] = m_blend[2];
+		} else {
+			m_blend[0] = math::Lerp(m_blend[1], m_blend[2], m_blendTime[0] / m_blendTime[1]);
+		}
 	}
 		
 	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
@@ -391,7 +404,19 @@ void Material::Sample(float time, float dt) {
 		float lerp = 1.f - m_colorWaves[i].Sample(time);
 		lerp = math::Clamp(lerp, 0.f, 1.f);
 		for (int k = 0; k < 4; ++k)
-			m_sampledColor[i][k] = math::Lerp(m_colors[i][kColorA][k], m_colors[i][kColorB][k], lerp);
+			m_sampledColor[i][k] = m_blend[0][k] * math::Lerp(m_colors[i][kColorA][k], m_colors[i][kColorB][k], lerp);
+	}
+}
+
+void Material::BlendTo(const Vec4 &rgba, float time) {
+	if (time <= 0.f) {
+		m_blendTime[0] = m_blendTime[1] = -1.f;
+		m_blend[0] = rgba;
+	} else {
+		m_blendTime[0] = 0.f;
+		m_blendTime[1] = time;
+		m_blend[1] = m_blend[0];
+		m_blend[2] = rgba;
 	}
 }
 

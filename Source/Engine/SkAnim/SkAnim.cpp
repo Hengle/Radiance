@@ -310,7 +310,7 @@ inline Vec3 DecodeV(const S16 *table, int idx, float decodeMag) {
 
 } // namespace
 
-void Animation::BlendFrames(int frameSrc, int frameDst, float blend, BoneTM *out, int firstBone, int numBones) {
+void Animation::BlendFrames(int frameSrc, int frameDst, float blend, BoneTM *out, int firstBone, int numBones) const {
 	const DSka &dska = *m_ska->m_dska;
 
 	RAD_ASSERT(frameSrc < m_danim->numFrames);
@@ -367,7 +367,7 @@ void Animation::EmitTags(
 	int firstBone,
 	int numBones,
 	const Notify::Ref &notify
-) {
+) const {
 	RAD_ASSERT(frame+numFrames <= (int)m_danim->numFrames);
 	RAD_ASSERT(firstBone+numBones <= m_ska->numBones);
 	

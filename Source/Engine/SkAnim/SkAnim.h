@@ -21,37 +21,45 @@ namespace ska {
 
 struct AnimTagEventData {
 	Ska* ska;
-	Animation* anim;
+	const Animation* anim;
 	String tag;
 	int bone;
 };
 
 struct AnimStateEventData {
 	Ska *ska;
-	Animation *anim;
+	const Animation *anim;
 };
 
 class RADENG_CLASS Notify {
 public:
 	typedef NotifyRef Ref;
 
-	Notify() : m_masked(false) {}
+	enum MaskFlags {
+		RAD_FLAG(kMaskFlag_Tags),
+		RAD_FLAG(kMaskFlag_EndFrame),
+		RAD_FLAG(kMaskFlag_Finished),
+		kMaskFlag_All = kMaskFlag_Tags|kMaskFlag_EndFrame|kMaskFlag_Finished,
+		kMaskFlag_None = 0
+	};
+
+	Notify() : m_masked(0) {}
 
 	// If masked, will not emit events.
-	RAD_DECLARE_PROPERTY(Notify, masked, bool, bool);
+	RAD_DECLARE_PROPERTY(Notify, masked, int, int);
 
 	void EmitTag(const AnimTagEventData &data) {
-		if (!m_masked)
+		if (!(m_masked&kMaskFlag_Tags))
 			OnTag(data);
 	}
 
 	void EmitEndFrame(const AnimStateEventData &data) {
-		if (!m_masked)
+		if (!(m_masked&kMaskFlag_EndFrame))
 			OnEndFrame(data);
 	}
 
 	void EmitFinish(const AnimStateEventData &data, bool masked) {
-		if (!m_masked)
+		if (!(m_masked&kMaskFlag_Finished))
 			OnFinish(data, masked);
 	}
 
@@ -62,15 +70,15 @@ protected:
 
 private:
 
-	RAD_DECLARE_GET(masked, bool) { 
+	RAD_DECLARE_GET(masked, int) { 
 		return m_masked; 
 	}
 
-	RAD_DECLARE_SET(masked, bool) { 
+	RAD_DECLARE_SET(masked, int) { 
 		m_masked = value; 
 	}
 
-	bool m_masked;
+	int m_masked;
 };
 
 struct BoneTM {
@@ -204,7 +212,7 @@ public:
 		BoneTM *out,
 		int firstBone,
 		int numBones
-	);
+	) const;
 
 	void EmitTags(
 		int frame,
@@ -212,7 +220,7 @@ public:
 		int firstBone,
 		int numBones,
 		const Notify::Ref &notify
-	);
+	) const;
 
 private:
 

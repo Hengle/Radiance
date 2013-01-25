@@ -141,13 +141,13 @@ protected:
 	InputEvent *CreateDelayedEvent(const InputEvent &e);
 	void RemoveDelayedEvent(void *touch);
 
-	bool G_LClick(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g);
-	bool G_RClick(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g);
-	bool G_DoubleTap(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g);
-	bool G_Tap(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g);
-	bool G_Circle(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g, bool lineGestureEnabled);
-	bool G_Line(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g);
-	bool G_Pinch(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g);
+	bool G_LClick(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g, float scale);
+	bool G_RClick(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g, float scale);
+	bool G_DoubleTap(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g, float scale);
+	bool G_Tap(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g, float scale);
+	bool G_Circle(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g, bool lineGestureEnabled, float scale);
+	bool G_Line(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g, float scale);
+	bool G_Pinch(const InputEvent &e, InputState &is, TouchState &touch, InputGesture &g, float scale);
 	
 	typedef zone_set<void*, ZEngineT>::type TouchSet;
 	

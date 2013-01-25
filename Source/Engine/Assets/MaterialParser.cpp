@@ -324,6 +324,8 @@ int MaterialParser::Load(
 		m_m.depthFunc = r::Material::kDepthFunc_Greater;
 	else if (*s == "GEqual")
 		m_m.depthFunc = r::Material::kDepthFunc_GEqual;
+	else if (*s == "Equal")
+		m_m.depthFunc = r::Material::kDepthFunc_Equal;
 	else
 		return SR_MetaError;
 

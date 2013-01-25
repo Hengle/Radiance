@@ -233,6 +233,7 @@ public:
 	// in the world.
 	void Link();
 	void Unlink();
+	void CancelFloorMove();
 
 protected:
 

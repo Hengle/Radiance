@@ -24,6 +24,8 @@ void D_Material::PushElements(lua_State *L) {
 	D_Asset::PushElements(L);
 	lua_pushcfunction(L, lua_Dimensions);
 	lua_setfield(L, -2, "Dimensions");
+	lua_pushcfunction(L, lua_BlendTo);
+	lua_setfield(L, -2, "BlendTo");
 	lua_pushcfunction(L, lua_SetState);
 	lua_setfield(L, -2, "SetState");
 }
@@ -57,6 +59,15 @@ int D_Material::lua_Dimensions(lua_State *L) {
 		return 2;
 	}
 
+	return 0;
+}
+
+int D_Material::lua_BlendTo(lua_State *L) {
+	D_Material::Ref self = lua::SharedPtr::Get<D_Material>(L, "D_Material", 1, true);
+	self->material->BlendTo(
+		lua::Marshal<Vec4>::Get(L, 2, true),
+		(float)luaL_checknumber(L, 3)
+	);
 	return 0;
 }
 

@@ -8,6 +8,7 @@
 #include "DrawModel.h"
 #include "Entity.h"
 #include "World.h"
+#include "Lua/D_Material.h"
 #include "../Assets/SkMaterialLoader.h"
 
 namespace world {
@@ -71,7 +72,7 @@ void DrawModel::Tick(float time, float dt) {
 	OnTick(time, dt);
 }
 
-void DrawModel::Fade(const Vec4 &rgba, float time) {
+void DrawModel::BlendTo(const Vec4 &rgba, float time) {
 	if (time <= 0.f) {
 		m_fade = false;
 		m_rgba[0] = rgba;
@@ -93,8 +94,8 @@ void DrawModel::SwapMaterial(int src, int dst) {
 }
 
 void DrawModel::PushElements(lua_State *L) {
-	lua_pushcfunction(L, lua_Fade);
-	lua_setfield(L, -2, "Fade");
+	lua_pushcfunction(L, lua_BlendTo);
+	lua_setfield(L, -2, "BlendTo");
 	lua_pushcfunction(L, lua_SwapMaterial);
 	lua_setfield(L, -2, "SwapMaterial");
 	
@@ -105,18 +106,18 @@ void DrawModel::PushElements(lua_State *L) {
 	LUART_REGISTER_GETSET(L, Bounds);
 }
 
-int DrawModel::lua_Fade(lua_State *L) {
+int DrawModel::lua_BlendTo(lua_State *L) {
 	Ref r = lua::SharedPtr::Get<DrawModel>(L, "DrawModel", 1, true);
-	r->Fade(lua::Marshal<Vec4>::Get(L, 2, true), (float)luaL_checknumber(L, 3));
+	r->BlendTo(lua::Marshal<Vec4>::Get(L, 2, true), (float)luaL_checknumber(L, 3));
 	return 0;
 }
 
 int DrawModel::lua_SwapMaterial(lua_State *L) {
 	Ref r = lua::SharedPtr::Get<DrawModel>(L, "DrawModel", 1, true);
-	r->SwapMaterial(
-		(int)luaL_checkinteger(L, 2),
-		(int)luaL_checkinteger(L, 3)
-	);
+	D_Material::Ref a = lua::SharedPtr::Get<D_Material>(L, "Material", 2, true);
+	D_Material::Ref b = lua::SharedPtr::Get<D_Material>(L, "Material", 3, true);
+
+	r->SwapMaterial(a->assetId, b->assetId);
 	return 0;
 }
 

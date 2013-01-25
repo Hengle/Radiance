@@ -15,7 +15,7 @@ namespace asset {
 
 extern const char *s_tcModNames[r::Material::kNumTCMods]; // defined in MaterialParser.cpp
 
-MaterialCooker::MaterialCooker() : Cooker(2) {
+MaterialCooker::MaterialCooker() : Cooker(3) {
 }
 
 MaterialCooker::~MaterialCooker() {

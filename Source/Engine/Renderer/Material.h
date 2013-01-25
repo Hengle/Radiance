@@ -47,7 +47,8 @@ public:
 		kDepthFunc_Less,
 		kDepthFunc_LEqual,
 		kDepthFunc_Greater,
-		kDepthFunc_GEqual
+		kDepthFunc_GEqual,
+		kDepthFunc_Equal
 	};
 
 	enum BlendMode {
@@ -150,6 +151,8 @@ public:
 	);
 
 	void ReleaseShader();
+
+	void BlendTo(const Vec4 &rgba, float time);
 
 	void Sample(float time, float dt);
 	void Clear();
@@ -305,8 +308,10 @@ private:
 	MTSInts m_ids;
 	MTSU8 m_tcGen;
 	MTSU8 m_tcUVIndex;
+	Vec4 m_blend[3];
 
 	float m_time;
+	float m_blendTime[2];
 	TimingMode m_timingMode;
 	ShaderInstance::Ref m_shader;
 #if defined(RAD_OPT_TOOLS)
