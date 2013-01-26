@@ -32,6 +32,7 @@ velocity(Vec3::Zero),
 targetAngles(Vec3::Zero),
 cameraAngles(Vec3::Zero),
 accel(Vec3::Zero),
+snapTurnAngles(360.f, 360.f, 360.f),
 groundFriction(0.f),
 airFriction(0.f),
 maxGroundSpeed(0.f),
@@ -429,6 +430,7 @@ void Entity::PushCallTable(lua_State *L) {
 	LUART_REGISTER_GETSET(L, DesiredMove);
 	LUART_REGISTER_GETSET(L, FloorPosition);
 	LUART_REGISTER_GETSET(L, Accel);
+	LUART_REGISTER_GETSET(L, SnapTurnAngles);
 	LUART_REGISTER_GETSET(L, GroundFriction);
 	LUART_REGISTER_GETSET(L, AirFriction);
 	LUART_REGISTER_GETSET(L, MaxGroundSpeed);
@@ -704,6 +706,7 @@ ENT_SET_CUSTOM(Entity, Mins, self->m_ps.bbox.SetMins(lua::Marshal<Vec3>::Get(L, 
 ENT_GET(Entity, Maxs, Vec3, m_ps.bbox.Maxs());
 ENT_SET_CUSTOM(Entity, Maxs, self->m_ps.bbox.SetMaxs(lua::Marshal<Vec3>::Get(L, 2, true)));
 ENT_GETSET(Entity, Accel, Vec3, m_ps.accel);
+ENT_GETSET(Entity, SnapTurnAngles, Vec3, m_ps.snapTurnAngles);
 ENT_GETSET(Entity, GroundFriction, float, m_ps.groundFriction);
 ENT_GETSET(Entity, AirFriction, float, m_ps.airFriction);
 ENT_GETSET(Entity, MaxGroundSpeed, float, m_ps.maxGroundSpeed);

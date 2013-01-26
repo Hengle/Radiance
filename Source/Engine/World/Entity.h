@@ -100,6 +100,7 @@ struct PState {
 	Vec3 cameraAngles;
 	Vec3 velocity;
 	Vec3 accel;
+	Vec3 snapTurnAngles;
 	BBox bbox;
 	FloorMove::Ref activeMove;
 	FloorMove::Ref desiredMove;
@@ -373,6 +374,7 @@ private:
 	ENT_DECL_GETSET(DesiredMove);
 	ENT_DECL_GETSET(FloorPosition);
 	ENT_DECL_GETSET(Accel);
+	ENT_DECL_GETSET(SnapTurnAngles);
 	ENT_DECL_GETSET(GroundFriction);
 	ENT_DECL_GETSET(AirFriction);
 	ENT_DECL_GETSET(MaxGroundSpeed);

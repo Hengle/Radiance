@@ -81,6 +81,13 @@ void Entity::SeekAngles(float dt) {
 
 	m_ps.angles.pos = DeltaAngles(m_ps.angles.pos, m_ps.targetAngles);
 
+	for (int i = 0; i < 3; ++i) {
+		if (m_ps.angles.pos[i] > m_ps.snapTurnAngles[i])
+			m_ps.angles.pos[i] = 0.f; // snap to facing
+		if (m_ps.angles.pos[i] < -m_ps.snapTurnAngles[i])
+			m_ps.angles.pos[i] = 0.f;
+	}
+
 	Vec3 x = m_ps.angles.pos;
 
 	if (!m_ps.angles.Update(dt, Vec3::Zero, m_ps.angleSpring)) {
