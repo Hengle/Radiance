@@ -1167,6 +1167,31 @@
 		33982E2216A8ABBC00C2ED49 /* Console.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DE316A8970500C2ED49 /* Console.h */; };
 		33982E2316A8ABBC00C2ED49 /* Console.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DE316A8970500C2ED49 /* Console.h */; };
 		33982E2416A8ABBD00C2ED49 /* Console.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982DE316A8970500C2ED49 /* Console.h */; };
+		33982E7816B2550300C2ED49 /* MT_Floor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E7716B2550300C2ED49 /* MT_Floor.cpp */; };
+		33982E7916B2550300C2ED49 /* MT_Floor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E7716B2550300C2ED49 /* MT_Floor.cpp */; };
+		33982E7A16B2550300C2ED49 /* MT_Floor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E7716B2550300C2ED49 /* MT_Floor.cpp */; };
+		33982E7B16B2550300C2ED49 /* MT_Floor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E7716B2550300C2ED49 /* MT_Floor.cpp */; };
+		33982E7C16B2550300C2ED49 /* MT_Floor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E7716B2550300C2ED49 /* MT_Floor.cpp */; };
+		33982E8016B2553300C2ED49 /* E_TouchTrigger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E7E16B2553300C2ED49 /* E_TouchTrigger.cpp */; };
+		33982E8116B2553300C2ED49 /* E_TouchTrigger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E7E16B2553300C2ED49 /* E_TouchTrigger.cpp */; };
+		33982E8216B2553300C2ED49 /* E_TouchTrigger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E7E16B2553300C2ED49 /* E_TouchTrigger.cpp */; };
+		33982E8316B2553300C2ED49 /* E_TouchTrigger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E7E16B2553300C2ED49 /* E_TouchTrigger.cpp */; };
+		33982E8416B2553300C2ED49 /* E_TouchTrigger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E7E16B2553300C2ED49 /* E_TouchTrigger.cpp */; };
+		33982E8516B2553300C2ED49 /* E_TouchTrigger.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982E7F16B2553300C2ED49 /* E_TouchTrigger.h */; };
+		33982E8616B2553300C2ED49 /* E_TouchTrigger.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982E7F16B2553300C2ED49 /* E_TouchTrigger.h */; };
+		33982E8716B2553300C2ED49 /* E_TouchTrigger.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982E7F16B2553300C2ED49 /* E_TouchTrigger.h */; };
+		33982E8816B2553300C2ED49 /* E_TouchTrigger.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982E7F16B2553300C2ED49 /* E_TouchTrigger.h */; };
+		33982E8916B2553300C2ED49 /* E_TouchTrigger.h in Headers */ = {isa = PBXBuildFile; fileRef = 33982E7F16B2553300C2ED49 /* E_TouchTrigger.h */; };
+		33982E9016B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E8F16B256D700C2ED49 /* WorldDebugDraw.cpp */; };
+		33982E9116B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E8F16B256D700C2ED49 /* WorldDebugDraw.cpp */; };
+		33982E9216B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E8F16B256D700C2ED49 /* WorldDebugDraw.cpp */; };
+		33982E9316B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E8F16B256D700C2ED49 /* WorldDebugDraw.cpp */; };
+		33982E9416B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E8F16B256D700C2ED49 /* WorldDebugDraw.cpp */; };
+		33982E9616B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E9516B256EF00C2ED49 /* GLWorldDebugDraw.cpp */; };
+		33982E9716B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E9516B256EF00C2ED49 /* GLWorldDebugDraw.cpp */; };
+		33982E9816B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E9516B256EF00C2ED49 /* GLWorldDebugDraw.cpp */; };
+		33982E9916B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E9516B256EF00C2ED49 /* GLWorldDebugDraw.cpp */; };
+		33982E9A16B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E9516B256EF00C2ED49 /* GLWorldDebugDraw.cpp */; };
 		33988F9816684EA60018C3E6 /* Floors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988F9616684EA60018C3E6 /* Floors.cpp */; };
 		33988F9916684EA60018C3E6 /* Floors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988F9616684EA60018C3E6 /* Floors.cpp */; };
 		33988F9A16684EA60018C3E6 /* Floors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33988F9616684EA60018C3E6 /* Floors.cpp */; };
@@ -2945,6 +2970,11 @@
 		33982E0616A89C3B00C2ED49 /* CVars.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CVars.inl; path = ../Engine/CVars.inl; sourceTree = "<group>"; };
 		33982E1116A89C8100C2ED49 /* GameCVars.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameCVars.cpp; sourceTree = "<group>"; };
 		33982E1216A89C8100C2ED49 /* GameCVars.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameCVars.h; sourceTree = "<group>"; };
+		33982E7716B2550300C2ED49 /* MT_Floor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MT_Floor.cpp; sourceTree = "<group>"; };
+		33982E7E16B2553300C2ED49 /* E_TouchTrigger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = E_TouchTrigger.cpp; sourceTree = "<group>"; };
+		33982E7F16B2553300C2ED49 /* E_TouchTrigger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = E_TouchTrigger.h; sourceTree = "<group>"; };
+		33982E8F16B256D700C2ED49 /* WorldDebugDraw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldDebugDraw.cpp; sourceTree = "<group>"; };
+		33982E9516B256EF00C2ED49 /* GLWorldDebugDraw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLWorldDebugDraw.cpp; sourceTree = "<group>"; };
 		33988F9616684EA60018C3E6 /* Floors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Floors.cpp; sourceTree = "<group>"; };
 		33988F9716684EA60018C3E6 /* Floors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Floors.h; sourceTree = "<group>"; };
 		33988FA316684F1C0018C3E6 /* BezierSpline_inl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BezierSpline_inl.h; sourceTree = "<group>"; };
@@ -4717,6 +4747,7 @@
 				33E8880615B9BA480089BA08 /* GLVertexBuffer.h */,
 				33E8880715B9BA480089BA08 /* GLVertexBuffer.inl */,
 				33E8880815B9BA480089BA08 /* GLVertexBufferDef.h */,
+				33982E9516B256EF00C2ED49 /* GLWorldDebugDraw.cpp */,
 				33E8880915B9BA480089BA08 /* GLWorldDraw.cpp */,
 				33E8880A15B9BA480089BA08 /* GLWorldDraw.h */,
 				33FA7E821633B97C002603A5 /* RBackend.h */,
@@ -4968,6 +4999,7 @@
 				33E888D015B9BA4A0089BA08 /* Keys.cpp */,
 				33E888D115B9BA4A0089BA08 /* Keys.h */,
 				33E8890015B9BA4A0089BA08 /* MBatchDraw.h */,
+				33982E7716B2550300C2ED49 /* MT_Floor.cpp */,
 				33E8890115B9BA4A0089BA08 /* MT_Fly.cpp */,
 				33E8890215B9BA4A0089BA08 /* MT_Spline.cpp */,
 				33E8890315B9BA4A0089BA08 /* PostProcess.cpp */,
@@ -4980,6 +5012,7 @@
 				33DB15E8162FA56A00963A33 /* WorldBSP.cpp */,
 				33E8890C15B9BA4A0089BA08 /* WorldCinematics.cpp */,
 				33E8890D15B9BA4A0089BA08 /* WorldCinematics.h */,
+				33982E8F16B256D700C2ED49 /* WorldDebugDraw.cpp */,
 				33E8890E15B9BA4A0089BA08 /* WorldDef.h */,
 				33E8890F15B9BA4A0089BA08 /* WorldDraw.cpp */,
 				33E8891015B9BA4A0089BA08 /* WorldDraw.h */,
@@ -5010,6 +5043,8 @@
 				33E888C415B9BA4A0089BA08 /* E_SoundEmitter.h */,
 				33E888C515B9BA4A0089BA08 /* E_SplineTrack.cpp */,
 				33E888C615B9BA4A0089BA08 /* E_SplineTrack.h */,
+				33982E7E16B2553300C2ED49 /* E_TouchTrigger.cpp */,
+				33982E7F16B2553300C2ED49 /* E_TouchTrigger.h */,
 				33E888C715B9BA4A0089BA08 /* E_ViewController.cpp */,
 				33E888C815B9BA4A0089BA08 /* E_ViewController.h */,
 				33E888C915B9BA4A0089BA08 /* E_Worldspawn.cpp */,
@@ -5469,6 +5504,7 @@
 				33982E0E16A89C3B00C2ED49 /* CVars.h in Headers */,
 				33982E1A16A89C8100C2ED49 /* GameCVars.h in Headers */,
 				33982E2216A8ABBC00C2ED49 /* Console.h in Headers */,
+				33982E8716B2553300C2ED49 /* E_TouchTrigger.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5855,6 +5891,7 @@
 				33982E0F16A89C3B00C2ED49 /* CVars.h in Headers */,
 				33982E1B16A89C8100C2ED49 /* GameCVars.h in Headers */,
 				33982E2316A8ABBC00C2ED49 /* Console.h in Headers */,
+				33982E8816B2553300C2ED49 /* E_TouchTrigger.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6323,6 +6360,7 @@
 				33982DEB16A89C0900C2ED49 /* WorldLuaCommon.h in Headers */,
 				33982E0C16A89C3B00C2ED49 /* CVars.h in Headers */,
 				33982E1816A89C8100C2ED49 /* GameCVars.h in Headers */,
+				33982E8516B2553300C2ED49 /* E_TouchTrigger.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6707,6 +6745,7 @@
 				33982E0D16A89C3B00C2ED49 /* CVars.h in Headers */,
 				33982E1916A89C8100C2ED49 /* GameCVars.h in Headers */,
 				33982E2116A8ABBC00C2ED49 /* Console.h in Headers */,
+				33982E8616B2553300C2ED49 /* E_TouchTrigger.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7093,6 +7132,7 @@
 				33982E1016A89C3B00C2ED49 /* CVars.h in Headers */,
 				33982E1C16A89C8100C2ED49 /* GameCVars.h in Headers */,
 				33982E2416A8ABBD00C2ED49 /* Console.h in Headers */,
+				33982E8916B2553300C2ED49 /* E_TouchTrigger.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7450,6 +7490,10 @@
 				33982E0916A89C3B00C2ED49 /* CVars.cpp in Sources */,
 				33982E1516A89C8100C2ED49 /* GameCVars.cpp in Sources */,
 				33982E1F16A8ABB700C2ED49 /* Console.cpp in Sources */,
+				33982E7A16B2550300C2ED49 /* MT_Floor.cpp in Sources */,
+				33982E8216B2553300C2ED49 /* E_TouchTrigger.cpp in Sources */,
+				33982E9216B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */,
+				33982E9816B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7616,6 +7660,10 @@
 				33982E0A16A89C3B00C2ED49 /* CVars.cpp in Sources */,
 				33982E1616A89C8100C2ED49 /* GameCVars.cpp in Sources */,
 				33982E1D16A8ABB500C2ED49 /* Console.cpp in Sources */,
+				33982E7B16B2550300C2ED49 /* MT_Floor.cpp in Sources */,
+				33982E8316B2553300C2ED49 /* E_TouchTrigger.cpp in Sources */,
+				33982E9316B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */,
+				33982E9916B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7866,6 +7914,10 @@
 				33982DFF16A89C0900C2ED49 /* WorldLuaWorld.cpp in Sources */,
 				33982E0716A89C3B00C2ED49 /* CVars.cpp in Sources */,
 				33982E1316A89C8100C2ED49 /* GameCVars.cpp in Sources */,
+				33982E7816B2550300C2ED49 /* MT_Floor.cpp in Sources */,
+				33982E8016B2553300C2ED49 /* E_TouchTrigger.cpp in Sources */,
+				33982E9016B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */,
+				33982E9616B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8031,6 +8083,10 @@
 				33982E0816A89C3B00C2ED49 /* CVars.cpp in Sources */,
 				33982E1416A89C8100C2ED49 /* GameCVars.cpp in Sources */,
 				33982E2016A8ABB700C2ED49 /* Console.cpp in Sources */,
+				33982E7916B2550300C2ED49 /* MT_Floor.cpp in Sources */,
+				33982E8116B2553300C2ED49 /* E_TouchTrigger.cpp in Sources */,
+				33982E9116B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */,
+				33982E9716B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8197,6 +8253,10 @@
 				33982E0B16A89C3B00C2ED49 /* CVars.cpp in Sources */,
 				33982E1716A89C8100C2ED49 /* GameCVars.cpp in Sources */,
 				33982E1E16A8ABB500C2ED49 /* Console.cpp in Sources */,
+				33982E7C16B2550300C2ED49 /* MT_Floor.cpp in Sources */,
+				33982E8416B2553300C2ED49 /* E_TouchTrigger.cpp in Sources */,
+				33982E9416B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */,
+				33982E9A16B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
