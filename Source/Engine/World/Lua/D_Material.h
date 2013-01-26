@@ -44,6 +44,7 @@ private:
 	static int lua_Dimensions(lua_State *L);
 	static int lua_SetState(lua_State *L);
 	static int lua_BlendTo(lua_State *L);
+	static int lua_Name(lua_State *L);
 	
 	pkg::AssetRef m_asset;
 	asset::MaterialParser::Ref m_parser;

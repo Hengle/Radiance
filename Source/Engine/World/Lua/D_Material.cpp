@@ -28,6 +28,8 @@ void D_Material::PushElements(lua_State *L) {
 	lua_setfield(L, -2, "BlendTo");
 	lua_pushcfunction(L, lua_SetState);
 	lua_setfield(L, -2, "SetState");
+	lua_pushcfunction(L, lua_Name);
+	lua_setfield(L, -2, "Name");
 }
 
 int D_Material::lua_Dimensions(lua_State *L) {
@@ -188,6 +190,12 @@ int D_Material::lua_SetState(lua_State *L) {
 
 	luaL_argerror(L, 2, "Invalid material state!");
 	return 0;
+}
+
+int D_Material::lua_Name(lua_State *L) {
+	D_Material::Ref self = lua::SharedPtr::Get<D_Material>(L, "D_Material", 1, true);
+	lua_pushstring(L, self->m_asset->path);
+	return 1;
 }
 
 } // world
