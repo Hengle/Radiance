@@ -90,7 +90,7 @@ void Material::BindStates(int flags, int blends) {
 		if (this->doubleSided)
 			drawFlags |= kCullFaceMode_None;
 		else
-			drawFlags |= kCullFaceMode_Front|kCullFaceMode_CCW;
+			drawFlags |= kCullFaceMode_Back|kCullFaceMode_CCW;
 	}
 
 	gls.Set(drawFlags, blendFlags);

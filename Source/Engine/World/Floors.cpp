@@ -108,7 +108,7 @@ void FloorMove::Merge(const Ref &old, State &state) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Floors::Floors() {
+Floors::Floors() : m_floodNum(-1) {
 }
 
 Floors::~Floors() {
@@ -124,6 +124,8 @@ bool Floors::Load(const bsp_file::BSPFile::Ref &bsp) {
 		Waypoint w;
 		w.waypointId = (int)i;
 		w.flags = (int)waypoint->flags;
+		w.floodNum = -1;
+		w.floodDistance = 0.f;
 
 		if (waypoint->targetName >= 0) {
 			w.targetName = m_bsp->String(waypoint->targetName);
@@ -172,6 +174,7 @@ FloorMove::Ref Floors::CreateMove(
 	WaypointBits waypoints;
 	float bestDistance = std::numeric_limits<float>::max();
 
+	++m_floodNum;
 	if (!PlanMove(start, end, 0.f, plan, planStack, floors, waypoints, bestDistance))
 		return FloorMove::Ref(); // there is no path between these points.
 
@@ -925,287 +928,279 @@ inline bool Floors::PlanMove(
 	WaypointBits &waypoints,
 	float &bestDistance
 ) const {
-	if (start.m_floor >= 0)
-		return PlanFloorMove(start, end, distance, plan, planSoFar, floors, waypoints, bestDistance);
-	return PlanWaypointMove(start, end, distance, plan, planSoFar, floors, waypoints, bestDistance);
-}
+	// done on stack to avoid stackoverflow
+	++m_floodNum;
 
-bool Floors::PlanFloorMove(
-	const FloorPosition &start,
-	const FloorPosition &end,
-	float distance,
-	MovePlan &plan,
-	MovePlan &planSoFar,
-	FloorBits &floors,
-	WaypointBits &waypoints,
-	float &bestDistance
-) const {
-	RAD_ASSERT(start.m_floor >= 0);
-	RAD_ASSERT(!floors.test(start.m_floor));
+	planSoFar.start = start;
+	planSoFar.end   = end;
+	planSoFar.steps->clear();
 	
-	// end is a floor move?
-	if ((end.m_floor >= 0) && (start.m_floor == end.m_floor)) {
-		Vec3 seg = end.m_pos - start.m_pos;
-		distance += seg.MagnitudeSquared();
-		if (distance < bestDistance) {
-			bestDistance = distance;
-			plan = planSoFar;
-			return true;
+	bestDistance = std::numeric_limits<float>::max();
+	
+	struct Connection {
+		typedef stackify<std::vector<Connection>, 16> Vec;
+
+		FloorPosition pos;
+
+		const bsp_file::BSPWaypoint *nextWaypoint;
+		const bsp_file::BSPFloor *nextFloor;
+		const bsp_file::BSPWaypointConnection *connection;
+
+		int nextWaypointIdx;
+		int connectionIdx;
+		int nextFloorIdx;
+
+		float cost; // <-- distace from position to the waypoint
+		float distance; // <-- distance from waypoint to the target
+
+		bool operator < (const Connection &c) {
+			return distance < c.distance;
 		}
-		return false;
-	}
+	};
+
+	struct Stack {
+		typedef stackify<std::vector<Stack>, 512> Vec;
+		Connection::Vec connections;
+		FloorPosition pos;
+		float distance;
+		int idx;
+	};
 	
-	floors.set(start.m_floor);
+	Stack::Vec stack;
+	Stack cur;
+	bool foundPath = false;
 
-	// follow all waypoints out.
-	bool foundMove = false;
 
-	const bsp_file::BSPFloor *floor = m_bsp->Floors() + start.m_floor;
-	for (S32 i = 0; i < floor->numWaypoints; ++i) {
-		U16 waypointNum = *(m_bsp->WaypointIndices() + floor->firstWaypoint + i);
-		const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + waypointNum;
+	// setup our starting state
 
-		const Vec3 kWaypointPos(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
+	if (start.m_waypoint != -1) {
+		// standing on a waypoint:
 
-		float estimatedDistanceToWaypoint = (kWaypointPos - start.m_pos).MagnitudeSquared() + distance;
+		const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + start.m_waypoint;
 
-		// NOTE: Connections are sorted by distance in the bsp file.
+		for (U32 i = 0; i < waypoint->numConnections; ++i) {
+			Connection c;
+			c.connectionIdx = (int)*(m_bsp->WaypointIndices() + waypoint->firstConnection + i);
+			c.connection = m_bsp->WaypointConnections() + c.connectionIdx;
+			
+			int dir = c.connection->waypoints[0] == (U32)start.m_waypoint;
+			c.nextWaypointIdx = (int)c.connection->waypoints[dir];
+			c.nextWaypoint = m_bsp->Waypoints() + c.nextWaypointIdx;
 
-		for (U32 k = 0; k < waypoint->numConnections; ++k) {
-			U16 connectionNum = *(m_bsp->WaypointIndices() + waypoint->firstConnection + k);
-			const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + connectionNum;
-
-			int otherIdx = connection->waypoints[0] == waypointNum;
-
-			if (otherIdx == 0) {
-				if (!(connection->flags&bsp_file::kWaypointConnectionFlag_BtoA))
-					continue; // not connected this way.
+			c.nextFloorIdx = (int)c.nextWaypoint->floorNum;
+			if (c.nextFloorIdx != -1) {
+				c.nextFloor = m_bsp->Floors() + c.nextFloorIdx;
 			} else {
-				RAD_ASSERT(otherIdx == 1);
-				if (!(connection->flags&bsp_file::kWaypointConnectionFlag_AtoB))
-					continue; // not connected this way.
+				c.nextFloor = 0;
 			}
 
-			U32 otherWaypointIdx = connection->waypoints[otherIdx];
+			const Vec3 kPos(c.nextWaypoint->pos[0], c.nextWaypoint->pos[1], c.nextWaypoint->pos[2]);
+			c.cost = (kPos - start.m_pos).MagnitudeSquared();
+			c.distance = (kPos - end.m_pos).MagnitudeSquared();
 
-			if (!(m_waypoints[otherWaypointIdx].flags&kWaypointState_Enabled))
-				continue; // waypoint is disabled right now.
+			c.pos.m_floor = (int)c.nextWaypoint->floorNum;
+			c.pos.m_waypoint = (int)c.nextWaypointIdx;
+			c.pos.m_tri = (int)c.nextWaypoint->triNum;
+			c.pos.m_nextWaypoint = -1;
+			c.pos.m_pos = kPos;
 
-			if (waypoints.test(otherWaypointIdx)) // came from here.
-				continue;
-
-			const bsp_file::BSPWaypoint *otherWaypoint = m_bsp->Waypoints() + otherWaypointIdx;
-
-			if (otherWaypoint->floorNum >= 0) {
-				// takes us to a floor.
-				if (floors.test(otherWaypoint->floorNum))
-					continue; // came from here
-			}
-
-			const Vec3 kOtherWaypointPos(otherWaypoint->pos[0], otherWaypoint->pos[1], otherWaypoint->pos[2]);
-
-			float estimatedDistanceToOtherWaypoint = (kOtherWaypointPos - kWaypointPos).MagnitudeSquared() + estimatedDistanceToWaypoint;
-
-			if (estimatedDistanceToOtherWaypoint >= bestDistance)
-				continue; // can't be better
-
-			// go to other waypoint.
-			FloorPosition waypointStart;
-			waypointStart.m_pos = kOtherWaypointPos;
-			waypointStart.m_floor = (int)otherWaypoint->floorNum;
-			waypointStart.m_tri = (int)otherWaypoint->triNum;
-			waypointStart.m_waypoint = (int)otherWaypointIdx;
-			waypointStart.m_nextWaypoint = -1;
-
-			MoveStep step;
-			step.waypoint = (int)otherWaypointIdx;
-			step.connection = (int)connectionNum;
-			
-			planSoFar.steps->push_back(step);
-
-			if (PlanMove(
-				waypointStart,
-				end,
-				estimatedDistanceToOtherWaypoint,
-				plan,
-				planSoFar,
-				floors,
-				waypoints,
-				bestDistance)) {
-					foundMove = true;
-			}
-
-			planSoFar.steps->pop_back();
+			cur.connections->push_back(c);
 		}
+
+		waypoints.set(start.m_waypoint);
+
+	} else {
+		// at an arbitrary position on a floor
+		RAD_ASSERT(start.m_floor != -1); 
+
+		const bsp_file::BSPFloor *floor = m_bsp->Floors() + start.m_floor;
+
+		for (S32 i = 0; i < floor->numWaypoints; ++i) {
+			Connection c;
+			c.nextFloor = 0;
+			c.connection = 0;
+			c.nextFloorIdx = -1;
+			c.connectionIdx = -1;
+			c.nextWaypointIdx = (int)*(m_bsp->WaypointIndices() + floor->firstWaypoint + i);
+			c.nextWaypoint = m_bsp->Waypoints() + c.nextWaypointIdx ;
+
+			const Vec3 kPos(c.nextWaypoint->pos[0], c.nextWaypoint->pos[1], c.nextWaypoint->pos[2]);
+			c.cost = (kPos - start.m_pos).MagnitudeSquared();
+			c.distance = (kPos - end.m_pos).MagnitudeSquared();
+
+			c.pos.m_floor = (int)c.nextWaypoint->floorNum;
+			c.pos.m_waypoint = (int)c.nextWaypointIdx;
+			c.pos.m_tri = (int)c.nextWaypoint->triNum;
+			c.pos.m_nextWaypoint = -1;
+			c.pos.m_pos = kPos;
+
+			cur.connections->push_back(c);
+		}
+
+		floors.set(start.m_floor);
+
 	}
 
-	floors.reset(start.m_floor);
+	std::sort(cur.connections->begin(), cur.connections->end());
+	cur.distance = 0.f;
+	cur.pos = start;
+	cur.idx = 0;
 
-	return foundMove;
-}
+	for (;;) {
 
-bool Floors::PlanWaypointMove(
-	const FloorPosition &start,
-	const FloorPosition &end,
-	float distance,
-	MovePlan &plan,
-	MovePlan &planSoFar,
-	FloorBits &floors,
-	WaypointBits &waypoints,
-	float &bestDistance
-) const {
-	RAD_ASSERT(start.m_floor < 0);
-	RAD_ASSERT(!waypoints.test(start.m_waypoint));
-	
-	// end is a waypoint?
-	if ((end.m_floor< 0) && (start.m_waypoint == end.m_waypoint)) {
-		if (distance < bestDistance) {
-			bestDistance = distance;
-			plan = planSoFar;
-			return true;
-		}
-		
-		return false;
-	}
-	
-	waypoints.set(start.m_waypoint);
+		// found a path?
+		bool goal = false;
+		bool pop  = true;
 
-	// follow all waypoints out.
-	bool foundMove = false;
+		if ((end.m_floor != -1) && (end.m_waypoint == -1)) {
+			// we are traveling to an arbitrary spot on a floor.
 
-	const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + start.m_waypoint;
+			if (cur.pos.m_floor == end.m_floor) {
+				float distance = cur.distance;
+				distance += (end.m_pos - cur.pos.m_pos).MagnitudeSquared();
 
-	const Vec3 kWaypointPos(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
-
-	// NOTE: Connections are sorted by distance in the bsp file.
-	// Waypoints are in a sparsly connected graph, a shorter euclidean distance between connections 
-	// does not imply a path to the target.
-
-	bool isNeighbor = false;
-
-	for (U32 k = 0; k < waypoint->numConnections; ++k) {
-		U16 connectionNum = *(m_bsp->WaypointIndices() + waypoint->firstConnection + k);
-		const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + connectionNum;
-
-		int otherIdx = connection->waypoints[0] == start.m_waypoint;
-
-		if (otherIdx == 0) {
-			if (!(connection->flags&bsp_file::kWaypointConnectionFlag_BtoA))
-				continue; // not connected this way.
+				if (distance < bestDistance) {
+					bestDistance = distance;
+					plan = planSoFar;
+					goal = true;
+				}
+			}
 		} else {
-			RAD_ASSERT(otherIdx == 1);
-			if (!(connection->flags&bsp_file::kWaypointConnectionFlag_AtoB))
-				continue; // not connected this way.
+			RAD_ASSERT(end.m_waypoint != -1);
+
+			// we are traveling to a specific waypoint
+			if (cur.pos.m_waypoint == end.m_waypoint) {
+				if (cur.distance < bestDistance) {
+					bestDistance = cur.distance;
+					plan = planSoFar;
+					goal = true;
+				}
+			}
 		}
 
-		U32 otherWaypointIdx = connection->waypoints[otherIdx];
+		foundPath = foundPath || goal;
 
-		if (!(m_waypoints[otherWaypointIdx].flags&kWaypointState_Enabled))
-			continue; // waypoint is disabled right now.
+		if (!goal && (cur.distance < bestDistance)) {
+			for (;cur.idx < (int)cur.connections->size(); ++cur.idx) {
 
-		if (otherWaypointIdx == end.m_waypoint) {
-			isNeighbor = true;
+				const Connection &c = cur.connections[cur.idx];
 
-			// goal.
-			const bsp_file::BSPWaypoint *otherWaypoint = m_bsp->Waypoints() + otherWaypointIdx;
-			const Vec3 kOtherWaypointPos(otherWaypoint->pos[0], otherWaypoint->pos[1], otherWaypoint->pos[2]);
-			float estimatedDistanceToOtherWaypoint = (kOtherWaypointPos - kWaypointPos).MagnitudeSquared();
-			if (estimatedDistanceToOtherWaypoint < bestDistance) {
-				// go to other waypoint.
-				FloorPosition waypointStart;
-				waypointStart.m_pos = kOtherWaypointPos;
-				waypointStart.m_floor = (int)otherWaypoint->floorNum;
-				waypointStart.m_tri = (int)otherWaypoint->triNum;
-				waypointStart.m_waypoint = (int)otherWaypointIdx;
-				waypointStart.m_nextWaypoint = -1;
+				// check for recursion:
+				RAD_ASSERT(c.nextWaypoint);
 
-				MoveStep step;
-				step.waypoint = (int)otherWaypointIdx;
-				step.connection = (int)connectionNum;
+				if (waypoints.test(c.nextWaypointIdx))
+					continue;
 			
-				planSoFar.steps->push_back(step);
-
-				if (PlanMove(
-					waypointStart,
-					end,
-					estimatedDistanceToOtherWaypoint,
-					plan,
-					planSoFar,
-					floors,
-					waypoints,
-					bestDistance)) {
-						foundMove = true;
+				if (c.nextFloor && (c.nextFloorIdx != cur.pos.m_floor)) {
+					// we are changing floors check recursion
+					if (floors.test(c.nextFloorIdx))
+						continue;
 				}
 
-				planSoFar.steps->pop_back();
-				RAD_ASSERT(foundMove == true);
-			}
+				float distance = cur.distance + c.cost;
 
-			break;
-		}
-	}
+				if (distance >= bestDistance)
+					continue; // this will only get worse
 
-	if (!isNeighbor) {
-		for (U32 k = 0; k < waypoint->numConnections; ++k) {
-			U16 connectionNum = *(m_bsp->WaypointIndices() + waypoint->firstConnection + k);
-			const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + connectionNum;
+				const Waypoint &dwaypoint = m_waypoints[c.nextWaypointIdx];
 
-			int otherIdx = connection->waypoints[0] == start.m_waypoint;
-			U32 otherWaypointIdx = connection->waypoints[otherIdx];
+				// have we passed through this waypoint already?
+				if (dwaypoint.floodNum == m_floodNum) {
+					// if so, are we any closer than we were last time?
+					if (distance >= dwaypoint.floodDistance)
+						continue;
+				}
 
-			if (waypoints.test(otherWaypointIdx)) // came from here.
-				continue;
+				// NOTE: mutable members
+				dwaypoint.floodNum = m_floodNum;
+				dwaypoint.floodDistance = distance;
 
-			if (!(m_waypoints[otherWaypointIdx].flags&kWaypointState_Enabled))
-				continue; // waypoint is disabled right now.
+				// we are gonna cross this connection
+				waypoints.set(c.nextWaypointIdx);
+				if (c.nextFloor)
+					floors.set(c.nextFloorIdx);
 
-			const bsp_file::BSPWaypoint *otherWaypoint = m_bsp->Waypoints() + otherWaypointIdx;
+				// we must be crossing a waypoint connection or be at an arbitrary floor position
+				RAD_ASSERT((c.connectionIdx != -1) || (cur.pos.m_floor != -1));
 
-			if (otherWaypoint->floorNum >= 0) {
-				// takes us to a floor.
-				if (floors.test(otherWaypoint->floorNum))
-					continue; // came from here
-			}
+				if (c.connectionIdx != -1) {
+					MoveStep step;
+					step.waypoint = c.nextWaypointIdx;
+					step.connection = c.connectionIdx;
+					planSoFar.steps->push_back(step);
+				}
 
-			const Vec3 kOtherWaypointPos(otherWaypoint->pos[0], otherWaypoint->pos[1], otherWaypoint->pos[2]);
+				stack->push_back(cur);
 
-			float estimatedDistanceToOtherWaypoint = (kOtherWaypointPos - kWaypointPos).MagnitudeSquared();
+				cur.idx = 0;
+				cur.pos = c.pos;
+				cur.distance = distance;
+				cur.connections->clear();
 
-			if (estimatedDistanceToOtherWaypoint >= bestDistance)
-				continue; // can't be better
+				// generate sorted connects
+				RAD_ASSERT(cur.pos.m_waypoint != -1);
 
-			// go to other waypoint.
-			FloorPosition waypointStart;
-			waypointStart.m_pos = kOtherWaypointPos;
-			waypointStart.m_floor = (int)otherWaypoint->floorNum;
-			waypointStart.m_tri = (int)otherWaypoint->triNum;
-			waypointStart.m_waypoint = (int)otherWaypointIdx;
+				// standing on a waypoint:
 
-			MoveStep step;
-			step.waypoint = (int)otherWaypointIdx;
-			step.connection = (int)connectionNum;
+				const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + cur.pos.m_waypoint;
+
+				for (U32 i = 0; i < waypoint->numConnections; ++i) {
+					Connection c;
+					c.connectionIdx = (int)*(m_bsp->WaypointIndices() + waypoint->firstConnection + i);
+					c.connection = m_bsp->WaypointConnections() + c.connectionIdx;
 			
-			planSoFar.steps->push_back(step);
+					int dir = c.connection->waypoints[0] == (U32)cur.pos.m_waypoint;
+					c.nextWaypointIdx = (int)c.connection->waypoints[dir];
+					c.nextWaypoint = m_bsp->Waypoints() + c.nextWaypointIdx;
 
-			if (PlanMove(
-				waypointStart,
-				end,
-				estimatedDistanceToOtherWaypoint,
-				plan,
-				planSoFar,
-				floors,
-				waypoints,
-				bestDistance)) {
-					foundMove = true;
+					c.nextFloorIdx = (int)c.nextWaypoint->floorNum;
+					if (c.nextFloorIdx != -1) {
+						c.nextFloor = m_bsp->Floors() + c.nextFloorIdx;
+					} else {
+						c.nextFloor = 0;
+					}
+
+					const Vec3 kPos(c.nextWaypoint->pos[0], c.nextWaypoint->pos[1], c.nextWaypoint->pos[2]);
+					c.cost = (kPos - cur.pos.m_pos).MagnitudeSquared();
+					c.distance = (kPos - end.m_pos).MagnitudeSquared();
+
+					c.pos.m_floor = (int)c.nextWaypoint->floorNum;
+					c.pos.m_waypoint = (int)c.nextWaypointIdx;
+					c.pos.m_tri = (int)c.nextWaypoint->triNum;
+					c.pos.m_nextWaypoint = -1;
+					c.pos.m_pos = kPos;
+
+					cur.connections->push_back(c);
+				}
+
+				std::sort(cur.connections->begin(), cur.connections->end());
+				pop = false;
+				break;
 			}
+		}
 
-			planSoFar.steps->pop_back();
+		if (pop) {
+			if (stack->empty())
+				break;
+
+			cur = stack->back();
+			stack->pop_back();
+
+			if (cur.idx < (int)cur.connections->size()) {
+				// pop our last state.
+				const Connection &c = cur.connections[cur.idx];
+				if (c.nextWaypoint)
+					waypoints.reset(c.nextWaypointIdx);
+				if (c.nextFloor)
+					floors.reset(c.nextFloorIdx);
+				if (!planSoFar.steps->empty())
+					planSoFar.steps->pop_back();
+				++cur.idx;
+			}
 		}
 	}
 
-	waypoints.reset(start.m_waypoint);
-
-	return foundMove;
+	return foundPath;
 }
 
 bool Floors::ClipToFloor(

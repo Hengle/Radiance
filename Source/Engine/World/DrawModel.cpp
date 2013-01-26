@@ -4,6 +4,9 @@
 // See Radiance/LICENSE for licensing terms.
 
 #include RADPCH
+#include "../App.h"
+#include "../Engine.h"
+#include "../Packages/Packages.h"
 #include "../MathUtils.h"
 #include "DrawModel.h"
 #include "Entity.h"
@@ -85,7 +88,7 @@ void DrawModel::BlendTo(const Vec4 &rgba, float time) {
 	}
 }
 
-void DrawModel::SwapMaterial(int src, int dst) {
+void DrawModel::ReplaceMaterial(int src, int dst) {
 	for (MBatchDraw::RefVec::iterator it = m_batches.begin(); it != m_batches.end(); ++it) {
 		const MBatchDraw::Ref &r = *it;
 		if (r->matId == src)
@@ -93,11 +96,22 @@ void DrawModel::SwapMaterial(int src, int dst) {
 	}
 }
 
+void DrawModel::ReplaceMaterials(int dst) {
+	for (MBatchDraw::RefVec::iterator it = m_batches.begin(); it != m_batches.end(); ++it) {
+		const MBatchDraw::Ref &r = *it;
+		r->matId = dst;
+	}
+}
+
 void DrawModel::PushElements(lua_State *L) {
 	lua_pushcfunction(L, lua_BlendTo);
 	lua_setfield(L, -2, "BlendTo");
-	lua_pushcfunction(L, lua_SwapMaterial);
-	lua_setfield(L, -2, "SwapMaterial");
+	lua_pushcfunction(L, lua_ReplaceMaterial);
+	lua_setfield(L, -2, "ReplaceMaterial");
+	lua_pushcfunction(L, lua_ReplaceMaterials);
+	lua_setfield(L, -2, "ReplaceMaterials");
+	lua_pushcfunction(L, lua_MaterialList);
+	lua_setfield(L, -2, "MaterialList");
 	
 	LUART_REGISTER_GETSET(L, Pos);
 	LUART_REGISTER_GETSET(L, Angles);
@@ -112,13 +126,24 @@ int DrawModel::lua_BlendTo(lua_State *L) {
 	return 0;
 }
 
-int DrawModel::lua_SwapMaterial(lua_State *L) {
+int DrawModel::lua_ReplaceMaterial(lua_State *L) {
 	Ref r = lua::SharedPtr::Get<DrawModel>(L, "DrawModel", 1, true);
 	D_Material::Ref a = lua::SharedPtr::Get<D_Material>(L, "Material", 2, true);
 	D_Material::Ref b = lua::SharedPtr::Get<D_Material>(L, "Material", 3, true);
-
-	r->SwapMaterial(a->assetId, b->assetId);
+	r->ReplaceMaterial(a->assetId, b->assetId);
 	return 0;
+}
+
+int DrawModel::lua_ReplaceMaterials(lua_State *L) {
+	Ref r = lua::SharedPtr::Get<DrawModel>(L, "DrawModel", 1, true);
+	D_Material::Ref a = lua::SharedPtr::Get<D_Material>(L, "Material", 2, true);
+	r->ReplaceMaterials(a->assetId);
+	return 0;
+}
+
+int DrawModel::lua_MaterialList(lua_State *L) {
+	Ref r = lua::SharedPtr::Get<DrawModel>(L, "DrawModel", 1, true);
+	return r->lua_PushMaterialList(L);
 }
 
 #define SELF Ref self = lua::SharedPtr::Get<DrawModel>(L, "DrawModel", 1, true)
@@ -188,6 +213,21 @@ int MeshDrawModel::lua_CreateInstance(lua_State *L) {
 	return 1;
 }
 
+int MeshDrawModel::lua_PushMaterialList(lua_State *L) {
+	pkg::Asset::Ref asset = App::Get()->engine->sys->packages->Asset(m_matId, pkg::Z_Engine);
+	if (asset) {
+		D_Material::Ref m = D_Material::New(asset);
+		if (m) {
+			lua_createtable(L, 1, 0);
+			lua_pushinteger(L, 1);
+			m->Push(L);
+			lua_settable(L, -3);
+			return 1;
+		}
+	}
+	return 0;
+}
+
 MeshDrawModel::Ref MeshDrawModel::CreateInstance() {
 	return New(entity, m_mesh, m_matId);
 }
@@ -243,11 +283,35 @@ MeshBundleDrawModel::Ref MeshBundleDrawModel::CreateInstance() {
 	return New(entity, m_bundle);
 }
 
-
 void MeshBundleDrawModel::PushElements(lua_State *L) {
 	DrawModel::PushElements(L);
 	lua_pushcfunction(L, lua_CreateInstance);
 	lua_setfield(L, -2, "CreateInstance");
+}
+
+int MeshBundleDrawModel::lua_PushMaterialList(lua_State *L) {
+
+	const asset::MeshMaterialLoader::Ref &loader = m_bundle->materialLoader;
+	int numUniqueMaterials = loader->numUniqueMaterials;
+
+	if (numUniqueMaterials < 1)
+		return 0;
+
+	lua_createtable(L, numUniqueMaterials, 0);
+
+	for (int i = 0; i < numUniqueMaterials; ++i) {
+		const pkg::Asset::Ref &asset = loader->UniqueMaterialAsset(i);
+		if (asset) {
+			D_Material::Ref m = D_Material::New(asset);
+			if (m) {
+				lua_pushinteger(L, i+1);
+				m->Push(L);
+				lua_settable(L, -3);
+			}
+		}
+	}
+
+	return 1;
 }
 
 int MeshBundleDrawModel::lua_CreateInstance(lua_State *L) {
@@ -341,6 +405,31 @@ void SkMeshDrawModel::PushElements(lua_State *L) {
 	LUART_REGISTER_GETSET(L, MotionScale);
 	lua_pushcfunction(L, lua_CreateInstance);
 	lua_setfield(L, -2, "CreateInstance");
+}
+
+int SkMeshDrawModel::lua_PushMaterialList(lua_State *L) {
+
+	asset::SkMaterialLoader::Ref loader = asset::SkMaterialLoader::Cast(m_mesh->asset);
+	int numUniqueMaterials = loader->numUniqueMaterials;
+
+	if (numUniqueMaterials < 1)
+		return 0;
+
+	lua_createtable(L, numUniqueMaterials, 0);
+
+	for (int i = 0; i < numUniqueMaterials; ++i) {
+		const pkg::Asset::Ref &asset = loader->UniqueMaterialAsset(i);
+		if (asset) {
+			D_Material::Ref m = D_Material::New(asset);
+			if (m) {
+				lua_pushinteger(L, i+1);
+				m->Push(L);
+				lua_settable(L, -3);
+			}
+		}
+	}
+
+	return 1;
 }
 
 int SkMeshDrawModel::lua_CreateInstance(lua_State *L) {

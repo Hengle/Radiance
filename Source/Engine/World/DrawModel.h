@@ -30,7 +30,8 @@ public:
 
 	void Tick(float time, float dt);
 	void BlendTo(const Vec4 &rgba, float time);
-	void SwapMaterial(int src, int dst);
+	void ReplaceMaterial(int src, int dst);
+	void ReplaceMaterials(int dst);
 
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, entity, Entity*);
 	RAD_DECLARE_PROPERTY(DrawModel, pos, const Vec3&, const Vec3&);
@@ -75,6 +76,8 @@ protected:
 	};
 
 	virtual void OnTick(float time, float dt) {}
+
+	virtual int lua_PushMaterialList(lua_State *L) = 0;
 
 private:
 
@@ -129,7 +132,9 @@ private:
 	}
 
 	static int lua_BlendTo(lua_State *L);
-	static int lua_SwapMaterial(lua_State *L);
+	static int lua_ReplaceMaterial(lua_State *L);
+	static int lua_ReplaceMaterials(lua_State *L);
+	static int lua_MaterialList(lua_State *L);
 	
 	LUART_DECL_GETSET(Pos);
 	LUART_DECL_GETSET(Angles);
@@ -168,6 +173,7 @@ public:
 protected:
 
 	virtual void PushElements(lua_State *L);
+	virtual int lua_PushMaterialList(lua_State *L);
 
 private:
 
@@ -216,6 +222,7 @@ public:
 protected:
 
 	virtual void PushElements(lua_State *L);
+	virtual int lua_PushMaterialList(lua_State *L);
 
 private:
 
@@ -270,6 +277,8 @@ public:
 protected:
 
 	virtual void PushElements(lua_State *L);
+	virtual int lua_PushMaterialList(lua_State *L);
+
 	virtual void OnTick(float time, float dt);
 
 private:

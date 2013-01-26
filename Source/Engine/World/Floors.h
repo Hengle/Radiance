@@ -220,7 +220,7 @@ private:
 
 	//! A step in a planned move
 	struct MoveStep {
-		typedef stackify<std::vector<MoveStep>, 8> Vec;
+		typedef stackify<std::vector<MoveStep>, 64> Vec;
 		int waypoint;
 		int connection;
 	};
@@ -233,28 +233,6 @@ private:
 
 	//! Find shortest path from start->end
 	bool PlanMove(
-		const FloorPosition &start,
-		const FloorPosition &end,
-		float distance,
-		MovePlan &plan,
-		MovePlan &planSoFar,
-		FloorBits &floors,
-		WaypointBits &waypoints,
-		float &bestDistance
-	) const;
-
-	bool PlanFloorMove(
-		const FloorPosition &start,
-		const FloorPosition &end,
-		float distance,
-		MovePlan &plan,
-		MovePlan &planSoFar,
-		FloorBits &floors,
-		WaypointBits &waypoints,
-		float &bestDistance
-	) const;
-
-	bool PlanWaypointMove(
 		const FloorPosition &start,
 		const FloorPosition &end,
 		float distance,
@@ -283,6 +261,8 @@ private:
 		String userId;
 		int waypointId;
 		int flags;
+		mutable int floodNum;
+		mutable float floodDistance;
 	};
 
 	Waypoint::Vec m_waypoints;
@@ -290,6 +270,7 @@ private:
 	Waypoint::MMap m_waypointUserIds;
 	IntVec m_floorState;
 	bsp_file::BSPFile::Ref m_bsp;
+	mutable int m_floodNum;
 };
 
 } // world

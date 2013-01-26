@@ -31,6 +31,12 @@ public:
 	const pkg::Asset::Ref &MaterialAsset(int mesh) const {
 		return m_matRefs[mesh];
 	}
+
+	const pkg::Asset::Ref &UniqueMaterialAsset(int idx) const {
+		return m_umatRefs[idx];
+	}
+
+	RAD_DECLARE_READONLY_PROPERTY(SkMaterialLoader, numUniqueMaterials, int);
 	
 protected:
 
@@ -57,7 +63,14 @@ private:
 		S_Error
 	};
 
+	void AddUMatRef(const pkg::Asset::Ref &m);
+
+	RAD_DECLARE_GET(numUniqueMaterials, int) { 
+		return (int)m_umatRefs.size(); 
+	}
+
 	pkg::Asset::Vec m_matRefs;
+	pkg::Asset::Vec m_umatRefs;
 	int m_state;
 	int m_matIdx;
 };

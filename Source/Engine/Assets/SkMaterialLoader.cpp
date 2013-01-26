@@ -108,11 +108,21 @@ int SkMaterialLoader::Load(
 
 		if (r != SR_Success)
 			return r;
+
+		AddUMatRef(m);
 	}
 
 	m_matIdx = 0;
 	++m_state;
 	return SR_Success;
+}
+
+void SkMaterialLoader::AddUMatRef(const pkg::Asset::Ref &m) {
+	for (int i = 0; i < (int)m_umatRefs.size(); ++i) {
+		if (m_umatRefs[i].get() == m.get())
+			return;
+	}
+	m_umatRefs.push_back(m);
 }
 
 void SkMaterialLoader::Register(Engine &engine) {

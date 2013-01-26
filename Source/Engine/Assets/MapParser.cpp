@@ -225,7 +225,7 @@ int MapParser::ParseBrush(
 			return SR_ParseError;
 
 		tools::SceneFile::BrushPlane bp;
-		bp.plane = Plane(pts[0], pts[1], pts[2]);
+		bp.plane = Plane(pts[2], pts[1], pts[0]); // <-- CCW
 		planes.push_back(bp);
 	}
 

@@ -219,9 +219,9 @@ namespace {
 
 				for (U32 j = 0; j < nf; ++j) {
 					UVFace f;
-					stream >> f.v[2];
-					stream >> f.v[1];
 					stream >> f.v[0];
+					stream >> f.v[1];
+					stream >> f.v[2];
 					
 					if (i < SceneFile::kMaxUVChannels) {
 						uvtris[i].push_back(f);
@@ -234,9 +234,9 @@ namespace {
 			for (U32 i = 0; i < nf; ++i) {
 
 				TriFace f;
-				stream >> f.v[2];
-				stream >> f.v[1];
 				stream >> f.v[0];
+				stream >> f.v[1];
+				stream >> f.v[2];
 				stream >> f.smg;
 				stream >> f.mat;
 

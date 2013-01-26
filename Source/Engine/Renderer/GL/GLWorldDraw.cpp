@@ -171,17 +171,9 @@ void GLWorldDraw::SetPerspectiveMatrix() {
 	gl.MatrixMode(GL_PROJECTION);
 	gl.LoadIdentity();
 
-#if defined(RAD_OPT_PC)
 	int vpx, vpy, vpw, vph;
 	world->game->Viewport(vpx, vpy, vpw, vph);
 	float yaspect = ((float)vph/(float)vpw);
-#else
-	float yaspect = 0.75f; // 3/4 aspect (matches iPad).
-	// the right thing to do here is keep the yfov the same but modify the xaspect according
-	// to the viewport, however this has ramifications with how some cinematics were framed/shot
-	// in max so we need to squish everything that was visible there into our device viewport
-	// regardless of the minor distortion.
-#endif
 	float xaspect = 1.f / yaspect;
 	float yfov = world->camera->fov.get() * yaspect;
 
@@ -434,17 +426,12 @@ void GLWorldDraw::CreateOverlay(
 		for (x = 0; x < OverlayDiv-1; ++x) {
 			U16 *idx = &indices[y*(OverlayDiv-1)*6+x*6];
 
-			// glOrtho() inverts the +Z axis (or -Z can't recall), inverting the 
-			// dot product sign and culling CCW faces (i.e. we're looking from the 
-			// back instead of from the front).
-			// I'm correcting this in the indices.
-
-			idx[2] = (U16)(y*OverlayDiv+x);
+			idx[0] = (U16)(y*OverlayDiv+x);
 			idx[1] = (U16)((y+1)*OverlayDiv+x);
-			idx[0] = (U16)((y+1)*OverlayDiv+x+1);
-			idx[5] = (U16)(y*OverlayDiv+x);
+			idx[2] = (U16)((y+1)*OverlayDiv+x+1);
+			idx[3] = (U16)(y*OverlayDiv+x);
 			idx[4] = (U16)((y+1)*OverlayDiv+x+1);
-			idx[3] = (U16)(y*OverlayDiv+x+1);
+			idx[5] = (U16)(y*OverlayDiv+x+1);
 		}
 	}
 

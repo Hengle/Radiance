@@ -217,17 +217,12 @@ void GLDraw::InitRectVerts(int vpw, int vph) {
 		for (x = 0; x < OverlayDiv-1; ++x) {
 			U16 *idx = &indices[y*(OverlayDiv-1)*6+x*6];
 
-			// glOrtho() inverts the +Z axis (or -Z can't recall), inverting the 
-			// dot product sign and culling CCW faces (i.e. we're looking from the 
-			// back instead of from the front).
-			// I'm correcting this in the indices.
-
-			idx[2] = (U16)(y*OverlayDiv+x);
+			idx[0] = (U16)(y*OverlayDiv+x);
 			idx[1] = (U16)((y+1)*OverlayDiv+x);
-			idx[0] = (U16)((y+1)*OverlayDiv+x+1);
-			idx[5] = (U16)(y*OverlayDiv+x);
+			idx[2] = (U16)((y+1)*OverlayDiv+x+1);
+			idx[3] = (U16)(y*OverlayDiv+x);
 			idx[4] = (U16)((y+1)*OverlayDiv+x+1);
-			idx[3] = (U16)(y*OverlayDiv+x+1);
+			idx[5] = (U16)(y*OverlayDiv+x+1);
 		}
 	}
 
