@@ -953,7 +953,7 @@ inline bool Floors::PlanMove(
 		float cost; // <-- distace from position to the waypoint
 		float distance; // <-- distance from waypoint to the target
 
-		bool operator < (const Connection &c) {
+		bool operator < (const Connection &c) const {
 			return distance < c.distance;
 		}
 	};
