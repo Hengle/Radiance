@@ -15,12 +15,12 @@ void Entity::UpdateVelocity(float dt) {
 	// velocity
 	if (m_ps.flags&kPhysicsFlag_Friction) {
 		float mag = m_ps.velocity.Magnitude();
-		if (mag > 0.f) {
+		if (mag > 0.01f) {
 			float decel;
 			if (m_ps.mtype == kMoveType_Floor) {
-				decel = mag < m_ps.groundFriction ? mag : m_ps.groundFriction;
+				decel = m_ps.groundFriction;
 			} else {
-				decel = mag < m_ps.airFriction ? mag : m_ps.airFriction;
+				decel = m_ps.airFriction;
 			}
 
 			decel = mag - dt*decel;
@@ -28,6 +28,8 @@ void Entity::UpdateVelocity(float dt) {
 				decel = 0.f;
 			decel /= mag;
 			m_ps.velocity *= decel;
+		} else {
+			m_ps.velocity = Vec3::Zero;
 		}
 	} else {
 		m_ps.velocity += m_ps.accel * dt;
