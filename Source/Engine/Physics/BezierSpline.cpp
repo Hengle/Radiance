@@ -22,6 +22,10 @@ void CubicBZSpline::Eval(float t, Vec3 &pos, Vec3 *tangent) const {
 }
 
 void CubicBZSpline::MakeCfs(const Vec3 &a, const Vec3 &b, const Vec3 &c, const Vec3 &d) {
+	m_ctrls[0] = a;
+	m_ctrls[1] = b;
+	m_ctrls[2] = c;
+	m_ctrls[3] = d;
 	m_cfs[0] = -a + (3.f*b) - (3.f*c) + d;
 	m_cfs[1] = (3.f*a) - (6.f*b) + (3.f*c);
 	m_cfs[2] = (-3.f*a) + (3.f*b);

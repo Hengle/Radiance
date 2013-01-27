@@ -15,11 +15,15 @@ void Entity::TransitionFloorMove() {
 	if (!m_ps.desiredMove)
 		return;
 
-	// for now just overwrite any existing motion.
-	m_ps.activeMove = m_ps.desiredMove;
-	m_ps.desiredMove.reset();
-
-	m_ps.activeMove->InitMove(m_ps.moveState);
+	if (m_ps.activeMove) {
+		m_ps.desiredMove->Merge(m_ps.activeMove, m_ps.moveState);
+		m_ps.activeMove = m_ps.desiredMove;
+		m_ps.desiredMove.reset();
+	} else {
+		m_ps.activeMove = m_ps.desiredMove;
+		m_ps.desiredMove.reset();
+		m_ps.activeMove->InitMove(m_ps.moveState);
+	}
 }
 
 void Entity::CancelFloorMove() {

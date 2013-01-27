@@ -27,6 +27,14 @@ inline int BSPConnectionFlagsToStateFlags(int flags) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void FloorMove::Step::Reverse() {
+	std::swap(events[0], events[1]);
+	std::swap(waypoints[0], waypoints[1]);
+	std::swap(floors[0], floors[1]);
+	spline.Reverse();
+	path.Load(spline);
+}
+
 FloorMove::FloorMove() {
 }
 
@@ -60,39 +68,47 @@ float FloorMove::Move(
 		return 0.f;
 	float moved = 0.f;
 
+	if (state.m_stepIdx >= (int)m_route.steps->size())
+		return 0.f;
+
 	while (moved < distance) {
-		if (state.m_stepIdx >= (int)m_route.steps->size()) {
-			const Step &step = m_route.steps[state.m_stepIdx-1];
-			state.pos.m_waypoint = step.waypoints[1];
-			state.pos.m_nextWaypoint = -1;
-			if (state.pos.m_waypoint == -1) {
-				state.pos.m_floor = step.floors[0];
-			}
-			break;
-		}
-		const Step &step = m_route.steps[state.m_stepIdx];
+		
+		const Step *step = &m_route.steps[state.m_stepIdx];
 
 		if (state.m_first) {
 			state.m_first = false;
-			if (!step.events[0].empty)
-				events.push_back(step.events[0]);
-			state.pos.m_waypoint = step.waypoints[0];
-			state.pos.m_nextWaypoint = step.waypoints[0];
-			if (state.pos.m_waypoint == -1) {
-				state.pos.m_floor = step.floors[0];
-			}
+			if (!step->events[0].empty)
+				events.push_back(step->events[0]);
 		}
-		
+
 		float dd = distance - moved;
 
-		float dx = state.m_m.Eval(step.path, dd, state.pos.m_pos, &state.facing, &distanceRemainingAfterMove);
+		float dx = state.m_m.Eval(step->path, dd, state.pos.m_pos, &state.facing, &distanceRemainingAfterMove);
 		moved += dx;
 
 		if (dx < dd) {
-			events.push_back(step.events[1]);
+			if (!step->events[1].empty)
+				events.push_back(step->events[1]);
 			++state.m_stepIdx;
 			state.m_m.Init();
 			state.m_first = true;
+
+			if (state.m_stepIdx >= (int)m_route.steps->size()) {
+				step = &m_route.steps[state.m_stepIdx-1];
+				state.pos.m_waypoint = step->waypoints[1];
+				state.pos.m_nextWaypoint = -1;
+				if (state.pos.m_waypoint == -1) {
+					state.pos.m_floor = step->floors[1];
+				}
+				break;
+			} else {
+				step = &m_route.steps[state.m_stepIdx];
+				state.pos.m_waypoint = step->waypoints[0];
+				state.pos.m_nextWaypoint = step->waypoints[1];
+				if (state.pos.m_waypoint == -1) {
+					state.pos.m_floor = step->floors[0];
+				}
+			}
 		}
 	}
 
@@ -104,6 +120,65 @@ float FloorMove::Move(
 }
 
 void FloorMove::Merge(const Ref &old, State &state) {
+	if (state.m_stepIdx >= (int)old->m_route.steps->size()) {
+		InitMove(state);
+		return;
+	}
+
+	if (m_route.steps->empty()) {
+		InitMove(state);
+		return;
+	}
+
+	const Step &firstStep = m_route.steps->front();
+	if (firstStep.waypoints[0] == -1) {
+		// arbitrary floor position no merging to do
+		InitMove(state);
+		return;
+	}
+
+	RAD_ASSERT(state.pos.m_nextWaypoint != -1);
+
+	if (firstStep.waypoints[0] != state.pos.m_waypoint) {
+		// disjointed move.
+			InitMove(state);
+		return;
+	}
+
+	if (firstStep.waypoints[1] != state.pos.m_nextWaypoint) {
+		// we are backtracking to our starting waypoint
+		if (state.m_m.distance < 0.01f) {
+			InitMove(state);
+			return; // we haven't traveled so just proceed with new move.
+		}
+
+		// reverse course back to our starting waypoint
+		const Step &curStep = old->m_route.steps[state.m_stepIdx];
+
+		Step newStep(curStep);
+		newStep.Reverse();
+
+		float distance = curStep.path.length - state.m_m.distance;
+		RAD_ASSERT(distance >= 0.f);
+		
+		Vec3 unused;
+		state.m_m.Init();
+		float moved = state.m_m.Eval(newStep.path, distance, unused, &state.facing);
+
+		RAD_ASSERT(math::Abs(moved-distance) < 0.1f);
+
+		state.m_first = false;
+		state.m_stepIdx = 0;
+		
+		Route newRoute;
+		newRoute.steps->push_back(newStep);
+		std::copy(m_route.steps->begin(), m_route.steps->end(), std::back_inserter(*newRoute.steps));
+
+		m_route.steps = newRoute.steps;
+	} else {
+		RAD_ASSERT(firstStep.waypoints[1] == state.pos.m_nextWaypoint);
+		state.m_stepIdx = 0; // just reset our step counter
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -787,14 +862,14 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 			if (connection->cmds[cmdSet*2+1] != -1)
 				step.events[1] = String(m_bsp->String(connection->cmds[cmdSet*2+1]));
 
-			physics::CubicBZSpline spline(
+			step.spline.Init(
 				cur.pos,
 				Vec3(connection->ctrls[dir][0], connection->ctrls[dir][1], connection->ctrls[dir][2]),
 				Vec3(connection->ctrls[!dir][0], connection->ctrls[!dir][1], connection->ctrls[!dir][2]),
 				Vec3(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2])
 			);
 
-			step.path.Load(spline);
+			step.path.Load(step.spline);
 			moveRoute.steps->push_back(step);
 			continue;
 		}

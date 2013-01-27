@@ -82,11 +82,14 @@ public:
 	struct Step {
 		typedef stackify<std::vector<Step>, 8> Vec;
 		Spline path;
+		physics::CubicBZSpline spline;
 		int waypoints[2];
 		int connection;
 		int flags;
 		int floors[2];
 		String events[2];
+
+		void Reverse();
 	};
 
 	struct Route {

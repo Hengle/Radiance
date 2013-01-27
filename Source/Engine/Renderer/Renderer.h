@@ -39,19 +39,25 @@ public:
 		return !Standard(); 
 	}
 
-	bool Is4x3() const { 
-		return !(Is16x9() || Is16x10()); 
+	bool Is3x2() const {
+		return Div(3, 2);
 	}
 
-	bool Is16x9() const { 
-		return Div(16, 9); 
+	bool Is4x3() const { 
+		return Div(4, 3);
 	}
 
 	bool Is16x10() const { 
 		return Div(16, 10); 
 	}
 
+	bool Is16x9() const { 
+		return !(Is3x2() || Is4x3() || Is16x10());
+	}
+
 	bool SameAspect(const r::VidMode &v) const {
+		if (Is3x2())
+			return v.Is3x2();
 		if (Is4x3())
 			return v.Is4x3();
 		if (Is16x9())

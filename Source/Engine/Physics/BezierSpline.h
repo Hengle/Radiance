@@ -26,6 +26,7 @@ public:
 	void Init(const Vec3 &a, const Vec3 &ctrlA, const Vec3 &ctrlB, const Vec3 &b);
 	void Init(const Vec3 *curve); // curve[4] (a, handle, handle, b)
 
+	void Reverse();
 	void Eval(float t, Vec3 &pos, Vec3 *tangent = 0) const;
 
 	CubicBZSpline &operator = (const CubicBZSpline &s);
@@ -38,6 +39,7 @@ private:
 	// d = b pos
 	void MakeCfs(const Vec3 &a, const Vec3 &b, const Vec3 &c, const Vec3 &d);
 
+	boost::array<Vec3, 4> m_ctrls;
 	boost::array<Vec3, 4> m_cfs;
 };
 
@@ -83,7 +85,13 @@ public:
 		//! Optional arguments returns tangent vector, and the T of the new position.
 		float Eval(const CachedCubicBZSpline &spline, float distance, Vec3 &pos, Vec3 *tangent = 0, float *distanceRemaining = 0, float *t = 0);
 
+		RAD_DECLARE_READONLY_PROPERTY(SmoothMotion, distance, float);
+
 	private:
+
+		RAD_DECLARE_GET(distance, float) {
+			return m_d;
+		}
 
 		float m_d;
 		int m_idx;

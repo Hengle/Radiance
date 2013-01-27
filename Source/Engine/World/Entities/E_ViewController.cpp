@@ -554,13 +554,14 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 	// special case (unrestricted camera)
 	if (m_rail.clamp[1] >= 180.f && m_rail.clamp[2] >= 180.f) {
 		Vec3 angles = LookAngles(m_rail.fwd);
+		Vec3 camAngles = AnglesFromQuat(m_rail.rot);
+		angles[0] = camAngles[0]; // always bank
 		world->camera->pos = pos;
 		world->camera->angles = angles;
 		world->camera->fov = fov;
 		world->camera->quatMode = false;
 	// special case (fully restricted camera)
 	} else if (m_rail.clamp[1] == 0.f && m_rail.clamp[2] == 0.f) {
-		Vec3 angles = LookAngles(m_rail.fwd);
 		world->camera->pos = pos;
 		world->camera->rot = m_rail.rot;
 		world->camera->fov = fov;
@@ -569,15 +570,11 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 		// we can drift +/- clamp angles from the cinematic camera orientation.
 		Vec3 qAngles = AnglesFromQuat(m_rail.rot);
 		Vec3 fAngles = LookAngles(m_rail.fwd);
-		
+		Vec3 deltaAngles = DeltaAngles(qAngles, fAngles);
+
 		for (int i = 1; i < 3; ++i) {
 			// shortest path.
-			float d = fAngles[i] - qAngles[i];
-			if (d < -180.f) {
-				d += 360.f;
-			} else if (d > 180.f) {
-				d -= 360.f;
-			}
+			float d = deltaAngles[i];
 
 			if (d > m_rail.clamp[i])
 				fAngles[i] = qAngles[i] + m_rail.clamp[i];

@@ -53,7 +53,9 @@ int WorldLua::lua_System_ScreenSize(lua_State *L) {
 	lua_setfield(L, -2, "height");
 
 	r::VidMode m(vpw, vph, 32, 60, true);
-	if (m.Is4x3()) {
+	if (m.Is3x2()) {
+		lua_pushstring(L, "3x2");
+	} else if (m.Is4x3()) {
 		lua_pushstring(L, "4x3");
 	} else if (m.Is16x9()) {
 		lua_pushstring(L, "16x9");

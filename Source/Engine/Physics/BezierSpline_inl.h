@@ -5,6 +5,8 @@
 	\ingroup physics
 */
 
+#include <algorithm>
+
 namespace physics {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -32,9 +34,20 @@ inline void CubicBZSpline::Init(const Vec3 *curve) { // curve[4]
 	Init(curve[0], curve[1], curve[2], curve[3]);
 }
 
+inline void CubicBZSpline::Reverse() {
+	Vec3 a = m_ctrls[3];
+	Vec3 ctrlA = m_ctrls[2];
+	Vec3 b = m_ctrls[0];
+	Vec3 ctrlB = m_ctrls[1];
+	MakeCfs(a, ctrlA, ctrlB, b);
+}
+
 inline CubicBZSpline &CubicBZSpline::operator = (const CubicBZSpline &s) {
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < 4; ++i) {
+		m_ctrls[i] = s.m_ctrls[i];
 		m_cfs[i] = s.m_cfs[i];
+	}
+	return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

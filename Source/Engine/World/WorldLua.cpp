@@ -522,7 +522,7 @@ void WorldLua::GarbageCollect() {
 	lua_State *L = m_L->L;
 
 	lua_gc(L, LUA_GCRESTART, 0);
-	lua_gc(L, LUA_GCSETSTEPMUL, 50);
+	lua_gc(L, LUA_GCSETSTEPMUL, 10);
 	lua_lock(L);
 
 	xtime::TimeVal start = xtime::ReadMilliseconds();

@@ -114,7 +114,8 @@ public:
 		float lookAtLag,   // how quickly the camera turns to look at the target object.
 		float stayBehind,  // >= 0 if we want to stay behind the player and this tells us how often to check.
 		bool useCinematicFOV, // true = uses embedded fov from cinematic
-		const Vec3 &angleClamp // how much camera can "turn" from its rail-track to look at target
+		const Vec3 &angleClamp // how much camera can "turn" from its rail-track to look at target.
+		                       // NOTE: X angles are ignored, camera always controls roll angle.
 	);
 	
 	//! Generates a rocking or swaying motion in the camera

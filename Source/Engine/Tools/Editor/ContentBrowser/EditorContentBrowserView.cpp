@@ -323,8 +323,9 @@ m_tickRedraw(false)
 	s->addWidget(new (ZEditor) QLabel(QString("Resolution:")), 0, col++);
 	
 	m_resolutions = new (ZEditor) QComboBox(this);
-	m_resolutions->addItem(QString("320x480 (3GS)"), makeRes(320, 480));
-	m_resolutions->addItem(QString("1024x768 (iPad)"), makeRes(1024, 768));
+	m_resolutions->addItem(QString("480x320 (3:2 3GS)"), makeRes(480, 320));
+	m_resolutions->addItem(QString("960x640 (3:2 iPhone 4)"), makeRes(960, 640));
+	m_resolutions->addItem(QString("1024x768 (4:3 iPad)"), makeRes(1024, 768));
 	m_resolutions->addItem(QString("1280x720 (16:9)"), makeRes(1280, 720));
 	m_resolutions->addItem(QString("1366x768 (16:9)"), makeRes(1366, 768));
 	m_resolutions->addItem(QString("1440x900 (16:10)"), makeRes(1440, 900));
