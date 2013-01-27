@@ -185,6 +185,7 @@ public:
 	}
 
 	RAD_DECLARE_READONLY_PROPERTY(WorldDraw, rb, const RB_WorldDraw::Ref&);
+	RAD_DECLARE_PROPERTY(WorldDraw, uiOnly, bool, bool);
 	
 private:
 
@@ -249,7 +250,17 @@ private:
 		static Vec3 s_scale;
 	};
 
-	RAD_DECLARE_GET(rb, const RB_WorldDraw::Ref&) { return m_rb; }
+	RAD_DECLARE_GET(rb, const RB_WorldDraw::Ref&) { 
+		return m_rb; 
+	}
+
+	RAD_DECLARE_GET(uiOnly, bool) {
+		return m_uiOnly;
+	}
+
+	RAD_DECLARE_SET(uiOnly, bool) {
+		m_uiOnly = value;
+	}
 	
 	static void DeleteBatch(details::MBatch *batch);
 
@@ -300,6 +311,7 @@ private:
 	World *m_world;
 	int m_frame;
 	int m_markFrame;
+	bool m_uiOnly;
 	bool m_init;
 
 #if defined(WORLD_DEBUG_DRAW)

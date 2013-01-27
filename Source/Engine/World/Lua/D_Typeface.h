@@ -35,6 +35,7 @@ private:
 
 	static int lua_Size(lua_State *L);
 	static int lua_StringDimensions(lua_State *L);
+	static int lua_WordWrap(lua_State *L);
 
 	pkg::AssetRef m_asset;
 	asset::TypefaceParser::Ref m_typeface;

@@ -97,6 +97,7 @@ WorldDraw::WorldDraw(World *w) :
 m_world(w), 
 m_frame(-1), 
 m_markFrame(-1),
+m_uiOnly(false),
 m_init(false) {
 	m_rb = RB_WorldDraw::New(w);
 }
@@ -278,28 +279,35 @@ void WorldDraw::Draw(Counters *counters) {
 
 	bool postFX = false;
 
-	for (PostProcessEffect::Map::const_iterator it = m_postFX.begin(); it != m_postFX.end(); ++it) {
-		if (it->second->enabled) {
-			postFX = true;
-			break;
+	if (!m_uiOnly) {
+		for (PostProcessEffect::Map::const_iterator it = m_postFX.begin(); it != m_postFX.end(); ++it) {
+			if (it->second->enabled) {
+				postFX = true;
+				break;
+			}
 		}
 	}
 
 	m_rb->BeginFrame();
 
-	if (postFX)
-		m_rb->BindRenderTarget();
+	if (m_uiOnly) {
+		m_rb->ClearBackBuffer();
+	} else {
+		if (postFX)
+			m_rb->BindRenderTarget();
 
-	m_rb->ClearBackBuffer();
-	m_rb->SetPerspectiveMatrix();
-	DrawView();
-	m_rb->SetScreenLocalMatrix();
-	DrawOverlays();
+		m_rb->ClearBackBuffer();
+		m_rb->SetPerspectiveMatrix();
+		DrawView();
+		m_rb->SetScreenLocalMatrix();
+		DrawOverlays();
 
-	if (postFX)
-		PostProcess();
+		if (postFX)
+			PostProcess();
+	}
 
 	DrawUI();
+
 	m_rb->Finish();
 	m_rb->EndFrame();
 

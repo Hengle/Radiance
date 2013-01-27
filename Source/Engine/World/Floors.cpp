@@ -365,12 +365,25 @@ int Floors::PickWaypoint(
 	World &world,
 	float x,
 	float y,
-	float d
+	float d,
+	float dropDist
 ) {
 	d = d*d; // squared distances.
 
-	int best = -1;
-	float bestDist = std::numeric_limits<float>::max();
+	struct Candidate {
+		typedef stackify<std::vector<Candidate>, 16> Vec;
+		int idx;
+		float dd;
+		float dist;
+
+		bool operator < (const Candidate &c) const {
+			return dist < c.dist;
+		}
+	};
+
+	Candidate::Vec waypoints;
+	
+	const Vec3 &fwd = world.camera->fwd;
 
 	for (U32 i = 0; i < m_bsp->numWaypoints; ++i) {
 		if (!(m_waypoints[i].flags&kWaypointState_Enabled))
@@ -387,10 +400,40 @@ int Floors::PickWaypoint(
 		float dd = dx*dx + dy*dy;
 
 		if (dd <= d) {
-			if (dd < bestDist) {
-				bestDist = dd;
-				best = (int)i;
+			Candidate c;
+			c.idx = (int)i;
+			c.dd = dd;
+			c.dist = fwd.Dot(kPos);
+			waypoints->push_back(c);
+		}
+	}
+
+	std::sort(waypoints->begin(), waypoints->end());
+
+	if (waypoints->empty())
+		return -1;
+
+	// drop waypoints that are further than dropDist from our best candidate.
+	if (dropDist > 0.f) {
+		for (int i = 1; i < (int)waypoints->size();) {
+			const Candidate &c = waypoints[0];
+			const Candidate &x = waypoints[i];
+			if (math::Abs(x.dist-c.dist) > dropDist) {
+				waypoints->erase(i+waypoints->begin());
+			} else {
+				++i;
 			}
+		}
+	}
+
+	int best = -1;
+	float bestDist = std::numeric_limits<float>::max();
+
+	for (int i = 0; i < (int)waypoints->size(); ++i) {
+		const Candidate &x = waypoints[i];
+		if (x.dd < bestDist) {
+			best = x.idx;
+			bestDist = x.dd;
 		}
 	}
 

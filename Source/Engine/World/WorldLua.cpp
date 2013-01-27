@@ -152,6 +152,8 @@ bool WorldLua::Init() {
 		{ "PickWaypoint", lua_World_PickWaypoint },
 		{ "DrawCounters", lua_World_DrawCounters },
 		{ "QuitGame", lua_World_QuitGame },
+		{ "SetDrawUIOnly", lua_World_SetDrawUIOnly },
+		{ "DrawUIOnly", lua_World_DrawUIOnly },
 		{ 0, 0 }
 	};
 

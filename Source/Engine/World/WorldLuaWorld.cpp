@@ -944,7 +944,8 @@ int WorldLua::lua_World_PickWaypoint(lua_State *L) {
 		*self->m_world,
 		(float)luaL_checknumber(L, 1),
 		(float)luaL_checknumber(L, 2),
-		(float)luaL_checknumber(L, 3)
+		(float)luaL_checknumber(L, 3),
+		(float)luaL_checknumber(L, 4)
 	);
 	
 	if (idx > -1) {
@@ -1016,6 +1017,18 @@ int WorldLua::lua_World_QuitGame(lua_State *L) {
 	LOAD_SELF
 	self->m_world->game->quit = true;
 	return 0;
+}
+
+int WorldLua::lua_World_SetDrawUIOnly(lua_State *L) {
+	LOAD_SELF
+	self->m_world->draw->uiOnly = lua_toboolean(L, 2) ? true : false;
+	return 0;
+}
+
+int WorldLua::lua_World_DrawUIOnly(lua_State *L) {
+	LOAD_SELF
+	lua_pushboolean(L, self->m_world->draw->uiOnly ? 1 : 0);
+	return 1;
 }
 
 } // world

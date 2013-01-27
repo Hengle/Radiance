@@ -230,7 +230,7 @@ public:
 
 	void Tick(float time, float dt);
 	void Draw(bool children=true);
-	void FadeTo(const Vec4 &dst, float time);
+	void BlendTo(const Vec4 &dst, float time);
 	void ScaleTo(const Vec2 &scale, const Vec2 &time);
 	void MoveTo(const Vec2 &pos, const Vec2 &time);
 	void SetFocus();
@@ -291,7 +291,7 @@ private:
 
 	static int lua_AddChild(lua_State *L);
 	static int lua_RemoveChild(lua_State *L);
-	static int lua_FadeTo(lua_State *L);
+	static int lua_BlendTo(lua_State *L);
 	static int lua_ScaleTo(lua_State *L);
 	static int lua_MoveTo(lua_State *L);
 	static int lua_SetCapture(lua_State *L);

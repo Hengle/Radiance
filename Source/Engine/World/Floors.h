@@ -185,7 +185,8 @@ public:
 		World &world,
 		float x,
 		float y,
-		float d
+		float d,
+		float dropDistance
 	);
 
 private:

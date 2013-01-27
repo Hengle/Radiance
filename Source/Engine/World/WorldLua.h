@@ -230,6 +230,8 @@ private:
 	static int lua_World_PickWaypoint(lua_State *L);
 	static int lua_World_DrawCounters(lua_State *L);
 	static int lua_World_QuitGame(lua_State *L);
+	static int lua_World_SetDrawUIOnly(lua_State *L);
+	static int lua_World_DrawUIOnly(lua_State *L);
 
 	/*
 	==============================================================================

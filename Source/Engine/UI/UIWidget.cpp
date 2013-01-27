@@ -388,8 +388,8 @@ void Widget::PushCallTable(lua_State *L)
 	lua_setfield(L, -2, "AddChild");
 	lua_pushcfunction(L, lua_RemoveChild);
 	lua_setfield(L, -2, "RemoveChild");
-	lua_pushcfunction(L, lua_FadeTo);
-	lua_setfield(L, -2, "FadeTo");
+	lua_pushcfunction(L, lua_BlendTo);
+	lua_setfield(L, -2, "BlendTo");
 	lua_pushcfunction(L, lua_ScaleTo);
 	lua_setfield(L, -2, "ScaleTo");
 	lua_pushcfunction(L, lua_MoveTo);
@@ -644,7 +644,7 @@ void Widget::Tick(float time, float dt)
 	}
 }
 
-void Widget::FadeTo(const Vec4 &dst, float time)
+void Widget::BlendTo(const Vec4 &dst, float time)
 {
 	if (time <= 0.f)
 	{
@@ -852,10 +852,10 @@ int Widget::lua_RemoveChild(lua_State *L)
 	return 0;
 }
 
-int Widget::lua_FadeTo(lua_State *L)
+int Widget::lua_BlendTo(lua_State *L)
 {
 	Ref w = GetRef<Widget>(L, "Widget", 1, true);
-	w->FadeTo(
+	w->BlendTo(
 		lua::Marshal<Vec4>::Get(L, 2, true),
 		(float)luaL_checknumber(L, 3)
 	);
