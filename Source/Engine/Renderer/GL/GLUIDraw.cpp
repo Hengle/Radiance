@@ -53,17 +53,40 @@ void GLDraw::SetViewport(
 
 void GLDraw::DrawRect(
 	const Rect &r, 
+	const Rect *clip,
+	const Vec3 &zRot, // (X, Y) is rotation center, Z is rotation in degrees
 	r::Material &m,
 	const asset::MaterialLoader::Ref &l,
 	bool sampleMaterialColor,
 	const Vec4 &rgba
 ) {
+	int flags = 0;
+
+	if (clip) {
+		flags |= kScissorTest_Enable;
+		gls.Scissor(
+			FloorFastInt(clip->x),
+			FloorFastInt(m_vp[3]-clip->y),
+			FloorFastInt(clip->w),
+			FloorFastInt(clip->h)
+		);
+	}
+
 	gl.MatrixMode(GL_MODELVIEW);
 	gl.PushMatrix();
 	gl.Translatef((float)r.x, (float)r.y, 0.f);
+
+	if (zRot[2] != 0.f) {
+		float cx = zRot[0]-r.x;
+		float cy = zRot[1]-r.y;
+		gl.Translatef(cx, cx, 0.f);
+		gl.Rotatef(zRot[2], 0.f, 0.f, 1.f);
+		gl.Translatef(-cx, -cx, 0.f);
+	}
+
 	gl.Scalef(r.w / (float)BaseRectSize, r.h / (float)BaseRectSize, 1.f);
 
-	m.BindStates();
+	m.BindStates(flags);
 	m.BindTextures(l);
 	m.shader->Begin(r::Shader::kPass_Default, m);
 
@@ -106,6 +129,7 @@ void GLDraw::DrawRect(
 void GLDraw::DrawTextModel(
 	const Rect &r,
 	const Rect *clip,
+	const Vec3 &zRot, // (X, Y) is rotation center, Z is rotation in degrees
 	r::Material &material,
 	r::TextModel &model,
 	bool sampleMaterialColor,

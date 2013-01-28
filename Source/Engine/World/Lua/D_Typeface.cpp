@@ -72,78 +72,32 @@ int D_Typeface::lua_WordWrap(lua_State *L) {
 	D_Typeface::Ref self = lua::SharedPtr::Get<D_Typeface>(L, "D_Typeface", 1, true);
 
 	bool kern = (lua_gettop(L) < 4) || (lua_toboolean(L, 4) ? true : false);
-	float kernScale = (lua_gettop(L) < 5) || (float)luaL_checknumber(L, 5);
+	float kernScale = (lua_gettop(L) < 5) ? 1.f : (float)luaL_checknumber(L, 5);
 
 	self->typeface->font->SetPixelSize(
 		self->typeface->width,
 		self->typeface->height
 	);
 
-	String text(CStr(luaL_checkstring(L, 2)));
-	const float kMaxWidth = luaL_checknumber(L, 3);
+	StringVec strings = self->typeface->font->WordWrapString(
+		luaL_checkstring(L, 2),
+		(float)luaL_checknumber(L, 3),
+		kern,
+		kernScale
+	);
 
-	string::UTF32Buf utf = text.ToUTF32();
+	if (strings.empty())
+		return 0;
 
-	lua_createtable(L, 2, 0);
-	int numStrings = 0;
-
-	const U32 *start = utf.c_str;
-	const U32 *end = start;
-
-	String cur;
-	const String kSpace(CStr(" "));
-
-	for (; *end; ++end) {
-		if (*end == 32) { // space (word break)
-			if (start == end) {
-				continue;
-			}
-
-			String x(start, end-start);
-			String test;
-
-			if (!cur.empty) {
-				test = cur + kSpace + x;
-			} else {
-				test = x;
-			}
-
-			float w, h;
-
-			self->typeface->font->StringDimensions(
-				test.c_str,
-				w,
-				h,
-				kern,
-				kernScale
-			);
-
-			if (w > kMaxWidth) {
-				lua_pushinteger(L, numStrings+1);
-				lua_pushstring(L, cur.c_str);
-				lua_settable(L, -3);
-				cur.Clear();
-				start = end+1;
-				++numStrings;
-			}
-		}
-	}
-
-	if (start != end) {
-		String x(start, end-start);
-		if (cur.empty) {
-			cur = x;
-		} else {
-			cur = cur + kSpace + x;
-		}
-
-		lua_pushinteger(L, numStrings+1);
-		lua_pushstring(L, cur.c_str);
+	int ofs = 1;
+	lua_createtable(L, strings.size(), 0);
+	for (StringVec::const_iterator it = strings.begin(); it != strings.end(); ++it) {
+		lua_pushinteger(L, ofs++);
+		lua_pushstring(L, (*it).c_str);
 		lua_settable(L, -3);
-		++numStrings;
 	}
 
-	return (numStrings > 0) ? 1 : 0;
+	return 1;
 }
 
 } // world

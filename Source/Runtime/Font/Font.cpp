@@ -414,6 +414,70 @@ void Font::StringDimensions(
 	}
 }
 
+StringVec Font::WordWrapString(
+	const char *utf8String,
+	float maxWidth,
+	bool kern,
+	float kernScale
+) {
+	StringVec strings;
+	String text(CStr(utf8String));
+	
+	string::UTF32Buf utf = text.ToUTF32();
+
+	const U32 *start = utf.c_str;
+	const U32 *end = start;
+
+	String cur;
+	const String kSpace(CStr(" "));
+
+	for (; *end; ++end) {
+		if (*end == 32) { // space (word break)
+			if (start == end) {
+				continue;
+			}
+
+			String x(start, end-start);
+			String test;
+
+			if (!cur.empty) {
+				test = cur + kSpace + x;
+			} else {
+				test = x;
+			}
+
+			float w, h;
+
+			StringDimensions(
+				test.c_str,
+				w,
+				h,
+				kern,
+				kernScale
+			);
+
+			if (w > maxWidth) {
+				strings.push_back(cur);
+				cur.Clear();
+				start = end+1;
+			}
+		}
+	}
+
+	if (start != end) {
+		String x(start, end-start);
+		if (cur.empty) {
+			cur = x;
+		} else {
+			cur = cur + kSpace + x;
+		}
+
+		strings.push_back(cur);
+	}
+
+	return strings;
+}
+
 float Font::RAD_IMPLEMENT_GET(ascenderPixels) {
 	RAD_ASSERT(m_face);
 	return floorf(0.5f + ((float)m_face->ascender) * m_face->size->metrics.y_ppem / m_face->units_per_EM);

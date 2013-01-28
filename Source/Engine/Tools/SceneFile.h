@@ -76,8 +76,7 @@ public:
 	};
 
 	typedef typename zone_vector<Material, Z3DXT>::type MatVec;
-	typedef typename zone_vector<String, Z3DXT>::type StringVec;
-
+	
 	/*
 	==============================================================================
 	Bone Weights

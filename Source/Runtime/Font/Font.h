@@ -160,6 +160,13 @@ public:
 		float kernScale
 	);
 
+	StringVec WordWrapString(
+		const char *utf8String,
+		float maxWidth,
+		bool kern,
+		float kernScale
+	);
+
 	UserGlyph *CopyGlyph() const;
 
 	RAD_DECLARE_READONLY_PROPERTY(Font, glyph, Glyph*);

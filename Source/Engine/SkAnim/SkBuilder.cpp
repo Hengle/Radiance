@@ -465,7 +465,6 @@ bool SkaBuilder::Compile(
 }
 
 typedef zone_vector<float, ZToolsT>::type FloatVec;
-typedef zone_vector<String, ZToolsT>::type StringVec;
 
 struct Tables {
 	FloatVec rTable;

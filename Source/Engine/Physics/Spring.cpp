@@ -11,8 +11,7 @@ namespace physics {
 Spring::Spring() :
 length(1.f),
 elasticity(1.f),
-tolerance(0.5f)
-{
+tolerance(0.5f) {
 }
 
 SpringVertex::SpringVertex() :
@@ -24,13 +23,11 @@ friction(0.1f),
 length(0.f),
 inner(false),
 outer(false),
-atRest(true)
-{
+atRest(true) {
 	drag[0] = drag[1] = 0.1f;
 }
 
-bool SpringVertex::Update(float dt, const Vec3 &root, const Spring &spring)
-{
+bool SpringVertex::Update(float dt, const Vec3 &root, const Spring &spring) {
 	force = pos - root;
 	
 	atRest = false;
@@ -40,14 +37,12 @@ bool SpringVertex::Update(float dt, const Vec3 &root, const Spring &spring)
 
 	if ((!inner && mag <= spring.length) ||
 		(!outer && mag >= spring.length) ||
-		(mag >= spring.length-spring.tolerance && mag <= spring.length+spring.tolerance))
-	{
+		(mag >= spring.length-spring.tolerance && mag <= spring.length+spring.tolerance)) {
 		atRest = true;
 		force = Vec3::Zero;
 	}
 
-	if (!atRest)
-	{
+	if (!atRest) {
 		force.Normalize();
 		mag = -spring.elasticity * (mag - spring.length);
 		force = (force*mag) - (friction*vel);
@@ -66,8 +61,7 @@ bool SpringVertex::Update(float dt, const Vec3 &root, const Spring &spring)
 
 namespace lua {
 
-void Marshal<physics::Spring>::Push(lua_State *L, const physics::Spring &s)
-{
+void Marshal<physics::Spring>::Push(lua_State *L, const physics::Spring &s) {
 	lua_createtable(L, 0, 3);
 	lua_pushnumber(L, s.length);
 	lua_setfield(L, -2, "length");
@@ -77,8 +71,7 @@ void Marshal<physics::Spring>::Push(lua_State *L, const physics::Spring &s)
 	lua_setfield(L, -2, "tolerance");
 }
 
-physics::Spring Marshal<physics::Spring>::Get(lua_State *L, int index, bool luaError)
-{
+physics::Spring Marshal<physics::Spring>::Get(lua_State *L, int index, bool luaError) {
 	physics::Spring s;
 
 	lua_getfield(L, index, "length");
@@ -102,8 +95,7 @@ physics::Spring Marshal<physics::Spring>::Get(lua_State *L, int index, bool luaE
 	return s;
 }
 
-void Marshal<physics::SpringVertex>::Push(lua_State *L, const physics::SpringVertex &v)
-{
+void Marshal<physics::SpringVertex>::Push(lua_State *L, const physics::SpringVertex &v) {
 	lua_createtable(L, 0, 8);
 	Marshal<Vec3>::Push(L, v.pos);
 	lua_setfield(L, -2, "pos");
@@ -133,8 +125,7 @@ void Marshal<physics::SpringVertex>::Push(lua_State *L, const physics::SpringVer
 	lua_setfield(L, -2, "atRest");
 }
 
-physics::SpringVertex Marshal<physics::SpringVertex>::Get(lua_State *L, int index, bool luaError)
-{
+physics::SpringVertex Marshal<physics::SpringVertex>::Get(lua_State *L, int index, bool luaError) {
 	physics::SpringVertex v;
 
 	lua_getfield(L, index, "pos");

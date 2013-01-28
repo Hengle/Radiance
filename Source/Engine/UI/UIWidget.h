@@ -1,7 +1,9 @@
-// UIWidget.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file UIWidget.h
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup ui
+*/
 
 #pragma once
 
@@ -26,20 +28,20 @@ RAD_ZONE_DEC(RADENG_API, ZUI);
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS Rect
-{
+class RADENG_CLASS Rect {
 public:
 	Rect() {}
 	Rect(const Rect &r) : x(r.x), y(r.y), w(r.w), h(r.h) {}
 	Rect(float _x, float _y, float _w, float _h) : x(_x), y(_y), w(_w), h(_h) {}
+
+	Rect &Intersect(const Rect &r);
 	
 	float x, y, w, h;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS RBDraw
-{
+class RADENG_CLASS RBDraw {
 public:
 	typedef RBDrawRef Ref;
 	typedef RBDrawWRef WRef;
@@ -53,6 +55,8 @@ public:
 
 	virtual void DrawRect(
 		const Rect &r, 
+		const Rect *clip,
+		const Vec3 &zRot, // (X, Y) is rotation center, Z is rotation in degrees
 		r::Material &m,
 		const asset::MaterialLoader::Ref &l,
 		bool sampleMaterialColor = true,
@@ -62,6 +66,7 @@ public:
 	virtual void DrawTextModel(
 		const Rect &r,
 		const Rect *clip,
+		const Vec3 &zRot, // (X, Y) is rotation center, Z is rotation in degrees
 		r::Material &material,
 		r::TextModel &model,
 		bool sampleMaterialColor = true,
@@ -84,8 +89,7 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS Root : public boost::enable_shared_from_this<Root>
-{
+class RADENG_CLASS Root : public boost::enable_shared_from_this<Root> {
 public:
 	typedef RootRef Ref;
 	typedef RootWRef WRef;
@@ -103,7 +107,7 @@ public:
 	WidgetRef RootWidget(int layer);
 
 	void Tick(float time, float dt, bool tickMaterials);
-	void Draw(bool children=true);
+	void Draw(const Rect *clip, bool children=true);
 	bool HandleInputEvent(const InputEvent &e, const TouchState *touch, const InputState &is);
 	bool HandleInputGesture(const InputGesture &g, const TouchState &touch, const InputState &is);
 
@@ -183,25 +187,27 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS Widget : public lua::SharedPtr
-{
+class RADENG_CLASS Widget : public lua::SharedPtr {
 public:
 	typedef WidgetRef Ref;
 	typedef WidgetWRef WRef;
 	typedef zone_vector<Ref, ZUIT>::type Vec;
 
-	enum HAlign
-	{
-		HA_Left,
-		HA_Right,
-		HA_Center
+	enum HorizontalAlign {
+		kHorizontalAlign_Left,
+		kHorizontalAlign_Right,
+		kHorizontalAlign_Center
 	};
 
-	enum VAlign
-	{
-		VA_Top,
-		VA_Bottom,
-		VA_Center
+	enum VerticalAlign {
+		kVerticalAlign_Top,
+		kVerticalAlign_Bottom,
+		kVerticalAlign_Center
+	};
+
+	enum PositionMode {
+		kPositionMode_Relative,
+		kPositionMode_Absolute
 	};
 
 	Widget();
@@ -224,25 +230,31 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Widget, screenRect, Rect);
 	RAD_DECLARE_READONLY_PROPERTY(Widget, id, int);
 	RAD_DECLARE_READONLY_PROPERTY(Widget, color, const Vec4&);
+	RAD_DECLARE_READONLY_PROPERTY(Widget, zRot, const Vec3&);
+	RAD_DECLARE_READONLY_PROPERTY(Widget, zRotScreen, Vec3);
 	RAD_DECLARE_PROPERTY(Widget, visible, bool, bool);
-	RAD_DECLARE_PROPERTY(Widget, valign, VAlign, VAlign);
-	RAD_DECLARE_PROPERTY(Widget, halign, HAlign, HAlign);
+	RAD_DECLARE_PROPERTY(Widget, valign, VerticalAlign, VerticalAlign);
+	RAD_DECLARE_PROPERTY(Widget, halign, HorizontalAlign, HorizontalAlign);
+	RAD_DECLARE_PROPERTY(Widget, positionMode, PositionMode, PositionMode);
+	RAD_DECLARE_PROPERTY(Widget, zRotationSpeed, float, float);
+	RAD_DECLARE_PROPERTY(Widget, zAngle, float, float);
 
 	void Tick(float time, float dt);
-	void Draw(bool children=true);
+	void Draw(const Rect *clip, bool children=true);
 	void BlendTo(const Vec4 &dst, float time);
 	void ScaleTo(const Vec2 &scale, const Vec2 &time);
 	void MoveTo(const Vec2 &pos, const Vec2 &time);
+	void RotateTo(const Vec3 &zRot, const Vec3 &time, bool shortestAngle);
 	void SetFocus();
 	void SetCapture(bool capture);
 	bool HandleInputEvent(const InputEvent &e, const TouchState *touch, const InputState &is);
 	bool HandleInputGesture(const InputGesture &g, const TouchState &touch, const InputState &is);
 
+	// We pack extra stuff in the widget table including the shared_ptr, which is why we have a
+	// GetRef call.
 	template <typename T>
-	static boost::shared_ptr<T> GetRef(lua_State *L, const char *tname, int index, bool luaError)
-	{
-		if (lua_type(L, index) != LUA_TTABLE)
-		{
+	static boost::shared_ptr<T> GetRef(lua_State *L, const char *tname, int index, bool luaError) {
+		if (lua_type(L, index) != LUA_TTABLE) {
 			if (luaError)
 				luaL_typerror(L, index, tname);
 			lua_pop(L, 1);
@@ -250,8 +262,7 @@ public:
 		}
 
 		lua_getfield(L, index, "@sp");
-		if (lua_type(L, -1) != LUA_TTABLE)
-		{
+		if (lua_type(L, -1) != LUA_TTABLE) {
 			if (luaError)
 				luaL_typerror(L, index, tname);
 			lua_pop(L, 1);
@@ -277,10 +288,10 @@ protected:
 	virtual void CreateFromTable(lua_State *L);
 
 	virtual void OnTick(float time, float dt) {}
-	virtual void OnDraw() {}
+	virtual void OnDraw(const Rect *clip) {}
 	virtual void OnFocusChanged(bool gotFocus) {}
-	virtual void AddedToRoot() {}
-	virtual void RemovedFromRoot() {}
+	virtual void AddedToRoot();
+	virtual void RemovedFromRoot();
 
 	virtual bool OnInputEvent(const InputEvent &e, const InputState &is) { return false; }
 	virtual bool OnInputGesture(const InputGesture &g, const InputState &is) { return false; }
@@ -294,6 +305,7 @@ private:
 	static int lua_BlendTo(lua_State *L);
 	static int lua_ScaleTo(lua_State *L);
 	static int lua_MoveTo(lua_State *L);
+	static int lua_RotateTo(lua_State *L);
 	static int lua_SetCapture(lua_State *L);
 
 	void Push(lua_State *L); // Don't call this! Call PushFrame()
@@ -301,25 +313,96 @@ private:
 
 	UIW_DECL_GETSET(Rect);
 	UIW_DECL_GET(ScreenRect);
+	UIW_DECL_GET(zRot);
+	UIW_DECL_GET(zRotScreen);
 	UIW_DECL_GET(Color);
 	UIW_DECL_GETSET(Visible);
 	UIW_DECL_GETSET(VAlign);
 	UIW_DECL_GETSET(HAlign);
 	UIW_DECL_SET(Tick);
+	UIW_DECL_GETSET(PositionMode);
+	UIW_DECL_GET(zRotationSpeed);
+	UIW_DECL_SET(ZRotationSpeed);
+	UIW_DECL_GET(zAngle);
+	UIW_DECL_SET(ZAngle);
 
-	RAD_DECLARE_GET(parent, Ref) { return m_parent.lock(); }
-	RAD_DECLARE_GET(root, Root::Ref) { return m_root.lock(); }
-	RAD_DECLARE_GET(rbDraw, const RBDraw::Ref&) { return m_root.lock()->m_rbdraw; }
-	RAD_DECLARE_GET(rect, Rect*) { return &const_cast<Widget*>(this)->m_rect; }
+	RAD_DECLARE_GET(parent, Ref) { 
+		return m_parent.lock(); 
+	}
+
+	RAD_DECLARE_GET(root, Root::Ref) { 
+		return m_root.lock(); 
+	}
+
+	RAD_DECLARE_GET(rbDraw, const RBDraw::Ref&) { 
+		return m_root.lock()->m_rbdraw; 
+	}
+
+	RAD_DECLARE_GET(rect, Rect*) { 
+		return &const_cast<Widget*>(this)->m_rect; 
+	}
+
 	RAD_DECLARE_GET(screenRect, Rect);
-	RAD_DECLARE_GET(id, int) { return m_id; }
-	RAD_DECLARE_GET(color, const Vec4&) { return m_color[0]; }
+
+	RAD_DECLARE_GET(id, int) { 
+		return m_id; 
+	}
+
+	RAD_DECLARE_GET(color, const Vec4&) { 
+		return m_color[0]; 
+	}
+
+	RAD_DECLARE_GET(zRot, const Vec3&) {
+		return m_zRotPlusRate;
+	}
+
+	RAD_DECLARE_GET(zRotScreen, Vec3);
+
 	RAD_DECLARE_GET(visible, bool);
-	RAD_DECLARE_SET(visible, bool) { m_visible = value; }
-	RAD_DECLARE_GET(valign, VAlign) { return m_valign; }
-	RAD_DECLARE_SET(valign, VAlign) { m_valign = value; }
-	RAD_DECLARE_GET(halign, HAlign) { return m_halign; }
-	RAD_DECLARE_SET(halign, HAlign) { m_halign = value; }
+
+	RAD_DECLARE_SET(visible, bool) { 
+		m_visible = value; 
+	}
+
+	RAD_DECLARE_GET(valign, VerticalAlign) { 
+		return m_valign; 
+	}
+
+	RAD_DECLARE_SET(valign, VerticalAlign) { 
+		m_valign = value; 
+	}
+
+	RAD_DECLARE_GET(halign, HorizontalAlign) { 
+		return m_halign; 
+	}
+
+	RAD_DECLARE_SET(halign, HorizontalAlign) {
+		m_halign = value; 
+	}
+
+	RAD_DECLARE_GET(positionMode, PositionMode) {
+		return m_positionMode;
+	}
+
+	RAD_DECLARE_SET(positionMode, PositionMode) {
+		m_positionMode = value;
+	}
+
+	RAD_DECLARE_GET(zRotationSpeed, float) {
+		return m_zRate[1];
+	}
+
+	RAD_DECLARE_SET(zRotationSpeed, float) {
+		m_zRate[1] = value;
+	}
+
+	RAD_DECLARE_GET(zAngle, float) {
+		return m_zRate[0];
+	}
+
+	RAD_DECLARE_SET(zAngle, float) {
+		m_zRate[0] = value;
+	}
 
 	Vec m_children;
 	Rect m_rect;
@@ -333,9 +416,16 @@ private:
 	Vec2 m_scaleTime[2];
 	Vec2 m_move[2];
 	Vec2 m_moveTime[2];
+	Vec2 m_zRotPos[2];
+	float m_zRotAngle[3];
+	Vec3 m_zRotTime[2];
+	Vec3 m_zRot;
+	Vec3 m_zRotPlusRate;
+	float m_zRate[2];
 	lua_State *L;
-	VAlign m_valign;
-	HAlign m_halign;
+	VerticalAlign m_valign;
+	HorizontalAlign m_halign;
+	PositionMode m_positionMode;
 	bool m_gc;
 	bool m_tick;
 	bool m_capture;
@@ -349,21 +439,17 @@ private:
 namespace lua {
 
 template <>
-struct Marshal<ui::Rect>
-{
-	static void Push(lua_State *L, const ui::Rect &val)
-	{
+struct Marshal<ui::Rect> {
+	static void Push(lua_State *L, const ui::Rect &val) {
 		Marshal<Vec4>::Push(L, Vec4(val.x, val.y, val.w, val.h));
 	}
 
-	static ui::Rect Get(lua_State *L, int index, bool luaError)
-	{
+	static ui::Rect Get(lua_State *L, int index, bool luaError) {
 		Vec4 v = Marshal<Vec4>::Get(L, index, luaError);
 		return ui::Rect(v[0], v[1], v[2], v[3]);
 	}
 
-	static bool IsA(lua_State *L, int index)
-	{
+	static bool IsA(lua_State *L, int index) {
 		return Marshal<Vec4>::IsA(L, index);
 	}
 };

@@ -112,6 +112,19 @@ RADENG_API float RADENG_CALL ClampedArcLerpSin(float t) {
 	return t;
 }
 
+RADENG_API Vec3 RADENG_CALL AbsAngles(const Vec3 &angles) {
+	Vec3 v(angles);
+	for (int i = 0; i < 3; ++i) {
+		if (v[i] < 0.f) {
+			v[i] += 360.f;
+		} else if (v[i] > 360.f) {
+			v[i] -= 360.f;
+		}
+	}
+
+	return v;
+}
+
 RADENG_API Vec3 RADENG_CALL WrapAngles(const Vec3 &angles) {
 	Vec3 v;
 	for (int i = 0; i < 3; ++i)

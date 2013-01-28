@@ -10,8 +10,7 @@
 
 namespace physics {
 
-struct Spring
-{
+struct Spring {
 	Spring();
 
 	float length;
@@ -22,8 +21,7 @@ struct Spring
 	float tolerance;
 };
 
-struct SpringVertex
-{
+struct SpringVertex {
 	SpringVertex();
 
 	Vec3 pos;
@@ -50,23 +48,19 @@ struct SpringVertex
 namespace lua {
 
 template <>
-struct Marshal<physics::Spring>
-{
+struct Marshal<physics::Spring> {
 	static void Push(lua_State *L, const physics::Spring &val);
 	static physics::Spring Get(lua_State *L, int index, bool luaError);
-	static bool IsA(lua_State *L, int index)
-	{
+	static bool IsA(lua_State *L, int index) {
 		return lua_type(L, index) == LUA_TTABLE;
 	}
 };
 
 template <>
-struct Marshal<physics::SpringVertex>
-{
+struct Marshal<physics::SpringVertex> {
 	static void Push(lua_State *L, const physics::SpringVertex &val);
 	static physics::SpringVertex Get(lua_State *L, int index, bool luaError);
-	static bool IsA(lua_State *L, int index)
-	{
+	static bool IsA(lua_State *L, int index) {
 		return lua_type(L, index) == LUA_TTABLE;
 	}
 };

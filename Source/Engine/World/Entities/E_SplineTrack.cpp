@@ -279,7 +279,7 @@ void E_SplineTrack::Eval(const Vec3 *ctrls, const Vec3 *last, float u, Vec3 &pos
 		rate = fwd;
 }
 
-E_SplineTrack::StringVec E_SplineTrack::SplitEvents(const char *str)
+StringVec E_SplineTrack::SplitEvents(const char *str)
 {
 	String s;
 	StringVec v;

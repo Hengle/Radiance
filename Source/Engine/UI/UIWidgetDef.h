@@ -1,7 +1,9 @@
-// UIWidgetDef.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file UIWidgetDef.h
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup ui
+*/
 
 #include "../Types.h"
 #include "../World/Lua/D_Asset.h"

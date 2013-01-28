@@ -550,7 +550,7 @@ void WorldDraw::DrawOverlays() {
 }
 
 void WorldDraw::DrawUI() {
-	m_world->uiRoot->Draw();
+	m_world->uiRoot->Draw(0);
 }
 
 void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {

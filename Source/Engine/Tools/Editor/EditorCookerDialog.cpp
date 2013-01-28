@@ -219,7 +219,7 @@ void CookerDialog::CookClicked()
 		return;
 	}
 
-	pkg::PackageMan::StringVec roots;
+	StringVec roots;
 	{
 		file::MMFileInputBuffer::Ref ib = App::Get()->engine->sys->files->OpenInputBuffer("@r:/cook.txt", ZTools);
 		if (!ib)
@@ -396,7 +396,7 @@ void CookerDialog::OnPrintMsg(const PrintMsgEvent &msg)
 
 CookThread::CookThread(
 	GLWidget *glw,
-	const pkg::PackageMan::StringVec &roots,
+	const StringVec &roots,
 	int plats,
 	int languages,
 	int compression,

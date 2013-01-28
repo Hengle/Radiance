@@ -1,7 +1,9 @@
-// UITextLabel.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file UITextLabel.cpp
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup ui
+*/
 
 #include RADPCH
 #include "UITextLabel.h"
@@ -12,19 +14,16 @@ using world::D_Typeface;
 
 namespace ui {
 
-TextLabel::TextLabel() : m_autoSize(false), m_clip(false), m_syncClipRect(true)
-{
+TextLabel::TextLabel() : m_clip(false) {
 }
 
-TextLabel::TextLabel(const Rect &r) : Widget(r), m_autoSize(false), m_clip(false), m_syncClipRect(true)
-{
+TextLabel::TextLabel(const Rect &r) : MatWidget(r), m_clip(false) {
 }
 
 void TextLabel::SetText(
 	const r::TextModel::String *strings,
 	int numStrings
-)
-{
+) {
 	SetText(0, strings, numStrings);
 }
 
@@ -37,8 +36,7 @@ void TextLabel::SetText(
 	float kernScale,
 	float scaleX, 
 	float scaleY
-)
-{
+) {
 	SetText(
 		0,
 		utf8String,
@@ -52,8 +50,7 @@ void TextLabel::SetText(
 	);
 }
 
-void TextLabel::Clear()
-{
+void TextLabel::Clear() {
 	if (m_textModel)
 		m_textModel->Clear();
 }
@@ -66,10 +63,8 @@ void TextLabel::SetText(
 {
 	RAD_ASSERT(m_textModel);
 
-	if (m_textModel)
-	{
+	if (m_textModel) {
 		m_textModel->SetText(strings, numStrings);
-		RecalcSize();
 	}
 }
 
@@ -83,12 +78,10 @@ void TextLabel::SetText(
 	float kernScale,
 	float scaleX, 
 	float scaleY
-)
-{
+) {
 	RAD_ASSERT(m_textModel);
 
-	if (m_textModel)
-	{
+	if (m_textModel) {
 		m_textModel->SetText(
 			utf8String,
 			x,
@@ -99,18 +92,15 @@ void TextLabel::SetText(
 			scaleX,
 			scaleY
 		);
-		RecalcSize();
 	}
 }
 
 bool TextLabel::BindTypeface(
 	const pkg::AssetRef &typeface
-)
-{
+) {
 	if (typeface && m_typeface && typeface.get() == m_typeface.get())
 		return true;
-	if (!typeface)
-	{
+	if (!typeface) {
 		m_typeface.reset();
 		m_textModel.reset();
 		m_parser.reset();
@@ -135,12 +125,10 @@ bool TextLabel::BindTypeface(
 		m_parser->height
 	);
 
-	RecalcSize();
 	return true;
 }
 
-void TextLabel::Dimensions(float &w, float &h)
-{
+void TextLabel::Dimensions(float &w, float &h) {
 	RAD_ASSERT(m_textModel);
 	float x = 0.f;
 	float y = 0.f;
@@ -153,33 +141,19 @@ void TextLabel::Dimensions(float &w, float &h)
 	h += y;
 }
 
-void TextLabel::CreateFromTable(lua_State *L)
-{
-	Widget::CreateFromTable(L);
+void TextLabel::CreateFromTable(lua_State *L) {
+	MatWidget::CreateFromTable(L);
 	
-	lua_getfield(L, -1, "autoSize");
-	if (!lua_isnil(L, -1))
-		m_autoSize = lua_toboolean(L, -1) ? true : false;
-	lua_pop(L, 1);
-
 	lua_getfield(L, -1, "clipRect");
-	if (lua_istable(L, -1))
-	{
+	if (lua_istable(L, -1)) {
 		m_clip = true;
-		m_syncClipRect = false;
 		m_clipRect = lua::Marshal<Rect>::Get(L, -1, true);
-	}
-	else if (lua_isboolean(L, -1))
-	{
-		m_syncClipRect = true;
+	} else if (lua_isboolean(L, -1)) {
 		m_clip = lua_toboolean(L, -1) ? true : false;
-		if (!m_autoSize && m_clip)
+		if (m_clip)
 			m_clipRect = *this->rect.get();
-	}
-	else
-	{
+	} else {
 		m_clip = false;
-		m_syncClipRect = true; // don't leave this uninitialized
 	}
 	lua_pop(L, 1);
 
@@ -190,22 +164,7 @@ void TextLabel::CreateFromTable(lua_State *L)
 	lua_pop(L, 1);
 }
 
-void TextLabel::RecalcSize()
-{
-	if (!m_autoSize || !m_textModel)
-		return;
-
-	Dimensions(
-		this->rect->w,
-		this->rect->h
-	);
-
-	if (m_syncClipRect)
-		m_clipRect = *this->rect.get();
-}
-
-int TextLabel::lua_SetText(lua_State *L)
-{
+int TextLabel::lua_SetText(lua_State *L) {
 	Ref w = GetRef<TextLabel>(L, "TextLabel", 1, true);
 
 	int numArgs = lua_gettop(L) - 1; // don't count self
@@ -248,8 +207,7 @@ int TextLabel::lua_SetText(lua_State *L)
 	return 0;
 }
 
-int TextLabel::lua_Dimensions(lua_State *L)
-{
+int TextLabel::lua_Dimensions(lua_State *L) {
 	Ref r = GetRef<TextLabel>(L, "TextLabel", 1, true);
 
 	float w, h;
@@ -259,20 +217,25 @@ int TextLabel::lua_Dimensions(lua_State *L)
 	return 2;
 }
 
-void TextLabel::OnDraw()
-{
+void TextLabel::OnDraw(const Rect *outerClip) {
+	MatWidget::OnDraw(outerClip);
+
 	if (!m_textModel || !m_parser)
 		return;
 
 	Rect screen = this->screenRect;
 	Rect clip;
 
-	if (m_clip)
+	if (m_clip) {
 		clip = Map(m_clipRect);
+		if (outerClip)
+			clip.Intersect(*outerClip);
+	}
 
 	rbDraw->DrawTextModel(
 		screen,
-		m_clip ? &clip : 0,
+		m_clip ? &clip : outerClip ? outerClip : 0,
+		this->zRotScreen,
 		*m_parser->material.get(),
 		*m_textModel,
 		true,
@@ -280,63 +243,41 @@ void TextLabel::OnDraw()
 	);
 }
 
-void TextLabel::AddedToRoot()
-{
+void TextLabel::AddedToRoot() {
+	MatWidget::AddedToRoot();
 	Root::Ref r = this->root;
 	if (r && m_parser)
 		r->AddTickMaterial(m_parser->materialAsset);
 }
 
-void TextLabel::PushCallTable(lua_State *L)
-{
-	Widget::PushCallTable(L);
+void TextLabel::PushCallTable(lua_State *L) {
+	MatWidget::PushCallTable(L);
 	lua_pushcfunction(L, lua_SetText);
 	lua_setfield(L, -2, "SetText");
 	lua_pushcfunction(L, lua_Dimensions);
 	lua_setfield(L, -2, "Dimensions");
-	LUART_REGISTER_GETSET(L, AutoSize);
 	LUART_REGISTER_GETSET(L, ClipRect);
 	LUART_REGISTER_SET(L, Typeface);
 }
 
-UIW_GET(TextLabel, AutoSize, bool, m_autoSize);
-int TextLabel::LUART_SETFN(AutoSize)(lua_State *L)
-{
-	Ref w = GetRef<TextLabel>(L, "TextLabel", 1, true);
-	w->m_autoSize = lua_toboolean(L, 2) ? true : false;
-	w->RecalcSize();
-	return 0;
-}
-
 UIW_GET(TextLabel, ClipRect, Rect, m_clipRect);
-int TextLabel::LUART_SETFN(ClipRect)(lua_State *L)
-{
+int TextLabel::LUART_SETFN(ClipRect)(lua_State *L) {
 	Ref w = GetRef<TextLabel>(L, "TextLabel", 1, true);
-	if (lua_istable(L, 2))
-	{
+	if (lua_istable(L, 2)) {
 		w->m_clip = true;
-		w->m_syncClipRect = false;
 		w->m_clipRect = lua::Marshal<Rect>::Get(L, 2, true);
-	}
-	else if (lua_isboolean(L, 2))
-	{
-		w->m_syncClipRect = true;
+	} else if (lua_isboolean(L, 2)) {
 		w->m_clip = lua_toboolean(L, 2) ? true : false;
-		if (!w->m_autoSize && w->m_clip)
+		if (w->m_clip)
 			w->m_clipRect = *w->rect.get();
-	}
-	else
-	{
+	} else {
 		w->m_clip = false;
-		w->m_syncClipRect = true; // don't leave this uninitialized
 	}
-	w->RecalcSize();
 
 	return 0;
 }
 
-int TextLabel::LUART_SETFN(Typeface)(lua_State *L)
-{
+int TextLabel::LUART_SETFN(Typeface)(lua_State *L) {
 	Ref w = GetRef<TextLabel>(L, "TextLabel", 1, true);
 	D_Typeface::Ref f = lua::SharedPtr::Get<D_Typeface>(L, "D_Typeface", 2, false);
 	if (f)

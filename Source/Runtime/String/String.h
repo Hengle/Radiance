@@ -559,3 +559,4 @@ std::basic_ostream<CharType, Traits>& operator << (std::basic_ostream<CharType, 
 #include "String_inl.h"
 
 typedef ::string::String String;
+typedef ::string::StringVec StringVec;

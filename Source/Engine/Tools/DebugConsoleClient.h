@@ -76,7 +76,6 @@ private:
 class DebugConsoleClient : public boost::noncopyable {
 public:
 	typedef boost::shared_ptr<DebugConsoleClient> Ref;
-	typedef zone_vector<String, ZToolsT>::type StringVec;
 
 	~DebugConsoleClient();
 

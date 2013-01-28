@@ -1,18 +1,19 @@
-// UITextLabel.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file UITextLabel.h
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup ui
+*/
 
 #pragma once
 
-#include "UIWidget.h"
+#include "UIMatWidget.h"
 #include "../Renderer/TextModel.h"
 #include "../Assets/TypefaceParser.h"
 
 namespace ui {
 
-class RADENG_CLASS TextLabel : public Widget
-{
+class RADENG_CLASS TextLabel : public MatWidget {
 public:
 	typedef boost::shared_ptr<TextLabel> Ref;
 	typedef boost::shared_ptr<TextLabel> WRef;
@@ -41,23 +42,14 @@ public:
 	bool BindTypeface(const pkg::AssetRef &typeface);
 	void Dimensions(float &w, float &h);
 
-	RAD_DECLARE_PROPERTY(TextLabel, autoSize, bool, bool);
-
 protected:
 
-	virtual void OnDraw();
+	virtual void OnDraw(const Rect *clip);
 	virtual void AddedToRoot();
 	virtual void PushCallTable(lua_State *L);
 	virtual void CreateFromTable(lua_State *L);
 	
 private:
-
-	RAD_DECLARE_GET(autoSize, bool) { return m_autoSize; }
-	RAD_DECLARE_SET(autoSize, bool) 
-	{ 
-		m_autoSize = value;
-		RecalcSize();
-	}
 
 	void SetText(
 		lua_State *L,
@@ -77,9 +69,6 @@ private:
 		float scaleY = 1.0f
 	);
 
-	void RecalcSize();
-
-	UIW_DECL_GETSET(AutoSize);
 	UIW_DECL_GETSET(ClipRect);
 	UIW_DECL_SET(Typeface);
 
@@ -92,8 +81,7 @@ private:
 	Vec4 m_color;
 	Rect m_clipRect;
 	bool m_clip;
-	bool m_syncClipRect;
-	bool m_autoSize;
+	bool m_multiline;
 };
 
 } // ui

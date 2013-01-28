@@ -77,7 +77,6 @@ class RADENG_CLASS FloorMove : public lua::SharedPtr {
 public:
 	typedef boost::shared_ptr<FloorMove> Ref;
 	typedef physics::CachedCubicBZSpline<8> Spline;
-	typedef zone_vector<String, ZWorldT>::type StringVec;
 
 	struct Step {
 		typedef stackify<std::vector<Step>, 8> Vec;

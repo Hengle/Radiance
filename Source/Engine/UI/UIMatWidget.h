@@ -1,7 +1,9 @@
-// UIMatWidget.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file UIMatWidget.h
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup ui
+*/
 
 #pragma once
 
@@ -10,20 +12,20 @@
 
 namespace ui {
 
-class RADENG_CLASS MatWidget : public Widget
-{
+class RADENG_CLASS MatWidget : public Widget {
 public:
 	typedef boost::shared_ptr<MatWidget> Ref;
 	typedef boost::weak_ptr<MatWidget> WRef;
 
 	MatWidget();
 	MatWidget(const Rect &r);
+	virtual ~MatWidget() {}
 
 	bool BindMaterial(const pkg::AssetRef &m);
 
 protected:
 
-	virtual void OnDraw();
+	virtual void OnDraw(const Rect *clip);
 	virtual void AddedToRoot();
 	virtual void PushCallTable(lua_State *L);
 	virtual void CreateFromTable(lua_State *L);

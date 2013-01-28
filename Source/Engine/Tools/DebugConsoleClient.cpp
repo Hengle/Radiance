@@ -160,7 +160,7 @@ bool DebugConsoleClient::Exec(const char *cmd) {
 	return z >= 0;
 }
 
-DebugConsoleClient::StringVec DebugConsoleClient::GetCVarList() {
+StringVec DebugConsoleClient::GetCVarList() {
 	StringVec v;
 
 	if (!m_sd)

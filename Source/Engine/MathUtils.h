@@ -34,6 +34,7 @@ RADENG_API Vec3 RADENG_CALL DeltaAngles(
 	int *flags=0
 );
 
+RADENG_API Vec3 RADENG_CALL AbsAngles(const Vec3 &angles);
 RADENG_API Vec3 RADENG_CALL WrapAngles(const Vec3 &angles);
 RADENG_API void RADENG_CALL FrameVecs(const Vec3 &fwd, Vec3 &up, Vec3 &left);
 

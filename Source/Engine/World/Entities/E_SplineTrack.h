@@ -15,7 +15,6 @@ class RADENG_CLASS E_SplineTrack : public Entity
 public:
 
 	typedef boost::shared_ptr<E_SplineTrack> Ref;
-	typedef zone_vector<String, ZWorldT>::type StringVec;
 
 	E_SplineTrack();
 	virtual ~E_SplineTrack();

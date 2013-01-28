@@ -91,7 +91,6 @@ namespace {
 typedef SceneFile::NormalTriVert TriVert;
 typedef zone_vector<TriVert, ZToolsT>::type TriVertVec;
 typedef zone_map<TriVert, int, ZToolsT>::type TriVertMap;
-typedef zone_vector<String, ZToolsT>::type StringVec;
 typedef zone_map<String, int, ZToolsT>::type StringMap;
 
 struct TriModel {

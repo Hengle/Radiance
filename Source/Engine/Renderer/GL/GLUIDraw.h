@@ -23,6 +23,8 @@ public:
 
 	virtual void DrawRect(
 		const Rect &r, 
+		const Rect *clip,
+		const Vec3 &zRot, // (X, Y) is rotation center, Z is rotation in degrees
 		r::Material &m,
 		const asset::MaterialLoader::Ref &l,
 		bool sampleMaterialColor,
@@ -32,6 +34,7 @@ public:
 	virtual void DrawTextModel(
 		const Rect &r,
 		const Rect *clip,
+		const Vec3 &zRot, // (X, Y) is rotation center, Z is rotation in degrees
 		r::Material &material,
 		r::TextModel &model,
 		bool sampleMaterialColor,

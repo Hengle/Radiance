@@ -817,7 +817,6 @@ class RADENG_CLASS PackageMan :
 public:
 	typedef boost::shared_ptr<PackageMan> Ref;
 	typedef boost::weak_ptr<PackageMan> WRef;
-	typedef zone_vector<String, ZPackagesT>::type StringVec;
 
 	static Ref New(Engine &engine, const char *pkgDir);
 

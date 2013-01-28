@@ -34,7 +34,7 @@ CookStatus SkAnimSetCooker::CheckRebuildFiles(int flags, int allflags) {
 	if (!s)
 		return CS_NeedRebuild;
 
-	SkAnimSetParser::StringVec sources;
+	StringVec sources;
 	int r = SkAnimSetParser::LoadToolsFile(
 		s->c_str,
 		*engine.get(),
@@ -47,7 +47,7 @@ CookStatus SkAnimSetCooker::CheckRebuildFiles(int flags, int allflags) {
 
 	CookStatus x = CS_UpToDate;
 
-	for (SkAnimSetParser::StringVec::const_iterator it = sources.begin(); it != sources.end(); ++it) {
+	for (StringVec::const_iterator it = sources.begin(); it != sources.end(); ++it) {
 		if (CompareCachedFileTime(flags, (*it).c_str, (*it).c_str)) {
 			x = CS_NeedRebuild; // cache all file times.
 		}

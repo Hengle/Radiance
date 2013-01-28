@@ -8,6 +8,7 @@
 #pragma once
 
 #include "IntStringBase.h"
+#include "../Container/ZoneVector.h"
 
 namespace string {
 namespace details {
@@ -65,6 +66,7 @@ typedef CharBuf<CharTraits> UTF8Buf;
 typedef CharBuf<UTF16Traits> UTF16Buf;
 typedef CharBuf<UTF32Traits> UTF32Buf;
 typedef CharBuf<WCharTraits> WCharBuf;
+typedef zone_vector<String, ZStringT>::type StringVec;
 
 static const CharTraits UTF8Tag;
 static const UTF16Traits UTF16Tag;

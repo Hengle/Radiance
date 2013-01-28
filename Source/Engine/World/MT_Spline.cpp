@@ -38,7 +38,7 @@ void Entity::Tick_MT_Spline(
 	m_ps.splineDistance += m_ps.velocity.Magnitude() * dt;
 
 	Vec3 fwd, pos, rate;
-	E_SplineTrack::StringVec events;
+	StringVec events;
 
 	bool end = spline->Eval(
 		m_psv.splineIdx,
@@ -51,7 +51,7 @@ void Entity::Tick_MT_Spline(
 
 	if (m_ps.flags&kPhysicsFlag_SplineEvents)
 	{
-		for (E_SplineTrack::StringVec::const_iterator it = events.begin(); it != events.end(); ++it)
+		for (StringVec::const_iterator it = events.begin(); it != events.end(); ++it)
 		{
 			world->DispatchEvent((*it).c_str);
 		}
@@ -162,7 +162,7 @@ void Entity::Tick_MT_Spline(
 
 	if (m_ps.flags&kPhysicsFlag_SplineEvents)
 	{
-		for (E_SplineTrack::StringVec::const_iterator it = events.begin(); it != events.end(); ++it)
+		for (StringVec::const_iterator it = events.begin(); it != events.end(); ++it)
 		{
 			world->DispatchEvent((*it).c_str);
 		}

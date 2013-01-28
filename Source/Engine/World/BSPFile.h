@@ -597,7 +597,6 @@ protected:
 	virtual RAD_DECLARE_GET(numActors, U32);
 	virtual RAD_DECLARE_GET(numActorIndices, U32);
 
-	typedef zone_vector< ::String , ZBSPBuilderT>::type StringVec;
 	typedef zone_vector<BSPEntity, ZBSPBuilderT>::type BSPEntityVec;
 	typedef zone_vector<BSPMaterial, ZBSPBuilderT>::type BSPMaterialVec;
 	typedef zone_vector<BSPNode, ZBSPBuilderT>::type BSPNodeVec;
