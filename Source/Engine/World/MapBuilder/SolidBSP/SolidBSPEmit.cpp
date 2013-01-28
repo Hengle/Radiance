@@ -1002,7 +1002,7 @@ bool BSPBuilder::EmitBSPFloors() {
 			e->dist[0] = edge.dist[0];
 			e->dist[1] = edge.dist[1];
 
-			SceneFile::Vec3 vedge(v1 - v0);
+			SceneFile::Vec3 vedge(v0 - v1);
 			vedge.Normalize();
 
 			if (math::Abs(vedge.Dot(kZAxis)) > 0.99) {
