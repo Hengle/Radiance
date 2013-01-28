@@ -16,6 +16,7 @@
 #include "../UI/UIWidget.h"
 #include "../UI/UIMatWidget.h"
 #include "../UI/UITextLabel.h"
+#include "../UI/UIVListWidget.h"
 #include "../Assets/MaterialParser.h"	
 #include "../Renderer/Material.h"
 #include "Lua/T_Precache.h"
@@ -325,6 +326,8 @@ int WorldLua::lua_World_CreateWidget(lua_State *L) {
 		w.reset(new (ui::ZUI) ui::MatWidget());
 	} else if(type == "TextLabel") {
 		w.reset(new (ui::ZUI) ui::TextLabel());
+	} else if (type == "VListWidget") {
+		w.reset(new (ui::ZUI) ui::VListWidget());
 	} else {
 		luaL_argerror(L, 1, "Invalid widget type!");
 	}

@@ -56,9 +56,14 @@ int D_Material::lua_Dimensions(lua_State *L) {
 	}
 	
 	if (mx > 0 && my > 0) {
+		lua_createtable(L, 2, 0);
+		lua_pushinteger(L, 1);
 		lua_pushinteger(L, mx);
+		lua_settable(L, -3);
+		lua_pushinteger(L, 2); 
 		lua_pushinteger(L, my);
-		return 2;
+		lua_settable(L, -3);
+		return 1;
 	}
 
 	return 0;

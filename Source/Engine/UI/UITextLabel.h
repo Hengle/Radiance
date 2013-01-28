@@ -10,6 +10,7 @@
 #include "UIMatWidget.h"
 #include "../Renderer/TextModel.h"
 #include "../Assets/TypefaceParser.h"
+#include <Runtime/PushPack.h>
 
 namespace ui {
 
@@ -40,7 +41,9 @@ public:
 	void Clear();
 
 	bool BindTypeface(const pkg::AssetRef &typeface);
-	void Dimensions(float &w, float &h);
+	
+
+	RAD_DECLARE_READONLY_PROPERTY(TextLabel, dimensions, Vec2);
 
 protected:
 
@@ -50,6 +53,8 @@ protected:
 	virtual void CreateFromTable(lua_State *L);
 	
 private:
+
+	RAD_DECLARE_GET(dimensions, Vec2);
 
 	void SetText(
 		lua_State *L,
@@ -69,19 +74,18 @@ private:
 		float scaleY = 1.0f
 	);
 
-	UIW_DECL_GETSET(ClipRect);
 	UIW_DECL_SET(Typeface);
+	UIW_DECL_GET(Dimensions);
 
 	static int lua_SetText(lua_State *L);
-	static int lua_Dimensions(lua_State *L);
 
 	pkg::Asset::Ref m_typeface;
 	asset::TypefaceParser::Ref m_parser;
 	r::TextModel::Ref m_textModel;
 	Vec4 m_color;
-	Rect m_clipRect;
-	bool m_clip;
 	bool m_multiline;
 };
 
 } // ui
+
+#include <Runtime/PopPack.h>

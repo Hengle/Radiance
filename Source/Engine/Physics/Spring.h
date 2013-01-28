@@ -7,6 +7,7 @@
 
 #include "../Types.h"
 #include "../Lua/LuaRuntime.h"
+#include <Runtime/PushPack.h>
 
 namespace physics {
 
@@ -66,3 +67,5 @@ struct Marshal<physics::SpringVertex> {
 };
 
 } // lua
+
+#include <Runtime/PopPack.h>

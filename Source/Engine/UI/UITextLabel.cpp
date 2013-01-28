@@ -14,10 +14,10 @@ using world::D_Typeface;
 
 namespace ui {
 
-TextLabel::TextLabel() : m_clip(false) {
+TextLabel::TextLabel() {
 }
 
-TextLabel::TextLabel(const Rect &r) : MatWidget(r), m_clip(false) {
+TextLabel::TextLabel(const Rect &r) : MatWidget(r) {
 }
 
 void TextLabel::SetText(
@@ -128,35 +128,22 @@ bool TextLabel::BindTypeface(
 	return true;
 }
 
-void TextLabel::Dimensions(float &w, float &h) {
+Vec2 TextLabel::RAD_IMPLEMENT_GET(dimensions) {
 	RAD_ASSERT(m_textModel);
-	float x = 0.f;
-	float y = 0.f;
+	float x;
+	float y;
+	float w = 0.f;
+	float h = 0.f;
 
-	w = h = 0.f;
 	if (m_textModel)
 		m_textModel->Dimensions(x, y, w, h);
 
-	w += x;
-	h += y;
+	return Vec2(w, h);
 }
 
 void TextLabel::CreateFromTable(lua_State *L) {
 	MatWidget::CreateFromTable(L);
 	
-	lua_getfield(L, -1, "clipRect");
-	if (lua_istable(L, -1)) {
-		m_clip = true;
-		m_clipRect = lua::Marshal<Rect>::Get(L, -1, true);
-	} else if (lua_isboolean(L, -1)) {
-		m_clip = lua_toboolean(L, -1) ? true : false;
-		if (m_clip)
-			m_clipRect = *this->rect.get();
-	} else {
-		m_clip = false;
-	}
-	lua_pop(L, 1);
-
 	lua_getfield(L, -1, "typeface");
 	D_Typeface::Ref f = lua::SharedPtr::Get<D_Typeface>(L, "D_Typeface", -1, false);
 	if (f)
@@ -207,34 +194,17 @@ int TextLabel::lua_SetText(lua_State *L) {
 	return 0;
 }
 
-int TextLabel::lua_Dimensions(lua_State *L) {
-	Ref r = GetRef<TextLabel>(L, "TextLabel", 1, true);
-
-	float w, h;
-	r->Dimensions(w, h);
-	lua_pushnumber(L, w);
-	lua_pushnumber(L, h);
-	return 2;
-}
-
-void TextLabel::OnDraw(const Rect *outerClip) {
-	MatWidget::OnDraw(outerClip);
+void TextLabel::OnDraw(const Rect *clip) {
+	MatWidget::OnDraw(clip);
 
 	if (!m_textModel || !m_parser)
 		return;
 
 	Rect screen = this->screenRect;
-	Rect clip;
-
-	if (m_clip) {
-		clip = Map(m_clipRect);
-		if (outerClip)
-			clip.Intersect(*outerClip);
-	}
-
+	
 	rbDraw->DrawTextModel(
 		screen,
-		m_clip ? &clip : outerClip ? outerClip : 0,
+		clip,
 		this->zRotScreen,
 		*m_parser->material.get(),
 		*m_textModel,
@@ -254,27 +224,8 @@ void TextLabel::PushCallTable(lua_State *L) {
 	MatWidget::PushCallTable(L);
 	lua_pushcfunction(L, lua_SetText);
 	lua_setfield(L, -2, "SetText");
-	lua_pushcfunction(L, lua_Dimensions);
-	lua_setfield(L, -2, "Dimensions");
-	LUART_REGISTER_GETSET(L, ClipRect);
+	LUART_REGISTER_GET(L, Dimensions);
 	LUART_REGISTER_SET(L, Typeface);
-}
-
-UIW_GET(TextLabel, ClipRect, Rect, m_clipRect);
-int TextLabel::LUART_SETFN(ClipRect)(lua_State *L) {
-	Ref w = GetRef<TextLabel>(L, "TextLabel", 1, true);
-	if (lua_istable(L, 2)) {
-		w->m_clip = true;
-		w->m_clipRect = lua::Marshal<Rect>::Get(L, 2, true);
-	} else if (lua_isboolean(L, 2)) {
-		w->m_clip = lua_toboolean(L, 2) ? true : false;
-		if (w->m_clip)
-			w->m_clipRect = *w->rect.get();
-	} else {
-		w->m_clip = false;
-	}
-
-	return 0;
 }
 
 int TextLabel::LUART_SETFN(Typeface)(lua_State *L) {
@@ -284,5 +235,7 @@ int TextLabel::LUART_SETFN(Typeface)(lua_State *L) {
 		w->BindTypeface(f->asset);
 	return 0;
 }
+
+UIW_GET(TextLabel, Dimensions, Vec2, dimensions);
 
 } // ui

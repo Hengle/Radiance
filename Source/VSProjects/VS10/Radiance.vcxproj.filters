@@ -1437,6 +1437,9 @@
     <ClInclude Include="..\..\Engine\World\Entities\E_TouchTrigger.h">
       <Filter>Source\Engine\World\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\UI\UIVListWidget.h">
+      <Filter>Source\Engine\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2188,6 +2191,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\World\MT_Floor.cpp">
       <Filter>Source\Engine\World</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\UI\UIVListWidget.cpp">
+      <Filter>Source\Engine\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

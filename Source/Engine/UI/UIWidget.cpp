@@ -272,7 +272,8 @@ m_halign(kHorizontalAlign_Center),
 m_positionMode(kPositionMode_Relative),
 m_gc(false),
 m_tick(false),
-m_capture(false) {
+m_capture(false),
+m_clip(false) {
 	m_fadeTime[0] = 0.f;
 	m_fadeTime[1] = 0.f;
 
@@ -293,12 +294,35 @@ m_capture(false) {
 	m_zRate[0] = m_zRate[1] = 0.f;
 }
 
-Widget::Widget(const Rect &r) : L(0), m_rect(r), m_id(-1), m_gc(false) {
+Widget::Widget(const Rect &r) : 
+L(0), 
+m_id(-1), 
+m_visible(true), 
+m_valign(kVerticalAlign_Center),
+m_halign(kHorizontalAlign_Center),
+m_positionMode(kPositionMode_Relative),
+m_gc(false),
+m_tick(false),
+m_capture(false),
+m_clip(false) {
 	m_fadeTime[0] = 0.f;
 	m_fadeTime[1] = 0.f;
 
 	for (int i = 0; i < 3; ++i)
 		m_color[i] = Vec4(1, 1, 1, 1);
+
+	m_scaleTime[0] = Vec2::Zero;
+	m_scaleTime[1] = Vec2::Zero;
+	m_scale[0] = m_scale[1] = m_scale[2] = Vec2(1, 1);
+
+	m_moveTime[0] = Vec2::Zero;
+	m_moveTime[1] = Vec2::Zero;
+	m_move[0] = m_move[1] = Vec2::Zero;
+
+	m_zRot = Vec3::Zero;
+	m_zRotPlusRate = Vec3::Zero;
+	m_zRotTime[0] = m_zRotTime[1] = Vec3::Zero;
+	m_zRate[0] = m_zRate[1] = 0.f;
 }
 
 Widget::~Widget() {
@@ -325,10 +349,10 @@ bool Widget::Spawn(lua_State *_L, lua_State *Lco, bool luaError) {
 		lua_setfield(Lco, -2, "@sp");
 
 		// pull tick function forward
-		lua_getfield(Lco, -4, "tick");
+		lua_getfield(Lco, -4, "Tick");
 		if (lua_isfunction(Lco, -1)) {
 			m_tick = true;
-			lua_setfield(Lco, -2, "tick");
+			lua_setfield(Lco, -2, "Tick");
 		} else {
 			lua_pop(Lco, 1);
 		}
@@ -382,12 +406,21 @@ void Widget::PushCallTable(lua_State *L) {
 	LUART_REGISTER_SET(L, ZRotationSpeed);
 	LUART_REGISTER_GET(L, zAngle);
 	LUART_REGISTER_SET(L, ZAngle);
+	LUART_REGISTER_GETSET(L, ClipRect);
 }
 
 void Widget::CreateFromTable(lua_State *L) {
 	lua_getfield(L, -1, "rect");
 	if (!lua_isnil(L, -1))
 		m_rect = lua::Marshal<Rect>::Get(L, -1, false);
+	lua_pop(L, 1);
+	lua_getfield(L, -1, "clipRect");
+	if (!lua_isnil(L, -1)) {
+		m_clip = true;
+		m_clipRect = lua::Marshal<Rect>::Get(L, -1, false);
+	} else {
+		m_clip = false;
+	}
 	lua_pop(L, 1);
 	lua_getfield(L, -1, "visible");
 	if (!lua_isnil(L, -1))
@@ -504,7 +537,7 @@ void Widget::RemovedFromRoot() {
 Rect Widget::RAD_IMPLEMENT_GET(screenRect) {
 	if (m_positionMode == kPositionMode_Absolute)
 		return m_rect;
-	return Map(m_rect);
+	return ToScreen(m_rect);
 }
 
 Vec3 Widget::RAD_IMPLEMENT_GET(zRotScreen) {
@@ -516,7 +549,7 @@ Vec3 Widget::RAD_IMPLEMENT_GET(zRotScreen) {
 }
 
 
-Rect Widget::Map(const Rect &r) const {
+Rect Widget::ToScreen(const Rect &r) const {
 	Rect base(0, 0, 0, 0);
 
 	Ref p = m_parent.lock();
@@ -554,6 +587,15 @@ Rect Widget::Map(const Rect &r) const {
 	}
 
 	return Rect(base.x+x, base.y+y, sw, sh);
+}
+
+Rect Widget::ToWidget(const Rect &r) const {
+	Rect x = screenRect;
+	x.x = r.x - x.x;
+	x.y = r.y - x.y;
+	x.w = r.w;
+	x.h = r.h;
+	return x;
 }
 
 void Widget::Tick(float time, float dt) {
@@ -746,17 +788,28 @@ void Widget::RotateTo(const Vec3 &zRot, const Vec3 &time, bool shortestAngle) {
 	}
 }
 
-void Widget::Draw(const Rect *clip, bool children) {
+void Widget::Draw(const Rect *_clip, bool children) {
 	if (!m_visible)
 		return;
 
-	if (visible) // tests alpha and scale
-		OnDraw(clip);
+	Rect clip;
+	if (m_clip) {
+		clip = m_clipRect;
+		if (_clip) {
+			Rect outerClip = ToWidget(*_clip);
+			clip.Intersect(outerClip);
+		}
+		clip = ToScreen(clip);
+	}
+
+	if (visible) { // tests alpha and scale
+		OnDraw(m_clip ? &clip : _clip);
+	}
 
 	if (children) {
 		for (Vec::const_iterator it = m_children.begin(); it != m_children.end(); ++it) {
 			const Ref &w = *it;
-			w->Draw(clip, true);
+			w->Draw(m_clip ? &clip : _clip, true);
 		}
 	}
 }
@@ -778,6 +831,9 @@ void Widget::SetCapture(bool capture) {
 bool Widget::HandleInputEvent(const InputEvent &e, const TouchState *touch, const InputState &is) {
 	if (!visible)
 		return false;
+
+	if (InputEventFilter(e, touch, is))
+		return true;
 
 	for (Vec::const_reverse_iterator it = m_children.rbegin(); it != m_children.rend(); ++it) {
 		const Ref &w = *it;
@@ -814,6 +870,9 @@ bool Widget::HandleInputEvent(const InputEvent &e, const TouchState *touch, cons
 
 bool Widget::HandleInputGesture(const InputGesture &g, const TouchState &touch, const InputState &is) {
 	if (!visible)
+		return false;
+
+	if (InputGestureFilter(g, touch, is))
 		return false;
 
 	for (Vec::const_reverse_iterator it = m_children.rbegin(); it != m_children.rend(); ++it) {
@@ -939,6 +998,26 @@ int Widget::LUART_SETFN(Tick)(lua_State *L) {
 	lua_pushvalue(L, 2);
 	lua_setfield(L, 1, "tick");
 	
+	return 0;
+}
+
+int Widget::LUART_GETFN(ClipRect)(lua_State *L) {
+	Ref self = GetRef<Widget>(L, "Widget", 1, true);
+	if (self->clip) {
+		lua::Marshal<Rect>::Push(L, self->clipRect);
+		return 1;
+	}
+	return 0;
+}
+
+int Widget::LUART_SETFN(ClipRect)(lua_State *L) {
+	Ref self = GetRef<Widget>(L, "Widget", 1, true);
+	if (lua_isnil(L, 2)) {
+		self->clip = false;
+	} else {
+		self->clip = true;
+		self->clipRect = lua::Marshal<Rect>::Get(L, 2, true);
+	}
 	return 0;
 }
 

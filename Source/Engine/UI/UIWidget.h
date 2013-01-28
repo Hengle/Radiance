@@ -221,25 +221,29 @@ public:
 	void AddChild(const Ref &widget);
 	void RemoveChild(const Ref &widget);
 
-	Rect Map(const Rect &r) const;
+	Rect ToScreen(const Rect &r) const;
+	Rect ToWidget(const Rect &r) const;
 
 	RAD_DECLARE_READONLY_PROPERTY(Widget, parent, Ref);
 	RAD_DECLARE_READONLY_PROPERTY(Widget, root, Root::Ref);
 	RAD_DECLARE_READONLY_PROPERTY(Widget, rbDraw, const RBDraw::Ref&);
-	RAD_DECLARE_READONLY_PROPERTY(Widget, rect, Rect*);
 	RAD_DECLARE_READONLY_PROPERTY(Widget, screenRect, Rect);
 	RAD_DECLARE_READONLY_PROPERTY(Widget, id, int);
 	RAD_DECLARE_READONLY_PROPERTY(Widget, color, const Vec4&);
 	RAD_DECLARE_READONLY_PROPERTY(Widget, zRot, const Vec3&);
 	RAD_DECLARE_READONLY_PROPERTY(Widget, zRotScreen, Vec3);
+	RAD_DECLARE_PROPERTY(Widget, rect, const Rect &, const Rect&);
 	RAD_DECLARE_PROPERTY(Widget, visible, bool, bool);
 	RAD_DECLARE_PROPERTY(Widget, valign, VerticalAlign, VerticalAlign);
 	RAD_DECLARE_PROPERTY(Widget, halign, HorizontalAlign, HorizontalAlign);
 	RAD_DECLARE_PROPERTY(Widget, positionMode, PositionMode, PositionMode);
 	RAD_DECLARE_PROPERTY(Widget, zRotationSpeed, float, float);
 	RAD_DECLARE_PROPERTY(Widget, zAngle, float, float);
+	RAD_DECLARE_PROPERTY(Widget, clip, bool, bool);
+	RAD_DECLARE_PROPERTY(Widget, clipRect, const Rect&, const Rect&); // <-- widget space
 
 	void Tick(float time, float dt);
+	//! clip rect is in screen space
 	void Draw(const Rect *clip, bool children=true);
 	void BlendTo(const Vec4 &dst, float time);
 	void ScaleTo(const Vec2 &scale, const Vec2 &time);
@@ -293,8 +297,21 @@ protected:
 	virtual void AddedToRoot();
 	virtual void RemovedFromRoot();
 
-	virtual bool OnInputEvent(const InputEvent &e, const InputState &is) { return false; }
-	virtual bool OnInputGesture(const InputGesture &g, const InputState &is) { return false; }
+	virtual bool InputEventFilter(const InputEvent &e, const TouchState *touch, const InputState &is) {
+		return false;
+	}
+
+	virtual bool InputGestureFilter(const InputGesture &g, const TouchState &touch, const InputState &is) {
+		return false;
+	}
+
+	virtual bool OnInputEvent(const InputEvent &e, const InputState &is) { 
+		return false; 
+	}
+
+	virtual bool OnInputGesture(const InputGesture &g, const InputState &is) { 
+		return false; 
+	}
 
 private:
 
@@ -325,6 +342,7 @@ private:
 	UIW_DECL_SET(ZRotationSpeed);
 	UIW_DECL_GET(zAngle);
 	UIW_DECL_SET(ZAngle);
+	UIW_DECL_GETSET(ClipRect);
 
 	RAD_DECLARE_GET(parent, Ref) { 
 		return m_parent.lock(); 
@@ -338,8 +356,12 @@ private:
 		return m_root.lock()->m_rbdraw; 
 	}
 
-	RAD_DECLARE_GET(rect, Rect*) { 
-		return &const_cast<Widget*>(this)->m_rect; 
+	RAD_DECLARE_GET(rect, const Rect&) { 
+		return m_rect;
+	}
+
+	RAD_DECLARE_SET(rect, const Rect&) {	
+		m_rect = value;
 	}
 
 	RAD_DECLARE_GET(screenRect, Rect);
@@ -404,8 +426,25 @@ private:
 		m_zRate[0] = value;
 	}
 
+	RAD_DECLARE_GET(clip, bool) {
+		return m_clip;
+	}
+
+	RAD_DECLARE_SET(clip, bool) {
+		m_clip = value;
+	}
+
+	RAD_DECLARE_GET(clipRect, const Rect&) {
+		return m_clipRect;
+	}
+
+	RAD_DECLARE_SET(clipRect, const Rect&) {
+		m_clipRect = value;
+	}
+
 	Vec m_children;
 	Rect m_rect;
+	Rect m_clipRect;
 	Vec4 m_color[3];
 	WRef m_parent;
 	Root::WRef m_root;
@@ -429,6 +468,7 @@ private:
 	bool m_gc;
 	bool m_tick;
 	bool m_capture;
+	bool m_clip;
 
 	static int NextWidgetId(lua_State *L);
 	static int s_id;

@@ -841,6 +841,7 @@
     <ClInclude Include="..\..\Engine\Types.h" />
     <ClInclude Include="..\..\Engine\UI\UIMatWidget.h" />
     <ClInclude Include="..\..\Engine\UI\UITextLabel.h" />
+    <ClInclude Include="..\..\Engine\UI\UIVListWidget.h" />
     <ClInclude Include="..\..\Engine\UI\UIWidget.h" />
     <ClInclude Include="..\..\Engine\UI\UIWidgetDef.h" />
     <ClInclude Include="..\..\Engine\Win\WinOpts.h" />
@@ -1948,6 +1949,7 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\UI\UIMatWidget.cpp" />
     <ClCompile Include="..\..\Engine\UI\UITextLabel.cpp" />
+    <ClCompile Include="..\..\Engine\UI\UIVListWidget.cpp" />
     <ClCompile Include="..\..\Engine\UI\UIWidget.cpp" />
     <ClCompile Include="..\..\Engine\World\BSPFile.cpp" />
     <ClCompile Include="..\..\Engine\World\Entities\E_Exports.cpp" />

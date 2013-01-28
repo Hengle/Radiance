@@ -9,6 +9,7 @@
 
 #include "UIWidget.h"
 #include "../Assets/MaterialParser.h"
+#include <Runtime/PushPack.h>
 
 namespace ui {
 
@@ -45,3 +46,5 @@ private:
 };
 
 } // ui
+
+#include <Runtime/PopPack.h>
