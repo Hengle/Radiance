@@ -19,7 +19,7 @@ VListWidget::VListWidget(const Rect &r) : Widget(r) {
 }
 
 void VListWidget::Init() {
-	m_friction = 4000.f;
+	m_friction = 2000.f;
 	m_scroll = Vec2::Zero;
 	m_velocity = Vec2::Zero;
 	m_contentSize = Vec2::Zero;
@@ -33,14 +33,14 @@ void VListWidget::Init() {
 	m_endStop = false;
 	m_checkDelayed = false;
 
-	m_spring.length = 0.1f;
-	m_spring.elasticity = 1.f;
-	m_spring.tolerance = 0.05f;
+	m_spring.length = 0.01f;
+	m_spring.elasticity = 200.f;
+	m_spring.tolerance = 0.003f;
 
-	m_vertex.mass = 1.f;
+	m_vertex.mass = 5.f;
 	m_vertex.friction = 0.5;
-	m_vertex.drag[0] = 1;
-	m_vertex.drag[1] = 1;
+	m_vertex.drag[0] = 10;
+	m_vertex.drag[1] = 10;
 	m_vertex.inner = false;
 	m_vertex.outer = true;
 }
@@ -175,21 +175,25 @@ void VListWidget::Scroll(const Vec2 &delta) {
 	scroll[1] += delta[1];
 
 	if (scroll[1] > 0.f) {
-		m_endStop = true;
-		if (scroll[1] > m_endStops[1]) {
-			scroll[1] = m_endStops[1];
-		} else {
-			scroll[1] = m_scroll[1] + (delta[1]*0.5f);
+		if (m_dragging || (m_velocity.Magnitude() < 0.001f) || (scroll[1] > m_endStops[1])) {
+			m_endStop = true;
+			if (scroll[1] > m_endStops[1]) {
+				scroll[1] = m_endStops[1];
+			} else {
+				scroll[1] = m_scroll[1] + (delta[1]*0.5f);
+			}
+			m_springRoot = Vec3::Zero;
 		}
-		m_springRoot = Vec3::Zero;
 	} else if (scroll[1] < minY) {
-		m_endStop = true;
-		if ((minY - scroll[1]) > m_endStops[1]) {
-			scroll[1] = minY - m_endStops[1];
-		} else {
-			scroll[1] = m_scroll[1] + (delta[1]*0.5f);
+		if (m_dragging || (m_velocity.Magnitude() < 0.001f) || ((minY - scroll[1]) > m_endStops[1])) {
+			m_endStop = true;
+			if ((minY - scroll[1]) > m_endStops[1]) {
+				scroll[1] = minY - m_endStops[1];
+			} else {
+				scroll[1] = m_scroll[1] + (delta[1]*0.5f);
+			}
+			m_springRoot = Vec3(0.f, minY, 0.f);
 		}
-		m_springRoot = Vec3(0.f, minY, 0.f);
 	} else {
 		m_endStop = false;
 	}
