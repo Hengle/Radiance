@@ -14,8 +14,8 @@ RADENG_API Quat RADENG_CALL QuatFromAngles(const Vec3 &angles) {
 
 RADENG_API Vec3 RADENG_CALL AnglesFromQuat(const Quat &quat) {
 	Mat4 m = Mat4::Rotation(quat);
-	Vec3 v = Vec3(1, 0, 0) * m;
-	return LookAngles(v);
+	Vec3 angles = m.Angles();
+	return (angles / math::Constants<float>::PI()) * 180.f;
 }
 
 RADENG_API Vec3 RADENG_CALL ForwardFromAngles(const Vec3 &angles) {

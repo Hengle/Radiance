@@ -426,15 +426,15 @@ Vector3<T> Matrix4X4<T>::Angles() const
 	
 	if( cp > T(8192.0*1.19209289550781250000e-07) )
 	{
-		v[0] = theta;// * 180.0f / PI;
+		v[0] = math::ArcTan2(m_mtx[1][2], m_mtx[2][2]);// * 180.0f / PI;
 		v[1] = math::ArcTan2(m_mtx[0][1], m_mtx[0][0]);// * 180.0f / PI;
-		v[2] = math::ArcTan2(m_mtx[1][2], m_mtx[2][2]);// * 180.0f / PI;
+		v[2] = theta;// * 180.0f / PI;
 	}
 	else
 	{
-		v[0] = theta;// * 180.0f / PI;
+		v[0] = 0.0f;
 		v[1] = -math::ArcTan2(m_mtx[1][0], m_mtx[1][1]);// * 180.0f / PI;
-		v[2] = 0.0f;
+		v[2] = theta;// * 180.0f / PI;
 	}
 	
 
