@@ -514,13 +514,13 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 
 	Vec3 targetFwd = ForwardFromAngles(target->ps->worldAngles);
 	UpdateRailTarget(target->ps->cameraPos, targetFwd);
-	if (!m_rail.tm)
+	if (!m_rail.tm[2])
 		return;
 
 	if (m_sync) {
-		m_rail.pos = m_rail.tm->t;
-		m_rail.rot = m_rail.tm->r;
-		m_rail.fov = m_rail.tm->fov;
+		m_rail.pos = m_rail.tm[2]->t;
+		m_rail.rot = m_rail.tm[2]->r;
+		m_rail.fov = m_rail.tm[2]->fov;
 	}
 	
 	Vec3 fwd = vTarget - m_rail.pos;
@@ -533,9 +533,9 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 		// blend to new pos/look
 		if (m_rail.trackLag > 0.f) {
 			float lerp = math::Clamp(m_rail.trackLag*dt, 0.f, 0.9999f);
-			m_rail.pos = math::Lerp(m_rail.pos, m_rail.tm->t, lerp);
-			m_rail.rot = math::Lerp(m_rail.rot, m_rail.tm->r, lerp);
-			m_rail.fov = math::Lerp(m_rail.fov, m_rail.tm->fov, lerp);
+			m_rail.pos = math::Lerp(m_rail.pos, m_rail.tm[2]->t, lerp);
+			m_rail.rot = math::Lerp(m_rail.rot, m_rail.tm[2]->r, lerp);
+			m_rail.fov = math::Lerp(m_rail.fov, m_rail.tm[2]->fov, lerp);
 		}
 		if (m_rail.turnLag > 0.f) {
 			float lerp = math::Clamp(m_rail.turnLag*dt, 0.f, 0.9999f);
@@ -599,23 +599,42 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 }
 
 void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFwd) {
-	Vec3 fwd(Vec3::Zero);
-	if (m_rail.tm) {
-		fwd = target - m_rail.tm->t;
+	Vec3 fwd[2];
+	fwd[0] = Vec3::Zero;
+	fwd[1] = Vec3::Zero;
 
-		if (m_rail.stayBehind <= 0.f) {
-			m_rail.targetFwd = targetFwd;
-			m_rail.lastBehindTime = xtime::ReadMilliseconds();
-		} else {
-			xtime::TimeVal now = xtime::ReadMilliseconds();
-			if ((now-m_rail.lastBehindTime) >= (m_rail.stayBehind*1000)) {
-				m_rail.targetFwd = targetFwd;
-			}
+	if (m_rail.tm[0]) {
+		fwd[0] = target - m_rail.tm[0]->t;
+	}
+
+	if (m_rail.tm[1]) {
+		fwd[1] = target - m_rail.tm[1]->t;
+	}
+
+	for (int i = 0; i < 2; ++i) {
+		for (int k = 0; k < 3; ++k) {
+			fwd[i][k] = (fwd[i][k] >= 0.f) ? 1.f : -1.f;
 		}
+	}
 
-	} else {
-		m_rail.lastBehindTime = xtime::ReadMilliseconds();
+	float weights[2] = {0, 0};
+	if (m_rail.tm[2] == m_rail.tm[0]) {
+		weights[1] = m_rail.distance*0.15f;
+		weights[1] *= weights[1];
+	} else if (m_rail.tm[2] == m_rail.tm[1]) {
+		weights[0] = m_rail.distance*0.3f;
+		weights[0] *= weights[0];
+	}
+		
+	if ((m_rail.stayBehind <= 0.f) || (m_rail.lastBehindTime==0.f)) {
 		m_rail.targetFwd = targetFwd;
+		m_rail.lastBehindTime = world->time;
+	} else {
+		float delta = world->time - m_rail.lastBehindTime;
+		if (delta >= m_rail.stayBehind) {
+			m_rail.targetFwd = targetFwd;
+			m_rail.lastBehindTime = world->time;
+		}
 	}
 
 	bool stayBehind = (m_rail.stayBehind >= 0.f);
@@ -626,45 +645,59 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 	bestDist[1] = bestDist[0];
 	
 	const bsp_file::BSPCameraTM *best[2];
-	best[0] = m_rail.tm ? m_rail.tm : bspFile->CameraTMs() + m_rail.track->firstTM;
+	best[0] = 0;
 	best[1] = 0;
 
 	for (S32 i = 0; i < m_rail.track->numTMs; ++i) {
 		const bsp_file::BSPCameraTM *tm = bspFile->CameraTMs() + m_rail.track->firstTM + i;
 
 		Vec3 v = target - tm->t;
+		Vec3 s;
+
+		for (int k = 0; k < 3; ++k) {
+			s[k] = (v[k] >= 0.f) ? 1.f : -1.f;
+		}
 		
 		float d = v.MagnitudeSquared();
 
-		float dd = m_rail.distance - d;
+		float dd = m_rail.distanceSq - d;
 		float abs = math::Abs(dd);
 
-		if ((!m_rail.tm || m_rail.strict) && (abs < bestDist[0])) {
-			bestDist[0] = abs;
-			best[0] = tm;
+		if ((!m_rail.tm[0] || m_rail.strict) && (abs < bestDist[0])) {
+			if (!m_rail.tm[0] || (fwd[0] == s)) {
+				bestDist[0] = abs;
+				best[0] = tm;
+			}
 		}
+
+		if (abs >= bestDist[1])
+			continue;
 
 		// these are more correct, but may not be available:
 
-		if (m_rail.tm && !stayBehind) {
+		if (m_rail.tm[1] && !stayBehind) {
 			// new position must be on same side as old
-			if (fwd.Dot(v) < 0.f)
+			if (fwd[1] != s)
 				continue;
 		}
 
 		if (stayBehind) {
 			// new position must be behind target facing
-			if (m_rail.targetFwd.Dot(v) < 0.f)
+			if (m_rail.targetFwd.Dot(v) <= 0.f)
 				continue;
 		}
 
-		if (abs < bestDist[1]) {
-			bestDist[1] = abs;
-			best[1] = tm;
-		}
+		bestDist[1] = abs;
+		best[1] = tm;
 	}
 
-	m_rail.tm = (best[1] && (!m_rail.strict || (bestDist[1] <= bestDist[0]))) ? best[1] : best[0];
+	bestDist[0] += weights[0];
+	if (best[1])
+		bestDist[1] += weights[1];
+
+	m_rail.tm[0] = best[0];
+	m_rail.tm[1] = best[1];
+	m_rail.tm[2] = (best[1] && (!m_rail.strict || (bestDist[1] <= bestDist[0]))) ? best[1] : best[0];
 }
 
 float E_ViewController::TickFOV(int frame, float dt, float distance) {
@@ -719,8 +752,9 @@ void E_ViewController::SetTargetMode(
 		useTargetPitch
 	);
 
-	if (mode == kTargetMode_Distance)
+	if (mode == kTargetMode_Distance) {
 		m_mode = kMode_Distance;
+	}
 
 	m_anims[mode].push_front(anim);
 }
@@ -745,7 +779,8 @@ void E_ViewController::SetRailMode(
 	const Vec3 &angleClamp // how much camera can "turn" from its rail-track to look at target
 ) {
 	if ((m_mode == kMode_Rail) && (m_rail.name == CStr(cinematicName))) {
-		m_rail.distance = distance*distance;
+		m_rail.distance = distance;
+		m_rail.distanceSq = distance*distance;
 		m_rail.strict = strict;
 		m_rail.trackLag = trackingLag;
 		m_rail.turnLag = lookAtLag;
@@ -765,7 +800,8 @@ void E_ViewController::SetRailMode(
 		if (trigger->camera < 0)
 			continue;
 		m_rail.track = world->bspFile->CameraTracks() + trigger->camera;
-		m_rail.distance = distance*distance;
+		m_rail.distance = distance;
+		m_rail.distanceSq = distance*distance;
 		m_rail.strict = strict;
 		m_rail.trackLag = trackingLag;
 		m_rail.turnLag = lookAtLag;
@@ -773,7 +809,8 @@ void E_ViewController::SetRailMode(
 		m_rail.cinematicFOV = useCinematicFOV;
 		m_rail.clamp = angleClamp;
 		m_rail.name = cinematicName;
-		m_rail.tm = 0;
+		m_rail.lastBehindTime = 0.f;
+		m_rail.tm[0] = m_rail.tm[1] = m_rail.tm[2] = 0;
 		// found a camera.
 		m_sync = true;
 		m_mode = kMode_Rail;

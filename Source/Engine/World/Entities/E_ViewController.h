@@ -301,18 +301,19 @@ private:
 	struct RailCameraState {
 		String name;
 		const bsp_file::BSPCameraTrack *track;
-		const bsp_file::BSPCameraTM *tm;
+		const bsp_file::BSPCameraTM *tm[3];
 		Vec3 pos;
 		Vec3 fwd;
 		Vec3 clamp;
 		Vec3 targetFwd;
 		Quat rot;
 		float distance;
+		float distanceSq;
 		float trackLag;
 		float turnLag;
 		float fov;
 		float stayBehind;
-		int lastBehindTime;
+		float lastBehindTime;
 		bool cinematicFOV;
 		bool strict;
 	};
