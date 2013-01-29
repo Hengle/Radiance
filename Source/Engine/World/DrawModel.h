@@ -152,6 +152,7 @@ private:
 	Vec4 m_rgba[3];
 	float m_fadeTime[2];
 	int m_markFrame;
+	int m_visibleFrame;
 	bool m_fade;
 	bool m_visible;
 };

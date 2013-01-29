@@ -14,7 +14,7 @@ inline AABB3<T>::AABB3()
 }
 
 template<typename T>
-inline AABB3<T>::AABB3(const AABB3& aabb) : m_mins(aabb.m_mins), m_maxs(aabb.m_maxs)
+inline AABB3<T>::AABB3(const AABB3& aabb) : m_mins(aabb.m_mins), m_maxs(aabb.m_maxs), m_org(aabb.m_org)
 {
 }
 

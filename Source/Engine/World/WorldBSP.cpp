@@ -168,7 +168,7 @@ void World::LinkEntity(Entity *entity, const BBox &bounds) {
 	if (entity->ps->otype == kOccupantType_None)
 		return;
 
-	entity->m_leaf = LeafForPoint(entity->ps->worldPos);
+	entity->m_leaf = LeafForPoint(bounds.Origin());
 	if (!entity->m_leaf)
 		return;
 
@@ -334,8 +334,10 @@ bool World::ClipOccupantVolume(
 			// quick reject, bounds touches this portal?
 			if (!volumeBounds.Touches(areaportal.bounds))
 				continue;
+			
+			Plane::SideType s = portalPlane.Side(volumeBounds, 1.f);
 
-			if (portalPlane.Side(volumeBounds, 0.f) != Plane::Cross)
+			if (s == Plane::Back)
 				continue;
 
 			StackWinding winding(
@@ -347,38 +349,55 @@ bool World::ClipOccupantVolume(
 			if (planeDist < -4.f) { // avoid clipping away this portal due to numerical issues
 				if (!ChopWindingToVolume(*volume, winding))
 					continue; // portal clipped away.
-			}
+			
+				// Generate planes that bound the portal.
+				PlaneVec boundingPlanes;
+				MakeBoundingPlanes(*constArgs.pos, winding, boundingPlanes, side == 0);
 
-			// Generate planes that bound the portal.
-			PlaneVec boundingPlanes;
-			MakeBoundingPlanes(*constArgs.pos, winding, boundingPlanes);
+				// Constrain volume to portal bounding planes.
+				ClippedAreaVolume areaVolume(otherArea, *volume, volumeBounds);
+				BBox areaVolumeBounds(volumeBounds);
 
-			// Constrain volume to portal bounding planes.
-			ClippedAreaVolume areaVolume(otherArea, *volume, volumeBounds);
-			BBox areaVolumeBounds(volumeBounds);
+				if (!ChopVolume(areaVolume.volume, areaVolumeBounds, boundingPlanes))
+					continue; // volume clipped away.
 
-			if (!ChopVolume(areaVolume.volume, areaVolumeBounds, boundingPlanes))
-				continue; // volume clipped away.
-
-			// Bound by portal.
+				// Bound by portal.
 		
-			if (!ChopVolume(areaVolume.volume, areaVolumeBounds, portalPlane))
-				continue;
+				if (!ChopVolume(areaVolume.volume, areaVolumeBounds, portalPlane))
+					continue;
 
-			constArgs.visible.set(otherArea);
+				constArgs.visible.set(otherArea);
 
-			// NOTE: this push_back involves a large amount of memory copying due to the use
-			// of these being stackify<> vectors. 
-			if (constArgs.clipped) 
-				(*constArgs.clipped)->push_back(areaVolume);
+				// NOTE: this push_back involves a large amount of memory copying due to the use
+				// of these being stackify<> vectors. 
+				if (constArgs.clipped) 
+					(*constArgs.clipped)->push_back(areaVolume);
 
-			if (constArgs.counters)
-				++constArgs.counters->drawnPortals;
+				if (constArgs.counters)
+					++constArgs.counters->drawnPortals;
 
-			canSee = otherArea == constArgs.toArea;
+				canSee = otherArea == constArgs.toArea;
 
-			if (!canSee)
-				canSee = ClipOccupantVolume(constArgs, &areaVolume.volume, areaVolumeBounds, otherArea);
+				if (!canSee)
+					canSee = ClipOccupantVolume(constArgs, &areaVolume.volume, areaVolumeBounds, otherArea);
+			} else { // to close to portal to generate restricting planes.
+				constArgs.visible.set(otherArea);
+
+				ClippedAreaVolume areaVolume(otherArea, *volume, volumeBounds);
+
+				// NOTE: this push_back involves a large amount of memory copying due to the use
+				// of these being stackify<> vectors. 
+				if (constArgs.clipped) 
+					(*constArgs.clipped)->push_back(areaVolume);
+
+				if (constArgs.counters)
+					++constArgs.counters->drawnPortals;
+
+				canSee = otherArea == constArgs.toArea;
+
+				if (!canSee)
+					canSee = ClipOccupantVolume(constArgs, volume, volumeBounds, otherArea);
+			}
 		}
 
 		if (canSee)
@@ -460,7 +479,7 @@ bool World::ChopVolume(StackWindingStackVec &volume, BBox &bounds, const Plane &
 	Plane::SideType side = p.Side(bounds, 0.f);
 	if (side == Plane::Back)
 		return false;
-	if (side == Plane::Front)
+	if ((side == Plane::Front) || (side == Plane::On))
 		return true;
 
 	StackWindingStackVec src(volume);
@@ -480,7 +499,7 @@ bool World::ChopVolume(StackWindingStackVec &volume, BBox &bounds, const Plane &
 		}
 	}
 
-	StackWinding pw(p, 32767.f);
+	StackWinding pw(p, 16384);
 
 	for (StackWindingStackVec::const_iterator it = volume->begin(); it != volume->end(); ++it) {
 		const StackWinding &w = *it;
@@ -531,7 +550,7 @@ void World::MakeVolume(const Plane *planes, int num, StackWindingStackVec &volum
 	StackWinding f;
 
 	for (int i = 0; i < num; ++i) {
-		StackWinding w(planes[i], 32767.f);
+		StackWinding w(planes[i], 16384);
 		for (int k = 0; k < num; ++k) {
 			if (k == i)
 				continue;
@@ -551,7 +570,7 @@ void World::MakeVolume(const Plane *planes, int num, StackWindingStackVec &volum
 	}
 }
 
-void World::MakeBoundingPlanes(const Vec3 &pos, const StackWinding &portal, PlaneVec &planes) {
+void World::MakeBoundingPlanes(const Vec3 &pos, const StackWinding &portal, PlaneVec &planes, bool side) {
 
 	RAD_ASSERT(portal.NumVertices() >= 3);
 
@@ -563,18 +582,13 @@ void World::MakeBoundingPlanes(const Vec3 &pos, const StackWinding &portal, Plan
 		if (k >= portal.NumVertices())
 			k = 0;
 		
-		int j = k+1;
-		if (j >= portal.NumVertices())
-			j = 0;
-
 		const Vec3 &a = portal.Vertices()[i];
 		const Vec3 &b = portal.Vertices()[k];
-		const Vec3 &c = portal.Vertices()[j];
-
+		
 		Plane p(a, b, pos);
-		if (p.Side(c, 0.f) == Plane::Back) {
+
+		if (side)
 			p = -p;
-		}
 
 		planes.push_back(p);
 	}

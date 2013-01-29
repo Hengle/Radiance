@@ -154,7 +154,7 @@ void GLState::CommitSB(S &s, bool f)
 			glDisable(GL_DEPTH_TEST);
 			CHECK_GL_ERRORS_EXTRA();
 			// record the current depth test state
-			s.s.s |= (s.d.s&kDepthTest_Flags)&~kDepthTest_Disable;
+//			s.s.s |= (s.d.s&kDepthTest_Flags)&~kDepthTest_Disable;
 		} else if(ss&kDepthTest_Flags) {
 			int df = 0;
 

@@ -81,7 +81,7 @@ void BSPBuilder::PaintHandler::DisableSmoothShading() {
 	glDisable(GL_LIGHT1);
 }
 
-void BSPBuilder::PaintHandler::BeginPaint(const QRect &viewport, tools::map_builder::DebugUI &ui, int state, int blend, bool backfaces) {
+void BSPBuilder::PaintHandler::BeginPaint(const QRect &viewport, tools::map_builder::DebugUI &ui, int state, int blend, bool cullBackfaces) {
 	float vpw = viewport.width();
 	float vph = viewport.height();
 
@@ -103,7 +103,7 @@ void BSPBuilder::PaintHandler::BeginPaint(const QRect &viewport, tools::map_buil
 	gls.DisableAllMTSources();
 	gls.DisableVertexAttribArrays();
 
-	int cfm = backfaces ? kCullFaceMode_Back : kCullFaceMode_Front;
+	int cfm = cullBackfaces ? kCullFaceMode_Back : kCullFaceMode_Front;
 
 	if (!state)
 		state = kDepthTest_Less|cfm|kCullFaceMode_CCW|kColorWriteMask_RGBA;
@@ -290,7 +290,7 @@ bool BSPBuilder::LeafFacesDraw::Paint(float time, float dt, const QRect &viewpor
 	if (!m_lock)
 		FindCameraLeaf(ui, bsp);
 	
-	BeginPaint(viewport, ui, 0, 0, m_isolate);
+	BeginPaint(viewport, ui, 0, 0, !m_isolate);
 
 	if (m_isolate && m_leaf) {
 		DrawNodes(m_leaf, false);

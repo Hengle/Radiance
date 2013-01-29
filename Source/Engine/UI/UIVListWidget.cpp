@@ -19,7 +19,7 @@ VListWidget::VListWidget(const Rect &r) : Widget(r) {
 }
 
 void VListWidget::Init() {
-	m_friction = 1.f;
+	m_friction = 4000.f;
 	m_scroll = Vec2::Zero;
 	m_velocity = Vec2::Zero;
 	m_contentSize = Vec2::Zero;
@@ -34,13 +34,15 @@ void VListWidget::Init() {
 	m_checkDelayed = false;
 
 	m_spring.length = 0.1f;
-	m_spring.elasticity = 40.f;
+	m_spring.elasticity = 1.f;
 	m_spring.tolerance = 0.05f;
 
-	m_vertex.mass = 5.f;
+	m_vertex.mass = 1.f;
 	m_vertex.friction = 0.5;
-	m_vertex.drag[0] = 7;
-	m_vertex.drag[1] = 7;
+	m_vertex.drag[0] = 1;
+	m_vertex.drag[1] = 1;
+	m_vertex.inner = false;
+	m_vertex.outer = true;
 }
 
 void VListWidget::ItemChanged() {
@@ -203,6 +205,7 @@ bool VListWidget::ApplyVelocity(float dt) {
 	if (m_dragging)
 		return false;
 	if (m_endStop) {
+		m_velocity = Vec2::Zero;
 		m_endStop = m_vertex.Update(dt, m_springRoot, m_spring);
 		if (m_endStop) {
 			m_scroll[0] = m_vertex.pos[0];

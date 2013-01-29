@@ -333,6 +333,9 @@ void WorldDraw::SetupFrustumPlanes(ViewDef &view) {
 	const Vec3 &fwd = view.camera.fwd;
 	const Vec3 &left = view.camera.left;
 	const Vec3 &up = view.camera.up;
+	/*Vec3 fwd = Vec3(1,0,0);
+	Vec3 left = Vec3(0,1,0);
+	Vec3 up   = Vec3(0,0,1);*/
 
 	float s,c;
 	Vec3 normals[ViewDef::kNumFrustumPlanes];
@@ -358,9 +361,20 @@ void WorldDraw::SetupFrustumPlanes(ViewDef &view) {
 
 	for (int i = 0; i < ViewDef::kNumFrustumPlanes; ++i) {
 		Plane p;
+
+		for (int k = 0; k < 3; ++k) {
+			float d = normals[i][k];
+			if (d < 0.001f && d > -0.001f) {
+				normals[i][k] = 0.f;
+			}
+		}
+
 		normals[i].Normalize();
 
-		if (i == 1 && ViewDef::kNumFrustumPlanes == 6) {
+		if ((i == 0) && (ViewDef::kNumFrustumPlanes > 4)) {
+			Vec3 t = normals[0] * 4.f;
+			p.Initialize(normals[i], view.camera.pos.get() + t, Plane::Unit);
+		} else if ((i == 1) && (ViewDef::kNumFrustumPlanes > 5)) {
 			Vec3 t = normals[0] * view.camera.farClip.get();
 			p.Initialize(normals[i], view.camera.pos.get() + t, Plane::Unit);
 		} else {
@@ -429,11 +443,15 @@ void WorldDraw::VisMarkArea(
 		if (m->m_markFrame != m_markFrame) {
 			m->m_markFrame = m_markFrame;
 			++m_counters.testedWorldModels;
+		}
+
+		if (m->m_visibleFrame != m_markFrame) {
 #if defined(WORLD_DEBUG_DRAW)
 			if (m_world->cvars->r_showworldbboxes.value)
 				m_dbgVars.debugWorldBBoxes.push_back(m->bounds);
 #endif
-			if (ClipBounds(volume, volumeBounds, m->bounds)) {
+			if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, m->bounds)) {
+				m->m_visibleFrame = m_markFrame;
 				++m_counters.drawnWorldModels;
 				details::MBatchRef batch = AddViewBatch(view, m->m_matId);
 				if (batch)
@@ -443,35 +461,43 @@ void WorldDraw::VisMarkArea(
 	}
 
 	// add entities.
-
+	
 	for (EntityPtrSet::const_iterator it = area.occupants.begin(); it != area.occupants.end(); ++it) {
 		Entity *e = *it;
 		if (e->m_markFrame != m_markFrame) {
 			e->m_markFrame = m_markFrame;
 			++m_counters.drawnEntities;
-			for (DrawModel::Map::const_iterator it = e->models->begin(); it != e->models->end(); ++it) {
-				const DrawModel::Ref &m = it->second;
-				if (!m->visible)
-					continue;
-				if (m->m_markFrame != m_markFrame) {
-					m->m_markFrame = m_markFrame;
-					++m_counters.testedEntityModels;
-					BBox bounds(m->bounds);
-					bounds.Translate(e->ps->worldPos);
+		}
+
+		for (DrawModel::Map::const_iterator it = e->models->begin(); it != e->models->end(); ++it) {
+			const DrawModel::Ref &m = it->second;
+			if (!m->visible)
+				continue;
+
+			if (m->m_markFrame != m_markFrame) {
+				m->m_markFrame = m_markFrame;
+				++m_counters.testedEntityModels;
+			}
+
+			if (m->m_visibleFrame != m_markFrame) {
+				BBox bounds(m->bounds);
+				bounds.Translate(e->ps->worldPos);
 #if defined(WORLD_DEBUG_DRAW)
-					if (m_world->cvars->r_showentitybboxes.value)
-						m_dbgVars.debugEntityBBoxes.push_back(bounds);
+				if (m_world->cvars->r_showentitybboxes.value)
+					m_dbgVars.debugEntityBBoxes.push_back(bounds);
 #endif
-					if (ClipBounds(volume, volumeBounds, bounds)) {
-						++m_counters.drawnEntityModels;
-						for (MBatchDraw::RefVec::const_iterator it = m->m_batches.begin(); it != m->m_batches.end(); ++it) {
-							const MBatchDraw::Ref &draw = *it;
-							if (draw->m_markFrame != m_markFrame) {
-								draw->m_markFrame = m_markFrame;
-								details::MBatchRef batch = AddViewBatch(view, draw->m_matId);
-								if (batch)
-									batch->AddDraw(*draw);
-							}
+				if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, bounds)) {
+					m->m_visibleFrame = m_markFrame;
+					++m_counters.drawnEntityModels;
+					for (MBatchDraw::RefVec::const_iterator it = m->m_batches.begin(); it != m->m_batches.end(); ++it) {
+						const MBatchDraw::Ref &draw = *it;
+						
+						if (draw->m_markFrame != m_markFrame) {
+							draw->m_markFrame = m_markFrame;
+							draw->m_visibleFrame = m_markFrame;
+							details::MBatchRef batch = AddViewBatch(view, draw->m_matId);
+							if (batch)
+								batch->AddDraw(*draw);
 						}
 					}
 				}

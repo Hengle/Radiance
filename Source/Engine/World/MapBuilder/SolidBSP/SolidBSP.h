@@ -471,7 +471,7 @@ private:
 			tools::map_builder::DebugUI &ui, 
 			int state = 0,
 			int blend = 0,
-			bool backfaces = false
+			bool cullBackfaces = true
 		);
 		void EndPaint();
 		void BeginWireframe(bool backfaces = false);

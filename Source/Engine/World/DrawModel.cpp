@@ -24,7 +24,8 @@ m_bounds(Vec3::Zero, Vec3::Zero),
 m_scale(Vec3(1, 1, 1)),
 m_visible(true),
 m_fade(false),
-m_markFrame(-1) {
+m_markFrame(-1),
+m_visibleFrame(-1) {
 	m_rgba[0] = m_rgba[1] = m_rgba[2] = Vec4(1, 1, 1, 1);
 	m_fadeTime[0] = m_fadeTime[1] = 0.f;
 }

@@ -821,6 +821,8 @@ void World::LoadBSP(const bsp_file::BSPFile &bsp) {
 			verts.push_back(p);
 		}
 
+		portal.bounds.Expand(16, 16, 16);
+
 		portal.open = true;
 		portal.areas[0] = x->areas[0];
 		portal.areas[1] = x->areas[1];

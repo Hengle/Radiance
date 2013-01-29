@@ -340,7 +340,7 @@ private:
 	static bool ChopVolume(StackWindingStackVec &volume, BBox &bounds, const PlaneVec &planes);
 	static bool IntersectVolumes(const StackWindingStackVec &a, StackWindingStackVec &out, BBox &bounds);
 	static void MakeVolume(const Plane *planes, int num, StackWindingStackVec &volume, BBox &bounds);
-	static void MakeBoundingPlanes(const Vec3 &pos, const StackWinding &portal, PlaneVec &planes);
+	static void MakeBoundingPlanes(const Vec3 &pos, const StackWinding &portal, PlaneVec &planes, bool side);
 
 	void BBoxTouching(
 		const BBox &bbox,

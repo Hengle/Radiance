@@ -49,7 +49,7 @@ public:
 	typedef boost::shared_ptr<MBatchDraw> Ref;
 	typedef zone_vector<Ref, ZWorldT>::type RefVec;
 	
-	MBatchDraw(int matId) : m_matId(matId), m_markFrame(-1) {}
+	MBatchDraw(int matId) : m_matId(matId), m_markFrame(-1), m_visibleFrame(-1) {}
 	virtual ~MBatchDraw() {}
 
 	RAD_DECLARE_PROPERTY(MBatchDraw, matId, int, int);
@@ -89,6 +89,7 @@ private:
 
 	int m_matId;
 	int m_markFrame;
+	int m_visibleFrame;
 };
 
 } // world

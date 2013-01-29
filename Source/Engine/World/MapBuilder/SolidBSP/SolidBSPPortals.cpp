@@ -95,7 +95,7 @@ void BSPBuilder::MakeNodePortal(Node *node) {
 	PortalRef p(new Portal());
 	Winding f, b;
 	p->plane.planenum = node->planenum;
-	p->plane.winding.Initialize(m_planes.Plane(node->planenum), SceneFile::kMaxRange*2);
+	p->plane.winding.Initialize(m_planes.Plane(node->planenum), SceneFile::kMaxRange);
 
 	// split portal by all bounding portals that look into the node.
 	int side;

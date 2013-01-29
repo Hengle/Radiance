@@ -643,9 +643,9 @@ Winding<TVertex, TPlane, stack_tag<TSize> > &Winding<TVertex, TPlane, stack_tag<
 
 	ValueType halfSize = size / ValueType(2);
 	v[0] = org + (left * halfSize) + (up * halfSize);
-	v[1] = org + (left * halfSize) + (up * -halfSize);
+	v[1] = org + (left * -halfSize) + (up * halfSize);
 	v[2] = org + (left * -halfSize) + (up * -halfSize);
-	v[3] = org + (left * -halfSize) + (up * halfSize);
+	v[3] = org + (left * halfSize) + (up * -halfSize);
 
 	Initialize(v, 4, p);
 	return *this;
