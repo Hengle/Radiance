@@ -457,14 +457,20 @@ StringVec Font::WordWrapString(
 			);
 
 			if (w > maxWidth) {
-				strings.push_back(cur);
-				cur.Clear();
+				if (!cur.empty) {
+					strings.push_back(cur);
+					cur = x;
+				} else {
+					strings.push_back(test); // single word too big
+				}
 				start = end+1;
+			} else {
+				cur = test;
 			}
 		}
 	}
 
-	if (start != end) {
+	if ((start+1) < end) { // don't add an empty string
 		String x(start, end-start);
 		if (cur.empty) {
 			cur = x;
@@ -476,6 +482,72 @@ StringVec Font::WordWrapString(
 	}
 
 	return strings;
+}
+
+void Font::SplitStringAtSize(
+	const char *utf8String,
+	String &first,
+	String &second,
+	float maxWidth,
+	bool kern,
+	float kernScale
+) {
+	String text(CStr(utf8String));
+
+	first.Clear();
+	second.Clear();
+	
+	string::UTF32Buf utf = text.ToUTF32();
+
+	const U32 *start = utf.c_str;
+	const U32 *end = start;
+
+	String cur;
+	const String kSpace(CStr(" "));
+
+	for (; *end; ++end) {
+		if (*end == 32) { // space (word break)
+			if (start == end) {
+				continue;
+			}
+
+			String x(start, end-start);
+			String test;
+
+			if (!cur.empty) {
+				test = cur + kSpace + x;
+			} else {
+				test = x;
+			}
+
+			float w, h;
+
+			StringDimensions(
+				test.c_str,
+				w,
+				h,
+				kern,
+				kernScale
+			);
+
+			if (w > maxWidth) {
+				if (cur.empty) {
+					first = x;
+					return;
+				}
+
+				first = cur;
+				second = x;
+				return;
+
+			} else {
+				cur = test;
+			}
+		}
+	}
+
+	first = utf8String;
+	second.Clear();
 }
 
 float Font::RAD_IMPLEMENT_GET(ascenderPixels) {

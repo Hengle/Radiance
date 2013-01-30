@@ -241,7 +241,8 @@ public:
 	RAD_DECLARE_PROPERTY(Widget, zAngle, float, float);
 	RAD_DECLARE_PROPERTY(Widget, clip, bool, bool);
 	RAD_DECLARE_PROPERTY(Widget, clipRect, const Rect&, const Rect&); // <-- widget space
-
+	RAD_DECLARE_PROPERTY(Widget, contentPos, const Vec2&, const Vec2);
+	
 	void Tick(float time, float dt);
 	//! clip rect is in screen space
 	void Draw(const Rect *clip, bool children=true);
@@ -315,6 +316,8 @@ protected:
 
 private:
 
+	void Init();
+
 	friend class Root;
 
 	static int lua_AddChild(lua_State *L);
@@ -343,6 +346,7 @@ private:
 	UIW_DECL_GET(zAngle);
 	UIW_DECL_SET(ZAngle);
 	UIW_DECL_GETSET(ClipRect);
+	UIW_DECL_GETSET(ContentPos);
 
 	RAD_DECLARE_GET(parent, Ref) { 
 		return m_parent.lock(); 
@@ -442,6 +446,14 @@ private:
 		m_clipRect = value;
 	}
 
+	RAD_DECLARE_GET(contentPos, const Vec2&) {
+		return m_contentPos;
+	}
+
+	RAD_DECLARE_SET(contentPos, const Vec2&) {
+		m_contentPos = value;
+	}
+
 	Vec m_children;
 	Rect m_rect;
 	Rect m_clipRect;
@@ -451,6 +463,7 @@ private:
 	int m_id;
 	bool m_visible;
 	float m_fadeTime[2];
+	Vec2 m_contentPos;
 	Vec2 m_scale[3];
 	Vec2 m_scaleTime[2];
 	Vec2 m_move[2];

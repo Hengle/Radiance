@@ -24,43 +24,6 @@ void TextLabel::SetText(
 	const r::TextModel::String *strings,
 	int numStrings
 ) {
-	SetText(0, strings, numStrings);
-}
-
-void TextLabel::SetText(
-	const char *utf8String, 
-	float x,
-	float y, 
-	float z,
-	bool kern,
-	float kernScale,
-	float scaleX, 
-	float scaleY
-) {
-	SetText(
-		0,
-		utf8String,
-		x,
-		y,
-		z,
-		kern,
-		kernScale,
-		scaleX,
-		scaleY
-	);
-}
-
-void TextLabel::Clear() {
-	if (m_textModel)
-		m_textModel->Clear();
-}
-
-void TextLabel::SetText(
-	lua_State *L,
-	const r::TextModel::String *strings,
-	int numStrings
-)
-{
 	RAD_ASSERT(m_textModel);
 
 	if (m_textModel) {
@@ -69,7 +32,6 @@ void TextLabel::SetText(
 }
 
 void TextLabel::SetText(
-	lua_State *L,
 	const char *utf8String, 
 	float x,
 	float y, 
@@ -93,6 +55,11 @@ void TextLabel::SetText(
 			scaleY
 		);
 	}
+}
+
+void TextLabel::Clear() {
+	if (m_textModel)
+		m_textModel->Clear();
 }
 
 bool TextLabel::BindTypeface(
@@ -154,42 +121,111 @@ void TextLabel::CreateFromTable(lua_State *L) {
 int TextLabel::lua_SetText(lua_State *L) {
 	Ref w = GetRef<TextLabel>(L, "TextLabel", 1, true);
 
-	int numArgs = lua_gettop(L) - 1; // don't count self
-	const char *string = luaL_checkstring(L, 2);
+	if (lua_type(L, 2) == LUA_TTABLE) {
+		typedef zone_vector<r::TextModel::String, ZUIT>::type TextModelStringVec;
+		TextModelStringVec modelStrings;
+		StringVec strings;
 
-	float x = 0.f;
-	float y = 0.f;
+		for (int i = 0; ; ++i) {
+			lua_pushinteger(L, i+1);
+			lua_gettable(L, 2);
+			if (lua_isnil(L, -1)) {
+				lua_pop(L, 1);
+				break;
+			}
+			luaL_checktype(L, -1, LUA_TTABLE);
 
-	if (numArgs > 2)
-		x = (float)luaL_checknumber(L, 3);
-	if (numArgs > 3)
-		y = (float)luaL_checknumber(L, 4);
+			r::TextModel::String modelString(0);
+			
+			lua_pushstring(L, "x");
+			lua_gettable(L, -2);
+			modelString.x = (float)luaL_checknumber(L, -1);
+			lua_pop(L, 1);
 
-	bool kern = true;
-	if (numArgs > 4)
-		kern = lua_toboolean(L, 5) ? true : false;
+			lua_pushstring(L, "y");
+			lua_gettable(L, -2);
+			modelString.y = (float)luaL_checknumber(L, -1);
+			lua_pop(L, 1);
 
-	float kernScale = 1.f;
-	if (numArgs > 5)
-		kernScale = (float)luaL_checknumber(L, 6);
+			lua_pushstring(L, "text");
+			lua_gettable(L, -2);
+			strings.push_back(String(luaL_checkstring(L, -1)));
+			lua_pop(L, 1);
+			
+			lua_pushstring(L, "kern");
+			lua_gettable(L, -2);
+			if (!lua_isnil(L, -1))
+				modelString.kern = lua_toboolean(L, -1);
+			lua_pop(L, 1);
 
-	float sx = 1.f;
-	float sy = 1.f;
-	if (numArgs > 6)
-		sx = (float)luaL_checknumber(L, 7);
-	if (numArgs > 7)
-		sy = (float)luaL_checknumber(L, 8);
+			lua_pushstring(L, "kernScale");
+			lua_gettable(L, -2);
+			if (!lua_isnil(L, -1))
+				modelString.kernScale = (float)luaL_checknumber(L, -1);
+			lua_pop(L, 1);
 
-	w->SetText(
-		string,
-		x,
-		y,
-		0.f,
-		kern,
-		kernScale,
-		sx,
-		sy
-	);
+			lua_pushstring(L, "scaleX");
+			lua_gettable(L, -2);
+			if (!lua_isnil(L, -1))
+				modelString.kernScale = (float)luaL_checknumber(L, -1);
+			lua_pop(L, 1);
+
+			lua_pushstring(L, "scaleY");
+			lua_gettable(L, -2);
+			if (!lua_isnil(L, -1))
+				modelString.kernScale = (float)luaL_checknumber(L, -1);
+			lua_pop(L, 1);
+
+			modelStrings.push_back(modelString);
+			lua_pop(L, 1);
+		}
+
+		for (int i = 0; i < (int)modelStrings.size(); ++i) {
+			modelStrings[i].utf8String = strings[i].c_str;
+		}
+
+		if (!modelStrings.empty())
+			w->SetText(&modelStrings[0], (int)modelStrings.size());
+
+	} else {
+
+		int numArgs = lua_gettop(L) - 1; // don't count self
+		const char *string = luaL_checkstring(L, 2);
+
+		float x = 0.f;
+		float y = 0.f;
+
+		if (numArgs > 2)
+			x = (float)luaL_checknumber(L, 3);
+		if (numArgs > 3)
+			y = (float)luaL_checknumber(L, 4);
+
+		bool kern = true;
+		if (numArgs > 4)
+			kern = lua_toboolean(L, 5) ? true : false;
+
+		float kernScale = 1.f;
+		if (numArgs > 5)
+			kernScale = (float)luaL_checknumber(L, 6);
+
+		float sx = 1.f;
+		float sy = 1.f;
+		if (numArgs > 6)
+			sx = (float)luaL_checknumber(L, 7);
+		if (numArgs > 7)
+			sy = (float)luaL_checknumber(L, 8);
+
+		w->SetText(
+			string,
+			x,
+			y,
+			0.f,
+			kern,
+			kernScale,
+			sx,
+			sy
+		);
+	}
 
 	return 0;
 }

@@ -345,4 +345,101 @@ int WorldLua::lua_System_BuildConfig(lua_State *L) {
 	return 1;
 }
 
+int WorldLua::lua_System_UTF8To32(lua_State *L) {
+	const char *sz = luaL_checkstring(L, 1);
+	const String kSz(CStr(sz));
+
+	U32 *buf;
+	U32 ubuf[Kilo*4];
+
+	int len = string::utf8to32len(kSz.c_str, kSz.length + 1);
+	if (len < 2) // don't count null
+		return 0;
+
+	if (len > sizeof(ubuf)/sizeof(U32)) {
+		buf = (U32*)safe_zone_malloc(ZWorld, sizeof(U32)*len);
+	} else {
+		buf = ubuf;
+	}
+
+	string::utf8to32(buf, kSz.c_str, kSz.length+1);
+
+	lua_createtable(L, len, 0);
+	for (int i = 0; i < len; ++i) {
+		lua_pushinteger(L, i+1);
+		lua_pushinteger(L, buf[i]);
+		lua_settable(L, -3);
+	}
+
+	if (buf != ubuf)
+		zone_free(buf);
+
+	return 1;
+}
+
+int WorldLua::lua_System_UTF32To8(lua_State *L) {
+	luaL_checktype(L, 1, LUA_TTABLE);
+
+	U32 ubuf[Kilo*4];
+	zone_vector<U32, ZWorldT>::type ubufVec;
+	U32 *ubufp = ubuf;
+	
+	int ofs;
+	for (ofs = 0; ;++ofs) {
+		lua_pushinteger(L, ofs+1);
+		lua_gettable(L, 1);
+
+		if (lua_isnil(L, -1))
+			break;
+		
+		U32 u = (U32)luaL_checknumber(L, -1);
+
+		if (ofs < (sizeof(ubuf)/sizeof(U32))) {
+			ubufp[ofs] = u;
+		} else {
+			if (ubufp == ubuf) {
+				ubufVec.reserve(ofs+1);
+				ubufVec.resize(ofs);
+				memcpy(&ubufVec[0], ubufp, sizeof(U32)*ofs);
+				ubufp = 0;
+			}
+
+			ubufVec.push_back(u);
+		}
+
+		lua_pop(L, 1);
+	}
+
+	if (ofs < 1)
+		return 0;
+
+	if (ubufp[ofs-1] != 0) {
+		luaL_error(L, "UTF32 array is not null terminated");
+	}
+
+	if (ofs < 2)
+		return 0;
+
+	if (!ubufp)
+		ubufp = &ubufVec[0];
+
+	char cbuf[Kilo*4*4];
+	char *cbufp = cbuf;
+
+	int len = string::utf32to8len(ubufp, ofs);
+	RAD_ASSERT(len > 1);
+
+	if (len > sizeof(cbuf))
+		cbufp = (char*)safe_zone_malloc(ZWorld, len);
+
+	string::utf32to8(cbufp, ubufp, ofs);
+	lua_pushstring(L, cbufp);
+
+
+	if (cbufp != cbuf)
+		zone_free(cbufp);
+
+	return 1;
+}
+
 } // world

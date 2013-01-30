@@ -36,7 +36,9 @@ public:
 	void ItemChanged();
 	void AddItem(const Widget::Ref &widget);
 	void RemoveItem(const Widget::Ref &widget);
+	void ScrollTo(const Vec2 &pos);
 	void Clear();
+	void DoVerticalLayout();
 
 protected:
 
@@ -106,7 +108,9 @@ private:
 	static int lua_ItemChanged(lua_State *L);
 	static int lua_AddItem(lua_State *L);
 	static int lua_RemoveItem(lua_State *L);
+	static int lua_ScrollTo(lua_State *L);
 	static int lua_Items(lua_State *L);
+	static int lua_DoVerticalLayout(lua_State *L);
 	static int lua_Clear(lua_State *L);
 
 	UIW_DECL_GETSET(Scroll);

@@ -170,6 +170,8 @@ bool WorldLua::Init() {
 		{ "COut", lua_System_COut },
 		{ "CurrentDateAndTime", lua_System_CurrentDateAndTime },
 		{ "BuildConfig", lua_System_BuildConfig },
+		{ "UTF8To32", lua_System_UTF8To32 },
+		{ "UTF32To8", lua_System_UTF32To8 },
 		{ 0, 0 }
 	};
 

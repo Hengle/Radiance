@@ -150,6 +150,8 @@ private:
 	static int lua_System_StartDownloadingLatestSaveVersion(lua_State *L);
 	static int lua_System_CloudStorageAvailable(lua_State *L);
 	static int lua_System_BuildConfig(lua_State *L);
+	static int lua_System_UTF8To32(lua_State *L);
+	static int lua_System_UTF32To8(lua_State *L);
 
 	/*
 	==============================================================================

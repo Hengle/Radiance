@@ -55,6 +55,9 @@ void VListWidget::Clear() {
 	m_endStop = false;
 	m_scroll = Vec2::Zero;
 	m_contentSize = Vec2::Zero;
+	m_dragging = false;
+	m_dragMove = false;
+	m_dragDidMove = false;
 
 	for (Widget::Vec::iterator it = m_widgets.begin(); it != m_widgets.end(); ++it) {
 		RemoveChild(*it);
@@ -82,6 +85,56 @@ void VListWidget::RemoveItem(const Widget::Ref &widget) {
 	}
 }
 
+void VListWidget::ScrollTo(const Vec2 &pos) {
+	// cancel any drag or motion
+	m_e.type = InputEvent::T_Invalid;
+	m_velocity = Vec2::Zero;
+	m_endStop = false;
+	m_dragging = false;
+	m_dragMove = false;
+	m_dragDidMove = false;
+
+	Rect r = this->rect;
+
+	Vec2 scrollTo = pos;
+
+	if ((scrollTo[0]+r.w) > m_contentSize[0]) {
+		scrollTo[0] = m_contentSize[0] - r.w;
+	}
+
+	if (scrollTo[0] < 0.f) { 
+		scrollTo[0] = 0.f;
+	}
+
+	if ((scrollTo[1]+r.h) > m_contentSize[1]) {
+		scrollTo[1] = m_contentSize[1] - r.h;
+	}
+
+	if (scrollTo[1] < 0.f) {
+		scrollTo[1] = 0.f;
+	}
+
+	m_scroll = -scrollTo;
+}
+
+void VListWidget::DoVerticalLayout() {
+	Vec2 pos(Vec2::Zero);
+
+	for (Widget::Vec::const_iterator it = m_widgets.begin(); it != m_widgets.end(); ++it) {
+		const Widget::Ref &w = *it;
+
+		Rect r = w->rect;
+		r.x += pos[0];
+		r.y += pos[1];
+
+		pos[1] += r.h;
+
+		w->rect = r;
+	}
+
+	RecalcLayout();
+}
+
 void VListWidget::RecalcLayout() {
 	Vec2 pos = m_scroll;
 
@@ -93,22 +146,17 @@ void VListWidget::RecalcLayout() {
 		const Widget::Ref &w = *it;
 
 		Rect r = w->rect;
-		r.x = pos[0];
-		r.y = pos[1];
-
-		if ((r.y+r.h) < 0.f) {
+		
+		if ((r.y+r.h+pos[1]) < 0.f) {
 			w->visible = false;
-		} else if (r.y > self.h) {
+		} else if ((r.y+pos[1]) > self.h) {
 			w->visible = false;
 		} else {
 			w->visible = true;
 		}
 
-		w->rect = r;
-
-		pos[1] += r.h;
-		m_contentSize[0] = std::max(m_contentSize[0], r.x+r.w-m_scroll[0]);
-		m_contentSize[1] = pos[1] - m_scroll[1];
+		m_contentSize[0] = std::max(m_contentSize[0], r.x+r.w);
+		m_contentSize[1] += r.h;
 	}
 }
 
@@ -253,8 +301,10 @@ void VListWidget::OnTick(float time, float dt) {
 		}
 	}
 
-	if (ApplyVelocity(dt))
+	if (ApplyVelocity(dt)) {
 		RecalcLayout();
+		this->contentPos = m_scroll;
+	}
 }
 
 bool VListWidget::ProcessInputEvent(const InputEvent &e, const TouchState *state, const InputState &is) {
@@ -346,8 +396,12 @@ void VListWidget::PushCallTable(lua_State *L) {
 	lua_setfield(L, -2, "AddItem");
 	lua_pushcfunction(L, lua_RemoveItem);
 	lua_setfield(L, -2, "RemoveItem");
+	lua_pushcfunction(L, lua_ScrollTo);
+	lua_setfield(L, -2, "ScrollTo");
 	lua_pushcfunction(L, lua_Items);
 	lua_setfield(L, -2, "Items");
+	lua_pushcfunction(L, lua_DoVerticalLayout);
+	lua_setfield(L, -2, "DoVerticalLayout");
 	lua_pushcfunction(L, lua_Clear);
 	lua_setfield(L, -2, "Clear");
 }
@@ -369,6 +423,18 @@ int VListWidget::lua_RemoveItem(lua_State *L) {
 	Ref self = GetRef<VListWidget>(L, "VListWidget", 1, true);
 	Widget::Ref widget = GetRef<Widget>(L, "Widget", 2, true);
 	self->RemoveItem(widget);
+	return 0;
+}
+
+int VListWidget::lua_ScrollTo(lua_State *L) {
+	Ref self = GetRef<VListWidget>(L, "VListWidget", 1, true);
+	self->ScrollTo(lua::Marshal<Vec2>::Get(L, 2, true));
+	return 0;
+}
+
+int VListWidget::lua_DoVerticalLayout(lua_State *L) {
+	Ref self = GetRef<VListWidget>(L, "VListWidget", 1, true);
+	self->DoVerticalLayout();
 	return 0;
 }
 

@@ -56,24 +56,6 @@ private:
 
 	RAD_DECLARE_GET(dimensions, Vec2);
 
-	void SetText(
-		lua_State *L,
-		const r::TextModel::String *strings,
-		int numStrings
-	);
-
-	void SetText(
-		lua_State *L,
-		const char *utf8String, 
-		float x = 0.0f, 
-		float y = 0.0f, 
-		float z = 0.0f, 
-		bool kern = true, 
-		float kernScale = 1.0f, 
-		float scaleX = 1.0f, 
-		float scaleY = 1.0f
-	);
-
 	UIW_DECL_SET(Typeface);
 	UIW_DECL_GET(Dimensions);
 

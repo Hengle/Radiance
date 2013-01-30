@@ -263,71 +263,51 @@ int Widget::NextWidgetId(lua_State *L) {
 	return s_id++;
 }
 
-Widget::Widget() : 
-L(0), 
-m_id(-1), 
-m_visible(true), 
-m_valign(kVerticalAlign_Center),
-m_halign(kHorizontalAlign_Center),
-m_positionMode(kPositionMode_Relative),
-m_gc(false),
-m_tick(false),
-m_capture(false),
-m_clip(false) {
-	m_fadeTime[0] = 0.f;
-	m_fadeTime[1] = 0.f;
-
-	for (int i = 0; i < 3; ++i)
-		m_color[i] = Vec4(1, 1, 1, 1);
-
-	m_scaleTime[0] = Vec2::Zero;
-	m_scaleTime[1] = Vec2::Zero;
-	m_scale[0] = m_scale[1] = m_scale[2] = Vec2(1, 1);
-
-	m_moveTime[0] = Vec2::Zero;
-	m_moveTime[1] = Vec2::Zero;
-	m_move[0] = m_move[1] = Vec2::Zero;
-
-	m_zRot = Vec3::Zero;
-	m_zRotPlusRate = Vec3::Zero;
-	m_zRotTime[0] = m_zRotTime[1] = Vec3::Zero;
-	m_zRate[0] = m_zRate[1] = 0.f;
+Widget::Widget() {
+	Init();
 }
 
-Widget::Widget(const Rect &r) : 
-L(0), 
-m_id(-1), 
-m_visible(true), 
-m_valign(kVerticalAlign_Center),
-m_halign(kHorizontalAlign_Center),
-m_positionMode(kPositionMode_Relative),
-m_gc(false),
-m_tick(false),
-m_capture(false),
-m_clip(false) {
-	m_fadeTime[0] = 0.f;
-	m_fadeTime[1] = 0.f;
-
-	for (int i = 0; i < 3; ++i)
-		m_color[i] = Vec4(1, 1, 1, 1);
-
-	m_scaleTime[0] = Vec2::Zero;
-	m_scaleTime[1] = Vec2::Zero;
-	m_scale[0] = m_scale[1] = m_scale[2] = Vec2(1, 1);
-
-	m_moveTime[0] = Vec2::Zero;
-	m_moveTime[1] = Vec2::Zero;
-	m_move[0] = m_move[1] = Vec2::Zero;
-
-	m_zRot = Vec3::Zero;
-	m_zRotPlusRate = Vec3::Zero;
-	m_zRotTime[0] = m_zRotTime[1] = Vec3::Zero;
-	m_zRate[0] = m_zRate[1] = 0.f;
+Widget::Widget(const Rect &r) {
+	Init();
+	m_rect = r;
 }
 
 Widget::~Widget() {
 	if (L)
 		Unmap(L);
+}
+
+void Widget::Init() {
+	L = 0;
+	m_id = -1;
+	m_visible = true;
+	m_valign = kVerticalAlign_Center;
+	m_halign = kHorizontalAlign_Center;
+	m_positionMode = kPositionMode_Relative;
+	m_gc = false;
+	m_tick = false;
+	m_capture = false;
+	m_clip = false;
+	m_contentPos = Vec2::Zero;
+
+	m_fadeTime[0] = 0.f;
+	m_fadeTime[1] = 0.f;
+
+	for (int i = 0; i < 3; ++i)
+		m_color[i] = Vec4(1, 1, 1, 1);
+
+	m_scaleTime[0] = Vec2::Zero;
+	m_scaleTime[1] = Vec2::Zero;
+	m_scale[0] = m_scale[1] = m_scale[2] = Vec2(1, 1);
+
+	m_moveTime[0] = Vec2::Zero;
+	m_moveTime[1] = Vec2::Zero;
+	m_move[0] = m_move[1] = Vec2::Zero;
+
+	m_zRot = Vec3::Zero;
+	m_zRotPlusRate = Vec3::Zero;
+	m_zRotTime[0] = m_zRotTime[1] = Vec3::Zero;
+	m_zRate[0] = m_zRate[1] = 0.f;
 }
 
 bool Widget::Spawn(lua_State *_L, lua_State *Lco, bool luaError) {
@@ -407,6 +387,7 @@ void Widget::PushCallTable(lua_State *L) {
 	LUART_REGISTER_GET(L, zAngle);
 	LUART_REGISTER_SET(L, ZAngle);
 	LUART_REGISTER_GETSET(L, ClipRect);
+	LUART_REGISTER_GETSET(L, ContentPos);
 }
 
 void Widget::CreateFromTable(lua_State *L) {
@@ -553,8 +534,12 @@ Rect Widget::ToScreen(const Rect &r) const {
 	Rect base(0, 0, 0, 0);
 
 	Ref p = m_parent.lock();
-	if (p)
+	if (p) {
 		base = p->screenRect;
+		Vec2 offset = p->contentPos;
+		base.x += offset[0];
+		base.y += offset[1];
+	}
 		
 	float sw = r.w * m_scale[0][0];
 	float sh = r.h * m_scale[0][1];
@@ -990,6 +975,7 @@ UIW_GET(Widget, zRotationSpeed, float, m_zRate[1]);
 UIW_SET(Widget, ZRotationSpeed, float, m_zRate[1]);
 UIW_GET(Widget, zAngle, float, m_zRate[0]);
 UIW_SET(Widget, ZAngle, float, m_zRate[0]);
+UIW_GETSET(Widget, ContentPos, Vec2, m_contentPos);
 
 int Widget::LUART_SETFN(Tick)(lua_State *L) {
 	Ref self = GetRef<Widget>(L, "Widget", 1, true);

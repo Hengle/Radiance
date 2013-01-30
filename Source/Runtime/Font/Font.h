@@ -167,6 +167,15 @@ public:
 		float kernScale
 	);
 
+	void SplitStringAtSize(
+		const char *utf8String,
+		String &first,
+		String &second,
+		float maxWidth,
+		bool kern,
+		float kernScale
+	);
+
 	UserGlyph *CopyGlyph() const;
 
 	RAD_DECLARE_READONLY_PROPERTY(Font, glyph, Glyph*);
