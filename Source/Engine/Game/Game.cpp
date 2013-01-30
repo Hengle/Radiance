@@ -615,8 +615,7 @@ void Game::ProcessInput() {
 		if (gesture && enabledGestures && touch && touch->gid != IG_Null && e.IsTouch() && !e.gesture) {
 			e.gesture = true;
 
-			if (GestureInput(e, m_inputState, g, *touch, enabledGestures))
-			{
+			if (GestureInput(e, m_inputState, g, *touch, enabledGestures)) {
 				OnGesture(g, *touch, m_inputState);
 			}
 

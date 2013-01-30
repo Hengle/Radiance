@@ -64,7 +64,7 @@ struct GConstants {
 
 // Helperes
 
-void IdentifyLineGesture(const InputEvent *e, const TouchState &touch, float n[2], bool &minSize, bool &isLine, bool scale) {
+void IdentifyLineGesture(const InputEvent *e, const TouchState &touch, float n[2], bool &minSize, bool &isLine, float scale) {
 	minSize = false;
 	isLine = false;
 
