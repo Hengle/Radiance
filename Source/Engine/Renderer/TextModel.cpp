@@ -150,8 +150,8 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings) {
 
 			font::GlyphCache::Batch *b = cache.BeginStringBatch(
 				string.utf8String, 
-				string.x, 
-				string.y, 
+				0, 
+				0, 
 				string.kern, 
 				string.kernScale
 			);
@@ -173,8 +173,8 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings) {
 
 					// TRI 1
 
-					v->x = FloorFastFloat(m->draw.x1 * string.scaleX + 0.5f);
-					v->y = FloorFastFloat(m->draw.y1 * string.scaleY + 0.5f);
+					v->x = (m->draw.x1 * string.scaleX) + string.x;
+					v->y = (m->draw.y1 * string.scaleY) + string.y;
 					//v->z = string.z;
 					v->s = m->bitmap.x1 / PageSize;
 					v->t = m->bitmap.y1 / PageSize;
@@ -188,8 +188,8 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings) {
 
 					++v;
 
-					v->x = FloorFastFloat(m->draw.x1 * string.scaleX + 0.5f);
-					v->y = FloorFastFloat(m->draw.y2 * string.scaleY + 0.5f);
+					v->x = (m->draw.x1 * string.scaleX) + string.x;
+					v->y = (m->draw.y2 * string.scaleY) + string.y;
 					//v->z = string.z;
 					v->s = m->bitmap.x1 / PageSize;
 					v->t = m->bitmap.y2 / PageSize;
@@ -203,8 +203,8 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings) {
 
 					++v;
 
-					v->x = FloorFastFloat(m->draw.x2 * string.scaleX + 0.5f);
-					v->y = FloorFastFloat(m->draw.y1 * string.scaleY + 0.5f);
+					v->x = (m->draw.x2 * string.scaleX) + string.x;
+					v->y = (m->draw.y1 * string.scaleY) + string.y;
 					//v->z = string.z;
 					v->s = m->bitmap.x2 / PageSize;
 					v->t = m->bitmap.y1 / PageSize;
@@ -225,8 +225,8 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings) {
 					*v = ptr[1];
 					++v;
 
-					v->x = FloorFastFloat(m->draw.x2 * string.scaleX + 0.5f);
-					v->y = FloorFastFloat(m->draw.y2 * string.scaleY + 0.5f);
+					v->x = (m->draw.x2 * string.scaleX) + string.x;
+					v->y = (m->draw.y2 * string.scaleY) + string.y;
 					//v->z = string.z;
 					v->s = m->bitmap.x2 / PageSize;
 					v->t = m->bitmap.y2 / PageSize;

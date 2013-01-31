@@ -403,7 +403,12 @@ void Font::StringDimensions(
 		U32 cp = utf8::unchecked::next(utf8String);
 
 		if (LoadGlyphFromChar(cp)) {
-			width += glyph->metrics->horzAdvance;
+			if (*utf8String) {
+				width += glyph->metrics->horzAdvance;
+			} else {
+				width += glyph->metrics->width+glyph->metrics->horzBearingX;
+			}
+
 			height = std::max<float>(height, glyph->metrics->height);
 			
 			if (kern && last)
@@ -431,55 +436,54 @@ StringVec Font::WordWrapString(
 	String cur;
 	const String kSpace(CStr(" "));
 
-	for (; *end; ++end) {
-		if (*end == 32) { // space (word break)
-			if (start == end) {
-				continue;
-			}
-
-			String x(start, end-start);
-			String test;
-
-			if (!cur.empty) {
-				test = cur + kSpace + x;
-			} else {
-				test = x;
-			}
-
-			float w, h;
-
-			StringDimensions(
-				test.c_str,
-				w,
-				h,
-				kern,
-				kernScale
-			);
-
-			if (w > maxWidth) {
-				if (!cur.empty) {
-					strings.push_back(cur);
-					cur = x;
-				} else {
-					strings.push_back(test); // single word too big
+	if (*end) {
+		for(;;) {
+			if ((*end == 32) || (*end == 0)) { // space/null (word break)
+				if (start == end) {
+					continue;
 				}
+
+				String x(start, end-start);
+				String test;
+
+				if (!cur.empty) {
+					test = cur + kSpace + x;
+				} else {
+					test = x;
+				}
+
+				float w, h;
+
+				StringDimensions(
+					test.c_str,
+					w,
+					h,
+					kern,
+					kernScale
+				);
+
+				if (w > maxWidth) {
+					if (!cur.empty) {
+						strings.push_back(cur);
+						cur = x;
+					} else {
+						strings.push_back(test); // single word too big
+					}
+				} else {
+					cur = test;
+				}
+
 				start = end+1;
-			} else {
-				cur = test;
 			}
+
+			if (*end == 0)
+				break;
+			++end;
 		}
 	}
 
-	if ((start+1) < end) { // don't add an empty string
-		String x(start, end-start);
-		if (cur.empty) {
-			cur = x;
-		} else {
-			cur = cur + kSpace + x;
-		}
-
+	if (!cur.empty)
 		strings.push_back(cur);
-	}
 
 	return strings;
 }
@@ -543,6 +547,8 @@ void Font::SplitStringAtSize(
 			} else {
 				cur = test;
 			}
+
+			start = end+1;
 		}
 	}
 
@@ -826,10 +832,10 @@ GlyphCache::CharDraw *GlyphCache::Precache() {
 		if (m_kern && lastGlyph != 0)
 			x += m_font->Kerning(lastGlyph, draw->glyph) * m_kernScale;
 
-		metrics->draw.x1 = FloorFastFloat(x + draw->item->bearingX + 0.5f);
-		metrics->draw.x2 = FloorFastFloat(metrics->draw.x1 + (float)cell->bmWidth + 0.5f);
-		metrics->draw.y1 = FloorFastFloat(y + m_tallest - draw->item->bearingY + 0.5f);
-		metrics->draw.y2 = FloorFastFloat(metrics->draw.y1 + (float)cell->bmHeight + 0.5f);
+		metrics->draw.x1 = x + draw->item->bearingX;
+		metrics->draw.x2 = metrics->draw.x1 + (float)cell->bmWidth;
+		metrics->draw.y1 = y + m_tallest - draw->item->bearingY;
+		metrics->draw.y2 = metrics->draw.y1 + (float)cell->bmHeight;
 
 		x += draw->item->advance;
 		m_orgX = x;

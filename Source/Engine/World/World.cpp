@@ -433,6 +433,10 @@ void World::FlushEvents() {
 }
 
 bool World::HandleInputEvent(const InputEvent &e, const TouchState *touch, const InputState &is) {
+
+	if (m_lua->InputEventFilter(e, touch, is))
+		return true;
+
 	bool handled = false;
 
 	if (m_uiRoot->HandleInputEvent(e, touch, is)) {
@@ -448,6 +452,8 @@ bool World::HandleInputEvent(const InputEvent &e, const TouchState *touch, const
 }
 
 bool World::HandleInputGesture(const InputGesture &g, const TouchState &touch, const InputState &is) {
+	if (m_lua->InputGestureFilter(g, touch, is))
+		return true;
 	if (m_uiRoot->HandleInputGesture(g, touch, is))
 		return true;
 	return m_lua->HandleInputGesture(g, touch, is);

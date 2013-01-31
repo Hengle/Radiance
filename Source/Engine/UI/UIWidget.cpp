@@ -288,6 +288,7 @@ void Widget::Init() {
 	m_tick = false;
 	m_capture = false;
 	m_clip = false;
+	m_blendWithParent = false;
 	m_contentPos = Vec2::Zero;
 
 	m_fadeTime[0] = 0.f;
@@ -388,6 +389,7 @@ void Widget::PushCallTable(lua_State *L) {
 	LUART_REGISTER_SET(L, ZAngle);
 	LUART_REGISTER_GETSET(L, ClipRect);
 	LUART_REGISTER_GETSET(L, ContentPos);
+	LUART_REGISTER_GETSET(L, BlendWithParent);
 }
 
 void Widget::CreateFromTable(lua_State *L) {
@@ -817,7 +819,7 @@ bool Widget::HandleInputEvent(const InputEvent &e, const TouchState *touch, cons
 	if (!visible)
 		return false;
 
-	if (InputEventFilter(e, touch, is))
+	if ((m_capture || InBounds(e)) && InputEventFilter(e, touch, is))
 		return true;
 
 	for (Vec::const_reverse_iterator it = m_children.rbegin(); it != m_children.rend(); ++it) {
@@ -857,7 +859,7 @@ bool Widget::HandleInputGesture(const InputGesture &g, const TouchState &touch, 
 	if (!visible)
 		return false;
 
-	if (InputGestureFilter(g, touch, is))
+	if ((m_capture || InBounds(g)) && InputGestureFilter(g, touch, is))
 		return false;
 
 	for (Vec::const_reverse_iterator it = m_children.rbegin(); it != m_children.rend(); ++it) {
@@ -898,10 +900,31 @@ bool Widget::HandleInputGesture(const InputGesture &g, const TouchState &touch, 
 }
 
 bool Widget::RAD_IMPLEMENT_GET(visible) {
-	return m_visible && 
+	bool r = m_visible && 
 		(m_color[0][3] > 0.f) && 
 		(m_scale[0][0] > 0.f) &&
 		(m_scale[0][1] > 0.f);
+
+	if (r) {
+		if (m_blendWithParent) {
+			Vec4 rgba = this->blendedColor;
+			r = rgba[3] > 0.f;
+		}
+	}
+
+	return r;
+}
+
+Vec4 Widget::RAD_IMPLEMENT_GET(blendedColor) {
+	if (!m_blendWithParent)
+		return m_color[0];
+
+	Vec4 rgba = m_color[0];
+	Widget::Ref parent = m_parent.lock();
+	if (parent) {
+		rgba *= parent->blendedColor;
+	}
+	return rgba;
 }
 
 int Widget::lua_AddChild(lua_State *L) {
@@ -976,6 +999,7 @@ UIW_SET(Widget, ZRotationSpeed, float, m_zRate[1]);
 UIW_GET(Widget, zAngle, float, m_zRate[0]);
 UIW_SET(Widget, ZAngle, float, m_zRate[0]);
 UIW_GETSET(Widget, ContentPos, Vec2, m_contentPos);
+UIW_GETSET(Widget, BlendWithParent, bool, m_blendWithParent);
 
 int Widget::LUART_SETFN(Tick)(lua_State *L) {
 	Ref self = GetRef<Widget>(L, "Widget", 1, true);

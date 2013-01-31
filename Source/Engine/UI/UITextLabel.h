@@ -56,7 +56,7 @@ private:
 
 	RAD_DECLARE_GET(dimensions, Vec2);
 
-	UIW_DECL_SET(Typeface);
+	UIW_DECL_GETSET(Typeface);
 	UIW_DECL_GET(Dimensions);
 
 	static int lua_SetText(lua_State *L);

@@ -76,7 +76,7 @@ void MatWidget::OnDraw(const Rect *clip) {
 		*m_material->material.get(),
 		m_loader,
 		true,
-		this->color
+		this->blendedColor
 	);
 }
 

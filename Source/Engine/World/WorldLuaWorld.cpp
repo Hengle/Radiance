@@ -31,6 +31,38 @@
 
 namespace world {
 
+bool WorldLua::InputEventFilter(const InputEvent &e, const TouchState *touch, const InputState &is) {
+	if (!PushGlobalCall("World.InputEventFilter"))
+		return false;
+	lua_State *L = m_L->L;
+
+	lua::Marshal<InputEvent>::Push(L, e, touch);	
+
+	bool r = false;
+	if (Call("WorldLua::InputEventFilter", 1, 1, 0)) {
+		r = lua_toboolean(L, -1) ? true : false;
+		lua_pop(L, 1);
+	}
+
+	return r;
+}
+
+bool WorldLua::InputGestureFilter(const InputGesture &g, const TouchState &touch, const InputState &is) {
+	if (!PushGlobalCall("World.InputGestureFilter"))
+		return false;
+	lua_State *L = m_L->L;
+
+	lua::Marshal<InputGesture>::Push(L, g, touch);
+
+	bool r = false;
+	if (Call("World::InputGestureFilter", 1, 1, 0)) {
+		r = lua_toboolean(L, -1) ? true : false;
+		lua_pop(L, 1);
+	}
+
+	return r;
+}
+
 bool WorldLua::HandleInputEvent(const InputEvent &e, const TouchState *touch, const InputState &is) {
 	if (!PushGlobalCall("World.OnInputEvent"))
 		return false;

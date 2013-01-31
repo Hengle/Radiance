@@ -167,13 +167,13 @@ int TextLabel::lua_SetText(lua_State *L) {
 			lua_pushstring(L, "scaleX");
 			lua_gettable(L, -2);
 			if (!lua_isnil(L, -1))
-				modelString.kernScale = (float)luaL_checknumber(L, -1);
+				modelString.scaleX = (float)luaL_checknumber(L, -1);
 			lua_pop(L, 1);
 
 			lua_pushstring(L, "scaleY");
 			lua_gettable(L, -2);
 			if (!lua_isnil(L, -1))
-				modelString.kernScale = (float)luaL_checknumber(L, -1);
+				modelString.scaleY = (float)luaL_checknumber(L, -1);
 			lua_pop(L, 1);
 
 			modelStrings.push_back(modelString);
@@ -245,7 +245,7 @@ void TextLabel::OnDraw(const Rect *clip) {
 		*m_parser->material.get(),
 		*m_textModel,
 		true,
-		this->color
+		this->blendedColor
 	);
 }
 
@@ -261,7 +261,7 @@ void TextLabel::PushCallTable(lua_State *L) {
 	lua_pushcfunction(L, lua_SetText);
 	lua_setfield(L, -2, "SetText");
 	LUART_REGISTER_GET(L, Dimensions);
-	LUART_REGISTER_SET(L, Typeface);
+	LUART_REGISTER_GETSET(L, Typeface);
 }
 
 int TextLabel::LUART_SETFN(Typeface)(lua_State *L) {
@@ -270,6 +270,15 @@ int TextLabel::LUART_SETFN(Typeface)(lua_State *L) {
 	if (f)
 		w->BindTypeface(f->asset);
 	return 0;
+}
+
+int TextLabel::LUART_GETFN(Typeface)(lua_State *L) {
+	Ref w = GetRef<TextLabel>(L, "TextLabel", 1, true);
+	if (!w->m_typeface)
+		return 0;
+	D_Typeface::Ref f = D_Typeface::New(w->m_typeface);
+	f->Push(L);
+	return 1;
 }
 
 UIW_GET(TextLabel, Dimensions, Vec2, dimensions);

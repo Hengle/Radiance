@@ -44,6 +44,9 @@ public:
 	bool Call(const char *context, int nargs, int nresults, int errfunc);
 	bool CreateEntity(Entity &ent, int id, const char *classname);
 
+	bool InputEventFilter(const InputEvent &e, const TouchState *touch, const InputState &is);
+	bool InputGestureFilter(const InputGesture &g, const TouchState &touch, const InputState &is);
+
 	bool HandleInputEvent(const InputEvent &e, const TouchState *touch, const InputState &is);
 	bool HandleInputGesture(const InputGesture &g, const TouchState &touch, const InputState &is);
 

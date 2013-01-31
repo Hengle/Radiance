@@ -230,6 +230,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Widget, screenRect, Rect);
 	RAD_DECLARE_READONLY_PROPERTY(Widget, id, int);
 	RAD_DECLARE_READONLY_PROPERTY(Widget, color, const Vec4&);
+	RAD_DECLARE_READONLY_PROPERTY(Widget, blendedColor, Vec4); // may include parent
 	RAD_DECLARE_READONLY_PROPERTY(Widget, zRot, const Vec3&);
 	RAD_DECLARE_READONLY_PROPERTY(Widget, zRotScreen, Vec3);
 	RAD_DECLARE_PROPERTY(Widget, rect, const Rect &, const Rect&);
@@ -242,6 +243,7 @@ public:
 	RAD_DECLARE_PROPERTY(Widget, clip, bool, bool);
 	RAD_DECLARE_PROPERTY(Widget, clipRect, const Rect&, const Rect&); // <-- widget space
 	RAD_DECLARE_PROPERTY(Widget, contentPos, const Vec2&, const Vec2);
+	RAD_DECLARE_PROPERTY(Widget, blendWithParent, bool, bool);
 	
 	void Tick(float time, float dt);
 	//! clip rect is in screen space
@@ -347,6 +349,7 @@ private:
 	UIW_DECL_SET(ZAngle);
 	UIW_DECL_GETSET(ClipRect);
 	UIW_DECL_GETSET(ContentPos);
+	UIW_DECL_GETSET(BlendWithParent);
 
 	RAD_DECLARE_GET(parent, Ref) { 
 		return m_parent.lock(); 
@@ -454,6 +457,16 @@ private:
 		m_contentPos = value;
 	}
 
+	RAD_DECLARE_GET(blendWithParent, bool) {
+		return m_blendWithParent;
+	}
+
+	RAD_DECLARE_SET(blendWithParent, bool) {
+		m_blendWithParent = value;
+	}
+
+	RAD_DECLARE_GET(blendedColor, Vec4);
+
 	Vec m_children;
 	Rect m_rect;
 	Rect m_clipRect;
@@ -482,6 +495,7 @@ private:
 	bool m_tick;
 	bool m_capture;
 	bool m_clip;
+	bool m_blendWithParent;
 
 	static int NextWidgetId(lua_State *L);
 	static int s_id;
