@@ -22,7 +22,7 @@ struct RADENG_CLASS DMesh {
 	typedef zone_vector<DMesh, ZMeshT>::type Vec;
 
 	enum {
-		kNumVertexFloats = 12
+		kNumVertexFloats = 14
 	};
 
 	U16 numVerts;

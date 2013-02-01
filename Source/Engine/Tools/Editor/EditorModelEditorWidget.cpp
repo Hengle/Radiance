@@ -302,7 +302,7 @@ void ModelEditorWidget::Draw(Material::Sort sort) {
 			m.Draw();
 			mat->shader->End();
 		}
-	} else {
+	} else if (m_bundle) {
 		for (int i = 0; i < m_bundle->numMeshes; ++i) {
 			asset::MaterialLoader::Ref loader = asset::MaterialLoader::Cast(
 				m_bundle->MaterialAsset(i)
@@ -516,7 +516,7 @@ void ModelEditorWidget::DrawMeshNormals(bool normals, bool tangents) {
 			Vec3 n(verts[3], verts[4], verts[5]);
 			
 			if (tangents) {
-				const float *f = verts + 10;
+				const float *f = verts + 6;
 
 				for (U16 k = 0; k < m.numChannels; ++k) {
 					Vec3 t(f[0], f[1], f[2]);
@@ -547,7 +547,7 @@ void ModelEditorWidget::DrawMeshNormals(bool normals, bool tangents) {
 				glEnd();
 			}
 
-			verts += ska::DMesh::kNumVertexFloats;
+			verts += asset::DMesh::kNumVertexFloats;
 		}
 	}
 }
@@ -569,7 +569,7 @@ void ModelEditorWidget::Tick(float dt) {
 			RAD_ASSERT(parser);
 			parser->material->Sample(App::Get()->time, dt);
 		}
-	} else {
+	} else if (m_bundle) {
 		asset::MeshMaterialLoader::Ref meshMaterials = asset::MeshMaterialLoader::Cast(m_bundle->asset);
 		RAD_ASSERT(meshMaterials);
 
