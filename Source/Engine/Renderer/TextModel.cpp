@@ -114,6 +114,9 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings) {
 	BOOST_STATIC_ASSERT(sizeof(VertexType)==16);
 	RAD_ASSERT(m_fontInstance);
 	m_passes.clear();
+
+	m_orgX = std::numeric_limits<float>::max();
+	m_orgY = std::numeric_limits<float>::max();
 	m_width = 0;
 	m_height = 0;
 
@@ -137,12 +140,7 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings) {
 		font::GlyphCache &cache = m_fontInstance->cache;
 
 		int ofs = 0;
-		float xs[2];
-		float ys[2];
 		
-		ys[0] = xs[0] = std::numeric_limits<float>::max();
-		ys[1] = xs[1] = -std::numeric_limits<float>::max();
-
 		for (int i = 0; i < numStrings ; ++i) {
 			const String &string = strings[i];
 			if (!string.utf8String || string.utf8String[0] == 0)
@@ -155,6 +153,8 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings) {
 				string.kern, 
 				string.kernScale
 			);
+
+			float height = 0;
 
 			while (b) {
 				RAD_ASSERT(ptr);
@@ -173,49 +173,55 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings) {
 
 					// TRI 1
 
-					v->x = (m->draw.x1 * string.scaleX) + string.x;
-					v->y = (m->draw.y1 * string.scaleY) + string.y;
-					//v->z = string.z;
+					float x = (m->draw.x1 * string.scaleX);
+					float y = (m->draw.y1 * string.scaleY);
+
+					m_width = std::max(m_width, x);
+					height  = std::max(height, y);
+
+					v->x = x + string.x;
+					v->y = y + string.y;
+
+					m_orgX = std::min(m_orgX, v->x);
+					m_orgY = std::min(m_orgY, v->y);
+
 					v->s = m->bitmap.x1 / PageSize;
 					v->t = m->bitmap.y1 / PageSize;
 					
-					// will handle negatively scaled fonts.
-
-					xs[0] = std::min(v->x, xs[0]);
-					xs[1] = std::max(v->x, xs[1]);
-					ys[0] = std::min(v->y, ys[0]);
-					ys[1] = std::max(v->y, ys[1]);
-
 					++v;
 
-					v->x = (m->draw.x1 * string.scaleX) + string.x;
-					v->y = (m->draw.y2 * string.scaleY) + string.y;
-					//v->z = string.z;
+					x = (m->draw.x1 * string.scaleX);
+					y = (m->draw.y2 * string.scaleY);
+					
+					m_width = std::max(m_width, x);
+					height  = std::max(height, y);
+
+					v->x = x + string.x;
+					v->y = y + string.y;
+
+					m_orgX = std::min(m_orgX, v->x);
+					m_orgY = std::min(m_orgY, v->y);
+
 					v->s = m->bitmap.x1 / PageSize;
 					v->t = m->bitmap.y2 / PageSize;
 					
-					// will handle negatively scaled fonts.
-
-					xs[0] = std::min(v->x, xs[0]);
-					xs[1] = std::max(v->x, xs[1]);
-					ys[0] = std::min(v->y, ys[0]);
-					ys[1] = std::max(v->y, ys[1]);
-
 					++v;
 
-					v->x = (m->draw.x2 * string.scaleX) + string.x;
-					v->y = (m->draw.y1 * string.scaleY) + string.y;
-					//v->z = string.z;
+					x = (m->draw.x2 * string.scaleX);
+					y = (m->draw.y1 * string.scaleY);
+					
+					m_width = std::max(m_width, x);
+					height  = std::max(height, y);
+
+					v->x = x + string.x;
+					v->y = y + string.y;
+
+					m_orgX = std::min(m_orgX, v->x);
+					m_orgY = std::min(m_orgY, v->y);
+
 					v->s = m->bitmap.x2 / PageSize;
 					v->t = m->bitmap.y1 / PageSize;
 					
-					// will handle negatively scaled fonts.
-
-					xs[0] = std::min(v->x, xs[0]);
-					xs[1] = std::max(v->x, xs[1]);
-					ys[0] = std::min(v->y, ys[0]);
-					ys[1] = std::max(v->y, ys[1]);
-
 					++v;
 
 					// TRI 2
@@ -225,19 +231,21 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings) {
 					*v = ptr[1];
 					++v;
 
-					v->x = (m->draw.x2 * string.scaleX) + string.x;
-					v->y = (m->draw.y2 * string.scaleY) + string.y;
-					//v->z = string.z;
+					x = (m->draw.x2 * string.scaleX);
+					y = (m->draw.y2 * string.scaleY);
+					
+					m_width = std::max(m_width, x);
+					height  = std::max(height, y);
+
+					v->x = x + string.x;
+					v->y = y + string.y;
+
+					m_orgX = std::min(m_orgX, v->x);
+					m_orgY = std::min(m_orgY, v->y);
+
 					v->s = m->bitmap.x2 / PageSize;
 					v->t = m->bitmap.y2 / PageSize;
 					
-					// will handle negatively scaled fonts.
-
-					xs[0] = std::min(v->x, xs[0]);
-					xs[1] = std::max(v->x, xs[1]);
-					ys[0] = std::min(v->y, ys[0]);
-					ys[1] = std::max(v->y, ys[1]);
-
 					ptr += 6;
 				}
 
@@ -247,15 +255,12 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings) {
 				b = cache.NextStringBatch();
 			}
 
+			m_height = std::max(m_height, height+string.y);
+
 			cache.EndStringBatch();
 		}
 
 		UnlockVerts();
-	
-		m_orgX = xs[0];
-		m_orgY = ys[0];
-		m_width = xs[1] - xs[0];
-		m_height = ys[1] - ys[0];
 	}
 }
 

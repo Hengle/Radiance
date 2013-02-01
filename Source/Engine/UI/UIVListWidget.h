@@ -33,10 +33,10 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(VListWidget, contentSize, const Vec2&);
 	RAD_DECLARE_READONLY_PROPERTY(VListWidget, items, const Widget::Vec*);
 
-	void ItemChanged();
+	void RecalcLayout();
 	void AddItem(const Widget::Ref &widget);
 	void RemoveItem(const Widget::Ref &widget);
-	void ScrollTo(const Vec2 &pos);
+	void ScrollTo(const Vec2 &pos, float time);
 	void Clear();
 	void DoVerticalLayout();
 
@@ -49,7 +49,6 @@ protected:
 private:
 
 	void Init();
-	void RecalcLayout();
 	void Drag(const InputEvent &e);
 	bool ProcessInputEvent(const InputEvent &e, const TouchState *state, const InputState &is);
 	void CheckPostDelayedInput();
@@ -105,7 +104,7 @@ private:
 		return &m_widgets;
 	}
 
-	static int lua_ItemChanged(lua_State *L);
+	static int lua_RecalcLayout(lua_State *L);
 	static int lua_AddItem(lua_State *L);
 	static int lua_RemoveItem(lua_State *L);
 	static int lua_ScrollTo(lua_State *L);
@@ -133,6 +132,8 @@ private:
 	Vec2 m_contentSize;
 	Vec2 m_endStops;
 	Vec2 m_dragMotion;
+	Vec2 m_scrollTo[2];
+	float m_scrollTime[2];
 	float m_friction;
 	bool m_dragging;
 	bool m_dragMove;

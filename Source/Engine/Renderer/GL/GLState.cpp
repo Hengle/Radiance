@@ -240,10 +240,11 @@ void GLState::CommitSB(S &s, bool f)
 	}
 
 	if (ss&kScissorTest_Flags) {
-		if (ss&kScissorTest_Enable)
+		if (ss&kScissorTest_Enable) {
 			glEnable(GL_SCISSOR_TEST);
-		else
+		} else {
 			glDisable(GL_SCISSOR_TEST);
+		}
 
 		s.d.s &= ~kScissorTest_Flags;
 		s.d.s |= s.s.s&kScissorTest_Flags;

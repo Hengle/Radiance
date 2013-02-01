@@ -66,10 +66,12 @@ void GLDraw::DrawRect(
 		flags |= kScissorTest_Enable;
 		gls.Scissor(
 			FloorFastInt(clip->x),
-			FloorFastInt(m_vp[3]-clip->y),
+			FloorFastInt(m_vp[3]-(clip->y+clip->h)),
 			FloorFastInt(clip->w),
 			FloorFastInt(clip->h)
 		);
+	} else {
+		flags |= kScissorTest_Disable;
 	}
 
 	gl.MatrixMode(GL_MODELVIEW);
@@ -141,10 +143,12 @@ void GLDraw::DrawTextModel(
 		flags |= kScissorTest_Enable;
 		gls.Scissor(
 			FloorFastInt(clip->x),
-			FloorFastInt(m_vp[3]-clip->y),
+			FloorFastInt(m_vp[3]-(clip->y+clip->h)),
 			FloorFastInt(clip->w),
 			FloorFastInt(clip->h)
 		);
+	} else {
+		flags |= kScissorTest_Disable;
 	}
 
 	gl.MatrixMode(GL_MODELVIEW);

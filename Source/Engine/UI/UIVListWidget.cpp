@@ -43,10 +43,9 @@ void VListWidget::Init() {
 	m_vertex.drag[1] = 10;
 	m_vertex.inner = false;
 	m_vertex.outer = true;
-}
 
-void VListWidget::ItemChanged() {
-	RecalcLayout();
+	m_scrollTo[0] = m_scrollTo[1] = Vec2::Zero;
+	m_scrollTime[0] = m_scrollTime[1] = 0.f;
 }
 
 void VListWidget::Clear() {
@@ -85,7 +84,7 @@ void VListWidget::RemoveItem(const Widget::Ref &widget) {
 	}
 }
 
-void VListWidget::ScrollTo(const Vec2 &pos) {
+void VListWidget::ScrollTo(const Vec2 &pos, float time) {
 	// cancel any drag or motion
 	m_e.type = InputEvent::T_Invalid;
 	m_velocity = Vec2::Zero;
@@ -114,7 +113,16 @@ void VListWidget::ScrollTo(const Vec2 &pos) {
 		scrollTo[1] = 0.f;
 	}
 
-	m_scroll = -scrollTo;
+	m_scrollTime[0] = 0.f;
+
+	if (time > 0.f) {
+		m_scrollTime[1] = 0.f;
+		m_scroll = -scrollTo;
+	} else {
+		m_scrollTime[1] = time;
+		m_scrollTo[0] = m_scroll;
+		m_scrollTo[1] = -scrollTo;
+	}
 }
 
 void VListWidget::DoVerticalLayout() {
@@ -254,6 +262,8 @@ void VListWidget::Scroll(const Vec2 &delta) {
 bool VListWidget::ApplyVelocity(float dt) {
 	if (m_dragMove)
 		return true;
+	if (m_scrollTime[1] > 0.f)
+		return true;
 	if (m_dragging)
 		return false;
 	if (m_endStop) {
@@ -301,6 +311,16 @@ void VListWidget::OnTick(float time, float dt) {
 		}
 	}
 
+	if (m_scrollTime[1] > 0.f) {
+		m_scrollTime[0] += dt;
+		if (m_scrollTime[0] >= m_scrollTime[1]) {
+			m_scrollTime[1] = 0.f;
+			m_scroll = m_scrollTo[1];
+		} else {
+			m_scroll = math::Lerp(m_scrollTo[0], m_scrollTo[1], m_scrollTime[0]/m_scrollTime[1]);
+		}
+	}
+
 	if (ApplyVelocity(dt)) {
 		RecalcLayout();
 		this->contentPos = m_scroll;
@@ -336,6 +356,7 @@ bool VListWidget::InputEventFilter(const InputEvent &e, const TouchState *state,
 		m_checkDelayed = false;
 		m_velocity = Vec2::Zero;
 		m_dragMotion = Vec2::Zero;
+		m_scrollTime[1] = 0.f; // kill any scrolling
 		return true;
 	} else if (e.touch != m_e.touch) {
 		return false; // not our touch
@@ -390,8 +411,8 @@ void VListWidget::PushCallTable(lua_State *L) {
 	LUART_REGISTER_GETSET(L, Friction);
 	LUART_REGISTER_GETSET(L, EndStops);
 	LUART_REGISTER_GET(L, ContentSize);
-	lua_pushcfunction(L, lua_ItemChanged);
-	lua_setfield(L, -2, "ItemChanged");
+	lua_pushcfunction(L, lua_RecalcLayout);
+	lua_setfield(L, -2, "RecalcLayout");
 	lua_pushcfunction(L, lua_AddItem);
 	lua_setfield(L, -2, "AddItem");
 	lua_pushcfunction(L, lua_RemoveItem);
@@ -406,9 +427,9 @@ void VListWidget::PushCallTable(lua_State *L) {
 	lua_setfield(L, -2, "Clear");
 }
 
-int VListWidget::lua_ItemChanged(lua_State *L) {
+int VListWidget::lua_RecalcLayout(lua_State *L) {
 	Ref self = GetRef<VListWidget>(L, "VListWidget", 1, true);
-	self->ItemChanged();
+	self->RecalcLayout();
 	return 0;
 }
 
@@ -428,7 +449,10 @@ int VListWidget::lua_RemoveItem(lua_State *L) {
 
 int VListWidget::lua_ScrollTo(lua_State *L) {
 	Ref self = GetRef<VListWidget>(L, "VListWidget", 1, true);
-	self->ScrollTo(lua::Marshal<Vec2>::Get(L, 2, true));
+	self->ScrollTo(
+		lua::Marshal<Vec2>::Get(L, 2, true),
+		(float)luaL_checknumber(L, 3)
+	);
 	return 0;
 }
 

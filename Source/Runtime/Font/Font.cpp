@@ -396,9 +396,10 @@ void Font::StringDimensions(
 
 	width = 0;
 	height = 0;
-
 	U32 last = 0;
 
+	float tallest = this->ascenderPixels;
+	
 	while (*utf8String) {
 		U32 cp = utf8::unchecked::next(utf8String);
 
@@ -406,10 +407,13 @@ void Font::StringDimensions(
 			if (*utf8String) {
 				width += glyph->metrics->horzAdvance;
 			} else {
-				width += glyph->metrics->width+glyph->metrics->horzBearingX;
+				width += glyph->metrics->horzBearingX+glyph->metrics->width;
 			}
 
-			height = std::max<float>(height, glyph->metrics->height);
+			float mhorzY = glyph->metrics->horzBearingY;
+			float mheight = glyph->metrics->height;
+
+			height = std::max(height, tallest - mhorzY + mheight);
 			
 			if (kern && last)
 				width += Kerning(last, cp) * kernScale;
