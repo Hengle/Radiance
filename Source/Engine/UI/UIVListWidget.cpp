@@ -164,7 +164,7 @@ void VListWidget::RecalcLayout() {
 		}
 
 		m_contentSize[0] = std::max(m_contentSize[0], r.x+r.w);
-		m_contentSize[1] += r.h;
+		m_contentSize[1] = std::max(m_contentSize[1], r.y+r.h);
 	}
 }
 
