@@ -115,9 +115,10 @@ void VListWidget::ScrollTo(const Vec2 &pos, float time) {
 
 	m_scrollTime[0] = 0.f;
 
-	if (time > 0.f) {
+	if (time <= 0.f) {
 		m_scrollTime[1] = 0.f;
 		m_scroll = -scrollTo;
+		RecalcLayout();
 	} else {
 		m_scrollTime[1] = time;
 		m_scrollTo[0] = m_scroll;
@@ -262,8 +263,6 @@ void VListWidget::Scroll(const Vec2 &delta) {
 bool VListWidget::ApplyVelocity(float dt) {
 	if (m_dragMove)
 		return true;
-	if (m_scrollTime[1] > 0.f)
-		return true;
 	if (m_dragging)
 		return false;
 	if (m_endStop) {
@@ -319,9 +318,11 @@ void VListWidget::OnTick(float time, float dt) {
 		} else {
 			m_scroll = math::Lerp(m_scrollTo[0], m_scrollTo[1], m_scrollTime[0]/m_scrollTime[1]);
 		}
-	}
 
-	if (ApplyVelocity(dt)) {
+		RecalcLayout();
+		this->contentPos = m_scroll;
+	}
+	else if (ApplyVelocity(dt)) {
 		RecalcLayout();
 		this->contentPos = m_scroll;
 	}
