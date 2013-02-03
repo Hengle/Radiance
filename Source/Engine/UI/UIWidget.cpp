@@ -112,8 +112,8 @@ void Root::Draw(const Rect *clip, bool children) {
 bool Root::HandleInputEvent(const InputEvent &_e, const TouchState *touch, const InputState &is) {
 	InputEvent e = Map(_e);
 
-	if (e.IsKeyboard()) {
-		return m_focus ? m_focus->HandleInputEvent(e, touch, is) : false;
+	if (e.IsKeyboard() && m_focus) {
+		return m_focus->HandleInputEvent(e, touch, is);
 	}
 
 	if (m_capture) {
@@ -819,7 +819,7 @@ bool Widget::HandleInputEvent(const InputEvent &e, const TouchState *touch, cons
 	if (!visible)
 		return false;
 
-	if ((m_capture || InBounds(e)) && InputEventFilter(e, touch, is))
+	if ((m_capture || e.IsKeyboard() || InBounds(e)) && InputEventFilter(e, touch, is))
 		return true;
 
 	for (Vec::const_reverse_iterator it = m_children.rbegin(); it != m_children.rend(); ++it) {
@@ -828,7 +828,7 @@ bool Widget::HandleInputEvent(const InputEvent &e, const TouchState *touch, cons
 			return true;
 	}
 
-	if (!m_capture && !InBounds(e))
+	if (!m_capture && (!e.IsKeyboard() && !InBounds(e)))
 		return false;
 
 	InputEvent local(e);
