@@ -619,7 +619,7 @@ void ContentBrowserView::DeleteSelection()
 	SelSet sel(m_sel);
 	
 	String msg;
-	msg.Printf("Are you sure you want to delete the following %d item(s)?"RAD_NEWLINE, sel.size());
+	msg.Printf("Are you sure you want to delete the following %d item(s)?" RAD_NEWLINE, sel.size());
 
 	{
 		String x;
@@ -644,7 +644,7 @@ void ContentBrowserView::DeleteSelection()
 			x += "...";
 		}
 
-		msg += "Assets:"RAD_NEWLINE+x;
+		msg += "Assets:" RAD_NEWLINE+x;
 	}
 
 	if (QMessageBox::question(

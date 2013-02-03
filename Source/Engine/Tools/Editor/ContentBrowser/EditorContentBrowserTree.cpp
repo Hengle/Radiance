@@ -266,7 +266,7 @@ void ContentBrowserTree::Delete(const pkg::PackageVec &pkgs, const pkg::IdVec &i
 {
 	enum { MaxItems = 10 };
 	String msg;
-	msg.Printf("Are you sure you want to delete the following %d item(s)?"RAD_NEWLINE, pkgs.size()+ids.size());
+	msg.Printf("Are you sure you want to delete the following %d item(s)?" RAD_NEWLINE, pkgs.size()+ids.size());
 
 	if (!pkgs.empty())
 	{
@@ -288,7 +288,7 @@ void ContentBrowserTree::Delete(const pkg::PackageVec &pkgs, const pkg::IdVec &i
 			x += "...";
 		}
 
-		msg += "Packages:"RAD_NEWLINE+x+RAD_NEWLINE;
+		msg += "Packages:" RAD_NEWLINE+x+RAD_NEWLINE;
 	}
 
 	if (!ids.empty())
@@ -315,7 +315,7 @@ void ContentBrowserTree::Delete(const pkg::PackageVec &pkgs, const pkg::IdVec &i
 			x += "...";
 		}
 
-		msg += "Assets:"RAD_NEWLINE+x;
+		msg += "Assets:" RAD_NEWLINE+x;
 	}
 
 	if (QMessageBox::question(

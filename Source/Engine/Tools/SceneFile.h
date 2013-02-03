@@ -60,7 +60,7 @@ public:
 	typedef math::Vector4<T> Vec4;
 	typedef math::Matrix4X4<T> Mat4;
 	typedef math::Quaternion<T> Quat;
-	typedef math::Winding<Vec3, Plane, zone_allocator<Vec3, Z3DXT>> Winding;
+	typedef math::Winding<Vec3, Plane, zone_allocator<Vec3, Z3DXT> > Winding;
 	typedef math::AABB3<T> BBox;
 
 	typedef typename zone_vector<Vec3, Z3DXT>::type Vec3Vec;

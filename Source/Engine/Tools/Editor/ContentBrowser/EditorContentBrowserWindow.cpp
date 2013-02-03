@@ -365,7 +365,7 @@ pkg::IdVec ContentBrowserWindow::GenericImportAssetFiles(asset::Type type, const
 
 		if (!conflictsMessage.isEmpty())
 		{
-			QString m = QString("One or more files selected for import conflict with assets in this package. Would you like to automatically rename the conflicting items during import?"RAD_NEWLINE""RAD_NEWLINE"The following items have conflicts:"RAD_NEWLINE"%1").arg(conflictsMessage);
+			QString m = QString("One or more files selected for import conflict with assets in this package. Would you like to automatically rename the conflicting items during import?" RAD_NEWLINE "" RAD_NEWLINE "The following items have conflicts:" RAD_NEWLINE "%1").arg(conflictsMessage);
 			QMessageBox::StandardButton b = QMessageBox::warning(
 				this,
 				"Conflicts",

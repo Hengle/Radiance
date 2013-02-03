@@ -235,7 +235,7 @@ RADENG_API pkg::IdVec RADENG_CALL CreateTextures(QWidget *parent, const pkg::Pac
 
 		if (!conflictsMessage.isEmpty())
 		{
-			QString m = QString("One or more textures or materials selected for import conflict with assets in this package. Would you like to automatically rename the conflicting items during import?"RAD_NEWLINE""RAD_NEWLINE"The following items have conflicts:"RAD_NEWLINE"%1").arg(conflictsMessage);
+			QString m = QString("One or more textures or materials selected for import conflict with assets in this package. Would you like to automatically rename the conflicting items during import?" RAD_NEWLINE "" RAD_NEWLINE "The following items have conflicts:" RAD_NEWLINE "%1").arg(conflictsMessage);
 			b = QMessageBox::warning(
 				parent,
 				"Conflicts",

@@ -358,6 +358,16 @@
 		330A99B115BCA101002A81EC /* TextureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8871C15B9B9ED0089BA08 /* TextureParser.h */; };
 		330A99B215BCA101002A81EC /* TypefaceParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8871F15B9B9ED0089BA08 /* TypefaceParser.cpp */; };
 		330A99B315BCA101002A81EC /* TypefaceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8872015B9B9ED0089BA08 /* TypefaceParser.h */; };
+		3342B1D016BE5AB300A287E3 /* UIVListWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3342B1CE16BE5AB300A287E3 /* UIVListWidget.cpp */; };
+		3342B1D116BE5AB300A287E3 /* UIVListWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3342B1CE16BE5AB300A287E3 /* UIVListWidget.cpp */; };
+		3342B1D216BE5AB300A287E3 /* UIVListWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3342B1CE16BE5AB300A287E3 /* UIVListWidget.cpp */; };
+		3342B1D316BE5AB300A287E3 /* UIVListWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3342B1CE16BE5AB300A287E3 /* UIVListWidget.cpp */; };
+		3342B1D416BE5AB300A287E3 /* UIVListWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3342B1CE16BE5AB300A287E3 /* UIVListWidget.cpp */; };
+		3342B1D516BE5AB300A287E3 /* UIVListWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 3342B1CF16BE5AB300A287E3 /* UIVListWidget.h */; };
+		3342B1D616BE5AB300A287E3 /* UIVListWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 3342B1CF16BE5AB300A287E3 /* UIVListWidget.h */; };
+		3342B1D716BE5AB300A287E3 /* UIVListWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 3342B1CF16BE5AB300A287E3 /* UIVListWidget.h */; };
+		3342B1D816BE5AB300A287E3 /* UIVListWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 3342B1CF16BE5AB300A287E3 /* UIVListWidget.h */; };
+		3342B1D916BE5AB300A287E3 /* UIVListWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 3342B1CF16BE5AB300A287E3 /* UIVListWidget.h */; };
 		334315F116914D8E00AABCEE /* ShaderTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334315EC16914D8E00AABCEE /* ShaderTool.cpp */; };
 		334315F216914D8E00AABCEE /* ShaderTool.h in Headers */ = {isa = PBXBuildFile; fileRef = 334315ED16914D8E00AABCEE /* ShaderTool.h */; };
 		334315F316914D8E00AABCEE /* ShaderToolUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334315EF16914D8E00AABCEE /* ShaderToolUtils.cpp */; };
@@ -2896,6 +2906,8 @@
 		3319498415B9FB0600458F43 /* AppReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppReleaseiOS.xcconfig; path = XCConfig/AppReleaseiOS.xcconfig; sourceTree = "<group>"; };
 		3319498515B9FB0600458F43 /* AppReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppReleaseOSX.xcconfig; path = XCConfig/AppReleaseOSX.xcconfig; sourceTree = "<group>"; };
 		3319498615B9FC3200458F43 /* AppRoot.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppRoot.xcconfig; path = XCConfig/AppRoot.xcconfig; sourceTree = "<group>"; };
+		3342B1CE16BE5AB300A287E3 /* UIVListWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIVListWidget.cpp; sourceTree = "<group>"; };
+		3342B1CF16BE5AB300A287E3 /* UIVListWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIVListWidget.h; sourceTree = "<group>"; };
 		334315EC16914D8E00AABCEE /* ShaderTool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderTool.cpp; sourceTree = "<group>"; };
 		334315ED16914D8E00AABCEE /* ShaderTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShaderTool.h; sourceTree = "<group>"; };
 		334315EE16914D8E00AABCEE /* ShaderTool.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ShaderTool.inl; sourceTree = "<group>"; };
@@ -4969,6 +4981,8 @@
 				33E888AF15B9BA4A0089BA08 /* UIMatWidget.h */,
 				33E888B015B9BA4A0089BA08 /* UITextLabel.cpp */,
 				33E888B115B9BA4A0089BA08 /* UITextLabel.h */,
+				3342B1CE16BE5AB300A287E3 /* UIVListWidget.cpp */,
+				3342B1CF16BE5AB300A287E3 /* UIVListWidget.h */,
 				33E888B215B9BA4A0089BA08 /* UIWidget.cpp */,
 				33E888B315B9BA4A0089BA08 /* UIWidget.h */,
 				33E888B415B9BA4A0089BA08 /* UIWidgetDef.h */,
@@ -5505,6 +5519,7 @@
 				33982E1A16A89C8100C2ED49 /* GameCVars.h in Headers */,
 				33982E2216A8ABBC00C2ED49 /* Console.h in Headers */,
 				33982E8716B2553300C2ED49 /* E_TouchTrigger.h in Headers */,
+				3342B1D716BE5AB300A287E3 /* UIVListWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5892,6 +5907,7 @@
 				33982E1B16A89C8100C2ED49 /* GameCVars.h in Headers */,
 				33982E2316A8ABBC00C2ED49 /* Console.h in Headers */,
 				33982E8816B2553300C2ED49 /* E_TouchTrigger.h in Headers */,
+				3342B1D816BE5AB300A287E3 /* UIVListWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6361,6 +6377,7 @@
 				33982E0C16A89C3B00C2ED49 /* CVars.h in Headers */,
 				33982E1816A89C8100C2ED49 /* GameCVars.h in Headers */,
 				33982E8516B2553300C2ED49 /* E_TouchTrigger.h in Headers */,
+				3342B1D516BE5AB300A287E3 /* UIVListWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6746,6 +6763,7 @@
 				33982E1916A89C8100C2ED49 /* GameCVars.h in Headers */,
 				33982E2116A8ABBC00C2ED49 /* Console.h in Headers */,
 				33982E8616B2553300C2ED49 /* E_TouchTrigger.h in Headers */,
+				3342B1D616BE5AB300A287E3 /* UIVListWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7133,6 +7151,7 @@
 				33982E1C16A89C8100C2ED49 /* GameCVars.h in Headers */,
 				33982E2416A8ABBD00C2ED49 /* Console.h in Headers */,
 				33982E8916B2553300C2ED49 /* E_TouchTrigger.h in Headers */,
+				3342B1D916BE5AB300A287E3 /* UIVListWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7494,6 +7513,7 @@
 				33982E8216B2553300C2ED49 /* E_TouchTrigger.cpp in Sources */,
 				33982E9216B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */,
 				33982E9816B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */,
+				3342B1D216BE5AB300A287E3 /* UIVListWidget.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7664,6 +7684,7 @@
 				33982E8316B2553300C2ED49 /* E_TouchTrigger.cpp in Sources */,
 				33982E9316B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */,
 				33982E9916B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */,
+				3342B1D316BE5AB300A287E3 /* UIVListWidget.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7918,6 +7939,7 @@
 				33982E8016B2553300C2ED49 /* E_TouchTrigger.cpp in Sources */,
 				33982E9016B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */,
 				33982E9616B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */,
+				3342B1D016BE5AB300A287E3 /* UIVListWidget.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8087,6 +8109,7 @@
 				33982E8116B2553300C2ED49 /* E_TouchTrigger.cpp in Sources */,
 				33982E9116B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */,
 				33982E9716B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */,
+				3342B1D116BE5AB300A287E3 /* UIVListWidget.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8257,6 +8280,7 @@
 				33982E8416B2553300C2ED49 /* E_TouchTrigger.cpp in Sources */,
 				33982E9416B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */,
 				33982E9A16B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */,
+				3342B1D416BE5AB300A287E3 /* UIVListWidget.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
