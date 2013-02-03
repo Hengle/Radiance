@@ -10,8 +10,7 @@
 
 namespace world {
 
-class RADENG_CLASS T_SoundPrecache : public T_Precache
-{
+class RADENG_CLASS T_SoundPrecache : public T_Precache {
 public:
 	typedef boost::shared_ptr<T_SoundPrecache> Ref;
 	

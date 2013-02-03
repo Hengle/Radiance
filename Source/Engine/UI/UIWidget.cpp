@@ -518,8 +518,6 @@ void Widget::RemovedFromRoot() {
 }
 
 Rect Widget::RAD_IMPLEMENT_GET(screenRect) {
-	if (m_positionMode == kPositionMode_Absolute)
-		return m_rect;
 	return ToScreen(m_rect);
 }
 
@@ -535,12 +533,14 @@ Vec3 Widget::RAD_IMPLEMENT_GET(zRotScreen) {
 Rect Widget::ToScreen(const Rect &r) const {
 	Rect base(0, 0, 0, 0);
 
-	Ref p = m_parent.lock();
-	if (p) {
-		base = p->screenRect;
-		Vec2 offset = p->contentPos;
-		base.x += offset[0];
-		base.y += offset[1];
+	if (m_positionMode == kPositionMode_Relative) {
+		Ref p = m_parent.lock();
+		if (p) {
+			base = p->screenRect;
+			Vec2 offset = p->contentPos;
+			base.x += offset[0];
+			base.y += offset[1];
+		}
 	}
 		
 	float sw = r.w * m_scale[0][0];

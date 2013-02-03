@@ -24,8 +24,7 @@ T_Precache::Ref T_Precache::New(
 	pkg::Zone zone,
 	bool create,
 	int extra
-)
-{
+) {
 	pkg::Asset::Ref r = e.sys->packages->Resolve(asset, zone);
 	if (!r)
 		return Ref();
@@ -37,12 +36,9 @@ T_Precache::Ref T_Precache::New(
 	const pkg::AssetRef &asset, 
 	bool create,
 	int extra
-)
-{
-	if (create)
-	{
-		switch (asset->type.get())
-		{
+) {
+	if (create) {
+		switch (asset->type.get()) {
 		case asset::AT_SkModel:
 			return Ref(new (ZWorld) T_SkModelPrecache(world, asset));
 		case asset::AT_Mesh:
@@ -65,14 +61,11 @@ T_Precache::Ref T_Precache::New(
 T_Precache::T_Precache(World *world, const pkg::AssetRef &asset) : 
 m_r(pkg::SR_Pending), 
 m_world(world), 
-m_asset(asset)
-{
+m_asset(asset) {
 }
 
-int T_Precache::Tick(Entity &e, float dt, const xtime::TimeSlice &time, int flags)
-{
-	if (!m_asset)
-	{
+int T_Precache::Tick(Entity &e, float dt, const xtime::TimeSlice &time, int flags) {
+	if (!m_asset) {
 		m_r = pkg::SR_FileNotFound;
 		return TickPop;
 	}
@@ -82,13 +75,7 @@ int T_Precache::Tick(Entity &e, float dt, const xtime::TimeSlice &time, int flag
 		pkg::P_Load|pkg::P_FastPath
 	);
 
-	if (m_r == pkg::SR_Success)
-	{ // P_Trim
-		m_asset->Process(
-			xtime::TimeSlice::Infinite,
-			pkg::P_Trim
-		);
-
+	if (m_r == pkg::SR_Success) { 
 		if (m_asset->type == asset::AT_Material) // for material tick
 			m_world->draw->AddMaterial(m_asset->id);
 	}
@@ -96,14 +83,19 @@ int T_Precache::Tick(Entity &e, float dt, const xtime::TimeSlice &time, int flag
 	return (m_r <= pkg::SR_Success) ? TickPop : TickNext;
 }
 
-int T_Precache::PushResult(lua_State *L)
-{
+int T_Precache::PushResult(lua_State *L) {
 	if (m_r != pkg::SR_Success)
 		return 0;
 
 	D_Asset::Ref r = D_Asset::New(asset);
-	if (r)
-	{
+
+	// P_Trim
+	asset->Process(
+		xtime::TimeSlice::Infinite,
+		pkg::P_Trim
+	);
+
+	if (r) {
 		r->Push(L);
 		return 1;
 	}

@@ -13,8 +13,7 @@
 
 namespace world {
 
-class RADENG_CLASS T_Spawn : public LuaTask
-{
+class RADENG_CLASS T_Spawn : public LuaTask {
 public:
 	typedef boost::shared_ptr<T_Spawn> Ref;
 

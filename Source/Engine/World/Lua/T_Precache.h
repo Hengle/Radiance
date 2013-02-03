@@ -15,8 +15,7 @@ namespace world {
 
 class World;
 
-class RADENG_CLASS T_Precache : public LuaTask
-{
+class RADENG_CLASS T_Precache : public LuaTask {
 public:
 	typedef boost::shared_ptr<T_Precache> Ref;
 
@@ -28,6 +27,7 @@ public:
 		bool create, // if true creates objects after data is loaded
 		int extra // extra data (not used on all types)
 	);
+
 	static Ref New(
 		World *world, 
 		const pkg::AssetRef &asset,

@@ -17,12 +17,10 @@ T_SoundPrecache::T_SoundPrecache(
 	const pkg::AssetRef &asset, 
 	int maxInstances
 )
-: T_Precache(world, asset), m_maxInstances(maxInstances)
-{
+: T_Precache(world, asset), m_maxInstances(maxInstances) {
 }
 
-int T_SoundPrecache::PushResult(lua_State *L)
-{
+int T_SoundPrecache::PushResult(lua_State *L) {
 	if (result != pkg::SR_Success)
 		return 0;
 
@@ -30,8 +28,14 @@ int T_SoundPrecache::PushResult(lua_State *L)
 		asset,
 		m_maxInstances
 	);
-	if (sound)
-	{
+	
+	// P_Trim
+	asset->Process(
+		xtime::TimeSlice::Infinite,
+		pkg::P_Trim
+	);
+
+	if (sound) {
 		D_Sound::Ref ds(D_Sound::New(asset, sound));
 		ds->Push(L);
 		return 1;

@@ -11,18 +11,22 @@
 namespace world {
 
 T_MeshPrecache::T_MeshPrecache(World *world, const pkg::AssetRef &asset)
-: T_Precache(world, asset)
-{
+: T_Precache(world, asset) {
 }
 
-int T_MeshPrecache::PushResult(lua_State *L)
-{
+int T_MeshPrecache::PushResult(lua_State *L) {
 	if (result != pkg::SR_Success)
 		return 0;
 
 	r::MeshBundle::Ref mesh = r::MeshBundle::New(asset);
-	if (mesh)
-	{
+
+	// P_Trim
+	asset->Process(
+		xtime::TimeSlice::Infinite,
+		pkg::P_Trim
+	);
+
+	if (mesh) {
 		// push lua mesh data element
 		D_Mesh::Ref dmesh(D_Mesh::New(mesh));
 		dmesh->Push(L);

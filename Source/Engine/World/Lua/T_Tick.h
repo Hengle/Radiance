@@ -11,8 +11,7 @@
 
 namespace world {
 
-class RADENG_CLASS T_Tick : public Entity::Tickable, public lua::SharedPtr
-{
+class RADENG_CLASS T_Tick : public Entity::Tickable, public lua::SharedPtr {
 public:
 	typedef boost::shared_ptr<T_Tick> Ref;
 

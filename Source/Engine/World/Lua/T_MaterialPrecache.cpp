@@ -10,12 +10,10 @@
 namespace world {
 
 T_MaterialPrecache::T_MaterialPrecache(World *world, const pkg::AssetRef &asset)
-: T_Precache(world, asset)
-{
+: T_Precache(world, asset) {
 }
 
-int T_MaterialPrecache::PushResult(lua_State *L)
-{
+int T_MaterialPrecache::PushResult(lua_State *L) {
 	if (result != pkg::SR_Success)
 		return 0;
 

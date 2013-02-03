@@ -10,8 +10,7 @@
 
 namespace world {
 
-class RADENG_CLASS T_MeshPrecache : public T_Precache
-{
+class RADENG_CLASS T_MeshPrecache : public T_Precache {
 public:
 	typedef boost::shared_ptr<T_MeshPrecache> Ref;
 

@@ -11,18 +11,22 @@
 namespace world {
 
 T_SkModelPrecache::T_SkModelPrecache(World *world, const pkg::AssetRef &asset)
-: T_Precache(world, asset)
-{
+: T_Precache(world, asset) {
 }
 
-int T_SkModelPrecache::PushResult(lua_State *L)
-{
+int T_SkModelPrecache::PushResult(lua_State *L) {
 	if (result != pkg::SR_Success)
 		return 0;
 
 	r::SkMesh::Ref skMesh = r::SkMesh::New(asset);
-	if (skMesh)
-	{
+
+	// P_Trim
+	asset->Process(
+		xtime::TimeSlice::Infinite,
+		pkg::P_Trim
+	);
+
+	if (skMesh) {
 		// push lua skmesh data element
 		D_SkModel::Ref dskm(D_SkModel::New(skMesh));
 		dskm->Push(L);
