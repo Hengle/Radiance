@@ -17,6 +17,7 @@
 #include <Engine/Renderer/GL/RBackend.h>
 #include <Engine/Renderer/GL/GLState.h>
 #include "../AppleGameCenter.h"
+#import "UIDevice-Hardware.h"
 
 #define TARGET_FRAME_RATE 30
 
@@ -154,10 +155,27 @@ AppDelegate *s_app;
 - (void)showSplash {
 	NSString *sz = 0;
 	
-	if ((App::Get()->deviceFamily == plat::kDeviceFamily_iPhone) && (App::Get()->deviceType >= plat::kDeviceType_iPhone4) ) {
-		sz = @"Default@2x-Landscape.png";
-	} else if (App::Get()->deviceFamily == plat::kDeviceFamily_iPad) {
-		if (App::Get()->deviceType >= plat::kDeviceType_iPad3) {
+	UIDeviceFamily deviceFamily = [[UIDevice currentDevice] deviceFamily];
+	int deviceType = [[UIDevice currentDevice] platformType];
+	
+	bool iPhoneiPod = (deviceFamily == UIDeviceFamilyiPhone) || (deviceFamily == UIDeviceFamilyiPod);
+	bool hd = false;
+	
+	if (iPhoneiPod) {
+		hd = ((deviceFamily == UIDeviceFamilyiPhone) && (deviceType >= UIDevice4iPhone)) ||
+			((deviceFamily == UIDeviceFamilyiPod) && (deviceType >= UIDevice4GiPod));
+	} else {
+		hd = (deviceFamily == UIDeviceFamilyiPad) && (deviceType >= UIDevice3GiPad);
+	}
+	
+	if (iPhoneiPod && hd) {
+		if ((deviceFamily == UIDeviceFamilyiPhone) && (deviceType >= UIDevice5iPhone)) {
+			sz = @"Default-Landscape-568h@2x.png";
+		} else {
+			sz = @"Default-Landscape@2x.png";
+		}
+	} else if (!iPhoneiPod) {
+		if (hd) {
 			sz = @"Default-Landscape@2x~ipad.png";
 		} else {
 			sz = @"Default-Landscape~ipad.png";
