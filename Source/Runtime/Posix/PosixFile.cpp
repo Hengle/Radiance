@@ -209,15 +209,20 @@ bool PosixFileSystem::DeleteDirectory_r(const char *nativePath) {
 				if (!DeleteDirectory_r(path.c_str))
 					return false;
 			} else {
-				if (unlink(path.c_str) != 0)
-					return false;
+				if (unlink(path.c_str) != 0) {
+					std::cerr << "ERROR: unable to remove file: " << path.c_str.get() << std::endl;
+				}
 			}
 		}
 
 		s.reset();
 	}
 
-	return unlink(nativePath) == 0;
+	if (unlink(nativePath)) {
+		std::cerr << "ERROR: unable to remove directory: " << nativePath << std::endl;
+	}
+	
+	return true;
 }
 
 bool PosixFileSystem::DeleteDirectory(
@@ -264,7 +269,7 @@ MMapping::Ref PosixMMFile::MMap(AddrSize ofs, AddrSize size, ::Zone &zone) {
 	AddrSize backingSize = (size+padd) - base;
 
 	if (m_mm) {
-		// we mapped the whole file just return the Posixdow
+		// we mapped the whole file just return the window
 		const void *data = reinterpret_cast<const U8*>(m_mm->data.get()) + ofs;
 		return MMapping::Ref(new (ZFile) PosixMMapping(shared_from_this(), 0, data, size, ofs, 0, backingSize, zone));
 	}
@@ -394,6 +399,14 @@ PosixFileSearch::PosixFileSearch(
 	m_sdir((DIR*)0),
 	m_cur(0)
 {
+	if (m_pattern.length > 1) {
+		String x = m_pattern.Right(2);
+		if (x == ".*") {
+			// fnmatch will require an extension with *.* unlike windows.
+			// change to *
+			m_pattern = m_pattern.Left(m_pattern.length - 2);
+		}
+	}
 }
 
 PosixFileSearch::~PosixFileSearch() {
@@ -495,8 +508,15 @@ PosixFileSearch::State PosixFileSearch::NextState() {
 				closedir((DIR*)m_sdir);
 			String path(m_path);
 			m_sdir = opendir(m_path.c_str);
-			if (m_sdir == 0)
+			if (m_sdir == 0) {
 				++m_state;
+			} else {
+				struct dirent *next;
+				if ((readdir_r((DIR*)m_sdir, m_cur, &next) != 0) || (next == 0)) {
+					closedir((DIR*)m_sdir);
+					++m_state;
+				}
+			}
 		}
 	} else if (m_state == kState_Dirs) {
 		++m_state;

@@ -601,7 +601,7 @@ int PackageMan::PakDirectory(
 			if (zipSize < size) {
 				// compression is good
 				data_codec::lmp::Writer::Lump *l = 
-					lumpWriter.WriteLump(lumpName.c_str, zipData, zipSize, 8);
+					lumpWriter.WriteLump(lumpName.c_str, zipData, zipSize, 16);
 				data_codec::lmp::LOfs *uncSize = (data_codec::lmp::LOfs*)l->AllocateTagData(sizeof(data_codec::lmp::LOfs));
 				*uncSize = (data_codec::lmp::LOfs)size;
 
@@ -617,7 +617,7 @@ int PackageMan::PakDirectory(
 		}
 
 		if (!compressed) {
-			lumpWriter.WriteLump(lumpName.c_str, data, size, 8);
+			lumpWriter.WriteLump(lumpName.c_str, data, size, 16);
 			*m_cookState->cout << "(0%)" << std::endl;
 		}
 
