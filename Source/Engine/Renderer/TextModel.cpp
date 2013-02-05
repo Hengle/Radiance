@@ -110,6 +110,21 @@ void TextModel::SetText(
 	BuildTextVerts(&s, 1);
 }
 
+void TextModel::AllocateText(
+	const char **utf8Strings,
+	int numStrings
+) {
+	int len = 0;
+	for (int i = 0; i < numStrings ; ++i) {
+		if (!utf8Strings[i])
+			continue;
+		len += (int)::string::len(utf8Strings[i]);
+	}
+
+	if (len > 0)
+		ReserveVerts(len*6);
+}
+
 void TextModel::BuildTextVerts(const String *strings, int numStrings) {
 	BOOST_STATIC_ASSERT(sizeof(VertexType)==16);
 	RAD_ASSERT(m_fontInstance);

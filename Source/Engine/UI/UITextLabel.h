@@ -38,6 +38,11 @@ public:
 		float scaleY = 1.0f
 	);
 
+	void AllocateText(
+		const char **utf8Strings,
+		int numStrings
+	);
+
 	void Clear();
 
 	bool BindTypeface(const pkg::AssetRef &typeface);
@@ -60,6 +65,7 @@ private:
 	UIW_DECL_GET(Dimensions);
 
 	static int lua_SetText(lua_State *L);
+	static int lua_AllocateText(lua_State *L);
 
 	pkg::Asset::Ref m_typeface;
 	asset::TypefaceParser::Ref m_parser;

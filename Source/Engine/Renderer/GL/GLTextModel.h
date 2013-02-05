@@ -19,6 +19,7 @@ protected:
 
 	virtual VertexType *LockVerts(int num);
 	virtual void UnlockVerts();
+	virtual void ReserveVerts(int num);
 	virtual void BindStates(int ofs, int count, font::IGlyphPage &page);
 	virtual void DrawVerts(int ofs, int count);
 

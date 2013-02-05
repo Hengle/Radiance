@@ -9,6 +9,7 @@
 #include "UITextLabel.h"
 #include "../World/Lua/D_Typeface.h"
 #include <Runtime/StringBase.h>
+#include <Runtime/Container/StackVector.h>
 
 using world::D_Typeface;
 
@@ -54,6 +55,15 @@ void TextLabel::SetText(
 			scaleX,
 			scaleY
 		);
+	}
+}
+
+void TextLabel::AllocateText(
+	const char **utf8Strings,
+	int numStrings) {
+	RAD_ASSERT(m_textModel);
+	if (m_textModel) {
+		m_textModel->AllocateText(utf8Strings, numStrings);
 	}
 }
 
@@ -230,6 +240,36 @@ int TextLabel::lua_SetText(lua_State *L) {
 	return 0;
 }
 
+int TextLabel::lua_AllocateText(lua_State *L) {
+	Ref w = GetRef<TextLabel>(L, "TextLabel", 1, true);
+
+	if (lua_type(L, 2) == LUA_TTABLE) {
+
+		typedef stackify<std::vector<const char*>, 64> StringPtrVec;
+		StringPtrVec v;
+
+		for (int i = 0; ; ++i) {
+			lua_pushinteger(L, i+1);
+			lua_gettable(L, 2);
+			if (lua_isnil(L, -1)) {
+				lua_pop(L, 1);
+				break;
+			}
+			v->push_back(luaL_checkstring(L, -1));
+			lua_pop(L, 1);
+		}
+
+		if (!v->empty())
+			w->AllocateText(&v[0], (int)v->size());
+
+	} else {
+		const char *sz = luaL_checkstring(L, 2);
+		w->AllocateText(&sz, 1);
+	}
+
+	return 0;
+}
+
 void TextLabel::OnDraw(const Rect *clip) {
 	MatWidget::OnDraw(clip);
 
@@ -260,6 +300,8 @@ void TextLabel::PushCallTable(lua_State *L) {
 	MatWidget::PushCallTable(L);
 	lua_pushcfunction(L, lua_SetText);
 	lua_setfield(L, -2, "SetText");
+	lua_pushcfunction(L, lua_AllocateText);
+	lua_setfield(L, -2, "AllocateText");
 	LUART_REGISTER_GET(L, Dimensions);
 	LUART_REGISTER_GETSET(L, Typeface);
 }

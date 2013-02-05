@@ -130,6 +130,13 @@ public:
 		const Vec4 &rgba = Vec4(1, 1, 1, 1)
 	);
 
+	// This call is optional, and will allocate vertex memory for 
+	// the specified text strings.
+	void AllocateText(
+		const char **utf8Strings,
+		int numStrings
+	);
+
 protected:
 
 	TextModel();
@@ -142,6 +149,7 @@ protected:
 
 	virtual VertexType *LockVerts(int num) = 0;
 	virtual void UnlockVerts() = 0;
+	virtual void ReserveVerts(int num) = 0;
 	virtual void BindStates(int ofs, int count, font::IGlyphPage &page) = 0;
 	virtual void DrawVerts(int ofs, int count) = 0;
 

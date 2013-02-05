@@ -81,18 +81,22 @@ font::IGlyphPage::Ref TextModel::AllocatePage(int width, int height) {
 }
 
 GLTextModel::VertexType *GLTextModel::LockVerts(int num) {
-	AddrSize size = sizeof(VertexType)*num;
-	if (!m_vb || m_vb->size != size) {
-		RAD_ASSERT(!m_lock);
-		m_vb.reset(new GLVertexBuffer(GL_ARRAY_BUFFER_ARB, GL_DYNAMIC_DRAW, size));
-	}
-
+	ReserveVerts(num);
 	m_lock = m_vb->Map();
 	return (VertexType*)m_lock->ptr.get();
 }
 
 void GLTextModel::UnlockVerts() {
 	m_lock.reset();
+}
+
+void GLTextModel::ReserveVerts(int num) {
+	AddrSize size = sizeof(VertexType)*num;
+
+	if (!m_vb || (m_vb->size < size)) {
+		RAD_ASSERT(!m_lock);
+		m_vb.reset(new GLVertexBuffer(GL_ARRAY_BUFFER_ARB, GL_DYNAMIC_DRAW, size));
+	}
 }
 
 void GLTextModel::BindStates(int ofs, int count, font::IGlyphPage &page) {
