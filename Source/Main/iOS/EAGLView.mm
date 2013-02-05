@@ -158,18 +158,18 @@
 	}
 	
 	CGPoint	 location = [touch locationInView:self];
-	float millis = (float)([touch timestamp] * 1000.0);
+	U64 millis = (U64)([touch timestamp] * 1000.0);
 	float scale = [[UIScreen mainScreen] scale];
 	
 	InputEvent event;
 	event.touch = touch;
 	event.type = type;
-	event.time = (int)millis;
+	event.time = (int)(millis & 0xffffff);
 	event.data[0] = location.x*scale;
 	event.data[1] = location.y*scale;
 	event.data[2] = [touch tapCount];
 	
-//	COut(C_Debug) << "Touch (" << event.data[0] << ", " << event.data[1] << "), (" << location.x << ", " << location.y << ")" << std::endl;
+//	COut(C_Debug) << "Touch (" << event.data[0] << ", " << event.data[1] << "), (" << location.x << ", " << location.y << "), (" << event.time << "ms, " << millis << "ms" << std::endl;
 	
 	App::Get()->game->PostInputEvent(event);
 }

@@ -45,10 +45,18 @@ void GLDraw::SetViewport(
 	gl.MatrixMode(GL_MODELVIEW);
 	gl.LoadIdentity();
 
-	m_vp[0] = (float)src[0];
-	m_vp[1] = (float)src[1];
-	m_vp[2] = (float)src[2];
-	m_vp[3] = (float)src[3];
+	m_srcvp[0] = (float)src[0];
+	m_srcvp[1] = (float)src[1];
+	m_srcvp[2] = (float)src[2];
+	m_srcvp[3] = (float)src[3];
+	
+	m_dstvp[0] = (float)dst[0];
+	m_dstvp[1] = (float)dst[1];
+	m_dstvp[2] = (float)dst[2];
+	m_dstvp[3] = (float)dst[3];
+	
+	m_todst[0] = m_dstvp[2] / m_srcvp[2];
+	m_todst[1] = m_dstvp[3] / m_srcvp[3];
 }
 
 void GLDraw::DrawRect(
@@ -64,11 +72,16 @@ void GLDraw::DrawRect(
 
 	if (clip) {
 		flags |= kScissorTest_Enable;
+		float x = ((clip->x - m_srcvp[0]) * m_todst[0]) + m_dstvp[0];
+		float y = ((clip->y - m_srcvp[1]) * m_todst[1]) + m_dstvp[1];
+		float w = clip->w * m_todst[0];
+		float h = clip->h * m_todst[1];
+		
 		gls.Scissor(
-			FloorFastInt(clip->x),
-			FloorFastInt(m_vp[3]-(clip->y+clip->h)),
-			FloorFastInt(clip->w),
-			FloorFastInt(clip->h)
+			FloorFastInt(x),
+			FloorFastInt(m_dstvp[3]-(y+h)),
+			FloorFastInt(w),
+			FloorFastInt(h)
 		);
 	} else {
 		flags |= kScissorTest_Disable;
@@ -83,7 +96,7 @@ void GLDraw::DrawRect(
 		float cy = zRot[1]-r.y;
 		gl.Translatef(cx, cx, 0.f);
 		gl.Rotatef(zRot[2], 0.f, 0.f, 1.f);
-		gl.Translatef(-cx, -cx, 0.f);
+		gl.Translatef(-cx, -cy, 0.f);
 	}
 
 	gl.Scalef(r.w / (float)BaseRectSize, r.h / (float)BaseRectSize, 1.f);
@@ -141,11 +154,16 @@ void GLDraw::DrawTextModel(
 
 	if (clip) {
 		flags |= kScissorTest_Enable;
+		float x = ((clip->x - m_srcvp[0]) * m_todst[0]) + m_dstvp[0];
+		float y = ((clip->y - m_srcvp[1]) * m_todst[1]) + m_dstvp[1];
+		float w = clip->w * m_todst[0];
+		float h = clip->h * m_todst[1];
+		
 		gls.Scissor(
-			FloorFastInt(clip->x),
-			FloorFastInt(m_vp[3]-(clip->y+clip->h)),
-			FloorFastInt(clip->w),
-			FloorFastInt(clip->h)
+			FloorFastInt(x),
+			FloorFastInt(m_dstvp[3]-(y+h)),
+			FloorFastInt(w),
+			FloorFastInt(h)
 		);
 	} else {
 		flags |= kScissorTest_Disable;
@@ -167,11 +185,17 @@ void GLDraw::BeginBatchText(
 
 	if (clip) {
 		flags |= kScissorTest_Enable;
+		// Scissor is in window coordinates (viewport)
+		float x = ((clip->x - m_srcvp[0]) * m_todst[0]) + m_dstvp[0];
+		float y = ((clip->y - m_srcvp[1]) * m_todst[1]) + m_dstvp[1];
+		float w = clip->w * m_todst[0];
+		float h = clip->h * m_todst[1];
+		
 		gls.Scissor(
-			FloorFastInt(clip->x),
-			FloorFastInt(m_vp[3]-clip->y),
-			FloorFastInt(clip->w),
-			FloorFastInt(clip->h)
+			FloorFastInt(x),
+			FloorFastInt(m_dstvp[3]-(y+h)),
+			FloorFastInt(w),
+			FloorFastInt(h)
 		);
 	}
 

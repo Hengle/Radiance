@@ -57,10 +57,12 @@ public:
 private:
 
 	void InitRectVerts(int vpw, int vph);
-
+	
 	r::GLVertexBuffer::Ref m_rectVB;
 	r::GLVertexBuffer::Ref m_rectIB;
-	float m_vp[4];
+	float m_srcvp[4];
+	float m_dstvp[4];
+	float m_todst[2];
 };
 
 } // ui

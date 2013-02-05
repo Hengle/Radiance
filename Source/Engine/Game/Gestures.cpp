@@ -152,7 +152,7 @@ bool Game::GestureInput(
 			return false;
 	}
 
-	float scale = (m_vp[2]/1024.f) * (m_vp[3]/768.f);
+	float scale = (m_vp[2]/1280.f);
 	
 	// these must be ordered by precidence
 	bool r = false;
