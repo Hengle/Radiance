@@ -71,10 +71,10 @@ void GLState::Init(S &s) {
 			kDepthWriteMask_Enable|
 			kScissorTest_Disable;
 	s.d.b = kBlendMode_Off;
-	s.s.scissor[0] = -1;
-	s.s.scissor[1] = -1;
-	s.s.scissor[2] = -1;
-	s.s.scissor[3] = -1;
+	s.d.scissor[0] = -1;
+	s.d.scissor[1] = -1;
+	s.d.scissor[2] = -1;
+	s.d.scissor[3] = -1;
 	s.t = 0;
 	s.s.s = s.d.s;
 	s.vaoBound = false;
