@@ -202,7 +202,7 @@ bool ModelEditorWidget::Load() {
 	m_glw->camera->LookAt(Vec3::Zero);
 	m_glw->camera->fov = 70.f;
 	m_glw->SetFreeMode();
-	m_glw->kbSpeed = 8.f;
+	m_glw->kbSpeed = 0.8f;
 	m_glw->mouseSpeed = 0.3f;
 	m_glw->camera->fov = 90.f;
 
