@@ -329,6 +329,7 @@ private:
 	static int lua_MoveTo(lua_State *L);
 	static int lua_RotateTo(lua_State *L);
 	static int lua_SetCapture(lua_State *L);
+	static int lua_Unmap(lua_State *L);
 
 	void Push(lua_State *L); // Don't call this! Call PushFrame()
 	void Unmap(lua_State *L);
@@ -491,7 +492,6 @@ private:
 	VerticalAlign m_valign;
 	HorizontalAlign m_halign;
 	PositionMode m_positionMode;
-	bool m_gc;
 	bool m_tick;
 	bool m_capture;
 	bool m_clip;

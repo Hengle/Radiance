@@ -119,6 +119,7 @@ void VListWidget::ScrollTo(const Vec2 &pos, float time) {
 		m_scrollTime[1] = 0.f;
 		m_scroll = -scrollTo;
 		RecalcLayout();
+		this->contentPos = m_scroll;
 	} else {
 		m_scrollTime[1] = time;
 		m_scrollTo[0] = m_scroll;

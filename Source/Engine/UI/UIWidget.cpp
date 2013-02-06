@@ -15,7 +15,7 @@
 namespace ui {
 
 RAD_ZONE_DEF(RADENG_API, ZUI, "UI", ZEngine);
-enum { MaxWidgets = 256 };
+enum { kMaxWidgets = 256 };
 
 Rect &Rect::Intersect(const Rect &r) {
 	
@@ -42,7 +42,7 @@ Root::Ref Root::New(lua_State *L) {
 		lua_getfield(L, LUA_REGISTRYINDEX, UIWIDGETS);
 		if (lua_isnil(L, -1)) {
 			lua_pop(L, 1);
-			lua_createtable(L, MaxWidgets, 0);
+			lua_createtable(L, kMaxWidgets, 0);
 			lua_setfield(L, LUA_REGISTRYINDEX, UIWIDGETS);
 		}
 		lua_pop(L, 1);
@@ -60,9 +60,6 @@ Root::Root() {
 }
 
 Root::~Root() {
-	for (WidgetMap::const_iterator it = m_layers.begin(); it != m_layers.end(); ++it) {
-		it->second->m_gc = true;
-	}
 }
 
 void Root::SetRootWidget(int layer, const WidgetRef &root) {
@@ -235,6 +232,9 @@ void Root::AddTickMaterial(const pkg::Asset::Ref &ref) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace {
+	int s_numWidgets = 0;
+}
 
 int Widget::s_id(0);
 int Widget::NextWidgetId(lua_State *L) {
@@ -243,20 +243,20 @@ int Widget::NextWidgetId(lua_State *L) {
 		RAD_ASSERT(!lua_isnil(L, -1));
 
 		int i;
-		for (i = 0; i < MaxWidgets; ++i) {
-			int id = (s_id+i)&(MaxWidgets-1);
+		for (i = 0; i < kMaxWidgets; ++i) {
+			int id = (s_id+i)&(kMaxWidgets-1);
 			lua_pushinteger(L, id);
 			lua_gettable(L, -2);
-			if (lua_isnil(L, -1)) {
-				lua_pop(L, 1);
+			bool nil = lua_isnil(L, -1);
+			lua_pop(L, 1);
+			if (nil)
 				break;
-			}
 		}
 
 		lua_pop(L, 1);
-		RAD_VERIFY_MSG(i<MaxWidgets, "MaxWidgets");
-		i = (s_id+i)&(MaxWidgets-1);
-		s_id = (i+1)&(MaxWidgets-1);
+		RAD_VERIFY_MSG(i<kMaxWidgets, "kMaxWidgets");
+		i = (s_id+i)&(kMaxWidgets-1);
+		s_id = (i+1)&(kMaxWidgets-1);
 		return i;
 	}
 
@@ -273,8 +273,6 @@ Widget::Widget(const Rect &r) {
 }
 
 Widget::~Widget() {
-	if (L)
-		Unmap(L);
 }
 
 void Widget::Init() {
@@ -284,7 +282,6 @@ void Widget::Init() {
 	m_valign = kVerticalAlign_Center;
 	m_halign = kHorizontalAlign_Center;
 	m_positionMode = kPositionMode_Relative;
-	m_gc = false;
 	m_tick = false;
 	m_capture = false;
 	m_clip = false;
@@ -313,9 +310,10 @@ void Widget::Init() {
 
 bool Widget::Spawn(lua_State *_L, lua_State *Lco, bool luaError) {
 	L = _L;
-	m_id = NextWidgetId(Lco);
-
+	
 	if (Lco) {
+		m_id = NextWidgetId(Lco);
+
 		CreateFromTable(Lco);
 
 		lua_getfield(Lco, LUA_REGISTRYINDEX, UIWIDGETS);
@@ -340,23 +338,34 @@ bool Widget::Spawn(lua_State *_L, lua_State *Lco, bool luaError) {
 
 		lua_settable(Lco, -3);
 		lua_pop(Lco, 1);
+
+		++s_numWidgets;
+#if defined(RAD_OPT_DEBUG)
+		COut(C_Debug) << "Widget::Spawn: " << s_numWidgets << " widget(s)" << std::endl;
+#endif
 	}
 
 	return true;
 }
 
 void Widget::Unmap(lua_State *L) {
-	if (!m_gc) {
+	if (m_id > -1) {
 		lua_getfield(L, LUA_REGISTRYINDEX, UIWIDGETS);
 		RAD_ASSERT(!lua_isnil(L, -1));
 		lua_pushnumber(L, m_id);
 		lua_pushnil(L);
 		lua_settable(L, -3);
 		lua_pop(L, 1);
+		m_id = -1;
+
+		--s_numWidgets;
+#if defined(RAD_OPT_DEBUG)
+		COut(C_Debug) << "Widget::Unmap: " << s_numWidgets << " widget(s)" << std::endl;
+#endif
 	}
 
 	for (Vec::const_iterator it = m_children.begin(); it != m_children.end(); ++it) {
-		(*it)->m_gc = m_gc;
+		(*it)->Unmap(L);
 	}
 }
 
@@ -375,6 +384,8 @@ void Widget::PushCallTable(lua_State *L) {
 	lua_setfield(L, -2, "RotateTo");
 	lua_pushcfunction(L, lua_SetCapture);
 	lua_setfield(L, -2, "SetCapture");
+	lua_pushcfunction(L, lua_Unmap);
+	lua_setfield(L, -2, "Unmap");
 	LUART_REGISTER_GETSET(L, Rect);
 	LUART_REGISTER_GET(L, ScreenRect);
 	LUART_REGISTER_GET(L, zRot);
@@ -420,17 +431,21 @@ void Widget::CreateFromTable(lua_State *L) {
 }
 
 bool Widget::PushFrame(lua_State *L) {
-	lua_getfield(L, LUA_REGISTRYINDEX, UIWIDGETS);
-	RAD_ASSERT(!lua_isnil(L, -1));
-	lua_pushnumber(L, m_id);
-	lua_gettable(L, -2);
-	if (lua_isnil(L, -1)) {
-		lua_pop(L, 2);
-		return false;
+	if (m_id > -1) {
+		lua_getfield(L, LUA_REGISTRYINDEX, UIWIDGETS);
+		RAD_ASSERT(!lua_isnil(L, -1));
+		lua_pushnumber(L, m_id);
+		lua_gettable(L, -2);
+		if (lua_isnil(L, -1)) {
+			lua_pop(L, 2);
+			return false;
+		}
+
+		lua_remove(L, -2);
+		return true;
 	}
 
-	lua_remove(L, -2);
-	return true;
+	return false;
 }
 
 bool Widget::PushCall(lua_State *L, const char *name) {
@@ -981,6 +996,12 @@ int Widget::lua_RotateTo(lua_State *L) {
 int Widget::lua_SetCapture(lua_State *L) {
 	Ref w = GetRef<Widget>(L, "Widget", 1, true);
 	w->SetCapture(lua_toboolean(L, 2) ? true : false);
+	return 0;
+}
+
+int Widget::lua_Unmap(lua_State *L) {
+	Ref w = GetRef<Widget>(L, "Widget", 1, true);
+	w->Unmap(L);
 	return 0;
 }
 
