@@ -478,9 +478,8 @@ bool WorldLua::ParseKeysTable(lua_State *L, Keys &keys, int index, bool luaError
 	lua_pushnil(L);
 	while (lua_next(L, (index<0) ? (index-1) : index) != 0) {
 		const char *key = lua_tolstring(L, -2, 0);
-		const char *val = lua_tolstring(L, -1, 0);
-
-		if (!key || !val) {
+		
+		if (!key) {
 			if (luaError) {
 				luaL_checktype(L, -1, LUA_TSTRING);
 				luaL_checktype(L, -2, LUA_TSTRING);
@@ -489,7 +488,10 @@ bool WorldLua::ParseKeysTable(lua_State *L, Keys &keys, int index, bool luaError
 			return false;
 		}
 
-		keys.pairs[String(key)] = String(val);
+		if (!lua_isnil(L, -1)) { // deleted key.
+			const char *val = lua_tolstring(L, -1, 0);
+			keys.pairs[String(key)] = String(val);
+		}
 		lua_pop(L, 1);
 	}
 
