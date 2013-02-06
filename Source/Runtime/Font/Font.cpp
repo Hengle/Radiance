@@ -443,41 +443,39 @@ StringVec Font::WordWrapString(
 	if (*end) {
 		for(;;) {
 			if ((*end == 32) || (*end == 0)) { // space/null (word break)
-				if (start == end) {
-					continue;
-				}
+				if (start != end) {
+					String x(start, end-start);
+					String test;
 
-				String x(start, end-start);
-				String test;
-
-				if (!cur.empty) {
-					test = cur + kSpace + x;
-				} else {
-					test = x;
-				}
-
-				float w, h;
-
-				StringDimensions(
-					test.c_str,
-					w,
-					h,
-					kern,
-					kernScale
-				);
-
-				if (w > maxWidth) {
 					if (!cur.empty) {
-						strings.push_back(cur);
-						cur = x;
+						test = cur + kSpace + x;
 					} else {
-						strings.push_back(test); // single word too big
+						test = x;
 					}
-				} else {
-					cur = test;
-				}
 
-				start = end+1;
+					float w, h;
+
+					StringDimensions(
+						test.c_str,
+						w,
+						h,
+						kern,
+						kernScale
+					);
+
+					if (w > maxWidth) {
+						if (!cur.empty) {
+							strings.push_back(cur);
+							cur = x;
+						} else {
+							strings.push_back(test); // single word too big
+						}
+					} else {
+						cur = test;
+					}
+
+					start = end+1;
+				}
 			}
 
 			if (*end == 0)
@@ -545,7 +543,9 @@ void Font::SplitStringAtSize(
 				}
 
 				first = cur;
-				second = x;
+
+				start = end+1;
+				second = x + kSpace + String(start, utf.end - start);
 				return;
 
 			} else {

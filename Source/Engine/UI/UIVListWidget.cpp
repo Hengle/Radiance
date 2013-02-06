@@ -57,6 +57,7 @@ void VListWidget::Clear() {
 	m_dragging = false;
 	m_dragMove = false;
 	m_dragDidMove = false;
+	this->contentPos = Vec2::Zero;
 
 	for (Widget::Vec::iterator it = m_widgets.begin(); it != m_widgets.end(); ++it) {
 		RemoveChild(*it);
