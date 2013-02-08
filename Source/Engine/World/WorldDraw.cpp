@@ -567,6 +567,10 @@ void WorldDraw::DrawView() {
 		DebugDrawActiveWaypoints();
 	}
 
+	if (m_world->cvars->r_showmovecmds.value) {
+		DebugDrawFloorMoves();
+	}
+
 #endif
 }
 

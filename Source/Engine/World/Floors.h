@@ -165,6 +165,13 @@ public:
 		FloorPosition &pos
 	) const;
 
+	bool ClipToFloor(
+		int floorNum,
+		const Vec3 &start,
+		const Vec3 &end,
+		FloorPosition &pos
+	) const;
+
 	FloorMove::Ref CreateMove(
 		const FloorPosition &start,
 		const FloorPosition &end

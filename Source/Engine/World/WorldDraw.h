@@ -26,6 +26,8 @@
 
 namespace world {
 
+class FloorMove;
+
 ///////////////////////////////////////////////////////////////////////////////
 
 class ViewDef {
@@ -333,6 +335,8 @@ private:
 	void DebugDrawBBox(const LocalMaterial &material, const BBox &bbox, bool wireframe);
 	void DebugDrawBBoxBatch(const LocalMaterial &material, const BBox &bbox, bool wireframe);
 	void DebugDrawActiveWaypoints();
+	void DebugDrawFloorMoves();
+	void DebugDrawFloorMoveBatch(const LocalMaterial &material, const FloorMove &move);
 
 	DebugVars m_dbgVars;
 #endif

@@ -242,6 +242,60 @@ void WorldDraw::DebugDrawActiveWaypoints() {
 	}
 }
 
+void WorldDraw::DebugDrawFloorMoves() {
+	LocalMaterial &material = m_dbgVars.debugWorldBBox_M;
+
+	bool begin = false;
+
+	for (Entity::IdMap::const_iterator it = m_world->m_ents.begin(); it != m_world->m_ents.end(); ++it) {
+		const Entity::Ref &entity = it->second;
+
+		if (entity->ps->activeMove) {
+			if (!begin) {
+				begin = true;
+				material.mat->BindStates();
+				material.mat->BindTextures(material.loader);
+				material.mat->shader->Begin(r::Shader::kPass_Default, *material.mat);
+			}
+
+			DebugDrawFloorMoveBatch(material, *entity->ps->activeMove);
+		}
+	}
+
+	if (begin)
+		material.mat->shader->End();
+}
+
+void WorldDraw::DebugDrawFloorMoveBatch(const LocalMaterial &material, const FloorMove &move) {
+	enum {
+		kSplineTess = 8
+	};
+
+	const float kStep = 1.f / (kSplineTess-1);
+	Vec3 pts[kSplineTess];
+
+	if (move.route->steps->empty())
+		return;
+
+	for (FloorMove::Step::Vec::const_iterator it = move.route->steps->begin(); it != move.route->steps->end(); ++it) {
+		const FloorMove::Step &step = *it;
+
+		float t = 0.f;
+
+		for (int i = 0; i < kSplineTess; ++i, t += kStep) {
+			step.path.Eval(t, pts[i], 0);
+		}
+
+		BBox bbox(pts[kSplineTess-1] - Vec3(16, 16, 16), pts[kSplineTess-1] + Vec3(16, 16, 16));
+		DebugDrawBBoxBatch(material, bbox, true);
+
+		m_rb->DebugUploadVerts(&pts[0], kSplineTess);
+		material.mat->shader->BindStates();
+		m_rb->CommitStates();
+		m_rb->DebugDrawLineStrip(kSplineTess);
+	}
+}
+
 } // world
 
 #endif // defined(WORLD_DEBUG_DRAW)

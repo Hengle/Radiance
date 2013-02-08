@@ -245,10 +245,9 @@ int WorldLua::lua_World_ClipToFloor(lua_State *L) {
 
 	FloorPosition p;
 	bool r = self->m_world->floors->ClipToFloor(start, end, p);
-	lua_pushboolean(L, r ? 1 : 0);
 	if (r)
 		lua::Marshal<FloorPosition>::Push(L, p);
-	return r ? 2 : 1;
+	return r ? 1 : 0;
 }
 
 int WorldLua::lua_World_CreateFloorMove(lua_State *L) {
@@ -1088,7 +1087,7 @@ void Marshal<world::Trace>::Push(lua_State *L, const world::Trace &val) {
 	Marshal<Vec3>::Push(L, val.start);
 	lua_setfield(L, -2, "start");
 	Marshal<Vec3>::Push(L, val.end);
-	lua_setfield(L, -2, "end");
+	lua_setfield(L, -2, "_end");
 	Marshal<Vec3>::Push(L, val.result);
 	lua_setfield(L, -2, "result");
 	lua_pushinteger(L, val.contents);
@@ -1109,7 +1108,7 @@ world::Trace Marshal<world::Trace>::Get(lua_State *L, int index, bool luaError) 
 	t.start = Marshal<Vec3>::Get(L, -1, luaError);
 	lua_pop(L, 1);
 
-	lua_getfield(L, index, "end");
+	lua_getfield(L, index, "_end");
 	t.end = Marshal<Vec3>::Get(L, -1, luaError);
 	lua_pop(L, 1);
 

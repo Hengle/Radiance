@@ -668,7 +668,7 @@ private:
 	bool EmitBSPWaypoint(SceneFile::Waypoint &waypoint);
 	U32 FindBSPMaterial(const char *name);
 	int FindBSPFloor(const char *name);
-	int PutPointOnFloor(SceneFile::Vec3 &pos, int floorNum);
+	int PutPointOnFloor(Vec3 &pos, int floorNum);
 	int EmitBSPCinematics();
 
 	void ResetProgress();
@@ -699,6 +699,7 @@ private:
 	static SceneFileD::TriVert ToBSPType(const SceneFile::TriVert &vec);
 	static BBox ToBSPType(const SceneFile::BBox &bbox);
 	static Plane ToBSPType(const SceneFile::Plane &plane);
+	static SceneFile::Vec3 FromBSPType(const Vec3 &vec);
 	static SceneFile::Plane FromBSPType(const Plane &plane);
 };
 

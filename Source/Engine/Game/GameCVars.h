@@ -19,6 +19,7 @@ public:
 	CVarBool r_showentitybboxes;
 	CVarBool r_showworldbboxes;
 	CVarBool r_showwaypoints;
+	CVarBool r_showmovecmds;
 	CVarBool r_frustumcull;
 
 	void AddLuaVar(const CVar::Ref &cvar) {

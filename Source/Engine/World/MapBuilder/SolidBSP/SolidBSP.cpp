@@ -1004,6 +1004,14 @@ Plane BSPBuilder::ToBSPType(const SceneFile::Plane &plane) {
 	);
 }
 
+SceneFile::Vec3 BSPBuilder::FromBSPType(const Vec3 &vec) {
+	return SceneFile::Vec3(
+		(SceneFile::ValueType)vec[0],
+		(SceneFile::ValueType)vec[1],
+		(SceneFile::ValueType)vec[2]
+	);
+}
+
 SceneFile::Plane BSPBuilder::FromBSPType(const Plane &plane) {
 	return SceneFile::Plane(
 		(SceneFile::ValueType)plane.A(),

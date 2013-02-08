@@ -51,9 +51,7 @@ void FloorMove::InitMove(State &state) {
 		step.path.Eval(0.f, state.pos.m_pos, &state.facing);
 		state.pos.m_waypoint = step.waypoints[0];
 		state.pos.m_nextWaypoint = step.waypoints[1];
-		if (state.pos.m_waypoint == -1) {
-			state.pos.m_floor = step.floors[0];
-		}
+		state.pos.m_floor = step.floors[0];
 	}
 }
 
@@ -261,15 +259,67 @@ bool Floors::ClipToFloor(
 	return r;
 }
 
+bool Floors::ClipToFloor(
+	int floorNum,
+	const Vec3 &start,
+	const Vec3 &end,
+	FloorPosition &pos
+) const {
+	RAD_ASSERT(floorNum < (int)m_bsp->numFloors);
+	float bestDistSq = std::numeric_limits<float>::max();
+	return ClipToFloor(floorNum, start, end, pos, bestDistSq);
+}
+
 FloorMove::Ref Floors::CreateMove(
-	const FloorPosition &start,
-	const FloorPosition &end
+	const FloorPosition &_start,
+	const FloorPosition &_end
 ) const {
 	MovePlan plan;
 	MovePlan planStack;
 	FloorBits floors;
 	WaypointBits waypoints;
 	float bestDistance = std::numeric_limits<float>::max();
+
+	// A floor move never sets the triangle number since motion along the move is arbitrary
+	// and doing a floor intersection test is expensive for every move step. We can fill this 
+	// information in here:
+
+	FloorPosition start(_start);
+	FloorPosition end(_end);
+
+	if (start.m_waypoint != -1) {
+		const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + start.m_waypoint;
+		start.m_floor = (int)waypoint->floorNum;
+		start.m_tri = (int)waypoint->triNum;
+	} else if (start.m_floor != -1) { // arbitrary floor position
+		if (start.m_tri == -1) {
+			Vec3 x(start.m_pos + Vec3(0, 0, 8.f));
+			Vec3 y(start.m_pos - Vec3(0, 0, 8.f));
+			if (!ClipToFloor(start.m_floor, x, y, start)) {
+#if !defined(RAD_OPT_SHIP)
+				RAD_FAIL("Floor starting position is outside floor!");
+#endif
+				return FloorMove::Ref();
+			}
+		}
+	}
+	
+	if (end.m_waypoint != -1) {
+		const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + end.m_waypoint;
+		end.m_floor = (int)waypoint->floorNum;
+		end.m_tri = (int)waypoint->triNum;
+	} else if (end.m_floor != -1) { // arbitrary floor position
+		if (end.m_tri == -1) {
+			Vec3 x(end.m_pos + Vec3(0, 0, 8.f));
+			Vec3 y(end.m_pos - Vec3(0, 0, 8.f));
+			if (!ClipToFloor(end.m_floor, x, y, end)) {
+#if !defined(RAD_OPT_SHIP)
+				RAD_FAIL("Floor ending position is outside floor!");
+#endif
+				return FloorMove::Ref();
+			}
+		}
+	}
 
 	++m_floodNum;
 	if (!PlanMove(start, end, 0.f, plan, planStack, floors, waypoints, bestDistance))
@@ -1060,7 +1110,8 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 
 		physics::CubicBZSpline spline(cur.pos, ctrls[0], ctrls[1], next.pos);
 		step.floors[0] = step.floors[1] = cur.floors[0];
-		step.waypoints[0] = step.waypoints[1] = -1;
+		step.waypoints[0] = -1;
+		step.waypoints[1] = next.waypoints[0];
 		step.connection = -1;
 		step.flags = BSPConnectionFlagsToStateFlags(cur.flags);
 		step.path.Load(spline);
@@ -1080,6 +1131,12 @@ inline bool Floors::PlanMove(
 	float &bestDistance
 ) const {
 	// done on stack to avoid overflow
+
+	if ((start.m_waypoint != -1) && (start.m_waypoint == end.m_waypoint))
+		return true; // at destination
+	if ((start.m_floor != -1) && (start.m_floor == end.m_floor))
+		return true; // at destination.
+
 	++m_floodNum;
 
 	planSoFar.start = start;
@@ -1158,6 +1215,39 @@ inline bool Floors::PlanMove(
 			cur.connections->push_back(c);
 		}
 
+		if (waypoint->floorNum >= 0) {
+			// on a floor, add waypoints
+			const bsp_file::BSPFloor *floor = m_bsp->Floors() + waypoint->floorNum;
+
+			for (S32 i = 0; i < floor->numWaypoints; ++i) {
+				Connection c;
+				c.nextFloor = 0;
+				c.connection = 0;
+				c.nextFloorIdx = -1;
+				c.connectionIdx = -1;
+				c.nextWaypointIdx = (int)*(m_bsp->WaypointIndices() + floor->firstWaypoint + i);
+
+				if (c.nextWaypointIdx == start.m_waypoint)
+					continue; // don't add ourselves
+
+				c.nextWaypoint = m_bsp->Waypoints() + c.nextWaypointIdx;
+
+				const Vec3 kPos(c.nextWaypoint->pos[0], c.nextWaypoint->pos[1], c.nextWaypoint->pos[2]);
+				c.cost = (kPos - start.m_pos).MagnitudeSquared();
+				c.distance = (kPos - end.m_pos).MagnitudeSquared();
+
+				c.pos.m_floor = (int)c.nextWaypoint->floorNum;
+				c.pos.m_waypoint = (int)c.nextWaypointIdx;
+				c.pos.m_tri = (int)c.nextWaypoint->triNum;
+				c.pos.m_nextWaypoint = -1;
+				c.pos.m_pos = kPos;
+
+				cur.connections->push_back(c);
+			}
+
+			floors.set(start.m_floor);
+		}
+
 		waypoints.set(start.m_waypoint);
 
 	} else {
@@ -1173,7 +1263,7 @@ inline bool Floors::PlanMove(
 			c.nextFloorIdx = -1;
 			c.connectionIdx = -1;
 			c.nextWaypointIdx = (int)*(m_bsp->WaypointIndices() + floor->firstWaypoint + i);
-			c.nextWaypoint = m_bsp->Waypoints() + c.nextWaypointIdx ;
+			c.nextWaypoint = m_bsp->Waypoints() + c.nextWaypointIdx;
 
 			const Vec3 kPos(c.nextWaypoint->pos[0], c.nextWaypoint->pos[1], c.nextWaypoint->pos[2]);
 			c.cost = (kPos - start.m_pos).MagnitudeSquared();
@@ -1324,6 +1414,37 @@ inline bool Floors::PlanMove(
 					cur.connections->push_back(c);
 				}
 
+				if (waypoint->floorNum >= 0) {
+					// on a floor, add waypoints
+					const bsp_file::BSPFloor *floor = m_bsp->Floors() + waypoint->floorNum;
+
+					for (S32 i = 0; i < floor->numWaypoints; ++i) {
+						Connection c;
+						c.nextFloor = 0;
+						c.connection = 0;
+						c.nextFloorIdx = -1;
+						c.connectionIdx = -1;
+						c.nextWaypointIdx = (int)*(m_bsp->WaypointIndices() + floor->firstWaypoint + i);
+
+						if (c.nextWaypointIdx == cur.pos.m_waypoint)
+							continue; // don't add ourselves
+
+						c.nextWaypoint = m_bsp->Waypoints() + c.nextWaypointIdx;
+
+						const Vec3 kPos(c.nextWaypoint->pos[0], c.nextWaypoint->pos[1], c.nextWaypoint->pos[2]);
+						c.cost = (kPos - start.m_pos).MagnitudeSquared();
+						c.distance = (kPos - end.m_pos).MagnitudeSquared();
+
+						c.pos.m_floor = (int)c.nextWaypoint->floorNum;
+						c.pos.m_waypoint = (int)c.nextWaypointIdx;
+						c.pos.m_tri = (int)c.nextWaypoint->triNum;
+						c.pos.m_nextWaypoint = -1;
+						c.pos.m_pos = kPos;
+
+						cur.connections->push_back(c);
+					}
+				}
+
 				std::sort(cur.connections->begin(), cur.connections->end());
 				pop = false;
 				break;
@@ -1417,6 +1538,8 @@ bool Floors::ClipToFloor(
 				bestDistSq = distSq;
 				pos.m_pos = clip;
 				pos.m_floor = (int)floorNum;
+				pos.m_waypoint = -1;
+				pos.m_nextWaypoint = -1;
 				bestTri = triNum;
 				pos.m_tri = bestTri;
 			}
@@ -1464,7 +1587,7 @@ world::FloorPosition Marshal<world::FloorPosition>::Get(lua_State *L, int index,
 	if (lua_type(L, -1) != LUA_TNUMBER) {
 		lua_pop(L, 1);
 		if (luaError)
-			luaL_typerror(L, index, "number");
+			luaL_typerror(L, index, "floor");
 		return p;
 	}
 	p.m_floor = (int)lua_tointeger(L, -1);

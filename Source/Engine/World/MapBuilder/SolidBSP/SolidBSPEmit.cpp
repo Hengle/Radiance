@@ -153,14 +153,18 @@ bool BSPBuilder::PutEntityOnFloor(const SceneFile::Entity::Ref &entity) {
 	int floorNum = FindBSPFloor(floor);
 	if (floorNum < 0) {
 		Log("ERROR: entity '%s' is looking for non-existent floor '%s'\n", entity->keys.StringForKey("classname", "<null>"), floor);
+		SetResult(pkg::SR_CompilerError);
 		return false;
 	}
 
-	int triNum = PutPointOnFloor(entity->origin, floorNum);
+	Vec3 pos(ToBSPType(entity->origin));
+	int triNum = PutPointOnFloor(pos, floorNum);
 	if (triNum < 0) {
 		Log("ERROR: entity '%s' is not inside floor '%s'\n", entity->keys.StringForKey("classname", "<null>"), floor);
 		return false;
 	}
+
+	entity->origin = FromBSPType(pos);
 
 	String s;
 	s.PrintfASCII("%f %f %f", entity->origin[0], entity->origin[1], entity->origin[2]);
@@ -1266,12 +1270,15 @@ bool BSPBuilder::EmitBSPWaypoint(SceneFile::Waypoint &waypoint) {
 			return false;
 		}
 
-		floorTriNum = PutPointOnFloor(waypoint.pos, floorNum);
+		Vec3 pos = ToBSPType(waypoint.pos);
+		floorTriNum = PutPointOnFloor(pos, floorNum);
 
 		if (floorTriNum < 0) {
 			Log("WARNING: Waypoint is not on or above floor \"%s\" (waypoint removed).\n", waypoint.floorName.c_str.get());
 			return false;
 		}
+
+		waypoint.pos = FromBSPType(pos);
 	}
 
 	if (m_bspFile->numWaypoints >= world::kMaxWaypoints) {
@@ -1324,29 +1331,28 @@ int BSPBuilder::FindBSPFloor(const char *name) {
 	return -1;
 }
 
-int BSPBuilder::PutPointOnFloor(SceneFile::Vec3 &pos, int floorNum) {
+int BSPBuilder::PutPointOnFloor(Vec3 &pos, int floorNum) {
 	const BSPFloor *floor = m_bspFile->Floors() + floorNum;
 
 	RAD_ASSERT(floor->numTris > 0);
 
 	int bestTri = -1;
 
-	SceneFile::Vec3 end(pos - SceneFile::Vec3(0, 0, 512));
+	Vec3 end(pos - Vec3(0, 0, 512));
 	float bestDistSq = std::numeric_limits<float>::max();
 
 	for (U32 i = 0; i < floor->numTris; ++i) {
 		U32 triNum = floor->firstTri + i;
 		const BSPFloorTri *tri = m_bspFile->FloorTris() + triNum;
 
-		const BSPPlane *plane = m_bspFile->Planes() + tri->planenum;
-		const SceneFile::Plane kTriPlane(plane->p[0], plane->p[1], plane->p[2], plane->p[3]);
-
-		SceneFile::Vec3 clip;
+		const Plane &kTriPlane = m_planes.Plane(tri->planenum);
+		
+		Vec3 clip;
 
 		if (!kTriPlane.IntersectLineSegment(clip, pos, end, 0.f))
 			continue;
 
-		float distSq = (clip-pos).MagnitudeSquared();
+		ValueType distSq = (clip-pos).MagnitudeSquared();
 		if (distSq >= bestDistSq) // can't be better
 			continue;
 
@@ -1354,16 +1360,14 @@ int BSPBuilder::PutPointOnFloor(SceneFile::Vec3 &pos, int floorNum) {
 		
 		for (k = 0; k < 3; ++k) {
 			const BSPFloorEdge *edge = m_bspFile->FloorEdges() + tri->edges[k];
-			plane = m_bspFile->Planes() + edge->planenum;
+			Plane plane = m_planes.Plane(edge->planenum);
 
 			int side = edge->tris[1] == triNum;
 
-			SceneFile::Plane edgePlane(plane->p[0], plane->p[1], plane->p[2], plane->p[3]);
-
 			if (side)
-				edgePlane.Flip();
+				plane.Flip();
 
-			if (edgePlane.Side(clip) == Plane::Back) {
+			if (plane.Side(clip) == Plane::Back) {
 				break;
 			}
 		}
