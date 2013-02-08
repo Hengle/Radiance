@@ -294,13 +294,7 @@ bool AnimationSource::Tick(
 		int start = firstBone;
 		int count = numBones;
 		int outOfs = 0;
-		if (start == 0) {
-			// remove motion from motion driven anims.
-			start = 1;
-			outOfs = 1;
-			--count;
-		}
-
+		
 		m_anim->BlendFrames(
 			src,
 			dst,
@@ -309,13 +303,6 @@ bool AnimationSource::Tick(
 			start,
 			count
 		);
-
-		if (firstBone == 0 && numBones > 0) {
-			// never any root motion (recorded seperately).
-			out[0].r = Quat::Identity;
-			out[0].s = Vec3(1, 1, 1);
-			out[0].t = Vec3::Zero;
-		}
 	}
 
 	if (dt > 0.f || distance > 0.f) {

@@ -650,8 +650,9 @@ private:
 
 	bool EmitBSPFile();
 	void EmitBSPMaterials();
-	void EmitBSPEntities();
-	void EmitBSPEntity(const SceneFile::Entity::Ref &entity);
+	bool EmitBSPEntities();
+	bool EmitBSPEntity(const SceneFile::Entity::Ref &entity);
+	bool PutEntityOnFloor(const SceneFile::Entity::Ref &entity);
 	bool EmitBSPAreas();
 	void EmitBSPAreaportals(Node *leaf, int areaNum, world::bsp_file::BSPArea &area);
 	void EmitBSPModels();
@@ -667,7 +668,7 @@ private:
 	bool EmitBSPWaypoint(SceneFile::Waypoint &waypoint);
 	U32 FindBSPMaterial(const char *name);
 	int FindBSPFloor(const char *name);
-	int PutWaypointOnFloor(SceneFile::Waypoint &waypoint, int floorNum);
+	int PutPointOnFloor(SceneFile::Vec3 &pos, int floorNum);
 	int EmitBSPCinematics();
 
 	void ResetProgress();

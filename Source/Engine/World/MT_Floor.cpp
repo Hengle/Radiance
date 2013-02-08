@@ -40,6 +40,7 @@ void Entity::Tick_MT_Floor(
 
 	if (!m_ps.activeMove) {
 		m_ps.velocity = Vec3::Zero;
+		m_ps.distanceMoved = 0.f;
 		Move();
 		return;
 	}
@@ -48,14 +49,16 @@ void Entity::Tick_MT_Floor(
 
 	float moveLen = m_ps.velocity.Magnitude() * dt;
 
-	if (moveLen < 0.01f)
+	if (moveLen < 0.01f) {
+		m_ps.distanceMoved = 0.f;
 		return;
+	}
 
 	float distanceRemaining;
 	StringVec events;
 
 	m_ps.distanceMoved = m_ps.activeMove->Move(m_ps.moveState, moveLen, distanceRemaining, events);
-	m_ps.origin = m_ps.moveState.pos.pos;
+	m_ps.origin = m_ps.moveState.pos.pos.get() + m_ps.bbox.Origin();
 
 	if (!events.empty()) {
 		for (StringVec::const_iterator it = events.begin(); it != events.end(); ++it) {
@@ -69,6 +72,7 @@ void Entity::Tick_MT_Floor(
 	}
 
 	if (distanceRemaining < 0.01f) {
+		m_ps.activeMove->ClampToEnd(m_ps.moveState);
 		m_ps.activeMove.reset(); // done with this move.
 	}
 

@@ -586,27 +586,32 @@ void Ska::Tick(
 		S16 parentIdx = m_dska->boneParents[i];
 
 		const float *parent = (m_worldBones+SIMDDriver::kNumBoneFloats) + parentIdx*SIMDDriver::kNumBoneFloats;
-
-		if (i > 0) {
-			Mat4 s = Mat4::Scaling(*reinterpret_cast<const Scale3*>(&tm.s));
-			Mat4 r = Mat4::Rotation(tm.r);
-			Mat4 t = Mat4::Translation(tm.t);
-
-			details::MulMat4x3(outMat[0], s, r);
-
-			if (parentIdx >= 0) {
-				const BoneTM &parentTM = m_boneTMs[parentIdx];
-				Scale3 invScale(1.0f/parentTM.s[0], 1.0f/parentTM.s[1], 1.0f/parentTM.s[2]);
-				s = Mat4::Scaling(invScale);
-				details::MulMat4x3(outMat[1], outMat[0], s);
-				std::swap(outMat[0], outMat[1]);
-			}
-
-			details::MulMat4x3(outMat[1], t, parent);
-			details::MulMat4x3(worldBone, outMat[0], outMat[1]);
-		} else { // remove root worldBone motion
-			details::StoreMat4x3(worldBone, parent);
+				
+		Mat4 s = Mat4::Scaling(*reinterpret_cast<const Scale3*>(&tm.s));
+		Mat4 r = Mat4::Rotation(tm.r);
+		Mat4 t;
+			
+		if ((i > 0) || (distance < 0.f)) {
+			t = Mat4::Translation(tm.t);
+		} else { // not distance driven
+			t = Mat4::Translation(Vec3(0.f, tm.t[1], tm.t[2]));
+			//t = r * Mat4::Translation(tm.t); // remove root bone motion on X axis
+			//t[3][0] = 0.f; // null out X motion.
+			//t = r.Transpose() * t;
 		}
+
+		details::MulMat4x3(outMat[0], s, r);
+
+		if (parentIdx >= 0) {
+			const BoneTM &parentTM = m_boneTMs[parentIdx];
+			Scale3 invScale(1.0f/parentTM.s[0], 1.0f/parentTM.s[1], 1.0f/parentTM.s[2]);
+			s = Mat4::Scaling(invScale);
+			details::MulMat4x3(outMat[1], outMat[0], s);
+			std::swap(outMat[0], outMat[1]);
+		}
+
+		details::MulMat4x3(outMat[1], t, parent);
+		details::MulMat4x3(worldBone, outMat[0], outMat[1]);
 	}
 
 	const float *invWorld = m_dska->invWorld;

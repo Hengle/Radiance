@@ -141,7 +141,7 @@ void FloorMove::Merge(const Ref &old, State &state) {
 
 	if (firstStep.waypoints[0] != state.pos.m_waypoint) {
 		// disjointed move.
-			InitMove(state);
+		InitMove(state);
 		return;
 	}
 
@@ -178,6 +178,23 @@ void FloorMove::Merge(const Ref &old, State &state) {
 	} else {
 		RAD_ASSERT(firstStep.waypoints[1] == state.pos.m_nextWaypoint);
 		state.m_stepIdx = 0; // just reset our step counter
+	}
+}
+
+void FloorMove::ClampToEnd(State &state) {
+	// this only applies to waypoint moves
+	if (state.m_stepIdx < (int)m_route.steps->size()) {
+		const Step &curStep = m_route.steps[state.m_stepIdx];
+		if (curStep.waypoints[0] != -1 &&
+			curStep.waypoints[1] != -1) {
+			if (state.m_stepIdx == (int)(m_route.steps->size())) {
+				// last step in move.
+				state.pos.m_waypoint = curStep.waypoints[1];
+				state.pos.m_nextWaypoint = -1;
+				state.pos.m_floor = curStep.floors[1];
+				curStep.path.Eval(1.f, state.pos.m_pos, &state.facing);
+			}
+		}
 	}
 }
 
@@ -1046,7 +1063,7 @@ inline bool Floors::PlanMove(
 	WaypointBits &waypoints,
 	float &bestDistance
 ) const {
-	// done on stack to avoid stackoverflow
+	// done on stack to avoid overflow
 	++m_floodNum;
 
 	planSoFar.start = start;

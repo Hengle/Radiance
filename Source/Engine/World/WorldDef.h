@@ -29,8 +29,8 @@ enum PauseFlags {
 };
 
 enum {
-	kMaxEnts = 1024,
-	kMaxTempEnts = 64,
+	kMaxEnts = 2048,
+	kMaxTempEnts = 1024,
 	kMaxStaticEnts = kMaxEnts-kMaxTempEnts,
 	kFirstTempEntId = kMaxStaticEnts,
 	kMaxAreas = 64

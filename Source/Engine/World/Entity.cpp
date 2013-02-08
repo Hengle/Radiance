@@ -42,7 +42,7 @@ maxSplineBank(0.f),
 splineBankScale(0.f),
 splineBankLerp(-1.f),
 autoDecelDistance(0.f),
-distanceMoved(0.f),
+distanceMoved(-1.f),
 mtype(kMoveType_None),
 stype(kSolidType_None),
 otype(kOccupantType_None),
@@ -748,7 +748,14 @@ int Entity::LUART_SETFN(DesiredMove)(lua_State *L) {
 	return 0;
 }
 
-ENT_GETSET(Entity, FloorPosition, FloorPosition, m_ps.moveState.pos);
+ENT_GET(Entity, FloorPosition, FloorPosition, m_ps.moveState.pos);
+
+int Entity::LUART_SETFN(FloorPosition) (lua_State *L) {
+	Entity *self = WorldLua::EntFramePtr(L, 1, true);
+	self->m_ps.moveState.pos = lua::Marshal<FloorPosition>::Get(L, 2, true);
+	self->m_ps.origin = self->m_ps.moveState.pos.pos.get() + self->m_ps.bbox.Origin();
+	return 0;
+}
 
 ENT_GETSET(Entity, MaxSplineBank, float, m_ps.maxSplineBank);
 ENT_GETSET(Entity, SplineBankScale, float, m_ps.splineBankScale);

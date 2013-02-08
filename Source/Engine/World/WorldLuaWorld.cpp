@@ -264,6 +264,19 @@ int WorldLua::lua_World_CreateFloorMove(lua_State *L) {
 	return move ? 1 : 0;
 }
 
+int WorldLua::lua_World_CreateFloorPosition(lua_State *L) {
+	LOAD_SELF
+
+	Vec3 pos = lua::Marshal<Vec3>::Get(L, 1, true);
+	int floorNum = (int)luaL_checkinteger(L, 2);
+	int triNum = (int)luaL_checkinteger(L, 3);
+
+	FloorPosition fp(pos, floorNum, triNum);
+	lua::Marshal<FloorPosition>::Push(L, fp);
+
+	return 1;
+}
+
 int WorldLua::lua_World_CreateScreenOverlay(lua_State *L) {
 	LOAD_SELF
 

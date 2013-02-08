@@ -24,6 +24,13 @@ namespace world {
 class RADENG_CLASS FloorPosition {
 public:
 
+	FloorPosition() {}
+	FloorPosition(const Vec3 &pos, int floor, int tri)
+		: m_pos(pos), m_floor(floor), m_tri(tri) {
+		m_waypoint = -1;
+		m_nextWaypoint = -1;
+	}
+
 	RAD_DECLARE_READONLY_PROPERTY(FloorPosition, pos, const Vec3&);
 	RAD_DECLARE_READONLY_PROPERTY(FloorPosition, floor, int);
 	RAD_DECLARE_READONLY_PROPERTY(FloorPosition, tri, int);
@@ -126,6 +133,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(FloorMove, route, const Route*);
 
 	void Merge(const Ref &old, State &state);
+	void ClampToEnd(State &state);
 
 private:
 
