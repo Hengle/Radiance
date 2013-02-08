@@ -1067,7 +1067,7 @@ RADENG_API bool RADENG_CALL ImportModule(lua_State *L, const char *name) {
 	MarkFileLoaded(L, name);
 
 	if (luaL_loadbuffer(L, (const char *)((const void*)code->ptr), code->size, code->name)) {
-		COut(C_Error) << "Error importing '%s'(%s):\n\t%s" << name << (const char*)code->name << lua_tostring(L, -1) << std::endl;
+		COut(C_Error) << "Error importing " << name << "(" << (const char*)code->name.get() << ")" << std::endl << lua_tostring(L, -1) << std::endl;
 		return false;
 	}
 

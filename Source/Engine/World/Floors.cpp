@@ -1557,15 +1557,13 @@ void Marshal<world::FloorPosition>::Push(lua_State *L, const world::FloorPositio
 	RAD_ASSERT(L);
 	lua_createtable(L, 0, 3);
 	Marshal<Vec3>::Push(L, val.m_pos);
-	lua_setfield(L, -2, "pos"); // <-- public
-	Marshal<Vec3>::Push(L, val.m_pos);
-	lua_setfield(L, -2, "@pos");
+	lua_setfield(L, -2, "pos");
 	lua_pushinteger(L, (int)val.m_floor);
-	lua_setfield(L, -2, "@floor");
+	lua_setfield(L, -2, "floor");
 	lua_pushinteger(L, (int)val.m_tri);
 	lua_setfield(L, -2, "@tri");
 	lua_pushinteger(L, (int)val.m_waypoint);
-	lua_setfield(L, -2, "@waypoint");
+	lua_setfield(L, -2, "waypoint");
 	lua_pushinteger(L, (int)val.m_nextWaypoint);
 	lua_setfield(L, -2, "@nextWaypoint");
 }
@@ -1579,11 +1577,11 @@ world::FloorPosition Marshal<world::FloorPosition>::Get(lua_State *L, int index,
 		return p;
 	}
 
-	lua_getfield(L, index, "@pos");
+	lua_getfield(L, index, "pos");
 	p.m_pos = Marshal<Vec3>::Get(L, -1, luaError);
 	lua_pop(L, 1);
 
-	lua_getfield(L, index, "@floor");
+	lua_getfield(L, index, "floor");
 	if (lua_type(L, -1) != LUA_TNUMBER) {
 		lua_pop(L, 1);
 		if (luaError)
@@ -1604,7 +1602,7 @@ world::FloorPosition Marshal<world::FloorPosition>::Get(lua_State *L, int index,
 	p.m_tri = (int)lua_tointeger(L, -1);
 	lua_pop(L, 1);
 
-	lua_getfield(L, index, "@waypoint");
+	lua_getfield(L, index, "waypoint");
 	if (lua_type(L, -1) != LUA_TNUMBER) {
 		lua_pop(L, 1);
 		if (luaError)

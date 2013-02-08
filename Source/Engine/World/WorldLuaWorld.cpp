@@ -240,6 +240,17 @@ int WorldLua::lua_World_ClipToFloor(lua_State *L) {
 
 	LOAD_SELF
 
+	if (lua_type(L, 1) == LUA_TNUMBER) {
+		Vec3 start = lua::Marshal<Vec3>::Get(L, 2, true);
+		Vec3 end = lua::Marshal<Vec3>::Get(L, 3, true);
+		
+		FloorPosition p;
+		bool r = self->m_world->floors->ClipToFloor((int)luaL_checkinteger(L, 1), start, end, p);
+		if (r)
+			lua::Marshal<FloorPosition>::Push(L, p);
+		return r ? 1 : 0;
+	}
+
 	Vec3 start = lua::Marshal<Vec3>::Get(L, 1, true);
 	Vec3 end = lua::Marshal<Vec3>::Get(L, 2, true);
 
