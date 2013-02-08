@@ -627,16 +627,13 @@ bool World::LineTrace(Trace &trace, int nodeNum) {
 		int leafNum = -(nodeNum + 1);
 		const dBSPLeaf &leaf = m_leafs[leafNum];
 
-		// it's gonna hit this leaf.
-		if (leaf.contents&trace.contents) {
-			trace.contents = leaf.contents;
-		} else {
-			trace.contents = 0;
-			trace.frac = 1.f;
-			trace.result = trace.end;
-		}
+		// it's not gonna hit this leaf.
+		if (!(leaf.contents&trace.contents))
+			return true;
 
-		return trace.frac == 1.f;
+		trace.contents = leaf.contents;
+		RAD_ASSERT(trace.frac < 1.f);
+		return false;
 	}
 
 	// trace from result->end
@@ -656,9 +653,6 @@ bool World::LineTrace(Trace &trace, int nodeNum) {
 		if (sides[0] == Plane::On) {
 			sides[0] = Plane::Front;
 			sides[1] = Plane::Front;
-		} else {
-			// all on one side
-			return LineTrace(trace, node.children[sides[0] == Plane::Back]);
 		}
 	}
 
@@ -675,11 +669,12 @@ bool World::LineTrace(Trace &trace, int nodeNum) {
 			std::swap(trace.result, result);
 			std::swap(trace.frac, frac);
 			bool r = LineTrace(trace, node.children[sides[1] == Plane::Back]);
-			if (r) { // did not intersect
-				trace.result = result; // restore.
-				trace.frac = frac;
-			}
-			return r;
+			if (!r)
+				return false;
+
+			// did not intersect
+			trace.result = result; // restore.
+			trace.frac = frac;
 		}
 	}
 

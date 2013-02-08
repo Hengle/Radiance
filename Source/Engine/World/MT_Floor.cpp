@@ -58,7 +58,7 @@ void Entity::Tick_MT_Floor(
 	StringVec events;
 
 	m_ps.distanceMoved = m_ps.activeMove->Move(m_ps.moveState, moveLen, distanceRemaining, events);
-	m_ps.origin = m_ps.moveState.pos.pos.get() + m_ps.bbox.Origin();
+	m_ps.origin = m_ps.moveState.pos.pos.get() - Vec3(0, 0, m_ps.bbox.Mins()[2]); // put bbox on floor.
 
 	if (!events.empty()) {
 		for (StringVec::const_iterator it = events.begin(); it != events.end(); ++it) {

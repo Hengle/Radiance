@@ -134,6 +134,7 @@ public:
 	);
 
 	//! Trace a line through the world BSP.
+	//! returns true if trace.start->trace.end was not blocked, false otherwise.
 	bool LineTrace(Trace &trace);
 
 	Entity::Vec EntitiesTouchingBrush(int classbits, int brushNum) const;

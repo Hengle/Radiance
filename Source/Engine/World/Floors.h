@@ -156,7 +156,8 @@ public:
 	Floors();
 	~Floors();
 
-	bool Load(const bsp_file::BSPFile::Ref &bsp);
+	bool Load(World &world);
+	bool Load(const bsp_file::BSPFile &bsp);
 
 	bool ClipToFloor(
 		const Vec3 &start,
@@ -189,7 +190,6 @@ public:
 	IntVec WaypointsForUserId(const char *userId) const;
 
 	int PickWaypoint(
-		World &world,
 		float x,
 		float y,
 		float d,
@@ -280,7 +280,8 @@ private:
 	Waypoint::MMap m_waypointTargets;
 	Waypoint::MMap m_waypointUserIds;
 	IntVec m_floorState;
-	bsp_file::BSPFile::Ref m_bsp;
+	const bsp_file::BSPFile *m_bsp;
+	World *m_world;
 	mutable int m_floodNum;
 };
 

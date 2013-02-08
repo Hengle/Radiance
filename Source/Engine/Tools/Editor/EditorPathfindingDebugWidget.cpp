@@ -145,7 +145,7 @@ void PathfindingDebugWidget::OnTick(float dt) {
 
 		if (r == pkg::SR_Success) {
 			m_bsp = m_map->bspFile;
-			m_floors.Load(m_bsp);
+			m_floors.Load(*m_bsp);
 			LoadPlayerStart();
 			m_loaded = true;
 			m_progress->close();

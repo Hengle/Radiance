@@ -200,14 +200,19 @@ void FloorMove::ClampToEnd(State &state) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Floors::Floors() : m_floodNum(-1) {
+Floors::Floors() : m_floodNum(-1), m_world(0) {
 }
 
 Floors::~Floors() {
 }
 
-bool Floors::Load(const bsp_file::BSPFile::Ref &bsp) {
-	m_bsp = bsp;
+bool Floors::Load(World &world) {
+	m_world = &world;
+	return Load(*world.bspFile);
+}
+
+bool Floors::Load(const bsp_file::BSPFile &bsp) {
+	m_bsp = &bsp;
 
 	m_waypoints.reserve(m_bsp->numWaypoints);
 	for (U32 i = 0; i < m_bsp->numWaypoints; ++i) {
@@ -379,12 +384,15 @@ IntVec Floors::WaypointsForUserId(const char *userId) const {
 }
 
 int Floors::PickWaypoint(
-	World &world,
 	float x,
 	float y,
 	float d,
 	float dropDist
 ) {
+	RAD_ASSERT(m_world);
+	if (!m_world) // debug tools.
+		return -1;
+
 	d = d*d; // squared distances.
 
 	struct Candidate {
@@ -398,9 +406,10 @@ int Floors::PickWaypoint(
 		}
 	};
 
+	Trace trace;
+	const Vec3 &fwd = m_world->camera->fwd;
+
 	Candidate::Vec waypoints;
-	
-	const Vec3 &fwd = world.camera->fwd;
 
 	for (U32 i = 0; i < m_bsp->numWaypoints; ++i) {
 		if (!(m_waypoints[i].flags&kWaypointState_Enabled))
@@ -409,7 +418,7 @@ int Floors::PickWaypoint(
 		const Vec3 kPos(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
 
 		Vec3 out;
-		if (!world.draw->Project(kPos, out))
+		if (!m_world->draw->Project(kPos, out))
 			continue;
 
 		float dx = out[0]-x;
@@ -417,11 +426,18 @@ int Floors::PickWaypoint(
 		float dd = dx*dx + dy*dy;
 
 		if (dd <= d) {
-			Candidate c;
-			c.idx = (int)i;
-			c.dd = dd;
-			c.dist = fwd.Dot(kPos);
-			waypoints->push_back(c);
+			// check line of sight
+			trace.start = m_world->camera->pos;
+			trace.end = kPos;
+			trace.contents = bsp_file::kContentsFlag_SolidContents|bsp_file::kContentsFlag_Clip;
+			if (m_world->LineTrace(trace)) {
+				// did not collide with world
+				Candidate c;
+				c.idx = (int)i;
+				c.dd = dd;
+				c.dist = fwd.Dot(kPos);
+				waypoints->push_back(c);
+			}
 		}
 	}
 
@@ -1346,8 +1362,8 @@ bool Floors::ClipToFloor(
 	float &bestDistSq
 ) const {
 	// TODO: optimize this with a AA BSP
-	
 	const bsp_file::BSPFloor *floor = m_bsp->Floors() + floorNum;
+	Trace trace;
 
 	RAD_ASSERT(floor->numTris > 0);
 
@@ -1389,11 +1405,21 @@ bool Floors::ClipToFloor(
 
 		if (k == 3) {
 			// inside triangle hull
-			bestDistSq = distSq;
-			pos.m_pos = clip;
-			pos.m_floor = (int)floorNum;
-			bestTri = triNum;
-			pos.m_tri = bestTri;
+			
+			// valid line trace?
+			trace.start = start;
+			trace.end = clip;
+			trace.contents = bsp_file::kContentsFlag_Solid|bsp_file::kContentsFlag_Clip;
+			
+			// debug tools don't give us a world object.
+			if (m_world && m_world->LineTrace(trace)) {
+				// did not collide with world.
+				bestDistSq = distSq;
+				pos.m_pos = clip;
+				pos.m_floor = (int)floorNum;
+				bestTri = triNum;
+				pos.m_tri = bestTri;
+			}
 		}
 	}
 

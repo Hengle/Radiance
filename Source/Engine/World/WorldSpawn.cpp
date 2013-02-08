@@ -44,7 +44,7 @@ int World::Spawn(
 		switch (m_spawnState) {
 		case SS_BSP:
 			LoadBSP(*bsp);
-			m_floors.Load(bsp);
+			m_floors.Load(*this);
 			r = SR_Success;
 			++m_spawnState;
 			break;

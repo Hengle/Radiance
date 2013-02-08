@@ -989,7 +989,6 @@ int WorldLua::lua_World_WaypointsForUserId(lua_State *L) {
 int WorldLua::lua_World_PickWaypoint(lua_State *L) {
 	LOAD_SELF
 	int idx = self->m_world->floors->PickWaypoint(
-		*self->m_world,
 		(float)luaL_checknumber(L, 1),
 		(float)luaL_checknumber(L, 2),
 		(float)luaL_checknumber(L, 3),

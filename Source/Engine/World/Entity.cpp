@@ -753,7 +753,7 @@ ENT_GET(Entity, FloorPosition, FloorPosition, m_ps.moveState.pos);
 int Entity::LUART_SETFN(FloorPosition) (lua_State *L) {
 	Entity *self = WorldLua::EntFramePtr(L, 1, true);
 	self->m_ps.moveState.pos = lua::Marshal<FloorPosition>::Get(L, 2, true);
-	self->m_ps.origin = self->m_ps.moveState.pos.pos.get() + self->m_ps.bbox.Origin();
+	self->m_ps.origin = self->m_ps.moveState.pos.pos.get() - Vec3(0, 0, self->m_ps.bbox.Mins()[2]); // put bbox on floor.
 	return 0;
 }
 
