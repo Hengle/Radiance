@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "../Packages/PackagesDef.h"
 #include "../Renderer/Mesh.h"
 #include "../Renderer/SkMesh.h"
 #include "../Lua/LuaRuntime.h"
@@ -213,12 +214,12 @@ public:
 	typedef boost::shared_ptr<MeshBundleDrawModel> Ref;
 	typedef boost::weak_ptr<MeshBundleDrawModel> WRef;
 
-	static Ref New(Entity *entity, const r::MeshBundle::Ref &bundle);
+	static Ref New(Entity *entity, const pkg::AssetRef &meshBundle);
 	virtual ~MeshBundleDrawModel();
 
 	Ref CreateInstance();
 
-	RAD_DECLARE_READONLY_PROPERTY(MeshBundleDrawModel, bundle, const r::MeshBundle::Ref&);
+	RAD_DECLARE_READONLY_PROPERTY(MeshBundleDrawModel, bundle, const pkg::AssetRef&);
 
 protected:
 
@@ -227,8 +228,8 @@ protected:
 
 private:
 
-	RAD_DECLARE_GET(bundle, const r::MeshBundle::Ref&) { 
-		return m_bundle; 
+	RAD_DECLARE_GET(bundle, const pkg::AssetRef&) { 
+		return m_asset; 
 	}
 
 	class Batch : public DrawModel::DrawBatch {
@@ -251,7 +252,7 @@ private:
 
 	MeshBundleDrawModel(Entity *entity);
 
-	r::MeshBundle::Ref m_bundle;
+	pkg::AssetRef m_asset;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

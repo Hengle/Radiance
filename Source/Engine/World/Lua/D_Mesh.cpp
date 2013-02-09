@@ -8,14 +8,11 @@
 
 namespace world {
 
-D_Mesh::Ref D_Mesh::New(const r::MeshBundle::Ref &bundle)
-{
-	return Ref(new (ZWorld) D_Mesh(bundle));
+D_Mesh::Ref D_Mesh::New(const pkg::AssetRef &asset) {
+	return Ref(new (ZWorld) D_Mesh(asset));
 }
 
-D_Mesh::D_Mesh(const r::MeshBundle::Ref &bundle) : D_Asset(bundle->asset),
-m_bundle(bundle)
-{
+D_Mesh::D_Mesh(const pkg::AssetRef &asset) : D_Asset(asset) {
 }
 
 } // world

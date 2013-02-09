@@ -120,48 +120,6 @@ private:
 	RB m_imp;
 };
 
-//! Defines a group of meshes and their associated materials.
-class RADENG_CLASS MeshBundle {
-public:
-	typedef boost::shared_ptr<MeshBundle> Ref;
-
-	static Ref New(const pkg::AssetRef &bundle);
-
-	MeshBundle() {}
-	~MeshBundle() {}
-
-	const r::Mesh::Ref &Mesh(int idx) { 
-		return m_meshes[idx]; 
-	}
-	
-	pkg::AssetRef MaterialAsset(int idx) {
-		RAD_ASSERT(m_loader);
-		return m_loader->MaterialAsset(idx);
-	}
-
-	RAD_DECLARE_READONLY_PROPERTY(MeshBundle, asset, const pkg::AssetRef&);
-	RAD_DECLARE_READONLY_PROPERTY(MeshBundle, materialLoader, asset::MeshMaterialLoader*);
-	RAD_DECLARE_READONLY_PROPERTY(MeshBundle, numMeshes, int);
-
-private:
-
-	RAD_DECLARE_GET(asset, const pkg::AssetRef&) { 
-		return m_asset; 
-	}
-
-	RAD_DECLARE_GET(materialLoader, asset::MeshMaterialLoader*) {
-		return m_loader;
-	}
-
-	RAD_DECLARE_GET(numMeshes, int) { 
-		return (int)m_meshes.size(); 
-	}
-
-	Mesh::Vec m_meshes;
-	pkg::AssetRef m_asset;
-	asset::MeshMaterialLoader *m_loader;
-};
-
 } // r
 
 

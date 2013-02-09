@@ -617,7 +617,7 @@ int Entity::lua_AttachDrawModel(lua_State *L) {
 	{
 		D_Mesh::Ref x = lua::SharedPtr::Get<D_Mesh>(L, "Model", 2, false);
 		if (x) {
-			MeshBundleDrawModel::Ref m = MeshBundleDrawModel::New(self, x->bundle);
+			MeshBundleDrawModel::Ref m = MeshBundleDrawModel::New(self, x->asset);
 			self->AttachDrawModel(m);
 			m->Push(L);
 			return 1;

@@ -8,6 +8,8 @@
 #include "../Engine.h"
 #include "../Packages/Packages.h"
 #include "../MathUtils.h"
+#include "../Assets/MeshMaterialLoader.h"
+#include "../Assets/MeshVBLoader.h"
 #include "DrawModel.h"
 #include "Entity.h"
 #include "World.h"
@@ -257,16 +259,22 @@ void MeshDrawModel::Batch::Draw() {
 
 MeshBundleDrawModel::Ref MeshBundleDrawModel::New(
 	Entity *entity, 
-	const r::MeshBundle::Ref &bundle
+	const pkg::AssetRef &asset
 ) {
+	if (asset->type != asset::AT_Mesh)
+		return Ref();
+
 	Ref r(new (ZWorld) MeshBundleDrawModel(entity));
-	r->m_bundle = bundle;
+	r->m_asset = asset;
 
 	WorldDraw *draw = entity->world->draw;
 
+	asset::MeshVBLoader *bundle = asset::MeshVBLoader::Cast(asset);
+	asset::MeshMaterialLoader *loader = asset::MeshMaterialLoader::Cast(asset);
+
 	for (int i = 0; i < bundle->numMeshes; ++i) {
-		Batch::Ref b(new (ZWorld) Batch(*r, bundle->Mesh(i), bundle->MaterialAsset(i)->id));
-		draw->AddMaterial(bundle->MaterialAsset(i)->id);
+		Batch::Ref b(new (ZWorld) Batch(*r, bundle->Mesh(i), loader->MaterialAsset(i)->id));
+		draw->AddMaterial(loader->MaterialAsset(i)->id);
 
 		r->RefBatch(b);
 	}
@@ -281,7 +289,7 @@ MeshBundleDrawModel::~MeshBundleDrawModel() {
 }
 
 MeshBundleDrawModel::Ref MeshBundleDrawModel::CreateInstance() {
-	return New(entity, m_bundle);
+	return New(entity, m_asset);
 }
 
 void MeshBundleDrawModel::PushElements(lua_State *L) {
@@ -292,7 +300,7 @@ void MeshBundleDrawModel::PushElements(lua_State *L) {
 
 int MeshBundleDrawModel::lua_PushMaterialList(lua_State *L) {
 
-	asset::MeshMaterialLoader *loader = m_bundle->materialLoader;
+	asset::MeshMaterialLoader *loader = asset::MeshMaterialLoader::Cast(m_asset);
 	int numUniqueMaterials = loader->numUniqueMaterials;
 
 	if (numUniqueMaterials < 1)

@@ -18,6 +18,11 @@ class QTreeWidget;
 class QTreeWidgetItem;
 class QCheckBox;
 
+namespace asset {
+class MeshVBLoader;
+class MeshMaterialLoader;
+}
+
 namespace tools {
 namespace editor {
 
@@ -64,7 +69,8 @@ private:
 	void DoClose();
 
 	r::SkMesh::Ref m_skModel;
-	r::MeshBundle::Ref m_bundle;
+	asset::MeshVBLoader *m_bundle;
+	asset::MeshMaterialLoader *m_bundleMLoader;
 	pkg::Asset::Ref m_asset;
 	pkg::Asset::Ref m_wireframeMat;
 	pkg::Asset::Ref m_normalMat;

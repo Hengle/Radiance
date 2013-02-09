@@ -101,6 +101,7 @@
     </ClInclude>
     <ClInclude Include="..\..\Engine\Assets\MeshMaterialLoader.h" />
     <ClInclude Include="..\..\Engine\Assets\MeshParser.h" />
+    <ClInclude Include="..\..\Engine\Assets\MeshVBLoader.h" />
     <ClInclude Include="..\..\Engine\Assets\MusicCooker.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
@@ -1213,6 +1214,7 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\Assets\MeshMaterialLoader.cpp" />
     <ClCompile Include="..\..\Engine\Assets\MeshParser.cpp" />
+    <ClCompile Include="..\..\Engine\Assets\MeshVBLoader.cpp" />
     <ClCompile Include="..\..\Engine\Assets\MusicCooker.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
@@ -1371,7 +1373,6 @@
     <ClCompile Include="..\..\Engine\Renderer\GL\RBGLAssets.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\GL\RGLBackend.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\Material.cpp" />
-    <ClCompile Include="..\..\Engine\Renderer\Mesh.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\Renderer.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\Shader.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\ShaderTool.cpp">

@@ -11,6 +11,8 @@
 #include "EditorUtils.h"
 #include "EditorGLNavWidget.h"
 #include "../../Assets/MeshParser.h"
+#include "../../Assets/MeshMaterialLoader.h"
+#include "../../Assets/MeshVBLoader.h"
 #include "../../Assets/SkModelParser.h"
 #include "../../Renderer/GL/GLState.h"
 #include "../../Renderer/GL/GLTexture.h"
@@ -51,7 +53,7 @@ ModelEditorWidget::ModelEditorWidget(
 	const pkg::Asset::Ref &asset,
 	bool editable,
 	QWidget *parent
-) : QWidget(parent), m_asset(asset), m_tree(0), m_glw(0) {
+) : QWidget(parent), m_asset(asset), m_tree(0), m_glw(0), m_bundle(0), m_bundleMLoader(0) {
 	m_skVerts[0] = 0;
 	m_skVerts[1] = 0;
 }
@@ -146,7 +148,8 @@ bool ModelEditorWidget::Load() {
 		if (m_asset->type == asset::AT_SkModel) {
 			m_skModel = r::SkMesh::New(m_asset);
 		} else {
-			m_bundle = r::MeshBundle::New(m_asset);
+			m_bundle = asset::MeshVBLoader::Cast(m_asset);
+			m_bundleMLoader = asset::MeshMaterialLoader::Cast(m_asset);
 		}
 	}
 
@@ -305,14 +308,14 @@ void ModelEditorWidget::Draw(Material::Sort sort) {
 	} else if (m_bundle) {
 		for (int i = 0; i < m_bundle->numMeshes; ++i) {
 			asset::MaterialLoader *loader = asset::MaterialLoader::Cast(
-				m_bundle->MaterialAsset(i)
+				m_bundleMLoader->MaterialAsset(i)
 			);
 
 			if (!loader)
 				continue;
 
 			asset::MaterialParser *parser = asset::MaterialParser::Cast(
-				m_bundle->MaterialAsset(i)
+				m_bundleMLoader->MaterialAsset(i)
 			);
 
 			RAD_ASSERT(parser);
@@ -570,12 +573,9 @@ void ModelEditorWidget::Tick(float dt) {
 			parser->material->Sample(App::Get()->time, dt);
 		}
 	} else if (m_bundle) {
-		asset::MeshMaterialLoader *meshMaterials = asset::MeshMaterialLoader::Cast(m_bundle->asset);
-		RAD_ASSERT(meshMaterials);
-
-		for (int i = 0; i < meshMaterials->numUniqueMaterials; ++i) {
+		for (int i = 0; i < m_bundleMLoader->numUniqueMaterials; ++i) {
 			asset::MaterialParser *parser = asset::MaterialParser::Cast(
-				meshMaterials->UniqueMaterialAsset(i)
+				m_bundleMLoader->UniqueMaterialAsset(i)
 			);
 
 			RAD_ASSERT(parser);

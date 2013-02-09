@@ -29,9 +29,7 @@ int MeshParser::Process(
 	if (m_valid && (flags&(P_Load|P_Parse|P_Info)))
 		return SR_Success;
 
-	if (flags&P_Unload) {
-// NOTE: see comments in SkModelParser.cpp
-#pragma message("TODO: Implement P_Trim")
+	if (flags&(P_Unload|P_Trim)) {
 #if defined(RAD_OPT_TOOLS)
 		m_bundleData.reset();
 #endif

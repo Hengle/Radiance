@@ -15,8 +15,9 @@
 #include "SoundParser.h"
 #include "SoundLoader.h"
 #include "MeshParser.h"
-#include "MusicParser.h"
 #include "MeshMaterialLoader.h"
+#include "MeshVBLoader.h"
+#include "MusicParser.h"
 #include "FontParser.h"
 #include "TypefaceParser.h"
 #include "StringTableParser.h"
@@ -66,6 +67,7 @@ RADENG_API void RADENG_CALL RegisterParsers(Engine &engine) {
 	SoundLoader::Register(engine);
 	MeshParser::Register(engine);
 	MeshMaterialLoader::Register(engine);
+	MeshVBLoader::Register(engine);
 	MusicParser::Register(engine);
 	FontParser::Register(engine);
 	TypefaceParser::Register(engine);
