@@ -269,18 +269,18 @@ void ModelEditorWidget::OnRenderGL(GLWidget &src) {
 void ModelEditorWidget::Draw(Material::Sort sort) {
 
 	if (m_skModel) {
-		asset::SkMaterialLoader::Ref skMaterials = asset::SkMaterialLoader::Cast(m_skModel->asset);
+		asset::SkMaterialLoader *skMaterials = asset::SkMaterialLoader::Cast(m_skModel->asset);
 		RAD_ASSERT(skMaterials);
 	
 		for (int i = 0; i < m_skModel->numMeshes; ++i) {
-			asset::MaterialLoader::Ref loader = asset::MaterialLoader::Cast(
+			asset::MaterialLoader *loader = asset::MaterialLoader::Cast(
 				skMaterials->MaterialAsset(i)
 			);
 
 			if (!loader)
 				continue;
 
-			asset::MaterialParser::Ref parser = asset::MaterialParser::Cast(
+			asset::MaterialParser *parser = asset::MaterialParser::Cast(
 				skMaterials->MaterialAsset(i)
 			);
 
@@ -304,14 +304,14 @@ void ModelEditorWidget::Draw(Material::Sort sort) {
 		}
 	} else if (m_bundle) {
 		for (int i = 0; i < m_bundle->numMeshes; ++i) {
-			asset::MaterialLoader::Ref loader = asset::MaterialLoader::Cast(
+			asset::MaterialLoader *loader = asset::MaterialLoader::Cast(
 				m_bundle->MaterialAsset(i)
 			);
 
 			if (!loader)
 				continue;
 
-			asset::MaterialParser::Ref parser = asset::MaterialParser::Cast(
+			asset::MaterialParser *parser = asset::MaterialParser::Cast(
 				m_bundle->MaterialAsset(i)
 			);
 
@@ -338,13 +338,13 @@ void ModelEditorWidget::DrawWireframe() {
 
 	r::gl.wireframe = true;
 
-	asset::MaterialLoader::Ref loader = asset::MaterialLoader::Cast(m_wireframeMat);
-	asset::MaterialParser::Ref parser = asset::MaterialParser::Cast(m_wireframeMat);
+	asset::MaterialLoader *loader = asset::MaterialLoader::Cast(m_wireframeMat);
+	asset::MaterialParser *parser = asset::MaterialParser::Cast(m_wireframeMat);
 
 	r::Material *mat = parser->material;
 
 	if (m_skModel) {
-		asset::SkMaterialLoader::Ref skMaterials = asset::SkMaterialLoader::Cast(m_skModel->asset);
+		asset::SkMaterialLoader *skMaterials = asset::SkMaterialLoader::Cast(m_skModel->asset);
 		RAD_ASSERT(skMaterials);
 	
 		for (int i = 0; i < m_skModel->numMeshes; ++i) {
@@ -492,7 +492,7 @@ void ModelEditorWidget::DrawSkaNormals(bool normals, bool tangents) {
 }
 
 void ModelEditorWidget::DrawMeshNormals(bool normals, bool tangents) {
-	asset::MeshParser::Ref parser = asset::MeshParser::Cast(m_asset);
+	asset::MeshParser *parser = asset::MeshParser::Cast(m_asset);
 	if (!parser)
 		return;
 
@@ -558,11 +558,11 @@ void ModelEditorWidget::Tick(float dt) {
 		ska::BoneTM unused;
 		m_skModel->ska->Tick(dt, -1.f, true, true, Mat4::Identity);
 
-		asset::SkMaterialLoader::Ref skMaterials = asset::SkMaterialLoader::Cast(m_skModel->asset);
+		asset::SkMaterialLoader *skMaterials = asset::SkMaterialLoader::Cast(m_skModel->asset);
 		RAD_ASSERT(skMaterials);
 
 		for (int i = 0; i < m_skModel->numMeshes; ++i) {
-			asset::MaterialParser::Ref parser = asset::MaterialParser::Cast(
+			asset::MaterialParser *parser = asset::MaterialParser::Cast(
 				skMaterials->MaterialAsset(i)
 			);
 
@@ -570,11 +570,11 @@ void ModelEditorWidget::Tick(float dt) {
 			parser->material->Sample(App::Get()->time, dt);
 		}
 	} else if (m_bundle) {
-		asset::MeshMaterialLoader::Ref meshMaterials = asset::MeshMaterialLoader::Cast(m_bundle->asset);
+		asset::MeshMaterialLoader *meshMaterials = asset::MeshMaterialLoader::Cast(m_bundle->asset);
 		RAD_ASSERT(meshMaterials);
 
 		for (int i = 0; i < meshMaterials->numUniqueMaterials; ++i) {
-			asset::MaterialParser::Ref parser = asset::MaterialParser::Cast(
+			asset::MaterialParser *parser = asset::MaterialParser::Cast(
 				meshMaterials->UniqueMaterialAsset(i)
 			);
 

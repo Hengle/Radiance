@@ -23,8 +23,6 @@ public:
 		AssetType = AT_SkModel
 	};
 
-	typedef boost::shared_ptr<SkMaterialLoader> Ref;
-
 	SkMaterialLoader();
 	virtual ~SkMaterialLoader();
 

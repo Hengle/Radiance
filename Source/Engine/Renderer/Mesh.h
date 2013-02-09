@@ -140,7 +140,7 @@ public:
 	}
 
 	RAD_DECLARE_READONLY_PROPERTY(MeshBundle, asset, const pkg::AssetRef&);
-	RAD_DECLARE_READONLY_PROPERTY(MeshBundle, materialLoader, const asset::MeshMaterialLoader::Ref&);
+	RAD_DECLARE_READONLY_PROPERTY(MeshBundle, materialLoader, asset::MeshMaterialLoader*);
 	RAD_DECLARE_READONLY_PROPERTY(MeshBundle, numMeshes, int);
 
 private:
@@ -149,7 +149,7 @@ private:
 		return m_asset; 
 	}
 
-	RAD_DECLARE_GET(materialLoader, const asset::MeshMaterialLoader::Ref&) {
+	RAD_DECLARE_GET(materialLoader, asset::MeshMaterialLoader*) {
 		return m_loader;
 	}
 
@@ -159,7 +159,7 @@ private:
 
 	Mesh::Vec m_meshes;
 	pkg::AssetRef m_asset;
-	asset::MeshMaterialLoader::Ref m_loader;
+	asset::MeshMaterialLoader *m_loader;
 };
 
 } // r

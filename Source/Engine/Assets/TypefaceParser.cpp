@@ -86,7 +86,7 @@ int TypefaceParser::Load(
 		int r = m_fontRef->Process(time, flags);
 		if (r != SR_Success)
 			return r;
-		FontParser::Ref parser = FontParser::Cast(m_fontRef);
+		FontParser *parser = FontParser::Cast(m_fontRef);
 		if (!parser || !parser->font.get())
 			return SR_MetaError;
 		m_font = parser->font;
@@ -106,7 +106,7 @@ int TypefaceParser::Load(
 		int r = m_matRef->Process(time, flags);
 		if (r != SR_Success)
 			return r;
-		MaterialParser::Ref parser = MaterialParser::Cast(m_matRef);
+		MaterialParser *parser = MaterialParser::Cast(m_matRef);
 		if (!parser || !parser->valid || !parser->procedural)
 			return SR_MetaError;
 		m_mat = parser->material;
@@ -141,7 +141,7 @@ int TypefaceParser::LoadCooked(
 		int r = m_fontRef->Process(time, flags);
 		if (r != SR_Success)
 			return r;
-		FontParser::Ref parser = FontParser::Cast(m_fontRef);
+		FontParser *parser = FontParser::Cast(m_fontRef);
 		if (!parser || !parser->font.get())
 			return SR_MetaError;
 		m_font = parser->font;
@@ -161,7 +161,7 @@ int TypefaceParser::LoadCooked(
 		int r = m_matRef->Process(time, flags);
 		if (r != SR_Success)
 			return r;
-		MaterialParser::Ref parser = MaterialParser::Cast(m_matRef);
+		MaterialParser *parser = MaterialParser::Cast(m_matRef);
 		if (!parser || !parser->valid || !parser->procedural)
 			return SR_MetaError;
 		m_mat = parser->material;

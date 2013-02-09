@@ -68,7 +68,7 @@ private:
 	static int lua_AllocateText(lua_State *L);
 
 	pkg::Asset::Ref m_typeface;
-	asset::TypefaceParser::Ref m_parser;
+	asset::TypefaceParser *m_parser;
 	r::TextModel::Ref m_textModel;
 	Vec4 m_color;
 	bool m_multiline;

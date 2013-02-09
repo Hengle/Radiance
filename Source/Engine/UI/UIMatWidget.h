@@ -41,8 +41,8 @@ private:
 	static void AddMaterial(const pkg::AssetRef &asset);
 
 	pkg::AssetRef m_asset;
-	asset::MaterialParser::Ref m_material;
-	asset::MaterialLoader::Ref m_loader;
+	asset::MaterialParser *m_material;
+	asset::MaterialLoader *m_loader;
 };
 
 } // ui

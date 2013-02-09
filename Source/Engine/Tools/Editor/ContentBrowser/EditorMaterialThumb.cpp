@@ -48,7 +48,7 @@ void MaterialThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, in
 		return;
 
 	xtime::TimeDate modified;
-	MaterialParser::Ref parser = MaterialParser::Cast(asset);
+	MaterialParser *parser = MaterialParser::Cast(asset);
 	if (!parser)
 		return;
 
@@ -72,7 +72,7 @@ void MaterialThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, in
 		}
 	}
 
-	MaterialLoader::Ref mL = MaterialLoader::Cast(asset);
+	MaterialLoader *mL = MaterialLoader::Cast(asset);
 	if (!mL->info) {
 		int r = asset->Process(
 			xtime::TimeSlice::Infinite,
@@ -91,7 +91,7 @@ void MaterialThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, in
 
 	// find the largest texture.
 	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
-		TextureParser::Ref t = TextureParser::Cast(mL->Texture(i));
+		TextureParser *t = TextureParser::Cast(mL->Texture(i));
 		if (!t)
 			break;
 		if (!t->headerValid)
@@ -492,8 +492,8 @@ ThumbResult MaterialThumb::Thumbnail::Tick(float dt, const xtime::TimeSlice &tim
 
 	m_mat = 0;
 
-	MaterialParser::Ref mP = MaterialParser::Cast(m_asset);
-	MaterialLoader::Ref mL = MaterialLoader::Cast(m_asset);
+	MaterialParser *mP = MaterialParser::Cast(m_asset);
+	MaterialLoader *mL = MaterialLoader::Cast(m_asset);
 
 	if (!mP || !mL || !mP->valid || !mL->parsed) {
 		m_icon = true;
@@ -515,7 +515,7 @@ ThumbResult MaterialThumb::Thumbnail::Tick(float dt, const xtime::TimeSlice &tim
 		if (!a)
 			break;
 
-		TextureParser::Ref t = TextureParser::Cast(a);
+		TextureParser *t = TextureParser::Cast(a);
 		const bool *wrapS = a->entry->KeyValue<bool>("Wrap.S", P_TARGET_PLATFORM);
 		const bool *wrapT = a->entry->KeyValue<bool>("Wrap.T", P_TARGET_PLATFORM);
 		const bool *wrapR = a->entry->KeyValue<bool>("Wrap.R", P_TARGET_PLATFORM);

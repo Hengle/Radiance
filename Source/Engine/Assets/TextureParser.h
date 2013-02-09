@@ -46,8 +46,6 @@ public:
 		AssetType = AT_Texture
 	};
 
-	typedef boost::shared_ptr<TextureParser> Ref;
-
 	struct Header {
 		int format;
 		int width;

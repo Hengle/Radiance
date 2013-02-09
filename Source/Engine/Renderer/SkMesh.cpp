@@ -15,14 +15,14 @@ using namespace asset;
 
 namespace r {
 
-SkMesh::SkMesh() {
+SkMesh::SkMesh() : m_parser(0) {
 }
 
 SkMesh::~SkMesh() {
 }
 
 SkMesh::Ref SkMesh::New(const pkg::AssetRef &asset) {
-	SkModelParser::Ref parser = SkModelParser::Cast(asset);
+	SkModelParser *parser = SkModelParser::Cast(asset);
 	if (!parser)
 		return Ref();
 
@@ -62,8 +62,7 @@ void SkMesh::Load(
 
 	const int kVertSize = ska::DMesh::kNumVertexFloats*sizeof(float);
 
-	for (size_t i = 0; i < m_meshes.size(); ++i)
-	{
+	for (size_t i = 0; i < m_meshes.size(); ++i) {
 		DefMesh &m = m_meshes[i];
 		const ska::DMesh &dm = dskm.meshes[i];
 

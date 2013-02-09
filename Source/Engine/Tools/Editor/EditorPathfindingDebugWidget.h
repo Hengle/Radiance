@@ -55,7 +55,7 @@ private:
 	::world::FloorPosition m_pos[2];
 	::world::FloorMove::Ref m_move;
 	pkg::Asset::Ref m_asset;
-	asset::MapAsset::Ref m_map;
+	asset::MapAsset *m_map;
 	world::Floors m_floors;
 	world::bsp_file::BSPFile::Ref m_bsp;
 	bool m_loaded;

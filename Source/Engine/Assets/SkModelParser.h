@@ -31,8 +31,6 @@ public:
 		AssetType = AT_SkModel
 	};
 
-	typedef boost::shared_ptr<SkModelParser> Ref;
-
 	SkModelParser();
 	virtual ~SkModelParser();
 
@@ -107,9 +105,9 @@ private:
 
 	pkg::Asset::Ref m_skaRef;
 	pkg::Asset::Ref m_statesRef;
-	SkAnimSetParser::Ref m_ska;
+	SkAnimSetParser *m_ska;
 	ska::DSkm m_dskm;
-	SkAnimStatesParser::Ref m_states;
+	SkAnimStatesParser *m_states;
 	file::MMapping::Ref m_mm[2];
 	int m_state;
 };

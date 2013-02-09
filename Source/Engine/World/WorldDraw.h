@@ -198,12 +198,11 @@ private:
 
 	struct LocalMaterial {
 		pkg::Asset::Ref asset;
-		asset::MaterialLoader::Ref loader;
+		asset::MaterialLoader *loader;
 		r::Material *mat;
 	};
 
-	class MStaticWorldMeshBatch : public MBatchDraw
-	{
+	class MStaticWorldMeshBatch : public MBatchDraw {
 	public:
 		typedef boost::shared_ptr<MStaticWorldMeshBatch> Ref;
 		typedef zone_vector<Ref, ZWorldT>::type RefVec;

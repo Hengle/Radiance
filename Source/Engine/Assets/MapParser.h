@@ -32,8 +32,6 @@ public:
 		SR_End = pkg::SR_User
 	};
 
-	typedef boost::shared_ptr<MapParser> Ref;
-
 	MapParser();
 	virtual ~MapParser();
 

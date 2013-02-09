@@ -37,7 +37,7 @@ int D_Material::lua_Dimensions(lua_State *L) {
 
 	// this function is not fast:
 
-	asset::MaterialLoader::Ref loader = asset::MaterialLoader::Cast(self->m_asset);
+	asset::MaterialLoader *loader = asset::MaterialLoader::Cast(self->m_asset);
 	if (!loader || !loader->info)
 		return 0;
 
@@ -46,7 +46,7 @@ int D_Material::lua_Dimensions(lua_State *L) {
 
 	// find the largest texture.
 	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
-		asset::TextureParser::Ref t = asset::TextureParser::Cast(loader->Texture(i));
+		asset::TextureParser *t = asset::TextureParser::Cast(loader->Texture(i));
 		if (!t)
 			break;
 		if (!t->headerValid)

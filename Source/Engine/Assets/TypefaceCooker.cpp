@@ -97,7 +97,7 @@ int TypefaceCooker::Compile(int flags, int allflags)
 	if (r != SR_Success)
 		return r;
 
-	MaterialParser::Ref matParser = MaterialParser::Cast(matRef);
+	MaterialParser *matParser = MaterialParser::Cast(matRef);
 	if (!matParser)
 		return SR_MetaError;
 	if (!matParser->procedural)

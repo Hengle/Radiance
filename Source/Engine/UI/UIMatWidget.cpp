@@ -14,10 +14,10 @@ using world::D_Material;
 namespace ui {
 
 
-MatWidget::MatWidget() {
+MatWidget::MatWidget() : m_material(0), m_loader(0) {
 }
 
-MatWidget::MatWidget(const Rect &r) : Widget(r) {
+MatWidget::MatWidget(const Rect &r) : Widget(r), m_material(0), m_loader(0) {
 }
 
 bool MatWidget::BindMaterial(const pkg::AssetRef &m) {
@@ -25,8 +25,8 @@ bool MatWidget::BindMaterial(const pkg::AssetRef &m) {
 		return true;
 	if (!m) {
 		m_asset.reset();
-		m_material.reset();
-		m_loader.reset();
+		m_material = 0;
+		m_loader = 0;
 		return true;
 	}
 
@@ -39,8 +39,8 @@ bool MatWidget::BindMaterial(const pkg::AssetRef &m) {
 
 	if (!m_material || !m_material->valid || !m_loader) {
 		m_asset.reset();
-		m_material.reset();
-		m_loader.reset();
+		m_material = 0;
+		m_loader = 0;
 		return false;
 	}
 

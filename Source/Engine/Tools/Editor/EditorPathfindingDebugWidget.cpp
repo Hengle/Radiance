@@ -23,7 +23,7 @@ namespace tools {
 namespace editor {
 
 PathfindingDebugWidget::PathfindingDebugWidget(QWidget *parent, Qt::WindowFlags f) : 
-GLNavWidget(parent, f), m_loaded(false), m_progress(0) {
+GLNavWidget(parent, f), m_loaded(false), m_progress(0), m_map(0) {
 	RAD_VERIFY(connect(MainWindow::Get(), SIGNAL(Closing()), SLOT(close())));
 	RAD_VERIFY(connect(MainWindow::Get(), SIGNAL(OnTick(float)), SLOT(OnTick(float))));
 
@@ -152,7 +152,7 @@ void PathfindingDebugWidget::OnTick(float dt) {
 			m_progress = 0;
 		} else if (r < pkg::SR_Success) {
 			m_asset.reset();
-			m_map.reset();
+			m_map = 0;
 			QMessageBox::critical(this, "Error", "Error loading map.");
 			m_progress->close();
 			m_progress = 0;

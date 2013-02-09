@@ -35,8 +35,6 @@ public:
 		AssetType = asset::AT_Map
 	};
 
-	typedef boost::shared_ptr<MapAsset> Ref;
-
 	MapAsset();
 	virtual ~MapAsset();
 
@@ -97,8 +95,8 @@ private:
 	tools::UIProgress *m_ui;
 	tools::map_builder::DebugUI *m_debugUI;
 	tools::map_builder::MapBuilder::Ref m_mapBuilder;
-	MapParser::Ref m_parser;
 	pkg::Cooker::Ref m_cooker;
+	MapParser *m_parser;
 
 	RAD_DECLARE_GET(compiling, bool) {
 		return m_cooker;

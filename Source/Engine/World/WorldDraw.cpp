@@ -144,7 +144,7 @@ int WorldDraw::LoadMaterial(const char *name, LocalMaterial &mat) {
 		return (r != pkg::SR_Pending) ? r : pkg::SR_MetaError;
 	}
 
-	asset::MaterialParser::Ref parser = asset::MaterialParser::Cast(mat.asset);
+	asset::MaterialParser *parser = asset::MaterialParser::Cast(mat.asset);
 	if (!parser || !parser->valid) {
 		COut(C_Error) << "Error: Unable to load '" << name << "'." << std::endl;
 		return pkg::SR_MetaError;
@@ -228,7 +228,7 @@ details::MatRef *WorldDraw::AddMaterialRef(int id) {
 	if (!asset)
 		return 0;
 
-	asset::MaterialParser::Ref parser = asset::MaterialParser::Cast(asset);
+	asset::MaterialParser *parser = asset::MaterialParser::Cast(asset);
 	RAD_VERIFY(parser);
 
 	details::MatRef r;

@@ -25,8 +25,6 @@ public:
 		AssetType = AT_Mesh
 	};
 
-	typedef boost::shared_ptr<MeshParser> Ref;
-
 	MeshParser();
 	virtual ~MeshParser();
 

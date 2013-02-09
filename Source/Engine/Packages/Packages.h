@@ -223,7 +223,6 @@ class SinkBaseHelper;
 class SinkBase {
 public:
 
-	typedef SinkBaseRef Ref;
 	SinkBase() : m_c(0), m_m(0) {}
 	virtual ~SinkBase() {}
 
@@ -244,8 +243,17 @@ private:
 
 	typedef boost::mutex Mutex;
 	typedef boost::lock_guard<Mutex> Lock;
-	typedef ObjectPool<Mutex> MutexPool;
 
+	struct SinkMutex {
+		SinkMutex * volatile next;
+		Mutex m;
+	};
+
+	typedef ObjectPool<SinkMutex> MutexPool;
+
+	void AcquireMutex();
+	void ReleaseMutex();
+	
 	int _Process(
 		const xtime::TimeSlice &time,
 		Engine &engine,
@@ -253,13 +261,15 @@ private:
 		int flags
 	);
 
-	static Ref Cast(const AssetRef &asset, int sid);
+	static SinkBase *Cast(const AssetRef &asset, int sid);
 
 	volatile int m_c;
-	Mutex * volatile m_m;
+	SinkMutex * volatile m_m;
 	
 	static Mutex s_m;
 	static MutexPool s_mp;
+	static SinkMutex * volatile s_head;
+	static volatile int s_c;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -267,7 +277,17 @@ private:
 template <typename T>
 class Sink : public SinkBase {
 public:
-	static boost::shared_ptr<T> Cast(const AssetRef &asset);
+	static T *Cast(const AssetRef &asset);
+
+	void *operator new(size_t size);
+	void operator delete(void *p);
+
+private:
+
+	typedef ThreadSafeMemoryPool Pool;
+
+	static Pool &GetPool();
+
 };
 
 #if defined(RAD_OPT_TOOLS)
@@ -758,7 +778,7 @@ public:
 #if defined(RAD_OPT_TOOLS)
 	RAD_DECLARE_READONLY_PROPERTY(Asset, cooked, bool);
 
-	//! Allocates a cooker object that writes into Base/Intermediate.
+	//! Allocates a cooker object that writes into intermediate directory.
 	Cooker::Ref AllocateIntermediateCooker();
 #endif
 
@@ -779,7 +799,7 @@ private:
 	friend class SinkFactoryBase;
 	friend class PackageMan;
 
-	typedef zone_map<int, SinkBase::Ref, ZPackagesT>::type SinkMap;
+	typedef zone_map<int, SinkBase*, ZPackagesT>::type SinkMap;
 
 	static Ref New(
 		Zone z,
@@ -899,7 +919,7 @@ private:
 
 	template <typename T>
 	struct SinkFactory : public details::SinkFactoryBase {
-		virtual SinkBase::Ref New();
+		virtual SinkBase *New();
 		virtual int Stage() const;
 	};
 
@@ -923,7 +943,7 @@ private:
 
 	void Unbind(Binding *binding);
 	SinkFactoryMap &TypeSinks(asset::Type type);
-	SinkBase::Ref AllocSink(const details::SinkFactoryBase::Ref &f, const Asset::Ref &asset);
+	SinkBase *AllocSink(const details::SinkFactoryBase::Ref &f, const Asset::Ref &asset);
 	void AllocSinks(const Asset::Ref &asset);
 
 	void LoadBin(

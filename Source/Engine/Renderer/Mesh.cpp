@@ -10,7 +10,7 @@
 namespace r {
 
 MeshBundle::Ref MeshBundle::New(const pkg::AssetRef &asset) {
-	asset::MeshParser::Ref parser = asset::MeshParser::Cast(asset);
+	asset::MeshParser *parser = asset::MeshParser::Cast(asset);
 	if (!parser || !parser->valid || parser->bundle->meshes.empty())
 		return Ref();
 

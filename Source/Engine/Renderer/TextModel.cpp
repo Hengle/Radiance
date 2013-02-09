@@ -307,7 +307,7 @@ void TextModel::BindFont(int fontWidth, int fontHeight) {
 			return;
 	}
 
-	asset::FontParser::Ref parser = asset::FontParser::Cast(m_font);
+	asset::FontParser *parser = asset::FontParser::Cast(m_font);
 	RAD_VERIFY(parser && parser->font.get());
 
 	m_fontInstance.reset(new (ZFonts) FontInstance());

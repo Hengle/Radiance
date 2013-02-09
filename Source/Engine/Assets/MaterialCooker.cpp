@@ -69,7 +69,7 @@ int MaterialCooker::Compile(int flags, int allflags) {
 	if (r != SR_Success)
 		return r;
 
-	MaterialParser::Ref parser = MaterialParser::Cast(asset);
+	MaterialParser *parser = MaterialParser::Cast(asset);
 	if (!parser || !parser->valid)
 		return SR_ParseError;
 	

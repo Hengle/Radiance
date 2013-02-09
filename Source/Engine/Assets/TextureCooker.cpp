@@ -119,7 +119,7 @@ int TextureCooker::Compile(int flags, int allflags) {
 
 		pkg::Asset::Ref localizedAsset = engine->sys->packages->Asset(asset->id, pkg::Z_Unique);
 
-		TextureParser::Ref parser = TextureParser::Cast(localizedAsset);
+		TextureParser *parser = TextureParser::Cast(localizedAsset);
 		if (!parser)
 			return SR_ParseError;
 

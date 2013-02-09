@@ -15,10 +15,10 @@ using world::D_Typeface;
 
 namespace ui {
 
-TextLabel::TextLabel() {
+TextLabel::TextLabel() : m_parser(0) {
 }
 
-TextLabel::TextLabel(const Rect &r) : MatWidget(r) {
+TextLabel::TextLabel(const Rect &r) : MatWidget(r), m_parser(0) {
 }
 
 void TextLabel::SetText(
@@ -80,7 +80,7 @@ bool TextLabel::BindTypeface(
 	if (!typeface) {
 		m_typeface.reset();
 		m_textModel.reset();
-		m_parser.reset();
+		m_parser = 0;
 		return true;
 	}
 

@@ -32,8 +32,8 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(PostProcessEffect, color, const Vec4&);
 	RAD_DECLARE_READONLY_PROPERTY(PostProcessEffect, material, r::Material*);
 	RAD_DECLARE_READONLY_PROPERTY(PostProcessEffect, asset, const pkg::AssetRef&);
-	RAD_DECLARE_READONLY_PROPERTY(PostProcessEffect, parser, const asset::MaterialParser::Ref&);
-	RAD_DECLARE_READONLY_PROPERTY(PostProcessEffect, loader, const asset::MaterialLoader::Ref&);
+	RAD_DECLARE_READONLY_PROPERTY(PostProcessEffect, parser, asset::MaterialParser*);
+	RAD_DECLARE_READONLY_PROPERTY(PostProcessEffect, loader, asset::MaterialLoader*);
 
 private:
 
@@ -42,12 +42,12 @@ private:
 	RAD_DECLARE_GET(color, const Vec4&) { return m_color[0]; }
 	RAD_DECLARE_GET(material, r::Material*) { return m_parser->material; }
 	RAD_DECLARE_GET(asset, const pkg::AssetRef&) { return m_asset; }
-	RAD_DECLARE_GET(parser, const asset::MaterialParser::Ref&) { return m_parser; }
-	RAD_DECLARE_GET(loader, const asset::MaterialLoader::Ref&) { return m_loader; }
+	RAD_DECLARE_GET(parser, asset::MaterialParser*) { return m_parser; }
+	RAD_DECLARE_GET(loader, asset::MaterialLoader*) { return m_loader; }
 
 	pkg::AssetRef m_asset;
-	asset::MaterialParser::Ref m_parser;
-	asset::MaterialLoader::Ref m_loader;
+	asset::MaterialParser *m_parser;
+	asset::MaterialLoader *m_loader;
 	float m_time[2];
 	Vec4 m_color[3];
 	bool m_enabled;

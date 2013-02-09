@@ -29,8 +29,6 @@ public:
 		AssetType = AT_Sound
 	};
 
-	typedef boost::shared_ptr<SoundParser> Ref;
-
 	SoundParser();
 	virtual ~SoundParser();
 

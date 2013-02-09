@@ -225,7 +225,7 @@ int MaterialParser::SourceModifiedTime(
 			texture = entry->Asset(asset->zone);
 		}
 
-		TextureParser::Ref parser = TextureParser::Cast(texture);
+		TextureParser *parser = TextureParser::Cast(texture);
 		RAD_ASSERT(parser);
 
 		xtime::TimeDate textureTd;
@@ -625,7 +625,7 @@ int MaterialLoader::Process(
 		return SR_Success;
 	}
 
-	MaterialParser::Ref parser = MaterialParser::Cast(asset);
+	MaterialParser *parser = MaterialParser::Cast(asset);
 	if (!parser)
 		return SR_ParseError;
 
@@ -694,7 +694,7 @@ int MaterialLoader::Process(
 				return r;
 
 			// flag animated based on texture bundle?
-			TextureParser::Ref texParser = TextureParser::Cast(tex);
+			TextureParser *texParser = TextureParser::Cast(tex);
 			if (!texParser)
 				return SR_MetaError;
 			if (texParser->numImages > 0 && (parser->material->TextureFPS(m_index)>0.f))

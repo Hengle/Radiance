@@ -36,7 +36,8 @@ m_slot(0),
 m_pinch(0), 
 m_pinchDelay(0), 
 m_cloudStorage(false),
-m_quit(false)
+m_quit(false),
+m_stringTableParser(0)
 #if defined(RAD_OPT_PC_TOOLS)
 , m_toolsCallback(0), m_progressIndicatorParent(0)
 #endif
@@ -181,7 +182,7 @@ bool Game::LoadMapSeq(int id, int slot, world::UnloadDisposition ud, bool play) 
 		return false;
 	}
 
-	asset::MapAsset::Ref mapAsset = asset::MapAsset::Cast(map);
+	asset::MapAsset *mapAsset = asset::MapAsset::Cast(map);
 	if (!mapAsset) {
 		COut(C_ErrMsgBox) << "Error loading map!" << std::endl;
 		return false;

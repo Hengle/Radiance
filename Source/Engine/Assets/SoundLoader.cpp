@@ -34,7 +34,7 @@ int SoundLoader::Process(
 		m_size = 0;
 	} else if (flags&P_Load) {
 		if (!m_id) {
-			SoundParser::Ref parser = SoundParser::Cast(asset);
+			SoundParser *parser = SoundParser::Cast(asset);
 			if (!parser || !parser->header)
 				return SR_ParseError;
 

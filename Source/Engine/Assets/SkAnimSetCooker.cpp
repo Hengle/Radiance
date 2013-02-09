@@ -94,7 +94,7 @@ int SkAnimSetCooker::Compile(int flags, int allflags) {
 	if (r < SR_Success)
 		return r;
 
-	SkAnimSetParser::Ref parser = SkAnimSetParser::Cast(asset);
+	SkAnimSetParser *parser = SkAnimSetParser::Cast(asset);
 	if (!parser)
 		return SR_ParseError;
 

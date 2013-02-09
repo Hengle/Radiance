@@ -713,7 +713,7 @@ GLTexture::Ref GLTextureAsset::CreateThumbnail(const pkg::Asset::Ref &asset, int
 
 	if (!asset->cooked)
 	{
-		asset::TextureParser::Ref parser(asset::TextureParser::Cast(asset));
+		asset::TextureParser *parser(asset::TextureParser::Cast(asset));
 		if (parser && parser->imgValid)
 		{
 			UploadTexture(*parser->Image(index), t, flags, width, height);
@@ -751,7 +751,7 @@ int GLTextureAsset::Process(
 
 	if (flags&(P_Load|P_VidBind) && m_texs.empty())
 	{
-		asset::TextureParser::Ref parser(asset::TextureParser::Cast(asset));
+		asset::TextureParser *parser(asset::TextureParser::Cast(asset));
 		if (!parser || !parser->imgValid)
 			return SR_ParseError;
 		

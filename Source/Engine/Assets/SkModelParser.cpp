@@ -13,7 +13,7 @@ using namespace pkg;
 
 namespace asset {
 
-SkModelParser::SkModelParser() : m_state(S_None) {
+SkModelParser::SkModelParser() : m_state(S_None), m_ska(0), m_states(0) {
 }
 
 SkModelParser::~SkModelParser() {
@@ -51,9 +51,9 @@ int SkModelParser::Process(
 
 	if (flags&P_Unload) {
 		m_state = S_None;
-		m_ska.reset();
+		m_ska = 0;
 		m_skaRef.reset();
-		m_states.reset();
+		m_states = 0;
 		m_statesRef.reset();
 		m_mm[0].reset();
 		m_mm[1].reset();

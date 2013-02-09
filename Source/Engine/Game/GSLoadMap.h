@@ -34,7 +34,7 @@ public:
 protected:
 
 	RAD_DECLARE_READONLY_PROPERTY(GSLoadMap, loadScreen, bool);
-	RAD_DECLARE_READONLY_PROPERTY(GSLoadMap, mapAsset, const asset::MapAsset::Ref &);
+	RAD_DECLARE_READONLY_PROPERTY(GSLoadMap, mapAsset, asset::MapAsset*);
 
 	virtual void Draw(Game &game, float dt) {}
 
@@ -44,7 +44,7 @@ private:
 		return m_loadScreen; 
 	}
 
-	RAD_DECLARE_GET(mapAsset, const asset::MapAsset::Ref&) { 
+	RAD_DECLARE_GET(mapAsset, asset::MapAsset*) { 
 		return m_mapAsset; 
 	}
 
@@ -53,7 +53,7 @@ private:
 	bool m_play;
 	bool m_loadScreen;
 	pkg::Asset::Ref m_map;
-	asset::MapAsset::Ref m_mapAsset;
+	asset::MapAsset *m_mapAsset;
 
 #if defined(RAD_OPT_PC_TOOLS)
 	QWidget *m_progressIndicatorParent;

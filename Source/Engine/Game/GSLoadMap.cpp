@@ -25,7 +25,8 @@ Game::Tickable(Priority),
 m_mapId(mapId), 
 m_slot(slot), 
 m_play(play),
-m_loadScreen(loadScreen)
+m_loadScreen(loadScreen),
+m_mapAsset(0)
 #if defined(RAD_OPT_PC_TOOLS)
 , m_progressIndicatorParent(0), m_progress(0)
 #endif
@@ -76,7 +77,6 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 	}
 
 	int r = pkg::SR_Pending;
-	asset::MapAsset::Ref m_mapAsset = asset::MapAsset::Cast(m_map);
 	
 	xtime::TimeSlice time(std::min<xtime::TimeVal>(100, outerTime.remaining.get()));
 

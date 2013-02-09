@@ -25,8 +25,6 @@ public:
 		AssetType = AT_StringTable
 	};
 
-	typedef boost::shared_ptr<StringTableParser> Ref;
-
 	StringTableParser();
 	virtual ~StringTableParser();
 

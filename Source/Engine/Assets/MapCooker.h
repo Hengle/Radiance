@@ -45,7 +45,7 @@ private:
 	Tokenizer m_script;
 	tools::CinematicActorCompressionMap m_caMap;
 	tools::UIProgress *m_ui;
-	MapParser::Ref m_parser;
+	MapParser *m_parser;
 	tools::map_builder::MapBuilder::Ref m_mapBuilder;
 	bool m_parsing;
 };

@@ -63,7 +63,7 @@ int MeshMaterialLoader::Load(
 	const pkg::Asset::Ref &asset,
 	int flags
 ) {
-	MeshParser::Ref parser = MeshParser::Cast(asset);
+	MeshParser *parser = MeshParser::Cast(asset);
 	if (!parser)
 		return SR_ParseError;
 

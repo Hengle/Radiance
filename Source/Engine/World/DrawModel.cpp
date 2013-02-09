@@ -292,7 +292,7 @@ void MeshBundleDrawModel::PushElements(lua_State *L) {
 
 int MeshBundleDrawModel::lua_PushMaterialList(lua_State *L) {
 
-	const asset::MeshMaterialLoader::Ref &loader = m_bundle->materialLoader;
+	asset::MeshMaterialLoader *loader = m_bundle->materialLoader;
 	int numUniqueMaterials = loader->numUniqueMaterials;
 
 	if (numUniqueMaterials < 1)
@@ -349,7 +349,7 @@ SkMeshDrawModel::Ref SkMeshDrawModel::New(
 ) {
 	Ref r(new (ZWorld) SkMeshDrawModel(entity, m));
 
-	asset::SkMaterialLoader::Ref loader = asset::SkMaterialLoader::Cast(m->asset);
+	asset::SkMaterialLoader *loader = asset::SkMaterialLoader::Cast(m->asset);
 	if (!loader)
 		return Ref();
 
@@ -410,7 +410,7 @@ void SkMeshDrawModel::PushElements(lua_State *L) {
 
 int SkMeshDrawModel::lua_PushMaterialList(lua_State *L) {
 
-	asset::SkMaterialLoader::Ref loader = asset::SkMaterialLoader::Cast(m_mesh->asset);
+	asset::SkMaterialLoader *loader = asset::SkMaterialLoader::Cast(m_mesh->asset);
 	int numUniqueMaterials = loader->numUniqueMaterials;
 
 	if (numUniqueMaterials < 1)

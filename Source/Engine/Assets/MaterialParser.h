@@ -24,8 +24,6 @@ public:
 		AssetType = AT_Material
 	};
 
-	typedef boost::shared_ptr<MaterialParser> Ref;
-
 	MaterialParser();
 	virtual ~MaterialParser();
 
@@ -89,9 +87,6 @@ public:
 		SinkStage = pkg::SS_Load,
 		AssetType = AT_Material
 	};
-
-
-	typedef boost::shared_ptr<MaterialLoader> Ref;
 
 	MaterialLoader();
 	virtual ~MaterialLoader();

@@ -47,7 +47,7 @@ private:
 	static int lua_Name(lua_State *L);
 	
 	pkg::AssetRef m_asset;
-	asset::MaterialParser::Ref m_parser;
+	asset::MaterialParser *m_parser;
 };
 
 } // world

@@ -247,7 +247,7 @@ private:
 	MapSlot::Map m_maps;
 	String m_saveGameName;
 	pkg::Asset::Ref m_stringTable;
-	asset::StringTableParser::Ref m_stringTableParser;
+	asset::StringTableParser *m_stringTableParser;
 	Persistence::Ref m_session;
 	Persistence::Ref m_saveGame;
 	CloudFile::Ref m_cloudFile;

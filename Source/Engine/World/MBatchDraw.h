@@ -27,7 +27,7 @@ struct MBatchDrawLink {
 struct MatRef {
 	r::Material *mat;
 	pkg::Asset::Ref asset;
-	asset::MaterialLoader::Ref loader;
+	asset::MaterialLoader *loader;
 };
 
 struct MBatch {

@@ -487,7 +487,7 @@ bool Sound::Init(
 ) {
 	if (asset->type != asset::AT_Sound)
 		return false;
-	asset::SoundLoader::Ref loader = asset::SoundLoader::Cast(asset);
+	asset::SoundLoader *loader = asset::SoundLoader::Cast(asset);
 	if (!Init(ctx, loader->id, maxInstances))
 		return false;
 	m_asset = asset;
@@ -500,7 +500,7 @@ bool Sound::InitStreaming(
 ) {
 	if (asset->type != asset::AT_Music)
 		return false;
-	asset::MusicParser::Ref parser = asset::MusicParser::Cast(asset);
+	asset::MusicParser *parser = asset::MusicParser::Cast(asset);
 	if (!parser || !parser->file.get())
 		return false;
 	m_ib.reset(new (ZSound) file::MMFileInputBuffer(parser->file, 256*Kilo, ZSound));

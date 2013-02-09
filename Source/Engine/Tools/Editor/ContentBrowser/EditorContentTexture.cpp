@@ -84,7 +84,7 @@ RADENG_API void RADENG_CALL AddTextureProperties(
 
 	if (r == pkg::SR_Success)
 	{ // extract width/height/bpp
-		asset::TextureParser::Ref parser(asset::TextureParser::Cast(asset));
+		asset::TextureParser *parser(asset::TextureParser::Cast(asset));
 		if (!parser || !parser->headerValid)
 			return;
 
@@ -308,7 +308,7 @@ RADENG_API pkg::IdVec RADENG_CALL CreateTextures(QWidget *parent, const pkg::Pac
 
 				if (r == pkg::SR_Success)
 				{
-					asset::TextureParser::Ref parser = asset::TextureParser::Cast(t);
+					asset::TextureParser *parser = asset::TextureParser::Cast(t);
 
 					bool pow2 = IsPowerOf2(parser->header->width) && IsPowerOf2(parser->header->height);
 					bool square = parser->header->width == parser->header->height;

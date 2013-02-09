@@ -29,15 +29,50 @@ RADENG_API int RADENG_CALL PlatformIndex(int plat) {
 	return -1;
 }
 
+volatile int SinkBase::s_c = 0;
+SinkBase::SinkMutex * volatile SinkBase::s_head = 0;
 SinkBase::Mutex SinkBase::s_m;
 SinkBase::MutexPool SinkBase::s_mp(ZPackages, "pkg-sink-mutex-pool", 8);
 
-SinkBase::Ref SinkBase::Cast(const Asset::Ref &asset, int stage) {
-	RAD_ASSERT(asset);
-	Asset::SinkMap::const_iterator it = asset->m_sinks.find(stage);
-	if (it != asset->m_sinks.end())
-		return it->second;
-	return SinkBase::Ref();
+inline void SinkBase::AcquireMutex() {
+	{
+		Lock L(s_m);
+		if (++m_c == 1) {
+			if (s_head) {
+				m_m = s_head;
+				s_head = s_head->next;
+				--s_c;
+				RAD_ASSERT(s_c >= 0);
+			} else {
+				m_m = s_mp.Construct();
+				m_m->next = 0;
+			}
+		}
+	}
+
+	RAD_ASSERT(m_m);
+	m_m->m.lock();
+}
+
+inline void SinkBase::ReleaseMutex() {
+
+	RAD_ASSERT(m_m);
+	m_m->m.unlock();
+
+	{
+		Lock L(s_m);
+		if (--m_c == 0) {
+			RAD_ASSERT(m_m);
+			if (s_c < 8) { // keep 8 mutexes around at most
+				m_m->next = s_head;
+				s_head = m_m;
+				++s_c;
+			} else {
+				s_mp.Destroy(m_m);
+			}
+			m_m = 0;
+		}
+	}
 }
 
 int SinkBase::_Process(
@@ -47,43 +82,20 @@ int SinkBase::_Process(
 		int flags
 ) {
 	int r;
-	{
-		Lock L(s_m);
-		if (++m_c == 1) {
-			RAD_ASSERT(!m_m);
-			m_m = s_mp.Construct();
-		}
-	}
+	
+	AcquireMutex();
 
-	RAD_ASSERT(m_m);
-	{
-		Lock L(*m_m); // serialize Sink
-		r = Process(
-			time,
-			engine,
-			asset,
-			flags
-		);
-	}
-
-	{
-		Lock L(s_m);
-		if (--m_c == 0) {
-			s_mp.Destroy(m_m);
-			m_m = 0;
-		}
-	}
+	r = Process(
+		time,
+		engine,
+		asset,
+		flags
+	);
+	
+	ReleaseMutex();
 
 	return r;
 }
-
-namespace details {
-
-SinkBase::Ref SinkFactoryBase::Cast(const AssetRef &asset) {
-	return SinkBaseHelper::Cast(asset, Stage());
-}
-
-} // details
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -405,7 +417,7 @@ int PackageMan::Process(
 
 	for (SinkFactoryMap::const_iterator it = factories.begin(); it != factories.end(); ++it) {
 		const details::SinkFactoryBase::Ref &f = it->second;
-		SinkBase::Ref sink = f->Cast(asset);
+		SinkBase *sink = f->Cast(asset);
 
 		if (!sink)
 			sink = AllocSink(f, asset);
@@ -453,8 +465,8 @@ PackageMan::SinkFactoryMap &PackageMan::TypeSinks(asset::Type type) {
 	return it->second;
 }
 
-SinkBase::Ref PackageMan::AllocSink(const details::SinkFactoryBase::Ref &f, const Asset::Ref &asset) {
-	SinkBase::Ref state = f->New();
+SinkBase *PackageMan::AllocSink(const details::SinkFactoryBase::Ref &f, const Asset::Ref &asset) {
+	SinkBase *state = f->New();
 	if (state) {
 #if defined(RAD_OPT_PC_TOOLS)
 		if (asset->zone != Z_Unique)

@@ -65,7 +65,7 @@ private slots:
 private:
 
 	pkg::Asset::Ref m_asset;
-	asset::MapAsset::Ref m_map;
+	asset::MapAsset *m_map;
 	float m_time, m_dt;
 	bool m_loaded;
 	bool m_enabled;

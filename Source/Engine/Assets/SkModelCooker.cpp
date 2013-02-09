@@ -75,7 +75,7 @@ int SkModelCooker::Compile(int flags, int allflags) {
 	if (r != SR_Success)
 		return r;
 
-	SkAnimSetParser::Ref ska = SkAnimSetParser::Cast(skaRef);
+	SkAnimSetParser *ska = SkAnimSetParser::Cast(skaRef);
 	if (!ska || !ska->valid)
 		return SR_ParseError;
 

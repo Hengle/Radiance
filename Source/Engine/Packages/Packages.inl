@@ -31,21 +31,55 @@ inline Binding::~Binding() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+inline SinkBase *SinkBase::Cast(const Asset::Ref &asset, int stage) {
+	RAD_ASSERT(asset);
+	Asset::SinkMap::const_iterator it = asset->m_sinks.find(stage);
+	if (it != asset->m_sinks.end())
+		return it->second;
+	return 0;
+}
+
 class SinkBaseHelper {
 public:
 
-	static SinkBase::Ref Cast(const Asset::Ref &asset, int stage) {
+	static SinkBase *Cast(const Asset::Ref &asset, int stage) {
 		return SinkBase::Cast(asset, stage);
 	}
 };
 
 template <typename T>
-inline boost::shared_ptr<T> Sink<T>::Cast(const AssetRef &asset) {
-	if (!asset || asset->type != T::AssetType) {
-		return boost::shared_ptr<T>();
-	}
-	return boost::static_pointer_cast<T>(SinkBaseHelper::Cast(asset, T::SinkStage));
+inline T *Sink<T>::Cast(const AssetRef &asset) {
+	if (!asset || asset->type != T::AssetType)
+		return 0;
+	return static_cast<T*>(SinkBaseHelper::Cast(asset, T::SinkStage));
 }
+
+template <typename T>
+inline void *Sink<T>::operator new(size_t size) {
+	RAD_ASSERT(sizeof(T) <= size);
+	return GetPool().SafeGetChunk();
+}
+
+template <typename T>
+inline void Sink<T>::operator delete(void *p) {
+	if (p) {
+		GetPool().ReturnChunk(p);
+	}
+}
+
+template <typename T>
+inline typename Sink<T>::Pool &Sink<T>::GetPool() {
+	static Pool s_pool(ZPackages, "pkgsinkpool", sizeof(T), 16);
+	return s_pool;
+}
+
+namespace details {
+
+inline SinkBase *SinkFactoryBase::Cast(const AssetRef &asset) {
+	return SinkBaseHelper::Cast(asset, Stage());
+}
+
+} // details
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -346,6 +380,8 @@ inline Asset::~Asset() {
 				Asset::Ref(),
 				P_Unload
 			);
+
+			delete it->second;
 		}
 
 		_pkg->UnlinkAsset(this);
@@ -408,8 +444,8 @@ inline KeyDef::Ref PackageMan::DefaultKeyDef() const {
 #endif
 
 template <typename T>
-inline SinkBase::Ref PackageMan::SinkFactory<T>::New() {
-	return SinkBase::Ref(new (ZPackages) T());
+inline SinkBase *PackageMan::SinkFactory<T>::New() {
+	return new T();
 }
 
 template <typename T>

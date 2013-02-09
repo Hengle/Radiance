@@ -60,7 +60,7 @@ int SkAnimStatesCooker::Compile(int flags, int allflags) {
 	if (r < SR_Success)
 		return r;
 
-	SkAnimStatesParser::Ref parser = SkAnimStatesParser::Cast(asset);
+	SkAnimStatesParser *parser = SkAnimStatesParser::Cast(asset);
 	if (!parser)
 		return SR_ParseError;
 

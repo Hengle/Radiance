@@ -25,8 +25,6 @@ public:
 		AssetType = AT_Font
 	};
 
-	typedef boost::shared_ptr<FontParser> Ref;
-
 	FontParser();
 	virtual ~FontParser();
 

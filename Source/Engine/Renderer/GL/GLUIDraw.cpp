@@ -64,7 +64,7 @@ void GLDraw::DrawRect(
 	const Rect *clip,
 	const Vec3 &zRot, // (X, Y) is rotation center, Z is rotation in degrees
 	r::Material &m,
-	const asset::MaterialLoader::Ref &l,
+	asset::MaterialLoader *l,
 	bool sampleMaterialColor,
 	const Vec4 &rgba
 ) {

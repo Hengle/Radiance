@@ -58,6 +58,7 @@ StringTableWidget::StringTableWidget(
 ) : 
 QWidget(parent),
 m_sortColumn(0),
+m_parser(0),
 m_sort(Qt::AscendingOrder) 
 {
 

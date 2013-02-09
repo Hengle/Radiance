@@ -26,8 +26,6 @@ public:
 		AssetType = AT_Typeface
 	};
 
-	typedef boost::shared_ptr<TypefaceParser> Ref;
-
 	TypefaceParser();
 	virtual ~TypefaceParser();
 

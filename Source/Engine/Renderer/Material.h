@@ -164,7 +164,7 @@ public:
 	// Apply rendering states
 	// See RB for implementation.
 	void BindStates(int flags=0, int blends=0);
-	void BindTextures(const asset::MaterialLoaderRef &loader);
+	void BindTextures(asset::MaterialLoader *loader);
 
 #if defined(RAD_OPT_PC_TOOLS)
 	int CookShader(const char *path, Engine &engine, int pflags);

@@ -82,7 +82,7 @@ WidgetRef Root::RootWidget(int layer) {
 void Root::Tick(float time, float dt, bool tickMaterials) {
 	if (tickMaterials) {
 		for (pkg::AssetIdMap::const_iterator it = m_materials.begin(); it != m_materials.end(); ++it) {
-			asset::MaterialParser::Ref parser = asset::MaterialParser::Cast(it->second);
+			asset::MaterialParser *parser = asset::MaterialParser::Cast(it->second);
 			if (parser && parser->valid)
 				parser->material->Sample(time, dt);
 		}

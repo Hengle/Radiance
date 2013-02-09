@@ -63,7 +63,7 @@ int SkMaterialLoader::Load(
 	int flags
 )
 {
-	SkModelParser::Ref parser = SkModelParser::Cast(asset);
+	SkModelParser *parser = SkModelParser::Cast(asset);
 	if (!parser)
 		return SR_ParseError;
 

@@ -31,8 +31,6 @@ public:
 		AssetType = AT_SkAnimSet
 	};
 
-	typedef boost::shared_ptr<SkAnimSetParser> Ref;
-
 	SkAnimSetParser();
 	virtual ~SkAnimSetParser();
 

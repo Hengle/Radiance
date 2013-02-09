@@ -24,8 +24,6 @@ public:
 		AssetType = AT_Music
 	};
 
-	typedef boost::shared_ptr<MusicParser> Ref;
-
 	MusicParser();
 	virtual ~MusicParser();
 

@@ -19,20 +19,18 @@ typedef boost::shared_lock<SharedMutex> ReadLock;
 typedef thread::upgrade_to_exclusive_lock<SharedMutex> UpgradeToWriteLock;
 typedef thread::Interlocked<UReg> UInterlocked;
 
-struct SinkFactoryBase
-{
+struct SinkFactoryBase {
 	typedef boost::shared_ptr<SinkFactoryBase> Ref;
-	virtual SinkBaseRef New() = 0;
+	virtual SinkBase *New() = 0;
 	virtual int Stage() const = 0;
 
-	SinkBaseRef Cast(const AssetRef &asset);
+	SinkBase *Cast(const AssetRef &asset);
 	AssetIdWMap assets[Z_Max];
 };
 
 #if defined(RAD_OPT_TOOLS)
 
-struct CookerFactoryBase
-{
+struct CookerFactoryBase {
 	typedef boost::shared_ptr<CookerFactoryBase> Ref;
 	virtual CookerRef New() = 0;
 };

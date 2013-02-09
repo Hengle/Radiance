@@ -87,7 +87,7 @@ private:
 	DefMesh::Vec m_meshes;
 	ska::Ska::Ref m_ska;
 	pkg::AssetRef m_asset;
-	asset::SkModelParser::Ref m_parser;
+	asset::SkModelParser *m_parser;
 	ska::SkinType m_type;
 };
 

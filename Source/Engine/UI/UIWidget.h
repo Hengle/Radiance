@@ -58,7 +58,7 @@ public:
 		const Rect *clip,
 		const Vec3 &zRot, // (X, Y) is rotation center, Z is rotation in degrees
 		r::Material &m,
-		const asset::MaterialLoader::Ref &l,
+		asset::MaterialLoader *l,
 		bool sampleMaterialColor = true,
 		const Vec4 &rgba = Vec4(1, 1, 1, 1)
 	) = 0;

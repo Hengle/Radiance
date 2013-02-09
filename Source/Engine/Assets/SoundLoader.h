@@ -25,8 +25,6 @@ public:
 		AssetType = AT_Sound
 	};
 
-	typedef boost::shared_ptr<SoundLoader> Ref;
-
 	SoundLoader();
 	virtual ~SoundLoader();
 

@@ -96,16 +96,17 @@ void Material::BindStates(int flags, int blends) {
 	gls.Set(drawFlags, blendFlags);
 }
 
-void Material::BindTextures(const asset::MaterialLoader::Ref &loader) {
+void Material::BindTextures(asset::MaterialLoader *loader) {
 	gls.DisableAllMTSources();
+
 	if (!loader)
 		return;
-
+	
 	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
 		pkg::Asset::Ref a = loader->Texture(i);
 		if (!a)
 			continue; // allows gaps here (may be a procedural texture)
-		GLTextureAsset::Ref tex = GLTextureAsset::Cast(a);
+		GLTextureAsset *tex = GLTextureAsset::Cast(a);
 		RAD_ASSERT(tex);
 
 		int index = 0;

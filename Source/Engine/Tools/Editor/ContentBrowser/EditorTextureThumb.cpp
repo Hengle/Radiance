@@ -228,7 +228,7 @@ void TextureThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, int
 		return;
 
 	xtime::TimeDate modified;
-	TextureParser::Ref parser = TextureParser::Cast(asset);
+	TextureParser *parser = TextureParser::Cast(asset);
 	if (!parser)
 		return;
 
@@ -252,7 +252,7 @@ void TextureThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, int
 		}
 	}
 
-	TextureParser::Ref t = TextureParser::Cast(asset);
+	TextureParser *t = TextureParser::Cast(asset);
 	if (t) {
 		if (!t->headerValid) {
 			// cache image header for dimensions.

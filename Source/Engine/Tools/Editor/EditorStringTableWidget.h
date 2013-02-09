@@ -69,7 +69,7 @@ private:
 
 	QIcon m_icons[StringTable::LangId_MAX];
 	pkg::Asset::Ref m_stringTable;
-	asset::StringTableParser::Ref m_parser;
+	asset::StringTableParser *m_parser;
 	StringTableItemModel *m_model;
 	QSortFilterProxyModel *m_sortModel;
 	QPushButton *m_delButton;

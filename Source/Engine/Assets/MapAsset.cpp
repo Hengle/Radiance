@@ -20,7 +20,7 @@ using namespace pkg;
 
 namespace asset {
 
-MapAsset::MapAsset() : m_game(0), m_slot(0), m_spawning(false) {
+MapAsset::MapAsset() : m_game(0), m_slot(0), m_spawning(false), m_parser(0) {
 #if defined(RAD_OPT_TOOLS)
 	m_ui = 0;
 	m_debugUI = 0;
@@ -39,7 +39,7 @@ int MapAsset::Process(
 	if (flags&P_Unload) {
 #if defined(RAD_OPT_TOOLS)
 		m_mapBuilder.reset();
-		m_parser.reset();
+		m_parser = 0;
 #endif
 		m_bspFile.reset();
 		m_bspData.reset();
@@ -63,7 +63,7 @@ int MapAsset::Process(
 		if (r < SR_Success) {
 			m_world.reset();
 			m_mapBuilder.reset();
-			m_parser.reset();
+			m_parser = 0;
 		}
 
 		return r;
@@ -227,7 +227,7 @@ int MapAsset::SpawnTool(
 		if (r != SR_Success) {
 			if (r == MapParser::SR_End) {
 				r = SR_Pending;
-				m_parser.reset();
+				m_parser = 0;
 				if (!m_mapBuilder->SpawnCompile())
 					return SR_ParseError;
 			}
@@ -269,7 +269,7 @@ int MapAsset::SpawnTool(
 		int r = m_parser->ParseEntity(spawn);
 		if (r != SR_Success) {
 			if (r == MapParser::SR_End) {
-				m_parser.reset();
+				m_parser = 0;
 				if (!m_mapBuilder->SpawnCompile())
 					return SR_ParseError;
 				return SR_Pending;

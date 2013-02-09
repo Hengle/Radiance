@@ -23,8 +23,6 @@ public:
 		AssetType = AT_Mesh
 	};
 
-	typedef boost::shared_ptr<MeshMaterialLoader> Ref;
-
 	MeshMaterialLoader();
 	virtual ~MeshMaterialLoader();
 

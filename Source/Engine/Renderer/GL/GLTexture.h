@@ -79,8 +79,6 @@ public:
 		AssetType = asset::AT_Texture
 	};
 
-	typedef boost::shared_ptr<GLTextureAsset> Ref;
-
 	GLTextureAsset();
 	virtual ~GLTextureAsset();
 

@@ -44,7 +44,7 @@ int StringTableCooker::Compile(int flags, int allflags) {
 	if (r < SR_Success)
 		return r;
 
-	StringTableParser::Ref parser = StringTableParser::Cast(asset);
+	StringTableParser *parser = StringTableParser::Cast(asset);
 	if (!parser)
 		return SR_ParseError;
 
