@@ -1561,7 +1561,7 @@ void Marshal<world::FloorPosition>::Push(lua_State *L, const world::FloorPositio
 	lua_pushinteger(L, (int)val.m_floor);
 	lua_setfield(L, -2, "floor");
 	lua_pushinteger(L, (int)val.m_tri);
-	lua_setfield(L, -2, "@tri");
+	lua_setfield(L, -2, "tri");
 	lua_pushinteger(L, (int)val.m_waypoint);
 	lua_setfield(L, -2, "waypoint");
 	lua_pushinteger(L, (int)val.m_nextWaypoint);
@@ -1591,7 +1591,7 @@ world::FloorPosition Marshal<world::FloorPosition>::Get(lua_State *L, int index,
 	p.m_floor = (int)lua_tointeger(L, -1);
 	lua_pop(L, 1);
 
-	lua_getfield(L, index, "@tri");
+	lua_getfield(L, index, "tri");
 	if (lua_type(L, -1) != LUA_TNUMBER) {
 		lua_pop(L, 1);
 		if (luaError)

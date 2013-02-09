@@ -71,9 +71,13 @@ void Entity::Tick_MT_Floor(
 		m_ps.flags |= kPhysicsFlag_Friction;
 	}
 
-	if (distanceRemaining < 0.01f) {
+	if (distanceRemaining < 1.f) {
 		m_ps.activeMove->ClampToEnd(m_ps.moveState);
 		m_ps.activeMove.reset(); // done with this move.
+
+		if (PushEntityCall("OnFloorMoveComplete")) {
+			world->lua->Call("Entity:OnFloorMoveComplete", 1, 0, 0);
+		}
 	}
 
 	m_ps.targetAngles = LookAngles(m_ps.moveState.facing);
