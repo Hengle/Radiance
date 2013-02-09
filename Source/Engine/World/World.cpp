@@ -239,23 +239,20 @@ void World::TickState(float dt, float unmod_dt) {
 
 		DispatchEvents();
 
-		xtime::TimeSlice time(1000/60);
-
 		for (Entity::IdMap::const_iterator it = m_ents.begin(); it != m_ents.end(); ++it) {
 			if (it->second.get() != m_viewController.get())
-				it->second->PrivateTick(frame, dt, time);
+				it->second->PrivateTick(frame, dt, xtime::TimeSlice::Infinite);
 		}
 
 		if (m_viewController)
-			m_viewController->PrivateTick(frame, dt, time);
+			m_viewController->PrivateTick(frame, dt, xtime::TimeSlice::Infinite);
 
 		gc = true;
 	}else if (!m_levelStart) { 
 		// game is paused, must tick world!
-		xtime::TimeSlice time(1000/60);
 		m_lua->Tick(0.f);
 		if (m_gameCode)
-			m_gameCode->PrivateTick(frame, 0.f, time);
+			m_gameCode->PrivateTick(frame, 0.f, xtime::TimeSlice::Infinite);
 	}
 
 	if (!(pauseState&kPauseCinematics))
