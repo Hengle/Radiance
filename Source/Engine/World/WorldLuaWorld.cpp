@@ -274,6 +274,43 @@ int WorldLua::lua_World_CreateFloorMove(lua_State *L) {
 	return move ? 1 : 0;
 }
 
+int WorldLua::lua_World_CreateFloorMoveSeq(lua_State *L) {
+
+	LOAD_SELF
+
+	luaL_checktype(L, 1, LUA_TTABLE);
+
+	FloorPosition::Vec vec;
+	vec.reserve(4);
+
+	for (int i = 0; ; ++i) {
+		lua_pushinteger(L, i+1);
+		lua_gettable(L, 1);
+		if (lua_isnil(L, -1)) {
+			lua_pop(L, 1);
+			break;
+		}
+		vec.push_back(lua::Marshal<FloorPosition>::Get(L, -1, true));
+		lua_pop(L, 1);
+	}
+
+	if (vec.size() < 2)
+		return 0;
+
+	FloorMove::Ref move;
+
+	if (vec.size() == 2) {
+		move = self->m_world->floors->CreateMove(vec[0], vec[1]);
+	} else {
+		move = self->m_world->floors->CreateMoveSeq(vec);
+	}
+
+	if (move)
+		move->Push(L);
+
+	return move ? 1 : 0;
+}
+
 int WorldLua::lua_World_CreateFloorPosition(lua_State *L) {
 	LOAD_SELF
 

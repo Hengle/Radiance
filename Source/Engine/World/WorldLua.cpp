@@ -87,6 +87,7 @@ bool WorldLua::Init() {
 		{ "LineTrace", lua_World_LineTrace },
 		{ "ClipToFloor", lua_World_ClipToFloor },
 		{ "CreateFloorMove", lua_World_CreateFloorMove },
+		{ "CreateFloorMoveSeq", lua_World_CreateFloorMoveSeq },
 		{ "CreateFloorPosition", lua_World_CreateFloorPosition },
 		{ "CreateScreenOverlay", lua_World_CreateScreenOverlay },
 		{ "PostEvent", lua_World_PostEvent },

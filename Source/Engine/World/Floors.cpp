@@ -271,109 +271,45 @@ bool Floors::ClipToFloor(
 }
 
 FloorMove::Ref Floors::CreateMove(
-	const FloorPosition &_start,
-	const FloorPosition &_end
+	const FloorPosition &start,
+	const FloorPosition &end
 ) const {
-	MovePlan plan;
-	MovePlan planStack;
-	FloorBits floors;
-	WaypointBits waypoints;
-	float bestDistance = std::numeric_limits<float>::max();
-
-	// A floor move never sets the triangle number since motion along the move is arbitrary
-	// and doing a floor intersection test is expensive for every move step. We can fill this 
-	// information in here:
-
-	FloorPosition start(_start);
-	FloorPosition end(_end);
-
-	if (start.m_waypoint != -1) {
-		const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + start.m_waypoint;
-		start.m_floor = (int)waypoint->floorNum;
-		start.m_tri = (int)waypoint->triNum;
-	} else if (start.m_floor != -1) { // arbitrary floor position
-		if (start.m_tri == -1) {
-			Vec3 x(start.m_pos + Vec3(0, 0, 8.f));
-			Vec3 y(start.m_pos - Vec3(0, 0, 8.f));
-			if (!ClipToFloor(start.m_floor, x, y, start)) {
-#if !defined(RAD_OPT_SHIP)
-				RAD_FAIL("Floor starting position is outside floor!");
-#endif
-				return FloorMove::Ref();
-			}
-		}
-	}
-	
-	if (end.m_waypoint != -1) {
-		const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + end.m_waypoint;
-		end.m_floor = (int)waypoint->floorNum;
-		end.m_tri = (int)waypoint->triNum;
-	} else if (end.m_floor != -1) { // arbitrary floor position
-		if (end.m_tri == -1) {
-			Vec3 x(end.m_pos + Vec3(0, 0, 8.f));
-			Vec3 y(end.m_pos - Vec3(0, 0, 8.f));
-			if (!ClipToFloor(end.m_floor, x, y, end)) {
-#if !defined(RAD_OPT_SHIP)
-				RAD_FAIL("Floor ending position is outside floor!");
-#endif
-				return FloorMove::Ref();
-			}
-		}
-	}
-
-	++m_floodNum;
-	if (!PlanMove(start, end, 0.f, plan, planStack, floors, waypoints, bestDistance))
-		return FloorMove::Ref(); // there is no path between these points.
-
-	// We have a rough movement plan from start->end, build the walk commands
 	WalkStep::Vec route;
-	WalkStep::Vec workRoute;
+	if (!Walk(start, end, route))
+		return FloorMove::Ref();
 
-	FloorPosition current(start);
+	FloorMove::Ref move(new (ZWorld) FloorMove());
+	GenerateFloorMove(route, move->m_route);
+	return move;
+}
 
-	for (MoveStep::Vec::const_iterator it = plan.steps->begin(); it != plan.steps->end(); ++it) {
-		const MoveStep &step = *it;
+FloorMove::Ref Floors::CreateMoveSeq(
+	const FloorPosition::Vec &seq
+) const {
+	if (seq.size() < 2)
+		return FloorMove::Ref();
 
-		const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + step.waypoint;
-		
-		FloorPosition waypointPos;
-		waypointPos.m_floor = (int)waypoint->floorNum;
-		waypointPos.m_tri = (int)waypoint->triNum;
-		waypointPos.m_pos = Vec3(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
-		waypointPos.m_waypoint = step.waypoint;
-		waypointPos.m_nextWaypoint = -1;
-		
-		// walk from floor -> waypoint (waypoint exiting floor)
-		if (current.m_floor >= 0) {
-			RAD_ASSERT(current.m_floor == waypointPos.m_floor);
-			workRoute->clear();
-			WalkFloor(current, waypointPos, workRoute);
-			std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*route));
+	FloorPosition cur(seq[0]);
+
+	WalkStep::Vec route;
+	WalkStep::Vec work;
+
+	FloorPosition::Vec::const_iterator start = seq.begin()+1;
+
+	for (FloorPosition::Vec::const_iterator it = start; it != seq.end(); ++it) {
+		const FloorPosition &next = *it;
+		if (it != start) {
+			if (!Walk(cur, next, work))
+				return FloorMove::Ref(); // no connection
+			RAD_ASSERT(!work->empty());
+			std::copy(work->begin()+1, work->end(), std::back_inserter(*route));
+			work->clear();
+		} else { // done in-place
+			if (!Walk(cur, next, route))
+				return FloorMove::Ref();
 		}
-
-		// walk from waypoint->waypoint (through connection)
-		WalkConnection(step.waypoint, step.connection, route);
-
-		const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + step.connection;
-		int otherIdx = connection->waypoints[0] == step.waypoint;
-		const bsp_file::BSPWaypoint *otherWaypoint = m_bsp->Waypoints() + connection->waypoints[otherIdx];
-
-		current.m_floor = (int)otherWaypoint->floorNum;
-		current.m_tri = (int)otherWaypoint->triNum;
-		current.m_pos = Vec3(otherWaypoint->pos[0], otherWaypoint->pos[1], otherWaypoint->pos[2]);
+		cur = next;
 	}
-
-	// walk.
-	if (current.m_floor >= 0) {
-		RAD_ASSERT(current.m_floor == end.m_floor);
-		workRoute->clear();
-		WalkFloor(current, end, workRoute);
-		std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*route));
-	} else { // waypoint move didn't generate a plan because we are at our destination waypoint already.
-		if (route->empty())
-			return FloorMove::Ref();
-	}
-
 
 	FloorMove::Ref move(new (ZWorld) FloorMove());
 	GenerateFloorMove(route, move->m_route);
@@ -951,6 +887,114 @@ void Floors::OptimizeRoute2(WalkStep::Vec &route) const {
 
 	} while (optimized);
 }
+
+bool Floors::Walk(
+	const FloorPosition &_start,
+	const FloorPosition &_end,
+	WalkStep::Vec &walkRoute
+) const {
+	MovePlan plan;
+	MovePlan planStack;
+	FloorBits floors;
+	WaypointBits waypoints;
+	float bestDistance = std::numeric_limits<float>::max();
+
+	// A floor move never sets the triangle number since motion along the move is arbitrary
+	// and doing a floor intersection test is expensive for every move step. We can fill this 
+	// information in here:
+
+	FloorPosition start(_start);
+	FloorPosition end(_end);
+
+	if (start.m_waypoint != -1) {
+		const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + start.m_waypoint;
+		start.m_floor = (int)waypoint->floorNum;
+		start.m_tri = (int)waypoint->triNum;
+	} else if (start.m_floor != -1) { // arbitrary floor position
+		if (start.m_tri == -1) {
+			Vec3 x(start.m_pos + Vec3(0, 0, 8.f));
+			Vec3 y(start.m_pos - Vec3(0, 0, 8.f));
+			if (!ClipToFloor(start.m_floor, x, y, start)) {
+#if !defined(RAD_OPT_SHIP)
+				RAD_FAIL("Floor starting position is outside floor!");
+#endif
+				return false;
+			}
+		}
+	}
+	
+	if (end.m_waypoint != -1) {
+		const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + end.m_waypoint;
+		end.m_floor = (int)waypoint->floorNum;
+		end.m_tri = (int)waypoint->triNum;
+	} else if (end.m_floor != -1) { // arbitrary floor position
+		if (end.m_tri == -1) {
+			Vec3 x(end.m_pos + Vec3(0, 0, 8.f));
+			Vec3 y(end.m_pos - Vec3(0, 0, 8.f));
+			if (!ClipToFloor(end.m_floor, x, y, end)) {
+#if !defined(RAD_OPT_SHIP)
+				RAD_FAIL("Floor ending position is outside floor!");
+#endif
+				return false;
+			}
+		}
+	}
+
+	++m_floodNum;
+	if (!PlanMove(start, end, 0.f, plan, planStack, floors, waypoints, bestDistance))
+		return false; // there is no path between these points.
+
+	// We have a rough movement plan from start->end, build the walk command
+	WalkStep::Vec workRoute;
+
+	FloorPosition current(start);
+
+	for (MoveStep::Vec::const_iterator it = plan.steps->begin(); it != plan.steps->end(); ++it) {
+		const MoveStep &step = *it;
+
+		const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + step.waypoint;
+		
+		FloorPosition waypointPos;
+		waypointPos.m_floor = (int)waypoint->floorNum;
+		waypointPos.m_tri = (int)waypoint->triNum;
+		waypointPos.m_pos = Vec3(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
+		waypointPos.m_waypoint = step.waypoint;
+		waypointPos.m_nextWaypoint = -1;
+		
+		// walk from floor -> waypoint (waypoint exiting floor)
+		if (current.m_floor >= 0) {
+			RAD_ASSERT(current.m_floor == waypointPos.m_floor);
+			workRoute->clear();
+			WalkFloor(current, waypointPos, workRoute);
+			std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*walkRoute));
+		}
+
+		// walk from waypoint->waypoint (through connection)
+		WalkConnection(step.waypoint, step.connection, walkRoute);
+
+		const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + step.connection;
+		int otherIdx = connection->waypoints[0] == step.waypoint;
+		const bsp_file::BSPWaypoint *otherWaypoint = m_bsp->Waypoints() + connection->waypoints[otherIdx];
+
+		current.m_floor = (int)otherWaypoint->floorNum;
+		current.m_tri = (int)otherWaypoint->triNum;
+		current.m_pos = Vec3(otherWaypoint->pos[0], otherWaypoint->pos[1], otherWaypoint->pos[2]);
+	}
+
+	// walk.
+	if (current.m_floor >= 0) {
+		RAD_ASSERT(current.m_floor == end.m_floor);
+		workRoute->clear();
+		WalkFloor(current, end, workRoute);
+		std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*walkRoute));
+	} else { // waypoint move didn't generate a plan because we are at our destination waypoint already.
+		if (walkRoute->empty())
+			return false;
+	}
+
+	return true;
+}
+
 
 void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route &moveRoute) const {
 	if (walkRoute->empty())

@@ -23,6 +23,7 @@ namespace world {
 
 class RADENG_CLASS FloorPosition {
 public:
+	typedef zone_vector<FloorPosition, ZWorldT>::type Vec;
 
 	FloorPosition() {}
 	FloorPosition(const Vec3 &pos, int floor, int tri)
@@ -177,6 +178,10 @@ public:
 		const FloorPosition &end
 	) const;
 
+	FloorMove::Ref CreateMoveSeq(
+		const FloorPosition::Vec &seq
+	) const;
+
 	enum {
 		RAD_FLAG(kFloorState_Enabled)
 	};
@@ -234,6 +239,12 @@ private:
 	void OptimizeRoute2(WalkStep::Vec &route) const;
 	Vec3 FindEdgePoint(const Vec3 &pos, const bsp_file::BSPFloorEdge *edge) const;
 	
+	bool Walk(
+		const FloorPosition &start,
+		const FloorPosition &end,
+		WalkStep::Vec &walkRoute
+	) const;
+
 	void GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route &moveRoute) const;
 
 	//! A step in a planned move
