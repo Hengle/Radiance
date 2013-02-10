@@ -255,7 +255,6 @@
 		330A993715BC9FEB002A81EC /* SkControllers.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8883415B9BA490089BA08 /* SkControllers.h */; };
 		330A993B15BCA002002A81EC /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8881215B9BA480089BA08 /* Material.cpp */; };
 		330A993C15BCA002002A81EC /* Material.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8881315B9BA480089BA08 /* Material.h */; };
-		330A993D15BCA002002A81EC /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8881515B9BA480089BA08 /* Mesh.cpp */; };
 		330A993E15BCA002002A81EC /* Mesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8881615B9BA480089BA08 /* Mesh.h */; };
 		330A993F15BCA002002A81EC /* Renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8881F15B9BA480089BA08 /* Renderer.cpp */; };
 		330A994015BCA002002A81EC /* Renderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8882015B9BA480089BA08 /* Renderer.h */; };
@@ -476,7 +475,6 @@
 		337AE5B515BF214F00AD1617 /* SkAnim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8882E15B9BA490089BA08 /* SkAnim.cpp */; };
 		337AE5B615BF214F00AD1617 /* SkControllers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8883315B9BA490089BA08 /* SkControllers.cpp */; };
 		337AE5B715BF214F00AD1617 /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8881215B9BA480089BA08 /* Material.cpp */; };
-		337AE5B815BF214F00AD1617 /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8881515B9BA480089BA08 /* Mesh.cpp */; };
 		337AE5B915BF214F00AD1617 /* Renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8881F15B9BA480089BA08 /* Renderer.cpp */; };
 		337AE5BA15BF214F00AD1617 /* Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8882215B9BA480089BA08 /* Shader.cpp */; };
 		337AE5BB15BF214F00AD1617 /* SkMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8882415B9BA480089BA08 /* SkMesh.cpp */; };
@@ -2048,8 +2046,6 @@
 		33E889A015B9BA4B0089BA08 /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8881215B9BA480089BA08 /* Material.cpp */; };
 		33E889A115B9BA4B0089BA08 /* Material.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8881315B9BA480089BA08 /* Material.h */; };
 		33E889A215B9BA4B0089BA08 /* Material.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8881315B9BA480089BA08 /* Material.h */; };
-		33E889A315B9BA4B0089BA08 /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8881515B9BA480089BA08 /* Mesh.cpp */; };
-		33E889A415B9BA4B0089BA08 /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8881515B9BA480089BA08 /* Mesh.cpp */; };
 		33E889A515B9BA4B0089BA08 /* Mesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8881615B9BA480089BA08 /* Mesh.h */; };
 		33E889A615B9BA4B0089BA08 /* Mesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8881615B9BA480089BA08 /* Mesh.h */; };
 		33E889B315B9BA4B0089BA08 /* Renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8881F15B9BA480089BA08 /* Renderer.cpp */; };
@@ -2363,6 +2359,16 @@
 		33E88B7015B9BA4B0089BA08 /* WorldLua.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891315B9BA4A0089BA08 /* WorldLua.h */; };
 		33E88B7115B9BA4B0089BA08 /* WorldSpawn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8891415B9BA4A0089BA08 /* WorldSpawn.cpp */; };
 		33E88B7215B9BA4B0089BA08 /* WorldSpawn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8891415B9BA4A0089BA08 /* WorldSpawn.cpp */; };
+		33F8F41716C75A2F009646B1 /* MeshVBLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33F8F41516C75A2F009646B1 /* MeshVBLoader.cpp */; };
+		33F8F41816C75A2F009646B1 /* MeshVBLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33F8F41516C75A2F009646B1 /* MeshVBLoader.cpp */; };
+		33F8F41916C75A2F009646B1 /* MeshVBLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33F8F41516C75A2F009646B1 /* MeshVBLoader.cpp */; };
+		33F8F41A16C75A2F009646B1 /* MeshVBLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33F8F41516C75A2F009646B1 /* MeshVBLoader.cpp */; };
+		33F8F41B16C75A2F009646B1 /* MeshVBLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33F8F41516C75A2F009646B1 /* MeshVBLoader.cpp */; };
+		33F8F41C16C75A2F009646B1 /* MeshVBLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 33F8F41616C75A2F009646B1 /* MeshVBLoader.h */; };
+		33F8F41D16C75A2F009646B1 /* MeshVBLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 33F8F41616C75A2F009646B1 /* MeshVBLoader.h */; };
+		33F8F41E16C75A30009646B1 /* MeshVBLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 33F8F41616C75A2F009646B1 /* MeshVBLoader.h */; };
+		33F8F41F16C75A30009646B1 /* MeshVBLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 33F8F41616C75A2F009646B1 /* MeshVBLoader.h */; };
+		33F8F42016C75A30009646B1 /* MeshVBLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 33F8F41616C75A2F009646B1 /* MeshVBLoader.h */; };
 		33FA7E871633B97D002603A5 /* RBackend.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FA7E821633B97C002603A5 /* RBackend.h */; };
 		33FA7E881633B97D002603A5 /* RBackend.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FA7E821633B97C002603A5 /* RBackend.h */; };
 		33FA7E891633B97D002603A5 /* RBackend.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FA7E821633B97C002603A5 /* RBackend.h */; };
@@ -2465,7 +2471,6 @@
 		33FA7F181633CA28002603A5 /* GLUIDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8880115B9BA480089BA08 /* GLUIDraw.cpp */; };
 		33FA7F191633CA28002603A5 /* GLWorldDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8880915B9BA480089BA08 /* GLWorldDraw.cpp */; };
 		33FA7F1A1633CA28002603A5 /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8881215B9BA480089BA08 /* Material.cpp */; };
-		33FA7F1B1633CA28002603A5 /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8881515B9BA480089BA08 /* Mesh.cpp */; };
 		33FA7F1C1633CA28002603A5 /* Renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8881F15B9BA480089BA08 /* Renderer.cpp */; };
 		33FA7F1D1633CA28002603A5 /* Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8882215B9BA480089BA08 /* Shader.cpp */; };
 		33FA7F1E1633CA28002603A5 /* SkMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8882415B9BA480089BA08 /* SkMesh.cpp */; };
@@ -3520,7 +3525,6 @@
 		33E8881215B9BA480089BA08 /* Material.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Material.cpp; sourceTree = "<group>"; };
 		33E8881315B9BA480089BA08 /* Material.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Material.h; sourceTree = "<group>"; };
 		33E8881415B9BA480089BA08 /* Material.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Material.inl; sourceTree = "<group>"; };
-		33E8881515B9BA480089BA08 /* Mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Mesh.cpp; sourceTree = "<group>"; };
 		33E8881615B9BA480089BA08 /* Mesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mesh.h; sourceTree = "<group>"; };
 		33E8881715B9BA480089BA08 /* Mesh.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Mesh.inl; sourceTree = "<group>"; };
 		33E8881F15B9BA480089BA08 /* Renderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Renderer.cpp; sourceTree = "<group>"; };
@@ -3739,6 +3743,8 @@
 		33E8891415B9BA4A0089BA08 /* WorldSpawn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldSpawn.cpp; sourceTree = "<group>"; };
 		33E88B7315B9BC7E0089BA08 /* mocfiles.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = mocfiles.sh; sourceTree = "<group>"; };
 		33E88B7615B9C3660089BA08 /* PVRTexLibPaths.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = PVRTexLibPaths.xcconfig; path = XCConfig/PVRTexLibPaths.xcconfig; sourceTree = "<group>"; };
+		33F8F41516C75A2F009646B1 /* MeshVBLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MeshVBLoader.cpp; sourceTree = "<group>"; };
+		33F8F41616C75A2F009646B1 /* MeshVBLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MeshVBLoader.h; sourceTree = "<group>"; };
 		33FA7E821633B97C002603A5 /* RBackend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RBackend.h; sourceTree = "<group>"; };
 		33FA7E831633B97C002603A5 /* RBackendDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RBackendDef.h; sourceTree = "<group>"; };
 		33FA7E841633B97D002603A5 /* RBGLAssets.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RBGLAssets.cpp; sourceTree = "<group>"; };
@@ -4573,6 +4579,8 @@
 				33E886FA15B9B9ED0089BA08 /* MeshMaterialLoader.h */,
 				33E886FB15B9B9ED0089BA08 /* MeshParser.cpp */,
 				33E886FC15B9B9ED0089BA08 /* MeshParser.h */,
+				33F8F41516C75A2F009646B1 /* MeshVBLoader.cpp */,
+				33F8F41616C75A2F009646B1 /* MeshVBLoader.h */,
 				33E886FD15B9B9ED0089BA08 /* MusicCooker.cpp */,
 				33E886FE15B9B9ED0089BA08 /* MusicCooker.h */,
 				33E886FF15B9B9ED0089BA08 /* MusicParser.cpp */,
@@ -4696,7 +4704,6 @@
 				33E8881215B9BA480089BA08 /* Material.cpp */,
 				33E8881315B9BA480089BA08 /* Material.h */,
 				33E8881415B9BA480089BA08 /* Material.inl */,
-				33E8881515B9BA480089BA08 /* Mesh.cpp */,
 				33E8881615B9BA480089BA08 /* Mesh.h */,
 				33E8881715B9BA480089BA08 /* Mesh.inl */,
 				33E8881F15B9BA480089BA08 /* Renderer.cpp */,
@@ -5520,6 +5527,7 @@
 				33982E2216A8ABBC00C2ED49 /* Console.h in Headers */,
 				33982E8716B2553300C2ED49 /* E_TouchTrigger.h in Headers */,
 				3342B1D716BE5AB300A287E3 /* UIVListWidget.h in Headers */,
+				33F8F41E16C75A30009646B1 /* MeshVBLoader.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5908,6 +5916,7 @@
 				33982E2316A8ABBC00C2ED49 /* Console.h in Headers */,
 				33982E8816B2553300C2ED49 /* E_TouchTrigger.h in Headers */,
 				3342B1D816BE5AB300A287E3 /* UIVListWidget.h in Headers */,
+				33F8F41F16C75A30009646B1 /* MeshVBLoader.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6378,6 +6387,7 @@
 				33982E1816A89C8100C2ED49 /* GameCVars.h in Headers */,
 				33982E8516B2553300C2ED49 /* E_TouchTrigger.h in Headers */,
 				3342B1D516BE5AB300A287E3 /* UIVListWidget.h in Headers */,
+				33F8F41C16C75A2F009646B1 /* MeshVBLoader.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6764,6 +6774,7 @@
 				33982E2116A8ABBC00C2ED49 /* Console.h in Headers */,
 				33982E8616B2553300C2ED49 /* E_TouchTrigger.h in Headers */,
 				3342B1D616BE5AB300A287E3 /* UIVListWidget.h in Headers */,
+				33F8F41D16C75A2F009646B1 /* MeshVBLoader.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7152,6 +7163,7 @@
 				33982E2416A8ABBD00C2ED49 /* Console.h in Headers */,
 				33982E8916B2553300C2ED49 /* E_TouchTrigger.h in Headers */,
 				3342B1D916BE5AB300A287E3 /* UIVListWidget.h in Headers */,
+				33F8F42016C75A30009646B1 /* MeshVBLoader.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7449,7 +7461,6 @@
 				330A993315BC9FEB002A81EC /* SkAnim.cpp in Sources */,
 				330A993615BC9FEB002A81EC /* SkControllers.cpp in Sources */,
 				330A993B15BCA002002A81EC /* Material.cpp in Sources */,
-				330A993D15BCA002002A81EC /* Mesh.cpp in Sources */,
 				330A993F15BCA002002A81EC /* Renderer.cpp in Sources */,
 				330A994215BCA002002A81EC /* Shader.cpp in Sources */,
 				330A994415BCA002002A81EC /* SkMesh.cpp in Sources */,
@@ -7514,6 +7525,7 @@
 				33982E9216B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */,
 				33982E9816B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */,
 				3342B1D216BE5AB300A287E3 /* UIVListWidget.cpp in Sources */,
+				33F8F41916C75A2F009646B1 /* MeshVBLoader.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7619,7 +7631,6 @@
 				337AE5B515BF214F00AD1617 /* SkAnim.cpp in Sources */,
 				337AE5B615BF214F00AD1617 /* SkControllers.cpp in Sources */,
 				337AE5B715BF214F00AD1617 /* Material.cpp in Sources */,
-				337AE5B815BF214F00AD1617 /* Mesh.cpp in Sources */,
 				337AE5B915BF214F00AD1617 /* Renderer.cpp in Sources */,
 				337AE5BA15BF214F00AD1617 /* Shader.cpp in Sources */,
 				337AE5BB15BF214F00AD1617 /* SkMesh.cpp in Sources */,
@@ -7685,6 +7696,7 @@
 				33982E9316B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */,
 				33982E9916B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */,
 				3342B1D316BE5AB300A287E3 /* UIVListWidget.cpp in Sources */,
+				33F8F41A16C75A2F009646B1 /* MeshVBLoader.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7790,7 +7802,6 @@
 				33E8898315B9BA4B0089BA08 /* GLUIDraw.cpp in Sources */,
 				33E8898F15B9BA4B0089BA08 /* GLWorldDraw.cpp in Sources */,
 				33E8899F15B9BA4B0089BA08 /* Material.cpp in Sources */,
-				33E889A315B9BA4B0089BA08 /* Mesh.cpp in Sources */,
 				33E889B315B9BA4B0089BA08 /* Renderer.cpp in Sources */,
 				33E889B915B9BA4B0089BA08 /* Shader.cpp in Sources */,
 				33E889BD15B9BA4B0089BA08 /* SkMesh.cpp in Sources */,
@@ -7940,6 +7951,7 @@
 				33982E9016B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */,
 				33982E9616B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */,
 				3342B1D016BE5AB300A287E3 /* UIVListWidget.cpp in Sources */,
+				33F8F41716C75A2F009646B1 /* MeshVBLoader.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8029,7 +8041,6 @@
 				33E8898415B9BA4B0089BA08 /* GLUIDraw.cpp in Sources */,
 				33E8899015B9BA4B0089BA08 /* GLWorldDraw.cpp in Sources */,
 				33E889A015B9BA4B0089BA08 /* Material.cpp in Sources */,
-				33E889A415B9BA4B0089BA08 /* Mesh.cpp in Sources */,
 				33E889B415B9BA4B0089BA08 /* Renderer.cpp in Sources */,
 				33E889BA15B9BA4B0089BA08 /* Shader.cpp in Sources */,
 				33E889BE15B9BA4B0089BA08 /* SkMesh.cpp in Sources */,
@@ -8110,6 +8121,7 @@
 				33982E9116B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */,
 				33982E9716B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */,
 				3342B1D116BE5AB300A287E3 /* UIVListWidget.cpp in Sources */,
+				33F8F41816C75A2F009646B1 /* MeshVBLoader.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8199,7 +8211,6 @@
 				33FA7F181633CA28002603A5 /* GLUIDraw.cpp in Sources */,
 				33FA7F191633CA28002603A5 /* GLWorldDraw.cpp in Sources */,
 				33FA7F1A1633CA28002603A5 /* Material.cpp in Sources */,
-				33FA7F1B1633CA28002603A5 /* Mesh.cpp in Sources */,
 				33FA7F1C1633CA28002603A5 /* Renderer.cpp in Sources */,
 				33FA7F1D1633CA28002603A5 /* Shader.cpp in Sources */,
 				33FA7F1E1633CA28002603A5 /* SkMesh.cpp in Sources */,
@@ -8281,6 +8292,7 @@
 				33982E9416B256D700C2ED49 /* WorldDebugDraw.cpp in Sources */,
 				33982E9A16B256EF00C2ED49 /* GLWorldDebugDraw.cpp in Sources */,
 				3342B1D416BE5AB300A287E3 /* UIVListWidget.cpp in Sources */,
+				33F8F41B16C75A2F009646B1 /* MeshVBLoader.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
