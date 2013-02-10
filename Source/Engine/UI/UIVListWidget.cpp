@@ -49,6 +49,7 @@ void VListWidget::Init() {
 }
 
 void VListWidget::Clear() {
+	SetCapture(false);
 	m_e.type = InputEvent::T_Invalid;
 	m_velocity = Vec2::Zero;
 	m_endStop = false;
@@ -87,6 +88,7 @@ void VListWidget::RemoveItem(const Widget::Ref &widget) {
 
 void VListWidget::ScrollTo(const Vec2 &pos, float time) {
 	// cancel any drag or motion
+	SetCapture(false);
 	m_e.type = InputEvent::T_Invalid;
 	m_velocity = Vec2::Zero;
 	m_endStop = false;
@@ -178,6 +180,7 @@ void VListWidget::Drag(const InputEvent &e) {
 		m_dragMove = false;
 		m_dragDidMove = false;
 		m_e.type = InputEvent::T_Invalid;
+		SetCapture(false);
 		return;
 	}
 
@@ -360,32 +363,23 @@ bool VListWidget::InputEventFilter(const InputEvent &e, const TouchState *state,
 		m_velocity = Vec2::Zero;
 		m_dragMotion = Vec2::Zero;
 		m_scrollTime[1] = 0.f; // kill any scrolling
-		return true;
-	} else if (e.touch != m_e.touch) {
-		return false; // not our touch
+		SetCapture(true);
+	} else if (e.touch == m_e.touch) {
+		if (m_dragDidMove) {
+			Drag(e);
+		} else if (e.IsTouchEnd(0)) {
+			// touch and release
+			RAD_ASSERT(m_e.type == InputEvent::T_TouchBegin);
+			ProcessInputEvent(m_e, state, is);
+			m_e.type = InputEvent::T_Invalid;
+			m_dragging = false;
+			SetCapture(false);
+		} else if (m_dragging) {
+			Drag(e);
+		}
 	}
 
-	if (m_dragDidMove) {
-		Drag(e);
-		return true;
-	}
-
-	if (e.IsTouchEnd(0)) {
-		// touch and release
-		RAD_ASSERT(m_e.type == InputEvent::T_TouchBegin);
-		ProcessInputEvent(m_e, state, is);
-		m_e.type = InputEvent::T_Invalid;
-		m_dragging = false;
-		return false;
-	}
-
-	if (m_dragging) {
-		Drag(e);
-		return true;
-	}
-
-
-	return false;
+	return true;
 }
 
 void VListWidget::CheckPostDelayedInput() {
@@ -402,6 +396,7 @@ void VListWidget::CheckPostDelayedInput() {
 		if (ProcessInputEvent(m_e, m_pts, m_is)) {
 			m_dragging = false;
 			m_e.type = InputEvent::T_Invalid;
+			SetCapture(false);
 		}
 	}
 }
