@@ -238,7 +238,7 @@ bool WinFileSystem::DeleteDirectory_r(const char *nativePath) {
 
 	FileSearch::Ref s = OpenSearch(
 		(basePath + "/*.*").c_str, 
-		kSearchOption_Recursive,
+		kSearchOption_Directories,
 		kFileOption_NativePath, 
 		0
 	);
@@ -254,11 +254,9 @@ bool WinFileSystem::DeleteDirectory_r(const char *nativePath) {
 			String path = basePath + name;
 
 			if (fa & kFileAttribute_Directory) {
-				if (!DeleteDirectory_r(path.c_str))
-					return false;
+				DeleteDirectory_r(path.c_str);
 			} else {
-				if (!DeleteFileA(path.c_str))
-					return false;
+				DeleteFileA(path.c_str);
 			}
 		}
 
@@ -455,6 +453,42 @@ bool WinFileSearch::NextFile(
 				if (m_subDir && m_subDir->NextFile(path, fileAttributes, fileTime))
 					return true;
 				m_subDir.reset();
+			} else if (m_options & kSearchOption_Directories) {
+				if (m_prefix.empty) {
+					path = String(kFileName, string::CopyTag); // move off of stack.
+				} else {
+					path = m_prefix + kFileName;
+				}
+
+				if (fileAttributes) {
+					*fileAttributes = kFileAttribute_Directory;
+
+					if (m_fd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
+						*fileAttributes |= kFileAttribute_Hidden;
+					if (m_fd.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
+						*fileAttributes |= kFileAttribute_ReadOnly;
+					if (m_fd.dwFileAttributes & FILE_ATTRIBUTE_NORMAL)
+						*fileAttributes |= kFileAttribute_Normal;
+				}
+
+				if (fileTime) {
+					SYSTEMTIME tm;
+					FileTimeToSystemTime(&m_fd.ftLastWriteTime, &tm);
+
+					fileTime->dayOfMonth = (U8)tm.wDay;
+					fileTime->month = (U8)tm.wMonth;
+					fileTime->year = (U16)tm.wYear;
+					fileTime->hour = (U8)tm.wHour;
+					fileTime->minute = (U8)tm.wMinute;
+					fileTime->second = (U8)tm.wSecond;
+					fileTime->dayOfWeek = (U8)tm.wDayOfWeek;
+					fileTime->millis = (U16)tm.wMilliseconds;
+				}
+
+				if (m_options & kSearchOption_ReturnNativePaths)
+					path.Replace('/', '\\');
+
+				return true;
 			}
 		} else if(m_state == kState_Files) {
 

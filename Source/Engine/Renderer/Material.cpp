@@ -45,14 +45,13 @@ Material::ShaderInstance::ShaderInstance() {
 }
 
 Material::ShaderInstance::~ShaderInstance() {
+	Lock L(s_m);
 #if defined(RAD_OPT_TOOLS)
 	if (idx < 0 && it != s_shaders.end()) {
-		Lock L(s_m);
 		s_shaders.erase(it);
 	} else if (idx >= 0 && !cooked)
 #endif
 	{
-		Lock L(s_m);
 		s_cShaders[idx].reset();
 	}
 }
@@ -121,8 +120,7 @@ Material::ShaderInstance::Ref Material::ShaderInstance::FindOrCreate(Engine &eng
 	if (m.shaderId < 0) {
 		for (WRefList::const_iterator it = s_shaders.begin(); it != s_shaders.end(); ++it) {
 			Ref r((*it).lock());
-			RAD_ASSERT(r);
-			if (r->shaderName == m.shaderName.get() && r->CanShare(m))
+			if (r && (r->shaderName == m.shaderName.get()) && r->CanShare(m))
 				return r;
 		}
 

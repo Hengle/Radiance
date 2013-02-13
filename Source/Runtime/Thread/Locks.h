@@ -222,9 +222,8 @@ public:
     explicit upgrade_to_exclusive_lock(boost::shared_lock<Mutex>& m_):
         source(&m_)
     {
-		source->mutex()->lock_upgrade();
 		source->mutex()->unlock_shared();
-		source->mutex()->unlock_upgrade_and_lock();
+		source->mutex()->lock();
 	}
     ~upgrade_to_exclusive_lock()
     {

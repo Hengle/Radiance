@@ -461,6 +461,35 @@ bool PosixFileSearch::NextFile(
 				if (m_subDir && m_subDir->NextFile(path, fileAttributes, fileTime))
 					return true;
 				m_subDir.reset();
+			} else if (m_options & kSearchOption_Directories) {
+				if (m_prefix.empty) {
+					path = String(kFileName, string::CopyTag); // move off of stack.
+				} else {
+					path = m_prefix + kFileName;
+				}
+
+				if (fileAttributes)
+					*fileAttributes = kFileAttribute_Directory;
+
+				if (fileTime) {
+					struct stat s;
+				
+					if (::stat(m_cur->d_name, &s) == 0) {
+						struct tm t;
+						localtime_r(&s.st_mtime, &t);
+
+						fileTime->dayOfMonth = (U8)t.tm_mday;
+						fileTime->month      = (U8)t.tm_mon;
+						fileTime->year       = (U16)t.tm_year;
+						fileTime->hour       = (U8)t.tm_hour;
+						fileTime->minute     = (U8)t.tm_min;
+						fileTime->second     = (U8)t.tm_sec;
+						fileTime->dayOfWeek  = (U8)t.tm_wday;
+						fileTime->millis     = 0;
+					}
+				}
+
+				return true;	
 			}
 		} else if((m_cur->d_type == DT_REG) && (m_state == kState_Files)) {
 

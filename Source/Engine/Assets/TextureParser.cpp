@@ -1133,7 +1133,7 @@ int TextureParser::Compress(
 					if (flags&P_FastCook)
 						quality = ePVRTCFast;
 
-					if (!Transcode(pvrTex, pvrFormat, ePVRTVarTypeUnsignedByteNorm, ePVRTCSpacelRGB, ePVRTCBest, false)) {
+					if (!Transcode(pvrTex, pvrFormat, ePVRTVarTypeUnsignedByteNorm, ePVRTCSpacelRGB, quality, false)) {
 						COut(C_Error) << "PVRTexLib failure: failed to compress texture!" << std::endl;
 						return SR_CompilerError;
 					}

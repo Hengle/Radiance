@@ -400,8 +400,12 @@ DWORD WINAPI Thread::ThreadProc(void* parm)
 	Thread *self = reinterpret_cast<thread::details::Thread*>(parm);
 	s_curContext.reset(self->m_context);
 	thread::Thread* thread = RAD_CLASS_FROM_MEMBER(thread::Thread, m_imp, self);
+	::EnterCriticalSection(&thread->m_imp.m_cs);
+
 	RAD_VERIFY(thread->m_imp.m_thread);
 	SetThreadAffinityMask(thread->m_imp.m_thread, static_cast<ThreadContext*>(self->m_context)->m_mask);
+	
+	::LeaveCriticalSection(&thread->m_imp.m_cs);
 
 	int ret = thread->ThreadProc();
 

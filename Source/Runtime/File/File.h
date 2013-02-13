@@ -58,10 +58,9 @@ namespace file {
 
 	\note
 
-	The file system is intended to be case-sensative. Resolving a path in a pak file is a
+	The file system is intended to be case-sensitive. Resolving a path in a pak file is also a
 	case-sensative operation. While Linux, Mac, and iOS all have case-sensative file systems,
-	Windows does not. When using free-files it is possible to make mistakes in casing of file 
-	names that won't hurt you on windows builds.
+	Windows does not.
 */
 class RADRT_CLASS FileSystem : public boost::noncopyable {
 public:

@@ -47,7 +47,7 @@ const char *ErrorString(int r) {
 		return "SR_ScriptError";
 	}
 
-	return "Unknown";
+	return "Unknown Error";
 }
 
 }
@@ -93,18 +93,28 @@ int PackageMan::CookThread::ThreadProc() {
 		}
 
 		if (cmd) {
-			(*out) << cmd->name << ": Cooking on thread " << threadNum << "..." << std::endl;
+			{
+				Lock L(pkgMan->m_cookState->ioMutex);
+				(*out) << cmd->name << ": Cooking on thread " << threadNum << "..." << std::endl;
+			}
 
 			try {
 				cmd->result = cmd->cooker->Cook(cmd->flags, cmd->allflags);
 			} catch (exception &e) {
+				Lock L(pkgMan->m_cookState->ioMutex);
 				(*out) << "ERROR: exception '" << e.type() << "' msg: '" << (e.what()?e.what():"no message") << "' occured!" << std::endl;
 				cmd->result = SR_IOError;
 			}
 
 			pkgMan->ResetCooker(cmd->cooker);
 
-			(*out) << cmd->name << ": Finished on thread " << threadNum << "..." << std::endl;
+			if (cmd->result == SR_Success) {
+				Lock L(pkgMan->m_cookState->ioMutex);
+				(*out) << cmd->name << ": Finished on thread " << threadNum << "." << std::endl;
+			} else {
+				Lock L(pkgMan->m_cookState->ioMutex);
+				(*out) << cmd->name << ": " << ErrorString(cmd->result) <<  " on thread " << threadNum << "." << std::endl;
+			}
 
 			Lock L(pkgMan->m_cookState->mutex);
 			cmd->next = pkgMan->m_cookState->complete;
@@ -194,7 +204,7 @@ bool PackageMan::MakeBuildDirs(int flags, std::ostream &out) {
 		if (flags&P_TargetiOS) {
 			if (!m_engine.sys->files->CreateDirectory("@r:/Cooked/Out/iOS"))
 				continue;
-			if (!MakePackageDirs("@r:/Cooked/Out/iOS"))
+			if (!MakePackageDirs("@r:/Cooked/Out/iOS/"))
 				continue;
 		}
 
@@ -340,12 +350,14 @@ int PackageMan::CookPlat(
 
 	for (StringVec::const_iterator it = roots.begin(); it != roots.end(); ++it) {
 		if (m_cancelCook) {
+			Lock L(m_cookState->ioMutex);
 			*m_cookState->cout << "ERROR: cook cancelled..." << std::endl;
 			return SR_ErrorGeneric;
 		}
 
 		Asset::Ref asset = Resolve((*it).c_str, Z_Cooker);
 		if (!asset) {
+			Lock L(m_cookState->ioMutex);
 			out << "ERROR: resolving " << *it << "!" << std::endl;
 			return SR_FileNotFound;
 		}
@@ -385,6 +397,7 @@ int PackageMan::CookPlat(
 				return m_cookState->error;
 
 			cooker->LoadImports();
+			Lock L2(m_cookState->ioMutex);
 			out << (*it) << ": Up to date." << std::endl;
 		} else {
 			Lock L(m_cookState->mutex);
@@ -394,14 +407,17 @@ int PackageMan::CookPlat(
 	}
 
 	m_cookState->finished.Wait();
+	
 	if (m_cookState->error != SR_Success)
 		return m_cookState->error;
+	
 	if (m_cancelCook) {
 		*m_cookState->cout << "ERROR: cook cancelled..." << std::endl;
 		return SR_ErrorGeneric;
 	}
-	RAD_ASSERT(m_cookState->numPending == 0);
-	RAD_ASSERT(m_cookState->pending == 0);
+
+	RAD_VERIFY(m_cookState->numPending == 0);
+	RAD_VERIFY(m_cookState->pending == 0);
 	while (m_cookState->complete) {
 		CookCommand *next = m_cookState->complete->next;
 		delete m_cookState->complete;
@@ -409,10 +425,12 @@ int PackageMan::CookPlat(
 	}
 
 	// follow imports...
+	std::set<int> imported(cooked);
 	bool imports = true;
 
 	while (imports) {
 		if (m_cancelCook) {
+			Lock L(m_cookState->ioMutex);
 			*m_cookState->cout << "ERROR: cook cancelled..." << std::endl;
 			return SR_ErrorGeneric;
 		}
@@ -421,8 +439,9 @@ int PackageMan::CookPlat(
 
 		std::set<int> added;
 
-		for (std::set<int>::const_iterator it = cooked.begin(); it != cooked.end(); ++it) {
+		for (std::set<int>::const_iterator it = imported.begin(); it != imported.end(); ++it) {
 			if (m_cancelCook) {
+				Lock L(m_cookState->ioMutex);
 				*m_cookState->cout << "ERROR: cook cancelled..." << std::endl;
 				return SR_ErrorGeneric;
 			}
@@ -433,6 +452,7 @@ int PackageMan::CookPlat(
 			for (Cooker::ImportVec::const_iterator it2 = cooker->m_imports.begin(); it2 != cooker->m_imports.end(); ++it2) {
 				
 				if (m_cancelCook) {
+					Lock L(m_cookState->ioMutex);
 					*m_cookState->cout << "ERROR: cook cancelled..." << std::endl;
 					return SR_ErrorGeneric;
 				}
@@ -442,14 +462,17 @@ int PackageMan::CookPlat(
 
 					Asset::Ref asset = Resolve(imp.path.c_str, Z_Cooker);
 					if (!asset) {
+						Lock L(m_cookState->ioMutex);
 						out << "ERROR: resolving import " << imp.path << " referenced from " << cooker->m_assetPath << "!" << std::endl;
 						return SR_FileNotFound;
 					}
 
-					if (added.find(asset->id)==added.end() && cooked.find(asset->id)==cooked.end()) {
+					if (cooked.find(asset->id)==cooked.end()) {
 						imports = true;
 
 						added.insert(asset->id);
+						cooked.insert(asset->id);
+
 						Cooker::Ref impCooker = CookerForAsset(asset);
 
 						if (!impCooker)
@@ -479,6 +502,7 @@ int PackageMan::CookPlat(
 							if (m_cookState->error != SR_Success)
 								return m_cookState->error;
 							impCooker->LoadImports();
+							Lock L2(m_cookState->ioMutex);
 							out << imp.path << ": Up to date." << std::endl;
 						} else {
 							Lock L(m_cookState->mutex);
@@ -490,25 +514,28 @@ int PackageMan::CookPlat(
 			}
 		}
 
-		for (std::set<int>::const_iterator it = added.begin(); it != added.end(); ++it)
-			cooked.insert(*it);
-	}
+		// add each level of imports.
 
-	m_cookState->finished.Wait();
-	if (m_cookState->error != SR_Success)
-		return m_cookState->error;
-	if (m_cancelCook) {
-		*m_cookState->cout << "ERROR: cook cancelled..." << std::endl;
-		return SR_ErrorGeneric;
-	}
-
-	RAD_ASSERT(m_cookState->numPending == 0);
-	RAD_ASSERT(m_cookState->pending == 0);
+		m_cookState->finished.Wait();
 	
-	while (m_cookState->complete) {
-		CookCommand *next = m_cookState->complete->next;
-		delete m_cookState->complete;
-		m_cookState->complete = next;
+		if (m_cookState->error != SR_Success)
+			return m_cookState->error;
+	
+		if (m_cancelCook) {
+			*m_cookState->cout << "ERROR: cook cancelled..." << std::endl;
+			return SR_ErrorGeneric;
+		}
+
+		RAD_VERIFY(m_cookState->numPending == 0);
+		RAD_VERIFY(m_cookState->pending == 0);
+	
+		while (m_cookState->complete) {
+			CookCommand *next = m_cookState->complete->next;
+			delete m_cookState->complete;
+			m_cookState->complete = next;
+		}
+		
+		imported.swap(added);
 	}
 
 	return SR_Success;

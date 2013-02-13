@@ -71,7 +71,8 @@ RAD_BEGIN_FLAGS
 RAD_END_FLAGS(FileAttributes)
 
 RAD_BEGIN_FLAGS
-	RAD_FLAG(kSearchOption_Recursive),
+	RAD_FLAG(kSearchOption_Recursive), // Recursive will not return directory names.
+	RAD_FLAG(kSearchOption_Directories),
 	RAD_FLAG(kSearchOption_ReturnNativePaths),
 	kSearchOptions_None = 0
 RAD_END_FLAGS(SearchOptions)

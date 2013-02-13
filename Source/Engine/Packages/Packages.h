@@ -1070,6 +1070,7 @@ private:
 		volatile bool done;
 		volatile int error;
 		Mutex mutex;
+		Mutex ioMutex;
 		void *glStateRef;
 	};
 
