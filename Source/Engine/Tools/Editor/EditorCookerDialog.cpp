@@ -42,8 +42,8 @@ m_cook(0),
 m_thread(0),
 m_clean(0),
 m_scriptsOnly(0),
-m_closeWhenFinished(false)
-{
+m_fast(0),
+m_closeWhenFinished(false) {
 	m_stringBuf.reset(new (ZEditor) CookerStringBuf(this));
 	m_oStream.reset(new (ZEditor) std::ostream(m_stringBuf.get()));
 
@@ -60,8 +60,7 @@ m_closeWhenFinished(false)
 
 	setAttribute(Qt::WA_DeleteOnClose);
 
-	if (parent)
-	{
+	if (parent) {
 		setModal(true);
 		CenterWidget(*this, *parent);
 	}
@@ -108,8 +107,7 @@ m_closeWhenFinished(false)
 
 	enum { MaxColumns = 3 };
 
-	for (int i = pkg::P_FirstTarget; i <= pkg::P_LastTarget; i <<= 1, ++targetNum)
-	{
+	for (int i = pkg::P_FirstTarget; i <= pkg::P_LastTarget; i <<= 1, ++targetNum) {
 		QString name(pkg::PlatformNameForFlags(i));
 
 		QCheckBox *check = new (ZEditor) QCheckBox(name);
@@ -153,14 +151,21 @@ m_closeWhenFinished(false)
 	RAD_VERIFY(connect(m_scriptsOnly, SIGNAL(stateChanged(int)), SLOT(ScriptsOnly(int))));
 	buttonLayout->addWidget(m_scriptsOnly);
 
-	if (m_scriptsOnly->checkState() == Qt::Checked)
-	{
+	m_fast = new (ZEditor) QCheckBox("Fast Cook");
+	m_fast->setChecked(
+		mainWin->userPrefs->value("cook/fast", false).toBool() ?
+		Qt::Checked :
+		Qt::Unchecked
+	);
+	RAD_VERIFY(connect(m_fast, SIGNAL(stateChanged(int)), SLOT(FastCook(int))));
+	buttonLayout->addWidget(m_fast);
+
+	if (m_scriptsOnly->checkState() == Qt::Checked) {
 		m_clean->setChecked(Qt::Unchecked);
 		m_clean->setEnabled(false);
 	}
 
-	if (m_clean->checkState() == Qt::Checked)
-	{
+	if (m_clean->checkState() == Qt::Checked) {
 		m_scriptsOnly->setChecked(Qt::Unchecked);
 		m_scriptsOnly->setEnabled(false);
 	}
@@ -178,23 +183,18 @@ m_closeWhenFinished(false)
 	s_instance = this;
 }
 
-CookerDialog::~CookerDialog()
-{
+CookerDialog::~CookerDialog() {
 	QMutexLocker L(&s_m);
 	s_instance = 0;
 }
 
-void CookerDialog::OnCheckBoxChanged(int flags)
-{
+void CookerDialog::OnCheckBoxChanged(int flags) {
 	QCheckBox *check = static_cast<QCheckBox*>(m_sigMap->mapping(flags));
-	if (check->checkState() == Qt::Checked)
-	{
+	if (check->checkState() == Qt::Checked) {
 		MainWindow::Get()->userPrefs->setValue(QString("cook/") + pkg::PlatformNameForFlags(flags), true);
 		m_platforms |= flags;
 		m_cook->setEnabled(true);
-	}
-	else
-	{
+	} else {
 		MainWindow::Get()->userPrefs->setValue(QString("cook/") + pkg::PlatformNameForFlags(flags), false);
 		m_platforms &= ~flags;
 		if (!m_platforms)
@@ -202,17 +202,14 @@ void CookerDialog::OnCheckBoxChanged(int flags)
 	}
 }
 
-void CookerDialog::CookClicked()
-{
-	if (m_thread)
-	{
+void CookerDialog::CookClicked() {
+	if (m_thread) {
 		if (QMessageBox::question(
 			this,
 			"Question",
 			"Are you sure you want to abort the current build?",
 			QMessageBox::Yes|QMessageBox::No
-		) == QMessageBox::Yes)
-		{
+		) == QMessageBox::Yes) {
 			m_thread->Cancel();
 		}
 
@@ -222,8 +219,7 @@ void CookerDialog::CookClicked()
 	StringVec roots;
 	{
 		file::MMFileInputBuffer::Ref ib = App::Get()->engine->sys->files->OpenInputBuffer("@r:/cook.txt", ZTools);
-		if (!ib)
-		{
+		if (!ib) {
 			QMessageBox::critical(
 				this,
 				"Error",
@@ -238,8 +234,7 @@ void CookerDialog::CookClicked()
 		while (script.GetToken(token, Tokenizer::kTokenMode_CrossLine))
 			roots.push_back(token);
 
-		if (roots.empty())
-		{
+		if (roots.empty()) {
 			QMessageBox::critical(
 				this,
 				"Error",
@@ -268,6 +263,8 @@ void CookerDialog::CookClicked()
 		flags |= pkg::P_Clean;
 	if (m_scriptsOnly->checkState() == Qt::Checked)
 		flags |= pkg::P_ScriptsOnly;
+	if (m_fast->checkState() == Qt::Checked)
+		flags |= pkg::P_FastCook;
 
 	m_thread = new CookThread(
 		m_glw,
@@ -285,8 +282,7 @@ void CookerDialog::CookClicked()
 	m_thread->start();
 }
 
-void CookerDialog::CookFinished()
-{
+void CookerDialog::CookFinished() {
 	delete m_thread;
 	m_thread = 0;
 	m_cook->setText("Cook...");
@@ -298,50 +294,41 @@ void CookerDialog::CookFinished()
 		QApplication::beep();
 }
 
-void CookerDialog::CompressionChanged(int value)
-{
+void CookerDialog::CompressionChanged(int value) {
 	MainWindow::Get()->userPrefs->setValue("cook/compression", value);
 }
 
-void CookerDialog::CleanChecked(int value)
-{
+void CookerDialog::CleanChecked(int value) {
 	MainWindow::Get()->userPrefs->setValue("cook/clean", value == Qt::Checked);
-	if (m_scriptsOnly)
-	{
-		if (m_clean->checkState() == Qt::Checked)
-		{
+	if (m_scriptsOnly) {
+		if (m_clean->checkState() == Qt::Checked) {
 			m_scriptsOnly->setChecked(Qt::Unchecked);
 			m_scriptsOnly->setEnabled(false);
-		}
-		else
-		{
+		} else {
 			m_scriptsOnly->setEnabled(true);
 		}
 	}
 }
 
-void CookerDialog::ScriptsOnly(int value)
-{
+void CookerDialog::ScriptsOnly(int value) {
 	MainWindow::Get()->userPrefs->setValue("cook/scriptsOnly", value == Qt::Checked);
 
-	if (m_clean)
-	{
-		if (m_scriptsOnly->checkState() == Qt::Checked)
-		{
+	if (m_clean) {
+		if (m_scriptsOnly->checkState() == Qt::Checked) {
 			m_clean->setChecked(Qt::Unchecked);
 			m_clean->setEnabled(false);
-		}
-		else
-		{
+		} else {
 			m_clean->setEnabled(true);
 		}
 	}
 }
 
-void CookerDialog::closeEvent(QCloseEvent *e)
-{
-	if (m_thread)
-	{
+void CookerDialog::FastCook(int value) {
+	MainWindow::Get()->userPrefs->setValue("cook/fast", value == Qt::Checked);
+}
+
+void CookerDialog::closeEvent(QCloseEvent *e) {
+	if (m_thread) {
 		e->ignore();
 		if (m_closeWhenFinished)
 			return;
@@ -350,34 +337,27 @@ void CookerDialog::closeEvent(QCloseEvent *e)
 			"Question", 
 			"Are you sure you want to abort the current build?", 
 			QMessageBox::Yes|QMessageBox::No
-		) == QMessageBox::Yes)
-		{
+		) == QMessageBox::Yes) {
 			m_closeWhenFinished = true;
 			m_thread->Cancel();
 		}
-	}
-	else
-	{
+	} else {
 		e->accept();
 	}
 }
 
-void CookerDialog::SPrint(const char *msg)
-{
+void CookerDialog::SPrint(const char *msg) {
 	QMutexLocker l(&s_m);
 	if (s_instance)
 		s_instance->Print(msg);
 }
 
-void CookerDialog::Print(const char *msg)
-{
+void CookerDialog::Print(const char *msg) {
 	QCoreApplication::postEvent(this, new (ZEditor) PrintMsgEvent(msg));
 }
 
-void CookerDialog::customEvent(QEvent *e)
-{
-	switch (e->type())
-	{
+void CookerDialog::customEvent(QEvent *e) {
+	switch (e->type()) {
 	case EV_CookWindowPrint:
 		OnPrintMsg(*static_cast<PrintMsgEvent*>(e));
 		break;
@@ -386,8 +366,7 @@ void CookerDialog::customEvent(QEvent *e)
 	}
 }
 
-void CookerDialog::OnPrintMsg(const PrintMsgEvent &msg)
-{
+void CookerDialog::OnPrintMsg(const PrintMsgEvent &msg) {
 	QTextCursor c = m_textArea->textCursor();
 	c.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
 	m_textArea->setTextCursor(c);
@@ -407,19 +386,16 @@ m_roots(roots),
 m_plats(plats), 
 m_languages(languages),
 m_compression(compression),
-m_cout(&cout)
-{
+m_cout(&cout) {
 }
 
-void CookThread::Cancel()
-{
+void CookThread::Cancel() {
 	App::Get()->engine->sys->packages->CancelCook();
 }
 
-void CookThread::run()
-{
+void CookThread::run() {
 	m_glw->bindGL(true);
-	App::Get()->engine->sys->packages->Cook(m_roots, m_plats, m_languages, m_compression, *m_cout);
+	App::Get()->engine->sys->packages->Cook(m_roots, m_plats, m_languages, m_compression, m_glw->rbContext, *m_cout);
 	m_glw->unbindGL();
 	emit Finished();
 }

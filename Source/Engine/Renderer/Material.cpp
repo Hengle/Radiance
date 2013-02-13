@@ -180,6 +180,8 @@ Material::ShaderInstance::Ref Material::ShaderInstance::FindOrCreate(Engine &eng
 #if defined(RAD_OPT_PC_TOOLS)
 
 int Material::ShaderInstance::Cook(const char *path, Engine &engine, const Material &m, int pflags) {
+	Lock L(s_m);
+
 	pflags &= pkg::P_AllTargets;
 	
 	for (RefList::const_iterator it = s_cookedShaders.begin(); it != s_cookedShaders.end(); ++it) {

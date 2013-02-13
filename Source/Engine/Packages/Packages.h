@@ -42,11 +42,13 @@
 #include <Runtime/Base/ObjectPool.h>
 
 #if defined(RAD_OPT_PC_TOOLS)
+	#include "../Renderer/Renderer.h"
 	#include "../Tools/Progress.h"
 	#include "../Persistence.h"
 	#include <Runtime/Event.h>
 	#include <Runtime/Time.h>
 	#include <Runtime/DataCodec/LmpDef.h>
+	#include <Runtime/Thread/Thread.h>
 	#include <stdio.h>
 #endif
 
@@ -371,6 +373,8 @@ protected:
 	int CompareCachedStringKey(int target, const char *key);
 	int CompareCachedString(int target, const char *key, const char *string);
 	int CompareCachedLocalizeKey(int target, const char *key);
+	const char *TargetString(int target, const char *key);
+	void SetTargetString(int target, const char *key, const char *string);
 	bool ModifiedTime(int target, xtime::TimeDate &td) const;
 	bool TimeForKey(int target, const char *key, xtime::TimeDate &td) const;
 
@@ -866,6 +870,7 @@ public:
 		int flags,
 		int languages,
 		int compression,
+		const r::HContext &rbContext,
 		std::ostream &out
 	);
 	void CancelCook();
@@ -1011,6 +1016,9 @@ private:
 #endif
 
 #if defined(RAD_OPT_PC_TOOLS)
+	typedef boost::mutex Mutex;
+	typedef boost::lock_guard<Mutex> Lock;
+
 	tools::UIProgress *m_ui;
 	// Delete, Rename, UpdateImports are not thread safe.
     void Delete(const Package::Ref &pkg);
@@ -1018,12 +1026,51 @@ private:
     void UpdateImports(const char *src, const char *dst);
 	int PackageSize(const String &path);
 
+	struct CookCommand {
+		CookCommand *next;
+		int flags;
+		int allflags;
+		int result;
+		String name;
+		Cooker::Ref cooker;
+	};
+
+	struct CookThread : public thread::Thread {
+		typedef boost::shared_ptr<CookThread> Ref;
+		typedef zone_vector<Ref, ZPackagesT>::type Vec;
+
+		CookThread(
+			int threadNum,
+			PackageMan *pkgMan,
+			std::ostream &out,
+			const r::HContext &rbContext
+		);
+
+		virtual ~CookThread();
+
+		virtual int ThreadProc();
+
+		int threadNum;
+		PackageMan *pkgMan;
+		std::ostream *out;
+		r::HContext rbContext;
+	};
+
 	typedef zone_map<int, Cooker::Ref, ZPackagesT>::type CookerMap;
 	struct CookState {
 		typedef boost::shared_ptr<CookState> Ref;
 		CookerMap cookers;
 		std::ostream *cout;
 		int languages;
+		CookCommand *pending;
+		CookCommand *complete;
+		thread::Gate waiting;
+		thread::Gate finished;
+		volatile int numPending;
+		volatile bool done;
+		volatile int error;
+		Mutex mutex;
+		void *glStateRef;
 	};
 
 	struct CookPackage {
@@ -1044,6 +1091,9 @@ private:
 		std::ostream &out
 	);
 
+	void CreateCookThreads(const r::HContext &rbContext, std::ostream &out);
+	void ResetCooker(const Cooker::Ref &cooker);
+
 	bool MakeBuildDirs(int flags, std::ostream &out);
 	bool MakePackageDirs(const char *prefix);
 	int BuildPackageData();
@@ -1062,7 +1112,9 @@ private:
 
 	volatile bool m_cancelCook;
 	CookState::Ref m_cookState;
+	CookThread::Vec m_cookThreads;
 	bool m_resavePackages;
+	friend struct CookThread;
 #endif
 
 	void MapId(int id, const Package::Ref &pkg);

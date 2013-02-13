@@ -151,8 +151,7 @@ enum PFlags
 	RAD_FLAG(P_Cancel),       /*!< Cancel an outstanding command. */
 	RAD_FLAG(P_FastPath),     /*!< Load data from cached data (on-the-fly cooking). (Does nothing in golden builds). */
 	RAD_FLAG(P_TargetPC),     /*!< PC target. */
-	RAD_FLAG(P_TargetIPhone), /*!< IPhone target. */
-	RAD_FLAG(P_TargetIPad),   /*!< IPad target. */
+	RAD_FLAG(P_TargetiOS),    /*!< iOS target. */
 	RAD_FLAG(P_TargetXBox360),/*!< XBox360 target. */
 	RAD_FLAG(P_TargetPS3),    /*!< PS3 target. */
 
@@ -164,6 +163,7 @@ enum PFlags
                                */
 	RAD_FLAG(P_Clean),         /*!< Used during cooking to request that any output files be cleaned. */
 	RAD_FLAG(P_ScriptsOnly),   /*!< Used during cooking to request that only scripts be cooked. */
+	RAD_FLAG(P_FastCook),      /*!< Cook data quickly, possibly with a reduction in quality. */
 	RAD_FLAG(P_NoDefaultMedia),/*!< Requests that sinks do not resolve pkg::SR_FileNotFound by substituting a place-holder,
                                     for example do not load a missing texture image.
                                */
@@ -175,9 +175,8 @@ enum PFlags
 
 #endif
 
-	P_TargetIOS = P_TargetIPhone|P_TargetIPad, /*!< All iOS target bits. \sa pkg::P_TargetIPhone and pkg::P_TargetIPad */
 	P_TargetConsole = P_TargetXBox360|P_TargetPS3, /*!< All Console target bits. \sa pkg::P_TargetXBox360 and pkg::P_TargetPS3 */
-	P_AllTargets = P_TargetConsole|P_TargetPC|P_TargetIPhone|P_TargetIPad, /*!< All target bits set. \sa pkg::P_TargetPC, pkg::P_TargetIPhone, pkg::P_TargetIPad, pkg::P_TargetXBox360, and pkg::P_TargetPS3 */
+	P_AllTargets = P_TargetConsole|P_TargetPC|P_TargetiOS, /*!< All target bits set. \sa pkg::P_TargetPC, pkg::P_TargetIPhone, pkg::P_TargetIPad, pkg::P_TargetXBox360, and pkg::P_TargetPS3 */
 	P_FirstTarget = P_TargetPC, /*!< First target bit. */
 	P_LastTarget  = P_TargetPS3, /*!< Last target bit. */
 	P_NumTargets  = 5 /*!< Number of targets. */

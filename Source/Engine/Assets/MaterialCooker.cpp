@@ -35,21 +35,10 @@ CookStatus MaterialCooker::Status(int flags, int allflags) {
 	// though the material keys match we still need to cook
 	// them seperately.
 
-	// only build ipad if different from iphone
-	if ((flags&P_TargetIPad) && (allflags&P_TargetIPhone)) {
-		if (MatchTargetKeys(P_TargetIPad, P_TargetIPhone))
-			return CS_Ignore;
-		return CS_NeedRebuild;
-	}
-
-	// if iphone/ipad is selected, and we have non-gles targets, then cook
-	if ((allflags&(P_TargetIPhone|P_TargetIPad)) && (allflags&~(P_TargetIPhone|P_TargetIPad)))
-		return CS_NeedRebuild; // all different
-
 	if (flags == 0) { 
 		// only build generics if all platforms are identical to eachother.
 		// && we have all GLES or non GLES targets.
-		if ((allflags&(P_TargetIPhone|P_TargetIPad)) && (allflags&~(P_TargetIPhone|P_TargetIPad)))
+		if ((allflags&P_TargetiOS) && (allflags&~P_TargetiOS))
 			return CS_Ignore; // no generics (all different)
 		return MatchTargetKeys(allflags, allflags)==allflags ? CS_NeedRebuild : CS_Ignore;
 	}
@@ -79,8 +68,8 @@ int MaterialCooker::Compile(int flags, int allflags) {
 		// for GLES variants.
 		// NOTE: we will never cook the generics path if we have mixed GLES/non ES targets
 		// See Status() above for that logic.
-		if (allflags&(P_TargetIPhone|P_TargetIPad))
-			shaderTarget = P_TargetIPhone;
+		if (allflags&P_TargetiOS)
+			shaderTarget = P_TargetiOS;
 	}
 
 	int shaderId = parser->material->CookShader(

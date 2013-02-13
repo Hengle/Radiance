@@ -126,9 +126,6 @@ inline const void *Package::Entry::TagData(int plat) {
 
 	++num;
 
-	if (plat == P_TargetIPad && !m_tags[num])
-		return TagData(P_TargetIPhone);
-
 	return m_tags[num] ? m_tags[num] : m_tags[0];
 }
 

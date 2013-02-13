@@ -9,6 +9,7 @@
 #include "LogFile.h"
 #include <Runtime/Stream/STLStream.h>
 #include <Runtime/String.h>
+#include <Runtime/Thread/Locks.h>
 #include <boost/thread/tss.hpp>
 
 #if !defined(RAD_OPT_SHIP)
@@ -37,6 +38,8 @@ protected:
 
 	virtual int Flush(const StringType &str)
 	{
+		boost::lock_guard<boost::mutex> L(s_m);
+
 #if !defined(RAD_OPT_SHIP)
 	tools::DebugConsoleServer::BroadcastLogMessage(str.c_str());
 #endif
@@ -64,7 +67,11 @@ protected:
 private:
 
 	int m_level;
+
+	static boost::mutex s_m;
 };
+
+boost::mutex ConStringBuf::s_m;
 
 boost::thread_specific_ptr<ConStringBuf> s_conStringBufPtr[C_Max];
 boost::thread_specific_ptr<std::ostream> s_ostreamPtr[C_Max];

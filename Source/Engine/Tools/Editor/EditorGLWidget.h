@@ -33,6 +33,8 @@ public:
 	void bindGL(bool makeCurrent = false);
 	void unbindGL();
 
+	RAD_DECLARE_READONLY_PROPERTY(GLWidget, rbContext, const r::HContext&);
+
 signals:
 
 	void OnRenderGL(GLWidget &src);
@@ -59,6 +61,11 @@ protected:
 	virtual void keyReleaseEvent(QKeyEvent *e);
 
 private:
+
+	RAD_DECLARE_GET(rbContext, const r::HContext&) {
+		return m_ctx;
+	}
+
 	virtual void paintGL();
 	r::HContext m_ctx;
 };

@@ -42,12 +42,6 @@ CookStatus MeshCooker::Status(int flags, int allflags) {
 	if (MatchTargetKeys(allflags, allflags)==allflags)
 		return CS_Ignore; // generics are selected
 
-	// only build ipad if different from iphone
-	if ((flags&P_TargetIPad) && (allflags&P_TargetIPhone)) {
-		if (MatchTargetKeys(P_TargetIPad, P_TargetIPhone))
-			return CS_Ignore;
-	}
-
 	return CheckRebuild(flags, allflags);
 }
 

@@ -31,6 +31,7 @@
 #include <Runtime/ImageCodec/Dds.h>
 #include <Runtime/ImageCodec/Bmp.h>
 #include <Runtime/ImageCodec/Png.h>
+#include "../Renderer/GL/GLTable.h"
 #endif
 #if defined(RAD_OPT_PC_TOOLS)
 #if defined(RAD_OPT_WINX)
@@ -633,20 +634,15 @@ int TextureParser::Parsing(
 					}
 				}
 
-				if (flags&P_TargetIOS) {
+				if (flags&P_TargetiOS) {
 					bool warn = false;
 
 					for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it) {
 						image_codec::Image::Ref &img = *it;
 
 						if (img->format == image_codec::Format_RGB888) {
-							if (!warn) {
-								warn = true;
-								COut(C_Warn) << "Converting: " << asset->path.get() << " expanding RGB texture to RGBA for iOS target." << std::endl;
-								
-								m_header.format = image_codec::Format_RGBA8888;
-							}
-
+							m_header.format = image_codec::Format_RGBA8888;
+							
 							for (int i = 0; i < img->frameCount; ++i) {
 								image_codec::Frame &sf = img->frames[i];
 								for (int k = 0; k < sf.mipCount; ++k) {
@@ -659,6 +655,11 @@ int TextureParser::Parsing(
 									sm.stride = sm.width*4;
 									sm.dataSize = sm.width*sm.height*4;
 								}
+							}
+
+							if (!warn) {
+								warn = true;
+								COut(C_Warn) << asset->path.get() << " expanded from RGB to RGBA for iOS target." << std::endl;
 							}
 							
 							img->format = image_codec::Format_RGBA8888;
@@ -781,17 +782,21 @@ int TextureParser::Resize(
 							FormatSize(a, (AddrSize)(m_header.width*m_header.height*src.bpp));
 							FormatSize(b, (AddrSize)(*w)*(*h)*src.bpp);
 
-							gluScaleImage(
-								format,
-								(GLint)m_header.width,
-								(GLint)m_header.height,
-								type,
-								src.frames[i].mipmaps[0].data,
-								*w,
-								*h,
-								type,
-								temp
-							);
+							{
+								r::GLTable::Lock L(r::gl.mutex);
+
+								gluScaleImage(
+									format,
+									(GLint)m_header.width,
+									(GLint)m_header.height,
+									type,
+									src.frames[i].mipmaps[0].data,
+									*w,
+									*h,
+									type,
+									temp
+								);
+							}
 
 							memcpy(img->frames[i].mipmaps[0].data, temp, img->frames[i].mipmaps[0].dataSize);
 
@@ -915,17 +920,20 @@ int TextureParser::Mipmap(
 								w*h*src.bpp
 							);
 						} else {
-							gluScaleImage(
-								format,
-								(GLint)m_header.width,
-								(GLint)m_header.height,
-								type,
-								src.frames[i].mipmaps[0].data,
-								w,
-								h,
-								type,
-								temp
-							);
+							{
+								r::GLTable::Lock L(r::gl.mutex);
+								gluScaleImage(
+									format,
+									(GLint)m_header.width,
+									(GLint)m_header.height,
+									type,
+									src.frames[i].mipmaps[0].data,
+									w,
+									h,
+									type,
+									temp
+								);
+							}
 
 							memcpy(
 								img->frames[i].mipmaps[m].data,
@@ -981,7 +989,7 @@ int TextureParser::Compress(
 	}
 	
 	if (m_header.width != m_header.height) {
-		if (flags&(P_TargetIOS)) {
+		if (flags&P_TargetiOS) {
 			COut(C_Error) << "Error: " << asset->path.get() << " is flagged for DXT/PVR compression but is not square. " << std::endl;
 			return SR_MetaError;
 		}
@@ -1017,7 +1025,7 @@ int TextureParser::Compress(
 			return SR_InvalidFormat;
 		const image_codec::Image::Ref &img = m_images[0];
 
-		if (flags&P_TargetIOS) {	
+		if (flags&P_TargetiOS) {	
 			if (*s == "DXT1/PVR2" ||
 				*s == "DXT3/PVR2" ||
 				*s == "DXT5/PVR2") {
@@ -1059,7 +1067,10 @@ int TextureParser::Compress(
 		src.Swap(*img);
 		img->bpp = 0;
 		img->format = format;
-		
+
+		COut(C_Info) << "Compressing " << asset->path.get() << " (" << 
+			m_header.width << "x" << m_header.height << "x" << src.bpp << ") as " << *s << std::endl;
+				
 		img->AllocateFrames(src.frameCount);
 		for (int i = 0; i < src.frameCount; ++i) {
 			const image_codec::Frame &sf = src.frames[i];
@@ -1117,6 +1128,10 @@ int TextureParser::Compress(
 							return SR_CompilerError;
 						}
 					}
+
+					ECompressorQuality quality = ePVRTCBest;
+					if (flags&P_FastCook)
+						quality = ePVRTCFast;
 
 					if (!Transcode(pvrTex, pvrFormat, ePVRTVarTypeUnsignedByteNorm, ePVRTCSpacelRGB, ePVRTCBest, false)) {
 						COut(C_Error) << "PVRTexLib failure: failed to compress texture!" << std::endl;

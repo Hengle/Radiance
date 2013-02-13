@@ -41,8 +41,7 @@ struct PlatNameFlags {
 
 PlatNameFlags s_PlatNames[] = {
 	{ "PC", P_TargetPC },
-	{ "IPhone", P_TargetIPhone },
-	{ "IPad", P_TargetIPad },
+	{ "iOS", P_TargetiOS },
 	{ "XBox360", P_TargetXBox360 },
 	{ "PS3", P_TargetPS3 },
 	{ 0, 0 }
@@ -593,8 +592,7 @@ lua::State::Ref PackageMan::InitLua() {
 	MAP(K_Import);
 	MAP(K_Global);
 	MAP(P_TargetPC);
-	MAP(P_TargetIPhone);
-	MAP(P_TargetIPad);
+	MAP(P_TargetiOS);
 	MAP(P_TargetConsole);
 	MAP(P_TargetXBox360);
 	MAP(P_TargetPS3);
@@ -724,17 +722,28 @@ void PackageMan::ParseEntry(
 	const KeyVal::Ref &parent,
 	const lua::Variant::Map &map
 ) {
+	const String kIPhone(CStr("IPhone"));
+	const String kIPad(CStr("IPad"));
+
 	for (lua::Variant::Map::const_iterator it = map.begin(); it != map.end(); ++it) {
 		String fullName;
+		String name = it->first;
+
+		// fixup old data.
+		if (name == kIPhone) {
+			name = "iOS";
+		} else if (name == kIPad) {
+			continue; // ignore this key.
+		}
 
 		if (path.empty) {
-			fullName = it->first;
+			fullName = name;
 		} else {
-			fullName = path + "." + it->first;
+			fullName = path + "." + name;
 		}
 
 		KeyVal::Ref key(new (ZPackages) KeyVal());
-		key->name = it->first;
+		key->name = name;
 		key->path = fullName;
 
 		const lua::Variant::Map *sub = static_cast<const lua::Variant::Map*>(it->second);

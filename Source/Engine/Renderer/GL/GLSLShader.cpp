@@ -301,7 +301,7 @@ bool GLSLShader::CompileShaderSource(
 	String fragmentSource;
 
 	tools::shader_utils::GLSLTool::AssembleFlags kGLESFlag = tools::shader_utils::GLSLTool::kAssemble_None;
-	if (pflags&pkg::P_TargetIOS)
+	if (pflags&pkg::P_TargetiOS)
 		kGLESFlag = tools::shader_utils::GLSLTool::kAssemble_GLES;
 
 	for (int i = 0; i < Shader::kNumPasses; ++i) {

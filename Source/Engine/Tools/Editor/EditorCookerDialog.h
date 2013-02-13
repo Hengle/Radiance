@@ -27,8 +27,7 @@ namespace editor {
 
 class GLWidget;
 
-class CookThread : public QThread
-{
+class CookThread : public QThread {
 	Q_OBJECT
 public:
 	CookThread(
@@ -60,8 +59,7 @@ private:
 	int m_compression;
 };
 
-class RADENG_CLASS CookerDialog : public QDialog
-{
+class RADENG_CLASS CookerDialog : public QDialog {
 	Q_OBJECT
 public:
 
@@ -84,13 +82,12 @@ private slots:
 	void CompressionChanged(int value);
 	void CleanChecked(int value);
 	void ScriptsOnly(int value);
+	void FastCook(int value);
 
 private:
 
-	struct PrintMsgEvent : public QEvent
-	{
-		PrintMsgEvent(const char *_msg) : QEvent((QEvent::Type)EV_CookWindowPrint)
-		{
+	struct PrintMsgEvent : public QEvent {
+		PrintMsgEvent(const char *_msg) : QEvent((QEvent::Type)EV_CookWindowPrint) {
 			RAD_ASSERT(_msg);
 			msg   = _msg;
 		};
@@ -100,21 +97,18 @@ private:
 
 	typedef boost::shared_ptr<std::ostream> OStreamRef;
 
-	class CookerStringBuf : public stream::basic_stringbuf<char>
-	{
+	class CookerStringBuf : public stream::basic_stringbuf<char> {
 	public:
 		typedef stream::basic_stringbuf<char> Super;
 		typedef Super::StringType StringType;
 		typedef boost::shared_ptr<CookerStringBuf> Ref;
 
-		CookerStringBuf(CookerDialog *cooker) : m_cooker(cooker)
-		{
+		CookerStringBuf(CookerDialog *cooker) : m_cooker(cooker) {
 		}
 
 	protected:
 
-		virtual int Flush(const StringType &str)
-		{
+		virtual int Flush(const StringType &str) {
 			m_cooker->Print(str.c_str());
 			return 0;
 		}
@@ -138,6 +132,7 @@ private:
 	QSlider *m_compression;
 	QCheckBox *m_clean;
 	QCheckBox *m_scriptsOnly;
+	QCheckBox *m_fast;
 	GLWidget *m_glw;
 	bool m_closeWhenFinished;
 };

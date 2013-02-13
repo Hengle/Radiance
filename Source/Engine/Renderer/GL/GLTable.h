@@ -8,11 +8,11 @@
 #include "../Common.h"
 #include <Runtime/Math/Matrix.h>
 #include <Runtime/Container/ZoneVector.h>
-
 #include "GLSystem.h"
 
 #if defined(RAD_OPT_TOOLS)
 struct glslopt_ctx;
+#include <Runtime/Thread/Locks.h>
 #endif
 
 #include <Runtime/PushPack.h>
@@ -48,6 +48,12 @@ struct RADENG_CLASS GLTable {
 	
 	bool CheckVer(const char *ver);
 	static bool CheckExt(const char *ext);
+
+#if defined(RAD_OPT_TOOLS)
+	typedef boost::mutex Mutex;
+	typedef boost::lock_guard<Mutex> Lock;
+	Mutex mutex;
+#endif
 	
 	int vMin;
 	int vMaj;

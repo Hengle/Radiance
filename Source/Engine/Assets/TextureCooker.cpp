@@ -21,46 +21,50 @@ TextureCooker::TextureCooker() : Cooker(1) {
 TextureCooker::~TextureCooker() {
 }
 
-CookStatus TextureCooker::CheckRebuild(int flags, int allflags) {
+CookStatus TextureCooker::CheckRebuild(int flags, int allflags, int opts) {
 	const bool * b = asset->entry->KeyValue<bool>("Localized", flags);
 	if (!b)
-		return CS_NeedRebuild; // force error is cook path.
+		return CS_NeedRebuild; // force error in cook path.
 
 	if (CompareVersion(flags) ||
 		CompareModifiedTime(flags) ||
-		CompareCachedFileTimeKey(flags, "Source.File", (*b) ? "Localized" : 0))
+		CompareCachedFileTimeKey(flags, "Source.File", (*b) ? "Localized" : 0) ||
+		CheckFastCook(flags, opts)) {
 		return CS_NeedRebuild;
+	}
 	return CS_UpToDate;
 }
 
 CookStatus TextureCooker::Status(int flags, int allflags) {
+	int opts = flags|allflags;
 	flags &= P_AllTargets;
 	allflags &= P_AllTargets;
 
 	if (flags == 0) { // only build generics if all platforms are identical to eachother.
 		if (MatchTargetKeys(allflags, allflags)==allflags)
-			return CheckRebuild(flags, allflags);
+			return CheckRebuild(flags, allflags, opts);
 		return CS_Ignore;
 	}
 
 	if (MatchTargetKeys(allflags, allflags)==allflags)
 		return CS_Ignore;
 
-	// only build ipad if different from iphone
-	if ((flags&P_TargetIPad) && (allflags&P_TargetIPhone)) {
-		if (MatchTargetKeys(P_TargetIPad, P_TargetIPhone))
-			return CS_Ignore;
-	}
-
-	return CheckRebuild(flags, allflags);
+	return CheckRebuild(flags, allflags, opts);
 }
 
 int TextureCooker::Compile(int flags, int allflags) {
+
+	const bool * b = asset->entry->KeyValue<bool>("Localized", flags);
+	if (!b)
+		return SR_MetaError;
+
 	// Make sure these get updated
 	CompareVersion(flags);
 	CompareModifiedTime(flags);
-		
-	// we need the asset parser to apply compression, and in the case of IOS
+	CompareCachedFileTimeKey(flags, "Source.File", (*b) ? "Localized" : 0);
+	CheckFastCook(flags, flags|allflags);
+
+	// we need the asset parser to apply compression, and in the case of iOS
 	// platforms we need need it to apply PVR compression (if selected) so if
 	// we are doing generics then force the target flags.
 	
@@ -72,7 +76,7 @@ int TextureCooker::Compile(int flags, int allflags) {
 	TextureTag tag;
 	tag.flags = 0;
 
-	const bool *b = asset->entry->KeyValue<bool>("Wrap.S", flags);
+	b = asset->entry->KeyValue<bool>("Wrap.S", flags);
 	if (!b)
 		return SR_MetaError;
 	tag.flags |= *b ? TextureTag::WrapS : 0;
@@ -209,7 +213,7 @@ int TextureCooker::MatchTargetKeys(int flags, int allflags) {
 
 		const String *s = asset->entry->KeyValue<String>("Compression", flags);
 		if (s) {
-			if ((allflags&P_TargetIOS) && (allflags&~P_TargetIOS)) {   
+			if ((allflags&P_TargetiOS) && (allflags&~P_TargetiOS)) {   
 				// IOS and non-IOS targets selected, they can never match since compression formats
 				// are different.
 				if (*s != "None")
@@ -221,6 +225,29 @@ int TextureCooker::MatchTargetKeys(int flags, int allflags) {
 	}
 
 	return x;
+}
+
+int TextureCooker::CheckFastCook(int flags, int opts) {
+	const char *sz = TargetString(flags, "P_FastCook");
+
+	if (sz && string::cmp(sz, "true")) {
+		// last time was a fast cook
+		if (opts&P_FastCook)
+			return 0; // no change
+		SetTargetString(flags, "P_FastCook", "false");
+		return -1; // fast data is low quality we want full quality now.
+	} else if (!sz) { // no quality string was set
+		if (opts&P_FastCook) {
+			SetTargetString(flags, "P_FastCook", "true");
+		} else {
+			SetTargetString(flags, "P_FastCook", "false");
+		}
+		return -1; // have to rebuild.
+	}
+
+	// last cook was not a fast cook.
+	// we never overwrite HQ textures with low quality fast ones.
+	return 0;
 }
 
 void TextureCooker::Register(Engine &engine) {

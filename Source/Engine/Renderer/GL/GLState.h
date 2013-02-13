@@ -115,6 +115,8 @@ public:
 	typedef boost::shared_ptr<S> Ref;
 	Ref New(bool init, bool clone = false);
 	void Bind(const Ref &s);
+	Ref GetRef();
+
 	void Commit(bool unconditional = false);
 	void Set(int s, int b, bool immediate=false);
 	void AlphaRef(GLclampf f);

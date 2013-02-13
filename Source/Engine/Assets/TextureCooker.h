@@ -30,8 +30,9 @@ public:
 
 private:
 
-	pkg::CookStatus CheckRebuild(int flags, int allflags);
+	pkg::CookStatus CheckRebuild(int flags, int allflags, int opts);
 	int MatchTargetKeys(int flags, int allflags);
+	int CheckFastCook(int flags, int opts);
 };
 
 } // asset

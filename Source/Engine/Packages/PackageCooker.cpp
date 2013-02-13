@@ -12,6 +12,9 @@
 #include <Runtime/DataCodec/LmpWriter.h>
 #include <Runtime/DataCodec/ZLib.h>
 #include "../Renderer/Material.h"
+#include "../Renderer/GL/GLState.h"
+#include <algorithm>
+#include <iomanip>
 #include <Runtime/PushSystemMacros.h>
 
 using namespace xtime;
@@ -50,6 +53,101 @@ const char *ErrorString(int r) {
 }
 
 #if defined(RAD_OPT_PC_TOOLS)
+
+PackageMan::CookThread::CookThread(
+		int _threadNum,
+		PackageMan *_pkgMan,
+		std::ostream &_out,
+		const r::HContext &_rbContext
+) : threadNum(_threadNum), pkgMan(_pkgMan), out(&_out), rbContext(_rbContext) {
+}
+
+PackageMan::CookThread::~CookThread() {
+	Join();
+}
+
+int PackageMan::CookThread::ThreadProc() {
+
+	pkgMan->m_engine.sys->r->ctx = rbContext;
+
+	for (;;) {
+
+		pkgMan->m_cookState->waiting.Wait();
+
+		if (pkgMan->m_cookState->done || pkgMan->m_cookState->error || pkgMan->m_cancelCook) {
+			Lock L(pkgMan->m_cookState->mutex);
+			pkgMan->m_cookState->finished.Open();
+			break;
+		}
+
+		CookCommand *cmd = 0;
+
+		{
+			Lock L(pkgMan->m_cookState->mutex);
+			cmd = pkgMan->m_cookState->pending;
+			if (cmd) {
+				pkgMan->m_cookState->pending = cmd->next;
+			} else {
+				pkgMan->m_cookState->waiting.Close();
+			}
+		}
+
+		if (cmd) {
+			(*out) << cmd->name << ": Cooking on thread " << threadNum << "..." << std::endl;
+
+			try {
+				cmd->result = cmd->cooker->Cook(cmd->flags, cmd->allflags);
+			} catch (exception &e) {
+				(*out) << "ERROR: exception '" << e.type() << "' msg: '" << (e.what()?e.what():"no message") << "' occured!" << std::endl;
+				cmd->result = SR_IOError;
+			}
+
+			pkgMan->ResetCooker(cmd->cooker);
+
+			(*out) << cmd->name << ": Finished on thread " << threadNum << "..." << std::endl;
+
+			Lock L(pkgMan->m_cookState->mutex);
+			cmd->next = pkgMan->m_cookState->complete;
+			pkgMan->m_cookState->complete = cmd;
+			RAD_ASSERT(pkgMan->m_cookState->numPending > 0);
+			if (--pkgMan->m_cookState->numPending == 0) {
+				pkgMan->m_cookState->finished.Open();
+			}
+
+			if (cmd->result != SR_Success) {
+				if (pkgMan->m_cookState->error == SR_Success) {
+					pkgMan->m_cookState->error = cmd->result;
+					pkgMan->m_cookState->finished.Open();
+				}
+				break;
+			}
+		}
+	}
+
+	pkgMan->m_engine.sys->r->ctx = r::HContext();
+
+	return 0;
+}
+
+void PackageMan::CreateCookThreads(const r::HContext &rbContext, std::ostream &out) {
+	int kNumThreads = std::max(4, (int)thread::NumContexts());
+	if (kNumThreads < 1)
+		kNumThreads = 1;
+
+	out << "num cook threads: " << kNumThreads << std::endl;
+
+	m_cookThreads.reserve(kNumThreads);
+
+	for (int i = 0; i < kNumThreads; ++i) {
+		CookThread::Ref thread(new (ZPackages) CookThread(i+1, this, out, rbContext));
+		thread->Run();
+		m_cookThreads.push_back(thread);
+	}
+}
+
+void PackageMan::ResetCooker(const Cooker::Ref &cooker) {
+	cooker->m_asset.reset();
+}
 
 bool PackageMan::MakeBuildDirs(int flags, std::ostream &out) {
 
@@ -93,19 +191,11 @@ bool PackageMan::MakeBuildDirs(int flags, std::ostream &out) {
 		
 		// package output directories.
 		
-		if (flags&(P_TargetIPhone|P_TargetIPad)) {
-			if (flags&P_TargetIPhone) {
-				if (!m_engine.sys->files->CreateDirectory("@r:/Cooked/Out/IOS/IPhone"))
-					continue;
-				if (!MakePackageDirs("@r:/Cooked/Out/IOS/IPhone/"))
-					continue;
-			}
-			if (flags&P_TargetIPad) {
-				if (!m_engine.sys->files->CreateDirectory("@r:/Cooked/Out/IOS/IPad"))
-					continue;
-				if (!MakePackageDirs("@r:/Cooked/Out/IOS/IPad/"))
-					continue;
-			}
+		if (flags&P_TargetiOS) {
+			if (!m_engine.sys->files->CreateDirectory("@r:/Cooked/Out/iOS"))
+				continue;
+			if (!MakePackageDirs("@r:/Cooked/Out/iOS"))
+				continue;
 		}
 
 		if (flags&P_TargetPC) {
@@ -126,6 +216,7 @@ int PackageMan::Cook(
 	int flags,
 	int languages,
 	int compression,
+	const r::HContext &rbContext,
 	std::ostream &out
 ) {
 	bool scriptsOnly = (flags&P_ScriptsOnly) ? true : false;
@@ -162,6 +253,13 @@ int PackageMan::Cook(
 	m_cookState.reset(new (ZPackages) CookState());
 	m_cookState->cout = &out;
 	m_cookState->languages = languages;
+	m_cookState->waiting.Close();
+	m_cookState->finished.Open();
+	m_cookState->pending = 0;
+	m_cookState->complete = 0;
+	m_cookState->numPending = 0;
+	m_cookState->done = false;
+	m_cookState->error = SR_Success;
 
 	int r = SR_Success;
 	int ptargets = P_TARGET_FLAGS(flags);
@@ -170,6 +268,8 @@ int PackageMan::Cook(
 	if (scriptsOnly) {
 		r = BuildPakFiles(ptargets, compression);
 	} else {
+		CreateCookThreads(rbContext, out);
+
 		r::Material::BeginCook();
 
 		out << "Coooking generics..." << std::endl;
@@ -197,6 +297,23 @@ int PackageMan::Cook(
 		}
 
 		r::Material::EndCook();
+
+		m_cookState->done = true;
+		m_cookState->waiting.Open();
+		{
+			Lock L(m_cookState->mutex);
+			while (m_cookState->complete) {
+				CookCommand *next = m_cookState->complete->next;
+				delete m_cookState->complete;
+				m_cookState->complete = next;
+			}
+			while (m_cookState->pending) {
+				CookCommand *next = m_cookState->pending->next;
+				delete m_cookState->pending;
+				m_cookState->pending = next;
+			}
+		}
+		m_cookThreads.clear(); // destroy cook threads.
 	}
 
 	xtime::TimeVal totalTime = xtime::ReadMilliseconds() - startTime;
@@ -206,6 +323,8 @@ int PackageMan::Cook(
 	xtime::MilliToDayHourSecond(totalTime, &days, &hours, &minutes, &seconds);
 
 	out << "Finished in " << (days*24+hours) << " hour(s), " << minutes << " minute(s), " << seconds << " second(s)" << std::endl;
+
+	m_cookState.reset();
 
 	return r;
 }
@@ -239,30 +358,54 @@ int PackageMan::CookPlat(
 		Cooker::Ref cooker = CookerForAsset(asset);
 		if (!cooker)
 			return SR_ErrorGeneric; 
-		
+
 		CookStatus status = cooker->Status(flags, allflags);
 		if (status == CS_NeedRebuild) {
-			out << (*it) << ": Cooking..." << std::endl;
 
-			int r;
+			Lock L(m_cookState->mutex);
+			if (m_cookState->error != SR_Success)
+				return m_cookState->error;
 
-			try {
-				r = cooker->Cook(flags, allflags);
-			} catch (exception &e) {
-				out << "ERROR: exception '" << e.type() << "' msg: '" << (e.what()?e.what():"no message") << "' occured!" << std::endl;
-				r = SR_IOError;
-			}
+			CookCommand *cmd = new (ZPackages) CookCommand();
+			cmd->flags = flags;
+			cmd->allflags = allflags;
+			cmd->result = 0;
+			cmd->name = *it;
+			cmd->cooker = cooker;
 
-			cooker->m_asset.reset();
+			cmd->next = m_cookState->pending;
+			m_cookState->pending = cmd;
+			++m_cookState->numPending;
+			m_cookState->waiting.Open();
+			m_cookState->finished.Close();
 
-			if (r != SR_Success) {
-				out << "ERROR: " << ErrorString(r) << std::endl;
-				return r;
-			}
 		} else if (status == CS_UpToDate) {
+			Lock L(m_cookState->mutex);
+			if (m_cookState->error != SR_Success)
+				return m_cookState->error;
+
 			cooker->LoadImports();
 			out << (*it) << ": Up to date." << std::endl;
+		} else {
+			Lock L(m_cookState->mutex);
+			if (m_cookState->error != SR_Success)
+				return m_cookState->error;
 		}
+	}
+
+	m_cookState->finished.Wait();
+	if (m_cookState->error != SR_Success)
+		return m_cookState->error;
+	if (m_cancelCook) {
+		*m_cookState->cout << "ERROR: cook cancelled..." << std::endl;
+		return SR_ErrorGeneric;
+	}
+	RAD_ASSERT(m_cookState->numPending == 0);
+	RAD_ASSERT(m_cookState->pending == 0);
+	while (m_cookState->complete) {
+		CookCommand *next = m_cookState->complete->next;
+		delete m_cookState->complete;
+		m_cookState->complete = next;
 	}
 
 	// follow imports...
@@ -314,26 +457,33 @@ int PackageMan::CookPlat(
 
 						CookStatus status = impCooker->Status(flags, allflags);
 						if (status == CS_NeedRebuild) {
-							out << imp.path << ": Cooking..." << std::endl;
+							Lock L(m_cookState->mutex);
+							if (m_cookState->error != SR_Success)
+								return m_cookState->error;
 
-							int r;
-							try {
-								r = impCooker->Cook(flags, allflags);
-							} catch (exception &e) {
-								out << "ERROR: exception '" << e.type() << "' msg: '" <<(e.what()?e.what():"no message") << "' occured!" << std::endl;
-								r = SR_IOError;
-							}
+							CookCommand *cmd = new (ZPackages) CookCommand();
+							cmd->flags = flags;
+							cmd->allflags = allflags;
+							cmd->result = 0;
+							cmd->name = imp.path;
+							cmd->cooker = impCooker;
 
-							impCooker->m_asset.reset();
-
-							if (r != SR_Success) {
-								out << "ERROR: " << ErrorString(r) << std::endl;
-								return r;
-							}
+							cmd->next = m_cookState->pending;
+							m_cookState->pending = cmd;
+							++m_cookState->numPending;
+							m_cookState->waiting.Open();
+							m_cookState->finished.Close();
 						}
 						else if (status == CS_UpToDate) {
+							Lock L(m_cookState->mutex);
+							if (m_cookState->error != SR_Success)
+								return m_cookState->error;
 							impCooker->LoadImports();
 							out << imp.path << ": Up to date." << std::endl;
+						} else {
+							Lock L(m_cookState->mutex);
+							if (m_cookState->error != SR_Success)
+								return m_cookState->error;
 						}
 					}
 				}
@@ -344,9 +494,21 @@ int PackageMan::CookPlat(
 			cooked.insert(*it);
 	}
 
+	m_cookState->finished.Wait();
+	if (m_cookState->error != SR_Success)
+		return m_cookState->error;
 	if (m_cancelCook) {
 		*m_cookState->cout << "ERROR: cook cancelled..." << std::endl;
 		return SR_ErrorGeneric;
+	}
+
+	RAD_ASSERT(m_cookState->numPending == 0);
+	RAD_ASSERT(m_cookState->pending == 0);
+	
+	while (m_cookState->complete) {
+		CookCommand *next = m_cookState->complete->next;
+		delete m_cookState->complete;
+		m_cookState->complete = next;
 	}
 
 	return SR_Success;
@@ -449,13 +611,9 @@ int PackageMan::BuildTargetPak(int plat, int compression) {
 		*m_cookState->cout << "------ Packaging PC ------" << std::endl;
 		path += "pc.pak";
 		break;
-	case P_TargetIPhone:
-		*m_cookState->cout << "------ Packaging IPhone ------" << std::endl;
-		path += "iphone.pak";
-		break;
-	case P_TargetIPad:
-		*m_cookState->cout << "------ Packaging IPad ------" << std::endl;
-		path += "ipad.pak";
+	case P_TargetiOS:
+		*m_cookState->cout << "------ Packaging iOS ------" << std::endl;
+		path += "ios.pak";
 		break;
 	case P_TargetXBox360:
 		*m_cookState->cout << "------ Packaging XBox360 ------" << std::endl;
@@ -491,11 +649,8 @@ int PackageMan::BuildTargetPak(int plat, int compression) {
 	case P_TargetPC:
 		r = PakDirectory("@r:/Cooked/Out/PC", "Cooked/", compression, lumpWriter);
 		break;
-	case P_TargetIPhone:
-		r = PakDirectory("@r:/Cooked/Out/IOS/IPhone", "Cooked/", compression, lumpWriter);
-		break;
-	case P_TargetIPad:
-		r = PakDirectory("@r:/Cooked/Out/IOS/IPad", "Cooked/", compression, lumpWriter);
+	case P_TargetiOS:
+		r = PakDirectory("@r:/Cooked/Out/iOS", "Cooked/", compression, lumpWriter);
 		break;
 	case P_TargetXBox360:
 		r = PakDirectory("@r:/Cooked/Out/XBox360", "Cooked/", compression, lumpWriter);
@@ -1109,23 +1264,29 @@ String Cooker::FilePath(const char *path, int pflags) {
 	String spath(CStr(path));
 	String sbase;
 
-	if (pflags&P_TargetIPhone) {
+	if (pflags&P_TargetiOS) {
 		if (m_cooking) {
-			sbase = CStr("@r:/Cooked/Out/IOS/IPhone/");
+			sbase = CStr("@r:/Cooked/Out/iOS/");
 		} else {
-			sbase = CStr("@r:/Temp/Out/IOS/IPhone/");
-		}
-	} else if (pflags&P_TargetIPad) {
-		if (m_cooking) {
-			sbase = CStr("@r:/Cooked/Out/IOS/IPad/");
-		} else {
-			sbase = CStr("@r:/Temp/Out/IOS/IPad/");
+			sbase = CStr("@r:/Temp/Out/iOS/");
 		}
 	} else if (pflags&P_TargetPC) {
 		if (m_cooking) {
 			sbase = CStr("@r:/Cooked/Out/PC/");
 		} else {
 			sbase = CStr("@r:/Temp/Out/PC/");
+		}
+	} else if (pflags&P_TargetXBox360) {
+		if (m_cooking) {
+			sbase = CStr("@r:/Cooked/Out/XBox360/");
+		} else {
+			sbase = CStr("@r:/Temp/Out/XBox360/");
+		}
+	} else if (pflags&P_TargetPS3) {
+		if (m_cooking) {
+			sbase = CStr("@r:/Cooked/Out/PS3/");
+		} else {
+			sbase = CStr("@r:/Temp/Out/PS3/");
 		}
 	} else {
 		if (m_cooking) {
@@ -1212,10 +1373,8 @@ String Cooker::TagPath(int pflags) {
 	if (pflags) {
 		if (pflags&P_TargetPC) {
 			spath += ".pc";
-		} else if (pflags&P_TargetIPhone) {
-			spath += ".iphone";
-		} else if (pflags&P_TargetIPad) {
-			spath += ".ipad";
+		} else if (pflags&P_TargetiOS) {
+			spath += ".ios";
 		} else if (pflags&P_TargetXBox360) {
 			spath += ".xbox360";
 		} else if (pflags&P_TargetPS3) {
@@ -1513,13 +1672,29 @@ int Cooker::CompareCachedLocalizeKey(int target, const char *key) {
 	return 0; // same languages
 }
 
-bool Cooker::ModifiedTime(int target, xtime::TimeDate &td) const
-{
+const char *Cooker::TargetString(int target, const char *key) {
+	RAD_ASSERT(key);
+
+	const String skey(TargetPath(target)+key);
+	world::Keys::Pairs::const_iterator it = globals->pairs.find(skey);
+	if (it != globals->pairs.end())
+		return it->second.c_str;
+	return 0;
+}
+
+void Cooker::SetTargetString(int target, const char *key, const char *string) {
+	RAD_ASSERT(key);
+	RAD_ASSERT(string);
+
+	const String skey(TargetPath(target)+key);
+	globals->pairs[skey] = String(string);
+}
+
+bool Cooker::ModifiedTime(int target, xtime::TimeDate &td) const {
 	return TimeForKey(target, "__cookerModifiedTime", td);
 }
 
-bool Cooker::TimeForKey(int target, const char *key, xtime::TimeDate &td) const
-{
+bool Cooker::TimeForKey(int target, const char *key, xtime::TimeDate &td) const {
 	RAD_ASSERT(key);
 	String skey(TargetPath(target)+key);
 	world::Keys::Pairs::const_iterator it = globals->pairs.find(skey);
@@ -1529,8 +1704,7 @@ bool Cooker::TimeForKey(int target, const char *key, xtime::TimeDate &td) const
 	return true;
 }
 
-String Cooker::TargetPath(int target)
-{
+String Cooker::TargetPath(int target) {
 	const char *sz = pkg::PlatformNameForFlags(target);
 	if (!sz)
 		return CStr("Generic/");
