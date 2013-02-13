@@ -1061,6 +1061,10 @@ int TextureParser::Compress(
 
 	U8 *temp = 0;
 
+	String sQuality(CStr("HQ"));
+	if (flags&P_FastCook)
+		sQuality = CStr("LQ");
+
 	for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it) {
 		image_codec::Image::Ref &img = *it;
 		image_codec::Image src;
@@ -1069,7 +1073,7 @@ int TextureParser::Compress(
 		img->format = format;
 
 		COut(C_Info) << "Compressing " << asset->path.get() << " (" << 
-			m_header.width << "x" << m_header.height << "x" << src.bpp << ") as " << *s << std::endl;
+			m_header.width << "x" << m_header.height << "x" << src.bpp << ") as " << sQuality << " " << *s << std::endl;
 				
 		img->AllocateFrames(src.frameCount);
 		for (int i = 0; i < src.frameCount; ++i) {
