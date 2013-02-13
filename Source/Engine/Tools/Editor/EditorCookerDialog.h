@@ -21,6 +21,8 @@ class QPushButton;
 class QCloseEvent;
 class QSlider;
 class QCheckBox;
+class QLineEdit;
+class QGroupBox;
 
 namespace tools {
 namespace editor {
@@ -36,6 +38,7 @@ public:
 		int plats, 
 		int languages,
 		int compression,
+		int numThreads,
 		std::ostream &cout
 	);
 
@@ -57,6 +60,7 @@ private:
 	int m_plats;
 	int m_languages;
 	int m_compression;
+	int m_numThreads;
 };
 
 class RADENG_CLASS CookerDialog : public QDialog {
@@ -83,6 +87,8 @@ private slots:
 	void CleanChecked(int value);
 	void ScriptsOnly(int value);
 	void FastCook(int value);
+	void MultithreadedClicked(bool checked);
+	void NumThreadsChanged(const QString &text);
 
 private:
 
@@ -133,6 +139,8 @@ private:
 	QCheckBox *m_clean;
 	QCheckBox *m_scriptsOnly;
 	QCheckBox *m_fast;
+	QGroupBox *m_multiThreaded;
+	QLineEdit *m_numThreads;
 	GLWidget *m_glw;
 	bool m_closeWhenFinished;
 };

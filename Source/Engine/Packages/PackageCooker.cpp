@@ -140,18 +140,16 @@ int PackageMan::CookThread::ThreadProc() {
 }
 
 void PackageMan::CreateCookThreads(const r::HContext &rbContext, std::ostream &out) {
-	int kNumThreads = std::max(4, (int)thread::NumContexts());
-	if (kNumThreads < 1)
-		kNumThreads = 1;
+	if (m_cookState->numThreads > 0) {
+		out << "Starting multithreaded cook with " << m_cookState->numThreads << " thread(s)." << std::endl;
 
-	out << "num cook threads: " << kNumThreads << std::endl;
+		m_cookThreads.reserve(m_cookState->numThreads);
 
-	m_cookThreads.reserve(kNumThreads);
-
-	for (int i = 0; i < kNumThreads; ++i) {
-		CookThread::Ref thread(new (ZPackages) CookThread(i+1, this, out, rbContext));
-		thread->Run();
-		m_cookThreads.push_back(thread);
+		for (int i = 0; i < m_cookState->numThreads; ++i) {
+			CookThread::Ref thread(new (ZPackages) CookThread(i+1, this, out, rbContext));
+			thread->Run();
+			m_cookThreads.push_back(thread);
+		}
 	}
 }
 
@@ -226,6 +224,7 @@ int PackageMan::Cook(
 	int flags,
 	int languages,
 	int compression,
+	int numThreads,
 	const r::HContext &rbContext,
 	std::ostream &out
 ) {
@@ -268,6 +267,7 @@ int PackageMan::Cook(
 	m_cookState->pending = 0;
 	m_cookState->complete = 0;
 	m_cookState->numPending = 0;
+	m_cookState->numThreads = numThreads;
 	m_cookState->done = false;
 	m_cookState->error = SR_Success;
 
@@ -374,22 +374,42 @@ int PackageMan::CookPlat(
 		CookStatus status = cooker->Status(flags, allflags);
 		if (status == CS_NeedRebuild) {
 
-			Lock L(m_cookState->mutex);
-			if (m_cookState->error != SR_Success)
-				return m_cookState->error;
+			if (m_cookState->numThreads > 0) {
+				Lock L(m_cookState->mutex);
+				if (m_cookState->error != SR_Success)
+					return m_cookState->error;
 
-			CookCommand *cmd = new (ZPackages) CookCommand();
-			cmd->flags = flags;
-			cmd->allflags = allflags;
-			cmd->result = 0;
-			cmd->name = *it;
-			cmd->cooker = cooker;
+				CookCommand *cmd = new (ZPackages) CookCommand();
+				cmd->flags = flags;
+				cmd->allflags = allflags;
+				cmd->result = 0;
+				cmd->name = *it;
+				cmd->cooker = cooker;
 
-			cmd->next = m_cookState->pending;
-			m_cookState->pending = cmd;
-			++m_cookState->numPending;
-			m_cookState->waiting.Open();
-			m_cookState->finished.Close();
+				cmd->next = m_cookState->pending;
+				m_cookState->pending = cmd;
+				++m_cookState->numPending;
+				m_cookState->waiting.Open();
+				m_cookState->finished.Close();
+			} else {
+				out << (*it) << ": Cooking..." << std::endl;
+
+				int r;
+
+				try {
+					r = cooker->Cook(flags, allflags);
+				} catch (exception &e) {
+					out << "ERROR: exception '" << e.type() << "' msg: '" << (e.what()?e.what():"no message") << "' occured!" << std::endl;
+					r = SR_IOError;
+				}
+
+				cooker->m_asset.reset();
+
+				if (r != SR_Success) {
+					out << "ERROR: " << ErrorString(r) << std::endl;
+					return r;
+				}
+			}
 
 		} else if (status == CS_UpToDate) {
 			Lock L(m_cookState->mutex);
@@ -406,22 +426,24 @@ int PackageMan::CookPlat(
 		}
 	}
 
-	m_cookState->finished.Wait();
+	if (m_cookState->numThreads > 0) {
+		m_cookState->finished.Wait();
 	
-	if (m_cookState->error != SR_Success)
-		return m_cookState->error;
+		if (m_cookState->error != SR_Success)
+			return m_cookState->error;
 	
-	if (m_cancelCook) {
-		*m_cookState->cout << "ERROR: cook cancelled..." << std::endl;
-		return SR_ErrorGeneric;
-	}
+		if (m_cancelCook) {
+			*m_cookState->cout << "ERROR: cook cancelled..." << std::endl;
+			return SR_ErrorGeneric;
+		}
 
-	RAD_VERIFY(m_cookState->numPending == 0);
-	RAD_VERIFY(m_cookState->pending == 0);
-	while (m_cookState->complete) {
-		CookCommand *next = m_cookState->complete->next;
-		delete m_cookState->complete;
-		m_cookState->complete = next;
+		RAD_VERIFY(m_cookState->numPending == 0);
+		RAD_VERIFY(m_cookState->pending == 0);
+		while (m_cookState->complete) {
+			CookCommand *next = m_cookState->complete->next;
+			delete m_cookState->complete;
+			m_cookState->complete = next;
+		}
 	}
 
 	// follow imports...
@@ -480,22 +502,42 @@ int PackageMan::CookPlat(
 
 						CookStatus status = impCooker->Status(flags, allflags);
 						if (status == CS_NeedRebuild) {
-							Lock L(m_cookState->mutex);
-							if (m_cookState->error != SR_Success)
-								return m_cookState->error;
 
-							CookCommand *cmd = new (ZPackages) CookCommand();
-							cmd->flags = flags;
-							cmd->allflags = allflags;
-							cmd->result = 0;
-							cmd->name = imp.path;
-							cmd->cooker = impCooker;
+							if (m_cookState->numThreads > 0) {
+								Lock L(m_cookState->mutex);
+								if (m_cookState->error != SR_Success)
+									return m_cookState->error;
 
-							cmd->next = m_cookState->pending;
-							m_cookState->pending = cmd;
-							++m_cookState->numPending;
-							m_cookState->waiting.Open();
-							m_cookState->finished.Close();
+								CookCommand *cmd = new (ZPackages) CookCommand();
+								cmd->flags = flags;
+								cmd->allflags = allflags;
+								cmd->result = 0;
+								cmd->name = imp.path;
+								cmd->cooker = impCooker;
+
+								cmd->next = m_cookState->pending;
+								m_cookState->pending = cmd;
+								++m_cookState->numPending;
+								m_cookState->waiting.Open();
+								m_cookState->finished.Close();
+							} else {
+								out << imp.path << ": Cooking..." << std::endl;
+
+								int r;
+								try {
+									r = impCooker->Cook(flags, allflags);
+								} catch (exception &e) {
+									out << "ERROR: exception '" << e.type() << "' msg: '" <<(e.what()?e.what():"no message") << "' occured!" << std::endl;
+									r = SR_IOError;
+								}
+
+								impCooker->m_asset.reset();
+
+								if (r != SR_Success) {
+									out << "ERROR: " << ErrorString(r) << std::endl;
+									return r;
+								}
+							}
 						}
 						else if (status == CS_UpToDate) {
 							Lock L(m_cookState->mutex);
@@ -515,26 +557,27 @@ int PackageMan::CookPlat(
 		}
 
 		// add each level of imports.
+		if (m_cookState->numThreads > 0) {
+			m_cookState->finished.Wait();
+	
+			if (m_cookState->error != SR_Success)
+				return m_cookState->error;
+	
+			if (m_cancelCook) {
+				*m_cookState->cout << "ERROR: cook cancelled..." << std::endl;
+				return SR_ErrorGeneric;
+			}
 
-		m_cookState->finished.Wait();
+			RAD_VERIFY(m_cookState->numPending == 0);
+			RAD_VERIFY(m_cookState->pending == 0);
 	
-		if (m_cookState->error != SR_Success)
-			return m_cookState->error;
-	
-		if (m_cancelCook) {
-			*m_cookState->cout << "ERROR: cook cancelled..." << std::endl;
-			return SR_ErrorGeneric;
+			while (m_cookState->complete) {
+				CookCommand *next = m_cookState->complete->next;
+				delete m_cookState->complete;
+				m_cookState->complete = next;
+			}
 		}
 
-		RAD_VERIFY(m_cookState->numPending == 0);
-		RAD_VERIFY(m_cookState->pending == 0);
-	
-		while (m_cookState->complete) {
-			CookCommand *next = m_cookState->complete->next;
-			delete m_cookState->complete;
-			m_cookState->complete = next;
-		}
-		
 		imported.swap(added);
 	}
 

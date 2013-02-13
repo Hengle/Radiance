@@ -870,6 +870,7 @@ public:
 		int flags,
 		int languages,
 		int compression,
+		int numThreads, // 0 == single threaded build.
 		const r::HContext &rbContext,
 		std::ostream &out
 	);
@@ -1069,9 +1070,9 @@ private:
 		volatile int numPending;
 		volatile bool done;
 		volatile int error;
+		int numThreads;
 		Mutex mutex;
 		Mutex ioMutex;
-		void *glStateRef;
 	};
 
 	struct CookPackage {

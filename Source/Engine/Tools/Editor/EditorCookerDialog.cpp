@@ -23,6 +23,8 @@
 #include <QtGui/QGroupBox>
 #include <QtGui/QSlider>
 #include <QtGui/QLabel>
+#include <QtGui/QLineEdit>
+#include <QtGui/QIntValidator>
 #include <QtOpenGL/QGLFormat>
 #include <QtOpenGL/QGLContext>
 #include <QtGui/QDesktopWidget>
@@ -82,7 +84,33 @@ m_closeWhenFinished(false) {
 
 	QGroupBox *targetGroup = new (ZEditor) QGroupBox("Targets");
 	QGridLayout *grid = new (ZEditor) QGridLayout(targetGroup);
-	vGroupBox->addWidget(targetGroup);
+
+	QHBoxLayout *hbox2 = new (ZEditor) QHBoxLayout();
+	hbox2->addWidget(targetGroup);
+	hbox2->setStretch(0, 2);
+
+	m_multiThreaded = new (ZEditor) QGroupBox("Multithreaded");
+	
+	m_multiThreaded->setCheckable(true);
+	m_multiThreaded->setChecked(mainWin->userPrefs->value("cook/multithreaded", false).toBool());
+	m_numThreads = new (ZEditor) QLineEdit();
+	m_numThreads->setText(mainWin->userPrefs->value("cook/numthreads", thread::NumContexts()).toString());
+	m_numThreads->setEnabled(m_multiThreaded->isChecked());
+	m_numThreads->setValidator(new QIntValidator(0, 256, this));
+	m_numThreads->setMaximumWidth(25);
+	RAD_VERIFY(connect(m_multiThreaded, SIGNAL(clicked(bool)), SLOT(MultithreadedClicked(bool))));
+	RAD_VERIFY(connect(m_numThreads, SIGNAL(textChanged(const QString&)), SLOT(NumThreadsChanged(const QString&))));
+	
+	QHBoxLayout *hbox3 = new (ZEditor) QHBoxLayout(m_multiThreaded);
+	hbox3->addStretch(1);
+	hbox3->addWidget(new QLabel("Num Threads:"));
+	hbox3->addWidget(m_numThreads);
+	hbox3->addStretch(1);
+
+	hbox2->addWidget(m_multiThreaded);
+	hbox2->setStretch(1, 1);
+
+	vGroupBox->addLayout(hbox2);
 	
 	QGroupBox *compressionGroup = new (ZEditor) QGroupBox("Compression");
 	QGridLayout *compressionGroupLayout = new (ZEditor) QGridLayout(compressionGroup);
@@ -216,6 +244,13 @@ void CookerDialog::CookClicked() {
 		return;
 	}
 
+	int numThreads = 0;
+	if (m_multiThreaded->isChecked()) {
+		numThreads = m_numThreads->text().toInt();
+		if (numThreads < 0)
+			numThreads = 0;
+	}
+
 	StringVec roots;
 	{
 		file::MMFileInputBuffer::Ref ib = App::Get()->engine->sys->files->OpenInputBuffer("@r:/cook.txt", ZTools);
@@ -272,6 +307,7 @@ void CookerDialog::CookClicked() {
 		flags,
 		enabledLangMask,
 		m_compression->value(),
+		numThreads,
 		*m_oStream
 	);
 
@@ -327,6 +363,15 @@ void CookerDialog::FastCook(int value) {
 	MainWindow::Get()->userPrefs->setValue("cook/fast", value == Qt::Checked);
 }
 
+void CookerDialog::MultithreadedClicked(bool checked) {
+	MainWindow::Get()->userPrefs->setValue("cook/multithreaded", checked);
+	m_numThreads->setEnabled(checked);
+}
+
+void CookerDialog::NumThreadsChanged(const QString &text) {
+	MainWindow::Get()->userPrefs->setValue("cook/numthreads", text);
+}
+
 void CookerDialog::closeEvent(QCloseEvent *e) {
 	if (m_thread) {
 		e->ignore();
@@ -379,6 +424,7 @@ CookThread::CookThread(
 	int plats,
 	int languages,
 	int compression,
+	int numThreads,
 	std::ostream &cout
 ) : 
 m_glw(glw),
@@ -386,6 +432,7 @@ m_roots(roots),
 m_plats(plats), 
 m_languages(languages),
 m_compression(compression),
+m_numThreads(numThreads),
 m_cout(&cout) {
 }
 
@@ -395,7 +442,7 @@ void CookThread::Cancel() {
 
 void CookThread::run() {
 	m_glw->bindGL(true);
-	App::Get()->engine->sys->packages->Cook(m_roots, m_plats, m_languages, m_compression, m_glw->rbContext, *m_cout);
+	App::Get()->engine->sys->packages->Cook(m_roots, m_plats, m_languages, m_compression, m_numThreads, m_glw->rbContext, *m_cout);
 	m_glw->unbindGL();
 	emit Finished();
 }
