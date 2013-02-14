@@ -230,7 +230,7 @@ int TextureCooker::MatchTargetKeys(int flags, int allflags) {
 int TextureCooker::CheckFastCook(int flags, int opts) {
 	const char *sz = TargetString(flags, "P_FastCook");
 
-	if (sz && string::cmp(sz, "true")) {
+	if (sz && !string::cmp(sz, "true")) {
 		// last time was a fast cook
 		if (opts&P_FastCook)
 			return 0; // no change
