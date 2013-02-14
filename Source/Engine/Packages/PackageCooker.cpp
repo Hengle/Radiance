@@ -13,6 +13,7 @@
 #include <Runtime/DataCodec/ZLib.h>
 #include "../Renderer/Material.h"
 #include "../Renderer/GL/GLState.h"
+#include "../Tools/Editor/EditorGLWidget.h"
 #include <algorithm>
 #include <iomanip>
 #include <Runtime/PushSystemMacros.h>
@@ -58,8 +59,8 @@ PackageMan::CookThread::CookThread(
 		int _threadNum,
 		PackageMan *_pkgMan,
 		std::ostream &_out,
-		const r::HContext &_rbContext
-) : threadNum(_threadNum), pkgMan(_pkgMan), out(&_out), rbContext(_rbContext) {
+		tools::editor::GLWidget &_glw
+) : threadNum(_threadNum), pkgMan(_pkgMan), out(&_out), glw(&_glw) {
 }
 
 PackageMan::CookThread::~CookThread() {
@@ -68,7 +69,7 @@ PackageMan::CookThread::~CookThread() {
 
 int PackageMan::CookThread::ThreadProc() {
 
-	pkgMan->m_engine.sys->r->ctx = rbContext;
+	glw->bindGL(true);
 
 	for (;;) {
 
@@ -139,14 +140,14 @@ int PackageMan::CookThread::ThreadProc() {
 	return 0;
 }
 
-void PackageMan::CreateCookThreads(const r::HContext &rbContext, std::ostream &out) {
+void PackageMan::CreateCookThreads(tools::editor::GLWidget &glContext, std::ostream &out) {
 	if (m_cookState->numThreads > 0) {
 		out << "Starting multithreaded cook with " << m_cookState->numThreads << " thread(s)." << std::endl;
 
 		m_cookThreads.reserve(m_cookState->numThreads);
 
 		for (int i = 0; i < m_cookState->numThreads; ++i) {
-			CookThread::Ref thread(new (ZPackages) CookThread(i+1, this, out, rbContext));
+			CookThread::Ref thread(new (ZPackages) CookThread(i+1, this, out, glContext));
 			thread->Run();
 			m_cookThreads.push_back(thread);
 		}
@@ -225,7 +226,7 @@ int PackageMan::Cook(
 	int languages,
 	int compression,
 	int numThreads,
-	const r::HContext &rbContext,
+	tools::editor::GLWidget &glContext,
 	std::ostream &out
 ) {
 	bool scriptsOnly = (flags&P_ScriptsOnly) ? true : false;
@@ -278,7 +279,7 @@ int PackageMan::Cook(
 	if (scriptsOnly) {
 		r = BuildPakFiles(ptargets, compression);
 	} else {
-		CreateCookThreads(rbContext, out);
+		CreateCookThreads(glContext, out);
 
 		r::Material::BeginCook();
 
@@ -377,27 +378,23 @@ int PackageMan::CookPlat(
 			bool queued = false;
 
 			if (m_cookState->numThreads > 0) {
-				// Some drivers have issues with multi-threaded GLshader stuff (even though it's all synchronized) :/
+				queued = true;
+				Lock L(m_cookState->mutex);
+				if (m_cookState->error != SR_Success)
+					return m_cookState->error;
 
-				if (asset->type != asset::AT_Material) {
-					queued = true;
-					Lock L(m_cookState->mutex);
-					if (m_cookState->error != SR_Success)
-						return m_cookState->error;
+				CookCommand *cmd = new (ZPackages) CookCommand();
+				cmd->flags = flags;
+				cmd->allflags = allflags;
+				cmd->result = 0;
+				cmd->name = *it;
+				cmd->cooker = cooker;
 
-					CookCommand *cmd = new (ZPackages) CookCommand();
-					cmd->flags = flags;
-					cmd->allflags = allflags;
-					cmd->result = 0;
-					cmd->name = *it;
-					cmd->cooker = cooker;
-
-					cmd->next = m_cookState->pending;
-					m_cookState->pending = cmd;
-					++m_cookState->numPending;
-					m_cookState->waiting.Open();
-					m_cookState->finished.Close();
-				}
+				cmd->next = m_cookState->pending;
+				m_cookState->pending = cmd;
+				++m_cookState->numPending;
+				m_cookState->waiting.Open();
+				m_cookState->finished.Close();
 			} 
 
 			if (!queued) {
@@ -518,30 +515,26 @@ int PackageMan::CookPlat(
 						if (status == CS_NeedRebuild) {
 							bool queued = false;
 
-							// Some drivers have issues with multi-threaded GLshader stuff (even though it's all synchronized) :/
+							if (m_cookState->numThreads > 0) {
+								queued = true;
+								Lock L(m_cookState->mutex);
+								if (m_cookState->error != SR_Success)
+									return m_cookState->error;
 
-							if (asset->type != asset::AT_Material) {
-								if (m_cookState->numThreads > 0) {
-									queued = true;
-									Lock L(m_cookState->mutex);
-									if (m_cookState->error != SR_Success)
-										return m_cookState->error;
+								CookCommand *cmd = new (ZPackages) CookCommand();
+								cmd->flags = flags;
+								cmd->allflags = allflags;
+								cmd->result = 0;
+								cmd->name = imp.path;
+								cmd->cooker = impCooker;
 
-									CookCommand *cmd = new (ZPackages) CookCommand();
-									cmd->flags = flags;
-									cmd->allflags = allflags;
-									cmd->result = 0;
-									cmd->name = imp.path;
-									cmd->cooker = impCooker;
-
-									cmd->next = m_cookState->pending;
-									m_cookState->pending = cmd;
-									++m_cookState->numPending;
-									m_cookState->waiting.Open();
-									m_cookState->finished.Close();
-								}
+								cmd->next = m_cookState->pending;
+								m_cookState->pending = cmd;
+								++m_cookState->numPending;
+								m_cookState->waiting.Open();
+								m_cookState->finished.Close();
 							}
-
+							
 							if (!queued) {
 								{
 									Lock L(m_cookState->ioMutex);

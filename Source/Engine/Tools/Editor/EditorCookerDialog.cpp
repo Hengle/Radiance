@@ -205,10 +205,10 @@ m_closeWhenFinished(false) {
 	buttonLayout->addWidget(m_cook);
 	buttonLayout->setStretch(0, 1);
 
-	m_glw = new GLWidget(this);
-	m_glw->hide();
-
 	s_instance = this;
+
+	m_glw = new (ZEditor) GLWidget(this);
+	m_glw->hide();
 }
 
 CookerDialog::~CookerDialog() {
@@ -426,7 +426,7 @@ CookThread::CookThread(
 	int compression,
 	int numThreads,
 	std::ostream &cout
-) : 
+) :
 m_glw(glw),
 m_roots(roots), 
 m_plats(plats), 
@@ -442,8 +442,7 @@ void CookThread::Cancel() {
 
 void CookThread::run() {
 	m_glw->bindGL(true);
-	App::Get()->engine->sys->packages->Cook(m_roots, m_plats, m_languages, m_compression, m_numThreads, m_glw->rbContext, *m_cout);
-	m_glw->unbindGL();
+	App::Get()->engine->sys->packages->Cook(m_roots, m_plats, m_languages, m_compression, m_numThreads, *m_glw, *m_cout);
 	emit Finished();
 }
 	

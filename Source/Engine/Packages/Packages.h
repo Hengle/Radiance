@@ -50,6 +50,11 @@
 	#include <Runtime/DataCodec/LmpDef.h>
 	#include <Runtime/Thread/Thread.h>
 	#include <stdio.h>
+namespace tools {
+namespace editor {
+	class GLWidget;
+} // editor
+} // tools
 #endif
 
 #if defined(RAD_OPT_TOOLS)
@@ -870,8 +875,8 @@ public:
 		int flags,
 		int languages,
 		int compression,
-		int numThreads, // 0 == single threaded build.
-		const r::HContext &rbContext,
+		int numThreads,
+		tools::editor::GLWidget &glContext,
 		std::ostream &out
 	);
 	void CancelCook();
@@ -1044,7 +1049,7 @@ private:
 			int threadNum,
 			PackageMan *pkgMan,
 			std::ostream &out,
-			const r::HContext &rbContext
+			tools::editor::GLWidget &glw
 		);
 
 		virtual ~CookThread();
@@ -1054,7 +1059,7 @@ private:
 		int threadNum;
 		PackageMan *pkgMan;
 		std::ostream *out;
-		r::HContext rbContext;
+		tools::editor::GLWidget *glw;
 	};
 
 	typedef zone_map<int, Cooker::Ref, ZPackagesT>::type CookerMap;
@@ -1093,7 +1098,7 @@ private:
 		std::ostream &out
 	);
 
-	void CreateCookThreads(const r::HContext &rbContext, std::ostream &out);
+	void CreateCookThreads(tools::editor::GLWidget &glContext, std::ostream &out);
 	void ResetCooker(const Cooker::Ref &cooker);
 
 	bool MakeBuildDirs(int flags, std::ostream &out);
