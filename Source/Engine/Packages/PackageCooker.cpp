@@ -378,23 +378,25 @@ int PackageMan::CookPlat(
 			bool queued = false;
 
 			if (m_cookState->numThreads > 0) {
-				queued = true;
-				Lock L(m_cookState->mutex);
-				if (m_cookState->error != SR_Success)
-					return m_cookState->error;
+				if (asset->type != asset::AT_Material) {
+					queued = true;
+					Lock L(m_cookState->mutex);
+					if (m_cookState->error != SR_Success)
+						return m_cookState->error;
 
-				CookCommand *cmd = new (ZPackages) CookCommand();
-				cmd->flags = flags;
-				cmd->allflags = allflags;
-				cmd->result = 0;
-				cmd->name = *it;
-				cmd->cooker = cooker;
+					CookCommand *cmd = new (ZPackages) CookCommand();
+					cmd->flags = flags;
+					cmd->allflags = allflags;
+					cmd->result = 0;
+					cmd->name = *it;
+					cmd->cooker = cooker;
 
-				cmd->next = m_cookState->pending;
-				m_cookState->pending = cmd;
-				++m_cookState->numPending;
-				m_cookState->waiting.Open();
-				m_cookState->finished.Close();
+					cmd->next = m_cookState->pending;
+					m_cookState->pending = cmd;
+					++m_cookState->numPending;
+					m_cookState->waiting.Open();
+					m_cookState->finished.Close();
+				}
 			} 
 
 			if (!queued) {
@@ -516,23 +518,25 @@ int PackageMan::CookPlat(
 							bool queued = false;
 
 							if (m_cookState->numThreads > 0) {
-								queued = true;
-								Lock L(m_cookState->mutex);
-								if (m_cookState->error != SR_Success)
-									return m_cookState->error;
+								if (asset->type != asset::AT_Material) {
+									queued = true;
+									Lock L(m_cookState->mutex);
+									if (m_cookState->error != SR_Success)
+										return m_cookState->error;
 
-								CookCommand *cmd = new (ZPackages) CookCommand();
-								cmd->flags = flags;
-								cmd->allflags = allflags;
-								cmd->result = 0;
-								cmd->name = imp.path;
-								cmd->cooker = impCooker;
+									CookCommand *cmd = new (ZPackages) CookCommand();
+									cmd->flags = flags;
+									cmd->allflags = allflags;
+									cmd->result = 0;
+									cmd->name = imp.path;
+									cmd->cooker = impCooker;
 
-								cmd->next = m_cookState->pending;
-								m_cookState->pending = cmd;
-								++m_cookState->numPending;
-								m_cookState->waiting.Open();
-								m_cookState->finished.Close();
+									cmd->next = m_cookState->pending;
+									m_cookState->pending = cmd;
+									++m_cookState->numPending;
+									m_cookState->waiting.Open();
+									m_cookState->finished.Close();
+								}
 							}
 							
 							if (!queued) {
