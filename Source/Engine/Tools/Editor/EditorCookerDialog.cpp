@@ -87,8 +87,7 @@ m_closeWhenFinished(false) {
 
 	QHBoxLayout *hbox2 = new (ZEditor) QHBoxLayout();
 	hbox2->addWidget(targetGroup);
-	hbox2->setStretch(0, 2);
-
+	
 	m_multiThreaded = new (ZEditor) QGroupBox("Multithreaded");
 	
 	m_multiThreaded->setCheckable(true);
@@ -108,8 +107,8 @@ m_closeWhenFinished(false) {
 	hbox3->addStretch(1);
 
 	hbox2->addWidget(m_multiThreaded);
-	hbox2->setStretch(1, 1);
-
+	hbox2->addStretch(1);
+	
 	vGroupBox->addLayout(hbox2);
 	
 	QGroupBox *compressionGroup = new (ZEditor) QGroupBox("Compression");
