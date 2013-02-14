@@ -374,31 +374,44 @@ int PackageMan::CookPlat(
 		CookStatus status = cooker->Status(flags, allflags);
 		if (status == CS_NeedRebuild) {
 
+			bool queued = false;
+
 			if (m_cookState->numThreads > 0) {
-				Lock L(m_cookState->mutex);
-				if (m_cookState->error != SR_Success)
-					return m_cookState->error;
+				// Some drivers have issues with multi-threaded GLshader stuff (even though it's all synchronized) :/
 
-				CookCommand *cmd = new (ZPackages) CookCommand();
-				cmd->flags = flags;
-				cmd->allflags = allflags;
-				cmd->result = 0;
-				cmd->name = *it;
-				cmd->cooker = cooker;
+				if (asset->type != asset::AT_Material) {
+					queued = true;
+					Lock L(m_cookState->mutex);
+					if (m_cookState->error != SR_Success)
+						return m_cookState->error;
 
-				cmd->next = m_cookState->pending;
-				m_cookState->pending = cmd;
-				++m_cookState->numPending;
-				m_cookState->waiting.Open();
-				m_cookState->finished.Close();
-			} else {
-				out << (*it) << ": Cooking..." << std::endl;
+					CookCommand *cmd = new (ZPackages) CookCommand();
+					cmd->flags = flags;
+					cmd->allflags = allflags;
+					cmd->result = 0;
+					cmd->name = *it;
+					cmd->cooker = cooker;
+
+					cmd->next = m_cookState->pending;
+					m_cookState->pending = cmd;
+					++m_cookState->numPending;
+					m_cookState->waiting.Open();
+					m_cookState->finished.Close();
+				}
+			} 
+
+			if (!queued) {
+				{
+					Lock L(m_cookState->ioMutex);
+					out << (*it) << ": Cooking..." << std::endl;
+				}
 
 				int r;
 
 				try {
 					r = cooker->Cook(flags, allflags);
 				} catch (exception &e) {
+					Lock L(m_cookState->ioMutex);
 					out << "ERROR: exception '" << e.type() << "' msg: '" << (e.what()?e.what():"no message") << "' occured!" << std::endl;
 					r = SR_IOError;
 				}
@@ -406,6 +419,7 @@ int PackageMan::CookPlat(
 				cooker->m_asset.reset();
 
 				if (r != SR_Success) {
+					Lock L(m_cookState->ioMutex);
 					out << "ERROR: " << ErrorString(r) << std::endl;
 					return r;
 				}
@@ -502,31 +516,43 @@ int PackageMan::CookPlat(
 
 						CookStatus status = impCooker->Status(flags, allflags);
 						if (status == CS_NeedRebuild) {
+							bool queued = false;
 
-							if (m_cookState->numThreads > 0) {
-								Lock L(m_cookState->mutex);
-								if (m_cookState->error != SR_Success)
-									return m_cookState->error;
+							// Some drivers have issues with multi-threaded GLshader stuff (even though it's all synchronized) :/
 
-								CookCommand *cmd = new (ZPackages) CookCommand();
-								cmd->flags = flags;
-								cmd->allflags = allflags;
-								cmd->result = 0;
-								cmd->name = imp.path;
-								cmd->cooker = impCooker;
+							if (asset->type != asset::AT_Material) {
+								if (m_cookState->numThreads > 0) {
+									queued = true;
+									Lock L(m_cookState->mutex);
+									if (m_cookState->error != SR_Success)
+										return m_cookState->error;
 
-								cmd->next = m_cookState->pending;
-								m_cookState->pending = cmd;
-								++m_cookState->numPending;
-								m_cookState->waiting.Open();
-								m_cookState->finished.Close();
-							} else {
-								out << imp.path << ": Cooking..." << std::endl;
+									CookCommand *cmd = new (ZPackages) CookCommand();
+									cmd->flags = flags;
+									cmd->allflags = allflags;
+									cmd->result = 0;
+									cmd->name = imp.path;
+									cmd->cooker = impCooker;
+
+									cmd->next = m_cookState->pending;
+									m_cookState->pending = cmd;
+									++m_cookState->numPending;
+									m_cookState->waiting.Open();
+									m_cookState->finished.Close();
+								}
+							}
+
+							if (!queued) {
+								{
+									Lock L(m_cookState->ioMutex);
+									out << imp.path << ": Cooking..." << std::endl;
+								}
 
 								int r;
 								try {
 									r = impCooker->Cook(flags, allflags);
 								} catch (exception &e) {
+									Lock L(m_cookState->ioMutex);
 									out << "ERROR: exception '" << e.type() << "' msg: '" <<(e.what()?e.what():"no message") << "' occured!" << std::endl;
 									r = SR_IOError;
 								}
@@ -534,6 +560,7 @@ int PackageMan::CookPlat(
 								impCooker->m_asset.reset();
 
 								if (r != SR_Success) {
+									Lock L(m_cookState->ioMutex);
 									out << "ERROR: " << ErrorString(r) << std::endl;
 									return r;
 								}
