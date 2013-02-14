@@ -845,7 +845,7 @@ int TextureParser::Mipmap(
 									   m_header.format == image_codec::Format_RGBA8888);
 
 #if !defined(RAD_OPT_WIN)
-	if (!(flags&P_TargetIOS))
+	if (!(flags&P_TargetiOS))
 		compressed = false;
 #endif
 	

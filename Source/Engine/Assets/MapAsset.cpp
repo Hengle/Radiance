@@ -20,10 +20,11 @@ using namespace pkg;
 
 namespace asset {
 
-MapAsset::MapAsset() : m_game(0), m_slot(0), m_spawning(false), m_parser(0) {
+MapAsset::MapAsset() : m_game(0), m_slot(0), m_spawning(false) {
 #if defined(RAD_OPT_TOOLS)
 	m_ui = 0;
 	m_debugUI = 0;
+	m_parser = 0;
 #endif
 }
 
