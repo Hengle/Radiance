@@ -51,7 +51,7 @@ void FloorMove::InitMove(State &state) {
 		step.path.Eval(0.f, state.pos.m_pos, &state.facing);
 		state.pos.m_waypoint = step.waypoints[0];
 		state.pos.m_nextWaypoint = step.waypoints[1];
-		state.pos.m_floor = step.floors[0];
+		state.pos.m_floor = (state.pos.m_waypoint != -1) ? -1 : step.floors[0];
 	}
 }
 
@@ -95,17 +95,13 @@ float FloorMove::Move(
 				step = &m_route.steps[state.m_stepIdx-1];
 				state.pos.m_waypoint = step->waypoints[1];
 				state.pos.m_nextWaypoint = -1;
-				if (state.pos.m_waypoint == -1) {
-					state.pos.m_floor = step->floors[1];
-				}
+				state.pos.m_floor = (state.pos.m_waypoint != -1) ? -1 : step->floors[1];
 				break;
 			} else {
 				step = &m_route.steps[state.m_stepIdx];
 				state.pos.m_waypoint = step->waypoints[0];
 				state.pos.m_nextWaypoint = step->waypoints[1];
-				if (state.pos.m_waypoint == -1) {
-					state.pos.m_floor = step->floors[0];
-				}
+				state.pos.m_floor = (state.pos.m_waypoint != -1) ? -1 : step->floors[0];
 			}
 		}
 	}
@@ -185,7 +181,7 @@ void FloorMove::ClampToEnd(State &state) {
 		const Step &curStep = m_route.steps[state.m_stepIdx];
 		if (curStep.waypoints[0] != -1 &&
 			curStep.waypoints[1] != -1) {
-			if (state.m_stepIdx == (int)(m_route.steps->size())) {
+			if (state.m_stepIdx == (int)(m_route.steps->size()-1)) {
 				// last step in move.
 				state.pos.m_waypoint = curStep.waypoints[1];
 				state.pos.m_nextWaypoint = -1;
@@ -537,7 +533,7 @@ void Floors::WalkFloor(
 	step.flags = bsp_file::kWaypointConnectionFlag_AutoFace;
 	routeSoFar->push_back(step);
 		
-	const bsp_file::BSPFloorTri *tri = m_bsp->FloorTris() + start.m_tri;
+	const bsp_file::BSPFloorTri *tri = m_bsp->FloorTris() + floor->firstTri + start.m_tri;
 
 	// sort edges
 	
@@ -551,7 +547,7 @@ void Floors::WalkFloor(
 
 	std::sort(cur.edges.begin(), cur.edges.end());
 
-	visited.set(cur.pos.m_tri - (int)floor->firstTri);
+	visited.set(cur.pos.m_tri);
 
 	for (;;) {
 
@@ -572,10 +568,10 @@ void Floors::WalkFloor(
 			if (stack->empty())
 				break; // done
 			routeSoFar->pop_back();
-			visited.reset(cur.pos.m_tri - (int)floor->firstTri);
+			visited.reset(cur.pos.m_tri);
 			cur = stack->back();
 			stack->pop_back();
-			tri = m_bsp->FloorTris() + cur.pos.m_tri;
+			tri = m_bsp->FloorTris() + floor->firstTri + cur.pos.m_tri;
 			continue;
 		}
 
@@ -590,9 +586,9 @@ void Floors::WalkFloor(
 				
 				const bsp_file::BSPFloorEdge *edge = m_bsp->FloorEdges() + edgeNum;
 				int otherSide = edge->tris[0] == cur.pos.m_tri;
-				int otherTriNum = (int)edge->tris[otherSide];
+				int otherTriNum = (int)edge->tris[otherSide] - (int)floor->firstTri;
 
-				if ((otherTriNum != -1) && !visited.test(otherTriNum - (int)floor->firstTri)) {
+				if ((otherTriNum != -1) && !visited.test(otherTriNum)) {
 					Vec3 mid = FindEdgePoint(cur.pos.m_pos, edge);
 					
 					float d = (mid - cur.pos.m_pos).MagnitudeSquared();
@@ -600,10 +596,10 @@ void Floors::WalkFloor(
 
 					if ((cur.distance+d+cost) < bestDistance) { // valid
 
-						const bsp_file::BSPFloorTri *otherTri = m_bsp->FloorTris() + otherTriNum;
+						const bsp_file::BSPFloorTri *otherTri = m_bsp->FloorTris() + floor->firstTri + otherTriNum;
 
 						// cross to next triangle.
-						visited.set(otherTriNum - (int)floor->firstTri);
+						visited.set(otherTriNum);
 
 						stack->push_back(cur);
 
@@ -618,7 +614,7 @@ void Floors::WalkFloor(
 						step.slopeChange = tri->planenum != otherTri->planenum; // preserve slopes
 						routeSoFar->push_back(step);
 
-						tri = m_bsp->FloorTris() + cur.pos.m_tri;
+						tri = m_bsp->FloorTris() + floor->firstTri + cur.pos.m_tri;
 						
 						for (int i = 0; i < 3; ++i) {
 							cur.edges[i].idx = i;
@@ -715,6 +711,8 @@ bool Floors::FindDirectRoute(const FloorPosition &start, const FloorPosition &en
 	route->push_back(step);
 	int skipEdge = -1;
 
+	const bsp_file::BSPFloor *floor = m_bsp->Floors() + start.m_floor;
+
 	FloorPosition cur(start);
 
 	while (cur.m_tri != end.m_tri) {
@@ -722,7 +720,7 @@ bool Floors::FindDirectRoute(const FloorPosition &start, const FloorPosition &en
 		int bestEdge = -1;
 		Vec3 bestPos;
 
-		const bsp_file::BSPFloorTri * tri = m_bsp->FloorTris() + cur.m_tri;
+		const bsp_file::BSPFloorTri * tri = m_bsp->FloorTris() + floor->firstTri + cur.m_tri;
 
 		for (int i = 0; i < 3; ++i) {
 			if (tri->edges[i] == skipEdge)
@@ -750,7 +748,7 @@ bool Floors::FindDirectRoute(const FloorPosition &start, const FloorPosition &en
 
 		RAD_ASSERT(bestEdge != -1);
 		const bsp_file::BSPFloorEdge *edge = m_bsp->FloorEdges() + tri->edges[bestEdge];
-		int otherTriNum = (edge->tris[0] == cur.m_tri) ? edge->tris[1] : edge->tris[0];
+		int otherTriNum = (edge->tris[0] == (cur.m_tri+(int)floor->firstTri)) ? edge->tris[1] : edge->tris[0];
 
 		if (otherTriNum == -1)
 			return false; // hit solid space no direct path.
@@ -760,13 +758,13 @@ bool Floors::FindDirectRoute(const FloorPosition &start, const FloorPosition &en
 		// have to add this if there is a slope change
 		if (tri->planenum != otherTri->planenum) {
 			step.pos = bestPos;
-			step.tri = otherTriNum;
+			step.tri = otherTriNum - floor->firstTri;
 			step.slopeChange = true;
 			route->push_back(step);
 		}
 
 		skipEdge = tri->edges[bestEdge]; // don't test this edge.
-		cur.m_tri = otherTriNum;
+		cur.m_tri = otherTriNum - floor->firstTri;
 		cur.m_pos = bestPos;
 	}
 
@@ -910,6 +908,7 @@ bool Floors::Walk(
 		const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + start.m_waypoint;
 		start.m_floor = (int)waypoint->floorNum;
 		start.m_tri = (int)waypoint->triNum;
+		start.m_pos = Vec3(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
 	} else if (start.m_floor != -1) { // arbitrary floor position
 		if (start.m_tri == -1) {
 			Vec3 x(start.m_pos + Vec3(0, 0, 8.f));
@@ -927,6 +926,7 @@ bool Floors::Walk(
 		const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + end.m_waypoint;
 		end.m_floor = (int)waypoint->floorNum;
 		end.m_tri = (int)waypoint->triNum;
+		end.m_pos = Vec3(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
 	} else if (end.m_floor != -1) { // arbitrary floor position
 		if (end.m_tri == -1) {
 			Vec3 x(end.m_pos + Vec3(0, 0, 8.f));
@@ -961,29 +961,30 @@ bool Floors::Walk(
 		waypointPos.m_waypoint = step.waypoint;
 		waypointPos.m_nextWaypoint = -1;
 		
-		// walk from floor -> waypoint (waypoint exiting floor)
-		if (current.m_floor >= 0) {
-			RAD_ASSERT(current.m_floor == waypointPos.m_floor);
+		if (step.connection != -1) {
+			// walk from waypoint->waypoint (through connection)
+			WalkConnection(step.waypoint, step.connection, walkRoute);
+		} else {
+			// walk from floor -> waypoint (waypoint exiting floor)
+			// check that we are exiting (may be on an exit waypoint at this step).
+	#if !defined(RAD_OPT_SHIP)
+			RAD_VERIFY(current.m_floor >= 0);
+			RAD_VERIFY(current.m_floor == waypointPos.m_floor);
+	#endif
 			workRoute->clear();
 			WalkFloor(current, waypointPos, workRoute);
-			std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*walkRoute));
+			std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*walkRoute)); 
 		}
 
-		// walk from waypoint->waypoint (through connection)
-		WalkConnection(step.waypoint, step.connection, walkRoute);
-
-		const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + step.connection;
-		int otherIdx = connection->waypoints[0] == step.waypoint;
-		const bsp_file::BSPWaypoint *otherWaypoint = m_bsp->Waypoints() + connection->waypoints[otherIdx];
-
-		current.m_floor = (int)otherWaypoint->floorNum;
-		current.m_tri = (int)otherWaypoint->triNum;
-		current.m_pos = Vec3(otherWaypoint->pos[0], otherWaypoint->pos[1], otherWaypoint->pos[2]);
+		current = waypointPos;
 	}
 
 	// walk.
-	if (current.m_floor >= 0) {
-		RAD_ASSERT(current.m_floor == end.m_floor);
+	if ((current.m_floor >= 0) && (end.m_waypoint == -1)) {
+		// entering a floor...
+#if !defined(RAD_OPT_SHIP)
+		RAD_VERIFY(current.m_floor == end.m_floor);
+#endif
 		workRoute->clear();
 		WalkFloor(current, end, workRoute);
 		std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*walkRoute));
@@ -1012,8 +1013,8 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 		if (cur.waypoints[0] != -1) { // waypoint move
 			step.waypoints[0] = cur.waypoints[0];
 			step.waypoints[1] = cur.waypoints[1];
-			step.floors[0] = cur.floors[0];
-			step.floors[1] = cur.floors[1];
+			step.floors[0] = -1;
+			step.floors[1] = -1;
 			step.connection = cur.connection;
 			step.flags = BSPConnectionFlagsToStateFlags(cur.flags);
 
@@ -1051,9 +1052,13 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 
 		const WalkStep &next = walkRoute[i+1];
 
+		// we walk to waypoints, cur.pos == next.waypoints.pos
+		if (next.waypoints[0] != -1)
+			continue;
+		
 		Vec3 ctrls[2];
-
-		Vec3 vNext(next.pos - cur.pos);
+		Vec3 vNext = next.pos - cur.pos;
+	
 		float nextLen = vNext.Normalize();
 		
 		// make move continous in X, Y. Preserve motion exactly in Z (don't want to float above/below
@@ -1063,7 +1068,7 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 			Vec3 prevPos;
 
 			if (prev.waypoints[0] != -1) {
-				const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + prev.waypoints[1];
+				const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + prev.waypoints[0];
 				prevPos.Initialize(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
 			} else {
 				prevPos = prev.pos;
@@ -1078,40 +1083,40 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 			ctrls[0].Normalize();
 			ctrls[0][2] = vNext[2]; // no longer normalized
 				
-			if (prev.waypoints[0] != -1) { // connect with previous waypoint move
-				const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + prev.waypoints[1];
-				const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + prev.connection;
-				int other = connection->waypoints[0] == prev.waypoints[0];
+			//if (prev.waypoints[0] != -1) { // connect with previous waypoint move
+			//	const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + prev.waypoints[1];
+			//	const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + prev.connection;
+			//	int other = connection->waypoints[0] == prev.waypoints[0];
 
-				Vec3 bzCtrls[4];
-				bzCtrls[0] = Vec3(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
-				
-				// invert ctrl point.
-				Vec3 z(connection->ctrls[other][0], connection->ctrls[other][1], connection->ctrls[other][2]);
-				z = z - bzCtrls[0];
-				z[2] = 0.f; // isolate Z
-				z.Normalize();
-				z[2] = vPrev[2];
+			//	Vec3 bzCtrls[4];
+			//	bzCtrls[0] = Vec3(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
+			//	
+			//	// invert ctrl point.
+			//	Vec3 z(connection->ctrls[other][0], connection->ctrls[other][1], connection->ctrls[other][2]);
+			//	z = z - bzCtrls[0];
+			//	z[2] = 0.f; // isolate Z
+			//	z.Normalize();
+			//	z[2] = vPrev[2];
 
-				float len = std::min(prevLen / 4.f, kSmoothness);
+			//	float len = std::min(prevLen / 4.f, kSmoothness);
 
-				bzCtrls[1] = bzCtrls[0] - (z*len);
-			
-				bzCtrls[2][0] = -ctrls[0][0];
-				bzCtrls[2][1] = -ctrls[0][1];
-				bzCtrls[2][3] = -vPrev[2];
+			//	bzCtrls[1] = bzCtrls[0] - (z*len);
+			//
+			//	bzCtrls[2][0] = -ctrls[0][0];
+			//	bzCtrls[2][1] = -ctrls[0][1];
+			//	bzCtrls[2][3] = -vPrev[2];
 
-				bzCtrls[2] = cur.pos + (bzCtrls[2] * len);
-				bzCtrls[3] = cur.pos;
+			//	bzCtrls[2] = cur.pos + (bzCtrls[2] * len);
+			//	bzCtrls[3] = cur.pos;
 
-				physics::CubicBZSpline spline(bzCtrls);
-				step.waypoints[0] = step.waypoints[1] = -1;
-				step.connection = -1;
-				step.flags = BSPConnectionFlagsToStateFlags(cur.flags);
-				step.floors[0] = step.floors[1] = cur.floors[0];
-				step.path.Load(spline);
-				moveRoute.steps->push_back(step);
-			}		
+			//	physics::CubicBZSpline spline(bzCtrls);
+			//	step.waypoints[0] = step.waypoints[1] = -1;
+			//	step.connection = -1;
+			//	step.flags = BSPConnectionFlagsToStateFlags(cur.flags);
+			//	step.floors[0] = step.floors[1] = cur.floors[0];
+			//	step.path.Load(spline);
+			//	moveRoute.steps->push_back(step);
+			//}		
 		} else {
 			ctrls[0] = vNext;
 		}
@@ -1119,23 +1124,31 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 		float len = std::min(nextLen / 4.f, kSmoothness);
 		ctrls[0] = cur.pos + (ctrls[0] * len);
 
-		if (next.waypoints[0] != -1) { // connect to waypoint
-			const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + next.waypoints[0];
-			const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + next.connection;
-			int self = connection->waypoints[1] == next.waypoints[0];
+		//if (next.waypoints[0] != -1) { // connect to waypoint
+		//	const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + next.waypoints[0];
+		//	const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + next.connection;
+		//	int self = connection->waypoints[1] == next.waypoints[0];
 
-			// invert ctrl point.
-			Vec3 z(connection->ctrls[self][0], connection->ctrls[self][1], connection->ctrls[self][2]);
-			z = z - next.pos;
-			z[2] = 0.f; // isolate Z
-			z.Normalize();
-			z[2] = vNext[2]; // no longer normalized
+		//	// invert ctrl point.
+		//	Vec3 z(connection->ctrls[self][0], connection->ctrls[self][1], connection->ctrls[self][2]);
+		//	z = z - next.pos;
+		//	z[2] = 0.f; // isolate Z
+		//	z.Normalize();
+		//	z[2] = vNext[2]; // no longer normalized
 
-			ctrls[1] = -z;
+		//	ctrls[1] = -z;
 
-		} else if (i < (kSize-2)) {
+		//} else 
+		if (i < (kSize-2)) {
 			const WalkStep &nextNext = walkRoute[i+2];
-			Vec3 vNextNext(nextNext.pos - next.pos);
+			Vec3 vNextNext;
+				
+			if (nextNext.waypoints[0] != -1) {
+				const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + nextNext.waypoints[1];
+				vNextNext = Vec3(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]) - next.pos;
+			} else {
+				vNextNext = nextNext.pos - next.pos;
+			}
 
 			float nnLen = vNextNext.Normalize();
 
@@ -1153,7 +1166,8 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 		ctrls[1] = next.pos + (ctrls[1]*len);
 
 		physics::CubicBZSpline spline(cur.pos, ctrls[0], ctrls[1], next.pos);
-		step.floors[0] = step.floors[1] = cur.floors[0];
+		step.floors[0] = cur.floors[0];
+		step.floors[1] = (next.waypoints[0] != -1) ? -1 : cur.floors[0];
 		step.waypoints[0] = -1;
 		step.waypoints[1] = next.waypoints[0];
 		step.connection = -1;
@@ -1178,7 +1192,7 @@ inline bool Floors::PlanMove(
 
 	if ((start.m_waypoint != -1) && (start.m_waypoint == end.m_waypoint))
 		return true; // at destination
-	if ((start.m_floor != -1) && (start.m_floor == end.m_floor))
+	if ((start.m_floor != -1) && (start.m_floor == end.m_floor) && (end.m_waypoint == -1))
 		return true; // at destination.
 
 	++m_floodNum;
@@ -1289,6 +1303,7 @@ inline bool Floors::PlanMove(
 				cur.connections->push_back(c);
 			}
 
+			RAD_ASSERT(start.m_floor != -1);
 			floors.set(start.m_floor);
 		}
 
@@ -1408,13 +1423,11 @@ inline bool Floors::PlanMove(
 				// we must be crossing a waypoint connection or be at an arbitrary floor position
 				RAD_ASSERT((c.connectionIdx != -1) || (cur.pos.m_floor != -1));
 
-				if (c.connectionIdx != -1) {
-					MoveStep step;
-					step.waypoint = c.nextWaypointIdx;
-					step.connection = c.connectionIdx;
-					planSoFar.steps->push_back(step);
-				}
-
+				MoveStep step;
+				step.waypoint = c.nextWaypointIdx;
+				step.connection = c.connectionIdx;
+				planSoFar.steps->push_back(step);
+				
 				stack->push_back(cur);
 
 				cur.idx = 0;
@@ -1584,7 +1597,7 @@ bool Floors::ClipToFloor(
 				pos.m_floor = (int)floorNum;
 				pos.m_waypoint = -1;
 				pos.m_nextWaypoint = -1;
-				bestTri = triNum;
+				bestTri = (int)i;
 				pos.m_tri = bestTri;
 			}
 		}
