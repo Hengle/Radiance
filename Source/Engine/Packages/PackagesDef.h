@@ -215,11 +215,7 @@ enum KFlags
 #if defined(RAD_OPT_PC)
 	#define P_TARGET_PLATFORM (pkg::P_TargetPC)
 #elif defined(RAD_OPT_IOS)
-#if defined(RAD_OPT_IPHONE)
-	#define P_TARGET_PLATFORM (pkg::P_TargetIPhone)
-#else
-	#define P_TARGET_PLATFORM (pkg::P_TargetIPad)
-#endif
+#define P_TARGET_PLATFORM (pkg::P_TargetiOS)
 #else
 #error RAD_ERROR_UNSUP_PLAT
 #endif
