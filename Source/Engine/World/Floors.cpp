@@ -585,8 +585,10 @@ void Floors::WalkFloor(
 				int edgeNum = tri->edges[cur.edges[curEdge].idx];
 				
 				const bsp_file::BSPFloorEdge *edge = m_bsp->FloorEdges() + edgeNum;
-				int otherSide = edge->tris[0] == cur.pos.m_tri;
-				int otherTriNum = (int)edge->tris[otherSide] - (int)floor->firstTri;
+				int otherSide = edge->tris[0] == (cur.pos.m_tri + floor->firstTri);
+				int otherTriNum = (int)edge->tris[otherSide];
+				if (otherTriNum != -1)
+					otherTriNum -= (int)floor->firstTri;
 
 				if ((otherTriNum != -1) && !visited.test(otherTriNum)) {
 					Vec3 mid = FindEdgePoint(cur.pos.m_pos, edge);
@@ -973,6 +975,12 @@ bool Floors::Walk(
 	#endif
 			workRoute->clear();
 			WalkFloor(current, waypointPos, workRoute);
+#if !defined(RAD_OPT_SHIP)
+			if (workRoute->size() < 2) {
+				int b = 0;
+			}
+			RAD_VERIFY(workRoute->size() > 1);
+#endif
 			std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*walkRoute)); 
 		}
 
@@ -987,6 +995,12 @@ bool Floors::Walk(
 #endif
 		workRoute->clear();
 		WalkFloor(current, end, workRoute);
+#if !defined(RAD_OPT_SHIP)
+		if (workRoute->size() < 2) {
+			int b = 0;
+		}
+		RAD_VERIFY(workRoute->size() > 1);
+#endif
 		std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*walkRoute));
 	} else { // waypoint move didn't generate a plan because we are at our destination waypoint already.
 		if (walkRoute->empty())
@@ -1046,7 +1060,9 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 		}
 
 		if (i >= (kSize-1)) {
-			RAD_ASSERT(!moveRoute.steps->empty());
+#if !defined(RAD_OPT_SHIP)
+			RAD_VERIFY(!moveRoute.steps->empty());
+#endif
 			break; // no more moves
 		}
 
@@ -1083,40 +1099,6 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 			ctrls[0].Normalize();
 			ctrls[0][2] = vNext[2]; // no longer normalized
 				
-			//if (prev.waypoints[0] != -1) { // connect with previous waypoint move
-			//	const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + prev.waypoints[1];
-			//	const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + prev.connection;
-			//	int other = connection->waypoints[0] == prev.waypoints[0];
-
-			//	Vec3 bzCtrls[4];
-			//	bzCtrls[0] = Vec3(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
-			//	
-			//	// invert ctrl point.
-			//	Vec3 z(connection->ctrls[other][0], connection->ctrls[other][1], connection->ctrls[other][2]);
-			//	z = z - bzCtrls[0];
-			//	z[2] = 0.f; // isolate Z
-			//	z.Normalize();
-			//	z[2] = vPrev[2];
-
-			//	float len = std::min(prevLen / 4.f, kSmoothness);
-
-			//	bzCtrls[1] = bzCtrls[0] - (z*len);
-			//
-			//	bzCtrls[2][0] = -ctrls[0][0];
-			//	bzCtrls[2][1] = -ctrls[0][1];
-			//	bzCtrls[2][3] = -vPrev[2];
-
-			//	bzCtrls[2] = cur.pos + (bzCtrls[2] * len);
-			//	bzCtrls[3] = cur.pos;
-
-			//	physics::CubicBZSpline spline(bzCtrls);
-			//	step.waypoints[0] = step.waypoints[1] = -1;
-			//	step.connection = -1;
-			//	step.flags = BSPConnectionFlagsToStateFlags(cur.flags);
-			//	step.floors[0] = step.floors[1] = cur.floors[0];
-			//	step.path.Load(spline);
-			//	moveRoute.steps->push_back(step);
-			//}		
 		} else {
 			ctrls[0] = vNext;
 		}
@@ -1124,21 +1106,6 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 		float len = std::min(nextLen / 4.f, kSmoothness);
 		ctrls[0] = cur.pos + (ctrls[0] * len);
 
-		//if (next.waypoints[0] != -1) { // connect to waypoint
-		//	const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + next.waypoints[0];
-		//	const bsp_file::BSPWaypointConnection *connection = m_bsp->WaypointConnections() + next.connection;
-		//	int self = connection->waypoints[1] == next.waypoints[0];
-
-		//	// invert ctrl point.
-		//	Vec3 z(connection->ctrls[self][0], connection->ctrls[self][1], connection->ctrls[self][2]);
-		//	z = z - next.pos;
-		//	z[2] = 0.f; // isolate Z
-		//	z.Normalize();
-		//	z[2] = vNext[2]; // no longer normalized
-
-		//	ctrls[1] = -z;
-
-		//} else 
 		if (i < (kSize-2)) {
 			const WalkStep &nextNext = walkRoute[i+2];
 			Vec3 vNextNext;
