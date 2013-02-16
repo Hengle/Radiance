@@ -1142,8 +1142,8 @@ void Marshal<world::Trace>::Push(lua_State *L, const world::Trace &val) {
 	lua_setfield(L, -2, "_end");
 	Marshal<Vec3>::Push(L, val.normal);
 	lua_setfield(L, -2, "normal");
-	Marshal<Vec3>::Push(L, val.traceend);
-	lua_setfield(L, -2, "traceend");
+	Marshal<Vec3>::Push(L, val.traceEnd);
+	lua_setfield(L, -2, "traceEnd");
 	lua_pushinteger(L, val.contents);
 	lua_setfield(L, -2, "contents");
 	lua_pushnumber(L, val.frac);

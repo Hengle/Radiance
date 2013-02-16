@@ -108,7 +108,7 @@ struct dAreaportal {
 struct Trace {
 	Vec3 start;
 	Vec3 end;
-	Vec3 traceend;
+	Vec3 traceEnd;
 	Vec3 normal;
 	int contents;
 	float frac;

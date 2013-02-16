@@ -600,7 +600,7 @@ bool World::LineTrace(Trace &trace) {
 	if (!leaf) {
 		trace.startSolid = true;
 		trace.contents = bsp_file::kContentsFlag_Solid;
-		trace.traceend = trace.start;
+		trace.traceEnd = trace.start;
 		trace.frac = 0.f;
 		return true;
 	}
@@ -610,13 +610,13 @@ bool World::LineTrace(Trace &trace) {
 	if (leaf->contents & solidTrace) {
 		trace.contents = leaf->contents;
 		trace.startSolid = true;
-		trace.traceend = trace.start;
+		trace.traceEnd = trace.start;
 		trace.frac = 0.f;
 		return true;
 	}
 
 	trace.startSolid = false;
-	trace.traceend = trace.start;
+	trace.traceEnd = trace.start;
 	trace.frac = 1.f;
 
 	bool r;
@@ -628,7 +628,7 @@ bool World::LineTrace(Trace &trace) {
 
 	if (r) {
 		float l = (trace.end - trace.start).MagnitudeSquared();
-		float d = (trace.traceend - trace.start).MagnitudeSquared();
+		float d = (trace.traceEnd - trace.start).MagnitudeSquared();
 		trace.frac = (l != 0.f) ? (d / l) : 1.f;
 	}
 
@@ -668,7 +668,7 @@ bool World::LineTrace(Trace &trace, const Vec3 &a, const Vec3 &b, int nodeNum) {
 
 			trace.contents = surface->contents;
 			trace.normal = m_planes[surface->planenum].Normal();
-			trace.traceend = intersection;
+			trace.traceEnd = intersection;
 			return true;
 		}
 
