@@ -38,6 +38,10 @@ bool BSPBuilder::CompileAreas() {
 			continue;
 		if (m->contents&kContentsFlag_Floor)
 			continue;
+		if (m->contents&kContentsFlag_Areaportal)
+			continue;
+		if (m->contents&kContentsFlag_Clip)
+			continue;
 
 		DecomposeAreaModel(*m);
 		if (m_ui) {
@@ -61,10 +65,7 @@ bool BSPBuilder::CompileAreas() {
 }
 
 void BSPBuilder::DecomposeAreaModel(SceneFile::TriModel &model) {
-	if (model.contents&kContentsFlag_Areaportal)
-		return;
-//	if (model.contents & Map::ContentsNoDraw) return;
-
+	
 	// push each triangle into the bsp, and assign areas.
 	bool solid = (model.contents&kContentsFlag_Solid) ? true : false;
 
@@ -76,7 +77,7 @@ void BSPBuilder::DecomposeAreaModel(SceneFile::TriModel &model) {
 	}
 
 	bool foundArea = false;
-	//int numNoDrawFaces = 0;
+	int numNoDrawFaces = 0;
 
 	for (SceneFile::TriFaceVec::const_iterator it = model.tris.begin(); it != model.tris.end(); ++it) {
 		if (++m_work % 1000 == 0)
@@ -85,10 +86,10 @@ void BSPBuilder::DecomposeAreaModel(SceneFile::TriModel &model) {
 		const SceneFile::TriFace &tri = *it;
 		if (tri.outside)
 			continue;
-		/*if (tri.surface & kSurfaceFlag_NoDraw) {
+		if (tri.surface & kSurfaceFlag_NoDraw) {
 			++numNoDrawFaces;
 			continue;
-		}*/
+		}
 
 		AreaPoly *poly = new (world::bsp_file::ZBSPBuilder) AreaPoly();
 		poly->plane = ToBSPType(tri.plane);
@@ -100,8 +101,6 @@ void BSPBuilder::DecomposeAreaModel(SceneFile::TriModel &model) {
 		poly->tri = const_cast<SceneFile::TriFace*>(&tri);
 		DecomposeAreaPoly(m_root.get(), poly);
 
-		//RAD_ASSERT(!tri.areas.empty());
-
 		if (tri.areas.empty()) {
 			++m_numOutsideTris;
 		} else {
@@ -112,7 +111,9 @@ void BSPBuilder::DecomposeAreaModel(SceneFile::TriModel &model) {
 
 	if (!foundArea) {
 		model.outside = true;
-		Log("\nWARNING: '%s' has no visible surfaces inside hull.\n", model.name.c_str.get());
+		if (!(model.contents&kContentsFlag_Solid)) {
+			Log("\nWARNING: '%s' has no visible surfaces inside hull.\n", model.name.c_str.get());
+		}
 	}
 
 	if (model.outside) {

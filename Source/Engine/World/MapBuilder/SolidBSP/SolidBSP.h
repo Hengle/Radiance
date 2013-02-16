@@ -310,6 +310,7 @@ private:
 		}
 
 		TriModelFragVec models;
+		TriModelFragVec clipModels;
 		BBox bounds;
 		WindingVec windingBounds;
 		Node *parent;
@@ -613,8 +614,30 @@ private:
 
 	void LeafNode(Node *node);
 	void Split(Node *node);
-	void SplitNodeBounds(Node *node, const Plane &p, BBox &front, WindingVec &frontVec, BBox &back, WindingVec &backVec);
-	void Split(const TriModelFragRef &model, const Plane &p, int planenum, TriModelFragRef &front, TriModelFragRef &back);
+
+	void SplitNodeBounds(
+		Node *node, 
+		const Plane &p, 
+		BBox &front, 
+		WindingVec &frontVec, 
+		BBox &back, 
+		WindingVec &backVec
+	);
+	
+	void Split(
+		const TriModelFragRef &model, 
+		const Plane &p, 
+		int planenum, 
+		TriModelFragRef &front, 
+		TriModelFragRef &back,
+		ValueType epsilon
+	);
+
+	void InsertClipModel(
+		const TriModelFragRef &model,
+		Node *node
+	);
+	
 	bool MarkNodePolys(int planenum, const TriModelFragRef &m);
 	void MarkDetail();
 	void Portalize();
@@ -637,6 +660,7 @@ private:
 	bool CheckAreas(Node *node);
 	bool FindAreas(Node *node);
 	bool CompileAreas();
+	void CompileClipModels();
 	void DecomposeAreaModel(SceneFile::TriModel &model);
 	void DecomposeAreaPoly(Node *node, AreaPoly *poly);
 	int FindSplitPlane(Node *node);
@@ -660,8 +684,8 @@ private:
 	int EmitBSPBrush(const SceneFile::Brush &brush);
 	int EmitBSPModel(const EmitTriModel &model);
 	S32 EmitBSPNodes(const Node *node, S32 parent);
-	void EmitBSPClipSurfaces(const Node *node, world::bsp_file::BSPLeaf *leaf);
-	void EmitBSPClipBevels(world::bsp_file::BSPLeaf *leaf);
+	void EmitBSPClipModels(const Node *node, world::bsp_file::BSPLeaf *leaf);
+	void EmitBSPClipModel(const TriModelFragRef &model);
 	void EmitBSPPlanes();
 	bool EmitBSPFloors();
 	void EmitBSPWaypoints();

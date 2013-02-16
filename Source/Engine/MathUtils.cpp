@@ -232,3 +232,43 @@ RADENG_API void RADENG_CALL FrameVecs(const Vec3 &fwd, Vec3 &up, Vec3 &left) {
 	left = up.Cross(fwd);
 	up = fwd.Cross(left);
 }
+
+RADENG_API bool RADENG_CALL RayIntersectsBBox(const Vec3 &_a, const Vec3 &_b, const BBox &bounds) {
+	Vec3 a(_a);
+	Vec3 b(_b);
+	Plane::SideType sides[2];
+
+	for (int i = 0; i < 2; ++i) {
+		for (int k = 0; k < 3; ++k) {
+			Vec3 normal(Vec3::Zero);
+			normal[k] = (i == 0) ? -1.f : 1.f;
+
+			Plane plane(normal, (i==0) ? -bounds.Mins()[k] : bounds.Maxs()[k]);
+			sides[0] = plane.Side(a, 0.f);
+			sides[1] = plane.Side(b, 0.f);
+
+			if (sides[0] == Plane::On)
+				sides[0] = sides[1];
+			if (sides[1] == Plane::On)
+				sides[1] = sides[0];
+
+			if (((sides[0] == Plane::On) || (sides[0] == Plane::Front)) && (sides[0] == sides[1]))
+				return false; // all on front
+
+			if (sides[0] != sides[1]) {
+				// cross
+				Vec3 mid;
+				plane.IntersectLineSegment(mid, a, b, 0.f);
+				if (sides[0] == Plane::Front) {
+					a = mid;
+				} else {
+					RAD_ASSERT(sides[1] == Plane::Front);
+					b = mid;
+				}
+			}
+		}
+	}
+	
+	// ray passes through bbox
+	return true;
+}

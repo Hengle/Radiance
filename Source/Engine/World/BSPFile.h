@@ -35,11 +35,11 @@ Contents & Surface Flags
 enum ContentsFlags {
 	RAD_FLAG(kContentsFlag_Areaportal),
 	RAD_FLAG(kContentsFlag_Solid),
-	RAD_FLAG(kContentsFlag_Clip),
 	RAD_FLAG(kContentsFlag_Fog),
 	RAD_FLAG(kContentsFlag_Water),
 
 	// Not in BSP
+	RAD_FLAG(kContentsFlag_Clip),
 	RAD_FLAG(kContentsFlag_Detail),
 	RAD_FLAG(kContentsFlag_Floor),
 
@@ -48,8 +48,8 @@ enum ContentsFlags {
 	kContentsFlag_LastVisibleContents = kContentsFlag_Water,
 	kContentsFlag_Structural = kContentsFlag_Solid|kContentsFlag_Areaportal, // just used for classification
 	kContentsFlag_SolidContents = kContentsFlag_Solid, // blocks portal flood
-	kContentsFlag_BSPContents = kContentsFlag_Areaportal|kContentsFlag_Solid|kContentsFlag_Clip|kContentsFlag_Fog|kContentsFlag_Water,
-	kContentsFlag_EmitContents = kContentsFlag_Detail
+	kContentsFlag_BSPContents = kContentsFlag_Areaportal|kContentsFlag_Solid|kContentsFlag_Fog|kContentsFlag_Water,
+	kContentsFlag_DetailContents = kContentsFlag_Detail|kContentsFlag_Clip
 };
 
 enum SurfaceFlags {
@@ -76,6 +76,13 @@ struct BSPLeaf {
 	S32 parent;
 	S32 area;
 	U32 contents;
+	U32 firstClipModel;
+	U32 numClipModels;
+	float mins[3];
+	float maxs[3];
+};
+
+struct BSPClipModel {
 	U32 firstClipSurface;
 	U32 numClipSurfaces;
 	float mins[3];
@@ -83,13 +90,12 @@ struct BSPLeaf {
 };
 
 struct BSPClipSurface {
-	enum {
-		RAD_FLAG(kFlag_Bevel)
-	};
 	U32 flags;
 	U32 contents;
 	U32 surface;
-	U32 planenum; // faces out of the leaf
+	U32 planenum;
+	U32 firstEdgePlane;
+	U32 numEdgePlanes;
 };
 
 struct BSPArea {
@@ -236,7 +242,9 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numModels, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numModelIndices, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numBrushes, U32);
+	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numClipModels, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numClipSurfaces, U32);
+	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numClipEdgePlanes, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numVerts, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numIndices, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numMaterials, U32);
@@ -265,7 +273,9 @@ public:
 	virtual const BSPModel *Models() const = 0;
 	virtual const U16 *ModelIndices() const = 0;
 	virtual const BSPBrush *Brushes() const = 0;
+	virtual const BSPClipModel *ClipModels() const = 0;
 	virtual const BSPClipSurface *ClipSurfaces() const = 0;
+	virtual const BSPPlane *ClipEdgePlanes() const = 0;
 	virtual const BSPWaypoint *Waypoints() const = 0;
 	virtual const U16 *WaypointIndices() const = 0;
 	virtual const BSPWaypointConnection *WaypointConnections() const = 0;
@@ -294,7 +304,9 @@ protected:
 	virtual RAD_DECLARE_GET(numAreas, U32) = 0;
 	virtual RAD_DECLARE_GET(numAreaportals, U32) = 0;
 	virtual RAD_DECLARE_GET(numAreaportalIndices, U32) = 0;
+	virtual RAD_DECLARE_GET(numClipModels, U32) = 0;
 	virtual RAD_DECLARE_GET(numClipSurfaces, U32) = 0;
+	virtual RAD_DECLARE_GET(numClipEdgePlanes, U32) = 0;
 	virtual RAD_DECLARE_GET(numModels, U32) = 0;
 	virtual RAD_DECLARE_GET(numModelIndices, U32) = 0;
 	virtual RAD_DECLARE_GET(numBrushes, U32) = 0;
@@ -342,7 +354,9 @@ public:
 	virtual const BSPModel *Models() const;
 	virtual const U16 *ModelIndices() const;
 	virtual const BSPBrush *Brushes() const;
+	virtual const BSPClipModel *ClipModels() const;
 	virtual const BSPClipSurface *ClipSurfaces() const;
+	virtual const BSPPlane *ClipEdgePlanes() const;
 	virtual const BSPWaypoint *Waypoints() const;
 	virtual const U16 *WaypointIndices() const;
 	virtual const BSPWaypointConnection *WaypointConnections() const;
@@ -373,7 +387,9 @@ private:
 	virtual RAD_DECLARE_GET(numAreas, U32);
 	virtual RAD_DECLARE_GET(numAreaportals, U32);
 	virtual RAD_DECLARE_GET(numAreaportalIndices, U32);
+	virtual RAD_DECLARE_GET(numClipModels, U32);
 	virtual RAD_DECLARE_GET(numClipSurfaces, U32);
+	virtual RAD_DECLARE_GET(numClipEdgePlanes, U32);
 	virtual RAD_DECLARE_GET(numModels, U32);
 	virtual RAD_DECLARE_GET(numModelIndices, U32);
 	virtual RAD_DECLARE_GET(numBrushes, U32);
@@ -408,7 +424,9 @@ private:
 	const BSPModel *m_models;
 	const U16 *m_modelIndices;
 	const BSPBrush *m_brushes;
+	const BSPClipModel *m_clipModels;
 	const BSPClipSurface *m_clipSurfaces;
+	const BSPPlane *m_clipEdgePlanes;
 	const BSPPlane *m_planes;
 	const BSPVertex *m_verts;
 	const BSPVertex *m_normals;
@@ -435,11 +453,13 @@ private:
 	U32 m_numAreas;
 	U32 m_numAreaportals;
 	U32 m_numAreaportalIndices;
+	U32 m_numClipModels;
 	U32 m_numClipSurfaces;
 	U32 m_numModels;
 	U32 m_numModelIndices;
 	U32 m_numBrushes;
 	U32 m_numPlanes;
+	U32 m_numClipEdgePlanes;
 	U32 m_numVerts;
 	U32 m_numTexCoords[kMaxUVChannels];
 	U32 m_numIndices;
@@ -480,7 +500,9 @@ public:
 	virtual const BSPModel *Models() const;
 	virtual const U16 *ModelIndices() const;
 	virtual const BSPBrush *Brushes() const;
+	virtual const BSPClipModel *ClipModels() const;
 	virtual const BSPClipSurface *ClipSurfaces() const;
+	virtual const BSPPlane *ClipEdgePlanes() const;
 	virtual const BSPWaypoint *Waypoints() const;
 	virtual const U16 *WaypointIndices() const;
 	virtual const BSPWaypointConnection *WaypointConnections() const;
@@ -509,7 +531,9 @@ public:
 	void ReserveAreas(int num);
 	void ReserveAreaportals(int num);
 	void ReserveAreaportalIndices(int num);
+	void ReserveClipModels(int num);
 	void ReserveClipSurfaces(int num);
+	void ReserveClipEdgePlanes(int num);
 	void ReserveModels(int num);
 	void ReserveModelIndices(int num);
 	void ReserveBrushes(int num);
@@ -539,7 +563,9 @@ public:
 	BSPArea *AddArea();
 	BSPAreaportal *AddAreaportal();
 	U16 *AddAreaportalIndex();
+	BSPClipModel *AddClipModel();
 	BSPClipSurface *AddClipSurface();
+	BSPPlane *AddClipEdgePlane();
 	BSPModel *AddModel();
 	U16 *AddModelIndex();
 	BSPBrush *AddBrush();
@@ -577,7 +603,9 @@ protected:
 	virtual RAD_DECLARE_GET(numAreaportals, U32);
 	virtual RAD_DECLARE_GET(numModels, U32);
 	virtual RAD_DECLARE_GET(numBrushes, U32);
+	virtual RAD_DECLARE_GET(numClipModels, U32);
 	virtual RAD_DECLARE_GET(numClipSurfaces, U32);
+	virtual RAD_DECLARE_GET(numClipEdgePlanes, U32);
 	virtual RAD_DECLARE_GET(numVerts, U32);
 	virtual RAD_DECLARE_GET(numAreaportalIndices, U32);
 	virtual RAD_DECLARE_GET(numModelIndices, U32);
@@ -605,6 +633,7 @@ protected:
 	typedef zone_vector<BSPAreaportal, ZBSPBuilderT>::type BSPAreaportalVec;
 	typedef zone_vector<BSPModel, ZBSPBuilderT>::type BSPModelVec;
 	typedef zone_vector<BSPBrush, ZBSPBuilderT>::type BSPBrushVec;
+	typedef zone_vector<BSPClipModel, ZBSPBuilderT>::type BSPClipModelVec;
 	typedef zone_vector<BSPClipSurface, ZBSPBuilderT>::type BSPClipSurfaceVec;
 	typedef zone_vector<BSPPlane, ZBSPBuilderT>::type BSPPlaneVec;
 	typedef zone_vector<BSPVertex, ZBSPBuilderT>::type BSPVertexVec;
@@ -634,7 +663,9 @@ protected:
 	BSPModelVec m_models;
 	BSPIndexVec m_modelIndices;
 	BSPBrushVec m_brushes;
+	BSPClipModelVec m_clipModels;
 	BSPClipSurfaceVec m_clipSurfaces;
+	BSPPlaneVec m_clipEdgePlanes;
 	BSPPlaneVec m_planes;
 	BSPVertexVec m_vertices;
 	BSPWaypointVec m_waypoints;

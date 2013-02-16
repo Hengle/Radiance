@@ -784,8 +784,8 @@ void World::LoadBSP(const bsp_file::BSPFile &bsp) {
 		l.parent = (int)x->parent;
 		l.area = (int)x->area;
 		l.contents = (int)x->contents;
-		l.firstClipSurface = (int)x->firstClipSurface;
-		l.numClipSurfaces = (int)x->numClipSurfaces;
+		l.firstClipModel = (int)x->firstClipModel;
+		l.numClipModels = (int)x->numClipModels;
 		l.bounds.Initialize(x->mins[0], x->mins[1], x->mins[2], x->maxs[0], x->maxs[1], x->maxs[2]);
 		m_leafs.push_back(l);
 	}

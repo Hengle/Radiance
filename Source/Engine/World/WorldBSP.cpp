@@ -600,39 +600,78 @@ bool World::LineTrace(Trace &trace) {
 	if (!leaf) {
 		trace.startSolid = true;
 		trace.contents = bsp_file::kContentsFlag_Solid;
-		trace.result = trace.start;
+		trace.traceend = trace.start;
 		trace.frac = 0.f;
-		return false;
+		return true;
 	}
 
-	if (leaf->contents & trace.contents) {
+	int solidTrace = trace.contents & ~bsp_file::kContentsFlag_Clip;
+
+	if (leaf->contents & solidTrace) {
 		trace.contents = leaf->contents;
 		trace.startSolid = true;
-		trace.result = trace.start;
+		trace.traceend = trace.start;
 		trace.frac = 0.f;
-		return false;
+		return true;
 	}
 
 	trace.startSolid = false;
-	trace.result = trace.start;
+	trace.traceend = trace.start;
 	trace.frac = 1.f;
 
-	if (m_nodes.empty())
-		return LineTrace(trace, -1);
-	return LineTrace(trace, 0);
+	bool r;
+	if (m_nodes.empty()) {
+		r = LineTrace(trace, trace.start, trace.end, -1);
+	} else {
+		r = LineTrace(trace, trace.start, trace.end, 0);
+	}
+
+	if (r) {
+		float l = (trace.end - trace.start).MagnitudeSquared();
+		float d = (trace.traceend - trace.start).MagnitudeSquared();
+		trace.frac = (l != 0.f) ? (d / l) : 1.f;
+	}
+
+	return r;
 }
 
-bool World::LineTrace(Trace &trace, int nodeNum) {
+bool World::LineTrace(Trace &trace, const Vec3 &a, const Vec3 &b, int nodeNum) {
 	if (nodeNum < 0) {
 		int leafNum = -(nodeNum + 1);
 		const dBSPLeaf &leaf = m_leafs[leafNum];
 
 		// it's not gonna hit this leaf.
 		if (!(leaf.contents&trace.contents))
-			return true;
+			return false;
+		
+		if (trace.contents&bsp_file::kContentsFlag_Clip) {
+			if (leaf.numClipModels < 1)
+				return false;
 
-		trace.contents = leaf.contents;
-		RAD_ASSERT(trace.frac < 1.f);
+			float bestDistance = std::numeric_limits<float>::max();
+			const bsp_file::BSPClipSurface *surface = 0;
+			Vec3 intersection;
+
+			for (int i = 0; i < leaf.numClipModels; ++i) {
+				RayIntersectsClipModel(
+					i+leaf.firstClipModel,
+					a,
+					b,
+					bestDistance,
+					intersection,
+					surface
+				);
+			}
+
+			if (!surface)
+				return false;
+
+			trace.contents = surface->contents;
+			trace.normal = m_planes[surface->planenum].Normal();
+			trace.traceend = intersection;
+			return true;
+		}
+
 		return false;
 	}
 
@@ -641,8 +680,8 @@ bool World::LineTrace(Trace &trace, int nodeNum) {
 	const Plane &plane = m_planes[node.planenum];
 
 	Plane::SideType sides[2];
-	sides[0] = plane.Side(trace.result);
-	sides[1] = plane.Side(trace.end);
+	sides[0] = plane.Side(a);
+	sides[1] = plane.Side(b);
 
 	if (sides[0] == Plane::On)
 		sides[0] = sides[1];
@@ -654,31 +693,19 @@ bool World::LineTrace(Trace &trace, int nodeNum) {
 			sides[0] = Plane::Front;
 			sides[1] = Plane::Front;
 		}
+		return LineTrace(trace, a, b, node.children[sides[0] == Plane::Back]);
 	}
 
-	if (!LineTrace(trace, node.children[sides[0] == Plane::Back]))
-		return false; // hit on result side
-	
-	if (sides[1] != sides[0]) {
-		// cross
-		Vec3 result;
-		if (plane.IntersectLineSegment(result, trace.result, trace.end)) {
-			float l = (trace.end - trace.start).MagnitudeSquared();
-			float d = (result - trace.start).MagnitudeSquared();
-			float frac = (l != 0.f) ? (d / l) : 1.f;
-			std::swap(trace.result, result);
-			std::swap(trace.frac, frac);
-			bool r = LineTrace(trace, node.children[sides[1] == Plane::Back]);
-			if (!r)
-				return false;
-
-			// did not intersect
-			trace.result = result; // restore.
-			trace.frac = frac;
-		}
+	// cross
+	Vec3 mid;
+	if (plane.IntersectLineSegment(mid, a, b)) {
+		if (LineTrace(trace, a, mid, node.children[sides[0] == Plane::Back]))
+			return true;
+		if (LineTrace(trace, mid, b, node.children[sides[1] == Plane::Back]))
+			return true;
 	}
 
-	return true;
+	return false;
 }
 
 Entity::Ref World::FirstEntityTouchingBrush(int classbits, int brushNum) const {
@@ -790,6 +817,58 @@ bool World::IsBBoxInsideBrushHull(const BBox &bbox, const bsp_file::BSPBrush *br
 	}
 
 	return true;
+}
+
+bool World::RayIntersectsClipModel(
+	int modelNum, 
+	const Vec3 &a, 
+	const Vec3 &b, 
+	float &bestDistance,
+	Vec3 &intersection,
+	const bsp_file::BSPClipSurface *& outSurf
+) {
+	const bsp_file::BSPClipModel *model = m_bsp->ClipModels() + modelNum;
+
+	BBox bounds(
+		model->mins[0], model->mins[1], model->mins[2],
+		model->maxs[0], model->maxs[1], model->maxs[2]
+	);
+
+	if (!RayIntersectsBBox(a, b, bounds))
+		return false;
+
+	bool intersects = false;
+
+	for (U32 i = 0; i < model->numClipSurfaces; ++i) {
+		const bsp_file::BSPClipSurface *surf = m_bsp->ClipSurfaces() + model->firstClipSurface + i;
+		const Plane &plane = m_planes[surf->planenum];
+
+		Vec3 mid;
+		if (plane.IntersectLineSegment(mid, a, b, 0.f)) {
+			Vec3 dd = (mid - a);
+			float len = dd.Normalize();
+			if (len < bestDistance) {
+				// inside polygon?
+				U32 k;
+				for (k = 0; k < surf->numEdgePlanes; ++k) {
+					const bsp_file::BSPPlane *pplane = m_bsp->ClipEdgePlanes() + surf->firstEdgePlane + k;
+					const Plane kPlane(pplane->p[0], pplane->p[1], pplane->p[2], pplane->p[3]);
+					if (kPlane.Side(mid, 0.f) != Plane::Front)
+						break;
+				}
+
+				if (k == surf->numEdgePlanes) {
+					// inside hull
+					outSurf = surf;
+					bestDistance = len;
+					intersection = mid;
+					intersects = true;
+				}
+			}
+		}
+	}
+
+	return intersects;
 }
 
 } // world

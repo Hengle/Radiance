@@ -76,8 +76,8 @@ struct dBSPLeaf {
 	int parent;
 	int area;
 	int contents;
-	int firstClipSurface;
-	int numClipSurfaces;
+	int firstClipModel;
+	int numClipModels;
 
 	EntityPtrSet occupants;
 };
@@ -108,7 +108,8 @@ struct dAreaportal {
 struct Trace {
 	Vec3 start;
 	Vec3 end;
-	Vec3 result;
+	Vec3 traceend;
+	Vec3 normal;
 	int contents;
 	float frac;
 	bool startSolid;

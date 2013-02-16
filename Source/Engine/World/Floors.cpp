@@ -412,7 +412,7 @@ int Floors::PickWaypoint(
 			trace.start = m_world->camera->pos;
 			trace.end = kPos;
 			trace.contents = bsp_file::kContentsFlag_SolidContents|bsp_file::kContentsFlag_Clip;
-			if (m_world->LineTrace(trace)) {
+			if (!m_world->LineTrace(trace)) {
 				// did not collide with world
 				Candidate c;
 				c.idx = (int)i;
@@ -1590,7 +1590,7 @@ bool Floors::ClipToFloor(
 			trace.contents = bsp_file::kContentsFlag_Solid|bsp_file::kContentsFlag_Clip;
 			
 			// debug tools don't give us a world object.
-			if (m_world && m_world->LineTrace(trace)) {
+			if (m_world && !m_world->LineTrace(trace)) {
 				// did not collide with world.
 				bestDistSq = distSq;
 				pos.m_pos = clip;

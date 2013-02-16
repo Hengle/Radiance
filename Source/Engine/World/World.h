@@ -134,7 +134,7 @@ public:
 	);
 
 	//! Trace a line through the world BSP.
-	//! returns true if trace.start->trace.end was not blocked, false otherwise.
+	//! returns true if trace.start->trace.end was blocked, false otherwise.
 	bool LineTrace(Trace &trace);
 
 	Entity::Vec EntitiesTouchingBrush(int classbits, int brushNum) const;
@@ -279,6 +279,15 @@ private:
 	void LinkEntity(Entity *entity, const BBox &bounds);
 	void UnlinkEntity(Entity *entity);
 	bool IsBBoxInsideBrushHull(const BBox &bbox, const bsp_file::BSPBrush *brush) const;
+	
+	bool RayIntersectsClipModel(
+		int modelNum, 
+		const Vec3 &a, 
+		const Vec3 &b, 
+		float &bestDistance,
+		Vec3 &intersection,
+		const bsp_file::BSPClipSurface *& surface
+	);
 
 	struct LinkEntityParms {
 
@@ -330,7 +339,7 @@ private:
 		int fromArea
 	);
 
-	bool LineTrace(Trace &trace, int node);
+	bool LineTrace(Trace &trace, const Vec3 &a, const Vec3 &b, int node);
 
 	dBSPLeaf *LeafForPoint(const Vec3 &pos);
 	dBSPLeaf *LeafForPoint(const Vec3 &pos, int nodeNum);

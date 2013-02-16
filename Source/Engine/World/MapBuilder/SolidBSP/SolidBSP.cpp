@@ -243,6 +243,9 @@ void BSPBuilder::Build()
 		return;
 	if (!CompileAreas())
 		return;
+	
+	CompileClipModels();
+	
 	if (!EmitBSPFile())
 		return;
 
@@ -362,7 +365,7 @@ void BSPBuilder::Split(Node *node) {
 
 		if (onNode || s == Plane::Cross || s == Plane::On) {
 			TriModelFragRef front, back;
-			Split(m, p, planenum, front, back);
+			Split(m, p, planenum, front, back, kBSPSplitEpsilon);
 			if (front) {
 				node->children[0]->models.push_back(front);
 			}
@@ -479,7 +482,8 @@ void BSPBuilder::Split(
 	const Plane &p, 
 	int planenum, 
 	TriModelFragRef &front, 
-	TriModelFragRef &back
+	TriModelFragRef &back,
+	ValueType epsilon
 ) {
 
 	front.reset(new (world::bsp_file::ZBSPBuilder) TriModelFrag());
@@ -498,7 +502,7 @@ void BSPBuilder::Split(
 			s = Plane::Front;
 			RAD_ASSERT(poly->onNode);
 		} else {
-			s = poly->winding->Side(p, kBSPSplitEpsilon);
+			s = poly->winding->Side(p, epsilon);
 			if (s == Plane::On) {
 				s = poly->winding->MajorSide(p, ValueType(0));
 				RAD_ASSERT(s != Plane::On);
@@ -525,7 +529,7 @@ void BSPBuilder::Split(
 			RAD_ASSERT(f->onNode == poly->onNode);
 			RAD_ASSERT(b->onNode == poly->onNode);
 
-			poly->winding->Split(p, f->winding.get(), b->winding.get(), kBSPSplitEpsilon);
+			poly->winding->Split(p, f->winding.get(), b->winding.get(), epsilon);
 
 			if (f->winding->Empty()) {
 				Log("WARNING: winding clipped away (front).\n");
@@ -550,6 +554,35 @@ void BSPBuilder::Split(
 	if (back->polys.empty()) {
 		back.reset();
 	}
+}
+
+void BSPBuilder::InsertClipModel(
+	const TriModelFragRef &model,
+	Node *node
+) {
+	if (node->planenum == kPlaneNumLeaf) {
+		node->clipModels.push_back(model);
+		return;
+	}
+
+	TriModelFragRef front;
+	TriModelFragRef back;
+
+	Split(
+		model,
+		m_planes.Plane(node->planenum),
+		node->planenum,
+		front,
+		back,
+		4.f
+	);
+
+	RAD_ASSERT(front||back);
+
+	if (front)
+		InsertClipModel(front, node->children[0].get());
+	if (back)
+		InsertClipModel(back, node->children[1].get());
 }
 
 void BSPBuilder::LeafNode(Node *node) {
@@ -696,6 +729,45 @@ void BSPBuilder::CreateRootNode() {
 	BBoxWindings(node->bounds, node->windingBounds);
 
 	m_root.reset(node);
+}
+
+void BSPBuilder::CompileClipModels() {
+	for (SceneFile::TriModel::Vec::iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
+		SceneFile::TriModel::Ref &trim = *m;
+
+		// gather contents.
+		if (trim->ignore || trim->cinematic)
+			continue;
+
+		if (!(trim->contents&kContentsFlag_Clip)) 
+			continue;
+					
+		TriModelFragRef frag(new (world::bsp_file::ZBSPBuilder) TriModelFrag());
+		frag->original = trim.get();
+		frag->bounds = ToBSPType(trim->bounds);
+		frag->polys.reserve(trim->tris.size());
+		
+		for (SceneFile::TriFaceVec::iterator f = trim->tris.begin(); f != trim->tris.end(); ++f) {
+			SceneFile::TriFace &trif = *f;
+					
+			PolyRef poly(new (world::bsp_file::ZBSPBuilder) Poly());
+			poly->original = &trif;
+			poly->contents = trim->contents;
+			poly->onNode = false;
+			poly->winding.reset(new (world::bsp_file::ZBSPBuilder) Winding());
+			poly->winding->Initialize(
+				SnapVertex(ToBSPType(trim->verts[trif.v[0]].pos)),
+				SnapVertex(ToBSPType(trim->verts[trif.v[1]].pos)),
+				SnapVertex(ToBSPType(trim->verts[trif.v[2]].pos))
+			);
+			// find plane-num from snapped verts.
+			poly->planenum = m_planes.FindPlaneNum(poly->winding->Plane());
+			frag->polys.push_back(poly);
+		}
+
+		if (!frag->polys.empty())
+			InsertClipModel(frag, m_root.get());
+	}
 }
 
 int BSPBuilder::BoxPlaneNum(Node *node) {

@@ -43,8 +43,16 @@ inline const BSPBrush *BSPFileParser::Brushes() const {
 	return m_brushes;
 }
 
+inline const BSPClipModel *BSPFileParser::ClipModels() const {
+	return m_clipModels;
+}
+
 inline const BSPClipSurface *BSPFileParser::ClipSurfaces() const {
 	return m_clipSurfaces;
+}
+
+inline const BSPPlane *BSPFileParser::ClipEdgePlanes() const {
+	return m_clipEdgePlanes;
 }
 
 inline const BSPWaypoint *BSPFileParser::Waypoints() const {
@@ -198,8 +206,16 @@ inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numBrushes) {
 	return m_numBrushes;
 }
 
+inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numClipModels) {
+	return m_numClipModels;
+}
+
 inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numClipSurfaces) {
 	return m_numClipSurfaces;
+}
+
+inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numClipEdgePlanes) {
+	return m_numClipEdgePlanes;
 }
 
 inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numVerts) {
@@ -288,8 +304,16 @@ inline const BSPBrush *BSPFileBuilder::Brushes() const {
 	return &m_brushes[0];
 }
 
+inline const BSPClipModel *BSPFileBuilder::ClipModels() const {
+	return &m_clipModels[0];
+}
+
 inline const BSPClipSurface *BSPFileBuilder::ClipSurfaces() const {
 	return &m_clipSurfaces[0];
+}
+
+inline const BSPPlane *BSPFileBuilder::ClipEdgePlanes() const {
+	return &m_clipEdgePlanes[0];
 }
 
 inline const BSPWaypoint *BSPFileBuilder::Waypoints() const {
@@ -372,7 +396,9 @@ inline void BSPFileBuilder::Clear() {
 	m_models.clear();
 	m_modelIndices.clear();
 	m_brushes.clear();
+	m_clipModels.clear();
 	m_clipSurfaces.clear();
+	m_clipEdgePlanes.clear();
 	m_planes.clear();
 	m_vertices.clear();
 	m_waypoints.clear();
@@ -436,8 +462,16 @@ inline void BSPFileBuilder::ReserveBrushes(int num) {
 	m_brushes.reserve(m_brushes.size()+(size_t)num);
 }
 
+inline void BSPFileBuilder::ReserveClipModels(int num) {
+	m_clipModels.reserve(m_clipModels.size()+(size_t)num);
+}
+
 inline void BSPFileBuilder::ReserveClipSurfaces(int num) {
 	m_clipSurfaces.reserve(m_clipSurfaces.size()+(size_t)num);
+}
+
+inline void BSPFileBuilder::ReserveClipEdgePlanes(int num) {
+	m_clipEdgePlanes.reserve(m_clipEdgePlanes.size()+(size_t)num);
 }
 
 inline void BSPFileBuilder::ReservePlanes(int num) {
@@ -564,9 +598,19 @@ inline BSPBrush *BSPFileBuilder::AddBrush() {
 	return &m_brushes.back();
 }
 
+inline BSPClipModel *BSPFileBuilder::AddClipModel() {
+	m_clipModels.resize(m_clipModels.size()+1);
+	return &m_clipModels.back();
+}
+
 inline BSPClipSurface *BSPFileBuilder::AddClipSurface() {
 	m_clipSurfaces.resize(m_clipSurfaces.size()+1);
 	return &m_clipSurfaces.back();
+}
+
+inline BSPPlane *BSPFileBuilder::AddClipEdgePlane() {
+	m_clipEdgePlanes.resize(m_clipEdgePlanes.size()+1);
+	return &m_clipEdgePlanes.back();
 }
 
 inline BSPWaypoint *BSPFileBuilder::AddWaypoint() {
@@ -709,8 +753,16 @@ inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numFloorEdges) {
 	return (U32)m_floorEdges.size();
 }
 
+inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numClipModels) {
+	return (U32)m_clipModels.size();
+}
+
 inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numClipSurfaces) {
 	return (U32)m_clipSurfaces.size();
+}
+
+inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numClipEdgePlanes) {
+	return (U32)m_clipEdgePlanes.size();
 }
 
 inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numVerts) {

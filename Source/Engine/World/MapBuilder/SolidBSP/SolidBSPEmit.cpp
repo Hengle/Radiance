@@ -65,7 +65,9 @@ bool BSPBuilder::EmitBSPFile() {
 	Log("\t%8d Areaportal(s)\n", m_bspFile->numAreaportals.get());
 	Log("\t%8d AreaportalIndice(s)\n", m_bspFile->numAreaportalIndices.get());
 	Log("\t%8d Model(s)\n", m_bspFile->numModels.get());
+	Log("\t%8d ClipModel(s)\n", m_bspFile->numClipModels.get());
 	Log("\t%8d ClipSurface(s)\n", m_bspFile->numClipSurfaces.get());
+	Log("\t%8d ClipEdgePlane(s)\n", m_bspFile->numClipEdgePlanes.get());
 	Log("\t%8d Vert(s)\n", m_bspFile->numVerts.get());
 	Log("\t%8d Waypoint(s)\n", m_bspFile->numWaypoints.get());
 	Log("\t%8d WaypointConnection(s)\n", m_bspFile->numWaypointConnections.get());
@@ -106,13 +108,15 @@ void BSPBuilder::EmitBSPMaterials() {
 		if (trim->ignore)
 			continue;
 
-		if (!(trim->contents & kContentsFlag_EmitContents))
+		if (!(trim->contents & kContentsFlag_DetailContents))
 			continue;
 
 		for (SceneFile::TriFaceVec::const_iterator f = trim->tris.begin(); f != trim->tris.end(); ++f) {
 			const SceneFile::TriFace &trif = *f;
 
-			if (!(trif.contents & kContentsFlag_EmitContents))
+			if (!(trif.contents & kContentsFlag_DetailContents))
+				continue;
+			if (trif.surface & kSurfaceFlag_NoDraw)
 				continue;
 
 			const SceneFile::Material &mat = m_map->mats[(*f).mat];
@@ -442,7 +446,7 @@ void BSPBuilder::EmitBSPModels() {
 		if (trim->areas.empty())
 			continue;
 
-		if (!(trim->contents & kContentsFlag_EmitContents))
+		if (!(trim->contents & kContentsFlag_DetailContents))
 			continue;
 
 		EmitBSPModel(trim);
@@ -589,10 +593,11 @@ S32 BSPBuilder::EmitBSPNodes(const Node *node, S32 parent) {
 			leaf->maxs[i] = node->bounds.Maxs()[i];
 		}
 
-		leaf->firstClipSurface = m_bspFile->numClipSurfaces;
-		leaf->numClipSurfaces = 0;
+		EmitBSPClipModels(node, leaf);
 
-		EmitBSPClipSurfaces(node, leaf);
+		if (leaf->numClipModels > 0)
+			leaf->contents |= kContentsFlag_Clip;
+
 		return -(index + 1);
 	}
 
@@ -619,79 +624,87 @@ S32 BSPBuilder::EmitBSPNodes(const Node *node, S32 parent) {
 
 /*
 ==============================================================================
-Clip Hull (unused)
+Clip Models
 ==============================================================================
 */
 
-void BSPBuilder::EmitBSPClipSurfaces(const Node *node, world::bsp_file::BSPLeaf *leaf) {
-	return;
+void BSPBuilder::EmitBSPClipModels(const Node *node, world::bsp_file::BSPLeaf *leaf) {
+	leaf->firstClipModel = m_bspFile->numClipModels;
+	leaf->numClipModels = 0;
 
-	if (leaf->contents == 0)
-		return; // this leaf has nothing to clip against.
+	m_bspFile->ReserveClipModels((int)node->clipModels.size());
 
-	// walk the bounding portals and generate clip surfaces.
-
-	int side;
-	for (PortalRef p = node->portals; p; p = p->next[side]) {
-		side = p->nodes[1] == node;
-
-		int planenum = p->plane.planenum ^ (side^1);
-
-		U32 i;
-		for (i = 0; i < leaf->numClipSurfaces; ++i) {
-			const BSPClipSurface *clip = m_bspFile->ClipSurfaces() + i + leaf->firstClipSurface;
-			if (clip->planenum == planenum) {
-				Log("WARNING: duplicate planenums present in clip surfaces, bounding portal ignored.\n");
-				break; // already have this plane.
-			}
-		}
-
-		if (i != leaf->numClipSurfaces)
-			continue;
-
-		BSPClipSurface *clip = m_bspFile->AddClipSurface();
-		clip->contents = p->poly->original->contents;
-		clip->surface = p->poly->original->surface;
-		clip->planenum = p->plane.planenum ^ (side^1); // always faces away from the leaf.
-		clip->flags = 0;
-		++leaf->numClipSurfaces;
+	for (TriModelFragVec::const_iterator it = node->clipModels.begin(); it != node->clipModels.end(); ++it) {
+		const TriModelFragRef &model = *it;
+		EmitBSPClipModel(model);
+		++leaf->numClipModels;
 	}
 
-	EmitBSPClipBevels(leaf);
 }
 
-void BSPBuilder::EmitBSPClipBevels(world::bsp_file::BSPLeaf *leaf) {
-	
-	Vec3 v;
-	int i, j;
+void BSPBuilder::EmitBSPClipModel(const TriModelFragRef &model) {
+	BSPClipModel *clipModel = m_bspFile->AddClipModel();
 
-	for(i = 0; i < 2; ++i) {
-		for(j = 0; j < 3; ++j) {
-			v = Vec3::Zero;
-			v[j] = i ? ValueType(-1) : ValueType(1);
-
-			U32 k;
-			for (k = 0; k < leaf->numClipSurfaces; ++k) {
-				const BSPClipSurface *clip = m_bspFile->ClipSurfaces() + k + leaf->firstClipSurface;
-				const Plane &p = m_planes.Plane((int)clip->planenum);
-
-				if (p.Normal().Dot(v) > ValueType(0.999))
-					break; // found.
-			}
-
-			if (k == leaf->numClipSurfaces)
-				break; // need bevel.
-		}
-
-		if (j != 3)
-			break; // need bevel.
+	for (int i = 0; i < 3; ++i) {
+		clipModel->mins[i] = model->bounds.Mins()[i];
+		clipModel->maxs[i] = model->bounds.Maxs()[i];
 	}
 
-	if (i == 2)
-		return; // don't need bevel planes.
+	clipModel->firstClipSurface = m_bspFile->numClipSurfaces;
+	clipModel->numClipSurfaces = 0;
 
-	// Create mesh.
+	m_bspFile->ReserveClipSurfaces((int)model->polys.size());
 
+	for (PolyVec::const_iterator it = model->polys.begin(); it != model->polys.end(); ++it) {
+		const PolyRef &poly = *it;
+
+		if (poly->winding->Vertices().empty())
+			continue;
+
+		BSPClipSurface *clipSurface = m_bspFile->AddClipSurface();
+		clipSurface->flags = 0;
+		clipSurface->contents = poly->original->contents;
+		clipSurface->surface  = poly->original->surface;
+		clipSurface->planenum = poly->planenum;
+
+		clipSurface->firstEdgePlane = m_bspFile->numClipEdgePlanes;
+		clipSurface->numEdgePlanes = 0;
+
+		const Plane &plane = m_planes.Plane(poly->planenum);
+		const WindingRef &winding = poly->winding;
+		const Winding::VertexListType &vertices = winding->Vertices();
+
+		m_bspFile->ReserveClipEdgePlanes((int)vertices.size());
+
+		for (int i = 0; i < (int)vertices.size(); ++i) {
+			int k = i+1;
+			if (k >= (int)vertices.size())
+				k = 0;
+			
+			Vec3 edge(vertices[i] - vertices[k]);
+			edge.Normalize();
+			edge = edge.Cross(plane.Normal());
+
+			Plane edgePlane(edge, vertices[i], Plane::Unit);
+			
+			/*int j = k+1;
+			if (j >= (int)vertices.size())
+				j = 0;
+
+			if (edgePlane.Side(vertices[j], 0.f) == Plane::Back)
+				edgePlane = -edgePlane;*/
+
+			BSPPlane *pplane = m_bspFile->AddClipEdgePlane();
+			pplane->p[0] = edgePlane.A();
+			pplane->p[1] = edgePlane.B();
+			pplane->p[2] = edgePlane.C();
+			pplane->p[3] = edgePlane.D();
+
+			++clipSurface->numEdgePlanes;
+		}
+
+		++clipModel->numClipSurfaces;
+	}
 }
 
 /*
@@ -854,26 +867,6 @@ bool BSPBuilder::FloorBuilder::AddTri(const Vert &v0, const Vert &v1, const Vert
 	tri.e[2] = AddEdge(tri.v[2], tri.v[0], triNum);
 	if (tri.e[2] == -1)
 		return false;
-
-	//// sort edges
-	//for (int i = 0; i < 3; ++i) {
-	//	const Edge &e = edges[tri.e[i]];
-
-	//	int ia = (i+1)%3;
-	//	int ib = (i+2)%3;
-
-	//	const Edge &a = edges[tri.e[ia]];
-	//	const Edge &b = edges[tri.e[ib]];
-
-	//	float da = (a.mid - e.mid).MagnitudeSquared();
-	//	float db = (b.mid - e.mid).MagnitudeSquared();
-
-	//	if (da < db) {
-	//		tri.sorted[i] = ia;
-	//	} else {
-	//		tri.sorted[i] = ib;
-	//	}
-	//}
 
 	tris.push_back(tri);
 	return true;

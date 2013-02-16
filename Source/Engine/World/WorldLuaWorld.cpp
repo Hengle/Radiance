@@ -232,8 +232,12 @@ int WorldLua::lua_World_LineTrace(lua_State *L) {
 	LOAD_SELF
 
 	Trace t = lua::Marshal<Trace>::Get(L, 1, true);
-	lua_pushboolean(L, self->m_world->LineTrace(t) ? 1 : 0);
-	return 1;
+	if (self->m_world->LineTrace(t)) {
+		lua::Marshal<Trace>::Push(L, t);
+		return 1;
+	}
+
+	return 0;
 }
 
 int WorldLua::lua_World_ClipToFloor(lua_State *L) {
@@ -1136,8 +1140,10 @@ void Marshal<world::Trace>::Push(lua_State *L, const world::Trace &val) {
 	lua_setfield(L, -2, "start");
 	Marshal<Vec3>::Push(L, val.end);
 	lua_setfield(L, -2, "_end");
-	Marshal<Vec3>::Push(L, val.result);
-	lua_setfield(L, -2, "result");
+	Marshal<Vec3>::Push(L, val.normal);
+	lua_setfield(L, -2, "normal");
+	Marshal<Vec3>::Push(L, val.traceend);
+	lua_setfield(L, -2, "traceend");
 	lua_pushinteger(L, val.contents);
 	lua_setfield(L, -2, "contents");
 	lua_pushnumber(L, val.frac);
@@ -1165,7 +1171,7 @@ world::Trace Marshal<world::Trace>::Get(lua_State *L, int index, bool luaError) 
 		t.contents = (int)lua_tointeger(L, -1);
 	lua_pop(L, 1);
 
-	// we do not marshal frac or startSolid (output params only).
+	// we do not marshal frac, startSolid, normal, or traceend (output params only).
 	return t;
 }
 

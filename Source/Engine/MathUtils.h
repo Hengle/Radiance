@@ -40,10 +40,12 @@ RADENG_API void RADENG_CALL FrameVecs(const Vec3 &fwd, Vec3 &up, Vec3 &left);
 
 // LerpSin will apply a sin over domain of [0, N] output range [0, 1]
 // The function does a complete cycle every 1.0f cycle of t.
-RADENG_API float RADENG_CLASS LerpSin(float t);
-RADENG_API float RADENG_CLASS ArcLerpSin(float t);
+RADENG_API float RADENG_CALL LerpSin(float t);
+RADENG_API float RADENG_CALL ArcLerpSin(float t);
 
 // ClampedLerpSin will apply a sin over domain [0, 1] output range [0, 1]
 // useful for blending using a sin instead of linear time
-RADENG_API float RADENG_CLASS ClampedLerpSin(float t);
-RADENG_API float RADENG_CLASS ClampedArcLerpSin(float t);
+RADENG_API float RADENG_CALL ClampedLerpSin(float t);
+RADENG_API float RADENG_CALL ClampedArcLerpSin(float t);
+
+RADENG_API bool RADENG_CALL RayIntersectsBBox(const Vec3 &a, const Vec3 &b, const BBox &bounds);
