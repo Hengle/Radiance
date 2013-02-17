@@ -339,8 +339,7 @@ void Material::Sample(float time, float dt) {
 	}
 		
 	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
-		for (int k = 0; k < kNumTCMods; ++k)
-		{
+		for (int k = 0; k < kNumTCMods; ++k) {
 			int &ops = m_waveOps[i][k];
 
 			if (k == kTCMod_Turb) { 
@@ -367,10 +366,10 @@ void Material::Sample(float time, float dt) {
 				sVal = sVal - sMod; // clamp to range.
 				tVal = tVal - tMod;
 
-				samples[0][0] = sVal*math::Constants<float>::PI()*2.0f;
+				samples[0][0] = sVal*math::Constants<float>::_2_PI();
 				samples[0][1] = S.amplitude;
 				samples[0][2] = S.phase;
-				samples[1][0] = tVal*math::Constants<float>::PI()*2.0f;
+				samples[1][0] = tVal*math::Constants<float>::_2_PI();
 				samples[1][1] = T.amplitude;
 				samples[1][2] = T.phase;
 			} else {
@@ -381,11 +380,13 @@ void Material::Sample(float time, float dt) {
 					float val = wave.Sample(time);
 
 					if (k == kTCMod_Rotate) { 
-						// sin/cos
+						// sin/cos [-pi/pi]
+						val = val - FloorFastFloat(val); // [-1, 1]
 						val *= math::Constants<float>::PI();
 						if (val != samples[2]) {
 							samples[2] = val;
-							math::SinAndCos(&samples[0], &samples[1], val);
+							samples[0] = math::FastSin(val);
+							samples[1] = math::FastCos(val);
 							++ops;
 						}
 					} else {

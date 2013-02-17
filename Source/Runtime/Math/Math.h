@@ -19,6 +19,8 @@ struct Constants
 {
 	static const T PI() { return T(3.1415926535897932384626433832795); }
 	static const T PI_OVER_2() { return T(1.5707963267948966192313216916395); }
+	static const T PI_SQUARED() { return T(3.141592653589793238462643383279*3.141592653589793238462643383279); }
+	static const T _2_PI() { return T(3.1415926535897932384626433832795*2.0); }
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -88,6 +90,14 @@ T Sin(const T &angle);
 
 template <typename T>
 T Cos(const T &angle);
+
+// Fast versions have an input range of -PI / PI
+
+template <typename T>
+T FastSin(const T &angle);
+
+template <typename T>
+T FastCos(const T &angle);
 
 template <typename T>
 T Tan(const T &angle);
