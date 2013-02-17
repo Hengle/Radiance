@@ -273,6 +273,11 @@ Widget::Widget(const Rect &r) {
 }
 
 Widget::~Widget() {
+	if (m_capture) {
+		Root::Ref root = m_root.lock();
+		if (root)
+			root->SetCapture(Widget::Ref());
+	}
 }
 
 void Widget::Init() {
@@ -529,6 +534,17 @@ void Widget::RemovedFromRoot() {
 	m_root.reset();
 	for (Vec::iterator it = m_children.begin(); it != m_children.end(); ++it) {
 		(*it)->RemovedFromRoot();
+	}
+}
+
+void Widget::ClearCapture() {
+	if (m_capture) {
+		SetCapture(false);
+		return;
+	}
+
+	for (Vec::const_iterator it = m_children.begin(); it != m_children.end(); ++it) {
+		(*it)->ClearCapture();
 	}
 }
 

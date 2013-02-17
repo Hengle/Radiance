@@ -14,10 +14,20 @@ using world::D_Material;
 namespace ui {
 
 
-MatWidget::MatWidget() : m_material(0), m_loader(0) {
+MatWidget::MatWidget() {
+	Init();
 }
 
-MatWidget::MatWidget(const Rect &r) : Widget(r), m_material(0), m_loader(0) {
+MatWidget::MatWidget(const Rect &r) : Widget(r) {
+	Init();
+}
+
+void MatWidget::Init() {
+	m_material = 0;
+	m_loader = 0;
+	m_drawMode = kDrawMode_Rect;
+	m_circle[0] = m_circle[1] = m_circle[2] = 1.f;
+	m_circleTime[0] = m_circleTime[1] = 0.f;
 }
 
 bool MatWidget::BindMaterial(const pkg::AssetRef &m) {
@@ -51,9 +61,24 @@ bool MatWidget::BindMaterial(const pkg::AssetRef &m) {
 	return true;
 }
 
+void MatWidget::FillCircleTo(float percent, float time) {
+	if (time <= 0.f) {
+		m_circle[0] = percent;
+		m_circleTime[1] = 0.f;
+	} else {
+		m_circle[1] = m_circle[0];
+		m_circle[2] = percent;
+		m_circleTime[0] = 0.f;
+		m_circleTime[1] = time;
+	}
+}
+
 void MatWidget::PushCallTable(lua_State *L) {
 	Widget::PushCallTable(L);
 	LUART_REGISTER_SET(L, Material);
+	LUART_REGISTER_GETSET(L, DrawMode);
+	lua_pushcfunction(L, lua_FillCircleTo);
+	lua_setfield(L, -2, "FillCircleTo");
 }
 
 void MatWidget::CreateFromTable(lua_State *L) {
@@ -63,21 +88,59 @@ void MatWidget::CreateFromTable(lua_State *L) {
 	lua_pop(L, 1);
 	if (m)
 		BindMaterial(m->asset);
+
+	lua_getfield(L, -1, "drawMode");
+	if (!lua_isnil(L, -1)) {
+		int x = luaL_checkinteger(L, -1);
+		if ((x != kDrawMode_Rect) && (x != kDrawMode_Circle))
+			luaL_error(L, "invalid draw mode %d", x);
+		m_drawMode = (DrawMode)x;
+	}
+	lua_pop(L, 1);
+}
+
+void MatWidget::OnTick(float time, float dt) {
+	Widget::OnTick(time, dt);
+
+	if (m_circleTime[1] > 0.f) {
+		m_circleTime[0] += dt;
+
+		if (m_circleTime[0] >= m_circleTime[1]) {
+			m_circleTime[1] = 0.f;
+			m_circle[0] = m_circle[2];
+		} else {
+			m_circle[0] = math::Lerp(m_circle[1], m_circle[2], m_circleTime[0] / m_circleTime[1]);
+		}
+	}
 }
 
 void MatWidget::OnDraw(const Rect *clip) {
 	if (!m_asset)
 		return;
 
-	rbDraw->DrawRect(
-		this->screenRect,
-		clip,
-		this->zRotScreen,
-		*m_material->material.get(),
-		m_loader,
-		true,
-		this->blendedColor
-	);
+	if (m_drawMode == kDrawMode_Rect) {
+		rbDraw->DrawRect(
+			this->screenRect,
+			clip,
+			this->zRotScreen,
+			*m_material->material.get(),
+			m_loader,
+			true,
+			this->blendedColor
+		);
+	} else {
+		RAD_ASSERT(m_drawMode == kDrawMode_Circle);
+		rbDraw->DrawCircle(
+			this->screenRect,
+			m_circle[0],
+			clip,
+			this->zRotScreen,
+			*m_material->material.get(),
+			m_loader,
+			true,
+			this->blendedColor
+		);
+	}
 }
 
 void MatWidget::AddedToRoot() {
@@ -96,5 +159,16 @@ int MatWidget::LUART_SETFN(Material)(lua_State *L) {
 
 	return 0;
 }
+
+int MatWidget::lua_FillCircleTo(lua_State *L) {
+	Ref w = GetRef<MatWidget>(L, "MatWidget", 1, true);
+	w->FillCircleTo(
+		(float)luaL_checknumber(L, 2),
+		(float)luaL_checknumber(L, 3)
+	);
+	return 0;
+}
+
+UIW_GETSET(MatWidget, DrawMode, int, m_drawMode);
 
 } // ui

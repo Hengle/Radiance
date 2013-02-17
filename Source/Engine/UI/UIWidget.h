@@ -63,6 +63,17 @@ public:
 		const Vec4 &rgba = Vec4(1, 1, 1, 1)
 	) = 0;
 
+	virtual void DrawCircle(
+		const Rect &r, 
+		float percent, // 0 = no wedge, 1 = full circle (winds clockwise), 0 -> -1 winds counter-clockwise
+		const Rect *clip,
+		const Vec3 &zRot, // (X, Y) is rotation center, Z is rotation in degrees
+		r::Material &m,
+		asset::MaterialLoader *l,
+		bool sampleMaterialColor = true,
+		const Vec4 &rgba = Vec4(1, 1, 1, 1)
+	) = 0;
+
 	virtual void DrawTextModel(
 		const Rect &r,
 		const Rect *clip,
@@ -334,6 +345,8 @@ private:
 	void Push(lua_State *L); // Don't call this! Call PushFrame()
 	void Unmap(lua_State *L);
 
+	void ClearCapture();
+
 	UIW_DECL_GETSET(Rect);
 	UIW_DECL_GET(ScreenRect);
 	UIW_DECL_GET(zRot);
@@ -391,7 +404,9 @@ private:
 	RAD_DECLARE_GET(visible, bool);
 
 	RAD_DECLARE_SET(visible, bool) { 
-		m_visible = value; 
+		m_visible = value;
+		if (!m_visible)
+			ClearCapture();
 	}
 
 	RAD_DECLARE_GET(valign, VerticalAlign) { 

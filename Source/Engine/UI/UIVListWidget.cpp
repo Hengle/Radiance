@@ -360,6 +360,7 @@ bool VListWidget::InputEventFilter(const InputEvent &e, const TouchState *state,
 		}
 		m_dragging = true;
 		m_checkDelayed = false;
+		m_dragDidMove = false;
 		m_velocity = Vec2::Zero;
 		m_dragMotion = Vec2::Zero;
 		m_scrollTime[1] = 0.f; // kill any scrolling
@@ -374,6 +375,7 @@ bool VListWidget::InputEventFilter(const InputEvent &e, const TouchState *state,
 			m_e.type = InputEvent::T_Invalid;
 			m_dragging = false;
 			SetCapture(false);
+			return false;
 		} else if (m_dragging) {
 			Drag(e);
 		}
@@ -391,7 +393,7 @@ void VListWidget::CheckPostDelayedInput() {
 		return;
 	RAD_ASSERT(m_dragging);
 	xtime::TimeVal delta = xtime::ReadMilliseconds() - m_e.time;
-	if (delta > 150) {
+	if (delta > 500) {
 		m_checkDelayed = true;
 		if (ProcessInputEvent(m_e, m_pts, m_is)) {
 			m_dragging = false;
