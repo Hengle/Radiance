@@ -31,15 +31,16 @@ public:
 
 	void Tick(float time, float dt);
 	void BlendTo(const Vec4 &rgba, float time);
+	void ScaleTo(const Vec3 &scale, float time);
 	void ReplaceMaterial(int src, int dst);
 	void ReplaceMaterials(int dst);
 
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, entity, Entity*);
 	RAD_DECLARE_PROPERTY(DrawModel, pos, const Vec3&, const Vec3&);
 	RAD_DECLARE_PROPERTY(DrawModel, angles, const Vec3&, const Vec3&);
-	RAD_DECLARE_PROPERTY(DrawModel, scale, const Vec3&, const Vec3&);
 	RAD_DECLARE_PROPERTY(DrawModel, visible, bool, bool);
 	RAD_DECLARE_PROPERTY(DrawModel, bounds, const BBox&, const BBox&);
+	RAD_DECLARE_READONLY_PROPERTY(DrawModel, scale, const Vec3&);
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, rgba, const Vec4&);
 
 protected:
@@ -105,11 +106,7 @@ private:
 	}
 
 	RAD_DECLARE_GET(scale, const Vec3&) { 
-		return m_scale; 
-	}
-
-	RAD_DECLARE_SET(scale, const Vec3&) { 
-		m_scale = value; 
+		return m_scale[0]; 
 	}
 
 	RAD_DECLARE_GET(visible, bool) { 
@@ -136,17 +133,19 @@ private:
 	static int lua_ReplaceMaterial(lua_State *L);
 	static int lua_ReplaceMaterials(lua_State *L);
 	static int lua_MaterialList(lua_State *L);
+	static int lua_ScaleTo(lua_State *L);
 	
 	LUART_DECL_GETSET(Pos);
 	LUART_DECL_GETSET(Angles);
-	LUART_DECL_GETSET(Scale);
+	LUART_DECL_GET(Scale);
 	LUART_DECL_GETSET(Visible);
 	LUART_DECL_GETSET(Bounds);
 	LUART_DECL_GET(RGBA);
 	
 	Vec3 m_r;
 	Vec3 m_p;
-	Vec3 m_scale;
+	Vec3 m_scale[3];
+	float m_scaleTime[2];
 	BBox m_bounds;
 	Entity *m_entity;
 	MBatchDraw::RefVec m_batches;
@@ -154,7 +153,6 @@ private:
 	float m_fadeTime[2];
 	int m_markFrame;
 	int m_visibleFrame;
-	bool m_fade;
 	bool m_visible;
 };
 

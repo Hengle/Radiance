@@ -23,13 +23,13 @@ m_entity(entity),
 m_r(Vec3::Zero), 
 m_p(Vec3::Zero),
 m_bounds(Vec3::Zero, Vec3::Zero),
-m_scale(Vec3(1, 1, 1)),
 m_visible(true),
-m_fade(false),
 m_markFrame(-1),
 m_visibleFrame(-1) {
 	m_rgba[0] = m_rgba[1] = m_rgba[2] = Vec4(1, 1, 1, 1);
 	m_fadeTime[0] = m_fadeTime[1] = 0.f;
+	m_scale[0] = m_scale[1] = m_scale[2] = Vec3(1, 1, 1);
+	m_scaleTime[0] = m_scaleTime[1] = 0.f;
 }
 
 DrawModel::~DrawModel() {
@@ -64,14 +64,23 @@ bool DrawModel::GetTransform(Vec3 &pos, Vec3 &angles) const {
 }
 
 void DrawModel::Tick(float time, float dt) {
-	if (m_fade) {
+	if (m_fadeTime[1] > 0.f) {
 		m_fadeTime[0] += dt;
 		if (m_fadeTime[0] >= m_fadeTime[1]) {
-			m_fade = false;
-			m_fadeTime[0] = m_fadeTime[1];
+			m_fadeTime[1] = 0.f;
 			m_rgba[0] = m_rgba[2];
 		} else {
 			m_rgba[0] = math::Lerp(m_rgba[1], m_rgba[2], m_fadeTime[0]/m_fadeTime[1]);
+		}
+	}
+
+	if (m_scaleTime[1] > 0.f) {
+		m_scaleTime[0] += dt;
+		if (m_scaleTime[0] >= m_scaleTime[1]) {
+			m_scaleTime[1] = 0.f;
+			m_scale[0] = m_scale[2];
+		} else {
+			m_scale[0] = math::Lerp(m_scale[1], m_scale[2], m_scaleTime[0]/m_scaleTime[1]);
 		}
 	}
 
@@ -80,14 +89,25 @@ void DrawModel::Tick(float time, float dt) {
 
 void DrawModel::BlendTo(const Vec4 &rgba, float time) {
 	if (time <= 0.f) {
-		m_fade = false;
+		m_fadeTime[1] = 0.f;
 		m_rgba[0] = rgba;
 	} else {
 		m_rgba[1] = m_rgba[0];
 		m_rgba[2] = rgba;
 		m_fadeTime[0] = 0.f;
 		m_fadeTime[1] = time;
-		m_fade = true;
+	}
+}
+
+void DrawModel::ScaleTo(const Vec3 &scale, float time) {
+	if (time <= 0.f) {
+		m_scaleTime[1] = 0.f;
+		m_scale[0] = scale;
+	} else {
+		m_scale[1] = m_scale[0];
+		m_scale[2] = scale;
+		m_scaleTime[0] = 0.f;
+		m_scaleTime[1] = time;
 	}
 }
 
@@ -115,10 +135,12 @@ void DrawModel::PushElements(lua_State *L) {
 	lua_setfield(L, -2, "ReplaceMaterials");
 	lua_pushcfunction(L, lua_MaterialList);
 	lua_setfield(L, -2, "MaterialList");
+	lua_pushcfunction(L, lua_ScaleTo);
+	lua_setfield(L, -2, "ScaleTo");
 	
 	LUART_REGISTER_GETSET(L, Pos);
 	LUART_REGISTER_GETSET(L, Angles);
-	LUART_REGISTER_GETSET(L, Scale);
+	LUART_REGISTER_GET(L, Scale);
 	LUART_REGISTER_GETSET(L, Visible);
 	LUART_REGISTER_GETSET(L, Bounds);
 }
@@ -149,10 +171,19 @@ int DrawModel::lua_MaterialList(lua_State *L) {
 	return r->lua_PushMaterialList(L);
 }
 
+int DrawModel::lua_ScaleTo(lua_State *L) {
+	Ref r = lua::SharedPtr::Get<DrawModel>(L, "DrawModel", 1, true);
+	r->ScaleTo(
+		lua::Marshal<Vec3>::Get(L, 2, true),
+		(float)luaL_checknumber(L, 3)
+	);
+	return 0;
+}
+
 #define SELF Ref self = lua::SharedPtr::Get<DrawModel>(L, "DrawModel", 1, true)
 LUART_GETSET(DrawModel, Pos, Vec3, m_p, SELF);
 LUART_GETSET(DrawModel, Angles, Vec3, m_r, SELF);
-LUART_GETSET(DrawModel, Scale, Vec3, m_scale, SELF);
+LUART_GET(DrawModel, Scale, Vec3, m_scale[0], SELF);
 LUART_GETSET(DrawModel, Visible, bool, m_visible, SELF);
 
 int DrawModel::LUART_GETFN(Bounds)(lua_State *L) {

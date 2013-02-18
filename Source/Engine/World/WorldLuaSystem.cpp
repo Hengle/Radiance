@@ -19,18 +19,15 @@ namespace world {
 
 int WorldLua::lua_System_Platform(lua_State *L) {
 	enum {
-		PlatMac,
-		PlatWin,
+		PlatPC,
 		PlatIPad,
 		PlatIPhone,
 		PlatXBox360,
 		PlatPS3
 	};
 
-#if defined(RAD_OPT_OSX)
-	lua_pushinteger(L, PlatMac);
-#elif defined(RAD_OPT_WIN)
-	lua_pushinteger(L, PlatWin);
+#if defined(RAD_OPT_WIN) || defined(RAD_OPT_OSX)
+	lua_pushinteger(L, PlatPC);
 #elif defined(RAD_OPT_IOS)
 	lua_pushinteger(L, (App::Get()->deviceFamily == plat::kDeviceFamily_iPhone) ? PlatIPhone : PlatIPad);
 #else
