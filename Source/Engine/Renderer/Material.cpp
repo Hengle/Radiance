@@ -308,7 +308,7 @@ void Material::Clear() {
 
 			for (int p = 0; p < kNumTexCoordDimensions; ++p) {
 				for (int z = 0; z < 3; ++z) {
-					m_waveSamples[i][k][p][z] = std::numeric_limits<float>::max();
+					m_waveSamples[i][k][p][z] = 0.f;
 				}
 			}
 		}
@@ -385,7 +385,7 @@ void Material::Sample(float time, float dt) {
 							val = val - FloorFastFloat(val); // [-1, 1]
 						}
 						val *= math::Constants<float>::PI();
-						if (val != samples[2]) {
+						if ((ops == 0) || (val != samples[2])) {
 							samples[2] = val;
 							samples[0] = math::FastSin(val);
 							samples[1] = math::FastCos(val);
