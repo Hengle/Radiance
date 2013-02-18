@@ -75,6 +75,7 @@ bool D_SkModel::BlendToState(const char *state, const char *blendTarget, bool re
 				1.f,
 				1.f,
 				0,
+				false,
 				*m_mesh->ska.get(),
 				notify
 			);

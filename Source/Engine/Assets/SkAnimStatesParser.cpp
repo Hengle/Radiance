@@ -80,6 +80,7 @@ int SkAnimStatesParser::LoadCooked(
 			is >> state.name;
 			is >> temp; state.loopCount[0] = (int)temp;
 			is >> temp; state.loopCount[1] = (int)temp;
+			is >> temp; state.distance = temp ? true : false;
 						
 			U16 numVariants;
 			is >> numVariants;
@@ -471,11 +472,31 @@ void SkAnimStatesParser::ParseAnimState(lua_State *L, const pkg::Asset::Ref &ass
 		state.loopCount[0] = state.loopCount[1] = 1;
 	}
 
+	it = map.find(CStr("distance"));
+	if (it != map.end()) {
+		const bool *b = static_cast<const bool*>(it->second);
+		if (!b) {
+			luaL_error(L, "AnimState '%s':'%s':distance expected boolean, (Function %s, File %s, Line %d)",
+				asset->name.get(),
+				state.name.c_str.get(),
+				__FUNCTION__,
+				__FILE__,
+				__LINE__
+			);
+		}
+
+		state.distance = *b;
+	} else {
+		state.distance = false;
+	}
+
 	for (lua::Variant::Map::const_iterator it = map.begin(); it != map.end(); ++it) {
 		ska::Variant v;
 
 		if (it->first == CStr("loop"))
 			continue; // special keyword
+		if (it->first == CStr("distance"))
+			continue;
 
 		v.name = it->first;
 

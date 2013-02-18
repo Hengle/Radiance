@@ -589,17 +589,8 @@ void Ska::Tick(
 				
 		Mat4 s = Mat4::Scaling(*reinterpret_cast<const Scale3*>(&tm.s));
 		Mat4 r = Mat4::Rotation(tm.r);
-		Mat4 t;
-			
-		if ((i > 0) || (distance < 0.f)) {
-			t = Mat4::Translation(tm.t);
-		} else { // not distance driven
-			t = Mat4::Translation(Vec3(0.f, tm.t[1], tm.t[2]));
-			//t = r * Mat4::Translation(tm.t); // remove root bone motion on X axis
-			//t[3][0] = 0.f; // null out X motion.
-			//t = r.Transpose() * t;
-		}
-
+		Mat4 t = Mat4::Translation(tm.t);
+		
 		details::MulMat4x3(outMat[0], s, r);
 
 		if (parentIdx >= 0) {

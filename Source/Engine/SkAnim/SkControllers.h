@@ -30,6 +30,7 @@ struct AnimState {
 	typedef zone_map<String, AnimState, ZSkaT>::type Map;
 	String name;
 	int loopCount[2];
+	bool distance;
 	Variant::Vec variants;
 };
 
@@ -164,6 +165,7 @@ public:
 		float out,
 		float timeScale,
 		int loopCount, // 0 == play forever
+		bool useDistanceIfPresent,
 		Ska &ska,
 		const Notify::Ref &notify
 	);
@@ -223,6 +225,7 @@ private:
 		float out,
 		float timeScale,
 		int loopCount, // 0 == loop forever
+		bool useDistanceIfPresent,
 		Ska &ska,
 		const Notify::Ref &notify
 	);
@@ -241,6 +244,7 @@ private:
 	int m_loopCount[2];
 	int m_emitFrame;
 	bool m_emitEndFrame;
+	bool m_distance;
 	BoneTM m_tm;
 };
 
@@ -421,6 +425,7 @@ private:
 	Node *m_blendTarget;
 	bool m_emitEndFrame;
 	int m_loopCount[2];
+	bool m_distance;
 	AnimationSource::Ref m_source;
 	BlendToController::Ref m_blend;
 };

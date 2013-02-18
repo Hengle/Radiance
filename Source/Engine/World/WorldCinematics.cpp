@@ -212,6 +212,7 @@ void WorldCinematics::Tick(int frame, float dt) {
 								0.f,
 								1.f,
 								loop ? 0 : 1,
+								false,
 								*actor->m->ska.get(),
 								ska::Notify::Ref(new (ZWorld) SkaNotify(*this, c))
 							);
@@ -562,6 +563,7 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time) {
 							0.f,
 							1.f,
 							loop ? 0 : 1,
+							false,
 							*actor->m->ska.get(),
 							ska::Notify::Ref(new (ZWorld) SkaNotify(*this, *c))
 						);

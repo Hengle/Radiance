@@ -445,6 +445,12 @@ void SkMeshDrawModel::PushElements(lua_State *L) {
 	LUART_REGISTER_GETSET(L, MotionScale);
 	lua_pushcfunction(L, lua_CreateInstance);
 	lua_setfield(L, -2, "CreateInstance");
+	lua_pushcfunction(L, lua_FindBone);
+	lua_setfield(L, -2, "FindBone");
+	lua_pushcfunction(L, lua_BonePos);
+	lua_setfield(L, -2, "BonePos");
+	lua_pushcfunction(L, lua_WorldBonePos);
+	lua_setfield(L, -2, "WorldBonePos");
 }
 
 int SkMeshDrawModel::lua_PushMaterialList(lua_State *L) {
@@ -484,6 +490,20 @@ int SkMeshDrawModel::lua_FindBone(lua_State *L) {
 	return 1;
 }
 
+int SkMeshDrawModel::lua_BonePos(lua_State *L) {
+	Ref r = lua::SharedPtr::Get<SkMeshDrawModel>(L, "SkMeshDrawModel", 1, true);
+	Vec3 pos = r->BonePos((int)luaL_checkinteger(L, 2));
+	lua::Marshal<Vec3>::Push(L, pos);
+	return 1;
+}
+
+int SkMeshDrawModel::lua_WorldBonePos(lua_State *L) {
+	Ref r = lua::SharedPtr::Get<SkMeshDrawModel>(L, "SkMeshDrawModel", 1, true);
+	Vec3 pos = r->WorldBonePos((int)luaL_checkinteger(L, 2));
+	lua::Marshal<Vec3>::Push(L, pos);
+	return 1;
+}
+
 #define SELF Ref self = lua::SharedPtr::Get<SkMeshDrawModel>(L, "SkMeshDrawModel", 1, true)
 LUART_GETSET(SkMeshDrawModel, TimeScale, float, m_timeScale, SELF);
 LUART_GETSET(SkMeshDrawModel, MotionScale, float, m_motionScale, SELF);
@@ -493,7 +513,7 @@ SkMeshDrawModel::Batch::Batch(DrawModel &model, const r::SkMesh::Ref &m, int idx
 DrawModel::DrawBatch(model, matId), m_idx(idx), m_m(m) {
 }
 
-Vec3 SkMeshDrawModel::BonePos(int idx) const {
+Vec3 SkMeshDrawModel::WorldBonePos(int idx) const {
 	if (idx >= 0 && idx < m_mesh->ska->numBones) {
 		Vec3 bone = m_mesh->ska->BoneWorldMat(idx)[3];
 		Vec3 pos, rot;
@@ -502,6 +522,15 @@ Vec3 SkMeshDrawModel::BonePos(int idx) const {
 			bone =  (Mat4::Scaling(Scale3(scale)) * Mat4::Rotation(QuatFromAngles(rot)) * Mat4::Translation(pos)) * bone;
 		}
 
+		return bone;
+	}
+	return Vec3::Zero;
+}
+
+Vec3 SkMeshDrawModel::BonePos(int idx) const {
+	if (idx >= 0 && idx < m_mesh->ska->numBones) {
+		Vec3 bone = m_mesh->ska->BoneWorldMat(idx)[3];
+		bone = (Mat4::Scaling(Scale3(scale)) * Mat4::Translation(pos)) * bone;
 		return bone;
 	}
 	return Vec3::Zero;

@@ -267,6 +267,7 @@ public:
 	Ref CreateInstance();
 	
 	Vec3 BonePos(int idx) const;
+	Vec3 WorldBonePos(int idx) const;
 
 	RAD_DECLARE_PROPERTY(SkMeshDrawModel, motionScale, float, float);
 	RAD_DECLARE_PROPERTY(SkMeshDrawModel, timeScale, float, float);
@@ -332,6 +333,8 @@ private:
 
 	static int lua_CreateInstance(lua_State *L);
 	static int lua_FindBone(lua_State *L);
+	static int lua_WorldBonePos(lua_State *L);
+	static int lua_BonePos(lua_State *L);
 
 	LUART_DECL_GETSET(TimeScale);
 	LUART_DECL_GETSET(MotionScale);

@@ -98,6 +98,7 @@ AnimationSource::Ref AnimationSource::New(
 	float out,
 	float timeScale,
 	int loopCount, // 0 == loop forever
+	bool distance,
 	Ska &ska,
 	const Notify::Ref &notify
 ) {
@@ -108,6 +109,7 @@ AnimationSource::Ref AnimationSource::New(
 			out, 
 			timeScale, 
 			loopCount,
+			distance,
 			ska,
 			notify
 		), &Delete
@@ -125,6 +127,7 @@ AnimationSource::AnimationSource(
 	float out,
 	float timeScale,
 	int loopCount, // 0 == loop forever
+	bool distance,
 	Ska &ska,
 	const Notify::Ref &notify
 ) : 
@@ -136,6 +139,7 @@ m_timeScale(timeScale),
 m_frame(0.f),
 m_notify(notify),
 m_emitEndFrame(true),
+m_distance(distance),
 m_emitFrame(0) {
 	m_loopCount[0] = 0;
 	m_loopCount[1] = loopCount;
@@ -235,7 +239,10 @@ bool AnimationSource::Tick(
 		distance = 0.f;
 	}
 
-	if ((m_anim->distance > 0.1f) && (distance >= 0.f)) {
+	bool useDistance = false;
+
+	if (m_distance && (m_anim->distance > 0.1f) && (distance >= 0.f)) {
+		useDistance = true;
 		m_frame += distance * ((float)m_anim->numFrames.get() / (float)m_anim->distance.get());
 	} else {
 		m_frame += (dt*m_timeScale) * m_anim->fps;
@@ -303,6 +310,10 @@ bool AnimationSource::Tick(
 			start,
 			count
 		);
+
+		if (useDistance && start == 0) {
+			out[0].t[0] = 0.f; // null out X axis motion
+		}
 	}
 
 	if (dt > 0.f || distance > 0.f) {
@@ -672,9 +683,11 @@ AnimationVariantsSource::AnimationVariantsSource(
 	const char *blendTarget
 ) : Controller(ska), m_node(0), m_blendTarget(0), m_notify(notify), m_emitEndFrame(true) {
 
+	m_distance = variants.distance;
+
 	m_loopCount[0] = 0;
 	m_loopCount[1] = variants.loopCount[0];
-
+	
 	if (variants.loopCount[0] != variants.loopCount[1])
 		m_loopCount[1] += (rand() % (variants.loopCount[1]-variants.loopCount[0]));
 
@@ -800,6 +813,7 @@ void AnimationVariantsSource::ChooseAnim() {
 				node->out,
 				timeScale,
 				loopCount,
+				m_distance,
 				*ska.get(),
 				m_notify
 			);
