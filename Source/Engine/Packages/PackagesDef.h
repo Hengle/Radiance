@@ -176,10 +176,10 @@ enum PFlags
 #endif
 
 	P_TargetConsole = P_TargetXBox360|P_TargetPS3, /*!< All Console target bits. \sa pkg::P_TargetXBox360 and pkg::P_TargetPS3 */
-	P_AllTargets = P_TargetConsole|P_TargetPC|P_TargetiOS, /*!< All target bits set. \sa pkg::P_TargetPC, pkg::P_TargetIPhone, pkg::P_TargetIPad, pkg::P_TargetXBox360, and pkg::P_TargetPS3 */
+	P_AllTargets = P_TargetConsole|P_TargetPC|P_TargetiOS, /*!< All target bits set. \sa pkg::P_TargetPC, pkg::P_TargetiOS, pkg::P_TargetXBox360, and pkg::P_TargetPS3 */
 	P_FirstTarget = P_TargetPC, /*!< First target bit. */
 	P_LastTarget  = P_TargetPS3, /*!< Last target bit. */
-	P_NumTargets  = 5 /*!< Number of targets. */
+	P_NumTargets  = 4 /*!< Number of targets. */
 
 };
 
@@ -210,7 +210,7 @@ enum KFlags
 //! Target platform flag.
 /*! \def P_TARGET_PLATFORM.
 	Defined to be the target platform during compile.
-	\sa pkg::P_TargetPC, pkg::P_TargetIPhone, pkg::P_TargetIPad, pkg::P_TargetXBox360, and pkg::P_TargetPS3
+	\sa pkg::P_TargetPC, pkg::P_TargetiOS, pkg::P_TargetXBox360, and pkg::P_TargetPS3
 */
 #if defined(RAD_OPT_PC)
 	#define P_TARGET_PLATFORM (pkg::P_TargetPC)

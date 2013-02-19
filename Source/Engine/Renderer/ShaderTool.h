@@ -76,6 +76,8 @@ public:
 		kMaterialSource_LightDir, // in texture space
 		kMaterialSource_HalfLightDir, // in texture space
 		kMaterialSource_TexCoord,
+		kMaterialSource_VertexColor,
+		kMaterialSource_SpriteSkin,
 		kNumMaterialSources
 	};
 
@@ -95,6 +97,11 @@ public:
 		kBasicType_Sampler2D,
 		kBasicType_SamplerCUBE,
 		kNumBasicTypes
+	};
+
+	enum SkinMode {
+		kSkinMode_Default,
+		kSkinMode_Sprite
 	};
 
 	enum ShaderOutput {
@@ -241,6 +248,7 @@ public:
 	//////////////////////////////////////////////////////////////////////////////////////////
 
 	RAD_DECLARE_READONLY_PROPERTY(Shader, name, const char*);
+	RAD_DECLARE_READONLY_PROPERTY(Shader, skinMode, SkinMode);
 
 	static Ref Load(Engine &engine, const char *name);
 
@@ -294,6 +302,7 @@ private:
 		virtual lua::SrcBuffer::Ref Load(lua_State *L, const char *name);
 	};
 
+	static int lua_SkinMode(lua_State *L);
 	static int lua_MNode(lua_State *L);
 	static int lua_NNode(lua_State *L);
 	static int lua_Compile(lua_State *L);
@@ -309,6 +318,7 @@ private:
 	static int lua_MLightDiffuseColor(lua_State *L);
 	static int lua_MLightSpecularColor(lua_State *L);
 	static int lua_MLightDir(lua_State *L);
+	static int lua_MVertexColor(lua_State *L);
 	static int lua_MSource(lua_State *L, MaterialSource source);
 	static int lua_gcNode(lua_State *L);
 	static void ParseConnection(lua_State *L, Node *node, const lua::Variant::Map &map, Connection &c);
@@ -316,6 +326,7 @@ private:
 	static lua::State::Ref InitLuaN(Node *n);
 
 	RAD_DECLARE_GET(name, const char*);
+	RAD_DECLARE_GET(skinMode, SkinMode);
 
 	Node::Ref LoadNode(Engine &e, lua_State *L, const char *type);
 	
@@ -429,6 +440,7 @@ private:
 	NodeVec m_instances;
 	ImportLoader m_impLoader;
 	String m_name;
+	SkinMode m_skinMode;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////

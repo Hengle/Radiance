@@ -1443,6 +1443,9 @@
     <ClInclude Include="..\..\Engine\Assets\MeshVBLoader.h">
       <Filter>Source\Engine\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\Renderer\Sprites.h">
+      <Filter>Source\Engine\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2197,6 +2200,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\Assets\MeshVBLoader.cpp">
       <Filter>Source\Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Renderer\Sprites.cpp">
+      <Filter>Source\Engine\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

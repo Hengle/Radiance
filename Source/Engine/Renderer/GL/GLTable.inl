@@ -50,6 +50,8 @@ inline void GLTable::LoadIdentity() {
 	CHECK_GL_ERRORS();
 #endif
 	++matrixOps;
+	if (mm == GL_PROJECTION)
+		++prMatrixOps;
 }
 
 inline void GLTable::PushMatrix() {
@@ -62,7 +64,6 @@ inline void GLTable::PushMatrix() {
 	glPushMatrix();
 	CHECK_GL_ERRORS();
 #endif
-	++matrixOps;
 }
 
 inline void GLTable::PopMatrix() {
@@ -76,6 +77,8 @@ inline void GLTable::PopMatrix() {
 	CHECK_GL_ERRORS();
 #endif
 	++matrixOps;
+	if (mm == GL_PROJECTION)
+		++prMatrixOps;
 }
 
 inline void GLTable::Rotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z) {
@@ -90,6 +93,8 @@ inline void GLTable::Rotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z) {
 	CHECK_GL_ERRORS();
 #endif
 	++matrixOps;
+	if (mm == GL_PROJECTION)
+		++prMatrixOps;
 }
 
 inline void GLTable::Scalef(GLfloat x, GLfloat y, GLfloat z) {
@@ -103,6 +108,8 @@ inline void GLTable::Scalef(GLfloat x, GLfloat y, GLfloat z) {
 	CHECK_GL_ERRORS();
 #endif
 	++matrixOps;
+	if (mm == GL_PROJECTION)
+		++prMatrixOps;
 }
 
 inline void GLTable::Translatef(GLfloat x, GLfloat y, GLfloat z) {
@@ -116,6 +123,8 @@ inline void GLTable::Translatef(GLfloat x, GLfloat y, GLfloat z) {
 	CHECK_GL_ERRORS();
 #endif
 	++matrixOps;
+	if (mm == GL_PROJECTION)
+		++prMatrixOps;
 }
 
 inline void GLTable::Ortho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar) {
@@ -137,6 +146,8 @@ inline void GLTable::Ortho(GLdouble left, GLdouble right, GLdouble bottom, GLdou
 #endif
 
 	++matrixOps;
+	if (mm == GL_PROJECTION)
+		++prMatrixOps;
 }
 
 inline void GLTable::Perspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar) {
@@ -164,6 +175,8 @@ inline void GLTable::Perspective(GLdouble fovy, GLdouble aspect, GLdouble zNear,
 #endif
 
 	++matrixOps;
+	if (mm == GL_PROJECTION)
+		++prMatrixOps;
 }
 
 inline void GLTable::MultMatrix(const Mat4 &m) {
@@ -180,6 +193,8 @@ inline void GLTable::MultMatrix(const Mat4 &m) {
 	}
 #endif
 	++matrixOps;
+	if (mm == GL_PROJECTION)
+		++prMatrixOps;
 }
 
 inline Mat4 GLTable::GetModelViewMatrix() {

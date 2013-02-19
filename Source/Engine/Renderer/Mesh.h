@@ -7,8 +7,6 @@
 #pragma once
 
 #include "../Types.h"
-#include "../Packages/PackagesDef.h"
-#include "../Assets/MeshMaterialLoader.h"
 #include "Common.h"
 #include "Shader.h"
 #include <Runtime/Container/ZoneVector.h>
@@ -40,7 +38,7 @@ public:
 	~Mesh();
 
 	//! Allocates swap chain storage.
-	/*! For dynamic mesh data it can be beneficial to place SU_Stream or SU_Dynamic vertex
+	/*! For dynamic mesh data it can be beneficial to place kStreamUsage_Static or kStreamUsage_Dynamic vertex
 		data into a swap chain that is then alternated each frame.
 
 		This method allocates storage for the requested number of swap chains. NOTE that this

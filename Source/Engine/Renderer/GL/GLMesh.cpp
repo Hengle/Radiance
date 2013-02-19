@@ -62,6 +62,8 @@ void GLMesh::MapSource(
 		source.count = 3;
 		break;
 	case kMaterialGeometrySource_Tangents:
+	case kMaterialGeometrySource_VertexColor:
+	case kMaterialGeometrySource_SpriteSkin:
 		source.count = 4;
 		break;
 	case kMaterialGeometrySource_TexCoords:

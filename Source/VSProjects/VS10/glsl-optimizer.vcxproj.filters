@@ -2,232 +2,244 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source">
-      <UniqueIdentifier>{4e024a6a-74e0-4a1b-adac-b49fc9ed61e8}</UniqueIdentifier>
+      <UniqueIdentifier>{00c25944-e58e-4b6f-a4d5-9742ed35eb74}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\s_expression.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\opt_tree_grafting.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\opt_swizzle_swizzle.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\opt_structure_splitting.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\opt_redundant_jumps.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\opt_noop_swizzle.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\opt_if_simplification.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\opt_function_inlining.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\opt_discard_simplification.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\opt_dead_functions.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\opt_dead_code_local.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\opt_dead_code.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\opt_copy_propagation_elements.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\opt_copy_propagation.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\opt_constant_variable.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\opt_constant_propagation.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\opt_constant_folding.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\opt_algebraic.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\lower_vector.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\lower_vec_index_to_swizzle.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\lower_vec_index_to_cond_assign.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\lower_variable_index_to_cond_assign.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\lower_texture_projection.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\lower_noise.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\lower_mat_op_to_vec.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\lower_jumps.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\lower_instructions.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\lower_if_to_cond_assign.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\lower_discard.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\loop_unroll.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\loop_controls.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\loop_analysis.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\linker.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\link_functions.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_variable_refcount.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_variable.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_validate.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_unused_structs.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_set_program_inouts.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_rvalue_visitor.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_reader.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_print_visitor.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_print_glsl_visitor.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_import_prototypes.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_hv_accept.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_hierarchical_visitor.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_function_detect_recursion.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_function_can_inline.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_function.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_expression_flattening.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_constant_expression.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_clone.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir_basic_block.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ir.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\hir_field_selection.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\glsl_types.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\glsl_symbol_table.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\glsl_parser_extras.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\glsl_parser.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\glsl_optimizer.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\glsl_lexer.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\builtin_function.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ast_type.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ast_to_hir.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ast_function.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ast_expr.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\mesa\program\hash_table.c">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\mesa\program\symbol_table.c">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\glcpp\glcpp-lex.c">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\glcpp\glcpp-parse.c">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\glcpp\pp.c">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\ralloc.c">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\strtod.c">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Extern\aras-p-glsl-optimizer-f2217b0\src\glsl\standalone_scaffolding.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\glslopt_ship_null.cpp" />
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\lower_vector.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\opt_algebraic.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\opt_array_splitting.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\opt_constant_folding.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\opt_constant_propagation.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\opt_constant_variable.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\opt_copy_propagation.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\opt_copy_propagation_elements.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\opt_dead_code.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\opt_dead_code_local.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\opt_dead_functions.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\opt_function_inlining.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\opt_if_simplification.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\opt_noop_swizzle.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\opt_redundant_jumps.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\opt_structure_splitting.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\opt_swizzle_swizzle.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\opt_tree_grafting.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\s_expression.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\standalone_scaffolding.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ast_expr.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ast_function.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ast_to_hir.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ast_type.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\builtin_function.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\builtin_variables.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\glsl_lexer.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\glsl_optimizer.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\glsl_parser.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\glsl_parser_extras.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\glsl_symbol_table.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\glsl_types.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\hir_field_selection.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ir.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ir_basic_block.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ir_clone.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ir_constant_expression.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ir_expression_flattening.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ir_function.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ir_function_can_inline.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ir_function_detect_recursion.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ir_hierarchical_visitor.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ir_hv_accept.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ir_import_prototypes.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ir_print_glsl_visitor.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ir_print_visitor.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ir_reader.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ir_rvalue_visitor.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ir_unused_structs.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ir_validate.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ir_variable_refcount.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\link_functions.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\link_uniform_initializers.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\link_uniforms.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\linker.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\loop_analysis.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\loop_controls.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\loop_unroll.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\lower_clip_distance.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\lower_discard.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\lower_discard_flow.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\lower_if_to_cond_assign.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\lower_instructions.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\lower_jumps.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\lower_mat_op_to_vec.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\lower_noise.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\lower_output_reads.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\lower_ubo_reference.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\lower_variable_index_to_cond_assign.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\lower_vec_index_to_cond_assign.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\lower_vec_index_to_swizzle.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\glcpp\glcpp-lex.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\glcpp\glcpp-parse.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\glcpp\pp.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\mesa\program\hash_table.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\mesa\program\symbol_table.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\ralloc.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Extern\glsl-optimizer\src\glsl\strtod.c">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

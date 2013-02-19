@@ -38,6 +38,8 @@ enum MaterialGeometrySource {
 	kMaterialGeometrySource_Normals,
 	kMaterialGeometrySource_Tangents,
 	kMaterialGeometrySource_TexCoords,
+	kMaterialGeometrySource_VertexColor,
+	kMaterialGeometrySource_SpriteSkin,
 	kNumMaterialGeometrySources,
 	kMaterialGeometrySource_MaxIndices = 2
 };

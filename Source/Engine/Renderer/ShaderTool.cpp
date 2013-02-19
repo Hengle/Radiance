@@ -111,6 +111,24 @@ Shader::Ref Shader::Load(Engine &e, const char *name) {
 	return m;
 }
 
+int Shader::lua_SkinMode(lua_State *L) {
+	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
+	Shader *self = (Shader*)lua_touserdata(L, -1);
+	lua_pop(L, 1);
+	RAD_VERIFY(self);
+
+	const char *sz = luaL_checkstring(L, 1);
+	if (!string::icmp(sz, "default")) {
+		self->m_skinMode = kSkinMode_Default;
+	} else if (!string::icmp(sz, "sprite")) {
+		self->m_skinMode = kSkinMode_Sprite;
+	} else {
+		luaL_error(L, "'%s' is not a valid skin mode.", sz);
+	}
+
+	return 0;
+}
+
 int Shader::lua_MNode(lua_State *L) { 
 	// in: 2 strings
     // out: io table
@@ -263,6 +281,10 @@ int Shader::lua_MLightDir(lua_State *L) {
 	return lua_MSource(L, kMaterialSource_LightDir);
 }
 
+int Shader::lua_MVertexColor(lua_State *L) {
+	return lua_MSource(L, kMaterialSource_VertexColor);
+}
+
 int Shader::lua_MSource(lua_State *L, MaterialSource source) {
 	if (lua_type(L, -1) != LUA_TNUMBER) {
 		luaL_error(L, "Invalid arguments for MSource(int), (Function %s, File %s, Line %d).",
@@ -300,6 +322,7 @@ lua::State::Ref Shader::InitLuaM(Engine &e, Shader *m) {
 	lua_State *L = state->L;
 
 	luaL_Reg r[] = {
+		{ "SkinMode", lua_SkinMode },
 		{ "Node", lua_MNode },
 		{ "Compile", lua_Compile },
 		{ "MColor", lua_MColor },
@@ -314,6 +337,7 @@ lua::State::Ref Shader::InitLuaM(Engine &e, Shader *m) {
 		{ "MLightDiffuseColor", lua_MLightDiffuseColor },
 		{ "MLightSpecularColor", lua_MLightSpecularColor },
 		{ "MLightDir", lua_MLightDir },
+		{ "MVertexColor", lua_MVertexColor },
 		{ 0, 0 }
 	};
 
@@ -1028,6 +1052,26 @@ void Shader::BuildInputMappings(lua_State *L, r::Shader::Pass pass) {
 		mapping
 	);
 
+	BuildAttributeSourceMapping(
+		L, 
+		numAttrs, 
+		r::kMaterialGeometrySource_VertexColor, 
+		usage.s[kMaterialSource_VertexColor], 
+		mapping
+	);
+
+	if (m_skinMode == kSkinMode_Sprite) {
+		// sprite skin needs special vertex-shader args
+		usage.s[kMaterialSource_SpriteSkin].insert(0);
+		BuildAttributeSourceMapping(
+			L, 
+			numAttrs, 
+			r::kMaterialGeometrySource_SpriteSkin, 
+			usage.s[kMaterialSource_SpriteSkin], 
+			mapping
+		);
+	}
+
 	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i)
 		mapping.tcMods[i] = r::kInvalidMapping;
 
@@ -1469,6 +1513,13 @@ bool Shader::szMaterialInput(
 		string::sprintf(
 			sz,
 			"DCOLOR%d",
+			index
+		);
+		return true;
+	case kMaterialSource_VertexColor:
+		string::sprintf(
+			sz,
+			"IN(vertexColor)",
 			index
 		);
 		return true;

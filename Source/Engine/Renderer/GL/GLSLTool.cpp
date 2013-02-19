@@ -11,7 +11,7 @@
 #include "../Material.h"
 #include <Runtime/Stream/STLStream.h>
 #include <Runtime/StringBase.h>
-#include "../../../../../Extern/aras-p-glsl-optimizer-f2217b0/src/glsl/glsl_optimizer.h"
+#include "../../../../../Extern/glsl-optimizer/src/glsl/glsl_optimizer.h"
 #include <sstream>
 #include <Runtime/PushSystemMacros.h>
 
@@ -29,18 +29,31 @@ bool GLSLTool::Assemble(
 	std::ostream &out
 ) {
 	std::stringstream ss;
+
+	const bool GLES = (flags & kAssemble_GLES) ? true : false;
 	
 	if (!(flags&(kAssemble_VertexShader|kAssemble_PixelShader)))
 		flags |= kAssemble_VertexShader;
 
 	bool vertexShader = (flags & kAssemble_VertexShader) ? true : false;
 
+	if (!GLES)
+		ss << "#version 120\r\n";
+
 	if (vertexShader) {
-		ss << "#define VERTEX" << "\r\n";
+		ss << "#define VERTEX\r\n";
 	} else {
-		ss << "#define FRAGMENT" << "\r\n";
-		ss << "#define MATERIAL" << "\r\n";
+		ss << "#define FRAGMENT\r\n";
+		ss << "#define MATERIAL\r\n";
 	}
+
+	if (pass != r::Shader::kPass_Preview) {
+		if (shader->skinMode == Shader::kSkinMode_Sprite)
+			ss << "#define SKIN_SPRITE\r\n";
+	}
+
+	if (shader->MaterialSourceUsage(pass, Shader::kMaterialSource_VertexColor) > 0)
+		ss << "#define VERTEX_COLOR\r\n";
 
 	if (shader->MaterialSourceUsage(pass, Shader::kMaterialSource_Vertex) > 0)
 		ss << "#define SHADER_POSITION\r\n";
@@ -186,8 +199,6 @@ bool GLSLTool::Assemble(
 			ss << "#define SHADER_LIGHT_HALFDIR " << numLightHalfDir << "\r\n";
 	}
 
-	const bool GLES = (flags & kAssemble_GLES) ? true : false;
-
 	if (GLES)
 		ss << "#define _GLES\r\n";
 	
@@ -252,6 +263,19 @@ bool GLSLTool::Assemble(
 		glslopt_shader_delete(opt_shader);
 
 		Copy(z, out);
+
+		{
+			engine.sys->files->CreateDirectory("@r:/Temp/Shaders/Logs");
+			String path(CStr("@r:/Temp/Shaders/Logs/"));
+			path += shader->name;
+			path += "_optimized";
+			if (vertexShader) {
+				path += ".vert.glsl";
+			} else {
+				path += ".frag.glsl";
+			}
+			tools::shader_utils::SaveText(engine, path.c_str, z.str().c_str());
+		}
 	} else {
 		Copy(ex, out);
 	}

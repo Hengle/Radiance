@@ -101,10 +101,15 @@ private:
 		kMaterialTextureSource_MaxIndices> tcModVals;
 		
 		boost::array<GLint, kMaxTextures> textures;
+		int matrixOps;
+		int prMatrixOps;
+		GLint mv;
+		GLint pr;
+		float mvfloats[16];
+		float prfloats[16];
 #if defined(RAD_OPT_OGLES2)
 		GLint mvp;
 		GLint color;
-		int matrixOps;
 		float rgba[4];
 		float mvpfloats[16];
 #endif

@@ -47,7 +47,7 @@ bool __IOS_IPad();
 #endif
 
 #if defined(RAD_OPT_TOOLS)
-#include "../../../../../Extern/aras-p-glsl-optimizer-f2217b0/src/glsl/glsl_optimizer.h"
+#include "../../../../../Extern/glsl-optimizer/src/glsl/glsl_optimizer.h"
 #endif
 
 namespace r {
@@ -158,6 +158,7 @@ void GLTable::Reset() {
 
 	mm = GL_PROJECTION;
 	matrixOps = 0;
+	prMatrixOps = 0;
 	colorOps = 0;
 	eyeOps = 0;
 	vbos = true;
@@ -394,6 +395,7 @@ void GLTable::Load() {
 
 	mm = GL_PROJECTION;
 	matrixOps = 0;
+	prMatrixOps = 0;
 	colorOps = 0;
 	eyeOps = 0;
 	wireframe = false;

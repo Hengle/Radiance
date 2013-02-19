@@ -18,11 +18,6 @@
 #include "GLSLTool.h"
 #endif
 
-#if defined(RAD_OPT_TOOLS)
-#define LOG_DUMP
-#define LOG_SAVE
-#endif
-
 #undef min
 #undef max
 
@@ -31,8 +26,7 @@
 namespace r {
 
 #if defined(RAD_OPT_TOOLS)
-class GLSLShaderLink : public tools::shader_utils::GLSLTool
-{
+class GLSLShaderLink : public tools::shader_utils::GLSLTool {
 public:
 	GLSLShaderLink(
 		Engine &engine,
@@ -136,20 +130,6 @@ bool GLSLShader::CompilePass(
 
 		String shaderSource(ss.str().c_str());
 
-#if defined(LOG_DUMP)
-		COut(C_Info) << "GLSLShader::CompilePass('" << shader->name.get() << "', " <<
-			pass << ", VertexShader): " << std::endl << shaderSource << std::endl;
-#if !defined(RAD_OPT_IOS) && defined(LOG_SAVE)
-		{
-			engine.sys->files->CreateDirectory("@r:/Temp/Shaders/Logs");
-			String path(CStr("@r:/Temp/Shaders/Logs/"));
-			path += shader->name;
-			path += "_optimized.vert.glsl";
-			tools::shader_utils::SaveText(engine, path.c_str, shaderSource.c_str);
-		}
-#endif
-#endif
-
 		vs.reset(new (ZRender) GLSLShaderObj(GL_VERTEX_SHADER_ARB));
 		const char *sz = shaderSource.c_str;
 		gl.ShaderSourceARB(vs->id, 1, &sz, 0);
@@ -165,11 +145,6 @@ bool GLSLShader::CompilePass(
 				pass << ", VertexShader) Error: \n" << ShaderLog(vs->id) << std::endl;
 			return false;
 		}
-
-#if defined(RAD_OPT_DEBUG)
-		COut(C_Debug) << "GLSLShader::CompilePass('" << shader->name.get() << "', " << pass <<
-			", VertexShader) Successfully Compiled. " << std::endl;
-#endif
 	}
 
 	{
@@ -194,20 +169,6 @@ bool GLSLShader::CompilePass(
 
 		String shaderSource(ss.str().c_str());
 
-#if defined(LOG_DUMP)
-		COut(C_Info) << "GLSLShader::CompilePass('" << shader->name.get() << "', " <<
-			pass << ", PixelShader): " << std::endl << shaderSource << std::endl;
-#if !defined(RAD_OPT_IOS) && defined(LOG_SAVE)
-		{
-			engine.sys->files->CreateDirectory("@r:/Temp/Shaders/Logs");
-			String path(CStr("@r:/Temp/Shaders/Logs/"));
-			path += shader->name;
-			path += "_optimized.frag.glsl";
-			tools::shader_utils::SaveText(engine, path.c_str, shaderSource.c_str);
-		}
-#endif
-#endif
-
 		fs.reset(new (ZRender) GLSLShaderObj(GL_FRAGMENT_SHADER_ARB));
 		const char *sz = shaderSource.c_str;
 		gl.ShaderSourceARB(fs->id, 1, &sz, 0);
@@ -223,11 +184,6 @@ bool GLSLShader::CompilePass(
 				pass << ", PixelShader) Error: \n" << ShaderLog(fs->id) << std::endl;
 			return false;
 		}
-
-#if defined(RAD_OPT_DEBUG)
-		COut(C_Debug) << "GLSLShader::CompilePass('" << shader->name.get() << "', " << pass <<
-			", PixelShader) Successfully Compiled. " << std::endl;
-#endif
 	}
 
 	GLSLProgramObj::Ref r(new (ZRender) GLSLProgramObj());
@@ -567,8 +523,10 @@ bool GLSLShader::LoadPass(
 bool GLSLShader::MapInputs(Pass &p, const Material &material) {
 	gls.UseProgram(p.p->id, true);
 
-#if defined(RAD_OPT_OGLES2)
 	p.u.matrixOps = 0;
+	p.u.prMatrixOps = 0;
+
+#if defined(RAD_OPT_OGLES2)
 	p.u.mvp = gl.GetUniformLocationARB(p.p->id, "U_mvp");
 	p.u.color = gl.GetUniformLocationARB(p.p->id, "U_color");
 	p.u.rgba[0] = -1.f;
@@ -578,6 +536,12 @@ bool GLSLShader::MapInputs(Pass &p, const Material &material) {
 	for (int i = 0; i < 16; ++i)
 		p.u.mvpfloats[i] = 0.f;
 #endif
+	p.u.mv = gl.GetUniformLocationARB(p.p->id, "U_mv");
+	p.u.pr = gl.GetUniformLocationARB(p.p->id, "U_pr");
+	for (int i = 0; i < 16; ++i) {
+		p.u.mvfloats[i] = 0.f;
+		p.u.prfloats[i] = 0.f;
+	}
 
 	const float kFloatMax = std::numeric_limits<float>::max();
 
@@ -861,10 +825,10 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 		dstLight.flags = srcLight.flags;
 	}
 	
-#if defined(RAD_OPT_OGLES2)
-	if (p.u.matrixOps != gl.matrixOps)
-	{ // matrix has changed
+	if (p.u.matrixOps != gl.matrixOps) { 
+		// matrix has changed
 		p.u.matrixOps = gl.matrixOps;
+#if defined(RAD_OPT_OGLES2)
 		// track modelview projection matrix?
 		if (p.u.mvp != -1) {
 			float floats[16];
@@ -876,7 +840,35 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 				gl.UniformMatrix4fvARB(p.u.mvp, 1, GL_FALSE, floats);
 			}
 		}
+#endif
+		// track modelview matrix?
+		if (p.u.mv != -1) {
+			float floats[16];
+			Mat4 *x = reinterpret_cast<Mat4*>(floats);
+			*x = gl.GetModelViewMatrix();
+			x->Transpose();
+			if (memcmp(floats, p.u.mvfloats, 16*sizeof(float))) {
+				memcpy(p.u.mvfloats, floats, 16*sizeof(float));
+				gl.UniformMatrix4fvARB(p.u.mv, 1, GL_FALSE, floats);
+			}
+		}
 	}
+
+	if (p.u.prMatrixOps != gl.prMatrixOps) {
+		p.u.prMatrixOps = gl.prMatrixOps;
+		// track projection matrix?
+		if (p.u.pr != -1) {
+			float floats[16];
+			Mat4 *x = reinterpret_cast<Mat4*>(floats);
+			*x = gl.GetProjectionMatrix();
+			x->Transpose();
+			if (memcmp(floats, p.u.prfloats, 16*sizeof(float))) {
+				memcpy(p.u.prfloats, floats, 16*sizeof(float));
+				gl.UniformMatrix4fvARB(p.u.pr, 1, GL_FALSE, floats);
+			}
+		}
+	}
+#if defined(RAD_OPT_OGLES2)
 	if (p.u.color != -1) {
 		if (p.u.rgba[0] != c[0] ||
 			p.u.rgba[1] != c[1] ||
@@ -1009,6 +1001,12 @@ void GLSLShader::BindAttribLocations(GLhandleARB p, const MaterialInputMappings 
 				char name[64];
 				string::sprintf(name, "in_tc%d", idx);
 				gl.BindAttribLocationARB(p, loc, name);
+				CHECK_GL_ERRORS();
+			}
+		break;
+		case kMaterialGeometrySource_VertexColor:
+			if (idx == 0) {
+				gl.BindAttribLocationARB(p, loc, "in_vertexColor");
 				CHECK_GL_ERRORS();
 			}
 		break;
