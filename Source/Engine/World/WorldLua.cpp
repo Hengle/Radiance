@@ -14,8 +14,10 @@
 
 extern "C" {
 #include <Lua/lualib.h>
+#if !defined(LUA_JIT)
 #include <Lua/lgc.h>
 #include <Lua/lstate.h>
+#endif
 #if LUA_VERSION_NUM >= 502
 #define LUALIB_API LUAMOD_API
 #endif
@@ -48,29 +50,31 @@ bool WorldLua::Init() {
 	lua_pushinteger(L, LUA_VERSION_NUM);
 	lua_setglobal(L, "LUA_VERSION_NUM");
 
-	luaopen_base(L);
+#if !defined(LUA_JIT) || (LUA_JIT < 200)
+	LUART_REGISTER_LUALIB(L, luaopen_base);
 #if LUA_VERSION_NUM >= 502
 	lua_setglobal(L, "_G");
 #endif
-	luaopen_math(L);
+	LUART_REGISTER_LUALIB(L, luaopen_math);
 #if LUA_VERSION_NUM >= 502
 	lua_setglobal(L, LUA_MATHLIBNAME);
 #endif
-	luaopen_string(L);
+	LUART_REGISTER_LUALIB(L, luaopen_string);
 #if LUA_VERSION_NUM >= 502
 	lua_setglobal(L, LUA_STRLIBNAME);
 #endif
-	luaopen_table(L);
+	LUART_REGISTER_LUALIB(L, luaopen_table);
 #if LUA_VERSION_NUM >= 502
 	lua_setglobal(L, LUA_TABLIBNAME);
 #endif
-	luaopen_bit(L);
+	LUART_REGISTER_LUALIB(L, luaopen_bit);
 #if LUA_VERSION_NUM >= 502
 	lua_setglobal(L, "bit");
 #endif
 #if LUA_VERSION_NUM >= 502
 	luaopen_coroutine(L);
 	lua_setglobal(L, LUA_COLIBNAME);
+#endif
 #endif
 	lua::EnableModuleImport(L, m_impLoader);
 	
@@ -525,6 +529,7 @@ void WorldLua::Tick(float dt) {
 }
 
 void WorldLua::GarbageCollect() {
+#if !defined(LUA_JIT)
 	// lua gc
 	enum { MaxGCTicks = 3 };
 
@@ -537,7 +542,6 @@ void WorldLua::GarbageCollect() {
 	xtime::TimeVal start = xtime::ReadMilliseconds();
 	xtime::TimeVal delta;
 	int numSteps = 0;
-
 	do {
 		++numSteps;
 		luaC_step(L);
@@ -549,6 +553,7 @@ void WorldLua::GarbageCollect() {
 
 	if (delta > MaxGCTicks+1)
 		COut(C_Debug) << "GC cycle overflow (" << delta << "/" << numSteps << ")" << std::endl;
+#endif
 }
 
 bool WorldLua::PostSpawn(Entity &ent) {

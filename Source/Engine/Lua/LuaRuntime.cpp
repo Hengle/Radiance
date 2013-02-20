@@ -23,6 +23,10 @@
 
 extern "C" {
 #include <Lua/lualib.h>
+#if defined(LUA_JIT)
+LUALIB_API int luaopen_jit(lua_State *L);
+LUALIB_API int luaopen_package(lua_State *L);
+#endif
 }
 
 #undef min
@@ -199,8 +203,26 @@ State::State(const char *name) {
 	m_m.biggest = std::numeric_limits<int>::min();
 	LuaPools::Open();
 
+#if defined(LUA_JIT)
+#if LUA_JIT >= 200
+#if (RAD_OPT_MACHINE_WORD_SIZE == 8) // 64bit?
+	m_s = ::luaL_newstate();
+#else
+	m_s = ::lua_newstate(LuaAlloc, this);
+#endif
+	RAD_ASSERT(m_s);
+	luaL_openlibs(m_s);
+#else
+	// this is a crippled version of the lua package stuff.
 	m_s = ::lua_newstate(LuaAlloc, this);
 	RAD_ASSERT(m_s);
+	LUART_REGISTER_LUALIB(m_s, luaopen_package);
+    LUART_REGISTER_LUALIB(m_s, luaopen_jit);
+#endif
+#else
+	m_s = ::lua_newstate(LuaAlloc, this);
+	RAD_ASSERT(m_s);
+#endif
 }
 
 State::~State() {

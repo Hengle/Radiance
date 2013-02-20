@@ -413,6 +413,15 @@ struct Marshal< ::reflect::Reflected> {
 RADENG_API int RADENG_CALL luaL_typerror (lua_State *L, int narg, const char *tname);
 #endif
 
+#if defined(LUA_JIT)
+#define LUART_REGISTER_LUALIB(L, x) \
+	lua_pushcfunction(L, x); \
+	lua_pushstring(L, ""); \
+	lua_call(L, 1, 0)
+#else
+#define LUART_REGISTER_LUALIB(L, x)	x(L)
+#endif
+
 #define LUART_GETFN(_name) luart_get_##_name
 #define LUART_SETFN(_name) luart_set_##_name
 

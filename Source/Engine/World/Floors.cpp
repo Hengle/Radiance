@@ -784,9 +784,9 @@ void Floors::OptimizeRoute(WalkStep::Vec &route) const {
 	WalkStep::Vec original(route);
 	route->clear();
 	
-	const size_t kSize = original->size();
+	const int kSize = (int)original->size();
 
-	for (size_t i = 0; i < kSize - 1; ++i) {
+	for (int i = 0; i < kSize - 1; ++i) {
 		const WalkStep &curStep = original[i];
 
 		FloorPosition curPos;
@@ -794,7 +794,7 @@ void Floors::OptimizeRoute(WalkStep::Vec &route) const {
 		curPos.m_tri = curStep.tri;
 		curPos.m_pos = curStep.pos;
 		
-		for (size_t k = kSize-1; k > i; --k) {
+		for (int k = kSize-1; k > i; --k) {
 			const WalkStep &testStep = original[k];
 
 			if (k == (i+1)) {
@@ -840,13 +840,13 @@ void Floors::OptimizeRoute2(WalkStep::Vec &route) const {
 	bool optimized = false;
 
 	do {
-		const size_t kSize = route->size();
+		const int kSize = (int)route->size();
 
 		if (kSize > 2) {
 			WalkStep::Vec original(route);
 			route->clear();
 
-			size_t i;
+			int i;
 			for (i = 0; i < kSize - 2; i += 2) {
 				// test direct connection between i -> (i+2) (optimize out i+1)
 				const WalkStep &curStep = original[i];
@@ -1017,9 +1017,9 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 
 	const float kSmoothness = 32.f;
 
-	const size_t kSize = walkRoute->size();
+	const int kSize = (int)walkRoute->size();
 
-	for (size_t i = 0; i < kSize; ++i) {
+	for (int i = 0; i < kSize; ++i) {
 		const WalkStep &cur = walkRoute[i];
 		
 		FloorMove::Step step;

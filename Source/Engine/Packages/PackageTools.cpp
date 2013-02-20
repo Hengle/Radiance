@@ -607,11 +607,15 @@ lua::State::Ref PackageMan::InitLua() {
 	lua::RegisterGlobals(L, 0, r);
 	lua_pushlightuserdata(L, this);
 	lua_setfield(L, LUA_REGISTRYINDEX, PACKAGEMAN_KEY);
-	luaopen_bit(L);
+#if !defined(LUA_JIT) || (LUA_JIT < 200)
+	LUART_REGISTER_LUALIB(L, luaopen_bit);
+#endif
 #if LUA_VERSION_NUM >= 502
 	lua_setglobal(L, "bit");
 #endif
-	luaopen_string(L);
+#if !defined(LUA_JIT) || (LUA_JIT < 200)
+	LUART_REGISTER_LUALIB(L, luaopen_string);
+#endif
 #if LUA_VERSION_NUM >= 502
 	lua_setglobal(L, LUA_STRLIBNAME);
 #endif
