@@ -5,6 +5,7 @@
     <Import Project="LinkQtRelease.props" />
     <Import Project="LinkOpenALSoft_x64.props" />
     <Import Project="LinkCg_x64.props" />
+    <Import Project="LinkLuaJITRelease_x64.props" />
     <Import Project="LinkVisualLeakDetector_x64.props" />
     <Import Project="CopyEngineDeveloperReleaseDLLs_x64.props" />
   </ImportGroup>

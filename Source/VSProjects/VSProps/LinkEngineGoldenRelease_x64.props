@@ -4,6 +4,7 @@
     <Import Project="LinkOpenALSoft_x64.props" />
     <Import Project="LinkQtRelease.props" />
     <Import Project="LinkVisualLeakDetector_x64.props" />
+    <Import Project="LinkLuaJITRelease_x64.props" />
     <Import Project="CopyEngineGoldenReleaseDLLs_x64.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
