@@ -1010,6 +1010,12 @@ void GLSLShader::BindAttribLocations(GLhandleARB p, const MaterialInputMappings 
 				CHECK_GL_ERRORS();
 			}
 		break;
+		case kMaterialGeometrySource_SpriteSkin:
+			if (idx == 0) {
+				gl.BindAttribLocationARB(p, loc, "in_spriteSkin");
+				CHECK_GL_ERRORS();
+			}
+		break;
 		default:
 			break;
 		}

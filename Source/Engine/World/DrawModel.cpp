@@ -554,4 +554,123 @@ void SkMeshDrawModel::Batch::Draw() {
 	m_m->Mesh(m_idx).Draw();
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+SpriteBatchDrawModel::Ref SpriteBatchDrawModel::New(
+	Entity *entity, 
+	const r::SpriteBatch::Ref &sprites,
+	int matId
+) {
+	SpriteBatchDrawModel::Ref r(new SpriteBatchDrawModel(entity, sprites, matId));
+
+	WorldDraw *draw = entity->world->draw;
+
+	Batch::Ref b(new (ZWorld) Batch(*r, sprites, matId));
+	draw->AddMaterial(matId);
+	r->RefBatch(b);
+
+	return r;
+}
+
+SpriteBatchDrawModel::SpriteBatchDrawModel(
+	Entity *entity,
+	const r::SpriteBatch::Ref &sprites,
+	int matId
+) : DrawModel(entity), m_spriteBatch(sprites), m_matId(matId) {
+
+}
+
+SpriteBatchDrawModel::~SpriteBatchDrawModel() {
+}
+
+void SpriteBatchDrawModel::OnTick(float time, float dt) {
+	m_spriteBatch->Skin();
+}
+
+void SpriteBatchDrawModel::PushElements(lua_State *L) {
+	DrawModel::PushElements(L);
+	lua_pushcfunction(L, lua_AllocateSprite);
+	lua_setfield(L, -2, "AllocateSprite");
+	lua_pushcfunction(L, lua_FreeSprite);
+	lua_setfield(L, -2, "FreeSprite");
+	lua_pushcfunction(L, lua_SetSpriteData);
+	lua_setfield(L, -2, "SetSpriteData");
+}
+
+int SpriteBatchDrawModel::lua_PushMaterialList(lua_State *L) {
+
+	pkg::Asset::Ref asset = App::Get()->engine->sys->packages->Asset(m_matId, pkg::Z_Engine);
+
+	if (asset) {
+		lua_createtable(L, 1, 0);
+		D_Material::Ref m = D_Material::New(asset);
+		if (m) {
+			lua_pushinteger(L, 1);
+			m->Push(L);
+			lua_settable(L, -3);
+		}
+
+		return 1;
+	}
+	
+	return 0;
+}
+
+int SpriteBatchDrawModel::lua_AllocateSprite(lua_State *L) {
+	SpriteBatchDrawModel::Ref r = lua::SharedPtr::Get<SpriteBatchDrawModel>(L, "SpriteBatchDrawModel", 1, true);
+	r::Sprite *sprite = r->m_spriteBatch->AllocateSprite();
+	if (sprite) {
+		lua_pushlightuserdata(L, sprite);
+		return 1;
+	}
+	return 0;
+}
+
+int SpriteBatchDrawModel::lua_FreeSprite(lua_State *L) {
+	SpriteBatchDrawModel::Ref r = lua::SharedPtr::Get<SpriteBatchDrawModel>(L, "SpriteBatchDrawModel", 1, true);
+	r::Sprite *sprite = (r::Sprite*)lua_touserdata(L, 2);
+	if (sprite)
+		r->m_spriteBatch->FreeSprite(sprite);
+	return 0;
+}
+
+int SpriteBatchDrawModel::lua_SetSpriteData(lua_State *L) {
+	SpriteBatchDrawModel::Ref r = lua::SharedPtr::Get<SpriteBatchDrawModel>(L, "SpriteBatchDrawModel", 1, true);
+	r::Sprite *sprite = (r::Sprite*)lua_touserdata(L, 2);
+	if (sprite) {
+		luaL_checktype(L, 3, LUA_TTABLE);
+		lua_getfield(L, 3, "pos");
+		sprite->pos = lua::Marshal<Vec3>::Get(L, -1, true);
+		lua_getfield(L, 3, "rgba");
+		sprite->rgba = lua::Marshal<Vec4>::Get(L, -1, true);
+		lua_getfield(L, 3, "size");
+		sprite->size = lua::Marshal<Vec2>::Get(L, -1, true);
+		lua_getfield(L, 3, "rot");
+		sprite->rot = (float)luaL_checknumber(L, -1);
+		lua_pop(L, 4);
+	}
+	return 0;
+}
+
+SpriteBatchDrawModel::Batch::Batch(DrawModel &model, const r::SpriteBatch::Ref &m, int matId) 
+: DrawModel::DrawBatch(model, matId), m_spriteBatch(m) {
+
+}
+
+void SpriteBatchDrawModel::Batch::Bind(r::Shader *shader) {
+	m_spriteBatch->mesh->BindAll(shader);
+}
+
+void SpriteBatchDrawModel::Batch::CompileArrayStates(r::Shader &shader) {
+	m_spriteBatch->mesh->CompileArrayStates(shader);
+}
+
+void SpriteBatchDrawModel::Batch::FlushArrayStates(r::Shader *shader) {
+	m_spriteBatch->mesh->FlushArrayStates(shader);
+}
+
+void SpriteBatchDrawModel::Batch::Draw() {
+	m_spriteBatch->Draw();
+}
+
 } // world

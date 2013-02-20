@@ -43,9 +43,14 @@ inline void GLMesh::BindIndices(bool force) {
 	gls.BindBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, m_i.vb, force);
 }
 
-inline void GLMesh::Draw() {
+inline void GLMesh::Draw(int numTris) {
 	RAD_ASSERT(m_i.vb);
-	gl.DrawElements(GL_TRIANGLES, m_i.count, m_i.type, 0);
+	if (numTris < 0) {
+		numTris = m_i.count;
+	} else {
+		numTris = numTris * 3;
+	}
+	gl.DrawElements(GL_TRIANGLES, numTris, m_i.type, 0);
 	CHECK_GL_ERRORS();
 }
 

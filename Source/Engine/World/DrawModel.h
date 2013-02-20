@@ -1,13 +1,16 @@
-// DrawModel.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file DrawModel.h
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup world
+*/
 
 #pragma once
 
 #include "../Packages/PackagesDef.h"
 #include "../Renderer/Mesh.h"
 #include "../Renderer/SkMesh.h"
+#include "../Renderer/Sprites.h"
 #include "../Lua/LuaRuntime.h"
 #include "MBatchDraw.h"
 #include <Runtime/Container/ZoneMap.h>
@@ -48,7 +51,7 @@ protected:
 	virtual void PushElements(lua_State *L);
 
 	void RefBatch(const MBatchDraw::Ref &batch);
-	bool GetTransform(Vec3 &pos, Vec3 &angles) const;
+	virtual bool GetTransform(Vec3 &pos, Vec3 &angles) const;
 
 	class DrawBatch : public MBatchDraw {
 	public:
@@ -193,7 +196,6 @@ private:
 		virtual void Draw();
 
 	private:
-		friend class MeshDrawModel;
 		r::Mesh::Ref m_m;
 	};
 
@@ -242,7 +244,6 @@ private:
 		virtual void Draw();
 
 	private:
-		friend class MeshBundleDrawModel;
 		r::Mesh::Ref m_m;
 	};
 
@@ -324,7 +325,6 @@ private:
 		virtual void Draw();
 
 	private:
-		friend class MeshDrawModel;
 		int m_idx;
 		r::SkMesh::Ref m_m;
 	};
@@ -343,6 +343,60 @@ private:
 	float m_motionScale;
 	float m_timeScale;
 	bool m_instanced;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+class RADENG_CLASS SpriteBatchDrawModel : public DrawModel {
+public:
+
+	typedef boost::shared_ptr<SpriteBatchDrawModel> Ref;
+	typedef boost::weak_ptr<SpriteBatchDrawModel> WRef;
+	
+	static Ref New(
+		Entity *entity, 
+		const r::SpriteBatch::Ref &sprites,
+		int matId
+	);
+
+	virtual ~SpriteBatchDrawModel();
+
+	RAD_DECLARE_READONLY_PROPERTY(SpriteBatchDrawModel, spriteBatch, r::SpriteBatch*);
+
+protected:
+
+	SpriteBatchDrawModel(Entity *entity, const r::SpriteBatch::Ref &sprites, int matId);
+
+	virtual void OnTick(float time, float dt);
+	virtual void PushElements(lua_State *L);
+	virtual int lua_PushMaterialList(lua_State *L);
+	static int lua_AllocateSprite(lua_State *L);
+	static int lua_FreeSprite(lua_State *L);
+	static int lua_SetSpriteData(lua_State *L);
+
+private:
+
+	class Batch : public DrawModel::DrawBatch {
+	public:
+		typedef boost::shared_ptr<Batch> Ref;
+		Batch(DrawModel &model, const r::SpriteBatch::Ref &m, int matId);
+
+	protected:
+		virtual void Bind(r::Shader *shader);
+		virtual void CompileArrayStates(r::Shader &shader);
+		virtual void FlushArrayStates(r::Shader *shader);
+		virtual void Draw();
+
+	private:
+		r::SpriteBatch::Ref m_spriteBatch;
+	};
+
+	RAD_DECLARE_GET(spriteBatch, r::SpriteBatch*) {
+		return m_spriteBatch.get();
+	}
+
+	r::SpriteBatch::Ref m_spriteBatch;
+	int m_matId;
 };
 
 

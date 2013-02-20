@@ -26,6 +26,7 @@
 #include "Lua/D_SkModel.h"
 #include "Lua/D_Sound.h"
 #include "Lua/D_Mesh.h"
+#include "Lua/D_SpriteBatch.h"
 #include "../Sound/Sound.h"
 #include "WorldLuaCommon.h"
 
@@ -1087,30 +1088,6 @@ int WorldLua::lua_World_DrawCounters(lua_State *L) {
 	return 1;
 }
 
-int WorldLua::lua_System_CurrentDateAndTime(lua_State *L) {
-	xtime::TimeDate ct = xtime::TimeDate::Now(xtime::TimeDate::local_time_tag());
-
-	lua_createtable(L, 0, 8);
-	lua_pushinteger(L, ct.year);
-	lua_setfield(L, -2, "year");
-	lua_pushinteger(L, ct.millis);
-	lua_setfield(L, -2, "millis");
-	lua_pushinteger(L, ct.month);
-	lua_setfield(L, -2, "month");
-	lua_pushinteger(L, ct.dayOfMonth);
-	lua_setfield(L, -2, "day");
-	lua_pushinteger(L, ct.dayOfWeek);
-	lua_setfield(L, -2, "dayOfWeek");
-	lua_pushinteger(L, ct.hour);
-	lua_setfield(L, -2, "hour");
-	lua_pushinteger(L, ct.minute);
-	lua_setfield(L, -2, "minute");
-	lua_pushinteger(L, ct.second);
-	lua_setfield(L, -2, "second");
-
-	return 1;
-}
-
 int WorldLua::lua_World_QuitGame(lua_State *L) {
 	LOAD_SELF
 	self->m_world->game->quit = true;
@@ -1126,6 +1103,16 @@ int WorldLua::lua_World_SetDrawUIOnly(lua_State *L) {
 int WorldLua::lua_World_DrawUIOnly(lua_State *L) {
 	LOAD_SELF
 	lua_pushboolean(L, self->m_world->draw->uiOnly ? 1 : 0);
+	return 1;
+}
+
+int WorldLua::lua_World_CreateSpriteBatch(lua_State *L) {
+	r::SpriteBatch::Ref sprites(new (r::ZRender) r::SpriteBatch(
+		(int)luaL_checkinteger(L, 1),
+		(int)luaL_checkinteger(L, 2)
+	));
+	D_SpriteBatch::Ref dsprites = D_SpriteBatch::New(sprites);
+	dsprites->Push(L);
 	return 1;
 }
 

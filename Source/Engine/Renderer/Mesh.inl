@@ -70,8 +70,8 @@ inline void Mesh::BindIndices() {
 	m_imp.BindIndices();
 }
 
-inline void Mesh::Draw() {
-	m_imp.Draw();
+inline void Mesh::Draw(int numTris) {
+	m_imp.Draw(numTris);
 }
 
 inline void Mesh::Release() {

@@ -46,7 +46,7 @@ public:
 
 	void Bind(MaterialGeometrySource source, int index);
 	void BindIndices(bool force=false);
-	void Draw();
+	void Draw(int numTris);
 
 	void ResetStreamState();
 	void Release();

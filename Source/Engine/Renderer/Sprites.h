@@ -2,7 +2,7 @@
 	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
 	\copyright See Radiance/LICENSE for licensing terms.
 	\author Joe Riedel
-	\ingroup ui
+	\ingroup renderer
 */
 
 #pragma once
@@ -36,7 +36,7 @@ public:
 	};
 
 	SpriteBatch();
-	SpriteBatch(int minSprites, int maxSprites = kMaxSprites); // 0 == no-limit
+	SpriteBatch(int minSprites, int maxSprites = 0); // 0 == no-limit/kMaxSprites
 
 	void Init(int minSprites, int maxSprites = kMaxSprites);
 
@@ -47,6 +47,7 @@ public:
 	void Compact();
 
 	void Skin();
+	void Draw();
 
 private:
 	

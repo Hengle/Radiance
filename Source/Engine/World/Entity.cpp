@@ -13,6 +13,8 @@
 #include "Lua/D_SkModel.h"
 #include "Lua/D_Sound.h"
 #include "Lua/D_Mesh.h"
+#include "Lua/D_SpriteBatch.h"
+#include "Lua/D_Material.h"
 #include "Lua/T_Tick.h"
 #include "../Sound/Sound.h"
 #include "../MathUtils.h"
@@ -618,6 +620,21 @@ int Entity::lua_AttachDrawModel(lua_State *L) {
 		D_Mesh::Ref x = lua::SharedPtr::Get<D_Mesh>(L, "Model", 2, false);
 		if (x) {
 			MeshBundleDrawModel::Ref m = MeshBundleDrawModel::New(self, x->asset);
+			self->AttachDrawModel(m);
+			m->Push(L);
+			return 1;
+		}
+	}
+
+	{
+		D_SpriteBatch::Ref x = lua::SharedPtr::Get<D_SpriteBatch>(L, "SpriteBatch", 2, false);
+		if (x) {
+			D_Material::Ref mat = lua::SharedPtr::Get<D_Material>(L, "Material", 3, true);
+			SpriteBatchDrawModel::Ref m = SpriteBatchDrawModel::New(
+				self,
+				x->spriteBatch,
+				mat->assetId
+			);
 			self->AttachDrawModel(m);
 			m->Push(L);
 			return 1;

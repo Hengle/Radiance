@@ -1446,6 +1446,9 @@
     <ClInclude Include="..\..\Engine\Renderer\Sprites.h">
       <Filter>Source\Engine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\World\Lua\D_SpriteBatch.h">
+      <Filter>Source\Engine\World\Lua</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2203,6 +2206,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\Renderer\Sprites.cpp">
       <Filter>Source\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\Lua\D_SpriteBatch.cpp">
+      <Filter>Source\Engine\World\Lua</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

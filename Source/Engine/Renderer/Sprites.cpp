@@ -2,7 +2,7 @@
 	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
 	\copyright See Radiance/LICENSE for licensing terms.
 	\author Joe Riedel
-	\ingroup ui
+	\ingroup renderer
 */
 
 #include RADPCH
@@ -50,6 +50,8 @@ void SpriteBatch::Init(int minSprites, int maxSprites) {
 	m_minSprites = minSprites;
 	// cannot generate indices for more than this:
 	m_maxSprites = std::min(maxSprites, (int)kMaxSprites);
+	if (m_maxSprites < 1)
+		m_maxSprites = kMaxSprites;
 
 	UReg maxSize = std::numeric_limits<UReg>::max();
 	if (maxSprites > 0)
@@ -138,6 +140,10 @@ void SpriteBatch::Skin() {
 	vb.reset();
 }
 
+void SpriteBatch::Draw() {
+	m_m.Draw(m_numSprites * 2);
+}
+
 void SpriteBatch::AllocateMesh() {
 	RAD_ASSERT(m_init);
 	if (m_meshSprites >= m_numSprites)
@@ -205,7 +211,7 @@ void SpriteBatch::AllocateMesh() {
 	vb = m_m.MapIndices(kStreamUsage_Static, sizeof(U16), m_meshSprites*2*3);
 	U16 *indices = (U16*)vb->ptr.get();
 	for (int i = 0; i < m_meshSprites; ++i) {
-		const U16 base = (U16)m_meshSprites * 4;
+		const U16 base = (U16)(i * 4);
 		indices[0] = base;
 		indices[1] = base+1;
 		indices[2] = base+2;

@@ -868,6 +868,7 @@
     <ClInclude Include="..\..\Engine\World\Lua\D_ScreenOverlay.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_SkModel.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_Sound.h" />
+    <ClInclude Include="..\..\Engine\World\Lua\D_SpriteBatch.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_Typeface.h" />
     <ClInclude Include="..\..\Engine\World\Lua\LuaTask.h" />
     <ClInclude Include="..\..\Engine\World\Lua\T_Fail.h" />
@@ -1973,6 +1974,7 @@
     <ClCompile Include="..\..\Engine\World\Lua\D_ScreenOverlay.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_SkModel.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_Sound.cpp" />
+    <ClCompile Include="..\..\Engine\World\Lua\D_SpriteBatch.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_Typeface.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\LuaTask.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\T_MaterialPrecache.cpp" />
