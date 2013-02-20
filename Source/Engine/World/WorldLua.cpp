@@ -214,8 +214,6 @@ bool WorldLua::Init() {
 	lua::RegisterGlobals(L, "System", systemCalls);
 	lua::RegisterGlobals(L, "GameNetwork", gameNetworkCalls);
 	lua::RegisterGlobals(L, 0, cvarCalls);
-	
-	lua_pop(L, 1);
 
 	// setup persistence tables.
 

@@ -44,8 +44,9 @@ Root::Ref Root::New(lua_State *L) {
 			lua_pop(L, 1);
 			lua_createtable(L, kMaxWidgets, 0);
 			lua_setfield(L, LUA_REGISTRYINDEX, UIWIDGETS);
+		} else {
+			lua_pop(L, 1);
 		}
-		lua_pop(L, 1);
 	}
 
 	return r;

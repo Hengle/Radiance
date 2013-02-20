@@ -12,6 +12,7 @@
 
 using namespace string;
 
+extern "C" {
 RADRT_API void RADRT_CALL __rad_assert(
 	const __RAD_ASSERT_CHAR *message,
 	const __RAD_ASSERT_CHAR *file,
@@ -50,7 +51,7 @@ RADRT_API void RADRT_CALL __rad_assert(
 	__assert_fail(message, file, line, function);
 #endif
 }
-
+}
 #if defined(BOOST_NO_EXCEPTIONS)
 namespace boost {
 void throw_exception(const std::exception &) {

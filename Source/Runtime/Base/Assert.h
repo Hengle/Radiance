@@ -12,12 +12,14 @@
 #define __RAD_ASSERT_CHAR char
 #define __RAD_ASSERT_WIDE(_str) _str
 
+extern "C" {
 RADRT_API void RADRT_CALL __rad_assert(
 	const __RAD_ASSERT_CHAR *message,
 	const __RAD_ASSERT_CHAR *file,
 	const __RAD_ASSERT_CHAR *function,
 	unsigned int line
 );
+}
 
 #include <boost/static_assert.hpp>
 
