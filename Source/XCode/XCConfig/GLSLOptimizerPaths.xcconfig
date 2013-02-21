@@ -3,5 +3,5 @@
 // Copyright (c) 2012 Sunside Inc., All Rights Reserved.
 // See Radiance/LICENSE for licensing terms.
 
-GLSLOPTIMIZER_PATH = $(EXTERN_PATH)/aras-p-glsl-optimizer-f2217b0
+GLSLOPTIMIZER_PATH = $(EXTERN_PATH)/glsl-optimizer
 
