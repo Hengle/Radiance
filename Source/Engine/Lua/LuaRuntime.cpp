@@ -1046,8 +1046,11 @@ RADENG_API bool RADENG_CALL GetFieldExt(lua_State *L, int index, const char *k) 
 			if (*path) {
 				*t++ = 0;
 
-				if (lua_type(L, index) != LUA_TTABLE)
+				if (lua_type(L, index) != LUA_TTABLE) {
+					if (!first)
+						lua_pop(L, 1);
 					return false;
+				}
 				lua_getfield(L, index, path);
 				if (!first)
 					lua_remove(L, -2);
