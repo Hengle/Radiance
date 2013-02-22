@@ -648,6 +648,20 @@ bool GLSLShader::MapInputs(Pass &p, const Material &material) {
 			}
 		}
 	}
+	
+	// init sprite verts
+	for (int i = 0; i < 4; ++i) {
+		char sz[64];
+		string::sprintf(sz, "U_spriteVerts[%d]", i);
+		int idx = gl.GetUniformLocationARB(p.p->id, sz);
+		if (idx == -1)
+			break;
+		gl.Uniform2fARB(
+			idx,
+			(i < 2) ? -0.5f : 0.5f,
+			(i == 1 || i == 2) ? -0.5f : 0.5f
+		);
+	}
 
 	return true;
 }

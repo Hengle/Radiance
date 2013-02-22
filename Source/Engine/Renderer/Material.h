@@ -258,7 +258,7 @@ private:
 		int idx;
 		Shader::Ref shader;
 
-		typedef boost::mutex Mutex;
+		typedef boost::recursive_mutex Mutex;
 		typedef boost::lock_guard<Mutex> Lock;
 
 		static Mutex s_m;
