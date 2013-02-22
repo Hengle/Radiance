@@ -91,6 +91,7 @@ protected:
 };
 
 class BlobSrcBuffer : public SrcBuffer {
+public:
 	BlobSrcBuffer(const char *name, const void *data, AddrSize size) : m_name(name), m_data(data), m_size(size) {}
 
 protected:
