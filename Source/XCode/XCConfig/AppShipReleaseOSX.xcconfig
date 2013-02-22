@@ -8,4 +8,4 @@
 
 OPTIONAL_EXTERNLIB_INCLUDES = 
 
-#include "AppBuild.xcconfig"
+#include "AppBuildOSX.xcconfig"

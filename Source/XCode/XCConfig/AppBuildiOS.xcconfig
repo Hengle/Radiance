@@ -3,6 +3,6 @@
 // Copyright (c) 2012 Sunside Inc., All Rights Reserved.
 // See Radiance/LICENSE for licensing terms.
 
-HEADER_SEARCH_PATHS = $(EXTERNLIB_INCLUDES) $(OPTIONAL_EXTERNLIB_INCLUDES) "$(ENGINE_PATH)" $(inherited)
-GCC_PREPROCESSOR_DEFINITIONS = $(CONFIG_DEFINES) $(RAD_DEFINES)
+#include "AppBuild.xcconfig"
 
+OTHER_LDFLAGS = $(CONFIG_LINKER_FLAGS)

@@ -3769,6 +3769,8 @@
 		33F8F4E116D613C5009646B1 /* Sprites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sprites.h; sourceTree = "<group>"; };
 		33F8F4EE16D61769009646B1 /* D_SpriteBatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = D_SpriteBatch.cpp; sourceTree = "<group>"; };
 		33F8F4EF16D61769009646B1 /* D_SpriteBatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = D_SpriteBatch.h; sourceTree = "<group>"; };
+		33F8F50016D6F8EF009646B1 /* AppBuildiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppBuildiOS.xcconfig; path = XCConfig/AppBuildiOS.xcconfig; sourceTree = "<group>"; };
+		33F8F50116D6F8F0009646B1 /* AppBuildOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppBuildOSX.xcconfig; path = XCConfig/AppBuildOSX.xcconfig; sourceTree = "<group>"; };
 		33FA7E821633B97C002603A5 /* RBackend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RBackend.h; sourceTree = "<group>"; };
 		33FA7E831633B97C002603A5 /* RBackendDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RBackendDef.h; sourceTree = "<group>"; };
 		33FA7E841633B97D002603A5 /* RBGLAssets.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RBGLAssets.cpp; sourceTree = "<group>"; };
@@ -3904,6 +3906,8 @@
 		33E8822D15B8C8F10089BA08 /* XCConfig_Common */ = {
 			isa = PBXGroup;
 			children = (
+				33F8F50016D6F8EF009646B1 /* AppBuildiOS.xcconfig */,
+				33F8F50116D6F8F0009646B1 /* AppBuildOSX.xcconfig */,
 				3319498215B9FB0600458F43 /* AppDebugiOS.xcconfig */,
 				3319498315B9FB0600458F43 /* AppDebugOSX.xcconfig */,
 				3319498415B9FB0600458F43 /* AppReleaseiOS.xcconfig */,
