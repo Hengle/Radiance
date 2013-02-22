@@ -978,6 +978,7 @@ int PackageMan::CompileScripts() {
 				fprintf(fp, ", ");
 		}
 
+		binFile->ob.FreeMemory();
 		fprintf(fp, "\n};\n\n");
 	}
 
