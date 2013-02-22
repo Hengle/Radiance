@@ -86,8 +86,21 @@ protected:
 	RAD_DECLARE_GET(size, AddrSize);
 	RAD_DECLARE_GET(name, const char *);
 
-	file::MMappingRef m_mm;
 	String m_name;
+	file::MMappingRef m_mm;
+};
+
+class BlobSrcBuffer : public SrcBuffer {
+	BlobSrcBuffer(const char *name, const void *data, AddrSize size) : m_name(name), m_data(data), m_size(size) {}
+
+protected:
+	RAD_DECLARE_GET(ptr, const void *);
+	RAD_DECLARE_GET(size, AddrSize);
+	RAD_DECLARE_GET(name, const char *);
+
+	String m_name;
+	const void *m_data;
+	AddrSize m_size;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////

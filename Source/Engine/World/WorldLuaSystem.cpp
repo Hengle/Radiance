@@ -440,7 +440,7 @@ int WorldLua::lua_System_UTF32To8(lua_State *L) {
 }
 
 int WorldLua::lua_System_CurrentDateAndTime(lua_State *L) {
-	xtime::TimeDate ct = xtime::TimeDate::Now(xtime::TimeDate::local_time_tag());
+	xtime::TimeDate ct = xtime::TimeDate::Now(xtime::TimeDate::local_time_tag);
 
 	lua_createtable(L, 0, 8);
 	lua_pushinteger(L, ct.year);

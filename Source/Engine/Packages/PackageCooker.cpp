@@ -11,6 +11,7 @@
 #include <Runtime/Endian/EndianStream.h>
 #include <Runtime/DataCodec/LmpWriter.h>
 #include <Runtime/DataCodec/ZLib.h>
+#include <Runtime/Stream/MemoryStream.h>
 #include "../Renderer/Material.h"
 #include "../Renderer/GL/GLState.h"
 #include "../Tools/Editor/EditorGLWidget.h"
@@ -276,55 +277,59 @@ int PackageMan::Cook(
 	int ptargets = P_TARGET_FLAGS(flags);
 	flags &= ~ptargets;
 
-	if (scriptsOnly) {
-		r = BuildPakFiles(ptargets, compression);
-	} else {
-		CreateCookThreads(glContext, out);
+	r = CompileScripts();
 
-		r::Material::BeginCook();
+	if (r == SR_Success) {
+		if (scriptsOnly) {
+			r = BuildPakFiles(ptargets, compression);
+		} else {
+			CreateCookThreads(glContext, out);
 
-		out << "Coooking generics..." << std::endl;
-		r = CookPlat(roots, flags, flags|ptargets, out);
+			r::Material::BeginCook();
+
+			out << "Coooking generics..." << std::endl;
+			r = CookPlat(roots, flags, flags|ptargets, out);
 		
-		if (r == SR_Success) {
-			for (int i = P_FirstTarget; i <= P_LastTarget; i <<= 1) {
-				if (i&ptargets) {
-					out << "Cooking " << PlatformNameForFlags(i) << "..." << std::endl;
-					r = CookPlat(roots, flags|i, flags|ptargets, out);
-					if (r != SR_Success) {
-						out << "ERROR: cooking " << PlatformNameForFlags(i) << "!" << std::endl;
-						break;
+			if (r == SR_Success) {
+				for (int i = P_FirstTarget; i <= P_LastTarget; i <<= 1) {
+					if (i&ptargets) {
+						out << "Cooking " << PlatformNameForFlags(i) << "..." << std::endl;
+						r = CookPlat(roots, flags|i, flags|ptargets, out);
+						if (r != SR_Success) {
+							out << "ERROR: cooking " << PlatformNameForFlags(i) << "!" << std::endl;
+							break;
+						}
 					}
 				}
+			} else {
+				out << "ERROR: cooking generics!" << std::endl;
 			}
-		} else {
-			out << "ERROR: cooking generics!" << std::endl;
-		}
 
-		if (r == SR_Success) {
-			r = BuildPackageData();
-			if (r == SR_Success)
-				r = BuildPakFiles(ptargets, compression);
-		}
-
-		r::Material::EndCook();
-
-		m_cookState->done = true;
-		m_cookState->waiting.Open();
-		{
-			Lock L(m_cookState->mutex);
-			while (m_cookState->complete) {
-				CookCommand *next = m_cookState->complete->next;
-				delete m_cookState->complete;
-				m_cookState->complete = next;
+			if (r == SR_Success) {
+				r = BuildPackageData();
+				if (r == SR_Success)
+					r = BuildPakFiles(ptargets, compression);
 			}
-			while (m_cookState->pending) {
-				CookCommand *next = m_cookState->pending->next;
-				delete m_cookState->pending;
-				m_cookState->pending = next;
+
+			r::Material::EndCook();
+
+			m_cookState->done = true;
+			m_cookState->waiting.Open();
+			{
+				Lock L(m_cookState->mutex);
+				while (m_cookState->complete) {
+					CookCommand *next = m_cookState->complete->next;
+					delete m_cookState->complete;
+					m_cookState->complete = next;
+				}
+				while (m_cookState->pending) {
+					CookCommand *next = m_cookState->pending->next;
+					delete m_cookState->pending;
+					m_cookState->pending = next;
+				}
 			}
+			m_cookThreads.clear(); // destroy cook threads.
 		}
-		m_cookThreads.clear(); // destroy cook threads.
 	}
 
 	xtime::TimeVal totalTime = xtime::ReadMilliseconds() - startTime;
@@ -662,20 +667,6 @@ int PackageMan::BuildPak0(int compression) {
 		return r;
 	}
 
-	{
-		String path;
-		if (!m_engine.sys->files->GetAbsolutePath("@r:/Source/Scripts", path, file::kFileMask_Base)) {
-			*m_cookState->cout << "ERROR GetAbsolutePath failed." << std::endl;
-			return SR_IOError;
-		}
-
-		r = PakDirectory(path.c_str, "Scripts/", compression, lumpWriter);
-		if (r != SR_Success) {
-			fclose(fp);
-			return r;
-		}
-	}
-
 	r = PakDirectory("@r:/Cooked/Out/Generic", "Cooked/", compression, lumpWriter);
 	if (r != SR_Success) {
 		fclose(fp);
@@ -872,6 +863,141 @@ int PackageMan::PakDirectory(
 
 		zone_free(data);
 	}
+
+	return SR_Success;
+}
+
+int PackageMan::LuaChunkWrite(lua_State *L, const void *p, size_t size, void *ud) {
+	return reinterpret_cast<stream::OutputStream*>(ud)->Write(p, (stream::SPos)size, 0) == false;
+}
+
+namespace {
+struct ScriptBinFile {
+	typedef boost::shared_ptr<ScriptBinFile> Ref;
+	typedef zone_vector<Ref, ZToolsT>::type Vec;
+
+	ScriptBinFile() : ob(ZTools) {}
+
+	String filename;
+	String cname;
+	stream::DynamicMemOutputBuffer ob;
+	int len;
+};
+}
+
+int PackageMan::CompileScripts() {
+	const String basePath(CStr("@r:/Source/Scripts"));
+	file::FileSearch::Ref s = m_engine.sys->files->OpenSearch(
+		(basePath + "/*.lua").c_str,
+		file::kSearchOption_Recursive,
+		file::kFileOptions_None,
+		file::kFileMask_Base
+	);
+	
+	if (!s)
+		return SR_Success;
+
+	ScriptBinFile::Vec files;
+
+	lua::State::Ref L(new lua::State("scripts"));
+
+	String filename;
+	while (s->NextFile(filename)) {
+		*m_cookState->cout << "Compiling " << filename << "..." << std::endl;
+
+		String filePath = basePath + "/" + filename;
+		file::MMapping::Ref mm = m_engine.sys->files->MapFile(filePath.c_str, ZTools);
+		if (!mm) {
+			*m_cookState->cout << "ERROR reading \"" << filePath << "\"" << std::endl;
+			return SR_FileNotFound;
+		}
+
+		if (luaL_loadbuffer(L->L, (const char*)mm->data.get(), mm->size, filename.c_str) != 0) {
+			*m_cookState->cout << "ERROR compiling \"" << filePath << "\"" << lua_tostring(L->L, -1) << std::endl;
+			return SR_CompilerError;
+		}
+
+		ScriptBinFile::Ref binFile(new ScriptBinFile());
+		binFile->filename = file::SetFileExtension(filename.c_str, 0);
+		binFile->cname = "s_luaBinFile_" + binFile->filename;
+		binFile->cname.Replace('/', '_');
+		stream::OutputStream os(binFile->ob);
+		
+		if (lua_dump(L->L, LuaChunkWrite, &os) != 0) {
+			*m_cookState->cout << "ERROR converting \"" << filePath << "\" to binfile." << std::endl;
+			return SR_CompilerError;
+		}
+
+		files.push_back(binFile);
+		lua_pop(L->L, 1); // pop function off the stack.
+	}
+
+	L.reset(); // don't need lua anymore.
+
+	// Dump binary to C++ code to be included in golden & ship builds (i.e. things that run from pak data).
+	FILE *fp = m_engine.sys->files->fopen("@r:/Source/Scripts/CompiledScripts.cpp", "wt");
+	if (!fp) {
+		*m_cookState->cout << "ERROR opening @r:/Source/Scripts/CompiledScripts.cpp for write." << std::endl;
+		return SR_IOError;
+	}
+
+	xtime::TimeDate curTime = xtime::TimeDate::Now(xtime::TimeDate::local_time_tag);
+
+	fprintf(fp, "// @r:/Source/Scripts/CompiledScripts.cpp\n");
+	fprintf(fp, "// Auto-generated by Radiance package cooker on %d/%d/%d @ %02d:%02d:%02d\n",
+		curTime.month, curTime.dayOfMonth, curTime.year,
+		curTime.hour, curTime.minute, curTime.second
+	);
+	
+	fprintf(fp, "// Contents:\n");
+
+	for (ScriptBinFile::Vec::const_iterator it = files.begin(); it != files.end(); ++it) {
+		const ScriptBinFile::Ref &binFile = *it;
+		fprintf(fp, "// %s.lua\n", binFile->filename.c_str.get());
+	}
+
+	fprintf(fp, "\n\n");
+	fprintf(fp, "namespace {\n\n");
+
+	for (ScriptBinFile::Vec::const_iterator it = files.begin(); it != files.end(); ++it) {
+		const ScriptBinFile::Ref &binFile = *it;
+
+		const U8 *data = (const U8*)binFile->ob.OutputBuffer().Ptr();
+		binFile->len  = (int)binFile->ob.OutputBuffer().OutPos();
+
+		fprintf(fp, "static const U8 %s[%d] = {", binFile->cname.c_str.get(), binFile->len);
+
+		for (int i = 0; i < binFile->len; ++i) {
+			// newline?
+			if ((i%16) == 0) {
+				fprintf(fp, "\n\t");
+			}
+			
+			fprintf(fp, "0x%02x", data[i]);
+			if (i < binFile->len-1)
+				fprintf(fp, ", ");
+		}
+
+		fprintf(fp, "\n};\n\n");
+	}
+
+	fprintf(fp, "} // namespace\n\n");
+	fprintf(fp, "lua::SrcBuffer::Ref WorldLua::ImportLoader::Load(lua_State *L, const char *name) {\n\n");
+
+	for (ScriptBinFile::Vec::const_iterator it = files.begin(); it != files.end(); ++it) {
+		const ScriptBinFile::Ref &binFile = *it;
+
+		fprintf(fp, "\tif (!string::cmp(name, \"%s\")) {\n", binFile->filename.c_str.get());
+		fprintf(fp, "\t\treturn lua::SrcBuffer::Ref(new lua::BlobSrcBuffer(\"%s.lua\", %s, %d));\n", 
+			binFile->filename.c_str.get(), 
+			binFile->cname.c_str.get(),
+			(int)binFile->len
+		);
+		fprintf(fp, "\t}\n");
+	}
+
+	fprintf(fp, "\n\treturn lua::SrcBuffer::Ref();\n}\n");
+	fclose(fp);
 
 	return SR_Success;
 }

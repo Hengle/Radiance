@@ -240,7 +240,7 @@ int Package::Entry::MatchTargetKeys(const char *path, int plat, int allplats) co
 }
 
 inline void Package::Entry::UpdateModifiedTime() {
-	m_modifiedTime = xtime::TimeDate::Now(xtime::TimeDate::universal_time_tag());
+	m_modifiedTime = xtime::TimeDate::Now(xtime::TimeDate::universal_time_tag);
 }
 
 inline bool Package::Entry::RAD_IMPLEMENT_GET(cooked) {

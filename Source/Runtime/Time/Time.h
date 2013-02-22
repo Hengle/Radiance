@@ -26,11 +26,14 @@ struct RADRT_CLASS TimeDate
 	U8 minute;
 	U8 second;
 
-	struct local_time_tag {};
-	struct universal_time_tag {};
+	struct local_time_tag_s {};
+	struct universal_time_tag_s {};
 
-	static TimeDate Now(const local_time_tag&);
-	static TimeDate Now(const universal_time_tag&);
+	static const local_time_tag_s local_time_tag;
+	static const universal_time_tag_s universal_time_tag;
+
+	static TimeDate Now(const local_time_tag_s&);
+	static TimeDate Now(const universal_time_tag_s&);
 	static TimeDate Zero();
 	static TimeDate FromString(const char *str);
 	

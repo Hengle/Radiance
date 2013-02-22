@@ -14,7 +14,6 @@
 namespace xtime {
 	
 const TimeSlice TimeSlice::Infinite(std::numeric_limits<TimeVal>::max());
-	
 
 RADRT_API void RADRT_CALL MilliToDayHourSecond(TimeVal time, UReg* days, UReg* hours, UReg* minutes, FReg* seconds)
 {
@@ -37,7 +36,10 @@ RADRT_API TimeVal RADRT_CALL DayHourSecondToMilli(UReg days, UReg hours, UReg mi
 	);
 }
 
-TimeDate TimeDate::Now(const local_time_tag&)
+const TimeDate::local_time_tag_s TimeDate::local_time_tag;
+const TimeDate::universal_time_tag_s TimeDate::universal_time_tag;
+
+TimeDate TimeDate::Now(const local_time_tag_s&)
 {
 	std::tm t = boost::posix_time::to_tm(boost::posix_time::second_clock::local_time());
 
@@ -53,7 +55,7 @@ TimeDate TimeDate::Now(const local_time_tag&)
 	return td;
 }
 
-TimeDate TimeDate::Now(const universal_time_tag&)
+TimeDate TimeDate::Now(const universal_time_tag_s&)
 {
 	std::tm t = boost::posix_time::to_tm(boost::posix_time::second_clock::universal_time());
 

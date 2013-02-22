@@ -559,12 +559,12 @@ bool WorldLua::PostSpawn(Entity &ent) {
 		return true; // not an error to have no PostSpawn
 	return Call("PostSpawn", 1, 0, 0);
 }
-lua::SrcBuffer::Ref WorldLua::ImportLoader::Load(lua_State *L, const char *name) {
+
 #if defined(RAD_TARGET_GOLDEN)
-	String path(CStr("Scripts/"));
+#include "../../Source/Scripts/CompiledScripts.cpp"
 #else
+lua::SrcBuffer::Ref WorldLua::ImportLoader::Load(lua_State *L, const char *name) {
 	String path(CStr("@r:/Source/Scripts/"));
-#endif
 
 	path += name;
 	path += ".lua";
@@ -575,5 +575,6 @@ lua::SrcBuffer::Ref WorldLua::ImportLoader::Load(lua_State *L, const char *name)
 
 	return lua::SrcBuffer::Ref(new lua::FileSrcBuffer((CStr(name) + ".lua").c_str, mm));
 }
+#endif
 
 } // world

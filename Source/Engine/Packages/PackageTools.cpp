@@ -688,7 +688,7 @@ int PackageMan::lua_Add(lua_State *L) {
 		modifiedTime = xtime::TimeDate::FromString(pstr->c_str);
 		map.erase(it); // not a key.
 	} else {
-		modifiedTime = xtime::TimeDate::Now(xtime::TimeDate::universal_time_tag());
+		modifiedTime = xtime::TimeDate::Now(xtime::TimeDate::universal_time_tag);
 		self->m_resavePackages = true; // resave times.
 	}
 

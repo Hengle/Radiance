@@ -1114,6 +1114,10 @@ private:
 		data_codec::lmp::Writer &lumpWriter
 	);
 
+	static int LuaChunkWrite(lua_State *L, const void *p, size_t size, void *ud);
+	
+	int CompileScripts();
+
 	bool LoadTagFile(const Cooker::Ref &cooker, int pflags, void *&data, AddrSize &size);
 	bool CreateTagData(const Cooker::Ref &cooker, TagData *&data, AddrSize &size);
 

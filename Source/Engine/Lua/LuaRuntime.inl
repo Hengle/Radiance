@@ -7,6 +7,20 @@ namespace lua {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
+inline const void *BlobSrcBuffer::RAD_IMPLEMENT_GET(ptr) { 
+	return m_data; 
+}
+
+inline AddrSize BlobSrcBuffer::RAD_IMPLEMENT_GET(size) { 
+	return m_size; 
+}
+
+inline const char *BlobSrcBuffer::RAD_IMPLEMENT_GET(name) { 
+	return m_name.c_str; 
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
 inline Variant::Variant() {
 }
 
