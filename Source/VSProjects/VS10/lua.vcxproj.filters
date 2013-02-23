@@ -198,5 +198,8 @@
     <ClCompile Include="..\..\..\..\Extern\lua-5.1.5\Lua\bitop.c">
       <Filter>lua-5.1.5</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\lua_ship_null.cpp">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

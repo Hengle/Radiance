@@ -1063,6 +1063,7 @@ public:
 		WaypointPair waypoints;
 		Vec3 ctrls[2];
 		String cmds[4];
+		String anims[2];
 		int flags;
 		int emitId;
 	};

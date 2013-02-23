@@ -95,6 +95,7 @@ public:
 		int flags;
 		int floors[2];
 		String events[2];
+		String anim;
 
 		void Reverse();
 	};
@@ -113,6 +114,8 @@ public:
 		FloorPosition pos;
 		Vec3 facing;
 		int flags;
+		bool moveAnim;
+
 	private:
 		friend class FloorMove;
 		friend class Floors;
@@ -124,10 +127,17 @@ public:
 	FloorMove();
 
 	void InitMove(State &state);
+	
 	float Move(
 		State &state, 
 		float distance, 
 		float &distanceRemainingAfterMove,
+		StringVec &events,
+		String &moveAnim
+	);
+
+	bool NextStep(
+		State &state,
 		StringVec &events
 	);
 	

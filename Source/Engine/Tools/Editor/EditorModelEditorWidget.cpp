@@ -616,7 +616,7 @@ void ModelEditorWidget::ItemSelectionChanged() {
 				1.f,
 				1.f,
 				0,
-				false,
+				ska::AnimState::kMoveType_None,
 				*m_skModel->ska.get(),
 				ska::Notify::Ref()
 			);

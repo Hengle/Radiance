@@ -80,7 +80,7 @@ int SkAnimStatesParser::LoadCooked(
 			is >> state.name;
 			is >> temp; state.loopCount[0] = (int)temp;
 			is >> temp; state.loopCount[1] = (int)temp;
-			is >> temp; state.distance = temp ? true : false;
+			is >> temp; state.moveType = (ska::AnimState::MoveType)temp;
 						
 			U16 numVariants;
 			is >> numVariants;
@@ -472,6 +472,8 @@ void SkAnimStatesParser::ParseAnimState(lua_State *L, const pkg::Asset::Ref &ass
 		state.loopCount[0] = state.loopCount[1] = 1;
 	}
 
+	state.moveType = ska::AnimState::kMoveType_None;
+
 	it = map.find(CStr("distance"));
 	if (it != map.end()) {
 		const bool *b = static_cast<const bool*>(it->second);
@@ -485,9 +487,25 @@ void SkAnimStatesParser::ParseAnimState(lua_State *L, const pkg::Asset::Ref &ass
 			);
 		}
 
-		state.distance = *b;
+		if (*b)
+			state.moveType = ska::AnimState::kMoveType_Distance;
 	} else {
-		state.distance = false;
+		it = map.find(CStr("motion"));
+		if (it != map.end()) {
+			const bool *b = static_cast<const bool*>(it->second);
+			if (!b) {
+				luaL_error(L, "AnimState '%s':'%s':motion expected boolean, (Function %s, File %s, Line %d)",
+					asset->name.get(),
+					state.name.c_str.get(),
+					__FUNCTION__,
+					__FILE__,
+					__LINE__
+				);
+			}
+
+			if (*b)
+				state.moveType = ska::AnimState::kMoveType_RemoveMotion;
+		}
 	}
 
 	for (lua::Variant::Map::const_iterator it = map.begin(); it != map.end(); ++it) {
@@ -496,6 +514,8 @@ void SkAnimStatesParser::ParseAnimState(lua_State *L, const pkg::Asset::Ref &ass
 		if (it->first == CStr("loop"))
 			continue; // special keyword
 		if (it->first == CStr("distance"))
+			continue;
+		if (it->first == CStr("motion"))
 			continue;
 
 		v.name = it->first;

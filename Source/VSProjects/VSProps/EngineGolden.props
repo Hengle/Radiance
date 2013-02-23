@@ -8,7 +8,7 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>RAD_TARGET_GOLDEN;RAD_OPT_PC;RAD_OPT_GL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RAD_TARGET_GOLDEN;RAD_OPT_PC;RAD_OPT_GL;LUA_JIT=201;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

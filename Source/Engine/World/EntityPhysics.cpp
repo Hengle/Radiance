@@ -74,6 +74,15 @@ void Entity::Move() {
 	Link();
 }
 
+void Entity::SkaMove() {
+	if (m_ps.motionSka) {
+		const ska::BoneTM *delta = m_ps.motionSka->ska->deltaMotion;
+		m_ps.origin += delta->t * m_ps.motionScale;
+		m_ps.angles.pos = Vec3::Zero;
+		Move();
+	}
+}
+
 void Entity::SeekAngles(float dt) {
 	// Need to do some stuff to fixup so the spring system works here
 	// Because angles need to lerp shortest path.

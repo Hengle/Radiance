@@ -59,7 +59,8 @@ float FloorMove::Move(
 	State &state, 
 	float distance, 
 	float &distanceRemainingAfterMove,
-	StringVec &events
+	StringVec &events,
+	String &moveAnim
 ) {
 	distanceRemainingAfterMove = 0.f;
 	if (m_route.steps->empty())
@@ -77,6 +78,13 @@ float FloorMove::Move(
 			state.m_first = false;
 			if (!step->events[0].empty)
 				events.push_back(step->events[0]);
+			moveAnim = step->anim;
+
+			if (!moveAnim.empty) {
+				state.moveAnim = true;
+				state.m_m.Eval(step->path, 0.f, state.pos.m_pos, &state.facing, &distanceRemainingAfterMove);
+				break; // animation system must move us now.
+			}
 		}
 
 		float dd = distance - moved;
@@ -111,6 +119,38 @@ float FloorMove::Move(
 	}
 
 	return moved;
+}
+
+bool FloorMove::NextStep(State &state, StringVec &events) {
+	if (m_route.steps->empty())
+		return true;
+	if (state.m_stepIdx >= (int)m_route.steps->size())
+		return true;
+
+	const Step *step = &m_route.steps[state.m_stepIdx];
+
+	if (!step->events[1].empty)
+		events.push_back(step->events[1]);
+
+	step->path.Eval(1.f, state.pos.m_pos, &state.facing);
+
+	++state.m_stepIdx;
+	state.m_m.Init();
+	state.m_first = true;
+
+	if (state.m_stepIdx >= (int)m_route.steps->size()) {
+		step = &m_route.steps[state.m_stepIdx-1];
+		state.pos.m_waypoint = step->waypoints[1];
+		state.pos.m_nextWaypoint = -1;
+		state.pos.m_floor = (state.pos.m_waypoint != -1) ? -1 : step->floors[1];
+	} else {
+		step = &m_route.steps[state.m_stepIdx];
+		state.pos.m_waypoint = step->waypoints[0];
+		state.pos.m_nextWaypoint = step->waypoints[1];
+		state.pos.m_floor = (state.pos.m_waypoint != -1) ? -1 : step->floors[0];
+	}
+
+	return (state.m_stepIdx >= (int)m_route.steps->size());
 }
 
 void FloorMove::Merge(const Ref &old, State &state) {
@@ -1043,9 +1083,12 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 			}
 
 			if (connection->cmds[cmdSet*2+0] != -1)
-				step.events[0] = String(m_bsp->String(connection->cmds[cmdSet*2+0]));
+				step.events[0] = CStr(m_bsp->String(connection->cmds[cmdSet*2+0]));
 			if (connection->cmds[cmdSet*2+1] != -1)
-				step.events[1] = String(m_bsp->String(connection->cmds[cmdSet*2+1]));
+				step.events[1] = CStr(m_bsp->String(connection->cmds[cmdSet*2+1]));
+
+			if (connection->anims[dir] != -1)
+				step.anim = CStr(m_bsp->String(connection->anims[dir]));
 
 			step.spline.Init(
 				cur.pos,

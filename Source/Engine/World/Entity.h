@@ -105,6 +105,7 @@ struct PState {
 	FloorMove::Ref activeMove;
 	FloorMove::Ref desiredMove;
 	FloorMove::State moveState;
+	r::SkMesh::Ref motionSka;
 	physics::Spring angleSpring;
 	physics::SpringVertex angles;
 	float groundFriction; // units per second on ground
@@ -116,6 +117,7 @@ struct PState {
 	float splineBankScale;
 	float splineBankLerp;
 	float autoDecelDistance;
+	float motionScale;
 	float distanceMoved; // set by physics engine
 	MoveType mtype;
 	SolidType stype;
@@ -294,6 +296,8 @@ protected:
 		const xtime::TimeSlice &time
 	);
 
+	virtual void CustomMoveComplete();
+
 	void TickOther(
 		Entity &entity,
 		int frame,
@@ -306,6 +310,7 @@ protected:
 	void AutoFace(float dt);
 	Vec3 ApplyVelocity(float dt);
 	void Move();
+	void SkaMove();
 	void TransitionFloorMove();
 	void SetNextTick(float dt);
 
@@ -355,6 +360,7 @@ private:
 	static int lua_Link(lua_State *L);
 	static int lua_Unlink(lua_State *L);
 	static int lua_Delete(lua_State *L);
+	static int lua_CustomMoveComplete(lua_State *L);
 
 	ENT_DECL_GETSET(Parent);
 	ENT_DECL_GETSET(Pos);
@@ -373,6 +379,7 @@ private:
 	ENT_DECL_GET(ActiveMove);
 	ENT_DECL_GETSET(DesiredMove);
 	ENT_DECL_GETSET(FloorPosition);
+	ENT_DECL_GETSET(MotionSka);
 	ENT_DECL_GETSET(Accel);
 	ENT_DECL_GETSET(SnapTurnAngles);
 	ENT_DECL_GETSET(GroundFriction);
@@ -384,6 +391,7 @@ private:
 	ENT_DECL_GETSET(SplineBankScale);
 	ENT_DECL_GETSET(SplineBankLerp);
 	ENT_DECL_GETSET(AutoDecelDistance);
+	ENT_DECL_GETSET(MotionScale);
 	ENT_DECL_GET(DistanceMoved);
 	ENT_DECL_GETSET(MoveType);
 	ENT_DECL_GETSET(SolidType);

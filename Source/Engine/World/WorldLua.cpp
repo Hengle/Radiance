@@ -561,7 +561,7 @@ bool WorldLua::PostSpawn(Entity &ent) {
 }
 
 #if defined(RAD_TARGET_GOLDEN)
-#include "../../Source/Scripts/CompiledScripts.cpp"
+#include "../../../../Source/Scripts/CompiledScripts.cpp"
 #else
 lua::SrcBuffer::Ref WorldLua::ImportLoader::Load(lua_State *L, const char *name) {
 	String path(CStr("@r:/Source/Scripts/"));

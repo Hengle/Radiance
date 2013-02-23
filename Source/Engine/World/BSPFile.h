@@ -199,6 +199,7 @@ struct BSPWaypoint {
 struct BSPWaypointConnection {
 	S32 flags;
 	S32 cmds[4];
+	S32 anims[2];
 	U32 waypoints[2];
 	float ctrls[2][3]; // curve
 };

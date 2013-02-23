@@ -10,7 +10,7 @@
 
 #define DECLARE(_name) namespace _name { namespace details { void Initialize(); void Finalize(); void ThreadInitialize(); void ThreadFinalize(); void ProcessTasks(); } }
 
-
+//#define TASK_THREAD
 
 DECLARE(thread)
 
@@ -22,6 +22,7 @@ namespace rt {
 
 namespace details
 {
+#if defined(TASK_THREAD)
 	class Tasks : public thread::Thread
 	{
 	public:
@@ -71,21 +72,26 @@ namespace details
 		volatile bool m_exit;
 		thread::Semaphore m_sem;
 	};
-
+#endif
 	namespace
 	{
 		RuntimeFlags s_flags;
+#if defined(TASK_THREAD)
 		Tasks        s_tasks;
+#endif
 	};
 
 	void SemPut()
 	{
+#if defined(TASK_THREAD)
 #if !defined(RAD_OPT_WIN)
 		s_tasks.SemPut();
+#endif
 #endif
 	}
 
 } // details
+
 
 RADRT_API void RADRT_CALL Initialize(RuntimeFlags flags, thread::IThreadContext *context)
 {
@@ -97,18 +103,22 @@ RADRT_API void RADRT_CALL Initialize(RuntimeFlags flags, thread::IThreadContext 
 
 	thread::details::Initialize();
 
+#if defined(TASK_THREAD)
 	if (flags != RFNoDefaultThreads)
 	{
 		details::s_tasks.Run(context);
 	}
+#endif
 }
 
 RADRT_API void RADRT_CALL Finalize()
 {
+#if defined(TASK_THREAD)
 	if (details::s_flags != RFNoDefaultThreads)
 	{
 		details::s_tasks.Exit();
 	}
+#endif
 
 	thread::details::Finalize();
 }
@@ -121,11 +131,6 @@ RADRT_API void RADRT_CALL ThreadInitialize()
 RADRT_API void RADRT_CALL ThreadFinalize()
 {
 	thread::details::ThreadFinalize();
-}
-
-RADRT_API void RADRT_CALL ProcessTasks()
-{
-	thread::details::ProcessTasks();
 }
 
 RADRT_API boost::mutex &RADRT_CALL GlobalMutex()

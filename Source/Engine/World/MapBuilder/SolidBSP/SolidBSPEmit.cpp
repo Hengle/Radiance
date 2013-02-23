@@ -1155,11 +1155,20 @@ void BSPBuilder::EmitBSPWaypoints() {
 		}
 
 		for (int i = 0; i < 4; ++i) {
-			if (connection->cmds[i].empty) {
+			if (!connection->cmds[i].empty) {
 				c->cmds[i] = m_bspFile->numStrings;
 				*m_bspFile->AddString() = connection->cmds[i];
 			} else {
 				c->cmds[i] = -1;
+			}
+		}
+
+		for (int i = 0; i < 2; ++i) {
+			if (!connection->anims[i].empty) {
+				c->anims[i] = m_bspFile->numStrings;
+				*m_bspFile->AddString() = connection->anims[i];
+			} else {
+				c->anims[i] = -1;
 			}
 		}
 	}

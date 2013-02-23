@@ -101,10 +101,6 @@ void ThreadFinalize()
 {
 }
 
-void ProcessTasks()
-{
-}
-
 } // details
 
 RADRT_API UReg RADRT_CALL NumContexts()

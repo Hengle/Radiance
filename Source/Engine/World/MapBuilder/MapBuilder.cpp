@@ -169,6 +169,16 @@ bool MapBuilder::ParseWaypoint(const EntSpawn &spawn) {
 		if (sz)
 			connection->cmds[3] = sz;
 
+		key.PrintfASCII("connection_fwd_anim %i", i);
+		sz = spawn.keys.StringForKey(key.c_str);
+		if (sz)
+			connection->anims[0] = sz;
+
+		key.PrintfASCII("connection_back_anim %i", i);
+		sz = spawn.keys.StringForKey(key.c_str);
+		if (sz)
+			connection->anims[1] = sz;
+
 		waypoint->connections.insert(SceneFile::WaypointConnection::Map::value_type(connection->waypoints, connection));
 		m_map.waypointConnections.insert(SceneFile::WaypointConnection::Map::value_type(connection->waypoints, connection));
 	}

@@ -10,6 +10,7 @@
       <AdditionalLibraryDirectories>$(LUA_JIT_PATH)\Debug\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>lua51.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ClCompile />
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

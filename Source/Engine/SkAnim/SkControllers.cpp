@@ -98,7 +98,7 @@ AnimationSource::Ref AnimationSource::New(
 	float out,
 	float timeScale,
 	int loopCount, // 0 == loop forever
-	bool distance,
+	AnimState::MoveType moveType,
 	Ska &ska,
 	const Notify::Ref &notify
 ) {
@@ -109,7 +109,7 @@ AnimationSource::Ref AnimationSource::New(
 			out, 
 			timeScale, 
 			loopCount,
-			distance,
+			moveType,
 			ska,
 			notify
 		), &Delete
@@ -127,7 +127,7 @@ AnimationSource::AnimationSource(
 	float out,
 	float timeScale,
 	int loopCount, // 0 == loop forever
-	bool distance,
+	AnimState::MoveType moveType,
 	Ska &ska,
 	const Notify::Ref &notify
 ) : 
@@ -139,7 +139,7 @@ m_timeScale(timeScale),
 m_frame(0.f),
 m_notify(notify),
 m_emitEndFrame(true),
-m_distance(distance),
+m_moveType(moveType),
 m_emitFrame(0) {
 	m_loopCount[0] = 0;
 	m_loopCount[1] = loopCount;
@@ -158,11 +158,12 @@ void AnimationSource::OnActivate(bool active) {
 			0,
 			0,
 			0.f,
-			&m_tm,
+			&m_bipZero,
 			0,
 			1
 		);
 
+		m_tm = m_bipZero;
 		SetPos(m_tm.t);
 		SetRot(m_tm.r);
 		SetDeltaRot(Quat::Identity);
@@ -241,7 +242,7 @@ bool AnimationSource::Tick(
 
 	bool useDistance = false;
 
-	if (m_distance && (m_anim->distance > 0.1f) && (distance >= 0.f)) {
+	if ((m_moveType == AnimState::kMoveType_Distance) && (m_anim->distance > 0.1f) && (distance >= 0.f)) {
 		useDistance = true;
 		m_frame += distance * ((float)m_anim->numFrames.get() / (float)m_anim->distance.get());
 	} else {
@@ -261,9 +262,7 @@ bool AnimationSource::Tick(
 			}
 
 			// reset delta motion
-			m_tm.r = Quat::Identity;
-			m_tm.s = Vec3(1, 1, 1);
-			m_tm.t = Vec3::Zero;
+			m_tm = m_bipZero;
 
 		} else {
 			m_loopCount[0] = m_loopCount[1];
@@ -311,8 +310,10 @@ bool AnimationSource::Tick(
 			count
 		);
 
-		if (useDistance && start == 0) {
+		if (useDistance && (start == 0)) {
 			out[0].t[0] = 0.f; // null out X axis motion
+		} else if((m_moveType == AnimState::kMoveType_RemoveMotion) && (start == 0)) {
+			out[0].t = m_bipZero.t; // remove all motion
 		}
 	}
 
@@ -321,9 +322,9 @@ bool AnimationSource::Tick(
 
 		// get root motion.
 		m_anim->BlendFrames(
-			0,
-			0,
-			0.f,
+			src,
+			dst,
+			lerp,
 			&root,
 			0,
 			1
@@ -683,7 +684,7 @@ AnimationVariantsSource::AnimationVariantsSource(
 	const char *blendTarget
 ) : Controller(ska), m_node(0), m_blendTarget(0), m_notify(notify), m_emitEndFrame(true) {
 
-	m_distance = variants.distance;
+	m_moveType = variants.moveType;
 
 	m_loopCount[0] = 0;
 	m_loopCount[1] = variants.loopCount[0];
@@ -813,7 +814,7 @@ void AnimationVariantsSource::ChooseAnim() {
 				node->out,
 				timeScale,
 				loopCount,
-				m_distance,
+				m_moveType,
 				*ska.get(),
 				m_notify
 			);

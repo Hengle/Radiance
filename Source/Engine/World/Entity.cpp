@@ -44,6 +44,7 @@ maxSplineBank(0.f),
 splineBankScale(0.f),
 splineBankLerp(-1.f),
 autoDecelDistance(0.f),
+motionScale(1.f),
 distanceMoved(-1.f),
 mtype(kMoveType_None),
 stype(kSolidType_None),
@@ -414,6 +415,8 @@ void Entity::PushCallTable(lua_State *L) {
 	lua_setfield(L, -2, "Unlink");
 	lua_pushcfunction(L, lua_Delete);
 	lua_setfield(L, -2, "Delete");
+	lua_pushcfunction(L, lua_CustomMoveComplete);
+	lua_setfield(L, -2, "CustomMoveComplete");
 	LUART_REGISTER_GETSET(L, Parent);
 	LUART_REGISTER_GETSET(L, Pos);
 	LUART_REGISTER_GETSET(L, Origin);
@@ -431,6 +434,7 @@ void Entity::PushCallTable(lua_State *L) {
 	LUART_REGISTER_GET(L, ActiveMove);
 	LUART_REGISTER_GETSET(L, DesiredMove);
 	LUART_REGISTER_GETSET(L, FloorPosition);
+	LUART_REGISTER_GETSET(L, MotionSka);
 	LUART_REGISTER_GETSET(L, Accel);
 	LUART_REGISTER_GETSET(L, SnapTurnAngles);
 	LUART_REGISTER_GETSET(L, GroundFriction);
@@ -442,6 +446,7 @@ void Entity::PushCallTable(lua_State *L) {
 	LUART_REGISTER_GETSET(L, SplineBankScale);
 	LUART_REGISTER_GETSET(L, SplineBankLerp);
 	LUART_REGISTER_GETSET(L, AutoDecelDistance);
+	LUART_REGISTER_GETSET(L, MotionScale);
 	LUART_REGISTER_GET(L, DistanceMoved);
 	LUART_REGISTER_GETSET(L, MoveType);
 	LUART_REGISTER_GETSET(L, SolidType);
@@ -706,6 +711,12 @@ int Entity::lua_Delete(lua_State *L) {
 	return 0;
 }
 
+int Entity::lua_CustomMoveComplete(lua_State *L) {
+	Entity *self = WorldLua::EntFramePtr(L, 1, true);
+	self->CustomMoveComplete();
+	return 0;
+}
+
 ENT_GETSET_WEAK_ENT(Entity, Parent, m_ps.parent);
 ENT_GETSET(Entity, Pos, Vec3, m_ps.pos);
 ENT_GETSET(Entity, Origin, Vec3, m_ps.origin);
@@ -774,10 +785,28 @@ int Entity::LUART_SETFN(FloorPosition) (lua_State *L) {
 	return 0;
 }
 
+int Entity::LUART_GETFN(MotionSka) (lua_State *L) {
+	Entity *self = WorldLua::EntFramePtr(L, 1, true);
+	if (self->m_ps.motionSka) {
+		D_SkModel::Ref r(D_SkModel::New(self->m_ps.motionSka));
+		r->Push(L);
+		return 1;
+	}
+	return 0;
+}
+
+int Entity::LUART_SETFN(MotionSka) (lua_State *L) {
+	Entity *self = WorldLua::EntFramePtr(L, 1, true);
+	D_SkModel::Ref r = lua::SharedPtr::Get<D_SkModel>(L, "SkModel", 2, false);
+	self->m_ps.motionSka = r->mesh;
+	return 0;
+}
+
 ENT_GETSET(Entity, MaxSplineBank, float, m_ps.maxSplineBank);
 ENT_GETSET(Entity, SplineBankScale, float, m_ps.splineBankScale);
 ENT_GETSET(Entity, SplineBankLerp, float, m_ps.splineBankLerp);
 ENT_GETSET(Entity, AutoDecelDistance, float, m_ps.autoDecelDistance);
+ENT_GETSET(Entity, MotionScale, float, m_ps.motionScale);
 ENT_GET(Entity, DistanceMoved, float, m_ps.distanceMoved);
 ENT_GET(Entity, MoveType, int, m_ps.mtype);
 ENT_SET_CUSTOM(Entity, MoveType, self->m_ps.mtype = (MoveType)luaL_checkinteger(L, 2));
