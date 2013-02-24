@@ -568,6 +568,8 @@ bool WorldLua::ParseKeysTable(lua_State *L, Persistence::KeyValue::Map &keys, in
 		kv.sVal = value.sVal;
 		kv.mVal = value.mVal;
 		value.mVal = 0; // don't delete.
+
+		lua_pop(L, 1);
 	}
 
 	return true;

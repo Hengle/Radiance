@@ -370,9 +370,10 @@ int lua_Import(lua_State *L) {
 	MarkFileLoaded(L, name);
 
 	if (luaL_loadbuffer(L, (const char *)((const void*)code->ptr), code->size, code->name)) {
-		String x(code->name);
+		char file[1024];
+		string::cpy(file, code->name.get());
 		code.reset();
-		luaL_error(L, "Error importing '%s'(%s):\n\t%s", name, x.c_str.get(), lua_tostring(L, -1));
+		luaL_error(L, "Error importing '%s'(%s):\n\t%s", name, file, lua_tostring(L, -1));
 	}
 
 	code.reset();
