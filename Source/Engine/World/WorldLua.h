@@ -13,6 +13,7 @@
 #include "../Lua/LuaRuntime.h"
 #include "../Packages/PackagesDef.h"
 #include "../Game/GameNetworkDef.h"
+#include "../Persistence.h"
 #include "WorldCinematics.h"
 #include "Entity.h"
 #include <Runtime/PushPack.h>
@@ -32,6 +33,8 @@ public:
 
 	void PushKeysTable(const Keys &keys);
 	bool ParseKeysTable(Keys &keys, int index, bool luaError);
+	void PushKeysTable(const Persistence::KeyValue::Map &keys);
+	bool ParseKeysTable(Persistence::KeyValue::Map &keys, int index, bool luaError);
 	void PushEntityFrame(Entity &ent);
 	bool PushEntityCall(Entity &ent, const char *name);
 	bool CoSpawn(Entity &ent, const Keys &keys);
@@ -65,6 +68,8 @@ public:
 
 	static void PushKeysTable(lua_State *L, const Keys &keys);
 	static bool ParseKeysTable(lua_State *L, Keys &keys, int index, bool luaError);
+	static void PushKeysTable(lua_State *L, const Persistence::KeyValue::Map &keys);
+	static bool ParseKeysTable(lua_State *L, Persistence::KeyValue::Map &keys, int index, bool luaError);
 	static Entity *EntFramePtr(lua_State *L, int index, bool luaError);
 	static void PushEntityFrame(lua_State *L, Entity &ent);
 	static bool PushEntityCall(lua_State *L, Entity &ent, const char *name);

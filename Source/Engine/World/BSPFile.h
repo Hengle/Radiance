@@ -187,6 +187,7 @@ struct BSPCinematic {
 
 struct BSPWaypoint {
 	float pos[3];
+	U32 uid;
 	U32 firstConnection;
 	U32 numConnections;
 	S32 floorNum;

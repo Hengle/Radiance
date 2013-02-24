@@ -180,15 +180,13 @@ int WorldLua::lua_System_CreateTempSpawnTask(lua_State *L) {
 int WorldLua::lua_System_SaveSession(lua_State *L) {
 	LOAD_SELF
 	
-	Keys x;
-	Keys *keys = self->m_world->game->session->keys;
+	Persistence::KeyValue::Map *keys = self->m_world->game->session->keys;
 	
 	luaL_checktype(L, 1, LUA_TTABLE);
 	lua_getfield(L, 1, "keys");
 
-	ParseKeysTable(L, x, -1, true);
-	*keys = x;
-
+	ParseKeysTable(L, *keys, -1, true);
+	
 	lua_pop(L, 1);
 	self->m_world->game->session->Save();
 	return 0;
@@ -198,22 +196,20 @@ int WorldLua::lua_System_LoadSession(lua_State *L) {
 	LOAD_SELF
 	
 	luaL_checktype(L, 1, LUA_TTABLE);
-	Keys *keys = self->m_world->game->session->keys;
+	Persistence::KeyValue::Map *keys = self->m_world->game->session->keys;
 	PushKeysTable(L, *keys);
 	lua_setfield(L, 1, "keys");
 	return 0;
 }
 
 int WorldLua::lua_System_SaveGlobals(lua_State *L) {
-	Keys x;
-	Keys *keys = App::Get()->engine->sys->globals->keys;
+	Persistence::KeyValue::Map *keys = App::Get()->engine->sys->globals->keys;
 	
 	luaL_checktype(L, 1, LUA_TTABLE);
 	lua_getfield(L, 1, "keys");
 
-	ParseKeysTable(L, x, -1, true);
-	*keys = x;
-
+	ParseKeysTable(L, *keys, -1, true);
+	
 	lua_pop(L, 1);
 	App::Get()->engine->sys->globals->Save();
 	return 0;
@@ -221,7 +217,7 @@ int WorldLua::lua_System_SaveGlobals(lua_State *L) {
 
 int WorldLua::lua_System_LoadGlobals(lua_State *L) {
 	luaL_checktype(L, 1, LUA_TTABLE);
-	Keys *keys = App::Get()->engine->sys->globals->keys;
+	Persistence::KeyValue::Map *keys = App::Get()->engine->sys->globals->keys;
 	PushKeysTable(L, *keys);
 	lua_setfield(L, 1, "keys");
 	return 0;
@@ -261,11 +257,9 @@ int WorldLua::lua_System_SaveGame(lua_State *L) {
 	luaL_checktype(L, 1, LUA_TTABLE);
 	lua_getfield(L, 1, "keys");
 
-	Keys x;
-	ParseKeysTable(L, x, -1, true);
+	ParseKeysTable(L, *self->m_world->game->saveGame->keys.get(), -1, true);
 	lua_pop(L, 1);
 
-	*self->m_world->game->saveGame->keys.get() = x;
 	self->m_world->game->SaveGame();
 	return 0;
 }

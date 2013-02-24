@@ -1679,27 +1679,27 @@ Engine *Cooker::RAD_IMPLEMENT_GET(engine) {
 void Cooker::UpdateModifiedTime(int target) {
 	String key(TargetPath(target)+"__cookerModifiedTime");
 	
-	world::Keys::Pairs::iterator it = globals->pairs.find(key);
-	if (it == globals->pairs.end()) {
-		globals->pairs[key] = asset->entry->modifiedTime->ToString();
+	Persistence::KeyValue::Map::iterator it = globals->find(key);
+	if (it == globals->end()) {
+		(*globals.get())[key].sVal = asset->entry->modifiedTime->ToString();
 	} else {
-		it->second = asset->entry->modifiedTime->ToString();
+		it->second.sVal = asset->entry->modifiedTime->ToString();
 	}
 }
 
 int Cooker::CompareVersion(int target, bool updateIfNewer) {
 	String key(TargetPath(target)+"__cookerVersion");
 
-	world::Keys::Pairs::iterator it = globals->pairs.find(key);
-	if (it == globals->pairs.end()) {
+	Persistence::KeyValue::Map::iterator it = globals->find(key);
+	if (it == globals->end()) {
 		char sz[64];
 		string::itoa(version, sz);
-		globals->pairs[key] = String(sz);
+		(*globals.get())[key].sVal = String(sz);
 
 		return -1; // we have no version on disk, so the source data has to be newer
 	}
 
-	int v = string::atoi(it->second.c_str.get());
+	int v = string::atoi(it->second.sVal.c_str.get());
 
 	// this logic may appear backwards but what we are saying here is that
 	// if the cached version is less than our current version then the source
@@ -1715,7 +1715,7 @@ int Cooker::CompareVersion(int target, bool updateIfNewer) {
 	if (r < 0 && updateIfNewer) {
 		char sz[64];
 		string::itoa(version, sz);
-		globals->pairs[key] = String(sz);
+		(*globals.get())[key].sVal = String(sz);
 	}
 
 	return r;
@@ -1724,16 +1724,16 @@ int Cooker::CompareVersion(int target, bool updateIfNewer) {
 int Cooker::CompareModifiedTime(int target, bool updateIfNewer) {
 	String key(TargetPath(target)+"__cookerModifiedTime");
 
-	world::Keys::Pairs::iterator it = globals->pairs.find(key);
-	if (it == globals->pairs.end()) {
-		globals->pairs[key] = asset->entry->modifiedTime->ToString();
+	Persistence::KeyValue::Map::iterator it = globals->find(key);
+	if (it == globals->end()) {
+		(*globals.get())[key].sVal = asset->entry->modifiedTime->ToString();
 		return -1; // always older
 	}
 
-	TimeDate td = TimeDate::FromString(it->second.c_str);
+	TimeDate td = TimeDate::FromString(it->second.sVal.c_str);
 	int r = td.Compare(*asset->entry->modifiedTime.get());
 	if ((r < 0 && updateIfNewer) || (r > 0)) {
-		globals->pairs[key] = asset->entry->modifiedTime->ToString();
+		(*globals.get())[key].sVal = asset->entry->modifiedTime->ToString();
 	}
 
 	return r;
@@ -1748,13 +1748,13 @@ int Cooker::CompareCachedFileTime(int target, const char *key, const char *path,
 	String spath(path);
 	bool force = false;
 
-	world::Keys::Pairs::const_iterator it = globals->pairs.find(skeyFile);
-	if (it != globals->pairs.end()) {
-		if (it->second != spath)
+	Persistence::KeyValue::Map::const_iterator it = globals->find(skeyFile);
+	if (it != globals->end()) {
+		if (it->second.sVal != spath)
 			force = true; // filename changed!
 	}
 
-	globals->pairs[skeyFile] = spath;
+	(*globals.get())[skeyFile].sVal = spath;
 
 	TimeDate selfTime;
 	bool m = TimeForKey(target, key, selfTime);
@@ -1767,7 +1767,7 @@ int Cooker::CompareCachedFileTime(int target, const char *key, const char *path,
 		if (optional && !m) // we don't have a record of this either
 			return 0;
 		if (m) // remove from cache, no longer a record of this file.
-			globals->pairs.erase(skeyFile);
+			globals->erase(skeyFile);
 		return -1; // always older
 	}
 
@@ -1777,7 +1777,7 @@ int Cooker::CompareCachedFileTime(int target, const char *key, const char *path,
 
 	if ((c < 0 && updateIfNewer) || (c > 0)) { 
 		// this can happen from DST or someone reverted a file version.
-		globals->pairs[skey] = fileTime.ToString();
+		(*globals.get())[skey].sVal = fileTime.ToString();
 	}
 
 	return c;
@@ -1850,14 +1850,14 @@ int Cooker::CompareCachedString(int target, const char *key, const char *string)
 	const String skey(TargetPath(target)+key);
 	const String sstring(CStr(string));
 
-	world::Keys::Pairs::const_iterator it = globals->pairs.find(skey);
-	if (it != globals->pairs.end()) {
-		if (it->second != sstring) {
-			globals->pairs[skey] = sstring;
+	Persistence::KeyValue::Map::const_iterator it = globals->find(skey);
+	if (it != globals->end()) {
+		if (it->second.sVal != sstring) {
+			(*globals.get())[skey].sVal = sstring;
 			return -1; // changed!
 		}
 	} else {
-		globals->pairs[skey] = sstring;
+		(*globals.get())[skey].sVal = sstring;
 		return -1; // doesn't exist!
 	}
 
@@ -1878,15 +1878,15 @@ int Cooker::CompareCachedLocalizeKey(int target, const char *key) {
 
 	String localizedString = LocalizedString(languages);
 	String skey(TargetPath(target)+"__cookerLocalizedVersion");
-	world::Keys::Pairs::const_iterator it = globals->pairs.find(skey);
+	Persistence::KeyValue::Map::const_iterator it = globals->find(skey);
 
-	if (it != globals->pairs.end()) {
-		if (it->second != localizedString) {
-			globals->pairs[skey] = localizedString;
+	if (it != globals->end()) {
+		if (it->second.sVal != localizedString) {
+			(*globals.get())[skey].sVal = localizedString;
 			return -1; // changed!
 		}
 	} else {
-		globals->pairs[skey] = localizedString;
+		(*globals.get())[skey].sVal = localizedString;
 		return -1; // doesn't exist!
 	}
 
@@ -1897,9 +1897,9 @@ const char *Cooker::TargetString(int target, const char *key) {
 	RAD_ASSERT(key);
 
 	const String skey(TargetPath(target)+key);
-	world::Keys::Pairs::const_iterator it = globals->pairs.find(skey);
-	if (it != globals->pairs.end())
-		return it->second.c_str;
+	Persistence::KeyValue::Map::const_iterator it = globals->find(skey);
+	if (it != globals->end())
+		return it->second.sVal.c_str;
 	return 0;
 }
 
@@ -1908,7 +1908,7 @@ void Cooker::SetTargetString(int target, const char *key, const char *string) {
 	RAD_ASSERT(string);
 
 	const String skey(TargetPath(target)+key);
-	globals->pairs[skey] = String(string);
+	(*globals.get())[skey].sVal = String(string);
 }
 
 bool Cooker::ModifiedTime(int target, xtime::TimeDate &td) const {
@@ -1918,10 +1918,10 @@ bool Cooker::ModifiedTime(int target, xtime::TimeDate &td) const {
 bool Cooker::TimeForKey(int target, const char *key, xtime::TimeDate &td) const {
 	RAD_ASSERT(key);
 	String skey(TargetPath(target)+key);
-	world::Keys::Pairs::const_iterator it = globals->pairs.find(skey);
-	if (it == globals->pairs.end())
+	Persistence::KeyValue::Map::const_iterator it = globals->find(skey);
+	if (it == globals->end())
 		return false;
-	td = TimeDate::FromString(it->second.c_str);
+	td = TimeDate::FromString(it->second.sVal.c_str);
 	return true;
 }
 

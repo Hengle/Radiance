@@ -1147,7 +1147,7 @@ void BSPBuilder::EmitBSPWaypoints() {
 		c->flags = (S32)connection->flags;
 		c->waypoints[0] = (U32)connection->waypoints.head->emitId;
 		c->waypoints[1] = (U32)connection->waypoints.tail->emitId;
-
+		
 		for (int i = 0; i < 2; ++i) {
 			for (int k = 0; k < 3; ++k) {
 				c->ctrls[i][k] = connection->ctrls[i][k];
@@ -1297,6 +1297,7 @@ bool BSPBuilder::EmitBSPWaypoint(SceneFile::Waypoint &waypoint) {
 	w->pos[0] = waypoint.pos[0];
 	w->pos[1] = waypoint.pos[1];
 	w->pos[2] = waypoint.pos[2];
+	w->uid = (U32)waypoint.uid;
 
 	w->firstConnection = std::numeric_limits<U32>::max();
 	w->numConnections = 0;

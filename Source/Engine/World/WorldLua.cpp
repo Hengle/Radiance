@@ -217,7 +217,7 @@ bool WorldLua::Init() {
 
 	// setup persistence tables.
 
-	Keys *keys = App::Get()->engine->sys->globals->keys;
+	Persistence::KeyValue::Map *keys = App::Get()->engine->sys->globals->keys;
 	lua_createtable(L, 0, 3);
 	PushKeysTable(L, *keys);
 	lua_setfield(L, -2, "keys");
@@ -479,6 +479,8 @@ bool WorldLua::ParseKeysTable(lua_State *L, Keys &keys, int index, bool luaError
 	else if (lua_type(L, index) != LUA_TTABLE)
 		return false;
 
+	keys.pairs.clear();
+
 	lua_checkstack(L, 3);
 	lua_pushnil(L);
 	while (lua_next(L, (index<0) ? (index-1) : index) != 0) {
@@ -498,6 +500,74 @@ bool WorldLua::ParseKeysTable(lua_State *L, Keys &keys, int index, bool luaError
 			keys.pairs[String(key)] = String(val);
 		}
 		lua_pop(L, 1);
+	}
+
+	return true;
+}
+
+void WorldLua::PushKeysTable(const Persistence::KeyValue::Map &keys) {
+	PushKeysTable(m_L->L, keys);
+}
+
+void WorldLua::PushKeysTable(lua_State *L, const Persistence::KeyValue::Map &keys) {
+	lua_createtable(L, 0, (int)keys.size());
+	for (Persistence::KeyValue::Map::const_iterator it = keys.begin(); it != keys.end(); ++it) {
+		lua_pushstring(L, it->first.c_str);
+		if (it->second.mVal) {
+			PushKeysTable(L, *it->second.mVal);
+		} else {
+			lua_pushstring(L, it->second.sVal.c_str);
+		}
+		lua_settable(L, -3);
+	}
+}
+
+bool WorldLua::ParseKeysTable(Persistence::KeyValue::Map &keys, int index, bool luaError) {
+	return ParseKeysTable(m_L->L, keys, index, luaError);
+}
+
+bool WorldLua::ParseKeysTable(lua_State *L, Persistence::KeyValue::Map &keys, int index, bool luaError) {
+	if (luaError) {
+		luaL_checktype(L, index, LUA_TTABLE);
+	} else if(lua_type(L, index) != LUA_TTABLE) {
+		return false;
+	}
+
+	Persistence::KeyValue value;
+
+	lua_pushnil(L);
+	while (lua_next(L, (index < 0) ? (index-1) : index) != 0) {
+		if (luaError) {
+			luaL_checktype(L, -2, LUA_TSTRING);
+		} else if (lua_type(L, -2) != LUA_TSTRING) {
+			lua_pop(L, 2);
+			return false;
+		}
+
+		value.mVal = 0;
+		value.sVal.Clear();
+
+		const char *name = lua_tostring(L, -2);
+				
+		if (lua_type(L, -1) == LUA_TTABLE) {
+			value.mVal = new (ZWorld) Persistence::KeyValue::Map();
+			if (!ParseKeysTable(L, *value.mVal, -1, luaError))
+				return false;
+		} else {
+			if (luaError) {
+				luaL_checktype(L, -1, LUA_TSTRING);
+			} else if (lua_type(L, -1) != LUA_TSTRING) {
+				lua_pop(L, 2);
+				return false;
+			}
+			value.sVal = lua_tostring(L, -1);
+		}
+
+		// avoid deep copy constructor.
+		Persistence::KeyValue &kv = keys[String(name)];
+		kv.sVal = value.sVal;
+		kv.mVal = value.mVal;
+		value.mVal = 0; // don't delete.
 	}
 
 	return true;

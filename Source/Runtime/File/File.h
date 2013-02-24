@@ -301,6 +301,8 @@ class RADRT_CLASS MMFile : public boost::noncopyable, public boost::enable_share
 public:
 	typedef MMFileRef Ref;
 
+	virtual ~MMFile() {}
+
 	//! Maps the specified file data into user address space.
 	/*! Passing zeros for the offset and size maps the entire file into memory.
 
@@ -332,8 +334,8 @@ class RADRT_CLASS MMapping : public boost::noncopyable {
 public:
 	typedef MMappingRef Ref;
 
-	~MMapping();
-
+	virtual ~MMapping();
+	
 	//! Notifies the operating system that the specified memory will be
 	//! used and should be prefetched into memory.
 	/*! \notes This function may not improve performance or may be ignored
@@ -379,6 +381,8 @@ private:
 class RADRT_CLASS FileSearch : public boost::noncopyable {
 public:
 	typedef FileSearchRef Ref;
+
+	virtual ~FileSearch() {}
 
 	virtual bool NextFile(
 		String &path,

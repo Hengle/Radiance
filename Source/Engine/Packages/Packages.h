@@ -391,7 +391,7 @@ protected:
 	RAD_DECLARE_READONLY_PROPERTY(Cooker, asset, const AssetRef&);
 	RAD_DECLARE_READONLY_PROPERTY(Cooker, assetPath, const char*);
 	RAD_DECLARE_READONLY_PROPERTY(Cooker, assetName, const char*);
-	RAD_DECLARE_READONLY_PROPERTY(Cooker, globals, world::Keys*);
+	RAD_DECLARE_READONLY_PROPERTY(Cooker, globals, Persistence::KeyValue::Map*);
 	RAD_DECLARE_READONLY_PROPERTY(Cooker, version, int);
 	RAD_DECLARE_READONLY_PROPERTY(Cooker, languages, int);
 
@@ -404,7 +404,7 @@ private:
 	RAD_DECLARE_GET(asset, const AssetRef&) { return m_asset; }
 	RAD_DECLARE_GET(assetPath, const char*) { return m_assetPath.c_str; }
 	RAD_DECLARE_GET(assetName, const char*) { return m_assetName.c_str; }
-	RAD_DECLARE_GET(globals, world::Keys*) { return m_globals->keys; }
+	RAD_DECLARE_GET(globals, Persistence::KeyValue::Map*) { return m_globals->keys; }
 	RAD_DECLARE_GET(version, int) { return m_version; }
 	RAD_DECLARE_GET(languages, int) {
 		return m_languages;

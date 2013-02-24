@@ -75,7 +75,7 @@ private:
 class RADRT_CLASS PosixMMFile : public MMFile {
 public:
 
-	~PosixMMFile();
+	virtual ~PosixMMFile();
 
 	virtual MMappingRef MMap(
 		AddrSize ofs, 
@@ -106,7 +106,7 @@ private:
 class RADRT_CLASS PosixMMapping : public MMapping {
 public:
 
-	~PosixMMapping();
+	virtual ~PosixMMapping();
 
 	virtual void Prefetch(
 		AddrSize offset,
@@ -139,7 +139,7 @@ private:
 class RADRT_CLASS PosixFileSearch : public FileSearch {
 public:
 
-	~PosixFileSearch();
+	virtual ~PosixFileSearch();
 
 	static FileSearch::Ref New(
 		const String &path,

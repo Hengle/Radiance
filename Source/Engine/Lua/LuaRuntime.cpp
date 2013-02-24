@@ -370,9 +370,12 @@ int lua_Import(lua_State *L) {
 	MarkFileLoaded(L, name);
 
 	if (luaL_loadbuffer(L, (const char *)((const void*)code->ptr), code->size, code->name)) {
-		luaL_error(L, "Error importing '%s'(%s):\n\t%s", name, (const char*)code->name, lua_tostring(L, -1));
+		String x(code->name);
+		code.reset();
+		luaL_error(L, "Error importing '%s'(%s):\n\t%s", name, x.c_str.get(), lua_tostring(L, -1));
 	}
 
+	code.reset();
 	lua_call(L, 0, 0); // run loaded code.
 
 	return 0;

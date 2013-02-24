@@ -72,7 +72,7 @@ private:
 class RADRT_CLASS WinMMFile : public MMFile {
 public:
 
-	~WinMMFile();
+	virtual ~WinMMFile();
 
 	virtual MMappingRef MMap(
 		AddrSize ofs, 
@@ -104,7 +104,7 @@ private:
 class RADRT_CLASS WinMMapping : public MMapping {
 public:
 
-	~WinMMapping();
+	virtual ~WinMMapping();
 
 	virtual void Prefetch(
 		AddrSize offset,
@@ -135,7 +135,7 @@ private:
 class RADRT_CLASS WinFileSearch : public FileSearch {
 public:
 
-	~WinFileSearch();
+	virtual ~WinFileSearch();
 
 	static FileSearch::Ref New(
 		const String &path,

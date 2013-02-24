@@ -13,8 +13,7 @@ namespace world {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct Keys
-{
+struct Keys {
 	typedef boost::shared_ptr<Keys> Ref;
 	typedef zone_map<String, String, ZWorldT>::type Pairs;
 	Pairs pairs;

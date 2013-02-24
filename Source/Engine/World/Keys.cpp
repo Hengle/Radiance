@@ -11,8 +11,7 @@ namespace world {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int Keys::IntForKey(const char *name, int def) const
-{
+int Keys::IntForKey(const char *name, int def) const {
 	RAD_ASSERT(name);
 	String s(name);
 	Pairs::const_iterator it = pairs.find(s);
@@ -26,8 +25,7 @@ int Keys::IntForKey(const char *name, int def) const
 	return r;
 }
 
-bool Keys::BoolForKey(const char *name, bool def) const
-{
+bool Keys::BoolForKey(const char *name, bool def) const {
 	RAD_ASSERT(name);
 	String s(name);
 	Pairs::const_iterator it = pairs.find(s);
@@ -36,8 +34,7 @@ bool Keys::BoolForKey(const char *name, bool def) const
 	return it->second == "true";
 }
 
-float Keys::FloatForKey(const char *name, float def) const
-{
+float Keys::FloatForKey(const char *name, float def) const {
 	RAD_ASSERT(name);
 	String s(name);
 	Pairs::const_iterator it = pairs.find(s);
@@ -51,8 +48,7 @@ float Keys::FloatForKey(const char *name, float def) const
 	return r;
 }
 
-const char *Keys::StringForKey(const char *name, const char *def) const
-{
+const char *Keys::StringForKey(const char *name, const char *def) const {
 	RAD_ASSERT(name);
 	String s(name);
 	Pairs::const_iterator it = pairs.find(s);
@@ -61,8 +57,7 @@ const char *Keys::StringForKey(const char *name, const char *def) const
 	return it->second.c_str;
 }
 
-Color4 Keys::Color4ForKey(const char *name, const Color4 &def) const
-{
+Color4 Keys::Color4ForKey(const char *name, const Color4 &def) const {
 	RAD_ASSERT(name);
 	String s(name);
 	Pairs::const_iterator it = pairs.find(s);
@@ -76,8 +71,7 @@ Color4 Keys::Color4ForKey(const char *name, const Color4 &def) const
 	return Color4(r/255.0f, g/255.0f, b/255.0f, a/255.0f);
 }
 
-Vec3 Keys::Vec3ForKey(const char *name, const Vec3 &def) const
-{
+Vec3 Keys::Vec3ForKey(const char *name, const Vec3 &def) const {
 	RAD_ASSERT(name);
 	String s(name);
 	Pairs::const_iterator it = pairs.find(s);
