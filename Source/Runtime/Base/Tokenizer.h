@@ -92,7 +92,8 @@ private:
 	enum InternalFetchMode {
 		kInternalFetchMode_Token,
 		kInternalFetchMode_AllowWhitespace,
-		kInternalFetchMode_DiscardWhitespace
+		kInternalFetchMode_DiscardWhitespace,
+		kInternalFetchMode_DiscardLeadingWhitespace
 	};
 
 	enum NewLineMode {

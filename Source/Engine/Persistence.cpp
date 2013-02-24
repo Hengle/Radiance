@@ -34,10 +34,11 @@ bool LoadArray(stream::InputStream &is, Persistence::KeyValue::Map &keys) {
 		U32 len;
 		if (!is.Read(&len))
 			return false;
-		if (len >= 1024)
+		if (len >= 1023)
 			return false;
 		if (is.Read(key, (stream::SPos)len, 0) != (stream::SPos)len)
 			return false;
+		key[len] = 0;
 
 		U8 type;
 		if (!is.Read(&type))
@@ -46,13 +47,14 @@ bool LoadArray(stream::InputStream &is, Persistence::KeyValue::Map &keys) {
 		Persistence::KeyValue val;
 
 		if (type == kType_String) {
-			char value[1024];
+			char value[1023];
 			if (!is.Read(&len))
 				return false;
-			if (len >= 1024)
+			if (len >= 1023)
 				return false;
 			if (is.Read(value, (stream::SPos)len, 0) != (stream::SPos)len)
 				return false;
+			value[len] = 0;
 			val.sVal = value;
 		} else {
 			RAD_ASSERT(type == kType_Map);
@@ -92,7 +94,7 @@ bool LoadStorage(stream::InputStream &is, Persistence::KeyValue::Map &keys) {
 					for (i = 0; i < numPairs; ++i) {
 						if (!is.Read(&len))
 							break;
-						if (len >= 1024)
+						if (len >= 1023)
 							break;
 						if (is.Read(key, (stream::SPos)len, 0) != (stream::SPos)len)
 							break;
@@ -100,7 +102,7 @@ bool LoadStorage(stream::InputStream &is, Persistence::KeyValue::Map &keys) {
 
 						if (!is.Read(&len))
 							break;
-						if (len >= 1024)
+						if (len >= 1023)
 							break;
 						if (is.Read(val, (stream::SPos)len, 0) != (stream::SPos)len)
 							break;

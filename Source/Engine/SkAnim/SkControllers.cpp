@@ -242,10 +242,9 @@ bool AnimationSource::Tick(
 
 	bool useDistance = false;
 
-	if ((m_moveType == AnimState::kMoveType_Distance) && (m_anim->distance > 0.1f)) {
+	if ((m_moveType == AnimState::kMoveType_Distance) && (m_anim->distance > 0.1f) && (distance >= 0.f)) {
 		useDistance = true;
-		if (distance > 0.f)
-			m_frame += distance * ((float)m_anim->numFrames.get() / (float)m_anim->distance.get());
+		m_frame += distance * ((float)m_anim->numFrames.get() / (float)m_anim->distance.get());
 	} else {
 		m_frame += (dt*m_timeScale) * m_anim->fps;
 	}

@@ -124,12 +124,13 @@ bool Tokenizer::GetToken(String &token, TokenMode mode) {
 
 bool Tokenizer::GetRemaining(String &token, FetchMode mode) {
 	token.Clear();
-	
+	ResetFetchState();
+
 	NewLineMode newLineMode = 
 		(mode == kFetchMode_RestOfLine) ? kNewLineMode_StopAtEndOfLine : kNewLineMode_CrossLines;
 
 	int c;
-	while ((c=Fetch(kInternalFetchMode_AllowWhitespace, newLineMode)) != InvalidChar) {
+	while ((c=Fetch(kInternalFetchMode_DiscardLeadingWhitespace, newLineMode)) != InvalidChar) {
 		token += (char)c;
 	}
 
@@ -336,7 +337,9 @@ int Tokenizer::PeekFetch(InternalFetchMode fetchMode, NewLineMode newLineMode) {
 	m_peek = InvalidChar;
 	
 	if ((fetchMode == kInternalFetchMode_DiscardWhitespace) || 
-		((fetchMode == kInternalFetchMode_Token) && !m_inToken)) {
+		(((fetchMode == kInternalFetchMode_Token) || 
+		  (fetchMode == kInternalFetchMode_DiscardLeadingWhitespace)) 
+		  && !m_inToken)) {
 		int c;
 		while ((c=FetchChar()) != InvalidChar) {
 			if (c > 32)
@@ -355,22 +358,22 @@ int Tokenizer::PeekFetch(InternalFetchMode fetchMode, NewLineMode newLineMode) {
 			return InvalidChar;
 		UnfetchChar();
 
-		if (fetchMode == kInternalFetchMode_Token)
+		if ((fetchMode == kInternalFetchMode_Token) || (fetchMode == kInternalFetchMode_DiscardLeadingWhitespace))
 			m_inToken = true;
 	}
 
 	int c = FetchChar();
 	if (c <= 32) {
-		if (c == '\n') {
-			++m_line;
-			if ((fetchMode != kInternalFetchMode_Token) &&
-				(newLineMode == kNewLineMode_StopAtEndOfLine)) {
-				return InvalidChar;
-			}
-		}
 		if (fetchMode == kInternalFetchMode_Token) {
 			m_inToken = false;
+			UnfetchChar();
 			return InvalidChar;
+		}
+		if (c == '\n') {
+			++m_line;
+			if (newLineMode == kNewLineMode_StopAtEndOfLine) {
+				return InvalidChar;
+			}
 		}
 	}
 

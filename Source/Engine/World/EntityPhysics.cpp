@@ -126,7 +126,7 @@ void Entity::TickPhysics(
 ) {
 	switch (m_ps.mtype) {
 	case kMoveType_None:
-		m_ps.distanceMoved = -1.f; // no distance driven animation
+		m_ps.distanceMoved = -1.f;
 		m_ps.worldPos = m_ps.origin + m_ps.pos;
 		m_ps.worldAngles = WrapAngles(m_ps.originAngles + m_ps.angles.pos);
 		m_ps.cameraPos = m_ps.worldPos + m_ps.cameraShift;
