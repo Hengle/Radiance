@@ -33,6 +33,8 @@ public:
 
 	virtual bool HandleEvent(const Event::Ref &event);
 
+	Entity::Vec GetTouching() const;
+
 protected:
 
 	virtual void PushCallTable(lua_State *L);
@@ -40,6 +42,8 @@ protected:
 private:
 
 	ENT_DECL_GETSET(TouchClassBits);
+
+	static int lua_GetTouching(lua_State *L);
 
 	void CheckEnter();
 	void CheckExit(const Entity &instigator);

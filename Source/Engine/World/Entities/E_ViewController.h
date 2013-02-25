@@ -152,9 +152,21 @@ public:
 
 	void BlendToTarget(float time);
 
+	void BlendToLookTarget(
+		const Vec3 &target,
+		float in,
+		float out,
+		float hold,
+		float weight,
+		float inSmooth, // The smooth factor, 0 = no smoothing, numbers very close to zero are very "laggy". Larger numbers are less smooth.
+		float outSmooth 
+	);
+
 protected:
 
 	virtual void PushCallTable(lua_State *L);
+
+private:
 
 	struct Blend {
 		enum Step {
@@ -226,8 +238,6 @@ protected:
 		bool m_sync;
 	};
 
-private:
-
 	enum Mode {
 		kMode_Distance,
 		kMode_Rail,
@@ -271,6 +281,18 @@ private:
 		float Tick(float dt, float distance);
 	};
 
+	struct LookTarget {
+		typedef zone_list<LookTarget, ZWorldT>::type List;
+
+		Blend blend;
+		Vec3 target;
+		float weight;
+		float frac;
+		float smooth[2];
+
+		static Vec3 Tick(List &list, const Vec3 &target, float dt);
+	};
+
 	void TickFixedMode(int frame, float dt, const Entity::Ref &target);
 	void TickDistanceMode(int frame, float dt, const Entity::Ref &target);
 	void TickRailMode(int frame, float dt, const Entity::Ref &target);
@@ -286,6 +308,7 @@ private:
 	static int lua_SetCameraFOV(lua_State *L);
 	static int lua_LerpCameraFOVShift(lua_State *L);
 	static int lua_BlendToTarget(lua_State *L);
+	static int lua_BlendToLookTarget(lua_State *L);
 	static int lua_Sync(lua_State *L);
 	
 	ENT_DECL_GETSET(Target);
@@ -325,6 +348,7 @@ private:
 	Vec3 m_angles;
 	Sway::List m_sways;
 	FOV::List m_fovs;
+	LookTarget::List m_looks;
 	float m_fovShift[4];
 	float m_blendTime[2];
 	VecAnim::List m_anims[kNumTargetModes];

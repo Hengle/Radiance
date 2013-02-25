@@ -51,7 +51,8 @@ enum MoveType {
 	kMoveType_None,
 	kMoveType_Fly,
 	kMoveType_Spline, // ps.ground points to spline track.
-	kMoveType_Floor // Floor move system
+	kMoveType_Floor, // Floor move system
+	kMoveType_Ska // Animation controlled move
 };
 
 enum SolidType {

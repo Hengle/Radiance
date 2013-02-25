@@ -79,6 +79,8 @@ void Entity::SkaMove() {
 		const ska::BoneTM *delta = m_ps.motionSka->ska->deltaMotion;
 		m_ps.origin += delta->t * m_ps.motionScale;
 		m_ps.angles.pos = Vec3::Zero;
+		m_ps.velocity = Vec3::Zero;
+		m_ps.distanceMoved = 0.f;
 		Move();
 	}
 }
@@ -140,6 +142,9 @@ void Entity::TickPhysics(
 		break;
 	case kMoveType_Floor:
 		Tick_MT_Floor(frame, dt, time);
+		break;
+	case kMoveType_Ska:
+		SkaMove();
 		break;
 	}
 }

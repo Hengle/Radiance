@@ -93,22 +93,18 @@ RADENG_API float RADENG_CALL ClampedLerpSin(float t) {
 	if (t >= 1.f)
 		return 1.f;
 
-	t *= math::Constants<float>::PI();
-	t -= math::Constants<float>::PI_OVER_2();
-	return (math::Sin(t)+1.f)*0.5f;
+	t *= math::Constants<float>::PI_OVER_2();
+	return math::Sin(t);
 }
 
 RADENG_API float RADENG_CALL ClampedArcLerpSin(float t) { 
-	// do inverse of LerpSin
+	// do inverse of ClampedLerpSin
 	if (t <= 0.f)
 		return 0.f;
 	if (t >= 1.f)
 		return 1.f;
-	t *= 2.f;
-	t -= 1.f;
 	t = math::ArcSin(t);
-	t += math::Constants<float>::PI_OVER_2();
-	t /= math::Constants<float>::PI();
+	t /= math::Constants<float>::PI_OVER_2();
 	return t;
 }
 

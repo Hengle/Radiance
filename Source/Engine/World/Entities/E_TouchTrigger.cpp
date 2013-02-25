@@ -151,11 +151,48 @@ bool E_TouchTrigger::HandleEvent(const Event::Ref &event) {
 	return false;
 }
 
+Entity::Vec E_TouchTrigger::GetTouching() const {
+	Entity::Vec ents;
+	EntityPtrSet set;
+
+	for (int i = 0; i < m_numBrushes; ++i) {
+		Entity::Vec touching = world->EntitiesTouchingBrush(m_classbits, m_firstBrush + i);
+		ents.reserve(touching.size());
+		for (Entity::Vec::const_iterator it = touching.begin(); it != touching.end(); ++it) {
+			// filter duplicates
+			if (set.find((*it).get()) == set.end()) {
+				set.insert((*it).get());
+				ents.push_back((*it));
+			}
+		}
+	}
+
+	return ents;
+}
+
 void E_TouchTrigger::PushCallTable(lua_State *L) {
 	Entity::PushCallTable(L);
+	lua_pushcfunction(L, lua_GetTouching);
+	lua_setfield(L, -2, "GetTouching");
 	LUART_REGISTER_GETSET(L, TouchClassBits);
 }
 
 ENT_GETSET(E_TouchTrigger, TouchClassBits, int, m_classbits);
+
+int E_TouchTrigger::lua_GetTouching(lua_State *L) {
+	E_TouchTrigger *self = static_cast<E_TouchTrigger*>(WorldLua::EntFramePtr(L, 1, true));
+	Entity::Vec ents = self->GetTouching();
+	if (ents.empty())
+		return 0;
+
+	int ofs = 0;
+	lua_createtable(L, (int)ents.size(), 0);
+	for (Entity::Vec::const_iterator it = ents.begin(); it != ents.end(); ++it) {
+		lua_pushnumber(L, ++ofs);
+		(*it)->PushEntityFrame(L);
+		lua_settable(L, -3);
+	}
+	return 1;
+}
 
 } // world

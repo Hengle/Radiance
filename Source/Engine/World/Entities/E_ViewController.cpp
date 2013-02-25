@@ -400,6 +400,68 @@ float E_ViewController::FOV::Tick(float dt, float distance) {
 	return f;
 }
 
+Vec3 E_ViewController::LookTarget::Tick(
+	List &list,
+	const Vec3 &target,
+	float dt
+) {
+	// Tick / Expire blends
+	{
+		for (List::iterator it = list.begin(); it != list.end();) {
+			List::iterator next = it; ++next;
+
+			LookTarget &x = *it;
+			x.blend.Tick(dt);
+			if ((x.blend.step == Blend::kStep_Done) && (x.frac < 0.001f))
+				list.erase(it);
+			it = next;
+		}
+	}
+
+	if (list.empty()) // none left
+		return target;
+
+	// find blocking value
+	List::iterator block = list.begin();
+
+	for (; block != list.end(); ++block) {
+		const LookTarget &x = *block;
+		if (x.blend.frac == 1.f)
+			break;
+	}
+
+	if (block == list.end())
+		--block;
+
+	// blend from blocking value forward.
+	Vec3 pos(target);
+	
+	List::iterator it = block;
+
+	for(;;) {
+		LookTarget &x = *it;
+
+		float smooth = ((x.blend.step == Blend::kStep_In) || (x.blend.step == Blend::kStep_Hold)) ?
+			x.smooth[0] : x.smooth[1];
+
+		if (smooth <= 0.f) {
+			x.frac = x.blend.frac;
+		} else {
+			float z = math::Clamp(smooth*dt, 0.f, 0.99999f);
+			x.frac = math::Lerp(x.frac, x.blend.frac, z);
+		}
+
+		pos = math::Lerp(pos, x.target, x.frac);
+		
+		if (it == list.begin())
+			break;
+		--it;
+	}
+
+	return pos;
+}
+
+
 E_ViewController::E_ViewController() : 
 E_CONSTRUCT_BASE,
 m_mode(kMode_Fixed),
@@ -472,6 +534,8 @@ void E_ViewController::TickDistanceMode(int frame, float dt, const Entity::Ref &
 		0,
 		m_sync
 	);
+
+	mLook = LookTarget::Tick(m_looks, mLook, dt);
 
 	Vec3 lookVec = mLook-mPos;
 	Vec3 fwd(lookVec);
@@ -549,11 +613,15 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 		fov = TickFOV(frame, dt, distance);
 	}
 	
+	vTarget = LookTarget::Tick(m_looks, vTarget, dt);
+	fwd = vTarget - m_rail.pos;
+	fwd.Normalize();
+
 	Vec3 pos = m_rail.pos + Sway::Tick(m_sways, dt, fwd);
 	
 	// special case (unrestricted camera)
 	if (m_rail.clamp[1] >= 180.f && m_rail.clamp[2] >= 180.f) {
-		Vec3 angles = LookAngles(m_rail.fwd);
+		Vec3 angles = LookAngles(fwd);
 		Vec3 camAngles = AnglesFromQuat(m_rail.rot);
 		angles[0] = camAngles[0]; // always bank
 		world->camera->pos = pos;
@@ -569,7 +637,7 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 	} else {
 		// we can drift +/- clamp angles from the cinematic camera orientation.
 		Vec3 qAngles = AnglesFromQuat(m_rail.rot);
-		Vec3 fAngles = LookAngles(m_rail.fwd);
+		Vec3 fAngles = LookAngles(fwd);
 		Vec3 deltaAngles = DeltaAngles(qAngles, fAngles);
 
 		for (int i = 1; i < 3; ++i) {
@@ -890,6 +958,25 @@ void E_ViewController::BlendToTarget(float time) {
 	m_blendTime[1] = time;
 }
 
+void E_ViewController::BlendToLookTarget(
+	const Vec3 &target, 
+	float in, 
+	float out, 
+	float hold, 
+	float weight,
+	float inSmooth,
+	float outSmooth
+) {
+	LookTarget t;
+	t.target = target;
+	t.blend.Init(in, out, hold);
+	t.weight = weight;
+	t.frac = 0.f;
+	t.smooth[0] = inSmooth;
+	t.smooth[1] = outSmooth;
+	m_looks.push_back(t);
+}
+
 int E_ViewController::lua_SetTargetMode(lua_State *L) {
 	E_ViewController *self = static_cast<E_ViewController*>(WorldLua::EntFramePtr(L, 1, true));
 	int mode = (int)luaL_checkinteger(L, 2);
@@ -1035,6 +1122,20 @@ int E_ViewController::lua_BlendToTarget(lua_State *L) {
 	return 0;
 }
 
+int E_ViewController::lua_BlendToLookTarget(lua_State *L) {
+	E_ViewController *self = static_cast<E_ViewController*>(WorldLua::EntFramePtr(L, 1, true));
+	self->BlendToLookTarget(
+		lua::Marshal<Vec3>::Get(L, 2, true),
+		(float)luaL_checknumber(L, 3),
+		(float)luaL_checknumber(L, 4),
+		(float)luaL_checknumber(L, 5),
+		(float)luaL_checknumber(L, 6),
+		(float)luaL_checknumber(L, 7),
+		(float)luaL_checknumber(L, 8)
+	);
+	return 0;
+}
+
 int E_ViewController::lua_Sync(lua_State *L) {
 	E_ViewController *self = static_cast<E_ViewController*>(WorldLua::EntFramePtr(L, 1, true));
 	self->m_sync = true;
@@ -1072,6 +1173,8 @@ void E_ViewController::PushCallTable(lua_State *L) {
 	lua_setfield(L, -2, "LerpCameraFOVShift");
 	lua_pushcfunction(L, lua_BlendToTarget);
 	lua_setfield(L, -2, "BlendToTarget");
+	lua_pushcfunction(L, lua_BlendToLookTarget);
+	lua_setfield(L, -2, "BlendToLookTarget");
 	lua_pushcfunction(L, lua_Sync);
 	lua_setfield(L, -2, "Sync");
 	LUART_REGISTER_GETSET(L, Target);

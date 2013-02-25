@@ -1707,7 +1707,7 @@ int Cooker::CompareVersion(int target, bool updateIfNewer) {
 
 	int r = 0;
 	if (version > -1) {
-		r = (v < version) ? -1 : (v > version) ? 1 : 0;
+		r = (v != version) ? -1 : 0;
 	} else { // version of -1 means always rebuild.
 		r = -1;
 	}
