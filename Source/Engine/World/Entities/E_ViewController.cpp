@@ -402,7 +402,8 @@ float E_ViewController::FOV::Tick(float dt, float distance) {
 
 Vec3 E_ViewController::LookTarget::Tick(
 	List &list,
-	const Vec3 &target,
+	const Vec3 &pos, 
+	const Vec3 &fwd,
 	float dt
 ) {
 	// Tick / Expire blends
@@ -419,7 +420,7 @@ Vec3 E_ViewController::LookTarget::Tick(
 	}
 
 	if (list.empty()) // none left
-		return target;
+		return fwd;
 
 	// find blocking value
 	List::iterator block = list.begin();
@@ -434,7 +435,7 @@ Vec3 E_ViewController::LookTarget::Tick(
 		--block;
 
 	// blend from blocking value forward.
-	Vec3 pos(target);
+	Vec3 nfwd(fwd);
 	
 	List::iterator it = block;
 
@@ -451,14 +452,16 @@ Vec3 E_ViewController::LookTarget::Tick(
 			x.frac = math::Lerp(x.frac, x.blend.frac, z);
 		}
 
-		pos = math::Lerp(pos, x.target, x.frac);
+		Vec3 tfwd = x.target - pos;
+		tfwd.Normalize();
+		nfwd = math::Lerp(nfwd, tfwd, x.frac);
 		
 		if (it == list.begin())
 			break;
 		--it;
 	}
 
-	return pos;
+	return nfwd;
 }
 
 
@@ -535,11 +538,12 @@ void E_ViewController::TickDistanceMode(int frame, float dt, const Entity::Ref &
 		m_sync
 	);
 
-	mLook = LookTarget::Tick(m_looks, mLook, dt);
-
 	Vec3 lookVec = mLook-mPos;
 	Vec3 fwd(lookVec);
 	fwd.Normalize();
+
+	fwd = LookTarget::Tick(m_looks, mPos, fwd, dt);
+
 	Vec3 mAngles = LookAngles(fwd);
 	mAngles[0] = roll;
 
@@ -590,38 +594,42 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 	Vec3 fwd = vTarget - m_rail.pos;
 	float distance = fwd.Normalize();
 
-	if (m_sync)
+	if (m_sync) {
 		m_rail.fwd = fwd;
-
-	if (!m_sync) {
+	} else {
 		// blend to new pos/look
 		if (m_rail.trackLag > 0.f) {
 			float lerp = math::Clamp(m_rail.trackLag*dt, 0.f, 0.9999f);
 			m_rail.pos = math::Lerp(m_rail.pos, m_rail.tm[2]->t, lerp);
 			m_rail.rot = math::Lerp(m_rail.rot, m_rail.tm[2]->r, lerp);
 			m_rail.fov = math::Lerp(m_rail.fov, m_rail.tm[2]->fov, lerp);
+		} else {
+			m_rail.pos = m_rail.tm[2]->t;
+			m_rail.rot = m_rail.tm[2]->r;
+			m_rail.fov = m_rail.tm[2]->fov;
 		}
+
 		if (m_rail.turnLag > 0.f) {
 			float lerp = math::Clamp(m_rail.turnLag*dt, 0.f, 0.9999f);
 			m_rail.fwd = math::Lerp(m_rail.fwd, fwd, lerp);
+		} else {
+			m_rail.fwd = fwd;
 		}
 	}
+
+	m_rail.lookFwd = LookTarget::Tick(m_looks, m_rail.pos, m_rail.fwd, dt);
 
 	float fov = m_rail.fov;
 
 	if (!m_rail.cinematicFOV) {
 		fov = TickFOV(frame, dt, distance);
 	}
-	
-	vTarget = LookTarget::Tick(m_looks, vTarget, dt);
-	fwd = vTarget - m_rail.pos;
-	fwd.Normalize();
 
-	Vec3 pos = m_rail.pos + Sway::Tick(m_sways, dt, fwd);
+	Vec3 pos = m_rail.pos + Sway::Tick(m_sways, dt, m_rail.lookFwd);
 	
 	// special case (unrestricted camera)
 	if (m_rail.clamp[1] >= 180.f && m_rail.clamp[2] >= 180.f) {
-		Vec3 angles = LookAngles(fwd);
+		Vec3 angles = LookAngles(m_rail.lookFwd);
 		Vec3 camAngles = AnglesFromQuat(m_rail.rot);
 		angles[0] = camAngles[0]; // always bank
 		world->camera->pos = pos;
@@ -637,7 +645,7 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 	} else {
 		// we can drift +/- clamp angles from the cinematic camera orientation.
 		Vec3 qAngles = AnglesFromQuat(m_rail.rot);
-		Vec3 fAngles = LookAngles(fwd);
+		Vec3 fAngles = LookAngles(m_rail.lookFwd);
 		Vec3 deltaAngles = DeltaAngles(qAngles, fAngles);
 
 		for (int i = 1; i < 3; ++i) {

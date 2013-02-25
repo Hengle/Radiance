@@ -290,7 +290,7 @@ private:
 		float frac;
 		float smooth[2];
 
-		static Vec3 Tick(List &list, const Vec3 &target, float dt);
+		static Vec3 Tick(List &list, const Vec3 &pos, const Vec3 &fwd, float dt);
 	};
 
 	void TickFixedMode(int frame, float dt, const Entity::Ref &target);
@@ -327,6 +327,7 @@ private:
 		const bsp_file::BSPCameraTM *tm[3];
 		Vec3 pos;
 		Vec3 fwd;
+		Vec3 lookFwd;
 		Vec3 clamp;
 		Vec3 targetFwd;
 		Quat rot;
