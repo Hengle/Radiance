@@ -482,8 +482,12 @@ bool Entity::PushEntityCall(lua_State *L, const char *name) {
 
 int Entity::StoreLuaCallback(lua_State *L, int index, int frame) {
 	int idx = FindLuaCallbackSlot();
-	if (idx == -1)
+	if (idx == -1) {
+#if !defined(RAD_OPT_SHIP)
+		RAD_FAIL("Entity::PushCallback: MaxLuaCallbacks");
+#endif
 		luaL_error(L, "Entity::PushCallback: MaxLuaCallbacks");
+	}
 
 	if (frame == lua::InvalidIndex)
 		PushEntityFrame(L);

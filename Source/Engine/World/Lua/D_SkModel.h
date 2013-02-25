@@ -62,6 +62,7 @@ private:
 	private:
 
 		static int lua_SetMasked(lua_State *L);
+		static int lua_Release(lua_State *L);
 
 		EntityWRef m_entity;
 		int m_callbackId;

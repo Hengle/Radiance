@@ -174,12 +174,14 @@ m_callbackId(callbackId) {
 D_SkModel::Notify::~Notify() {
 	Entity::Ref entity = m_entity.lock();
 	if (entity)
-		entity->ReleaseLuaCallback(m_callbackId, lua::InvalidIndex);
+		entity->ReleaseLuaCallback(m_callbackId);
 }
 
 void D_SkModel::Notify::PushElements(lua_State *L) {
 	lua_pushcfunction(L, lua_SetMasked);
 	lua_setfield(L, -2, "SetMasked");
+	lua_pushcfunction(L, lua_Release);
+	lua_setfield(L, -2, "Release");
 }
 
 void D_SkModel::Notify::OnTag(const ska::AnimTagEventData &data) {
@@ -221,6 +223,9 @@ void D_SkModel::Notify::OnEndFrame(const ska::AnimStateEventData &data) {
 	entity->PushEntityFrame(L);
 	entity->world->lua->Call(L, "D_SkModel::Notify::OnEndFrame", 1, 0, 0);
 	lua_pop(L, 1); // pop callback table
+
+	entity->ReleaseLuaCallback(m_callbackId);
+	m_entity.reset();
 }
 
 void D_SkModel::Notify::OnFinish(const ska::AnimStateEventData &data, bool masked) {
@@ -241,6 +246,9 @@ void D_SkModel::Notify::OnFinish(const ska::AnimStateEventData &data, bool maske
 	entity->PushEntityFrame(L);
 	entity->world->lua->Call(L, "D_SkModel::Notify::OnFinish", 1, 0, 0);
 	lua_pop(L, 1); // pop callback table
+
+	entity->ReleaseLuaCallback(m_callbackId);
+	m_entity.reset();
 }
 
 int D_SkModel::Notify::lua_SetMasked(lua_State *L) {
@@ -249,6 +257,17 @@ int D_SkModel::Notify::lua_SetMasked(lua_State *L) {
 	self->masked = (int)luaL_checkinteger(L, 2);
 	lua_pushinteger(L, oldMask);
 	return 1;
+}
+
+int D_SkModel::Notify::lua_Release(lua_State *L) {
+	Ref self = lua::SharedPtr::Get<Notify>(L, "D_SkModel::Notify", 1, true);
+	// explicitly free our callback slot, otherwise we rapidly get overflow
+	// before the GC comes around and deletes us.
+	Entity::Ref entity = self->m_entity.lock();
+	if (entity)
+		entity->ReleaseLuaCallback(L, self->m_callbackId);
+	self->m_entity.reset();
+	return 0;
 }
 
 } // world
