@@ -108,6 +108,11 @@ int SkModelCooker::Compile(int flags, int allflags) {
 		*ska->dska.get()
 	);
 
+	if (!skmd) {
+		COut(C_Error) << "ERROR: " << asset->name.get() << " does not contain an animated mesh." << std::endl;
+		return SR_CompilerError;
+	}
+
 	String path(CStr(asset->path));
 	String path2(path);
 	path2 += ".0.bin";

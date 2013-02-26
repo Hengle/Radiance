@@ -1231,6 +1231,10 @@ bool CompileCPUSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 
 	SceneFile::Entity::Ref e = map.worldspawn;
 	SceneFile::TriModel::Ref r = e->models[trimodel];
+
+	if (r->skel < 0)
+		return false;
+
 	const SceneFile::Skel &skel = *e->skels[r->skel].get();
 
 	for (int i = 0; i < (int)map.mats.size(); ++i){
