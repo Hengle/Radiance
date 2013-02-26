@@ -180,6 +180,7 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName =
 				
 				WriteLong file flags #unsigned
 				-- write skel index
+				print (m.name + " has skel index " + (skels[2][meshNum][1] as string))
 				WriteLong file (skels[2][meshNum][1]-1)
 				
 				if (m.material != undefined) then (

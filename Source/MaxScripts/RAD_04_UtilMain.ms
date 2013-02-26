@@ -54,7 +54,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 		if (selectionOnlyCheckbox.checked) then ( objs = selection )
 		objs = RAD_FilterVisible objs vis:(not hidden)		
 		objs = RAD_ConvertableFilter objs #(Mesh, Freecamera)
-		objs = RAD_Exclude objs Bone -- exclude bones
+		objs = RAD_Exclude objs #(Bone, CATBone) -- exclude bones
 		
 		if (objs.count == 0) then
 		(
