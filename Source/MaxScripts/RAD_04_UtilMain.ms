@@ -54,7 +54,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 		if (selectionOnlyCheckbox.checked) then ( objs = selection )
 		objs = RAD_FilterVisible objs vis:(not hidden)		
 		objs = RAD_ConvertableFilter objs #(Mesh, Freecamera)
-		objs = RAD_Exclude objs #(Bone, CATBone) -- exclude bones
+		objs = RAD_Exclude objs #(Bone, CATBone, HubObject) -- exclude bones
 		
 		if (objs.count == 0) then
 		(
@@ -118,7 +118,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 	function selectedMeshes = 
 	(
 		meshes = (RAD_ConvertableFilter (getCurrentSelection()) #(Mesh))
-		RAD_Exclude meshes #(Bone) -- filter bones
+		RAD_Exclude meshes #(Bone, CATBone, HubObject) -- filter bones
 	)
 	
 	function selectedAnimatable =
@@ -408,7 +408,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 			
 	function onSelChange =
 	(
-		sel = RAD_Exclude (RAD_ConvertableFilter selection #(Mesh, Freecamera)) Bone
+		sel = RAD_Exclude (RAD_ConvertableFilter selection #(Mesh, Freecamera)) #(Bone, CATBone, HubObject)
 		if (sel.count > 0) then
 		(
 			setupUIForObjects sel

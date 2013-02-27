@@ -384,6 +384,18 @@ function RAD_GetNodeKeyFrameTag obj frame =
 	""
 )
 
+function RAD_GetBoneTM b =
+(
+	cl = classof b
+	
+	if ((cl == CATBone) or (cl == HubObject)) then
+	(
+		return b.objecttransform
+	)
+	
+	b.transform
+)
+
 function RAD_ExportAnims file doMeshes doAnims obj =
 (
 	isCamera = (classof(obj) == Freecamera)
@@ -464,7 +476,7 @@ function RAD_ExportAnims file doMeshes doAnims obj =
 			if (isCamera) then
 			(
 				WriteFloat file obj.fov
-				x = obj.transform
+				x = RAD_GetBoneTM obj
 --				x = (rotateYMatrix -90) * (rotateXMatrix 90) * x
 				x = (rotateXMatrix -90) * (rotateYMatrix 90) * x
 --				x.translation = obj.transform.translation
@@ -475,12 +487,13 @@ function RAD_ExportAnims file doMeshes doAnims obj =
 			(
 				for bn =1 to numBones do
 				(
-					b = getNodeByName (skinops.GetBoneName obj.skin bn 0)
-					tm = b.transform
+					b = getNodeByName (skinops.GetBoneName obj.skin bn 0)\
+					
+					tm = RAD_GetBoneTM b
 					
 					if (b.parent != undefined) then 
 					(
-						tm = tm * (inverse b.parent.transform)
+						tm = tm * (inverse (RAD_GetBoneTM b.parent))
 					)
 					
 					RAD_WriteBoneTM file tm
