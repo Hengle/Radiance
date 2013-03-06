@@ -37,25 +37,19 @@ void EventMutex::NotifyAll() {
 //
 // Wait for gate to be "opened".
 //
-bool Gate::Wait(U32 timeout) const
-{
+bool Gate::Wait(U32 timeout) const {
 	Lock l(m_x);
 
 	bool r = true;
 	++m_waiting;
 
-	while (!m_open)
-	{
-		if (timeout != Infinite)
-		{
-			if (!m_sc.timed_wait(m_x, duration(timeout)) && !m_pulse)
-			{
+	while (!m_open) {
+		if (timeout != Infinite) {
+			if (!m_sc.timed_wait(m_x, duration(timeout)) && !m_pulse) {
 				r = false;
 				break;
 			}
-		}
-		else
-		{
+		} else {
 			m_sc.wait(m_x);
 		}
 		
@@ -63,15 +57,11 @@ bool Gate::Wait(U32 timeout) const
 			break;
 	}
 
-	if (m_pulse)
-	{
-		if (--m_waitingBeforePulse == 0)
-		{
+	if (m_pulse) {
+		if (--m_waitingBeforePulse == 0) {
 			m_pulse = false;
 		}
-	}
-	else
-	{
+	} else {
 		--m_waiting;
 	}
 
@@ -82,13 +72,11 @@ bool Gate::Wait(U32 timeout) const
 // Open the gate. If "autoCloseSingleRelease" is true, then one waiting thread will
 // be released, and the gate will be closed, blocking any other waiting threads.
 //
-void Gate::Open()
-{
+void Gate::Open() {
 	Lock l(m_x);
 	if(m_open) 
 		return;
-	if (m_single)
-	{
+	if (m_single) {
 		Pulse();
 		return;
 	}
@@ -101,8 +89,7 @@ void Gate::Open()
 //
 // Close the gate.
 //
-void Gate::Close()
-{
+void Gate::Close() {
 	Lock l(m_x);
 	if (!m_open) 
 		return;
@@ -117,33 +104,25 @@ void Gate::Close()
 // only one thread wakes up).
 // Closes the gate.
 //
-void Gate::Pulse()
-{
-	Lock l(m_x);
+void Gate::Pulse() {
+	Lock L(m_x);
 
 	// previous pulse not processed yet?
-	if (m_pulse)
-	{
+	if (m_pulse){
 		return; // don't do anything.
-	}
-	else if (m_open)
-	{
+	} else if (m_open) {
 		m_open = false;
 		return;
 	}
 
-	if (m_waiting > 0) // threads are waiting.
-	{
+	if (m_waiting > 0) { // threads are waiting.
 		m_pulse = true;
 
-		if (m_single)
-		{
+		if (m_single) {
 			--m_waiting;
 			m_waitingBeforePulse = 1;
 			m_sc.notify_one();
-		}
-		else
-		{
+		} else {
 			m_waitingBeforePulse = m_waiting;
 			m_waiting = 0;
 			m_sc.notify_all();
@@ -153,55 +132,179 @@ void Gate::Pulse()
 
 ///////////////////////////////////////////////////////////////////////////////
 
+SharedMutex::SharedMutex() : 
+m_upgrades(0),
+m_state(kLockState_Unlocked),
+m_lockCount(0) {
+	m_numReaders[0] = m_numReaders[1] = 0;
+	m_numWriters[0] = m_numWriters[1] = 0;
+	RAD_DEBUG_ONLY(m_threadId = -1);
+}
+
+SharedMutex::~SharedMutex() {
+}
+
+void SharedMutex::ReadLock() { // -- doesn't hold mutex.
+	Lock L(m_m);
+
+	// if we got in here there are no active writers
+	++m_numReaders[0];
+
+	// pending writers?
+	if (m_numWriters[0] > 0) {
+		m_readGate.wait(L);
+	}
+
+	--m_numReaders[0];
+	++m_numReaders[1];
+
+	RAD_ASSERT(m_state != kLockState_Write);
+	++m_lockCount;
+
+	m_state = kLockState_Read;
+}
+
+void SharedMutex::WriteLock() {
+	Lock L(m_m);
+
+	while (m_numReaders[0] > 0) { // pending readers
+		m_writeGate.wait(L);
+	}
+
+	++m_numWriters[0];
+
+	while (m_numReaders[1] > 0) { // active readers
+		m_writeGate.wait(L);
+	}
+
+	--m_numWriters[0];
+	++m_numWriters[1];
+
+	RAD_ASSERT(m_state == kLockState_Unlocked);
+	RAD_ASSERT(m_threadId == -1);
+	++m_lockCount;
+	RAD_ASSERT(m_lockCount == 1);
+
+	m_state = kLockState_Write;
+	RAD_DEBUG_ONLY(m_threadId = thread::ThreadId());
+	L.release(); // don't unlock mutex in Writer case
+}
+
+void SharedMutex::Unlock() {
+	Lock L(m_m);
+	// if you assert here you are unlocking on a thread that did not initiate a lock
+	// or you are unlocking too many times or doing something bad.
+#if defined(RAD_OPT_DEBUG)
+	if (m_state == kLockState_Write) {
+		// consistency check
+		RAD_ASSERT(m_threadId == thread::ThreadId());
+		RAD_DEBUG_ONLY(m_threadId = -1);
+		RAD_ASSERT(m_lockCount == 1);
+	} else {
+		RAD_ASSERT(m_lockCount > 0);
+	}
+#endif
+	if ((--m_lockCount) == 0) {
+		if (m_state == kLockState_Write) {
+			RAD_ASSERT(m_numWriters[1] == 1);
+			--m_numWriters[1];
+			m_state = kLockState_Unlocked;
+			m_m.unlock();
+			m_readGate.notify_all();
+		}
+	}
+
+	if (m_state == kLockState_Read) {
+		RAD_ASSERT(m_numReaders > 0);
+		--m_numReaders[1];
+		if (m_numReaders[1] == 0) {
+			if (m_upgrades > 0) {
+				m_upgradeGate.notify_all();
+			} else {
+				m_writeGate.notify_all();
+			}
+			m_state = kLockState_Unlocked;
+		}
+	}
+}
+
+void SharedMutex::UpgradeToWriteLock() {
+	Lock L(m_m);
+	
+	RAD_ASSERT(m_state == kLockState_Read);
+	RAD_ASSERT(m_numReaders[1] > 0);
+	--m_numReaders[1];
+	
+	if (m_numReaders[1] > 0) {
+		++m_upgrades;
+		while (m_numReaders[1] > 0) {
+			// we can't write lock this until all readers are done
+			m_upgradeGate.wait(L);
+		}
+		--m_upgrades;
+		RAD_ASSERT(m_state == kLockState_Unlocked);
+	}
+
+	++m_numWriters[1];
+	m_state = kLockState_Write;
+	RAD_DEBUG_ONLY(m_threadId = thread::ThreadId());
+}
+
+void SharedMutex::DowngradeToReadLock() {
+	Lock L(m_m);
+
+	RAD_ASSERT(m_state == kLockState_Write);
+	RAD_ASSERT(m_numWriters[1] == 1);
+	--m_numWriters[1];
+	++m_numReaders[1];
+	m_state = kLockState_Read;
+	RAD_DEBUG_ONLY(m_threadId = -1);
+	m_m.unlock(); // unlock outer write lock.
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 Semaphore::Semaphore(int count) :
-m_gate(count > 0),
-m_count(count)
-{
+m_count(count) {
 }
 
-void Semaphore::Put()
-{
-	Lock l(m_m);
+void Semaphore::Put() {
+	Lock L(m_m);
 	++m_count;
-	m_gate.Open();
+	m_gate.notify_all();
 }
 
-int Semaphore::Get(U32 timeout, bool clear)
-{
+int Semaphore::Get(U32 timeout, bool clear) {
 	xtime::TimeVal start = xtime::ReadMilliseconds();
 	int r = 0;
 
-	while (timeout == Infinite || (xtime::ReadMilliseconds() - start) < timeout)
-	{
-		m_gate.Wait(timeout); // force thread round robin
-		Lock l(m_m);
-		if (m_count > 0)
-		{
-			if (clear)
-			{
+	Lock L(m_m);
+
+	do {
+		if (m_count > 0) {
+			if (clear) {
 				r = m_count;
 				m_count = 0;
-			}
-			else
-			{
+			} else {
 				r = 1;
 				--m_count;
 			}
-			
-			if (m_count < 1)
-				m_gate.Close();
 			break;
 		}
-	}
+
+		if (timeout != Infinite) {
+			m_gate.timed_wait(m_m, duration(timeout));
+		} else {
+			m_gate.wait(m_m);
+		}
+
+	} while (timeout == Infinite || (xtime::ReadMilliseconds() - start) < timeout);
 
 	return r;
 }
 
-int Semaphore::Reset()
-{
-	Lock l(m_m);
-	m_gate.Close();
-	
+int Semaphore::Reset() {
+	Lock L(m_m);
 	int r = m_count;
 	m_count = 0;
 	return r;

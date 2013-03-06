@@ -197,7 +197,7 @@ void SoundContext::Tick(float dt, bool positional)
 				}
 
 				if (source->sound->Tick(dt, channel, *source, positional)) {
-					UpgradeToWriteLock WL(L);
+					UpgradeToWriteLock WL(m_m);
 					Source::List::iterator next = it; ++next;
 					list.erase(it);
 					it = next;
@@ -224,7 +224,7 @@ int SoundContext::TickStreams(ALDriver &driver)
 		RAD_ASSERT(s->stream);
 		Sound::StreamResult r = s->sound->TickStream(*s);
 		if (r == Sound::kStreamResult_Finished) {
-			UpgradeToWriteLock WL(L);
+			UpgradeToWriteLock WL(m_m);
 			UnmapSource(*s);
 		} else if (r == Sound::kStreamResult_Decoding) {
 			++numBusy;

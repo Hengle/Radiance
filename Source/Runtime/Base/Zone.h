@@ -172,12 +172,12 @@ private:
 #if defined(RAD_OPT_ZONE_MEMGUARD)
 	unsigned int m_frontGuard[2];
 #endif
-	AddrSize m_numBytes;
-	AddrSize m_overhead;
-	AddrSize m_numAllocs;
-	AddrSize m_small;
-	AddrSize m_large;
-	AddrSize m_high;
+	volatile AddrSize m_numBytes;
+	volatile AddrSize m_overhead;
+	volatile AddrSize m_numAllocs;
+	volatile AddrSize m_small;
+	volatile AddrSize m_large;
+	volatile AddrSize m_high;
 	const char *m_name;
 	Zone *m_parent;
 	Zone *m_next;

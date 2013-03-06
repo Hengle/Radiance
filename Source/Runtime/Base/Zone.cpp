@@ -164,7 +164,7 @@ void RAD_ANSICALL operator delete[](void *p, Zone &z) throw() {
 #endif
 }
 
-//#define NEED_LOCKS
+#define NEED_LOCKS
 
 #if defined(NEED_LOCKS)
 namespace {
@@ -187,7 +187,7 @@ void Zone::Init() {
 
 	if (m_parent) {
 #if defined(NEED_LOCKS)
-		Lock l(s_m);
+		Lock L(s_m);
 #endif
 		m_next = m_parent->m_head;
 		m_parent->m_head = this;
@@ -195,14 +195,20 @@ void Zone::Init() {
 }
 
 void Zone::Inc(AddrSize size, AddrSize overhead) {
+#if defined(NEED_LOCKS)
+	Lock L(s_m);
+#endif
 	m_numBytes += size;
 	m_overhead += overhead;
-	m_high = (AddrSize)std::max(m_numBytes, m_high);
-	m_small = (AddrSize)std::min(m_small, (AddrSize)size);
-	m_large = (AddrSize)std::max(m_large, (AddrSize)size);
+	m_high = std::max<volatile AddrSize>(m_numBytes, m_high);
+	m_small = std::min<volatile AddrSize>(m_small, size);
+	m_large = std::max<volatile AddrSize>(m_large, size);
 }
 
 void Zone::Dec(AddrSize size, AddrSize overhead) {
+#if defined(NEED_LOCKS)
+	Lock L(s_m);
+#endif
 	m_numBytes -= size;
 	m_overhead -= overhead;
 }
@@ -259,7 +265,7 @@ void *Zone::Realloc(void *ptr, size_t size, AddrSize headerSize, AddrSize alignm
 
 AddrSize Zone::RAD_IMPLEMENT_GET(totalBytes) {
 #if defined(NEED_LOCKS)
-	Lock l(s_m);
+	Lock L(s_m);
 #endif
 	AddrSize total = m_numBytes;
 	for (Zone *z = m_head; z; z = z->next) {
@@ -270,7 +276,7 @@ AddrSize Zone::RAD_IMPLEMENT_GET(totalBytes) {
 
 AddrSize Zone::RAD_IMPLEMENT_GET(totalOverhead) {
 #if defined(NEED_LOCKS)
-	Lock l(s_m);
+	Lock L(s_m);
 #endif
 	AddrSize total = m_overhead;
 	for (Zone *z = m_head; z; z = z->next) {
@@ -281,7 +287,7 @@ AddrSize Zone::RAD_IMPLEMENT_GET(totalOverhead) {
 
 AddrSize Zone::RAD_IMPLEMENT_GET(totalCount) {
 #if defined(NEED_LOCKS)
-	Lock l(s_m);
+	Lock L(s_m);
 #endif
 	AddrSize total = m_numAllocs;
 	for (Zone *z = m_head; z; z = z->next) {
@@ -292,7 +298,7 @@ AddrSize Zone::RAD_IMPLEMENT_GET(totalCount) {
 
 AddrSize Zone::RAD_IMPLEMENT_GET(totalSmall) {
 #if defined(NEED_LOCKS)
-	Lock l(s_m);
+	Lock L(s_m);
 #endif
 	AddrSize total = m_small;
 	for (Zone *z = m_head; z; z = z->next) {
@@ -303,7 +309,7 @@ AddrSize Zone::RAD_IMPLEMENT_GET(totalSmall) {
 
 AddrSize Zone::RAD_IMPLEMENT_GET(totalLarge) {
 #if defined(NEED_LOCKS)
-	Lock l(s_m);
+	Lock L(s_m);
 #endif
 	AddrSize total = m_large;
 	for (Zone *z = m_head; z; z = z->next) {
@@ -314,7 +320,7 @@ AddrSize Zone::RAD_IMPLEMENT_GET(totalLarge) {
 
 AddrSize Zone::RAD_IMPLEMENT_GET(totalHigh) {
 #if defined(NEED_LOCKS)
-	Lock l(s_m);
+	Lock L(s_m);
 #endif
 	AddrSize total = m_high;
 	for (Zone *z = m_head; z; z = z->next) {

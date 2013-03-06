@@ -1484,9 +1484,6 @@
     <ClCompile Include="..\..\Runtime\Base\Zone.cpp">
       <Filter>Source\Runtime\Base</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Runtime\String\String.cpp">
-      <Filter>Source\Runtime\String</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\RadPCH.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -2209,6 +2206,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\World\Lua\D_SpriteBatch.cpp">
       <Filter>Source\Engine\World\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Runtime\String\String.cpp">
+      <Filter>Source\Runtime\String</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

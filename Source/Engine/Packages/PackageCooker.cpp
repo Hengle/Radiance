@@ -338,7 +338,10 @@ int PackageMan::Cook(
 
 	xtime::MilliToDayHourSecond(totalTime, &days, &hours, &minutes, &seconds);
 
-	out << "Finished in " << (days*24+hours) << " hour(s), " << minutes << " minute(s), " << seconds << " second(s)" << std::endl;
+	if (r == SR_Success) {
+		out << "Finished in " << (days*24+hours) << " hour(s), " << minutes << " minute(s), " << seconds << " second(s)" << std::endl;
+	} else {
+	}out << "Finished WITH ERRORS in " << (days*24+hours) << " hour(s), " << minutes << " minute(s), " << seconds << " second(s)" << std::endl;
 
 	m_cookState.reset();
 

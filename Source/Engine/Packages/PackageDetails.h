@@ -16,7 +16,7 @@ namespace details {
 typedef boost::shared_mutex SharedMutex;
 typedef boost::lock_guard<SharedMutex> WriteLock;
 typedef boost::shared_lock<SharedMutex> ReadLock;
-typedef thread::upgrade_to_exclusive_lock<SharedMutex> UpgradeToWriteLock;
+typedef thread::unsafe_upgrade_to_exclusive_lock<SharedMutex> UpgradeToWriteLock;
 typedef thread::Interlocked<UReg> UInterlocked;
 
 struct SinkFactoryBase {

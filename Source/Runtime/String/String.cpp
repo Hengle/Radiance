@@ -149,7 +149,7 @@ void DataBlock::InitPools() {
 	s_init = true;
 }
 
-MemoryPool *DataBlock::PoolForSize(int size, int &poolIdx, Mutex::ScopedLock &L) {
+MemoryPool *DataBlock::PoolForSize(int size, int &poolIdx, Mutex::Lock &_Lout) {
 
 #if defined(DISABLE_POOLS)
 	return 0;
@@ -157,7 +157,8 @@ MemoryPool *DataBlock::PoolForSize(int size, int &poolIdx, Mutex::ScopedLock &L)
 	if (size > kMaxPoolSize)
 		return 0;
 
-	L.lock(Mutex::Get());
+	Mutex::Lock L(Mutex::Get());
+	L.swap(_Lout);
 
 	InitPools();
 
@@ -197,7 +198,7 @@ DataBlock::Ref DataBlock::New(
 		char *buf = 0;
 
 		if (&zone == &ZString.Get()) {
-			Mutex::ScopedLock L;
+			Mutex::Lock L;
 			pool = PoolForSize(len, poolIdx, L);
 			if (pool) {
 				buf = reinterpret_cast<char*>(pool->GetChunk());

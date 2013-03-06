@@ -153,10 +153,10 @@ private:
 	void UnmapSource(Source &source);
 	int TickStreams(ALDriver &alDriver);
 
-	typedef boost::shared_mutex Mutex;
+	typedef thread::SharedMutex Mutex;
 	typedef boost::lock_guard<Mutex> WriteLock;
 	typedef boost::shared_lock<Mutex> ReadLock;
-	typedef thread::upgrade_to_exclusive_lock<Mutex> UpgradeToWriteLock;
+	typedef thread::UpgradeToWriteLock UpgradeToWriteLock;
 
 	Mutex m_m;
 	Source::Map m_sources;

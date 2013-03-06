@@ -21,8 +21,7 @@ namespace details {
 class Mutex {
 public:
 	typedef boost::mutex M;
-	typedef boost::lock_guard<M> Lock;
-	typedef thread::scoped_lock_guard<M> ScopedLock;
+	typedef boost::unique_lock<M> Lock;
 	static M &Get() {
 #if defined(RAD_OPT_GCC)
 		static M &s_m(*(new M()));
@@ -159,7 +158,7 @@ private:
 	static MemoryPool *PoolForSize(
 		int size, 
 		int &poolIdx, 
-		Mutex::ScopedLock &L
+		Mutex::Lock &L
 	);
 
 	static bool s_init;

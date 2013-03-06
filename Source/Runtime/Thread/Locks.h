@@ -6,8 +6,10 @@
 #pragma once
 
 #include "../Base.h"
+#include "../ThreadDef.h"
 #include "../Thread/Interlocked.h"
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/locks.hpp>
@@ -82,8 +84,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADRT_CLASS Gate : private boost::noncopyable
-{
+class RADRT_CLASS Gate : private boost::noncopyable {
 public:
 
 	Gate(bool initiallyOpen = false, bool autoCloseSingleRelease = false)
@@ -125,7 +126,7 @@ public:
 private:
 
 	typedef boost::mutex MutexType;
-	typedef boost::lock_guard<MutexType> Lock;
+	typedef boost::unique_lock<MutexType> Lock;
 
 	mutable boost::condition m_sc; // state condition
 	mutable MutexType m_x;
@@ -139,8 +140,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADRT_CLASS Semaphore
-{
+class RADRT_CLASS Semaphore {
 public:
 	Semaphore(int count = 0);
 
@@ -151,8 +151,8 @@ public:
 private:
 
 	typedef boost::mutex Mutex;
-	typedef boost::lock_guard<Mutex> Lock;
-	Gate m_gate;
+	typedef boost::unique_lock<Mutex> Lock;
+	boost::condition m_gate;
 	Mutex m_m;
 	int m_count;
 };
@@ -170,8 +170,7 @@ private:
 // ------------------------------------------------
 
 template <UReg NumKeys>
-class SegmentedLock : private boost::noncopyable
-{
+class SegmentedLock : private boost::noncopyable {
 public:
 
 	SegmentedLock();
@@ -185,10 +184,8 @@ private:
 	typedef boost::mutex Mutex;
 
 	friend struct KeyState;
-	struct KeyState
-	{
-		KeyState() : lockCount(0), unlockCount(0), lockGate(false, false)
-		{
+	struct KeyState {
+		KeyState() : lockCount(0), unlockCount(0), lockGate(false, false) {
 		}
 
 		Interlocked<UReg> lockCount;
@@ -203,56 +200,135 @@ private:
 	void UnlockOtherKeys(UReg key);
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// boost doesn't supply a lock concept that goes from a read->write lock
-// although you can do this with the naked mutex.
-// Note: going from shared_lock, to upgrade_lock, to upgrade_to_unique_lock
-// will hang because upgrade_to_unique_lock will wait for shared_locks to go
-// away.
-///////////////////////////////////////////////////////////////////////////////
+//! A mutex that can be upgraded from a read -> write -> read
+/*! Boost has some weird restrictions on how shared_mutex can be upgraded to a write lock
+ ** (i.e. only a single thread can upgrade to write, if you ever have 2 or more threads
+     trying to upgrade to write it will deadlock).
+
+	 This class is heavier than a boost::shared_mutex but does reliable read->write->read upgrading.
+*/
+class SharedMutex {
+public:
+
+	SharedMutex();
+	~SharedMutex();
+
+	void ReadLock();
+	void WriteLock();
+	void Unlock();
+
+	void UpgradeToWriteLock();
+	void DowngradeToReadLock();
+
+	// boost lock concept support:
+
+	void lock() {
+		WriteLock();
+	}
+
+	void lock_shared() {
+		ReadLock();
+	}
+
+	void unlock() {
+		Unlock();
+	}
+
+	void unlock_shared() {
+		Unlock();
+	}
+
+private:
+
+	typedef boost::recursive_mutex Mutex;
+	typedef boost::unique_lock<Mutex> Lock;
+
+	enum LockState {
+		kLockState_Unlocked,
+		kLockState_Read,
+		kLockState_Write
+	};
+
+	boost::condition m_readGate;
+	boost::condition m_writeGate;
+	boost::condition m_upgradeGate;
+	Mutex m_m;
+	volatile int m_numReaders[2];
+	volatile int m_numWriters[2];
+	volatile int m_upgrades;
+	volatile int m_lockCount;
+	volatile LockState m_state;
+
+#if defined(RAD_OPT_DEBUG)
+	volatile Id m_threadId;
+#endif
+};
+
+//! SharedMutex upgrade to write lock helper
+class UpgradeToWriteLock {
+public:
+	UpgradeToWriteLock(SharedMutex &m) : m_m(m) {
+		m.UpgradeToWriteLock();
+	}
+	
+	~UpgradeToWriteLock() {
+		m_m.DowngradeToReadLock();
+	}
+
+private:
+	SharedMutex &m_m;
+};
+
+/*! Boost doesn't supply a lock concept that goes from a read->write lock that works
+ ** without exception. Boost only supports a single thread upgrading to write.
+ ** This class avoids this issue by simply unlocking the read and locking for write
+ ** and not going through the upgrade path at all.
+ **
+ ** This is, however, unsafe in the sense that in between these operations a read or write
+ ** thread could consume or change data. If you require fully safe access, use the SharedMutex
+ ** class above.
+*/
 
 template <class Mutex>
-class upgrade_to_exclusive_lock
+class unsafe_upgrade_to_exclusive_lock
 {
 private:
     boost::shared_lock<Mutex>* source;
-    explicit upgrade_to_exclusive_lock(upgrade_to_exclusive_lock&);
-    upgrade_to_exclusive_lock& operator=(upgrade_to_exclusive_lock&);
+    explicit unsafe_upgrade_to_exclusive_lock(unsafe_upgrade_to_exclusive_lock&);
+    unsafe_upgrade_to_exclusive_lock& operator=(unsafe_upgrade_to_exclusive_lock&);
 public:
-    explicit upgrade_to_exclusive_lock(boost::shared_lock<Mutex>& m_):
+    explicit unsafe_upgrade_to_exclusive_lock(boost::shared_lock<Mutex>& m_):
         source(&m_)
     {
 		source->mutex()->unlock_shared();
 		source->mutex()->lock();
 	}
-    ~upgrade_to_exclusive_lock()
-    {
-        if(source)
-        {
+    ~unsafe_upgrade_to_exclusive_lock() {
+        if(source) {
             source->mutex()->unlock_and_lock_shared();
         }
     }
 
-    upgrade_to_exclusive_lock(boost::detail::thread_move_t<upgrade_to_exclusive_lock<Mutex> > other):
+    unsafe_upgrade_to_exclusive_lock(boost::detail::thread_move_t<unsafe_upgrade_to_exclusive_lock<Mutex> > other):
         source(other->source)
     {
         other->source=0;
     }
     
-    upgrade_to_exclusive_lock& operator=(boost::detail::thread_move_t<upgrade_to_exclusive_lock<Mutex> > other)
+    unsafe_upgrade_to_exclusive_lock& operator=(boost::detail::thread_move_t<unsafe_upgrade_to_exclusive_lock<Mutex> > other)
     {
-        upgrade_to_exclusive_lock temp(other);
+        unsafe_upgrade_to_exclusive_lock temp(other);
         swap(temp);
         return *this;
     }
-    void swap(upgrade_to_exclusive_lock& other)
+    void swap(unsafe_upgrade_to_exclusive_lock& other)
     {
         std::swap(source,other.source);
     }
-    typedef void (upgrade_to_exclusive_lock::*bool_type)(upgrade_to_exclusive_lock&);
+    typedef void (unsafe_upgrade_to_exclusive_lock::*bool_type)(unsafe_upgrade_to_exclusive_lock&);
     operator bool_type() const
     {
-        return source?&upgrade_to_exclusive_lock::swap:0;
+        return source?&unsafe_upgrade_to_exclusive_lock::swap:0;
     }
     bool operator!() const
     {
@@ -263,39 +339,6 @@ public:
         return source!=0;
     }
 };
-
-///////////////////////////////////////////////////////////////////////////////
-// no concept in boost for a optionally scoped guards
-///////////////////////////////////////////////////////////////////////////////
-
-template <typename Mutex>
-class scoped_lock_guard {
-private:
-    Mutex* m;
-    explicit scoped_lock_guard(const scoped_lock_guard&);
-    scoped_lock_guard& operator=(scoped_lock_guard&);
-
-public:
-	scoped_lock_guard() : m(0) {}
-
-    ~scoped_lock_guard()
-    {
-		if (m)
-			m->unlock();
-    }
-
-	void lock(Mutex &_m)
-	{
-		adopt(_m);
-		_m.lock();
-	}
-
-	void adopt(Mutex &_m)
-	{
-		m = &_m;
-	}
-};
-
 
 } // thread
 
