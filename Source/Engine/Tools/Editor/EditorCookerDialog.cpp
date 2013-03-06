@@ -15,6 +15,7 @@
 #include <QtCore/QSignalMapper>
 #include <QtGui/QPlainTextEdit>
 #include <QtGui/QCheckBox>
+#include <QtGui/QRadioButton>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QGridLayout>
@@ -38,7 +39,6 @@ CookerDialog *CookerDialog::s_instance = 0;
 CookerDialog::CookerDialog(QWidget *parent) : 
 QDialog(parent),
 m_platforms(0),
-m_sigMap(0),
 m_textArea(0),
 m_cook(0),
 m_thread(0),
@@ -67,7 +67,6 @@ m_closeWhenFinished(false) {
 		CenterWidget(*this, *parent);
 	}
 
-	m_sigMap = new (ZEditor) QSignalMapper(this);
 	QVBoxLayout *vbox = new (ZEditor) QVBoxLayout(this);
 
 	m_textArea = new (ZEditor) QPlainTextEdit(this);
@@ -110,23 +109,6 @@ m_closeWhenFinished(false) {
 	hbox2->addStretch(1);
 	
 	vGroupBox->addLayout(hbox2);
-	
-	QGroupBox *compressionGroup = new (ZEditor) QGroupBox("Compression");
-	QGridLayout *compressionGroupLayout = new (ZEditor) QGridLayout(compressionGroup);
-	m_compression = new QSlider(Qt::Horizontal);
-	m_compression->setTickInterval(1);
-	m_compression->setTickPosition(QSlider::TicksBelow);
-	m_compression->setRange(data_codec::zlib::NoCompression, data_codec::zlib::BestCompression);
-	//m_compression->setValue(mainWin->userPrefs->value("cook/compression", data_codec::zlib::BestCompression).toInt());
-	m_compression->setValue(data_codec::zlib::NoCompression);
-	m_compression->setEnabled(false);
-	RAD_VERIFY(connect(m_compression, SIGNAL(valueChanged(int)), SLOT(CompressionChanged(int))));
-	compressionGroupLayout->addWidget(m_compression, 0, 0, 1, 3);
-	compressionGroupLayout->addWidget(new QLabel("None"), 1, 0);
-	compressionGroupLayout->addWidget(new QLabel("Best"), 1, 2);
-	compressionGroupLayout->setColumnStretch(1, 1);
-	vGroupBox->addWidget(compressionGroup);
-
 	hbox->addLayout(vGroupBox);
 
 	m_platforms = 0;
@@ -137,24 +119,22 @@ m_closeWhenFinished(false) {
 	for (int i = pkg::P_FirstTarget; i <= pkg::P_LastTarget; i <<= 1, ++targetNum) {
 		QString name(pkg::PlatformNameForFlags(i));
 
-		QCheckBox *check = new (ZEditor) QCheckBox(name);
+		QRadioButton *radio = new (ZEditor) QRadioButton(name);
 		
 		bool checked = mainWin->userPrefs->value("cook/" + name, true).toBool();
-		check->setCheckState(checked ? Qt::Checked : Qt::Unchecked);
+		radio->setChecked(checked);
+		radio->setProperty("platformFlag", i);
 
 		int col = targetNum / MaxColumns;
 		int row = targetNum % MaxColumns;
 
-		grid->addWidget(check, row, col);
+		grid->addWidget(radio, row, col);
 
 		if (checked)
-			m_platforms |= i;
+			m_platforms = i;
 
-		RAD_VERIFY(connect(check, SIGNAL(stateChanged(int)), m_sigMap, SLOT(map())));
-		m_sigMap->setMapping(check, i);
+		RAD_VERIFY(connect(radio, SIGNAL(toggled(bool)), SLOT(OnPlatformSelected(bool))));
 	}
-
-	RAD_VERIFY(connect(m_sigMap, SIGNAL(mapped(int)), SLOT(OnCheckBoxChanged(int))));
 
 	QVBoxLayout *buttonLayout = new (ZEditor) QVBoxLayout();
 	hbox->addLayout(buttonLayout);
@@ -178,7 +158,7 @@ m_closeWhenFinished(false) {
 	RAD_VERIFY(connect(m_scriptsOnly, SIGNAL(stateChanged(int)), SLOT(ScriptsOnly(int))));
 	buttonLayout->addWidget(m_scriptsOnly);
 
-	m_fast = new (ZEditor) QCheckBox("Fast Cook");
+	m_fast = new (ZEditor) QCheckBox("Fast Cook (Low Quality)");
 	m_fast->setChecked(
 		mainWin->userPrefs->value("cook/fast", false).toBool() ?
 		Qt::Checked :
@@ -215,17 +195,16 @@ CookerDialog::~CookerDialog() {
 	s_instance = 0;
 }
 
-void CookerDialog::OnCheckBoxChanged(int flags) {
-	QCheckBox *check = static_cast<QCheckBox*>(m_sigMap->mapping(flags));
-	if (check->checkState() == Qt::Checked) {
+void CookerDialog::OnPlatformSelected(bool checked) {
+	QGroupBox *group = static_cast<QGroupBox*>(sender());
+	int flags = group->property("platformFlags").toInt();
+
+	if (checked) {
 		MainWindow::Get()->userPrefs->setValue(QString("cook/") + pkg::PlatformNameForFlags(flags), true);
-		m_platforms |= flags;
+		m_platforms = flags;
 		m_cook->setEnabled(true);
 	} else {
 		MainWindow::Get()->userPrefs->setValue(QString("cook/") + pkg::PlatformNameForFlags(flags), false);
-		m_platforms &= ~flags;
-		if (!m_platforms)
-			m_cook->setEnabled(false);
 	}
 }
 
@@ -305,7 +284,7 @@ void CookerDialog::CookClicked() {
 		roots, 
 		flags,
 		enabledLangMask,
-		m_compression->value(),
+		0,
 		numThreads,
 		*m_oStream
 	);

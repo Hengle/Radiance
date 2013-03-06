@@ -80,7 +80,7 @@ protected:
 private slots:
 
 	virtual void closeEvent(QCloseEvent *e);
-	void OnCheckBoxChanged(int flags);
+	void OnPlatformSelected(bool checked);
 	void CookClicked();
 	void CookFinished();
 	void CompressionChanged(int value);
@@ -131,11 +131,9 @@ private:
 	OStreamRef m_oStream;
 	CookerStringBuf::Ref m_stringBuf;
 	int m_platforms;
-	QSignalMapper *m_sigMap;
 	QPlainTextEdit *m_textArea;
 	QPushButton *m_cook;
 	CookThread *m_thread;
-	QSlider *m_compression;
 	QCheckBox *m_clean;
 	QCheckBox *m_scriptsOnly;
 	QCheckBox *m_fast;
