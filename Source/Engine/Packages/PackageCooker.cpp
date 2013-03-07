@@ -1033,7 +1033,7 @@ int PackageMan::CompileScripts() {
 	return SR_Success;
 }
 
-bool PackageMan::LoadTagFile(const Cooker::Ref &cooker, int pflags, void *&data, AddrSize &size) {
+bool PackageMan::LoadTagFile(const Cooker::Ref &cooker, void *&data, AddrSize &size) {
 	String path = cooker->TagPath();
 	String nativePath;
 
@@ -1075,7 +1075,7 @@ bool PackageMan::CreateTagData(const Cooker::Ref &cooker, TagData *&data, AddrSi
 
 	tag->type = (U16)cooker->m_type;
 
-	if (LoadTagFile(cooker, m_cookState->ptargets, file, fileSize)) {
+	if (LoadTagFile(cooker, file, fileSize)) {
 		tag = (TagData*)safe_zone_realloc(ZPackages, tag, ofs+fileSize);
 		tag->ofs = (U32)ofs;
 		memcpy(((U8*)tag)+tag->ofs, file, fileSize);
@@ -1328,9 +1328,12 @@ Cooker::Ref PackageMan::CookerForAsset(const Asset::Ref &asset, const CookPakFil
 	cooker->m_pkg = asset->pkg;
 	cooker->m_type = asset->type;
 	cooker->m_cooking = true;
+	cooker->m_basePath = m_cookState->targetPath;
 	cooker->m_globalsPath = m_cookState->targetPath + CStr("/Globals/");
 	cooker->m_tagsPath = m_cookState->targetPath + CStr("/Tags/");
 	cooker->m_filePath = m_cookState->targetPath + CStr("/Pak/") + pakfile->name + CStr("/");
+	cooker->m_pakfile = pakfile->name;
+	cooker->m_originalPakfile = pakfile->name;
 	cooker->LoadGlobals();
 
 	return cooker;
@@ -1389,6 +1392,16 @@ Cooker::Ref PackageMan::AllocateIntermediateCooker(const Asset::Ref &_asset) {
 	cooker->LoadGlobals();
 
 	return cooker;
+}
+
+void Cooker::ResetPakFile() {
+	this->pakfile = m_originalPakfile.c_str;
+}
+
+void Cooker::RAD_IMPLEMENT_SET(pakfile) (const char *value) {
+	RAD_ASSERT(value);
+	m_pakfile = value;
+	m_filePath = m_basePath + CStr("/Pak/") + m_pakfile + CStr("/");
 }
 
 int Cooker::Cook(int flags) {

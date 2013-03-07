@@ -357,6 +357,7 @@ protected:
 
 	virtual int Compile(int flags) = 0;
 
+	void ResetPakFile();
 	String FilePath(const char *path);
 	bool FileTime(const char *path, xtime::TimeDate &time);
 	bool CopyOutputFile(const char *src, const char *dst);
@@ -383,6 +384,7 @@ protected:
 	static String TargetPath(int target);
 	static String LocalizedString(int languages);
 	
+	RAD_DECLARE_PROPERTY(Cooker, pakfile, const char*, const char*);
 	RAD_DECLARE_READONLY_PROPERTY(Cooker, engine, Engine*);
 	RAD_DECLARE_READONLY_PROPERTY(Cooker, cout, std::ostream&);
 	RAD_DECLARE_READONLY_PROPERTY(Cooker, asset, const AssetRef&);
@@ -397,15 +399,40 @@ private:
 	friend class PackageMan;
 
 	RAD_DECLARE_GET(engine, Engine*);
-	RAD_DECLARE_GET(cout, std::ostream&) { return *m_cout; }
-	RAD_DECLARE_GET(asset, const AssetRef&) { return m_asset; }
-	RAD_DECLARE_GET(assetPath, const char*) { return m_assetPath.c_str; }
-	RAD_DECLARE_GET(assetName, const char*) { return m_assetName.c_str; }
-	RAD_DECLARE_GET(globals, Persistence::KeyValue::Map*) { return m_globals->keys; }
-	RAD_DECLARE_GET(version, int) { return m_version; }
+	
+	RAD_DECLARE_GET(cout, std::ostream&) { 
+		return *m_cout; 
+	}
+	
+	RAD_DECLARE_GET(asset, const AssetRef&) { 
+		return m_asset; 
+	}
+	
+	RAD_DECLARE_GET(assetPath, const char*) { 
+		return m_assetPath.c_str; 
+	}
+	
+	RAD_DECLARE_GET(assetName, const char*) { 
+		return m_assetName.c_str; 
+	}
+	
+	RAD_DECLARE_GET(globals, Persistence::KeyValue::Map*) { 
+		return m_globals->keys; 
+	}
+	
+	RAD_DECLARE_GET(version, int) { 
+		return m_version; 
+	}
+	
 	RAD_DECLARE_GET(languages, int) {
 		return m_languages;
 	}
+
+	RAD_DECLARE_GET(pakfile, const char*) {
+		return m_pakfile.c_str;
+	}
+
+	RAD_DECLARE_SET(pakfile, const char*);
 
 	//! After compiling this must be called to save cooker state.
 	void SaveState();
@@ -439,6 +466,9 @@ private:
 	String m_globalsPath;
 	String m_tagsPath;
 	String m_filePath;
+	String m_basePath;
+	String m_pakfile;
+	String m_originalPakfile;
 	bool m_cooking;
 	int m_languages;
 	int m_version;
@@ -1127,7 +1157,7 @@ private:
 	
 	int CompileScripts();
 
-	bool LoadTagFile(const Cooker::Ref &cooker, int pflags, void *&data, AddrSize &size);
+	bool LoadTagFile(const Cooker::Ref &cooker, void *&data, AddrSize &size);
 	bool CreateTagData(const Cooker::Ref &cooker, TagData *&data, AddrSize &size);
 
 	volatile bool m_cancelCook;
