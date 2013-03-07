@@ -1,7 +1,10 @@
-// MapAsset.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file MapAsset.cpp
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
+
 
 #include RADPCH
 #include "MapAsset.h"
@@ -112,7 +115,7 @@ int MapAsset::SpawnCooked(
 #if defined(RAD_OPT_TOOLS)
 		if (!asset->cooked) {
 			if (m_cooker) {
-				int r = m_cooker->Cook(0, P_TARGET_FLAGS(flags));
+				int r = m_cooker->Cook(P_TARGET_FLAGS(flags));
 				if (r != SR_Success)
 					return r;
 
@@ -121,14 +124,14 @@ int MapAsset::SpawnCooked(
 				String path(CStr(asset->path));
 				path += ".bsp";
 
-				m_bspData = m_cooker->MapFile(path.c_str, 0, ZWorld);
+				m_bspData = m_cooker->MapFile(path.c_str, ZWorld);
 				if (!m_bspData)
 					return SR_FileNotFound;
 				m_cooker.reset();
 
 			} else {
 				m_cooker = asset->AllocateIntermediateCooker();
-				CookStatus status = m_cooker->Status(0, P_TARGET_FLAGS(flags));
+				CookStatus status = m_cooker->Status(P_TARGET_FLAGS(flags));
 
 				if (status == CS_Ignore)
 					return SR_CompilerError;
@@ -136,7 +139,7 @@ int MapAsset::SpawnCooked(
 				if (status == CS_NeedRebuild) {
 					COut(C_Info) << asset->path.get() << " is out of date, rebuilding..." << std::endl;
 					static_cast<MapCooker*>(m_cooker.get())->SetProgressIndicator(m_ui);
-					int r = m_cooker->Cook(0, P_TARGET_FLAGS(flags));
+					int r = m_cooker->Cook(P_TARGET_FLAGS(flags));
 					if (r != SR_Success)
 						return r;
 				} else {
@@ -146,7 +149,7 @@ int MapAsset::SpawnCooked(
 				String path(CStr(asset->path));
 				path += ".bsp";
 
-				m_bspData = m_cooker->MapFile(path.c_str, 0, ZWorld);
+				m_bspData = m_cooker->MapFile(path.c_str, ZWorld);
 				if (!m_bspData)
 					return SR_FileNotFound;
 				m_cooker.reset();

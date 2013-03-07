@@ -123,7 +123,7 @@ int TypefaceParser::LoadCooked(
 	int flags
 ) {
 	if (!m_fontRef) {
-		const U16 *tags = (const U16*)asset->entry->TagData(P_TARGET_FLAGS(flags));
+		const U16 *tags = (const U16*)asset->entry->tagData.get();
 
 		m_width = tags[0];
 		m_height = tags[1];

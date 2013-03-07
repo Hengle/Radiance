@@ -1,7 +1,9 @@
-// TypefaceCooker.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file TypefaceCooker.cpp
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
 
 #include RADPCH
 #include "TypefaceCooker.h"
@@ -14,65 +16,30 @@ using namespace pkg;
 
 namespace asset {
 
-TypefaceCooker::TypefaceCooker() : Cooker(0)
-{
+TypefaceCooker::TypefaceCooker() : Cooker(0) {
 }
 
-TypefaceCooker::~TypefaceCooker()
-{
+TypefaceCooker::~TypefaceCooker() {
 }
 
-CookStatus TypefaceCooker::CheckRebuild(int flags, int allflags)
-{
+CookStatus TypefaceCooker::Status(int flags) {
 	if (CompareVersion(flags) || CompareModifiedTime(flags))
 		return CS_NeedRebuild;
 	return CS_UpToDate;
 }
 
-CookStatus TypefaceCooker::Status(int flags, int allflags)
-{
-	flags &= P_AllTargets;
-	allflags &= P_AllTargets;
-
-	if (flags == 0)
-	{ // only build generics if all platforms are identical to eachother.
-		if (MatchTargetKeys(allflags, allflags)==allflags)
-			return CheckRebuild(flags, allflags);
-		return CS_Ignore;
-	}
-
-	if (MatchTargetKeys(allflags, allflags)==allflags)
-		return CS_Ignore;
-
-	return CheckRebuild(flags, allflags);
-}
-
-int TypefaceCooker::Compile(int flags, int allflags)
-{
-	int pflags = flags;
-
+int TypefaceCooker::Compile(int flags) {
+	
 	// Make sure these get updated
 	CompareVersion(flags);
 	CompareModifiedTime(flags);
-
-	// Typeface's are not K_Global, so they have paths
-	// like Source.Font.PC, etc. So if flags == 0 then
-	// we are doing generics (i.e. all targets have the same
-	// values), however to load the actual data we can't use
-	// a flags value of zero, since that will return the Typeface.keys
-	// defaults which have blanks (and aren't what the user set anyway).
-
-	if ((flags&P_AllTargets)==0)
-	{ // use any target, since generics means all targets are the same.
-		flags = (flags&~P_AllTargets)|FirstTarget(allflags);
-	}
 
 	const String *s = asset->entry->KeyValue<String>("Source.Font", flags);
 	if (!s || s->empty)
 		return SR_MetaError;
 
 	// import font.
-	AddImport(s->c_str, pflags);
+	AddImport(s->c_str);
 
 	s = asset->entry->KeyValue<String>("Source.Material", flags);
 	if (!s || s->empty)
@@ -93,14 +60,13 @@ int TypefaceCooker::Compile(int flags, int allflags)
 	MaterialParser *matParser = MaterialParser::Cast(matRef);
 	if (!matParser)
 		return SR_MetaError;
-	if (!matParser->procedural)
-	{
-		cout.get() << "ERROR: Materials referenced by a typeface must be marked as procedural!" << std::endl;
+	if (!matParser->procedural) {
+		cout.get() << "ERROR: Typeface materials must be marked as procedural!" << std::endl;
 		return SR_MetaError;
 	}
 	
 	// import material
-	AddImport(s->c_str, pflags);
+	AddImport(s->c_str);
 
 	int w, h;
 
@@ -118,7 +84,7 @@ int TypefaceCooker::Compile(int flags, int allflags)
 		return SR_MetaError;
 
 	// save width/height to tag
-	BinFile::Ref f = OpenTagWrite(flags);
+	BinFile::Ref f = OpenTagWrite();
 	if (!f)
 		return SR_IOError;
 
@@ -129,16 +95,7 @@ int TypefaceCooker::Compile(int flags, int allflags)
 	return SR_Success;
 }
 
-int TypefaceCooker::MatchTargetKeys(int flags, int allflags)
-{
-	return asset->entry->MatchTargetKeys<String>("Source.Font", flags, allflags)&
-		asset->entry->MatchTargetKeys<String>("Source.Material", flags, allflags)&
-		asset->entry->MatchTargetKeys<int>("Typeface.Width", flags, allflags)&
-		asset->entry->MatchTargetKeys<int>("Typeface.Height", flags, allflags);
-}
-
-void TypefaceCooker::Register(Engine &engine)
-{
+void TypefaceCooker::Register(Engine &engine) {
 	static pkg::Binding::Ref binding = engine.sys->packages->BindCooker<TypefaceCooker>();
 }
 

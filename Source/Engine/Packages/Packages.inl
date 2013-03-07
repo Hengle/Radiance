@@ -101,32 +101,16 @@ m_id(id),
 m_name(name),
 m_path(path),
 m_type(type),
-m_pkg(pkg)
+m_pkg(pkg),
+m_tag(0)
 #if defined(RAD_OPT_TOOLS)
 , m_cooked(false),
 m_defs(defs)
 #endif
 {
-	for (int i = 0; i < P_NumTargets+1; ++i)
-		m_tags[i] = 0;
 }
 
 inline Package::Entry::~Entry() {
-}
-
-inline const void *Package::Entry::TagData(int plat) {
-	plat &= P_AllTargets;
-
-	if (!plat)
-		return m_tags[0];
-
-	int num = PlatformIndex(plat);
-	if (num < 0 || num >= P_NumTargets)
-		return 0;
-
-	++num;
-
-	return m_tags[num] ? m_tags[num] : m_tags[0];
 }
 
 inline Package::Entry::Ref Package::FindEntry(const char *name) const {
@@ -305,6 +289,10 @@ inline int Package::Entry::RAD_IMPLEMENT_GET(numImports) {
 	return (int)m_imports.size();
 }
 
+inline const void *Package::Entry::RAD_IMPLEMENT_GET(tagData) {
+	return m_tag;
+}
+
 inline const Package::Entry::Import *Package::Entry::Resolve(int index) const {
 	RAD_ASSERT(index >= 0 && index < (int)m_imports.size());
 	return &m_imports[index];
@@ -423,12 +411,6 @@ inline bool Asset::RAD_IMPLEMENT_GET(cooked) {
 
 inline Cooker::Ref Asset::AllocateIntermediateCooker() {
 	return pkg->pkgMan->AllocateIntermediateCooker(shared_from_this());
-}
-#endif
-
-#if defined(RAD_OPT_PC_TOOLS)
-inline Cooker::Ref Asset::CookerForAsset() {
-	return pkg->pkgMan->CookerForAsset(shared_from_this());
 }
 #endif
 

@@ -1,7 +1,10 @@
-// FontCooker.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file FontCooker.cpp
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
+
 
 #include RADPCH
 #include "FontCooker.h"
@@ -18,24 +21,19 @@ FontCooker::FontCooker() : Cooker(0) {
 FontCooker::~FontCooker() {
 }
 
-CookStatus FontCooker::Status(int flags, int allflags) {
-	flags &= P_AllTargets;
+CookStatus FontCooker::Status(int flags) {
 
-	if (flags == 0) {
-		if (CompareVersion(flags) ||
-			CompareModifiedTime(flags) ||
-			CompareCachedFileTimeKey(flags, "Source.File"))
-		{
-			return CS_NeedRebuild;
-		}
-
-		return CS_UpToDate;
+	if (CompareVersion(flags) ||
+		CompareModifiedTime(flags) ||
+		CompareCachedFileTimeKey(flags, "Source.File"))
+	{
+		return CS_NeedRebuild;
 	}
 
 	return CS_Ignore;
 }
 
-int FontCooker::Compile(int flags, int allflags) {
+int FontCooker::Compile(int flags) {
 	// Make sure these get updated (Status may have not called them all)
 	CompareVersion(flags);
 	CompareModifiedTime(flags);
@@ -45,7 +43,7 @@ int FontCooker::Compile(int flags, int allflags) {
 	if (!s || s->empty)
 		return SR_MetaError;
 
-	if (!CopyOutputBinFile(s->c_str, flags))
+	if (!CopyOutputBinFile(s->c_str))
 		return SR_IOError;
 	return SR_Success;
 }

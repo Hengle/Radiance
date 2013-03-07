@@ -24,7 +24,7 @@ SoundCooker::SoundCooker() : Cooker(0) {
 SoundCooker::~SoundCooker() {
 }
 
-CookStatus SoundCooker::CheckRebuild(int flags, int allflags) {
+CookStatus SoundCooker::Status(int flags) {
 	if (CompareVersion(flags) ||
 		CompareModifiedTime(flags) || 
 		CompareCachedFileTimeKey(flags, "Source.File"))
@@ -32,24 +32,7 @@ CookStatus SoundCooker::CheckRebuild(int flags, int allflags) {
 	return CS_UpToDate;
 }
 
-CookStatus SoundCooker::Status(int flags, int allflags) {
-	flags &= P_AllTargets;
-	allflags &= P_AllTargets;
-
-	if (flags == 0) { 
-		// only build generics if all platforms are identical to eachother.
-		if (MatchTargetKeys(allflags, allflags)==allflags)
-			return CheckRebuild(flags, allflags);
-		return CS_Ignore;
-	}
-
-	if (MatchTargetKeys(allflags, allflags)==allflags)
-		return CS_Ignore;
-
-	return CheckRebuild(flags, allflags);
-}
-
-int SoundCooker::Compile(int flags, int allflags) {
+int SoundCooker::Compile(int flags) {
 	// Make sure these get updated
 	CompareVersion(flags);
 	CompareModifiedTime(flags);
@@ -71,7 +54,7 @@ int SoundCooker::Compile(int flags, int allflags) {
 
 	String path(CStr(asset->path));
 	path += ".bin";
-	BinFile::Ref fp = OpenWrite(path.c_str, flags);
+	BinFile::Ref fp = OpenWrite(path.c_str);
 	if (!fp)
 		return SR_IOError;
 
@@ -104,10 +87,6 @@ int SoundCooker::Compile(int flags, int allflags) {
 	}
 
 	return numBytes ? SR_InvalidFormat : SR_Success;
-}
-
-int SoundCooker::MatchTargetKeys(int flags, int allflags) {
-	return asset->entry->MatchTargetKeys<String>("Source.File", flags, allflags);
 }
 
 void SoundCooker::Register(Engine &engine) {

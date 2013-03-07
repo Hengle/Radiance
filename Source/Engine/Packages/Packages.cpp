@@ -278,12 +278,14 @@ m_entry(entry) {
 
 int Asset::Process(
 	const xtime::TimeSlice &time,
-	int flags
+	int flags,
+	int maxStage
 ) {
 	return m_entry->m_pkg.lock()->m_pm.lock()->Process(
 		time,
 		shared_from_this(),
-		flags
+		flags,
+		maxStage
 	);
 }
 
@@ -408,7 +410,8 @@ int PackageMan::ProcessAll(
 int PackageMan::Process(
 	const xtime::TimeSlice &time,
 	const Asset::Ref &asset,
-	int flags
+	int flags,
+	int maxStage
 ) {
 	RAD_ASSERT(!(flags&P_Unload));
 
@@ -417,6 +420,9 @@ int PackageMan::Process(
 
 	for (SinkFactoryMap::const_iterator it = factories.begin(); it != factories.end(); ++it) {
 		const details::SinkFactoryBase::Ref &f = it->second;
+		if (it->first > maxStage)
+			continue;
+
 		SinkBase *sink = f->Cast(asset);
 
 		if (!sink)
@@ -552,10 +558,7 @@ void PackageMan::LoadBin(
 				entry->m_imports.push_back(import);
 			}
 
-			for (int k = 0; k < P_NumTargets+1; ++k) {
-				if (tag->ofs[k] != 0)
-					entry->m_tags[k] = ((U8*)tag)+tag->ofs[k];
-			}
+			entry->m_tag = (void*)tag;
 		}
 	}
 

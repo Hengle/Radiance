@@ -1,7 +1,9 @@
-// SkAnimStatesCooker.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file SkAnimStatesCooker.h
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
 
 #pragma once
 
@@ -23,13 +25,8 @@ public:
 	SkAnimStatesCooker();
 	virtual ~SkAnimStatesCooker();
 
-	virtual pkg::CookStatus Status(int flags, int allflags);
-	virtual int Compile(int flags, int allflags);
-
-private:
-
-	pkg::CookStatus CheckRebuild(int flags, int allflags);
-	int MatchTargetKeys(int flags, int allflags);
+	virtual pkg::CookStatus Status(int flags);
+	virtual int Compile(int flags);
 
 };
 

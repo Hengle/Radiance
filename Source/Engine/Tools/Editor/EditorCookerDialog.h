@@ -34,7 +34,6 @@ class CookThread : public QThread {
 public:
 	CookThread(
 		GLWidget *glw,
-		const StringVec &roots,
 		int plats, 
 		int languages,
 		int compression,
@@ -54,7 +53,6 @@ protected:
 
 private:
 
-	StringVec m_roots;
 	std::ostream *m_cout;
 	GLWidget *m_glw;
 	int m_plats;

@@ -1,7 +1,10 @@
-// MaterialCooker.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file MaterialCooker.h
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
+
 
 #pragma once
 
@@ -25,12 +28,8 @@ public:
 	MaterialCooker();
 	virtual ~MaterialCooker();
 
-	virtual pkg::CookStatus Status(int flags, int allflags);
-	virtual int Compile(int flags, int allflags);
-
-private:
-
-	int MatchTargetKeys(int flags, int allflags);
+	virtual pkg::CookStatus Status(int flags);
+	virtual int Compile(int flags);
 };
 
 } // asset

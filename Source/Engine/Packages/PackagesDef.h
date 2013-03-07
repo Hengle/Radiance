@@ -92,7 +92,8 @@ enum SinkStage
 {
 	SS_Parser  = 100, /*!< Default parsing stage. For stages that parse asset data into an intermediate representation. */
 	SS_Load, /*!< Default loading stage. For stages that consume pkg::SS_Parser output and load the data. */
-	SS_Process = 256 /*!< Default processing stage. For stages that consume pkg::SS_Load output and process it further. */
+	SS_Process = 256, /*!< Default processing stage. For stages that consume pkg::SS_Load output and process it further. */
+	SS_Max = 1024
 };
 
 #if defined(RAD_OPT_TOOLS)
@@ -105,7 +106,8 @@ enum CookStatus
 {
 	CS_UpToDate, /*!< Cooked state of asset is up to date. */
 	CS_Ignore, /*!< Asset should be ignored and not be cooked or packaged. */
-	CS_NeedRebuild /*!< Cooked state of asset is out of date and needs to be rebuilt. */
+	CS_NeedRebuild, /*!< Cooked state of asset is out of date and needs to be rebuilt. */
+	CS_Error /*!< Error occured getting cook state. */
 };
 #endif
 
@@ -125,19 +127,19 @@ enum PFlags
 {
 	// Process flags
 
-	RAD_FLAG(P_SAlloc),       /*!< Allocates Sink States. Not required as the system will allocate sink states as necessary. */
-	RAD_FLAG(P_Info),         /*!< Parse asset for header information. Typically fulfilled by the pkg::SS_Parser sink. */
-	RAD_FLAG(P_Parse),        /*!< Fully parse asset data. Typically fulfilled by the pkg::SS_Parser sink. */
-	RAD_FLAG(P_Load),         /*!< Fully load the the asset data. Typically fulfilled by an pkg::SS_Parser, pkg::SS_Load, and the pkg::SS_Process sinks. */
-	RAD_FLAG(P_Unformatted),  /*!< Do not reformat the data upon load. For example a texture asset which 
+	RAD_FLAG(P_SAlloc),        /*!< Allocates Sink States. Not required as the system will allocate sink states as necessary. */
+	RAD_FLAG(P_Info),          /*!< Parse asset for header information. Typically fulfilled by the pkg::SS_Parser sink. */
+	RAD_FLAG(P_Parse),         /*!< Fully parse asset data. Typically fulfilled by the pkg::SS_Parser sink. */
+	RAD_FLAG(P_Load),          /*!< Fully load the the asset data. Typically fulfilled by an pkg::SS_Parser, pkg::SS_Load, and the pkg::SS_Process sinks. */
+	RAD_FLAG(P_Unformatted),   /*!< Do not reformat the data upon load. For example a texture asset which 
                                    specifies DXT compression but is loaded from a TGA file would be compressed
                                    by the pkg::SS_Parser sink unless this flag is specified. 
-                              */
-	RAD_FLAG(P_Unload),       /*!< Unload the asset and free all data. This process flag is specified automatically
+                               */
+	RAD_FLAG(P_Unload),        /*!< Unload the asset and free all data. This process flag is specified automatically
                                    by the system when all references to an asset instance are released. It is therefore
                                    not necessary to do manually.
-                              */
-	RAD_FLAG(P_Trim),         /*!< Request that all asset sinks release any intermediate data. This should always be performed
+                               */
+	RAD_FLAG(P_Trim),          /*!< Request that all asset sinks release any intermediate data. This should always be performed
                                    by any caller doing a pkg::P_Load command after the load operation completes. Typically this
                                    request will cause the pkg::SS_Parser sink to free intermediate data and therefore that stage
                                    would no longer have data available to consume. For example after executing a pkg::P_Load
@@ -145,15 +147,16 @@ enum PFlags
                                    and the pkg::SS_Load stage would have uploaded the pkg::SS_Parser data into the graphics backend.
                                    In most circumstances the data in the pkg::SS_Parser stage is now redundant and can be free'd,
                                    which is what the pkg::P_Trim command is used for.
-                              */
-	RAD_FLAG(P_VidReset),     /*!< A video reset has occurred and sinks should release any video related state. */
-	RAD_FLAG(P_VidBind),      /*!< A video rebind has occurred and sinks should recreate any video related state. */
-	RAD_FLAG(P_Cancel),       /*!< Cancel an outstanding command. */
-	RAD_FLAG(P_FastPath),     /*!< Load data from cached data (on-the-fly cooking). (Does nothing in golden builds). */
-	RAD_FLAG(P_TargetPC),     /*!< PC target. */
-	RAD_FLAG(P_TargetiOS),    /*!< iOS target. */
-	RAD_FLAG(P_TargetXBox360),/*!< XBox360 target. */
-	RAD_FLAG(P_TargetPS3),    /*!< PS3 target. */
+                               */
+	RAD_FLAG(P_VidReset),      /*!< A video reset has occurred and sinks should release any video related state. */
+	RAD_FLAG(P_VidBind),       /*!< A video rebind has occurred and sinks should recreate any video related state. */
+	RAD_FLAG(P_Cancel),        /*!< Cancel an outstanding command. */
+	RAD_FLAG(P_FastPath),      /*!< Load data from cached data (on-the-fly cooking). (Does nothing in golden builds). */
+	RAD_FLAG(P_TargetPC),      /*!< PC target. */
+	RAD_FLAG(P_TargetiOS),     /*!< iOS target. */
+	RAD_FLAG(P_TargetAndroid), /*!< Android target. */
+	RAD_FLAG(P_TargetXBox360), /*!< XBox360 target. */
+	RAD_FLAG(P_TargetPS3),     /*!< PS3 target. */
 
 #if defined(RAD_OPT_TOOLS)
 
@@ -179,7 +182,7 @@ enum PFlags
 	P_AllTargets = P_TargetConsole|P_TargetPC|P_TargetiOS, /*!< All target bits set. \sa pkg::P_TargetPC, pkg::P_TargetiOS, pkg::P_TargetXBox360, and pkg::P_TargetPS3 */
 	P_FirstTarget = P_TargetPC, /*!< First target bit. */
 	P_LastTarget  = P_TargetPS3, /*!< Last target bit. */
-	P_NumTargets  = 4 /*!< Number of targets. */
+	P_NumTargets  = 5 /*!< Number of targets. */
 
 };
 

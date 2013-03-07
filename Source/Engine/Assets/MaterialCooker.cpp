@@ -1,7 +1,10 @@
-// MaterialCooker.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file MaterialCooker.cpp
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
+
 
 #include RADPCH
 #include "MaterialCooker.h"
@@ -21,36 +24,32 @@ MaterialCooker::MaterialCooker() : Cooker(4) {
 MaterialCooker::~MaterialCooker() {
 }
 
-CookStatus MaterialCooker::Status(int flags, int allflags) {
-	flags &= P_AllTargets;
-	allflags &= P_AllTargets;
-
+CookStatus MaterialCooker::Status(int flags) {
+	
 	// NOTE: Materials must be cooked every time.
 	// The reason for this is somewhat stupid. The shader
 	// indexes can change as materials are built. This can
 	// make them inconsistent.
 
-	// The Shader indexes are different for GLES targets
-	// (i.e. they produce different shader code), so even
-	// though the material keys match we still need to cook
-	// them seperately.
-
-	if (flags == 0) { 
-		// only build generics if all platforms are identical to eachother.
-		// && we have all GLES or non GLES targets.
-		if ((allflags&P_TargetiOS) && (allflags&~P_TargetiOS))
-			return CS_Ignore; // no generics (all different)
-		return MatchTargetKeys(allflags, allflags)==allflags ? CS_NeedRebuild : CS_Ignore;
-	}
-
-	if (MatchTargetKeys(flags, allflags)==allflags)
-		return CS_Ignore;
-
 	return CS_NeedRebuild;
 }
 
-int MaterialCooker::Compile(int flags, int allflags) {
+int MaterialCooker::Compile(int flags) {
+
+	// manually allocate sinks so we can set some initial flags.
+
 	int r = asset->Process(
+		xtime::TimeSlice::Infinite,
+		P_SAlloc
+	);
+
+	MaterialLoader *loader = MaterialLoader::Cast(asset);
+	if (!loader)
+		return SR_ParseError;
+
+	loader->shaderOnly = true; // don't load textures
+	
+	r = asset->Process(
 		xtime::TimeSlice::Infinite, 
 		flags|P_Parse|P_TargetDefault|P_NoDefaultMedia
 	);
@@ -62,20 +61,18 @@ int MaterialCooker::Compile(int flags, int allflags) {
 	if (!parser || !parser->valid)
 		return SR_ParseError;
 	
-	int shaderTarget = flags&pkg::P_AllTargets;
-	if (shaderTarget == 0) {   
-		// if we are cooking the generics path, we need to explicity set the target
-		// for GLES variants.
-		// NOTE: we will never cook the generics path if we have mixed GLES/non ES targets
-		// See Status() above for that logic.
-		if (allflags&P_TargetiOS)
-			shaderTarget = P_TargetiOS;
-	}
+	// HACK: we shouldn't be hardcoding this here
+	String shaderPath("@r:/Cooked/");
+	const char *platformName = PlatformNameForFlags(flags);
+	if (!platformName)
+		return SR_MetaError;
+	shaderPath += CStr(platformName);
+	shaderPath += CStr("/Shaders");
 
 	int shaderId = parser->material->CookShader(
-		"@r:/Cooked/Out/Shaders",
+		shaderPath.c_str,
 		*engine.get(),
-		shaderTarget
+		flags&pkg::P_AllTargets
 	);
 
 	if (shaderId < 0)
@@ -83,7 +80,7 @@ int MaterialCooker::Compile(int flags, int allflags) {
 
 	String path(CStr(asset->path));
 	path += ".bin";
-	BinFile::Ref fp = OpenWrite(path.c_str, flags);
+	BinFile::Ref fp = OpenWrite(path.c_str);
 	if (!fp)
 		return SR_IOError;
 
@@ -106,7 +103,7 @@ int MaterialCooker::Compile(int flags, int allflags) {
 		if (s->empty) {
 			os << (U8)255;
 		} else {
-			os << (U8)AddImport(s->c_str, flags);
+			os << (U8)AddImport(s->c_str);
 		}
 
 		os << (U8)parser->material->TCUVIndex(i);
@@ -153,78 +150,7 @@ int MaterialCooker::Compile(int flags, int allflags) {
 	return SR_Success;
 }
 
-int MaterialCooker::MatchTargetKeys(int flags, int allflags) {
-	int x = asset->entry->MatchTargetKeys<String>("Source.Shader", flags, allflags)&
-		asset->entry->MatchTargetKeys<String>("Sort", flags, allflags)&
-		asset->entry->MatchTargetKeys<String>("BlendMode", flags, allflags)&
-		asset->entry->MatchTargetKeys<bool>("DoubleSided", flags, allflags)&
-		asset->entry->MatchTargetKeys<bool>("DepthWrite", flags, allflags)&
-		asset->entry->MatchTargetKeys<String>("DepthFunc", flags, allflags);
-
-	if (!x)
-		return 0;
-
-	String path;
-	String z;
-
-	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
-		path.Printf("Texture%d.Source.Texture", i+1);
-		x &= asset->entry->MatchTargetKeys<String>(path.c_str, flags, allflags);
-		path.Printf("Texture%d.Source.uvChannel", i+1);
-		x &= asset->entry->MatchTargetKeys<String>(path.c_str, flags, allflags);
-		path.Printf("Texture%d.Source.FramesPerSecond", i+1);
-		x &= asset->entry->MatchTargetKeys<String>(path.c_str, flags, allflags);
-		path.Printf("Texture%d.tcGen", i+1);
-		x &= asset->entry->MatchTargetKeys<String>(path.c_str, flags, allflags);
-
-		if (!x)
-			return 0;
-
-		for (int k = 0; k < r::Material::kNumTCMods; ++k) {
-			path.Printf("Texture%d.tcMod.%s", i+1, s_tcModNames[k]);
-			z = path + ".Type";
-			x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
-			z = path + ".Amplitude";
-			x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
-			z = path + ".Frequency";
-			x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
-			z = path + ".Phase";
-			x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
-			z = path + ".Base";
-			x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
-
-			if (!x)
-				return 0;
-		}
-	}
-
-	for (int i = r::Material::kColor0; i < r::Material::kNumColors; ++i) {
-		for (int k = r::Material::kColorA; k < r::Material::kNumColorIndices; ++k) {
-			path.Printf("Color%d.%c", i, 'A'+k);
-			x &= asset->entry->MatchTargetKeys<String>(path.c_str, flags, allflags);
-		}
-
-		if (!x)
-			return 0;
-
-		path.Printf("Color%d.Gen", i);
-		z = path + ".Type";
-		x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
-		z = path + ".Amplitude";
-		x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
-		z = path + ".Frequency";
-		x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
-		z = path + ".Phase";
-		x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
-		z = path + ".Base";
-		x &= asset->entry->MatchTargetKeys<String>(z.c_str, flags, allflags);
-	}
-
-	return x;
-}
-
-void MaterialCooker::Register(Engine &engine)
-{
+void MaterialCooker::Register(Engine &engine) {
 	static pkg::Binding::Ref binding = engine.sys->packages->BindCooker<MaterialCooker>();
 }
 

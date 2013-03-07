@@ -1,7 +1,9 @@
-// StringTableParser.cpp
-// Copyright (c) 2012 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file StringTableParser.cpp
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
 
 #include RADPCH
 #include "StringTableParser.h"

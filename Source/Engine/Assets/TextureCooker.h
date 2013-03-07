@@ -1,7 +1,9 @@
-// TextureCooker.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file TextureCooker.h
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
 
 #pragma once
 
@@ -25,14 +27,12 @@ public:
 	TextureCooker();
 	virtual ~TextureCooker();
 
-	virtual pkg::CookStatus Status(int flags, int allflags);
-	virtual int Compile(int flags, int allflags);
+	virtual pkg::CookStatus Status(int flags);
+	virtual int Compile(int flags);
 
 private:
 
-	pkg::CookStatus CheckRebuild(int flags, int allflags, int opts);
-	int MatchTargetKeys(int flags, int allflags);
-	int CheckFastCook(int flags, int opts);
+	int CheckFastCook(int flags);
 };
 
 } // asset

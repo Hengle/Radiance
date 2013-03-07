@@ -1,7 +1,9 @@
-// TextureCooker.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file TextureCooker.cpp
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
 
 #include RADPCH
 #include "TextureCooker.h"
@@ -21,38 +23,21 @@ TextureCooker::TextureCooker() : Cooker(1) {
 TextureCooker::~TextureCooker() {
 }
 
-CookStatus TextureCooker::CheckRebuild(int flags, int allflags, int opts) {
+CookStatus TextureCooker::Status(int flags) {
 	const bool * b = asset->entry->KeyValue<bool>("Localized", flags);
 	if (!b)
-		return CS_NeedRebuild; // force error in cook path.
+		return CS_Error;
 
 	if (CompareVersion(flags) ||
 		CompareModifiedTime(flags) ||
 		CompareCachedFileTimeKey(flags, "Source.File", (*b) ? "Localized" : 0) ||
-		CheckFastCook(flags, opts)) {
+		CheckFastCook(flags)) {
 		return CS_NeedRebuild;
 	}
 	return CS_UpToDate;
 }
 
-CookStatus TextureCooker::Status(int flags, int allflags) {
-	int opts = flags|allflags;
-	flags &= P_AllTargets;
-	allflags &= P_AllTargets;
-
-	if (flags == 0) { // only build generics if all platforms are identical to eachother.
-		if (MatchTargetKeys(allflags, allflags)==allflags)
-			return CheckRebuild(flags, allflags, opts);
-		return CS_Ignore;
-	}
-
-	if (MatchTargetKeys(allflags, allflags)==allflags)
-		return CS_Ignore;
-
-	return CheckRebuild(flags, allflags, opts);
-}
-
-int TextureCooker::Compile(int flags, int allflags) {
+int TextureCooker::Compile(int flags) {
 
 	const bool * b = asset->entry->KeyValue<bool>("Localized", flags);
 	if (!b)
@@ -62,17 +47,8 @@ int TextureCooker::Compile(int flags, int allflags) {
 	CompareVersion(flags);
 	CompareModifiedTime(flags);
 	CompareCachedFileTimeKey(flags, "Source.File", (*b) ? "Localized" : 0);
-	CheckFastCook(flags, flags|allflags);
+	CheckFastCook(flags);
 
-	// we need the asset parser to apply compression, and in the case of iOS
-	// platforms we need need it to apply PVR compression (if selected) so if
-	// we are doing generics then force the target flags.
-	
-	int parseTarget = flags&pkg::P_AllTargets;
-	if (parseTarget == 0) { // generics
-		parseTarget = LowBitVal(allflags&P_AllTargets);
-	}
-	
 	TextureTag tag;
 	tag.flags = 0;
 
@@ -109,7 +85,7 @@ int TextureCooker::Compile(int flags, int allflags) {
 	// Cache here.
 	CompareCachedFileTimeKey(flags, "Source.File", (*b) ? "Localized" : 0);
 
-	BinFile::Ref fp = OpenTagWrite(flags);
+	BinFile::Ref fp = OpenTagWrite();
 	if (!fp)
 		return SR_IOError;
 
@@ -131,7 +107,7 @@ int TextureCooker::Compile(int flags, int allflags) {
 
 		int r = localizedAsset->Process(
 			xtime::TimeSlice::Infinite, 
-			flags|parseTarget|P_Parse|P_TargetDefault|P_NoDefaultMedia
+			flags|P_Parse|P_TargetDefault|P_NoDefaultMedia
 		);
 
 		if (r != SR_Success) {
@@ -149,7 +125,7 @@ int TextureCooker::Compile(int flags, int allflags) {
 
 		path += ".bin";
 
-		fp = OpenWrite(path.c_str, flags);
+		fp = OpenWrite(path.c_str);
 		if (!fp) {
 			cout.get() << "ERROR failed to open '" << asset->path.get() << ".bin'!" << std::endl;
 			return SR_IOError;
@@ -194,50 +170,17 @@ int TextureCooker::Compile(int flags, int allflags) {
 
 	return SR_Success;
 }
-
-int TextureCooker::MatchTargetKeys(int flags, int allflags) {
-	int x = asset->entry->MatchTargetKeys<String>("Source.File", flags, allflags)&
-			asset->entry->MatchTargetKeys<bool>("Resize", flags, allflags)&
-			asset->entry->MatchTargetKeys<bool>("Mipmap", flags, allflags)&
-			asset->entry->MatchTargetKeys<bool>("Wrap.S", flags, allflags)&
-			asset->entry->MatchTargetKeys<bool>("Wrap.T", flags, allflags)&
-			asset->entry->MatchTargetKeys<bool>("Wrap.R", flags, allflags)&
-			asset->entry->MatchTargetKeys<bool>("Localized", flags, allflags);
-
-	if (x) {
-		const bool *b = asset->entry->KeyValue<bool>("Resize", flags);
-		if (b && *b) { // make sure resized sizes match if we're resizing
-			x &= asset->entry->MatchTargetKeys<int>("Resize.Width", flags, allflags)&
-				asset->entry->MatchTargetKeys<int>("Resize.Height", flags, allflags);
-		}
-
-		const String *s = asset->entry->KeyValue<String>("Compression", flags);
-		if (s) {
-			if ((allflags&P_TargetiOS) && (allflags&~P_TargetiOS)) {   
-				// IOS and non-IOS targets selected, they can never match since compression formats
-				// are different.
-				if (*s != "None")
-					x &= flags;					
-			}
-
-			x &= asset->entry->MatchTargetKeys<String>("Compression", flags, allflags);
-		}
-	}
-
-	return x;
-}
-
-int TextureCooker::CheckFastCook(int flags, int opts) {
+int TextureCooker::CheckFastCook(int flags) {
 	const char *sz = TargetString(flags, "P_FastCook");
 
 	if (sz && !string::cmp(sz, "true")) {
 		// last time was a fast cook
-		if (opts&P_FastCook)
+		if (flags&P_FastCook)
 			return 0; // no change
 		SetTargetString(flags, "P_FastCook", "false");
 		return -1; // fast data is low quality we want full quality now.
 	} else if (!sz) { // no quality string was set
-		if (opts&P_FastCook) {
+		if (flags&P_FastCook) {
 			SetTargetString(flags, "P_FastCook", "true");
 		} else {
 			SetTargetString(flags, "P_FastCook", "false");

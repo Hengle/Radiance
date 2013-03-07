@@ -1,7 +1,9 @@
-// StringTableCooker.h
-// Copyright (c) 2012 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file StringTableCooker.h
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
 
 #pragma once
 
@@ -25,12 +27,12 @@ public:
 	StringTableCooker();
 	virtual ~StringTableCooker();
 
-	virtual pkg::CookStatus Status(int flags, int allflags);
-	virtual int Compile(int flags, int allflags);
+	virtual pkg::CookStatus Status(int flags);
+	virtual int Compile(int flags);
 
 private:
 
-	pkg::CookStatus CheckRebuild(int flags, int allflags);
+	pkg::CookStatus CheckRebuildFiles(int flags);
 };
 
 } // asset

@@ -1,7 +1,9 @@
-// MaterialParser.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file MaterialParser.h
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
 
 #pragma once
 
@@ -99,6 +101,10 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(MaterialLoader, parsed, bool);
 	RAD_DECLARE_READONLY_PROPERTY(MaterialLoader, info, bool);
 
+#if defined(RAD_OPT_TOOLS)
+	RAD_DECLARE_PROPERTY(MaterialLoader, shaderOnly, bool, bool);
+#endif
+
 protected:
 
 	virtual int Process(
@@ -132,9 +138,21 @@ private:
 		return m_index == Done || m_index == Parsed || m_index == Info; 
 	}
 
+	
 	int m_index;
-
 	boost::array<pkg::Asset::Ref, r::kMaterialTextureSource_MaxIndices> m_textures;
+
+#if defined(RAD_OPT_TOOLS)
+	RAD_DECLARE_GET(shaderOnly, bool) {
+		return m_shaderOnly;
+	}
+
+	RAD_DECLARE_SET(shaderOnly, bool) {
+		m_shaderOnly = value;
+	}
+
+	bool m_shaderOnly;
+#endif
 };
 
 } // asset

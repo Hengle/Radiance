@@ -1,7 +1,9 @@
-// MaterialParser.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file MaterialParser.cpp
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
 
 #include RADPCH
 #include "MaterialParser.h"
@@ -581,6 +583,9 @@ void MaterialParser::Register(Engine &engine) {
 ///////////////////////////////////////////////////////////////////////////////
 
 MaterialLoader::MaterialLoader() : m_index(Unloaded) {
+#if defined(RAD_OPT_TOOLS)
+	m_shaderOnly = false;
+#endif
 }
 
 MaterialLoader::~MaterialLoader() {
@@ -684,6 +689,9 @@ int MaterialLoader::Process(
 			}
 		}
 
+#if defined(RAD_OPT_TOOLS)
+		if (!m_shaderOnly) {
+#endif
 		if (tex) {
 			int r = tex->Process(
 				time,
@@ -700,6 +708,10 @@ int MaterialLoader::Process(
 			if (texParser->numImages > 0 && (parser->material->TextureFPS(m_index)>0.f))
 				parser->material->animated = true;
 		}
+
+#if defined(RAD_OPT_TOOLS)
+		}
+#endif
 
 		++m_index;
 		if (m_index >= r::kMaterialTextureSource_MaxIndices) {

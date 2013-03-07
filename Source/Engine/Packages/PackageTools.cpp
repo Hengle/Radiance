@@ -42,6 +42,7 @@ struct PlatNameFlags {
 PlatNameFlags s_PlatNames[] = {
 	{ "PC", P_TargetPC },
 	{ "iOS", P_TargetiOS },
+	{ "Android", P_TargetAndroid },
 	{ "XBox360", P_TargetXBox360 },
 	{ "PS3", P_TargetPS3 },
 	{ 0, 0 }

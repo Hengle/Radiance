@@ -1,7 +1,9 @@
-// TextureParser.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file TextureParser.cpp
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
 
 // It should be noted here that the Radiance DDS library is used here.
 // It should *also* be noted that this code *does not compress or decompress DXT formatted data* using
@@ -168,14 +170,14 @@ int TextureParser::LoadCooked(
 
 			m_cooker = asset->AllocateIntermediateCooker();
 
-			CookStatus status = m_cooker->Status(0, P_TARGET_FLAGS(flags));
+			CookStatus status = m_cooker->Status(P_TARGET_FLAGS(flags));
 
 			if (status == CS_Ignore)
 				return SR_CompilerError;
 
 			if (status == CS_NeedRebuild) {
 				COut(C_Info) << asset->path.get() << " is out of date, rebuilding..." << std::endl;
-				int r = m_cooker->Cook(0, P_TARGET_FLAGS(flags));
+				int r = m_cooker->Cook(P_TARGET_FLAGS(flags));
 				if (r != SR_Success)
 					return r;
 			}
@@ -184,7 +186,7 @@ int TextureParser::LoadCooked(
 			}
 
 			// Load TAG
-			file::MMapping::Ref mm = m_cooker->LoadTag(0);
+			file::MMapping::Ref mm = m_cooker->LoadTag();
 			if (!mm)
 				return SR_FileNotFound;
 
@@ -202,7 +204,7 @@ int TextureParser::LoadCooked(
 
 			path += ".bin";
 
-			m_mm = m_cooker->MapFile(path.c_str, 0, r::ZTextures);
+			m_mm = m_cooker->MapFile(path.c_str, r::ZTextures);
 			if (!m_mm)
 				return SR_FileNotFound;
 		}
@@ -211,7 +213,7 @@ int TextureParser::LoadCooked(
 #else
 		StringTable::LangId langId = App::Get()->langId;
 #endif
-		const asset::TextureTag *tag = (const asset::TextureTag*)asset->entry->TagData(P_TARGET_FLAGS(flags));
+		const asset::TextureTag *tag = (const asset::TextureTag*)asset->entry->tagData.get();
 		if (!tag)
 			return SR_MetaError;
 		m_tag = *tag;

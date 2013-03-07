@@ -271,6 +271,9 @@ public:
 	int StrStr(const String &str) const;
 	int StrStr(const char *sz) const;
 
+	StringVec Split(const String &sep) const;
+	StringVec Split(const char *sep) const;
+
 	String Join(const String &str) const;
 	String Join(const char *sz) const;
 	String Join(const wchar_t *sz) const;

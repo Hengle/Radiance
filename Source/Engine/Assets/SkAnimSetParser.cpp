@@ -1,7 +1,9 @@
-// SkAnimSetParser.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file SkAnimSetParser.cpp
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
 
 #include RADPCH
 #include "SkAnimSetParser.h"
@@ -67,14 +69,14 @@ int SkAnimSetParser::LoadCooked(
 #if defined(RAD_OPT_TOOLS)
 		if (!asset->cooked) {
 			Cooker::Ref cooker = asset->AllocateIntermediateCooker();
-			CookStatus status = cooker->Status(0, P_TARGET_FLAGS(flags));
+			CookStatus status = cooker->Status(P_TARGET_FLAGS(flags));
 
 			if (status == CS_Ignore)
 				return SR_CompilerError;
 
 			if (status == CS_NeedRebuild) {
 				COut(C_Info) << asset->path.get() << " is out of date, rebuilding..." << std::endl;
-				int r = cooker->Cook(0, P_TARGET_FLAGS(flags));
+				int r = cooker->Cook(P_TARGET_FLAGS(flags));
 				if (r != SR_Success)
 					return r;
 			} else {
@@ -84,7 +86,7 @@ int SkAnimSetParser::LoadCooked(
 			String path(CStr(asset->path));
 			path += ".bin";
 
-			m_mm = cooker->MapFile(path.c_str, 0, ska::ZSka);
+			m_mm = cooker->MapFile(path.c_str, ska::ZSka);
 			if (!m_mm)
 				return SR_FileNotFound;
 		}

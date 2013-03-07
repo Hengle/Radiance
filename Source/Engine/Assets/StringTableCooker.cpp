@@ -1,7 +1,9 @@
-// StringTableCooker.cpp
-// Copyright (c) 2012 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file StringTableCooker.cpp
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
 
 #include RADPCH
 #include "StringTableParser.h"
@@ -19,22 +21,36 @@ StringTableCooker::StringTableCooker() : Cooker(2) {
 StringTableCooker::~StringTableCooker() {
 }
 
-CookStatus StringTableCooker::Status(int flags, int allflags) {
-	flags &= P_AllTargets;
-	allflags &= P_AllTargets;
+CookStatus StringTableCooker::CheckRebuildFiles(int flags) {
+	const String *root = asset->entry->KeyValue<String>("Source.Root", flags);
+	if (!root)
+		return CS_Error;
 
-	if (flags == 0) // string tables only cook on generics pass.
-		return CheckRebuild(flags, allflags);
+	CookStatus x = CS_UpToDate;
 
-	return CS_Ignore;
+	for (int i = StringTable::LangId_First; i < StringTable::LangId_MAX; ++i) {
+		const String kPath(*root + CStr(StringTable::Langs[i]));
+		if (CompareCachedFileTime(flags, kPath.c_str, kPath.c_str)) {
+			x = CS_NeedRebuild; // cache all file times.
+		}
+	}
+
+	return x;
 }
 
-int StringTableCooker::Compile(int flags, int allflags) {
+CookStatus StringTableCooker::Status(int flags) {
+	if (CompareVersion(flags) ||
+		CompareModifiedTime(flags))
+		return CheckRebuildFiles(flags);
+	return CS_UpToDate;
+}
+
+int StringTableCooker::Compile(int flags) {
 
 	// Make sure these are updated.
 	CompareVersion(flags);
 	CompareModifiedTime(flags);
-	CompareCachedFileTimeKey(flags, "Source.Root");
+	CheckRebuildFiles(flags);
 
 	int r = asset->Process(
 		xtime::TimeSlice::Infinite,
@@ -48,14 +64,10 @@ int StringTableCooker::Compile(int flags, int allflags) {
 	if (!parser)
 		return SR_ParseError;
 
-	const String *s = asset->entry->KeyValue<String>("Source.Root", flags);
-	if (!s)
-		return SR_MetaError;
-
 	String path(CStr(asset->path));
 	path += ".bin";
 
-	BinFile::Ref fp = OpenWrite(path.c_str, flags);
+	BinFile::Ref fp = OpenWrite(path.c_str);
 	if (!fp)
 		return SR_IOError;
 
@@ -63,14 +75,6 @@ int StringTableCooker::Compile(int flags, int allflags) {
 		return SR_IOError;
 
 	return SR_Success;
-}
-
-CookStatus StringTableCooker::CheckRebuild(int flags, int allflags) {
-	if (CompareVersion(flags) ||
-		CompareModifiedTime(flags) ||
-		CompareCachedFileTimeKey(flags, "Source.Root"))
-		return CS_NeedRebuild;
-	return CS_UpToDate;
 }
 
 void StringTableCooker::Register(Engine &engine) {

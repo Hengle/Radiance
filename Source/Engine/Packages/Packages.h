@@ -339,34 +339,31 @@ public:
 	Cooker(int version) : m_version(version), m_languages(0) {}
 	virtual ~Cooker() {}
 
-	virtual CookStatus Status(int flags, int allflags) = 0;
-	int Cook(int flags, int allflags);
+	virtual CookStatus Status(int flags) = 0;
+	int Cook(int flags);
 
-	bool HasTag(int pflags);
-	BinFile::Ref OpenRead(const char *path, int pflags);
-	BinFile::Ref OpenTagRead(int pflags);
+	bool HasTag();
+	BinFile::Ref OpenRead(const char *path);
+	BinFile::Ref OpenTagRead();
 
 	file::MMapping::Ref MapFile(
 		const char *path, 
-		int pflags,
 		::Zone &zone
 	);
 
-	file::MMapping::Ref LoadTag(int pflags);
+	file::MMapping::Ref LoadTag();
 
 protected:
 
-	virtual int Compile(int flags, int allflags) = 0;
+	virtual int Compile(int flags) = 0;
 
-	String FilePath(const char *path, int pflags);
-	bool FileTime(const char *path, int pflags, xtime::TimeDate &time);
-	bool CopyOutputFile(const char *src, const char *dst, int pflags);
-	bool CopyOutputBinFile(const char *src, int pflags);
-	BinFile::Ref OpenWrite(const char *path, int pflags);
-	BinFile::Ref OpenTagWrite(int pflags);
-	bool NeedsRebuild(const AssetRef &asset);
-	int AddImport(const char *path, int pflags);
-	int FirstTarget(int allflags);
+	String FilePath(const char *path);
+	bool FileTime(const char *path, xtime::TimeDate &time);
+	bool CopyOutputFile(const char *src, const char *dst);
+	bool CopyOutputBinFile(const char *src);
+	BinFile::Ref OpenWrite(const char *path);
+	BinFile::Ref OpenTagWrite();
+	int AddImport(const char *path);
 	void UpdateModifiedTime(int target);
 
 	// Compares: -1 == source is newer, 1 == cook is newer, 0 == same
@@ -413,11 +410,10 @@ private:
 	//! After compiling this must be called to save cooker state.
 	void SaveState();
 
-	String TagPath(int pflags);
+	String TagPath();
 
 	struct Import {
 		String path;
-		int pflags;
 	};
 
 	typedef zone_vector<Import, ZPackagesT>::type ImportVec;
@@ -440,9 +436,12 @@ private:
 	String m_assetName;
 	asset::Type m_type;
 	Persistence::Ref m_globals;
+	String m_globalsPath;
+	String m_tagsPath;
+	String m_filePath;
+	bool m_cooking;
 	int m_languages;
 	int m_version;
-	bool m_cooking;
 };
 
 #endif
@@ -538,8 +537,7 @@ public:
 		RAD_DECLARE_READONLY_PROPERTY(Entry, pkg, PackageRef);
 		RAD_DECLARE_READONLY_PROPERTY(Entry, numImports, int);
 		RAD_DECLARE_READONLY_PROPERTY(Entry, id, int);
-
-		const void *TagData(int plat);
+		RAD_DECLARE_READONLY_PROPERTY(Entry, tagData, const void*);
 
 		AssetRef Asset(Zone z) const;
 				
@@ -586,8 +584,7 @@ public:
 		void Delete();
 		bool Rename(const char *name);
 
-		struct KeyChangedEventData
-		{
+		struct KeyChangedEventData {
 			Package::Entry::Ref origin;
 			KeyVal::Ref key;
 			// NOTE: path does not contain full path, it contains the
@@ -668,6 +665,7 @@ public:
 		RAD_DECLARE_GET(pkg, PackageRef);
 		RAD_DECLARE_GET(numImports, int);
 		RAD_DECLARE_GET(id, int);
+		RAD_DECLARE_GET(tagData, const void*);
 
 		int m_id;
 		String m_name;
@@ -675,7 +673,7 @@ public:
 		asset::Type m_type;
 		Import::Vec m_imports;
 		PackageWRef m_pkg;
-		void *m_tags[P_NumTargets+1];
+		void *m_tag;
 
 #if defined(RAD_OPT_TOOLS)
 		RAD_DECLARE_GET(cooked, bool);
@@ -793,13 +791,9 @@ public:
 
 	int Process(
 		const xtime::TimeSlice &time,
-		int flags
+		int flags,
+		int maxStage = SS_Max
 	);
-
-#if defined(RAD_OPT_PC_TOOLS)
-	//! Gets a cooker object used during asset cooking.
-	Cooker::Ref CookerForAsset();
-#endif
 
 private:
 
@@ -871,7 +865,6 @@ public:
 	PackageMap GatherPackages(const IdVec &ids);
 	bool DiscoverPackages(tools::UIProgress &ui);
 	int Cook(
-		const StringVec &roots,
 		int flags,
 		int languages,
 		int compression,
@@ -949,7 +942,8 @@ private:
 	int Process(
 		const xtime::TimeSlice &time,
 		const Asset::Ref &asset,
-		int flags
+		int flags,
+		int maxStage
 	);
 
 	void Unbind(Binding *binding);
@@ -1009,7 +1003,7 @@ private:
 #endif
 
 	struct TagData {
-		U32 ofs[P_NumTargets+1];
+		U32 ofs;
 		U16 type;
 		U16 numImports;
 		U16 imports[1]; // variable sized
@@ -1035,7 +1029,6 @@ private:
 	struct CookCommand {
 		CookCommand *next;
 		int flags;
-		int allflags;
 		int result;
 		String name;
 		Cooker::Ref cooker;
@@ -1063,11 +1056,27 @@ private:
 	};
 
 	typedef zone_map<int, Cooker::Ref, ZPackagesT>::type CookerMap;
+
+	struct CookPakFile {
+		typedef boost::shared_ptr<CookPakFile> Ref;
+		typedef zone_map<String, Ref, ZPackagesT>::type Map;
+		typedef zone_map<int, Ref, ZPackagesT>::type IdMap;
+		String name;
+		StringVec roots;
+		CookerMap cookers;
+	};
+
 	struct CookState {
 		typedef boost::shared_ptr<CookState> Ref;
 		CookerMap cookers;
+		CookPakFile::Map pakfiles;
+		CookPakFile::IdMap assetPakFiles;
+		std::set<int> cooked;
 		std::ostream *cout;
+		int flags;
+		int ptargets;
 		int languages;
+		String targetPath;
 		CookCommand *pending;
 		CookCommand *complete;
 		thread::Gate waiting;
@@ -1089,12 +1098,11 @@ private:
 		int AddImport(const char *path);
 	};
 
-	Cooker::Ref CookerForAsset(const Asset::Ref &asset);
+	Cooker::Ref CookerForAsset(const Asset::Ref &asset, const CookPakFile::Ref &pakfile);
 
-	int CookPlat(
-		const StringVec &roots,
+	int CookPakFileSources(
+		const CookPakFile::Ref &pakfile,
 		int flags,
-		int allflags,
 		std::ostream &out
 	);
 
@@ -1104,15 +1112,16 @@ private:
 	bool MakeBuildDirs(int flags, std::ostream &out);
 	bool MakePackageDirs(const char *prefix);
 	int BuildPackageData();
+	int BuildManifest(int compression);
 	int BuildPakFiles(int flags, int compression);
-	int BuildPak0(int compression);
-	int BuildTargetPak(int plat, int compression);
+	int BuildPakFile(const char *name, int compression);
 	int PakDirectory(
 		const char *path,
 		const char *prefix,
 		int compression, 
 		data_codec::lmp::Writer &lumpWriter
 	);
+	int LoadCookTxt(int flags, std::ostream &out);
 
 	static int LuaChunkWrite(lua_State *L, const void *p, size_t size, void *ud);
 	

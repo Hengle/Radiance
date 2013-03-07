@@ -1,7 +1,9 @@
-// SkAnimStatesCooker.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file SkAnimStatesCooker.cpp
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
 
 #include RADPCH
 #include "SkAnimStatesCooker.h"
@@ -19,7 +21,7 @@ SkAnimStatesCooker::SkAnimStatesCooker() : Cooker(3) {
 SkAnimStatesCooker::~SkAnimStatesCooker() {
 }
 
-CookStatus SkAnimStatesCooker::CheckRebuild(int flags, int allflags) {
+CookStatus SkAnimStatesCooker::Status(int flags) {
 	if (CompareVersion(flags) || 
 		CompareModifiedTime(flags) || 
 		CompareCachedFileTimeKey(flags, "Source.File"))
@@ -27,24 +29,7 @@ CookStatus SkAnimStatesCooker::CheckRebuild(int flags, int allflags) {
 	return CS_UpToDate;
 }
 
-CookStatus SkAnimStatesCooker::Status(int flags, int allflags) {
-	flags &= P_AllTargets;
-	allflags &= P_AllTargets;
-
-	if (flags == 0) { 
-		// only build generics if all platforms are identical to eachother.
-		if (MatchTargetKeys(allflags, allflags)==allflags)
-			return CheckRebuild(flags, allflags);
-		return CS_Ignore;
-	}
-
-	if (MatchTargetKeys(allflags, allflags)==allflags)
-		return CS_Ignore;
-
-	return CheckRebuild(flags, allflags);
-}
-
-int SkAnimStatesCooker::Compile(int flags, int allflags) {
+int SkAnimStatesCooker::Compile(int flags) {
 	// Make sure these get updated
 	CompareVersion(flags);
 	CompareModifiedTime(flags);
@@ -61,7 +46,7 @@ int SkAnimStatesCooker::Compile(int flags, int allflags) {
 	String path(CStr(asset->path));
 	path += ".bin";
 
-	BinFile::Ref fp = OpenWrite(path.c_str, flags);
+	BinFile::Ref fp = OpenWrite(path.c_str);
 	if (!fp)
 		return SR_IOError;
 
@@ -96,10 +81,6 @@ int SkAnimStatesCooker::Compile(int flags, int allflags) {
 	}
 
 	return SR_Success;
-}
-
-int SkAnimStatesCooker::MatchTargetKeys(int flags, int allflags) {
-	return asset->entry->MatchTargetKeys<String>("Source.File", flags, allflags);
 }
 
 void SkAnimStatesCooker::Register(Engine &engine) {

@@ -475,6 +475,7 @@ String String::SubStr(int first, int count) const {
 
 			while (count-- > 0) {
 				const char *tail = sz;
+				RAD_ASSERT(tail < end);
 				utf8::unchecked::utf8to32(&tail, tail+1, &b);
 				sub.NAppend(sz, (int)(tail-sz));
 				sz = tail;
@@ -484,6 +485,37 @@ String String::SubStr(int first, int count) const {
 		}
 	}
 	return String();
+}
+
+StringVec String::Split(const String &sep) const {
+	StringVec v;
+	String workString(*this);
+
+	const int kSepNumChars = sep.numChars;
+
+	int r;
+	while ((r=workString.StrStr(sep)) != -1) {
+		if (r > 0) {
+			String x = workString.Left(r);
+			v.push_back(x);
+		}
+
+		const int kWorkStringNumChars = workString.numChars;
+
+		int skip = r + kSepNumChars;
+
+		if (kWorkStringNumChars > skip) {
+			// skip leading.
+			workString = workString.SubStr(skip);
+		} else {
+			break; // no more
+		}
+	}
+
+	if (v.empty() && !this->empty)
+		v.push_back(*this);
+
+	return v;
 }
 
 int String::CharForByte(int pos) const {
@@ -641,7 +673,7 @@ String &String::Replace(const String &src, const String &dst) {
 
 String &String::Printf_valist(const char *fmt, va_list args) {
 	String sfmt(CStr(fmt));
-#if defined(RAD_OPT_WIN) // fuck you windows you non-standard piece of shit
+#if defined(RAD_OPT_WIN) // what the hell windows
 	sfmt.Replace("%s", "%hs");
 #endif
 	WCharBuf wfmt = sfmt.ToWChar();

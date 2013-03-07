@@ -1,7 +1,9 @@
-// SkModelCooker.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file SkModelCooker.cpp
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
 
 #include RADPCH
 #include "SkModelCooker.h"
@@ -20,7 +22,7 @@ SkModelCooker::SkModelCooker() : Cooker(6) {
 SkModelCooker::~SkModelCooker() {
 }
 
-CookStatus SkModelCooker::CheckRebuild(int flags, int allflags) {
+CookStatus SkModelCooker::Status(int flags) {
 	if (CompareVersion(flags) || 
 		CompareModifiedTime(flags) || 
 		CompareCachedFileTimeKey(flags, "Mesh.Source.File"))
@@ -28,24 +30,7 @@ CookStatus SkModelCooker::CheckRebuild(int flags, int allflags) {
 	return CS_UpToDate;
 }
 
-CookStatus SkModelCooker::Status(int flags, int allflags) {
-	flags &= P_AllTargets;
-	allflags &= P_AllTargets;
-
-	if (flags == 0) { 
-		// generic only gets cooked if all platforms are identical
-		if (MatchTargetKeys(allflags, allflags)==allflags)
-			return CheckRebuild(flags, allflags);
-		return CS_Ignore;
-	}
-
-	if (MatchTargetKeys(allflags, allflags)==allflags)
-		return CS_Ignore; // generics are selected
-
-	return CS_NeedRebuild;
-}
-
-int SkModelCooker::Compile(int flags, int allflags) {
+int SkModelCooker::Compile(int flags) {
 	// Make sure these get updated
 	CompareVersion(flags);
 	CompareModifiedTime(flags);
@@ -74,14 +59,14 @@ int SkModelCooker::Compile(int flags, int allflags) {
 		return SR_ParseError;
 
 	// AnimSet import index
-	AddImport(s->c_str, flags);
+	AddImport(s->c_str);
 
 	s = asset->entry->KeyValue<String>("AnimStates.Source", flags);
 	if (!s)
 		return SR_MetaError;
 
 	// AnimStates import index
-	AddImport(s->c_str, flags);
+	AddImport(s->c_str);
 
 	// Load 3DX Mesh file
 	s = asset->entry->KeyValue<String>("Mesh.Source.File", flags);
@@ -119,7 +104,7 @@ int SkModelCooker::Compile(int flags, int allflags) {
 
 	// File 0 (discardable after load)
 	{
-		BinFile::Ref skmFile = OpenWrite(path2.c_str, flags);
+		BinFile::Ref skmFile = OpenWrite(path2.c_str);
 		if (!skmFile)
 			return SR_IOError;
 
@@ -133,7 +118,7 @@ int SkModelCooker::Compile(int flags, int allflags) {
 
 	// File 1 (persisted)
 	{
-		BinFile::Ref skmFile = OpenWrite(path2.c_str, flags);
+		BinFile::Ref skmFile = OpenWrite(path2.c_str);
 		if (!skmFile)
 			return SR_IOError;
 
@@ -145,14 +130,10 @@ int SkModelCooker::Compile(int flags, int allflags) {
 	// add material imports
 
 	for (ska::DMesh::Vec::const_iterator it = skmd->dskm.meshes.begin(); it != skmd->dskm.meshes.end(); ++it) {
-		AddImport((*it).material, flags);
+		AddImport((*it).material);
 	}
 
 	return SR_Success;
-}
-
-int SkModelCooker::MatchTargetKeys(int flags, int allflags) {
-	return asset->entry->MatchTargetKeys<String>("Mesh.Source.File", flags, allflags);
 }
 
 void SkModelCooker::Register(Engine &engine) {

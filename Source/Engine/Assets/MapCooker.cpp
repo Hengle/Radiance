@@ -1,7 +1,9 @@
-// MapCooker.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file MapCooker.cpp
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
 
 #include RADPCH
 #include "MapCooker.h"
@@ -21,71 +23,65 @@ MapCooker::MapCooker() : Cooker(30), m_parsing(false), m_ui(0), m_parser(0) {
 MapCooker::~MapCooker() {
 }
 
-CookStatus MapCooker::Status(int flags, int allflags) {
-	// Maps only cook on the generics path
-	flags &= P_AllTargets;
+CookStatus MapCooker::Status(int flags) {
+	
+	if (CompareVersion(flags) ||
+		CompareModifiedTime(flags) ||
+		CompareCachedFileTimeKey(flags, "Source.File")) {
+		return CS_NeedRebuild;
+	}
 
-	if (flags == 0) {
-		if (CompareVersion(flags) ||
-			CompareModifiedTime(flags) ||
-			CompareCachedFileTimeKey(flags, "Source.File")) {
-			return CS_NeedRebuild;
-		}
+	// Check 3DX timestamp
 
-		// Check 3DX timestamp
+	const String *mapPath = asset->entry->KeyValue<String>("Source.File", flags);
+	if (!mapPath || mapPath->empty)
+		return CS_NeedRebuild;
 
-		const String *mapPath = asset->entry->KeyValue<String>("Source.File", flags);
-		if (!mapPath || mapPath->empty)
-			return CS_NeedRebuild;
+	String actorPath = file::SetFileExtension(mapPath->c_str, ".actors");
+	if (CompareCachedFileTime(flags, "Source.File.Actors", actorPath.c_str, true, true))
+		return CS_NeedRebuild;
 
-		String actorPath = file::SetFileExtension(mapPath->c_str, ".actors");
-		if (CompareCachedFileTime(flags, "Source.File.Actors", actorPath.c_str, true, true))
-			return CS_NeedRebuild;
+	file::MMFileInputBuffer::Ref ib = engine->sys->files->OpenInputBuffer(mapPath->c_str, ZTools);
+	if (!ib)
+		return CS_NeedRebuild;
 
-		file::MMFileInputBuffer::Ref ib = engine->sys->files->OpenInputBuffer(mapPath->c_str, ZTools);
-		if (!ib)
-			return CS_NeedRebuild;
+	m_script.Bind(ib);
+	ib.reset();
 
-		m_script.Bind(ib);
-		ib.reset();
+	int r;
+	CookStatus status = CS_UpToDate;
+	tools::map_builder::EntSpawn spawn;
 
-		int r;
-		CookStatus status = CS_UpToDate;
-		tools::map_builder::EntSpawn spawn;
-
-		while ((r=MapParser::ParseEntity(m_script, spawn))==SR_Success) {
-			const char *sz = spawn.keys.StringForKey("classname");
-			if (!sz)
-				continue;
-			if (!string::cmp(sz, "static_mesh_scene")) {
-				sz = spawn.keys.StringForKey("file");
-				if (sz) {
-					String path(sz);
-					path += ".3dx";
-					if (CompareCachedFileTime(flags, path.c_str, path.c_str)) {
-						status = CS_NeedRebuild;
-						break;
-					}
+	while ((r=MapParser::ParseEntity(m_script, spawn))==SR_Success) {
+		const char *sz = spawn.keys.StringForKey("classname");
+		if (!sz)
+			continue;
+		if (!string::cmp(sz, "static_mesh_scene")) {
+			sz = spawn.keys.StringForKey("file");
+			if (sz) {
+				String path(sz);
+				path += ".3dx";
+				if (CompareCachedFileTime(flags, path.c_str, path.c_str)) {
+					status = CS_NeedRebuild;
+					break;
 				}
 			}
 		}
-
-		if (r != SR_Success && r != SR_End)
-			status = CS_NeedRebuild; // force error
-
-		return status;
 	}
 
-	return CS_Ignore;
+	if (r != SR_Success && r != SR_End)
+		status = CS_NeedRebuild; // force error
+
+	return status;
 }
 
-int MapCooker::Compile(int flags, int allflags) {
+int MapCooker::Compile(int flags) {
 
 	if (m_ui) // progress indicator makes cooker a tickable object
-		return TickCompile(flags, allflags);
+		return TickCompile(flags);
 
 	int r;
-	while((r=TickCompile(flags, allflags)) == SR_Pending) {
+	while((r=TickCompile(flags)) == SR_Pending) {
 		if (m_mapBuilder)
 			m_mapBuilder->WaitForCompletion();
 	}
@@ -93,9 +89,8 @@ int MapCooker::Compile(int flags, int allflags) {
 	return r;
 }
 
-int MapCooker::TickCompile(int flags, int allflags) {
-	RAD_ASSERT((flags&P_AllTargets)==0);
-
+int MapCooker::TickCompile(int flags) {
+	
 	if (m_parsing) {
 		int r = m_mapBuilder->result;
 		if (r != SR_Success)
@@ -142,7 +137,7 @@ int MapCooker::TickCompile(int flags, int allflags) {
 
 		String path(CStr(asset->path));
 		path += ".bsp";
-		BinFile::Ref fp = OpenWrite(path.c_str, flags);
+		BinFile::Ref fp = OpenWrite(path.c_str);
 		if (!fp)
 			return SR_IOError;
 
@@ -155,7 +150,7 @@ int MapCooker::TickCompile(int flags, int allflags) {
 
 		for (U32 i = 0; i < bspFile->numMaterials; ++i) { 
 			// import materials.
-			AddImport(bspFile->String((bspFile->Materials()+i)->string), flags);
+			AddImport(bspFile->String((bspFile->Materials()+i)->string));
 		}
 
 		return SR_Success;
@@ -197,7 +192,7 @@ void MapCooker::SetProgressIndicator(tools::UIProgress *ui) {
 int MapCooker::ParseCinematicCompressionMap(int flags) {
 	m_caMap.clear();
 
-	const String *name = asset->entry->KeyValue<String>("Source.File", P_TARGET_FLAGS(flags));
+	const String *name = asset->entry->KeyValue<String>("Source.File", flags);
 	if (!name || name->empty)
 		return SR_MetaError;
 

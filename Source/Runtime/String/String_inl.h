@@ -433,6 +433,10 @@ inline int String::StrStr(const char *sz) const {
 	return pos ? (int)(pos-root) : -1;
 }
 
+inline StringVec String::Split(const char *sep) const {
+	return Split(CStr(sep));
+}
+
 inline String String::Join(const String &str) const {
 	String x(*this);
 	x.Append(str);

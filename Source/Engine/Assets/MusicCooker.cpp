@@ -1,7 +1,9 @@
-// MusicCooker.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file MusicCooker.cpp
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
 
 #include RADPCH
 #include "MusicCooker.h"
@@ -15,16 +17,13 @@ using namespace endian;
 
 namespace asset {
 
-MusicCooker::MusicCooker() : Cooker(0)
-{
+MusicCooker::MusicCooker() : Cooker(0) {
 }
 
-MusicCooker::~MusicCooker()
-{
+MusicCooker::~MusicCooker() {
 }
 
-CookStatus MusicCooker::CheckRebuild(int flags, int allflags)
-{
+CookStatus MusicCooker::Status(int flags) {
 	if (CompareVersion(flags) ||
 		CompareModifiedTime(flags) || 
 		CompareCachedFileTimeKey(flags, "Source.File"))
@@ -32,26 +31,7 @@ CookStatus MusicCooker::CheckRebuild(int flags, int allflags)
 	return CS_UpToDate;
 }
 
-CookStatus MusicCooker::Status(int flags, int allflags)
-{
-	flags &= P_AllTargets;
-	allflags &= P_AllTargets;
-
-	if (flags == 0)
-	{ // only build generics if all platforms are identical to eachother.
-		if (MatchTargetKeys(allflags, allflags)==allflags)
-			return CheckRebuild(flags, allflags);
-		return CS_Ignore;
-	}
-
-	if (MatchTargetKeys(allflags, allflags)==allflags)
-		return CS_Ignore;
-
-	return CheckRebuild(flags, allflags);
-}
-
-int MusicCooker::Compile(int flags, int allflags)
-{
+int MusicCooker::Compile(int flags) {
 	// Make sure these get updated
 	CompareVersion(flags);
 	CompareModifiedTime(flags);
@@ -61,13 +41,9 @@ int MusicCooker::Compile(int flags, int allflags)
 	if (!s)
 		return SR_MetaError;
 
-	if (!CopyOutputBinFile(s->c_str, flags))
+	if (!CopyOutputBinFile(s->c_str))
 		return SR_IOError;
 	return SR_Success;
-}
-
-int MusicCooker::MatchTargetKeys(int flags, int allflags) {
-	return asset->entry->MatchTargetKeys<String>("Source.File", flags, allflags);
 }
 
 void MusicCooker::Register(Engine &engine) {

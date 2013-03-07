@@ -116,13 +116,14 @@ m_closeWhenFinished(false) {
 
 	enum { MaxColumns = 3 };
 
+	QRadioButton *checkedRadio = 0;
+
 	for (int i = pkg::P_FirstTarget; i <= pkg::P_LastTarget; i <<= 1, ++targetNum) {
 		QString name(pkg::PlatformNameForFlags(i));
 
 		QRadioButton *radio = new (ZEditor) QRadioButton(name);
 		
-		bool checked = mainWin->userPrefs->value("cook/" + name, true).toBool();
-		radio->setChecked(checked);
+		bool checked = mainWin->userPrefs->value("cook/" + name, false).toBool();
 		radio->setProperty("platformFlag", i);
 
 		int col = targetNum / MaxColumns;
@@ -130,8 +131,10 @@ m_closeWhenFinished(false) {
 
 		grid->addWidget(radio, row, col);
 
-		if (checked)
+		if (checked) {
 			m_platforms = i;
+			checkedRadio = radio;
+		}
 
 		RAD_VERIFY(connect(radio, SIGNAL(toggled(bool)), SLOT(OnPlatformSelected(bool))));
 	}
@@ -188,6 +191,9 @@ m_closeWhenFinished(false) {
 
 	m_glw = new (ZEditor) GLWidget(this);
 	m_glw->hide();
+
+	if (checkedRadio)
+		checkedRadio->setChecked(true);
 }
 
 CookerDialog::~CookerDialog() {
@@ -197,7 +203,7 @@ CookerDialog::~CookerDialog() {
 
 void CookerDialog::OnPlatformSelected(bool checked) {
 	QGroupBox *group = static_cast<QGroupBox*>(sender());
-	int flags = group->property("platformFlags").toInt();
+	int flags = group->property("platformFlag").toInt();
 
 	if (checked) {
 		MainWindow::Get()->userPrefs->setValue(QString("cook/") + pkg::PlatformNameForFlags(flags), true);
@@ -229,34 +235,6 @@ void CookerDialog::CookClicked() {
 			numThreads = 0;
 	}
 
-	StringVec roots;
-	{
-		file::MMFileInputBuffer::Ref ib = App::Get()->engine->sys->files->OpenInputBuffer("@r:/cook.txt", ZTools);
-		if (!ib) {
-			QMessageBox::critical(
-				this,
-				"Error",
-				"Unable to open cook.txt!"
-			);
-			return;
-		}
-				
-		Tokenizer script(ib);
-		
-		String token;
-		while (script.GetToken(token, Tokenizer::kTokenMode_CrossLine))
-			roots.push_back(token);
-
-		if (roots.empty()) {
-			QMessageBox::critical(
-				this,
-				"Error",
-				"cook.txt is empty"
-			);
-			return;
-		}
-	}
-
 	int enabledLangMask;
 	App::Get()->LoadLangId(&enabledLangMask, App::Get()->systemLangId);
 	if (enabledLangMask == 0) {
@@ -281,7 +259,6 @@ void CookerDialog::CookClicked() {
 
 	m_thread = new CookThread(
 		m_glw,
-		roots, 
 		flags,
 		enabledLangMask,
 		0,
@@ -398,7 +375,6 @@ void CookerDialog::OnPrintMsg(const PrintMsgEvent &msg) {
 
 CookThread::CookThread(
 	GLWidget *glw,
-	const StringVec &roots,
 	int plats,
 	int languages,
 	int compression,
@@ -406,7 +382,6 @@ CookThread::CookThread(
 	std::ostream &cout
 ) :
 m_glw(glw),
-m_roots(roots), 
 m_plats(plats), 
 m_languages(languages),
 m_compression(compression),
@@ -420,7 +395,7 @@ void CookThread::Cancel() {
 
 void CookThread::run() {
 	m_glw->bindGL(true);
-	App::Get()->engine->sys->packages->Cook(m_roots, m_plats, m_languages, m_compression, m_numThreads, *m_glw, *m_cout);
+	App::Get()->engine->sys->packages->Cook(m_plats, m_languages, m_compression, m_numThreads, *m_glw, *m_cout);
 	emit Finished();
 }
 	

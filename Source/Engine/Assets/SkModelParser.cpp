@@ -1,7 +1,9 @@
-// SkModelParser.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file SkModelParser.cpp
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
 
 #include RADPCH
 #include "SkModelParser.h"
@@ -173,14 +175,14 @@ int SkModelParser::LoadCooked(
 #if defined(RAD_OPT_TOOLS)
 			if (!asset->cooked) {
 				m_cooker = asset->AllocateIntermediateCooker();
-				CookStatus status = m_cooker->Status(0, P_TARGET_FLAGS(flags));
+				CookStatus status = m_cooker->Status(P_TARGET_FLAGS(flags));
 
 				if (status == CS_Ignore)
 					return SR_CompilerError;
 
 				if (status == CS_NeedRebuild) {
 					COut(C_Info) << asset->path.get() << " is out of date, rebuilding..." << std::endl;
-					int r = m_cooker->Cook(0, P_TARGET_FLAGS(flags));
+					int r = m_cooker->Cook(P_TARGET_FLAGS(flags));
 					if (r != SR_Success)
 						return r;
 				} else {
@@ -190,7 +192,7 @@ int SkModelParser::LoadCooked(
 				String path(CStr(asset->path));
 				path += ".0.bin";
 
-				m_mm[0] = m_cooker->MapFile(path.c_str, 0, r::ZSkm);
+				m_mm[0] = m_cooker->MapFile(path.c_str, r::ZSkm);
 				if (!m_mm[0])
 					return SR_FileNotFound;
 			}
@@ -219,7 +221,7 @@ int SkModelParser::LoadCooked(
 				String path(CStr(asset->path));
 				path += ".1.bin";
 
-				m_mm[1] = m_cooker->MapFile(path.c_str, 0, r::ZSkm);
+				m_mm[1] = m_cooker->MapFile(path.c_str, r::ZSkm);
 				m_cooker.reset();
 
 				if (!m_mm[1])

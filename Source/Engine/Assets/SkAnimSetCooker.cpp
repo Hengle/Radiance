@@ -1,7 +1,9 @@
-// SkAnimSetCooker.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file SkAnimSetCooker.cpp
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup assets
+*/
 
 #include RADPCH
 #include "SkAnimSetCooker.h"
@@ -20,19 +22,10 @@ SkAnimSetCooker::SkAnimSetCooker() : Cooker(5) {
 SkAnimSetCooker::~SkAnimSetCooker() {
 }
 
-CookStatus SkAnimSetCooker::CheckRebuild(int flags, int allflags) {
-	if (CompareVersion(flags) || 
-		CompareModifiedTime(flags) || 
-		CompareCachedFileTimeKey(flags, "Source.File"))
-		return CS_NeedRebuild;
-
-	return CheckRebuildFiles(flags, allflags);
-}
-
-CookStatus SkAnimSetCooker::CheckRebuildFiles(int flags, int allflags) {
+CookStatus SkAnimSetCooker::CheckRebuildFiles(int flags) {
 	const String *s = asset->entry->KeyValue<String>("Source.File", flags);
 	if (!s)
-		return CS_NeedRebuild;
+		return CS_Error;
 
 	StringVec sources;
 	int r = SkAnimSetParser::LoadToolsFile(
@@ -56,29 +49,21 @@ CookStatus SkAnimSetCooker::CheckRebuildFiles(int flags, int allflags) {
 	return x;
 }
 
-CookStatus SkAnimSetCooker::Status(int flags, int allflags) {
-	flags &= P_AllTargets;
-	allflags &= P_AllTargets;
+CookStatus SkAnimSetCooker::Status(int flags) {
+	if (CompareVersion(flags) || 
+		CompareModifiedTime(flags) || 
+		CompareCachedFileTimeKey(flags, "Source.File"))
+		return CS_NeedRebuild;
 
-	if (flags == 0) { 
-		// only build generics if all platforms are identical to eachother.
-		if (MatchTargetKeys(allflags, allflags)==allflags)
-			return CheckRebuild(flags, allflags);
-		return CS_Ignore;
-	}
-
-	if (MatchTargetKeys(allflags, allflags)==allflags)
-		return CS_Ignore;
-
-	return CheckRebuild(flags, allflags);
+	return CheckRebuildFiles(flags);
 }
 
-int SkAnimSetCooker::Compile(int flags, int allflags) {
+int SkAnimSetCooker::Compile(int flags) {
 	// Make sure these get updated
 	CompareVersion(flags);
 	CompareModifiedTime(flags);
 	CompareCachedFileTimeKey(flags, "Source.File");
-	CheckRebuildFiles(flags, allflags);
+	CheckRebuildFiles(flags);
 
 	int r = asset->Process(
 		xtime::TimeSlice::Infinite, 
@@ -95,7 +80,7 @@ int SkAnimSetCooker::Compile(int flags, int allflags) {
 	String path(CStr(asset->path));
 	path += ".bin";
 
-	BinFile::Ref fp = OpenWrite(path.c_str, flags);
+	BinFile::Ref fp = OpenWrite(path.c_str);
 	if (!fp)
 		return SR_IOError;
 
@@ -105,10 +90,6 @@ int SkAnimSetCooker::Compile(int flags, int allflags) {
 		return SR_IOError;
 
 	return SR_Success;
-}
-
-int SkAnimSetCooker::MatchTargetKeys(int flags, int allflags) {
-	return asset->entry->MatchTargetKeys<String>("Source.File", flags, allflags);
 }
 
 void SkAnimSetCooker::Register(Engine &engine) {
