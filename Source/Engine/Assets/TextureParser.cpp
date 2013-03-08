@@ -662,6 +662,37 @@ int TextureParser::Parsing(
 						}
 					}
 				}
+
+				if (flags&P_TargetiOS) {
+					// iOS GPU's will expand RGB to RGBA on upload (slow).
+					// Verified by testing, get warnings in GL profiler in XCode.
+					// This should be silent, we don't want artists using RGBA unnecessarily.
+
+					for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it) {
+						image_codec::Image::Ref &img = *it;
+
+						if (img->format == image_codec::Format_RGB888) {
+							m_header.format = image_codec::Format_RGBA8888;
+							
+							for (int i = 0; i < img->frameCount; ++i) {
+								image_codec::Frame &sf = img->frames[i];
+								for (int k = 0; k < sf.mipCount; ++k) {
+									image_codec::Mipmap &sm = sf.mipmaps[k];
+
+									U8 *data = (U8*)safe_zone_malloc(image_codec::ZImageCodec, sm.width*sm.height*4);
+									image_codec::ConvertPixelData(sm.data, sm.dataSize, data, 0, img->format, image_codec::Format_RGBA8888);
+									zone_free(sm.data);
+									sm.data = data;
+									sm.stride = sm.width*4;
+									sm.dataSize = sm.width*sm.height*4;
+								}
+							}
+
+							img->format = image_codec::Format_RGBA8888;
+							img->bpp = 4;
+						}
+					}
+				}
 			}
 
 			r = Resize(
@@ -964,7 +995,7 @@ int TextureParser::Compress(
 		return SR_Success;
 	}
 
-	int compressionMode = GetCompressionMode(asset, flags);
+	int compressionMode = GetCompressionMode(asset, P_TARGET_FLAGS(flags));
 	if (compressionMode < 0)
 		return compressionMode;
 
