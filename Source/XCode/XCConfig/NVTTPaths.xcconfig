@@ -1,0 +1,7 @@
+// NVTTPaths.xcconfig
+// Sets up the nvidia texture tools library path.
+// Copyright (c) 2012 Sunside Inc., All Rights Reserved.
+// See Radiance/LICENSE for licensing terms.
+
+NVTT_PATH = $(EXTERN_PATH)/nvtt-2.0.8-1/include
+

@@ -1090,6 +1090,18 @@
 		338CDFBB15BC9B970058DFF5 /* PlaneDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8853315B9ACBE0089BA08 /* PlaneDef.h */; };
 		338CDFBC15BC9B970058DFF5 /* Quaternion.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8853415B9ACBE0089BA08 /* Quaternion.h */; };
 		338CDFBD15BC9B970058DFF5 /* QuaternionDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8853615B9ACBE0089BA08 /* QuaternionDef.h */; };
+		3397727316E9AEC70046535B /* TextureParserDXT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3397727116E9AEC70046535B /* TextureParserDXT.cpp */; };
+		3397727416E9AEC70046535B /* TextureParserPVR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3397727216E9AEC70046535B /* TextureParserPVR.cpp */; };
+		3397728416E9BB2B0046535B /* StackContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3397728216E9BB2B0046535B /* StackContainer.h */; };
+		3397728516E9BB2B0046535B /* StackContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3397728216E9BB2B0046535B /* StackContainer.h */; };
+		3397728616E9BB2B0046535B /* StackContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3397728216E9BB2B0046535B /* StackContainer.h */; };
+		3397728716E9BB2B0046535B /* StackContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3397728216E9BB2B0046535B /* StackContainer.h */; };
+		3397728816E9BB2B0046535B /* StackContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3397728216E9BB2B0046535B /* StackContainer.h */; };
+		3397728916E9BB2B0046535B /* StackVector.h in Headers */ = {isa = PBXBuildFile; fileRef = 3397728316E9BB2B0046535B /* StackVector.h */; };
+		3397728A16E9BB2B0046535B /* StackVector.h in Headers */ = {isa = PBXBuildFile; fileRef = 3397728316E9BB2B0046535B /* StackVector.h */; };
+		3397728B16E9BB2B0046535B /* StackVector.h in Headers */ = {isa = PBXBuildFile; fileRef = 3397728316E9BB2B0046535B /* StackVector.h */; };
+		3397728C16E9BB2B0046535B /* StackVector.h in Headers */ = {isa = PBXBuildFile; fileRef = 3397728316E9BB2B0046535B /* StackVector.h */; };
+		3397728D16E9BB2B0046535B /* StackVector.h in Headers */ = {isa = PBXBuildFile; fileRef = 3397728316E9BB2B0046535B /* StackVector.h */; };
 		339805941676D544002758B1 /* FloorsDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 339805931676D544002758B1 /* FloorsDef.h */; };
 		339805951676D544002758B1 /* FloorsDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 339805931676D544002758B1 /* FloorsDef.h */; };
 		339805961676D544002758B1 /* FloorsDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 339805931676D544002758B1 /* FloorsDef.h */; };
@@ -2982,6 +2994,12 @@
 		338CDF0815BC8F140058DFF5 /* RadianceShipDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceShipDebugOSX.xcconfig; path = XCConfig/RadianceShipDebugOSX.xcconfig; sourceTree = "<group>"; };
 		338CDF0915BC8F140058DFF5 /* RadianceShipReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceShipReleaseiOS.xcconfig; path = XCConfig/RadianceShipReleaseiOS.xcconfig; sourceTree = "<group>"; };
 		338CDF0A15BC8F140058DFF5 /* RadianceShipReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceShipReleaseOSX.xcconfig; path = XCConfig/RadianceShipReleaseOSX.xcconfig; sourceTree = "<group>"; };
+		3397726C16E9ABB60046535B /* NVTTPaths.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = NVTTPaths.xcconfig; path = XCConfig/NVTTPaths.xcconfig; sourceTree = "<group>"; };
+		3397726E16E9AC560046535B /* OpenALPaths.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = OpenALPaths.xcconfig; path = XCConfig/OpenALPaths.xcconfig; sourceTree = "<group>"; };
+		3397727116E9AEC70046535B /* TextureParserDXT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureParserDXT.cpp; sourceTree = "<group>"; };
+		3397727216E9AEC70046535B /* TextureParserPVR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureParserPVR.cpp; sourceTree = "<group>"; };
+		3397728216E9BB2B0046535B /* StackContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackContainer.h; sourceTree = "<group>"; };
+		3397728316E9BB2B0046535B /* StackVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackVector.h; sourceTree = "<group>"; };
 		339805931676D544002758B1 /* FloorsDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FloorsDef.h; sourceTree = "<group>"; };
 		33982DAD16A8840900C2ED49 /* Socket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Socket.cpp; sourceTree = "<group>"; };
 		33982DAE16A8840900C2ED49 /* Socket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Socket.h; sourceTree = "<group>"; };
@@ -3936,6 +3954,8 @@
 				33E8824315B8C90C0089BA08 /* ExternLibReleaseOSX.xcconfig */,
 				33E8824415B8C90C0089BA08 /* ExternPath.xcconfig */,
 				33FA81D316351C3D002603A5 /* FlurryPaths.xcconfig */,
+				3397726C16E9ABB60046535B /* NVTTPaths.xcconfig */,
+				3397726E16E9AC560046535B /* OpenALPaths.xcconfig */,
 				33E8824F15B8C90D0089BA08 /* iOS.xcconfig */,
 				33E8826E15B8C90D0089BA08 /* OSX.xcconfig */,
 				33E88B7615B9C3660089BA08 /* PVRTexLibPaths.xcconfig */,
@@ -4180,6 +4200,8 @@
 				33E8842E15B9AC7E0089BA08 /* RedBlackNodeTree.inl */,
 				33E8842F15B9AC7E0089BA08 /* RedBlackNodeTreeDef.h */,
 				33E8843015B9AC7E0089BA08 /* StdExtHash.inl */,
+				3397728216E9BB2B0046535B /* StackContainer.h */,
+				3397728316E9BB2B0046535B /* StackVector.h */,
 				33E8843115B9AC7E0089BA08 /* ThreadSafeFIFO.h */,
 				33E8843215B9AC7E0089BA08 /* ThreadSafeFIFO.inl */,
 				33E8843315B9AC7E0089BA08 /* ZoneDeque.h */,
@@ -4640,6 +4662,8 @@
 				33E8871915B9B9ED0089BA08 /* TextureCooker.cpp */,
 				33E8871A15B9B9ED0089BA08 /* TextureCooker.h */,
 				33E8871B15B9B9ED0089BA08 /* TextureParser.cpp */,
+				3397727116E9AEC70046535B /* TextureParserDXT.cpp */,
+				3397727216E9AEC70046535B /* TextureParserPVR.cpp */,
 				33E8871C15B9B9ED0089BA08 /* TextureParser.h */,
 				33E8871D15B9B9ED0089BA08 /* TypefaceCooker.cpp */,
 				33E8871E15B9B9ED0089BA08 /* TypefaceCooker.h */,
@@ -5562,6 +5586,8 @@
 				33F8F41E16C75A30009646B1 /* MeshVBLoader.h in Headers */,
 				33F8F4E916D613C6009646B1 /* Sprites.h in Headers */,
 				33F8F4F716D61769009646B1 /* D_SpriteBatch.h in Headers */,
+				3397728616E9BB2B0046535B /* StackContainer.h in Headers */,
+				3397728B16E9BB2B0046535B /* StackVector.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5953,6 +5979,8 @@
 				33F8F41F16C75A30009646B1 /* MeshVBLoader.h in Headers */,
 				33F8F4EA16D613C6009646B1 /* Sprites.h in Headers */,
 				33F8F4F816D61769009646B1 /* D_SpriteBatch.h in Headers */,
+				3397728716E9BB2B0046535B /* StackContainer.h in Headers */,
+				3397728C16E9BB2B0046535B /* StackVector.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6426,6 +6454,8 @@
 				33F8F41C16C75A2F009646B1 /* MeshVBLoader.h in Headers */,
 				33F8F4E716D613C6009646B1 /* Sprites.h in Headers */,
 				33F8F4F516D61769009646B1 /* D_SpriteBatch.h in Headers */,
+				3397728416E9BB2B0046535B /* StackContainer.h in Headers */,
+				3397728916E9BB2B0046535B /* StackVector.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6815,6 +6845,8 @@
 				33F8F41D16C75A2F009646B1 /* MeshVBLoader.h in Headers */,
 				33F8F4E816D613C6009646B1 /* Sprites.h in Headers */,
 				33F8F4F616D61769009646B1 /* D_SpriteBatch.h in Headers */,
+				3397728516E9BB2B0046535B /* StackContainer.h in Headers */,
+				3397728A16E9BB2B0046535B /* StackVector.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7206,6 +7238,8 @@
 				33F8F42016C75A30009646B1 /* MeshVBLoader.h in Headers */,
 				33F8F4EB16D613C6009646B1 /* Sprites.h in Headers */,
 				33F8F4F916D61769009646B1 /* D_SpriteBatch.h in Headers */,
+				3397728816E9BB2B0046535B /* StackContainer.h in Headers */,
+				3397728D16E9BB2B0046535B /* StackVector.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8000,6 +8034,8 @@
 				33F8F41716C75A2F009646B1 /* MeshVBLoader.cpp in Sources */,
 				33F8F4E216D613C6009646B1 /* Sprites.cpp in Sources */,
 				33F8F4F016D61769009646B1 /* D_SpriteBatch.cpp in Sources */,
+				3397727316E9AEC70046535B /* TextureParserDXT.cpp in Sources */,
+				3397727416E9AEC70046535B /* TextureParserPVR.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

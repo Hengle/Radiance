@@ -76,7 +76,6 @@ private:
 
 	struct RefreshEvent : public QEvent {
 		RefreshEvent() : QEvent((QEvent::Type)EV_ProgressDialog) {}
-		State s;
 	};
 
 	void OnRefreshEvent(const RefreshEvent &e);
@@ -84,6 +83,7 @@ private:
 	int m_total[2];
 	int m_sub[2];
 	String m_strings[2];
+	State m_uiState;
 	RefreshEvent *m_inFlight;
 	QMutex m_m;
 };

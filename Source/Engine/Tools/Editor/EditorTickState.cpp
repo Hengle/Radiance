@@ -99,7 +99,7 @@ int TickLoad::Tick(::App &app, float dt, const xtime::TimeSlice &time, int flags
 {
 	if (firstTick)
 	{
-		m_d = new (ZEditor) ProgressDialog(
+		m_d = new ProgressDialog(
 			"Initializing...",
 			QString(),
 			QString(),

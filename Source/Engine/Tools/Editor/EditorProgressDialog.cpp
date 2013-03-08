@@ -14,17 +14,16 @@ namespace editor {
 ProgressDialog::ProgressDialog(
 	QWidget *parent,
 	Qt::WFlags f
-) : QProgressDialog(parent, f),
-m_inFlight(0) {
-	setAutoClose(false);
+) : QProgressDialog(parent, f), m_inFlight(0) {
+	setAutoReset(false);
 	setAttribute(Qt::WA_DeleteOnClose);
 	setMinimumDuration(0);
 	setModal(true);
-	setWindowFlags(
+	/*setWindowFlags(
 		Qt::Dialog|
 		Qt::CustomizeWindowHint|
 		Qt::WindowTitleHint
-	);
+	);*/
 }
 
 ProgressDialog::ProgressDialog(
@@ -35,18 +34,17 @@ ProgressDialog::ProgressDialog(
 	int maximum, 
 	QWidget *parent, 
 	Qt::WFlags f
-) : QProgressDialog(labelText, cancelButtonText, minimum, maximum, parent, f),
-m_inFlight(0) {
+) : QProgressDialog(labelText, cancelButtonText, minimum, maximum, parent, f), m_inFlight(0) {
 	setWindowTitle(title);
-	setAutoClose(false);
+	setAutoReset(false);
 	setAttribute(Qt::WA_DeleteOnClose);
 	setMinimumDuration(0);
 	setModal(true);
-	setWindowFlags(
+	/*setWindowFlags(
 		Qt::Dialog|
 		Qt::CustomizeWindowHint|
 		Qt::WindowTitleHint
-	);
+	);*/
 }
 
 ProgressDialog::~ProgressDialog() {
@@ -63,22 +61,18 @@ void ProgressDialog::SubStep() {
 void ProgressDialog::Refresh() {
 	// avoid setValue() recursion with modal progress dialog.
 
-	bool post = false;
 	m_m.lock();
 	
+	m_uiState.total[0] = m_total[0];
+	m_uiState.total[1] = m_total[1];
+	m_uiState.title = QString(m_strings[0].c_str.get());
+
 	if (!m_inFlight) {
-		m_inFlight = new (ZEditor) RefreshEvent();
-		post = true;
-	}
-
-	m_inFlight->s.total[0] = m_total[0];
-	m_inFlight->s.total[1] = m_total[1];
-	m_inFlight->s.title = QString(m_strings[0].c_str.get());
-
-	m_m.unlock();
-
-	if (post)
+		m_inFlight = new RefreshEvent();
 		QCoreApplication::postEvent(this, m_inFlight);
+	}	
+		
+	m_m.unlock();
 }
 
 QSize ProgressDialog::sizeHint() const {
@@ -157,17 +151,21 @@ void ProgressDialog::customEvent(QEvent *e) {
 	default:
 		break;
 	}
+	
+	QProgressDialog::customEvent(e);
 }
 
 void ProgressDialog::OnRefreshEvent(const RefreshEvent &e) {
 	m_m.lock();
-	setMinimum(0);
-	setMaximum(e.s.total[0]);
-	setValue(e.s.total[1]);
-	if (e.s.title != labelText()) {
-		setLabelText(e.s.title);
+	if (m_inFlight) {
+		m_inFlight = 0;
+		setMinimum(0);
+		setMaximum(m_uiState.total[0]);
+		setValue(m_uiState.total[1]);
+		if (m_uiState.title != labelText()) {
+			setLabelText(m_uiState.title);
+		}
 	}
-	m_inFlight = 0;
 	m_m.unlock();
 }
 

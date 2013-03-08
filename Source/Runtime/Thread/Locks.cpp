@@ -138,7 +138,7 @@ m_state(kLockState_Unlocked),
 m_lockCount(0) {
 	m_numReaders[0] = m_numReaders[1] = 0;
 	m_numWriters[0] = m_numWriters[1] = 0;
-	RAD_DEBUG_ONLY(m_threadId = -1);
+	RAD_DEBUG_ONLY(m_threadId = 0);
 }
 
 SharedMutex::~SharedMutex() {
@@ -181,7 +181,7 @@ void SharedMutex::WriteLock() {
 	++m_numWriters[1];
 
 	RAD_ASSERT(m_state == kLockState_Unlocked);
-	RAD_ASSERT(m_threadId == -1);
+	RAD_ASSERT(m_threadId == 0);
 	++m_lockCount;
 	RAD_ASSERT(m_lockCount == 1);
 
@@ -198,7 +198,7 @@ void SharedMutex::Unlock() {
 	if (m_state == kLockState_Write) {
 		// consistency check
 		RAD_ASSERT(m_threadId == thread::ThreadId());
-		RAD_DEBUG_ONLY(m_threadId = -1);
+		RAD_DEBUG_ONLY(m_threadId = 0);
 		RAD_ASSERT(m_lockCount == 1);
 	} else {
 		RAD_ASSERT(m_lockCount > 0);
@@ -258,7 +258,7 @@ void SharedMutex::DowngradeToReadLock() {
 	--m_numWriters[1];
 	++m_numReaders[1];
 	m_state = kLockState_Read;
-	RAD_DEBUG_ONLY(m_threadId = -1);
+	RAD_DEBUG_ONLY(m_threadId = 0);
 	m_m.unlock(); // unlock outer write lock.
 }
 

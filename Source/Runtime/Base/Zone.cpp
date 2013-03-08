@@ -170,7 +170,11 @@ void RAD_ANSICALL operator delete[](void *p, Zone &z) throw() {
 namespace {
 typedef boost::recursive_mutex Mutex;
 typedef boost::lock_guard<Mutex> Lock;
-Mutex s_m;
+Mutex &GetMutex() {
+	static aligned_block<sizeof(Mutex), RAD_ALIGNOF(Mutex)> s_data;
+	static Mutex *m = new (s_data.data) Mutex();
+	return *m;
+}
 } // namespace
 #endif
 
@@ -187,7 +191,7 @@ void Zone::Init() {
 
 	if (m_parent) {
 #if defined(NEED_LOCKS)
-		Lock L(s_m);
+		Lock L(GetMutex());
 #endif
 		m_next = m_parent->m_head;
 		m_parent->m_head = this;
@@ -196,7 +200,7 @@ void Zone::Init() {
 
 void Zone::Inc(AddrSize size, AddrSize overhead) {
 #if defined(NEED_LOCKS)
-	Lock L(s_m);
+	Lock L(GetMutex());
 #endif
 	m_numBytes += size;
 	m_overhead += overhead;
@@ -207,7 +211,7 @@ void Zone::Inc(AddrSize size, AddrSize overhead) {
 
 void Zone::Dec(AddrSize size, AddrSize overhead) {
 #if defined(NEED_LOCKS)
-	Lock L(s_m);
+	Lock L(GetMutex());
 #endif
 	m_numBytes -= size;
 	m_overhead -= overhead;
@@ -265,7 +269,7 @@ void *Zone::Realloc(void *ptr, size_t size, AddrSize headerSize, AddrSize alignm
 
 AddrSize Zone::RAD_IMPLEMENT_GET(totalBytes) {
 #if defined(NEED_LOCKS)
-	Lock L(s_m);
+	Lock L(GetMutex());
 #endif
 	AddrSize total = m_numBytes;
 	for (Zone *z = m_head; z; z = z->next) {
@@ -276,7 +280,7 @@ AddrSize Zone::RAD_IMPLEMENT_GET(totalBytes) {
 
 AddrSize Zone::RAD_IMPLEMENT_GET(totalOverhead) {
 #if defined(NEED_LOCKS)
-	Lock L(s_m);
+	Lock L(GetMutex());
 #endif
 	AddrSize total = m_overhead;
 	for (Zone *z = m_head; z; z = z->next) {
@@ -287,7 +291,7 @@ AddrSize Zone::RAD_IMPLEMENT_GET(totalOverhead) {
 
 AddrSize Zone::RAD_IMPLEMENT_GET(totalCount) {
 #if defined(NEED_LOCKS)
-	Lock L(s_m);
+	Lock L(GetMutex());
 #endif
 	AddrSize total = m_numAllocs;
 	for (Zone *z = m_head; z; z = z->next) {
@@ -298,7 +302,7 @@ AddrSize Zone::RAD_IMPLEMENT_GET(totalCount) {
 
 AddrSize Zone::RAD_IMPLEMENT_GET(totalSmall) {
 #if defined(NEED_LOCKS)
-	Lock L(s_m);
+	Lock L(GetMutex());
 #endif
 	AddrSize total = m_small;
 	for (Zone *z = m_head; z; z = z->next) {
@@ -309,7 +313,7 @@ AddrSize Zone::RAD_IMPLEMENT_GET(totalSmall) {
 
 AddrSize Zone::RAD_IMPLEMENT_GET(totalLarge) {
 #if defined(NEED_LOCKS)
-	Lock L(s_m);
+	Lock L(GetMutex());
 #endif
 	AddrSize total = m_large;
 	for (Zone *z = m_head; z; z = z->next) {
@@ -320,7 +324,7 @@ AddrSize Zone::RAD_IMPLEMENT_GET(totalLarge) {
 
 AddrSize Zone::RAD_IMPLEMENT_GET(totalHigh) {
 #if defined(NEED_LOCKS)
-	Lock L(s_m);
+	Lock L(GetMutex());
 #endif
 	AddrSize total = m_high;
 	for (Zone *z = m_head; z; z = z->next) {

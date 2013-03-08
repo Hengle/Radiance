@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "Types.h"
 #include <Runtime/StreamDef.h>
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/Container/ZoneMap.h>
