@@ -558,7 +558,7 @@ void PackageMan::LoadBin(
 				entry->m_imports.push_back(import);
 			}
 
-			entry->m_tag = (void*)tag;
+			entry->m_tag = ((U8*)tag)+tag->ofs;
 		}
 	}
 

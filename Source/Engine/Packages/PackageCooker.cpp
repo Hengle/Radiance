@@ -1268,8 +1268,15 @@ int PackageMan::BuildManifest(int compression) {
 	lumpWriter.Begin(file::kDPakSig, file::kDPakMagic, os);
 
 	const String kPakDir(m_cookState->targetPath + CStr("/Packages/"));
+	const String kShaderDir(m_cookState->targetPath + CStr("/Shaders/"));
 	
 	int r = PakDirectory(kPakDir.c_str, "Packages/", compression, lumpWriter);
+	if (r != SR_Success) {
+		fclose(fp);
+		return r;
+	}
+	
+	r = PakDirectory(kShaderDir.c_str, "Shaders/", compression, lumpWriter);
 	if (r != SR_Success) {
 		fclose(fp);
 		return r;
