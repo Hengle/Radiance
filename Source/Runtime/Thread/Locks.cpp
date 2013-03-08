@@ -248,6 +248,7 @@ void SharedMutex::UpgradeToWriteLock() {
 	++m_numWriters[1];
 	m_state = kLockState_Write;
 	RAD_DEBUG_ONLY(m_threadId = thread::ThreadId());
+	L.release(); // don't release writer lock.
 }
 
 void SharedMutex::DowngradeToReadLock() {
