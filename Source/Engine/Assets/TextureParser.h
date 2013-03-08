@@ -61,7 +61,18 @@ public:
 	const image_codec::Image *Image(int idx) const;
 
 #if defined(RAD_OPT_TOOLS)
+
+	enum CompressionMode {
+		kCompressionMode_Disabled, // never compressed
+		kCompressionMode_Default, // controlled by asset
+		kCompressionMode_DXT,
+		kCompressionMode_PVR,
+		kCompressionMode_ATITC,
+		kCompressionMode_ETC
+	};
+
 	RAD_DECLARE_PROPERTY(TextureParser, langId, StringTable::LangId, StringTable::LangId);
+	RAD_DECLARE_PROPERTY(TextureParser, compressionMode, CompressionMode, CompressionMode);
 
 	int SourceModifiedTime(
 		Engine &engine,
@@ -132,21 +143,40 @@ private:
 		const pkg::Asset::Ref &asset,
 		int flags
 	);
-
+	
+#if defined(RAD_OPT_PC_TOOLS)
 	int Compress(
 		Engine &engine,
 		const xtime::TimeSlice &time,
 		const pkg::Asset::Ref &asset,
 		int flags
 	);
-	
-#if defined(RAD_OPT_PC_TOOLS)
+
+	// TextureParserDXT.cpp
+
+	int CompressDXT(
+		Engine &engine,
+		const xtime::TimeSlice &time,
+		const pkg::Asset::Ref &asset,
+		int flags
+	);
+
+	// TextureParserPVR.cpp
+
+	int CompressPVR(
+		Engine &engine,
+		const xtime::TimeSlice &time,
+		const pkg::Asset::Ref &asset,
+		int flags
+	);
+
 	static int ExtractPVR(
 		Engine &engine,
 		int frame,
 		pvrtexture::CPVRTexture &src,
 		image_codec::Image &img
 	);
+
 #endif
 
 	int m_fmt;
@@ -188,6 +218,16 @@ private:
 	RAD_DECLARE_SET(langId, StringTable::LangId) {
 		m_langId = value;
 	}
+
+	RAD_DECLARE_GET(compressionMode, CompressionMode) {
+		return m_compressionMode;
+	}
+
+	RAD_DECLARE_SET(compressionMode, CompressionMode) {
+		m_compressionMode = value;
+	}
+
+	int GetCompressionMode(const pkg::Asset::Ref &asset, int flags);
 #endif
 	
 	typedef zone_vector<image_codec::Image::Ref, ZEngineT>::type ImageVec;
@@ -201,6 +241,7 @@ private:
 	IOVec m_bufs;
 	pkg::Cooker::Ref m_cooker;
 	StringTable::LangId m_langId;
+	CompressionMode m_compressionMode;
 #endif
 	file::MMapping::Ref m_mm;
 	TextureTag m_tag;

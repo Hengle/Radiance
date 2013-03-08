@@ -15,7 +15,8 @@ xcopy "$(QT_PATH)\bin\QtOpenGLd4.dll" "$(OutDir)" /D /Y
 xcopy "$(OPENAL_PATH)\Win32\OpenAL32.dll" "$(OutDir)" /D /Y
 xcopy "$(PVRTEXLIB_PATH)\x32\Dll\PVRTexLib.dll" "$(OutDir)" /D /Y
 xcopy "$(CG_PATH)\x32\cg.dll" "$(OutDir)" /D /Y
-xcopy "$(CG_PATH)\x32\cgGL.dll" "$(OutDir)" /D /Y</Command>
+xcopy "$(CG_PATH)\x32\cgGL.dll" "$(OutDir)" /D /Y
+xcopy "$(NVTT_PATH)\x32\nvtt.dll" "$(OutDir)" /D /Y</Command>
       <Message>Installing Extern DLLs...</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>

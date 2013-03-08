@@ -2210,6 +2210,12 @@
     <ClCompile Include="..\..\Runtime\String\String.cpp">
       <Filter>Source\Runtime\String</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\Assets\TextureParserPVR.cpp">
+      <Filter>Source\Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Assets\TextureParserDXT.cpp">
+      <Filter>Source\Engine\Assets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Runtime\Base\Event.inl">

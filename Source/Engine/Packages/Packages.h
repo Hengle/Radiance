@@ -580,12 +580,19 @@ public:
 		
 		KeyDef::Ref FindKeyDef(
 			const String &name,
-			const String &path
+			const String &path,
+			bool allowDefault = true
 		) const;
 
 		static String TrimKeyName(const String &name);
 		void AddImport(const char *name, const char *path);
 		bool AddKey(const KeyVal::Ref &key, bool applyDefault);
+
+		// will not add a key with no definition
+		// -1 = not added, no definition
+		//  0 = not added, duplicate key
+		//  1 = added
+		int TryAddKey(const KeyVal::Ref &key, bool applyDefault);
 
 		// plat: on input specified platform, on output specifies the platform if found or zero
 		// if the default path was found.

@@ -5,22 +5,25 @@
 	\ingroup assets
 */
 
-// It should be noted here that the Radiance DDS library is used here.
-// It should *also* be noted that this code *does not compress or decompress DXT formatted data* using
-// the Radiance DDS library, rather the code is used to simply unwrap the DDS format around DXT compressed
-// blocks.
-
-// DDS files are not written by this code.
-
-// DXT compression, should it be enabled by a texture asset, is performed by the PVRTexLib provided
-// by PowerVR. The software used to compress this data is linked as a DLL and is therefore not part
-// of the Radiance Engine.
-
-// Therefore the use of this code, unmodified, is not subject to any patents related to S3TC compression 
-// formats and licensees of this software are not required to seek an S3TC license.
-
-// Furthermore: All DXT related functionality is not linked into any shipping builds of 
-// a game. PVRTexLib, DDS, JPEG, TGA loading is only part of development/tools builds of the engine.
+/* It should be noted here that the Radiance DDS library is used here.
+   It should *also* be noted that this code *does not compress or decompress DXT formatted data* using
+   the Radiance DDS library, rather the code is used to simply unwrap the DDS format around DXT compressed
+   blocks.
+  
+   DDS files are not written by this code.
+  
+   DXT compression, should it be enabled by a texture asset, is performed by the texture tools provided by
+   NVidia, see TextureParserDXT.cpp . The software used to compress this data is linked as a DLL and is therefore 
+   not part of the Radiance Engine, and its use should fall under the patent licenses obtained by NVidia.
+  
+   Therefore the use of this code, unmodified, should not be subject to any patents related to S3TC compression 
+   formats and licensees of this software should not be required to seek an S3TC license. However, this should
+   not be taken as law, and any concerned parties should consult their legal counsel.
+  
+   Furthermore: All DXT related functionality is not linked into any shipping builds of 
+   a game. PVRTexLib, NVTT, ATI_Compress, DDS, JPEG, TGA loading is only part of development/tools builds of 
+   the engine.
+*/
 
 #include RADPCH
 #include "TextureParser.h"
@@ -34,23 +37,9 @@
 #include <Runtime/ImageCodec/Bmp.h>
 #include <Runtime/ImageCodec/Png.h>
 #include "../Renderer/GL/GLTable.h"
-#endif
-#if defined(RAD_OPT_PC_TOOLS)
-#if defined(RAD_OPT_WINX)
-#define _WINDLL_IMPORT 1
-#endif
-#include <PVRTexLib/PVRTTexture.h>
-#include <PVRTexLib/PVRTextureHeader.h>
-#include <PVRTexLib/PVRTextureUtilities.h>
 #include "../Renderer/GL/GLTexture.h"
-#include <algorithm>
-using namespace pvrtexture;
-#undef min
-#undef max
-#undef DeleteFile
-enum 
-{
-	MinMipSize = 1
+enum {
+	kMinMipSize = 1
 };
 #endif
 
@@ -62,6 +51,7 @@ TextureParser::TextureParser()
 : m_state(S_None), m_load(false) {
 #if defined(RAD_OPT_TOOLS)
 	m_langId = App::Get()->langId;
+	m_compressionMode = kCompressionMode_Default;
 #endif
 }
 
@@ -319,6 +309,43 @@ int TextureParser::LoadCooked(
 }
 
 #if defined(RAD_OPT_TOOLS)
+
+int TextureParser::GetCompressionMode(const pkg::Asset::Ref &asset, int flags) {
+	if (m_compressionMode != kCompressionMode_Default)
+		return m_compressionMode;
+
+	// android target MUST force a compression mode (this path only gets hit during cooking).
+	RAD_VERIFY(!(flags&P_TargetAndroid));
+	RAD_ASSERT(flags&P_AllTargets);
+
+	const bool *enabled = asset->entry->KeyValue<bool>("Compression.Enabled", flags);
+	if (!enabled)
+		return SR_MetaError;
+
+	if (!*enabled)
+		return kCompressionMode_Disabled;
+
+	if (flags&P_TargetiOS) {
+		// pvr?
+		const String *compression = asset->entry->KeyValue<String>("Compression.PVR", flags);
+		if (!compression)
+			return SR_MetaError;
+
+		if (*compression != "Disabled")
+			return kCompressionMode_PVR;
+		return kCompressionMode_Disabled;
+	}
+
+	// PC target
+	RAD_VERIFY(flags&P_TargetPC);
+	const String *compression = asset->entry->KeyValue<String>("Compression.DXT.Mode", flags);
+	if (!compression)
+		return SR_MetaError;
+
+	if (*compression != "Disabled")
+		return kCompressionMode_DXT;
+	return kCompressionMode_Disabled;
+}
 
 int TextureParser::SourceModifiedTime(
 	Engine &engine,
@@ -615,7 +642,7 @@ int TextureParser::Parsing(
 						return SR_MetaError;
 					tag.flags |= *b ? TextureTag::Filter : 0;
 					
-					// Test wrap/mipmap contraints on IOS.
+					// Test wrap/mipmap contraints on mobile devices.
 					if (tag.flags&(TextureTag::WrapS|TextureTag::WrapT|TextureTag::WrapR|TextureTag::Mipmap)) {
 						for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it) {
 							image_codec::Image::Ref &image = *it;
@@ -627,45 +654,11 @@ int TextureParser::Parsing(
 								if (frame.mipCount > 0) {
 									const image_codec::Mipmap &mip = frame.mipmaps[0];
 									if ((PowerOf2(mip.width) != mip.width) || (PowerOf2(mip.height) != mip.height)) {
-										COut(C_Warn) << "Error (iOS Target): " << asset->path.get() << " is not a power of 2 but is flagged for mipmap/wrap." << std::endl;
+										COut(C_Warn) << "Error (Mobile Target): " << asset->path.get() << " is not a power of 2 but is flagged for mipmap/wrap." << std::endl;
 										return SR_MetaError;
 									}
 								}
 							}
-						}
-					}
-				}
-
-				if (flags&P_TargetiOS) {
-					bool warn = false;
-
-					for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it) {
-						image_codec::Image::Ref &img = *it;
-
-						if (img->format == image_codec::Format_RGB888) {
-							m_header.format = image_codec::Format_RGBA8888;
-							
-							for (int i = 0; i < img->frameCount; ++i) {
-								image_codec::Frame &sf = img->frames[i];
-								for (int k = 0; k < sf.mipCount; ++k) {
-									image_codec::Mipmap &sm = sf.mipmaps[k];
-
-									U8 *data = (U8*)safe_zone_malloc(image_codec::ZImageCodec, sm.width*sm.height*4);
-									image_codec::ConvertPixelData(sm.data, sm.dataSize, data, 0, img->format, image_codec::Format_RGBA8888);
-									zone_free(sm.data);
-									sm.data = data;
-									sm.stride = sm.width*4;
-									sm.dataSize = sm.width*sm.height*4;
-								}
-							}
-
-							if (!warn) {
-								warn = true;
-								COut(C_Warn) << asset->path.get() << " expanded from RGB to RGBA for iOS target." << std::endl;
-							}
-							
-							img->format = image_codec::Format_RGBA8888;
-							img->bpp = 4;
 						}
 					}
 				}
@@ -687,6 +680,7 @@ int TextureParser::Parsing(
 				);
 			}
 			
+#if defined(RAD_OPT_PC_TOOLS)
 			if (r == SR_Success) {
 				r = Compress(
 					engine,
@@ -695,6 +689,7 @@ int TextureParser::Parsing(
 					flags
 				);
 			}
+#endif
 		}
 	}
 
@@ -837,130 +832,125 @@ int TextureParser::Mipmap(
 	if (!b)
 		return SR_MetaError;
 
+	if (!*b)
+		return SR_Success;
+
 	// Compression?
-	const String *s = asset->entry->KeyValue<String>("Compression", P_TARGET_FLAGS(flags));
+	int compressionMode = GetCompressionMode(asset, flags);
+	if (compressionMode < 0)
+		return compressionMode;
 
-	if (!s)
-		return SR_MetaError;
-
-	bool compressed = *s != "None" && (m_header.format == image_codec::Format_RGB888 || 
-									   m_header.format == image_codec::Format_RGBA8888);
-
-#if !defined(RAD_OPT_WIN)
-	if (!(flags&P_TargetiOS))
-		compressed = false;
-#endif
-	
-	if (compressed)
-		return SR_Success; // PVRTexLib generates mipmaps
-		
-	if (*b) {
-		int w = m_header.width;
-		int h = m_header.height;
-		int numMips = 1;
-
-		while (w > MinMipSize || h > MinMipSize) {
-			if (w > MinMipSize)
-				w >>= 1;
-			if (h > MinMipSize)
-				h >>= 1;
-			w = std::max<int>(w, MinMipSize);
-			h = std::max<int>(h, MinMipSize);
-			++numMips;
-		}
-		
-		if (m_header.numMips == numMips)
-			return SR_Success; // complete mipmaps provided.
-
-		m_header.numMips = numMips;
-
-		if (!(flags&(P_Load|P_Parse)))
-			return SR_Success;
-
-		if (numMips > 1) {
-			GLenum internal, format, type;
-			r::GLImageFormat(m_header.format, internal, format, type, GL_ALPHA);
-
-			// Use temp buffer as gluScaleImage corrupts memory (overruns)
-			// when non-power-of 2
-			// height+2: http://xscreensaver.sourcearchive.com/documentation/5.07-0ubuntu2/grab-ximage_8c-source.html
-
-			void *temp = safe_zone_malloc(
-				image_codec::ZImageCodec, 
-				PowerOf2(m_header.width)*
-				(PowerOf2(m_header.height)+2) *
-				m_images[0]->bpp
-			);
+	if ((compressionMode == kCompressionMode_DXT) ||
+		(compressionMode == kCompressionMode_PVR))
+		return SR_Success; // libraries generate mipmaps.
 			
-			for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it) {
-				image_codec::Image::Ref &img = *it;
-				image_codec::Image src;
-				src.Swap(*img);
+	int w = m_header.width;
+	int h = m_header.height;
+	int numMips = 1;
 
-				img->bpp = src.bpp;
-				img->format = src.format;
-				img->AllocateFrames(src.frameCount);
+	while (w > kMinMipSize || h > kMinMipSize) {
+		if (w > kMinMipSize)
+			w >>= 1;
+		if (h > kMinMipSize)
+			h >>= 1;
+		w = std::max<int>(w, kMinMipSize);
+		h = std::max<int>(h, kMinMipSize);
+		++numMips;
+	}
+		
+	if (m_header.numMips == numMips)
+		return SR_Success; // complete mipmaps provided.
 
-				for (int i = 0; i < src.frameCount; ++i) {
-					w = m_header.width;
-					h = m_header.height;
+	m_header.numMips = numMips;
 
-					if (src.frames[i].mipCount < 1 ||
-						src.frames[i].mipmaps[0].width != (UReg)w ||
-						src.frames[i].mipmaps[0].height != (UReg)h) {
-						return SR_InvalidFormat;
-					}
+	if (!(flags&(P_Load|P_Parse)))
+		return SR_Success;
 
-					img->AllocateMipmaps(i, numMips);
-					for (int m = 0; m < numMips; ++m) {
-						img->AllocateMipmap(i, m, w, h, w*src.bpp, w*h*src.bpp);
+	if (numMips > 1) {
+		GLenum internal, format, type;
+		r::GLImageFormat(m_header.format, internal, format, type, GL_ALPHA);
+
+		// Use temp buffer as gluScaleImage corrupts memory (overruns)
+		// when non-power-of 2
+		// height+2: http://xscreensaver.sourcearchive.com/documentation/5.07-0ubuntu2/grab-ximage_8c-source.html
+
+		void *temp = safe_zone_malloc(
+			image_codec::ZImageCodec, 
+			PowerOf2(m_header.width)*
+			(PowerOf2(m_header.height)+2) *
+			m_images[0]->bpp
+		);
+			
+		for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it) {
+			image_codec::Image::Ref &img = *it;
+			image_codec::Image src;
+			src.Swap(*img);
+
+			img->bpp = src.bpp;
+			img->format = src.format;
+			img->AllocateFrames(src.frameCount);
+
+			for (int i = 0; i < src.frameCount; ++i) {
+				w = m_header.width;
+				h = m_header.height;
+
+				if (src.frames[i].mipCount < 1 ||
+					src.frames[i].mipmaps[0].width != (UReg)w ||
+					src.frames[i].mipmaps[0].height != (UReg)h) {
+					return SR_InvalidFormat;
+				}
+
+				img->AllocateMipmaps(i, numMips);
+				for (int m = 0; m < numMips; ++m) {
+					img->AllocateMipmap(i, m, w, h, w*src.bpp, w*h*src.bpp);
 						
-						if (w == m_header.width && h == m_header.height) {
-							memcpy(
-								img->frames[i].mipmaps[m].data,
+					if (w == m_header.width && h == m_header.height) {
+						memcpy(
+							img->frames[i].mipmaps[m].data,
+							src.frames[i].mipmaps[0].data,
+							w*h*src.bpp
+						);
+					} else {
+						{
+							r::GLTable::Lock L(r::gl.mutex);
+							gluScaleImage(
+								format,
+								(GLint)m_header.width,
+								(GLint)m_header.height,
+								type,
 								src.frames[i].mipmaps[0].data,
-								w*h*src.bpp
-							);
-						} else {
-							{
-								r::GLTable::Lock L(r::gl.mutex);
-								gluScaleImage(
-									format,
-									(GLint)m_header.width,
-									(GLint)m_header.height,
-									type,
-									src.frames[i].mipmaps[0].data,
-									w,
-									h,
-									type,
-									temp
-								);
-							}
-
-							memcpy(
-								img->frames[i].mipmaps[m].data,
-								temp,
-								w*h*src.bpp
+								w,
+								h,
+								type,
+								temp
 							);
 						}
 
-						if (w > MinMipSize)
-							w >>= 1;
-						if (h > MinMipSize)
-							h >>= 1;
-
-						w = std::max<int>(w, MinMipSize);
-						h = std::max<int>(h, MinMipSize);
+						memcpy(
+							img->frames[i].mipmaps[m].data,
+							temp,
+							w*h*src.bpp
+						);
 					}
+
+					if (w > kMinMipSize)
+						w >>= 1;
+					if (h > kMinMipSize)
+						h >>= 1;
+
+					w = std::max<int>(w, kMinMipSize);
+					h = std::max<int>(h, kMinMipSize);
 				}
 			}
-
-			zone_free(temp);
 		}
+
+		zone_free(temp);
 	}
 
 	return SR_Success;
 }
+
+#if defined(RAD_OPT_PC_TOOLS)
 
 int TextureParser::Compress(
 	Engine &engine,
@@ -968,270 +958,64 @@ int TextureParser::Compress(
 	const pkg::Asset::Ref &asset,
 	int flags
 ) {
-#if defined(RAD_OPT_PC_TOOLS)
 	if ((flags&P_Unformatted) || 
 		(m_header.format != image_codec::Format_RGB888 &&
 		 m_header.format != image_codec::Format_RGBA8888)) {
 		return SR_Success;
 	}
 
-	// Compression?
-	const String *s = asset->entry->KeyValue<String>("Compression", P_TARGET_FLAGS(flags));
+	int compressionMode = GetCompressionMode(asset, flags);
+	if (compressionMode < 0)
+		return compressionMode;
 
-	if (!s)
-		return SR_MetaError;
+	if (compressionMode == kCompressionMode_Disabled)
+		return SR_Success; // no compression.
 
-	if (*s == "None")
-		return SR_Success;
+	// check various constraints so we get errors on any platform:
+	bool reqPOW2 = false;
+
+	const String *pvr = asset->entry->KeyValue<String>("Compression.PVR", P_TARGET_FLAGS(flags));
+	if (*pvr != "Disabled")
+		reqPOW2 = true;
+
+	const String *dxt = asset->entry->KeyValue<String>("Compression.DXT.Mode", P_TARGET_FLAGS(flags));
+	if (*dxt != "Disabled")
+		reqPOW2 = true;
+
+	const String *atitc = asset->entry->KeyValue<String>("Compression.ATITC", P_TARGET_FLAGS(flags));
+	if (*atitc != "Disabled")
+		reqPOW2 = true;
+
+	const String *etc = asset->entry->KeyValue<String>("Compression.ETC", P_TARGET_FLAGS(flags));
+	if (*etc != "Disabled")
+		reqPOW2 = true;
+
+	if (reqPOW2) {
+		if (!IsPowerOf2(m_header.width) || 
+			!IsPowerOf2(m_header.height)) {
+			COut(C_Error) << "Error: " << asset->path.get() << " is flagged for compression but is not a power of two. " << std::endl;
+			return SR_MetaError;
+		}
 	
-	if (!IsPowerOf2(m_header.width) || 
-		!IsPowerOf2(m_header.height)) {
-		COut(C_Error) << "Error: " << asset->path.get() << " is flagged for DXT/PVR compression but is not a power of two. " << std::endl;
-		return SR_MetaError;
-	}
-	
-	if (m_header.width != m_header.height) {
-		if (flags&P_TargetiOS) {
-			COut(C_Error) << "Error: " << asset->path.get() << " is flagged for DXT/PVR compression but is not square. " << std::endl;
+		if (m_header.width != m_header.height) {
+			// this is over pedantic because only PVR really requires this, and maybe etc?
+			COut(C_Error) << "Error: " << asset->path.get() << " is flagged for compression but is not square. " << std::endl;
 			return SR_MetaError;
 		}
 	}
-		
-	// Mipmap?
-	const bool *b = asset->entry->KeyValue<bool>("Mipmap", P_TARGET_FLAGS(flags));
-	if (!b)
-		return SR_MetaError;
-	
-	int numMips = 1;
-	
-	if (*b) {
-		int w = m_header.width;
-		int h = m_header.height;
-		
-		while (w > MinMipSize || h > MinMipSize) {
-			if (w > MinMipSize)
-				w >>= 1;
-			if (h > MinMipSize)
-				h >>= 1;
-			w = std::max<int>(w, MinMipSize);
-			h = std::max<int>(h, MinMipSize);
-			++numMips;
-		}
-	}
 
-	int format;
-	EPVRTPixelFormat pvrFormat=ePVRTPF_RGBG8888;
-	
-	{
-		if (m_images.empty())
-			return SR_InvalidFormat;
-		const image_codec::Image::Ref &img = m_images[0];
+	RAD_VERIFY(compressionMode != kCompressionMode_Default);
 
-		if (flags&P_TargetiOS) {	
-			if (*s == "DXT1/PVR2" ||
-				*s == "DXT3/PVR2" ||
-				*s == "DXT5/PVR2") {
-				pvrFormat = (img->bpp==4) ? ePVRTPF_PVRTCI_2bpp_RGBA : ePVRTPF_PVRTCI_2bpp_RGB;
-				format = (img->bpp==4) ? image_codec::dds::Format_PVR2A : image_codec::dds::Format_PVR2;
-			} else {
-				pvrFormat = (img->bpp==4) ? ePVRTPF_PVRTCI_4bpp_RGBA : ePVRTPF_PVRTCI_4bpp_RGB;
-				format = (img->bpp==4) ? image_codec::dds::Format_PVR4A : image_codec::dds::Format_PVR4;
-			}
-		} else {
-#if !defined(RAD_OPT_WIN)
-			COut(C_Warn) << "Warning: " << asset->path.get() << " is flagged for DXT compression but a compressor is not available on this platform. Compression setting ignored." << std::endl;
-			return SR_Success;
-#endif
-			if (*s == "DXT1/PVR2" ||
-				*s == "DXT1/PVR4") {
-				pvrFormat = ePVRTPF_DXT1;
-				format = img->bpp==4 ? image_codec::dds::Format_DXT1A : image_codec::dds::Format_DXT1;
-			} else if (*s == "DXT3/PVR2" || *s == "DXT3/PVR4") {
-				pvrFormat = ePVRTPF_DXT3;
-				format = image_codec::dds::Format_DXT3;
-			} else {
-				pvrFormat = ePVRTPF_DXT5;
-				format = image_codec::dds::Format_DXT5;
-			}
-		}
-	}
-	m_header.format = format;
-	m_header.numMips = numMips;
-
-	if (!(flags&(P_Load|P_Parse)))
-		return SR_Success;
-
-	U8 *temp = 0;
-
-	String sQuality(CStr("HQ"));
-	if (flags&P_FastCook)
-		sQuality = CStr("LQ");
-
-	for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it) {
-		image_codec::Image::Ref &img = *it;
-		image_codec::Image src;
-		src.Swap(*img);
-		img->bpp = 0;
-		img->format = format;
-
-		COut(C_Info) << "Compressing " << asset->path.get() << " (" << 
-			m_header.width << "x" << m_header.height << "x" << src.bpp << ") as " << sQuality << " " << *s << std::endl;
-				
-		img->AllocateFrames(src.frameCount);
-		for (int i = 0; i < src.frameCount; ++i) {
-			const image_codec::Frame &sf = src.frames[i];
-			if (sf.mipCount < 1)
-				continue;
-			const image_codec::Mipmap &sm = sf.mipmaps[0];
-
-			switch (format) {
-			case image_codec::dds::Format_DXT1:
-			case image_codec::dds::Format_DXT1A:
-			case image_codec::dds::Format_DXT3:
-			case image_codec::dds::Format_DXT5:
-			case image_codec::dds::Format_PVR2:
-			case image_codec::dds::Format_PVR2A:
-			case image_codec::dds::Format_PVR4:
-			case image_codec::dds::Format_PVR4A:
-				{
-					if (!temp)
-						temp = (U8*)safe_zone_malloc(image_codec::ZImageCodec, sm.width*sm.height*4);
-
-					U8 *data = (U8*)sm.data;
-					if (src.bpp != 4) {
-						image_codec::ConvertPixelData(
-							sm.data, 
-							sm.dataSize, 
-							temp, 
-							0, 
-							src.format, 
-							image_codec::Format_RGBA8888
-						);
-						data = temp;
-					}
-
-					CPVRTextureHeader pvrHeader(
-						(uint64)PVRStandard8PixelType.PixelTypeID,
-						(uint32)sm.width,
-						(uint32)sm.height,
-						(uint32)1,
-						(uint32)1,
-						(uint32)1,
-						(uint32)1,
-						ePVRTCSpacelRGB,
-						ePVRTVarTypeUnsignedByteNorm,
-						false // not-premultiplied.
-					);
-
-					CPVRTexture pvrTex(
-						pvrHeader,
-						data
-					);
-
-					if (numMips > 1) {
-						if (!GenerateMIPMaps(pvrTex, eResizeCubic, numMips)) {
-							COut(C_Error) << "PVRTexLib failure: failed to create mimaps!" << std::endl;
-							return SR_CompilerError;
-						}
-					}
-
-					ECompressorQuality quality = ePVRTCBest;
-					if (flags&P_FastCook)
-						quality = ePVRTCFast;
-
-					if (!Transcode(pvrTex, pvrFormat, ePVRTVarTypeUnsignedByteNorm, ePVRTCSpacelRGB, quality, false)) {
-						COut(C_Error) << "PVRTexLib failure: failed to compress texture!" << std::endl;
-						return SR_CompilerError;
-					}
-
-					if (ExtractPVR(engine, i, pvrTex, *img) != SR_Success) {
-						if (temp)
-							zone_free(temp);
-						COut(C_Error) << "PVRTexLib compression failure: failed to extract PVR texture data!" << std::endl;
-						return SR_CompilerError;
-					}
-				}
-				break;
-			}
-		}
-
-		AddrSize srcSize=0;
-		AddrSize dstSize=0;
-
-		for (int i = 0; i < src.frameCount; ++i) {
-			for (int m = 0; m < src.frames[i].mipCount; ++m) {
-				srcSize += src.frames[i].mipmaps[m].dataSize;
-				dstSize += img->frames[i].mipmaps[m].dataSize;
-			}
-		}
-
-		SizeBuffer sa, sb;
-		FormatSize(sa, srcSize);
-		FormatSize(sb, dstSize);
-
-		COut(C_Info) << "Compressed " << asset->path.get() << " (" << 
-			m_header.width << "x" << m_header.height << "x" << src.bpp << ") @ " << sa << " to (" << 
-			img->frames[0].mipmaps[0].width << "x" << img->frames[0].mipmaps[0].height << ") @ " << sb << " as " << *s << std::endl;
-	}
-
-	if (temp)
-		zone_free(temp);
-
-#endif // defined(RAD_OPT_PC_TOOLS)
-	return SR_Success;
-}
-	
-#if defined(RAD_OPT_PC_TOOLS)
-int TextureParser::ExtractPVR(
-	Engine &engine,
-	int frame,
-	CPVRTexture &src,
-	image_codec::Image &img
-) {
-	const U8 *data = (const U8*)src.getDataPtr();
-	const CPVRTextureHeader &header = src.getHeader();
-
-	int numMips = header.getNumMIPLevels();
-		
-	img.AllocateMipmaps(frame, numMips);
-	
-	int w = (int)src.getWidth();
-	int h = (int)src.getHeight();
-	
-	for (int m = 0; m < numMips; ++m) {
-		image_codec::Mipmap &mip = img.frames[frame].mipmaps[m];
-		AddrSize blockSize = 0;
-		
-		// What format?
-		switch (src.getPixelType().PixelTypeID) {
-			case ePVRTPF_PVRTCI_2bpp_RGB:
-			case ePVRTPF_PVRTCI_2bpp_RGBA:
-				blockSize = std::max<AddrSize>(w/8,2)*std::max<AddrSize>(h/4,2)*8;
-				break;
-			case ePVRTPF_PVRTCI_4bpp_RGB:
-			case ePVRTPF_PVRTCI_4bpp_RGBA:
-				blockSize = std::max<AddrSize>(w/4,2)*std::max<AddrSize>(h/4,2)*8;
-				break;
-			case ePVRTPF_DXT1:
-			case ePVRTPF_DXT2:
-				blockSize = std::max<AddrSize>((w*h/16)*8, 8);
-				break;
-			case ePVRTPF_DXT3:
-			case ePVRTPF_DXT4:
-			case ePVRTPF_DXT5:
-				blockSize = std::max<AddrSize>((w*h/16)*16, 16);
-				break;
-		}
-		
-		img.AllocateMipmap(frame, m, w, h, 0, blockSize);
-		memcpy(mip.data, data, blockSize);
-		data += blockSize;
-		w = std::max(w>>1, 1);
-		h = std::max(h>>1, 1);
+	switch (compressionMode) {
+	case kCompressionMode_DXT:
+		return CompressDXT(engine, time, asset, flags);
+	case kCompressionMode_PVR:
+		return CompressPVR(engine, time, asset, flags);
 	}
 
 	return SR_Success;
 }
+
 #endif
 
 #endif // defined(RAD_OPT_TOOLS)

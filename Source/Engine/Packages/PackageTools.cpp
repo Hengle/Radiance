@@ -152,6 +152,26 @@ bool Package::Entry::AddKey(const KeyVal::Ref &key, bool applyDefault) {
 	return p.second;
 }
 
+int Package::Entry::TryAddKey(const KeyVal::Ref &key, bool applyDefault) {
+	std::pair<KeyVal::Map::iterator, bool> p =
+		m_keys.insert(KeyVal::Map::value_type(key->path, key));
+
+	if (p.second) { // inserted
+		if (!key->def) // lookup def
+			key->def = FindKeyDef(key->name, key->path, false);
+
+		if (!key->def || !key->def->val.Valid())
+			return -1;
+
+		if (!key->val.Valid() && applyDefault)
+			key->val = key->def->val;
+		
+		MapImport(key);
+	}
+
+	return p.second ? 1 : 0;
+}
+
 KeyVal::Ref Package::Entry::FindKey(const char *path, int &plat) const {
 	String sPath(path);
 
@@ -248,7 +268,8 @@ void Package::Entry::MapImport(const KeyVal::Ref &key) {
 
 KeyDef::Ref Package::Entry::FindKeyDef(
 	const String &name,
-	const String &path
+	const String &path,
+	bool allowDefault
 ) const {
 	KeyDef::Ref def;
 	KeyDef::Map::iterator itDef = m_defs->find(path);
@@ -267,7 +288,7 @@ KeyDef::Ref Package::Entry::FindKeyDef(
 		def = itDef->second;
 	}
 
-	if (!def) {
+	if (!def && allowDefault) {
 		def = pkg->pkgMan->DefaultKeyDef();
 	}
 
@@ -755,7 +776,9 @@ void PackageMan::ParseEntry(
 		if (sub) {
 			ParseEntry(pkg, fullName, entry, key, *sub);
 		} else { // assign value.
-			entry->AddKey(key, true);
+
+			if (entry->TryAddKey(key, true) < 0)
+				continue;
 
 			if (static_cast<const lua_Number*>(it->second) != 0) { 
 				// convert to ints

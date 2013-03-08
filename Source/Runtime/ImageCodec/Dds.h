@@ -30,6 +30,10 @@ enum
 	_Format_PVR2A, // PowerVR 2BPP+A
 	_Format_PVR4, // PowerVR 4BPP
 	_Format_PVR4A, // PowerVR 4BPP+A
+	_Format_ATC_RGB, // ATITC RGB
+	_Format_ATC_RGBA_Explicit, // ATITC explicit alpha
+	_Format_ATC_RGBA_Interpolated, // ATITC interpolated alpha
+	_Format_ETC_ETC1, // RGB compressed format
 
 	Format_DXT1 = RAD_IMAGECODEC_DDSFORMAT(_Format_DXT1),
 	Format_DXT1A = RAD_IMAGECODEC_DDSFORMAT(_Format_DXT1A),
@@ -42,6 +46,12 @@ enum
 	Format_PVR2A = RAD_IMAGECODEC_DDSFORMAT(_Format_PVR2A),
 	Format_PVR4  = RAD_IMAGECODEC_DDSFORMAT(_Format_PVR4),
 	Format_PVR4A = RAD_IMAGECODEC_DDSFORMAT(_Format_PVR4A),
+
+	Format_ATC_RGB  = RAD_IMAGECODEC_DDSFORMAT(_Format_ATC_RGB),
+	Format_ATC_RGBA_Explicit = RAD_IMAGECODEC_DDSFORMAT(_Format_ATC_RGBA_Explicit),
+	Format_ATC_RGBA_Interpolated  = RAD_IMAGECODEC_DDSFORMAT(_Format_ATC_RGBA_Interpolated),
+
+	Format_ETC_ETC1 = RAD_IMAGECODEC_DDSFORMAT(_Format_ETC_ETC1),
 
 	// NOTE: These formats are not supported by pixel conversion routines!
 	Format_FP16 = RAD_IMAGECODEC_DDSFORMAT(_Format_FP16),

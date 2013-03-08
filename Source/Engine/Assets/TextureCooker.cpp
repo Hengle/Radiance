@@ -17,7 +17,7 @@ namespace asset {
 
 BOOST_STATIC_ASSERT(sizeof(TextureTag)==1);
 
-TextureCooker::TextureCooker() : Cooker(1) {
+TextureCooker::TextureCooker() : Cooker(2) {
 }
 
 TextureCooker::~TextureCooker() {
