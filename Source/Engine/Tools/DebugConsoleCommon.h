@@ -16,7 +16,7 @@ enum {
 	kDebugConsoleNetServerVersion = 1,
 	kDebugConsoleNetPort = 33331,
 	kDebugConsoleNetBroadcastPort = kDebugConsoleNetPort + 1,
-	kDebugConsoleNetMaxCommandLen = 4*Meg,
+	kDebugConsoleNetMaxCommandLen = 4*kMeg,
 	kDebugConsoleBroadcastPacketSize = 512,
 	kDebugConsoleServerBroadcastFreq = 500,
 	kDebugConsoleServerExpiry = kDebugConsoleServerBroadcastFreq*3

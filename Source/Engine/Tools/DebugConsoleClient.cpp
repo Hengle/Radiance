@@ -179,7 +179,7 @@ StringVec DebugConsoleClient::GetCVarList() {
 	z = recv(*m_sd, (char*)&cmds[0], sizeof(U32), MSG_WAITALL);
 	if (z >= 0) {
 		// sanity check
-		if (cmds[0] < Meg) {
+		if (cmds[0] < kMeg) {
 			void *data = safe_zone_malloc(ZTools, cmds[0]);
 			z = recv(*m_sd, (char*)data, (int)cmds[0], MSG_WAITALL);
 			if (z >= 0) {

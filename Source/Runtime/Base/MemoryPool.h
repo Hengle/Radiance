@@ -1,6 +1,6 @@
 // MemoryPool.h
 // Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Steve Nowalk
+// Author: Steve Nowalk & Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
 #pragma once
@@ -20,106 +20,162 @@
 
 #include "../PushPack.h"
 
-//////////////////////////////////////////////////////////////////////////////////////////
-
-class MemoryPool : public boost::noncopyable
-{
+//! Memory pool efficiently batches small memory allocations into large ones
+//! effectively reducing memory fragmentation.
+class MemoryPool : public boost::noncopyable {
 public:
 
-	typedef void (*ChunkConstructor)(void* chunk);
-	typedef void (*ChunkDestructor) (void* chunk);
-	typedef void (*WalkCallback) (void* chunk);
-
+	typedef void (*ChunkCallback)(void* chunk);
+	
+	//! Default constructs the pool, Create() must be called
+	//! before the pool can be used.
 	MemoryPool();
+	
+	//! Initializes the pool (no memory is allocated initially). \sa Create()
 	MemoryPool(
 		Zone &zone, 
 		const char* name, 
 		AddrSize chunkSize, 
-		UReg growSize, 
-		int alignment = DefaultAlignment, 
-		UReg maxSize = std::numeric_limits<UReg>::max()
+		int numChunksInBlock, 
+		int chunkAlignment = kDefaultAlignment, 
+		int maxChunks = std::numeric_limits<int>::max()
 	);
 
+	//! Calls Destroy() if the memory pool was initialized.
 	~MemoryPool();
 
-	//
-	// "name" is the name.
-	// "chunkSize" is the size of each chunk.
-	// "growSize" is the number of chunks to grow when space is exhausted.
-	// "maxSize" is the maximum number of objects.
-	//
-
+	//! Initializes the pool (no memory is allocated initially).
+	/*! \param zone The memory zone used for allocations.
+	    \param name The name of the pool (for debugging).
+		\param chunkSize The size of the individual chunks that will be returned
+		                 by the pool when requested.
+		\param numChunksInBlock How many chunks should be allocated in a single block.
+		                This block will be allocated from zone memory.
+		\param chunkAlignment The minimum alignment of the memory chunks returned by the
+		                 pool.
+		\param maxChunks The maximum number of allocated chunks (not blocks).
+	 */
 	void Create(
 		Zone &zone, 
 		const char* name, 
 		AddrSize chunkSize, 
-		UReg growSize, 
-		int alignment = DefaultAlignment, 
-		UReg maxSize = std::numeric_limits<UReg>::max()
+		int numChunksInBlock, 
+		int chunkAlignment = kDefaultAlignment, 
+		int maxChunks = std::numeric_limits<int>::max()
 	);
 
-	void Destroy(WalkCallback usedChunkCallback = 0);
-	void Reset(WalkCallback usedChunkCallback = 0);
-	void Compact();
-	void Delete(WalkCallback usedChunkCallback = 0);
-	void WalkUsed(WalkCallback usedChunkCallback);
+	//! Destroys the pool, freeing all memory used.
+	/*! All memory is released, Create() must be called to reinitialize. 
+		\param usedChunkCallback optional function is executed on each used chunk before
+		       memory is released.
+	 */
+	void Destroy(ChunkCallback usedChunkCallback = 0);
 
+	//! All used chunks are reset and marked as free.
+	/*! \param usedChunkCallback optional function is executed on each used chunk before
+	           it is marked as free.
+	 */
+	void Reset(ChunkCallback usedChunkCallback = 0);
+
+	//! Frees all used memory.
+	/*! \param usedChunkCallback optional function is executed on each used chunk before
+		       memory is released.
+	 */
+	void Delete(ChunkCallback usedChunkCallback = 0);
+
+	//! Calls the specified callback routine on each used chunk.
+	void WalkUsed(ChunkCallback usedChunkCallback);
+
+	//! Frees any blocks that have no used chunks.
+	void Compact();
+
+	//! Returns a chunk of memory, or NULL if the maximum number of allocated chunks
+	//! have been used.
 	void* GetChunk();
+
+	//! Returns a chunk of memory. If the maximum number of allocated chunks has been
+	//! reached the application terminates with an error.
 	void* SafeGetChunk();
 
+	//! Returns a chunk of memory to the pool, marking it as free. It will be
+	//! reused on a future call to GetChunk() or SafeGetChunk().
 	void ReturnChunk(void* pT);
 
 #if defined (RAD_OPT_MEMPOOL_DEBUG)
+	//! Validates a chunk of memory from a memory pool.
 	static void AssertChunkIsValid(void *pT);
 #endif
 
-	UReg NumUsedChunks() const;
-	UReg NumAllocatedChunks() const;
+	RAD_DECLARE_READONLY_PROPERTY(MemoryPool, numUsedChunks, int);
+	RAD_DECLARE_READONLY_PROPERTY(MemoryPool, numAllocatedChunks, int);
+	RAD_DECLARE_READONLY_PROPERTY(MemoryPool, numChunksInBlock, int);
+	RAD_DECLARE_READONLY_PROPERTY(MemoryPool, maxChunks, int);
 
-	UReg GrowSize() const;
-	UReg MaxSize() const;
+	void SetChunkConstructor(ChunkCallback c);
+	void SetChunkDestructor (ChunkCallback  d);
 
-	void SetChunkConstructor(ChunkConstructor c);
-	void SetChunkDestructor (ChunkDestructor  d);
-
-	static MemoryPool *PoolFromUserData(void *p);
+	static MemoryPool *PoolFromChunk(void *chunk);
 
 private:
 
 	struct Pool;
 	struct PoolNode;
 
-	enum { PoolAlignment = DefaultAlignment };
+	enum { 
+		kPoolAlignment = kDefaultAlignment 
+	};
 
-	struct PoolNode
-	{
+	struct PoolNode {
 	
 #if defined (RAD_OPT_MEMPOOL_DEBUG)
 		enum { MagicId = RAD_FOURCC_LE('M','E','P','N') };
-		int m_magicID;
+		U32 m_magicID;
 #endif
 
 		Pool*       m_pool;
 		PoolNode*   m_next;
-		bool        m_used;
+		U8          m_used;
 	};
 
-	struct RADRT_CLASS Pool
-	{
-		static AddrSize	CalculateMemorySize(UReg inArraySize, AddrSize inDataSize, int alignment);
+	struct RADRT_CLASS Pool {
+		
+		static AddrSize	CalculateMemorySize(
+			AddrSize inArraySize, 
+			AddrSize inDataSize, 
+			AddrSize alignment
+		);
 
-		AddrSize Create(UReg inArraySize,AddrSize chunkSize,void* pBaseAddr,PoolNode** inFreeHead);
-		void Destroy(UReg inArraySize,ChunkDestructor destructor, WalkCallback callback);
+		AddrSize Create(
+			AddrSize inArraySize, 
+			AddrSize chunkSize, 
+			void* pBaseAddr, 
+			PoolNode** inFreeHead
+		);
+		
+		void Destroy(
+			AddrSize inArraySize, 
+			ChunkCallback destructor, 
+			ChunkCallback callback
+		);
 
-		void Reset(UReg inArraySize,PoolNode** inFreeHead, ChunkDestructor destructor, WalkCallback callback);
-		void WalkUsed(UReg inArraySize,WalkCallback callback);
+		void Reset(
+			AddrSize inArraySize, 
+			PoolNode** inFreeHead, 
+			ChunkCallback destructor, 
+			ChunkCallback callback
+		);
+
+		void WalkUsed(
+			AddrSize inArraySize, 
+			ChunkCallback callback
+		);
 
 #if defined (RAD_OPT_MEMPOOL_DEBUG)
 		enum { MagicId = RAD_FOURCC_LE('M','E','M','P') };
-		int m_magicID;
+		U32 m_magicID;
 #endif
 
-		UReg         m_numNodesInUse;
+		AddrSize     m_numNodesInUse;
 		void*        m_array;
 		Pool*        m_next;
 		MemoryPool * m_memPool;
@@ -135,121 +191,206 @@ private:
 	static void AssertPoolNodeIsValid(PoolNode *node);
 #endif
 
-	enum { MaxNameLen = 31 };
+	enum { 
+		kMaxNameLen = 31 
+	};
 
-	bool                        m_inited;
-	char                        m_name[MaxNameLen+1];
-	UReg                        m_growSize;
-	UReg                        m_maxSize;
-	AddrSize                    m_dataSize;
-	UReg                        m_numUsedObjects;
-	UReg                        m_numAllocatedObjects;
-	Pool*                       m_poolList;
-	PoolNode*                   m_freeList;
-	ChunkConstructor            m_constructor;
-	ChunkDestructor             m_destructor;
-	int                         m_alignment;
-	AddrSize                    m_offsetToNext;
-	Zone*                       m_zone;
+	RAD_DECLARE_GET(numUsedChunks, int) {
+		return m_numUsedChunks;
+	}
+
+	RAD_DECLARE_GET(numAllocatedChunks, int) {
+		return m_numAllocatedChunks;
+	}
+	
+	RAD_DECLARE_GET(numChunksInBlock, int) {
+		return m_numChunksInBlock;
+	}
+
+	RAD_DECLARE_GET(maxChunks, int) {
+		return m_maxChunks;
+	}
+	
+	AddrSize      m_chunkSize;
+	AddrSize      m_offsetToNext;
+	Zone*         m_zone;
+	Pool*         m_poolList;
+	PoolNode*     m_freeList;
+	ChunkCallback m_constructor;
+	ChunkCallback m_destructor;
+	
 #if defined(RAD_OPT_MEMPOOL_DEBUG)
-	thread::Interlocked<UReg>   m_concurrencyCheck;
+	thread::Interlocked<int> m_concurrencyCheck;
 #endif
+
+	int m_numChunksInBlock;
+	int m_maxChunks;
+	int m_numUsedChunks;
+	int m_numAllocatedChunks;
+	int m_alignment;
+		 
+	bool m_inited;
+	char m_name[kMaxNameLen+1];
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class RADRT_CLASS ThreadSafeMemoryPool : public boost::noncopyable
-{
+//! Memory pool efficiently batches small memory allocations into large ones
+//! effectively reducing memory fragmentation.
+/*! This class is identical to MemoryPool except that it is thread-safe. */
+class RADRT_CLASS ThreadSafeMemoryPool : public boost::noncopyable {
 public:
 
+	//! Default constructs the pool, Create() must be called
+	//! before the pool can be used.
 	ThreadSafeMemoryPool();
+
+	//! Initializes the pool (no memory is allocated initially). \sa Create()
 	ThreadSafeMemoryPool(
 		Zone &zone, 
 		const char* name, 
 		AddrSize chunkSize, 
-		UReg growSize, 
-		int alignment = DefaultAlignment, 
-		UReg maxSize = std::numeric_limits<UReg>::max()
+		int numChunksInBlock, 
+		int chunkAlignment = kDefaultAlignment, 
+		int maxChunks = std::numeric_limits<int>::max()
 	);
+
+	//! Calls Destroy() if the pool was initialized.
 	~ThreadSafeMemoryPool();
 
-	//
-	// "name" is the name.
-	// "chunkSize" is the size of each chunk.
-	// "growSize" is the number of chunks to grow when space is exhausted.
-	// "maxSize" is the maximum number of objects.
-	//
-
+	//! Initializes the pool (no memory is allocated initially).
+	/*! \param zone The memory zone used for allocations.
+	    \param name The name of the pool (for debugging).
+		\param chunkSize The size of the individual chunks that will be returned
+		                 by the pool when requested.
+		\param numChunksInBlock How many chunks should be allocated in a single block.
+		                This block will be allocated from zone memory.
+		\param chunkAlignment The minimum alignment of the memory chunks returned by the
+		                 pool.
+		\param maxChunks The maximum number of allocated chunks (not blocks).
+	 */
 	void Create(
 		Zone &zone,
 		const char* name, 
 		AddrSize chunkSize, 
-		UReg growSize, 
-		int alignment = DefaultAlignment, 
-		UReg maxSize = std::numeric_limits<UReg>::max()
+		int numChunksInBlock, 
+		int chunkAlignment = kDefaultAlignment, 
+		int maxChunks = std::numeric_limits<int>::max()
 	);
 
-	void Destroy(MemoryPool::WalkCallback usedChunkCallback = 0);
+	//! Destroys the pool, freeing all memory used.
+	/*! All memory is released, Create() must be called to reinitialize. 
+		\param usedChunkCallback optional function is executed on each used chunk before
+		       memory is released.
+	 */
+	void Destroy(MemoryPool::ChunkCallback usedChunkCallback = 0);
 
-	void Reset(MemoryPool::WalkCallback usedChunkCallback = 0);
+	//! All used chunks are reset and marked as free.
+	/*! \param usedChunkCallback optional function is executed on each used chunk before
+	           it is marked as free.
+	 */
+	void Reset(MemoryPool::ChunkCallback usedChunkCallback = 0);
+
+	//! Frees all used memory.
+	/*! \param usedChunkCallback optional function is executed on each used chunk before
+		       memory is released.
+	 */
+	void Delete(MemoryPool::ChunkCallback usedChunkCallback = 0);
+
+	//! Calls the specified callback routine on each used chunk.
+	void WalkUsed(MemoryPool::ChunkCallback callback);
+
+	//! Frees any blocks that have no used chunks.
 	void Compact();
-	void Delete(MemoryPool::WalkCallback usedChunkCallback = 0);
-	void WalkUsed(MemoryPool::WalkCallback callback);
 
+	//! Returns a chunk of memory. If the maximum number of allocated chunks have been
+	//! reached the application terminates with an error.
 	void *GetChunk();
+
+	//! Returns a chunk of memory. If the maximum number of allocated chunks has been
+	//! reached the application terminates with an error.
 	void *SafeGetChunk();
 
+	//! Returns a chunk of memory to the pool, marking it as free. It will be
+	//! reused on a future call to GetChunk() or SafeGetChunk().
 	void ReturnChunk(void* pT);
 
-	UReg NumUsedChunks() const;
-	UReg NumAllocatedChunks() const;
+	RAD_DECLARE_READONLY_PROPERTY(ThreadSafeMemoryPool, numUsedChunks, int);
+	RAD_DECLARE_READONLY_PROPERTY(ThreadSafeMemoryPool, numAllocatedChunks, int);
+	RAD_DECLARE_READONLY_PROPERTY(ThreadSafeMemoryPool, numChunksInBlock, int);
+	RAD_DECLARE_READONLY_PROPERTY(ThreadSafeMemoryPool, maxChunks, int);
 
-	UReg GrowSize() const;
-	UReg MaxSize() const;
+	void SetChunkConstructor(MemoryPool::ChunkCallback c);
+	void SetChunkDestructor (MemoryPool::ChunkCallback  d);
 
-	void SetChunkConstructor(MemoryPool::ChunkConstructor c);
-	void SetChunkDestructor (MemoryPool::ChunkDestructor  d);
-
-	static ThreadSafeMemoryPool *PoolFromUserData(void *p);
+	static ThreadSafeMemoryPool *PoolFromChunk(void *chunk);
 
 private:
 
 	typedef boost::mutex Mutex;
 	typedef boost::lock_guard<Mutex> Lock;
 
+	RAD_DECLARE_GET(numUsedChunks, int) {
+		Lock L(m_m);
+		return m_pool.numUsedChunks;
+	}
+
+	RAD_DECLARE_GET(numAllocatedChunks, int) {
+		Lock L(m_m);
+		return m_pool.numAllocatedChunks;
+	}
+	
+	RAD_DECLARE_GET(numChunksInBlock, int) {
+		Lock L(m_m);
+		return m_pool.numChunksInBlock;
+	}
+
+	RAD_DECLARE_GET(maxChunks, int) {
+		Lock L(m_m);
+		return m_pool.maxChunks;
+	}
+
 	MemoryPool m_pool;
-	Mutex m_cs;
+	mutable Mutex m_m;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-template <typename Tag, typename _Zone, UReg ChunkSize, UReg _GrowSize, UReg _MaxSize, int Alignment, typename Pool>
+template <
+	typename Tag, 
+	typename _Zone, 
+	AddrSize ChunkSize, 
+	int _NumChunksInBlock, 
+	int _MaxChunks, 
+	int Alignment, 
+	typename Pool
+>
 class SingletonPool : boost::noncopyable
 {
 public:
 
-	static void Destroy(MemoryPool::WalkCallback usedChunkCallback = 0);
+	static void Destroy(MemoryPool::ChunkCallback usedChunkCallback = 0);
+	static void Reset(MemoryPool::ChunkCallback usedChunkCallback = 0);
+	static void Delete(MemoryPool::ChunkCallback usedChunkCallback = 0);
+	static void WalkUsed(MemoryPool::ChunkCallback callback);
 
-	static void Reset(MemoryPool::WalkCallback usedChunkCallback = 0);
 	static void Compact();
-	static void Delete(MemoryPool::WalkCallback usedChunkCallback = 0);
-	static void WalkUsed(MemoryPool::WalkCallback callback);
 
 	static void *GetChunk();
 	static void *SafeGetChunk();
 
 	static void ReturnChunk(void* pT);
 
-	static UReg NumUsedChunks();
-	static UReg NumAllocatedChunks();
+	static int NumUsedChunks();
+	static int NumAllocatedChunks();
 
-	static UReg GrowSize();
-	static UReg MaxSize();
+	static int NumChunksInBlock();
+	static int MaxChunks();
 
-	static void SetChunkConstructor(MemoryPool::ChunkConstructor c);
-	static void SetChunkDestructor (MemoryPool::ChunkDestructor  d);
+	static void SetChunkConstructor(MemoryPool::ChunkCallback c);
+	static void SetChunkDestructor (MemoryPool::ChunkCallback  d);
 
-	static Pool *PoolFromUserData(void *p);
+	static Pool *PoolFromChunk(void *p);
 
 private:
 
@@ -264,8 +405,7 @@ private:
 struct pool_allocator_tag {};
 
 template <typename T, typename _Zone, UReg GrowSize, UReg MaxSize, int Alignment, typename Pool>
-class pool_allocator
-{
+class pool_allocator {
 public:
 	typedef pool_allocator<T, _Zone, GrowSize, MaxSize, Alignment, Pool> self_type;
 	typedef _Zone zone_type;
@@ -290,8 +430,7 @@ public:
 	static const_pointer address(const_reference s) { return &s; }
 	static size_type max_size()	{ return (std::numeric_limits<size_type>::max)(); }
 	static void construct(const pointer ptr, const value_type & t) { new (ptr) T(t); }
-	static void destroy(const pointer ptr)
-	{
+	static void destroy(const pointer ptr) {
 		ptr->~T();
 		(void) ptr;
 	}
@@ -299,16 +438,14 @@ public:
 	bool operator==(const pool_allocator<T, _Zone, GrowSize, MaxSize, Alignment, Pool> &) const { return true; }
 	bool operator!=(const pool_allocator<T, _Zone, GrowSize, MaxSize, Alignment, Pool> &) const { return false; }
 
-	static pointer allocate(const size_type n)
-	{
+	static pointer allocate(const size_type n) {
 		RAD_ASSERT(n==1);
 		return (pointer)pool_type::SafeGetChunk();
 	}
 
 	static pointer allocate(const size_type n, const void * const) { return allocate(n); }
 
-	static void deallocate(const pointer ptr, const size_type n)
-	{
+	static void deallocate(const pointer ptr, const size_type n) {
 #ifdef BOOST_NO_PROPER_STL_DEALLOCATE
 		if (ptr == 0 || n == 0)
 			return;

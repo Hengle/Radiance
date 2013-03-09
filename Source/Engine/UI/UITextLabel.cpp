@@ -245,7 +245,7 @@ int TextLabel::lua_AllocateText(lua_State *L) {
 
 	if (lua_type(L, 2) == LUA_TTABLE) {
 
-		typedef stackify<std::vector<const char*>, 64> StringPtrVec;
+		typedef stackify<zone_vector<const char*, ZUIT>::type, 64> StringPtrVec;
 		StringPtrVec v;
 
 		for (int i = 0; ; ++i) {

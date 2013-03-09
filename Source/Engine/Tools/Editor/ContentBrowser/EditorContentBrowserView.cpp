@@ -270,7 +270,7 @@ m_inTick(false),
 m_tickRedraw(false)
 {
 	m_resolution = MainWindow::Get()->userPrefs->value("contentBrowser/resolution", 1).toInt();
-	m_font.setPixelSize(10);
+//	m_font.setPixelSize(10); // this causes Qt to crash in renderText wtf
 
 	QGridLayout *l = new (ZEditor) QGridLayout(this);
 	
@@ -1468,7 +1468,7 @@ void ContentBrowserView::OnRenderGL(GLWidget&)
 
 				m_glw->renderText(
 					info.x+info.w/2-info.tw/2, 
-					r.y[0]+r.y[1]+VLabelBorder+VLabelBorder/2+fh/2+1,
+					r.y[0]+r.y[1]+VLabelBorder+VLabelBorder/2+fh/2+2,
 					0.0,
 					asset->path.get(),
 					m_font

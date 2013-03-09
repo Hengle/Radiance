@@ -151,7 +151,7 @@ public:
 	MMFileInputBufferRef OpenInputBuffer(
 		const char *path,
 		::Zone &zone,
-		AddrSize mappedSize = 8*Meg,
+		AddrSize mappedSize = 8*kMeg,
 		FileOptions options = kFileOptions_None,
 		int mask = kFileMask_Any,
 		int exclude = 0,
@@ -509,7 +509,7 @@ public:
 	
 	MMFileInputBuffer(
 		const MMFile::Ref &file,
-		AddrSize mappedSize = 8*Meg,
+		AddrSize mappedSize = 8*kMeg,
 		::Zone &zone = ZFile
 	);
 

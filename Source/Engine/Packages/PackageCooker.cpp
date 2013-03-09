@@ -1562,7 +1562,7 @@ bool Cooker::CopyOutputFile(const char *src, const char *dst) {
 	file::MMFileInputBuffer::Ref ib = engine->sys->files->OpenInputBuffer(
 		src,
 		ZPackages,
-		8*Meg,
+		8*kMeg,
 		file::kFileOptions_None,
 		~file::kFileMask_PakFiles
 	);

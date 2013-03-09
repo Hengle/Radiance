@@ -18,7 +18,7 @@ class TextureThumb : public ContentAssetThumb {
 public:
 
 	enum {
-		kMaxCacheSize = 16*Meg,
+		kMaxCacheSize = 16*kMeg,
 		kMaxLoading = 16
 	};
 

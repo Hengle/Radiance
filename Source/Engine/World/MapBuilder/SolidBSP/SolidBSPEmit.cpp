@@ -18,7 +18,7 @@ namespace solid_bsp {
 
 namespace {
 enum {
-	kMaxBatchElements = Kilo*64
+	kMaxBatchElements = kKilo*64
 };
 }
 

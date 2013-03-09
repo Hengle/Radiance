@@ -11,15 +11,15 @@
 
 RADRT_API void RADRT_CALL FormatSize(SizeBuffer& buffer, AddrSize size)
 {
-	if (size < Kilo)
+	if (size < kKilo)
 	{
 		sprintf(buffer, "%i byte(s)", (U32)size);
 	}
-	else if (size < Meg)
+	else if (size < kMeg)
 	{
 		sprintf(buffer, "%.3f KB(s)", (F32)size / Constants<float>::Kilo());
 	}
-	else if (size < Gig)
+	else if (size < kGig)
 	{
 		sprintf(buffer, "%.3f MB(s)", (F32)size / Constants<float>::Meg());
 	}

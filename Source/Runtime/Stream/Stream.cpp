@@ -78,7 +78,7 @@ public:
 
 UReg InputStream::PipeToStream(OutputStream& outputStream, SPos* bytesRead, SPos numBytesToPipe, PipeFlags pipeFlags)
 {
-	const int SIZE = Kilo*16;
+	const int SIZE = kKilo*16;
 	S8 bytes[SIZE];
 	Pump np;
 

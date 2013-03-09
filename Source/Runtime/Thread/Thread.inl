@@ -76,7 +76,7 @@ inline Thread *Fiber::RAD_IMPLEMENT_GET(thread)
 #endif
 
 inline Thread::Thread(AddrSize stackSize) :
-m_imp(stackSize != Default ? stackSize : 4*Meg)
+m_imp(stackSize != Default ? stackSize : 4*kMeg)
 {
 }
 
@@ -87,7 +87,7 @@ inline Thread::~Thread()
 
 inline void Thread::Create(AddrSize stackSize)
 {
-	m_imp.Create(stackSize != Default ? stackSize : 4*Meg);
+	m_imp.Create(stackSize != Default ? stackSize : 4*kMeg);
 }
 
 inline bool Thread::Run(IThreadContext *context)

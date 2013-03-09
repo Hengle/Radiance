@@ -87,7 +87,7 @@ public:
 	typedef physics::CachedCubicBZSpline<8> Spline;
 
 	struct Step {
-		typedef stackify<std::vector<Step>, 8> Vec;
+		typedef stackify<zone_vector<Step, ZWorldT>::type, 8> Vec;
 		Spline path;
 		physics::CubicBZSpline spline;
 		int waypoints[2];
@@ -221,7 +221,7 @@ public:
 private:
 
 	struct WalkStep {
-		typedef stackify<std::vector<WalkStep>, 64> Vec;
+		typedef stackify<zone_vector<WalkStep, ZWorldT>::type, 64> Vec;
 		Vec3 pos;
 		int tri;
 		int connection;
@@ -259,7 +259,7 @@ private:
 
 	//! A step in a planned move
 	struct MoveStep {
-		typedef stackify<std::vector<MoveStep>, 64> Vec;
+		typedef stackify<zone_vector<MoveStep, ZWorldT>::type, 64> Vec;
 		int waypoint;
 		int connection;
 	};

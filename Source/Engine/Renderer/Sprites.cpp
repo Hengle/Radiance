@@ -53,17 +53,13 @@ void SpriteBatch::Init(int minSprites, int maxSprites) {
 	if (m_maxSprites < 1)
 		m_maxSprites = kMaxSprites;
 
-	UReg maxSize = std::numeric_limits<UReg>::max();
-	if (maxSprites > 0)
-		maxSize = maxSprites * sizeof(Sprite);
-	
 	m_p.Create(
 		ZRender,
 		"spritebatch",
 		sizeof(Sprite),
 		64,
-		DefaultAlignment,
-		maxSize
+		kDefaultAlignment,
+		(maxSprites > 0) ? maxSprites : std::numeric_limits<int>::max()
 	);
 }
 

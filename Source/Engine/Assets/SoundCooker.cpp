@@ -71,7 +71,7 @@ int SoundCooker::Compile(int flags) {
 	if (os.Write(&header, sizeof(header), 0) != sizeof(header))
 		return SR_IOError;
 
-	enum { BlockSize = 8*Kilo };
+	enum { BlockSize = 8*kKilo };
 	char block[BlockSize];
 
 	AddrSize size = 0;

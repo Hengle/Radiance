@@ -23,8 +23,8 @@ enum {
 	kMaxSimultaneousSounds = 32,
 	kDefaultReferenceDistance = 50,
 	kDefaultMaxDistance = 150,
-	kStreamingBufferSize = 16*Kilo,
-	kMaxBytesDecodedPerTick = Kilo
+	kStreamingBufferSize = 16*kKilo,
+	kMaxBytesDecodedPerTick = kKilo
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -503,7 +503,7 @@ bool Sound::InitStreaming(
 	asset::MusicParser *parser = asset::MusicParser::Cast(asset);
 	if (!parser || !parser->file.get())
 		return false;
-	m_ib.reset(new (ZSound) file::MMFileInputBuffer(parser->file, 256*Kilo, ZSound));
+	m_ib.reset(new (ZSound) file::MMFileInputBuffer(parser->file, 256*kKilo, ZSound));
 	m_is = new (ZMusic) stream::InputStream(*m_ib);
 	if (!m_is)
 		return false;

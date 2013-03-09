@@ -10,8 +10,8 @@
 #include "IntContainer.h"
 #include <memory>
 
-template <typename T, size_t TNumElms>
-class stack_allocator : public std::allocator<T> {
+template <typename T, size_t TNumElms, typename TFallbackAllocator >
+class stack_allocator : public TFallbackAllocator {
 public:
 	typedef T value_type;
 	typedef value_type *pointer;
@@ -20,19 +20,20 @@ public:
 	typedef const value_type &const_reference;
 	typedef AddrSize size_type;
 	typedef SAddrSize difference_type;
+	typedef TFallbackAllocator fallback_allocator;
 
 	class buffer {
 	public:
 		buffer() : used(false) {}
 	private:
-		friend class stack_allocator<T, TNumElms>;
+		friend class stack_allocator<T, TNumElms, fallback_allocator >;
 		typedef aligned_block<sizeof(T[TNumElms]), RAD_ALIGNOF(T)> block_type;
 		block_type block;
 		bool used;
 	};
 
 	template <typename U>
-	struct rebind { typedef stack_allocator<U, TNumElms> other; };
+	struct rebind { typedef stack_allocator<U, TNumElms, typename fallback_allocator::rebind<U>::other > other; };
 
 	stack_allocator(const stack_allocator &other) : m_storage(other.m_storage) {
 	}
@@ -42,7 +43,7 @@ public:
 	
 	// The following is not explicit, mimicking std::allocator [20.4.1]
 	template <typename U>
-	stack_allocator(const stack_allocator<U, TNumElms> &) : m_storage(0) {
+	stack_allocator(const stack_allocator<U, TNumElms, typename fallback_allocator::rebind<U>::other> &) : m_storage(0) {
 	}
 
 	static pointer address(reference r) { return &r; }
@@ -62,7 +63,7 @@ public:
 			m_storage->used = true;
 			return (pointer)m_storage->block.data;
 		} else {
-			return std::allocator<T>::allocate(n, 0);
+			return TFallbackAllocator::allocate(n, 0);
 		}
 	}
 
@@ -78,7 +79,7 @@ public:
 		if (m_storage && (((const pointer)m_storage->block.data) == ptr)) {
 			m_storage->used = false;
 		} else {
-			std::allocator<T>::deallocate(ptr, n);
+			TFallbackAllocator::deallocate(ptr, n);
 		}
 	}
 

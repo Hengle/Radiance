@@ -70,15 +70,15 @@ void throw_exception(const std::exception &) {
 
 RADRT_API void RADRT_CALL DebugString(const char* message, ...)
 {
-	enum { MaxSize = 32*Kilo };
-	char dbgString[MaxSize];
+	enum { kMaxSize = 32*kKilo };
+	char dbgString[kMaxSize];
 	va_list arglist;
 	int count;
 
 	va_start(arglist, message);
 	count = ::string::vscprintf(message, arglist);
-	if (count > MaxSize)
-		count = MaxSize;
+	if (count > kMaxSize)
+		count = kMaxSize;
 
 	::string::vsnprintf(dbgString, count, message, arglist);
 	va_end(arglist);

@@ -105,10 +105,10 @@ bool Writer::Begin(U32 sig, U32 magic, stream::OutputStream &stream)
 Writer::Lump* Writer::WriteLump(const char* name, const void* data, AddrSize dataSize, LOfs alignment)
 {
 	RAD_ASSERT_MSG(m_active, "Please Begin() this lmp writer before writing entries!");
-	RAD_ASSERT(m_stream->OutPos() < MaxLOfs);
+	RAD_ASSERT(m_stream->OutPos() < kMaxLOfs);
 	RAD_ASSERT((alignment > 0) && IsPowerOf2(alignment));
 
-	if (string::len(name) > MaxLumpNameLen)
+	if (string::len(name) > kMaxLumpNameLen)
 	{
 		return 0;
 	}
@@ -211,10 +211,10 @@ Writer::Lump* Writer::LumpForName(const char* name)
 
 bool Writer::End()
 {
-	U8 nulls[LumpTagAlignment-1];
-	memset(nulls, 0, LumpTagAlignment-1);
+	U8 nulls[kLumpTagAlignment-1];
+	memset(nulls, 0, kLumpTagAlignment-1);
 
-	RAD_ASSERT(m_stream->OutPos() <= MaxLOfs);
+	RAD_ASSERT(m_stream->OutPos() <= kMaxLOfs);
 	LOfs dirStart = (LOfs)m_stream->OutPos();
 
 	// write out how many lumps there are...
@@ -234,7 +234,7 @@ bool Writer::End()
 		}
 
 		U32 nameLen = (U32)l->m_name.length+1;
-		RAD_ASSERT(nameLen <= MaxU16);
+		RAD_ASSERT(nameLen <= kMaxU16);
 
 		if (!m_stream->Write((U16)nameLen, 0) ||  // name length (including null) (2 bytes)
 			(m_stream->Write(l->m_name.c_str.get(), nameLen, 0) != nameLen))   // name data (plus null)
@@ -244,7 +244,7 @@ bool Writer::End()
 
 		nameLen += 14; // the 14 bytes of header we wrote before the name.
 
-		U32 aligned = (nameLen + (LumpTagAlignment-1)) & ~(LumpTagAlignment-1);
+		U32 aligned = (nameLen + (kLumpTagAlignment-1)) & ~(kLumpTagAlignment-1);
 
 		// pad to LumpTagAlignment alignment!
 		if (nameLen != aligned)
@@ -258,7 +258,7 @@ bool Writer::End()
 			if (m_stream->Write(l->m_tagData, l->m_tagSize, 0) != l->m_tagSize) 
 				return false;
 
-			aligned = (l->m_tagSize + (LumpTagAlignment-1)) & ~(LumpTagAlignment-1);
+			aligned = (l->m_tagSize + (kLumpTagAlignment-1)) & ~(kLumpTagAlignment-1);
 
 			// pad to LumpTagAlignment alignment!
 			if (l->m_tagSize != aligned)
@@ -309,7 +309,7 @@ U32 Writer::NumLumps() const
 // data_codec::lmp::StreamReader
 //////////////////////////////////////////////////////////////////////////////////////////
 
-StreamReader::Lump::Lump() : m_info(0), m_name(0), m_tagData(0), m_idx(MaxU32)
+StreamReader::Lump::Lump() : m_info(0), m_name(0), m_tagData(0), m_idx(kMaxU32)
 {
 }
 
@@ -486,10 +486,10 @@ void StreamReader::SetupLumps(EndianMode endianMode)
 		lump->m_name = (const char*)(rawLump + 14);
 
 		// aligned to LumpTagAlignment bytes....
-		nameLen = (nameLen + 14 + (LumpTagAlignment-1)) & ~(LumpTagAlignment-1);
+		nameLen = (nameLen + 14 + (kLumpTagAlignment-1)) & ~(kLumpTagAlignment-1);
 		rawLump += nameLen;
 
-		alignedTagSize = (lump->m_info->tagSize + (LumpTagAlignment-1)) & ~(LumpTagAlignment-1);
+		alignedTagSize = (lump->m_info->tagSize + (kLumpTagAlignment-1)) & ~(kLumpTagAlignment-1);
 
 		if (alignedTagSize)
 		{

@@ -1046,7 +1046,7 @@ void PackageMan::EnumeratePackage(
 	file::MMFileInputBuffer::Ref ib = m_engine.sys->files->OpenInputBuffer(
 		path.c_str,
 		ZPackages,
-		1*Meg,
+		1*kMeg,
 		file::kFileOptions_None,
 		file::kFileMask_Base
 	);
@@ -1063,7 +1063,7 @@ void PackageMan::EnumeratePackage(
 	lua::State::Ref L = InitLua();
 
 	{
-		typedef lua::StreamLoader<8*Kilo, lua::StackMemTag> Loader;
+		typedef lua::StreamLoader<8*kKilo, lua::StackMemTag> Loader;
 		stream::InputStream is(*ib);
 
 		Loader loader(is);
@@ -1192,7 +1192,7 @@ int PackageMan::PackageSize(const String &path) {
 	file::MMFileInputBuffer::Ref ib = m_engine.sys->files->OpenInputBuffer(
 		(path + ".idx").c_str,
 		ZPackages,
-		1*Kilo,
+		1*kKilo,
 		file::kFileOptions_None,
 		file::kFileMask_Base
 	);

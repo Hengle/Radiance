@@ -89,9 +89,9 @@ inline int VertsPerSecond(xtime::MicroTimer &timer, int numVerts) {
 
 void SIMDSkinTest(std::ostream &out) {
 	enum {
-		kNumVerts = 64*Kilo,
+		kNumVerts = 64*kKilo,
 		kNumBones = 256,
-		kMultiplier = (2*Meg) / kNumVerts
+		kMultiplier = (2*kMeg) / kNumVerts
 	};
 	xtime::MicroTimer refTime, simdTime;
 	SkinTestData skinData;

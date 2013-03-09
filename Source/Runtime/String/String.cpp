@@ -680,7 +680,7 @@ String &String::Printf_valist(const char *fmt, va_list args) {
 	int len = vscprintf(wfmt.c_str.get(), args);
 	if (len > 1) { // > 1 because NULL is counted
 		// do as wchars for UTF support.
-		bool stack = (len*sizeof(wchar_t)) < (4*Kilo);
+		bool stack = (len*sizeof(wchar_t)) < (4*kKilo);
 		wchar_t *wchars;
 		if (stack) {
 			wchars = (wchar_t*)stack_alloc(len*sizeof(wchar_t));

@@ -354,7 +354,7 @@ bool GLSLShader::CompileShaderSource(
 #endif
 
 String GLSLShader::ShaderLog(GLhandleARB s) {
-	enum { MaxLen = Kilo*8 };
+	enum { MaxLen = kKilo*8 };
 	char sz[MaxLen];
 	gl.GetInfoLogARB(s, MaxLen, 0, sz);
 	return String(sz);
@@ -436,7 +436,7 @@ bool GLSLShader::LoadPass(
 	U32 programLength[2];
 	is >> programLength[0] >> programLength[1];
 	U32 maxLength = std::max(programLength[0], programLength[1]);
-	if (maxLength > 64*Kilo)
+	if (maxLength > 64*kKilo)
 		return false; // size check
 	
 	char *source = (char*)stack_alloc(maxLength);

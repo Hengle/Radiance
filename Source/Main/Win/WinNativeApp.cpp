@@ -307,27 +307,6 @@ bool NativeApp::PreInit() {
 		}
 
 #if defined(RAD_OPT_GL)
-		HWND hWnd = CreateWindowA(
-			"rad_openGL_ini", 
-			"", 
-			WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
-			dm.dmPosition.x,
-			dm.dmPosition.y,
-			100,
-			100,
-			0,
-			0,
-			s_hInstance,
-			0
-		);
-
-		if (!hWnd) {
-			COut(C_Error) << "ERROR: Unable to create device window!" << std::endl;
-			return false;
-		}
-
-		HDC dc = GetDC(hWnd);
-
 		if (multiSample) {
 
 			int maxSamples = 0;
@@ -348,7 +327,7 @@ bool NativeApp::PreInit() {
 
 			// Enumerate all pixel formats, find highest multi-sample count
 			for (int k = 1; ; ++k) { // PF's are 1 based
-				if (!wglGetPixelFormatAttribivARB(dc, k, PFD_MAIN_PLANE, 9, reqAttribs, attribs))
+				if (!wglGetPixelFormatAttribivARB(wglDC, k, PFD_MAIN_PLANE, 9, reqAttribs, attribs))
 					break;
 				if (attribs[0] != TRUE)
 					continue;
@@ -377,53 +356,13 @@ bool NativeApp::PreInit() {
 			dd->m_maxMSAA = maxSamples;
 		}
 
-		// create a GL context and query for anisotropy.
-		{ // basic context is fine.
-			int attribs[] = {
-				WGL_SUPPORT_OPENGL_ARB, TRUE,
-				WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
-				WGL_DRAW_TO_WINDOW_ARB, TRUE,
-				WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB,
-				WGL_DOUBLE_BUFFER_ARB, TRUE,
-				WGL_COLOR_BITS_ARB, 24,
-				WGL_RED_BITS_ARB, 8,
-				WGL_GREEN_BITS_ARB, 8,
-				WGL_BLUE_BITS_ARB, 8,
-				WGL_ALPHA_BITS_ARB, 8,
-				WGL_DEPTH_BITS_ARB, 24,
-				WGL_STENCIL_BITS_ARB, 8,
-				0
-			};
-
-			int pfi;
-			UINT num;
-			if (wglChoosePixelFormatARB(dc, attribs, 0, 1, &pfi, &num)) {
-				PIXELFORMATDESCRIPTOR pfd;
-				if (DescribePixelFormat(dc, pfi, sizeof(PIXELFORMATDESCRIPTOR), &pfd)) {
-					pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
-					pfd.nVersion = 1;
-					if (SetPixelFormat(dc, pfi, &pfd)) {
-						HGLRC glrc = wglCreateContext(dc);
-						if (glrc) {
-							if (wglMakeCurrent(dc, glrc)) {
-								const char *glExt = (const char *)glGetString(GL_EXTENSIONS);
-								if (glExt && string::strstr(glExt, "GL_EXT_texture_filter_anisotropic")) {
-									GLint maxAnisotropy;
-									glGetIntegerv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy);
-									dd->m_maxAnisotropy = maxAnisotropy;
-								}
-								wglMakeCurrent(wglDC, wglRC);
-							}
-							wglDeleteContext(glrc);
-						}
-					}
-				}
-			}
-
-			ReleaseDC(hWnd, dc);
-			DestroyWindow(hWnd);
+		const char *glExt = (const char *)glGetString(GL_EXTENSIONS);
+		if (glExt && string::strstr(glExt, "GL_EXT_texture_filter_anisotropic")) {
+			GLint maxAnisotropy;
+			glGetIntegerv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy);
+			dd->m_maxAnisotropy = maxAnisotropy;
 		}
-
+		
 #endif
 
 		m_displayDevices.push_back(_dd);

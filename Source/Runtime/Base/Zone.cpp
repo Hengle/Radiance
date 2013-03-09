@@ -213,6 +213,8 @@ void Zone::Dec(AddrSize size, AddrSize overhead) {
 #if defined(NEED_LOCKS)
 	Lock L(GetMutex());
 #endif
+	RAD_ASSERT(m_numBytes >= size);
+	RAD_ASSERT(m_overhead >= overhead);
 	m_numBytes -= size;
 	m_overhead -= overhead;
 }

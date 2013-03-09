@@ -8,6 +8,7 @@
 #include "../StringBase.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////
+
 #if defined(RAD_OPT_MEMPOOL_DEBUG)
 #define MP_ASSERT(_x) RAD_VERIFY(_x)
 #define MP_DEBUG_ONLY(_x) _x
@@ -20,13 +21,13 @@ MemoryPool::MemoryPool() :
 m_zone(0), 
 m_poolList(0), 
 m_freeList(0), 
-m_numUsedObjects(0), 
-m_numAllocatedObjects(0)
+m_numUsedChunks(0), 
+m_numAllocatedChunks(0)
 #if defined(RAD_OPT_MEMPOOL_DEBUG)
 , m_concurrencyCheck(0)
 #endif
 {
-	string::ncpy(m_name, "uninited", MaxNameLen+1);
+	string::ncpy(m_name, "uninited", kMaxNameLen+1);
 	m_inited = false;
 }
 
@@ -34,15 +35,15 @@ MemoryPool::MemoryPool(
 	Zone &zone,
 	const char* name,
 	AddrSize chunkSize,
-	UReg growSize,
-	int alignment,
-	UReg maxSize
+	int numChunksInBlock,
+	int chunkAlignment,
+	int maxChunks
 ) : 
 m_zone(0), 
 m_poolList(0), 
 m_freeList(0), 
-m_numUsedObjects(0), 
-m_numAllocatedObjects(0)
+m_numUsedChunks(0), 
+m_numAllocatedChunks(0)
 #if defined(RAD_OPT_MEMPOOL_DEBUG)
 , m_concurrencyCheck(0)
 #endif
@@ -53,157 +54,154 @@ m_numAllocatedObjects(0)
 		zone,
 		name,
 		chunkSize,
-		growSize,
-		alignment,
-		maxSize
+		numChunksInBlock,
+		chunkAlignment,
+		maxChunks
 	);
 }
 
-MemoryPool::~MemoryPool()
-{
-	if (m_poolList)
-	{
+MemoryPool::~MemoryPool() {
+	if (m_poolList) {
 		RAD_ASSERT(m_inited);
 		Destroy();
 	}
 	RAD_VERIFY(!m_poolList);
-	RAD_VERIFY(m_numUsedObjects == 0);
-	RAD_VERIFY(m_numAllocatedObjects == 0);
+	RAD_VERIFY(m_numUsedChunks == 0);
+	RAD_VERIFY(m_numAllocatedChunks == 0);
+}
+
+inline void* MemoryPool::UserDataFromPoolNode(PoolNode *node) {
+	return reinterpret_cast<U8*>(node) + sizeof(PoolNode);
+}
+
+inline MemoryPool::PoolNode* MemoryPool::PoolNodeFromUserData(void *data) {
+	return (PoolNode*)(reinterpret_cast<U8*>(data) - sizeof(PoolNode));
 }
 
 void MemoryPool::Create(
 	Zone &zone, 
 	const char* name, 
-	AddrSize inDataSize, 
-	UReg inGrowSize, 
-	int alignment, 
-	UReg inMaxSize
-)
-{
+	AddrSize chunkSize, 
+	int numChunksInBlock, 
+	int chunkAlignment, 
+	int maxChunks
+) {
 	MP_ASSERT(!m_inited);
-	MP_ASSERT(inDataSize > 0);
-	MP_ASSERT(alignment >= PoolAlignment);
-	BOOST_STATIC_ASSERT((int)MemoryPool::PoolAlignment >= (int)DefaultAlignment);
+	MP_ASSERT(chunkSize > 0);
+	BOOST_STATIC_ASSERT((int)MemoryPool::kPoolAlignment >= (int)kDefaultAlignment);
+
+	chunkAlignment = std::max<int>(chunkAlignment, kPoolAlignment);
 
 	m_inited = true;
 
-	string::ncpy(m_name, name, MaxNameLen+1);
+	string::ncpy(m_name, name, kMaxNameLen+1);
 
 	m_zone                  = &zone;
-	m_growSize              = inGrowSize;
-	m_maxSize               = inMaxSize;
-	m_dataSize              = inDataSize;
-	m_numUsedObjects        = 0;
-	m_numAllocatedObjects   = 0;
+	m_numChunksInBlock      = numChunksInBlock;
+	m_maxChunks             = maxChunks;
+	m_chunkSize             = chunkSize;
+	m_numUsedChunks         = 0;
+	m_numAllocatedChunks    = 0;
 	m_poolList              = NULL;
 	m_freeList              = NULL;
 	m_constructor           = NULL;
 	m_destructor            = NULL;
-	m_alignment             = alignment;
+	m_alignment             = chunkAlignment;
 #if defined(RAD_OPT_MEMPOOL_DEBUG)
-	m_offsetToNext          = Align<AddrSize>(sizeof(PoolNode) + inDataSize + sizeof(UReg), alignment);
+	// +sizeof(U32) is for overwrite buffer (underwrite buffer is inside PoolNode)
+	m_offsetToNext = Align<AddrSize>(
+		sizeof(PoolNode) + chunkSize + sizeof(U32), chunkAlignment
+	);
 #else
-	m_offsetToNext          = Align<AddrSize>(sizeof(PoolNode) + inDataSize, alignment);
+	m_offsetToNext = Align<AddrSize>(sizeof(PoolNode) + chunkSize, chunkAlignment);
 #endif
 }
 
-void MemoryPool::Destroy(WalkCallback callback)
-{
+void MemoryPool::Destroy(ChunkCallback callback) {
 	MP_ASSERT(m_inited);
-
 	Delete(callback);
-
 	m_inited = false;
 }
 
-void MemoryPool::Delete(WalkCallback callback)
+void MemoryPool::Delete(ChunkCallback callback)
 {
 	MP_ASSERT(m_inited);
 	Pool* pool = m_poolList;
 
-	if (m_numUsedObjects == 0) callback = 0; // no callback!
+	if (m_numUsedChunks == 0) 
+		callback = 0; // no callback!
 
-	while (pool)
-	{	
+	while (pool) {	
 		Pool* next = pool->m_next;
 
-		pool->Destroy(m_growSize,m_destructor,callback);
+		pool->Destroy((AddrSize)m_numChunksInBlock, m_destructor, callback);
 		zone_free(pool);
 
 		pool = next;
 	}
 
-	m_numUsedObjects = 0;
-	m_numAllocatedObjects = 0;
+	m_numUsedChunks = 0;
+	m_numAllocatedChunks = 0;
 
 	m_poolList = NULL;
 	m_freeList = NULL;
 }
 
-void MemoryPool::Reset(WalkCallback callback)
+void MemoryPool::Reset(ChunkCallback callback)
 {
 	MP_ASSERT(m_inited);
 	
-	if (m_numUsedObjects == 0) callback = 0; // no callback!
+	if (m_numUsedChunks == 0) 
+		callback = 0; // no callback!
 
 	m_freeList = NULL;
 
 	Pool* pool = m_poolList;
 
-	while (pool)
-	{
-		pool->Reset(m_growSize,&m_freeList,m_destructor,callback);
-
+	while (pool) {
+		pool->Reset((AddrSize)m_numChunksInBlock, &m_freeList, m_destructor, callback);
 		pool = pool->m_next;
 	}
 
-	m_numUsedObjects = 0;
+	m_numUsedChunks = 0;
 }
 
-void MemoryPool::WalkUsed(WalkCallback callback)
-{
+void MemoryPool::WalkUsed(ChunkCallback callback) {
 	MP_ASSERT(callback);
 	MP_ASSERT(m_inited);
 
 	Pool* pool = m_poolList;
 
-	while (pool)
-	{
-		pool->WalkUsed(m_growSize, callback);
+	while (pool) {
+		pool->WalkUsed((AddrSize)m_numChunksInBlock, callback);
 		pool = pool->m_next;
 	}
 }
 
-void MemoryPool::Compact()
-{
+void MemoryPool::Compact() {
 	MP_ASSERT(m_inited);
 
 	Pool* pool		= m_poolList;
 	Pool* previous	= NULL;
 
-	while (pool)
-	{
+	while (pool) {
 		Pool* next = pool->m_next;
 
-		if (pool->m_numNodesInUse == 0)
-		{
-			m_numAllocatedObjects -= m_growSize;
-			m_numUsedObjects -= pool->m_numNodesInUse;
+		if (pool->m_numNodesInUse == 0) {
+			RAD_ASSERT(m_numAllocatedChunks >= m_numChunksInBlock);
+			m_numAllocatedChunks -= m_numChunksInBlock;
+			RAD_ASSERT((AddrSize)m_numUsedChunks >= pool->m_numNodesInUse);
+			m_numUsedChunks -= pool->m_numNodesInUse;
 
-			pool->Destroy(m_growSize,m_destructor,0);
+			pool->Destroy(m_numChunksInBlock, m_destructor, 0);
 			zone_free(pool);
 
-			if (previous)
-			{
+			if (previous) {
 				previous->m_next = next;
-			}
-			else
-			{
+			} else {
 				m_poolList = next;
 			}
-		}
-		else
-		{
+		} else {
 			previous = pool;
 		}
 
@@ -215,15 +213,11 @@ void MemoryPool::Compact()
 	m_freeList = 0;
 	pool = m_poolList;
 
-	while (pool)
-	{
-		if (pool->m_numNodesInUse < m_growSize)
-		{
-			for (UReg i = 0; i < m_growSize; ++i)
-			{
+	while (pool) {
+		if (pool->m_numNodesInUse < (AddrSize)m_numChunksInBlock) {
+			for (AddrSize i = 0; i < (AddrSize)m_numChunksInBlock; ++i) {
 				PoolNode *node = (PoolNode*)(((U8*)pool->m_array) + (i*m_offsetToNext));
-				if (!node->m_used)
-				{
+				if (!node->m_used) {
 					node->m_next = m_freeList;
 					m_freeList = node;
 				}
@@ -234,15 +228,13 @@ void MemoryPool::Compact()
 	}
 }
 
-void* MemoryPool::SafeGetChunk()
-{
+void* MemoryPool::SafeGetChunk() {
 	void* n = GetChunk();
 	RAD_OUT_OF_MEM(n);
 	return n;
 }
 
-void* MemoryPool::GetChunk()
-{
+void* MemoryPool::GetChunk() {
 	MP_ASSERT(m_inited);
 	MP_ASSERT(++m_concurrencyCheck == 1);
 
@@ -250,42 +242,53 @@ void* MemoryPool::GetChunk()
 	// Is our list of pool nodes empty?
 	//
 
-	if (!m_freeList)
-	{
+	if (!m_freeList) {
 		//
 		// Have we hit our ceiling?
 		//
 
-		if (m_numAllocatedObjects >= m_maxSize)
-		{
+		if (m_numAllocatedChunks >= m_maxChunks) {
 			MP_ASSERT(--m_concurrencyCheck == 0);
 			return NULL;
 		}
 
-		AddrSize	totalBytes = Pool::CalculateMemorySize(m_growSize, m_dataSize, m_alignment);
-		AddrSize	nStart;
-		AddrSize	nEnd;
+		AddrSize totalBytes = Pool::CalculateMemorySize(
+			(AddrSize)m_numChunksInBlock, 
+			m_offsetToNext, 
+			(AddrSize)m_alignment
+		);
 
-		Pool* newPool = (Pool*)safe_zone_malloc(*m_zone, totalBytes, 0, PoolAlignment);
+		AddrSize nStart;
+		AddrSize nEnd;
+
+		Pool* newPool = (Pool*)safe_zone_malloc(*m_zone, totalBytes, 0, kPoolAlignment);
 		newPool->m_memPool = this;
 
 		nStart	= ((AddrSize)newPool) + sizeof(Pool);
-		nEnd	= newPool->Create(m_growSize, m_dataSize, (void*)nStart, &m_freeList);
+		nEnd	= newPool->Create(
+			(AddrSize)m_numChunksInBlock, 
+			m_chunkSize, 
+			(void*)nStart, 
+			&m_freeList
+		);
 
 		Pool *oldPool = newPool;
-		newPool = (Pool*)safe_zone_realloc(*m_zone, newPool, nEnd - ((AddrSize)newPool), 0, PoolAlignment);
+		newPool = (Pool*)safe_zone_realloc(
+			*m_zone, 
+			newPool, 
+			nEnd - ((AddrSize)newPool), 
+			0, 
+			kPoolAlignment
+		);
 
 		// adjust free list pointers if address changed
-		if (newPool != oldPool)
-		{
+		if (newPool != oldPool) {
 			newPool->m_array = (void*)(((AddrSize)newPool->m_array - (AddrSize)oldPool) + (AddrSize)newPool);
 			m_freeList = (PoolNode*)(((AddrSize)m_freeList - (AddrSize)oldPool) + (AddrSize)newPool);
 			PoolNode *node = m_freeList;
-			while (node)
-			{
+			while (node) {
 				node->m_pool = (Pool*)(((AddrSize)node->m_pool - (AddrSize)oldPool) + (AddrSize)newPool);
-				if (node->m_next)
-				{
+				if (node->m_next) {
 					node->m_next = (PoolNode*)(((AddrSize)node->m_next - (AddrSize)oldPool) + (AddrSize)newPool);
 				}
 				MP_DEBUG_ONLY(AssertPoolNodeIsValid(node));
@@ -297,7 +300,7 @@ void* MemoryPool::GetChunk()
 		newPool->m_next = m_poolList;
 		m_poolList = newPool;
 
-		m_numAllocatedObjects += m_growSize;
+		m_numAllocatedChunks += m_numChunksInBlock;
 	}
 
 	//
@@ -314,7 +317,7 @@ void* MemoryPool::GetChunk()
 	m_freeList = m_freeList->m_next;
 
 	node->m_pool->m_numNodesInUse++;
-	m_numUsedObjects++;
+	m_numUsedChunks++;
 	MP_DEBUG_ONLY(AssertPoolNodeIsValid(node));
 	MP_ASSERT(!node->m_used);
 	node->m_used = true;
@@ -327,8 +330,7 @@ void* MemoryPool::GetChunk()
 	return UserDataFromPoolNode(node);
 }
 
-void MemoryPool::ReturnChunk(void* userData)
-{
+void MemoryPool::ReturnChunk(void* userData) {
 	if (!m_inited) // this can happen during static destruction from a doexit chain.
 		return;
 
@@ -355,16 +357,15 @@ void MemoryPool::ReturnChunk(void* userData)
 	m_freeList = node;
 
 	node->m_pool->m_numNodesInUse--;
-	m_numUsedObjects--;
+	m_numUsedChunks--;
 
 	MP_ASSERT(--m_concurrencyCheck == 0);
 }
 
-MemoryPool* MemoryPool::PoolFromUserData(void *userData)
-{
-	MP_ASSERT(userData);
+MemoryPool* MemoryPool::PoolFromChunk(void *chunk) {
+	MP_ASSERT(chunk);
 
-	PoolNode* node = PoolNodeFromUserData(userData);
+	PoolNode* node = PoolNodeFromUserData(chunk);
 
 	RAD_ASSERT(node);
 	RAD_ASSERT(node->m_pool);
@@ -373,32 +374,20 @@ MemoryPool* MemoryPool::PoolFromUserData(void *userData)
 	return node->m_pool->m_memPool;
 }
 
-inline void* MemoryPool::UserDataFromPoolNode(PoolNode *node)
-{
-	return reinterpret_cast<U8*>(node) + sizeof(PoolNode);
-}
-
-inline MemoryPool::PoolNode* MemoryPool::PoolNodeFromUserData(void *data)
-{
-	return (PoolNode*)(reinterpret_cast<U8*>(data) - sizeof(PoolNode));
-}
-
 #if defined(RAD_OPT_MEMPOOL_DEBUG)
-bool MemoryPool::IsPoolNodeValid(PoolNode *node)
-{
+bool MemoryPool::IsPoolNodeValid(PoolNode *node) {
 	bool b;
 
 	UReg id = PoolNode::MagicId;
 	const U8 *pid = (const U8*)&id;
-	const U8 *dst = (U8*)UserDataFromPoolNode(node) + node->m_pool->m_memPool->m_dataSize;
+	const U8 *dst = (U8*)UserDataFromPoolNode(node) + node->m_pool->m_memPool->m_chunkSize;
 
 	b = (dst[0] == pid[0] && dst[1] == pid[1] && dst[2] == pid[2] && dst[3] == pid[3]);
 
 	return (node->m_magicID == PoolNode::MagicId) && b;
 }
 
-void MemoryPool::AssertPoolNodeIsValid(PoolNode *node)
-{
+void MemoryPool::AssertPoolNodeIsValid(PoolNode *node) {
 	RAD_VERIFY_MSG(IsPoolNodeValid(node), "MemoryPool: memory corruption detected!");
 }
 
@@ -411,19 +400,20 @@ void MemoryPool::AssertChunkIsValid(void *pT) {
 
 #endif
 
-inline AddrSize MemoryPool::Pool::CalculateMemorySize(UReg inArraySize, AddrSize inDataSize, int alignment)
-{
-	return (AddrSize)(sizeof(Pool) + PoolAlignment + (alignment - PoolAlignment) + (
-#if defined(RAD_OPT_MEMPOOL_DEBUG)
-		Align<AddrSize>(sizeof(PoolNode) + inDataSize + sizeof(UReg), alignment)
-#else
-		Align<AddrSize>(sizeof(PoolNode) + inDataSize, alignment)
-#endif
-		) * inArraySize);
+inline AddrSize MemoryPool::Pool::CalculateMemorySize(
+	AddrSize inArraySize, 
+	AddrSize inDataSize, 
+	AddrSize alignment
+) {
+	return (AddrSize)(sizeof(Pool) + (alignment-1) + (inDataSize * inArraySize));
 }
 
-AddrSize MemoryPool::Pool::Create(UReg inArraySize, AddrSize inDataSize, void *inBaseAddr, PoolNode **inFreeHead)
-{
+AddrSize MemoryPool::Pool::Create(
+	AddrSize inArraySize, 
+	AddrSize inDataSize, 
+	void *inBaseAddr, 
+	PoolNode **inFreeHead
+) {
 	RAD_ASSERT(inFreeHead);
 	RAD_ASSERT(m_memPool);
 
@@ -444,8 +434,7 @@ AddrSize MemoryPool::Pool::Create(UReg inArraySize, AddrSize inDataSize, void *i
 
 	PoolNode* localHead = (*inFreeHead);
 
-	for (UReg i = 0;i < inArraySize;i++)
-	{
+	for (AddrSize i = 0;i < inArraySize;i++) {
 		PoolNode* n = (PoolNode*)baseAddr;
 
 		n->m_pool		= this;
@@ -458,7 +447,7 @@ AddrSize MemoryPool::Pool::Create(UReg inArraySize, AddrSize inDataSize, void *i
 #if defined(RAD_OPT_MEMPOOL_DEBUG)
 		// we do it this way to avoid un-aligned write exceptions on shitty hardware.
 		{
-			UReg id = PoolNode::MagicId;
+			U32 id = PoolNode::MagicId;
 			const U8 *pid = (const U8*)&id;
 			U8 *dst = (U8*)m_memPool->UserDataFromPoolNode(n) + inDataSize;
 			
@@ -479,29 +468,27 @@ AddrSize MemoryPool::Pool::Create(UReg inArraySize, AddrSize inDataSize, void *i
 	return (AddrSize)baseAddr;
 }
 
-void MemoryPool::Pool::Destroy(UReg inArraySize, ChunkDestructor destructor, WalkCallback callback)
-{
+void MemoryPool::Pool::Destroy(
+	AddrSize inArraySize, 
+	ChunkCallback destructor, 
+	ChunkCallback callback
+) {
 	RAD_ASSERT(m_magicID == MagicId);
 	RAD_ASSERT(m_memPool);
 
-	if (destructor || callback)
-	{
+	if (destructor || callback) {
 		void* baseAddr = (void*)m_array;
 
-		for (UReg i = 0;i < inArraySize;i++)
-		{
+		for (AddrSize i = 0;i < inArraySize;i++) {
 			PoolNode* n = (PoolNode*)baseAddr;
 
 			MP_DEBUG_ONLY(m_memPool->AssertPoolNodeIsValid(n));
 
-			if (n->m_used)
-			{
-				if (callback)
-				{
+			if (n->m_used) {
+				if (callback) {
 					callback(m_memPool->UserDataFromPoolNode(n));
 				}
-				if (destructor)
-				{
+				if (destructor) {
 					destructor(m_memPool->UserDataFromPoolNode(n));
 				}
 			}
@@ -511,8 +498,12 @@ void MemoryPool::Pool::Destroy(UReg inArraySize, ChunkDestructor destructor, Wal
 	}
 }
 
-void MemoryPool::Pool::Reset(UReg inArraySize, PoolNode** inFreeHead, ChunkDestructor destructor, WalkCallback callback)
-{
+void MemoryPool::Pool::Reset(
+	AddrSize inArraySize, 
+	PoolNode** inFreeHead, 
+	ChunkCallback destructor, 
+	ChunkCallback callback
+) {
 	MP_ASSERT(m_magicID == MagicId);
 	MP_ASSERT(inFreeHead);
 	MP_ASSERT(m_memPool);
@@ -521,20 +512,16 @@ void MemoryPool::Pool::Reset(UReg inArraySize, PoolNode** inFreeHead, ChunkDestr
 
 	AddrSize baseAddr = (AddrSize)m_array;
 
-	for (UReg i = 0;i < inArraySize;i++)
-	{
+	for (AddrSize i = 0;i < inArraySize;i++) {
 		PoolNode* n = (PoolNode*)baseAddr;
 
 		RAD_DEBUG_ONLY(m_memPool->AssertPoolNodeIsValid(n));
 
-		if (n->m_used)
-		{
-			if (callback)
-			{
+		if (n->m_used) {
+			if (callback) {
 				callback(m_memPool->UserDataFromPoolNode(n));
 			}
-			if (destructor)
-			{
+			if (destructor) {
 				destructor(m_memPool->UserDataFromPoolNode(n));
 			}
 		}
@@ -552,21 +539,18 @@ void MemoryPool::Pool::Reset(UReg inArraySize, PoolNode** inFreeHead, ChunkDestr
 	m_numNodesInUse = 0;
 }
 
-void MemoryPool::Pool::WalkUsed(UReg inArraySize, WalkCallback callback)
-{
+void MemoryPool::Pool::WalkUsed(AddrSize inArraySize, ChunkCallback callback) {
 	MP_ASSERT(m_magicID == MagicId);
 	MP_ASSERT(m_memPool);
 
 	AddrSize baseAddr = (AddrSize)m_array;
 
-	for (UReg i = 0;i < inArraySize;i++)
-	{
+	for (AddrSize i = 0;i < inArraySize;i++) {
 		PoolNode* n = (PoolNode*)baseAddr;
 
 		RAD_DEBUG_ONLY(m_memPool->AssertPoolNodeIsValid(n));	
 
-		if (n->m_used)
-		{
+		if (n->m_used) {
 			callback(m_memPool->UserDataFromPoolNode(n));
 		}
 

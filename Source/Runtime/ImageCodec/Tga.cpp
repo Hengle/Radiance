@@ -622,7 +622,7 @@ struct OUTBUFF
 	{
 		if (m_ofs+size > m_size)
 		{
-			AddrSize growSize = std::max<AddrSize>(Kilo*4, size);
+			AddrSize growSize = std::max<AddrSize>(kKilo*4, size);
 			// grow.
 			void* newBuff = zone_realloc(ZImageCodec, m_buff, m_size+growSize, 0);
 			if (!newBuff) return false;

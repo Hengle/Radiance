@@ -21,7 +21,7 @@
 enum {
 	kMeshTag = RAD_FOURCC_LE('M', 'E', 'S', 'H'),
 	kMeshVersion = 2,
-	kMaxBatchElements = Kilo*64,
+	kMaxBatchElements = kKilo*64,
 	kMaxUVChannels = ska::kMaxUVChannels
 };
 

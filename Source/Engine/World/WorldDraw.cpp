@@ -111,9 +111,9 @@ WorldDraw::~WorldDraw() {
 	m_refMats.clear();
 
 	if (m_init) {
-		RAD_ASSERT(m_batchPool.NumUsedObjects() == 0);
+		RAD_ASSERT(m_batchPool.numUsedObjects == 0);
 		m_batchPool.Destroy();
-		RAD_ASSERT(m_linkPool.NumUsedObjects() == 0);
+		RAD_ASSERT(m_linkPool.numUsedObjects == 0);
 		m_linkPool.Destroy();
 	}
 }

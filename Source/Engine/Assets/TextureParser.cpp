@@ -436,7 +436,7 @@ int TextureParser::Load(
 		file::MMFile::Ref file = engine.sys->files->OpenFile(sname.c_str, r::ZTextures);
 		if (!file)
 			return SR_FileNotFound;
-		file::MMapping::Ref mm = file->MMap(0, Kilo*4, r::ZTextures);
+		file::MMapping::Ref mm = file->MMap(0, kKilo*4, r::ZTextures);
 		if (!mm)
 			return SR_IOError;
 		m_bufs.push_back(mm);

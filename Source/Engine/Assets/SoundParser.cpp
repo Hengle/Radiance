@@ -81,7 +81,7 @@ int SoundParser::Load(
 		m_decodeOfs = 0;
 	}
 
-	enum { kBlockSize = 64*Kilo };
+	enum { kBlockSize = 64*kKilo };
 
 	while (m_decodeOfs < m_header.numBytes && time.remaining) {
 		AddrSize reqBytes = (AddrSize)std::min<int>(kBlockSize, (m_header.numBytes-m_decodeOfs));

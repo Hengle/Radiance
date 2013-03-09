@@ -537,7 +537,7 @@ FileSearch::Ref FileSystem::OpenSearch(
 PakFile::Ref PakFile::Open(const MMFile::Ref &file) {
 	PakFile::Ref r(new (ZFile) PakFile(file));
 
-	MMFileInputBuffer ib(file, 1*Meg);
+	MMFileInputBuffer ib(file, 1*kMeg);
 	stream::InputStream is(ib);
 
 	if (!r->m_pak.LoadLumpInfo(kDPakSig, kDPakMagic, is, data_codec::lmp::LittleEndian))

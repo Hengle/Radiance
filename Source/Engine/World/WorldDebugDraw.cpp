@@ -113,7 +113,7 @@ void WorldDraw::DebugDrawBBox(const LocalMaterial &material, const BBox &bbox, b
 }
 
 void WorldDraw::DebugDrawBBoxBatch(const LocalMaterial &material, const BBox &bbox, bool wireframe) {
-	typedef stackify<std::vector<Vec3>, 4> StackVec;
+	typedef stackify<zone_vector<Vec3, ZWorldT>::type, 4> StackVec;
 	StackVec v;
 
 	const Vec3 &mins = bbox.Mins();

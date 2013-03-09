@@ -36,7 +36,7 @@ void CVarZone::Open(const char *path) {
 	file::MMFileInputBuffer::Ref ib = App::Get()->engine->sys->files->OpenInputBuffer(
 		path,
 		ZEngine,
-		Kilo
+		kKilo
 	);
 	
 	if (!ib)

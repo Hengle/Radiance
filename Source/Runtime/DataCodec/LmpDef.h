@@ -17,11 +17,11 @@ typedef U32 LOfs;
 
 enum
 {
-	MaxEntrySize = MaxU32,
-	MaxEntryCount = MaxU32 - 1,
-	MaxLOfs = MaxU32,
-	MaxLumpNameLen = 511,
-	LumpTagAlignment = 8 // 8 byte alignment
+	kMaxEntrySize = kMaxU32,
+	kMaxEntryCount = kMaxU32 - 1,
+	kMaxLOfs = kMaxU32,
+	kMaxLumpNameLen = 511,
+	kLumpTagAlignment = 8 // 8 byte alignment
 };
 
 class Writer;

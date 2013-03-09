@@ -39,7 +39,7 @@ void Copy(
 	std::ostream &out,
 	bool resetIn
 ) {
-	enum { kMaxLineLength = Kilo*4 };
+	enum { kMaxLineLength = kKilo*4 };
 	char lineBuf[kMaxLineLength];
 
 	if (resetIn)
@@ -93,7 +93,7 @@ bool ExpandIncludes(
 	std::istream &is,
 	std::ostream &os
 ) {
-	enum { kMaxLineLength = Kilo*4 };
+	enum { kMaxLineLength = kKilo*4 };
 	char lineBuf[kMaxLineLength];
 
 	is.seekg(0);

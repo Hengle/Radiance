@@ -418,7 +418,7 @@ int Floors::PickWaypoint(
 	d = d*d; // squared distances.
 
 	struct Candidate {
-		typedef stackify<std::vector<Candidate>, 16> Vec;
+		typedef stackify<zone_vector<Candidate, ZWorldT>::type, 16> Vec;
 		int idx;
 		float dd;
 		float dist;
@@ -546,7 +546,7 @@ void Floors::WalkFloor(
 	};
 
 	struct Stack {
-		typedef stackify<std::vector<Stack>, 256> Vec;
+		typedef stackify<zone_vector<Stack, ZWorldT>::type, 256> Vec;
 		FloorPosition pos;
 		int edgeNum;
 		int numVisited;
@@ -1214,7 +1214,7 @@ inline bool Floors::PlanMove(
 	bestDistance = std::numeric_limits<float>::max();
 	
 	struct Connection {
-		typedef stackify<std::vector<Connection>, 16> Vec;
+		typedef stackify<zone_vector<Connection, ZWorldT>::type, 16> Vec;
 
 		FloorPosition pos;
 
@@ -1235,7 +1235,7 @@ inline bool Floors::PlanMove(
 	};
 
 	struct Stack {
-		typedef stackify<std::vector<Stack>, 512> Vec;
+		typedef stackify<zone_vector<Stack, ZWorldT>::type, 512> Vec;
 		Connection::Vec connections;
 		FloorPosition pos;
 		float distance;

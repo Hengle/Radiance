@@ -21,26 +21,24 @@
 #include <limits>
 #include "../PushPack.h"
 
-enum
-{
-	DefaultAlignment = RAD_STRUCT_ALIGN,
-	MinAlignment = 4,
-	MaxU8 =  UCHAR_MAX,
-	MinS8 =  SCHAR_MIN,
-	MaxS8 =  SCHAR_MAX,
-	MaxU16 = USHRT_MAX,
-	MinS16 = SHRT_MIN,
-	MaxS16 = SHRT_MAX,
-	MaxU32 = UINT_MAX,
-	MinS32 = LONG_MIN,
-	MaxS32 = LONG_MAX
+enum {
+	kDefaultAlignment = RAD_STRUCT_ALIGN,
+	kMinAlignment = 4,
+	kMaxU8 =  UCHAR_MAX,
+	kMinS8 =  SCHAR_MIN,
+	kMaxS8 =  SCHAR_MAX,
+	kMaxU16 = USHRT_MAX,
+	kMinS16 = SHRT_MIN,
+	kMaxS16 = SHRT_MAX,
+	kMaxU32 = UINT_MAX,
+	kMinS32 = LONG_MIN,
+	kMaxS32 = LONG_MAX
 };
 
 typedef SAddrSize PtrDiff;
 
 template <typename T>
-struct Constants
-{
+struct Constants {
 	BOOST_STATIC_ASSERT(sizeof(T) >= 2);
 
 	static T Kilo() { return (T)1024; }
@@ -48,15 +46,13 @@ struct Constants
 	static T Gig() { return (T)(1024*1024*1024); }
 };
 
-enum
-{
-	Kilo = 1024,
-	Meg  = Kilo*Kilo,
-	Gig  = Meg*Kilo
+enum {
+	kKilo = 1024,
+	kMeg  = kKilo*kKilo,
+	kGig  = kMeg*kKilo
 };
 
-struct StructAlignmentCheck
-{
+struct StructAlignmentCheck {
 	U8  a;
 	U16 b;
 	U8  c;
@@ -88,8 +84,7 @@ protected:\
 #define RAD_DECLARE_EXCEPTION(_class, _base) RAD_DECLARE_EXCEPTION_CODE(_class, _base, 0)
 
 template <typename T>
-struct ValueTraits
-{
+struct ValueTraits {
 	typedef T Type;
 	typedef T ValueType;
 

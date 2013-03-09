@@ -67,7 +67,7 @@ void *aligned_realloc(void *ptr, AddrSize size, AddrSize headerSize, AddrSize al
 	RAD_ASSERT(size > 0);
 	RAD_ASSERT(align < (std::numeric_limits<U16>::max()-sizeof(void*)*2+2));
 
-	align = std::max<AddrSize>(std::max<AddrSize>(align, MinAlignment), sizeof(void*));
+	align = std::max<AddrSize>(std::max<AddrSize>(align, kMinAlignment), sizeof(void*));
 
 	void *pptr = ptr;
 	AddrSize oldOfs = 0;

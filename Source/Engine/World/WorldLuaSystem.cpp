@@ -341,7 +341,7 @@ int WorldLua::lua_System_UTF8To32(lua_State *L) {
 	const String kSz(CStr(sz));
 
 	U32 *buf;
-	U32 ubuf[Kilo*4];
+	U32 ubuf[kKilo*4];
 
 	int len = string::utf8to32len(kSz.c_str, kSz.length + 1);
 	if (len < 2) // don't count null
@@ -371,7 +371,7 @@ int WorldLua::lua_System_UTF8To32(lua_State *L) {
 int WorldLua::lua_System_UTF32To8(lua_State *L) {
 	luaL_checktype(L, 1, LUA_TTABLE);
 
-	U32 ubuf[Kilo*4];
+	U32 ubuf[kKilo*4];
 	zone_vector<U32, ZWorldT>::type ubufVec;
 	U32 *ubufp = ubuf;
 	
@@ -414,7 +414,7 @@ int WorldLua::lua_System_UTF32To8(lua_State *L) {
 	if (!ubufp)
 		ubufp = &ubufVec[0];
 
-	char cbuf[Kilo*4*4];
+	char cbuf[kKilo*4*4];
 	char *cbufp = cbuf;
 
 	int len = string::utf32to8len(ubufp, ofs);

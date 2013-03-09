@@ -90,7 +90,7 @@ int MapParser::Load(
 		file::MMFileInputBuffer::Ref ib = engine.sys->files->OpenInputBuffer(
 			name->c_str, 
 			ZWorld,
-			1*Meg,
+			1*kMeg,
 			file::kFileOptions_None,
 			file::kFileMask_Base
 		);
@@ -130,7 +130,7 @@ int MapParser::ParseCinematicCompressionMap(
 	file::MMFileInputBuffer::Ref ib = engine.sys->files->OpenInputBuffer(
 		file.c_str, 
 		ZWorld,
-		1*Meg,
+		1*kMeg,
 		file::kFileOptions_None,
 		file::kFileMask_Base
 	);

@@ -64,7 +64,7 @@ private:
 class RADRT_CLASS DynamicMemOutputBuffer : public stream::IOutputBuffer
 {
 public:
-	DynamicMemOutputBuffer(Zone &zone, AddrSize alignment=DefaultAlignment);
+	DynamicMemOutputBuffer(Zone &zone, AddrSize alignment=kDefaultAlignment);
 	virtual ~DynamicMemOutputBuffer();
 
 	stream::SPos Size() const;

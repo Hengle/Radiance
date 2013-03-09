@@ -114,7 +114,7 @@ int StringTable::Load(const char *name, const char *root, StringTable::Ref &_r, 
 	lua_pushlightuserdata(L->L, r.get());
 	lua_setfield(L->L, LUA_REGISTRYINDEX, THIS);
 
-	typedef lua::StreamLoader<8*Kilo, lua::StackMemTag> Loader;
+	typedef lua::StreamLoader<8*kKilo, lua::StackMemTag> Loader;
 
 	int loadMask = 0;
 	if (_loadMask)

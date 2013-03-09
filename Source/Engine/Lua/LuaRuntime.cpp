@@ -155,7 +155,7 @@ struct LuaPools {
 					ZLuaRuntime,
 					sz,
 					chunkSize,
-					std::max<UReg>((UReg)((32*Kilo)/chunkSize), 4)
+					std::max<int>((int)((32*kKilo)/chunkSize), 4)
 				);
 			}
 		}

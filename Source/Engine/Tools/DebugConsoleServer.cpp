@@ -114,10 +114,10 @@ int DebugConsoleServer::HandleClientCmd(const Client &client) {
 		return -1;
 	}
 
-	U8 msgBuf[4*Kilo];
+	U8 msgBuf[4*kKilo];
 	U8 *dmsgBuf = msgBuf;
 
-	if (cmds[1] > 4*Kilo) {
+	if (cmds[1] > 4*kKilo) {
 		dmsgBuf = (U8*)safe_zone_malloc(ZTools, cmds[1]);
 	}
 

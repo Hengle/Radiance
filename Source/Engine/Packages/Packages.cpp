@@ -513,7 +513,7 @@ void PackageMan::LoadBin(
 	file::MMFileInputBuffer::Ref ib = m_engine.sys->files->OpenInputBuffer(
 		path.c_str,
 		ZPackages,
-		1*Meg,
+		1*kMeg,
 		file::kFileOptions_None,
 		file::kFileMask_PakFiles
 	);

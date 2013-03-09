@@ -177,7 +177,7 @@ enum
 
 	SwapFlags = (SwapVarFlag|SwapPtrFlag|SwapStructFlag|SwapFieldFlag|SwapArrayFlag),
 
-	SwapEnd = MaxU16
+	SwapEnd = kMaxU16
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////

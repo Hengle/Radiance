@@ -12,7 +12,7 @@
 template <typename T, typename A, size_t TNumElms>
 class stackify< std::vector<T, A>, TNumElms > {
 public:
-	typedef stack_allocator<T, TNumElms> allocator_type;
+	typedef stack_allocator<T, TNumElms, A> allocator_type;
 	typedef std::vector<T, allocator_type> container_type;
 	typedef stackify< std::vector<T, A>, TNumElms > self_type;
 	typedef typename container_type::iterator iterator;

@@ -120,7 +120,7 @@ int SkAnimSetParser::LoadToolsFile(
 	file::MMFileInputBuffer::Ref ib = engine.sys->files->OpenInputBuffer(
 		path, 
 		ZTools, 
-		1*Meg,
+		1*kMeg,
 		file::kFileOptions_None, 
 		file::kFileMask_Base
 	);

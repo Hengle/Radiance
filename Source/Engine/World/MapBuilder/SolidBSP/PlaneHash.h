@@ -19,7 +19,7 @@ public:
 	typedef zone_vector< ::tools::solid_bsp::Plane, ZToolsT>::type PlaneVec;
 
 	PlaneHash() {
-		m_planes.reserve(4*Kilo);
+		m_planes.reserve(4*kKilo);
 		memset(m_hash, 0, sizeof(HashPlane*)*NumBuckets);
 	}
 

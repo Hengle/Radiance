@@ -22,7 +22,7 @@ namespace tools {
 namespace editor {
 
 enum {
-	MaxSize = 16*Meg,
+	MaxSize = 16*kMeg,
 	MaxLoading = 8,
 	OverlayDiv = 8
 };
