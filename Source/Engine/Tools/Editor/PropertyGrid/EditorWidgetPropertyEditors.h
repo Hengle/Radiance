@@ -16,15 +16,13 @@ namespace editor {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct RADENG_CLASS NullPropertyHints
-{
-	void ApplyHints(QWidget &, const Property &) {}
+struct RADENG_CLASS NullPropertyHints {
+	static void ApplyHints(QWidget &, const Property &) {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class PropertyComboBox : public QComboBox
-{
+class PropertyComboBox : public QComboBox {
 	Q_OBJECT
 public:
 	PropertyComboBox(QWidget *parent);
@@ -40,12 +38,28 @@ private slots:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-template <typename TWidget, typename THints, typename T>
-struct SpinBoxPropertyTraits : public QVariantPropertyTraits<T>
-{
+template <typename T>
+struct ReadOnlyTraits : public QVariantPropertyTraits<T> {
 	typedef T Type;
+	typedef QVariantPropertyTraits<T> Super;
+	typedef ReadOnlyTraits<T> Self;
+	typedef TProperty<Self> PropertyType;
 
-	QWidget *CreateEditor(
+	static Qt::ItemFlags Flags(const Property &p) {
+		return Super().Flags(p) & ~(Qt::ItemIsEditable|Qt::ItemIsEnabled);
+	}
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+template <typename TWidget, typename THints, typename T>
+struct SpinBoxPropertyTraits : public QVariantPropertyTraits<T> {
+	typedef T Type;
+	typedef QVariantPropertyTraits<T> Super;
+	typedef SpinBoxPropertyTraits<TWidget, THints, T> Self;
+	typedef TProperty<Self> PropertyType;
+
+	static QWidget *CreateEditor(
 		QWidget *parent, 
 		const QStyleOptionViewItem &option, 
 		const QModelIndex &index,
@@ -53,7 +67,7 @@ struct SpinBoxPropertyTraits : public QVariantPropertyTraits<T>
 		const Property &context
 	);
 
-	bool SetEditorData(
+	static bool SetEditorData(
 		QWidget &editor, 
 		const QModelIndex &index,
 		const QVariant &v,
@@ -61,7 +75,7 @@ struct SpinBoxPropertyTraits : public QVariantPropertyTraits<T>
 		const Property &context
 	);
 
-	bool SetModelData(
+	static bool SetModelData(
 		QWidget &editor, 
 		QAbstractItemModel &model, 
 		const QModelIndex &index,
@@ -72,11 +86,13 @@ struct SpinBoxPropertyTraits : public QVariantPropertyTraits<T>
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct RADENG_CLASS FilePathFieldWidgetPropertyTraits : public QVariantPropertyTraits<QString>
-{
+struct RADENG_CLASS AllFilesPathFieldWidgetPropertyTraits : public QVariantPropertyTraits<QString> {
 	typedef QString Type;
+	typedef QVariantPropertyTraits<QString> Super;
+	typedef AllFilesPathFieldWidgetPropertyTraits Self;
+	typedef TProperty<Self> PropertyType;
 	
-	QWidget *CreateEditor(
+	static QWidget *CreateEditor(
 		QWidget *parent, 
 		const QStyleOptionViewItem &option, 
 		const QModelIndex &index,
@@ -84,7 +100,7 @@ struct RADENG_CLASS FilePathFieldWidgetPropertyTraits : public QVariantPropertyT
 		const Property &context
 	);
 
-	bool SetEditorData(
+	static bool SetEditorData(
 		QWidget &editor, 
 		const QModelIndex &index,
 		const QVariant &v,
@@ -92,7 +108,7 @@ struct RADENG_CLASS FilePathFieldWidgetPropertyTraits : public QVariantPropertyT
 		const Property &context
 	);
 
-	bool SetModelData(
+	static bool SetModelData(
 		QWidget &editor, 
 		QAbstractItemModel &model, 
 		const QModelIndex &index,
@@ -103,11 +119,13 @@ struct RADENG_CLASS FilePathFieldWidgetPropertyTraits : public QVariantPropertyT
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct RADENG_CLASS BoolComboBoxPropertyTraits : public QVariantPropertyTraits<bool>
-{
+struct RADENG_CLASS BoolComboBoxPropertyTraits : public QVariantPropertyTraits<bool> {
 	typedef bool Type;
+	typedef QVariantPropertyTraits<bool> Super;
+	typedef BoolComboBoxPropertyTraits Self;
+	typedef TProperty<Self> PropertyType;
 
-	QWidget *CreateEditor(
+	static QWidget *CreateEditor(
 		QWidget *parent, 
 		const QStyleOptionViewItem &option, 
 		const QModelIndex &index,
@@ -115,7 +133,7 @@ struct RADENG_CLASS BoolComboBoxPropertyTraits : public QVariantPropertyTraits<b
 		const Property &context
 	);
 
-	bool SetEditorData(
+	static bool SetEditorData(
 		QWidget &editor, 
 		const QModelIndex &index,
 		const QVariant &v,
@@ -123,7 +141,7 @@ struct RADENG_CLASS BoolComboBoxPropertyTraits : public QVariantPropertyTraits<b
 		const Property &context
 	);
 
-	bool SetModelData(
+	static bool SetModelData(
 		QWidget &editor, 
 		QAbstractItemModel &model, 
 		const QModelIndex &index,
@@ -135,11 +153,13 @@ struct RADENG_CLASS BoolComboBoxPropertyTraits : public QVariantPropertyTraits<b
 ///////////////////////////////////////////////////////////////////////////////
 
 template <typename TWidget, typename TExtractor, typename T>
-struct WidgetPropertyTraits : public QVariantPropertyTraits<T>
-{
+struct WidgetPropertyTraits : public QVariantPropertyTraits<T> {
 	typedef T Type;
-	
-	QWidget *CreateEditor(
+	typedef QVariantPropertyTraits<T> Super;
+	typedef WidgetPropertyTraits<TWidget, TExtractor, T> Self;
+	typedef TProperty<Self> PropertyType;
+
+	static QWidget *CreateEditor(
 		QWidget *parent, 
 		const QStyleOptionViewItem &option, 
 		const QModelIndex &index,
@@ -147,7 +167,7 @@ struct WidgetPropertyTraits : public QVariantPropertyTraits<T>
 		const Property &context
 	);
 
-	bool SetEditorData(
+	static bool SetEditorData(
 		QWidget &editor, 
 		const QModelIndex &index,
 		const QVariant &v,
@@ -155,7 +175,7 @@ struct WidgetPropertyTraits : public QVariantPropertyTraits<T>
 		const Property &context
 	);
 
-	bool SetModelData(
+	static bool SetModelData(
 		QWidget &editor, 
 		QAbstractItemModel &model, 
 		const QModelIndex &index,
@@ -166,11 +186,13 @@ struct WidgetPropertyTraits : public QVariantPropertyTraits<T>
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct RADENG_CLASS LineEditPropertyTraits : public QVariantPropertyTraits<QString>
-{
+struct RADENG_CLASS LineEditPropertyTraits : public QVariantPropertyTraits<QString> {
 	typedef QString Type;
+	typedef QVariantPropertyTraits<QString> Super;
+	typedef LineEditPropertyTraits Self;
+	typedef TProperty<Self> PropertyType;
 
-	QWidget *CreateEditor(
+	static QWidget *CreateEditor(
 		QWidget *parent, 
 		const QStyleOptionViewItem &option, 
 		const QModelIndex &index,
@@ -178,7 +200,7 @@ struct RADENG_CLASS LineEditPropertyTraits : public QVariantPropertyTraits<QStri
 		const Property &context
 	);
 
-	bool SetEditorData(
+	static bool SetEditorData(
 		QWidget &editor, 
 		const QModelIndex &index,
 		const QVariant &v,
@@ -186,11 +208,50 @@ struct RADENG_CLASS LineEditPropertyTraits : public QVariantPropertyTraits<QStri
 		const Property &context
 	);
 
-	bool SetModelData(
+	static bool SetModelData(
 		QWidget &editor, 
 		QAbstractItemModel &model, 
 		const QModelIndex &index,
 		PropertyGridItemDelegate &source,
+		const Property &context
+	);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+struct RADENG_CLASS ColorFieldWidgetTraits : public QVariantPropertyTraits<QString> {
+	typedef QString Type;
+	typedef QVariantPropertyTraits<QString> Super;
+	typedef ColorFieldWidgetTraits Self;
+	typedef TProperty<Self> PropertyType;
+
+	static QWidget *CreateEditor(
+		QWidget *parent, 
+		const QStyleOptionViewItem &option, 
+		const QModelIndex &index,
+		PropertyGridItemDelegate &source,
+		const Property &context
+	);
+
+	static bool SetEditorData(
+		QWidget &editor, 
+		const QModelIndex &index,
+		const QVariant &v,
+		PropertyGridItemDelegate &source,
+		const Property &context
+	);
+
+	static bool SetModelData(
+		QWidget &editor, 
+		QAbstractItemModel &model, 
+		const QModelIndex &index,
+		PropertyGridItemDelegate &source,
+		const Property &context
+	);
+
+	static QVariant ToVariant(
+		const QString &t, 
+		int role, 
 		const Property &context
 	);
 };

@@ -6,6 +6,7 @@
 #include RADPCH
 #include "EditorWidgetPropertyEditors.h"
 #include "EditorFilePathFieldWidget.h"
+#include "EditorColorFieldWidget.h"
 #include <QtGui/QComboBox>
 #include <QtGui/QLineEdit>
 
@@ -14,42 +15,43 @@ namespace editor {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-PropertyComboBox::PropertyComboBox(QWidget *parent) : QComboBox(parent)
-{
+PropertyComboBox::PropertyComboBox(QWidget *parent) : QComboBox(parent) {
 	RAD_VERIFY(connect(this, SIGNAL(activated(int)), SLOT(OnSelectionChanged())));
 }
 
-void PropertyComboBox::OnSelectionChanged()
-{
+void PropertyComboBox::OnSelectionChanged() {
 	emit CloseEditor();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-QWidget *FilePathFieldWidgetPropertyTraits::CreateEditor(
+QWidget *AllFilesPathFieldWidgetPropertyTraits::CreateEditor(
 	QWidget *parent, 
 	const QStyleOptionViewItem &option, 
 	const QModelIndex &index,
 	PropertyGridItemDelegate &source,
 	const Property &context
-)
-{
+) {
 	return new (ZEditor) FilePathFieldWidget(parent);
 }
 
-bool FilePathFieldWidgetPropertyTraits::SetEditorData(
+bool AllFilesPathFieldWidgetPropertyTraits::SetEditorData(
 	QWidget &editor, 
 	const QModelIndex &index,
 	const QVariant &v,
 	PropertyGridItemDelegate &source,
 	const Property &context
-)
-{
-	static_cast<FilePathFieldWidget&>(editor).SetPath(v.toString());
+) {
+	FilePathFieldWidget &fw = static_cast<FilePathFieldWidget&>(editor);
+	String prefix;
+	Files()->GetAbsolutePath("", prefix, file::kFileMask_Base);
+	fw.SetPrefix(prefix.c_str.get());
+	fw.SetFilter("All Files (*.*)");
+	fw.SetPath(v.toString());
 	return true;
 }
 
-bool FilePathFieldWidgetPropertyTraits::SetModelData(
+bool AllFilesPathFieldWidgetPropertyTraits::SetModelData(
 	QWidget &editor, 
 	QAbstractItemModel &model, 
 	const QModelIndex &index,
@@ -140,6 +142,63 @@ bool LineEditPropertyTraits::SetModelData(
 {
 	QLineEdit &edit = static_cast<QLineEdit&>(editor);
 	return model.setData(index, edit.text(), Qt::EditRole);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+QWidget *ColorFieldWidgetTraits::CreateEditor(
+	QWidget *parent, 
+	const QStyleOptionViewItem &option, 
+	const QModelIndex &index,
+	PropertyGridItemDelegate &source,
+	const Property &context
+)
+{
+	ColorFieldWidget *w = new (ZEditor) ColorFieldWidget(parent);
+	return w;
+}
+
+bool ColorFieldWidgetTraits::SetEditorData(
+	QWidget &editor, 
+	const QModelIndex &index,
+	const QVariant &v,
+	PropertyGridItemDelegate &source,
+	const Property &context
+)
+{
+	static_cast<ColorFieldWidget&>(editor).SetColor(v.toString());
+	return true;
+}
+
+bool ColorFieldWidgetTraits::SetModelData(
+	QWidget &editor, 
+	QAbstractItemModel &model, 
+	const QModelIndex &index,
+	PropertyGridItemDelegate &source,
+	const Property &context
+)
+{
+	QVariant v = static_cast<ColorFieldWidget&>(editor).Color();
+	if (v.isValid())
+		model.setData(index, v, Qt::EditRole);
+	return true;
+}
+
+QVariant ColorFieldWidgetTraits::ToVariant(
+	const QString &t, 
+	int role, 
+	const Property &context
+)
+{
+	if (role == Qt::DisplayRole)
+		return QVariant();
+	if (role != Qt::BackgroundRole)
+		return QVariantPropertyTraits<QString>::ToVariant(t, role, context);
+	int r, g, b, a;
+	sscanf(t.toAscii().constData(), "%d %d %d %d",
+		&r, &g, &b, &a
+	);
+	return QColor(r, g, b, a);
 }
 
 } // editor

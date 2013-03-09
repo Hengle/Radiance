@@ -5,7 +5,6 @@
 	\ingroup assets
 */
 
-
 #pragma once
 
 #include "AssetTypes.h"

@@ -7,16 +7,14 @@ namespace tools {
 namespace editor {
 
 template <typename T>
-inline QVariant QVariantPropertyTraits<T>::ToVariant(const T &t, int role, const Property &)
-{
+inline QVariant QVariantPropertyTraits<T>::ToVariant(const T &t, int role, const Property &) {
 	if (role == Qt::EditRole || role == Qt::DisplayRole)
 		return QVariant(t);
 	return QVariant();
 }
 
 template <typename T>
-inline bool QVariantPropertyTraits<T>::FromVariant(const QVariant &t, T &out, int role, const Property &)
-{
+inline bool QVariantPropertyTraits<T>::FromVariant(const QVariant &t, T &out, int role, const Property &) {
 	if (role != Qt::EditRole)
 		return false;
 	out = t.value<T>();
@@ -24,20 +22,17 @@ inline bool QVariantPropertyTraits<T>::FromVariant(const QVariant &t, T &out, in
 }
 
 template <typename T>
-bool QVariantPropertyTraits<T>::SupportsEquals()
-{
+bool QVariantPropertyTraits<T>::SupportsEquals() {
 	return false;
 }
 
 template <typename T>
-bool QVariantPropertyTraits<T>::Equals(const Property &a, const Property &b)
-{
+bool QVariantPropertyTraits<T>::Equals(const Property &a, const Property &b) {
 	return false;
 }
 
 template <typename T>
-inline QVariant QVariantPropertyTraits<T>::NilVariant(int role, const Property &p)
-{
+inline QVariant QVariantPropertyTraits<T>::NilVariant(int role, const Property &p) {
 	return QVariant();
 }
 
@@ -48,8 +43,8 @@ inline QWidget *QVariantPropertyTraits<T>::CreateEditor(
 	const QModelIndex &index,
 	PropertyGridItemDelegate &source,
 	const Property &context
-)
-{ // NULL calls QItemDelegate (see EditorPropertyGridItemDelegate.cpp)
+) { 
+	// NULL calls QItemDelegate (see EditorPropertyGridItemDelegate.cpp)
 	return 0;
 }
 
@@ -60,8 +55,8 @@ inline bool QVariantPropertyTraits<T>::SetEditorData(
 	const QVariant &value,
 	PropertyGridItemDelegate &source,
 	const Property &context
-)
-{ // false calls QItemDelegate (see EditorPropertyGridItemDelegate.cpp)
+) { 
+	// false calls QItemDelegate (see EditorPropertyGridItemDelegate.cpp)
 	return false;
 }
 
@@ -84,8 +79,7 @@ inline bool QVariantPropertyTraits<T>::UpdateEditorGeometry(
 	const QModelIndex &index,
 	PropertyGridItemDelegate &source,
 	const Property &context
-)
-{
+) {
 	return false;
 }
 
@@ -96,25 +90,21 @@ inline bool QVariantPropertyTraits<T>::Validate(
 	const QModelIndex &index,
 	PropertyGridItemDelegate &source,
 	const Property &context
-)
-{
+) {
 	return true;
 }
 
 template <typename T>
-inline void QVariantPropertyTraits<T>::Changed(Property &context)
-{
+inline void QVariantPropertyTraits<T>::Changed(Property &context) {
 }
 
 template <typename T>
-inline bool QVariantPropertyTraits<T>::SetValue(const T &t, Property &context)
-{
+inline bool QVariantPropertyTraits<T>::SetValue(const T &t, Property &context) {
 	return true;
 }
 
 template <typename T>
-Qt::ItemFlags QVariantPropertyTraits<T>::Flags(const Property &context)
-{
+Qt::ItemFlags QVariantPropertyTraits<T>::Flags(const Property &context) {
 	return Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsEnabled;
 }
 
@@ -127,38 +117,33 @@ inline TProperty<Traits>::TProperty(
 	const QString &name,
 	QWidget &widget,
 	QObject *parent
-) : Property(name, context, widget, parent), m_value(value)
-{
+) : Property(name, context, widget, parent), m_value(value) {
 }
 
 template <typename Traits>
-inline TProperty<Traits>::~TProperty()
-{
+inline TProperty<Traits>::~TProperty() {
 }
 
 template <typename Traits>
-inline QVariant TProperty<Traits>::Data(int role, bool nil) const
-{
+inline QVariant TProperty<Traits>::Data(int role, bool nil) const {
 	if (role == Qt::EditRole || 
 		role == Qt::DisplayRole || 
 		role == Qt::BackgroundRole ||
-		role == Qt::CheckStateRole)
-	{
-		return nil ? Traits().NilVariant(role, *this) : Traits().ToVariant(m_value, role, *this);
+		role == Qt::CheckStateRole) {
+		return nil ? Traits::NilVariant(role, *this) : Traits::ToVariant(m_value, role, *this);
 	}
 	return QVariant();
 }
 
 template <typename Traits>
-inline bool TProperty<Traits>::SetData(const QVariant &value, int role)
-{
+inline bool TProperty<Traits>::SetData(const QVariant &value, int role) {
 	T x;
-	if (!Traits().FromVariant(value, x, role, *this))
+	if (!Traits::FromVariant(value, x, role, *this))
 		return false;
-	if (x != m_value)
-	{// returns true if handled, returning false sends this on to 
-	 // to QItemDelegate (we don't want that)
-		if (!Traits().SetValue(x, *this))
+	if (x != m_value) {
+		// returns true if handled, returning false sends this on to 
+		// to QItemDelegate (we don't want that)
+		if (!Traits::SetValue(x, *this))
 			return true;
 		m_value = x;
 		SignalChanged();
@@ -167,16 +152,14 @@ inline bool TProperty<Traits>::SetData(const QVariant &value, int role)
 }
 
 template <typename Traits>
-inline Qt::ItemFlags TProperty<Traits>::Flags() const
-{
-	return Traits().Flags(*this);
+inline Qt::ItemFlags TProperty<Traits>::Flags() const {
+	return Traits::Flags(*this);
 }
 
 template <typename Traits>
-inline bool TProperty<Traits>::Equals(const Property &other) const
-{
-	if(Traits().SupportsEquals())
-		return Traits().Equals(*this, other);
+inline bool TProperty<Traits>::Equals(const Property &other) const {
+	if(Traits::SupportsEquals())
+		return Traits::Equals(*this, other);
 	return static_cast<const SelfType&>(other).Value() == Value();
 }
 
@@ -186,9 +169,8 @@ inline QWidget *TProperty<Traits>::CreateEditor(
 	const QStyleOptionViewItem &option, 
 	const QModelIndex &index,
 	PropertyGridItemDelegate &source
-) const
-{
-	return Traits().CreateEditor(
+) const {
+	return Traits::CreateEditor(
 		parent,
 		option,
 		index,
@@ -203,12 +185,11 @@ inline bool TProperty<Traits>::SetEditorData(
 	const QModelIndex &index,
 	bool nil,
 	PropertyGridItemDelegate &source
-) const
-{
-	return Traits().SetEditorData(
+) const {
+	return Traits::SetEditorData(
 		editor,
 		index,
-		nil ? Traits().NilVariant(Qt::EditRole, *this) : Traits().ToVariant(m_value, Qt::EditRole, *this),
+		nil ? Traits::NilVariant(Qt::EditRole, *this) : Traits::ToVariant(m_value, Qt::EditRole, *this),
 		source,
 		*this
 	);
@@ -220,9 +201,8 @@ inline bool TProperty<Traits>::SetModelData(
 	QAbstractItemModel &model, 
 	const QModelIndex &index,
 	PropertyGridItemDelegate &source
-) const
-{
-	return Traits().SetModelData(
+) const {
+	return Traits::SetModelData(
 		editor,
 		model,
 		index,
@@ -237,9 +217,8 @@ inline bool TProperty<Traits>::Validate(
 	QAbstractItemModel &model, 
 	const QModelIndex &index,
 	PropertyGridItemDelegate &source
-) const
-{
-	return Traits().Validate(
+) const {
+	return Traits::Validate(
 		editor,
 		model,
 		index,
@@ -254,9 +233,8 @@ inline bool TProperty<Traits>::UpdateEditorGeometry(
 	const QStyleOptionViewItem &option,
 	const QModelIndex &index,
 	PropertyGridItemDelegate &source
-) const
-{
-	return Traits().UpdateEditorGeometry(
+) const {
+	return Traits::UpdateEditorGeometry(
 		editor,
 		option,
 		index,
@@ -265,17 +243,14 @@ inline bool TProperty<Traits>::UpdateEditorGeometry(
 	);
 }
 
-
 template <typename Traits>
-inline typename Traits::Type TProperty<Traits>::Value() const
-{
+inline typename Traits::Type TProperty<Traits>::Value() const {
 	return m_value;
 }
 
 template <typename Traits>
-inline void TProperty<Traits>::SignalChanged()
-{
-	Traits().Changed(*this);
+inline void TProperty<Traits>::SignalChanged() {
+	Traits::Changed(*this);
 	Property::SignalChanged();
 }
 

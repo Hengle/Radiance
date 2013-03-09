@@ -10,21 +10,18 @@ namespace content_property_details {
 ///////////////////////////////////////////////////////////////////////////////
 
 template <>
-struct ComboBoxExtractor<QString>
-{
-	void ApplyHints(QComboBox &cb) {}
-	void SetEditorData(QComboBox &cb, const QVariant &v, const Property &context);
-	QVariant ToVariant(QComboBox &cb, const Property &context);
+struct ComboBoxExtractor<QString> {
+	static void ApplyHints(QComboBox &cb) {}
+	static void SetEditorData(QComboBox &cb, const QVariant &v, const Property &context);
+	static QVariant ToVariant(QComboBox &cb, const Property &context);
 };
 
 template <typename T>
-inline void ComboBoxExtractor<T>::ApplyHints(QComboBox &cb)
-{
+inline void ComboBoxExtractor<T>::ApplyHints(QComboBox &cb) {
 }
 
 template <typename T>
-void ComboBoxExtractor<T>::SetEditorData(QComboBox &cb, const QVariant &v, const Property &p)
-{
+void ComboBoxExtractor<T>::SetEditorData(QComboBox &cb, const QVariant &v, const Property &p) {
 	KeyContext::Ref context = boost::static_pointer_cast<KeyContext, Property::UserContext>(p.Context());
 	RAD_ASSERT(context);
 
@@ -48,8 +45,7 @@ void ComboBoxExtractor<T>::SetEditorData(QComboBox &cb, const QVariant &v, const
 }
 
 template <typename T>
-inline QVariant ComboBoxExtractor<T>::ToVariant(QComboBox &cb, const Property &p)
-{
+inline QVariant ComboBoxExtractor<T>::ToVariant(QComboBox &cb, const Property &p) {
 	if (cb.currentIndex() != -1)
 		return QVariant(cb.currentText()).value<T>();
 	return QVariant();
@@ -58,8 +54,7 @@ inline QVariant ComboBoxExtractor<T>::ToVariant(QComboBox &cb, const Property &p
 ///////////////////////////////////////////////////////////////////////////////
 
 template<typename T, typename X>
-bool KeyTraits<T, X>::SetValue(const Type &value, Property &p)
-{
+bool KeyTraits<T, X>::SetValue(const Type &value, Property &p) {
 	// store and notify.
 	KeyContext::Ref context = boost::static_pointer_cast<KeyContext, Property::UserContext>(p.Context());
 	RAD_ASSERT(context);
@@ -71,8 +66,7 @@ bool KeyTraits<T, X>::SetValue(const Type &value, Property &p)
 	context->MakeKey(entry);
 
 	Type *i = static_cast<Type*>(context->key->val);
-	if (i)
-	{
+	if (i) {
 		*i = value;
 		entry->UpdateModifiedTime();
 		ContentPropertyGrid::PropertyChanged(
@@ -86,26 +80,23 @@ bool KeyTraits<T, X>::SetValue(const Type &value, Property &p)
 }
 
 template<typename T, typename X>
-Qt::ItemFlags KeyTraits<T, X>::Flags(const Property &p)
-{
+Qt::ItemFlags KeyTraits<T, X>::Flags(const Property &p) {
 	KeyContext::Ref context = boost::static_pointer_cast<KeyContext, Property::UserContext>(p.Context());
 	RAD_ASSERT(context);
 
-	Qt::ItemFlags flags = T().Flags(p);
+	Qt::ItemFlags flags = T::Flags(p);
 	if (context->def && context->def->style&pkg::K_ReadOnly)
 		return flags & ~(Qt::ItemIsEnabled|Qt::ItemIsEditable);
 	return flags;
 }
 
 template <typename T>
-struct KeyTraits<T, QString> : public T
-{
+struct KeyTraits<T, QString> : public T {
 	typedef typename T::Type Type;
 	typedef KeyTraits<T> Self;
 	typedef TProperty<Self> PropertyType;
 
-	bool SetValue(const Type &value, Property &p)
-	{
+	static bool SetValue(const Type &value, Property &p) {
 		// store and notify.
 		KeyContext::Ref context = boost::static_pointer_cast<KeyContext, Property::UserContext>(p.Context());
 		RAD_ASSERT(context);
@@ -136,12 +127,11 @@ struct KeyTraits<T, QString> : public T
 		return true;
 	}
 
-	Qt::ItemFlags Flags(const Property &p)
-	{
+	static Qt::ItemFlags Flags(const Property &p) {
 		KeyContext::Ref context = boost::static_pointer_cast<KeyContext, Property::UserContext>(p.Context());
 		RAD_ASSERT(context);
 
-		Qt::ItemFlags flags = T().Flags(p);
+		Qt::ItemFlags flags = T::Flags(p);
 		if (context->def && context->def->style&pkg::K_ReadOnly)
 			return flags & ~(Qt::ItemIsEnabled|Qt::ItemIsEditable);
 		return flags;

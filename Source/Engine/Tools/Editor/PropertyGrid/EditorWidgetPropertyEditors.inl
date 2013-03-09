@@ -17,10 +17,9 @@ inline QWidget *SpinBoxPropertyTraits<TWidget, THints, T>::CreateEditor(
 	const QModelIndex &index,
 	PropertyGridItemDelegate &source,
 	const Property &context
-)
-{
+) {
 	TWidget *editor = new (ZEditor) TWidget(parent);
-	THints().ApplyHints(*editor, context);
+	THints::ApplyHints(*editor, context);
 	return editor;
 }
 
@@ -31,8 +30,7 @@ inline bool SpinBoxPropertyTraits<TWidget, THints, T>::SetEditorData(
 	const QVariant &v,
 	PropertyGridItemDelegate &source,
 	const Property &context
-)
-{
+) {
 	static_cast<TWidget&>(editor).setRange(
 		std::numeric_limits<int>::min(), 
 		std::numeric_limits<int>::max()
@@ -48,8 +46,7 @@ inline bool SpinBoxPropertyTraits<TWidget, THints, T>::SetModelData(
 	const QModelIndex &index,
 	PropertyGridItemDelegate &source,
 	const Property &context
-)
-{
+) {
 	TWidget &spin = static_cast<TWidget&>(editor);
 	spin.interpretText();
 	model.setData(index, spin.value(), Qt::EditRole);
@@ -65,10 +62,9 @@ inline QWidget *WidgetPropertyTraits<TWidget, TExtractor, T>::CreateEditor(
 	const QModelIndex &index,
 	PropertyGridItemDelegate &source,
 	const Property &context
-)
-{
+) {
 	TWidget *w = new (ZEditor) TWidget(parent);
-	TExtractor().ApplyHints(*w);
+	TExtractor::ApplyHints(*w);
 	return w;
 }
 
@@ -79,9 +75,8 @@ inline bool WidgetPropertyTraits<TWidget, TExtractor, T>::SetEditorData(
 	const QVariant &v,
 	PropertyGridItemDelegate &source,
 	const Property &context
-)
-{
-	TExtractor().SetEditorData(static_cast<TWidget&>(editor), v, context);
+) {
+	TExtractor::SetEditorData(static_cast<TWidget&>(editor), v, context);
 	return true;
 }
 
@@ -92,9 +87,8 @@ inline bool WidgetPropertyTraits<TWidget, TExtractor, T>::SetModelData(
 	const QModelIndex &index,
 	PropertyGridItemDelegate &source,
 	const Property &context
-)
-{
-	QVariant v = TExtractor().ToVariant(static_cast<TWidget&>(editor), context);
+) {
+	QVariant v = TExtractor::ToVariant(static_cast<TWidget&>(editor), context);
 	if (v.isValid())
 		model.setData(index, v, Qt::EditRole);
 	return true;

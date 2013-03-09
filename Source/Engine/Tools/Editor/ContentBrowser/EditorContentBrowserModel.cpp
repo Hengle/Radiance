@@ -27,7 +27,8 @@ const char *s_typeIcons[asset::AT_Max] =
 	"Editor/music_small.png",
 	"Editor/font_small.png",
 	"Editor/typeface_small.png",
-	"Editor/stringtable_small.png"
+	"Editor/stringtable_small.png",
+	"Editor/conversation_tree_small.png"
 };
 
 } // namespace

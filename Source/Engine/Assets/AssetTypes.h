@@ -31,6 +31,7 @@ enum Type {
 	AT_Font,
 	AT_Typeface,
 	AT_StringTable,
+	AT_ConversationTree,
 	AT_Max
 };
 
@@ -66,7 +67,8 @@ const char *s_strings[asset::AT_Max] = {
 	"Music",
 	"Font",
 	"Typeface",
-	"StringTable"
+	"StringTable",
+	"ConversationTree"
 };
 }
 

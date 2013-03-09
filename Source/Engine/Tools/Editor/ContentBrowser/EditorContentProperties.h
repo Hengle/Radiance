@@ -21,15 +21,13 @@ namespace tools {
 namespace editor {
 
 class FilePathFieldWidget;
-class ColorFieldWidget;
 class ComboCheckBox;
 
 namespace content_property_details {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct RADENG_CLASS KeyContext : public Property::UserContext
-{
+struct RADENG_CLASS KeyContext : public Property::UserContext {
 	typedef boost::shared_ptr<KeyContext> Ref;
 
 	KeyContext(
@@ -39,18 +37,15 @@ struct RADENG_CLASS KeyContext : public Property::UserContext
 		const pkg::KeyDef::Ref &_def
 	) :	id(_id), flags(_flags), key(_key), def(_def) {}
 
-	void MakeKey(const pkg::Package::Entry::Ref &entry)
-	{
-		if (!key)
-		{
+	void MakeKey(const pkg::Package::Entry::Ref &entry) {
+		if (!key) {
 			RAD_ASSERT(def);
 			key = def->CreateKey(flags);
 			entry->AddKey(key, true);
 		}
 	}
 
-	const lua::Variant &Variant() const
-	{
+	const lua::Variant &Variant() const {
 		if (key)
 			return key->val;
 		RAD_ASSERT(def);
@@ -65,23 +60,18 @@ struct RADENG_CLASS KeyContext : public Property::UserContext
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct RADENG_CLASS EntryIdContext : public Property::UserContext
-{
+struct RADENG_CLASS EntryIdContext : public Property::UserContext {
 	typedef boost::shared_ptr<EntryIdContext> Ref;
 	EntryIdContext(int _id) : id(_id) {}
-
 	int id;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline String TrimKeyName(const String &path, int flags)
-{
-	if (flags&pkg::P_AllTargets)
-	{
+inline String TrimKeyName(const String &path, int flags) {
+	if (flags&pkg::P_AllTargets) {
 		return pkg::Package::Entry::TrimKeyName(path);
 	}
-
 	return path;
 }
 
@@ -91,8 +81,7 @@ inline void SendChangedEvent(
 	const pkg::Package::Entry::Ref &entry,
 	const KeyContext::Ref &context,
 	Property &p
-)
-{
+) {
 	pkg::Package::Entry::KeyChangedEventData d;
 	d.origin = entry;
 	d.key = context->key;
@@ -104,91 +93,35 @@ inline void SendChangedEvent(
 ///////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-struct ReadOnlyTraits : public QVariantPropertyTraits<T>
-{
-	typedef T Type;
-	typedef QVariantPropertyTraits<T> Super;
-	typedef ReadOnlyTraits<T> Self;
-	typedef TProperty<Self> PropertyType;
-
-	Qt::ItemFlags Flags(const Property &p)
-	{
-		return Super().Flags(p) & ~(Qt::ItemIsEditable|Qt::ItemIsEnabled);
-	}
+struct ComboBoxExtractor {
+	static void ApplyHints(QComboBox &cb);
+	static void SetEditorData(QComboBox &cb, const QVariant &v, const Property &context);
+	static QVariant ToVariant(QComboBox &cb, const Property &context);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
-template <typename T>
-struct ComboBoxExtractor
-{
-	void ApplyHints(QComboBox &cb);
-	void SetEditorData(QComboBox &cb, const QVariant &v, const Property &context);
-	QVariant ToVariant(QComboBox &cb, const Property &context);
+struct RADENG_CLASS ComboCheckBoxExtractor { 
+	// only supports strings (no other way to make value lists).
+	static void ApplyHints(ComboCheckBox &cb) {}
+	static void SetEditorData(ComboCheckBox &cb, const QVariant &v, const Property &context);
+	static QVariant ToVariant(ComboCheckBox &cb, const Property &context);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct RADENG_CLASS ColorFieldWidgetTraits : public QVariantPropertyTraits<QString>
-{
-	typedef QString Type;
-	
-	QWidget *CreateEditor(
-		QWidget *parent, 
-		const QStyleOptionViewItem &option, 
-		const QModelIndex &index,
-		PropertyGridItemDelegate &source,
-		const Property &context
-	);
-
-	bool SetEditorData(
-		QWidget &editor, 
-		const QModelIndex &index,
-		const QVariant &v,
-		PropertyGridItemDelegate &source,
-		const Property &context
-	);
-
-	bool SetModelData(
-		QWidget &editor, 
-		QAbstractItemModel &model, 
-		const QModelIndex &index,
-		PropertyGridItemDelegate &source,
-		const Property &context
-	);
-
-	QVariant ToVariant(
-		const QString &t, 
-		int role, 
-		const Property &context
-	);
+struct RADENG_CLASS FilePathExtractor {
+	static void ApplyHints(FilePathFieldWidget &fw);
+	static void SetEditorData(FilePathFieldWidget &fw, const QVariant &v, const Property &context);
+	static QVariant ToVariant(FilePathFieldWidget &fw, const Property &context);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct RADENG_CLASS ComboCheckBoxExtractor
-{ // only supports strings (no other way to make value lists).
-	void ApplyHints(ComboCheckBox &cb) {}
-	void SetEditorData(ComboCheckBox &cb, const QVariant &v, const Property &context);
-	QVariant ToVariant(ComboCheckBox &cb, const Property &context);
-};
-
-///////////////////////////////////////////////////////////////////////////////
-
-struct RADENG_CLASS FilePathExtractor
-{
-	void ApplyHints(FilePathFieldWidget &fw);
-	void SetEditorData(FilePathFieldWidget &fw, const QVariant &v, const Property &context);
-	QVariant ToVariant(FilePathFieldWidget &fw, const Property &context);
-};
-
-///////////////////////////////////////////////////////////////////////////////
-
-struct RADENG_CLASS ContentImportPathExtractor
-{
-	void ApplyHints(ContentImportFieldWidget &fw);
-	void SetEditorData(ContentImportFieldWidget &fw, const QVariant &v, const Property &context);
-	QVariant ToVariant(ContentImportFieldWidget &fw, const Property &context);
+struct RADENG_CLASS ContentImportPathExtractor {
+	static void ApplyHints(ContentImportFieldWidget &fw);
+	static void SetEditorData(ContentImportFieldWidget &fw, const QVariant &v, const Property &context);
+	static QVariant ToVariant(ContentImportFieldWidget &fw, const Property &context);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -197,11 +130,12 @@ template <typename T, typename X = typename T::Type>
 struct KeyTraits : public T
 {
 	typedef typename T::Type Type;
+	typedef T Super;
 	typedef KeyTraits<T> Self;
 	typedef TProperty<Self> PropertyType;
 
-	bool SetValue(const Type &t, Property &p);
-	Qt::ItemFlags Flags(const Property &context);
+	static bool SetValue(const Type &t, Property &p);
+	static Qt::ItemFlags Flags(const Property &context);
 };
 
 typedef KeyTraits<SpinBoxPropertyTraits<QSpinBox, NullPropertyHints, int> > IntTraits;
@@ -217,12 +151,12 @@ typedef KeyTraits<WidgetPropertyTraits<ComboCheckBox, ComboCheckBoxExtractor, QS
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct RADENG_CLASS AssetRenameTraits : public LineEditPropertyTraits
-{
+struct RADENG_CLASS AssetRenameTraits : public LineEditPropertyTraits {
 	typedef QString Type;
-	typedef TProperty<AssetRenameTraits> PropertyType;
-
-	bool SetValue(const QString &value, Property &p);
+	typedef LineEditPropertyTraits Super;
+	typedef AssetRenameTraits Self;
+	typedef TProperty<Self> PropertyType;
+	static bool SetValue(const QString &value, Property &p);
 };
 
 ///////////////////////////////////////////////////////////////////////////////

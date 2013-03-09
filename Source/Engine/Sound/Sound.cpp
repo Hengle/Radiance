@@ -409,7 +409,8 @@ m_bsi(0) {
 Sound::~Sound() {
 	SoundContext::Ref ctx = m_ctx.lock();
 	if (ctx) {
-		ZMusic.Get().Dec(kNumStreamingBuffers*kStreamingBufferSize, 0);
+		if (m_is)
+			ZMusic.Get().Dec(kNumStreamingBuffers*kStreamingBufferSize, 0);
 
 		for (SourceVec::iterator it = m_sources.begin(); it != m_sources.end(); ++it) {
 			SoundContext::Source &source = *it;

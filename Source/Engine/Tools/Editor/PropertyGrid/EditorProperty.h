@@ -27,14 +27,12 @@ typedef QList<Property*> PropertyList;
 class PropertyGridItemDelegate;
 namespace details { class MultiProperty; }
 
-class RADENG_CLASS Property : public QObject
-{
+class RADENG_CLASS Property : public QObject {
 	Q_OBJECT
 
 public:
 
-	class UserContext
-	{
+	class UserContext {
 	public:
 		typedef boost::shared_ptr<UserContext> Ref;
 	};
@@ -44,14 +42,12 @@ public:
 	Property(const QString &name, const UserContext::Ref &context, QWidget &view, QObject *parent = 0);
 	virtual ~Property();
 
-	virtual int Row() const 
-	{ 
+	virtual int Row() const { 
 		RAD_ASSERT(parent());
 		return parent()->children().indexOf(const_cast<Property*>(this)); 
 	}
 
-	virtual int RowCount() const
-	{
+	virtual int RowCount() const {
 		return children().size();
 	}
 
@@ -70,8 +66,8 @@ public:
 		const QStyleOptionViewItem &option, 
 		const QModelIndex &index,
 		PropertyGridItemDelegate &source
-	) const
-	{
+	) const {
+		// NULL calls QItemDelegate (see EditorPropertyGridItemDelegate.cpp)
 		return 0;
 	}
 
@@ -80,8 +76,8 @@ public:
 		const QModelIndex &index,
 		bool nil,
 		PropertyGridItemDelegate &source
-	) const
-	{
+	) const {
+		// false calls QItemDelegate (see EditorPropertyGridItemDelegate.cpp)
 		return false;
 	}
 
@@ -90,8 +86,8 @@ public:
 		QAbstractItemModel &model, 
 		const QModelIndex &index,
 		PropertyGridItemDelegate &source
-	) const
-	{
+	) const {
+		// false calls QItemDelegate (see EditorPropertyGridItemDelegate.cpp)
 		return false;
 	}
 
@@ -100,8 +96,7 @@ public:
 		const QStyleOptionViewItem &option,
 		const QModelIndex &index,
 		PropertyGridItemDelegate &source
-	) const
-	{
+	) const {
 		return false;
 	}
 
@@ -110,8 +105,7 @@ public:
 		QAbstractItemModel &model, 
 		const QModelIndex &index,
 		PropertyGridItemDelegate &source
-	) const
-	{
+	) const {
 		return true;
 	}
 
@@ -137,28 +131,27 @@ private:
 // For types that are directly supported by QVariant
 
 template <typename T>
-struct QVariantPropertyTraits
-{
+struct QVariantPropertyTraits {
 	typedef T Type;
 
-	QVariant ToVariant(
+	static QVariant ToVariant(
 		const T &t, 
 		int role, 
 		const Property &context
 	);
 
-	bool FromVariant(
+	static bool FromVariant(
 		const QVariant &v, 
 		T &out, 
 		int role, 
 		const Property &context
 	);
 
-	QVariant NilVariant(int role, const Property &context);
-	bool Equals(const Property &a, const Property &b);
-	bool SupportsEquals();
+	static QVariant NilVariant(int role, const Property &context);
+	static bool Equals(const Property &a, const Property &b);
+	static bool SupportsEquals();
 
-	QWidget *CreateEditor(
+	static QWidget *CreateEditor(
 		QWidget *parent, 
 		const QStyleOptionViewItem &option, 
 		const QModelIndex &index,
@@ -166,7 +159,7 @@ struct QVariantPropertyTraits
 		const Property &context
 	);
 
-	bool SetEditorData(
+	static bool SetEditorData(
 		QWidget &editor, 
 		const QModelIndex &index,
 		const QVariant &v,
@@ -174,7 +167,7 @@ struct QVariantPropertyTraits
 		const Property &context
 	);
 
-	bool SetModelData(
+	static bool SetModelData(
 		QWidget &editor, 
 		QAbstractItemModel &model, 
 		const QModelIndex &index,
@@ -182,7 +175,7 @@ struct QVariantPropertyTraits
 		const Property &context
 	);
 
-	bool UpdateEditorGeometry(
+	static bool UpdateEditorGeometry(
 		QWidget &editor,
 		const QStyleOptionViewItem &option,
 		const QModelIndex &index,
@@ -190,7 +183,7 @@ struct QVariantPropertyTraits
 		const Property &context
 	);
 
-	bool Validate(
+	static bool Validate(
 		QWidget &editor,
 		QAbstractItemModel &model, 
 		const QModelIndex &index,
@@ -198,9 +191,9 @@ struct QVariantPropertyTraits
 		const Property &context
 	);
 
-	void Changed(Property &context);
-	bool SetValue(const T &t, Property &context);
-	Qt::ItemFlags Flags(const Property &context);
+	static void Changed(Property &context);
+	static bool SetValue(const T &t, Property &context);
+	static Qt::ItemFlags Flags(const Property &context);
 };
 
 ///////////////////////////////////////////////////////////////////////////////

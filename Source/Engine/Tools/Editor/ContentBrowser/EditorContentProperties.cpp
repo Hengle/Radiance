@@ -142,63 +142,6 @@ QVariant FilePathExtractor::ToVariant(FilePathFieldWidget &fw, const Property &c
 
 ///////////////////////////////////////////////////////////////////////////////
 
-QWidget *ColorFieldWidgetTraits::CreateEditor(
-	QWidget *parent, 
-	const QStyleOptionViewItem &option, 
-	const QModelIndex &index,
-	PropertyGridItemDelegate &source,
-	const Property &context
-)
-{
-	ColorFieldWidget *w = new (ZEditor) ColorFieldWidget(parent);
-	return w;
-}
-
-bool ColorFieldWidgetTraits::SetEditorData(
-	QWidget &editor, 
-	const QModelIndex &index,
-	const QVariant &v,
-	PropertyGridItemDelegate &source,
-	const Property &context
-)
-{
-	static_cast<ColorFieldWidget&>(editor).SetColor(v.toString());
-	return true;
-}
-
-bool ColorFieldWidgetTraits::SetModelData(
-	QWidget &editor, 
-	QAbstractItemModel &model, 
-	const QModelIndex &index,
-	PropertyGridItemDelegate &source,
-	const Property &context
-)
-{
-	QVariant v = static_cast<ColorFieldWidget&>(editor).Color();
-	if (v.isValid())
-		model.setData(index, v, Qt::EditRole);
-	return true;
-}
-
-QVariant ColorFieldWidgetTraits::ToVariant(
-	const QString &t, 
-	int role, 
-	const Property &context
-)
-{
-	if (role == Qt::DisplayRole)
-		return QVariant();
-	if (role != Qt::BackgroundRole)
-		return QVariantPropertyTraits<QString>::ToVariant(t, role, context);
-	int r, g, b, a;
-	sscanf(t.toAscii().constData(), "%d %d %d %d",
-		&r, &g, &b, &a
-	);
-	return QColor(r, g, b, a);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 void ContentImportPathExtractor::ApplyHints(ContentImportFieldWidget &fw)
 {
 }
