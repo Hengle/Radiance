@@ -550,9 +550,6 @@ public:
 	};
 
 	class Entry {
-#if defined(RAD_OPT_PC_TOOLS)
-		RAD_EVENT_CLASS(EventNoAccess)
-#endif
 	public:
 		typedef boost::shared_ptr<Entry> Ref;
 		typedef zone_map<String, Ref, ZPackagesT>::type Map;
@@ -622,6 +619,8 @@ public:
 		bool Rename(const char *name);
 
 		struct KeyChangedEventData {
+			KeyChangedEventData() : flags(0) {}
+
 			Package::Entry::Ref origin;
 			KeyVal::Ref key;
 			// NOTE: path does not contain full path, it contains the
@@ -634,6 +633,19 @@ public:
 
 		typedef Event<KeyChangedEventData, EventNoAccess> KeyChangeEvent;
 		KeyChangeEvent OnKeyChange;
+
+		struct AssetModifiedEventData {
+			AssetModifiedEventData() : user(0), flags(0), zone(Z_Max) {}
+
+			Package::Entry::Ref origin;
+			Zone zone;
+			void *user;
+			int flags;
+		};
+
+		typedef Event<AssetModifiedEventData, EventNoAccess> AssetModifiedEvent;
+		AssetModifiedEvent OnAssetModified;
+
 #endif
 
 		class Import {

@@ -1449,6 +1449,12 @@
     <ClInclude Include="..\..\Engine\World\Lua\D_SpriteBatch.h">
       <Filter>Source\Engine\World\Lua</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\Assets\ConversationTreeParser.h">
+      <Filter>Source\Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Assets\ConversationTree.h">
+      <Filter>Source\Engine\Assets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -1832,12 +1838,6 @@
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorStringTableEditorWindow.cpp">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\Tools\Editor\EditorStringTableWidget.cpp">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Engine\Tools\Editor\EditorStringTableWidgetItemModel.cpp">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorTextEditorDialog.cpp">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </ClCompile>
@@ -2216,6 +2216,30 @@
     <ClCompile Include="..\..\Engine\Assets\TextureParserDXT.cpp">
       <Filter>Source\Engine\Assets</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\Assets\ConversationTreeParser.cpp">
+      <Filter>Source\Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Assets\ConversationTree.cpp">
+      <Filter>Source\Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorStringTableEditorWidget.cpp">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorStringTableEditorItemModel.cpp">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorConversationTreeEditorWidget.cpp">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorConversationTreeEditorWindow.cpp">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorConversationTreeThumb.cpp">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorConversationTreeEditorItemEditDialog.cpp">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Runtime\Base\Event.inl">
@@ -2481,12 +2505,6 @@
     <QtMOC Include="..\..\Engine\Tools\Editor\EditorTextEditorDialog.h">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </QtMOC>
-    <QtMOC Include="..\..\Engine\Tools\Editor\EditorStringTableWidgetItemModel.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </QtMOC>
-    <QtMOC Include="..\..\Engine\Tools\Editor\EditorStringTableWidget.h">
-      <Filter>Source\Engine\Tools\Editor</Filter>
-    </QtMOC>
     <QtMOC Include="..\..\Engine\Tools\Editor\EditorStringTableEditorWindow.h">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </QtMOC>
@@ -2617,6 +2635,24 @@
       <Filter>Source\Engine\Tools\Editor</Filter>
     </QtMOC>
     <QtMOC Include="..\..\Engine\Tools\Editor\EditorDebugConsoleMenuBuilder.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorStringTableEditorWidget.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorStringTableEditorItemModel.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorConversationTreeEditorWindow.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorConversationTreeEditorWidget.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorConversationTreeThumb.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorConversationTreeEditorItemEditDialog.h">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </QtMOC>
   </ItemGroup>

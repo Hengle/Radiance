@@ -32,9 +32,11 @@ public:
 		kButton_OK = 0x1,
 		kButton_Cancel = 0x2,
 		kButton_Apply = 0x4,
-		kButton_DefaultOK = 0x8,
-		kButton_DefaultCancel = 0x10,
-		kButton_DefaultApply = 0x20,
+		kButton_Close = 0x8,
+		kButton_DefaultOK = 0x10,
+		kButton_DefaultClose = 0x10,
+		kButton_DefaultCancel = 0x20,
+		kButton_DefaultApply = 0x40,
 		kButton_OKCancel = kButton_OK|kButton_Cancel,
 		kButton_OKCancelApply = kButton_OK|kButton_Cancel|kButton_Apply
 	};
@@ -88,6 +90,15 @@ public:
 
 	//! Centers the window inside the parent.
 	void CenterParent();
+
+	//! Centers the window inside the parent and makes it a percentage of the parents size.
+	void Center(QWidget &widget, float x, float y);
+
+	//! Centers the windows inside the parent and makes it a certain size.
+	void Center(QWidget &widget, int w, int h);
+
+	//! Centers the window inside the parent.
+	void Center(QWidget &widget);
 
 signals:
 

@@ -41,7 +41,8 @@ FilePathFieldWidget::FilePathFieldWidget(QWidget *parent)
 void FilePathFieldWidget::SetPath(const QString &path)
 {
 	m_path = path;
-	m_edit->setText(path);
+	m_path.replace('\\', '/');
+	m_edit->setText(m_path);
 	m_edit->selectAll();
 }
 
@@ -102,6 +103,7 @@ void FilePathFieldWidget::BrowseClicked()
 void FilePathFieldWidget::EditLineFinished()
 {
 	m_path = m_edit->text();
+	m_path.replace('\\', '/');
 }
 
 bool FilePathFieldWidget::ValidatePath(const QString &s)

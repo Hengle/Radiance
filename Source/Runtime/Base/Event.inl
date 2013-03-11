@@ -123,29 +123,29 @@ Event<T, TAccess>::~Event()
 
 template <typename T, typename TAccess>
 template <typename C>
-inline void Event<T, TAccess>::Bind(C *instance, void(C::*fn)(const T&), const ManualReleaseEventTag&)
+inline void Event<T, TAccess>::Bind(C *instance, void(C::*fn)(const T&), const ManualReleaseEventTag_t&)
 {
 	typename THandler::Ref handler(new details::EventHandlerClassMethodBindManual<C, T>(instance, fn));
-	TAccess().Lock(this);
+	TAccess::Lock(this);
 	m_handlers.insert(typename HandlerMMap::value_type(instance, handler));
-	TAccess().Unlock(this);
+	TAccess::Unlock(this);
 }
 
 template <typename T, typename TAccess>
 template <typename C>
-inline EventBinding::Ref Event<T, TAccess>::Bind(C *instance, void(C::*fn)(const T&), const AutoReleaseEventTag&)
+inline EventBinding::Ref Event<T, TAccess>::Bind(C *instance, void(C::*fn)(const T&), const AutoReleaseEventTag_t&)
 {
 	typename THandler::Ref handler(new details::EventHandlerClassMethodBindAuto<C, T>(instance, fn));
-	TAccess().Lock(this);
+	TAccess::Lock(this);
 	typename HandlerMMap::iterator it = m_handlers.insert(typename HandlerMMap::value_type(instance, handler));
-	TAccess().Unlock(this);
-	return Binding::Ref(new Binding(this, it));
+	TAccess::Unlock(this);
+	return EventBinding::Ref(new Binding(this, it));
 }
 
 template <typename T, typename TAccess>
 inline void Event<T, TAccess>::Trigger(const DataType &t)
 {
-	TAccess().Lock(this);
+	TAccess::Lock(this);
 	typename HandlerMMap::iterator it = m_handlers.begin();
 	typename HandlerMMap::iterator end = m_handlers.end();
 	
@@ -153,14 +153,14 @@ inline void Event<T, TAccess>::Trigger(const DataType &t)
 	{
 		it->second->Invoke(t);
 	}
-	TAccess().Unlock(this);
+	TAccess::Unlock(this);
 }
 
 template <typename T, typename TAccess>
 template <typename C>
 void Event<T, TAccess>::Unbind(C *instance, void(C::*fn)(const T&))
 {
-	TAccess().Lock(this);
+	TAccess::Lock(this);
 	typename HandlerMMap::iterator it = m_handlers.begin();
 	typename HandlerMMap::iterator end = m_handlers.end();
 	
@@ -176,21 +176,22 @@ void Event<T, TAccess>::Unbind(C *instance, void(C::*fn)(const T&))
 			++it;
 		}
 	}
-	TAccess().Unlock(this);
+	TAccess::Unlock(this);
 }
 
 template <typename T, typename TAccess>
 inline void Event<T, TAccess>::Unbind(EventBinding *binding)
 {
-	TAccess().Lock(this);
-	m_handlers.erase(static_cast<Binding*>(binding)->it);
-	TAccess().Unlock(this);
+	TAccess::Lock(this);
+	Binding *autoBinding = static_cast<Binding*>(binding);
+	m_handlers.erase(autoBinding->it);
+	TAccess::Unlock(this);
 }
 
 template <typename T, typename TAccess>
 inline void Event<T, TAccess>::DestructNotify()
 {
-	TAccess().Lock(this);
+	TAccess::Lock(this);
 	typename HandlerMMap::iterator it = m_handlers.begin();
 	typename HandlerMMap::iterator end = m_handlers.end();
 	
@@ -199,7 +200,7 @@ inline void Event<T, TAccess>::DestructNotify()
 		it->second->DestructNotify(this);
 	}
 	
-	TAccess().Unlock(this);
+	TAccess::Unlock(this);
 }
 
 template <typename TAccess>
@@ -210,29 +211,29 @@ Event<void, TAccess>::~Event()
 
 template <typename TAccess>
 template <typename C>
-inline void Event<void, TAccess>::Bind(C *instance, void(C::*fn)(), const ManualReleaseEventTag&)
+inline void Event<void, TAccess>::Bind(C *instance, void(C::*fn)(), const ManualReleaseEventTag_t&)
 {
 	THandler::Ref handler(new details::EventHandlerClassMethodBindManual<C, void>(instance, fn));
-	TAccess().Lock(this);
+	TAccess::Lock(this);
 	m_handlers.insert(HandlerMMap::value_type(instance, handler));
-	TAccess().Unlock(this);
+	TAccess::Unlock(this);
 }
 
 template <typename TAccess>
 template <typename C>
-inline EventBinding::Ref Event<void, TAccess>::Bind(C *instance, void(C::*fn)(), const AutoReleaseEventTag&)
+inline EventBinding::Ref Event<void, TAccess>::Bind(C *instance, void(C::*fn)(), const AutoReleaseEventTag_t&)
 {
 	THandler::Ref handler(new details::EventHandlerClassMethodBindAuto<C, void>(instance, fn));
-	TAccess().Lock(this);
+	TAccess::Lock(this);
 	typename HandlerMMap::iterator it = m_handlers.insert(HandlerMMap::value_type(instance, handler));
-	TAccess().Unlock(this);
-	return Binding::Ref(new Binding(this, it));
+	TAccess::Unlock(this);
+	return EventBinding::Ref(new Binding(this, it));
 }
 
 template <typename TAccess>
 inline void Event<void, TAccess>::Trigger()
 {
-	TAccess().Lock(this);
+	TAccess::Lock(this);
 	
 	typename HandlerMMap::iterator it = m_handlers.begin();
 	typename HandlerMMap::iterator end = m_handlers.end();
@@ -241,14 +242,14 @@ inline void Event<void, TAccess>::Trigger()
 	{
 		it->second->Invoke();
 	}
-	TAccess().Unlock(this);
+	TAccess::Unlock(this);
 }
 
 template <typename TAccess>
 template <typename C>
 void Event<void, TAccess>::Unbind(C *instance, void(C::*fn)())
 {
-	TAccess().Lock(this);
+	TAccess::Lock(this);
 	
 	typename HandlerMMap::iterator it = m_handlers.begin();
 	typename HandlerMMap::iterator end = m_handlers.end();
@@ -265,21 +266,21 @@ void Event<void, TAccess>::Unbind(C *instance, void(C::*fn)())
 			++it;
 		}
 	}
-	TAccess().Unlock(this);
+	TAccess::Unlock(this);
 }
 
 template <typename TAccess>
 inline void Event<void, TAccess>::Unbind(EventBinding *binding)
 {
-	TAccess().Lock(this);
+	TAccess::Lock(this);
 	m_handlers.erase(static_cast<Binding*>(binding)->it);
-	TAccess().Unlock(this);
+	TAccess::Unlock(this);
 }
 
 template <typename TAccess>
 inline void Event<void, TAccess>::DestructNotify()
 {
-	TAccess().Lock(this);
+	TAccess::Lock(this);
 	
 	typename HandlerMMap::iterator it = m_handlers.begin();
 	typename HandlerMMap::iterator end = m_handlers.end();
@@ -289,5 +290,5 @@ inline void Event<void, TAccess>::DestructNotify()
 		it->second->DestructNotify(this);
 	}
 	
-	TAccess().Unlock(this);
+	TAccess::Unlock(this);
 }

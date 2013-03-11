@@ -16,12 +16,10 @@ namespace tools {
 namespace editor {
 namespace content_property_details {
 
-RADENG_API PropertyList RADENG_CALL CreatePropertiesForAsset(const pkg::Package::Entry::Ref &e, int flags, QWidget &widget)
-{
+RADENG_API PropertyList RADENG_CALL CreatePropertiesForAsset(const pkg::Package::Entry::Ref &e, int flags, QWidget &widget) {
 	PropertyList l = CreateDefaultPropertiesForAsset(e, flags, widget);
 
-	switch (e->type.get())
-	{
+	switch (e->type.get()) {
 	case asset::AT_Texture:
 		AddTextureProperties(l, e, flags, widget);
 		break;
@@ -34,8 +32,7 @@ RADENG_API PropertyList RADENG_CALL CreatePropertiesForAsset(const pkg::Package:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void ComboCheckBoxExtractor::SetEditorData(ComboCheckBox &cb, const QVariant &v, const Property &p)
-{
+void ComboCheckBoxExtractor::SetEditorData(ComboCheckBox &cb, const QVariant &v, const Property &p) {
 	KeyContext::Ref context = boost::static_pointer_cast<KeyContext, Property::UserContext>(p.Context());
 	RAD_ASSERT(context);
 
@@ -56,8 +53,7 @@ void ComboCheckBoxExtractor::SetEditorData(ComboCheckBox &cb, const QVariant &v,
 	qs = v.toString();
 	QStringList sel = qs.split(';', QString::SkipEmptyParts);
 
-	foreach(QString s, values)
-	{
+	foreach(QString s, values) {
 		bool checked = sel.indexOf(s) > -1;
 		cb.addItem(s, checked);
 	}
@@ -65,15 +61,13 @@ void ComboCheckBoxExtractor::SetEditorData(ComboCheckBox &cb, const QVariant &v,
 	cb.showPopup();
 }
 
-QVariant ComboCheckBoxExtractor::ToVariant(ComboCheckBox &cb, const Property &context)
-{
+QVariant ComboCheckBoxExtractor::ToVariant(ComboCheckBox &cb, const Property &context) {
 	return cb.getSelString();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void ComboBoxExtractor<QString>::SetEditorData(QComboBox &cb, const QVariant &v, const Property &p)
-{
+void ComboBoxExtractor<QString>::SetEditorData(QComboBox &cb, const QVariant &v, const Property &p) {
 	KeyContext::Ref context = boost::static_pointer_cast<KeyContext, Property::UserContext>(p.Context());
 	RAD_ASSERT(context);
 
@@ -98,8 +92,7 @@ void ComboBoxExtractor<QString>::SetEditorData(QComboBox &cb, const QVariant &v,
 	cb.showPopup();
 }
 
-QVariant ComboBoxExtractor<QString>::ToVariant(QComboBox &cb, const Property &context)
-{
+QVariant ComboBoxExtractor<QString>::ToVariant(QComboBox &cb, const Property &context) {
 	if (cb.currentIndex() != -1)
 		return QVariant(cb.currentText());
 	return QVariant();
@@ -107,12 +100,10 @@ QVariant ComboBoxExtractor<QString>::ToVariant(QComboBox &cb, const Property &co
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void FilePathExtractor::ApplyHints(FilePathFieldWidget &fw)
-{
+void FilePathExtractor::ApplyHints(FilePathFieldWidget &fw) {
 }
 
-void FilePathExtractor::SetEditorData(FilePathFieldWidget &fw, const QVariant &v, const Property &p)
-{
+void FilePathExtractor::SetEditorData(FilePathFieldWidget &fw, const QVariant &v, const Property &p) {
 	KeyContext::Ref context = boost::static_pointer_cast<KeyContext, Property::UserContext>(p.Context());
 	RAD_ASSERT(context);
 
@@ -125,8 +116,7 @@ void FilePathExtractor::SetEditorData(FilePathFieldWidget &fw, const QVariant &v
 	fw.SetFilter("All Files (*.*)");
 
 	pkg::KeyDef::Pair::Map::const_iterator it = context->def->pairs.find(CStr("filter"));
-	if (it != context->def->pairs.end())
-	{
+	if (it != context->def->pairs.end()) {
 		const String *s = static_cast<const String*>(it->second.val);
 		if (s)
 			fw.SetFilter(s->c_str.get());
@@ -135,19 +125,16 @@ void FilePathExtractor::SetEditorData(FilePathFieldWidget &fw, const QVariant &v
 	fw.SetPath(v.toString());
 }
 
-QVariant FilePathExtractor::ToVariant(FilePathFieldWidget &fw, const Property &context)
-{
+QVariant FilePathExtractor::ToVariant(FilePathFieldWidget &fw, const Property &context) {
 	return fw.Path();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void ContentImportPathExtractor::ApplyHints(ContentImportFieldWidget &fw)
-{
+void ContentImportPathExtractor::ApplyHints(ContentImportFieldWidget &fw) {
 }
 
-void ContentImportPathExtractor::SetEditorData(ContentImportFieldWidget &fw, const QVariant &v, const Property &p)
-{
+void ContentImportPathExtractor::SetEditorData(ContentImportFieldWidget &fw, const QVariant &v, const Property &p) {
 	KeyContext::Ref context = boost::static_pointer_cast<KeyContext, Property::UserContext>(p.Context());
 	RAD_ASSERT(context);
 
@@ -155,8 +142,7 @@ void ContentImportPathExtractor::SetEditorData(ContentImportFieldWidget &fw, con
 		return;
 
 	pkg::KeyDef::Pair::Map::const_iterator it = context->def->pairs.find(String("types"));
-	if (it != context->def->pairs.end())
-	{
+	if (it != context->def->pairs.end()) {
 		const String *s = static_cast<const String*>(it->second.val);
 		if (s)
 			fw.SetFilter(s->c_str.get());
@@ -165,15 +151,13 @@ void ContentImportPathExtractor::SetEditorData(ContentImportFieldWidget &fw, con
 	fw.SetPath(v.toString());
 }
 
-QVariant ContentImportPathExtractor::ToVariant(ContentImportFieldWidget &fw, const Property &context)
-{
+QVariant ContentImportPathExtractor::ToVariant(ContentImportFieldWidget &fw, const Property &context) {
 	return fw.Path();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool AssetRenameTraits::SetValue(const QString &value, Property &p)
-{
+bool AssetRenameTraits::SetValue(const QString &value, Property &p) {
 	EntryIdContext::Ref context = boost::static_pointer_cast<EntryIdContext, Property::UserContext>(p.Context());
 	RAD_ASSERT(context);
 
@@ -181,8 +165,7 @@ bool AssetRenameTraits::SetValue(const QString &value, Property &p)
 	if (!entry)
 		return false;
 
-	if (entry->Rename(value.toAscii().constData()))
-	{
+	if (entry->Rename(value.toAscii().constData())) {
 		ContentPropertyGrid::PropertyChanged(entry);
 		return true;
 	}
@@ -198,17 +181,14 @@ bool AssetRenameTraits::SetValue(const QString &value, Property &p)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-RADENG_API Property *RADENG_CALL PropertyForKey(const char *name, const KeyContext::Ref &key, QWidget &widget)
-{
+RADENG_API Property *RADENG_CALL PropertyForKey(const char *name, const KeyContext::Ref &key, QWidget &widget) {
 	int type = key->def->Type();
 
 	// int
 	{
 		const int *i = static_cast<const int*>(key->Variant());
-		if (i)
-		{
-			switch (type)
-			{
+		if (i) {
+			switch (type) {
 			case pkg::K_List:
 				return new (ZEditor) IntComboBoxTraits::PropertyType(
 					*i,
@@ -229,8 +209,7 @@ RADENG_API Property *RADENG_CALL PropertyForKey(const char *name, const KeyConte
 	// bool
 	{
 		const bool *b = static_cast<const bool*>(key->Variant());
-		if (b)
-		{
+		if (b) {
 			return new (ZEditor) BoolTraits::PropertyType(
 				*b,
 				key,
@@ -242,10 +221,8 @@ RADENG_API Property *RADENG_CALL PropertyForKey(const char *name, const KeyConte
 	// string
 	{
 		const String *s = static_cast<const String*>(key->Variant());
-		if (s)
-		{
-			switch (type)
-			{
+		if (s) {
+			switch (type) {
 			case pkg::K_Import:
 				return new (ZEditor) ContentImportTraits::PropertyType(
 					s->c_str.get(),
@@ -295,8 +272,8 @@ RADENG_API Property *RADENG_CALL PropertyForKey(const char *name, const KeyConte
 	return 0;
 }
 
-RADENG_API Property *RADENG_CALL PropertyForName(const pkg::Package::Entry::Ref &e, QWidget &widget)
-{ // Get property for editing the asset name.
+RADENG_API Property *RADENG_CALL PropertyForName(const pkg::Package::Entry::Ref &e, QWidget &widget) { 
+	// Get property for editing the asset name.
 	return new (ZEditor) AssetRenameTraits::PropertyType(
 		e->name.get(),
 		Property::UserContext::Ref(new (ZEditor) EntryIdContext(e->id)),
@@ -305,14 +282,12 @@ RADENG_API Property *RADENG_CALL PropertyForName(const pkg::Package::Entry::Ref 
 	);
 }
 
-RADENG_API PropertyList RADENG_CALL CreateDefaultPropertiesForAsset(const pkg::Package::Entry::Ref &e, int flags, QWidget &widget)
-{
+RADENG_API PropertyList RADENG_CALL CreateDefaultPropertiesForAsset(const pkg::Package::Entry::Ref &e, int flags, QWidget &widget) {
 	PropertyList l;
 
 	flags &= pkg::P_AllTargets;
 
-	if (!flags)
-	{
+	if (!flags) {
 		Property *p = PropertyForName(e, widget);
 		if (p)
 			l.append(p);
@@ -321,22 +296,20 @@ RADENG_API PropertyList RADENG_CALL CreateDefaultPropertiesForAsset(const pkg::P
 	pkg::KeyDef::MapRef defs = Packages()->KeyDefsForType(e->type);
 	const pkg::KeyVal::Map &keys = e->Keys();
 
-	for (int t = pkg::P_FirstTarget; t <= pkg::P_LastTarget; t <<= 1)
-	{
+	for (int t = pkg::P_FirstTarget; t <= pkg::P_LastTarget; t <<= 1) {
 		if (flags && !(flags&t))
 			continue;
 
-		for (pkg::KeyDef::Map::const_iterator it = defs->begin(); it != defs->end(); ++it)
-		{
+		for (pkg::KeyDef::Map::const_iterator it = defs->begin(); it != defs->end(); ++it) {
 			const pkg::KeyDef::Ref &def = it->second;
 
 			if (def->style&pkg::K_Hidden)
 				continue;
 
-			if (def->flags == 0 && def->val.Valid())
-			{ // only select defs that aren't tagged for any platform
-			  // then look for a platform specific version. if none found, default to def
-			  // SetValue()'s will add key if necessary.
+			if (def->flags == 0 && def->val.Valid()) { 
+				// only select defs that aren't tagged for any platform
+				// then look for a platform specific version. if none found, default to def
+				// SetValue()'s will add key if necessary.
 
 				if ((flags && (def->style&pkg::K_Global)) ||
 					(!flags && !(def->style&pkg::K_Global)))
@@ -344,15 +317,13 @@ RADENG_API PropertyList RADENG_CALL CreateDefaultPropertiesForAsset(const pkg::P
 
 				pkg::KeyVal::Ref key;
 				String path = def->path;
-				if (flags)
-				{
+				if (flags) {
 					path += ".";
 					path += pkg::PlatformNameForFlags(t);
 				}
 				pkg::KeyVal::Map::const_iterator k = keys.find(path);
 
-				if (k != keys.end())
-				{
+				if (k != keys.end()) {
 					key = k->second;
 				}
 

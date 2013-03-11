@@ -127,8 +127,7 @@ struct RADENG_CLASS ContentImportPathExtractor {
 ///////////////////////////////////////////////////////////////////////////////
 
 template <typename T, typename X = typename T::Type>
-struct KeyTraits : public T
-{
+struct KeyTraits : public T {
 	typedef typename T::Type Type;
 	typedef T Super;
 	typedef KeyTraits<T> Self;

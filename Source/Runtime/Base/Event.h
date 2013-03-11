@@ -11,10 +11,88 @@
 #include "EventDetails.h"
 #include "../PushPack.h"
 
+/*
+==============================================================================
+Event System (similiar to C#):
+	
+	--------------------------------------------------------------------------
+	Declare an event type using the Event<> template like so:
+	--------------------------------------------------------------------------
+
+	struct MyEventPayload {
+		...fields...
+	};
+
+	typedef Event<MyEventPayload, AccessControlType> MyEvent;
+
+	The AccessControlType is a traits class that contains:
+		class AccessControl {
+			static void Lock(MyEvent* or BaseEvent*);
+			static void Unlock(MyEvent* or BaseEvent*);
+		};
+
+		This is used to synchronize access to the event object if there are multipe
+		threads using the event
+
+	Use EventNoAccess if you have no need for synchronization.
+
+	--------------------------------------------------------------------------
+	Trigger an event like so:
+	--------------------------------------------------------------------------
+
+	class MyClassSender {
+		MyEvent OnMyEvent;
+	};
+
+	MyEventPayload payload;
+	payload.fields = {}
+
+	myClassSenderInstance.OnMyEvent.Trigger(payload);
+
+	--------------------------------------------------------------------------
+	Bind an event handler like so:
+	--------------------------------------------------------------------------
+
+	There are 2 types of event handlers: manual release and auto release. Auto
+	release events manage the linkage between object instances automatically.
+	If the sender is deleted, all the receivers are automatically disconnected.
+	If a receive is deleted it automatically unregisters from the sender. Note
+	this could cause issues if sender and receiver are destroyed on different
+	threads in an undefined way (like both at the same time).
+
+	A manual release event is bound like so:
+
+	class MyEventReceiver {
+		void MyEventHandler(const MyEventPayload &payload);
+	};
+
+	myClassSenderInstance.OnMyEvent.Bind(myReceiverInstance, &MyEventReceiver::MyEventHandler, ManualReleaseTag);
+
+	Unbind a manual release event liks so:
+
+	myClassSenderInstance.OnMyEvent.Unbind(myReceiverInstance, &MyClassReceiver::MyEventHandler);
+
+	An auto release event is bound like so:
+
+	class MyEventReceiver {
+		RAD_EVENT_CLASS(EventNoAccess)
+		void MyEventHandler(const MyEventPayload &payload);
+	};
+
+	myReceiverInstance.Bind(myClassSenderInstance.OnMyEvent, &MyEventReceiver::MyEventHandler);
+
+	No need to unregister!
+
+==============================================================================
+*/
+
 RAD_ZONE_DEC(RADRT_API, ZEvents);
 
-struct ManualReleaseEventTag {};
-struct AutoReleaseEventTag {};
+struct ManualReleaseEventTag_t {};
+struct AutoReleaseEventTag_t {};
+static const ManualReleaseEventTag_t ManualReleaseEventTag;
+static const AutoReleaseEventTag_t AutoReleaseEventTag;
+
 class EventBinding;
 
 class BaseEvent
@@ -29,18 +107,20 @@ class EventBinding
 public:
 	typedef boost::shared_ptr<EventBinding> Ref;
 	EventBinding(BaseEvent *e) : m_e(e) {}
-	virtual ~EventBinding() { m_e->Unbind(this); }
+	virtual ~EventBinding() {}
 	bool Equals(BaseEvent *e) const { return m_e == e; }
+protected:
+	void Unbind() { m_e->Unbind(this); }
 private:
 	BaseEvent *m_e;
 };
 
 struct EventNoAccess
 {
-	void Lock(BaseEvent*) {}
-	void Unlock(BaseEvent*) {}
-	void Lock(void*) {}
-	void Unlock(void*) {}
+	static void Lock(BaseEvent*) {}
+	static void Unlock(BaseEvent*) {}
+	static void Lock(void*) {}
+	static void Unlock(void*) {}
 };
 
 template <typename T, typename TAccess>
@@ -53,9 +133,9 @@ public:
 	~Event();
 
 	template <typename C>
-	void Bind(C *instance, void(C::*fn)(const T&), const ManualReleaseEventTag&);
+	void Bind(C *instance, void(C::*fn)(const T&), const ManualReleaseEventTag_t&);
 	template <typename C>
-	EventBinding::Ref Bind(C *instance, void(C::*fn)(const T&), const AutoReleaseEventTag&);
+	EventBinding::Ref Bind(C *instance, void(C::*fn)(const T&), const AutoReleaseEventTag_t&);
 
 	void Trigger(const DataType &t);
 
@@ -71,6 +151,7 @@ private:
 	{
 	public:
 		Binding(SelfType *self, typename HandlerMMap::iterator _it) : EventBinding(self), it(_it) {}
+		virtual ~Binding() { Unbind(); }
 		typename HandlerMMap::iterator it;
 	};
 
@@ -90,9 +171,9 @@ public:
 	~Event();
 
 	template <typename C>
-	void Bind(C *instance, void(C::*fn)(), const ManualReleaseEventTag&);
+	void Bind(C *instance, void(C::*fn)(), const ManualReleaseEventTag_t&);
 	template <typename C>
-	EventBinding::Ref Bind(C *instance, void(C::*fn)(), const AutoReleaseEventTag&);
+	EventBinding::Ref Bind(C *instance, void(C::*fn)(), const AutoReleaseEventTag_t&);
 
 	void Trigger();
 
@@ -108,6 +189,7 @@ private:
 	{
 	public:
 		Binding(SelfType *self, typename HandlerMMap::iterator _it) : EventBinding(self), it(_it) {}
+		virtual ~Binding() { Unbind(); }
 		typename HandlerMMap::iterator it;
 	};
 
@@ -117,6 +199,7 @@ private:
 	HandlerMMap m_handlers;
 };
 
+// Classes that use auto-release events need to place this macro in their class definition
 #define RAD_EVENT_CLASS(_TAccess) \
 private: \
 	typedef zone_list<EventBinding::Ref, ZEventsT>::type __rad_event_handlers; \
@@ -125,13 +208,13 @@ public: \
 	template <typename E, typename C> \
 	void Bind(E &e, void (C::*F)(const typename E::DataType&)) \
 	{ \
-		_TAccess().Lock(this); \
-		__event_handlers.push_back(e.Bind(this, F), AutoReleaseEventTag()); \
-		_TAccess().Unlock(this); \
+		_TAccess::Lock(this); \
+		__event_handlers.push_back(e.Bind(this, F, AutoReleaseEventTag)); \
+		_TAccess::Unlock(this); \
 	} \
 	void __rad_handle_event_destruct(BaseEvent *e) \
 	{ \
-		_TAccess().Lock(this); \
+		_TAccess::Lock(this); \
 		for (__rad_event_handlers::iterator it = __event_handlers.begin(); it != __event_handlers.end();) \
 		{ \
 			if ((*it)->Equals(e)) \
@@ -143,7 +226,7 @@ public: \
 				++it; \
 			} \
 		} \
-		_TAccess().Unlock(this); \
+		_TAccess::Unlock(this); \
 	} \
 private:
 

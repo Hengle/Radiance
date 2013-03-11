@@ -5,7 +5,6 @@
 	\ingroup assets
 */
 
-
 #include RADPCH
 #include "Assets.h"
 #include "TextureParser.h"
@@ -24,6 +23,7 @@
 #include "FontParser.h"
 #include "TypefaceParser.h"
 #include "StringTableParser.h"
+#include "ConversationTreeParser.h"
 
 #if defined(RAD_OPT_TOOLS)
 #include "MapParser.h"
@@ -75,6 +75,7 @@ RADENG_API void RADENG_CALL RegisterParsers(Engine &engine) {
 	FontParser::Register(engine);
 	TypefaceParser::Register(engine);
 	StringTableParser::Register(engine);
+	ConversationTreeParser::Register(engine);
 	RB_RegisterParsers(engine);
 }
 

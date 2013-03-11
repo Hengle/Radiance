@@ -6,10 +6,7 @@
 #pragma once
 
 #include "EditorWindow.h"
-#include "EditorStringTableWidget.h"
 #include <Runtime/PushPack.h>
-
-class QCloseEvent;
 
 namespace tools {
 namespace editor {

@@ -5,6 +5,7 @@
 
 #include RADPCH
 #include "EditorStringTableEditorWindow.h"
+#include "EditorStringTableEditorWidget.h"
 #include <QtGui/QHBoxLayout>
 
 namespace tools {
@@ -18,23 +19,21 @@ StringTableEditorWindow::StringTableEditorWindow(
 ) : 
 EditorWindow(
 	style, 
-	EditorWindow::kButton_OK|EditorWindow::kButton_DefaultOK, 
+	EditorWindow::kButton_Close|EditorWindow::kButton_DefaultClose, 
 	true,
 	false, 
 	parent
 ) {
 
 	QHBoxLayout *layout = new (ZEditor) QHBoxLayout();
-	StringTableWidget *widget = new (ZEditor) StringTableWidget(
+	StringTableEditorWidget *widget = new (ZEditor) StringTableEditorWidget(
 		asset,
 		editable,
 		this
 	);
 
 	layout->addWidget(widget);
-
 	SetCenterLayout(layout);
-
 	CenterParent(0.65f, 0.65f);
 }
 

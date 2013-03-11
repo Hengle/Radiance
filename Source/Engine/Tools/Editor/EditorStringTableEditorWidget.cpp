@@ -4,7 +4,7 @@
 // See Radiance/LICENSE for licensing terms.
 
 #include RADPCH
-#include "EditorStringTableWidget.h"
+#include "EditorStringTableEditorWidget.h"
 #include "EditorSearchLineWidget.h"
 #include "EditorComboCheckBox.h"
 #include "EditorUtils.h"
@@ -19,25 +19,13 @@
 #include <QtGui/QSortFilterProxyModel>
 #include <QtGui/QTextEdit>
 #include <QtCore/QAbstractItemModel>
-#include "../../Assets/StringTableParser.h"
-#include "EditorStringTableWidgetItemModel.h"
+#include "EditorStringTableEditorItemModel.h"
 #include "EditorTextEditorDialog.h"
 
 namespace tools {
 namespace editor {
 
 namespace {
-const char *s_iconNames[StringTable::LangId_MAX] = {
-	"Editor/Flags/flag_usa.png",
-	"Editor/Flags/flag_france.png",
-	"Editor/Flags/flag_italy.png",
-	"Editor/Flags/flag_germany.png",
-	"Editor/Flags/flag_spain.png",
-	"Editor/Flags/flag_russia.png",
-	"Editor/Flags/flag_japan.png",
-	"Editor/Flags/flag_china.png"
-};
-
 inline QString ExpandNewlines(const QString &str) {
 	QString x(str);
 	x.replace('\n', "\\n");
@@ -51,7 +39,18 @@ inline QString CollapseNewlines(const QString & str) {
 }
 }
 
-StringTableWidget::StringTableWidget(
+const char *s_stringTableIconNames[StringTable::LangId_MAX] = {
+	"Editor/Flags/flag_usa.png",
+	"Editor/Flags/flag_france.png",
+	"Editor/Flags/flag_italy.png",
+	"Editor/Flags/flag_germany.png",
+	"Editor/Flags/flag_spain.png",
+	"Editor/Flags/flag_russia.png",
+	"Editor/Flags/flag_japan.png",
+	"Editor/Flags/flag_china.png"
+};
+
+StringTableEditorWidget::StringTableEditorWidget(
 	const pkg::Asset::Ref &stringTable,
 	bool editable,
 	QWidget *parent
@@ -69,8 +68,8 @@ m_sort(Qt::AscendingOrder)
 	}
 
 	for (int i = 0; i < StringTable::LangId_MAX; ++i) {
-		if (s_iconNames[i])
-			m_icons[i] = LoadIcon(s_iconNames[i]);
+		if (s_stringTableIconNames[i])
+			m_icons[i] = LoadIcon(s_stringTableIconNames[i]);
 	}
 
 	QGridLayout *mainLayout = new (ZEditor) QGridLayout(this);
@@ -115,7 +114,7 @@ m_sort(Qt::AscendingOrder)
 		m_languages->addItem(
 			m_icons[i],
 			StringTable::LangTitles[i],
-			QVariant(i)
+			qVariantFromValue(i)
 		);
 	}
 
@@ -167,8 +166,8 @@ m_sort(Qt::AscendingOrder)
 
 	RAD_VERIFY(connect(m_table, SIGNAL(doubleClicked(const QModelIndex&)), SLOT(OnItemDoubleClicked(const QModelIndex&))));
 
-	m_model = new (ZEditor) StringTableItemModel(
-		*m_parser->mutableStringTable.get(),
+	m_model = new (ZEditor) StringTableEditorItemModel(
+		*m_parser->stringTable.get(),
 		StringTable::LangId_FR,
 		editable,
 		m_icons,
@@ -195,36 +194,36 @@ m_sort(Qt::AscendingOrder)
 	mainLayout->setRowStretch(1, 1);
 }
 
-void StringTableWidget::showEvent(QShowEvent *e) {
+void StringTableEditorWidget::showEvent(QShowEvent *e) {
 	QWidget::showEvent(e);
 	m_table->horizontalHeader()->resizeSections(QHeaderView::Stretch);
 }
 
-void StringTableWidget::resizeEvent(QResizeEvent *e) {
+void StringTableEditorWidget::resizeEvent(QResizeEvent *e) {
 	QWidget::resizeEvent(e);
 	m_table->horizontalHeader()->resizeSections(QHeaderView::Stretch);
 }
 
-void StringTableWidget::OnSearchTextChanged(const QString &text) {
+void StringTableEditorWidget::OnSearchTextChanged(const QString &text) {
 }
 
-void StringTableWidget::OnSearchItemChecked(int index, bool checked) {
+void StringTableEditorWidget::OnSearchItemChecked(int index, bool checked) {
 }
 
-void StringTableWidget::OnSearchItemAllChecked(bool checked) {
+void StringTableEditorWidget::OnSearchItemAllChecked(bool checked) {
 }
 
-void StringTableWidget::OnLanguageChanged(int index) {
+void StringTableEditorWidget::OnLanguageChanged(int index) {
 	QVariant data = m_languages->itemData(index);
 	if (data.isValid() && data.type() == QVariant::Int)
 		m_model->langId = (StringTable::LangId)data.toInt();
 }
 
-void StringTableWidget::OnAddClicked() {
+void StringTableEditorWidget::OnAddClicked() {
 	String id(CStr("New String"));
 
 	for (int i = 2; ; ++i) {
-		if (m_parser->mutableStringTable->CreateId(id.c_str))
+		if (m_parser->stringTable->CreateId(id.c_str))
 			break;
 		id.Printf("New String %d", i);
 	}
@@ -241,7 +240,7 @@ void StringTableWidget::OnAddClicked() {
 	SaveChanges();
 }
 
-void StringTableWidget::OnDeleteClicked() {
+void StringTableEditorWidget::OnDeleteClicked() {
 	QModelIndexList sel = m_table->selectionModel()->selectedIndexes();
 	if (sel.empty())
 		return;
@@ -264,11 +263,11 @@ void StringTableWidget::OnDeleteClicked() {
 	SaveChanges();
 }
 
-void StringTableWidget::OnSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
+void StringTableEditorWidget::OnSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
 	m_delButton->setEnabled(m_table->selectionModel()->hasSelection());
 }
 
-void StringTableWidget::OnSortChanged(int index, Qt::SortOrder sort) {
+void StringTableEditorWidget::OnSortChanged(int index, Qt::SortOrder sort) {
 	if (index != m_sortColumn || sort != m_sort) {
 		m_sortColumn = index;
 		m_sort = sort;
@@ -276,14 +275,14 @@ void StringTableWidget::OnSortChanged(int index, Qt::SortOrder sort) {
 	}
 }
 
-void StringTableWidget::OnItemRenamed(const QModelIndex &index) {
+void StringTableEditorWidget::OnItemRenamed(const QModelIndex &index) {
 	QModelIndex dst = m_sortModel->mapFromSource(index);
 	m_table->selectRow(dst.row());
 	m_table->scrollTo(dst);
 	SaveChanges();
 }
 
-void StringTableWidget::OnItemDoubleClicked(const QModelIndex &index) {
+void StringTableEditorWidget::OnItemDoubleClicked(const QModelIndex &index) {
 	if (!index.isValid() || index.column() == 0)
 		return;
 	QModelIndex mappedIndex = m_sortModel->mapToSource(index);
@@ -320,19 +319,24 @@ void StringTableWidget::OnItemDoubleClicked(const QModelIndex &index) {
 	}
 }
 
-void StringTableWidget::OnModelReset() {
+void StringTableEditorWidget::OnModelReset() {
 	m_delButton->setEnabled(false);
 }
 
-void StringTableWidget::SaveChanges() {
-	m_parser->Save(
+void StringTableEditorWidget::SaveChanges() {
+	asset::StringTableParser::Save(
 		*App::Get()->engine.get(),
 		m_stringTable,
 		0
 	);
+
+	pkg::Package::Entry::AssetModifiedEventData data;
+	data.origin = m_stringTable->entry;
+	data.zone = m_stringTable->zone;
+	m_stringTable->entry->OnAssetModified.Trigger(data);
 }
 
 } // editor
 } // tools
 
-#include "moc_EditorStringTableWidget.cc"
+#include "moc_EditorStringTableEditorWidget.cc"

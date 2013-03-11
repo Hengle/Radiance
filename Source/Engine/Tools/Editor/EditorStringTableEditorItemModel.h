@@ -1,15 +1,14 @@
-// EditorStringTableItemModel.h
+// EditorStringTableEditorItemModel.h
 // Copyright (c) 2012 Sunside Inc., All Rights Reserved
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
 #pragma once
 
-#include <QtCore/QAbstractItemModel>
 #include "../../StringTable.h"
+#include <QtCore/QAbstractItemModel>
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/Container/ZoneMap.h>
-
 #include <Runtime/PushPack.h>
 
 class QIcon;
@@ -17,17 +16,19 @@ class QIcon;
 namespace tools {
 namespace editor {
 
-class StringTableItemModel : public QAbstractItemModel {
+class StringTableEditorItemModel : public QAbstractItemModel {
 	Q_OBJECT
 public:
 
-	StringTableItemModel(
+	StringTableEditorItemModel(
 		StringTable &stringTable,
 		StringTable::LangId langId,
 		bool editable,
 		const QIcon *icons,
 		QObject *parent = 0
 	);
+
+	void Load();
 
 	virtual QModelIndex index(int row, int column, const QModelIndex &parent) const {
 		return createIndex(row, column);
@@ -49,16 +50,14 @@ public:
 	virtual bool setData(const QModelIndex &index, const QVariant &value, int role);
 	virtual Qt::ItemFlags flags(const QModelIndex &index) const;
 	virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-
-	void Load();
-
+	
 	const StringTable::Entry::Map::const_iterator *IteratorForIndex(const QModelIndex &index) const;
 	int RowForId(const char *id) const;
 	QModelIndex IndexForRow(int row) const;
 	void DeleteItem(const QModelIndex &index);
 	void DeleteItems(const QModelIndexList &indices);
 
-	RAD_DECLARE_PROPERTY(StringTableItemModel, langId, StringTable::LangId, StringTable::LangId);
+	RAD_DECLARE_PROPERTY(StringTableEditorItemModel, langId, StringTable::LangId, StringTable::LangId);
 
 signals:
 

@@ -20,19 +20,19 @@ void GameNetworkEventQueue::Bind(GameNetwork &network)
 	network.OnAuthenticated.Bind<GameNetworkEventQueue>(
 		this, 
 		&GameNetworkEventQueue::OnAuthenticated, 
-		ManualReleaseEventTag()
+		ManualReleaseEventTag
 	);
 
 	network.OnShowLeaderboard.Bind<GameNetworkEventQueue>(
 		this,
 		&GameNetworkEventQueue::OnShowLeaderboard,
-		ManualReleaseEventTag()
+		ManualReleaseEventTag
 	);
 
 	network.OnShowAchievements.Bind<GameNetworkEventQueue>(
 		this,
 		&GameNetworkEventQueue::OnShowAchievements,
-		ManualReleaseEventTag()
+		ManualReleaseEventTag
 	);
 }
 

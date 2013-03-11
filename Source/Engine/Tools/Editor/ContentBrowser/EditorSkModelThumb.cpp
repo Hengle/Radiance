@@ -21,9 +21,9 @@ void SkModelThumb::OpenEditor(const pkg::Package::Entry::Ref &entry, bool editab
 	ModelEditorWindow *w;
 
 	if (modal) {
-		w = EditorWindow::CreateDialog<ModelEditorWindow>(asset, editable, View().parentWidget());
+		w = EditorWindow::CreateDialog<ModelEditorWindow>(asset, editable);
 	} else {
-		w = EditorWindow::Open<ModelEditorWindow>(asset, View().parentWidget());
+		w = EditorWindow::Open<ModelEditorWindow>(asset);
 	}
 
 	if (w) {

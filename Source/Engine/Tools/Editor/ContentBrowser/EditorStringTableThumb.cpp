@@ -33,9 +33,9 @@ void StringTableThumb::OpenEditor(const pkg::Package::Entry::Ref &entry, bool ed
 	}
 
 	if (modal) {
-		EditorWindow::CreateDialog<StringTableEditorWindow>(asset, editable, View().parentWidget());
+		EditorWindow::CreateDialog<StringTableEditorWindow>(asset, editable);
 	} else {
-		EditorWindow::Open<StringTableEditorWindow>(asset, View().parentWidget());
+		EditorWindow::Open<StringTableEditorWindow>(asset);
 	}
 }
 

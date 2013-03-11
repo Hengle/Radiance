@@ -55,6 +55,7 @@ void CreateMeshThumb(ContentBrowserView &view);
 void CreateSoundThumb(ContentBrowserView &view);
 void CreateMusicThumb(ContentBrowserView &view);
 void CreateStringTableThumb(ContentBrowserView &view);
+void CreateConversationTreeThumb(ContentBrowserView &view);
 
 void CreateThumbs(ContentBrowserView &view) {
 	CreateTextureThumb(view);
@@ -65,6 +66,7 @@ void CreateThumbs(ContentBrowserView &view) {
 	CreateSoundThumb(view);
 	CreateMusicThumb(view);
 	CreateStringTableThumb(view);
+	CreateConversationTreeThumb(view);
 }
 
 inline int makeRes(int w, int h) {

@@ -1,17 +1,17 @@
-// EditorStringTableItemModel.cpp
+// EditorStringTableEditorItemModel.cpp
 // Copyright (c) 2012 Sunside Inc., All Rights Reserved
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
 #include RADPCH
-#include "EditorStringTableWidgetItemModel.h"
+#include "EditorStringTableEditorItemModel.h"
 #include <QtGui/QIcon>
 #include <QtGui/QMessageBox>
 
 namespace tools {
 namespace editor {
 
-StringTableItemModel::StringTableItemModel(
+StringTableEditorItemModel::StringTableEditorItemModel(
 	StringTable &stringTable,
 	StringTable::LangId langId,
 	bool editable,
@@ -25,7 +25,7 @@ m_editable(editable),
 m_icons(icons) {
 }
 
-QVariant StringTableItemModel::data(const QModelIndex &index, int role) const {
+QVariant StringTableEditorItemModel::data(const QModelIndex &index, int role) const {
 	if ((role != Qt::DisplayRole) && (role != Qt::EditRole))
 		return QVariant();
 	const StringTable::Entry::Map::const_iterator *it = IteratorForIndex(index);
@@ -53,7 +53,7 @@ QVariant StringTableItemModel::data(const QModelIndex &index, int role) const {
 	}
 }
 
-bool StringTableItemModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+bool StringTableEditorItemModel::setData(const QModelIndex &index, const QVariant &value, int role) {
 	if ((role != Qt::EditRole) || (value.type() != QVariant::String))
 		return false;
 	const StringTable::Entry::Map::const_iterator *it = IteratorForIndex(index);
@@ -72,8 +72,11 @@ bool StringTableItemModel::setData(const QModelIndex &index, const QVariant &val
 				}
 				Load();
 				int row = RowForId(ascii.constData());
-				if (row != -1)
-					emit ItemRenamed(IndexForRow(row));
+				if (row != -1) {
+					QModelIndex idx = IndexForRow(row);
+					emit dataChanged(idx, idx);
+					emit ItemRenamed(idx);
+				}
 			}
 		} break;
 		case 1: {
@@ -97,13 +100,13 @@ bool StringTableItemModel::setData(const QModelIndex &index, const QVariant &val
 	return true;
 }
 
-Qt::ItemFlags StringTableItemModel::flags(const QModelIndex &index) const {
+Qt::ItemFlags StringTableEditorItemModel::flags(const QModelIndex &index) const {
 	if (m_editable && (index.column() == 0)) // only name is editable in this way.
 		return Qt::ItemIsEditable|Qt::ItemIsEnabled|Qt::ItemIsSelectable;
 	return Qt::ItemIsEnabled|Qt::ItemIsSelectable;
 }
 
-QVariant StringTableItemModel::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant StringTableEditorItemModel::headerData(int section, Qt::Orientation orientation, int role) const {
 	if (section < 0 || section > 2)
 		return QVariant();
 	if (role == Qt::DisplayRole) {
@@ -121,7 +124,7 @@ QVariant StringTableItemModel::headerData(int section, Qt::Orientation orientati
 	return QVariant();
 }
 
-void StringTableItemModel::Load() {
+void StringTableEditorItemModel::Load() {
 	m_stringMap.clear();
 	m_stringVec.clear();
 	m_stringVec.reserve(m_stringTable.entries->size());
@@ -132,13 +135,13 @@ void StringTableItemModel::Load() {
 	reset();
 }
 
-const StringTable::Entry::Map::const_iterator *StringTableItemModel::IteratorForIndex(const QModelIndex &index) const {
+const StringTable::Entry::Map::const_iterator *StringTableEditorItemModel::IteratorForIndex(const QModelIndex &index) const {
 	if (index.isValid() && (index.row() < (int)m_stringVec.size()))
 		return &m_stringVec[index.row()];
 	return 0;
 }
 
-int StringTableItemModel::RowForId(const char *id) const {
+int StringTableEditorItemModel::RowForId(const char *id) const {
 	RAD_ASSERT(id);
 	Map::const_iterator it = m_stringMap.find(String(id));
 	if (it != m_stringMap.end())
@@ -146,13 +149,13 @@ int StringTableItemModel::RowForId(const char *id) const {
 	return -1;
 }
 
-QModelIndex StringTableItemModel::IndexForRow(int row) const {
+QModelIndex StringTableEditorItemModel::IndexForRow(int row) const {
 	if (row >= 0 && row < (int)m_stringVec.size())
 		return createIndex(row, 0);
 	return QModelIndex();
 }
 
-void StringTableItemModel::DeleteItem(const QModelIndex &index) {
+void StringTableEditorItemModel::DeleteItem(const QModelIndex &index) {
 	if (index.row() < (int)m_stringVec.size()) {
 		beginRemoveRows(QModelIndex(), index.row(), index.row());
 		m_stringTable.DeleteId(m_stringVec[index.row()]->first.c_str);
@@ -161,14 +164,14 @@ void StringTableItemModel::DeleteItem(const QModelIndex &index) {
 	}
 }
 
-void StringTableItemModel::DeleteItems(const QModelIndexList &indices) {
+void StringTableEditorItemModel::DeleteItems(const QModelIndexList &indices) {
 	foreach(QModelIndex index, indices) {
 		m_stringTable.DeleteId(m_stringVec[index.row()]->first.c_str);
 	}
 	Load();
 }
 
-void StringTableItemModel::RAD_IMPLEMENT_SET(langId) (StringTable::LangId value) {
+void StringTableEditorItemModel::RAD_IMPLEMENT_SET(langId) (StringTable::LangId value) {
 	if (m_langId != value) {
 		m_langId = value;
 		emit dataChanged(
@@ -182,4 +185,4 @@ void StringTableItemModel::RAD_IMPLEMENT_SET(langId) (StringTable::LangId value)
 } // editor
 } // tools
 
-#include "moc_EditorStringTableWidgetItemModel.cc"
+#include "moc_EditorStringTableEditorItemModel.cc"

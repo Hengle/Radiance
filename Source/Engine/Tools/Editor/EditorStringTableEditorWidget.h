@@ -1,4 +1,4 @@
-// EditorStringTableWidget.h
+// EditorStringTableEditorWidget.h
 // Copyright (c) 2012 Sunside Inc., All Rights Reserved
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
@@ -23,15 +23,15 @@ class QResizeEvent;
 namespace tools {
 namespace editor {
 
-class StringTableItemModel;
+class StringTableEditorItemModel;
 class ComboCheckBox;
 class SearchLineWidget;
 
-class RADENG_CLASS StringTableWidget : public QWidget {
+class RADENG_CLASS StringTableEditorWidget : public QWidget {
 	Q_OBJECT
 public:
 
-	StringTableWidget(
+	StringTableEditorWidget(
 		const pkg::Asset::Ref &stringTable,
 		bool editable,
 		QWidget *parent = 0
@@ -42,7 +42,7 @@ protected:
 	virtual void showEvent(QShowEvent*);
 	virtual void resizeEvent(QResizeEvent*);
 
-	StringTableItemModel *Model() const { return m_model; }
+	StringTableEditorItemModel *Model() const { return m_model; }
 
 	QTableView *m_table;
 	SearchLineWidget *m_search;
@@ -70,7 +70,7 @@ private:
 	QIcon m_icons[StringTable::LangId_MAX];
 	pkg::Asset::Ref m_stringTable;
 	asset::StringTableParser *m_parser;
-	StringTableItemModel *m_model;
+	StringTableEditorItemModel *m_model;
 	QSortFilterProxyModel *m_sortModel;
 	QPushButton *m_delButton;
 	int m_sortColumn;

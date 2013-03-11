@@ -29,16 +29,16 @@ public:
 
 	StringTableParser();
 	virtual ~StringTableParser();
-
-	RAD_DECLARE_READONLY_PROPERTY(StringTableParser, stringTable, const StringTable*);
-
+	
 #if defined(RAD_OPT_PC_TOOLS)
-	virtual int Save(
+	static int Save(
 		Engine &engine,
 		const pkg::Asset::Ref &asset,
 		int flags
 	);
-	RAD_DECLARE_READONLY_PROPERTY(StringTableParser, mutableStringTable, StringTable*);
+	RAD_DECLARE_READONLY_PROPERTY(StringTableParser, stringTable, StringTable*);
+#else
+	RAD_DECLARE_READONLY_PROPERTY(StringTableParser, stringTable, const StringTable*);
 #endif
 
 protected:
@@ -68,12 +68,12 @@ protected:
 
 private:
 
-	RAD_DECLARE_GET(stringTable, const StringTable*) {
+#if defined(RAD_OPT_PC_TOOLS)
+	RAD_DECLARE_GET(stringTable, StringTable*) {
 		return m_stringTable.get();
 	}
-
-#if defined(RAD_OPT_PC_TOOLS)
-	RAD_DECLARE_GET(mutableStringTable, StringTable*) {
+#else
+	RAD_DECLARE_GET(stringTable, const StringTable*) {
 		return m_stringTable.get();
 	}
 #endif

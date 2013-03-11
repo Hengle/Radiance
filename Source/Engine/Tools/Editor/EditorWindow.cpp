@@ -6,6 +6,8 @@
 #include RADPCH
 #include "EditorWindow.h"
 #include "EditorMainWindow.h"
+#include "ContentBrowser/EditorContentBrowserWindow.h"
+#include "ContentBrowser/EditorContentBrowserView.h"
 #include "EditorUtils.h"
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QKeyEvent>
@@ -28,9 +30,13 @@ m_id(-1),
 m_style(style),
 m_btFlags(0) {
 
-	if (style == WS_Dialog)
-		m_btFlags = buttons;
+	if (buttons&kButton_OK)
+		buttons &= ~kButton_Close;
+	if (buttons&kButton_Close)
+		buttons &= ~kButton_OK;
 
+	m_btFlags = buttons;
+	
 	m_buttons[0] = m_buttons[1] = m_buttons[2] = 0;
 
 	if (parent) {
@@ -68,24 +74,40 @@ void EditorWindow::keyPressEvent(QKeyEvent *e) {
 
 void EditorWindow::CenterParent(float x, float y) {
 	QWidget *parent = parentWidget();
-	if (parent) {
-		PercentSize(*this, *parent, x, y);
-		CenterWidget(*this, *parent);
-	}
+	if (!parent)
+		parent = MainWindow::Get()->contentBrowser->view;
+	if (parent)
+		Center(*parent, x, y);
 }
 
 void EditorWindow::CenterParent(int w, int h) {
 	QWidget *parent = parentWidget();
-	if (parent) {
-		resize(w, h);
-		CenterWidget(*this, *parent);
-	}
+	if (!parent)
+		parent = MainWindow::Get()->contentBrowser->view;
+	if (parent)
+		Center(*parent, w, h);
 }
 
 void EditorWindow::CenterParent() {
 	QWidget *parent = parentWidget();
+	if (!parent)
+		parent = MainWindow::Get()->contentBrowser->view;
 	if (parent)
-		CenterWidget(*this, *parent);
+		Center(*parent);
+}
+
+void EditorWindow::Center(QWidget &widget, float x, float y) {
+	PercentSize(*this, widget, x, y);
+	CenterWidget(*this, widget);
+}
+
+void EditorWindow::Center(QWidget &widget, int w, int h) {
+	resize(w, h);
+	CenterWidget(*this, widget);
+}
+
+void EditorWindow::Center(QWidget &widget) {
+	CenterWidget(*this, widget);
 }
 
 void EditorWindow::HandleOK() {
@@ -121,13 +143,18 @@ void EditorWindow::CreateLayout(QLayout *centerLayout, QWidget *centerWidget) {
 		outer->addWidget(centerWidget);
 	}
 
-	if (m_btFlags&(kButton_OK|kButton_Cancel|kButton_Apply)) {
+	if (m_btFlags&(kButton_OK|kButton_Cancel|kButton_Apply|kButton_Close)) {
 		
 		QHBoxLayout *buttonLayout = new QHBoxLayout();
 		buttonLayout->addStretch(1);
 		
-		if (m_btFlags&kButton_OK) {
-			m_buttons[0] = new QPushButton("OK", this);
+		if (m_btFlags&(kButton_OK|kButton_Close)) {
+			if (m_btFlags&kButton_OK) {
+				m_buttons[0] = new QPushButton("OK", this);
+			} else {
+				m_buttons[0] = new QPushButton("Close", this);
+			}
+
 			buttonLayout->addWidget(m_buttons[0]);
 			if (m_btFlags&kButton_DefaultOK)
 				m_buttons[0]->setDefault(true);

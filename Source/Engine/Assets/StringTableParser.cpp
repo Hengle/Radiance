@@ -79,7 +79,7 @@ int StringTableParser::Save(
 	const pkg::Asset::Ref &asset,
 	int flags
 ) {
-	if (!m_stringTable || (asset->type != AT_StringTable))
+	if (asset->type != AT_StringTable)
 		return SR_ErrorGeneric;
 
 	const String *s = asset->entry->KeyValue<String>("Source.Root", P_TARGET_FLAGS(flags));
@@ -90,7 +90,11 @@ int StringTableParser::Save(
 	if (!engine.sys->files->ExpandToNativePath(s->c_str, native, ~file::kFileMask_PakFiles))
 		return SR_ErrorGeneric;
 
-	if (!m_stringTable->SaveText(asset->path, native.c_str))
+	StringTableParser *parser = StringTableParser::Cast(asset);
+	if (!parser)
+		return SR_MetaError;
+
+	if (!parser->stringTable->SaveText(asset->path, native.c_str))
 		return SR_IOError;
 
 	return SR_Success;
