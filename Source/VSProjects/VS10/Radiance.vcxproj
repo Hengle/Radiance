@@ -580,6 +580,16 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
     </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorConversationTreeEditorView.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
+    </QtMOC>
     <ClInclude Include="..\..\Engine\Tools\Editor\EditorEventRegistry.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
@@ -1738,6 +1748,16 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorConversationTreeEditorItemEditDialog.cpp" />
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorConversationTreeEditorView.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorConversationTreeEditorWidget.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>

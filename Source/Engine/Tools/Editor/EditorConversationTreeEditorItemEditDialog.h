@@ -19,6 +19,7 @@ class QListWidget;
 class QListWidgetItem;
 class QCheckBox;
 class QComboBox;
+class QTextEdit;
 
 namespace tools {
 namespace editor {
@@ -28,10 +29,15 @@ namespace editor {
 class ConversationTreeStringOptionEditWidget : public QDialog {
 	Q_OBJECT
 public:
-	ConversationTreeStringOptionEditWidget(const StringTable &stringTable, QWidget *parent = 0);
+	ConversationTreeStringOptionEditWidget(
+		int langId,
+		const StringTable &stringTable, 
+		QWidget *parent = 0
+	);
 
 	void Load(asset::ConversationTree::StringOption *opt);
 	void ReloadStrings();
+	void SetLangId(int langId);
 
 signals:
 
@@ -43,11 +49,15 @@ private slots:
 
 private:
 
-	QComboBox *m_text;
+	void LoadText();
+
+	QComboBox *m_string;
+	QTextEdit *m_text;
 	QLineEdit *m_probabilityLow;
 	QLineEdit *m_probabilityHigh;
 	asset::ConversationTree::StringOption *m_opt;
 	const StringTable *m_stringTable;
+	int m_langId;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,12 +67,14 @@ class ConversationTreeEditorItemEditDialog : public QDialog {
 	RAD_EVENT_CLASS(EventNoAccess)
 public:
 	ConversationTreeEditorItemEditDialog(
+		int langId,
 		asset::ConversationTree::Root &root,
 		asset::ConversationTreeParser &parser,
 		QWidget *parent = 0
 	);
 
 	ConversationTreeEditorItemEditDialog(
+		int langId,
 		asset::ConversationTree::Dialog &dialog,
 		asset::ConversationTreeParser &parser,
 		QWidget *parent = 0
@@ -93,6 +105,7 @@ private slots:
 	void OnDeleteReply();
 	void OnNameChanged(const QString &text);
 	void OnSelectedPromptChanged(QListWidgetItem *current);
+	void OnSelectedReplyChanged(QListWidgetItem *current);
 
 private:
 
@@ -102,13 +115,23 @@ private:
 	void Save();
 
 	void LoadRoot();
+	void LoadDialog();
 	void SaveRoot();
-
+	void SaveDialog();
+	
 	void LoadPrompts();
 	void LoadRootPrompts();
+	void LoadDialogPrompts();
+	void LoadReplies();
 
 	void AddRootPrompt();
+	void AddDialogPrompt();
+
 	void DeleteRootPrompt();
+	void DeleteDialogPrompt();
+
+	void AddReply();
+	void DeleteReply();
 
 	void OnStringTableDataChanged(const pkg::Package::Entry::AssetModifiedEventData &data);
 
@@ -142,6 +165,7 @@ private:
 	ConversationTreeStringOptionEditWidget *m_promptEdit;
 	ConversationTreeStringOptionEditWidget *m_replyEdit;
 	asset::ConversationTreeParser *m_parser;
+	int m_langId;
 };
 
 } // editor

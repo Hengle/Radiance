@@ -39,14 +39,14 @@ m_btFlags(0) {
 	
 	m_buttons[0] = m_buttons[1] = m_buttons[2] = 0;
 
-	if (parent) {
-		if (enableTick) {
-			RAD_VERIFY(connect(MainWindow::Get(), SIGNAL(OnTick(float)), SLOT(OnMainWindowTick(float))));
-		}
-		if (style == WS_Window)
-			connect(parent, SIGNAL(OnClose(QCloseEvent*)), SLOT(OnParentWindowClose(QCloseEvent*)));
+	if (style == WS_Window) {
+		connect(parent ? parent : MainWindow::Get(), SIGNAL(OnClose(QCloseEvent*)), SLOT(OnParentWindowClose(QCloseEvent*)));
+	} 
+
+	if (enableTick) {
+		RAD_VERIFY(connect(MainWindow::Get(), SIGNAL(OnTick(float)), SLOT(OnMainWindowTick(float))));
 	}
-	
+
 	if (deleteOnClose)
 		setAttribute(Qt::WA_DeleteOnClose);
 

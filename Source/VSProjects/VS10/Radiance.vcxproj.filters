@@ -2240,6 +2240,9 @@
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorConversationTreeEditorItemEditDialog.cpp">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorConversationTreeEditorView.cpp">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Runtime\Base\Event.inl">
@@ -2653,6 +2656,9 @@
       <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
     </QtMOC>
     <QtMOC Include="..\..\Engine\Tools\Editor\EditorConversationTreeEditorItemEditDialog.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorConversationTreeEditorView.h">
       <Filter>Source\Engine\Tools\Editor</Filter>
     </QtMOC>
   </ItemGroup>

@@ -10,21 +10,22 @@
 #include "EditorTypes.h"
 #include "../../Assets/ConversationTreeParser.h"
 #include <QtGui/QWidget>
+#include <QtGui/QListWidget>
 #include <Runtime/PushPack.h>
 
 class QGraphicsScene;
 class QGraphicsView;
-class QListWidget;
-class QListWidgetItem;
 class QPushButton;
 class QComboBox;
 
 namespace tools {
 namespace editor {
 
+class ConversationTreeEditorView;
+class ConversationTreeEditorWidgetDialogDragList;
+
 class RADENG_CLASS ConversationTreeEditorWidget : public QWidget {
 	Q_OBJECT
-	RAD_EVENT_CLASS(EventNoAccess);
 public:
 
 	ConversationTreeEditorWidget(
@@ -49,21 +50,40 @@ private:
 
 	void LoadRoots();
 	void LoadDialog();
-	void ReloadStrings();
-	void OnStringTableDataChanged(const pkg::Package::Entry::AssetModifiedEventData &data);
+	
+	void RemoveDialogFromTree(asset::ConversationTree::Dialog &dialog);
+
+	void RemoveDialogFromTree(
+		asset::ConversationTree::Root &root,
+		asset::ConversationTree::Dialog &dialog
+	);
+
+	void RemoveDialogFromTree(
+		asset::ConversationTree::Dialog &parent,
+		asset::ConversationTree::Dialog &dialog
+	);
 
 	pkg::Asset::Ref m_conversationTree;
 	asset::ConversationTreeParser *m_parser;
-	QGraphicsScene *m_scene;
-	QGraphicsView  *m_view;
+	ConversationTreeEditorView *m_view;
 	QListWidget *m_roots;
-	QListWidget *m_dialog;
+	ConversationTreeEditorWidgetDialogDragList *m_dialog;
 	QPushButton *m_deleteRoot;
 	QPushButton *m_editRoot;
 	QPushButton *m_deleteDialog;
 	QPushButton *m_editDialog;
 	QComboBox *m_languages;
 	int m_langId;
+};
+
+class ConversationTreeEditorWidgetDialogDragList : public QListWidget {
+	Q_OBJECT
+public:
+	ConversationTreeEditorWidgetDialogDragList(QWidget *parent = 0);
+
+protected:
+
+	virtual QMimeData *mimeData(const QList<QListWidgetItem*> items) const;
 };
 
 } // editor

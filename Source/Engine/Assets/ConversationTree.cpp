@@ -41,6 +41,10 @@ ConversationTree::~ConversationTree() {
 		DeleteRoot(**it);
 	}
 
+	while (!m_dialogs.empty()) {
+		DeleteDialog(*m_dialogs.begin()->second);
+	}
+
 	RAD_ASSERT(m_dialogPool.numUsedObjects == 0);
 	RAD_ASSERT(m_rootPool.numUsedObjects == 0);
 }
@@ -51,7 +55,7 @@ ConversationTree::Root *ConversationTree::NewRoot() {
 
 void ConversationTree::DeleteRoot(Root &root) {
 	for (Dialog::PtrVec::iterator it = root.dialog->begin(); it != root.dialog->end(); ++it) {
-		DeleteDialog(**it);
+		UnrefDialog(**it);
 	}
 	m_rootPool.Destroy(&root);
 }
@@ -64,9 +68,11 @@ ConversationTree::Dialog *ConversationTree::NewDialog() {
 }
 
 void ConversationTree::DeleteDialog(Dialog &dialog) {
+
 	for (Dialog::PtrVec::iterator it = dialog.choices->begin(); it != dialog.choices->end(); ++it) {
 		UnrefDialog(**it);
 	}
+
 	m_dialogs.erase(dialog.uid);
 	m_dialogPool.Destroy(&dialog);
 }
@@ -76,44 +82,22 @@ void ConversationTree::RefDialog(Dialog &dialog) {
 }
 
 void ConversationTree::UnrefDialog(Dialog &dialog) {
-	if (--dialog.refs == 0)
-		DeleteDialog(dialog);
+	RAD_ASSERT(dialog.refs > 0);
+	--dialog.refs;
 }
 
 const ConversationTree::Dialog *ConversationTree::DialogForUID(int uid) const {
-	UIDMap::const_iterator it = m_dialogs.find(uid);
+	Dialog::UIDMap::const_iterator it = m_dialogs.find(uid);
 	if (it != m_dialogs.end())
-		return it->second;
-	return 0;
-}
-
-const ConversationTree::Dialog *ConversationTree::DialogForName(const char *name) const {
-	StringMap::const_iterator it = m_names.find(CStr(name));
-	if (it != m_names.end())
 		return it->second;
 	return 0;
 }
 
 ConversationTree::Dialog *ConversationTree::DialogForUID(int uid) {
-	UIDMap::iterator it = m_dialogs.find(uid);
+	Dialog::UIDMap::iterator it = m_dialogs.find(uid);
 	if (it != m_dialogs.end())
 		return it->second;
 	return 0;
-}
-
-ConversationTree::Dialog *ConversationTree::DialogForName(const char *name) {
-	StringMap::iterator it = m_names.find(CStr(name));
-	if (it != m_names.end())
-		return it->second;
-	return 0;
-}
-
-void ConversationTree::MapDialog(Dialog &dialog) {
-	m_names[dialog.name] = &dialog;
-}
-
-void ConversationTree::UnmapDialog(Dialog &dialog) {
-	m_names.erase(dialog.name);
 }
 
 int ConversationTree::PushCopy(lua_State *L) const {
@@ -300,12 +284,12 @@ bool ConversationTree::SaveBin(stream::OutputStream &_os) const {
 		return false;
 
 	// keys.
-	for (UIDMap::const_iterator it = m_dialogs.begin(); it != m_dialogs.end(); ++it) {
+	for (Dialog::UIDMap::const_iterator it = m_dialogs.begin(); it != m_dialogs.end(); ++it) {
 		if (!os.Write((S32)it->first))
 			return false;
 	}
 
-	for (UIDMap::const_iterator it = m_dialogs.begin(); it != m_dialogs.end(); ++it) {
+	for (Dialog::UIDMap::const_iterator it = m_dialogs.begin(); it != m_dialogs.end(); ++it) {
 		if (!SaveBinDialog(*(it->second), os))
 			return false;
 	}
@@ -560,10 +544,9 @@ bool ConversationTree::LoadBinDialog(Dialog &dialog, stream::InputStream &is) {
 			return false;
 		Dialog *d = m_dialogs[uid];
 		RAD_ASSERT(d);
+		RefDialog(*d);
 		dialog.choices->push_back(d);
 	}
-
-	MapDialog(dialog);
 
 	return true;
 }

@@ -46,6 +46,7 @@ public:
 
 	struct Dialog {
 		typedef stackify<zone_vector<Dialog*, ZAssetsT>::type, 4> PtrVec;
+		typedef zone_map<int, Dialog*, ZAssetsT>::type UIDMap;
 
 		Dialog() {
 			probability = 1.f;
@@ -85,6 +86,7 @@ public:
 	~ConversationTree();
 
 	RAD_DECLARE_READONLY_PROPERTY(ConversationTree, roots, Root::PtrVec*);
+	RAD_DECLARE_READONLY_PROPERTY(ConversationTree, dialogs, const Dialog::UIDMap*);
 
 	Root *NewRoot();
 	void DeleteRoot(Root &root);
@@ -96,14 +98,9 @@ public:
 	void UnrefDialog(Dialog &dialog);
 
 	const Dialog *DialogForUID(int uid) const;
-	const Dialog *DialogForName(const char *name) const;
-
+	
 	Dialog *DialogForUID(int uid);
-	Dialog *DialogForName(const char *name);
-
-	void MapDialog(Dialog &dialog);
-	void UnmapDialog(Dialog &dialog);
-
+	
 	int PushCopy(lua_State *L) const;
 
 	// Save/Load streams will be adapted to EndianStreams internally.
@@ -115,9 +112,6 @@ public:
 	bool LoadBin(stream::InputStream &is);
 
 private:
-
-	typedef zone_map<int, Dialog*, ZAssetsT>::type UIDMap;
-	typedef zone_map<String, Dialog*, ZAssetsT>::type StringMap;
 
 	void PushRoot(lua_State *L, const Root &root) const;
 	void PushDialog(lua_State *L, const Dialog &dialog) const;
@@ -137,11 +131,14 @@ private:
 		return &m_roots;
 	}
 
+	RAD_DECLARE_GET(dialogs, const Dialog::UIDMap*) {
+		return &m_dialogs;
+	}
+
 	ObjectPool<Dialog> m_dialogPool;
 	ObjectPool<Root> m_rootPool;
 	mutable Root::PtrVec m_roots;
-	UIDMap m_dialogs;
-	StringMap m_names;
+	Dialog::UIDMap m_dialogs;
 	int m_nextUID;
 };
 
