@@ -1455,6 +1455,18 @@
     <ClInclude Include="..\..\Engine\Assets\ConversationTree.h">
       <Filter>Source\Engine\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\World\Lua\T_StringTablePrecache.h">
+      <Filter>Source\Engine\World\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\World\Lua\D_StringTable.h">
+      <Filter>Source\Engine\World\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\World\Lua\D_ConversationTree.h">
+      <Filter>Source\Engine\World\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\World\Lua\T_ConversationTreePrecache.h">
+      <Filter>Source\Engine\World\Lua</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2242,6 +2254,18 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorConversationTreeEditorView.cpp">
       <Filter>Source\Engine\Tools\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\Lua\T_StringTablePrecache.cpp">
+      <Filter>Source\Engine\World\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\Lua\D_StringTable.cpp">
+      <Filter>Source\Engine\World\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\Lua\D_ConversationTree.cpp">
+      <Filter>Source\Engine\World\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\Lua\T_ConversationTreePrecache.cpp">
+      <Filter>Source\Engine\World\Lua</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

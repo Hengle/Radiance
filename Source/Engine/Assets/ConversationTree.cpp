@@ -116,12 +116,20 @@ int ConversationTree::PushCopy(lua_State *L) const {
 			++numTableElems;
 		if (!dialog.condition.empty)
 			++numTableElems;
+		if (dialog.probability != 1.f)
+			++numTableElems;
 
 		lua_createtable(L, 0, numTableElems);
 		lua_settable(L, -3);
 	}
 
 	int dialogTable = lua_gettop(L);
+
+	for (Dialog::UIDMap::const_iterator it = m_dialogs.begin(); it != m_dialogs.end(); ++it) {
+		const Dialog &dialog = *it->second;
+		PushDialog(L, dialog, dialogTable);
+		RAD_ASSERT(dialogTable == lua_gettop(L));
+	}
 
 	lua_createtable(L, 0, m_roots->size());
 	for (size_t i = 0; i < m_roots->size(); ++i) {
@@ -145,10 +153,9 @@ int ConversationTree::PushCopy(lua_State *L) const {
 
 void ConversationTree::PushRoot(lua_State *L, const Root &root, int dialogTable) const {
 
-	lua_createtable(L, 0, 2);
+	lua_createtable(L, 0, 4);
 	
 	// reply = {{prob = {0, 1}, "REPLY"}}
-	lua_pushstring(L, "reply");
 	lua_createtable(L, (int)root.prompts->size(), 0);
 	
 	for (size_t i = 0; i < root.prompts->size(); ++i) {
@@ -157,17 +164,14 @@ void ConversationTree::PushRoot(lua_State *L, const Root &root, int dialogTable)
 			continue;
 		
 		lua_pushinteger(L, (int)(i+1));
-
-		lua_createtable(L, 1, 1);
 		PushStringOption(L, prompt);
 		lua_settable(L, -3);
 	}
 
-	lua_settable(L, -3);
+	lua_setfield(L, -2, "reply");
 
 	// choices = {{prob = 0, {...}}}
 
-	lua_pushstring(L, "choices");
 	lua_createtable(L, (int)root.dialog->size(), 0);
 
 	for (size_t i = 0; i < root.dialog->size(); ++i) {
@@ -178,7 +182,25 @@ void ConversationTree::PushRoot(lua_State *L, const Root &root, int dialogTable)
 		lua_settable(L, -3);
 	}
 
-	lua_settable(L, -3);
+	lua_setfield(L, -2, "choices");
+
+	if ((root.probability[0] != 1.f) ||
+		(root.probability[1] != 1.f)) {
+		lua_createtable(L, 2, 0);
+		lua_pushinteger(L, 1);
+		lua_pushnumber(L, root.probability[0]);
+		lua_settable(L, -3);
+		lua_pushinteger(L, 2);
+		lua_pushnumber(L, root.probability[1]);
+		lua_settable(L, -3);
+
+		lua_setfield(L, -2, "prob");
+	}
+
+	if (!root.group.empty) {
+		lua_pushstring(L, root.group.c_str);
+		lua_setfield(L, -2, "group");
+	}
 }
 
 void ConversationTree::PushDialog(lua_State *L, const Dialog &dialog, int dialogTable) const {
@@ -187,7 +209,6 @@ void ConversationTree::PushDialog(lua_State *L, const Dialog &dialog, int dialog
 	lua_gettable(L, dialogTable);
 
 	if (!dialog.choices->empty()) {
-		lua_pushstring(L, "choices");
 		lua_createtable(L, (int)dialog.choices->size(), 0);
 
 		for (size_t i = 0; i < dialog.choices->size(); ++i) {
@@ -198,11 +219,10 @@ void ConversationTree::PushDialog(lua_State *L, const Dialog &dialog, int dialog
 			lua_settable(L, -3);
 		}
 
-		lua_settable(L, -3);
+		lua_setfield(L, -2, "choices");
 
 	}
 	// prompt = {{prob = {0, 1}, "TEXT"}}
-	lua_pushstring(L, "prompt");
 	lua_createtable(L, (int)dialog.prompts->size(), 0);
 	
 	for (size_t i = 0; i < dialog.prompts->size(); ++i) {
@@ -215,10 +235,9 @@ void ConversationTree::PushDialog(lua_State *L, const Dialog &dialog, int dialog
 		lua_settable(L, -3);
 	}
 
-	lua_settable(L, -3);
+	lua_setfield(L, -2, "prompt");
 
 	// reply = {{prob = {0, 1}, "REPLY"}
-	lua_pushstring(L, "reply");
 	lua_createtable(L, (int)dialog.replies->size(), 0);
 
 	for (size_t i = 0; i < dialog.replies->size(); ++i) {
@@ -231,28 +250,32 @@ void ConversationTree::PushDialog(lua_State *L, const Dialog &dialog, int dialog
 		lua_settable(L, -3);
 	}
 
-	lua_settable(L, -3);
+	lua_setfield(L, -2, "reply");
 
 	// action = "string"
 	if (!dialog.action.empty) {
-		lua_pushstring(L, "action");
 		lua_pushstring(L, dialog.action.c_str);
-		lua_settable(L, -3);
+		lua_setfield(L, -2, "action");
 	}
 
 	// condition = "string"
 	if (!dialog.condition.empty) {
-		lua_pushstring(L, "condition");
 		lua_pushstring(L, dialog.condition.c_str);
-		lua_settable(L, -3);
+		lua_setfield(L, -2, "condition");
 	}
+
+	if (dialog.probability != 1.f) {
+		lua_pushnumber(L, dialog.probability);
+		lua_setfield(L, -2, "prob");
+	}
+
+	lua_pop(L, 1);
 }
 
 void ConversationTree::PushStringOption(lua_State *L, const StringOption &opt) const {
 	lua_createtable(L, 1, 1);
 	if (opt.probability[0] != 1.f ||
 		opt.probability[1] != 1.f) {
-		lua_pushstring(L, "prob");
 		lua_createtable(L, 2, 0);
 		lua_pushinteger(L, 1);
 		lua_pushnumber(L, opt.probability[0]);
@@ -260,7 +283,7 @@ void ConversationTree::PushStringOption(lua_State *L, const StringOption &opt) c
 		lua_pushinteger(L, 2);
 		lua_pushnumber(L, opt.probability[1]);
 		lua_settable(L, -3);
-		lua_settable(L, -3);
+		lua_setfield(L, -2, "prob");
 	}
 	lua_pushinteger(L, 1);
 	lua_pushstring(L, opt.text.c_str);

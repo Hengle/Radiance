@@ -69,26 +69,6 @@ int WorldLua::lua_System_SystemLanguage(lua_State *L) {
 	return 1;
 }
 
-int WorldLua::lua_System_GetLangString(lua_State *L) {
-	LOAD_SELF
-
-	const StringTable *stringTable = self->m_world->game->stringTable;
-
-	if (stringTable) {
-		const char *id = luaL_checkstring(L, 1);
-		int lang = (int)luaL_checkinteger(L, 2);
-		if (lang < StringTable::LangId_EN || lang >= StringTable::LangId_MAX)
-			luaL_error(L, "System.GetLangString() invalid language id %d", lang);
-		const String *s = stringTable->Find(id, (StringTable::LangId)lang);
-		if (s) {
-			lua_pushstring(L, s->c_str);
-			return 1;
-		}
-	}
-
-	return 0;
-}
-
 int WorldLua::lua_System_LaunchURL(lua_State *L) {
 	const char *sz = luaL_checkstring(L, 1);
 	App::Get()->LaunchURL(sz);

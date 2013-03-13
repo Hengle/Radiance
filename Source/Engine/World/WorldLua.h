@@ -133,7 +133,6 @@ private:
 
 	static int lua_System_Platform(lua_State *L);
 	static int lua_System_SystemLanguage(lua_State *L);
-	static int lua_System_GetLangString(lua_State *L);
 	static int lua_System_LaunchURL(lua_State *L);
 	static int lua_System_Fullscreen(lua_State *L);
 	static int lua_System_ScreenSize(lua_State *L);

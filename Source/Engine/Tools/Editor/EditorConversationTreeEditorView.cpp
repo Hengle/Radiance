@@ -36,6 +36,7 @@ ConversationTreeEditorView::ConversationTreeEditorView(
 	m_view = new (ZEditor) ConversationTreeEditorViewGraphicsView(m_scene);
 	m_view->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 	m_view->setAcceptDrops(true);
+	m_view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
 	RAD_VERIFY(connect(m_view, SIGNAL(OnDeleteKey()), SLOT(OnDeleteKey())));
 			
@@ -81,8 +82,10 @@ void ConversationTreeEditorView::SelectionChanged() {
 
 void ConversationTreeEditorView::OnDeleteKey() {
 	TreeItem::Ref item = GetSelectedItemFromScene();
-	if (item)
+	if (item) {
 		RemoveItem(item);
+		LayoutItems();
+	}
 }
 
 void ConversationTreeEditorView::OnDialogDropped(ConversationTreeEditorViewItem *target, int uid) {
@@ -109,7 +112,7 @@ void ConversationTreeEditorView::OnDialogDropped(ConversationTreeEditorViewItem 
 		}
 	}
 
-	m_scene->update();
+	UpdateView();
 }
 
 void ConversationTreeEditorView::DialogDeleted(asset::ConversationTree::Dialog &dialog) {
@@ -199,6 +202,7 @@ void ConversationTreeEditorView::ReplaceDialog(const TreeItem::Ref &item, asset:
 				m_parser->conversationTree->UnrefDialog(*item->dialog);
 				item->dialog = &dialog;
 				parent->root->dialog[i] = &dialog;
+				m_parser->conversationTree->RefDialog(dialog);
 				break;
 			}
 		}
@@ -223,12 +227,14 @@ void ConversationTreeEditorView::ReplaceDialog(const TreeItem::Ref &item, asset:
 				m_parser->conversationTree->UnrefDialog(*item->dialog);
 				item->dialog = &dialog;
 				parent->dialog->choices[i] = &dialog;
+				m_parser->conversationTree->RefDialog(dialog);
 				break;
 			}
 		}
 	}
 
 	item->children.clear();
+	ReloadStrings(m_root);
 	LayoutItems();
 
 	m_scene->blockSignals(false);
@@ -364,7 +370,7 @@ void ConversationTreeEditorView::OnStringTableDataChanged(const pkg::Package::En
 	if (m_root) {
 		ReloadStrings(m_root);
 		LayoutItems();
-		m_scene->update();
+		UpdateView();
 	}
 }
 
@@ -430,9 +436,29 @@ void ConversationTreeEditorView::RemoveItem(const TreeItem::Ref &item) {
 
 	// remove from parent?
 	if (item->parent) {
+		if (item->parent->root) {
+			for (asset::ConversationTree::Dialog::PtrVec::iterator it = item->parent->root->dialog->begin(); it != item->parent->root->dialog->end(); ++it) {
+				if (*it == item->dialog) {
+					item->parent->root->dialog->erase(it);
+					m_parser->conversationTree->UnrefDialog(*item->dialog);
+					break;
+				}
+			}
+		}
+
+		if (item->parent->dialog) {
+			for (asset::ConversationTree::Dialog::PtrVec::iterator it = item->parent->dialog->choices->begin(); it != item->parent->dialog->choices->end(); ++it) {
+				if (*it == item->dialog) {
+					item->parent->dialog->choices->erase(it);
+					m_parser->conversationTree->UnrefDialog(*item->dialog);
+					break;
+				}
+			}
+		}
+
 		for (TreeItem::Vec::iterator it = item->parent->children.begin(); it != item->parent->children.end(); ++it) {
 			if ((*it).get() == item.get()) {
-				item->parent->children.erase(it);
+				it = item->parent->children.erase(it);
 				break;
 			}
 		}
@@ -468,7 +494,7 @@ void ConversationTreeEditorView::SelectItem(const TreeItem::Ref &item) {
 	m_scene->addItem(item->dropTarget);
 
 	LayoutItems();
-	m_scene->update();
+	UpdateView();
 }
 
 void ConversationTreeEditorView::PruneChildren(TreeItem *parent, TreeItem *except) {
@@ -563,6 +589,10 @@ QString ConversationTreeEditorView::TextForDialogPrompt(TreeItem &item) {
 		return QString(s->c_str.get());
 
 	return QString("<NOT TRANSLATED>");
+}
+
+void ConversationTreeEditorView::UpdateView() {
+	m_scene->update();
 }
 
 ConversationTreeEditorView::TreeItem::TreeItem() : parent(0), root(0), dialog(0), viewItem(0), promptItem(0), dropTarget(0) {
@@ -660,7 +690,6 @@ ConversationTreeEditorViewItem::ConversationTreeEditorViewItem(const QString& te
 
 void ConversationTreeEditorViewItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
 	QRectF rect = boundingRect();
-	rect.adjust(-4.f, -4.f, 4.f, 4.f);
 	
 	if (m_dropFocus) {
 		painter->setBrush(QColor(qRgb(240, 240, 240)));
@@ -677,7 +706,7 @@ void ConversationTreeEditorViewItem::paint(QPainter *painter, const QStyleOption
 	painter->drawRect(rect);
 
 	painter->setPen(QColor(qRgb(0,0,0)));
-	painter->drawText(boundingRect(), text());
+	painter->drawText(QGraphicsSimpleTextItem::boundingRect(), text());
 }
 
 void ConversationTreeEditorViewItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event) {
@@ -709,6 +738,12 @@ void ConversationTreeEditorViewItem::dropEvent(QGraphicsSceneDragDropEvent *even
 		static_cast<ConversationTreeEditorViewGraphicsScene*>(scene())->EmitDialogDropped(this, uid);
 }
 
+QRectF ConversationTreeEditorViewItem::boundingRect() {
+	QRectF rect = QGraphicsSimpleTextItem::boundingRect();
+	rect.adjust(-4.f, -4.f, 4.f, 4.f);
+	return rect;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 ConversationTreeEditorDropTarget::ConversationTreeEditorDropTarget(QGraphicsItem *parent) 
@@ -717,7 +752,7 @@ ConversationTreeEditorDropTarget::ConversationTreeEditorDropTarget(QGraphicsItem
 
 void ConversationTreeEditorDropTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
 	QRectF rect = boundingRect();
-	rect.adjust(-4.f, -4.f, 4.f, 4.f);
+	
 	painter->setPen(QColor(qRgb(0, 0, 0)));
 	if (m_dropFocus) {
 		painter->setBrush(QColor(qRgb(240, 240, 240)));

@@ -167,7 +167,6 @@ bool WorldLua::Init() {
 	luaL_Reg systemCalls [] = {
 		{ "Platform", lua_System_Platform },
 		{ "SystemLanguage", lua_System_SystemLanguage },
-		{ "GetLangString", lua_System_GetLangString },
 		{ "LaunchURL", lua_System_LaunchURL },
 		{ "Fullscreen", lua_System_Fullscreen },
 		{ "ScreenSize", lua_System_ScreenSize },

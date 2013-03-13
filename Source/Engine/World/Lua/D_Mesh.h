@@ -6,7 +6,6 @@
 #pragma once
 
 #include "../../Types.h"
-#include "../EntityDef.h"
 #include "D_Asset.h"
 #include <Runtime/PushPack.h>
 

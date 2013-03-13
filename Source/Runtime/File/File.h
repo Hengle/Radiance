@@ -358,7 +358,7 @@ protected:
 		const void *data,
 		AddrSize size,
 		AddrSize offset,
-		AddrSize backingSize,
+		AddrSize mappedSize,
 		::Zone &zone
 	);
 	
@@ -371,7 +371,7 @@ private:
 	const void *m_data;
 	AddrSize m_size;
 	AddrSize m_offset;
-	AddrSize m_backingSize;
+	AddrSize m_mappedSize;
 	::Zone &m_zone;
 };
 

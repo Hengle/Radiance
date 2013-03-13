@@ -33,14 +33,14 @@ inline MMapping::MMapping(
 	const void *data, 
 	AddrSize size, 
 	AddrSize offset, 
-	AddrSize backingSize,
+	AddrSize mappedSize,
 	::Zone &zone
-) : m_data(data), m_size(size), m_offset(offset), m_backingSize(backingSize), m_zone(zone) {
-	m_zone.Inc(backingSize, 0);
+) : m_data(data), m_size(size), m_offset(offset), m_mappedSize(mappedSize), m_zone(zone) {
+	m_zone.Inc(mappedSize, 0);
 }
 
 inline MMapping::~MMapping() {
-	m_zone.Dec(m_backingSize, 0);
+	m_zone.Dec(m_mappedSize, 0);
 }
 
 inline const void *MMapping::RAD_IMPLEMENT_GET(data) {

@@ -15,8 +15,7 @@ D_Material::Ref D_Material::New(const pkg::AssetRef &asset) {
 	return Ref(new (ZWorld) D_Material(asset));
 }
 
-D_Material::D_Material(const pkg::AssetRef &asset) : D_Asset(asset),
-m_asset(asset) {
+D_Material::D_Material(const pkg::AssetRef &asset) : D_Asset(asset) {
 	m_parser = asset::MaterialParser::Cast(asset);
 }
 
@@ -37,7 +36,7 @@ int D_Material::lua_Dimensions(lua_State *L) {
 
 	// this function is not fast:
 
-	asset::MaterialLoader *loader = asset::MaterialLoader::Cast(self->m_asset);
+	asset::MaterialLoader *loader = asset::MaterialLoader::Cast(self->asset);
 	if (!loader || !loader->info)
 		return 0;
 
@@ -199,7 +198,7 @@ int D_Material::lua_SetState(lua_State *L) {
 
 int D_Material::lua_Name(lua_State *L) {
 	D_Material::Ref self = lua::SharedPtr::Get<D_Material>(L, "D_Material", 1, true);
-	lua_pushstring(L, self->m_asset->path);
+	lua_pushstring(L, self->asset->path);
 	return 1;
 }
 

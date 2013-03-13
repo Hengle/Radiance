@@ -11,6 +11,8 @@
 #include "T_SoundPrecache.h"
 #include "T_MaterialPrecache.h"
 #include "T_TypefacePrecache.h"
+#include "T_StringTablePrecache.h"
+#include "T_ConversationTreePrecache.h"
 #include "D_Asset.h"
 #include "../../Packages/Packages.h"
 #include "../../Engine.h"
@@ -50,6 +52,10 @@ T_Precache::Ref T_Precache::New(
 			return Ref(new (ZWorld) T_MaterialPrecache(world, asset));
 		case asset::AT_Typeface:
 			return Ref(new (ZWorld) T_TypefacePrecache(world, asset));
+		case asset::AT_StringTable:
+			return Ref(new (ZWorld) T_StringTablePrecache(world, asset));
+		case asset::AT_ConversationTree:
+			return Ref(new (ZWorld) T_ConversationTreePrecache(world, asset));
 		default:
 			break;
 		}

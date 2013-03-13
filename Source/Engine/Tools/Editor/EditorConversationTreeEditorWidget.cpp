@@ -169,6 +169,7 @@ void ConversationTreeEditorWidget::EditRootPressed() {
 		item->setText(root->name.c_str.get());
 		m_view->ReloadItems();
 		SaveChanges();
+		break;
 	}
 }
 
@@ -195,6 +196,7 @@ void ConversationTreeEditorWidget::AddRootPressed() {
 		m_roots->addItem(item);
 		m_roots->setCurrentItem(item);
 		SaveChanges();
+		break;
 	}
 }
 
@@ -242,6 +244,7 @@ void ConversationTreeEditorWidget::EditDialogPressed() {
 		item->setText(dialog->name.c_str.get());
 		m_view->ReloadItems();
 		SaveChanges();
+		break;
 	}
 }
 
@@ -268,6 +271,7 @@ void ConversationTreeEditorWidget::AddDialogPressed() {
 		m_dialog->addItem(item);
 		m_dialog->setCurrentItem(item);
 		SaveChanges();
+		break;
 	}
 }
 

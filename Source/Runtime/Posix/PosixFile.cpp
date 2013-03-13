@@ -266,17 +266,17 @@ MMapping::Ref PosixMMFile::MMap(AddrSize ofs, AddrSize size, ::Zone &zone) {
 
 	AddrSize base = ofs & ~(m_pageSize-1);
 	AddrSize padd = ofs - base;
-	AddrSize backingSize = (size+padd) - base;
+	AddrSize mappedSize = size+padd;
 
 	if (m_mm) {
 		// we mapped the whole file just return the window
 		const void *data = reinterpret_cast<const U8*>(m_mm->data.get()) + ofs;
-		return MMapping::Ref(new (ZFile) PosixMMapping(shared_from_this(), 0, data, size, ofs, 0, backingSize, zone));
+		return MMapping::Ref(new (ZFile) PosixMMapping(shared_from_this(), 0, data, size, ofs, 0, zone));
 	}
 	
 	const void *pbase = mmap(
 		0,
-		(size_t)(size + padd),
+		(size_t)backingSize,
 		PROT_READ,
 		MAP_PRIVATE,
 		m_fd,
@@ -293,8 +293,7 @@ MMapping::Ref PosixMMFile::MMap(AddrSize ofs, AddrSize size, ::Zone &zone) {
 		data,
 		size,
 		ofs,
-		size + padd,
-		backingSize,
+		mappedSize,
 		zone
 	));
 }
@@ -315,10 +314,9 @@ PosixMMapping::PosixMMapping(
 	const void *data,
 	AddrSize size,
 	AddrSize offset,
-	AddrSize mappedSize,
-	AddrSize backingSize,
+	AddrSize mappedSize
 	::Zone &zone
-) : MMapping(data, size, offset, backingSize, zone), m_file(file), m_base(base), m_mappedSize(mappedSize) {
+) : MMapping(data, size, offset, mappedSize, zone), m_file(file), m_base(base) {
 }
 
 PosixMMapping::~PosixMMapping() {

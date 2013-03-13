@@ -16,8 +16,14 @@ bool InputStream::Read(string::String *str, UReg *errorCode) {
 	S32 l;
 	if (!Read(&l, errorCode))
 		return false;
-	*str = string::String((int)l);
-	return Read(const_cast<char*>(str->c_str.get()), (SPos)l, errorCode) == (SPos)l;
+	if (l > 1) {
+		*str = string::String((int)l);
+		return Read(const_cast<char*>(str->c_str.get()), (SPos)l, errorCode) == (SPos)l;
+	}
+
+	str->Clear();
+	// null only.
+	return SeekIn(StreamCur, 1, errorCode);
 }
 
 bool OutputStream::Write(const string::String &str, UReg *errorCode) {

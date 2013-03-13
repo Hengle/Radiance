@@ -14,8 +14,7 @@ D_Typeface::Ref D_Typeface::New(const pkg::AssetRef &asset)
 	return Ref(new (ZWorld) D_Typeface(asset));
 }
 
-D_Typeface::D_Typeface(const pkg::AssetRef &asset) : D_Asset(asset),
-m_asset(asset)
+D_Typeface::D_Typeface(const pkg::AssetRef &asset) : D_Asset(asset)
 {
 	m_typeface = asset::TypefaceParser::Cast(asset);
 }

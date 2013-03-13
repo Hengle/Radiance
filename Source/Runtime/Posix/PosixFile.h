@@ -125,13 +125,11 @@ private:
 		AddrSize size,
 		AddrSize offset,
 		AddrSize mappedSize,
-		AddrSize backingSize,
 		::Zone &zone
 	);
 
 	MMFile::Ref m_file; // keeps the file open.
 	const void *m_base;
-	AddrSize m_mappedSize;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -310,12 +310,12 @@ MMapping::Ref WinMMFile::MMap(AddrSize ofs, AddrSize size, ::Zone &zone) {
 
 	AddrSize base = ofs & ~(m_pageSize-1);
 	AddrSize padd = ofs - base;
-	AddrSize backingSize = (size+padd) - base;
+	AddrSize mappedSize = size+padd;
 
 	if (m_mm) {
 		// we mapped the whole file just return the window
 		const void *data = reinterpret_cast<const U8*>(m_mm->data.get()) + ofs;
-		return MMapping::Ref(new (ZFile) WinMMapping(shared_from_this(), 0, data, size, ofs, backingSize, zone));
+		return MMapping::Ref(new (ZFile) WinMMapping(shared_from_this(), 0, data, size, ofs, mappedSize, zone));
 	}
 
 	const void *pbase = MapViewOfFile(
@@ -323,14 +323,14 @@ MMapping::Ref WinMMFile::MMap(AddrSize ofs, AddrSize size, ::Zone &zone) {
 		FILE_MAP_READ,
 		0,
 		(DWORD)base,
-		(DWORD)(size + padd)
+		(DWORD)mappedSize
 	);
 
 	if (!pbase)
 		return MMapping::Ref();
 
 	const void *data = reinterpret_cast<const U8*>(pbase) + padd;
-	return MMapping::Ref(new (ZFile) WinMMapping(shared_from_this(), pbase, data, size, ofs, backingSize, zone));
+	return MMapping::Ref(new (ZFile) WinMMapping(shared_from_this(), pbase, data, size, ofs, mappedSize, zone));
 }
 
 AddrSize WinMMFile::RAD_IMPLEMENT_GET(size) {
@@ -345,9 +345,9 @@ WinMMapping::WinMMapping(
 	const void *data,
 	AddrSize size,
 	AddrSize offset,
-	AddrSize backingSize,
+	AddrSize mappedSize,
 	::Zone &zone
-) : MMapping(data, size, offset, backingSize, zone), m_file(file), m_base(base) {
+) : MMapping(data, size, offset, mappedSize, zone), m_file(file), m_base(base) {
 }
 
 WinMMapping::~WinMMapping() {

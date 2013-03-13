@@ -107,7 +107,6 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Game, saveGame, const Persistence::Ref&);
 	RAD_DECLARE_READONLY_PROPERTY(Game, numSavedGameConflicts, int);
 	RAD_DECLARE_READONLY_PROPERTY(Game, gameNetwork, gn::GameNetwork *);
-	RAD_DECLARE_READONLY_PROPERTY(Game, stringTable, const StringTable*);
 	RAD_DECLARE_READONLY_PROPERTY(Game, cvars, GameCVars*);
 	RAD_DECLARE_READONLY_PROPERTY(Game, cvarZone, CVarZone*);
 	RAD_DECLARE_PROPERTY(Game, cloudStorage, bool, bool);
@@ -208,12 +207,6 @@ private:
 		return m_gameNetwork.get(); 
 	}
 
-	RAD_DECLARE_GET(stringTable, const StringTable*) {
-		if (m_stringTableParser)
-			return m_stringTableParser->stringTable;
-		return 0;
-	}
-
 	RAD_DECLARE_GET(quit, bool) {
 		return m_quit;
 	}
@@ -246,8 +239,6 @@ private:
 	MapSlot *m_slot;
 	MapSlot::Map m_maps;
 	String m_saveGameName;
-	pkg::Asset::Ref m_stringTable;
-	asset::StringTableParser *m_stringTableParser;
 	Persistence::Ref m_session;
 	Persistence::Ref m_saveGame;
 	CloudFile::Ref m_cloudFile;

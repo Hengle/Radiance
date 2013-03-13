@@ -19,7 +19,6 @@ public:
 
 	static Ref New(const pkg::AssetRef &typeface);
 
-	RAD_DECLARE_READONLY_PROPERTY(D_Typeface, asset, const pkg::AssetRef&);
 	RAD_DECLARE_READONLY_PROPERTY(D_Typeface, typeface, asset::TypefaceParser*);
 
 protected:
@@ -30,7 +29,6 @@ private:
 
 	D_Typeface(const pkg::AssetRef &asset);
 
-	RAD_DECLARE_GET(asset, const pkg::AssetRef &) { return m_asset; }
 	RAD_DECLARE_GET(typeface, asset::TypefaceParser*) { return m_typeface; }
 
 	static int lua_Size(lua_State *L);
@@ -39,7 +37,6 @@ private:
 	static int lua_AscenderDescender(lua_State *L);
 	static int lua_SplitStringAtSize(lua_State *L);
 
-	pkg::AssetRef m_asset;
 	asset::TypefaceParser *m_typeface;
 };
 

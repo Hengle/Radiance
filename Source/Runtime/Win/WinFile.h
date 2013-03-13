@@ -122,7 +122,7 @@ private:
 		const void *data,
 		AddrSize size,
 		AddrSize offset,
-		AddrSize backingSize,
+		AddrSize mappedSize,
 		::Zone &zone
 	);
 

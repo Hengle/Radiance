@@ -74,6 +74,7 @@ private:
 	void ReplaceDialog(const TreeItem::Ref &item, asset::ConversationTree::Dialog &dialog);
 	void ReloadItems(const TreeItem::Ref &item);
 	bool IsDialogParent(const TreeItem &item, asset::ConversationTree::Dialog &dialog);
+	void UpdateView();
 
 	void OnStringTableDataChanged(const pkg::Package::Entry::AssetModifiedEventData &data);
 	TreeItem::Ref ItemForRoot(asset::ConversationTree::Root &root);
@@ -148,6 +149,7 @@ protected:
 	virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
 	virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
 	virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
+	virtual QRectF boundingRect();
 
 	bool m_dropFocus;
 };

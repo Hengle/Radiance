@@ -642,7 +642,7 @@ int Entity::lua_AttachDrawModel(lua_State *L) {
 			SpriteBatchDrawModel::Ref m = SpriteBatchDrawModel::New(
 				self,
 				x->spriteBatch,
-				mat->assetId
+				mat->asset->entry->id
 			);
 			self->AttachDrawModel(m);
 			m->Push(L);

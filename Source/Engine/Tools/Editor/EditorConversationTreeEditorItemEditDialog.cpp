@@ -537,6 +537,11 @@ void ConversationTreeEditorItemEditDialog::LoadRootPrompts() {
 	m_deletePrompt->setEnabled(false);
 	m_promptEdit->Load(0);
 	m_prompts->blockSignals(false);
+
+	if (m_prompts->count() > 0) {
+		m_prompts->item(0)->setSelected(true);
+		OnSelectedPromptChanged(m_prompts->item(0));
+	}
 }
 
 void ConversationTreeEditorItemEditDialog::LoadDialogPrompts() {
@@ -553,6 +558,11 @@ void ConversationTreeEditorItemEditDialog::LoadDialogPrompts() {
 	m_deletePrompt->setEnabled(false);
 	m_promptEdit->Load(0);
 	m_prompts->blockSignals(false);
+
+	if (m_prompts->count() > 0) {
+		m_prompts->item(0)->setSelected(true);
+		OnSelectedPromptChanged(m_prompts->item(0));
+	}
 }
 
 void ConversationTreeEditorItemEditDialog::LoadReplies() {
@@ -569,6 +579,11 @@ void ConversationTreeEditorItemEditDialog::LoadReplies() {
 	m_deleteReply->setEnabled(false);
 	m_replyEdit->Load(0);
 	m_replies->blockSignals(false);
+
+	if (m_replies->count() > 0) {
+		m_replies->item(0)->setSelected(true);
+		OnSelectedReplyChanged(m_replies->item(0));
+	}
 }
 
 void ConversationTreeEditorItemEditDialog::SaveRoot() {

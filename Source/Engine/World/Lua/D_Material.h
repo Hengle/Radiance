@@ -23,7 +23,6 @@ public:
 	static Ref New(const pkg::AssetRef &asset);
 
 	RAD_DECLARE_READONLY_PROPERTY(D_Material, material, r::Material*);
-	RAD_DECLARE_READONLY_PROPERTY(D_Material, assetId, int);
 
 protected:
 
@@ -37,16 +36,11 @@ private:
 		return m_parser ? m_parser->material.get() : 0; 
 	}
 
-	RAD_DECLARE_GET(assetId, int) {
-		return m_asset->id;
-	}
-
 	static int lua_Dimensions(lua_State *L);
 	static int lua_SetState(lua_State *L);
 	static int lua_BlendTo(lua_State *L);
 	static int lua_Name(lua_State *L);
 	
-	pkg::AssetRef m_asset;
 	asset::MaterialParser *m_parser;
 };
 

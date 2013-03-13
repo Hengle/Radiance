@@ -155,14 +155,14 @@ int DrawModel::lua_ReplaceMaterial(lua_State *L) {
 	Ref r = lua::SharedPtr::Get<DrawModel>(L, "DrawModel", 1, true);
 	D_Material::Ref a = lua::SharedPtr::Get<D_Material>(L, "Material", 2, true);
 	D_Material::Ref b = lua::SharedPtr::Get<D_Material>(L, "Material", 3, true);
-	r->ReplaceMaterial(a->assetId, b->assetId);
+	r->ReplaceMaterial(a->asset->entry->id, b->asset->entry->id);
 	return 0;
 }
 
 int DrawModel::lua_ReplaceMaterials(lua_State *L) {
 	Ref r = lua::SharedPtr::Get<DrawModel>(L, "DrawModel", 1, true);
 	D_Material::Ref a = lua::SharedPtr::Get<D_Material>(L, "Material", 2, true);
-	r->ReplaceMaterials(a->assetId);
+	r->ReplaceMaterials(a->asset->entry->id);
 	return 0;
 }
 
