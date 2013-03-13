@@ -45,6 +45,7 @@ private slots:
 	void OnLanguageChanged(int index);
 	void OnRootListSelected(QListWidgetItem *item);
 	void OnDialogListSelected(QListWidgetItem *item);
+	void SaveChanges();
 
 private:
 
@@ -62,6 +63,9 @@ private:
 		asset::ConversationTree::Dialog &parent,
 		asset::ConversationTree::Dialog &dialog
 	);
+
+	asset::ConversationTree::Root *FindRoot(const char *name);
+	asset::ConversationTree::Dialog *FindDialog(const char *name);
 
 	pkg::Asset::Ref m_conversationTree;
 	asset::ConversationTreeParser *m_parser;

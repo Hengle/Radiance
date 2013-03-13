@@ -156,15 +156,20 @@ int ConversationTreeParser::Save(
 		return SR_FileNotFound;
 
 	ConversationTreeParser *parser = ConversationTreeParser::Cast(asset);
-	if (!parser)
+	if (!parser) {
+		fclose(fp);
 		return SR_MetaError;
+	}
 
 	file::FILEOutputBuffer ob(fp);
 	stream::OutputStream os(ob);
 
-	if (!parser->conversationTree->SaveBin(os))
+	if (!parser->conversationTree->SaveBin(os)) {
+		fclose(fp);
 		return SR_IOError;
+	}
 
+	fclose(fp);
 	return SR_Success;
 }
 

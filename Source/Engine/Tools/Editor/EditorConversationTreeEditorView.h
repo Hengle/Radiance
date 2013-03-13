@@ -39,11 +39,14 @@ public:
 	void DialogDeleted(asset::ConversationTree::Dialog &dialog);
 	void ReloadItems();
 
+signals:
+	void OnDataChanged();
+
 private slots:
 
 	void SelectionChanged();
 	void OnDeleteKey();
-	void OnDialogDropped(ConversationTreeEditorViewItem *target, int uid);
+	void OnDialogDropped(ConversationTreeEditorViewItem *item, int uid);
 
 private:
 
@@ -60,6 +63,7 @@ private:
 		asset::ConversationTree::Dialog *dialog;
 		ConversationTreeEditorViewItem *viewItem;
 		ConversationTreeEditorViewItem *promptItem;
+		ConversationTreeEditorDropTarget *dropTarget;
 	};
 
 	void ReloadStrings(const TreeItem::Ref &item);
@@ -69,6 +73,7 @@ private:
 	void AddDialogToItem(const TreeItem::Ref &item, asset::ConversationTree::Dialog &dialog);
 	void ReplaceDialog(const TreeItem::Ref &item, asset::ConversationTree::Dialog &dialog);
 	void ReloadItems(const TreeItem::Ref &item);
+	bool IsDialogParent(const TreeItem &item, asset::ConversationTree::Dialog &dialog);
 
 	void OnStringTableDataChanged(const pkg::Package::Entry::AssetModifiedEventData &data);
 	TreeItem::Ref ItemForRoot(asset::ConversationTree::Root &root);
@@ -86,7 +91,6 @@ private:
 	QString TextForDialogPrompt(TreeItem &item);
 
 	TreeItem::Ref m_root;
-	ConversationTreeEditorDropTarget *m_dropTarget;
 	ConversationTreeEditorViewGraphicsScene *m_scene;
 	ConversationTreeEditorViewGraphicsView *m_view;
 	asset::ConversationTreeParser *m_parser;
@@ -113,11 +117,13 @@ class RADENG_CLASS ConversationTreeEditorViewGraphicsScene : public QGraphicsSce
 public:
 	ConversationTreeEditorViewGraphicsScene(QWidget *parent = 0);
 
-	void EmitDialogDropped(ConversationTreeEditorViewItem *target, int uid);
+	void EmitDialogDropped(ConversationTreeEditorViewItem *item, int uid);
+
+	static int DialogIDFromDrop(QGraphicsSceneDragDropEvent *event);
 
 signals:
 
-	void OnDialogDropped(ConversationTreeEditorViewItem *target, int uid);
+	void OnDialogDropped(ConversationTreeEditorViewItem *item, int uid);
 
 protected:
 

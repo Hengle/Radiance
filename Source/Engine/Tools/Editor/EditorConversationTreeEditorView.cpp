@@ -89,16 +89,13 @@ void ConversationTreeEditorView::OnDialogDropped(ConversationTreeEditorViewItem 
 	TreeItem::Ref targetItem;
 	
 	if (target) {
-		if (target == m_dropTarget) {
-			targetItem = GetSelectedItemFromTree();
-			if (!targetItem)
-				targetItem = m_root;
-			target = 0;
-		} else {
-			targetItem = ItemForViewItem(*target);
+		targetItem = ItemForViewItem(*target);
+		RAD_ASSERT(targetItem);
+		if (targetItem->dropTarget == target) {
+			target = 0; // append.
 		}
 	} else {
-		targetItem = m_root;
+		targetItem = GetSelectedItemFromTree();
 	}
 
 	RAD_ASSERT(targetItem);
@@ -123,6 +120,12 @@ void ConversationTreeEditorView::DialogDeleted(asset::ConversationTree::Dialog &
 }
 
 void ConversationTreeEditorView::AddDialogToItem(const TreeItem::Ref &item, asset::ConversationTree::Dialog &dialog) {
+
+	if (IsDialogParent(*item, dialog)) {
+		QMessageBox::critical(this, "Error", "This dialog item is already placed above, this would create a circular chat.");
+		return;
+	}
+
 	if (item->root) {
 		bool found = false;
 		for (asset::ConversationTree::Dialog::PtrVec::const_iterator it = item->root->dialog->begin(); it != item->root->dialog->end(); ++it) {
@@ -160,11 +163,17 @@ void ConversationTreeEditorView::AddDialogToItem(const TreeItem::Ref &item, asse
 	m_parser->conversationTree->RefDialog(dialog);
 	ItemForDialog(dialog, item.get());
 	LayoutItems();
+	emit OnDataChanged();
 }
 
 void ConversationTreeEditorView::ReplaceDialog(const TreeItem::Ref &item, asset::ConversationTree::Dialog &dialog) {
 	RAD_ASSERT(item->parent);
 	RAD_ASSERT(item->dialog);
+
+	if (IsDialogParent(*item, dialog)) {
+		QMessageBox::critical(this, "Error", "This dialog item is already placed above, this would create a circular chat.");
+		return;
+	}
 
 	m_scene->blockSignals(true);
 
@@ -223,6 +232,7 @@ void ConversationTreeEditorView::ReplaceDialog(const TreeItem::Ref &item, asset:
 	LayoutItems();
 
 	m_scene->blockSignals(false);
+	emit OnDataChanged();
 }
 
 void ConversationTreeEditorView::DialogDeleted(const TreeItem::Ref &item, asset::ConversationTree::Dialog &dialog) {
@@ -307,9 +317,12 @@ void ConversationTreeEditorView::ReloadItems(const TreeItem::Ref &item) {
 void ConversationTreeEditorView::ReloadStrings(const TreeItem::Ref &item) {
 	RAD_ASSERT(item->viewItem);
 	item->viewItem->setText(TextForItem(*item));
+	item->viewItem->update();
 
-	if (item->dialog && item->promptItem)
+	if (item->dialog && item->promptItem) {
 		item->promptItem->setText(TextForDialogPrompt(*item));
+		item->promptItem->update();
+	}
 
 	for (TreeItem::Vec::const_iterator it = item->children.begin(); it != item->children.end(); ++it) {
 		ReloadStrings(*it);
@@ -334,23 +347,25 @@ bool ConversationTreeEditorView::LayoutItems(const TreeItem::Ref &item, qreal x,
 	}
 
 	x = 20.f;
-	bool placeDropTarget = true;
-
+	
 	for (TreeItem::Vec::const_iterator it = item->children.begin(); it != item->children.end(); ++it) {
 		const TreeItem::Ref &child = *it;
-		placeDropTarget = LayoutItems(child, x, y) && placeDropTarget;
+		LayoutItems(child, x, y);
 		x = child->viewItem->sceneBoundingRect().right() + 16.f;
 	}
 
-	if (placeDropTarget)
-		m_dropTarget->setPos(x, y);
+	if (item->dropTarget)
+		item->dropTarget->setPos(x, y);
 
 	return item->children.empty();
 }
 
 void ConversationTreeEditorView::OnStringTableDataChanged(const pkg::Package::Entry::AssetModifiedEventData &data) {
-	if (m_root)
+	if (m_root) {
 		ReloadStrings(m_root);
+		LayoutItems();
+		m_scene->update();
+	}
 }
 
 ConversationTreeEditorView::TreeItem::Ref ConversationTreeEditorView::ItemForRoot(asset::ConversationTree::Root &root) {
@@ -359,10 +374,6 @@ ConversationTreeEditorView::TreeItem::Ref ConversationTreeEditorView::ItemForRoo
 	origin->setBrush(Qt::NoBrush);
 	origin->setPen(Qt::NoPen);
 	m_scene->addItem(origin);
-
-	m_dropTarget = new ConversationTreeEditorDropTarget();
-	m_dropTarget->setAcceptDrops(true);
-	m_scene->addItem(m_dropTarget);
 
 	TreeItem::Ref item(new (ZEditor) TreeItem());
 	item->root = &root;
@@ -381,7 +392,6 @@ ConversationTreeEditorView::TreeItem::Ref ConversationTreeEditorView::ItemForDia
 	item->viewItem->setText(TextForItem(*item));
 	item->viewItem->setFlags(QGraphicsItem::ItemIsSelectable);
 	item->viewItem->setAcceptDrops(true);
-	
 	m_scene->addItem(item->viewItem);
 
 	if (parent)
@@ -391,13 +401,21 @@ ConversationTreeEditorView::TreeItem::Ref ConversationTreeEditorView::ItemForDia
 }
 
 ConversationTreeEditorView::TreeItem::Ref ConversationTreeEditorView::ItemForViewItem(ConversationTreeEditorViewItem &item) {
-	return ItemForViewItem(m_root, item);
+	if (m_root) {
+		if (m_root->dropTarget == &item)
+			return m_root;
+		return ItemForViewItem(m_root, item);
+	}
+
+	return TreeItem::Ref();
 }
 
 ConversationTreeEditorView::TreeItem::Ref ConversationTreeEditorView::ItemForViewItem(const TreeItem::Ref &tree, ConversationTreeEditorViewItem &item) {
 	for (TreeItem::Vec::const_iterator it = tree->children.begin(); it != tree->children.end(); ++it) {
 		const TreeItem::Ref &child = *it;
 		if (child->viewItem == &item)
+			return child;
+		if (child->dropTarget == &item)
 			return child;
 		TreeItem::Ref sub = ItemForViewItem(child, item);
 		if (sub)
@@ -445,6 +463,10 @@ void ConversationTreeEditorView::SelectItem(const TreeItem::Ref &item) {
 		item->promptItem->setText(TextForDialogPrompt(*item));
 	}
 
+	item->dropTarget = new (ZEditor) ConversationTreeEditorDropTarget();
+	item->dropTarget->setAcceptDrops(true);
+	m_scene->addItem(item->dropTarget);
+
 	LayoutItems();
 	m_scene->update();
 }
@@ -455,11 +477,29 @@ void ConversationTreeEditorView::PruneChildren(TreeItem *parent, TreeItem *excep
 		if (child.get() != except) {
 			child->children.clear();
 			child->viewItem->drawSelected = false;
+			if (child->dropTarget) {
+				m_scene->removeItem(child->dropTarget);
+				delete child->dropTarget;
+				child->dropTarget = 0;
+			}
+			if (child->promptItem) {
+				m_scene->removeItem(child->promptItem);
+				delete child->promptItem;
+				child->promptItem = 0;
+			}
 		}
 	}
 
 	if (parent->parent)
 		PruneChildren(parent->parent, parent);
+}
+
+bool ConversationTreeEditorView::IsDialogParent(const TreeItem &item, asset::ConversationTree::Dialog &dialog) {
+	if (item.dialog == &dialog)
+		return true;
+	if (item.parent)
+		return IsDialogParent(*item.parent, dialog);
+	return false;
 }
 
 ConversationTreeEditorView::TreeItem::Ref ConversationTreeEditorView::GetSelectedItemFromScene() {
@@ -525,7 +565,7 @@ QString ConversationTreeEditorView::TextForDialogPrompt(TreeItem &item) {
 	return QString("<NOT TRANSLATED>");
 }
 
-ConversationTreeEditorView::TreeItem::TreeItem() : parent(0), root(0), dialog(0), viewItem(0), promptItem(0) {
+ConversationTreeEditorView::TreeItem::TreeItem() : parent(0), root(0), dialog(0), viewItem(0), promptItem(0), dropTarget(0) {
 }
 
 ConversationTreeEditorView::TreeItem::~TreeItem() {
@@ -537,6 +577,11 @@ ConversationTreeEditorView::TreeItem::~TreeItem() {
 		if (promptItem) {
 			scene->removeItem(promptItem);
 			delete promptItem;
+		}
+
+		if (dropTarget) {
+			scene->removeItem(dropTarget);
+			delete dropTarget;
 		}
 	}
 }
@@ -563,8 +608,8 @@ ConversationTreeEditorViewGraphicsScene::ConversationTreeEditorViewGraphicsScene
 	: QGraphicsScene(parent) {
 }
 
-void ConversationTreeEditorViewGraphicsScene::EmitDialogDropped(ConversationTreeEditorViewItem *target, int uid) {
-	emit OnDialogDropped(target, uid);
+void ConversationTreeEditorViewGraphicsScene::EmitDialogDropped(ConversationTreeEditorViewItem *item, int uid) {
+	emit OnDialogDropped(item, uid);
 }
 
 void ConversationTreeEditorViewGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
@@ -574,19 +619,33 @@ void ConversationTreeEditorViewGraphicsScene::mousePressEvent(QGraphicsSceneMous
 
 void ConversationTreeEditorViewGraphicsScene::dragEnterEvent(QGraphicsSceneDragDropEvent *event) {
 	QGraphicsScene::dragEnterEvent(event);
-	event->setAccepted(true);
+//	event->setAccepted(true);
 }
 
 void ConversationTreeEditorViewGraphicsScene::dragMoveEvent(QGraphicsSceneDragDropEvent *event) {
 	QGraphicsScene::dragMoveEvent(event);
-	event->setAccepted(true);
+//	event->setAccepted(true);
 }
 
 void ConversationTreeEditorViewGraphicsScene::dropEvent(QGraphicsSceneDragDropEvent *event) {
 	QGraphicsScene::dropEvent(event);
-	if (!event->isAccepted()) {
+	/*if (!event->isAccepted()) {
 		event->setAccepted(true);
+	}*/
+}
+
+int ConversationTreeEditorViewGraphicsScene::DialogIDFromDrop(QGraphicsSceneDragDropEvent *event) {
+	const QMimeData *mime = event->mimeData();
+	if (mime->hasFormat("application/conversationDialogId")) {
+		QByteArray bytes = mime->data("application/conversationDialogId");
+		QBuffer buffer(&bytes);
+		buffer.open(QIODevice::ReadOnly);
+		int uid;
+		buffer.read((char*)&uid, sizeof(int));
+		return uid;
 	}
+
+	return -1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -619,8 +678,6 @@ void ConversationTreeEditorViewItem::paint(QPainter *painter, const QStyleOption
 
 	painter->setPen(QColor(qRgb(0,0,0)));
 	painter->drawText(boundingRect(), text());
-
-	//QGraphicsSimpleTextItem::paint(painter, option, widget);
 }
 
 void ConversationTreeEditorViewItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event) {
@@ -645,18 +702,11 @@ void ConversationTreeEditorViewItem::dragMoveEvent(QGraphicsSceneDragDropEvent *
 
 void ConversationTreeEditorViewItem::dropEvent(QGraphicsSceneDragDropEvent *event) {
 	m_dropFocus = false;
-
-	const QMimeData *mime = event->mimeData();
-	if (mime->hasFormat("application/conversationDialogId")) {
-		QByteArray bytes = mime->data("application/conversationDialogId");
-		QBuffer buffer(&bytes);
-		buffer.open(QIODevice::ReadOnly);
-		int uid;
-		buffer.read((char*)&uid, sizeof(int));
-		static_cast<ConversationTreeEditorViewGraphicsScene*>(scene())->EmitDialogDropped(this, uid);
-	}
-
 	update();
+
+	int uid = ConversationTreeEditorViewGraphicsScene::DialogIDFromDrop(event);
+	if (uid != -1)
+		static_cast<ConversationTreeEditorViewGraphicsScene*>(scene())->EmitDialogDropped(this, uid);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -113,8 +113,8 @@ public:
 
 private:
 
-	void PushRoot(lua_State *L, const Root &root) const;
-	void PushDialog(lua_State *L, const Dialog &dialog) const;
+	void PushRoot(lua_State *L, const Root &root, int dialogTable) const;
+	void PushDialog(lua_State *L, const Dialog &dialog, int dialogTable) const;
 	void PushStringOption(lua_State *L, const StringOption &opt) const;
 
 #if defined(RAD_OPT_PC_TOOLS)

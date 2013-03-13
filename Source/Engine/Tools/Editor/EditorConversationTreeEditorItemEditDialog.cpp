@@ -73,9 +73,20 @@ void ConversationTreeStringOptionEditWidget::Load(asset::ConversationTree::Strin
 
 	if (opt) {
 		int index = m_string->findText(opt->text.c_str.get());
+		m_string->blockSignals(true);
+		m_probabilityLow->blockSignals(true);
+		m_probabilityHigh->blockSignals(true);
 		m_string->setCurrentIndex(index);
+		if (index >= 0) {
+			m_opt->text = m_string->itemText(index).toAscii().constData();
+		} else {
+			m_opt->text.Clear();
+		}
 		m_probabilityLow->setText(QString("%1").arg(opt->probability[0]));
 		m_probabilityHigh->setText(QString("%1").arg(opt->probability[1]));
+		m_string->blockSignals(false);
+		m_probabilityLow->blockSignals(false);
+		m_probabilityHigh->blockSignals(false);
 		setEnabled(true);
 	} else {
 		m_string->setCurrentIndex(-1);

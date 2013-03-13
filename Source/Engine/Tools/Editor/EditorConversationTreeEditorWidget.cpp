@@ -45,6 +45,7 @@ ConversationTreeEditorWidget::ConversationTreeEditorWidget(
 	QHBoxLayout *hbox = new (ZEditor) QHBoxLayout(this);
 	
 	m_view = new (ZEditor) ConversationTreeEditorView(m_langId, m_parser);
+	RAD_VERIFY(connect(m_view, SIGNAL(OnDataChanged()), SLOT(SaveChanges())));
 
 	hbox->addWidget(m_view);
 
@@ -155,10 +156,19 @@ void ConversationTreeEditorWidget::EditRootPressed() {
 
 	ConversationTreeEditorItemEditDialog dlg(m_langId, *root, *m_parser, this);
 	
-	if (dlg.exec() == QDialog::Accepted) {
+	while (dlg.exec() == QDialog::Accepted) {
+		asset::ConversationTree::Root *other = FindRoot(dlg.root->name.c_str);
+		
+		if (other && other != root) {
+			QMessageBox::critical(this, "Error", "A topic with that name already exists!");
+			dlg.SelectName();
+			continue;
+		}
+
 		*root = *dlg.root.get();
 		item->setText(root->name.c_str.get());
 		m_view->ReloadItems();
+		SaveChanges();
 	}
 }
 
@@ -170,7 +180,13 @@ void ConversationTreeEditorWidget::AddRootPressed() {
 	ConversationTreeEditorItemEditDialog dlg(m_langId, root, *m_parser, this);
 	dlg.SelectName();
 
-	if (dlg.exec() == QDialog::Accepted) {
+	while (dlg.exec() == QDialog::Accepted) {
+		if (FindRoot(dlg.root->name.c_str)) {
+			QMessageBox::critical(this, "Error", "A topic with that name already exists!");
+			dlg.SelectName();
+			continue;
+		}
+
 		asset::ConversationTree::Root *x = m_parser->conversationTree->NewRoot();
 		*x = *dlg.root.get();
 		(*m_parser->conversationTree->roots.get())->push_back(x);
@@ -178,6 +194,7 @@ void ConversationTreeEditorWidget::AddRootPressed() {
 		item->setData(Qt::UserRole, qVariantFromValue((void*)x));
 		m_roots->addItem(item);
 		m_roots->setCurrentItem(item);
+		SaveChanges();
 	}
 }
 
@@ -200,6 +217,7 @@ void ConversationTreeEditorWidget::DeleteRootPressed() {
 			(*m_parser->conversationTree->roots)->erase(it);
 			m_parser->conversationTree->DeleteRoot(*root);
 			LoadRoots();
+			SaveChanges();
 			break;
 		}
 	}
@@ -211,10 +229,19 @@ void ConversationTreeEditorWidget::EditDialogPressed() {
 
 	ConversationTreeEditorItemEditDialog dlg(m_langId, *dialog, *m_parser, this);
 	
-	if (dlg.exec() == QDialog::Accepted) {
+	while (dlg.exec() == QDialog::Accepted) {
+		asset::ConversationTree::Dialog *other = FindDialog(dlg.dialog->name.c_str);
+		
+		if (other && other != dialog) {
+			QMessageBox::critical(this, "Error", "A dialog with that name already exists!");
+			dlg.SelectName();
+			continue;
+		}
+
 		*dialog = *dlg.dialog.get();
 		item->setText(dialog->name.c_str.get());
 		m_view->ReloadItems();
+		SaveChanges();
 	}
 }
 
@@ -225,13 +252,22 @@ void ConversationTreeEditorWidget::AddDialogPressed() {
 	ConversationTreeEditorItemEditDialog dlg(m_langId, dialog, *m_parser, this);
 	dlg.SelectName();
 
-	if (dlg.exec() == QDialog::Accepted) {
+	while (dlg.exec() == QDialog::Accepted) {
+		if (FindDialog(dlg.dialog->name.c_str)) {
+			QMessageBox::critical(this, "Error", "A dialog with that name already exists!");
+			dlg.SelectName();
+			continue;
+		}
+
 		asset::ConversationTree::Dialog *x = m_parser->conversationTree->NewDialog();
+		int uid = x->uid;
 		*x = *dlg.dialog.get();
+		x->uid = uid;
 		QListWidgetItem *item = new QListWidgetItem(x->name.c_str.get());
 		item->setData(Qt::UserRole, qVariantFromValue((void*)x));
 		m_dialog->addItem(item);
 		m_dialog->setCurrentItem(item);
+		SaveChanges();
 	}
 }
 
@@ -254,6 +290,7 @@ void ConversationTreeEditorWidget::DeleteDialogPressed() {
 	m_view->DialogDeleted(*dialog);
 	m_parser->conversationTree->DeleteDialog(*dialog);
 	LoadDialog();
+	SaveChanges();
 }
 
 void ConversationTreeEditorWidget::OnLanguageChanged(int index) {
@@ -303,7 +340,7 @@ void ConversationTreeEditorWidget::LoadDialog() {
 		const asset::ConversationTree::Dialog &dialog = *it->second;
 		QListWidgetItem *item = new (ZEditor) QListWidgetItem(dialog.name.c_str.get());
 		item->setData(Qt::UserRole, qVariantFromValue((void*)&dialog));
-		m_roots->addItem(item);
+		m_dialog->addItem(item);
 	}
 
 	m_deleteDialog->setEnabled(false);
@@ -324,16 +361,14 @@ void ConversationTreeEditorWidget::RemoveDialogFromTree(
 	asset::ConversationTree::Dialog &dialog
 ) {
 	for (asset::ConversationTree::Dialog::PtrVec::iterator it = root.dialog->begin(); it != root.dialog->end();) {
-		asset::ConversationTree::Dialog::PtrVec::iterator next(it); ++next;
-
+		
 		if (*it == &dialog) {
-			root.dialog->erase(it);
+			it = root.dialog->erase(it);
 			m_parser->conversationTree->UnrefDialog(dialog);
 		} else {
 			RemoveDialogFromTree(**it, dialog);
+			++it;
 		}
-
-		it = next;
 	}
 }
 
@@ -342,16 +377,44 @@ void ConversationTreeEditorWidget::RemoveDialogFromTree(
 	asset::ConversationTree::Dialog &dialog
 ) {
 	for (asset::ConversationTree::Dialog::PtrVec::iterator it = parent.choices->begin(); it != parent.choices->end();) {
-		asset::ConversationTree::Dialog::PtrVec::iterator next(it); ++next;
-
+		
 		if (*it == &dialog) {
-			parent.choices->erase(it);
+			it = parent.choices->erase(it);
 			m_parser->conversationTree->UnrefDialog(dialog);
 		} else {
 			RemoveDialogFromTree(**it, dialog);
+			++it;
 		}
+	}
+}
 
-		it = next;
+asset::ConversationTree::Root *ConversationTreeEditorWidget::FindRoot(const char *name) {
+	const asset::ConversationTree::Root::PtrVec &roots = *m_parser->conversationTree->roots;
+	for (asset::ConversationTree::Root::PtrVec::const_iterator it = roots->begin(); it != roots->end(); ++it) {
+		if ((*it)->name == name)
+			return *it;
+	}
+
+	return 0;
+}
+
+asset::ConversationTree::Dialog *ConversationTreeEditorWidget::FindDialog(const char *name) {
+	const asset::ConversationTree::Dialog::UIDMap &dialogs = *m_parser->conversationTree->dialogs;
+	for (asset::ConversationTree::Dialog::UIDMap::const_iterator it = dialogs.begin(); it != dialogs.end(); ++it) {
+		if (it->second->name == name)
+			return it->second;
+	}
+
+	return 0;
+}
+
+void ConversationTreeEditorWidget::SaveChanges() {
+	if (m_conversationTree) {
+		asset::ConversationTreeParser::Save(
+			*App::Get()->engine,
+			m_conversationTree,
+			0
+		);
 	}
 }
 

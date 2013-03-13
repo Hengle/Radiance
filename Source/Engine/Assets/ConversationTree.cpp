@@ -104,6 +104,25 @@ int ConversationTree::PushCopy(lua_State *L) const {
 	if (m_roots->empty())
 		return 0;
 
+	// push empty dialog table that can be linked up
+	lua_createtable(L, (int)m_dialogs.size(), 0);
+
+	for (Dialog::UIDMap::const_iterator it = m_dialogs.begin(); it != m_dialogs.end(); ++it) {
+		const Dialog &dialog = *it->second;
+		lua_pushinteger(L, dialog.uid);
+
+		int numTableElems = 3;
+		if (!dialog.action.empty)
+			++numTableElems;
+		if (!dialog.condition.empty)
+			++numTableElems;
+
+		lua_createtable(L, 0, numTableElems);
+		lua_settable(L, -3);
+	}
+
+	int dialogTable = lua_gettop(L);
+
 	lua_createtable(L, 0, m_roots->size());
 	for (size_t i = 0; i < m_roots->size(); ++i) {
 		const Root &root = *m_roots[i];
@@ -115,14 +134,16 @@ int ConversationTree::PushCopy(lua_State *L) const {
 			continue;
 		
 		lua_pushstring(L, root.name.c_str);
-		PushRoot(L, root);
+		PushRoot(L, root, dialogTable);
 		lua_settable(L, -3);
 	}
+
+	lua_remove(L, dialogTable);
 
 	return 1;
 }
 
-void ConversationTree::PushRoot(lua_State *L, const Root &root) const {
+void ConversationTree::PushRoot(lua_State *L, const Root &root, int dialogTable) const {
 
 	lua_createtable(L, 0, 2);
 	
@@ -152,58 +173,34 @@ void ConversationTree::PushRoot(lua_State *L, const Root &root) const {
 	for (size_t i = 0; i < root.dialog->size(); ++i) {
 		const Dialog &dialog = *root.dialog[i];
 		lua_pushinteger(L, (int)(i+1));
-		PushDialog(L, dialog);
+		lua_pushinteger(L, dialog.uid);
+		lua_gettable(L, dialogTable);
 		lua_settable(L, -3);
 	}
 
 	lua_settable(L, -3);
 }
 
-void ConversationTree::PushDialog(lua_State *L, const Dialog &dialog) const {
+void ConversationTree::PushDialog(lua_State *L, const Dialog &dialog, int dialogTable) const {
 
-	int numTableElems = 3;
-	if (!dialog.action.empty)
-		++numTableElems;
-	if (!dialog.condition.empty)
-		++numTableElems;
+	lua_pushinteger(L, dialog.uid);
+	lua_gettable(L, dialogTable);
 
 	if (!dialog.choices->empty()) {
-		// dialog choices are deep nested tables
-		// construct from the inside out so we don't blow up the lua stack.
-
-		for (size_t i = 0; i < dialog.choices->size(); ++i) {
-			const Dialog &d = *dialog.choices[i];
-			PushDialog(L, d);
-		}
-
+		lua_pushstring(L, "choices");
 		lua_createtable(L, (int)dialog.choices->size(), 0);
 
 		for (size_t i = 0; i < dialog.choices->size(); ++i) {
-			int idx = (int)(dialog.choices->size() - i);
+			const Dialog &child = *dialog.choices[i];
 			lua_pushinteger(L, (int)(i+1));
-			lua_pushvalue(L, -idx - 2);
+			lua_pushinteger(L, child.uid);
+			lua_gettable(L, dialogTable);
 			lua_settable(L, -3);
 		}
 
-		lua_replace(L, -((int)dialog.choices->size()) - 1);
-		if (dialog.choices->size() > 1)
-			lua_pop(L, (int)dialog.choices->size() - 1);
-
-		RAD_ASSERT(lua_type(L, -1) == LUA_TTABLE);
-
-		// choices = {{prob = 1, { choices } }}
-		lua_createtable(L, 0, numTableElems);
-		lua_pushstring(L, "choices");
-		lua_pushvalue(L, -3);
 		lua_settable(L, -3);
 
-		lua_replace(L, -2);
-		RAD_ASSERT(lua_type(L, -1) == LUA_TTABLE);
-
-	} else {
-		lua_createtable(L, 0, numTableElems);
 	}
-
 	// prompt = {{prob = {0, 1}, "TEXT"}}
 	lua_pushstring(L, "prompt");
 	lua_createtable(L, (int)dialog.prompts->size(), 0);
