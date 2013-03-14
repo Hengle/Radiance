@@ -55,6 +55,7 @@
     <ClInclude Include="..\..\Engine\Assets\Assets.h" />
     <ClInclude Include="..\..\Engine\Assets\AssetTypes.h" />
     <ClInclude Include="..\..\Engine\Assets\ConversationTree.h" />
+    <ClInclude Include="..\..\Engine\Assets\ConversationTreeCooker.h" />
     <ClInclude Include="..\..\Engine\Assets\ConversationTreeParser.h" />
     <ClInclude Include="..\..\Engine\Assets\FontCooker.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
@@ -1252,6 +1253,7 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\Assets\Assets.cpp" />
     <ClCompile Include="..\..\Engine\Assets\ConversationTree.cpp" />
+    <ClCompile Include="..\..\Engine\Assets\ConversationTreeCooker.cpp" />
     <ClCompile Include="..\..\Engine\Assets\ConversationTreeParser.cpp" />
     <ClCompile Include="..\..\Engine\Assets\FontCooker.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>

@@ -31,6 +31,7 @@
 #include "FontCooker.h"
 #include "TypefaceCooker.h"
 #include "StringTableCooker.h"
+#include "ConversationTreeCooker.h"
 
 namespace asset {
 
@@ -49,6 +50,7 @@ RADENG_API void RADENG_CALL RegisterCookers(Engine &engine) {
 	FontCooker::Register(engine);
 	TypefaceCooker::Register(engine);
 	StringTableCooker::Register(engine);
+	ConversationTreeCooker::Register(engine);
 	RB_RegisterCookers(engine);
 }
 

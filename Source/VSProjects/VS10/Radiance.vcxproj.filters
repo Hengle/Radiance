@@ -1467,6 +1467,9 @@
     <ClInclude Include="..\..\Engine\World\Lua\T_ConversationTreePrecache.h">
       <Filter>Source\Engine\World\Lua</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\Assets\ConversationTreeCooker.h">
+      <Filter>Source\Engine\Assets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2266,6 +2269,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\World\Lua\T_ConversationTreePrecache.cpp">
       <Filter>Source\Engine\World\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Assets\ConversationTreeCooker.cpp">
+      <Filter>Source\Engine\Assets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
