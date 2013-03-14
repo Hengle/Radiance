@@ -186,7 +186,7 @@ public:
 	InputStream &operator >> (S8& var);  // throw(ReadException);
 	InputStream &operator >> (U8& var);  // throw(ReadException);
 	InputStream &operator >> (S16& var); // throw(ReadException);
-	InputStream &operator >> (U16& var); // throw(ReadException);
+	InputStream &operator >> (U16& var); // throw(ReadException);22
 	InputStream &operator >> (S32& var); // throw(ReadException);
 	InputStream &operator >> (U32& var); // throw(ReadException);
 	InputStream &operator >> (S64& var); // throw(ReadException);
