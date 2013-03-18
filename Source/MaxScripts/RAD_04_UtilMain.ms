@@ -301,10 +301,10 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 			deleteAnim.enabled = false
 		)
 		
-		bboxEnable = (animSel.count > 0)
-		setBBox.enabled = bboxEnable
+		bboxEnabled = (animSel.count > 0)
+		setBBox.enabled = bboxEnabled
 		
-		if (bboxEnable) then (
+		if (bboxEnabled) then (
 			bboxEnabled = false
 			vals = RAD_GatherObjectProps animSel #("SetBBox") #("false")
 			if (vals[1]) then (
