@@ -540,33 +540,33 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 	(
 		if (state) then
 		(
-			RAD_SetObjectProps (selectedMeshes()) #(#("CinematicObject", "true"))
+			RAD_SetObjectProps (selectedAnimatable()) #(#("CinematicObject", "true"))
 		)
 		else
 		(
-			RAD_SetObjectProps (selectedMeshes()) #(#("CinematicObject", "false"))
+			RAD_SetObjectProps (selectedAnimatable()) #(#("CinematicObject", "false"))
 		)
 	)
 	on hideUntilRef changed state do
 	(
 		if (state) then
 		(
-			RAD_SetObjectProps (selectedMeshes()) #(#("HideUntilRef", "true"))
+			RAD_SetObjectProps (selectedAnimatable()) #(#("HideUntilRef", "true"))
 		)
 		else
 		(
-			RAD_SetObjectProps (selectedMeshes()) #(#("HideUntilRef", "false"))
+			RAD_SetObjectProps (selectedAnimatable()) #(#("HideUntilRef", "false"))
 		)
 	)
 	on hideWhenDone changed state do
 	(
 		if (state) then
 		(
-			RAD_SetObjectProps (selectedMeshes()) #(#("HideWhenDone", "true"))
+			RAD_SetObjectProps (selectedAnimatable()) #(#("HideWhenDone", "true"))
 		)
 		else
 		(
-			RAD_SetObjectProps (selectedMeshes()) #(#("HideWhenDone", "false"))
+			RAD_SetObjectProps (selectedAnimatable()) #(#("HideWhenDone", "false"))
 		)
 	)
 	on nameCompleteMapsButton pressed do
