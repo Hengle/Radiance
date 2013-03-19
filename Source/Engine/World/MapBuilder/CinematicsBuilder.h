@@ -37,6 +37,9 @@ private:
 		typedef zone_vector<Actor, world::bsp_file::ZBSPBuilderT>::type Vec;
 		Actor() : emitId(-1), index(-1) {}
 
+
+		BBox bounds;
+		Vec3 pos;
 		int flags;
 		int emitId;
 		int index;

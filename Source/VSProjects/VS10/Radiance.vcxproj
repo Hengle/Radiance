@@ -981,6 +981,7 @@
     <ClInclude Include="..\..\Engine\World\MapBuilder\SolidBSP\SolidBSP.h" />
     <ClInclude Include="..\..\Engine\World\MapBuilder\SolidBSP\VecHash.h" />
     <ClInclude Include="..\..\Engine\World\MBatchDraw.h" />
+    <ClInclude Include="..\..\Engine\World\Occupant.h" />
     <ClInclude Include="..\..\Engine\World\PostProcess.h" />
     <ClInclude Include="..\..\Engine\World\ScreenOverlay.h" />
     <ClInclude Include="..\..\Engine\World\ScreenOverlayDef.h" />
@@ -2192,6 +2193,7 @@
     <ClCompile Include="..\..\Engine\World\MT_Floor.cpp" />
     <ClCompile Include="..\..\Engine\World\MT_Fly.cpp" />
     <ClCompile Include="..\..\Engine\World\MT_Spline.cpp" />
+    <ClCompile Include="..\..\Engine\World\Occupant.cpp" />
     <ClCompile Include="..\..\Engine\World\PostProcess.cpp" />
     <ClCompile Include="..\..\Engine\World\ScreenOverlay.cpp" />
     <ClCompile Include="..\..\Engine\World\DrawModel.cpp" />

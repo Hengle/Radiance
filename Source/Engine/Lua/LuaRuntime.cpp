@@ -45,7 +45,9 @@ RADENG_API int RADENG_CALL luaL_typerror (lua_State *L, int narg, const char *tn
 
 namespace lua {
 
+#if !defined(LUA_JIT)
 struct LuaPools {
+
 	enum {
 		kNumPools = 10,
 		kBasePoolSize = 8,
@@ -195,21 +197,22 @@ size_t LuaPools::s_max = std::numeric_limits<size_t>::min();
 size_t LuaPools::s_min = std::numeric_limits<size_t>::max();
 LuaPools::PoolsArray LuaPools::s_pools;
 
+#endif
+
 State::State(const char *name) {
 	string::ncpy(m_sz, name, 64);
 
 	m_m.numAllocs = 0;
 	m_m.smallest = std::numeric_limits<int>::max();
 	m_m.biggest = std::numeric_limits<int>::min();
+
+#if !defined(LUA_JIT)
 	LuaPools::Open();
+#endif
 
 #if defined(LUA_JIT)
 #if LUA_JIT >= 200
-#if (RAD_OPT_MACHINE_WORD_SIZE == 8) // 64bit?
 	m_s = ::luaL_newstate();
-#else
-	m_s = ::lua_newstate(LuaAlloc, this);
-#endif
 	RAD_ASSERT(m_s);
 	luaL_openlibs(m_s);
 #else
@@ -228,13 +231,18 @@ State::State(const char *name) {
 State::~State() {
 	if (m_s)
 		::lua_close(m_s);
+#if !defined(LUA_JIT)
 	LuaPools::Close();
+#endif
 }
 
 void State::CompactPools() {
+#if !defined(LUA_JIT)
 	LuaPools::Compact();
+#endif
 }
 
+#if !defined(LUA_JIT)
 void *State::LuaAlloc(void *ud, void *ptr, size_t osize, size_t nsize) {
 	State *s = reinterpret_cast<State*>(ud);
 	if (!nsize) {
@@ -268,6 +276,7 @@ void *State::LuaAlloc(void *ud, void *ptr, size_t osize, size_t nsize) {
 
 	return LuaPools::Alloc(ptr, osize, nsize);
 }
+#endif
 
 namespace {
 

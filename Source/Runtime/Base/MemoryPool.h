@@ -404,13 +404,13 @@ private:
 
 struct pool_allocator_tag {};
 
-template <typename T, typename _Zone, UReg GrowSize, UReg MaxSize, int Alignment, typename Pool>
+template <typename T, typename _Zone, int NumChunksInBlock, int MaxChunks, typename Pool>
 class pool_allocator {
 public:
-	typedef pool_allocator<T, _Zone, GrowSize, MaxSize, Alignment, Pool> self_type;
+	typedef pool_allocator<T, _Zone, NumChunksInBlock, MaxChunks, Pool> self_type;
 	typedef _Zone zone_type;
 	typedef T value_type;
-	typedef SingletonPool<pool_allocator_tag, _Zone, sizeof(T), GrowSize, MaxSize, Alignment, Pool> pool_type;
+	typedef SingletonPool<pool_allocator_tag, _Zone, sizeof(T), NumChunksInBlock, MaxChunks, RAD_ALIGNOF(T), Pool> pool_type;
 	typedef value_type *pointer;
 	typedef const value_type *const_pointer;
 	typedef value_type &reference;
@@ -419,12 +419,12 @@ public:
 	typedef SAddrSize difference_type;
 
 	template <typename U>
-	struct rebind { typedef pool_allocator<U, _Zone, GrowSize, MaxSize, Alignment, Pool> other; };
+	struct rebind { typedef pool_allocator<U, _Zone, NumChunksInBlock, MaxChunks, Pool> other; };
 
 	pool_allocator() {}
 	// The following is not explicit, mimicking std::allocator [20.4.1]
 	template <typename U>
-	pool_allocator(const pool_allocator<U, _Zone, GrowSize, MaxSize, Alignment, Pool> &) {}
+	pool_allocator(const pool_allocator<U, _Zone, NumChunksInBlock, MaxChunks, Pool> &) {}
 
 	static pointer address(reference r) { return &r; }
 	static const_pointer address(const_reference s) { return &s; }
@@ -435,8 +435,8 @@ public:
 		(void) ptr;
 	}
 
-	bool operator==(const pool_allocator<T, _Zone, GrowSize, MaxSize, Alignment, Pool> &) const { return true; }
-	bool operator!=(const pool_allocator<T, _Zone, GrowSize, MaxSize, Alignment, Pool> &) const { return false; }
+	bool operator==(const self_type &) const { return true; }
+	bool operator!=(const self_type &) const { return false; }
 
 	static pointer allocate(const size_type n) {
 		RAD_ASSERT(n==1);

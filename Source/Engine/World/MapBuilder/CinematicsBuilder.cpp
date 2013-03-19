@@ -35,6 +35,9 @@ bool CinematicsBuilder::Compile(
 		if (model->hideWhenDone)
 			a.flags |= world::bsp_file::kHideWhenDone;
 		
+		a.bounds = model->bounds;
+		a.pos = a.bounds.Origin();
+		a.bounds.Translate(-a.bounds.Origin());
 		m_actors.push_back(a);
 	}
 
@@ -216,6 +219,12 @@ bool CinematicsBuilder::EmitActor(const SceneFile &map, const SkaCompressionMap 
 	
 	bspActor->flags = actor.flags;
 	bspActor->initial = -1;
+	
+	for (int i = 0; i < 3; ++i) {
+		bspActor->pos[i] = actor.pos[i];
+		bspActor->mins[i] = actor.bounds.Mins()[i];
+		bspActor->maxs[i] = actor.bounds.Maxs()[i];
+	}
 
 	// emit skas
 	tools::SkaData::Ref ska = tools::CompileSkaData(

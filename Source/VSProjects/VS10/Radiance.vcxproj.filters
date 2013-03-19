@@ -1470,6 +1470,9 @@
     <ClInclude Include="..\..\Engine\Assets\ConversationTreeCooker.h">
       <Filter>Source\Engine\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\World\Occupant.h">
+      <Filter>Source\Engine\World</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2272,6 +2275,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\Assets\ConversationTreeCooker.cpp">
       <Filter>Source\Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\Occupant.cpp">
+      <Filter>Source\Engine\World</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

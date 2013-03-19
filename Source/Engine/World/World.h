@@ -172,6 +172,7 @@ private:
 
 	friend class WorldDraw;
 	friend class Entity;
+	friend class MBatchOccupant;
 	typedef zone_list<Event::Ref, ZWorldT>::type EventList;
 	typedef zone_map<int, ZoneTagRef, ZWorldT>::type ZoneIdMap;
 
@@ -280,6 +281,8 @@ private:
 	void LoadBSP(const bsp_file::BSPFile &bsp);
 	void LinkEntity(Entity *entity, const BBox &bounds);
 	void UnlinkEntity(Entity *entity);
+	void LinkOccupant(MBatchOccupant *occupant, const BBox &bounds);
+	void UnlinkOccupant(MBatchOccupant *occupant);
 	bool IsBBoxInsideBrushHull(const BBox &bbox, const bsp_file::BSPBrush *brush) const;
 	
 	bool RayIntersectsClipModel(
@@ -308,6 +311,24 @@ private:
 	};
 
 	void LinkEntity(const LinkEntityParms &constArgs, int nodeNum);
+
+	struct LinkOccupantParms {
+
+		LinkOccupantParms(
+			MBatchOccupant *_occupant,
+			const BBox &_bounds,
+			AreaBits &_visible
+		) : occupant(_occupant),
+		    bounds(_bounds),
+			visible(_visible) {
+		}
+
+		MBatchOccupant *occupant;
+		const BBox &bounds;
+		AreaBits &visible;
+	};
+
+	void LinkOccupant(const LinkOccupantParms &constArgs, int nodeNum);
 
 	struct ClipOccupantVolumeParms {
 

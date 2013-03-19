@@ -297,6 +297,9 @@ private:
 	void LinkEntity(Entity *entity, const BBox &bounds);
 	void UnlinkEntity(Entity *entity);
 	void LinkEntity(Entity *entity, const BBox &bounds, int nodeNum);
+	void LinkOccupant(MBatchOccupant *occupant, const BBox &bounds);
+	void UnlinkOccupant(MBatchOccupant *occupant);
+	void LinkOccupant(MBatchOccupant *occupant, const BBox &bounds, int nodeNum);
 
 	int LoadMaterial(const char *name, LocalMaterial &mat);
 	

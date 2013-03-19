@@ -24,7 +24,7 @@ template <
 >
 struct zone_pool_list
 {
-	typedef pool_allocator<T, _Zone, 8, 0xffffffff, kDefaultAlignment, MemoryPool> pool_type;
+	typedef pool_allocator<T, _Zone, 16, 0x7fffffff, MemoryPool> pool_type;
 	typedef ::std::list<T, pool_type > type;
 };
 

@@ -26,7 +26,7 @@ template <
 >
 struct zone_pool_set
 {
-	typedef pool_allocator<Key, _Zone, 8, 0xffffffff, kDefaultAlignment, MemoryPool> pool_type;
+	typedef pool_allocator<Key, _Zone, 16, 0x7fffffff, MemoryPool> pool_type;
 	typedef ::std::set<Key, Pr, pool_type > type;
 };
 
@@ -47,6 +47,6 @@ template <
 >
 struct zone_pool_multiset
 {
-	typedef pool_allocator<Key, _Zone, 8, 0xffffffff, kDefaultAlignment, MemoryPool> pool_type;
+	typedef pool_allocator<Key, _Zone, 16, 0x7fffffff, MemoryPool> pool_type;
 	typedef ::std::multiset<Key, Pr, pool_type > type;
 };

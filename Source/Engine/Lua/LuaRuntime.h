@@ -51,7 +51,9 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(State, metrics, const Metrics*);
 private:
 
+#if !defined(LUA_JIT)
 	static void *LuaAlloc(void *ud, void *ptr, size_t, size_t size);
+#endif
 
 	RAD_DECLARE_GET(L, lua_State*) { return m_s; }
 	RAD_DECLARE_GET(metrics, const Metrics*) { return &m_m; }

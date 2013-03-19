@@ -196,6 +196,6 @@ inline  Pool *SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxChunks
 
 template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxChunks, int Alignment, typename Pool>
 inline Pool &SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxChunks, Alignment, Pool>::GetPool() {
-	static Pool s_pool(_Zone::Get(), "singleton_memory_pool", _NumChunksInBlock, _MaxChunks, Alignment, _MaxSize);
+	static Pool s_pool(_Zone::Get(), "singleton_memory_pool", ChunkSize, _NumChunksInBlock, Alignment, _MaxChunks);
 	return s_pool;
 }

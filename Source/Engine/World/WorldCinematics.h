@@ -7,6 +7,7 @@
 
 #include "../Types.h"
 #include "WorldDraw.h"
+#include "Occupant.h"
 #include "BSPFile.h"
 #include "../Renderer/SkMesh.h"
 #include <Runtime/Container/ZoneVector.h>
@@ -24,9 +25,9 @@ public:
 	typedef boost::shared_ptr<WorldCinematics> Ref;
 
 	enum CinematicFlags {
-		RAD_FLAG(CF_AnimateCamera),
-		RAD_FLAG(CF_CanPlayForever),
-		RAD_FLAG(CF_Loop)
+		RAD_FLAG(kCinematicFlag_AnimateCamera),
+		RAD_FLAG(kCinematicFlag_CanPlayForever),
+		RAD_FLAG(kCinematicFlag_Loop)
 	};
 
 	class RADENG_CLASS Notify {
@@ -66,11 +67,17 @@ private:
 
 	int Spawn(const bsp_file::BSPFile::Ref &bsp, const xtime::TimeSlice &time, int flags);
 
+	class SkActorOccupant;
+	typedef boost::shared_ptr<SkActorOccupant> SkActorOccupantRef;
+
 	class Actor {
 	public:
 		typedef boost::shared_ptr<Actor> Ref;
 		typedef zone_vector<Ref, ZWorldT>::type Vec;
 
+		SkActorOccupantRef occupant;
+		Vec3 pos[3];
+		BBox bounds[2];
 		r::SkMesh::Ref m;
 		int flags;
 		int frame;
@@ -82,27 +89,68 @@ private:
 	public:
 		typedef boost::shared_ptr<SkActorBatch> Ref;
 
-		SkActorBatch(const Actor::Ref &actor, int idx, int matId);
+		SkActorBatch(const Actor &actor, int idx, int matId);
 
 		virtual void Bind(r::Shader *shader);
 		virtual void CompileArrayStates(r::Shader &shader);
 		virtual void FlushArrayStates(r::Shader *shader);
 		virtual void Draw();
 
-		virtual RAD_DECLARE_GET(visible, bool) { return m_actor->visible; }
-		virtual RAD_DECLARE_GET(rgba, const Vec4&) { return s_rgba; }
-		virtual RAD_DECLARE_GET(scale, const Vec3&) { return s_scale; }
-		virtual RAD_DECLARE_GET(xform, bool) { return true; }
-		virtual RAD_DECLARE_GET(bounds, const BBox&) { return s_bounds; }
+		virtual RAD_DECLARE_GET(visible, bool) { 
+			return true; 
+		}
+
+		virtual RAD_DECLARE_GET(rgba, const Vec4&) { 
+			return s_rgba; 
+		}
+
+		virtual RAD_DECLARE_GET(scale, const Vec3&) { 
+			return s_scale; 
+		}
+
+		virtual RAD_DECLARE_GET(xform, bool) { 
+			return true; 
+		}
+
+		virtual RAD_DECLARE_GET(bounds, const BBox&) { 
+			return m_actor->bounds[1]; 
+		}
 
 	private:
 
 		static Vec4 s_rgba;
 		static Vec3 s_scale;
-		static BBox s_bounds;
 
-		Actor::Ref m_actor;
+		const Actor *m_actor;
 		int m_idx;
+	};
+
+	class SkActorOccupant : public MBatchOccupant {
+	public:
+		SkActorOccupant(const Actor &actor, World &world) : MBatchOccupant(world), m_actor(&actor) {}
+
+		void AddMBatch(const MBatchDraw::Ref &batch) {
+			m_batches.push_back(batch);
+		}
+
+	protected:
+
+		RAD_DECLARE_GET(visible, bool) {
+			return m_actor->visible;
+		}
+
+		RAD_DECLARE_GET(bounds, const BBox&) {
+			return m_actor->bounds[1];
+		}
+
+		RAD_DECLARE_GET(batches, const MBatchDraw::RefVec*) {
+			return &m_batches;
+		}
+
+	private:
+
+		MBatchDraw::RefVec m_batches;
+		const Actor *m_actor;
 	};
 
 	typedef zone_set<int, ZWorldT>::type IntSet;

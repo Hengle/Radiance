@@ -156,6 +156,9 @@ struct BSPActor {
 	int flags;
 	int initial;
 	int ska;
+	float pos[3];
+	float mins[3];
+	float maxs[3];
 };
 
 struct BSPCameraTM {

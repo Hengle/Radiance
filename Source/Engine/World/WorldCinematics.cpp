@@ -51,6 +51,19 @@ int WorldCinematics::Spawn(
 		actor->visible = (actor->flags&kHideUntilRef) ? false : true;
 		actor->loop = false;
 		actor->frame = -1;
+		actor->pos[0] = Vec3(bspActor->pos[0], bspActor->pos[1], bspActor->pos[2]);
+		actor->pos[1] = actor->pos[0];
+		actor->bounds[0] = BBox(bspActor->mins[0], bspActor->mins[1], bspActor->mins[2],
+			bspActor->maxs[0], bspActor->maxs[1], bspActor->maxs[2]
+		);
+		actor->pos[2] = Vec3(
+			std::numeric_limits<float>::max(),
+			std::numeric_limits<float>::max(),
+			std::numeric_limits<float>::max()
+		);
+
+		actor->bounds[1] = actor->bounds[0];
+		actor->bounds[1].Translate(actor->pos[0]);
 
 		actor->m = r::SkMesh::New(
 			bsp->DSka(bspActor->ska),
@@ -58,7 +71,7 @@ int WorldCinematics::Spawn(
 			ska::kSkinType_CPU
 		);
 
-		m_actors.push_back(actor);
+		actor->occupant.reset(new SkActorOccupant(*actor, *m_world));
 
 		// create material batches
 		const ska::DSkm &dskm = bsp->DSkm(bspActor->ska);
@@ -70,10 +83,12 @@ int WorldCinematics::Spawn(
 			if (id < 0)
 				continue;
 
-			MBatchDraw::Ref batch(new SkActorBatch(actor, i, id));
+			MBatchDraw::Ref batch(new SkActorBatch(*actor, i, id));
 			m_world->draw->AddMaterial(id);
+			actor->occupant->AddMBatch(batch);
 		}
 
+		m_actors.push_back(actor);
 		++m_spawnOfs;
 	}
 
@@ -141,6 +156,17 @@ void WorldCinematics::Tick(int frame, float dt) {
 					c.actors.erase(it2);
 					it2 = next;
 				} else {
+
+					const ska::BoneTM *motion = actor->m->ska->deltaMotion;
+					actor->pos[1] = actor->pos[0] + motion->t;
+					actor->bounds[1] = actor->bounds[0];
+					actor->bounds[1].Translate(actor->pos[1]);
+
+					if (actor->pos[2] != actor->pos[1]) {
+						actor->occupant->Link();
+						actor->pos[2] = actor->pos[1];
+					}
+
 					if (!actor->loop)
 						++numActive;
 
@@ -157,7 +183,7 @@ void WorldCinematics::Tick(int frame, float dt) {
 				if (c.trigger->camera > -1)
 					track = m_bspFile->CameraTracks() + c.trigger->camera;
 
-				if (track && track != c.track && (c.flags&CF_AnimateCamera)) {
+				if (track && track != c.track && (c.flags&kCinematicFlag_AnimateCamera)) {
 					if (c.track)
 						EmitCameraTags(c);
 					c.track = track;
@@ -266,7 +292,7 @@ void WorldCinematics::Tick(int frame, float dt) {
 
 				// If we are a looping cinematic, then all we want to do is reset our
 				// time and start over.
-				if (c.flags&CF_Loop) {
+				if (c.flags&kCinematicFlag_Loop) {
 #if !defined(RAD_TARGET_GOLDEN)
 					COut(C_Debug) << "Cinematic(" << c.name << ") looping." << std::endl;
 #endif
@@ -286,7 +312,7 @@ void WorldCinematics::Tick(int frame, float dt) {
 					// NOTE: it may now be invalid since OnComplete() may have stopped us.
 					it = m_cinematics.begin();
 					continue; // jump to start.
-				} else if (!(c.flags&CF_CanPlayForever) && !numActive) {
+				} else if (!(c.flags&kCinematicFlag_CanPlayForever) && !numActive) {
 #if !defined(RAD_TARGET_GOLDEN)
 					COut(C_Debug) << "Cinematic(" << c.name << ") finished." << std::endl;
 #endif
@@ -519,7 +545,7 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time) {
 		if (c->trigger->camera > -1)
 			track = m_bspFile->CameraTracks() + c->trigger->camera;
 
-		if (track && (c->flags&CF_AnimateCamera)) {
+		if (track && (c->flags&kCinematicFlag_AnimateCamera)) {
 			if (triggerDelta <= (float)(track->numTMs-1)) {
 				c->track = track;
 				c->camera = true;
@@ -738,10 +764,9 @@ void WorldCinematics::SkaNotify::OnTag(const ska::AnimTagEventData &data) {
 
 Vec4 WorldCinematics::SkActorBatch::s_rgba(1, 1, 1, 1);
 Vec3 WorldCinematics::SkActorBatch::s_scale(1, 1, 1);
-BBox WorldCinematics::SkActorBatch::s_bounds(Vec3::Zero, Vec3::Zero);
-
-WorldCinematics::SkActorBatch::SkActorBatch(const Actor::Ref &actor, int idx, int matId) :
-MBatchDraw(matId), m_idx(idx), m_actor(actor) {
+\
+WorldCinematics::SkActorBatch::SkActorBatch(const Actor &actor, int idx, int matId) :
+MBatchDraw(matId), m_idx(idx), m_actor(&actor) {
 }
 
 void WorldCinematics::SkActorBatch::Bind(r::Shader *shader) {

@@ -16,6 +16,7 @@
 namespace world {
 
 class Entity;
+class MBatchOccupant;
 
 enum UnloadDisposition {
 	kUD_None,
@@ -40,8 +41,9 @@ enum {
 
 typedef zone_vector<Plane, ZWorldT>::type PlaneVec;
 typedef zone_vector<int, ZWorldT>::type IntVec;
-typedef zone_set<Entity*, ZWorldT>::type EntityPtrSet;
-typedef zone_set<int, ZWorldT>::type IntSet;
+typedef zone_pool_set<Entity*, ZWorldT>::type EntityPtrSet;
+typedef zone_pool_set<MBatchOccupant*, ZWorldT>::type MBatchOccupantPtrSet;
+typedef zone_pool_set<int, ZWorldT>::type IntSet;
 typedef std::bitset<kMaxEnts> EntityBits;
 typedef std::bitset<kMaxAreas> AreaBits;
 typedef math::Winding<Vec3, Plane, zone_allocator<Vec3, ZWorldT> > Winding;
@@ -81,7 +83,8 @@ struct dBSPLeaf {
 	int firstClipModel;
 	int numClipModels;
 
-	EntityPtrSet occupants;
+	EntityPtrSet entities;
+	MBatchOccupantPtrSet occupants;
 };
 
 struct dBSPArea {
@@ -94,7 +97,8 @@ struct dBSPArea {
 	int firstModel;
 	int numModels;
 
-	EntityPtrSet occupants;
+	EntityPtrSet entities;
+	MBatchOccupantPtrSet occupants;
 };
 
 struct dAreaportal {

@@ -8,13 +8,14 @@
 #include RADPCH
 #include "../App.h"
 #include "../Engine.h"
-#include "World.h"
 #include "../Game/Game.h"
 #include "../Game/GameCVars.h"
-#include "ScreenOverlay.h"
 #include "../Renderer/Shader.h"
 #include "../Packages/Packages.h"
 #include "../UI/UIWidget.h"
+#include "World.h"
+#include "Occupant.h"
+#include "ScreenOverlay.h"
 #include <Runtime/Container/ZoneList.h>
 
 using namespace r;
@@ -335,9 +336,6 @@ void WorldDraw::SetupFrustumPlanes(ViewDef &view) {
 	const Vec3 &fwd = view.camera.fwd;
 	const Vec3 &left = view.camera.left;
 	const Vec3 &up = view.camera.up;
-	/*Vec3 fwd = Vec3(1,0,0);
-	Vec3 left = Vec3(0,1,0);
-	Vec3 up   = Vec3(0,0,1);*/
 
 	float s,c;
 	Vec3 normals[ViewDef::kNumFrustumPlanes];
@@ -464,7 +462,7 @@ void WorldDraw::VisMarkArea(
 
 	// add entities.
 	
-	for (EntityPtrSet::const_iterator it = area.occupants.begin(); it != area.occupants.end(); ++it) {
+	for (EntityPtrSet::const_iterator it = area.entities.begin(); it != area.entities.end(); ++it) {
 		Entity *e = *it;
 		if (e->m_markFrame != m_markFrame) {
 			e->m_markFrame = m_markFrame;
@@ -502,6 +500,45 @@ void WorldDraw::VisMarkArea(
 								batch->AddDraw(*draw);
 						}
 					}
+				}
+			}
+		}
+	}
+
+	// add batch occupants.
+	
+	for (MBatchOccupantPtrSet::const_iterator it = area.occupants.begin(); it != area.occupants.end(); ++it) {
+		MBatchOccupant *o = *it;
+		if (!o->visible)
+			continue;
+
+		if (o->m_markFrame != m_markFrame) {
+			o->m_markFrame = m_markFrame;
+			++m_counters.drawnEntities;
+		}
+
+		for (MBatchDraw::RefVec::const_iterator it = o->batches->begin(); it != o->batches->end(); ++it) {
+			const MBatchDraw::Ref &m = *it;
+			if (!m->visible)
+				continue;
+
+			if (m->m_markFrame != m_markFrame) {
+				m->m_markFrame = m_markFrame;
+				++m_counters.testedEntityModels;
+			}
+
+			if (m->m_visibleFrame != m_markFrame) {
+				const BBox &bounds = m->bounds;
+#if defined(WORLD_DEBUG_DRAW)
+				if (m_world->cvars->r_showworldbboxes.value)
+					m_dbgVars.debugWorldBBoxes.push_back(bounds);
+#endif
+				if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, bounds)) {
+					m->m_visibleFrame = m_markFrame;
+					++m_counters.drawnEntityModels;
+					details::MBatchRef batch = AddViewBatch(view, m->m_matId);
+					if (batch)
+						batch->AddDraw(*m);	
 				}
 			}
 		}
@@ -710,6 +747,16 @@ void WorldDraw::UnlinkEntity(Entity *entity) {
 }
 
 void WorldDraw::LinkEntity(Entity *entity, const BBox &bounds, int nodeNum) {
+}
+
+void WorldDraw::LinkOccupant(MBatchOccupant *occupant, const BBox &bounds) {
+	UnlinkOccupant(occupant);
+}
+
+void WorldDraw::UnlinkOccupant(MBatchOccupant *occupant) {
+}
+
+void WorldDraw::LinkOccupant(MBatchOccupant *occupant, const BBox &bounds, int nodeNum) {
 }
 
 } // world
