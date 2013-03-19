@@ -158,23 +158,24 @@ int Entity::Spawn(
 	return pkg::SR_Success;
 }
 
-void Entity::PostSpawn() {
+int Entity::PostSpawn() {
+	return pkg::SR_Success;
 }
 
 void Entity::LevelStart() {
 }
 
-bool Entity::HandleEvent(const Event::Ref &event) {
+bool Entity::HandleEvent(const Event &event) {
 	if (scripted) {
 		lua_State *L = world->lua->L;
 		PushEntityFrame(L);
 		lua_getfield(L, -1, "OnEvent");
 		if (lua_type(L, -1) == LUA_TFUNCTION) {
 			lua_pushvalue(L, -2);
-			lua_pushstring(L, event->cmd.get());
+			lua_pushstring(L, event.cmd.get());
 
-			if (event->args.get() && event->args.get()[0] != 0) {
-				lua_pushstring(L, event->args.get());
+			if (event.args.get() && event.args.get()[0] != 0) {
+				lua_pushstring(L, event.args.get());
 			} else {
 				lua_pushnil(L);
 			}
@@ -336,7 +337,9 @@ int Entity::PrivatePostSpawn(
 		++m_spawnState;
 
 	if (m_spawnState == S_NativePostSpawn) {
-		PostSpawn();
+		int r = PostSpawn();
+		if (r != pkg::SR_Success)
+			return r;
 		++m_spawnState;
 		m_ps.worldPos = m_ps.pos + m_ps.origin;
 		m_ps.worldAngles = WrapAngles(m_ps.angles.pos + m_ps.originAngles);
@@ -374,7 +377,7 @@ void Entity::PrivateLevelStart() {
 	}
 }
 
-bool Entity::PrivateHandleEvent(const Event::Ref &event) {
+bool Entity::ProcessEvent(const Event &event) {
 	return HandleEvent(event);
 }
 

@@ -188,8 +188,10 @@ void D_SkModel::Notify::OnTag(const ska::AnimTagEventData &data) {
 	Entity::Ref entity = m_entity.lock();
 	if (!entity)
 		return;
-	if (!entity->LoadLuaCallback(m_callbackId))
+	if (!entity->LoadLuaCallback(m_callbackId)) {
+		m_entity.reset();
 		return;
+	}
 
 	lua_State *L = entity->world->lua->L;
 
@@ -209,8 +211,10 @@ void D_SkModel::Notify::OnEndFrame(const ska::AnimStateEventData &data) {
 	Entity::Ref entity = m_entity.lock();
 	if (!entity)
 		return;
-	if (!entity->LoadLuaCallback(m_callbackId))
+	if (!entity->LoadLuaCallback(m_callbackId)) {
+		m_entity.reset();
 		return;
+	}
 
 	lua_State *L = entity->world->lua->L;
 
@@ -232,8 +236,10 @@ void D_SkModel::Notify::OnFinish(const ska::AnimStateEventData &data, bool maske
 	Entity::Ref entity = m_entity.lock();
 	if (!entity)
 		return;
-	if (!entity->LoadLuaCallback(m_callbackId))
+	if (!entity->LoadLuaCallback(m_callbackId)) {
+		m_entity.reset();
 		return;
+	}
 
 	lua_State *L = entity->world->lua->L;
 
@@ -264,9 +270,10 @@ int D_SkModel::Notify::lua_Release(lua_State *L) {
 	// explicitly free our callback slot, otherwise we rapidly get overflow
 	// before the GC comes around and deletes us.
 	Entity::Ref entity = self->m_entity.lock();
-	if (entity)
+	if (entity) {
 		entity->ReleaseLuaCallback(L, self->m_callbackId);
-	self->m_entity.reset();
+		self->m_entity.reset();
+	}
 	return 0;
 }
 

@@ -8,6 +8,7 @@
 #include RADPCH
 #include "E_TouchTrigger.h"
 #include "../World.h"
+#include "../../COut.h"
 
 namespace world {
 
@@ -16,7 +17,9 @@ E_CONSTRUCT_BASE,
 m_firstBrush(0), 
 m_numBrushes(0),
 m_enabled(false),
-m_classbits(kEntityClassBits_Any) {
+m_classbits(kEntityClassBits_Any),
+m_attachmentBone(-1),
+m_attachmentXform(Vec3::Zero) {
 }
 
 E_TouchTrigger::~E_TouchTrigger() {
@@ -48,8 +51,66 @@ int E_TouchTrigger::Spawn(
 		COut(C_Error) << "ERROR: TouchTrigger: I have no brushes!" << std::endl;
 		return pkg::SR_ParseError;
 	}
+	
+	// need to address the fact that keys are not available in PostSpawn
+	sz = keys.StringForKey("attachment");
+	if (sz)
+		m_sAttachment = sz;
+
+	sz = keys.StringForKey("attachment_bone");
+	if (sz)
+		m_sAttachmentBone = sz;
 
 	SetNextTick(1.f/4.f); // 4hz
+
+	return pkg::SR_Success;
+}
+
+int E_TouchTrigger::PostSpawn() {
+	SetupAttachment();
+	return pkg::SR_Success;
+}
+
+int E_TouchTrigger::SetupAttachment() {
+
+	if (!(m_sAttachment.empty || m_sAttachmentBone.empty)) {
+		Entity::Vec vec = world->FindEntityTargets(m_sAttachment.c_str);
+		if (vec.empty()) {
+			COut(C_Error) << "E_TouchTrigger.SetupAttachment: no entity named '" << m_sAttachment << "'" << std::endl;
+			return pkg::SR_ParseError;
+		}
+		if (vec.size() != 1) {
+			COut(C_Error) << "E_TouchTrigger.SetupAttachment: more than 1 entity named '" << m_sAttachment << "'" << std::endl;
+			return pkg::SR_ParseError;
+		}
+
+		Entity::Ref r = vec[0];
+		SkMeshDrawModel::Ref m;
+
+		// find a skel model
+		for (DrawModel::Map::const_iterator it = r->models->begin(); it != r->models->end(); ++it) {
+			m = boost::dynamic_pointer_cast<SkMeshDrawModel>(it->second);
+			if (m)
+				break;
+		}
+
+		if (!m) {
+			COut(C_Error) << "E_TouchTrigger.SetupAttachment: there are no skeletal models attached to '" << m_sAttachment << "'" << std::endl;
+			return pkg::SR_ParseError;
+		}
+
+		RAD_ASSERT(m->mesh.get());
+		m_attachmentBone = m->mesh->ska->FindBone(m_sAttachmentBone.c_str);
+
+		if (m_attachmentBone < 0) {
+			COut(C_Error) << "E_TouchTrigger.SetupAttachment: there is no bone named '" << m_sAttachmentBone << "' in '" << m_sAttachment << "'" << std::endl;
+			return pkg::SR_ParseError;
+		}
+
+		m_attachment = r;
+		m_attachmentModel = m;
+		SetNextTick(0.f); // check every frame
+	}
 
 	return pkg::SR_Success;
 }
@@ -61,6 +122,8 @@ void E_TouchTrigger::Tick(
 ) {
 	if (!m_enabled)
 		return;
+
+	UpdateAttachment(frame, dt, time);
 
 	Entity::Ref instigator = m_instigator.lock();
 	if (instigator) {
@@ -84,7 +147,7 @@ void E_TouchTrigger::CheckEnter() {
 	Entity::Ref instigator;
 
 	for (int i = 0; i < m_numBrushes; ++i) {
-		instigator = world->FirstEntityTouchingBrush(m_classbits, m_firstBrush + i);
+		instigator = world->FirstEntityTouchingBrush(m_classbits, m_firstBrush + i, m_attachmentXform);
 		if (instigator)
 			break;
 	}
@@ -100,7 +163,7 @@ void E_TouchTrigger::CheckExit(const Entity &instigator) {
 	bool touching = false;
 
 	for (int i = 0; i < m_numBrushes; ++i) {
-		touching = world->EntityTouchesBrush(instigator, m_firstBrush + i);
+		touching = world->EntityTouchesBrush(instigator, m_firstBrush + i, m_attachmentXform);
 		if (touching)
 			break;
 	}
@@ -120,15 +183,43 @@ void E_TouchTrigger::DoEnter() {
 	m_occupied = true;
 	if (!m_enter.empty)
 		world->PostEvent(m_enter.c_str);
+	NotifyAttachmentTouch();
 }
 
-bool E_TouchTrigger::HandleEvent(const Event::Ref &event) {
+void E_TouchTrigger::UpdateAttachment(
+	int frame,
+	float dt, 
+	const xtime::TimeSlice &time
+) {
+	Entity::Ref attachmentEntity = m_attachment.lock();
+	if (!attachmentEntity)
+		return;
+	TickOther(*attachmentEntity, frame, dt, time); // make sure we get a current bone position
+
+	SkMeshDrawModel::Ref m = m_attachmentModel.lock();
+	if (!m)
+		return;
+
+	Vec3 pos = m->WorldBonePos(m_attachmentBone);
+	m_attachmentXform = pos - this->ps->worldPos;
+}
+
+void E_TouchTrigger::NotifyAttachmentTouch() {
+	Entity::Ref attachmentEntity = m_attachment.lock();
+	if (!attachmentEntity)
+		return;
+
+	Event event(attachmentEntity->id, "touch_trigger_touched");
+	attachmentEntity->ProcessEvent(event);
+}
+
+bool E_TouchTrigger::HandleEvent(const Event &event) {
 	if (Entity::HandleEvent(event))
 		return true;
 
 	const String kEnable(CStr("enable"));
 	const String kDisable(CStr("disable"));
-	const String kCmd(CStr(event->cmd));
+	const String kCmd(CStr(event.cmd));
 
 	if (kCmd == kEnable) {
 		if (!m_enabled) {
@@ -156,7 +247,7 @@ Entity::Vec E_TouchTrigger::GetTouching() const {
 	EntityPtrSet set;
 
 	for (int i = 0; i < m_numBrushes; ++i) {
-		Entity::Vec touching = world->EntitiesTouchingBrush(m_classbits, m_firstBrush + i);
+		Entity::Vec touching = world->EntitiesTouchingBrush(m_classbits, m_firstBrush + i, m_attachmentXform);
 		ents.reserve(touching.size());
 		for (Entity::Vec::const_iterator it = touching.begin(); it != touching.end(); ++it) {
 			// filter duplicates

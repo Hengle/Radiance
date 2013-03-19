@@ -139,9 +139,9 @@ public:
 	//! returns true if trace.start->trace.end was blocked, false otherwise.
 	bool LineTrace(Trace &trace);
 
-	Entity::Vec EntitiesTouchingBrush(int classbits, int brushNum) const;
-	Entity::Ref FirstEntityTouchingBrush(int classbits, int brushNum) const;
-	bool EntityTouchesBrush(const Entity &entity, int brushNum) const;
+	Entity::Vec EntitiesTouchingBrush(int classbits, int brushNum, const Vec3 &xform = Vec3::Zero) const;
+	Entity::Ref FirstEntityTouchingBrush(int classbits, int brushNum, const Vec3 &xform = Vec3::Zero) const;
+	bool EntityTouchesBrush(const Entity &entity, int brushNum, const Vec3 &xform = Vec3::Zero) const;
 	
 	RAD_DECLARE_PROPERTY(World, viewController, Entity::Ref, Entity::Ref);
 	RAD_DECLARE_PROPERTY(World, playerPawn, Entity::Ref, Entity::Ref);

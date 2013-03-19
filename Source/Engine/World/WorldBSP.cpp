@@ -783,13 +783,13 @@ bool World::LineTrace(Trace &trace, const Vec3 &a, const Vec3 &b, int nodeNum) {
 	return false;
 }
 
-Entity::Ref World::FirstEntityTouchingBrush(int classbits, int brushNum) const {
+Entity::Ref World::FirstEntityTouchingBrush(int classbits, int brushNum, const Vec3 &xform) const {
 	RAD_ASSERT(brushNum >= 0 && brushNum < (int)m_bsp->numBrushes);
 	const bsp_file::BSPBrush *brush = m_bsp->Brushes() + brushNum;
 
 	const BBox kBrushBBox(
-		Vec3(brush->mins[0], brush->mins[1], brush->mins[2]),
-		Vec3(brush->maxs[0], brush->maxs[1], brush->maxs[2])
+		Vec3(brush->mins[0], brush->mins[1], brush->mins[2]) + xform,
+		Vec3(brush->maxs[0], brush->maxs[1], brush->maxs[2]) + xform
 	);
 
 	Entity::Ref touching = FirstBBoxTouching(kBrushBBox, classbits);
@@ -799,6 +799,7 @@ Entity::Ref World::FirstEntityTouchingBrush(int classbits, int brushNum) const {
 			// non-axial brush hull, do planes test
 			BBox bbox(touching->ps->bbox);
 			bbox.Translate(touching->ps->worldPos);
+			bbox.Translate(-xform);
 
 			if (!IsBBoxInsideBrushHull(bbox, brush))
 				touching.reset();
@@ -808,13 +809,13 @@ Entity::Ref World::FirstEntityTouchingBrush(int classbits, int brushNum) const {
 	return touching;
 }
 
-Entity::Vec World::EntitiesTouchingBrush(int classbits, int brushNum) const {
+Entity::Vec World::EntitiesTouchingBrush(int classbits, int brushNum, const Vec3 &xform) const {
 	RAD_ASSERT(brushNum >= 0 && brushNum < (int)m_bsp->numBrushes);
 	const bsp_file::BSPBrush *brush = m_bsp->Brushes() + brushNum;
 
 	const BBox kBrushBBox(
-		Vec3(brush->mins[0], brush->mins[1], brush->mins[2]),
-		Vec3(brush->maxs[0], brush->maxs[1], brush->maxs[2])
+		Vec3(brush->mins[0], brush->mins[1], brush->mins[2]) + xform,
+		Vec3(brush->maxs[0], brush->maxs[1], brush->maxs[2]) + xform
 	);
 
 	Entity::Vec bboxTouching = BBoxTouching(kBrushBBox, classbits);
@@ -832,6 +833,7 @@ Entity::Vec World::EntitiesTouchingBrush(int classbits, int brushNum) const {
 
 		BBox bbox(entity->ps->bbox);
 		bbox.Translate(entity->ps->worldPos);
+		bbox.Translate(-xform);
 
 		if (IsBBoxInsideBrushHull(bbox, brush))
 			touching.push_back(entity);
@@ -840,7 +842,7 @@ Entity::Vec World::EntitiesTouchingBrush(int classbits, int brushNum) const {
 	return touching;
 }
 
-bool World::EntityTouchesBrush(const Entity &entity, int brushNum) const {
+bool World::EntityTouchesBrush(const Entity &entity, int brushNum, const Vec3 &xform) const {
 	RAD_ASSERT(brushNum >= 0 && brushNum < (int)m_bsp->numBrushes);
 	const bsp_file::BSPBrush *brush = m_bsp->Brushes() + brushNum;
 
@@ -851,6 +853,7 @@ bool World::EntityTouchesBrush(const Entity &entity, int brushNum) const {
 
 	BBox bbox(entity.ps->bbox);
 	bbox.Translate(entity.ps->worldPos);
+	bbox.Translate(-xform);
 
 	if (!kBrushBBox.Instersects(bbox))
 		return false;

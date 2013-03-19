@@ -200,7 +200,10 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Entity, ps, PState*);
 	RAD_DECLARE_PROPERTY(Entity, gc, bool, bool);
 	
-	virtual bool HandleEvent(const Event::Ref &event);
+	virtual bool HandleEvent(const Event &event);
+
+	// Will call HandleEvent and pass it to script code
+	bool ProcessEvent(const Event &event);
 
 	void QueueTask(const Tickable::Ref &task);
 	void QueueScriptTask(const Tickable::Ref &task);
@@ -266,7 +269,7 @@ protected:
 		int flags
 	);
 
-	virtual void PostSpawn();
+	virtual int PostSpawn();
 	virtual void LevelStart();
 
 	virtual void PushCallTable(lua_State *L);
@@ -348,7 +351,6 @@ private:
 
 	int PrivatePostSpawn(const xtime::TimeSlice &time, int flags);
 	void PrivateLevelStart();
-	bool PrivateHandleEvent(const Event::Ref &event);
 
 	int FindLuaCallbackSlot();
 

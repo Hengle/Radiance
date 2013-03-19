@@ -406,7 +406,7 @@ void World::DispatchEvent(const Event::Ref &event) {
 	}
 
 	for (Entity::Vec::const_iterator it = ents.begin(); it != ents.end(); ++it) {
-		(*it)->PrivateHandleEvent(event);
+		(*it)->ProcessEvent(*event);
 	}
 }
 

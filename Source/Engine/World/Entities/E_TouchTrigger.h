@@ -31,13 +31,14 @@ public:
 		const xtime::TimeSlice &time
 	);
 
-	virtual bool HandleEvent(const Event::Ref &event);
+	virtual bool HandleEvent(const Event &event);
 
 	Entity::Vec GetTouching() const;
 
 protected:
 
 	virtual void PushCallTable(lua_State *L);
+	virtual int PostSpawn();
 
 private:
 
@@ -49,10 +50,25 @@ private:
 	void CheckExit(const Entity &instigator);
 	void DoExit();
 	void DoEnter();
+	void UpdateAttachment(
+		int frame,
+		float dt, 
+		const xtime::TimeSlice &time
+	);
+	void NotifyAttachmentTouch();
+
+	int SetupAttachment();
 
 	String m_enter;
 	String m_exit;
+	String m_sAttachment;
+	String m_sAttachmentBone;
+
 	Entity::WRef m_instigator;
+	Entity::WRef m_attachment;
+	SkMeshDrawModel::WRef m_attachmentModel;
+	Vec3 m_attachmentXform;
+	int m_attachmentBone;
 	int m_firstBrush;
 	int m_numBrushes;
 	int m_classbits;
