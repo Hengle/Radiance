@@ -221,6 +221,8 @@ bool E_TouchTrigger::HandleEvent(const Event &event) {
 	const String kDisable(CStr("disable"));
 	const String kCmd(CStr(event.cmd));
 
+	COut(C_Debug) << "E_TouchTrigger.HandleEvent(" << kCmd << ")" << std::endl;
+
 	if (kCmd == kEnable) {
 		if (!m_enabled) {
 			if (!m_enter.empty || !m_exit.empty)
