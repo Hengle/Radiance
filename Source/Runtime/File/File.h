@@ -362,11 +362,14 @@ protected:
 		::Zone &zone
 	);
 	
+	RAD_DECLARE_READONLY_PROPERTY(MMapping, mappedSize, AddrSize);
+	
 private:
 
 	RAD_DECLARE_GET(data, const void*);
 	RAD_DECLARE_GET(size, AddrSize);
 	RAD_DECLARE_GET(offset, AddrSize);
+	RAD_DECLARE_GET(mappedSize, AddrSize);
 
 	const void *m_data;
 	AddrSize m_size;

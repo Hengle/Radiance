@@ -536,7 +536,7 @@ inline int vscprintf<wchar_t>(const wchar_t *format, va_list argptr) {
 	va_copy(_valist, argptr);
 	
 	// Posix systems lack a vsnwprintf... sigh
-	enum { MaxLen = Kilo*4 };
+	enum { MaxLen = kKilo*4 };
 	
 	int r = ::vswprintf((wchar_t*)stack_alloc(MaxLen), MaxLen, format, _valist) + 1;
 	RAD_ASSERT(r != -1); // make sure this buffer is large enough.

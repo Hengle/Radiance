@@ -88,8 +88,8 @@ Event System (similiar to C#):
 
 RAD_ZONE_DEC(RADRT_API, ZEvents);
 
-struct ManualReleaseEventTag_t {};
-struct AutoReleaseEventTag_t {};
+struct ManualReleaseEventTag_t { ManualReleaseEventTag_t() {} };
+struct AutoReleaseEventTag_t { AutoReleaseEventTag_t() {} };
 static const ManualReleaseEventTag_t ManualReleaseEventTag;
 static const AutoReleaseEventTag_t AutoReleaseEventTag;
 

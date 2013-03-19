@@ -276,7 +276,7 @@ MMapping::Ref PosixMMFile::MMap(AddrSize ofs, AddrSize size, ::Zone &zone) {
 	
 	const void *pbase = mmap(
 		0,
-		(size_t)backingSize,
+		(size_t)mappedSize,
 		PROT_READ,
 		MAP_PRIVATE,
 		m_fd,
@@ -314,14 +314,14 @@ PosixMMapping::PosixMMapping(
 	const void *data,
 	AddrSize size,
 	AddrSize offset,
-	AddrSize mappedSize
+	AddrSize mappedSize,
 	::Zone &zone
 ) : MMapping(data, size, offset, mappedSize, zone), m_file(file), m_base(base) {
 }
 
 PosixMMapping::~PosixMMapping() {
 	if (m_base)
-		munmap((void*)m_base, m_mappedSize);
+		munmap((void*)m_base, this->mappedSize);
 }
 
 void PosixMMapping::Prefetch(AddrSize offset, AddrSize size) {

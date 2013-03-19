@@ -33,7 +33,7 @@ public:
 	};
 
 	template <typename U>
-	struct rebind { typedef stack_allocator<U, TNumElms, typename fallback_allocator::rebind<U>::other > other; };
+	struct rebind { typedef stack_allocator<U, TNumElms, typename fallback_allocator::template rebind<U>::other > other; };
 
 	stack_allocator(const stack_allocator &other) : m_storage(other.m_storage) {
 	}
@@ -43,7 +43,7 @@ public:
 	
 	// The following is not explicit, mimicking std::allocator [20.4.1]
 	template <typename U>
-	stack_allocator(const stack_allocator<U, TNumElms, typename fallback_allocator::rebind<U>::other> &) : m_storage(0) {
+	stack_allocator(const stack_allocator<U, TNumElms, typename fallback_allocator::template rebind<U>::other> &) : m_storage(0) {
 	}
 
 	static pointer address(reference r) { return &r; }

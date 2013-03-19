@@ -55,6 +55,10 @@ inline AddrSize MMapping::RAD_IMPLEMENT_GET(offset) {
 	return m_offset;
 }
 
+inline AddrSize MMapping::RAD_IMPLEMENT_GET(mappedSize) {
+	return m_mappedSize;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 inline FileSearch::FileSearch() {

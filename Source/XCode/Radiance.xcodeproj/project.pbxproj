@@ -1102,6 +1102,92 @@
 		3397728B16E9BB2B0046535B /* StackVector.h in Headers */ = {isa = PBXBuildFile; fileRef = 3397728316E9BB2B0046535B /* StackVector.h */; };
 		3397728C16E9BB2B0046535B /* StackVector.h in Headers */ = {isa = PBXBuildFile; fileRef = 3397728316E9BB2B0046535B /* StackVector.h */; };
 		3397728D16E9BB2B0046535B /* StackVector.h in Headers */ = {isa = PBXBuildFile; fileRef = 3397728316E9BB2B0046535B /* StackVector.h */; };
+		3397729716F8E6900046535B /* EditorStringTableEditorItemModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3397729316F8E68B0046535B /* EditorStringTableEditorItemModel.cpp */; };
+		3397729816F8E6900046535B /* EditorStringTableEditorItemModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 3397729416F8E68C0046535B /* EditorStringTableEditorItemModel.h */; };
+		3397729916F8E6900046535B /* EditorStringTableEditorWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3397729516F8E68D0046535B /* EditorStringTableEditorWidget.cpp */; };
+		3397729A16F8E6900046535B /* EditorStringTableEditorWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 3397729616F8E68E0046535B /* EditorStringTableEditorWidget.h */; };
+		339772A316F8F05D0046535B /* EditorConversationTreeEditorItemEditDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3397729B16F8F0590046535B /* EditorConversationTreeEditorItemEditDialog.cpp */; };
+		339772A416F8F05D0046535B /* EditorConversationTreeEditorItemEditDialog.h in Headers */ = {isa = PBXBuildFile; fileRef = 3397729C16F8F0590046535B /* EditorConversationTreeEditorItemEditDialog.h */; };
+		339772A516F8F05D0046535B /* EditorConversationTreeEditorView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3397729D16F8F05A0046535B /* EditorConversationTreeEditorView.cpp */; };
+		339772A616F8F05D0046535B /* EditorConversationTreeEditorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 3397729E16F8F05A0046535B /* EditorConversationTreeEditorView.h */; };
+		339772A716F8F05D0046535B /* EditorConversationTreeEditorWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3397729F16F8F05B0046535B /* EditorConversationTreeEditorWidget.cpp */; };
+		339772A816F8F05D0046535B /* EditorConversationTreeEditorWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772A016F8F05B0046535B /* EditorConversationTreeEditorWidget.h */; };
+		339772A916F8F05D0046535B /* EditorConversationTreeEditorWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772A116F8F05C0046535B /* EditorConversationTreeEditorWindow.cpp */; };
+		339772AA16F8F05D0046535B /* EditorConversationTreeEditorWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772A216F8F05C0046535B /* EditorConversationTreeEditorWindow.h */; };
+		339772AF16F8F1190046535B /* ConversationTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772AB16F8F1190046535B /* ConversationTree.cpp */; };
+		339772B016F8F1190046535B /* ConversationTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772AB16F8F1190046535B /* ConversationTree.cpp */; };
+		339772B116F8F1190046535B /* ConversationTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772AB16F8F1190046535B /* ConversationTree.cpp */; };
+		339772B216F8F1190046535B /* ConversationTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772AB16F8F1190046535B /* ConversationTree.cpp */; };
+		339772B316F8F1190046535B /* ConversationTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772AB16F8F1190046535B /* ConversationTree.cpp */; };
+		339772B416F8F1190046535B /* ConversationTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772AC16F8F1190046535B /* ConversationTree.h */; };
+		339772B516F8F1190046535B /* ConversationTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772AC16F8F1190046535B /* ConversationTree.h */; };
+		339772B616F8F1190046535B /* ConversationTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772AC16F8F1190046535B /* ConversationTree.h */; };
+		339772B716F8F1190046535B /* ConversationTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772AC16F8F1190046535B /* ConversationTree.h */; };
+		339772B816F8F1190046535B /* ConversationTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772AC16F8F1190046535B /* ConversationTree.h */; };
+		339772B916F8F1190046535B /* ConversationTreeParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772AD16F8F1190046535B /* ConversationTreeParser.cpp */; };
+		339772BA16F8F1190046535B /* ConversationTreeParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772AD16F8F1190046535B /* ConversationTreeParser.cpp */; };
+		339772BB16F8F1190046535B /* ConversationTreeParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772AD16F8F1190046535B /* ConversationTreeParser.cpp */; };
+		339772BC16F8F1190046535B /* ConversationTreeParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772AD16F8F1190046535B /* ConversationTreeParser.cpp */; };
+		339772BD16F8F1190046535B /* ConversationTreeParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772AD16F8F1190046535B /* ConversationTreeParser.cpp */; };
+		339772BE16F8F1190046535B /* ConversationTreeParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772AE16F8F1190046535B /* ConversationTreeParser.h */; };
+		339772BF16F8F1190046535B /* ConversationTreeParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772AE16F8F1190046535B /* ConversationTreeParser.h */; };
+		339772C016F8F1190046535B /* ConversationTreeParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772AE16F8F1190046535B /* ConversationTreeParser.h */; };
+		339772C116F8F1190046535B /* ConversationTreeParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772AE16F8F1190046535B /* ConversationTreeParser.h */; };
+		339772C216F8F1190046535B /* ConversationTreeParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772AE16F8F1190046535B /* ConversationTreeParser.h */; };
+		339772C516F8F1240046535B /* ConversationTreeCooker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772C316F8F1240046535B /* ConversationTreeCooker.cpp */; };
+		339772C616F8F1240046535B /* ConversationTreeCooker.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772C416F8F1240046535B /* ConversationTreeCooker.h */; };
+		339772C916F8F19C0046535B /* EditorConversationTreeThumb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772C716F8F19B0046535B /* EditorConversationTreeThumb.cpp */; };
+		339772CA16F8F19C0046535B /* EditorConversationTreeThumb.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772C816F8F19B0046535B /* EditorConversationTreeThumb.h */; };
+		339772CD16F8F1B30046535B /* T_ConversationTreePrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772CB16F8F1B30046535B /* T_ConversationTreePrecache.cpp */; };
+		339772CE16F8F1B30046535B /* T_ConversationTreePrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772CB16F8F1B30046535B /* T_ConversationTreePrecache.cpp */; };
+		339772CF16F8F1B30046535B /* T_ConversationTreePrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772CB16F8F1B30046535B /* T_ConversationTreePrecache.cpp */; };
+		339772D016F8F1B30046535B /* T_ConversationTreePrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772CB16F8F1B30046535B /* T_ConversationTreePrecache.cpp */; };
+		339772D116F8F1B30046535B /* T_ConversationTreePrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772CB16F8F1B30046535B /* T_ConversationTreePrecache.cpp */; };
+		339772D216F8F1B30046535B /* T_ConversationTreePrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772CC16F8F1B30046535B /* T_ConversationTreePrecache.h */; };
+		339772D316F8F1B30046535B /* T_ConversationTreePrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772CC16F8F1B30046535B /* T_ConversationTreePrecache.h */; };
+		339772D416F8F1B30046535B /* T_ConversationTreePrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772CC16F8F1B30046535B /* T_ConversationTreePrecache.h */; };
+		339772D516F8F1B30046535B /* T_ConversationTreePrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772CC16F8F1B30046535B /* T_ConversationTreePrecache.h */; };
+		339772D616F8F1B30046535B /* T_ConversationTreePrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772CC16F8F1B30046535B /* T_ConversationTreePrecache.h */; };
+		339772D916F8F1BA0046535B /* T_StringTablePrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772D716F8F1BA0046535B /* T_StringTablePrecache.cpp */; };
+		339772DA16F8F1BA0046535B /* T_StringTablePrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772D716F8F1BA0046535B /* T_StringTablePrecache.cpp */; };
+		339772DB16F8F1BA0046535B /* T_StringTablePrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772D716F8F1BA0046535B /* T_StringTablePrecache.cpp */; };
+		339772DC16F8F1BA0046535B /* T_StringTablePrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772D716F8F1BA0046535B /* T_StringTablePrecache.cpp */; };
+		339772DD16F8F1BA0046535B /* T_StringTablePrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772D716F8F1BA0046535B /* T_StringTablePrecache.cpp */; };
+		339772DE16F8F1BA0046535B /* T_StringTablePrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772D816F8F1BA0046535B /* T_StringTablePrecache.h */; };
+		339772DF16F8F1BA0046535B /* T_StringTablePrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772D816F8F1BA0046535B /* T_StringTablePrecache.h */; };
+		339772E016F8F1BA0046535B /* T_StringTablePrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772D816F8F1BA0046535B /* T_StringTablePrecache.h */; };
+		339772E116F8F1BA0046535B /* T_StringTablePrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772D816F8F1BA0046535B /* T_StringTablePrecache.h */; };
+		339772E216F8F1BA0046535B /* T_StringTablePrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772D816F8F1BA0046535B /* T_StringTablePrecache.h */; };
+		339772E516F8F2080046535B /* Occupant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772E316F8F2070046535B /* Occupant.cpp */; };
+		339772E616F8F2080046535B /* Occupant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772E316F8F2070046535B /* Occupant.cpp */; };
+		339772E716F8F2080046535B /* Occupant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772E316F8F2070046535B /* Occupant.cpp */; };
+		339772E816F8F2080046535B /* Occupant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772E316F8F2070046535B /* Occupant.cpp */; };
+		339772E916F8F2080046535B /* Occupant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772E316F8F2070046535B /* Occupant.cpp */; };
+		339772EA16F8F2080046535B /* Occupant.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772E416F8F2070046535B /* Occupant.h */; };
+		339772EB16F8F2080046535B /* Occupant.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772E416F8F2070046535B /* Occupant.h */; };
+		339772EC16F8F2080046535B /* Occupant.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772E416F8F2070046535B /* Occupant.h */; };
+		339772ED16F8F2080046535B /* Occupant.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772E416F8F2070046535B /* Occupant.h */; };
+		339772EE16F8F2080046535B /* Occupant.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772E416F8F2070046535B /* Occupant.h */; };
+		339772F116F8F2D90046535B /* D_ConversationTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772EF16F8F2D90046535B /* D_ConversationTree.cpp */; };
+		339772F216F8F2D90046535B /* D_ConversationTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772EF16F8F2D90046535B /* D_ConversationTree.cpp */; };
+		339772F316F8F2D90046535B /* D_ConversationTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772EF16F8F2D90046535B /* D_ConversationTree.cpp */; };
+		339772F416F8F2D90046535B /* D_ConversationTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772EF16F8F2D90046535B /* D_ConversationTree.cpp */; };
+		339772F516F8F2D90046535B /* D_ConversationTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772EF16F8F2D90046535B /* D_ConversationTree.cpp */; };
+		339772F616F8F2D90046535B /* D_ConversationTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772F016F8F2D90046535B /* D_ConversationTree.h */; };
+		339772F716F8F2D90046535B /* D_ConversationTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772F016F8F2D90046535B /* D_ConversationTree.h */; };
+		339772F816F8F2D90046535B /* D_ConversationTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772F016F8F2D90046535B /* D_ConversationTree.h */; };
+		339772F916F8F2D90046535B /* D_ConversationTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772F016F8F2D90046535B /* D_ConversationTree.h */; };
+		339772FA16F8F2D90046535B /* D_ConversationTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772F016F8F2D90046535B /* D_ConversationTree.h */; };
+		339772FD16F8F2DF0046535B /* D_StringTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772FB16F8F2DF0046535B /* D_StringTable.cpp */; };
+		339772FE16F8F2DF0046535B /* D_StringTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772FB16F8F2DF0046535B /* D_StringTable.cpp */; };
+		339772FF16F8F2DF0046535B /* D_StringTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772FB16F8F2DF0046535B /* D_StringTable.cpp */; };
+		3397730016F8F2DF0046535B /* D_StringTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772FB16F8F2DF0046535B /* D_StringTable.cpp */; };
+		3397730116F8F2DF0046535B /* D_StringTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 339772FB16F8F2DF0046535B /* D_StringTable.cpp */; };
+		3397730216F8F2DF0046535B /* D_StringTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772FC16F8F2DF0046535B /* D_StringTable.h */; };
+		3397730316F8F2DF0046535B /* D_StringTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772FC16F8F2DF0046535B /* D_StringTable.h */; };
+		3397730416F8F2DF0046535B /* D_StringTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772FC16F8F2DF0046535B /* D_StringTable.h */; };
+		3397730516F8F2DF0046535B /* D_StringTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772FC16F8F2DF0046535B /* D_StringTable.h */; };
+		3397730616F8F2DF0046535B /* D_StringTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 339772FC16F8F2DF0046535B /* D_StringTable.h */; };
 		339805941676D544002758B1 /* FloorsDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 339805931676D544002758B1 /* FloorsDef.h */; };
 		339805951676D544002758B1 /* FloorsDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 339805931676D544002758B1 /* FloorsDef.h */; };
 		339805961676D544002758B1 /* FloorsDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 339805931676D544002758B1 /* FloorsDef.h */; };
@@ -2168,10 +2254,6 @@
 		33E88A6315B9BA4B0089BA08 /* EditorSearchLineWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8887F15B9BA490089BA08 /* EditorSearchLineWidget.h */; };
 		33E88A6915B9BA4B0089BA08 /* EditorStringTableEditorWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8888215B9BA490089BA08 /* EditorStringTableEditorWindow.cpp */; };
 		33E88A6B15B9BA4B0089BA08 /* EditorStringTableEditorWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8888315B9BA490089BA08 /* EditorStringTableEditorWindow.h */; };
-		33E88A6D15B9BA4B0089BA08 /* EditorStringTableWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8888415B9BA490089BA08 /* EditorStringTableWidget.cpp */; };
-		33E88A6F15B9BA4B0089BA08 /* EditorStringTableWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8888515B9BA490089BA08 /* EditorStringTableWidget.h */; };
-		33E88A7115B9BA4B0089BA08 /* EditorStringTableWidgetItemModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8888615B9BA490089BA08 /* EditorStringTableWidgetItemModel.cpp */; };
-		33E88A7315B9BA4B0089BA08 /* EditorStringTableWidgetItemModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8888715B9BA490089BA08 /* EditorStringTableWidgetItemModel.h */; };
 		33E88A7515B9BA4B0089BA08 /* EditorTextEditorDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8888815B9BA490089BA08 /* EditorTextEditorDialog.cpp */; };
 		33E88A7715B9BA4B0089BA08 /* EditorTextEditorDialog.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8888915B9BA490089BA08 /* EditorTextEditorDialog.h */; };
 		33E88A7915B9BA4B0089BA08 /* EditorTickState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8888A15B9BA490089BA08 /* EditorTickState.cpp */; };
@@ -3000,6 +3082,36 @@
 		3397727216E9AEC70046535B /* TextureParserPVR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureParserPVR.cpp; sourceTree = "<group>"; };
 		3397728216E9BB2B0046535B /* StackContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackContainer.h; sourceTree = "<group>"; };
 		3397728316E9BB2B0046535B /* StackVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackVector.h; sourceTree = "<group>"; };
+		3397729316F8E68B0046535B /* EditorStringTableEditorItemModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorStringTableEditorItemModel.cpp; sourceTree = "<group>"; };
+		3397729416F8E68C0046535B /* EditorStringTableEditorItemModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorStringTableEditorItemModel.h; sourceTree = "<group>"; };
+		3397729516F8E68D0046535B /* EditorStringTableEditorWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorStringTableEditorWidget.cpp; sourceTree = "<group>"; };
+		3397729616F8E68E0046535B /* EditorStringTableEditorWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorStringTableEditorWidget.h; sourceTree = "<group>"; };
+		3397729B16F8F0590046535B /* EditorConversationTreeEditorItemEditDialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorConversationTreeEditorItemEditDialog.cpp; sourceTree = "<group>"; };
+		3397729C16F8F0590046535B /* EditorConversationTreeEditorItemEditDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorConversationTreeEditorItemEditDialog.h; sourceTree = "<group>"; };
+		3397729D16F8F05A0046535B /* EditorConversationTreeEditorView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorConversationTreeEditorView.cpp; sourceTree = "<group>"; };
+		3397729E16F8F05A0046535B /* EditorConversationTreeEditorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorConversationTreeEditorView.h; sourceTree = "<group>"; };
+		3397729F16F8F05B0046535B /* EditorConversationTreeEditorWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorConversationTreeEditorWidget.cpp; sourceTree = "<group>"; };
+		339772A016F8F05B0046535B /* EditorConversationTreeEditorWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorConversationTreeEditorWidget.h; sourceTree = "<group>"; };
+		339772A116F8F05C0046535B /* EditorConversationTreeEditorWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorConversationTreeEditorWindow.cpp; sourceTree = "<group>"; };
+		339772A216F8F05C0046535B /* EditorConversationTreeEditorWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorConversationTreeEditorWindow.h; sourceTree = "<group>"; };
+		339772AB16F8F1190046535B /* ConversationTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConversationTree.cpp; sourceTree = "<group>"; };
+		339772AC16F8F1190046535B /* ConversationTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConversationTree.h; sourceTree = "<group>"; };
+		339772AD16F8F1190046535B /* ConversationTreeParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConversationTreeParser.cpp; sourceTree = "<group>"; };
+		339772AE16F8F1190046535B /* ConversationTreeParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConversationTreeParser.h; sourceTree = "<group>"; };
+		339772C316F8F1240046535B /* ConversationTreeCooker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConversationTreeCooker.cpp; sourceTree = "<group>"; };
+		339772C416F8F1240046535B /* ConversationTreeCooker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConversationTreeCooker.h; sourceTree = "<group>"; };
+		339772C716F8F19B0046535B /* EditorConversationTreeThumb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorConversationTreeThumb.cpp; sourceTree = "<group>"; };
+		339772C816F8F19B0046535B /* EditorConversationTreeThumb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorConversationTreeThumb.h; sourceTree = "<group>"; };
+		339772CB16F8F1B30046535B /* T_ConversationTreePrecache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = T_ConversationTreePrecache.cpp; sourceTree = "<group>"; };
+		339772CC16F8F1B30046535B /* T_ConversationTreePrecache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = T_ConversationTreePrecache.h; sourceTree = "<group>"; };
+		339772D716F8F1BA0046535B /* T_StringTablePrecache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = T_StringTablePrecache.cpp; sourceTree = "<group>"; };
+		339772D816F8F1BA0046535B /* T_StringTablePrecache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = T_StringTablePrecache.h; sourceTree = "<group>"; };
+		339772E316F8F2070046535B /* Occupant.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Occupant.cpp; sourceTree = "<group>"; };
+		339772E416F8F2070046535B /* Occupant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Occupant.h; sourceTree = "<group>"; };
+		339772EF16F8F2D90046535B /* D_ConversationTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = D_ConversationTree.cpp; sourceTree = "<group>"; };
+		339772F016F8F2D90046535B /* D_ConversationTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = D_ConversationTree.h; sourceTree = "<group>"; };
+		339772FB16F8F2DF0046535B /* D_StringTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = D_StringTable.cpp; sourceTree = "<group>"; };
+		339772FC16F8F2DF0046535B /* D_StringTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = D_StringTable.h; sourceTree = "<group>"; };
 		339805931676D544002758B1 /* FloorsDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FloorsDef.h; sourceTree = "<group>"; };
 		33982DAD16A8840900C2ED49 /* Socket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Socket.cpp; sourceTree = "<group>"; };
 		33982DAE16A8840900C2ED49 /* Socket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Socket.h; sourceTree = "<group>"; };
@@ -3655,10 +3767,6 @@
 		33E8887F15B9BA490089BA08 /* EditorSearchLineWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorSearchLineWidget.h; sourceTree = "<group>"; };
 		33E8888215B9BA490089BA08 /* EditorStringTableEditorWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorStringTableEditorWindow.cpp; sourceTree = "<group>"; };
 		33E8888315B9BA490089BA08 /* EditorStringTableEditorWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorStringTableEditorWindow.h; sourceTree = "<group>"; };
-		33E8888415B9BA490089BA08 /* EditorStringTableWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorStringTableWidget.cpp; sourceTree = "<group>"; };
-		33E8888515B9BA490089BA08 /* EditorStringTableWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorStringTableWidget.h; sourceTree = "<group>"; };
-		33E8888615B9BA490089BA08 /* EditorStringTableWidgetItemModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorStringTableWidgetItemModel.cpp; sourceTree = "<group>"; };
-		33E8888715B9BA490089BA08 /* EditorStringTableWidgetItemModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorStringTableWidgetItemModel.h; sourceTree = "<group>"; };
 		33E8888815B9BA490089BA08 /* EditorTextEditorDialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorTextEditorDialog.cpp; sourceTree = "<group>"; };
 		33E8888915B9BA490089BA08 /* EditorTextEditorDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorTextEditorDialog.h; sourceTree = "<group>"; };
 		33E8888A15B9BA490089BA08 /* EditorTickState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorTickState.cpp; sourceTree = "<group>"; };
@@ -4607,6 +4715,12 @@
 				33E886E415B9B9ED0089BA08 /* Assets.cpp */,
 				33E886E515B9B9ED0089BA08 /* Assets.h */,
 				33E886E615B9B9ED0089BA08 /* AssetTypes.h */,
+				339772AB16F8F1190046535B /* ConversationTree.cpp */,
+				339772AC16F8F1190046535B /* ConversationTree.h */,
+				339772C316F8F1240046535B /* ConversationTreeCooker.cpp */,
+				339772C416F8F1240046535B /* ConversationTreeCooker.h */,
+				339772AD16F8F1190046535B /* ConversationTreeParser.cpp */,
+				339772AE16F8F1190046535B /* ConversationTreeParser.h */,
 				33E886E715B9B9ED0089BA08 /* FontCooker.cpp */,
 				33E886E815B9B9ED0089BA08 /* FontCooker.h */,
 				33E886E915B9B9ED0089BA08 /* FontParser.cpp */,
@@ -4899,6 +5013,14 @@
 				33E8889715B9BA490089BA08 /* PropertyGrid */,
 				33DB1609162FB28700963A33 /* EditorBSPDebugWidget.cpp */,
 				33DB160A162FB28700963A33 /* EditorBSPDebugWidget.h */,
+				3397729B16F8F0590046535B /* EditorConversationTreeEditorItemEditDialog.cpp */,
+				3397729C16F8F0590046535B /* EditorConversationTreeEditorItemEditDialog.h */,
+				3397729D16F8F05A0046535B /* EditorConversationTreeEditorView.cpp */,
+				3397729E16F8F05A0046535B /* EditorConversationTreeEditorView.h */,
+				3397729F16F8F05B0046535B /* EditorConversationTreeEditorWidget.cpp */,
+				339772A016F8F05B0046535B /* EditorConversationTreeEditorWidget.h */,
+				339772A116F8F05C0046535B /* EditorConversationTreeEditorWindow.cpp */,
+				339772A216F8F05C0046535B /* EditorConversationTreeEditorWindow.h */,
 				33988FB516684F980018C3E6 /* EditorPathfindingDebugWidget.cpp */,
 				33988FB616684F980018C3E6 /* EditorPathfindingDebugWidget.h */,
 				33E8886715B9BA490089BA08 /* EditorComboCheckBox.cpp */,
@@ -4932,12 +5054,12 @@
 				33E8887D15B9BA490089BA08 /* EditorProgressDialog.h */,
 				33E8887E15B9BA490089BA08 /* EditorSearchLineWidget.cpp */,
 				33E8887F15B9BA490089BA08 /* EditorSearchLineWidget.h */,
+				3397729316F8E68B0046535B /* EditorStringTableEditorItemModel.cpp */,
+				3397729416F8E68C0046535B /* EditorStringTableEditorItemModel.h */,
+				3397729516F8E68D0046535B /* EditorStringTableEditorWidget.cpp */,
+				3397729616F8E68E0046535B /* EditorStringTableEditorWidget.h */,
 				33E8888215B9BA490089BA08 /* EditorStringTableEditorWindow.cpp */,
 				33E8888315B9BA490089BA08 /* EditorStringTableEditorWindow.h */,
-				33E8888415B9BA490089BA08 /* EditorStringTableWidget.cpp */,
-				33E8888515B9BA490089BA08 /* EditorStringTableWidget.h */,
-				33E8888615B9BA490089BA08 /* EditorStringTableWidgetItemModel.cpp */,
-				33E8888715B9BA490089BA08 /* EditorStringTableWidgetItemModel.h */,
 				33E8888815B9BA490089BA08 /* EditorTextEditorDialog.cpp */,
 				33E8888915B9BA490089BA08 /* EditorTextEditorDialog.h */,
 				33E8888A15B9BA490089BA08 /* EditorTickState.cpp */,
@@ -4983,6 +5105,8 @@
 				33E8885415B9BA490089BA08 /* EditorContentTexture.h */,
 				33E8885515B9BA490089BA08 /* EditorContentThumbCache.cpp */,
 				33E8885615B9BA490089BA08 /* EditorContentThumbCache.h */,
+				339772C716F8F19B0046535B /* EditorConversationTreeThumb.cpp */,
+				339772C816F8F19B0046535B /* EditorConversationTreeThumb.h */,
 				33E8885715B9BA490089BA08 /* EditorMapThumb.cpp */,
 				33E8885815B9BA490089BA08 /* EditorMapThumb.h */,
 				33E8885915B9BA490089BA08 /* EditorMaterialThumb.cpp */,
@@ -5077,6 +5201,8 @@
 				33982E7716B2550300C2ED49 /* MT_Floor.cpp */,
 				33E8890115B9BA4A0089BA08 /* MT_Fly.cpp */,
 				33E8890215B9BA4A0089BA08 /* MT_Spline.cpp */,
+				339772E316F8F2070046535B /* Occupant.cpp */,
+				339772E416F8F2070046535B /* Occupant.h */,
 				33E8890315B9BA4A0089BA08 /* PostProcess.cpp */,
 				33E8890415B9BA4A0089BA08 /* PostProcess.h */,
 				33E8890515B9BA4A0089BA08 /* ScreenOverlay.cpp */,
@@ -5133,6 +5259,8 @@
 			children = (
 				33E888D315B9BA4A0089BA08 /* D_Asset.cpp */,
 				33E888D415B9BA4A0089BA08 /* D_Asset.h */,
+				339772EF16F8F2D90046535B /* D_ConversationTree.cpp */,
+				339772F016F8F2D90046535B /* D_ConversationTree.h */,
 				33E888D515B9BA4A0089BA08 /* D_Material.cpp */,
 				33E888D615B9BA4A0089BA08 /* D_Material.h */,
 				33E888D715B9BA4A0089BA08 /* D_Mesh.cpp */,
@@ -5145,11 +5273,15 @@
 				33E888DE15B9BA4A0089BA08 /* D_Sound.h */,
 				33F8F4EE16D61769009646B1 /* D_SpriteBatch.cpp */,
 				33F8F4EF16D61769009646B1 /* D_SpriteBatch.h */,
+				339772FB16F8F2DF0046535B /* D_StringTable.cpp */,
+				339772FC16F8F2DF0046535B /* D_StringTable.h */,
 				33E888DF15B9BA4A0089BA08 /* D_Typeface.cpp */,
 				33E888E015B9BA4A0089BA08 /* D_Typeface.h */,
 				33E888E115B9BA4A0089BA08 /* LuaTask.cpp */,
 				33E888E215B9BA4A0089BA08 /* LuaTask.h */,
 				33E888E315B9BA4A0089BA08 /* LuaTask.inl */,
+				339772CB16F8F1B30046535B /* T_ConversationTreePrecache.cpp */,
+				339772CC16F8F1B30046535B /* T_ConversationTreePrecache.h */,
 				33E888E415B9BA4A0089BA08 /* T_Fail.h */,
 				33E888E515B9BA4A0089BA08 /* T_MaterialPrecache.cpp */,
 				33E888E615B9BA4A0089BA08 /* T_MaterialPrecache.h */,
@@ -5163,6 +5295,8 @@
 				33E888EE15B9BA4A0089BA08 /* T_SoundPrecache.h */,
 				33E888EF15B9BA4A0089BA08 /* T_Spawn.cpp */,
 				33E888F015B9BA4A0089BA08 /* T_Spawn.h */,
+				339772D716F8F1BA0046535B /* T_StringTablePrecache.cpp */,
+				339772D816F8F1BA0046535B /* T_StringTablePrecache.h */,
 				33E888F115B9BA4A0089BA08 /* T_TempSpawn.cpp */,
 				33E888F215B9BA4A0089BA08 /* T_TempSpawn.h */,
 				33E888F315B9BA4A0089BA08 /* T_Tick.cpp */,
@@ -5588,6 +5722,13 @@
 				33F8F4F716D61769009646B1 /* D_SpriteBatch.h in Headers */,
 				3397728616E9BB2B0046535B /* StackContainer.h in Headers */,
 				3397728B16E9BB2B0046535B /* StackVector.h in Headers */,
+				339772B616F8F1190046535B /* ConversationTree.h in Headers */,
+				339772C016F8F1190046535B /* ConversationTreeParser.h in Headers */,
+				339772D416F8F1B30046535B /* T_ConversationTreePrecache.h in Headers */,
+				339772E016F8F1BA0046535B /* T_StringTablePrecache.h in Headers */,
+				339772EC16F8F2080046535B /* Occupant.h in Headers */,
+				339772F816F8F2D90046535B /* D_ConversationTree.h in Headers */,
+				3397730416F8F2DF0046535B /* D_StringTable.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5981,6 +6122,13 @@
 				33F8F4F816D61769009646B1 /* D_SpriteBatch.h in Headers */,
 				3397728716E9BB2B0046535B /* StackContainer.h in Headers */,
 				3397728C16E9BB2B0046535B /* StackVector.h in Headers */,
+				339772B716F8F1190046535B /* ConversationTree.h in Headers */,
+				339772C116F8F1190046535B /* ConversationTreeParser.h in Headers */,
+				339772D516F8F1B30046535B /* T_ConversationTreePrecache.h in Headers */,
+				339772E116F8F1BA0046535B /* T_StringTablePrecache.h in Headers */,
+				339772ED16F8F2080046535B /* Occupant.h in Headers */,
+				339772F916F8F2D90046535B /* D_ConversationTree.h in Headers */,
+				3397730516F8F2DF0046535B /* D_StringTable.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6338,8 +6486,6 @@
 				33E88A5F15B9BA4B0089BA08 /* EditorProgressDialog.h in Headers */,
 				33E88A6315B9BA4B0089BA08 /* EditorSearchLineWidget.h in Headers */,
 				33E88A6B15B9BA4B0089BA08 /* EditorStringTableEditorWindow.h in Headers */,
-				33E88A6F15B9BA4B0089BA08 /* EditorStringTableWidget.h in Headers */,
-				33E88A7315B9BA4B0089BA08 /* EditorStringTableWidgetItemModel.h in Headers */,
 				33E88A7715B9BA4B0089BA08 /* EditorTextEditorDialog.h in Headers */,
 				33E88A7B15B9BA4B0089BA08 /* EditorTickState.h in Headers */,
 				33E88A7D15B9BA4B0089BA08 /* EditorTypes.h in Headers */,
@@ -6456,6 +6602,21 @@
 				33F8F4F516D61769009646B1 /* D_SpriteBatch.h in Headers */,
 				3397728416E9BB2B0046535B /* StackContainer.h in Headers */,
 				3397728916E9BB2B0046535B /* StackVector.h in Headers */,
+				3397729816F8E6900046535B /* EditorStringTableEditorItemModel.h in Headers */,
+				3397729A16F8E6900046535B /* EditorStringTableEditorWidget.h in Headers */,
+				339772A416F8F05D0046535B /* EditorConversationTreeEditorItemEditDialog.h in Headers */,
+				339772A616F8F05D0046535B /* EditorConversationTreeEditorView.h in Headers */,
+				339772A816F8F05D0046535B /* EditorConversationTreeEditorWidget.h in Headers */,
+				339772AA16F8F05D0046535B /* EditorConversationTreeEditorWindow.h in Headers */,
+				339772B416F8F1190046535B /* ConversationTree.h in Headers */,
+				339772BE16F8F1190046535B /* ConversationTreeParser.h in Headers */,
+				339772C616F8F1240046535B /* ConversationTreeCooker.h in Headers */,
+				339772CA16F8F19C0046535B /* EditorConversationTreeThumb.h in Headers */,
+				339772D216F8F1B30046535B /* T_ConversationTreePrecache.h in Headers */,
+				339772DE16F8F1BA0046535B /* T_StringTablePrecache.h in Headers */,
+				339772EA16F8F2080046535B /* Occupant.h in Headers */,
+				339772F616F8F2D90046535B /* D_ConversationTree.h in Headers */,
+				3397730216F8F2DF0046535B /* D_StringTable.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6847,6 +7008,13 @@
 				33F8F4F616D61769009646B1 /* D_SpriteBatch.h in Headers */,
 				3397728516E9BB2B0046535B /* StackContainer.h in Headers */,
 				3397728A16E9BB2B0046535B /* StackVector.h in Headers */,
+				339772B516F8F1190046535B /* ConversationTree.h in Headers */,
+				339772BF16F8F1190046535B /* ConversationTreeParser.h in Headers */,
+				339772D316F8F1B30046535B /* T_ConversationTreePrecache.h in Headers */,
+				339772DF16F8F1BA0046535B /* T_StringTablePrecache.h in Headers */,
+				339772EB16F8F2080046535B /* Occupant.h in Headers */,
+				339772F716F8F2D90046535B /* D_ConversationTree.h in Headers */,
+				3397730316F8F2DF0046535B /* D_StringTable.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7240,6 +7408,13 @@
 				33F8F4F916D61769009646B1 /* D_SpriteBatch.h in Headers */,
 				3397728816E9BB2B0046535B /* StackContainer.h in Headers */,
 				3397728D16E9BB2B0046535B /* StackVector.h in Headers */,
+				339772B816F8F1190046535B /* ConversationTree.h in Headers */,
+				339772C216F8F1190046535B /* ConversationTreeParser.h in Headers */,
+				339772D616F8F1B30046535B /* T_ConversationTreePrecache.h in Headers */,
+				339772E216F8F1BA0046535B /* T_StringTablePrecache.h in Headers */,
+				339772EE16F8F2080046535B /* Occupant.h in Headers */,
+				339772FA16F8F2D90046535B /* D_ConversationTree.h in Headers */,
+				3397730616F8F2DF0046535B /* D_StringTable.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7604,6 +7779,13 @@
 				33F8F41916C75A2F009646B1 /* MeshVBLoader.cpp in Sources */,
 				33F8F4E416D613C6009646B1 /* Sprites.cpp in Sources */,
 				33F8F4F216D61769009646B1 /* D_SpriteBatch.cpp in Sources */,
+				339772B116F8F1190046535B /* ConversationTree.cpp in Sources */,
+				339772BB16F8F1190046535B /* ConversationTreeParser.cpp in Sources */,
+				339772CF16F8F1B30046535B /* T_ConversationTreePrecache.cpp in Sources */,
+				339772DB16F8F1BA0046535B /* T_StringTablePrecache.cpp in Sources */,
+				339772E716F8F2080046535B /* Occupant.cpp in Sources */,
+				339772F316F8F2D90046535B /* D_ConversationTree.cpp in Sources */,
+				339772FF16F8F2DF0046535B /* D_StringTable.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7777,6 +7959,13 @@
 				33F8F41A16C75A2F009646B1 /* MeshVBLoader.cpp in Sources */,
 				33F8F4E516D613C6009646B1 /* Sprites.cpp in Sources */,
 				33F8F4F316D61769009646B1 /* D_SpriteBatch.cpp in Sources */,
+				339772B216F8F1190046535B /* ConversationTree.cpp in Sources */,
+				339772BC16F8F1190046535B /* ConversationTreeParser.cpp in Sources */,
+				339772D016F8F1B30046535B /* T_ConversationTreePrecache.cpp in Sources */,
+				339772DC16F8F1BA0046535B /* T_StringTablePrecache.cpp in Sources */,
+				339772E816F8F2080046535B /* Occupant.cpp in Sources */,
+				339772F416F8F2D90046535B /* D_ConversationTree.cpp in Sources */,
+				3397730016F8F2DF0046535B /* D_StringTable.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7923,8 +8112,6 @@
 				33E88A5D15B9BA4B0089BA08 /* EditorProgressDialog.cpp in Sources */,
 				33E88A6115B9BA4B0089BA08 /* EditorSearchLineWidget.cpp in Sources */,
 				33E88A6915B9BA4B0089BA08 /* EditorStringTableEditorWindow.cpp in Sources */,
-				33E88A6D15B9BA4B0089BA08 /* EditorStringTableWidget.cpp in Sources */,
-				33E88A7115B9BA4B0089BA08 /* EditorStringTableWidgetItemModel.cpp in Sources */,
 				33E88A7515B9BA4B0089BA08 /* EditorTextEditorDialog.cpp in Sources */,
 				33E88A7915B9BA4B0089BA08 /* EditorTickState.cpp in Sources */,
 				33E88A7F15B9BA4B0089BA08 /* EditorUtils.cpp in Sources */,
@@ -8036,6 +8223,21 @@
 				33F8F4F016D61769009646B1 /* D_SpriteBatch.cpp in Sources */,
 				3397727316E9AEC70046535B /* TextureParserDXT.cpp in Sources */,
 				3397727416E9AEC70046535B /* TextureParserPVR.cpp in Sources */,
+				3397729716F8E6900046535B /* EditorStringTableEditorItemModel.cpp in Sources */,
+				3397729916F8E6900046535B /* EditorStringTableEditorWidget.cpp in Sources */,
+				339772A316F8F05D0046535B /* EditorConversationTreeEditorItemEditDialog.cpp in Sources */,
+				339772A516F8F05D0046535B /* EditorConversationTreeEditorView.cpp in Sources */,
+				339772A716F8F05D0046535B /* EditorConversationTreeEditorWidget.cpp in Sources */,
+				339772A916F8F05D0046535B /* EditorConversationTreeEditorWindow.cpp in Sources */,
+				339772AF16F8F1190046535B /* ConversationTree.cpp in Sources */,
+				339772B916F8F1190046535B /* ConversationTreeParser.cpp in Sources */,
+				339772C516F8F1240046535B /* ConversationTreeCooker.cpp in Sources */,
+				339772C916F8F19C0046535B /* EditorConversationTreeThumb.cpp in Sources */,
+				339772CD16F8F1B30046535B /* T_ConversationTreePrecache.cpp in Sources */,
+				339772D916F8F1BA0046535B /* T_StringTablePrecache.cpp in Sources */,
+				339772E516F8F2080046535B /* Occupant.cpp in Sources */,
+				339772F116F8F2D90046535B /* D_ConversationTree.cpp in Sources */,
+				339772FD16F8F2DF0046535B /* D_StringTable.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8208,6 +8410,13 @@
 				33F8F41816C75A2F009646B1 /* MeshVBLoader.cpp in Sources */,
 				33F8F4E316D613C6009646B1 /* Sprites.cpp in Sources */,
 				33F8F4F116D61769009646B1 /* D_SpriteBatch.cpp in Sources */,
+				339772B016F8F1190046535B /* ConversationTree.cpp in Sources */,
+				339772BA16F8F1190046535B /* ConversationTreeParser.cpp in Sources */,
+				339772CE16F8F1B30046535B /* T_ConversationTreePrecache.cpp in Sources */,
+				339772DA16F8F1BA0046535B /* T_StringTablePrecache.cpp in Sources */,
+				339772E616F8F2080046535B /* Occupant.cpp in Sources */,
+				339772F216F8F2D90046535B /* D_ConversationTree.cpp in Sources */,
+				339772FE16F8F2DF0046535B /* D_StringTable.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8381,6 +8590,13 @@
 				33F8F41B16C75A2F009646B1 /* MeshVBLoader.cpp in Sources */,
 				33F8F4E616D613C6009646B1 /* Sprites.cpp in Sources */,
 				33F8F4F416D61769009646B1 /* D_SpriteBatch.cpp in Sources */,
+				339772B316F8F1190046535B /* ConversationTree.cpp in Sources */,
+				339772BD16F8F1190046535B /* ConversationTreeParser.cpp in Sources */,
+				339772D116F8F1B30046535B /* T_ConversationTreePrecache.cpp in Sources */,
+				339772DD16F8F1BA0046535B /* T_StringTablePrecache.cpp in Sources */,
+				339772E916F8F2080046535B /* Occupant.cpp in Sources */,
+				339772F516F8F2D90046535B /* D_ConversationTree.cpp in Sources */,
+				3397730116F8F2DF0046535B /* D_StringTable.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
