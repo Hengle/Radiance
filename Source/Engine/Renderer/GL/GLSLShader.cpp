@@ -362,7 +362,7 @@ String GLSLShader::ShaderLog(GLhandleARB s) {
 
 String GLSLShader::ProgramLog(GLhandleARB s) {
 #if defined(RAD_OPT_OGLES)
-	enum { MaxLen = Kilo*8 };
+	enum { MaxLen = kKilo*8 };
 	char sz[MaxLen];
 	glGetProgramInfoLog(s, MaxLen, 0, sz);
 	return String(sz);
