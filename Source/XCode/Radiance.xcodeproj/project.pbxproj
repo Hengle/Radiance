@@ -277,7 +277,6 @@
 		330A995715BCA060002A81EC /* GLShader.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887ED15B9BA480089BA08 /* GLShader.h */; };
 		330A995815BCA060002A81EC /* GLSLShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887EE15B9BA480089BA08 /* GLSLShader.cpp */; };
 		330A995915BCA060002A81EC /* GLSLShader.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887EF15B9BA480089BA08 /* GLSLShader.h */; };
-		330A995A15BCA060002A81EC /* GLSLTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887F115B9BA480089BA08 /* GLSLTool.cpp */; };
 		330A995B15BCA060002A81EC /* GLSLTool.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887F215B9BA480089BA08 /* GLSLTool.h */; };
 		330A995C15BCA060002A81EC /* GLState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887F315B9BA480089BA08 /* GLState.cpp */; };
 		330A995D15BCA060002A81EC /* GLState.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E887F415B9BA480089BA08 /* GLState.h */; };
@@ -485,7 +484,6 @@
 		337AE5C215BF214F00AD1617 /* GLRenderTarget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887EA15B9BA480089BA08 /* GLRenderTarget.cpp */; };
 		337AE5C315BF214F00AD1617 /* GLShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887EC15B9BA480089BA08 /* GLShader.cpp */; };
 		337AE5C415BF214F00AD1617 /* GLSLShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887EE15B9BA480089BA08 /* GLSLShader.cpp */; };
-		337AE5C515BF214F00AD1617 /* GLSLTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887F115B9BA480089BA08 /* GLSLTool.cpp */; };
 		337AE5C615BF214F00AD1617 /* GLState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887F315B9BA480089BA08 /* GLState.cpp */; };
 		337AE5C715BF214F00AD1617 /* GLTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887F715B9BA480089BA08 /* GLTable.cpp */; };
 		337AE5C815BF214F00AD1617 /* GLTextModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E887FB15B9BA480089BA08 /* GLTextModel.cpp */; };
@@ -7722,7 +7720,6 @@
 				330A995415BCA060002A81EC /* GLRenderTarget.cpp in Sources */,
 				330A995615BCA060002A81EC /* GLShader.cpp in Sources */,
 				330A995815BCA060002A81EC /* GLSLShader.cpp in Sources */,
-				330A995A15BCA060002A81EC /* GLSLTool.cpp in Sources */,
 				330A995C15BCA060002A81EC /* GLState.cpp in Sources */,
 				330A995F15BCA060002A81EC /* GLTable.cpp in Sources */,
 				330A996215BCA060002A81EC /* GLTextModel.cpp in Sources */,
@@ -7901,7 +7898,6 @@
 				337AE5C215BF214F00AD1617 /* GLRenderTarget.cpp in Sources */,
 				337AE5C315BF214F00AD1617 /* GLShader.cpp in Sources */,
 				337AE5C415BF214F00AD1617 /* GLSLShader.cpp in Sources */,
-				337AE5C515BF214F00AD1617 /* GLSLTool.cpp in Sources */,
 				337AE5C615BF214F00AD1617 /* GLState.cpp in Sources */,
 				337AE5C715BF214F00AD1617 /* GLTable.cpp in Sources */,
 				337AE5C815BF214F00AD1617 /* GLTextModel.cpp in Sources */,

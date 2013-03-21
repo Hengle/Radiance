@@ -93,9 +93,9 @@ void Engine::Finalize()
 		m_comTable.r->ctx = r::HContext();
 
 	m_comTable.r.Close();
-	m_comTable.files.reset();
-
+	
 	CVarZone::Globals().Close();
+	m_comTable.files.reset();
 }
 
 void Engine::Tick(float elapsed)
