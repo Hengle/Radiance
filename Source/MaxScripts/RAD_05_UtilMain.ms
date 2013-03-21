@@ -408,7 +408,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 			
 	function onSelChange =
 	(
-		sel = RAD_Exclude (RAD_ConvertableFilter selection #(Mesh, Freecamera)) #(Bone, CATBone, HubObject)
+		sel = RAD_FilterAnimatable selection --RAD_Exclude (RAD_FilterAnimatable selection) #(Bone, CATBone, HubObject)
 		if (sel.count > 0) then
 		(
 			setupUIForObjects sel

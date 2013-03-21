@@ -91,7 +91,11 @@ function RAD_GetSkelRoot skel =
 		if numBones == 0 then return undefined
 		name = skinops.GetBoneName skel.skin 1 0
 		obj = GetNodeByName name
-		RAD_GetObjectRoot obj
+		while (obj.parent != undefined) do (
+			if (classof(obj.parent) == CATParent) then ( exit )
+			obj = obj.parent
+		)
+		obj
 )
 
 function RAD_IsAnimated model =
@@ -141,12 +145,8 @@ function RAD_FilterAnimated objs =
 
 function RAD_FilterAnimatable objs =
 (
-	anims = #()
-	for x in objs do
-	(
-		if (x.modifiers[#skin] != undefined or (classof(x) == Freecamera)) then append anims x
-	)
-	anims
+	animatable = RAD_ConvertableFilter objs #(Mesh, Freecamera)
+	RAD_Exclude animatable #(Bone, CATBone, HubObject) -- filter bones
 )
 
 function RAD_GetObjInitialAnim obj =
@@ -388,6 +388,10 @@ function RAD_GetBoneTM b =
 (
 	cl = classof b
 	
+	if (cl == CATParent) then (
+		return (matrix3 1)
+	)
+	
 	if ((cl == CATBone) or (cl == HubObject)) then
 	(
 		return b.objecttransform
@@ -477,9 +481,7 @@ function RAD_ExportAnims file doMeshes doAnims obj =
 			(
 				WriteFloat file obj.fov
 				x = RAD_GetBoneTM obj
---				x = (rotateYMatrix -90) * (rotateXMatrix 90) * x
 				x = (rotateXMatrix -90) * (rotateYMatrix 90) * x
---				x.translation = obj.transform.translation
 				RAD_WriteBoneTM file x
 				WriteString file (RAD_GetNodeKeyFrameTag obj f)
 			)
@@ -487,11 +489,11 @@ function RAD_ExportAnims file doMeshes doAnims obj =
 			(
 				for bn =1 to numBones do
 				(
-					b = getNodeByName (skinops.GetBoneName obj.skin bn 0)\
+					b = getNodeByName (skinops.GetBoneName obj.skin bn 0)
 					
 					tm = RAD_GetBoneTM b
 					
-					if (b.parent != undefined) then 
+					if ((b.parent != undefined) and (classof(b.parent) != CATParent)) then 
 					(
 						tm = tm * (inverse (RAD_GetBoneTM b.parent))
 					)

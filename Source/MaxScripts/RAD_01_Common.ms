@@ -3,21 +3,86 @@
 -- Author: Joe Riedel
 -- See Radiance/LICENSE for licensing terms.
 
-function RAD_WritePoint3 file p =
-(
+function RAD_GetObjectKeyFrameTimes obj = (
+	c = classof(obj)
+	if (c == Loft) then (
+		return RAD_GetLoftKeyFrameTimes(obj)
+	) else if (c == Editable_Mesh) then (
+		return RAD_GetEditableMeshKeyFrameTimes(obj)
+	)
+	
+	undefined
+)
+
+function RAD_GetLoftKeyFrameTimes obj = (
+	if (obj.line != undefined) then (
+		if (classof(obj.baseobject[#line][#master]) == SubAnim) then (
+			return RAD_GetLoftLineKeyFrameTimes obj
+		)
+	)
+	undefined
+)
+
+function RAD_GetLoftLineKeyFrameTimes obj = (
+	keyframes = undefined
+	baseLine = obj.baseobject[#line][#master]
+	props = getPropNames baseLine #dynamicOnly
+	
+	for p in props do (
+		z = execute ("($" + obj.name + ").baseobject[#line][#master]." + (p as string) + ".controller.keys")
+		if (z.count > 1) then (
+			w = for x in z collect x.time
+			if (keyframes == undefined) then (
+				keyframes = #()
+			)
+			join keyframes w
+		)
+	)
+	
+	xformkeys = RAD_GetObjectTransformKeyFrameTimes obj
+	if (xformkeys != undefined) then (
+		if (keyframes != undefined) then (
+			join keyframes xformkeys
+		) else (
+			keyframes = xformkeys
+		)
+	)
+	
+	if (keyframes != undefined) then (
+		keyframes = makeUniqueArray keyframes
+		sort keyframes
+	)
+	
+	keyframes
+)
+
+function RAD_GetObjectTransformKeyFrameTimes obj = (
+	pos = obj.transform.controller.position.controller.keys
+	rot = obj.transform.controller.position.controller.keys
+	scl = obj.transform.controller.scale.controller.keys
+	
+	keys = RAD_CombineArrays pos rot
+	keys = RAD_CombineArrays keys scl
+	
+	if (keys.count < 1) then (
+		keys = undefined
+	end
+		
+	keys
+)
+
+function RAD_WritePoint3 file p = (
 	WriteFloat file p.x
 	WriteFloat file p.y
 	WriteFloat file p.z
 )
 
-function RAD_WritePoint2 file p =
-(
+function RAD_WritePoint2 file p = (
 	WriteFloat file p.x
 	WriteFloat file p.y
 )
 
-function RAD_WriteQuat file q =
-(
+function RAD_WriteQuat file q = (
 	q = inverse q
 	WriteFloat file q.w
 	WriteFloat file q.x
@@ -25,18 +90,15 @@ function RAD_WriteQuat file q =
 	WriteFloat file q.z
 )
 
-function RAD_WriteMat3 file m =
-(
-	for x = 1 to 4 do
-	(
+function RAD_WriteMat3 file m = (
+	for x = 1 to 4 do (
 		WriteFloat file m[x].x
 		WriteFloat file m[x].y
 		WriteFloat file m[x].z
 	)
 )
 
-function RAD_FlipMatrix m =
-(
+function RAD_FlipMatrix m = (
 	r1 = m[1]
 	r2 = m[2]
 	r3 = m[3]
@@ -44,8 +106,7 @@ function RAD_FlipMatrix m =
 	matrix3 (point3 r1.x r1.z -r1.y) (point3 r2.x r2.z -r2.y) (point3 r3.x r3.z -r3.y) (point3 r4.x r4.z -r4.y)
 )
 
-function RAD_WriteBoneTM file m =
-(
+function RAD_WriteBoneTM file m = (
 --	m = RAD_FlipMatrix m
 --	RAD_WriteQuat file m.rotationpart
 --	RAD_WritePoint3 file m.scalepart
@@ -53,23 +114,18 @@ function RAD_WriteBoneTM file m =
 	RAD_WriteMat3 file m
 )
 
-function RAD_FindSubMat mat id =
-(
+function RAD_FindSubMat mat id = (
 	i = 1
-	for x in mat.materialIDList do
-	(
-		if (x == id) then
-		(
+	for x in mat.materialIDList do (
+		if (x == id) then (
 			return mat.materialList[i]
 		)
 	)
 	undefined
 )
 
-function RAD_MaterialName mat id =
-(
-	if ((classof mat) == MultiMaterial) then
-	(
+function RAD_MaterialName mat id = (
+	if ((classof mat) == MultiMaterial) then (
 		mat = RAD_FindSubMat mat id
 		if (mat != undefined) then ( return mat.name )
 		return undefined
@@ -77,37 +133,27 @@ function RAD_MaterialName mat id =
 	mat.name
 )
 
-function RAD_GatherMultiMaterials list mtl =
-(
+function RAD_GatherMultiMaterials list mtl = (
 	mats = #()
-	for s = 1 to mtl.numsubs do
-	(
-		if (classof mtl.materialList[s] == MultiMaterial) then
-		(
+	for s = 1 to mtl.numsubs do (
+		if (classof mtl.materialList[s] == MultiMaterial) then (
 			mats = gatherMultiMaterials mats mtl.materialList[s]
-		)
-		else
-		(
+		) else (
 			mats = append mats mtl.materialList[s]
 		)
 	)
 	mats + list
 )
 
-function RAD_GatherSceneMaterials =
-(
+function RAD_GatherSceneMaterials = (
 	mats = #()
 	
 	mtlib = sceneMaterials
-	for i = 1 to mtlib.count do
-	(
+	for i = 1 to mtlib.count do (
 		mtl = mtlib[i]
-		if classof mtl == MultiMaterial then
-		(
+		if classof mtl == MultiMaterial then (
 			mats = gatherMultiMaterials mats mtl
-		)
-		else
-		(
+		) else (
 			mats = append mats mtl
 		)
 	)
@@ -116,12 +162,10 @@ function RAD_GatherSceneMaterials =
 )
 
 
-function RAD_ConvertPath name =
-(
+function RAD_ConvertPath name = (
 	ss = name as StringStream
 	name = ""
-	while (not eof ss) do
-	(
+	while (not eof ss) do (
 		c = readChar ss
 		if (c != " ") then name = name + c
 	)
@@ -129,14 +173,12 @@ function RAD_ConvertPath name =
 	name
 )
 
-function RAD_GetObjectRoot obj =
-(
+function RAD_GetObjectRoot obj = (
 	while (obj.parent != undefined) do (obj = obj.parent)
 	obj
 )
 
-function RAD_GetObjPath obj =
-(
+function RAD_GetObjPath obj = (
 	pn = obj.name
 	while obj.parent != undefined do
 	(
@@ -146,19 +188,15 @@ function RAD_GetObjPath obj =
 	pn
 )
 
-function RAD_Exclude list class =
-(
+function RAD_Exclude list class = (
 	r = #()
 	if ((classof class) != Array) then ( class = #(class) )
 	
-	for x in list do
-	(
+	for x in list do (
 		skip = false
 		
-		for c in class do
-		(
-			if ((classof x) == c) then 
-			( 
+		for c in class do (
+			if ((classof x) == c) then (
 				skip = true
 				exit
 			)
@@ -169,17 +207,13 @@ function RAD_Exclude list class =
 	r
 )
 
-function RAD_Filter list class =
-(
+function RAD_Filter list class = (
 	r = #()
 	if ((classof class) != Array) then ( class = #(class) )
 	
-	for x in list do
-	(
-		for c in class do
-		(
-			if ((classof x) == c) then 
-			( 
+	for x in list do (
+		for c in class do (
+			if ((classof x) == c) then (
 				r = append r x
 				exit
 			)
@@ -188,17 +222,13 @@ function RAD_Filter list class =
 	r
 )
 
-function RAD_ConvertableFilter list class =
-(
+function RAD_ConvertableFilter list class = (
 	r = #()
 	if ((classof class) != Array) then ( class = #(class) )
 	
-	for x in list do
-	(
-		for c in class do
-		(
-			if (canConvertTo x c) then 
-			( 
+	for x in list do (
+		for c in class do (
+			if (canConvertTo x c) then  ( 
 				r = append r x
 				exit
 			)
@@ -207,85 +237,67 @@ function RAD_ConvertableFilter list class =
 	r
 )
 
-function RAD_FilterVisible objs val:true =
-(
+function RAD_FilterVisible objs val:true = (
 	l = #()
-	for x in objs do
-	(
+	for x in objs do (
 		if (x.isHiddenInVpt != val) then ( l = append l x )
 	)
 	l
 )
 
-function RAD_FilterSelected objs val:false =
-(
+function RAD_FilterSelected objs val:false = (
 	l = #()
-	for x in objs do
-	(
+	for x in objs do (
 		if (x.isSelected == val) then ( l = append l x )
 	)
 	l
 )
 
-function RAD_FilterVisibleSelected objs vis:true sel:true  =
-(
+function RAD_FilterVisibleSelected objs vis:true sel:true  = (
 	l = #()
-	for x in objs do
-	(
+	for x in objs do (
 		if (x.isSelected == sel and x.isHiddenInVpt != vis) then ( l = append l x )
 	)
 	l
 )
 
-function RAD_SplitTypes objs types =
-(
+function RAD_SplitTypes objs types = (
 	l = #(objs)
-	for t in types do
-	(
+	for t in types do (
 		l = append l (RAD_Filter objs t)
 	)
 	l
 )
 
-function RAD_ConvertableSplitTypes objs types =
-(
+function RAD_ConvertableSplitTypes objs types = (
 	l = #(objs)
-	for t in types do
-	(
+	for t in types do (
 		l = append l (RAD_ConvertableFilter objs t)
 	)
 	l
 )
 
-function RAD_GatherObjectProps objs props defaults =
-(
+function RAD_GatherObjectProps objs props defaults = (
 	vals = #()
 	aggr = #()
 	same = true
-	for x in defaults do
-	(
+	for x in defaults do (
 		aggr = append aggr undefined
 	)
-	for x in objs do
-	(
+	for x in objs do (
 		c = 1
 		objVals = #()
-		for p in props do
-		(
+		for p in props do (
 			v = getUserProp x p
-			if (v == undefined) then
-			(
+			if (v == undefined) then (
 				v = defaults[c]	
 			)
 			
 			v = v as String
 			
-			if (aggr[c] == undefined) then
-			(
+			if (aggr[c] == undefined) then (
 				aggr[c] = v
-			)
-			else
-			(
+			) else (
 				same = same and (aggr[c] == v)
 			)
 			
@@ -297,27 +309,21 @@ function RAD_GatherObjectProps objs props defaults =
 	#(same, vals)
 )
 
-function RAD_SetObjectProps objs props =
-(
-	for x in objs do
-	(
-		for p in props do
-		(
+function RAD_SetObjectProps objs props = (
+	for x in objs do (
+		for p in props do (
 			setUserProp x p[1] p[2]
 		)
 	)
 	objs
 )
 
-function RAD_FilterByProps objs props defaults values =
-(
+function RAD_FilterByProps objs props defaults values = (
 	objs = RAD_GatherObjectProps objs props defaults
 	l = #()
-	for x in objs[2] do -- for each object
-	(
+	for x in objs[2] do ( -- for each object
 		c = 0
-		for y in x[2] do -- for each propery in the object
-		(
+		for y in x[2] do ( -- for each propery in the object
 			if (y != values[c+1]) then exit
 			c = c + 1
 		)
@@ -326,23 +332,19 @@ function RAD_FilterByProps objs props defaults values =
 	l
 )
 
-function RAD_FilterByModifiers list type =
-(
+function RAD_FilterByModifiers list type = (
 	out = #()
 	
-	for x in list do
-	(
+	for x in list do (
 		if (x.modifiers[type] != undefined) then append out x
 	)
 	
 	out
 )
 
-function RAD_AssignIDs list first =
-(
+function RAD_AssignIDs list first = (
 	ids = #()
-	for x in list do
-	(
+	for x in list do (
 		setUserProp x "id" first
 		ids = append ids first
 		first = first + 1
@@ -350,41 +352,34 @@ function RAD_AssignIDs list first =
 	#(first, ids)
 )
 
-function RAD_GatherObjsByID objs id =
-(
+function RAD_GatherObjsByID objs id = (
 	l = #()
 	id = id as String
-	for x in list do
-	(
+	for x in list do (
 		z = getUserProp x "id"
 		if (z == id) then ( l = append l x )
 	)
 	l
 )
 
-function RAD_GetObj name =
-(
+function RAD_GetObj name = (
 	execute ("$" + (convertPath name))
 )
 
-function RAD_AddSelChangeHandler cmd name =
-(
+function RAD_AddSelChangeHandler cmd name = (
 	callbacks.addScript #selectionSetChanged cmd id:name
 )
 
-function RAD_RemoveSelChangeHandler name =
-(
+function RAD_RemoveSelChangeHandler name = (
 	callbacks.removeScripts #selectionSetChanged id:name
 )
 
-function RAD_AddFileOpenHandler cmd name =
-(
+function RAD_AddFileOpenHandler cmd name = (
 	callbacks.addScript #filePostOpenProcess cmd id:name
 	callbacks.addScript #postImport cmd id:name
 )
 
-function RAD_RemoveFileOpenHandler name =
-(
+function RAD_RemoveFileOpenHandler name = (
 	callbacks.removeScripts #filePostOpenProcess id:name
 	callbacks.removeScripts #postImport id:name
 )
