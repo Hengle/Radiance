@@ -14,6 +14,10 @@ function RAD_GetObjectKeyFrameTimes obj = (
 	undefined
 )
 
+function RAD_GetEditableMeshKeyFrameTimes obj = (
+	
+)
+
 function RAD_GetLoftKeyFrameTimes obj = (
 	if (obj.line != undefined) then (
 		if (classof(obj.baseobject[#line][#master]) == SubAnim) then (
@@ -66,7 +70,7 @@ function RAD_GetObjectTransformKeyFrameTimes obj = (
 	
 	if (keys.count < 1) then (
 		keys = undefined
-	end
+	)
 		
 	keys
 )
