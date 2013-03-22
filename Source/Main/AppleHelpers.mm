@@ -63,9 +63,13 @@ StringTable::LangId AppleGetLangId() {
 	return lang;
 }
 
-String AppleGetBundlePath() {
+String AppleGetFileSystemRoot() {
 	NSString *path = [[NSBundle mainBundle] bundlePath];
-	return String([path cStringUsingEncoding:NSASCIIStringEncoding]);
+	String s([path cStringUsingEncoding:NSASCIIStringEncoding]);
+#if defined(RAD_OPT_OSX)
+	s += "/Contents/Resources";
+#endif
+	return s;
 }
 
 FILE *AppleOpenPersistence(const char *name, const char *mode) {

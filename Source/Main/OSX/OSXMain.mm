@@ -20,6 +20,7 @@
 
 extern "C" int main(int argc, char *argv[]) {
 	
+#if !defined(RAD_TARGET_GOLDEN)
 	bool setwd = true;
 	for (int i = 1; i < argc; ++i) {
 		if (!strcmp("-nosetwd", argv[i])) {
@@ -29,28 +30,26 @@ extern "C" int main(int argc, char *argv[]) {
 	}
 	
 	if (setwd) {
-		// Set working directory to the same folder that our .app bundle is in.
+		// (tools only): Set working directory to the same folder that our .app bundle is in.
 		char bundlepath[1024];
 		CFURLRef url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
-#if defined(RAD_TARGET_GOLDEN)
 		if (CFURLGetFileSystemRepresentation(url, 1, (UInt8 *)bundlepath, 1024)) {
 			strcat(bundlepath, "/Contents/Resources");
 			chdir(bundlepath);
 		}
-#else
 		CFURLRef url2 = CFURLCreateCopyDeletingLastPathComponent(0, url);
 		if (CFURLGetFileSystemRepresentation(url2, 1, (UInt8 *)bundlepath, 1024)) {
 			chdir(bundlepath);
 		}
 		CFRelease(url2);
-#endif
 		CFRelease(url);
 	}
 		
 	char wd[1024];
 	getcwd(wd, 1024);
-	COut(C_Debug) << "Working Dir: " << wd << std::endl;
-	
+	COut(C_Info) << "Working Dir: " << wd << std::endl;
+#endif
+
 #if defined(RAD_OPT_PC_TOOLS)
 	return QtAppMain(argc, (const char **)argv);
 #else

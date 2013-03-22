@@ -22,7 +22,7 @@ using namespace xtime;
 
 // In the Main project.
 #if defined(RAD_OPT_APPLE)
-String AppleGetBundlePath();
+String AppleGetFileSystemRoot();
 #endif
 
 namespace file {
@@ -32,7 +32,7 @@ FileSystem::Ref FileSystem::New() {
 	String cwd;
 
 #if defined(RAD_OPT_IOS) || (defined(RAD_OPT_OSX) && defined(RAD_OPT_SHIP))
-	cwd = AppleGetBundlePath();
+	cwd = AppleGetFileSystemRoot();
 #else
 	{
 		char x[256];

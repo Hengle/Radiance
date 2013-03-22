@@ -40,6 +40,11 @@
 		331949F515BA34BC00458F43 /* NativeAppDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E515BA34BC00458F43 /* NativeAppDef.h */; };
 		331949F615BA34BC00458F43 /* NativeDeviceContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949E615BA34BC00458F43 /* NativeDeviceContext.h */; };
 		331949F715BA34BC00458F43 /* null_CloudStorage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 331949E715BA34BC00458F43 /* null_CloudStorage.cpp */; };
+		3321A9F716FBBB2B00E2102F /* AppDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 33194B2715BC8A6700458F43 /* AppDelegate.h */; };
+		3321A9F816FBBB2B00E2102F /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33194B2815BC8A6700458F43 /* AppDelegate.mm */; };
+		3321A9FA16FBBB2F00E2102F /* OSXMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33194A2515BA4F4A00458F43 /* OSXMain.mm */; };
+		3321A9FB16FBBB3200E2102F /* OSXNativeApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 331949EB15BA34BC00458F43 /* OSXNativeApp.h */; };
+		3321A9FC16FBBB3200E2102F /* OSXNativeApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 331949EC15BA34BC00458F43 /* OSXNativeApp.mm */; };
 		336836CB15D41E8D00EE9472 /* AppleGameCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 336836C915D41E8D00EE9472 /* AppleGameCenter.h */; };
 		336836CC15D41E8D00EE9472 /* AppleGameCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 336836C915D41E8D00EE9472 /* AppleGameCenter.h */; };
 		336836CD15D41E8D00EE9472 /* AppleGameCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 336836C915D41E8D00EE9472 /* AppleGameCenter.h */; };
@@ -350,6 +355,8 @@
 				331949F615BA34BC00458F43 /* NativeDeviceContext.h in Headers */,
 				337AE54715BF033700AD1617 /* GLContext.h in Headers */,
 				336836CB15D41E8D00EE9472 /* AppleGameCenter.h in Headers */,
+				3321A9F716FBBB2B00E2102F /* AppDelegate.h in Headers */,
+				3321A9FB16FBBB3200E2102F /* OSXNativeApp.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -553,6 +560,9 @@
 				331949F715BA34BC00458F43 /* null_CloudStorage.cpp in Sources */,
 				336836CE15D41E8D00EE9472 /* AppleGameCenter.mm in Sources */,
 				33FA7E1616339AE8002603A5 /* AppleHelpers.mm in Sources */,
+				3321A9F816FBBB2B00E2102F /* AppDelegate.mm in Sources */,
+				3321A9FA16FBBB2F00E2102F /* OSXMain.mm in Sources */,
+				3321A9FC16FBBB3200E2102F /* OSXNativeApp.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
