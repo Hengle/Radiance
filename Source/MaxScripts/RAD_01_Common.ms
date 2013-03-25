@@ -3,37 +3,23 @@
 -- Author: Joe Riedel
 -- See Radiance/LICENSE for licensing terms.
 
-function RAD_GetObjectKeyFrameTimes obj = (
+function RAD_GetObjectKeyframeTimes obj = (
 	c = classof(obj)
 	if (c == Loft) then (
-		return RAD_GetLoftKeyFrameTimes(obj)
+		return RAD_GetLoftKeyframeTimes(obj)
 	) else if (c == Editable_Mesh) then (
-		return RAD_GetEditableMeshKeyFrameTimes(obj)
+		return RAD_GetEditableMeshKeyframeTimes(obj)
 	)
 	
 	undefined
 )
 
-function RAD_GetEditableMeshKeyFrameTimes obj = (
-	
-)
-
-function RAD_GetLoftKeyFrameTimes obj = (
-	if (obj.line != undefined) then (
-		if (classof(obj.baseobject[#line][#master]) == SubAnim) then (
-			return RAD_GetLoftLineKeyFrameTimes obj
-		)
-	)
-	undefined
-)
-
-function RAD_GetLoftLineKeyFrameTimes obj = (
+function RAD_GetEditableMeshKeyframeTimes obj = (
+	props = getPropNames obj #dynamicOnly
 	keyframes = undefined
-	baseLine = obj.baseobject[#line][#master]
-	props = getPropNames baseLine #dynamicOnly
 	
 	for p in props do (
-		z = execute ("($" + obj.name + ").baseobject[#line][#master]." + (p as string) + ".controller.keys")
+		z = execute("($" + obj.name + ")." + (p as string) + ".controller.keys")
 		if (z.count > 1) then (
 			w = for x in z collect x.time
 			if (keyframes == undefined) then (
@@ -43,7 +29,7 @@ function RAD_GetLoftLineKeyFrameTimes obj = (
 		)
 	)
 	
-	xformkeys = RAD_GetObjectTransformKeyFrameTimes obj
+	xformkeys = RAD_GetObjectTransformKeyframeTimes obj
 	if (xformkeys != undefined) then (
 		if (keyframes != undefined) then (
 			join keyframes xformkeys
@@ -60,19 +46,72 @@ function RAD_GetLoftLineKeyFrameTimes obj = (
 	keyframes
 )
 
-function RAD_GetObjectTransformKeyFrameTimes obj = (
-	pos = obj.transform.controller.position.controller.keys
-	rot = obj.transform.controller.position.controller.keys
-	scl = obj.transform.controller.scale.controller.keys
+function RAD_GetLoftKeyframeTimes obj = (
+	if (obj.line != undefined) then (
+		if (classof(obj.baseobject[#line][#master]) == SubAnim) then (
+			return RAD_GetLoftLineKeyFrameTimes obj
+		)
+	)
+	undefined
+)
+
+function RAD_GetLoftLineKeyframeTimes obj = (
+	keyframes = undefined
+	baseLine = obj.baseobject[#line][#master]
+	props = getPropNames baseLine #dynamicOnly
 	
-	keys = RAD_CombineArrays pos rot
-	keys = RAD_CombineArrays keys scl
+	for p in props do (
+		z = execute ("($" + obj.name + ").baseobject[#line][#master]." + (p as string) + ".controller.keys")
+		if (z.count > 1) then (
+			w = for x in z collect x.time
+			if (keyframes == undefined) then (
+				keyframes = #()
+			)
+			join keyframes w
+		)
+	)
+	
+	xformkeys = RAD_GetObjectTransformKeyframeTimes obj
+	if (xformkeys != undefined) then (
+		if (keyframes != undefined) then (
+			join keyframes xformkeys
+		) else (
+			keyframes = xformkeys
+		)
+	)
+	
+	if (keyframes != undefined) then (
+		keyframes = makeUniqueArray keyframes
+		sort keyframes
+	)
+	
+	keyframes
+)
+
+function RAD_GetObjectTransformKeyframeTimes obj = (
+	pos = for x in obj.transform.controller.position.controller.keys collect x.time
+	rot = for x in obj.transform.controller.rotation.controller.keys collect x.time
+	scl = for x in obj.transform.controller.scale.controller.keys collect x.time
+	
+	keys = join pos rot
+	keys = join keys scl
+	keys = makeUniqueArray keys
 	
 	if (keys.count < 1) then (
 		keys = undefined
 	)
 		
 	keys
+)
+
+function RAD_GetKeyframeBounds start end keys = (
+	z = #()
+	append z start
+	join z keys
+	append z end
+	z = makeUniqueArray z
+	sort z
+	z
 )
 
 function RAD_WritePoint3 file p = (
@@ -111,10 +150,6 @@ function RAD_FlipMatrix m = (
 )
 
 function RAD_WriteBoneTM file m = (
---	m = RAD_FlipMatrix m
---	RAD_WriteQuat file m.rotationpart
---	RAD_WritePoint3 file m.scalepart
---	RAD_WritePoint3 file m.translationpart
 	RAD_WriteMat3 file m
 )
 

@@ -6,7 +6,7 @@
 -- [name, origin[3], id, subobjs[], ids[]]
 
 global kSceneFile_Id =  (bit.shift (bit.charAsInt "N") 24) + (bit.shift (bit.charAsInt "C") 16) + (bit.shift (bit.charAsInt "S") 8) + (bit.charAsInt "R")
-global kSceneFile_Version = 5
+global kSceneFile_Version = 6
 global kSceneFlag_HasMaterialFlag = 0x80000000
 global kSceneFlag_HasMesh = 0x00100000
 global kSceneFlag_HasAnim = 0x00200000
@@ -14,6 +14,8 @@ global kSceneFlag_CinematicObject = 0x00080000
 global kSceneFlag_HideUntilRefed = 0x00040000
 global kSceneFlag_HideWhenDone = 0x00010000
 global kSceneFlag_SetBBox = 0x00008000
+global kScene_AnimTypeSkeletal = 0
+global kScene_AnimTypeVertex = 1
 
 function RAD_GatherEntities objs =
 (
@@ -146,7 +148,7 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName =
 				
 				flags = 0
 				
-				if (doMeshes) then (-- mesh
+				if (doMeshes or (RAD_IsVertexAnimated m)) then (-- mesh
 					flags = bit.or flags kSceneFlag_HasMesh
 				)
 				
@@ -213,11 +215,7 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName =
 				
 				numtris = numtris + trim.numfaces
 				
-				if (doMeshes) then (
-					RAD_WriteTriMesh file trim
-				)
-				
-				RAD_ExportAnims file doMeshes doAnims m
+				RAD_ExportAnims file doMeshes doAnims trim m
 								
 				if (not skinEnabled and (m.modifiers[#skin] != undefined)) then (
 					m.skin.enabled = false

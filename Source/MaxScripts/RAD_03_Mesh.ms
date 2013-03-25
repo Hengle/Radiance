@@ -22,9 +22,9 @@ function RAD_WriteTriMesh file mesh = (
 	for i=1 to mesh.numverts do
 	(
 		v = getVert mesh i
---		z = point3 v.x v.z -v.y
 		RAD_WritePoint3 file v
 	)
+	
 	for i=1 to nummaps do
 	(
 		if (meshop.getMapSupport mesh i) then
@@ -56,6 +56,15 @@ function RAD_WriteTriMesh file mesh = (
 		WriteLong file ((f.z as Integer)-1) #unsigned
 		WriteLong file (getFaceSmoothGroup mesh i) #unsigned
 		WriteLong file (getFaceMatId mesh i) #unsigned
+	)
+)
+
+function RAD_WriteTriMeshVerts file mesh = (
+	WriteLong file mesh.numverts #unsigned
+	for i=1 to mesh.numverts do
+	(
+		v = getVert mesh i
+		RAD_WritePoint3 file v
 	)
 )
 

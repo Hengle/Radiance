@@ -219,7 +219,7 @@ function RAD_BuildAnimString anim =
 function RAD_LoadObjAnims obj =
 (
 	s = getUserProp obj "$animations$"
-	if (s == undefined or s == "$empty$" or ((obj.modifiers[#skin] == undefined) and (classof(obj) != Freecamera))) then
+	if (s == undefined or s == "$empty$" or ((not (canConvertTo obj Mesh)) and (classof(obj) != Freecamera))) then
 	(
 		return #()
 	)
@@ -400,51 +400,14 @@ function RAD_GetBoneTM b =
 	b.transform
 )
 
-function RAD_ExportAnims file doMeshes doAnims obj =
-(
-	isCamera = (classof(obj) == Freecamera)
-	if ((not doAnims) and isCamera) then throw "Cannot export cameras without animation!"
-	
-	if (obj.modifiers[#skin] == undefined) then
-	(
-		WriteLong file -1
-		if not isCamera then
-		(
-			return undefined
-		)
-	)
-	
-	z = RAD_LoadObjAnims obj
-	anims = #()
-	for x in z do
-	(
-		if (x.export and x.end >= x.start) then append anims x
-	)
-	
-	if (doAnims) then
-	(
-		WriteLong file anims.count
-		WriteLong file frameRate #unsigned
-	)
-	else
-	(
-		WriteLong file 0
-		WriteLong file frameRate #unsigned
-	)
-	
-	numBones = 0
-	numVerts = 0
-	
+function RAD_ExportSkAnims file doMeshes doAnims isCamera anims obj = (
 	select obj
 	
-	if (not isCamera) then
-	(
-		max modify mode
-		numBones = skinops.GetNumberBones obj.skin
-		numVerts = skinops.GetNumberVertices obj.skin
-	)
-	
-	if (doMeshes and not isCamera) then
+	max modify mode
+	numBones = skinops.GetNumberBones obj.skin
+	numVerts = skinops.GetNumberVertices obj.skin
+		
+	if (doMeshes) then
 	(
 		for x = 1 to numVerts do
 		(
@@ -464,6 +427,8 @@ function RAD_ExportAnims file doMeshes doAnims obj =
 	
 	for x in anims do
 	(
+		print ("Exporting " + obj.name + " : skeletal animation '" + x.name + "'")
+		
 		flags = 0
 		if (x.loop) then flags = 1
 		WriteString file x.name
@@ -504,5 +469,93 @@ function RAD_ExportAnims file doMeshes doAnims obj =
 			)
 		)
 	)
+)
+
+function RAD_ExportVertexAnims file anims obj = (
+
+	keyframes = RAD_GetObjectKeyframeTimes obj
+	
+	for x in anims do (
+		
+		print ("Exporting " + obj.name + " : vertex animation '" + x.name + "'")
+		
+		flags = 0
+		if (x.loop) then flags = 1
+		WriteString file x.name
+		WriteLong file flags #unsigned
+		WriteLong file x.start
+		WriteLong file ((x.end-x.start)+1) #unsigned
+		
+		boundedFrames = RAD_GetKeyframeBounds (x.start as time) (x.end as time) keyframes
+		WriteLong file (boundedFrames.count) #unsigned
+		
+		animationRange = interval x.start (x.end+1)
+		
+		for f in boundedFrames do (
+			sliderTime = f
+			WriteLong file f #unsigned
+			trim = snapshotAsMesh obj
+			RAD_WriteTriMeshVerts file trim
+		)
+	)
+)
+
+function RAD_IsVertexAnimated obj = (
+	if (classof(obj) == Freecamera) then (
+		return false
+	)
+	
+	if (obj.modifiers[#skin] != undefined) then (
+		return false
+	)
+	
+	z = RAD_LoadObjAnims objs
+	z.count > 1
+)
+
+function RAD_ExportAnims file doMeshes doAnims trim obj =
+(
+	isCamera = (classof(obj) == Freecamera)
+	if ((not doAnims) and isCamera) then throw "Cannot export cameras without animation!"
+	
+	z = RAD_LoadObjAnims obj
+	anims = #()
+	for x in z do
+	(
+		if (x.export and x.end >= x.start) then append anims x
+	)
+	
+	if (obj.modifiers[#skin] != undefined) then (
+		if (doMeshes) then (
+			RAD_WriteTriMesh file trim
+		)
+	) else if (z.count > 0) then ( -- it's vertex animated, always write full tri-mesh
+		RAD_WriteTriMesh file trim
+	) else (
+		if (doMeshes) then (
+			RAD_WriteTriMesh file trim
+		)
+		WriteLong file -1 -- not animated
+		return undefined
+	)
+	
+	if (doAnims) then
+	(
+		WriteLong file anims.count
+		WriteLong file frameRate #unsigned
+	)
+	else
+	(
+		WriteLong file 0
+		WriteLong file frameRate #unsigned
+	)
+	
+	if (isCamera or (obj.modifiers[#skin] != undefined)) then (
+		WriteLong file kScene_AnimTypeSkeletal
+		return RAD_ExportSkAnims file doMeshes doAnims isCamera anims obj
+	)
+	
+	WriteLong file kScene_AnimTypeVertex
+	RAD_ExportVertexAnims file anims obj
 )
 
