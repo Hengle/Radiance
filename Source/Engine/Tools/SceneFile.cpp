@@ -30,7 +30,8 @@ namespace {
 		kVersion2 = 2,
 		kVersion3 = 3,
 		kVersion4 = 4,
-		kVersion = 5,
+		kVersion5 = 5,
+		kVersion = 6,
 
 		kHasMaterialFlag = 0x80000000,
 		kHasAnimsFlag = 0x00200000,
@@ -38,7 +39,9 @@ namespace {
 		kCinematicObjectFlag = 0x00080000,
 		kHideUntilRefedFlag = 0x00040000,
 		kHideWhenDoneFlag = 0x00010000,
-		kSetBBoxFlag = 0x00008000
+		kSetBBoxFlag = 0x00008000,
+		kAnimType_Skeletal = 0,
+		kAnimType_Vertex = 1
 	};
 
 	struct Material {
@@ -176,11 +179,10 @@ namespace {
 		bool hideWhenDone;
 	};
 
-	void ReadTriModel(InputStream &stream, int version, TriModel &mdl, int flags, const SceneFile::SkelVec &skels) {
+	bool ReadTriModel(InputStream &stream, int version, TriModel &mdl, int flags, const SceneFile::SkelVec &skels) {
 		U32 nv, nf, nc;
 
-		if (flags&kHasMeshFlag)
-		{
+		if (flags&kHasMeshFlag) {
 			stream >> nv;
 			stream >> nf;
 			stream >> nc;
@@ -267,67 +269,113 @@ namespace {
 		stream >> numAnims;
 
 		if (numAnims < 0) // EOS indicator.
-			return;
+			return true;
 
 		stream >> frameRate;
 
-		if (flags&kHasMeshFlag) {
-			mdl.skin.reset(new SceneFile::Skin());
-			mdl.skin->reserve(nv);
+		S32 animType = kAnimType_Skeletal;
 
-			// skin
-			for (U32 i = 0; i < nv; ++i) {
-				SceneFile::BoneWeights weights;
+		if (version > kVersion5)
+			stream >> animType;
 
-				U32 numWeights;
-				stream >> numWeights;
-				weights.reserve(numWeights);
+		if (animType == kAnimType_Skeletal) {
+			if (flags&kHasMeshFlag) {
+				mdl.skin.reset(new SceneFile::Skin());
+				mdl.skin->reserve(nv);
 
-				for (U32 j = 0; j < numWeights; ++j) {
-					SceneFile::BoneWeight w;
-					stream >> w.weight;
-					stream >> w.bone;
-					if (w.weight > 0.0f)
-						weights.push_back(w);
+				// skin
+				for (U32 i = 0; i < nv; ++i) {
+					SceneFile::BoneWeights weights;
+
+					U32 numWeights;
+					stream >> numWeights;
+					weights.reserve(numWeights);
+
+					for (U32 j = 0; j < numWeights; ++j) {
+						SceneFile::BoneWeight w;
+						stream >> w.weight;
+						stream >> w.bone;
+						if (w.weight > 0.0f)
+							weights.push_back(w);
+					}
+
+					mdl.skin->push_back(weights);
+				}
+			}
+
+			// anims
+			for (int i = 0; i < numAnims; ++i) {
+				const SceneFile::Skel::Ref &skel = skels[mdl.skel];
+
+				SceneFile::Anim::Ref a(new SceneFile::Anim());
+				a->name = ReadString(stream);
+			
+				U32 flags, numFrames, firstFrame;
+
+				if (version > kVersion2) {
+					stream >> flags >> firstFrame >> numFrames;
+				} else {
+					firstFrame = 0;
+					stream >> flags >> numFrames;
 				}
 
-				mdl.skin->push_back(weights);
-			}
-		}
+				a->looping = flags&1;
+				a->frameRate = frameRate;
+				a->firstFrame = (int)firstFrame;
+				a->boneFrames.resize(numFrames);
 
-		// anims
-		for (int i = 0; i < numAnims; ++i) {
-			const SceneFile::Skel::Ref &skel = skels[mdl.skel];
+				for (U32 j = 0; j < numFrames; ++j) {
+					SceneFile::BonePoseVec &tms = a->boneFrames[j];
+					tms.resize(skel->bones.size());
+					for (SceneFile::BonePoseVec::iterator tm = tms.begin(); tm != tms.end(); ++tm) {
+						(*tm).fov = 0.f;
+						(*tm).m = ReadBoneTM(stream);
+						(*tm).tag = ReadString(stream);
+					}
+				}
+
+				mdl.anims.insert(SceneFile::AnimMap::value_type(a->name, a));
+			}
+		} else {
+			RAD_ASSERT(animType == kAnimType_Vertex);
+			if (!(flags&kHasMeshFlag))
+				return false;
 
 			SceneFile::Anim::Ref a(new SceneFile::Anim());
 			a->name = ReadString(stream);
 			
 			U32 flags, numFrames, firstFrame;
-
-			if (version > kVersion2) {
-				stream >> flags >> firstFrame >> numFrames;
-			} else {
-				firstFrame = 0;
-				stream >> flags >> numFrames;
-			}
-
+			stream >> flags >> firstFrame >> numFrames;
+			
 			a->looping = flags&1;
 			a->frameRate = frameRate;
 			a->firstFrame = (int)firstFrame;
-			a->frames.resize(numFrames);
+			a->vertexFrames.resize(numFrames);
 
-			for (U32 j = 0; j < numFrames; ++j) {
-				SceneFile::BonePoseVec &tms = a->frames[j];
-				tms.resize(skel->bones.size());
-				for (SceneFile::BonePoseVec::iterator tm = tms.begin(); tm != tms.end(); ++tm) {
-					(*tm).fov = 0.f;
-					(*tm).m = ReadBoneTM(stream);
-					(*tm).tag = ReadString(stream);
-				}
+			U32 numVertFrames;
+			stream >> numVertFrames;
+
+			for (U32 j = 0; j < numVertFrames; ++j) {
+				SceneFile::VertexFrame &vframe = a->vertexFrames[j];
+				
+				U32 frame;
+				stream >> frame;
+				vframe.frame = frame;
+
+				vframe.verts.resize(mdl.verts.size());
+
+				U32 numVerts;
+				stream >> numVerts;
+
+				if (numVerts != (U32)mdl.verts.size())
+					return false;
+
+				for (U32 k = 0; k < numVerts; ++k)
+					vframe.verts[k].pos = ReadVec3(stream);
 			}
-
-			mdl.anims.insert(SceneFile::AnimMap::value_type(a->name, a));
 		}
+
+		return true;
 	}
 
 	struct SmoothVert : public SceneFile::WeightedNormalTriVert {
@@ -552,6 +600,31 @@ namespace {
 				mmdl->skin->push_back((*it).weights);
 		}
 
+		// smooth vertex frames
+		for (SceneFile::AnimMap::iterator it = mmdl->anims.begin(); it != mmdl->anims.end(); ++it) {
+			const SceneFile::Anim::Ref &anim = it->second;
+			
+			for (SceneFile::VertexFrames::iterator it = anim->vertexFrames.begin(); it != anim->vertexFrames.end(); ++it) {
+				SceneFile::VertexFrame &vframe = *it;
+
+				// pull vert positions from originally indexed verts.
+				for (SmoothVertVec::iterator it = smv.begin(); it != smv.end(); ++it) {
+					SmoothVert &v = *it;
+					v.pos = vframe.verts[v.id];
+				}
+
+				// replace frame with smoothed vertices
+				// false because we don't need to regenerate sm groups (already done)
+				MakeNormals(mdl, smv, false);
+
+				vframe.verts.clear();
+
+				for (SmoothVertVec::iterator it = smv.begin(); it != smv.end(); ++it) {
+					vframe.verts.push_back(*it);
+				}
+			}
+		}
+
 		return mmdl;
 	}
 
@@ -636,11 +709,11 @@ bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth, UIProgres
 				a->looping = flags&1;
 				a->frameRate = frameRate;
 				a->firstFrame = (int)firstFrame;
-				a->frames.resize(numFrames);
+				a->boneFrames.resize(numFrames);
 
 				for (U32 j = 0; j < numFrames; ++j) {
 
-					SceneFile::BonePoseVec &tms = a->frames[j];
+					SceneFile::BonePoseVec &tms = a->boneFrames[j];
 					tms.resize(1);
 					for (SceneFile::BonePoseVec::iterator tm = tms.begin(); tm != tms.end(); ++tm) {
 						stream >> (*tm).fov;
@@ -747,8 +820,10 @@ bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth, UIProgres
 					mdl.uvtris[i].clear();
 				}
 				
-				if (flags&(kHasMeshFlag|kHasAnimsFlag))
-					ReadTriModel(stream, version, mdl, flags, ent->skels);
+				if (flags&(kHasMeshFlag|kHasAnimsFlag)) {
+					if (!ReadTriModel(stream, version, mdl, flags, ent->skels))
+						return false;
+				}
 
 				for (TriFaceVec::iterator it = mdl.tris.begin(); it != mdl.tris.end(); ++it) {
 					if (m) {

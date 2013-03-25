@@ -910,6 +910,13 @@ public:
 	typedef typename zone_vector<BonePose, Z3DXT>::type BonePoseVec;
 	typedef typename zone_vector<BonePoseVec, Z3DXT>::type BoneFrames;
 
+	struct VertexFrame {
+		int frame;
+		TriVertVec verts;
+	};
+
+	typedef typename zone_vector<VertexFrame, Z3DXT>::type VertexFrames;
+	
 	/*
 	==============================================================================
 	Animations
@@ -922,7 +929,8 @@ public:
 		U32 frameRate;
 		bool looping;
 		int firstFrame;
-		BoneFrames frames;
+		BoneFrames boneFrames;
+		VertexFrames vertexFrames;
 	};
 
 	typedef typename zone_map<String, typename Anim::Ref, Z3DXT>::type AnimMap;

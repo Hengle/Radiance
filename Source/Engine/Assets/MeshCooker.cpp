@@ -16,7 +16,7 @@ using namespace pkg;
 
 namespace asset {
 
-MeshCooker::MeshCooker() : Cooker(4) {
+MeshCooker::MeshCooker() : Cooker(5) {
 }
 
 MeshCooker::~MeshCooker() {
@@ -49,7 +49,7 @@ int MeshCooker::Compile(int flags) {
 	tools::SceneFileRef map(new (ZTools) tools::SceneFile());
 	tools::SceneFileVec vec;
 
-	if (!tools::LoadSceneFile(is, *map, false))
+	if (!tools::LoadSceneFile(is, *map, true))
 		return SR_ParseError;
 
 	ib.reset();

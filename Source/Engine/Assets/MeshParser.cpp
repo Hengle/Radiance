@@ -121,7 +121,7 @@ int MeshParser::Load(
 	tools::SceneFileRef map(new (ZTools) tools::SceneFile());
 	tools::SceneFileVec vec;
 
-	if (!tools::LoadSceneFile(is, *map, false))
+	if (!tools::LoadSceneFile(is, *map, true))
 		return SR_ParseError;
 
 	ib.reset();

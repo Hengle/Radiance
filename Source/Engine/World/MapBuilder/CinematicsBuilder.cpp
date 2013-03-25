@@ -167,9 +167,9 @@ bool CinematicsBuilder::EmitCinematic(const SceneFile &map, const CinematicActor
 			track->name = (int)m_bspFile->numStrings.get();
 			*m_bspFile->AddString() = camera->name.c_str;
 
-			m_bspFile->ReserveCameraTMs((int)anim->frames.size());
+			m_bspFile->ReserveCameraTMs((int)anim->boneFrames.size());
 
-			for (SceneFile::BoneFrames::const_iterator it = anim->frames.begin(); it != anim->frames.end(); ++it) {
+			for (SceneFile::BoneFrames::const_iterator it = anim->boneFrames.begin(); it != anim->boneFrames.end(); ++it) {
 				const SceneFile::BonePoseVec &pose = *it;
 				RAD_VERIFY(pose.size() == 1);
 				world::bsp_file::BSPCameraTM *tm = m_bspFile->AddCameraTM();

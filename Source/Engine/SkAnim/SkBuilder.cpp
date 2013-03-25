@@ -291,13 +291,13 @@ bool SkaBuilder::Compile(
 
 		for (SceneFile::AnimMap::const_iterator it = m->anims.begin(); it != m->anims.end(); ++it) {
 			const SceneFile::Anim &anim = *(it->second.get());
-			if (anim.frames.empty())
+			if (anim.boneFrames.empty())
 				continue;
 
 			BeginAnim(
 				anim.name.c_str,
 				(float)anim.frameRate,
-				(int)anim.frames.size(),
+				(int)anim.boneFrames.size(),
 				false,
 				compression
 			);
@@ -305,7 +305,7 @@ bool SkaBuilder::Compile(
 			BoneTMVec tms;
 			tms.resize(skel.bones.size());
 
-			for (SceneFile::BoneFrames::const_iterator it = anim.frames.begin(); it != anim.frames.end(); ++it) {
+			for (SceneFile::BoneFrames::const_iterator it = anim.boneFrames.begin(); it != anim.boneFrames.end(); ++it) {
 				const SceneFile::BonePoseVec &frame = *it;
 
 				// TODO: dynamic remap bones by name, would be pretty 
@@ -313,7 +313,7 @@ bool SkaBuilder::Compile(
 
 				if (frame.size() != skel.bones.size()) {
 					COut(C_Error) << "BuildAnimData(\"" << name << "\"): animation \"" << anim.name << "\" frame " << 
-						(it-anim.frames.begin()) << " has mismatched bone count." << std::endl;
+						(it-anim.boneFrames.begin()) << " has mismatched bone count." << std::endl;
 					return false;
 				}
 
@@ -408,13 +408,13 @@ bool SkaBuilder::Compile(
 
 	for (SceneFile::AnimMap::const_iterator it = m->anims.begin(); it != m->anims.end(); ++it) {
 		const SceneFile::Anim &anim = *(it->second.get());
-		if (anim.frames.empty())
+		if (anim.boneFrames.empty())
 			continue;
 
 		BeginAnim(
 			anim.name.c_str,
 			(float)anim.frameRate,
-			(int)anim.frames.size(),
+			(int)anim.boneFrames.size(),
 			false,
 			compression
 		);
@@ -422,7 +422,7 @@ bool SkaBuilder::Compile(
 		BoneTMVec tms;
 		tms.resize(skel.bones.size());
 
-		for (SceneFile::BoneFrames::const_iterator it = anim.frames.begin(); it != anim.frames.end(); ++it) {
+		for (SceneFile::BoneFrames::const_iterator it = anim.boneFrames.begin(); it != anim.boneFrames.end(); ++it) {
 			const SceneFile::BonePoseVec &frame = *it;
 
 			// TODO: dynamic remap bones by name, would be pretty 
@@ -430,7 +430,7 @@ bool SkaBuilder::Compile(
 
 			if (frame.size() != skel.bones.size()) {
 				COut(C_Error) << "BuildAnimData(\"" << name << "\"): animation \"" << anim.name << "\" frame " << 
-					(it-anim.frames.begin()) << " has mismatched bone count." << std::endl;
+					(it-anim.boneFrames.begin()) << " has mismatched bone count." << std::endl;
 				return false;
 			}
 

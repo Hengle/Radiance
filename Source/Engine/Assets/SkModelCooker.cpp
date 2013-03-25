@@ -16,7 +16,7 @@ using namespace pkg;
 
 namespace asset {
 
-SkModelCooker::SkModelCooker() : Cooker(6) {
+SkModelCooker::SkModelCooker() : Cooker(7) {
 }
 
 SkModelCooker::~SkModelCooker() {
@@ -80,7 +80,7 @@ int SkModelCooker::Compile(int flags) {
 	stream::InputStream is (*ib);
 
 	tools::SceneFile map;
-	if (!tools::LoadSceneFile(is, map, false))
+	if (!tools::LoadSceneFile(is, map, true))
 		return SR_ParseError;
 
 	ib.reset();
