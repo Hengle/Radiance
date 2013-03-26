@@ -6,13 +6,26 @@
 #pragma once
 
 #include "EditorWindow.h"
+#include <QtGui/QTextEdit>
 #include <Runtime/PushPack.h>
 
 class QIcon;
-class QTextEdit;
+class QEvent;
 
 namespace tools {
 namespace editor {
+
+class RADENG_CLASS TextEditorDialogTextEdit : public QTextEdit {
+	Q_OBJECT
+public:
+
+	TextEditorDialogTextEdit(QWidget *parent = 0);
+	TextEditorDialogTextEdit(const QString &text, QWidget *parent = 0);
+
+private:
+
+	virtual bool event(QEvent *e);
+};
 
 class RADENG_CLASS TextEditorDialog : public EditorWindow {
 	Q_OBJECT

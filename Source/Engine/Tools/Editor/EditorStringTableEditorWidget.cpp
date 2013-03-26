@@ -82,10 +82,25 @@ m_sort(Qt::AscendingOrder)
 	);
 
 	addButton->setIconSize(QSize(32, 32));
+	addButton->setToolTip("Add String");
 
 	RAD_VERIFY(connect(addButton, SIGNAL(clicked()), SLOT(OnAddClicked())));
 
 	controlStrip->addWidget(addButton);
+
+	m_cloneButton = new (ZEditor) QPushButton(
+		LoadIcon("Editor/documents_new.png"),
+		QString(),
+		this
+	);
+
+	m_cloneButton->setIconSize(QSize(32, 32));
+	m_cloneButton->setEnabled(false);
+	m_cloneButton->setToolTip("Clone Selected String(s)");
+
+	RAD_VERIFY(connect(m_cloneButton, SIGNAL(clicked()), SLOT(OnCloneClicked())));
+
+	controlStrip->addWidget(m_cloneButton);
 
 	m_delButton = new (ZEditor) QPushButton(
 		LoadIcon("Editor/delete2.png"),
@@ -95,6 +110,7 @@ m_sort(Qt::AscendingOrder)
 
 	m_delButton->setIconSize(QSize(32, 32));
 	m_delButton->setEnabled(false);
+	m_delButton->setToolTip("Delete Selected String(s)");
 
 	RAD_VERIFY(connect(m_delButton, SIGNAL(clicked()), SLOT(OnDeleteClicked())));
 
@@ -240,6 +256,68 @@ void StringTableEditorWidget::OnAddClicked() {
 	SaveChanges();
 }
 
+void StringTableEditorWidget::OnCloneClicked() {
+	QModelIndexList sel = m_table->selectionModel()->selectedIndexes();
+	if (sel.empty())
+		return;
+
+	QModelIndexList mapped;
+
+	foreach (QModelIndex index, sel) {
+		if (index.column() == 0) {
+			mapped.push_back(m_sortModel->mapToSource(index));
+		}
+	}
+
+	CloneItems(mapped);
+}
+
+void StringTableEditorWidget::CloneItems(const QModelIndexList &items) {
+
+	StringVec added;
+
+	foreach (QModelIndex index, items) {
+		const StringTable::Entry::Map::const_iterator *it = m_model->IteratorForIndex(index);
+		if (it) {
+			const String &baseName = (*it)->first;
+			String name;
+
+			for (int i = 2; ; ++i) {
+				name.Printf("%s_%d", baseName.c_str.get(), i);
+
+				if (m_parser->stringTable->CreateId(name.c_str))
+					break;
+			}
+
+			const StringTable::Entry &entry = (*it)->second;
+
+			for (StringTable::Entry::Strings::const_iterator it = entry.strings.begin(); it != entry.strings.end(); ++it) {
+				m_parser->stringTable->SetString(name.c_str, (StringTable::LangId)it->first, it->second.c_str);
+			}
+
+			added.push_back(name);
+		}
+	}
+
+	if (!added.empty()) {
+		m_model->Load();
+		// select the new strings
+		m_table->setSelectionMode(QAbstractItemView::MultiSelection);
+		for (StringVec::const_iterator it = added.begin(); it != added.end(); ++it) {
+			int row = m_model->RowForId((*it).c_str);
+			QModelIndex index = m_model->IndexForRow(row);
+			index = m_sortModel->mapFromSource(index);
+			m_table->selectRow(index.row());
+			if (it == added.begin())
+				m_table->scrollTo(index);
+		}
+		m_table->setSelectionMode(QAbstractItemView::ExtendedSelection);
+		m_table->setFocus(Qt::MouseFocusReason);
+	}
+
+	SaveChanges();
+}
+
 void StringTableEditorWidget::OnDeleteClicked() {
 	QModelIndexList sel = m_table->selectionModel()->selectedIndexes();
 	if (sel.empty())
@@ -265,6 +343,7 @@ void StringTableEditorWidget::OnDeleteClicked() {
 
 void StringTableEditorWidget::OnSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
 	m_delButton->setEnabled(m_table->selectionModel()->hasSelection());
+	m_cloneButton->setEnabled(m_table->selectionModel()->hasSelection());
 }
 
 void StringTableEditorWidget::OnSortChanged(int index, Qt::SortOrder sort) {
@@ -321,6 +400,7 @@ void StringTableEditorWidget::OnItemDoubleClicked(const QModelIndex &index) {
 
 void StringTableEditorWidget::OnModelReset() {
 	m_delButton->setEnabled(false);
+	m_cloneButton->setEnabled(false);
 }
 
 void StringTableEditorWidget::SaveChanges() {

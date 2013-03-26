@@ -57,6 +57,7 @@ private slots:
 	void OnLanguageChanged(int index);
 	void OnAddClicked();
 	void OnDeleteClicked();
+	void OnCloneClicked();
 	void OnSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 	void OnSortChanged(int index, Qt::SortOrder sort);
 	void OnItemRenamed(const QModelIndex &index);
@@ -65,6 +66,7 @@ private slots:
 
 private:
 
+	void CloneItems(const QModelIndexList &items);
 	void SaveChanges();
 
 	QIcon m_icons[StringTable::LangId_MAX];
@@ -73,6 +75,7 @@ private:
 	StringTableEditorItemModel *m_model;
 	QSortFilterProxyModel *m_sortModel;
 	QPushButton *m_delButton;
+	QPushButton *m_cloneButton;
 	int m_sortColumn;
 	Qt::SortOrder m_sort;
 };
