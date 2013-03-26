@@ -539,7 +539,7 @@ void ConversationTreeEditorItemEditDialog::LoadRootPrompts() {
 	m_prompts->blockSignals(false);
 
 	if (m_prompts->count() > 0) {
-		m_prompts->item(0)->setSelected(true);
+		m_prompts->setCurrentItem(m_prompts->item(0));
 		OnSelectedPromptChanged(m_prompts->item(0));
 	}
 }
@@ -560,7 +560,7 @@ void ConversationTreeEditorItemEditDialog::LoadDialogPrompts() {
 	m_prompts->blockSignals(false);
 
 	if (m_prompts->count() > 0) {
-		m_prompts->item(0)->setSelected(true);
+		m_prompts->setCurrentItem(m_prompts->item(0));
 		OnSelectedPromptChanged(m_prompts->item(0));
 	}
 }
@@ -581,7 +581,7 @@ void ConversationTreeEditorItemEditDialog::LoadReplies() {
 	m_replies->blockSignals(false);
 
 	if (m_replies->count() > 0) {
-		m_replies->item(0)->setSelected(true);
+		m_replies->setCurrentItem(m_replies->item(0));
 		OnSelectedReplyChanged(m_replies->item(0));
 	}
 }
