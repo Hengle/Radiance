@@ -400,6 +400,8 @@ float E_ViewController::FOV::Tick(float dt, float distance) {
 	return f;
 }
 
+int E_ViewController::LookTarget::s_nextId(0);
+
 Vec3 E_ViewController::LookTarget::Tick(
 	List &list,
 	const Vec3 &pos, 
@@ -454,7 +456,7 @@ Vec3 E_ViewController::LookTarget::Tick(
 
 		Vec3 tfwd = x.target - pos;
 		tfwd.Normalize();
-		nfwd = math::Lerp(nfwd, tfwd, x.frac);
+		nfwd = math::Lerp(nfwd, tfwd, x.frac*x.weight);
 		
 		if (it == list.begin())
 			break;
@@ -621,7 +623,9 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 
 	float fov = m_rail.fov;
 
-	if (!m_rail.cinematicFOV) {
+	if (m_rail.cinematicFOV) {
+		fov += TickFOV(frame, dt, -1.f);
+	} else {
 		fov = TickFOV(frame, dt, distance);
 	}
 
@@ -789,7 +793,8 @@ float E_ViewController::TickFOV(int frame, float dt, float distance) {
 		}
 	}
 	
-	fov += FOV::Tick(m_fovs, dt, distance);
+	if (distance >= 0.f)
+		fov += FOV::Tick(m_fovs, dt, distance);
 	fov = math::Clamp(fov, 0.f, 360.f);
 
 	return fov;
@@ -966,7 +971,7 @@ void E_ViewController::BlendToTarget(float time) {
 	m_blendTime[1] = time;
 }
 
-void E_ViewController::BlendToLookTarget(
+int E_ViewController::BlendToLookTarget(
 	const Vec3 &target, 
 	float in, 
 	float out, 
@@ -982,7 +987,35 @@ void E_ViewController::BlendToLookTarget(
 	t.frac = 0.f;
 	t.smooth[0] = inSmooth;
 	t.smooth[1] = outSmooth;
+	t.id = LookTarget::s_nextId++;
 	m_looks.push_back(t);
+
+	return t.id;
+}
+
+void E_ViewController::FadeOutLookTarget(int id, float time) {
+	for (LookTarget::List::iterator it = m_looks.begin(); it != m_looks.end(); ++it) {
+		LookTarget &t = *it;
+		if (t.id == id) {
+			if (t.blend.step != Blend::kStep_Done &&
+				t.blend.step != Blend::kStep_Out) {
+				t.blend.step = Blend::kStep_Out;
+				t.blend.out[1] = time;
+			}
+			break;
+		}
+	}
+}
+
+void E_ViewController::FadeOutLookTargets(float time) {
+	for (LookTarget::List::iterator it = m_looks.begin(); it != m_looks.end(); ++it) {
+		LookTarget &t = *it;
+		if (t.blend.step != Blend::kStep_Done &&
+			t.blend.step != Blend::kStep_Out) {
+			t.blend.step = Blend::kStep_Out;
+			t.blend.out[1] = time;
+		}
+	}
 }
 
 int E_ViewController::lua_SetTargetMode(lua_State *L) {
@@ -1132,7 +1165,7 @@ int E_ViewController::lua_BlendToTarget(lua_State *L) {
 
 int E_ViewController::lua_BlendToLookTarget(lua_State *L) {
 	E_ViewController *self = static_cast<E_ViewController*>(WorldLua::EntFramePtr(L, 1, true));
-	self->BlendToLookTarget(
+	int id = self->BlendToLookTarget(
 		lua::Marshal<Vec3>::Get(L, 2, true),
 		(float)luaL_checknumber(L, 3),
 		(float)luaL_checknumber(L, 4),
@@ -1141,6 +1174,22 @@ int E_ViewController::lua_BlendToLookTarget(lua_State *L) {
 		(float)luaL_checknumber(L, 7),
 		(float)luaL_checknumber(L, 8)
 	);
+	lua_pushinteger(L, id);
+	return 1;
+}
+
+int E_ViewController::lua_FadeOutLookTarget(lua_State *L) {
+	E_ViewController *self = static_cast<E_ViewController*>(WorldLua::EntFramePtr(L, 1, true));
+	self->FadeOutLookTarget(
+		(int)luaL_checkinteger(L, 2),
+		(float)luaL_checknumber(L, 3)
+	);
+	return 0;
+}
+
+int E_ViewController::lua_FadeOutLookTargets(lua_State *L) {
+	E_ViewController *self = static_cast<E_ViewController*>(WorldLua::EntFramePtr(L, 1, true));
+	self->FadeOutLookTargets(luaL_checknumber(L, 2));
 	return 0;
 }
 
@@ -1183,6 +1232,10 @@ void E_ViewController::PushCallTable(lua_State *L) {
 	lua_setfield(L, -2, "BlendToTarget");
 	lua_pushcfunction(L, lua_BlendToLookTarget);
 	lua_setfield(L, -2, "BlendToLookTarget");
+	lua_pushcfunction(L, lua_FadeOutLookTarget);
+	lua_setfield(L, -2, "FadeOutLookTarget");
+	lua_pushcfunction(L, lua_FadeOutLookTargets);
+	lua_setfield(L, -2, "FadeOutLookTargets");
 	lua_pushcfunction(L, lua_Sync);
 	lua_setfield(L, -2, "Sync");
 	LUART_REGISTER_GETSET(L, Target);

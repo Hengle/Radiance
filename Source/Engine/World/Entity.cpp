@@ -520,8 +520,12 @@ bool Entity::LoadLuaCallback(lua_State *L, int id, int frame, bool release, bool
 
 	int bucket = id / kMaxLuaCallbacks;
 	int idx = id & (kMaxLuaCallbacks-1);
-	if ((m_luaCallbacks[bucket]&(1<<idx)) == 0)
+	if ((m_luaCallbacks[bucket]&(1<<idx)) == 0) {
+#if !defined(RAD_OPT_SHIP)
+		RAD_FAIL("Entity::LoadLuaCallback: Invalid lua callback index.");
+#endif
 		return false;
+	}
 
 	if (frame == lua::InvalidIndex)
 		PushEntityFrame(L);
@@ -577,7 +581,11 @@ void Entity::ReleaseLuaCallback(int id, int frame) {
 void Entity::ReleaseLuaCallback(lua_State *L, int id, int frame, bool luaError) {
 	int bucket = id / kMaxLuaCallbacks;
 	int idx = id & (kMaxLuaCallbacks-1);
+#if !defined(RAD_OPT_SHIP)
+	RAD_VERIFY(m_luaCallbacks[bucket]&(1<<idx));
+#else
 	RAD_ASSERT(m_luaCallbacks[bucket]&(1<<idx));
+#endif
 	m_luaCallbacks[bucket] &= ~(1<<idx);
 	m_luaCallbackIdx = id;
 

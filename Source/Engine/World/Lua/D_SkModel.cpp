@@ -137,8 +137,7 @@ int D_SkModel::lua_BlendToState(lua_State *L) {
 		return 1;
 	}
 
-	lua_pushnil(L);
-	return 1;
+	return 0;
 }
 
 int D_SkModel::lua_SetRootController(lua_State *L) {
@@ -228,7 +227,9 @@ void D_SkModel::Notify::OnEndFrame(const ska::AnimStateEventData &data) {
 	entity->world->lua->Call(L, "D_SkModel::Notify::OnEndFrame", 1, 0, 0);
 	lua_pop(L, 1); // pop callback table
 
-	entity->ReleaseLuaCallback(m_callbackId);
+	entity = m_entity.lock(); // must be done, we could have been explicitly released during this callback
+	if (entity)
+		entity->ReleaseLuaCallback(m_callbackId);
 	m_entity.reset();
 }
 
@@ -253,7 +254,9 @@ void D_SkModel::Notify::OnFinish(const ska::AnimStateEventData &data, bool maske
 	entity->world->lua->Call(L, "D_SkModel::Notify::OnFinish", 1, 0, 0);
 	lua_pop(L, 1); // pop callback table
 
-	entity->ReleaseLuaCallback(m_callbackId);
+	entity = m_entity.lock(); // must be done, we could have been explicitly released during this callback
+	if (entity)
+		entity->ReleaseLuaCallback(m_callbackId);
 	m_entity.reset();
 }
 

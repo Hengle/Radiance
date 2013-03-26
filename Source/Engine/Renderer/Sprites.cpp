@@ -57,7 +57,7 @@ void SpriteBatch::Init(int minSprites, int maxSprites) {
 		ZRender,
 		"spritebatch",
 		sizeof(Sprite),
-		64,
+		(maxSprites > 64) ? 64 : maxSprites,
 		kDefaultAlignment,
 		(maxSprites > 0) ? maxSprites : std::numeric_limits<int>::max()
 	);

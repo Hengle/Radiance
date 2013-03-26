@@ -152,7 +152,8 @@ public:
 
 	void BlendToTarget(float time);
 
-	void BlendToLookTarget(
+	// returns id
+	int BlendToLookTarget(
 		const Vec3 &target,
 		float in,
 		float out,
@@ -161,6 +162,10 @@ public:
 		float inSmooth, // The smooth factor, 0 = no smoothing, numbers very close to zero are very "laggy". Larger numbers are less smooth.
 		float outSmooth 
 	);
+
+	void FadeOutLookTarget(int id, float time);
+	void FadeOutLookTargets(float time);
+
 
 protected:
 
@@ -286,10 +291,12 @@ private:
 
 		Blend blend;
 		Vec3 target;
+		int id;
 		float weight;
 		float frac;
 		float smooth[2];
 
+		static int s_nextId;
 		static Vec3 Tick(List &list, const Vec3 &pos, const Vec3 &fwd, float dt);
 	};
 
@@ -309,6 +316,8 @@ private:
 	static int lua_LerpCameraFOVShift(lua_State *L);
 	static int lua_BlendToTarget(lua_State *L);
 	static int lua_BlendToLookTarget(lua_State *L);
+	static int lua_FadeOutLookTarget(lua_State *L);
+	static int lua_FadeOutLookTargets(lua_State *L);
 	static int lua_Sync(lua_State *L);
 	
 	ENT_DECL_GETSET(Target);
