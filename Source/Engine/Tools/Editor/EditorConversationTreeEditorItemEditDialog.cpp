@@ -135,6 +135,10 @@ void ConversationTreeStringOptionEditWidget::SetLangId(int langId) {
 	LoadText();
 }
 
+QString ConversationTreeStringOptionEditWidget::Text() const {
+	return m_text->toPlainText();
+}
+
 void ConversationTreeStringOptionEditWidget::LoadText() {
 	if (m_opt) {
 		const String *string = m_stringTable->Find(m_opt->text.c_str, (StringTable::LangId)m_langId);
@@ -252,6 +256,7 @@ void ConversationTreeEditorItemEditDialog::InitRoot() {
 	vbox->addLayout(hbox);
 
 	m_promptEdit = new (ZEditor) ConversationTreeStringOptionEditWidget(m_langId, *m_parser->stringTable);
+	RAD_VERIFY(connect(m_promptEdit, SIGNAL(OnDataChanged()), SLOT(DoAutoName())));
 	vbox->addWidget(m_promptEdit);
 
 	outer->addWidget(group, 0, 1);
@@ -325,6 +330,7 @@ void ConversationTreeEditorItemEditDialog::InitDialog() {
 	vbox->addLayout(hbox);
 
 	m_promptEdit = new (ZEditor) ConversationTreeStringOptionEditWidget(m_langId, *m_parser->stringTable);
+	RAD_VERIFY(connect(m_promptEdit, SIGNAL(OnDataChanged()), SLOT(DoAutoName())));
 	vbox->addWidget(m_promptEdit);
 
 	outer->addWidget(group, 0, 1);
@@ -369,6 +375,14 @@ void ConversationTreeEditorItemEditDialog::InitDialog() {
 	outer->addLayout(hbox, 1, 0, 1, 3);
 
 	Load();
+}
+
+void ConversationTreeEditorItemEditDialog::DoAutoName() {
+	if (m_name->text() == "[Enter Name]") {
+		QString text = m_promptEdit->Text();
+		if (!text.isEmpty())
+			m_name->setText(text);
+	}
 }
 
 void ConversationTreeEditorItemEditDialog::OnAddPrompt() {

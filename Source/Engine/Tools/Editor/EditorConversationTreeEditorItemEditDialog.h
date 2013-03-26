@@ -38,6 +38,7 @@ public:
 	void Load(asset::ConversationTree::StringOption *opt);
 	void ReloadStrings();
 	void SetLangId(int langId);
+	QString Text() const;
 
 signals:
 
@@ -106,6 +107,7 @@ private slots:
 	void OnNameChanged(const QString &text);
 	void OnSelectedPromptChanged(QListWidgetItem *current);
 	void OnSelectedReplyChanged(QListWidgetItem *current);
+	void DoAutoName();
 
 private:
 
