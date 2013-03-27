@@ -797,6 +797,8 @@ int Entity::LUART_SETFN(FloorPosition) (lua_State *L) {
 	Entity *self = WorldLua::EntFramePtr(L, 1, true);
 	self->m_ps.moveState.pos = lua::Marshal<FloorPosition>::Get(L, 2, true);
 	self->m_ps.origin = self->m_ps.moveState.pos.pos.get() - Vec3(0, 0, self->m_ps.bbox.Mins()[2]); // put bbox on floor.
+	self->CancelFloorMove();
+	self->m_ps.moveState.moveAnim = false;
 	return 0;
 }
 
@@ -830,8 +832,15 @@ ENT_SET_CUSTOM(Entity, SolidType, self->m_ps.stype = (SolidType)luaL_checkintege
 ENT_GET(Entity, OccupantType, int, m_ps.otype);
 ENT_SET_CUSTOM(Entity, OccupantType, self->m_ps.otype = (OccupantType)luaL_checkinteger(L, 2));
 ENT_GETSET(Entity, Flags, int, m_ps.flags);
-ENT_GETSET(Entity, NextThink, float, m_nextLuaThink);
+ENT_GET(Entity, NextThink, float, m_nextLuaThink);
 ENT_GETSET(Entity, ClassBits, int, m_classbits);
+
+int Entity::LUART_SETFN(NextThink) (lua_State *L) {
+	Entity *self = WorldLua::EntFramePtr(L, 1, true);
+	self->m_nextLuaThink = luaL_checknumber(L, 2);
+	self->m_lastLuaThink = self->world->gameTime;
+	return 0;
+}
 
 void Entity::SetNextTick(float dt) {
 	m_nextTick = dt;
@@ -843,4 +852,5 @@ void Entity::SetNextTick(float dt) {
 
 RADREFLECT_BEGIN_CLASS_NAMESPACE("world::EntityFactoryAttribute", world, EntityFactoryAttribute)
 RADREFLECT_END_NAMESPACE(RADENG_API, world, EntityFactoryAttribute)
+
 
