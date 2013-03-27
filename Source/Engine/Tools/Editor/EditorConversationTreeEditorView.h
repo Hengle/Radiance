@@ -41,10 +41,13 @@ public:
 
 signals:
 	void OnDataChanged();
+	void OnRootDoubleClicked(asset::ConversationTree::Root &root);
+	void OnDialogDoubleClicked(asset::ConversationTree::Dialog &dialog);
 
 private slots:
 
 	void SelectionChanged();
+	void OnItemDoubleClicked(QGraphicsItem &item);
 	void OnDeleteKey();
 	void OnDialogDropped(ConversationTreeEditorViewItem *item, int uid);
 
@@ -125,10 +128,12 @@ public:
 signals:
 
 	void OnDialogDropped(ConversationTreeEditorViewItem *item, int uid);
+	void OnDoubleClick(QGraphicsItem &item);
 
 protected:
 
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
+	virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent);
 	virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
 	virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
 	virtual void dropEvent(QGraphicsSceneDragDropEvent *event);

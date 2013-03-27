@@ -155,12 +155,15 @@ private:
 	QLineEdit *m_group;
 	QLineEdit *m_action;
 	QLineEdit *m_condition;
+	QLineEdit *m_priority;
 	QLineEdit *m_probabilityLow;
 	QLineEdit *m_probabilityHigh;
 	QListWidget *m_prompts;
 	QListWidget *m_replies;
-	QCheckBox *m_hidden;
 	QCheckBox *m_locked;
+	QCheckBox *m_autoGenerate;
+	QCheckBox *m_procedural;
+	QCheckBox *m_shuffle;
 	QPushButton *m_deletePrompt;
 	QPushButton *m_deleteReply;
 	QPushButton *m_ok;

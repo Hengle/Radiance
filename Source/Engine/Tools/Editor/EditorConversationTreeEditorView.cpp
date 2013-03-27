@@ -32,7 +32,8 @@ ConversationTreeEditorView::ConversationTreeEditorView(
 	
 	RAD_VERIFY(connect(m_scene, SIGNAL(selectionChanged()), SLOT(SelectionChanged())));
 	RAD_VERIFY(connect(m_scene, SIGNAL(OnDialogDropped(ConversationTreeEditorViewItem *, int)), SLOT(OnDialogDropped(ConversationTreeEditorViewItem *, int))));
-		
+	RAD_VERIFY(connect(m_scene, SIGNAL(OnDoubleClick(QGraphicsItem&)), SLOT(OnItemDoubleClicked(QGraphicsItem&))));
+
 	m_view = new (ZEditor) ConversationTreeEditorViewGraphicsView(m_scene);
 	m_view->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 	m_view->setAcceptDrops(true);
@@ -80,11 +81,29 @@ void ConversationTreeEditorView::SelectionChanged() {
 		SelectItem(item);
 }
 
+void ConversationTreeEditorView::OnItemDoubleClicked(QGraphicsItem &item) {
+	TreeItem::Ref ref = ItemForViewItem(static_cast<ConversationTreeEditorViewItem&>(item));
+	if (!ref && m_root) {
+		// root is uneditable in view
+		if (m_root->viewItem == &static_cast<ConversationTreeEditorViewItem&>(item))
+			ref = m_root;
+	}
+	if (ref) {
+		if (ref->root) {
+			emit OnRootDoubleClicked(*ref->root);
+		} else {
+			RAD_ASSERT(ref->dialog);
+			emit OnDialogDoubleClicked(*ref->dialog);
+		}
+	}
+}
+
 void ConversationTreeEditorView::OnDeleteKey() {
 	TreeItem::Ref item = GetSelectedItemFromScene();
 	if (item) {
 		RemoveItem(item);
 		LayoutItems();
+		emit OnDataChanged();
 	}
 }
 
@@ -640,6 +659,14 @@ ConversationTreeEditorViewGraphicsScene::ConversationTreeEditorViewGraphicsScene
 
 void ConversationTreeEditorViewGraphicsScene::EmitDialogDropped(ConversationTreeEditorViewItem *item, int uid) {
 	emit OnDialogDropped(item, uid);
+}
+
+void ConversationTreeEditorViewGraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent) {
+	QGraphicsScene::mouseDoubleClickEvent(mouseEvent);
+	QGraphicsItem *item = this->itemAt(mouseEvent->scenePos());
+	if (item) {
+		emit OnDoubleClick(*item);
+	}
 }
 
 void ConversationTreeEditorViewGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {

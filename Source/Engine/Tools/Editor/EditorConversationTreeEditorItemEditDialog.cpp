@@ -207,6 +207,9 @@ void ConversationTreeEditorItemEditDialog::InitRoot() {
 	m_group = new (ZEditor) QLineEdit();
 	form->addRow("Group:", m_group);
 
+	m_priority = new (ZEditor) QLineEdit();
+	form->addRow("Priority:", m_priority);
+
 	QGroupBox *pgroup = new (ZEditor) QGroupBox("Probability");
 	QFormLayout *pform = new (ZEditor) QFormLayout(pgroup);
 
@@ -222,10 +225,14 @@ void ConversationTreeEditorItemEditDialog::InitRoot() {
 
 	pgroup = new (ZEditor) QGroupBox("Flags");
 	QGridLayout *pgrid = new (ZEditor) QGridLayout(pgroup);
-	m_hidden = new (ZEditor) QCheckBox("Hidden");
-	pgrid->addWidget(m_hidden, 0, 0);
 	m_locked = new (ZEditor) QCheckBox("Locked");
-	pgrid->addWidget(m_locked, 0, 1);
+	pgrid->addWidget(m_locked, 0, 0);
+	m_autoGenerate = new (ZEditor) QCheckBox("Auto Generate Choices");
+	pgrid->addWidget(m_autoGenerate, 1, 0);
+	m_procedural = new (ZEditor) QCheckBox("Used In Auto Generation");
+	pgrid->addWidget(m_procedural, 2, 0);
+	m_shuffle = new (ZEditor) QCheckBox("Shuffle Choices");
+	pgrid->addWidget(m_shuffle, 3, 0);
 
 	form->addRow(pgroup);
 
@@ -280,9 +287,10 @@ void ConversationTreeEditorItemEditDialog::InitRoot() {
 void ConversationTreeEditorItemEditDialog::InitDialog() {
 	setWindowTitle("Edit Dialog");
 
-	m_hidden = 0;
 	m_locked = 0;
 	m_group = 0;
+	m_priority = 0;
+	m_procedural = 0;
 	m_probabilityHigh = 0;
 
 	QGridLayout *outer = new (ZEditor) QGridLayout(this);
@@ -302,6 +310,15 @@ void ConversationTreeEditorItemEditDialog::InitDialog() {
 	m_probabilityLow = new (ZEditor) QLineEdit();
 	m_probabilityLow->setValidator(new (ZEditor) QDoubleValidator(this));
 	form->addRow("Probability (0-1)", m_probabilityLow);
+
+	QGroupBox *pgroup = new (ZEditor) QGroupBox("Flags");
+	QGridLayout *pgrid = new (ZEditor) QGridLayout(pgroup);
+	m_autoGenerate = new (ZEditor) QCheckBox("Auto Generate Choices");
+	pgrid->addWidget(m_autoGenerate, 1, 0);
+	m_shuffle = new (ZEditor) QCheckBox("Shuffle Choices");
+	pgrid->addWidget(m_shuffle, 2, 0);
+	
+	form->addRow(pgroup);
 
 	outer->addWidget(group, 0, 0);
 
@@ -518,12 +535,15 @@ void ConversationTreeEditorItemEditDialog::LoadRoot() {
 	m_name->setText(m_root->name.c_str.get());
 	m_ok->setEnabled(!m_name->text().isEmpty());
 	m_group->setText(m_root->group.c_str.get());
+	m_priority->setText(QString("%1").arg(m_root->priority));
 	m_probabilityLow->setText(QString("%1").arg(m_root->probability[0]));
 	m_probabilityHigh->setText(QString("%1").arg(m_root->probability[0]));
 
-	m_hidden->setChecked((m_root->flags & asset::ConversationTree::kRootFlag_Hidden) ? true : false);
-	m_locked->setChecked((m_root->flags & asset::ConversationTree::kRootFlag_Locked) ? true : false);
-	
+	m_locked->setChecked((m_root->flags & asset::ConversationTree::kChatFlag_Locked) ? true : false);
+	m_autoGenerate->setChecked((m_root->flags & asset::ConversationTree::kChatFlag_AutoGenerate) ? true : false);
+	m_procedural->setChecked((m_root->flags & asset::ConversationTree::kChatFlag_Procedural) ? true : false);
+	m_shuffle->setChecked((m_root->flags & asset::ConversationTree::kChatFlag_ShuffleChoices) ? true : false);
+
 	LoadRootPrompts();
 }
 
@@ -533,6 +553,8 @@ void ConversationTreeEditorItemEditDialog::LoadDialog() {
 	m_action->setText(m_dialog->action.c_str.get());
 	m_condition->setText(m_dialog->condition.c_str.get());
 	m_probabilityLow->setText(QString("%1").arg(m_dialog->probability));
+	m_autoGenerate->setChecked((m_dialog->flags & asset::ConversationTree::kChatFlag_AutoGenerate) ? true : false);
+	m_shuffle->setChecked((m_dialog->flags & asset::ConversationTree::kChatFlag_ShuffleChoices) ? true : false);
 	LoadDialogPrompts();
 	LoadReplies();
 }
@@ -603,14 +625,19 @@ void ConversationTreeEditorItemEditDialog::LoadReplies() {
 void ConversationTreeEditorItemEditDialog::SaveRoot() {
 	m_root->name = m_name->text().toAscii().constData();
 	m_root->group = m_group->text().toAscii().constData();
+	m_root->priority = m_priority->text().toFloat();
 	m_root->probability[0] = m_probabilityLow->text().toFloat();
 	m_root->probability[1] = m_probabilityHigh->text().toFloat();
 
 	m_root->flags = 0;
-	if (m_hidden->isChecked())
-		m_root->flags |= asset::ConversationTree::kRootFlag_Hidden;
 	if (m_locked->isChecked())
-		m_root->flags |= asset::ConversationTree::kRootFlag_Locked;
+		m_root->flags |= asset::ConversationTree::kChatFlag_Locked;
+	if (m_autoGenerate->isChecked())
+		m_root->flags |= asset::ConversationTree::kChatFlag_AutoGenerate;
+	if (m_procedural->isChecked())
+		m_root->flags |= asset::ConversationTree::kChatFlag_Procedural;
+	if (m_shuffle->isChecked())
+		m_root->flags |= asset::ConversationTree::kChatFlag_ShuffleChoices;
 }
 
 void ConversationTreeEditorItemEditDialog::SaveDialog() {
@@ -618,6 +645,12 @@ void ConversationTreeEditorItemEditDialog::SaveDialog() {
 	m_dialog->action = m_action->text().toAscii().constData();
 	m_dialog->condition = m_condition->text().toAscii().constData();
 	m_dialog->probability = m_probabilityLow->text().toFloat();
+
+	m_dialog->flags = 0;
+	if (m_autoGenerate->isChecked())
+		m_dialog->flags |= asset::ConversationTree::kChatFlag_AutoGenerate;
+	if (m_shuffle->isChecked())
+		m_dialog->flags |= asset::ConversationTree::kChatFlag_ShuffleChoices;
 }
 
 void ConversationTreeEditorItemEditDialog::done(int r) {

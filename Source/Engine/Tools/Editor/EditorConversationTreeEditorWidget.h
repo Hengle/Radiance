@@ -46,11 +46,16 @@ private slots:
 	void OnRootListSelected(QListWidgetItem *item);
 	void OnDialogListSelected(QListWidgetItem *item);
 	void SaveChanges();
+	void OnEditDialog(asset::ConversationTree::Dialog &dialog);
+	void OnEditRoot(asset::ConversationTree::Root &root);
 
 private:
 
 	void LoadRoots();
 	void LoadDialog();
+
+	void EditRoot(QListWidgetItem &item);
+	void EditDialog(QListWidgetItem &item);
 	
 	void RemoveDialogFromTree(asset::ConversationTree::Dialog &dialog);
 

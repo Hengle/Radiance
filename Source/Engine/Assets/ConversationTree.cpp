@@ -16,7 +16,8 @@ namespace asset {
 namespace {
 	enum {
 		kBinTag = RAD_FOURCC_LE('C', 'O', 'N', 'V'),
-		kBinVer = 1
+		kBinVer1 = 1,
+		kBinVer = 2,
 	};
 }
 
@@ -104,6 +105,8 @@ int ConversationTree::PushCopy(lua_State *L) const {
 	if (m_roots->empty())
 		return 0;
 
+	lua_createtable(L, 0, 2); // outer table that is returned
+
 	// push empty dialog table that can be linked up
 	lua_createtable(L, (int)m_dialogs.size(), 0);
 
@@ -111,7 +114,7 @@ int ConversationTree::PushCopy(lua_State *L) const {
 		const Dialog &dialog = *it->second;
 		lua_pushinteger(L, dialog.uid);
 
-		int numTableElems = 3;
+		int numTableElems = 4;
 		if (!dialog.action.empty)
 			++numTableElems;
 		if (!dialog.condition.empty)
@@ -138,22 +141,26 @@ int ConversationTree::PushCopy(lua_State *L) const {
 			continue;
 		if (root.prompts->empty())
 			continue;
-		if (root.dialog->empty())
-			continue;
+		if (root.dialog->empty()) {
+			if (!(root.flags&kChatFlag_AutoGenerate))
+				continue;
+		}
 		
 		lua_pushstring(L, root.name.c_str);
 		PushRoot(L, root, dialogTable);
 		lua_settable(L, -3);
 	}
+	lua_setfield(L, -3, "roots");
 
-	lua_remove(L, dialogTable);
+	RAD_ASSERT(dialogTable == lua_gettop(L));
+	lua_setfield(L, -2, "dialogs");
 
 	return 1;
 }
 
 void ConversationTree::PushRoot(lua_State *L, const Root &root, int dialogTable) const {
 
-	lua_createtable(L, 0, 4);
+	lua_createtable(L, 0, 6);
 	
 	// reply = {{prob = {0, 1}, "REPLY"}}
 	lua_createtable(L, (int)root.prompts->size(), 0);
@@ -201,6 +208,12 @@ void ConversationTree::PushRoot(lua_State *L, const Root &root, int dialogTable)
 		lua_pushstring(L, root.group.c_str);
 		lua_setfield(L, -2, "group");
 	}
+
+	lua_pushnumber(L, root.priority);
+	lua_setfield(L, -2, "priority");
+
+	lua_pushinteger(L, root.flags);
+	lua_setfield(L, -2, "flags");
 }
 
 void ConversationTree::PushDialog(lua_State *L, const Dialog &dialog, int dialogTable) const {
@@ -269,6 +282,9 @@ void ConversationTree::PushDialog(lua_State *L, const Dialog &dialog, int dialog
 		lua_setfield(L, -2, "prob");
 	}
 
+	lua_pushinteger(L, dialog.flags);
+	lua_setfield(L, -2, "flags");
+
 	lua_pop(L, 1);
 }
 
@@ -334,6 +350,8 @@ bool ConversationTree::SaveBinRoot(const Root &root, stream::OutputStream &os) c
 		return false;
 	if (!os.Write(root.flags))
 		return false;
+	if (!os.Write(root.priority))
+		return false;
 
 	if (!os.Write((U32)root.prompts->size()))
 		return false;
@@ -364,6 +382,8 @@ bool ConversationTree::SaveBinDialog(const Dialog &dialog, stream::OutputStream 
 	if (!os.Write(dialog.condition))
 		return false;
 	if (!os.Write(dialog.probability))
+		return false;
+	if (!os.Write((S32)dialog.flags))
 		return false;
 	
 	if (!os.Write((U32)dialog.prompts->size()))
@@ -411,7 +431,7 @@ bool ConversationTree::LoadBin(stream::InputStream &_is) {
 	U32 tag, ver;
 	if (!(is.Read(&tag) && is.Read(&ver)))
 		return false;
-	if (tag != kBinTag || ver != kBinVer)
+	if (tag != kBinTag || ver > kBinVer)
 		return false;
 
 	S32 nextUID;
@@ -438,7 +458,7 @@ bool ConversationTree::LoadBin(stream::InputStream &_is) {
 			return false;
 		Dialog *d = m_dialogs[uid];
 		RAD_ASSERT(d);
-		if (!LoadBinDialog(*d, is))
+		if (!LoadBinDialog(*d, is, ver))
 			return false;
 	}
 
@@ -447,7 +467,7 @@ bool ConversationTree::LoadBin(stream::InputStream &_is) {
 		return false;
 
 	for (U32 i = 0; i < numRoots; ++i) {
-		Root *r = LoadBinRoot(is);
+		Root *r = LoadBinRoot(is, ver);
 		if (!r)
 			return false;
 		m_roots->push_back(r);
@@ -456,7 +476,7 @@ bool ConversationTree::LoadBin(stream::InputStream &_is) {
 	return true;
 }
 
-ConversationTree::Root *ConversationTree::LoadBinRoot(stream::InputStream &is) {
+ConversationTree::Root *ConversationTree::LoadBinRoot(stream::InputStream &is, int version) {
 	Root *r = NewRoot();
 	if (!is.Read(&r->name)) {
 		DeleteRoot(*r);
@@ -478,6 +498,13 @@ ConversationTree::Root *ConversationTree::LoadBinRoot(stream::InputStream &is) {
 		return 0;
 	}
 
+	if (version > kBinVer1) {
+		if (!is.Read(&r->priority)) {
+			DeleteRoot(*r);
+			return 0;
+		}
+	}
+
 	U32 count;
 	if (!is.Read(&count)) {
 		DeleteRoot(*r);
@@ -486,7 +513,7 @@ ConversationTree::Root *ConversationTree::LoadBinRoot(stream::InputStream &is) {
 
 	for (U32 i = 0; i < count; ++i) {
 		StringOption x;
-		if (!LoadBinStringOption(x, is)) {
+		if (!LoadBinStringOption(x, is, version)) {
 			DeleteRoot(*r);
 			return 0;
 		}
@@ -511,7 +538,7 @@ ConversationTree::Root *ConversationTree::LoadBinRoot(stream::InputStream &is) {
 	return r;
 }
 
-bool ConversationTree::LoadBinDialog(Dialog &dialog, stream::InputStream &is) {
+bool ConversationTree::LoadBinDialog(Dialog &dialog, stream::InputStream &is, int version) {
 	// UID read by LoadBin function
 
 	if (!is.Read(&dialog.name))
@@ -529,6 +556,14 @@ bool ConversationTree::LoadBinDialog(Dialog &dialog, stream::InputStream &is) {
 		return false;
 	}
 
+	if (version > kBinVer1) {
+		S32 n;
+		if (!is.Read(&n)) {
+			return false;
+		}
+		dialog.flags = n;
+	}
+
 	U32 count;
 	if (!is.Read(&count)) {
 		return false;
@@ -536,7 +571,7 @@ bool ConversationTree::LoadBinDialog(Dialog &dialog, stream::InputStream &is) {
 
 	for (U32 i = 0; i < count; ++i) {
 		StringOption x;
-		if (!LoadBinStringOption(x, is)) {
+		if (!LoadBinStringOption(x, is, version)) {
 			return false;
 		}
 		dialog.prompts->push_back(x);
@@ -548,7 +583,7 @@ bool ConversationTree::LoadBinDialog(Dialog &dialog, stream::InputStream &is) {
 
 	for (U32 i = 0; i < count; ++i) {
 		StringOption x;
-		if (!LoadBinStringOption(x, is)) {
+		if (!LoadBinStringOption(x, is, version)) {
 			return false;
 		}
 		dialog.replies->push_back(x);
@@ -571,7 +606,7 @@ bool ConversationTree::LoadBinDialog(Dialog &dialog, stream::InputStream &is) {
 	return true;
 }
 
-bool ConversationTree::LoadBinStringOption(StringOption &opt, stream::InputStream &is) {
+bool ConversationTree::LoadBinStringOption(StringOption &opt, stream::InputStream &is, int version) {
 	if (!is.Read(&opt.probability[0]))
 		return false;
 	if (!is.Read(&opt.probability[1]))

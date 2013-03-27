@@ -14,7 +14,7 @@ using namespace pkg;
 
 namespace asset {
 
-ConversationTreeCooker::ConversationTreeCooker() : Cooker(0) {
+ConversationTreeCooker::ConversationTreeCooker() : Cooker(1) {
 }
 
 ConversationTreeCooker::~ConversationTreeCooker() {

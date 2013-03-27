@@ -46,6 +46,8 @@ ConversationTreeEditorWidget::ConversationTreeEditorWidget(
 	
 	m_view = new (ZEditor) ConversationTreeEditorView(m_langId, m_parser);
 	RAD_VERIFY(connect(m_view, SIGNAL(OnDataChanged()), SLOT(SaveChanges())));
+	RAD_VERIFY(connect(m_view, SIGNAL(OnRootDoubleClicked(asset::ConversationTree::Root&)), SLOT(OnEditRoot(asset::ConversationTree::Root&))));
+	RAD_VERIFY(connect(m_view, SIGNAL(OnDialogDoubleClicked(asset::ConversationTree::Dialog&)), SLOT(OnEditDialog(asset::ConversationTree::Dialog&))));
 
 	hbox->addWidget(m_view);
 
@@ -152,8 +154,21 @@ ConversationTreeEditorWidget::ConversationTreeEditorWidget(
 
 void ConversationTreeEditorWidget::EditRootPressed() {
 	QListWidgetItem *item = m_roots->currentItem();
-	asset::ConversationTree::Root *root = (asset::ConversationTree::Root*)item->data(Qt::UserRole).value<void*>();
+	EditRoot(*item);
+}
 
+void ConversationTreeEditorWidget::OnEditRoot(asset::ConversationTree::Root &root) {
+	for (int i = 0; i < m_roots->count(); ++i) {
+		QListWidgetItem *item = m_roots->item(i);
+		if (&root == (asset::ConversationTree::Root*)item->data(Qt::UserRole).value<void*>()) {
+			EditRoot(*item);
+			break;
+		}
+	}
+}
+
+void ConversationTreeEditorWidget::EditRoot(QListWidgetItem &item) {
+	asset::ConversationTree::Root *root = (asset::ConversationTree::Root*)item.data(Qt::UserRole).value<void*>();
 	ConversationTreeEditorItemEditDialog dlg(m_langId, *root, *m_parser, this);
 	
 	while (dlg.exec() == QDialog::Accepted) {
@@ -166,7 +181,7 @@ void ConversationTreeEditorWidget::EditRootPressed() {
 		}
 
 		*root = *dlg.root.get();
-		item->setText(root->name.c_str.get());
+		item.setText(root->name.c_str.get());
 		m_view->ReloadItems();
 		SaveChanges();
 		break;
@@ -227,7 +242,21 @@ void ConversationTreeEditorWidget::DeleteRootPressed() {
 
 void ConversationTreeEditorWidget::EditDialogPressed() {
 	QListWidgetItem *item = m_dialog->currentItem();
-	asset::ConversationTree::Dialog *dialog = (asset::ConversationTree::Dialog*)item->data(Qt::UserRole).value<void*>();
+	EditDialog(*item);
+}
+
+void ConversationTreeEditorWidget::OnEditDialog(asset::ConversationTree::Dialog &dialog) {
+	for (int i = 0; i < m_dialog->count(); ++i) {
+		QListWidgetItem *item = m_dialog->item(i);
+		if (&dialog == (asset::ConversationTree::Dialog*)item->data(Qt::UserRole).value<void*>()) {
+			EditDialog(*item);
+			break;
+		}
+	}
+}
+
+void ConversationTreeEditorWidget::EditDialog(QListWidgetItem &item) {
+	asset::ConversationTree::Dialog *dialog = (asset::ConversationTree::Dialog*)item.data(Qt::UserRole).value<void*>();
 
 	ConversationTreeEditorItemEditDialog dlg(m_langId, *dialog, *m_parser, this);
 	
@@ -241,7 +270,7 @@ void ConversationTreeEditorWidget::EditDialogPressed() {
 		}
 
 		*dialog = *dlg.dialog.get();
-		item->setText(dialog->name.c_str.get());
+		item.setText(dialog->name.c_str.get());
 		m_view->ReloadItems();
 		SaveChanges();
 		break;

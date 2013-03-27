@@ -27,9 +27,11 @@ class RADENG_CLASS ConversationTree {
 public:
 	typedef boost::shared_ptr<ConversationTree> Ref;
 	
-	enum RootFlags {
-		RAD_FLAG(kRootFlag_Hidden),
-		RAD_FLAG(kRootFlag_Locked)
+	enum ChatFlags {
+		RAD_FLAG(kChatFlag_Locked),
+		RAD_FLAG(kChatFlag_AutoGenerate),
+		RAD_FLAG(kChatFlag_Procedural),
+		RAD_FLAG(kChatFlag_ShuffleChoices)
 	};
 	
 	struct StringOption {
@@ -52,6 +54,7 @@ public:
 			probability = 1.f;
 			refs = 0;
 			uid = 0;
+			flags = kChatFlag_AutoGenerate|kChatFlag_ShuffleChoices;
 		}
 
 		StringOption::Vec prompts;
@@ -61,6 +64,7 @@ public:
 		String condition;
 		String name;
 		float probability; // 0 -> 1
+		int flags;
 		int uid;
 		int refs;
 	};
@@ -71,13 +75,15 @@ public:
 		Root() {
 			probability[0] = 1.f;
 			probability[1] = 1.f;
-			flags = 0;
+			priority = 1.f;
+			flags = kChatFlag_AutoGenerate|kChatFlag_Procedural|kChatFlag_ShuffleChoices;
 		}
 
 		StringOption::Vec prompts;
 		Dialog::PtrVec dialog;
 		String name;
 		String group;
+		float priority;
 		float probability[2];
 		int flags;
 	};
@@ -123,9 +129,9 @@ private:
 	bool SaveBinStringOption(const StringOption &opt, stream::OutputStream &os) const;
 #endif
 
-	Root *LoadBinRoot(stream::InputStream &is);
-	bool LoadBinDialog(Dialog &dialog, stream::InputStream &is);
-	bool LoadBinStringOption(StringOption &opt, stream::InputStream &is);
+	Root *LoadBinRoot(stream::InputStream &is, int version);
+	bool LoadBinDialog(Dialog &dialog, stream::InputStream &is, int version);
+	bool LoadBinStringOption(StringOption &opt, stream::InputStream &is, int version);
 
 	RAD_DECLARE_GET(roots, Root::PtrVec*) {
 		return &m_roots;
