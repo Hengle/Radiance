@@ -532,8 +532,6 @@ bool WorldLua::ParseKeysTable(lua_State *L, Persistence::KeyValue::Map &keys, in
 		return false;
 	}
 
-	Persistence::KeyValue value;
-
 	lua_pushnil(L);
 	while (lua_next(L, (index < 0) ? (index-1) : index) != 0) {
 		if (luaError) {
@@ -543,14 +541,23 @@ bool WorldLua::ParseKeysTable(lua_State *L, Persistence::KeyValue::Map &keys, in
 			return false;
 		}
 
-		value.mVal = 0;
-		value.sVal.Clear();
-
 		const char *name = lua_tostring(L, -2);
-				
+		
+		if (lua_isnil(L, -1)) {
+			// deleted key.
+			keys.erase(String(name));
+			lua_pop(L, 1);
+			continue;
+		}
+
+		// avoid deep copy constructor.
+		Persistence::KeyValue &kv = keys[String(name)];
+
 		if (lua_type(L, -1) == LUA_TTABLE) {
-			value.mVal = new (ZWorld) Persistence::KeyValue::Map();
-			if (!ParseKeysTable(L, *value.mVal, -1, luaError))
+			if (!kv.mVal)
+				kv.mVal = new (ZWorld) Persistence::KeyValue::Map();
+			kv.sVal.Clear();
+			if (!ParseKeysTable(L, *kv.mVal, -1, luaError))
 				return false;
 		} else {
 			if (luaError) {
@@ -559,14 +566,12 @@ bool WorldLua::ParseKeysTable(lua_State *L, Persistence::KeyValue::Map &keys, in
 				lua_pop(L, 2);
 				return false;
 			}
-			value.sVal = lua_tostring(L, -1);
+			kv.sVal = lua_tostring(L, -1);
+			if (kv.mVal) {
+				delete kv.mVal;
+				kv.mVal = 0;
+			}
 		}
-
-		// avoid deep copy constructor.
-		Persistence::KeyValue &kv = keys[String(name)];
-		kv.sVal = value.sVal;
-		kv.mVal = value.mVal;
-		value.mVal = 0; // don't delete.
 
 		lua_pop(L, 1);
 	}

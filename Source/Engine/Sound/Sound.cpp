@@ -807,9 +807,19 @@ Sound::StreamResult Sound::TickStream(SoundContext::Source &source)
 		return kStreamResult_Finished;
 	if (source.paused)
 		return kStreamResult_Playing;
+
+	if (m_volume[3] == 0.f && m_fadeOutAndStop) {
+		if (source.mapped) {
+			m_alDriver->SourceStop(ALDRIVER_SIG source.source);
+		}
+		return kStreamResult_Finished;
+	}
 	
 	if (m_eos) {
 		ALint num;
+		alGetSourcei(source.source, AL_BUFFERS_PROCESSED, &num);
+		if (num > 0)
+			alSourceUnqueueBuffers(source.source, num, m_rbufs);
 		alGetSourcei(source.source, AL_BUFFERS_QUEUED, &num);
 		return (num > 0) ? kStreamResult_Playing : kStreamResult_Finished;
 	}
