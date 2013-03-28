@@ -1261,6 +1261,11 @@ inline bool Floors::PlanMove(
 			
 			int dir = c.connection->waypoints[0] == (U32)start.m_waypoint;
 			c.nextWaypointIdx = (int)c.connection->waypoints[dir];
+
+			// waypoint is not enabled?
+			if (!(m_waypoints[c.nextWaypointIdx].flags&kWaypointState_Enabled))
+				continue;
+
 			c.nextWaypoint = m_bsp->Waypoints() + c.nextWaypointIdx;
 
 			c.nextFloorIdx = (int)c.nextWaypoint->floorNum;
@@ -1332,6 +1337,11 @@ inline bool Floors::PlanMove(
 			c.nextFloorIdx = -1;
 			c.connectionIdx = -1;
 			c.nextWaypointIdx = (int)*(m_bsp->WaypointIndices() + floor->firstWaypoint + i);
+
+			// waypoint is not enabled?
+			if (!(m_waypoints[c.nextWaypointIdx].flags&kWaypointState_Enabled))
+				continue;
+
 			c.nextWaypoint = m_bsp->Waypoints() + c.nextWaypointIdx;
 
 			const Vec3 kPos(c.nextWaypoint->pos[0], c.nextWaypoint->pos[1], c.nextWaypoint->pos[2]);
@@ -1459,6 +1469,11 @@ inline bool Floors::PlanMove(
 			
 					int dir = c.connection->waypoints[0] == (U32)cur.pos.m_waypoint;
 					c.nextWaypointIdx = (int)c.connection->waypoints[dir];
+
+					// waypoint is not enabled?
+					if (!(m_waypoints[c.nextWaypointIdx].flags&kWaypointState_Enabled))
+						continue;
+
 					c.nextWaypoint = m_bsp->Waypoints() + c.nextWaypointIdx;
 
 					c.nextFloorIdx = (int)c.nextWaypoint->floorNum;
@@ -1482,33 +1497,39 @@ inline bool Floors::PlanMove(
 				}
 
 				if (waypoint->floorNum >= 0) {
-					// on a floor, add waypoints
-					const bsp_file::BSPFloor *floor = m_bsp->Floors() + waypoint->floorNum;
+					if (m_floorState[waypoint->floorNum]&kFloorState_Enabled) {
+						// on a floor, add waypoints
+						const bsp_file::BSPFloor *floor = m_bsp->Floors() + waypoint->floorNum;
 
-					for (S32 i = 0; i < floor->numWaypoints; ++i) {
-						Connection c;
-						c.nextFloor = 0;
-						c.connection = 0;
-						c.nextFloorIdx = -1;
-						c.connectionIdx = -1;
-						c.nextWaypointIdx = (int)*(m_bsp->WaypointIndices() + floor->firstWaypoint + i);
+						for (S32 i = 0; i < floor->numWaypoints; ++i) {
+							Connection c;
+							c.nextFloor = 0;
+							c.connection = 0;
+							c.nextFloorIdx = -1;
+							c.connectionIdx = -1;
+							c.nextWaypointIdx = (int)*(m_bsp->WaypointIndices() + floor->firstWaypoint + i);
 
-						if (c.nextWaypointIdx == cur.pos.m_waypoint)
-							continue; // don't add ourselves
+							if (c.nextWaypointIdx == cur.pos.m_waypoint)
+								continue; // don't add ourselves
 
-						c.nextWaypoint = m_bsp->Waypoints() + c.nextWaypointIdx;
+							// waypoint is not enabled?
+							if (!(m_waypoints[c.nextWaypointIdx].flags&kWaypointState_Enabled))
+								continue;
 
-						const Vec3 kPos(c.nextWaypoint->pos[0], c.nextWaypoint->pos[1], c.nextWaypoint->pos[2]);
-						c.cost = (kPos - start.m_pos).MagnitudeSquared();
-						c.distance = (kPos - end.m_pos).MagnitudeSquared();
+							c.nextWaypoint = m_bsp->Waypoints() + c.nextWaypointIdx;
 
-						c.pos.m_floor = (int)c.nextWaypoint->floorNum;
-						c.pos.m_waypoint = (int)c.nextWaypointIdx;
-						c.pos.m_tri = (int)c.nextWaypoint->triNum;
-						c.pos.m_nextWaypoint = -1;
-						c.pos.m_pos = kPos;
+							const Vec3 kPos(c.nextWaypoint->pos[0], c.nextWaypoint->pos[1], c.nextWaypoint->pos[2]);
+							c.cost = (kPos - start.m_pos).MagnitudeSquared();
+							c.distance = (kPos - end.m_pos).MagnitudeSquared();
 
-						cur.connections->push_back(c);
+							c.pos.m_floor = (int)c.nextWaypoint->floorNum;
+							c.pos.m_waypoint = (int)c.nextWaypointIdx;
+							c.pos.m_tri = (int)c.nextWaypoint->triNum;
+							c.pos.m_nextWaypoint = -1;
+							c.pos.m_pos = kPos;
+
+							cur.connections->push_back(c);
+						}
 					}
 				}
 

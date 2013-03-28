@@ -30,6 +30,12 @@ public:
 		bool restart, 
 		const ska::Notify::Ref &notify
 	);
+	virtual bool BlendImmediate(
+		const char *state,
+		const char *blendTarget,
+		bool restart, 
+		const ska::Notify::Ref &notify
+	);
 
 	virtual bool HasState(const char *state);
 
@@ -73,6 +79,7 @@ private:
 	}
 
 	static int lua_BlendToState(lua_State *L);
+	static int lua_BlendImmediate(lua_State *L);
 	static int lua_SetRootController(lua_State *L);
 	static int lua_HasState(lua_State *L);
 };

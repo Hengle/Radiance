@@ -645,6 +645,11 @@ void BlendToController::BlendTo(const Controller::Ref &to) {
 	}
 }
 
+void BlendToController::BlendImmediate(const Controller::Ref &to) {
+	m_root.reset();
+	BlendTo(to);
+}
+
 float BlendToController::RAD_IMPLEMENT_GET(in) {
 	return m_root ? m_root->in : 0.f;
 }

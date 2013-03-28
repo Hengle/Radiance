@@ -218,7 +218,7 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings) {
 					m_orgY = std::min(m_orgY, v->y);
 
 					v->s = m->bitmap.x1 / PageSize;
-					v->t = m->bitmap.y2 / PageSize;
+					v->t = m->bitmap.y2 / PageSize + (0.5f / PageSize);
 					
 					++v;
 
@@ -234,7 +234,7 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings) {
 					m_orgX = std::min(m_orgX, v->x);
 					m_orgY = std::min(m_orgY, v->y);
 
-					v->s = m->bitmap.x2 / PageSize;
+					v->s = m->bitmap.x2 / PageSize + (0.5f / PageSize);
 					v->t = m->bitmap.y1 / PageSize;
 					
 					++v;
@@ -258,8 +258,8 @@ void TextModel::BuildTextVerts(const String *strings, int numStrings) {
 					m_orgX = std::min(m_orgX, v->x);
 					m_orgY = std::min(m_orgY, v->y);
 
-					v->s = m->bitmap.x2 / PageSize;
-					v->t = m->bitmap.y2 / PageSize;
+					v->s = m->bitmap.x2 / PageSize + (0.5f / PageSize);
+					v->t = m->bitmap.y2 / PageSize + (0.5f / PageSize);
 					
 					ptr += 6;
 				}

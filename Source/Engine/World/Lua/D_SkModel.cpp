@@ -18,6 +18,8 @@ void D_SkModel::PushElements(lua_State *L) {
 	D_Asset::PushElements(L);
 	lua_pushcfunction(L, lua_BlendToState);
 	lua_setfield(L, -2, "BlendToState");
+	lua_pushcfunction(L, lua_BlendImmediate);
+	lua_setfield(L, -2, "BlendImmediate");
 	lua_pushcfunction(L, lua_SetRootController);
 	lua_setfield(L, -2, "SetRootController");
 	lua_pushcfunction(L, lua_HasState);
@@ -92,6 +94,60 @@ bool D_SkModel::BlendToState(const char *state, const char *blendTarget, bool re
 	return target ? true : false;
 }
 
+bool D_SkModel::BlendImmediate(const char *state, const char *blendTarget, bool restart, const ska::Notify::Ref &notify) {
+	if (!m_blendTo || !m_mesh->ska->root.get())
+		return false;
+	
+	String tname(CStr(state));
+
+	if (m_curState == tname && !restart)
+		return false; // no action taken
+
+	ska::Controller::Ref target;
+
+	// check animstate first
+	{
+		ska::AnimState::Map::const_iterator it = m_mesh->states->find(String(tname));
+
+		if (it != m_mesh->states->end()) {
+			ska::AnimationVariantsSource::Ref animSource = ska::AnimationVariantsSource::New(
+				it->second,
+				*m_mesh->ska.get(),
+				notify,
+				blendTarget
+			);
+
+			target = boost::static_pointer_cast<ska::Controller>(animSource);
+		}
+	}
+
+	if (!target) {
+		ska::Animation::Map::const_iterator it = m_mesh->ska->anims->find(tname);
+		
+		if (it != m_mesh->ska->anims->end()) {
+			ska::AnimationSource::Ref animSource = ska::AnimationSource::New(
+				*it->second,
+				1.f,
+				1.f,
+				1.f,
+				0,
+				ska::AnimState::kMoveType_None,
+				*m_mesh->ska.get(),
+				notify
+			);
+
+			target = boost::static_pointer_cast<ska::Controller>(animSource);
+		}
+	}
+
+	if (target) {
+		m_curState = state; // make copy of string.
+		m_blendTo->BlendImmediate(target);
+	}
+
+	return target ? true : false;
+}
+
 bool D_SkModel::HasState(const char *state) {
 	if (!m_blendTo || !m_mesh->ska->root.get())
 		return false;
@@ -131,6 +187,32 @@ int D_SkModel::lua_BlendToState(lua_State *L) {
 	}
 
 	bool r = self->BlendToState(string, blendTarget, restart, notify);
+
+	if (notify && r) {
+		static_cast<Notify&>(*notify).Push(L);
+		return 1;
+	}
+
+	return 0;
+}
+
+int D_SkModel::lua_BlendImmediate(lua_State *L) {
+	Ref self = Get<D_SkModel>(L, "D_SkModel", 1, true);
+	const char *string = luaL_checkstring(L, 2);
+	const char *blendTarget = lua_tostring(L, 3);
+	bool restart = lua_toboolean(L, 4) ? true : false;
+
+	ska::Notify::Ref notify;
+
+	Entity *entity = WorldLua::EntFramePtr(L, 5, false);
+	if (entity && lua_gettop(L) > 5)  {
+		// passed in a callback table
+		int callbackId = entity->StoreLuaCallback(L, 6, 5);
+		RAD_ASSERT(callbackId != -1);
+		notify.reset(new Notify(*entity, callbackId));
+	}
+
+	bool r = self->BlendImmediate(string, blendTarget, restart, notify);
 
 	if (notify && r) {
 		static_cast<Notify&>(*notify).Push(L);

@@ -272,6 +272,7 @@ public:
 	virtual ~BlendToController();
 
 	void BlendTo(const Controller::Ref &to);
+	void BlendImmediate(const Controller::Ref &to);
 
 	virtual bool Tick(
 		float dt,
