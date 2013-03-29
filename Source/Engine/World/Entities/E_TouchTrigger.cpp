@@ -120,8 +120,11 @@ void E_TouchTrigger::Tick(
 	float dt, 
 	const xtime::TimeSlice &time
 ) {
-	if (!m_enabled)
+	if (!m_enabled) {
+		m_instigator.reset();
+		m_occupied = false;
 		return;
+	}
 
 	UpdateAttachment(frame, dt, time);
 
@@ -268,9 +271,11 @@ void E_TouchTrigger::PushCallTable(lua_State *L) {
 	lua_pushcfunction(L, lua_GetTouching);
 	lua_setfield(L, -2, "GetTouching");
 	LUART_REGISTER_GETSET(L, TouchClassBits);
+	LUART_REGISTER_GETSET(L, Enabled);
 }
 
 ENT_GETSET(E_TouchTrigger, TouchClassBits, int, m_classbits);
+ENT_GETSET(E_TouchTrigger, Enabled, bool, m_enabled);
 
 int E_TouchTrigger::lua_GetTouching(lua_State *L) {
 	E_TouchTrigger *self = static_cast<E_TouchTrigger*>(WorldLua::EntFramePtr(L, 1, true));

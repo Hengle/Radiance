@@ -1008,13 +1008,17 @@ void E_ViewController::FadeOutLookTarget(int id, float time) {
 }
 
 void E_ViewController::FadeOutLookTargets(float time) {
-	for (LookTarget::List::iterator it = m_looks.begin(); it != m_looks.end(); ++it) {
-		LookTarget &t = *it;
-		if (t.blend.step != Blend::kStep_Done &&
-			t.blend.step != Blend::kStep_Out) {
-			t.blend.step = Blend::kStep_Out;
-			t.blend.out[1] = time;
+	if (time > 0.f) {
+		for (LookTarget::List::iterator it = m_looks.begin(); it != m_looks.end(); ++it) {
+			LookTarget &t = *it;
+			if (t.blend.step != Blend::kStep_Done &&
+				t.blend.step != Blend::kStep_Out) {
+				t.blend.step = Blend::kStep_Out;
+				t.blend.out[1] = time;
+			}
 		}
+	} else {
+		m_looks.clear();
 	}
 }
 

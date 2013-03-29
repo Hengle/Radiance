@@ -35,6 +35,8 @@ public:
 
 	Entity::Vec GetTouching() const;
 
+	RAD_DECLARE_PROPERTY(E_TouchTrigger, enabled, bool, bool);
+
 protected:
 
 	virtual void PushCallTable(lua_State *L);
@@ -43,6 +45,15 @@ protected:
 private:
 
 	ENT_DECL_GETSET(TouchClassBits);
+	ENT_DECL_GETSET(Enabled);
+
+	RAD_DECLARE_GET(enabled, bool) {
+		return m_enabled;
+	}
+
+	RAD_DECLARE_SET(enabled, bool) {
+		m_enabled = value;
+	}
 
 	static int lua_GetTouching(lua_State *L);
 
