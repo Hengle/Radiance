@@ -51,6 +51,7 @@ m_unloadSlotReq(false),
 m_switchLoad(false),
 m_switchLoadScreen(false),
 m_levelStart(true),
+m_generateSave(false),
 m_gestures(0) {
 	m_draw.reset(new (ZWorld) WorldDraw(this));
 	m_cinematics.reset(new (ZWorld) WorldCinematics(this));
@@ -249,7 +250,7 @@ void World::TickState(float dt, float unmod_dt) {
 			m_viewController->PrivateTick(frame, dt, xtime::TimeSlice::Infinite);
 
 		gc = true;
-	}else if (!m_levelStart) { 
+	} else if (!m_levelStart) { 
 		// game is paused, must tick world!
 		m_lua->Tick(0.f);
 		if (m_gameCode)
@@ -299,6 +300,16 @@ void World::TickState(float dt, float unmod_dt) {
 			(pauseState&(kPauseGame|kPauseCinematics))==(kPauseGame|kPauseCinematics)
 		);
 	}
+
+	GenerateSaveGame();
+}
+
+void World::GenerateSaveGame() {
+	if (!m_generateSave)
+		return;
+
+	m_lua->SaveState();
+	m_generateSave = false;
 }
 
 Event::Vec World::ParseMultiEvent(const char *string) {

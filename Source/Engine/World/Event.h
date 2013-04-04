@@ -19,7 +19,7 @@ public:
 
 	enum Target
 	{
-		T_Id,
+		T_Id, // Id based events are not persisted
 		T_Name,
 		T_ViewController,
 		T_PlayerPawn,

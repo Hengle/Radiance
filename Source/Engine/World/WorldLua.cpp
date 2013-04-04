@@ -84,6 +84,7 @@ bool WorldLua::Init() {
 	lua_setfield(L, LUA_REGISTRYINDEX, SELF);
 
 	luaL_Reg worldRegs [] = {
+		{ "RequestGenerateSaveGame", lua_World_RequestGenerateSaveGame },
 		{ "FindEntityId", lua_World_FindEntityId },
 		{ "FindEntityUID", lua_World_FindEntityUID },
 		{ "FindEntityClass", lua_World_FindEntityClass },
@@ -97,6 +98,8 @@ bool WorldLua::Init() {
 		{ "CreateScreenOverlay", lua_World_CreateScreenOverlay },
 		{ "PostEvent", lua_World_PostEvent },
 		{ "DispatchEvent", lua_World_DispatchEvent },
+		{ "FlushEvents", lua_World_FlushEvents },
+		{ "GetEvents", lua_World_GetEvents },
 		{ "Project", lua_World_Project },
 		{ "Unproject", lua_World_Unproject },
 		{ "SetUIViewport", lua_World_SetUIViewport },
@@ -602,6 +605,11 @@ Entity *WorldLua::EntFramePtr(lua_State *L, int index, bool luaError) {
 
 void WorldLua::Tick(float dt) {
 	GarbageCollect();
+}
+
+void WorldLua::SaveState() {
+	if (PushGlobalCall("World.SaveGameState"))
+		Call("World.SaveGameState", 0, 0, 0);
 }
 
 void WorldLua::GarbageCollect() {

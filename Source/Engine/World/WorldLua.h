@@ -30,6 +30,7 @@ public:
 	~WorldLua();
 
 	void Tick(float dt);
+	void SaveState();
 
 	void PushKeysTable(const Keys &keys);
 	bool ParseKeysTable(Keys &keys, int index, bool luaError);
@@ -166,6 +167,7 @@ private:
 	==============================================================================
 	*/
 
+	static int lua_World_RequestGenerateSaveGame(lua_State *L);
 	static int lua_World_FindEntityId(lua_State *L);
 	static int lua_World_FindEntityUID(lua_State *L);
 	static int lua_World_FindEntityClass(lua_State *L);
@@ -179,6 +181,8 @@ private:
 	static int lua_World_CreateScreenOverlay(lua_State *L);
 	static int lua_World_PostEvent(lua_State *L);
 	static int lua_World_DispatchEvent(lua_State *L);
+	static int lua_World_FlushEvents(lua_State *L);
+	static int lua_World_GetEvents(lua_State *L);
 	static int lua_World_Project(lua_State *L);
 	static int lua_World_Unproject(lua_State *L);
 	static int lua_World_SetUIViewport(lua_State *L);

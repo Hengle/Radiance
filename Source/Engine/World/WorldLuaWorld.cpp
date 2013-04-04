@@ -146,6 +146,12 @@ void WorldLua::RestoreApplicationState() {
 	Call("World::RestoreApplicationState", 0, 0, 0);
 }
 
+int WorldLua::lua_World_RequestGenerateSaveGame(lua_State *L) {
+	LOAD_SELF
+	self->m_world->generateSaveGame = true;
+	return 0;
+}
+
 int WorldLua::lua_World_FindEntityId(lua_State *L) {
 	LOAD_SELF
 
@@ -369,6 +375,63 @@ int WorldLua::lua_World_DispatchEvent(lua_State *L) {
 	const char *event = luaL_checkstring(L, 1);
 	self->m_world->DispatchEvent(event);
 	return 0;
+}
+
+int WorldLua::lua_World_FlushEvents(lua_State *L) {
+	LOAD_SELF
+	self->m_world->FlushEvents();
+	return 0;
+}
+
+int WorldLua::lua_World_GetEvents(lua_State *L) {
+	LOAD_SELF
+
+	const World::EventList &events = self->m_world->m_events;
+
+	if (events.empty())
+		return 0;
+
+	lua_createtable(L, (int)events.size(), 0);
+
+	String x;
+	int ofs = 0;
+	for (World::EventList::const_iterator it = events.begin(); it != events.end(); ++it) {
+		const Event::Ref &event = *it;
+		switch (event->target) {
+		case Event::T_Id:
+			continue;
+			break;
+		case Event::T_Name:
+			x = "\"";
+			x += event->name.get();
+			x += "\" ";
+			break;
+		case Event::T_ViewController:
+			x = "@view ";
+			break;
+		case Event::T_PlayerPawn:
+			x = "@player ";
+			break;
+		case Event::T_World:
+			x = "@world ";
+			break;
+		}
+
+		x += "\"";
+		x += event->cmd.get();
+		x += "\"";
+
+		if (event->args.get()) {
+			x += " ";
+			x += event->args.get();
+		}
+
+		lua_pushinteger(L, ++ofs);
+		lua_pushstring(L, x.c_str.get());
+		lua_settable(L, -3);
+	}
+
+	return 1;
 }
 
 int WorldLua::lua_World_Project(lua_State *L) {

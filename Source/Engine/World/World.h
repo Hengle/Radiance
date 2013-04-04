@@ -34,6 +34,8 @@ class Engine;
 namespace world {
 
 class WorldDraw;
+class WorldLua;
+
 class RADENG_CLASS World {
 public:
 
@@ -150,6 +152,8 @@ public:
 	RAD_DECLARE_PROPERTY(World, gameCode, Entity::Ref, Entity::Ref);
 	RAD_DECLARE_PROPERTY(World, pauseState, int, int);
 	RAD_DECLARE_PROPERTY(World, enabledGestures, int, int);
+	RAD_DECLARE_PROPERTY(World, generateSaveGame, bool, bool);
+
 	RAD_DECLARE_READONLY_PROPERTY(World, time, float);
 	RAD_DECLARE_READONLY_PROPERTY(World, gameTime, float);
 	RAD_DECLARE_READONLY_PROPERTY(World, dt, float);
@@ -172,6 +176,7 @@ public:
 private:
 
 	friend class WorldDraw;
+	friend class WorldLua;
 	friend class Entity;
 	friend class MBatchOccupant;
 	typedef zone_list<Event::Ref, ZWorldT>::type EventList;
@@ -279,6 +284,7 @@ private:
 	void DispatchEvents();
 	void FlushEvents();
 	int PostSpawn(const xtime::TimeSlice &time, int flags);
+	void GenerateSaveGame();
 	void LoadBSP(const bsp_file::BSPFile &bsp);
 	void LinkEntity(Entity *entity, const BBox &bounds);
 	void UnlinkEntity(Entity *entity);
@@ -501,6 +507,14 @@ private:
 		return m_bsp.get();
 	}
 
+	RAD_DECLARE_GET(generateSaveGame, bool) {
+		return m_generateSave;
+	}
+
+	RAD_DECLARE_SET(generateSaveGame, bool) {
+		m_generateSave = value;
+	}
+
 	RAD_DECLARE_GET(cvars, GameCVars*);
 	RAD_DECLARE_GET(listenerPos, const Vec3&);
 
@@ -560,6 +574,7 @@ private:
 	int m_slot;
 	bool m_switchLoad;
 	bool m_switchLoadScreen;
+	bool m_generateSave;
 	float m_gameSpeed[3];
 	float m_gameSpeedTime[2];
 	int m_gestures;
