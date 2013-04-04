@@ -66,6 +66,7 @@ World::~World() {
 	m_viewController.reset();
 	m_worldspawn.reset();
 	m_cinematics.reset();
+	m_uids.clear();
 	m_ents.clear();
 	m_lua.reset();
 	m_uiRoot.reset();
@@ -505,6 +506,13 @@ Entity::Vec World::FindEntityTargets(const char *targetname) const {
 Entity::Ref World::FindEntityId(int id) const {
 	Entity::IdMap::const_iterator it = m_ents.find(id);
 	if (it != m_ents.end())
+		return it->second;
+	return Entity::Ref();
+}
+
+Entity::Ref World::FindEntityUID(int uid) const {
+	Entity::IdMap::const_iterator it = m_uids.find(uid);
+	if (it != m_uids.end())
 		return it->second;
 	return Entity::Ref();
 }

@@ -56,6 +56,8 @@ private:
 	}
 
 	static int lua_GetTouching(lua_State *L);
+	static int lua_Instigator(lua_State *L);
+	static int lua_SetInstigator(lua_State *L);
 
 	void CheckEnter();
 	void CheckExit(const Entity &instigator);
@@ -67,6 +69,7 @@ private:
 		const xtime::TimeSlice &time
 	);
 	void NotifyAttachmentTouch();
+	void SetInstigator(Entity *instigator);
 
 	int SetupAttachment();
 

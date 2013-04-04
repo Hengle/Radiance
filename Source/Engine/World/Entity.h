@@ -189,6 +189,7 @@ public:
 	virtual ~Entity();
 
 	RAD_DECLARE_READONLY_PROPERTY(Entity, id, int);
+	RAD_DECLARE_READONLY_PROPERTY(Entity, uid, int);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, zoneTag, ZoneTagRef);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, world, World*);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, classname, const char*);
@@ -411,6 +412,10 @@ private:
 		return m_id; 
 	}
 
+	RAD_DECLARE_GET(uid, int) {
+		return m_uid;
+	}
+
 	RAD_DECLARE_GET(classname, const char*) { 
 		return m_classname.c_str; 
 	}
@@ -477,6 +482,7 @@ private:
 	int m_frame;
 	int m_spawnState;
 	int m_id;
+	int m_uid;
 	float m_nextLuaThink;
 	float m_lastLuaThink;
 	float m_nextTick;

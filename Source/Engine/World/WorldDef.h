@@ -9,6 +9,7 @@
 #include "../Types.h"
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/Container/ZoneSet.h>
+#include <Runtime/Container/ZoneMap.h>
 #include <Runtime/Container/StackVector.h>
 #include <Runtime/Math/Winding.h>
 #include <bitset>

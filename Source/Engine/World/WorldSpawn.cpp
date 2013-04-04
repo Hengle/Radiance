@@ -319,6 +319,10 @@ void World::SetupEntity(const Entity::Ref &entity, int id) {
 
 void World::MapEntity(const Entity::Ref &entity) {
 	m_ents.insert(Entity::IdMap::value_type(entity->m_id, entity));
+	if (entity->m_uid != -1) {
+		RAD_ASSERT(m_uids.find(entity->m_uid) == m_uids.end());
+		m_uids.insert(Entity::IdMap::value_type(entity->m_uid, entity));
+	}
 	m_classnames.insert(Entity::StringMMap::value_type(CStr(entity->classname), entity));
 	if (entity->targetname.get() != 0)
 		m_targetnames.insert(Entity::StringMMap::value_type(CStr(entity->targetname), entity));
@@ -328,6 +332,9 @@ void World::UnmapEntity(const Entity::Ref &entity) {
 	m_lua->DeleteEntId(*entity);
 
 	m_ents.erase(entity->m_id);
+	if (entity->m_uid != -1)
+		m_uids.erase(entity->m_uid);
+
 	m_classnames.erase(CStr(entity->classname));
 	if (entity->targetname.get() != 0)
 		m_targetnames.erase(CStr(entity->targetname));
@@ -723,7 +730,18 @@ int World::CreateEntity(const Keys &keys) {
 
 int World::CreateEntity(const bsp_file::BSPFile &bsp, U32 entityNum) {
 	m_spawnKeys = LoadEntityKeys(bsp, entityNum);
-	return CreateEntity(m_spawnKeys);
+	int r = CreateEntity(m_spawnKeys);
+	if (r == SR_Success) {
+		int uid = m_spawnKeys.IntForKey("uid");
+		if (uid != -1) {
+			m_spawnEnt->m_uid = uid;
+		} else {
+			COut(C_Error) << "World::CreateEntity(" << entityNum << "), persistent entity is missing uid." << std::endl;
+			r = SR_ParseError; 
+		}
+	}
+
+	return r;
 }
 
 int World::PostSpawn(const xtime::TimeSlice &time, int flags) {

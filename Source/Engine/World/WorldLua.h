@@ -45,7 +45,7 @@ public:
 	Entity *EntFramePtr(int index, bool luaError);
 	void DeleteEntId(Entity &ent);
 	bool Call(const char *context, int nargs, int nresults, int errfunc);
-	bool CreateEntity(Entity &ent, int id, const char *classname);
+	bool CreateEntity(Entity &ent, int id, int uid, const char *classname);
 
 	bool InputEventFilter(const InputEvent &e, const TouchState *touch, const InputState &is);
 	bool InputGestureFilter(const InputGesture &g, const TouchState &touch, const InputState &is);
@@ -167,6 +167,7 @@ private:
 	*/
 
 	static int lua_World_FindEntityId(lua_State *L);
+	static int lua_World_FindEntityUID(lua_State *L);
 	static int lua_World_FindEntityClass(lua_State *L);
 	static int lua_World_FindEntityTargets(lua_State *L);
 	static int lua_World_BBoxTouching(lua_State *L);

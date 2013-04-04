@@ -111,6 +111,7 @@ public:
 	void SetAreaportalState(int areaportalNum, bool open, bool relinkOccupants);
 
 	Entity::Ref FindEntityId(int id) const;
+	Entity::Ref FindEntityUID(int uid) const;
 	Entity::Vec FindEntityClass(const char *classname) const;
 	Entity::Vec FindEntityTargets(const char *targetname) const;
 	Entity::Vec BBoxTouching(const BBox &bbox, int classbits) const;
@@ -511,6 +512,7 @@ private:
 	pkg::Asset::Vec m_bspMaterials;
 	bsp_file::BSPFile::Ref m_bsp;
 	Entity::IdMap m_ents;
+	Entity::IdMap m_uids;
 	Entity::StringMMap m_classnames;
 	Entity::StringMMap m_targetnames;
 	Entity::Ref m_playerPawn;

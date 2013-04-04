@@ -266,10 +266,24 @@ Entity::Vec E_TouchTrigger::GetTouching() const {
 	return ents;
 }
 
+void E_TouchTrigger::SetInstigator(Entity *instigator) {
+	if (instigator) {
+		m_occupied = true;
+		m_instigator = instigator->shared_from_this();
+	} else {
+		m_occupied = false;
+		m_instigator.reset();
+	}
+}
+
 void E_TouchTrigger::PushCallTable(lua_State *L) {
 	Entity::PushCallTable(L);
 	lua_pushcfunction(L, lua_GetTouching);
 	lua_setfield(L, -2, "GetTouching");
+	lua_pushcfunction(L, lua_Instigator);
+	lua_setfield(L, -2, "Instigator");
+	lua_pushcfunction(L, lua_SetInstigator);
+	lua_setfield(L, -2, "SetInstigator");
 	LUART_REGISTER_GETSET(L, TouchClassBits);
 	LUART_REGISTER_GETSET(L, Enabled);
 }
@@ -291,6 +305,23 @@ int E_TouchTrigger::lua_GetTouching(lua_State *L) {
 		lua_settable(L, -3);
 	}
 	return 1;
+}
+
+int E_TouchTrigger::lua_Instigator(lua_State *L) {
+	E_TouchTrigger *self = static_cast<E_TouchTrigger*>(WorldLua::EntFramePtr(L, 1, true));
+	Entity::Ref r = self->m_instigator.lock();
+	if (r) {
+		r->PushEntityFrame(L);
+		return 1;
+	}
+	return 0;
+}
+
+int E_TouchTrigger::lua_SetInstigator(lua_State *L) {
+	E_TouchTrigger *self = static_cast<E_TouchTrigger*>(WorldLua::EntFramePtr(L, 1, true));
+	Entity *instigator = WorldLua::EntFramePtr(L, 2, false);
+	self->SetInstigator(instigator);
+	return 0;
 }
 
 } // world

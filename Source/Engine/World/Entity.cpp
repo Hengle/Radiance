@@ -109,6 +109,7 @@ Entity::Ref Entity::LuaCreate(const char *classname) {
 Entity::Entity() :
 m_spawnState(S_LuaCreate), 
 m_id(-1),
+m_uid(-1),
 m_nextLuaThink(1.f), 
 m_lastLuaThink(0.f),
 m_nextTick(0.f),
@@ -286,7 +287,7 @@ int Entity::PrivateSpawn(
 		{
 		case S_LuaCreate:
 			{
-				if (!world->lua->CreateEntity(*this, m_id, m_scripted ? m_classname.c_str.get() : 0))
+				if (!world->lua->CreateEntity(*this, m_id, m_uid, m_scripted ? m_classname.c_str.get() : 0))
 					return pkg::SR_ScriptError;
 				++m_spawnState;
 				if (!time.remaining)

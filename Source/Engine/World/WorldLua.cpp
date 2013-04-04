@@ -85,6 +85,7 @@ bool WorldLua::Init() {
 
 	luaL_Reg worldRegs [] = {
 		{ "FindEntityId", lua_World_FindEntityId },
+		{ "FindEntityUID", lua_World_FindEntityUID },
 		{ "FindEntityClass", lua_World_FindEntityClass },
 		{ "FindEntityTargets", lua_World_FindEntityTargets },
 		{ "BBoxTouching", lua_World_BBoxTouching },
@@ -318,7 +319,7 @@ bool WorldLua::Call(lua_State *L, const char *context, int nargs, int nresults, 
 	return true;
 }
 
-bool WorldLua::CreateEntity(Entity &ent, int id, const char *classname) {
+bool WorldLua::CreateEntity(Entity &ent, int id, int uid, const char *classname) {
 	lua_State *L = m_L->L;
 	lua_getfield(L, LUA_REGISTRYINDEX, ENTREF_TABLE);	
 	lua_pushinteger(L, id);
@@ -351,9 +352,10 @@ bool WorldLua::CreateEntity(Entity &ent, int id, const char *classname) {
 	ent.PushCallTable(L);
 
 	lua_pushinteger(L, id);
+	lua_pushinteger(L, uid);
 	lua_pushlightuserdata(L, &ent);
 	
-	if (!Call("World.CreateEntity", 3, 1, 0)) {
+	if (!Call("World.CreateEntity", 4, 1, 0)) {
 		lua_pop(L, 2);
 		return false;
 	}

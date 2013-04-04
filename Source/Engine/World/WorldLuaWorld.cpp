@@ -154,11 +154,24 @@ int WorldLua::lua_World_FindEntityId(lua_State *L) {
 
 	if (ref) {
 		ref->PushEntityFrame(L);
-	} else {
-		lua_pushnil(L);
+		return 1;
 	}
 
-	return 1;
+	return 0;
+}
+
+int WorldLua::lua_World_FindEntityUID(lua_State *L) {
+	LOAD_SELF
+
+	int uid = (int)luaL_checkinteger(L, 1);
+	Entity::Ref ref = self->m_world->FindEntityUID(uid);
+
+	if (ref) {
+		ref->PushEntityFrame(L);
+		return 1;
+	}
+
+	return 0;
 }
 
 int WorldLua::lua_World_FindEntityClass(lua_State *L) {
