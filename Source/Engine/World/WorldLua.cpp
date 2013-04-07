@@ -283,9 +283,9 @@ Entity::Ref WorldLua::CreateEntity(const Keys &keys) {
 	bool hasClass = lua_type(L, -1) == LUA_TTABLE;
 	lua_pop(L, 1);
 
-	if (!hasClass)
-		return Entity::Create(classname);
-
+	if (hasClass)
+		return Entity::LuaCreate(classname);
+	
 	return Entity::LuaCreate(classname);
 }
 

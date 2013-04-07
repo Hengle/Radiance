@@ -500,46 +500,6 @@ int World::PostSpawnEntity(
 	return entity->PrivatePostSpawn(time, P_Load);
 }
 
-int World::SpawnEntity(
-	const bsp_file::BSPFile &bsp,
-	U32 entityNum,
-	const xtime::TimeSlice &time,
-	int flags
-) {
-	if (!m_spawnEnt) {
-		if (m_nextEntId >= kMaxStaticEnts) {
-			COut(C_Warn) << "kMaxStaticEnts" << std::endl;
-			return SR_ErrorGeneric;
-		}
-
-		int r = CreateEntity(bsp, entityNum);
-		if (r != SR_Success) // don't fail on not finding a class factory.
-			return SR_Success;
-		RAD_ASSERT(m_spawnEnt);
-		SetupEntity(m_spawnEnt, m_nextEntId++);
-	}
-
-	int r = m_spawnEnt->PrivateSpawn(
-		m_spawnKeys,
-		time,
-		flags
-	);
-
-	if (r == SR_Pending)
-		return r;
-	if (r == SR_Success) {
-		COut(C_Debug) << "Spawned '" << m_spawnEnt->classname.get() << "'" << std::endl;
-		MapEntity(m_spawnEnt);
-	} else {
-		COut(C_Warn) << "Failed to spawn '" << m_spawnEnt->classname.get() << "'" << std::endl;
-	}
-
-	m_spawnEnt.reset();
-	m_spawnKeys.pairs.clear();
-
-	return r;
-}
-
 int World::SpawnSoundEmitter(
 	const bsp_file::BSPFile &bsp,
 	U32 entityNum,
@@ -557,10 +517,17 @@ int World::SpawnSoundEmitter(
 		if (classname && string::cmp(classname, "info_sound_emitter"))
 			return SR_Success; // skip non sound emitters
 
+		int uid = m_spawnKeys.IntForKey("uuid");
+		if (uid == -1) {
+			COut(C_Error) << "World::SpawnSoundEmitter(" << entityNum << "), persistent entity is missing uid." << std::endl;
+			return SR_ParseError; 
+		}
+
 		int r = CreateEntity(m_spawnKeys);
 		if (r != SR_Success) // don't fail on not finding a class factory.
 			return SR_Success;
 		RAD_ASSERT(m_spawnEnt);
+		m_spawnEnt->m_uid = uid;
 		SetupEntity(m_spawnEnt, m_nextEntId++);
 	}
 
@@ -601,11 +568,20 @@ int World::SpawnNonSoundEmitter(
 		const char *classname = m_spawnKeys.StringForKey("classname");
 		if (classname && !string::cmp(classname, "info_sound_emitter"))
 			return SR_Success; // skip sound emitters
+		
+		int uid = m_spawnKeys.IntForKey("uuid");
+#if !defined(RAD_OPT_SHIP)
+		if ((uid == -1) && string::cmp(classname, "worldspawn")) { // worldspawn has no persistent id
+			COut(C_Error) << "World::SpawnNonSoundEmitter(" << entityNum << "), persistent entity is missing uid." << std::endl;
+			return SR_ParseError; 
+		}
+#endif
 
 		int r = CreateEntity(m_spawnKeys);
 		if (r != SR_Success) // don't fail on not finding a class factory.
 			return SR_Success;
 		RAD_ASSERT(m_spawnEnt);
+		m_spawnEnt->m_uid = uid;
 		SetupEntity(m_spawnEnt, m_nextEntId++);
 	}
 
@@ -726,22 +702,6 @@ Keys World::LoadEntityKeys(const bsp_file::BSPFile &bsp, U32 entityNum) {
 int World::CreateEntity(const Keys &keys) {
 	m_spawnEnt = m_lua->CreateEntity(keys);
 	return m_spawnEnt ? SR_Success : SR_ParseError;
-}
-
-int World::CreateEntity(const bsp_file::BSPFile &bsp, U32 entityNum) {
-	m_spawnKeys = LoadEntityKeys(bsp, entityNum);
-	int r = CreateEntity(m_spawnKeys);
-	if (r == SR_Success) {
-		int uid = m_spawnKeys.IntForKey("uid");
-		if (uid != -1) {
-			m_spawnEnt->m_uid = uid;
-		} else {
-			COut(C_Error) << "World::CreateEntity(" << entityNum << "), persistent entity is missing uid." << std::endl;
-			r = SR_ParseError; 
-		}
-	}
-
-	return r;
 }
 
 int World::PostSpawn(const xtime::TimeSlice &time, int flags) {

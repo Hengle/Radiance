@@ -241,13 +241,6 @@ private:
 		int flags
 	);
 
-	int SpawnEntity(
-		const bsp_file::BSPFile &bsp,
-		U32 entityNum,
-		const xtime::TimeSlice &time,
-		int flags
-	);
-
 	int SpawnSoundEmitter(
 		const bsp_file::BSPFile &bsp,
 		U32 entityNum,
@@ -278,7 +271,6 @@ private:
 	void SetupEntity(const Entity::Ref &entity, int id);
 	void MapEntity(const Entity::Ref &entity);
 	int CreateEntity(const Keys &keys);
-	int CreateEntity(const bsp_file::BSPFile &bsp, U32 entityNum);
 	Keys LoadEntityKeys(const bsp_file::BSPFile &bsp, U32 entityNum);
 	void TickState(float dt, float unmod_dt);
 	void DispatchEvents();
