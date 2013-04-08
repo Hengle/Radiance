@@ -220,6 +220,11 @@ int SkAnimSetParser::Load(
 		if (!tools::LoadSceneFile(is, *source, false))
 			return SR_ParseError;
 
+		if (source->worldspawn->models.size() != 1) {
+			COut(C_Error) << "ERROR: 3DX file should only contain 1 model, it contains " << source->worldspawn->models.size() << "file, '" << *it << "'" << std::endl;
+			return SR_ParseError;
+		}
+
 		sources.push_back(source);
 	}
 
