@@ -44,8 +44,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 	
 	persistent global RadianceUtil_lastSceneFile
 	
-	function exportScene doMeshes doAnims =
-	(
+	function exportScene doMeshes doAnims = (
 		hidden  = exportHiddenCheckbox.checked
 		objs = objects;
 		oldSelection = selection
@@ -56,8 +55,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 		objs = RAD_ConvertableFilter objs #(Mesh, Freecamera)
 		objs = RAD_Exclude objs #(BoneGeometry, CATBone, HubObject) -- exclude bones
 		
-		if (objs.count == 0) then
-		(
+		if (objs.count == 0) then (
 			messagebox "No objects to export!"
 			return undefined
 		)
@@ -77,14 +75,12 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 		sliderTime = oldTime
 	)
 	
-	function enableMeshControls val =
-	(
+	function enableMeshControls val = (
 		exportMeshButton.enabled =val 
 		exportSkelButton.enabled = false 
 	)
 	
-	function enableAnimControls val =
-	(
+	function enableAnimControls val = (
 		animList.enabled = val
 		animStart.enabled = val
 		animEnd.enabled = val
@@ -101,104 +97,75 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 		exportAnimButton.enabled = val
 	)
 	
-	function enableAnimObjControls val =
-	(
+	function enableAnimObjControls val = (
 		cinematicObject.enabled = val
 		hideUntilRef.enabled = val
 		hideWhenDone.enabled = val
 	)
 	
-	function disableAll =
-	(
+	function disableAll = (
 		enableMeshControls false
 		enableAnimControls false
 		enableAnimObjControls false
 	)
 	
-	function selectedMeshes = 
-	(
+	function selectedMeshes =  (
 		meshes = (RAD_ConvertableFilter (getCurrentSelection()) #(Mesh))
 		RAD_Exclude meshes #(Bone, CATBone, HubObject) -- filter bones
 	)
 	
-	function selectedAnimatable =
-	(
-		RAD_FilterAnimatable (getCurrentSelection())
-	)
-	
-	function saveAnims =
-	(
-		for x in animSel do
-		(
-			for y in animSet do
-			(
+	function saveAnims = (
+		for x in animSel do (
+			for y in animSet do (
 				RAD_SetObjAnim x y
 			)
 		)
 		
-		for x in animSel do
-		(
+		for x in animSel do (
 			RAD_SetObjInitialAnim x animInitialState.selected
 		)
 	)
 	
-	function setupUIForSelAnim =
-	(
+	function setupUIForSelAnim = (
 		anim = animSet[animList.selection]
 		animName.text = anim.name
 		
-		if (anim.start != undefined) then
-		(
+		if (anim.start != undefined) then (
 			animStart.text = anim.start as string
-		)
-		else
-		(
+		) else (
 			animStart.text = ""
 		)
 		
-		if (anim.end != undefined) then
-		(
+		if (anim.end != undefined) then (
 			animEnd.text = anim.end as string
-		)
-		else
-		(
+		) else (
 			animEnd.text = ""
 		)
 		
-		if (anim.loop != undefined) then
-		(
+		if (anim.loop != undefined) then (
 			animLoop.checked = anim.loop
-		)
-		else
-		(
+		) else (
 			animLoop.triState = 2
 		)
 		
-		if (anim.export != undefined) then
-		(
+		if (anim.export != undefined) then (
 			animExport.checked = anim.export
-		)
-		else
-		(
+		) else (
 			animExport.triState = 2
 		)
 	)
 	
-	function deleteSelAnim =
-	(
+	function deleteSelAnim = (
 		anim = animSet[animList.selection]
 		initial = animInitialState.selected
 		
-		if (anim.name == initial) then 
-		(
-			for x in animSel do
-			(
+		if (anim.name == initial) then  (
+			for x in animSel do (
 				RAD_SetObjInitialAnim x undefined
 			)
 		)
 		
-		for x in animSel do
-		(
+		for x in animSel do (
 			RAD_DeleteObjAnim x animList.selected
 		)
 		
@@ -207,14 +174,11 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 		animList.items = items
 		animInitialState.items = items
 		
-		if (animSet.count > 0) then
-		(
+		if (animSet.count > 0) then (
 			animList.selection = 1
 			animInitialState.selection = findItem animInitialState.items (RAD_FilterInitialAnim animSel)
 			setupUIForSelAnim()
-		)
-		else
-		(
+		) else (
 			animName.text = ""
 			animStart.text = ""
 			animEnd.text = ""
@@ -225,8 +189,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 		)
 	)
 	
-	function addNewAnim =
-	(
+	function addNewAnim = (
 		anim = Animation (RAD_NewAnimName animSet) 0 0 false true
 		append animSet anim
 		items = (for x in animSet collect x.name)
@@ -239,25 +202,20 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 		saveAnims()
 	)
 	
-	function renameSelAnim name =
-	(
-		if (name == "") then
-		(
+	function renameSelAnim name = (
+		if (name == "") then (
 			messagebox "Invalid animation name!"
 			return undefined
 		)
 		
 		c = animList.selection
-		if (name != animSet[c].name) then
-		(
-			if ((RAD_FindAnimIndex animSet name) > 0) then
-			(
+		if (name != animSet[c].name) then (
+			if ((RAD_FindAnimIndex animSet name) > 0) then (
 				messagebox "An animation with that name already exists!"
 				return undefined
 			)
 			
-			for x in animSel do
-			(
+			for x in animSel do (
 				RAD_RenameObjAnim x animSet[c].name name
 			)
 			
@@ -270,8 +228,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 		)
 	)
 	
-	function setupUIForAnims objs =
-	(
+	function setupUIForAnims objs = (
 		-- get animatables in the selection
 		animSel = RAD_FilterAnimatable objs
 		animSet = RAD_GatherAnims animSel
@@ -284,8 +241,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 			animInitialState.selection = findItem animInitialState.items (RAD_FilterInitialAnim animSel)
 			enableAnimControls true
 			setupUIForSelAnim()
-		)
-		else if (animSel.count > 0) then (
+		) else if (animSel.count > 0) then (
 			animList.items = #()
 			animList.enabled = false
 			animInitialState.items = #()
@@ -303,6 +259,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 		
 		bboxEnabled = (animSel.count > 0)
 		setBBox.enabled = bboxEnabled
+		calcBBoxSize.enabled = bboxEnabled
 		
 		if (bboxEnabled) then (
 			bboxEnabled = false
@@ -336,85 +293,60 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 		)
 	)
 	
-	function setupUIForAnimatable objs = 
-	(
+	function setupUIForAnimatable objs = (
 		setupUIForAnims objs
 		
 		enableAnimObjControls true
 		
 		vals = RAD_GatherObjectProps objs #("CinematicObject") #("false")
-		if (vals[1]) then
-		(
-			if (vals[2][1][2][1] as BooleanClass) then
-			(
+		if (vals[1]) then (
+			if (vals[2][1][2][1] as BooleanClass) then (
 				cinematicObject.triState = 1 -- checked
-			)
-			else
-			(
+			) else (
 				cinematicObject.triState = 0
 			)
-		)
-		else
-		(
+		) else (
 			cinematicObject.state = 2 -- undefined
 		)
 		
 		vals = RAD_GatherObjectProps objs #("HideUntilRef") #("true")
-		if (vals[1]) then
-		(
-			if (vals[2][1][2][1] as BooleanClass) then
-			(
+		if (vals[1]) then (
+			if (vals[2][1][2][1] as BooleanClass) then (
 				hideUntilRef.triState = 1 -- checked
-			)
-			else
-			(
+			) else (
 				hideUntilRef.triState = 0
 			)
-		)
-		else
-		(
+		) else (
 			hideUntilRef.state = 2 -- undefined
 		)
 		
 		vals = RAD_GatherObjectProps objs #("HideWhenDone") #("true")
-		if (vals[1]) then
-		(
-			if (vals[2][1][2][1] as BooleanClass) then
-			(
+		if (vals[1]) then (
+			if (vals[2][1][2][1] as BooleanClass) then (
 				hideWhenDone.triState = 1 -- checked
-			)
-			else
-			(
+			) else (
 				hideWhenDone.triState = 0
 			)
-		)
-		else
-		(
+		) else (
 			hideWhenDone.state = 2 -- undefined
 		)
 	)
 	
-	function setupUIForObjects objs =
-	(
+	function setupUIForObjects objs = (
 		meshes = RAD_ConvertableFilter objs #(Mesh)
 		
-		if meshes.count > 0 then
-		(
+		if meshes.count > 0 then (
 			enableMeshControls true
 		)
 		
 		setupUIForAnimatable objs
 	)
 			
-	function onSelChange =
-	(
+	function onSelChange = (
 		sel = RAD_FilterAnimatable selection --RAD_Exclude (RAD_FilterAnimatable selection) #(Bone, CATBone, HubObject)
-		if (sel.count > 0) then
-		(
+		if (sel.count > 0) then (
 			setupUIForObjects sel
-		)
-		else
-		(
+		) else (
 			animSel = #()
 			animSet = #()
 			animList.items = #()
@@ -429,54 +361,51 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 		)
 	)
 	
-	function fileOpen =
-	(
+	function fileOpen = (
 	)
 		
-	on RadianceUtil open do
-	(
+	on RadianceUtil open do (
 		RadianceUtil.disableAll()
 		RadianceUtil.onSelChange()
 		RAD_AddSelChangeHandler "RadianceUtil.onSelChange()" #RadianceUtil_SELCHANGE
 		RAD_AddFileOpenHandler "RadianceUtil.fileOpen()" #RadianceUtil_FILEOPEN
 	)
-	on RadianceUtil close do
-	(
+	
+	on RadianceUtil close do (
 		RAD_RemoveSelChangeHandler #RadianceUtil_SELCHANGE
 		RAD_RemoveFileOpenHandler #RadianceUtil_FILEOPEN
 	)
-	on animList selected idx do
-	(
+	
+	on animList selected idx do (
 		animName.text = animSet[animList.selection].name
 		animStart.text = animSet[animList.selection].start as string
 		animEnd.text = animSet[animList.selection].end as string
 		animExport.checked = animSet[animList.selection].export
 		animLoop.checked = animSet[animList.selection].loop
 	)
-	on animName entered newVal do
-	(
+	
+	on animName entered newVal do (
 		renameSelAnim newVal
 	)
-	on exportSceneButton pressed do
-	(
+	
+	on exportSceneButton pressed do (
 		exportScene true true
 	)
-	on exportAnimButton pressed do
-	(
+	
+	on exportAnimButton pressed do (
 		exportScene false true
 	)
-	on exportMeshButton pressed do
-	(
+	
+	on exportMeshButton pressed do (
 		exportScene true false
 	)
-	on exportSkelButton pressed do
-	(
+	
+	on exportSkelButton pressed do (
 		exportScene false false
 	)
-	on animStart entered newVal do
-	(
-		if (newVal == "") then
-		(
+	
+	on animStart entered newVal do (
+		if (newVal == "") then (
 			messagebox "Please enter a number for the animation start frame."
 			return undefined
 		)
@@ -484,10 +413,9 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 		animSet[animList.selection].start = (newVal as integer)
 		saveAnims()
 	)
-	on animEnd entered newVal do
-	(
-		if (newVal == "") then
-		(
+	
+	on animEnd entered newVal do (
+		if (newVal == "") then (
 			messagebox "Please enter a number for the animation end frame."
 			return undefined
 		)
@@ -495,82 +423,72 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 		animSet[animList.selection].end = (newVal as integer)
 		saveAnims()
 	)
-	on animLoop changed state do
-	(
+	
+	on animLoop changed state do (
 		animSet[animList.selection].loop = state
 		saveAnims()
 	)
-	on animInitialState selected idx do
-	(
+	
+	on animInitialState selected idx do (
 		saveAnims()
 	)
-	on animSetStart pressed do
-		(
+	
+	on animSetStart pressed do (
 	)
-	on animSetEnd pressed do
-		(
+	
+	on animSetEnd pressed do (
 	)
-	on animTest pressed do
-		(
+	
+	on animTest pressed do (
 	)
-	on animExport changed state do
-	(
+	
+	on animExport changed state do (
 		animSet[animList.selection].export = state
 		saveAnims()
 	)
-	on addAnim pressed do
-	(
+	
+	on addAnim pressed do (
 		addNewAnim()
 	)
-	on deleteAnim pressed do
-	(
+	
+	on deleteAnim pressed do (
 		deleteSelAnim()
 	)
-	on noDefault pressed do
-	(
+	
+	on noDefault pressed do (
 		animInitialState.selection = -1
 		animInitialState.items = (for x in animSet collect x.name)
 				
-		for x in animSel do
-		(
+		for x in animSel do (
 			RAD_SetObjInitialAnim x undefined
 		)
 	)
-	on cinematicObject changed state do
-	(
-		if (state) then
-		(
-			RAD_SetObjectProps (selectedAnimatable()) #(#("CinematicObject", "true"))
-		)
-		else
-		(
-			RAD_SetObjectProps (selectedAnimatable()) #(#("CinematicObject", "false"))
+	
+	on cinematicObject changed state do (
+		if (state) then (
+			RAD_SetObjectProps (selectedMeshes()) #(#("CinematicObject", "true"))
+		) else (
+			RAD_SetObjectProps (selectedMeshes()) #(#("CinematicObject", "false"))
 		)
 	)
-	on hideUntilRef changed state do
-	(
-		if (state) then
-		(
-			RAD_SetObjectProps (selectedAnimatable()) #(#("HideUntilRef", "true"))
-		)
-		else
-		(
-			RAD_SetObjectProps (selectedAnimatable()) #(#("HideUntilRef", "false"))
+	
+	on hideUntilRef changed state do (
+		if (state) then (
+			RAD_SetObjectProps (selectedMeshes()) #(#("HideUntilRef", "true"))
+		) else (
+			RAD_SetObjectProps (selectedMeshes()) #(#("HideUntilRef", "false"))
 		)
 	)
-	on hideWhenDone changed state do
-	(
-		if (state) then
-		(
-			RAD_SetObjectProps (selectedAnimatable()) #(#("HideWhenDone", "true"))
-		)
-		else
-		(
-			RAD_SetObjectProps (selectedAnimatable()) #(#("HideWhenDone", "false"))
+	
+	on hideWhenDone changed state do (
+		if (state) then (
+			RAD_SetObjectProps (selectedMeshes()) #(#("HideWhenDone", "true"))
+		) else (
+			RAD_SetObjectProps (selectedMeshes()) #(#("HideWhenDone", "false"))
 		)
 	)
-	on nameCompleteMapsButton pressed do
-	(
+	
+	on nameCompleteMapsButton pressed do (
 		mat = meditMaterials[activeMeditSlot]
 		
 		if (classof(mat) != MultiMaterial) then (
@@ -605,20 +523,30 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 			sub.name = autonamePackage.text + "/" + x + "_M"
 		)
 	)
-	on setBBoxSize changed state do (
+	
+	on setBBox changed state do (
 		if (state) then (
-			RAD_SetObjectProps (selectedAnimatable()) #(#("SetBBox", "true"))
+			RAD_SetObjectProps (selectedMeshes()) #(#("SetBBox", "true"))
+			calcBBoxSize.enabled = true
+			vals = RAD_GatherObjectProps animSel #("BBox") #("-24 -24 -24 24 24 24")
+			if (vals[1]) then (
+				bboxSize.text = vals[2][1][2][1]
+			) else (
+				bboxSize.text = ""
+			)
 		) else (
-			RAD_SetObjectProps (selectedAnimatable()) #(#("SetBBox", "false"))
+			RAD_SetObjectProps (selectedMeshes()) #(#("SetBBox", "false"))
+			calcBBoxSize.enabled = false
+			bboxSize.text = ""
 		)
 	)
-	on bboxSize entered newVal do
-	(
-		RAD_SetObjectProps (selectedAnimatable()) #(#("BBox", newVal))
+	
+	on bboxSize entered newVal do (
+		RAD_SetObjectProps (selectedMeshes()) #(#("BBox", newVal))
 	)
-	on calcBBoxSize pressed do
-	(
-		objs = selectedAnimatable()
+	
+	on calcBBoxSize pressed do (
+		objs = selectedMeshes()
 		for i=1 to objs.count do (
 			bbox = RAD_MeshBBox (snapshotAsMesh objs[i])
 			s = ""

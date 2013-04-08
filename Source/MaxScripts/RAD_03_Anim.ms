@@ -104,7 +104,7 @@ function RAD_GetSkelRoot skel =
 function RAD_IsAnimated model =
 (
 	s = getUserProp model "$animations$"
-	(s != undefined and s != "$empty$") and (model.modifiers[#skin] != undefined)
+	(s != undefined and s != "$empty$")
 )
 
 -- [num, [(skelnum, root, obj)]]
@@ -566,9 +566,7 @@ function RAD_ExportAnims file doMeshes doAnims trim obj =
 		return RAD_ExportSkAnims file doMeshes doAnims isCamera anims obj
 	)
 	
-	if (z.count > 0) then (
-		WriteLong file kScene_AnimTypeVertex
-		RAD_ExportVertexAnims file anims obj
-	)
+	WriteLong file kScene_AnimTypeVertex
+	RAD_ExportVertexAnims file anims obj
 )
 

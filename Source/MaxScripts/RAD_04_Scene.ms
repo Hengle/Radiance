@@ -15,30 +15,25 @@ global kSceneFlag_HideUntilRefed = 0x00040000
 global kSceneFlag_HideWhenDone = 0x00010000
 global kSceneFlag_SetBBox = 0x00008000
 
-function RAD_GatherEntities objs =
-(
+function RAD_GatherEntities objs = (
 	ents = #()
 	meshes = RAD_Exclude (RAD_ConvertableFilter objs #(Mesh)) #(BoneGeometry, CATBone, HubObject) -- exclude bones
 	ids = RAD_AssignIDs meshes 1
 	
-	if (meshes.count > 0) then
-	(
+	if (meshes.count > 0) then (
 		ents = append ents #("worldspawn", [0, 0, 0], 0, meshes, ids[2])
 	)
 	
 	ents
 )
 
-function RAD_GatherCameras objs =
-(
+function RAD_GatherCameras objs = (
 	return RAD_Filter objs #(Freecamera)
 )
 
-function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName =
-(
+function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName = (
 	file = fopen fileName "wb"
-	if (file == undefined) then
-	(
+	if (file == undefined) then (
 		messagebox ("cannot open " + fileName + " for write!")
 		return undefined
 	)
@@ -60,39 +55,32 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName =
 		
 		mats = sceneMaterials
 		WriteLong file mats.count #unsigned
-		for x in mats do
-		(
+		for x in mats do (
 			flags = 0
 			WriteString file x.name
-			if ((classof x) == MultiMaterial) then
-			(
+			if ((classof x) == MultiMaterial) then (
 				flags = 1
 				WriteLong file flags #unsigned
 				WriteLong file x.materialList.count #unsigned
 				c = 1
-				for y in x.materialList do
-				(
+				for y in x.materialList do (
 					WriteLong file x.materialIDList[c] #unsigned
 					WriteString file y.name
 					c = c + 1
 				)
-			)
-			else
-			(
+			) else (
 				WriteLong file flags #unsigned
 			)
 		)
 		
 		ents = RAD_GatherEntities objs
 		
-		if (doAnims) then
-		(
+		if (doAnims) then (
 			cams = RAD_GatherCameras objs
 			
 			WriteLong file cams.count #unsigned
 			
-			for x in cams do
-			(
+			for x in cams do (
 				WriteString file x.name
 				flags = 0
 				cinematicObject = getUserProp x "CinematicObject"
@@ -100,17 +88,14 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName =
 				WriteLong file flags #unsigned
 				RAD_ExportAnims file false true undefined x
 			)
-		)
-		else
-		(
+		) else (
 			WriteLong file 0 #unsigned
 		)
 		
 		WriteLong file ents.count #unsigned
 	
 		c = 0
-		for x in ents do
-		(
+		for x in ents do (
 			WriteString file x[1] -- name
 			WriteLong file x[3] -- id
 			org = x[2]
@@ -124,10 +109,8 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName =
 			-- note there is a skel[] per mesh in the worlspawn
 			-- meshes that have no skel[] have a 0 for their skel index.
 			
-			for y in skels[2] do
-			(
-				if (y[1] != 0) then
-				(
+			for y in skels[2] do (
+				if (y[1] != 0) then (
 					RAD_WriteSkel file y[3]
 				)
 			)
@@ -137,8 +120,7 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName =
 			print ("Exporting " + (x[4].count as string) + " object(s) in entity " + x[1])
 			
 			meshNum = 1
-			for m in x[4] do -- mesh
-			(
+			for m in x[4] do ( -- mesh
 				if (getProgressCancel()) then (throw "cancel")
 				
 				WriteLong file x[5][meshNum] #unsigned -- id
@@ -198,8 +180,7 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName =
 				)
 				
 				skinEnabled = false
-				if (m.modifiers[#skin] != undefined) then
-				(
+				if (m.modifiers[#skin] != undefined) then (
 					skinEnabled = m.skin.enabled
 					m.skin.enabled = false
 				)
