@@ -255,6 +255,7 @@ public:
 	RAD_DECLARE_PROPERTY(Widget, clipRect, const Rect&, const Rect&); // <-- widget space
 	RAD_DECLARE_PROPERTY(Widget, contentPos, const Vec2&, const Vec2);
 	RAD_DECLARE_PROPERTY(Widget, blendWithParent, bool, bool);
+	RAD_DECLARE_PROPERTY(Widget, opaqueLayerInput, bool, bool);
 	
 	void Tick(float time, float dt);
 	//! clip rect is in screen space
@@ -364,6 +365,7 @@ private:
 	UIW_DECL_GETSET(ClipRect);
 	UIW_DECL_GETSET(ContentPos);
 	UIW_DECL_GETSET(BlendWithParent);
+	UIW_DECL_GETSET(OpaqueLayerInput);
 
 	RAD_DECLARE_GET(parent, Ref) { 
 		return m_parent.lock(); 
@@ -481,6 +483,14 @@ private:
 		m_blendWithParent = value;
 	}
 
+	RAD_DECLARE_GET(opaqueLayerInput, bool) {
+		return m_opaqueLayerInput;
+	}
+
+	RAD_DECLARE_SET(opaqueLayerInput, bool) {
+		m_opaqueLayerInput = value;
+	}
+
 	RAD_DECLARE_GET(blendedColor, Vec4);
 
 	Vec m_children;
@@ -511,6 +521,7 @@ private:
 	bool m_capture;
 	bool m_clip;
 	bool m_blendWithParent;
+	bool m_opaqueLayerInput;
 
 	static int NextWidgetId(lua_State *L);
 	static int s_id;

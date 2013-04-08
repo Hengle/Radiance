@@ -121,6 +121,8 @@ bool Root::HandleInputEvent(const InputEvent &_e, const TouchState *touch, const
 		for (WidgetMap::const_reverse_iterator it = m_layers.rbegin(); it != m_layers.rend(); ++it) {
 			if (it->second->HandleInputEvent(e, touch, is))
 				return true;
+			if (it->second->visible && it->second->opaqueLayerInput)
+				break;
 		}
 	}
 
@@ -137,6 +139,8 @@ bool Root::HandleInputGesture(const InputGesture &_g, const TouchState &touch, c
 		for (WidgetMap::const_reverse_iterator it = m_layers.rbegin(); it != m_layers.rend(); ++it) {
 			if (it->second->HandleInputGesture(g, touch, is))
 				return true;
+			if (it->second->visible && it->second->opaqueLayerInput)
+				break;
 		}
 	}
 
@@ -292,6 +296,7 @@ void Widget::Init() {
 	m_capture = false;
 	m_clip = false;
 	m_blendWithParent = false;
+	m_opaqueLayerInput = false;
 	m_contentPos = Vec2::Zero;
 
 	m_fadeTime[0] = 0.f;
@@ -407,6 +412,7 @@ void Widget::PushCallTable(lua_State *L) {
 	LUART_REGISTER_GETSET(L, ClipRect);
 	LUART_REGISTER_GETSET(L, ContentPos);
 	LUART_REGISTER_GETSET(L, BlendWithParent);
+	LUART_REGISTER_GETSET(L, OpaqueLayerInput);
 }
 
 void Widget::CreateFromTable(lua_State *L) {
@@ -1038,6 +1044,7 @@ UIW_GET(Widget, zAngle, float, m_zRate[0]);
 UIW_SET(Widget, ZAngle, float, m_zRate[0]);
 UIW_GETSET(Widget, ContentPos, Vec2, m_contentPos);
 UIW_GETSET(Widget, BlendWithParent, bool, m_blendWithParent);
+UIW_GETSET(Widget, OpaqueLayerInput, bool, m_opaqueLayerInput);
 
 int Widget::LUART_SETFN(Tick)(lua_State *L) {
 	Ref self = GetRef<Widget>(L, "Widget", 1, true);
