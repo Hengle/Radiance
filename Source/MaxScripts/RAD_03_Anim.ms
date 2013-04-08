@@ -5,6 +5,9 @@
 
 -- [name, start, end, looping]
 
+global kScene_AnimTypeSkeletal = 0
+global kScene_AnimTypeVertex = 1
+
 Struct Animation
 (
 	name,
@@ -403,12 +406,15 @@ function RAD_GetBoneTM b =
 function RAD_ExportSkAnims file doMeshes doAnims isCamera anims obj = (
 	select obj
 	
-	max modify mode
-	numBones = skinops.GetNumberBones obj.skin
-	numVerts = skinops.GetNumberVertices obj.skin
+	numBones = 0
+	numVerts = 0
 		
 	if (doMeshes) then
 	(
+		max modify mode
+		numBones = skinops.GetNumberBones obj.skin
+		numVerts = skinops.GetNumberVertices obj.skin
+		
 		for x = 1 to numVerts do
 		(
 			numWeights = skinops.GetVertexWeightCount obj.skin x
@@ -474,6 +480,9 @@ function RAD_ExportSkAnims file doMeshes doAnims isCamera anims obj = (
 function RAD_ExportVertexAnims file anims obj = (
 
 	keyframes = RAD_GetObjectKeyframeTimes obj
+	if (keyframes == undefined) then (
+		keyframes = #()
+	)
 	
 	for x in anims do (
 		
@@ -530,7 +539,9 @@ function RAD_ExportAnims file doMeshes doAnims trim obj =
 			RAD_WriteTriMesh file trim
 		)
 	) else if (z.count > 0) then ( -- it's vertex animated, always write full tri-mesh
-		RAD_WriteTriMesh file trim
+		if (not isCamera) then (
+			RAD_WriteTriMesh file trim
+		)
 	) else (
 		if (doMeshes) then (
 			RAD_WriteTriMesh file trim
@@ -555,7 +566,9 @@ function RAD_ExportAnims file doMeshes doAnims trim obj =
 		return RAD_ExportSkAnims file doMeshes doAnims isCamera anims obj
 	)
 	
-	WriteLong file kScene_AnimTypeVertex
-	RAD_ExportVertexAnims file anims obj
+	if (z.count > 0) then (
+		WriteLong file kScene_AnimTypeVertex
+		RAD_ExportVertexAnims file anims obj
+	)
 )
 

@@ -324,7 +324,7 @@ int SkModelParser::Load(
 	ib.reset();
 
 	if (map.worldspawn->models.size() != 1) {
-		COut(C_Error) << "ERROR: 3DX file should only contain 1 model, it contains " << map.worldspawn->models.size() << "file, '" << *s << "'" << std::endl;
+		COut(C_Error) << "ERROR: 3DX file should only contain 1 model, it contains " << map.worldspawn->models.size() << ". File: '" << *s << "'" << std::endl;
 		return SR_ParseError;
 	}
 

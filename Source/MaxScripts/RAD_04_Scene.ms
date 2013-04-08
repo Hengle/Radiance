@@ -14,8 +14,6 @@ global kSceneFlag_CinematicObject = 0x00080000
 global kSceneFlag_HideUntilRefed = 0x00040000
 global kSceneFlag_HideWhenDone = 0x00010000
 global kSceneFlag_SetBBox = 0x00008000
-global kScene_AnimTypeSkeletal = 0
-global kScene_AnimTypeVertex = 1
 
 function RAD_GatherEntities objs =
 (
@@ -100,7 +98,7 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName =
 				cinematicObject = getUserProp x "CinematicObject"
 				if (cinematicObject != undefined and cinematicObject == true) then (flags = bit.or flags kSceneFlag_CinematicObject)
 				WriteLong file flags #unsigned
-				RAD_ExportAnims file false true x
+				RAD_ExportAnims file false true undefined x
 			)
 		)
 		else

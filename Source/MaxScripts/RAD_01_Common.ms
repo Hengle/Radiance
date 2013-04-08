@@ -3,56 +3,20 @@
 -- Author: Joe Riedel
 -- See Radiance/LICENSE for licensing terms.
 
-function RAD_GetObjectKeyframeTimes obj = (
-	c = classof(obj)
-	if (c == Loft) then (
-		return RAD_GetLoftKeyframeTimes(obj)
-	) else if (c == Editable_Mesh) then (
-		return RAD_GetEditableMeshKeyframeTimes(obj)
-	)
+function RAD_GetObjectTransformKeyframeTimes obj = (
+	pos = for x in obj.transform.controller.position.controller.keys collect x.time
+	rot = for x in obj.transform.controller.rotation.controller.keys collect x.time
+	scl = for x in obj.transform.controller.scale.controller.keys collect x.time
 	
-	undefined
-)
-
-function RAD_GetEditableMeshKeyframeTimes obj = (
-	props = getPropNames obj #dynamicOnly
-	keyframes = undefined
+	keys = join pos rot
+	keys = join keys scl
+	keys = makeUniqueArray keys
 	
-	for p in props do (
-		z = execute("($" + obj.name + ")." + (p as string) + ".controller.keys")
-		if (z.count > 1) then (
-			w = for x in z collect x.time
-			if (keyframes == undefined) then (
-				keyframes = #()
-			)
-			join keyframes w
-		)
+	if (keys.count < 1) then (
+		keys = undefined
 	)
-	
-	xformkeys = RAD_GetObjectTransformKeyframeTimes obj
-	if (xformkeys != undefined) then (
-		if (keyframes != undefined) then (
-			join keyframes xformkeys
-		) else (
-			keyframes = xformkeys
-		)
-	)
-	
-	if (keyframes != undefined) then (
-		keyframes = makeUniqueArray keyframes
-		sort keyframes
-	)
-	
-	keyframes
-)
-
-function RAD_GetLoftKeyframeTimes obj = (
-	if (obj.line != undefined) then (
-		if (classof(obj.baseobject[#line][#master]) == SubAnim) then (
-			return RAD_GetLoftLineKeyFrameTimes obj
-		)
-	)
-	undefined
+		
+	keys
 )
 
 function RAD_GetLoftLineKeyframeTimes obj = (
@@ -88,20 +52,56 @@ function RAD_GetLoftLineKeyframeTimes obj = (
 	keyframes
 )
 
-function RAD_GetObjectTransformKeyframeTimes obj = (
-	pos = for x in obj.transform.controller.position.controller.keys collect x.time
-	rot = for x in obj.transform.controller.rotation.controller.keys collect x.time
-	scl = for x in obj.transform.controller.scale.controller.keys collect x.time
-	
-	keys = join pos rot
-	keys = join keys scl
-	keys = makeUniqueArray keys
-	
-	if (keys.count < 1) then (
-		keys = undefined
+function RAD_GetLoftKeyframeTimes obj = (
+	if (obj.line != undefined) then (
+		if (classof(obj.baseobject[#line][#master]) == SubAnim) then (
+			return RAD_GetLoftLineKeyFrameTimes obj
+		)
 	)
-		
-	keys
+	undefined
+)
+
+function RAD_GetEditableMeshKeyframeTimes obj = (
+	props = getPropNames obj #dynamicOnly
+	keyframes = undefined
+	
+	for p in props do (
+		z = execute("($" + obj.name + ")." + (p as string) + ".controller.keys")
+		if (z.count > 1) then (
+			w = for x in z collect x.time
+			if (keyframes == undefined) then (
+				keyframes = #()
+			)
+			join keyframes w
+		)
+	)
+	
+	xformkeys = RAD_GetObjectTransformKeyframeTimes obj
+	if (xformkeys != undefined) then (
+		if (keyframes != undefined) then (
+			join keyframes xformkeys
+		) else (
+			keyframes = xformkeys
+		)
+	)
+	
+	if (keyframes != undefined) then (
+		keyframes = makeUniqueArray keyframes
+		sort keyframes
+	)
+	
+	keyframes
+)
+
+function RAD_GetObjectKeyframeTimes obj = (
+	c = classof(obj)
+	if (c == Loft) then (
+		return RAD_GetLoftKeyframeTimes(obj)
+	) else if (c == Editable_Mesh) then (
+		return RAD_GetEditableMeshKeyframeTimes(obj)
+	)
+	
+	undefined
 )
 
 function RAD_GetKeyframeBounds start end keys = (
