@@ -341,37 +341,41 @@ namespace {
 			if (!(flags&kHasMeshFlag))
 				return false;
 
-			SceneFile::Anim::Ref a(new SceneFile::Anim());
-			a->name = ReadString(stream);
+			for (int i = 0; i < numAnims; ++i) {
+				SceneFile::Anim::Ref a(new SceneFile::Anim());
+				a->name = ReadString(stream);
 			
-			U32 flags, numFrames, firstFrame;
-			stream >> flags >> firstFrame >> numFrames;
+				U32 flags, numFrames, firstFrame;
+				stream >> flags >> firstFrame >> numFrames;
 			
-			a->looping = flags&1;
-			a->frameRate = frameRate;
-			a->firstFrame = (int)firstFrame;
-			a->vertexFrames.resize(numFrames);
+				a->looping = flags&1;
+				a->frameRate = frameRate;
+				a->firstFrame = (int)firstFrame;
+				a->vertexFrames.resize(numFrames);
 
-			U32 numVertFrames;
-			stream >> numVertFrames;
+				U32 numVertFrames;
+				stream >> numVertFrames;
 
-			for (U32 j = 0; j < numVertFrames; ++j) {
-				SceneFile::VertexFrame &vframe = a->vertexFrames[j];
+				for (U32 j = 0; j < numVertFrames; ++j) {
+					SceneFile::VertexFrame &vframe = a->vertexFrames[j];
 				
-				U32 frame;
-				stream >> frame;
-				vframe.frame = frame;
+					U32 frame;
+					stream >> frame;
+					vframe.frame = frame;
 
-				vframe.verts.resize(mdl.verts.size());
+					vframe.verts.resize(mdl.verts.size());
 
-				U32 numVerts;
-				stream >> numVerts;
+					U32 numVerts;
+					stream >> numVerts;
 
-				if (numVerts != (U32)mdl.verts.size())
-					return false;
+					if (numVerts != (U32)mdl.verts.size())
+						return false;
 
-				for (U32 k = 0; k < numVerts; ++k)
-					vframe.verts[k].pos = ReadVec3(stream);
+					for (U32 k = 0; k < numVerts; ++k)
+						vframe.verts[k].pos = ReadVec3(stream);
+				}
+
+				mdl.anims.insert(SceneFile::AnimMap::value_type(a->name, a));
 			}
 		}
 
