@@ -245,6 +245,7 @@ bool SkaBuilder::Compile(
 	}
 
 	// bones is now a vector of bones sorted in parent->children order.
+	root = 0;
 	SetBones(bones);
 
 	std::vector<bool> badList;
