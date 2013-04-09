@@ -508,6 +508,15 @@ int Floors::FindFloor(const char *name) const {
 	return -1;
 }
 
+const char *Floors::FloorName(int floor) const {
+	
+	if (floor < 0 || floor >= (int)m_bsp->numFloors)
+		return 0;
+
+	const bsp_file::BSPFloor *fp = m_bsp->Floors() + floor;
+	return m_bsp->String(fp->name);
+}
+
 int Floors::FloorState(int floor) const {
 	if (floor < 0 || (floor >= (int)m_floorState.size()))
 		return 0;
@@ -797,7 +806,6 @@ bool Floors::FindDirectRoute(const FloorPosition &start, const FloorPosition &en
 
 		const bsp_file::BSPFloorTri *otherTri = m_bsp->FloorTris() + otherTriNum;
 
-		// have to add this if there is a slope change
 		if (tri->planenum != otherTri->planenum) {
 			step.pos = bestPos;
 			step.tri = otherTriNum - floor->firstTri;
@@ -871,6 +879,22 @@ void Floors::OptimizeRoute(WalkStep::Vec &route) const {
 
 	// always emit end-point
 	route->push_back(original->back());
+
+	// remove duplicates.
+	bool removed = true;
+
+	while (removed) {
+		removed = false;
+		for (size_t i = 0; i < route->size()-1; ++i) {
+			const WalkStep &a = route[i];
+			const WalkStep &b = route[i+1];
+			if (a.pos.NearlyEquals(b.pos, 1.f)) {
+				route->erase(route->begin()+i+1);
+				removed = true;
+				break;
+			}
+		}
+	}
 }
 
 void Floors::OptimizeRoute2(WalkStep::Vec &route) const {
@@ -953,12 +977,10 @@ bool Floors::Walk(
 		start.m_pos = Vec3(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
 	} else if (start.m_floor != -1) { // arbitrary floor position
 		if (start.m_tri == -1) {
-			Vec3 x(start.m_pos + Vec3(0, 0, 8.f));
-			Vec3 y(start.m_pos - Vec3(0, 0, 8.f));
+			Vec3 x(start.m_pos + Vec3(0, 0, 16.f));
+			Vec3 y(start.m_pos - Vec3(0, 0, 16.f));
 			if (!ClipToFloor(start.m_floor, x, y, start)) {
-#if !defined(RAD_OPT_SHIP)
-				RAD_FAIL("Floor starting position is outside floor!");
-#endif
+				COut(C_Error) << "Floor starting position is outside floor!" << std::endl;
 				return false;
 			}
 		}
@@ -971,12 +993,10 @@ bool Floors::Walk(
 		end.m_pos = Vec3(waypoint->pos[0], waypoint->pos[1], waypoint->pos[2]);
 	} else if (end.m_floor != -1) { // arbitrary floor position
 		if (end.m_tri == -1) {
-			Vec3 x(end.m_pos + Vec3(0, 0, 8.f));
-			Vec3 y(end.m_pos - Vec3(0, 0, 8.f));
+			Vec3 x(end.m_pos + Vec3(0, 0, 16.f));
+			Vec3 y(end.m_pos - Vec3(0, 0, 16.f));
 			if (!ClipToFloor(end.m_floor, x, y, end)) {
-#if !defined(RAD_OPT_SHIP)
-				RAD_FAIL("Floor ending position is outside floor!");
-#endif
+				COut(C_Error) << "Floor ending position is outside floor!" << std::endl;
 				return false;
 			}
 		}
@@ -1050,6 +1070,10 @@ bool Floors::Walk(
 	return true;
 }
 
+#define RANGE_CHECK(v) \
+	RAD_ASSERT(math::Abs(v[0]) < 16000.f); \
+	RAD_ASSERT(math::Abs(v[1]) < 16000.f); \
+	RAD_ASSERT(math::Abs(v[2]) < 16000.f)
 
 void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route &moveRoute) const {
 	if (walkRoute->empty())
@@ -1120,8 +1144,11 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 	
 		float nextLen = vNext.Normalize();
 		
+		RANGE_CHECK(cur.pos);
+
 		// make move continous in X, Y. Preserve motion exactly in Z (don't want to float above/below
 		// floor).
+		
 		if (i > 0) {
 			const WalkStep &prev = walkRoute[i-1];
 			Vec3 prevPos;
@@ -1141,6 +1168,8 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 			ctrls[0][2] = 0.f;
 			ctrls[0].Normalize();
 			ctrls[0][2] = vNext[2]; // no longer normalized
+
+
 				
 		} else {
 			ctrls[0] = vNext;
@@ -1166,14 +1195,18 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 			// isolate Z
 			ctrls[1][2] = 0.f;
 			ctrls[1].Normalize();
-			ctrls[1][2] = vNext[2]; // no longer normalized
-				
+			ctrls[1][2] = vNext[2];
+
 			ctrls[1] = -ctrls[1];
 		} else {
 			ctrls[1] = -vNext;
 		}
 
 		ctrls[1] = next.pos + (ctrls[1]*len);
+		
+		RANGE_CHECK(ctrls[0]);
+		RANGE_CHECK(ctrls[1]);
+		RANGE_CHECK(next.pos);
 
 		physics::CubicBZSpline spline(cur.pos, ctrls[0], ctrls[1], next.pos);
 		step.floors[0] = cur.floors[0];
@@ -1607,13 +1640,71 @@ bool Floors::ClipToFloor(
 			if (side)
 				edgePlane.Flip();
 
-			if (edgePlane.Side(clip) == Plane::Back) {
+			if ((edge->tris[0] == -1) || (edge->tris[1] == -1)) {
+				// must be well within floor edge
+				if (edgePlane.Side(clip, 1.f) != Plane::Front)
+					break;
+			} else if (edgePlane.Side(clip) == Plane::Back) {
 				break;
 			}
 		}
 
 		if (k == 3) {
 			// inside triangle hull
+
+			// don't let the clip point be too close to an edge for precision issues
+			//bool skip = false;
+
+			//for (k = 0; k < 3; ++k) {
+			//	const bsp_file::BSPFloorEdge *edge = m_bsp->FloorEdges() + tri->edges[k];
+			//	if (edge->tris[0] != -1 && edge->tris[1] != -1)
+			//		continue; // not a floor edge
+
+			//	plane = m_bsp->Planes() + edge->planenum;
+
+			//	int side = edge->tris[1] == triNum;
+
+			//	Plane edgePlane(plane->p[0], plane->p[1], plane->p[2], plane->p[3]);
+
+			//	if (side)
+			//		edgePlane.Flip();
+
+			//	float d = edgePlane.Distance(clip);
+			//	if (d < 1.f) {
+			//		// move clip a little bit
+			//		clip = clip + (edgePlane.Normal() * (1.f - d));
+
+			//		// check other edges
+			//		RAD_ASSERT(edgePlane.Side(clip) == Plane::Front);
+			//		int j;
+			//		for (j = 0; j < 3; ++j) {
+			//			if (j == k)
+			//				continue;
+
+			//			const bsp_file::BSPFloorEdge *edge = m_bsp->FloorEdges() + tri->edges[k];
+
+			//			plane = m_bsp->Planes() + edge->planenum;
+
+			//			side = edge->tris[1] == triNum;
+
+			//			edgePlane = Plane(plane->p[0], plane->p[1], plane->p[2], plane->p[3]);
+
+			//			if (side)
+			//				edgePlane.Flip();
+
+			//			if (edgePlane.Side(clip) != Plane::Front)
+			//				break;
+			//		}
+
+			//		if (j != 3) {
+			//			skip = true;
+			//			break;
+			//		}
+			//	}
+			//}
+			//
+			//if (skip)
+			//	continue;
 			
 			// valid line trace?
 			trace.start = start;

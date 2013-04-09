@@ -197,6 +197,7 @@ public:
 	};
 
 	int FindFloor(const char *name) const;
+	const char *FloorName(int floor) const;
 	int FloorState(int floor) const;
 	void SetFloorState(int floor, int state);
 

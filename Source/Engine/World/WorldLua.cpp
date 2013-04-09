@@ -152,6 +152,7 @@ bool WorldLua::Init() {
 		{ "FlushInput", lua_World_FlushInput },
 		{ "FindFloor", lua_World_FindFloor },
 		{ "FloorState", lua_World_FloorState },
+		{ "FloorName", lua_World_FloorName },
 		{ "SetFloorState", lua_World_SetFloorState },
 		{ "WaypointPosition", lua_World_WaypointPosition },
 		{ "WaypointFloorPosition", lua_World_WaypointFloorPosition },

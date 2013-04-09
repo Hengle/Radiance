@@ -1038,6 +1038,17 @@ int WorldLua::lua_World_FloorState(lua_State *L) {
 	return 1;
 }
 
+int WorldLua::lua_World_FloorName(lua_State *L) {
+	LOAD_SELF
+	const char *sz = self->m_world->floors->FloorName(luaL_checkinteger(L, 1));
+	if (sz) {
+		lua_pushstring(L, sz);
+		return 1;
+	}
+
+	return 0;
+}
+
 int WorldLua::lua_World_SetFloorState(lua_State *L) {
 	LOAD_SELF
 	self->m_world->floors->SetFloorState(luaL_checkinteger(L, 1), luaL_checkinteger(L, 2));
