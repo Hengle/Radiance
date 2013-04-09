@@ -51,7 +51,6 @@ private:
 	void Init();
 	void Drag(const InputEvent &e);
 	bool ProcessInputEvent(const InputEvent &e, const TouchState *state, const InputState &is);
-	void CheckPostDelayedInput();
 	void Scroll(const Vec2 &delta);
 
 	bool ApplyVelocity(float dt);
@@ -140,7 +139,7 @@ private:
 	bool m_dragDidMove;
 	bool m_postingEvent;
 	bool m_endStop;
-	bool m_checkDelayed;
+	bool m_sendCancelTouch;
 };
 
 } // ui

@@ -31,7 +31,7 @@ void VListWidget::Init() {
 	m_postingEvent = false;
 	m_dragDidMove = false;
 	m_endStop = false;
-	m_checkDelayed = false;
+	m_sendCancelTouch = false;
 
 	m_spring.length = 0.01f;
 	m_spring.elasticity = 200.f;
@@ -199,7 +199,7 @@ void VListWidget::Drag(const InputEvent &e) {
 
 	float dt = delta / 1000.f;
 	
-	if (dt < 0.1f) {
+	if (dt < 0.3f) {
 		if (((dy < 0.f) && (m_dragMotion[0] <= 0.f)) ||
 			((dy > 0.f) && (m_dragMotion[0] >= 0.f))) {
 			m_dragMotion[0] += dy;
@@ -218,7 +218,6 @@ void VListWidget::Drag(const InputEvent &e) {
 
 	m_dragMove = dy != 0.f;
 	m_dragDidMove = m_dragDidMove || m_dragMove;
-
 	Scroll(Vec2(0.f, dy));
 }
 
@@ -304,16 +303,15 @@ bool VListWidget::ApplyVelocity(float dt) {
 }
 
 void VListWidget::OnTick(float time, float dt) {
-	CheckPostDelayedInput();
-
-	if (m_dragging) {
+	
+	/*if (m_dragging) {
 		xtime::TimeVal delta = xtime::ReadMilliseconds() - m_e.time;
 		if (delta > 250) {
 			m_dragMotion[0] = 0.f;
 			m_dragMotion[1] = 0.f;
 			m_velocity[1] = 0.f;
 		}
-	}
+	}*/
 
 	if (m_scrollTime[1] > 0.f) {
 		m_scrollTime[0] += dt;
@@ -359,11 +357,11 @@ bool VListWidget::InputEventFilter(const InputEvent &e, const TouchState *state,
 			m_pts = 0;
 		}
 		m_dragging = true;
-		m_checkDelayed = false;
 		m_dragDidMove = false;
 		m_velocity = Vec2::Zero;
 		m_dragMotion = Vec2::Zero;
 		m_scrollTime[1] = 0.f; // kill any scrolling
+		m_sendCancelTouch = ProcessInputEvent(e, state, is);
 		SetCapture(true);
 	} else if (e.touch == m_e.touch) {
 		if (m_dragDidMove) {
@@ -371,36 +369,26 @@ bool VListWidget::InputEventFilter(const InputEvent &e, const TouchState *state,
 		} else if (e.IsTouchEnd(0)) {
 			// touch and release
 			RAD_ASSERT(m_e.type == InputEvent::T_TouchBegin);
-			ProcessInputEvent(m_e, state, is);
 			m_e.type = InputEvent::T_Invalid;
 			m_dragging = false;
 			SetCapture(false);
 			return false;
 		} else if (m_dragging) {
 			Drag(e);
+			if (m_dragDidMove && m_sendCancelTouch) {
+				m_sendCancelTouch = false;
+				InputEvent x(e);
+				x.type = InputEvent::T_TouchCancelled;
+				ProcessInputEvent(x, state, is);
+
+				// force capture.
+				SetCapture(false);
+				SetCapture(true);
+			}
 		}
 	}
 
 	return true;
-}
-
-void VListWidget::CheckPostDelayedInput() {
-	if (m_checkDelayed)
-		return;
-	if (m_dragDidMove)
-		return;
-	if (m_e.type == InputEvent::T_Invalid)
-		return;
-	RAD_ASSERT(m_dragging);
-	xtime::TimeVal delta = xtime::ReadMilliseconds() - m_e.time;
-	if (delta > 500) {
-		m_checkDelayed = true;
-		if (ProcessInputEvent(m_e, m_pts, m_is)) {
-			m_dragging = false;
-			m_e.type = InputEvent::T_Invalid;
-			SetCapture(false);
-		}
-	}
 }
 
 void VListWidget::PushCallTable(lua_State *L) {
