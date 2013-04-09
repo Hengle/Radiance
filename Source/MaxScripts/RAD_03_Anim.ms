@@ -148,7 +148,7 @@ function RAD_FilterAnimated objs =
 
 function RAD_FilterAnimatable objs =
 (
-	animatable = RAD_ConvertableFilter objs #(Mesh, Freecamera)
+	animatable = RAD_ConvertableFilter objs #(Mesh, Freecamera, Targetcamera)
 	RAD_Exclude animatable #(BoneGeometry, CATBone, HubObject) -- filter bones
 )
 
@@ -222,7 +222,7 @@ function RAD_BuildAnimString anim =
 function RAD_LoadObjAnims obj =
 (
 	s = getUserProp obj "$animations$"
-	if (s == undefined or s == "$empty$" or ((not (canConvertTo obj Mesh)) and (classof(obj) != Freecamera))) then
+	if (s == undefined or s == "$empty$" or ((not (canConvertTo obj Mesh)) and (classof(obj) != Freecamera) and (classof(obj) != Targetcamera))) then
 	(
 		return #()
 	)
@@ -510,7 +510,7 @@ function RAD_ExportVertexAnims file anims obj = (
 )
 
 function RAD_IsVertexAnimated obj = (
-	if (classof(obj) == Freecamera) then (
+	if ((classof(obj) == Freecamera) or (classof(obj) == Targetcamera)) then (
 		return false
 	)
 	
@@ -524,7 +524,7 @@ function RAD_IsVertexAnimated obj = (
 
 function RAD_ExportAnims file doMeshes doAnims trim obj =
 (
-	isCamera = (classof(obj) == Freecamera)
+	isCamera = (classof(obj) == Freecamera) or (classof(obj) == Targetcamera)
 	if ((not doAnims) and isCamera) then throw "Cannot export cameras without animation!"
 	
 	z = RAD_LoadObjAnims obj

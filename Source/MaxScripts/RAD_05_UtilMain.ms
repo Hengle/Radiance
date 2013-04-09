@@ -52,7 +52,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 		oldTime = sliderTime
 		if (selectionOnlyCheckbox.checked) then ( objs = selection )
 		objs = RAD_FilterVisible objs vis:(not hidden)		
-		objs = RAD_ConvertableFilter objs #(Mesh, Freecamera)
+		objs = RAD_ConvertableFilter objs #(Mesh, Freecamera, Targetcamera)
 		objs = RAD_Exclude objs #(BoneGeometry, CATBone, HubObject) -- exclude bones
 		
 		if (objs.count == 0) then (

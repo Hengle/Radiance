@@ -28,7 +28,7 @@ function RAD_GatherEntities objs = (
 )
 
 function RAD_GatherCameras objs = (
-	return RAD_Filter objs #(Freecamera)
+	return RAD_Filter objs #(Targetcamera, Freecamera)
 )
 
 function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName = (

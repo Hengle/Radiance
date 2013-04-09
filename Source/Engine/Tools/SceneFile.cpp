@@ -696,17 +696,21 @@ bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth, UIProgres
 			U32 flags;
 			stream >> flags;
 
-			U32 numAnims, frameRate, z;
+			S32 numAnims; // signed because may be -1
+			U32 frameRate, z;
 			
 			if (version > kVersion5) {
-				stream >> numAnims >> frameRate >> z;
+				stream >> numAnims;
+				if (numAnims < 0)
+					continue;
+				stream >> frameRate >> z;
 				RAD_ASSERT(z == kAnimType_Skeletal);
 			} else {
 				stream >> z; // skip skel index
 				stream >> numAnims >> frameRate;
 			}
 					
-			for (U32 k = 0; k < numAnims; ++k) {
+			for (S32 k = 0; k < numAnims; ++k) {
 
 				SceneFile::Anim::Ref a(new SceneFile::Anim());
 				a->name = ReadString(stream);
