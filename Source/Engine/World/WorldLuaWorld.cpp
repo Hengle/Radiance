@@ -677,7 +677,8 @@ int WorldLua::lua_World_StopCinematic(lua_State *L) {
 	LOAD_SELF
 
 	self->m_world->cinematics->StopCinematic(
-		luaL_checkstring(L, 1)
+		luaL_checkstring(L, 1),
+		lua_toboolean(L, 2) ? true : false
 	);
 
 	return 0;
@@ -1112,6 +1113,20 @@ int WorldLua::lua_World_WaypointsForUserId(lua_State *L) {
 
 	return 0;
 
+}
+
+int WorldLua::lua_World_NumFloors(lua_State *L) {
+	LOAD_SELF
+
+	lua_pushinteger(L, self->m_world->floors->numFloors);
+	return 1;
+}
+
+int WorldLua::lua_World_NumWaypoints(lua_State *L) {
+	LOAD_SELF
+
+	lua_pushinteger(L, self->m_world->floors->numWaypoints);
+	return 1;
 }
 
 int WorldLua::lua_World_PickWaypoint(lua_State *L) {

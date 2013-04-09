@@ -52,7 +52,7 @@ public:
 		const Notify::Ref &notify
 	);
 
-	void StopCinematic(const char *name);
+	void StopCinematic(const char *name, bool resetActors);
 	float CinematicTime(const char *name);
 	bool SetCinematicTime(const char *name, float time);
 	void Skip();

@@ -15,7 +15,6 @@
 using namespace pkg;
 using namespace world::bsp_file;
 
-
 namespace ska {
 namespace details {
 
@@ -252,6 +251,16 @@ void WorldCinematics::Tick(int frame, float dt) {
 								Mat4::Identity
 							);
 
+							const ska::BoneTM *motion = actor->m->ska->deltaMotion;
+							actor->pos[1] = actor->pos[0] + motion->t;
+							actor->bounds[1] = actor->bounds[0];
+							actor->bounds[1].Translate(actor->pos[1]);
+
+							if (actor->pos[2] != actor->pos[1]) {
+								actor->occupant->Link();
+								actor->pos[2] = actor->pos[1];
+							}
+
 							if (!actor->loop)
 								++numActive;
 
@@ -398,7 +407,7 @@ bool WorldCinematics::PlayCinematic(
 	return true;
 }
 
-void WorldCinematics::StopCinematic(const char *name) {
+void WorldCinematics::StopCinematic(const char *name, bool resetActors) {
 	for (Cinematic::List::iterator it = m_cinematics.begin(); it != m_cinematics.end(); ++it) {
 		Cinematic &c = *(*it);
 		if (strcmp(name, c.name.c_str))
@@ -413,6 +422,17 @@ void WorldCinematics::StopCinematic(const char *name) {
 			const Actor::Ref &a = m_actors[*it2];
 			if (a->flags&kHideWhenDone) {
 				a->visible = false;
+				a->frame = -1;
+			}
+			
+			if ((a->flags&kHideWhenDone) || resetActors) {
+				a->pos[1] = a->pos[0];
+				a->bounds[1] = a->bounds[0];
+				a->bounds[1].Translate(a->pos[1]);
+
+				a->occupant->Link();
+				a->pos[2] = a->pos[1];
+				
 				a->frame = -1;
 				a->m->ska->root = ska::Controller::Ref();
 			}
@@ -515,7 +535,7 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time) {
 			COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << *it << ") done." << std::endl;
 #endif
 			actor->frame = -1;
-			actor->visible = false;
+			actor->visible = (actor->flags&kHideUntilRef) ? false : true;
 			actor->m->ska->root = ska::Controller::Ref();
 
 			IntSet::iterator next = it; ++next;
@@ -602,6 +622,16 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time) {
 							false, // no animation events
 							Mat4::Identity
 						);
+
+						const ska::BoneTM *motion = actor->m->ska->deltaMotion;
+						actor->pos[1] = actor->pos[0] + motion->t;
+						actor->bounds[1] = actor->bounds[0];
+						actor->bounds[1].Translate(actor->pos[1]);
+
+						if (actor->pos[2] != actor->pos[1]) {
+							actor->occupant->Link();
+							actor->pos[2] = actor->pos[1];
+						}
 
 #if !defined(RAD_TARGET_GOLDEN)
 					COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << actorIdx << ") triggered." << std::endl;

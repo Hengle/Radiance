@@ -218,6 +218,9 @@ public:
 		float dropDistance
 	);
 
+	RAD_DECLARE_READONLY_PROPERTY(Floors, numFloors, int);
+	RAD_DECLARE_READONLY_PROPERTY(Floors, numWaypoints, int);
+
 private:
 
 	struct WalkStep {
@@ -303,6 +306,14 @@ private:
 		mutable int floodNum;
 		mutable float floodDistance;
 	};
+
+	RAD_DECLARE_GET(numFloors, int) {
+		return (int)m_floorState.size();
+	}
+
+	RAD_DECLARE_GET(numWaypoints, int) {
+		return (int)m_waypoints.size();
+	}
 
 	Waypoint::Vec m_waypoints;
 	Waypoint::MMap m_waypointTargets;
