@@ -52,8 +52,8 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 		oldTime = sliderTime
 		if (selectionOnlyCheckbox.checked) then ( objs = selection )
 		objs = RAD_FilterVisible objs vis:(not hidden)		
-		objs = RAD_ConvertableFilter objs #(Mesh, Freecamera, Targetcamera)
-		objs = RAD_Exclude objs #(BoneGeometry, CATBone, HubObject) -- exclude bones
+		objs = RAD_ConvertableFilter objs kRADMeshTypes
+		objs = RAD_Exclude objs kRADHelperTypes -- exclude helper types
 		
 		if (objs.count == 0) then (
 			messagebox "No objects to export!"
@@ -111,7 +111,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 	
 	function selectedMeshes =  (
 		meshes = (RAD_ConvertableFilter (getCurrentSelection()) #(Mesh))
-		RAD_Exclude meshes #(Bone, CATBone, HubObject) -- filter bones
+		RAD_Exclude meshes kRADHelperTypes
 	)
 	
 	function saveAnims = (
@@ -343,7 +343,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 	)
 			
 	function onSelChange = (
-		sel = RAD_FilterAnimatable selection --RAD_Exclude (RAD_FilterAnimatable selection) #(Bone, CATBone, HubObject)
+		sel = RAD_FilterAnimatable selection
 		if (sel.count > 0) then (
 			setupUIForObjects sel
 		) else (

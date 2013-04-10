@@ -148,8 +148,8 @@ function RAD_FilterAnimated objs =
 
 function RAD_FilterAnimatable objs =
 (
-	animatable = RAD_ConvertableFilter objs #(Mesh, Freecamera, Targetcamera)
-	RAD_Exclude animatable #(BoneGeometry, CATBone, HubObject) -- filter bones
+	animatable = RAD_ConvertableFilter objs kRADMeshTypes
+	RAD_Exclude animatable kRADHelperTypes -- filter helpers
 )
 
 function RAD_GetObjInitialAnim obj =

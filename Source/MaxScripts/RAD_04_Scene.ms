@@ -17,7 +17,7 @@ global kSceneFlag_SetBBox = 0x00008000
 
 function RAD_GatherEntities objs = (
 	ents = #()
-	meshes = RAD_Exclude (RAD_ConvertableFilter objs #(Mesh)) #(BoneGeometry, CATBone, HubObject) -- exclude bones
+	meshes = RAD_Exclude (RAD_ConvertableFilter objs #(Mesh)) kRADHelperTypes -- exclude helper types
 	ids = RAD_AssignIDs meshes 1
 	
 	if (meshes.count > 0) then (
