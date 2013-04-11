@@ -11,6 +11,7 @@
 #include "Lua/T_Precache.h"
 #include "Lua/T_Spawn.h"
 #include "Lua/T_TempSpawn.h"
+#include "Lua/D_HTTP.h"
 #include "../Persistence.h"
 #include "../StringTable.h"
 #include "WorldLuaCommon.h"
@@ -434,6 +435,13 @@ int WorldLua::lua_System_CurrentDateAndTime(lua_State *L) {
 	lua_pushinteger(L, ct.second);
 	lua_setfield(L, -2, "second");
 
+	return 1;
+}
+
+int WorldLua::lua_System_NewHTTPGet(lua_State *L) {
+	net::HTTPGet::Ref httpGet(new (ZWorld) net::HTTPGet(ZWorld));
+	D_HTTPGet::Ref dhttpGet(D_HTTPGet::New(httpGet));
+	dhttpGet->Push(L);
 	return 1;
 }
 

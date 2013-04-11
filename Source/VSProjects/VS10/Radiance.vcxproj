@@ -943,6 +943,7 @@
     <ClInclude Include="..\..\Engine\World\Keys.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_Asset.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_ConversationTree.h" />
+    <ClInclude Include="..\..\Engine\World\Lua\D_HTTP.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_Material.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_Mesh.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_ScreenOverlay.h" />
@@ -1148,6 +1149,7 @@
     <ClInclude Include="..\..\Runtime\Meta\TypeTraits\TypeSelect.h" />
     <ClInclude Include="..\..\Runtime\Meta\TypeTraits\TypeTraits.h" />
     <ClInclude Include="..\..\Runtime\Meta\TypeTraits\VolatileTraits.h" />
+    <ClInclude Include="..\..\Runtime\Net\HTTP.h" />
     <ClInclude Include="..\..\Runtime\Net\Socket.h" />
     <ClInclude Include="..\..\Runtime\PopCAWarnings.h" />
     <ClInclude Include="..\..\Runtime\PopPack.h" />
@@ -2118,6 +2120,7 @@
     <ClCompile Include="..\..\Engine\World\Keys.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_Asset.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_ConversationTree.cpp" />
+    <ClCompile Include="..\..\Engine\World\Lua\D_HTTP.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_Material.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_Mesh.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_ScreenOverlay.cpp" />
@@ -2262,6 +2265,7 @@
     <ClCompile Include="..\..\Runtime\Interface\ComponentManager.cpp" />
     <ClCompile Include="..\..\Runtime\Interface\ComponentManagerReflectMap.cpp" />
     <ClCompile Include="..\..\Runtime\Interface\InterfaceReflectMap.cpp" />
+    <ClCompile Include="..\..\Runtime\Net\HTTP.cpp" />
     <ClCompile Include="..\..\Runtime\Net\Socket.cpp" />
     <ClCompile Include="..\..\Runtime\Reflect\Private\ReflectPrivate.cpp" />
     <ClCompile Include="..\..\Runtime\Reflect\Reflect.cpp" />

@@ -1473,6 +1473,12 @@
     <ClInclude Include="..\..\Engine\World\Occupant.h">
       <Filter>Source\Engine\World</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Runtime\Net\HTTP.h">
+      <Filter>Source\Runtime\Socket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\World\Lua\D_HTTP.h">
+      <Filter>Source\Engine\World\Lua</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2278,6 +2284,12 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\World\Occupant.cpp">
       <Filter>Source\Engine\World</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Runtime\Net\HTTP.cpp">
+      <Filter>Source\Runtime\Socket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\Lua\D_HTTP.cpp">
+      <Filter>Source\Engine\World\Lua</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
