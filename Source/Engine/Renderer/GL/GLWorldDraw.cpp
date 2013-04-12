@@ -49,12 +49,12 @@ void GLWorldDraw::EndFrame() {
 }
 
 void GLWorldDraw::ClearDepthBuffer() {
-	gls.Set(kDepthWriteMask_Enable, -1, true); // for glClear()
+	gls.Set(kDepthWriteMask_Enable|kScissorTest_Disable, -1, true); // for glClear()
 	glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 void GLWorldDraw::ClearBackBuffer() {
-	gls.Set(kDepthWriteMask_Enable, -1, true); // for glClear()
+	gls.Set(kDepthWriteMask_Enable|kScissorTest_Disable, -1, true); // for glClear()
 
 #if defined(RAD_OPT_IOS)
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
