@@ -78,7 +78,8 @@ public:
 	typedef boost::shared_ptr<HTTPGet> Ref;
 
 	HTTPGet(Zone &zone = ZRuntime);
-	
+	~HTTPGet();
+
 	HTTP_OpStatus SendRequest(const char *host, const char *resource, const char *accept);
 	HTTP_OpStatus WaitForCompletion();
 

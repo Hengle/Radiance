@@ -48,6 +48,9 @@ public:
 
 	static Ref New();
 
+	virtual void Begin() = 0;
+	virtual void End() = 0;
+
 	virtual void SetViewport(
 		int src[4],
 		int dst[4]

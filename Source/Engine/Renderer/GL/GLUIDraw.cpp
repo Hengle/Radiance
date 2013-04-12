@@ -41,6 +41,13 @@ GLDraw::GLDraw() {
 	InitCircleVerts(kBaseRectSize, kBaseRectSize);
 }
 
+void GLDraw::Begin() {
+}
+
+void GLDraw::End() {
+	gls.Set(kScissorTest_Disable, 1, true);
+}
+
 void GLDraw::SetViewport(
 	int src[4],
 	int dst[4]

@@ -15,6 +15,9 @@ public:
 
 	GLDraw();
 
+	virtual void Begin();
+	virtual void End();
+
 	virtual void SetViewport(
 		int src[4],
 		int dst[4]

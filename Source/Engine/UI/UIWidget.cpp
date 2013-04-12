@@ -96,6 +96,7 @@ void Root::Tick(float time, float dt, bool tickMaterials) {
 
 void Root::Draw(const Rect *clip, bool children) {
 	if (!m_layers.empty()) {
+		m_rbdraw->Begin();
 		m_rbdraw->SetViewport(
 			m_srcvp,
 			m_dstvp
@@ -104,6 +105,10 @@ void Root::Draw(const Rect *clip, bool children) {
 
 	for (WidgetMap::const_iterator it = m_layers.begin(); it != m_layers.end(); ++it) {
 		it->second->Draw(clip, children);
+	}
+
+	if (!m_layers.empty()) {
+		m_rbdraw->End();
 	}
 }
 

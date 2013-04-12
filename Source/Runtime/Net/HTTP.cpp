@@ -124,6 +124,10 @@ HTTPGet::HTTPGet(Zone &zone)
 : m_zone(&zone), m_status(kHTTP_OpStatus_None) {
 }
 
+HTTPGet::~HTTPGet() {
+	Join();
+}
+
 HTTP_OpStatus HTTPGet::SendRequest(const char *host, const char *resource, const char *accept) {
 	RAD_ASSERT(host);
 	RAD_ASSERT(resource);
