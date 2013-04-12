@@ -52,7 +52,7 @@ void Material::BindStates(int flags, int blends) {
 	}
 
 	if (!(flags&kScissorTest_Flags))
-		flags |= kScissorTest_Disable; // disable scissor test unless requested.
+		drawFlags |= kScissorTest_Disable; // disable scissor test unless requested.
 
 	int blendFlags = kBlendMode_Off;
 

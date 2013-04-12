@@ -1198,7 +1198,7 @@ int WorldLua::lua_World_QuitGame(lua_State *L) {
 
 int WorldLua::lua_World_SetDrawUIOnly(lua_State *L) {
 	LOAD_SELF
-	self->m_world->draw->uiOnly = lua_toboolean(L, 2) ? true : false;
+	self->m_world->draw->uiOnly = lua_toboolean(L, 1) ? true : false;
 	return 0;
 }
 

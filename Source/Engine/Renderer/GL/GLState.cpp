@@ -64,7 +64,6 @@ void GLState::Init(S &s) {
 	gl.SetActiveTexCoord(0);
 
 	s.d.s = kDepthTest_Disable|
-			kDepthTest_Less|
 			kColorWriteMask_RGBA|
 			kCullFaceMode_None|
 			kCullFaceMode_CCW|
@@ -144,7 +143,7 @@ void GLState::CommitSB(S &s, bool f)
 		s.d.s |= s.s.s&kDepthWriteMask_Flags;
 	}
 
-	if ((s.s.s&kDepthTest_Flags) != (s.d.s&kDepthTest_Flags)) {
+	if (ss&kDepthTest_Flags) {
 		if(ds&kDepthTest_Disable) {
 			glEnable(GL_DEPTH_TEST);
 			CHECK_GL_ERRORS_EXTRA();
