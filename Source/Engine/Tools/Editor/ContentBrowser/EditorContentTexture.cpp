@@ -356,20 +356,66 @@ RADENG_API pkg::IdVec RADENG_CALL CreateTextures(QWidget *parent, const pkg::Pac
 						}
 					}
 
-					if (pow2 && square && 
-						((parser->header->format == image_codec::Format_RGB888) ||
-						 (parser->header->format == image_codec::Format_RGBA8888)))// enable compression
-					{
-						def = texture->FindKeyDef(String(), String("Compression"));
-						if (def)
-						{ // not a K_Global property
+					bool compress = (parser->header->format == image_codec::Format_RGB888) ||
+						 (parser->header->format == image_codec::Format_RGBA8888);
+
+					bool pvr = compress && pow2 && square;
+					bool dxt = compress && pow2;
+
+					if (!pvr) {
+						// disable compression defaults (pvr is on in keydefs)
+						def = texture->FindKeyDef(String(), String("Compression.PVR"));
+						if (def) {
+							// not a K_Global property
 							for (int t = pkg::P_FirstTarget; t <= pkg::P_LastTarget; t <<= 1)
 							{
 								pkg::KeyVal::Ref key = def->CreateKey(t);
 								texture->AddKey(key, true);
 								String *s = static_cast<String*>(key->val);
 								if (s)
-									*s = "DXT1/PVR2";
+									*s = "Disabled";
+							}
+						}
+					}
+
+					if (!dxt) {
+						// disable compression defaults for DXT, ATITC, and ETC
+						def = texture->FindKeyDef(String(), String("Compression.DXT.Mode"));
+						if (def) {
+							// not a K_Global property
+							for (int t = pkg::P_FirstTarget; t <= pkg::P_LastTarget; t <<= 1)
+							{
+								pkg::KeyVal::Ref key = def->CreateKey(t);
+								texture->AddKey(key, true);
+								String *s = static_cast<String*>(key->val);
+								if (s)
+									*s = "Disabled";
+							}
+						}
+
+						def = texture->FindKeyDef(String(), String("Compression.ATITC"));
+						if (def) {
+							// not a K_Global property
+							for (int t = pkg::P_FirstTarget; t <= pkg::P_LastTarget; t <<= 1)
+							{
+								pkg::KeyVal::Ref key = def->CreateKey(t);
+								texture->AddKey(key, true);
+								String *s = static_cast<String*>(key->val);
+								if (s)
+									*s = "Disabled";
+							}
+						}
+
+						def = texture->FindKeyDef(String(), String("Compression.ETC"));
+						if (def) {
+							// not a K_Global property
+							for (int t = pkg::P_FirstTarget; t <= pkg::P_LastTarget; t <<= 1)
+							{
+								pkg::KeyVal::Ref key = def->CreateKey(t);
+								texture->AddKey(key, true);
+								String *s = static_cast<String*>(key->val);
+								if (s)
+									*s = "Disabled";
 							}
 						}
 					}

@@ -1024,13 +1024,12 @@ int TextureParser::Compress(
 	if (reqPOW2) {
 		if (!IsPowerOf2(m_header.width) || 
 			!IsPowerOf2(m_header.height)) {
-			COut(C_Error) << "Error: " << asset->path.get() << " is flagged for compression but is not a power of two. " << std::endl;
+			COut(C_Error) << "Error: " << asset->path.get() << " is flagged for compression but is not a power of two." << std::endl;
 			return SR_MetaError;
 		}
 	
-		if (m_header.width != m_header.height) {
-			// this is over pedantic because only PVR really requires this, and maybe etc?
-			COut(C_Error) << "Error: " << asset->path.get() << " is flagged for compression but is not square. " << std::endl;
+		if ((*pvr != "Disabled") && (m_header.width != m_header.height)) {
+			COut(C_Error) << "Error: " << asset->path.get() << " is flagged for PVR compression but is not square (iOS constraint)." << std::endl;
 			return SR_MetaError;
 		}
 	}
