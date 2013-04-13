@@ -558,7 +558,6 @@ private:
 	bool m_loadScreen;
 	UnloadDisposition m_unloadDisp;
 	bool m_returnReq;
-	bool m_levelStart;
 	bool m_switchReq;
 	int m_switchSlot;
 	bool m_unloadSlotReq;

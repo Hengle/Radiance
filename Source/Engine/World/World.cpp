@@ -50,7 +50,6 @@ m_unloadSlot(-1),
 m_unloadSlotReq(false),
 m_switchLoad(false),
 m_switchLoadScreen(false),
-m_levelStart(true),
 m_generateSave(false),
 m_gestures(0) {
 	m_draw.reset(new (ZWorld) WorldDraw(this));
@@ -228,13 +227,6 @@ void World::TickState(float dt, float unmod_dt) {
 	int pauseState = m_pauseState;
 
 	if (!(pauseState&kPauseGame)) {
-		if (m_levelStart) {
-			m_levelStart = false;
-			for (Entity::IdMap::const_iterator it = m_ents.begin(); it != m_ents.end(); ++it) {
-				it->second->PrivateLevelStart();
-			}
-		}
-		
 		m_gameTime += dt;
 
 		m_lua->Tick(dt);
@@ -250,7 +242,7 @@ void World::TickState(float dt, float unmod_dt) {
 			m_viewController->PrivateTick(frame, dt, xtime::TimeSlice::Infinite);
 
 		gc = true;
-	} else if (!m_levelStart) { 
+	} else { 
 		// game is paused, must tick world!
 		m_lua->Tick(0.f);
 		if (m_gameCode)
