@@ -11,6 +11,9 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile />
+    <Link>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>
