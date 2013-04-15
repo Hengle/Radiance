@@ -140,7 +140,7 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\VSProps\BoostBuildOpts.props" />
+    <Import Project="..\VSProps\BoostShipBuildOpts.props" />
     <Import Project="..\VSProps\ExternLibDebugShip.props" />
     <Import Project="..\VSProps\BoostPaths.props" />
   </ImportGroup>
@@ -158,7 +158,7 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\VSProps\BoostBuildOpts.props" />
+    <Import Project="..\VSProps\BoostShipBuildOpts.props" />
     <Import Project="..\VSProps\ExternLibDebugShip.props" />
     <Import Project="..\VSProps\BoostPaths.props" />
   </ImportGroup>
@@ -176,7 +176,7 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\VSProps\BoostBuildOpts.props" />
+    <Import Project="..\VSProps\BoostShipBuildOpts.props" />
     <Import Project="..\VSProps\ExternLibReleaseShip.props" />
     <Import Project="..\VSProps\BoostPaths.props" />
   </ImportGroup>
@@ -194,7 +194,7 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\VSProps\BoostBuildOpts.props" />
+    <Import Project="..\VSProps\BoostShipBuildOpts.props" />
     <Import Project="..\VSProps\ExternLibReleaseShip.props" />
     <Import Project="..\VSProps\BoostPaths.props" />
   </ImportGroup>

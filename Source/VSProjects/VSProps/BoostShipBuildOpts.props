@@ -1,13 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ImportGroup Label="PropertySheets">
-    <Import Project="ExternLibPaths.props" />
-  </ImportGroup>
+  <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;BOOST_NO_EXCEPTIONS;BOOST_ENABLE_ASSERT_HANDLER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_THREAD_BUILD_LIB;BOOST_ALL_NO_LIB;BOOST_NO_EXCEPTIONS;BOOST_All_STATIC_LINK;BOOST_DISABLE_ASSERTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
