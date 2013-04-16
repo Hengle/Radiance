@@ -162,7 +162,8 @@ int WorldLua::lua_System_SaveSession(lua_State *L) {
 	LOAD_SELF
 	
 	Persistence::KeyValue::Map *keys = self->m_world->game->session->keys;
-	
+	keys->clear();
+
 	luaL_checktype(L, 1, LUA_TTABLE);
 	lua_getfield(L, 1, "keys");
 
@@ -185,7 +186,8 @@ int WorldLua::lua_System_LoadSession(lua_State *L) {
 
 int WorldLua::lua_System_SaveGlobals(lua_State *L) {
 	Persistence::KeyValue::Map *keys = App::Get()->engine->sys->globals->keys;
-	
+	keys->clear();
+
 	luaL_checktype(L, 1, LUA_TTABLE);
 	lua_getfield(L, 1, "keys");
 
@@ -235,10 +237,13 @@ int WorldLua::lua_System_LoadSaveTable(lua_State *L) {
 int WorldLua::lua_System_SaveGame(lua_State *L) {
 	LOAD_SELF
 
+	Persistence::KeyValue::Map *keys = self->m_world->game->saveGame->keys;
+	keys->clear();
+
 	luaL_checktype(L, 1, LUA_TTABLE);
 	lua_getfield(L, 1, "keys");
 
-	ParseKeysTable(L, *self->m_world->game->saveGame->keys.get(), -1, true);
+	ParseKeysTable(L, *keys, -1, true);
 	lua_pop(L, 1);
 
 	self->m_world->game->SaveGame();
