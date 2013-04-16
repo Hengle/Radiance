@@ -48,7 +48,7 @@ public:
 	bool BindTypeface(const pkg::AssetRef &typeface);
 	
 
-	RAD_DECLARE_READONLY_PROPERTY(TextLabel, dimensions, Vec2);
+	RAD_DECLARE_READONLY_PROPERTY(TextLabel, dimensions, Vec4);
 
 protected:
 
@@ -59,7 +59,7 @@ protected:
 	
 private:
 
-	RAD_DECLARE_GET(dimensions, Vec2);
+	RAD_DECLARE_GET(dimensions, Vec4);
 
 	UIW_DECL_GETSET(Typeface);
 	UIW_DECL_GET(Dimensions);

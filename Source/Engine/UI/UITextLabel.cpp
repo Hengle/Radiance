@@ -105,7 +105,7 @@ bool TextLabel::BindTypeface(
 	return true;
 }
 
-Vec2 TextLabel::RAD_IMPLEMENT_GET(dimensions) {
+Vec4 TextLabel::RAD_IMPLEMENT_GET(dimensions) {
 	RAD_ASSERT(m_textModel);
 	float x;
 	float y;
@@ -115,7 +115,7 @@ Vec2 TextLabel::RAD_IMPLEMENT_GET(dimensions) {
 	if (m_textModel)
 		m_textModel->Dimensions(x, y, w, h);
 
-	return Vec2(w, h);
+	return Vec4(x, y, w, h);
 }
 
 void TextLabel::CreateFromTable(lua_State *L) {
@@ -323,6 +323,6 @@ int TextLabel::LUART_GETFN(Typeface)(lua_State *L) {
 	return 1;
 }
 
-UIW_GET(TextLabel, Dimensions, Vec2, dimensions);
+UIW_GET(TextLabel, Dimensions, Vec4, dimensions);
 
 } // ui
