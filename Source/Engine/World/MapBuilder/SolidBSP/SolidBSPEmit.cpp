@@ -108,16 +108,18 @@ void BSPBuilder::EmitBSPMaterials() {
 		if (trim->ignore)
 			continue;
 
-		if (!(trim->contents & kContentsFlag_DetailContents))
+		if (!trim->cinematic && !(trim->contents & kContentsFlag_DetailContents))
 			continue;
 
 		for (SceneFile::TriFaceVec::const_iterator f = trim->tris.begin(); f != trim->tris.end(); ++f) {
 			const SceneFile::TriFace &trif = *f;
 
-			if (!(trif.contents & kContentsFlag_DetailContents))
-				continue;
-			if (trif.surface & kSurfaceFlag_NoDraw)
-				continue;
+			if (!trim->cinematic) {
+				if (!(trif.contents & kContentsFlag_DetailContents))
+					continue;
+				if (trif.surface & kSurfaceFlag_NoDraw)
+					continue;
+			}
 
 			const SceneFile::Material &mat = m_map->mats[(*f).mat];
 			mats.insert(mat.name);
