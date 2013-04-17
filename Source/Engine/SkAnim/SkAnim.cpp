@@ -19,7 +19,7 @@
 namespace ska {
 
 BOOST_STATIC_ASSERT(sizeof(Mat4)==(16*sizeof(float)));
-BOOST_STATIC_ASSERT(sizeof(DTag)==6);
+BOOST_STATIC_ASSERT(sizeof(DSkTag)==6);
 
 namespace details {
 
@@ -251,7 +251,7 @@ inline bool CompareMatrices(const float *a, const Mat4 &b) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Animation::Animation(Ska &ska, const DAnim &anim) :
+Animation::Animation(Ska &ska, const DSkAnim &anim) :
 m_ska(&ska),
 m_danim(&anim) {
 }
@@ -383,7 +383,7 @@ void Animation::EmitTags(
 	tag.anim = this;
 
 	int numTags = (int)m_danim->numTags;
-	const DTag *dtag = m_danim->tags;
+	const DSkTag *dtag = m_danim->tags;
 
 	while (frame > (int)dtag->frame) {
 		++dtag;
@@ -456,8 +456,8 @@ void Ska::Init() {
 	m_worldBones = (float*)zone_malloc(ZSka, sizeof(float)*SIMDDriver::kNumBoneFloats*((int)m_dska->numBones+1), 0, SIMDDriver::kAlignment);
 	m_boneTMs = (BoneTM*)zone_malloc(ZSka, sizeof(BoneTM)*((int)m_dska->numBones));
 	
-	for (DAnim::Vec::const_iterator it = m_dska->anims.begin(); it != m_dska->anims.end(); ++it) {
-		const DAnim &da = *it;
+	for (DSkAnim::Vec::const_iterator it = m_dska->anims.begin(); it != m_dska->anims.end(); ++it) {
+		const DSkAnim &da = *it;
 
 		m_anims.insert(Animation::Map::value_type(
 			String(da.name),
@@ -716,7 +716,7 @@ int DSka::Parse(const void *data, AddrSize len) {
 	anims.resize(numAnims);
 
 	for (U16 i = 0; i < numAnims; ++i) {
-		DAnim &m = anims[i];
+		DSkAnim &m = anims[i];
 		CHECK_SIZE(kDNameLen+1);
 		m.name = reinterpret_cast<const char*>(bytes);
 		bytes += kDNameLen+1;
@@ -736,7 +736,7 @@ int DSka::Parse(const void *data, AddrSize len) {
 	}
 
 	for (U16 i = 0; i < numAnims; ++i) {
-		DAnim &m = anims[i];
+		DSkAnim &m = anims[i];
 		CHECK_SIZE(((int)numBones) * ((int)m.numFrames) * kEncBytes * 3);
 		m.rFrames = bytes;
 		bytes += ((int)numBones) * ((int)m.numFrames) * kEncBytes;
@@ -744,10 +744,10 @@ int DSka::Parse(const void *data, AddrSize len) {
 		bytes += ((int)numBones) * ((int)m.numFrames) * kEncBytes;
 		m.tFrames = bytes;
 		bytes += ((int)numBones) * ((int)m.numFrames) * kEncBytes;
-		CHECK_SIZE(((int)m.numTags) * sizeof(DTag));
+		CHECK_SIZE(((int)m.numTags) * sizeof(DSkTag));
 		if (m.numTags > 0) {
-			m.tags = reinterpret_cast<const DTag*>(bytes);
-			bytes += ((int)m.numTags) * sizeof(DTag);
+			m.tags = reinterpret_cast<const DSkTag*>(bytes);
+			bytes += ((int)m.numTags) * sizeof(DSkTag);
 		} else {
 			m.tags = 0;
 		}
@@ -830,7 +830,7 @@ int DSkm::Parse(const void * const *_data, const AddrSize *_len, SkinType type) 
 
 	meshes.resize(numMeshes);
 	for (U16 i = 0; i < numMeshes; ++i) {
-		DMesh &m = meshes[i];
+		DSkMesh &m = meshes[i];
 
 		CHECK_SIZE(sizeof(U16)*(kBonesPerVert+3));
 
@@ -881,14 +881,14 @@ int DSkm::Parse(const void * const *_data, const AddrSize *_len, SkinType type) 
 
 		bytes += 8;
 		for (U16 i = 0; i < numMeshes; ++i) {
-			DMesh &m = meshes[i];
+			DSkMesh &m = meshes[i];
 
 			bytes = Align(bytes, SIMDDriver::kAlignment);
 			
 			m.verts = reinterpret_cast<const float*>(bytes);
 
 			for (int k = 0; k < kBonesPerVert; ++k) {
-				const int kNumFloats = ((int)m.numVerts[k])*(k+1)*DMesh::kNumVertexFloats;
+				const int kNumFloats = ((int)m.numVerts[k])*(k+1)*DSkMesh::kNumVertexFloats;
 				CHECK_SIZE(kNumFloats * sizeof(float));
 				bytes += kNumFloats * sizeof(float);
 			}

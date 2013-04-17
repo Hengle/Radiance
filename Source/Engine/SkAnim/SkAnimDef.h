@@ -29,9 +29,9 @@ class ModelBuilder;
 typedef boost::shared_ptr<ModelBuilder> ModelBuilderRef;
 #endif
 
-struct DAnim;
+struct DSkAnim;
 struct DSka;
-struct DMesh;
+struct DSkMesh;
 struct DSkm;
 
 enum {

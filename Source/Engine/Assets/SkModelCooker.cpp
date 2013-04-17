@@ -129,7 +129,7 @@ int SkModelCooker::Compile(int flags) {
 
 	// add material imports
 
-	for (ska::DMesh::Vec::const_iterator it = skmd->dskm.meshes.begin(); it != skmd->dskm.meshes.end(); ++it) {
+	for (ska::DSkMesh::Vec::const_iterator it = skmd->dskm.meshes.begin(); it != skmd->dskm.meshes.end(); ++it) {
 		AddImport((*it).material);
 	}
 

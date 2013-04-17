@@ -100,14 +100,14 @@ struct BoneTM {
 // all N bones. Indexes from N*2 to N*2+N are the indexes for N bones for
 // frame 1, etc.
 
-struct DTag {
+struct DSkTag {
 	U16 frame; // frame that tag should be emitted on.
 	U16 numBones; // number of bones with tags on this frame.
 	U16 tagOfs; // offset into boneTags
 };
 
-struct DAnim {
-	typedef zone_vector<DAnim, ZSkaT>::type Vec;
+struct DSkAnim {
+	typedef zone_vector<DSkAnim, ZSkaT>::type Vec;
 	typedef zone_vector<int, ZSkaT>::type IntVec;
 
 	const char *name;
@@ -118,7 +118,7 @@ struct DAnim {
 	const U8 *rFrames;
 	const U8 *sFrames;
 	const U8 *tFrames;
-	const DTag *tags;
+	const DSkTag *tags;
 	const U8 *boneTags; // (U16) bone index, + (U8) string index (3 bytes per bone in this field).
 };
 
@@ -140,14 +140,14 @@ struct RADENG_CLASS DSka {
 	const char *strings;
 
 	// animations
-	DAnim::Vec anims;
+	DSkAnim::Vec anims;
 
 	void Clear();
 	int Parse(const void *data, AddrSize len);
 };
 
-struct DMesh {
-	typedef zone_vector<DMesh, ZSkaT>::type Vec;
+struct DSkMesh {
+	typedef zone_vector<DSkMesh, ZSkaT>::type Vec;
 	
 	enum {
 		kNumVertexFloats = 12
@@ -179,7 +179,7 @@ struct DMesh {
 struct RADENG_CLASS DSkm {
 
 	BBox bounds;
-	DMesh::Vec meshes;
+	DSkMesh::Vec meshes;
 
 	void Clear();
 
@@ -226,7 +226,7 @@ private:
 
 	friend class Ska;
 
-	Animation(Ska &ska, const DAnim &anim);
+	Animation(Ska &ska, const DSkAnim &anim);
 
 	RAD_DECLARE_GET(name, const char *);
 	RAD_DECLARE_GET(numFrames, int);
@@ -236,7 +236,7 @@ private:
 	RAD_DECLARE_GET(ska, Ska*) { return m_ska; }
 
 	Ska *m_ska;
-	const DAnim *m_danim;
+	const DSkAnim *m_danim;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

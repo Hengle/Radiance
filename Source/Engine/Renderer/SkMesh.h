@@ -40,7 +40,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(SkMesh, asset, const pkg::AssetRef&);
 
 #if !defined(RAD_OPT_SHIP)
-	const ska::DMesh *DMesh(int idx) {
+	const ska::DSkMesh *DMesh(int idx) {
 		return m_meshes[idx].dm;
 	}
 #endif
@@ -81,7 +81,7 @@ private:
 		r::Mesh m;
 		int boneFrame;
 		int vertStreamIdx;
-		const ska::DMesh *dm;
+		const ska::DSkMesh *dm;
 	};
 
 	DefMesh::Vec m_meshes;

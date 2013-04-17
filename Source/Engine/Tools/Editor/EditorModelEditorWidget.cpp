@@ -179,10 +179,10 @@ bool ModelEditorWidget::Load() {
 #endif
 
 		for (int i = 0; i < m_skModel->numMeshes; ++i) {
-			const ska::DMesh *m = m_skModel->DMesh(i);
-			m_skVerts[0][i] = (float*)safe_zone_malloc(ZTools, ska::DMesh::kNumVertexFloats * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
+			const ska::DSkMesh *m = m_skModel->DMesh(i);
+			m_skVerts[0][i] = (float*)safe_zone_malloc(ZTools, ska::DSkMesh::kNumVertexFloats * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
 #if defined(VALIDATE_SIMD_SKIN)
-			m_skVerts[1][i] = (float*)safe_zone_malloc(ZTools, ska::DMesh::kNumVertexFloats * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
+			m_skVerts[1][i] = (float*)safe_zone_malloc(ZTools, ska::DSkMesh::kNumVertexFloats * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
 #endif
 		}
 
@@ -399,7 +399,7 @@ void ModelEditorWidget::DrawSkaNormals(bool normals, bool tangents) {
 	gls.Commit();
 
 	for (int i = 0; i < m_skModel->numMeshes; ++i) {
-		const ska::DMesh *m = m_skModel->DMesh(i);
+		const ska::DSkMesh *m = m_skModel->DMesh(i);
 
 		m_skModel->SkinToBuffer(SIMD, i, m_skVerts[0][i]);
 #if defined(VALIDATE_SIMD_SKIN)
@@ -489,7 +489,7 @@ void ModelEditorWidget::DrawSkaNormals(bool normals, bool tangents) {
 				glEnd();
 			}
 
-			verts += ska::DMesh::kNumVertexFloats;
+			verts += ska::DSkMesh::kNumVertexFloats;
 		}
 	}
 }

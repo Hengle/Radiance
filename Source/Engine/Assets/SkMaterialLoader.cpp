@@ -80,7 +80,7 @@ int SkMaterialLoader::Load(
 	RAD_ASSERT(m_state == S_LoadMaterials);
 	for (; m_matIdx < (int)m_matRefs.size(); ++m_matIdx) {
 		pkg::Asset::Ref &m = m_matRefs[m_matIdx];
-		const ska::DMesh &dm = parser->dskm->meshes[m_matIdx];
+		const ska::DSkMesh &dm = parser->dskm->meshes[m_matIdx];
 
 		if (!m) {
 			m = engine.sys->packages->Resolve(dm.material, asset->zone);

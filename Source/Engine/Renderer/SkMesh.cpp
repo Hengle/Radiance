@@ -60,11 +60,11 @@ void SkMesh::Load(
 	m_meshes.clear();
 	m_meshes.resize(dskm.meshes.size());
 
-	const int kVertSize = ska::DMesh::kNumVertexFloats*sizeof(float);
+	const int kVertSize = ska::DSkMesh::kNumVertexFloats*sizeof(float);
 
 	for (size_t i = 0; i < m_meshes.size(); ++i) {
 		DefMesh &m = m_meshes[i];
-		const ska::DMesh &dm = dskm.meshes[i];
+		const ska::DSkMesh &dm = dskm.meshes[i];
 
 		m.boneFrame = -1;
 		m.dm = &dm;
@@ -187,8 +187,8 @@ void SkMesh::SkinToBuffer(const SIMDDriver *driver, int mesh, void *buffer) {
 			);
 		}
 
-		outVerts += numVerts*ska::DMesh::kNumVertexFloats;
-		srcVerts += numVerts*(i+1)*ska::DMesh::kNumVertexFloats;
+		outVerts += numVerts*ska::DSkMesh::kNumVertexFloats;
+		srcVerts += numVerts*(i+1)*ska::DSkMesh::kNumVertexFloats;
 	}
 }
 
