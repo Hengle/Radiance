@@ -324,7 +324,6 @@ private:
 	bool m_animated;
 	bool m_doubleSided;
 	bool m_depthWrite;
-	U8 m_alphaVal;
 };
 
 } // namespace
