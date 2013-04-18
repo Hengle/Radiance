@@ -45,6 +45,7 @@ struct SIMDDriver {
 		float *outVerts,
 		const float *srcVerts,
 		const float *dstVerts,
+		float frac,
 		int numVerts
 	);
 

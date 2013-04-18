@@ -27,6 +27,8 @@ typedef boost::shared_ptr<Controller> ControllerWRef;
 class Notify;
 typedef boost::shared_ptr<Notify> NotifyRef;
 
+typedef boost::shared_array<float> VertArrayRef;
+
 #if defined(RAD_OPT_TOOLS)
 class ModelBuilder;
 typedef boost::shared_ptr<ModelBuilder> ModelBuilderRef;

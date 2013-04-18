@@ -253,30 +253,41 @@ inline bool CompareMatrices(const float *a, const Mat4 &b) {
 
 Animation::Animation(Ska &ska, const DSkAnim &anim) :
 m_ska(&ska),
-m_danim(&anim) {
+m_vtm(0),
+m_dska(&anim),
+m_dvta(0) {
+}
+
+Animation::Animation(Vtm &vtm, const DVtAnim &anim) :
+m_ska(0),
+m_vtm(&vtm),
+m_dska(0),
+m_dvta(&anim) {
 }
 
 Animation::~Animation() {
 }
 
 const char *Animation::RAD_IMPLEMENT_GET(name) {
-	return m_danim->name;
+	return m_dska ? m_dska->name : m_dvta->name;
 }
 
 int Animation::RAD_IMPLEMENT_GET(numFrames) {
-	return m_danim->numFrames;
+	return m_dska ? m_dska->numFrames : m_dvta->frames[m_dvta->numFrames-1];
 }
 
 float Animation::RAD_IMPLEMENT_GET(fps) {
-	return m_danim->fps;
+	return m_dska ? m_dska->fps : m_dvta->fps;
 }
 
 float Animation::RAD_IMPLEMENT_GET(distance) {
-	return m_danim->distance;
+	return m_dska ? m_dska->distance : 0.f;
 }
 
 float Animation::RAD_IMPLEMENT_GET(length) {
-	return ((float)m_danim->numFrames)/((float)m_danim->fps);
+	if (m_dska)
+		return ((float)m_dska->numFrames)/((float)m_dska->fps);
+	return m_dvta->frames[m_dvta->numFrames-1] / (float)m_dvta->fps;
 }
 
 namespace {
@@ -313,18 +324,18 @@ inline Vec3 DecodeV(const S16 *table, int idx, float decodeMag) {
 void Animation::BlendFrames(int frameSrc, int frameDst, float blend, BoneTM *out, int firstBone, int numBones) const {
 	const DSka &dska = *m_ska->m_dska;
 
-	RAD_ASSERT(frameSrc < m_danim->numFrames);
-	RAD_ASSERT(frameDst < m_danim->numFrames);
+	RAD_ASSERT(frameSrc < m_dska->numFrames);
+	RAD_ASSERT(frameDst < m_dska->numFrames);
 
 	const S16 *rTable = dska.rTable;
 	const S16 *sTable = dska.sTable;
 	const S16 *tTable = dska.tTable;
-	const U8 *srcRFrames = m_danim->rFrames+((frameSrc*(int)dska.numBones)+firstBone)*kEncBytes;
-	const U8 *srcSFrames = m_danim->sFrames+((frameSrc*(int)dska.numBones)+firstBone)*kEncBytes;
-	const U8 *srcTFrames = m_danim->tFrames+((frameSrc*(int)dska.numBones)+firstBone)*kEncBytes;
-	const U8 *dstRFrames = m_danim->rFrames+((frameDst*(int)dska.numBones)+firstBone)*kEncBytes;
-	const U8 *dstSFrames = m_danim->sFrames+((frameDst*(int)dska.numBones)+firstBone)*kEncBytes;
-	const U8 *dstTFrames = m_danim->tFrames+((frameDst*(int)dska.numBones)+firstBone)*kEncBytes;
+	const U8 *srcRFrames = m_dska->rFrames+((frameSrc*(int)dska.numBones)+firstBone)*kEncBytes;
+	const U8 *srcSFrames = m_dska->sFrames+((frameSrc*(int)dska.numBones)+firstBone)*kEncBytes;
+	const U8 *srcTFrames = m_dska->tFrames+((frameSrc*(int)dska.numBones)+firstBone)*kEncBytes;
+	const U8 *dstRFrames = m_dska->rFrames+((frameDst*(int)dska.numBones)+firstBone)*kEncBytes;
+	const U8 *dstSFrames = m_dska->sFrames+((frameDst*(int)dska.numBones)+firstBone)*kEncBytes;
+	const U8 *dstTFrames = m_dska->tFrames+((frameDst*(int)dska.numBones)+firstBone)*kEncBytes;
 
 	if (blend < 0.01f) {
 		for (int i = 0; i < numBones; ++i) {
@@ -361,6 +372,31 @@ void Animation::BlendFrames(int frameSrc, int frameDst, float blend, BoneTM *out
 	}
 }
 
+void Animation::BlendVerts(
+	const SIMDDriver &driver,
+	int frameSrc,
+	int frameDst,
+	float blend,
+	float *out,
+	int firstVert,
+	int numVerts
+) const {
+	RAD_ASSERT(frameSrc < (int)m_dvta->numFrames);
+	RAD_ASSERT(frameDst < (int)m_dvta->numFrames);
+	RAD_ASSERT((firstVert+numVerts) <= m_vtm->numVerts);
+
+	const int srcOfs = DVtm::kNumVertexFloats * ((m_vtm->numVerts * frameSrc) + firstVert);
+	const int dstOfs = DVtm::kNumVertexFloats * ((m_vtm->numVerts * frameDst) + firstVert);
+
+	driver.BlendVerts(
+		out,
+		m_dvta->verts + srcOfs,
+		m_dvta->verts + dstOfs,
+		blend,
+		numVerts
+	);
+}
+
 void Animation::EmitTags(
 	int frame,
 	int numFrames,
@@ -368,22 +404,23 @@ void Animation::EmitTags(
 	int numBones,
 	const Notify::Ref &notify
 ) const {
-	RAD_ASSERT(frame+numFrames <= (int)m_danim->numFrames);
+	RAD_ASSERT(m_dska);
+	RAD_ASSERT(frame+numFrames <= (int)m_dska->numFrames);
 	RAD_ASSERT(firstBone+numBones <= m_ska->numBones);
 	
 	const DSka *dska = m_ska->m_dska;
 	
-	if (!m_danim->tags)
+	if (!m_dska->tags)
 		return;
 
-	RAD_ASSERT(m_danim->boneTags);
+	RAD_ASSERT(m_dska->boneTags);
 
 	AnimTagEventData tag;
 	tag.ska = m_ska;
 	tag.anim = this;
 
-	int numTags = (int)m_danim->numTags;
-	const DSkTag *dtag = m_danim->tags;
+	int numTags = (int)m_dska->numTags;
+	const DSkTag *dtag = m_dska->tags;
 
 	while (frame > (int)dtag->frame) {
 		++dtag;
@@ -403,7 +440,7 @@ void Animation::EmitTags(
 		RAD_ASSERT(f >= frame);
 		RAD_ASSERT(f <= lastFrame);
 
-		const U8 *boneTags = m_danim->boneTags + dtag->tagOfs;
+		const U8 *boneTags = m_dska->boneTags + dtag->tagOfs;
 
 		for (U16 i = 0; i < dtag->numBones; ++i, boneTags += 3) {
 			int bone = (int)*reinterpret_cast<const U16*>(boneTags);
@@ -420,6 +457,51 @@ void Animation::EmitTags(
 			if (notify)
 				notify->EmitTag(tag);
 			m_ska->OnTag.Trigger(tag);
+		}
+	}
+}
+
+void Animation::GetBlendingFrames(
+	float frame,
+	int &src,
+	int &dst,
+	float &blend
+) const {
+	if (m_dska) {
+		float x;
+		math::ModF(x, blend, frame);
+		src = FloatToInt(x);
+		dst = src+1;
+
+		if (dst > (int)(m_dska->numFrames-1)) {
+			dst = src;
+			blend = 0.f;
+		}
+	} else {
+		// vertex animation is trickier. it's composed of irregularly spaced frames
+		for (src = 0; src < m_dvta->numFrames; ++src) {
+			if (m_dvta->frames[src] > frame)
+				break;
+		}
+
+		dst = src+1;
+		if (dst > (int)(m_dvta->numFrames-1)) {
+			src = m_dvta->numFrames-1;
+			dst = src;
+			blend = 0.f;
+		} else {
+			float srcFrame = m_dvta->frames[src];
+			float dstFrame = m_dvta->frames[dst];
+
+			RAD_ASSERT(srcFrame <= frame);
+			RAD_ASSERT(dstFrame >= frame);
+
+			float len = dstFrame - srcFrame;
+			RAD_ASSERT(len>0.f);
+
+			float pos = frame-srcFrame;
+
+			blend = pos / len;
 		}
 	}
 }
@@ -643,12 +725,8 @@ Vtm::~Vtm() {
 }
 
 void Vtm::Init() {
-	m_boneFloats = (float*)zone_malloc(ZSka, sizeof(float)*SIMDDriver::kNumBoneFloats*((int)m_dska->numBones), 0, SIMDDriver::kAlignment);
-	m_worldBones = (float*)zone_malloc(ZSka, sizeof(float)*SIMDDriver::kNumBoneFloats*((int)m_dska->numBones+1), 0, SIMDDriver::kAlignment);
-	m_boneTMs = (BoneTM*)zone_malloc(ZSka, sizeof(BoneTM)*((int)m_dska->numBones));
-	
-	for (DSkAnim::Vec::const_iterator it = m_dska->anims.begin(); it != m_dska->anims.end(); ++it) {
-		const DSkAnim &da = *it;
+	for (DVtAnim::Vec::const_iterator it = m_dvtm->anims.begin(); it != m_dvtm->anims.end(); ++it) {
+		const DVtAnim &da = *it;
 
 		m_anims.insert(Animation::Map::value_type(
 			String(da.name),
@@ -656,74 +734,18 @@ void Vtm::Init() {
 		));
 	}
 
-	// all idents.
-	for (int i = 0; i < m_dska->numBones+1; ++i)
-		details::Mat4x3Ident(m_worldBones + i*SIMDDriver::kNumBoneFloats);
-	for (int i = 0; i < m_dska->numBones; ++i)
-		details::Mat4x3Ident(m_boneFloats + i*SIMDDriver::kNumBoneFloats);
-
-	m_deltaMotion.s = Vec3(1, 1, 1);
-	m_deltaMotion.r = Quat::Identity;
-	m_deltaMotion.t = Vec3::Zero;
-
-	m_absMotion.s = Vec3(1, 1, 1);
-	m_absMotion.r = Quat::Identity;
-	m_absMotion.t = Vec3::Zero;
-
 	m_ident = true;
-}
-
-int Vtm::FindBone(const char *name) const {
-	const char *boneNames = m_dska->boneNames;
-
-	for (int i = 0; i < m_dska->numBones; ++i, boneNames += (kDNameLen+1)) {
-		if (!string::cmp(boneNames, name))
-			return i;
-	}
-
-	return -1;
-}
-
-int Vtm::ParentOf(int bone) const {
-	RAD_ASSERT(bone > -1);
-	RAD_ASSERT(bone < m_dska->numBones);
-	return m_dska->boneParents[bone];
-}
-
-Mat4 Vtm::BoneWorldMat(int bone) const {
-	RAD_ASSERT(bone > -1);
-	RAD_ASSERT(bone < m_dska->numBones);
-
-	const float *x = m_worldBones + SIMDDriver::kNumBoneFloats + (bone*SIMDDriver::kNumBoneFloats);
-	return details::Mat4From4x3(x);
-}
-
-const float *Vtm::BoneTMs(const ColumnMajorTag&) const {
-	return 0;
-}
-
-const float *Vtm::BoneTMs(const RowMajorTag&) const {
-	return m_boneFloats;
 }
 
 void Vtm::Tick(
 	float dt, 
-	float distance,
 	bool advance, 
-	bool emitTags, 
-	const Mat4 &root
+	bool emitTags
 ) {
 	if (!m_root) {
 		if (!m_ident) {
-			details::StoreMat4x3(m_worldBones, root); // root position.
-
-			for (int i = 0; i < m_dska->numBones+1; ++i)
-				details::Mat4x3Ident(m_worldBones + i*SIMDDriver::kNumBoneFloats);
-			for (int i = 0; i < m_dska->numBones; ++i)
-				details::Mat4x3Ident(m_boneFloats + i*SIMDDriver::kNumBoneFloats);
-
 			m_ident = true;
-			++m_boneFrame;
+			++m_vertexFrame;
 		}
 
 		return;
@@ -733,93 +755,44 @@ void Vtm::Tick(
 
 	bool valid = m_root->Tick(
 		dt,
-		distance,
-		m_boneTMs,
+		0.f,
 		0,
-		m_dska->numBones,
+		0,
+		0,
 		advance,
 		emitTags
 	);
 
 	if (!valid) {
 		if (!m_ident) {
-			details::StoreMat4x3(m_worldBones, root); // root position.
-			for (int i = 0; i < m_dska->numBones+1; ++i)
-				details::Mat4x3Ident(m_worldBones + i*SIMDDriver::kNumBoneFloats);
-			for (int i = 0; i < m_dska->numBones; ++i)
-				details::Mat4x3Ident(m_boneFloats + i*SIMDDriver::kNumBoneFloats);
 			m_ident = true;
-			++m_boneFrame;
+			++m_vertexFrame;
 		}
 
 		return;
 	}
 
-	++m_boneFrame;
+	++m_vertexFrame;
 	m_ident = false;
+}
 
-	m_deltaMotion.s = Vec3(1, 1, 1);
-	m_deltaMotion.r = m_root->deltaRot;
-	m_deltaMotion.t = m_root->deltaPos;
-	
-	m_absMotion.s = Vec3(1, 1, 1);
-	m_absMotion.r = m_root->rot;
-	m_absMotion.t = m_root->pos;
-	
-	float tempBoneMtx[2][SIMDDriver::kNumBoneFloats];
-	float *outMat[2] = { tempBoneMtx[0], tempBoneMtx[1] };
-	float *worldBone = m_worldBones+SIMDDriver::kNumBoneFloats;
+void Vtm::BlendVerts(
+	const SIMDDriver &driver,
+	float *out,
+	int firstVert,
+	int numVerts
+) const {
+	RAD_ASSERT((firstVert+numVerts) <= (int)m_dvtm->numVerts);
 
-	details::StoreMat4x3(m_worldBones, root); // root position.
-
-	for (int i = 0; i < m_dska->numBones; ++i, worldBone += SIMDDriver::kNumBoneFloats) {
-		const BoneTM &tm = m_boneTMs[i];
-		S16 parentIdx = m_dska->boneParents[i];
-
-		const float *parent = (m_worldBones+SIMDDriver::kNumBoneFloats) + parentIdx*SIMDDriver::kNumBoneFloats;
-				
-		Mat4 s = Mat4::Scaling(*reinterpret_cast<const Scale3*>(&tm.s));
-		Mat4 r = Mat4::Rotation(tm.r);
-		Mat4 t = Mat4::Translation(tm.t);
-		
-		details::MulMat4x3(outMat[0], s, r);
-
-		if (parentIdx >= 0) {
-			const BoneTM &parentTM = m_boneTMs[parentIdx];
-			Scale3 invScale(1.0f/parentTM.s[0], 1.0f/parentTM.s[1], 1.0f/parentTM.s[2]);
-			s = Mat4::Scaling(invScale);
-			details::MulMat4x3(outMat[1], outMat[0], s);
-			std::swap(outMat[0], outMat[1]);
-		}
-
-		details::MulMat4x3(outMat[1], t, parent);
-		details::MulMat4x3(worldBone, outMat[0], outMat[1]);
-	}
-
-	const float *invWorld = m_dska->invWorld;
-	float *boneFloats = m_boneFloats;
-	worldBone = m_worldBones+SIMDDriver::kNumBoneFloats;
-
-	for (int i = 0; i < m_dska->numBones; ++i, invWorld += 12, worldBone += SIMDDriver::kNumBoneFloats, boneFloats += SIMDDriver::kNumBoneFloats) {
-		if (SIMDDriver::kNumBoneFloats == 16) { 
-			// SIMD does 4x4 matrices
-			details::MulMat4x3(tempBoneMtx[0], invWorld, worldBone);
-
-			for (int r = 0; r < 4; ++r)
-				for (int c = 0; c < 3; ++c)
-					boneFloats[r*4+c] = MA(tempBoneMtx[0], r, c);
-
-			boneFloats[0*4+3] = 0.f;
-			boneFloats[1*4+3] = 0.f;
-			boneFloats[2*4+3] = 0.f;
-			boneFloats[3*4+3] = 1.f;
-		} else {
-			details::MulMat4x3(boneFloats, invWorld, worldBone);
-		}
+	if (m_ident) {
+		driver.BlendVerts(out, m_dvtm->refVerts + (firstVert*DVtm::kNumVertexFloats), 0, 0.f, numVerts);
+	} else {
+		m_root->BlendVerts(driver, out, firstVert, numVerts);
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
 #define CHECK_SIZE(_size) if (((bytes+(_size))-reinterpret_cast<const U8*>(data)) > (int)len) return pkg::SR_CorruptFile;
 
 void DSka::Clear() {
@@ -1099,6 +1072,152 @@ int DSkm::Parse(const void * const *_data, const AddrSize *_len, SkinType type) 
 	}
 
 	return pkg::SR_Success;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int DVtm::Parse(const void * const *_data, const AddrSize *_len) {
+
+	maxBlendVerts = 0;
+
+	const void *data = _data[0];
+	AddrSize len = _len[0];
+
+	if (len < 8)
+		return pkg::SR_InvalidFormat;
+
+	const U8 *bytes = reinterpret_cast<const U8*>(data);
+	const U32 *header = reinterpret_cast<const U32*>(data);
+	if (header[0] != kVtmxTag || header[1] != kVtmVersion)
+		return pkg::SR_InvalidFormat;
+
+	bytes += 8;
+
+	CHECK_SIZE(sizeof(float)*6);
+	float mins[3];
+	float maxs[3];
+
+	for (int i = 0; i < 3; ++i) {
+		mins[i] = *reinterpret_cast<const float*>(bytes);
+		bytes += sizeof(float);
+	}
+
+	for (int i = 0; i < 3; ++i) {
+		maxs[i] = *reinterpret_cast<const float*>(bytes);
+		bytes += sizeof(float);
+	}
+
+	bounds.Initialize(
+		mins[0], mins[1], mins[2],
+		maxs[0], maxs[1], maxs[2]
+	);
+
+	CHECK_SIZE(sizeof(U16)*2);
+	U16 numMeshes = *reinterpret_cast<const U16*>(bytes);
+	bytes += sizeof(U16)*2;
+
+	if (numMeshes < 1)
+		return pkg::SR_InvalidFormat;
+
+	meshes.resize(numMeshes);
+	for (U16 i = 0; i < numMeshes; ++i) {
+		DVtMesh &m = meshes[i];
+
+
+		CHECK_SIZE(sizeof(U32));
+		m.vertOfs = *reinterpret_cast<const U32*>(bytes);
+		bytes += sizeof(U32);
+
+		CHECK_SIZE(sizeof(U16)*4);
+		m.numVerts = *reinterpret_cast<const U16*>(bytes);
+		bytes += sizeof(U16);
+
+		maxBlendVerts = ((U32)m.numVerts > maxBlendVerts) ? (U32)m.numVerts : maxBlendVerts;
+
+		m.numTris = *reinterpret_cast<const U16*>(bytes);
+		bytes += sizeof(U16);
+
+		m.numChannels = *reinterpret_cast<const U16*>(bytes);
+		bytes += sizeof(U16);
+
+		bytes += sizeof(U16); // padd.
+
+		CHECK_SIZE(kDNameLen);
+		m.material = reinterpret_cast<const char*>(bytes);
+		bytes += kDNameLen;
+
+		CHECK_SIZE(sizeof(float)*2*((int)m.numVerts)*((int)m.numChannels));
+		m.texCoords = reinterpret_cast<const float*>(bytes);
+		bytes += sizeof(float)*2*((int)m.numVerts)*((int)m.numChannels);
+
+		CHECK_SIZE(sizeof(U16)*((int)m.numTris)*3);
+		m.indices = reinterpret_cast<const U16*>(bytes);
+		bytes += sizeof(U16)*((int)m.numTris)*3;
+		if (m.numTris&1) { // padd
+			CHECK_SIZE(sizeof(U16));
+			bytes += sizeof(U16);
+		}
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+
+	// file2
+
+	data = _data[1];
+	len = _len[1];
+	bytes = reinterpret_cast<const U8*>(data);
+	header = reinterpret_cast<const U32*>(data);
+	if (header[0] != kVtmpTag || header[1] != kVtmVersion)
+		return pkg::SR_InvalidFormat;
+
+	bytes += 8;
+
+	CHECK_SIZE(sizeof(U32)+sizeof(U16));
+	numVerts = *reinterpret_cast<const U32*>(bytes);
+	bytes += sizeof(U32);
+	U16 numAnims = *reinterpret_cast<const U16*>(bytes);
+	bytes += sizeof(U16);
+
+	CHECK_SIZE(sizeof(U16)*3);
+	bytes += sizeof(U16)*3;
+
+	CHECK_SIZE(sizeof(float)*kNumVertexFloats*numVerts);
+	refVerts = reinterpret_cast<const float*>(bytes);
+	bytes += sizeof(float)*kNumVertexFloats*numVerts;
+
+	anims.resize(numAnims);
+
+	for (U16 i = 0; i < numAnims; ++i) {
+		DVtAnim &anim = anims[i];
+		
+		CHECK_SIZE(kDNameLen);
+		anim.name = reinterpret_cast<const char*>(bytes);
+		bytes += kDNameLen;
+
+		CHECK_SIZE(sizeof(U16)*2);
+		anim.fps = *reinterpret_cast<const U16*>(bytes);
+		bytes += sizeof(U16);
+		anim.numFrames = *reinterpret_cast<const U16*>(bytes);
+		bytes += sizeof(U16);
+
+		CHECK_SIZE(sizeof(U16)*((int)anim.numFrames));
+		anim.frames = reinterpret_cast<const U16*>(bytes);
+		bytes += sizeof(U16)*((int)anim.numFrames);
+
+		bytes = Align(bytes, SIMDDriver::kAlignment);
+		CHECK_SIZE(sizeof(float)*kNumVertexFloats*numVerts);
+		anim.verts = reinterpret_cast<const float*>(bytes);
+		bytes += sizeof(float)*kNumVertexFloats*numVerts;
+	}
+
+	return pkg::SR_Success;
+}
+
+void DVtm::Clear() {
+	numVerts = 0;
+	maxBlendVerts = 0;
+	meshes.clear();
+	anims.clear();
 }
 
 } // ska

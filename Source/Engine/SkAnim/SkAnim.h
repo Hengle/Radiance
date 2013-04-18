@@ -22,6 +22,7 @@ namespace ska {
 
 struct AnimTagEventData {
 	Ska* ska;
+	Vtm *vtm;
 	const Animation* anim;
 	String tag;
 	int bone;
@@ -29,6 +30,7 @@ struct AnimTagEventData {
 
 struct AnimStateEventData {
 	Ska *ska;
+	Vtm *vtm;
 	const Animation *anim;
 };
 
@@ -199,7 +201,7 @@ struct RADENG_CLASS DVtAnim {
 	const float *verts; // 0-3   -> vertex
 						// 4-7   -> normal
 						// 8-11  -> tangent
-	U16 *frames;
+	const U16 *frames;
 	U16 fps;
 	U16 numFrames;
 };
@@ -219,10 +221,15 @@ struct RADENG_CLASS DVtMesh {
 
 struct RADENG_CLASS DVtm {
 
+	enum {
+		kNumVertexFloats = 12
+	};
+
 	const float *refVerts; // 0-3   -> vertex
 						   // 4-7   -> normal
 						   // 8-11  -> tangent
 	U32 numVerts;
+	U32 maxBlendVerts;
 
 	BBox bounds;
 	DVtMesh::Vec meshes;
@@ -250,6 +257,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Animation, distance, float);
 	RAD_DECLARE_READONLY_PROPERTY(Animation, length, float); // in seconds
 	RAD_DECLARE_READONLY_PROPERTY(Animation, ska, Ska*);
+	RAD_DECLARE_READONLY_PROPERTY(Animation, vtm, Vtm*);
 
 	void BlendFrames(
 		int frameSrc,
@@ -260,6 +268,16 @@ public:
 		int numBones
 	) const;
 
+	void BlendVerts(
+		const SIMDDriver &driver,
+		int frameSrc,
+		int frameDst,
+		float blend,
+		float *out,
+		int firstVert,
+		int numVerts
+	) const;
+
 	void EmitTags(
 		int frame,
 		int numFrames,
@@ -268,21 +286,39 @@ public:
 		const Notify::Ref &notify
 	) const;
 
+	void GetBlendingFrames(
+		float frame,
+		int &src,
+		int &dst,
+		float &blend
+	) const;
+
 private:
 
 	friend class Ska;
+	friend class Vtm;
 
 	Animation(Ska &ska, const DSkAnim &anim);
+	Animation(Vtm &vtm, const DVtAnim &anim);
 
 	RAD_DECLARE_GET(name, const char *);
 	RAD_DECLARE_GET(numFrames, int);
 	RAD_DECLARE_GET(fps, float);
 	RAD_DECLARE_GET(distance, float);
 	RAD_DECLARE_GET(length, float);
-	RAD_DECLARE_GET(ska, Ska*) { return m_ska; }
+
+	RAD_DECLARE_GET(ska, Ska*) { 
+		return m_ska; 
+	}
+
+	RAD_DECLARE_GET(vtm, Vtm*) {
+		return m_vtm;
+	}
 
 	Ska *m_ska;
-	const DSkAnim *m_danim;
+	Vtm *m_vtm;
+	const DSkAnim *m_dska;
+	const DVtAnim *m_dvta;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -343,14 +379,6 @@ private:
 		return &m_anims; 
 	}
 
-	RAD_DECLARE_GET(root, const ControllerRef&) { 
-		return m_root; 
-	}
-
-	RAD_DECLARE_SET(root, const ControllerRef&) { 
-		m_root = value; 
-	}
-
 	RAD_DECLARE_GET(boneFrame, int) { 
 		return m_boneFrame; 
 	}
@@ -361,6 +389,14 @@ private:
 
 	RAD_DECLARE_GET(absMotion, const BoneTM*) {
 		return &m_absMotion;
+	}
+
+	RAD_DECLARE_GET(root, const ControllerRef&) { 
+		return m_root; 
+	}
+
+	RAD_DECLARE_SET(root, const ControllerRef&) { 
+		m_root = value; 
 	}
 
 	friend class Animation;
@@ -382,9 +418,6 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-
-struct ColumnMajorTag {};
-struct RowMajorTag {};
 
 // Vertex model
 class RADENG_CLASS Vtm {
@@ -408,14 +441,16 @@ public:
 	);
 
 	void BlendVerts(
-		const SIMDDriver *driver,
+		const SIMDDriver &driver,
 		float *out,
 		int firstVert,
 		int numVerts
-	);
+	) const;
 
 	RAD_DECLARE_READONLY_PROPERTY(Vtm, anims, const Animation::Map*);
 	RAD_DECLARE_READONLY_PROPERTY(Vtm, vertexFrame, int); //++ per Tick()
+	RAD_DECLARE_READONLY_PROPERTY(Vtm, numVerts, int);
+	RAD_DECLARE_READONLY_PROPERTY(Vtm, maxBlendVerts, int);
 	RAD_DECLARE_PROPERTY(Vtm, root, const ControllerRef&, const ControllerRef&);
 
 	AnimTagEvent OnTag;
@@ -429,16 +464,24 @@ private:
 		return &m_anims; 
 	}
 
+	RAD_DECLARE_GET(vertexFrame, int) { 
+		return m_vertexFrame; 
+	}
+
+	RAD_DECLARE_GET(numVerts, int) {
+		return (int)m_dvtm->numVerts;
+	}
+
+	RAD_DECLARE_GET(maxBlendVerts, int) {
+		return (int)m_dvtm->maxBlendVerts;
+	}
+
 	RAD_DECLARE_GET(root, const ControllerRef&) { 
 		return m_root; 
 	}
 
 	RAD_DECLARE_SET(root, const ControllerRef&) { 
 		m_root = value; 
-	}
-
-	RAD_DECLARE_GET(vertexFrame, int) { 
-		return m_vertexFrame; 
 	}
 
 	friend class Animation;
@@ -448,7 +491,7 @@ private:
 	Animation::Map m_anims;
 	ControllerRef m_root;
 	const DVtm *m_dvtm;
-	int m_boneFrame;
+	int m_vertexFrame;
 	bool m_ident;
 };
 

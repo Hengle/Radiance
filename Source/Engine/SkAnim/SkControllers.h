@@ -71,6 +71,8 @@ public:
 	typedef ControllerWRef WRef;
 
 	Controller(Ska &ska);
+	Controller(Vtm &vtm);
+	Controller(Ska *ska, Vtm *vtm);
 	virtual ~Controller();
 
 	virtual bool Tick(
@@ -83,6 +85,13 @@ public:
 		bool emitTags
 	) = 0;
 
+	virtual void BlendVerts(
+		const SIMDDriver &driver,
+		float *out,
+		int firstVert,
+		int numVerts
+	) const = 0;
+
 	virtual void ResetMotion() = 0;
 
 	void Activate(bool active=true);
@@ -92,13 +101,9 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Controller, deltaRot, const Quat&);
 	RAD_DECLARE_READONLY_PROPERTY(Controller, deltaPos, const Vec3&);
 	RAD_DECLARE_READONLY_PROPERTY(Controller, ska, Ska*);
+	RAD_DECLARE_READONLY_PROPERTY(Controller, vtm, Vtm*);
 	RAD_DECLARE_READONLY_PROPERTY(Controller, in, float);
 	RAD_DECLARE_READONLY_PROPERTY(Controller, out, float);
-
-	// If set to true, then the animation motion will be
-	// blended if using a BlendToController
-	// Default: false
-	RAD_DECLARE_PROPERTY(Controller, blendTM, bool, bool); 
 
 	static void Blend(
 		BoneTM *out,
@@ -119,6 +124,8 @@ protected:
 	virtual void OnActivate(bool active=true) {}
 
 	BoneTM::Ref AllocBoneArray();
+	VertArrayRef AllocVertArray();
+
 	void SetRot(const Quat &q) { 
 		m_q = q; 
 	}
@@ -144,15 +151,14 @@ private:
 	RAD_DECLARE_GET(deltaRot, const Quat&) { return m_dq; }
 	RAD_DECLARE_GET(deltaPos, const Vec3&) { return m_dp; }
 	RAD_DECLARE_GET(ska, Ska*) { return m_ska; }
-	RAD_DECLARE_GET(blendTM, bool) { return m_blendTM; }
-	RAD_DECLARE_SET(blendTM, bool) { m_blendTM = value; }
+	RAD_DECLARE_GET(vtm, Vtm*) { return m_vtm; }
 
 	Ska *m_ska;
+	Vtm *m_vtm;
 	Quat m_q;
 	Quat m_dq;
 	Vec3 m_p;
 	Vec3 m_dp;
-	bool m_blendTM;
 	bool m_active;
 };
 
@@ -177,6 +183,16 @@ public:
 		const Notify::Ref &notify
 	);
 
+	static Ref New(
+		const Animation &anim,
+		float in,
+		float out,
+		float timeScale,
+		int loopCount, // 0 == play forever
+		Vtm &vtm,
+		const Notify::Ref &notify
+	);
+
 	virtual bool Tick(
 		float dt,
 		float distance,
@@ -186,6 +202,13 @@ public:
 		bool advance,
 		bool emitTags
 	);
+
+	virtual void BlendVerts(
+		const SIMDDriver &driver,
+		float *out,
+		int firstVert,
+		int numVerts
+	) const;
 
 	virtual void ResetMotion();
 	void ResetLoopCount(int loopCount);
@@ -237,6 +260,16 @@ private:
 		const Notify::Ref &notify
 	);
 
+	AnimationSource(
+		const Animation &anim,
+		float in,
+		float out,
+		float timeScale,
+		int loopCount, // 0 == loop forever
+		Vtm &vtm,
+		const Notify::Ref &notify
+	);
+
 	void EmitTags(int firstBone, int numBones);
 	void EmitTags(int frame, int numFrames, int firstBone, int numBones);
 
@@ -269,6 +302,11 @@ public:
 		const Notify::Ref &notify
 	);
 
+	static Ref New(
+		Vtm &vtm,
+		const Notify::Ref &notify
+	);
+
 	virtual ~BlendToController();
 
 	void BlendTo(const Controller::Ref &to);
@@ -284,6 +322,13 @@ public:
 		bool emitTags
 	);
 
+	virtual void BlendVerts(
+		const SIMDDriver &driver,
+		float *out,
+		int firstVert,
+		int numVerts
+	) const;
+
 	virtual void ResetMotion();
 
 	RAD_DECLARE_READONLY_PROPERTY(BlendToController, validRootAnim, bool);
@@ -296,6 +341,11 @@ private:
 
 	BlendToController(
 		Ska &ska,
+		const Notify::Ref &notify
+	);
+
+	BlendToController(
+		Vtm &vtm,
 		const Notify::Ref &notify
 	);
 
@@ -330,6 +380,13 @@ private:
 			bool emitTags
 		);
 
+		void BlendVerts(
+			const SIMDDriver &driver,
+			float *out,
+			int firstVert,
+			int numVerts
+		) const;
+
 		void ResetMotion();
 
 		RAD_DECLARE_READONLY_PROPERTY(Blend, out, float);
@@ -339,6 +396,7 @@ private:
 		Union b;
 		BlendTimer blend;
 		BoneTM::Ref bones;
+		VertArrayRef verts[2];
 
 	private:
 
@@ -366,6 +424,13 @@ public:
 		const char *blendTarget = 0
 	);
 
+	static Ref New(
+		const AnimState &variants,
+		Vtm &vtm,
+		const Notify::Ref &notify,
+		const char *blendTarget = 0
+	);
+
 	virtual ~AnimationVariantsSource();
 
 	virtual bool Tick(
@@ -377,6 +442,13 @@ public:
 		bool advance,
 		bool emitTags
 	);
+
+	virtual void BlendVerts(
+		const SIMDDriver &driver,
+		float *out,
+		int firstVert,
+		int numVerts
+	) const;
 
 	virtual void ResetMotion();
 
@@ -395,6 +467,13 @@ private:
 	AnimationVariantsSource(
 		const AnimState &variants,
 		Ska &ska,
+		const Notify::Ref &notify,
+		const char *blendTarget
+	);
+
+	AnimationVariantsSource(
+		const AnimState &variants,
+		Vtm &vtm,
 		const Notify::Ref &notify,
 		const char *blendTarget
 	);

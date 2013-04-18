@@ -1534,7 +1534,7 @@ bool CompileVtmData(
 	int trimodel, 
 	VtmData &vtm
 ) {
-	VtmModel::Ref m(new (ZTools) SkTriModel());
+	VtmModel::Ref m(new (ZTools) VtmModel());
 	VtmModel::Vec models;
 
 	const SceneFile::Entity::Ref &e = mesh.worldspawn;
@@ -1560,7 +1560,7 @@ bool CompileVtmData(
 		if (!m->indices.empty()) {
 			models.push_back(m);
 			vertOfs += (int)m->verts.size();
-			m.reset(new (ZTools) SkTriModel());
+			m.reset(new (ZTools) VtmModel());
 		}
 	}
 
@@ -1753,7 +1753,8 @@ bool CompileVtmData(
 
 			// frame offsets
 			for (SceneFile::VertexFrames::const_iterator it = srcAnim->vertexFrames.begin(); it != srcAnim->vertexFrames.end(); ++it) {
-				if (!os.Write((U16)(*it).frame))
+				int offsetFrame = (*it).frame - srcAnim->firstFrame;
+				if (!os.Write((U16)offsetFrame))
 					return false;
 			}
 
@@ -1878,6 +1879,25 @@ RADENG_API SkmData::Ref RADENG_CALL CompileSkmData(
 	COut(C_Info) << "CompileSkmData(" << memSize[0] << ", " << memSize[1] << ")" << std::endl;
 
 	return sk;
+}
+
+RADENG_API VtmData::Ref RADENG_CALL CompileVtmData(
+	const char *name,
+	const SceneFile &mesh,
+	const SceneFileVec &anims,
+	int trimodel
+) {
+	VtmData::Ref vtm(new (ZTools) VtmData());
+
+	if (!CompileVtmData(name, mesh, anims, trimodel, *vtm))
+		return VtmData::Ref();
+
+	SizeBuffer memSize[2];
+	FormatSize(memSize[0], vtm->vtmSize[0]);
+	FormatSize(memSize[1], vtm->vtmSize[1]);
+	COut(C_Info) << "CompileVtmData(" << memSize[0] << ", " << memSize[1] << ")" << std::endl;
+
+	return vtm;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

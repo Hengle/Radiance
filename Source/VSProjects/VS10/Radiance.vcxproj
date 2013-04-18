@@ -1024,7 +1024,6 @@
     <ClInclude Include="..\..\Runtime\Base\SharedLibrary.h" />
     <ClInclude Include="..\..\Runtime\Base\SharedLibraryDef.h" />
     <ClInclude Include="..\..\Runtime\Base\SIMD.h" />
-    <ClInclude Include="..\..\Runtime\Base\SIMD_ref.h" />
     <ClInclude Include="..\..\Runtime\Base\Tokenizer.h" />
     <ClInclude Include="..\..\Runtime\Base\Types.h" />
     <ClInclude Include="..\..\Runtime\Base\Utils.h" />

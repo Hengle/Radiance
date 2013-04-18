@@ -185,6 +185,24 @@ void SkinVerts4B(
 	SkinVerts(outVerts, bones, vertices, boneIndices, numVerts, 4);
 }
 
+void BlendVerts(
+	float *outVerts,
+	const float *srcVerts,
+	const float *dstVerts,
+	float frac,
+	int numVerts
+) {
+	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(srcVerts, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(dstVerts, SIMDDriver::kAlignment));
+	
+	// 16 floats per vertex
+	const int kNumFloats = numVerts * 16;
+	for (int i = 0; i < kNumFloats; ++i) {
+		outVerts[i] = math::Lerp(srcVerts[i], dstVerts[i], frac);
+	}
+}
+
 }
 
 const SIMDDriver *SIMD_ref_bind() {
@@ -197,6 +215,7 @@ const SIMDDriver *SIMD_ref_bind() {
 	d.SkinVerts[1] = &SkinVerts2B;
 	d.SkinVerts[2] = &SkinVerts3B;
 	d.SkinVerts[3] = &SkinVerts4B;
+	d.BlendVerts = &BlendVerts;
 	
 	string::cpy(d.name, "SIMD_ref");
 	return &d;

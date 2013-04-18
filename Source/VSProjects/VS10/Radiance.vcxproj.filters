@@ -309,9 +309,6 @@
     <ClInclude Include="..\..\Runtime\Base\SIMD.h">
       <Filter>Source\Runtime\Base</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Runtime\Base\SIMD_ref.h">
-      <Filter>Source\Runtime\Base</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Runtime\Base\Types.h">
       <Filter>Source\Runtime\Base</Filter>
     </ClInclude>
