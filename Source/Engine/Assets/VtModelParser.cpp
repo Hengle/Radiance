@@ -1,4 +1,4 @@
-/*! \file SkModelParser.cpp
+/*! \file VtModelParser.cpp
 	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
 	\copyright See Radiance/LICENSE for licensing terms.
 	\author Joe Riedel
@@ -6,7 +6,7 @@
 */
 
 #include RADPCH
-#include "SkModelParser.h"
+#include "VtModelParser.h"
 #include "../SkAnim/SkAnim.h"
 #include "../Engine.h"
 #include <Runtime/Base/SIMD.h>
@@ -15,13 +15,13 @@ using namespace pkg;
 
 namespace asset {
 
-SkModelParser::SkModelParser() : m_state(S_None), m_ska(0), m_states(0) {
+VtModelParser::VtModelParser() : m_state(kS_None), m_states(kS_None) {
 }
 
-SkModelParser::~SkModelParser() {
+VtModelParser::~VtModelParser() {
 }
 
-int SkModelParser::Process(
+int VtModelParser::Process(
 	const xtime::TimeSlice &time,
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
@@ -31,38 +31,28 @@ int SkModelParser::Process(
 		return SR_Success;
 
 #pragma message("TODO: Implement P_Trim")
-	// This is unfinished. SkMesh has 2 files, one is persistent, mesh weights, verts (for cpu skin), bone indices etc.
+	// This is unfinished. VtMesh has 2 files, one is persistent, mesh uv's, indices etc.
 	// The other is meant to be free'd after the model is created. BUT we can't free the transient data
 	// (texture coords, indices, etc) because they are references repeatedly by new instances of SkMesh. What I should
-	// do is have SkModelParser move its transient data into those vertex buffers and expose them as part of its interface.
+	// do is have VtModelParser move its transient data into those vertex buffers and expose them as part of its interface.
 	// Work todo in the future, right now it's not going to save enough memory to care too much.
 	//
 	// Technically this is broken because the entire concept of this asset sink parser mechanism is to expose the "static" side
 	// of the data in whatever form it should take place. TextureParser does this correctly, it moves the data into a GLTexture
 	// as a later sink stage.
 	//
-	// So we need to make a GLSkModelParser that moves the SkModelParser transient data into some VB's and then when we get a P_Trim
+	// So we need to make a GLVtModelParser that moves the VtModelParser transient data into some VB's and then when we get a P_Trim
 	// we can properly release this data.
-#if defined(RAD_OPT_TOOLS)
-	if ((m_skmd||m_state==S_Done) && (flags&(P_Load|P_Parse|P_Info|P_Trim)))
+
+	if ((m_state==kS_Done) && (flags&(P_Load|P_Parse|P_Info|P_Trim)))
 		return SR_Success;
-#else
-	if ((m_state==S_Done) && (flags&(P_Load|P_Parse|P_Info|P_Trim)))
-		return SR_Success;
-#endif
 
 	if (flags&P_Unload) {
-		m_state = S_None;
-		m_ska = 0;
-		m_skaRef.reset();
+		m_state = lS_None;
 		m_states = 0;
 		m_statesRef.reset();
 		m_mm[0].reset();
 		m_mm[1].reset();
-#if defined(RAD_OPT_TOOLS)
-		m_skmd.reset();
-		m_cooker.reset();
-#endif
 		return SR_Success;
 	}
 
@@ -74,36 +64,16 @@ int SkModelParser::Process(
 	return LoadCooked(time, engine, asset, flags);	
 }
 
-int SkModelParser::LoadCooked(
+int VtModelParser::LoadCooked(
 	const xtime::TimeSlice &time,
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
 ) {
-	if (m_state == S_None) {
+	if (m_state == kS_None) {
 #if defined(RAD_OPT_TOOLS)
 		if (!asset->cooked) {
-			const String *s = asset->entry->KeyValue<String>("AnimSet.Source", P_TARGET_FLAGS(flags));
-			if (!s)
-				return SR_MetaError;
-
-			m_skaRef = engine.sys->packages->Resolve(s->c_str, asset->zone);
-			if (!m_skaRef)
-				return SR_FileNotFound;
-
-			int r = m_skaRef->Process(
-				xtime::TimeSlice::Infinite,
-				flags
-			);
-
-			if (r != SR_Success)
-				return r;
-
-			m_ska = SkAnimSetParser::Cast(m_skaRef);
-			if (!m_ska || !m_ska->valid)
-				return SR_ParseError;
-
-			s = asset->entry->KeyValue<String>("AnimStates.Source", P_TARGET_FLAGS(flags));
+			const String *s = asset->entry->KeyValue<String>("AnimStates.Source", P_TARGET_FLAGS(flags));
 			if (!s)
 				return SR_MetaError;
 
@@ -111,7 +81,7 @@ int SkModelParser::LoadCooked(
 			if (!m_statesRef)
 				return SR_FileNotFound;
 
-			r = m_statesRef->Process(
+			int r = m_statesRef->Process(
 				xtime::TimeSlice::Infinite,
 				flags
 			);
@@ -128,31 +98,11 @@ int SkModelParser::LoadCooked(
 		if (!import)
 			return SR_MetaError;
 
-		m_skaRef = asset->entry->Resolve(*import, asset->zone);
-		if (!m_skaRef)
-			return SR_MetaError;
-
-		int r = m_skaRef->Process(
-			xtime::TimeSlice::Infinite,
-			flags
-		);
-
-		if (r != SR_Success)
-			return r;
-
-		m_ska = SkAnimSetParser::Cast(m_skaRef);
-		if (!m_ska || !m_ska->valid)
-			return SR_ParseError;
-
-		import = asset->entry->Resolve(1);
-		if (!import)
-			return SR_MetaError;
-
 		m_statesRef = asset->entry->Resolve(*import, asset->zone);
 		if (!m_statesRef)
 			return SR_FileNotFound;
 
-		r = m_statesRef->Process(
+		int r = m_statesRef->Process(
 			xtime::TimeSlice::Infinite,
 			flags
 		);
@@ -167,10 +117,10 @@ int SkModelParser::LoadCooked(
 		}
 #endif
 
-		m_state = S_Load0;
+		m_state = kS_Load0;
 	}
 
-	if (m_state == S_Load0) {
+	if (m_state == kS_Load0) {
 		if (!m_mm[0]) {
 #if defined(RAD_OPT_TOOLS)
 			if (!asset->cooked) {
@@ -261,7 +211,7 @@ int SkModelParser::LoadCooked(
 
 #if defined(RAD_OPT_TOOLS)
 
-int SkModelParser::Load(
+int VtModelParser::Load(
 	const xtime::TimeSlice &time,
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
@@ -339,7 +289,7 @@ int SkModelParser::Load(
 	return m_skmd ? SR_Success : SR_ParseError;
 }
 
-bool SkModelParser::RAD_IMPLEMENT_GET(valid)  {
+bool VtModelParser::RAD_IMPLEMENT_GET(valid)  {
 	if (m_skmd)
 		return m_ska && m_ska->valid && m_states && m_states->valid; 
 	return m_mm[1] && m_ska && m_ska->valid && m_states && m_states->valid;
@@ -347,8 +297,8 @@ bool SkModelParser::RAD_IMPLEMENT_GET(valid)  {
 
 #endif
 
-void SkModelParser::Register(Engine &engine) {
-	static pkg::Binding::Ref ref = engine.sys->packages->Bind<SkModelParser>();
+void VtModelParser::Register(Engine &engine) {
+	static pkg::Binding::Ref ref = engine.sys->packages->Bind<VtModelParser>();
 }
 
 } // asset
