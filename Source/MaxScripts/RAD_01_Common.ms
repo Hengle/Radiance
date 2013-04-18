@@ -29,7 +29,7 @@ function RAD_GetLoftLineKeyframeTimes obj = (
 	props = getPropNames baseLine #dynamicOnly
 	
 	for p in props do (
-		z = execute ("($" + obj.name + ").baseobject[#line][#master]." + (p as string) + ".controller.keys")
+		z = execute ("($'" + obj.name + "').baseobject[#line][#master]." + (p as string) + ".controller.keys")
 		if (z.count > 1) then (
 			w = for x in z collect x.time
 			if (keyframes == undefined) then (

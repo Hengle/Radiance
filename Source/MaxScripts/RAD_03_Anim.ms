@@ -115,7 +115,7 @@ function RAD_GatherSkels objs =
 	
 	for x in objs do
 	(
-		if (RAD_IsAnimated x) then
+		if ((not RAD_IsVertexAnimated x) and (RAD_IsAnimated x)) then
 		(
 			root = RAD_GetSkelRoot x
 			if (root != undefined) then
@@ -406,15 +406,12 @@ function RAD_GetBoneTM b =
 function RAD_ExportSkAnims file doMeshes doAnims isCamera anims obj = (
 	select obj
 	
-	numBones = 0
-	numVerts = 0
+	max modify mode
+	numBones = skinops.GetNumberBones obj.skin
+	numVerts = skinops.GetNumberVertices obj.skin
 		
 	if (doMeshes) then
 	(
-		max modify mode
-		numBones = skinops.GetNumberBones obj.skin
-		numVerts = skinops.GetNumberVertices obj.skin
-		
 		for x = 1 to numVerts do
 		(
 			numWeights = skinops.GetVertexWeightCount obj.skin x
@@ -518,8 +515,8 @@ function RAD_IsVertexAnimated obj = (
 		return false
 	)
 	
-	z = RAD_LoadObjAnims objs
-	z.count > 1
+	z = RAD_LoadObjAnims obj
+	z.count > 0
 )
 
 function RAD_ExportAnims file doMeshes doAnims trim obj =
