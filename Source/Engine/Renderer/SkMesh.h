@@ -45,7 +45,6 @@ public:
 	}
 #endif
 
-
 private:
 
 	SkMesh();

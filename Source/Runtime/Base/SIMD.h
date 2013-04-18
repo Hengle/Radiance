@@ -40,6 +40,15 @@ struct SIMDDriver {
 	);
 
 	FSkinVerts SkinVerts[4]; // [numBones]
+
+	typedef void (*FBlendVerts) (
+		float *outVerts,
+		const float *srcVerts,
+		const float *dstVerts,
+		int numVerts
+	);
+
+	FBlendVerts BlendVerts;
 	
 	char name[16];
 

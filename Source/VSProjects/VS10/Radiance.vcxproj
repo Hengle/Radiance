@@ -195,6 +195,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\..\Engine\Assets\TypefaceParser.h" />
+    <ClInclude Include="..\..\Engine\Assets\VtMaterialLoader.h" />
+    <ClInclude Include="..\..\Engine\Assets\VtModelCooker.h" />
+    <ClInclude Include="..\..\Engine\Assets\VtModelParser.h" />
     <ClInclude Include="..\..\Engine\Camera.h" />
     <ClInclude Include="..\..\Engine\ComponentExports.h" />
     <ClInclude Include="..\..\Engine\Console.h" />
@@ -1416,6 +1419,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\Engine\Assets\TypefaceParser.cpp" />
+    <ClCompile Include="..\..\Engine\Assets\VtMaterialLoader.cpp" />
+    <ClCompile Include="..\..\Engine\Assets\VtModelCooker.cpp" />
+    <ClCompile Include="..\..\Engine\Assets\VtModelParser.cpp" />
     <ClCompile Include="..\..\Engine\Camera.cpp" />
     <ClCompile Include="..\..\Engine\ComponentExports.cpp" />
     <ClCompile Include="..\..\Engine\Console.cpp" />

@@ -629,6 +629,197 @@ void Ska::Tick(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+Vtm::Vtm(const DVtm &dvtm) :
+m_dvtm(&dvtm),
+m_vertexFrame(1),
+m_ident(false) {
+	Init();
+}
+
+Vtm::~Vtm() {
+	for (Animation::Map::iterator it = m_anims.begin(); it != m_anims.end(); ++it)
+		delete it->second;
+}
+
+void Vtm::Init() {
+	m_boneFloats = (float*)zone_malloc(ZSka, sizeof(float)*SIMDDriver::kNumBoneFloats*((int)m_dska->numBones), 0, SIMDDriver::kAlignment);
+	m_worldBones = (float*)zone_malloc(ZSka, sizeof(float)*SIMDDriver::kNumBoneFloats*((int)m_dska->numBones+1), 0, SIMDDriver::kAlignment);
+	m_boneTMs = (BoneTM*)zone_malloc(ZSka, sizeof(BoneTM)*((int)m_dska->numBones));
+	
+	for (DSkAnim::Vec::const_iterator it = m_dska->anims.begin(); it != m_dska->anims.end(); ++it) {
+		const DSkAnim &da = *it;
+
+		m_anims.insert(Animation::Map::value_type(
+			String(da.name),
+			new Animation(*this, da)
+		));
+	}
+
+	// all idents.
+	for (int i = 0; i < m_dska->numBones+1; ++i)
+		details::Mat4x3Ident(m_worldBones + i*SIMDDriver::kNumBoneFloats);
+	for (int i = 0; i < m_dska->numBones; ++i)
+		details::Mat4x3Ident(m_boneFloats + i*SIMDDriver::kNumBoneFloats);
+
+	m_deltaMotion.s = Vec3(1, 1, 1);
+	m_deltaMotion.r = Quat::Identity;
+	m_deltaMotion.t = Vec3::Zero;
+
+	m_absMotion.s = Vec3(1, 1, 1);
+	m_absMotion.r = Quat::Identity;
+	m_absMotion.t = Vec3::Zero;
+
+	m_ident = true;
+}
+
+int Vtm::FindBone(const char *name) const {
+	const char *boneNames = m_dska->boneNames;
+
+	for (int i = 0; i < m_dska->numBones; ++i, boneNames += (kDNameLen+1)) {
+		if (!string::cmp(boneNames, name))
+			return i;
+	}
+
+	return -1;
+}
+
+int Vtm::ParentOf(int bone) const {
+	RAD_ASSERT(bone > -1);
+	RAD_ASSERT(bone < m_dska->numBones);
+	return m_dska->boneParents[bone];
+}
+
+Mat4 Vtm::BoneWorldMat(int bone) const {
+	RAD_ASSERT(bone > -1);
+	RAD_ASSERT(bone < m_dska->numBones);
+
+	const float *x = m_worldBones + SIMDDriver::kNumBoneFloats + (bone*SIMDDriver::kNumBoneFloats);
+	return details::Mat4From4x3(x);
+}
+
+const float *Vtm::BoneTMs(const ColumnMajorTag&) const {
+	return 0;
+}
+
+const float *Vtm::BoneTMs(const RowMajorTag&) const {
+	return m_boneFloats;
+}
+
+void Vtm::Tick(
+	float dt, 
+	float distance,
+	bool advance, 
+	bool emitTags, 
+	const Mat4 &root
+) {
+	if (!m_root) {
+		if (!m_ident) {
+			details::StoreMat4x3(m_worldBones, root); // root position.
+
+			for (int i = 0; i < m_dska->numBones+1; ++i)
+				details::Mat4x3Ident(m_worldBones + i*SIMDDriver::kNumBoneFloats);
+			for (int i = 0; i < m_dska->numBones; ++i)
+				details::Mat4x3Ident(m_boneFloats + i*SIMDDriver::kNumBoneFloats);
+
+			m_ident = true;
+			++m_boneFrame;
+		}
+
+		return;
+	}
+
+	m_root->Activate();
+
+	bool valid = m_root->Tick(
+		dt,
+		distance,
+		m_boneTMs,
+		0,
+		m_dska->numBones,
+		advance,
+		emitTags
+	);
+
+	if (!valid) {
+		if (!m_ident) {
+			details::StoreMat4x3(m_worldBones, root); // root position.
+			for (int i = 0; i < m_dska->numBones+1; ++i)
+				details::Mat4x3Ident(m_worldBones + i*SIMDDriver::kNumBoneFloats);
+			for (int i = 0; i < m_dska->numBones; ++i)
+				details::Mat4x3Ident(m_boneFloats + i*SIMDDriver::kNumBoneFloats);
+			m_ident = true;
+			++m_boneFrame;
+		}
+
+		return;
+	}
+
+	++m_boneFrame;
+	m_ident = false;
+
+	m_deltaMotion.s = Vec3(1, 1, 1);
+	m_deltaMotion.r = m_root->deltaRot;
+	m_deltaMotion.t = m_root->deltaPos;
+	
+	m_absMotion.s = Vec3(1, 1, 1);
+	m_absMotion.r = m_root->rot;
+	m_absMotion.t = m_root->pos;
+	
+	float tempBoneMtx[2][SIMDDriver::kNumBoneFloats];
+	float *outMat[2] = { tempBoneMtx[0], tempBoneMtx[1] };
+	float *worldBone = m_worldBones+SIMDDriver::kNumBoneFloats;
+
+	details::StoreMat4x3(m_worldBones, root); // root position.
+
+	for (int i = 0; i < m_dska->numBones; ++i, worldBone += SIMDDriver::kNumBoneFloats) {
+		const BoneTM &tm = m_boneTMs[i];
+		S16 parentIdx = m_dska->boneParents[i];
+
+		const float *parent = (m_worldBones+SIMDDriver::kNumBoneFloats) + parentIdx*SIMDDriver::kNumBoneFloats;
+				
+		Mat4 s = Mat4::Scaling(*reinterpret_cast<const Scale3*>(&tm.s));
+		Mat4 r = Mat4::Rotation(tm.r);
+		Mat4 t = Mat4::Translation(tm.t);
+		
+		details::MulMat4x3(outMat[0], s, r);
+
+		if (parentIdx >= 0) {
+			const BoneTM &parentTM = m_boneTMs[parentIdx];
+			Scale3 invScale(1.0f/parentTM.s[0], 1.0f/parentTM.s[1], 1.0f/parentTM.s[2]);
+			s = Mat4::Scaling(invScale);
+			details::MulMat4x3(outMat[1], outMat[0], s);
+			std::swap(outMat[0], outMat[1]);
+		}
+
+		details::MulMat4x3(outMat[1], t, parent);
+		details::MulMat4x3(worldBone, outMat[0], outMat[1]);
+	}
+
+	const float *invWorld = m_dska->invWorld;
+	float *boneFloats = m_boneFloats;
+	worldBone = m_worldBones+SIMDDriver::kNumBoneFloats;
+
+	for (int i = 0; i < m_dska->numBones; ++i, invWorld += 12, worldBone += SIMDDriver::kNumBoneFloats, boneFloats += SIMDDriver::kNumBoneFloats) {
+		if (SIMDDriver::kNumBoneFloats == 16) { 
+			// SIMD does 4x4 matrices
+			details::MulMat4x3(tempBoneMtx[0], invWorld, worldBone);
+
+			for (int r = 0; r < 4; ++r)
+				for (int c = 0; c < 3; ++c)
+					boneFloats[r*4+c] = MA(tempBoneMtx[0], r, c);
+
+			boneFloats[0*4+3] = 0.f;
+			boneFloats[1*4+3] = 0.f;
+			boneFloats[2*4+3] = 0.f;
+			boneFloats[3*4+3] = 1.f;
+		} else {
+			details::MulMat4x3(boneFloats, invWorld, worldBone);
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
 #define CHECK_SIZE(_size) if (((bytes+(_size))-reinterpret_cast<const U8*>(data)) > (int)len) return pkg::SR_CorruptFile;
 
 void DSka::Clear() {

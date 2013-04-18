@@ -13,6 +13,7 @@
 #include <Runtime/Container/ZoneList.h>
 #include <Runtime/Event.h>
 #include <Runtime/TimeDef.h>
+#include <Runtime/Base/SIMD.h>
 #include <Runtime/PushPack.h>
 
 class Engine;
@@ -377,6 +378,77 @@ private:
 	const DSka *m_dska;
 	int m_boneFrame;
 	bool m_cmBoneTMsDirty;
+	bool m_ident;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+struct ColumnMajorTag {};
+struct RowMajorTag {};
+
+// Vertex model
+class RADENG_CLASS Vtm {
+	RAD_EVENT_CLASS(EventNoAccess)
+public:
+
+	typedef VtmRef Ref;
+	typedef VtmWRef WRef;
+
+	typedef Event<AnimTagEventData, EventNoAccess> AnimTagEvent;
+	typedef Event<AnimStateEventData, EventNoAccess> AnimStateEvent;
+
+	Vtm(const DVtm &dvtm);
+	~Vtm();
+
+	// Ticks the model animations
+	void Tick(
+		float dt, 
+		bool advance, 
+		bool emitTags
+	);
+
+	void BlendVerts(
+		const SIMDDriver *driver,
+		float *out,
+		int firstVert,
+		int numVerts
+	);
+
+	RAD_DECLARE_READONLY_PROPERTY(Vtm, anims, const Animation::Map*);
+	RAD_DECLARE_READONLY_PROPERTY(Vtm, vertexFrame, int); //++ per Tick()
+	RAD_DECLARE_PROPERTY(Vtm, root, const ControllerRef&, const ControllerRef&);
+
+	AnimTagEvent OnTag;
+	AnimStateEvent OnFinished;
+	AnimStateEvent OnMasked;
+	AnimStateEvent OnEndFrame;
+
+private:
+
+	RAD_DECLARE_GET(anims, const Animation::Map*) { 
+		return &m_anims; 
+	}
+
+	RAD_DECLARE_GET(root, const ControllerRef&) { 
+		return m_root; 
+	}
+
+	RAD_DECLARE_SET(root, const ControllerRef&) { 
+		m_root = value; 
+	}
+
+	RAD_DECLARE_GET(vertexFrame, int) { 
+		return m_vertexFrame; 
+	}
+
+	friend class Animation;
+	friend class Controller;
+	void Init();
+	
+	Animation::Map m_anims;
+	ControllerRef m_root;
+	const DVtm *m_dvtm;
+	int m_boneFrame;
 	bool m_ident;
 };
 
