@@ -40,6 +40,19 @@ struct SkmData {
 	AddrSize skmSize[2];
 };
 
+struct VtmData {
+	// cleans itself up when destructed.
+	typedef boost::shared_ptr<VtmData> Ref;
+
+	VtmData();
+	~VtmData();
+
+	ska::DVtm dvtm;
+
+	void *vtmData[2];
+	AddrSize vtmSize[2];
+};
+
 RADENG_API SkaData::Ref RADENG_CALL CompileSkaData(
 	const char *name,
 	const SceneFileVec &anims,
@@ -60,6 +73,20 @@ RADENG_API SkmData::Ref RADENG_CALL CompileSkmData(
 	int trimodel,
 	ska::SkinType skinType,
 	const ska::DSka &ska
+);
+
+RADENG_API VtmData::Ref RADENG_CALL CompileVtmData(
+	const char *name,
+	const SceneFile &mesh,
+	const SceneFileVec &anims,
+	int trimodel
+);
+
+RADENG_API VtmData::Ref RADENG_CALL CompileVtmData(
+	const char *name,
+	const SceneFile &mesh,
+	const SceneFile &anims,
+	int trimodel
 );
 
 } // tools

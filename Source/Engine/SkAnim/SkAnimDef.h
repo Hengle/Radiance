@@ -34,6 +34,10 @@ struct DSka;
 struct DSkMesh;
 struct DSkm;
 
+struct DVtAnim;
+struct DVtMesh;
+struct DVtm;
+
 enum {
 	kEncBytes = 3,
 	kEncMask = 0x00ffffff
@@ -49,6 +53,9 @@ enum {
 	kSkmxTag = RAD_FOURCC_LE('S', 'K', 'M', 'X'),
 	kSkmpTag = RAD_FOURCC_LE('S', 'K', 'M', 'P'),
 	kSkmVersion = 2,
+	kVtmxTag = RAD_FOURCC_LE('V', 'A', 'M', 'X'),
+	kVtmpTag = RAD_FOURCC_LE('V', 'A', 'M', 'M'),
+	kVtmVersion = 1,
 	kDNameLen = 63, 
 	kBonesPerVert = 4,
 	kMaxUVChannels = 1

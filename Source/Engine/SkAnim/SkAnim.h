@@ -191,6 +191,51 @@ struct RADENG_CLASS DSkm {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+struct RADENG_CLASS DVtAnim {
+	typedef zone_vector<DVtAnim, ZSkaT>::type Vec;
+
+	const char *name;
+	const float *verts; // 0-3   -> vertex
+						// 4-7   -> normal
+						// 8-11  -> tangent
+	U16 *frames;
+	U16 fps;
+	U16 numFrames;
+};
+
+struct RADENG_CLASS DVtMesh {
+	typedef zone_vector<DVtMesh, ZSkaT>::type Vec;
+
+	const char *material;
+	const float *texCoords; // 2 floats * numChannels
+	const U16 *indices;
+
+	U32 vertOfs; // offset into vert array that this mesh starts
+	U16 numVerts;
+	U16 numTris;
+	U16 numChannels;
+};
+
+struct RADENG_CLASS DVtm {
+
+	const float *refVerts; // 0-3   -> vertex
+						   // 4-7   -> normal
+						   // 8-11  -> tangent
+	U32 numVerts;
+
+	BBox bounds;
+	DVtMesh::Vec meshes;
+	DVtAnim::Vec anims;
+
+	void Clear();
+
+	// data[0] == non-persisted data: material names, texCoords, tris
+	// data[1] == persisted data: vertices, normals, tangents
+	int Parse(const void * const *data, const AddrSize *len);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
 class RADENG_CLASS Animation {
 public:
 

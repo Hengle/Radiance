@@ -406,17 +406,21 @@ namespace {
 		          SmoothVertIdxMap::const_iterator> pair = idxMap.equal_range(v);
 
 		while (pair.first != pair.second) {
-			if (smooth) {
-				SmoothVert &x = vec[pair.first->second];
-				if (v.sm & x.sm) {
-					x.sm |= v.sm;
-					AddFaces(v, x);
-					return pair.first->second;
+			// do not collapse vertices (important for vertex animation)
+			if (pair.first->first.id == v.id) {
+				if (smooth) {
+					SmoothVert &x = vec[pair.first->second];
+					if (v.sm & x.sm) {
+						x.sm |= v.sm;
+						AddFaces(v, x);
+						return pair.first->second;
+					}
+					++pair.first;
+					continue;
 				}
-				++pair.first;
-				continue;
+				return pair.first->second;
 			}
-			return pair.first->second;
+			++pair.first;
 		}
 
 		vec.push_back(v);
@@ -426,28 +430,7 @@ namespace {
 	}
 
 	void MakeNormals(const TriModel &mdl, SmoothVertVec &vec, bool smooth) {
-		// some coincedent vertices may not have been combined
-		// because their UV's are different. smooth over these as well.
-		if (smooth) {
-			for (SmoothVertVec::iterator it = vec.begin(); it != vec.end(); ++it) {
-				SmoothVert &a = *it;
-				for (SmoothVertVec::iterator it2 = vec.begin(); it2 != vec.end(); ++it2) {
-					if (it == it2) 
-						continue;
-
-					SmoothVert &b = *it2;
-
-					if (a.sm & b.sm) { // smooth?
-						if (a.pos != b.pos) 
-							continue;
-
-						a.sm = b.sm = (a.sm|b.sm);
-						CombineFaces(a, b);
-					}
-				}
-			}
-		}
-
+		
 		for (SmoothVertVec::iterator it = vec.begin(); it != vec.end(); ++it) {
 			SmoothVert &v = *it;
 			v.normal = SceneFile::Vec3::Zero;

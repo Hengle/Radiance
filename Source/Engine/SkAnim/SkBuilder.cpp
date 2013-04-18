@@ -1292,10 +1292,14 @@ bool CompileCPUSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 		for (SkTriModel::Vec::const_iterator it = models.begin(); it != models.end(); ++it) {
 			const SkTriModel::Ref &m = *it;
 
-			if (m->totalVerts > std::numeric_limits<U16>::max())
+			if (m->totalVerts > std::numeric_limits<U16>::max()) {
+				COut(C_Error) << "object exceeds 32k verts." << std::endl;
 				return false;
-			if (m->sortedIndices.size()/3 > std::numeric_limits<U16>::max())
+			}
+			if (m->sortedIndices.size()/3 > std::numeric_limits<U16>::max()) {
+				COut(C_Error) << "object exceeds 32k indices (this is not a vertex count issue, contact a programmer to remove this limit)." << std::endl;
 				return false;
+			}
 
 			if (!os.Write((U16)m->totalVerts))
 				return false;
@@ -1318,7 +1322,7 @@ bool CompileCPUSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 					return false;
 
 			if (map.mats[m->mat].name.length > ska::kDNameLen) {
-				COut(C_ErrMsgBox) << "ska::DNameLen exceeded, contact a programmer to increase." << std::endl;
+				COut(C_Error) << "ska::kDNameLen exceeded, contact a programmer to increase." << std::endl;
 				return false;
 			}
 
@@ -1464,6 +1468,352 @@ bool CompileCPUSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 	}
 
 	RAD_VERIFY(sk.dskm.Parse(sk.skmData, sk.skmSize, ska::kSkinType_CPU) == pkg::SR_Success);
+	return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+typedef SceneFile::NormalTriVert VtmVert;
+typedef zone_vector<VtmVert, ZToolsT>::type VtmVertVec;
+
+struct VtmModel {
+	typedef boost::shared_ptr<VtmModel> Ref;
+	typedef zone_vector<Ref, ZToolsT>::type Vec;
+	typedef zone_vector<Vec4, ZToolsT>::type Vec4Vec;
+	typedef zone_vector<Vec3, ZToolsT>::type Vec3Vec;
+	typedef zone_vector<Vec2, ZToolsT>::type Vec2Vec;
+	typedef zone_vector<int, ZToolsT>::type IntVec;
+	typedef zone_map<int, int, ZToolsT>::type VertMap;
+
+	int mat;
+	int vertOfs; // relative to file
+	VtmVertVec verts;
+	VertMap remap[2];
+	IntVec indices;
+
+	int AddVertex(const VtmVert &v, int idx) {
+
+		VertMap::iterator it = remap[0].find(idx);
+		if (it != remap[0].end()) {
+			RAD_ASSERT(v == verts[it->second]);
+			return it->second;
+		}
+		
+		int ofs = (int)verts.size();
+		verts.push_back(v);
+		remap[0].insert(VertMap::value_type(idx, ofs));
+		remap[1].insert(VertMap::value_type(ofs, idx));
+		return ofs;
+	}
+
+	void AddTriangles(const SceneFile::TriModel::Ref &m) {
+
+		remap[0].clear();
+		remap[1].clear();
+		verts.clear();
+
+		indices.clear();
+		indices.reserve(m->tris.size()*3);
+
+		for (SceneFile::TriFaceVec::const_iterator it = m->tris.begin(); it != m->tris.end(); ++it) {
+			const SceneFile::TriFace &tri = *it;
+			if (tri.mat < 0)
+				continue;
+			if (tri.mat != mat)
+				continue;
+			for (int i = 0; i < 3; ++i)
+				indices.push_back(AddVertex(VtmVert(m->verts[tri.v[i]]), tri.v[i]));
+		}
+	}
+};
+
+bool CompileVtmData(
+	const char *name, 
+	const SceneFile &mesh,
+	const SceneFileVec &anims, 
+	int trimodel, 
+	VtmData &vtm
+) {
+	VtmModel::Ref m(new (ZTools) SkTriModel());
+	VtmModel::Vec models;
+
+	const SceneFile::Entity::Ref &e = mesh.worldspawn;
+	const SceneFile::TriModel::Ref &r = e->models[trimodel];
+
+	// validate all anim files for identical meshes
+	for (SceneFileVec::const_iterator it = anims.begin(); it != anims.end(); ++it) {
+		const SceneFile::Entity::Ref w = (*it)->worldspawn;
+		const SceneFile::TriModel::Ref &t = w->models[trimodel];
+		if ((t->verts.size() != r->verts.size()) ||
+			(t->tris.size() != r->tris.size())) {
+			COut(C_Error) << "CompileVtmData: vertex animated model has animation files that do not match its mesh." << std::endl;
+			return false;
+		}
+	}
+
+	int vertOfs = 0;
+
+	for (int i = 0; i < (int)mesh.mats.size(); ++i){
+		m->mat = i;
+		m->vertOfs = vertOfs;
+		m->AddTriangles(r);
+		if (!m->indices.empty()) {
+			models.push_back(m);
+			vertOfs += (int)m->verts.size();
+			m.reset(new (ZTools) SkTriModel());
+		}
+	}
+
+	// write file 1: non-persisted data: material names, texCoords, tris
+	{
+		stream::DynamicMemOutputBuffer ob(ska::ZSka);
+		stream::LittleOutputStream os(ob);
+
+		if (!os.Write((U32)ska::kVtmxTag) || !os.Write((U32)ska::kVtmVersion))
+			return false;
+
+		// bounds
+		for (int i = 0; i < 3; ++i) {
+			if (!os.Write((float)r->bounds.Mins()[i]))
+				return false;
+		}
+		for (int i = 0; i < 3; ++i) {
+			if (!os.Write((float)r->bounds.Maxs()[i]))
+				return false;
+		}
+
+		if (!os.Write((U16)models.size()))
+			return false;
+		if (!os.Write((U16)0))
+			return false; // padd
+		
+		for (VtmModel::Vec::const_iterator it = models.begin(); it != models.end(); ++it) {
+			const VtmModel::Ref &m = *it;
+
+			if (m->verts.size() > std::numeric_limits<U16>::max()) {
+				COut(C_Error) << "object exceeds 32k verts." << std::endl;
+				return false;
+			}
+			if (m->indices.size()/3 > std::numeric_limits<U16>::max()) {
+				COut(C_Error) << "object exceeds 32k indices (this is not a vertex count issue, contact a programmer to remove this limit)." << std::endl;
+				return false;
+			}
+
+			if (!os.Write((U32)m->vertOfs))
+				return false;
+			if (!os.Write((U16)m->verts.size()))
+				return false;
+			if (!os.Write((U16)(m->indices.size()/3)))
+				return false;
+			if (!os.Write((U16)r->numChannels))
+				return false;
+			if (!os.Write((U16)0))
+				return false; // padd
+
+			if (mesh.mats[m->mat].name.length > ska::kDNameLen) {
+				COut(C_Error) << "ska::kDNameLen exceeded, contact a programmer to increase." << std::endl;
+				return false;
+			}
+
+			char name[ska::kDNameLen+1];
+			string::ncpy(name, mesh.mats[m->mat].name.c_str.get(), ska::kDNameLen+1);
+			if (!os.Write(name, ska::kDNameLen+1, 0))
+				return false;
+
+			for (int i = 0; i < r->numChannels; ++i) {
+				for (VtmVertVec::const_iterator it = m->verts.begin(); it != m->verts.end(); ++it) {
+					for (int k = 0; k < 2; ++k) {
+						if (!os.Write((*it).st[i][k]))
+							return false;
+					}
+				}
+			}
+
+			// tris (indices)
+			for (IntVec::const_iterator it = m->indices.begin(); it != m->indices.end(); ++it) {
+				if (!os.Write((U16)*it))
+					return false;
+			}
+
+			if (m->indices.size()&1) { // align
+				if (!os.Write((U16)0))
+					return false;
+			}
+		}
+
+		vtm.vtmData[0] = ob.OutputBuffer().Ptr();
+		vtm.vtmSize[0] = (AddrSize)ob.OutPos();
+		ob.OutputBuffer().Set(0, 0);
+		vtm.vtmData[0] = zone_realloc(ska::ZSka, vtm.vtmData[0], vtm.vtmSize[0]);
+	}
+
+	typedef std::map<String, SceneFileRef> AnimMap;
+	AnimMap animMap;
+	
+	// get animation list
+	for (SceneFileVec::const_iterator it = anims.begin(); it != anims.end(); ++it) {
+		const SceneFile::Entity::Ref w = (*it)->worldspawn;
+		const SceneFile::TriModel::Ref &t = w->models[trimodel];
+
+		for (SceneFile::AnimMap::const_iterator animIt = t->anims.begin(); animIt != t->anims.end(); ++animIt) {
+			
+			AnimMap::iterator x = animMap.find(animIt->first);
+			if (x != animMap.end()) {
+				COut(C_Error) << "ERROR: animation '" << animIt->first << "' is duplicated in the model source files." << std::endl;
+				return false;
+			}
+
+			const SceneFile::Anim::Ref &anim = animIt->second;
+			if (anim->vertexFrames.empty())
+				continue;
+
+			animMap.insert(AnimMap::value_type(animIt->first, *it));
+		}
+	}
+
+	if (animMap.empty()) {
+		COut(C_Error) << "ERROR: no vertex animation data present." << std::endl;
+		return false;
+	}
+
+	// write file 2: persisted data: vertices, normals, tangents
+	{
+		stream::DynamicMemOutputBuffer ob(ska::ZSka);
+		stream::LittleOutputStream os(ob);
+
+		if (!os.Write((U32)ska::kVtmpTag) || !os.Write((U32)ska::kVtmVersion))
+			return false;
+
+		if (!os.Write((U32)vertOfs))
+			return false;
+		if (!os.Write((U16)animMap.size()))
+			return false;
+
+		// padd to 16
+		if (!os.Write((U16)0))
+			return false; 
+		if (!os.Write((U32)0))
+			return false;
+		if (!os.Write((U32)0))
+			return false;
+
+		BOOST_STATIC_ASSERT(SIMDDriver::kAlignment == 16); // this is coded to be 16 byte aligned.
+
+		// write ref verts
+		for (VtmModel::Vec::const_iterator it = models.begin(); it != models.end(); ++it) {
+			const VtmModel::Ref &m = *it;
+
+			for (VtmVertVec::const_iterator it = m->verts.begin(); it != m->verts.end(); ++it) {
+				const VtmVert &v = *it;
+
+				// vertex, normal, tangent
+				for (int i = 0; i < 3; ++i) {
+					if (!os.Write(v.pos[i]))
+						return false;
+				}
+
+				if (!os.Write(1.f))
+					return false;
+
+				for (int i = 0; i < 3; ++i) {
+					if (!os.Write(v.normal[i]))
+						return false;
+				}
+
+				if (!os.Write(1.f))
+					return false;
+
+				for (int i = 0; i < 4; ++i) {
+					if (!os.Write(v.tangent[0][i]))
+						return false;
+				}
+			}
+		}
+		
+		// write animations
+		for (AnimMap::const_iterator it = animMap.begin(); it != animMap.end(); ++it) {
+			const SceneFileRef &srcFile = it->second;
+
+			if (it->first.length > ska::kDNameLen) {
+				COut(C_Error) << "ska::kDNameLen exceeded, contact a programmer to increase." << std::endl;
+				return false;
+			}
+
+			char name[ska::kDNameLen+1];
+			string::ncpy(name, it->first.c_str.get(), ska::kDNameLen+1);
+			if (!os.Write(name, ska::kDNameLen+1, 0))
+				return false;
+
+			const SceneFile::Anim::Ref &srcAnim = srcFile->worldspawn->models[trimodel]->anims[it->first];
+			
+			if (!os.Write((U16)srcAnim->frameRate))
+				return false;
+			if (!os.Write((U16)srcAnim->vertexFrames.size()))
+				return false;
+
+			// frame offsets
+			for (SceneFile::VertexFrames::const_iterator it = srcAnim->vertexFrames.begin(); it != srcAnim->vertexFrames.end(); ++it) {
+				if (!os.Write((U16)(*it).frame))
+					return false;
+			}
+
+			int numShortsToPadd = 8 - ((2+(int)srcAnim->vertexFrames.size())&7);
+			if (numShortsToPadd < 8) {
+				U16 shorts[7] = {0, 0, 0, 0, 0, 0, 0};
+				if (os.Write(shorts, sizeof(U16)*numShortsToPadd, 0) != (stream::SPos)(sizeof(U16)*numShortsToPadd))
+					return false;
+			}
+
+			// write verts, indexed by model.
+			for (SceneFile::VertexFrames::const_iterator it = srcAnim->vertexFrames.begin(); it != srcAnim->vertexFrames.end(); ++it) {
+				const SceneFile::VertexFrame &vframe = *it;
+
+				for (VtmModel::Vec::const_iterator it = models.begin(); it != models.end(); ++it) {
+					const VtmModel::Ref &m = *it;
+
+					for (size_t i = 0; i < m->verts.size(); ++it) {
+						const SceneFile::TriVert &vfv = vframe.verts[m->remap[1][i]];
+						
+						// vertex, normal, tangent
+						for (int k = 0; k < 3; ++k) {
+							if (!os.Write(vfv.pos[k]))
+								return false;
+						}
+
+						if (!os.Write(1.f))
+							return false;
+
+						for (int k = 0; k < 3; ++k) {
+							if (!os.Write(vfv.normal[k]))
+								return false;
+						}
+
+						if (!os.Write(1.f))
+							return false;
+
+
+						// NOTE: pull the determinant from the original model, we can't blend a binary
+						// -1 -> 1, binormal may not be right under severe distortion
+						for (int k = 0; k < 3; ++k) {
+							if (!os.Write(vfv.tangent[0][k]))
+								return false;
+						}
+
+						const VtmVert &mv = m->verts[i];
+						if (!os.Write(mv.tangent[0][3]))
+							return false;
+					}
+				}
+			}
+		}
+
+		vtm.vtmData[1] = ob.OutputBuffer().Ptr();
+		vtm.vtmSize[1] = (AddrSize)ob.OutPos();
+		ob.OutputBuffer().Set(0, 0);
+		vtm.vtmData[1] = zone_realloc(ska::ZSka, vtm.vtmData[1], vtm.vtmSize[1]);
+	}
+
+	RAD_VERIFY(vtm.dvtm.Parse(vtm.vtmData, vtm.vtmSize) == pkg::SR_Success);
 	return true;
 }
 
