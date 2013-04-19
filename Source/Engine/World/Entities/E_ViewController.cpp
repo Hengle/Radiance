@@ -573,6 +573,12 @@ void E_ViewController::TickDistanceMode(int frame, float dt, const Entity::Ref &
 
 void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &target) {
 
+	if (m_sync) {
+		m_rail.tm[0] = 0;
+		m_rail.tm[1] = 0;
+		m_rail.tm[2] = 0;
+	}
+
 	Vec3 vTarget = VecAnim::Tick(
 		m_anims[kTargetMode_Look],
 		dt,
@@ -683,12 +689,19 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 	fwd[0] = Vec3::Zero;
 	fwd[1] = Vec3::Zero;
 
+	bool fwdValid[2] = {
+		m_rail.tm[0] != 0,
+		m_rail.tm[1] != 0
+	};
+
 	if (m_rail.tm[0]) {
 		fwd[0] = target - m_rail.tm[0]->t;
+		m_rail.tmDist[0] = fwd[0].MagnitudeSquared();
 	}
 
 	if (m_rail.tm[1]) {
 		fwd[1] = target - m_rail.tm[1]->t;
+		m_rail.tmDist[1] = fwd[1].MagnitudeSquared();
 	}
 
 	for (int i = 0; i < 2; ++i) {
@@ -697,7 +710,7 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 		}
 	}
 
-	float weights[2] = {0, 0};
+	float weights[2] = {0.f, 0.f};
 	if (m_rail.tm[2] == m_rail.tm[0]) {
 		weights[1] = m_rail.distance*0.15f;
 		weights[1] *= weights[1];
@@ -720,14 +733,47 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 	bool stayBehind = (m_rail.stayBehind >= 0.f);
 
 	const bsp_file::BSPFile *bspFile = world->bspFile;
-	float bestDist[2];
-	bestDist[0] = std::numeric_limits<float>::max();
-	bestDist[1] = bestDist[0];
+	const bsp_file::BSPCameraTM *fallback0[2];
+	const bsp_file::BSPCameraTM *fallback1;
+	float fallbackDist0[2];
+	float fallbackDist1;
 	
-	const bsp_file::BSPCameraTM *best[2];
-	best[0] = 0;
-	best[1] = 0;
+	fallback0[0] = 0;
+	fallback0[1] = 0;
+	fallback1 = 0;
+	fallbackDist0[0] = std::numeric_limits<float>::max();
+	fallbackDist0[1] = std::numeric_limits<float>::max();
+	fallbackDist1 = std::numeric_limits<float>::max();
 
+	if (!m_rail.strict && m_rail.tm[0]) {
+		// rope too long?
+		if (m_rail.tmDist[0] > m_rail.distanceSq) {
+			m_rail.tm[0] = 0;
+			m_rail.tmDist[0] = std::numeric_limits<float>::max();
+		}
+	} else {
+		m_rail.tm[0] = 0;
+		m_rail.tmDist[0] = std::numeric_limits<float>::max();
+	}
+
+	if (!m_rail.strict && m_rail.tm[1]) {
+		// rope too long?
+		bool invalid = false;
+
+		if (stayBehind) {
+			Vec3 v = target - m_rail.tm[1]->t;
+			invalid = m_rail.targetFwd.Dot(v) <= 0.f;
+		}
+
+		if (invalid || (m_rail.tmDist[1] > m_rail.distanceSq)) {
+			m_rail.tm[1] = 0;
+			m_rail.tmDist[1] = std::numeric_limits<float>::max();
+		}
+	} else {
+		m_rail.tm[1] = 0;
+		m_rail.tmDist[1] = std::numeric_limits<float>::max();
+	}
+	
 	for (S32 i = 0; i < m_rail.track->numTMs; ++i) {
 		const bsp_file::BSPCameraTM *tm = bspFile->CameraTMs() + m_rail.track->firstTM + i;
 
@@ -743,19 +789,51 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 		float dd = m_rail.distanceSq - d;
 		float abs = math::Abs(dd);
 
-		if ((!m_rail.tm[0] || m_rail.strict) && (abs < bestDist[0])) {
-			if (!m_rail.tm[0] || (fwd[0] == s)) {
-				bestDist[0] = abs;
-				best[0] = tm;
+		if (m_rail.strict) {
+			// rod camera
+			if (abs < m_rail.tmDist[0]) {
+				if (!fwdValid[0] || (fwd[0] == s)) {
+					m_rail.tmDist[0] = abs;
+					m_rail.tm[0] = tm;
+				}
+			}
+
+			if (abs < fallbackDist0[0]) {
+				fallback0[0] = tm;
+				fallbackDist0[0] = abs;
+			}
+		} else if (!m_rail.tm[0]) {
+			// rope camera
+			if (dd >= 0.f) {
+				if (!fwdValid[0] || (fwd[0] == s)) {
+					m_rail.tmDist[0] = abs;
+					m_rail.tm[0] = tm;
+				}
+
+				if (!fallback0[0]) {
+					fallback0[0] = tm;
+					fallbackDist0[0] = abs;
+				}
+			}
+
+			if (abs < fallbackDist0[1]) {
+				fallback0[1] = tm;
+				fallbackDist0[1] = abs;
 			}
 		}
 
-		if (abs >= bestDist[1])
+		if (!m_rail.strict && (m_rail.tm[0]&&m_rail.tm[1]))
+			break;
+		
+		if (abs >= m_rail.tmDist[1])
+			continue;
+
+		if (!m_rail.strict && m_rail.tm[1])
 			continue;
 
 		// these are more correct, but may not be available:
 
-		if (m_rail.tm[1] && !stayBehind) {
+		if (fwdValid[1] && !stayBehind) {
 			// new position must be on same side as old
 			if (fwd[1] != s)
 				continue;
@@ -767,17 +845,59 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 				continue;
 		}
 
-		bestDist[1] = abs;
-		best[1] = tm;
+		if (m_rail.strict) {
+			m_rail.tmDist[1] = abs;
+			m_rail.tm[1] = tm;
+		} else {
+			if (dd >= 0.f) {
+				m_rail.tmDist[1] = abs;
+				m_rail.tm[1] = tm;
+			}
+
+			if (abs < fallbackDist1) {
+				fallback1 = tm;
+				fallbackDist1 = abs;
+			}
+		}
 	}
 
-	bestDist[0] += weights[0];
-	if (best[1])
-		bestDist[1] += weights[1];
+	if (!m_rail.tm[0]) {
+		m_rail.tm[0] = fallback0[0];
+		m_rail.tmDist[0] = fallbackDist0[0];
+	}
 
-	m_rail.tm[0] = best[0];
-	m_rail.tm[1] = best[1];
-	m_rail.tm[2] = (best[1] && (!m_rail.strict || (bestDist[1] <= bestDist[0]))) ? best[1] : best[0];
+	if (!m_rail.tm[0]) {
+		m_rail.tm[0] = fallback0[1];
+		m_rail.tmDist[0] = fallbackDist0[1];
+	}
+
+	if (!m_rail.tm[1]) {
+		m_rail.tm[1] = fallback1;
+		m_rail.tmDist[1] = fallbackDist1;
+	}
+
+	float dist[2];
+	if (m_rail.tm[0])
+		dist[0] = m_rail.tmDist[0]+weights[0];
+	if (m_rail.tm[1])
+		dist[1] = m_rail.tmDist[1]+weights[1];
+
+	if (m_rail.tm[0] && m_rail.tm[1]) {
+		m_rail.tm[2] = dist[1] <= dist[0] ? m_rail.tm[1] : m_rail.tm[0];
+	} else if (m_rail.tm[1]) {
+		m_rail.tm[2] = m_rail.tm[1]; // easy
+	} else if (m_rail.tm[0]) {
+		m_rail.tm[2] = m_rail.tm[0];
+	} else {
+		if (fallback0[0]) {
+			m_rail.tm[0] = fallback0[0];
+			m_rail.tmDist[0] = fallbackDist0[0];
+		} else {
+			m_rail.tm[0] = fallback0[1];
+			m_rail.tmDist[0] = fallbackDist0[0];
+		}
+		m_rail.tm[2] = m_rail.tm[0];
+	}
 }
 
 float E_ViewController::TickFOV(int frame, float dt, float distance) {
