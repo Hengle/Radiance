@@ -775,7 +775,9 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 	if (best[1])
 		bestDist[1] += weights[1];
 
-	m_rail.tm[0] = best[0];
+	if (best[0])
+		m_rail.tm[0] = best[0];
+
 	m_rail.tm[1] = best[1];
 	m_rail.tm[2] = (best[1] && (!m_rail.strict || (bestDist[1] <= bestDist[0]))) ? best[1] : best[0];
 }
