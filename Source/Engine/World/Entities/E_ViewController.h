@@ -307,7 +307,7 @@ private:
 	float TickFOV(int frame, float dt, float distance);
 
 	void UpdateRailTarget(const Vec3 &target, const Vec3 &targetFwd);
-
+	
 	static int lua_SetTargetMode(lua_State *L);
 	static int lua_SetRailMode(lua_State *L);
 	static int lua_SetFixedCamera(lua_State *L);
@@ -340,6 +340,7 @@ private:
 		Vec3 clamp;
 		Vec3 targetFwd;
 		Quat rot;
+		float tmDist[2];
 		float distance;
 		float distanceSq;
 		float trackLag;
