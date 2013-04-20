@@ -839,7 +839,7 @@ bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth, UIProgres
 					}
 				}
 
-				if (!mdl.tris.empty())
+				if ((flags&kHasAnimsFlag) || (!mdl.tris.empty()))
 					ent->models.push_back(Build(mdl, j, z, smooth));
 
 				if (ui) {
