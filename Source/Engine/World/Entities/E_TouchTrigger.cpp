@@ -17,6 +17,7 @@ E_CONSTRUCT_BASE,
 m_firstBrush(0), 
 m_numBrushes(0),
 m_enabled(false),
+m_occupied(false),
 m_classbits(kEntityClassBits_Any),
 m_attachmentBone(-1),
 m_attachmentXform(Vec3::Zero) {
