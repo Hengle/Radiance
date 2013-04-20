@@ -1678,7 +1678,7 @@ bool CompileVtmData(
 
 	// write file 2: persisted data: vertices, normals, tangents
 	{
-		stream::DynamicMemOutputBuffer ob(ska::ZSka);
+		stream::DynamicMemOutputBuffer ob(ska::ZSka, SIMDDriver::kAlignment);
 		stream::LittleOutputStream os(ob);
 
 		if (!os.Write((U32)ska::kVtmpTag) || !os.Write((U32)ska::kVtmVersion))
@@ -1692,10 +1692,6 @@ bool CompileVtmData(
 		// padd to 16
 		if (!os.Write((U16)0))
 			return false; 
-		if (!os.Write((U32)0))
-			return false;
-		if (!os.Write((U32)0))
-			return false;
 
 		BOOST_STATIC_ASSERT(SIMDDriver::kAlignment == 16); // this is coded to be 16 byte aligned.
 
@@ -1772,7 +1768,7 @@ bool CompileVtmData(
 				for (VtmModel::Vec::const_iterator it = models.begin(); it != models.end(); ++it) {
 					const VtmModel::Ref &m = *it;
 
-					for (size_t i = 0; i < m->verts.size(); ++it) {
+					for (size_t i = 0; i < m->verts.size(); ++i) {
 						const SceneFile::TriVert &vfv = vframe.verts[m->remap[1][i]];
 						
 						// vertex, normal, tangent
@@ -1811,7 +1807,13 @@ bool CompileVtmData(
 		vtm.vtmData[1] = ob.OutputBuffer().Ptr();
 		vtm.vtmSize[1] = (AddrSize)ob.OutPos();
 		ob.OutputBuffer().Set(0, 0);
-		vtm.vtmData[1] = zone_realloc(ska::ZSka, vtm.vtmData[1], vtm.vtmSize[1]);
+		vtm.vtmData[1] = zone_realloc(
+			ska::ZSka, 
+			vtm.vtmData[1], 
+			vtm.vtmSize[1],
+			0,
+			SIMDDriver::kAlignment
+		);
 	}
 
 	RAD_VERIFY(vtm.dvtm.Parse(vtm.vtmData, vtm.vtmSize) == pkg::SR_Success);
@@ -1925,6 +1927,19 @@ SkmData::~SkmData() {
 		zone_free(skmData[0]);
 	if (skmData[1])
 		zone_free(skmData[1]);
+}
+
+VtmData::VtmData() {
+	vtmData[0] = vtmData[1] = 0;
+	vtmSize[0] = vtmSize[1] = 0;
+	dvtm.Clear();
+}
+
+VtmData::~VtmData() {
+	if (vtmData[0])
+		zone_free(vtmData[0]);
+	if (vtmData[1])
+		zone_free(vtmData[1]);
 }
 
 } // tools

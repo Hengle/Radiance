@@ -478,13 +478,16 @@ void Animation::GetBlendingFrames(
 			blend = 0.f;
 		}
 	} else {
+		RAD_ASSERT(frame >= 0.f);
+
 		// vertex animation is trickier. it's composed of irregularly spaced frames
-		for (src = 0; src < m_dvta->numFrames; ++src) {
-			if (m_dvta->frames[src] > frame)
+		for (src = 0; src < m_dvta->numFrames-1; ++src) {
+			if (m_dvta->frames[src+1] > frame)
 				break;
 		}
 
 		dst = src+1;
+
 		if (dst > (int)(m_dvta->numFrames-1)) {
 			src = m_dvta->numFrames-1;
 			dst = src;
@@ -1144,7 +1147,7 @@ int DVtm::Parse(const void * const *_data, const AddrSize *_len) {
 
 		CHECK_SIZE(kDNameLen);
 		m.material = reinterpret_cast<const char*>(bytes);
-		bytes += kDNameLen;
+		bytes += kDNameLen+1;
 
 		CHECK_SIZE(sizeof(float)*2*((int)m.numVerts)*((int)m.numChannels));
 		m.texCoords = reinterpret_cast<const float*>(bytes);
@@ -1165,6 +1168,9 @@ int DVtm::Parse(const void * const *_data, const AddrSize *_len) {
 
 	data = _data[1];
 	len = _len[1];
+
+	RAD_ASSERT(IsAligned(data, SIMDDriver::kAlignment)); // SIMD aligned
+
 	bytes = reinterpret_cast<const U8*>(data);
 	header = reinterpret_cast<const U32*>(data);
 	if (header[0] != kVtmpTag || header[1] != kVtmVersion)
@@ -1178,8 +1184,8 @@ int DVtm::Parse(const void * const *_data, const AddrSize *_len) {
 	U16 numAnims = *reinterpret_cast<const U16*>(bytes);
 	bytes += sizeof(U16);
 
-	CHECK_SIZE(sizeof(U16)*3);
-	bytes += sizeof(U16)*3;
+	CHECK_SIZE(sizeof(U16));
+	bytes += sizeof(U16);
 
 	CHECK_SIZE(sizeof(float)*kNumVertexFloats*numVerts);
 	refVerts = reinterpret_cast<const float*>(bytes);
@@ -1192,7 +1198,7 @@ int DVtm::Parse(const void * const *_data, const AddrSize *_len) {
 		
 		CHECK_SIZE(kDNameLen);
 		anim.name = reinterpret_cast<const char*>(bytes);
-		bytes += kDNameLen;
+		bytes += kDNameLen+1;
 
 		CHECK_SIZE(sizeof(U16)*2);
 		anim.fps = *reinterpret_cast<const U16*>(bytes);
@@ -1205,9 +1211,9 @@ int DVtm::Parse(const void * const *_data, const AddrSize *_len) {
 		bytes += sizeof(U16)*((int)anim.numFrames);
 
 		bytes = Align(bytes, SIMDDriver::kAlignment);
-		CHECK_SIZE(sizeof(float)*kNumVertexFloats*numVerts);
+		CHECK_SIZE(sizeof(float)*kNumVertexFloats*numVerts*(int)anim.numFrames);
 		anim.verts = reinterpret_cast<const float*>(bytes);
-		bytes += sizeof(float)*kNumVertexFloats*numVerts;
+		bytes += sizeof(float)*kNumVertexFloats*numVerts*(int)anim.numFrames;
 	}
 
 	return pkg::SR_Success;

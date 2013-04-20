@@ -44,7 +44,7 @@ int SkModelParser::Process(
 	// So we need to make a GLSkModelParser that moves the SkModelParser transient data into some VB's and then when we get a P_Trim
 	// we can properly release this data.
 #if defined(RAD_OPT_TOOLS)
-	if ((m_skmd||m_state==S_Done) && (flags&(P_Load|P_Parse|P_Info|P_Trim)))
+	if ((m_skmd||(m_state==S_Done)) && (flags&(P_Load|P_Parse|P_Info|P_Trim)))
 		return SR_Success;
 #else
 	if ((m_state==S_Done) && (flags&(P_Load|P_Parse|P_Info|P_Trim)))
@@ -342,7 +342,7 @@ int SkModelParser::Load(
 bool SkModelParser::RAD_IMPLEMENT_GET(valid)  {
 	if (m_skmd)
 		return m_ska && m_ska->valid && m_states && m_states->valid; 
-	return m_mm[1] && m_ska && m_ska->valid && m_states && m_states->valid;
+	return m_state == S_Done;
 }
 
 #endif

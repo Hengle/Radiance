@@ -221,7 +221,11 @@ DataBlock::Ref DataBlock::New(
 
 	Mutex::Lock L(Mutex::Get());
 	InitPools();
+//#if defined(DISABLE_POOLS)
+//	DataBlock::Ref r(new DataBlock(refType, const_cast<void*>(src), len, pool, poolIdx));
+//#else
 	DataBlock::Ref r(s_dataBlockPool.Construct(refType, const_cast<void*>(src), len, pool, poolIdx), &DataBlock::Destroy);
+//#endif
 #if defined(RAD_OPT_MEMPOOL_DEBUG)
 	r->Validate();
 #endif

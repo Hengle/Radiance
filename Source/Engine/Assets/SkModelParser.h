@@ -13,11 +13,12 @@
 #include "SkAnimSetParser.h"
 #include "SkAnimStatesParser.h"
 #include <Runtime/File.h>
-#include <Runtime/PushPack.h>
 
 #if defined(RAD_OPT_TOOLS)
 #include "../SkAnim/SkBuilder.h"
 #endif
+
+#include <Runtime/PushPack.h>
 
 class Engine;
 
@@ -84,11 +85,9 @@ private:
 	RAD_DECLARE_GET(dskm, const ska::DSkm*) { 
 		return m_skmd ? &m_skmd->dskm : &m_dskm; 
 	}
-	tools::SkmData::Ref m_skmd;
-	pkg::Cooker::Ref m_cooker;
 #else
 	RAD_DECLARE_GET(valid, bool) { 
-		return m_mm[1] && m_ska && m_ska->valid && m_states && m_states->valid;
+		return m_state == S_Done;
 	}
 	RAD_DECLARE_GET(dskm, const ska::DSkm*) { 
 		return &m_dskm; 
@@ -104,6 +103,11 @@ private:
 		S_Load1,
 		S_Done
 	};
+
+#if defined(RAD_OPT_TOOLS)
+	tools::SkmData::Ref m_skmd;
+	pkg::Cooker::Ref m_cooker;
+#endif
 
 	pkg::Asset::Ref m_skaRef;
 	pkg::Asset::Ref m_statesRef;

@@ -22,6 +22,7 @@ const char *s_typeIcons[asset::AT_Max] =
 	"Editor/skmodel_small.png",
 	"Editor/skanimset_small.png",
 	"Editor/skanimstates_small.png",
+	"Editor/vtmodel_small.png",
 	"Editor/mesh_small.png",
 	"Editor/sound_small.png",
 	"Editor/music_small.png",

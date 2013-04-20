@@ -195,11 +195,18 @@ void BlendVerts(
 	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
 	RAD_ASSERT(IsAligned(srcVerts, SIMDDriver::kAlignment));
 	RAD_ASSERT(IsAligned(dstVerts, SIMDDriver::kAlignment));
-	
-	// 16 floats per vertex
-	const int kNumFloats = numVerts * 16;
-	for (int i = 0; i < kNumFloats; ++i) {
-		outVerts[i] = math::Lerp(srcVerts[i], dstVerts[i], frac);
+
+	const int kNumFloats = numVerts * 12;
+
+	if (frac < 0.01f) {
+		memcpy(outVerts, srcVerts, kNumFloats*sizeof(float));
+	} else if(frac > 0.99) {
+		memcpy(outVerts, dstVerts, kNumFloats*sizeof(float));
+	} else {
+		// 12 floats per vertex
+		for (int i = 0; i < kNumFloats; ++i) {
+			outVerts[i] = math::Lerp(srcVerts[i], dstVerts[i], frac);
+		}
 	}
 }
 

@@ -14,6 +14,7 @@
 #include "../../Assets/MeshMaterialLoader.h"
 #include "../../Assets/MeshVBLoader.h"
 #include "../../Assets/SkModelParser.h"
+#include "../../Assets/VtModelParser.h"
 #include "../../Renderer/GL/GLState.h"
 #include "../../Renderer/GL/GLTexture.h"
 #include "../../Renderer/Shader.h"
@@ -21,6 +22,7 @@
 #include "../../Renderer/SkMesh.h"
 #include "../../Renderer/Mesh.h"
 #include "../../Assets/SkMaterialLoader.h"
+#include "../../Assets/VtMaterialLoader.h"
 #include "../../Assets/MaterialParser.h"
 #include "../../SkAnim/SkAnim.h"
 #include "../../SkAnim/SkControllers.h"
@@ -35,7 +37,7 @@
 #include <Runtime/Base/SIMD.h>
 
 #if defined(RAD_OPT_DEBUG)
-//#define VALIDATE_SIMD_SKIN
+#define VALIDATE_SIMD_SKIN
 #endif
 
 #if defined(VALIDATE_SIMD_SKIN)
@@ -53,7 +55,7 @@ ModelEditorWidget::ModelEditorWidget(
 	const pkg::Asset::Ref &asset,
 	bool editable,
 	QWidget *parent
-) : QWidget(parent), m_asset(asset), m_tree(0), m_glw(0), m_bundle(0), m_bundleMLoader(0) {
+) : QWidget(parent), m_asset(asset), m_tree(0), m_glw(0), m_bundle(0) {
 	m_skVerts[0] = 0;
 	m_skVerts[1] = 0;
 }
@@ -61,9 +63,15 @@ ModelEditorWidget::ModelEditorWidget(
 ModelEditorWidget::~ModelEditorWidget() {
 	for (int i = 0; i < 2; ++i) {
 		if (m_skVerts[i]) {
-			RAD_ASSERT(m_skModel);
-			for (int k = 0; k < m_skModel->numMeshes; ++k) {
-				zone_free(m_skVerts[i][k]);
+			if (m_skModel) {
+				for (int k = 0; k < m_skModel->numMeshes; ++k) {
+					zone_free(m_skVerts[i][k]);
+				}
+			} else {
+				RAD_ASSERT(m_vtModel);
+				for (int k = 0; k < m_vtModel->numMeshes; ++k) {
+					zone_free(m_skVerts[i][k]);
+				}
 			}
 
 			delete [] m_skVerts[i];
@@ -123,7 +131,8 @@ void ModelEditorWidget::resizeEvent(QResizeEvent *event) {
 bool ModelEditorWidget::Load() {
 	
 	if ((m_asset->type != asset::AT_Mesh) &&
-		(m_asset->type != asset::AT_SkModel))
+		(m_asset->type != asset::AT_SkModel) &&
+		(m_asset->type != asset::AT_VtModel))
 		return false;
 
 	m_glw->bindGL(true);
@@ -147,9 +156,10 @@ bool ModelEditorWidget::Load() {
 
 		if (m_asset->type == asset::AT_SkModel) {
 			m_skModel = r::SkMesh::New(m_asset);
+		} else if (m_asset->type == asset::AT_VtModel) {
+			m_vtModel = r::VtMesh::New(m_asset);
 		} else {
 			m_bundle = asset::MeshVBLoader::Cast(m_asset);
-			m_bundleMLoader = asset::MeshMaterialLoader::Cast(m_asset);
 		}
 	}
 
@@ -183,6 +193,38 @@ bool ModelEditorWidget::Load() {
 			m_skVerts[0][i] = (float*)safe_zone_malloc(ZTools, ska::DSkMesh::kNumVertexFloats * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
 #if defined(VALIDATE_SIMD_SKIN)
 			m_skVerts[1][i] = (float*)safe_zone_malloc(ZTools, ska::DSkMesh::kNumVertexFloats * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
+#endif
+		}
+
+	} else if (m_vtModel) {
+		QList<QTreeWidgetItem*> items;
+
+		const ska::AnimState::Map &states = *m_vtModel->states.get();
+		for (ska::AnimState::Map::const_iterator it = states.begin(); it != states.end(); ++it) {
+			QTreeWidgetItem *root = new QTreeWidgetItem(QStringList(QString(it->first.c_str.get())));
+		
+			const ska::AnimState &state = it->second;
+			for (ska::Variant::Vec::const_iterator it = state.variants.begin(); it != state.variants.end(); ++it) {
+				new QTreeWidgetItem(root, QStringList(QString((*it).name.c_str.get())));
+			}
+
+			items.push_back(root);
+		}
+
+		m_tree->addTopLevelItems(items);
+		m_tree->setHeaderLabel("AnimStates");
+
+		m_skVerts[0] = new float*[m_vtModel->numMeshes];
+
+#if defined(VALIDATE_SIMD_SKIN)
+		m_skVerts[1] = new float*[m_vtModel->numMeshes];
+#endif
+
+		for (int i = 0; i < m_vtModel->numMeshes; ++i) {
+			const ska::DVtMesh *m = m_vtModel->DMesh(i);
+			m_skVerts[0][i] = (float*)safe_zone_malloc(ZTools, ska::DVtm::kNumVertexFloats * m->numVerts * sizeof(float), 0, SIMDDriver::kAlignment);
+#if defined(VALIDATE_SIMD_SKIN)
+			m_skVerts[1][i] = (float*)safe_zone_malloc(ZTools, ska::DVtm::kNumVertexFloats * m->numVerts * sizeof(float), 0, SIMDDriver::kAlignment);
 #endif
 		}
 
@@ -238,7 +280,7 @@ pkg::Asset::Ref ModelEditorWidget::LoadMaterial(const char *m) {
 }
 
 void ModelEditorWidget::OnRenderGL(GLWidget &src) {
-	if (!(m_skModel || m_bundle))
+	if (!(m_skModel || m_vtModel || m_bundle))
 		return;
 
 	glClearColor(0.3f, 0.3f, 0.3f, 1.f);
@@ -272,7 +314,7 @@ void ModelEditorWidget::OnRenderGL(GLWidget &src) {
 void ModelEditorWidget::Draw(Material::Sort sort) {
 
 	if (m_skModel) {
-		asset::SkMaterialLoader *skMaterials = asset::SkMaterialLoader::Cast(m_skModel->asset);
+		asset::SkMaterialLoader *skMaterials = asset::SkMaterialLoader::Cast(m_asset);
 		RAD_ASSERT(skMaterials);
 	
 		for (int i = 0; i < m_skModel->numMeshes; ++i) {
@@ -305,17 +347,52 @@ void ModelEditorWidget::Draw(Material::Sort sort) {
 			m.Draw();
 			mat->shader->End();
 		}
-	} else if (m_bundle) {
-		for (int i = 0; i < m_bundle->numMeshes; ++i) {
+	} else if (m_vtModel) {
+		asset::VtMaterialLoader *vtMaterials = asset::VtMaterialLoader::Cast(m_asset);
+		RAD_ASSERT(vtMaterials);
+	
+		for (int i = 0; i < m_vtModel->numMeshes; ++i) {
 			asset::MaterialLoader *loader = asset::MaterialLoader::Cast(
-				m_bundleMLoader->MaterialAsset(i)
+				vtMaterials->MaterialAsset(i)
 			);
 
 			if (!loader)
 				continue;
 
 			asset::MaterialParser *parser = asset::MaterialParser::Cast(
-				m_bundleMLoader->MaterialAsset(i)
+				vtMaterials->MaterialAsset(i)
+			);
+
+			RAD_ASSERT(parser);
+			r::Material *mat = parser->material;
+
+			if (mat->sort != sort)
+				continue;
+
+			m_vtModel->Skin(i);
+
+			mat->BindTextures(loader);
+			mat->BindStates();
+			mat->shader->Begin(Shader::kPass_Preview, *mat);
+			Mesh &m = m_vtModel->Mesh(i);
+			m.BindAll(0);
+			mat->shader->BindStates();
+			gls.Commit();
+			m.Draw();
+			mat->shader->End();
+		}
+	} else if (m_bundle) {
+		for (int i = 0; i < m_bundle->numMeshes; ++i) {
+			asset::MeshMaterialLoader *mbLoader = asset::MeshMaterialLoader::Cast(m_asset);
+			asset::MaterialLoader *loader = asset::MaterialLoader::Cast(
+				mbLoader->MaterialAsset(i)
+			);
+
+			if (!loader)
+				continue;
+
+			asset::MaterialParser *parser = asset::MaterialParser::Cast(
+				mbLoader->MaterialAsset(i)
 			);
 
 			RAD_ASSERT(parser);
@@ -347,7 +424,7 @@ void ModelEditorWidget::DrawWireframe() {
 	r::Material *mat = parser->material;
 
 	if (m_skModel) {
-		asset::SkMaterialLoader *skMaterials = asset::SkMaterialLoader::Cast(m_skModel->asset);
+		asset::SkMaterialLoader *skMaterials = asset::SkMaterialLoader::Cast(m_asset);
 		RAD_ASSERT(skMaterials);
 	
 		for (int i = 0; i < m_skModel->numMeshes; ++i) {
@@ -357,6 +434,23 @@ void ModelEditorWidget::DrawWireframe() {
 			mat->BindStates();
 			mat->shader->Begin(Shader::kPass_Preview, *mat);
 			Mesh &m = m_skModel->Mesh(i);
+			m.BindAll(0);
+			mat->shader->BindStates();
+			gls.Commit();
+			m.Draw();
+			mat->shader->End();
+		}
+	} else if (m_vtModel) {
+		asset::VtMaterialLoader *vtMaterials = asset::VtMaterialLoader::Cast(m_asset);
+		RAD_ASSERT(vtMaterials);
+	
+		for (int i = 0; i < m_vtModel->numMeshes; ++i) {
+			m_vtModel->Skin(i);
+
+			mat->BindTextures(loader);
+			mat->BindStates();
+			mat->shader->Begin(Shader::kPass_Preview, *mat);
+			Mesh &m = m_vtModel->Mesh(i);
 			m.BindAll(0);
 			mat->shader->BindStates();
 			gls.Commit();
@@ -383,6 +477,8 @@ void ModelEditorWidget::DrawWireframe() {
 void ModelEditorWidget::DrawNormals(bool normals, bool tangents) {
 	if (m_skModel) {
 		DrawSkaNormals(normals, tangents);
+	} else if (m_vtModel) {
+		DrawVtmNormals(normals, tangents);
 	} else {
 		DrawMeshNormals(normals, tangents);
 	}
@@ -401,11 +497,11 @@ void ModelEditorWidget::DrawSkaNormals(bool normals, bool tangents) {
 	for (int i = 0; i < m_skModel->numMeshes; ++i) {
 		const ska::DSkMesh *m = m_skModel->DMesh(i);
 
-		m_skModel->SkinToBuffer(SIMD, i, m_skVerts[0][i]);
+		m_skModel->SkinToBuffer(*SIMD, i, m_skVerts[0][i]);
 #if defined(VALIDATE_SIMD_SKIN)
 		// Compare the C reference implementation with optimized path:
 		static const SIMDDriver *SIMD_ref = SIMD_ref_bind();
-		m_skModel->SkinToBuffer(SIMD_ref, i, m_skVerts[1][i]);
+		m_skModel->SkinToBuffer(*SIMD_ref, i, m_skVerts[1][i]);
 		const float *src = m_skVerts[0][i];
 		const float *cmp = m_skVerts[1][i];
 		for (int z = 0; z < (int)m->totalVerts; ++z) {
@@ -494,6 +590,112 @@ void ModelEditorWidget::DrawSkaNormals(bool normals, bool tangents) {
 	}
 }
 
+void ModelEditorWidget::DrawVtmNormals(bool normals, bool tangents) {
+	
+	gls.DisableAllMGSources();
+	gls.DisableAllMTSources();
+	gls.DisableTextures();
+	gls.DisableVertexAttribArrays();
+	gls.UseProgram(0);
+	gls.Set(r::kDepthTest_Less|r::kDepthWriteMask_Disable, r::kBlendMode_Off);
+	gls.Commit();
+
+	for (int i = 0; i < m_vtModel->numMeshes; ++i) {
+		const ska::DVtMesh *m = m_vtModel->DMesh(i);
+
+		m_vtModel->SkinToBuffer(*SIMD, i, m_skVerts[0][i]);
+#if defined(VALIDATE_SIMD_SKIN)
+		// Compare the C reference implementation with optimized path:
+		static const SIMDDriver *SIMD_ref = SIMD_ref_bind();
+		m_vtModel->SkinToBuffer(*SIMD_ref, i, m_skVerts[1][i]);
+		const float *src = m_skVerts[0][i];
+		const float *cmp = m_skVerts[1][i];
+		for (int z = 0; z < (int)m->numVerts; ++z) {
+			float d[4];
+
+			for (int j = 0; j < 3; ++j)
+				d[j] = math::Abs(src[j]-cmp[j]);
+
+			if (d[0] > 0.1f ||
+				d[1] > 0.1f ||
+				d[2] > 0.1f) {
+					int b = 0; // bad vertex
+			}
+
+			src += 4;
+			cmp += 4;
+
+			for (int j = 0; j < 3; ++j)
+				d[j] = math::Abs(src[j]-cmp[j]);
+
+			if (d[0] > 0.1f ||
+				d[1] > 0.1f ||
+				d[2] > 0.1f) {
+					int b = 0; // bad normal
+			}
+
+			src += 4;
+			cmp += 4;
+
+			for (int j = 0; j < 4; ++j) {
+				d[j] = math::Abs(src[j]-cmp[j]);
+			}
+
+			if (d[0] > 0.1f ||
+				d[1] > 0.1f ||
+				d[2] > 0.1f ||
+				d[3] != 0.f) {
+					int b = 0; // bad tangent
+			}
+
+			src += 4;
+			cmp += 4;
+		}
+#endif
+
+		const float *verts = (const float*)m_skVerts[0][i];
+
+		for (int i = 0; i < (int)m->numVerts; ++i) {
+			Vec3 v(verts[0], verts[1], verts[2]);
+			Vec3 n(verts[4], verts[5], verts[6]);
+			
+			if (tangents) {
+				const float *f = verts + 8;
+
+				for (U16 k = 0; k < m->numChannels; ++k) {
+					Vec3 t(f[0], f[1], f[2]);
+					Vec3 b = f[3] * n.Cross(t);
+					
+					t = v + (t*s_kNormalLen);
+					b = v + (b*s_kNormalLen);
+
+					glBegin(GL_LINES);
+					glColor4f(1.f, 0.f, 0.f, 1.f);
+					glVertex3f(v[0], v[1], v[2]);
+					glVertex3f(t[0], t[1],t[2]);
+					glColor4f(0.f, 0.f, 1.f, 1.f);
+					glVertex3f(v[0], v[1], v[2]);
+					glVertex3f(b[0], b[1],b[2]);
+					glEnd();
+
+					f += 4;
+				}
+			}
+
+			if (normals) {
+				glColor4f(0.f, 1.f, 0.f, 1.f);
+				n = v + (n*s_kNormalLen);
+				glBegin(GL_LINES);
+				glVertex3f(v[0], v[1], v[2]);
+				glVertex3f(n[0], n[1], n[2]);
+				glEnd();
+			}
+
+			verts += ska::DVtm::kNumVertexFloats;
+		}
+	}
+}
+
 void ModelEditorWidget::DrawMeshNormals(bool normals, bool tangents) {
 	asset::MeshParser *parser = asset::MeshParser::Cast(m_asset);
 	if (!parser)
@@ -558,10 +760,9 @@ void ModelEditorWidget::DrawMeshNormals(bool normals, bool tangents) {
 void ModelEditorWidget::Tick(float dt) {
 	
 	if (m_skModel) {
-		ska::BoneTM unused;
 		m_skModel->ska->Tick(dt, -1.f, true, true, Mat4::Identity);
 
-		asset::SkMaterialLoader *skMaterials = asset::SkMaterialLoader::Cast(m_skModel->asset);
+		asset::SkMaterialLoader *skMaterials = asset::SkMaterialLoader::Cast(m_asset);
 		RAD_ASSERT(skMaterials);
 
 		for (int i = 0; i < m_skModel->numMeshes; ++i) {
@@ -572,10 +773,25 @@ void ModelEditorWidget::Tick(float dt) {
 			RAD_ASSERT(parser);
 			parser->material->Sample(App::Get()->time, dt);
 		}
-	} else if (m_bundle) {
-		for (int i = 0; i < m_bundleMLoader->numUniqueMaterials; ++i) {
+	} else if (m_vtModel) {
+		m_vtModel->vtm->Tick(dt, true, false);
+		
+		asset::VtMaterialLoader *vtMaterials = asset::VtMaterialLoader::Cast(m_asset);
+		RAD_ASSERT(vtMaterials);
+
+		for (int i = 0; i < m_vtModel->numMeshes; ++i) {
 			asset::MaterialParser *parser = asset::MaterialParser::Cast(
-				m_bundleMLoader->UniqueMaterialAsset(i)
+				vtMaterials->MaterialAsset(i)
+			);
+
+			RAD_ASSERT(parser);
+			parser->material->Sample(App::Get()->time, dt);
+		}
+	} else if (m_bundle) {
+		asset::MeshMaterialLoader * mbMaterials = asset::MeshMaterialLoader::Cast(m_asset);
+		for (int i = 0; i < mbMaterials->numUniqueMaterials; ++i) {
+			asset::MaterialParser *parser = asset::MaterialParser::Cast(
+				mbMaterials->UniqueMaterialAsset(i)
 			);
 
 			RAD_ASSERT(parser);
@@ -588,69 +804,127 @@ void ModelEditorWidget::Tick(float dt) {
 }
 
 void ModelEditorWidget::ItemSelectionChanged() {
-	if (!m_skModel)
-		return;
-
 	QList<QTreeWidgetItem*> s = m_tree->selectedItems();
 
-	if (s.empty()) {
-		m_skModel->ska->root = ska::Controller::Ref();
-		return;
-	}
+	if (m_skModel) {
+		if (s.empty()) {
+			m_skModel->ska->root = ska::Controller::Ref();
+			return;
+		}
 
-	QTreeWidgetItem *i = s.first();
+		QTreeWidgetItem *i = s.first();
 
-	ska::Controller::Ref target;
+		ska::Controller::Ref target;
 
-	if (i->parent()) { 
-		// animation
-		ska::Animation::Map::const_iterator it = m_skModel->ska->anims->find(
-			String(i->text(0).toAscii().constData())
-		);
+		if (i->parent()) { 
+			// animation
+			ska::Animation::Map::const_iterator it = m_skModel->ska->anims->find(
+				String(i->text(0).toAscii().constData())
+			);
 		
-		if (it != m_skModel->ska->anims->end())
-		{
-			ska::AnimationSource::Ref animSource = ska::AnimationSource::New(
-				*it->second,
-				1.f,
-				1.f,
-				1.f,
-				0,
-				ska::AnimState::kMoveType_None,
-				*m_skModel->ska.get(),
-				ska::Notify::Ref()
+			if (it != m_skModel->ska->anims->end())
+			{
+				ska::AnimationSource::Ref animSource = ska::AnimationSource::New(
+					*it->second,
+					1.f,
+					1.f,
+					1.f,
+					0,
+					ska::AnimState::kMoveType_None,
+					*m_skModel->ska.get(),
+					ska::Notify::Ref()
+				);
+
+				target = boost::static_pointer_cast<ska::Controller>(animSource);
+			}
+		} else { 
+			// state
+			ska::AnimState::Map::const_iterator it = m_skModel->states->find(
+				String(i->text(0).toAscii().constData())
 			);
 
-			target = boost::static_pointer_cast<ska::Controller>(animSource);
-		}
-	} else { 
-		// state
-		ska::AnimState::Map::const_iterator it = m_skModel->states->find(
-			String(i->text(0).toAscii().constData())
-		);
+			if (it != m_skModel->states->end()) {
+				ska::AnimationVariantsSource::Ref animSource = ska::AnimationVariantsSource::New(
+					it->second,
+					*m_skModel->ska.get(),
+					ska::Notify::Ref()
+				);
 
-		if (it != m_skModel->states->end()) {
-			ska::AnimationVariantsSource::Ref animSource = ska::AnimationVariantsSource::New(
-				it->second,
-				*m_skModel->ska.get(),
-				ska::Notify::Ref()
+				target = boost::static_pointer_cast<ska::Controller>(animSource);
+			}
+		}
+
+		if (target) {
+			if (!m_skModel->ska->root.get()) {
+				// attach blend controller.
+				ska::BlendToController::Ref blendTo = ska::BlendToController::New(*m_skModel->ska.get(), ska::Notify::Ref());
+				m_skModel->ska->root = boost::static_pointer_cast<ska::Controller>(blendTo);
+				blendTo->Activate();
+			}
+
+			boost::static_pointer_cast<ska::BlendToController>(m_skModel->ska->root.get())->BlendTo(target);
+		} else {
+			m_skModel->ska->root = ska::Controller::Ref();
+		}
+	} else if (m_vtModel) {
+		if (s.empty()) {
+			m_vtModel->vtm->root = ska::Controller::Ref();
+			return;
+		}
+
+		QTreeWidgetItem *i = s.first();
+
+		ska::Controller::Ref target;
+
+		if (i->parent()) { 
+			// animation
+			ska::Animation::Map::const_iterator it = m_vtModel->vtm->anims->find(
+				String(i->text(0).toAscii().constData())
+			);
+		
+			if (it != m_vtModel->vtm->anims->end())
+			{
+				ska::AnimationSource::Ref animSource = ska::AnimationSource::New(
+					*it->second,
+					1.f,
+					1.f,
+					1.f,
+					0,
+					*m_vtModel->vtm.get(),
+					ska::Notify::Ref()
+				);
+
+				target = boost::static_pointer_cast<ska::Controller>(animSource);
+			}
+		} else { 
+			// state
+			ska::AnimState::Map::const_iterator it = m_vtModel->states->find(
+				String(i->text(0).toAscii().constData())
 			);
 
-			target = boost::static_pointer_cast<ska::Controller>(animSource);
-		}
-	}
+			if (it != m_vtModel->states->end()) {
+				ska::AnimationVariantsSource::Ref animSource = ska::AnimationVariantsSource::New(
+					it->second,
+					*m_vtModel->vtm.get(),
+					ska::Notify::Ref()
+				);
 
-	if (target) {
-		if (!m_skModel->ska->root.get()) {
-			// attach blend controller.
-			ska::BlendToController::Ref blendTo = ska::BlendToController::New(*m_skModel->ska.get(), ska::Notify::Ref());
-			m_skModel->ska->root = boost::static_pointer_cast<ska::Controller>(blendTo);
-			blendTo->Activate();
+				target = boost::static_pointer_cast<ska::Controller>(animSource);
+			}
 		}
 
-		boost::static_pointer_cast<ska::BlendToController>(m_skModel->ska->root.get())->BlendTo(target);
-	} else {
-		m_skModel->ska->root = ska::Controller::Ref();
+		if (target) {
+			if (!m_vtModel->vtm->root.get()) {
+				// attach blend controller.
+				ska::BlendToController::Ref blendTo = ska::BlendToController::New(*m_vtModel->vtm.get(), ska::Notify::Ref());
+				m_vtModel->vtm->root = boost::static_pointer_cast<ska::Controller>(blendTo);
+				blendTo->Activate();
+			}
+
+			boost::static_pointer_cast<ska::BlendToController>(m_vtModel->vtm->root.get())->BlendTo(target);
+		} else {
+			m_vtModel->vtm->root = ska::Controller::Ref();
+		}
 	}
 }
 

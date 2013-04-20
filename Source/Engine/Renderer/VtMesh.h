@@ -1,5 +1,5 @@
-/*! \file SkMesh.h
-	\copyright Copyright (c) 2010 Sunside Inc., All Rights Reserved.
+/*! \file VtMesh.h
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
 	\copyright See Radiance/LICENSE for licensing terms.
 	\author Joe Riedel
 	\ingroup renderer
@@ -11,21 +11,21 @@
 #include "../SkAnim/SkAnim.h"
 #include "../SkAnim/SkControllers.h"
 #include "../Packages/PackagesDef.h"
-#include "../Assets/SkModelParser.h"
+#include "../Assets/VtModelParser.h"
 #include <Runtime/Base/SIMD.h>
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/PushPack.h>
 
 namespace r {
 
-class RADENG_CLASS SkMesh {
+class RADENG_CLASS VtMesh {
 public:
-	typedef boost::shared_ptr<SkMesh> Ref;
+	typedef boost::shared_ptr<VtMesh> Ref;
 
-	~SkMesh();
+	~VtMesh();
 
 	static Ref New(const pkg::AssetRef &asset);
-	static Ref New(const ska::DSka &dska, const ska::DSkm &dskm, ska::SkinType skinType);
+	static Ref New(const ska::DVtm &dvtm);
 
 	r::Mesh &Mesh(int idx) { 
 		return m_meshes[idx].m; 
@@ -36,33 +36,32 @@ public:
 
 	void SkinToBuffer(const SIMDDriver &driver, int mesh, void *buffer);
 
-	RAD_DECLARE_READONLY_PROPERTY(SkMesh, numMeshes, int);
-	RAD_DECLARE_READONLY_PROPERTY(SkMesh, ska, ska::Ska*);
-	RAD_DECLARE_READONLY_PROPERTY(SkMesh, states, const ska::AnimState::Map*);
-	RAD_DECLARE_READONLY_PROPERTY(SkMesh, asset, const pkg::AssetRef&);
+	RAD_DECLARE_READONLY_PROPERTY(VtMesh, numMeshes, int);
+	RAD_DECLARE_READONLY_PROPERTY(VtMesh, vtm, ska::Vtm*);
+	RAD_DECLARE_READONLY_PROPERTY(VtMesh, states, const ska::AnimState::Map*);
+	RAD_DECLARE_READONLY_PROPERTY(VtMesh, asset, const pkg::AssetRef&);
 
 #if !defined(RAD_OPT_SHIP)
-	const ska::DSkMesh *DMesh(int idx) {
+	const ska::DVtMesh *DMesh(int idx) {
 		return m_meshes[idx].dm;
 	}
 #endif
 
 private:
 
-	SkMesh();
+	VtMesh();
 
 	void Load(
-		const ska::Ska::Ref &skanim,
-		const ska::DSkm &dskm,
-		ska::SkinType type
+		const ska::Vtm::Ref &skanim,
+		const ska::DVtm &dvtm
 	);
 
 	RAD_DECLARE_GET(numMeshes, int)  { 
 		return (int)m_meshes.size(); 
 	}
 
-	RAD_DECLARE_GET(ska, ska::Ska*) { 
-		return m_ska.get(); 
+	RAD_DECLARE_GET(vtm, ska::Vtm*) { 
+		return m_vtm.get(); 
 	}
 
 	RAD_DECLARE_GET(states, const ska::AnimState::Map*) { 
@@ -80,16 +79,15 @@ private:
 	struct DefMesh {
 		typedef zone_vector<DefMesh, ZEngineT>::type Vec;
 		r::Mesh m;
-		int boneFrame;
+		int vertexFrame;
 		int vertStreamIdx;
-		const ska::DSkMesh *dm;
+		const ska::DVtMesh *dm;
 	};
 
 	DefMesh::Vec m_meshes;
-	ska::Ska::Ref m_ska;
+	ska::Vtm::Ref m_vtm;
 	pkg::AssetRef m_asset;
-	asset::SkModelParser *m_parser;
-	ska::SkinType m_type;
+	asset::VtModelParser *m_parser;
 };
 
 } // r

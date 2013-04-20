@@ -7,6 +7,7 @@
 
 #include RADPCH
 #include "VtModelParser.h"
+#include "SkAnimSetParser.h"
 #include "../SkAnim/SkAnim.h"
 #include "../Engine.h"
 #include <Runtime/Base/SIMD.h>
@@ -15,7 +16,7 @@ using namespace pkg;
 
 namespace asset {
 
-VtModelParser::VtModelParser() : m_state(kS_None), m_states(kS_None) {
+VtModelParser::VtModelParser() : m_state(kS_None), m_states(0) {
 }
 
 VtModelParser::~VtModelParser() {
@@ -44,15 +45,24 @@ int VtModelParser::Process(
 	// So we need to make a GLVtModelParser that moves the VtModelParser transient data into some VB's and then when we get a P_Trim
 	// we can properly release this data.
 
+#if defined(RAD_OPT_TOOLS)
+	if ((m_vtmd||(m_state==kS_Done)) && (flags&(P_Load|P_Parse|P_Info|P_Trim)))
+		return SR_Success;
+#else
 	if ((m_state==kS_Done) && (flags&(P_Load|P_Parse|P_Info|P_Trim)))
 		return SR_Success;
+#endif
 
 	if (flags&P_Unload) {
-		m_state = lS_None;
+		m_state = kS_None;
 		m_states = 0;
 		m_statesRef.reset();
 		m_mm[0].reset();
 		m_mm[1].reset();
+#if defined(RAD_OPT_TOOLS)
+		m_vtmd.reset();
+		m_cooker.reset();
+#endif
 		return SR_Success;
 	}
 
@@ -160,10 +170,10 @@ int VtModelParser::LoadCooked(
 #endif
 		}
 
-		m_state = S_Load1;
+		m_state = kS_Load1;
 	}
 
-	if (m_state == S_Load1) {
+	if (m_state == kS_Load1) {
 		if (!m_mm[1]) {
 #if defined(RAD_OPT_TOOLS)
 			if (!asset->cooked)
@@ -199,11 +209,11 @@ int VtModelParser::LoadCooked(
 		size[0] = m_mm[0]->size;
 		size[1] = m_mm[1]->size;
 
-		int r = m_dskm.Parse(data, size, ska::kSkinType_CPU);
+		int r = m_dvtm.Parse(data, size);
 		if (r < SR_Success)
 			return r;
 
-		m_state = S_Done;
+		m_state = kS_Done;
 	}
 
 	return SR_Success;
@@ -217,27 +227,7 @@ int VtModelParser::Load(
 	const pkg::Asset::Ref &asset,
 	int flags
 ) {
-	const String *s = asset->entry->KeyValue<String>("AnimSet.Source", P_TARGET_FLAGS(flags));
-	if (!s)
-		return SR_MetaError;
-
-	m_skaRef = engine.sys->packages->Resolve(s->c_str, asset->zone);
-	if (!m_skaRef)
-		return SR_FileNotFound;
-
-	int r = m_skaRef->Process(
-		xtime::TimeSlice::Infinite,
-		flags
-	);
-
-	if (r != SR_Success)
-		return r;
-
-	m_ska = SkAnimSetParser::Cast(m_skaRef);
-	if (!m_ska || !m_ska->valid)
-		return SR_ParseError;
-
-	s = asset->entry->KeyValue<String>("AnimStates.Source", P_TARGET_FLAGS(flags));
+	const String *s = asset->entry->KeyValue<String>("AnimStates.Source", P_TARGET_FLAGS(flags));
 	if (!s)
 		return SR_MetaError;
 
@@ -245,7 +235,7 @@ int VtModelParser::Load(
 	if (!m_statesRef)
 		return SR_FileNotFound;
 
-	r = m_statesRef->Process(
+	int r = m_statesRef->Process(
 		xtime::TimeSlice::Infinite,
 		flags
 	);
@@ -267,32 +257,53 @@ int VtModelParser::Load(
 
 	stream::InputStream is(*ib);
 
-	tools::SceneFile map;
-	if (!tools::LoadSceneFile(is, map, true))
+	tools::SceneFile mesh;
+	if (!tools::LoadSceneFile(is, mesh, true))
 		return SR_ParseError;
 
 	ib.reset();
 
-	if (map.worldspawn->models.size() != 1) {
-		COut(C_Error) << "ERROR: 3DX file should only contain 1 model, it contains " << map.worldspawn->models.size() << ". File: '" << *s << "'" << std::endl;
+	if (mesh.worldspawn->models.size() != 1) {
+		COut(C_Error) << "ERROR: 3DX file should only contain 1 model, it contains " << mesh.worldspawn->models.size() << ". File: '" << *s << "'" << std::endl;
 		return SR_ParseError;
 	}
 
-	m_skmd = tools::CompileSkmData(
-		asset->name,
-		map,
-		0,
-		ska::kSkinType_CPU,
-		*m_ska->dska.get()
+	s = asset->entry->KeyValue<String>("Anims.Source.File", P_TARGET_FLAGS(flags));
+	if (!s)
+		return SR_MetaError;
+
+	StringVec animSources;
+	SkAnimSetParser::LoadToolsFile(s->c_str, engine, &animSources, 0);
+
+	if (animSources.empty())
+		return SR_ParseError;
+
+	tools::SceneFileVec anims;
+	for (StringVec::const_iterator it = animSources.begin(); it != animSources.end(); ++it) {
+		ib = engine.sys->files->OpenInputBuffer((*it).c_str, ZTools);
+		if (!ib)
+			return SR_FileNotFound;
+		stream::InputStream is(*ib);
+		tools::SceneFileRef x(new (tools::Z3DX) tools::SceneFile());
+		if (!tools::LoadSceneFile(is, *x, true))
+			return SR_ParseError;
+		anims.push_back(x);
+	}
+
+	m_vtmd = tools::CompileVtmData(
+		asset->path,
+		mesh,
+		anims,
+		0
 	);
 
-	return m_skmd ? SR_Success : SR_ParseError;
+	return m_vtmd ? SR_Success : SR_ParseError;
 }
 
 bool VtModelParser::RAD_IMPLEMENT_GET(valid)  {
-	if (m_skmd)
-		return m_ska && m_ska->valid && m_states && m_states->valid; 
-	return m_mm[1] && m_ska && m_ska->valid && m_states && m_states->valid;
+	if (m_vtmd)
+		return m_states && m_states->valid; 
+	return m_state == kS_Done;
 }
 
 #endif

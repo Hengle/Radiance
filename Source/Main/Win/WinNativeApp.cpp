@@ -94,11 +94,22 @@ NativeApp::NativeApp()
 {
 }
 
+inline HGLRC myWglCreateContex(HDC dc) {
+	HGLRC wglRC = 0;
+	__try {
+		wglRC = wglCreateContext(dc);
+	} __except(EXCEPTION_CONTINUE_EXECUTION) {
+	}
+	return wglRC;
+}
+
+
 bool NativeApp::PreInit() {
 	
 	COut(C_Info) << "Detecting video system..." << std::endl;
 
-#if defined(RAD_OPT_GL)
+#define HACK_DISABLE_GL
+#if defined(RAD_OPT_GL) && !defined(HACK_DISABLE_GL)
 
 	{
 		WNDCLASSEXA clex;
@@ -163,7 +174,8 @@ bool NativeApp::PreInit() {
 		}
 	}
 
-	HGLRC wglRC = wglCreateContext(wglDC);
+	HGLRC wglRC = myWglCreateContex(wglDC);
+	
 	if (!wglRC) {
 		COut(C_Error) << "ERROR: Unable to create device window context!" << std::endl;
 		return false;
@@ -306,7 +318,7 @@ bool NativeApp::PreInit() {
 			continue;
 		}
 
-#if defined(RAD_OPT_GL)
+#if defined(RAD_OPT_GL) && !defined(HACK_DISABLE_GL)
 		if (multiSample) {
 
 			int maxSamples = 0;

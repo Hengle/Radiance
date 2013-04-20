@@ -14,6 +14,8 @@
 #include "SkAnimStatesParser.h"
 #include "SkModelParser.h"
 #include "SkMaterialLoader.h"
+#include "VtModelParser.h"
+#include "VtMaterialLoader.h"
 #include "SoundParser.h"
 #include "SoundLoader.h"
 #include "MeshParser.h"
@@ -66,6 +68,8 @@ RADENG_API void RADENG_CALL RegisterParsers(Engine &engine) {
 	SkAnimStatesParser::Register(engine);
 	SkModelParser::Register(engine);
 	SkMaterialLoader::Register(engine);
+	VtModelParser::Register(engine);
+	VtMaterialLoader::Register(engine);
 	SoundParser::Register(engine);
 	SoundLoader::Register(engine);
 	MeshParser::Register(engine);

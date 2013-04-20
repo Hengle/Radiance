@@ -7,6 +7,7 @@
 #include "../World.h"
 #include "T_Precache.h"
 #include "T_SkModelPrecache.h"
+#include "T_VtModelPrecache.h"
 #include "T_MeshPrecache.h"
 #include "T_SoundPrecache.h"
 #include "T_MaterialPrecache.h"
@@ -43,6 +44,8 @@ T_Precache::Ref T_Precache::New(
 		switch (asset->type.get()) {
 		case asset::AT_SkModel:
 			return Ref(new (ZWorld) T_SkModelPrecache(world, asset));
+		case asset::AT_VtModel:
+			return Ref(new (ZWorld) T_VtModelPrecache(world, asset));
 		case asset::AT_Mesh:
 			return Ref(new (ZWorld) T_MeshPrecache(world, asset));
 		case asset::AT_Sound:

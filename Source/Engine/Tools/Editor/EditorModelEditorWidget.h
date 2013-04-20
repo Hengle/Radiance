@@ -11,6 +11,7 @@
 #include <QtGui/QWidget>
 #include "../../Renderer/Mesh.h"
 #include "../../Renderer/SkMesh.h"
+#include "../../Renderer/VtMesh.h"
 #include "../../Renderer/Material.h"
 #include <Runtime/PushPack.h>
 
@@ -60,6 +61,7 @@ private:
 	void DrawNormals(bool normals, bool tangents);
 	
 	void DrawSkaNormals(bool normals, bool tangents);
+	void DrawVtmNormals(bool normals, bool tangents);
 	void DrawMeshNormals(bool normals, bool tangents);
 	
 	ModelEditorWidget();
@@ -69,8 +71,8 @@ private:
 	void DoClose();
 
 	r::SkMesh::Ref m_skModel;
+	r::VtMesh::Ref m_vtModel;
 	asset::MeshVBLoader *m_bundle;
-	asset::MeshMaterialLoader *m_bundleMLoader;
 	pkg::Asset::Ref m_asset;
 	pkg::Asset::Ref m_wireframeMat;
 	pkg::Asset::Ref m_normalMat;

@@ -123,7 +123,7 @@ protected:
 
 	virtual void OnActivate(bool active=true) {}
 
-	BoneTM::Ref AllocBoneArray();
+	BoneTM::ArrayRef AllocBoneArray();
 	VertArrayRef AllocVertArray();
 
 	void SetRot(const Quat &q) { 
@@ -152,6 +152,8 @@ private:
 	RAD_DECLARE_GET(deltaPos, const Vec3&) { return m_dp; }
 	RAD_DECLARE_GET(ska, Ska*) { return m_ska; }
 	RAD_DECLARE_GET(vtm, Vtm*) { return m_vtm; }
+
+	static void FreeVertArray(void *array);
 
 	Ska *m_ska;
 	Vtm *m_vtm;
@@ -395,7 +397,7 @@ private:
 		Union a;
 		Union b;
 		BlendTimer blend;
-		BoneTM::Ref bones;
+		BoneTM::ArrayRef bones;
 		VertArrayRef verts[2];
 
 	private:

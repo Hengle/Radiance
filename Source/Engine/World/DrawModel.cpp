@@ -15,6 +15,7 @@
 #include "World.h"
 #include "Lua/D_Material.h"
 #include "../Assets/SkMaterialLoader.h"
+#include "../Assets/VtMaterialLoader.h"
 
 namespace world {
 
@@ -551,6 +552,125 @@ void SkMeshDrawModel::Batch::FlushArrayStates(r::Shader *shader) {
 }
 
 void SkMeshDrawModel::Batch::Draw() {
+	m_m->Mesh(m_idx).Draw();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+VtMeshDrawModel::Ref VtMeshDrawModel::New(
+	Entity *entity, 
+	const r::VtMesh::Ref &m
+) {
+	Ref r(new (ZWorld) VtMeshDrawModel(entity, m));
+
+	asset::VtMaterialLoader *loader = asset::VtMaterialLoader::Cast(m->asset);
+	if (!loader)
+		return Ref();
+
+	WorldDraw *draw = entity->world->draw;
+
+	for (int i = 0 ; i < m->numMeshes; ++i) {
+		pkg::Asset::Ref material = loader->MaterialAsset(i);
+		if (!material)
+			continue;
+
+		Batch::Ref b(new (ZWorld) Batch(*r, m, i, material->id));
+		draw->AddMaterial(material->id);
+
+		r->RefBatch(b);
+	}
+
+	return r;
+}
+
+VtMeshDrawModel::VtMeshDrawModel(Entity *entity, const r::VtMesh::Ref &m) : 
+DrawModel(entity),
+m_mesh(m),
+m_timeScale(1.f),
+m_instanced(false) {
+}
+
+VtMeshDrawModel::~VtMeshDrawModel() {
+}
+
+VtMeshDrawModel::Ref VtMeshDrawModel::CreateInstance() {
+	Ref r = New(entity, m_mesh);
+	r->m_instanced = true;
+	r->m_timeScale = m_timeScale;
+	return r;
+}
+
+void VtMeshDrawModel::OnTick(float time, float dt) {
+	if (visible && !m_instanced) {
+		m_mesh->vtm->Tick(
+			dt * m_timeScale, 
+			true, 
+			true
+		);
+	}
+}
+
+void VtMeshDrawModel::PushElements(lua_State *L) {
+	DrawModel::PushElements(L);
+	LUART_REGISTER_GETSET(L, TimeScale);
+	lua_pushcfunction(L, lua_CreateInstance);
+	lua_setfield(L, -2, "CreateInstance");
+}
+
+int VtMeshDrawModel::lua_PushMaterialList(lua_State *L) {
+
+	asset::VtMaterialLoader *loader = asset::VtMaterialLoader::Cast(m_mesh->asset);
+	int numUniqueMaterials = loader->numUniqueMaterials;
+
+	if (numUniqueMaterials < 1)
+		return 0;
+
+	lua_createtable(L, numUniqueMaterials, 0);
+
+	for (int i = 0; i < numUniqueMaterials; ++i) {
+		const pkg::Asset::Ref &asset = loader->UniqueMaterialAsset(i);
+		if (asset) {
+			D_Material::Ref m = D_Material::New(asset);
+			if (m) {
+				lua_pushinteger(L, i+1);
+				m->Push(L);
+				lua_settable(L, -3);
+			}
+		}
+	}
+
+	return 1;
+}
+
+int VtMeshDrawModel::lua_CreateInstance(lua_State *L) {
+	Ref r = lua::SharedPtr::Get<VtMeshDrawModel>(L, "VtMeshDrawModel", 1, true);
+	r->CreateInstance()->Push(L);
+	return 1;
+}
+
+#define SELF Ref self = lua::SharedPtr::Get<VtMeshDrawModel>(L, "VtMeshDrawModel", 1, true)
+LUART_GETSET(VtMeshDrawModel, TimeScale, float, m_timeScale, SELF);
+#undef SELF
+
+VtMeshDrawModel::Batch::Batch(DrawModel &model, const r::VtMesh::Ref &m, int idx, int matId) :
+DrawModel::DrawBatch(model, matId), m_idx(idx), m_m(m) {
+}
+	
+void VtMeshDrawModel::Batch::Bind(r::Shader *shader) {
+	m_m->Skin(m_idx);
+	r::Mesh &m = m_m->Mesh(m_idx);
+	m.BindAll(shader);
+}
+
+void VtMeshDrawModel::Batch::CompileArrayStates(r::Shader &shader) {
+	m_m->Mesh(m_idx).CompileArrayStates(shader);
+}
+
+void VtMeshDrawModel::Batch::FlushArrayStates(r::Shader *shader) {
+	m_m->Mesh(m_idx).FlushArrayStates(shader);
+}
+
+void VtMeshDrawModel::Batch::Draw() {
 	m_m->Mesh(m_idx).Draw();
 }
 

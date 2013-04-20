@@ -11,6 +11,7 @@
 #include "Entity.h"
 #include "../COut.h"
 #include "Lua/D_SkModel.h"
+#include "Lua/D_VtModel.h"
 #include "Lua/D_Sound.h"
 #include "Lua/D_Mesh.h"
 #include "Lua/D_SpriteBatch.h"
@@ -631,6 +632,16 @@ int Entity::lua_AttachDrawModel(lua_State *L) {
 		D_SkModel::Ref x = lua::SharedPtr::Get<D_SkModel>(L, "Model", 2, false);
 		if (x) {
 			SkMeshDrawModel::Ref m = SkMeshDrawModel::New(self, x->mesh);
+			self->AttachDrawModel(m);
+			m->Push(L);
+			return 1;
+		}
+	}
+
+	{
+		D_VtModel::Ref x = lua::SharedPtr::Get<D_VtModel>(L, "Model", 2, false);
+		if (x) {
+			VtMeshDrawModel::Ref m = VtMeshDrawModel::New(self, x->mesh);
 			self->AttachDrawModel(m);
 			m->Push(L);
 			return 1;

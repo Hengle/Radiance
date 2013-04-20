@@ -70,7 +70,7 @@ function RAD_GetEditableMeshKeyframeTimes obj = (
 	keyframes = undefined
 	
 	for p in props do (
-		z = execute("($" + obj.name + ")." + (p as string) + ".controller.keys")
+		z = execute("($'" + obj.name + "')." + (p as string) + ".controller.keys")
 		if (z.count > 1) then (
 			w = for x in z collect x.time
 			if (keyframes == undefined) then (
@@ -111,7 +111,12 @@ function RAD_GetObjectKeyframeTimes obj = (
 function RAD_GetKeyframeBounds start end keys = (
 	z = #()
 	append z start
-	join z keys
+	for k in keys do (
+		if (k >= end) then ( exit )
+		if (k > start) then (
+			append z k
+		)
+	)
 	append z end
 	z = makeUniqueArray z
 	sort z

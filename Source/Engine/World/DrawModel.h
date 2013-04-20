@@ -10,6 +10,7 @@
 #include "../Packages/PackagesDef.h"
 #include "../Renderer/Mesh.h"
 #include "../Renderer/SkMesh.h"
+#include "../Renderer/VtMesh.h"
 #include "../Renderer/Sprites.h"
 #include "../Lua/LuaRuntime.h"
 #include "MBatchDraw.h"
@@ -341,6 +342,71 @@ private:
 
 	r::SkMesh::Ref m_mesh;
 	float m_motionScale;
+	float m_timeScale;
+	bool m_instanced;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+class RADENG_CLASS VtMeshDrawModel : public DrawModel {
+public:
+	typedef boost::shared_ptr<VtMeshDrawModel> Ref;
+	typedef boost::weak_ptr<VtMeshDrawModel> WRef;
+	
+	static Ref New(Entity *entity, const r::VtMesh::Ref &m);
+
+	virtual ~VtMeshDrawModel();
+
+	Ref CreateInstance();
+	
+
+	RAD_DECLARE_PROPERTY(VtMeshDrawModel, timeScale, float, float);
+	RAD_DECLARE_READONLY_PROPERTY(VtMeshDrawModel, mesh, const r::VtMesh::Ref&);
+
+protected:
+
+	virtual void PushElements(lua_State *L);
+	virtual int lua_PushMaterialList(lua_State *L);
+
+	virtual void OnTick(float time, float dt);
+
+private:
+
+	RAD_DECLARE_GET(timeScale, float) { 
+		return m_timeScale;
+	}
+
+	RAD_DECLARE_SET(timeScale, float) {
+		m_timeScale = value;
+	}
+
+	RAD_DECLARE_GET(mesh, const r::VtMesh::Ref&) { 
+		return m_mesh; 
+	}
+
+	class Batch : public DrawModel::DrawBatch {
+	public:
+		typedef boost::shared_ptr<Batch> Ref;
+		Batch(DrawModel &model, const r::VtMesh::Ref &m, int idx, int matId);
+
+	protected:
+		virtual void Bind(r::Shader *shader);
+		virtual void CompileArrayStates(r::Shader &shader);
+		virtual void FlushArrayStates(r::Shader *shader);
+		virtual void Draw();
+
+	private:
+		int m_idx;
+		r::VtMesh::Ref m_m;
+	};
+
+	VtMeshDrawModel(Entity *entity, const r::VtMesh::Ref &m);
+
+	static int lua_CreateInstance(lua_State *L);
+
+	LUART_DECL_GETSET(TimeScale);
+
+	r::VtMesh::Ref m_mesh;
 	float m_timeScale;
 	bool m_instanced;
 };

@@ -1485,6 +1485,15 @@
     <ClInclude Include="..\..\Engine\Assets\VtModelParser.h">
       <Filter>Source\Engine\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\Renderer\VtMesh.h">
+      <Filter>Source\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\World\Lua\T_VtModelPrecache.h">
+      <Filter>Source\Engine\World\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\World\Lua\D_VtModel.h">
+      <Filter>Source\Engine\World\Lua</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2306,6 +2315,18 @@
     <ClCompile Include="..\..\Engine\Assets\VtModelParser.cpp">
       <Filter>Source\Engine\Assets</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\Renderer\VtMesh.cpp">
+      <Filter>Source\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorVtModelThumb.cpp">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\Lua\T_VtModelPrecache.cpp">
+      <Filter>Source\Engine\World\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\Lua\D_VtModel.cpp">
+      <Filter>Source\Engine\World\Lua</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Runtime\Base\Event.inl">
@@ -2723,6 +2744,9 @@
     </QtMOC>
     <QtMOC Include="..\..\Engine\Tools\Editor\EditorConversationTreeEditorView.h">
       <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorVtModelThumb.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
     </QtMOC>
   </ItemGroup>
 </Project>

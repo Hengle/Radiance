@@ -40,7 +40,6 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(SkAnimSetParser, valid, bool);
 
 #if defined(RAD_OPT_TOOLS)
-
 	static int LoadToolsFile(
 		const char *path,
 		Engine &engine,

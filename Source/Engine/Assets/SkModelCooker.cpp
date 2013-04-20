@@ -79,22 +79,27 @@ int SkModelCooker::Compile(int flags) {
 	
 	stream::InputStream is (*ib);
 
-	tools::SceneFile map;
-	if (!tools::LoadSceneFile(is, map, true))
+	tools::SceneFile mesh;
+	if (!tools::LoadSceneFile(is, mesh, true))
 		return SR_ParseError;
 
 	ib.reset();
 
+	if (mesh.worldspawn->models.size() != 1) {
+		COut(C_Error) << "ERROR: 3DX file should only contain 1 model, it contains " << mesh.worldspawn->models.size() << ". File: '" << *s << "'" << std::endl;
+		return SR_ParseError;
+	}
+
 	tools::SkmData::Ref skmd = tools::CompileSkmData(
 		asset->name,
-		map,
+		mesh,
 		0,
 		ska::kSkinType_CPU,
 		*ska->dska.get()
 	);
 
 	if (!skmd) {
-		COut(C_Error) << "ERROR: " << asset->name.get() << " does not contain an animated mesh." << std::endl;
+		COut(C_Error) << "ERROR: " << asset->name.get() << " does not contain a skeletal animated mesh." << std::endl;
 		return SR_CompilerError;
 	}
 

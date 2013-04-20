@@ -51,6 +51,7 @@ void CreateTextureThumb(ContentBrowserView &view);
 void CreateMapThumb(ContentBrowserView &view);
 void CreateMaterialThumb(ContentBrowserView &view);
 void CreateSkModelThumb(ContentBrowserView &view);
+void CreateVtModelThumb(ContentBrowserView &view);
 void CreateMeshThumb(ContentBrowserView &view);
 void CreateSoundThumb(ContentBrowserView &view);
 void CreateMusicThumb(ContentBrowserView &view);
@@ -62,6 +63,7 @@ void CreateThumbs(ContentBrowserView &view) {
 	CreateMapThumb(view);
 	CreateMaterialThumb(view);
 	CreateSkModelThumb(view);
+	CreateVtModelThumb(view);
 	CreateMeshThumb(view);
 	CreateSoundThumb(view);
 	CreateMusicThumb(view);
@@ -272,7 +274,11 @@ m_inTick(false),
 m_tickRedraw(false)
 {
 	m_resolution = MainWindow::Get()->userPrefs->value("contentBrowser/resolution", 1).toInt();
-//	m_font.setPixelSize(10); // this causes Qt to crash in renderText wtf
+
+	// Qt needs to fix this, it overwrites memory using these calls, but too much time
+	// pressure right now to replace it with our own font rendering...
+	// https://bugreports.qt-project.org/browse/QTBUG-26649
+	m_font.setPixelSize(12);
 
 	QGridLayout *l = new (ZEditor) QGridLayout(this);
 	

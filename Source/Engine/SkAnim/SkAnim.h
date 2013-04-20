@@ -85,7 +85,7 @@ private:
 };
 
 struct BoneTM {
-	typedef boost::shared_array<BoneTM> Ref;
+	typedef boost::shared_array<BoneTM> ArrayRef;
 	Quat r;
 	Vec3 s;
 	Vec3 t;

@@ -57,10 +57,10 @@ protected:
 private:
 
 	enum {
-		S_None,
-		S_LoadMaterials,
-		S_Done,
-		S_Error
+		kS_None,
+		kS_LoadMaterials,
+		kS_Done,
+		kS_Error
 	};
 
 	void AddUMatRef(const pkg::Asset::Ref &m);

@@ -107,31 +107,6 @@ function RAD_IsAnimated model =
 	(s != undefined and s != "$empty$")
 )
 
--- [num, [(skelnum, root, obj)]]
-function RAD_GatherSkels objs =
-(
-	c = 0
-	l = #()
-	
-	for x in objs do
-	(
-		if ((not RAD_IsVertexAnimated x) and (RAD_IsAnimated x)) then
-		(
-			root = RAD_GetSkelRoot x
-			if (root != undefined) then
-			(
-				append l #(c+1, root, x)
-				c = c + 1
-				continue
-			)
-		)
-		
-		append l #(0, undefined, x)
-	)
-	
-	#(c, l)
-)
-
 function RAD_FilterAnimated objs =
 (
 	anims = #()
@@ -369,6 +344,45 @@ function RAD_GatherAnims objs =
 	r
 )
 
+function RAD_IsVertexAnimated obj = (
+	if ((classof(obj) == Freecamera) or (classof(obj) == Targetcamera)) then (
+		return false
+	)
+	
+	if (obj.modifiers[#skin] != undefined) then (
+		return false
+	)
+	
+	z = RAD_LoadObjAnims obj
+	z.count > 0
+)
+
+-- [num, [(skelnum, root, obj)]]
+function RAD_GatherSkels objs =
+(
+	c = 0
+	l = #()
+	
+	for x in objs do
+	(
+		if ((not RAD_IsVertexAnimated x) and (RAD_IsAnimated x)) then
+		(
+			root = RAD_GetSkelRoot x
+			if (root != undefined) then
+			(
+				append l #(c+1, root, x)
+				c = c + 1
+				continue
+			)
+		)
+		
+		append l #(0, undefined, x)
+	)
+	
+	#(c, l)
+)
+
+
 function RAD_GetNodeKeyFrameTag obj frame =
 (
 	for i = 1 to (numNoteTracks obj) do
@@ -483,8 +497,6 @@ function RAD_ExportVertexAnims file anims obj = (
 	
 	for x in anims do (
 		
-		print ("Exporting " + obj.name + " : vertex animation '" + x.name + "'")
-		
 		flags = 0
 		if (x.loop) then flags = 1
 		WriteString file x.name
@@ -495,6 +507,16 @@ function RAD_ExportVertexAnims file anims obj = (
 		boundedFrames = RAD_GetKeyframeBounds (x.start as time) (x.end as time) keyframes
 		WriteLong file (boundedFrames.count) #unsigned
 		
+		s = "("
+		for i = 1 to boundedFrames.count do (
+			if (i > 1) then (s = s + ", ")
+			s = s + (boundedFrames[i] as string)
+		)
+		
+		s = s + ")"
+		
+		print ("Exporting " + obj.name + " : vertex animation '" + x.name + "' with keyframes " + s)
+		
 		animationRange = interval x.start (x.end+1)
 		
 		for f in boundedFrames do (
@@ -504,19 +526,6 @@ function RAD_ExportVertexAnims file anims obj = (
 			RAD_WriteTriMeshVerts file trim
 		)
 	)
-)
-
-function RAD_IsVertexAnimated obj = (
-	if ((classof(obj) == Freecamera) or (classof(obj) == Targetcamera)) then (
-		return false
-	)
-	
-	if (obj.modifiers[#skin] != undefined) then (
-		return false
-	)
-	
-	z = RAD_LoadObjAnims obj
-	z.count > 0
 )
 
 function RAD_ExportAnims file doMeshes doAnims trim obj =

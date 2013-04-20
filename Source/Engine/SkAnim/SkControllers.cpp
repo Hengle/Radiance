@@ -90,14 +90,18 @@ void Controller::Activate(bool active) {
 	OnActivate(active);
 }
 
-BoneTM::Ref Controller::AllocBoneArray() {
+BoneTM::ArrayRef Controller::AllocBoneArray() {
 	RAD_ASSERT(m_ska);
-	return BoneTM::Ref(new (ZSka) BoneTM[m_ska->numBones.get()]);
+	return BoneTM::ArrayRef(new (ZSka) BoneTM[m_ska->numBones.get()]);
 }
 
 VertArrayRef Controller::AllocVertArray() {
 	RAD_ASSERT(m_vtm);
-	return VertArrayRef(new (ZSka) float[DVtm::kNumVertexFloats*m_vtm->maxBlendVerts.get()]);
+	return VertArrayRef((float*)safe_zone_malloc(ZSka, sizeof(float)*DVtm::kNumVertexFloats*m_vtm->maxBlendVerts.get(), 0, SIMDDriver::kAlignment), &FreeVertArray);
+}
+
+void Controller::FreeVertArray(void *array) {
+	zone_free(array);
 }
 
 void Controller::Blend(
@@ -337,7 +341,7 @@ bool AnimationSource::Tick(
 		m_frame += (dt*m_timeScale) * m_anim->fps;
 	}
 
-	if (m_frame > m_anim->numFrames.get()-1) {
+	if (m_frame > ((float)m_anim->numFrames.get()-1)) {
 		bool emit = false;
 
 		if (!m_loopCount[1] || (m_loopCount[0]+1 < m_loopCount[1])) {
@@ -367,13 +371,13 @@ bool AnimationSource::Tick(
 		}
 	}
 
-	if (emitTags)
-		EmitTags(firstBone, numBones);
-
 	if (kIsSka) {
 		int src;
 		int dst;
 		float lerp;
+
+		if (emitTags)
+			EmitTags(firstBone, numBones);
 
 		m_anim->GetBlendingFrames(m_frame, src, dst, lerp);
 	
@@ -505,6 +509,16 @@ bool BlendToController::Tick(
 	SetDeltaRot(delta.r);
 	SetDeltaPos(delta.t);
 	return true;
+}
+
+void BlendToController::BlendVerts(
+	const SIMDDriver &driver,
+	float *out,
+	int firstVert,
+	int numVerts
+) const {
+	if (m_root)
+		m_root->BlendVerts(driver, out, firstVert, numVerts);
 }
 
 void BlendToController::ResetMotion() {
@@ -936,7 +950,7 @@ void AnimationVariantsSource::Init(const Variant::Vec &anims) {
 
 
 		Node n;
-		n.anim = ska->anims->find((*it).name)->second;
+		n.anim = ska.get() ? (ska->anims->find((*it).name)->second) : (vtm->anims->find((*it).name)->second);
 		n.timeScale[0] = (*it).timeScale[0];
 		n.timeScale[1] = (*it).timeScale[1];
 		n.loopCount[0] = (*it).loopCount[0];

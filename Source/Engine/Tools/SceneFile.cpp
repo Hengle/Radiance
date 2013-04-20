@@ -351,10 +351,11 @@ namespace {
 				a->looping = flags&1;
 				a->frameRate = frameRate;
 				a->firstFrame = (int)firstFrame;
-				a->vertexFrames.resize(numFrames);
-
+				
 				U32 numVertFrames;
 				stream >> numVertFrames;
+
+				a->vertexFrames.resize(numVertFrames);
 
 				for (U32 j = 0; j < numVertFrames; ++j) {
 					SceneFile::VertexFrame &vframe = a->vertexFrames[j];

@@ -6,7 +6,6 @@
 #include RADPCH
 #include "SkMesh.h"
 #include "Common.h"
-#include "../Assets/SkModelParser.h"
 #include <limits>
 #undef max
 
@@ -158,12 +157,12 @@ void SkMesh::Skin(int mesh) {
 	m.m.SwapChain();
 	Mesh::StreamPtr::Ref vb = m.m.Map(m.vertStreamIdx);
 
-	SkinToBuffer(SIMD, mesh, vb->ptr);
+	SkinToBuffer(*SIMD, mesh, vb->ptr);
 
 	vb.reset();
 }
 
-void SkMesh::SkinToBuffer(const SIMDDriver *driver, int mesh, void *buffer) {
+void SkMesh::SkinToBuffer(const SIMDDriver &driver, int mesh, void *buffer) {
 	DefMesh &m = m_meshes[mesh];
 	
 	const float *srcVerts = m.dm->verts;
@@ -178,7 +177,7 @@ void SkMesh::SkinToBuffer(const SIMDDriver *driver, int mesh, void *buffer) {
 		RAD_ASSERT(m.dm->numChannels < 2);
 
 		if (numVerts > 0) {
-			driver->SkinVerts[i](
+			driver.SkinVerts[i](
 				outVerts,
 				bones,
 				srcVerts,

@@ -26,6 +26,7 @@
 #include "SkModelCooker.h"
 #include "SkAnimSetCooker.h"
 #include "SkAnimStatesCooker.h"
+#include "VtModelCooker.h"
 #include "MeshCooker.h"
 #include "MusicCooker.h"
 #include "FontCooker.h"
@@ -44,6 +45,7 @@ RADENG_API void RADENG_CALL RegisterCookers(Engine &engine) {
 	SkModelCooker::Register(engine);
 	SkAnimSetCooker::Register(engine);
 	SkAnimStatesCooker::Register(engine);
+	VtModelCooker::Register(engine);
 	SoundCooker::Register(engine);
 	MeshCooker::Register(engine);
 	MusicCooker::Register(engine);

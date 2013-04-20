@@ -1,4 +1,4 @@
-/*! \file SkModelCooker.h
+/*! \file VtModelCooker.h
 	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
 	\copyright See Radiance/LICENSE for licensing terms.
 	\author Joe Riedel
@@ -15,17 +15,17 @@ class Engine;
 
 namespace asset {
 
-class RADENG_CLASS SkModelCooker : public pkg::Cooker {
+class RADENG_CLASS VtModelCooker : public pkg::Cooker {
 public:
 
 	static void Register(Engine &engine);
 
 	enum {
-		AssetType = AT_SkModel
+		AssetType = AT_VtModel
 	};
 
-	SkModelCooker();
-	virtual ~SkModelCooker();
+	VtModelCooker();
+	virtual ~VtModelCooker();
 
 	virtual pkg::CookStatus Status(int flags);
 	virtual int Compile(int flags);
