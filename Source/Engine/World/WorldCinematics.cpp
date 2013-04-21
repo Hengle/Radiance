@@ -368,6 +368,7 @@ bool WorldCinematics::PlayCinematic(
 	const char *name, 
 	int flags,
 	float xfadeCamera,
+	const Entity::Ref &origin,
 	const Notify::Ref &notify
 ) {
 	for(Cinematic::List::const_iterator it = m_cinematics.begin(); it != m_cinematics.end(); ++it) {
@@ -382,6 +383,7 @@ bool WorldCinematics::PlayCinematic(
 	Cinematic::Ref c(new (ZWorld) Cinematic());
 	c->name = name;
 	c->flags = flags;
+	c->origin = origin;
 	c->notify = notify;
 	c->frame[0] = c->frame[1] = 0.f;
 	c->triggerNum = 0;
@@ -767,6 +769,14 @@ void WorldCinematics::BlendCameraFrame(Cinematic &c) {
 
 	if (c.xfade[0] > c.xfade[1])
 		c.xfade[0] = c.xfade[1];
+
+	Entity::Ref origin = c.origin.lock();
+	if (origin) {
+		Quat r = Quat(Vec3(0.f, 0.f, 1.f), math::DegToRad(origin->ps->worldAngles[2]));
+		tmOut.r = r * tmOut.r;
+		tmOut.t = Mat4::Rotation(r).Transform3X3(tmOut.t);
+		tmOut.t = origin->ps->worldPos + tmOut.t;
+	}
 
 	if (m_cameraActive && c.xfade[0] < c.xfade[1]) {
 		ska::BoneTM temp(tmOut);

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "../Types.h"
+#include "EntityDef.h"
 #include "WorldDraw.h"
 #include "Occupant.h"
 #include "BSPFile.h"
@@ -19,8 +20,7 @@ namespace world {
 
 class World;
 
-class RADENG_CLASS WorldCinematics
-{
+class RADENG_CLASS WorldCinematics {
 public:
 	typedef boost::shared_ptr<WorldCinematics> Ref;
 
@@ -49,6 +49,7 @@ public:
 		const char *name, 
 		int flags,
 		float xfadeCamera,
+		const EntityRef &cameraOrigin,
 		const Notify::Ref &notify
 	);
 
@@ -161,6 +162,7 @@ private:
 
 		String name;
 		Notify::Ref notify;
+		EntityWRef origin;
 		const bsp_file::BSPCinematicTrigger *trigger;
 		const bsp_file::BSPCameraTrack *track;
 		const bsp_file::BSPCinematic *cinematic;

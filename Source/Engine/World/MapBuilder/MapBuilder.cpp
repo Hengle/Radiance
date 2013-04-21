@@ -209,7 +209,25 @@ bool MapBuilder::LoadScene(const EntSpawn &spawn) {
 	}
 
 	stream::InputStream is(*ib);
-	return LoadSceneFile(is, m_map, true, m_ui);
+	return LoadSceneFile(is, m_map, true, m_ui) && MergeCommonScene();
+}
+
+bool MapBuilder::MergeCommonScene() {
+	// load common scene file and merge in camera data.
+	file::MMFileInputBuffer::Ref ib = m_e.sys->files->OpenInputBuffer("Meshes/World/common.3dx", ZTools);
+	if (!ib) {
+		COut(C_Error) << "ERROR: unable to open 'Meshes/World/common.3dx'" << std::endl;
+		return false;
+	}
+
+	stream::InputStream is(*ib);
+	SceneFile scene;
+	if (!LoadSceneFile(is, scene, false, 0))
+		return false;
+
+	// copy cameras
+	std::copy(scene.cameras.begin(), scene.cameras.end(), std::back_inserter(m_map.cameras));
+	return true;
 }
 
 void MapBuilder::ConnectWaypoints() {

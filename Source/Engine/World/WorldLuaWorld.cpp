@@ -655,17 +655,20 @@ int WorldLua::lua_World_PlayCinematic(lua_State *L) {
 
 	WorldCinematics::Notify::Ref notify;
 
-	Entity *entity = EntFramePtr(L, 4, false);
-	if (entity && lua_gettop(L) > 4) { // passed in callbacks?
-		int callbackId = entity->StoreLuaCallback(L, 5, 4);
+	Entity *entity = EntFramePtr(L, 5, false);
+	if (entity && lua_gettop(L) > 5) { // passed in callbacks?
+		int callbackId = entity->StoreLuaCallback(L, 6, 5);
 		RAD_ASSERT(callbackId != -1);
 		notify.reset(new CinematicsNotify(self->m_world, *entity, callbackId));
 	}
+
+	Entity *cameraOrigin = EntFramePtr(L, 4, false);
 
 	bool r = self->m_world->cinematics->PlayCinematic(
 		luaL_checkstring(L, 1),
 		(int)luaL_checkinteger(L, 2),
 		(float)luaL_checknumber(L, 3),
+		cameraOrigin ? cameraOrigin->shared_from_this() : Entity::Ref(),
 		notify
 	);
 

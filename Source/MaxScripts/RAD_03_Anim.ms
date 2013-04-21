@@ -420,10 +420,15 @@ function RAD_GetBoneTM b =
 function RAD_ExportSkAnims file doMeshes doAnims isCamera anims obj = (
 	select obj
 	
-	max modify mode
-	numBones = skinops.GetNumberBones obj.skin
-	numVerts = skinops.GetNumberVertices obj.skin
-		
+	numBones = undefined
+	numVerts = undefined
+	
+	if (not isCamera) then (
+		max modify mode
+		numBones = skinops.GetNumberBones obj.skin
+		numVerts = skinops.GetNumberVertices obj.skin
+	)
+	
 	if (doMeshes) then
 	(
 		for x = 1 to numVerts do

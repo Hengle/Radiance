@@ -17,7 +17,7 @@ using namespace pkg;
 
 namespace asset {
 
-MapCooker::MapCooker() : Cooker(33), m_parsing(false), m_ui(0), m_parser(0) {
+MapCooker::MapCooker() : Cooker(34), m_parsing(false), m_ui(0), m_parser(0) {
 }
 
 MapCooker::~MapCooker() {
@@ -27,7 +27,8 @@ CookStatus MapCooker::Status(int flags) {
 	
 	if (CompareVersion(flags) ||
 		CompareModifiedTime(flags) ||
-		CompareCachedFileTimeKey(flags, "Source.File")) {
+		CompareCachedFileTimeKey(flags, "Source.File") ||
+		CompareCachedFileTime(flags, "Meshes/World/common.3dx", "Meshes/World/common.3dx")) {
 		return CS_NeedRebuild;
 	}
 
@@ -162,6 +163,7 @@ int MapCooker::TickCompile(int flags) {
 	CompareVersion(flags);
 	CompareModifiedTime(flags);
 	CompareCachedFileTimeKey(flags, "Source.File");
+	CompareCachedFileTime(flags, "Meshes/World/common.3dx", "Meshes/World/common.3dx");
 
 	const String *mapPath = asset->entry->KeyValue<String>("Source.File", flags);
 	if (!mapPath || mapPath->empty)

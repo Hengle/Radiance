@@ -70,6 +70,7 @@ private:
 	bool ParseEntity(const EntSpawn &spawn);
 	bool ParseWaypoint(const EntSpawn &spawn);
 	bool LoadScene(const EntSpawn &spawn);
+	bool MergeCommonScene();
 	void ConnectWaypoints();
 
 	SceneFile m_map;
