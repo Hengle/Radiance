@@ -130,14 +130,14 @@ public:
 				const BrushPlane &plane = *it;
 				BrushWinding w;
 				w.bevel = false;
-				w.winding.Initialize(plane.plane, 32767.f);
+				w.winding.Initialize(plane.plane, 16384.f);
 				w.plane = plane.plane;
 
 				for (typename BrushPlane::Vec::const_iterator it2 = planes.begin(); it2 != planes.end(); ++it2) {
 					if (it2 == it)
 						continue; // skip same side.
 					const BrushPlane &plane2 = *it2;
-					w.winding.ChopInPlace(plane2.plane, Plane::Back, 0.f);
+					w.winding.ChopInPlace(plane2.plane, Plane::Back, 1.f);
 					if (w.winding.Empty())
 						break;
 				}
@@ -208,7 +208,7 @@ public:
 					int sideNum;
 					for (sideNum = 0; sideNum < (int)brush.m_windings.size(); ++sideNum) {
 						const BrushWinding &w = brush.m_windings[sideNum];
-						const Plane &p = w.winding.Plane();
+						const Plane &p = w.plane;
 						if (p.Normal()[axis] == (ValueType)dir)
 							break;
 					}

@@ -228,6 +228,17 @@ int MapParser::ParseBrush(
 
 		tools::SceneFile::BrushPlane bp;
 		bp.plane = Plane(pts[2], pts[1], pts[0]); // <-- CCW
+
+		// snap plane.
+		for (int i = 0; i < 3; ++i) {
+			if (math::Abs(bp.plane.Normal()[i]) > 0.999f) {
+				Vec3 n = Vec3::Zero;
+				n[i] = bp.plane.Normal()[i] > 0.f ? 1 : -1.f;
+				bp.plane = Plane(n, bp.plane.D());
+				break;
+			}
+		}
+
 		planes.push_back(bp);
 	}
 
