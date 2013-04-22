@@ -155,7 +155,7 @@ HTTP_OpStatus HTTPGet::SendRequest(const char *host, const char *resource, const
 
 	m_hostAddr.sin_family = AF_INET;
 	m_hostAddr.sin_port = htons(80);
-	m_hostAddr.sin_addr.s_addr = *((ulong*)z->h_addr_list[0]);
+	m_hostAddr.sin_addr.s_addr = *((unsigned int*)z->h_addr_list[0]);
 
 	m_status = kHTTP_OpStatus_Pending;
 	Run();

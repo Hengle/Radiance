@@ -375,6 +375,80 @@
 		334315F816914DB200AABCEE /* Common.h in Headers */ = {isa = PBXBuildFile; fileRef = 334315F516914DB200AABCEE /* Common.h */; };
 		334315F916914DB200AABCEE /* Common.h in Headers */ = {isa = PBXBuildFile; fileRef = 334315F516914DB200AABCEE /* Common.h */; };
 		334315FA16914DB200AABCEE /* Common.h in Headers */ = {isa = PBXBuildFile; fileRef = 334315F516914DB200AABCEE /* Common.h */; };
+		334389471724C8E50048052A /* VtMaterialLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389411724C8E50048052A /* VtMaterialLoader.cpp */; };
+		334389481724C8E50048052A /* VtMaterialLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389411724C8E50048052A /* VtMaterialLoader.cpp */; };
+		334389491724C8E50048052A /* VtMaterialLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389411724C8E50048052A /* VtMaterialLoader.cpp */; };
+		3343894A1724C8E50048052A /* VtMaterialLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389411724C8E50048052A /* VtMaterialLoader.cpp */; };
+		3343894B1724C8E50048052A /* VtMaterialLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389411724C8E50048052A /* VtMaterialLoader.cpp */; };
+		3343894C1724C8E50048052A /* VtMaterialLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389421724C8E50048052A /* VtMaterialLoader.h */; };
+		3343894D1724C8E50048052A /* VtMaterialLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389421724C8E50048052A /* VtMaterialLoader.h */; };
+		3343894E1724C8E50048052A /* VtMaterialLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389421724C8E50048052A /* VtMaterialLoader.h */; };
+		3343894F1724C8E50048052A /* VtMaterialLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389421724C8E50048052A /* VtMaterialLoader.h */; };
+		334389501724C8E50048052A /* VtMaterialLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389421724C8E50048052A /* VtMaterialLoader.h */; };
+		334389511724C8E50048052A /* VtModelCooker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389431724C8E50048052A /* VtModelCooker.cpp */; };
+		334389561724C8E50048052A /* VtModelCooker.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389441724C8E50048052A /* VtModelCooker.h */; };
+		3343895B1724C8E50048052A /* VtModelParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389451724C8E50048052A /* VtModelParser.cpp */; };
+		3343895C1724C8E50048052A /* VtModelParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389451724C8E50048052A /* VtModelParser.cpp */; };
+		3343895D1724C8E50048052A /* VtModelParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389451724C8E50048052A /* VtModelParser.cpp */; };
+		3343895E1724C8E50048052A /* VtModelParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389451724C8E50048052A /* VtModelParser.cpp */; };
+		3343895F1724C8E50048052A /* VtModelParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389451724C8E50048052A /* VtModelParser.cpp */; };
+		334389601724C8E50048052A /* VtModelParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389461724C8E50048052A /* VtModelParser.h */; };
+		334389611724C8E50048052A /* VtModelParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389461724C8E50048052A /* VtModelParser.h */; };
+		334389621724C8E50048052A /* VtModelParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389461724C8E50048052A /* VtModelParser.h */; };
+		334389631724C8E50048052A /* VtModelParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389461724C8E50048052A /* VtModelParser.h */; };
+		334389641724C8E50048052A /* VtModelParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389461724C8E50048052A /* VtModelParser.h */; };
+		334389681724CB440048052A /* D_HTTP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389661724CB440048052A /* D_HTTP.cpp */; };
+		334389691724CB440048052A /* D_HTTP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389661724CB440048052A /* D_HTTP.cpp */; };
+		3343896A1724CB440048052A /* D_HTTP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389661724CB440048052A /* D_HTTP.cpp */; };
+		3343896B1724CB440048052A /* D_HTTP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389661724CB440048052A /* D_HTTP.cpp */; };
+		3343896C1724CB440048052A /* D_HTTP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389661724CB440048052A /* D_HTTP.cpp */; };
+		3343896D1724CB440048052A /* D_HTTP.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389671724CB440048052A /* D_HTTP.h */; };
+		3343896E1724CB440048052A /* D_HTTP.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389671724CB440048052A /* D_HTTP.h */; };
+		3343896F1724CB440048052A /* D_HTTP.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389671724CB440048052A /* D_HTTP.h */; };
+		334389701724CB440048052A /* D_HTTP.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389671724CB440048052A /* D_HTTP.h */; };
+		334389711724CB440048052A /* D_HTTP.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389671724CB440048052A /* D_HTTP.h */; };
+		334389741724CB4F0048052A /* D_VtModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389721724CB4F0048052A /* D_VtModel.cpp */; };
+		334389751724CB4F0048052A /* D_VtModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389721724CB4F0048052A /* D_VtModel.cpp */; };
+		334389761724CB4F0048052A /* D_VtModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389721724CB4F0048052A /* D_VtModel.cpp */; };
+		334389771724CB4F0048052A /* D_VtModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389721724CB4F0048052A /* D_VtModel.cpp */; };
+		334389781724CB4F0048052A /* D_VtModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389721724CB4F0048052A /* D_VtModel.cpp */; };
+		334389791724CB4F0048052A /* D_VtModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389731724CB4F0048052A /* D_VtModel.h */; };
+		3343897A1724CB4F0048052A /* D_VtModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389731724CB4F0048052A /* D_VtModel.h */; };
+		3343897B1724CB4F0048052A /* D_VtModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389731724CB4F0048052A /* D_VtModel.h */; };
+		3343897C1724CB4F0048052A /* D_VtModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389731724CB4F0048052A /* D_VtModel.h */; };
+		3343897D1724CB4F0048052A /* D_VtModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389731724CB4F0048052A /* D_VtModel.h */; };
+		334389801724CB5E0048052A /* T_VtModelPrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343897E1724CB5E0048052A /* T_VtModelPrecache.cpp */; };
+		334389811724CB5E0048052A /* T_VtModelPrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343897E1724CB5E0048052A /* T_VtModelPrecache.cpp */; };
+		334389821724CB5E0048052A /* T_VtModelPrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343897E1724CB5E0048052A /* T_VtModelPrecache.cpp */; };
+		334389831724CB5E0048052A /* T_VtModelPrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343897E1724CB5E0048052A /* T_VtModelPrecache.cpp */; };
+		334389841724CB5E0048052A /* T_VtModelPrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343897E1724CB5E0048052A /* T_VtModelPrecache.cpp */; };
+		334389851724CB5E0048052A /* T_VtModelPrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 3343897F1724CB5E0048052A /* T_VtModelPrecache.h */; };
+		334389861724CB5E0048052A /* T_VtModelPrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 3343897F1724CB5E0048052A /* T_VtModelPrecache.h */; };
+		334389871724CB5E0048052A /* T_VtModelPrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 3343897F1724CB5E0048052A /* T_VtModelPrecache.h */; };
+		334389881724CB5E0048052A /* T_VtModelPrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 3343897F1724CB5E0048052A /* T_VtModelPrecache.h */; };
+		334389891724CB5E0048052A /* T_VtModelPrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 3343897F1724CB5E0048052A /* T_VtModelPrecache.h */; };
+		3343898C1724CBC00048052A /* HTTP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343898A1724CBC00048052A /* HTTP.cpp */; };
+		3343898D1724CBC00048052A /* HTTP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343898A1724CBC00048052A /* HTTP.cpp */; };
+		3343898E1724CBC00048052A /* HTTP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343898A1724CBC00048052A /* HTTP.cpp */; };
+		3343898F1724CBC00048052A /* HTTP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343898A1724CBC00048052A /* HTTP.cpp */; };
+		334389901724CBC00048052A /* HTTP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343898A1724CBC00048052A /* HTTP.cpp */; };
+		334389911724CBC00048052A /* HTTP.h in Headers */ = {isa = PBXBuildFile; fileRef = 3343898B1724CBC00048052A /* HTTP.h */; };
+		334389921724CBC00048052A /* HTTP.h in Headers */ = {isa = PBXBuildFile; fileRef = 3343898B1724CBC00048052A /* HTTP.h */; };
+		334389931724CBC00048052A /* HTTP.h in Headers */ = {isa = PBXBuildFile; fileRef = 3343898B1724CBC00048052A /* HTTP.h */; };
+		334389941724CBC00048052A /* HTTP.h in Headers */ = {isa = PBXBuildFile; fileRef = 3343898B1724CBC00048052A /* HTTP.h */; };
+		334389951724CBC00048052A /* HTTP.h in Headers */ = {isa = PBXBuildFile; fileRef = 3343898B1724CBC00048052A /* HTTP.h */; };
+		334389981724CBFD0048052A /* EditorVtModelThumb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 334389961724CBFD0048052A /* EditorVtModelThumb.cpp */; };
+		334389991724CBFD0048052A /* EditorVtModelThumb.h in Headers */ = {isa = PBXBuildFile; fileRef = 334389971724CBFD0048052A /* EditorVtModelThumb.h */; };
+		3343899C1724CDA60048052A /* VtMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343899A1724CDA60048052A /* VtMesh.cpp */; };
+		3343899D1724CDA60048052A /* VtMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343899A1724CDA60048052A /* VtMesh.cpp */; };
+		3343899E1724CDA60048052A /* VtMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343899A1724CDA60048052A /* VtMesh.cpp */; };
+		3343899F1724CDA60048052A /* VtMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343899A1724CDA60048052A /* VtMesh.cpp */; };
+		334389A01724CDA60048052A /* VtMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343899A1724CDA60048052A /* VtMesh.cpp */; };
+		334389A11724CDA60048052A /* VtMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 3343899B1724CDA60048052A /* VtMesh.h */; };
+		334389A21724CDA60048052A /* VtMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 3343899B1724CDA60048052A /* VtMesh.h */; };
+		334389A31724CDA60048052A /* VtMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 3343899B1724CDA60048052A /* VtMesh.h */; };
+		334389A41724CDA60048052A /* VtMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 3343899B1724CDA60048052A /* VtMesh.h */; };
+		334389A51724CDA60048052A /* VtMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 3343899B1724CDA60048052A /* VtMesh.h */; };
 		336836D515D43BA800EE9472 /* GameNetworkNull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 336836D415D43BA800EE9472 /* GameNetworkNull.cpp */; };
 		337AE55215BF214F00AD1617 /* Runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8867515B9AD160089BA08 /* Runtime.cpp */; };
 		337AE55315BF214F00AD1617 /* Time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8865A15B9ACFA0089BA08 /* Time.cpp */; };
@@ -3031,6 +3105,24 @@
 		334315EF16914D8E00AABCEE /* ShaderToolUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderToolUtils.cpp; sourceTree = "<group>"; };
 		334315F016914D8E00AABCEE /* ShaderToolUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShaderToolUtils.h; sourceTree = "<group>"; };
 		334315F516914DB200AABCEE /* Common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Common.h; sourceTree = "<group>"; };
+		334389411724C8E50048052A /* VtMaterialLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VtMaterialLoader.cpp; sourceTree = "<group>"; };
+		334389421724C8E50048052A /* VtMaterialLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VtMaterialLoader.h; sourceTree = "<group>"; };
+		334389431724C8E50048052A /* VtModelCooker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VtModelCooker.cpp; sourceTree = "<group>"; };
+		334389441724C8E50048052A /* VtModelCooker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VtModelCooker.h; sourceTree = "<group>"; };
+		334389451724C8E50048052A /* VtModelParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VtModelParser.cpp; sourceTree = "<group>"; };
+		334389461724C8E50048052A /* VtModelParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VtModelParser.h; sourceTree = "<group>"; };
+		334389661724CB440048052A /* D_HTTP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = D_HTTP.cpp; sourceTree = "<group>"; };
+		334389671724CB440048052A /* D_HTTP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = D_HTTP.h; sourceTree = "<group>"; };
+		334389721724CB4F0048052A /* D_VtModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = D_VtModel.cpp; sourceTree = "<group>"; };
+		334389731724CB4F0048052A /* D_VtModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = D_VtModel.h; sourceTree = "<group>"; };
+		3343897E1724CB5E0048052A /* T_VtModelPrecache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = T_VtModelPrecache.cpp; sourceTree = "<group>"; };
+		3343897F1724CB5E0048052A /* T_VtModelPrecache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = T_VtModelPrecache.h; sourceTree = "<group>"; };
+		3343898A1724CBC00048052A /* HTTP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HTTP.cpp; sourceTree = "<group>"; };
+		3343898B1724CBC00048052A /* HTTP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTTP.h; sourceTree = "<group>"; };
+		334389961724CBFD0048052A /* EditorVtModelThumb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorVtModelThumb.cpp; sourceTree = "<group>"; };
+		334389971724CBFD0048052A /* EditorVtModelThumb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorVtModelThumb.h; sourceTree = "<group>"; };
+		3343899A1724CDA60048052A /* VtMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VtMesh.cpp; sourceTree = "<group>"; };
+		3343899B1724CDA60048052A /* VtMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VtMesh.h; sourceTree = "<group>"; };
 		336836D415D43BA800EE9472 /* GameNetworkNull.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameNetworkNull.cpp; sourceTree = "<group>"; };
 		337AE54C15BF20D300AD1617 /* RadianceGoldenDebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceGoldenDebugiOS.xcconfig; path = XCConfig/RadianceGoldenDebugiOS.xcconfig; sourceTree = "<group>"; };
 		337AE54D15BF20D300AD1617 /* RadianceGoldenDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceGoldenDebugOSX.xcconfig; path = XCConfig/RadianceGoldenDebugOSX.xcconfig; sourceTree = "<group>"; };
@@ -4003,6 +4095,8 @@
 		33982DAC16A8840900C2ED49 /* Net */ = {
 			isa = PBXGroup;
 			children = (
+				3343898A1724CBC00048052A /* HTTP.cpp */,
+				3343898B1724CBC00048052A /* HTTP.h */,
 				33982DAD16A8840900C2ED49 /* Socket.cpp */,
 				33982DAE16A8840900C2ED49 /* Socket.h */,
 			);
@@ -4781,6 +4875,12 @@
 				33E8871E15B9B9ED0089BA08 /* TypefaceCooker.h */,
 				33E8871F15B9B9ED0089BA08 /* TypefaceParser.cpp */,
 				33E8872015B9B9ED0089BA08 /* TypefaceParser.h */,
+				334389411724C8E50048052A /* VtMaterialLoader.cpp */,
+				334389421724C8E50048052A /* VtMaterialLoader.h */,
+				334389431724C8E50048052A /* VtModelCooker.cpp */,
+				334389441724C8E50048052A /* VtModelCooker.h */,
+				334389451724C8E50048052A /* VtModelParser.cpp */,
+				334389461724C8E50048052A /* VtModelParser.h */,
 			);
 			name = Assets;
 			path = ../Engine/Assets;
@@ -4886,6 +4986,8 @@
 				33F8F4E116D613C5009646B1 /* Sprites.h */,
 				33E8882715B9BA480089BA08 /* TextModel.cpp */,
 				33E8882815B9BA480089BA08 /* TextModel.h */,
+				3343899A1724CDA60048052A /* VtMesh.cpp */,
+				3343899B1724CDA60048052A /* VtMesh.h */,
 			);
 			name = Renderer;
 			path = ../Engine/Renderer;
@@ -5121,6 +5223,8 @@
 				33E8886415B9BA490089BA08 /* EditorStringTableThumb.h */,
 				33E8886515B9BA490089BA08 /* EditorTextureThumb.cpp */,
 				33E8886615B9BA490089BA08 /* EditorTextureThumb.h */,
+				334389961724CBFD0048052A /* EditorVtModelThumb.cpp */,
+				334389971724CBFD0048052A /* EditorVtModelThumb.h */,
 			);
 			path = ContentBrowser;
 			sourceTree = "<group>";
@@ -5259,6 +5363,8 @@
 				33E888D415B9BA4A0089BA08 /* D_Asset.h */,
 				339772EF16F8F2D90046535B /* D_ConversationTree.cpp */,
 				339772F016F8F2D90046535B /* D_ConversationTree.h */,
+				334389661724CB440048052A /* D_HTTP.cpp */,
+				334389671724CB440048052A /* D_HTTP.h */,
 				33E888D515B9BA4A0089BA08 /* D_Material.cpp */,
 				33E888D615B9BA4A0089BA08 /* D_Material.h */,
 				33E888D715B9BA4A0089BA08 /* D_Mesh.cpp */,
@@ -5275,6 +5381,8 @@
 				339772FC16F8F2DF0046535B /* D_StringTable.h */,
 				33E888DF15B9BA4A0089BA08 /* D_Typeface.cpp */,
 				33E888E015B9BA4A0089BA08 /* D_Typeface.h */,
+				334389721724CB4F0048052A /* D_VtModel.cpp */,
+				334389731724CB4F0048052A /* D_VtModel.h */,
 				33E888E115B9BA4A0089BA08 /* LuaTask.cpp */,
 				33E888E215B9BA4A0089BA08 /* LuaTask.h */,
 				33E888E315B9BA4A0089BA08 /* LuaTask.inl */,
@@ -5301,6 +5409,8 @@
 				33E888F415B9BA4A0089BA08 /* T_Tick.h */,
 				33E888F515B9BA4A0089BA08 /* T_TypefacePrecache.cpp */,
 				33E888F615B9BA4A0089BA08 /* T_TypefacePrecache.h */,
+				3343897E1724CB5E0048052A /* T_VtModelPrecache.cpp */,
+				3343897F1724CB5E0048052A /* T_VtModelPrecache.h */,
 			);
 			path = Lua;
 			sourceTree = "<group>";
@@ -5727,6 +5837,13 @@
 				339772EC16F8F2080046535B /* Occupant.h in Headers */,
 				339772F816F8F2D90046535B /* D_ConversationTree.h in Headers */,
 				3397730416F8F2DF0046535B /* D_StringTable.h in Headers */,
+				3343894E1724C8E50048052A /* VtMaterialLoader.h in Headers */,
+				334389621724C8E50048052A /* VtModelParser.h in Headers */,
+				3343896F1724CB440048052A /* D_HTTP.h in Headers */,
+				3343897B1724CB4F0048052A /* D_VtModel.h in Headers */,
+				334389871724CB5E0048052A /* T_VtModelPrecache.h in Headers */,
+				334389931724CBC00048052A /* HTTP.h in Headers */,
+				334389A31724CDA60048052A /* VtMesh.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6127,6 +6244,13 @@
 				339772ED16F8F2080046535B /* Occupant.h in Headers */,
 				339772F916F8F2D90046535B /* D_ConversationTree.h in Headers */,
 				3397730516F8F2DF0046535B /* D_StringTable.h in Headers */,
+				3343894F1724C8E50048052A /* VtMaterialLoader.h in Headers */,
+				334389631724C8E50048052A /* VtModelParser.h in Headers */,
+				334389701724CB440048052A /* D_HTTP.h in Headers */,
+				3343897C1724CB4F0048052A /* D_VtModel.h in Headers */,
+				334389881724CB5E0048052A /* T_VtModelPrecache.h in Headers */,
+				334389941724CBC00048052A /* HTTP.h in Headers */,
+				334389A41724CDA60048052A /* VtMesh.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6615,6 +6739,15 @@
 				339772EA16F8F2080046535B /* Occupant.h in Headers */,
 				339772F616F8F2D90046535B /* D_ConversationTree.h in Headers */,
 				3397730216F8F2DF0046535B /* D_StringTable.h in Headers */,
+				3343894C1724C8E50048052A /* VtMaterialLoader.h in Headers */,
+				334389561724C8E50048052A /* VtModelCooker.h in Headers */,
+				334389601724C8E50048052A /* VtModelParser.h in Headers */,
+				3343896D1724CB440048052A /* D_HTTP.h in Headers */,
+				334389791724CB4F0048052A /* D_VtModel.h in Headers */,
+				334389851724CB5E0048052A /* T_VtModelPrecache.h in Headers */,
+				334389911724CBC00048052A /* HTTP.h in Headers */,
+				334389991724CBFD0048052A /* EditorVtModelThumb.h in Headers */,
+				334389A11724CDA60048052A /* VtMesh.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7013,6 +7146,13 @@
 				339772EB16F8F2080046535B /* Occupant.h in Headers */,
 				339772F716F8F2D90046535B /* D_ConversationTree.h in Headers */,
 				3397730316F8F2DF0046535B /* D_StringTable.h in Headers */,
+				3343894D1724C8E50048052A /* VtMaterialLoader.h in Headers */,
+				334389611724C8E50048052A /* VtModelParser.h in Headers */,
+				3343896E1724CB440048052A /* D_HTTP.h in Headers */,
+				3343897A1724CB4F0048052A /* D_VtModel.h in Headers */,
+				334389861724CB5E0048052A /* T_VtModelPrecache.h in Headers */,
+				334389921724CBC00048052A /* HTTP.h in Headers */,
+				334389A21724CDA60048052A /* VtMesh.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7413,6 +7553,13 @@
 				339772EE16F8F2080046535B /* Occupant.h in Headers */,
 				339772FA16F8F2D90046535B /* D_ConversationTree.h in Headers */,
 				3397730616F8F2DF0046535B /* D_StringTable.h in Headers */,
+				334389501724C8E50048052A /* VtMaterialLoader.h in Headers */,
+				334389641724C8E50048052A /* VtModelParser.h in Headers */,
+				334389711724CB440048052A /* D_HTTP.h in Headers */,
+				3343897D1724CB4F0048052A /* D_VtModel.h in Headers */,
+				334389891724CB5E0048052A /* T_VtModelPrecache.h in Headers */,
+				334389951724CBC00048052A /* HTTP.h in Headers */,
+				334389A51724CDA60048052A /* VtMesh.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7783,6 +7930,13 @@
 				339772E716F8F2080046535B /* Occupant.cpp in Sources */,
 				339772F316F8F2D90046535B /* D_ConversationTree.cpp in Sources */,
 				339772FF16F8F2DF0046535B /* D_StringTable.cpp in Sources */,
+				334389491724C8E50048052A /* VtMaterialLoader.cpp in Sources */,
+				3343895D1724C8E50048052A /* VtModelParser.cpp in Sources */,
+				3343896A1724CB440048052A /* D_HTTP.cpp in Sources */,
+				334389761724CB4F0048052A /* D_VtModel.cpp in Sources */,
+				334389821724CB5E0048052A /* T_VtModelPrecache.cpp in Sources */,
+				3343898E1724CBC00048052A /* HTTP.cpp in Sources */,
+				3343899E1724CDA60048052A /* VtMesh.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7962,6 +8116,13 @@
 				339772E816F8F2080046535B /* Occupant.cpp in Sources */,
 				339772F416F8F2D90046535B /* D_ConversationTree.cpp in Sources */,
 				3397730016F8F2DF0046535B /* D_StringTable.cpp in Sources */,
+				3343894A1724C8E50048052A /* VtMaterialLoader.cpp in Sources */,
+				3343895E1724C8E50048052A /* VtModelParser.cpp in Sources */,
+				3343896B1724CB440048052A /* D_HTTP.cpp in Sources */,
+				334389771724CB4F0048052A /* D_VtModel.cpp in Sources */,
+				334389831724CB5E0048052A /* T_VtModelPrecache.cpp in Sources */,
+				3343898F1724CBC00048052A /* HTTP.cpp in Sources */,
+				3343899F1724CDA60048052A /* VtMesh.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8234,6 +8395,15 @@
 				339772E516F8F2080046535B /* Occupant.cpp in Sources */,
 				339772F116F8F2D90046535B /* D_ConversationTree.cpp in Sources */,
 				339772FD16F8F2DF0046535B /* D_StringTable.cpp in Sources */,
+				334389471724C8E50048052A /* VtMaterialLoader.cpp in Sources */,
+				334389511724C8E50048052A /* VtModelCooker.cpp in Sources */,
+				3343895B1724C8E50048052A /* VtModelParser.cpp in Sources */,
+				334389681724CB440048052A /* D_HTTP.cpp in Sources */,
+				334389741724CB4F0048052A /* D_VtModel.cpp in Sources */,
+				334389801724CB5E0048052A /* T_VtModelPrecache.cpp in Sources */,
+				3343898C1724CBC00048052A /* HTTP.cpp in Sources */,
+				334389981724CBFD0048052A /* EditorVtModelThumb.cpp in Sources */,
+				3343899C1724CDA60048052A /* VtMesh.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8413,6 +8583,13 @@
 				339772E616F8F2080046535B /* Occupant.cpp in Sources */,
 				339772F216F8F2D90046535B /* D_ConversationTree.cpp in Sources */,
 				339772FE16F8F2DF0046535B /* D_StringTable.cpp in Sources */,
+				334389481724C8E50048052A /* VtMaterialLoader.cpp in Sources */,
+				3343895C1724C8E50048052A /* VtModelParser.cpp in Sources */,
+				334389691724CB440048052A /* D_HTTP.cpp in Sources */,
+				334389751724CB4F0048052A /* D_VtModel.cpp in Sources */,
+				334389811724CB5E0048052A /* T_VtModelPrecache.cpp in Sources */,
+				3343898D1724CBC00048052A /* HTTP.cpp in Sources */,
+				3343899D1724CDA60048052A /* VtMesh.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8593,6 +8770,13 @@
 				339772E916F8F2080046535B /* Occupant.cpp in Sources */,
 				339772F516F8F2D90046535B /* D_ConversationTree.cpp in Sources */,
 				3397730116F8F2DF0046535B /* D_StringTable.cpp in Sources */,
+				3343894B1724C8E50048052A /* VtMaterialLoader.cpp in Sources */,
+				3343895F1724C8E50048052A /* VtModelParser.cpp in Sources */,
+				3343896C1724CB440048052A /* D_HTTP.cpp in Sources */,
+				334389781724CB4F0048052A /* D_VtModel.cpp in Sources */,
+				334389841724CB5E0048052A /* T_VtModelPrecache.cpp in Sources */,
+				334389901724CBC00048052A /* HTTP.cpp in Sources */,
+				334389A01724CDA60048052A /* VtMesh.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
