@@ -55,6 +55,7 @@ m "EditorSkModelThumb"
 m "EditorSoundThumb"
 m "EditorStringTableThumb"
 m "EditorTextureThumb"
+m "EditorVtModelThumb"
 
 BASE=$ROOT/MapEditor
 
