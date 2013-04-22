@@ -7,7 +7,6 @@
     <PostBuildEvent>
       <Command>xcopy "$(QT_PATH)\bin\QtCored4.dll" "$(OutDir)" /D /Y
 xcopy "$(QT_PATH)\bin\QtGuid4.dll" "$(OutDir)" /D /Y
-xcopy "$(QT_PATH)\bin\QtOpenGLd4.dll" "$(OutDir)" /D /Y
 xcopy "$(OPENAL_PATH)\Win32\OpenAL32.dll" "$(OutDir)" /D</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
