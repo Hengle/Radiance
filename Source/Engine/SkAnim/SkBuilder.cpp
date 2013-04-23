@@ -42,7 +42,7 @@ static const float kQuatCompressionBasis[3] = {0.01f, 2.0f, 1.0f};
 // compression = max(compression_floor, compression_basis / (numchildren+1))
 
 static const float kScaleCompressionBasis[2] = {0.1f*0.1f, 0.5f*0.5f}; // units squared
-static const float kTranslationCompressionBasis[2] = {0.5f*0.5f, 1.f*1.f};
+static const float kTranslationCompressionBasis[2] = {0.25f*0.25f, 1.f*1.f};
 
 typedef zone_vector<int, ZToolsT>::type IntVec;
 typedef zone_set<int, ZToolsT>::type IntSet;
