@@ -82,6 +82,13 @@ RADENG_API VtmData::Ref RADENG_CALL CompileVtmData(
 	int trimodel
 );
 
+RADENG_API VtmData::Ref RADENG_CALL CompileVtmData(
+	const char *name,
+	const SceneFile &mesh,
+	const SceneFile &anims,
+	int trimodel
+);
+
 } // tools
 
 #include <Runtime/PopPack.h>

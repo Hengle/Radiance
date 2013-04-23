@@ -1332,12 +1332,13 @@ bool CompileCPUSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 				return false;
 
 			// texcoords
-			for (int i = 0; i < r->numChannels; ++i) {
-				const SkTriModel::Vec2Vec &uvs = m->uvs[i];
-				for (SkTriModel::Vec2Vec::const_iterator it = uvs.begin(); it != uvs.end(); ++it) {
-					const Vec2 &v = *it;
-					for (int k = 0; k < 2; ++k) {
-						if (!os.Write(v[k]))
+			const int kNumTexCoords = (int)m->uvs[0].size();
+
+			for (int i = 0; i < kNumTexCoords; ++i) {
+				for (int k = 0; k < r->numChannels; ++k) {
+					const SkTriModel::Vec2Vec &uvs = m->uvs[k];
+					for (int j = 0; j < 2; ++j) {
+						if (!os.Write(uvs[i][j]))
 							return false;
 					}
 				}
@@ -1530,10 +1531,14 @@ struct VtmModel {
 bool CompileVtmData(
 	const char *name, 
 	const SceneFile &mesh,
-	const SceneFileVec &anims, 
+	const SceneFileVec *animVec, 
+	const SceneFile *animFile,
 	int trimodel, 
 	VtmData &vtm
 ) {
+	if (!animVec && !animFile)
+		return false;
+
 	VtmModel::Ref m(new (ZTools) VtmModel());
 	VtmModel::Vec models;
 
@@ -1541,8 +1546,19 @@ bool CompileVtmData(
 	const SceneFile::TriModel::Ref &r = e->models[trimodel];
 
 	// validate all anim files for identical meshes
-	for (SceneFileVec::const_iterator it = anims.begin(); it != anims.end(); ++it) {
-		const SceneFile::Entity::Ref w = (*it)->worldspawn;
+	if (animVec) {
+		for (SceneFileVec::const_iterator it = animVec->begin(); it != animVec->end(); ++it) {
+			const SceneFile::Entity::Ref w = (*it)->worldspawn;
+			const SceneFile::TriModel::Ref &t = w->models[trimodel];
+			if ((t->verts.size() != r->verts.size()) ||
+				(t->tris.size() != r->tris.size())) {
+				COut(C_Error) << "CompileVtmData: vertex animated model has animation files that do not match its mesh." << std::endl;
+				return false;
+			}
+		}
+	} else {
+		RAD_ASSERT(animFile);
+		const SceneFile::Entity::Ref w = animFile->worldspawn;
 		const SceneFile::TriModel::Ref &t = w->models[trimodel];
 		if ((t->verts.size() != r->verts.size()) ||
 			(t->tris.size() != r->tris.size())) {
@@ -1620,8 +1636,8 @@ bool CompileVtmData(
 			if (!os.Write(name, ska::kDNameLen+1, 0))
 				return false;
 
-			for (int i = 0; i < r->numChannels; ++i) {
-				for (VtmVertVec::const_iterator it = m->verts.begin(); it != m->verts.end(); ++it) {
+			for (VtmVertVec::const_iterator it = m->verts.begin(); it != m->verts.end(); ++it) {
+				for (int i = 0; i < r->numChannels; ++i) {
 					for (int k = 0; k < 2; ++k) {
 						if (!os.Write((*it).st[i][k]))
 							return false;
@@ -1647,12 +1663,33 @@ bool CompileVtmData(
 		vtm.vtmData[0] = zone_realloc(ska::ZSka, vtm.vtmData[0], vtm.vtmSize[0]);
 	}
 
-	typedef std::map<String, SceneFileRef> AnimMap;
+	typedef std::map<String, const SceneFile*> AnimMap;
 	AnimMap animMap;
 	
 	// get animation list
-	for (SceneFileVec::const_iterator it = anims.begin(); it != anims.end(); ++it) {
-		const SceneFile::Entity::Ref w = (*it)->worldspawn;
+	if (animVec) {
+		for (SceneFileVec::const_iterator it = animVec->begin(); it != animVec->end(); ++it) {
+			const SceneFile::Entity::Ref w = (*it)->worldspawn;
+			const SceneFile::TriModel::Ref &t = w->models[trimodel];
+
+			for (SceneFile::AnimMap::const_iterator animIt = t->anims.begin(); animIt != t->anims.end(); ++animIt) {
+			
+				AnimMap::iterator x = animMap.find(animIt->first);
+				if (x != animMap.end()) {
+					COut(C_Error) << "ERROR: animation '" << animIt->first << "' is duplicated in the model source files." << std::endl;
+					return false;
+				}
+
+				const SceneFile::Anim::Ref &anim = animIt->second;
+				if (anim->vertexFrames.empty())
+					continue;
+
+				animMap.insert(AnimMap::value_type(animIt->first, it->get()));
+			}
+		}
+	} else {
+		RAD_ASSERT(animFile);
+		const SceneFile::Entity::Ref w = animFile->worldspawn;
 		const SceneFile::TriModel::Ref &t = w->models[trimodel];
 
 		for (SceneFile::AnimMap::const_iterator animIt = t->anims.begin(); animIt != t->anims.end(); ++animIt) {
@@ -1667,7 +1704,7 @@ bool CompileVtmData(
 			if (anim->vertexFrames.empty())
 				continue;
 
-			animMap.insert(AnimMap::value_type(animIt->first, *it));
+			animMap.insert(AnimMap::value_type(animIt->first, animFile));
 		}
 	}
 
@@ -1728,7 +1765,7 @@ bool CompileVtmData(
 		
 		// write animations
 		for (AnimMap::const_iterator it = animMap.begin(); it != animMap.end(); ++it) {
-			const SceneFileRef &srcFile = it->second;
+			const SceneFile &srcFile = *it->second;
 
 			if (it->first.length > ska::kDNameLen) {
 				COut(C_Error) << "ska::kDNameLen exceeded, contact a programmer to increase." << std::endl;
@@ -1740,7 +1777,7 @@ bool CompileVtmData(
 			if (!os.Write(name, ska::kDNameLen+1, 0))
 				return false;
 
-			const SceneFile::Anim::Ref &srcAnim = srcFile->worldspawn->models[trimodel]->anims[it->first];
+			const SceneFile::Anim::Ref &srcAnim = srcFile.worldspawn->models[trimodel]->anims[it->first];
 			
 			if (!os.Write((U16)srcAnim->frameRate))
 				return false;
@@ -1891,7 +1928,26 @@ RADENG_API VtmData::Ref RADENG_CALL CompileVtmData(
 ) {
 	VtmData::Ref vtm(new (ZTools) VtmData());
 
-	if (!CompileVtmData(name, mesh, anims, trimodel, *vtm))
+	if (!CompileVtmData(name, mesh, &anims, 0, trimodel, *vtm))
+		return VtmData::Ref();
+
+	SizeBuffer memSize[2];
+	FormatSize(memSize[0], vtm->vtmSize[0]);
+	FormatSize(memSize[1], vtm->vtmSize[1]);
+	COut(C_Info) << "CompileVtmData(" << memSize[0] << ", " << memSize[1] << ")" << std::endl;
+
+	return vtm;
+}
+
+RADENG_API VtmData::Ref RADENG_CALL CompileVtmData(
+	const char *name,
+	const SceneFile &mesh,
+	const SceneFile &anims,
+	int trimodel
+) {
+	VtmData::Ref vtm(new (ZTools) VtmData());
+
+	if (!CompileVtmData(name, mesh, 0, &anims, trimodel, *vtm))
 		return VtmData::Ref();
 
 	SizeBuffer memSize[2];

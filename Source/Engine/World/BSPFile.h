@@ -155,7 +155,7 @@ struct BSPVertex {
 struct BSPActor {
 	int flags;
 	int initial;
-	int ska;
+	int ska; // negative number is vtm
 	float pos[3];
 	float mins[3];
 	float maxs[3];
@@ -267,6 +267,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numCinematicTriggers, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numCinematics, U32);
 	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numSkas, U32);
+	RAD_DECLARE_READONLY_PROPERTY(BSPFile, numVtms, U32);
 
 	virtual const char *String(U32 idx) const = 0;
 	virtual const BSPEntity *Entities() const = 0;
@@ -299,6 +300,7 @@ public:
 	virtual const BSPCinematic *Cinematics() const = 0;
 	virtual const ska::DSka &DSka(int idx) const = 0;
 	virtual const ska::DSkm &DSkm(int idx) const = 0;
+	virtual const ska::DVtm &DVtm(int idx) const = 0;
 
 protected:
 
@@ -332,6 +334,7 @@ protected:
 	virtual RAD_DECLARE_GET(numCinematicTriggers, U32) = 0;
 	virtual RAD_DECLARE_GET(numCinematics, U32) = 0;
 	virtual RAD_DECLARE_GET(numSkas, U32) = 0;
+	virtual RAD_DECLARE_GET(numVtms, U32) = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -379,6 +382,7 @@ public:
 	virtual const BSPCinematic *Cinematics() const;
 	virtual const ska::DSka &DSka(int idx) const;
 	virtual const ska::DSkm &DSkm(int idx) const;
+	virtual const ska::DVtm &DVtm(int idx) const;
 
 	virtual U32 NumTexCoords(int channel) const;
 
@@ -414,6 +418,7 @@ private:
 	virtual RAD_DECLARE_GET(numCinematicTriggers, U32);
 	virtual RAD_DECLARE_GET(numCinematics, U32);
 	virtual RAD_DECLARE_GET(numSkas, U32);
+	virtual RAD_DECLARE_GET(numVtms, U32);
 
 	typedef zone_vector<int, ZBSPFileT>::type IntVec;
 	
@@ -450,6 +455,7 @@ private:
 	const BSPCinematic *m_cinematics;
 	ska::DSka *m_skas;
 	ska::DSkm *m_skms;
+	ska::DVtm *m_vtms;
 	U32 m_numStrings;
 	U32 m_numEnts;
 	U32 m_numMats;
@@ -477,6 +483,7 @@ private:
 	U32 m_numActorIndices;
 	U32 m_numActors;
 	U32 m_numSkas;
+	U32 m_numVtms;
 	U32 m_numCameraTMs;
 	U32 m_numCameraTracks;
 	U32 m_numCinematicTriggers;
@@ -524,6 +531,7 @@ public:
 	virtual const BSPCinematic *Cinematics() const;
 	virtual const ska::DSka &DSka(int idx) const;
 	virtual const ska::DSkm &DSkm(int idx) const;
+	virtual const ska::DVtm &DVtm(int idx) const;
 	virtual const BSPActor *Actors() const;
 		
 	void Clear();
@@ -557,6 +565,7 @@ public:
 	void ReserveCinematicTriggers(int num);
 	void ReserveCinematics(int num);
 	void ReserveSkas(int num);
+	void ReserveVtms(int num);
 	void ReserveActors(int num);
 	
 	::String *AddString();
@@ -595,6 +604,8 @@ public:
 		const tools::SkmData::Ref &skmRef
 	);
 
+	int AddVtm(const tools::VtmData::Ref &vtmRef);
+
 	int Write(stream::OutputStream &os);
 
 protected:
@@ -627,6 +638,7 @@ protected:
 	virtual RAD_DECLARE_GET(numCinematicTriggers, U32);
 	virtual RAD_DECLARE_GET(numCinematics, U32);
 	virtual RAD_DECLARE_GET(numSkas, U32);
+	virtual RAD_DECLARE_GET(numVtms, U32);
 	virtual RAD_DECLARE_GET(numActors, U32);
 	virtual RAD_DECLARE_GET(numActorIndices, U32);
 
@@ -656,6 +668,7 @@ protected:
 	typedef zone_vector<BSPActor, ZBSPBuilderT>::type BSPActorVec;
 	typedef zone_vector<tools::SkaData::Ref, ZBSPBuilderT>::type SkaVec;
 	typedef zone_vector<tools::SkmData::Ref, ZBSPBuilderT>::type SkmVec;
+	typedef zone_vector<tools::VtmData::Ref, ZBSPBuilderT>::type VtmVec;
 
 	StringVec m_strings;
 	BSPMaterialVec m_mats;
@@ -688,6 +701,7 @@ protected:
 	BSPActorVec m_actors;
 	SkaVec m_skas;
 	SkmVec m_skms;
+	VtmVec m_vtms;
 };
 
 #endif

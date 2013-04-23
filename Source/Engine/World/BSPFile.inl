@@ -133,6 +133,11 @@ inline const ska::DSkm &BSPFileParser::DSkm(int idx) const {
 	return m_skms[idx];
 }
 
+inline const ska::DVtm &BSPFileParser::DVtm(int idx) const {
+	RAD_ASSERT(idx < (int)m_numVtms);
+	return m_vtms[idx];
+}
+
 inline U32 BSPFileParser::NumTexCoords(int channel) const {
 	RAD_ASSERT(channel < kMaxUVChannels);
 	return m_numTexCoords[channel];
@@ -258,6 +263,10 @@ inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numSkas) {
 	return m_numSkas;
 }
 
+inline U32 BSPFileParser::RAD_IMPLEMENT_GET(numVtms) {
+	return m_numVtms;
+}
+
 #if defined(RAD_OPT_TOOLS)
 
 inline const char *BSPFileBuilder::String(U32 idx) const {
@@ -376,6 +385,10 @@ inline const ska::DSkm &BSPFileBuilder::DSkm(int idx) const {
 	return m_skms[idx]->dskm;
 }
 
+inline const ska::DVtm &BSPFileBuilder::DVtm(int idx) const {
+	return m_vtms[idx]->dvtm;
+}
+
 inline const BSPActor *BSPFileBuilder::Actors() const {
 	return &m_actors[0];
 }
@@ -415,6 +428,7 @@ inline void BSPFileBuilder::Clear() {
 	m_cinematics.clear();
 	m_skas.clear();
 	m_skms.clear();
+	m_vtms.clear();
 	m_actors.clear();
 }
 
@@ -529,6 +543,10 @@ inline void BSPFileBuilder::ReserveCinematics(int num) {
 inline void BSPFileBuilder::ReserveSkas(int num) {
 	m_skas.reserve(m_skas.size()+(size_t)num);
 	m_skms.reserve(m_skms.size()+(size_t)num);
+}
+
+inline void BSPFileBuilder::ReserveVtms(int num) {
+	m_vtms.reserve(m_vtms.size()+(size_t)num);
 }
 
 inline void BSPFileBuilder::ReserveActors(int num) {
@@ -692,6 +710,11 @@ inline int BSPFileBuilder::AddSka(
 	return (int)(m_skas.size()-1);
 }
 
+inline int BSPFileBuilder::AddVtm(const tools::VtmData::Ref &vtmRef) {
+	m_vtms.push_back(vtmRef);
+	return (int)(m_vtms.size()-1);
+}
+
 inline U32 *BSPFileBuilder::AddActorIndex() {
 	m_actorIndices.resize(m_actorIndices.size()+1);
 	return &m_actorIndices.back();
@@ -807,6 +830,10 @@ inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numCinematics) {
 
 inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numSkas) {
 	return (U32)m_skas.size();
+}
+
+inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numVtms) {
+	return (U32)m_vtms.size();
 }
 
 inline U32 BSPFileBuilder::RAD_IMPLEMENT_GET(numActors) {

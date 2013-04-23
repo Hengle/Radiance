@@ -24,8 +24,18 @@ bool CinematicsBuilder::Compile(
 	const SceneFile::Entity::Ref &world = map.worldspawn;
 	for (SceneFile::TriModel::Vec::const_iterator it = world->models.begin(); it != world->models.end(); ++it) {
 		const SceneFile::TriModel::Ref &model = *it;
-		if (!model->cinematic || model->skel < 0)
+		if (!model->cinematic)
 			continue;
+		if (model->anims.empty())
+			continue;
+		if (model->anims.begin()->second->boneFrames.empty() &&
+			model->anims.begin()->second->vertexFrames.empty()) {
+			continue;
+		}
+		if (!model->anims.begin()->second->boneFrames.empty() && (model->skel < 0)) {
+			continue; // missing skeleton.
+		}
+
 		Actor a;
 		a.emitId = -1;
 		a.index = (int)(it-world->models.begin());
@@ -226,32 +236,47 @@ bool CinematicsBuilder::EmitActor(const SceneFile &map, const SkaCompressionMap 
 		bspActor->maxs[i] = actor.bounds.Maxs()[i];
 	}
 
-	// emit skas
-	tools::SkaData::Ref ska = tools::CompileSkaData(
-		"BSPBuilder",
-		map,
-		actor.index,
-		compression
-	);
+	tools::SceneFile::TriModel::Ref m = map.worldspawn->models[actor.index];
 
-	if (!ska)
-		return false;
+	if (!m->anims.begin()->second->boneFrames.empty()) {
 
-	tools::SkmData::Ref skm = tools::CompileSkmData(
-		"BSPBuilder",
-		map,
-		actor.index,
-		ska::kSkinType_CPU,
-		ska->dska
-	);
+		// emit ska
+		tools::SkaData::Ref ska = tools::CompileSkaData(
+			"BSPBuilder",
+			map,
+			actor.index,
+			compression
+		);
 
-	if (!skm)
-		return false;
+		if (!ska)
+			return false;
 
-	bspActor->ska = m_bspFile->AddSka(ska, skm);
+		tools::SkmData::Ref skm = tools::CompileSkmData(
+			"BSPBuilder",
+			map,
+			actor.index,
+			ska::kSkinType_CPU,
+			ska->dska
+		);
 
-	m_skaSize += ska->skaSize;
-	m_skaSize += skm->skmSize[0] + skm->skmSize[1];
+		if (!skm)
+			return false;
+
+		bspActor->ska = m_bspFile->AddSka(ska, skm);
+
+		m_skaSize += ska->skaSize;
+		m_skaSize += skm->skmSize[0] + skm->skmSize[1];
+	} else {
+		RAD_ASSERT(!m->anims.begin()->second->vertexFrames.empty());
+
+		tools::VtmData::Ref vtm = tools::CompileVtmData("BSPBuilder", map, map, actor.index);
+		if (!vtm)
+			return false;
+
+		bspActor->ska = -(m_bspFile->AddVtm(vtm) + 1);
+
+		m_skaSize += vtm->vtmSize[0] + vtm->vtmSize[1];
+	}
 
 	return true;
 }

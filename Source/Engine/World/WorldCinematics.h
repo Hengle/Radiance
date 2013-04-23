@@ -11,6 +11,7 @@
 #include "Occupant.h"
 #include "BSPFile.h"
 #include "../Renderer/SkMesh.h"
+#include "../Renderer/VtMesh.h"
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/Container/ZoneList.h>
 #include <Runtime/Container/ZoneSet.h>
@@ -68,18 +69,19 @@ private:
 
 	int Spawn(const bsp_file::BSPFile::Ref &bsp, const xtime::TimeSlice &time, int flags);
 
-	class SkActorOccupant;
-	typedef boost::shared_ptr<SkActorOccupant> SkActorOccupantRef;
+	class ActorOccupant;
+	typedef boost::shared_ptr<ActorOccupant> ActorOccupantRef;
 
 	class Actor {
 	public:
 		typedef boost::shared_ptr<Actor> Ref;
 		typedef zone_vector<Ref, ZWorldT>::type Vec;
 
-		SkActorOccupantRef occupant;
+		ActorOccupantRef occupant;
 		Vec3 pos[3];
 		BBox bounds[2];
-		r::SkMesh::Ref m;
+		r::SkMesh::Ref skm;
+		r::VtMesh::Ref vtm;
 		int flags;
 		int frame;
 		bool visible;
@@ -126,9 +128,49 @@ private:
 		int m_idx;
 	};
 
-	class SkActorOccupant : public MBatchOccupant {
+	class VtActorBatch : public MBatchDraw {
 	public:
-		SkActorOccupant(const Actor &actor, World &world) : MBatchOccupant(world), m_actor(&actor) {}
+		typedef boost::shared_ptr<VtActorBatch> Ref;
+
+		VtActorBatch(const Actor &actor, int idx, int matId);
+
+		virtual void Bind(r::Shader *shader);
+		virtual void CompileArrayStates(r::Shader &shader);
+		virtual void FlushArrayStates(r::Shader *shader);
+		virtual void Draw();
+
+		virtual RAD_DECLARE_GET(visible, bool) { 
+			return true; 
+		}
+
+		virtual RAD_DECLARE_GET(rgba, const Vec4&) { 
+			return s_rgba; 
+		}
+
+		virtual RAD_DECLARE_GET(scale, const Vec3&) { 
+			return s_scale; 
+		}
+
+		virtual RAD_DECLARE_GET(xform, bool) { 
+			return true; 
+		}
+
+		virtual RAD_DECLARE_GET(bounds, const BBox&) { 
+			return m_actor->bounds[1]; 
+		}
+
+	private:
+
+		static Vec4 s_rgba;
+		static Vec3 s_scale;
+
+		const Actor *m_actor;
+		int m_idx;
+	};
+
+	class ActorOccupant : public MBatchOccupant {
+	public:
+		ActorOccupant(const Actor &actor, World &world) : MBatchOccupant(world), m_actor(&actor) {}
 
 		void AddMBatch(const MBatchDraw::Ref &batch) {
 			m_batches.push_back(batch);

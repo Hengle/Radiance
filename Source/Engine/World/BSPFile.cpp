@@ -15,7 +15,7 @@ namespace bsp_file {
 
 enum  { 
 	kBspTag = RAD_FOURCC('b', 's', 'p', 't'),
-	kBspVersion  = 4
+	kBspVersion  = 5
 };
 
 RAD_ZONE_DEF(RADENG_API, ZBSPFile, "BSPFile", ZWorld);
@@ -52,6 +52,7 @@ m_cinematicTriggers(0),
 m_cinematics(0),
 m_skas(0),
 m_skms(0),
+m_vtms(0),
 m_numStrings(0),
 m_numEnts(0),
 m_numMats(0),
@@ -72,6 +73,8 @@ m_numModelIndices(0),
 m_numIndices(0),
 m_numActorIndices(0),
 m_numActors(0),
+m_numSkas(0),
+m_numVtms(0),
 m_numCameraTMs(0),
 m_numCameraTracks(0),
 m_numCinematicTriggers(0),
@@ -83,6 +86,8 @@ BSPFileParser::~BSPFileParser() {
 		delete [] m_skas;
 	if (m_skms)
 		delete [] m_skms;
+	if (m_vtms)
+		delete [] m_vtms;
 }
 
 #define CHECK_SIZE(_size) if (((bytes+(_size))-reinterpret_cast<const U8*>(data)) > (int)len) return pkg::SR_CorruptFile
@@ -90,7 +95,7 @@ BSPFileParser::~BSPFileParser() {
 int BSPFileParser::Parse(const void *data, AddrSize len) {
 	// Read header
 	const U8 *bytes = reinterpret_cast<const U8*>(data);
-	CHECK_SIZE(sizeof(U32)*33);
+	CHECK_SIZE(sizeof(U32)*34);
 	U32 tag = *reinterpret_cast<const U32*>(bytes);
 	U32 version  = *reinterpret_cast<const U32*>(bytes+sizeof(U32));
 	if (tag != kBspTag || version != kBspVersion)
@@ -191,6 +196,9 @@ int BSPFileParser::Parse(const void *data, AddrSize len) {
 	bytes += sizeof(U32);
 	
 	m_numSkas = *reinterpret_cast<const U32*>(bytes);
+	bytes += sizeof(U32);
+
+	m_numVtms = *reinterpret_cast<const U32*>(bytes);
 	bytes += sizeof(U32);
 
 	// Setup pointers into data.
@@ -309,39 +317,69 @@ int BSPFileParser::Parse(const void *data, AddrSize len) {
 	m_cinematics = reinterpret_cast<const BSPCinematic*>(bytes);
 	bytes += sizeof(BSPCinematic)*m_numCinematics;
 
-	m_skas = new (ZBSPFile) ska::DSka[m_numSkas];
-	m_skms = new (ZBSPFile) ska::DSkm[m_numSkas];
+	if (m_numSkas > 0) {
+		m_skas = new (ZBSPFile) ska::DSka[m_numSkas];
+		m_skms = new (ZBSPFile) ska::DSkm[m_numSkas];
 
-	for (U32 i = 0; i < m_numSkas; ++i) {
-		AddrSize sizes[3];
-		const void *ptr[2];
+		for (U32 i = 0; i < m_numSkas; ++i) {
+			AddrSize sizes[3];
+			const void *ptr[2];
 
-		CHECK_SIZE(sizeof(U32)*3);
-		sizes[0] = (AddrSize)*reinterpret_cast<const U32*>(bytes);
-		bytes += sizeof(U32);
-		sizes[1] = (AddrSize)*reinterpret_cast<const U32*>(bytes);
-		bytes += sizeof(U32);
-		sizes[2] = (AddrSize)*reinterpret_cast<const U32*>(bytes);
-		bytes += sizeof(U32);
+			CHECK_SIZE(sizeof(U32)*3);
+			sizes[0] = (AddrSize)*reinterpret_cast<const U32*>(bytes);
+			bytes += sizeof(U32);
+			sizes[1] = (AddrSize)*reinterpret_cast<const U32*>(bytes);
+			bytes += sizeof(U32);
+			sizes[2] = (AddrSize)*reinterpret_cast<const U32*>(bytes);
+			bytes += sizeof(U32);
 
-		CHECK_SIZE(sizes[0]);
-		int r = m_skas[i].Parse(bytes, sizes[0]);
-		if (r != pkg::SR_Success)
-			return r;
-		bytes += sizes[0];
-		CHECK_SIZE(sizes[1]);
-		ptr[0] = bytes;
-		bytes += sizes[1];
+			CHECK_SIZE(sizes[0]);
+			int r = m_skas[i].Parse(bytes, sizes[0]);
+			if (r != pkg::SR_Success)
+				return r;
+			bytes += sizes[0];
+			CHECK_SIZE(sizes[1]);
+			ptr[0] = bytes;
+			bytes += sizes[1];
 
-		bytes = Align(bytes, SIMDDriver::kAlignment);
+			bytes = Align(bytes, SIMDDriver::kAlignment);
 
-		CHECK_SIZE(sizes[2]);
-		ptr[1] = bytes;
-		bytes += sizes[2];
+			CHECK_SIZE(sizes[2]);
+			ptr[1] = bytes;
+			bytes += sizes[2];
 
-		r = m_skms[i].Parse(ptr, &sizes[1], ska::kSkinType_CPU);
-		if (r != pkg::SR_Success)
-			return r;
+			r = m_skms[i].Parse(ptr, &sizes[1], ska::kSkinType_CPU);
+			if (r != pkg::SR_Success)
+				return r;
+		}
+	}
+
+	if (m_numVtms > 0) {
+		m_vtms = new (ZBSPFile) ska::DVtm[m_numVtms];
+
+		for (U32 i = 0; i < m_numVtms; ++i) {
+			AddrSize sizes[2];
+			const void *ptrs[2];
+
+			CHECK_SIZE(sizeof(U32)*2);
+			sizes[0] = (AddrSize)*reinterpret_cast<const U32*>(bytes);
+			bytes += sizeof(U32);
+			sizes[1] = (AddrSize)*reinterpret_cast<const U32*>(bytes);
+			bytes += sizeof(U32);
+
+			CHECK_SIZE(sizes[0]);
+			ptrs[0] = bytes;
+			bytes += sizes[0];
+
+			bytes = Align(bytes, SIMDDriver::kAlignment);
+			CHECK_SIZE(sizes[1]);
+			ptrs[1] = bytes;
+			bytes += sizes[1];
+
+			int r = m_vtms[i].Parse(ptrs, sizes);
+			if (r != pkg::SR_Success)
+				return r;
+		}
 	}
 
 	m_strings = reinterpret_cast<const char*>(bytes);
@@ -403,6 +441,7 @@ int BSPFileBuilder::Write(stream::OutputStream &os) {
 	os << (U32)m_cinematicTriggers.size();
 	os << (U32)m_cinematics.size();
 	os << (U32)m_skas.size();
+	os << (U32)m_vtms.size();
 
 	// write!
 	stream::SPos len = (stream::SPos)(sizeof(BSPMaterial)*m_mats.size());
@@ -548,6 +587,30 @@ int BSPFileBuilder::Write(stream::OutputStream &os) {
 		}
 
 		if (os.Write(skmd->skmData[1], (stream::SPos)skmd->skmSize[1], 0) != (stream::SPos)skmd->skmSize[1])
+			return pkg::SR_IOError;
+	}
+
+	// vtms
+	for (size_t i = 0; i < m_vtms.size(); ++i) {
+		const tools::VtmData::Ref &vtm = m_vtms[i];
+
+		if (!os.Write((U32)vtm->vtmSize[0]))
+			return pkg::SR_IOError;
+		if (!os.Write((U32)vtm->vtmSize[1]))
+			return pkg::SR_IOError;
+
+		if (os.Write(vtm->vtmData[0], (stream::SPos)vtm->vtmSize[0], 0) != (stream::SPos)vtm->vtmSize[0])
+			return pkg::SR_IOError;
+
+		len = os.OutPos();
+		if (!IsAligned(len, SIMDDriver::kAlignment)) {
+			U8 padd[SIMDDriver::kAlignment-1];
+			len = (SIMDDriver::kAlignment) - (len & (SIMDDriver::kAlignment-1));
+			if (os.Write(padd, len, 0) != len)
+				return false;
+		}
+
+		if (os.Write(vtm->vtmData[1], (stream::SPos)vtm->vtmSize[1], 0) != (stream::SPos)vtm->vtmSize[1])
 			return pkg::SR_IOError;
 	}
 

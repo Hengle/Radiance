@@ -55,38 +55,56 @@ int WorldCinematics::Spawn(
 		actor->bounds[0] = BBox(bspActor->mins[0], bspActor->mins[1], bspActor->mins[2],
 			bspActor->maxs[0], bspActor->maxs[1], bspActor->maxs[2]
 		);
-		actor->pos[2] = Vec3(
-			std::numeric_limits<float>::max(),
-			std::numeric_limits<float>::max(),
-			std::numeric_limits<float>::max()
-		);
+		actor->pos[2] = actor->pos[1];
 
 		actor->bounds[1] = actor->bounds[0];
 		actor->bounds[1].Translate(actor->pos[0]);
 
-		actor->m = r::SkMesh::New(
-			bsp->DSka(bspActor->ska),
-			bsp->DSkm(bspActor->ska),
-			ska::kSkinType_CPU
-		);
-
-		actor->occupant.reset(new SkActorOccupant(*actor, *m_world));
-
-		// create material batches
-		const ska::DSkm &dskm = bsp->DSkm(bspActor->ska);
-		for (int i = 0; i < (int)dskm.meshes.size(); ++i) {
-			int id = App::Get()->engine->sys->packages->ResolveId(
-				dskm.meshes[i].material
+		if (bspActor->ska >= 0) {
+			actor->skm = r::SkMesh::New(
+				bsp->DSka(bspActor->ska),
+				bsp->DSkm(bspActor->ska),
+				ska::kSkinType_CPU
 			);
 
-			if (id < 0)
-				continue;
+			actor->occupant.reset(new ActorOccupant(*actor, *m_world));
 
-			MBatchDraw::Ref batch(new SkActorBatch(*actor, i, id));
-			m_world->draw->AddMaterial(id);
-			actor->occupant->AddMBatch(batch);
+			// create material batches
+			const ska::DSkm &dskm = bsp->DSkm(bspActor->ska);
+			for (int i = 0; i < (int)dskm.meshes.size(); ++i) {
+				int id = App::Get()->engine->sys->packages->ResolveId(
+					dskm.meshes[i].material
+				);
+
+				if (id < 0)
+					continue;
+
+				MBatchDraw::Ref batch(new SkActorBatch(*actor, i, id));
+				m_world->draw->AddMaterial(id);
+				actor->occupant->AddMBatch(batch);
+			}
+		} else {
+			actor->vtm = r::VtMesh::New(bsp->DVtm(-(bspActor->ska+1)));
+
+			actor->occupant.reset(new ActorOccupant(*actor, *m_world));
+
+			// create material batches
+			const ska::DVtm &vtm = bsp->DVtm(-(bspActor->ska+1));
+			for (int i = 0; i < (int)vtm.meshes.size(); ++i) {
+				int id = App::Get()->engine->sys->packages->ResolveId(
+					vtm.meshes[i].material
+				);
+
+				if (id < 0)
+					continue;
+
+				MBatchDraw::Ref batch(new VtActorBatch(*actor, i, id));
+				m_world->draw->AddMaterial(id);
+				actor->occupant->AddMBatch(batch);
+			}
 		}
 
+		actor->occupant->Link();
 		m_actors.push_back(actor);
 		++m_spawnOfs;
 	}
@@ -123,17 +141,29 @@ void WorldCinematics::Tick(int frame, float dt) {
 			for (IntSet::iterator it2 = c.actors.begin(); it2 != c.actors.end();) {
 				const Actor::Ref &actor = m_actors[*it2];
 
-				RAD_ASSERT(actor->m);
-				actor->m->ska->Tick(
-					dt,
-					0.f,
-					true,
-					true,
-					Mat4::Identity
-				);
+				ska::AnimationSource::Ref source;
 
-				ska::AnimationSource::Ref source = 
-					boost::static_pointer_cast<ska::AnimationSource>(actor->m->ska->root.get());
+				if (actor->skm) {
+					actor->skm->ska->Tick(
+						dt,
+						0.f,
+						true,
+						true,
+						Mat4::Identity
+					);
+
+					source = boost::static_pointer_cast<ska::AnimationSource>(actor->skm->ska->root.get());
+				} else {
+					RAD_ASSERT(actor->vtm);
+
+					actor->vtm->vtm->Tick(
+						dt,
+						true,
+						true
+					);
+
+					source = boost::static_pointer_cast<ska::AnimationSource>(actor->vtm->vtm->root.get());
+				}
 
 				bool remove = false;
 
@@ -143,7 +173,11 @@ void WorldCinematics::Tick(int frame, float dt) {
 #endif
 					if (actor->flags&kHideWhenDone) {
 						actor->visible = false;
-						actor->m->ska->root = ska::Controller::Ref();
+						if (actor->skm) {
+							actor->skm->ska->root = ska::Controller::Ref();
+						} else {
+							actor->vtm->vtm->root = ska::Controller::Ref();
+						}
 					}
 
 					remove = true;
@@ -156,14 +190,16 @@ void WorldCinematics::Tick(int frame, float dt) {
 					it2 = next;
 				} else {
 
-					const ska::BoneTM *motion = actor->m->ska->deltaMotion;
-					actor->pos[1] = actor->pos[0] + motion->t;
-					actor->bounds[1] = actor->bounds[0];
-					actor->bounds[1].Translate(actor->pos[1]);
+					if (actor->skm) {
+						const ska::BoneTM *motion = actor->skm->ska->deltaMotion;
+						actor->pos[1] = actor->pos[0] + motion->t;
+						actor->bounds[1] = actor->bounds[0];
+						actor->bounds[1].Translate(actor->pos[1]);
 
-					if (actor->pos[2] != actor->pos[1]) {
-						actor->occupant->Link();
-						actor->pos[2] = actor->pos[1];
+						if (actor->pos[2] != actor->pos[1]) {
+							actor->occupant->Link();
+							actor->pos[2] = actor->pos[1];
+						}
 					}
 
 					if (!actor->loop)
@@ -223,53 +259,92 @@ void WorldCinematics::Tick(int frame, float dt) {
 						}
 
 						// play cinematic animation.
-						ska::Animation::Map::const_iterator animIt = actor->m->ska->anims->find(c.name);
+						if (actor->skm) {
+							ska::Animation::Map::const_iterator animIt = actor->skm->ska->anims->find(c.name);
 
-						if (animIt != actor->m->ska->anims->end()) {
-							actor->visible = true;
-							actor->loop = loop;
-							actor->frame = c.trigger->frame;
-							c.actors.insert(actorIdx);
+							if (animIt != actor->skm->ska->anims->end()) {
+								actor->visible = true;
+								actor->loop = loop;
+								actor->frame = c.trigger->frame;
+								c.actors.insert(actorIdx);
 
-							ska::AnimationSource::Ref source = ska::AnimationSource::New(
-								*(animIt->second),
-								0.f,
-								0.f,
-								1.f,
-								loop ? 0 : 1,
-								ska::AnimState::kMoveType_None,
-								*actor->m->ska.get(),
-								ska::Notify::Ref(new (ZWorld) SkaNotify(*this, c))
-							);
+								ska::AnimationSource::Ref source = ska::AnimationSource::New(
+									*(animIt->second),
+									0.f,
+									0.f,
+									1.f,
+									loop ? 0 : 1,
+									ska::AnimState::kMoveType_None,
+									*actor->skm->ska.get(),
+									ska::Notify::Ref(new (ZWorld) SkaNotify(*this, c))
+								);
 
-							actor->m->ska->root = boost::static_pointer_cast<ska::Controller>(source);
-							actor->m->ska->Tick( // advance delta
-								tickDelta,
-								0.f,
-								true,
-								true,
-								Mat4::Identity
-							);
+								actor->skm->ska->root = boost::static_pointer_cast<ska::Controller>(source);
+								actor->skm->ska->Tick( // advance delta
+									tickDelta,
+									0.f,
+									true,
+									true,
+									Mat4::Identity
+								);
 
-							const ska::BoneTM *motion = actor->m->ska->deltaMotion;
-							actor->pos[1] = actor->pos[0] + motion->t;
-							actor->bounds[1] = actor->bounds[0];
-							actor->bounds[1].Translate(actor->pos[1]);
+								const ska::BoneTM *motion = actor->skm->ska->deltaMotion;
+								actor->pos[1] = actor->pos[0] + motion->t;
+								actor->bounds[1] = actor->bounds[0];
+								actor->bounds[1].Translate(actor->pos[1]);
 
-							if (actor->pos[2] != actor->pos[1]) {
-								actor->occupant->Link();
-								actor->pos[2] = actor->pos[1];
+								if (actor->pos[2] != actor->pos[1]) {
+									actor->occupant->Link();
+									actor->pos[2] = actor->pos[1];
+								}
+
+								if (!actor->loop)
+									++numActive;
+
+	#if !defined(RAD_TARGET_GOLDEN)
+								if (actor->loop)
+									COut(C_Debug) << "Cinematics(" << c.name << ") looping actor(" << actorIdx << ") triggered." << std::endl;
+								else
+									COut(C_Debug) << "Cinematics(" << c.name << ") actor(" << actorIdx << ") triggered." << std::endl;
+	#endif
 							}
+						} else {
+							RAD_ASSERT(actor->vtm);
+								ska::Animation::Map::const_iterator animIt = actor->vtm->vtm->anims->find(c.name);
 
-							if (!actor->loop)
-								++numActive;
+							if (animIt != actor->vtm->vtm->anims->end()) {
+								actor->visible = true;
+								actor->loop = loop;
+								actor->frame = c.trigger->frame;
+								c.actors.insert(actorIdx);
 
-#if !defined(RAD_TARGET_GOLDEN)
-							if (actor->loop)
-								COut(C_Debug) << "Cinematics(" << c.name << ") looping actor(" << actorIdx << ") triggered." << std::endl;
-							else
-								COut(C_Debug) << "Cinematics(" << c.name << ") actor(" << actorIdx << ") triggered." << std::endl;
-#endif
+								ska::AnimationSource::Ref source = ska::AnimationSource::New(
+									*(animIt->second),
+									0.f,
+									0.f,
+									1.f,
+									loop ? 0 : 1,
+									*actor->vtm->vtm.get(),
+									ska::Notify::Ref(new (ZWorld) SkaNotify(*this, c))
+								);
+
+								actor->vtm->vtm->root = boost::static_pointer_cast<ska::Controller>(source);
+								actor->vtm->vtm->Tick( // advance delta
+									tickDelta,
+									true,
+									true
+								);
+
+								if (!actor->loop)
+									++numActive;
+
+	#if !defined(RAD_TARGET_GOLDEN)
+								if (actor->loop)
+									COut(C_Debug) << "Cinematics(" << c.name << ") looping actor(" << actorIdx << ") triggered." << std::endl;
+								else
+									COut(C_Debug) << "Cinematics(" << c.name << ") actor(" << actorIdx << ") triggered." << std::endl;
+	#endif
+							}
 						}
 					}
 				}
@@ -335,7 +410,13 @@ void WorldCinematics::Tick(int frame, float dt) {
 						if (actor->flags&kHideWhenDone) {
 							actor->visible = false;
 							actor->frame = -1;
-							actor->m->ska->root = ska::Controller::Ref();
+
+							if (actor->skm) {
+								actor->skm->ska->root = ska::Controller::Ref();
+							} else {
+								RAD_ASSERT(actor->vtm);
+								actor->vtm->vtm->root = ska::Controller::Ref();
+							}
 #if !defined(RAD_TARGET_GOLDEN)
 							COut(C_Debug) << "Cinematics(" << c.name << ") actor(" << *it2 << ") done." << std::endl;
 #endif
@@ -436,7 +517,13 @@ void WorldCinematics::StopCinematic(const char *name, bool resetActors) {
 				a->pos[2] = a->pos[1];
 				
 				a->frame = -1;
-				a->m->ska->root = ska::Controller::Ref();
+
+				if (a->skm) {
+					a->skm->ska->root = ska::Controller::Ref();
+				} else {
+					RAD_ASSERT(a->vtm);
+					a->vtm->vtm->root = ska::Controller::Ref();
+				}
 			}
 #if !defined(RAD_TARGET_GOLDEN)
 			COut(C_Debug) << "Cinematics(" << c.name << ") actor(" << *it2 << ") done." << std::endl;
@@ -485,17 +572,29 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time) {
 			for (IntSet::iterator it = c->actors.begin(); it != c->actors.end();) {
 				const Actor::Ref &actor = m_actors[*it];
 
-				RAD_ASSERT(actor->m);
-				actor->m->ska->Tick(
-					timeDelta,
-					0.f,
-					true,
-					false, // don't emit any events
-					Mat4::Identity
-				);
+				ska::AnimationSource::Ref source;
 
-				ska::AnimationSource::Ref source = 
-					boost::static_pointer_cast<ska::AnimationSource>(actor->m->ska->root.get());
+				if (actor->skm) {
+					actor->skm->ska->Tick(
+						timeDelta,
+						0.f,
+						true,
+						false, // don't emit any events
+						Mat4::Identity
+					);
+
+					source = boost::static_pointer_cast<ska::AnimationSource>(actor->skm->ska->root.get());
+				} else {
+					RAD_ASSERT(actor->vtm);
+					actor->vtm->vtm->Tick(
+						timeDelta,
+						true,
+						false
+					);
+
+					source = boost::static_pointer_cast<ska::AnimationSource>(actor->vtm->vtm->root.get());
+				}
+				
 
 				bool remove = false;
 
@@ -505,7 +604,12 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time) {
 #endif
 					if (actor->flags&kHideWhenDone) {
 						actor->visible = false;
-						actor->m->ska->root = ska::Controller::Ref();
+						if (actor->skm) {
+							actor->skm->ska->root = ska::Controller::Ref();
+						} else {
+							RAD_ASSERT(actor->vtm);
+							actor->vtm->vtm->root = ska::Controller::Ref();
+						}
 					}
 
 					remove = true;
@@ -538,7 +642,13 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time) {
 #endif
 			actor->frame = -1;
 			actor->visible = (actor->flags&kHideUntilRef) ? false : true;
-			actor->m->ska->root = ska::Controller::Ref();
+
+			if (actor->skm) {
+				actor->skm->ska->root = ska::Controller::Ref();
+			} else {
+				RAD_ASSERT(actor->vtm);
+				actor->vtm->vtm->root = ska::Controller::Ref();
+			}
 
 			IntSet::iterator next = it; ++next;
 			c->actors.erase(it);
@@ -594,56 +704,100 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time) {
 
 			if (actor->frame == -1) {
 				// play cinematic animation.
-				ska::Animation::Map::const_iterator animIt = actor->m->ska->anims->find(c->name);
+				if (actor->skm) {
+					ska::Animation::Map::const_iterator animIt = actor->skm->ska->anims->find(c->name);
 
-				if (animIt != actor->m->ska->anims->end()) {
-					// only trigger this animation if it won't be complete after it's played or
-					// the actor is not hidden when done.
-					if (loop || (animIt->second->length >= tickDelta) || !(actor->flags&kHideWhenDone)) {
-						actor->loop = loop;
-						actor->visible = true;
-						actor->frame = c->trigger->frame;
-						c->actors.insert(actorIdx);
+					if (animIt != actor->skm->ska->anims->end()) {
+						// only trigger this animation if it won't be complete after it's played or
+						// the actor is not hidden when done.
+						if (loop || (animIt->second->length >= tickDelta) || !(actor->flags&kHideWhenDone)) {
+							actor->loop = loop;
+							actor->visible = true;
+							actor->frame = c->trigger->frame;
+							c->actors.insert(actorIdx);
 
-						ska::AnimationSource::Ref source = ska::AnimationSource::New(
-							*(animIt->second),
-							0.f,
-							0.f,
-							1.f,
-							loop ? 0 : 1,
-							ska::AnimState::kMoveType_None,
-							*actor->m->ska.get(),
-							ska::Notify::Ref(new (ZWorld) SkaNotify(*this, *c))
-						);
+							ska::AnimationSource::Ref source = ska::AnimationSource::New(
+								*(animIt->second),
+								0.f,
+								0.f,
+								1.f,
+								loop ? 0 : 1,
+								ska::AnimState::kMoveType_None,
+								*actor->skm->ska.get(),
+								ska::Notify::Ref(new (ZWorld) SkaNotify(*this, *c))
+							);
 
-						actor->m->ska->root = boost::static_pointer_cast<ska::Controller>(source);
-						actor->m->ska->Tick( // advance delta
-							tickDelta,
-							0.f,
-							true,
-							false, // no animation events
-							Mat4::Identity
-						);
+							actor->skm->ska->root = boost::static_pointer_cast<ska::Controller>(source);
+							actor->skm->ska->Tick( // advance delta
+								tickDelta,
+								0.f,
+								true,
+								false, // no animation events
+								Mat4::Identity
+							);
 
-						const ska::BoneTM *motion = actor->m->ska->deltaMotion;
-						actor->pos[1] = actor->pos[0] + motion->t;
-						actor->bounds[1] = actor->bounds[0];
-						actor->bounds[1].Translate(actor->pos[1]);
+							const ska::BoneTM *motion = actor->skm->ska->deltaMotion;
+							actor->pos[1] = actor->pos[0] + motion->t;
+							actor->bounds[1] = actor->bounds[0];
+							actor->bounds[1].Translate(actor->pos[1]);
 
-						if (actor->pos[2] != actor->pos[1]) {
-							actor->occupant->Link();
-							actor->pos[2] = actor->pos[1];
-						}
+							if (actor->pos[2] != actor->pos[1]) {
+								actor->occupant->Link();
+								actor->pos[2] = actor->pos[1];
+							}
 
 #if !defined(RAD_TARGET_GOLDEN)
-					COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << actorIdx << ") triggered." << std::endl;
+						COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << actorIdx << ") triggered." << std::endl;
 #endif
+						}
+					}
+				} else {
+					RAD_ASSERT(actor->vtm);
+
+					
+					ska::Animation::Map::const_iterator animIt = actor->vtm->vtm->anims->find(c->name);
+
+					if (animIt != actor->vtm->vtm->anims->end()) {
+						// only trigger this animation if it won't be complete after it's played or
+						// the actor is not hidden when done.
+						if (loop || (animIt->second->length >= tickDelta) || !(actor->flags&kHideWhenDone)) {
+							actor->loop = loop;
+							actor->visible = true;
+							actor->frame = c->trigger->frame;
+							c->actors.insert(actorIdx);
+
+							ska::AnimationSource::Ref source = ska::AnimationSource::New(
+								*(animIt->second),
+								0.f,
+								0.f,
+								1.f,
+								loop ? 0 : 1,
+								*actor->vtm->vtm.get(),
+								ska::Notify::Ref(new (ZWorld) SkaNotify(*this, *c))
+							);
+
+							actor->vtm->vtm->root = boost::static_pointer_cast<ska::Controller>(source);
+							actor->vtm->vtm->Tick( // advance delta
+								tickDelta,
+								true,
+								false // no animation events
+							);
+
+#if !defined(RAD_TARGET_GOLDEN)
+						COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << actorIdx << ") triggered." << std::endl;
+#endif
+						}
 					}
 				}
 			} else {
-				RAD_ASSERT(actor->m);
-				ska::AnimationSource::Ref source = 
-					boost::static_pointer_cast<ska::AnimationSource>(actor->m->ska->root.get());
+				ska::AnimationSource::Ref source;
+				
+				if (actor->skm) {
+					source = boost::static_pointer_cast<ska::AnimationSource>(actor->skm->ska->root.get());
+				} else {
+					RAD_ASSERT(actor->vtm);
+					source = boost::static_pointer_cast<ska::AnimationSource>(actor->vtm->vtm->root.get());
+				}
 
 				if (source) {
 #if !defined(RAD_TARGET_GOLDEN)
@@ -804,27 +958,52 @@ void WorldCinematics::SkaNotify::OnTag(const ska::AnimTagEventData &data) {
 
 Vec4 WorldCinematics::SkActorBatch::s_rgba(1, 1, 1, 1);
 Vec3 WorldCinematics::SkActorBatch::s_scale(1, 1, 1);
-\
+
 WorldCinematics::SkActorBatch::SkActorBatch(const Actor &actor, int idx, int matId) :
 MBatchDraw(matId), m_idx(idx), m_actor(&actor) {
 }
 
 void WorldCinematics::SkActorBatch::Bind(r::Shader *shader) {
-	m_actor->m->Skin(m_idx);
-	r::Mesh &m = m_actor->m->Mesh(m_idx);
+	m_actor->skm->Skin(m_idx);
+	r::Mesh &m = m_actor->skm->Mesh(m_idx);
 	m.BindAll(shader);
 }
 
 void WorldCinematics::SkActorBatch::CompileArrayStates(r::Shader &shader) {
-	m_actor->m->Mesh(m_idx).CompileArrayStates(shader);
+	m_actor->skm->Mesh(m_idx).CompileArrayStates(shader);
 }
 
 void WorldCinematics::SkActorBatch::FlushArrayStates(r::Shader *shader) {
-	m_actor->m->Mesh(m_idx).FlushArrayStates(shader);
+	m_actor->skm->Mesh(m_idx).FlushArrayStates(shader);
 }
 
 void WorldCinematics::SkActorBatch::Draw() {
-	m_actor->m->Mesh(m_idx).Draw();
+	m_actor->skm->Mesh(m_idx).Draw();
+}
+
+Vec4 WorldCinematics::VtActorBatch::s_rgba(1, 1, 1, 1);
+Vec3 WorldCinematics::VtActorBatch::s_scale(1, 1, 1);
+
+WorldCinematics::VtActorBatch::VtActorBatch(const Actor &actor, int idx, int matId) :
+MBatchDraw(matId), m_idx(idx), m_actor(&actor) {
+}
+
+void WorldCinematics::VtActorBatch::Bind(r::Shader *shader) {
+	m_actor->vtm->Skin(m_idx);
+	r::Mesh &m = m_actor->vtm->Mesh(m_idx);
+	m.BindAll(shader);
+}
+
+void WorldCinematics::VtActorBatch::CompileArrayStates(r::Shader &shader) {
+	m_actor->vtm->Mesh(m_idx).CompileArrayStates(shader);
+}
+
+void WorldCinematics::VtActorBatch::FlushArrayStates(r::Shader *shader) {
+	m_actor->vtm->Mesh(m_idx).FlushArrayStates(shader);
+}
+
+void WorldCinematics::VtActorBatch::Draw() {
+	m_actor->vtm->Mesh(m_idx).Draw();
 }
 
 } // world
