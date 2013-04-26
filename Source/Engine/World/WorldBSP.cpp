@@ -6,6 +6,7 @@
 #include RADPCH
 #include "World.h"
 #include "Occupant.h"
+#include "Light.h"
 #include "../MathUtils.h"
 #include <algorithm>
 
@@ -19,23 +20,84 @@ void World::SetAreaportalState(int areaportalNum, bool open, bool relinkOccupant
 	if (!relinkOccupants)
 		return;
 
-	EntityPtrSet occupants;
+	UpdateAreaVis(-1);
+
+	EntityPtrSet ents;
+	MBatchOccupantPtrSet occupants;
+	LightPtrSet lights;
 
 	for (dBSPLeaf::Vec::const_iterator it = m_leafs.begin(); it != m_leafs.end(); ++it) {
 		const dBSPLeaf &leaf = *it;
 
-		for (EntityPtrSet::iterator it2 = leaf.entities.begin(); it2 != leaf.entities.end(); ++it2) {
-			Entity *entity = *it2;
+		for (EntityPtrSet::iterator it = leaf.entities.begin(); it != leaf.entities.end(); ++it) {
+			Entity *entity = *it;
 			RAD_ASSERT(entity);
 
 			if (leaf.area != entity->m_leaf->area) // foreign occupant?
-				occupants.insert(entity);
+				ents.insert(entity);
+		}
+
+		for (MBatchOccupantPtrSet::iterator it = leaf.occupants.begin(); it != leaf.occupants.end(); ++it) {
+			MBatchOccupant *occupant = *it;
+			if (leaf.area != occupant->m_leaf->area)
+				occupants.insert(occupant);
+		}
+
+		for (LightPtrSet::iterator it = leaf.lights.begin(); it != leaf.lights.end(); ++it) {
+			Light *light = *it;
+			if (leaf.area != light->m_leaf->area)
+				lights.insert(light);
 		}
 	}
 
-	for (EntityPtrSet::const_iterator it = occupants.begin(); it != occupants.end(); ++it) {
-		Entity *entity = *it;
-		entity->Link();
+	for (EntityPtrSet::const_iterator it = ents.begin(); it != ents.end(); ++it) {
+		(*it)->Link();
+	}
+
+	for (MBatchOccupantPtrSet::iterator it = occupants.begin(); it != occupants.end(); ++it) {
+		(*it)->Link();
+	}
+
+	for (LightPtrSet::const_iterator it = lights.begin(); it != lights.end(); ++it) {
+		(*it)->Link();
+	}
+}
+
+void World::UpdateAreaVis(int area) {
+	AreaBits visited;
+
+	if (area >= 0) {
+		m_areaVis[area].reset();
+		UpdateAreaVis(area, m_areaVis[area], visited);
+		return;
+	}
+
+	for (int i = 0; i < (int)m_bsp->numAreas; ++i) {
+		visited.reset();
+		m_areaVis[i].reset();
+		UpdateAreaVis(i, m_areaVis[i], visited);
+	}
+}
+
+void World::UpdateAreaVis(int area, AreaBits &vis, AreaBits &visited) {
+	vis.set(area);
+	visited.set(area);
+
+	const bsp_file::BSPArea *bspArea = m_bsp->Areas() + area;
+
+	for (int i = 0; i < (int)bspArea->numPortals; ++i) {
+		const int kPortalIndex = (int)*(m_bsp->AreaportalIndices() + bspArea->firstPortal + i);
+
+		if (!m_areaportals[kPortalIndex].open)
+			continue;
+
+		const bsp_file::BSPAreaportal *portal = m_bsp->Areaportals() + kPortalIndex;
+		const int kOtherSide = portal->areas[0] == area;
+		const int kOtherArea = portal->areas[kOtherSide];
+
+		if (!visited.test(kOtherArea)) {
+			UpdateAreaVis(kOtherArea, vis, visited);
+		}
 	}
 }
 
@@ -163,59 +225,62 @@ Entity::Ref World::FirstBBoxTouching(
 	return touching;
 }
 
-void World::LinkEntity(Entity *entity, const BBox &bounds) {
-	UnlinkEntity(entity);
+void World::LinkEntity(Entity &entity, const BBox &bounds) {
+	m_draw->InvalidateInteractions(entity);
+	InternalUnlinkEntity(entity);
 
-	if (entity->ps->otype == kOccupantType_None)
+	if (entity.ps->otype == kOccupantType_None)
 		return;
 
-	entity->m_leaf = LeafForPoint(bounds.Origin());
-	if (!entity->m_leaf)
+	entity.m_leaf = LeafForPoint(bounds.Origin());
+	if (!entity.m_leaf)
 		return;
 
 	AreaBits visible;
 	
-	if (entity->m_leaf->area > -1) {
-		visible.set(entity->m_leaf->area);
+	if (entity.m_leaf->area > -1) {
+		visible.set(entity.m_leaf->area);
 
-		if (entity->ps->otype == kOccupantType_Volume) {
+		if (entity.ps->otype == kOccupantType_Volume) {
 			StackWindingStackVec bbox;
 			BoundWindings(bounds, bbox);
-			ClipOccupantVolume(&entity->ps->pos, &bbox, bounds, 0, entity->m_leaf->area, -1, visible);
+			ClipOccupantVolume(&entity.ps->pos, &bbox, bounds, 0, entity.m_leaf->area, -1, visible);
 		} else {
-			RAD_ASSERT(entity->ps->otype == kOccupantType_BBox);
-			ClipOccupantVolume(0, 0, bounds, 0, entity->m_leaf->area, -1, visible);
+			RAD_ASSERT(entity.ps->otype == kOccupantType_BBox);
+			ClipOccupantVolume(0, 0, bounds, 0, entity.m_leaf->area, -1, visible);
 		}
 	}
 
 	LinkEntityParms constArgs(entity, bounds, visible);
 
-	entity->m_bspLeafs.reserve(8);
+	entity.m_bspLeafs.reserve(8);
 	if (m_nodes.empty()) {
 		LinkEntity(constArgs, -1);
 	} else {
 		LinkEntity(constArgs, 0);
 	}
-
-	m_draw->LinkEntity(entity, bounds);
 }
 
-void World::UnlinkEntity(Entity *entity) {
+void World::UnlinkEntity(Entity &entity) {
 	m_draw->UnlinkEntity(entity);
+	InternalUnlinkEntity(entity);
+}
 
-	for (dBSPLeaf::PtrVec::const_iterator it = entity->m_bspLeafs.begin(); it != entity->m_bspLeafs.end(); ++it) {
+void World::InternalUnlinkEntity(Entity &entity) {
+	
+	for (dBSPLeaf::PtrVec::const_iterator it = entity.m_bspLeafs.begin(); it != entity.m_bspLeafs.end(); ++it) {
 		dBSPLeaf *leaf = *it;
-		leaf->entities.erase(entity);
+		leaf->entities.erase(&entity);
 	}
 
-	for (IntSet::const_iterator it = entity->m_areas.begin(); it != entity->m_areas.end(); ++it) {
+	for (IntSet::const_iterator it = entity.m_areas.begin(); it != entity.m_areas.end(); ++it) {
 		dBSPArea &area = m_areas[*it];
-		area.entities.erase(entity);
+		area.entities.erase(&entity);
 	}
 
-	entity->m_bspLeafs.clear();
-	entity->m_areas.clear();
-	entity->m_leaf = 0;
+	entity.m_bspLeafs.clear();
+	entity.m_areas.clear();
+	entity.m_leaf = 0;
 }
 
 void World::LinkEntity(const LinkEntityParms &constArgs, int nodeNum) {
@@ -225,11 +290,18 @@ void World::LinkEntity(const LinkEntityParms &constArgs, int nodeNum) {
 		dBSPLeaf &leaf = m_leafs[nodeNum];
 
 		if ((leaf.area > -1) && constArgs.visible.test(leaf.area)) {
-			leaf.entities.insert(constArgs.entity);
-			constArgs.entity->m_bspLeafs.push_back(&leaf);
-			constArgs.entity->m_areas.insert(leaf.area);
-			m_areas[leaf.area].entities.insert(constArgs.entity);
-			m_draw->LinkEntity(constArgs.entity, constArgs.bounds, nodeNum);
+			leaf.entities.insert(&constArgs.entity);
+			constArgs.entity.m_bspLeafs.push_back(&leaf);
+			constArgs.entity.m_areas.insert(leaf.area);
+			dBSPArea &area = m_areas[leaf.area];
+			area.entities.insert(&constArgs.entity);
+			m_draw->LinkEntity(
+				constArgs.entity, 
+				constArgs.bounds, 
+				nodeNum,
+				leaf,
+				area
+			);
 		}
 
 		return;
@@ -248,48 +320,51 @@ void World::LinkEntity(const LinkEntityParms &constArgs, int nodeNum) {
 		LinkEntity(constArgs, node.children[1]);
 }
 
-void World::LinkOccupant(MBatchOccupant *occupant, const BBox &bounds) {
-	UnlinkOccupant(occupant);
-
-	occupant->m_leaf = LeafForPoint(bounds.Origin());
-	if (!occupant->m_leaf)
+void World::LinkOccupant(MBatchOccupant &occupant, const BBox &bounds) {
+	m_draw->InvalidateInteractions(occupant);
+	InternalUnlinkOccupant(occupant);
+	
+	occupant.m_leaf = LeafForPoint(bounds.Origin());
+	if (!occupant.m_leaf)
 		return;
 
 	AreaBits visible;
 	
-	if (occupant->m_leaf->area > -1) {
-		visible.set(occupant->m_leaf->area);
-		ClipOccupantVolume(0, 0, bounds, 0, occupant->m_leaf->area, -1, visible);
+	if (occupant.m_leaf->area > -1) {
+		visible.set(occupant.m_leaf->area);
+		ClipOccupantVolume(0, 0, bounds, 0, occupant.m_leaf->area, -1, visible);
 	}
 
 	LinkOccupantParms constArgs(occupant, bounds, visible);
 
-	occupant->m_bspLeafs.reserve(8);
+	occupant.m_bspLeafs.reserve(8);
 	if (m_nodes.empty()) {
 		LinkOccupant(constArgs, -1);
 	} else {
 		LinkOccupant(constArgs, 0);
 	}
-
-	m_draw->LinkOccupant(occupant, bounds);
 }
 
-void World::UnlinkOccupant(MBatchOccupant *occupant) {
+void World::UnlinkOccupant(MBatchOccupant &occupant) {
 	m_draw->UnlinkOccupant(occupant);
+	InternalUnlinkOccupant(occupant);
+}
 
-	for (dBSPLeaf::PtrVec::const_iterator it = occupant->m_bspLeafs.begin(); it != occupant->m_bspLeafs.end(); ++it) {
+void World::InternalUnlinkOccupant(MBatchOccupant &occupant) {
+	
+	for (dBSPLeaf::PtrVec::const_iterator it = occupant.m_bspLeafs.begin(); it != occupant.m_bspLeafs.end(); ++it) {
 		dBSPLeaf *leaf = *it;
-		leaf->occupants.erase(occupant);
+		leaf->occupants.erase(&occupant);
 	}
 
-	for (IntSet::const_iterator it = occupant->m_areas.begin(); it != occupant->m_areas.end(); ++it) {
+	for (IntSet::const_iterator it = occupant.m_areas.begin(); it != occupant.m_areas.end(); ++it) {
 		dBSPArea &area = m_areas[*it];
-		area.occupants.erase(occupant);
+		area.occupants.erase(&occupant);
 	}
 
-	occupant->m_bspLeafs.clear();
-	occupant->m_areas.clear();
-	occupant->m_leaf = 0;
+	occupant.m_bspLeafs.clear();
+	occupant.m_areas.clear();
+	occupant.m_leaf = 0;
 }
 
 void World::LinkOccupant(const LinkOccupantParms &constArgs, int nodeNum) {
@@ -299,11 +374,18 @@ void World::LinkOccupant(const LinkOccupantParms &constArgs, int nodeNum) {
 		dBSPLeaf &leaf = m_leafs[nodeNum];
 
 		if ((leaf.area > -1) && constArgs.visible.test(leaf.area)) {
-			leaf.occupants.insert(constArgs.occupant);
-			constArgs.occupant->m_bspLeafs.push_back(&leaf);
-			constArgs.occupant->m_areas.insert(leaf.area);
-			m_areas[leaf.area].occupants.insert(constArgs.occupant);
-			m_draw->LinkOccupant(constArgs.occupant, constArgs.bounds, nodeNum);
+			leaf.occupants.insert(&constArgs.occupant);
+			constArgs.occupant.m_bspLeafs.push_back(&leaf);
+			constArgs.occupant.m_areas.insert(leaf.area);
+			dBSPArea &area = m_areas[leaf.area];
+			area.occupants.insert(&constArgs.occupant);
+			m_draw->LinkOccupant(
+				constArgs.occupant, 
+				constArgs.bounds, 
+				nodeNum,
+				leaf,
+				area
+			);
 		}
 
 		return;
@@ -320,6 +402,95 @@ void World::LinkOccupant(const LinkOccupantParms &constArgs, int nodeNum) {
 		LinkOccupant(constArgs, node.children[0]);
 	if ((side == Plane::Cross) || (side == Plane::Back))
 		LinkOccupant(constArgs, node.children[1]);
+}
+
+void World::LinkLight(Light &light, const BBox &bounds) {
+	m_draw->InvalidateInteractions(light);
+	InternalUnlinkLight(light);
+
+	light.m_leaf = LeafForPoint(light.m_pos);
+	if (!light.m_leaf)
+		return;
+
+	AreaBits visible;
+	
+	if (light.m_leaf->area > -1) {
+		visible.set(light.m_leaf->area);
+
+		StackWindingStackVec bbox;
+		BoundWindings(bounds, bbox);
+		ClipOccupantVolume(&light.m_pos, &bbox, bounds, 0, light.m_leaf->area, -1, visible);
+	}
+
+	LinkLightParms constArgs(light, bounds, visible);
+
+	light.m_bspLeafs.reserve(8);
+	if (m_nodes.empty()) {
+		LinkLight(constArgs, -1);
+	} else {
+		LinkLight(constArgs, 0);
+	}
+
+	m_draw->LinkLight(light, bounds);
+}
+
+void World::UnlinkLight(Light &light) {
+	m_draw->UnlinkLight(light);
+	InternalUnlinkLight(light);
+}
+
+void World::InternalUnlinkLight(Light &light) {
+	
+	for (dBSPLeaf::PtrVec::const_iterator it = light.m_bspLeafs.begin(); it != light.m_bspLeafs.end(); ++it) {
+		dBSPLeaf *leaf = *it;
+		leaf->lights.erase(&light);
+	}
+
+	for (IntSet::const_iterator it = light.m_areas.begin(); it != light.m_areas.end(); ++it) {
+		dBSPArea &area = m_areas[*it];
+		area.lights.erase(&light);
+	}
+
+	light.m_bspLeafs.clear();
+	light.m_areas.clear();
+	light.m_leaf = 0;
+}
+
+void World::LinkLight(const LinkLightParms &constArgs, int nodeNum) {
+	if (nodeNum < 0) {
+		nodeNum = -(nodeNum + 1);
+		RAD_ASSERT(nodeNum < (int)m_leafs.size());
+		dBSPLeaf &leaf = m_leafs[nodeNum];
+
+		if ((leaf.area > -1) && constArgs.visible.test(leaf.area)) {
+			leaf.lights.insert(&constArgs.light);
+			constArgs.light.m_bspLeafs.push_back(&leaf);
+			constArgs.light.m_areas.insert(leaf.area);
+			dBSPArea &area = m_areas[leaf.area];
+			area.lights.insert(&constArgs.light);
+			m_draw->LinkLight(
+				constArgs.light, 
+				constArgs.bounds, 
+				nodeNum,
+				leaf,
+				area
+			);
+		}
+
+		return;
+	}
+
+	RAD_ASSERT(nodeNum < (int)m_nodes.size());
+	const dBSPNode &node = m_nodes[nodeNum];
+	RAD_ASSERT(node.planenum < (int)m_planes.size());
+	const Plane &p = m_planes[node.planenum];
+
+	Plane::SideType side = p.Side(constArgs.bounds, 0.0f);
+	
+	if ((side == Plane::Cross) || (side == Plane::Front))
+		LinkLight(constArgs, node.children[0]);
+	if ((side == Plane::Cross) || (side == Plane::Back))
+		LinkLight(constArgs, node.children[1]);
 }
 
 bool World::ClipOccupantVolume(
@@ -801,7 +972,7 @@ Entity::Ref World::FirstEntityTouchingBrush(int classbits, int brushNum, const V
 			bbox.Translate(touching->ps->worldPos);
 			bbox.Translate(-xform);
 
-			if (!IsBBoxInsideBrushHull(bbox, brush))
+			if (!IsBBoxInsideBrushHull(bbox, *brush))
 				touching.reset();
 		}
 	}
@@ -835,7 +1006,7 @@ Entity::Vec World::EntitiesTouchingBrush(int classbits, int brushNum, const Vec3
 		bbox.Translate(entity->ps->worldPos);
 		bbox.Translate(-xform);
 
-		if (IsBBoxInsideBrushHull(bbox, brush))
+		if (IsBBoxInsideBrushHull(bbox, *brush))
 			touching.push_back(entity);
 	}
 
@@ -861,19 +1032,19 @@ bool World::EntityTouchesBrush(const Entity &entity, int brushNum, const Vec3 &x
 	if (brush->numPlanes == 6)
 		return true; // pure axial brush, bbox test was enough
 
-	return IsBBoxInsideBrushHull(bbox, brush);
+	return IsBBoxInsideBrushHull(bbox, *brush);
 }
 
 bool World::IsBBoxInsideBrushHull(const BBox &bbox, int brushNum) const {
 	RAD_ASSERT(brushNum >= 0 && brushNum < (int)m_bsp->numBrushes);
 	const bsp_file::BSPBrush *brush = m_bsp->Brushes() + brushNum;
-	return IsBBoxInsideBrushHull(bbox, brush);
+	return IsBBoxInsideBrushHull(bbox, *brush);
 }
 
-bool World::IsBBoxInsideBrushHull(const BBox &bbox, const bsp_file::BSPBrush *brush) const {
+bool World::IsBBoxInsideBrushHull(const BBox &bbox, const bsp_file::BSPBrush &brush) const {
 
-	for (U32 i = 0; i < brush->numPlanes; ++i) {
-		const bsp_file::BSPPlane *bspPlane = m_bsp->Planes() + brush->firstPlane + i;
+	for (U32 i = 0; i < brush.numPlanes; ++i) {
+		const bsp_file::BSPPlane *bspPlane = m_bsp->Planes() + brush.firstPlane + i;
 		const Plane kPlane(bspPlane->p[0], bspPlane->p[1], bspPlane->p[2], bspPlane->p[3]);
 
 		Vec3 p;

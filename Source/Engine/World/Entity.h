@@ -199,6 +199,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Entity, bspLeafs, const dBSPLeaf::PtrVec*);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, classbits, int);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, ps, PState*);
+	RAD_DECLARE_PROPERTY(Entity, lightingFlags, LightingFlags, LightingFlags);
 	RAD_DECLARE_PROPERTY(Entity, gc, bool, bool);
 	
 	virtual bool HandleEvent(const Event &event);
@@ -403,6 +404,7 @@ private:
 	ENT_DECL_GETSET(Flags);
 	ENT_DECL_GETSET(NextThink);
 	ENT_DECL_GETSET(ClassBits);
+	ENT_DECL_GETSET(LightingFlags);
 
 	RAD_DECLARE_GET(zoneTag, ZoneTagRef) { 
 		return m_zoneTag.lock(); 
@@ -436,6 +438,14 @@ private:
 
 	RAD_DECLARE_GET(ps, PState*) { 
 		return &const_cast<Entity*>(this)->m_ps; 
+	}
+
+	RAD_DECLARE_GET(lightingFlags, LightingFlags) {
+		return m_lightingFlags;
+	}
+
+	RAD_DECLARE_SET(lightingFlags, LightingFlags) {
+		m_lightingFlags = value;
 	}
 
 	RAD_DECLARE_GET(gc, bool) { 
@@ -479,6 +489,7 @@ private:
 	ZoneTagWRef m_zoneTag;
 	String m_targetname;
 	String m_classname;
+	LightingFlags m_lightingFlags;
 	int m_frame;
 	int m_spawnState;
 	int m_id;

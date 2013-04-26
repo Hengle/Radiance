@@ -212,17 +212,26 @@ int Shader::lua_Compile(lua_State *L) {
 	lua::Variant::Map map;
 	lua::ParseVariantTable(L, map, true);
 
-	self->ParseShaderPass(L, "Diffuse", r::Shader::kPass_Diffuse, map);
-	self->BuildInputMappings(L, r::Shader::kPass_Diffuse);
-
-	self->ParseShaderPass(L, "Specular", r::Shader::kPass_Specular, map);
-	self->BuildInputMappings(L, r::Shader::kPass_Specular);
-
-	self->ParseShaderPass(L, "DiffuseSpecular", r::Shader::kPass_DiffuseSpecular, map);
-	self->BuildInputMappings(L, r::Shader::kPass_DiffuseSpecular);
-
 	self->ParseShaderPass(L, "Default", r::Shader::kPass_Default, map);
 	self->BuildInputMappings(L, r::Shader::kPass_Default);
+
+	for (int i = 0; i < r::kMaxLights; ++i) {
+		char sz[64];
+		sprintf(sz, "Diffuse%i", i+1);
+		self->ParseShaderPass(L, sz, (r::Shader::Pass)(r::Shader::kPass_Diffuse1+i), map);
+		self->BuildInputMappings(L, (r::Shader::Pass)(r::Shader::kPass_Diffuse1+i));
+
+		sprintf(sz, "Specular%i", i+1);
+		self->ParseShaderPass(L, sz, (r::Shader::Pass)(r::Shader::kPass_Specular1+i), map);
+		self->BuildInputMappings(L, (r::Shader::Pass)(r::Shader::kPass_Specular1+i));
+
+		sprintf(sz, "DiffuseSpecular%i", i+1);
+		self->ParseShaderPass(L, sz, (r::Shader::Pass)(r::Shader::kPass_DiffuseSpecular1+i), map);
+		self->BuildInputMappings(L, (r::Shader::Pass)(r::Shader::kPass_DiffuseSpecular1+i));
+	}
+
+	self->ParseShaderPass(L, "Fullbright", r::Shader::kPass_Fullbright, map);
+	self->BuildInputMappings(L, r::Shader::kPass_Fullbright);
 
 	self->ParseShaderPass(L, "Preview", r::Shader::kPass_Preview, map);
 	if (!self->Exists(r::Shader::kPass_Preview))

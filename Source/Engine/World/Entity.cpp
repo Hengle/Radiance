@@ -119,6 +119,7 @@ m_scripted(false),
 m_frame(-1),
 m_luaCallbackIdx(0),
 m_classbits(0),
+m_lightingFlags(kLightingFlag_Unlit),
 m_gc(false),
 m_markFrame(-1) {
 	for (int i = 0; i < kNumLuaCallbackBuckets; ++i)
@@ -386,11 +387,11 @@ bool Entity::ProcessEvent(const Event &event) {
 void Entity::Link() {
 	BBox bounds(m_ps.bbox);
 	bounds.Translate(m_ps.worldPos);
-	world->LinkEntity(this, bounds);
+	world->LinkEntity(*this, bounds);
 }
 	
 void Entity::Unlink() {
-	world->UnlinkEntity(this);
+	world->UnlinkEntity(*this);
 }
 
 World *Entity::RAD_IMPLEMENT_GET(world) {
@@ -459,6 +460,7 @@ void Entity::PushCallTable(lua_State *L) {
 	LUART_REGISTER_GETSET(L, Flags);
 	LUART_REGISTER_GETSET(L, NextThink);
 	LUART_REGISTER_GETSET(L, ClassBits);
+	LUART_REGISTER_GETSET(L, LightingFlags);
 }
 
 void Entity::AttachDrawModel(const DrawModel::Ref &ref) {
@@ -846,6 +848,8 @@ ENT_SET_CUSTOM(Entity, OccupantType, self->m_ps.otype = (OccupantType)luaL_check
 ENT_GETSET(Entity, Flags, int, m_ps.flags);
 ENT_GET(Entity, NextThink, float, m_nextLuaThink);
 ENT_GETSET(Entity, ClassBits, int, m_classbits);
+ENT_GET(Entity, LightingFlags, int, m_lightingFlags);
+ENT_SET_CUSTOM(Entity, LightingFlags, self->m_lightingFlags = (LightingFlags::Enum)luaL_checkinteger(L, 2));
 
 int Entity::LUART_SETFN(NextThink) (lua_State *L) {
 	Entity *self = WorldLua::EntFramePtr(L, 1, true);

@@ -46,6 +46,7 @@ public:
 	RAD_DECLARE_PROPERTY(DrawModel, bounds, const BBox&, const BBox&);
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, scale, const Vec3&);
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, rgba, const Vec4&);
+	RAD_DECLARE_READONLY_PROPERTY(DrawModel, batches, const MBatchDraw::RefVec*);
 
 protected:
 
@@ -131,6 +132,10 @@ private:
 
 	RAD_DECLARE_SET(bounds, const BBox&) {
 		m_bounds = value;
+	}
+
+	RAD_DECLARE_GET(batches, const MBatchDraw::RefVec*) {
+		return &m_batches;
 	}
 
 	static int lua_BlendTo(lua_State *L);

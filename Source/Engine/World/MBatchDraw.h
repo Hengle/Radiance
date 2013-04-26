@@ -8,7 +8,7 @@
 #include "../Renderer/Mesh.h"
 #include "../Renderer/Material.h"
 #include "../Assets/MaterialParser.h"
-#include "WorldDrawDef.h"
+#include "WorldDef.h"
 #include <Runtime/Container/ZoneVector.h>
 #include <Runtime/Container/ZoneList.h>
 #include <Runtime/PushPack.h>
@@ -49,7 +49,7 @@ public:
 	typedef boost::shared_ptr<MBatchDraw> Ref;
 	typedef zone_vector<Ref, ZWorldT>::type RefVec;
 	
-	MBatchDraw(int matId) : m_matId(matId), m_markFrame(-1), m_visibleFrame(-1) {}
+	MBatchDraw(int matId) : m_matId(matId), m_markFrame(-1), m_visibleFrame(-1), m_interactions(0) {}
 	virtual ~MBatchDraw() {}
 
 	RAD_DECLARE_PROPERTY(MBatchDraw, matId, int, int);
@@ -87,6 +87,7 @@ private:
 		m_matId = value;
 	}
 
+	details::LightInteraction *m_interactions;
 	int m_matId;
 	int m_markFrame;
 	int m_visibleFrame;

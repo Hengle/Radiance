@@ -22,10 +22,20 @@ public:
 
 	enum Pass {
 		kPass_First,
-		kPass_Diffuse,
-		kPass_Specular,
-		kPass_DiffuseSpecular,
 		kPass_Default, // blend is controlled by material
+		kPass_Diffuse1,
+		kPass_Diffuse2,
+		kPass_Diffuse3,
+		kPass_Diffuse4,
+		kPass_Specular1,
+		kPass_Specular2,
+		kPass_Specular3,
+		kPass_Specular4,
+		kPass_DiffuseSpecular1,
+		kPass_DiffuseSpecular2,
+		kPass_DiffuseSpecular3,
+		kPass_DiffuseSpecular4,
+		kPass_Fullbright,
 #if defined(RAD_OPT_PC_TOOLS)
 		kPass_Preview, // material preview
 #endif

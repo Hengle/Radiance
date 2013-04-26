@@ -112,6 +112,10 @@ public:
 
 	void SetAreaportalState(int areaportalNum, bool open, bool relinkOccupants);
 
+	bool AreaCanSeeArea(int fromArea, int toArea) {
+		return m_areaVis[fromArea].test(toArea);
+	}
+
 	Entity::Ref FindEntityId(int id) const;
 	Entity::Ref FindEntityUID(int uid) const;
 	Entity::Vec FindEntityClass(const char *classname) const;
@@ -179,8 +183,10 @@ private:
 	friend class WorldLua;
 	friend class Entity;
 	friend class MBatchOccupant;
+	friend class Light;
 	typedef zone_list<Event::Ref, ZWorldT>::type EventList;
 	typedef zone_map<int, ZoneTagRef, ZWorldT>::type ZoneIdMap;
+	typedef boost::array<AreaBits, kMaxAreas> AreaVisMask;
 
 	World(Game &game, int slot, const SoundContextRef &sound, pkg::Zone zone);
 
@@ -278,11 +284,18 @@ private:
 	int PostSpawn(const xtime::TimeSlice &time, int flags);
 	void GenerateSaveGame();
 	void LoadBSP(const bsp_file::BSPFile &bsp);
-	void LinkEntity(Entity *entity, const BBox &bounds);
-	void UnlinkEntity(Entity *entity);
-	void LinkOccupant(MBatchOccupant *occupant, const BBox &bounds);
-	void UnlinkOccupant(MBatchOccupant *occupant);
-	bool IsBBoxInsideBrushHull(const BBox &bbox, const bsp_file::BSPBrush *brush) const;
+	void LinkEntity(Entity &entity, const BBox &bounds);
+	void UnlinkEntity(Entity &entity);
+	void InternalUnlinkEntity(Entity &entity);
+	void LinkOccupant(MBatchOccupant &occupant, const BBox &bounds);
+	void UnlinkOccupant(MBatchOccupant &occupant);
+	void InternalUnlinkOccupant(MBatchOccupant &occupant);
+	void LinkLight(Light &light, const BBox &bounds);
+	void UnlinkLight(Light &light);
+	void InternalUnlinkLight(Light &light);
+	void UpdateAreaVis(int area);
+	void UpdateAreaVis(int area, AreaBits &vis, AreaBits &visited);
+	bool IsBBoxInsideBrushHull(const BBox &bbox, const bsp_file::BSPBrush &brush) const;
 	
 	bool RayIntersectsClipModel(
 		int modelNum, 
@@ -296,7 +309,7 @@ private:
 	struct LinkEntityParms {
 
 		LinkEntityParms(
-			Entity *_entity,
+			Entity &_entity,
 			const BBox &_bounds,
 			AreaBits &_visible
 		) : entity(_entity),
@@ -304,7 +317,7 @@ private:
 			visible(_visible) {
 		}
 
-		Entity *entity;
+		Entity &entity;
 		const BBox &bounds;
 		AreaBits &visible;
 	};
@@ -314,7 +327,7 @@ private:
 	struct LinkOccupantParms {
 
 		LinkOccupantParms(
-			MBatchOccupant *_occupant,
+			MBatchOccupant &_occupant,
 			const BBox &_bounds,
 			AreaBits &_visible
 		) : occupant(_occupant),
@@ -322,12 +335,30 @@ private:
 			visible(_visible) {
 		}
 
-		MBatchOccupant *occupant;
+		MBatchOccupant &occupant;
 		const BBox &bounds;
 		AreaBits &visible;
 	};
 
 	void LinkOccupant(const LinkOccupantParms &constArgs, int nodeNum);
+
+	struct LinkLightParms {
+
+		LinkLightParms(
+			Light &_light,
+			const BBox &_bounds,
+			AreaBits &_visible
+		) : light(_light),
+		    bounds(_bounds),
+			visible(_visible) {
+		}
+
+		Light &light;
+		const BBox &bounds;
+		AreaBits &visible;
+	};
+
+	void LinkLight(const LinkLightParms &constArgs, int nodeNum);
 
 	struct ClipOccupantVolumeParms {
 
@@ -510,6 +541,7 @@ private:
 	RAD_DECLARE_GET(cvars, GameCVars*);
 	RAD_DECLARE_GET(listenerPos, const Vec3&);
 
+	AreaVisMask m_areaVis;
 	EventList m_events;
 	ZoneRef m_zone;
 	EntityRef m_spawnEnt;

@@ -1221,9 +1221,6 @@
     <ClInclude Include="..\..\Engine\World\WorldDraw.h">
       <Filter>Source\Engine\World</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\World\WorldDrawDef.h">
-      <Filter>Source\Engine\World</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\World\WorldLua.h">
       <Filter>Source\Engine\World</Filter>
     </ClInclude>
@@ -1493,6 +1490,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Engine\World\Lua\D_VtModel.h">
       <Filter>Source\Engine\World\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\World\Light.h">
+      <Filter>Source\Engine\World</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2326,6 +2326,12 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\World\Lua\D_VtModel.cpp">
       <Filter>Source\Engine\World\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\WorldDrawLight.cpp">
+      <Filter>Source\Engine\World</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\Light.cpp">
+      <Filter>Source\Engine\World</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

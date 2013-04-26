@@ -29,6 +29,16 @@ public:
 	virtual void SetWorldStates();
 	virtual void SetPerspectiveMatrix();
 	virtual void SetScreenLocalMatrix();
+
+	virtual void SetOrthoMatrix(
+		float left, 
+		float right, 
+		float top, 
+		float bottom, 
+		float near, 
+		float far
+	);
+
 	virtual void RotateForCamera(const Camera &camera);
 	virtual void RotateForCameraBasis();
 	virtual void PushMatrix(const Vec3 &pos, const Vec3 &scale, const Vec3 &angles);

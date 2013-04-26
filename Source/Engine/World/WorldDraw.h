@@ -1,7 +1,9 @@
-// WorldDraw.h
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file WorldDraw.h
+	\copyright Copyright (c) 2013 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup world
+*/
 
 #pragma once
 
@@ -11,7 +13,6 @@
 #include "../Camera.h"
 #include "BSPFile.h"
 #include "WorldDef.h"
-#include "WorldDrawDef.h"
 #include "MBatchDraw.h"
 #include "DrawModel.h"
 #include "ScreenOverlay.h"
@@ -21,8 +22,6 @@
 #include <Runtime/Base/ObjectPool.h>
 #include <bitset>
 #include <Runtime/PushPack.h>
-
-#define WORLD_DEBUG_DRAW
 
 namespace world {
 
@@ -73,6 +72,16 @@ public:
 	virtual void SetWorldStates() = 0;
 	virtual void SetPerspectiveMatrix() = 0;
 	virtual void SetScreenLocalMatrix() = 0;
+
+	virtual void SetOrthoMatrix(
+		float left, 
+		float right, 
+		float top, 
+		float bottom, 
+		float near, 
+		float far
+	) = 0;
+
 	virtual void RotateForCamera(const Camera &camera) = 0;
 	virtual void RotateForCameraBasis() = 0;
 	virtual void PushMatrix(const Vec3 &pos, const Vec3 &scale, const Vec3 &angles) = 0;
@@ -294,17 +303,91 @@ private:
 	void DrawOverlay(ScreenOverlay &overlay);
 	void AddScreenOverlay(ScreenOverlay &overlay);
 	void RemoveScreenOverlay(ScreenOverlay &overlay);
-	void LinkEntity(Entity *entity, const BBox &bounds);
-	void UnlinkEntity(Entity *entity);
-	void LinkEntity(Entity *entity, const BBox &bounds, int nodeNum);
-	void LinkOccupant(MBatchOccupant *occupant, const BBox &bounds);
-	void UnlinkOccupant(MBatchOccupant *occupant);
-	void LinkOccupant(MBatchOccupant *occupant, const BBox &bounds, int nodeNum);
 
+	void LinkEntity(
+		Entity &entity, 
+		const BBox &bounds, 
+		int nodeNum,
+		dBSPLeaf &leaf,
+		dBSPArea &area
+	);
+
+	void UnlinkEntity(Entity &entity);
+	
+	void LinkOccupant(
+		MBatchOccupant &occupant, 
+		const BBox &bounds, 
+		int nodeNum,
+		dBSPLeaf &leaf,
+		dBSPArea &area
+	);
+
+	void UnlinkOccupant(MBatchOccupant &occupant);
+	
 	int LoadMaterial(const char *name, LocalMaterial &mat);
+
+	/*
+	==============================================================================
+	WorldDrawLight.cpp
+	==============================================================================
+	*/
+
+	void InvalidateInteractions(Light &light);
+	void InvalidateInteractions(Entity &entity);
+	void InvalidateInteractions(MBatchOccupant &occupant);
+
+	void LinkLight(Light &light, const BBox &bounds);
+
+	void LinkLight(
+		Light &light, 
+		const BBox &bounds, 
+		int nodeNum,
+		dBSPLeaf &leaf,
+		dBSPArea &area
+	);
+
+	void UnlinkLight(Light &light);
+
+	details::LightInteraction *FindInteraction(
+		Light &light,
+		MBatchDraw &batch
+	);
+
+	details::LightInteraction *CreateInteraction(
+		Light &light,
+		MBatchDraw &batch
+	);
+
+	details::LightInteraction *CreateInteraction(
+		Light &light,
+		Entity &entity,
+		MBatchDraw &batch
+	);
+
+	details::LightInteraction *CreateInteraction(
+		Light &light,
+		MBatchOccupant &occupant,
+		MBatchDraw &batch
+	);
+
+	void LinkInteraction(
+		details::LightInteraction &interaction,
+		details::LightInteraction *&headOnLight,
+		details::LightInteraction *&headOnBatch
+	);
+
+	void UnlinkInteraction(
+		details::LightInteraction &interaction,
+		details::LightInteraction *&headOnLight,
+		details::LightInteraction *&headOnBatch
+	);
+
+	void UpdateLightInteractions(Light &light);
+	void CleanupLights();
 	
 	ObjectPool<details::MBatch> m_batchPool;
 	ObjectPool<details::MBatchDrawLink> m_linkPool;
+	MemoryPool m_interactionPool;
 	
 	Counters m_counters;
 	PostProcessEffect::Map m_postFX;
@@ -313,6 +396,7 @@ private:
 	RB_WorldDraw::Ref m_rb;
 	details::MatRefMap m_refMats;
 	World *m_world;
+	Light *m_lights[2];
 	int m_frame;
 	int m_markFrame;
 	bool m_uiOnly;

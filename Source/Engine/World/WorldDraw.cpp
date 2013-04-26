@@ -102,10 +102,14 @@ m_frame(-1),
 m_markFrame(-1),
 m_uiOnly(false),
 m_init(false) {
+	m_lights[0] = m_lights[1] = 0;
 	m_rb = RB_WorldDraw::New(w);
 }
 
 WorldDraw::~WorldDraw() {
+
+	CleanupLights();
+	
 	m_worldModels.clear();
 	m_overlays.clear();
 	m_rb.reset();
@@ -162,6 +166,7 @@ void WorldDraw::Init(const bsp_file::BSPFile::Ref &bsp) {
 
 	m_batchPool.Create(ZWorld, "world-draw-batch", 64);
 	m_linkPool.Create(ZWorld, "world-draw-link", 64);
+	m_interactionPool.Create(ZWorld, "world-light-interactions", sizeof(details::LightInteraction), 64);
 
 	m_init = true;
 }
@@ -737,26 +742,6 @@ void WorldDraw::PostProcess() {
 		m_rb->DrawPostFXQuad();
 		m->shader->End();
 	}
-}
-
-void WorldDraw::LinkEntity(Entity *entity, const BBox &bounds) {
-	UnlinkEntity(entity);
-}
-
-void WorldDraw::UnlinkEntity(Entity *entity) {
-}
-
-void WorldDraw::LinkEntity(Entity *entity, const BBox &bounds, int nodeNum) {
-}
-
-void WorldDraw::LinkOccupant(MBatchOccupant *occupant, const BBox &bounds) {
-	UnlinkOccupant(occupant);
-}
-
-void WorldDraw::UnlinkOccupant(MBatchOccupant *occupant) {
-}
-
-void WorldDraw::LinkOccupant(MBatchOccupant *occupant, const BBox &bounds, int nodeNum) {
 }
 
 } // world

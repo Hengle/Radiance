@@ -15,13 +15,20 @@ namespace world {
 class RADENG_CLASS MBatchOccupant {
 public:
 
-	MBatchOccupant(World &world) : m_markFrame(-1), m_world(&world), m_leaf(0) {}
+	MBatchOccupant(World &world, LightingFlags lightingFlags = kLightingFlag_Unlit) 
+		: m_markFrame(-1), 
+		m_world(&world), 
+		m_leaf(0),
+		m_lightingFlags(lightingFlags)
+	{}
+
 	virtual ~MBatchOccupant() {}
 
 	RAD_DECLARE_READONLY_PROPERTY(MBatchOccupant, visible, bool);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchOccupant, bounds, const BBox&);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchOccupant, batches, const MBatchDraw::RefVec *);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchOccupant, world, World*);
+	RAD_DECLARE_PROPERTY(MBatchOccupant, lightingFlags, LightingFlags, LightingFlags);
 
 	void Link();
 	void Unlink();
@@ -38,6 +45,14 @@ private:
 		return m_world;
 	}
 
+	RAD_DECLARE_GET(lightingFlags, LightingFlags) {
+		return m_lightingFlags;
+	}
+
+	RAD_DECLARE_SET(lightingFlags, LightingFlags) {
+		m_lightingFlags = value;
+	}
+
 	friend class World;
 	friend class WorldDraw;
 
@@ -46,6 +61,7 @@ private:
 	World *m_world;
 	dBSPLeaf *m_leaf;
 	int m_markFrame;
+	LightingFlags m_lightingFlags;
 };
 
 }

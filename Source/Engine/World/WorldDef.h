@@ -14,10 +14,21 @@
 #include <Runtime/Math/Winding.h>
 #include <bitset>
 
+#define WORLD_DEBUG_DRAW
+
 namespace world {
 
 class Entity;
 class MBatchOccupant;
+class World;
+class WorldLua;
+class WorldDraw;
+class Zone;
+class ZoneTag;
+class WorldDrawLight;
+class RB_WorldDraw;
+class MBatchDraw;
+class Light;
 
 enum UnloadDisposition {
 	kUD_None,
@@ -43,6 +54,7 @@ enum {
 typedef zone_vector<Plane, ZWorldT>::type PlaneVec;
 typedef zone_vector<int, ZWorldT>::type IntVec;
 typedef zone_pool_set<Entity*, ZWorldT>::type EntityPtrSet;
+typedef zone_pool_set<Light*, ZWorldT>::type LightPtrSet;
 typedef zone_pool_set<MBatchOccupant*, ZWorldT>::type MBatchOccupantPtrSet;
 typedef zone_pool_set<int, ZWorldT>::type IntSet;
 typedef std::bitset<kMaxEnts> EntityBits;
@@ -52,6 +64,13 @@ typedef zone_vector<Winding, ZWorldT>::type WindingVec;
 typedef math::Winding<Vec3, Plane, math::stack_tag<24> > StackWinding;
 typedef zone_vector<StackWinding, ZWorldT>::type StackWindingVec;
 typedef stackify<StackWindingVec, 12> StackWindingStackVec;
+
+typedef boost::shared_ptr<World> WorldRef;
+typedef boost::weak_ptr<World> WorldWRef;
+typedef boost::shared_ptr<Zone> ZoneRef;
+typedef boost::weak_ptr<Zone> ZoneWRef;
+typedef boost::shared_ptr<ZoneTag> ZoneTagRef;
+typedef boost::weak_ptr<ZoneTag> ZoneTagWRef;
 
 struct ClippedAreaVolume {
 
@@ -86,6 +105,7 @@ struct dBSPLeaf {
 
 	EntityPtrSet entities;
 	MBatchOccupantPtrSet occupants;
+	LightPtrSet lights;
 };
 
 struct dBSPArea {
@@ -100,6 +120,7 @@ struct dBSPArea {
 
 	EntityPtrSet entities;
 	MBatchOccupantPtrSet occupants;
+	LightPtrSet lights;
 };
 
 struct dAreaportal {
@@ -122,17 +143,38 @@ struct Trace {
 	bool startSolid;
 };
 
-class World;
-class WorldLua;
-class WorldDraw;
-class Zone;
-class ZoneTag;
+RAD_BEGIN_FLAGS
+	RAD_FLAG(kLightingFlag_Light),
+	RAD_FLAG(kLightingFlag_Shadow),
+	kLightingFlag_Unlit = 0
+RAD_END_FLAGS(LightingFlags)
 
-typedef boost::shared_ptr<World> WorldRef;
-typedef boost::weak_ptr<World> WorldWRef;
-typedef boost::shared_ptr<Zone> ZoneRef;
-typedef boost::weak_ptr<Zone> ZoneWRef;
-typedef boost::shared_ptr<ZoneTag> ZoneTagRef;
-typedef boost::weak_ptr<ZoneTag> ZoneTagWRef;
+namespace details {
 
+struct MBatchDrawLink;
+
+struct MatRef;
+typedef zone_map<int, MatRef, ZWorldT>::type MatRefMap;
+
+struct MBatch;
+typedef boost::shared_ptr<MBatch> MBatchRef;
+typedef zone_map<int, MBatchRef, ZWorldT>::type MBatchIdMap;
+
+struct LightInteraction {
+	LightInteraction *prevOnLight;
+	LightInteraction *nextOnLight;
+	LightInteraction *prevOnBatch;
+	LightInteraction *nextOnBatch;
+	MBatchDraw *draw;
+	Light *light;
+	Entity *entity;
+	MBatchOccupant *occupant;
+	bool dirty;
+};
+
+typedef zone_pool_map<int, LightInteraction*, ZWorldT>::type MatInteractionChain;
+
+} // details
 } // world
+
+RAD_IMPLEMENT_FLAGS(world::LightingFlags)

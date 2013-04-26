@@ -811,6 +811,8 @@ void World::LoadBSP(const bsp_file::BSPFile &bsp) {
 		m_areaportals.push_back(portal);
 		verts.clear();
 	}
+
+	UpdateAreaVis(-1);
 }
 
 } // world

@@ -998,7 +998,7 @@
     <ClInclude Include="..\..\Engine\World\WorldCinematics.h" />
     <ClInclude Include="..\..\Engine\World\WorldDef.h" />
     <ClInclude Include="..\..\Engine\World\WorldDraw.h" />
-    <ClInclude Include="..\..\Engine\World\WorldDrawDef.h" />
+    <ClInclude Include="..\..\Engine\World\Light.h" />
     <ClInclude Include="..\..\Engine\World\WorldLua.h" />
     <ClInclude Include="..\..\Engine\World\WorldLuaCommon.h" />
     <ClInclude Include="..\..\Engine\Zones.h" />
@@ -2129,6 +2129,7 @@
     <ClCompile Include="..\..\Engine\World\EntityPhysics.cpp" />
     <ClCompile Include="..\..\Engine\World\Floors.cpp" />
     <ClCompile Include="..\..\Engine\World\Keys.cpp" />
+    <ClCompile Include="..\..\Engine\World\Light.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_Asset.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_ConversationTree.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_HTTP.cpp" />
@@ -2218,6 +2219,7 @@
     <ClCompile Include="..\..\Engine\World\WorldCinematics.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldDebugDraw.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldDraw.cpp" />
+    <ClCompile Include="..\..\Engine\World\WorldDrawLight.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldLua.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldLuaCVars.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldLuaGameNetwork.cpp" />

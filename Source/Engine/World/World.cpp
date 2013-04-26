@@ -277,7 +277,7 @@ void World::TickState(float dt, float unmod_dt) {
 
 			if (it->second->gc) {
 				Entity::Ref r(it->second);
-				UnlinkEntity(r.get());
+				UnlinkEntity(*r);
 				UnmapEntity(r);
 			}
 			

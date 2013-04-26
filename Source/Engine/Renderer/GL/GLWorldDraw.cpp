@@ -15,6 +15,8 @@
 #include <algorithm>
 #undef min
 #undef max
+#undef near
+#undef far
 
 using namespace r;
 
@@ -154,19 +156,6 @@ void GLWorldDraw::BindRTTX(int num) {
 	}
 }
 
-void GLWorldDraw::SetScreenLocalMatrix() {
-	gl.MatrixMode(GL_PROJECTION);
-	gl.LoadIdentity();
-
-	int vpx, vpy, vpw, vph;
-	world->game->Viewport(vpx, vpy, vpw, vph);
-	gl.Ortho((double)vpx, (double)vpw, (double)(vpy+vph), (double)vpy, -1.0, 1.0);
-	gls.invertCullFace = false;
-
-	gl.MatrixMode(GL_MODELVIEW);
-	gl.LoadIdentity();
-}
-
 void GLWorldDraw::SetPerspectiveMatrix() {
 	gl.MatrixMode(GL_PROJECTION);
 	gl.LoadIdentity();
@@ -184,6 +173,43 @@ void GLWorldDraw::SetPerspectiveMatrix() {
 		gl.Scalef(1.f, -1.f, 1.f);
 		gls.invertCullFace = true;
 	}
+}
+
+void GLWorldDraw::SetScreenLocalMatrix() {
+	gl.MatrixMode(GL_PROJECTION);
+	gl.LoadIdentity();
+
+	int vpx, vpy, vpw, vph;
+	world->game->Viewport(vpx, vpy, vpw, vph);
+	gl.Ortho((double)vpx, (double)(vpx+vpw), (double)(vpy+vph), (double)vpy, -1.0, 1.0);
+	gls.invertCullFace = false;
+
+	gl.MatrixMode(GL_MODELVIEW);
+	gl.LoadIdentity();
+}
+
+void GLWorldDraw::SetOrthoMatrix(
+	float left,
+	float right,
+	float top,
+	float bottom,
+	float near, 
+	float far
+) {
+	gl.MatrixMode(GL_PROJECTION);
+	gl.LoadIdentity();
+	gl.Ortho(
+		(double)left, 
+		(double)right,
+		(double)bottom,
+		(double)top,
+		(double)near,
+		(double)far
+	);
+
+	gls.invertCullFace = false;
+	gl.MatrixMode(GL_MODELVIEW);
+	gl.LoadIdentity();
 }
 
 void RotateForDebugCamera() {

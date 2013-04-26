@@ -9,7 +9,7 @@
 #include "../Packages/PackagesDef.h"
 #include "../Assets/MaterialParser.h"
 #include "../Renderer/Material.h"
-#include "WorldDrawDef.h"
+#include "WorldDef.h"
 #include <Runtime/Container/ZoneList.h>
 
 namespace world {

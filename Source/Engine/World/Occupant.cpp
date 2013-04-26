@@ -12,11 +12,11 @@
 namespace world {
 
 void MBatchOccupant::Link() {
-	m_world->LinkOccupant(this, this->bounds);
+	m_world->LinkOccupant(*this, this->bounds);
 }
 
 void MBatchOccupant::Unlink() {
-	m_world->UnlinkOccupant(this);
+	m_world->UnlinkOccupant(*this);
 }
 
 }
