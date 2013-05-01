@@ -64,6 +64,7 @@ typedef zone_vector<Winding, ZWorldT>::type WindingVec;
 typedef math::Winding<Vec3, Plane, math::stack_tag<24> > StackWinding;
 typedef zone_vector<StackWinding, ZWorldT>::type StackWindingVec;
 typedef stackify<StackWindingVec, 12> StackWindingStackVec;
+typedef zone_vector<Light*, ZWorldT>::type LightVec;
 
 typedef boost::shared_ptr<World> WorldRef;
 typedef boost::weak_ptr<World> WorldWRef;

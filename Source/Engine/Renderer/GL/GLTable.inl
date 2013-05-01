@@ -239,17 +239,4 @@ inline void GLTable::GetColor4fv(float *v) {
 	v[3] = color[3];
 }
 
-inline void GLTable::SetEye(const float *_eye) {
-	eye[0] = _eye[0];
-	eye[1] = _eye[1];
-	eye[2] = _eye[2];
-	++eyeOps;
-}
-
-inline void GLTable::GetEye(float *_eye) {
-	_eye[0] = eye[0];
-	_eye[1] = eye[1];
-	_eye[2] = eye[2];
-}
-
 } // r

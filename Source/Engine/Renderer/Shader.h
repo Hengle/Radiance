@@ -52,12 +52,14 @@ public:
 	struct Uniforms {
 		LightEnv lights;
 		Vec4 blendColor;
+		Vec3 eyePos;
 
 		struct defaultTag {};
 
 		Uniforms() {}
 		Uniforms(const Uniforms &u) : lights(u.lights), blendColor(u.blendColor) {}
-		explicit Uniforms(const defaultTag&) : blendColor(1.f, 1.f, 1.f, 1.f) {
+		explicit Uniforms(const defaultTag&) : 
+			blendColor(1.f, 1.f, 1.f, 1.f), eyePos(0.f, 0.f, 0.f) {
 			lights.numLights = 0;
 		}
 		explicit Uniforms(const Vec4 &color) : blendColor(color) {

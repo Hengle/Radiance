@@ -1485,15 +1485,32 @@ bool Shader::szMaterialInput(
 			)
 		);
 		return true;
-	case kMaterialSource_TexCoord:
+	case kMaterialSource_Color:
 		string::sprintf(
 			sz,
-			"IN(TEXCOORD%d)",
-			AttribUsageIndex(
-				pass,
-				source, 
-				index
-			)
+			"DCOLOR%d",
+			index
+		);
+		return true;
+	case kMaterialSource_LightDiffuseColor:
+		string::sprintf(
+			sz,
+			"UNIFORM(light%i_diffuseColor)",
+			index
+		);
+		return true;
+	case kMaterialSource_LightSpecularColor:
+		string::sprintf(
+			sz,
+			"UNIFORM(light%i_specularColor)",
+			index
+		);
+		return true;
+	case kMaterialSource_LightPos:
+		string::sprintf(
+			sz,
+			"UNIFORM(light%i_pos)",
+			index
 		);
 		return true;
 	case kMaterialSource_Normal:
@@ -1518,19 +1535,52 @@ bool Shader::szMaterialInput(
 			)
 		);
 		return true;
-	case kMaterialSource_Color:
+	case kMaterialSource_Bitangent:
 		string::sprintf(
 			sz,
-			"DCOLOR%d",
-			index
+			"IN(bitan%d)",
+			AttribUsageIndex(
+				pass,
+				source, 
+				index
+			)
+		);
+		return true;
+	case kMaterialSource_LightDir:
+		string::sprintf(
+			sz,
+			"IN(light%d_dir)",
+			AttribUsageIndex(
+				pass,
+				source, 
+				index
+			)
+		);
+		return true;
+	case kMaterialSource_HalfLightDir:
+		string::sprintf(
+			sz,
+			"IN(light%d_halfdir)",
+			AttribUsageIndex(
+				pass,
+				source, 
+				index
+			)
+		);
+		return true;
+	case kMaterialSource_TexCoord:
+		string::sprintf(
+			sz,
+			"IN(TEXCOORD%d)",
+			AttribUsageIndex(
+				pass,
+				source, 
+				index
+			)
 		);
 		return true;
 	case kMaterialSource_VertexColor:
-		string::sprintf(
-			sz,
-			"IN(vertexColor)",
-			index
-		);
+		strcpy(sz, "IN(vertexColor");
 		return true;
 	default:
 		break;

@@ -152,15 +152,11 @@ void GLTable::Reset() {
 	color[1] = 1.f;
 	color[2] = 1.f;
 	color[3] = 1.f;
-	eye[0] = 0.f;
-	eye[1] = 0.f;
-	eye[2] = 0.f;
-
+	
 	mm = GL_PROJECTION;
 	matrixOps = 0;
 	prMatrixOps = 0;
 	colorOps = 0;
-	eyeOps = 0;
 	vbos = true;
 #if defined(RAD_OPT_OSX)
 	vaos = false; // not on OSX.
@@ -397,7 +393,6 @@ void GLTable::Load() {
 	matrixOps = 0;
 	prMatrixOps = 0;
 	colorOps = 0;
-	eyeOps = 0;
 	wireframe = false;
 	numTris = 0;
 
@@ -405,9 +400,6 @@ void GLTable::Load() {
 	color[1] = 1.f;
 	color[2] = 1.f;
 	color[3] = 1.f;
-	eye[0] = 0.f;
-	eye[1] = 0.f;
-	eye[2] = 0.f;
 
 #if !defined(RAD_OPT_OGLES2)
 	glMatrixMode(mm);

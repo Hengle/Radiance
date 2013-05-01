@@ -238,10 +238,6 @@ void GLWorldDraw::RotateForCamera(const Camera &camera) {
 		gl.Rotatef(-angles.Y(), 0, 1, 0);
 		gl.Rotatef(-angles.Z(), 0, 0, 1);
 	}
-
-	const Vec3 &pos = camera.pos;
-	gl.Translatef(-pos.X(), -pos.Y(), -pos.Z());
-	gl.SetEye(&pos[0]);
 }
 
 void GLWorldDraw::RotateForCameraBasis() {

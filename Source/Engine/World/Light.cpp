@@ -14,10 +14,12 @@ namespace world {
 Light::Light(World *w) : 
 m_pos(Vec3::Zero) ,
 m_style(kStyle_Diffuse|kStyle_Specular|kStyle_Shadows|kStyle_AffectAll),
+m_brightness(1.f),
 m_leaf(0),
 m_prev(0),
 m_next(0),
-m_world(w) {
+m_world(w),
+m_markFrame(-1) {
 	m_spColor = Vec4(1,1,1,1);
 	m_shColor = Vec4(0,0,0,1);
 	m_dfColor = Vec3(1,1,1);

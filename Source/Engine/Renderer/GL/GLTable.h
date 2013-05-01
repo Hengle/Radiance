@@ -63,7 +63,6 @@ struct RADENG_CLASS GLTable {
 	int matrixOps;
 	int prMatrixOps;
 	int colorOps;
-	int eyeOps;
 	int numTris;
 
 	bool v1_1;
@@ -323,9 +322,6 @@ struct RADENG_CLASS GLTable {
 	void Color4f(float r, float g, float b, float a, bool force=false);
 	void GetColor4fv(float *v);
 
-	void SetEye(const float *eye);
-	void GetEye(float *eye);
-
 	void RotateForCamera(const Vec3 &pos, const Mat4 &rot, float near, float far, float fov, float yaspect);
 	void RotateForCamera(const Vec3 &pos, const Mat4 &rot);
 
@@ -340,7 +336,6 @@ private:
 	GLMatrixStack prj;
 
 	float color[4];
-	float eye[3];
 	
 	friend class RBackend;
 

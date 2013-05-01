@@ -13,11 +13,13 @@
 #include "../../Renderer/SkMesh.h"
 #include "../../Renderer/VtMesh.h"
 #include "../../Renderer/Material.h"
+#include "../../Renderer/Shader.h"
 #include <Runtime/PushPack.h>
 
 class QTreeWidget;
 class QTreeWidgetItem;
 class QCheckBox;
+class QLineEdit;
 
 namespace asset {
 class MeshVBLoader;
@@ -56,7 +58,11 @@ private:
 
 	pkg::Asset::Ref LoadMaterial(const char *m);
 
-	void Draw(r::Material::Sort sort);
+	void Draw(
+		r::Material::Sort sort,
+		const r::Shader::Uniforms &u
+	);
+
 	void DrawWireframe();
 	void DrawNormals(bool normals, bool tangents);
 	
@@ -82,6 +88,9 @@ private:
 	QCheckBox *m_wireframe;
 	QCheckBox *m_normals;
 	QCheckBox *m_tangents;
+	QCheckBox *m_lighting;
+	QLineEdit *m_brightness;
+	QLineEdit *m_distance;
 	float **m_skVerts[2];
 };
 

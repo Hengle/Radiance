@@ -319,10 +319,39 @@ void WorldDraw::UpdateLightInteractions(Light &light) {
 	}
 }
 
+Light::Ref WorldDraw::CreateLight() {
+	Light::Ref l(new Light(this->m_world), &DeleteLight);
+	l->m_prev = 0;
+	l->m_next = m_lights[0];
+	if (m_lights[0])
+		m_lights[0]->m_prev = l.get();
+	if (!m_lights[1])
+		m_lights[1] = l.get();
+	m_lights[0] = l.get();
+	return l;
+}
+
 void WorldDraw::CleanupLights() {
 	for (Light *l = m_lights[0]; l; l = l->m_next) {
 		UnlinkLight(*l);
 	}
+	m_lights[0] = m_lights[1] = 0;
+}
+
+void WorldDraw::DeleteLight(Light *light) {
+	WorldDraw *self = light->m_world->m_draw.get();
+	if (self->m_lights[0]) {
+		self->UnlinkLight(*light);
+		if (light->m_prev)
+			light->m_prev->m_next = light->m_next;
+		if (light->m_next)
+			light->m_next->m_prev = light->m_prev;
+		if (self->m_lights[0] == light)
+			self->m_lights[0] = light->m_next;
+		if (self->m_lights[1] == light)
+			self->m_lights[1] = light->m_prev;
+	}
+	delete light;
 }
 
 } // world

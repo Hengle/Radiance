@@ -91,6 +91,8 @@ void WorldDraw::Counters::Clear() {
 	drawnEntities = 0;
 	testedEntityModels = 0;
 	drawnEntityModels = 0;
+	testedLights = 0;
+	drawnLights = 0;
 	numBatches = 0;
 	numTris = 0;
 	numMaterials = 0;
@@ -437,6 +439,25 @@ void WorldDraw::VisMarkArea(
 
 	++m_counters.drawnAreas;
 
+	// mark lights
+	for (LightPtrSet::const_iterator it = area.lights.begin(); it != area.lights.end(); ++it) {
+		Light &light = **it;
+
+		if (light.m_markFrame != m_markFrame) {
+			light.m_markFrame = m_markFrame;
+
+			BBox bounds(light.m_size);
+			bounds.Translate(light.m_pos);
+
+			++m_counters.testedLights;
+			if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, bounds)) {
+				++m_counters.drawnLights;
+				view.visLights.push_back(&light);
+			}
+		}
+	}
+
+	// mark world models.
 	for (int i = 0; i < area.numModels; ++i) {
 		U16 modelNum = *(m_world->m_bsp->ModelIndices() + i + area.firstModel);
 		RAD_ASSERT(modelNum < (U16)m_worldModels.size());

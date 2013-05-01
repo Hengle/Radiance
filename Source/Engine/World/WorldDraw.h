@@ -15,6 +15,7 @@
 #include "WorldDef.h"
 #include "MBatchDraw.h"
 #include "DrawModel.h"
+#include "Light.h"
 #include "ScreenOverlay.h"
 #include "PostProcess.h"
 #include <Runtime/Container/ZoneMap.h>
@@ -44,6 +45,7 @@ public:
 	int area;
 	bool mirror;
 	AreaBits areas;
+	LightVec visLights;
 
 	details::MBatchIdMap batches;
 };
@@ -167,6 +169,8 @@ public:
 		int drawnEntities;
 		int testedEntityModels;
 		int drawnEntityModels;
+		int testedLights;
+		int drawnLights;
 		int numBatches;
 		int numTris;
 		int numMaterials;
@@ -179,6 +183,7 @@ public:
 	bool AddMaterial(int matId);
 		
 	ScreenOverlay::Ref CreateScreenOverlay(int matId);
+	Light::Ref CreateLight();
 	
 	void Tick(float dt);
 	void Draw(Counters *counters = 0);
@@ -384,7 +389,8 @@ private:
 
 	void UpdateLightInteractions(Light &light);
 	void CleanupLights();
-	
+	static void DeleteLight(Light *light);
+
 	ObjectPool<details::MBatch> m_batchPool;
 	ObjectPool<details::MBatchDrawLink> m_linkPool;
 	MemoryPool m_interactionPool;

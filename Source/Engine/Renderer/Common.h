@@ -55,11 +55,14 @@ struct MaterialInputMappings {
 struct LightDef {
 	enum {
 		RAD_FLAG(kFlag_Diffuse),
-		RAD_FLAG(kFlag_Specular)
+		RAD_FLAG(kFlag_Specular),
+		RAD_FLAG(kFlag_CastShadows)
 	};
-	Vec4 diffuse;
 	Vec4 specular;
+	Vec3 diffuse;
 	Vec3 pos;
+	float radius;
+	float brightness;
 	int flags;
 
 	bool operator == (const LightDef &d) {

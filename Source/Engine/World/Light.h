@@ -38,6 +38,7 @@ public:
 	RAD_DECLARE_PROPERTY(Light, style, LightStyles, LightStyles);
 	RAD_DECLARE_PROPERTY(Light, pos, const Vec3&, const Vec3&);
 	RAD_DECLARE_PROPERTY(Light, size, const BBox&, const BBox&);
+	RAD_DECLARE_PROPERTY(Light, brightness, float, float);
 
 	void Link();
 	void Unlink();
@@ -97,6 +98,14 @@ private:
 		m_size = value;
 	}
 
+	RAD_DECLARE_GET(brightness, float) {
+		return m_brightness;
+	}
+
+	RAD_DECLARE_SET(brightness, float) {
+		m_brightness = value;
+	}
+
 	details::LightInteraction **ChainHead(int matId);
 	
 	dBSPLeaf::PtrVec m_bspLeafs;
@@ -107,7 +116,9 @@ private:
 	Vec4 m_shColor;
 	Vec3 m_dfColor;
 	Vec3 m_pos;
+	float m_brightness;
 	LightStyles m_style;
+	int m_markFrame;
 	dBSPLeaf *m_leaf;
 	Light *m_prev;
 	Light *m_next;

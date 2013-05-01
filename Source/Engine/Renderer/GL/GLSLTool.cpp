@@ -164,6 +164,8 @@ bool GLSLTool::Assemble(
 		numNormals = std::max(1, numShaderNormals);
 		numTangents = std::max(1, numShaderTangents);
 		numBitangents = std::max(1, numShaderBitangents);
+
+		ss << "#define TANGENT_FRAME" << "\r\n";
 	}
 
 	if (numNormals > 0)
@@ -193,10 +195,16 @@ bool GLSLTool::Assemble(
 
 	if (numLights > 0) {
 		ss << "#define LIGHTS " << numLights << "\r\n";
+		if (numLightPos > 0)
+			ss << "#define SHADER_LIGHT_POS " << numLightPos << "\r\n";
 		if (numLightDir > 0)
 			ss << "#define SHADER_LIGHT_DIR " << numLightDir << "\r\n";
 		if (numLightHalfDir > 0)
 			ss << "#define SHADER_LIGHT_HALFDIR " << numLightHalfDir << "\r\n";
+		if (numLightDiffuseColor > 0)
+			ss << "#define SHADER_LIGHT_DIFFUSE_COLOR " << numLightDiffuseColor << "\r\n";
+		if (numLightSpecularColor > 0)
+			ss << "#define SHADER_LIGHT_SPECULAR_COLOR " << numLightSpecularColor << "\r\n";
 	}
 
 	if (GLES)
@@ -222,11 +230,15 @@ bool GLSLTool::Assemble(
 			in.c_str, 
 			0
 		);
+
+		char szPass[32];
+		sprintf(szPass, "_pass%d", (int)pass);
 		
 		{
 			engine.sys->files->CreateDirectory("@r:/Temp/Shaders/Logs");
 			String path(CStr("@r:/Temp/Shaders/Logs/"));
 			path += shader->name;
+			path += szPass;
 			path += "_unoptimized";
 			if (vertexShader) {
 				path += ".vert.glsl";
@@ -268,6 +280,7 @@ bool GLSLTool::Assemble(
 			engine.sys->files->CreateDirectory("@r:/Temp/Shaders/Logs");
 			String path(CStr("@r:/Temp/Shaders/Logs/"));
 			path += shader->name;
+			path += szPass;
 			path += "_optimized";
 			if (vertexShader) {
 				path += ".vert.glsl";

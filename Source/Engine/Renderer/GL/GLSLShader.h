@@ -119,8 +119,7 @@ private:
 		GLint lightSpecular[kMaxLights];
 
 		GLint eye;
-		float eyePos[3];
-		int eyeOps;
+		Vec3 eyePos;
 	};
 
 	struct Pass {

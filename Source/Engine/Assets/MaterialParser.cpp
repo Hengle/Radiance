@@ -9,6 +9,7 @@
 #include "MaterialParser.h"
 #include "TextureParser.h"
 #include "../Engine.h"
+#include "../Renderer/Shader.h"
 #include <Runtime/Stream.h>
 #include <string.h>
 #include <algorithm>
@@ -85,6 +86,7 @@ int MaterialParser::LoadCooked(
 		is >> temp; m_m.depthFunc = (r::Material::DepthFunc)temp;
 		is >> temp; m_m.doubleSided.set(temp?true:false);
 		is >> temp; m_m.depthWrite.set(temp?true:false);
+		is >> temp; m_m.lit.set(temp?true:false);
 
 		m_m.animated = false;
 
@@ -251,6 +253,9 @@ int MaterialParser::Load(
 ) {
 	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i)
 		m_m.SetTextureId(i, -1);
+
+	// NOTE: lit is set in MaterialLoader
+	m_m.lit = false;
 
 	const String *s = asset->entry->KeyValue<String>("Source.Shader", P_TARGET_FLAGS(flags));
 	if (!s)
@@ -648,6 +653,19 @@ int MaterialLoader::Process(
 				return r;
 
 			m_index = 0;
+
+#if defined(RAD_OPT_TOOLS)
+			if (!asset->cooked) {
+				parser->material->lit = false;
+
+				for (int i = r::Shader::kPass_Diffuse1; i <= r::Shader::kPass_DiffuseSpecular4; ++i) {
+					if (parser->material->shader->HasPass((r::Shader::Pass)i)) {
+						parser->material->lit = true;
+						break;
+					}
+				}
+			}
+#endif
 
 			if (!time.remaining)
 				return SR_Pending;

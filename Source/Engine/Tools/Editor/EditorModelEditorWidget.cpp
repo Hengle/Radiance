@@ -30,9 +30,11 @@
 #include <QtGui/QSplitter>
 #include <QtGui/QWidget>
 #include <QtGui/QBoxLayout.h>
+#include <QtGui/QFormLayout.h>
 #include <QtGui/QGroupBox.h>
 #include <QtGui/QCheckBox.h>
 #include <QtGui/QTreeWidget>
+#include <QtGui/QLineEdit>
 #include <QtGui/QMessageBox>
 #include <Runtime/Base/SIMD.h>
 
@@ -107,6 +109,18 @@ void ModelEditorWidget::resizeEvent(QResizeEvent *event) {
 	vbl->addWidget(m_wireframe);
 	vbl->addWidget(m_normals);
 	vbl->addWidget(m_tangents);
+
+	QGroupBox *lightGroup = new QGroupBox("Lighting");
+	QFormLayout *llayout = new QFormLayout(lightGroup);
+
+	m_lighting = new QCheckBox("Enable Lighting");
+	llayout->addRow(m_lighting);
+	m_brightness = new QLineEdit();
+	llayout->addRow("Brightness", m_brightness);
+	m_distance = new QLineEdit();
+	llayout->addRow("Distance", m_distance);
+
+	vbl->addWidget(lightGroup);
 
 	vblOuter->addWidget(group);
 	
@@ -298,8 +312,24 @@ void ModelEditorWidget::OnRenderGL(GLWidget &src) {
 		vph/vpw
 	);
 
-	for (int i = 0; i < r::Material::kNumSorts; ++i) {
-		Draw((r::Material::Sort)i);
+	r::Shader::Uniforms u(r::Shader::Uniforms::kDefault);
+
+	if (m_lighting->isChecked()) {
+		u.eyePos = m_glw->camera->pos;
+		u.lights.numLights = 1;
+		u.lights.lights[0].radius = 400.f;
+		u.lights.lights[0].brightness = 2.f;
+		u.lights.lights[0].pos = Vec3(65.f, 0.f, 120.f);
+		u.lights.lights[0].diffuse = Vec3(1.f,1.f,1.f);
+		u.lights.lights[0].specular = Vec4(1.f,1.f,1.f,1.f);
+		u.lights.lights[0].flags = r::LightDef::kFlag_Diffuse|r::LightDef::kFlag_Specular;
+		for (int i = 0; i < r::Material::kNumSorts; ++i) {
+			Draw((r::Material::Sort)i, u);
+		}
+	} else {
+		for (int i = 0; i < r::Material::kNumSorts; ++i) {
+			Draw((r::Material::Sort)i, u);
+		}
 	}
 
 	if (m_wireframe->isChecked())
@@ -311,7 +341,10 @@ void ModelEditorWidget::OnRenderGL(GLWidget &src) {
 	gls.Commit();
 }
 
-void ModelEditorWidget::Draw(Material::Sort sort) {
+void ModelEditorWidget::Draw(
+	Material::Sort sort,
+	const r::Shader::Uniforms &u
+) {
 
 	if (m_skModel) {
 		asset::SkMaterialLoader *skMaterials = asset::SkMaterialLoader::Cast(m_asset);
@@ -339,10 +372,24 @@ void ModelEditorWidget::Draw(Material::Sort sort) {
 
 			mat->BindTextures(loader);
 			mat->BindStates();
-			mat->shader->Begin(Shader::kPass_Preview, *mat);
+
+			if (u.lights.numLights > 0) {
+				if (mat->shader->HasPass(Shader::kPass_DiffuseSpecular1)) {
+					mat->shader->Begin(Shader::kPass_DiffuseSpecular1, *mat);
+				} else if (mat->shader->HasPass(Shader::kPass_Diffuse1)) {
+					mat->shader->Begin(Shader::kPass_Diffuse1, *mat);
+				} else if (mat->shader->HasPass(Shader::kPass_Specular1)) {
+					mat->shader->Begin(Shader::kPass_Specular1, *mat);
+				} else {
+					mat->shader->Begin(Shader::kPass_Preview, *mat);
+				}
+			} else {
+				mat->shader->Begin(Shader::kPass_Preview, *mat);
+			}
+
 			Mesh &m = m_skModel->Mesh(i);
 			m.BindAll(0);
-			mat->shader->BindStates();
+			mat->shader->BindStates(u);
 			gls.Commit();
 			m.Draw();
 			mat->shader->End();
@@ -376,7 +423,7 @@ void ModelEditorWidget::Draw(Material::Sort sort) {
 			mat->shader->Begin(Shader::kPass_Preview, *mat);
 			Mesh &m = m_vtModel->Mesh(i);
 			m.BindAll(0);
-			mat->shader->BindStates();
+			mat->shader->BindStates(u);
 			gls.Commit();
 			m.Draw();
 			mat->shader->End();
@@ -406,7 +453,7 @@ void ModelEditorWidget::Draw(Material::Sort sort) {
 			mat->shader->Begin(Shader::kPass_Preview, *mat);
 			Mesh &m = *m_bundle->Mesh(i);
 			m.BindAll(0);
-			mat->shader->BindStates();
+			mat->shader->BindStates(u);
 			gls.Commit();
 			m.Draw();
 			mat->shader->End();

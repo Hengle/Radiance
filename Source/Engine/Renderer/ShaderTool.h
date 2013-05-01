@@ -66,9 +66,9 @@ public:
 		kMaterialSource_Texture,
 		kMaterialSource_Framebuffer,
 		kMaterialSource_Color, // constant
-		kMaterialSource_LightDiffuseColor, // constant
-		kMaterialSource_LightSpecularColor, // constant
-		kMaterialSource_LightPos, // model space constant (xyz) + w == brightness
+		kMaterialSource_LightDiffuseColor, // constant (rgb) + w == brightness
+		kMaterialSource_LightSpecularColor, // constant (rgb) + w == exponent
+		kMaterialSource_LightPos, // model space constant (xyz) + w == radius
 		kMaterialSource_Vertex,
 		kMaterialSource_Normal,
 		kMaterialSource_Tangent,

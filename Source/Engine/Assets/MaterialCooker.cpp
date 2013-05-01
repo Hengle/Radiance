@@ -18,7 +18,7 @@ namespace asset {
 
 extern const char *s_tcModNames[r::Material::kNumTCMods]; // defined in MaterialParser.cpp
 
-MaterialCooker::MaterialCooker() : Cooker(4) {
+MaterialCooker::MaterialCooker() : Cooker(5) {
 }
 
 MaterialCooker::~MaterialCooker() {
@@ -92,6 +92,7 @@ int MaterialCooker::Compile(int flags) {
 	os << (U8)parser->material->depthFunc.get();
 	os << (U8)(parser->material->doubleSided.get() ? 1 : 0);
 	os << (U8)(parser->material->depthWrite.get() ? 1 : 0);
+	os << (U8)(parser->material->lit.get() ? 1 : 0);
 
 	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
 		String path;

@@ -112,6 +112,7 @@ public:
 	RAD_DECLARE_PROPERTY(Material, depthWrite, bool, bool);
 	RAD_DECLARE_PROPERTY(Material, shaderId, int, int);
 	RAD_DECLARE_PROPERTY(Material, animated, bool, bool);
+	RAD_DECLARE_PROPERTY(Material, lit, bool, bool);
 	RAD_DECLARE_PROPERTY(Material, time, float, float);
 	RAD_DECLARE_PROPERTY(Material, timingMode, TimingMode, TimingMode);
 	RAD_DECLARE_READONLY_PROPERTY(Material, shader, Shader::Ref);
@@ -206,6 +207,8 @@ private:
 	RAD_DECLARE_SET(time, float) { m_time = value; }
 	RAD_DECLARE_GET(timingMode, TimingMode) { return m_timingMode; }
 	RAD_DECLARE_SET(timingMode, const TimingMode&); // if this is not const TimingMode& we get an ICE!!!!! WTF!!!!
+	RAD_DECLARE_GET(lit, bool) { return m_lit; }
+	RAD_DECLARE_SET(lit, bool) { m_lit = value; }
 
 	// Basically I want materials that can to share a Shader::Ref to minimize
 	// the cost of material changes (i.e. I can sort materials by shader and
@@ -324,6 +327,7 @@ private:
 	bool m_animated;
 	bool m_doubleSided;
 	bool m_depthWrite;
+	bool m_lit;
 };
 
 } // namespace

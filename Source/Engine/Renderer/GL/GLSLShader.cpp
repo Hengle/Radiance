@@ -546,13 +546,12 @@ bool GLSLShader::MapInputs(Pass &p, const Material &material) {
 	const float kFloatMax = std::numeric_limits<float>::max();
 
 	p.u.eye = gl.GetUniformLocationARB(p.p->id, "U_eye");
-	p.u.eyeOps = 0;
 	p.u.eyePos[0] = p.u.eyePos[1] = p.u.eyePos[2] = kFloatMax;
 
 	p.u.lights.numLights = 0;
 
 	for (int i = 0; i < kMaxLights; ++i) {
-		p.u.lights.lights[i].diffuse = Vec4(kFloatMax, kFloatMax, kFloatMax, kFloatMax);
+		p.u.lights.lights[i].diffuse = Vec3(kFloatMax, kFloatMax, kFloatMax);
 		p.u.lights.lights[i].specular = Vec4(kFloatMax, kFloatMax, kFloatMax, kFloatMax);
 		p.u.lights.lights[i].pos = Vec3(kFloatMax, kFloatMax, kFloatMax);
 		p.u.lights.lights[i].flags = 0;
@@ -564,10 +563,10 @@ bool GLSLShader::MapInputs(Pass &p, const Material &material) {
 		string::sprintf(sz, "U_light%d_pos", i);
 		p.u.lightPos[i] = gl.GetUniformLocationARB(p.p->id, sz);
 
-		string::sprintf(sz, "U_light%d_diffuseColor", sz);
+		string::sprintf(sz, "U_light%d_diffuseColor", i);
 		p.u.lightDiffuse[i] = gl.GetUniformLocationARB(p.p->id, sz);
 
-		string::sprintf(sz, "U_light%d_specularColor", sz);
+		string::sprintf(sz, "U_light%d_specularColor", i);
 		p.u.lightSpecular[i] = gl.GetUniformLocationARB(p.p->id, sz);
 
 		if (p.u.lightPos[i] == -1 &&
@@ -799,35 +798,31 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 #endif
 	}
 
-	if ((p.u.eye != -1) && (p.u.eyeOps != gl.eyeOps)) {
-		p.u.eyeOps = gl.eyeOps;
-
-		float eye[3];
-		gl.GetEye(eye);
-
-		if (eye[0] != p.u.eyePos[0] ||
-			eye[1] != p.u.eyePos[1] ||
-			eye[2] != p.u.eyePos[2]) {
-
+	if (p.u.eye != -1) {
+		if (uniforms.eyePos != p.u.eyePos) {
+			p.u.eyePos = uniforms.eyePos;
+			gl.Uniform3fvARB(p.u.eye, 1, &uniforms.eyePos[0]);
 		}
 	}
 
 	// shader has to be provided all inputs!
-	RAD_ASSERT(p.u.lights.numLights == uniforms.lights.numLights);
+	RAD_ASSERT(p.u.lights.numLights <= uniforms.lights.numLights);
 
-	for (int i = 0; i < uniforms.lights.numLights; ++i) {
+	for (int i = 0; i < p.u.lights.numLights; ++i) {
 		const LightDef &srcLight = uniforms.lights.lights[i];
 		LightDef &dstLight = p.u.lights.lights[i];
 
-		if ((p.u.lightPos[i] != -1) && (srcLight.pos != dstLight.pos)) {
+		if ((p.u.lightPos[i] != -1) && ((srcLight.pos != dstLight.pos) || (srcLight.radius != dstLight.radius))) {
 			dstLight.pos = srcLight.pos;
-			gl.Uniform3fvARB(p.u.lightPos[i], 1, &srcLight.pos[0]);
+			dstLight.radius = srcLight.radius;
+			gl.Uniform4fARB(p.u.lightPos[i], srcLight.pos[0], srcLight.pos[1], srcLight.pos[2], srcLight.radius);
 		}
 
-		if ((p.u.lightDiffuse[i] != -1) && (srcLight.diffuse != dstLight.diffuse)) {
-			RAD_ASSERT(srcLight.flags & LightDef::kFlag_Diffuse);
+		if ((p.u.lightDiffuse[i] != -1) && ((srcLight.diffuse != dstLight.diffuse) || (srcLight.brightness != dstLight.brightness))) {
+//			RAD_ASSERT(srcLight.flags & LightDef::kFlag_Diffuse);
 			dstLight.diffuse = srcLight.diffuse;
-			gl.Uniform4fvARB(p.u.lightDiffuse[i], 1, &srcLight.diffuse[0]);
+			dstLight.brightness = srcLight.brightness;
+			gl.Uniform4fARB(p.u.lightDiffuse[i], srcLight.diffuse[0], srcLight.diffuse[1], srcLight.diffuse[2], srcLight.brightness);
 		}
 
 		if ((p.u.lightSpecular[i] != -1) && (srcLight.specular != dstLight.specular)) {
@@ -1000,13 +995,13 @@ void GLSLShader::BindAttribLocations(GLhandleARB p, const MaterialInputMappings 
 		break;
 		case kMaterialGeometrySource_Normals:
 			if (idx == 0) {
-				gl.BindAttribLocationARB(p, loc, "in_normal");
+				gl.BindAttribLocationARB(p, loc, "in_nm0");
 				CHECK_GL_ERRORS();
 			}
 		break;
 		case kMaterialGeometrySource_Tangents:
 			if (idx == 0) {
-				gl.BindAttribLocationARB(p, loc, "in_tangent");
+				gl.BindAttribLocationARB(p, loc, "in_tan0");
 				CHECK_GL_ERRORS();
 			}
 		break;
