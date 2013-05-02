@@ -16,7 +16,7 @@ using namespace pkg;
 
 namespace asset {
 
-VtModelCooker::VtModelCooker() : Cooker(1) {
+VtModelCooker::VtModelCooker() : Cooker(2) {
 }
 
 VtModelCooker::~VtModelCooker() {

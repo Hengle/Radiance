@@ -389,9 +389,10 @@ namespace {
 		int id;
 	};
 
-	typedef zone_multimap<SmoothVert, int, Z3DXT>::type SmoothVertIdxMap;
 	typedef zone_vector<SmoothVert, Z3DXT>::type SmoothVertVec;
-
+	typedef zone_vector<int, Z3DXT>::type IntVec;
+	typedef zone_map<int, IntVec, Z3DXT>::type SmoothVertIdxMap;
+		
 	void AddFaces(const SmoothVert &src, SmoothVert &dst) {
 		for (TriFaceIdxSet::const_iterator it = src.faces.begin(); it != src.faces.end(); ++it)
 			dst.faces.insert(*it);
@@ -402,35 +403,39 @@ namespace {
 		a.faces = b.faces;
 	}
 
-	int HashVert(const SmoothVert &v, SmoothVertVec &vec, SmoothVertIdxMap &idxMap, bool smooth) {
-		std::pair<SmoothVertIdxMap::const_iterator,
-		          SmoothVertIdxMap::const_iterator> pair = idxMap.equal_range(v);
+	int HashVert(const SmoothVert &v, SmoothVertVec &vec, SmoothVertIdxMap &idxMap) {
+		SmoothVertIdxMap::iterator it = idxMap.find(v.id);
 
-		while (pair.first != pair.second) {
-			// do not collapse vertices (important for vertex animation)
-			if (pair.first->first.id == v.id) {
-				if (smooth) {
-					SmoothVert &x = vec[pair.first->second];
-					if (v.sm & x.sm) {
-						x.sm |= v.sm;
-						AddFaces(v, x);
-						return pair.first->second;
+		int idx = -1;
+
+		if (it != idxMap.end()) {
+			IntVec &indices = it->second;
+			for (IntVec::const_iterator it = indices.begin(); it != indices.end(); ++it) {
+				SmoothVert &x = vec[*it];
+				if ((x.sm&v.sm)||(x.sm==v.sm)) {
+					// identical?
+					if (x.sm == v.sm) {
+						RAD_ASSERT(idx == -1);
+						idx = *it;
 					}
-					++pair.first;
-					continue;
+
+					AddFaces(v, x);
 				}
-				return pair.first->second;
 			}
-			++pair.first;
+		} else {
+			it = idxMap.insert(SmoothVertIdxMap::value_type(v.id, IntVec())).first;
 		}
 
+		if (idx != -1)
+			return idx;
+
+		idx = (int)vec.size();
 		vec.push_back(v);
-		int ofs = (int)(vec.size()-1);
-		idxMap.insert(SmoothVertIdxMap::value_type(v, ofs));
-		return ofs;
+		it->second.push_back(idx);
+		return idx;
 	}
 
-	void MakeNormals(const TriModel &mdl, SmoothVertVec &vec, bool smooth) {
+	void MakeNormals(const TriModel &mdl, SmoothVertVec &vec) {
 		
 		for (SmoothVertVec::iterator it = vec.begin(); it != vec.end(); ++it) {
 			SmoothVert &v = *it;
@@ -521,7 +526,7 @@ namespace {
 	}
 
 	// apply smoothing groups and build the real trimodel.
-	SceneFile::TriModel::Ref Build(TriModel &mdl, int id, int count, bool smooth) {
+	SceneFile::TriModel::Ref Build(TriModel &mdl, int id, int count, bool useSmGroups) {
 		COut(C_Debug) << "(3DX) processing mesh " << (id+1) << "/" << count << std::endl;
 		
 		SceneFile::TriModel::Ref mmdl(new SceneFile::TriModel());
@@ -555,7 +560,7 @@ namespace {
 				v.orgPos = mdl.verts[tri.v[i]].orgPos;
 				if (mdl.skin)
 					v.weights = (*mdl.skin)[tri.v[i]];
-				v.sm  = tri.smg;
+				v.sm  = useSmGroups ? tri.smg : 1;
 				v.id = tri.v[i];
 
 				for (int j = 0; j < SceneFile::kMaxUVChannels; ++j) {
@@ -568,13 +573,13 @@ namespace {
 					}
 				}
 
-				tri.sm[i] = HashVert(v, smv, smidxm, smooth);
+				tri.sm[i] = HashVert(v, smv, smidxm);
 			}
 
 			mmdl->tris.push_back(SceneFile::TriFace(tri.sm[0], tri.sm[1], tri.sm[2], tri.mat, tri.plane, mmdl.get()));
 		}
 
-		MakeNormals(mdl, smv, smooth);
+		MakeNormals(mdl, smv);
 
 		mmdl->verts.reserve(smv.size());
 		mmdl->bounds = mdl.bounds;
@@ -603,7 +608,7 @@ namespace {
 
 				// replace frame with smoothed vertices
 				// false because we don't need to regenerate sm groups (already done)
-				MakeNormals(mdl, smv, false);
+				MakeNormals(mdl, smv);
 
 				vframe.verts.clear();
 
