@@ -345,7 +345,7 @@ bool ModelEditorWidget::Load() {
 	m_lightPos = Vec3(65.f, 0.f, 120.f);
 	m_lightRadius = 400;
 	m_lightBrightness = 2.f;
-	m_lightSpecularExp = 16.f;
+	m_lightSpecularExp = 32.f;
 
 	m_brightness->setText(QString("%1").arg(m_lightBrightness));
 	m_specularExponent->setText(QString("%1").arg(m_lightSpecularExp));

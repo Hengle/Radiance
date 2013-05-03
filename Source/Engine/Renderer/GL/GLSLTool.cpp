@@ -147,7 +147,8 @@ bool GLSLTool::Assemble(
 
 	int numLightPos = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightPos);
 	int numLightDir = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightDir);
-	int numLightHalfDir = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_HalfLightDir);
+	int numLightHalfPos = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightHalfPos);
+	int numLightHalfDir = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightHalfDir);
 	int numLightDiffuseColor = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightDiffuseColor);
 	int numLightSpecularColor = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightSpecularColor);
 
@@ -187,8 +188,11 @@ bool GLSLTool::Assemble(
 		std::max(
 			numLightDir, 
 			std::max(
-				numLightHalfDir,
-				std::max(numLightDiffuseColor, numLightSpecularColor)
+				numLightHalfPos,
+				std::max(
+					numLightHalfDir,
+					std::max(numLightDiffuseColor, numLightSpecularColor)
+				)
 			)
 		)
 	);
@@ -199,6 +203,8 @@ bool GLSLTool::Assemble(
 			ss << "#define SHADER_LIGHT_POS " << numLightPos << "\r\n";
 		if (numLightDir > 0)
 			ss << "#define SHADER_LIGHT_DIR " << numLightDir << "\r\n";
+		if (numLightHalfPos > 0)
+			ss << "#define SHADER_LIGHT_HALFPOS " << numLightHalfPos << "\r\n";
 		if (numLightHalfDir > 0)
 			ss << "#define SHADER_LIGHT_HALFDIR " << numLightHalfDir << "\r\n";
 		if (numLightDiffuseColor > 0)

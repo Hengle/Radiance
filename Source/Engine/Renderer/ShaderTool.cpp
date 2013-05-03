@@ -278,6 +278,10 @@ int Shader::lua_MLightPos(lua_State *L) {
 	return lua_MSource(L, kMaterialSource_LightPos);
 }
 
+int Shader::lua_MLightHalfPos(lua_State *L) {
+	return lua_MSource(L, kMaterialSource_LightHalfPos);
+}
+
 int Shader::lua_MLightDiffuseColor(lua_State *L) {
 	return lua_MSource(L, kMaterialSource_LightDiffuseColor);
 }
@@ -288,6 +292,10 @@ int Shader::lua_MLightSpecularColor(lua_State *L) {
 
 int Shader::lua_MLightDir(lua_State *L) {
 	return lua_MSource(L, kMaterialSource_LightDir);
+}
+
+int Shader::lua_MLightHalfDir(lua_State *L) {
+	return lua_MSource(L, kMaterialSource_LightHalfDir);
 }
 
 int Shader::lua_MVertexColor(lua_State *L) {
@@ -343,9 +351,11 @@ lua::State::Ref Shader::InitLuaM(Engine &e, Shader *m) {
 		{ "MTangent", lua_MTangent },
 		{ "MBitangent", lua_MBitangent },
 		{ "MLightPos", lua_MLightPos },
+		{ "MLightHalfPos", lua_MLightHalfPos },
 		{ "MLightDiffuseColor", lua_MLightDiffuseColor },
 		{ "MLightSpecularColor", lua_MLightSpecularColor },
 		{ "MLightDir", lua_MLightDir },
+		{ "MLightHalfDir", lua_MLightHalfDir },
 		{ "MVertexColor", lua_MVertexColor },
 		{ 0, 0 }
 	};
@@ -1033,7 +1043,7 @@ void Shader::BuildInputMappings(lua_State *L, r::Shader::Pass pass) {
 	// NOTE: Normal, Tangent are needed if shader accessed the LightDir field.
 
 	if (!usage.s[kMaterialSource_LightDir].empty() ||
-		!usage.s[kMaterialSource_HalfLightDir].empty()) {
+		!usage.s[kMaterialSource_LightHalfDir].empty()) {
 		// only one normal channel
 		usage.s[kMaterialSource_Normal].insert(0);
 
@@ -1513,6 +1523,13 @@ bool Shader::szMaterialInput(
 			index
 		);
 		return true;
+	case kMaterialSource_LightHalfPos:
+		string::sprintf(
+			sz,
+			"IN(light%i_chalfpos)",
+			index
+		);
+		return true;
 	case kMaterialSource_Vertex:
 		strcpy(sz, "IN(position)");
 		return true;
@@ -1556,7 +1573,7 @@ bool Shader::szMaterialInput(
 			index
 		);
 		return true;
-	case kMaterialSource_HalfLightDir:
+	case kMaterialSource_LightHalfDir:
 		string::sprintf(
 			sz,
 			"IN(light%d_halfdir)",

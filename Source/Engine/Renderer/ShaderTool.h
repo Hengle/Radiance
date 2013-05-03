@@ -69,12 +69,13 @@ public:
 		kMaterialSource_LightDiffuseColor, // constant (rgb) + w == brightness
 		kMaterialSource_LightSpecularColor, // constant (rgb) + w == exponent
 		kMaterialSource_LightPos, // model space constant (xyz) + w == radius
+		kMaterialSource_LightHalfPos, // model space constant (xyz)
 		kMaterialSource_Vertex,
 		kMaterialSource_Normal,
 		kMaterialSource_Tangent,
 		kMaterialSource_Bitangent,
 		kMaterialSource_LightDir, // in texture space
-		kMaterialSource_HalfLightDir, // in texture space
+		kMaterialSource_LightHalfDir, // in texture space
 		kMaterialSource_TexCoord,
 		kMaterialSource_VertexColor,
 		kMaterialSource_SpriteSkin,
@@ -315,9 +316,11 @@ private:
 	static int lua_MTangent(lua_State *L);
 	static int lua_MBitangent(lua_State *L);
 	static int lua_MLightPos(lua_State *L);
+	static int lua_MLightHalfPos(lua_State *L);
 	static int lua_MLightDiffuseColor(lua_State *L);
 	static int lua_MLightSpecularColor(lua_State *L);
 	static int lua_MLightDir(lua_State *L);
+	static int lua_MLightHalfDir(lua_State *L);
 	static int lua_MVertexColor(lua_State *L);
 	static int lua_MSource(lua_State *L, MaterialSource source);
 	static int lua_gcNode(lua_State *L);
