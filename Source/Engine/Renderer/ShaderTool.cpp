@@ -1509,9 +1509,12 @@ bool Shader::szMaterialInput(
 	case kMaterialSource_LightPos:
 		string::sprintf(
 			sz,
-			"UNIFORM(light%i_pos)",
+			"IN(light%i_cpos)",
 			index
 		);
+		return true;
+	case kMaterialSource_Vertex:
+		strcpy(sz, "IN(position)");
 		return true;
 	case kMaterialSource_Normal:
 		string::sprintf(
@@ -1550,22 +1553,14 @@ bool Shader::szMaterialInput(
 		string::sprintf(
 			sz,
 			"IN(light%d_dir)",
-			AttribUsageIndex(
-				pass,
-				source, 
-				index
-			)
+			index
 		);
 		return true;
 	case kMaterialSource_HalfLightDir:
 		string::sprintf(
 			sz,
 			"IN(light%d_halfdir)",
-			AttribUsageIndex(
-				pass,
-				source, 
-				index
-			)
+			index
 		);
 		return true;
 	case kMaterialSource_TexCoord:
@@ -1580,7 +1575,7 @@ bool Shader::szMaterialInput(
 		);
 		return true;
 	case kMaterialSource_VertexColor:
-		strcpy(sz, "IN(vertexColor");
+		strcpy(sz, "IN(vertexColor)");
 		return true;
 	default:
 		break;

@@ -924,7 +924,7 @@ void ModelEditorWidget::DrawLightSphere() {
 		r::gl.MatrixMode(GL_MODELVIEW);
 		r::gl.PushMatrix();
 		r::gl.Translatef(m_lightPos[0], m_lightPos[1], m_lightPos[2]);
-		r::gl.Scalef(m_lightRadius/2.f, m_lightRadius/2.f, m_lightRadius/2.f);
+		r::gl.Scalef(m_lightRadius, m_lightRadius, m_lightRadius);
 
 		mat->BindTextures(loader);
 		mat->BindStates();
