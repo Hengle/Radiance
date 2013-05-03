@@ -113,6 +113,10 @@ public:
 
 	void Reserve(int numStreams);
 
+	// Builders
+
+	static Ref MakeSphere(Zone &zone, bool uvs, float scale = 1.f, int tessLat = 32, int tessLog = 32);
+
 private:
 
 	RB m_imp;

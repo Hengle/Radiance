@@ -46,8 +46,8 @@ void GLNavWidget::TickCamera(float dt) {
 	Vec3 left = m_c.left;
 	Vec3 fwd = m_c.fwd;
 
-	left *= m_leftMotion;
-	fwd *= m_fwdMotion;
+	left *= m_leftMotion*dt;
+	fwd *= m_fwdMotion*dt;
 
 	m_c.pos = (m_c.pos.get() + left + fwd);
 }

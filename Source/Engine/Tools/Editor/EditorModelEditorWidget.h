@@ -9,6 +9,8 @@
 
 #include "../../Types.h"
 #include <QtGui/QWidget>
+#include <QtCore/QPoint>
+#include "EditorGLNavWidget.h"
 #include "../../Renderer/Mesh.h"
 #include "../../Renderer/SkMesh.h"
 #include "../../Renderer/VtMesh.h"
@@ -19,6 +21,7 @@
 class QTreeWidget;
 class QTreeWidgetItem;
 class QCheckBox;
+class QLabel;
 class QLineEdit;
 
 namespace asset {
@@ -29,8 +32,35 @@ class MeshMaterialLoader;
 namespace tools {
 namespace editor {
 
-class GLWidget;
-class GLNavWidget;
+class RADENG_CLASS ModelEditorNavWidget : public GLNavWidget {
+	Q_OBJECT
+public:
+	ModelEditorNavWidget(QWidget *parent = 0);
+
+signals:
+
+	void OnAdjustLightDistance(float distance);
+	void OnAdjustLightRadius(float adjust);
+	void OnOrbitLight(float x, float y);
+
+protected:
+
+	virtual void mouseMoveEvent(QMouseEvent *e);
+	virtual void mousePressEvent(QMouseEvent *e);
+	virtual void mouseReleaseEvent(QMouseEvent *e);
+
+private:
+
+	enum Mode {
+		kMode_None,
+		kMode_Orbit,
+		kMode_Distance,
+		kMode_Radius
+	};
+
+	QPoint m_mp;
+	Mode m_mode;
+};
 
 class RADENG_CLASS ModelEditorWidget : public QWidget {
 	Q_OBJECT
@@ -52,7 +82,14 @@ protected:
 private slots:
 
 	void OnRenderGL(GLWidget &src);
-	void ItemSelectionChanged();
+	void OnItemSelectionChanged();
+	void OnAdjustLightDistance(float distance);
+	void OnAdjustLightRadius(float adjust);
+	void OnOrbitLight(float x, float y);
+	void OnLightBrightnessChanged(const QString &text);
+	void OnLightSpecularExponentChanged(const QString &text);
+	void OnLightDiffuseColorChanged(const Vec4 &rgba);
+	void OnLightSpecularColorChanged(const Vec4 &rgba);
 
 private:
 
@@ -63,6 +100,7 @@ private:
 		const r::Shader::Uniforms &u
 	);
 
+	void DrawLightSphere();
 	void DrawWireframe();
 	void DrawNormals(bool normals, bool tangents);
 	
@@ -76,21 +114,30 @@ private:
 	void Load(int id);
 	void DoClose();
 
+	Vec3 m_lightDfColor;
+	Vec3 m_lightSpColor;
+	Vec3 m_lightPos;
+	float m_lightRadius;
+	float m_lightBrightness;
+	float m_lightSpecularExp;
+
+	r::Mesh::Ref m_lightSphere;
 	r::SkMesh::Ref m_skModel;
 	r::VtMesh::Ref m_vtModel;
 	asset::MeshVBLoader *m_bundle;
 	pkg::Asset::Ref m_asset;
 	pkg::Asset::Ref m_wireframeMat;
-	pkg::Asset::Ref m_normalMat;
-	pkg::Asset::Ref m_tangentMat;
-	GLNavWidget *m_glw;
+	pkg::Asset::Ref m_lightSphereMat;
+	pkg::Asset::Ref m_lightRadiusMat;
+	ModelEditorNavWidget *m_glw;
 	QTreeWidget *m_tree;
 	QCheckBox *m_wireframe;
 	QCheckBox *m_normals;
 	QCheckBox *m_tangents;
 	QCheckBox *m_lighting;
+	QCheckBox *m_showLightRadius;
 	QLineEdit *m_brightness;
-	QLineEdit *m_distance;
+	QLineEdit *m_specularExponent;
 	float **m_skVerts[2];
 };
 

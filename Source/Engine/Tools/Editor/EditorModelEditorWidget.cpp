@@ -10,6 +10,7 @@
 #include "EditorMainWindow.h"
 #include "EditorUtils.h"
 #include "EditorGLNavWidget.h"
+#include "EditorColorPicker.h"
 #include "../../Assets/MeshParser.h"
 #include "../../Assets/MeshMaterialLoader.h"
 #include "../../Assets/MeshVBLoader.h"
@@ -36,7 +37,9 @@
 #include <QtGui/QTreeWidget>
 #include <QtGui/QLineEdit>
 #include <QtGui/QMessageBox>
+#include <QtGui/QDoubleValidator>
 #include <Runtime/Base/SIMD.h>
+#include <Runtime/Math.h>
 
 #if defined(RAD_OPT_DEBUG)
 #define VALIDATE_SIMD_SKIN
@@ -52,6 +55,65 @@ namespace tools {
 namespace editor {
 
 static const float s_kNormalLen = 10.f;
+
+ModelEditorNavWidget::ModelEditorNavWidget(QWidget *parent) : 
+GLNavWidget(parent),
+m_mode(kMode_None) {
+}
+
+void ModelEditorNavWidget::mouseMoveEvent(QMouseEvent *e) {
+	if (m_mode == kMode_None) {
+		GLNavWidget::mouseMoveEvent(e);
+		return;
+	}
+
+	QPoint pos = e->pos();
+	float dx = pos.x() - m_mp.x();
+	float dy = pos.y() - m_mp.y();
+
+	switch (m_mode) {
+	case kMode_Orbit:
+		emit OnOrbitLight(dx, dy);
+		break;
+	case kMode_Distance:
+		emit OnAdjustLightDistance(dy);
+		break;
+	case kMode_Radius:
+		emit OnAdjustLightRadius(dy);
+		break;
+	}
+
+	m_mp = pos;
+}
+
+void ModelEditorNavWidget::mousePressEvent(QMouseEvent *e) {
+	m_mp = e->pos();
+	if (e->modifiers() == Qt::ControlModifier) {
+		if (e->button() == Qt::LeftButton) {
+			m_mode = kMode_Distance;
+		} else if (e->button() == Qt::RightButton) {
+			m_mode = kMode_Radius;
+		}
+		return;
+	} else if (e->button() == Qt::RightButton) {
+		m_mode = kMode_Orbit;
+		return;
+	}
+
+	m_mode = kMode_None;
+	GLNavWidget::mousePressEvent(e);
+}
+
+void ModelEditorNavWidget::mouseReleaseEvent(QMouseEvent *e) {
+	if (m_mode == kMode_None) {
+		GLNavWidget::mouseReleaseEvent(e);
+		return;
+	}
+
+	m_mode = kMode_None;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 ModelEditorWidget::ModelEditorWidget(
 	const pkg::Asset::Ref &asset,
@@ -91,50 +153,63 @@ void ModelEditorWidget::resizeEvent(QResizeEvent *event) {
 	right = (int)(this->width()*0.85f);
 	left = this->width()-right;
 
-	QSplitter *s = new QSplitter(this);
+	QSplitter *s = new (ZEditor) QSplitter(this);
 	s->setOpaqueResize(false);
 	s->setOrientation(Qt::Horizontal);
 
-	QWidget *w = new QWidget();
+	QWidget *w = new (ZEditor) QWidget();
 
-	QVBoxLayout *vblOuter = new QVBoxLayout(w);
+	QVBoxLayout *vblOuter = new (ZEditor) QVBoxLayout(w);
 
-	QGroupBox *group = new QGroupBox("Options");
+	QGroupBox *group = new (ZEditor) QGroupBox("Options");
 	
-	QVBoxLayout *vbl = new QVBoxLayout(group);
-	m_wireframe = new QCheckBox("Wireframe");
-	m_normals = new QCheckBox("Normals");
-	m_tangents = new QCheckBox("Tangents");
+	QVBoxLayout *vbl = new (ZEditor) QVBoxLayout(group);
+	m_wireframe = new (ZEditor) QCheckBox("Wireframe");
+	m_normals = new (ZEditor) QCheckBox("Normals");
+	m_tangents = new (ZEditor) QCheckBox("Tangents");
 
 	vbl->addWidget(m_wireframe);
 	vbl->addWidget(m_normals);
 	vbl->addWidget(m_tangents);
 
-	QGroupBox *lightGroup = new QGroupBox("Lighting");
-	QFormLayout *llayout = new QFormLayout(lightGroup);
+	QGroupBox *lightGroup = new (ZEditor) QGroupBox("Lighting");
+	QFormLayout *llayout = new (ZEditor) QFormLayout(lightGroup);
 
-	m_lighting = new QCheckBox("Enable Lighting");
+	m_lighting = new (ZEditor) QCheckBox("Enable Lighting");
 	llayout->addRow(m_lighting);
-	m_brightness = new QLineEdit();
+	m_showLightRadius = new (ZEditor) QCheckBox("Show Light Radius");
+	llayout->addRow(m_showLightRadius);
+	m_brightness = new (ZEditor) QLineEdit();
+	m_brightness->setValidator(new (ZEditor) QDoubleValidator(m_brightness));
 	llayout->addRow("Brightness", m_brightness);
-	m_distance = new QLineEdit();
-	llayout->addRow("Distance", m_distance);
-
+	RAD_VERIFY(connect(m_brightness, SIGNAL(textEdited(const QString&)), SLOT(OnLightBrightnessChanged(const QString&))));
+	ColorPicker *colorPicker = new (ZEditor) ColorPicker();
+	llayout->addRow("Diffuse Color", colorPicker);
+	RAD_VERIFY(connect(colorPicker, SIGNAL(OnColorChanged(const Vec4&)), SLOT(OnLightDiffuseColorChanged(const Vec4&))));
+	colorPicker = new (ZEditor) ColorPicker();
+	llayout->addRow("Specular Color", colorPicker);
+	RAD_VERIFY(connect(colorPicker, SIGNAL(OnColorChanged(const Vec4&)), SLOT(OnLightSpecularColorChanged(const Vec4&))));
+	m_specularExponent = new (ZEditor) QLineEdit();
+	m_specularExponent->setValidator(new (ZEditor) QDoubleValidator(m_specularExponent));
+	llayout->addRow("Specular Exponent", m_specularExponent);
+	RAD_VERIFY(connect(m_specularExponent, SIGNAL(textEdited(const QString&)), SLOT(OnLightSpecularExponentChanged(const QString&))));
 	vbl->addWidget(lightGroup);
-
 	vblOuter->addWidget(group);
 	
-	m_tree = new QTreeWidget();
+	m_tree = new (ZEditor) QTreeWidget();
 	m_tree->resize(left, m_tree->height());
 	m_tree->setSelectionMode(QAbstractItemView::SingleSelection);
-	RAD_VERIFY(connect(m_tree, SIGNAL(itemSelectionChanged()), SLOT(ItemSelectionChanged())));
+	RAD_VERIFY(connect(m_tree, SIGNAL(itemSelectionChanged()), SLOT(OnItemSelectionChanged())));
 	vblOuter->addWidget(m_tree);
 
 	s->addWidget(w);
 	
-	m_glw = new (ZEditor) GLNavWidget();
+	m_glw = new (ZEditor) ModelEditorNavWidget();
 	RAD_VERIFY(connect(m_glw, SIGNAL(OnRenderGL(GLWidget&)), SLOT(OnRenderGL(GLWidget&))));
-	
+	RAD_VERIFY(connect(m_glw, SIGNAL(OnAdjustLightDistance(float)), SLOT(OnAdjustLightDistance(float))));
+	RAD_VERIFY(connect(m_glw, SIGNAL(OnAdjustLightRadius(float)), SLOT(OnAdjustLightRadius(float))));
+	RAD_VERIFY(connect(m_glw, SIGNAL(OnOrbitLight(float, float)), SLOT(OnOrbitLight(float, float))));
+
 	m_glw->resize(right, m_glw->height());
 	s->addWidget(m_glw);
 
@@ -249,21 +324,33 @@ bool ModelEditorWidget::Load() {
 	m_wireframeMat = LoadMaterial("Sys/DebugWireframe_M");
 	if (!m_wireframeMat)
 		return false;
-	m_normalMat = LoadMaterial("Sys/DebugNormals_M");
-	if (!m_normalMat)
+	m_lightSphereMat = LoadMaterial("Sys/EditorLightSphere_M");
+	if (!m_lightSphereMat)
 		return false;
-	m_tangentMat = LoadMaterial("Sys/DebugTangents_M");
-	if (!m_tangentMat)
+	m_lightRadiusMat = LoadMaterial("Sys/EditorLightRadius_M");
+	if (!m_lightRadiusMat)
 		return false;
 
-	m_glw->unbindGL();
 	m_glw->camera->pos = Vec3(300.f, 0.f, 0.f);
 	m_glw->camera->LookAt(Vec3::Zero);
 	m_glw->camera->fov = 70.f;
 	m_glw->SetFreeMode();
-	m_glw->kbSpeed = 0.8f;
+	m_glw->kbSpeed = 800.f;
 	m_glw->mouseSpeed = 0.3f;
 	m_glw->camera->fov = 90.f;
+
+	m_lightSphere = r::Mesh::MakeSphere(ZEditor, false);
+	m_lightDfColor = Vec3(1.f,1.f,1.f);
+	m_lightSpColor = Vec3(1.f,1.f,1.f);
+	m_lightPos = Vec3(65.f, 0.f, 120.f);
+	m_lightRadius = 400;
+	m_lightBrightness = 2.f;
+	m_lightSpecularExp = 16.f;
+
+	m_brightness->setText(QString("%1").arg(m_lightBrightness));
+	m_specularExponent->setText(QString("%1").arg(m_lightSpecularExp));
+
+	m_glw->unbindGL();
 
 	return true;
 }
@@ -317,11 +404,11 @@ void ModelEditorWidget::OnRenderGL(GLWidget &src) {
 	if (m_lighting->isChecked()) {
 		u.eyePos = m_glw->camera->pos;
 		u.lights.numLights = 1;
-		u.lights.lights[0].radius = 400.f;
-		u.lights.lights[0].brightness = 2.f;
-		u.lights.lights[0].pos = Vec3(65.f, 0.f, 120.f);
-		u.lights.lights[0].diffuse = Vec3(1.f,1.f,1.f);
-		u.lights.lights[0].specular = Vec4(1.f,1.f,1.f,1.f);
+		u.lights.lights[0].radius = m_lightRadius;
+		u.lights.lights[0].brightness = m_lightBrightness;
+		u.lights.lights[0].pos = m_lightPos;
+		u.lights.lights[0].diffuse = m_lightDfColor;
+		u.lights.lights[0].specular = Vec4(m_lightSpColor, m_lightSpecularExp);
 		u.lights.lights[0].flags = r::LightDef::kFlag_Diffuse|r::LightDef::kFlag_Specular;
 		for (int i = 0; i < r::Material::kNumSorts; ++i) {
 			Draw((r::Material::Sort)i, u);
@@ -336,6 +423,9 @@ void ModelEditorWidget::OnRenderGL(GLWidget &src) {
 		DrawWireframe();
 	if (m_normals->isChecked() || m_tangents->isChecked())
 		DrawNormals(m_normals->isChecked(), m_tangents->isChecked());
+
+	if (m_lighting->isChecked())
+		DrawLightSphere();
 	
 	gls.Set(kDepthWriteMask_Enable, -1); // for glClear()
 	gls.Commit();
@@ -804,6 +894,51 @@ void ModelEditorWidget::DrawMeshNormals(bool normals, bool tangents) {
 	}
 }
 
+void ModelEditorWidget::DrawLightSphere() {
+
+	asset::MaterialLoader *loader = asset::MaterialLoader::Cast(m_lightSphereMat);
+	asset::MaterialParser *parser = asset::MaterialParser::Cast(m_lightSphereMat);
+	r::Material *mat = parser->material;
+
+	r::gl.MatrixMode(GL_MODELVIEW);
+	r::gl.PushMatrix();
+	r::gl.Translatef(m_lightPos[0], m_lightPos[1], m_lightPos[2]);
+	r::gl.Scalef(8.f, 8.f, 8.f);
+
+	mat->BindTextures(loader);
+	mat->BindStates();
+	mat->shader->Begin(Shader::kPass_Preview, *mat);
+	m_lightSphere->BindAll(0);
+	mat->shader->BindStates(r::Shader::Uniforms(Vec4(m_lightDfColor, 1.f)));
+	gls.Commit();
+	m_lightSphere->Draw();
+	mat->shader->End();
+
+	r::gl.PopMatrix();
+
+	if (m_showLightRadius->isChecked()) {
+		loader = asset::MaterialLoader::Cast(m_lightRadiusMat);
+		parser = asset::MaterialParser::Cast(m_lightRadiusMat);
+		mat = parser->material;
+
+		r::gl.MatrixMode(GL_MODELVIEW);
+		r::gl.PushMatrix();
+		r::gl.Translatef(m_lightPos[0], m_lightPos[1], m_lightPos[2]);
+		r::gl.Scalef(m_lightRadius/2.f, m_lightRadius/2.f, m_lightRadius/2.f);
+
+		mat->BindTextures(loader);
+		mat->BindStates();
+		mat->shader->Begin(Shader::kPass_Preview, *mat);
+		m_lightSphere->BindAll(0);
+		mat->shader->BindStates();
+		gls.Commit();
+		m_lightSphere->Draw();
+		mat->shader->End();
+
+		r::gl.PopMatrix();
+	}
+}
+
 void ModelEditorWidget::Tick(float dt) {
 	
 	if (m_skModel) {
@@ -850,7 +985,7 @@ void ModelEditorWidget::Tick(float dt) {
 	m_glw->updateGL();
 }
 
-void ModelEditorWidget::ItemSelectionChanged() {
+void ModelEditorWidget::OnItemSelectionChanged() {
 	QList<QTreeWidgetItem*> s = m_tree->selectedItems();
 
 	if (m_skModel) {
@@ -973,6 +1108,62 @@ void ModelEditorWidget::ItemSelectionChanged() {
 			m_vtModel->vtm->root = ska::Controller::Ref();
 		}
 	}
+}
+
+void ModelEditorWidget::OnAdjustLightDistance(float distance) {
+	distance *= 3.f;
+	float d = m_lightPos.Magnitude();
+	d += distance;
+	if (d < 10.f)
+		d = 10.f;
+	m_lightPos.Normalize();
+	m_lightPos *= d;
+}
+
+void ModelEditorWidget::OnAdjustLightRadius(float adjust) {
+	m_lightRadius += adjust * 3.f;
+	if (m_lightRadius < 64.f)
+		m_lightRadius = 64.f;
+}
+
+void ModelEditorWidget::OnOrbitLight(float x, float y) {
+	x *= math::Constants<float>::PI() / 1000.f;
+	y *= math::Constants<float>::PI() / 1000.f;
+
+	Quat a(Vec3(0,0,1), x);
+
+	Vec3 localX;
+	Vec3 up(0,0,1);
+
+	Vec3 dir(m_lightPos);
+	dir.Normalize();
+
+	if (up.Dot(dir) > 0.999f) {
+		up = Vec3(0,1,0);
+	}
+
+	localX = up.Cross(dir);
+
+	Quat b(localX, y);
+
+	Mat4 m = Mat4::Rotation(b * a);
+	m_lightPos = m * m_lightPos;
+}
+
+void ModelEditorWidget::OnLightBrightnessChanged(const QString &text) {
+	m_lightBrightness = text.toFloat();
+}
+
+void ModelEditorWidget::OnLightSpecularExponentChanged(const QString &text) {
+	m_lightSpecularExp = text.toFloat();
+}
+
+void ModelEditorWidget::OnLightDiffuseColorChanged(const Vec4 &rgba) {
+	m_lightDfColor = rgba;
+}
+
+void ModelEditorWidget::OnLightSpecularColorChanged(const Vec4 &rgba) {
+	m_lightSpColor = rgba;
 }
 
 } // editor

@@ -2333,6 +2333,12 @@
     <ClCompile Include="..\..\Engine\World\Light.cpp">
       <Filter>Source\Engine\World</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\Renderer\Mesh.cpp">
+      <Filter>Source\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorColorPicker.cpp">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Runtime\Base\Event.inl">
@@ -2753,6 +2759,9 @@
     </QtMOC>
     <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorVtModelThumb.h">
       <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorColorPicker.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
     </QtMOC>
   </ItemGroup>
 </Project>
