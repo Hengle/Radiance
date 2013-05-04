@@ -3,8 +3,7 @@
 // Author: Joe Riedel
 // See Radiance/LICENSE for licensing terms.
 
-inline AddrSize zone_malloc_size(void *p)
-{
+inline AddrSize zone_malloc_size(void *p) {
 	return Zone::AllocSize(p);
 }
 
@@ -81,3 +80,9 @@ inline void zone_free(void *p) {
 	Zone::Delete(p);
 }
 
+inline void zone_checkptr(void *p) {
+#if defined (RAD_OPT_ZONE_MEMGUARD)
+	if (p)
+		Zone::CheckMemGuards(p);
+#endif
+}

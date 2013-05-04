@@ -528,14 +528,13 @@ bool GLSLShader::MapInputs(Pass &p, const Material &material) {
 
 #if defined(RAD_OPT_OGLES2)
 	p.u.mvp = gl.GetUniformLocationARB(p.p->id, "U_mvp");
-	p.u.color = gl.GetUniformLocationARB(p.p->id, "U_color");
-	p.u.rgba[0] = -1.f;
-	p.u.rgba[1] = -1.f;
-	p.u.rgba[2] = -1.f;
-	p.u.rgba[3] = -1.f;
 	for (int i = 0; i < 16; ++i)
 		p.u.mvpfloats[i] = 0.f;
 #endif
+	p.u.dcolor = gl.GetUniformLocationARB(p.p->id, "U_color");
+	p.u.drgba = Vec4(-1.f, -1.f, -1.f, -1.f);
+	p.u.scolor = gl.GetUniformLocationARB(p.p->id, "U_scolor");
+	p.u.srgba = Vec4(-1.f, -1.f, -1.f, -1.f);
 	p.u.mv = gl.GetUniformLocationARB(p.p->id, "U_mv");
 	p.u.pr = gl.GetUniformLocationARB(p.p->id, "U_pr");
 	for (int i = 0; i < 16; ++i) {
@@ -781,21 +780,16 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 	RAD_ASSERT(m_curMat);
 	Pass &p = m_passes[m_curPass];
 	
-	float c[4];
+	Vec4 dcolor;
+	Vec4 scolor;
 
 	if (sampleMaterialColor) {
-		m_curMat->SampleColor(Material::kColor0, c);
-		c[0] *= uniforms.blendColor[0];
-		c[1] *= uniforms.blendColor[1];
-		c[2] *= uniforms.blendColor[2];
-		c[3] *= uniforms.blendColor[3];
-
-#if defined(RAD_OPT_PC)
-		gl.Color4f(c[0], c[1], c[2], c[3]);
-#else
+		dcolor = m_curMat->SampleColor(Material::kColor0);
+		dcolor *= uniforms.blendColor;
+		scolor = Vec4(m_curMat->SampleSpecularColor() * uniforms.blendColor, m_curMat->specularExponent);
 	} else {
-		gl.GetColor4fv(c);
-#endif
+		scolor = Vec4(1.f, 1.f, 1.f, m_curMat->specularExponent);
+		gl.GetColor4fv(&dcolor[0]);
 	}
 
 	if (p.u.eye != -1) {
@@ -828,7 +822,7 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 		if ((p.u.lightSpecular[i] != -1) && (srcLight.specular != dstLight.specular)) {
 			RAD_ASSERT(srcLight.flags & LightDef::kFlag_Specular);
 			dstLight.specular = srcLight.specular;
-			gl.Uniform4fvARB(p.u.lightSpecular[i], 1, &srcLight.specular[0]);
+			gl.Uniform3fvARB(p.u.lightSpecular[i], 1, &srcLight.specular[0]);
 		}
 
 		dstLight.flags = srcLight.flags;
@@ -877,21 +871,18 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 			}
 		}
 	}
-#if defined(RAD_OPT_OGLES2)
-	if (p.u.color != -1) {
-		if (p.u.rgba[0] != c[0] ||
-			p.u.rgba[1] != c[1] ||
-			p.u.rgba[2] != c[2] ||
-			p.u.rgba[3] != c[3])
-		{
-			p.u.rgba[0] = c[0];
-			p.u.rgba[1] = c[1];
-			p.u.rgba[2] = c[2];
-			p.u.rgba[3] = c[3];
-			gl.Uniform4fvARB(p.u.color, 1, &c[0]);
+	if (p.u.dcolor != -1) {
+		if (p.u.drgba != dcolor) {
+			p.u.drgba = dcolor;
+			gl.Uniform4fvARB(p.u.dcolor, 1, &dcolor[0]);
 		}
 	}
-#endif
+	if (p.u.scolor != -1) {
+		if (p.u.srgba != scolor) {
+			p.u.srgba = scolor;
+			gl.Uniform4fvARB(p.u.scolor, 1, &scolor[0]);
+		}
+	}
 
 	GLVertexArray::Ref vao = gls.VertexArrayBinding();
 	if (vao && vao->initialized)

@@ -54,6 +54,12 @@ int TextureParser::CompressPVR(
 	const bool *b = asset->entry->KeyValue<bool>("Mipmap", P_TARGET_FLAGS(flags));
 	if (!b)
 		return SR_MetaError;
+
+	const String *imgType = asset->entry->KeyValue<String>("Compression.ImageType", P_TARGET_FLAGS(flags));
+	if (!imgType)
+		return SR_MetaError;
+
+	const bool kNormalMap = *imgType == "NormalMap";
 	
 	int numMips = 1;
 	
@@ -81,12 +87,40 @@ int TextureParser::CompressPVR(
 		const image_codec::Image::Ref &img = m_images[0];
 
 		if (*s == "PVR2") {
-			pvrFormat = (img->bpp==4) ? ePVRTPF_PVRTCI_2bpp_RGBA : ePVRTPF_PVRTCI_2bpp_RGB;
-			format = (img->bpp==4) ? image_codec::dds::Format_PVR2A : image_codec::dds::Format_PVR2;
+			if (kNormalMap) {
+			} else {
+				pvrFormat = (img->bpp==4) ? ePVRTPF_PVRTCI_2bpp_RGBA : ePVRTPF_PVRTCI_2bpp_RGB;
+				format = (img->bpp==4) ? image_codec::dds::Format_PVR2A : image_codec::dds::Format_PVR2;
+			}
 		} else {
-			pvrFormat = (img->bpp==4) ? ePVRTPF_PVRTCI_4bpp_RGBA : ePVRTPF_PVRTCI_4bpp_RGB;
-			format = (img->bpp==4) ? image_codec::dds::Format_PVR4A : image_codec::dds::Format_PVR4;
+			if (kNormalMap) {
+			} else {
+				pvrFormat = (img->bpp==4) ? ePVRTPF_PVRTCI_4bpp_RGBA : ePVRTPF_PVRTCI_4bpp_RGB;
+				format = (img->bpp==4) ? image_codec::dds::Format_PVR4A : image_codec::dds::Format_PVR4;
+			}
 		}
+	}
+
+	String strFormat;
+	if (pvrFormat == ePVRTPF_PVRTCI_2bpp_RGB) {
+		if (kNormalMap) {
+			strFormat = "PVR2n";
+		} else {
+			strFormat = "PVR2";
+		}
+	} else if(pvrFormat == ePVRTPF_PVRTCI_4bpp_RGB) {
+		if (kNormalMap) {
+			strFormat = "PVR4n";
+		} else {
+			strFormat = "PVR4";
+		}
+	} else if (pvrFormat == ePVRTPF_PVRTCI_2bpp_RGBA) {
+		RAD_ASSERT(!kNormalMap);
+		strFormat = "PVR2a";
+	} else {
+		RAD_ASSERT(!kNormalMap);
+		RAD_ASSERT(pvrFormat == ePVRTPF_PVRTCI_4bpp_RGBA);
+		strFormat = "PVR4a";
 	}
 
 	m_header.format = format;
@@ -109,7 +143,7 @@ int TextureParser::CompressPVR(
 		img->format = format;
 
 		COut(C_Info) << "Compressing " << asset->path.get() << " (" << 
-			m_header.width << "x" << m_header.height << "x" << src.bpp << ") as " << sQuality << " " << *s << std::endl;
+			m_header.width << "x" << m_header.height << "x" << src.bpp << ") as " << sQuality << " " << strFormat << std::endl;
 				
 		img->AllocateFrames(src.frameCount);
 		for (int i = 0; i < src.frameCount; ++i) {
@@ -156,6 +190,34 @@ int TextureParser::CompressPVR(
 				if (!GenerateMIPMaps(pvrTex, eResizeCubic, numMips)) {
 					COut(C_Error) << "PVRTexLib failure: failed to create mimaps!" << std::endl;
 					return SR_CompilerError;
+				}
+			}
+
+			if (kNormalMap) {
+				// normalize and swizzle normal map data.
+
+				const U8 *data = (const U8*)pvrTex.getDataPtr();
+				const CPVRTextureHeader &header = pvrTex.getHeader();
+
+				int z = header.getNumMIPLevels();
+
+				int w = (int)pvrTex.getWidth();
+				int h = (int)pvrTex.getHeight();
+
+				for (int k = 0; k < z; ++k) {
+
+					NormalizeNormalMap((void*)data, w, h, 4, 0);
+					SwizzleNormalMap((void*)data, w, h, 4, kGenNormalMapFlag_DXT1n);
+
+					data += w*h*4;
+
+					w >>= 1;
+					h >>= 1;
+
+					if (w < 1)
+						w = 1;
+					if (h < 1)
+						h = 1;
 				}
 			}
 

@@ -87,6 +87,32 @@ int MaterialParser::LoadCooked(
 		is >> temp; m_m.doubleSided.set(temp?true:false);
 		is >> temp; m_m.depthWrite.set(temp?true:false);
 		is >> temp; m_m.lit.set(temp?true:false);
+		is >> temp; m_m.castShadows.set(temp?true:false);
+		is >> temp; m_m.receiveShadows.set(temp?true:false);
+		is >> temp; m_m.selfShadow.set(temp?true:false);
+		is >> f; m_m.specularExponent = f;
+
+		for (int i = 0; i < r::Material::kNumColorIndices; ++i) {
+			U8 rgb[3];
+			is >> rgb[0];
+			is >> rgb[1];
+			is >> rgb[2];
+			Vec3 c;
+			c[0] = rgb[0] / 255.f;
+			c[1] = rgb[1] / 255.f;
+			c[2] = rgb[2] / 255.f;
+			m_m.SetSpecularColor(i, c);
+		}
+
+		{
+			WaveAnim &w = *m_m.specularColorWave;
+			is >> temp; w.type = (WaveAnim::Type)temp;	
+			is >> f; w.amplitude.set(f);
+			is >> f; w.freq.set(f);
+			is >> f; w.phase.set(f);
+			is >> f; w.base.set(f);			
+			m_m.animated = m_m.animated || w.type != WaveAnim::T_Identity;
+		}
 
 		m_m.animated = false;
 
@@ -144,7 +170,7 @@ int MaterialParser::LoadCooked(
 				is >> rgba[2];
 				is >> rgba[3];
 
-				float c[4];
+				Vec4 c;
 				c[0] = rgba[0] / 255.f;
 				c[1] = rgba[1] / 255.f;
 				c[2] = rgba[2] / 255.f;
@@ -490,6 +516,7 @@ int MaterialParser::Load(
 			T.base = b;
 		}
 	}
+	
 	// color
 	for (int i = r::Material::kColor0; i < r::Material::kNumColors; ++i) {
 		for (int k = r::Material::kColorA; k < r::Material::kNumColorIndices; ++k) {
@@ -499,7 +526,7 @@ int MaterialParser::Load(
 				return SR_MetaError;
 
 			int r, g, b, a;
-			float c[4];
+			Vec4 c;
 
 			sscanf(s->c_str, "%d %d %d %d", &r, &g, &b, &a);
 			c[0] = r/255.f;
@@ -508,7 +535,7 @@ int MaterialParser::Load(
 			c[3] = a/255.f;
 
 			for (int j = 0; j < 4; ++j)
-				c[j] = std::max(std::min(c[j], 255.f), 0.f);
+				c[j] = math::Clamp(c[j], 0.f, 1.f);
 
 			m_m.SetColor(i, k, c);
 		}
@@ -573,6 +600,128 @@ int MaterialParser::Load(
 
 		sscanf(s->c_str, "%f", &a);
 		C.base = a;
+	}
+	
+	// lighting stuff
+	b = asset->entry->KeyValue<bool>("DynamicLighting.CastShadows", P_TARGET_FLAGS(flags));
+	if (!b)
+		return SR_MetaError;
+	m_m.castShadows = *b;
+
+	b = asset->entry->KeyValue<bool>("DynamicLighting.ReceiveShadows", P_TARGET_FLAGS(flags));
+	if (!b)
+		return SR_MetaError;
+	m_m.receiveShadows = *b;
+
+	b = asset->entry->KeyValue<bool>("DynamicLighting.SelfShadow", P_TARGET_FLAGS(flags));
+	if (!b)
+		return SR_MetaError;
+	m_m.selfShadow = *b;
+
+	{
+		s = asset->entry->KeyValue<String>("DynamicLighting.SpecularColor.A", P_TARGET_FLAGS(flags));
+		if (!s)
+			return SR_MetaError;
+
+		int r, g, b;
+		sscanf(s->c_str, "%d %d %d", &r, &g, &b);
+
+		Vec3 c;
+		c[0] = r/255.f;
+		c[1] = g/255.f;
+		c[2] = b/255.f;
+
+		for (int i = 0; i < 3; ++i)
+			c[i] = math::Clamp(c[i], 0.f, 1.f);
+
+		m_m.SetSpecularColor(r::Material::kColorA, c);
+
+		s = asset->entry->KeyValue<String>("DynamicLighting.SpecularColor.B", P_TARGET_FLAGS(flags));
+		if (!s)
+			return SR_MetaError;
+
+		sscanf(s->c_str, "%d %d %d", &r, &g, &b);
+
+		c[0] = r/255.f;
+		c[1] = g/255.f;
+		c[2] = b/255.f;
+
+		for (int i = 0; i < 3; ++i)
+			c[i] = math::Clamp(c[i], 0.f, 1.f);
+
+		m_m.SetSpecularColor(r::Material::kColorB, c);
+	}
+
+	{
+		path = "DynamicLighting.SpecularColor.Gen";
+		z = path + ".Type";
+
+		s = asset->entry->KeyValue<String>(z.c_str, P_TARGET_FLAGS(flags));
+		if (!s)
+			return SR_MetaError;
+
+		WaveAnim &C = *m_m.specularColorWave;
+
+		if (*s == "Identity") {
+			C.type = WaveAnim::T_Identity;
+		} else if (*s == "Constant") {
+			C.type =  WaveAnim::T_Constant;
+		} else if (*s == "Square") {
+			C.type = WaveAnim::T_Square;
+		} else if (*s == "Sawtooth") {
+			C.type = WaveAnim::T_Sawtooth;
+		} else if (*s == "Triangle") {
+			C.type = WaveAnim::T_Triangle;
+		} else if (*s == "Noise") {
+			C.type = WaveAnim::T_Noise;
+		} else {
+			return SR_MetaError;
+		}
+
+		m_m.animated = m_m.animated || C.type != WaveAnim::T_Identity;
+
+		z = path + ".Amplitude";
+		s = asset->entry->KeyValue<String>(z.c_str, P_TARGET_FLAGS(flags));
+		if (!s)
+			return SR_MetaError;
+
+		float a;
+
+		sscanf(s->c_str, "%f", &a);
+		C.amplitude = a;
+		
+		z = path + ".Frequency";
+		s = asset->entry->KeyValue<String>(z.c_str, P_TARGET_FLAGS(flags));
+		if (!s)
+			return SR_MetaError;
+
+		sscanf(s->c_str, "%f", &a);
+		C.freq = a;
+
+		z = path + ".Phase";
+		s = asset->entry->KeyValue<String>(z.c_str, P_TARGET_FLAGS(flags));
+		if (!s)
+			return SR_MetaError;
+
+		sscanf(s->c_str, "%f", &a);
+		C.phase = a;
+
+		z = path + ".Base";
+		s = asset->entry->KeyValue<String>(z.c_str, P_TARGET_FLAGS(flags));
+		if (!s)
+			return SR_MetaError;
+
+		sscanf(s->c_str, "%f", &a);
+		C.base = a;
+	}
+
+	{
+		s = asset->entry->KeyValue<String>("DynamicLighting.SpecularExponent", P_TARGET_FLAGS(flags));
+		if (!s)
+			return SR_MetaError;
+		float exp;
+		sscanf(s->c_str, "%f", &exp);
+		m_m.specularExponent = exp;
 	}
 
 	m_loaded = true;

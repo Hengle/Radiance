@@ -7,40 +7,36 @@
 
 namespace r {
 
-inline void Material::SetColor(int num, int index, float *c) {
-	m_colors[num][index][0] = c[0];
-	m_colors[num][index][1] = c[1];
-	m_colors[num][index][2] = c[2];
-	m_colors[num][index][3] = c[3];
+inline void Material::SetColor(int num, int index, const Vec4 &color) {
+	m_colors[num][index] = color;
 }
 
-inline void Material::Color(int num, int index, float *out) const {
-	out[0] = m_colors[num][index][0];
-	out[1] = m_colors[num][index][1];
-	out[2] = m_colors[num][index][2];
-	out[3] = m_colors[num][index][3];
-}
-
-inline void Material::SampleColor(int num, float *out) const {
-	if (m_animated) {	
-		out[0] = m_sampledColor[num][0];
-		out[1] = m_sampledColor[num][1];
-		out[2] = m_sampledColor[num][2];
-		out[3] = m_sampledColor[num][3];
-	} else {
-		out[0] = m_colors[num][kColorA][0];
-		out[1] = m_colors[num][kColorA][1];
-		out[2] = m_colors[num][kColorA][2];
-		out[3] = m_colors[num][kColorA][3];
-	}
-}
-
-inline const WaveAnim &Material::ColorWave(int num) const {
-	return m_colorWaves[num];
+inline Vec4 Material::Color(int num, int index) const {
+	return m_colors[num][index];
 }
 
 inline WaveAnim &Material::ColorWave(int num) {
 	return m_colorWaves[num];
+}
+
+inline Vec4 Material::SampleColor(int num) const {
+	if (m_animated)
+		return m_sampledColor[num];
+	return m_colors[num][kColorA];
+}
+
+inline void Material::SetSpecularColor(int index, const Vec3 &color) {
+	m_specularColors[index] = color;
+}
+
+inline Vec3 Material::SpecularColor(int index) const {
+	return m_specularColors[index];
+}
+
+inline Vec3 Material::SampleSpecularColor() const {
+	if (m_animated)
+		return m_sampledSpecularColor;
+	return m_specularColors[kColorA];
 }
 
 inline int Material::TCUVIndex(int index) const {

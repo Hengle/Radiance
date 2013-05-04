@@ -170,6 +170,28 @@ private:
 		int flags
 	);
 
+	enum {
+		RAD_FLAG(kGenNormalMapFlag_BGRA),
+		RAD_FLAG(kGenNormalMapFlag_DXT1n),
+		RAD_FLAG(kGenNormalMapFlag_DXT5n)
+	};
+
+	static void NormalizeNormalMap(
+		void *data,
+		int w,
+		int h,
+		int bpp,
+		int flags
+	);
+
+	static void SwizzleNormalMap(
+		void *data,
+		int w,
+		int h,
+		int bpp,
+		int flags
+	);
+
 	static int ExtractPVR(
 		Engine &engine,
 		int frame,

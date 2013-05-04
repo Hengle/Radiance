@@ -242,10 +242,14 @@ m_animated(false),
 m_doubleSided(false),
 m_depthWrite(true),
 m_lit(false),
+m_castShadows(false),
+m_receiveShadows(false),
+m_selfShadow(false),
 m_blendMode(kBlendMode_None),
 m_shaderId(-1),
 m_time(0.f),
-m_timingMode(kTimingMode_Absolute) {
+m_timingMode(kTimingMode_Absolute),
+m_specularExponent(32.f) {
 	Clear();
 
 	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
@@ -264,6 +268,11 @@ m_timingMode(kTimingMode_Absolute) {
 	for (int i = 0; i < kNumColors; ++i)
 		for (int k = 0; k < 4; ++k)
 			m_sampledColor[i][k] = 1.f;
+
+	for (int i = 0; i < kNumColorIndices; ++i)
+		m_specularColors[i] = Vec3(1.f, 1.f, 1.f);
+
+	m_sampledSpecularColor = Vec3(1.f, 1.f, 1.f);
 
 	m_blend[0] = m_blend[1] = m_blend[3] = Vec4(1,1,1,1);
 	m_blendTime[0] = m_blendTime[1] = -1.f;
@@ -316,7 +325,7 @@ void Material::Clear() {
 	}
 }
 
-void Material::RAD_IMPLEMENT_SET(timingMode)(const TimingMode &mode) {
+void Material::RAD_IMPLEMENT_SET(timingMode)(TimingMode mode) {
 	if (mode != kTimingMode_Absolute)
 		m_time = 0.f; // reset time.
 	m_timingMode = mode;
@@ -407,8 +416,13 @@ void Material::Sample(float time, float dt) {
 	for (int i = 0; i < kNumColors; ++i) {
 		float lerp = 1.f - m_colorWaves[i].Sample(time);
 		lerp = math::Clamp(lerp, 0.f, 1.f);
-		for (int k = 0; k < 4; ++k)
-			m_sampledColor[i][k] = m_blend[0][k] * math::Lerp(m_colors[i][kColorA][k], m_colors[i][kColorB][k], lerp);
+		m_sampledColor[i] = m_blend[0] * math::Lerp(m_colors[i][kColorA], m_colors[i][kColorB], lerp);
+	}
+
+	{
+		float lerp = 1.f - m_specularWave.Sample(time);
+		lerp = math::Clamp(lerp, 0.f, 1.f);
+		m_sampledSpecularColor = math::Lerp(m_specularColors[kColorA], m_specularColors[kColorB], lerp);
 	}
 }
 

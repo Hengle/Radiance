@@ -87,7 +87,6 @@ private slots:
 	void OnAdjustLightRadius(float adjust);
 	void OnOrbitLight(float x, float y);
 	void OnLightBrightnessChanged(const QString &text);
-	void OnLightSpecularExponentChanged(const QString &text);
 	void OnLightDiffuseColorChanged(const Vec4 &rgba);
 	void OnLightSpecularColorChanged(const Vec4 &rgba);
 
@@ -119,7 +118,6 @@ private:
 	Vec3 m_lightPos;
 	float m_lightRadius;
 	float m_lightBrightness;
-	float m_lightSpecularExp;
 
 	r::Mesh::Ref m_lightSphere;
 	r::SkMesh::Ref m_skModel;
@@ -137,7 +135,6 @@ private:
 	QCheckBox *m_lighting;
 	QCheckBox *m_showLightRadius;
 	QLineEdit *m_brightness;
-	QLineEdit *m_specularExponent;
 	float **m_skVerts[2];
 };
 

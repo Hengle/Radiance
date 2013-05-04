@@ -189,10 +189,6 @@ void ModelEditorWidget::resizeEvent(QResizeEvent *event) {
 	colorPicker = new (ZEditor) ColorPicker();
 	llayout->addRow("Specular Color", colorPicker);
 	RAD_VERIFY(connect(colorPicker, SIGNAL(OnColorChanged(const Vec4&)), SLOT(OnLightSpecularColorChanged(const Vec4&))));
-	m_specularExponent = new (ZEditor) QLineEdit();
-	m_specularExponent->setValidator(new (ZEditor) QDoubleValidator(m_specularExponent));
-	llayout->addRow("Specular Exponent", m_specularExponent);
-	RAD_VERIFY(connect(m_specularExponent, SIGNAL(textEdited(const QString&)), SLOT(OnLightSpecularExponentChanged(const QString&))));
 	vbl->addWidget(lightGroup);
 	vblOuter->addWidget(group);
 	
@@ -345,11 +341,9 @@ bool ModelEditorWidget::Load() {
 	m_lightPos = Vec3(65.f, 0.f, 120.f);
 	m_lightRadius = 400;
 	m_lightBrightness = 2.f;
-	m_lightSpecularExp = 32.f;
-
+	
 	m_brightness->setText(QString("%1").arg(m_lightBrightness));
-	m_specularExponent->setText(QString("%1").arg(m_lightSpecularExp));
-
+	
 	m_glw->unbindGL();
 
 	return true;
@@ -408,7 +402,7 @@ void ModelEditorWidget::OnRenderGL(GLWidget &src) {
 		u.lights.lights[0].brightness = m_lightBrightness;
 		u.lights.lights[0].pos = m_lightPos;
 		u.lights.lights[0].diffuse = m_lightDfColor;
-		u.lights.lights[0].specular = Vec4(m_lightSpColor, m_lightSpecularExp);
+		u.lights.lights[0].specular = m_lightSpColor;
 		u.lights.lights[0].flags = r::LightDef::kFlag_Diffuse|r::LightDef::kFlag_Specular;
 		for (int i = 0; i < r::Material::kNumSorts; ++i) {
 			Draw((r::Material::Sort)i, u);
@@ -903,7 +897,7 @@ void ModelEditorWidget::DrawLightSphere() {
 	r::gl.MatrixMode(GL_MODELVIEW);
 	r::gl.PushMatrix();
 	r::gl.Translatef(m_lightPos[0], m_lightPos[1], m_lightPos[2]);
-	r::gl.Scalef(8.f, 8.f, 8.f);
+	r::gl.Scalef(4.f, 4.f, 4.f);
 
 	mat->BindTextures(loader);
 	mat->BindStates();
@@ -1152,10 +1146,6 @@ void ModelEditorWidget::OnOrbitLight(float x, float y) {
 
 void ModelEditorWidget::OnLightBrightnessChanged(const QString &text) {
 	m_lightBrightness = text.toFloat();
-}
-
-void ModelEditorWidget::OnLightSpecularExponentChanged(const QString &text) {
-	m_lightSpecularExp = text.toFloat();
 }
 
 void ModelEditorWidget::OnLightDiffuseColorChanged(const Vec4 &rgba) {

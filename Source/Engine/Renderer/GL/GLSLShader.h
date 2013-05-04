@@ -107,19 +107,20 @@ private:
 		GLint pr;
 		float mvfloats[16];
 		float prfloats[16];
-#if defined(RAD_OPT_OGLES2)
-		GLint mvp;
-		GLint color;
-		float rgba[4];
-		float mvpfloats[16];
-#endif
+		GLint dcolor;
+		Vec4 drgba;
+		GLint scolor;
+		Vec4 srgba;
 		LightEnv lights;
 		GLint lightPos[kMaxLights];
 		GLint lightDiffuse[kMaxLights];
 		GLint lightSpecular[kMaxLights];
-
 		GLint eye;
 		Vec3 eyePos;
+#if defined(RAD_OPT_OGLES2)
+		GLint mvp;
+		float mvpfloats[16];
+#endif
 	};
 
 	struct Pass {

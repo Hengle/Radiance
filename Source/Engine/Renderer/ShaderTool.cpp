@@ -245,6 +245,10 @@ int Shader::lua_MColor(lua_State *L) {
 	return lua_MSource(L, kMaterialSource_Color);
 }
 
+int Shader::lua_MSpecularColor(lua_State *L) {
+	return lua_MSource(L, kMaterialSource_SpecularColor);
+}
+
 int Shader::lua_MTexture(lua_State *L) {
 	return lua_MSource(L, kMaterialSource_Texture);
 }
@@ -264,14 +268,6 @@ int Shader::lua_MVertex(lua_State *L) {
 
 int Shader::lua_MNormal(lua_State *L) {
 	return lua_MSource(L, kMaterialSource_Normal);
-}
-
-int Shader::lua_MTangent(lua_State *L) {
-	return lua_MSource(L, kMaterialSource_Tangent);
-}
-
-int Shader::lua_MBitangent(lua_State *L) {
-	return lua_MSource(L, kMaterialSource_Bitangent);
 }
 
 int Shader::lua_MLightPos(lua_State *L) {
@@ -343,13 +339,12 @@ lua::State::Ref Shader::InitLuaM(Engine &e, Shader *m) {
 		{ "Node", lua_MNode },
 		{ "Compile", lua_Compile },
 		{ "MColor", lua_MColor },
+		{ "MSpecularColor", lua_MSpecularColor },
 		{ "MTexture", lua_MTexture },
 		{ "MFramebuffer", lua_MFramebuffer },
 		{ "MTexCoord", lua_MTexCoord },
 		{ "MVertex", lua_MVertex },
 		{ "MNormal", lua_MNormal },
-		{ "MTangent", lua_MTangent },
-		{ "MBitangent", lua_MBitangent },
 		{ "MLightPos", lua_MLightPos },
 		{ "MLightHalfPos", lua_MLightHalfPos },
 		{ "MLightDiffuseColor", lua_MLightDiffuseColor },
@@ -1496,11 +1491,10 @@ bool Shader::szMaterialInput(
 		);
 		return true;
 	case kMaterialSource_Color:
-		string::sprintf(
-			sz,
-			"DCOLOR%d",
-			index
-		);
+		strcpy(sz, "U_color");
+		return true;
+	case kMaterialSource_SpecularColor:
+		strcpy(sz, "U_scolor");
 		return true;
 	case kMaterialSource_LightDiffuseColor:
 		string::sprintf(
@@ -1592,7 +1586,7 @@ bool Shader::szMaterialInput(
 		);
 		return true;
 	case kMaterialSource_VertexColor:
-		strcpy(sz, "IN(vertexColor)");
+		strcpy(sz, "vertexColor");
 		return true;
 	default:
 		break;

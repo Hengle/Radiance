@@ -66,16 +66,17 @@ public:
 		kMaterialSource_Texture,
 		kMaterialSource_Framebuffer,
 		kMaterialSource_Color, // constant
+		kMaterialSource_SpecularColor, // constant
 		kMaterialSource_LightDiffuseColor, // constant (rgb) + w == brightness
 		kMaterialSource_LightSpecularColor, // constant (rgb) + w == exponent
-		kMaterialSource_LightPos, // model space constant (xyz) + w == radius
-		kMaterialSource_LightHalfPos, // model space constant (xyz)
+		kMaterialSource_LightPos, // model space (xyz) + w == radius
+		kMaterialSource_LightHalfPos, // model space
 		kMaterialSource_Vertex,
 		kMaterialSource_Normal,
 		kMaterialSource_Tangent,
 		kMaterialSource_Bitangent,
-		kMaterialSource_LightDir, // in texture space
-		kMaterialSource_LightHalfDir, // in texture space
+		kMaterialSource_LightDir, // texture space
+		kMaterialSource_LightHalfDir, // texture space
 		kMaterialSource_TexCoord,
 		kMaterialSource_VertexColor,
 		kMaterialSource_SpriteSkin,
@@ -308,13 +309,12 @@ private:
 	static int lua_NNode(lua_State *L);
 	static int lua_Compile(lua_State *L);
 	static int lua_MColor(lua_State *L);
+	static int lua_MSpecularColor(lua_State *L);
 	static int lua_MTexture(lua_State *L);
 	static int lua_MFramebuffer(lua_State *L);
 	static int lua_MTexCoord(lua_State *L);
 	static int lua_MVertex(lua_State *L);
 	static int lua_MNormal(lua_State *L);
-	static int lua_MTangent(lua_State *L);
-	static int lua_MBitangent(lua_State *L);
 	static int lua_MLightPos(lua_State *L);
 	static int lua_MLightHalfPos(lua_State *L);
 	static int lua_MLightDiffuseColor(lua_State *L);

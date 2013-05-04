@@ -58,7 +58,7 @@ struct LightDef {
 		RAD_FLAG(kFlag_Specular),
 		RAD_FLAG(kFlag_CastShadows)
 	};
-	Vec4 specular;
+	Vec3 specular;
 	Vec3 diffuse;
 	Vec3 pos;
 	float radius;

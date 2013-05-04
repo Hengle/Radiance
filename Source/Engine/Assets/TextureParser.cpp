@@ -771,6 +771,12 @@ int TextureParser::Resize(
 		const int *w = asset->entry->KeyValue<int>("Resize.Width", P_TARGET_FLAGS(flags));
 		const int *h = asset->entry->KeyValue<int>("Resize.Height", P_TARGET_FLAGS(flags));
 
+		const String *imgType = asset->entry->KeyValue<String>("Compression.ImageType", P_TARGET_FLAGS(flags));
+		if (!imgType)
+			return SR_MetaError;
+
+		const bool kNormalMap = *imgType == "NormalMap";
+
 		if (!w || !h || *w < 1 || *h < 1)
 			return SR_MetaError;
 
@@ -826,6 +832,17 @@ int TextureParser::Resize(
 								);
 							}
 
+							if (kNormalMap) {
+								RAD_ASSERT(src.bpp >= 3);
+								NormalizeNormalMap(
+									temp,
+									*w,
+									*h,
+									src.bpp,
+									0
+								);
+							}
+
 							memcpy(img->frames[i].mipmaps[0].data, temp, img->frames[i].mipmaps[0].dataSize);
 
 							COut(C_Info) << "Resized: " << asset->path.get() << " from (" << 
@@ -874,6 +891,12 @@ int TextureParser::Mipmap(
 	if ((compressionMode == kCompressionMode_DXT) ||
 		(compressionMode == kCompressionMode_PVR))
 		return SR_Success; // libraries generate mipmaps.
+
+	const String *imgType = asset->entry->KeyValue<String>("Compression.ImageType", P_TARGET_FLAGS(flags));
+	if (!imgType)
+		return SR_MetaError;
+
+	const bool kNormalMap = *imgType == "NormalMap";
 			
 	int w = m_header.width;
 	int h = m_header.height;
@@ -957,6 +980,17 @@ int TextureParser::Mipmap(
 							);
 						}
 
+						if (kNormalMap) {
+							RAD_ASSERT(src.bpp >= 3);
+							NormalizeNormalMap(
+								temp,
+								w,
+								h,
+								src.bpp,
+								0
+							);
+						}
+
 						memcpy(
 							img->frames[i].mipmaps[m].data,
 							temp,
@@ -999,8 +1033,39 @@ int TextureParser::Compress(
 	if (compressionMode < 0)
 		return compressionMode;
 
-	if (compressionMode == kCompressionMode_Disabled)
+	if (compressionMode == kCompressionMode_Disabled) {
+		const String *imgType = asset->entry->KeyValue<String>("Compression.ImageType", P_TARGET_FLAGS(flags));
+		if (!imgType)
+			return SR_MetaError;
+
+		const bool kNormalMap = *imgType == "NormalMap";
+
+		if (kNormalMap) {
+			// uncompressed normal map needs to be swizzled for SampleNormalMap shader.
+			for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it) {
+				image_codec::Image::Ref &img = *it;
+
+				RAD_ASSERT(img->bpp >= 3);
+
+				for (int i = 0; i < img->frameCount; ++i) {
+					const image_codec::Frame &sf = img->frames[i];
+					for (int k = 0; k < sf.mipCount; ++k) {
+						const image_codec::Mipmap &m = sf.mipmaps[k];
+						SwizzleNormalMap(
+							m.data,
+							m.width,
+							m.height,
+							img->bpp,
+							kGenNormalMapFlag_DXT1n
+						);
+					}
+				}
+			}
+
+		}
+
 		return SR_Success; // no compression.
+	}
 
 	// check various constraints so we get errors on any platform:
 	bool reqPOW2 = false;
@@ -1044,6 +1109,73 @@ int TextureParser::Compress(
 	}
 
 	return SR_Success;
+}
+
+void TextureParser::NormalizeNormalMap(void *data, int w, int h, int bpp, int flags) {
+	U8 *src = (U8*)data;
+
+	for (int i = 0; i < w*h; ++i) {
+		Vec3 n;
+		
+		if (flags&kGenNormalMapFlag_BGRA) {
+			n = Vec3((float)src[2], (float)src[1], (float)src[0]);
+		} else {
+			n = Vec3((float)src[0], (float)src[1], (float)src[2]);
+		}
+
+		n /= 255.f;
+		n = (n - 0.5f) * 2.f;
+		n.Normalize();
+
+		n = (n / 2.f) + 0.5f;
+		n *= 255.f;
+
+		for (int k = 0; k < 3; ++k)
+			n[k] = math::Clamp(n[k], 0.f, 255.f);
+
+		if (flags&kGenNormalMapFlag_BGRA) {
+			src[0] = (U8)n[2];
+			src[1] = (U8)n[1];
+			src[2] = (U8)n[0];
+		} else {
+			src[0] = (U8)n[0];
+			src[1] = (U8)n[1];
+			src[2] = (U8)n[2];
+		}
+
+		src += bpp;
+	}
+}
+
+void TextureParser::SwizzleNormalMap(void *data, int w, int h, int bpp, int flags) {
+	U8 *src = (U8*)data;
+
+	for (int i = 0; i < w*h; ++i) {
+		if (flags&kGenNormalMapFlag_DXT1n) {
+			if (flags&kGenNormalMapFlag_BGRA) {
+				src[0] = 255;
+			} else {
+				src[2] = 255;
+			}
+			
+			if (bpp > 3)
+				src[3] = 255;
+		} else {
+			RAD_ASSERT(bpp > 3);
+			RAD_ASSERT(flags&kGenNormalMapFlag_DXT5n);
+			if (flags&kGenNormalMapFlag_BGRA) {
+				src[3] = src[2];
+				src[2] = 255;
+				src[0] = 255;
+			} else {
+				src[3] = src[0];
+				src[0] = 255;
+				src[2] = 255;
+			}
+		}
+
+		src += bpp;
+	}
 }
 
 #endif

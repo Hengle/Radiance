@@ -18,7 +18,7 @@ namespace asset {
 
 extern const char *s_tcModNames[r::Material::kNumTCMods]; // defined in MaterialParser.cpp
 
-MaterialCooker::MaterialCooker() : Cooker(5) {
+MaterialCooker::MaterialCooker() : Cooker(6) {
 }
 
 MaterialCooker::~MaterialCooker() {
@@ -84,6 +84,9 @@ int MaterialCooker::Compile(int flags) {
 	if (!fp)
 		return SR_IOError;
 
+	Vec3 rgb;
+	Vec4 rgba;
+
 	stream::OutputStream os(fp->ob);
 	os << (U16)shaderId;
 	os << (U8)(parser->procedural.get() ? 1 : 0);
@@ -93,6 +96,26 @@ int MaterialCooker::Compile(int flags) {
 	os << (U8)(parser->material->doubleSided.get() ? 1 : 0);
 	os << (U8)(parser->material->depthWrite.get() ? 1 : 0);
 	os << (U8)(parser->material->lit.get() ? 1 : 0);
+	os << (U8)(parser->material->castShadows.get() ? 1 : 0);
+	os << (U8)(parser->material->receiveShadows.get() ? 1 : 0);
+	os << (U8)(parser->material->selfShadow.get() ? 1 : 0);
+	os << parser->material->specularExponent.get();
+
+	for (int i = 0; i < r::Material::kNumColorIndices; ++i) {
+		rgb = parser->material->SpecularColor(i);
+		os << (U8)(rgb[0]*255.f);
+		os << (U8)(rgb[1]*255.f);
+		os << (U8)(rgb[2]*255.f);
+	}
+
+	{
+		const WaveAnim &w = *parser->material->specularColorWave;
+		os << (U8)w.type.get();
+		os << w.amplitude.get();
+		os << w.freq.get();
+		os << w.phase.get();
+		os << w.base.get();
+	}
 
 	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
 		String path;
@@ -131,8 +154,7 @@ int MaterialCooker::Compile(int flags) {
 
 	for (int i = r::Material::kColor0; i < r::Material::kNumColors; ++i) {
 		for (int k = r::Material::kColorA; k < r::Material::kNumColorIndices; ++k) {
-			float rgba[4];
-			parser->material->Color(i, k, rgba);
+			rgba = parser->material->Color(i, k);
 			os << (U8)(rgba[0]*255.f);
 			os << (U8)(rgba[1]*255.f);
 			os << (U8)(rgba[2]*255.f);

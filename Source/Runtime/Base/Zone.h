@@ -127,6 +127,11 @@ public:
 		return zone;
 	}
 
+#if defined (RAD_OPT_ZONE_MEMGUARD)
+	static void CheckMemGuards(void *ptr);
+	void CheckGuards();
+#endif
+
 
 private:
 
@@ -164,9 +169,7 @@ private:
 	}
 
 #if defined (RAD_OPT_ZONE_MEMGUARD)
-	static void CheckMemGuards(void *ptr);
 	static void *WriteMemGuards(void *ptr);
-	void CheckGuards();
 #endif
 
 #if defined(RAD_OPT_ZONE_MEMGUARD)
@@ -236,6 +239,7 @@ void *safe_zone_calloc(
 );
 
 void zone_free(void *p);
+void zone_checkptr(void *p);
 
 template <typename T, typename Z>
 class zone_allocator {

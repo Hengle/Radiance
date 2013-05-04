@@ -33,10 +33,10 @@ enum {
 	kMinMipSize = 1
 };
 
-class DXTOutputImage : public nvtt::OutputHandler {
+class nvttOutputImage : public nvtt::OutputHandler {
 public:
 
-	DXTOutputImage(image_codec::Image &output, int frame) : m_img(output), m_frame(frame), m_ofs(0), m_mip(0) {
+	nvttOutputImage(image_codec::Image &output, int frame) : m_img(output), m_frame(frame), m_ofs(0), m_mip(0) {
 		RAD_ASSERT(frame < output.frameCount); // must be preallocated!
 	}
 
@@ -99,6 +99,8 @@ int TextureParser::CompressDXT(
 	const String *imgType = asset->entry->KeyValue<String>("Compression.ImageType", P_TARGET_FLAGS(flags));
 	if (!imgType)
 		return SR_MetaError;
+
+	const bool kNormalMap = *imgType == "NormalMap";
 	
 	// Mipmap?
 	const bool *mipmap = asset->entry->KeyValue<bool>("Mipmap", P_TARGET_FLAGS(flags));
@@ -123,32 +125,52 @@ int TextureParser::CompressDXT(
 	}
 
 	int format;
+	int bpp;
 	nvtt::Format nvttFormat;
-
+	
 	{
 		if (m_images.empty())
 			return SR_InvalidFormat;
 		const image_codec::Image::Ref &img = m_images[0];
 
-		if (*imgType == "NormalMap") {
-			nvttFormat = nvtt::Format_DXT5n;
-			format = image_codec::dds::Format_DXT5;
-		} else if (*mode == "DXT5") {
-			nvttFormat = (img->bpp==4) ? nvtt::Format_DXT5 : nvtt::Format_DXT1;
-			format = (img->bpp==4) ? image_codec::dds::Format_DXT5 : image_codec::dds::Format_DXT1;
+		bpp = img->bpp;
+
+		if (*mode == "DXT5") {
+			if (kNormalMap) {
+				nvttFormat = nvtt::Format_DXT5;
+				format = image_codec::dds::Format_DXT5;
+			} else {
+				nvttFormat = (img->bpp==4) ? nvtt::Format_DXT5 : nvtt::Format_DXT1;
+				format = (img->bpp==4) ? image_codec::dds::Format_DXT5 : image_codec::dds::Format_DXT1;
+			}
 		} else {
-			nvttFormat = (img->bpp==4) ? nvtt::Format_DXT3 : nvtt::Format_DXT1;
-			format = (img->bpp==4) ? image_codec::dds::Format_DXT3 : image_codec::dds::Format_DXT1;
+			if (kNormalMap) {
+				nvttFormat = nvtt::Format_DXT1;
+				format = image_codec::dds::Format_DXT1;
+			} else {
+				nvttFormat = (img->bpp==4) ? nvtt::Format_DXT3 : nvtt::Format_DXT1;
+				format = (img->bpp==4) ? image_codec::dds::Format_DXT3 : image_codec::dds::Format_DXT1;
+			}
 		}
 	}
 
 	String strFormat;
 	if (nvttFormat == nvtt::Format_DXT1) {
-		strFormat = "DXT1";
-	} else if(nvttFormat == nvtt::Format_DXT5n) {
-		strFormat = "DXT5n";
+		if (kNormalMap) {
+			strFormat = "DXT1n";
+		} else {
+			strFormat = "DXT1";
+		}
+	} else if(nvttFormat == nvtt::Format_DXT5) {
+		if (kNormalMap) {
+			strFormat = "DXT5n";
+		} else {
+			strFormat = "DXT5";
+		}
 	} else {
-		strFormat = *mode;
+		RAD_ASSERT(!kNormalMap);
+		RAD_ASSERT(nvttFormat == nvtt::Format_DXT3);
+		strFormat = "DXT3";
 	}
 
 	m_header.format = format;
@@ -167,8 +189,7 @@ int TextureParser::CompressDXT(
 	compressor.enableCudaAcceleration(true);
 
 	nvtt::CompressionOptions compressionOptions;
-	compressionOptions.setFormat(nvttFormat);
-
+	
 	if (flags&P_FastCook) { 
 		compressionOptions.setQuality(nvtt::Quality_Fastest);
 	} else {
@@ -207,6 +228,9 @@ int TextureParser::CompressDXT(
 				);
 			}
 
+			// not using nvtt normal map functions to exercise code shared
+			// between compression paths.
+
 			img->AllocateMipmaps(i, numMips);
 
 			nvtt::InputOptions inputTexture;
@@ -215,15 +239,9 @@ int TextureParser::CompressDXT(
 				sm.width,
 				sm.height
 			);
+			inputTexture.setMipmapGeneration(*mipmap);
+			inputTexture.setAlphaMode(((bpp == 4) && !kNormalMap) ? nvtt::AlphaMode_Transparency : nvtt::AlphaMode_None);
 			
-			inputTexture.setMipmapData(
-				temp,
-				sm.width,
-				sm.height
-			);
-
-			inputTexture.setAlphaMode(nvtt::AlphaMode_Transparency);
-
 			if (*border == "Clamp") {
 				inputTexture.setWrapMode(nvtt::WrapMode_Clamp);
 			} else if (*border == "Wrap") {
@@ -232,26 +250,100 @@ int TextureParser::CompressDXT(
 				inputTexture.setWrapMode(nvtt::WrapMode_Mirror);
 			}
 
-			inputTexture.setMipmapGeneration(*mipmap);
-			if (*mipmap) {
-				if ((*filter == "Box") || (flags&P_FastCook)) { // forces box filter on
-					inputTexture.setMipmapFilter(nvtt::MipmapFilter_Box);
-				} else if (*filter == "Triangle") {
-					inputTexture.setMipmapFilter(nvtt::MipmapFilter_Triangle);
-				} else {
-					inputTexture.setMipmapFilter(nvtt::MipmapFilter_Kaiser);
-					inputTexture.setKaiserParameters(kaiserWidth, 4.f, 1.f);
+			if (kNormalMap) {
+
+				nvtt::InputOptions workTexture;
+				workTexture.setTextureLayout(
+					nvtt::TextureType_2D,
+					sm.width,
+					sm.height
+				);
+
+				workTexture.setMipmapData(
+					temp,
+					sm.width,
+					sm.height
+				);
+
+				workTexture.setMipmapGeneration(*mipmap);
+				if (*mipmap) {
+					if ((*filter == "Box") || (flags&P_FastCook)) { // forces box filter on
+						workTexture.setMipmapFilter(nvtt::MipmapFilter_Box);
+					} else if (*filter == "Triangle") {
+						workTexture.setMipmapFilter(nvtt::MipmapFilter_Triangle);
+					} else {
+						workTexture.setMipmapFilter(nvtt::MipmapFilter_Kaiser);
+						workTexture.setKaiserParameters(kaiserWidth, 4.f, 1.f);
+					}
+				}
+
+				nvttOutputImage outputWriter(*img, i);
+
+				nvtt::OutputOptions outputOptions;
+				outputOptions.setOutputHeader(false);
+				outputOptions.setOutputHandler(&outputWriter);
+
+				compressionOptions.setFormat(nvtt::Format_RGBA);
+
+				if (!compressor.process(workTexture, compressionOptions, outputOptions)) {
+					COut(C_Error) << "NVTT failure: unable to mipmap normalmap texture!" << std::endl;
+					return SR_CompilerError;
+				}
+
+				// img is full of mipmapped normal data
+				// normalize and swizzle into appropriate channels for DXT
+				image_codec::Frame &frame = img->frames[i];
+
+				for (int k = 0; k < frame.mipCount; ++k) {
+					image_codec::Mipmap &m = frame.mipmaps[k];
+
+					int flags = kGenNormalMapFlag_BGRA;
+					if (nvttFormat == nvtt::Format_DXT1) {
+						flags |= kGenNormalMapFlag_DXT1n;
+					} else {
+						RAD_ASSERT(nvttFormat == nvtt::Format_DXT5);
+						flags |= kGenNormalMapFlag_DXT5n;
+					}
+
+					NormalizeNormalMap(m.data, m.width, m.height, 4, flags);
+					SwizzleNormalMap(m.data, m.width, m.height, 4, flags);
+					
+					inputTexture.setMipmapData(
+						m.data,
+						m.width,
+						m.height,
+						1,
+						0,
+						k
+					);
+
+					zone_free(m.data);
+				}
+
+			} else {
+				inputTexture.setMipmapData(
+					temp,
+					sm.width,
+					sm.height
+				);
+
+				if (*mipmap) {
+					if ((*filter == "Box") || (flags&P_FastCook)) { // forces box filter on
+						inputTexture.setMipmapFilter(nvtt::MipmapFilter_Box);
+					} else if (*filter == "Triangle") {
+						inputTexture.setMipmapFilter(nvtt::MipmapFilter_Triangle);
+					} else {
+						inputTexture.setMipmapFilter(nvtt::MipmapFilter_Kaiser);
+						inputTexture.setKaiserParameters(kaiserWidth, 4.f, 1.f);
+					}
 				}
 			}
 
-			if (nvttFormat == nvtt::Format_DXT5n) {
-				inputTexture.setNormalMap(true);
-				inputTexture.setNormalizeMipmaps(true);
-			}
+			compressionOptions.setFormat(nvttFormat);
 
 			inputTexture.setRoundMode(nvtt::RoundMode_None);
 
-			DXTOutputImage outputWriter(*img, i);
+			nvttOutputImage outputWriter(*img, i);
 
 			nvtt::OutputOptions outputOptions;
 			outputOptions.setOutputHeader(false);

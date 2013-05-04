@@ -52,8 +52,11 @@ bool GLSLTool::Assemble(
 			ss << "#define SKIN_SPRITE\r\n";
 	}
 
+	if (shader->MaterialSourceUsage(pass, Shader::kMaterialSource_Color) > 0)
+		ss << "#define SHADER_COLOR\r\n";
+
 	if (shader->MaterialSourceUsage(pass, Shader::kMaterialSource_VertexColor) > 0)
-		ss << "#define VERTEX_COLOR\r\n";
+		ss << "#define SHADER_VERTEX_COLOR\r\n";
 
 	if (shader->MaterialSourceUsage(pass, Shader::kMaterialSource_Vertex) > 0)
 		ss << "#define SHADER_POSITION\r\n";
@@ -144,6 +147,10 @@ bool GLSLTool::Assemble(
 
 	if (numColors > 0)
 		ss << "#define COLORS " << numColors << "\r\n";
+
+	int numSpecularColors = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_SpecularColor);
+	if (numSpecularColors > 0)
+		ss << "#define SHADER_SPECULAR_COLORS " << numSpecularColors << "\r\n";
 
 	int numLightPos = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightPos);
 	int numLightDir = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightDir);

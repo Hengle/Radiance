@@ -83,11 +83,19 @@ int D_Material::lua_SetState(lua_State *L) {
 	const char *state = luaL_checkstring(L, 2);
 	if (!strcmp(state, "Color0.A")) {
 		Vec4 c = lua::Marshal<Vec4>::Get(L, 3, true);
-		self->material->SetColor(r::Material::kColor0, r::Material::kColorA, &c[0]);
+		self->material->SetColor(r::Material::kColor0, r::Material::kColorA, c);
 		return 0;
 	} else if(!strcmp(state, "Color0.B")) {
 		Vec4 c = lua::Marshal<Vec4>::Get(L, 3, true);
-		self->material->SetColor(r::Material::kColor0, r::Material::kColorB, &c[0]);
+		self->material->SetColor(r::Material::kColor0, r::Material::kColorB, c);
+		return 0;
+	} else if (!strcmp(state, "DynamicLighting.SpecularColor0.A")) {
+		Vec3 c = lua::Marshal<Vec3>::Get(L, 3, true);
+		self->material->SetSpecularColor(r::Material::kColorA, c);
+		return 0;
+	} else if(!strcmp(state, "DynamicLighting.SpecularColor0.B")) {
+		Vec3 c = lua::Marshal<Vec3>::Get(L, 3, true);
+		self->material->SetSpecularColor(r::Material::kColorB, c);
 		return 0;
 	} else if(!strcmp(state, "Time")) {
 		self->material->time = (float)luaL_checknumber(L, 3);

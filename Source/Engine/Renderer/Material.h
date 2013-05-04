@@ -28,7 +28,7 @@ typedef boost::shared_ptr<MaterialLoader> MaterialLoaderRef;
 
 namespace r {
 
-class RADENG_CLASS Material
+class RADENG_CLASS Material : public boost::noncopyable
 {
 public:
 
@@ -115,16 +115,23 @@ public:
 	RAD_DECLARE_PROPERTY(Material, lit, bool, bool);
 	RAD_DECLARE_PROPERTY(Material, time, float, float);
 	RAD_DECLARE_PROPERTY(Material, timingMode, TimingMode, TimingMode);
+	RAD_DECLARE_PROPERTY(Material, castShadows, bool, bool);
+	RAD_DECLARE_PROPERTY(Material, receiveShadows, bool, bool);
+	RAD_DECLARE_PROPERTY(Material, selfShadow, bool, bool);
+	RAD_DECLARE_PROPERTY(Material, specularExponent, float, float);
+	RAD_DECLARE_READONLY_PROPERTY(Material, specularColorWave, WaveAnim*);
 	RAD_DECLARE_READONLY_PROPERTY(Material, shader, Shader::Ref);
 
 #if defined(RAD_OPT_TOOLS)
 	RAD_DECLARE_PROPERTY(Material, shaderName, const char *, const char *);
 #endif
 
-	void SetColor(int num, int index, float *c);
-	void Color(int num, int index, float *out) const;
-	const WaveAnim &ColorWave(int num) const;
+	void SetColor(int num, int index, const Vec4 &color);
+	Vec4 Color(int num, int index) const;
 	WaveAnim &ColorWave(int num);
+
+	void SetSpecularColor(int index, const Vec3 &color);
+	Vec3 SpecularColor(int index) const;
 
 	int TCUVIndex(int index) const;
 	void SetTCUVIndex(int index, int uvIndex);
@@ -160,7 +167,8 @@ public:
 
 	// Returns 6 floats (st sampled + accumulated + ex)
 	void Sample(int index, int tcMod, int &ops, float *out) const;
-	void SampleColor(int num, float *out) const; // returns 4 floats
+	Vec4 SampleColor(int num) const;
+	Vec3 SampleSpecularColor() const;
 
 	// Apply rendering states
 	// See RB for implementation.
@@ -203,12 +211,23 @@ private:
 	RAD_DECLARE_SET(blendMode, BlendMode) { m_blendMode = value; }
 	RAD_DECLARE_GET(shaderId, int) { return m_shaderId; }
 	RAD_DECLARE_SET(shaderId, int) { m_shaderId = value; }
+	RAD_DECLARE_GET(lit, bool) { return m_lit; }
+	RAD_DECLARE_SET(lit, bool) { m_lit = value; }
 	RAD_DECLARE_GET(time, float) { return m_time; }
 	RAD_DECLARE_SET(time, float) { m_time = value; }
 	RAD_DECLARE_GET(timingMode, TimingMode) { return m_timingMode; }
-	RAD_DECLARE_SET(timingMode, const TimingMode&); // if this is not const TimingMode& we get an ICE!!!!! WTF!!!!
-	RAD_DECLARE_GET(lit, bool) { return m_lit; }
-	RAD_DECLARE_SET(lit, bool) { m_lit = value; }
+	RAD_DECLARE_SET(timingMode, TimingMode);
+	RAD_DECLARE_GET(castShadows, bool) { return m_castShadows; }
+	RAD_DECLARE_SET(castShadows, bool) { m_castShadows = value; }
+	RAD_DECLARE_GET(receiveShadows, bool) { return m_receiveShadows; }
+	RAD_DECLARE_SET(receiveShadows, bool) { m_receiveShadows = value; }
+	RAD_DECLARE_GET(selfShadow, bool) { return m_selfShadow; }
+	RAD_DECLARE_SET(selfShadow, bool) { m_selfShadow = value; }
+	RAD_DECLARE_GET(specularExponent, float) { return m_specularExponent; }
+	RAD_DECLARE_SET(specularExponent, float) { m_specularExponent = value; }
+	RAD_DECLARE_GET(specularColorWave, WaveAnim*) {
+		return const_cast<WaveAnim*>(&m_specularWave);
+	}
 
 	// Basically I want materials that can to share a Shader::Ref to minimize
 	// the cost of material changes (i.e. I can sort materials by shader and
@@ -279,8 +298,6 @@ private:
 		kNumTCMods>,
 	kMaterialTextureSource_MaxIndices> m_waves;
 
-	boost::array<WaveAnim, kNumColors> m_colorWaves;
-	
 	boost::array<
 		boost::array<int, kNumTCMods>, 
 	kMaterialTextureSource_MaxIndices> m_waveOps;
@@ -293,15 +310,17 @@ private:
 		kNumTCMods>,
 	kMaterialTextureSource_MaxIndices> m_waveSamples;
 
+	boost::array<WaveAnim, kNumColors> m_colorWaves;
+
 	boost::array<
-		boost::array<
-			boost::array<float, 4>,
-		kNumColorIndices>,
+		boost::array<Vec4, kNumColorIndices>,
 	kNumColors> m_colors;
 	
-	boost::array<
-		boost::array<float, 4>,
-	kNumColors> m_sampledColor;
+	boost::array<Vec4, kNumColors> m_sampledColor;
+
+	boost::array<Vec3, kNumColorIndices> m_specularColors;
+	Vec3 m_sampledSpecularColor;
+	WaveAnim m_specularWave;
 
 	boost::array<float, kMaterialTextureSource_MaxIndices> m_textureFPS;
 	boost::array<U8, kMaterialTextureSource_MaxIndices> m_textureClamp;
@@ -315,11 +334,9 @@ private:
 
 	float m_time;
 	float m_blendTime[2];
+	float m_specularExponent;
 	TimingMode m_timingMode;
 	ShaderInstance::Ref m_shader;
-#if defined(RAD_OPT_TOOLS)
-	String m_shaderName;
-#endif
 	int m_shaderId;
 	Sort m_sort;
 	DepthFunc m_depthFunc;
@@ -328,6 +345,13 @@ private:
 	bool m_doubleSided;
 	bool m_depthWrite;
 	bool m_lit;
+	bool m_castShadows;
+	bool m_receiveShadows;
+	bool m_selfShadow;
+
+#if defined(RAD_OPT_TOOLS)
+	String m_shaderName;
+#endif
 };
 
 } // namespace
