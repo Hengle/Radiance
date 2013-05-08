@@ -5,7 +5,8 @@
 
 global kRADBoneTypes = #(BoneGeometry, CATBone, CATParent, HubObject)
 global kRADHelperTypes = #(BoneGeometry, CATBone, CATParent, HubObject, SplineShape, Circle, Rectangle)
-global kRADMeshTypes = #(Mesh, Targetcamera, Freecamera, Omnilight)
+global kRADAnimatableTypes = #(Mesh, Targetcamera, Freecamera, Omnilight)
+global kRADLightTypes = #(Omnilight)
 
 function RAD_PrintProps obj = (
 
@@ -334,6 +335,16 @@ function RAD_ConvertableSplitTypes objs types = (
 	)
 	l
 )
+
+-- This function gathers the requested property of all the indicated objects into an array
+-- Return value = R[]
+-- The first array element is a boolean indicating if all the properties are identical
+-- R[2] contains an array for each object containing the 
+-- FirstObject = R[2][1], SecondObject = R[2][2]... etc
+-- FirstObject is an array, index [1] contains the object, [2] is an array of the property values
+--
+-- Therefore, if R[1] == true then all objects have identical properties, and R[2][1][2][1] will contain the
+-- value of the first property.
 
 function RAD_GatherObjectProps objs props defaults = (
 	vals = #()

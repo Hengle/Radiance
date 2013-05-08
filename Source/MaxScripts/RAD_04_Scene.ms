@@ -14,9 +14,15 @@ global kSceneFlag_CinematicObject = 0x00080000
 global kSceneFlag_HideUntilRefed = 0x00040000
 global kSceneFlag_HideWhenDone = 0x00010000
 global kSceneFlag_SetBBox = 0x00008000
+global kSceneFlag_ObjectIsWorld = 0x00004000
+global kSceneFlag_ObjectIsObject = 0x00002000
+global kSceneFlag_CastShadows = 0x00001000
 global kLightFlag_Diffuse = 0x000000001
 global kLightFlag_Specular = 0x00000002
 global kLightFlag_CastShadows = 0x00000004
+global kLightFlag_AffectWorld = 0x00000008
+global kLightFlag_AffectPlayer = 0x00000010
+global kLightFlag_AffectObjects = 0x00000020
 
 function RAD_GatherEntities objs = (
 	ents = #()
@@ -35,7 +41,7 @@ function RAD_GatherCameras objs = (
 )
 
 function RAD_GatherLights objs = (
-	return RAD_Filter objs #(Omnilight)
+	return RAD_Filter objs kRADLightTypes
 )
 
 function RAD_ExportObjectsToSceneFile objs doMeshes doAnims doLights fileName = (
@@ -114,7 +120,15 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims doLights fileName = 
 				flags = 0
 				if (x.affectDiffuse) then (flags = bit.or flags kLightFlag_Diffuse)
 				if (x.affectSpecular) then (flags = bit.or flags kLightFlag_Specular)
-				if (x.castShadows) then (flags = bit.or flags kLightFlag_CastShadows)
+				if (x.baseObject.castShadows) then (flags = bit.or flags kLightFlag_CastShadows)
+				
+				affect = getUserProp x "AffectWorld"
+				if ((affect == undefined) or (affect == true)) then (flags = bit.or flags kLightFlag_AffectWorld)
+				affect = getUserProp x "AffectPlayer"
+				if ((affect == undefined) or (affect == true)) then (flags = bit.or flags kLightFlag_AffectPlayer)
+				affect = getUserProp x "AffectObjects"
+				if ((affect == undefined) or (affect == true)) then (flags = bit.or flags kLightFlag_AffectObjects)
+				
 				WriteLong file flags #unsigned
 				
 				WriteFloat file (x.color.red/255.0)
@@ -196,6 +210,21 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims doLights fileName = 
 					flags = bit.or flags kSceneFlag_HideWhenDone
 				)
 				
+				worldLights = getUserProp m "WorldLights"
+				if (worldLights == undefined or worldLights == true) then (
+					flags = bit.or flags kSceneFlag_ObjectIsWorld
+				)
+				
+				objectLights = getUserProp m "ObjectLights"
+				if (objectLights == undefined or objectLights == true) then (
+					flags = bit.or flags kSceneFlag_ObjectIsObject
+				)
+				
+				castShadows = getUserProp m "CastShadows"
+				if (castShadows == undefined or castShadows == true) then (
+					flags = bit.or flags kSceneFlag_CastShadows
+				)
+				
 				setBBox = getUserProp m "SetBBox"
 				if (setBBox != undefined and setBBox == "true") then (
 					flags = bit.or flags kSceneFlag_SetBBox
@@ -268,7 +297,7 @@ function RAD_ExportScene selectionOnly exportHidden doMeshes doAnims doLights fi
 	oldTime = sliderTime
 	if (selectionOnly) then ( objs = selection )
 	objs = RAD_FilterVisible objs vis:(not exportHidden)		
-	objs = RAD_ConvertableFilter objs kRADMeshTypes
+	objs = RAD_ConvertableFilter objs kRADAnimatableTypes
 	objs = RAD_Exclude objs kRADHelperTypes -- exclude helper types
 	
 	if (objs.count == 0) then (

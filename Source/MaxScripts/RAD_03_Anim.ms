@@ -123,7 +123,7 @@ function RAD_FilterAnimated objs =
 
 function RAD_FilterAnimatable objs =
 (
-	animatable = RAD_ConvertableFilter objs kRADMeshTypes
+	animatable = RAD_ConvertableFilter objs kRADAnimatableTypes
 	RAD_Exclude animatable kRADHelperTypes -- filter helpers
 )
 
