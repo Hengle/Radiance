@@ -48,7 +48,7 @@ bool GLSLTool::Assemble(
 	}
 
 	if (pass != r::Shader::kPass_Preview) {
-		if (shader->skinMode == Shader::kSkinMode_Sprite)
+		if (material.skinMode == r::Material::kSkinMode_Sprite)
 			ss << "#define SKIN_SPRITE\r\n";
 	}
 
@@ -153,9 +153,10 @@ bool GLSLTool::Assemble(
 		ss << "#define SHADER_SPECULAR_COLORS " << numSpecularColors << "\r\n";
 
 	int numLightPos = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightPos);
-	int numLightDir = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightDir);
-	int numLightHalfPos = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightHalfPos);
-	int numLightHalfDir = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightHalfDir);
+	int numLightVec = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightVec);
+	int numLightHalfVec = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightHalfVec);
+	int numLightTanVec = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightTanVec);
+	int numLightTanHalfVec = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightTanHalfVec);
 	int numLightDiffuseColor = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightDiffuseColor);
 	int numLightSpecularColor = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightSpecularColor);
 
@@ -167,7 +168,7 @@ bool GLSLTool::Assemble(
 	int numTangents = numShaderTangents;
 	int numBitangents = numShaderBitangents;
 
-	bool needTangents = vertexShader && (numLightDir || numLightHalfDir);
+	bool needTangents = vertexShader && (numLightTanVec || numLightTanHalfVec);
 	if (needTangents) {
 		numNormals = std::max(1, numShaderNormals);
 		numTangents = std::max(1, numShaderTangents);
@@ -193,12 +194,15 @@ bool GLSLTool::Assemble(
 	int numLights = std::max(
 		numLightPos, 
 		std::max(
-			numLightDir, 
+			numLightVec, 
 			std::max(
-				numLightHalfPos,
+				numLightHalfVec,
 				std::max(
-					numLightHalfDir,
-					std::max(numLightDiffuseColor, numLightSpecularColor)
+					numLightTanVec,
+					std::max(
+						numLightTanHalfVec,
+						std::max(numLightDiffuseColor, numLightSpecularColor)
+					)
 				)
 			)
 		)
@@ -208,12 +212,14 @@ bool GLSLTool::Assemble(
 		ss << "#define LIGHTS " << numLights << "\r\n";
 		if (numLightPos > 0)
 			ss << "#define SHADER_LIGHT_POS " << numLightPos << "\r\n";
-		if (numLightDir > 0)
-			ss << "#define SHADER_LIGHT_DIR " << numLightDir << "\r\n";
-		if (numLightHalfPos > 0)
-			ss << "#define SHADER_LIGHT_HALFPOS " << numLightHalfPos << "\r\n";
-		if (numLightHalfDir > 0)
-			ss << "#define SHADER_LIGHT_HALFDIR " << numLightHalfDir << "\r\n";
+		if (numLightVec > 0)
+			ss << "#define SHADER_LIGHT_VEC " << numLightVec << "\r\n";
+		if (numLightHalfVec > 0)
+			ss << "#define SHADER_LIGHT_HALFVEC " << numLightHalfVec << "\r\n";
+		if (numLightTanVec > 0)
+			ss << "#define SHADER_LIGHT_TANVEC " << numLightTanVec << "\r\n";
+		if (numLightTanHalfVec > 0)
+			ss << "#define SHADER_LIGHT_TANHALFVEC " << numLightTanHalfVec << "\r\n";
 		if (numLightDiffuseColor > 0)
 			ss << "#define SHADER_LIGHT_DIFFUSE_COLOR " << numLightDiffuseColor << "\r\n";
 		if (numLightSpecularColor > 0)

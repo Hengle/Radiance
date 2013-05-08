@@ -232,6 +232,9 @@ bool BSPBuilder::EmitSceneOmniLights() {
 		s.PrintfASCII("%d", baseUUID++);
 		e->keys.pairs[CStr("uuid")] = s;
 
+		s.PrintfASCII("%d %d %d", (int)light->pos[0], (int)light->pos[1], (int)light->pos[2]);
+		e->keys.pairs[CStr("origin")] = s;
+
 		if (!EmitBSPEntity(e))
 			return false;
 	}

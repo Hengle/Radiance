@@ -119,7 +119,10 @@ inline const char *Shader::Node::RAD_IMPLEMENT_GET(alias) {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-inline Shader::Shader(const char *name) : m_name(name), m_skinMode(kSkinMode_Default) {
+inline Shader::Shader(
+	const char *name,
+	r::Material::SkinMode skinMode
+) : m_name(name), m_skinMode(skinMode) {
 }
 
 inline Shader::~Shader() {
@@ -135,10 +138,6 @@ inline const Shader::IntSet &Shader::AttributeUsage(r::Shader::Pass pass, Materi
 
 inline const char *Shader::RAD_IMPLEMENT_GET(name) {
 	return m_name.c_str;
-}
-
-inline Shader::SkinMode Shader::RAD_IMPLEMENT_GET(skinMode) {
-	return m_skinMode;
 }
 
 } // shader_utils

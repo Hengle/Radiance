@@ -668,6 +668,7 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 			DrawUnlitBatch(*it->second, wireframe);
 		}
 
+		m_rb->ReleaseArrayStates();
 		return;
 	}
 
@@ -687,6 +688,8 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 			}
 		}
 	}
+
+	m_rb->ReleaseArrayStates();
 }
 
 void WorldDraw::DrawUnlitBatch(const details::MBatch &batch, bool wireframe) {
@@ -745,7 +748,6 @@ void WorldDraw::DrawUnlitBatch(const details::MBatch &batch, bool wireframe) {
 			m_rb->PopMatrix();
 	}
 
-	m_rb->ReleaseArrayStates();
 	mat->shader->End();
 }
 

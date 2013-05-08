@@ -13,8 +13,7 @@
 
 #include "../Types.h"
 #include "../Lua/LuaRuntime.h"
-#include "Common.h"
-#include "Shader.h"
+#include "Material.h"
 #include <Runtime/Container/ZoneMap.h>
 #include <Runtime/Container/ZoneSet.h>
 #include <Runtime/Container/ZoneVector.h>
@@ -22,10 +21,6 @@
 #include <Runtime/PushPack.h>
 
 class Engine;
-
-namespace r {
-	class Material;	
-}
 
 namespace tools {
 namespace shader_utils {
@@ -70,13 +65,14 @@ public:
 		kMaterialSource_LightDiffuseColor, // constant (rgb) + w == brightness
 		kMaterialSource_LightSpecularColor, // constant (rgb) + w == exponent
 		kMaterialSource_LightPos, // model space (xyz) + w == radius
-		kMaterialSource_LightHalfPos, // model space
+		kMaterialSource_LightVec, // model space angle
+		kMaterialSource_LightHalfVec, // model space half angle
 		kMaterialSource_Vertex,
 		kMaterialSource_Normal,
 		kMaterialSource_Tangent,
 		kMaterialSource_Bitangent,
-		kMaterialSource_LightDir, // texture space
-		kMaterialSource_LightHalfDir, // texture space
+		kMaterialSource_LightTanVec, // texture space
+		kMaterialSource_LightTanHalfVec, // texture space
 		kMaterialSource_TexCoord,
 		kMaterialSource_VertexColor,
 		kMaterialSource_SpriteSkin,
@@ -99,11 +95,6 @@ public:
 		kBasicType_Sampler2D,
 		kBasicType_SamplerCUBE,
 		kNumBasicTypes
-	};
-
-	enum SkinMode {
-		kSkinMode_Default,
-		kSkinMode_Sprite
 	};
 
 	enum ShaderOutput {
@@ -250,15 +241,18 @@ public:
 	//////////////////////////////////////////////////////////////////////////////////////////
 
 	RAD_DECLARE_READONLY_PROPERTY(Shader, name, const char*);
-	RAD_DECLARE_READONLY_PROPERTY(Shader, skinMode, SkinMode);
-
-	static Ref Load(Engine &engine, const char *name);
+	
+	static Ref Load(
+		Engine &engine, 
+		const char *name,
+		r::Material::SkinMode skinMode
+	);
 
 	//! Emits supporting shader functions.
 	bool EmitFunctions(Engine &engine, std::ostream &out) const;
 	
 	//! Emits shader code.
-	/*! Shader code is generated in 2 passes. First call EmitFunnctions to emit
+	/*! Shader code is generated in 2 passes. First call EmitFunctions to emit
 	    supporting shader functions and data. Then call this function to emit the
 		shader's MAIN entry point. */
 	bool EmitShader(
@@ -289,7 +283,10 @@ public:
 	const IntSet &AttributeUsage(r::Shader::Pass pass, MaterialSource source);
 
 private:
-	Shader(const char *name);
+	Shader(
+		const char *name, 
+		r::Material::SkinMode skinMode
+	);
 	
 	typedef zone_map<String, Node::Ref, ZToolsT>::type NodeMap;
 	typedef zone_vector<Node::Ref, ZToolsT>::type NodeVec;
@@ -304,7 +301,6 @@ private:
 		virtual lua::SrcBuffer::Ref Load(lua_State *L, const char *name);
 	};
 
-	static int lua_SkinMode(lua_State *L);
 	static int lua_MNode(lua_State *L);
 	static int lua_NNode(lua_State *L);
 	static int lua_Compile(lua_State *L);
@@ -316,11 +312,12 @@ private:
 	static int lua_MVertex(lua_State *L);
 	static int lua_MNormal(lua_State *L);
 	static int lua_MLightPos(lua_State *L);
-	static int lua_MLightHalfPos(lua_State *L);
+	static int lua_MLightVec(lua_State *L);
+	static int lua_MLightHalfVec(lua_State *L);
 	static int lua_MLightDiffuseColor(lua_State *L);
 	static int lua_MLightSpecularColor(lua_State *L);
-	static int lua_MLightDir(lua_State *L);
-	static int lua_MLightHalfDir(lua_State *L);
+	static int lua_MLightTanVec(lua_State *L);
+	static int lua_MLightTanHalfVec(lua_State *L);
 	static int lua_MVertexColor(lua_State *L);
 	static int lua_MSource(lua_State *L, MaterialSource source);
 	static int lua_gcNode(lua_State *L);
@@ -329,7 +326,6 @@ private:
 	static lua::State::Ref InitLuaN(Node *n);
 
 	RAD_DECLARE_GET(name, const char*);
-	RAD_DECLARE_GET(skinMode, SkinMode);
 
 	Node::Ref LoadNode(Engine &e, lua_State *L, const char *type);
 	
@@ -443,7 +439,7 @@ private:
 	NodeVec m_instances;
 	ImportLoader m_impLoader;
 	String m_name;
-	SkinMode m_skinMode;
+	r::Material::SkinMode m_skinMode;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -453,15 +449,15 @@ public:
 	typedef boost::shared_ptr<ShaderCache> Ref;
 	typedef zone_map<String, Shader::Ref, ZToolsT>::type ShaderMap;
 
-	RAD_DECLARE_READONLY_PROPERTY(ShaderCache, shaders, const ShaderMap&);
-
-	Shader::Ref Load(Engine &engine, const char *name);
+	Shader::Ref Load(
+		Engine &engine, 
+		const char *name,
+		r::Material::SkinMode skinMode
+	);
 
 private:
 
-	RAD_DECLARE_GET(shaders, const ShaderMap&) { return m_shaders; }
-
-	ShaderMap m_shaders;
+	boost::array<ShaderMap, r::Material::kNumSkinModes> m_shaders;
 };
 
 } // shader_utils

@@ -18,7 +18,7 @@ namespace asset {
 
 extern const char *s_tcModNames[r::Material::kNumTCMods]; // defined in MaterialParser.cpp
 
-MaterialCooker::MaterialCooker() : Cooker(6) {
+MaterialCooker::MaterialCooker() : Cooker(7) {
 }
 
 MaterialCooker::~MaterialCooker() {
@@ -90,6 +90,7 @@ int MaterialCooker::Compile(int flags) {
 	stream::OutputStream os(fp->ob);
 	os << (U16)shaderId;
 	os << (U8)(parser->procedural.get() ? 1 : 0);
+	os << (U8)(parser->material->skinMode.get());
 	os << (U8)parser->material->sort.get();
 	os << (U8)parser->material->blendMode.get();
 	os << (U8)parser->material->depthFunc.get();

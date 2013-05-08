@@ -132,9 +132,13 @@ void GLMesh::BindAll(Shader *shader) {
 	if (m_va && !m_va->at(m_swapChain))
 		m_va = 0;
 
+	bool bindState = true;
+
 	if (m_va) { 
 		// we have compiled vertex states.
-		gls.BindVertexArray(m_va->at(m_swapChain));
+		const GLVertexArray::Ref &va = m_va->at(m_swapChain);
+		gls.BindVertexArray(va);
+		bindState = !va->initialized;
 	} else if (shader && (gl.vbos&&gl.vaos)) {
 		RAD_ASSERT(guid != -1);
 		m_va = m_shaderStates.Create(guid, m_swapChain);
@@ -147,10 +151,12 @@ void GLMesh::BindAll(Shader *shader) {
 		BindIndices();
 	}
 
-	ResetStreamState();
-	for (int s = 0; s < kNumMaterialGeometrySources; ++s) {
-		for (int i = 0; i < kMaterialGeometrySource_MaxIndices; ++i) {
-			Bind((MaterialGeometrySource)s, i);
+	if (bindState) {
+		ResetStreamState();
+		for (int s = 0; s < kNumMaterialGeometrySources; ++s) {
+			for (int i = 0; i < kMaterialGeometrySource_MaxIndices; ++i) {
+				Bind((MaterialGeometrySource)s, i);
+			}
 		}
 	}
 }

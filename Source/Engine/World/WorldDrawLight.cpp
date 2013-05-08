@@ -43,13 +43,13 @@ void WorldDraw::DrawUnshadowedLitBatch(const details::MBatch &batch) {
 
 	mat->shader->End();
 
+	if (!batch.matRef->mat->lit)
+		return;
+
 	for (details::MBatchDrawLink *link = batch.head; link; link = link->next) {
 		MBatchDraw *draw = link->draw;
-
 		DrawUnshadowedLitBatchLights(*draw, *mat);
 	}
-
-	m_rb->ReleaseArrayStates();
 }
 
 void WorldDraw::DrawBatch(
@@ -92,6 +92,12 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 
 	bool diffuse = mat.shader->HasPass(r::Shader::kPass_Diffuse1);
 	bool specular = mat.shader->HasPass(r::Shader::kPass_Specular1);
+	bool diffuseSpecular = mat.shader->HasPass(r::Shader::kPass_DiffuseSpecular1);
+
+	RAD_ASSERT_MSG(!(diffuse&&specular) || diffuseSpecular, "Shaders with diffuse and specular passes must also have combined DiffuseSpecular pass"); // sanity check on shader
+
+	bool didDiffuse = false;
+	bool didDiffuseSpecular = false;
 
 	const bool tx = draw.GetTransform(pos, angles);
 	if (tx) {
@@ -102,7 +108,7 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 	++m_counters.numBatches;
 
 	// draw all unshadowed lights
-	r::Shader::Uniforms u;
+	r::Shader::Uniforms u(draw.rgba.get());
 	BBox lightBounds;
 
 	if (tx) {
@@ -116,13 +122,6 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 	for (;;) {
 		details::LightInteraction *interaction = draw.m_interactions;
 
-		Light::LightStyle reqStyle;
-
-		if (diffuse)
-			reqStyle |= Light::kStyle_Diffuse;
-		if (specular)
-			reqStyle |= Light::kStyle_Specular;
-		
 		while (interaction) {
 
 			// batch up to kNumLights
@@ -136,7 +135,21 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 				Light::LightStyle style = interaction->light->style;
 
 				if (!(style & Light::kStyle_CastShadows)) {
-					if ((style&reqStyle) == reqStyle) {
+					bool add = false;
+
+					if ((style&Light::kStyle_DiffuseSpecular) == Light::kStyle_DiffuseSpecular) {
+						add = diffuseSpecular || (!didDiffuseSpecular && (diffuse||specular));
+					}
+					
+					if (style&Light::kStyle_Diffuse) {
+						add = add || (!diffuseSpecular && !didDiffuseSpecular && diffuse);
+					}
+
+					if (style&Light::kStyle_Specular) {
+						add = add || (!diffuseSpecular && !didDiffuseSpecular && specular);
+					}
+
+					if (add) {
 						r::LightDef &lightDef = u.lights.lights[u.lights.numLights++];
 						GenLightDef(*interaction->light, lightDef, tx ? &invTx : 0);
 						lightBounds.Insert(interaction->light->bounds);
@@ -151,7 +164,7 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 				// find the correct pass
 				int pass;
 
-				if (diffuse && specular) {
+				if (diffuseSpecular) {
 					pass = r::Shader::kPass_DiffuseSpecular1 + u.lights.numLights - 1;
 				} else if (diffuse) {
 					pass = r::Shader::kPass_Diffuse1 + u.lights.numLights - 1;
@@ -169,7 +182,7 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 					draw.Bind(mat.shader.get().get());
 				}
 
-				m_rb->BindLitMaterialStates(mat, &lightBounds);
+				m_rb->BindLitMaterialStates(mat, 0);
 
 				mat.shader->BindStates(u);
 				m_rb->CommitStates();
@@ -178,8 +191,12 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 			}
 		}
 
-		if (diffuse && specular) {
+		if (diffuseSpecular) {
+			diffuseSpecular = false;
+			didDiffuseSpecular = true;
+		} else if(diffuse) {
 			diffuse = false;
+			didDiffuse = true;
 		} else {
 			break;
 		}
@@ -256,16 +273,20 @@ void WorldDraw::LinkEntity(
 		if (!(light.interactionFlags & entity.lightInteractionFlags))
 			continue; // masked
 
-		BBox bounds(light.m_bounds);
-		bounds.Translate(light.m_pos);
+		BBox lightBounds(light.m_bounds);
+		lightBounds.Translate(light.m_pos);
 
-		if (bounds.Touches(bounds)) {
+		if (lightBounds.Touches(bounds)) {
 			for (DrawModel::Map::const_iterator it = entity.models->begin(); it != entity.models->end(); ++it) {
 				const DrawModel::Ref &model = it->second;
 				for (MBatchDraw::RefVec::const_iterator it = model->batches->begin(); it != model->batches->end(); ++it) {
 					const MBatchDraw::Ref &batch = *it;
-					if (batch->lit && !FindInteraction(light, *batch)) {
-						CreateInteraction(light, entity, *batch);
+					BBox batchBounds(batch->bounds);
+					batchBounds.Translate(entity.ps->worldPos);
+					if (lightBounds.Touches(batchBounds)) {
+						if (batch->lit && !FindInteraction(light, *batch)) {
+							CreateInteraction(light, entity, *batch);
+						}
 					}
 				}
 			}
@@ -303,14 +324,16 @@ void WorldDraw::LinkOccupant(
 		if (!(light.interactionFlags & occupant.lightInteractionFlags))
 			continue; // masked
 
-		BBox bounds(light.m_bounds);
-		bounds.Translate(light.m_pos);
+		BBox lightBounds(light.m_bounds);
+		lightBounds.Translate(light.m_pos);
 
-		if (bounds.Touches(bounds)) {
+		if (lightBounds.Touches(bounds)) {
 			for (MBatchDraw::RefVec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
 				const MBatchDraw::Ref &batch = *it;
-				if (batch->lit && !FindInteraction(light, *batch)) {
-					CreateInteraction(light, occupant, *batch);
+				if (lightBounds.Touches(batch->bounds)) {
+					if (batch->lit && !FindInteraction(light, *batch)) {
+						CreateInteraction(light, occupant, *batch);
+					}
 				}
 			}
 		}
@@ -363,6 +386,12 @@ void WorldDraw::LinkLight(
 		Entity &entity = **it;
 
 		if (!(light.interactionFlags & entity.lightInteractionFlags))
+			continue;
+
+		BBox entBounds(entity.ps->bbox);
+		entBounds.Translate(entity.ps->worldPos);
+
+		if (!bounds.Touches(entBounds))
 			continue;
 
 		for (DrawModel::Map::const_iterator it = entity.models->begin(); it != entity.models->end(); ++it) {

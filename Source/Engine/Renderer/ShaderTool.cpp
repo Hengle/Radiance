@@ -68,7 +68,11 @@ lua::SrcBuffer::Ref Shader::ImportLoader::Load(lua_State *L, const char *name) {
 	return lua::SrcBuffer::Ref(new lua::FileSrcBuffer(name, mm));
 };
 
-Shader::Ref Shader::Load(Engine &e, const char *name) {
+Shader::Ref Shader::Load(
+	Engine &e, 
+	const char *name,
+	r::Material::SkinMode skinMode
+) {
 	String path(CStr("@r:/Source/Shaders/"));
 	path += name;
 	path += ".shader";
@@ -79,7 +83,7 @@ Shader::Ref Shader::Load(Engine &e, const char *name) {
 		return Ref();
 	}
 
-	Shader::Ref m(new (ZTools) Shader(name));
+	Shader::Ref m(new (ZTools) Shader(name, skinMode));
 	lua::State::Ref L = InitLuaM(e, m.get());
 
 	if (luaL_loadbuffer(
@@ -109,24 +113,6 @@ Shader::Ref Shader::Load(Engine &e, const char *name) {
 		m.reset();
 
 	return m;
-}
-
-int Shader::lua_SkinMode(lua_State *L) {
-	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
-	Shader *self = (Shader*)lua_touserdata(L, -1);
-	lua_pop(L, 1);
-	RAD_VERIFY(self);
-
-	const char *sz = luaL_checkstring(L, 1);
-	if (!string::icmp(sz, "default")) {
-		self->m_skinMode = kSkinMode_Default;
-	} else if (!string::icmp(sz, "sprite")) {
-		self->m_skinMode = kSkinMode_Sprite;
-	} else {
-		luaL_error(L, "'%s' is not a valid skin mode.", sz);
-	}
-
-	return 0;
 }
 
 int Shader::lua_MNode(lua_State *L) { 
@@ -274,8 +260,12 @@ int Shader::lua_MLightPos(lua_State *L) {
 	return lua_MSource(L, kMaterialSource_LightPos);
 }
 
-int Shader::lua_MLightHalfPos(lua_State *L) {
-	return lua_MSource(L, kMaterialSource_LightHalfPos);
+int Shader::lua_MLightVec(lua_State *L) {
+	return lua_MSource(L, kMaterialSource_LightVec);
+}
+
+int Shader::lua_MLightHalfVec(lua_State *L) {
+	return lua_MSource(L, kMaterialSource_LightHalfVec);
 }
 
 int Shader::lua_MLightDiffuseColor(lua_State *L) {
@@ -286,12 +276,12 @@ int Shader::lua_MLightSpecularColor(lua_State *L) {
 	return lua_MSource(L, kMaterialSource_LightSpecularColor);
 }
 
-int Shader::lua_MLightDir(lua_State *L) {
-	return lua_MSource(L, kMaterialSource_LightDir);
+int Shader::lua_MLightTanVec(lua_State *L) {
+	return lua_MSource(L, kMaterialSource_LightTanVec);
 }
 
-int Shader::lua_MLightHalfDir(lua_State *L) {
-	return lua_MSource(L, kMaterialSource_LightHalfDir);
+int Shader::lua_MLightTanHalfVec(lua_State *L) {
+	return lua_MSource(L, kMaterialSource_LightTanHalfVec);
 }
 
 int Shader::lua_MVertexColor(lua_State *L) {
@@ -335,7 +325,6 @@ lua::State::Ref Shader::InitLuaM(Engine &e, Shader *m) {
 	lua_State *L = state->L;
 
 	luaL_Reg r[] = {
-		{ "SkinMode", lua_SkinMode },
 		{ "Node", lua_MNode },
 		{ "Compile", lua_Compile },
 		{ "MColor", lua_MColor },
@@ -346,11 +335,12 @@ lua::State::Ref Shader::InitLuaM(Engine &e, Shader *m) {
 		{ "MVertex", lua_MVertex },
 		{ "MNormal", lua_MNormal },
 		{ "MLightPos", lua_MLightPos },
-		{ "MLightHalfPos", lua_MLightHalfPos },
+		{ "MLightVec", lua_MLightVec },
+		{ "MLightHalfVec", lua_MLightHalfVec },
 		{ "MLightDiffuseColor", lua_MLightDiffuseColor },
 		{ "MLightSpecularColor", lua_MLightSpecularColor },
-		{ "MLightDir", lua_MLightDir },
-		{ "MLightHalfDir", lua_MLightHalfDir },
+		{ "MLightTanVec", lua_MLightTanVec },
+		{ "MLightTanHalfVec", lua_MLightTanHalfVec },
 		{ "MVertexColor", lua_MVertexColor },
 		{ 0, 0 }
 	};
@@ -1037,17 +1027,19 @@ void Shader::BuildInputMappings(lua_State *L, r::Shader::Pass pass) {
 
 	// NOTE: Normal, Tangent are needed if shader accessed the LightDir field.
 
-	if (!usage.s[kMaterialSource_LightDir].empty() ||
-		!usage.s[kMaterialSource_LightHalfDir].empty()) {
-		// only one normal channel
-		usage.s[kMaterialSource_Normal].insert(0);
-
-		// add references to Tangent.
-		for (IntSet::const_iterator it = usage.s[kMaterialSource_LightDir].begin(); it != usage.s[kMaterialSource_LightDir].end(); ++it) {
+	if (!usage.s[kMaterialSource_LightTanVec].empty() ||
+		!usage.s[kMaterialSource_LightTanHalfVec].empty()) {
+		// add references to Normal/Tangent.
+		for (IntSet::const_iterator it = usage.s[kMaterialSource_LightTanVec].begin(); it != usage.s[kMaterialSource_LightTanVec].end(); ++it) {
+			usage.s[kMaterialSource_Normal].insert(*it);
+			usage.s[kMaterialSource_Tangent].insert(*it);
+		}
+		for (IntSet::const_iterator it = usage.s[kMaterialSource_LightTanHalfVec].begin(); it != usage.s[kMaterialSource_LightTanHalfVec].end(); ++it) {
+			usage.s[kMaterialSource_Normal].insert(*it);
 			usage.s[kMaterialSource_Tangent].insert(*it);
 		}
 
-		// NOTE: bitangent is computed by vertex shader if LightDir is accessed.
+		// NOTE: bitangent is computed by vertex shader if LightTangentVec/LightTangentHalfVec is accessed.
 	}
 
 	BuildAttributeSourceMapping(
@@ -1074,7 +1066,7 @@ void Shader::BuildInputMappings(lua_State *L, r::Shader::Pass pass) {
 		mapping
 	);
 
-	if (m_skinMode == kSkinMode_Sprite) {
+	if ((pass != r::Shader::kPass_Preview) && (m_skinMode == r::Material::kSkinMode_Sprite)) {
 		// sprite skin needs special vertex-shader args
 		usage.s[kMaterialSource_SpriteSkin].insert(0);
 		BuildAttributeSourceMapping(
@@ -1513,14 +1505,21 @@ bool Shader::szMaterialInput(
 	case kMaterialSource_LightPos:
 		string::sprintf(
 			sz,
-			"IN(light%i_cpos)",
+			"UNIFORM(light%i_pos)",
 			index
 		);
 		return true;
-	case kMaterialSource_LightHalfPos:
+	case kMaterialSource_LightVec:
 		string::sprintf(
 			sz,
-			"IN(light%i_chalfpos)",
+			"normalize(IN(light%i_vec))",
+			index
+		);
+		return true;
+	case kMaterialSource_LightHalfVec:
+		string::sprintf(
+			sz,
+			"normalize(IN(light%i_halfvec))",
 			index
 		);
 		return true;
@@ -1530,7 +1529,7 @@ bool Shader::szMaterialInput(
 	case kMaterialSource_Normal:
 		string::sprintf(
 			sz,
-			"IN(nm%d)",
+			"normalize(IN(nm%d))",
 			AttribUsageIndex(
 				pass,
 				source, 
@@ -1560,17 +1559,17 @@ bool Shader::szMaterialInput(
 			)
 		);
 		return true;
-	case kMaterialSource_LightDir:
+	case kMaterialSource_LightTanVec:
 		string::sprintf(
 			sz,
-			"IN(light%d_dir)",
+			"normalize(IN(light%d_tanvec))",
 			index
 		);
 		return true;
-	case kMaterialSource_LightHalfDir:
+	case kMaterialSource_LightTanHalfVec:
 		string::sprintf(
 			sz,
-			"IN(light%d_halfdir)",
+			"normalize(IN(light%d_tanhalfvec))",
 			index
 		);
 		return true;
@@ -1586,7 +1585,7 @@ bool Shader::szMaterialInput(
 		);
 		return true;
 	case kMaterialSource_VertexColor:
-		strcpy(sz, "vertexColor");
+		strcpy(sz, "IN(vertexColor)");
 		return true;
 	default:
 		break;
@@ -1745,16 +1744,20 @@ Shader::Node::Ref Shader::Node::Clone() const {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-Shader::Ref ShaderCache::Load(Engine &engine, const char *name) {
+Shader::Ref ShaderCache::Load(
+	Engine &engine, 
+	const char *name,
+	r::Material::SkinMode skinMode
+) {
 	RAD_ASSERT(name);
 	String sname(name);
-	ShaderMap::const_iterator it = m_shaders.find(sname);
-	if (it != m_shaders.end())
+	ShaderMap::const_iterator it = m_shaders[skinMode].find(sname);
+	if (it != m_shaders[skinMode].end())
 		return it->second;
 
-	Shader::Ref m = Shader::Load(engine, name);
+	Shader::Ref m = Shader::Load(engine, name, skinMode);
 	if (m)
-		m_shaders[sname] = m;
+		m_shaders[skinMode][sname] = m;
 
 	return m;
 }

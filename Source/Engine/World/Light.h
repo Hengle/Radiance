@@ -21,7 +21,8 @@ public:
 	RAD_BEGIN_FLAGS
 		RAD_FLAG(kStyle_Diffuse),
 		RAD_FLAG(kStyle_Specular),
-		RAD_FLAG(kStyle_CastShadows)
+		RAD_FLAG(kStyle_CastShadows),
+		kStyle_DiffuseSpecular = kStyle_Diffuse|kStyle_Specular
 	RAD_END_FLAGS(LightStyle)
 
 	enum {

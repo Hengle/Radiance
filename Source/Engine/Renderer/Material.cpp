@@ -32,6 +32,7 @@ Material::ShaderInstance::ShaderInstance() {
 #if defined(RAD_OPT_TOOLS)
 	cooked = false;
 	pflags = 0;
+	skinMode = kNumSkinModes;
 
 	for (int i = 0 ;i < kMaxTextures; ++i)
 		uvIndices[i] = 0;
@@ -60,6 +61,9 @@ Material::ShaderInstance::~ShaderInstance() {
 
 bool Material::ShaderInstance::CanShare(const Material &m) const {
 	
+	if (skinMode != m.skinMode)
+		return false;
+
 	for (int i = 0; i < kMaxTextures; ++i) {
 		if (uvIndices[i] != m.TCUVIndex(i))
 			return false;
@@ -76,6 +80,9 @@ bool Material::ShaderInstance::CanShare(const Material &m) const {
 }
 
 void Material::ShaderInstance::CopySharedData(const Material &m) {
+
+	skinMode = m.skinMode;
+
 	for (int i = 0; i < kMaxTextures; ++i)
 		uvIndices[i] = m.TCUVIndex(i);
 
@@ -236,6 +243,7 @@ void Material::EndCook() {
 #endif
 
 Material::Material() : 
+m_skinMode(kSkinMode_Vertex),
 m_sort(kSort_Solid), 
 m_depthFunc(kDepthFunc_Less),
 m_animated(false),

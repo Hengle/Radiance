@@ -30,6 +30,7 @@ enum {
 struct OverlayVert {
 	float xy[2];
 	float st[2];
+	U8 color[4];
 };
 
 MaterialThumb::MaterialThumb(ContentBrowserView &view) :
@@ -213,6 +214,17 @@ bool MaterialThumb::Render(const pkg::Package::Entry::Ref &entry, int x, int y, 
 			sizeof(float)*2
 		);
 
+		gls.SetMGSource(
+			kMaterialGeometrySource_VertexColor,
+			0,
+			t->vb,
+			4,
+			GL_UNSIGNED_BYTE,
+			GL_TRUE,
+			sizeof(OverlayVert),
+			sizeof(float)*4
+		);
+
 		gls.BindBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, t->ib);
 
 		gl.MatrixMode(GL_MODELVIEW);
@@ -373,6 +385,7 @@ void MaterialThumb::Thumbnail::Request(int w, int h) {
 			v.xy[1] = yf-h/2;
 			v.st[0] = xf / w;
 			v.st[1] = yf / h;
+			v.color[0] = v.color[1] = v.color[2] = v.color[3] = 255;
 		}
 	}
 

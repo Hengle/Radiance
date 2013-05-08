@@ -81,6 +81,7 @@ int MaterialParser::LoadCooked(
 		is >> shaderId;
 		m_m.shaderId = shaderId;
 		is >> temp; m_procedural = temp ? true : false;
+		is >> temp; m_m.skinMode = (r::Material::SkinMode)temp;
 		is >> temp; m_m.sort = (r::Material::Sort)temp;
 		is >> temp; m_m.blendMode = (r::Material::BlendMode)temp;
 		is >> temp; m_m.depthFunc = (r::Material::DepthFunc)temp;
@@ -288,6 +289,17 @@ int MaterialParser::Load(
 		return SR_MetaError;
 
 	m_m.shaderName = s->c_str;
+
+	s = asset->entry->KeyValue<String>("SkinMode", P_TARGET_FLAGS(flags));
+	if (!s)
+		return SR_MetaError;
+
+	if (*s == "Vertex")
+		m_m.skinMode = r::Material::kSkinMode_Vertex;
+	else if (*s == "Sprite")
+		m_m.skinMode = r::Material::kSkinMode_Sprite;
+	else
+		return pkg::SR_MetaError;
 
 	s = asset->entry->KeyValue<String>("Sort", P_TARGET_FLAGS(flags));
 	if (!s)

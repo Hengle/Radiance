@@ -32,6 +32,12 @@ class RADENG_CLASS Material : public boost::noncopyable
 {
 public:
 
+	enum SkinMode {
+		kSkinMode_Vertex,
+		kSkinMode_Sprite,
+		kNumSkinModes
+	};
+
 	enum Sort {
 		kSort_Solid,
 		kSort_Translucent,
@@ -105,6 +111,7 @@ public:
 	Material();
 	~Material();
 
+	RAD_DECLARE_PROPERTY(Material, skinMode, SkinMode, SkinMode);
 	RAD_DECLARE_PROPERTY(Material, sort, Sort, Sort);
 	RAD_DECLARE_PROPERTY(Material, blendMode, BlendMode, BlendMode);
 	RAD_DECLARE_PROPERTY(Material, depthFunc, DepthFunc, DepthFunc);
@@ -120,7 +127,7 @@ public:
 	RAD_DECLARE_PROPERTY(Material, selfShadow, bool, bool);
 	RAD_DECLARE_PROPERTY(Material, specularExponent, float, float);
 	RAD_DECLARE_READONLY_PROPERTY(Material, specularColorWave, WaveAnim*);
-	RAD_DECLARE_READONLY_PROPERTY(Material, shader, Shader::Ref);
+	RAD_DECLARE_READONLY_PROPERTY(Material, shader, const Shader::Ref&);
 
 #if defined(RAD_OPT_TOOLS)
 	RAD_DECLARE_PROPERTY(Material, shaderName, const char *, const char *);
@@ -196,7 +203,9 @@ private:
 		} 
 	}
 #endif
-	RAD_DECLARE_GET(shader, Shader::Ref) { return m_shader->shader; }
+	RAD_DECLARE_GET(skinMode, SkinMode) { return m_skinMode; }
+	RAD_DECLARE_SET(skinMode, SkinMode) { m_skinMode = value; }
+	RAD_DECLARE_GET(shader, const Shader::Ref&) { return m_shader->shader; }
 	RAD_DECLARE_GET(sort, Sort) { return m_sort; }
 	RAD_DECLARE_SET(sort, Sort) { m_sort = value; }
 	RAD_DECLARE_GET(depthFunc, DepthFunc) { return m_depthFunc; }
@@ -264,6 +273,8 @@ private:
 
 		bool CanShare(const Material &m) const;
 		void CopySharedData(const Material &m);
+
+		SkinMode skinMode;
 
 		boost::array<
 			boost::array<WaveAnim::Type, kNumTCMods>,
@@ -338,6 +349,7 @@ private:
 	TimingMode m_timingMode;
 	ShaderInstance::Ref m_shader;
 	int m_shaderId;
+	SkinMode m_skinMode;
 	Sort m_sort;
 	DepthFunc m_depthFunc;
 	BlendMode m_blendMode;

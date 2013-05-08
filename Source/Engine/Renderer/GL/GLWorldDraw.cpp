@@ -238,6 +238,9 @@ void GLWorldDraw::RotateForCamera(const Camera &camera) {
 		gl.Rotatef(-angles.Y(), 0, 1, 0);
 		gl.Rotatef(-angles.Z(), 0, 0, 1);
 	}
+
+	const Vec3 &pos = camera.pos;
+	gl.Translatef(-pos.X(), -pos.Y(), -pos.Z());
 }
 
 void GLWorldDraw::RotateForCameraBasis() {
@@ -306,17 +309,21 @@ void GLWorldDraw::BindLitMaterialStates(
 
 					float fz = z ? scissorBounds->Maxs()[2] : scissorBounds->Mins()[2];
 
-					Vec3 p = ::Unproject(
+					Vec3 p;
+					bool r = ::Project(
 						gl.GetModelViewProjectionMatrix(),
 						&viewport[0],
-						Vec3(fx, fy, fz)
+						Vec3(fx, fy, fz),
+						p
 					);
 
 					// clamp
-					scissor[0] = math::Min(scissor[0], FloatToInt(p[0]));
-					scissor[1] = math::Min(scissor[1], FloatToInt(p[1]));
-					scissor[2] = math::Max(scissor[2], FloatToInt(p[0]));
-					scissor[3] = math::Max(scissor[3], FloatToInt(p[1]));
+					if (r) {
+						scissor[0] = math::Min(scissor[0], FloatToInt(p[0]));
+						scissor[1] = math::Min(scissor[1], FloatToInt(p[1]));
+						scissor[2] = math::Max(scissor[2], FloatToInt(p[0]));
+						scissor[3] = math::Max(scissor[3], FloatToInt(p[1]));
+					}
 				}
 			}
 		}
@@ -341,7 +348,11 @@ void GLWorldDraw::BindLitMaterialStates(
 		);
 	}
 
-	mat.BindStates(flags);
+	int bm = 0;
+	if (mat.blendMode == Material::kBlendMode_None)
+		bm = kBlendModeSource_One|kBlendModeDest_One; // additive
+
+	mat.BindStates(flags, bm);
 }
 
 void GLWorldDraw::SetWorldStates() {

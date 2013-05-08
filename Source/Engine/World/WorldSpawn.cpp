@@ -249,6 +249,22 @@ void World::SpawnModel(
 		0
 	);
 
+	mesh->MapSource(
+		streamIndex,
+		r::kMaterialGeometrySource_Normals,
+		0,
+		sizeof(bsp_file::BSPVertex),
+		sizeof(float)*3
+	);
+
+	mesh->MapSource(
+		streamIndex,
+		r::kMaterialGeometrySource_Tangents,
+		0,
+		sizeof(bsp_file::BSPVertex),
+		sizeof(float)*(6+(bsp_file::kMaxUVChannels*2))
+	);
+
 	if (model->numChannels > 0) {
 		mesh->MapSource(
 			streamIndex,
