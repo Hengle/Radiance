@@ -168,6 +168,7 @@ bool WorldLua::Init() {
 		{ "SetDrawUIOnly", lua_World_SetDrawUIOnly },
 		{ "DrawUIOnly", lua_World_DrawUIOnly },
 		{ "CreateSpriteBatch", lua_World_CreateSpriteBatch },
+		{ "CreateDynamicLight", lua_World_CreateDynamicLight },
 		{ 0, 0 }
 	};
 

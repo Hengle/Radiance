@@ -27,6 +27,7 @@
 #include "Lua/D_Sound.h"
 #include "Lua/D_Mesh.h"
 #include "Lua/D_SpriteBatch.h"
+#include "Lua/D_Light.h"
 #include "../Sound/Sound.h"
 #include "WorldLuaCommon.h"
 
@@ -1218,6 +1219,13 @@ int WorldLua::lua_World_CreateSpriteBatch(lua_State *L) {
 	));
 	D_SpriteBatch::Ref dsprites = D_SpriteBatch::New(sprites);
 	dsprites->Push(L);
+	return 1;
+}
+
+int WorldLua::lua_World_CreateDynamicLight(lua_State *L) {
+	LOAD_SELF
+	D_Light::Ref light = D_Light::New(self->m_world->draw->CreateLight());
+	light->Push(L);
 	return 1;
 }
 

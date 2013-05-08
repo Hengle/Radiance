@@ -951,7 +951,9 @@ public:
 			outside(true), 
 			cinematic(false), 
 			hideUntilRef(false), 
-			hideWhenDone(false) {
+			hideWhenDone(false),
+			affectedByWorldLights(false),
+			affectedByObjectLights(false) {
 			portalAreas[0] = -1;
 			portalAreas[1] = -1;
 		}
@@ -975,6 +977,9 @@ public:
 		bool cinematic;
 		bool hideUntilRef;
 		bool hideWhenDone;
+		bool affectedByWorldLights;
+		bool affectedByObjectLights;
+		bool castShadows;
 	};
 
 	/*
@@ -1093,11 +1098,38 @@ public:
 		int emitId;
 	};
 
+	/*
+	==============================================================================
+	Lights
+	==============================================================================
+	*/
+	enum {
+		RAD_FLAG(kLightFlag_Diffuse),
+		RAD_FLAG(kLightFlag_Specular),
+		RAD_FLAG(kLightFlag_CastShadows),
+		RAD_FLAG(kLightFlag_AffectWorld),
+		RAD_FLAG(kLightFlag_AffectPlayer),
+		RAD_FLAG(kLightFlag_AffectObjects)
+	};
+
+	struct OmniLight {
+		typedef boost::shared_ptr<OmniLight> Ref;
+		typedef typename zone_vector<Ref, Z3DXT>::type Vec;
+		String name;
+		Vec3 pos;
+		Vec3 color;
+		Vec3 shadowColor;
+		float brightness;
+		float radius;
+		int flags;
+	};
+
 	int version;
 	typename Entity::Vec ents;
 	MatVec               mats;
 	typename Entity::Ref worldspawn;
 	typename Camera::Vec cameras;
+	typename OmniLight::Vec omniLights;
 	typename WaypointConnection::Map waypointConnections;
 	typename Waypoint::Map waypoints;
 

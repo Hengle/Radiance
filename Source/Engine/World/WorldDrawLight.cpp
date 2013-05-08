@@ -10,8 +10,205 @@
 #include "Light.h"
 #include "Entity.h"
 #include "Occupant.h"
+#include "../Renderer/Shader.h"
 
 namespace world {
+
+void WorldDraw::DrawUnshadowedLitBatch(const details::MBatch &batch) {
+
+	if (!batch.head)
+		return;
+
+	r::Material *mat = batch.matRef->mat;
+
+	bool first = true;
+
+	mat->BindStates();
+	mat->BindTextures(batch.matRef->loader);
+
+	RAD_ASSERT(mat->shader->HasPass(r::Shader::kPass_Default));
+	mat->shader->Begin(r::Shader::kPass_Default, *mat);
+
+	// draw base pass
+	for (details::MBatchDrawLink *link = batch.head; link; link = link->next) {
+		MBatchDraw *draw = link->draw;
+
+		if (first) {
+			first = false;
+			++m_counters.numMaterials;
+		}
+
+		DrawBatch(*draw, *mat);
+	}
+
+	mat->shader->End();
+
+	for (details::MBatchDrawLink *link = batch.head; link; link = link->next) {
+		MBatchDraw *draw = link->draw;
+
+		DrawUnshadowedLitBatchLights(*draw, *mat);
+	}
+
+	m_rb->ReleaseArrayStates();
+}
+
+void WorldDraw::DrawBatch(
+	MBatchDraw &draw,
+	r::Material &mat
+) {
+	Vec3 pos;
+	Vec3 angles;
+	Mat4 invTx;
+
+	bool tx = draw.GetTransform(pos, angles);
+	if (tx) {
+		m_rb->PushMatrix(pos, draw.scale, angles);
+		invTx = Mat4::Translation(-pos) * (Mat4::Rotation(QuatFromAngles(angles)).Transpose());
+	}
+
+	draw.Bind(mat.shader.get().get());
+	r::Shader::Uniforms u(draw.rgba.get());
+
+	if (tx) {
+		u.eyePos = invTx * m_world->camera->pos.get();
+	} else {
+		u.eyePos = m_world->camera->pos;
+	}
+
+	mat.shader->BindStates(u);
+	m_rb->CommitStates();
+	draw.CompileArrayStates(*mat.shader.get());
+	draw.Draw();
+
+	if (tx)
+		m_rb->PopMatrix();
+}
+
+void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat) {
+
+	Vec3 pos;
+	Vec3 angles;
+	Mat4 invTx;
+
+	bool diffuse = mat.shader->HasPass(r::Shader::kPass_Diffuse1);
+	bool specular = mat.shader->HasPass(r::Shader::kPass_Specular1);
+
+	const bool tx = draw.GetTransform(pos, angles);
+	if (tx) {
+		m_rb->PushMatrix(pos, draw.scale, angles);
+		invTx = Mat4::Translation(-pos) * (Mat4::Rotation(QuatFromAngles(angles)).Transpose());
+	}
+	
+	++m_counters.numBatches;
+
+	// draw all unshadowed lights
+	r::Shader::Uniforms u;
+	BBox lightBounds;
+
+	if (tx) {
+		u.eyePos = invTx * m_world->camera->pos.get();
+	} else {
+		u.eyePos = m_world->camera->pos;
+	}
+
+	int curPass = -1;
+
+	for (;;) {
+		details::LightInteraction *interaction = draw.m_interactions;
+
+		Light::LightStyle reqStyle;
+
+		if (diffuse)
+			reqStyle |= Light::kStyle_Diffuse;
+		if (specular)
+			reqStyle |= Light::kStyle_Specular;
+		
+		while (interaction) {
+
+			// batch up to kNumLights
+			u.lights.numLights = 0;
+			lightBounds.Initialize();
+
+			while (interaction && (u.lights.numLights < r::kMaxLights)) {
+				if (interaction->light->m_visFrame != m_markFrame)
+					continue; // not visible this frame.
+
+				Light::LightStyle style = interaction->light->style;
+
+				if (!(style & Light::kStyle_CastShadows)) {
+					if ((style&reqStyle) == reqStyle) {
+						r::LightDef &lightDef = u.lights.lights[u.lights.numLights++];
+						GenLightDef(*interaction->light, lightDef, tx ? &invTx : 0);
+						lightBounds.Insert(interaction->light->bounds);
+					}
+				}
+
+				interaction = interaction->nextOnBatch;
+			}
+
+			if (u.lights.numLights > 0) {
+
+				// find the correct pass
+				int pass;
+
+				if (diffuse && specular) {
+					pass = r::Shader::kPass_DiffuseSpecular1 + u.lights.numLights - 1;
+				} else if (diffuse) {
+					pass = r::Shader::kPass_Diffuse1 + u.lights.numLights - 1;
+				} else {
+					RAD_ASSERT(specular);
+					pass = r::Shader::kPass_Specular1 + u.lights.numLights - 1;
+				}
+
+				RAD_ASSERT(mat.shader->HasPass((r::Shader::Pass)pass));
+
+				if (curPass != pass) {
+					mat.shader->End();
+					mat.shader->Begin((r::Shader::Pass)pass, mat);
+					curPass = pass;
+					draw.Bind(mat.shader.get().get());
+				}
+
+				m_rb->BindLitMaterialStates(mat, &lightBounds);
+
+				mat.shader->BindStates(u);
+				m_rb->CommitStates();
+				draw.CompileArrayStates(*mat.shader.get());
+				draw.Draw();
+			}
+		}
+
+		if (diffuse && specular) {
+			diffuse = false;
+		} else {
+			break;
+		}
+	}
+
+	if (curPass != -1)
+		mat.shader->End();
+
+	if (tx)
+		m_rb->PopMatrix();
+}
+
+void WorldDraw::GenLightDef(
+	const Light &light,
+	r::LightDef &lightDef,
+	Mat4 *tx
+) {
+	lightDef.diffuse = light.diffuseColor;
+	lightDef.specular = light.specularColor;
+	lightDef.pos = tx ? ((*tx) * light.pos.get()) : light.pos;
+	lightDef.brightness = light.brightness;
+	lightDef.radius = light.radius;
+	
+	lightDef.flags = 0;
+	if (light.style.get() & Light::kStyle_Diffuse)
+		lightDef.flags |= r::LightDef::kFlag_Diffuse;
+	if (light.style.get() & Light::kStyle_Specular)
+		lightDef.flags |= r::LightDef::kFlag_Specular;
+}
 
 void WorldDraw::InvalidateInteractions(Light &light) {
 	for (details::MatInteractionChain::const_iterator it = light.m_interactions.begin(); it != light.m_interactions.end(); ++it) {
@@ -49,13 +246,17 @@ void WorldDraw::LinkEntity(
 	dBSPLeaf &leaf,
 	dBSPArea &area
 ) {
-	if (entity.lightingFlags.get() == kLightingFlag_Unlit)
+	if (entity.lightInteractionFlags == 0)
 		return;
-
+	
 	// link potential light interactions
 	for (LightPtrSet::const_iterator it = leaf.lights.begin(); it != leaf.lights.end(); ++it) {
 		Light &light = **it;
-		BBox bounds(light.m_size);
+
+		if (!(light.interactionFlags & entity.lightInteractionFlags))
+			continue; // masked
+
+		BBox bounds(light.m_bounds);
 		bounds.Translate(light.m_pos);
 
 		if (bounds.Touches(bounds)) {
@@ -63,7 +264,7 @@ void WorldDraw::LinkEntity(
 				const DrawModel::Ref &model = it->second;
 				for (MBatchDraw::RefVec::const_iterator it = model->batches->begin(); it != model->batches->end(); ++it) {
 					const MBatchDraw::Ref &batch = *it;
-					if (!FindInteraction(light, *batch)) {
+					if (batch->lit && !FindInteraction(light, *batch)) {
 						CreateInteraction(light, entity, *batch);
 					}
 				}
@@ -92,19 +293,23 @@ void WorldDraw::LinkOccupant(
 	dBSPLeaf &leaf,
 	dBSPArea &area
 ) {
-	if (occupant.lightingFlags.get() == kLightingFlag_Unlit)
+	if (occupant.lightInteractionFlags == 0)
 		return;
 
 	// link potential light interactions
 	for (LightPtrSet::const_iterator it = leaf.lights.begin(); it != leaf.lights.end(); ++it) {
 		Light &light = **it;
-		BBox bounds(light.m_size);
+
+		if (!(light.interactionFlags & occupant.lightInteractionFlags))
+			continue; // masked
+
+		BBox bounds(light.m_bounds);
 		bounds.Translate(light.m_pos);
 
 		if (bounds.Touches(bounds)) {
 			for (MBatchDraw::RefVec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
 				const MBatchDraw::Ref &batch = *it;
-				if (!FindInteraction(light, *batch)) {
+				if (batch->lit && !FindInteraction(light, *batch)) {
 					CreateInteraction(light, occupant, *batch);
 				}
 			}
@@ -125,6 +330,9 @@ void WorldDraw::UnlinkOccupant(MBatchOccupant &occupant) {
 void WorldDraw::LinkLight(Light &light, const BBox &bounds) {
 	// link to static world models
 
+	if ((!light.interactionFlags & Light::kInteractionFlag_World))
+		return; // not a world light
+
 	// NOTE: models can span areas, this may check them multiple times.
 	for (IntSet::const_iterator it = light.m_areas.begin(); it != light.m_areas.end(); ++it) {
 		const dBSPArea &area = m_world->m_areas[*it];
@@ -135,7 +343,7 @@ void WorldDraw::LinkLight(Light &light, const BBox &bounds) {
 
 			const MStaticWorldMeshBatch::Ref &m = m_worldModels[modelNum];
 
-			if (bounds.Touches(m->bounds)) {
+			if (m->lit && bounds.Touches(m->bounds)) {
 				if (!FindInteraction(light, *m)) {
 					CreateInteraction(light, *m);
 				}
@@ -153,11 +361,15 @@ void WorldDraw::LinkLight(
 ) {
 	for (EntityPtrSet::const_iterator it = leaf.entities.begin(); it != leaf.entities.begin(); it++) {
 		Entity &entity = **it;
+
+		if (!(light.interactionFlags & entity.lightInteractionFlags))
+			continue;
+
 		for (DrawModel::Map::const_iterator it = entity.models->begin(); it != entity.models->end(); ++it) {
 			const DrawModel::Ref &model = it->second;
 			for (MBatchDraw::RefVec::const_iterator it = model->batches->begin(); it != model->batches->end(); ++it) {
 				const MBatchDraw::Ref &batch = *it;
-				if (!FindInteraction(light, *batch)) {
+				if (batch->lit && !FindInteraction(light, *batch)) {
 					CreateInteraction(light, entity, *batch);
 				}
 			}
@@ -166,9 +378,13 @@ void WorldDraw::LinkLight(
 
 	for (MBatchOccupantPtrSet::const_iterator it = leaf.occupants.begin(); it != leaf.occupants.end(); ++it) {
 		MBatchOccupant &occupant = **it;
+
+		if (!(light.interactionFlags & occupant.lightInteractionFlags))
+			continue;
+
 		for (MBatchDraw::RefVec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
 			const MBatchDraw::Ref &batch = *it;
-			if (!FindInteraction(light, *batch)) {
+			if (batch->lit && !FindInteraction(light, *batch)) {
 				CreateInteraction(light, occupant, *batch);
 			}
 		}
@@ -293,7 +509,7 @@ void WorldDraw::UnlinkInteraction(
 
 void WorldDraw::UpdateLightInteractions(Light &light) {
 	
-	BBox bounds(light.m_size);
+	BBox bounds(light.m_bounds);
 	bounds.Translate(light.m_pos);
 
 	for (details::MatInteractionChain::iterator it = light.m_interactions.begin(); it != light.m_interactions.end(); ++it) {

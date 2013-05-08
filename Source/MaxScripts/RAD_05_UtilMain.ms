@@ -1,4 +1,4 @@
---- RAD_UtilMainms
+--- RAD_UtilMain.ms
 -- Copyright (c) 2010 Sunside Inc., All Rights Reserved
 -- Author: Joe Riedel
 -- See Radiance/LICENSE for licensing terms.
@@ -44,35 +44,14 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 	
 	persistent global RadianceUtil_lastSceneFile
 	
-	function exportScene doMeshes doAnims = (
-		hidden  = exportHiddenCheckbox.checked
-		objs = objects;
-		oldSelection = selection
-		oldRange = animationRange
-		oldTime = sliderTime
-		if (selectionOnlyCheckbox.checked) then ( objs = selection )
-		objs = RAD_FilterVisible objs vis:(not hidden)		
-		objs = RAD_ConvertableFilter objs kRADMeshTypes
-		objs = RAD_Exclude objs kRADHelperTypes -- exclude helper types
-		
-		if (objs.count == 0) then (
-			messagebox "No objects to export!"
-			return undefined
-		)
+	function exportScene doMeshes doAnims doLights = (
 		
 		if (RadianceUtil_lastSceneFile == undefined) then ( RadianceUtil_lastSceneFile = "Scene.3dx" )
-		file = getSaveFileName caption:"Scene Export..." filename:RadianceUtil_lastSceneFile types:"3DX Files (*.3dx)|*.3dx|All Files (*.*)|*.*"
+		file = getSaveFileName caption:"Export 3DX..." filename:RadianceUtil_lastSceneFile types:"3DX Files (*.3dx)|*.3dx|All Files (*.*)|*.*"
 		if (file == undefined) then return undefined
 		RadianceUtil_lastSceneFile = file
 		
-		disableSceneRedraw()
-		RAD_ExportObjectsToSceneFile objs doMeshes doAnims file
-		enableSceneRedraw()
-		clearSelection()
-		select oldSelection
-		max utility mode
-		animationRange = oldRange
-		sliderTime = oldTime
+		RAD_ExportScene selectionOnlyCheckbox.checked exportHiddenCheckbox.checked doMeshes doAnims doLights file
 	)
 	
 	function enableMeshControls val = (
@@ -389,19 +368,19 @@ utility RadianceUtil "Radiance Tools" width:166 height:600
 	)
 	
 	on exportSceneButton pressed do (
-		exportScene true true
+		exportScene true true true
 	)
 	
 	on exportAnimButton pressed do (
-		exportScene false true
+		exportScene false true false
 	)
 	
 	on exportMeshButton pressed do (
-		exportScene true false
+		exportScene true false false
 	)
 	
 	on exportSkelButton pressed do (
-		exportScene false false
+		exportScene false false false
 	)
 	
 	on animStart entered newVal do (

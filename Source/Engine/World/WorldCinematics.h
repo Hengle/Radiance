@@ -20,6 +20,7 @@
 namespace world {
 
 class World;
+class WorldDraw;
 
 class RADENG_CLASS WorldCinematics {
 public:
@@ -92,7 +93,7 @@ private:
 	public:
 		typedef boost::shared_ptr<SkActorBatch> Ref;
 
-		SkActorBatch(const Actor &actor, int idx, int matId);
+		SkActorBatch(WorldDraw &draw, const Actor &actor, int idx, int matId);
 
 		virtual void Bind(r::Shader *shader);
 		virtual void CompileArrayStates(r::Shader &shader);
@@ -132,7 +133,7 @@ private:
 	public:
 		typedef boost::shared_ptr<VtActorBatch> Ref;
 
-		VtActorBatch(const Actor &actor, int idx, int matId);
+		VtActorBatch(WorldDraw &draw, const Actor &actor, int idx, int matId);
 
 		virtual void Bind(r::Shader *shader);
 		virtual void CompileArrayStates(r::Shader &shader);
@@ -170,7 +171,12 @@ private:
 
 	class ActorOccupant : public MBatchOccupant {
 	public:
-		ActorOccupant(const Actor &actor, World &world) : MBatchOccupant(world), m_actor(&actor) {}
+		ActorOccupant(
+			const Actor &actor, 
+			LightingFlags lightingFlags, 
+			int lightInteractionFlags,
+			World &world) : 
+		 MBatchOccupant(world, lightingFlags, lightInteractionFlags), m_actor(&actor) {}
 
 		void AddMBatch(const MBatchDraw::Ref &batch) {
 			m_batches.push_back(batch);

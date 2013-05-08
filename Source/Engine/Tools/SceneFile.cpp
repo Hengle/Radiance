@@ -31,7 +31,8 @@ namespace {
 		kVersion3 = 3,
 		kVersion4 = 4,
 		kVersion5 = 5,
-		kVersion = 6,
+		kVersion6 = 6,
+		kVersion = 7,
 
 		kHasMaterialFlag = 0x80000000,
 		kHasAnimsFlag = 0x00200000,
@@ -40,6 +41,9 @@ namespace {
 		kHideUntilRefedFlag = 0x00040000,
 		kHideWhenDoneFlag = 0x00010000,
 		kSetBBoxFlag = 0x00008000,
+		kAffectedByWorldLightsFlag = 0x00004000,
+		kAffectedByObjectLightsFlag = 0x00002000,
+		kCastShadows = 0x00001000,
 		kAnimType_Skeletal = 0,
 		kAnimType_Vertex = 1
 	};
@@ -177,6 +181,9 @@ namespace {
 		bool cinematic;
 		bool hideUntilRef;
 		bool hideWhenDone;
+		bool affectedByWorldLights;
+		bool affectedByObjectLights;
+		bool castShadows;
 	};
 
 	bool ReadTriModel(InputStream &stream, int version, TriModel &mdl, int flags, const SceneFile::SkelVec &skels) {
@@ -538,6 +545,9 @@ namespace {
 		mmdl->cinematic = mdl.cinematic;
 		mmdl->hideUntilRef = mdl.hideUntilRef;
 		mmdl->hideWhenDone = mdl.hideWhenDone;
+		mmdl->affectedByObjectLights = mdl.affectedByObjectLights;
+		mmdl->affectedByWorldLights = mdl.affectedByWorldLights;
+		mmdl->castShadows = mdl.castShadows;
 
 		SmoothVertVec smv;
 		SmoothVertIdxMap smidxm;
@@ -678,7 +688,7 @@ bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth, UIProgres
 		stream >> n;
 
 		for (U32 i = 0; i < n; ++i) {
-			SceneFile::Camera::Ref cam(new SceneFile::Camera());
+			SceneFile::Camera::Ref cam(new (Z3DX) SceneFile::Camera());
 
 			cam->name = ReadString(stream);
 
@@ -727,6 +737,28 @@ bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth, UIProgres
 				cam->anims.insert(SceneFile::AnimMap::value_type(a->name, a));
 				map.cameras.push_back(cam);
 			}
+		}
+	}
+
+	if (version > kVersion6) { // omni lights
+		stream >> n;
+
+		for (U32 i = 0; i < n; ++i) {
+			SceneFile::OmniLight::Ref light(new (Z3DX) SceneFile::OmniLight());
+
+			light->name = ReadString(stream);
+			light->pos = ReadVec3(stream);
+
+			S32 flags;
+			stream >> flags;
+			light->flags = (int)flags;
+
+			light->color = ReadVec3(stream);
+			light->shadowColor = ReadVec3(stream);
+			stream >> light->brightness;
+			stream >> light->radius;
+
+			map.omniLights.push_back(light);
 		}
 	}
 
@@ -810,6 +842,16 @@ bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth, UIProgres
 					mdl.cinematic = false;
 					mdl.hideUntilRef = false;
 					mdl.hideWhenDone = false;
+				}
+
+				if (version > kVersion6) {
+					mdl.affectedByObjectLights = (flags&kAffectedByObjectLightsFlag) ? true : false;
+					mdl.affectedByWorldLights = (flags&kAffectedByWorldLightsFlag) ? true : false;
+					mdl.castShadows = (flags&kCastShadows) ? true : false;
+				} else {
+					mdl.affectedByObjectLights = false;
+					mdl.affectedByWorldLights = false;
+					mdl.castShadows = false;
 				}
 
 				mdl.verts.clear();

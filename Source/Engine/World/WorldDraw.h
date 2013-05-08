@@ -9,6 +9,7 @@
 
 #include "../Renderer/Mesh.h"
 #include "../Renderer/Material.h"
+#include "../Renderer/Shader.h"
 #include "../Assets/MaterialParser.h"
 #include "../Camera.h"
 #include "BSPFile.h"
@@ -89,6 +90,11 @@ public:
 	virtual void PushMatrix(const Vec3 &pos, const Vec3 &scale, const Vec3 &angles) = 0;
 	virtual void PopMatrix() = 0;
 	virtual void ReleaseArrayStates() = 0;
+
+	virtual void BindLitMaterialStates(
+		r::Material &mat,
+		const BBox *scissorBounds
+	) = 0;
 
 	// Post Process FX
 	virtual void BindPostFXTargets(bool chain) = 0;
@@ -207,6 +213,7 @@ private:
 
 	friend class ScreenOverlay;
 	friend class World;
+	friend class MBatchDraw;
 	friend struct details::MBatch;
 	typedef zone_vector<BBox, ZWorldT>::type BBoxVec;
 
@@ -222,6 +229,7 @@ private:
 		typedef zone_vector<Ref, ZWorldT>::type RefVec;
 
 		MStaticWorldMeshBatch(
+			WorldDraw &draw,
 			const r::Mesh::Ref &m,
 			const BBox &bounds,
 			int matId
@@ -301,10 +309,35 @@ private:
 	void DrawView(ViewDef &view);
 	void DrawUI();
 	void DrawOverlays();
-	void DrawViewBatches(ViewDef &view, bool wireframe);
 	void PostProcess();
-	void DrawViewBatches(ViewDef &view, r::Material::Sort sort, bool wireframe);
-	void DrawBatch(const details::MBatch &batch, bool wireframe);
+	
+	void DrawViewBatches(ViewDef &view, bool wireframe);
+	
+	void DrawUnlitBatch(
+		const details::MBatch &batch,
+		bool wireframe
+	);
+
+	void DrawUnshadowedLitBatch(
+		const details::MBatch &batch
+	);
+
+	void DrawBatch(
+		MBatchDraw &draw,
+		r::Material &mat
+	);
+
+	void DrawUnshadowedLitBatchLights(
+		MBatchDraw &draw,
+		r::Material &mat
+	);
+
+	void GenLightDef(
+		const Light &light,
+		r::LightDef &lightDef,
+		Mat4 *tx
+	);
+	
 	void DrawOverlay(ScreenOverlay &overlay);
 	void AddScreenOverlay(ScreenOverlay &overlay);
 	void RemoveScreenOverlay(ScreenOverlay &overlay);

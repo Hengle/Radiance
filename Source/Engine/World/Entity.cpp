@@ -119,7 +119,8 @@ m_scripted(false),
 m_frame(-1),
 m_luaCallbackIdx(0),
 m_classbits(0),
-m_lightingFlags(kLightingFlag_Unlit),
+m_lightInteractionFlags(0),
+m_lightingFlags(kLightingFlag_None),
 m_gc(false),
 m_markFrame(-1) {
 	for (int i = 0; i < kNumLuaCallbackBuckets; ++i)
@@ -461,6 +462,7 @@ void Entity::PushCallTable(lua_State *L) {
 	LUART_REGISTER_GETSET(L, NextThink);
 	LUART_REGISTER_GETSET(L, ClassBits);
 	LUART_REGISTER_GETSET(L, LightingFlags);
+	LUART_REGISTER_GETSET(L, LightInteractionFlags);
 }
 
 void Entity::AttachDrawModel(const DrawModel::Ref &ref) {
@@ -850,6 +852,7 @@ ENT_GET(Entity, NextThink, float, m_nextLuaThink);
 ENT_GETSET(Entity, ClassBits, int, m_classbits);
 ENT_GET(Entity, LightingFlags, int, m_lightingFlags);
 ENT_SET_CUSTOM(Entity, LightingFlags, self->m_lightingFlags = (LightingFlags::Enum)luaL_checkinteger(L, 2));
+ENT_GETSET(Entity, LightInteractionFlags, int, m_lightInteractionFlags);
 
 int Entity::LUART_SETFN(NextThink) (lua_State *L) {
 	Entity *self = WorldLua::EntFramePtr(L, 1, true);

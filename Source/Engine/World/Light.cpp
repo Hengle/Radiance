@@ -8,28 +8,33 @@
 #include RADPCH
 #include "World.h"
 #include "Light.h"
+#include "Entity.h"
 
 namespace world {
 
 Light::Light(World *w) : 
 m_pos(Vec3::Zero) ,
-m_style(kStyle_Diffuse|kStyle_Specular|kStyle_Shadows|kStyle_AffectAll),
+m_style(kStyle_Diffuse|kStyle_Specular|kStyle_CastShadows),
 m_brightness(1.f),
+m_radius(400.f),
+m_interactionFlags(0),
 m_leaf(0),
 m_prev(0),
 m_next(0),
 m_world(w),
-m_markFrame(-1) {
-	m_spColor = Vec4(1,1,1,1);
+m_markFrame(-1),
+m_visFrame(-1) {
 	m_shColor = Vec4(0,0,0,1);
+	m_spColor = Vec3(1,1,1);
 	m_dfColor = Vec3(1,1,1);
+	m_bounds = BBox(-Vec3(m_radius, m_radius, m_radius), Vec3(m_radius, m_radius, m_radius));
 }
 
 Light::~Light() {
 }
 
 void Light::Link() {
-	BBox bounds(m_size);
+	BBox bounds(m_bounds);
 	bounds.Translate(m_pos);
 
 	m_world->LinkLight(

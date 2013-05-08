@@ -7,6 +7,7 @@
 #include "WorldCinematics.h"
 #include "WorldDraw.h"
 #include "World.h"
+#include "Light.h"
 #include "../Packages/Packages.h"
 #include "../SkAnim/SkControllers.h"
 #include "../App.h"
@@ -60,6 +61,18 @@ int WorldCinematics::Spawn(
 		actor->bounds[1] = actor->bounds[0];
 		actor->bounds[1].Translate(actor->pos[0]);
 
+		LightingFlags lightingFlags = kLightingFlag_None;
+
+		if (actor->flags&kCastShadows)
+			lightingFlags |= kLightingFlag_CastShadows;
+
+		int lightInteractionFlags = 0;
+
+		if (actor->flags & kAffectedByObjectLights)
+			lightInteractionFlags |= Light::kInteractionFlag_Objects;
+		if (actor->flags & kAffectedByWorldLights)
+			lightInteractionFlags |= Light::kInteractionFlag_World;
+
 		if (bspActor->ska >= 0) {
 			actor->skm = r::SkMesh::New(
 				bsp->DSka(bspActor->ska),
@@ -67,7 +80,7 @@ int WorldCinematics::Spawn(
 				ska::kSkinType_CPU
 			);
 
-			actor->occupant.reset(new ActorOccupant(*actor, *m_world));
+			actor->occupant.reset(new ActorOccupant(*actor, lightingFlags, lightInteractionFlags, *m_world));
 
 			// create material batches
 			const ska::DSkm &dskm = bsp->DSkm(bspActor->ska);
@@ -79,14 +92,13 @@ int WorldCinematics::Spawn(
 				if (id < 0)
 					continue;
 
-				MBatchDraw::Ref batch(new SkActorBatch(*actor, i, id));
-				m_world->draw->AddMaterial(id);
+				MBatchDraw::Ref batch(new SkActorBatch(*m_world->draw, *actor, i, id));
 				actor->occupant->AddMBatch(batch);
 			}
 		} else {
 			actor->vtm = r::VtMesh::New(bsp->DVtm(-(bspActor->ska+1)));
 
-			actor->occupant.reset(new ActorOccupant(*actor, *m_world));
+			actor->occupant.reset(new ActorOccupant(*actor, lightingFlags, lightInteractionFlags, *m_world));
 
 			// create material batches
 			const ska::DVtm &vtm = bsp->DVtm(-(bspActor->ska+1));
@@ -98,8 +110,7 @@ int WorldCinematics::Spawn(
 				if (id < 0)
 					continue;
 
-				MBatchDraw::Ref batch(new VtActorBatch(*actor, i, id));
-				m_world->draw->AddMaterial(id);
+				MBatchDraw::Ref batch(new VtActorBatch(*m_world->draw, *actor, i, id));
 				actor->occupant->AddMBatch(batch);
 			}
 		}
@@ -959,8 +970,8 @@ void WorldCinematics::SkaNotify::OnTag(const ska::AnimTagEventData &data) {
 Vec4 WorldCinematics::SkActorBatch::s_rgba(1, 1, 1, 1);
 Vec3 WorldCinematics::SkActorBatch::s_scale(1, 1, 1);
 
-WorldCinematics::SkActorBatch::SkActorBatch(const Actor &actor, int idx, int matId) :
-MBatchDraw(matId), m_idx(idx), m_actor(&actor) {
+WorldCinematics::SkActorBatch::SkActorBatch(WorldDraw &draw, const Actor &actor, int idx, int matId) :
+MBatchDraw(draw, matId), m_idx(idx), m_actor(&actor) {
 }
 
 void WorldCinematics::SkActorBatch::Bind(r::Shader *shader) {
@@ -984,8 +995,8 @@ void WorldCinematics::SkActorBatch::Draw() {
 Vec4 WorldCinematics::VtActorBatch::s_rgba(1, 1, 1, 1);
 Vec3 WorldCinematics::VtActorBatch::s_scale(1, 1, 1);
 
-WorldCinematics::VtActorBatch::VtActorBatch(const Actor &actor, int idx, int matId) :
-MBatchDraw(matId), m_idx(idx), m_actor(&actor) {
+WorldCinematics::VtActorBatch::VtActorBatch(WorldDraw &draw, const Actor &actor, int idx, int matId) :
+MBatchDraw(draw, matId), m_idx(idx), m_actor(&actor) {
 }
 
 void WorldCinematics::VtActorBatch::Bind(r::Shader *shader) {

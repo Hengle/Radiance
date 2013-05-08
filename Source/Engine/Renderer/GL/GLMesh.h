@@ -54,6 +54,8 @@ public:
 
 private:
 
+	int GenShaderGuid(Shader *shader);
+
 	struct Source {
 		Source() : stream(-1) {}
 		int stream;
@@ -91,7 +93,7 @@ private:
 	int m_numSwapChains;
 	Indices m_i;
 	GLVertexArray::Vec *m_va;
-	Shader *m_shader;
+	int m_shaderGuid;
 };
 
 } // r

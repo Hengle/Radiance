@@ -45,6 +45,11 @@ public:
 	virtual void PopMatrix();
 	virtual void ReleaseArrayStates();
 
+	virtual void BindLitMaterialStates(
+		r::Material &mat,
+		const BBox *scissorBounds
+	);
+
 	virtual void BindPostFXTargets(bool chain);
 	virtual void BindPostFXQuad();
 	virtual void DrawPostFXQuad();

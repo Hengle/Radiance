@@ -22,7 +22,7 @@ public:
 
 	enum Pass {
 		kPass_First,
-		kPass_Default, // blend is controlled by material
+		kPass_Default = kPass_First, // blend is controlled by material
 		kPass_Diffuse1,
 		kPass_Diffuse2,
 		kPass_Diffuse3,
@@ -103,6 +103,11 @@ public:
 #endif
 
 	RAD_DECLARE_READONLY_PROPERTY(Shader, guid, int);
+	RAD_DECLARE_READONLY_PROPERTY(Shader, curPass, Pass);
+
+protected:
+
+	virtual RAD_DECLARE_GET(curPass, Pass) = 0;
 
 private:
 

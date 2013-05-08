@@ -807,11 +807,21 @@ int MaterialLoader::Process(
 			if (!asset->cooked) {
 				parser->material->lit = false;
 
-				for (int i = r::Shader::kPass_Diffuse1; i <= r::Shader::kPass_DiffuseSpecular4; ++i) {
-					if (parser->material->shader->HasPass((r::Shader::Pass)i)) {
-						parser->material->lit = true;
-						break;
+				r::Material::BlendMode blendMode = parser->material->blendMode;
+
+				// lighting only supports these blend modes
+				if ((blendMode == r::Material::kBlendMode_None) ||
+					(blendMode == r::Material::kBlendMode_AddBlend) ||
+					(blendMode == r::Material::kBlendMode_Alpha) ||
+					(blendMode == r::Material::kBlendMode_InvAlpha)) {
+
+					for (int i = r::Shader::kPass_Diffuse1; i <= r::Shader::kPass_DiffuseSpecular4; ++i) {
+						if (parser->material->shader->HasPass((r::Shader::Pass)i)) {
+							parser->material->lit = true;
+							break;
+						}
 					}
+
 				}
 			}
 #endif

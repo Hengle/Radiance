@@ -145,9 +145,8 @@ struct Trace {
 };
 
 RAD_BEGIN_FLAGS
-	RAD_FLAG(kLightingFlag_Light),
-	RAD_FLAG(kLightingFlag_Shadow),
-	kLightingFlag_Unlit = 0
+	RAD_FLAG(kLightingFlag_CastShadows),
+	kLightingFlag_None = 0
 RAD_END_FLAGS(LightingFlags)
 
 namespace details {

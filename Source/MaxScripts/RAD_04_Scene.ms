@@ -6,7 +6,7 @@
 -- [name, origin[3], id, subobjs[], ids[]]
 
 global kSceneFile_Id =  (bit.shift (bit.charAsInt "N") 24) + (bit.shift (bit.charAsInt "C") 16) + (bit.shift (bit.charAsInt "S") 8) + (bit.charAsInt "R")
-global kSceneFile_Version = 6
+global kSceneFile_Version = 7
 global kSceneFlag_HasMaterialFlag = 0x80000000
 global kSceneFlag_HasMesh = 0x00100000
 global kSceneFlag_HasAnim = 0x00200000
@@ -14,6 +14,9 @@ global kSceneFlag_CinematicObject = 0x00080000
 global kSceneFlag_HideUntilRefed = 0x00040000
 global kSceneFlag_HideWhenDone = 0x00010000
 global kSceneFlag_SetBBox = 0x00008000
+global kLightFlag_Diffuse = 0x000000001
+global kLightFlag_Specular = 0x00000002
+global kLightFlag_CastShadows = 0x00000004
 
 function RAD_GatherEntities objs = (
 	ents = #()
@@ -31,7 +34,11 @@ function RAD_GatherCameras objs = (
 	return RAD_Filter objs #(Targetcamera, Freecamera)
 )
 
-function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName = (
+function RAD_GatherLights objs = (
+	return RAD_Filter objs #(Omnilight)
+)
+
+function RAD_ExportObjectsToSceneFile objs doMeshes doAnims doLights fileName = (
 	file = fopen fileName "wb"
 	if (file == undefined) then (
 		messagebox ("cannot open " + fileName + " for write!")
@@ -89,6 +96,40 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName = (
 				RAD_ExportAnims file false true undefined x
 			)
 		) else (
+			WriteLong file 0 #unsigned
+		)
+		
+		if (doLights) then (
+			_lights = RAD_GatherLights objs
+			
+			WriteLong file _lights.count #unsigned
+			
+			for x in _lights do (
+				print ("Exporting light " + x.name)
+				WriteString file x.name
+				WriteFloat file x.pos.x
+				WriteFloat file x.pos.y
+				WriteFloat file x.pos.z
+								
+				flags = 0
+				if (x.affectDiffuse) then (flags = bit.or flags kLightFlag_Diffuse)
+				if (x.affectSpecular) then (flags = bit.or flags kLightFlag_Specular)
+				if (x.castShadows) then (flags = bit.or flags kLightFlag_CastShadows)
+				WriteLong file flags #unsigned
+				
+				WriteFloat file (x.color.red/255.0)
+				WriteFloat file (x.color.green/255.0)
+				WriteFloat file (x.color.blue/255.0)
+				WriteFloat file (x.shadowcolor.red/255.0)
+				WriteFloat file (x.shadowcolor.green/255.0)
+				WriteFloat file (x.shadowcolor.blue/255.0)
+				
+				WriteFloat file (x.multiplier)
+				WriteFloat file (x.farattenend)
+				
+			)
+			
+		) else (	
 			WriteLong file 0 #unsigned
 		)
 		
@@ -217,4 +258,31 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims fileName = (
 	progressEnd()
 	if (cancel) then (messagebox "Export failed.")
 	else (messagebox ("Exported " + (numtris as String) + " tri(s) in " + (objs.count as String) + " object(s)."))
+)
+
+function RAD_ExportScene selectionOnly exportHidden doMeshes doAnims doLights filename = (
+
+	objs = objects;
+	oldSelection = selection
+	oldRange = animationRange
+	oldTime = sliderTime
+	if (selectionOnly) then ( objs = selection )
+	objs = RAD_FilterVisible objs vis:(not exportHidden)		
+	objs = RAD_ConvertableFilter objs kRADMeshTypes
+	objs = RAD_Exclude objs kRADHelperTypes -- exclude helper types
+	
+	if (objs.count == 0) then (
+		messagebox "No objects to export!"
+		return undefined
+	)
+	
+	disableSceneRedraw()
+	RAD_ExportObjectsToSceneFile objs doMeshes doAnims doLights filename
+	enableSceneRedraw()
+	clearSelection()
+	select oldSelection
+	max utility mode
+	animationRange = oldRange
+	sliderTime = oldTime
+	
 )

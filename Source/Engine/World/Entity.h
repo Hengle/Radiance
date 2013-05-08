@@ -199,6 +199,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Entity, bspLeafs, const dBSPLeaf::PtrVec*);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, classbits, int);
 	RAD_DECLARE_READONLY_PROPERTY(Entity, ps, PState*);
+	RAD_DECLARE_PROPERTY(Entity, lightInteractionFlags, int, int);
 	RAD_DECLARE_PROPERTY(Entity, lightingFlags, LightingFlags, LightingFlags);
 	RAD_DECLARE_PROPERTY(Entity, gc, bool, bool);
 	
@@ -405,6 +406,7 @@ private:
 	ENT_DECL_GETSET(NextThink);
 	ENT_DECL_GETSET(ClassBits);
 	ENT_DECL_GETSET(LightingFlags);
+	ENT_DECL_GETSET(LightInteractionFlags);
 
 	RAD_DECLARE_GET(zoneTag, ZoneTagRef) { 
 		return m_zoneTag.lock(); 
@@ -446,6 +448,14 @@ private:
 
 	RAD_DECLARE_SET(lightingFlags, LightingFlags) {
 		m_lightingFlags = value;
+	}
+
+	RAD_DECLARE_GET(lightInteractionFlags, int) {
+		return m_lightInteractionFlags;
+	}
+
+	RAD_DECLARE_SET(lightInteractionFlags, int) {
+		m_lightInteractionFlags = value;
 	}
 
 	RAD_DECLARE_GET(gc, bool) { 
@@ -494,6 +504,7 @@ private:
 	int m_spawnState;
 	int m_id;
 	int m_uid;
+	int m_lightInteractionFlags;
 	float m_nextLuaThink;
 	float m_lastLuaThink;
 	float m_nextTick;

@@ -5,7 +5,7 @@
 
 namespace r {
 	
-inline GLMesh::GLMesh() : m_va(0), m_shader(0), m_numSwapChains(1), m_swapChain(0) {
+inline GLMesh::GLMesh() : m_va(0), m_shaderGuid(-1), m_numSwapChains(1), m_swapChain(0) {
 }
 
 inline GLMesh::~GLMesh() {
@@ -28,11 +28,14 @@ inline void GLMesh::CompileArrayStates(Shader &shader) {
 inline void GLMesh::FlushArrayStates(Shader *shader) {
 	m_va = 0;
 
-	if (!shader || m_shader == shader)
-		m_shader = 0;
+	int guid = GenShaderGuid(shader);
+
+	if (m_shaderGuid == guid)
+		m_shaderGuid = -1;
 
 	if (shader) {
-		m_shaderStates.Flush(shader->guid);
+		RAD_ASSERT(guid != -1);
+		m_shaderStates.Flush(guid);
 	} else {
 		m_shaderStates.Clear();
 	}
@@ -60,6 +63,14 @@ inline void GLMesh::ResetStreamState() {
 
 inline void GLMesh::Reserve(int numStreams)  {
 	m_streams.reserve(numStreams);
+}
+
+inline int GLMesh::GenShaderGuid(Shader *shader) {
+	if (!shader)
+		return -1;
+	int guid = shader->guid;
+	guid = guid | ((int)shader->curPass.get() << 16);
+	return guid;
 }
 
 } // r

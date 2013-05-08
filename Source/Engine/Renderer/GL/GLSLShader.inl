@@ -49,7 +49,7 @@ inline GLhandleARB GLSLProgramObj::RAD_IMPLEMENT_GET(id) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline GLSLShader::GLSLShader() : m_curMat(0) {
+inline GLSLShader::GLSLShader() : m_curMat(0), m_curPass(kNumPasses) {
 }
 
 inline int GLSLShader::Usage(Shader::Pass p, MaterialTextureSource source) const {

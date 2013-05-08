@@ -205,7 +205,8 @@ int DrawModel::LUART_SETFN(Bounds)(lua_State *L) {
 LUART_GET(DrawModel, RGBA, Vec4, m_rgba[0], SELF);
 #undef SELF
 
-DrawModel::DrawBatch::DrawBatch(DrawModel &model, int matId) : MBatchDraw(matId), m_model(&model) {
+DrawModel::DrawBatch::DrawBatch(DrawModel &model, int matId) : 
+MBatchDraw(*model.entity->world->draw, matId), m_model(&model) {
 }
 
 bool DrawModel::DrawBatch::GetTransform(Vec3 &pos, Vec3 &angles) const {
@@ -224,8 +225,7 @@ MeshDrawModel::Ref MeshDrawModel::New(
 	r->m_matId = matId;
 
 	Batch::Ref b(new (ZWorld) Batch(*r, m, matId));
-	entity->world->draw->AddMaterial(matId);
-
+	
 	r->RefBatch(b);
 	return r;
 }
@@ -306,8 +306,6 @@ MeshBundleDrawModel::Ref MeshBundleDrawModel::New(
 
 	for (int i = 0; i < bundle->numMeshes; ++i) {
 		Batch::Ref b(new (ZWorld) Batch(*r, bundle->Mesh(i), loader->MaterialAsset(i)->id));
-		draw->AddMaterial(loader->MaterialAsset(i)->id);
-
 		r->RefBatch(b);
 	}
 
@@ -401,8 +399,6 @@ SkMeshDrawModel::Ref SkMeshDrawModel::New(
 			continue;
 
 		Batch::Ref b(new (ZWorld) Batch(*r, m, i, material->id));
-		draw->AddMaterial(material->id);
-
 		r->RefBatch(b);
 	}
 
@@ -575,8 +571,6 @@ VtMeshDrawModel::Ref VtMeshDrawModel::New(
 			continue;
 
 		Batch::Ref b(new (ZWorld) Batch(*r, m, i, material->id));
-		draw->AddMaterial(material->id);
-
 		r->RefBatch(b);
 	}
 
@@ -686,7 +680,6 @@ SpriteBatchDrawModel::Ref SpriteBatchDrawModel::New(
 	WorldDraw *draw = entity->world->draw;
 
 	Batch::Ref b(new (ZWorld) Batch(*r, sprites, matId));
-	draw->AddMaterial(matId);
 	r->RefBatch(b);
 
 	return r;

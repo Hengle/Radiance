@@ -675,6 +675,8 @@ private:
 	bool EmitBSPFile();
 	void EmitBSPMaterials();
 	bool EmitBSPEntities();
+	bool EmitSceneLights();
+	bool EmitSceneOmniLights();
 	bool EmitBSPEntity(const SceneFile::Entity::Ref &entity);
 	bool PutEntityOnFloor(const SceneFile::Entity::Ref &entity);
 	bool EmitBSPAreas();

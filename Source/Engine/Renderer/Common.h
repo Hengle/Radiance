@@ -55,8 +55,7 @@ struct MaterialInputMappings {
 struct LightDef {
 	enum {
 		RAD_FLAG(kFlag_Diffuse),
-		RAD_FLAG(kFlag_Specular),
-		RAD_FLAG(kFlag_CastShadows)
+		RAD_FLAG(kFlag_Specular)
 	};
 	Vec3 specular;
 	Vec3 diffuse;

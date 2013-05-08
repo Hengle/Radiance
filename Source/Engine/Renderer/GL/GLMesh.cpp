@@ -116,10 +116,14 @@ void GLMesh::Bind(MaterialGeometrySource s, int index) {
 }
 
 void GLMesh::BindAll(Shader *shader) {
-	if (m_shader != shader) {
-		m_shader = shader;
+
+	// shader state guid must be unique per-shader-pass
+	int guid = GenShaderGuid(shader);
+
+	if (m_shaderGuid != guid) {
+		m_shaderGuid = guid;
 		if (shader) {
-			m_va = m_shaderStates.Find(shader->guid);
+			m_va = m_shaderStates.Find(guid);
 		} else {
 			m_va = 0;
 		}
@@ -132,7 +136,8 @@ void GLMesh::BindAll(Shader *shader) {
 		// we have compiled vertex states.
 		gls.BindVertexArray(m_va->at(m_swapChain));
 	} else if (shader && (gl.vbos&&gl.vaos)) {
-		m_va = m_shaderStates.Create(shader->guid, m_swapChain);
+		RAD_ASSERT(guid != -1);
+		m_va = m_shaderStates.Create(guid, m_swapChain);
 		RAD_ASSERT(m_va);
 		gls.BindVertexArray(m_va->at(m_swapChain));
 		BindIndices(true); // must force this binding to be set.
@@ -152,7 +157,7 @@ void GLMesh::BindAll(Shader *shader) {
 
 void GLMesh::Release() {
 	m_va = 0;
-	m_shader = 0;
+	m_shaderGuid = -1;
 	m_swapChain = 0;
 	m_shaderStates.Clear();
 	m_i.vb.reset();

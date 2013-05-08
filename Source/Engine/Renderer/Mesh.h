@@ -82,6 +82,9 @@ public:
 		The array states will automatically be used by subsequent BindAll() method
 		calls on the mesh.
 
+		NOTE: BindAll() must be called after Shader->Begin(...) because the generated
+		array states are dependant on the shader pass.
+
 		To draw a mesh using vertex array states:
 
 		\verbatim

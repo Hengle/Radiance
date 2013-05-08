@@ -1494,6 +1494,9 @@
     <ClInclude Include="..\..\Engine\World\Light.h">
       <Filter>Source\Engine\World</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\World\Lua\D_Light.h">
+      <Filter>Source\Engine\World\Lua</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2338,6 +2341,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorColorPicker.cpp">
       <Filter>Source\Engine\Tools\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\Lua\D_Light.cpp">
+      <Filter>Source\Engine\World\Lua</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

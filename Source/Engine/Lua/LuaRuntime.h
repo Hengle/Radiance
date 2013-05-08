@@ -217,7 +217,7 @@ typedef std::map<String, String> SymbolMap;
 /*! Objects that are contained in a boost shared pointer can derrive from this class
     to enable type-safe marshaling to and from the lua runtime. Marshaling this object
 	from lua requires a dynamic_cast. */
-class SharedPtr : public boost::enable_shared_from_this<SharedPtr> {
+class SharedPtr : public boost::enable_shared_from_this<SharedPtr>, public boost::noncopyable {
 public:
 	typedef boost::shared_ptr<SharedPtr> Ref;
 

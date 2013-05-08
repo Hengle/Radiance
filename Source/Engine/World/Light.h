@@ -14,31 +14,35 @@ class Material;
 
 namespace world {
 
-class RADENG_CLASS Light {
+class RADENG_CLASS Light : public boost::noncopyable {
 public:
 	typedef boost::shared_ptr<Light> Ref;
 
 	RAD_BEGIN_FLAGS
 		RAD_FLAG(kStyle_Diffuse),
 		RAD_FLAG(kStyle_Specular),
-		RAD_FLAG(kStyle_Shadows),
-		RAD_FLAG(kStyle_AffectWorld),
-		RAD_FLAG(kStyle_AffectObjects),
-		RAD_FLAG(kStyle_AffectPlayer),
-		kStyle_AffectAll = kStyle_AffectWorld|kStyle_AffectObjects|kStyle_AffectPlayer
-	RAD_END_FLAGS(LightStyles)
+		RAD_FLAG(kStyle_CastShadows)
+	RAD_END_FLAGS(LightStyle)
+
+	enum {
+		RAD_FLAG(kInteractionFlag_World),
+		RAD_FLAG(kInteractionFlag_Player),
+		RAD_FLAG(kInteractionFlag_Objects)		
+	};
 
 	~Light();
 
 	RAD_DECLARE_PROPERTY(Light, diffuseColor, const Vec3&, const Vec3&);
 	// alpha control specular power
-	RAD_DECLARE_PROPERTY(Light, specularColor, const Vec4&, const Vec4&);
+	RAD_DECLARE_PROPERTY(Light, specularColor, const Vec3&, const Vec3&);
 	// alpha controls shadow opacity
 	RAD_DECLARE_PROPERTY(Light, shadowColor, const Vec4&, const Vec4&);
-	RAD_DECLARE_PROPERTY(Light, style, LightStyles, LightStyles);
+	RAD_DECLARE_PROPERTY(Light, style, LightStyle, LightStyle);
 	RAD_DECLARE_PROPERTY(Light, pos, const Vec3&, const Vec3&);
-	RAD_DECLARE_PROPERTY(Light, size, const BBox&, const BBox&);
+	RAD_DECLARE_PROPERTY(Light, radius, float, float);
+	RAD_DECLARE_PROPERTY(Light, bounds, const BBox&, const BBox&);
 	RAD_DECLARE_PROPERTY(Light, brightness, float, float);
+	RAD_DECLARE_PROPERTY(Light, interactionFlags, int, int);
 
 	void Link();
 	void Unlink();
@@ -58,11 +62,11 @@ private:
 		m_dfColor = value;
 	}
 
-	RAD_DECLARE_GET(specularColor, const Vec4&) {
+	RAD_DECLARE_GET(specularColor, const Vec3&) {
 		return m_spColor;
 	}
 
-	RAD_DECLARE_SET(specularColor, const Vec4&) {
+	RAD_DECLARE_SET(specularColor, const Vec3&) {
 		m_spColor = value;
 	}
 
@@ -74,11 +78,11 @@ private:
 		m_shColor = value;
 	}
 
-	RAD_DECLARE_GET(style, LightStyles) {
+	RAD_DECLARE_GET(style, LightStyle) {
 		return m_style;
 	}
 
-	RAD_DECLARE_SET(style, LightStyles) {
+	RAD_DECLARE_SET(style, LightStyle) {
 		m_style = value;
 	}
 
@@ -90,12 +94,20 @@ private:
 		m_pos = value;
 	}
 
-	RAD_DECLARE_GET(size, const BBox&) {
-		return m_size;
+	RAD_DECLARE_GET(radius, float) {
+		return m_radius;
 	}
 
-	RAD_DECLARE_SET(size, const BBox&) {
-		m_size = value;
+	RAD_DECLARE_SET(radius, float) {
+		m_radius = value;
+	}
+
+	RAD_DECLARE_GET(bounds, const BBox&) {
+		return m_bounds;
+	}
+
+	RAD_DECLARE_SET(bounds, const BBox&) {
+		m_bounds = value;
 	}
 
 	RAD_DECLARE_GET(brightness, float) {
@@ -106,19 +118,30 @@ private:
 		m_brightness = value;
 	}
 
+	RAD_DECLARE_GET(interactionFlags, int) {
+		return m_interactionFlags;
+	}
+
+	RAD_DECLARE_SET(interactionFlags, int) {
+		m_interactionFlags = value;
+	}
+
 	details::LightInteraction **ChainHead(int matId);
 	
 	dBSPLeaf::PtrVec m_bspLeafs;
 	details::MatInteractionChain m_interactions;
 	IntSet m_areas;
-	BBox m_size;
-	Vec4 m_spColor;
+	BBox m_bounds;
+	Vec3 m_spColor;
 	Vec4 m_shColor;
 	Vec3 m_dfColor;
 	Vec3 m_pos;
 	float m_brightness;
-	LightStyles m_style;
+	float m_radius;
+	LightStyle m_style;
 	int m_markFrame;
+	int m_visFrame;
+	int m_interactionFlags;
 	dBSPLeaf *m_leaf;
 	Light *m_prev;
 	Light *m_next;
@@ -127,4 +150,4 @@ private:
 
 } // world
 
-RAD_IMPLEMENT_FLAGS(world::Light::LightStyles)
+RAD_IMPLEMENT_FLAGS(world::Light::LightStyle)

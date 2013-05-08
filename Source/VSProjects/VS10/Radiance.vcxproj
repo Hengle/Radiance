@@ -950,6 +950,7 @@
     <ClInclude Include="..\..\Engine\World\Lua\D_Asset.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_ConversationTree.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_HTTP.h" />
+    <ClInclude Include="..\..\Engine\World\Lua\D_Light.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_Material.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_Mesh.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_ScreenOverlay.h" />
@@ -2136,6 +2137,7 @@
     <ClCompile Include="..\..\Engine\World\Lua\D_Asset.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_ConversationTree.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_HTTP.cpp" />
+    <ClCompile Include="..\..\Engine\World\Lua\D_Light.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_Material.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_Mesh.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_ScreenOverlay.cpp" />

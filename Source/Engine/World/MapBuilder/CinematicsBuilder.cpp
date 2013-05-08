@@ -44,6 +44,12 @@ bool CinematicsBuilder::Compile(
 			a.flags |= world::bsp_file::kHideUntilRef;
 		if (model->hideWhenDone)
 			a.flags |= world::bsp_file::kHideWhenDone;
+		if (model->affectedByObjectLights)
+			a.flags |= world::bsp_file::kAffectedByObjectLights;
+		if (model->affectedByWorldLights)
+			a.flags |= world::bsp_file::kAffectedByWorldLights;
+		if (model->castShadows)
+			a.flags |= world::bsp_file::kCastShadows;
 		
 		a.bounds = model->bounds;
 		a.pos = a.bounds.Origin();

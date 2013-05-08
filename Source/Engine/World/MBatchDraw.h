@@ -44,15 +44,16 @@ struct MBatch {
 
 } // details
 
-class RADENG_CLASS MBatchDraw {
+class RADENG_CLASS MBatchDraw : public boost::noncopyable {
 public:
 	typedef boost::shared_ptr<MBatchDraw> Ref;
 	typedef zone_vector<Ref, ZWorldT>::type RefVec;
 	
-	MBatchDraw(int matId) : m_matId(matId), m_markFrame(-1), m_visibleFrame(-1), m_interactions(0) {}
+	MBatchDraw(WorldDraw &draw, int matId);
 	virtual ~MBatchDraw() {}
 
 	RAD_DECLARE_PROPERTY(MBatchDraw, matId, int, int);
+	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, lit, bool);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, visible, bool);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, rgba, const Vec4&);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, scale, const Vec3&);
@@ -87,6 +88,12 @@ private:
 		m_matId = value;
 	}
 
+	RAD_DECLARE_GET(lit, bool) {
+		RAD_ASSERT(m_matRef && m_matRef->mat);
+		return m_matRef->mat->lit;
+	}
+
+	details::MatRef *m_matRef;
 	details::LightInteraction *m_interactions;
 	int m_matId;
 	int m_markFrame;

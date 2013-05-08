@@ -56,11 +56,21 @@ void MBatch::AddDraw(MBatchDraw &draw) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+MBatchDraw::MBatchDraw(WorldDraw &draw, int matId) : 
+m_matId(matId), 
+m_markFrame(-1), 
+m_visibleFrame(-1), 
+m_interactions(0) {
+	m_matRef = draw.AddMaterialRef(matId);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 Vec4 WorldDraw::MStaticWorldMeshBatch::s_rgba(Vec4(1, 1, 1, 1));
 Vec3 WorldDraw::MStaticWorldMeshBatch::s_scale(Vec3(1, 1, 1));
 
-WorldDraw::MStaticWorldMeshBatch::MStaticWorldMeshBatch(const r::Mesh::Ref &m, const BBox &bounds, int matId) :
-MBatchDraw(matId), m_m(m), m_bounds(bounds) {
+WorldDraw::MStaticWorldMeshBatch::MStaticWorldMeshBatch(WorldDraw &draw, const r::Mesh::Ref &m, const BBox &bounds, int matId) :
+MBatchDraw(draw, matId), m_m(m), m_bounds(bounds) {
 }
 
 void WorldDraw::MStaticWorldMeshBatch::Bind(r::Shader *shader) {
@@ -280,7 +290,7 @@ ScreenOverlay::Ref WorldDraw::CreateScreenOverlay(int matId)
 
 void WorldDraw::AddStaticWorldMesh(const r::Mesh::Ref &m, const BBox &bounds, int matId) {
 	RAD_ASSERT(m);
-	MStaticWorldMeshBatch::Ref r(new (ZWorld) MStaticWorldMeshBatch(m, bounds, matId));
+	MStaticWorldMeshBatch::Ref r(new (ZWorld) MStaticWorldMeshBatch(*this, m, bounds, matId));
 	m_worldModels.push_back(r);
 }
 
@@ -446,12 +456,13 @@ void WorldDraw::VisMarkArea(
 		if (light.m_markFrame != m_markFrame) {
 			light.m_markFrame = m_markFrame;
 
-			BBox bounds(light.m_size);
+			BBox bounds(light.m_bounds);
 			bounds.Translate(light.m_pos);
 
 			++m_counters.testedLights;
 			if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, bounds)) {
 				++m_counters.drawnLights;
+				light.m_visFrame = m_markFrame;
 				view.visLights.push_back(&light);
 			}
 		}
@@ -603,6 +614,7 @@ void WorldDraw::DrawView() {
 	m_rb->SetWorldStates();
 
 	m_rb->numTris = 0;
+	m_counters.numMaterials += (int)view.batches.size();
 
 	DrawViewBatches(view, false);
 
@@ -649,27 +661,43 @@ void WorldDraw::DrawUI() {
 }
 
 void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
-	if (!wireframe)
-		m_counters.numMaterials += (int)view.batches.size();
-	for (int i = 0; i < r::Material::kNumSorts; ++i)
-		DrawViewBatches(view, (r::Material::Sort)i, wireframe);
-}
 
-void WorldDraw::DrawViewBatches(ViewDef &view, r::Material::Sort sort, bool wireframe) {
-	for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
-		if (it->second->matRef->mat->sort != sort)
-			continue;
-		DrawBatch(*it->second, wireframe);
+	if (wireframe) {
+		
+		for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
+			DrawUnlitBatch(*it->second, wireframe);
+		}
+
+		return;
+	}
+
+	for (LightVec::const_iterator it = view.visLights.begin(); it != view.visLights.end(); ++it) {
+		UpdateLightInteractions(**it);
+	}
+
+	// unshadowed light pass
+	// also initializes Z buffer
+
+	for (int i = 0; i < r::Material::kNumSorts; ++i) {
+		for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
+			const details::MBatch &batch = *it->second;
+
+			if (batch.matRef->mat->sort == (r::Material::Sort)i) {
+				DrawUnshadowedLitBatch(*it->second);
+			}
+		}
 	}
 }
 
-void WorldDraw::DrawBatch(const details::MBatch &batch, bool wireframe) {
+void WorldDraw::DrawUnlitBatch(const details::MBatch &batch, bool wireframe) {
 
 	if (!batch.head)
 		return;
 
 	Vec3 pos;
 	Vec3 angles;
+	Mat4 invTx;
+
 #if defined(WORLD_DEBUG_DRAW)
 	r::Material *mat = (wireframe) ? m_dbgVars.debugWireframe_M.mat : batch.matRef->mat;
 #else
@@ -686,8 +714,10 @@ void WorldDraw::DrawBatch(const details::MBatch &batch, bool wireframe) {
 		MBatchDraw *draw = link->draw;
 
 		bool tx = draw->GetTransform(pos, angles);
-		if (tx)
+		if (tx) {
 			m_rb->PushMatrix(pos, draw->scale, angles);
+			invTx = Mat4::Translation(-pos) * (Mat4::Rotation(QuatFromAngles(angles)).Transpose());
+		}
 
 		if (first && !wireframe) {
 			first = false;
@@ -698,7 +728,14 @@ void WorldDraw::DrawBatch(const details::MBatch &batch, bool wireframe) {
 			++m_counters.numBatches;
 
 		draw->Bind(mat->shader.get().get());
-		Shader::Uniforms u(draw->rgba.get());
+		r::Shader::Uniforms u(draw->rgba.get());
+
+		if (tx) {
+			u.eyePos = invTx * m_world->camera->pos.get();
+		} else {
+			u.eyePos = m_world->camera->pos;
+		}
+
 		mat->shader->BindStates(u);
 		m_rb->CommitStates();
 		draw->CompileArrayStates(*mat->shader.get());

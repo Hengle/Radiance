@@ -23,6 +23,9 @@ enum {
 	RAD_FLAG(kCinematicObj),
 	RAD_FLAG(kHideUntilRef),
 	RAD_FLAG(kHideWhenDone),
+	RAD_FLAG(kAffectedByObjectLights),
+	RAD_FLAG(kAffectedByWorldLights),
+	RAD_FLAG(kCastShadows),
 	kMaxUVChannels = 2
 };
 

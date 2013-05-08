@@ -12,14 +12,15 @@
 
 namespace world {
 
-class RADENG_CLASS MBatchOccupant {
+class RADENG_CLASS MBatchOccupant : public boost::noncopyable {
 public:
 
-	MBatchOccupant(World &world, LightingFlags lightingFlags = kLightingFlag_Unlit) 
+	MBatchOccupant(World &world, LightingFlags lightingFlags, int lightInteractionFlags) 
 		: m_markFrame(-1), 
 		m_world(&world), 
 		m_leaf(0),
-		m_lightingFlags(lightingFlags)
+		m_lightingFlags(lightingFlags),
+		m_lightInteractionFlags(lightInteractionFlags)
 	{}
 
 	virtual ~MBatchOccupant() {}
@@ -28,6 +29,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(MBatchOccupant, bounds, const BBox&);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchOccupant, batches, const MBatchDraw::RefVec *);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchOccupant, world, World*);
+	RAD_DECLARE_PROPERTY(MBatchOccupant, lightInteractionFlags, int, int);
 	RAD_DECLARE_PROPERTY(MBatchOccupant, lightingFlags, LightingFlags, LightingFlags);
 
 	void Link();
@@ -53,6 +55,14 @@ private:
 		m_lightingFlags = value;
 	}
 
+	RAD_DECLARE_GET(lightInteractionFlags, int) {
+		return m_lightInteractionFlags;
+	}
+
+	RAD_DECLARE_SET(lightInteractionFlags, int) {
+		m_lightInteractionFlags = value;
+	}
+
 	friend class World;
 	friend class WorldDraw;
 
@@ -61,6 +71,7 @@ private:
 	World *m_world;
 	dBSPLeaf *m_leaf;
 	int m_markFrame;
+	int m_lightInteractionFlags;
 	LightingFlags m_lightingFlags;
 };
 

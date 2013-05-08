@@ -9,6 +9,7 @@
 #include "SolidBSP.h"
 #include "../CinematicsBuilder.h"
 #include "../../Floors.h"
+#include "../../Light.h"
 #include <algorithm>
 
 using namespace world::bsp_file;
@@ -143,11 +144,18 @@ Entities
 */
 
 bool BSPBuilder::EmitBSPEntities() {
-	EmitBSPEntity(m_map->worldspawn);
+	
+	if (!EmitBSPEntity(m_map->worldspawn))
+		return false;
+	
+	if (!EmitSceneLights())
+		return false;
+
 	for (SceneFile::Entity::Vec::const_iterator it = m_map->ents.begin(); it != m_map->ents.end(); ++it) {
 		if (!EmitBSPEntity(*it))
 			return false;
 	}
+
 	return true;
 }
 
@@ -181,6 +189,52 @@ bool BSPBuilder::PutEntityOnFloor(const SceneFile::Entity::Ref &entity) {
 
 	s.PrintfASCII("%d", triNum);
 	entity->keys.pairs[String("floorTri")] = s;
+
+	return true;
+}
+
+bool BSPBuilder::EmitSceneLights() {
+	return EmitSceneOmniLights();
+}
+
+bool BSPBuilder::EmitSceneOmniLights() {
+	SceneFile::Entity::Ref e(new (ZBSPBuilder) SceneFile::Entity());
+
+	e->keys.pairs[CStr("classname")] = CStr("info_dynlight");
+	e->keys.pairs[CStr("type")] = CStr("omni");
+
+	int baseUUID = kKilo*kKilo*16; // this is a huge f---ing hack.
+
+	String s;
+	for (SceneFile::OmniLight::Vec::const_iterator it = m_map->omniLights.begin(); it != m_map->omniLights.end(); ++it) {
+		const SceneFile::OmniLight::Ref &light = *it;
+
+		e->origin = light->pos;
+		
+		e->keys.pairs.erase(CStr("targetname"));
+		
+		if (!light->name.empty)
+			e->keys.pairs[CStr("targetname")] = light->name;
+
+		s.PrintfASCII("%f %f %f", light->color[0], light->color[1], light->color[2]);
+		e->keys.pairs[CStr("diffuseColor")] = s;
+		e->keys.pairs[CStr("specularColor")] = s;
+		
+		s.PrintfASCII("%f", light->radius);
+		e->keys.pairs[CStr("radius")] = s;
+
+		s.PrintfASCII("%f", light->brightness);
+		e->keys.pairs[CStr("brightness")] = s;
+
+		s.PrintfASCII("%d", light->flags);
+		e->keys.pairs[CStr("flags")] = s;
+
+		s.PrintfASCII("%d", baseUUID++);
+		e->keys.pairs[CStr("uuid")] = s;
+
+		if (!EmitBSPEntity(e))
+			return false;
+	}
 
 	return true;
 }

@@ -84,6 +84,12 @@ public:
 	);
 #endif
 
+protected:
+
+	virtual RAD_DECLARE_GET(curPass, Pass) {
+		return m_curPass;
+	}
+
 private:
 
 	GLSLShader();

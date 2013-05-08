@@ -5,7 +5,17 @@
 
 global kRADBoneTypes = #(BoneGeometry, CATBone, CATParent, HubObject)
 global kRADHelperTypes = #(BoneGeometry, CATBone, CATParent, HubObject, SplineShape, Circle, Rectangle)
-global kRADMeshTypes = #(Mesh, Targetcamera, Freecamera)
+global kRADMeshTypes = #(Mesh, Targetcamera, Freecamera, Omnilight)
+
+function RAD_PrintProps obj = (
+
+	z = getpropnames obj
+	
+	for p in z do (
+		print p
+	)
+	
+)
 
 function RAD_GetObjectTransformKeyframeTimes obj = (
 	pos = for x in obj.transform.controller.position.controller.keys collect x.time
