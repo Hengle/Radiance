@@ -16,7 +16,7 @@ using namespace pkg;
 
 namespace asset {
 
-MeshCooker::MeshCooker() : Cooker(6) {
+MeshCooker::MeshCooker() : Cooker(7) {
 }
 
 MeshCooker::~MeshCooker() {

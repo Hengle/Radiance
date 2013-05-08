@@ -422,8 +422,15 @@ namespace {
 				if ((x.sm&v.sm)||(x.sm==v.sm)) {
 					// identical?
 					if (x.sm == v.sm) {
-						RAD_ASSERT(idx == -1);
-						idx = *it;
+						int i;
+						for (i = 0; i < SceneFile::kMaxUVChannels; ++i) {
+							if (x.st[i] != v.st[i])
+								break;
+						}
+						if (i == SceneFile::kMaxUVChannels) {
+							RAD_ASSERT(idx == -1);
+							idx = *it;
+						}
 					}
 
 					AddFaces(v, x);
