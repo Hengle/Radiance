@@ -27,6 +27,7 @@ class QLineEdit;
 namespace asset {
 class MeshVBLoader;
 class MeshMaterialLoader;
+class MaterialLoader;
 }
 
 namespace tools {
@@ -106,7 +107,14 @@ private:
 	void DrawSkaNormals(bool normals, bool tangents);
 	void DrawVtmNormals(bool normals, bool tangents);
 	void DrawMeshNormals(bool normals, bool tangents);
-	
+
+	void DrawMesh(
+		r::Material &mat,
+		asset::MaterialLoader &loader,
+		r::Mesh &mesh,
+		const r::Shader::Uniforms &u
+	);
+
 	ModelEditorWidget();
 	virtual ~ModelEditorWidget();
 

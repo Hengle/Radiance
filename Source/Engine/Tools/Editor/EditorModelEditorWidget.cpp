@@ -453,30 +453,8 @@ void ModelEditorWidget::Draw(
 				continue;
 
 			m_skModel->Skin(i);
-
-			mat->BindTextures(loader);
-			mat->BindStates();
-
-			if (u.lights.numLights > 0) {
-				if (mat->shader->HasPass(Shader::kPass_DiffuseSpecular1)) {
-					mat->shader->Begin(Shader::kPass_DiffuseSpecular1, *mat);
-				} else if (mat->shader->HasPass(Shader::kPass_Diffuse1)) {
-					mat->shader->Begin(Shader::kPass_Diffuse1, *mat);
-				} else if (mat->shader->HasPass(Shader::kPass_Specular1)) {
-					mat->shader->Begin(Shader::kPass_Specular1, *mat);
-				} else {
-					mat->shader->Begin(Shader::kPass_Preview, *mat);
-				}
-			} else {
-				mat->shader->Begin(Shader::kPass_Preview, *mat);
-			}
-
 			Mesh &m = m_skModel->Mesh(i);
-			m.BindAll(0);
-			mat->shader->BindStates(u);
-			gls.Commit();
-			m.Draw();
-			mat->shader->End();
+			DrawMesh(*mat, *loader, m, u);
 		}
 	} else if (m_vtModel) {
 		asset::VtMaterialLoader *vtMaterials = asset::VtMaterialLoader::Cast(m_asset);
@@ -501,16 +479,8 @@ void ModelEditorWidget::Draw(
 				continue;
 
 			m_vtModel->Skin(i);
-
-			mat->BindTextures(loader);
-			mat->BindStates();
-			mat->shader->Begin(Shader::kPass_Preview, *mat);
 			Mesh &m = m_vtModel->Mesh(i);
-			m.BindAll(0);
-			mat->shader->BindStates(u);
-			gls.Commit();
-			m.Draw();
-			mat->shader->End();
+			DrawMesh(*mat, *loader, m, u);
 		}
 	} else if (m_bundle) {
 		for (int i = 0; i < m_bundle->numMeshes; ++i) {
@@ -532,16 +502,72 @@ void ModelEditorWidget::Draw(
 			if (mat->sort != sort)
 				continue;
 
-			mat->BindTextures(loader);
-			mat->BindStates();
-			mat->shader->Begin(Shader::kPass_Preview, *mat);
 			Mesh &m = *m_bundle->Mesh(i);
-			m.BindAll(0);
-			mat->shader->BindStates(u);
-			gls.Commit();
-			m.Draw();
-			mat->shader->End();
+			DrawMesh(*mat, *loader, m, u);
 		}
+	}
+}
+
+void ModelEditorWidget::DrawMesh(
+	r::Material &mat,
+	asset::MaterialLoader &loader,
+	r::Mesh &mesh,
+	const r::Shader::Uniforms &u
+) {
+	if (u.lights.numLights > 0) {
+		bool blend = false;
+
+		mat.BindTextures(&loader);
+
+		if (mat.shader->HasPass(Shader::kPass_Default)) {
+			mat.BindStates();
+			mat.shader->Begin(Shader::kPass_Default, mat);
+			mesh.BindAll(0);
+			mat.shader->BindStates();
+			gls.Commit();
+			mesh.Draw();
+			mat.shader->End();
+
+			blend = true;
+		}
+
+		int flags = 0;
+		int bm = 0;
+
+		if (blend) {
+			flags = kDepthTest_Equal|kDepthWriteMask_Disable;
+
+			if (mat.blendMode == Material::kBlendMode_None) {
+				bm = kBlendModeSource_One|kBlendModeDest_One; // additive
+			}
+		}
+
+		mat.BindStates(flags, bm);
+
+		if (mat.shader->HasPass(Shader::kPass_DiffuseSpecular1)) {
+			mat.shader->Begin(Shader::kPass_DiffuseSpecular1, mat);
+		} else if (mat.shader->HasPass(Shader::kPass_Diffuse1)) {
+			mat.shader->Begin(Shader::kPass_Diffuse1, mat);
+		} else if (mat.shader->HasPass(Shader::kPass_Specular1)) {
+			mat.shader->Begin(Shader::kPass_Specular1, mat);
+		} else {
+			mat.shader->Begin(Shader::kPass_Preview, mat);
+		}
+				
+		mesh.BindAll(0);
+		mat.shader->BindStates(u);
+		gls.Commit();
+		mesh.Draw();
+		mat.shader->End();
+	} else {
+		mat.BindTextures(&loader);
+		mat.BindStates();
+		mat.shader->Begin(Shader::kPass_Preview, mat);
+		mesh.BindAll(0);
+		mat.shader->BindStates(u);
+		gls.Commit();
+		mesh.Draw();
+		mat.shader->End();
 	}
 }
 
