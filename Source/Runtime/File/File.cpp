@@ -289,6 +289,14 @@ MMFile::Ref FileSystem::OpenFile(
 	if (options & kFileOption_NativePath)
 		return NativeOpenFile(path, zone, options);
 
+#if !defined(RAD_OPT_SHIP)
+	// backslash characters are illegal in a file path and won't open on multiple platforms.
+	for (const char *z = path; *z; ++z) {
+		if (*z == '\\')
+			return MMFile::Ref();
+	}
+#endif
+
 	if (IsAbsPath(path)) {
 		String nativePath;
 		if (!GetNativePath(path, nativePath))
