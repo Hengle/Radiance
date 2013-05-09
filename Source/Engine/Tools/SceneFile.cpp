@@ -419,7 +419,7 @@ namespace {
 			IntVec &indices = it->second;
 			for (IntVec::const_iterator it = indices.begin(); it != indices.end(); ++it) {
 				SmoothVert &x = vec[*it];
-				if ((x.sm&v.sm)||(x.sm==v.sm)) {
+				if ((x.sm && v.sm) && ((x.sm&v.sm)||(x.sm==v.sm))) {
 					// identical?
 					if (x.sm == v.sm) {
 						int i;
