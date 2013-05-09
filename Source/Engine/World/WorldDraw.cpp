@@ -455,11 +455,15 @@ void WorldDraw::VisMarkArea(
 
 		if (light.m_markFrame != m_markFrame) {
 			light.m_markFrame = m_markFrame;
+			++m_counters.testedLights;
+		}
 
+		if (light.m_visFrame != m_markFrame) {
+			
 			BBox bounds(light.m_bounds);
 			bounds.Translate(light.m_pos);
 
-			++m_counters.testedLights;
+			
 			if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, bounds)) {
 				++m_counters.drawnLights;
 				light.m_visFrame = m_markFrame;

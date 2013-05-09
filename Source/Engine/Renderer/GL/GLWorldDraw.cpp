@@ -274,7 +274,7 @@ void GLWorldDraw::BindLitMaterialStates(
 ) {
 	int flags = kDepthTest_Equal|kDepthWriteMask_Disable;
 
-	if (scissorBounds) {
+	if (scissorBounds && !scissorBounds->Contains(world->camera->pos)) {
 		boost::array<int, 4> viewport;
 		world->game->Viewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
