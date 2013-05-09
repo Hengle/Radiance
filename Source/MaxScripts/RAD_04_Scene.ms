@@ -40,11 +40,20 @@ function RAD_GatherCameras objs = (
 	return RAD_Filter objs #(Targetcamera, Freecamera)
 )
 
-function RAD_GatherLights objs = (
-	return RAD_Filter objs kRADLightTypes
+function RAD_GatherEnabledLights objs = (
+	x = RAD_Filter objs kRADLightTypes
+	z = #()
+	
+	for l in x do (
+		if (l.on) then (
+			append z l
+		)
+	)
+	
+	z
 )
 
-function RAD_ExportObjectsToSceneFile objs doMeshes doAnims doLights fileName = (
+function RAD_ExportObjectsToSceneFile objs doMeshes doAnims doLights suppressDialogs fileName = (
 	file = fopen fileName "wb"
 	if (file == undefined) then (
 		messagebox ("cannot open " + fileName + " for write!")
@@ -106,11 +115,12 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims doLights fileName = 
 		)
 		
 		if (doLights) then (
-			_lights = RAD_GatherLights objs
+			_lights = RAD_GatherEnabledLights objs
 			
 			WriteLong file _lights.count #unsigned
 			
 			for x in _lights do (
+				
 				print ("Exporting light " + x.name)
 				WriteString file x.name
 				WriteFloat file x.pos.x
@@ -285,11 +295,14 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims doLights fileName = 
 	fflush file		
 	fclose file
 	progressEnd()
-	if (cancel) then (messagebox "Export failed.")
-	else (messagebox ("Exported " + (numtris as String) + " tri(s) in " + (objs.count as String) + " object(s)."))
+	
+	if (not suppressDialogs) then (
+		if (cancel) then (messagebox "Export failed.")
+		else (messagebox ("Exported " + (numtris as String) + " tri(s) in " + (objs.count as String) + " object(s)."))
+	)
 )
 
-function RAD_ExportScene selectionOnly exportHidden doMeshes doAnims doLights filename = (
+function RAD_ExportScene selectionOnly exportHidden doMeshes doAnims doLights suppressDialogs filename = (
 
 	objs = objects;
 	oldSelection = selection
@@ -306,7 +319,7 @@ function RAD_ExportScene selectionOnly exportHidden doMeshes doAnims doLights fi
 	)
 	
 	disableSceneRedraw()
-	RAD_ExportObjectsToSceneFile objs doMeshes doAnims doLights filename
+	RAD_ExportObjectsToSceneFile objs doMeshes doAnims doLights suppressDialogs filename
 	enableSceneRedraw()
 	clearSelection()
 	select oldSelection

@@ -59,7 +59,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:762
 		if (file == undefined) then return undefined
 		RadianceUtil_lastSceneFile = file
 		
-		RAD_ExportScene selectionOnlyCheckbox.checked exportHiddenCheckbox.checked doMeshes doAnims doLights file
+		RAD_ExportScene selectionOnlyCheckbox.checked exportHiddenCheckbox.checked doMeshes doAnims doLights false file
 	)
 	
 	function enableMeshControls val = (
