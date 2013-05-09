@@ -238,6 +238,8 @@ private:
 		return const_cast<WaveAnim*>(&m_specularWave);
 	}
 
+	typedef boost::array<int, kMaterialTextureSource_MaxIndices> MTSU8;
+
 	// Basically I want materials that can to share a Shader::Ref to minimize
 	// the cost of material changes (i.e. I can sort materials by shader and
 	// not incur a GLSL/HLSL program change for every material).
@@ -281,6 +283,8 @@ private:
 		kMaterialTextureSource_MaxIndices> types;
 
 		boost::array<int, kMaxTextures> uvIndices;
+
+		MTSU8 tcGen;
 
 		String shaderName;
 		WRefList::iterator it;
@@ -336,7 +340,6 @@ private:
 	boost::array<float, kMaterialTextureSource_MaxIndices> m_textureFPS;
 	boost::array<U8, kMaterialTextureSource_MaxIndices> m_textureClamp;
 	typedef boost::array<int, kMaterialTextureSource_MaxIndices> MTSInts;
-	typedef boost::array<int, kMaterialTextureSource_MaxIndices> MTSU8;
 
 	MTSInts m_ids;
 	MTSU8 m_tcGen;

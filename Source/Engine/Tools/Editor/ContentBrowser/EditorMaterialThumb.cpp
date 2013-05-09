@@ -233,7 +233,9 @@ bool MaterialThumb::Render(const pkg::Package::Entry::Ref &entry, int x, int y, 
 		gl.Translatef(x + w/2, y + h/2, 0.0f);
 
 		t->material->shader->Begin(Shader::kPass_Preview, *t->material.get());
-		t->material->shader->BindStates();
+		Shader::Uniforms u(Shader::Uniforms::kDefault);
+		u.eyePos = Vec3(-10.f, -10.f, -10.f);
+		t->material->shader->BindStates(u);
 		gls.Commit();
 		
 		gl.DrawElements(GL_TRIANGLES, (OverlayDiv-1)*(OverlayDiv-1)*6, GL_UNSIGNED_SHORT, 0);

@@ -41,6 +41,7 @@ Material::ShaderInstance::ShaderInstance() {
 		for (int k = 0; k < kNumTCMods; ++k) {
 			types[i][k] = WaveAnim::T_Identity;
 		}
+		tcGen[i] = -1;
 	}
 #endif
 }
@@ -70,6 +71,8 @@ bool Material::ShaderInstance::CanShare(const Material &m) const {
 	}
 
 	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
+		if (tcGen[i] != m.TCGen(i))
+			return false;
 		for (int k = 0; k < kNumTCMods; ++k) {
 			if (m.Wave(i, k, Material::kTexCoord_S).type != types[i][k]) {
 				return false;
@@ -87,6 +90,7 @@ void Material::ShaderInstance::CopySharedData(const Material &m) {
 		uvIndices[i] = m.TCUVIndex(i);
 
 	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
+		tcGen[i] = m.TCGen(i);
 		for (int k = 0; k < kNumTCMods; ++k) {
 			types[i][k] = m.Wave(i, k, Material::kTexCoord_S).type;
 		}

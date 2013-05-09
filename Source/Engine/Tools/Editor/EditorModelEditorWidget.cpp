@@ -394,9 +394,9 @@ void ModelEditorWidget::OnRenderGL(GLWidget &src) {
 	);
 
 	r::Shader::Uniforms u(r::Shader::Uniforms::kDefault);
+	u.eyePos = m_glw->camera->pos;
 
 	if (m_lighting->isChecked()) {
-		u.eyePos = m_glw->camera->pos;
 		u.lights.numLights = 1;
 		u.lights.lights[0].radius = m_lightRadius;
 		u.lights.lights[0].brightness = m_lightBrightness;

@@ -116,6 +116,7 @@ bool GLSLTool::Assemble(
 		if (vertexShader) {
 			Shader::IntSet tcInputs;
 			
+			bool genReflect = false;
 			for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
 				if (mapping.tcMods[i] == r::kInvalidMapping)
 					break;
@@ -135,8 +136,13 @@ bool GLSLTool::Assemble(
 					ss << "#define TEXCOORD" << i << "_TURB\r\n";
 
 				int tcGen = material.TCGen(tcIndex);
-				if (tcGen == r::Material::kTCGen_EnvMap)
+				if (tcGen == r::Material::kTCGen_EnvMap) {
+					if (!genReflect) {
+						genReflect = true;
+						ss << "#define GENREFLECT\r\n";
+					}
 					ss << "#define TEXCOORD" << i << "_GENREFLECT\r\n";
+				}
 			}
 
 			ss << "#define TCINPUTS " << tcInputs.size() << "\r\n";
