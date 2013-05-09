@@ -398,14 +398,6 @@ void WorldCinematics::Tick(int frame, float dt) {
 					c.updateFrame = -1; // this will force this cinematic to be ticked again in this loop.
 					c.trigger = m_bspFile->CinematicTriggers()+c.cinematic->firstTrigger;
 					++c.loopCount;
-
-					Cinematic::Ref r = *it; // keep us around in case OnComplete stops us.
-
-					if (c.notify)
-						c.notify->OnComplete();
-
-					// NOTE: it may now be invalid since OnComplete() may have stopped us.
-					it = m_cinematics.begin();
 					continue; // jump to start.
 				} else if (!(c.flags&kCinematicFlag_CanPlayForever) && !numActive) {
 #if !defined(RAD_TARGET_GOLDEN)
