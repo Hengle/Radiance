@@ -23,7 +23,8 @@ m_prev(0),
 m_next(0),
 m_world(w),
 m_markFrame(-1),
-m_visFrame(-1) {
+m_visFrame(-1),
+m_drawFrame(-1) {
 	m_shColor = Vec4(0,0,0,1);
 	m_spColor = Vec3(1,1,1);
 	m_dfColor = Vec3(1,1,1);

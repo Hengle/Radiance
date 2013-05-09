@@ -93,7 +93,12 @@ public:
 
 	virtual void BindLitMaterialStates(
 		r::Material &mat,
-		const BBox *scissorBounds
+		const Vec4 *scissorBounds
+	) = 0;
+
+	virtual bool CalcBoundsScissor(
+		const BBox &bounds,
+		Vec4 &rect
 	) = 0;
 
 	// Post Process FX
@@ -176,6 +181,7 @@ public:
 		int testedEntityModels;
 		int drawnEntityModels;
 		int testedLights;
+		int visLights;
 		int drawnLights;
 		int numBatches;
 		int numTris;
@@ -215,8 +221,7 @@ private:
 	friend class World;
 	friend class MBatchDraw;
 	friend struct details::MBatch;
-	typedef zone_vector<BBox, ZWorldT>::type BBoxVec;
-
+	
 	struct LocalMaterial {
 		pkg::Asset::Ref asset;
 		asset::MaterialLoader *loader;
@@ -443,9 +448,13 @@ private:
 
 #if defined(WORLD_DEBUG_DRAW)
 
+	typedef zone_vector<BBox, ZWorldT>::type BBoxVec;
+	typedef zone_vector<Vec4, ZWorldT>::type Vec4Vec;
+
 	struct DebugVars {
 		BBoxVec debugEntityBBoxes;
 		BBoxVec debugWorldBBoxes;
+		Vec4Vec debugLightScissors;
 		LocalMaterial debugWireframe_M;
 		LocalMaterial debugPortal_M[2];
 		LocalMaterial debugWorldBBox_M;
@@ -456,6 +465,10 @@ private:
 	int  LoadDebugMaterials();
 	void DebugDrawPortals(ViewDef &view);
 	void DebugDrawAreaportals(int area);
+	void DebugDrawLightScissors();
+	void DebugDrawRects(const LocalMaterial &material, const Vec4Vec &rects);
+	void DebugDrawRect(const LocalMaterial &material, const Vec4 &rect);
+	void DebugDrawRectBatch(const LocalMaterial &material, const Vec4 &rect);
 	void DebugDrawBBoxes(const LocalMaterial &material, const BBoxVec &bboxes, bool wireframe);
 	void DebugDrawBBox(const LocalMaterial &material, const BBox &bbox, bool wireframe);
 	void DebugDrawBBoxBatch(const LocalMaterial &material, const BBox &bbox, bool wireframe);

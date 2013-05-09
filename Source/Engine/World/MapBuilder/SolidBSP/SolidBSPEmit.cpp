@@ -209,6 +209,9 @@ bool BSPBuilder::EmitSceneOmniLights() {
 	for (SceneFile::OmniLight::Vec::const_iterator it = m_map->omniLights.begin(); it != m_map->omniLights.end(); ++it) {
 		const SceneFile::OmniLight::Ref &light = *it;
 
+		if (!(light->flags&(SceneFile::kLightFlag_AffectObjects|SceneFile::kLightFlag_AffectPlayer|SceneFile::kLightFlag_AffectWorld)))
+			continue; // light doesn't do anything
+
 		e->origin = light->pos;
 		
 		e->keys.pairs.erase(CStr("targetname"));

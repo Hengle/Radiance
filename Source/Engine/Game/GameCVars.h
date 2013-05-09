@@ -21,6 +21,8 @@ public:
 	CVarBool r_showwaypoints;
 	CVarBool r_showmovecmds;
 	CVarBool r_frustumcull;
+	CVarBool r_lightscissor;
+	CVarBool r_showlightscissor;
 
 	void AddLuaVar(const CVar::Ref &cvar) {
 		m_vec.push_back(cvar);

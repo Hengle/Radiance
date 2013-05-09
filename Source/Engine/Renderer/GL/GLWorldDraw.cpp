@@ -270,81 +270,20 @@ void GLWorldDraw::ReleaseArrayStates() {
 
 void GLWorldDraw::BindLitMaterialStates(
 	r::Material &mat,
-	const BBox *scissorBounds
+	const Vec4 *rect
 ) {
 	int flags = kDepthTest_Equal|kDepthWriteMask_Disable;
 
-	if (scissorBounds && !scissorBounds->Contains(world->camera->pos)) {
+	if (rect) {
 		boost::array<int, 4> viewport;
 		world->game->Viewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
-		gl.MatrixMode(GL_PROJECTION);
-		gl.PushMatrix();
-		gl.MatrixMode(GL_MODELVIEW);
-		gl.PushMatrix();
-
-		bool tempRTFB = m_rtFB;
-		m_rtFB = false;
-	
-		SetPerspectiveMatrix();
-		RotateForCamera(*world->camera.get());
-
-		m_rtFB = tempRTFB;
-	
-		boost::array<int, 4> scissor;
-
-		scissor[0] = std::numeric_limits<int>::max();
-		scissor[1] = std::numeric_limits<int>::max();
-		scissor[2] = std::numeric_limits<int>::min();
-		scissor[3] = std::numeric_limits<int>::min();
-
-		for (int x = 0; x < 2; ++x) {
-			float fx = x ? scissorBounds->Maxs()[0] : scissorBounds->Mins()[0];
-
-			for (int y = 0; y < 2; ++y) {
-
-				float fy = y ? scissorBounds->Maxs()[1] : scissorBounds->Mins()[1];
-
-				for (int z = 0; z < 2; ++z) {
-
-					float fz = z ? scissorBounds->Maxs()[2] : scissorBounds->Mins()[2];
-
-					Vec3 p;
-					bool r = ::Project(
-						gl.GetModelViewProjectionMatrix(),
-						&viewport[0],
-						Vec3(fx, fy, fz),
-						p
-					);
-
-					// clamp
-					if (r) {
-						scissor[0] = math::Min(scissor[0], FloatToInt(p[0]));
-						scissor[1] = math::Min(scissor[1], FloatToInt(p[1]));
-						scissor[2] = math::Max(scissor[2], FloatToInt(p[0]));
-						scissor[3] = math::Max(scissor[3], FloatToInt(p[1]));
-					}
-				}
-			}
-		}
-
-		// clamp
-		scissor[0] = math::Clamp(scissor[0], viewport[0], viewport[0]+viewport[2]);
-		scissor[1] = math::Clamp(scissor[1], viewport[1], viewport[1]+viewport[3]);
-		scissor[2] = math::Clamp(scissor[2], viewport[0], viewport[0]+viewport[2]);
-		scissor[3] = math::Clamp(scissor[3], viewport[1], viewport[1]+viewport[3]);
-
-		gl.MatrixMode(GL_PROJECTION);
-		gl.PopMatrix();
-		gl.MatrixMode(GL_MODELVIEW);
-		gl.PopMatrix();
-
 		flags |= kScissorTest_Enable;
 		gls.Scissor(
-			scissor[0],
-			scissor[3],
-			scissor[1]-scissor[0],
-			scissor[3]-scissor[1]
+			FloatToInt((*rect)[0]),
+			viewport[3]-FloatToInt((*rect)[3]),
+			FloatToInt((*rect)[2])-FloatToInt((*rect)[0]),
+			FloatToInt((*rect)[3]-(*rect)[1])
 		);
 	}
 
@@ -353,6 +292,85 @@ void GLWorldDraw::BindLitMaterialStates(
 		bm = kBlendModeSource_One|kBlendModeDest_One; // additive
 
 	mat.BindStates(flags, bm);
+}
+
+bool GLWorldDraw::CalcBoundsScissor(
+	const BBox &bounds,
+	Vec4 &rect
+) {
+	if (bounds.Contains(world->camera->pos))
+		return false;
+
+	boost::array<int, 4> viewport;
+	world->game->Viewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+
+	boost::array<float, 4> fviewport;
+	for (int i = 0; i < 4; ++i)
+		fviewport[i] = (float)viewport[i];
+
+	gl.MatrixMode(GL_PROJECTION);
+	gl.PushMatrix();
+	gl.MatrixMode(GL_MODELVIEW);
+	gl.PushMatrix();
+
+	bool tempRTFB = m_rtFB;
+	m_rtFB = false;
+	
+	SetPerspectiveMatrix();
+	RotateForCamera(*world->camera.get());
+
+	m_rtFB = tempRTFB;
+
+	rect[0] = std::numeric_limits<float>::max();
+	rect[1] = std::numeric_limits<float>::max();
+	rect[2] = std::numeric_limits<float>::min();
+	rect[3] = std::numeric_limits<float>::min();
+
+	for (int x = 0; x < 2; ++x) {
+		float fx = x ? bounds.Maxs()[0] : bounds.Mins()[0];
+
+		for (int y = 0; y < 2; ++y) {
+
+			float fy = y ? bounds.Maxs()[1] : bounds.Mins()[1];
+
+			for (int z = 0; z < 2; ++z) {
+
+				float fz = z ? bounds.Maxs()[2] : bounds.Mins()[2];
+
+				Vec3 p;
+				::Project(
+					gl.GetModelViewProjectionMatrix(),
+					&viewport[0],
+					Vec3(fx, fy, fz),
+					p
+				);
+
+				// clamp
+				rect[0] = math::Min(rect[0], p[0]);
+				rect[1] = math::Min(rect[1], p[1]);
+				rect[2] = math::Max(rect[2], p[0]);
+				rect[3] = math::Max(rect[3], p[1]);
+			}
+		}
+	}
+
+	// clamp
+	rect[0] = math::Clamp(rect[0], fviewport[0], fviewport[0]+fviewport[2]);
+	rect[1] = math::Clamp(rect[1], fviewport[1], fviewport[1]+fviewport[3]);
+	rect[2] = math::Clamp(rect[2], fviewport[0], fviewport[0]+fviewport[2]);
+	rect[3] = math::Clamp(rect[3], fviewport[1], fviewport[1]+fviewport[3]);
+
+	gl.MatrixMode(GL_PROJECTION);
+	gl.PopMatrix();
+	gl.MatrixMode(GL_MODELVIEW);
+	gl.PopMatrix();
+
+	if ((rect[0] == fviewport[0]) && (rect[1] == fviewport[1]) &&
+		(rect[2] == (fviewport[0]+fviewport[2])) && (rect[3] == (fviewport[1]+fviewport[3]))) {
+		return false;
+	}
+
+	return true;
 }
 
 void GLWorldDraw::SetWorldStates() {

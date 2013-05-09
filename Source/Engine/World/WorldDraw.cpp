@@ -102,6 +102,7 @@ void WorldDraw::Counters::Clear() {
 	testedEntityModels = 0;
 	drawnEntityModels = 0;
 	testedLights = 0;
+	visLights = 0;
 	drawnLights = 0;
 	numBatches = 0;
 	numTris = 0;
@@ -465,9 +466,17 @@ void WorldDraw::VisMarkArea(
 
 			
 			if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, bounds)) {
-				++m_counters.drawnLights;
+				++m_counters.visLights;
 				light.m_visFrame = m_markFrame;
 				view.visLights.push_back(&light);
+#if defined(WORLD_DEBUG_DRAW)
+				if (m_world->cvars->r_showlightscissor.value) {
+					Vec4 scissorRect;
+					if (m_rb->CalcBoundsScissor(bounds, scissorRect)) {
+						m_dbgVars.debugLightScissors.push_back(scissorRect);
+					}
+				}
+#endif
 			}
 		}
 	}
@@ -652,6 +661,12 @@ void WorldDraw::DrawView() {
 		DebugDrawFloorMoves();
 	}
 
+	// NOTE: scissor draw destroys perspective transform
+	if (m_world->cvars->r_showlightscissor.value) {
+		DebugDrawLightScissors();
+		m_dbgVars.debugLightScissors.clear();
+	}
+
 #endif
 }
 
@@ -710,7 +725,6 @@ void WorldDraw::DrawUnlitBatch(const details::MBatch &batch, bool wireframe) {
 #else
 	r::Material *mat = batch.matRef->mat;
 #endif
-	bool first = true;
 
 	mat->BindStates();
 	if (!wireframe)
@@ -724,11 +738,6 @@ void WorldDraw::DrawUnlitBatch(const details::MBatch &batch, bool wireframe) {
 		if (tx) {
 			m_rb->PushMatrix(pos, draw->scale, angles);
 			invTx = Mat4::Translation(-pos) * (Mat4::Rotation(QuatFromAngles(angles)).Transpose());
-		}
-
-		if (first && !wireframe) {
-			first = false;
-			++m_counters.numMaterials;
 		}
 
 		if (!wireframe)

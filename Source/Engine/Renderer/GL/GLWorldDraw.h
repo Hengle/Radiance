@@ -47,7 +47,12 @@ public:
 
 	virtual void BindLitMaterialStates(
 		r::Material &mat,
-		const BBox *scissorBounds
+		const Vec4 *scissorBounds
+	);
+
+	virtual bool CalcBoundsScissor(
+		const BBox &bounds,
+		Vec4 &rect
 	);
 
 	virtual void BindPostFXTargets(bool chain);

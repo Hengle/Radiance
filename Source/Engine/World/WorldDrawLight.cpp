@@ -7,6 +7,7 @@
 
 #include RADPCH
 #include "World.h"
+#include "../Game/GameCVars.h"
 #include "Light.h"
 #include "Entity.h"
 #include "Occupant.h"
@@ -104,8 +105,6 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 		m_rb->PushMatrix(pos, draw.scale, angles);
 		invTx = Mat4::Translation(-pos) * (Mat4::Rotation(QuatFromAngles(angles)).Transpose());
 	}
-	
-	++m_counters.numBatches;
 
 	// draw all unshadowed lights
 	r::Shader::Uniforms u(draw.rgba.get());
@@ -152,9 +151,15 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 					}
 
 					if (add) {
+						if (interaction->light->m_drawFrame != m_markFrame) {
+							interaction->light->m_drawFrame = m_markFrame;
+							++m_counters.drawnLights;
+						}
 						r::LightDef &lightDef = u.lights.lights[u.lights.numLights++];
 						GenLightDef(*interaction->light, lightDef, tx ? &invTx : 0);
-						lightBounds.Insert(interaction->light->bounds);
+						BBox bounds(interaction->light->bounds);
+						bounds.Translate(interaction->light->pos);
+						lightBounds.Insert(bounds);
 					}
 				}
 
@@ -184,12 +189,21 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 					draw.Bind(mat.shader.get().get());
 				}
 
-				m_rb->BindLitMaterialStates(mat, 0);
+				Vec4 scissorRect;
+				bool scissor = false;
+				
+				if (m_world->cvars->r_lightscissor.value) {
+					scissor = m_rb->CalcBoundsScissor(lightBounds, scissorRect);
+				}
+
+				m_rb->BindLitMaterialStates(mat, scissor ? &scissorRect : 0);
 
 				mat.shader->BindStates(u);
 				m_rb->CommitStates();
 				draw.CompileArrayStates(*mat.shader.get());
 				draw.Draw();
+
+				++m_counters.numBatches;
 			}
 		}
 

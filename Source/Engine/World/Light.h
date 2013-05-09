@@ -142,6 +142,7 @@ private:
 	LightStyle m_style;
 	int m_markFrame;
 	int m_visFrame;
+	int m_drawFrame;
 	int m_interactionFlags;
 	dBSPLeaf *m_leaf;
 	Light *m_prev;

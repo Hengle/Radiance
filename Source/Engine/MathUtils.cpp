@@ -59,6 +59,10 @@ RADENG_API bool RADENG_CALL Project(const Mat4 &mvp, int viewport[4], const Vec3
 	Vec4 x(p, 1.f);
 	Vec4 z = mvp.Transform(x);
 	
+	bool front = z[3] > 0.f;
+	if (z[3] < 0)
+		z[3] = -z[3];
+
 	if (z[3] != 0.f) {
 		out[0] = z[0] / z[3];
 		out[1] = z[1] / z[3];
@@ -68,7 +72,7 @@ RADENG_API bool RADENG_CALL Project(const Mat4 &mvp, int viewport[4], const Vec3
 		out[1] = viewport[3]-((out[1]+1)*0.5f*viewport[3]+viewport[1]);
 	}
 	
-	return z[3] > 0.f;
+	return front;
 }
 
 RADENG_API float RADENG_CALL LerpSin(float t) {

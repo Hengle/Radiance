@@ -90,6 +90,45 @@ void WorldDraw::DebugDrawAreaportals(int areaNum) {
 	}
 }
 
+void WorldDraw::DebugDrawLightScissors() {
+	m_rb->SetScreenLocalMatrix();
+	DebugDrawRects(m_dbgVars.debugWireframe_M, m_dbgVars.debugLightScissors);
+}
+
+void WorldDraw::DebugDrawRects(const LocalMaterial &material, const Vec4Vec &rects) {
+	material.mat->BindStates();
+	material.mat->BindTextures(material.loader);
+	material.mat->shader->Begin(r::Shader::kPass_Default, *material.mat);
+
+	for (Vec4Vec::const_iterator it = rects.begin(); it != rects.end(); ++it)
+		DebugDrawRectBatch(material, *it);
+
+	material.mat->shader->End();
+}
+
+void WorldDraw::DebugDrawRect(const LocalMaterial &material, const Vec4 &rect) {
+	m_rb->SetScreenLocalMatrix();
+	material.mat->BindStates();
+	material.mat->BindTextures(material.loader);
+	material.mat->shader->Begin(r::Shader::kPass_Default, *material.mat);
+	DebugDrawRectBatch(material, rect);
+	material.mat->shader->End();
+}
+
+void WorldDraw::DebugDrawRectBatch(const LocalMaterial &material, const Vec4 &rect) {
+	Vec3 verts[4];
+
+	verts[0] = Vec3(rect[0], rect[1], 0.f);
+	verts[1] = Vec3(rect[0], rect[3], 0.f);
+	verts[2] = Vec3(rect[2], rect[3], 0.f);
+	verts[3] = Vec3(rect[2], rect[1], 0.f);
+
+	m_rb->DebugUploadVerts(verts, 4);
+	material.mat->shader->BindStates();
+	m_rb->CommitStates();
+	m_rb->DebugDrawLineLoop(4);
+}
+
 void WorldDraw::DebugDrawBBoxes(const LocalMaterial &material, const BBoxVec &bboxes, bool wireframe) {
 	if (bboxes.empty())
 		return;
