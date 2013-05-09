@@ -129,8 +129,10 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 			lightBounds.Initialize();
 
 			while (interaction && (u.lights.numLights < r::kMaxLights)) {
-				if (interaction->light->m_visFrame != m_markFrame)
+				if (interaction->light->m_visFrame != m_markFrame) {
+					interaction = interaction->nextOnBatch;
 					continue; // not visible this frame.
+				}
 
 				Light::LightStyle style = interaction->light->style;
 
@@ -508,10 +510,18 @@ void WorldDraw::LinkInteraction(
 ) {
 	interaction.prevOnLight = 0;
 	interaction.nextOnLight = headOnLight;
+
+	if (headOnLight)
+		headOnLight->prevOnLight = &interaction;
+
 	headOnLight = &interaction;
 
 	interaction.prevOnBatch = 0;
 	interaction.nextOnBatch = headOnBatch;
+
+	if (headOnBatch)
+		headOnBatch->prevOnBatch = &interaction;
+
 	headOnBatch = &interaction;
 }
 
@@ -520,7 +530,7 @@ void WorldDraw::UnlinkInteraction(
 	details::LightInteraction *&headOnLight,
 	details::LightInteraction *&headOnBatch
 ) {
-	if (headOnLight = &interaction)
+	if (headOnLight == &interaction)
 		headOnLight = interaction.nextOnLight;
 	if (interaction.nextOnLight)
 		interaction.nextOnLight->prevOnLight = interaction.prevOnLight;
@@ -528,7 +538,7 @@ void WorldDraw::UnlinkInteraction(
 		interaction.prevOnLight->nextOnLight = interaction.nextOnLight;
 
 
-	if (headOnBatch = &interaction)
+	if (headOnBatch == &interaction)
 		headOnBatch = interaction.nextOnBatch;
 	if (interaction.nextOnBatch)
 		interaction.nextOnBatch->prevOnBatch = interaction.prevOnBatch;
