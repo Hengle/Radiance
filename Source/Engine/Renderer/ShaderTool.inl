@@ -119,12 +119,6 @@ inline const char *Shader::Node::RAD_IMPLEMENT_GET(alias) {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-inline Shader::Shader(
-	const char *name,
-	r::Material::SkinMode skinMode
-) : m_name(name), m_skinMode(skinMode) {
-}
-
 inline Shader::~Shader() {
 }
 

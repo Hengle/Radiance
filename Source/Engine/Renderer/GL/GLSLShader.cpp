@@ -58,7 +58,7 @@ GLSLShader::Ref GLSLShader::Load(
 	const char *name,
 	const Material &material
 ) {
-	tools::shader_utils::Shader::Ref shader = GLShader::Cache()->Load(engine, name, material.skinMode);
+	tools::shader_utils::Shader::Ref shader = GLShader::Cache()->Load(engine, name, material);
 	if (shader) {
 		GLSLShader::Ref r(new (ZRender) GLSLShader());
 		r->m_name = name;
@@ -239,7 +239,7 @@ bool GLSLShader::CompileShaderSource(
 	const Material &material
 ) {
 	tools::shader_utils::Shader::Ref shader = 
-		GLShader::Cache()->Load(engine, m_name.c_str, material.skinMode);
+		GLShader::Cache()->Load(engine, m_name.c_str, material);
 	if (!shader)
 		return false;
 

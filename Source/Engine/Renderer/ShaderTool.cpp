@@ -68,10 +68,22 @@ lua::SrcBuffer::Ref Shader::ImportLoader::Load(lua_State *L, const char *name) {
 	return lua::SrcBuffer::Ref(new lua::FileSrcBuffer(name, mm));
 };
 
+Shader::Shader(
+	const char *name,
+	const r::Material &m
+) : m_name(name), m_skinMode(m.skinMode), m_genReflect(false) {
+	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
+		if (m.TCGen(i) == r::Material::kTCGen_EnvMap) {
+			m_genReflect = true;
+			break;
+		}
+	}
+}
+
 Shader::Ref Shader::Load(
 	Engine &e, 
 	const char *name,
-	r::Material::SkinMode skinMode
+	const r::Material &mat
 ) {
 	String path(CStr("@r:/Source/Shaders/"));
 	path += name;
@@ -83,7 +95,7 @@ Shader::Ref Shader::Load(
 		return Ref();
 	}
 
-	Shader::Ref m(new (ZTools) Shader(name, skinMode));
+	Shader::Ref m(new (ZTools) Shader(name, mat));
 	lua::State::Ref L = InitLuaM(e, m.get());
 
 	if (luaL_loadbuffer(
@@ -1042,6 +1054,11 @@ void Shader::BuildInputMappings(lua_State *L, r::Shader::Pass pass) {
 		// NOTE: bitangent is computed by vertex shader if LightTangentVec/LightTangentHalfVec is accessed.
 	}
 
+	if (m_genReflect) {
+		// normals are required for environment mapping.
+		usage.s[kMaterialSource_Normal].insert(0);
+	}
+
 	BuildAttributeSourceMapping(
 		L, 
 		numAttrs, 
@@ -1747,17 +1764,17 @@ Shader::Node::Ref Shader::Node::Clone() const {
 Shader::Ref ShaderCache::Load(
 	Engine &engine, 
 	const char *name,
-	r::Material::SkinMode skinMode
+	const r::Material &mat
 ) {
 	RAD_ASSERT(name);
 	String sname(name);
-	ShaderMap::const_iterator it = m_shaders[skinMode].find(sname);
-	if (it != m_shaders[skinMode].end())
+	ShaderMap::const_iterator it = m_shaders[mat.skinMode].find(sname);
+	if (it != m_shaders[mat.skinMode].end())
 		return it->second;
 
-	Shader::Ref m = Shader::Load(engine, name, skinMode);
+	Shader::Ref m = Shader::Load(engine, name, mat);
 	if (m)
-		m_shaders[skinMode][sname] = m;
+		m_shaders[mat.skinMode][sname] = m;
 
 	return m;
 }

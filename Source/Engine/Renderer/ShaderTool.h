@@ -245,7 +245,7 @@ public:
 	static Ref Load(
 		Engine &engine, 
 		const char *name,
-		r::Material::SkinMode skinMode
+		const r::Material &m
 	);
 
 	//! Emits supporting shader functions.
@@ -285,7 +285,7 @@ public:
 private:
 	Shader(
 		const char *name, 
-		r::Material::SkinMode skinMode
+		const r::Material &m
 	);
 	
 	typedef zone_map<String, Node::Ref, ZToolsT>::type NodeMap;
@@ -440,6 +440,7 @@ private:
 	ImportLoader m_impLoader;
 	String m_name;
 	r::Material::SkinMode m_skinMode;
+	bool m_genReflect;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -452,7 +453,7 @@ public:
 	Shader::Ref Load(
 		Engine &engine, 
 		const char *name,
-		r::Material::SkinMode skinMode
+		const r::Material &m
 	);
 
 private:
