@@ -224,9 +224,11 @@ bool ModelEditorWidget::Load() {
 
 	if (m_asset) {
 		
+		int fastFlags = (MainWindow::Get()->lowQualityPreview) ? pkg::P_FastCook : 0;
+
 		int r = m_asset->Process(
 			xtime::TimeSlice::Infinite,
-			pkg::P_Load|pkg::P_FastPath
+			pkg::P_Load|pkg::P_FastPath|fastFlags
 		);
 
 		if (r != pkg::SR_Success) {
@@ -548,8 +550,6 @@ void ModelEditorWidget::DrawMesh(
 			mat.shader->Begin(Shader::kPass_DiffuseSpecular1, mat);
 		} else if (mat.shader->HasPass(Shader::kPass_Diffuse1)) {
 			mat.shader->Begin(Shader::kPass_Diffuse1, mat);
-		} else if (mat.shader->HasPass(Shader::kPass_Specular1)) {
-			mat.shader->Begin(Shader::kPass_Specular1, mat);
 		} else {
 			mat.shader->Begin(Shader::kPass_Preview, mat);
 		}

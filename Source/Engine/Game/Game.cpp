@@ -21,6 +21,10 @@
 #include "../Renderer/GL/GLState.h"
 #endif
 
+#if defined(RAD_OPT_PC_TOOLS)
+#include "../Tools/Editor/EditorMainWindow.h"
+#endif
+
 #include <algorithm>
 
 #undef min
@@ -185,6 +189,10 @@ bool Game::LoadMapSeq(int id, int slot, world::UnloadDisposition ud, bool play) 
 
 	int r = pkg::SR_Pending;
 
+#if defined(RAD_OPT_PC_TOOLS)
+	int kLoadFlags = (tools::editor::MainWindow::Get()->lowQualityPreview) ? pkg::P_FastCook : 0;
+#endif
+
 	while (r == pkg::SR_Pending) {
 		xtime::TimeVal start = xtime::ReadMilliseconds();
 		xtime::TimeSlice slice(100);
@@ -192,6 +200,9 @@ bool Game::LoadMapSeq(int id, int slot, world::UnloadDisposition ud, bool play) 
 		r = map->Process(
 			slice,
 			pkg::P_Load|pkg::P_FastPath
+#if defined(RAD_OPT_PC_TOOLS)
+			| kLoadFlags
+#endif
 		);
 
 		xtime::TimeVal elapsed = xtime::ReadMilliseconds() - start;

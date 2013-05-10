@@ -160,14 +160,15 @@ int TextureParser::LoadCooked(
 
 			m_cooker = asset->AllocateIntermediateCooker();
 
-			CookStatus status = m_cooker->Status(P_TARGET_FLAGS(flags));
+			int fastCook = flags & P_FastCook;
+			CookStatus status = m_cooker->Status(P_TARGET_FLAGS(flags)|fastCook);
 
 			if (status == CS_Ignore)
 				return SR_CompilerError;
 
 			if (status == CS_NeedRebuild) {
 				COut(C_Info) << asset->path.get() << " is out of date, rebuilding..." << std::endl;
-				int r = m_cooker->Cook(P_TARGET_FLAGS(flags));
+				int r = m_cooker->Cook(P_TARGET_FLAGS(flags)|fastCook);
 				if (r != SR_Success)
 					return r;
 			}

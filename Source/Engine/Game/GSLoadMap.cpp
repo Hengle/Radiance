@@ -17,6 +17,7 @@
 
 #if defined(RAD_OPT_PC_TOOLS)
 #include <QtGui/QWidget>
+#include "../Tools/Editor/EditorMainWindow.h"
 #include "../Tools/Editor/EditorProgressDialog.h"
 #endif
 
@@ -82,12 +83,19 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 
 	bool first = firstTick;
 
+#if defined(RAD_OPT_PC_TOOLS)
+	const int kLoadFlags = (tools::editor::MainWindow::Get()->lowQualityPreview) ? pkg::P_FastCook : 0;
+#endif
+
 	while ((r == pkg::SR_Pending) && time.remaining) {
 		xtime::TimeVal start = xtime::ReadMilliseconds();
 		
 		r = m_map->Process(
 			time,
 			pkg::P_Load|pkg::P_FastPath
+#if defined(RAD_OPT_PC_TOOLS)
+			| kLoadFlags
+#endif
 		);
 
 		xtime::TimeVal elapsed = xtime::ReadMilliseconds() - start;

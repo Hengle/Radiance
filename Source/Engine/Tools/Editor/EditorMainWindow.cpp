@@ -128,6 +128,23 @@ bool MainWindow::Show() {
 
 	m_sound = SoundContext::New(m_app->engine->sys->alDriver);
 
+	QMenuBar *menuBar = new (ZEditor) QMenuBar(this);
+
+	m_dbgServersMenu = menuBar->addMenu("Debug");
+
+	QMenu *toolsMenu = menuBar->addMenu("Tools");
+
+	QAction *openCookerDialog = new (ZEditor) QAction("Cooker..", this);
+	RAD_VERIFY(connect(openCookerDialog, SIGNAL(triggered(bool)), SLOT(OpenCookerDialog())));
+	m_lowQualityPreview = new (ZEditor) QAction("LQ Preview", this);
+	m_lowQualityPreview->setCheckable(true);
+	m_lowQualityPreview->setChecked(m_userSettings.value("lq preview", true).toBool());
+	RAD_VERIFY(connect(m_lowQualityPreview, SIGNAL(triggered(bool)), SLOT(LowQualityPreview(bool))));
+	toolsMenu->addAction(m_lowQualityPreview);
+	toolsMenu->addAction(openCookerDialog);
+
+	QMenu *viewMenu = menuBar->addMenu("View");
+
 	m_logWinShowHide = new (ZEditor) QAction("Log Window", this);
 	m_logWinShowHide->setCheckable(true);
 	m_logWinShowHide->setChecked(true);
@@ -138,16 +155,6 @@ bool MainWindow::Show() {
 	m_zoneWinShowHide->setChecked(false);
 	RAD_VERIFY(connect(m_zoneWinShowHide, SIGNAL(triggered(bool)), SLOT(ShowHideZoneWindowTriggered(bool))));
 
-	QAction *openCookerDialog = new (ZEditor) QAction("Cooker..", this);
-	RAD_VERIFY(connect(openCookerDialog, SIGNAL(triggered(bool)), SLOT(OpenCookerDialog())));
-
-	QMenuBar *menuBar = new (ZEditor) QMenuBar(this);
-
-	m_dbgServersMenu = menuBar->addMenu("Debug");
-
-	QMenu *toolsMenu = menuBar->addMenu("Tools");
-	toolsMenu->addAction(openCookerDialog);
-	QMenu *viewMenu = menuBar->addMenu("View");
 	viewMenu->addAction(m_logWinShowHide);
 	viewMenu->addAction(m_zoneWinShowHide);
 
@@ -172,6 +179,14 @@ void MainWindow::ShowHideZoneWindowTriggered(bool checked) {
 			m_zoneWin->close();
 		m_zoneWin = 0;
 	}
+}
+
+void MainWindow::LowQualityPreview(bool checked) {
+	m_userSettings.setValue("lq preview", checked);
+}
+
+bool MainWindow::RAD_IMPLEMENT_GET(lowQualityPreview) {
+	return m_lowQualityPreview->isChecked();
 }
 
 void MainWindow::OpenCookerDialog() {

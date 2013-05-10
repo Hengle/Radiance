@@ -92,11 +92,10 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 	Mat4 invTx;
 
 	bool diffuse = mat.shader->HasPass(r::Shader::kPass_Diffuse1);
-	bool specular = mat.shader->HasPass(r::Shader::kPass_Specular1);
 	bool diffuseSpecular = mat.shader->HasPass(r::Shader::kPass_DiffuseSpecular1);
 
-	RAD_ASSERT_MSG(!(diffuse&&specular) || diffuseSpecular, "Shaders with diffuse and specular passes must also have combined DiffuseSpecular pass"); // sanity check on shader
-
+	RAD_ASSERT_MSG(diffuse, "All lighting shaders must have diffuse pass!");
+	
 	bool didDiffuse = false;
 	bool didDiffuseSpecular = false;
 
@@ -139,17 +138,11 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 					bool add = false;
 
 					if ((style&Light::kStyle_DiffuseSpecular) == Light::kStyle_DiffuseSpecular) {
-						add = diffuseSpecular || (!didDiffuseSpecular && (diffuse||specular));
+						add = !didDiffuseSpecular;
+					} else if (style&Light::kStyle_Diffuse) {
+						add = diffuse && (!diffuseSpecular || didDiffuseSpecular);
 					}
 					
-					if (style&Light::kStyle_Diffuse) {
-						add = add || (!diffuseSpecular && !didDiffuseSpecular && diffuse);
-					}
-
-					if (style&Light::kStyle_Specular) {
-						add = add || (!diffuseSpecular && !didDiffuseSpecular && specular);
-					}
-
 					if (add) {
 						if (interaction->light->m_drawFrame != m_markFrame) {
 							interaction->light->m_drawFrame = m_markFrame;
@@ -171,13 +164,11 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 				// find the correct pass
 				int pass;
 
-				if (diffuseSpecular) {
+				if (diffuseSpecular && !didDiffuseSpecular) {
 					pass = r::Shader::kPass_DiffuseSpecular1 + u.lights.numLights - 1;
-				} else if (diffuse) {
-					pass = r::Shader::kPass_Diffuse1 + u.lights.numLights - 1;
 				} else {
-					RAD_ASSERT(specular);
-					pass = r::Shader::kPass_Specular1 + u.lights.numLights - 1;
+					RAD_ASSERT(diffuse);
+					pass = r::Shader::kPass_Diffuse1 + u.lights.numLights - 1;
 				}
 
 				RAD_ASSERT(mat.shader->HasPass((r::Shader::Pass)pass));
@@ -207,12 +198,8 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 			}
 		}
 
-		if (diffuseSpecular) {
-			diffuseSpecular = false;
+		if (diffuseSpecular && !didDiffuseSpecular) {
 			didDiffuseSpecular = true;
-		} else if(diffuse) {
-			diffuse = false;
-			didDiffuse = true;
 		} else {
 			break;
 		}

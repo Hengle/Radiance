@@ -50,6 +50,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(MainWindow, logWindow, LogWindow*);
 	RAD_DECLARE_READONLY_PROPERTY(MainWindow, app, ::App*);
 	RAD_DECLARE_READONLY_PROPERTY(MainWindow, run, bool);
+	RAD_DECLARE_READONLY_PROPERTY(MainWindow, lowQualityPreview, bool);
 	RAD_DECLARE_READONLY_PROPERTY(MainWindow, glBase, QGLWidget*);
 	RAD_DECLARE_READONLY_PROPERTY(MainWindow, mdiArea, QMdiArea*);
 	RAD_DECLARE_READONLY_PROPERTY(MainWindow, userPrefs, QSettings*);
@@ -73,8 +74,9 @@ private slots:
 
 	void ShowHideLogWindowTriggered(bool checked);
 	void ShowHideZoneWindowTriggered(bool checked);
+	void LowQualityPreview(bool checked);
 	void OpenCookerDialog();
-
+	
 private:
 
 	void AppTick();
@@ -94,6 +96,8 @@ private:
 	RAD_DECLARE_GET(zoneWinShowHideAction, QAction*) { return m_zoneWinShowHide; }
 	RAD_DECLARE_GET(soundContext, SoundContext*) { return m_sound.get(); }
 
+	RAD_DECLARE_GET(lowQualityPreview, bool);
+
 	RAD_DECLARE_GET(mdiArea, QMdiArea*) {
 		return qobject_cast<QMdiArea*>(centralWidget());
 	}
@@ -106,6 +110,7 @@ private:
 	ContentBrowserWindow *m_contentBrowser;
 	QAction *m_logWinShowHide;
 	QAction *m_zoneWinShowHide;
+	QAction *m_lowQualityPreview;
 	QMenu *m_dbgServersMenu;
 	DebugConsoleMenuBuilder *m_dbgServersMenuBuilder;
 	::App *m_app;

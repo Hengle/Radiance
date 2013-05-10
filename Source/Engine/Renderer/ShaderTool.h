@@ -56,17 +56,25 @@ public:
 	typedef boost::shared_ptr<Node> NodeRef;
 	typedef boost::weak_ptr<Node> NodeWRef;
 
+	enum Precision {
+		kPrecision_High,
+		kPrecision_Medium,
+		kPrecision_Low
+	};
+
 	enum MaterialSource {
 		kMaterialSource_Node,
 		kMaterialSource_Texture,
 		kMaterialSource_Framebuffer,
 		kMaterialSource_Color, // constant
 		kMaterialSource_SpecularColor, // constant
+		kMaterialSource_SpecularExponent,
 		kMaterialSource_LightDiffuseColor, // constant (rgb) + w == brightness
 		kMaterialSource_LightSpecularColor, // constant (rgb) + w == exponent
 		kMaterialSource_LightPos, // model space (xyz) + w == radius
 		kMaterialSource_LightVec, // model space angle
 		kMaterialSource_LightHalfVec, // model space half angle
+		kMaterialSource_LightVertex, // light origin adjusted vertex (vertex - lightpos)
 		kMaterialSource_Vertex,
 		kMaterialSource_Normal,
 		kMaterialSource_Tangent,
@@ -241,6 +249,7 @@ public:
 	//////////////////////////////////////////////////////////////////////////////////////////
 
 	RAD_DECLARE_READONLY_PROPERTY(Shader, name, const char*);
+	RAD_DECLARE_READONLY_PROPERTY(Shader, precisionMode, Precision);
 	
 	static Ref Load(
 		Engine &engine, 
@@ -280,7 +289,9 @@ public:
 	) const;
 
 	//! Returns attribute usage map.
-	const IntSet &AttributeUsage(r::Shader::Pass pass, MaterialSource source);
+	const IntSet &AttributeUsage(r::Shader::Pass pass, MaterialSource source) const;
+
+	Precision SamplerPrecisionMode(int index) const;
 
 private:
 	Shader(
@@ -304,8 +315,11 @@ private:
 	static int lua_MNode(lua_State *L);
 	static int lua_NNode(lua_State *L);
 	static int lua_Compile(lua_State *L);
+	static int lua_SetPrecisionMode(lua_State *L);
+	static int lua_SetSamplerPrecision(lua_State *L);
 	static int lua_MColor(lua_State *L);
 	static int lua_MSpecularColor(lua_State *L);
+	static int lua_MSpecularExponent(lua_State *L);
 	static int lua_MTexture(lua_State *L);
 	static int lua_MFramebuffer(lua_State *L);
 	static int lua_MTexCoord(lua_State *L);
@@ -314,6 +328,7 @@ private:
 	static int lua_MLightPos(lua_State *L);
 	static int lua_MLightVec(lua_State *L);
 	static int lua_MLightHalfVec(lua_State *L);
+	static int lua_MLightVertex(lua_State *L);
 	static int lua_MLightDiffuseColor(lua_State *L);
 	static int lua_MLightSpecularColor(lua_State *L);
 	static int lua_MLightTanVec(lua_State *L);
@@ -326,6 +341,7 @@ private:
 	static lua::State::Ref InitLuaN(Node *n);
 
 	RAD_DECLARE_GET(name, const char*);
+	RAD_DECLARE_GET(precisionMode, Precision);
 
 	Node::Ref LoadNode(Engine &e, lua_State *L, const char *type);
 	
@@ -435,12 +451,14 @@ private:
 	boost::array<Usage, r::Shader::kNumPasses> m_usage;
 	boost::array<Root, r::Shader::kNumPasses> m_nodes;
 	boost::array<r::MaterialInputMappings, r::Shader::kNumPasses> m_mapping;
+	boost::array<Precision, r::kMaxTextures> m_samplerPrecision;
 	NodeMap m_types;
 	NodeVec m_instances;
 	ImportLoader m_impLoader;
 	String m_name;
 	r::Material::SkinMode m_skinMode;
 	bool m_genReflect;
+	Precision m_precisionMode;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////

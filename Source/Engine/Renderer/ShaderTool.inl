@@ -126,12 +126,20 @@ inline int Shader::MaterialSourceUsage(r::Shader::Pass pass, MaterialSource sour
 	return (int)m_usage[pass].s[source].size();
 }
 
-inline const Shader::IntSet &Shader::AttributeUsage(r::Shader::Pass pass, MaterialSource source) {
+inline const Shader::IntSet &Shader::AttributeUsage(r::Shader::Pass pass, MaterialSource source) const {
 	return m_usage[pass].s[source];
 }
 
 inline const char *Shader::RAD_IMPLEMENT_GET(name) {
 	return m_name.c_str;
+}
+
+inline Shader::Precision Shader::RAD_IMPLEMENT_GET(precisionMode) {
+	return m_precisionMode;
+}
+
+inline Shader::Precision Shader::SamplerPrecisionMode(int index) const {
+	return m_samplerPrecision[index];
 }
 
 } // shader_utils

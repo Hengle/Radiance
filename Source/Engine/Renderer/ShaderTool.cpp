@@ -71,13 +71,16 @@ lua::SrcBuffer::Ref Shader::ImportLoader::Load(lua_State *L, const char *name) {
 Shader::Shader(
 	const char *name,
 	const r::Material &m
-) : m_name(name), m_skinMode(m.skinMode), m_genReflect(false) {
+) : m_name(name), m_skinMode(m.skinMode), m_genReflect(false), m_precisionMode(kPrecision_Low) {
 	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
 		if (m.TCGen(i) == r::Material::kTCGen_EnvMap) {
 			m_genReflect = true;
 			break;
 		}
 	}
+
+	for (int i = 0; i < r::kMaxTextures; ++i)
+		m_samplerPrecision[i] = kPrecision_Low;
 }
 
 Shader::Ref Shader::Load(
@@ -219,10 +222,6 @@ int Shader::lua_Compile(lua_State *L) {
 		self->ParseShaderPass(L, sz, (r::Shader::Pass)(r::Shader::kPass_Diffuse1+i), map);
 		self->BuildInputMappings(L, (r::Shader::Pass)(r::Shader::kPass_Diffuse1+i));
 
-		sprintf(sz, "Specular%i", i+1);
-		self->ParseShaderPass(L, sz, (r::Shader::Pass)(r::Shader::kPass_Specular1+i), map);
-		self->BuildInputMappings(L, (r::Shader::Pass)(r::Shader::kPass_Specular1+i));
-
 		sprintf(sz, "DiffuseSpecular%i", i+1);
 		self->ParseShaderPass(L, sz, (r::Shader::Pass)(r::Shader::kPass_DiffuseSpecular1+i), map);
 		self->BuildInputMappings(L, (r::Shader::Pass)(r::Shader::kPass_DiffuseSpecular1+i));
@@ -235,6 +234,66 @@ int Shader::lua_Compile(lua_State *L) {
 	if (!self->Exists(r::Shader::kPass_Preview))
 		self->ParseShaderPass(L, "Default", r::Shader::kPass_Preview, map);
 	self->BuildInputMappings(L, r::Shader::kPass_Preview);
+
+	return 0;
+}
+
+int Shader::lua_SetPrecisionMode(lua_State *L) {
+	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
+	Shader *self = (Shader*)lua_touserdata(L, -1);
+	lua_pop(L, 1);
+	RAD_VERIFY(self);
+
+	const char *sz = luaL_checkstring(L, 1);
+	const String ksz(CStr(sz));
+
+	if (ksz == "low") {
+		self->m_precisionMode = kPrecision_Low;
+	} else if (ksz == "medium") {
+		self->m_precisionMode = kPrecision_Medium;
+	} else if (ksz == "high") {
+		self->m_precisionMode = kPrecision_High;
+	} else {
+		luaL_error(L, "ERROR: %s in not a valid precision mode.", sz);
+	}
+
+	return 0;
+}
+
+int Shader::lua_SetSamplerPrecision(lua_State *L) {
+	lua_getfield(L, LUA_REGISTRYINDEX, SELF);
+	Shader *self = (Shader*)lua_touserdata(L, -1);
+	lua_pop(L, 1);
+	RAD_VERIFY(self);
+
+	int idx = 1;
+	int samplerIndex = -1;
+	if (lua_gettop(L) >= 2) {
+		int samplerIndex = luaL_checknumber(L, 1);
+		if ((samplerIndex < 0 || samplerIndex > r::kMaxTextures)) {
+			luaL_error(L, "ERROR: %d is not a valid sampler index.", samplerIndex);
+		}
+		++idx;
+	}
+
+	const char *sz = luaL_checkstring(L, idx);
+	const String ksz(CStr(sz));
+
+	Precision mode = kPrecision_High;
+	if (ksz == "low") {
+		mode = kPrecision_Low;
+	} else if (ksz == "medium") {
+		mode = kPrecision_Medium;
+	} else if (ksz != "high") {
+		luaL_error(L, "ERROR: %s in not a valid precision mode.", sz);
+	}
+
+	if (idx == 2) {
+		self->m_samplerPrecision[samplerIndex] = mode;
+	} else {
+		for (int i = 0; i < r::kMaxTextures; ++i)
+			self->m_samplerPrecision[i] = mode;
+	}
 
 	return 0;
 }
@@ -280,6 +339,10 @@ int Shader::lua_MLightHalfVec(lua_State *L) {
 	return lua_MSource(L, kMaterialSource_LightHalfVec);
 }
 
+int Shader::lua_MLightVertex(lua_State *L) {
+	return lua_MSource(L, kMaterialSource_LightVertex);
+}
+
 int Shader::lua_MLightDiffuseColor(lua_State *L) {
 	return lua_MSource(L, kMaterialSource_LightDiffuseColor);
 }
@@ -298,6 +361,10 @@ int Shader::lua_MLightTanHalfVec(lua_State *L) {
 
 int Shader::lua_MVertexColor(lua_State *L) {
 	return lua_MSource(L, kMaterialSource_VertexColor);
+}
+
+int Shader::lua_MSpecularExponent(lua_State *L) {
+	return lua_MSource(L, kMaterialSource_SpecularExponent);
 }
 
 int Shader::lua_MSource(lua_State *L, MaterialSource source) {
@@ -335,10 +402,12 @@ int Shader::lua_gcNode(lua_State *L) {
 lua::State::Ref Shader::InitLuaM(Engine &e, Shader *m) {
 	lua::State::Ref state(new (ZTools) lua::State("ShaderFile"));
 	lua_State *L = state->L;
-
+	
 	luaL_Reg r[] = {
 		{ "Node", lua_MNode },
 		{ "Compile", lua_Compile },
+		{ "SetPrecisionMode", lua_SetPrecisionMode },
+		{ "SetSamplerPrecision", lua_SetSamplerPrecision },
 		{ "MColor", lua_MColor },
 		{ "MSpecularColor", lua_MSpecularColor },
 		{ "MTexture", lua_MTexture },
@@ -349,11 +418,13 @@ lua::State::Ref Shader::InitLuaM(Engine &e, Shader *m) {
 		{ "MLightPos", lua_MLightPos },
 		{ "MLightVec", lua_MLightVec },
 		{ "MLightHalfVec", lua_MLightHalfVec },
+		{ "MLightVertex", lua_MLightVertex },
 		{ "MLightDiffuseColor", lua_MLightDiffuseColor },
 		{ "MLightSpecularColor", lua_MLightSpecularColor },
 		{ "MLightTanVec", lua_MLightTanVec },
 		{ "MLightTanHalfVec", lua_MLightTanHalfVec },
 		{ "MVertexColor", lua_MVertexColor },
+		{ "MSpecularExponent", lua_MSpecularExponent },
 		{ 0, 0 }
 	};
 
@@ -1314,7 +1385,7 @@ bool Shader::EmitShader(
 			return false;
 		}
 	} else {
-		out << "\tR.color = FLOAT4(1.0, 1.0, 1.0, 1.0);\r\n";
+		out << "\tR.color = PRECISION_COLOR_TYPE(1.0, 1.0, 1.0, 1.0);\r\n";
 	}
 
 	if (alpha) {
@@ -1505,6 +1576,9 @@ bool Shader::szMaterialInput(
 	case kMaterialSource_SpecularColor:
 		strcpy(sz, "U_scolor");
 		return true;
+	case kMaterialSource_SpecularExponent:
+		strcpy(sz, "U_scolor.w");
+		return true;
 	case kMaterialSource_LightDiffuseColor:
 		string::sprintf(
 			sz,
@@ -1537,6 +1611,13 @@ bool Shader::szMaterialInput(
 		string::sprintf(
 			sz,
 			"normalize(IN(light%i_halfvec))",
+			index
+		);
+		return true;
+	case kMaterialSource_LightVertex:
+		string::sprintf(
+			sz,
+			"IN(light%i_vpos)",
 			index
 		);
 		return true;

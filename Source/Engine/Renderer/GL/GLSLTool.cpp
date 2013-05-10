@@ -47,6 +47,18 @@ bool GLSLTool::Assemble(
 		ss << "#define MATERIAL\r\n";
 	}
 
+	switch (shader->precisionMode) {
+	case Shader::kPrecision_Low:
+		ss << "#define PRECISION_COLOR_TYPE FIXED4\r\n";
+		break;
+	case Shader::kPrecision_Medium:
+		ss << "#define PRECISION_COLOR_TYPE HALF4\r\n";
+		break;
+	case Shader::kPrecision_High:
+		ss << "#define PRECISION_COLOR_TYPE FLOAT4\r\n";
+		break;
+	}
+
 	if (pass != r::Shader::kPass_Preview) {
 		if (material.skinMode == r::Material::kSkinMode_Sprite)
 			ss << "#define SKIN_SPRITE\r\n";
@@ -70,6 +82,17 @@ bool GLSLTool::Assemble(
 			ss << "#define T" << i << "TYPE sampler2D" << "\r\n";
 			break;
 		default:
+			break;
+		}
+		switch(shader->SamplerPrecisionMode(i)) {
+		case Shader::kPrecision_Low:
+			ss << "#define T" << i << "PRECISION lowp" << "\r\n";
+			break;
+		case Shader::kPrecision_Medium:
+			ss << "#define T" << i << "PRECISION mediump" << "\r\n";
+			break;
+		case Shader::kPrecision_High:
+			ss << "#define T" << i << "PRECISION highp" << "\r\n";
 			break;
 		}
 		++numTextures;
@@ -154,13 +177,16 @@ bool GLSLTool::Assemble(
 	if (numColors > 0)
 		ss << "#define COLORS " << numColors << "\r\n";
 
-	int numSpecularColors = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_SpecularColor);
+	int numSpecularColors = 
+		shader->MaterialSourceUsage(pass, Shader::kMaterialSource_SpecularColor) +
+		shader->MaterialSourceUsage(pass, Shader::kMaterialSource_SpecularExponent);
 	if (numSpecularColors > 0)
 		ss << "#define SHADER_SPECULAR_COLORS " << numSpecularColors << "\r\n";
 
 	int numLightPos = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightPos);
 	int numLightVec = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightVec);
 	int numLightHalfVec = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightHalfVec);
+	int numLightVertex = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightVertex);
 	int numLightTanVec = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightTanVec);
 	int numLightTanHalfVec = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightTanHalfVec);
 	int numLightDiffuseColor = shader->MaterialSourceUsage(pass, Shader::kMaterialSource_LightDiffuseColor);
@@ -204,10 +230,13 @@ bool GLSLTool::Assemble(
 			std::max(
 				numLightHalfVec,
 				std::max(
-					numLightTanVec,
+					numLightVertex,
 					std::max(
-						numLightTanHalfVec,
-						std::max(numLightDiffuseColor, numLightSpecularColor)
+						numLightTanVec,
+						std::max(
+							numLightTanHalfVec,
+							std::max(numLightDiffuseColor, numLightSpecularColor)
+						)
 					)
 				)
 			)
@@ -222,6 +251,8 @@ bool GLSLTool::Assemble(
 			ss << "#define SHADER_LIGHT_VEC " << numLightVec << "\r\n";
 		if (numLightHalfVec > 0)
 			ss << "#define SHADER_LIGHT_HALFVEC " << numLightHalfVec << "\r\n";
+		if (numLightVertex > 0)
+			ss << "#define SHADER_LIGHT_VERTEXPOS " << numLightVertex << "\r\n";
 		if (numLightTanVec > 0)
 			ss << "#define SHADER_LIGHT_TANVEC " << numLightTanVec << "\r\n";
 		if (numLightTanHalfVec > 0)
