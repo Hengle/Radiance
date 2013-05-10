@@ -231,7 +231,6 @@
 		330A991D15BC9FC1002A81EC /* WorldDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890E15B9BA4A0089BA08 /* WorldDef.h */; };
 		330A991E15BC9FC1002A81EC /* WorldDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8890F15B9BA4A0089BA08 /* WorldDraw.cpp */; };
 		330A991F15BC9FC1002A81EC /* WorldDraw.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891015B9BA4A0089BA08 /* WorldDraw.h */; };
-		330A992015BC9FC1002A81EC /* WorldDrawDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891115B9BA4A0089BA08 /* WorldDrawDef.h */; };
 		330A992115BC9FC1002A81EC /* WorldLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8891215B9BA4A0089BA08 /* WorldLua.cpp */; };
 		330A992215BC9FC1002A81EC /* WorldLua.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891315B9BA4A0089BA08 /* WorldLua.h */; };
 		330A992315BC9FC1002A81EC /* WorldSpawn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8891415B9BA4A0089BA08 /* WorldSpawn.cpp */; };
@@ -880,7 +879,6 @@
 		337AE71415BF214F00AD1617 /* WorldCinematics.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890D15B9BA4A0089BA08 /* WorldCinematics.h */; };
 		337AE71515BF214F00AD1617 /* WorldDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890E15B9BA4A0089BA08 /* WorldDef.h */; };
 		337AE71615BF214F00AD1617 /* WorldDraw.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891015B9BA4A0089BA08 /* WorldDraw.h */; };
-		337AE71715BF214F00AD1617 /* WorldDrawDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891115B9BA4A0089BA08 /* WorldDrawDef.h */; };
 		337AE71815BF214F00AD1617 /* WorldLua.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891315B9BA4A0089BA08 /* WorldLua.h */; };
 		337AE71A15BF214F00AD1617 /* UIMatWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888AF15B9BA4A0089BA08 /* UIMatWidget.h */; };
 		337AE71B15BF214F00AD1617 /* UITextLabel.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E888B115B9BA4A0089BA08 /* UITextLabel.h */; };
@@ -2517,8 +2515,6 @@
 		33E88B6815B9BA4B0089BA08 /* WorldDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8890F15B9BA4A0089BA08 /* WorldDraw.cpp */; };
 		33E88B6915B9BA4B0089BA08 /* WorldDraw.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891015B9BA4A0089BA08 /* WorldDraw.h */; };
 		33E88B6A15B9BA4B0089BA08 /* WorldDraw.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891015B9BA4A0089BA08 /* WorldDraw.h */; };
-		33E88B6B15B9BA4B0089BA08 /* WorldDrawDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891115B9BA4A0089BA08 /* WorldDrawDef.h */; };
-		33E88B6C15B9BA4B0089BA08 /* WorldDrawDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891115B9BA4A0089BA08 /* WorldDrawDef.h */; };
 		33E88B6D15B9BA4B0089BA08 /* WorldLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8891215B9BA4A0089BA08 /* WorldLua.cpp */; };
 		33E88B6E15B9BA4B0089BA08 /* WorldLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8891215B9BA4A0089BA08 /* WorldLua.cpp */; };
 		33E88B6F15B9BA4B0089BA08 /* WorldLua.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891315B9BA4A0089BA08 /* WorldLua.h */; };
@@ -3066,7 +3062,6 @@
 		33FA80B61633CA28002603A5 /* WorldCinematics.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890D15B9BA4A0089BA08 /* WorldCinematics.h */; };
 		33FA80B71633CA28002603A5 /* WorldDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8890E15B9BA4A0089BA08 /* WorldDef.h */; };
 		33FA80B81633CA28002603A5 /* WorldDraw.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891015B9BA4A0089BA08 /* WorldDraw.h */; };
-		33FA80B91633CA28002603A5 /* WorldDrawDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891115B9BA4A0089BA08 /* WorldDrawDef.h */; };
 		33FA80BA1633CA28002603A5 /* WorldLua.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8891315B9BA4A0089BA08 /* WorldLua.h */; };
 		33FA80BB1633CA28002603A5 /* App.h in Headers */ = {isa = PBXBuildFile; fileRef = 33836C0115B9CF580030EAEC /* App.h */; };
 		33FA80BC1633CA28002603A5 /* Camera.h in Headers */ = {isa = PBXBuildFile; fileRef = 33836C0315B9CF580030EAEC /* Camera.h */; };
@@ -3089,6 +3084,38 @@
 		33FA80CE1633CA28002603A5 /* RBackend.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FA7E821633B97C002603A5 /* RBackend.h */; };
 		33FA80CF1633CA28002603A5 /* RBackendDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FA7E831633B97C002603A5 /* RBackendDef.h */; };
 		33FA80D01633CA28002603A5 /* RGLBackend.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FA7E861633B97D002603A5 /* RGLBackend.h */; };
+		33FBD042173B069200043A8D /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD041173B069200043A8D /* Mesh.cpp */; };
+		33FBD043173B069200043A8D /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD041173B069200043A8D /* Mesh.cpp */; };
+		33FBD044173B069200043A8D /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD041173B069200043A8D /* Mesh.cpp */; };
+		33FBD045173B069200043A8D /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD041173B069200043A8D /* Mesh.cpp */; };
+		33FBD046173B069200043A8D /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD041173B069200043A8D /* Mesh.cpp */; };
+		33FBD04A173B06B800043A8D /* EditorColorPicker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD048173B06B800043A8D /* EditorColorPicker.cpp */; };
+		33FBD04B173B06B800043A8D /* EditorColorPicker.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FBD049173B06B800043A8D /* EditorColorPicker.h */; };
+		33FBD04D173B070B00043A8D /* WorldDrawLight.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD04C173B070B00043A8D /* WorldDrawLight.cpp */; };
+		33FBD04E173B070B00043A8D /* WorldDrawLight.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD04C173B070B00043A8D /* WorldDrawLight.cpp */; };
+		33FBD04F173B070B00043A8D /* WorldDrawLight.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD04C173B070B00043A8D /* WorldDrawLight.cpp */; };
+		33FBD050173B070B00043A8D /* WorldDrawLight.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD04C173B070B00043A8D /* WorldDrawLight.cpp */; };
+		33FBD051173B070B00043A8D /* WorldDrawLight.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD04C173B070B00043A8D /* WorldDrawLight.cpp */; };
+		33FBD054173B071500043A8D /* Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD052173B071500043A8D /* Light.cpp */; };
+		33FBD055173B071500043A8D /* Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD052173B071500043A8D /* Light.cpp */; };
+		33FBD056173B071500043A8D /* Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD052173B071500043A8D /* Light.cpp */; };
+		33FBD057173B071500043A8D /* Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD052173B071500043A8D /* Light.cpp */; };
+		33FBD058173B071500043A8D /* Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD052173B071500043A8D /* Light.cpp */; };
+		33FBD059173B071500043A8D /* Light.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FBD053173B071500043A8D /* Light.h */; };
+		33FBD05A173B071500043A8D /* Light.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FBD053173B071500043A8D /* Light.h */; };
+		33FBD05B173B071500043A8D /* Light.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FBD053173B071500043A8D /* Light.h */; };
+		33FBD05C173B071500043A8D /* Light.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FBD053173B071500043A8D /* Light.h */; };
+		33FBD05D173B071500043A8D /* Light.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FBD053173B071500043A8D /* Light.h */; };
+		33FBD060173B073E00043A8D /* D_Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD05E173B073E00043A8D /* D_Light.cpp */; };
+		33FBD061173B073E00043A8D /* D_Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD05E173B073E00043A8D /* D_Light.cpp */; };
+		33FBD062173B073E00043A8D /* D_Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD05E173B073E00043A8D /* D_Light.cpp */; };
+		33FBD063173B073E00043A8D /* D_Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD05E173B073E00043A8D /* D_Light.cpp */; };
+		33FBD064173B073E00043A8D /* D_Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33FBD05E173B073E00043A8D /* D_Light.cpp */; };
+		33FBD065173B073E00043A8D /* D_Light.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FBD05F173B073E00043A8D /* D_Light.h */; };
+		33FBD066173B073E00043A8D /* D_Light.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FBD05F173B073E00043A8D /* D_Light.h */; };
+		33FBD067173B073E00043A8D /* D_Light.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FBD05F173B073E00043A8D /* D_Light.h */; };
+		33FBD068173B073E00043A8D /* D_Light.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FBD05F173B073E00043A8D /* D_Light.h */; };
+		33FBD069173B073E00043A8D /* D_Light.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FBD05F173B073E00043A8D /* D_Light.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -3973,7 +4000,6 @@
 		33E8890E15B9BA4A0089BA08 /* WorldDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldDef.h; sourceTree = "<group>"; };
 		33E8890F15B9BA4A0089BA08 /* WorldDraw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldDraw.cpp; sourceTree = "<group>"; };
 		33E8891015B9BA4A0089BA08 /* WorldDraw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldDraw.h; sourceTree = "<group>"; };
-		33E8891115B9BA4A0089BA08 /* WorldDrawDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldDrawDef.h; sourceTree = "<group>"; };
 		33E8891215B9BA4A0089BA08 /* WorldLua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldLua.cpp; sourceTree = "<group>"; };
 		33E8891315B9BA4A0089BA08 /* WorldLua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldLua.h; sourceTree = "<group>"; };
 		33E8891415B9BA4A0089BA08 /* WorldSpawn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldSpawn.cpp; sourceTree = "<group>"; };
@@ -4004,6 +4030,14 @@
 		33FA81D316351C3D002603A5 /* FlurryPaths.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = FlurryPaths.xcconfig; path = XCConfig/FlurryPaths.xcconfig; sourceTree = "<group>"; };
 		33FA82A71635489E002603A5 /* Tokenizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tokenizer.cpp; sourceTree = "<group>"; };
 		33FA82A81635489E002603A5 /* Tokenizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tokenizer.h; sourceTree = "<group>"; };
+		33FBD041173B069200043A8D /* Mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Mesh.cpp; sourceTree = "<group>"; };
+		33FBD048173B06B800043A8D /* EditorColorPicker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorColorPicker.cpp; sourceTree = "<group>"; };
+		33FBD049173B06B800043A8D /* EditorColorPicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorColorPicker.h; sourceTree = "<group>"; };
+		33FBD04C173B070B00043A8D /* WorldDrawLight.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldDrawLight.cpp; sourceTree = "<group>"; };
+		33FBD052173B071500043A8D /* Light.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Light.cpp; sourceTree = "<group>"; };
+		33FBD053173B071500043A8D /* Light.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Light.h; sourceTree = "<group>"; };
+		33FBD05E173B073E00043A8D /* D_Light.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = D_Light.cpp; sourceTree = "<group>"; };
+		33FBD05F173B073E00043A8D /* D_Light.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = D_Light.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -4970,6 +5004,7 @@
 				33E8881415B9BA480089BA08 /* Material.inl */,
 				33E8881615B9BA480089BA08 /* Mesh.h */,
 				33E8881715B9BA480089BA08 /* Mesh.inl */,
+				33FBD041173B069200043A8D /* Mesh.cpp */,
 				33E8881F15B9BA480089BA08 /* Renderer.cpp */,
 				33E8882015B9BA480089BA08 /* Renderer.h */,
 				33E8882115B9BA480089BA08 /* RendererDef.h */,
@@ -5113,6 +5148,8 @@
 				33E8889715B9BA490089BA08 /* PropertyGrid */,
 				33DB1609162FB28700963A33 /* EditorBSPDebugWidget.cpp */,
 				33DB160A162FB28700963A33 /* EditorBSPDebugWidget.h */,
+				33FBD048173B06B800043A8D /* EditorColorPicker.cpp */,
+				33FBD049173B06B800043A8D /* EditorColorPicker.h */,
 				3397729B16F8F0590046535B /* EditorConversationTreeEditorItemEditDialog.cpp */,
 				3397729C16F8F0590046535B /* EditorConversationTreeEditorItemEditDialog.h */,
 				3397729D16F8F05A0046535B /* EditorConversationTreeEditorView.cpp */,
@@ -5299,6 +5336,8 @@
 				339805931676D544002758B1 /* FloorsDef.h */,
 				33E888D015B9BA4A0089BA08 /* Keys.cpp */,
 				33E888D115B9BA4A0089BA08 /* Keys.h */,
+				33FBD052173B071500043A8D /* Light.cpp */,
+				33FBD053173B071500043A8D /* Light.h */,
 				33E8890015B9BA4A0089BA08 /* MBatchDraw.h */,
 				33982E7716B2550300C2ED49 /* MT_Floor.cpp */,
 				33E8890115B9BA4A0089BA08 /* MT_Fly.cpp */,
@@ -5319,7 +5358,7 @@
 				33E8890E15B9BA4A0089BA08 /* WorldDef.h */,
 				33E8890F15B9BA4A0089BA08 /* WorldDraw.cpp */,
 				33E8891015B9BA4A0089BA08 /* WorldDraw.h */,
-				33E8891115B9BA4A0089BA08 /* WorldDrawDef.h */,
+				33FBD04C173B070B00043A8D /* WorldDrawLight.cpp */,
 				33E8891215B9BA4A0089BA08 /* WorldLua.cpp */,
 				33E8891315B9BA4A0089BA08 /* WorldLua.h */,
 				33982DE616A89C0900C2ED49 /* WorldLuaCommon.h */,
@@ -5365,6 +5404,8 @@
 				339772F016F8F2D90046535B /* D_ConversationTree.h */,
 				334389661724CB440048052A /* D_HTTP.cpp */,
 				334389671724CB440048052A /* D_HTTP.h */,
+				33FBD05E173B073E00043A8D /* D_Light.cpp */,
+				33FBD05F173B073E00043A8D /* D_Light.h */,
 				33E888D515B9BA4A0089BA08 /* D_Material.cpp */,
 				33E888D615B9BA4A0089BA08 /* D_Material.h */,
 				33E888D715B9BA4A0089BA08 /* D_Mesh.cpp */,
@@ -5735,7 +5776,6 @@
 				330A991C15BC9FC1002A81EC /* WorldCinematics.h in Headers */,
 				330A991D15BC9FC1002A81EC /* WorldDef.h in Headers */,
 				330A991F15BC9FC1002A81EC /* WorldDraw.h in Headers */,
-				330A992015BC9FC1002A81EC /* WorldDrawDef.h in Headers */,
 				330A992215BC9FC1002A81EC /* WorldLua.h in Headers */,
 				330A992715BC9FCD002A81EC /* UIMatWidget.h in Headers */,
 				330A992915BC9FCD002A81EC /* UITextLabel.h in Headers */,
@@ -5844,6 +5884,8 @@
 				334389871724CB5E0048052A /* T_VtModelPrecache.h in Headers */,
 				334389931724CBC00048052A /* HTTP.h in Headers */,
 				334389A31724CDA60048052A /* VtMesh.h in Headers */,
+				33FBD05B173B071500043A8D /* Light.h in Headers */,
+				33FBD067173B073E00043A8D /* D_Light.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6140,7 +6182,6 @@
 				337AE71415BF214F00AD1617 /* WorldCinematics.h in Headers */,
 				337AE71515BF214F00AD1617 /* WorldDef.h in Headers */,
 				337AE71615BF214F00AD1617 /* WorldDraw.h in Headers */,
-				337AE71715BF214F00AD1617 /* WorldDrawDef.h in Headers */,
 				337AE71815BF214F00AD1617 /* WorldLua.h in Headers */,
 				337AE71A15BF214F00AD1617 /* UIMatWidget.h in Headers */,
 				337AE71B15BF214F00AD1617 /* UITextLabel.h in Headers */,
@@ -6251,6 +6292,8 @@
 				334389881724CB5E0048052A /* T_VtModelPrecache.h in Headers */,
 				334389941724CBC00048052A /* HTTP.h in Headers */,
 				334389A41724CDA60048052A /* VtMesh.h in Headers */,
+				33FBD05C173B071500043A8D /* Light.h in Headers */,
+				33FBD068173B073E00043A8D /* D_Light.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6666,7 +6709,6 @@
 				33E88B6315B9BA4B0089BA08 /* WorldCinematics.h in Headers */,
 				33E88B6515B9BA4B0089BA08 /* WorldDef.h in Headers */,
 				33E88B6915B9BA4B0089BA08 /* WorldDraw.h in Headers */,
-				33E88B6B15B9BA4B0089BA08 /* WorldDrawDef.h in Headers */,
 				33E88B6F15B9BA4B0089BA08 /* WorldLua.h in Headers */,
 				33836C1C15B9CF590030EAEC /* App.h in Headers */,
 				33836C2015B9CF590030EAEC /* Camera.h in Headers */,
@@ -6748,6 +6790,9 @@
 				334389911724CBC00048052A /* HTTP.h in Headers */,
 				334389991724CBFD0048052A /* EditorVtModelThumb.h in Headers */,
 				334389A11724CDA60048052A /* VtMesh.h in Headers */,
+				33FBD04B173B06B800043A8D /* EditorColorPicker.h in Headers */,
+				33FBD059173B071500043A8D /* Light.h in Headers */,
+				33FBD065173B073E00043A8D /* D_Light.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7099,7 +7144,6 @@
 				33E88B6415B9BA4B0089BA08 /* WorldCinematics.h in Headers */,
 				33E88B6615B9BA4B0089BA08 /* WorldDef.h in Headers */,
 				33E88B6A15B9BA4B0089BA08 /* WorldDraw.h in Headers */,
-				33E88B6C15B9BA4B0089BA08 /* WorldDrawDef.h in Headers */,
 				33E88B7015B9BA4B0089BA08 /* WorldLua.h in Headers */,
 				33836C1D15B9CF590030EAEC /* App.h in Headers */,
 				33836C2115B9CF590030EAEC /* Camera.h in Headers */,
@@ -7153,6 +7197,8 @@
 				334389861724CB5E0048052A /* T_VtModelPrecache.h in Headers */,
 				334389921724CBC00048052A /* HTTP.h in Headers */,
 				334389A21724CDA60048052A /* VtMesh.h in Headers */,
+				33FBD05A173B071500043A8D /* Light.h in Headers */,
+				33FBD066173B073E00043A8D /* D_Light.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7504,7 +7550,6 @@
 				33FA80B61633CA28002603A5 /* WorldCinematics.h in Headers */,
 				33FA80B71633CA28002603A5 /* WorldDef.h in Headers */,
 				33FA80B81633CA28002603A5 /* WorldDraw.h in Headers */,
-				33FA80B91633CA28002603A5 /* WorldDrawDef.h in Headers */,
 				33FA80BA1633CA28002603A5 /* WorldLua.h in Headers */,
 				33FA80BB1633CA28002603A5 /* App.h in Headers */,
 				33FA80BC1633CA28002603A5 /* Camera.h in Headers */,
@@ -7560,6 +7605,8 @@
 				334389891724CB5E0048052A /* T_VtModelPrecache.h in Headers */,
 				334389951724CBC00048052A /* HTTP.h in Headers */,
 				334389A51724CDA60048052A /* VtMesh.h in Headers */,
+				33FBD05D173B071500043A8D /* Light.h in Headers */,
+				33FBD069173B073E00043A8D /* D_Light.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7937,6 +7984,10 @@
 				334389821724CB5E0048052A /* T_VtModelPrecache.cpp in Sources */,
 				3343898E1724CBC00048052A /* HTTP.cpp in Sources */,
 				3343899E1724CDA60048052A /* VtMesh.cpp in Sources */,
+				33FBD044173B069200043A8D /* Mesh.cpp in Sources */,
+				33FBD04F173B070B00043A8D /* WorldDrawLight.cpp in Sources */,
+				33FBD056173B071500043A8D /* Light.cpp in Sources */,
+				33FBD062173B073E00043A8D /* D_Light.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8123,6 +8174,10 @@
 				334389831724CB5E0048052A /* T_VtModelPrecache.cpp in Sources */,
 				3343898F1724CBC00048052A /* HTTP.cpp in Sources */,
 				3343899F1724CDA60048052A /* VtMesh.cpp in Sources */,
+				33FBD045173B069200043A8D /* Mesh.cpp in Sources */,
+				33FBD050173B070B00043A8D /* WorldDrawLight.cpp in Sources */,
+				33FBD057173B071500043A8D /* Light.cpp in Sources */,
+				33FBD063173B073E00043A8D /* D_Light.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8404,6 +8459,11 @@
 				3343898C1724CBC00048052A /* HTTP.cpp in Sources */,
 				334389981724CBFD0048052A /* EditorVtModelThumb.cpp in Sources */,
 				3343899C1724CDA60048052A /* VtMesh.cpp in Sources */,
+				33FBD042173B069200043A8D /* Mesh.cpp in Sources */,
+				33FBD04A173B06B800043A8D /* EditorColorPicker.cpp in Sources */,
+				33FBD04D173B070B00043A8D /* WorldDrawLight.cpp in Sources */,
+				33FBD054173B071500043A8D /* Light.cpp in Sources */,
+				33FBD060173B073E00043A8D /* D_Light.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8590,6 +8650,10 @@
 				334389811724CB5E0048052A /* T_VtModelPrecache.cpp in Sources */,
 				3343898D1724CBC00048052A /* HTTP.cpp in Sources */,
 				3343899D1724CDA60048052A /* VtMesh.cpp in Sources */,
+				33FBD043173B069200043A8D /* Mesh.cpp in Sources */,
+				33FBD04E173B070B00043A8D /* WorldDrawLight.cpp in Sources */,
+				33FBD055173B071500043A8D /* Light.cpp in Sources */,
+				33FBD061173B073E00043A8D /* D_Light.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8777,6 +8841,10 @@
 				334389841724CB5E0048052A /* T_VtModelPrecache.cpp in Sources */,
 				334389901724CBC00048052A /* HTTP.cpp in Sources */,
 				334389A01724CDA60048052A /* VtMesh.cpp in Sources */,
+				33FBD046173B069200043A8D /* Mesh.cpp in Sources */,
+				33FBD051173B070B00043A8D /* WorldDrawLight.cpp in Sources */,
+				33FBD058173B071500043A8D /* Light.cpp in Sources */,
+				33FBD064173B073E00043A8D /* D_Light.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

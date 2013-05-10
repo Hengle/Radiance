@@ -701,6 +701,15 @@ int TextureParser::Parsing(
 				asset,
 				flags
 			);
+			
+#if defined(RAD_OPT_TOOLS)
+			if (flags&(P_TargetiOS|P_TargetAndroid)) {
+				if ((m_header.width > 2048) || (m_header.height > 2048)) {
+					COut(C_Error) << "ERROR: texture dimensions exceed 2kx2k maximum for iOS/Android target, use the resize option in the texture asset." << std::endl;
+					return SR_MetaError;
+				}
+			}
+#endif
 
 			if (r == SR_Success) {
 				r = Mipmap(

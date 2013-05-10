@@ -10,6 +10,7 @@ function m() {
 BASE=$ROOT
 
 m "EditorBSPDebugWidget"
+m "EditorColorPicker"
 m "EditorConversationTreeEditorItemEditDialog"
 m "EditorConversationTreeEditorView"
 m "EditorConversationTreeEditorWidget"

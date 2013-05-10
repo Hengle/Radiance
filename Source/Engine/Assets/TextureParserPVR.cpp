@@ -88,12 +88,16 @@ int TextureParser::CompressPVR(
 
 		if (*s == "PVR2") {
 			if (kNormalMap) {
+				pvrFormat = ePVRTPF_PVRTCI_2bpp_RGB;
+				format = image_codec::dds::Format_PVR2;
 			} else {
 				pvrFormat = (img->bpp==4) ? ePVRTPF_PVRTCI_2bpp_RGBA : ePVRTPF_PVRTCI_2bpp_RGB;
 				format = (img->bpp==4) ? image_codec::dds::Format_PVR2A : image_codec::dds::Format_PVR2;
 			}
 		} else {
 			if (kNormalMap) {
+				pvrFormat = ePVRTPF_PVRTCI_4bpp_RGB;
+				format = image_codec::dds::Format_PVR4;
 			} else {
 				pvrFormat = (img->bpp==4) ? ePVRTPF_PVRTCI_4bpp_RGBA : ePVRTPF_PVRTCI_4bpp_RGB;
 				format = (img->bpp==4) ? image_codec::dds::Format_PVR4A : image_codec::dds::Format_PVR4;
@@ -283,8 +287,10 @@ int TextureParser::ExtractPVR(
 		image_codec::Mipmap &mip = img.frames[frame].mipmaps[m];
 		AddrSize blockSize = 0;
 		
+		PixelType pixelFormat = src.getPixelType();
+		
 		// What format?
-		switch (src.getPixelType().PixelTypeID) {
+		switch (pixelFormat.PixelTypeID) {
 			case ePVRTPF_PVRTCI_2bpp_RGB:
 			case ePVRTPF_PVRTCI_2bpp_RGBA:
 				blockSize = std::max<AddrSize>(w/8,2)*std::max<AddrSize>(h/4,2)*8;
@@ -293,15 +299,8 @@ int TextureParser::ExtractPVR(
 			case ePVRTPF_PVRTCI_4bpp_RGBA:
 				blockSize = std::max<AddrSize>(w/4,2)*std::max<AddrSize>(h/4,2)*8;
 				break;
-			/*case ePVRTPF_DXT1:
-			case ePVRTPF_DXT2:
-				blockSize = std::max<AddrSize>((w*h/16)*8, 8);
-				break;
-			case ePVRTPF_DXT3:
-			case ePVRTPF_DXT4:
-			case ePVRTPF_DXT5:
-				blockSize = std::max<AddrSize>((w*h/16)*16, 16);
-				break;*/
+			default:
+				return SR_CompilerError;
 		}
 		
 		img.AllocateMipmap(frame, m, w, h, 0, blockSize);

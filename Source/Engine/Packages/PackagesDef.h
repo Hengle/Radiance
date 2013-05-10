@@ -179,7 +179,7 @@ enum PFlags
 #endif
 
 	P_TargetConsole = P_TargetXBox360|P_TargetPS3, /*!< All Console target bits. \sa pkg::P_TargetXBox360 and pkg::P_TargetPS3 */
-	P_AllTargets = P_TargetConsole|P_TargetPC|P_TargetiOS, /*!< All target bits set. \sa pkg::P_TargetPC, pkg::P_TargetiOS, pkg::P_TargetXBox360, and pkg::P_TargetPS3 */
+	P_AllTargets = P_TargetConsole|P_TargetPC|P_TargetiOS|P_TargetAndroid, /*!< All target bits set. \sa pkg::P_TargetPC, pkg::P_TargetiOS, pkg::P_TargetXBox360, and pkg::P_TargetPS3 */
 	P_FirstTarget = P_TargetPC, /*!< First target bit. */
 	P_LastTarget  = P_TargetPS3, /*!< Last target bit. */
 	P_NumTargets  = 5 /*!< Number of targets. */

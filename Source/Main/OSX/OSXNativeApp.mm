@@ -213,7 +213,7 @@ bool NativeApp::PreInit() {
 				continue; // we don't do this.
 			
 			r::VidMode m = VidModeFromCGMode(cgMode);
-			if (m.bpp < 32)
+			if (m.bpp < 32)	
 				continue; // we don't like anything less than 32 bpp.
 
 			if (SystemVersion::HasGameCenter() && (m.h < 640))
