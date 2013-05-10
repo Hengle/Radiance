@@ -17,6 +17,9 @@
 #include "D_Asset.h"
 #include "../../Packages/Packages.h"
 #include "../../Engine.h"
+#if defined(RAD_OPT_PC_TOOLS)
+#include "../../Tools/Editor/EditorMainWindow.h"
+#endif
 
 namespace world {
 
@@ -79,9 +82,16 @@ int T_Precache::Tick(Entity &e, float dt, const xtime::TimeSlice &time, int flag
 		return TickPop;
 	}
 
+#if defined(RAD_OPT_PC_TOOLS)
+	const int kLoadFlags = (tools::editor::MainWindow::Get()->lowQualityPreview) ? pkg::P_FastCook : 0;
+#endif
+
 	m_r = m_asset->Process(
 		time,
 		pkg::P_Load|pkg::P_FastPath
+#if defined(RAD_OPT_PC_TOOLS)
+		| kLoadFlags
+#endif
 	);
 
 	if (m_r == pkg::SR_Success) { 
