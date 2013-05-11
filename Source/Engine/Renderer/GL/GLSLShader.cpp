@@ -76,7 +76,7 @@ bool GLSLShader::Compile(
 ) {
 	int numPasses = 0;
 
-	for (int i = 0; i < Shader::kNumPasses; ++i) {
+	for (int i = Shader::kNumPasses-1; i >= 0; --i) {
 		if (shader->Exists((Shader::Pass)i)) {
 			if (!CompilePass(engine, (Shader::Pass)i, shader, material))
 				return false;

@@ -1113,15 +1113,8 @@ void Shader::BuildInputMappings(lua_State *L, r::Shader::Pass pass) {
 	if (!usage.s[kMaterialSource_LightTanVec].empty() ||
 		!usage.s[kMaterialSource_LightTanHalfVec].empty()) {
 		// add references to Normal/Tangent.
-		for (IntSet::const_iterator it = usage.s[kMaterialSource_LightTanVec].begin(); it != usage.s[kMaterialSource_LightTanVec].end(); ++it) {
-			usage.s[kMaterialSource_Normal].insert(*it);
-			usage.s[kMaterialSource_Tangent].insert(*it);
-		}
-		for (IntSet::const_iterator it = usage.s[kMaterialSource_LightTanHalfVec].begin(); it != usage.s[kMaterialSource_LightTanHalfVec].end(); ++it) {
-			usage.s[kMaterialSource_Normal].insert(*it);
-			usage.s[kMaterialSource_Tangent].insert(*it);
-		}
-
+		usage.s[kMaterialSource_Normal].insert(0);
+		usage.s[kMaterialSource_Tangent].insert(0);
 		// NOTE: bitangent is computed by vertex shader if LightTangentVec/LightTangentHalfVec is accessed.
 	}
 
@@ -1658,11 +1651,20 @@ bool Shader::szMaterialInput(
 		);
 		return true;
 	case kMaterialSource_LightTanVec:
-		string::sprintf(
-			sz,
-			"normalize(IN(light%d_tanvec))",
-			index
-		);
+		 // see Shaders/Nodes/Common.c comments
+		if (index < 3) {
+			string::sprintf(
+				sz,
+				"normalize(IN(light%d_tanvec))",
+				index
+			);
+		} else {
+			string::sprintf(
+				sz,
+				"normalize(IN(light_%d_tanvec))",
+				index
+			);
+		}
 		return true;
 	case kMaterialSource_LightTanHalfVec:
 		string::sprintf(

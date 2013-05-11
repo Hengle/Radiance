@@ -18,7 +18,7 @@ enum {
 	kMaxTextures = 6,
 	kMaxAttribArrays = 8,
 	kInvalidMapping = 255,
-	kMaxLights = 1
+	kMaxLights = 4
 };
 
 enum StreamUsage {

@@ -177,9 +177,10 @@ bool GLSLTool::Assemble(
 	if (numColors > 0)
 		ss << "#define COLORS " << numColors << "\r\n";
 
-	int numSpecularColors = 
-		shader->MaterialSourceUsage(pass, Shader::kMaterialSource_SpecularColor) +
-		shader->MaterialSourceUsage(pass, Shader::kMaterialSource_SpecularExponent);
+	int numSpecularColors = std::max(
+		shader->MaterialSourceUsage(pass, Shader::kMaterialSource_SpecularColor),
+		shader->MaterialSourceUsage(pass, Shader::kMaterialSource_SpecularExponent)
+	);
 	if (numSpecularColors > 0)
 		ss << "#define SHADER_SPECULAR_COLORS " << numSpecularColors << "\r\n";
 
