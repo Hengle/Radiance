@@ -322,10 +322,17 @@ bool GLSLTool::Assemble(
 
 		std::stringstream z;
 		if (GLES) {
-			if (vertexShader)
-				z << "precision mediump float;\r\n";
-			else
-				z << "precision lowp float;\r\n";
+			switch (shader->precisionMode) {
+			case Shader::kPrecision_Low:
+				z << "#define precision lowp float\r\n";
+				break;
+			case Shader::kPrecision_Medium:
+				z << "#define precision lowp mediump\r\n";
+				break;
+			case Shader::kPrecision_High:
+				z << "#define precision lowp highp\r\n";
+				break;
+			}
 		}
 		z << glslopt_get_output(opt_shader);
 		glslopt_shader_delete(opt_shader);
