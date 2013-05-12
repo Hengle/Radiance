@@ -319,12 +319,6 @@ bool GLSLShader::CompileShaderSource(
 			continue; // don't cook this.
 
 		if (shader->Exists((Shader::Pass)i)) {
-			MaterialInputMappings m;
-			tools::shader_utils::Shader::TexCoordMapping tcMapping;
-
-			if (!shader->BuildInputMappings(material, (Shader::Pass)i, m, tcMapping))
-				return false;
-
 			++numPasses;
 		}
 	}
@@ -539,6 +533,11 @@ bool GLSLShader::LoadPass(
 		return false;
 
 	if (p.numReqVaryings > gl.maxVaryings) {
+		if (passNum == Shader::kPass_Default) {
+			COut(C_Error) << "GLSLShader::LoadPass:\"" << name << "\" kPass_Default exceeds platform varying limit (" << p.numReqVaryings << " > " << gl.maxVaryings << ")!" << std::endl;
+			return false;
+		}
+		is.Read(source, (stream::SPos)programLength[1], 0);
 		return true; // we can't use this program on this device, skip.
 	}
 	

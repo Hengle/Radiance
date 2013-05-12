@@ -233,7 +233,7 @@ bool Game::LoadMapSeq(int id, int slot, world::UnloadDisposition ud, bool play) 
 		Play();
 
 	App::DumpMemStats(C_Debug);
-	App::Get()->throttleFramerate = true; // throttle framerate if supported.
+	App::Get()->throttleFramerate = cvars->r_throttle.value; // throttle framerate if supported.
 	return true;
 }
 

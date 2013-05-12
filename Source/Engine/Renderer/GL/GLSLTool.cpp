@@ -325,13 +325,13 @@ bool GLSLTool::Assemble(
 		if (GLES) {
 			switch (shader->precisionMode) {
 			case Shader::kPrecision_Low:
-				z << "#define precision lowp float\r\n";
+				z << "precision lowp float;\r\n";
 				break;
 			case Shader::kPrecision_Medium:
-				z << "#define precision lowp mediump\r\n";
+				z << "precision mediump float;\r\n";
 				break;
 			case Shader::kPrecision_High:
-				z << "#define precision lowp highp\r\n";
+				z << "precision highp float;\r\n";
 				break;
 			}
 		}

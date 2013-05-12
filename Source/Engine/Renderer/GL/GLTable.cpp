@@ -417,6 +417,9 @@ void GLTable::Load() {
 	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextures);
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttribs);
 	
+	if (maxVaryings < 32)
+		maxVaryings = 32; // why does this return 0 on iOS?
+	
 	CHECK(IMG_texture_compression_pvrtc);
 	SGIS_generate_mipmap = true;
 	ARB_texture_non_power_of_two = false;

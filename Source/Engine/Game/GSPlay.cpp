@@ -5,6 +5,7 @@
 
 #include RADPCH
 #include "GSPlay.h"
+#include "GameCVars.h"
 #include "../World/World.h"
 #include "../App.h"
 #include "../Engine.h"
@@ -19,6 +20,8 @@ int GSPlay::Tick(Game &game, float dt, const xtime::TimeSlice &time, int flags) 
 		App::Get()->ClearFrameHistory();
 		dt = 0.001f;
 	}
+	
+	App::Get()->throttleFramerate = game.cvars->r_throttle.value; // frame limit if supported.
 
 	int vpx, vpy, vpw, vph;
 	game.Viewport(vpx, vpy, vpw, vph);

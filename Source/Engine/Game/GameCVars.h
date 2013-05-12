@@ -23,6 +23,7 @@ public:
 	CVarBool r_frustumcull;
 	CVarBool r_lightscissor;
 	CVarBool r_showlightscissor;
+	CVarBool r_throttle;
 
 	void AddLuaVar(const CVar::Ref &cvar) {
 		m_vec.push_back(cvar);

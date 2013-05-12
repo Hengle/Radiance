@@ -5,6 +5,7 @@
 
 #include RADPCH
 #include "GSLoadMap.h"
+#include "GameCVars.h"
 #include "../COut.h"
 #include "../App.h"
 #include "../Engine.h"
@@ -58,8 +59,6 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 		}
 
 		m_mapAsset->SetGame(game, m_slot);
-		
-		App::Get()->throttleFramerate = false; // tick loading as fast as possible.
 
 #if defined(RAD_OPT_PC_TOOLS)
 		if (m_progressIndicatorParent) {
@@ -76,6 +75,8 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 		}
 #endif
 	}
+	
+	App::Get()->throttleFramerate = false; // tick loading as fast as possible.
 
 	int r = pkg::SR_Pending;
 	
@@ -136,7 +137,7 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 			m_mapAsset->SetProgressIndicator(0);
 		}
 #endif
-		App::Get()->throttleFramerate = true; // frame limit if supported.
+		App::Get()->throttleFramerate = game.cvars->r_throttle.value; // frame limit if supported.
 		
 		if (r == pkg::SR_Success) {
 			COut(C_Info) << "Map loaded successfully." << std::endl;

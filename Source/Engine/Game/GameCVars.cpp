@@ -18,6 +18,7 @@ r_showwaypoints(zone, "r_showwaypoints", false, false),
 r_showmovecmds(zone, "r_showmovecmds", false, false),
 r_frustumcull(zone, "r_frustumcull", false, false),
 r_lightscissor(zone, "r_lightscissor", true, false),
-r_showlightscissor(zone, "r_showlightscissor", false, false){
+r_showlightscissor(zone, "r_showlightscissor", false, false),
+r_throttle(zone, "r_throttle", true, false){
 }
 
