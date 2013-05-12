@@ -144,6 +144,7 @@ void GLTable::Reset() {
 	maxTextures = 0;
 	maxTextureSize = 0;
 	maxVertexAttribs = 0;
+	maxVaryings = 0;
 
 	SGIS_generate_mipmap = false;
 	ARB_texture_non_power_of_two = false;
@@ -406,6 +407,7 @@ void GLTable::Load() {
 #endif
 
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+	glGetIntegerv(GL_MAX_VARYING_FLOATS, &maxVaryings);
 	
 #if defined(RAD_OPT_OGLES)
 #if defined(RAD_OPT_OGLES1_AND_2)

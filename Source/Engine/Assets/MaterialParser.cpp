@@ -71,6 +71,9 @@ int MaterialParser::LoadCooked(
 	if (!ib)
 		return SR_FileNotFound;
 
+	// # lights calculated in MaterialLoader
+	m_m.m_maxLights = 0;
+
 	stream::InputStream is(*ib);
 
 	try {
@@ -87,7 +90,6 @@ int MaterialParser::LoadCooked(
 		is >> temp; m_m.depthFunc = (r::Material::DepthFunc)temp;
 		is >> temp; m_m.doubleSided.set(temp?true:false);
 		is >> temp; m_m.depthWrite.set(temp?true:false);
-		is >> temp; m_m.lit.set(temp?true:false);
 		is >> temp; m_m.castShadows.set(temp?true:false);
 		is >> temp; m_m.receiveShadows.set(temp?true:false);
 		is >> temp; m_m.selfShadow.set(temp?true:false);
@@ -281,8 +283,8 @@ int MaterialParser::Load(
 	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i)
 		m_m.SetTextureId(i, -1);
 
-	// NOTE: lit is set in MaterialLoader
-	m_m.lit = false;
+	// NOTE: m_maxLights is set in MaterialLoader
+	m_m.m_maxLights = 0;
 
 	const String *s = asset->entry->KeyValue<String>("Source.Shader", P_TARGET_FLAGS(flags));
 	if (!s)
@@ -816,8 +818,10 @@ int MaterialLoader::Process(
 			m_index = 0;
 
 #if defined(RAD_OPT_TOOLS)
-			if (!asset->cooked) {
-				parser->material->lit = false;
+			if (!asset->cooked)
+#endif
+			{
+				parser->material->m_maxLights = 0;
 
 				r::Material::BlendMode blendMode = parser->material->blendMode;
 
@@ -827,16 +831,20 @@ int MaterialLoader::Process(
 					(blendMode == r::Material::kBlendMode_Alpha) ||
 					(blendMode == r::Material::kBlendMode_InvAlpha)) {
 
-					for (int i = r::Shader::kPass_Diffuse1; i <= r::Shader::kPass_DiffuseSpecular4; ++i) {
-						if (parser->material->shader->HasPass((r::Shader::Pass)i)) {
-							parser->material->lit = true;
+					int dBase = r::Shader::kPass_Diffuse1;
+					int dsBase = r::Shader::kPass_DiffuseSpecular1;
+
+					for (int i = 0; i < r::kMaxLights; ++i) {
+						if (!(parser->material->shader->HasPass((r::Shader::Pass)dBase) ||
+							  parser->material->shader->HasPass((r::Shader::Pass)dsBase))) {
 							break;
 						}
-					}
 
+						parser->material->m_maxLights = i+1;
+					}
 				}
 			}
-#endif
+
 
 			if (!time.remaining)
 				return SR_Pending;

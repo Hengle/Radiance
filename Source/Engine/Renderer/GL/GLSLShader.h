@@ -133,10 +133,8 @@ private:
 		GLSLProgramObj::Ref p;
 		Uniforms u;
 		int outputs;
+		int numReqVaryings;
 		MaterialInputMappings m;
-#if defined(RAD_OPT_TOOLS)
-		tools::shader_utils::Shader::TexCoordMapping tcMapping;
-#endif
 	};
 
 	bool LoadPass(
@@ -158,15 +156,26 @@ private:
 		Engine &e,
 		Shader::Pass pass,
 		const tools::shader_utils::Shader::Ref &shader,
+		const MaterialInputMappings &m,
+		const tools::shader_utils::Shader::TexCoordMapping &tcMapping,
+		int numVaryingFloats,
 		const Material &material
 	);
+
+	int CalcNumShaderVaryings(
+		Shader::Pass pass,
+		const tools::shader_utils::Shader::Ref &shader,
+		const MaterialInputMappings &m,
+		const tools::shader_utils::Shader::TexCoordMapping &tcMapping,
+		const Material &material
+	);
+
 #endif
 
 	String ShaderLog(GLhandleARB s);
 	String ProgramLog(GLhandleARB s);
 
 	void BindAttribLocations(GLhandleARB p, const MaterialInputMappings &m);
-
 	String m_name;
 	Shader::Pass m_curPass;
 	const r::Material *m_curMat;

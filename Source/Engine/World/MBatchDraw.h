@@ -53,7 +53,7 @@ public:
 	virtual ~MBatchDraw() {}
 
 	RAD_DECLARE_PROPERTY(MBatchDraw, matId, int, int);
-	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, lit, bool);
+	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, maxLights, int);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, visible, bool);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, rgba, const Vec4&);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, scale, const Vec3&);
@@ -88,9 +88,9 @@ private:
 		m_matId = value;
 	}
 
-	RAD_DECLARE_GET(lit, bool) {
+	RAD_DECLARE_GET(maxLights, int) {
 		RAD_ASSERT(m_matRef && m_matRef->mat);
-		return m_matRef->mat->lit;
+		return m_matRef->mat->maxLights;
 	}
 
 	details::MatRef *m_matRef;

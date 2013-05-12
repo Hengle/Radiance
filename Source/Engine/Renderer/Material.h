@@ -21,6 +21,7 @@
 
 namespace asset {
 
+class MaterialParser;
 class MaterialLoader;
 typedef boost::shared_ptr<MaterialLoader> MaterialLoaderRef;
 
@@ -119,13 +120,13 @@ public:
 	RAD_DECLARE_PROPERTY(Material, depthWrite, bool, bool);
 	RAD_DECLARE_PROPERTY(Material, shaderId, int, int);
 	RAD_DECLARE_PROPERTY(Material, animated, bool, bool);
-	RAD_DECLARE_PROPERTY(Material, lit, bool, bool);
 	RAD_DECLARE_PROPERTY(Material, time, float, float);
 	RAD_DECLARE_PROPERTY(Material, timingMode, TimingMode, TimingMode);
 	RAD_DECLARE_PROPERTY(Material, castShadows, bool, bool);
 	RAD_DECLARE_PROPERTY(Material, receiveShadows, bool, bool);
 	RAD_DECLARE_PROPERTY(Material, selfShadow, bool, bool);
 	RAD_DECLARE_PROPERTY(Material, specularExponent, float, float);
+	RAD_DECLARE_READONLY_PROPERTY(Material, maxLights, int);
 	RAD_DECLARE_READONLY_PROPERTY(Material, specularColorWave, WaveAnim*);
 	RAD_DECLARE_READONLY_PROPERTY(Material, shader, const Shader::Ref&);
 
@@ -190,6 +191,9 @@ public:
 
 private:
 
+	friend class asset::MaterialParser;
+	friend class asset::MaterialLoader;
+
 #if defined(RAD_OPT_TOOLS)
 	RAD_DECLARE_GET(shaderName, const char*) { 
 		return m_shaderName.c_str; 
@@ -220,8 +224,7 @@ private:
 	RAD_DECLARE_SET(blendMode, BlendMode) { m_blendMode = value; }
 	RAD_DECLARE_GET(shaderId, int) { return m_shaderId; }
 	RAD_DECLARE_SET(shaderId, int) { m_shaderId = value; }
-	RAD_DECLARE_GET(lit, bool) { return m_lit; }
-	RAD_DECLARE_SET(lit, bool) { m_lit = value; }
+	RAD_DECLARE_GET(maxLights, int) { return m_maxLights; }
 	RAD_DECLARE_GET(time, float) { return m_time; }
 	RAD_DECLARE_SET(time, float) { m_time = value; }
 	RAD_DECLARE_GET(timingMode, TimingMode) { return m_timingMode; }
@@ -352,6 +355,7 @@ private:
 	TimingMode m_timingMode;
 	ShaderInstance::Ref m_shader;
 	int m_shaderId;
+	int m_maxLights;
 	SkinMode m_skinMode;
 	Sort m_sort;
 	DepthFunc m_depthFunc;
@@ -359,7 +363,6 @@ private:
 	bool m_animated;
 	bool m_doubleSided;
 	bool m_depthWrite;
-	bool m_lit;
 	bool m_castShadows;
 	bool m_receiveShadows;
 	bool m_selfShadow;

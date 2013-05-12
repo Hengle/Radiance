@@ -26,6 +26,7 @@
 namespace r {
 
 #if defined(RAD_OPT_TOOLS)
+
 class GLSLShaderLink : public tools::shader_utils::GLSLTool {
 public:
 	GLSLShaderLink(
@@ -78,9 +79,26 @@ bool GLSLShader::Compile(
 
 	for (int i = Shader::kNumPasses-1; i >= 0; --i) {
 		if (shader->Exists((Shader::Pass)i)) {
-			if (!CompilePass(engine, (Shader::Pass)i, shader, material))
+			
+			MaterialInputMappings m;
+			tools::shader_utils::Shader::TexCoordMapping tcMapping;
+			
+			if (!shader->BuildInputMappings(material, (Shader::Pass)i, m, tcMapping))
 				return false;
-			++numPasses;
+
+			int numVaryings = CalcNumShaderVaryings(
+				(Shader::Pass)i,
+				shader,
+				m,
+				tcMapping,
+				material
+			);
+
+			if (numVaryings <= gl.maxVaryings) {
+				if (!CompilePass(engine, (Shader::Pass)i, shader, m, tcMapping, numVaryings, material))
+					return false;
+				++numPasses;
+			}
 		}
 	}
 
@@ -91,13 +109,16 @@ bool GLSLShader::CompilePass(
 	Engine &engine,
 	Shader::Pass pass,
 	const tools::shader_utils::Shader::Ref &shader,
+	const MaterialInputMappings &m,
+	const tools::shader_utils::Shader::TexCoordMapping &tcMapping,
+	int numVaryingFloats,
 	const Material &material
 ) {
 	Pass &p = m_passes[pass];
 
-	if (!shader->BuildInputMappings(material, pass, p.m, p.tcMapping))
-		return false;
+	memcpy(&p.m, &m, sizeof(MaterialInputMappings));
 	p.outputs = shader->PassOutputs(pass);
+	p.numReqVaryings = numVaryingFloats;
 
 #if defined(RAD_OPT_OGLES)
 	const tools::shader_utils::GLSLTool::AssembleFlags kGLESFlag = tools::shader_utils::GLSLTool::kAssemble_GLES;
@@ -117,7 +138,7 @@ bool GLSLShader::CompilePass(
 			material,
 			shader,
 			p.m,
-			p.tcMapping,
+			tcMapping,
 			pass,
 			tools::shader_utils::GLSLTool::kAssemble_VertexShader|
 				tools::shader_utils::GLSLTool::kAssemble_Optimize|kGLESFlag,
@@ -156,7 +177,7 @@ bool GLSLShader::CompilePass(
 			material,
 			shader,
 			p.m,
-			p.tcMapping,
+			tcMapping,
 			pass,
 			tools::shader_utils::GLSLTool::kAssemble_PixelShader|
 				tools::shader_utils::GLSLTool::kAssemble_Optimize|kGLESFlag,
@@ -228,6 +249,55 @@ bool GLSLShader::CompilePass(
 	return true;
 }
 
+int GLSLShader::CalcNumShaderVaryings(
+	Shader::Pass pass,
+	const tools::shader_utils::Shader::Ref &shader,
+	const MaterialInputMappings &m,
+	const tools::shader_utils::Shader::TexCoordMapping &tcMapping,
+	const Material &material
+) {
+
+	int numFloats = 0;
+
+	int numVertices = shader->MaterialSourceUsage(pass, tools::shader_utils::Shader::kMaterialSource_Vertex);
+	numFloats += numVertices*4;
+
+	int numTexCoords = 0;
+	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
+		if (m.tcMods[i] == r::kInvalidMapping)
+			break;
+		++numTexCoords;
+	}
+
+	numFloats += numTexCoords*2;
+
+	int numLightVec = shader->MaterialSourceUsage(pass, tools::shader_utils::Shader::kMaterialSource_LightVec);
+	numFloats += numLightVec*3;
+
+	int numLightHalfVec = shader->MaterialSourceUsage(pass, tools::shader_utils::Shader::kMaterialSource_LightHalfVec);
+	numFloats += numLightHalfVec*3;
+
+	int numLightVertex = shader->MaterialSourceUsage(pass, tools::shader_utils::Shader::kMaterialSource_LightVertex);
+	numFloats += numLightVertex*4;
+
+	int numLightTanVec = shader->MaterialSourceUsage(pass, tools::shader_utils::Shader::kMaterialSource_LightTanVec);
+	numFloats += numLightTanVec*3;
+
+	int numLightTanHalfVec = shader->MaterialSourceUsage(pass, tools::shader_utils::Shader::kMaterialSource_LightTanHalfVec);
+	numFloats += numLightTanHalfVec*3;
+	
+	int numShaderNormals = shader->MaterialSourceUsage(pass, tools::shader_utils::Shader::kMaterialSource_Normal);
+	numFloats += numShaderNormals*3;
+
+	int numShaderTangents = shader->MaterialSourceUsage(pass, tools::shader_utils::Shader::kMaterialSource_Tangent);
+	numFloats += numShaderTangents*3;
+
+	int numShaderBitangents = shader->MaterialSourceUsage(pass, tools::shader_utils::Shader::kMaterialSource_Bitangent);
+	numFloats += numShaderBitangents*3;
+
+	return numFloats;
+}
+
 #endif // defined(RAD_OPT_TOOLS)
 
 #if defined(RAD_OPT_PC_TOOLS)
@@ -247,8 +317,16 @@ bool GLSLShader::CompileShaderSource(
 	for (int i = 0; i < Shader::kNumPasses; ++i) {
 		if (i == Shader::kPass_Preview)
 			continue; // don't cook this.
-		if (m_passes[i].p)
+
+		if (shader->Exists((Shader::Pass)i)) {
+			MaterialInputMappings m;
+			tools::shader_utils::Shader::TexCoordMapping tcMapping;
+
+			if (!shader->BuildInputMappings(material, (Shader::Pass)i, m, tcMapping))
+				return false;
+
 			++numPasses;
+		}
 	}
 
 	os << (U8)GLShader::kBackend_GLSL;
@@ -265,10 +343,22 @@ bool GLSLShader::CompileShaderSource(
 		if (i == Shader::kPass_Preview)
 			continue; // don't cook this.
 
-		Pass &p = m_passes[i];
-
-		if (!p.p)
+		if (!shader->Exists((r::Shader::Pass)i))
 			continue;
+
+		MaterialInputMappings m;
+		tools::shader_utils::Shader::TexCoordMapping tcMapping;
+
+		if (!shader->BuildInputMappings(material, (r::Shader::Pass)i, m, tcMapping))
+			return false;
+
+		const int kNumVaryings = CalcNumShaderVaryings(
+			(Shader::Pass)i,
+			shader,
+			m,
+			tcMapping,
+			material
+		);
 
 		{
 			std::stringstream ss;
@@ -278,8 +368,8 @@ bool GLSLShader::CompileShaderSource(
 				engine, 
 				material,
 				shader,
-				p.m,
-				p.tcMapping,
+				m,
+				tcMapping,
 				(Shader::Pass)i,
 				tools::shader_utils::GLSLTool::kAssemble_VertexShader|
 					tools::shader_utils::GLSLTool::kAssemble_Optimize|kGLESFlag,
@@ -301,8 +391,8 @@ bool GLSLShader::CompileShaderSource(
 				engine, 
 				material,
 				shader,
-				p.m,
-				p.tcMapping,
+				m,
+				tcMapping,
 				(Shader::Pass)i,
 				tools::shader_utils::GLSLTool::kAssemble_PixelShader|
 					tools::shader_utils::GLSLTool::kAssemble_Optimize|kGLESFlag,
@@ -317,28 +407,29 @@ bool GLSLShader::CompileShaderSource(
 		}
 
 		os << (U8)i;
-		os << (U8)p.outputs;
+		os << (U8)shader->PassOutputs((r::Shader::Pass)i);
+		os << (U16)kNumVaryings;
 
 		for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
-			os << p.m.tcMods[i];
+			os << m.tcMods[i];
 		}
 
 		for (int i = 0; i < kNumMaterialTextureSources; ++i) {
-			os << p.m.numMTSources[i];
+			os << m.numMTSources[i];
 		}
 
 		for (int i = 0; i < kNumMaterialGeometrySources; ++i) {
-			os << p.m.numMGSources[i];
+			os << m.numMGSources[i];
 		}
 
 		for (int i = 0; i < kMaxTextures; ++i) {
-			os << p.m.textures[i][0];
-			os << p.m.textures[i][1];
+			os << m.textures[i][0];
+			os << m.textures[i][1];
 		}
 		
 		for (int i = 0; i < kMaxAttribArrays; ++i) {
-			os << p.m.attributes[i][0];
-			os << p.m.attributes[i][1];
+			os << m.attributes[i][0];
+			os << m.attributes[i][1];
 		}
 
 		os << (U32)(vertexSource.length+1);
@@ -412,6 +503,9 @@ bool GLSLShader::LoadPass(
 	
 	is >> outputs; p.outputs = outputs;
 
+	U16 numVaryings;
+	is >> numVaryings; p.numReqVaryings = (int)numVaryings;
+
 	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
 		is >> p.m.tcMods[i];
 	}
@@ -443,6 +537,10 @@ bool GLSLShader::LoadPass(
 	char *source = (char*)stack_alloc(maxLength);
 	if (is.Read(source, (stream::SPos)programLength[0], 0) != (stream::SPos)programLength[0])
 		return false;
+
+	if (p.numReqVaryings > gl.maxVaryings) {
+		return true; // we can't use this program on this device, skip.
+	}
 	
 	GLSLProgramObj::Ref r(new (ZRender) GLSLProgramObj());
 	

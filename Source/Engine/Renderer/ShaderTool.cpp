@@ -1109,25 +1109,27 @@ void Shader::BuildInputMappings(lua_State *L, r::Shader::Pass pass) {
 	);
 
 	// NOTE: Normal, Tangent are needed if shader accessed the LightDir field.
+	IntSet normalUsage = usage.s[kMaterialSource_Normal];
+	IntSet tangentUsage = usage.s[kMaterialSource_Tangent];
 
 	if (!usage.s[kMaterialSource_LightTanVec].empty() ||
 		!usage.s[kMaterialSource_LightTanHalfVec].empty()) {
 		// add references to Normal/Tangent.
-		usage.s[kMaterialSource_Normal].insert(0);
-		usage.s[kMaterialSource_Tangent].insert(0);
+		normalUsage.insert(0);
+		tangentUsage.insert(0);
 		// NOTE: bitangent is computed by vertex shader if LightTangentVec/LightTangentHalfVec is accessed.
 	}
 
 	if (m_genReflect) {
 		// normals are required for environment mapping.
-		usage.s[kMaterialSource_Normal].insert(0);
+		normalUsage.insert(0);
 	}
 
 	BuildAttributeSourceMapping(
 		L, 
 		numAttrs, 
 		r::kMaterialGeometrySource_Normals, 
-		usage.s[kMaterialSource_Normal], 
+		normalUsage, 
 		mapping
 	);
 
@@ -1135,7 +1137,7 @@ void Shader::BuildInputMappings(lua_State *L, r::Shader::Pass pass) {
 		L, 
 		numAttrs, 
 		r::kMaterialGeometrySource_Tangents, 
-		usage.s[kMaterialSource_Tangent], 
+		tangentUsage, 
 		mapping
 	);
 

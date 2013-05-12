@@ -44,7 +44,7 @@ void WorldDraw::DrawUnshadowedLitBatch(const details::MBatch &batch) {
 
 	mat->shader->End();
 
-	if (!batch.matRef->mat->lit)
+	if (batch.matRef->mat->maxLights < 1)
 		return;
 
 	for (details::MBatchDrawLink *link = batch.head; link; link = link->next) {
@@ -87,6 +87,8 @@ void WorldDraw::DrawBatch(
 
 void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat) {
 
+	RAD_ASSERT(mat.maxLights > 0);
+
 	Vec3 pos;
 	Vec3 angles;
 	Mat4 invTx;
@@ -126,7 +128,7 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 			u.lights.numLights = 0;
 			lightBounds.Initialize();
 
-			while (interaction && (u.lights.numLights < r::kMaxLights)) {
+			while (interaction && (u.lights.numLights < mat.maxLights)) {
 				if (interaction->light->m_visFrame != m_markFrame) {
 					interaction = interaction->nextOnBatch;
 					continue; // not visible this frame.
@@ -287,7 +289,7 @@ void WorldDraw::LinkEntity(
 					BBox batchBounds(batch->bounds);
 					batchBounds.Translate(entity.ps->worldPos);
 					if (lightBounds.Touches(batchBounds)) {
-						if (batch->lit && !FindInteraction(light, *batch)) {
+						if ((batch->maxLights > 0) && !FindInteraction(light, *batch)) {
 							CreateInteraction(light, entity, *batch);
 						}
 					}
@@ -334,7 +336,7 @@ void WorldDraw::LinkOccupant(
 			for (MBatchDraw::RefVec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
 				const MBatchDraw::Ref &batch = *it;
 				if (lightBounds.Touches(batch->bounds)) {
-					if (batch->lit && !FindInteraction(light, *batch)) {
+					if ((batch->maxLights > 0) && !FindInteraction(light, *batch)) {
 						CreateInteraction(light, occupant, *batch);
 					}
 				}
@@ -369,7 +371,7 @@ void WorldDraw::LinkLight(Light &light, const BBox &bounds) {
 
 			const MStaticWorldMeshBatch::Ref &m = m_worldModels[modelNum];
 
-			if (m->lit && bounds.Touches(m->bounds)) {
+			if ((m->maxLights > 0) && bounds.Touches(m->bounds)) {
 				if (!FindInteraction(light, *m)) {
 					CreateInteraction(light, *m);
 				}
@@ -401,7 +403,7 @@ void WorldDraw::LinkLight(
 			const DrawModel::Ref &model = it->second;
 			for (MBatchDraw::RefVec::const_iterator it = model->batches->begin(); it != model->batches->end(); ++it) {
 				const MBatchDraw::Ref &batch = *it;
-				if (batch->lit && !FindInteraction(light, *batch)) {
+				if ((batch->maxLights > 0) && !FindInteraction(light, *batch)) {
 					CreateInteraction(light, entity, *batch);
 				}
 			}
@@ -416,7 +418,7 @@ void WorldDraw::LinkLight(
 
 		for (MBatchDraw::RefVec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
 			const MBatchDraw::Ref &batch = *it;
-			if (batch->lit && !FindInteraction(light, *batch)) {
+			if ((batch->maxLights > 0) && !FindInteraction(light, *batch)) {
 				CreateInteraction(light, occupant, *batch);
 			}
 		}
