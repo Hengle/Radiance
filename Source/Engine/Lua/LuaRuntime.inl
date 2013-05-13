@@ -89,7 +89,7 @@ inline void SharedPtr::Push(lua_State *L) {
 }
 
 template <typename T>
-inline boost::shared_ptr<T> SharedPtr::Get(lua_State *L, const char *tname, int index, bool luaError) {
+boost::shared_ptr<T> SharedPtr::Get(lua_State *L, const char *tname, int index, bool luaError) {
 	if (lua_type(L, index) != LUA_TTABLE) {
 		if (luaError)
 			luaL_typerror(L, index, tname);
@@ -354,7 +354,7 @@ inline bool Marshal<Vec4>::IsA(lua_State *L, int index) {
 }
 
 template <typename T>
-inline void Marshal<boost::shared_ptr<T> >::Push(lua_State *L, const boost::shared_ptr<T> &ptr, int id) {
+void Marshal<boost::shared_ptr<T> >::Push(lua_State *L, const boost::shared_ptr<T> &ptr, int id) {
 	RAD_ASSERT(L);
 	lua_createtable(L, 0, 2);
 	new (lua_newuserdata(L, sizeof(boost::shared_ptr<T>))) boost::shared_ptr<T>(ptr);
@@ -368,7 +368,7 @@ inline void Marshal<boost::shared_ptr<T> >::Push(lua_State *L, const boost::shar
 }
 
 template <typename T>
-inline boost::shared_ptr<T> Marshal<boost::shared_ptr<T> >::Get(lua_State *L, int index, int id, bool luaError) {
+boost::shared_ptr<T> Marshal<boost::shared_ptr<T> >::Get(lua_State *L, int index, int id, bool luaError) {
 	if (lua_type(L, index) != LUA_TTABLE) {
 		if (luaError)
 			luaL_typerror(L, index, "table");
@@ -411,15 +411,11 @@ inline bool Marshal<boost::shared_ptr<T> >::IsA(lua_State *L, int index, int id)
 }
 
 template <typename T>
-inline int Marshal<boost::shared_ptr<T> >::gc(lua_State *L) {
+int Marshal<boost::shared_ptr<T> >::gc(lua_State *L) {
 	if (lua_type(L, -1) == LUA_TUSERDATA) {
 		boost::shared_ptr<T> *x = reinterpret_cast<boost::shared_ptr<T>*>(lua_touserdata(L, -1));
 		RAD_ASSERT(x);
-#if defined(RAD_OPT_LLVM)
-		x->template shared_ptr<T>::~shared_ptr();
-#else
 		x->~shared_ptr();
-#endif
 	}
 	return 0;
 }
