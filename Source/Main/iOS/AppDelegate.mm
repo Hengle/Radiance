@@ -123,9 +123,9 @@ AppDelegate *s_app;
 
 - (void)startRefresh {
 	[self stopRefresh];
-	if (throttleFramerate) {
+	/*if (throttleFramerate) {
 		refreshTimer = [NSTimer scheduledTimerWithTimeInterval:(1.f / TARGET_FRAME_RATE) target:self selector:@selector(gameUpdate) userInfo:nil repeats:YES];
-	} else {
+	} else*/ {
 		refreshTimer = [NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(gameUpdate) userInfo:nil repeats:YES];
 	}
 }
