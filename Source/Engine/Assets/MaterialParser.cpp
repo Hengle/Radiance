@@ -833,13 +833,19 @@ int MaterialLoader::Process(
 
 					int dBase = r::Shader::kPass_Diffuse1;
 					int dsBase = r::Shader::kPass_DiffuseSpecular1;
+					
+					// is this a diffuse specular material?
+					bool diffuseSpecular = parser->material->shader->HasPass((r::Shader::Pass)dsBase);
 
 					for (int i = 0; i < r::kMaxLights; ++i) {
-						if (!(parser->material->shader->HasPass((r::Shader::Pass)dBase) ||
-							  parser->material->shader->HasPass((r::Shader::Pass)dsBase))) {
-							break;
+						if (diffuseSpecular) {
+							if (!parser->material->shader->HasPass((r::Shader::Pass)(dsBase + i)))
+								break;
+						} else {
+							if (!parser->material->shader->HasPass((r::Shader::Pass)(dBase + i)))
+								break;
 						}
-
+						
 						parser->material->m_maxLights = i+1;
 					}
 				}

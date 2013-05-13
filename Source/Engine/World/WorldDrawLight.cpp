@@ -12,6 +12,7 @@
 #include "Entity.h"
 #include "Occupant.h"
 #include "../Renderer/Shader.h"
+#include <algorithm>
 
 namespace world {
 
@@ -118,6 +119,8 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 	}
 
 	int curPass = -1;
+	
+	const int kMaxLights = std::min(mat.maxLights.get(), m_world->cvars->r_maxLightsPerPass.value.get());
 
 	for (;;) {
 		details::LightInteraction *interaction = draw.m_interactions;
@@ -127,8 +130,8 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 			// batch up to kNumLights
 			u.lights.numLights = 0;
 			lightBounds.Initialize();
-
-			while (interaction && (u.lights.numLights < mat.maxLights)) {
+	
+			while (interaction && (u.lights.numLights < kMaxLights)) {
 				if (interaction->light->m_visFrame != m_markFrame) {
 					interaction = interaction->nextOnBatch;
 					continue; // not visible this frame.

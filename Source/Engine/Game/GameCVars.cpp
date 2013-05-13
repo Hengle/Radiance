@@ -7,6 +7,7 @@
 
 #include RADPCH
 #include "GameCVars.h"
+#include "../Renderer/Common.h"
 
 // cvar defaults
 GameCVars::GameCVars(Game &game, CVarZone &zone) : 
@@ -19,6 +20,7 @@ r_showmovecmds(zone, "r_showmovecmds", false, false),
 r_frustumcull(zone, "r_frustumcull", false, false),
 r_lightscissor(zone, "r_lightscissor", true, false),
 r_showlightscissor(zone, "r_showlightscissor", false, false),
-r_throttle(zone, "r_throttle", true, false){
+r_throttle(zone, "r_throttle", true, false),
+r_maxLightsPerPass(zone, "r_maxlightsperpass", r::kMaxLights, false){
 }
 
