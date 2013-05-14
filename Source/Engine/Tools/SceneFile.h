@@ -842,7 +842,7 @@ public:
 
 	//! Contains a single triangle in a model. Indices are indexes into the models vertex array.
 	struct TriFace {
-		TriFace() : outside(true), shared(-1), contents(0), surface(0) {
+		TriFace() : outside(true), shared(-1), contents(0), surface(0), emitId(-1) {
 		}
 
 		TriFace(unsigned int a,
@@ -857,6 +857,7 @@ public:
 			v[0] = a;
 			v[1] = b;
 			v[2] = c;
+			emitId = -1;
 		}
 
 		Plane plane;
@@ -865,6 +866,7 @@ public:
 		int mat;
 		int shared;
 		int contents;
+		int emitId;
 		int surface;
 		bool outside;
 		TriModel *model;
@@ -941,6 +943,8 @@ public:
 	==============================================================================
 	*/
 
+	typedef typename zone_map<int, typename IntVec, Z3DXT>::type AreaModelIdVec;
+
 	struct TriModel {
 		typedef boost::shared_ptr<TriModel> Ref;
 		typedef typename zone_vector<Ref, Z3DXT>::type Vec;
@@ -960,12 +964,12 @@ public:
 
 		TriVertVec verts;
 		TriFaceVec tris;
+		AreaModelIdVec emitIds;
 		SkinRef skin;
 		AnimMap anims;
 		BBox bounds;
 		String name;
 		AreaNumSet areas;
-		IntVec emitIds;
 		IntVec portalIds;
 		int id;
 		int skel;

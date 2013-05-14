@@ -344,19 +344,20 @@ bool BSPBuilder::EmitBSPAreas() {
 		for (SceneFile::TriModel::Vec::const_iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
 			const SceneFile::TriModel::Ref &trim = *m;
 
-			if (trim->areas.find(area->area) == trim->areas.end())
+			SceneFile::AreaModelIdVec::const_iterator it = trim->emitIds.find(area->area);
+
+			if (it == trim->emitIds.end())
 				continue; // not in this area.
-			if (trim->emitIds.empty())
-				continue;
+			
+			const SceneFile::IntVec &emitIds = it->second;
+			if (emitIds.empty())
+				continue; // not in this area
 			
 			bounds.Insert(trim->bounds);
 
-			// NOTE this indexes all model fragments, even if they are isolated in other areas they still
-			// belong to a model that touches this area.
+			m_bspFile->ReserveModelIndices((int)emitIds.size());
 
-			m_bspFile->ReserveModelIndices((int)trim->emitIds.size());
-
-			for (SceneFile::IntVec::const_iterator id = trim->emitIds.begin(); id != trim->emitIds.end(); ++id) {
+			for (SceneFile::IntVec::const_iterator id = emitIds.begin(); id != emitIds.end(); ++id) {
 				if (*id > std::numeric_limits<U16>::max()) {
 					Log("ERROR: there are too many models in this map (exceeds 32k)!\n");
 					SetResult(pkg::SR_CompilerError);
@@ -517,7 +518,6 @@ void BSPBuilder::EmitBSPModels() {
 
 void BSPBuilder::EmitBSPModel(const SceneFile::TriModel::Ref &triModel) {
 
-	typedef zone_set<int, ZBSPBuilderT>::type IntSet;
 	IntSet mats;
 
 	// gather materials.
@@ -531,6 +531,25 @@ void BSPBuilder::EmitBSPModel(const SceneFile::TriModel::Ref &triModel) {
 		mats.insert(trif.mat);
 	}
 
+	for (SceneFile::TriFaceVec::const_iterator f = triModel->tris.begin(); f != triModel->tris.end(); ++f) {
+		const SceneFile::TriFace &trif = *f;
+		if (trif.emitId != -1)
+			continue; // already done
+
+		// get areas from tris
+		EmitBSPModel(
+			triModel,
+			mats,
+			trif.areas
+		);
+	}
+}
+
+void BSPBuilder::EmitBSPModel(
+	const SceneFile::TriModel::Ref &triModel,
+	const IntSet &mats,
+	const SceneFile::AreaNumSet &areas
+) {
 	for (int c = 1; c <= kMaxUVChannels; ++c){
 		for (IntSet::const_iterator it = mats.begin(); it != mats.end(); ++it) {
 			EmitTriModel m;
@@ -538,21 +557,25 @@ void BSPBuilder::EmitBSPModel(const SceneFile::TriModel::Ref &triModel) {
 			m.numChannels = c;
 			m.bounds.Initialize();
 
-			for (SceneFile::TriFaceVec::const_iterator f = triModel->tris.begin(); f != triModel->tris.end(); ++f) {
-				const SceneFile::TriFace &trif = *f;
+			for (SceneFile::TriFaceVec::iterator f = triModel->tris.begin(); f != triModel->tris.end(); ++f) {
+				SceneFile::TriFace &trif = *f;
 
+				if (trif.emitId != -1)
+					continue;
 				if (trif.mat != m.mat)
 					continue;
 				if (trif.model->numChannels != c)
 					continue;
-				if (trif.areas.empty())
-					continue;
 				if (trif.surface&kSurfaceFlag_NoDraw)
 					continue;
+				if (trif.areas != areas)
+					continue;
+
+				trif.emitId = 0; // just flag as emitted
 
 				if (((int)m.indices.size() >= kMaxBatchElements-3) ||
 					((int)m.verts.size() >= kMaxBatchElements-3)) {
-					triModel->emitIds.push_back(EmitBSPModel(m));
+					EmitBSPModel(triModel, m, areas);
 					m.Clear();
 				}
 
@@ -562,10 +585,22 @@ void BSPBuilder::EmitBSPModel(const SceneFile::TriModel::Ref &triModel) {
 			}
 
 			if (!m.verts.empty()) {
-				triModel->emitIds.push_back(EmitBSPModel(m));
+				EmitBSPModel(triModel, m, areas);
 			}
 		}
 	}
+}
+
+int BSPBuilder::EmitBSPModel(
+	const SceneFile::TriModel::Ref &triModel,
+	const EmitTriModel &model,
+	const SceneFile::AreaNumSet &areas
+) {
+	int id = EmitBSPModel(model);
+	for (SceneFile::AreaNumSet::const_iterator it = areas.begin(); it != areas.end(); ++it) {
+		triModel->emitIds[*it].push_back(id);
+	}
+	return id;
 }
 
 void BSPBuilder::EmitTriModel::AddVertex(const Vert &vert) {
@@ -1158,7 +1193,7 @@ bool BSPBuilder::EmitBSPFloors() {
 			t->planenum = m_planes.FindPlaneNum(kPlane);
 		}
 
-		m->emitIds.push_back(emitId);
+		m->emitIds[0].push_back(emitId);
 	}
 
 	return true;
@@ -1390,7 +1425,7 @@ int BSPBuilder::FindBSPFloor(const char *name) {
 			continue;
 
 		if (m->name == kName)
-			return m->emitIds[0];
+			return m->emitIds[0][0];
 	}
 
 	return -1;

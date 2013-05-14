@@ -672,6 +672,8 @@ private:
 	==============================================================================
 	*/
 
+	typedef zone_set<int, world::bsp_file::ZBSPBuilderT>::type IntSet;
+
 	bool EmitBSPFile();
 	void EmitBSPMaterials();
 	bool EmitBSPEntities();
@@ -683,6 +685,16 @@ private:
 	void EmitBSPAreaportals(Node *leaf, int areaNum, world::bsp_file::BSPArea &area);
 	void EmitBSPModels();
 	void EmitBSPModel(const SceneFile::TriModel::Ref &triModel);
+	void EmitBSPModel(
+		const SceneFile::TriModel::Ref &triModel,
+		const IntSet &mats,
+		const SceneFile::AreaNumSet &areas
+	);
+	int EmitBSPModel(
+		const SceneFile::TriModel::Ref &triModel,
+		const EmitTriModel &model,
+		const SceneFile::AreaNumSet &areas
+	);
 	int EmitBSPBrush(const SceneFile::Brush &brush);
 	int EmitBSPModel(const EmitTriModel &model);
 	S32 EmitBSPNodes(const Node *node, S32 parent);
