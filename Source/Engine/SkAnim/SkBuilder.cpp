@@ -1265,7 +1265,7 @@ bool CompileCPUSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 	m.reset();
 
 	if (models.empty())
-		return true;
+		return false;
 
 	{ // file 1: non persistant data (material names, texCoords, tris)
 		stream::DynamicMemOutputBuffer ob(ska::ZSka);
