@@ -309,6 +309,8 @@ private:
 		const BBox &volumeBounds
 	);
 		
+	void UpdateLightInteractions(ViewDef &view);
+
 	bool ClipBounds(const StackWindingStackVec &volume, const BBox &volumeBounds, const BBox &bounds);
 	void DrawView();
 	void DrawView(ViewDef &view);
@@ -456,10 +458,11 @@ private:
 		BBoxVec debugWorldBBoxes;
 		Vec4Vec debugLightScissors;
 		LocalMaterial debugWireframe_M;
-		LocalMaterial debugPortal_M[2];
+		boost::array<LocalMaterial, 2> debugPortal_M;
 		LocalMaterial debugWorldBBox_M;
 		LocalMaterial debugEntityBBox_M;
 		LocalMaterial debugWaypoint_M;
+		boost::array<LocalMaterial, 6> debugLightPasses_M;
 	};
 	
 	int  LoadDebugMaterials();
@@ -475,7 +478,9 @@ private:
 	void DebugDrawActiveWaypoints();
 	void DebugDrawFloorMoves();
 	void DebugDrawFloorMoveBatch(const LocalMaterial &material, const FloorMove &move);
-
+	void DebugDrawLightPasses(ViewDef &view);
+	void DebugDrawLightPass(const details::MBatch &batch);
+	
 	DebugVars m_dbgVars;
 #endif
 	

@@ -622,6 +622,7 @@ void WorldDraw::DrawView() {
 	SetupFrustumPlanes(view);
 
 	VisMarkAreas(view);
+	UpdateLightInteractions(view);
 
 	m_rb->RotateForCamera(view.camera);
 	m_rb->SetWorldStates();
@@ -629,7 +630,17 @@ void WorldDraw::DrawView() {
 	m_rb->numTris = 0;
 	m_counters.numMaterials += (int)view.batches.size();
 
+#if defined(WORLD_DEBUG_DRAW)
+	if (m_world->cvars->r_showlightpasses.value) {
+		DebugDrawLightPasses(view);
+	} else {
+#endif
+
 	DrawViewBatches(view, false);
+
+#if defined(WORLD_DEBUG_DRAW)
+	}
+#endif
 
 	m_counters.numTris += m_rb->numTris;
 
@@ -670,6 +681,12 @@ void WorldDraw::DrawView() {
 #endif
 }
 
+void WorldDraw::UpdateLightInteractions(ViewDef &view) {
+	for (LightVec::const_iterator it = view.visLights.begin(); it != view.visLights.end(); ++it) {
+		UpdateLightInteractions(**it);
+	}
+}
+
 void WorldDraw::DrawOverlays() {
 	for (ScreenOverlay::List::const_iterator it = m_overlays.begin(); it != m_overlays.end(); ++it)
 		DrawOverlay(*(*it));
@@ -687,12 +704,7 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 			DrawUnlitBatch(*it->second, wireframe);
 		}
 
-		m_rb->ReleaseArrayStates();
 		return;
-	}
-
-	for (LightVec::const_iterator it = view.visLights.begin(); it != view.visLights.end(); ++it) {
-		UpdateLightInteractions(**it);
 	}
 
 	// unshadowed light pass
@@ -707,8 +719,6 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 			}
 		}
 	}
-
-	m_rb->ReleaseArrayStates();
 }
 
 void WorldDraw::DrawUnlitBatch(const details::MBatch &batch, bool wireframe) {
@@ -761,6 +771,7 @@ void WorldDraw::DrawUnlitBatch(const details::MBatch &batch, bool wireframe) {
 			m_rb->PopMatrix();
 	}
 
+	m_rb->ReleaseArrayStates();
 	mat->shader->End();
 }
 

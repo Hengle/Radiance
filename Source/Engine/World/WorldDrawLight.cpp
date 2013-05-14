@@ -43,6 +43,7 @@ void WorldDraw::DrawUnshadowedLitBatch(const details::MBatch &batch) {
 		DrawBatch(*draw, *mat);
 	}
 
+	m_rb->ReleaseArrayStates();
 	mat->shader->End();
 
 	if (batch.matRef->mat->maxLights < 1)
@@ -99,9 +100,6 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 
 	RAD_ASSERT_MSG(diffuse, "All lighting shaders must have diffuse pass!");
 	
-	bool didDiffuse = false;
-	bool didDiffuseSpecular = false;
-
 	const bool tx = draw.GetTransform(pos, angles);
 	if (tx) {
 		m_rb->PushMatrix(pos, draw.scale, angles);
@@ -122,6 +120,9 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 	
 	const int kMaxLights = std::min(mat.maxLights.get(), m_world->cvars->r_maxLightsPerPass.value.get());
 
+	bool didDiffuse = false;
+	bool didDiffuseSpecular = false;
+
 	for (;;) {
 		details::LightInteraction *interaction = draw.m_interactions;
 
@@ -137,14 +138,14 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 					continue; // not visible this frame.
 				}
 
-				Light::LightStyle style = interaction->light->style;
+				const Light::LightStyle kStyle = interaction->light->style;
 
-				if (!(style & Light::kStyle_CastShadows)) {
+				if (!(kStyle & Light::kStyle_CastShadows)) {
 					bool add = false;
 
-					if ((style&Light::kStyle_DiffuseSpecular) == Light::kStyle_DiffuseSpecular) {
+					if ((kStyle&Light::kStyle_DiffuseSpecular) == Light::kStyle_DiffuseSpecular) {
 						add = !didDiffuseSpecular;
-					} else if (style&Light::kStyle_Diffuse) {
+					} else if (kStyle&Light::kStyle_Diffuse) {
 						add = diffuse && (!diffuseSpecular || didDiffuseSpecular);
 					}
 					
@@ -179,6 +180,7 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 				RAD_ASSERT(mat.shader->HasPass((r::Shader::Pass)pass));
 
 				if (curPass != pass) {
+					m_rb->ReleaseArrayStates();
 					mat.shader->End();
 					mat.shader->Begin((r::Shader::Pass)pass, mat);
 					curPass = pass;
@@ -210,11 +212,13 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 		}
 	}
 
-	if (curPass != -1)
-		mat.shader->End();
-
 	if (tx)
 		m_rb->PopMatrix();
+
+	if (curPass != -1) {
+		m_rb->ReleaseArrayStates();
+		mat.shader->End();
+	}
 }
 
 void WorldDraw::GenLightDef(

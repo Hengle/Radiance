@@ -21,6 +21,7 @@ r_frustumcull(zone, "r_frustumcull", false, false),
 r_lightscissor(zone, "r_lightscissor", true, false),
 r_showlightscissor(zone, "r_showlightscissor", false, false),
 r_throttle(zone, "r_throttle", true, false),
+r_showlightpasses(zone, "r_showlightpasses", false, false),
 r_maxLightsPerPass(zone, "r_maxlightsperpass", r::kMaxLights, false){
 }
 

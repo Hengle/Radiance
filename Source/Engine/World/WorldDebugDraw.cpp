@@ -40,6 +40,30 @@ int WorldDraw::LoadDebugMaterials() {
 	if (r != pkg::SR_Success)
 		return r;
 
+	r = LoadMaterial("Sys/DebugLight0_M", m_dbgVars.debugLightPasses_M[0]);
+	if (r != pkg::SR_Success)
+		return r;
+
+	r = LoadMaterial("Sys/DebugLight1_M", m_dbgVars.debugLightPasses_M[1]);
+	if (r != pkg::SR_Success)
+		return r;
+
+	r = LoadMaterial("Sys/DebugLight2_M", m_dbgVars.debugLightPasses_M[2]);
+	if (r != pkg::SR_Success)
+		return r;
+
+	r = LoadMaterial("Sys/DebugLight3_M", m_dbgVars.debugLightPasses_M[3]);
+	if (r != pkg::SR_Success)
+		return r;
+
+	r = LoadMaterial("Sys/DebugLight4_M", m_dbgVars.debugLightPasses_M[4]);
+	if (r != pkg::SR_Success)
+		return r;
+
+	r = LoadMaterial("Sys/DebugLight5_M", m_dbgVars.debugLightPasses_M[5]);
+	if (r != pkg::SR_Success)
+		return r;
+
 	return m_rb->LoadMaterials();
 }
 
@@ -332,6 +356,135 @@ void WorldDraw::DebugDrawFloorMoveBatch(const LocalMaterial &material, const Flo
 		material.mat->shader->BindStates();
 		m_rb->CommitStates();
 		m_rb->DebugDrawLineStrip(kSplineTess);
+	}
+}
+
+void WorldDraw::DebugDrawLightPasses(ViewDef &view) {
+	for (int i = 0; i < r::Material::kNumSorts; ++i) {
+		for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
+			const details::MBatch &batch = *it->second;
+
+			if (batch.matRef->mat->sort != (r::Material::Sort)i) {
+				continue;
+			}
+
+			if (batch.matRef->mat->maxLights > 0) {
+				DebugDrawLightPass(batch);
+			} else {
+				DrawUnlitBatch(batch, false);
+			}
+		}
+	}
+}
+
+void WorldDraw::DebugDrawLightPass(const details::MBatch &batch) {
+
+	r::Material *mat = batch.matRef->mat;
+		
+	Vec3 pos;
+	Vec3 angles;
+	
+	bool diffuse = mat->shader->HasPass(r::Shader::kPass_Diffuse1);
+	bool diffuseSpecular = mat->shader->HasPass(r::Shader::kPass_DiffuseSpecular1);
+
+	RAD_ASSERT_MSG(diffuse, "All lighting shaders must have diffuse pass!");
+
+	const int kMaxLights = std::min(mat->maxLights.get(), m_world->cvars->r_maxLightsPerPass.value.get());
+
+	for (details::MBatchDrawLink *link = batch.head; link; link = link->next) {
+		MBatchDraw *draw = link->draw;
+
+		const bool tx = draw->GetTransform(pos, angles);
+		if (tx) {
+			m_rb->PushMatrix(pos, draw->scale, angles);
+		}
+
+		int numPasses = 0;
+		
+		details::LightInteraction *interaction = draw->m_interactions;
+		while (interaction) {
+			if (interaction->light->m_visFrame != m_markFrame) {
+				interaction = interaction->nextOnBatch;
+				continue; // not visible this frame.
+			}
+			const Light::LightStyle kStyle = interaction->light->style;
+			if (kStyle & Light::kStyle_CastShadows) {
+				++numPasses; // shadow casters cannot be batched.
+			}
+			interaction = interaction->nextOnBatch;
+		}
+
+		bool didDiffuse = false;
+		bool didDiffuseSpecular = false;
+
+		// count the # of lighting passes required to render this object.
+		for (;;) {
+			interaction = draw->m_interactions;
+
+			while (interaction) {
+
+				// batch up to kNumLights
+				int numLights = 0;
+	
+				while (interaction && (numLights < kMaxLights)) {
+					if (interaction->light->m_visFrame != m_markFrame) {
+						interaction = interaction->nextOnBatch;
+						continue; // not visible this frame.
+					}
+
+					const Light::LightStyle kStyle = interaction->light->style;
+
+					if (!(kStyle & Light::kStyle_CastShadows)) {
+						bool add = false;
+
+						if ((kStyle&Light::kStyle_DiffuseSpecular) == Light::kStyle_DiffuseSpecular) {
+							add = !didDiffuseSpecular;
+						} else if (kStyle&Light::kStyle_Diffuse) {
+							add = diffuse && (!diffuseSpecular || didDiffuseSpecular);
+						}
+					
+						if (add) {
+							++numLights;
+						}
+					}
+
+					interaction = interaction->nextOnBatch;
+				}
+
+				if (numLights > 0) {
+					++numPasses;
+				}
+
+				if (numPasses >= 5)
+					break; // debug display doesn't do more than this.
+			}
+
+			if (numPasses >= 5)
+				break; // debug display doesn't do more than this.
+
+			if (diffuseSpecular && !didDiffuseSpecular) {
+				didDiffuseSpecular = true;
+			} else {
+				break;
+			}
+		}
+
+		const LocalMaterial &debugMat = m_dbgVars.debugLightPasses_M[numPasses];
+		
+		debugMat.mat->BindStates();
+		debugMat.mat->BindTextures(debugMat.loader);
+		debugMat.mat->shader->Begin(r::Shader::kPass_Default, *debugMat.mat);
+		draw->Bind(debugMat.mat->shader.get().get());
+		debugMat.mat->shader->BindStates();
+		m_rb->CommitStates();
+		draw->CompileArrayStates(*debugMat.mat->shader.get());
+		draw->Draw();
+
+		if (tx)
+			m_rb->PopMatrix();
+
+		m_rb->ReleaseArrayStates();
+		debugMat.mat->shader->End();
 	}
 }
 
