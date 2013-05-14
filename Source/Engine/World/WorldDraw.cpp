@@ -633,6 +633,8 @@ void WorldDraw::DrawView() {
 #if defined(WORLD_DEBUG_DRAW)
 	if (m_world->cvars->r_showlightpasses.value) {
 		DebugDrawLightPasses(view);
+	} else if(m_world->cvars->r_showlightcounts.value) {
+		DebugDrawLightCounts(view);
 	} else {
 #endif
 

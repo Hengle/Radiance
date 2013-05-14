@@ -480,6 +480,8 @@ private:
 	void DebugDrawFloorMoveBatch(const LocalMaterial &material, const FloorMove &move);
 	void DebugDrawLightPasses(ViewDef &view);
 	void DebugDrawLightPass(const details::MBatch &batch);
+	void DebugDrawLightCounts(ViewDef &view);
+	void DebugDrawLightCounts(const details::MBatch &batch);
 	
 	DebugVars m_dbgVars;
 #endif

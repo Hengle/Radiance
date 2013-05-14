@@ -488,6 +488,77 @@ void WorldDraw::DebugDrawLightPass(const details::MBatch &batch) {
 	}
 }
 
+void WorldDraw::DebugDrawLightCounts(ViewDef &view) {
+	for (int i = 0; i < r::Material::kNumSorts; ++i) {
+		for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
+			const details::MBatch &batch = *it->second;
+
+			if (batch.matRef->mat->sort != (r::Material::Sort)i) {
+				continue;
+			}
+
+			if (batch.matRef->mat->maxLights > 0) {
+				DebugDrawLightCounts(batch);
+			} else {
+				DrawUnlitBatch(batch, false);
+			}
+		}
+	}
+}
+
+void WorldDraw::DebugDrawLightCounts(const details::MBatch &batch) {
+
+	r::Material *mat = batch.matRef->mat;
+		
+	Vec3 pos;
+	Vec3 angles;
+	
+	bool diffuse = mat->shader->HasPass(r::Shader::kPass_Diffuse1);
+	bool diffuseSpecular = mat->shader->HasPass(r::Shader::kPass_DiffuseSpecular1);
+
+	RAD_ASSERT_MSG(diffuse, "All lighting shaders must have diffuse pass!");
+
+	const int kMaxLights = std::min(mat->maxLights.get(), m_world->cvars->r_maxLightsPerPass.value.get());
+
+	for (details::MBatchDrawLink *link = batch.head; link; link = link->next) {
+		MBatchDraw *draw = link->draw;
+
+		const bool tx = draw->GetTransform(pos, angles);
+		if (tx) {
+			m_rb->PushMatrix(pos, draw->scale, angles);
+		}
+
+		int numLights = 0;
+		
+		details::LightInteraction *interaction = draw->m_interactions;
+		while (interaction) {
+			if (interaction->light->m_visFrame == m_markFrame) {
+				++numLights;
+				if (numLights >= 5) // max for debug display
+					break;
+			}
+			interaction = interaction->nextOnBatch;
+		}
+
+		const LocalMaterial &debugMat = m_dbgVars.debugLightPasses_M[numLights];
+		
+		debugMat.mat->BindStates();
+		debugMat.mat->BindTextures(debugMat.loader);
+		debugMat.mat->shader->Begin(r::Shader::kPass_Default, *debugMat.mat);
+		draw->Bind(debugMat.mat->shader.get().get());
+		debugMat.mat->shader->BindStates();
+		m_rb->CommitStates();
+		draw->CompileArrayStates(*debugMat.mat->shader.get());
+		draw->Draw();
+
+		if (tx)
+			m_rb->PopMatrix();
+
+		m_rb->ReleaseArrayStates();
+		debugMat.mat->shader->End();
+	}
+}
+
 } // world
 
 #endif // defined(WORLD_DEBUG_DRAW)

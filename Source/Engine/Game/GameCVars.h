@@ -25,6 +25,7 @@ public:
 	CVarBool r_showlightscissor;
 	CVarBool r_throttle;
 	CVarBool r_showlightpasses;
+	CVarBool r_showlightcounts;
 	CVarInt r_maxLightsPerPass;
 
 	void AddLuaVar(const CVar::Ref &cvar) {
