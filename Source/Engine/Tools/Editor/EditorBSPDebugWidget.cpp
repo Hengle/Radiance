@@ -23,7 +23,7 @@ GLNavWidget(parent, f), m_menu(0), m_time(0.f), m_dt(0.f), m_loaded(false), m_en
 	RAD_VERIFY(connect(MainWindow::Get(), SIGNAL(OnTick(float)), SLOT(OnTick(float))));
 
 	SetFreeMode();
-	GLNavWidget::kbSpeed = 15.f;
+	GLNavWidget::kbSpeed = 1500.f;
 	GLNavWidget::mouseSpeed = 0.5f;
 	GLNavWidget::camera->fov = 90.f;
 }
