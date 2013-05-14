@@ -6,6 +6,7 @@
 #include RADPCH
 #include "E_ViewController.h"
 #include "../World.h"
+#include "../../Game/GameCVars.h"
 #include <algorithm>
 
 namespace world {
@@ -513,10 +514,12 @@ void E_ViewController::Tick(
 }
 
 void E_ViewController::TickFixedMode(int frame, float dt, const Entity::Ref &target) {
-	Vec3 fwd = Mat4::Rotation(QuatFromAngles(m_angles)) * Vec3(1, 0, 0);
-	world->camera->pos = m_pos + Sway::Tick(m_sways, dt, fwd);
-	world->camera->angles = m_angles;
-	world->camera->fov = TickFOV(frame, dt, 0.f);;
+	if (!world->cvars->r_fly.value) {
+		Vec3 fwd = Mat4::Rotation(QuatFromAngles(m_angles)) * Vec3(1, 0, 0);
+		world->camera->pos = m_pos + Sway::Tick(m_sways, dt, fwd);
+		world->camera->angles = m_angles;
+		world->camera->fov = TickFOV(frame, dt, 0.f);;
+	}
 }
 
 void E_ViewController::TickDistanceMode(int frame, float dt, const Entity::Ref &target) {
@@ -564,10 +567,13 @@ void E_ViewController::TickDistanceMode(int frame, float dt, const Entity::Ref &
 		
 	float fov = TickFOV(frame, dt, lookVec.Magnitude());
 	
-	world->camera->pos = mPos;
-	world->camera->angles = mAngles;
-	world->camera->fov = fov;
-	world->camera->quatMode = false;
+	if (!world->cvars->r_fly.value) {
+		world->camera->pos = mPos;
+		world->camera->angles = mAngles;
+		world->camera->fov = fov;
+		world->camera->quatMode = false;
+	}
+
 	m_sync = false;
 }
 
@@ -642,16 +648,20 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 		Vec3 angles = LookAngles(m_rail.lookFwd);
 		Vec3 camAngles = AnglesFromQuat(m_rail.rot);
 		angles[0] = camAngles[0]; // always bank
-		world->camera->pos = pos;
-		world->camera->angles = angles;
-		world->camera->fov = fov;
-		world->camera->quatMode = false;
+		if (!world->cvars->r_fly.value) {
+			world->camera->pos = pos;
+			world->camera->angles = angles;
+			world->camera->fov = fov;
+			world->camera->quatMode = false;
+		}
 	// special case (fully restricted camera)
 	} else if (m_rail.clamp[1] == 0.f && m_rail.clamp[2] == 0.f) {
-		world->camera->pos = pos;
-		world->camera->rot = m_rail.rot;
-		world->camera->fov = fov;
-		world->camera->quatMode = true;
+		if (!world->cvars->r_fly.value) {
+			world->camera->pos = pos;
+			world->camera->rot = m_rail.rot;
+			world->camera->fov = fov;
+			world->camera->quatMode = true;
+		}
 	} else {
 		// we can drift +/- clamp angles from the cinematic camera orientation.
 		Vec3 qAngles = AnglesFromQuat(m_rail.rot);
@@ -675,10 +685,12 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 
 		fAngles[0] = qAngles[0]; // preserve roll
 
-		world->camera->pos = pos;
-		world->camera->angles = fAngles;
-		world->camera->fov = fov;
-		world->camera->quatMode = false;
+		if (!world->cvars->r_fly.value) {
+			world->camera->pos = pos;
+			world->camera->angles = fAngles;
+			world->camera->fov = fov;
+			world->camera->quatMode = false;
+		}
 	}
 
 	m_sync = false;

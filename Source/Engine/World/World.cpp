@@ -51,7 +51,8 @@ m_unloadSlotReq(false),
 m_switchLoad(false),
 m_switchLoadScreen(false),
 m_generateSave(false),
-m_gestures(0) {
+m_gestures(0),
+m_flyCam(0) {
 	m_draw.reset(new (ZWorld) WorldDraw(this));
 	m_cinematics.reset(new (ZWorld) WorldCinematics(this));
 	m_gameSpeed[0] = m_gameSpeed[1] = m_gameSpeed[2] = 1.f;

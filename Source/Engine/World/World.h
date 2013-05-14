@@ -588,6 +588,7 @@ private:
 	bool m_destroy;
 	bool m_loadReq;
 	bool m_loadScreen;
+	bool m_flyCam;
 	UnloadDisposition m_unloadDisp;
 	bool m_returnReq;
 	bool m_switchReq;

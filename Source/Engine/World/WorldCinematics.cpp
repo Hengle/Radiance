@@ -12,6 +12,7 @@
 #include "../SkAnim/SkControllers.h"
 #include "../App.h"
 #include "../Engine.h"
+#include "../Game/GameCVars.h"
 
 using namespace pkg;
 using namespace world::bsp_file;
@@ -944,10 +945,12 @@ void WorldCinematics::BlendCameraFrame(Cinematic &c) {
 		fov = math::Lerp(m_world->camera->fov.get(), fov, blend);
 	}
 
-	m_world->camera->rot = tmOut.r;
-	m_world->camera->pos = tmOut.t;
-	m_world->camera->fov = fov;
-	m_world->camera->quatMode = true;
+	if (!m_world->cvars->r_fly.value) {
+		m_world->camera->rot = tmOut.r;
+		m_world->camera->pos = tmOut.t;
+		m_world->camera->fov = fov;
+		m_world->camera->quatMode = true;
+	}
 
 	c.camera = !end;
 }

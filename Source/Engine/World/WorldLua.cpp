@@ -148,6 +148,7 @@ bool WorldLua::Init() {
 		{ "CameraFwd", lua_World_CameraFwd },
 		{ "CameraLeft", lua_World_CameraLeft },
 		{ "CameraUp", lua_World_CameraUp },
+		{ "SetCamera", lua_World_SetCamera},
 		{ "SetEnabledGestures", lua_World_SetEnabledGestures },
 		{ "FlushInput", lua_World_FlushInput },
 		{ "FindFloor", lua_World_FindFloor },

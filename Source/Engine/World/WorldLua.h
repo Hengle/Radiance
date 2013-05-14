@@ -233,6 +233,7 @@ private:
 	static int lua_World_CameraFwd(lua_State *L);
 	static int lua_World_CameraLeft(lua_State *L);
 	static int lua_World_CameraUp(lua_State *L);
+	static int lua_World_SetCamera(lua_State *L);
 	static int lua_World_SetEnabledGestures(lua_State *L);
 	static int lua_World_FlushInput(lua_State *L);
 	static int lua_World_FindFloor(lua_State *L);

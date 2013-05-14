@@ -1017,6 +1017,15 @@ int WorldLua::lua_World_CameraUp(lua_State *L) {
 	lua::Marshal<Vec3>::Push(L, self->m_world->camera->up);
 	return 1;
 }
+
+int WorldLua::lua_World_SetCamera(lua_State *L) {
+	LOAD_SELF
+	self->m_world->camera->pos = lua::Marshal<Vec3>::Get(L, 1, true);
+	self->m_world->camera->angles = lua::Marshal<Vec3>::Get(L, 2, true);
+	self->m_world->camera->fov = (float)luaL_checknumber(L, 3);
+	self->m_world->camera->quatMode = false;
+	return 0;
+}
 	
 int WorldLua::lua_World_SetEnabledGestures(lua_State *L) {
 	LOAD_SELF
