@@ -43,7 +43,6 @@ void WorldDraw::DrawUnshadowedLitBatch(const details::MBatch &batch) {
 		DrawBatch(*draw, *mat);
 	}
 
-	m_rb->ReleaseArrayStates();
 	mat->shader->End();
 
 	if (batch.matRef->mat->maxLights < 1)
@@ -180,7 +179,6 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 				RAD_ASSERT(mat.shader->HasPass((r::Shader::Pass)pass));
 
 				if (curPass != pass) {
-					m_rb->ReleaseArrayStates();
 					mat.shader->End();
 					mat.shader->Begin((r::Shader::Pass)pass, mat);
 					curPass = pass;
@@ -216,7 +214,6 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 		m_rb->PopMatrix();
 
 	if (curPass != -1) {
-		m_rb->ReleaseArrayStates();
 		mat.shader->End();
 	}
 }

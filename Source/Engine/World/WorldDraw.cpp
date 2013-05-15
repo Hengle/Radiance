@@ -644,6 +644,7 @@ void WorldDraw::DrawView() {
 	}
 #endif
 
+	m_rb->ReleaseArrayStates();
 	m_counters.numTris += m_rb->numTris;
 
 #if defined(WORLD_DEBUG_DRAW)
@@ -773,7 +774,6 @@ void WorldDraw::DrawUnlitBatch(const details::MBatch &batch, bool wireframe) {
 			m_rb->PopMatrix();
 	}
 
-	m_rb->ReleaseArrayStates();
 	mat->shader->End();
 }
 

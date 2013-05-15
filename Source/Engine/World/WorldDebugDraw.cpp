@@ -483,7 +483,6 @@ void WorldDraw::DebugDrawLightPass(const details::MBatch &batch) {
 		if (tx)
 			m_rb->PopMatrix();
 
-		m_rb->ReleaseArrayStates();
 		debugMat.mat->shader->End();
 	}
 }
@@ -554,7 +553,6 @@ void WorldDraw::DebugDrawLightCounts(const details::MBatch &batch) {
 		if (tx)
 			m_rb->PopMatrix();
 
-		m_rb->ReleaseArrayStates();
 		debugMat.mat->shader->End();
 	}
 }
