@@ -943,7 +943,7 @@ public:
 	==============================================================================
 	*/
 
-	typedef typename zone_map<int, typename IntVec, Z3DXT>::type AreaModelIdVec;
+	typedef typename zone_map<int, IntVec, Z3DXT>::type AreaModelIdVec;
 
 	struct TriModel {
 		typedef boost::shared_ptr<TriModel> Ref;
