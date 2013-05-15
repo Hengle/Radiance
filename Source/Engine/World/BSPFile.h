@@ -26,6 +26,7 @@ enum {
 	RAD_FLAG(kAffectedByObjectLights),
 	RAD_FLAG(kAffectedByWorldLights),
 	RAD_FLAG(kCastShadows),
+	RAD_FLAG(kSkyActor),
 	kMaxUVChannels = 2
 };
 
@@ -43,8 +44,9 @@ enum ContentsFlags {
 
 	// Not in BSP
 	RAD_FLAG(kContentsFlag_Clip),
-	RAD_FLAG(kContentsFlag_Detail),
+	RAD_FLAG(kContentsFlag_Detail), // detail contents are removed if outside valid BSP
 	RAD_FLAG(kContentsFlag_Floor),
+	RAD_FLAG(kContentsFlag_Sky),
 
 	kContentsFlag_VisibleContents = kContentsFlag_Areaportal|kContentsFlag_Solid|kContentsFlag_Clip|kContentsFlag_Fog|kContentsFlag_Water,
 	kContentsFlag_FirstVisibleContents = kContentsFlag_Areaportal,
@@ -56,7 +58,8 @@ enum ContentsFlags {
 };
 
 enum SurfaceFlags {
-	RAD_FLAG(kSurfaceFlag_NoDraw)
+	RAD_FLAG(kSurfaceFlag_NoDraw),
+	RAD_FLAG(kSurfaceFlag_SkyPortal)
 };
 
 enum WaypointConnectionFlags {
@@ -101,11 +104,12 @@ struct BSPClipSurface {
 	U32 numEdgePlanes;
 };
 
-struct BSPArea {
+struct BSPArea { // sky area is always 0
 	U32 firstPortal;
 	U32 numPortals;
 	U32 firstModel;
 	U32 numModels;
+	U32 sky; // can see sky
 	float mins[3];
 	float maxs[3];
 };

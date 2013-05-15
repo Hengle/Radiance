@@ -957,7 +957,8 @@ public:
 			hideUntilRef(false), 
 			hideWhenDone(false),
 			affectedByWorldLights(false),
-			affectedByObjectLights(false) {
+			affectedByObjectLights(false),
+			sky(false) {
 			portalAreas[0] = -1;
 			portalAreas[1] = -1;
 		}
@@ -984,6 +985,7 @@ public:
 		bool affectedByWorldLights;
 		bool affectedByObjectLights;
 		bool castShadows;
+		bool sky;
 	};
 
 	/*
@@ -996,7 +998,7 @@ public:
 		typedef boost::shared_ptr<Entity> Ref;
 		typedef typename zone_vector<Ref, Z3DXT>::type Vec;
 
-		Entity() : maxEnt(false), id(-1) {}
+		Entity() : maxEnt(false), id(-1), sky(false) {}
 		String name;
 		world::Keys keys;
 		Vec3 origin;
@@ -1004,6 +1006,7 @@ public:
 		typename Brush::Vec brushes;
 		SkelVec skels;
 		bool maxEnt;
+		bool sky;
 		int id;
 	};
 

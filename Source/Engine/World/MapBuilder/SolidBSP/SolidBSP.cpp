@@ -652,7 +652,7 @@ bool BSPBuilder::LoadMaterials() {
 			if (!trim->contents)
 				trim->contents = trif.contents;
 			if (trim->contents != trif.contents) {
-				Log("ERROR: mixed contents on '%s', material '%s', this has to be corrected.\n", trim->name.c_str.get(), mat.name.c_str.get());
+				Log("ERROR: mixed contents on '%s', material '%s'.\n", trim->name.c_str.get(), mat.name.c_str.get());
 				SetResult(SR_CompilerError);
 				return false;
 			}

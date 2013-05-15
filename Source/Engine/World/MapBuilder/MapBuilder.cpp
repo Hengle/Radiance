@@ -105,6 +105,7 @@ bool MapBuilder::ParseEntity(const EntSpawn &spawn) {
 	entity->brushes = spawn.brushes;
 	Vec3 org(spawn.keys.Vec3ForKey("origin"));
 	entity->origin = SceneFile::Vec3(org.X(), org.Y(), org.Z());
+	entity->sky = spawn.keys.BoolForKey("sky", false);
 	m_map.ents.push_back(entity);
 	return true;
 }

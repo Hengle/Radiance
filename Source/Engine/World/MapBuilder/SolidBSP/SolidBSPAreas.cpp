@@ -124,6 +124,17 @@ void BSPBuilder::DecomposeAreaModel(SceneFile::TriModel &model) {
 }
 
 void BSPBuilder::DecomposeAreaPoly(Node *node, AreaPoly *poly) {
+
+	if (poly->tri->contents == kContentsFlag_Sky) {
+		poly->tri->areas.insert(0); // sky area
+		if (poly->tri->model->areas.find(0) == poly->tri->model->areas.end()) {
+			poly->tri->model->areas.insert(0);
+			++m_areas[0]->numModels;
+		}
+		poly->tri->model->outside = false;
+		return;
+	}
+
 	if (node->planenum == kPlaneNumLeaf) {
 		if ((!m_flood || node->occupied) && node->area) {
 

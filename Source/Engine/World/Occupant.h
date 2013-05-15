@@ -26,6 +26,7 @@ public:
 	virtual ~MBatchOccupant() {}
 
 	RAD_DECLARE_READONLY_PROPERTY(MBatchOccupant, visible, bool);
+	RAD_DECLARE_READONLY_PROPERTY(MBatchOccupant, sky, bool);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchOccupant, bounds, const BBox&);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchOccupant, batches, const MBatchDraw::RefVec *);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchOccupant, world, World*);
@@ -38,6 +39,7 @@ public:
 protected:
 
 	virtual RAD_DECLARE_GET(visible, bool) = 0;
+	virtual RAD_DECLARE_GET(sky, bool) = 0;
 	virtual RAD_DECLARE_GET(bounds, const BBox&) = 0;
 	virtual RAD_DECLARE_GET(batches, const MBatchDraw::RefVec*) = 0;
 

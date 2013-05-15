@@ -3,19 +3,19 @@
 -- Author: Joe Riedel
 -- See Radiance/LICENSE for licensing terms.
 
-utility RadianceUtil "Radiance Tools" width:166 height:762
+utility RadianceUtil "Radiance Tools" width:166 height:782
 (
-	GroupBox grp1 "Selected Geo && Bones" pos:[6,84] width:155 height:509
+	GroupBox grp1 "Selected Geo && Bones" pos:[6,84] width:155 height:527
 	GroupBox grp4 "Animation" pos:[15,100] width:138 height:270
 	dropdownList animList "" pos:[18,118] width:130 height:21
 	edittext animName "Name:" pos:[18,146] width:130 height:17
-	GroupBox grp8 "Export" pos:[6,678] width:154 height:79
-	checkbox selectionOnlyCheckbox "Selection Only" pos:[69,693] width:87 height:14
-	checkbox exportHiddenCheckbox "Hidden" pos:[11,692] width:55 height:14
-	button exportSceneButton "Scene..." pos:[11,712] width:65 height:17
-	button exportAnimButton "Anim..." pos:[89,735] width:65 height:17
-	button exportMeshButton "Mesh..." pos:[89,712] width:65 height:17
-	button exportSkelButton "Skel..." pos:[11,734] width:65 height:17
+	GroupBox grp8 "Export" pos:[6,696] width:154 height:79
+	checkbox selectionOnlyCheckbox "Selection Only" pos:[69,711] width:87 height:14
+	checkbox exportHiddenCheckbox "Hidden" pos:[11,710] width:55 height:14
+	button exportSceneButton "Scene..." pos:[11,730] width:65 height:17
+	button exportAnimButton "Anim..." pos:[89,753] width:65 height:17
+	button exportMeshButton "Mesh..." pos:[89,730] width:65 height:17
+	button exportSkelButton "Skel..." pos:[11,752] width:65 height:17
 	edittext animStart "Start:" pos:[18,170] width:66 height:17
 	edittext animEnd "End:" pos:[86,170] width:66 height:17
 	checkbox animLoop "Looping" pos:[21,249] width:63 height:18
@@ -38,14 +38,15 @@ utility RadianceUtil "Radiance Tools" width:166 height:762
 	edittext bboxSize "" pos:[24,395] width:113 height:17
 	button calcBBoxSize "Calculate" pos:[38,420] width:86 height:17
 	checkbox setBBox "Set BBox" pos:[25,373] width:64 height:15
-	GroupBox grp7 "Selected Light(s)" pos:[6,597] width:154 height:77
-	checkbox affectWorldCheck "Affect World" pos:[21,616] width:88 height:18
-	checkbox affectPlayerCheck "Affect Player" pos:[21,634] width:88 height:18
-	checkbox affectObjectsCheck "Affect Objects" pos:[21,652] width:88 height:18
-	GroupBox grp15 "Light Interaction" pos:[14,507] width:140 height:77
-	checkbox worldLightsCheck "World Lights" pos:[22,526] width:101 height:17
-	checkbox objectLightsCheck "Object Lights" pos:[22,544] width:101 height:17
-	checkbox castShadowsCheck "Cast Shadows" pos:[23,563] width:101 height:17
+	GroupBox grp7 "Selected Light(s)" pos:[6,615] width:154 height:77
+	checkbox affectWorldCheck "Affect World" pos:[21,634] width:88 height:18
+	checkbox affectPlayerCheck "Affect Player" pos:[21,652] width:88 height:18
+	checkbox affectObjectsCheck "Affect Objects" pos:[21,670] width:88 height:18
+	GroupBox grp15 "Light Interaction" pos:[14,525] width:140 height:77
+	checkbox worldLightsCheck "World Lights" pos:[22,544] width:101 height:17
+	checkbox objectLightsCheck "Object Lights" pos:[22,562] width:101 height:17
+	checkbox castShadowsCheck "Cast Shadows" pos:[23,581] width:101 height:17
+	checkbox skyActorCheck "Sky Actor" pos:[21,504] width:129 height:17
 	
 	local animSel = #() -- selected objects that have animations
 	local animSet = #() -- selected set of animations [struct Animation]
@@ -100,6 +101,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:762
 		cinematicObject.enabled = val
 		hideUntilRef.enabled = val
 		hideWhenDone.enabled = val
+		skyActorCheck.enabled = val
 	)
 	
 	function disableAll = (
@@ -385,6 +387,17 @@ utility RadianceUtil "Radiance Tools" width:166 height:762
 			hideWhenDone.triState = 2 -- undefined
 		)
 		
+		vals = RAD_GatherObjectProps objs #("SkyActor") #("false")
+		if (vals[1]) then (
+			if (vals[2][1][2][1] as BooleanClass) then (
+				hideWhenDone.triState = 1 -- checked
+			) else (
+				hideWhenDone.triState = 0
+			)
+		) else (
+			hideWhenDone.triState = 2 -- undefined
+		)
+		
 		vals = RAD_GatherObjectProps objs #("WorldLights") #("true")
 		if (vals[1]) then (
 			if (vals[2][1][2][1] as BooleanClass) then (
@@ -577,6 +590,14 @@ utility RadianceUtil "Radiance Tools" width:166 height:762
 			RAD_SetObjectProps (selectedMeshes()) #(#("HideWhenDone", "false"))
 		)
 	)
+	on skyActorChecked changed state do
+	(
+		if (state) then (
+			RAD_SetObjectProps (selectedMeshes()) #(#("SkyActor", "true"))
+		) else (
+			RAD_SetObjectProps (selectedMeshes()) #(#("SkyActor", "false"))
+		)
+	)
 	on nameCompleteMapsButton pressed do
 	(
 		mat = meditMaterials[activeMeditSlot]
@@ -703,6 +724,14 @@ utility RadianceUtil "Radiance Tools" width:166 height:762
 			RAD_SetObjectProps (selectedMeshes()) #(#("CastShadows", "true"))
 		) else (
 			RAD_SetObjectProps (selectedMeshes()) #(#("CastShadows", "false"))
+		)
+	)
+	on skyActorCheck changed state do
+	(
+		if (state) then (
+			RAD_SetObjectProps (selectedMeshes()) #(#("HideWhenDone", "true"))
+		) else (
+			RAD_SetObjectProps (selectedMeshes()) #(#("HideWhenDone", "false"))
 		)
 	)
 )

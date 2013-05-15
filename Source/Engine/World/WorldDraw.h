@@ -37,7 +37,7 @@ public:
 		kNumFrustumPlanes = 6
 	};
 	
-	ViewDef() : mirror(false) {
+	ViewDef() : mirror(false), sky(false) {
 	}
 
 	Camera camera;
@@ -45,6 +45,7 @@ public:
 
 	int area;
 	bool mirror;
+	bool sky;
 	AreaBits areas;
 	LightVec visLights;
 

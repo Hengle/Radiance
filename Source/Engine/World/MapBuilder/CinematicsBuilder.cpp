@@ -50,6 +50,8 @@ bool CinematicsBuilder::Compile(
 			a.flags |= world::bsp_file::kAffectedByWorldLights;
 		if (model->castShadows)
 			a.flags |= world::bsp_file::kCastShadows;
+		if (model->sky)
+			a.flags |= world::bsp_file::kSkyActor;
 		
 		a.bounds = model->bounds;
 		a.pos = a.bounds.Origin();

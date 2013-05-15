@@ -17,6 +17,7 @@ global kSceneFlag_SetBBox = 0x00008000
 global kSceneFlag_ObjectIsWorld = 0x00004000
 global kSceneFlag_ObjectIsObject = 0x00002000
 global kSceneFlag_CastShadows = 0x00001000
+global kSceneFlag_SkyActor = 0x00000800
 global kLightFlag_Diffuse = 0x000000001
 global kLightFlag_Specular = 0x00000002
 global kLightFlag_CastShadows = 0x00000004
@@ -218,6 +219,11 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims doLights suppressDia
 				hideWhenDone = getUserProp m "HideWhenDone"
 				if (hideWhenDone == undefined or hideWhenDone == true) then (
 					flags = bit.or flags kSceneFlag_HideWhenDone
+				)
+				
+				skyActor = getUserProp m "SkyActor"
+				if ((skyActor != undefined) and (skyActor == true)) then (
+					flags = bit.or flags kSceneFlag_SkyActor
 				)
 				
 				worldLights = getUserProp m "WorldLights"

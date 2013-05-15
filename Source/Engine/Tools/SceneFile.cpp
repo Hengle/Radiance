@@ -43,7 +43,8 @@ namespace {
 		kSetBBoxFlag = 0x00008000,
 		kAffectedByWorldLightsFlag = 0x00004000,
 		kAffectedByObjectLightsFlag = 0x00002000,
-		kCastShadows = 0x00001000,
+		kCastShadowsFlag = 0x00001000,
+		kSkyActorFlag = 0x00000800,
 		kAnimType_Skeletal = 0,
 		kAnimType_Vertex = 1
 	};
@@ -184,6 +185,7 @@ namespace {
 		bool affectedByWorldLights;
 		bool affectedByObjectLights;
 		bool castShadows;
+		bool sky;
 	};
 
 	bool ReadTriModel(InputStream &stream, int version, TriModel &mdl, int flags, const SceneFile::SkelVec &skels) {
@@ -555,6 +557,7 @@ namespace {
 		mmdl->affectedByObjectLights = mdl.affectedByObjectLights;
 		mmdl->affectedByWorldLights = mdl.affectedByWorldLights;
 		mmdl->castShadows = mdl.castShadows;
+		mmdl->sky = mdl.sky;
 
 		SmoothVertVec smv;
 		SmoothVertIdxMap smidxm;
@@ -854,11 +857,13 @@ bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth, UIProgres
 				if (version > kVersion6) {
 					mdl.affectedByObjectLights = (flags&kAffectedByObjectLightsFlag) ? true : false;
 					mdl.affectedByWorldLights = (flags&kAffectedByWorldLightsFlag) ? true : false;
-					mdl.castShadows = (flags&kCastShadows) ? true : false;
+					mdl.castShadows = (flags&kCastShadowsFlag) ? true : false;
+					mdl.sky = (flags&kSkyActorFlag) ? true : false;
 				} else {
 					mdl.affectedByObjectLights = false;
 					mdl.affectedByWorldLights = false;
 					mdl.castShadows = false;
+					mdl.sky = false;
 				}
 
 				mdl.verts.clear();

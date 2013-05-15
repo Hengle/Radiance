@@ -64,7 +64,8 @@ enum SolidType {
 enum OccupantType {
 	kOccupantType_None,
 	kOccupantType_BBox,
-	kOccupantType_Volume
+	kOccupantType_Volume,
+	kOccupantType_Sky
 };
 
 enum PhysicsFlags {

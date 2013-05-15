@@ -48,7 +48,8 @@ enum {
 	kMaxTempEnts = 1024,
 	kMaxStaticEnts = kMaxEnts-kMaxTempEnts,
 	kFirstTempEntId = kMaxStaticEnts,
-	kMaxAreas = 64
+	kMaxAreas = 64,
+	kSkyArea = 0
 };
 
 typedef zone_vector<Plane, ZWorldT>::type PlaneVec;
@@ -118,6 +119,7 @@ struct dBSPArea {
 	int numPortals;
 	int firstModel;
 	int numModels;
+	bool sky;
 
 	EntityPtrSet entities;
 	MBatchOccupantPtrSet occupants;

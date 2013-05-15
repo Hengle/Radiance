@@ -273,11 +273,12 @@ private:
 	///////////////////////////////////////////////////////////////////////////////
 
 	struct Area {
-		Area() : area(-1), numModels(0) {
+		Area() : area(-1), numModels(0), sky(false) {
 		}
 
 		int area;
 		int numModels;
+		bool sky; // can see sky?
 	};
 
 	typedef boost::shared_ptr<Area> AreaRef;

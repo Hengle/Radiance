@@ -794,6 +794,7 @@ void World::LoadBSP(const bsp_file::BSPFile &bsp) {
 		area.firstModel = (int)x->firstModel;
 		area.numModels = (int)x->numModels;
 		area.bounds.Initialize(x->mins[0], x->mins[1], x->mins[2], x->maxs[0], x->maxs[1], x->maxs[2]);
+		area.sky = x->sky != 0;
 		m_areas.push_back(area);
 	}
 

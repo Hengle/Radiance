@@ -196,6 +196,10 @@ private:
 			return &m_batches;
 		}
 
+		RAD_DECLARE_GET(sky, bool) {
+			return (m_actor->flags & bsp_file::kSkyActor) ? true : false;
+		}
+
 	private:
 
 		MBatchDraw::RefVec m_batches;

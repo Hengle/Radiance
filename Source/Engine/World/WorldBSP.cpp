@@ -236,6 +236,13 @@ void World::LinkEntity(Entity &entity, const BBox &bounds) {
 	if (!entity.m_leaf)
 		return;
 
+	if (entity.ps->otype == kOccupantType_Sky) {
+		entity.m_areas.insert(kSkyArea);
+		dBSPArea &area = m_areas[kSkyArea];
+		area.entities.insert(&entity);
+		return;
+	}
+
 	AreaBits visible;
 	
 	if (entity.m_leaf->area > -1) {
@@ -327,6 +334,13 @@ void World::LinkOccupant(MBatchOccupant &occupant, const BBox &bounds) {
 	occupant.m_leaf = LeafForPoint(bounds.Origin());
 	if (!occupant.m_leaf)
 		return;
+
+	if (occupant.sky) {
+		occupant.m_areas.insert(kSkyArea);
+		dBSPArea &area = m_areas[kSkyArea];
+		area.occupants.insert(&occupant);
+		return;
+	}
 
 	AreaBits visible;
 	

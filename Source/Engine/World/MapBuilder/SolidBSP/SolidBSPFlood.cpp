@@ -27,6 +27,8 @@ bool BSPBuilder::FloodFill() {
 		const SceneFile::Entity::Ref &ent = *it;
 		if (ent == m_map->worldspawn) 
 			continue;
+		if (ent->sky)
+			continue;
 		Node *leaf = LeafForPoint(ToBSPType(ent->origin));
 		if (!leaf) {
 			SOLID_BSP_ICE();
@@ -74,7 +76,7 @@ void BSPBuilder::FillOutside() {
 		if ((*m)->ignore || (*m)->cinematic)
 			continue;
 
-		if ((*m)->contents & kContentsFlag_Detail) {
+		if ((*m)->contents & (kContentsFlag_Detail|kContentsFlag_Sky)) {
 			// details area never outside (they aren't in the tree).
 			++m_numInsideModels;
 			m_numInsideTris += (int)(*m)->tris.size();
@@ -232,6 +234,11 @@ bool BSPBuilder::AreaFlood() {
 	ResetProgress();
 	Log("------------\n");
 	Log("Area Flood...\n");
+
+	// sky area
+	AreaRef area(new Area());
+	area->area = 0;
+	m_areas.push_back(area);
 
 	if (!FindAreas(m_root.get())) {
 		SetResult(pkg::SR_CompilerError);

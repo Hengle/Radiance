@@ -435,6 +435,8 @@ void WorldDraw::VisMarkAreas(ViewDef &view) {
 		VisMarkArea(view, volume.area, volume.volume, volume.bounds);
 	}
 
+	if (view.sky) // add sky surfs
+		VisMarkArea(view, kSkyArea, frustumVolume, frustumBounds);
 }
 
 void WorldDraw::VisMarkArea(
@@ -447,6 +449,8 @@ void WorldDraw::VisMarkArea(
 	RAD_ASSERT(areaNum > -1);
 	RAD_ASSERT(areaNum < (int)m_world->m_areas.size());
 	const dBSPArea &area = m_world->m_areas[areaNum];
+
+	view.sky = view.sky || area.sky;
 
 	++m_counters.drawnAreas;
 

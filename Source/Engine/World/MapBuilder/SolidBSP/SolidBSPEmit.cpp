@@ -340,6 +340,7 @@ bool BSPBuilder::EmitBSPAreas() {
 
 		bspArea->firstModel = m_bspFile->numModelIndices;
 		bspArea->numModels = 0;
+		bspArea->sky = area->sky ? 1 : 0;
 
 		for (SceneFile::TriModel::Vec::const_iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
 			const SceneFile::TriModel::Ref &trim = *m;
@@ -570,6 +571,12 @@ void BSPBuilder::EmitBSPModel(
 					continue;
 				if (trif.areas != areas)
 					continue;
+				if (trif.surface&kSurfaceFlag_SkyPortal) {
+					for (SceneFile::AreaNumSet::const_iterator it = areas.begin(); it != areas.end(); ++it) {
+						RAD_VERIFY((*it) != 0);
+						m_areas[*it]->sky = true;
+					}
+				}
 
 				trif.emitId = 0; // just flag as emitted
 
