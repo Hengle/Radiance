@@ -710,15 +710,53 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 		return;
 	}
 
-	// unshadowed light pass
-	// also initializes Z buffer
+	// draw unlit solid surfaces
+	for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
+		const details::MBatch &batch = *it->second;
 
-	for (int i = 0; i < r::Material::kNumSorts; ++i) {
+		if (batch.matRef->mat->sort == r::Material::kSort_Solid) {
+			if (batch.matRef->mat->maxLights == 0) {
+				DrawUnlitBatch(*it->second, false);
+			}
+		}
+	}
+
+	// draw lit unshadowed solid surfaces
+	
+	for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
+		const details::MBatch &batch = *it->second;
+
+		if (batch.matRef->mat->sort == r::Material::kSort_Solid) {
+			if (batch.matRef->mat->maxLights > 0) {
+				DrawUnshadowedLitBatch(*it->second);
+			}
+		}
+	}
+
+	// draw unlit translucent surfaces
+
+	for (int i = r::Material::kSort_Translucent; i < r::Material::kNumSorts; ++i) {
 		for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
 			const details::MBatch &batch = *it->second;
 
 			if (batch.matRef->mat->sort == (r::Material::Sort)i) {
-				DrawUnshadowedLitBatch(*it->second);
+				if (batch.matRef->mat->maxLights == 0) {
+					DrawUnlitBatch(*it->second, false);
+				}
+			}
+		}
+	}
+
+	// draw lit unshadowed translucent surfaces
+
+	for (int i = r::Material::kSort_Translucent; i < r::Material::kNumSorts; ++i) {
+		for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
+			const details::MBatch &batch = *it->second;
+
+			if (batch.matRef->mat->sort == (r::Material::Sort)i) {
+				if (batch.matRef->mat->maxLights > 0) {
+					DrawUnshadowedLitBatch(*it->second);
+				}
 			}
 		}
 	}

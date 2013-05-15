@@ -23,6 +23,8 @@ void WorldDraw::DrawUnshadowedLitBatch(const details::MBatch &batch) {
 
 	r::Material *mat = batch.matRef->mat;
 
+	RAD_ASSERT(mat->maxLights > 0);
+
 	bool first = true;
 
 	mat->BindStates();
@@ -44,9 +46,6 @@ void WorldDraw::DrawUnshadowedLitBatch(const details::MBatch &batch) {
 	}
 
 	mat->shader->End();
-
-	if (batch.matRef->mat->maxLights < 1)
-		return;
 
 	for (details::MBatchDrawLink *link = batch.head; link; link = link->next) {
 		MBatchDraw *draw = link->draw;
