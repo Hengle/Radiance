@@ -70,7 +70,7 @@ function RAD_WriteTriMeshVerts file mesh = (
 
 function RAD_MeshBBox mesh = (
 	mn = [1.0e+37, 1.0e+37, 1.0e+37]
-	mx = [1.0e-37, 1.0e-37, 1.0e-37]
+	mx = [-1.0e+37, -1.0e+37, -1.0e+37]
 	
 	for i=1 to mesh.numverts do (
 		v = getVert mesh i

@@ -242,7 +242,7 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims doLights suppressDia
 				)
 				
 				setBBox = getUserProp m "SetBBox"
-				if (setBBox != undefined and setBBox == "true") then (
+				if (setBBox != undefined and setBBox == true) then (
 					flags = bit.or flags kSceneFlag_SetBBox
 				)
 				
@@ -257,7 +257,7 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims doLights suppressDia
 					WriteLong file (idx-1) #unsigned
 				)
 				
-				if (setBBox != undefined and setBBox == "true") then (
+				if (setBBox != undefined and setBBox == true) then (
 					bboxSize = getUserProp m "BBox"
 					if (bboxSize == undefined) then (
 						bboxSize = "-24 -24 -24 24 24 24" -- default
