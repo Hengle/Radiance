@@ -138,6 +138,11 @@ void BSPBuilder::DecomposeAreaPoly(Node *node, AreaPoly *poly) {
 	if (node->planenum == kPlaneNumLeaf) {
 		if ((!m_flood || node->occupied) && node->area) {
 
+			if (poly->tri->surface & kSurfaceFlag_SkyPortal) {
+				RAD_VERIFY(node->area->area > 0);
+				node->area->sky = true;
+			}
+
 			poly->tri->areas.insert(node->area->area);
 			if (poly->tri->model->areas.find(node->area->area) == poly->tri->model->areas.end()) {
 				poly->tri->model->areas.insert(node->area->area);

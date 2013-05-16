@@ -563,20 +563,14 @@ void BSPBuilder::EmitBSPModel(
 
 				if (trif.emitId != -1)
 					continue;
+				if (trif.surface&kSurfaceFlag_NoDraw)
+					continue;
 				if (trif.mat != m.mat)
 					continue;
 				if (trif.model->numChannels != c)
 					continue;
-				if (trif.surface&kSurfaceFlag_NoDraw)
-					continue;
 				if (trif.areas != areas)
 					continue;
-				if (trif.surface&kSurfaceFlag_SkyPortal) {
-					for (SceneFile::AreaNumSet::const_iterator it = areas.begin(); it != areas.end(); ++it) {
-						RAD_VERIFY((*it) != 0);
-						m_areas[*it]->sky = true;
-					}
-				}
 
 				trif.emitId = 0; // just flag as emitted
 
