@@ -100,7 +100,7 @@ void GLWorldDraw::BindRenderTarget() {
 				GL_DEPTH_COMPONENT32_ARB,
 				m_rtSize[0]*m_rtSize[1]*8,
 	#endif
-				TX_Filter
+				TX_FilterBilinear
 			));
 
 			for (int k = 1; k < kNumRTs; ++k) {
@@ -112,7 +112,7 @@ void GLWorldDraw::BindRenderTarget() {
 					m_rtSize[1],
 					0,
 					m_rtSize[0]*m_rtSize[1]*4,
-					TX_Filter
+					TX_FilterBilinear
 				));
 
 				gls.BindBuffer(GL_FRAMEBUFFER_EXT, m_rts[i][k]->id[0]);

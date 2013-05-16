@@ -1530,7 +1530,7 @@ void ContentBrowserView::LoadIcons()
 			{
 				m_icons[i] = r::GLTexture::UploadImage(
 					img,
-					r::TX_Filter|r::TX_WrapAll,
+					r::TX_FilterBilinear|r::TX_WrapAll,
 					48,
 					48
 				);

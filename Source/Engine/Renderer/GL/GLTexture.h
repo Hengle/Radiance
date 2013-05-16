@@ -18,25 +18,41 @@ struct Image;
 
 namespace r {
 
-enum
-{
+enum {
 	RAD_FLAG(TX_WrapS),
 	RAD_FLAG(TX_WrapT),
 	RAD_FLAG(TX_WrapR),
-	RAD_FLAG(TX_Filter),
+	RAD_FLAG(TX_FilterBilinear),
+	RAD_FLAG(TX_FilterTrilinear),
 	RAD_FLAG(TX_Mipmap),
 	TX_WrapAll = TX_WrapS|TX_WrapT|TX_WrapR
 };
 
-RADENG_API GLenum RADENG_CALL GLInternalFormat(GLenum format, GLenum type);
-RADENG_API bool RADENG_CALL GLImageFormat(int imgType, GLenum &format, GLenum &type, GLenum alpha);
-RADENG_API bool RADENG_CALL GLImageFormat(int imgType, GLenum &internal, GLenum &format, GLenum &type, GLenum alpha);
+RADENG_API GLenum RADENG_CALL GLInternalFormat(
+	GLenum format, 
+	GLenum type
+);
+
+RADENG_API bool RADENG_CALL GLImageFormat(
+	int imgType, 
+	GLenum &format, 
+	GLenum &type, 
+	GLenum alpha
+);
+
+RADENG_API bool RADENG_CALL GLImageFormat(
+	int imgType, 
+	GLenum &internal, 
+	GLenum &format, 
+	GLenum &type, 
+	GLenum alpha
+);
+
 RADENG_API int RADENG_CALL GLCubeFace(int flags);
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS GLTexture
-{
+class RADENG_CLASS GLTexture {
 public:
 	typedef boost::shared_ptr<GLTexture> Ref;
 	typedef zone_vector<Ref, ZEngineT>::type Vec;
@@ -67,14 +83,12 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class RADENG_CLASS GLTextureAsset : public pkg::Sink<GLTextureAsset>
-{
+class RADENG_CLASS GLTextureAsset : public pkg::Sink<GLTextureAsset> {
 public:
 
 	static void Register(Engine &engine);
 
-	enum
-	{
+	enum {
 		SinkStage = pkg::SS_Process,
 		AssetType = asset::AT_Texture
 	};

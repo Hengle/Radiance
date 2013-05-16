@@ -529,10 +529,11 @@ ThumbResult MaterialThumb::Thumbnail::Tick(float dt, const xtime::TimeSlice &tim
 		const bool *wrapS = a->entry->KeyValue<bool>("Wrap.S", P_TARGET_PLATFORM);
 		const bool *wrapT = a->entry->KeyValue<bool>("Wrap.T", P_TARGET_PLATFORM);
 		const bool *wrapR = a->entry->KeyValue<bool>("Wrap.R", P_TARGET_PLATFORM);
-		const bool *filter = a->entry->KeyValue<bool>("Filter", P_TARGET_PLATFORM);
+		const bool *filterB = a->entry->KeyValue<bool>("Filter", P_TARGET_PLATFORM);
+		const String *filterS = a->entry->KeyValue<String>("Filter", P_TARGET_PLATFORM);
 		const bool *mipmap = a->entry->KeyValue<bool>("Mipmap", P_TARGET_PLATFORM);
 
-		if (!t || !t->imgValid || !wrapS || !wrapT || !wrapR || !filter || !mipmap) {
+		if (!t || !t->imgValid || !wrapS || !wrapT || !wrapR || !(filterB||filterS) || !mipmap) {
 			for (int k = 0; k < kMaterialTextureSource_MaxIndices; ++k) {
 				m_texs[k].clear();
 			}
@@ -552,8 +553,8 @@ ThumbResult MaterialThumb::Thumbnail::Tick(float dt, const xtime::TimeSlice &tim
 			flags |= TX_WrapT;
 		if (*wrapS) 
 			flags |= TX_WrapR;
-		if (*filter) 
-			flags |= TX_Filter;
+		if ((filterB && *filterB) || (filterS && (*filterS != "None")))
+			flags |= TX_FilterBilinear;
 		if (*mipmap) 
 			flags |= TX_Mipmap;
 

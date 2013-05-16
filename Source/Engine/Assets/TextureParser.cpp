@@ -638,10 +638,19 @@ int TextureParser::Parsing(
 						return SR_MetaError;
 					tag.flags |= *b ? TextureTag::Mipmap : 0;
 
-					b = asset->entry->KeyValue<bool>("Filter", P_TARGET_FLAGS(flags));
-					if (!b)
-						return SR_MetaError;
-					tag.flags |= *b ? TextureTag::Filter : 0;
+					const String *s = asset->entry->KeyValue<String>("Filter", flags);
+					if (s) {
+						if (*s == "Bilinear") {
+							tag.flags |= TextureTag::FilterBilinear;
+						} else if (*s == "Trilinear") {
+							tag.flags |= TextureTag::FilterTrilinear;
+						}
+					} else {
+						b = asset->entry->KeyValue<bool>("Filter", flags);
+						if (!b)
+							return SR_MetaError;
+						tag.flags |= *b ? TextureTag::FilterBilinear : 0;
+					}
 					
 					// Test wrap/mipmap contraints on mobile devices.
 					if (tag.flags&(TextureTag::WrapS|TextureTag::WrapT|TextureTag::WrapR|TextureTag::Mipmap)) {

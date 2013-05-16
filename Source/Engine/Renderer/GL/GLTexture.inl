@@ -11,8 +11,7 @@ format(0),
 width(0),
 height(0),
 depth(0),
-size(_size)
-{
+size(_size) {
 	glGenTextures(1, &id);
 	RAD_ASSERT(id>0);
 	CHECK_GL_ERRORS();
@@ -31,26 +30,22 @@ format(_format),
 width(_width),
 height(_height),
 depth(_depth),
-size(_size)
-{
+size(_size) {
 	glGenTextures(1, &id);
 	RAD_ASSERT(id>0);
 	CHECK_GL_ERRORS();
 	ZTextures.Get().Inc(_size, 0);
 }
 
-inline GLTexture::~GLTexture()
-{
-	if (id>0)
-	{
+inline GLTexture::~GLTexture() {
+	if (id>0) {
 		glDeleteTextures(1, &id);
 		CHECK_GL_ERRORS();
 		ZTextures.Get().Dec(size, 0);
 	}
 }
 
-inline const GLTexture::Ref &GLTextureAsset::Texture(int index)
-{
+inline const GLTexture::Ref &GLTextureAsset::Texture(int index) {
 	RAD_ASSERT(index < (int)m_texs.size());
 	return m_texs[index];
 }

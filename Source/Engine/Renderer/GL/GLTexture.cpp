@@ -32,17 +32,13 @@ using namespace pkg;
 
 namespace r {
 
-RADENG_API GLenum RADENG_CALL GLInternalFormat(GLenum format, GLenum type)
-{
-	switch( type )
-	{
+RADENG_API GLenum RADENG_CALL GLInternalFormat(GLenum format, GLenum type) {
+	switch( type ) {
 		case GL_FLOAT:
 			return format;
 			
-		case GL_UNSIGNED_BYTE:
-		{
-			switch(format)
-			{
+		case GL_UNSIGNED_BYTE: {
+			switch(format) {
 				case GL_RGBA:
 				case GL_BGRA:
 					return GL_RGBA8;
@@ -66,10 +62,8 @@ RADENG_API GLenum RADENG_CALL GLInternalFormat(GLenum format, GLenum type)
 		break;
 
 #if !defined(RAD_OPT_OGLES)
-		case GL_UNSIGNED_SHORT:
-		{
-			switch(format)
-			{
+		case GL_UNSIGNED_SHORT: {
+			switch(format) {
 				case GL_RGB:
 				case GL_BGR:
 					return GL_RGB16;
@@ -140,10 +134,8 @@ RADENG_API GLenum RADENG_CALL GLInternalFormat(GLenum format, GLenum type)
 	return (GLenum)0;
 }
 
-RADENG_API bool RADENG_CALL GLImageFormat(int imgType, GLenum &format, GLenum &type, GLenum alpha)
-{
-	switch (imgType)
-	{
+RADENG_API bool RADENG_CALL GLImageFormat(int imgType, GLenum &format, GLenum &type, GLenum alpha) {
+	switch (imgType) {
 	case image_codec::Format_A8:
 		format = alpha;
 		type = GL_UNSIGNED_BYTE;
@@ -220,18 +212,21 @@ RADENG_API bool RADENG_CALL GLImageFormat(int imgType, GLenum &format, GLenum &t
 	return false;
 }
 
-RADENG_API bool RADENG_CALL GLImageFormat(int imgType, GLenum &internal, GLenum &format, GLenum &type, GLenum alpha)
-{
-	if (!GLImageFormat(imgType, format, type, alpha))
-	{
+RADENG_API bool RADENG_CALL GLImageFormat(
+	int imgType, 
+	GLenum &internal, 
+	GLenum &format, 
+	GLenum &type, 
+	GLenum alpha
+) {
+	if (!GLImageFormat(imgType, format, type, alpha)) {
 		return false;
 	}
 
 	return (internal=GLInternalFormat(format, type)) != (GLenum)0;
 }
 
-RADENG_API int RADENG_CALL GLCubeFace(int flags)
-{
+RADENG_API int RADENG_CALL GLCubeFace(int flags) {
 	if (flags&image_codec::dds::FrameFlagCubemapPositiveX)
 		return GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB;
 	if (flags&image_codec::dds::FrameFlagCubemapNegativeX)
@@ -246,8 +241,7 @@ RADENG_API int RADENG_CALL GLCubeFace(int flags)
 	return GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB;
 }
 
-void GLTexture::SetFlags(const Ref &tex, int flags, int numMips, bool generateMips)
-{
+void GLTexture::SetFlags(const Ref &tex, int flags, int numMips, bool generateMips) {
 	gls.SetTexture(0, tex, true);
 
 	glTexParameteri(tex->target, GL_TEXTURE_WRAP_S, (flags&TX_WrapS) ? GL_REPEAT : GL_CLAMP_TO_EDGE);
@@ -263,7 +257,13 @@ void GLTexture::SetFlags(const Ref &tex, int flags, int numMips, bool generateMi
 
 	bool mipmap = flags&TX_Mipmap ? true : false;
 
-	GLint filter = (flags&TX_Filter) ? mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR : mipmap ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST;
+	GLint filter = GL_NEAREST;
+	
+	if (flags&TX_FilterBilinear) {
+		filter = mipmap ? GL_LINEAR_MIPMAP_NEAREST : GL_LINEAR;
+	} else if (flags&TX_FilterTrilinear) {
+		filter = mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
+	}
 	
 	glTexParameteri(
 		tex->target, 
@@ -276,46 +276,40 @@ void GLTexture::SetFlags(const Ref &tex, int flags, int numMips, bool generateMi
 	glTexParameteri(
 		tex->target,
 		GL_TEXTURE_MAG_FILTER,
-		(flags&TX_Filter) ? GL_LINEAR : GL_NEAREST
+		(flags&(TX_FilterBilinear|TX_FilterTrilinear)) ? GL_LINEAR : GL_NEAREST
 	);
 
 	CHECK_GL_ERRORS();
 
 #if !defined(RAD_OPT_OGLES)
 	// sgis auto-gen mipmaps?
-	if (mipmap && !numMips && gl.SGIS_generate_mipmap)
-	{
+	if (mipmap && !numMips && gl.SGIS_generate_mipmap) {
 		glTexParameteri(tex->target, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
 		CHECK_GL_ERRORS();
 	}
 
-	if (mipmap && numMips)
-	{
+	if (mipmap && numMips) {
 		glTexParameteri(tex->target, GL_TEXTURE_MAX_LEVEL, numMips-1);
 		CHECK_GL_ERRORS();
 	}
 #endif
 
 #if defined(RAD_OPT_OGLES)
-	if (mipmap && !numMips && generateMips)
-	{
+	if (mipmap && !numMips && generateMips) {
 		glGenerateMipmap(tex->target);
 		CHECK_GL_ERRORS();
 	}
 #else
 	// EXT_frame_buffer generate mips?
-	if (mipmap && !numMips && generateMips && gl.EXT_framebuffer_object && !gl.SGIS_generate_mipmap)
-	{
+	if (mipmap && !numMips && generateMips && gl.EXT_framebuffer_object && !gl.SGIS_generate_mipmap) {
 		GenerateMipmaps(tex);
 	}
 #endif
 }
 
-void GLTexture::GenerateMipmaps(const Ref &tex)
-{
+void GLTexture::GenerateMipmaps(const Ref &tex) {
 	RAD_ASSERT(tex);
-	if (gl.EXT_framebuffer_object)
-	{
+	if (gl.EXT_framebuffer_object) {
 		gls.SetTexture(0, tex, true);
 		gl.GenerateMipmapEXT(tex->target);
 		CHECK_GL_ERRORS();
@@ -330,26 +324,20 @@ int UploadTexture(
 	int flags,
 	int width,
 	int height
-)
-{
-	if (image.frameCount < 1 || image.frames[0].mipCount < 1)
-	{
+) {
+	if (image.frameCount < 1 || image.frames[0].mipCount < 1) {
 		return SR_ErrorGeneric;
 	}
 
-	if (image.frameCount > 1)
-	{
-		if (image.frameCount != 6)
-		{
+	if (image.frameCount > 1) {
+		if (image.frameCount != 6) {
 			return SR_ErrorGeneric; // invalid cube-map.
 		}
 
 		UReg numMips = image.frames[0].mipCount;
 
-		for (int i = 1; i < 6; ++i)
-		{
-			if (image.frames[i].mipCount != numMips)
-			{
+		for (int i = 1; i < 6; ++i) {
+			if (image.frames[i].mipCount != numMips) {
 				return SR_ErrorGeneric; // invalid cube-map
 			}
 		}
@@ -358,8 +346,7 @@ int UploadTexture(
 	GLenum internal, format, type;
 
 	// find out what kind of pixel data this is.
-	if (!GLImageFormat(image.format, internal, format, type, GL_ALPHA))
-	{
+	if (!GLImageFormat(image.format, internal, format, type, GL_ALPHA)) {
 		return SR_InvalidFormat;
 	}
 
@@ -376,8 +363,7 @@ int UploadTexture(
 		internal == GL_COMPRESSED_RGBA_S3TC_DXT3_EXT ||
 		internal == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 
-	if (compressed && (!gl.EXT_texture_compression_s3tc || !gl.ARB_texture_compression))
-	{
+	if (compressed && (!gl.EXT_texture_compression_s3tc || !gl.ARB_texture_compression)) {
 		return SR_InvalidFormat;
 	}
 #endif
@@ -410,11 +396,13 @@ int UploadTexture(
 	bool mipmap = flags&TX_Mipmap ? true : false;
 	bool hasMips = image.frames[0].mipCount > 1;
 	
-#if defined(RAD_OPT_OGLES)
-	GLint filter = (flags&TX_Filter) ? mipmap ? GL_LINEAR_MIPMAP_NEAREST : GL_LINEAR : mipmap ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST;
-#else
-	GLint filter = (flags&TX_Filter) ? mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR : mipmap ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST;
-#endif
+	GLint filter = GL_NEAREST;
+	
+	if (flags&TX_FilterBilinear) {
+		filter = mipmap ? GL_LINEAR_MIPMAP_NEAREST : GL_LINEAR;
+	} else if (flags&TX_FilterTrilinear) {
+		filter = mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
+	}
 	
 	glTexParameteri(
 		tex->target, 
@@ -427,38 +415,32 @@ int UploadTexture(
 	glTexParameteri(
 		tex->target,
 		GL_TEXTURE_MAG_FILTER,
-		(flags&TX_Filter) ? GL_LINEAR : GL_NEAREST
+		(flags&(TX_FilterBilinear|TX_FilterTrilinear)) ? GL_LINEAR : GL_NEAREST
 	);
 
 	CHECK_GL_ERRORS();
 
 #if !defined(RAD_OPT_OGLES)
 	// sgis auto-gen mipmaps?
-	if (mipmap && !hasMips && gl.SGIS_generate_mipmap)
-	{
+	if (mipmap && !hasMips && gl.SGIS_generate_mipmap) {
 		glTexParameteri(tex->target, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
 		CHECK_GL_ERRORS();
 	}
 
-	if (mipmap && hasMips)
-	{
+	if (mipmap && hasMips) {
 		glTexParameteri(tex->target, GL_TEXTURE_MAX_LEVEL, (int)image.frames[0].mipCount-1);
 		CHECK_GL_ERRORS();
 	}
 #endif
 	
-	if (tex->target == GL_TEXTURE_CUBE_MAP_ARB)
-	{
-		for (int i = 0; i < 6; ++i)
-		{
+	if (tex->target == GL_TEXTURE_CUBE_MAP_ARB) {
+		for (int i = 0; i < 6; ++i) {
 			const image_codec::Frame &f = image.frames[i];
-			for (int k = 0; k < f.mipCount; ++k)
-			{
+			for (int k = 0; k < f.mipCount; ++k) {
 				const image_codec::Mipmap &m = f.mipmaps[k];
 				GLuint msize = (GLuint)m.dataSize;
 
-				if (compressed)
-				{
+				if (compressed) {
 #if defined(RAD_OPT_OGLES)
 					glCompressedTexImage2D(
 						GLCubeFace(f.flags),
@@ -482,16 +464,13 @@ int UploadTexture(
 						m.data
 					);
 #endif
-				}
-				else
-				{
+				} else {
 					void *mdata = m.data;
 					GLint  mw = (GLint)m.width;
 					GLint  mh = (GLint)m.height;
 
 #if !defined(RAD_OPT_OGLES)
-					if ((width && width != iwidth) || (height && height != iheight))
-					{
+					if ((width && width != iwidth) || (height && height != iheight)) {
 						GLuint bpp = (GLuint)(m.dataSize / (m.width*m.height));
 						mw = (GLuint)width>>k;
 						mh = (GLuint)height>>k;
@@ -526,8 +505,7 @@ int UploadTexture(
 						mdata
 					);
 
-					if (mdata != m.data)
-					{
+					if (mdata != m.data) {
 						zone_free(mdata);
 					}
 				}
@@ -537,17 +515,13 @@ int UploadTexture(
 					break; // that's it
 			}
 		}
-	}
-	else
-	{
+	} else {
 		const image_codec::Frame &f = image.frames[0];
-		for (int i = 0; i < f.mipCount; ++i)
-		{
+		for (int i = 0; i < f.mipCount; ++i) {
 			const image_codec::Mipmap &m = f.mipmaps[i];
 			GLuint msize = (GLuint)m.dataSize;
 
-			if (compressed)
-			{
+			if (compressed) {
 #if defined(RAD_OPT_OGLES)
 				glCompressedTexImage2D(
 					tex->target,
@@ -571,16 +545,13 @@ int UploadTexture(
 					m.data
 				);
 #endif
-			}
-			else
-			{
+			} else {
 				void *mdata = m.data;
 				GLint  mw = (GLint)m.width;
 				GLint  mh = (GLint)m.height;
 
 #if !defined(RAD_OPT_OGLES)
-				if ((width && width != iwidth) || (height && height != iheight))
-				{
+				if ((width && width != iwidth) || (height && height != iheight)) {
 					GLuint bpp = (GLuint)(m.dataSize / (m.width*m.height));
 					mw = (GLuint)width>>i;
 					mh = (GLuint)height>>i;
@@ -615,8 +586,7 @@ int UploadTexture(
 					mdata
 				);
 
-				if (mdata != m.data)
-				{
+				if (mdata != m.data) {
 					zone_free(mdata);
 				}
 			}
@@ -628,15 +598,13 @@ int UploadTexture(
 	}
 
 #if defined(RAD_OPT_OGLES)
-	if (mipmap && !hasMips)
-	{
+	if (mipmap && !hasMips) {
 		glGenerateMipmap(tex->target);
 		CHECK_GL_ERRORS();
 	}
 #else
 	// EXT_frame_buffer generate mips?
-	if (mipmap && !hasMips && gl.EXT_framebuffer_object && !gl.SGIS_generate_mipmap)
-	{
+	if (mipmap && !hasMips && gl.EXT_framebuffer_object && !gl.SGIS_generate_mipmap) {
 		gl.GenerateMipmapEXT(tex->target);
 		CHECK_GL_ERRORS();
 	}
@@ -656,8 +624,7 @@ int UploadTexture(
 	int flags,
 	int width,
 	int height
-)
-{
+) {
 	int tflags = 0;
 
 	const bool *b = asset->entry->KeyValue<bool>("Wrap.S", P_TARGET_FLAGS(flags));
@@ -678,15 +645,25 @@ int UploadTexture(
 	if (*b) 
 		tflags |= TX_WrapR;
 
-	const bool *filter = asset->entry->KeyValue<bool>("Filter", P_TARGET_FLAGS(flags));
-	if (!filter) 
-		return SR_MetaError;
+	const String *s = asset->entry->KeyValue<String>("Filter", P_TARGET_FLAGS(flags));
+	if (s) {
+		if (*s == "Bilinear") {
+			tflags |= TX_FilterBilinear;
+		} else if (*s == "Trilinear") {
+			tflags |= TX_FilterTrilinear;
+		}
+	} else {
+		const bool *filter = asset->entry->KeyValue<bool>("Filter", P_TARGET_FLAGS(flags));
+		if (!filter) 
+			return SR_MetaError;
+		if (*filter) 
+			tflags |= TX_FilterBilinear;
+	}
+
 	const bool *mipmap = asset->entry->KeyValue<bool>("Mipmap", P_TARGET_FLAGS(flags));
 	if (!mipmap) 
 		return SR_MetaError;
 
-	if (*filter) 
-		tflags |= TX_Filter;
 	if (*mipmap) 
 		tflags |= TX_Mipmap;
 
@@ -697,8 +674,7 @@ int UploadTexture(
 
 } // namespace
 
-GLTexture::Ref GLTexture::UploadImage(const image_codec::Image &img, int flags, int width, int height)
-{
+GLTexture::Ref GLTexture::UploadImage(const image_codec::Image &img, int flags, int width, int height) {
 	Ref t;
 	if (UploadTexture(img, t, flags, width, height) == SR_Success)
 		return t;
@@ -707,15 +683,12 @@ GLTexture::Ref GLTexture::UploadImage(const image_codec::Image &img, int flags, 
 
 #if defined(RAD_OPT_PC_TOOLS)
 
-GLTexture::Ref GLTextureAsset::CreateThumbnail(const pkg::Asset::Ref &asset, int index, int flags, int width, int height)
-{
+GLTexture::Ref GLTextureAsset::CreateThumbnail(const pkg::Asset::Ref &asset, int index, int flags, int width, int height) {
 	GLTexture::Ref t;
 
-	if (!asset->cooked)
-	{
+	if (!asset->cooked) {
 		asset::TextureParser *parser(asset::TextureParser::Cast(asset));
-		if (parser && parser->imgValid)
-		{
+		if (parser && parser->imgValid) {
 			UploadTexture(*parser->Image(index), t, flags, width, height);
 		}
 	}
@@ -725,12 +698,10 @@ GLTexture::Ref GLTextureAsset::CreateThumbnail(const pkg::Asset::Ref &asset, int
 
 #endif
 
-GLTextureAsset::GLTextureAsset()
-{
+GLTextureAsset::GLTextureAsset() {
 }
 
-GLTextureAsset::~GLTextureAsset()
-{
+GLTextureAsset::~GLTextureAsset() {
 }
 
 int GLTextureAsset::Process(
@@ -738,10 +709,8 @@ int GLTextureAsset::Process(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
-	if (flags & (P_Unload|P_VidReset))
-	{
+) {
+	if (flags & (P_Unload|P_VidReset)) {
 		m_texs.clear();
 		STLContainerShrinkToSize(m_texs);
 		return SR_Success;
@@ -749,8 +718,7 @@ int GLTextureAsset::Process(
 
 	int r = SR_Success;
 
-	if (flags&(P_Load|P_VidBind) && m_texs.empty())
-	{
+	if (flags&(P_Load|P_VidBind) && m_texs.empty()) {
 		asset::TextureParser *parser(asset::TextureParser::Cast(asset));
 		if (!parser || !parser->imgValid)
 			return SR_ParseError;
@@ -758,11 +726,9 @@ int GLTextureAsset::Process(
 
 		// This method must be called on the main thread (where GL is bound)
 #if defined(RAD_OPT_TOOLS)
-		if (!asset->cooked)
-		{
+		if (!asset->cooked) {
 			const int numImages = parser->numImages;
-			for (int i = 0; i < numImages; ++i)
-			{
+			for (int i = 0; i < numImages; ++i) {
 				GLTexture::Ref tex;
 
 				const image_codec::Image *image = parser->Image(i);
@@ -794,12 +760,15 @@ int GLTextureAsset::Process(
 				tflags |= TX_WrapR;
 			if (parser->tag->flags&asset::TextureTag::Mipmap)
 				tflags |= TX_Mipmap;
-			if (parser->tag->flags&asset::TextureTag::Filter)
-				tflags |= TX_Filter;
+
+			if (parser->tag->flags&asset::TextureTag::FilterBilinear) {
+				tflags |= TX_FilterBilinear;
+			} else if (parser->tag->flags&asset::TextureTag::FilterTrilinear) {
+				tflags |= TX_FilterTrilinear;
+			}
 
 			const int numImages = parser->numImages;
-			for (int i = 0; i < numImages; ++i)
-			{
+			for (int i = 0; i < numImages; ++i) {
 				GLTexture::Ref tex;
 
 				const image_codec::Image *image = parser->Image(i);
@@ -823,8 +792,7 @@ int GLTextureAsset::Process(
 	return r;
 }
 
-void GLTextureAsset::Register(Engine &engine)
-{
+void GLTextureAsset::Register(Engine &engine) {
 	static pkg::Binding::Ref r = engine.sys->packages->Bind<GLTextureAsset>();
 }
 

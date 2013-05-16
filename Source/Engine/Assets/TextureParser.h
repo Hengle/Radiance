@@ -31,7 +31,8 @@ struct TextureTag {
 		RAD_FLAG(WrapT),
 		RAD_FLAG(WrapR),
 		RAD_FLAG(Mipmap),
-		RAD_FLAG(Filter),
+		RAD_FLAG(FilterBilinear),
+		RAD_FLAG(FilterTrilinear),
 		RAD_FLAG(Localized)
 	};
 

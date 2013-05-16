@@ -17,7 +17,7 @@ namespace asset {
 
 BOOST_STATIC_ASSERT(sizeof(TextureTag)==1);
 
-TextureCooker::TextureCooker() : Cooker(2) {
+TextureCooker::TextureCooker() : Cooker(3) {
 }
 
 TextureCooker::~TextureCooker() {
@@ -72,10 +72,19 @@ int TextureCooker::Compile(int flags) {
 		return SR_MetaError;
 	tag.flags |= *b ? TextureTag::Mipmap : 0;
 
-	b = asset->entry->KeyValue<bool>("Filter", flags);
-	if (!b)
-		return SR_MetaError;
-	tag.flags |= *b ? TextureTag::Filter : 0;
+	const String *s = asset->entry->KeyValue<String>("Filter", flags);
+	if (s) {
+		if (*s == "Bilinear") {
+			tag.flags |= TextureTag::FilterBilinear;
+		} else if (*s == "Trilinear") {
+			tag.flags |= TextureTag::FilterTrilinear;
+		}
+	} else {
+		b = asset->entry->KeyValue<bool>("Filter", flags);
+		if (!b)
+			return SR_MetaError;
+		tag.flags |= *b ? TextureTag::FilterBilinear : 0;
+	}
 
 	b = asset->entry->KeyValue<bool>("Localized", flags);
 	if (!b)

@@ -29,7 +29,7 @@ struct GlyphPage : public font::IGlyphPage {
 		tex->width = width;
 		tex->height = height;
 		tex->format = GLInternalFormat(GL_ALPHA, GL_UNSIGNED_BYTE);
-		GLTexture::SetFlags(tex, TX_Filter);
+		GLTexture::SetFlags(tex, TX_FilterBilinear);
 	}
 
 	virtual ~GlyphPage() {

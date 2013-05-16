@@ -106,7 +106,7 @@ ThumbResult TextureThumb::Thumbnail::Tick(float dt, const xtime::TimeSlice &time
 	m_tex = r::GLTextureAsset::CreateThumbnail(
 		m_asset, 
 		0,
-		r::TX_WrapAll|r::TX_Filter,
+		r::TX_WrapAll|r::TX_FilterBilinear,
 		m_w,
 		m_h
 	);
