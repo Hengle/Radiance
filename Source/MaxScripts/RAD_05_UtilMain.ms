@@ -390,12 +390,12 @@ utility RadianceUtil "Radiance Tools" width:166 height:782
 		vals = RAD_GatherObjectProps objs #("SkyActor") #("false")
 		if (vals[1]) then (
 			if (vals[2][1][2][1] as BooleanClass) then (
-				hideWhenDone.triState = 1 -- checked
+				skyActorCheck.triState = 1 -- checked
 			) else (
-				hideWhenDone.triState = 0
+				skyActorCheck.triState = 0
 			)
 		) else (
-			hideWhenDone.triState = 2 -- undefined
+			skyActorCheck.triState = 2 -- undefined
 		)
 		
 		vals = RAD_GatherObjectProps objs #("WorldLights") #("true")
@@ -590,7 +590,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:782
 			RAD_SetObjectProps (selectedMeshes()) #(#("HideWhenDone", "false"))
 		)
 	)
-	on skyActorChecked changed state do
+	on skyActorCheck changed state do
 	(
 		if (state) then (
 			RAD_SetObjectProps (selectedMeshes()) #(#("SkyActor", "true"))
@@ -724,14 +724,6 @@ utility RadianceUtil "Radiance Tools" width:166 height:782
 			RAD_SetObjectProps (selectedMeshes()) #(#("CastShadows", "true"))
 		) else (
 			RAD_SetObjectProps (selectedMeshes()) #(#("CastShadows", "false"))
-		)
-	)
-	on skyActorCheck changed state do
-	(
-		if (state) then (
-			RAD_SetObjectProps (selectedMeshes()) #(#("HideWhenDone", "true"))
-		) else (
-			RAD_SetObjectProps (selectedMeshes()) #(#("HideWhenDone", "false"))
 		)
 	)
 )

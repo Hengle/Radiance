@@ -46,7 +46,6 @@ enum ContentsFlags {
 	RAD_FLAG(kContentsFlag_Clip),
 	RAD_FLAG(kContentsFlag_Detail), // detail contents are removed if outside valid BSP
 	RAD_FLAG(kContentsFlag_Floor),
-	RAD_FLAG(kContentsFlag_Sky),
 
 	kContentsFlag_VisibleContents = kContentsFlag_Areaportal|kContentsFlag_Solid|kContentsFlag_Clip|kContentsFlag_Fog|kContentsFlag_Water,
 	kContentsFlag_FirstVisibleContents = kContentsFlag_Areaportal,

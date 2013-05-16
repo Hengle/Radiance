@@ -76,7 +76,7 @@ void BSPBuilder::FillOutside() {
 		if ((*m)->ignore || (*m)->cinematic)
 			continue;
 
-		if ((*m)->contents & (kContentsFlag_Detail|kContentsFlag_Sky)) {
+		if (((*m)->contents&kContentsFlag_Detail) || (*m)->sky) {
 			// details area never outside (they aren't in the tree).
 			++m_numInsideModels;
 			m_numInsideTris += (int)(*m)->tris.size();
