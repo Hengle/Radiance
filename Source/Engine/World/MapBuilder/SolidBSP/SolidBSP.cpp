@@ -1001,6 +1001,7 @@ int BSPBuilder::SurfaceForString(const String &s) {
 	};
 	static Flags kFlags[] = {
 		{ "No Draw", kSurfaceFlag_NoDraw },
+		{ "Sky Portal", kSurfaceFlag_SkyPortal },
 		{ 0, }
 	};
 	int flags = 0;
