@@ -838,7 +838,7 @@ bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth, UIProgres
 					);
 					mdl.bounds.Initialize(
 						(SceneFile::ValueType)mins[0], (SceneFile::ValueType)mins[1], (SceneFile::ValueType)mins[2],
-						(SceneFile::ValueType)maxs[0], (SceneFile::ValueType)maxs[2], (SceneFile::ValueType)maxs[2]
+						(SceneFile::ValueType)maxs[0], (SceneFile::ValueType)maxs[1], (SceneFile::ValueType)maxs[2]
 					);
 				} else {
 					mdl.bounds.Initialize();
