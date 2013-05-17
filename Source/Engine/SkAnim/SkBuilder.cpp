@@ -412,6 +412,14 @@ bool SkaBuilder::Compile(
 		if (anim.boneFrames.empty())
 			continue;
 
+		// do we already have this animation?
+		for (Anim::Vec::const_iterator it = m_anims.begin(); it != m_anims.end(); ++it) {
+			if ((*it).name.Comparei(anim.name.c_str) == 0) {
+				COut(C_Error) << "ERROR: animation '" << anim.name << " has duplicates. One or more 3DX files have this animation exported." << std::endl;
+				return false;
+			}
+		}
+
 		BeginAnim(
 			anim.name.c_str,
 			(float)anim.frameRate,

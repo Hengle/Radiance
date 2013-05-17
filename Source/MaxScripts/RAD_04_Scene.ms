@@ -334,3 +334,11 @@ function RAD_ExportScene selectionOnly exportHidden doMeshes doAnims doLights su
 	sliderTime = oldTime
 	
 )
+
+function RAD_ExportSelectedMesh filename = (
+	RAD_ExportScene true (selection[1].ishiddeninvpt) true false false true filename
+)
+
+function RAD_ExportSelectedAnims filename = (
+	RAD_ExportScene true (selection[1].ishiddeninvpt) false true false true filename
+)

@@ -296,10 +296,10 @@ function RAD_ConvertableFilter list class = (
 	r
 )
 
-function RAD_FilterVisible objs val:true = (
+function RAD_FilterVisible objs vis:true = (
 	l = #()
 	for x in objs do (
-		if (x.isHiddenInVpt != val) then ( l = append l x )
+		if (x.isHiddenInVpt != vis) then ( l = append l x )
 	)
 	l
 )
