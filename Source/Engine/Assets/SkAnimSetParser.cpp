@@ -211,8 +211,10 @@ int SkAnimSetParser::Load(
 	
 		file::MMFileInputBuffer::Ref scene = engine.sys->files->OpenInputBuffer((*it).c_str, ZTools);
 
-		if (!scene)
+		if (!scene) {
+			COut(C_Error) << "ERROR: Unable to open file '" << *it << "'" << std::endl;
 			return SR_FileNotFound;
+		}
 
 		stream::InputStream is(*scene);
 		tools::SceneFileRef source(new (ZTools) tools::SceneFile());
