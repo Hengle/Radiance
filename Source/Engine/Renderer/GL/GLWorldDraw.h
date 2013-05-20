@@ -11,6 +11,7 @@
 #include "../Material.h"
 #include "../../Packages/PackagesDef.h"
 #include "../../Assets/MaterialParser.h"
+#include <Runtime/PushPack.h>
 
 namespace world {
 
@@ -50,11 +51,21 @@ public:
 		const Vec4 *scissorBounds
 	);
 
-	virtual bool CalcBoundsScissor(
+	virtual void CalcBBoxScreenBounds(
 		const BBox &bounds,
-		Vec4 &rect
+		Vec4 &rect,
+		int viewport[4]
+	);
+	
+	virtual void CalcModelViewBBoxScreenBounds(
+		const BBox &bounds,
+		Vec4 &rect,
+		int viewport[4]
 	);
 
+	virtual void BindUnifiedShadowRenderTarget();
+	virtual void BindUnifiedShadowTexture();
+	
 	virtual void BindPostFXTargets(bool chain);
 	virtual void BindPostFXQuad();
 	virtual void DrawPostFXQuad();
@@ -68,6 +79,8 @@ public:
 	virtual bool Project(const Vec3 &p, Vec3 &out);
 	virtual Vec3 Unproject(const Vec3 &p);
 
+	virtual Mat4 GetModelViewMatrix();
+	virtual Mat4 GetModelViewProjectionMatrix();
 
 #if defined(WORLD_DEBUG_DRAW)
 	virtual void DebugUploadVerts(
@@ -117,16 +130,24 @@ private:
 		kNumBanks = 1
 	};
 
+	void CalcBBoxScreenBounds(
+		const BBox &bounds,
+		Vec4 &rect,
+		int viewport[4],
+		bool modelViewOnly
+	);
+
 	void CreateScreenOverlay();
+	void BindRTFB(int num);
+	void BindRTTX(int num);
 
 	int m_bank;
 	int m_activeRT;
 	int m_rtSize[2];
 	bool m_rtFB;
 	boost::array<boost::array<r::GLRenderTarget::Ref, kNumRTs>, kNumBanks> m_rts;
-	void BindRTFB(int num);
-	void BindRTTX(int num);
-
+	r::GLRenderTarget::Ref m_unifiedShadowRT;
+	
 	struct OverlayVert {
 		float xy[2];
 		float st[2];
@@ -158,3 +179,5 @@ private:
 };
 
 } // world
+
+#include <Runtime/PopPack.h>

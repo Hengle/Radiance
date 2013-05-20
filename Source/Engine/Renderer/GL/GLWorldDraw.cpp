@@ -294,83 +294,10 @@ void GLWorldDraw::BindLitMaterialStates(
 	mat.BindStates(flags, bm);
 }
 
-bool GLWorldDraw::CalcBoundsScissor(
-	const BBox &bounds,
-	Vec4 &rect
-) {
-	if (bounds.Contains(world->camera->pos))
-		return false;
+void GLWorldDraw::BindUnifiedShadowRenderTarget() {
+}
 
-	boost::array<int, 4> viewport;
-	world->game->Viewport(viewport[0], viewport[1], viewport[2], viewport[3]);
-
-	boost::array<float, 4> fviewport;
-	for (int i = 0; i < 4; ++i)
-		fviewport[i] = (float)viewport[i];
-
-	gl.MatrixMode(GL_PROJECTION);
-	gl.PushMatrix();
-	gl.MatrixMode(GL_MODELVIEW);
-	gl.PushMatrix();
-
-	bool tempRTFB = m_rtFB;
-	m_rtFB = false;
-	
-	SetPerspectiveMatrix();
-	RotateForCamera(*world->camera.get());
-
-	m_rtFB = tempRTFB;
-
-	rect[0] = std::numeric_limits<float>::max();
-	rect[1] = std::numeric_limits<float>::max();
-	rect[2] = std::numeric_limits<float>::min();
-	rect[3] = std::numeric_limits<float>::min();
-
-	for (int x = 0; x < 2; ++x) {
-		float fx = x ? bounds.Maxs()[0] : bounds.Mins()[0];
-
-		for (int y = 0; y < 2; ++y) {
-
-			float fy = y ? bounds.Maxs()[1] : bounds.Mins()[1];
-
-			for (int z = 0; z < 2; ++z) {
-
-				float fz = z ? bounds.Maxs()[2] : bounds.Mins()[2];
-
-				Vec3 p;
-				::Project(
-					gl.GetModelViewProjectionMatrix(),
-					&viewport[0],
-					Vec3(fx, fy, fz),
-					p
-				);
-
-				// clamp
-				rect[0] = math::Min(rect[0], p[0]);
-				rect[1] = math::Min(rect[1], p[1]);
-				rect[2] = math::Max(rect[2], p[0]);
-				rect[3] = math::Max(rect[3], p[1]);
-			}
-		}
-	}
-
-	// clamp
-	rect[0] = math::Clamp(rect[0], fviewport[0], fviewport[0]+fviewport[2]);
-	rect[1] = math::Clamp(rect[1], fviewport[1], fviewport[1]+fviewport[3]);
-	rect[2] = math::Clamp(rect[2], fviewport[0], fviewport[0]+fviewport[2]);
-	rect[3] = math::Clamp(rect[3], fviewport[1], fviewport[1]+fviewport[3]);
-
-	gl.MatrixMode(GL_PROJECTION);
-	gl.PopMatrix();
-	gl.MatrixMode(GL_MODELVIEW);
-	gl.PopMatrix();
-
-	if ((rect[0] == fviewport[0]) && (rect[1] == fviewport[1]) &&
-		(rect[2] == (fviewport[0]+fviewport[2])) && (rect[3] == (fviewport[1]+fviewport[3]))) {
-		return false;
-	}
-
-	return true;
+void GLWorldDraw::BindUnifiedShadowTexture() {
 }
 
 void GLWorldDraw::SetWorldStates() {
@@ -637,6 +564,14 @@ Vec3 GLWorldDraw::Unproject(const Vec3 &p) {
 	gl.PopMatrix();
 
 	return z;
+}
+
+Mat4 GLWorldDraw::GetModelViewMatrix() {
+	return gl.GetModelViewMatrix();
+}
+
+Mat4 GLWorldDraw::GetModelViewProjectionMatrix() {
+	return gl.GetModelViewProjectionMatrix();
 }
 
 } // world

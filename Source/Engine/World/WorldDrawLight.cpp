@@ -7,6 +7,7 @@
 
 #include RADPCH
 #include "World.h"
+#include "../Game/Game.h"
 #include "../Game/GameCVars.h"
 #include "Light.h"
 #include "Entity.h"
@@ -16,7 +17,10 @@
 
 namespace world {
 
-void WorldDraw::DrawUnshadowedLitBatch(const details::MBatch &batch) {
+void WorldDraw::DrawUnshadowedLitBatch(
+	ViewDef &view,
+	const details::MBatch &batch
+) {
 
 	if (!batch.head)
 		return;
@@ -42,18 +46,19 @@ void WorldDraw::DrawUnshadowedLitBatch(const details::MBatch &batch) {
 			++m_counters.numMaterials;
 		}
 
-		DrawBatch(*draw, *mat);
+		DrawBatch(view, *draw, *mat);
 	}
 
 	mat->shader->End();
 
 	for (details::MBatchDrawLink *link = batch.head; link; link = link->next) {
 		MBatchDraw *draw = link->draw;
-		DrawUnshadowedLitBatchLights(*draw, *mat);
+		DrawUnshadowedLitBatchLights(view, *draw, *mat);
 	}
 }
 
 void WorldDraw::DrawBatch(
+	ViewDef &view,
 	MBatchDraw &draw,
 	r::Material &mat
 ) {
@@ -85,7 +90,11 @@ void WorldDraw::DrawBatch(
 		m_rb->PopMatrix();
 }
 
-void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat) {
+void WorldDraw::DrawUnshadowedLitBatchLights(
+	ViewDef &view,
+	MBatchDraw &draw, 
+	r::Material &mat
+) {
 
 	RAD_ASSERT(mat.maxLights > 0);
 
@@ -138,26 +147,27 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 
 				const Light::LightStyle kStyle = interaction->light->style;
 
-				if (!(kStyle & Light::kStyle_CastShadows)) {
-					bool add = false;
+				// TODO: non-unified shadows need to only render unshadowed passes
+				// in this function
+				
+				bool add = false;
 
-					if ((kStyle&Light::kStyle_DiffuseSpecular) == Light::kStyle_DiffuseSpecular) {
-						add = !didDiffuseSpecular;
-					} else if (kStyle&Light::kStyle_Diffuse) {
-						add = diffuse && (!diffuseSpecular || didDiffuseSpecular);
-					}
+				if ((kStyle&Light::kStyle_DiffuseSpecular) == Light::kStyle_DiffuseSpecular) {
+					add = !didDiffuseSpecular;
+				} else if (kStyle&Light::kStyle_Diffuse) {
+					add = diffuse && (!diffuseSpecular || didDiffuseSpecular);
+				}
 					
-					if (add) {
-						if (interaction->light->m_drawFrame != m_markFrame) {
-							interaction->light->m_drawFrame = m_markFrame;
-							++m_counters.drawnLights;
-						}
-						r::LightDef &lightDef = u.lights.lights[u.lights.numLights++];
-						GenLightDef(*interaction->light, lightDef, tx ? &invTx : 0);
-						BBox bounds(interaction->light->bounds);
-						bounds.Translate(interaction->light->pos);
-						lightBounds.Insert(bounds);
+				if (add) {
+					if (interaction->light->m_drawFrame != m_markFrame) {
+						interaction->light->m_drawFrame = m_markFrame;
+						++m_counters.drawnLights;
 					}
+					r::LightDef &lightDef = u.lights.lights[u.lights.numLights++];
+					GenLightDef(*interaction->light, lightDef, tx ? &invTx : 0);
+					BBox bounds(interaction->light->bounds);
+					bounds.Translate(interaction->light->pos);
+					lightBounds.Insert(bounds);
 				}
 
 				interaction = interaction->nextOnBatch;
@@ -188,7 +198,7 @@ void WorldDraw::DrawUnshadowedLitBatchLights(MBatchDraw &draw, r::Material &mat)
 				bool scissor = false;
 				
 				if (m_world->cvars->r_lightscissor.value) {
-					scissor = m_rb->CalcBoundsScissor(lightBounds, scissorRect);
+					scissor = CalcScissorBounds(view, lightBounds, scissorRect);
 				}
 
 				m_rb->BindLitMaterialStates(mat, scissor ? &scissorRect : 0);
@@ -235,8 +245,231 @@ void WorldDraw::GenLightDef(
 		lightDef.flags |= r::LightDef::kFlag_Specular;
 }
 
+bool WorldDraw::CalcScissorBounds(
+	const ViewDef &view,
+	const BBox &bounds,
+	Vec4 &rect
+) {
+	if (bounds.Contains(view.camera.pos))
+		return false;
+
+	Vec4 rect;
+	
+	rect[0] = std::numeric_limits<float>::max();
+	rect[1] = std::numeric_limits<float>::max();
+	rect[2] = std::numeric_limits<float>::min();
+	rect[3] = std::numeric_limits<float>::min();
+
+	for (int x = 0; x < 2; ++x) {
+		float fx = x ? bounds.Maxs()[0] : bounds.Mins()[0];
+
+		for (int y = 0; y < 2; ++y) {
+
+			float fy = y ? bounds.Maxs()[1] : bounds.Mins()[1];
+
+			for (int z = 0; z < 2; ++z) {
+
+				float fz = z ? bounds.Maxs()[2] : bounds.Mins()[2];
+
+				Vec3 p;
+				::Project(
+					view.mvp,
+					&view.viewport[0],
+					Vec3(fx, fy, fz),
+					p
+				);
+
+				// bounds
+				rect[0] = math::Min(rect[0], p[0]);
+				rect[1] = math::Min(rect[1], p[1]);
+				rect[2] = math::Max(rect[2], p[0]);
+				rect[3] = math::Max(rect[3], p[1]);
+			}
+		}
+	}
+
+	// clamp
+	rect[0] = math::Clamp(rect[0], (float)view.viewport[0], (float)view.viewport[0]+view.viewport[2]);
+	rect[1] = math::Clamp(rect[1], (float)view.viewport[1], (float)view.viewport[1]+view.viewport[3]);
+	rect[2] = math::Clamp(rect[2], (float)view.viewport[0], (float)view.viewport[0]+view.viewport[2]);
+	rect[3] = math::Clamp(rect[3], (float)view.viewport[1], (float)view.viewport[1]+view.viewport[3]);
+
+	if ((rect[0] == (float)view.viewport[0]) && (rect[1] == (float)view.viewport[1]) &&
+		(rect[2] == ((float)view.viewport[0]+view.viewport[2])) && (rect[3] == ((float)view.viewport[1]+view.viewport[3]))) {
+		return false;
+	}
+
+	return true;
+}
+
+void WorldDraw::SetBoundingOrthoMatrix(
+	const ViewDef &view,
+	const BBox &bounds
+) {
+	Vec4 viewPlaneBounds;
+	Vec2 zBounds;
+
+	viewPlaneBounds[0] = std::numeric_limits<float>::max();
+	viewPlaneBounds[1] = std::numeric_limits<float>::max();
+	viewPlaneBounds[2] = std::numeric_limits<float>::min();
+	viewPlaneBounds[3] = std::numeric_limits<float>::min();
+	zBounds[0] = std::numeric_limits<float>::min();
+	zBounds[1] = std::numeric_limits<float>::max();
+
+	for (int x = 0; x < 2; ++x) {
+		float fx = x ? bounds.Maxs()[0] : bounds.Mins()[0];
+
+		for (int y = 0; y < 2; ++y) {
+
+			float fy = y ? bounds.Maxs()[1] : bounds.Mins()[1];
+
+			for (int z = 0; z < 2; ++z) {
+
+				float fz = z ? bounds.Maxs()[2] : bounds.Mins()[2];
+
+				Vec3 p = Vec3(fx, fy, fz) * view.mv;
+				
+				// bounds
+				viewPlaneBounds[0] = math::Min(viewPlaneBounds[0], p[0]);
+				viewPlaneBounds[1] = math::Min(viewPlaneBounds[1], p[1]);
+				viewPlaneBounds[2] = math::Max(viewPlaneBounds[2], p[0]);
+				viewPlaneBounds[3] = math::Max(viewPlaneBounds[3], p[1]);
+				zBounds[0] = math::Max(zBounds[0], p[2]);
+				zBounds[1] = math::Min(zBounds[1], p[2]);
+			}
+		}
+	}
+
+	m_rb->SetOrthoMatrix(
+		viewPlaneBounds[0] - 16.f,
+		viewPlaneBounds[2] + 16.f,
+		viewPlaneBounds[1] - 16.f,
+		viewPlaneBounds[3] + 16.f,
+		zBounds[1] - 16.f,
+		zBounds[0] + 16.f
+	);
+}
+
+void WorldDraw::DrawViewUnifiedShadows(ViewDef &view) {
+	for (EntityPtrSet::const_iterator it = view.shadowEntities.begin(); it != view.shadowEntities.end(); ++it) {
+		DrawUnifiedEntityShadow(view, **it);
+	}
+	for (MBatchOccupantPtrSet::const_iterator it = view.shadowOccupants.begin(); it != view.shadowOccupants.end(); ++it) {
+		DrawUnifiedOccupantShadow(view, **it);
+	}
+}
+
+void WorldDraw::DrawUnifiedEntityShadow(ViewDef &view, const Entity &e) {
+	Vec3 unifiedPos;
+	float unifiedRadius;
+
+	BBox bounds(e.ps->bbox);
+	bounds.Translate(e.ps->worldPos);
+
+	CalcUnifiedShadowPosAndSize(
+		bounds,
+		e.m_lightInteractions,
+		unifiedPos,
+		unifiedRadius
+	);
+
+	DrawUnifiedShadow(
+		view,
+		*e.models,
+		unifiedPos,
+		unifiedRadius
+	);
+}
+
+void WorldDraw::DrawUnifiedOccupantShadow(ViewDef &view, const MBatchOccupant &o) {
+	Vec3 unifiedPos;
+	float unifiedRadius;
+
+	CalcUnifiedShadowPosAndSize(
+		o.bounds,
+		o.m_lightInteractions,
+		unifiedPos,
+		unifiedRadius
+	);
+
+	DrawUnifiedShadow(
+		view,
+		*o.batches,
+		unifiedPos,
+		unifiedRadius
+	);
+}
+
+void WorldDraw::DrawUnifiedShadow(
+	ViewDef &view,
+	const DrawModel::Map &models,
+	const Vec3 &unifiedPos,
+	float unifiedRadius
+) {
+}
+
+void WorldDraw::DrawUnifiedShadow(
+	ViewDef &view,
+	const MBatchDraw::RefVec &batches,
+	const Vec3 &unifiedPos,
+	float unifiedRadius
+) {
+}
+
+void WorldDraw::DrawUnifiedShadowBatches(
+	const MBatchDraw::RefVec &batches
+) {
+}
+
+void WorldDraw::CalcUnifiedShadowPosAndSize(
+	const BBox &bounds,
+	const details::LightInteraction *head,
+	Vec3 &pos,
+	float &radius
+) {
+	float totalDist = 0.f;
+	const Vec3 &origin = bounds.Origin();
+	
+	for (const details::LightInteraction *i = head; i; i = i->nextOnBatch) {
+		Vec3 z = i->light->pos.get() - origin;
+		totalDist += z.Magnitude();
+	}
+
+	pos = head->light->pos;
+
+	if (totalDist > 0.f) {
+		
+		for (const details::LightInteraction *i = head->nextOnBatch; i; i = i->nextOnBatch) {
+			Vec3 z = i->light->pos.get() - origin;
+			float w = z.Magnitude() / totalDist;
+			if (w >= 1.f) {
+				pos = i->light->pos;
+			} else {
+				pos = math::Lerp(i->light->pos.get(), pos, w);
+			}
+		}
+
+		radius = 0.f;
+
+		// calculate the radius that encloses all the effecting lights
+
+		for (const details::LightInteraction *i = head->nextOnBatch; i; i = i->nextOnBatch) {
+			Vec3 z = i->light->pos.get() - pos;
+			float m = z.Magnitude();
+			radius += i->light->radius + m;
+		}
+
+	} else {
+		radius = head->light->radius;
+	}
+}
+
 void WorldDraw::InvalidateInteractions(Light &light) {
-	for (details::MatInteractionChain::const_iterator it = light.m_interactions.begin(); it != light.m_interactions.end(); ++it) {
+	for (details::LightInteraction *i = light.m_interactionHead; i; i = i->nextOnLight) {
+		i->dirty = true;
+	}
+
+	for (details::MatInteractionChain::const_iterator it = light.m_matInteractionChain.begin(); it != light.m_matInteractionChain.end(); ++it) {
 		for (details::LightInteraction *i = it->second; i; i = i->nextOnLight) {
 			i->dirty = true;
 		}
@@ -244,6 +477,10 @@ void WorldDraw::InvalidateInteractions(Light &light) {
 }
 
 void WorldDraw::InvalidateInteractions(Entity &entity) {
+	for (details::LightInteraction *i = entity.m_lightInteractions; i; i = i->nextOnBatch) {
+		i->dirty = true;
+	}
+
 	for (DrawModel::Map::const_iterator it = entity.models->begin(); it != entity.models->end(); ++it) {
 		const DrawModel::Ref &model = it->second;
 		for (MBatchDraw::RefVec::const_iterator it = model->batches->begin(); it != model->batches->end(); ++it) {
@@ -256,6 +493,10 @@ void WorldDraw::InvalidateInteractions(Entity &entity) {
 }
 
 void WorldDraw::InvalidateInteractions(MBatchOccupant &occupant) {
+	for (details::LightInteraction *i = occupant.m_lightInteractions; i; i = i->nextOnBatch) {
+		i->dirty = true;
+	}
+
 	for (MBatchDraw::RefVec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
 		const MBatchDraw::Ref &batch = *it;
 		for (details::LightInteraction *i = batch->m_interactions; i; i = i->nextOnBatch) {
@@ -303,13 +544,21 @@ void WorldDraw::LinkEntity(
 }
 
 void WorldDraw::UnlinkEntity(Entity &entity) {
+	while (entity.m_lightInteractions) {
+		details::LightInteraction *i = entity.m_lightInteractions;
+		UnlinkInteraction(*i, i->light->m_interactionHead, entity.m_lightInteractions);
+		m_interactionPool.ReturnChunk(i);
+	}
+
 	for (DrawModel::Map::const_iterator it = entity.models->begin(); it != entity.models->end(); ++it) {
 		const DrawModel::Ref &model = it->second;
 		for (MBatchDraw::RefVec::const_iterator it = model->batches->begin(); it != model->batches->end(); ++it) {
 			const MBatchDraw::Ref &batch = *it;
 			while (batch->m_interactions) {
+				details::LightInteraction *i = batch->m_interactions;
 				details::LightInteraction **lightHead = batch->m_interactions->light->ChainHead(batch->matId);
-				UnlinkInteraction(*batch->m_interactions, *lightHead, batch->m_interactions);
+				UnlinkInteraction(*i, *lightHead, batch->m_interactions);
+				m_interactionPool.ReturnChunk(i);
 			}
 		}
 	}
@@ -336,6 +585,15 @@ void WorldDraw::LinkOccupant(
 		lightBounds.Translate(light.m_pos);
 
 		if (lightBounds.Touches(bounds)) {
+
+			if (occupant.lightingFlags.get()&kLightingFlag_CastShadows) {
+				if (light.style.get()&Light::kStyle_CastShadows) {
+					if (!FindInteraction(light, occupant)) {
+						CreateInteraction(light, occupant);
+					}
+				}
+			}
+
 			for (MBatchDraw::RefVec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
 				const MBatchDraw::Ref &batch = *it;
 				if (lightBounds.Touches(batch->bounds)) {
@@ -349,11 +607,20 @@ void WorldDraw::LinkOccupant(
 }
 
 void WorldDraw::UnlinkOccupant(MBatchOccupant &occupant) {
+
+	while (occupant.m_lightInteractions) {
+		details::LightInteraction *i = occupant.m_lightInteractions;
+		UnlinkInteraction(*i, i->light->m_interactionHead, occupant.m_lightInteractions);
+		m_interactionPool.ReturnChunk(i);
+	}
+
 	for (MBatchDraw::RefVec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
 		const MBatchDraw::Ref &batch = *it;
 		while (batch->m_interactions) {
+			details::LightInteraction *i = batch->m_interactions;
 			details::LightInteraction **lightHead = batch->m_interactions->light->ChainHead(batch->matId);
-			UnlinkInteraction(*batch->m_interactions, *lightHead, batch->m_interactions);
+			UnlinkInteraction(*i, *lightHead, batch->m_interactions);
+			m_interactionPool.ReturnChunk(i);
 		}
 	}
 }
@@ -402,6 +669,14 @@ void WorldDraw::LinkLight(
 		if (!bounds.Touches(entBounds))
 			continue;
 
+		if (light.style.get()&Light::kStyle_CastShadows) {
+			if (entity.lightingFlags.get()&kLightingFlag_CastShadows) {
+				if (!FindInteraction(light, entity)) {
+					CreateInteraction(light, entity);
+				}
+			}
+		}
+		
 		for (DrawModel::Map::const_iterator it = entity.models->begin(); it != entity.models->end(); ++it) {
 			const DrawModel::Ref &model = it->second;
 			for (MBatchDraw::RefVec::const_iterator it = model->batches->begin(); it != model->batches->end(); ++it) {
@@ -419,6 +694,17 @@ void WorldDraw::LinkLight(
 		if (!(light.interactionFlags & occupant.lightInteractionFlags))
 			continue;
 
+		if (!bounds.Touches(occupant.bounds))
+			continue;
+
+		if (light.style.get()&Light::kStyle_CastShadows) {
+			if (occupant.lightingFlags.get()&kLightingFlag_CastShadows) {
+				if (!FindInteraction(light, occupant)) {
+					CreateInteraction(light, occupant);
+				}
+			}
+		}
+
 		for (MBatchDraw::RefVec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
 			const MBatchDraw::Ref &batch = *it;
 			if ((batch->maxLights > 0) && !FindInteraction(light, *batch)) {
@@ -429,23 +715,55 @@ void WorldDraw::LinkLight(
 }
 
 void WorldDraw::UnlinkLight(Light &light) {
-	for (details::MatInteractionChain::iterator it = light.m_interactions.begin(); it != light.m_interactions.end(); ++it) {
+
+	for (details::MatInteractionChain::iterator it = light.m_matInteractionChain.begin(); it != light.m_matInteractionChain.end(); ++it) {
 		details::LightInteraction **lightHead = &it->second;
 
-		details::LightInteraction *next = 0;
-		for (details::LightInteraction *i = *lightHead; i; i = next) {
-			next = i->nextOnLight;
+		while (*lightHead) {
+			details::LightInteraction *i = *lightHead;
 			UnlinkInteraction(*i, *lightHead, i->draw->m_interactions);
 			m_interactionPool.ReturnChunk(i);
 		}
+	}
+
+	while (light.m_interactionHead) {
+		details::LightInteraction *i = light.m_interactionHead;
+		RAD_ASSERT(i->entity||i->occupant);
+		RAD_ASSERT(i->draw == 0);
+		UnlinkInteraction(*i, light.m_interactionHead, i->entity ? i->entity->m_lightInteractions : i->occupant->m_lightInteractions);
+		m_interactionPool.ReturnChunk(i);
 	}
 }
 
 details::LightInteraction *WorldDraw::FindInteraction(
 	Light &light,
-	MBatchDraw &batch
+	const MBatchDraw &batch
 ) {
 	for (details::LightInteraction *i = batch.m_interactions; i; i = i->nextOnBatch) {
+		if (i->light == &light)
+			return i;
+	}
+
+	return 0;
+}
+
+details::LightInteraction *WorldDraw::FindInteraction(
+	Light &light,
+	const Entity &entity
+) {
+	for (details::LightInteraction *i = entity.m_lightInteractions; i; i = i->nextOnBatch) {
+		if (i->light == &light)
+			return i;
+	}
+
+	return 0;
+}
+
+details::LightInteraction *WorldDraw::FindInteraction(
+	Light &light,
+	const MBatchOccupant &occupant
+) {
+	for (details::LightInteraction *i = occupant.m_lightInteractions; i; i = i->nextOnBatch) {
 		if (i->light == &light)
 			return i;
 	}
@@ -509,6 +827,36 @@ details::LightInteraction *WorldDraw::CreateInteraction(
 	return i;
 }
 
+details::LightInteraction *WorldDraw::CreateInteraction(
+	Light &light,
+	Entity &entity
+) {
+	details::LightInteraction *i = reinterpret_cast<details::LightInteraction*>(m_interactionPool.SafeGetChunk());
+	i->entity = &entity;
+	i->light = &light;
+	i->occupant = 0;
+	i->dirty = true;
+	i->draw = 0;
+
+	LinkInteraction(*i, light.m_interactionHead, entity.m_lightInteractions);
+
+	return i;
+}
+
+details::LightInteraction *WorldDraw::CreateInteraction(
+	Light &light,
+	MBatchOccupant &occupant
+) {
+	details::LightInteraction *i = reinterpret_cast<details::LightInteraction*>(m_interactionPool.SafeGetChunk());
+	i->light = &light;
+	i->occupant = &occupant;
+	i->entity = 0;
+	i->dirty = true;
+	i->draw = 0;
+
+	LinkInteraction(*i, light.m_interactionHead, occupant.m_lightInteractions);
+}
+
 void WorldDraw::LinkInteraction(
 	details::LightInteraction &interaction,
 	details::LightInteraction *&headOnLight,
@@ -557,7 +905,7 @@ void WorldDraw::UpdateLightInteractions(Light &light) {
 	BBox bounds(light.m_bounds);
 	bounds.Translate(light.m_pos);
 
-	for (details::MatInteractionChain::iterator it = light.m_interactions.begin(); it != light.m_interactions.end(); ++it) {
+	for (details::MatInteractionChain::iterator it = light.m_matInteractionChain.begin(); it != light.m_matInteractionChain.end(); ++it) {
 		details::LightInteraction **lightHead = &it->second;
 		details::LightInteraction *next = 0;
 		for (details::LightInteraction *i = *lightHead; i; i = next) {
@@ -577,6 +925,29 @@ void WorldDraw::UpdateLightInteractions(Light &light) {
 				}
 			}
 		}
+	}
+
+	details::LightInteraction *next = 0;
+	for (details::LightInteraction *i = light.m_interactionHead; i; i = next) {
+		next = i->nextOnLight;
+		RAD_ASSERT(i->draw == 0);
+
+		if (i->dirty) {
+			i->dirty = false;
+			if (i->entity) {
+				BBox entBounds(i->entity->ps->bbox);
+				entBounds.Translate(i->entity->ps->worldPos);
+				if (!bounds.Touches(entBounds)) {
+					UnlinkInteraction(*i, light.m_interactionHead, i->entity->m_lightInteractions);
+					m_interactionPool.ReturnChunk(i);
+				}
+			} else {
+				RAD_ASSERT(i->occupant);
+				if (!bounds.Touches(i->occupant->bounds)) {
+					UnlinkInteraction(*i, light.m_interactionHead, i->occupant->m_lightInteractions);
+					m_interactionPool.ReturnChunk(i);
+				}
+			}
 	}
 }
 

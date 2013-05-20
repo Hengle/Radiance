@@ -501,6 +501,7 @@ private:
 	String m_targetname;
 	String m_classname;
 	LightingFlags m_lightingFlags;
+	details::LightInteraction *m_lightInteractions; // only valid for shadow casters
 	int m_frame;
 	int m_spawnState;
 	int m_id;
@@ -511,6 +512,7 @@ private:
 	float m_nextTick;
 	float m_lastTick;
 	int m_markFrame;
+	int m_shadowFrame;
 	int m_classbits;
 	bool m_scripted;
 	bool m_gc;

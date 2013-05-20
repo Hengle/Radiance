@@ -37,19 +37,25 @@ public:
 		kNumFrustumPlanes = 6
 	};
 	
-	ViewDef() : mirror(false), sky(false) {
+	ViewDef() : light(false), sky(false) {
 	}
 
 	Camera camera;
-	PlaneVec frustum;
+	Mat4 mvp;
+	Mat4 mv;
 
-	int area;
-	bool mirror;
-	bool sky;
+	PlaneVec frustum;
+	
 	AreaBits areas;
 	LightVec visLights;
-
+	EntityPtrSet shadowEntities;
+	MBatchOccupantPtrSet shadowOccupants;
 	details::MBatchIdMap batches;
+
+	int viewport[4];
+	int area;
+	bool light;
+	bool sky;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -97,11 +103,10 @@ public:
 		const Vec4 *scissorBounds
 	) = 0;
 
-	virtual bool CalcBoundsScissor(
-		const BBox &bounds,
-		Vec4 &rect
-	) = 0;
-
+	// Unified Shadows
+	virtual void BindUnifiedShadowRenderTarget() = 0;
+	virtual void BindUnifiedShadowTexture() = 0;
+	
 	// Post Process FX
 	virtual void BindPostFXTargets(bool chain) = 0;
 	virtual void BindPostFXQuad() = 0;
@@ -116,6 +121,8 @@ public:
 	virtual bool Project(const Vec3 &p, Vec3 &out) = 0;
 	virtual Vec3 Unproject(const Vec3 &p) = 0;
 
+	virtual Mat4 GetModelViewMatrix() = 0;
+	virtual Mat4 GetModelViewProjectionMatrix() = 0;
 
 #if defined(WORLD_DEBUG_DRAW)
 	RAD_DECLARE_PROPERTY(RB_WorldDraw, wireframe, bool, bool);
@@ -311,6 +318,8 @@ private:
 	);
 		
 	void UpdateLightInteractions(ViewDef &view);
+	void VisMarkShadowCasters(ViewDef &view);
+	bool ClipShadowCasterBounds(ViewDef &view, const BBox &bounds, const Vec3 &lightPos);
 
 	bool ClipBounds(const StackWindingStackVec &volume, const BBox &volumeBounds, const BBox &bounds);
 	void DrawView();
@@ -326,26 +335,6 @@ private:
 		bool wireframe
 	);
 
-	void DrawUnshadowedLitBatch(
-		const details::MBatch &batch
-	);
-
-	void DrawBatch(
-		MBatchDraw &draw,
-		r::Material &mat
-	);
-
-	void DrawUnshadowedLitBatchLights(
-		MBatchDraw &draw,
-		r::Material &mat
-	);
-
-	void GenLightDef(
-		const Light &light,
-		r::LightDef &lightDef,
-		Mat4 *tx
-	);
-	
 	void DrawOverlay(ScreenOverlay &overlay);
 	void AddScreenOverlay(ScreenOverlay &overlay);
 	void RemoveScreenOverlay(ScreenOverlay &overlay);
@@ -396,7 +385,17 @@ private:
 
 	details::LightInteraction *FindInteraction(
 		Light &light,
-		MBatchDraw &batch
+		const MBatchDraw &batch
+	);
+
+	details::LightInteraction *FindInteraction(
+		Light &light,
+		const Entity &entity
+	);
+
+	details::LightInteraction *FindInteraction(
+		Light &light,
+		const MBatchOccupant &occupant
 	);
 
 	details::LightInteraction *CreateInteraction(
@@ -416,6 +415,16 @@ private:
 		MBatchDraw &batch
 	);
 
+	details::LightInteraction *CreateInteraction(
+		Light &light,
+		Entity &entity
+	);
+
+	details::LightInteraction *CreateInteraction(
+		Light &light,
+		MBatchOccupant &occupant
+	);
+
 	void LinkInteraction(
 		details::LightInteraction &interaction,
 		details::LightInteraction *&headOnLight,
@@ -426,6 +435,69 @@ private:
 		details::LightInteraction &interaction,
 		details::LightInteraction *&headOnLight,
 		details::LightInteraction *&headOnBatch
+	);
+
+	void DrawUnshadowedLitBatch(
+		ViewDef &view,
+		const details::MBatch &batch
+	);
+
+	void DrawBatch(
+		ViewDef &view,
+		MBatchDraw &draw,
+		r::Material &mat
+	);
+
+	void DrawUnshadowedLitBatchLights(
+		ViewDef &view,
+		MBatchDraw &draw,
+		r::Material &mat
+	);
+
+	void GenLightDef(
+		const Light &light,
+		r::LightDef &lightDef,
+		Mat4 *tx
+	);
+
+	bool CalcScissorBounds(
+		const ViewDef &view,
+		const BBox &bounds,
+		Vec4 &rect
+	);
+
+	void SetBoundingOrthoMatrix(
+		const ViewDef &view,
+		const BBox &bounds
+	);
+
+	void DrawViewUnifiedShadows(ViewDef &view);
+	void DrawUnifiedEntityShadow(ViewDef &view, const Entity &e);
+	void DrawUnifiedOccupantShadow(ViewDef &view, const MBatchOccupant &o);
+
+	void DrawUnifiedShadow(
+		ViewDef &view,
+		const DrawModel::Map &models,
+		const Vec3 &unifiedPos,
+		float unifiedRadius
+	);
+
+	void DrawUnifiedShadow(
+		ViewDef &view,
+		const MBatchDraw::RefVec &batches,
+		const Vec3 &unifiedPos,
+		float unifiedRadius
+	);
+
+	void DrawUnifiedShadowBatches(
+		const MBatchDraw::RefVec &batches
+	);
+
+	void CalcUnifiedShadowPosAndSize(
+		const BBox &bounds,
+		const details::LightInteraction *head,
+		Vec3 &pos,
+		float &radius
 	);
 
 	void UpdateLightInteractions(Light &light);

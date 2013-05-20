@@ -45,7 +45,7 @@ RADENG_API Vec3 RADENG_CALL RotateVector(const Vec3 &v, const Vec3 &angles) {
 	return Mat4::Rotation(QuatFromAngles(angles)).Transform3X3(v);
 }
 
-RADENG_API Vec3 RADENG_CALL Unproject(const Mat4 &mvp, int viewport[4], const Vec3 &p) {
+RADENG_API Vec3 RADENG_CALL Unproject(const Mat4 &mvp, const int viewport[4], const Vec3 &p) {
 	Vec3 z(
 		2*(p[0]-viewport[0])/viewport[2]-1,
 		2*(viewport[3]-(p[1]-viewport[1]))/viewport[3]-1,
@@ -55,7 +55,7 @@ RADENG_API Vec3 RADENG_CALL Unproject(const Mat4 &mvp, int viewport[4], const Ve
 	return mvp.Inverse().Transform(z);
 }
 
-RADENG_API bool RADENG_CALL Project(const Mat4 &mvp, int viewport[4], const Vec3 &p, Vec3 &out) {
+RADENG_API bool RADENG_CALL Project(const Mat4 &mvp, const int viewport[4], const Vec3 &p, Vec3 &out) {
 	Vec4 x(p, 1.f);
 	Vec4 z = mvp.Transform(x);
 	

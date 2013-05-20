@@ -27,6 +27,7 @@ public:
 	CVarBool r_showlightpasses;
 	CVarBool r_showlightcounts;
 	CVarBool r_fly;
+	CVarBool r_viewunilightmatrix;
 	CVarInt r_maxLightsPerPass;
 
 	void AddLuaVar(const CVar::Ref &cvar) {

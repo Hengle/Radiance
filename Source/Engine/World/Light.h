@@ -130,7 +130,8 @@ private:
 	details::LightInteraction **ChainHead(int matId);
 	
 	dBSPLeaf::PtrVec m_bspLeafs;
-	details::MatInteractionChain m_interactions;
+	details::MatInteractionChain m_matInteractionChain; // linkage to draws
+	details::LightInteraction *m_interactionHead; // linkage to objects
 	IntSet m_areas;
 	BBox m_bounds;
 	Vec3 m_spColor;

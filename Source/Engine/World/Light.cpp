@@ -50,7 +50,7 @@ void Light::Unlink() {
 
 details::LightInteraction **Light::ChainHead(int matId) {
 	std::pair<details::MatInteractionChain::iterator, bool> r = 
-		m_interactions.insert(details::MatInteractionChain::value_type(matId, (details::LightInteraction *)0));
+		m_matInteractionChain.insert(details::MatInteractionChain::value_type(matId, (details::LightInteraction *)0));
 	return &r.first->second;
 }
 

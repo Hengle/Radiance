@@ -24,6 +24,7 @@ r_throttle(zone, "r_throttle", true, false),
 r_showlightpasses(zone, "r_showlightpasses", false, false),
 r_showlightcounts(zone, "r_showlightcounts", false, false),
 r_fly(zone, "r_fly", false, false),
+r_viewunilightmatrix(zone, "r_viewunilightmatrix", false, false),
 r_maxLightsPerPass(zone, "r_maxlightsperpass", r::kMaxLights, false){
 }
 

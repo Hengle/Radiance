@@ -122,7 +122,9 @@ m_classbits(0),
 m_lightInteractionFlags(0),
 m_lightingFlags(kLightingFlag_None),
 m_gc(false),
-m_markFrame(-1) {
+m_markFrame(-1),
+m_shadowFrame(-1),
+m_lightInteractions(0) {
 	for (int i = 0; i < kNumLuaCallbackBuckets; ++i)
 		m_luaCallbacks[i] = 0;
 }

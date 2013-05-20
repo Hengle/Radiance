@@ -17,10 +17,12 @@ public:
 
 	MBatchOccupant(World &world, LightingFlags lightingFlags, int lightInteractionFlags) 
 		: m_markFrame(-1), 
+		m_shadowFrame(-1),
 		m_world(&world), 
 		m_leaf(0),
 		m_lightingFlags(lightingFlags),
-		m_lightInteractionFlags(lightInteractionFlags)
+		m_lightInteractionFlags(lightInteractionFlags),
+		m_lightInteractions(0)
 	{}
 
 	virtual ~MBatchOccupant() {}
@@ -73,8 +75,10 @@ private:
 	World *m_world;
 	dBSPLeaf *m_leaf;
 	int m_markFrame;
+	int m_shadowFrame;
 	int m_lightInteractionFlags;
 	LightingFlags m_lightingFlags;
+	details::LightInteraction *m_lightInteractions; // only valid for shadow casters
 };
 
 }
