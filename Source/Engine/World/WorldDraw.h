@@ -80,7 +80,10 @@ public:
     virtual void ClearBackBuffer() = 0;
 	virtual void ClearDepthBuffer() = 0;
 	virtual void SetWorldStates() = 0;
-	virtual void SetPerspectiveMatrix() = 0;
+	virtual void SetPerspectiveMatrix(
+		const Camera &camera,
+		int viewport[4]
+	) = 0;
 	virtual void SetScreenLocalMatrix() = 0;
 
 	virtual void SetOrthoMatrix(
@@ -180,6 +183,7 @@ public:
 		void Clear();
 
 		float fps;
+		int area;
 		int drawnAreas;
 		int testedPortals;
 		int drawnPortals;
@@ -188,6 +192,9 @@ public:
 		int drawnEntities;
 		int testedEntityModels;
 		int drawnEntityModels;
+		int drawnActors;
+		int testedActorModels;
+		int drawnActorModels;
 		int testedLights;
 		int visLights;
 		int drawnLights;
@@ -331,6 +338,7 @@ private:
 	void DrawViewBatches(ViewDef &view, bool wireframe);
 	
 	void DrawUnlitBatch(
+		ViewDef &view,
 		const details::MBatch &batch,
 		bool wireframe
 	);
@@ -514,12 +522,14 @@ private:
 	ScreenOverlay::List m_overlays;
 	RB_WorldDraw::Ref m_rb;
 	details::MatRefMap m_refMats;
+	Camera m_lockVisCamera;
 	World *m_world;
 	Light *m_lights[2];
 	int m_frame;
 	int m_markFrame;
 	bool m_uiOnly;
 	bool m_init;
+	bool m_lockVis;
 
 #if defined(WORLD_DEBUG_DRAW)
 
@@ -529,11 +539,15 @@ private:
 	struct DebugVars {
 		BBoxVec debugEntityBBoxes;
 		BBoxVec debugWorldBBoxes;
+		BBoxVec debugActorBBoxes;
 		Vec4Vec debugLightScissors;
+		StackWindingStackVec frustum;
+		ClippedAreaVolumeStackVec frustumAreas;
 		LocalMaterial debugWireframe_M;
 		boost::array<LocalMaterial, 2> debugPortal_M;
 		LocalMaterial debugWorldBBox_M;
 		LocalMaterial debugEntityBBox_M;
+		LocalMaterial debugActorBBox_M;
 		LocalMaterial debugWaypoint_M;
 		boost::array<LocalMaterial, 6> debugLightPasses_M;
 	};
@@ -555,6 +569,7 @@ private:
 	void DebugDrawLightPass(const details::MBatch &batch);
 	void DebugDrawLightCounts(ViewDef &view);
 	void DebugDrawLightCounts(const details::MBatch &batch);
+	void DebugDrawFrustumVolumes(ViewDef &view);
 	
 	DebugVars m_dbgVars;
 #endif

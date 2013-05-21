@@ -13,7 +13,8 @@
 namespace world {
 
 Light::Light(World *w) : 
-m_pos(Vec3::Zero) ,
+m_interactionHead(0),
+m_pos(Vec3::Zero),
 m_style(kStyle_Diffuse|kStyle_Specular|kStyle_CastShadows),
 m_brightness(1.f),
 m_radius(400.f),

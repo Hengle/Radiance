@@ -18,6 +18,7 @@ public:
 	CVarBool r_showportals;
 	CVarBool r_showentitybboxes;
 	CVarBool r_showworldbboxes;
+	CVarBool r_showactorbboxes;
 	CVarBool r_showwaypoints;
 	CVarBool r_showmovecmds;
 	CVarBool r_frustumcull;
@@ -27,7 +28,9 @@ public:
 	CVarBool r_showlightpasses;
 	CVarBool r_showlightcounts;
 	CVarBool r_fly;
+	CVarBool r_lockvis;
 	CVarBool r_viewunilightmatrix;
+	CVarBool r_showfrustum;
 	CVarInt r_maxLightsPerPass;
 
 	void AddLuaVar(const CVar::Ref &cvar) {

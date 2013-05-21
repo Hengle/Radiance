@@ -36,6 +36,10 @@ int WorldDraw::LoadDebugMaterials() {
 	if (r != pkg::SR_Success)
 		return r;
 
+	r = LoadMaterial("Sys/DebugActorBBox_M", m_dbgVars.debugActorBBox_M);
+	if (r != pkg::SR_Success)
+		return r;
+
 	r = LoadMaterial("Sys/DebugWaypoint_M", m_dbgVars.debugWaypoint_M);
 	if (r != pkg::SR_Success)
 		return r;
@@ -371,7 +375,7 @@ void WorldDraw::DebugDrawLightPasses(ViewDef &view) {
 			if (batch.matRef->mat->maxLights > 0) {
 				DebugDrawLightPass(batch);
 			} else {
-				DrawUnlitBatch(batch, false);
+				DrawUnlitBatch(view, batch, false);
 			}
 		}
 	}
@@ -499,7 +503,7 @@ void WorldDraw::DebugDrawLightCounts(ViewDef &view) {
 			if (batch.matRef->mat->maxLights > 0) {
 				DebugDrawLightCounts(batch);
 			} else {
-				DrawUnlitBatch(batch, false);
+				DrawUnlitBatch(view, batch, false);
 			}
 		}
 	}
@@ -555,6 +559,49 @@ void WorldDraw::DebugDrawLightCounts(const details::MBatch &batch) {
 
 		debugMat.mat->shader->End();
 	}
+}
+
+void WorldDraw::DebugDrawFrustumVolumes(ViewDef &view) {
+
+	m_dbgVars.debugWireframe_M.mat->BindStates();
+	m_dbgVars.debugWireframe_M.mat->BindTextures(m_dbgVars.debugWireframe_M.loader);
+	m_dbgVars.debugWireframe_M.mat->shader->Begin(r::Shader::kPass_Default, *m_dbgVars.debugWireframe_M.mat);
+
+	r::Shader::Uniforms u(Vec4(1,1,1,1));
+
+	for (StackWindingStackVec::const_iterator it = m_dbgVars.frustum->begin(); it != m_dbgVars.frustum->end(); ++it) {
+		const StackWinding &w = *it;
+			
+		m_rb->DebugUploadVerts(
+			&w.Vertices()[0],
+			w.NumVertices()
+		);
+
+		m_dbgVars.debugWireframe_M.mat->shader->BindStates(u);
+		m_rb->CommitStates();
+		m_rb->DebugDrawLineLoop(w.NumVertices());
+	}
+	
+	u.blendColor = Vec4(0,1,0,1);
+
+	for (ClippedAreaVolumeStackVec::const_iterator it = m_dbgVars.frustumAreas->begin(); it != m_dbgVars.frustumAreas->end(); ++it) {
+		const ClippedAreaVolume &v = *it;
+
+		for (StackWindingStackVec::const_iterator it = v.volume->begin(); it != v.volume->end(); ++it) {
+			const StackWinding &w = *it;
+			
+			m_rb->DebugUploadVerts(
+				&w.Vertices()[0],
+				w.NumVertices()
+			);
+
+			m_dbgVars.debugWireframe_M.mat->shader->BindStates(u);
+			m_rb->CommitStates();
+			m_rb->DebugDrawLineLoop(w.NumVertices());
+		}
+	}
+
+	m_dbgVars.debugWireframe_M.mat->shader->End();
 }
 
 } // world

@@ -52,7 +52,10 @@ public:
 
 		struct defaultTag {};
 
-		Uniforms() {}
+		Uniforms() {
+			lights.numLights = 0;
+		}
+
 		Uniforms(const Uniforms &u) : lights(u.lights), blendColor(u.blendColor) {}
 		explicit Uniforms(const defaultTag&) : 
 			blendColor(1.f, 1.f, 1.f, 1.f), eyePos(0.f, 0.f, 0.f) {

@@ -101,6 +101,9 @@ void WorldDraw::Counters::Clear() {
 	drawnEntities = 0;
 	testedEntityModels = 0;
 	drawnEntityModels = 0;
+	drawnActors = 0;
+	testedActorModels = 0;
+	drawnActorModels = 0;
 	testedLights = 0;
 	visLights = 0;
 	drawnLights = 0;
@@ -114,7 +117,8 @@ m_world(w),
 m_frame(-1), 
 m_markFrame(-1),
 m_uiOnly(false),
-m_init(false) {
+m_init(false),
+m_lockVis(false) {
 	m_lights[0] = m_lights[1] = 0;
 	m_rb = RB_WorldDraw::New(w);
 }
@@ -318,7 +322,6 @@ void WorldDraw::Draw(Counters *counters) {
 			m_rb->BindRenderTarget();
 
 		m_rb->ClearBackBuffer();
-		m_rb->SetPerspectiveMatrix();
 		DrawView();
 		m_rb->SetScreenLocalMatrix();
 		DrawOverlays();
@@ -435,6 +438,13 @@ void WorldDraw::VisMarkAreas(ViewDef &view) {
 
 	if (!view.light && view.sky) // add sky surfs
 		VisMarkArea(view, kSkyArea, frustumVolume, frustumBounds);
+
+#if defined(WORLD_DEBUG_DRAW)
+	if (m_world->cvars->r_showfrustum.value) {
+		m_dbgVars.frustum = frustumVolume;
+		m_dbgVars.frustumAreas = frustumAreas;
+	}
+#endif
 }
 
 void WorldDraw::VisMarkArea(
@@ -466,8 +476,7 @@ void WorldDraw::VisMarkArea(
 			
 				BBox bounds(light.m_bounds);
 				bounds.Translate(light.m_pos);
-
-			
+							
 				if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, bounds)) {
 					++m_counters.visLights;
 					light.m_visFrame = m_markFrame;
@@ -475,7 +484,7 @@ void WorldDraw::VisMarkArea(
 #if defined(WORLD_DEBUG_DRAW)
 					if (m_world->cvars->r_showlightscissor.value) {
 						Vec4 scissorRect;
-						if (CalcScissorBounds(bounds, scissorRect)) {
+						if (CalcScissorBounds(view, bounds, scissorRect)) {
 							m_dbgVars.debugLightScissors.push_back(scissorRect);
 						}
 					}
@@ -536,10 +545,10 @@ void WorldDraw::VisMarkArea(
 				if (m->m_visibleFrame != m_markFrame) {
 					BBox bounds(m->bounds);
 					bounds.Translate(e->ps->worldPos);
-	#if defined(WORLD_DEBUG_DRAW)
+#if defined(WORLD_DEBUG_DRAW)
 					if (m_world->cvars->r_showentitybboxes.value)
 						m_dbgVars.debugEntityBBoxes.push_back(bounds);
-	#endif
+#endif
 					if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, bounds)) {
 						m->m_visibleFrame = m_markFrame;
 						++m_counters.drawnEntityModels;
@@ -568,7 +577,11 @@ void WorldDraw::VisMarkArea(
 
 			if (o->m_markFrame != m_markFrame) {
 				o->m_markFrame = m_markFrame;
-				++m_counters.drawnEntities;
+				++m_counters.drawnActors;
+#if defined(WORLD_DEBUG_DRAW)
+				if (m_world->cvars->r_showactorbboxes.value)
+					m_dbgVars.debugActorBBoxes.push_back(o->bounds);
+#endif
 			}
 
 			for (MBatchDraw::RefVec::const_iterator it = o->batches->begin(); it != o->batches->end(); ++it) {
@@ -578,18 +591,14 @@ void WorldDraw::VisMarkArea(
 
 				if (m->m_markFrame != m_markFrame) {
 					m->m_markFrame = m_markFrame;
-					++m_counters.testedEntityModels;
+					++m_counters.testedActorModels;
 				}
 
 				if (m->m_visibleFrame != m_markFrame) {
 					const BBox &bounds = m->bounds;
-	#if defined(WORLD_DEBUG_DRAW)
-					if (m_world->cvars->r_showworldbboxes.value)
-						m_dbgVars.debugWorldBBoxes.push_back(bounds);
-	#endif
 					if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, bounds)) {
 						m->m_visibleFrame = m_markFrame;
-						++m_counters.drawnEntityModels;
+						++m_counters.drawnActorModels;
 						details::MBatchRef batch = AddViewBatch(view, m->m_matId);
 						if (batch)
 							batch->AddDraw(*m);	
@@ -619,23 +628,42 @@ bool WorldDraw::ClipBounds(const StackWindingStackVec &volume, const BBox &volum
 
 void WorldDraw::DrawView() {
 	++m_frame;
-	
+
 	ViewDef view;
-	view.camera = *m_world->camera.get();
 	m_world->game->Viewport(view.viewport[0], view.viewport[1], view.viewport[2], view.viewport[3]);
 
-	m_rb->RotateForCamera(view.camera);
 	m_rb->SetWorldStates();
-
-	view.mvp = m_rb->GetModelViewProjectionMatrix();
-	view.mv = m_rb->GetModelViewMatrix();
+	
+	if (m_world->cvars->r_lockvis.value) {
+		if (!m_lockVis) {
+			m_lockVisCamera = *m_world->camera.get();
+			m_lockVis = true;
+		}
+		m_rb->SetPerspectiveMatrix(*m_world->camera.get(), view.viewport);
+		m_rb->RotateForCamera(*m_world->camera.get());
+		view.mvp = m_rb->GetModelViewProjectionMatrix();
+		view.mv = m_rb->GetModelViewMatrix();
+		view.camera = m_lockVisCamera;
+	} else {
+		m_lockVis = false;
+		view.camera = *m_world->camera.get();
+		m_rb->SetPerspectiveMatrix(view.camera, view.viewport);
+		m_rb->RotateForCamera(view.camera);
+		view.mvp = m_rb->GetModelViewProjectionMatrix();
+		view.mv = m_rb->GetModelViewMatrix();
+	}
 
 	FindViewArea(view);
 	SetupFrustumPlanes(view);
 
 	VisMarkAreas(view);
+	m_counters.area = view.area;
 	UpdateLightInteractions(view);
 	VisMarkShadowCasters(view);
+
+	if (m_lockVis) { // restore world camera after vis has been calculated
+		view.camera = *m_world->camera.get();
+	}
 
 	m_rb->numTris = 0;
 	m_counters.numMaterials += (int)view.batches.size();
@@ -667,6 +695,12 @@ void WorldDraw::DrawView() {
 		m_rb->wireframe = false;
 	}
 
+	if (m_world->cvars->r_showfrustum.value) {
+		DebugDrawFrustumVolumes(view);
+		m_dbgVars.frustum->clear();
+		m_dbgVars.frustumAreas->clear();
+	}
+
 	if (m_world->cvars->r_showentitybboxes.value) {
 		DebugDrawBBoxes(m_dbgVars.debugEntityBBox_M, m_dbgVars.debugEntityBBoxes, true);
 		m_dbgVars.debugEntityBBoxes.clear();
@@ -675,6 +709,11 @@ void WorldDraw::DrawView() {
 	if (m_world->cvars->r_showworldbboxes.value) {
 		DebugDrawBBoxes(m_dbgVars.debugWorldBBox_M, m_dbgVars.debugWorldBBoxes, true);
 		m_dbgVars.debugWorldBBoxes.clear();
+	}
+
+	if (m_world->cvars->r_showactorbboxes.value) {
+		DebugDrawBBoxes(m_dbgVars.debugActorBBox_M, m_dbgVars.debugActorBBoxes, true);
+		m_dbgVars.debugActorBBoxes.clear();
 	}
 
 	if (m_world->cvars->r_showwaypoints.value) {
@@ -707,7 +746,7 @@ void WorldDraw::VisMarkShadowCasters(ViewDef &view) {
 
 		if (light.style.get()&Light::kStyle_CastShadows) {
 			// add all visible objects as casters
-			for (details::MatInteractionChain::const_iterator it = light.m_interactions.begin(); it != light.m_interactions.end(); ++it) {
+			for (details::MatInteractionChain::const_iterator it = light.m_matInteractionChain.begin(); it != light.m_matInteractionChain.end(); ++it) {
 				for (details::LightInteraction *i = it->second; i; i = i->nextOnLight) {
 					if (i->entity) {
 						if (i->entity->m_shadowFrame != m_markFrame) {
@@ -740,7 +779,7 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 	if (wireframe) {
 		
 		for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
-			DrawUnlitBatch(*it->second, wireframe);
+			DrawUnlitBatch(view, *it->second, wireframe);
 		}
 
 		return;
@@ -752,7 +791,7 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 
 		if (batch.matRef->mat->sort == r::Material::kSort_Solid) {
 			if (batch.matRef->mat->maxLights == 0) {
-				DrawUnlitBatch(*it->second, false);
+				DrawUnlitBatch(view, *it->second, false);
 			}
 		}
 	}
@@ -777,7 +816,7 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 
 			if (batch.matRef->mat->sort == (r::Material::Sort)i) {
 				if (batch.matRef->mat->maxLights == 0) {
-					DrawUnlitBatch(*it->second, false);
+					DrawUnlitBatch(view, *it->second, false);
 				}
 			}
 		}
@@ -798,7 +837,11 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 	}
 }
 
-void WorldDraw::DrawUnlitBatch(const details::MBatch &batch, bool wireframe) {
+void WorldDraw::DrawUnlitBatch(
+	ViewDef &view,
+	const details::MBatch &batch, 
+	bool wireframe
+) {
 
 	if (!batch.head)
 		return;
@@ -834,9 +877,9 @@ void WorldDraw::DrawUnlitBatch(const details::MBatch &batch, bool wireframe) {
 		r::Shader::Uniforms u(draw->rgba.get());
 
 		if (tx) {
-			u.eyePos = invTx * m_world->camera->pos.get();
+			u.eyePos = invTx * view.camera.pos.get();
 		} else {
-			u.eyePos = m_world->camera->pos;
+			u.eyePos = view.camera.pos;
 		}
 
 		mat->shader->BindStates(u);

@@ -28,7 +28,10 @@ public:
     virtual void ClearBackBuffer();
 	virtual void ClearDepthBuffer();
 	virtual void SetWorldStates();
-	virtual void SetPerspectiveMatrix();
+	virtual void SetPerspectiveMatrix(
+		const Camera &camera,
+		int viewport[4]
+	);
 	virtual void SetScreenLocalMatrix();
 
 	virtual void SetOrthoMatrix(
@@ -49,18 +52,6 @@ public:
 	virtual void BindLitMaterialStates(
 		r::Material &mat,
 		const Vec4 *scissorBounds
-	);
-
-	virtual void CalcBBoxScreenBounds(
-		const BBox &bounds,
-		Vec4 &rect,
-		int viewport[4]
-	);
-	
-	virtual void CalcModelViewBBoxScreenBounds(
-		const BBox &bounds,
-		Vec4 &rect,
-		int viewport[4]
 	);
 
 	virtual void BindUnifiedShadowRenderTarget();

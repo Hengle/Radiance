@@ -683,7 +683,7 @@ private:
 	bool EmitBSPEntity(const SceneFile::Entity::Ref &entity);
 	bool PutEntityOnFloor(const SceneFile::Entity::Ref &entity);
 	bool EmitBSPAreas();
-	void EmitBSPAreaportals(Node *leaf, int areaNum, world::bsp_file::BSPArea &area);
+	bool EmitBSPAreaportals(Node *leaf, int areaNum, world::bsp_file::BSPArea &area);
 	void EmitBSPModels();
 	void EmitBSPModel(const SceneFile::TriModel::Ref &triModel);
 	void EmitBSPModel(

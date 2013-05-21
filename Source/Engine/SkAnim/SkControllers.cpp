@@ -420,8 +420,8 @@ bool AnimationSource::Tick(
 		
 			m_tm = root;
 
-			SetPos(m_tm.t);
-			SetRot(m_tm.r);
+			SetPos(m_tm.t - m_bipZero.t);
+			SetRot(m_bipZero.r.Inverse() * m_tm.r);
 
 		} else {
 			SetDeltaRot(Quat::Identity);

@@ -336,7 +336,8 @@ bool BSPBuilder::EmitBSPAreas() {
 		bspArea->firstPortal = std::numeric_limits<U32>::max();
 		bspArea->numPortals = 0;
 
-		EmitBSPAreaportals(m_root.get(), area->area, *bspArea);
+		if (!EmitBSPAreaportals(m_root.get(), area->area, *bspArea))
+			return false;
 
 		bspArea->firstModel = m_bspFile->numModelIndices;
 		bspArea->numModels = 0;
@@ -360,7 +361,7 @@ bool BSPBuilder::EmitBSPAreas() {
 
 			for (SceneFile::IntVec::const_iterator id = emitIds.begin(); id != emitIds.end(); ++id) {
 				if (*id > std::numeric_limits<U16>::max()) {
-					Log("ERROR: there are too many models in this map (exceeds 32k)!\n");
+					Log("ERROR: there are too many models in this map (limit is 32k)!\n");
 					SetResult(pkg::SR_CompilerError);
 					return false;
 				}
@@ -384,12 +385,10 @@ bool BSPBuilder::EmitBSPAreas() {
 		if (!(trim->contents & kContentsFlag_Areaportal))
 			continue;
 
-		if (trim->areas.empty())
-			continue;
-
 		if (trim->portalAreas[0] == -1 ||
 			trim->portalAreas[1] == -1) {
-			Log("WARNING: Areaportal '%s' does not seperate areas!\n", trim->name.c_str.get());
+			Log("ERRROR: Areaportal '%s' does not seperate areas.\n", trim->name.c_str.get());
+			return false;
 		}
 	}
 
@@ -402,15 +401,14 @@ Portals
 ==============================================================================
 */
 
-void BSPBuilder::EmitBSPAreaportals(Node *leaf, int areaNum, BSPArea &area) {
+bool BSPBuilder::EmitBSPAreaportals(Node *leaf, int areaNum, BSPArea &area) {
 	if (leaf->planenum != kPlaneNumLeaf) {
-		EmitBSPAreaportals(leaf->children[0].get(), areaNum, area);
-		EmitBSPAreaportals(leaf->children[1].get(), areaNum, area);
-		return;
+		return EmitBSPAreaportals(leaf->children[0].get(), areaNum, area) &&
+			EmitBSPAreaportals(leaf->children[1].get(), areaNum, area);
 	}
 
 	if (!leaf->area || (leaf->area->area != areaNum))
-		return;
+		return true;
 
 	int side;
 	for (PortalRef p = leaf->portals; p; p = p->next[side]) {
@@ -436,8 +434,9 @@ void BSPBuilder::EmitBSPAreaportals(Node *leaf, int areaNum, BSPArea &area) {
 		}
 
 		if (!original) {
-			Log("WARNING: portal fragment bounds area but is not an area portal!\n");
-			continue;
+			Log("ERROR: portal fragment bounds area but is not an area portal.\n");
+			SetResult(pkg::SR_CompilerError);
+			return false;
 		}
 
 		if (original->model->portalAreas[0] == -1) {
@@ -446,8 +445,9 @@ void BSPBuilder::EmitBSPAreaportals(Node *leaf, int areaNum, BSPArea &area) {
 			if (original->model->portalAreas[1] == -1) {
 				original->model->portalAreas[1] = areaNum;
 			} else if (original->model->portalAreas[1] != areaNum) {
-				Log("WARNING: Areaportal '%s' touches more than 2 areas (%d, %d, %d), map will not render correctly.\n", original->model->name.c_str.get(),areaNum, other->area->area, p->areas[side]);
-				continue;
+				Log("ERROR: Areaportal '%s' touches more than 2 areas (%d, %d, %d).\n", original->model->name.c_str.get(),areaNum, other->area->area, p->areas[side]);
+				SetResult(pkg::SR_CompilerError);
+				return false;
 			}
 		}
 
@@ -478,7 +478,9 @@ void BSPBuilder::EmitBSPAreaportals(Node *leaf, int areaNum, BSPArea &area) {
 
 		if (p->areas[side] != -1) {
 			// This should never-ever happen.
-			Log("WARNING: Areaportal fragment touches more than 2 areas (%d, %d, %d), map will not render correctly.\n", areaNum, other->area->area, p->areas[side]);
+			Log("ERROR: Areaportal fragment touches more than 2 areas (%d, %d, %d).\n", areaNum, other->area->area, p->areas[side]);
+			SetResult(pkg::SR_CompilerError);
+			return false;
 		} else {
 			p->areas[side] = areaNum;
 			if (area.firstPortal == std::numeric_limits<U32>::max()) {
@@ -491,6 +493,8 @@ void BSPBuilder::EmitBSPAreaportals(Node *leaf, int areaNum, BSPArea &area) {
 			areaportal->areas[side] = (U32)areaNum;
 		}
 	}
+
+	return true;
 }
 
 /*

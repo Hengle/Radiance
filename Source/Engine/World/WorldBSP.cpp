@@ -724,7 +724,7 @@ bool World::ChopWindingToVolume(const StackWindingStackVec &volume, StackWinding
 		const StackWinding &w = *it;
 
 		f.Clear();
-		out.Chop(w.Plane(), Plane::Front, f, 0.f);
+		out.Chop(w.Plane(), Plane::Front, f, 1.f);
 		out = f;
 
 		if (out.Empty())
@@ -736,7 +736,7 @@ bool World::ChopWindingToVolume(const StackWindingStackVec &volume, StackWinding
 
 bool World::ChopVolume(StackWindingStackVec &volume, BBox &bounds, const Plane &p) {
 
-	Plane::SideType side = p.Side(bounds, 0.f);
+	Plane::SideType side = p.Side(bounds, 1.f);
 	if (side == Plane::Back)
 		return false;
 	if ((side == Plane::Front) || (side == Plane::On))
@@ -751,7 +751,7 @@ bool World::ChopVolume(StackWindingStackVec &volume, BBox &bounds, const Plane &
 		const StackWinding &w = *it;
 
 		f.Clear();
-		w.Chop(p, Plane::Front, f, 0.f);
+		w.Chop(p, Plane::Front, f, 1.f);
 		if (!f.Empty()) {
 			for (int i = 0; i < f.NumVertices(); ++i)
 				bounds.Insert(f.Vertices()[i]);
@@ -765,7 +765,7 @@ bool World::ChopVolume(StackWindingStackVec &volume, BBox &bounds, const Plane &
 		const StackWinding &w = *it;
 
 		f.Clear();
-		pw.Chop(w.Plane(), Plane::Front, f, 0.f);
+		pw.Chop(w.Plane(), Plane::Front, f, 1.f);
 		pw = f;
 		if (pw.Empty())
 			break;
@@ -816,7 +816,7 @@ void World::MakeVolume(const Plane *planes, int num, StackWindingStackVec &volum
 				continue;
 			
 			f.Clear();
-			w.Chop(planes[k], Plane::Front, f, 0.f);
+			w.Chop(planes[k], Plane::Front, f, 1.f);
 			w = f;
 			if (w.Empty())
 				break;

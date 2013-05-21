@@ -203,7 +203,7 @@ void WorldCinematics::Tick(int frame, float dt) {
 				} else {
 
 					if (actor->skm) {
-						const ska::BoneTM *motion = actor->skm->ska->deltaMotion;
+						const ska::BoneTM *motion = actor->skm->ska->absMotion;
 						actor->pos[1] = actor->pos[0] + motion->t;
 						actor->bounds[1] = actor->bounds[0];
 						actor->bounds[1].Translate(actor->pos[1]);
@@ -300,7 +300,7 @@ void WorldCinematics::Tick(int frame, float dt) {
 									Mat4::Identity
 								);
 
-								const ska::BoneTM *motion = actor->skm->ska->deltaMotion;
+								const ska::BoneTM *motion = actor->skm->ska->absMotion;
 								actor->pos[1] = actor->pos[0] + motion->t;
 								actor->bounds[1] = actor->bounds[0];
 								actor->bounds[1].Translate(actor->pos[1]);
@@ -740,7 +740,7 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time) {
 								Mat4::Identity
 							);
 
-							const ska::BoneTM *motion = actor->skm->ska->deltaMotion;
+							const ska::BoneTM *motion = actor->skm->ska->absMotion;
 							actor->pos[1] = actor->pos[0] + motion->t;
 							actor->bounds[1] = actor->bounds[0];
 							actor->bounds[1].Translate(actor->pos[1]);

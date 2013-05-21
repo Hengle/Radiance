@@ -156,17 +156,18 @@ void GLWorldDraw::BindRTTX(int num) {
 	}
 }
 
-void GLWorldDraw::SetPerspectiveMatrix() {
+void GLWorldDraw::SetPerspectiveMatrix(
+	const Camera &camera,
+	int viewport[4]
+) {
 	gl.MatrixMode(GL_PROJECTION);
 	gl.LoadIdentity();
 
-	int vpx, vpy, vpw, vph;
-	world->game->Viewport(vpx, vpy, vpw, vph);
-	float yaspect = ((float)vph/(float)vpw);
+	float yaspect = ((float)viewport[3]/(float)viewport[2]);
 	float xaspect = 1.f / yaspect;
-	float yfov = world->camera->fov.get() * yaspect;
+	float yfov = camera.fov.get() * yaspect;
 
-	gl.Perspective(yfov, xaspect, 4.0, world->camera->farClip.get());
+	gl.Perspective(yfov, xaspect, 4.0, camera.farClip.get());
 
 	if (m_rtFB) { 
 		// render target tc's are flipped about Y, so correct for this in the perspective transform.
@@ -182,6 +183,7 @@ void GLWorldDraw::SetScreenLocalMatrix() {
 	int vpx, vpy, vpw, vph;
 	world->game->Viewport(vpx, vpy, vpw, vph);
 	gl.Ortho((double)vpx, (double)(vpx+vpw), (double)(vpy+vph), (double)vpy, -1.0, 1.0);
+
 	gls.invertCullFace = false;
 
 	gl.MatrixMode(GL_MODELVIEW);
@@ -207,7 +209,12 @@ void GLWorldDraw::SetOrthoMatrix(
 		(double)far
 	);
 
-	gls.invertCullFace = false;
+	if (m_rtFB) { 
+		// render target tc's are flipped about Y, so correct for this in the transform.
+		gl.Scalef(1.f, -1.f, 1.f);
+		gls.invertCullFace = true;
+	}
+
 	gl.MatrixMode(GL_MODELVIEW);
 	gl.LoadIdentity();
 }
@@ -515,7 +522,7 @@ bool GLWorldDraw::Project(const Vec3 &p, Vec3 &out) {
 	bool tempRTFB = m_rtFB;
 	m_rtFB = false;
 	
-	SetPerspectiveMatrix();
+	SetPerspectiveMatrix(*world->camera.get(), viewport);
 	RotateForCamera(*world->camera.get());
 
 	m_rtFB = tempRTFB;
@@ -547,7 +554,7 @@ Vec3 GLWorldDraw::Unproject(const Vec3 &p) {
 	bool tempRTFB = m_rtFB;
 	m_rtFB = false;
 	
-	SetPerspectiveMatrix();
+	SetPerspectiveMatrix(*world->camera.get(), viewport);
 	RotateForCamera(*world->camera.get());
 	
 	m_rtFB = tempRTFB;

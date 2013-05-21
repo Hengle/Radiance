@@ -1177,6 +1177,8 @@ int WorldLua::lua_World_DrawCounters(lua_State *L) {
 	lua_createtable(L, 0, 12);
 	lua_pushnumber(L, counters->fps);
 	lua_setfield(L, -2, "fps");
+	lua_pushinteger(L, counters->area);
+	lua_setfield(L, -2, "area");
 	lua_pushinteger(L, counters->drawnAreas);
 	lua_setfield(L, -2, "drawnAreas");
 	lua_pushinteger(L, counters->testedPortals);
@@ -1193,6 +1195,12 @@ int WorldLua::lua_World_DrawCounters(lua_State *L) {
 	lua_setfield(L, -2, "testedEntityModels");
 	lua_pushinteger(L, counters->drawnEntityModels);
 	lua_setfield(L, -2, "drawnEntityModels");
+	lua_pushinteger(L, counters->drawnActors);
+	lua_setfield(L, -2, "drawnActors");
+	lua_pushinteger(L, counters->testedActorModels);
+	lua_setfield(L, -2, "testedActorModels");
+	lua_pushinteger(L, counters->drawnActorModels);
+	lua_setfield(L, -2, "drawnActorModels");
 	lua_pushinteger(L, counters->testedLights);
 	lua_setfield(L, -2, "testedLights");
 	lua_pushinteger(L, counters->visLights);

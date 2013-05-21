@@ -76,9 +76,9 @@ void WorldDraw::DrawBatch(
 	r::Shader::Uniforms u(draw.rgba.get());
 
 	if (tx) {
-		u.eyePos = invTx * m_world->camera->pos.get();
+		u.eyePos = invTx * view.camera.pos.get();
 	} else {
-		u.eyePos = m_world->camera->pos;
+		u.eyePos = view.camera.pos;
 	}
 
 	mat.shader->BindStates(u);
@@ -118,9 +118,9 @@ void WorldDraw::DrawUnshadowedLitBatchLights(
 	BBox lightBounds;
 
 	if (tx) {
-		u.eyePos = invTx * m_world->camera->pos.get();
+		u.eyePos = invTx * view.camera.pos.get();
 	} else {
-		u.eyePos = m_world->camera->pos;
+		u.eyePos = view.camera.pos;
 	}
 
 	int curPass = -1;
@@ -253,8 +253,6 @@ bool WorldDraw::CalcScissorBounds(
 	if (bounds.Contains(view.camera.pos))
 		return false;
 
-	Vec4 rect;
-	
 	rect[0] = std::numeric_limits<float>::max();
 	rect[1] = std::numeric_limits<float>::max();
 	rect[2] = std::numeric_limits<float>::min();
@@ -839,7 +837,6 @@ details::LightInteraction *WorldDraw::CreateInteraction(
 	i->draw = 0;
 
 	LinkInteraction(*i, light.m_interactionHead, entity.m_lightInteractions);
-
 	return i;
 }
 
@@ -855,6 +852,7 @@ details::LightInteraction *WorldDraw::CreateInteraction(
 	i->draw = 0;
 
 	LinkInteraction(*i, light.m_interactionHead, occupant.m_lightInteractions);
+	return i;
 }
 
 void WorldDraw::LinkInteraction(
@@ -948,6 +946,7 @@ void WorldDraw::UpdateLightInteractions(Light &light) {
 					m_interactionPool.ReturnChunk(i);
 				}
 			}
+		}
 	}
 }
 
