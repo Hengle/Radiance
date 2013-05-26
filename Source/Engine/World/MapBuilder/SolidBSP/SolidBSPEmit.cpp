@@ -1204,7 +1204,7 @@ bool BSPBuilder::EmitBSPFloors() {
 	return true;
 }
 
-void BSPBuilder::EmitBSPWaypoints() {
+bool BSPBuilder::EmitBSPWaypoints() {
 
 	// only emit connected waypoints
 
@@ -1215,8 +1215,9 @@ void BSPBuilder::EmitBSPWaypoints() {
 		RAD_ASSERT(connection->waypoints.head);
 
 		if (!connection->waypoints.tail) {
-			Log("WARNING: waypoint connection is missing tail (head = %d) (connection removed).\n", connection->waypoints.head->uid);
-			continue;
+			Log("ERROR: waypoint connection is missing tail (head = %d) (this indicates a bug, contact a programmer!).\n", connection->waypoints.head->uid);
+			SetResult(pkg::SR_CompilerError);
+			return false;
 		}
 
 		RAD_ASSERT(connection->waypoints.tail);
@@ -1234,13 +1235,14 @@ void BSPBuilder::EmitBSPWaypoints() {
 		}
 
 		if (m_bspFile->numWaypointConnections.get() > std::numeric_limits<U16>::max()) {
-			Log("WARNING: too many waypoint connections (internal error, contact programmer to increase limit)!\n");
-			continue;
+			Log("ERROR: too many waypoint connections (internal error, contact programmer to increase limit)!\n");
+			SetResult(pkg::SR_CompilerError);
+			return false;
 		}
 
 		if (!EmitBSPWaypoint(*connection->waypoints.head) ||
 			!EmitBSPWaypoint(*connection->waypoints.tail)) {
-			continue;
+			return false;
 		}
 
 		connection->emitId = (int)m_bspFile->numWaypointConnections.get();
@@ -1280,8 +1282,16 @@ void BSPBuilder::EmitBSPWaypoints() {
 	for (SceneFile::Waypoint::Map::const_iterator it = m_map->waypoints.begin(); it != m_map->waypoints.end(); ++it) {
 		const SceneFile::Waypoint::Ref &waypoint = it->second;
 
-		if (waypoint->emitId < 0)
-			continue;
+		if (waypoint->emitId < 0) {
+			// this waypoint was overlooked cause it has no connections but may be a teleport, emit it into the BSP
+			if (waypoint->userId.empty && waypoint->targetName.empty) {
+				Log("WARNING: waypoint has no connections and no targetname or userid (waypoint removed).");
+				continue;
+			}
+			if (!EmitBSPWaypoint(*waypoint)) {
+				return false;
+			}
+		}
 
 		BSPWaypoint *w = const_cast<BSPWaypoint*>(m_bspFile->Waypoints() + waypoint->emitId);
 
@@ -1357,6 +1367,8 @@ void BSPBuilder::EmitBSPWaypoints() {
 			}
 		}
 	}
+
+	return true;
 }
 
 bool BSPBuilder::EmitBSPWaypoint(SceneFile::Waypoint &waypoint) {
@@ -1370,7 +1382,7 @@ bool BSPBuilder::EmitBSPWaypoint(SceneFile::Waypoint &waypoint) {
 	if (!waypoint.floorName.empty) {
 		floorNum = FindBSPFloor(waypoint.floorName.c_str);
 		if (floorNum < 0) {
-			Log("WARNING: Floor \"%s\" does not exist (waypoint removed).\n", waypoint.floorName.c_str.get());
+			Log("ERROR: Waypoint references a floor that does not exist: \"%s\".\n", waypoint.floorName.c_str.get());
 			return false;
 		}
 
@@ -1378,7 +1390,8 @@ bool BSPBuilder::EmitBSPWaypoint(SceneFile::Waypoint &waypoint) {
 		floorTriNum = PutPointOnFloor(pos, floorNum);
 
 		if (floorTriNum < 0) {
-			Log("WARNING: Waypoint is not on or above floor \"%s\" (waypoint removed).\n", waypoint.floorName.c_str.get());
+			Log("ERROR: Waypoint is not on or above floor \"%s\".\n", waypoint.floorName.c_str.get());
+			SetResult(pkg::SR_CompilerError);
 			return false;
 		}
 

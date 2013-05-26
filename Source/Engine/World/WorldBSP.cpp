@@ -1040,7 +1040,7 @@ bool World::EntityTouchesBrush(const Entity &entity, int brushNum, const Vec3 &x
 	bbox.Translate(entity.ps->worldPos);
 	bbox.Translate(-xform);
 
-	if (!kBrushBBox.Instersects(bbox))
+	if (!kBrushBBox.Touches(bbox))
 		return false;
 
 	if (brush->numPlanes == 6)

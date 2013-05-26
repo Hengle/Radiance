@@ -703,7 +703,7 @@ private:
 	void EmitBSPClipModel(const TriModelFragRef &model);
 	void EmitBSPPlanes();
 	bool EmitBSPFloors();
-	void EmitBSPWaypoints();
+	bool EmitBSPWaypoints();
 	bool EmitBSPWaypoint(SceneFile::Waypoint &waypoint);
 	U32 FindBSPMaterial(const char *name);
 	int FindBSPFloor(const char *name);
