@@ -9,36 +9,30 @@
 namespace math {
 
 template<typename T>
-inline AABB3<T>::AABB3()
-{
+inline AABB3<T>::AABB3() {
 }
 
 template<typename T>
-inline AABB3<T>::AABB3(const AABB3& aabb) : m_mins(aabb.m_mins), m_maxs(aabb.m_maxs), m_org(aabb.m_org)
-{
+inline AABB3<T>::AABB3(const AABB3& aabb) : m_mins(aabb.m_mins), m_maxs(aabb.m_maxs), m_org(aabb.m_org) {
 }
 
 template<typename T>
-inline AABB3<T>::AABB3(const Vector3<T>& mins, const Vector3<T>& maxs) : m_mins(mins), m_maxs(maxs)
-{
+inline AABB3<T>::AABB3(const Vector3<T>& mins, const Vector3<T>& maxs) : m_mins(mins), m_maxs(maxs) {
 	m_org = (m_maxs + m_mins) / T(2);
 }
 
 template<typename T>
 inline AABB3<T>::AABB3(const T& minX, const T& minY, const T& minZ, const T& maxX, const T& maxY, const T& maxZ) :
-m_mins(minX, minY, minZ), m_maxs(maxX, maxY, maxZ)
-{
+m_mins(minX, minY, minZ), m_maxs(maxX, maxY, maxZ) {
 	m_org = (m_maxs + m_mins) / T(2);
 }
 
 template<typename T>
-inline AABB3<T>::~AABB3()
-{
+inline AABB3<T>::~AABB3() {
 }
 
 template<typename T>
-inline AABB3<T>& AABB3<T>::Initialize()
-{
+inline AABB3<T>& AABB3<T>::Initialize() {
 	m_mins.SetX(std::numeric_limits<T>::max());
 	m_mins.SetY(std::numeric_limits<T>::max());
 	m_mins.SetZ(std::numeric_limits<T>::max());
@@ -51,14 +45,12 @@ inline AABB3<T>& AABB3<T>::Initialize()
 }
 
 template<typename T>
-inline AABB3<T>& AABB3<T>::Initialize(const AABB3& aabb)
-{
+inline AABB3<T>& AABB3<T>::Initialize(const AABB3& aabb) {
 	return Initialize(aabb.m_mins, aabb.m_maxs);
 }
 
 template<typename T>
-inline AABB3<T>& AABB3<T>::Initialize(const Vector3<T>& mins, const Vector3<T>& maxs)
-{
+inline AABB3<T>& AABB3<T>::Initialize(const Vector3<T>& mins, const Vector3<T>& maxs) {
 	m_mins = mins;
 	m_maxs = maxs;
 	m_org = (m_maxs + m_mins) / T(2);
@@ -67,8 +59,7 @@ inline AABB3<T>& AABB3<T>::Initialize(const Vector3<T>& mins, const Vector3<T>& 
 }
 
 template<typename T>
-inline AABB3<T>& AABB3<T>::Initialize(const T& minX, const T& minY, const T& minZ, const T& maxX, const T& maxY, const T& maxZ)
-{
+inline AABB3<T>& AABB3<T>::Initialize(const T& minX, const T& minY, const T& minZ, const T& maxX, const T& maxY, const T& maxZ) {
 	m_mins.SetX(minX);
 	m_mins.SetY(minY);
 	m_mins.SetZ(minZ);
@@ -81,8 +72,7 @@ inline AABB3<T>& AABB3<T>::Initialize(const T& minX, const T& minY, const T& min
 }
 
 template<typename T>
-inline AABB3<T>& AABB3<T>::Expand(const Vector3<T>& ex)
-{
+inline AABB3<T>& AABB3<T>::Expand(const Vector3<T>& ex) {
 	Vector3<T> half = ex / 2.0f;
 	m_mins -= half;
 	m_maxs += half;
@@ -92,42 +82,36 @@ inline AABB3<T>& AABB3<T>::Expand(const Vector3<T>& ex)
 }
 
 template<typename T>
-inline AABB3<T>& AABB3<T>::Expand(const T& expX, const T& expY, const T& expZ)
-{
+inline AABB3<T>& AABB3<T>::Expand(const T& expX, const T& expY, const T& expZ) {
 	return Expand(Vector3<T>(expX, expY, expZ));
 }
 
 template<typename T>
-inline AABB3<T>& AABB3<T>::ExpandMin(const Vector3<T>& ex)
-{
+inline AABB3<T>& AABB3<T>::ExpandMin(const Vector3<T>& ex) {
 	m_mins -= ex;
 	m_org = (m_maxs + m_mins) / T(2);
 	return *this;
 }
 
 template<typename T>
-inline AABB3<T>& AABB3<T>::ExpandMin(const T& expX, const T& expY, const T& expZ)
-{
+inline AABB3<T>& AABB3<T>::ExpandMin(const T& expX, const T& expY, const T& expZ) {
 	return ExpandMin(Vector3<T>(expX, expY, expZ));
 }
 
 template<typename T>
-inline AABB3<T>& AABB3<T>::ExpandMax(const Vector3<T>& ex)
-{
+inline AABB3<T>& AABB3<T>::ExpandMax(const Vector3<T>& ex) {
 	m_maxs += ex;
 	m_org = (m_maxs + m_mins) / T(2);
 	return *this;
 }
 
 template<typename T>
-inline AABB3<T>& AABB3<T>::ExpandMax(const T& expX, const T& expY, const T& expZ)
-{
+inline AABB3<T>& AABB3<T>::ExpandMax(const T& expX, const T& expY, const T& expZ){
 	return ExpandMax(Vector3<T>(expX, expY, expZ));
 }
 
 template<typename T>
-inline AABB3<T>& AABB3<T>::Insert(const AABB3<T>& aabb)
-{
+inline AABB3<T>& AABB3<T>::Insert(const AABB3<T>& aabb) {
 	m_mins.Initialize( (aabb.m_mins.X() < m_mins.X()) ? aabb.m_mins.X() : m_mins.X(),
 		(aabb.m_mins.Y() < m_mins.Y()) ? aabb.m_mins.Y() : m_mins.Y(),
 		(aabb.m_mins.Z() < m_mins.Z()) ? aabb.m_mins.Z() : m_mins.Z() );
@@ -140,8 +124,7 @@ inline AABB3<T>& AABB3<T>::Insert(const AABB3<T>& aabb)
 }
 
 template<typename T>
-inline AABB3<T>& AABB3<T>::Insert(const Vector3<T>& point)
-{
+inline AABB3<T>& AABB3<T>::Insert(const Vector3<T>& point) {
 	m_mins.Initialize( (point.X() < m_mins.X()) ? point.X() : m_mins.X(),
 		(point.Y() < m_mins.Y()) ? point.Y() : m_mins.Y(),
 		(point.Z() < m_mins.Z()) ? point.Z() : m_mins.Z() );
@@ -154,22 +137,20 @@ inline AABB3<T>& AABB3<T>::Insert(const Vector3<T>& point)
 }
 
 template<typename T>
-inline AABB3<T>& AABB3<T>::Insert(const T& x, const T& y, const T& z)
-{
+inline AABB3<T>& AABB3<T>::Insert(const T& x, const T& y, const T& z) {
 	return Insert(Vector3<T>(x, y, z));
 }
 
 template<typename T>
-inline bool AABB3<T>::Contains(const Vector3<T>& point, const T epsilon) const
-{
+inline bool AABB3<T>::Contains(const Vector3<T>& point, const T epsilon) const{
 	return (((m_mins.X()-epsilon) <= point.X()) && ((m_maxs.X()+epsilon) >= point.X()) &&
 		((m_mins.Y()-epsilon) <= point.Y()) && ((m_maxs.Y()+epsilon) >= point.Y()) &&
 		((m_mins.Z()-epsilon) <= point.Z()) && ((m_maxs.Z()+epsilon) >= point.Z()));
 }
 
 template<typename T>
-inline bool AABB3<T>::Touches(const AABB3& other, const T epsilon) const // returns true if they intersect OR the edges touch.
-{
+inline bool AABB3<T>::Touches(const AABB3& other, const T epsilon) const  { 
+	// returns true if they intersect OR the edges touch.
 		// don't touch on X?
 	if ((m_maxs.X() < other.m_mins.X()) || (other.m_maxs.X() < m_mins.X()) ||
 		// don't touch on Y?
@@ -184,8 +165,8 @@ inline bool AABB3<T>::Touches(const AABB3& other, const T epsilon) const // retu
 }
 
 template<typename T>
-inline bool AABB3<T>::Instersects(const AABB3& other, const T epsilon ) const // returns true only if one piece is inside another.
-{
+inline bool AABB3<T>::Instersects(const AABB3& other, const T epsilon ) const {
+	// returns true only if one piece is inside another.
 		// don't touch on X?
 	if ((m_maxs.X() <= other.m_mins.X()) || (other.m_maxs.X() <= m_mins.X()) ||
 		// don't touch on Y?
@@ -200,8 +181,7 @@ inline bool AABB3<T>::Instersects(const AABB3& other, const T epsilon ) const //
 }
 
 template<typename T>
-inline AABB3<T>& AABB3<T>::Translate(const Vector3<T>& t)
-{
+inline AABB3<T>& AABB3<T>::Translate(const Vector3<T>& t) {
 	m_mins += t;
 	m_maxs += t;
 	m_org = (m_maxs + m_mins) / T(2);
@@ -209,78 +189,76 @@ inline AABB3<T>& AABB3<T>::Translate(const Vector3<T>& t)
 }
 
 template<typename T>
-inline AABB3<T>& AABB3<T>::Translate(const T& x, const T& y, const T& z)
-{
+inline AABB3<T>& AABB3<T>::Translate(const T& x, const T& y, const T& z) {
 	return Translate(Vector3<T>(x, y, z));
 }
 
 template<typename T>
-inline AABB3<T>& AABB3<T>::Scale(const Vector3<T>& s)
-{
+inline AABB3<T>& AABB3<T>::Scale(const Vector3<T>& s) {
 	m_mins = ((m_mins - m_org) * s) + m_org;
 	m_maxs = ((m_maxs - m_org) * s) + m_org;
 	return *this;
 }
 
 template<typename T>
-inline AABB3<T>& AABB3<T>::Scale(const T& x, const T& y, const T& z)
-{
+inline AABB3<T>& AABB3<T>::Scale(const T& x, const T& y, const T& z) {
 	return Scale(Vector3<T>(x, y, z));
 }
 
 template<typename T>
-inline bool AABB3<T>::operator == (const AABB3<T>& other) const
-{
+inline AABB3<T> &AABB3<T>::SetPos(const Vector3<T> &p) {
+	return Translate(p - Origin());
+}
+
+template<typename T>
+inline AABB3<T> &AABB3<T>::SetPos(const T &x, const T &y, const T &z) {
+	return SetPos(Vector3<T>(x, y, z));
+}
+
+template<typename T>
+inline bool AABB3<T>::operator == (const AABB3<T>& other) const {
 	return (m_mins == other.m_mins) && (m_maxs == other.m_maxs);
 }
 
 template<typename T>
-inline bool AABB3<T>::operator != (const AABB3<T>& other) const
-{
+inline bool AABB3<T>::operator != (const AABB3<T>& other) const {
 	return !(AABB3<T>::operator == (other));
 }
 
 template<typename T>
-inline AABB3<T>& AABB3<T>::operator = (const AABB3<T>& other)
-{
+inline AABB3<T>& AABB3<T>::operator = (const AABB3<T>& other) {
 	return Initialize(other.m_mins, other.m_maxs);
 }
 
 template<typename T>
-inline void AABB3<T>::SetMins(const Vector3<T>& v)
-{
+inline void AABB3<T>::SetMins(const Vector3<T>& v) {
 	m_mins = v;
 	m_org = (m_maxs + m_mins) / T(2);
 }
 
 template<typename T>
-inline void AABB3<T>::SetMaxs(const Vector3<T>& v)
-{
+inline void AABB3<T>::SetMaxs(const Vector3<T>& v) {
 	m_maxs = v;
 	m_org = (m_maxs + m_mins) / T(2);
 }
 
 template<typename T>
-inline const Vector3<T>& AABB3<T>::Mins() const
-{
+inline const Vector3<T>& AABB3<T>::Mins() const {
 	return m_mins;
 }
 
 template<typename T>
-inline const Vector3<T>& AABB3<T>::Maxs() const
-{
+inline const Vector3<T>& AABB3<T>::Maxs() const{
 	return m_maxs;
 }
 
 template<typename T>
-const Vector3<T>& AABB3<T>::Origin() const
-{
+const Vector3<T>& AABB3<T>::Origin() const{
 	return m_org;
 }
 
 template<typename T>
-Vector3<T> AABB3<T>::Size() const
-{
+Vector3<T> AABB3<T>::Size() const {
 	return m_maxs - m_mins;
 }
 

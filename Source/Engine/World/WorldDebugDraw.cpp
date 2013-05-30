@@ -68,6 +68,12 @@ int WorldDraw::LoadDebugMaterials() {
 	if (r != pkg::SR_Success)
 		return r;
 
+	r = LoadMaterial("Sys/EditorLightSphere_M", m_dbgVars.debugLightSphere_M);
+	if (r != pkg::SR_Success)
+		return r;
+
+	m_dbgVars.debugLightMesh = r::Mesh::MakeSphere(ZWorld, false);
+
 	return m_rb->LoadMaterials();
 }
 
@@ -379,6 +385,8 @@ void WorldDraw::DebugDrawLightPasses(ViewDef &view) {
 			}
 		}
 	}
+
+	m_rb->ReleaseArrayStates(); // important! keeps pipeline changes from being recorded into VAO's
 }
 
 void WorldDraw::DebugDrawLightPass(const details::MBatch &batch) {
@@ -507,6 +515,8 @@ void WorldDraw::DebugDrawLightCounts(ViewDef &view) {
 			}
 		}
 	}
+
+	m_rb->ReleaseArrayStates(); // important! keeps pipeline changes from being recorded into VAO's
 }
 
 void WorldDraw::DebugDrawLightCounts(const details::MBatch &batch) {
@@ -602,6 +612,56 @@ void WorldDraw::DebugDrawFrustumVolumes(ViewDef &view) {
 	}
 
 	m_dbgVars.debugWireframe_M.mat->shader->End();
+}
+
+void WorldDraw::DebugDrawLights() {
+
+	LocalMaterial &material = m_dbgVars.debugLightSphere_M;
+	
+	material.mat->BindStates();
+	material.mat->BindTextures(material.loader);
+	material.mat->shader->Begin(r::Shader::kPass_Default, *material.mat);
+
+	for (Vec3Vec::const_iterator it = m_dbgVars.debugLights.begin(); it != m_dbgVars.debugLights.end(); ++it) {
+		const Vec3 &pos = *it;
+		m_rb->PushMatrix(pos, Vec3(4,4,4), Vec3::Zero);
+		m_dbgVars.debugLightMesh->BindAll(material.mat->shader.get().get());
+		material.mat->shader->BindStates();
+		m_rb->CommitStates();
+		m_dbgVars.debugLightMesh->CompileArrayStates(*material.mat->shader.get());
+		m_dbgVars.debugLightMesh->Draw();
+		m_rb->PopMatrix();
+	}
+		
+	material.mat->shader->End();
+
+	m_rb->ReleaseArrayStates(); // important! keeps pipeline changes from being recorded into VAO's
+}
+
+void WorldDraw::DebugDrawUnifiedLights() {
+	r::Shader::Uniforms u(r::Shader::Uniforms::kDefault);
+	u.blendColor = Vec4(1.f, 0.f, 1.f, 1.f);
+
+	LocalMaterial &material = m_dbgVars.debugLightSphere_M;
+	
+	material.mat->BindStates();
+	material.mat->BindTextures(material.loader);
+	material.mat->shader->Begin(r::Shader::kPass_Default, *material.mat);
+
+	for (Vec3Vec::const_iterator it = m_dbgVars.debugUnifiedLights.begin(); it != m_dbgVars.debugUnifiedLights.end(); ++it) {
+		const Vec3 &pos = *it;
+		m_rb->PushMatrix(pos, Vec3(4,4,4), Vec3::Zero);
+		material.mat->shader->BindStates(u);
+		m_rb->CommitStates();
+		m_dbgVars.debugLightMesh->BindAll(material.mat->shader.get().get());
+		m_dbgVars.debugLightMesh->CompileArrayStates(*material.mat->shader.get());
+		m_dbgVars.debugLightMesh->Draw();
+		m_rb->PopMatrix();
+	}
+		
+	material.mat->shader->End();
+
+	m_rb->ReleaseArrayStates(); // important! keeps pipeline changes from being recorded into VAO's
 }
 
 } // world

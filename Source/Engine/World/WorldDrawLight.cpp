@@ -162,6 +162,11 @@ void WorldDraw::DrawUnshadowedLitBatchLights(
 					if (interaction->light->m_drawFrame != m_markFrame) {
 						interaction->light->m_drawFrame = m_markFrame;
 						++m_counters.drawnLights;
+#if defined(WORLD_DEBUG_DRAW)
+						if (m_world->cvars->r_showlights.value) {
+							m_dbgVars.debugLights.push_back(interaction->light->pos);
+						}
+#endif
 					}
 					r::LightDef &lightDef = u.lights.lights[u.lights.numLights++];
 					GenLightDef(*interaction->light, lightDef, tx ? &invTx : 0);
@@ -371,6 +376,12 @@ void WorldDraw::DrawUnifiedEntityShadow(ViewDef &view, const Entity &e) {
 		unifiedRadius
 	);
 
+#if defined(WORLD_DEBUG_DRAW)
+	if (m_world->cvars->r_showunifiedlights.value) {
+		m_dbgVars.debugUnifiedLights.push_back(unifiedPos);
+	}
+#endif
+
 	DrawUnifiedShadow(
 		view,
 		*e.models,
@@ -389,6 +400,12 @@ void WorldDraw::DrawUnifiedOccupantShadow(ViewDef &view, const MBatchOccupant &o
 		unifiedPos,
 		unifiedRadius
 	);
+
+#if defined(WORLD_DEBUG_DRAW)
+	if (m_world->cvars->r_showunifiedlights.value) {
+		m_dbgVars.debugUnifiedLights.push_back(unifiedPos);
+	}
+#endif
 
 	DrawUnifiedShadow(
 		view,
@@ -454,7 +471,7 @@ void WorldDraw::CalcUnifiedShadowPosAndSize(
 		for (const details::LightInteraction *i = head->nextOnBatch; i; i = i->nextOnBatch) {
 			Vec3 z = i->light->pos.get() - pos;
 			float m = z.Magnitude();
-			radius += i->light->radius + m;
+			radius = math::Max(radius, i->light->radius + m);
 		}
 
 	} else {
@@ -524,6 +541,15 @@ void WorldDraw::LinkEntity(
 		lightBounds.Translate(light.m_pos);
 
 		if (lightBounds.Touches(bounds)) {
+
+			if (entity.lightingFlags.get()&kLightingFlag_CastShadows) {
+				if (light.style.get()&Light::kStyle_CastShadows) {
+					if (!FindInteraction(light, entity)) {
+						CreateInteraction(light, entity);
+					}
+				}
+			}
+
 			for (DrawModel::Map::const_iterator it = entity.models->begin(); it != entity.models->end(); ++it) {
 				const DrawModel::Ref &model = it->second;
 				for (MBatchDraw::RefVec::const_iterator it = model->batches->begin(); it != model->batches->end(); ++it) {

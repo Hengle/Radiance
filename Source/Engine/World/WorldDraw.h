@@ -535,11 +535,14 @@ private:
 
 	typedef zone_vector<BBox, ZWorldT>::type BBoxVec;
 	typedef zone_vector<Vec4, ZWorldT>::type Vec4Vec;
+	typedef zone_vector<Vec3, ZWorldT>::type Vec3Vec;
 
 	struct DebugVars {
 		BBoxVec debugEntityBBoxes;
 		BBoxVec debugWorldBBoxes;
 		BBoxVec debugActorBBoxes;
+		Vec3Vec debugUnifiedLights;
+		Vec3Vec debugLights;
 		Vec4Vec debugLightScissors;
 		StackWindingStackVec frustum;
 		ClippedAreaVolumeStackVec frustumAreas;
@@ -549,7 +552,9 @@ private:
 		LocalMaterial debugEntityBBox_M;
 		LocalMaterial debugActorBBox_M;
 		LocalMaterial debugWaypoint_M;
+		LocalMaterial debugLightSphere_M;
 		boost::array<LocalMaterial, 6> debugLightPasses_M;
+		r::Mesh::Ref debugLightMesh;
 	};
 	
 	int  LoadDebugMaterials();
@@ -570,7 +575,9 @@ private:
 	void DebugDrawLightCounts(ViewDef &view);
 	void DebugDrawLightCounts(const details::MBatch &batch);
 	void DebugDrawFrustumVolumes(ViewDef &view);
-	
+	void DebugDrawLights();
+	void DebugDrawUnifiedLights();
+
 	DebugVars m_dbgVars;
 #endif
 	

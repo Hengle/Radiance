@@ -31,6 +31,8 @@ void GLRenderer::CommitStates() {
 }
 
 void GLRenderer::UnbindStates() {
+	if (gl.vbos&&gl.vaos)
+		gls.BindVertexArray(GLVertexArrayRef());
 	gls.DisableTextures();
 	gls.DisableVertexAttribArrays(true);
 	gls.DisableAllMGSources();
@@ -38,8 +40,6 @@ void GLRenderer::UnbindStates() {
 	gls.UseProgram(0, true);
 	gls.BindBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, GLVertexBufferRef());
 	gls.BindBuffer(GL_ARRAY_BUFFER_ARB, GLVertexBufferRef());
-	if (gl.vbos&&gl.vaos)
-		gls.BindVertexArray(GLVertexArrayRef());
 	gls.BindBuffer(GL_FRAMEBUFFER_EXT, 0);
 	gls.BindBuffer(GL_RENDERBUFFER_EXT, 0);
 }

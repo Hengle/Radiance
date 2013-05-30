@@ -32,6 +32,8 @@ public:
 	CVarBool r_viewunilightmatrix;
 	CVarBool r_showfrustum;
 	CVarInt r_maxLightsPerPass;
+	CVarBool r_showlights;
+	CVarBool r_showunifiedlights;
 
 	void AddLuaVar(const CVar::Ref &cvar) {
 		m_vec.push_back(cvar);

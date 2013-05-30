@@ -682,7 +682,7 @@ void WorldDraw::DrawView() {
 	}
 #endif
 
-	m_rb->ReleaseArrayStates();
+	m_rb->ReleaseArrayStates(); // important! keeps pipeline changes from being recorded into VAO's
 	m_counters.numTris += m_rb->numTris;
 
 #if defined(WORLD_DEBUG_DRAW)
@@ -724,6 +724,16 @@ void WorldDraw::DrawView() {
 		DebugDrawFloorMoves();
 	}
 
+	if (m_world->cvars->r_showlights.value) {
+		DebugDrawLights();
+		m_dbgVars.debugLights.clear();
+	}
+
+	if (m_world->cvars->r_showunifiedlights.value) {
+		DebugDrawUnifiedLights();
+		m_dbgVars.debugUnifiedLights.clear();
+	}
+
 	// NOTE: scissor draw destroys perspective transform
 	if (m_world->cvars->r_showlightscissor.value) {
 		DebugDrawLightScissors();
@@ -748,12 +758,12 @@ void WorldDraw::VisMarkShadowCasters(ViewDef &view) {
 			// add all visible objects as casters
 			for (details::MatInteractionChain::const_iterator it = light.m_matInteractionChain.begin(); it != light.m_matInteractionChain.end(); ++it) {
 				for (details::LightInteraction *i = it->second; i; i = i->nextOnLight) {
-					if (i->entity) {
+					if (i->entity && (i->entity->lightingFlags.get()&kLightingFlag_CastShadows)) {
 						if (i->entity->m_shadowFrame != m_markFrame) {
 							i->entity->m_shadowFrame = m_markFrame;
 							view.shadowEntities.insert(i->entity);
 						}
-					} else if (i->occupant) {
+					} else if (i->occupant  && (i->occupant->lightingFlags.get()&kLightingFlag_CastShadows)) {
 						if (i->occupant->m_shadowFrame != m_markFrame) {
 							i->occupant->m_shadowFrame = m_markFrame;
 							view.shadowOccupants.insert(i->occupant);
@@ -806,6 +816,14 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 				DrawUnshadowedLitBatch(view, *it->second);
 			}
 		}
+	}
+
+	for (EntityPtrSet::const_iterator it = view.shadowEntities.begin(); it != view.shadowEntities.end(); ++it) {
+		DrawUnifiedEntityShadow(view, **it);
+	}
+
+	for (MBatchOccupantPtrSet::const_iterator it = view.shadowOccupants.begin(); it != view.shadowOccupants.end(); ++it) {
+		DrawUnifiedOccupantShadow(view, **it);
 	}
 
 	// draw unlit translucent surfaces
