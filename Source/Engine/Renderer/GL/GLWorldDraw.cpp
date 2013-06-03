@@ -174,6 +174,8 @@ void GLWorldDraw::SetPerspectiveMatrix(
 		gl.Scalef(1.f, -1.f, 1.f);
 		gls.invertCullFace = true;
 	}
+
+	gl.MatrixMode(GL_MODELVIEW);
 }
 
 void GLWorldDraw::SetScreenLocalMatrix() {
@@ -216,7 +218,6 @@ void GLWorldDraw::SetOrthoMatrix(
 	}
 
 	gl.MatrixMode(GL_MODELVIEW);
-	gl.LoadIdentity();
 }
 
 void RotateForDebugCamera() {

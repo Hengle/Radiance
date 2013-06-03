@@ -29,7 +29,7 @@ public:
 	CVarBool r_showlightcounts;
 	CVarBool r_fly;
 	CVarBool r_lockvis;
-	CVarBool r_viewunilightmatrix;
+	CVarBool r_viewunifiedlightmatrix;
 	CVarBool r_showfrustum;
 	CVarInt r_maxLightsPerPass;
 	CVarBool r_showlights;

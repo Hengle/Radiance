@@ -117,8 +117,7 @@ m_world(w),
 m_frame(-1), 
 m_markFrame(-1),
 m_uiOnly(false),
-m_init(false),
-m_lockVis(false) {
+m_init(false) {
 	m_lights[0] = m_lights[1] = 0;
 	m_rb = RB_WorldDraw::New(w);
 }
@@ -346,8 +345,8 @@ void WorldDraw::FindViewArea(ViewDef &view) {
 
 void WorldDraw::SetupFrustumPlanes(ViewDef &view) {
 
-	// Things on front of frustum planes are outside the frustum
-	// Kind of reversed from normal but easier for convex volume clipping.
+	// Things on back of frustum planes are outside the frustum
+	view.frustum.clear();
 
 	float yaspect = ((float)view.viewport[3]/(float)view.viewport[2]);
 	float xfov = math::DegToRad(view.camera.fov.get()) * 0.5f;
@@ -370,13 +369,13 @@ void WorldDraw::SetupFrustumPlanes(ViewDef &view) {
 	
 	math::SinAndCos(&s, &c, xfov);
 
-	normals[idx++] = fwd * s + left * c;
 	normals[idx++] = fwd * s + left * -c;
+	normals[idx++] = fwd * s + left * c;
 
 	math::SinAndCos(&s, &c, yfov);
 	
-	normals[idx++] = fwd * s + up * c;
 	normals[idx++] = fwd * s + up * -c;
+	normals[idx++] = fwd * s + up * c;
 
 	for (int i = 0; i < ViewDef::kNumFrustumPlanes; ++i) {
 		Plane p;
@@ -402,6 +401,167 @@ void WorldDraw::SetupFrustumPlanes(ViewDef &view) {
 
 		view.frustum.push_back(p);
 	}
+}
+
+void WorldDraw::SetupOrthoFrustumPlanes(
+	ViewDef &view,
+	const Vec4 &viewplanes,
+	const Vec2 &zplanes
+) {
+	// Things on back of frustum planes are outside the frustum
+	view.frustum.clear();
+
+	const Vec3 &fwd = view.camera.fwd;
+	const Vec3 &left = view.camera.left;
+	const Vec3 &up = view.camera.up;
+	
+	const float kWidth = (viewplanes[1] - viewplanes[0]) / 2.f;
+	const float kHeight = (viewplanes[2] - viewplanes[3]) / 2.f; // +Y up
+
+	Plane p;
+
+	if (ViewDef::kNumFrustumPlanes > 4) {
+		Vec3 t = fwd * -zplanes[0];
+		p.Initialize(fwd, view.camera.pos.get() + t, Plane::Unit);
+		view.frustum.push_back(p);
+	}
+
+	if (ViewDef::kNumFrustumPlanes > 5) {
+		Vec3 t = fwd * -zplanes[1];
+		p.Initialize(-fwd, view.camera.pos.get() + t, Plane::Unit);
+		view.frustum.push_back(p);
+	}
+
+	Vec3 t = left * kWidth;
+	p.Initialize(-left, view.camera.pos.get() + t, Plane::Unit);
+	view.frustum.push_back(p);
+
+	t = -left * kWidth;
+	p.Initialize(left, view.camera.pos.get() + t, Plane::Unit);
+	view.frustum.push_back(p);
+
+	t = up * kHeight;
+	p.Initialize(-up, view.camera.pos.get() + t, Plane::Unit);
+	view.frustum.push_back(p);
+
+	t = -up * kHeight;
+	p.Initialize(up, view.camera.pos.get() + t, Plane::Unit);
+	view.frustum.push_back(p);
+}
+
+bool WorldDraw::CalcScissorBounds(
+	const ViewDef &view,
+	const BBox &bounds,
+	Vec4 &rect
+) {
+	if (bounds.Contains(view.camera.pos))
+		return false;
+
+	rect[0] = std::numeric_limits<float>::max();
+	rect[1] = std::numeric_limits<float>::max();
+	rect[2] = std::numeric_limits<float>::min();
+	rect[3] = std::numeric_limits<float>::min();
+
+	for (int x = 0; x < 2; ++x) {
+		float fx = x ? bounds.Maxs()[0] : bounds.Mins()[0];
+
+		for (int y = 0; y < 2; ++y) {
+
+			float fy = y ? bounds.Maxs()[1] : bounds.Mins()[1];
+
+			for (int z = 0; z < 2; ++z) {
+
+				float fz = z ? bounds.Maxs()[2] : bounds.Mins()[2];
+
+				Vec3 p;
+				::Project(
+					view.mvp,
+					&view.viewport[0],
+					Vec3(fx, fy, fz),
+					p
+				);
+
+				// bounds
+				rect[0] = math::Min(rect[0], p[0]);
+				rect[1] = math::Min(rect[1], p[1]);
+				rect[2] = math::Max(rect[2], p[0]);
+				rect[3] = math::Max(rect[3], p[1]);
+			}
+		}
+	}
+
+	// clamp
+	rect[0] = math::Clamp(rect[0], (float)view.viewport[0], (float)view.viewport[0]+view.viewport[2]);
+	rect[1] = math::Clamp(rect[1], (float)view.viewport[1], (float)view.viewport[1]+view.viewport[3]);
+	rect[2] = math::Clamp(rect[2], (float)view.viewport[0], (float)view.viewport[0]+view.viewport[2]);
+	rect[3] = math::Clamp(rect[3], (float)view.viewport[1], (float)view.viewport[1]+view.viewport[3]);
+
+	if ((rect[0] == (float)view.viewport[0]) && (rect[1] == (float)view.viewport[1]) &&
+		(rect[2] == ((float)view.viewport[0]+view.viewport[2])) && (rect[3] == ((float)view.viewport[1]+view.viewport[3]))) {
+		return false;
+	}
+
+	return true;
+}
+
+void WorldDraw::CalcViewplaneBounds(
+	const ViewDef &view,
+	const BBox &bounds,
+	Vec4 &viewplanes,
+	Vec2 &zplanes
+) {
+	
+	viewplanes[0] = std::numeric_limits<float>::max();
+	viewplanes[1] = -std::numeric_limits<float>::max();
+	viewplanes[2] = -std::numeric_limits<float>::max();
+	viewplanes[3] = std::numeric_limits<float>::max();
+	zplanes[0] = -std::numeric_limits<float>::max();
+	zplanes[1] = std::numeric_limits<float>::max();
+
+	for (int x = 0; x < 2; ++x) {
+		float fx = x ? bounds.Maxs()[0] : bounds.Mins()[0];
+
+		for (int y = 0; y < 2; ++y) {
+
+			float fy = y ? bounds.Maxs()[1] : bounds.Mins()[1];
+
+			for (int z = 0; z < 2; ++z) {
+
+				float fz = z ? bounds.Maxs()[2] : bounds.Mins()[2];
+
+				Vec3 p = view.mv.Transform(Vec3(fx, fy, fz));
+				
+				// bounds
+				viewplanes[0] = math::Min(viewplanes[0], p[0]);
+				viewplanes[1] = math::Max(viewplanes[1], p[0]);
+				viewplanes[2] = math::Max(viewplanes[2], p[1]); // +Y up
+				viewplanes[3] = math::Min(viewplanes[3], p[1]);
+				zplanes[0] = math::Max(zplanes[0], p[2]);
+				zplanes[1] = math::Min(zplanes[1], p[2]);
+			}
+		}
+	}
+
+	viewplanes[0] -= 8.f;
+	viewplanes[1] += 8.f;
+	viewplanes[2] += 8.f;
+	viewplanes[3] -= 8.f;
+	zplanes[0] += 8.f;
+	zplanes[1] -= 8.f;
+}
+
+void WorldDraw::SetOrthoMatrix(
+	const Vec4 &viewplanes,
+	const Vec2 &zplanes
+) {
+	m_rb->SetOrthoMatrix(
+		viewplanes[0],
+		viewplanes[1],
+		viewplanes[2],
+		viewplanes[3],
+		-zplanes[0],
+		-zplanes[1]
+	);
 }
 
 void WorldDraw::VisMarkAreas(ViewDef &view) {
@@ -634,36 +794,54 @@ void WorldDraw::DrawView() {
 
 	m_rb->SetWorldStates();
 	
+#if defined(WORLD_DEBUG_DRAW)
+	bool debugUniMatrix = true;
 	if (m_world->cvars->r_lockvis.value) {
-		if (!m_lockVis) {
-			m_lockVisCamera = *m_world->camera.get();
-			m_lockVis = true;
+		if (!(m_world->cvars->r_viewunifiedlightmatrix.value && DebugSetupUnifiedLightMatrixView(view))) {
+			if (!m_dbgVars.lockVis) {
+				m_dbgVars.lockVisCamera = *m_world->camera.get();
+				m_dbgVars.lockVis = true;
+			}
+			m_rb->SetPerspectiveMatrix(*m_world->camera.get(), view.viewport);
+			m_rb->RotateForCamera(*m_world->camera.get());
+			view.mvp = m_rb->GetModelViewProjectionMatrix();
+			view.mv = m_rb->GetModelViewMatrix();
+			view.camera = m_dbgVars.lockVisCamera;
+			FindViewArea(view);
+			SetupFrustumPlanes(view);
+			debugUniMatrix = false;
 		}
-		m_rb->SetPerspectiveMatrix(*m_world->camera.get(), view.viewport);
-		m_rb->RotateForCamera(*m_world->camera.get());
-		view.mvp = m_rb->GetModelViewProjectionMatrix();
-		view.mv = m_rb->GetModelViewMatrix();
-		view.camera = m_lockVisCamera;
-	} else {
-		m_lockVis = false;
+	} else if (!(m_world->cvars->r_viewunifiedlightmatrix.value && DebugSetupUnifiedLightMatrixView(view))) {
+		debugUniMatrix = false;
+		m_dbgVars.lockVis = false;
+#endif
 		view.camera = *m_world->camera.get();
 		m_rb->SetPerspectiveMatrix(view.camera, view.viewport);
 		m_rb->RotateForCamera(view.camera);
 		view.mvp = m_rb->GetModelViewProjectionMatrix();
 		view.mv = m_rb->GetModelViewMatrix();
+		FindViewArea(view);
+		SetupFrustumPlanes(view);
+#if defined(WORLD_DEBUG_DRAW)
 	}
-
-	FindViewArea(view);
-	SetupFrustumPlanes(view);
+#endif
 
 	VisMarkAreas(view);
 	m_counters.area = view.area;
 	UpdateLightInteractions(view);
 	VisMarkShadowCasters(view);
 
-	if (m_lockVis) { // restore world camera after vis has been calculated
+#if defined(WORLD_DEBUG_DRAW)
+	if (m_dbgVars.lockVis) { // restore world camera after vis has been calculated
 		view.camera = *m_world->camera.get();
+		if (debugUniMatrix && m_world->cvars->r_fly.value) {
+			m_rb->SetPerspectiveMatrix(view.camera, view.viewport);
+			m_rb->RotateForCamera(view.camera);
+			view.mvp = m_rb->GetModelViewProjectionMatrix();
+			view.mv = m_rb->GetModelViewMatrix();
+		}
 	}
+#endif
 
 	m_rb->numTris = 0;
 	m_counters.numMaterials += (int)view.batches.size();

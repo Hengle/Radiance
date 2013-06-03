@@ -577,35 +577,45 @@ void WorldDraw::DebugDrawFrustumVolumes(ViewDef &view) {
 	m_dbgVars.debugWireframe_M.mat->BindTextures(m_dbgVars.debugWireframe_M.loader);
 	m_dbgVars.debugWireframe_M.mat->shader->Begin(r::Shader::kPass_Default, *m_dbgVars.debugWireframe_M.mat);
 
-	r::Shader::Uniforms u(Vec4(1,1,1,1));
+	const r::Shader::Uniforms white(Vec4(1,1,1,1));
+	const r::Shader::Uniforms green(Vec4(0,1,0,1));
+	const r::Shader::Uniforms blue(Vec4(0,1,0,1));
 
-	for (StackWindingStackVec::const_iterator it = m_dbgVars.frustum->begin(); it != m_dbgVars.frustum->end(); ++it) {
-		const StackWinding &w = *it;
+	for (int x = m_dbgVars.frustum->size(); x > 0; --x) {
+		const StackWinding &w = m_dbgVars.frustum[x-1];
 			
 		m_rb->DebugUploadVerts(
 			&w.Vertices()[0],
 			w.NumVertices()
 		);
 
-		m_dbgVars.debugWireframe_M.mat->shader->BindStates(u);
+		if (x == 1) {
+			m_dbgVars.debugWireframe_M.mat->shader->BindStates(green);
+		} else {
+			m_dbgVars.debugWireframe_M.mat->shader->BindStates(white);
+		}
+
 		m_rb->CommitStates();
 		m_rb->DebugDrawLineLoop(w.NumVertices());
 	}
-	
-	u.blendColor = Vec4(0,1,0,1);
 
 	for (ClippedAreaVolumeStackVec::const_iterator it = m_dbgVars.frustumAreas->begin(); it != m_dbgVars.frustumAreas->end(); ++it) {
 		const ClippedAreaVolume &v = *it;
 
-		for (StackWindingStackVec::const_iterator it = v.volume->begin(); it != v.volume->end(); ++it) {
-			const StackWinding &w = *it;
+		for (int x = v.volume->size(); x > 0; --x) {
+			const StackWinding &w = v.volume[x-1];
 			
 			m_rb->DebugUploadVerts(
 				&w.Vertices()[0],
 				w.NumVertices()
 			);
 
-			m_dbgVars.debugWireframe_M.mat->shader->BindStates(u);
+			if (x == 1) {
+				m_dbgVars.debugWireframe_M.mat->shader->BindStates(green);
+			} else {
+				m_dbgVars.debugWireframe_M.mat->shader->BindStates(blue);
+			}
+
 			m_rb->CommitStates();
 			m_rb->DebugDrawLineLoop(w.NumVertices());
 		}
@@ -651,9 +661,9 @@ void WorldDraw::DebugDrawUnifiedLights() {
 	for (Vec3Vec::const_iterator it = m_dbgVars.debugUnifiedLights.begin(); it != m_dbgVars.debugUnifiedLights.end(); ++it) {
 		const Vec3 &pos = *it;
 		m_rb->PushMatrix(pos, Vec3(4,4,4), Vec3::Zero);
+		m_dbgVars.debugLightMesh->BindAll(material.mat->shader.get().get());
 		material.mat->shader->BindStates(u);
 		m_rb->CommitStates();
-		m_dbgVars.debugLightMesh->BindAll(material.mat->shader.get().get());
 		m_dbgVars.debugLightMesh->CompileArrayStates(*material.mat->shader.get());
 		m_dbgVars.debugLightMesh->Draw();
 		m_rb->PopMatrix();
@@ -662,6 +672,51 @@ void WorldDraw::DebugDrawUnifiedLights() {
 	material.mat->shader->End();
 
 	m_rb->ReleaseArrayStates(); // important! keeps pipeline changes from being recorded into VAO's
+}
+
+bool WorldDraw::DebugSetupUnifiedLightMatrixView(ViewDef &view) {
+
+	const Entity::Ref &player = m_world->playerPawn;
+	if (!(player && player->m_lightInteractions)) {
+		return false; // player has no shadowing lights.
+	}
+
+	float unused;
+	Vec3 lightPos;
+
+	BBox bounds(player->ps->bbox);
+	bounds.Translate(player->ps->worldPos);
+	CalcUnifiedShadowPosAndSize(bounds, player->m_lightInteractions, lightPos, unused);
+
+	Camera lightCam;
+	lightCam.pos = lightPos;
+	lightCam.fov = 45.f;
+	lightCam.farClip = 500;//m_world->camera->farClip;
+	lightCam.LookAt(bounds.Origin());
+
+	if (m_world->cvars->r_lockvis.value) {
+		if (!m_dbgVars.lockVis) {
+			m_dbgVars.lockVisCamera = lightCam;
+			m_dbgVars.lockVis = true;
+		}
+	}
+
+	view.camera = lightCam;
+	m_rb->RotateForCamera(view.camera);
+	view.mv = m_rb->GetModelViewMatrix();
+
+	Vec4 viewplanes;
+	Vec2 zplanes;
+
+	CalcViewplaneBounds(view, bounds, viewplanes, zplanes);
+	
+	SetOrthoMatrix(viewplanes, zplanes);
+	view.mvp = m_rb->GetModelViewProjectionMatrix();
+
+	SetupOrthoFrustumPlanes(view, viewplanes, zplanes);
+	FindViewArea(view);
+
+	return true;
 }
 
 } // world

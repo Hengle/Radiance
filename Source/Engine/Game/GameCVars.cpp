@@ -27,7 +27,7 @@ r_showlightcounts(zone, "r_showlightcounts", false, false),
 r_fly(zone, "r_fly", false, false),
 r_lockvis(zone, "r_lockvis", false, false),
 r_showfrustum(zone, "r_showfrustum", false, false),
-r_viewunilightmatrix(zone, "r_viewunilightmatrix", false, false),
+r_viewunifiedlightmatrix(zone, "r_viewunifiedlightmatrix", false, false),
 r_maxLightsPerPass(zone, "r_maxlightsperpass", r::kMaxLights, false),
 r_showlights(zone, "r_showlights", false, false),
 r_showunifiedlights(zone, "r_showunifiedlights", false, false) {

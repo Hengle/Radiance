@@ -314,7 +314,33 @@ private:
 	details::MBatchRef AddViewBatch(ViewDef &view, int id);
 
 	void FindViewArea(ViewDef &view);
+	
 	void SetupFrustumPlanes(ViewDef &view);
+	
+	void SetupOrthoFrustumPlanes(
+		ViewDef &view,
+		const Vec4 &viewplanes,
+		const Vec2 &zplanes
+	);
+	
+	bool CalcScissorBounds(
+		const ViewDef &view,
+		const BBox &bounds,
+		Vec4 &rect
+	);
+
+	void CalcViewplaneBounds(
+		const ViewDef &view,
+		const BBox &bounds,
+		Vec4 &viewplanes,
+		Vec2 &zplanes
+	);
+
+	void SetOrthoMatrix(
+		const Vec4 &viewplanes,
+		const Vec2 &zplanes
+	);
+
 	void VisMarkAreas(ViewDef &view);
 
 	void VisMarkArea(
@@ -328,7 +354,12 @@ private:
 	void VisMarkShadowCasters(ViewDef &view);
 	bool ClipShadowCasterBounds(ViewDef &view, const BBox &bounds, const Vec3 &lightPos);
 
-	bool ClipBounds(const StackWindingStackVec &volume, const BBox &volumeBounds, const BBox &bounds);
+	bool ClipBounds(
+		const StackWindingStackVec &volume, 
+		const BBox &volumeBounds, 
+		const BBox &bounds
+	);
+
 	void DrawView();
 	void DrawView(ViewDef &view);
 	void DrawUI();
@@ -468,17 +499,6 @@ private:
 		Mat4 *tx
 	);
 
-	bool CalcScissorBounds(
-		const ViewDef &view,
-		const BBox &bounds,
-		Vec4 &rect
-	);
-
-	void SetBoundingOrthoMatrix(
-		const ViewDef &view,
-		const BBox &bounds
-	);
-
 	void DrawViewUnifiedShadows(ViewDef &view);
 	void DrawUnifiedEntityShadow(ViewDef &view, const Entity &e);
 	void DrawUnifiedOccupantShadow(ViewDef &view, const MBatchOccupant &o);
@@ -522,15 +542,13 @@ private:
 	ScreenOverlay::List m_overlays;
 	RB_WorldDraw::Ref m_rb;
 	details::MatRefMap m_refMats;
-	Camera m_lockVisCamera;
 	World *m_world;
 	Light *m_lights[2];
 	int m_frame;
 	int m_markFrame;
 	bool m_uiOnly;
 	bool m_init;
-	bool m_lockVis;
-
+	
 #if defined(WORLD_DEBUG_DRAW)
 
 	typedef zone_vector<BBox, ZWorldT>::type BBoxVec;
@@ -538,6 +556,8 @@ private:
 	typedef zone_vector<Vec3, ZWorldT>::type Vec3Vec;
 
 	struct DebugVars {
+		DebugVars() : lockVis(false) {}
+
 		BBoxVec debugEntityBBoxes;
 		BBoxVec debugWorldBBoxes;
 		BBoxVec debugActorBBoxes;
@@ -555,6 +575,8 @@ private:
 		LocalMaterial debugLightSphere_M;
 		boost::array<LocalMaterial, 6> debugLightPasses_M;
 		r::Mesh::Ref debugLightMesh;
+		Camera lockVisCamera;
+		bool lockVis;
 	};
 	
 	int  LoadDebugMaterials();
@@ -577,6 +599,7 @@ private:
 	void DebugDrawFrustumVolumes(ViewDef &view);
 	void DebugDrawLights();
 	void DebugDrawUnifiedLights();
+	bool DebugSetupUnifiedLightMatrixView(ViewDef &view);
 
 	DebugVars m_dbgVars;
 #endif

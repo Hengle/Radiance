@@ -230,7 +230,9 @@ RADENG_API void RADENG_CALL FrameVecs(const Vec3 &fwd, Vec3 &up, Vec3 &left) {
 		up = Vec3(0.f, 1.f, 0.f);
 	
 	left = up.Cross(fwd);
+	left.Normalize();
 	up = fwd.Cross(left);
+	up.Normalize(); // not really necessary because fwd and left or orthogonal
 }
 
 RADENG_API bool RADENG_CALL RayIntersectsBBox(const Vec3 &_a, const Vec3 &_b, const BBox &bounds) {

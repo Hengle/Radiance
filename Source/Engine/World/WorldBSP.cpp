@@ -816,7 +816,7 @@ void World::MakeVolume(const Plane *planes, int num, StackWindingStackVec &volum
 				continue;
 			
 			f.Clear();
-			w.Chop(planes[k], Plane::Front, f, 1.f);
+			w.Chop(planes[k], Plane::Front, f, 0.1f);
 			w = f;
 			if (w.Empty())
 				break;

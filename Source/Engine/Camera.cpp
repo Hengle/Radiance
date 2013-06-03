@@ -65,10 +65,6 @@ void Camera::SetFacing(const Vec3 &_fwd)
 
 	m_rot = m.Rotation();
 
-	m_fwd  = Vec3(1, 0, 0) * m;
-	m_left = Vec3(0, 1, 0) * m;
-	m_up = Vec3(0, 0, 1) * m;
-
 	m_fwd = fwd;
 	m_left = left;
 	m_up = up;
