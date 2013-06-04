@@ -164,7 +164,7 @@ void WorldDraw::DrawUnshadowedLitBatchLights(
 						++m_counters.drawnLights;
 #if defined(WORLD_DEBUG_DRAW)
 						if (m_world->cvars->r_showlights.value) {
-							m_dbgVars.debugLights.push_back(interaction->light->pos);
+							m_dbgVars.lights.push_back(interaction->light->pos);
 						}
 #endif
 					}
@@ -275,7 +275,7 @@ void WorldDraw::DrawUnifiedEntityShadow(ViewDef &view, const Entity &e) {
 
 #if defined(WORLD_DEBUG_DRAW)
 	if (m_world->cvars->r_showunifiedlights.value) {
-		m_dbgVars.debugUnifiedLights.push_back(unifiedPos);
+		m_dbgVars.unifiedLights.push_back(unifiedPos);
 	}
 #endif
 
@@ -300,7 +300,7 @@ void WorldDraw::DrawUnifiedOccupantShadow(ViewDef &view, const MBatchOccupant &o
 
 #if defined(WORLD_DEBUG_DRAW)
 	if (m_world->cvars->r_showunifiedlights.value) {
-		m_dbgVars.debugUnifiedLights.push_back(unifiedPos);
+		m_dbgVars.unifiedLights.push_back(unifiedPos);
 	}
 #endif
 
@@ -343,8 +343,11 @@ void WorldDraw::CalcUnifiedShadowPosAndSize(
 	const Vec3 &origin = bounds.Origin();
 	
 	for (const details::LightInteraction *i = head; i; i = i->nextOnBatch) {
-		Vec3 z = i->light->pos.get() - origin;
-		totalDist += z.Magnitude();
+		if (i->light->brightness > 0.f) {
+			Vec3 z = i->light->pos.get() - origin;
+			float dist = z.Magnitude() / i->light->brightness;
+			totalDist += dist*dist;
+		}
 	}
 
 	pos = head->light->pos;
@@ -352,12 +355,13 @@ void WorldDraw::CalcUnifiedShadowPosAndSize(
 	if (totalDist > 0.f) {
 		
 		for (const details::LightInteraction *i = head->nextOnBatch; i; i = i->nextOnBatch) {
-			Vec3 z = i->light->pos.get() - origin;
-			float w = z.Magnitude() / totalDist;
-			if (w >= 1.f) {
-				pos = i->light->pos;
-			} else {
-				pos = math::Lerp(i->light->pos.get(), pos, w);
+			if (i->light->brightness > 0.f) {
+				Vec3 z = i->light->pos.get() - origin;
+				float dist = z.Magnitude() / i->light->brightness;
+				float w = (dist*dist) / totalDist;
+				if (w < 1.f) {
+					pos = math::Lerp(i->light->pos.get(), pos, w);
+				}
 			}
 		}
 
@@ -366,9 +370,11 @@ void WorldDraw::CalcUnifiedShadowPosAndSize(
 		// calculate the radius that encloses all the effecting lights
 
 		for (const details::LightInteraction *i = head->nextOnBatch; i; i = i->nextOnBatch) {
-			Vec3 z = i->light->pos.get() - pos;
-			float m = z.Magnitude();
-			radius = math::Max(radius, i->light->radius + m);
+			if (i->light->brightness > 0.f) {
+				Vec3 z = i->light->pos.get() - pos;
+				float m = z.Magnitude();
+				radius = math::Max(radius, i->light->radius + m);
+			}
 		}
 
 	} else {

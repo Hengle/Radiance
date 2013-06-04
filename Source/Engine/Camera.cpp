@@ -54,25 +54,14 @@ void Camera::SetFacing(const Vec3 &_fwd)
 	Vec3 left;
 	Vec3 up;
 
-	FrameVecs(fwd, up, left);
-
-	Mat4 m = Mat4(
-		Vec4(fwd[0], left[0], up[0], 0.f),
-		Vec4(fwd[1], left[1], up[1], 0.f),
-		Vec4(fwd[2], left[2], up[2], 0.f),
-		Vec4(0.f, 0.f, 0.f, 1.f)
-	);
-
-	m_rot = m.Rotation();
+	fwd.FrameVecs(up, left);
 
 	m_fwd = fwd;
 	m_left = left;
 	m_up = up;
 
-	Vec3 angles = m.Angles() * (180.f / math::Constants<float>::PI());
-	m_angles[0] = 0.f;
-	m_angles[1] = -angles[0];
-	m_angles[2] = -angles[1];
+	m_angles = LookAngles(fwd);
+	m_rot = QuatFromAngles(m_angles);
 }
 
 void Camera::RAD_IMPLEMENT_SET(angles)(const Vec3 &angles)

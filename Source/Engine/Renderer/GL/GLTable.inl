@@ -181,14 +181,13 @@ inline void GLTable::Perspective(GLdouble fovy, GLdouble aspect, GLdouble zNear,
 
 inline void GLTable::MultMatrix(const Mat4 &m) {
 	GLMatrixStack *ms = MATRIXP;
-	Mat4 temp = m.Transpose();
-	ms->Top() = temp * ms->Top();
+	ms->Top() = m * ms->Top();
 #if defined(RAD_OPT_OGLES1_AND_2)
 	if (!ogles2)
 #endif
 #if !defined(RAD_OPT_OGLES) || defined(RAD_OPT_OGLES1)
 	{
-		glMultMatrixf((const float*)&temp);
+		glMultMatrixf((const float*)&m);
 		CHECK_GL_ERRORS();
 	}
 #endif

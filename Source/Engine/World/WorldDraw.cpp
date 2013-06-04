@@ -415,8 +415,8 @@ void WorldDraw::SetupOrthoFrustumPlanes(
 	const Vec3 &left = view.camera.left;
 	const Vec3 &up = view.camera.up;
 	
-	const float kWidth = (viewplanes[1] - viewplanes[0]) / 2.f;
-	const float kHeight = (viewplanes[2] - viewplanes[3]) / 2.f; // +Y up
+	//const float kWidth = (viewplanes[1] - viewplanes[0]) / 2.f;
+	//const float kHeight = (viewplanes[2] - viewplanes[3]) / 2.f; // +Y up
 
 	Plane p;
 
@@ -432,19 +432,19 @@ void WorldDraw::SetupOrthoFrustumPlanes(
 		view.frustum.push_back(p);
 	}
 
-	Vec3 t = left * kWidth;
+	Vec3 t = -left * viewplanes[0];
 	p.Initialize(-left, view.camera.pos.get() + t, Plane::Unit);
 	view.frustum.push_back(p);
 
-	t = -left * kWidth;
+	t = -left * viewplanes[1];
 	p.Initialize(left, view.camera.pos.get() + t, Plane::Unit);
 	view.frustum.push_back(p);
 
-	t = up * kHeight;
+	t = up * viewplanes[2];
 	p.Initialize(-up, view.camera.pos.get() + t, Plane::Unit);
 	view.frustum.push_back(p);
 
-	t = -up * kHeight;
+	t = up * viewplanes[3];
 	p.Initialize(up, view.camera.pos.get() + t, Plane::Unit);
 	view.frustum.push_back(p);
 }
@@ -507,6 +507,7 @@ bool WorldDraw::CalcScissorBounds(
 void WorldDraw::CalcViewplaneBounds(
 	const ViewDef &view,
 	const BBox &bounds,
+	const Vec3 *radial,
 	Vec4 &viewplanes,
 	Vec2 &zplanes
 ) {
@@ -518,6 +519,8 @@ void WorldDraw::CalcViewplaneBounds(
 	zplanes[0] = -std::numeric_limits<float>::max();
 	zplanes[1] = std::numeric_limits<float>::max();
 
+	const Mat4 &mv = view.mv;
+	
 	for (int x = 0; x < 2; ++x) {
 		float fx = x ? bounds.Maxs()[0] : bounds.Mins()[0];
 
@@ -529,8 +532,17 @@ void WorldDraw::CalcViewplaneBounds(
 
 				float fz = z ? bounds.Maxs()[2] : bounds.Mins()[2];
 
-				Vec3 p = view.mv.Transform(Vec3(fx, fy, fz));
+				Vec3 p = mv.Transform(Vec3(fx, fy, fz));
 				
+#if defined(WORLD_DEBUG_DRAW)
+				if (m_world->cvars->r_showunifiedlightbboxprojection.value) {
+					Vec3 a = -p[2] * view.camera.fwd.get();
+					Vec3 b = -p[0] * view.camera.left.get();
+					Vec3 c =  p[1] * view.camera.up.get();
+					m_dbgVars.projectedBoxPoints.push_back(view.camera.pos.get() + a+b+c);
+				}
+#endif
+
 				// bounds
 				viewplanes[0] = math::Min(viewplanes[0], p[0]);
 				viewplanes[1] = math::Max(viewplanes[1], p[0]);
@@ -542,12 +554,33 @@ void WorldDraw::CalcViewplaneBounds(
 		}
 	}
 
-	viewplanes[0] -= 8.f;
+	if (radial) {
+		Vec3 p = mv.Transform(*radial);
+				
+#if defined(WORLD_DEBUG_DRAW)
+		if (m_world->cvars->r_showunifiedlightbboxprojection.value) {
+			Vec3 a = -p[2] * view.camera.fwd.get();
+			Vec3 b = -p[0] * view.camera.left.get();
+			Vec3 c =  p[1] * view.camera.up.get();
+			m_dbgVars.projectedBoxPoints.push_back(view.camera.pos.get() + a+b+c);
+		}
+#endif
+
+		// bounds
+		viewplanes[0] = math::Min(viewplanes[0], p[0]);
+		viewplanes[1] = math::Max(viewplanes[1], p[0]);
+		viewplanes[2] = math::Max(viewplanes[2], p[1]); // +Y up
+		viewplanes[3] = math::Min(viewplanes[3], p[1]);
+		zplanes[0] = math::Max(zplanes[0], p[2]);
+		zplanes[1] = math::Min(zplanes[1], p[2]);
+	}
+
+	/*viewplanes[0] -= 8.f;
 	viewplanes[1] += 8.f;
 	viewplanes[2] += 8.f;
 	viewplanes[3] -= 8.f;
 	zplanes[0] += 8.f;
-	zplanes[1] -= 8.f;
+	zplanes[1] -= 8.f;*/
 }
 
 void WorldDraw::SetOrthoMatrix(
@@ -645,7 +678,7 @@ void WorldDraw::VisMarkArea(
 					if (m_world->cvars->r_showlightscissor.value) {
 						Vec4 scissorRect;
 						if (CalcScissorBounds(view, bounds, scissorRect)) {
-							m_dbgVars.debugLightScissors.push_back(scissorRect);
+							m_dbgVars.lightScissors.push_back(scissorRect);
 						}
 					}
 #endif
@@ -671,7 +704,7 @@ void WorldDraw::VisMarkArea(
 		if (m->m_visibleFrame != m_markFrame) {
 #if defined(WORLD_DEBUG_DRAW)
 			if (m_world->cvars->r_showworldbboxes.value)
-				m_dbgVars.debugWorldBBoxes.push_back(m->bounds);
+				m_dbgVars.worldBBoxes.push_back(m->bounds);
 #endif
 			if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, m->bounds)) {
 				m->m_visibleFrame = m_markFrame;
@@ -707,7 +740,7 @@ void WorldDraw::VisMarkArea(
 					bounds.Translate(e->ps->worldPos);
 #if defined(WORLD_DEBUG_DRAW)
 					if (m_world->cvars->r_showentitybboxes.value)
-						m_dbgVars.debugEntityBBoxes.push_back(bounds);
+						m_dbgVars.entityBBoxes.push_back(bounds);
 #endif
 					if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, bounds)) {
 						m->m_visibleFrame = m_markFrame;
@@ -740,7 +773,7 @@ void WorldDraw::VisMarkArea(
 				++m_counters.drawnActors;
 #if defined(WORLD_DEBUG_DRAW)
 				if (m_world->cvars->r_showactorbboxes.value)
-					m_dbgVars.debugActorBBoxes.push_back(o->bounds);
+					m_dbgVars.actorBBoxes.push_back(o->bounds);
 #endif
 			}
 
@@ -832,7 +865,7 @@ void WorldDraw::DrawView() {
 	VisMarkShadowCasters(view);
 
 #if defined(WORLD_DEBUG_DRAW)
-	if (m_dbgVars.lockVis) { // restore world camera after vis has been calculated
+	if (m_dbgVars.lockVis || m_world->cvars->r_fly.value) { // restore world camera after vis has been calculated
 		view.camera = *m_world->camera.get();
 		if (debugUniMatrix && m_world->cvars->r_fly.value) {
 			m_rb->SetPerspectiveMatrix(view.camera, view.viewport);
@@ -865,8 +898,10 @@ void WorldDraw::DrawView() {
 
 #if defined(WORLD_DEBUG_DRAW)
 
-	if (m_world->cvars->r_showportals.value)
+	if (m_world->cvars->r_showportals.value) {
 		DebugDrawPortals(view);
+	}
+
 	if (m_world->cvars->r_showtris.value) {
 		m_rb->wireframe = true;
 		DrawViewBatches(view, true);
@@ -880,18 +915,18 @@ void WorldDraw::DrawView() {
 	}
 
 	if (m_world->cvars->r_showentitybboxes.value) {
-		DebugDrawBBoxes(m_dbgVars.debugEntityBBox_M, m_dbgVars.debugEntityBBoxes, true);
-		m_dbgVars.debugEntityBBoxes.clear();
+		DebugDrawBBoxes(m_dbgVars.entityBBox_M, m_dbgVars.entityBBoxes, true);
+		m_dbgVars.entityBBoxes.clear();
 	}
 	
 	if (m_world->cvars->r_showworldbboxes.value) {
-		DebugDrawBBoxes(m_dbgVars.debugWorldBBox_M, m_dbgVars.debugWorldBBoxes, true);
-		m_dbgVars.debugWorldBBoxes.clear();
+		DebugDrawBBoxes(m_dbgVars.worldBBox_M, m_dbgVars.worldBBoxes, true);
+		m_dbgVars.worldBBoxes.clear();
 	}
 
 	if (m_world->cvars->r_showactorbboxes.value) {
-		DebugDrawBBoxes(m_dbgVars.debugActorBBox_M, m_dbgVars.debugActorBBoxes, true);
-		m_dbgVars.debugActorBBoxes.clear();
+		DebugDrawBBoxes(m_dbgVars.actorBBox_M, m_dbgVars.actorBBoxes, true);
+		m_dbgVars.actorBBoxes.clear();
 	}
 
 	if (m_world->cvars->r_showwaypoints.value) {
@@ -904,18 +939,27 @@ void WorldDraw::DrawView() {
 
 	if (m_world->cvars->r_showlights.value) {
 		DebugDrawLights();
-		m_dbgVars.debugLights.clear();
+		m_dbgVars.lights.clear();
 	}
 
 	if (m_world->cvars->r_showunifiedlights.value) {
 		DebugDrawUnifiedLights();
-		m_dbgVars.debugUnifiedLights.clear();
+		m_dbgVars.unifiedLights.clear();
+	}
+
+	if (m_world->cvars->r_showunifiedlightbboxprojection.value) {
+		DebugDrawProjectedBBoxPoints();
+		m_dbgVars.projectedBoxPoints.clear();
+	}
+
+	if (debugUniMatrix) {
+		DebugDrawUnifiedLightAxis();
 	}
 
 	// NOTE: scissor draw destroys perspective transform
 	if (m_world->cvars->r_showlightscissor.value) {
 		DebugDrawLightScissors();
-		m_dbgVars.debugLightScissors.clear();
+		m_dbgVars.lightScissors.clear();
 	}
 
 #endif
@@ -1047,7 +1091,7 @@ void WorldDraw::DrawUnlitBatch(
 	Mat4 invTx;
 
 #if defined(WORLD_DEBUG_DRAW)
-	r::Material *mat = (wireframe) ? m_dbgVars.debugWireframe_M.mat : batch.matRef->mat;
+	r::Material *mat = (wireframe) ? m_dbgVars.wireframe_M.mat : batch.matRef->mat;
 #else
 	r::Material *mat = batch.matRef->mat;
 #endif

@@ -36,7 +36,6 @@ RADENG_API Vec3 RADENG_CALL DeltaAngles(
 
 RADENG_API Vec3 RADENG_CALL AbsAngles(const Vec3 &angles);
 RADENG_API Vec3 RADENG_CALL WrapAngles(const Vec3 &angles);
-RADENG_API void RADENG_CALL FrameVecs(const Vec3 &fwd, Vec3 &up, Vec3 &left);
 
 // LerpSin will apply a sin over domain of [0, N] output range [0, 1]
 // The function does a complete cycle every 1.0f cycle of t.

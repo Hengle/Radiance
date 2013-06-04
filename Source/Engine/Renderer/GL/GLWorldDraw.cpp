@@ -220,25 +220,12 @@ void GLWorldDraw::SetOrthoMatrix(
 	gl.MatrixMode(GL_MODELVIEW);
 }
 
-void RotateForDebugCamera() {
-	gl.MatrixMode(GL_MODELVIEW);
-	gl.LoadIdentity();
-	gl.Rotatef(-90, 1, 0, 0);	    // put Z going up
-    gl.Rotatef( 90, 0, 0, 1);	    // put Z going up
-
-	gl.Rotatef(0, 1, 0, 0);
-	gl.Rotatef(-90, 0, 1, 0);
-	gl.Rotatef(0, 0, 0, 1);
-	
-	Vec3 pos(0.f, 0.f, 8000.f);
-	gl.Translatef(-pos.X(), -pos.Y(), -pos.Z());
-}
-
 void GLWorldDraw::RotateForCamera(const Camera &camera) {
 	RotateForCameraBasis();
 
 	if (camera.quatMode) {
 		Mat4 rot = Mat4::Rotation(camera.rot.get());
+		rot.Transpose();
 		gl.MultMatrix(rot);
 	} else {
 		const Vec3 &angles = camera.angles;

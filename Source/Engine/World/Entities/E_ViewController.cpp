@@ -310,7 +310,7 @@ Vec3 E_ViewController::Sway::Tick(float dt, const Vec3 &fwd) {
 	Quat q(fwd, angle);
 	Vec3 up, left;
 	
-	FrameVecs(fwd, up, left);
+	fwd.FrameVecs(up, left);
 	Vec3 shift = Mat4::Rotation(q) * left;
 
 	Vec3 x = (left * scale[0]) * left.Dot(shift);

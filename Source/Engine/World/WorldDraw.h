@@ -332,6 +332,7 @@ private:
 	void CalcViewplaneBounds(
 		const ViewDef &view,
 		const BBox &bounds,
+		const Vec3 *radial,
 		Vec4 &viewplanes,
 		Vec2 &zplanes
 	);
@@ -558,23 +559,27 @@ private:
 	struct DebugVars {
 		DebugVars() : lockVis(false) {}
 
-		BBoxVec debugEntityBBoxes;
-		BBoxVec debugWorldBBoxes;
-		BBoxVec debugActorBBoxes;
-		Vec3Vec debugUnifiedLights;
-		Vec3Vec debugLights;
-		Vec4Vec debugLightScissors;
+		BBoxVec entityBBoxes;
+		BBoxVec worldBBoxes;
+		BBoxVec actorBBoxes;
+		Vec3Vec unifiedLights;
+		Vec3Vec projectedBoxPoints;
+		Vec3Vec lights;
+		Vec4Vec lightScissors;
+		boost::array<Vec3, 5> unifiedLightAxis;
+		Mat4 unifiedLightMatrix;
 		StackWindingStackVec frustum;
 		ClippedAreaVolumeStackVec frustumAreas;
-		LocalMaterial debugWireframe_M;
-		boost::array<LocalMaterial, 2> debugPortal_M;
-		LocalMaterial debugWorldBBox_M;
-		LocalMaterial debugEntityBBox_M;
-		LocalMaterial debugActorBBox_M;
-		LocalMaterial debugWaypoint_M;
-		LocalMaterial debugLightSphere_M;
-		boost::array<LocalMaterial, 6> debugLightPasses_M;
-		r::Mesh::Ref debugLightMesh;
+		LocalMaterial wireframe_M;
+		boost::array<LocalMaterial, 2> portal_M;
+		LocalMaterial worldBBox_M;
+		LocalMaterial entityBBox_M;
+		LocalMaterial actorBBox_M;
+		LocalMaterial waypoint_M;
+		LocalMaterial lightSphere_M;
+		LocalMaterial sphere_M;
+		boost::array<LocalMaterial, 6> lightPasses_M;
+		r::Mesh::Ref lightMesh;
 		Camera lockVisCamera;
 		bool lockVis;
 	};
@@ -600,6 +605,8 @@ private:
 	void DebugDrawLights();
 	void DebugDrawUnifiedLights();
 	bool DebugSetupUnifiedLightMatrixView(ViewDef &view);
+	void DebugDrawProjectedBBoxPoints();
+	void DebugDrawUnifiedLightAxis();
 
 	DebugVars m_dbgVars;
 #endif

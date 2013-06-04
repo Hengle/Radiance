@@ -155,7 +155,7 @@ void SoundContext::Tick(float dt, bool positional)
 			fwd = fwd * m;
 
 			Vec3 up, left;
-			FrameVecs(fwd, up, left);
+			fwd.FrameVecs(up, left);
 
 			float f[6] = {
 				fwd[0], fwd[1], fwd[2],
