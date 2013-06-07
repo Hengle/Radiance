@@ -77,8 +77,10 @@ void Entity::Move() {
 void Entity::SkaMove() {
 	if (m_ps.motionSka) {
 		const ska::BoneTM *delta = m_ps.motionSka->ska->deltaMotion;
-		m_ps.origin += delta->t * m_ps.motionScale;
-		m_ps.angles.pos = Vec3::Zero;
+		Vec3 t;
+		Mat4 m = Mat4::Rotation(QuatFromAngles(m_ps.angles.pos));
+		t = m.Transform3X3(delta->t);
+		m_ps.origin += t * m_ps.motionScale;
 		m_ps.velocity = Vec3::Zero;
 		m_ps.distanceMoved = 0.f;
 		Move();

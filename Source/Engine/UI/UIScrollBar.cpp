@@ -74,6 +74,8 @@ void VScrollBar::RecalcBar() {
 	m_thumbSize -= buttonHeight;
 	m_thumbSize = std::max(8.f, m_thumbSize);
 	
+	m_thumbMaxPos = m_rect.h - m_thumbSize;
+//	m_thumbMaxPos = std::max(0.f
 }
 
 } // ui
