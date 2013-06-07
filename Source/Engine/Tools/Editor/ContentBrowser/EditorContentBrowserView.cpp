@@ -16,6 +16,7 @@
 #include "../../../Packages/Packages.h"
 #include "../../../Renderer/GL/GLState.h"
 #include "../../../Renderer/GL/GLTexture.h"
+#include "../../../Game/GameDef.h"
 #include <Runtime/StringBase.h>
 #include <Runtime/ImageCodec/ImageCodec.h>
 #include <Runtime/ImageCodec/Png.h>
@@ -274,6 +275,7 @@ m_inTick(false),
 m_tickRedraw(false)
 {
 	m_resolution = MainWindow::Get()->userPrefs->value("contentBrowser/resolution", 1).toInt();
+	m_uiMode = MainWindow::Get()->userPrefs->value("contentBrowser/uiMode", kGameUIMode_PC).toInt();
 
 	// Qt needs to fix this, it overwrites memory using these calls, but too much time
 	// pressure right now to replace it with our own font rendering...
@@ -302,7 +304,7 @@ m_tickRedraw(false)
 	m_sizes->setCurrentIndex(3);
 	RAD_VERIFY(connect(m_sizes, SIGNAL(currentIndexChanged(int)), SLOT(SizeChanged(int))));
 	s->addWidget(m_sizes, 0, col++);
-	m_sizes->setToolTip("Set Thumnail Size");
+	m_sizes->setToolTip("Thumbnail Size");
 	
 	s->addItem(new (ZEditor) QSpacerItem(32, 0), 0, col++);
 	s->addWidget(new (ZEditor) QLabel(QString("Sort By:")), 0, col++);
@@ -314,9 +316,20 @@ m_tickRedraw(false)
 	m_sort->setCurrentIndex(m_filter.sort);
 	RAD_VERIFY(connect(m_sort, SIGNAL(currentIndexChanged(int)), SLOT(SortChanged(int))));
 	s->addWidget(m_sort, 0, col++);
-	m_sort->setToolTip("Set Sort Mode");
+	m_sort->setToolTip("Sort Mode");
 	
 	s->addItem(new (ZEditor) QSpacerItem(32, 0), 0, col++);
+
+	s->addWidget(new (ZEditor) QLabel(QString("UIMode:")), 0, col++);
+	m_uiModes = new (ZEditor) QComboBox(this);
+	m_uiModes->addItem("PC", kGameUIMode_PC);
+	m_uiModes->addItem("Mobile", kGameUIMode_Mobile);
+	m_uiModes->setCurrentIndex(m_uiMode);
+
+	RAD_VERIFY(connect(m_uiModes, SIGNAL(currentIndexChanged(int)), SLOT(UIModeChanged(int))));
+	s->addWidget(m_uiModes, 0, col++);
+	m_uiModes->setToolTip("Game UI Mode");
+
 	s->addWidget(new (ZEditor) QLabel(QString("Resolution:")), 0, col++);
 	
 	m_resolutions = new (ZEditor) QComboBox(this);
@@ -332,9 +345,9 @@ m_tickRedraw(false)
 	m_resolutions->addItem(QString("1920x1080 (16:9)"), makeRes(1920, 1080));
 	m_resolutions->setCurrentIndex(m_resolution);
 	
-	RAD_VERIFY(connect(m_resolutions, SIGNAL(currentIndexChanged(int)), SLOT(resolutionChanged(int))));
+	RAD_VERIFY(connect(m_resolutions, SIGNAL(currentIndexChanged(int)), SLOT(ResolutionChanged(int))));
 	s->addWidget(m_resolutions, 0, col++);
-	m_sort->setToolTip("Set Game Resolution");
+	m_resolutions->setToolTip("Game Resolution");
 	
 	m_searchLine = new (ZEditor) SearchLineWidget(this);
 	RAD_VERIFY(connect(m_searchLine, SIGNAL(textChanged(const QString&)), SLOT(UpdateFilter())));
@@ -576,9 +589,14 @@ void ContentBrowserView::SizeChanged(int index)
 	}
 }
 
-void ContentBrowserView::resolutionChanged(int index) {
+void ContentBrowserView::ResolutionChanged(int index) {
 	m_resolution = index;
 	MainWindow::Get()->userPrefs->setValue("contentBrowser/resolution", index);
+}
+
+void ContentBrowserView::UIModeChanged(int index) {
+	m_uiMode = index;
+	MainWindow::Get()->userPrefs->setValue("contentBrowser/uiMode", m_uiMode);
 }
 
 void ContentBrowserView::ZoomIn()

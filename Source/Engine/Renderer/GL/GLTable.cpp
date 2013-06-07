@@ -952,7 +952,7 @@ void GLTable::RotateForCamera(const Vec3 &pos, const Mat4 &rot) {
 #endif
 	gl.Rotatef(-90, 1, 0, 0); // put Z going up
     gl.Rotatef( 90, 0, 0, 1); // put Z going up
-	MultMatrix(rot);
+	MultMatrix(rot.Transposed());
 	Translatef(-pos[0], -pos[1], -pos[2]);
 }
 

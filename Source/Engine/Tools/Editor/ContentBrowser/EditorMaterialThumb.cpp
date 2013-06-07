@@ -66,6 +66,7 @@ void MaterialThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, in
 		ContentAssetThumbDimensionCache::Get()->Find(entry->id);
 
 	if (pinfo) {
+		// can we use the cached size to avoid loading texture data?
 		if (modified == pinfo->modified) {
 			w = pinfo->width;
 			h = pinfo->height;
@@ -87,23 +88,9 @@ void MaterialThumb::Dimensions(const pkg::Package::Entry::Ref &entry, int &w, in
 			return;
 	}
 
-	int mx = 0;
-	int my = 0;
-
-	// find the largest texture.
-	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
-		TextureParser *t = TextureParser::Cast(mL->Texture(i));
-		if (!t)
-			break;
-		if (!t->headerValid)
-			break;
-		mx = std::max(mx, t->header->width);
-		my = std::max(my, t->header->height);
-	}
-	
-	if (mx > 0 && my > 0) {
-		w = mx;
-		h = my;
+	if ((mL->width) > 0 && (mL->height > 0)) {
+		w = mL->width;
+		h = mL->height;
 	}
 
 	ContentAssetThumbDimensionCache::Info info;

@@ -450,4 +450,10 @@ int WorldLua::lua_System_NewHTTPGet(lua_State *L) {
 	return 1;
 }
 
+int WorldLua::lua_System_UIMode(lua_State *L) {
+	LOAD_SELF
+	lua_pushinteger(L, (int)self->m_world->game->uiMode.get());
+	return 1;
+}
+
 } // world

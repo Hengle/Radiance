@@ -52,7 +52,7 @@ RADENG_API Vec3 RADENG_CALL Unproject(const Mat4 &mvp, const int viewport[4], co
 		p[2]
 	);
 
-	return mvp.Inverse().Transform(z);
+	return mvp.Inverted().Transform(z);
 }
 
 RADENG_API bool RADENG_CALL Project(const Mat4 &mvp, const int viewport[4], const Vec3 &p, Vec3 &out) {

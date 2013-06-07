@@ -166,7 +166,7 @@ bool SkaBuilder::EmitBones(const char *name, int idx, int parent, BoneMap::Vec &
 	bone.parent = (S16)parent;
 	bone.remap = idx;
 	bone.childDepth = 0;
-	bone.invWorld = mb.world.Inverse();
+	bone.invWorld = mb.world.Inverted();
 	bones.push_back(bone);
 
 	// propogate depth.

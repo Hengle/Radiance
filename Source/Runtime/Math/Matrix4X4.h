@@ -145,8 +145,8 @@ public:
 	Columns4X4<T> Columns() const;
 	Quaternion<T> Rotation() const;
 	Vector3<T> Angles() const;
-	Matrix4X4<T> Transpose() const;
-	Matrix4X4<T> Inverse() const;
+	Matrix4X4<T> Transposed() const;
+	Matrix4X4<T> Inverted() const;
 	T Determinant() const;
 	T Determinant3X3() const;
 
@@ -165,7 +165,7 @@ public:
 		const Vector3<T> &row3
 	);
 	Matrix4X4<T> &MakeIdentity();
-	Matrix4X4<T> &MakeTranspose();
+	Matrix4X4<T> &Transpose();
 	Matrix4X4<T> &Invert();
 
 	// Make projection matrix

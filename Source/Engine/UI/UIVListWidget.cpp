@@ -7,6 +7,7 @@
 
 #include RADPCH
 #include "UIVListWidget.h"
+#include "../World/Lua/D_Material.h"
 
 namespace ui {
 
@@ -46,6 +47,21 @@ void VListWidget::Init() {
 
 	m_scrollTo[0] = m_scrollTo[1] = Vec2::Zero;
 	m_scrollTime[0] = m_scrollTime[1] = 0.f;
+}
+
+void VListWidget::CreateVerticalScrollBar(
+	float width,
+	float arrowHeight,
+	const pkg::Asset::Ref &arrow,
+	const pkg::Asset::Ref &arrowPressed,
+	const pkg::Asset::Ref &track,
+	const pkg::Asset::Ref &thumbTop,
+	const pkg::Asset::Ref &thumbTopPressed,
+	const pkg::Asset::Ref &thumbMiddle,
+	const pkg::Asset::Ref &thumbMiddlePressed,
+	const pkg::Asset::Ref &thumbBottom,
+	const pkg::Asset::Ref &thumbBottomPressed
+) {
 }
 
 void VListWidget::Clear() {
@@ -304,15 +320,6 @@ bool VListWidget::ApplyVelocity(float dt) {
 
 void VListWidget::OnTick(float time, float dt) {
 	
-	/*if (m_dragging) {
-		xtime::TimeVal delta = xtime::ReadMilliseconds() - m_e.time;
-		if (delta > 250) {
-			m_dragMotion[0] = 0.f;
-			m_dragMotion[1] = 0.f;
-			m_velocity[1] = 0.f;
-		}
-	}*/
-
 	if (m_scrollTime[1] > 0.f) {
 		m_scrollTime[0] += dt;
 		if (m_scrollTime[0] >= m_scrollTime[1]) {
@@ -413,6 +420,8 @@ void VListWidget::PushCallTable(lua_State *L) {
 	lua_setfield(L, -2, "DoVerticalLayout");
 	lua_pushcfunction(L, lua_Clear);
 	lua_setfield(L, -2, "Clear");
+	lua_pushcfunction(L, lua_CreateVerticalScrollBar);
+	lua_setfield(L, -2, "CreateVerticalScrollBar");
 }
 
 int VListWidget::lua_RecalcLayout(lua_State *L) {
@@ -468,6 +477,24 @@ int VListWidget::lua_Items(lua_State *L) {
 int VListWidget::lua_Clear(lua_State *L) {
 	Ref self = GetRef<VListWidget>(L, "VListWidget", 1, true);
 	self->Clear();
+	return 0;
+}
+
+int VListWidget::lua_CreateVerticalScrollBar(lua_State *L) {
+	Ref self = GetRef<VListWidget>(L, "VListWidget", 1, true);
+	self->CreateVerticalScrollBar(
+		(float)luaL_checknumber(L, 2),
+		(float)luaL_checknumber(L, 3),
+		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 4, true)->asset,
+		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 5, true)->asset,
+		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 6, true)->asset,
+		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 7, true)->asset,
+		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 8, true)->asset,
+		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 9, true)->asset,
+		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 10, true)->asset,
+		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 11, true)->asset,
+		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 12, true)->asset
+	);
 	return 0;
 }
 

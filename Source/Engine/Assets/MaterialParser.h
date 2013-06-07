@@ -100,6 +100,8 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(MaterialLoader, loaded, bool);
 	RAD_DECLARE_READONLY_PROPERTY(MaterialLoader, parsed, bool);
 	RAD_DECLARE_READONLY_PROPERTY(MaterialLoader, info, bool);
+	RAD_DECLARE_READONLY_PROPERTY(MaterialLoader, width, int);
+	RAD_DECLARE_READONLY_PROPERTY(MaterialLoader, height, int);
 
 #if defined(RAD_OPT_TOOLS)
 	RAD_DECLARE_PROPERTY(MaterialLoader, shaderOnly, bool, bool);
@@ -138,8 +140,18 @@ private:
 		return m_index == Done || m_index == Parsed || m_index == Info; 
 	}
 
+	RAD_DECLARE_GET(width, int) {
+		return m_width;
+	}
+
+	RAD_DECLARE_GET(height, int) {
+		return m_height;
+	}
+
 	
 	int m_index;
+	int m_width;
+	int m_height;
 	boost::array<pkg::Asset::Ref, r::kMaterialTextureSource_MaxIndices> m_textures;
 
 #if defined(RAD_OPT_TOOLS)
@@ -153,6 +165,30 @@ private:
 
 	bool m_shaderOnly;
 #endif
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+class MaterialBundle {
+public:
+	MaterialBundle() : loader(0), material(0) {
+	}
+
+	MaterialBundle(const pkg::Asset::Ref &asset) {
+		Bind(asset);
+	}
+
+	void Bind(const pkg::Asset::Ref &asset);
+
+	void Reset() {
+		asset.reset();
+		loader = 0;
+		material = 0;
+	}
+
+	pkg::Asset::Ref asset;
+	MaterialLoader *loader;
+	r::Material *material;
 };
 
 } // asset

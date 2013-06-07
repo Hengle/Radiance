@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../Types.h"
+#include "GameDef.h"
 #include "../CVars.h"
 #include "../Engine.h"
 #include "../Tickable.h"
@@ -33,17 +33,6 @@ class QWidget;
 
 #include <Runtime/PushPack.h>
 
-class App;
-class GSLoadMap;
-class GameCVars;
-
-#if defined(RAD_OPT_PC_TOOLS)
-class IToolsCallbacks {
-public:
-	virtual void SwapBuffers() = 0;
-};
-#endif
-
 class RADENG_CLASS Game {
 public:
 
@@ -58,9 +47,9 @@ public:
 		int id;
 	};
 
-	static Ref New();
+	static Ref New(GameUIMode uiMode);
 
-	Game();
+	Game(GameUIMode uiMode);
 	virtual ~Game();
 
 	virtual bool LoadEntry();
@@ -109,6 +98,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Game, gameNetwork, gn::GameNetwork *);
 	RAD_DECLARE_READONLY_PROPERTY(Game, cvars, GameCVars*);
 	RAD_DECLARE_READONLY_PROPERTY(Game, cvarZone, CVarZone*);
+	RAD_DECLARE_READONLY_PROPERTY(Game, uiMode, GameUIMode);
 	RAD_DECLARE_PROPERTY(Game, cloudStorage, bool, bool);
 	RAD_DECLARE_PROPERTY(Game, quit, bool, bool);
 
@@ -223,6 +213,10 @@ private:
 		return const_cast<CVarZone*>(&m_cvarZone);
 	}
 
+	RAD_DECLARE_GET(uiMode, GameUIMode) {
+		return m_uiMode;
+	}
+
 #if defined(RAD_OPT_PC_TOOLS)
 	RAD_DECLARE_GET(toolsCallback, IToolsCallbacks*) { 
 		return m_toolsCallback; 
@@ -249,6 +243,7 @@ private:
 	bool m_cloudStorage;
 	bool m_quit;
 	int m_vp[4];
+	GameUIMode m_uiMode;
 
 #if !defined(RAD_OPT_SHIP)
 	tools::DebugConsoleServer::Ref m_dbgServer;

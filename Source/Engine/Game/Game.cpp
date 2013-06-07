@@ -35,12 +35,13 @@ enum {
 };
 
 
-Game::Game() : 
+Game::Game(GameUIMode uiMode) : 
 m_slot(0), 
 m_pinch(0), 
 m_pinchDelay(0), 
 m_cloudStorage(false),
-m_quit(false)
+m_quit(false),
+m_uiMode(uiMode)
 #if defined(RAD_OPT_PC_TOOLS)
 , m_toolsCallback(0), m_progressIndicatorParent(0)
 #endif

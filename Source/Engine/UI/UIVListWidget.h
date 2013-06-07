@@ -15,7 +15,7 @@ namespace ui {
 
 //! A vertically oriented list of widgets.
 /*! Contains and organizes a list of widgets vertically, and allows the user
-    to scroll this list. */
+    to scroll the list. */
 class VListWidget : public Widget {
 public:
 	typedef boost::shared_ptr<VListWidget> Ref;
@@ -32,6 +32,20 @@ public:
 	RAD_DECLARE_PROPERTY(VListWidget, endStops, const Vec2&, const Vec2&);
 	RAD_DECLARE_READONLY_PROPERTY(VListWidget, contentSize, const Vec2&);
 	RAD_DECLARE_READONLY_PROPERTY(VListWidget, items, const Widget::Vec*);
+
+	void CreateVerticalScrollBar(
+		float width,
+		float arrowHeight,
+		const pkg::Asset::Ref &arrow,
+		const pkg::Asset::Ref &arrowPressed,
+		const pkg::Asset::Ref &track,
+		const pkg::Asset::Ref &thumbTop,
+		const pkg::Asset::Ref &thumbTopPressed,
+		const pkg::Asset::Ref &thumbMiddle,
+		const pkg::Asset::Ref &thumbMiddlePressed,
+		const pkg::Asset::Ref &thumbBottom,
+		const pkg::Asset::Ref &thumbBottomPressed
+	);
 
 	void RecalcLayout();
 	void AddItem(const Widget::Ref &widget);
@@ -110,6 +124,7 @@ private:
 	static int lua_Items(lua_State *L);
 	static int lua_DoVerticalLayout(lua_State *L);
 	static int lua_Clear(lua_State *L);
+	static int lua_CreateVerticalScrollBar(lua_State *L);
 
 	UIW_DECL_GETSET(Scroll);
 	UIW_DECL_GETSET(StopSpring);

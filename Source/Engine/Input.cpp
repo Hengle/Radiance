@@ -8,21 +8,19 @@
 
 namespace lua {
 
-void Marshal<InputEvent>::Push(lua_State *L, const InputEvent &e, const TouchState *touch)
-{
+void Marshal<InputEvent>::Push(lua_State *L, const InputEvent &e, const TouchState *touch) {
 	lua_createtable(L, 0, 4);
+	lua_pushstring(L, e.unicode.c_str);
+	lua_setfield(L, -2, "unicode");
 	lua_pushlightuserdata(L, e.touch);
 	lua_setfield(L, -2, "touch");
 	lua_pushinteger(L, e.type);
 	lua_setfield(L, -2, "type");
 	lua_pushinteger(L, e.time);
 	lua_setfield(L, -2, "time");
-	if (touch)
-	{
+	if (touch) {
 		lua_pushinteger(L, touch->Age());
-	}
-	else
-	{
+	} else {
 		lua_pushinteger(L, 0);
 	}
 	lua_setfield(L, -2, "age");
@@ -36,8 +34,7 @@ void Marshal<InputEvent>::Push(lua_State *L, const InputEvent &e, const TouchSta
 	lua_setfield(L, -2, "data");
 }
 
-void Marshal<InputGesture>::Push(lua_State *L, const InputGesture &g, const TouchState &touch)
-{
+void Marshal<InputGesture>::Push(lua_State *L, const InputGesture &g, const TouchState &touch) {
 	lua_createtable(L, 0, 5);
 	lua_pushinteger(L, g.id);
 	lua_setfield(L, -2, "id");
@@ -49,8 +46,7 @@ void Marshal<InputGesture>::Push(lua_State *L, const InputGesture &g, const Touc
 	lua_setfield(L, -2, "age");
 	
 	lua_createtable(L, 2, 0);
-	for (int i = 0; i < 2; ++i)
-	{
+	for (int i = 0; i < 2; ++i) {
 		lua_pushinteger(L, i+1);
 		lua_pushinteger(L, g.mins[i]);
 		lua_settable(L, -3);
@@ -58,8 +54,7 @@ void Marshal<InputGesture>::Push(lua_State *L, const InputGesture &g, const Touc
 	lua_setfield(L, -2, "mins");
 
 	lua_createtable(L, 2, 0);
-	for (int i = 0; i < 2; ++i)
-	{
+	for (int i = 0; i < 2; ++i) {
 		lua_pushinteger(L, i+1);
 		lua_pushinteger(L, g.maxs[i]);
 		lua_settable(L, -3);
@@ -67,8 +62,7 @@ void Marshal<InputGesture>::Push(lua_State *L, const InputGesture &g, const Touc
 	lua_setfield(L, -2, "maxs");
 
 	lua_createtable(L, 2, 0);
-	for (int i = 0; i < 2; ++i)
-	{
+	for (int i = 0; i < 2; ++i) {
 		lua_pushinteger(L, i+1);
 		lua_pushinteger(L, g.origin[i]);
 		lua_settable(L, -3);
@@ -76,8 +70,7 @@ void Marshal<InputGesture>::Push(lua_State *L, const InputGesture &g, const Touc
 	lua_setfield(L, -2, "origin");
 
 	lua_createtable(L, 2, 0);
-	for (int i = 0; i < 2; ++i)
-	{
+	for (int i = 0; i < 2; ++i) {
 		lua_pushinteger(L, i+1);
 		lua_pushinteger(L, g.start[i]);
 		lua_settable(L, -3);
@@ -85,8 +78,7 @@ void Marshal<InputGesture>::Push(lua_State *L, const InputGesture &g, const Touc
 	lua_setfield(L, -2, "start");
 
 	lua_createtable(L, 2, 0);
-	for (int i = 0; i < 2; ++i)
-	{
+	for (int i = 0; i < 2; ++i) {
 		lua_pushinteger(L, i+1);
 		lua_pushinteger(L, g.end[i]);
 		lua_settable(L, -3);

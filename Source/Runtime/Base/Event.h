@@ -70,7 +70,7 @@ Event System (similiar to C#):
 
 	Unbind a manual release event liks so:
 
-	myClassSenderInstance.OnMyEvent.Unbind(myReceiverInstance, &MyClassReceiver::MyEventHandler);
+	myClassSenderInstance.OnMyEvent.Unbind(myReceiverInstance, &MyEventReceiver::MyEventHandler);
 
 	An auto release event is bound like so:
 

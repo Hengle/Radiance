@@ -9,6 +9,7 @@
 #include "EditorContentAssetThumbDimensionCache.h"
 #include "EditorContentBrowserDef.h"
 #include "../../../Assets/AssetTypes.h"
+#include "../../../Game/GameDef.h"
 #include <QtGui/QWidget>
 #include <QtGui/QResizeEvent>
 #include <QtGui/QFont>
@@ -194,6 +195,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(ContentBrowserView, filter, Filter*);
 	RAD_DECLARE_PROPERTY(ContentBrowserView, selMode, SelMode, SelMode);
 	RAD_DECLARE_READONLY_PROPERTY(ContentBrowserView, errorIcon, r::GLTexture::Ref);
+	RAD_DECLARE_READONLY_PROPERTY(ContentBrowserView, uiMode, GameUIMode);
 
 	typedef zone_set<int, ZEditorT>::type SelSet;
 
@@ -223,7 +225,8 @@ private slots:
 	void OnScrollMove(int pos);
 	void SortChanged(int index);
 	void SizeChanged(int index);
-	void resolutionChanged(int index);
+	void ResolutionChanged(int index);
+	void UIModeChanged(int index);
 	void ZoomIn();
 	void ZoomOut();
 	void ZoomFull();
@@ -252,6 +255,7 @@ private:
 	RAD_DECLARE_SET(selMode, SelMode);
 	RAD_DECLARE_GET(selection, const SelSet &) { return m_sel; }
 	RAD_DECLARE_GET(errorIcon, r::GLTexture::Ref) { return GetIcon(I_Error); }
+	RAD_DECLARE_GET(uiMode, GameUIMode) { return (GameUIMode)m_uiMode; }
 
 	void _SortName();
 	void _SortSize(bool sortName);
@@ -307,6 +311,7 @@ private:
 	int m_hoverId;
 	int m_step;
 	int m_resolution;
+	int m_uiMode;
 	bool m_vscroll;
 	bool m_editable;
 	bool m_modal;
@@ -318,6 +323,7 @@ private:
 	QComboBox *m_sort;
 	QComboBox *m_sizes;
 	QComboBox *m_resolutions;
+	QComboBox *m_uiModes;
 	QPushButton *m_delButton;
 	QPushButton *m_cloneButton;
 	QPushButton *m_moveButton;

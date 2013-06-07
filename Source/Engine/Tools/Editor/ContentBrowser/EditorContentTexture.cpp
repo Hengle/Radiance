@@ -362,7 +362,19 @@ RADENG_API pkg::IdVec RADENG_CALL CreateTextures(QWidget *parent, const pkg::Pac
 					bool pvr = compress && pow2 && square;
 					bool dxt = compress && pow2;
 
-					if (!pvr) {
+					if (!pvr && !dxt) {
+						def = texture->FindKeyDef(String(), String("Compression.Enabled"));
+						if (def) {
+							// not a K_Global property
+							for (int t = pkg::P_FirstTarget; t <= pkg::P_LastTarget; t <<= 1) {
+								pkg::KeyVal::Ref key = def->CreateKey(t);
+								texture->AddKey(key, true);
+								bool *b = static_cast<bool*>(key->val);
+								if (b)
+									*b = false;
+							}
+						}
+					} else if (!pvr) {
 						// disable compression defaults (pvr is on in keydefs)
 						def = texture->FindKeyDef(String(), String("Compression.PVR"));
 						if (def) {
@@ -376,9 +388,7 @@ RADENG_API pkg::IdVec RADENG_CALL CreateTextures(QWidget *parent, const pkg::Pac
 									*s = "Disabled";
 							}
 						}
-					}
-
-					if (!dxt) {
+					} else if (!dxt) {
 						// disable compression defaults for DXT, ATITC, and ETC
 						def = texture->FindKeyDef(String(), String("Compression.DXT.Mode"));
 						if (def) {

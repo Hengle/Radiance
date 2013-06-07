@@ -28,8 +28,8 @@ PIEWidget::~PIEWidget() {
 		m_game->NotifySaveState();
 }
 
-void PIEWidget::RunMap(int id) {
-	m_game = Game::New();
+void PIEWidget::RunMap(int id, GameUIMode uiMode) {
+	m_game = Game::New(uiMode);
 	m_game->SetViewport(0, 0, width(), height());
 	m_game->EnableProgressIndicator(this);
 

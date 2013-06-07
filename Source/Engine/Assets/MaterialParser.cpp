@@ -20,14 +20,34 @@ using namespace pkg;
 
 namespace asset {
 
-MaterialParser::MaterialParser() : 
-m_loaded(false),
-m_procedural(false)
-{
+///////////////////////////////////////////////////////////////////////////////
+
+void MaterialBundle::Bind(const pkg::Asset::Ref &_asset) {
+	if (_asset->type != AT_Material) {
+		Reset();
+		return;
+	}
+
+	asset = _asset;
+	loader = MaterialLoader::Cast(asset);
+	
+	MaterialParser *parser = MaterialParser::Cast(asset);
+	if (!parser) {
+		Reset();
+		return;
+	}
+
+	material = parser->material;
 }
 
-MaterialParser::~MaterialParser()
-{
+///////////////////////////////////////////////////////////////////////////////
+
+MaterialParser::MaterialParser() : 
+m_loaded(false),
+m_procedural(false) {
+}
+
+MaterialParser::~MaterialParser() {
 }
 
 int MaterialParser::Process(
@@ -35,8 +55,7 @@ int MaterialParser::Process(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
+) {
 	if (!(flags&(P_Load|P_Unload|P_Parse|P_Info|P_Trim)))
 		return SR_Success;
 
@@ -61,8 +80,7 @@ int MaterialParser::LoadCooked(
 	Engine &engine,
 	const pkg::Asset::Ref &asset,
 	int flags
-)
-{
+) {
 	String path(CStr("Cooked/"));
 	path += CStr(asset->path);
 	path += ".bin";
@@ -750,7 +768,7 @@ void MaterialParser::Register(Engine &engine) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-MaterialLoader::MaterialLoader() : m_index(Unloaded) {
+MaterialLoader::MaterialLoader() : m_index(Unloaded), m_width(0), m_height(0) {
 #if defined(RAD_OPT_TOOLS)
 	m_shaderOnly = false;
 #endif
@@ -906,10 +924,12 @@ int MaterialLoader::Process(
 
 			// flag animated based on texture bundle?
 			TextureParser *texParser = TextureParser::Cast(tex);
-			if (!texParser)
+			if (!texParser || !texParser->headerValid)
 				return SR_MetaError;
 			if (texParser->numImages > 0 && (parser->material->TextureFPS(m_index)>0.f))
 				parser->material->animated = true;
+			m_width = std::max(m_width, texParser->header->width);
+			m_height = std::max(m_height, texParser->header->height);
 		}
 
 #if defined(RAD_OPT_TOOLS)

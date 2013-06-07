@@ -1497,6 +1497,12 @@
     <ClInclude Include="..\..\Engine\World\Lua\D_Light.h">
       <Filter>Source\Engine\World\Lua</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\Game\GameDef.h">
+      <Filter>Source\Engine\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\UI\UIScrollBar.h">
+      <Filter>Source\Engine\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2344,6 +2350,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\World\Lua\D_Light.cpp">
       <Filter>Source\Engine\World\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\UI\UIScrollBar.cpp">
+      <Filter>Source\Engine\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

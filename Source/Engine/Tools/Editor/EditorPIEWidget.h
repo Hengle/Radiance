@@ -23,7 +23,7 @@ public:
 	PIEWidget(QWidget *parent = 0, Qt::WindowFlags f = 0);
 	virtual ~PIEWidget();
 
-	void RunMap(int id);
+	void RunMap(int id, GameUIMode uiMode);
 
 	// IToolsCallback
 	virtual void SwapBuffers() {

@@ -390,6 +390,10 @@ void PostInputEvent(QKeyEvent *event, Game &game, bool press)
 	i.type = press ? InputEvent::T_KeyDown : InputEvent::T_KeyUp;
 	i.time = xtime::ReadMilliseconds();
 	i.data[0] = key;
+
+	QString unicodeString = event->text();
+	i.unicode = unicodeString.toUtf8().data();
+	
 	game.PostInputEvent(i);
 }
 

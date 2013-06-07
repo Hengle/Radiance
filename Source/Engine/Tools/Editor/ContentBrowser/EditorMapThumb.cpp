@@ -68,7 +68,7 @@ void MapThumb::Play(const pkg::Package::Entry::Ref &entry) {
 	w->resize(res.first, res.second);
 	CenterWidget(*w, *MainWindow::Get());
 	w->show();
-	w->RunMap(entry->id);
+	w->RunMap(entry->id, View().uiMode);
 }
 
 void MapThumb::DebugBSP(const pkg::Package::Entry::Ref &entry) {

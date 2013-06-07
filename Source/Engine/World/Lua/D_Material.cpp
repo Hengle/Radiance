@@ -40,27 +40,13 @@ int D_Material::lua_Dimensions(lua_State *L) {
 	if (!loader || !loader->info)
 		return 0;
 
-	int mx = 0;
-	int my = 0;
-
-	// find the largest texture.
-	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
-		asset::TextureParser *t = asset::TextureParser::Cast(loader->Texture(i));
-		if (!t)
-			break;
-		if (!t->headerValid)
-			break;
-		mx = std::max(mx, t->header->width);
-		my = std::max(my, t->header->height);
-	}
-	
-	if (mx > 0 && my > 0) {
+	if (loader->width > 0 && loader->height > 0) {
 		lua_createtable(L, 2, 0);
 		lua_pushinteger(L, 1);
-		lua_pushinteger(L, mx);
+		lua_pushinteger(L, loader->width);
 		lua_settable(L, -3);
 		lua_pushinteger(L, 2); 
-		lua_pushinteger(L, my);
+		lua_pushinteger(L, loader->height);
 		lua_settable(L, -3);
 		return 1;
 	}

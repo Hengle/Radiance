@@ -206,6 +206,7 @@
     <ClInclude Include="..\..\Engine\Engine.h" />
     <ClInclude Include="..\..\Engine\Game\Game.h" />
     <ClInclude Include="..\..\Engine\Game\GameCVars.h" />
+    <ClInclude Include="..\..\Engine\Game\GameDef.h" />
     <ClInclude Include="..\..\Engine\Game\GameNetwork.h" />
     <ClInclude Include="..\..\Engine\Game\GameNetworkDef.h" />
     <ClInclude Include="..\..\Engine\Game\GSLoadMap.h" />
@@ -927,6 +928,7 @@
     </ClInclude>
     <ClInclude Include="..\..\Engine\Types.h" />
     <ClInclude Include="..\..\Engine\UI\UIMatWidget.h" />
+    <ClInclude Include="..\..\Engine\UI\UIScrollBar.h" />
     <ClInclude Include="..\..\Engine\UI\UITextLabel.h" />
     <ClInclude Include="..\..\Engine\UI\UIVListWidget.h" />
     <ClInclude Include="..\..\Engine\UI\UIWidget.h" />
@@ -2117,6 +2119,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\Engine\UI\UIMatWidget.cpp" />
+    <ClCompile Include="..\..\Engine\UI\UIScrollBar.cpp" />
     <ClCompile Include="..\..\Engine\UI\UITextLabel.cpp" />
     <ClCompile Include="..\..\Engine\UI\UIVListWidget.cpp" />
     <ClCompile Include="..\..\Engine\UI\UIWidget.cpp" />

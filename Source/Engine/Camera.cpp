@@ -98,8 +98,5 @@ void Camera::RAD_IMPLEMENT_SET(rot)(const Quat &r)
 	m_fwd  = Vec3(1, 0, 0) * m;
 	m_left = Vec3(0, 1, 0) * m;
 	m_up = Vec3(0, 0, 1) * m;
-	Vec3 angles = m.Angles() * (180.f / math::Constants<float>::PI());
-	m_angles[0] = 0.f;
-	m_angles[1] = -angles[0];
-	m_angles[2] = -angles[1];
+	m_angles = LookAngles(m_fwd);
 }

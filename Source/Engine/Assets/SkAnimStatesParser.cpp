@@ -471,7 +471,7 @@ void SkAnimStatesParser::ParseAnimState(lua_State *L, const pkg::Asset::Ref &ass
 		if (state.loopCount[0] > state.loopCount[1])
 			state.loopCount[1] = state.loopCount[0];
 	} else {
-		state.loopCount[0] = state.loopCount[1] = 1;
+		state.loopCount[0] = state.loopCount[1] = 0; // default to loop forever
 	}
 
 	state.moveType = ska::AnimState::kMoveType_None;
