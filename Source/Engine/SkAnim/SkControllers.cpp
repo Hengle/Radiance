@@ -1001,14 +1001,17 @@ void AnimationVariantsSource::ChooseAnim() {
 	}
 
 	for (;;) {
-		Node::Map::iterator it = m_map.upper_bound(rand());
-		if (it != m_map.begin())
-			--it;
-		Node *node = &it->second;
+		
+		Node *node;
 
 		if (m_blendTarget) {
 			node = m_blendTarget;
 			m_blendTarget = 0;
+		} else {
+			Node::Map::iterator it = m_map.upper_bound(rand());
+			if (it != m_map.begin())
+				--it;
+			node = &it->second;
 		}
 		
 		float timeScale = rand() / ((float)RAND_MAX) * (node->timeScale[1]-node->timeScale[0]);
@@ -1030,6 +1033,7 @@ void AnimationVariantsSource::ChooseAnim() {
 				continue; // pick another animation
 			RAD_ASSERT(m_source);
 			m_source->ResetLoopCount(loopCount);
+			m_source->SetTime(0.f);
 			m_source->timeScale = timeScale;
 		} else {
 			if (ska.get()) {

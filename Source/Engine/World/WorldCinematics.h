@@ -225,6 +225,7 @@ private:
 		int emitFrame;
 		int triggerNum;
 		int updateFrame;
+		int updateCount;
 		int flags;
 		int loopCount;
 		bool done;

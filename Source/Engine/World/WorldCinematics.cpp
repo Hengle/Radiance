@@ -131,6 +131,11 @@ void WorldCinematics::Tick(int frame, float dt) {
 
 	bool active;
 
+	for (Cinematic::List::iterator it = m_cinematics.begin(); it != m_cinematics.end(); ++it) {
+		Cinematic &c = *(*it);
+		c.updateCount = 0;
+	}
+
 	do {
 		// Tick any cinematics that were started by events to make sure we 
 		// get an updated camera position before cuts occur
@@ -148,6 +153,7 @@ void WorldCinematics::Tick(int frame, float dt) {
 			c.camera = false;
 			active = true;
 			c.updateFrame = frame;
+			++c.updateCount;
 
 			// tick actors
 			for (IntSet::iterator it2 = c.actors.begin(); it2 != c.actors.end();) {
@@ -237,7 +243,10 @@ void WorldCinematics::Tick(int frame, float dt) {
 					c.frame[1] = (float)c.trigger->frame;
 					c.emitFrame = 0;
 #if !defined(RAD_TARGET_GOLDEN)
-					COut(C_Debug) << "Cinematics(" << c.name << ") camera(" << c.trigger->camera << ") triggered." << std::endl;
+					// don't be all spammy
+					if (c.cinematic->numTriggers > 1) {
+						COut(C_Debug) << "Cinematics(" << c.name << ") camera(" << c.trigger->camera << ") triggered." << std::endl;
+					}
 #endif
 				}
 
@@ -390,16 +399,21 @@ void WorldCinematics::Tick(int frame, float dt) {
 				// time and start over.
 				if (c.flags&kCinematicFlag_Loop) {
 #if !defined(RAD_TARGET_GOLDEN)
-					COut(C_Debug) << "Cinematic(" << c.name << ") looping." << std::endl;
+					// don't be all spammy
+					if (c.cinematic->numTriggers > 1) {
+						COut(C_Debug) << "Cinematic(" << c.name << ") looping." << std::endl;
+					}
 #endif
 					c.frame[0] = c.frame[1] = 0;
 					c.triggerNum = 0;
 					c.track = 0;
 					c.emitFrame = 0;
-					c.updateFrame = -1; // this will force this cinematic to be ticked again in this loop.
 					c.trigger = m_bspFile->CinematicTriggers()+c.cinematic->firstTrigger;
 					++c.loopCount;
-					continue; // jump to start.
+					if (c.updateCount < 2) { // don't infinite loop on short cinematics
+						c.updateFrame = -1; // this will force this cinematic to be ticked again in this loop.
+						continue; // jump to start.
+					}
 				} else if (!(c.flags&kCinematicFlag_CanPlayForever) && !numActive) {
 #if !defined(RAD_TARGET_GOLDEN)
 					COut(C_Debug) << "Cinematic(" << c.name << ") finished." << std::endl;
@@ -477,6 +491,7 @@ bool WorldCinematics::PlayCinematic(
 	c->emitFrame = 0;
 	c->loopCount = 0;
 	c->updateFrame = -1;
+	c->updateCount = 0;
 	c->done = false;
 	c->camera = false;
 	c->xfade[0] = 0.f;
@@ -687,7 +702,10 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time) {
 				c->camera = true;
 				c->frame[1] = (float)c->trigger->frame;
 #if !defined(RAD_TARGET_GOLDEN)
-				COut(C_Debug) << "Cinematics(" << c->name << ") camera(" << c->trigger->camera << ") triggered." << std::endl;
+				// don't be all spammy
+				if (c->cinematic->numTriggers > 1) {
+					COut(C_Debug) << "Cinematics(" << c->name << ") camera(" << c->trigger->camera << ") triggered." << std::endl;
+				}
 #endif
 			}
 		}
