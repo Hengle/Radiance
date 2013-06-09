@@ -125,9 +125,6 @@ void Entity::CustomMoveComplete() {
 			}
 		}
 
-		m_ps.angles.pos = LookAngles(m_ps.moveState.facing);
-		m_ps.angles.pos[0] = 0.f;
-		m_ps.angles.pos[1] = 0.f;
 		m_ps.origin = m_ps.moveState.pos.pos.get() - Vec3(0, 0, m_ps.bbox.Mins()[2]); // put bbox on floor.
 
 		if (!events.empty()) {
