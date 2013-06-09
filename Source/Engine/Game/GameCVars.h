@@ -35,6 +35,7 @@ public:
 	CVarBool r_showlights;
 	CVarBool r_showunifiedlights;
 	CVarBool r_showunifiedlightbboxprojection;
+	CVarBool r_enablelights;
 
 	void AddLuaVar(const CVar::Ref &cvar) {
 		m_vec.push_back(cvar);

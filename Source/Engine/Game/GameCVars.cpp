@@ -31,6 +31,7 @@ r_viewunifiedlightmatrix(zone, "r_viewunifiedlightmatrix", false, false),
 r_maxLightsPerPass(zone, "r_maxlightsperpass", r::kMaxLights, false),
 r_showlights(zone, "r_showlights", false, false),
 r_showunifiedlights(zone, "r_showunifiedlights", false, false),
-r_showunifiedlightbboxprojection(zone, "r_showunifiedlightbboxprojection", false, false) {
+r_showunifiedlightbboxprojection(zone, "r_showunifiedlightbboxprojection", false, false),
+r_enablelights(zone, "r_enablelights", true, false){
 }
 

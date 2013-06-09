@@ -935,7 +935,6 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 			float floats[16];
 			Mat4 *x = reinterpret_cast<Mat4*>(floats);
 			*x = gl.GetModelViewProjectionMatrix();
-			x->Transpose();
 			if (memcmp(floats, p.u.mvpfloats, 16*sizeof(float))) {
 				memcpy(p.u.mvpfloats, floats, 16*sizeof(float));
 				gl.UniformMatrix4fvARB(p.u.mvp, 1, GL_FALSE, floats);
@@ -947,7 +946,6 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 			float floats[16];
 			Mat4 *x = reinterpret_cast<Mat4*>(floats);
 			*x = gl.GetModelViewMatrix();
-			x->Transpose();
 			if (memcmp(floats, p.u.mvfloats, 16*sizeof(float))) {
 				memcpy(p.u.mvfloats, floats, 16*sizeof(float));
 				gl.UniformMatrix4fvARB(p.u.mv, 1, GL_FALSE, floats);
@@ -962,7 +960,6 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 			float floats[16];
 			Mat4 *x = reinterpret_cast<Mat4*>(floats);
 			*x = gl.GetProjectionMatrix();
-			x->Transpose();
 			if (memcmp(floats, p.u.prfloats, 16*sizeof(float))) {
 				memcpy(p.u.prfloats, floats, 16*sizeof(float));
 				gl.UniformMatrix4fvARB(p.u.pr, 1, GL_FALSE, floats);

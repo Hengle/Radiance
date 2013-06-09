@@ -1030,22 +1030,24 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 
 	// draw lit unshadowed solid surfaces
 	
-	for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
-		const details::MBatch &batch = *it->second;
+	if (m_world->cvars->r_enablelights.value) {
+		for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
+			const details::MBatch &batch = *it->second;
 
-		if (batch.matRef->mat->sort == r::Material::kSort_Solid) {
-			if (batch.matRef->mat->maxLights > 0) {
-				DrawUnshadowedLitBatch(view, *it->second);
+			if (batch.matRef->mat->sort == r::Material::kSort_Solid) {
+				if (batch.matRef->mat->maxLights > 0) {
+					DrawUnshadowedLitBatch(view, *it->second);
+				}
 			}
 		}
-	}
 
-	for (EntityPtrSet::const_iterator it = view.shadowEntities.begin(); it != view.shadowEntities.end(); ++it) {
-		DrawUnifiedEntityShadow(view, **it);
-	}
+		for (EntityPtrSet::const_iterator it = view.shadowEntities.begin(); it != view.shadowEntities.end(); ++it) {
+			DrawUnifiedEntityShadow(view, **it);
+		}
 
-	for (MBatchOccupantPtrSet::const_iterator it = view.shadowOccupants.begin(); it != view.shadowOccupants.end(); ++it) {
-		DrawUnifiedOccupantShadow(view, **it);
+		for (MBatchOccupantPtrSet::const_iterator it = view.shadowOccupants.begin(); it != view.shadowOccupants.end(); ++it) {
+			DrawUnifiedOccupantShadow(view, **it);
+		}
 	}
 
 	// draw unlit translucent surfaces
@@ -1064,13 +1066,15 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 
 	// draw lit unshadowed translucent surfaces
 
-	for (int i = r::Material::kSort_Translucent; i < r::Material::kNumSorts; ++i) {
-		for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
-			const details::MBatch &batch = *it->second;
+	if (m_world->cvars->r_enablelights.value) {
+		for (int i = r::Material::kSort_Translucent; i < r::Material::kNumSorts; ++i) {
+			for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
+				const details::MBatch &batch = *it->second;
 
-			if (batch.matRef->mat->sort == (r::Material::Sort)i) {
-				if (batch.matRef->mat->maxLights > 0) {
-					DrawUnshadowedLitBatch(view, *it->second);
+				if (batch.matRef->mat->sort == (r::Material::Sort)i) {
+					if (batch.matRef->mat->maxLights > 0) {
+						DrawUnshadowedLitBatch(view, *it->second);
+					}
 				}
 			}
 		}
