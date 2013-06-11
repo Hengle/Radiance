@@ -9,18 +9,15 @@
 
 namespace world {
 
-D_Typeface::Ref D_Typeface::New(const pkg::AssetRef &asset)
-{
+D_Typeface::Ref D_Typeface::New(const pkg::AssetRef &asset) {
 	return Ref(new (ZWorld) D_Typeface(asset));
 }
 
-D_Typeface::D_Typeface(const pkg::AssetRef &asset) : D_Asset(asset)
-{
+D_Typeface::D_Typeface(const pkg::AssetRef &asset) : D_Asset(asset) {
 	m_typeface = asset::TypefaceParser::Cast(asset);
 }
 
-void D_Typeface::PushElements(lua_State *L)
-{
+void D_Typeface::PushElements(lua_State *L) {
 	D_Asset::PushElements(L);
 	lua_pushcfunction(L, lua_Size);
 	lua_setfield(L, -2, "Size");
@@ -34,8 +31,7 @@ void D_Typeface::PushElements(lua_State *L)
 	lua_setfield(L, -2, "SplitStringAtSize");
 }
 
-int D_Typeface::lua_Size(lua_State *L)
-{
+int D_Typeface::lua_Size(lua_State *L) {
 	D_Typeface::Ref self = lua::SharedPtr::Get<D_Typeface>(L, "D_Typeface", 1, true);
 	
 	lua_pushinteger(L, self->typeface->width);
@@ -43,8 +39,7 @@ int D_Typeface::lua_Size(lua_State *L)
 	return 2;
 }
 
-int D_Typeface::lua_StringDimensions(lua_State *L)
-{
+int D_Typeface::lua_StringDimensions(lua_State *L) {
 	D_Typeface::Ref self = lua::SharedPtr::Get<D_Typeface>(L, "D_Typeface", 1, true);
 
 	float w, h;
