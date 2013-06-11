@@ -43,6 +43,7 @@ void Entity::Tick_MT_Floor(
 	if (!m_ps.activeMove) {
 		m_ps.velocity = Vec3::Zero;
 		m_ps.distanceMoved = 0.f;
+		SeekAngles(dt);
 		Move();
 		return;
 	}
@@ -59,6 +60,8 @@ void Entity::Tick_MT_Floor(
 
 	if (moveLen < 0.01f) {
 		m_ps.distanceMoved = 0.f;
+		SeekAngles(dt);
+		Move();
 		return;
 	}
 

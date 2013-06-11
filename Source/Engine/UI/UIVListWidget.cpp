@@ -440,6 +440,21 @@ bool VListWidget::InputEventFilter(const InputEvent &e, const TouchState *state,
 		if (m_scrollBar->HandleInputEvent(*this, e, state, is))
 			return true;
 
+		if (e.type == InputEvent::T_MouseWheel) {
+			if (m_scrollBar->thumbMaxPos > 0.f) {
+				Vec2 pos = -m_scroll;
+
+				if (e.data[2] < 0) {
+					pos[1] += m_scrollBar->autoScrollSpeed * 1.5f;
+				} else {
+					pos[1] -= m_scrollBar->autoScrollSpeed * 1.5f;
+				}
+
+				ScrollTo(pos, 0.f);
+			}
+			return true;
+		}
+
 		return false; // not using touch gestures in PC mode.
 	}
 
