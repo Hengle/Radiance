@@ -502,8 +502,7 @@ bool Widget::InBounds(const InputGesture &g) {
 
 bool Widget::InBounds(float x, float y) {
 	Rect r = screenRect;
-	return (x >= r.x && x <= r.x+r.w) &&
-		(y >= r.y && y <= r.y+r.h);
+	return r.InBounds(x,y);
 }
 
 void Widget::AddChild(const Ref &widget) {

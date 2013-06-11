@@ -376,30 +376,13 @@ int Game::OnWorldInit(world::World &world) {
 }
 
 void Game::PostInputEvent(const InputEvent &e) {
-#if defined(RAD_OPT_PC)
+#if defined(RAD_OPT_PC) && !defined(RAD_TARGET_GOLDEN)
 	InputEvent x(e);
 
 	// Only translate LEFT mouse button
 	if ((x.type == InputEvent::T_MouseUp || x.type == InputEvent::T_MouseDown || x.type == InputEvent::T_MouseMove) && (x.data[2]&kMouseButton_Left)) {
-		switch (x.type) {
-		case InputEvent::T_MouseDown:
-			x.type = InputEvent::T_TouchBegin;
-			x.touch = (void*)1;
-			m_inputEvents.push_back(x);
-			break;
-		case InputEvent::T_MouseUp:
-			x.type = InputEvent::T_TouchEnd;
-			x.touch = (void*)1;
-			m_inputEvents.push_back(x);
-			break;
-		case InputEvent::T_MouseMove:
-			x.type = InputEvent::T_TouchMoved;
-			x.touch = (void*)1;
-			m_inputEvents.push_back(x);
-			break;
-		default:
-			break;
-		}
+		x.touch = (void*)1; // set touch
+		m_inputEvents.push_back(x);
 	}	
 	else
 	{

@@ -8,6 +8,7 @@
 #pragma once
 
 #include "UIWidget.h"
+#include "UIScrollBar.h"
 #include "../Physics/Spring.h"
 #include <Runtime/PushPack.h>
 
@@ -17,6 +18,7 @@ namespace ui {
 /*! Contains and organizes a list of widgets vertically, and allows the user
     to scroll the list. */
 class VListWidget : public Widget {
+	RAD_EVENT_CLASS(EventNoAccess)
 public:
 	typedef boost::shared_ptr<VListWidget> Ref;
 	typedef boost::weak_ptr<VListWidget> WRef;
@@ -30,12 +32,16 @@ public:
 	RAD_DECLARE_PROPERTY(VListWidget, stopSpring, const physics::Spring&, const physics::Spring&);
 	RAD_DECLARE_PROPERTY(VListWidget, stopSpringVertex, const physics::SpringVertex&, const physics::SpringVertex&);
 	RAD_DECLARE_PROPERTY(VListWidget, endStops, const Vec2&, const Vec2&);
+	RAD_DECLARE_PROPERTY(VListWidget, wheelDelta, float, float);
+	RAD_DECLARE_PROPERTY(VListWidget, autoScrollSpeed, float, float);
+	RAD_DECLARE_PROPERTY(VListWidget, autoFadeScrollBar, bool, bool);
 	RAD_DECLARE_READONLY_PROPERTY(VListWidget, contentSize, const Vec2&);
 	RAD_DECLARE_READONLY_PROPERTY(VListWidget, items, const Widget::Vec*);
 
 	void CreateVerticalScrollBar(
 		float width,
 		float arrowHeight,
+		float minThumbSize,
 		const pkg::Asset::Ref &arrow,
 		const pkg::Asset::Ref &arrowPressed,
 		const pkg::Asset::Ref &track,
@@ -57,6 +63,7 @@ public:
 protected:
 
 	virtual void OnTick(float time, float dt);
+	virtual void OnDraw(const Rect *clip);
 	virtual void PushCallTable(lua_State *L);
 	virtual bool InputEventFilter(const InputEvent &e, const TouchState *touch, const InputState &is);
 
@@ -66,6 +73,9 @@ private:
 	void Drag(const InputEvent &e);
 	bool ProcessInputEvent(const InputEvent &e, const TouchState *state, const InputState &is);
 	void Scroll(const Vec2 &delta);
+	float InternalScrollTo(const Vec2 &pos, float time);
+	void InternalRecalcLayout();
+	void OnScrollBarMoved(const VScrollBarMovedEventData &data);
 
 	bool ApplyVelocity(float dt);
 
@@ -117,6 +127,17 @@ private:
 		return &m_widgets;
 	}
 
+	RAD_DECLARE_GET(wheelDelta, float) {
+		return m_wheelDelta;
+	}
+
+	RAD_DECLARE_SET(wheelDelta, float) {
+		m_wheelDelta = value;
+	}
+
+	RAD_DECLARE_GETSET(autoScrollSpeed, float, float);
+	RAD_DECLARE_GETSET(autoFadeScrollBar, bool, bool);
+
 	static int lua_RecalcLayout(lua_State *L);
 	static int lua_AddItem(lua_State *L);
 	static int lua_RemoveItem(lua_State *L);
@@ -131,8 +152,12 @@ private:
 	UIW_DECL_GETSET(StopSpringVertex);
 	UIW_DECL_GETSET(Friction);
 	UIW_DECL_GETSET(EndStops);
+	UIW_DECL_GETSET(WheelDelta);
+	UIW_DECL_GETSET(AutoScrollSpeed);
+	UIW_DECL_GETSET(AutoFadeScrollBar);
 	UIW_DECL_GET(ContentSize);
 
+	VScrollBar::Ref m_scrollBar;
 	Widget::Vec m_widgets;
 	Vec2 m_scroll;
 	Vec2 m_velocity;
@@ -149,6 +174,7 @@ private:
 	Vec2 m_scrollTo[2];
 	float m_scrollTime[2];
 	float m_friction;
+	float m_wheelDelta;
 	bool m_dragging;
 	bool m_dragMove;
 	bool m_dragDidMove;

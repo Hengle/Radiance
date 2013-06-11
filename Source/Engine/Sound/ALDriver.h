@@ -78,12 +78,19 @@ public:
 		typedef boost::shared_ptr<Callback> Ref;
 
 		Callback(const ALDriver::Ref &driver);
-		~Callback();
+		virtual ~Callback();
 		
 		virtual void Tick(ALDriver &driver) = 0;
 
+	protected:
+
+		void Unregister();
+
 	private:
 
+		friend class ALDriver;
+
+		RAD_DEBUG_ONLY(bool m_registered);
 		ALDriver::WRef m_driver;
 	};
 

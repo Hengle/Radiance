@@ -87,12 +87,18 @@ bool CheckALErrors(const char *file, int line)
 ///////////////////////////////////////////////////////////////////////////////
 
 ALDriver::Callback::Callback(const ALDriver::Ref &driver) : m_driver(driver) {
+	RAD_DEBUG_ONLY(m_registered = false);
 }
 
 ALDriver::Callback::~Callback() {
+	RAD_ASSERT(!m_registered); // Derrived classes MUST call Unregister() in their destructor.
+}
+
+void ALDriver::Callback::Unregister() {
 	ALDriver::Ref driver = m_driver.lock();
 	if (driver)
 		driver->RemoveCallback(*this);
+	m_driver.reset();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -185,11 +191,13 @@ void ALDriver::Wake() {
 void ALDriver::AddCallback(Callback &callback) {
 	Lock L(m_mcb);
 	m_callbacks.insert(&callback);
+	RAD_DEBUG_ONLY(callback.m_registered = true);
 }
 
 void ALDriver::RemoveCallback(Callback &callback) {
 	Lock L(m_mcb);
 	m_callbacks.erase(&callback);
+	RAD_DEBUG_ONLY(callback.m_registered = false);
 }
 
 void ALDriver::SyncProcess(ALDRIVER_VOID_PARAMS) {

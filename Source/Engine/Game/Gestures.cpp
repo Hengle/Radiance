@@ -227,15 +227,6 @@ bool Game::G_DoubleTap(const InputEvent &e, InputState &is, TouchState &touch, I
 		return false; // this touch state cannot generate a gesture
 
 	switch (e.type) {
-	case InputEvent::T_MouseDown:
-		if (e.data[2] & kMouseButton_Left) {
-			// check double click.
-			if ((e.time-is.ms.time) <= kDoubleClickMs) {
-				g.id = IG_DoubleTap;
-				g.phase = IGPhase_Begin;
-			}
-		}
-		break;
 	case InputEvent::T_TouchBegin:
 			if (m_doubleTap.type == InputEvent::T_TouchBegin) {
 				if ((e.time - m_doubleTap.time) <= kDoubleTapMs) {
@@ -276,6 +267,9 @@ bool Game::G_Tap(const InputEvent &e, InputState &is, TouchState &touch, InputGe
 		return false; // this touch state cannot generate a gesture
 
 	switch (e.type) {
+	case InputEvent::T_MouseUp:
+		if (e.data[2] != kMouseButton_Left)
+			break; // don't fall through!
 	case InputEvent::T_TouchEnd: 
 		{
 			int dx = touch.maxs[0] - touch.mins[0];
@@ -309,6 +303,9 @@ bool Game::G_Circle(const InputEvent &e, InputState &is, TouchState &touch, Inpu
 		return false; // this touch state cannot generate a gesture
 
 	switch (e.type) {
+	case InputEvent::T_MouseMove:
+		if (e.data[2] != kMouseButton_Left)
+			break; // don't fall through!
 	case InputEvent::T_TouchMoved:
 		{
 			bool emit = false;
@@ -370,6 +367,10 @@ bool Game::G_Line(const InputEvent &e, InputState &is, TouchState &touch, InputG
 		return false; // this touch state cannot generate a gesture
 
 	switch (e.type) {
+	case InputEvent::T_MouseMove:
+	case InputEvent::T_MouseUp:
+		if (e.data[2] != kMouseButton_Left)
+			break; // don't fall through!
 	case InputEvent::T_TouchEnd:
 	case InputEvent::T_TouchMoved:
 		{
@@ -432,6 +433,9 @@ bool Game::G_Pinch(const InputEvent &e, InputState &is, TouchState &touch, Input
 		return false; // not our gestures.
 	
 	switch (e.type) {
+	case InputEvent::T_MouseDown:
+		if (e.data[2] != kMouseButton_Left)
+			break; // don't fall through!
 	case InputEvent::T_TouchBegin:
 		{
 			// NOTE: T_TouchBegin will have a null TouchState object!
@@ -498,6 +502,9 @@ bool Game::G_Pinch(const InputEvent &e, InputState &is, TouchState &touch, Input
 			}
 		}
 		break;
+	case InputEvent::T_MouseUp:
+		if (e.data[2] != kMouseButton_Left)
+			break; // don't fall through!
 	case InputEvent::T_TouchEnd:
 		{
 			bool valid = m_pinchTouches.size() == 2;
@@ -520,7 +527,10 @@ bool Game::G_Pinch(const InputEvent &e, InputState &is, TouchState &touch, Input
 			}
 		}
 		break;
-			
+		
+	case InputEvent::T_MouseMove:
+		if (e.data[2] != kMouseButton_Left)
+			break; // don't fall through!
 	case InputEvent::T_TouchMoved:
 			if (m_pinch && (m_pinchTouches.size()==2) && (m_pinchTouches.find(e.touch) != m_pinchTouches.end())) {
 				TouchSet::const_iterator it = m_pinchTouches.begin();

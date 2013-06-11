@@ -66,7 +66,7 @@ Event System (similiar to C#):
 		void MyEventHandler(const MyEventPayload &payload);
 	};
 
-	myClassSenderInstance.OnMyEvent.Bind(myReceiverInstance, &MyEventReceiver::MyEventHandler, ManualReleaseTag);
+	myClassSenderInstance.OnMyEvent.Bind(myReceiverInstance, &MyEventReceiver::MyEventHandler, ManualReleaseEventTag);
 
 	Unbind a manual release event liks so:
 

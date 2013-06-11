@@ -21,6 +21,7 @@ VListWidget::VListWidget(const Rect &r) : Widget(r) {
 
 void VListWidget::Init() {
 	m_friction = 2000.f;
+	m_wheelDelta = 0.f;
 	m_scroll = Vec2::Zero;
 	m_velocity = Vec2::Zero;
 	m_contentSize = Vec2::Zero;
@@ -52,6 +53,7 @@ void VListWidget::Init() {
 void VListWidget::CreateVerticalScrollBar(
 	float width,
 	float arrowHeight,
+	float minThumbSize,
 	const pkg::Asset::Ref &arrow,
 	const pkg::Asset::Ref &arrowPressed,
 	const pkg::Asset::Ref &track,
@@ -62,6 +64,57 @@ void VListWidget::CreateVerticalScrollBar(
 	const pkg::Asset::Ref &thumbBottom,
 	const pkg::Asset::Ref &thumbBottomPressed
 ) {
+	if (m_scrollBar)
+		return;
+
+	m_scrollBar.reset(new VScrollBar());
+	m_scrollBar->Initialize(
+		arrowHeight,
+		minThumbSize,
+		arrow,
+		arrowPressed,
+		track,
+		thumbTop,
+		thumbTopPressed,
+		thumbMiddle,
+		thumbMiddlePressed,
+		thumbBottom,
+		thumbBottomPressed
+	);
+
+	const Rect &selfRect = this->rect;
+
+	// put on the left.
+	Rect r;
+	r.w = width;
+	r.h = selfRect.h;
+	r.y = 0.f;
+	r.x = selfRect.w - width;
+	
+	m_scrollBar->rect = r;
+	m_scrollBar->OnMoved.Bind(this, &VListWidget::OnScrollBarMoved, ManualReleaseEventTag);
+}
+
+float VListWidget::RAD_IMPLEMENT_GET(autoScrollSpeed) {
+	if (m_scrollBar)
+		return m_scrollBar->autoScrollSpeed;
+	return 0.f;
+}
+
+void VListWidget::RAD_IMPLEMENT_SET(autoScrollSpeed) (float value) {
+	if (m_scrollBar)
+		m_scrollBar->autoScrollSpeed = value;
+}
+
+bool VListWidget::RAD_IMPLEMENT_GET(autoFadeScrollBar) {
+	if (m_scrollBar)
+		return m_scrollBar->autoFade;
+	return false;
+}
+
+void VListWidget::RAD_IMPLEMENT_SET(autoFadeScrollBar) (bool value) {
+	if (m_scrollBar)
+		m_scrollBar->autoFade = value;
 }
 
 void VListWidget::Clear() {
@@ -75,6 +128,9 @@ void VListWidget::Clear() {
 	m_dragMove = false;
 	m_dragDidMove = false;
 	this->contentPos = Vec2::Zero;
+
+	if (m_scrollBar)
+		m_scrollBar->contentSize = 0.f;
 
 	for (Widget::Vec::iterator it = m_widgets.begin(); it != m_widgets.end(); ++it) {
 		RemoveChild(*it);
@@ -103,8 +159,16 @@ void VListWidget::RemoveItem(const Widget::Ref &widget) {
 }
 
 void VListWidget::ScrollTo(const Vec2 &pos, float time) {
+	float s = InternalScrollTo(pos, time);
+	if (m_scrollBar)
+		m_scrollBar->scrollPos = s;
+}
+
+float VListWidget::InternalScrollTo(const Vec2 &pos, float time) {
 	// cancel any drag or motion
-	SetCapture(false);
+	if (!m_scrollBar)
+		SetCapture(false);
+
 	m_e.type = InputEvent::T_Invalid;
 	m_velocity = Vec2::Zero;
 	m_endStop = false;
@@ -137,13 +201,22 @@ void VListWidget::ScrollTo(const Vec2 &pos, float time) {
 	if (time <= 0.f) {
 		m_scrollTime[1] = 0.f;
 		m_scroll = -scrollTo;
-		RecalcLayout();
+		InternalRecalcLayout();
 		this->contentPos = m_scroll;
 	} else {
 		m_scrollTime[1] = time;
 		m_scrollTo[0] = m_scroll;
 		m_scrollTo[1] = -scrollTo;
 	}
+
+	return scrollTo[1];
+}
+
+void VListWidget::OnScrollBarMoved(const VScrollBarMovedEventData &data) {
+	InternalScrollTo(
+		Vec2(0.f, data.instigator->scrollPos),
+		0.f
+	);
 }
 
 void VListWidget::DoVerticalLayout() {
@@ -165,6 +238,12 @@ void VListWidget::DoVerticalLayout() {
 }
 
 void VListWidget::RecalcLayout() {
+	InternalRecalcLayout();
+	if (m_scrollBar)
+		m_scrollBar->contentSize = m_contentSize[1];
+}
+
+void VListWidget::InternalRecalcLayout() {
 	Vec2 pos = m_scroll;
 
 	Rect self = this->rect;
@@ -191,7 +270,7 @@ void VListWidget::RecalcLayout() {
 
 void VListWidget::Drag(const InputEvent &e) {
 
-	if (e.IsTouchEnd(0)) {
+	if (e.IsTouchEnd(0) || (e.type == InputEvent::T_MouseUp)) {
 		m_dragging = false;
 		m_dragMove = false;
 		m_dragDidMove = false;
@@ -200,7 +279,7 @@ void VListWidget::Drag(const InputEvent &e) {
 		return;
 	}
 
-	RAD_ASSERT(e.IsTouchMove(0));
+	RAD_ASSERT(e.IsTouchMove(0) || (e.type == InputEvent::T_MouseMove));
 
 	float dy = (float)(e.data[1] - m_e.data[1]);
 
@@ -320,6 +399,9 @@ bool VListWidget::ApplyVelocity(float dt) {
 
 void VListWidget::OnTick(float time, float dt) {
 	
+	if (m_scrollBar)
+		m_scrollBar->Tick(time, dt);
+
 	if (m_scrollTime[1] > 0.f) {
 		m_scrollTime[0] += dt;
 		if (m_scrollTime[0] >= m_scrollTime[1]) {
@@ -338,6 +420,11 @@ void VListWidget::OnTick(float time, float dt) {
 	}
 }
 
+void VListWidget::OnDraw(const Rect *clip) {
+	if (m_scrollBar)
+		m_scrollBar->Draw(*this, 0);
+}
+
 bool VListWidget::ProcessInputEvent(const InputEvent &e, const TouchState *state, const InputState &is) {
 	m_postingEvent = true;
 	bool r = HandleInputEvent(e, state, is);
@@ -349,12 +436,25 @@ bool VListWidget::InputEventFilter(const InputEvent &e, const TouchState *state,
 	if (m_postingEvent)
 		return false;
 
-	if (!e.IsTouch())
-		return false;
+	if (m_scrollBar) {
+		if (m_scrollBar->HandleInputEvent(*this, e, state, is))
+			return true;
+
+		return false; // not using touch gestures in PC mode.
+	}
+
+	if (!e.IsTouch()) {
+		if (!e.IsMouse() || (e.data[2] != kMouseButton_Left))
+			return false;
+	}
 
 	if (m_e.type == InputEvent::T_Invalid) {
-		if (!e.IsTouchBegin())
-			return false;
+		if (!e.IsTouchBegin()) {
+			if (e.type != InputEvent::T_MouseDown) {
+				return false;
+			}
+		}
+		
 		m_e = e;
 		m_is = is;
 		if (state) {
@@ -373,9 +473,8 @@ bool VListWidget::InputEventFilter(const InputEvent &e, const TouchState *state,
 	} else if (e.touch == m_e.touch) {
 		if (m_dragDidMove) {
 			Drag(e);
-		} else if (e.IsTouchEnd(0)) {
+		} else if (e.IsTouchEnd(0) || (e.type == InputEvent::T_MouseUp)) {
 			// touch and release
-			RAD_ASSERT(m_e.type == InputEvent::T_TouchBegin);
 			m_e.type = InputEvent::T_Invalid;
 			m_dragging = false;
 			SetCapture(false);
@@ -405,6 +504,9 @@ void VListWidget::PushCallTable(lua_State *L) {
 	LUART_REGISTER_GETSET(L, StopSpringVertex);
 	LUART_REGISTER_GETSET(L, Friction);
 	LUART_REGISTER_GETSET(L, EndStops);
+	LUART_REGISTER_GETSET(L, WheelDelta);
+	LUART_REGISTER_GETSET(L, AutoScrollSpeed);
+	LUART_REGISTER_GETSET(L, AutoFadeScrollBar);
 	LUART_REGISTER_GET(L, ContentSize);
 	lua_pushcfunction(L, lua_RecalcLayout);
 	lua_setfield(L, -2, "RecalcLayout");
@@ -485,7 +587,7 @@ int VListWidget::lua_CreateVerticalScrollBar(lua_State *L) {
 	self->CreateVerticalScrollBar(
 		(float)luaL_checknumber(L, 2),
 		(float)luaL_checknumber(L, 3),
-		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 4, true)->asset,
+		(float)luaL_checknumber(L, 4),
 		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 5, true)->asset,
 		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 6, true)->asset,
 		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 7, true)->asset,
@@ -493,7 +595,8 @@ int VListWidget::lua_CreateVerticalScrollBar(lua_State *L) {
 		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 9, true)->asset,
 		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 10, true)->asset,
 		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 11, true)->asset,
-		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 12, true)->asset
+		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 12, true)->asset,
+		lua::SharedPtr::Get<world::D_Material>(L, "D_Material", 13, true)->asset
 	);
 	return 0;
 }
@@ -503,6 +606,9 @@ UIW_GETSET(VListWidget, StopSpring, physics::Spring, m_spring);
 UIW_GETSET(VListWidget, StopSpringVertex, physics::SpringVertex, m_vertex);
 UIW_GETSET(VListWidget, Friction, float, m_friction);
 UIW_GETSET(VListWidget, EndStops, Vec2, m_endStops);
+UIW_GETSET(VListWidget, WheelDelta, float, m_wheelDelta);
+UIW_GETSET(VListWidget, AutoScrollSpeed, float, autoScrollSpeed);
+UIW_GETSET(VListWidget, AutoFadeScrollBar, bool, autoFadeScrollBar);
 UIW_GET(VListWidget, ContentSize, Vec2, m_contentSize);
 
 } // ui

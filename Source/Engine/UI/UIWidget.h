@@ -35,7 +35,18 @@ public:
 	Rect(float _x, float _y, float _w, float _h) : x(_x), y(_y), w(_w), h(_h) {}
 
 	Rect &Intersect(const Rect &r);
-	
+	Rect &Translate(int _x, int _y) {
+		x += _x;
+		y += _y;
+		return *this;
+	}
+	Rect &Translate(const Rect &r) {
+		return Translate(r.x, r.y);
+	}
+	bool InBounds(float _x, float _y) {
+		return (_x>=x) && (_x<=(x+w)) && (_y>=y) && (_y<=(y+h));
+	}
+
 	float x, y, w, h;
 };
 
@@ -312,6 +323,7 @@ protected:
 	virtual void OnTick(float time, float dt) {}
 	virtual void OnDraw(const Rect *clip) {}
 	virtual void OnFocusChanged(bool gotFocus) {}
+	virtual void OnRectChanged() {}
 	virtual void AddedToRoot();
 	virtual void RemovedFromRoot();
 
@@ -388,6 +400,7 @@ private:
 
 	RAD_DECLARE_SET(rect, const Rect&) {	
 		m_rect = value;
+		OnRectChanged();
 	}
 
 	RAD_DECLARE_GET(screenRect, Rect);

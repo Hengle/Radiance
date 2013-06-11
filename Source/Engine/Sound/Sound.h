@@ -137,6 +137,7 @@ private:
 	class StreamCallback : public ALDriver::Callback {
 	public:
 		StreamCallback(SoundContext &ctx);
+		virtual ~StreamCallback();
 
 		virtual void Tick(ALDriver &alDriver);
 

@@ -33,6 +33,10 @@ SoundContext::StreamCallback::StreamCallback(SoundContext &ctx) :
 ALDriver::Callback(ctx.m_alDriver), m_ctx(ctx) {
 }
 
+SoundContext::StreamCallback::~StreamCallback() {
+	Unregister();
+}
+
 void SoundContext::StreamCallback::Tick(ALDriver &alDriver) {
 	if (m_ctx.TickStreams(alDriver))
 		alDriver.Wake(); // don't sleep we are still working.
