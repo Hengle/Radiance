@@ -722,15 +722,6 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 		}
 	}
 
-	float weights[2] = {0.f, 0.f};
-	if (m_rail.tm[2] == m_rail.tm[0]) {
-		weights[1] = m_rail.distance*0.15f;
-		weights[1] *= weights[1];
-	} else if (m_rail.tm[2] == m_rail.tm[1]) {
-		weights[0] = m_rail.distance*0.3f;
-		weights[0] *= weights[0];
-	}
-		
 	if ((m_rail.stayBehind <= 0.f) || (m_rail.lastBehindTime==0.f)) {
 		m_rail.targetFwd = targetFwd;
 		m_rail.lastBehindTime = world->time;
@@ -743,6 +734,7 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 	}
 
 	bool stayBehind = (m_rail.stayBehind >= 0.f);
+	bool matchNearest[2] = {false, false};
 
 	const bsp_file::BSPFile *bspFile = world->bspFile;
 	const bsp_file::BSPCameraTM *fallback0[2];
@@ -760,28 +752,30 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 	if (!m_rail.strict && m_rail.tm[0]) {
 		// rope too long?
 		if (m_rail.tmDist[0] > m_rail.distanceSq) {
+			matchNearest[0] = true;
 			m_rail.tm[0] = 0;
 			m_rail.tmDist[0] = std::numeric_limits<float>::max();
 		}
 	} else {
+		matchNearest[0] = true;
 		m_rail.tm[0] = 0;
 		m_rail.tmDist[0] = std::numeric_limits<float>::max();
 	}
 
 	if (!m_rail.strict && m_rail.tm[1]) {
+		RAD_ASSERT(stayBehind);
+
 		// rope too long?
-		bool invalid = false;
-
-		if (stayBehind) {
-			Vec3 v = target - m_rail.tm[1]->t;
-			invalid = m_rail.targetFwd.Dot(v) <= 0.f;
-		}
-
+		Vec3 v = target - m_rail.tm[1]->t;
+		bool invalid = m_rail.targetFwd.Dot(v) <= 0.f;
+		
 		if (invalid || (m_rail.tmDist[1] > m_rail.distanceSq)) {
+			matchNearest[1] = true;
 			m_rail.tm[1] = 0;
 			m_rail.tmDist[1] = std::numeric_limits<float>::max();
 		}
 	} else {
+		matchNearest[1] = true;
 		m_rail.tm[1] = 0;
 		m_rail.tmDist[1] = std::numeric_limits<float>::max();
 	}
@@ -814,15 +808,17 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 				fallback0[0] = tm;
 				fallbackDist0[0] = abs;
 			}
-		} else if (!m_rail.tm[0]) {
+		} else {
 			// rope camera
 			if (dd >= 0.f) {
-				if (!fwdValid[0] || (fwd[0] == s)) {
-					m_rail.tmDist[0] = abs;
-					m_rail.tm[0] = tm;
+				if (abs < m_rail.tmDist[0]) {
+					if (!fwdValid[0] || (fwd[0] == s)) {
+						m_rail.tmDist[0] = abs;
+						m_rail.tm[0] = tm;
+					}
 				}
 
-				if (!fallback0[0]) {
+				if (abs < fallbackDist0[0]) {
 					fallback0[0] = tm;
 					fallbackDist0[0] = abs;
 				}
@@ -834,29 +830,24 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 			}
 		}
 
-		if (!m_rail.strict && (m_rail.tm[0]&&m_rail.tm[1]))
-			break;
-		
-		if (abs >= m_rail.tmDist[1])
+		if (!m_rail.strict && m_rail.tm[0]&&!matchNearest[0]&&(!stayBehind||(!matchNearest[1]&&m_rail.tm[1])))
+			break; // strict cameras have positions.
+
+		if (!stayBehind)
+			continue; // only behind cameras are in tm[1]
+
+		if (!m_rail.strict && m_rail.tm[1] && !matchNearest[1])
 			continue;
 
-		if (!m_rail.strict && m_rail.tm[1])
+		if (abs >= m_rail.tmDist[1])
 			continue;
 
 		// these are more correct, but may not be available:
 
-		if (fwdValid[1] && !stayBehind) {
-			// new position must be on same side as old
-			if (fwd[1] != s)
-				continue;
-		}
-
-		if (stayBehind) {
-			// new position must be behind target facing
-			if (m_rail.targetFwd.Dot(v) <= 0.f)
-				continue;
-		}
-
+		// new position must be behind target facing
+		if (m_rail.targetFwd.Dot(v) <= 0.f)
+			continue;
+		
 		if (m_rail.strict) {
 			m_rail.tmDist[1] = abs;
 			m_rail.tm[1] = tm;
@@ -888,26 +879,12 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 		m_rail.tmDist[1] = fallbackDist1;
 	}
 
-	float dist[2];
-	if (m_rail.tm[0])
-		dist[0] = m_rail.tmDist[0]+weights[0];
-	if (m_rail.tm[1])
-		dist[1] = m_rail.tmDist[1]+weights[1];
-
-	if (m_rail.tm[0] && m_rail.tm[1]) {
-		m_rail.tm[2] = dist[1] <= dist[0] ? m_rail.tm[1] : m_rail.tm[0];
-	} else if (m_rail.tm[1]) {
-		m_rail.tm[2] = m_rail.tm[1]; // easy
+	if (m_rail.tm[1]) {
+		m_rail.tm[2] = m_rail.tm[1];
 	} else if (m_rail.tm[0]) {
 		m_rail.tm[2] = m_rail.tm[0];
 	} else {
-		if (fallback0[0]) {
-			m_rail.tm[0] = fallback0[0];
-			m_rail.tmDist[0] = fallbackDist0[0];
-		} else {
-			m_rail.tm[0] = fallback0[1];
-			m_rail.tmDist[0] = fallbackDist0[0];
-		}
+		m_rail.tm[0] = bspFile->CameraTMs() + m_rail.track->firstTM;
 		m_rail.tm[2] = m_rail.tm[0];
 	}
 }
