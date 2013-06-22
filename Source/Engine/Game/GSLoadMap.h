@@ -56,6 +56,7 @@ private:
 	asset::MapAsset *m_mapAsset;
 
 #if defined(RAD_OPT_PC_TOOLS)
+	bool m_nested;
 	QWidget *m_progressIndicatorParent;
 	tools::editor::ProgressDialog *m_progress;
 #endif

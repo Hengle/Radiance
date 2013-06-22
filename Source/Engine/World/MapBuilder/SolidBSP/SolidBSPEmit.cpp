@@ -40,7 +40,9 @@ bool BSPBuilder::EmitBSPFile() {
 	EmitBSPMaterials();
 	EmitBSPNodes(m_root.get(), -1);
 	EmitBSPModels();
-	EmitBSPAreas();
+	
+	if (!EmitBSPAreas())
+		return false;
 	
 	if (!EmitBSPFloors())
 		return false;
@@ -48,7 +50,9 @@ bool BSPBuilder::EmitBSPFile() {
 	if (!EmitBSPEntities())
 		return false;
 
-	EmitBSPWaypoints();
+	if (!EmitBSPWaypoints())
+		return false;
+
 	EmitBSPPlanes();
 
 	int skaSize = EmitBSPCinematics();
@@ -388,6 +392,7 @@ bool BSPBuilder::EmitBSPAreas() {
 		if (trim->portalAreas[0] == -1 ||
 			trim->portalAreas[1] == -1) {
 			Log("ERRROR: Areaportal '%s' does not seperate areas.\n", trim->name.c_str.get());
+			SetResult(pkg::SR_CompilerError);
 			return false;
 		}
 	}

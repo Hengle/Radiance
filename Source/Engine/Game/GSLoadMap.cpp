@@ -30,12 +30,19 @@ m_play(play),
 m_loadScreen(loadScreen),
 m_mapAsset(0)
 #if defined(RAD_OPT_PC_TOOLS)
-, m_progressIndicatorParent(0), m_progress(0)
+, m_progressIndicatorParent(0), m_progress(0), m_nested(false)
 #endif
 {
 }
 
 int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int flags) {
+#if defined(RAD_OPT_PC_TOOLS)
+	if (m_nested)
+		return TickNext;
+	m_nested = true;
+#endif
+
+	
 	if (!m_map) {
 		m_map = App::Get()->engine->sys->packages->Asset(m_mapId, pkg::Z_Engine);
 		if (!m_map) {
@@ -119,9 +126,10 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 #if defined(RAD_OPT_PC_TOOLS)
 		if (!m_mapAsset->compiling) {
 			if (m_progress) {
-				m_progress->close();
+				tools::editor::ProgressDialog *d = m_progress;
 				m_progress = 0;
 				m_mapAsset->SetProgressIndicator(0);
+				d->close();
 			}
 		}
 		if (m_progress)
@@ -132,9 +140,10 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 	if (r != pkg::SR_Pending) {
 #if defined(RAD_OPT_PC_TOOLS)
 		if (m_progress) {
-			m_progress->close();
+			tools::editor::ProgressDialog *d = m_progress;
 			m_progress = 0;
 			m_mapAsset->SetProgressIndicator(0);
+			d->close();
 		}
 #endif
 		App::Get()->throttleFramerate = game.cvars->r_throttle.value; // frame limit if supported.
@@ -158,15 +167,19 @@ int GSLoadMap::Tick(Game &game, float dt, const xtime::TimeSlice &outerTime, int
 			// TODO: handle failed loading
 			COut(C_ErrMsgBox) << "Error loading map!" << std::endl;
 #if defined(RAD_OPT_PC_TOOLS)
-		if (m_progressIndicatorParent) {
-			m_progressIndicatorParent->close();
-			m_progressIndicatorParent = 0;
-		}
+			if (m_progressIndicatorParent) {
+				m_progressIndicatorParent->close();
+				m_progressIndicatorParent = 0;
+			}
 #endif
 		}
 
 		return TickPop;
 	}
+
+#if defined(RAD_OPT_PC_TOOLS)
+	m_nested = false;
+#endif
 
 	return TickNext;
 }
