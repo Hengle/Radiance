@@ -170,6 +170,8 @@ void SoundContext::Tick(float dt, bool positional)
 		}
 	}
 
+	Source::StackPtrVec callbacks;
+
 	for (int i = 0; i < SC_Max; ++i) {
 		Channel &channel = m_channels[i];
 
@@ -207,11 +209,35 @@ void SoundContext::Tick(float dt, bool positional)
 					it = next;
 					source->mapped = false;
 					m_sources[source->priority].erase(source->it[1]);
+					if (source->notify)
+						callbacks->push_back(source);
 					RAD_ASSERT(m_numSources>0);
 					--m_numSources;
 				} else {
 					++it;
 				}
+			}
+		}
+	}
+
+	// completion callbacks
+
+	for(Source::StackPtrVec::const_iterator it = callbacks->begin(); it != callbacks->end(); ++it) {
+		Source *source = *it;
+		Notify::Ref r = source->notify;
+		source->notify.reset();
+		r->OnComplete(*source->sound);
+	}
+
+	// m_streams is modified by ALDriver thread
+	ReadLock L(m_m);
+	for (Source::List::const_iterator it = m_streams.begin(); it != m_streams.end(); ++it) {
+		Source *s = *it;
+		if (s->doNotify) {
+			s->doNotify = false;
+			if (s->notify) {
+				s->notify->OnComplete(*s->sound);
+				s->notify.reset();
 			}
 		}
 	}
@@ -230,6 +256,7 @@ int SoundContext::TickStreams(ALDriver &driver)
 		if (r == Sound::kStreamResult_Finished) {
 			UpgradeToWriteLock WL(m_m);
 			UnmapSource(*s);
+			s->doNotify = true;
 		} else if (r == Sound::kStreamResult_Decoding) {
 			++numBusy;
 		}
@@ -575,6 +602,10 @@ void Sound::FadeOutAndStop(float time) {
 }
 
 bool Sound::Play(SoundChannel c, int priority) {
+	return Play(c, priority, SoundContext::Notify::Ref());
+}
+
+bool Sound::Play(SoundChannel c, int priority, SoundContext::Notify::Ref notify) {
 	SoundContext::Ref ctx = m_ctx.lock();
 	if (!ctx)
 		return false;
@@ -593,6 +624,7 @@ bool Sound::Play(SoundChannel c, int priority) {
 			source.priority = priority;
 			source.channel = c;
 			source.paused = false;
+			source.notify = notify;
 			if (!ctx->MapSource(source))
 				return false;
 			source.play = true;
@@ -671,6 +703,7 @@ void Sound::Stop() {
 		if (source.mapped) {
 			SoundContext::WriteLock L(ctx->m_m);
 			ctx->UnmapSource(source);
+			source.notify.reset();
 		}
 	}
 }

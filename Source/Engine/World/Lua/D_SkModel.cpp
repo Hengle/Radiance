@@ -183,7 +183,7 @@ int D_SkModel::lua_BlendToState(lua_State *L) {
 		// passed in a callback table
 		int callbackId = entity->StoreLuaCallback(L, 6, 5);
 		RAD_ASSERT(callbackId != -1);
-		notify.reset(new Notify(*entity, callbackId));
+		notify.reset(new (ZWorld) Notify(*entity, callbackId));
 	}
 
 	bool r = self->BlendToState(string, blendTarget, restart, notify);

@@ -14,6 +14,7 @@
 #include <Runtime/Container/ZoneList.h>
 #include <Runtime/Container/ZoneMap.h>
 #include <Runtime/Container/ZoneSet.h>
+#include <Runtime/Container/StackVector.h>
 #include <Runtime/StreamDef.h>
 #include <Runtime/AudioCodec/VorbisDef.h>
 #include <Runtime/Thread/Locks.h>
@@ -26,6 +27,13 @@ class RADENG_CLASS SoundContext : public boost::enable_shared_from_this<SoundCon
 public:
 	typedef SoundContextRef Ref;
 	typedef SoundContextWRef WRef;
+
+	class RADENG_CLASS Notify {
+	public:
+		typedef boost::shared_ptr<Notify> Ref;
+		virtual ~Notify() {}
+		virtual void OnComplete(Sound &sound) = 0;
+	};
 
 	static Ref New(const ALDriver::Ref &driver);
 
@@ -96,15 +104,18 @@ private:
 	struct Source {
 		typedef zone_list<Source*, ZSoundT>::type List;
 		typedef zone_map<int, List, ZSoundT>::type Map;
+		typedef zone_vector<Source*, ZSoundT>::type PtrVec;
+		typedef stackify<PtrVec, 16> StackPtrVec;
 		
 		Source() : 
 			source(0), 
 			idx(-1), 
-			sound(0), 
+			sound(0),
 			mapped(false), 
 			play(false), 
 			paused(false), 
 			stream(false), 
+			doNotify(false),
 			status(AL_INITIAL),
 			channel(SC_Max) {}
 
@@ -113,11 +124,13 @@ private:
 		int idx;
 		int priority;
 		Sound *sound;
+		Notify::Ref notify;
 		List::iterator it[3];
 		bool play;
 		bool mapped;
 		bool paused;
 		bool stream;
+		bool doNotify;
 		volatile ALint status;
 	};
 
@@ -207,6 +220,7 @@ public:
 	void FadeOutAndStop(float time);
 
 	bool Play(SoundChannel c, int priority);
+	bool Play(SoundChannel c, int priority, SoundContext::Notify::Ref notifty);
 	void Pause(bool pause = true);
 	void Rewind();
 	void Stop();
@@ -380,11 +394,11 @@ private:
 	file::MMFileInputBuffer::Ref m_ib;
 	void *m_blockData;
 	AddrSize m_decodeOfs;
-	bool m_eos;
 	SourceVec m_sources;
 	SoundContext::WRef m_ctx;
 	ALDriver::Ref m_alDriver;
 	pkg::AssetRef m_asset;
+	bool m_eos;
 	bool m_loop;
 	bool m_relative;
 	bool m_fadeOutAndStop;

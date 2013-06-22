@@ -6,7 +6,8 @@
 #pragma once
 
 #include "../../Types.h"
-#include "../../Sound/SoundDef.h"
+#include "../../Sound/Sound.h"
+#include "../EntityDef.h"
 #include "D_Asset.h"
 #include <Runtime/PushPack.h>
 
@@ -26,6 +27,22 @@ protected:
 	virtual void PushElements(lua_State *L);
 
 private:
+
+	class Notify : public SoundContext::Notify {
+	public:
+		typedef boost::shared_ptr<Notify> Ref;
+
+		Notify(D_Sound &sound, Entity &entity, int callbackId);
+		virtual ~Notify();
+
+		virtual void OnComplete(Sound &sound);
+
+	private:
+
+		D_Sound *m_sound;
+		EntityWRef m_entity;
+		int m_callbackId;
+	};
 
 	RAD_DECLARE_GET(sound, const SoundRef&) { return m_sound; }
 
