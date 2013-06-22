@@ -1387,7 +1387,7 @@ bool BSPBuilder::EmitBSPWaypoint(SceneFile::Waypoint &waypoint) {
 	if (!waypoint.floorName.empty) {
 		floorNum = FindBSPFloor(waypoint.floorName.c_str);
 		if (floorNum < 0) {
-			Log("ERROR: Waypoint references a floor that does not exist: \"%s\".\n", waypoint.floorName.c_str.get());
+			Log("ERROR: Waypoint (targetname=\"%s\", userid=\"%s\") references a floor that does not exist: \"%s\".\n", waypoint.targetName.c_str.get(), waypoint.userId.c_str.get(), waypoint.floorName.c_str.get());
 			return false;
 		}
 
@@ -1395,7 +1395,7 @@ bool BSPBuilder::EmitBSPWaypoint(SceneFile::Waypoint &waypoint) {
 		floorTriNum = PutPointOnFloor(pos, floorNum);
 
 		if (floorTriNum < 0) {
-			Log("ERROR: Waypoint is not on or above floor \"%s\".\n", waypoint.floorName.c_str.get());
+			Log("ERROR: Waypoint (targetname=\"%s\", userid=\"%s\") is not on or above floor \"%s\".\n", waypoint.targetName.c_str.get(), waypoint.userId.c_str.get(), waypoint.floorName.c_str.get());
 			SetResult(pkg::SR_CompilerError);
 			return false;
 		}
