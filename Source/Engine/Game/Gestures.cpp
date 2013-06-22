@@ -384,7 +384,7 @@ bool Game::G_Line(const InputEvent &e, InputState &is, TouchState &touch, InputG
 			bool minSize, isLine;
 
 			IdentifyLineGesture(
-				(e.type == InputEvent::T_TouchEnd) ? 0 : &e,
+				(e.type == InputEvent::T_TouchEnd || e.type == InputEvent::T_MouseUp) ? 0 : &e,
 				touch, 
 				n, 
 				minSize, 

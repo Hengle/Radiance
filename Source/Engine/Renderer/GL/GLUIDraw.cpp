@@ -429,6 +429,31 @@ void GLDraw::InitCircleVerts(int vpw, int vph) {
 	for (int i = 0; i < kNumCircleSteps; ++i, angle += angleStep) {
 		float s, c;
 		math::SinAndCos(&s, &c, angle);
+
+		float xl = -1.f;
+		float yl = -1.f;
+
+		if (s != 0.f) {
+			xl = hw / math::Abs(s);
+		}
+
+		if (c != 0.f) {
+			yl = hh / math::Abs(c);
+		}
+
+		float w = hw;
+		float h = hh;
+
+		if ((xl > -1.f) && (xl <= yl)) {
+			w = xl;
+			h = hh * (xl/hw);
+		} else if ((yl > -1.f) && (yl <= xl)) {
+			h = yl;
+			w = hw * (yl/hh);
+		}
+
+		float lineStepX = w / (kHalfOverlayDiv - 1);
+		float lineStepY = h / (kHalfOverlayDiv - 1);
 	
 		float xd = lineStepX;
 		float yd = lineStepY;
