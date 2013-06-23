@@ -1063,6 +1063,8 @@ bool Floors::Walk(
 		}
 		RAD_VERIFY(workRoute->size() > 1);
 #endif
+		if (workRoute->size() < 2)
+			return false;
 		std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*walkRoute));
 	} else { // waypoint move didn't generate a plan because we are at our destination waypoint already.
 		if (walkRoute->empty())
