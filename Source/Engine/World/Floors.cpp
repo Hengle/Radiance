@@ -1041,6 +1041,8 @@ bool Floors::Walk(
 			}
 			RAD_VERIFY(workRoute->size() > 1);
 #endif
+			if (workRoute->size() < 2)
+				return false;
 			std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*walkRoute)); 
 		}
 
