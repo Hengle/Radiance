@@ -267,7 +267,10 @@ void GLWorldDraw::BindLitMaterialStates(
 	r::Material &mat,
 	const Vec4 *rect
 ) {
-	int flags = kDepthTest_Equal|kDepthWriteMask_Disable;
+	int flags = 0;
+	
+	if (mat.depthWrite)
+		flags |= kDepthTest_Equal|kDepthWriteMask_Disable;
 
 	if (rect) {
 		boost::array<int, 4> viewport;

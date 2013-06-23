@@ -521,8 +521,10 @@ void ModelEditorWidget::DrawMesh(
 
 		mat.BindTextures(&loader);
 
+		int bm = 0;
+
 		if (mat.shader->HasPass(Shader::kPass_Default)) {
-			mat.BindStates();
+			mat.BindStates(0, bm);
 			mat.shader->Begin(Shader::kPass_Default, mat);
 			mesh.BindAll(0);
 			mat.shader->BindStates();
@@ -534,10 +536,12 @@ void ModelEditorWidget::DrawMesh(
 		}
 
 		int flags = 0;
-		int bm = 0;
+		bm = 0;
 
 		if (blend) {
-			flags = kDepthTest_Equal|kDepthWriteMask_Disable;
+			if (mat.depthWrite) {
+				flags = kDepthTest_Equal|kDepthWriteMask_Disable;
+			}
 
 			if (mat.blendMode == Material::kBlendMode_None) {
 				bm = kBlendModeSource_One|kBlendModeDest_One; // additive
