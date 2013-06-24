@@ -230,6 +230,10 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(WorldDraw, rb, const RB_WorldDraw::Ref&);
 	RAD_DECLARE_PROPERTY(WorldDraw, uiOnly, bool, bool);
 	
+#if defined(WORLD_DEBUG_DRAW)
+	void DebugAddEntityBBox(const BBox &bounds);
+#endif
+
 private:
 
 	friend class ScreenOverlay;

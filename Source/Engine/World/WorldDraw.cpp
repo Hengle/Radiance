@@ -1193,4 +1193,12 @@ void WorldDraw::PostProcess() {
 	}
 }
 
+#if defined(WORLD_DEBUG_DRAW)
+void WorldDraw::DebugAddEntityBBox(const BBox &bounds) {
+	if (m_world->cvars->r_showentitybboxes.value) {
+		m_dbgVars.entityBBoxes.push_back(bounds);
+	}
+}
+#endif
+
 } // world
