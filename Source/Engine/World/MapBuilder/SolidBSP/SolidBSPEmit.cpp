@@ -230,8 +230,8 @@ bool BSPBuilder::EmitSceneOmniLights() {
 		s.PrintfASCII("%f", light->radius);
 		e->keys.pairs[CStr("radius")] = s;
 
-		s.PrintfASCII("%f", light->brightness);
-		e->keys.pairs[CStr("brightness")] = s;
+		s.PrintfASCII("%f", light->intensity);
+		e->keys.pairs[CStr("intensity")] = s;
 
 		s.PrintfASCII("%d", light->flags);
 		e->keys.pairs[CStr("flags")] = s;

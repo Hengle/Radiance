@@ -181,7 +181,7 @@ void ModelEditorWidget::resizeEvent(QResizeEvent *event) {
 	llayout->addRow(m_showLightRadius);
 	m_brightness = new (ZEditor) QLineEdit();
 	m_brightness->setValidator(new (ZEditor) QDoubleValidator(m_brightness));
-	llayout->addRow("Brightness", m_brightness);
+	llayout->addRow("Intensity", m_brightness);
 	RAD_VERIFY(connect(m_brightness, SIGNAL(textEdited(const QString&)), SLOT(OnLightBrightnessChanged(const QString&))));
 	ColorPicker *colorPicker = new (ZEditor) ColorPicker();
 	llayout->addRow("Diffuse Color", colorPicker);
@@ -401,7 +401,7 @@ void ModelEditorWidget::OnRenderGL(GLWidget &src) {
 	if (m_lighting->isChecked()) {
 		u.lights.numLights = 1;
 		u.lights.lights[0].radius = m_lightRadius;
-		u.lights.lights[0].brightness = m_lightBrightness;
+		u.lights.lights[0].intensity = m_lightBrightness;
 		u.lights.lights[0].pos = m_lightPos;
 		u.lights.lights[0].diffuse = m_lightDfColor;
 		u.lights.lights[0].specular = m_lightSpColor;

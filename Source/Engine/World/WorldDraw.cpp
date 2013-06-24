@@ -221,6 +221,8 @@ void WorldDraw::AddEffect(int id, const PostProcessEffect::Ref &fx) {
 
 void WorldDraw::Tick(float dt) {
 
+	TickLights(dt);
+
 	for (details::MatRefMap::const_iterator it = m_refMats.begin(); it != m_refMats.end(); ++it)
 		it->second.mat->Sample(m_world->time, dt);
 

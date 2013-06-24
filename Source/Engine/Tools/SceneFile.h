@@ -1126,7 +1126,7 @@ public:
 		Vec3 pos;
 		Vec3 color;
 		Vec3 shadowColor;
-		float brightness;
+		float intensity;
 		float radius;
 		int flags;
 	};

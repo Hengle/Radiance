@@ -231,8 +231,8 @@ int WorldLua::lua_World_BBoxTouching(lua_State *L) {
 		lua::Marshal<Vec3>::Get(L, 2, true)
 	);
 
-	int stypes = (int)luaL_checknumber(L, 3);
-	Entity::Vec ents = self->m_world->BBoxTouching(bbox, stypes);
+	int classtypes = (int)luaL_checknumber(L, 3);
+	Entity::Vec ents = self->m_world->BBoxTouching(bbox, classtypes);
 
 	if (ents.empty()) {
 		lua_pushnil(L);

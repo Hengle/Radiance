@@ -765,7 +765,7 @@ bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth, UIProgres
 
 			light->color = ReadVec3(stream);
 			light->shadowColor = ReadVec3(stream);
-			stream >> light->brightness;
+			stream >> light->intensity;
 			stream >> light->radius;
 
 			map.omniLights.push_back(light);

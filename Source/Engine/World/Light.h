@@ -7,6 +7,7 @@
 
 #pragma once
 #include "WorldDef.h"
+#include <Runtime/Container/ZoneVector.h>
 
 namespace r {
 class Material;
@@ -31,6 +32,18 @@ public:
 		RAD_FLAG(kInteractionFlag_Objects)		
 	};
 
+	struct IntensityStep {
+		typedef zone_vector<IntensityStep, ZWorldT>::type Vec;
+		float intensity;
+		double time;
+	};
+
+	struct ColorStep {
+		typedef zone_vector<ColorStep, ZWorldT>::type Vec;
+		Vec3 color;
+		double time;
+	};
+
 	~Light();
 
 	RAD_DECLARE_PROPERTY(Light, diffuseColor, const Vec3&, const Vec3&);
@@ -42,11 +55,16 @@ public:
 	RAD_DECLARE_PROPERTY(Light, pos, const Vec3&, const Vec3&);
 	RAD_DECLARE_PROPERTY(Light, radius, float, float);
 	RAD_DECLARE_PROPERTY(Light, bounds, const BBox&, const BBox&);
-	RAD_DECLARE_PROPERTY(Light, brightness, float, float);
+	RAD_DECLARE_PROPERTY(Light, intensity, float, float);
 	RAD_DECLARE_PROPERTY(Light, interactionFlags, int, int);
 
 	void Link();
 	void Unlink();
+	void Tick(float dt);
+
+	void AnimateIntensity(const IntensityStep::Vec &vec, bool loop);
+	void AnimateDiffuseColor(const ColorStep::Vec &vec, bool loop);
+	void AnimateSpecularColor(const ColorStep::Vec &vec, bool loop);
 
 private:
 
@@ -111,12 +129,12 @@ private:
 		m_bounds = value;
 	}
 
-	RAD_DECLARE_GET(brightness, float) {
-		return m_brightness;
+	RAD_DECLARE_GET(intensity, float) {
+		return m_intensity;
 	}
 
-	RAD_DECLARE_SET(brightness, float) {
-		m_brightness = value;
+	RAD_DECLARE_SET(intensity, float) {
+		m_intensity = value;
 	}
 
 	RAD_DECLARE_GET(interactionFlags, int) {
@@ -128,7 +146,31 @@ private:
 	}
 
 	details::LightInteraction **ChainHead(int matId);
+
+	void AnimateIntensity(float dt);
+	void AnimateColor(
+		float dt,
+		ColorStep::Vec &steps,
+		int &index,
+		double &time,
+		Vec3 &color,
+		bool loop
+	);
+
+	void InitColorSteps(
+		const ColorStep::Vec &srcVec,
+		bool srcLoop,
+		ColorStep::Vec &vec,
+		Vec3 &color,
+		double &time,
+		int &index,
+		bool &loop
+	);
 	
+	IntensityStep::Vec m_intensitySteps;
+	ColorStep::Vec m_dfSteps;
+	ColorStep::Vec m_spSteps;
+
 	dBSPLeaf::PtrVec m_bspLeafs;
 	details::MatInteractionChain m_matInteractionChain; // linkage to draws
 	details::LightInteraction *m_interactionHead; // linkage to objects
@@ -138,13 +180,22 @@ private:
 	Vec4 m_shColor;
 	Vec3 m_dfColor;
 	Vec3 m_pos;
-	float m_brightness;
+	float m_intensity;
 	float m_radius;
+	double m_intensityTime;
+	double m_dfTime;
+	double m_spTime;
 	LightStyle m_style;
 	int m_markFrame;
 	int m_visFrame;
 	int m_drawFrame;
 	int m_interactionFlags;
+	int m_intensityStep;
+	int m_dfStep;
+	int m_spStep;
+	bool m_intensityLoop;
+	bool m_dfLoop;
+	bool m_spLoop;
 	dBSPLeaf *m_leaf;
 	Light *m_prev;
 	Light *m_next;

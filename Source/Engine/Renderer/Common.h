@@ -61,7 +61,7 @@ struct LightDef {
 	Vec3 diffuse;
 	Vec3 pos;
 	float radius;
-	float brightness;
+	float intensity;
 	int flags;
 
 	bool operator == (const LightDef &d) {

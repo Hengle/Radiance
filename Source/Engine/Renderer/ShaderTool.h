@@ -69,7 +69,7 @@ public:
 		kMaterialSource_Color, // constant
 		kMaterialSource_SpecularColor, // constant
 		kMaterialSource_SpecularExponent,
-		kMaterialSource_LightDiffuseColor, // constant (rgb) + w == brightness
+		kMaterialSource_LightDiffuseColor, // constant (rgb) + w == intensity
 		kMaterialSource_LightSpecularColor, // constant (rgb) + w == exponent
 		kMaterialSource_LightPos, // model space (xyz) + w == radius
 		kMaterialSource_LightVec, // model space angle

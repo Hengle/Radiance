@@ -240,7 +240,7 @@ void WorldDraw::GenLightDef(
 	lightDef.diffuse = light.diffuseColor;
 	lightDef.specular = light.specularColor;
 	lightDef.pos = tx ? ((*tx) * light.pos.get()) : light.pos;
-	lightDef.brightness = light.brightness;
+	lightDef.intensity = light.intensity;
 	lightDef.radius = light.radius;
 	
 	lightDef.flags = 0;
@@ -343,9 +343,9 @@ void WorldDraw::CalcUnifiedShadowPosAndSize(
 	const Vec3 &origin = bounds.Origin();
 	
 	for (const details::LightInteraction *i = head; i; i = i->nextOnBatch) {
-		if (i->light->brightness > 0.f) {
+		if (i->light->intensity > 0.f) {
 			Vec3 z = i->light->pos.get() - origin;
-			float dist = z.Magnitude() / i->light->brightness;
+			float dist = z.Magnitude() / i->light->intensity;
 			totalDist += dist*dist;
 		}
 	}
@@ -355,9 +355,9 @@ void WorldDraw::CalcUnifiedShadowPosAndSize(
 	if (totalDist > 0.f) {
 		
 		for (const details::LightInteraction *i = head->nextOnBatch; i; i = i->nextOnBatch) {
-			if (i->light->brightness > 0.f) {
+			if (i->light->intensity > 0.f) {
 				Vec3 z = i->light->pos.get() - origin;
-				float dist = z.Magnitude() / i->light->brightness;
+				float dist = z.Magnitude() / i->light->intensity;
 				float w = (dist*dist) / totalDist;
 				if (w < 1.f) {
 					pos = math::Lerp(i->light->pos.get(), pos, w);
@@ -370,7 +370,7 @@ void WorldDraw::CalcUnifiedShadowPosAndSize(
 		// calculate the radius that encloses all the effecting lights
 
 		for (const details::LightInteraction *i = head->nextOnBatch; i; i = i->nextOnBatch) {
-			if (i->light->brightness > 0.f) {
+			if (i->light->intensity > 0.f) {
 				Vec3 z = i->light->pos.get() - pos;
 				float m = z.Magnitude();
 				radius = math::Max(radius, i->light->radius + m);
@@ -896,6 +896,12 @@ void WorldDraw::CleanupLights() {
 		UnlinkLight(*l);
 	}
 	m_lights[0] = m_lights[1] = 0;
+}
+
+void WorldDraw::TickLights(float dt) {
+	for (Light *l = m_lights[0]; l; l = l->m_next) {
+		l->Tick(dt);
+	}
 }
 
 void WorldDraw::DeleteLight(Light *light) {

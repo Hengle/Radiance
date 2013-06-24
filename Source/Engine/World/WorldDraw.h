@@ -531,6 +531,7 @@ private:
 
 	void UpdateLightInteractions(Light &light);
 	void CleanupLights();
+	void TickLights(float dt);
 	static void DeleteLight(Light *light);
 
 	ObjectPool<details::MBatch> m_batchPool;

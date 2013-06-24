@@ -18,6 +18,8 @@ class RADENG_CLASS D_Light : public lua::SharedPtr {
 public:
 	typedef boost::shared_ptr<D_Light> Ref;
 
+	virtual ~D_Light();
+
 	static Ref New(const Light::Ref &light);
 
 	RAD_DECLARE_READONLY_PROPERTY(D_Light, light, const Light::Ref&);
@@ -33,12 +35,18 @@ private:
 	LUART_DECL_GETSET(ShadowColor);
 	LUART_DECL_GETSET(Pos);
 	LUART_DECL_GETSET(Radius);
-	LUART_DECL_GETSET(Brightness);
+	LUART_DECL_GETSET(Intensity);
 	LUART_DECL_GETSET(Style);
 	LUART_DECL_GETSET(InteractionFlags);
 
 	static int lua_Link(lua_State *L);
 	static int lua_Unlink(lua_State *L);
+	static int lua_AnimateIntensity(lua_State *L);
+	static int lua_AnimateDiffuseColor(lua_State *L);
+	static int lua_AnimateSpecularColor(lua_State *L);
+
+	static void ParseColorSteps(lua_State *L, int tableIndex, Light::ColorStep::Vec &steps);
+	static void ParseIntensitySteps(lua_State *L, int tableIndex, Light::IntensityStep::Vec &steps);
 
 	D_Light(const Light::Ref &light);
 

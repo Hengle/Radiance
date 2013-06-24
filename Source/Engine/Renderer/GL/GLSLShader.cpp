@@ -910,11 +910,11 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 			gl.Uniform4fARB(p.u.lightPos[i], srcLight.pos[0], srcLight.pos[1], srcLight.pos[2], srcLight.radius);
 		}
 
-		if ((p.u.lightDiffuse[i] != -1) && ((srcLight.diffuse != dstLight.diffuse) || (srcLight.brightness != dstLight.brightness))) {
+		if ((p.u.lightDiffuse[i] != -1) && ((srcLight.diffuse != dstLight.diffuse) || (srcLight.intensity != dstLight.intensity))) {
 //			RAD_ASSERT(srcLight.flags & LightDef::kFlag_Diffuse);
 			dstLight.diffuse = srcLight.diffuse;
-			dstLight.brightness = srcLight.brightness;
-			gl.Uniform4fARB(p.u.lightDiffuse[i], srcLight.diffuse[0], srcLight.diffuse[1], srcLight.diffuse[2], srcLight.brightness);
+			dstLight.intensity = srcLight.intensity;
+			gl.Uniform4fARB(p.u.lightDiffuse[i], srcLight.diffuse[0], srcLight.diffuse[1], srcLight.diffuse[2], srcLight.intensity);
 		}
 
 		if ((p.u.lightSpecular[i] != -1) && (srcLight.specular != dstLight.specular)) {
