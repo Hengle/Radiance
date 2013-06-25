@@ -492,7 +492,9 @@ bool BlendToController::Tick(
 	BoneTM tm;
 	BoneTM delta;
 
-	if (!m_root->Tick(
+	BlendToController::Blend::Ref root(m_root); // m_root may get eaten
+
+	if (!root->Tick(
 		dt,
 		distance,
 		tm,
