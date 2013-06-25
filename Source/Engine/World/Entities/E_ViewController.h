@@ -188,6 +188,8 @@ private:
 		Step step;
 
 		void Init(float in, float out, float hold);
+		void FadeIn(float time);
+		void FadeOut(float time);
 		void Tick(float dt);
 	};
 
@@ -290,8 +292,11 @@ private:
 		typedef zone_list<LookTarget, ZWorldT>::type List;
 
 		Blend blend;
+		Blend band;
 		Vec3 target;
 		int id;
+		bool init;
+		bool valid;
 		float weight;
 		float frac;
 		float smooth[2];

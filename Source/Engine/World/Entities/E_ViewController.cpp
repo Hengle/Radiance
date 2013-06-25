@@ -34,6 +34,18 @@ void E_ViewController::Blend::Init(float _in, float _out, float _hold) {
 	}
 }
 
+void E_ViewController::Blend::FadeIn(float time) {
+	in[0] = frac * time;
+	in[1] = time;
+	step = kStep_In;
+}
+
+void E_ViewController::Blend::FadeOut(float time) {
+	out[0] = frac * time;
+	out[1] = time;
+	step = kStep_Out;
+}
+
 void E_ViewController::Blend::Tick(float dt) {
 	if (step == kStep_In) {
 		in[0] += dt;
@@ -415,6 +427,33 @@ Vec3 E_ViewController::LookTarget::Tick(
 			List::iterator next = it; ++next;
 
 			LookTarget &x = *it;
+
+			Vec3 tfwd = x.target - pos;
+			tfwd.Normalize();
+
+			float d = tfwd.Dot(fwd);
+			bool valid = d >= 0.5f;
+
+			if (!x.init) {
+				x.init = true;
+				x.valid = valid;
+				if (valid) {
+					x.band.Init(0.f, 0.f, -1.f);
+				} else {
+					x.band.Init(0.f, 0.f, 0.f);
+				}
+			} else {
+				if (x.valid != valid) {
+					x.valid = valid;
+					if (valid) {
+						x.band.FadeIn(1.f);
+					} else {
+						x.band.FadeOut(1.f);
+					}
+				}
+			}
+
+			x.band.Tick(dt);
 			x.blend.Tick(dt);
 			if ((x.blend.step == Blend::kStep_Done) && (x.frac < 0.001f))
 				list.erase(it);
@@ -430,7 +469,7 @@ Vec3 E_ViewController::LookTarget::Tick(
 
 	for (; block != list.end(); ++block) {
 		const LookTarget &x = *block;
-		if (x.blend.frac == 1.f)
+		if ((x.blend.frac*x.band.frac) >= 0.999f)
 			break;
 	}
 
@@ -449,10 +488,10 @@ Vec3 E_ViewController::LookTarget::Tick(
 			x.smooth[0] : x.smooth[1];
 
 		if (smooth <= 0.f) {
-			x.frac = x.blend.frac;
+			x.frac = x.blend.frac*x.band.frac;
 		} else {
 			float z = math::Clamp(smooth*dt, 0.f, 0.99999f);
-			x.frac = math::Lerp(x.frac, x.blend.frac, z);
+			x.frac = math::Lerp(x.frac, x.blend.frac*x.band.frac, z);
 		}
 
 		Vec3 tfwd = x.target - pos;
@@ -1097,6 +1136,9 @@ int E_ViewController::BlendToLookTarget(
 	t.smooth[0] = inSmooth;
 	t.smooth[1] = outSmooth;
 	t.id = LookTarget::s_nextId++;
+	t.init = false;
+	t.valid = false;
+	t.band.Init(0.f, 0.f, 0.f);
 	m_looks.push_back(t);
 
 	return t.id;
