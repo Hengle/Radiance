@@ -1074,10 +1074,14 @@ bool Floors::Walk(
 	return true;
 }
 
+#if defined(RAD_OPT_SHIP)
+#define RANGE_CHECK(v)
+#else
 #define RANGE_CHECK(v) \
-	RAD_ASSERT(math::Abs(v[0]) < 16000.f); \
-	RAD_ASSERT(math::Abs(v[1]) < 16000.f); \
-	RAD_ASSERT(math::Abs(v[2]) < 16000.f)
+	RAD_VERIFY(math::Abs(v[0]) < 16000.f); \
+	RAD_VERIFY(math::Abs(v[1]) < 16000.f); \
+	RAD_VERIFY(math::Abs(v[2]) < 16000.f)
+#endif
 
 void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route &moveRoute) const {
 	if (walkRoute->empty())
