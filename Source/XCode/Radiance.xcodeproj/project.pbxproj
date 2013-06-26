@@ -355,6 +355,21 @@
 		330A99B115BCA101002A81EC /* TextureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8871C15B9B9ED0089BA08 /* TextureParser.h */; };
 		330A99B215BCA101002A81EC /* TypefaceParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8871F15B9B9ED0089BA08 /* TypefaceParser.cpp */; };
 		330A99B315BCA101002A81EC /* TypefaceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8872015B9B9ED0089BA08 /* TypefaceParser.h */; };
+		33138669177A5A8400424DB4 /* GameDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33138668177A5A8400424DB4 /* GameDef.h */; };
+		3313866A177A5A8400424DB4 /* GameDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33138668177A5A8400424DB4 /* GameDef.h */; };
+		3313866B177A5A8400424DB4 /* GameDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33138668177A5A8400424DB4 /* GameDef.h */; };
+		3313866C177A5A8400424DB4 /* GameDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33138668177A5A8400424DB4 /* GameDef.h */; };
+		3313866D177A5A8400424DB4 /* GameDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33138668177A5A8400424DB4 /* GameDef.h */; };
+		33138670177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3313866E177A5A9E00424DB4 /* UIScrollBar.cpp */; };
+		33138671177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3313866E177A5A9E00424DB4 /* UIScrollBar.cpp */; };
+		33138672177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3313866E177A5A9E00424DB4 /* UIScrollBar.cpp */; };
+		33138673177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3313866E177A5A9E00424DB4 /* UIScrollBar.cpp */; };
+		33138674177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3313866E177A5A9E00424DB4 /* UIScrollBar.cpp */; };
+		33138675177A5A9E00424DB4 /* UIScrollBar.h in Headers */ = {isa = PBXBuildFile; fileRef = 3313866F177A5A9E00424DB4 /* UIScrollBar.h */; };
+		33138676177A5A9E00424DB4 /* UIScrollBar.h in Headers */ = {isa = PBXBuildFile; fileRef = 3313866F177A5A9E00424DB4 /* UIScrollBar.h */; };
+		33138677177A5A9E00424DB4 /* UIScrollBar.h in Headers */ = {isa = PBXBuildFile; fileRef = 3313866F177A5A9E00424DB4 /* UIScrollBar.h */; };
+		33138678177A5A9E00424DB4 /* UIScrollBar.h in Headers */ = {isa = PBXBuildFile; fileRef = 3313866F177A5A9E00424DB4 /* UIScrollBar.h */; };
+		33138679177A5A9E00424DB4 /* UIScrollBar.h in Headers */ = {isa = PBXBuildFile; fileRef = 3313866F177A5A9E00424DB4 /* UIScrollBar.h */; };
 		3342B1D016BE5AB300A287E3 /* UIVListWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3342B1CE16BE5AB300A287E3 /* UIVListWidget.cpp */; };
 		3342B1D116BE5AB300A287E3 /* UIVListWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3342B1CE16BE5AB300A287E3 /* UIVListWidget.cpp */; };
 		3342B1D216BE5AB300A287E3 /* UIVListWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3342B1CE16BE5AB300A287E3 /* UIVListWidget.cpp */; };
@@ -3119,6 +3134,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		33138668177A5A8400424DB4 /* GameDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameDef.h; sourceTree = "<group>"; };
+		3313866E177A5A9E00424DB4 /* UIScrollBar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIScrollBar.cpp; sourceTree = "<group>"; };
+		3313866F177A5A9E00424DB4 /* UIScrollBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIScrollBar.h; sourceTree = "<group>"; };
 		3319498215B9FB0600458F43 /* AppDebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppDebugiOS.xcconfig; path = XCConfig/AppDebugiOS.xcconfig; sourceTree = "<group>"; };
 		3319498315B9FB0600458F43 /* AppDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppDebugOSX.xcconfig; path = XCConfig/AppDebugOSX.xcconfig; sourceTree = "<group>"; };
 		3319498415B9FB0600458F43 /* AppReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppReleaseiOS.xcconfig; path = XCConfig/AppReleaseiOS.xcconfig; sourceTree = "<group>"; };
@@ -4927,6 +4945,7 @@
 				33E887BC15B9BA470089BA08 /* Game.h */,
 				33982E1116A89C8100C2ED49 /* GameCVars.cpp */,
 				33982E1216A89C8100C2ED49 /* GameCVars.h */,
+				33138668177A5A8400424DB4 /* GameDef.h */,
 				33E887BD15B9BA470089BA08 /* GameNetwork.cpp */,
 				33E887BE15B9BA470089BA08 /* GameNetwork.h */,
 				338A45FC15DE8B9500B0B9B7 /* GameNetworkDef.h */,
@@ -5303,6 +5322,8 @@
 			children = (
 				33E888AE15B9BA4A0089BA08 /* UIMatWidget.cpp */,
 				33E888AF15B9BA4A0089BA08 /* UIMatWidget.h */,
+				3313866E177A5A9E00424DB4 /* UIScrollBar.cpp */,
+				3313866F177A5A9E00424DB4 /* UIScrollBar.h */,
 				33E888B015B9BA4A0089BA08 /* UITextLabel.cpp */,
 				33E888B115B9BA4A0089BA08 /* UITextLabel.h */,
 				3342B1CE16BE5AB300A287E3 /* UIVListWidget.cpp */,
@@ -5886,6 +5907,8 @@
 				334389A31724CDA60048052A /* VtMesh.h in Headers */,
 				33FBD05B173B071500043A8D /* Light.h in Headers */,
 				33FBD067173B073E00043A8D /* D_Light.h in Headers */,
+				3313866B177A5A8400424DB4 /* GameDef.h in Headers */,
+				33138677177A5A9E00424DB4 /* UIScrollBar.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6294,6 +6317,8 @@
 				334389A41724CDA60048052A /* VtMesh.h in Headers */,
 				33FBD05C173B071500043A8D /* Light.h in Headers */,
 				33FBD068173B073E00043A8D /* D_Light.h in Headers */,
+				3313866C177A5A8400424DB4 /* GameDef.h in Headers */,
+				33138678177A5A9E00424DB4 /* UIScrollBar.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6793,6 +6818,8 @@
 				33FBD04B173B06B800043A8D /* EditorColorPicker.h in Headers */,
 				33FBD059173B071500043A8D /* Light.h in Headers */,
 				33FBD065173B073E00043A8D /* D_Light.h in Headers */,
+				33138669177A5A8400424DB4 /* GameDef.h in Headers */,
+				33138675177A5A9E00424DB4 /* UIScrollBar.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7199,6 +7226,8 @@
 				334389A21724CDA60048052A /* VtMesh.h in Headers */,
 				33FBD05A173B071500043A8D /* Light.h in Headers */,
 				33FBD066173B073E00043A8D /* D_Light.h in Headers */,
+				3313866A177A5A8400424DB4 /* GameDef.h in Headers */,
+				33138676177A5A9E00424DB4 /* UIScrollBar.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7607,6 +7636,8 @@
 				334389A51724CDA60048052A /* VtMesh.h in Headers */,
 				33FBD05D173B071500043A8D /* Light.h in Headers */,
 				33FBD069173B073E00043A8D /* D_Light.h in Headers */,
+				3313866D177A5A8400424DB4 /* GameDef.h in Headers */,
+				33138679177A5A9E00424DB4 /* UIScrollBar.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7988,6 +8019,7 @@
 				33FBD04F173B070B00043A8D /* WorldDrawLight.cpp in Sources */,
 				33FBD056173B071500043A8D /* Light.cpp in Sources */,
 				33FBD062173B073E00043A8D /* D_Light.cpp in Sources */,
+				33138672177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8178,6 +8210,7 @@
 				33FBD050173B070B00043A8D /* WorldDrawLight.cpp in Sources */,
 				33FBD057173B071500043A8D /* Light.cpp in Sources */,
 				33FBD063173B073E00043A8D /* D_Light.cpp in Sources */,
+				33138673177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8464,6 +8497,7 @@
 				33FBD04D173B070B00043A8D /* WorldDrawLight.cpp in Sources */,
 				33FBD054173B071500043A8D /* Light.cpp in Sources */,
 				33FBD060173B073E00043A8D /* D_Light.cpp in Sources */,
+				33138670177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8654,6 +8688,7 @@
 				33FBD04E173B070B00043A8D /* WorldDrawLight.cpp in Sources */,
 				33FBD055173B071500043A8D /* Light.cpp in Sources */,
 				33FBD061173B073E00043A8D /* D_Light.cpp in Sources */,
+				33138671177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8845,6 +8880,7 @@
 				33FBD051173B070B00043A8D /* WorldDrawLight.cpp in Sources */,
 				33FBD058173B071500043A8D /* Light.cpp in Sources */,
 				33FBD064173B073E00043A8D /* D_Light.cpp in Sources */,
+				33138674177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

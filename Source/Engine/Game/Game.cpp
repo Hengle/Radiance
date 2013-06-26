@@ -390,7 +390,7 @@ void Game::PostInputEvent(const InputEvent &e) {
 
 	m_inputEvents.push_back(e);
 
-#if defined(RAD_OPT_PC)
+#if defined(RAD_OPT_PC) && !defined(RAD_TARGET_GOLDEN)
 	}
 #endif
 }
