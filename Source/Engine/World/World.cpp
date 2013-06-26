@@ -297,6 +297,15 @@ void World::TickState(float dt, float unmod_dt) {
 	GenerateSaveGame();
 }
 
+void World::MarkTempEntsForGC() {
+	for (Entity::IdMap::const_iterator it = m_ents.begin(); it != m_ents.end(); ++it) {
+		const Entity::Ref &entity = it->second;
+		if (entity->id >= kFirstTempEntId) {
+			entity->m_gc = true;
+		}
+	}
+}
+
 void World::GenerateSaveGame() {
 	if (!m_generateSave)
 		return;

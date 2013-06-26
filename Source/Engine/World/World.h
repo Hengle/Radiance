@@ -71,6 +71,8 @@ public:
 		const xtime::TimeSlice &time
 	);
 
+	void MarkTempEntsForGC();
+
 	void SetGameSpeed(float speed, float duration);
 
 	void Tick(float dt);

@@ -1252,6 +1252,12 @@ int WorldLua::lua_World_CreateDynamicLight(lua_State *L) {
 	return 1;
 }
 
+int WorldLua::lua_World_MarkTempEntsForGC(lua_State *L) {
+	LOAD_SELF
+	self->m_world->MarkTempEntsForGC();
+	return 0;
+}
+
 } // world
 
 

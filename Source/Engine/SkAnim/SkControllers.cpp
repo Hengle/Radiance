@@ -1031,8 +1031,6 @@ void AnimationVariantsSource::ChooseAnim() {
 			loopCount = 0;
 
 		if (node == m_node) { // picked self?
-			if (m_map.size() > 1)
-				continue; // pick another animation
 			RAD_ASSERT(m_source);
 			m_source->ResetLoopCount(loopCount);
 			m_source->SetTime(0.f);

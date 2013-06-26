@@ -256,6 +256,7 @@ private:
 	static int lua_World_DrawUIOnly(lua_State *L);
 	static int lua_World_CreateSpriteBatch(lua_State *L);
 	static int lua_World_CreateDynamicLight(lua_State *L);
+	static int lua_World_MarkTempEntsForGC(lua_State *L);
 
 	/*
 	==============================================================================

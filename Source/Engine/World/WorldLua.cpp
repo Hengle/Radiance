@@ -170,6 +170,7 @@ bool WorldLua::Init() {
 		{ "DrawUIOnly", lua_World_DrawUIOnly },
 		{ "CreateSpriteBatch", lua_World_CreateSpriteBatch },
 		{ "CreateDynamicLight", lua_World_CreateDynamicLight },
+		{ "MarkTempEntsForGC", lua_World_MarkTempEntsForGC },
 		{ 0, 0 }
 	};
 
