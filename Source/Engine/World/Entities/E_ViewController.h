@@ -64,6 +64,14 @@ public:
 		kNumTargetModes
 	};
 
+	enum RailStartMode {
+		kRailStart_Front, // start in front of the player if possible
+		kRailStart_Back, // start behind the player if possible
+		kRailStart_Begin, // start at the start of the track
+		kRailStart_End, // start and the end of the track
+		kRailStart_DontCare // no preference
+	};
+
 	//! Sets the parameters for a camera that tracks the target by a specified distance
 	/*! The camera position and orientation are defined by two points offset from the
 		view controllers target. Each point is offset via an animating distance and angle 
@@ -113,6 +121,7 @@ public:
 						   // kTargetMode_Look may lag the "look at" point
 		float lookAtLag,   // how quickly the camera turns to look at the target object.
 		float stayBehind,  // >= 0 if we want to stay behind the player and this tells us how often to check.
+		RailStartMode startMode, // Determines how we pick our initial spot
 		bool useCinematicFOV, // true = uses embedded fov from cinematic
 		const Vec3 &angleClamp // how much camera can "turn" from its rail-track to look at target.
 		                       // NOTE: X angles are ignored, camera always controls roll angle.
@@ -302,7 +311,7 @@ private:
 		float smooth[2];
 
 		static int s_nextId;
-		static Vec3 Tick(List &list, const Vec3 &pos, const Vec3 &fwd, float dt);
+		static Vec3 Tick(List &list, const Vec3 &pos, const Vec3 &fwd, const Vec3 &targetFwd, float dt);
 	};
 
 	void TickFixedMode(int frame, float dt, const Entity::Ref &target);
@@ -355,6 +364,7 @@ private:
 		float lastBehindTime;
 		bool cinematicFOV;
 		bool strict;
+		RailStartMode startMode;
 	};
 
 	Mode m_mode;
