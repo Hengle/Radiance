@@ -501,10 +501,12 @@ Vec3 E_ViewController::LookTarget::Tick(
 			x.frac = math::Lerp(x.frac, x.blend.frac*x.band.frac, z);
 		}
 
-		Vec3 tfwd = x.target - pos;
-		tfwd.Normalize();
-		nfwd = math::Lerp(nfwd, tfwd, x.frac*x.weight);
-		
+		if (x.band.frac > 0.f) {
+			Vec3 tfwd = x.target - pos;
+			tfwd.Normalize();
+			nfwd = math::Lerp(nfwd, tfwd, x.frac*x.weight);
+		}
+
 		if (it == list.begin())
 			break;
 		--it;
