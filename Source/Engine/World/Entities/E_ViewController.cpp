@@ -762,7 +762,7 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 
 void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFwd) {
 	static const float kFrontAngle = 0.707f;
-	static const float kBackAngle = -0.2f;
+	static const float kBackAngle = -0.707f;
 	const bsp_file::BSPFile *bspFile = world->bspFile;
 
 	if (m_rail.startMode == kRailStart_Front) {
@@ -955,7 +955,7 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 		// these are more correct, but may not be available:
 
 		// new position must be behind target facing
-		if (m_rail.targetFwd.Dot(v) < kBackAngle)
+		if (m_rail.targetFwd.Dot(v) < 0.f)
 				continue;
 				
 		if (m_rail.strict) {
