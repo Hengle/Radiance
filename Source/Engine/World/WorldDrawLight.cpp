@@ -250,23 +250,32 @@ void WorldDraw::GenLightDef(
 		lightDef.flags |= r::LightDef::kFlag_Specular;
 }
 
-void WorldDraw::DrawViewUnifiedShadows(ViewDef &view) {
-	for (EntityPtrSet::const_iterator it = view.shadowEntities.begin(); it != view.shadowEntities.end(); ++it) {
-		DrawUnifiedEntityShadow(view, **it);
+void WorldDraw::DrawViewUnifiedShadows(const ViewDef &view) {
+
+	bool draw = false;
+
+	for (EntityPtrVec::const_iterator it = view.shadowEntities.begin(); it != view.shadowEntities.end(); ++it) {
+		draw = DrawUnifiedEntityShadow(view, **it);
 	}
-	for (MBatchOccupantPtrSet::const_iterator it = view.shadowOccupants.begin(); it != view.shadowOccupants.end(); ++it) {
+	/*for (MBatchOccupantPtrVec::const_iterator it = view.shadowOccupants.begin(); it != view.shadowOccupants.end(); ++it) {
 		DrawUnifiedOccupantShadow(view, **it);
+	}*/
+
+	if (!draw && !(view.shadowEntities.empty() && view.shadowOccupants.empty())) {
+		m_rb->RotateForCamera(view.camera);
+		m_rb->SetPerspectiveMatrix(view.camera, view.viewport);
+		m_rb->UnbindUnifiedShadowRenderTarget();
 	}
 }
 
-void WorldDraw::DrawUnifiedEntityShadow(ViewDef &view, const Entity &e) {
+bool WorldDraw::DrawUnifiedEntityShadow(const ViewDef &view, const Entity &e) {
 	Vec3 unifiedPos;
 	float unifiedRadius;
 
 	BBox bounds(e.ps->bbox);
 	bounds.Translate(e.ps->worldPos);
 
-	CalcUnifiedShadowPosAndSize(
+	CalcUnifiedLightPosAndSize(
 		bounds,
 		e.m_lightInteractions,
 		unifiedPos,
@@ -279,19 +288,71 @@ void WorldDraw::DrawUnifiedEntityShadow(ViewDef &view, const Entity &e) {
 	}
 #endif
 
-	DrawUnifiedShadow(
+	Camera lightCam;
+	lightCam.pos = unifiedPos;
+	lightCam.fov = 0.f;
+	lightCam.farClip = 0.f;
+	lightCam.LookAt(bounds.Origin());
+
+	m_rb->RotateForCamera(lightCam);
+	const Mat4 mv = m_rb->GetModelViewMatrix();
+
+	Vec4 viewplanes;
+	Vec2 zplanes;
+	Vec3 radial(lightCam.pos.get() + (lightCam.fwd.get() * unifiedRadius));
+
+	CalcViewplaneBounds(0, mv, bounds, &radial, viewplanes, zplanes);
+
+	//SetOrthoMatrix(viewplanes, zplanes);
+	Mat4 prj = MakePerspectiveMatrix(viewplanes, zplanes, false);
+	m_rb->SetPerspectiveMatrix(prj);
+	
+	m_rb->BindUnifiedShadowRenderTarget(
+		*m_shadow_M.mat
+	);
+
+	m_shadow_M.mat->BindTextures(m_shadow_M.loader);
+	m_shadow_M.mat->shader->Begin(r::Shader::kPass_Default, *m_shadow_M.mat);
+
+	bool drawn = DrawUnifiedShadowTexture(
 		view,
 		*e.models,
 		unifiedPos,
 		unifiedRadius
 	);
+
+	m_shadow_M.mat->shader->End();
+
+	if (!drawn)
+		return false;
+
+	PlaneVec frustum;
+	SetupPerspectiveFrustumPlanes(
+		frustum,
+		lightCam,
+		viewplanes,
+		zplanes
+	);
+
+	DrawViewWithUnifiedShadow(
+		view,
+		unifiedPos,
+		unifiedRadius,
+		frustum,
+		mv,
+		viewplanes,
+		zplanes,
+		&e
+	);
+
+	return true;
 }
 
-void WorldDraw::DrawUnifiedOccupantShadow(ViewDef &view, const MBatchOccupant &o) {
+bool WorldDraw::DrawUnifiedOccupantShadow(const ViewDef &view, const MBatchOccupant &o) {
 	Vec3 unifiedPos;
 	float unifiedRadius;
 
-	CalcUnifiedShadowPosAndSize(
+	CalcUnifiedLightPosAndSize(
 		o.bounds,
 		o.m_lightInteractions,
 		unifiedPos,
@@ -304,7 +365,7 @@ void WorldDraw::DrawUnifiedOccupantShadow(ViewDef &view, const MBatchOccupant &o
 	}
 #endif
 
-	DrawUnifiedShadow(
+	return DrawUnifiedShadowTexture(
 		view,
 		*o.batches,
 		unifiedPos,
@@ -312,73 +373,190 @@ void WorldDraw::DrawUnifiedOccupantShadow(ViewDef &view, const MBatchOccupant &o
 	);
 }
 
-void WorldDraw::DrawUnifiedShadow(
-	ViewDef &view,
+bool WorldDraw::DrawUnifiedShadowTexture(
+	const ViewDef &view,
 	const DrawModel::Map &models,
 	const Vec3 &unifiedPos,
 	float unifiedRadius
 ) {
+	bool drawn = false;
+	for (DrawModel::Map::const_iterator it = models.begin(); it != models.end(); ++it) {
+		const DrawModel::Ref &m = it->second;
+		if (!m->visible)
+			continue;
+		drawn = DrawUnifiedShadowTexture(view, m->m_batches, unifiedPos, unifiedRadius) || drawn;
+	}
+	return drawn;
 }
 
-void WorldDraw::DrawUnifiedShadow(
-	ViewDef &view,
+bool WorldDraw::DrawUnifiedShadowTexture(
+	const ViewDef &view,
 	const MBatchDraw::RefVec &batches,
 	const Vec3 &unifiedPos,
 	float unifiedRadius
 ) {
+	bool drawn = false;
+
+	Vec3 pos;
+	Vec3 angles;
+	r::Shader::Uniforms u;
+
+	u.lights.numLights = 0;
+	u.blendColor = Vec4(0.f, 0.f, 0.f, 1.f);
+
+	// material->BindStates() was issued by caller
+	for (MBatchDraw::RefVec::const_iterator it = batches.begin(); it != batches.end(); ++it) {
+		const MBatchDraw::Ref &draw = *it;
+
+		details::MatRef *mat = AddMaterialRef(draw->m_matId);
+		if (mat) {
+			if (mat->mat->castShadows) {
+				drawn = true;
+				
+				bool tx = draw->GetTransform(pos, angles);
+				if (tx) {
+					m_rb->PushMatrix(pos, draw->scale, angles);
+				}
+
+				draw->Bind(m_shadow_M.mat->shader.get().get());
+				m_shadow_M.mat->shader->BindStates(u);
+				m_rb->CommitStates();
+				draw->CompileArrayStates(*m_shadow_M.mat->shader.get());
+				draw->Draw();
+
+				if (tx)
+					m_rb->PopMatrix();
+			}
+		}
+	}
+
+	return drawn;
 }
 
-void WorldDraw::DrawUnifiedShadowBatches(
-	const MBatchDraw::RefVec &batches
+void WorldDraw::DrawViewWithUnifiedShadow(
+	const ViewDef &view,
+	const Vec3 &unifiedPos,
+	float unifiedRadius,
+	const PlaneVec &shadowFrustum,
+	const Mat4 &mv,
+	const Vec4 &viewplanes,
+	const Vec2 &zplanes,
+	const void *occluder
 ) {
+	StackWindingStackVec frustumVolume;
+	BBox frustumBounds;
+
+	World::MakeVolume(&shadowFrustum[0], (int)shadowFrustum.size(), frustumVolume, frustumBounds);
+
+	m_rb->SetPerspectiveMatrix(view.camera, view.viewport);
+	m_rb->RotateForCamera(view.camera);
+
+	r::Shader::Uniforms u;
+	u.blendColor = Vec4(1.f, 1.f, 1.f, 1.f);
+	u.lights.numLights = 1;
+	memset(&u.lights.lights[0], 0, sizeof(r::LightDef));
+	u.lights.lights[0].pos = unifiedPos;
+	u.lights.lights[0].radius = unifiedRadius;
+	u.tcGen = mv * MakePerspectiveMatrix(viewplanes, zplanes, true);
+
+	m_projected_M.mat->BindTextures(m_projected_M.loader);
+	m_rb->BindUnifiedShadowTexture(*m_projected_M.mat); // does mat->BindStates()
+
+	m_projected_M.mat->shader->Begin(r::Shader::kPass_Default, *m_projected_M.mat);
+
+	Vec3 pos, angles;
+
+	for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
+		const details::MBatch &batch = *it->second;
+		if (batch.matRef->mat->receiveShadows == false)
+			continue; // this material doesn't want shadows.
+
+		for (details::MBatchDrawLink *link = batch.head; link; link = link->next) {
+			MBatchDraw *draw = link->draw;
+			if (draw->m_uid == occluder)
+				continue; // don't render occluder with their own shadow
+
+			if (m_world->cvars->r_frustumcull.value && !ClipBounds(frustumVolume, frustumBounds, draw->TransformedBounds())) {
+				continue; // not in light frustum
+			}
+
+			bool tx = draw->GetTransform(pos, angles);
+			if (tx)
+				m_rb->PushMatrix(pos, draw->scale, angles);
+
+			draw->Bind(m_projected_M.mat->shader.get().get());
+			m_projected_M.mat->shader->BindStates(u, false);
+			m_rb->CommitStates();
+			draw->CompileArrayStates(*m_projected_M.mat->shader.get());
+			draw->Draw();
+
+			if (tx)
+				m_rb->PopMatrix();
+		}
+	}
+
+	m_projected_M.mat->shader->End();
 }
 
-void WorldDraw::CalcUnifiedShadowPosAndSize(
+void WorldDraw::CalcUnifiedLightPosAndSize(
 	const BBox &bounds,
 	const details::LightInteraction *head,
 	Vec3 &pos,
 	float &radius
 ) {
 	float totalDist = 0.f;
+	float totalIntensity = 0.f;
 	const Vec3 &origin = bounds.Origin();
 	
 	for (const details::LightInteraction *i = head; i; i = i->nextOnBatch) {
-		if (i->light->intensity > 0.f) {
-			Vec3 z = i->light->pos.get() - origin;
-			float dist = z.Magnitude() / i->light->intensity;
-			totalDist += dist*dist;
-		}
+		totalIntensity += i->light->intensity;
 	}
 
-	pos = head->light->pos;
+	if (totalIntensity == 0.f)
+		return;
 
-	if (totalDist > 0.f) {
-		
-		for (const details::LightInteraction *i = head->nextOnBatch; i; i = i->nextOnBatch) {
-			if (i->light->intensity > 0.f) {
-				Vec3 z = i->light->pos.get() - origin;
-				float dist = z.Magnitude() / i->light->intensity;
-				float w = (dist*dist) / totalDist;
-				if (w < 1.f) {
-					pos = math::Lerp(i->light->pos.get(), pos, w);
-				}
-			}
-		}
+	float totalWeight = 0.f;
 
-		radius = 0.f;
+	for (const details::LightInteraction *i = head; i; i = i->nextOnBatch) {
 
-		// calculate the radius that encloses all the effecting lights
+		if (i->light->radius == 0.f)
+			continue;
 
-		for (const details::LightInteraction *i = head->nextOnBatch; i; i = i->nextOnBatch) {
-			if (i->light->intensity > 0.f) {
-				Vec3 z = i->light->pos.get() - pos;
-				float m = z.Magnitude();
-				radius = math::Max(radius, i->light->radius + m);
-			}
-		}
+		Vec3 z = i->light->pos.get() - origin;
+		float dist = z.Magnitude();
+		float w = 1.f - math::Min(1.f, dist / i->light->radius);
+		w = w * w * (i->light->intensity / totalIntensity);
 
-	} else {
-		radius = head->light->radius;
+		totalWeight += w;
+
+	}
+
+	// blend lights
+	pos = Vec3::Zero;
+	radius = 0.f;
+
+	for (const details::LightInteraction *i = head; i; i = i->nextOnBatch) {
+
+		if (i->light->radius == 0.f)
+			continue;
+
+		Vec3 z = i->light->pos.get() - origin;
+		float dist = z.Magnitude();
+		float w = 1.f - math::Min(1.f, dist / i->light->radius);
+		w = w * w * (i->light->intensity / totalIntensity);
+
+		w = w / totalWeight;
+		pos += i->light->pos.get() * w;
+		radius += i->light->radius * w;
+	}
+
+	Vec3 boundSize = bounds.Size();
+	float boundRadius = math::Max(math::Max(boundSize[0], boundSize[1]), boundSize[2]);
+	Vec3 v = pos - origin;
+	float dist = v.Normalize();
+
+	if (dist < boundRadius) { // keep outside of bounding radius
+		pos += v*(boundRadius-dist);
 	}
 }
 
@@ -457,9 +635,7 @@ void WorldDraw::LinkEntity(
 				const DrawModel::Ref &model = it->second;
 				for (MBatchDraw::RefVec::const_iterator it = model->batches->begin(); it != model->batches->end(); ++it) {
 					const MBatchDraw::Ref &batch = *it;
-					BBox batchBounds(batch->bounds);
-					batchBounds.Translate(entity.ps->worldPos);
-					if (lightBounds.Touches(batchBounds)) {
+					if (lightBounds.Touches(batch->TransformedBounds())) {
 						if ((batch->maxLights > 0) && !FindInteraction(light, *batch)) {
 							CreateInteraction(light, entity, *batch);
 						}
@@ -523,7 +699,7 @@ void WorldDraw::LinkOccupant(
 
 			for (MBatchDraw::RefVec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
 				const MBatchDraw::Ref &batch = *it;
-				if (lightBounds.Touches(batch->bounds)) {
+				if (lightBounds.Touches(batch->TransformedBounds())) {
 					if ((batch->maxLights > 0) && !FindInteraction(light, *batch)) {
 						CreateInteraction(light, occupant, *batch);
 					}
@@ -568,7 +744,7 @@ void WorldDraw::LinkLight(Light &light, const BBox &bounds) {
 
 			const MStaticWorldMeshBatch::Ref &m = m_worldModels[modelNum];
 
-			if ((m->maxLights > 0) && bounds.Touches(m->bounds)) {
+			if ((m->maxLights > 0) && bounds.Touches(m->TransformedBounds())) {
 				if (!FindInteraction(light, *m)) {
 					CreateInteraction(light, *m);
 				}
@@ -840,13 +1016,8 @@ void WorldDraw::UpdateLightInteractions(Light &light) {
 
 			if (i->dirty) {
 				i->dirty = false;
-				BBox batchBounds(i->draw->bounds);
-
-				if (i->entity) {
-					batchBounds.Translate(i->entity->ps->worldPos);
-				}
-
-				if (!bounds.Touches(batchBounds)) {
+				
+				if (!bounds.Touches(i->draw->TransformedBounds())) {
 					UnlinkInteraction(*i, *lightHead, i->draw->m_interactions);
 					m_interactionPool.ReturnChunk(i);
 				}
@@ -854,6 +1025,7 @@ void WorldDraw::UpdateLightInteractions(Light &light) {
 		}
 	}
 
+	// shadow
 	details::LightInteraction *next = 0;
 	for (details::LightInteraction *i = light.m_interactionHead; i; i = next) {
 		next = i->nextOnLight;

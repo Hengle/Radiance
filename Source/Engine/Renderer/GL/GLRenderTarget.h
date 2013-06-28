@@ -26,7 +26,8 @@ public:
 		GLsizei height, 
 		GLsizei depthFormat, 
 		GLsizei size,
-		int flags
+		int flags,
+		bool autoGenMips
 	);
 
 	virtual ~GLRenderTarget();

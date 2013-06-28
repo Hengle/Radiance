@@ -37,7 +37,7 @@ public:
 		kNumFrustumPlanes = 6
 	};
 	
-	ViewDef() : light(false), sky(false) {
+	ViewDef() : sky(false) {
 	}
 
 	Camera camera;
@@ -48,13 +48,12 @@ public:
 	
 	AreaBits areas;
 	LightVec visLights;
-	EntityPtrSet shadowEntities;
-	MBatchOccupantPtrSet shadowOccupants;
+	EntityPtrVec shadowEntities;
+	MBatchOccupantPtrVec shadowOccupants;
 	details::MBatchIdMap batches;
 
 	int viewport[4];
 	int area;
-	bool light;
 	bool sky;
 };
 
@@ -80,10 +79,24 @@ public:
     virtual void ClearBackBuffer() = 0;
 	virtual void ClearDepthBuffer() = 0;
 	virtual void SetWorldStates() = 0;
+	
+	virtual Mat4 MakePerspectiveMatrix(
+		float left, 
+		float right, 
+		float top, 
+		float bottom, 
+		float near, 
+		float far,
+		const Mat4 *bias
+	) = 0;
+
 	virtual void SetPerspectiveMatrix(
 		const Camera &camera,
-		int viewport[4]
+		const int viewport[4]
 	) = 0;
+
+	virtual void SetPerspectiveMatrix(const Mat4 &m) = 0;
+
 	virtual void SetScreenLocalMatrix() = 0;
 
 	virtual void SetOrthoMatrix(
@@ -107,8 +120,9 @@ public:
 	) = 0;
 
 	// Unified Shadows
-	virtual void BindUnifiedShadowRenderTarget() = 0;
-	virtual void BindUnifiedShadowTexture() = 0;
+	virtual void BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) = 0;
+	virtual void BindUnifiedShadowTexture(r::Material &projectedMaterial) = 0;
+	virtual void UnbindUnifiedShadowRenderTarget() = 0;
 	
 	// Post Process FX
 	virtual void BindPostFXTargets(bool chain) = 0;
@@ -259,6 +273,10 @@ private:
 			int matId
 		);
 
+		virtual BBox TransformedBounds() const {
+			return m_bounds;
+		}
+
 	protected:
 		virtual void Bind(r::Shader *shader);
 		virtual void CompileArrayStates(r::Shader &shader);
@@ -279,14 +297,6 @@ private:
 
 		virtual RAD_DECLARE_GET(scale, const Vec3&) { 
 			return s_scale; 
-		}
-
-		virtual RAD_DECLARE_GET(xform, bool) { 
-			return true; 
-		}
-
-		virtual RAD_DECLARE_GET(bounds, const BBox&) {
-			return m_bounds;
 		}
 
 	private:
@@ -319,8 +329,21 @@ private:
 
 	void FindViewArea(ViewDef &view);
 	
-	void SetupFrustumPlanes(ViewDef &view);
-	
+	void SetupPerspectiveFrustumPlanes(ViewDef &view);
+
+	void SetupPerspectiveFrustumPlanes(
+		ViewDef &view,
+		const Vec4 &viewplanes,
+		const Vec2 &zplanes
+	);
+
+	void SetupPerspectiveFrustumPlanes(
+		PlaneVec &planes,
+		const Camera &camera,
+		const Vec4 &viewplanes,
+		const Vec2 &zplanes
+	);
+
 	void SetupOrthoFrustumPlanes(
 		ViewDef &view,
 		const Vec4 &viewplanes,
@@ -334,7 +357,8 @@ private:
 	);
 
 	void CalcViewplaneBounds(
-		const ViewDef &view,
+		const ViewDef *view,
+		const Mat4 &mv,
 		const BBox &bounds,
 		const Vec3 *radial,
 		Vec4 &viewplanes,
@@ -344,6 +368,12 @@ private:
 	void SetOrthoMatrix(
 		const Vec4 &viewplanes,
 		const Vec2 &zplanes
+	);
+
+	Mat4 MakePerspectiveMatrix(
+		const Vec4 &viewplanes,
+		const Vec2 &zplanes,
+		bool txAddressBias
 	);
 
 	void VisMarkAreas(ViewDef &view);
@@ -504,29 +534,36 @@ private:
 		Mat4 *tx
 	);
 
-	void DrawViewUnifiedShadows(ViewDef &view);
-	void DrawUnifiedEntityShadow(ViewDef &view, const Entity &e);
-	void DrawUnifiedOccupantShadow(ViewDef &view, const MBatchOccupant &o);
+	void DrawViewUnifiedShadows(const ViewDef &view);
+	bool DrawUnifiedEntityShadow(const ViewDef &view, const Entity &e);
+	bool DrawUnifiedOccupantShadow(const ViewDef &view, const MBatchOccupant &o);
 
-	void DrawUnifiedShadow(
-		ViewDef &view,
+	bool DrawUnifiedShadowTexture(
+		const ViewDef &view,
 		const DrawModel::Map &models,
 		const Vec3 &unifiedPos,
 		float unifiedRadius
 	);
 
-	void DrawUnifiedShadow(
-		ViewDef &view,
+	bool DrawUnifiedShadowTexture(
+		const ViewDef &view,
 		const MBatchDraw::RefVec &batches,
 		const Vec3 &unifiedPos,
 		float unifiedRadius
 	);
 
-	void DrawUnifiedShadowBatches(
-		const MBatchDraw::RefVec &batches
+	void DrawViewWithUnifiedShadow(
+		const ViewDef &view,
+		const Vec3 &unifiedPos,
+		float unifiedRadius,
+		const PlaneVec &shadowFrustum,
+		const Mat4 &mv,
+		const Vec4 &viewplanes,
+		const Vec2 &zplanes,
+		const void *occluder
 	);
 
-	void CalcUnifiedShadowPosAndSize(
+	void CalcUnifiedLightPosAndSize(
 		const BBox &bounds,
 		const details::LightInteraction *head,
 		Vec3 &pos,
@@ -543,6 +580,8 @@ private:
 	MemoryPool m_interactionPool;
 	
 	Counters m_counters;
+	LocalMaterial m_projected_M;
+	LocalMaterial m_shadow_M;
 	PostProcessEffect::Map m_postFX;
 	MStaticWorldMeshBatch::RefVec m_worldModels;
 	ScreenOverlay::List m_overlays;
@@ -609,7 +648,8 @@ private:
 	void DebugDrawFrustumVolumes(ViewDef &view);
 	void DebugDrawLights();
 	void DebugDrawUnifiedLights();
-	bool DebugSetupUnifiedLightMatrixView(ViewDef &view);
+	bool DebugSetupUnifiedLightTextureMatrixView(ViewDef &view);
+	bool DebugSetupUnifiedLightProjectionMatrixView(ViewDef &view);
 	void DebugDrawProjectedBBoxPoints();
 	void DebugDrawUnifiedLightAxis();
 

@@ -28,10 +28,24 @@ public:
     virtual void ClearBackBuffer();
 	virtual void ClearDepthBuffer();
 	virtual void SetWorldStates();
+	
+	virtual Mat4 MakePerspectiveMatrix(
+		float left, 
+		float right, 
+		float top, 
+		float bottom, 
+		float near, 
+		float far,
+		const Mat4 *bias
+	);
+
 	virtual void SetPerspectiveMatrix(
 		const Camera &camera,
-		int viewport[4]
+		const int viewport[4]
 	);
+
+	virtual void SetPerspectiveMatrix(const Mat4 &m);
+
 	virtual void SetScreenLocalMatrix();
 
 	virtual void SetOrthoMatrix(
@@ -54,8 +68,15 @@ public:
 		const Vec4 *scissorBounds
 	);
 
-	virtual void BindUnifiedShadowRenderTarget();
-	virtual void BindUnifiedShadowTexture();
+	virtual void BindUnifiedShadowRenderTarget(
+		r::Material &shadowMaterial
+	);
+	
+	virtual void BindUnifiedShadowTexture(
+		r::Material &projectedMaterial
+	);
+
+	virtual void UnbindUnifiedShadowRenderTarget();
 	
 	virtual void BindPostFXTargets(bool chain);
 	virtual void BindPostFXQuad();
@@ -118,7 +139,8 @@ private:
 
 	enum {
 		kNumRTs = 2,
-		kNumBanks = 1
+		kNumBanks = 1,
+		kNumShadowTextures = 4
 	};
 
 	void CalcBBoxScreenBounds(
@@ -129,15 +151,21 @@ private:
 	);
 
 	void CreateScreenOverlay();
-	void BindRTFB(int num);
+	void BindRTFB(int num, bool discardHint);
 	void BindRTTX(int num);
+	void BindShadowRTFB(int num);
+	void BindShadowRTTX(int num);
+	void BindDefaultFB(bool discardHint);
 
 	int m_bank;
 	int m_activeRT;
 	int m_rtSize[2];
+	int m_shadowRTSize[2];
+	int m_activeShadowRT;
 	bool m_rtFB;
+	bool m_shadowRTFB;
 	boost::array<boost::array<r::GLRenderTarget::Ref, kNumRTs>, kNumBanks> m_rts;
-	r::GLRenderTarget::Ref m_unifiedShadowRT;
+	boost::array<r::GLRenderTarget::Ref, kNumShadowTextures> m_unifiedShadowRTs;
 	
 	struct OverlayVert {
 		float xy[2];

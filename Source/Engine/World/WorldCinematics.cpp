@@ -984,7 +984,7 @@ Vec4 WorldCinematics::SkActorBatch::s_rgba(1, 1, 1, 1);
 Vec3 WorldCinematics::SkActorBatch::s_scale(1, 1, 1);
 
 WorldCinematics::SkActorBatch::SkActorBatch(WorldDraw &draw, const Actor &actor, int idx, int matId) :
-MBatchDraw(draw, matId), m_idx(idx), m_actor(&actor) {
+MBatchDraw(draw, matId, actor.occupant.get()), m_idx(idx), m_actor(&actor) {
 }
 
 void WorldCinematics::SkActorBatch::Bind(r::Shader *shader) {
@@ -1009,7 +1009,7 @@ Vec4 WorldCinematics::VtActorBatch::s_rgba(1, 1, 1, 1);
 Vec3 WorldCinematics::VtActorBatch::s_scale(1, 1, 1);
 
 WorldCinematics::VtActorBatch::VtActorBatch(WorldDraw &draw, const Actor &actor, int idx, int matId) :
-MBatchDraw(draw, matId), m_idx(idx), m_actor(&actor) {
+MBatchDraw(draw, matId, actor.occupant.get()), m_idx(idx), m_actor(&actor) {
 }
 
 void WorldCinematics::VtActorBatch::Bind(r::Shader *shader) {

@@ -122,7 +122,9 @@ private:
 		GLint lightDiffuse[kMaxLights];
 		GLint lightSpecular[kMaxLights];
 		GLint eye;
+		GLint tcPrj;
 		Vec3 eyePos;
+		Mat4 tcPrjMat;
 #if defined(RAD_OPT_OGLES2)
 		GLint mvp;
 		float mvpfloats[16];

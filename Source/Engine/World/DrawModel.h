@@ -39,11 +39,13 @@ public:
 	void ReplaceMaterial(int src, int dst);
 	void ReplaceMaterials(int dst);
 
+	BBox TransformedBounds() const;
+
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, entity, Entity*);
 	RAD_DECLARE_PROPERTY(DrawModel, pos, const Vec3&, const Vec3&);
 	RAD_DECLARE_PROPERTY(DrawModel, angles, const Vec3&, const Vec3&);
 	RAD_DECLARE_PROPERTY(DrawModel, visible, bool, bool);
-	RAD_DECLARE_PROPERTY(DrawModel, bounds, const BBox&, const BBox&);
+	RAD_DECLARE_READONLY_PROPERTY(DrawModel, bounds, const BBox&);
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, scale, const Vec3&);
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, rgba, const Vec4&);
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, batches, const MBatchDraw::RefVec*);
@@ -59,6 +61,10 @@ protected:
 	public:
 		DrawBatch(DrawModel &model, int matId);
 
+		virtual BBox TransformedBounds() const {
+			return m_model->TransformedBounds();
+		}
+
 	protected:
 		virtual bool GetTransform(Vec3 &pos, Vec3 &angles) const;
 
@@ -72,10 +78,6 @@ protected:
 
 		virtual RAD_DECLARE_GET(scale, const Vec3&) { return 
 			m_model->scale; 
-		}
-
-		virtual RAD_DECLARE_GET(bounds, const BBox&) { return 
-			m_model->bounds; 
 		}
 
 	private:
@@ -128,10 +130,6 @@ private:
 	
 	RAD_DECLARE_GET(bounds, const BBox&) {
 		return m_bounds;
-	}
-
-	RAD_DECLARE_SET(bounds, const BBox&) {
-		m_bounds = value;
 	}
 
 	RAD_DECLARE_GET(batches, const MBatchDraw::RefVec*) {

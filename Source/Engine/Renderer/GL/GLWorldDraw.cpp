@@ -31,9 +31,10 @@ RB_WorldDraw::Ref RB_WorldDraw::New(World *world) {
 }
 
 GLWorldDraw::GLWorldDraw(World *world) : RB_WorldDraw(world), 
-m_activeRT(-1), m_bank(0), m_rtFB(false) {
+m_activeRT(-1), m_bank(0), m_rtFB(false), m_shadowRTFB(false), m_activeShadowRT(-1) {
 	m_overlaySize[0] = m_overlaySize[1] = 0;
 	m_rtSize[0] = m_rtSize[1] = 0;
+	m_shadowRTSize[0] = m_shadowRTSize[1] = 0;
 #if defined(WORLD_DEBUG_DRAW)
 	m_numDebugVerts = 0;
 	m_numDebugIndices = 0;
@@ -100,9 +101,11 @@ void GLWorldDraw::BindRenderTarget() {
 				GL_DEPTH_COMPONENT32_ARB,
 				m_rtSize[0]*m_rtSize[1]*8,
 	#endif
-				TX_FilterBilinear
+				TX_FilterBilinear,
+				false
 			));
 
+			// for the remaining RTs, attach a shared depth buffer.
 			for (int k = 1; k < kNumRTs; ++k) {
 				m_rts[i][k].reset(new GLRenderTarget(
 					GL_TEXTURE_2D,
@@ -112,7 +115,8 @@ void GLWorldDraw::BindRenderTarget() {
 					m_rtSize[1],
 					0,
 					m_rtSize[0]*m_rtSize[1]*4,
-					TX_FilterBilinear
+					TX_FilterBilinear,
+					false
 				));
 
 				gls.BindBuffer(GL_FRAMEBUFFER_EXT, m_rts[i][k]->id[0]);
@@ -132,18 +136,20 @@ void GLWorldDraw::BindRenderTarget() {
 	}
 
 	m_activeRT = 0;
-	BindRTFB(m_activeRT);
+	BindRTFB(m_activeRT, true);
 	m_rtFB = true;
 }
 
-void GLWorldDraw::BindRTFB(int num) {
+void GLWorldDraw::BindRTFB(int num, bool discardHint) {
 	GLuint fb = m_rts[m_bank][num]->id[0];
 	gls.BindBuffer(GL_FRAMEBUFFER_EXT, fb);
 	CHECK_GL_ERRORS();
 #if defined(RAD_OPT_IOS)
-    // won't be able to do depth here for each FB bind once we support MTS_FrameBuffer
-    GLenum attachments[] = { GL_COLOR_ATTACHMENT0_EXT, GL_DEPTH_ATTACHMENT_EXT };
-    glDiscardFramebufferEXT(GL_FRAMEBUFFER_EXT, 2, attachments);
+	if (discardHint) {
+		// won't be able to do depth here for each FB bind once we support MTS_FrameBuffer
+		GLenum attachments[] = { GL_COLOR_ATTACHMENT0_EXT, GL_DEPTH_ATTACHMENT_EXT };
+		glDiscardFramebufferEXT(GL_FRAMEBUFFER_EXT, 2, attachments);
+	}
 #endif
 	glViewport(0, 0, m_rtSize[0], m_rtSize[1]);
 	CHECK_GL_ERRORS();
@@ -156,9 +162,121 @@ void GLWorldDraw::BindRTTX(int num) {
 	}
 }
 
+void GLWorldDraw::BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) {
+	int vpx, vpy, vpw, vph;
+	world->game->Viewport(vpx, vpy, vpw, vph);
+
+	vpw >>= 1;
+	vph >>= 1;
+
+	if (vpw != m_shadowRTSize[0] || vph != m_shadowRTSize[1]) {
+		m_shadowRTSize[0] = vpw;
+		m_shadowRTSize[1] = vph;
+		
+		for (int i = 0; i < kNumShadowTextures; ++i) {
+			m_unifiedShadowRTs[i].reset(new GLRenderTarget(
+				GL_TEXTURE_2D,
+				GL_RGBA,
+				GL_UNSIGNED_BYTE,
+				m_shadowRTSize[0],
+				m_shadowRTSize[1],
+	#if defined(RAD_OPT_IOS)
+				GL_DEPTH_COMPONENT24_ARB,
+				m_rtSize[0]*m_rtSize[1]*7,
+	#else
+				GL_DEPTH_COMPONENT32_ARB,
+				m_rtSize[0]*m_rtSize[1]*8,
+	#endif
+				TX_FilterBilinear,
+				true
+			));
+		}
+	}
+
+	BindShadowRTFB(++m_shadowRTFB);
+	shadowMaterial.BindStates(kScissorTest_Enable);
+}
+
+void GLWorldDraw::UnbindUnifiedShadowRenderTarget() {
+	m_shadowRTFB = false;
+	if (m_rtFB) {
+		BindRTFB(m_activeRT, false);
+	} else {
+		BindDefaultFB(false);
+	}
+}
+
+void GLWorldDraw::BindUnifiedShadowTexture(
+	r::Material &projectedTexture
+) {
+	BindShadowRTTX(m_shadowRTFB);
+	projectedTexture.BindStates(0, kBlendModeSource_SrcAlpha|kBlendModeDest_InvSrcAlpha);
+}
+
+void GLWorldDraw::BindShadowRTFB(int num) {
+	GLuint fb = m_unifiedShadowRTs[num]->id[0];
+	gls.BindBuffer(GL_FRAMEBUFFER_EXT, fb);
+	CHECK_GL_ERRORS();
+#if defined(RAD_OPT_IOS)
+    // won't be able to do depth here for each FB bind once we support MTS_FrameBuffer
+    GLenum attachments[] = { GL_COLOR_ATTACHMENT0_EXT, GL_DEPTH_ATTACHMENT_EXT };
+    glDiscardFramebufferEXT(GL_FRAMEBUFFER_EXT, 2, attachments);
+#endif
+	glViewport(0, 0, m_shadowRTSize[0], m_shadowRTSize[1]);
+	gls.Set(kDepthWriteMask_Enable|kScissorTest_Disable, -1, true); // for glClear()
+	glClearColor(0.f, 0.f, 0.f, 0.f);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	gls.Scissor(
+		2,
+		2,
+		m_shadowRTSize[0]-4,
+		m_shadowRTSize[1]-4
+	);
+	CHECK_GL_ERRORS();
+	m_shadowRTFB = true;
+}
+
+void GLWorldDraw::BindShadowRTTX(int num) {
+	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
+		if (!gls.MaterialTextureSource(kMaterialTextureSource_Texture, i))
+			gls.SetMTSource(kMaterialTextureSource_Texture, i, m_unifiedShadowRTs[num]->tex);
+	}
+
+	UnbindUnifiedShadowRenderTarget();
+}
+
+void GLWorldDraw::BindDefaultFB(bool discardHint) {
+	// restore frame buffer
+	int vpx, vpy, vpw, vph;
+	world->game->Viewport(vpx, vpy, vpw, vph);
+	App::Get()->engine->sys->r->BindFramebuffer();
+#if defined(RAD_OPT_IOS)
+	if (discardHint)
+		ClearBackBuffer(); // discard hint
+#endif
+	glViewport(0, 0, vpw, vph);
+	m_rtFB = false;
+	m_shadowRTFB = false;
+}
+
+Mat4 GLWorldDraw::MakePerspectiveMatrix(
+	float left, 
+	float right, 
+	float top, 
+	float bottom, 
+	float near, 
+	float far,
+	const Mat4 *bias
+) {
+	Mat4 m = Mat4::PerspectiveOffCenterRH(left, right, bottom, top, near, far);
+	if (bias)
+		m = m * (*bias);
+	return m;
+}
+
 void GLWorldDraw::SetPerspectiveMatrix(
 	const Camera &camera,
-	int viewport[4]
+	const int viewport[4]
 ) {
 	gl.MatrixMode(GL_PROJECTION);
 	gl.LoadIdentity();
@@ -168,6 +286,22 @@ void GLWorldDraw::SetPerspectiveMatrix(
 	float yfov = camera.fov.get() * yaspect;
 
 	gl.Perspective(yfov, xaspect, 4.0, camera.farClip.get());
+
+	if (m_rtFB) { 
+		// render target tc's are flipped about Y, so correct for this in the perspective transform.
+		gl.Scalef(1.f, -1.f, 1.f);
+		gls.invertCullFace = true;
+	}
+
+	gl.MatrixMode(GL_MODELVIEW);
+}
+
+void GLWorldDraw::SetPerspectiveMatrix(
+	const Mat4 &m
+) {
+	gl.MatrixMode(GL_PROJECTION);
+	gl.LoadIdentity();
+	gl.MultMatrix(m);
 
 	if (m_rtFB) { 
 		// render target tc's are flipped about Y, so correct for this in the perspective transform.
@@ -292,33 +426,18 @@ void GLWorldDraw::BindLitMaterialStates(
 	mat.BindStates(flags, bm);
 }
 
-void GLWorldDraw::BindUnifiedShadowRenderTarget() {
-}
-
-void GLWorldDraw::BindUnifiedShadowTexture() {
-}
-
 void GLWorldDraw::SetWorldStates() {
 }
 
 void GLWorldDraw::BindPostFXTargets(bool chain) {
 	if (chain) {
 		int d = (m_activeRT+1)%kNumRTs;
-		BindRTFB(d);
+		BindRTFB(d, true);
 		BindRTTX(m_activeRT);
 		m_activeRT = d;
 	} else { 
-		// write to frame buffer
-		int vpx, vpy, vpw, vph;
-		world->game->Viewport(vpx, vpy, vpw, vph);
-
-		App::Get()->engine->sys->r->BindFramebuffer();
-#if defined(RAD_OPT_IOS)
-		ClearBackBuffer(); // discard hint
-#endif
-		glViewport(0, 0, vpw, vph);
+		BindDefaultFB(true);
 		BindRTTX(m_activeRT);
-		m_rtFB = false;
 	}
 }
 

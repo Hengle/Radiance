@@ -454,6 +454,8 @@ int MaterialParser::Load(
 			m_m.SetTCGen(i, r::Material::kTCGen_Vertex);
 		} else if (*s == "EnvMap") {
 			m_m.SetTCGen(i, r::Material::kTCGen_EnvMap);
+		} else if (*s == "Projected") {
+			m_m.SetTCGen(i, r::Material::kTCGen_Projected);
 		} else {
 			return SR_MetaError;
 		}

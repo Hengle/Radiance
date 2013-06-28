@@ -127,6 +127,14 @@ void DrawModel::ReplaceMaterials(int dst) {
 	}
 }
 
+BBox DrawModel::TransformedBounds() const {
+	BBox bounds = m_bounds;
+	Vec3 pos, angles;
+	if (GetTransform(pos, angles))
+		bounds.Translate(pos);
+	return bounds;
+}
+
 void DrawModel::PushElements(lua_State *L) {
 	lua_pushcfunction(L, lua_BlendTo);
 	lua_setfield(L, -2, "BlendTo");
@@ -206,7 +214,7 @@ LUART_GET(DrawModel, RGBA, Vec4, m_rgba[0], SELF);
 #undef SELF
 
 DrawModel::DrawBatch::DrawBatch(DrawModel &model, int matId) : 
-MBatchDraw(*model.entity->world->draw, matId), m_model(&model) {
+MBatchDraw(*model.entity->world->draw, matId, model.m_entity), m_model(&model) {
 }
 
 bool DrawModel::DrawBatch::GetTransform(Vec3 &pos, Vec3 &angles) const {

@@ -678,7 +678,7 @@ void WorldDraw::DebugDrawUnifiedLights() {
 	m_rb->ReleaseArrayStates(); // important! keeps pipeline changes from being recorded into VAO's
 }
 
-bool WorldDraw::DebugSetupUnifiedLightMatrixView(ViewDef &view) {
+bool WorldDraw::DebugSetupUnifiedLightTextureMatrixView(ViewDef &view) {
 
 	const Entity::Ref &player = m_world->playerPawn;
 	if (!(player && player->m_lightInteractions)) {
@@ -690,12 +690,12 @@ bool WorldDraw::DebugSetupUnifiedLightMatrixView(ViewDef &view) {
 
 	BBox bounds(player->ps->bbox);
 	bounds.Translate(player->ps->worldPos);
-	CalcUnifiedShadowPosAndSize(bounds, player->m_lightInteractions, lightPos, radius);
+	CalcUnifiedLightPosAndSize(bounds, player->m_lightInteractions, lightPos, radius);
 
 	Camera lightCam;
 	lightCam.pos = lightPos;
 	lightCam.fov = 45.f;
-	lightCam.farClip = 500;//m_world->camera->farClip;
+	lightCam.farClip = 5000.f;
 	lightCam.LookAt(bounds.Origin());
 	m_dbgVars.unifiedLightAxis[0] = lightCam.fwd;
 	m_dbgVars.unifiedLightAxis[1] = lightCam.left;
@@ -720,12 +720,72 @@ bool WorldDraw::DebugSetupUnifiedLightMatrixView(ViewDef &view) {
 
 	Vec3 radial(lightCam.pos.get() + (lightCam.fwd.get() * radius));
 
-	CalcViewplaneBounds(view, bounds, &radial, viewplanes, zplanes);
+	CalcViewplaneBounds(&view, view.mv, bounds, &radial, viewplanes, zplanes);
 	
 	SetOrthoMatrix(viewplanes, zplanes);
 	view.mvp = m_rb->GetModelViewProjectionMatrix();
 
 	SetupOrthoFrustumPlanes(view, viewplanes, zplanes);
+	FindViewArea(view);
+
+	return true;
+}
+
+bool WorldDraw::DebugSetupUnifiedLightProjectionMatrixView(ViewDef &view) {
+
+	const Entity::Ref &player = m_world->playerPawn;
+	if (!(player && player->m_lightInteractions)) {
+		return false; // player has no shadowing lights.
+	}
+
+	float radius;
+	Vec3 lightPos;
+
+	BBox bounds(player->ps->bbox);
+	bounds.Translate(player->ps->worldPos);
+	CalcUnifiedLightPosAndSize(bounds, player->m_lightInteractions, lightPos, radius);
+
+	Camera lightCam;
+	lightCam.pos = lightPos;
+	lightCam.fov = 90.f;
+	lightCam.farClip = 5000.f;
+	lightCam.LookAt(bounds.Origin());
+	
+	if (m_world->cvars->r_lockvis.value) {
+		if (!m_dbgVars.lockVis) {
+			m_dbgVars.lockVisCamera = lightCam;
+			m_dbgVars.lockVis = true;
+		}
+	}
+
+	view.camera = lightCam;
+	m_rb->RotateForCamera(view.camera);
+	Mat4 mv = m_rb->GetModelViewMatrix();
+	
+	Vec4 viewplanes;
+	Vec2 zplanes;
+
+	Vec3 radial(lightCam.pos.get() + (lightCam.fwd.get() * radius));
+
+	CalcViewplaneBounds(0, mv, bounds, &radial, viewplanes, zplanes);
+	
+	view.camera = lightCam;
+
+	Mat4 prj = MakePerspectiveMatrix(
+		viewplanes,
+		zplanes,
+		false
+	);
+	
+	m_rb->SetPerspectiveMatrix(prj);
+	view.mvp = m_rb->GetModelViewProjectionMatrix();
+
+	SetupPerspectiveFrustumPlanes(
+		view,
+		viewplanes,
+		zplanes
+	);
+
 	FindViewArea(view);
 
 	return true;

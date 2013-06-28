@@ -140,6 +140,8 @@ bool GLSLTool::Assemble(
 			Shader::IntSet tcInputs;
 			
 			bool genReflect = false;
+			bool genProject = false;
+
 			for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
 				if (mapping.tcMods[i] == r::kInvalidMapping)
 					break;
@@ -165,6 +167,12 @@ bool GLSLTool::Assemble(
 						ss << "#define GENREFLECT\r\n";
 					}
 					ss << "#define TEXCOORD" << i << "_GENREFLECT\r\n";
+				} else if (tcGen == r::Material::kTCGen_Projected) {
+					if (!genProject) {
+						genProject = true;
+						ss << "#define GENPROJECT\r\n";
+					}
+					ss << "#define TEXCOORD" << i << "_GENPROJECT\r\n";
 				}
 			}
 

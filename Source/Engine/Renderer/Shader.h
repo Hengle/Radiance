@@ -49,6 +49,7 @@ public:
 		LightEnv lights;
 		Vec4 blendColor;
 		Vec3 eyePos;
+		Mat4 tcGen;
 
 		struct defaultTag {};
 

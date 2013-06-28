@@ -49,15 +49,16 @@ public:
 	typedef boost::shared_ptr<MBatchDraw> Ref;
 	typedef zone_vector<Ref, ZWorldT>::type RefVec;
 	
-	MBatchDraw(WorldDraw &draw, int matId);
+	MBatchDraw(WorldDraw &draw, int matId, const void *uid);
 	virtual ~MBatchDraw() {}
+
+	virtual BBox TransformedBounds() const = 0;
 
 	RAD_DECLARE_PROPERTY(MBatchDraw, matId, int, int);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, maxLights, int);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, visible, bool);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, rgba, const Vec4&);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, scale, const Vec3&);
-	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, bounds, const BBox&);
 
 protected:
 
@@ -73,7 +74,6 @@ protected:
 	virtual RAD_DECLARE_GET(visible, bool) = 0;
 	virtual RAD_DECLARE_GET(rgba, const Vec4&) = 0;
 	virtual RAD_DECLARE_GET(scale, const Vec3&) = 0;
-	virtual RAD_DECLARE_GET(bounds, const BBox&) = 0;
 
 private:
 	
@@ -95,6 +95,7 @@ private:
 
 	details::MatRef *m_matRef;
 	details::LightInteraction *m_interactions;
+	const void *m_uid;
 	int m_matId;
 	int m_markFrame;
 	int m_visibleFrame;

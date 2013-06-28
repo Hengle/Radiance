@@ -55,8 +55,10 @@ enum {
 typedef zone_vector<Plane, ZWorldT>::type PlaneVec;
 typedef zone_vector<int, ZWorldT>::type IntVec;
 typedef zone_pool_set<Entity*, ZWorldT>::type EntityPtrSet;
+typedef zone_vector<Entity*, ZWorldT>::type EntityPtrVec;
 typedef zone_pool_set<Light*, ZWorldT>::type LightPtrSet;
 typedef zone_pool_set<MBatchOccupant*, ZWorldT>::type MBatchOccupantPtrSet;
+typedef zone_vector<MBatchOccupant*, ZWorldT>::type MBatchOccupantPtrVec;
 typedef zone_pool_set<int, ZWorldT>::type IntSet;
 typedef std::bitset<kMaxEnts> EntityBits;
 typedef std::bitset<kMaxAreas> AreaBits;

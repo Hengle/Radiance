@@ -17,7 +17,8 @@ GLRenderTarget::GLRenderTarget(
 	GLsizei height, 
 	GLsizei _depthFormat, 
 	GLsizei size,
-	int flags
+	int flags,
+	bool autoGenMips
 ) : depthFormat(_depthFormat), depthSize(0)
 {
 	id[0] = id[1] = 0;
@@ -68,7 +69,7 @@ GLRenderTarget::GLRenderTarget(
 	));
 
 	gls.SetTexture(0, tex, true);
-	GLTexture::SetFlags(tex, flags, 0, false);
+	GLTexture::SetFlags(tex, flags, 0, autoGenMips);
 	
 	RAD_ASSERT(tex->target==GL_TEXTURE_2D);
 

@@ -123,8 +123,7 @@ void GLState::Commit(S &s, bool f) {
 	}
 }
 
-void GLState::CommitSB(S &s, bool f)
-{
+void GLState::CommitSB(S &s, bool f) {
 	int ds  = s.d.s&~s.s.s; // not in s
 	if (f) 
 		s.d.s = ds; // clear everything set in source to force apply

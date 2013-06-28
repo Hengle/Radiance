@@ -56,11 +56,12 @@ void MBatch::AddDraw(MBatchDraw &draw) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-MBatchDraw::MBatchDraw(WorldDraw &draw, int matId) : 
+MBatchDraw::MBatchDraw(WorldDraw &draw, int matId, const void *uid) : 
 m_matId(matId), 
 m_markFrame(-1), 
 m_visibleFrame(-1), 
-m_interactions(0) {
+m_interactions(0),
+m_uid(uid) {
 	m_matRef = draw.AddMaterialRef(matId);
 }
 
@@ -70,7 +71,7 @@ Vec4 WorldDraw::MStaticWorldMeshBatch::s_rgba(Vec4(1, 1, 1, 1));
 Vec3 WorldDraw::MStaticWorldMeshBatch::s_scale(Vec3(1, 1, 1));
 
 WorldDraw::MStaticWorldMeshBatch::MStaticWorldMeshBatch(WorldDraw &draw, const r::Mesh::Ref &m, const BBox &bounds, int matId) :
-MBatchDraw(draw, matId), m_m(m), m_bounds(bounds) {
+MBatchDraw(draw, matId, 0), m_m(m), m_bounds(bounds) {
 }
 
 void WorldDraw::MStaticWorldMeshBatch::Bind(r::Shader *shader) {
@@ -141,8 +142,16 @@ WorldDraw::~WorldDraw() {
 
 int WorldDraw::LoadMaterials() {
 	
+	int r = LoadMaterial("Sys/ProjectedShadow_M", m_projected_M);
+	if (r != pkg::SR_Success)
+		return r;
+
+	r = LoadMaterial("Sys/Shadow_M", m_shadow_M);
+	if (r != pkg::SR_Success)
+		return r;
+
 #if defined(WORLD_DEBUG_DRAW)
-	int r = LoadDebugMaterials();
+	r = LoadDebugMaterials();
 	if (r != pkg::SR_Success)
 		return r;
 #endif
@@ -345,7 +354,7 @@ void WorldDraw::FindViewArea(ViewDef &view) {
 	view.area = leaf ? leaf->area : -1;
 }
 
-void WorldDraw::SetupFrustumPlanes(ViewDef &view) {
+void WorldDraw::SetupPerspectiveFrustumPlanes(ViewDef &view) {
 
 	// Things on back of frustum planes are outside the frustum
 	view.frustum.clear();
@@ -403,6 +412,65 @@ void WorldDraw::SetupFrustumPlanes(ViewDef &view) {
 
 		view.frustum.push_back(p);
 	}
+}
+
+void WorldDraw::SetupPerspectiveFrustumPlanes(
+	PlaneVec &planes,
+	const Camera &camera,
+	const Vec4 &viewplanes,
+	const Vec2 &zplanes
+) {
+	// Things on back of frustum planes are outside the frustum
+	planes.clear();
+
+	const Vec3 &fwd = camera.fwd;
+	const Vec3 &left = camera.left;
+	const Vec3 &up = camera.up;
+	
+	Plane p;
+
+	if (ViewDef::kNumFrustumPlanes > 4) {
+		Vec3 t = fwd * -zplanes[0];
+		p.Initialize(fwd, camera.pos.get() + t, Plane::Unit);
+		planes.push_back(p);
+	}
+
+	if (ViewDef::kNumFrustumPlanes > 5) {
+		Vec3 t = fwd * -zplanes[1];
+		p.Initialize(-fwd, camera.pos.get() + t, Plane::Unit);
+		planes.push_back(p);
+	}
+
+	Vec3 xmin = -left * viewplanes[0];
+	Vec3 xmax = -left * viewplanes[1];
+	Vec3 ymin = up * viewplanes[2];
+	Vec3 ymax = up * viewplanes[3];
+
+	Vec3 viewOrg = camera.pos.get() + fwd * -zplanes[0];
+	Vec3 topLeft = xmin + ymin + viewOrg;
+	Vec3 topRight = xmax + ymin + viewOrg;
+	Vec3 bottomLeft = xmin + ymax + viewOrg;
+	Vec3 bottomRight = xmax + ymax + viewOrg;
+
+	p.Initialize(camera.pos.get(), bottomLeft, topLeft);
+	planes.push_back(p);
+
+	p.Initialize(camera.pos.get(), topRight, bottomRight);
+	planes.push_back(p);
+
+	p.Initialize(camera.pos.get(), topLeft, topRight);
+	planes.push_back(p);
+
+	p.Initialize(camera.pos.get(), bottomRight, bottomLeft);
+	planes.push_back(p);
+}
+
+void WorldDraw::SetupPerspectiveFrustumPlanes(
+	ViewDef &view,
+	const Vec4 &viewplanes,
+	const Vec2 &zplanes
+) {
+	SetupPerspectiveFrustumPlanes(view.frustum, view.camera, viewplanes, zplanes);
 }
 
 void WorldDraw::SetupOrthoFrustumPlanes(
@@ -507,7 +575,8 @@ bool WorldDraw::CalcScissorBounds(
 }
 
 void WorldDraw::CalcViewplaneBounds(
-	const ViewDef &view,
+	const ViewDef *view,
+	const Mat4 &mv,
 	const BBox &bounds,
 	const Vec3 *radial,
 	Vec4 &viewplanes,
@@ -521,8 +590,6 @@ void WorldDraw::CalcViewplaneBounds(
 	zplanes[0] = -std::numeric_limits<float>::max();
 	zplanes[1] = std::numeric_limits<float>::max();
 
-	const Mat4 &mv = view.mv;
-	
 	for (int x = 0; x < 2; ++x) {
 		float fx = x ? bounds.Maxs()[0] : bounds.Mins()[0];
 
@@ -537,11 +604,11 @@ void WorldDraw::CalcViewplaneBounds(
 				Vec3 p = mv.Transform(Vec3(fx, fy, fz));
 				
 #if defined(WORLD_DEBUG_DRAW)
-				if (m_world->cvars->r_showunifiedlightbboxprojection.value) {
-					Vec3 a = -p[2] * view.camera.fwd.get();
-					Vec3 b = -p[0] * view.camera.left.get();
-					Vec3 c =  p[1] * view.camera.up.get();
-					m_dbgVars.projectedBoxPoints.push_back(view.camera.pos.get() + a+b+c);
+				if (view && m_world->cvars->r_showunifiedlightbboxprojection.value) {
+					Vec3 a = -p[2] * view->camera.fwd.get();
+					Vec3 b = -p[0] * view->camera.left.get();
+					Vec3 c =  p[1] * view->camera.up.get();
+					m_dbgVars.projectedBoxPoints.push_back(view->camera.pos.get() + a+b+c);
 				}
 #endif
 
@@ -560,11 +627,11 @@ void WorldDraw::CalcViewplaneBounds(
 		Vec3 p = mv.Transform(*radial);
 				
 #if defined(WORLD_DEBUG_DRAW)
-		if (m_world->cvars->r_showunifiedlightbboxprojection.value) {
-			Vec3 a = -p[2] * view.camera.fwd.get();
-			Vec3 b = -p[0] * view.camera.left.get();
-			Vec3 c =  p[1] * view.camera.up.get();
-			m_dbgVars.projectedBoxPoints.push_back(view.camera.pos.get() + a+b+c);
+		if (view && m_world->cvars->r_showunifiedlightbboxprojection.value) {
+			Vec3 a = -p[2] * view->camera.fwd.get();
+			Vec3 b = -p[0] * view->camera.left.get();
+			Vec3 c =  p[1] * view->camera.up.get();
+			m_dbgVars.projectedBoxPoints.push_back(view->camera.pos.get() + a+b+c);
 		}
 #endif
 
@@ -596,6 +663,33 @@ void WorldDraw::SetOrthoMatrix(
 		viewplanes[3],
 		-zplanes[0],
 		-zplanes[1]
+	);
+}
+
+Mat4 WorldDraw::MakePerspectiveMatrix(
+	const Vec4 &viewplanes,
+	const Vec2 &zplanes,
+	bool txAddressBias
+) {
+	Mat4 bias;
+
+	if (txAddressBias) {
+		bias = Mat4(
+			Vec4(0.5f, 0.0f, 0.0f, 0.0f),
+			Vec4(0.0f, 0.5f, 0.0f, 0.0f),
+			Vec4(0.0f, 0.0f, 0.5f, 0.0f),
+			Vec4(0.5f, 0.5f, 0.5f, 1.0f)
+		);
+	}
+
+	return m_rb->MakePerspectiveMatrix(
+		viewplanes[0],
+		viewplanes[1],
+		viewplanes[2],
+		viewplanes[3],
+		-zplanes[0],
+		-zplanes[1],
+		txAddressBias ? &bias : 0
 	);
 }
 
@@ -631,7 +725,7 @@ void WorldDraw::VisMarkAreas(ViewDef &view) {
 		VisMarkArea(view, volume.area, volume.volume, volume.bounds);
 	}
 
-	if (!view.light && view.sky) // add sky surfs
+	if (view.sky) // add sky surfs
 		VisMarkArea(view, kSkyArea, frustumVolume, frustumBounds);
 
 #if defined(WORLD_DEBUG_DRAW)
@@ -657,34 +751,32 @@ void WorldDraw::VisMarkArea(
 
 	++m_counters.drawnAreas;
 
-	if (!view.light) {
-		// mark lights
-		for (LightPtrSet::const_iterator it = area.lights.begin(); it != area.lights.end(); ++it) {
-			Light &light = **it;
+	// mark lights
+	for (LightPtrSet::const_iterator it = area.lights.begin(); it != area.lights.end(); ++it) {
+		Light &light = **it;
 
-			if (light.m_markFrame != m_markFrame) {
-				light.m_markFrame = m_markFrame;
-				++m_counters.testedLights;
-			}
+		if (light.m_markFrame != m_markFrame) {
+			light.m_markFrame = m_markFrame;
+			++m_counters.testedLights;
+		}
 
-			if (light.m_visFrame != m_markFrame) {
+		if (light.m_visFrame != m_markFrame) {
 			
-				BBox bounds(light.m_bounds);
-				bounds.Translate(light.m_pos);
+			BBox bounds(light.m_bounds);
+			bounds.Translate(light.m_pos);
 							
-				if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, bounds)) {
-					++m_counters.visLights;
-					light.m_visFrame = m_markFrame;
-					view.visLights.push_back(&light);
+			if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, bounds)) {
+				++m_counters.visLights;
+				light.m_visFrame = m_markFrame;
+				view.visLights.push_back(&light);
 #if defined(WORLD_DEBUG_DRAW)
-					if (m_world->cvars->r_showlightscissor.value) {
-						Vec4 scissorRect;
-						if (CalcScissorBounds(view, bounds, scissorRect)) {
-							m_dbgVars.lightScissors.push_back(scissorRect);
-						}
+				if (m_world->cvars->r_showlightscissor.value) {
+					Vec4 scissorRect;
+					if (CalcScissorBounds(view, bounds, scissorRect)) {
+						m_dbgVars.lightScissors.push_back(scissorRect);
 					}
-#endif
 				}
+#endif
 			}
 		}
 	}
@@ -706,9 +798,9 @@ void WorldDraw::VisMarkArea(
 		if (m->m_visibleFrame != m_markFrame) {
 #if defined(WORLD_DEBUG_DRAW)
 			if (m_world->cvars->r_showworldbboxes.value)
-				m_dbgVars.worldBBoxes.push_back(m->bounds);
+				m_dbgVars.worldBBoxes.push_back(m->TransformedBounds());
 #endif
-			if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, m->bounds)) {
+			if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, m->TransformedBounds())) {
 				m->m_visibleFrame = m_markFrame;
 				++m_counters.drawnWorldModels;
 				details::MBatchRef batch = AddViewBatch(view, m->m_matId);
@@ -719,85 +811,89 @@ void WorldDraw::VisMarkArea(
 	}
 
 	// add entities.
-	if (!view.light) {
-		for (EntityPtrSet::const_iterator it = area.entities.begin(); it != area.entities.end(); ++it) {
-			Entity *e = *it;
-			if (e->m_markFrame != m_markFrame) {
-				e->m_markFrame = m_markFrame;
-				++m_counters.drawnEntities;
+	for (EntityPtrSet::const_iterator it = area.entities.begin(); it != area.entities.end(); ++it) {
+		Entity *e = *it;
+
+		for (DrawModel::Map::const_iterator it = e->models->begin(); it != e->models->end(); ++it) {
+			const DrawModel::Ref &m = it->second;
+			if (!m->visible)
+				continue;
+
+			if (m->m_markFrame != m_markFrame) {
+				m->m_markFrame = m_markFrame;
+				++m_counters.testedEntityModels;
 			}
 
-			for (DrawModel::Map::const_iterator it = e->models->begin(); it != e->models->end(); ++it) {
-				const DrawModel::Ref &m = it->second;
-				if (!m->visible)
-					continue;
+			if (m->m_visibleFrame != m_markFrame) {
 
-				if (m->m_markFrame != m_markFrame) {
-					m->m_markFrame = m_markFrame;
-					++m_counters.testedEntityModels;
-				}
+				if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, m->TransformedBounds())) {
+					m->m_visibleFrame = m_markFrame;
+					++m_counters.drawnEntityModels;
 
-				if (m->m_visibleFrame != m_markFrame) {
-					BBox bounds(m->bounds);
-					bounds.Translate(e->ps->worldPos);
+					if (e->m_markFrame != m_markFrame) {
+						e->m_markFrame = m_markFrame;
+						++m_counters.drawnEntities;
+
 #if defined(WORLD_DEBUG_DRAW)
-					if (m_world->cvars->r_showentitybboxes.value)
-						m_dbgVars.entityBBoxes.push_back(bounds);
+						if (m_world->cvars->r_showentitybboxes.value) {
+							BBox bounds(e->ps->bbox);
+							bounds.Translate(e->ps->worldPos);
+							m_dbgVars.entityBBoxes.push_back(bounds);
+						}
 #endif
-					if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, bounds)) {
-						m->m_visibleFrame = m_markFrame;
-						++m_counters.drawnEntityModels;
-						for (MBatchDraw::RefVec::const_iterator it = m->m_batches.begin(); it != m->m_batches.end(); ++it) {
-							const MBatchDraw::Ref &draw = *it;
+					}			
+
+					for (MBatchDraw::RefVec::const_iterator it = m->m_batches.begin(); it != m->m_batches.end(); ++it) {
+						const MBatchDraw::Ref &draw = *it;
 						
-							if (draw->m_markFrame != m_markFrame) {
-								draw->m_markFrame = m_markFrame;
-								draw->m_visibleFrame = m_markFrame;
-								details::MBatchRef batch = AddViewBatch(view, draw->m_matId);
-								if (batch)
-									batch->AddDraw(*draw);
-							}
+						if (draw->m_markFrame != m_markFrame) {
+							draw->m_markFrame = m_markFrame;
+							draw->m_visibleFrame = m_markFrame;
+							details::MBatchRef batch = AddViewBatch(view, draw->m_matId);
+							if (batch)
+								batch->AddDraw(*draw);
 						}
 					}
 				}
 			}
 		}
+	}
 
-		// add batch occupants.
+	// add batch occupants.
 	
-		for (MBatchOccupantPtrSet::const_iterator it = area.occupants.begin(); it != area.occupants.end(); ++it) {
-			MBatchOccupant *o = *it;
-			if (!o->visible)
+	for (MBatchOccupantPtrSet::const_iterator it = area.occupants.begin(); it != area.occupants.end(); ++it) {
+		MBatchOccupant *o = *it;
+		if (!o->visible)
+			continue;
+
+		for (MBatchDraw::RefVec::const_iterator it = o->batches->begin(); it != o->batches->end(); ++it) {
+			const MBatchDraw::Ref &m = *it;
+			if (!m->visible)
 				continue;
 
-			if (o->m_markFrame != m_markFrame) {
-				o->m_markFrame = m_markFrame;
-				++m_counters.drawnActors;
-#if defined(WORLD_DEBUG_DRAW)
-				if (m_world->cvars->r_showactorbboxes.value)
-					m_dbgVars.actorBBoxes.push_back(o->bounds);
-#endif
+			if (m->m_markFrame != m_markFrame) {
+				m->m_markFrame = m_markFrame;
+				++m_counters.testedActorModels;
 			}
 
-			for (MBatchDraw::RefVec::const_iterator it = o->batches->begin(); it != o->batches->end(); ++it) {
-				const MBatchDraw::Ref &m = *it;
-				if (!m->visible)
-					continue;
+			if (m->m_visibleFrame != m_markFrame) {
+				
+				if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, m->TransformedBounds())) {
+					m->m_visibleFrame = m_markFrame;
+					++m_counters.drawnActorModels;
 
-				if (m->m_markFrame != m_markFrame) {
-					m->m_markFrame = m_markFrame;
-					++m_counters.testedActorModels;
-				}
-
-				if (m->m_visibleFrame != m_markFrame) {
-					const BBox &bounds = m->bounds;
-					if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, bounds)) {
-						m->m_visibleFrame = m_markFrame;
-						++m_counters.drawnActorModels;
-						details::MBatchRef batch = AddViewBatch(view, m->m_matId);
-						if (batch)
-							batch->AddDraw(*m);	
+					if (o->m_markFrame != m_markFrame) {
+						o->m_markFrame = m_markFrame;
+						++m_counters.drawnActors;
+			#if defined(WORLD_DEBUG_DRAW)
+						if (m_world->cvars->r_showactorbboxes.value)
+							m_dbgVars.actorBBoxes.push_back(o->bounds);
+			#endif
 					}
+
+					details::MBatchRef batch = AddViewBatch(view, m->m_matId);
+					if (batch)
+						batch->AddDraw(*m);	
 				}
 			}
 		}
@@ -832,7 +928,8 @@ void WorldDraw::DrawView() {
 #if defined(WORLD_DEBUG_DRAW)
 	bool debugUniMatrix = true;
 	if (m_world->cvars->r_lockvis.value) {
-		if (!(m_world->cvars->r_viewunifiedlightmatrix.value && DebugSetupUnifiedLightMatrixView(view))) {
+		if (!(m_world->cvars->r_viewunifiedlighttexturematrix.value && DebugSetupUnifiedLightTextureMatrixView(view)) &&
+			!(m_world->cvars->r_viewunifiedlightprojectionmatrix.value && DebugSetupUnifiedLightProjectionMatrixView(view))) {
 			if (!m_dbgVars.lockVis) {
 				m_dbgVars.lockVisCamera = *m_world->camera.get();
 				m_dbgVars.lockVis = true;
@@ -843,10 +940,11 @@ void WorldDraw::DrawView() {
 			view.mv = m_rb->GetModelViewMatrix();
 			view.camera = m_dbgVars.lockVisCamera;
 			FindViewArea(view);
-			SetupFrustumPlanes(view);
+			SetupPerspectiveFrustumPlanes(view);
 			debugUniMatrix = false;
 		}
-	} else if (!(m_world->cvars->r_viewunifiedlightmatrix.value && DebugSetupUnifiedLightMatrixView(view))) {
+	} else if (!(m_world->cvars->r_viewunifiedlighttexturematrix.value && DebugSetupUnifiedLightTextureMatrixView(view)) &&
+			!(m_world->cvars->r_viewunifiedlightprojectionmatrix.value && DebugSetupUnifiedLightProjectionMatrixView(view))) {
 		debugUniMatrix = false;
 		m_dbgVars.lockVis = false;
 #endif
@@ -856,7 +954,7 @@ void WorldDraw::DrawView() {
 		view.mvp = m_rb->GetModelViewProjectionMatrix();
 		view.mv = m_rb->GetModelViewMatrix();
 		FindViewArea(view);
-		SetupFrustumPlanes(view);
+		SetupPerspectiveFrustumPlanes(view);
 #if defined(WORLD_DEBUG_DRAW)
 	}
 #endif
@@ -865,7 +963,7 @@ void WorldDraw::DrawView() {
 	m_counters.area = view.area;
 	UpdateLightInteractions(view);
 	VisMarkShadowCasters(view);
-
+	
 #if defined(WORLD_DEBUG_DRAW)
 	if (m_dbgVars.lockVis || m_world->cvars->r_fly.value) { // restore world camera after vis has been calculated
 		view.camera = *m_world->camera.get();
@@ -975,6 +1073,9 @@ void WorldDraw::UpdateLightInteractions(ViewDef &view) {
 
 void WorldDraw::VisMarkShadowCasters(ViewDef &view) {
 
+	view.shadowEntities.reserve(64);
+	view.shadowOccupants.reserve(64);
+
 	for (LightVec::const_iterator it = view.visLights.begin(); it != view.visLights.end(); ++it) {
 		const Light &light = **it;
 
@@ -985,12 +1086,12 @@ void WorldDraw::VisMarkShadowCasters(ViewDef &view) {
 					if (i->entity && (i->entity->lightingFlags.get()&kLightingFlag_CastShadows)) {
 						if (i->entity->m_shadowFrame != m_markFrame) {
 							i->entity->m_shadowFrame = m_markFrame;
-							view.shadowEntities.insert(i->entity);
+							view.shadowEntities.push_back(i->entity);
 						}
 					} else if (i->occupant  && (i->occupant->lightingFlags.get()&kLightingFlag_CastShadows)) {
 						if (i->occupant->m_shadowFrame != m_markFrame) {
 							i->occupant->m_shadowFrame = m_markFrame;
-							view.shadowOccupants.insert(i->occupant);
+							view.shadowOccupants.push_back(i->occupant);
 						}
 					}
 				}
@@ -1043,13 +1144,7 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 			}
 		}
 
-		for (EntityPtrSet::const_iterator it = view.shadowEntities.begin(); it != view.shadowEntities.end(); ++it) {
-			DrawUnifiedEntityShadow(view, **it);
-		}
-
-		for (MBatchOccupantPtrSet::const_iterator it = view.shadowOccupants.begin(); it != view.shadowOccupants.end(); ++it) {
-			DrawUnifiedOccupantShadow(view, **it);
-		}
+		DrawViewUnifiedShadows(view);
 	}
 
 	// draw unlit translucent surfaces

@@ -95,6 +95,10 @@ private:
 
 		SkActorBatch(WorldDraw &draw, const Actor &actor, int idx, int matId);
 
+		virtual BBox TransformedBounds() const { 
+			return m_actor->bounds[1]; 
+		}
+
 		virtual void Bind(r::Shader *shader);
 		virtual void CompileArrayStates(r::Shader &shader);
 		virtual void FlushArrayStates(r::Shader *shader);
@@ -110,14 +114,6 @@ private:
 
 		virtual RAD_DECLARE_GET(scale, const Vec3&) { 
 			return s_scale; 
-		}
-
-		virtual RAD_DECLARE_GET(xform, bool) { 
-			return true; 
-		}
-
-		virtual RAD_DECLARE_GET(bounds, const BBox&) { 
-			return m_actor->bounds[1]; 
 		}
 
 	private:
@@ -135,6 +131,10 @@ private:
 
 		VtActorBatch(WorldDraw &draw, const Actor &actor, int idx, int matId);
 
+		virtual BBox TransformedBounds() const { 
+			return m_actor->bounds[1]; 
+		}
+
 		virtual void Bind(r::Shader *shader);
 		virtual void CompileArrayStates(r::Shader &shader);
 		virtual void FlushArrayStates(r::Shader *shader);
@@ -150,14 +150,6 @@ private:
 
 		virtual RAD_DECLARE_GET(scale, const Vec3&) { 
 			return s_scale; 
-		}
-
-		virtual RAD_DECLARE_GET(xform, bool) { 
-			return true; 
-		}
-
-		virtual RAD_DECLARE_GET(bounds, const BBox&) { 
-			return m_actor->bounds[1]; 
 		}
 
 	private:

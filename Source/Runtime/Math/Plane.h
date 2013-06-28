@@ -78,7 +78,7 @@ public:
 	Plane<T> &Initialize(const Vector3<T> &normal, T d);
 	Plane<T> &Initialize(const Vector3<T> &normal, const Vector3<T> &p);
 	Plane<T> &Initialize(const Vector3<T> &normal, const Vector3<T> &p, UnitHint u);
-	// expects a clock-wise wound triangle.
+	// expects a counter-clockwise wound triangle.
 	Plane<T> &Initialize(const Vector3<T> &p1, const Vector3<T> &p2, const Vector3<T> &p3);
 		
 	// Unary operations

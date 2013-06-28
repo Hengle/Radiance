@@ -73,6 +73,7 @@ public:
 		// TcGen
 		kTCGen_Vertex = 0,
 		kTCGen_EnvMap,
+		kTCGen_Projected,
 		kNumTCGens,
 		// TcMod
 		RAD_FLAG_BIT(kTCModFlag_Rotate, 0),

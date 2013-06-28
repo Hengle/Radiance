@@ -269,7 +269,7 @@ int GLSLShader::CalcNumShaderVaryings(
 		++numTexCoords;
 	}
 
-	numFloats += numTexCoords*2;
+	numFloats += numTexCoords*4;
 
 	int numLightVec = shader->MaterialSourceUsage(pass, tools::shader_utils::Shader::kMaterialSource_LightVec);
 	numFloats += numLightVec*3;
@@ -645,6 +645,9 @@ bool GLSLShader::MapInputs(Pass &p, const Material &material) {
 	p.u.eye = gl.GetUniformLocationARB(p.p->id, "U_eye");
 	p.u.eyePos[0] = p.u.eyePos[1] = p.u.eyePos[2] = kFloatMax;
 
+	p.u.tcPrj = gl.GetUniformLocationARB(p.p->id, "U_tcPrj");
+	p.u.tcPrjMat = Mat4::Identity;
+
 	p.u.lights.numLights = 0;
 
 	for (int i = 0; i < kMaxLights; ++i) {
@@ -875,6 +878,8 @@ inline int RemapIndex(int idx) {
 }
 
 void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMaterialColor) {
+	RAD_STATIC_ASSERT(sizeof(Mat4) == (sizeof(float)*16));
+
 	RAD_ASSERT(m_curMat);
 	Pass &p = m_passes[m_curPass];
 	
@@ -894,6 +899,13 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 		if (uniforms.eyePos != p.u.eyePos) {
 			p.u.eyePos = uniforms.eyePos;
 			gl.Uniform3fvARB(p.u.eye, 1, &uniforms.eyePos[0]);
+		}
+	}
+
+	if (p.u.tcPrj != -1) {
+		if (memcmp(&p.u.tcPrjMat, &uniforms.tcGen, sizeof(Mat4))) {
+			p.u.tcPrjMat = uniforms.tcGen;
+			gl.UniformMatrix4fvARB(p.u.tcPrj, 1, GL_FALSE, (const float*)&uniforms.tcGen);
 		}
 	}
 
