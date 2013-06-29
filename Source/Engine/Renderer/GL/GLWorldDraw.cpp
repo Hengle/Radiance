@@ -166,8 +166,8 @@ void GLWorldDraw::BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) {
 	int vpx, vpy, vpw, vph;
 	world->game->Viewport(vpx, vpy, vpw, vph);
 
-	vpw >>= 1;
-	vph >>= 1;
+	vpw = PowerOf2(vpw>>1)>>1;
+	vph = PowerOf2(vph>>1)>>1;
 
 	if (vpw != m_shadowRTSize[0] || vph != m_shadowRTSize[1]) {
 		m_shadowRTSize[0] = vpw;
@@ -193,7 +193,8 @@ void GLWorldDraw::BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) {
 		}
 	}
 
-	BindShadowRTFB(++m_shadowRTFB);
+	m_activeShadowRT = (m_activeShadowRT+1) & (kNumShadowTextures-1);
+	BindShadowRTFB(m_activeShadowRT);
 	shadowMaterial.BindStates(kScissorTest_Enable);
 }
 
@@ -209,7 +210,7 @@ void GLWorldDraw::UnbindUnifiedShadowRenderTarget() {
 void GLWorldDraw::BindUnifiedShadowTexture(
 	r::Material &projectedTexture
 ) {
-	BindShadowRTTX(m_shadowRTFB);
+	BindShadowRTTX(m_activeShadowRT);
 	projectedTexture.BindStates(0, kBlendModeSource_SrcAlpha|kBlendModeDest_InvSrcAlpha);
 }
 

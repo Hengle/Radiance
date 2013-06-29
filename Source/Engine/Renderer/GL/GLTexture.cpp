@@ -415,7 +415,7 @@ int UploadTexture(
 
 #if !defined(RAD_OPT_OGLES)
 	// sgis auto-gen mipmaps?
-	if (mipmap && !hasMips && gl.SGIS_generate_mipmap) {
+	if (mipmap && !hasMips && gl.SGIS_generate_mipmap && !gl.EXT_framebuffer_object) {
 		glTexParameteri(tex->target, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
 		CHECK_GL_ERRORS();
 	}
@@ -590,18 +590,11 @@ int UploadTexture(
 		}
 	}
 
-#if defined(RAD_OPT_OGLES)
-	if (mipmap && !hasMips) {
-		glGenerateMipmap(tex->target);
-		CHECK_GL_ERRORS();
-	}
-#else
 	// EXT_frame_buffer generate mips?
-	if (mipmap && !hasMips && gl.EXT_framebuffer_object && !gl.SGIS_generate_mipmap) {
+	if (mipmap && !hasMips && gl.EXT_framebuffer_object) {
 		gl.GenerateMipmapEXT(tex->target);
 		CHECK_GL_ERRORS();
 	}
-#endif
 
 	out = tex;
 	ZTextures.Get().Inc(tex->size, 0);

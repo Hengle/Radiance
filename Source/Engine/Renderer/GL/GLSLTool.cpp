@@ -272,8 +272,10 @@ bool GLSLTool::Assemble(
 			ss << "#define SHADER_LIGHT_SPECULAR_COLOR " << numLightSpecularColor << "\r\n";
 	}
 
-	if (GLES)
+	if (GLES) {
 		ss << "#define _GLES\r\n";
+		ss << "#define MOBILE\r\b";
+	}
 	
 	if (!Inject(engine, "@r:/Source/Shaders/Nodes/GLSL.c", ss))
 		return false;

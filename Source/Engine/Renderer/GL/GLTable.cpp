@@ -396,7 +396,7 @@ void GLTable::Load() {
 	colorOps = 0;
 	wireframe = false;
 	numTris = 0;
-
+		
 	color[0] = 1.f;
 	color[1] = 1.f;
 	color[2] = 1.f;
@@ -414,7 +414,7 @@ void GLTable::Load() {
 	ogles2 = true;
 #endif
 	maxTextures = 1;
-	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextures);
+	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextures);
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttribs);
 	
 	if (maxVaryings < 32)
@@ -523,7 +523,7 @@ void GLTable::Load() {
 
 	maxTextures = 1;
 	BEGIN(ARB_multitexture)
-		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextures);
+		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextures);
 		glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttribs);
 	END
 
@@ -570,8 +570,7 @@ void GLTable::Load() {
 		L(PFNGLGENVERTEXARRAYSAPPLEPROC, GenVertexArrays);
 	END
 	
-	if (!ARB_vertex_array_object)
-	{
+	if (!ARB_vertex_array_object) {
 		BEGIN_EXT(ARB_vertex_array_object, APPLE_vertex_array_object)
 			L(PFNGLBINDVERTEXARRAYAPPLEPROC, BindVertexArray);
 			L(PFNGLDELETEVERTEXARRAYSAPPLEPROC, DeleteVertexArrays);

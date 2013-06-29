@@ -49,6 +49,10 @@ void GLState::Init(S &s) {
 	gl.LoadIdentity();
 	gl.Color4f(0.f, 0.f, 0.f, 1.f);
 
+	if (gl.EXT_framebuffer_object) {
+		glHint(GL_GENERATE_MIPMAP_HINT, GL_FASTEST);
+	}
+	
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_SCISSOR_TEST);
 	glDepthFunc(GL_LESS);

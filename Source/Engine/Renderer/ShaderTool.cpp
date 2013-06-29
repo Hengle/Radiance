@@ -1598,14 +1598,14 @@ bool Shader::szMaterialInput(
 	case kMaterialSource_LightVec:
 		string::sprintf(
 			sz,
-			"normalize(IN(light%i_vec))",
+			"optional_normalize(IN(light%i_vec))",
 			index
 		);
 		return true;
 	case kMaterialSource_LightHalfVec:
 		string::sprintf(
 			sz,
-			"normalize(IN(light%i_halfvec))",
+			"optional_normalize(IN(light%i_halfvec))",
 			index
 		);
 		return true;
@@ -1622,7 +1622,7 @@ bool Shader::szMaterialInput(
 	case kMaterialSource_Normal:
 		string::sprintf(
 			sz,
-			"normalize(IN(nm%d))",
+			"optional_normalize(IN(nm%d))",
 			AttribUsageIndex(
 				pass,
 				source, 
@@ -1657,13 +1657,13 @@ bool Shader::szMaterialInput(
 		if (index < 3) {
 			string::sprintf(
 				sz,
-				"normalize(IN(light%d_tanvec))",
+				"optional_normalize(IN(light%d_tanvec))",
 				index
 			);
 		} else {
 			string::sprintf(
 				sz,
-				"normalize(IN(light_%d_tanvec))",
+				"optional_normalize(IN(light_%d_tanvec))",
 				index
 			);
 		}
@@ -1671,7 +1671,7 @@ bool Shader::szMaterialInput(
 	case kMaterialSource_LightTanHalfVec:
 		string::sprintf(
 			sz,
-			"normalize(IN(light%d_tanhalfvec))",
+			"optional_normalize(IN(light%d_tanhalfvec))",
 			index
 		);
 		return true;

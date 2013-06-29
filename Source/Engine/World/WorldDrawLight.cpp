@@ -127,7 +127,6 @@ void WorldDraw::DrawUnshadowedLitBatchLights(
 	
 	const int kMaxLights = std::min(mat.maxLights.get(), m_world->cvars->r_maxLightsPerPass.value.get());
 
-	bool didDiffuse = false;
 	bool didDiffuseSpecular = false;
 
 	for (;;) {
