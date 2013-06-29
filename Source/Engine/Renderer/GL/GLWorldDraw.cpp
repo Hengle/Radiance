@@ -228,10 +228,10 @@ void GLWorldDraw::BindShadowRTFB(int num) {
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	gls.Scissor(
-		2,
-		2,
-		m_shadowRTSize[0]-4,
-		m_shadowRTSize[1]-4
+		8,
+		8,
+		m_shadowRTSize[0]-16,
+		m_shadowRTSize[1]-16
 	);
 	CHECK_GL_ERRORS();
 	m_shadowRTFB = true;
