@@ -421,7 +421,7 @@ void GLTable::Load() {
 		maxVaryings = 32; // why does this return 0 on iOS?
 	
 	CHECK(IMG_texture_compression_pvrtc);
-	SGIS_generate_mipmap = true;
+	SGIS_generate_mipmap = false;
 	ARB_texture_non_power_of_two = false;
 	ActiveTextureARB = &glActiveTexture;
 	ARB_vertex_buffer_object = true;

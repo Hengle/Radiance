@@ -18,7 +18,7 @@ struct Image;
 
 namespace r {
 
-enum {
+enum { // flags are serialized by texture
 	RAD_FLAG(TX_WrapS),
 	RAD_FLAG(TX_WrapT),
 	RAD_FLAG(TX_WrapR),

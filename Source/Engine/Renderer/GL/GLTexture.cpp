@@ -283,7 +283,7 @@ void GLTexture::SetFlags(const Ref &tex, int flags, int numMips, bool generateMi
 
 #if !defined(RAD_OPT_OGLES)
 	// sgis auto-gen mipmaps?
-	if (mipmap && !numMips && gl.SGIS_generate_mipmap) {
+	if (mipmap && !numMips && gl.SGIS_generate_mipmap && !gl.EXT_framebuffer_object) {
 		glTexParameteri(tex->target, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
 		CHECK_GL_ERRORS();
 	}
@@ -294,17 +294,10 @@ void GLTexture::SetFlags(const Ref &tex, int flags, int numMips, bool generateMi
 	}
 #endif
 
-#if defined(RAD_OPT_OGLES)
-	if (mipmap && !numMips && generateMips) {
-		glGenerateMipmap(tex->target);
-		CHECK_GL_ERRORS();
-	}
-#else
 	// EXT_frame_buffer generate mips?
-	if (mipmap && !numMips && generateMips && gl.EXT_framebuffer_object && !gl.SGIS_generate_mipmap) {
+	if (mipmap && !numMips && generateMips && gl.EXT_framebuffer_object) {
 		GenerateMipmaps(tex);
 	}
-#endif
 }
 
 void GLTexture::GenerateMipmaps(const Ref &tex) {

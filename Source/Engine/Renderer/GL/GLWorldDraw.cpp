@@ -187,8 +187,8 @@ void GLWorldDraw::BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) {
 				GL_DEPTH_COMPONENT32_ARB,
 				m_rtSize[0]*m_rtSize[1]*8,
 	#endif
-				TX_FilterBilinear,
-				true
+				TX_Mipmap|TX_FilterTrilinear,
+				false
 			));
 		}
 	}
@@ -243,6 +243,8 @@ void GLWorldDraw::BindShadowRTTX(int num) {
 	}
 
 	UnbindUnifiedShadowRenderTarget();
+
+	GLTexture::GenerateMipmaps(m_unifiedShadowRTs[num]->tex);
 }
 
 void GLWorldDraw::BindDefaultFB(bool discardHint) {
