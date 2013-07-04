@@ -19,7 +19,6 @@ public:
 	virtual void Initialize(int version);
 
 	virtual void ClearBackBuffer();
-	virtual void ClearDepthBuffer();
 	virtual void CommitStates();
 	virtual void UnbindStates();
 

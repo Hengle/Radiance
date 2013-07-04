@@ -75,9 +75,7 @@ public:
 	virtual void EndFrame() = 0;
 	virtual int LoadMaterials() = 0;
 	virtual int Precache() = 0;
-	virtual void BindRenderTarget() = 0;
-    virtual void ClearBackBuffer() = 0;
-	virtual void ClearDepthBuffer() = 0;
+	virtual void ClearBackBuffer() = 0;
 	virtual void SetWorldStates() = 0;
 	
 	virtual Mat4 MakePerspectiveMatrix(
@@ -120,11 +118,14 @@ public:
 	) = 0;
 
 	// Unified Shadows
+	virtual void BindRenderTarget() = 0;
+
 	virtual void BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) = 0;
 	virtual void BindUnifiedShadowTexture(r::Material &projectedMaterial) = 0;
 	virtual void UnbindUnifiedShadowRenderTarget() = 0;
 	
 	// Post Process FX
+	virtual void ScalePostFXSource(float scaleX, float scaleY) = 0;
 	virtual void BindPostFXTargets(bool chain) = 0;
 	virtual void BindPostFXQuad() = 0;
 	virtual void DrawPostFXQuad() = 0;
@@ -241,8 +242,11 @@ public:
 		return m_postFX[idx];
 	}
 
+	int NumActivePostFX() const;
+
 	RAD_DECLARE_READONLY_PROPERTY(WorldDraw, rb, const RB_WorldDraw::Ref&);
 	RAD_DECLARE_PROPERTY(WorldDraw, uiOnly, bool, bool);
+	RAD_DECLARE_PROPERTY(WorldDraw, bloomEnabled, bool, bool);
 	
 #if defined(WORLD_DEBUG_DRAW)
 	void DebugAddEntityBBox(const BBox &bounds);

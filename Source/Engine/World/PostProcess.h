@@ -29,6 +29,7 @@ public:
 	virtual void BindStates();
 
 	RAD_DECLARE_PROPERTY(PostProcessEffect, enabled, bool, bool);
+	RAD_DECLARE_PROPERTY(PostProcessEffect, srcScale, const Vec2&, const Vec2&);
 	RAD_DECLARE_READONLY_PROPERTY(PostProcessEffect, color, const Vec4&);
 	RAD_DECLARE_READONLY_PROPERTY(PostProcessEffect, material, r::Material*);
 	RAD_DECLARE_READONLY_PROPERTY(PostProcessEffect, asset, const pkg::AssetRef&);
@@ -39,6 +40,8 @@ private:
 
 	RAD_DECLARE_GET(enabled, bool) { return m_enabled; }
 	RAD_DECLARE_SET(enabled, bool) { m_enabled = value; }
+	RAD_DECLARE_GET(srcScale, Vec2) { return m_srcScale; }
+	RAD_DECLARE_SET(srcScale, Vec2) { m_srcScale = value; }
 	RAD_DECLARE_GET(color, const Vec4&) { return m_color[0]; }
 	RAD_DECLARE_GET(material, r::Material*) { return m_parser->material; }
 	RAD_DECLARE_GET(asset, const pkg::AssetRef&) { return m_asset; }
@@ -46,10 +49,11 @@ private:
 	RAD_DECLARE_GET(loader, asset::MaterialLoader*) { return m_loader; }
 
 	pkg::AssetRef m_asset;
+	Vec4 m_color[3];
+	Vec2 m_srcScale;
 	asset::MaterialParser *m_parser;
 	asset::MaterialLoader *m_loader;
 	float m_time[2];
-	Vec4 m_color[3];
 	bool m_enabled;
 };
 

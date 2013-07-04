@@ -26,7 +26,6 @@ public:
 	virtual int Precache();
 	virtual void BindRenderTarget();
     virtual void ClearBackBuffer();
-	virtual void ClearDepthBuffer();
 	virtual void SetWorldStates();
 	
 	virtual Mat4 MakePerspectiveMatrix(
@@ -139,8 +138,7 @@ private:
 
 	enum {
 		kNumRTs = 2,
-		kNumBanks = 1,
-		kNumShadowTextures = 4
+		kNumShadowTextures = 2
 	};
 
 	void CalcBBoxScreenBounds(
@@ -151,22 +149,13 @@ private:
 	);
 
 	void CreateScreenOverlay();
-	void BindRTFB(int num, bool discardHint);
-	void BindRTTX(int num);
-	void BindShadowRTFB(int num);
-	void BindShadowRTTX(int num);
 	void BindDefaultFB(bool discardHint);
 
-	int m_bank;
-	int m_activeRT;
-	int m_rtSize[2];
-	int m_shadowRTSize[2];
-	int m_activeShadowRT;
-	bool m_rtFB;
-	bool m_shadowRTFB;
-	boost::array<boost::array<r::GLRenderTarget::Ref, kNumRTs>, kNumBanks> m_rts;
-	boost::array<r::GLRenderTarget::Ref, kNumShadowTextures> m_unifiedShadowRTs;
-	
+	GLRenderTargetMultiCache::Ref m_rtCache;
+	GLRenderTargetCache::Ref m_unifiedShadowRTCache;
+	GLRenderTarget::Ref m_activeRT;
+	GLRenderTarget::Ref m_shadowRT;
+		
 	struct OverlayVert {
 		float xy[2];
 		float st[2];

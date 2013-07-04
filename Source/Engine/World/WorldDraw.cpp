@@ -1262,14 +1262,7 @@ void WorldDraw::RemoveScreenOverlay(ScreenOverlay &overlay) {
 
 void WorldDraw::PostProcess() {
 	int num = 0;
-
-	for (PostProcessEffect::Map::const_iterator it = m_postFX.begin(); it != m_postFX.end(); ++it) {
-		const PostProcessEffect::Ref &fx = it->second;
-		if (!fx->enabled)
-			continue;
-		++num;
-	}
-
+	
 	for (PostProcessEffect::Map::const_iterator it = m_postFX.begin(); it != m_postFX.end(); ++it) {
 		const PostProcessEffect::Ref &fx = it->second;
 		if (!fx->enabled)
@@ -1286,6 +1279,18 @@ void WorldDraw::PostProcess() {
 		m_rb->DrawPostFXQuad();
 		m->shader->End();
 	}
+}
+
+int WorldDraw::NumActivePostFX() const {
+	int num = 0;
+
+	for (PostProcessEffect::Map::const_iterator it = m_postFX.begin(); it != m_postFX.end(); ++it) {
+		const PostProcessEffect::Ref &fx = it->second;
+		if (fx->enabled)
+			++num;
+	}
+
+	return num;
 }
 
 #if defined(WORLD_DEBUG_DRAW)

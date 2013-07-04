@@ -86,7 +86,6 @@ RAD_REFLECTED_INTERFACE_BEGIN(IRenderer, IInterface, r.IRenderer)
 	virtual void Initialize(int version = Version) = 0;
 
 	virtual void ClearBackBuffer() = 0;
-	virtual void ClearDepthBuffer() = 0;
 	virtual void CommitStates() = 0;
 	virtual void BindFramebuffer() = 0;
 	virtual void UnbindStates() = 0;

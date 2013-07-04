@@ -22,10 +22,6 @@ void GLRenderer::ClearBackBuffer() {
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 }
 
-void GLRenderer::ClearDepthBuffer() {
-	glClear(GL_DEPTH_BUFFER_BIT);
-}
-
 void GLRenderer::CommitStates() {
 	gls.Commit();
 }
