@@ -99,6 +99,19 @@ void GLWorldDraw::BindRenderTarget() {
 	m_activeRT->BindFramebuffer(GLRenderTarget::kDiscard_All);
 }
 
+void GLWorldDraw::BindPostFXTargets(bool chain) {
+	
+	m_activeRT->BindTexture();
+
+	if (chain) {
+		BindRenderTarget();
+	} else {
+		GLRenderTarget::DiscardFlags(GLRenderTarget::kDiscard_Depth); // don't need depth anymore.
+		BindDefaultFB(true);
+		m_activeRT.reset();
+	}
+}
+
 void GLWorldDraw::BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) {
 
 	if (!m_unifiedShadowRTCache) {
@@ -348,19 +361,6 @@ void GLWorldDraw::BindLitMaterialStates(
 }
 
 void GLWorldDraw::SetWorldStates() {
-}
-
-void GLWorldDraw::BindPostFXTargets(bool chain) {
-	
-	m_activeRT->BindTexture();
-
-	if (chain) {
-		BindRenderTarget();
-	} else {
-		GLRenderTarget::DiscardFlags(GLRenderTarget::kDiscard_Depth); // don't need depth anymore.
-		BindDefaultFB(true);
-		m_activeRT.reset();
-	}
 }
 
 void GLWorldDraw::CreateScreenOverlay() {
