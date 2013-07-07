@@ -311,6 +311,19 @@ m_depthMode(GLRenderTargetCache::kDepthInstanceMode_None) {
 
 }
 
+GLRenderTargetMultiCache::GLRenderTargetMultiCache(
+	int numRenderTargets,
+	GLenum format,
+	GLenum type,
+	GLenum depth,
+	GLRenderTargetCache::DepthInstanceMode depthMode,
+	int flags,
+	int colorBytesPP,
+	int depthBytesPP
+) {
+	SetFormats(numRenderTargets, format, type, depth, depthMode, flags, colorBytesPP, depthBytesPP);
+}
+
 void GLRenderTargetMultiCache::SetFormats(
 	int numRenderTargets,
 	GLenum format,

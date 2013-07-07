@@ -151,10 +151,10 @@ private:
 	void CreateScreenOverlay();
 	void BindDefaultFB(bool discardHint);
 
-	GLRenderTargetMultiCache::Ref m_rtCache;
-	GLRenderTargetCache::Ref m_unifiedShadowRTCache;
-	GLRenderTarget::Ref m_activeRT;
-	GLRenderTarget::Ref m_shadowRT;
+	r::GLRenderTargetMultiCache::Ref m_rtCache;
+	r::GLRenderTargetCache::Ref m_unifiedShadowRTCache;
+	r::GLRenderTarget::Ref m_activeRT;
+	r::GLRenderTarget::Ref m_shadowRT;
 		
 	struct OverlayVert {
 		float xy[2];

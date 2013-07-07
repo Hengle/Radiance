@@ -106,7 +106,7 @@ void GLWorldDraw::BindPostFXTargets(bool chain) {
 	if (chain) {
 		BindRenderTarget();
 	} else {
-		GLRenderTarget::DiscardFlags(GLRenderTarget::kDiscard_Depth); // don't need depth anymore.
+		GLRenderTarget::DiscardFramebuffer(GLRenderTarget::kDiscard_Depth); // don't need depth anymore.
 		BindDefaultFB(true);
 		m_activeRT.reset();
 	}
@@ -148,7 +148,7 @@ void GLWorldDraw::BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) {
 		GLRenderTarget::DiscardFramebuffer(GLRenderTarget::kDiscard_All);
 
 	m_shadowRT = m_unifiedShadowRTCache->NextRenderTarget();
-	m_shadowRT->BindframeBuffer(GLRenderTarget::kDiscard_All);
+	m_shadowRT->BindFramebuffer(GLRenderTarget::kDiscard_All);
 	shadowMaterial.BindStates(kScissorTest_Enable);
 }
 

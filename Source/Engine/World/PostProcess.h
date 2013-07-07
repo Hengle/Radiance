@@ -40,8 +40,8 @@ private:
 
 	RAD_DECLARE_GET(enabled, bool) { return m_enabled; }
 	RAD_DECLARE_SET(enabled, bool) { m_enabled = value; }
-	RAD_DECLARE_GET(srcScale, Vec2) { return m_srcScale; }
-	RAD_DECLARE_SET(srcScale, Vec2) { m_srcScale = value; }
+	RAD_DECLARE_GET(srcScale, const Vec2&) { return m_srcScale; }
+	RAD_DECLARE_SET(srcScale, const Vec2&) { m_srcScale = value; }
 	RAD_DECLARE_GET(color, const Vec4&) { return m_color[0]; }
 	RAD_DECLARE_GET(material, r::Material*) { return m_parser->material; }
 	RAD_DECLARE_GET(asset, const pkg::AssetRef&) { return m_asset; }

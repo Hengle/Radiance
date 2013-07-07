@@ -125,7 +125,6 @@ public:
 	virtual void UnbindUnifiedShadowRenderTarget() = 0;
 	
 	// Post Process FX
-	virtual void ScalePostFXSource(float scaleX, float scaleY) = 0;
 	virtual void BindPostFXTargets(bool chain) = 0;
 	virtual void BindPostFXQuad() = 0;
 	virtual void DrawPostFXQuad() = 0;

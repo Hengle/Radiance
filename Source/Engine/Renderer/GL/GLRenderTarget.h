@@ -222,6 +222,5 @@ private:
 } // r
 
 RAD_IMPLEMENT_FLAGS(r::GLRenderTarget::DiscardFlags);
-RAD_IMPLEMENT_FLAGS(r::GLRenderTarget::ClearFlags);
 
 #include <Runtime/PopPack.h>

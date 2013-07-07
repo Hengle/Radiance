@@ -11,10 +11,10 @@ namespace world {
 PostProcessEffect::PostProcessEffect() : 
 m_enabled(false), 
 m_parser(0), 
-m_loader(0),
-m_srcCopy(false) {
+m_loader(0) {
 	m_time[0] = m_time[1] = 0.f;
 	m_color[0] = m_color[1] = m_color[2] = Vec4(1, 1, 1, 1);
+	m_srcScale[0] = m_srcScale[1] = 1.f;
 }
 
 bool PostProcessEffect::BindMaterial(const pkg::AssetRef &asset) {
