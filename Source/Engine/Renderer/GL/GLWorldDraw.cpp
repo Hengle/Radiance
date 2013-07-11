@@ -149,6 +149,15 @@ void GLWorldDraw::BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) {
 
 	m_shadowRT = m_unifiedShadowRTCache->NextRenderTarget();
 	m_shadowRT->BindFramebuffer(GLRenderTarget::kDiscard_All);
+
+	gls.Scissor(
+		8,
+		8,
+		m_shadowRT->tex->size-16,
+		m_shadowRT->tex->size-16
+	);
+	CHECK_GL_ERRORS();
+
 	shadowMaterial.BindStates(kScissorTest_Enable);
 }
 
