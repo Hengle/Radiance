@@ -187,10 +187,12 @@ void Light::AnimateIntensity(const IntensityStep::Vec &vec, bool loop) {
 	m_intensityStep = 0;
 
 	m_intensitySteps.clear();
-	m_intensitySteps = vec;
-	m_intensitySteps[0].time = 0.0;
-	m_intensity = m_intensitySteps[0].intensity;
-
+	IntensityStep current;
+	current.intensity = m_intensity;
+	current.time = 0.0;
+	m_intensitySteps.push_back(current);
+	std::copy(vec.begin(), vec.end(), std::back_inserter(m_intensitySteps));
+	
 	double dt = 0.0;
 	for (size_t i = 1; i < m_intensitySteps.size(); ++i) {
 		m_intensitySteps[i].time += dt;
@@ -222,9 +224,11 @@ void Light::InitColorSteps(
 	index = 0;
 
 	vec.clear();
-	vec = srcVec;
-	vec[0].time = 0.0;
-	color = vec[0].color;
+	ColorStep current;
+	current.color = color;
+	current.time = 0.0;
+	vec.push_back(current);
+	std::copy(srcVec.begin(), srcVec.end(), std::back_inserter(vec));
 
 	double dt = 0.0;
 	for (size_t i = 1; i < vec.size(); ++i) {

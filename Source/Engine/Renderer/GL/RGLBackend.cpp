@@ -117,9 +117,6 @@ void RBackend::VidReset() {
 bool RBackend::CheckCaps() {
 	return gl.v1_2 && 
 		gl.ARB_vertex_buffer_object &&
-#if !defined(RAD_OPT_OSX)
-		gl.ARB_vertex_array_object && // OSX does not support this.
-#endif
 		gl.ARB_fragment_program &&
 		gl.ARB_vertex_program &&
 		gl.ARB_texture_compression &&
