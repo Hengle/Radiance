@@ -251,14 +251,14 @@ void WorldDraw::GenLightDef(
 
 void WorldDraw::DrawViewUnifiedShadows(const ViewDef &view) {
 
-	bool draw = false;
+	bool draw = false; // records state of last shadow draw
 
 	for (EntityPtrVec::const_iterator it = view.shadowEntities.begin(); it != view.shadowEntities.end(); ++it) {
 		draw = DrawUnifiedEntityShadow(view, **it);
 	}
-	/*for (MBatchOccupantPtrVec::const_iterator it = view.shadowOccupants.begin(); it != view.shadowOccupants.end(); ++it) {
-		DrawUnifiedOccupantShadow(view, **it);
-	}*/
+	for (MBatchOccupantPtrVec::const_iterator it = view.shadowOccupants.begin(); it != view.shadowOccupants.end(); ++it) {
+		draw = DrawUnifiedOccupantShadow(view, **it);
+	}
 
 	if (!draw && !(view.shadowEntities.empty() && view.shadowOccupants.empty())) {
 		m_rb->RotateForCamera(view.camera);
@@ -350,8 +350,10 @@ bool WorldDraw::DrawUnifiedOccupantShadow(const ViewDef &view, const MBatchOccup
 	Vec3 unifiedPos;
 	float unifiedRadius;
 
+	const BBox &bounds = o.bounds;
+
 	CalcUnifiedLightPosAndSize(
-		o.bounds,
+		bounds,
 		o.m_lightInteractions,
 		unifiedPos,
 		unifiedRadius
@@ -363,12 +365,63 @@ bool WorldDraw::DrawUnifiedOccupantShadow(const ViewDef &view, const MBatchOccup
 	}
 #endif
 
-	return DrawUnifiedShadowTexture(
+	Camera lightCam;
+	lightCam.pos = unifiedPos;
+	lightCam.fov = 0.f;
+	lightCam.farClip = 0.f;
+	lightCam.LookAt(bounds.Origin());
+
+	m_rb->RotateForCamera(lightCam);
+	const Mat4 mv = m_rb->GetModelViewMatrix();
+
+	Vec4 viewplanes;
+	Vec2 zplanes;
+	Vec3 radial(lightCam.pos.get() + (lightCam.fwd.get() * unifiedRadius));
+
+	CalcViewplaneBounds(0, mv, bounds, &radial, viewplanes, zplanes);
+
+	Mat4 prj = MakePerspectiveMatrix(viewplanes, zplanes, false);
+	m_rb->SetPerspectiveMatrix(prj);
+	
+	m_rb->BindUnifiedShadowRenderTarget(
+		*m_shadow_M.material
+	);
+
+	m_shadow_M.material->BindTextures(m_shadow_M.loader);
+	m_shadow_M.material->shader->Begin(r::Shader::kPass_Default, *m_shadow_M.material);
+
+	bool drawn = DrawUnifiedShadowTexture(
 		view,
 		*o.batches,
 		unifiedPos,
 		unifiedRadius
 	);
+
+	m_shadow_M.material->shader->End();
+
+	if (!drawn)
+		return false;
+
+	PlaneVec frustum;
+	SetupPerspectiveFrustumPlanes(
+		frustum,
+		lightCam,
+		viewplanes,
+		zplanes
+	);
+
+	DrawViewWithUnifiedShadow(
+		view,
+		unifiedPos,
+		unifiedRadius,
+		frustum,
+		mv,
+		viewplanes,
+		zplanes,
+		&o
+	);
+
+	return true;
 }
 
 bool WorldDraw::DrawUnifiedShadowTexture(
