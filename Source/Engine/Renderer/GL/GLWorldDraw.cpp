@@ -350,13 +350,6 @@ void GLWorldDraw::SetPerspectiveMatrix(
 	gl.MatrixMode(GL_PROJECTION);
 	gl.LoadIdentity();
 	gl.MultMatrix(m);
-
-	if (m_activeRT) { 
-		// render target tc's are flipped about Y, so correct for this in the perspective transform.
-		gl.Scalef(1.f, -1.f, 1.f);
-		gls.invertCullFace = true;
-	}
-
 	gl.MatrixMode(GL_MODELVIEW);
 }
 

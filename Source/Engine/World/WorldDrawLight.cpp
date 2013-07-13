@@ -302,7 +302,6 @@ bool WorldDraw::DrawUnifiedEntityShadow(const ViewDef &view, const Entity &e) {
 
 	CalcViewplaneBounds(0, mv, bounds, &radial, viewplanes, zplanes);
 
-	//SetOrthoMatrix(viewplanes, zplanes);
 	Mat4 prj = MakePerspectiveMatrix(viewplanes, zplanes, false);
 	m_rb->SetPerspectiveMatrix(prj);
 	
