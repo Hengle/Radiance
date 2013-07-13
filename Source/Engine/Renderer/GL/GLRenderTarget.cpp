@@ -106,10 +106,14 @@ GLRenderTarget::~GLRenderTarget() {
 	}
 }
 
-void GLRenderTarget::BindTexture() {
-	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
-		if (!gls.MaterialTextureSource(kMaterialTextureSource_Texture, i))
-			gls.SetMTSource(kMaterialTextureSource_Texture, i, tex);
+void GLRenderTarget::BindTexture(int index) {
+	if (index == -1) {
+		for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
+			if (!gls.MaterialTextureSource(kMaterialTextureSource_Texture, i))
+				gls.SetMTSource(kMaterialTextureSource_Texture, i, tex);
+		}
+	} else {
+		gls.SetMTSource(kMaterialTextureSource_Texture, index, tex);
 	}
 }
 

@@ -125,7 +125,7 @@ public:
 	virtual void UnbindUnifiedShadowRenderTarget() = 0;
 	
 	// Post Process FX
-	virtual void BindPostFXTargets(bool chain) = 0;
+	virtual Vec2 BindPostFXTargets(bool chain, const r::Material &mat, const Vec2 &srcScale, const Vec2 &dstScale) = 0;
 	virtual void BindPostFXQuad() = 0;
 	virtual void DrawPostFXQuad() = 0;
 
@@ -140,6 +140,8 @@ public:
 
 	virtual Mat4 GetModelViewMatrix() = 0;
 	virtual Mat4 GetModelViewProjectionMatrix() = 0;
+
+	static int LoadMaterial(const char *name, asset::MaterialBundle &mat);
 
 #if defined(WORLD_DEBUG_DRAW)
 	RAD_DECLARE_PROPERTY(RB_WorldDraw, wireframe, bool, bool);
@@ -257,12 +259,6 @@ private:
 	friend class MBatchDraw;
 	friend struct details::MBatch;
 	
-	struct LocalMaterial {
-		pkg::Asset::Ref asset;
-		asset::MaterialLoader *loader;
-		r::Material *mat;
-	};
-
 	class MStaticWorldMeshBatch : public MBatchDraw {
 	public:
 		typedef boost::shared_ptr<MStaticWorldMeshBatch> Ref;
@@ -434,8 +430,6 @@ private:
 	);
 
 	void UnlinkOccupant(MBatchOccupant &occupant);
-	
-	int LoadMaterial(const char *name, LocalMaterial &mat);
 
 	/*
 	==============================================================================
@@ -582,8 +576,8 @@ private:
 	MemoryPool m_interactionPool;
 	
 	Counters m_counters;
-	LocalMaterial m_projected_M;
-	LocalMaterial m_shadow_M;
+	asset::MaterialBundle m_projected_M;
+	asset::MaterialBundle m_shadow_M;
 	PostProcessEffect::Map m_postFX;
 	MStaticWorldMeshBatch::RefVec m_worldModels;
 	ScreenOverlay::List m_overlays;
@@ -616,15 +610,15 @@ private:
 		Mat4 unifiedLightMatrix;
 		StackWindingStackVec frustum;
 		ClippedAreaVolumeStackVec frustumAreas;
-		LocalMaterial wireframe_M;
-		boost::array<LocalMaterial, 2> portal_M;
-		LocalMaterial worldBBox_M;
-		LocalMaterial entityBBox_M;
-		LocalMaterial actorBBox_M;
-		LocalMaterial waypoint_M;
-		LocalMaterial lightSphere_M;
-		LocalMaterial sphere_M;
-		boost::array<LocalMaterial, 6> lightPasses_M;
+		asset::MaterialBundle wireframe_M;
+		boost::array<asset::MaterialBundle, 2> portal_M;
+		asset::MaterialBundle worldBBox_M;
+		asset::MaterialBundle entityBBox_M;
+		asset::MaterialBundle actorBBox_M;
+		asset::MaterialBundle waypoint_M;
+		asset::MaterialBundle lightSphere_M;
+		asset::MaterialBundle sphere_M;
+		boost::array<asset::MaterialBundle, 6> lightPasses_M;
 		r::Mesh::Ref lightMesh;
 		Camera lockVisCamera;
 		bool lockVis;
@@ -634,15 +628,15 @@ private:
 	void DebugDrawPortals(ViewDef &view);
 	void DebugDrawAreaportals(int area);
 	void DebugDrawLightScissors();
-	void DebugDrawRects(const LocalMaterial &material, const Vec4Vec &rects);
-	void DebugDrawRect(const LocalMaterial &material, const Vec4 &rect);
-	void DebugDrawRectBatch(const LocalMaterial &material, const Vec4 &rect);
-	void DebugDrawBBoxes(const LocalMaterial &material, const BBoxVec &bboxes, bool wireframe);
-	void DebugDrawBBox(const LocalMaterial &material, const BBox &bbox, bool wireframe);
-	void DebugDrawBBoxBatch(const LocalMaterial &material, const BBox &bbox, bool wireframe);
+	void DebugDrawRects(const asset::MaterialBundle &material, const Vec4Vec &rects);
+	void DebugDrawRect(const asset::MaterialBundle &material, const Vec4 &rect);
+	void DebugDrawRectBatch(const asset::MaterialBundle &material, const Vec4 &rect);
+	void DebugDrawBBoxes(const asset::MaterialBundle &material, const BBoxVec &bboxes, bool wireframe);
+	void DebugDrawBBox(const asset::MaterialBundle &material, const BBox &bbox, bool wireframe);
+	void DebugDrawBBoxBatch(const asset::MaterialBundle &material, const BBox &bbox, bool wireframe);
 	void DebugDrawActiveWaypoints();
 	void DebugDrawFloorMoves();
-	void DebugDrawFloorMoveBatch(const LocalMaterial &material, const FloorMove &move);
+	void DebugDrawFloorMoveBatch(const asset::MaterialBundle &material, const FloorMove &move);
 	void DebugDrawLightPasses(ViewDef &view);
 	void DebugDrawLightPass(const details::MBatch &batch);
 	void DebugDrawLightCounts(ViewDef &view);

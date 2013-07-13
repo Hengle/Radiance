@@ -367,6 +367,10 @@ int Shader::lua_MSpecularExponent(lua_State *L) {
 	return lua_MSource(L, kMaterialSource_SpecularExponent);
 }
 
+int Shader::lua_MPFXVars(lua_State *L) {
+	return lua_MSource(L, kMaterialSource_PFXVars);
+}
+
 int Shader::lua_MSource(lua_State *L, MaterialSource source) {
 	if (lua_type(L, -1) != LUA_TNUMBER) {
 		luaL_error(L, "Invalid arguments for MSource(int), (Function %s, File %s, Line %d).",
@@ -425,6 +429,7 @@ lua::State::Ref Shader::InitLuaM(Engine &e, Shader *m) {
 		{ "MLightTanHalfVec", lua_MLightTanHalfVec },
 		{ "MVertexColor", lua_MVertexColor },
 		{ "MSpecularExponent", lua_MSpecularExponent },
+		{ "MPFXVars", lua_MPFXVars },
 		{ 0, 0 }
 	};
 
@@ -1688,6 +1693,9 @@ bool Shader::szMaterialInput(
 		return true;
 	case kMaterialSource_VertexColor:
 		strcpy(sz, "IN(vertexColor)");
+		return true;
+	case kMaterialSource_PFXVars:
+		strcpy(sz, "IN(pfxShift)");
 		return true;
 	default:
 		break;

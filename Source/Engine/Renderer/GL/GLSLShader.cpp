@@ -648,6 +648,9 @@ bool GLSLShader::MapInputs(Pass &p, const Material &material) {
 	p.u.tcPrj = gl.GetUniformLocationARB(p.p->id, "U_tcPrj");
 	p.u.tcPrjMat = Mat4::Identity;
 
+	p.u.pfx = gl.GetUniformLocationARB(p.p->id, "U_pfxVars");
+	p.u.pfxVars = Vec2(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+
 	p.u.lights.numLights = 0;
 
 	for (int i = 0; i < kMaxLights; ++i) {
@@ -906,6 +909,13 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 		if (memcmp(&p.u.tcPrjMat, &uniforms.tcGen, sizeof(Mat4))) {
 			p.u.tcPrjMat = uniforms.tcGen;
 			gl.UniformMatrix4fvARB(p.u.tcPrj, 1, GL_FALSE, (const float*)&uniforms.tcGen);
+		}
+	}
+
+	if (p.u.pfx != -1) {
+		if (p.u.pfxVars != uniforms.pfxVars) {
+			p.u.pfxVars = uniforms.pfxVars;
+			gl.Uniform2fvARB(p.u.pfx, 2, &uniforms.pfxVars[0]);
 		}
 	}
 

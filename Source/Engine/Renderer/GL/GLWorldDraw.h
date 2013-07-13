@@ -77,7 +77,13 @@ public:
 
 	virtual void UnbindUnifiedShadowRenderTarget();
 	
-	virtual void BindPostFXTargets(bool chain);
+	virtual Vec2 BindPostFXTargets(
+		bool chain, 
+		const r::Material &mat,
+		const Vec2 &srcScale,
+		const Vec2 &dstScale
+	);
+
 	virtual void BindPostFXQuad();
 	virtual void DrawPostFXQuad();
 
@@ -150,12 +156,18 @@ private:
 
 	void CreateScreenOverlay();
 	void BindDefaultFB(bool discardHint);
-
+	
+	void Copy(
+		const r::GLRenderTarget::Ref &src,
+		const r::GLRenderTarget::Ref &dst
+	);
+	
 	r::GLRenderTargetMultiCache::Ref m_rtCache;
 	r::GLRenderTargetCache::Ref m_unifiedShadowRTCache;
 	r::GLRenderTarget::Ref m_activeRT;
 	r::GLRenderTarget::Ref m_shadowRT;
-		
+	r::GLRenderTarget::Ref m_framebufferRT;
+			
 	struct OverlayVert {
 		float xy[2];
 		float st[2];
@@ -169,9 +181,14 @@ private:
 		bool invY
 	);
 
-	int m_overlaySize[2];
+	void CreateRect(r::GLVertexBuffer::Ref &vb, r::GLVertexBuffer::Ref &ib);
+
+	asset::MaterialBundle m_copy_M;
 	r::GLVertexBuffer::Ref m_overlayVB[2];
 	r::GLVertexBuffer::Ref m_overlayIB[2];
+	r::GLVertexBuffer::Ref m_rectVB;
+	r::GLVertexBuffer::Ref m_rectIB;
+	int m_overlaySize[2];
 
 #if defined(WORLD_DEBUG_DRAW)
 	enum {

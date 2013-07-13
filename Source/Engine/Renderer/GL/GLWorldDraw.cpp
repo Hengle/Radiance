@@ -50,22 +50,16 @@ void GLWorldDraw::EndFrame() {
 
 void GLWorldDraw::ClearBackBuffer() {
 	gls.Set(kDepthWriteMask_Enable|kScissorTest_Disable, -1, true); // for glClear()
-
-#if defined(RAD_OPT_IOS)
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-#else
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-#endif
 }
 
 int GLWorldDraw::LoadMaterials() {
-	return pkg::SR_Success;
+	int r = LoadMaterial("Sys/Copy_M", m_copy_M);
+	return r;
 }
 
 int GLWorldDraw::Precache() {
 	CreateScreenOverlay();
-	BindRenderTarget();
-	BindPostFXTargets(false);
 	return pkg::SR_Success;
 }
 
@@ -73,6 +67,34 @@ void GLWorldDraw::BindRenderTarget() {
 	int vpx, vpy, vpw, vph;
 	world->game->Viewport(vpx, vpy, vpw, vph);
 
+	if (!m_framebufferRT) {
+#if defined(RAD_OPT_OGLES)
+		const GLenum depth = GL_DEPTH_COMPONENT24_ARB;
+		const int depthBytesPP = 3;
+#else
+		const GLenum depth = GL_DEPTH_COMPONENT32_ARB;
+		const int depthBytesPP = 4;
+#endif
+
+		m_framebufferRT.reset(new (ZRender) GLRenderTarget(
+			GL_TEXTURE_2D,
+			GL_RGBA,
+			GL_UNSIGNED_BYTE,
+			vpw,
+			vph,
+			depth,
+			(depthBytesPP+4)*vpw*vph,
+			TX_FilterBilinear,
+			false
+		));
+	}
+
+	m_activeRT = m_framebufferRT;
+	m_activeRT->BindFramebuffer(GLRenderTarget::kDiscard_All);
+}
+
+Vec2 GLWorldDraw::BindPostFXTargets(bool chain, const r::Material &mat, const Vec2 &srcScale, const Vec2 &dstScale) {
+	
 	if (!m_rtCache) {
 #if defined(RAD_OPT_OGLES)
 		const GLenum depth = GL_DEPTH_COMPONENT24_ARB;
@@ -89,27 +111,110 @@ void GLWorldDraw::BindRenderTarget() {
 			GL_UNSIGNED_BYTE,
 			depth,
 			GLRenderTargetCache::kDepthInstanceMode_Shared,
-			0,
+			TX_FilterBilinear,
 			4,
 			depthBytesPP
 		));
 	}
 
-	m_activeRT = m_rtCache->NextRenderTarget(vpw, vph);
-	m_activeRT->BindFramebuffer(GLRenderTarget::kDiscard_All);
-}
+	int vpx, vpy, vpw, vph;
+	world->game->Viewport(vpx, vpy, vpw, vph);
 
-void GLWorldDraw::BindPostFXTargets(bool chain) {
+	int srcW = vpw * srcScale[0];
+	int srcH = vph * srcScale[1];
 	
-	m_activeRT->BindTexture();
+	GLRenderTarget::Ref curRT(m_activeRT);
+				
+	if ((curRT->tex->width != srcW) || (curRT->tex->height != srcH)) {
+		m_activeRT = m_rtCache->NextRenderTarget(srcW, srcH);
+		Copy(curRT, m_activeRT);
+		curRT = m_activeRT;
+	}
+		
+	curRT->BindTexture(0);
+	m_framebufferRT->BindTexture(1);
 
 	if (chain) {
-		BindRenderTarget();
+		// select output size
+		int dstW = vpw * dstScale[0];
+		int dstH = vph * dstScale[1];
+
+		m_activeRT = m_rtCache->NextRenderTarget(dstW, dstH);
+		m_activeRT->BindFramebuffer(GLRenderTarget::kDiscard_All);
 	} else {
 		GLRenderTarget::DiscardFramebuffer(GLRenderTarget::kDiscard_Depth); // don't need depth anymore.
 		BindDefaultFB(true);
 		m_activeRT.reset();
 	}
+
+	return Vec2(1.f/srcW, 1.f/srcH);
+}
+
+void GLWorldDraw::Copy(
+	const r::GLRenderTarget::Ref &src,
+	const r::GLRenderTarget::Ref &dst
+) {
+	ReleaseArrayStates();
+
+	m_copy_M.material->BindTextures(m_copy_M.loader);
+	src->BindTexture(0);
+	dst->BindFramebuffer(GLRenderTarget::kDiscard_All);
+
+	m_copy_M.material->shader->Begin(r::Shader::kPass_Default, *m_copy_M.material);
+
+	gl.MatrixMode(GL_PROJECTION);
+	gl.PushMatrix();
+	gl.LoadIdentity();
+
+	gl.Ortho(0.0, 1.0, 1.0, 0.0, -1.0, 1.0);
+
+	gls.invertCullFace = false;
+
+	gl.MatrixMode(GL_MODELVIEW);
+	gl.PushMatrix();
+	gl.LoadIdentity();
+
+	gls.DisableAllMGSources();
+	gls.SetMGSource(
+		kMaterialGeometrySource_Vertices,
+		0,
+		m_rectVB,
+		2,
+		GL_FLOAT,
+		GL_FALSE,
+		sizeof(OverlayVert),
+		0
+	);
+
+	gls.SetMGSource(
+		kMaterialGeometrySource_TexCoords,
+		0,
+		m_rectVB,
+		2,
+		GL_FLOAT,
+		GL_FALSE,
+		sizeof(OverlayVert),
+		sizeof(float)*2
+	);
+
+	gls.BindBuffer(
+		GL_ELEMENT_ARRAY_BUFFER_ARB,
+		m_rectIB
+	);
+
+	m_copy_M.material->BindStates();
+	m_copy_M.material->shader->BindStates();
+	gls.Commit();
+
+	gl.DrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+	CHECK_GL_ERRORS();
+	m_copy_M.material->shader->End();
+
+	gl.MatrixMode(GL_PROJECTION);
+	gl.PopMatrix();
+
+	gl.MatrixMode(GL_MODELVIEW);
+	gl.PopMatrix();
 }
 
 void GLWorldDraw::BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) {
@@ -178,7 +283,7 @@ void GLWorldDraw::BindUnifiedShadowTexture(
 	r::Material &projectedTexture
 ) {
 	GLRenderTarget::DiscardFramebuffer(GLRenderTarget::kDiscard_Depth);
-	m_shadowRT->BindTexture();
+	m_shadowRT->BindTexture(0);
 	GLTexture::GenerateMipmaps(m_shadowRT->tex);
 	m_shadowRT.reset();
 
@@ -195,10 +300,10 @@ void GLWorldDraw::BindDefaultFB(bool discardHint) {
 	int vpx, vpy, vpw, vph;
 	world->game->Viewport(vpx, vpy, vpw, vph);
 	App::Get()->engine->sys->r->BindFramebuffer();
-#if defined(RAD_OPT_OGLES)
+//#if defined(RAD_OPT_OGLES)
 	if (discardHint)
 		ClearBackBuffer(); // discard hint
-#endif
+//#endif
 	glViewport(0, 0, vpw, vph);
 }
 
@@ -384,6 +489,8 @@ void GLWorldDraw::CreateScreenOverlay() {
 		m_overlaySize[0] = vpw;
 		m_overlaySize[1] = vph;
 	}
+
+	CreateRect(m_rectVB, m_rectIB);
 }
 
 void GLWorldDraw::BindPostFXQuad() {
@@ -539,6 +646,68 @@ void GLWorldDraw::CreateOverlay(
 			idx[5] = (U16)(y*OverlayDiv+x+1);
 		}
 	}
+
+	vb.reset(); // unmap
+}
+
+void GLWorldDraw::CreateRect(r::GLVertexBuffer::Ref &_vb, r::GLVertexBuffer::Ref &_ib) {
+	_vb.reset(
+		new GLVertexBuffer(
+			GL_ARRAY_BUFFER_ARB, 
+			GL_STATIC_DRAW_ARB, 
+			sizeof(OverlayVert)*4
+		)
+	);
+
+	RAD_ASSERT(_vb);
+
+	GLVertexBuffer::Ptr::Ref vb = _vb->Map();
+	RAD_ASSERT(vb);
+	OverlayVert *verts = (OverlayVert*)vb->ptr.get();
+
+	// note flipped TC's
+	verts[0].st[0] = 0.f;
+	verts[0].st[1] = 1.f;
+	verts[0].xy[0] = 0.f;
+	verts[0].xy[1] = 0.f;
+	
+	verts[1].st[0] = 1.f;
+	verts[1].st[1] = 1.f;
+	verts[1].xy[0] = 1.f;
+	verts[1].xy[1] = 0.f;
+
+	verts[2].st[0] = 1.f;
+	verts[2].st[1] = 0.f;
+	verts[2].xy[0] = 1.f;
+	verts[2].xy[1] = 1.f;
+
+	verts[3].st[0] = 0.f;
+	verts[3].st[1] = 0.f;
+	verts[3].xy[0] = 0.f;
+	verts[3].xy[1] = 1.f;
+
+	vb.reset(); // unmap
+
+	// setup triangle indices
+
+	_ib.reset(
+		new GLVertexBuffer(
+			GL_ELEMENT_ARRAY_BUFFER_ARB,
+			GL_STATIC_DRAW_ARB,
+			sizeof(U16)*6
+		)
+	);
+
+	vb = _ib->Map();
+	RAD_ASSERT(vb);
+	U16 *indices = (U16*)vb->ptr.get();
+
+	indices[0] = 0;
+	indices[1] = 3;
+	indices[2] = 1;
+	indices[3] = 1;
+	indices[4] = 3;
+	indices[5] = 2;
 
 	vb.reset(); // unmap
 }

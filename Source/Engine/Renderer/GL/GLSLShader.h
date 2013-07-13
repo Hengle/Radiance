@@ -118,13 +118,16 @@ private:
 		GLint scolor;
 		Vec4 srgba;
 		LightEnv lights;
+		Vec3 eyePos;
+		Mat4 tcPrjMat;
+		Vec2 pfxVars;
 		GLint lightPos[kMaxLights];
 		GLint lightDiffuse[kMaxLights];
 		GLint lightSpecular[kMaxLights];
 		GLint eye;
 		GLint tcPrj;
-		Vec3 eyePos;
-		Mat4 tcPrjMat;
+		GLint pfx;
+		
 #if defined(RAD_OPT_OGLES2)
 		GLint mvp;
 		float mvpfloats[16];

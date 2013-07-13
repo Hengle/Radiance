@@ -84,6 +84,7 @@ public:
 		kMaterialSource_TexCoord,
 		kMaterialSource_VertexColor,
 		kMaterialSource_SpriteSkin,
+		kMaterialSource_PFXVars, // postfx kernel vars
 		kNumMaterialSources
 	};
 
@@ -334,6 +335,7 @@ private:
 	static int lua_MLightTanVec(lua_State *L);
 	static int lua_MLightTanHalfVec(lua_State *L);
 	static int lua_MVertexColor(lua_State *L);
+	static int lua_MPFXVars(lua_State *L);
 	static int lua_MSource(lua_State *L, MaterialSource source);
 	static int lua_gcNode(lua_State *L);
 	static void ParseConnection(lua_State *L, Node *node, const lua::Variant::Map &map, Connection &c);

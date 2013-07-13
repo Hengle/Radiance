@@ -52,7 +52,41 @@ void MBatch::AddDraw(MBatchDraw &draw) {
 		head = link;
 }
 
+int LoadMaterial(const char *name, asset::MaterialBundle &mat) {
+	mat.asset = App::Get()->engine->sys->packages->Resolve(name, pkg::Z_Engine);
+	if (!mat.asset || mat.asset->type != asset::AT_Material) {
+		COut(C_Error) << "Error: Unable to load '" << name << "'." << std::endl;
+		return pkg::SR_FileNotFound;
+	}
+	
+	int r = mat.asset->Process(
+		xtime::TimeSlice::Infinite,
+		pkg::P_Load | pkg::P_FastPath
+	);
+
+	if (r != pkg::SR_Success) {
+		COut(C_Error) << "Error: Unable to load '" << name << "'." << std::endl;
+		return (r != pkg::SR_Pending) ? r : pkg::SR_MetaError;
+	}
+
+	asset::MaterialParser *parser = asset::MaterialParser::Cast(mat.asset);
+	if (!parser || !parser->valid) {
+		COut(C_Error) << "Error: Unable to load '" << name << "'." << std::endl;
+		return pkg::SR_MetaError;
+	}
+
+	mat.material = parser->material;
+	mat.loader = asset::MaterialLoader::Cast(mat.asset);
+	return pkg::SR_Success;
+}
+
 } // details
+
+///////////////////////////////////////////////////////////////////////////////
+
+int RB_WorldDraw::LoadMaterial(const char *name, asset::MaterialBundle &mat) {
+	return details::LoadMaterial(name, mat);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -142,11 +176,11 @@ WorldDraw::~WorldDraw() {
 
 int WorldDraw::LoadMaterials() {
 	
-	int r = LoadMaterial("Sys/ProjectedShadow_M", m_projected_M);
+	int r = details::LoadMaterial("Sys/ProjectedShadow_M", m_projected_M);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/Shadow_M", m_shadow_M);
+	r = details::LoadMaterial("Sys/Shadow_M", m_shadow_M);
 	if (r != pkg::SR_Success)
 		return r;
 
@@ -157,34 +191,6 @@ int WorldDraw::LoadMaterials() {
 #endif
 
 	return m_rb->LoadMaterials();
-}
-
-int WorldDraw::LoadMaterial(const char *name, LocalMaterial &mat) {
-	mat.asset = App::Get()->engine->sys->packages->Resolve(name, pkg::Z_Engine);
-	if (!mat.asset || mat.asset->type != asset::AT_Material) {
-		COut(C_Error) << "Error: Unable to load '" << name << "'." << std::endl;
-		return pkg::SR_FileNotFound;
-	}
-	
-	int r = mat.asset->Process(
-		xtime::TimeSlice::Infinite,
-		pkg::P_Load | pkg::P_FastPath
-	);
-
-	if (r != pkg::SR_Success) {
-		COut(C_Error) << "Error: Unable to load '" << name << "'." << std::endl;
-		return (r != pkg::SR_Pending) ? r : pkg::SR_MetaError;
-	}
-
-	asset::MaterialParser *parser = asset::MaterialParser::Cast(mat.asset);
-	if (!parser || !parser->valid) {
-		COut(C_Error) << "Error: Unable to load '" << name << "'." << std::endl;
-		return pkg::SR_MetaError;
-	}
-
-	mat.mat = parser->material;
-	mat.loader = asset::MaterialLoader::Cast(mat.asset);
-	return pkg::SR_Success;
 }
 
 void WorldDraw::Init(const bsp_file::BSPFile::Ref &bsp) {
@@ -315,12 +321,7 @@ void WorldDraw::Draw(Counters *counters) {
 	bool postFX = false;
 
 	if (!m_uiOnly) {
-		for (PostProcessEffect::Map::const_iterator it = m_postFX.begin(); it != m_postFX.end(); ++it) {
-			if (it->second->enabled) {
-				postFX = true;
-				break;
-			}
-		}
+		postFX = NumActivePostFX() > 0;
 	}
 
 	m_rb->BeginFrame();
@@ -328,10 +329,12 @@ void WorldDraw::Draw(Counters *counters) {
 	if (m_uiOnly) {
 		m_rb->ClearBackBuffer();
 	} else {
-		if (postFX)
+		if (postFX) {
 			m_rb->BindRenderTarget();
+		} else {
+			m_rb->ClearBackBuffer();
+		}
 
-		m_rb->ClearBackBuffer();
 		DrawView();
 		m_rb->SetScreenLocalMatrix();
 		DrawOverlays();
@@ -1192,7 +1195,7 @@ void WorldDraw::DrawUnlitBatch(
 	Mat4 invTx;
 
 #if defined(WORLD_DEBUG_DRAW)
-	r::Material *mat = (wireframe) ? m_dbgVars.wireframe_M.mat : batch.matRef->mat;
+	r::Material *mat = (wireframe) ? m_dbgVars.wireframe_M.material : batch.matRef->mat;
 #else
 	r::Material *mat = batch.matRef->mat;
 #endif
@@ -1261,19 +1264,34 @@ void WorldDraw::RemoveScreenOverlay(ScreenOverlay &overlay) {
 }
 
 void WorldDraw::PostProcess() {
-	int num = 0;
+	int num = NumActivePostFX();
 	
 	for (PostProcessEffect::Map::const_iterator it = m_postFX.begin(); it != m_postFX.end(); ++it) {
 		const PostProcessEffect::Ref &fx = it->second;
 		if (!fx->enabled)
 			continue;
+
+		Vec2 dstScale(1.f, 1.f);
+		{
+			PostProcessEffect::Map::const_iterator x = it;
+			++x;
+			for (; x != m_postFX.end(); ++x) {
+				const PostProcessEffect::Ref &dfx = x->second;
+				if (dfx->enabled) {
+					dstScale = dfx->srcScale;
+					break;
+				}
+			}
+		}
+
+		Shader::Uniforms u(fx->color.get());
+
 		r::Material *m = fx->material;
-		m->BindStates();
 		m->BindTextures(fx->loader);
-		m_rb->BindPostFXTargets(--num > 0);
+		u.pfxVars = m_rb->BindPostFXTargets(--num > 0, *m, fx->srcScale, dstScale);
+		m->BindStates();
 		m->shader->Begin(r::Shader::kPass_Default, *m);
 		m_rb->BindPostFXQuad();
-		Shader::Uniforms u(fx->color.get());
 		m->shader->BindStates(u);
 		m_rb->CommitStates();
 		m_rb->DrawPostFXQuad();

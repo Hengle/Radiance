@@ -561,6 +561,18 @@ int WorldLua::lua_World_EnablePostProcessEffect(lua_State *L) {
 	return 0;
 }
 
+int WorldLua::lua_World_SetPostProcessEffectScale(lua_State *L) {
+	LOAD_SELF
+
+	int id = (int)luaL_checkinteger(L, 1);
+	Vec2 scale = lua::Marshal<Vec2>::Get(L, 2, true);
+
+	const PostProcessEffect::Ref &r = self->m_world->draw->PostFX(id);
+	if (r)
+		r->srcScale = scale;
+	return 0;
+}
+
 WorldLua::CinematicsNotify::CinematicsNotify(World *world, Entity &entity, int callbackId) :
 m_world(world),
 m_entity(entity.shared_from_this()),

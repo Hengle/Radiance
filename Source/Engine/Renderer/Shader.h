@@ -50,6 +50,7 @@ public:
 		Vec4 blendColor;
 		Vec3 eyePos;
 		Mat4 tcGen;
+		Vec2 pfxVars;
 
 		struct defaultTag {};
 

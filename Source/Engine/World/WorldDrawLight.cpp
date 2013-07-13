@@ -307,11 +307,11 @@ bool WorldDraw::DrawUnifiedEntityShadow(const ViewDef &view, const Entity &e) {
 	m_rb->SetPerspectiveMatrix(prj);
 	
 	m_rb->BindUnifiedShadowRenderTarget(
-		*m_shadow_M.mat
+		*m_shadow_M.material
 	);
 
-	m_shadow_M.mat->BindTextures(m_shadow_M.loader);
-	m_shadow_M.mat->shader->Begin(r::Shader::kPass_Default, *m_shadow_M.mat);
+	m_shadow_M.material->BindTextures(m_shadow_M.loader);
+	m_shadow_M.material->shader->Begin(r::Shader::kPass_Default, *m_shadow_M.material);
 
 	bool drawn = DrawUnifiedShadowTexture(
 		view,
@@ -320,7 +320,7 @@ bool WorldDraw::DrawUnifiedEntityShadow(const ViewDef &view, const Entity &e) {
 		unifiedRadius
 	);
 
-	m_shadow_M.mat->shader->End();
+	m_shadow_M.material->shader->End();
 
 	if (!drawn)
 		return false;
@@ -417,10 +417,10 @@ bool WorldDraw::DrawUnifiedShadowTexture(
 					m_rb->PushMatrix(pos, draw->scale, angles);
 				}
 
-				draw->Bind(m_shadow_M.mat->shader.get().get());
-				m_shadow_M.mat->shader->BindStates(u);
+				draw->Bind(m_shadow_M.material->shader.get().get());
+				m_shadow_M.material->shader->BindStates(u);
 				m_rb->CommitStates();
-				draw->CompileArrayStates(*m_shadow_M.mat->shader.get());
+				draw->CompileArrayStates(*m_shadow_M.material->shader.get());
 				draw->Draw();
 
 				if (tx)
@@ -458,10 +458,10 @@ void WorldDraw::DrawViewWithUnifiedShadow(
 	u.lights.lights[0].radius = unifiedRadius;
 	u.tcGen = mv * MakePerspectiveMatrix(viewplanes, zplanes, true);
 
-	m_projected_M.mat->BindTextures(m_projected_M.loader);
-	m_rb->BindUnifiedShadowTexture(*m_projected_M.mat); // does mat->BindStates()
+	m_projected_M.material->BindTextures(m_projected_M.loader);
+	m_rb->BindUnifiedShadowTexture(*m_projected_M.material); // does mat->BindStates()
 
-	m_projected_M.mat->shader->Begin(r::Shader::kPass_Default, *m_projected_M.mat);
+	m_projected_M.material->shader->Begin(r::Shader::kPass_Default, *m_projected_M.material);
 
 	Vec3 pos, angles;
 
@@ -483,10 +483,10 @@ void WorldDraw::DrawViewWithUnifiedShadow(
 			if (tx)
 				m_rb->PushMatrix(pos, draw->scale, angles);
 
-			draw->Bind(m_projected_M.mat->shader.get().get());
-			m_projected_M.mat->shader->BindStates(u, false);
+			draw->Bind(m_projected_M.material->shader.get().get());
+			m_projected_M.material->shader->BindStates(u, false);
 			m_rb->CommitStates();
-			draw->CompileArrayStates(*m_projected_M.mat->shader.get());
+			draw->CompileArrayStates(*m_projected_M.material->shader.get());
 			draw->Draw();
 
 			if (tx)
@@ -494,7 +494,7 @@ void WorldDraw::DrawViewWithUnifiedShadow(
 		}
 	}
 
-	m_projected_M.mat->shader->End();
+	m_projected_M.material->shader->End();
 }
 
 void WorldDraw::CalcUnifiedLightPosAndSize(

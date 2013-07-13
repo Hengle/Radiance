@@ -73,6 +73,9 @@ bool GLSLTool::Assemble(
 	if (shader->MaterialSourceUsage(pass, Shader::kMaterialSource_Vertex) > 0)
 		ss << "#define SHADER_POSITION\r\n";
 
+	if (shader->MaterialSourceUsage(pass, Shader::kMaterialSource_PFXVars) > 0)
+		ss << "#define PFX_VARS\r\n";
+
 	int numTextures = 0;
 	for (int i = 0; i < r::kMaxTextures; ++i) {
 		if (mapping.textures[i][0] == r::kInvalidMapping)

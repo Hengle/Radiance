@@ -14,65 +14,69 @@ using namespace r;
 
 namespace world {
 
+namespace details {
+int LoadMaterial(const char *name, asset::MaterialBundle &mat);
+}
+
 int WorldDraw::LoadDebugMaterials() {
 	
-	int r = LoadMaterial("Sys/DebugWireframe_M", m_dbgVars.wireframe_M);
+	int r = details::LoadMaterial("Sys/DebugWireframe_M", m_dbgVars.wireframe_M);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/DebugPortalEdge_M", m_dbgVars.portal_M[0]);
+	r = details::LoadMaterial("Sys/DebugPortalEdge_M", m_dbgVars.portal_M[0]);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/DebugPortal_M", m_dbgVars.portal_M[1]);
+	r = details::LoadMaterial("Sys/DebugPortal_M", m_dbgVars.portal_M[1]);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/DebugWorldBBox_M", m_dbgVars.worldBBox_M);
+	r = details::LoadMaterial("Sys/DebugWorldBBox_M", m_dbgVars.worldBBox_M);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/DebugEntityBBox_M", m_dbgVars.entityBBox_M);
+	r = details::LoadMaterial("Sys/DebugEntityBBox_M", m_dbgVars.entityBBox_M);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/DebugActorBBox_M", m_dbgVars.actorBBox_M);
+	r = details::LoadMaterial("Sys/DebugActorBBox_M", m_dbgVars.actorBBox_M);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/DebugWaypoint_M", m_dbgVars.waypoint_M);
+	r = details::LoadMaterial("Sys/DebugWaypoint_M", m_dbgVars.waypoint_M);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/DebugLight0_M", m_dbgVars.lightPasses_M[0]);
+	r = details::LoadMaterial("Sys/DebugLight0_M", m_dbgVars.lightPasses_M[0]);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/DebugLight1_M", m_dbgVars.lightPasses_M[1]);
+	r = details::LoadMaterial("Sys/DebugLight1_M", m_dbgVars.lightPasses_M[1]);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/DebugLight2_M", m_dbgVars.lightPasses_M[2]);
+	r = details::LoadMaterial("Sys/DebugLight2_M", m_dbgVars.lightPasses_M[2]);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/DebugLight3_M", m_dbgVars.lightPasses_M[3]);
+	r = details::LoadMaterial("Sys/DebugLight3_M", m_dbgVars.lightPasses_M[3]);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/DebugLight4_M", m_dbgVars.lightPasses_M[4]);
+	r = details::LoadMaterial("Sys/DebugLight4_M", m_dbgVars.lightPasses_M[4]);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/DebugLight5_M", m_dbgVars.lightPasses_M[5]);
+	r = details::LoadMaterial("Sys/DebugLight5_M", m_dbgVars.lightPasses_M[5]);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/EditorLightSphere_M", m_dbgVars.lightSphere_M);
+	r = details::LoadMaterial("Sys/EditorLightSphere_M", m_dbgVars.lightSphere_M);
 	if (r != pkg::SR_Success)
 		return r;
 
-	r = LoadMaterial("Sys/DebugSphere_M", m_dbgVars.sphere_M);
+	r = details::LoadMaterial("Sys/DebugSphere_M", m_dbgVars.sphere_M);
 	if (r != pkg::SR_Success)
 		return r;
 
@@ -93,9 +97,9 @@ void WorldDraw::DebugDrawAreaportals(int areaNum) {
 	RAD_ASSERT(areaNum < (int)m_world->m_areas.size());
 
 	for (int style = 0; style < 2; ++style) {
-		m_dbgVars.portal_M[style].mat->BindStates();
-		m_dbgVars.portal_M[style].mat->BindTextures(m_dbgVars.portal_M[style].loader);
-		m_dbgVars.portal_M[style].mat->shader->Begin(r::Shader::kPass_Default, *m_dbgVars.portal_M[style].mat);
+		m_dbgVars.portal_M[style].material->BindStates();
+		m_dbgVars.portal_M[style].material->BindTextures(m_dbgVars.portal_M[style].loader);
+		m_dbgVars.portal_M[style].material->shader->Begin(r::Shader::kPass_Default, *m_dbgVars.portal_M[style].material);
 
 
 		const dBSPArea &area = m_world->m_areas[areaNum];
@@ -114,7 +118,7 @@ void WorldDraw::DebugDrawAreaportals(int areaNum) {
 			if (style == 1)
 				numIndices = m_rb->DebugTesselateVerts(portal.winding.NumVertices());
 
-			m_dbgVars.portal_M[style].mat->shader->BindStates();
+			m_dbgVars.portal_M[style].material->shader->BindStates();
 			m_rb->CommitStates();
 
 			if (style == 0) {
@@ -124,7 +128,7 @@ void WorldDraw::DebugDrawAreaportals(int areaNum) {
 			}
 		}
 
-		m_dbgVars.portal_M[style].mat->shader->End();
+		m_dbgVars.portal_M[style].material->shader->End();
 	}
 }
 
@@ -133,27 +137,27 @@ void WorldDraw::DebugDrawLightScissors() {
 	DebugDrawRects(m_dbgVars.wireframe_M, m_dbgVars.lightScissors);
 }
 
-void WorldDraw::DebugDrawRects(const LocalMaterial &material, const Vec4Vec &rects) {
-	material.mat->BindStates();
-	material.mat->BindTextures(material.loader);
-	material.mat->shader->Begin(r::Shader::kPass_Default, *material.mat);
+void WorldDraw::DebugDrawRects(const asset::MaterialBundle &material, const Vec4Vec &rects) {
+	material.material->BindStates();
+	material.material->BindTextures(material.loader);
+	material.material->shader->Begin(r::Shader::kPass_Default, *material.material);
 
 	for (Vec4Vec::const_iterator it = rects.begin(); it != rects.end(); ++it)
 		DebugDrawRectBatch(material, *it);
 
-	material.mat->shader->End();
+	material.material->shader->End();
 }
 
-void WorldDraw::DebugDrawRect(const LocalMaterial &material, const Vec4 &rect) {
+void WorldDraw::DebugDrawRect(const asset::MaterialBundle &material, const Vec4 &rect) {
 	m_rb->SetScreenLocalMatrix();
-	material.mat->BindStates();
-	material.mat->BindTextures(material.loader);
-	material.mat->shader->Begin(r::Shader::kPass_Default, *material.mat);
+	material.material->BindStates();
+	material.material->BindTextures(material.loader);
+	material.material->shader->Begin(r::Shader::kPass_Default, *material.material);
 	DebugDrawRectBatch(material, rect);
-	material.mat->shader->End();
+	material.material->shader->End();
 }
 
-void WorldDraw::DebugDrawRectBatch(const LocalMaterial &material, const Vec4 &rect) {
+void WorldDraw::DebugDrawRectBatch(const asset::MaterialBundle &material, const Vec4 &rect) {
 	Vec3 verts[4];
 
 	verts[0] = Vec3(rect[0], rect[1], 0.f);
@@ -162,34 +166,34 @@ void WorldDraw::DebugDrawRectBatch(const LocalMaterial &material, const Vec4 &re
 	verts[3] = Vec3(rect[2], rect[1], 0.f);
 
 	m_rb->DebugUploadVerts(verts, 4);
-	material.mat->shader->BindStates();
+	material.material->shader->BindStates();
 	m_rb->CommitStates();
 	m_rb->DebugDrawLineLoop(4);
 }
 
-void WorldDraw::DebugDrawBBoxes(const LocalMaterial &material, const BBoxVec &bboxes, bool wireframe) {
+void WorldDraw::DebugDrawBBoxes(const asset::MaterialBundle &material, const BBoxVec &bboxes, bool wireframe) {
 	if (bboxes.empty())
 		return;
 
-	material.mat->BindStates();
-	material.mat->BindTextures(material.loader);
-	material.mat->shader->Begin(r::Shader::kPass_Default, *material.mat);
+	material.material->BindStates();
+	material.material->BindTextures(material.loader);
+	material.material->shader->Begin(r::Shader::kPass_Default, *material.material);
 
 	for (BBoxVec::const_iterator it = bboxes.begin(); it != bboxes.end(); ++it)
 		DebugDrawBBoxBatch(material, *it, wireframe);
 
-	material.mat->shader->End();
+	material.material->shader->End();
 }
 
-void WorldDraw::DebugDrawBBox(const LocalMaterial &material, const BBox &bbox, bool wireframe) {
-	material.mat->BindStates();
-	material.mat->BindTextures(material.loader);
-	material.mat->shader->Begin(r::Shader::kPass_Default, *material.mat);
+void WorldDraw::DebugDrawBBox(const asset::MaterialBundle &material, const BBox &bbox, bool wireframe) {
+	material.material->BindStates();
+	material.material->BindTextures(material.loader);
+	material.material->shader->Begin(r::Shader::kPass_Default, *material.material);
 	DebugDrawBBoxBatch(material, bbox, wireframe);
-	material.mat->shader->End();
+	material.material->shader->End();
 }
 
-void WorldDraw::DebugDrawBBoxBatch(const LocalMaterial &material, const BBox &bbox, bool wireframe) {
+void WorldDraw::DebugDrawBBoxBatch(const asset::MaterialBundle &material, const BBox &bbox, bool wireframe) {
 	typedef stackify<zone_vector<Vec3, ZWorldT>::type, 4> StackVec;
 	StackVec v;
 
@@ -203,7 +207,7 @@ void WorldDraw::DebugDrawBBoxBatch(const LocalMaterial &material, const BBox &bb
 	v->push_back(Vec3(maxs[0], maxs[1], mins[2]));
 
 	m_rb->DebugUploadVerts(&v[0], 4);
-	material.mat->shader->BindStates();
+	material.material->shader->BindStates();
 	m_rb->CommitStates();
 	if (wireframe) {
 		m_rb->DebugDrawLineLoop(4);
@@ -219,7 +223,7 @@ void WorldDraw::DebugDrawBBoxBatch(const LocalMaterial &material, const BBox &bb
 	v->push_back(Vec3(mins[0], mins[1], maxs[2]));
 
 	m_rb->DebugUploadVerts(&v[0], 4);
-	material.mat->shader->BindStates();
+	material.material->shader->BindStates();
 	m_rb->CommitStates();
 	if (wireframe) {
 		m_rb->DebugDrawLineLoop(4);
@@ -235,7 +239,7 @@ void WorldDraw::DebugDrawBBoxBatch(const LocalMaterial &material, const BBox &bb
 	v->push_back(Vec3(mins[0], maxs[1], maxs[2]));
 
 	m_rb->DebugUploadVerts(&v[0], 4);
-	material.mat->shader->BindStates();
+	material.material->shader->BindStates();
 	m_rb->CommitStates();
 	if (wireframe) {
 		m_rb->DebugDrawLineLoop(4);
@@ -251,7 +255,7 @@ void WorldDraw::DebugDrawBBoxBatch(const LocalMaterial &material, const BBox &bb
 	v->push_back(Vec3(maxs[0], mins[1], mins[2]));
 	
 	m_rb->DebugUploadVerts(&v[0], 4);
-	material.mat->shader->BindStates();
+	material.material->shader->BindStates();
 	m_rb->CommitStates();
 	if (wireframe) {
 		m_rb->DebugDrawLineLoop(4);
@@ -267,7 +271,7 @@ void WorldDraw::DebugDrawBBoxBatch(const LocalMaterial &material, const BBox &bb
 	v->push_back(Vec3(maxs[0], mins[1], maxs[2]));
 
 	m_rb->DebugUploadVerts(&v[0], 4);
-	material.mat->shader->BindStates();
+	material.material->shader->BindStates();
 	m_rb->CommitStates();
 	if (wireframe) {
 		m_rb->DebugDrawLineLoop(4);
@@ -283,7 +287,7 @@ void WorldDraw::DebugDrawBBoxBatch(const LocalMaterial &material, const BBox &bb
 	v->push_back(Vec3(mins[0], maxs[1], mins[2]));
 
 	m_rb->DebugUploadVerts(&v[0], 4);
-	material.mat->shader->BindStates();
+	material.material->shader->BindStates();
 	m_rb->CommitStates();
 	if (wireframe) {
 		m_rb->DebugDrawLineLoop(4);
@@ -303,9 +307,9 @@ void WorldDraw::DebugDrawActiveWaypoints() {
 
 		if (!begin) {
 			begin = true;
-			m_dbgVars.waypoint_M.mat->BindStates();
-			m_dbgVars.waypoint_M.mat->BindTextures(m_dbgVars.waypoint_M.loader);
-			m_dbgVars.waypoint_M.mat->shader->Begin(r::Shader::kPass_Default, *m_dbgVars.waypoint_M.mat);
+			m_dbgVars.waypoint_M.material->BindStates();
+			m_dbgVars.waypoint_M.material->BindTextures(m_dbgVars.waypoint_M.loader);
+			m_dbgVars.waypoint_M.material->shader->Begin(r::Shader::kPass_Default, *m_dbgVars.waypoint_M.material);
 		}
 
 		const bsp_file::BSPWaypoint *waypoint = m_world->bspFile->Waypoints() + i;
@@ -315,12 +319,12 @@ void WorldDraw::DebugDrawActiveWaypoints() {
 	}
 
 	if (begin) {
-		m_dbgVars.waypoint_M.mat->shader->End();
+		m_dbgVars.waypoint_M.material->shader->End();
 	}
 }
 
 void WorldDraw::DebugDrawFloorMoves() {
-	LocalMaterial &material = m_dbgVars.worldBBox_M;
+	asset::MaterialBundle &material = m_dbgVars.worldBBox_M;
 
 	bool begin = false;
 
@@ -330,9 +334,9 @@ void WorldDraw::DebugDrawFloorMoves() {
 		if (entity->ps->activeMove) {
 			if (!begin) {
 				begin = true;
-				material.mat->BindStates();
-				material.mat->BindTextures(material.loader);
-				material.mat->shader->Begin(r::Shader::kPass_Default, *material.mat);
+				material.material->BindStates();
+				material.material->BindTextures(material.loader);
+				material.material->shader->Begin(r::Shader::kPass_Default, *material.material);
 			}
 
 			DebugDrawFloorMoveBatch(material, *entity->ps->activeMove);
@@ -340,10 +344,10 @@ void WorldDraw::DebugDrawFloorMoves() {
 	}
 
 	if (begin)
-		material.mat->shader->End();
+		material.material->shader->End();
 }
 
-void WorldDraw::DebugDrawFloorMoveBatch(const LocalMaterial &material, const FloorMove &move) {
+void WorldDraw::DebugDrawFloorMoveBatch(const asset::MaterialBundle &material, const FloorMove &move) {
 	enum {
 		kSplineTess = 8
 	};
@@ -367,7 +371,7 @@ void WorldDraw::DebugDrawFloorMoveBatch(const LocalMaterial &material, const Flo
 		DebugDrawBBoxBatch(material, bbox, true);
 
 		m_rb->DebugUploadVerts(&pts[0], kSplineTess);
-		material.mat->shader->BindStates();
+		material.material->shader->BindStates();
 		m_rb->CommitStates();
 		m_rb->DebugDrawLineStrip(kSplineTess);
 	}
@@ -485,21 +489,21 @@ void WorldDraw::DebugDrawLightPass(const details::MBatch &batch) {
 			}
 		}
 
-		const LocalMaterial &debugMat = m_dbgVars.lightPasses_M[numPasses];
+		const asset::MaterialBundle &debugMat = m_dbgVars.lightPasses_M[numPasses];
 		
-		debugMat.mat->BindStates();
-		debugMat.mat->BindTextures(debugMat.loader);
-		debugMat.mat->shader->Begin(r::Shader::kPass_Default, *debugMat.mat);
-		draw->Bind(debugMat.mat->shader.get().get());
-		debugMat.mat->shader->BindStates();
+		debugMat.material->BindStates();
+		debugMat.material->BindTextures(debugMat.loader);
+		debugMat.material->shader->Begin(r::Shader::kPass_Default, *debugMat.material);
+		draw->Bind(debugMat.material->shader.get().get());
+		debugMat.material->shader->BindStates();
 		m_rb->CommitStates();
-		draw->CompileArrayStates(*debugMat.mat->shader.get());
+		draw->CompileArrayStates(*debugMat.material->shader.get());
 		draw->Draw();
 
 		if (tx)
 			m_rb->PopMatrix();
 
-		debugMat.mat->shader->End();
+		debugMat.material->shader->End();
 	}
 }
 
@@ -557,29 +561,29 @@ void WorldDraw::DebugDrawLightCounts(const details::MBatch &batch) {
 			interaction = interaction->nextOnBatch;
 		}
 
-		const LocalMaterial &debugMat = m_dbgVars.lightPasses_M[numLights];
+		const asset::MaterialBundle &debugMat = m_dbgVars.lightPasses_M[numLights];
 		
-		debugMat.mat->BindStates();
-		debugMat.mat->BindTextures(debugMat.loader);
-		debugMat.mat->shader->Begin(r::Shader::kPass_Default, *debugMat.mat);
-		draw->Bind(debugMat.mat->shader.get().get());
-		debugMat.mat->shader->BindStates();
+		debugMat.material->BindStates();
+		debugMat.material->BindTextures(debugMat.loader);
+		debugMat.material->shader->Begin(r::Shader::kPass_Default, *debugMat.material);
+		draw->Bind(debugMat.material->shader.get().get());
+		debugMat.material->shader->BindStates();
 		m_rb->CommitStates();
-		draw->CompileArrayStates(*debugMat.mat->shader.get());
+		draw->CompileArrayStates(*debugMat.material->shader.get());
 		draw->Draw();
 
 		if (tx)
 			m_rb->PopMatrix();
 
-		debugMat.mat->shader->End();
+		debugMat.material->shader->End();
 	}
 }
 
 void WorldDraw::DebugDrawFrustumVolumes(ViewDef &view) {
 
-	m_dbgVars.wireframe_M.mat->BindStates();
-	m_dbgVars.wireframe_M.mat->BindTextures(m_dbgVars.wireframe_M.loader);
-	m_dbgVars.wireframe_M.mat->shader->Begin(r::Shader::kPass_Default, *m_dbgVars.wireframe_M.mat);
+	m_dbgVars.wireframe_M.material->BindStates();
+	m_dbgVars.wireframe_M.material->BindTextures(m_dbgVars.wireframe_M.loader);
+	m_dbgVars.wireframe_M.material->shader->Begin(r::Shader::kPass_Default, *m_dbgVars.wireframe_M.material);
 
 	const r::Shader::Uniforms white(Vec4(1,1,1,1));
 	const r::Shader::Uniforms green(Vec4(0,1,0,1));
@@ -594,9 +598,9 @@ void WorldDraw::DebugDrawFrustumVolumes(ViewDef &view) {
 		);
 
 		if (x == 1) {
-			m_dbgVars.wireframe_M.mat->shader->BindStates(green);
+			m_dbgVars.wireframe_M.material->shader->BindStates(green);
 		} else {
-			m_dbgVars.wireframe_M.mat->shader->BindStates(white);
+			m_dbgVars.wireframe_M.material->shader->BindStates(white);
 		}
 
 		m_rb->CommitStates();
@@ -615,9 +619,9 @@ void WorldDraw::DebugDrawFrustumVolumes(ViewDef &view) {
 			);
 
 			if (x == 1) {
-				m_dbgVars.wireframe_M.mat->shader->BindStates(green);
+				m_dbgVars.wireframe_M.material->shader->BindStates(green);
 			} else {
-				m_dbgVars.wireframe_M.mat->shader->BindStates(blue);
+				m_dbgVars.wireframe_M.material->shader->BindStates(blue);
 			}
 
 			m_rb->CommitStates();
@@ -625,29 +629,29 @@ void WorldDraw::DebugDrawFrustumVolumes(ViewDef &view) {
 		}
 	}
 
-	m_dbgVars.wireframe_M.mat->shader->End();
+	m_dbgVars.wireframe_M.material->shader->End();
 }
 
 void WorldDraw::DebugDrawLights() {
 
-	LocalMaterial &material = m_dbgVars.lightSphere_M;
+	asset::MaterialBundle &material = m_dbgVars.lightSphere_M;
 	
-	material.mat->BindStates();
-	material.mat->BindTextures(material.loader);
-	material.mat->shader->Begin(r::Shader::kPass_Default, *material.mat);
+	material.material->BindStates();
+	material.material->BindTextures(material.loader);
+	material.material->shader->Begin(r::Shader::kPass_Default, *material.material);
 
 	for (Vec3Vec::const_iterator it = m_dbgVars.lights.begin(); it != m_dbgVars.lights.end(); ++it) {
 		const Vec3 &pos = *it;
 		m_rb->PushMatrix(pos, Vec3(4,4,4), Vec3::Zero);
-		m_dbgVars.lightMesh->BindAll(material.mat->shader.get().get());
-		material.mat->shader->BindStates();
+		m_dbgVars.lightMesh->BindAll(material.material->shader.get().get());
+		material.material->shader->BindStates();
 		m_rb->CommitStates();
-		m_dbgVars.lightMesh->CompileArrayStates(*material.mat->shader.get());
+		m_dbgVars.lightMesh->CompileArrayStates(*material.material->shader.get());
 		m_dbgVars.lightMesh->Draw();
 		m_rb->PopMatrix();
 	}
 		
-	material.mat->shader->End();
+	material.material->shader->End();
 
 	m_rb->ReleaseArrayStates(); // important! keeps pipeline changes from being recorded into VAO's
 }
@@ -656,24 +660,24 @@ void WorldDraw::DebugDrawUnifiedLights() {
 	r::Shader::Uniforms u(r::Shader::Uniforms::kDefault);
 	u.blendColor = Vec4(1.f, 0.f, 1.f, 1.f);
 
-	LocalMaterial &material = m_dbgVars.lightSphere_M;
+	asset::MaterialBundle &material = m_dbgVars.lightSphere_M;
 	
-	material.mat->BindStates();
-	material.mat->BindTextures(material.loader);
-	material.mat->shader->Begin(r::Shader::kPass_Default, *material.mat);
+	material.material->BindStates();
+	material.material->BindTextures(material.loader);
+	material.material->shader->Begin(r::Shader::kPass_Default, *material.material);
 
 	for (Vec3Vec::const_iterator it = m_dbgVars.unifiedLights.begin(); it != m_dbgVars.unifiedLights.end(); ++it) {
 		const Vec3 &pos = *it;
 		m_rb->PushMatrix(pos, Vec3(4,4,4), Vec3::Zero);
-		m_dbgVars.lightMesh->BindAll(material.mat->shader.get().get());
-		material.mat->shader->BindStates(u);
+		m_dbgVars.lightMesh->BindAll(material.material->shader.get().get());
+		material.material->shader->BindStates(u);
 		m_rb->CommitStates();
-		m_dbgVars.lightMesh->CompileArrayStates(*material.mat->shader.get());
+		m_dbgVars.lightMesh->CompileArrayStates(*material.material->shader.get());
 		m_dbgVars.lightMesh->Draw();
 		m_rb->PopMatrix();
 	}
 		
-	material.mat->shader->End();
+	material.material->shader->End();
 
 	m_rb->ReleaseArrayStates(); // important! keeps pipeline changes from being recorded into VAO's
 }
@@ -795,30 +799,30 @@ void WorldDraw::DebugDrawProjectedBBoxPoints() {
 	r::Shader::Uniforms u(r::Shader::Uniforms::kDefault);
 	u.blendColor = Vec4(0.f, 0.f, 1.f, 1.f);
 
-	LocalMaterial &material = m_dbgVars.sphere_M;
+	asset::MaterialBundle &material = m_dbgVars.sphere_M;
 	
-	material.mat->BindStates();
-	material.mat->BindTextures(material.loader);
-	material.mat->shader->Begin(r::Shader::kPass_Default, *material.mat);
+	material.material->BindStates();
+	material.material->BindTextures(material.loader);
+	material.material->shader->Begin(r::Shader::kPass_Default, *material.material);
 
 	for (Vec3Vec::const_iterator it = m_dbgVars.projectedBoxPoints.begin(); it != m_dbgVars.projectedBoxPoints.end(); ++it) {
 		const Vec3 &pos = *it;
 		m_rb->PushMatrix(pos, Vec3(2,2,2), Vec3::Zero);
-		m_dbgVars.lightMesh->BindAll(material.mat->shader.get().get());
-		material.mat->shader->BindStates(u);
+		m_dbgVars.lightMesh->BindAll(material.material->shader.get().get());
+		material.material->shader->BindStates(u);
 		m_rb->CommitStates();
-		m_dbgVars.lightMesh->CompileArrayStates(*material.mat->shader.get());
+		m_dbgVars.lightMesh->CompileArrayStates(*material.material->shader.get());
 		m_dbgVars.lightMesh->Draw();
 		m_rb->PopMatrix();
 	}
 		
-	material.mat->shader->End();
+	material.material->shader->End();
 
 	m_rb->ReleaseArrayStates(); // important! keeps pipeline changes from being recorded into VAO's
 }
 
 void WorldDraw::DebugDrawUnifiedLightAxis() {
-	const LocalMaterial &material = m_dbgVars.wireframe_M;
+	const asset::MaterialBundle &material = m_dbgVars.wireframe_M;
 	const r::Shader::Uniforms kRed(Vec4(1.f, 0.f, 0.f, 1.f));
 	const r::Shader::Uniforms kGreen(Vec4(0.f, 1.f, 0.f, 1.f));
 	const r::Shader::Uniforms kBlue(Vec4(0.f, 0.f, 1.f, 1.f));
@@ -826,37 +830,37 @@ void WorldDraw::DebugDrawUnifiedLightAxis() {
 
 	const Vec3 &cameraPos = m_dbgVars.unifiedLightAxis[3];
 
-	material.mat->BindStates();
-	material.mat->BindTextures(material.loader);
-	material.mat->shader->Begin(r::Shader::kPass_Default, *material.mat);
+	material.material->BindStates();
+	material.material->BindTextures(material.loader);
+	material.material->shader->Begin(r::Shader::kPass_Default, *material.material);
 
 	Vec3 v[2];
 
 	v[0] = cameraPos;
 	v[1] = m_dbgVars.unifiedLightAxis[4];
 	m_rb->DebugUploadVerts(&v[0], 2);
-	material.mat->shader->BindStates();
+	material.material->shader->BindStates();
 	m_rb->CommitStates();
 	m_rb->DebugDrawLineStrip(2);
 
 	// camera-space Z
 	v[1] = cameraPos + m_dbgVars.unifiedLightAxis[0] * kAxisLen;
 	m_rb->DebugUploadVerts(&v[0], 2);
-	material.mat->shader->BindStates(kBlue);
+	material.material->shader->BindStates(kBlue);
 	m_rb->CommitStates();
 	m_rb->DebugDrawLineStrip(2);
 
 	// camera-space X
 	v[1] = cameraPos + m_dbgVars.unifiedLightAxis[1] * kAxisLen;
 	m_rb->DebugUploadVerts(&v[0], 2);
-	material.mat->shader->BindStates(kRed);
+	material.material->shader->BindStates(kRed);
 	m_rb->CommitStates();
 	m_rb->DebugDrawLineStrip(2);
 
 	// camera space Y
 	v[1] = cameraPos + m_dbgVars.unifiedLightAxis[2] * kAxisLen;
 	m_rb->DebugUploadVerts(&v[0], 2);
-	material.mat->shader->BindStates(kGreen);
+	material.material->shader->BindStates(kGreen);
 	m_rb->CommitStates();
 	m_rb->DebugDrawLineStrip(2);
 
@@ -875,7 +879,7 @@ void WorldDraw::DebugDrawUnifiedLightAxis() {
 
 	v[1] = axis;
 	m_rb->DebugUploadVerts(&v[0], 2);
-	material.mat->shader->BindStates(kBlue);
+	material.material->shader->BindStates(kBlue);
 	m_rb->CommitStates();
 	m_rb->DebugDrawLineStrip(2);
 
@@ -885,7 +889,7 @@ void WorldDraw::DebugDrawUnifiedLightAxis() {
 
 	v[1] = axis;
 	m_rb->DebugUploadVerts(&v[0], 2);
-	material.mat->shader->BindStates(kRed);
+	material.material->shader->BindStates(kRed);
 	m_rb->CommitStates();
 	m_rb->DebugDrawLineStrip(2);
 
@@ -895,11 +899,11 @@ void WorldDraw::DebugDrawUnifiedLightAxis() {
 
 	v[1] = axis;
 	m_rb->DebugUploadVerts(&v[0], 2);
-	material.mat->shader->BindStates(kGreen);
+	material.material->shader->BindStates(kGreen);
 	m_rb->CommitStates();
 	m_rb->DebugDrawLineStrip(2);
 	
-	material.mat->shader->End();
+	material.material->shader->End();
 }
 
 } // world

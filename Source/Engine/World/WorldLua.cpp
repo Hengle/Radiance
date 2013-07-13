@@ -109,6 +109,7 @@ bool WorldLua::Init() {
 		{ "CreatePostProcessEffect", lua_World_CreatePostProcessEffect },
 		{ "FadePostProcessEffect", lua_World_FadePostProcessEffect },
 		{ "EnablePostProcessEffect", lua_World_EnablePostProcessEffect },
+		{ "SetPostProcessEffectScale", lua_World_SetPostProcessEffectScale },
 		{ "PlayCinematic", lua_World_PlayCinematic },
 		{ "StopCinematic", lua_World_StopCinematic },
 		{ "CinematicTime", lua_World_CinematicTime },

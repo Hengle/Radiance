@@ -194,6 +194,7 @@ private:
 	static int lua_World_CreatePostProcessEffect(lua_State *L);
 	static int lua_World_FadePostProcessEffect(lua_State *L);
 	static int lua_World_EnablePostProcessEffect(lua_State *L);
+	static int lua_World_SetPostProcessEffectScale(lua_State *L);
 	static int lua_World_PlayCinematic(lua_State *L);
 	static int lua_World_StopCinematic(lua_State *L);
 	static int lua_World_SkipCinematics(lua_State *L);

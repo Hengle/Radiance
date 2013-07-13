@@ -40,7 +40,7 @@ public:
 
 	~GLRenderTarget();
 
-	void BindTexture();
+	void BindTexture(int index);
 	void BindFramebuffer(DiscardFlags flags);
 	
 	static void DiscardFramebuffer(DiscardFlags flags);
