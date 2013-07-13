@@ -915,7 +915,7 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 	if (p.u.pfx != -1) {
 		if (p.u.pfxVars != uniforms.pfxVars) {
 			p.u.pfxVars = uniforms.pfxVars;
-			gl.Uniform2fvARB(p.u.pfx, 2, &uniforms.pfxVars[0]);
+			gl.Uniform2fvARB(p.u.pfx, 1, &uniforms.pfxVars[0]);
 		}
 	}
 
