@@ -1135,8 +1135,9 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 	}
 
 	// draw lit unshadowed solid surfaces
-	
+#if !defined(RAD_OPT_GOLDEN)
 	if (m_world->cvars->r_enablelights.value) {
+#endif
 		for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
 			const details::MBatch &batch = *it->second;
 
@@ -1148,15 +1149,17 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 		}
 
 		DrawViewUnifiedShadows(view);
+#if !defined(RAD_OPT_GOLDEN)
 	} else {
 		for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
 			const details::MBatch &batch = *it->second;
 
-			if (batch.matRef->mat->sort == r::Material::kSort_Solid) {
+			if (batch.matRef->mat->maxLights > 0) {
 				DrawUnlitBatch(view, *it->second, false);
 			}
 		}
 	}
+#endif
 
 	// draw unlit translucent surfaces
 
@@ -1173,8 +1176,9 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 	}
 
 	// draw lit unshadowed translucent surfaces
-
+#if !defined(RAD_OPT_GOLDEN)
 	if (m_world->cvars->r_enablelights.value) {
+#endif
 		for (int i = r::Material::kSort_Translucent; i < r::Material::kNumSorts; ++i) {
 			for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
 				const details::MBatch &batch = *it->second;
@@ -1186,17 +1190,21 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 				}
 			}
 		}
+#if !defined(RAD_OPT_GOLDEN)
 	} else {
 		for (int i = r::Material::kSort_Translucent; i < r::Material::kNumSorts; ++i) {
 			for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
 				const details::MBatch &batch = *it->second;
 
 				if (batch.matRef->mat->sort == (r::Material::Sort)i) {
-					DrawUnlitBatch(view, *it->second, false);
+					if (batch.matRef->mat->maxLights > 0) {
+						DrawUnlitBatch(view, *it->second, false);
+					}
 				}
 			}
 		}
 	}
+#endif
 }
 
 void WorldDraw::DrawUnlitBatch(
@@ -1221,7 +1229,15 @@ void WorldDraw::DrawUnlitBatch(
 	mat->BindStates();
 	if (!wireframe)
 		mat->BindTextures(batch.matRef->loader);
-	mat->shader->Begin(r::Shader::kPass_Default, *mat);
+
+#if !defined(RAD_OPT_GOLDEN)
+	if (mat->maxLights > 0) {
+		mat->shader->Begin(r::Shader::kPass_Preview, *mat);
+	} else 
+#endif
+	{
+		mat->shader->Begin(r::Shader::kPass_Default, *mat);
+	}
 
 	for (details::MBatchDrawLink *link = batch.head; link; link = link->next) {
 		MBatchDraw *draw = link->draw;
