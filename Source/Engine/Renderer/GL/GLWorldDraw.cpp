@@ -49,8 +49,8 @@ void GLWorldDraw::EndFrame() {
 }
 
 void GLWorldDraw::ClearBackBuffer() {
-	gls.Set(kDepthWriteMask_Enable|kScissorTest_Disable, -1, true); // for glClear()
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	gls.Set(kColorWriteMask_RGBA|kDepthWriteMask_Enable|kScissorTest_Disable, -1, true); // for glClear()
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 }
 
 int GLWorldDraw::LoadMaterials() {
@@ -60,6 +60,7 @@ int GLWorldDraw::LoadMaterials() {
 
 int GLWorldDraw::Precache() {
 	CreateScreenOverlay();
+	CreateRect(m_rectVB, m_rectIB);
 	return pkg::SR_Success;
 }
 
@@ -88,6 +89,8 @@ void GLWorldDraw::BindRenderTarget() {
 			false
 		));
 	}
+	
+	GLRenderTarget::DiscardFramebuffer(GLRenderTarget::kDiscard_All);
 
 	m_activeRT = m_framebufferRT;
 	m_activeRT->BindFramebuffer(GLRenderTarget::kDiscard_All);
@@ -300,11 +303,11 @@ void GLWorldDraw::BindDefaultFB(bool discardHint) {
 	int vpx, vpy, vpw, vph;
 	world->game->Viewport(vpx, vpy, vpw, vph);
 	App::Get()->engine->sys->r->BindFramebuffer();
+	glViewport(0, 0, vpw, vph);
 //#if defined(RAD_OPT_OGLES)
 	if (discardHint)
 		ClearBackBuffer(); // discard hint
 //#endif
-	glViewport(0, 0, vpw, vph);
 }
 
 Mat4 GLWorldDraw::MakePerspectiveMatrix(
@@ -482,8 +485,6 @@ void GLWorldDraw::CreateScreenOverlay() {
 		m_overlaySize[0] = vpw;
 		m_overlaySize[1] = vph;
 	}
-
-	CreateRect(m_rectVB, m_rectIB);
 }
 
 void GLWorldDraw::BindPostFXQuad() {

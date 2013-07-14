@@ -135,12 +135,12 @@ void GLRenderTarget::BindFramebuffer(DiscardFlags flags) {
 		glsFlags |= kDepthWriteMask_Enable;
 	}
 
+	glViewport(0, 0, tex->width, tex->height);
+	
 	if (mask) {
 		gls.Set(glsFlags, -1, true); // for glClear()
 		glClear(mask);
 	}
-
-	glViewport(0, 0, tex->width, tex->height);
 }
 
 void GLRenderTarget::DiscardFramebuffer(DiscardFlags flags) {

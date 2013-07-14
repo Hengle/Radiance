@@ -64,14 +64,14 @@
 }
 
 - (void)presentScene {
+	GLenum attachments[] = {GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT};
+	glDiscardFramebufferEXT(GL_FRAMEBUFFER, 2, attachments);
+	
 	if (s_app && s_app->initialized)
 		r::gls.BindBuffer(GL_RENDERBUFFER, m_viewRenderbuffer);
 	else
 		glBindRenderbuffer(GL_RENDERBUFFER, m_viewRenderbuffer);
 	[context presentRenderbuffer:GL_RENDERBUFFER];
-
-	GLenum attachments[] = {GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT};
-	glDiscardFramebufferEXT(GL_FRAMEBUFFER, 2, attachments);
 }
 
 - (void)layoutSubviews  {
