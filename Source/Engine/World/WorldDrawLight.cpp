@@ -139,7 +139,8 @@ void WorldDraw::DrawUnshadowedLitBatchLights(
 			lightBounds.Initialize();
 	
 			while (interaction && (u.lights.numLights < kMaxLights)) {
-				if (interaction->light->m_visFrame != m_markFrame) {
+				if ((interaction->light->m_visFrame != m_markFrame) ||
+					(interaction->light->intensity < 0.01f)) {
 					interaction = interaction->nextOnBatch;
 					continue; // not visible this frame.
 				}
@@ -560,7 +561,7 @@ void WorldDraw::CalcUnifiedLightPosAndSize(
 	const Vec3 &origin = bounds.Origin();
 	
 	for (const details::LightInteraction *i = head; i; i = i->nextOnBatch) {
-		totalIntensity += i->light->intensity;
+		totalIntensity += math::Abs(i->light->intensity.get());
 	}
 
 	if (totalIntensity == 0.f)
@@ -576,7 +577,7 @@ void WorldDraw::CalcUnifiedLightPosAndSize(
 		Vec3 z = i->light->pos.get() - origin;
 		float dist = z.Magnitude();
 		float w = 1.f - math::Min(1.f, dist / i->light->radius);
-		w = w * w * (i->light->intensity / totalIntensity);
+		w = w * w * (math::Abs(i->light->intensity.get()) / totalIntensity);
 
 		totalWeight += w;
 
@@ -594,7 +595,7 @@ void WorldDraw::CalcUnifiedLightPosAndSize(
 		Vec3 z = i->light->pos.get() - origin;
 		float dist = z.Magnitude();
 		float w = 1.f - math::Min(1.f, dist / i->light->radius);
-		w = w * w * (i->light->intensity / totalIntensity);
+		w = w * w * (math::Abs(i->light->intensity.get()) / totalIntensity);
 
 		w = w / totalWeight;
 		pos += i->light->pos.get() * w;
