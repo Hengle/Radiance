@@ -1148,6 +1148,14 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 		}
 
 		DrawViewUnifiedShadows(view);
+	} else {
+		for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
+			const details::MBatch &batch = *it->second;
+
+			if (batch.matRef->mat->sort == r::Material::kSort_Solid) {
+				DrawUnlitBatch(view, *it->second, false);
+			}
+		}
 	}
 
 	// draw unlit translucent surfaces
@@ -1175,6 +1183,16 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 					if (batch.matRef->mat->maxLights > 0) {
 						DrawUnshadowedLitBatch(view, *it->second);
 					}
+				}
+			}
+		}
+	} else {
+		for (int i = r::Material::kSort_Translucent; i < r::Material::kNumSorts; ++i) {
+			for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
+				const details::MBatch &batch = *it->second;
+
+				if (batch.matRef->mat->sort == (r::Material::Sort)i) {
+					DrawUnlitBatch(view, *it->second, false);
 				}
 			}
 		}
