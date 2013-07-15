@@ -74,19 +74,19 @@ private:
 	Light(World *w);
 
 	RAD_DECLARE_GET(diffuseColor, const Vec3&) {
-		return m_dfColor;
+		return m_dfColor[0];
 	}
 
 	RAD_DECLARE_SET(diffuseColor, const Vec3&) {
-		m_dfColor = value;
+		m_dfColor[0] = value;
 	}
 
 	RAD_DECLARE_GET(specularColor, const Vec3&) {
-		return m_spColor;
+		return m_spColor[0];
 	}
 
 	RAD_DECLARE_SET(specularColor, const Vec3&) {
-		m_spColor = value;
+		m_spColor[0] = value;
 	}
 
 	RAD_DECLARE_GET(shadowColor, const Vec4&) {
@@ -130,11 +130,11 @@ private:
 	}
 
 	RAD_DECLARE_GET(intensity, float) {
-		return m_intensity;
+		return m_intensity[0];
 	}
 
 	RAD_DECLARE_SET(intensity, float) {
-		m_intensity = value;
+		m_intensity[0] = value;
 	}
 
 	RAD_DECLARE_GET(interactionFlags, int) {
@@ -148,12 +148,13 @@ private:
 	details::LightInteraction **ChainHead(int matId);
 
 	void AnimateIntensity(float dt);
+
 	void AnimateColor(
 		float dt,
 		ColorStep::Vec &steps,
 		int &index,
 		double &time,
-		Vec3 &color,
+		Vec3 *color,
 		bool loop
 	);
 
@@ -161,7 +162,7 @@ private:
 		const ColorStep::Vec &srcVec,
 		bool srcLoop,
 		ColorStep::Vec &vec,
-		Vec3 &color,
+		Vec3 *color,
 		double &time,
 		int &index,
 		bool &loop
@@ -176,11 +177,11 @@ private:
 	details::LightInteraction *m_interactionHead; // linkage to objects
 	IntSet m_areas;
 	BBox m_bounds;
-	Vec3 m_spColor;
+	Vec3 m_spColor[2];
+	Vec3 m_dfColor[2];
 	Vec4 m_shColor;
-	Vec3 m_dfColor;
 	Vec3 m_pos;
-	float m_intensity;
+	float m_intensity[2];
 	float m_radius;
 	double m_intensityTime;
 	double m_dfTime;

@@ -16,7 +16,6 @@ Light::Light(World *w) :
 m_interactionHead(0),
 m_pos(Vec3::Zero),
 m_style(kStyle_Diffuse|kStyle_Specular|kStyle_CastShadows),
-m_intensity(1.f),
 m_intensityTime(0.0),
 m_dfTime(0.0),
 m_spTime(0.0),
@@ -35,9 +34,10 @@ m_world(w),
 m_markFrame(-1),
 m_visFrame(-1),
 m_drawFrame(-1) {
+	m_intensity[0] = m_intensity[1] = 1.f;
 	m_shColor = Vec4(0,0,0,1);
-	m_spColor = Vec3(1,1,1);
-	m_dfColor = Vec3(1,1,1);
+	m_spColor[0] = m_spColor[1] = Vec3(1,1,1);
+	m_dfColor[0] = m_dfColor[1] = Vec3(1,1,1);
 	m_bounds = BBox(-Vec3(m_radius, m_radius, m_radius), Vec3(m_radius, m_radius, m_radius));
 }
 
@@ -60,42 +60,39 @@ void Light::Unlink() {
 
 void Light::AnimateIntensity(float dt) {
 	if (!m_intensitySteps.empty()) {
+		double baseTime = 0.0;
 		m_intensityTime += (double)dt;
 
 		const IntensityStep *cur = &m_intensitySteps[m_intensityStep];
 
-		if (m_intensityStep+1 >= (int)m_intensitySteps.size()) {
-			// off the end
-			if (m_intensityLoop) {
-				m_intensityStep = 0;
-				cur = &m_intensitySteps[0];
-				m_intensityTime = dt;
-			} else {
-				m_intensity = cur->intensity;
-				m_intensitySteps.clear();
-				return;
-			}
-		}
+		while (m_intensityTime > cur->time) {
 
-		const IntensityStep *next = &m_intensitySteps[m_intensityStep+1];
-
-		while (m_intensityTime > next->time) {
+			m_intensity[1] = cur->intensity;
 			
 			++m_intensityStep;
 			
-			if (m_intensityStep+1 >= (int)m_intensitySteps.size()) {
-				return; // process overflow next tick
+			if (m_intensityStep >= (int)m_intensitySteps.size()) {
+				if (m_intensityLoop) {
+					m_intensityStep = 0;
+					m_intensityTime -= cur->time;
+					cur = &m_intensitySteps[0];
+				} else {
+					m_intensity[0] = m_intensity[1] = cur->intensity;
+					m_intensitySteps.clear();
+					return;
+				}
 			}
 			
-			cur = next;
-			next = &m_intensitySteps[m_intensityStep+1];
+			cur = &m_intensitySteps[m_intensityStep];
 		}
 
-		if (!m_intensitySteps.empty()) {
-			float dt = next->time - cur->time;
-			float offset = m_intensityTime - cur->time;
-			m_intensity = math::Lerp(cur->intensity, next->intensity, offset / dt);
+		if (m_intensityStep > 0) {
+			baseTime = m_intensitySteps[m_intensityStep-1].time;
 		}
+
+		float dt = cur->time - baseTime;
+		float offset = m_intensityTime - baseTime;
+		m_intensity[0] = math::Lerp(m_intensity[1], cur->intensity, offset / dt);
 	}
 }
 
@@ -104,46 +101,43 @@ void Light::AnimateColor(
 	ColorStep::Vec &steps,
 	int &index,
 	double &time,
-	Vec3 &color,
+	Vec3 *color,
 	bool loop
 ) {
 	if (!steps.empty()) {
+		double baseTime = 0.0;
 		time += (double)dt;
 
 		const ColorStep *cur = &steps[index];
 
-		if (index+1 >= (int)steps.size()) {
-			// off the end
-			if (loop) {
-				index = 0;
-				cur = &steps[0];
-				time = dt;
-			} else {
-				color = cur->color;
-				steps.clear();
-				return;
-			}
-		}
+		while (time > cur->time) {
 
-		const ColorStep *next = &steps[index+1];
-
-		while (time > next->time) {
+			color[1] = cur->color;
 			
 			++index;
 			
-			if (index+1 >= (int)steps.size()) {
-				return; // process overflow next tick
+			if (index >= (int)steps.size()) {
+				if (loop) {
+					index = 0;
+					time -= cur->time;
+					cur = &steps[0];
+				} else {
+					color[0] = color[1] = cur->color;
+					steps.clear();
+					return;
+				}
 			}
 			
-			cur = next;
-			next = &steps[index+1];
+			cur = &steps[index];
 		}
 
-		if (!steps.empty()) {
-			float dt = next->time - cur->time;
-			float offset = time - cur->time;
-			color = math::Lerp(cur->color, next->color, offset / dt);
+		if (index > 0) {
+			baseTime = steps[index-1].time;
 		}
+
+		float dt = cur->time - baseTime;
+		float offset = time - baseTime;
+		color[0] = math::Lerp(color[1], cur->color, offset / dt);
 	}
 }
 
@@ -177,7 +171,7 @@ void Light::AnimateIntensity(const IntensityStep::Vec &vec, bool loop) {
 		return;
 	}
 	if (vec.size() < 2) {
-		m_intensity = vec[0].intensity;
+		m_intensity[0] = vec[0].intensity;
 		m_intensitySteps.clear();
 		return;
 	}
@@ -185,16 +179,11 @@ void Light::AnimateIntensity(const IntensityStep::Vec &vec, bool loop) {
 	m_intensityLoop = loop;
 	m_intensityTime = 0.0;
 	m_intensityStep = 0;
+	m_intensity[1] = m_intensity[0];
+	m_intensitySteps = vec;
 
-	m_intensitySteps.clear();
-	IntensityStep current;
-	current.intensity = m_intensity;
-	current.time = 0.0;
-	m_intensitySteps.push_back(current);
-	std::copy(vec.begin(), vec.end(), std::back_inserter(m_intensitySteps));
-	
 	double dt = 0.0;
-	for (size_t i = 1; i < m_intensitySteps.size(); ++i) {
+	for (size_t i = 0; i < m_intensitySteps.size(); ++i) {
 		m_intensitySteps[i].time += dt;
 		dt += m_intensitySteps[i].time;
 	}
@@ -204,7 +193,7 @@ void Light::InitColorSteps(
 	const ColorStep::Vec &srcVec,
 	bool srcLoop,
 	ColorStep::Vec &vec,
-	Vec3 &color,
+	Vec3 *color,
 	double &time,
 	int &index,
 	bool &loop
@@ -214,7 +203,7 @@ void Light::InitColorSteps(
 		return;
 	}
 	if (srcVec.size() < 2) {
-		color = srcVec[0].color;
+		color[0] = color[1] = srcVec[0].color;
 		vec.clear();
 		return;
 	}
@@ -223,15 +212,11 @@ void Light::InitColorSteps(
 	time = 0.0;
 	index = 0;
 
-	vec.clear();
-	ColorStep current;
-	current.color = color;
-	current.time = 0.0;
-	vec.push_back(current);
-	std::copy(srcVec.begin(), srcVec.end(), std::back_inserter(vec));
+	vec = srcVec;
+	color[1] = color[0];
 
 	double dt = 0.0;
-	for (size_t i = 1; i < vec.size(); ++i) {
+	for (size_t i = 0; i < vec.size(); ++i) {
 		vec[i].time += dt;
 		dt += vec[i].time;
 	}
