@@ -504,30 +504,9 @@ void SkAnimStatesParser::ParseAnimState(lua_State *L, const pkg::Asset::Ref &ass
 					__LINE__
 				);
 			}
-
-			const bool *b2 = 0;
-			it = map.find(CStr("absrotate"));
-			if (it != map.end()) {
-				b2 = static_cast<const bool*>(it->second);
-				if (!b2) {
-					luaL_error(L, "AnimState '%s':'%s':rotate expected boolean, (Function %s, File %s, Line %d)",
-						asset->name.get(),
-						state.name.c_str.get(),
-						__FUNCTION__,
-						__FILE__,
-						__LINE__
-					);
-				}
-			}
-
-			if (*b) {
-				if (b2 && *b2) {
-					// remove motion but keep absolute orientation (no deltas).
-					state.moveType = ska::AnimState::kMoveType_RemoveMotion;
-				} else {
-					state.moveType = ska::AnimState::kMoveType_RemoveMotionAndRotation;
-				}
-			}
+			
+			if (*b)
+				state.moveType = ska::AnimState::kMoveType_RemoveMotion;
 		}
 	}
 

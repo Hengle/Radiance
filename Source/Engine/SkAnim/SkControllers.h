@@ -32,8 +32,7 @@ struct AnimState {
 	enum MoveType {
 		kMoveType_None,
 		kMoveType_Distance,
-		kMoveType_RemoveMotion,
-		kMoveType_RemoveMotionAndRotation,
+		kMoveType_RemoveMotion
 	};
 	
 	String name;

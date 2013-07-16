@@ -393,9 +393,6 @@ bool AnimationSource::Tick(
 				out[0].t[0] = 0.f; // null out X axis motion
 			} else if((m_moveType == AnimState::kMoveType_RemoveMotion) && (firstBone == 0)) {
 				out[0].t = Vec3::Zero; // remove all motion
-			} else if((m_moveType == AnimState::kMoveType_RemoveMotionAndRotation) && (firstBone == 0)) {
-				out[0].t = Vec3::Zero; // remove all motion
-				out[0].r = Quat::Identity;
 			}
 		}
 
