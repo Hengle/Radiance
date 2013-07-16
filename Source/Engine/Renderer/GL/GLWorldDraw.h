@@ -8,6 +8,7 @@
 #include "../../World/World.h"
 #include "GLVertexBuffer.h"
 #include "GLRenderTarget.h"
+#include "../Mesh.h"
 #include "../Material.h"
 #include "../../Packages/PackagesDef.h"
 #include "../../Assets/MaterialParser.h"
@@ -87,10 +88,10 @@ public:
 		const Vec2 &dstScale
 	);
 
-	virtual void BindPostFXQuad();
+	virtual void BindPostFXQuad(const r::Material &mat);
 	virtual void DrawPostFXQuad();
 
-	virtual void BindOverlay();
+	virtual void BindOverlay(const r::Material &mat);
 	
 	virtual void DrawOverlay();
 	virtual void CommitStates();
@@ -182,18 +183,16 @@ private:
 	void CreateOverlay(
 		int vpw, 
 		int vph,
-		r::GLVertexBuffer::Ref &vb,
-		r::GLVertexBuffer::Ref &ib,
+		r::Mesh::Ref &mesh,
 		bool invY
 	);
 
-	void CreateRect(r::GLVertexBuffer::Ref &vb, r::GLVertexBuffer::Ref &ib);
+	void CreateRect();
 
 	asset::MaterialBundle m_copy_M;
-	r::GLVertexBuffer::Ref m_overlayVB[2];
-	r::GLVertexBuffer::Ref m_overlayIB[2];
-	r::GLVertexBuffer::Ref m_rectVB;
-	r::GLVertexBuffer::Ref m_rectIB;
+	r::Mesh::Ref m_rectMesh;
+	r::Mesh::Ref m_overlays[2];
+
 	int m_overlaySize[2];
 	bool m_flipMatrix;
 

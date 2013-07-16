@@ -138,10 +138,10 @@ public:
 	
 	// Post Process FX
 	virtual Vec2 BindPostFXTargets(bool chain, const r::Material &mat, const Vec2 &srcScale, const Vec2 &dstScale) = 0;
-	virtual void BindPostFXQuad() = 0;
+	virtual void BindPostFXQuad(const r::Material &mat) = 0;
 	virtual void DrawPostFXQuad() = 0;
 
-	virtual void BindOverlay() = 0;
+	virtual void BindOverlay(const r::Material &mat) = 0;
 	
 	virtual void DrawOverlay() = 0;
 	virtual void CommitStates() = 0;

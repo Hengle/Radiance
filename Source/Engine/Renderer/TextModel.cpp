@@ -329,17 +329,17 @@ void TextModel::BindFont(int fontWidth, int fontHeight) {
 	m_fontInstance->it = s_fontHash.insert(FontInstanceHash::value_type(key, m_fontInstance)).first;
 }
 
-void TextModel::BeginPass(int i) {
+void TextModel::BeginPass(const r::Material &material, int i) {
 	RAD_ASSERT(i < (int)m_passes.size());
 	Pass &p = m_passes[i];
 	RAD_ASSERT(p.page);
-	BindStates(p.ofs, p.num, *p.page);
+	BindStates(material, p.ofs, p.num, *p.page);
 	m_curPass = &p;
 }
 
-void TextModel::Draw() {
+void TextModel::DrawVerts(const r::Material &material) {
 	RAD_ASSERT(m_curPass);
-	DrawVerts(m_curPass->ofs, m_curPass->num);
+	DrawVerts(material, m_curPass->ofs, m_curPass->num);
 }
 
 void TextModel::EndPass() {
@@ -355,11 +355,11 @@ void TextModel::BatchDraw(r::Material &material, bool sampleMaterialColor, const
 	Shader::Uniforms u(rgba);
 
 	for (int i = 0; i < numPasses; ++i) {
-		BeginPass(i);
+		BeginPass(material, i);
 		material.shader->Begin(Shader::kPass_Default, material);
 		material.shader->BindStates(u, sampleMaterialColor);
 		App::Get()->engine->sys->r->CommitStates();
-		Draw();
+		DrawVerts(material);
 		material.shader->End();
 	}
 }

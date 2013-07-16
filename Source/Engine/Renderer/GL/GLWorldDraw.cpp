@@ -60,7 +60,7 @@ int GLWorldDraw::LoadMaterials() {
 
 int GLWorldDraw::Precache() {
 	CreateScreenOverlay();
-	CreateRect(m_rectVB, m_rectIB);
+	CreateRect();
 	return pkg::SR_Success;
 }
 
@@ -161,11 +161,10 @@ void GLWorldDraw::Copy(
 	const r::GLRenderTarget::Ref &src,
 	const r::GLRenderTarget::Ref &dst
 ) {
-	ReleaseArrayStates();
-
 	m_copy_M.material->BindTextures(m_copy_M.loader);
 	src->BindTexture(0);
 	dst->BindFramebuffer(GLRenderTarget::kDiscard_All);
+	m_copy_M.material->BindStates();
 
 	m_copy_M.material->shader->Begin(r::Shader::kPass_Default, *m_copy_M.material);
 
@@ -175,46 +174,21 @@ void GLWorldDraw::Copy(
 
 	gl.Ortho(0.0, 1.0, 1.0, 0.0, -1.0, 1.0);
 
+	bool oldCullFace = gls.invertCullFace;
 	gls.invertCullFace = false;
 
 	gl.MatrixMode(GL_MODELVIEW);
 	gl.PushMatrix();
 	gl.LoadIdentity();
 
-	gls.DisableAllMGSources();
-	gls.SetMGSource(
-		kMaterialGeometrySource_Vertices,
-		0,
-		m_rectVB,
-		2,
-		GL_FLOAT,
-		GL_FALSE,
-		sizeof(OverlayVert),
-		0
-	);
+	m_rectMesh->BindAll(m_copy_M.material->shader.get().get());
 
-	gls.SetMGSource(
-		kMaterialGeometrySource_TexCoords,
-		0,
-		m_rectVB,
-		2,
-		GL_FLOAT,
-		GL_FALSE,
-		sizeof(OverlayVert),
-		sizeof(float)*2
-	);
-
-	gls.BindBuffer(
-		GL_ELEMENT_ARRAY_BUFFER_ARB,
-		m_rectIB
-	);
-
-	m_copy_M.material->BindStates();
 	m_copy_M.material->shader->BindStates();
 	gls.Commit();
+	
+	m_rectMesh->CompileArrayStates(*m_copy_M.material->shader.get());
+	m_rectMesh->Draw();
 
-	gl.DrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
-	CHECK_GL_ERRORS();
 	m_copy_M.material->shader->End();
 
 	gl.MatrixMode(GL_PROJECTION);
@@ -222,6 +196,8 @@ void GLWorldDraw::Copy(
 
 	gl.MatrixMode(GL_MODELVIEW);
 	gl.PopMatrix();
+
+	gls.invertCullFace = oldCullFace;
 }
 
 void GLWorldDraw::BeginUnifiedShadows() {
@@ -505,115 +481,62 @@ void GLWorldDraw::CreateScreenOverlay() {
 	if (vpw != m_overlaySize[0] ||
 		vph != m_overlaySize[1]) {
 		RAD_ASSERT(vpw&&vph);
-		CreateOverlay(vpw, vph, m_overlayVB[0], m_overlayIB[0], false);
-		CreateOverlay(vpw, vph, m_overlayVB[1], m_overlayIB[1], true);
+		CreateOverlay(vpw, vph, m_overlays[0], false);
+		CreateOverlay(vpw, vph, m_overlays[1], true);
 		m_overlaySize[0] = vpw;
 		m_overlaySize[1] = vph;
 	}
 }
 
-void GLWorldDraw::BindPostFXQuad() {
-	CreateScreenOverlay();
-	RAD_ASSERT(m_overlayVB);
-	RAD_ASSERT(m_overlayIB);
-
-	gls.DisableAllMGSources();
-	gls.SetMGSource(
-		kMaterialGeometrySource_Vertices,
-		0,
-		m_activeRT ? m_overlayVB[1] : m_overlayVB[0],
-		2,
-		GL_FLOAT,
-		GL_FALSE,
-		sizeof(OverlayVert),
-		0
-	);
-
-	gls.SetMGSource(
-		kMaterialGeometrySource_TexCoords,
-		0,
-		m_activeRT ? m_overlayVB[1] : m_overlayVB[0],
-		2,
-		GL_FLOAT,
-		GL_FALSE,
-		sizeof(OverlayVert),
-		sizeof(float)*2
-	);
-
-	gls.BindBuffer(
-		GL_ELEMENT_ARRAY_BUFFER_ARB,
-		m_activeRT ? m_overlayIB[1] : m_overlayIB[0]
-	);
+void GLWorldDraw::BindPostFXQuad(const r::Material &mat) {
+	BindOverlay(mat);
 }
 
 void GLWorldDraw::DrawPostFXQuad() {
-	gl.DrawElements(GL_TRIANGLES, (OverlayDiv-1)*(OverlayDiv-1)*6, GL_UNSIGNED_SHORT, 0);
-	CHECK_GL_ERRORS();
+	DrawOverlay();
 }
 
-void GLWorldDraw::BindOverlay() {
+void GLWorldDraw::BindOverlay(const r::Material &mat) {
 	BOOST_STATIC_ASSERT(sizeof(GLWorldDraw::OverlayVert)==16);
 	
 	CreateScreenOverlay();
 
-	GLVertexBuffer::Ref vb = m_activeRT ? m_overlayVB[1] : m_overlayVB[0];
-	GLVertexBuffer::Ref ib = m_activeRT ? m_overlayIB[1] : m_overlayIB[0];
-	
-	RAD_ASSERT(vb);
-	RAD_ASSERT(ib);
-
-	gls.DisableAllMGSources();
-	gls.SetMGSource(
-		kMaterialGeometrySource_Vertices,
-		0,
-		vb,
-		2,
-		GL_FLOAT,
-		GL_FALSE,
-		sizeof(OverlayVert),
-		0
-	);
-
-	gls.SetMGSource(
-		kMaterialGeometrySource_TexCoords,
-		0,
-		vb,
-		2,
-		GL_FLOAT,
-		GL_FALSE,
-		sizeof(OverlayVert),
-		sizeof(float)*2
-	);
-
-	gls.BindBuffer(
-		GL_ELEMENT_ARRAY_BUFFER_ARB,
-		ib
-	);
+	const r::Mesh::Ref &mesh = m_activeRT ? m_overlays[1] : m_overlays[0];
+	mesh->BindAll(mat.shader.get().get());
 }
 
 void GLWorldDraw::DrawOverlay() {
-	gl.DrawElements(GL_TRIANGLES, (OverlayDiv-1)*(OverlayDiv-1)*6, GL_UNSIGNED_SHORT, 0);
+	const r::Mesh::Ref &mesh = m_activeRT ? m_overlays[1] : m_overlays[0];
+	mesh->Draw();
 	CHECK_GL_ERRORS();
 }
 
 void GLWorldDraw::CreateOverlay(
 	int vpw, 
 	int vph,
-	GLVertexBuffer::Ref &_vb,
-	GLVertexBuffer::Ref &_ib,
+	r::Mesh::Ref &mesh,
 	bool invY
 ) {
-	_vb.reset(
-		new GLVertexBuffer(
-			GL_ARRAY_BUFFER_ARB, 
-			GL_STATIC_DRAW_ARB, 
-			sizeof(OverlayVert)*OverlayDiv*OverlayDiv
-		)
+	mesh.reset(new (ZRender) Mesh());
+	int stream = mesh->AllocateStream(kStreamUsage_Static, sizeof(OverlayVert), OverlayDiv*OverlayDiv);
+
+	mesh->MapSource(
+		stream,
+		kMaterialGeometrySource_Vertices,
+		0,
+		sizeof(OverlayVert),
+		0
 	);
 
-	RAD_ASSERT(_vb);
+	mesh->MapSource(
+		stream,
+		kMaterialGeometrySource_TexCoords,
+		0,
+		sizeof(OverlayVert),
+		sizeof(float)*2
+	);
 
-	GLVertexBuffer::Ptr::Ref vb = _vb->Map();
+	GLVertexBuffer::Ptr::Ref vb = mesh->Map(stream);
 	RAD_ASSERT(vb);
 	OverlayVert *verts = (OverlayVert*)vb->ptr.get();
 
@@ -641,15 +564,7 @@ void GLWorldDraw::CreateOverlay(
 
 	// setup triangle indices
 
-	_ib.reset(
-		new GLVertexBuffer(
-			GL_ELEMENT_ARRAY_BUFFER_ARB,
-			GL_STATIC_DRAW_ARB,
-			sizeof(U16)*(OverlayDiv-1)*(OverlayDiv-1)*6
-		)
-	);
-
-	vb = _ib->Map();
+	vb = mesh->MapIndices(kStreamUsage_Static, sizeof(U16), (OverlayDiv-1)*(OverlayDiv-1)*6);
 	RAD_ASSERT(vb);
 	U16 *indices = (U16*)vb->ptr.get();
 
@@ -669,18 +584,28 @@ void GLWorldDraw::CreateOverlay(
 	vb.reset(); // unmap
 }
 
-void GLWorldDraw::CreateRect(r::GLVertexBuffer::Ref &_vb, r::GLVertexBuffer::Ref &_ib) {
-	_vb.reset(
-		new GLVertexBuffer(
-			GL_ARRAY_BUFFER_ARB, 
-			GL_STATIC_DRAW_ARB, 
-			sizeof(OverlayVert)*4
-		)
+void GLWorldDraw::CreateRect() {
+
+	m_rectMesh.reset(new (ZRender) Mesh());
+	int stream = m_rectMesh->AllocateStream(r::kStreamUsage_Static, sizeof(OverlayVert), 4, false);
+
+	m_rectMesh->MapSource(
+		stream,
+		kMaterialGeometrySource_Vertices, 
+		0, 
+		sizeof(OverlayVert), 
+		0
 	);
 
-	RAD_ASSERT(_vb);
+	m_rectMesh->MapSource(
+		stream,
+		kMaterialGeometrySource_TexCoords,
+		0,
+		sizeof(OverlayVert),
+		sizeof(float)*2
+	);
 
-	GLVertexBuffer::Ptr::Ref vb = _vb->Map();
+	GLVertexBuffer::Ptr::Ref vb = m_rectMesh->Map(stream);
 	RAD_ASSERT(vb);
 	OverlayVert *verts = (OverlayVert*)vb->ptr.get();
 
@@ -709,15 +634,7 @@ void GLWorldDraw::CreateRect(r::GLVertexBuffer::Ref &_vb, r::GLVertexBuffer::Ref
 
 	// setup triangle indices
 
-	_ib.reset(
-		new GLVertexBuffer(
-			GL_ELEMENT_ARRAY_BUFFER_ARB,
-			GL_STATIC_DRAW_ARB,
-			sizeof(U16)*6
-		)
-	);
-
-	vb = _ib->Map();
+	vb = m_rectMesh->MapIndices(kStreamUsage_Static, sizeof(U16), 6);
 	RAD_ASSERT(vb);
 	U16 *indices = (U16*)vb->ptr.get();
 

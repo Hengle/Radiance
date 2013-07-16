@@ -348,6 +348,8 @@ void WorldDraw::Draw(Counters *counters) {
 
 		if (m_postFXRT)
 			PostProcess();
+
+		m_rb->ReleaseArrayStates();
 	}
 
 	DrawUI();
@@ -1120,6 +1122,7 @@ void WorldDraw::DrawOverlays() {
 
 void WorldDraw::DrawUI() {
 	m_world->uiRoot->Draw(0);
+	m_rb->ReleaseArrayStates();
 }
 
 void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
@@ -1290,7 +1293,7 @@ void WorldDraw::DrawOverlay(ScreenOverlay &overlay) {
 	matRef->mat->BindStates();
 	matRef->mat->BindTextures(matRef->loader);
 	matRef->mat->shader->Begin(r::Shader::kPass_Default, *matRef->mat);
-	m_rb->BindOverlay();
+	m_rb->BindOverlay(*matRef->mat);
 	Shader::Uniforms u(Vec4(1, 1, 1, overlay.alpha));
 	matRef->mat->shader->BindStates(u);
 	m_rb->CommitStates();
@@ -1335,7 +1338,7 @@ void WorldDraw::PostProcess() {
 		u.pfxVars = m_rb->BindPostFXTargets(--num > 0, *m, fx->srcScale, dstScale);
 		m->BindStates();
 		m->shader->Begin(r::Shader::kPass_Default, *m);
-		m_rb->BindPostFXQuad();
+		m_rb->BindPostFXQuad(*m);
 		m->shader->BindStates(u);
 		m_rb->CommitStates();
 		m_rb->DrawPostFXQuad();

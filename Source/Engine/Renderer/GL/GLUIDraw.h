@@ -6,6 +6,7 @@
 #pragma once
 
 #include "../../UI/UIWidget.h"
+#include "../Mesh.h"
 #include "GLVertexBuffer.h"
 
 namespace ui {
@@ -72,10 +73,9 @@ private:
 	void InitRectVerts(int vpw, int vph);
 	void InitCircleVerts(int vpw, int vph);
 	
-	r::GLVertexBuffer::Ref m_rectVB;
-	r::GLVertexBuffer::Ref m_rectIB;
-	r::GLVertexBuffer::Ref m_circleVB;
-	r::GLVertexBuffer::Ref m_circleIB;
+	r::Mesh::Ref m_rect;
+	r::Mesh::Ref m_circle;
+
 	float m_srcvp[4];
 	float m_dstvp[4];
 	float m_todst[2];

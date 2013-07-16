@@ -82,7 +82,7 @@ font::IGlyphPage::Ref TextModel::AllocatePage(int width, int height) {
 
 GLTextModel::VertexType *GLTextModel::LockVerts(int num) {
 	ReserveVerts(num);
-	m_lock = m_vb->Map();
+	m_lock = m_mesh->Map(m_streamId);
 	return (VertexType*)m_lock->ptr.get();
 }
 
@@ -91,40 +91,32 @@ void GLTextModel::UnlockVerts() {
 }
 
 void GLTextModel::ReserveVerts(int num) {
-	AddrSize size = sizeof(VertexType)*num;
+	int size = sizeof(VertexType)*num;
 
-	if (!m_vb || (m_vb->size < size)) {
+	if (!m_mesh || (m_streamSize < size)) {
+		m_streamSize = size;
 		RAD_ASSERT(!m_lock);
-		m_vb.reset(new GLVertexBuffer(GL_ARRAY_BUFFER_ARB, GL_DYNAMIC_DRAW, size));
+		m_mesh.reset(new (ZRender) Mesh());
+		m_streamId = m_mesh->AllocateStream(kStreamUsage_Dynamic, sizeof(VertexType), num);
+		m_mesh->MapSource(
+			m_streamId,
+			kMaterialGeometrySource_Vertices,
+			0,
+			sizeof(VertexType),
+			0
+		);
+		m_mesh->MapSource(
+			m_streamId,
+			kMaterialGeometrySource_TexCoords,
+			0,
+			sizeof(VertexType),
+			sizeof(float)*2
+		);
 	}
 }
 
-void GLTextModel::BindStates(int ofs, int count, font::IGlyphPage &page) {
-	gls.DisableAllMGSources();
-	gls.DisableAllMTSources();
-
-	gls.SetMGSource(
-		kMaterialGeometrySource_Vertices,
-		0,
-		m_vb,
-		2,
-		GL_FLOAT,
-		GL_FALSE,
-		sizeof(VertexType),
-		0
-	);
-
-	gls.SetMGSource(
-		kMaterialGeometrySource_TexCoords,
-		0,
-		m_vb,
-		2,
-		GL_FLOAT,
-		GL_FALSE,
-		sizeof(VertexType),
-		sizeof(float)*2
-	);
-
+void GLTextModel::BindStates(const r::Material &material, int ofs, int count, font::IGlyphPage &page) {
+	m_mesh->BindAll(material.shader.get().get());
 	gls.SetMTSource(
 		kMaterialTextureSource_Texture,
 		0,
@@ -132,7 +124,8 @@ void GLTextModel::BindStates(int ofs, int count, font::IGlyphPage &page) {
 	);
 }
 
-void GLTextModel::DrawVerts(int ofs, int count) {
+void GLTextModel::DrawVerts(const r::Material &material, int ofs, int count) {
+	m_mesh->CompileArrayStates(*material.shader.get());
 	glDrawArrays(GL_TRIANGLES, ofs*6, count*6);
 }
 

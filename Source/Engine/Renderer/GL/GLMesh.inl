@@ -42,7 +42,6 @@ inline void GLMesh::FlushArrayStates(Shader *shader) {
 }
 
 inline void GLMesh::BindIndices(bool force) {
-	RAD_ASSERT(m_i.vb);
 	gls.BindBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, m_i.vb, force);
 }
 

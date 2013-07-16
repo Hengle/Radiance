@@ -117,36 +117,13 @@ void GLDraw::DrawRect(
 	m.BindTextures(l);
 	m.shader->Begin(r::Shader::kPass_Default, m);
 
-	gls.DisableAllMGSources();
-	gls.SetMGSource(
-		r::kMaterialGeometrySource_Vertices,
-		0,
-		m_rectVB,
-		2,
-		GL_FLOAT,
-		GL_FALSE,
-		sizeof(OverlayVert),
-		0
-	);
-	gls.SetMGSource(
-		r::kMaterialGeometrySource_TexCoords,
-		0,
-		m_rectVB,
-		2,
-		GL_FLOAT,
-		GL_FALSE,
-		sizeof(OverlayVert),
-		sizeof(float)*2
-	);
-	gls.BindBuffer(
-		GL_ELEMENT_ARRAY_BUFFER_ARB,
-		m_rectIB
-	);
+	m_rect->BindAll(m.shader.get().get());
 
 	Shader::Uniforms u(rgba);
 	m.shader->BindStates(u, sampleMaterialColor);
 	gls.Commit();
-	gl.DrawElements(GL_TRIANGLES, (kOverlayDiv-1)*(kOverlayDiv-1)*6, GL_UNSIGNED_SHORT, 0);
+	m_rect->CompileArrayStates(*m.shader.get());
+	m_rect->Draw();
 	CHECK_GL_ERRORS();
 	m.shader->End();
 
@@ -216,38 +193,12 @@ void GLDraw::DrawCircle(
 	m.BindTextures(l);
 	m.shader->Begin(r::Shader::kPass_Default, m);
 
-	gls.DisableAllMGSources();
-	gls.SetMGSource(
-		r::kMaterialGeometrySource_Vertices,
-		0,
-		m_circleVB,
-		2,
-		GL_FLOAT,
-		GL_FALSE,
-		sizeof(OverlayVert),
-		0
-	);
-	gls.SetMGSource(
-		r::kMaterialGeometrySource_TexCoords,
-		0,
-		m_circleVB,
-		2,
-		GL_FLOAT,
-		GL_FALSE,
-		sizeof(OverlayVert),
-		sizeof(float)*2
-	);
-	gls.BindBuffer(
-		GL_ELEMENT_ARRAY_BUFFER_ARB,
-		m_circleIB
-	);
-
+	m_circle->BindAll(m.shader.get().get());
 	Shader::Uniforms u(rgba);
 	m.shader->BindStates(u, sampleMaterialColor);
 	gls.Commit();
-
-	gl.DrawElements(GL_TRIANGLES, numElems, GL_UNSIGNED_SHORT, (const void*)(base*sizeof(U16)));
-	
+	m_circle->CompileArrayStates(*m.shader.get());
+	m_circle->Draw();
 	CHECK_GL_ERRORS();
 	m.shader->End();
 
@@ -332,17 +283,31 @@ void GLDraw::EndBatchText() {
 }
 
 void GLDraw::InitRectVerts(int vpw, int vph) {
-	m_rectVB.reset(
-		new GLVertexBuffer(
-			GL_ARRAY_BUFFER_ARB, 
-			GL_STATIC_DRAW_ARB, 
-			sizeof(OverlayVert)*kOverlayDiv*kOverlayDiv
-		)
+
+	m_rect.reset(new (ZRender) r::Mesh());
+	int stream = m_rect->AllocateStream(
+		r::kStreamUsage_Static, 
+		sizeof(OverlayVert), 
+		kOverlayDiv*kOverlayDiv
 	);
 
-	RAD_ASSERT(m_rectVB);
+	m_rect->MapSource(
+		stream,
+		r::kMaterialGeometrySource_Vertices,
+		0,
+		sizeof(OverlayVert),
+		0
+	);
 
-	GLVertexBuffer::Ptr::Ref vb = m_rectVB->Map();
+	m_rect->MapSource(
+		stream,
+		r::kMaterialGeometrySource_TexCoords,
+		0,
+		sizeof(OverlayVert),
+		sizeof(float)*2
+	);
+
+	GLVertexBuffer::Ptr::Ref vb = m_rect->Map(stream);
 	RAD_ASSERT(vb);
 	OverlayVert *verts = (OverlayVert*)vb->ptr.get();
 
@@ -366,15 +331,7 @@ void GLDraw::InitRectVerts(int vpw, int vph) {
 
 	// setup triangle indices
 
-	m_rectIB.reset(
-		new GLVertexBuffer(
-			GL_ELEMENT_ARRAY_BUFFER_ARB,
-			GL_STATIC_DRAW_ARB,
-			sizeof(U16)*(kOverlayDiv-1)*(kOverlayDiv-1)*6
-		)
-	);
-
-	vb = m_rectIB->Map();
+	vb = m_rect->MapIndices(r::kStreamUsage_Static, sizeof(U16), (kOverlayDiv-1)*(kOverlayDiv-1)*6);
 	RAD_ASSERT(vb);
 	U16 *indices = (U16*)vb->ptr.get();
 
@@ -395,17 +352,31 @@ void GLDraw::InitRectVerts(int vpw, int vph) {
 }
 
 void GLDraw::InitCircleVerts(int vpw, int vph) {
-	m_circleVB.reset(
-		new GLVertexBuffer(
-			GL_ELEMENT_ARRAY_BUFFER_ARB,
-			GL_STATIC_DRAW_ARB,
-			sizeof(OverlayVert)*kNumCircleVerts
-		)
+
+	m_circle.reset(new (ZRender) r::Mesh());
+	int stream = m_circle->AllocateStream(
+		r::kStreamUsage_Static, 
+		sizeof(OverlayVert), 
+		kNumCircleVerts
 	);
 
-	RAD_ASSERT(m_circleVB);
+	m_circle->MapSource(
+		stream,
+		r::kMaterialGeometrySource_Vertices,
+		0,
+		sizeof(OverlayVert),
+		0
+	);
 
-	GLVertexBuffer::Ptr::Ref vb = m_circleVB->Map();
+	m_circle->MapSource(
+		stream,
+		r::kMaterialGeometrySource_TexCoords,
+		0,
+		sizeof(OverlayVert),
+		sizeof(float)*2
+	);
+
+	GLVertexBuffer::Ptr::Ref vb = m_circle->Map(stream);
 	RAD_ASSERT(vb);
 	OverlayVert *verts = (OverlayVert*)vb->ptr.get();
 	RAD_DEBUG_ONLY(OverlayVert *endVert = verts + kNumCircleVerts);
@@ -478,15 +449,12 @@ void GLDraw::InitCircleVerts(int vpw, int vph) {
 
 	// indices
 
-	m_circleIB.reset(
-		new GLVertexBuffer(
-			GL_ELEMENT_ARRAY_BUFFER_ARB,
-			GL_STATIC_DRAW_ARB,
-			sizeof(U16)*kNumCircleStepTris*kNumCircleSteps*3
-		)
+	vb = m_circle->MapIndices(
+		r::kStreamUsage_Static, 
+		sizeof(U16), 
+		kNumCircleStepTris*kNumCircleSteps*3
 	);
 
-	vb = m_circleIB->Map();
 	RAD_ASSERT(vb);
 	U16 *indices = (U16*)vb->ptr.get();
 	RAD_DEBUG_ONLY(U16 *endIndices = indices+(kNumCircleStepTris*kNumCircleSteps*3));

@@ -152,8 +152,8 @@ protected:
 	virtual VertexType *LockVerts(int num) = 0;
 	virtual void UnlockVerts() = 0;
 	virtual void ReserveVerts(int num) = 0;
-	virtual void BindStates(int ofs, int count, font::IGlyphPage &page) = 0;
-	virtual void DrawVerts(int ofs, int count) = 0;
+	virtual void BindStates(const r::Material &material, int ofs, int count, font::IGlyphPage &page) = 0;
+	virtual void DrawVerts(const r::Material &material, int ofs, int count) = 0;
 
 	// implemented by RB
 	static font::IGlyphPage::Ref AllocatePage(int width, int height);
@@ -218,8 +218,8 @@ private:
 	void BuildTextVerts(const String *strings, int numStrings);
 	void BindFont(int fontWidth, int fontHeight);
 
-	void BeginPass(int i);
-	void Draw();
+	void BeginPass(const r::Material &material, int i);
+	void DrawVerts(const r::Material &material);
 	void EndPass();
 
 	RAD_DECLARE_GET(numPasses, int) { return (int)m_passes.size(); }
