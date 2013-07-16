@@ -25,10 +25,10 @@
 #include <bitset>
 #include <Runtime/PushPack.h>
 
-//#if defined(RAD_OPT_OGLES)
+#if defined(RAD_OPT_OGLES)
 #define PRERENDER_SHADOWS
 enum { kMaxPrerenderedShadowCount = 8 };
-//#endif
+#endif
 
 namespace world {
 
