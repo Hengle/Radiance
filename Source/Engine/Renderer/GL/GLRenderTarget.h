@@ -91,8 +91,9 @@ public:
 	);
 
 	void CreateRenderTargets(int num);
-	GLRenderTarget::Ref NextRenderTarget();
+	GLRenderTarget::Ref NextRenderTarget(bool wrap);
 
+	void Reset();
 	void Clear();
 
 	RAD_DECLARE_READONLY_PROPERTY(GLRenderTargetCache, width, GLsizei);
@@ -155,7 +156,8 @@ public:
 
 	GLRenderTarget::Ref NextRenderTarget(
 		GLsizei width,
-		GLsizei height
+		GLsizei height,
+		bool wrap
 	);
 
 	void Clear();

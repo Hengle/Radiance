@@ -25,6 +25,11 @@
 #include <bitset>
 #include <Runtime/PushPack.h>
 
+//#if defined(RAD_OPT_OGLES)
+#define PRERENDER_SHADOWS
+enum { kMaxPrerenderedShadowCount = 8 };
+//#endif
+
 namespace world {
 
 class FloorMove;
@@ -37,20 +42,23 @@ public:
 		kNumFrustumPlanes = 6
 	};
 	
-	ViewDef() : sky(false) {
+	ViewDef(WorldDraw *_draw) : draw(_draw),  sky(false) {
 	}
+
+	~ViewDef();
 
 	Camera camera;
 	Mat4 mvp;
 	Mat4 mv;
 
-	PlaneVec frustum;
+	PlaneStackVec frustum;
 	
 	AreaBits areas;
 	LightVec visLights;
 	EntityPtrVec shadowEntities;
 	MBatchOccupantPtrVec shadowOccupants;
 	details::MBatchIdMap batches;
+	WorldDraw *draw;
 
 	int viewport[4];
 	int area;
@@ -75,8 +83,10 @@ public:
 	virtual void EndFrame() = 0;
 	virtual int LoadMaterials() = 0;
 	virtual int Precache() = 0;
+	virtual void BindFramebuffer(bool discardHint) = 0;
 	virtual void ClearBackBuffer() = 0;
 	virtual void SetWorldStates() = 0;
+	virtual void FlipMatrixHack(bool enable) = 0;
 	
 	virtual Mat4 MakePerspectiveMatrix(
 		float left, 
@@ -120,9 +130,11 @@ public:
 	// Unified Shadows
 	virtual void BindRenderTarget() = 0;
 
-	virtual void BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) = 0;
-	virtual void BindUnifiedShadowTexture(r::Material &projectedMaterial) = 0;
-	virtual void UnbindUnifiedShadowRenderTarget() = 0;
+	virtual void BeginUnifiedShadows() = 0;
+	virtual void EndUnifiedShadows() = 0;
+
+	virtual bool BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) = 0;
+	virtual bool BindUnifiedShadowTexture(r::Material &projectedMaterial) = 0;
 	
 	// Post Process FX
 	virtual Vec2 BindPostFXTargets(bool chain, const r::Material &mat, const Vec2 &srcScale, const Vec2 &dstScale) = 0;
@@ -257,6 +269,7 @@ private:
 	friend class ScreenOverlay;
 	friend class World;
 	friend class MBatchDraw;
+	friend class ViewDef;
 	friend struct details::MBatch;
 	
 	class MStaticWorldMeshBatch : public MBatchDraw {
@@ -321,9 +334,9 @@ private:
 
 	void AddStaticWorldMesh(const r::Mesh::Ref &m, const BBox &bounds, int matId);
 
-	details::MBatchRef AllocateBatch();
+	details::MBatch* AllocateBatch();
 	details::MatRef *AddMaterialRef(int id);
-	details::MBatchRef AddViewBatch(ViewDef &view, int id);
+	details::MBatch* AddViewBatch(ViewDef &view, details::MatRef *matRef, int id);
 
 	void FindViewArea(ViewDef &view);
 	
@@ -336,7 +349,7 @@ private:
 	);
 
 	void SetupPerspectiveFrustumPlanes(
-		PlaneVec &planes,
+		PlaneStackVec &planes,
 		const Camera &camera,
 		const Vec4 &viewplanes,
 		const Vec2 &zplanes
@@ -393,6 +406,7 @@ private:
 		const BBox &bounds
 	);
 
+	void BindFramebuffer();
 	void DrawView();
 	void DrawView(ViewDef &view);
 	void DrawUI();
@@ -530,33 +544,53 @@ private:
 		Mat4 *tx
 	);
 
-	void DrawViewUnifiedShadows(const ViewDef &view);
-	bool DrawUnifiedEntityShadow(const ViewDef &view, const Entity &e);
-	bool DrawUnifiedOccupantShadow(const ViewDef &view, const MBatchOccupant &o);
+	struct UnifiedShadow {
+#if defined(PRERENDER_SHADOWS)
+		typedef stackify<std::vector<UnifiedShadow>, kMaxPrerenderedShadowCount> StackVec;
+#endif
+		PlaneStackVec frustum;
+		Mat4 mv;
+		Vec4 viewplanes;
+		Vec3 unifiedPos;
+		Vec2 zplanes;
+		float unifiedRadius;
+		const void *occluder;
+	};
 
-	bool DrawUnifiedShadowTexture(
+#if defined(PRERENDER_SHADOWS)
+	void GenerateViewUnifiedShadows(const ViewDef &view);
+#endif
+
+	void DrawViewUnifiedShadows(const ViewDef &view);
+
+	bool GenerateUnifiedEntityShadow(const ViewDef &view, const Entity &e, UnifiedShadow &projector);
+	bool GenerateUnifiedOccupantShadow(const ViewDef &view, const MBatchOccupant &o, UnifiedShadow &projector);
+	
+	void DrawUnifiedShadowTexture(
 		const ViewDef &view,
 		const DrawModel::Map &models,
 		const Vec3 &unifiedPos,
 		float unifiedRadius
 	);
 
-	bool DrawUnifiedShadowTexture(
+	void DrawUnifiedShadowTexture(
 		const ViewDef &view,
 		const MBatchDraw::RefVec &batches,
 		const Vec3 &unifiedPos,
 		float unifiedRadius
 	);
 
+	bool FindShadowMaterials(
+		const DrawModel::Map &models
+	);
+
+	bool FindShadowMaterials(
+		const MBatchDraw::RefVec &batches
+	);
+
 	void DrawViewWithUnifiedShadow(
 		const ViewDef &view,
-		const Vec3 &unifiedPos,
-		float unifiedRadius,
-		const PlaneVec &shadowFrustum,
-		const Mat4 &mv,
-		const Vec4 &viewplanes,
-		const Vec2 &zplanes,
-		const void *occluder
+		const UnifiedShadow &shadow
 	);
 
 	void CalcUnifiedLightPosAndSize(
@@ -576,6 +610,9 @@ private:
 	MemoryPool m_interactionPool;
 	
 	Counters m_counters;
+#if defined(PRERENDER_SHADOWS)
+	UnifiedShadow::StackVec m_unifiedShadows;
+#endif
 	asset::MaterialBundle m_projected_M;
 	asset::MaterialBundle m_shadow_M;
 	PostProcessEffect::Map m_postFX;
@@ -589,7 +626,8 @@ private:
 	int m_markFrame;
 	bool m_uiOnly;
 	bool m_init;
-	
+	bool m_postFXRT;
+
 #if defined(WORLD_DEBUG_DRAW)
 
 	typedef zone_vector<BBox, ZWorldT>::type BBoxVec;

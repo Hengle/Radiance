@@ -24,10 +24,12 @@ public:
 	virtual void EndFrame();
 	virtual int LoadMaterials();
 	virtual int Precache();
+	virtual void BindFramebuffer(bool discardHint);
 	virtual void BindRenderTarget();
     virtual void ClearBackBuffer();
 	virtual void SetWorldStates();
-	
+	virtual void FlipMatrixHack(bool enable);
+
 	virtual Mat4 MakePerspectiveMatrix(
 		float left, 
 		float right, 
@@ -67,15 +69,16 @@ public:
 		const Vec4 *scissorBounds
 	);
 
-	virtual void BindUnifiedShadowRenderTarget(
+	virtual void BeginUnifiedShadows();
+	virtual void EndUnifiedShadows();
+
+	virtual bool BindUnifiedShadowRenderTarget(
 		r::Material &shadowMaterial
 	);
 	
-	virtual void BindUnifiedShadowTexture(
+	virtual bool BindUnifiedShadowTexture(
 		r::Material &projectedMaterial
 	);
-
-	virtual void UnbindUnifiedShadowRenderTarget();
 	
 	virtual Vec2 BindPostFXTargets(
 		bool chain, 
@@ -144,7 +147,11 @@ private:
 
 	enum {
 		kNumRTs = 2,
+#if defined(PRERENDER_SHADOWS)
+		kNumShadowTextures = 8
+#else
 		kNumShadowTextures = 2
+#endif
 	};
 
 	void CalcBBoxScreenBounds(
@@ -155,7 +162,6 @@ private:
 	);
 
 	void CreateScreenOverlay();
-	void BindDefaultFB(bool discardHint);
 	
 	void Copy(
 		const r::GLRenderTarget::Ref &src,
@@ -189,6 +195,7 @@ private:
 	r::GLVertexBuffer::Ref m_rectVB;
 	r::GLVertexBuffer::Ref m_rectIB;
 	int m_overlaySize[2];
+	bool m_flipMatrix;
 
 #if defined(WORLD_DEBUG_DRAW)
 	enum {

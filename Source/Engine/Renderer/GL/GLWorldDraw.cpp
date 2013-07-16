@@ -30,7 +30,7 @@ RB_WorldDraw::Ref RB_WorldDraw::New(World *world) {
 	return RB_WorldDraw::Ref(new (ZWorld) GLWorldDraw(world));
 }
 
-GLWorldDraw::GLWorldDraw(World *world) : RB_WorldDraw(world) {
+GLWorldDraw::GLWorldDraw(World *world) : RB_WorldDraw(world), m_flipMatrix(false) {
 	m_overlaySize[0] = m_overlaySize[1] = 0;
 #if defined(WORLD_DEBUG_DRAW)
 	m_numDebugVerts = 0;
@@ -62,6 +62,10 @@ int GLWorldDraw::Precache() {
 	CreateScreenOverlay();
 	CreateRect(m_rectVB, m_rectIB);
 	return pkg::SR_Success;
+}
+
+void GLWorldDraw::FlipMatrixHack(bool enable) {
+	m_flipMatrix = enable;
 }
 
 void GLWorldDraw::BindRenderTarget() {
@@ -129,7 +133,7 @@ Vec2 GLWorldDraw::BindPostFXTargets(bool chain, const r::Material &mat, const Ve
 	GLRenderTarget::Ref curRT(m_activeRT);
 				
 	if ((curRT->tex->width != srcW) || (curRT->tex->height != srcH)) {
-		m_activeRT = m_rtCache->NextRenderTarget(srcW, srcH);
+		m_activeRT = m_rtCache->NextRenderTarget(srcW, srcH, true);
 		Copy(curRT, m_activeRT);
 		curRT = m_activeRT;
 	}
@@ -142,11 +146,11 @@ Vec2 GLWorldDraw::BindPostFXTargets(bool chain, const r::Material &mat, const Ve
 		int dstW = vpw * dstScale[0];
 		int dstH = vph * dstScale[1];
 
-		m_activeRT = m_rtCache->NextRenderTarget(dstW, dstH);
+		m_activeRT = m_rtCache->NextRenderTarget(dstW, dstH, true);
 		m_activeRT->BindFramebuffer(GLRenderTarget::kDiscard_All);
 	} else {
 		GLRenderTarget::DiscardFramebuffer(GLRenderTarget::kDiscard_Depth); // don't need depth anymore.
-		BindDefaultFB(true);
+		BindFramebuffer(true);
 		m_activeRT.reset();
 	}
 
@@ -220,7 +224,18 @@ void GLWorldDraw::Copy(
 	gl.PopMatrix();
 }
 
-void GLWorldDraw::BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) {
+void GLWorldDraw::BeginUnifiedShadows() {
+#if defined(PRERENDER_SHADOWS)
+	if (m_unifiedShadowRTCache)
+		m_unifiedShadowRTCache->Reset();
+	m_shadowRT.reset();
+#endif
+}
+
+void GLWorldDraw::EndUnifiedShadows() {
+}
+
+bool GLWorldDraw::BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) {
 
 	if (!m_unifiedShadowRTCache) {
 #if defined(RAD_OPT_OGLES)
@@ -252,10 +267,20 @@ void GLWorldDraw::BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) {
 		m_unifiedShadowRTCache->CreateRenderTargets(kNumShadowTextures);
 	}
 
+#if defined(PRERENDER_SHADOWS)
+	const bool kWrap = false;
+	if (m_shadowRT)
+		GLRenderTarget::DiscardFramebuffer(GLRenderTarget::kDiscard_Depth);
+#else
+	const bool kWrap = true;
 	if (m_shadowRT)
 		GLRenderTarget::DiscardFramebuffer(GLRenderTarget::kDiscard_All);
+#endif
 
-	m_shadowRT = m_unifiedShadowRTCache->NextRenderTarget();
+	m_shadowRT = m_unifiedShadowRTCache->NextRenderTarget(kWrap);
+	if (!m_shadowRT)
+		return false;
+
 	m_shadowRT->BindFramebuffer(GLRenderTarget::kDiscard_All);
 
 	gls.Scissor(
@@ -267,47 +292,43 @@ void GLWorldDraw::BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) {
 	CHECK_GL_ERRORS();
 
 	shadowMaterial.BindStates(kScissorTest_Enable);
+
+	return true;
 }
 
-void GLWorldDraw::UnbindUnifiedShadowRenderTarget() {
-
-	RAD_ASSERT(m_shadowRT);
-	GLRenderTarget::DiscardFramebuffer(GLRenderTarget::kDiscard_All);
-	m_shadowRT.reset();
-
-	if (m_activeRT) {
-		m_activeRT->BindFramebuffer(GLRenderTarget::kDiscard_None);
-	} else {
-		BindDefaultFB(false);
-	}
-}
-
-void GLWorldDraw::BindUnifiedShadowTexture(
+bool GLWorldDraw::BindUnifiedShadowTexture(
 	r::Material &projectedTexture
 ) {
-	GLRenderTarget::DiscardFramebuffer(GLRenderTarget::kDiscard_Depth);
+#if defined(PRERENDER_SHADOWS)
+	m_shadowRT = m_unifiedShadowRTCache->NextRenderTarget(false);
+	if (!m_shadowRT)
+		return false;
+#endif
+	RAD_ASSERT(m_shadowRT);
 	m_shadowRT->BindTexture(0);
 	GLTexture::GenerateMipmaps(m_shadowRT->tex);
 	m_shadowRT.reset();
 
 	if (m_activeRT) {
 		m_activeRT->BindFramebuffer(GLRenderTarget::kDiscard_None);
-	} else {
-		BindDefaultFB(false);
+	} 
+#if !defined(PRERENDER_SHADOWS)
+	else {
+		BindFramebuffer(false);
 	}
+#endif
 
 	projectedTexture.BindStates(0, kBlendModeSource_SrcAlpha|kBlendModeDest_InvSrcAlpha);
+	return true;
 }
 
-void GLWorldDraw::BindDefaultFB(bool discardHint) {
+void GLWorldDraw::BindFramebuffer(bool discardHint) {
 	int vpx, vpy, vpw, vph;
 	world->game->Viewport(vpx, vpy, vpw, vph);
 	App::Get()->engine->sys->r->BindFramebuffer();
-	glViewport(0, 0, vpw, vph);
-//#if defined(RAD_OPT_OGLES)
+	gls.Viewport(0, 0, vpw, vph);
 	if (discardHint)
 		ClearBackBuffer(); // discard hint
-//#endif
 }
 
 Mat4 GLWorldDraw::MakePerspectiveMatrix(
@@ -338,10 +359,12 @@ void GLWorldDraw::SetPerspectiveMatrix(
 
 	gl.Perspective(yfov, xaspect, 4.0, camera.farClip.get());
 
-	if (m_activeRT) { 
+	if (m_flipMatrix) { 
 		// render target tc's are flipped about Y, so correct for this in the perspective transform.
 		gl.Scalef(1.f, -1.f, 1.f);
 		gls.invertCullFace = true;
+	} else {
+		gls.invertCullFace = false;
 	}
 
 	gl.MatrixMode(GL_MODELVIEW);
@@ -389,10 +412,12 @@ void GLWorldDraw::SetOrthoMatrix(
 		(double)far
 	);
 
-	if (m_activeRT) { 
+	if (m_flipMatrix) { 
 		// render target tc's are flipped about Y, so correct for this in the transform.
 		gl.Scalef(1.f, -1.f, 1.f);
 		gls.invertCullFace = true;
+	} else {
+		gls.invertCullFace = false;
 	}
 
 	gl.MatrixMode(GL_MODELVIEW);

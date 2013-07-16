@@ -101,6 +101,14 @@ m_uid(uid) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+ViewDef::~ViewDef() {
+	for (details::MBatchIdMap::const_iterator it = batches.begin(); it != batches.end(); ++it) {
+		draw->DeleteBatch(it->second);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 Vec4 WorldDraw::MStaticWorldMeshBatch::s_rgba(Vec4(1, 1, 1, 1));
 Vec3 WorldDraw::MStaticWorldMeshBatch::s_scale(Vec3(1, 1, 1));
 
@@ -152,7 +160,8 @@ m_world(w),
 m_frame(-1), 
 m_markFrame(-1),
 m_uiOnly(false),
-m_init(false) {
+m_init(false),
+m_postFXRT(false) {
 	m_lights[0] = m_lights[1] = 0;
 	m_rb = RB_WorldDraw::New(w);
 }
@@ -253,11 +262,11 @@ void WorldDraw::DeleteBatch(details::MBatch *batch) {
 	batch->owner->m_batchPool.Destroy(batch);
 }
 
-details::MBatchRef WorldDraw::AllocateBatch() {
+details::MBatch* WorldDraw::AllocateBatch() {
 	details::MBatch *batch = m_batchPool.Construct();
 	RAD_OUT_OF_MEM(batch);
 	batch->owner = this;
-	return details::MBatchRef(batch, &WorldDraw::DeleteBatch);
+	return batch;
 }
 
 details::MatRef *WorldDraw::AddMaterialRef(int id) {
@@ -282,16 +291,12 @@ details::MatRef *WorldDraw::AddMaterialRef(int id) {
 	return &p.first->second;
 }
 
-details::MBatchRef WorldDraw::AddViewBatch(ViewDef &view, int id) {
+details::MBatch* WorldDraw::AddViewBatch(ViewDef &view, details::MatRef *matRef, int id) {
 	details::MBatchIdMap::iterator it = view.batches.find(id);
 	if (it != view.batches.end())
 		return it->second;
 
-	details::MatRef *matRef = AddMaterialRef(id);
-	if (!matRef)
-		return details::MBatchRef();
-
-	details::MBatchRef b(AllocateBatch());
+	details::MBatch *b = AllocateBatch();
 	b->matRef = matRef;
 	view.batches.insert(details::MBatchIdMap::value_type(id, b));
 	return b;
@@ -315,13 +320,21 @@ void WorldDraw::AddStaticWorldMesh(const r::Mesh::Ref &m, const BBox &bounds, in
 	m_worldModels.push_back(r);
 }
 
+void WorldDraw::BindFramebuffer() {
+	if (m_postFXRT) {
+		m_rb->BindRenderTarget();
+	} else {
+		m_rb->BindFramebuffer(true); // discard
+	}
+}
+
 void WorldDraw::Draw(Counters *counters) {
 	m_counters.Clear();
 
-	bool postFX = false;
+	m_postFXRT = false;
 
 	if (!m_uiOnly) {
-		postFX = NumActivePostFX() > 0;
+		m_postFXRT = NumActivePostFX() > 0;
 	}
 
 	m_rb->BeginFrame();
@@ -329,17 +342,11 @@ void WorldDraw::Draw(Counters *counters) {
 	if (m_uiOnly) {
 		m_rb->ClearBackBuffer();
 	} else {
-		if (postFX) {
-			m_rb->BindRenderTarget();
-		} else {
-			m_rb->ClearBackBuffer();
-		}
-
 		DrawView();
 		m_rb->SetScreenLocalMatrix();
 		DrawOverlays();
 
-		if (postFX)
+		if (m_postFXRT)
 			PostProcess();
 	}
 
@@ -360,7 +367,7 @@ void WorldDraw::FindViewArea(ViewDef &view) {
 void WorldDraw::SetupPerspectiveFrustumPlanes(ViewDef &view) {
 
 	// Things on back of frustum planes are outside the frustum
-	view.frustum.clear();
+	view.frustum->clear();
 
 	float yaspect = ((float)view.viewport[3]/(float)view.viewport[2]);
 	float xfov = math::DegToRad(view.camera.fov.get()) * 0.5f;
@@ -413,18 +420,18 @@ void WorldDraw::SetupPerspectiveFrustumPlanes(ViewDef &view) {
 			p.Initialize(normals[i], view.camera.pos.get(), Plane::Unit);
 		}
 
-		view.frustum.push_back(p);
+		view.frustum->push_back(p);
 	}
 }
 
 void WorldDraw::SetupPerspectiveFrustumPlanes(
-	PlaneVec &planes,
+	PlaneStackVec &planes,
 	const Camera &camera,
 	const Vec4 &viewplanes,
 	const Vec2 &zplanes
 ) {
 	// Things on back of frustum planes are outside the frustum
-	planes.clear();
+	planes->clear();
 
 	const Vec3 &fwd = camera.fwd;
 	const Vec3 &left = camera.left;
@@ -435,13 +442,13 @@ void WorldDraw::SetupPerspectiveFrustumPlanes(
 	if (ViewDef::kNumFrustumPlanes > 4) {
 		Vec3 t = fwd * -zplanes[0];
 		p.Initialize(fwd, camera.pos.get() + t, Plane::Unit);
-		planes.push_back(p);
+		planes->push_back(p);
 	}
 
 	if (ViewDef::kNumFrustumPlanes > 5) {
 		Vec3 t = fwd * -zplanes[1];
 		p.Initialize(-fwd, camera.pos.get() + t, Plane::Unit);
-		planes.push_back(p);
+		planes->push_back(p);
 	}
 
 	Vec3 xmin = -left * viewplanes[0];
@@ -456,16 +463,16 @@ void WorldDraw::SetupPerspectiveFrustumPlanes(
 	Vec3 bottomRight = xmax + ymax + viewOrg;
 
 	p.Initialize(camera.pos.get(), bottomLeft, topLeft);
-	planes.push_back(p);
+	planes->push_back(p);
 
 	p.Initialize(camera.pos.get(), topRight, bottomRight);
-	planes.push_back(p);
+	planes->push_back(p);
 
 	p.Initialize(camera.pos.get(), topLeft, topRight);
-	planes.push_back(p);
+	planes->push_back(p);
 
 	p.Initialize(camera.pos.get(), bottomRight, bottomLeft);
-	planes.push_back(p);
+	planes->push_back(p);
 }
 
 void WorldDraw::SetupPerspectiveFrustumPlanes(
@@ -482,44 +489,41 @@ void WorldDraw::SetupOrthoFrustumPlanes(
 	const Vec2 &zplanes
 ) {
 	// Things on back of frustum planes are outside the frustum
-	view.frustum.clear();
+	view.frustum->clear();
 
 	const Vec3 &fwd = view.camera.fwd;
 	const Vec3 &left = view.camera.left;
 	const Vec3 &up = view.camera.up;
 	
-	//const float kWidth = (viewplanes[1] - viewplanes[0]) / 2.f;
-	//const float kHeight = (viewplanes[2] - viewplanes[3]) / 2.f; // +Y up
-
 	Plane p;
 
 	if (ViewDef::kNumFrustumPlanes > 4) {
 		Vec3 t = fwd * -zplanes[0];
 		p.Initialize(fwd, view.camera.pos.get() + t, Plane::Unit);
-		view.frustum.push_back(p);
+		view.frustum->push_back(p);
 	}
 
 	if (ViewDef::kNumFrustumPlanes > 5) {
 		Vec3 t = fwd * -zplanes[1];
 		p.Initialize(-fwd, view.camera.pos.get() + t, Plane::Unit);
-		view.frustum.push_back(p);
+		view.frustum->push_back(p);
 	}
 
 	Vec3 t = -left * viewplanes[0];
 	p.Initialize(-left, view.camera.pos.get() + t, Plane::Unit);
-	view.frustum.push_back(p);
+	view.frustum->push_back(p);
 
 	t = -left * viewplanes[1];
 	p.Initialize(left, view.camera.pos.get() + t, Plane::Unit);
-	view.frustum.push_back(p);
+	view.frustum->push_back(p);
 
 	t = up * viewplanes[2];
 	p.Initialize(-up, view.camera.pos.get() + t, Plane::Unit);
-	view.frustum.push_back(p);
+	view.frustum->push_back(p);
 
 	t = up * viewplanes[3];
 	p.Initialize(up, view.camera.pos.get() + t, Plane::Unit);
-	view.frustum.push_back(p);
+	view.frustum->push_back(p);
 }
 
 bool WorldDraw::CalcScissorBounds(
@@ -646,13 +650,6 @@ void WorldDraw::CalcViewplaneBounds(
 		zplanes[0] = math::Max(zplanes[0], p[2]);
 		zplanes[1] = math::Min(zplanes[1], p[2]);
 	}
-
-	/*viewplanes[0] -= 8.f;
-	viewplanes[1] += 8.f;
-	viewplanes[2] += 8.f;
-	viewplanes[3] -= 8.f;
-	zplanes[0] += 8.f;
-	zplanes[1] -= 8.f;*/
 }
 
 void WorldDraw::SetOrthoMatrix(
@@ -704,7 +701,7 @@ void WorldDraw::VisMarkAreas(ViewDef &view) {
 	StackWindingStackVec frustumVolume;
 	BBox frustumBounds;
 
-	World::MakeVolume(&view.frustum[0], (int)view.frustum.size(), frustumVolume, frustumBounds);
+	World::MakeVolume(&view.frustum[0], (int)view.frustum->size(), frustumVolume, frustumBounds);
 
 	ClippedAreaVolumeStackVec frustumAreas;
 	m_world->ClipOccupantVolume(
@@ -806,7 +803,7 @@ void WorldDraw::VisMarkArea(
 			if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, m->TransformedBounds())) {
 				m->m_visibleFrame = m_markFrame;
 				++m_counters.drawnWorldModels;
-				details::MBatchRef batch = AddViewBatch(view, m->m_matId);
+				details::MBatch *batch = AddViewBatch(view, m->m_matRef, m->m_matId);
 				if (batch)
 					batch->AddDraw(*m);
 			}
@@ -852,7 +849,7 @@ void WorldDraw::VisMarkArea(
 						if (draw->m_markFrame != m_markFrame) {
 							draw->m_markFrame = m_markFrame;
 							draw->m_visibleFrame = m_markFrame;
-							details::MBatchRef batch = AddViewBatch(view, draw->m_matId);
+							details::MBatch *batch = AddViewBatch(view, draw->m_matRef, draw->m_matId);
 							if (batch)
 								batch->AddDraw(*draw);
 						}
@@ -894,7 +891,7 @@ void WorldDraw::VisMarkArea(
 			#endif
 					}
 
-					details::MBatchRef batch = AddViewBatch(view, m->m_matId);
+					details::MBatch *batch = AddViewBatch(view, m->m_matRef, m->m_matId);
 					if (batch)
 						batch->AddDraw(*m);	
 				}
@@ -923,11 +920,17 @@ bool WorldDraw::ClipBounds(const StackWindingStackVec &volume, const BBox &volum
 void WorldDraw::DrawView() {
 	++m_frame;
 
-	ViewDef view;
+	ViewDef view(this);
 	m_world->game->Viewport(view.viewport[0], view.viewport[1], view.viewport[2], view.viewport[3]);
 
 	m_rb->SetWorldStates();
 	
+	// NOTE: glTexImage2D origin is bottom left.
+	// All our texture coordinates are inverted but when drawing
+	// to a FB RT the image is rendered right-side up, instead up
+	// upside down, correct for this.
+	m_rb->FlipMatrixHack(m_postFXRT);
+
 #if defined(WORLD_DEBUG_DRAW)
 	bool debugUniMatrix = true;
 	if (m_world->cvars->r_lockvis.value) {
@@ -981,6 +984,11 @@ void WorldDraw::DrawView() {
 
 	m_rb->numTris = 0;
 	m_counters.numMaterials += (int)view.batches.size();
+
+#if defined(PRERENDER_SHADOWS)
+	GenerateViewUnifiedShadows(view);
+#endif
+	BindFramebuffer();
 
 #if defined(WORLD_DEBUG_DRAW)
 	if (m_world->cvars->r_showlightpasses.value) {
@@ -1066,6 +1074,8 @@ void WorldDraw::DrawView() {
 	}
 
 #endif
+
+	m_rb->FlipMatrixHack(false); // restore this for picking.
 }
 
 void WorldDraw::UpdateLightInteractions(ViewDef &view) {

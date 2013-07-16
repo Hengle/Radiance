@@ -135,7 +135,7 @@ void GLRenderTarget::BindFramebuffer(DiscardFlags flags) {
 		glsFlags |= kDepthWriteMask_Enable;
 	}
 
-	glViewport(0, 0, tex->width, tex->height);
+	gls.Viewport(0, 0, tex->width, tex->height);
 	
 	if (mask) {
 		gls.Set(glsFlags, -1, true); // for glClear()
@@ -290,11 +290,21 @@ void GLRenderTargetCache::CreateRenderTargets(int num) {
 	}
 }
 
-GLRenderTarget::Ref GLRenderTargetCache::NextRenderTarget() {
+GLRenderTarget::Ref GLRenderTargetCache::NextRenderTarget(bool wrap) {
+	if (m_next >= (int)m_vec.size()) {
+		if (wrap) {
+			m_next = 0;
+		} else {
+			return GLRenderTarget::Ref();
+		}
+	}
+
 	GLRenderTarget::Ref t = m_vec[m_next++];
-	if (m_next >= (int)m_vec.size())
-		m_next = 0;
 	return t;
+}
+
+void GLRenderTargetCache::Reset() {
+	m_next = 0;
 }
 
 void GLRenderTargetCache::Clear() {
@@ -354,7 +364,8 @@ void GLRenderTargetMultiCache::SetFormats(
 
 GLRenderTarget::Ref GLRenderTargetMultiCache::NextRenderTarget(
 	GLsizei width,
-	GLsizei height
+	GLsizei height,
+	bool wrap
 ) {
 	RAD_ASSERT(width>0);
 	RAD_ASSERT(height>0);
@@ -363,7 +374,7 @@ GLRenderTarget::Ref GLRenderTargetMultiCache::NextRenderTarget(
 
 	Map::iterator it = m_map.find(kKey);
 	if (it != m_map.end()) {
-		return it->second->NextRenderTarget();
+		return it->second->NextRenderTarget(wrap);
 	}
 
 	GLRenderTargetCache::Ref cache(
@@ -382,7 +393,7 @@ GLRenderTarget::Ref GLRenderTargetMultiCache::NextRenderTarget(
 	cache->CreateRenderTargets(m_numRenderTargets);
 
 	m_map[kKey] = cache;
-	return cache->NextRenderTarget();
+	return cache->NextRenderTarget(wrap);
 }
 
 void GLRenderTargetMultiCache::Clear() {

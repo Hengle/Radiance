@@ -382,23 +382,22 @@ bool AnimationSource::Tick(
 		m_anim->GetBlendingFrames(m_frame, src, dst, lerp);
 	
 		if (out) {
-			int start = firstBone;
-			int count = numBones;
-			int outOfs = 0;
-		
 			m_anim->BlendFrames(
 				src,
 				dst,
 				lerp,
-				out + outOfs,
-				start,
-				count
+				out,
+				firstBone,
+				numBones
 			);
 
-			if (useDistance && (start == 0)) {
+			if (firstBone == 0)
+				out[0].r = Quat::Identity;
+
+			if (useDistance && (firstBone == 0)) {
 				out[0].t[0] = 0.f; // null out X axis motion
-			} else if((m_moveType == AnimState::kMoveType_RemoveMotion) && (start == 0)) {
-				out[0].t = m_bipZero.t; // remove all motion
+			} else if((m_moveType == AnimState::kMoveType_RemoveMotion) && (firstBone == 0)) {
+				out[0].t = Vec3::Zero; // remove all motion
 			}
 		}
 

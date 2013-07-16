@@ -80,7 +80,9 @@ void GLState::Init(S &s) {
 	s.d.scissor[3] = -1;
 	s.t = 0;
 	s.s.s = s.d.s;
+	s.bb[0] = s.bb[1] = 0;
 	s.vaoBound = false;
+	s.vp[0] = s.vp[1] = s.vp[2] = s.vp[3] = 0;
 
 	CHECK_GL_ERRORS();
 }

@@ -146,6 +146,7 @@ public:
 	// these take effect immediately
 	// i.e. they do not require a Commit()
 
+	void Viewport(GLint x, GLint y, GLsizei width, GLsizei height, bool force=false);
 	void SetActiveTexture(int t, bool force=false);
 	void SetActiveTexCoord(int t, bool force=false);
 	void BindBuffer(GLenum target, GLuint id, bool force=false);
@@ -252,12 +253,14 @@ public:
 		int t;
 		boost::array<GLuint, 2> bb;
 		boost::array<GLVertexBufferRef, 2> vbb;
+		boost::array<int, 4> vp;
 		GLVertexArrayRef vao;
 		bool vaoBound;
 #if !defined(RAD_OPT_OGLES)
 		int tc;
 #endif
 
+		void Viewport(GLint x, GLint y, GLsizei width, GLsizei height, bool force=false);
 		void SetActiveTexture(int t, bool force=false);
 		void SetActiveTexCoord(int t, bool force=false);
 		void BindBuffer(GLenum target, GLuint id, bool force=false);

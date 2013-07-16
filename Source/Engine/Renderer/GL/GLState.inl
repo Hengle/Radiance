@@ -89,12 +89,24 @@ inline bool GLState::AA::operator != (const AA &aa) const {
 }
 
 inline GLState::S::S() :
-t(0)
+t(0),
+vaoBound(false)
 #if !defined(RAD_OPT_OGLES)
 , tc(0)
 #endif
 {
 	bb[0] = bb[1] = 0;
+	vp[0] = vp[1] = vp[2] = vp[3] = 0;
+}
+
+inline void GLState::S::Viewport(GLint x, GLint y, GLsizei width, GLsizei height, bool force) {
+	if (force || (vp[0] != x) || (vp[1] != y) || (vp[2] != width) || (vp[3] != height)) {
+		vp[0] = x;
+		vp[1] = y;
+		vp[2] = width;
+		vp[3] = height;
+		glViewport(x, y, width, height);
+	}
 }
 
 inline void GLState::S::SetActiveTexture(int _t, bool force) {
@@ -280,6 +292,10 @@ inline GLhandleARB GLState::Program() const {
 inline void GLState::Commit(bool force) {
 	RAD_ASSERT(m_s);
 	Commit(*m_s.get(), force);
+}
+
+inline void GLState::Viewport(GLint x, GLint y, GLsizei width, GLsizei height, bool force) {
+	m_s->Viewport(x, y, width, height, force);
 }
 
 inline void GLState::SetActiveTexture(int t, bool force) {

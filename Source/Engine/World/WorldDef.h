@@ -53,6 +53,7 @@ enum {
 };
 
 typedef zone_vector<Plane, ZWorldT>::type PlaneVec;
+typedef stackify<PlaneVec, 6> PlaneStackVec;
 typedef zone_vector<int, ZWorldT>::type IntVec;
 typedef zone_pool_set<Entity*, ZWorldT>::type EntityPtrSet;
 typedef zone_vector<Entity*, ZWorldT>::type EntityPtrVec;
@@ -158,11 +159,10 @@ namespace details {
 struct MBatchDrawLink;
 
 struct MatRef;
-typedef zone_map<int, MatRef, ZWorldT>::type MatRefMap;
+typedef zone_pool_map<int, MatRef, ZWorldT>::type MatRefMap;
 
 struct MBatch;
-typedef boost::shared_ptr<MBatch> MBatchRef;
-typedef zone_map<int, MBatchRef, ZWorldT>::type MBatchIdMap;
+typedef zone_pool_map<int, MBatch*, ZWorldT>::type MBatchIdMap;
 
 struct LightInteraction {
 	LightInteraction *prevOnLight;
