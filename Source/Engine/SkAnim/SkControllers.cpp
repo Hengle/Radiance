@@ -241,17 +241,15 @@ void AnimationSource::OnActivate(bool active) {
 			);
 
 			m_tm = m_bipZero;
-			SetPos(m_tm.t);
-			SetRot(m_tm.r);
 		} else {
 			m_bipZero.r = Quat::Identity;
 			m_bipZero.t = Vec3::Zero;
 			m_bipZero.s = Vec3(1,1,1);
 			m_tm = m_bipZero;
-			SetPos(Vec3::Zero);
-			SetRot(Quat::Identity);
 		}
 
+		SetPos(Vec3::Zero);
+		SetRot(Quat::Identity);
 		SetDeltaPos(Vec3::Zero);
 		SetDeltaRot(Quat::Identity);
 		
@@ -391,13 +389,13 @@ bool AnimationSource::Tick(
 				numBones
 			);
 
-			if (firstBone == 0)
-				out[0].r = Quat::Identity;
-
 			if (useDistance && (firstBone == 0)) {
 				out[0].t[0] = 0.f; // null out X axis motion
 			} else if((m_moveType == AnimState::kMoveType_RemoveMotion) && (firstBone == 0)) {
 				out[0].t = Vec3::Zero; // remove all motion
+			} else if((m_moveType == AnimState::kMoveType_RemoveMotionAndRotation) && (firstBone == 0)) {
+				out[0].t = Vec3::Zero; // remove all motion
+				out[0].r = Quat::Identity;
 			}
 		}
 

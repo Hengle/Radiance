@@ -318,7 +318,7 @@ protected:
 	void AutoFace(float dt);
 	Vec3 ApplyVelocity(float dt);
 	void Move();
-	void SkaMove();
+	void SkaMove(bool relativeMotion);
 	void TransitionFloorMove();
 	void SetNextTick(float dt);
 

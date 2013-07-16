@@ -38,6 +38,7 @@ void Entity::Tick_MT_Floor(
 	const xtime::TimeSlice &time
 ) {
 	m_ps.distanceMoved = 0.f;
+	int oldFlags = m_ps.moveState.flags;
 	TransitionFloorMove();
 
 	if (!m_ps.activeMove) {
@@ -50,7 +51,7 @@ void Entity::Tick_MT_Floor(
 
 	if (m_ps.moveState.moveAnim) {
 		SeekAngles(dt);
-		SkaMove();
+		SkaMove((m_ps.moveState.flags & FloorMove::State::kStateFlag_AutoFace) ? true : false);
 		return;
 	}
 
@@ -95,6 +96,16 @@ void Entity::Tick_MT_Floor(
 	m_ps.targetAngles = LookAngles(m_ps.moveState.facing);
 	m_ps.targetAngles[0] = 0.f;
 	m_ps.targetAngles[1] = 0.f;
+
+	if (!(oldFlags&FloorMove::State::kStateFlag_AutoFace) && (m_ps.moveState.flags&FloorMove::State::kStateFlag_AutoFace)) {
+		// sync orientation
+		m_ps.angles.pos = m_ps.targetAngles;
+	} else if (!(m_ps.moveState.flags&FloorMove::State::kStateFlag_AutoFace)) {
+		// hint to let animation control this.
+		m_ps.targetAngles = Vec3::Zero;
+		m_ps.angles.pos = Vec3::Zero;
+	}
+
 	SeekAngles(dt);
 	Move();
 

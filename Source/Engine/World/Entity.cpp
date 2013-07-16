@@ -57,6 +57,8 @@ flags(0) {
 	angleSpring.tolerance = 0.001f;
 	angles.inner = false;
 	angles.outer = true;
+	moveState.flags = FloorMove::State::kStateFlag_AutoFace;
+	moveState.moveAnim = false;
 }
 
 Entity::PSVars::PSVars() :
@@ -817,6 +819,7 @@ int Entity::LUART_SETFN(FloorPosition) (lua_State *L) {
 	self->m_ps.origin = self->m_ps.moveState.pos.pos.get() - Vec3(0, 0, self->m_ps.bbox.Mins()[2]); // put bbox on floor.
 	self->CancelFloorMove();
 	self->m_ps.moveState.moveAnim = false;
+	self->m_ps.moveState.flags =  FloorMove::State::kStateFlag_AutoFace;
 	return 0;
 }
 

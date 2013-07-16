@@ -74,12 +74,18 @@ void Entity::Move() {
 	Link();
 }
 
-void Entity::SkaMove() {
+void Entity::SkaMove(bool relativeMotion) {
 	if (m_ps.motionSka) {
 		const ska::BoneTM *delta = m_ps.motionSka->ska->deltaMotion;
 		Vec3 t;
-		Mat4 m = Mat4::Rotation(QuatFromAngles(m_ps.targetAngles));
-		t = m.Transform3X3(delta->t);
+
+		if (relativeMotion) {
+			Mat4 m = Mat4::Rotation(QuatFromAngles(m_ps.targetAngles));
+			t = m.Transform3X3(delta->t);
+		} else {
+			t = delta->t;
+		}
+
 		m_ps.origin += t * m_ps.motionScale;
 		m_ps.velocity = Vec3::Zero;
 		m_ps.distanceMoved = 0.f;
@@ -146,7 +152,7 @@ void Entity::TickPhysics(
 		Tick_MT_Floor(frame, dt, time);
 		break;
 	case kMoveType_Ska:
-		SkaMove();
+		SkaMove(true);
 		break;
 	}
 }

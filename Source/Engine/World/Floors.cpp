@@ -48,6 +48,7 @@ void FloorMove::InitMove(State &state) {
 
 	if (!m_route.steps->empty()) {
 		const Step &step = m_route.steps[0];
+		state.flags = step.flags;
 		step.path.Eval(0.f, state.pos.m_pos, &state.facing);
 		state.pos.m_waypoint = step.waypoints[0];
 		state.pos.m_nextWaypoint = step.waypoints[1];
@@ -76,6 +77,7 @@ float FloorMove::Move(
 
 		if (state.m_first) {
 			state.m_first = false;
+			state.flags = step->flags;
 			if (!step->events[0].empty)
 				events.push_back(step->events[0]);
 			moveAnim = step->anim;
@@ -1222,7 +1224,7 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 		step.waypoints[0] = -1;
 		step.waypoints[1] = next.waypoints[0];
 		step.connection = -1;
-		step.flags = BSPConnectionFlagsToStateFlags(cur.flags);
+		step.flags = FloorMove::State::kStateFlag_AutoFace|FloorMove::State::kStateFlag_Interruptable;
 		step.path.Load(spline);
 
 		moveRoute.steps->push_back(step);
