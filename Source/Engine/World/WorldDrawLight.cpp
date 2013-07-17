@@ -376,7 +376,6 @@ void WorldDraw::GenerateViewUnifiedShadows(const ViewDef &view) {
 #else
 void WorldDraw::DrawViewUnifiedShadows(const ViewDef &view) {
 #endif
-	bool draw = false; // records state of last shadow draw
 	bool stop = false;
 
 	m_rb->BeginUnifiedShadows();

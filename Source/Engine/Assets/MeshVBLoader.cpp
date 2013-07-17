@@ -60,7 +60,8 @@ int MeshVBLoader::Process(
 			r::kMaterialGeometrySource_Vertices,
 			0,
 			kVertSize,
-			0
+			0,
+			3
 		);
 		
 		m->MapSource(
@@ -68,7 +69,8 @@ int MeshVBLoader::Process(
 			r::kMaterialGeometrySource_Normals,
 			0,
 			kVertSize,
-			sizeof(float)*3
+			sizeof(float)*3,
+			3
 		);
 
 		if (dm.numChannels > 0) {
@@ -77,14 +79,16 @@ int MeshVBLoader::Process(
 				r::kMaterialGeometrySource_Tangents,
 				0,
 				kVertSize,
-				sizeof(float)*6
+				sizeof(float)*6,
+				3
 			);
 			m->MapSource(
 				streamIdx,
 				r::kMaterialGeometrySource_TexCoords,
 				0,
 				kVertSize,
-				sizeof(float)*10
+				sizeof(float)*10,
+				2
 			);
 		}
 
@@ -94,7 +98,8 @@ int MeshVBLoader::Process(
 				r::kMaterialGeometrySource_TexCoords,
 				1,
 				kVertSize,
-				sizeof(float)*12
+				sizeof(float)*12,
+				2
 			);
 		}
 		

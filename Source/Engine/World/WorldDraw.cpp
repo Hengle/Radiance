@@ -342,6 +342,7 @@ void WorldDraw::Draw(Counters *counters) {
 	if (m_uiOnly) {
 		m_rb->ClearBackBuffer();
 	} else {
+
 		DrawView();
 		m_rb->SetScreenLocalMatrix();
 		DrawOverlays();
@@ -988,7 +989,8 @@ void WorldDraw::DrawView() {
 	m_counters.numMaterials += (int)view.batches.size();
 
 #if defined(PRERENDER_SHADOWS)
-	GenerateViewUnifiedShadows(view);
+	if (m_world->cvars->r_unifiedshadows.value)
+		GenerateViewUnifiedShadows(view);
 #endif
 	BindFramebuffer();
 
@@ -1148,7 +1150,7 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 	}
 
 	// draw lit unshadowed solid surfaces
-#if !defined(RAD_OPT_GOLDEN)
+#if !defined(RAD_TARGET_GOLDEN)
 	if (m_world->cvars->r_enablelights.value) {
 #endif
 		for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
@@ -1161,8 +1163,9 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 			}
 		}
 
-		DrawViewUnifiedShadows(view);
-#if !defined(RAD_OPT_GOLDEN)
+		if (m_world->cvars->r_unifiedshadows.value)
+			DrawViewUnifiedShadows(view);
+#if !defined(RAD_TARGET_GOLDEN)
 	} else {
 		for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
 			const details::MBatch &batch = *it->second;
@@ -1189,7 +1192,7 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 	}
 
 	// draw lit unshadowed translucent surfaces
-#if !defined(RAD_OPT_GOLDEN)
+#if !defined(RAD_TARGET_GOLDEN)
 	if (m_world->cvars->r_enablelights.value) {
 #endif
 		for (int i = r::Material::kSort_Translucent; i < r::Material::kNumSorts; ++i) {
@@ -1203,7 +1206,7 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 				}
 			}
 		}
-#if !defined(RAD_OPT_GOLDEN)
+#if !defined(RAD_TARGET_GOLDEN)
 	} else {
 		for (int i = r::Material::kSort_Translucent; i < r::Material::kNumSorts; ++i) {
 			for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
@@ -1243,7 +1246,7 @@ void WorldDraw::DrawUnlitBatch(
 	if (!wireframe)
 		mat->BindTextures(batch.matRef->loader);
 
-#if !defined(RAD_OPT_GOLDEN)
+#if !defined(RAD_TARGET_GOLDEN)
 	if (mat->maxLights > 0) {
 		mat->shader->Begin(r::Shader::kPass_Preview, *mat);
 	} else 

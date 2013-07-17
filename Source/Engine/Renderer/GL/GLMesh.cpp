@@ -47,7 +47,8 @@ void GLMesh::MapSource(
 	MaterialGeometrySource s, 
 	int index,
 	int stride,
-	int ofs
+	int ofs,
+	int count
 ) {
 	Source &source = m_sources[s][index];
 
@@ -55,23 +56,7 @@ void GLMesh::MapSource(
 	source.type = GL_FLOAT;
 	source.stride = stride;
 	source.ofs = (GLuint)ofs;
-
-	switch (s) {
-	case kMaterialGeometrySource_Vertices:
-	case kMaterialGeometrySource_Normals:
-		source.count = 3;
-		break;
-	case kMaterialGeometrySource_Tangents:
-	case kMaterialGeometrySource_VertexColor:
-	case kMaterialGeometrySource_SpriteSkin:
-		source.count = 4;
-		break;
-	case kMaterialGeometrySource_TexCoords:
-		source.count = 2;
-		break;
-	default:
-		break;
-	}
+	source.count = count;
 
 }
 

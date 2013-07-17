@@ -246,7 +246,8 @@ void World::SpawnModel(
 		r::kMaterialGeometrySource_Vertices,
 		0,
 		sizeof(bsp_file::BSPVertex),
-		0
+		0,
+		3
 	);
 
 	mesh->MapSource(
@@ -254,7 +255,8 @@ void World::SpawnModel(
 		r::kMaterialGeometrySource_Normals,
 		0,
 		sizeof(bsp_file::BSPVertex),
-		sizeof(float)*3
+		sizeof(float)*3,
+		3
 	);
 
 	mesh->MapSource(
@@ -262,7 +264,8 @@ void World::SpawnModel(
 		r::kMaterialGeometrySource_Tangents,
 		0,
 		sizeof(bsp_file::BSPVertex),
-		sizeof(float)*(6+(bsp_file::kMaxUVChannels*2))
+		sizeof(float)*(6+(bsp_file::kMaxUVChannels*2)),
+		3
 	);
 
 	if (model->numChannels > 0) {
@@ -271,7 +274,8 @@ void World::SpawnModel(
 			r::kMaterialGeometrySource_TexCoords,
 			0,
 			sizeof(bsp_file::BSPVertex),
-			sizeof(float)*6
+			sizeof(float)*6,
+			2
 		);
 	}
 
@@ -281,7 +285,8 @@ void World::SpawnModel(
 			r::kMaterialGeometrySource_TexCoords,
 			1,
 			sizeof(bsp_file::BSPVertex),
-			sizeof(float)*8
+			sizeof(float)*8,
+			2
 		);
 	}
 

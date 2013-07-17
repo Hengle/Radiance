@@ -158,7 +158,8 @@ void SpriteBatch::AllocateMesh() {
 		kMaterialGeometrySource_Vertices,
 		0,
 		sizeof(SpriteVertex),
-		0
+		0,
+		3
 	);
 
 	m_m.MapSource(
@@ -166,7 +167,8 @@ void SpriteBatch::AllocateMesh() {
 		kMaterialGeometrySource_VertexColor,
 		0,
 		sizeof(SpriteVertex),
-		sizeof(float)*3
+		sizeof(float)*3,
+		4
 	);
 
 	m_m.MapSource(
@@ -174,7 +176,8 @@ void SpriteBatch::AllocateMesh() {
 		kMaterialGeometrySource_SpriteSkin,
 		0,
 		sizeof(SpriteVertex),
-		sizeof(float)*7
+		sizeof(float)*7,
+		4
 	);
 
 	int uvStream = m_m.AllocateStream(kStreamUsage_Static, sizeof(float)*2, m_meshSprites*4);
@@ -183,7 +186,8 @@ void SpriteBatch::AllocateMesh() {
 		kMaterialGeometrySource_TexCoords,
 		0,
 		0,
-		0
+		0,
+		2
 	);
 
 	// generate UV's

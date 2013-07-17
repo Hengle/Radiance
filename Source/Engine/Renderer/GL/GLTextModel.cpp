@@ -103,14 +103,16 @@ void GLTextModel::ReserveVerts(int num) {
 			kMaterialGeometrySource_Vertices,
 			0,
 			sizeof(VertexType),
-			0
+			0,
+			2
 		);
 		m_mesh->MapSource(
 			m_streamId,
 			kMaterialGeometrySource_TexCoords,
 			0,
 			sizeof(VertexType),
-			sizeof(float)*2
+			sizeof(float)*2,
+			2
 		);
 	}
 }

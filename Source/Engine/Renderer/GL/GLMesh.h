@@ -35,7 +35,8 @@ public:
 		MaterialGeometrySource source, 
 		int index,
 		int stride,
-		int ofs
+		int ofs,
+		int count
 	);
 
 	StreamPtr::Ref MapIndices(StreamUsage usage, int elemSize, int count);

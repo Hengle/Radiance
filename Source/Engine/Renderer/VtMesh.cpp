@@ -73,7 +73,8 @@ void VtMesh::Load(
 			kMaterialGeometrySource_Vertices,
 			0,
 			kVertSize,
-			0
+			0,
+			3
 		);
 
 		m.m.MapSource(
@@ -81,7 +82,8 @@ void VtMesh::Load(
 			kMaterialGeometrySource_Normals,
 			0,
 			kVertSize,
-			sizeof(float) * 4
+			sizeof(float) * 4,
+			3
 		);
 
 		if (dm.numChannels > 0) {
@@ -90,7 +92,8 @@ void VtMesh::Load(
 				kMaterialGeometrySource_Tangents,
 				0,
 				kVertSize,
-				sizeof(float) * 8
+				sizeof(float) * 8,
+				3
 			);
 		}
 
@@ -104,7 +107,8 @@ void VtMesh::Load(
 				kMaterialGeometrySource_TexCoords,
 				0,
 				sizeof(float) * 4,
-				0
+				0,
+				2
 			);
 
 			m.m.MapSource(
@@ -112,7 +116,8 @@ void VtMesh::Load(
 				kMaterialGeometrySource_TexCoords,
 				1,
 				sizeof(float) * 4,
-				sizeof(float) * 2
+				sizeof(float) * 2,
+				2
 			);
 
 		} else if (dm.numChannels > 0) {
@@ -124,7 +129,8 @@ void VtMesh::Load(
 				kMaterialGeometrySource_TexCoords,
 				0,
 				0,
-				0
+				0,
+				2
 			);
 		}
 

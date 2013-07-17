@@ -296,7 +296,8 @@ void GLDraw::InitRectVerts(int vpw, int vph) {
 		r::kMaterialGeometrySource_Vertices,
 		0,
 		sizeof(OverlayVert),
-		0
+		0,
+		2
 	);
 
 	m_rect->MapSource(
@@ -304,7 +305,8 @@ void GLDraw::InitRectVerts(int vpw, int vph) {
 		r::kMaterialGeometrySource_TexCoords,
 		0,
 		sizeof(OverlayVert),
-		sizeof(float)*2
+		sizeof(float)*2,
+		2
 	);
 
 	GLVertexBuffer::Ptr::Ref vb = m_rect->Map(stream);
@@ -365,7 +367,8 @@ void GLDraw::InitCircleVerts(int vpw, int vph) {
 		r::kMaterialGeometrySource_Vertices,
 		0,
 		sizeof(OverlayVert),
-		0
+		0,
+		2
 	);
 
 	m_circle->MapSource(
@@ -373,7 +376,8 @@ void GLDraw::InitCircleVerts(int vpw, int vph) {
 		r::kMaterialGeometrySource_TexCoords,
 		0,
 		sizeof(OverlayVert),
-		sizeof(float)*2
+		sizeof(float)*2,
+		2
 	);
 
 	GLVertexBuffer::Ptr::Ref vb = m_circle->Map(stream);

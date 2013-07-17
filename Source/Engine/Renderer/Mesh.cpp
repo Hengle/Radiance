@@ -92,7 +92,8 @@ Mesh::Ref Mesh::MakeSphere(Zone &zone, bool uvs, float scale, int tessLat, int t
 		kMaterialGeometrySource_Vertices,
 		0,
 		kVertSize,
-		0
+		0,
+		3
 	);
 
 	if (uvs) {
@@ -101,7 +102,8 @@ Mesh::Ref Mesh::MakeSphere(Zone &zone, bool uvs, float scale, int tessLat, int t
 			kMaterialGeometrySource_TexCoords,
 			0,
 			kVertSize,
-			sizeof(float)*3
+			sizeof(float)*3,
+			2
 		);
 	}
 

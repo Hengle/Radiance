@@ -36,9 +36,10 @@ inline void Mesh::MapSource(
 	MaterialGeometrySource source, 
 	int index,
 	int stride,
-	int ofs
+	int ofs,
+	int count
 ) {
-	m_imp.MapSource(stream, source, index, stride, ofs);
+	m_imp.MapSource(stream, source, index, stride, ofs, count);
 }
 
 inline Mesh::StreamPtr::Ref Mesh::MapIndices(StreamUsage usage, int elemSize, int count) {

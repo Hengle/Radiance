@@ -235,7 +235,11 @@ bool GLWorldDraw::BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) {
 			GL_UNSIGNED_BYTE,
 			depth,
 			GLRenderTargetCache::kDepthInstanceMode_Shared,
+#if defined(RAD_OPT_OGLES)
+			TX_FilterBilinear,
+#else
 			TX_Mipmap|TX_FilterTrilinear,
+#endif
 			4,
 			depthBytesPP
 		));
@@ -245,13 +249,12 @@ bool GLWorldDraw::BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) {
 
 #if defined(PRERENDER_SHADOWS)
 	const bool kWrap = false;
-	if (m_shadowRT)
-		GLRenderTarget::DiscardFramebuffer(GLRenderTarget::kDiscard_Depth);
 #else
 	const bool kWrap = true;
+#endif
+
 	if (m_shadowRT)
 		GLRenderTarget::DiscardFramebuffer(GLRenderTarget::kDiscard_All);
-#endif
 
 	m_shadowRT = m_unifiedShadowRTCache->NextRenderTarget(kWrap);
 	if (!m_shadowRT)
@@ -282,13 +285,15 @@ bool GLWorldDraw::BindUnifiedShadowTexture(
 #endif
 	RAD_ASSERT(m_shadowRT);
 	m_shadowRT->BindTexture(0);
-	GLTexture::GenerateMipmaps(m_shadowRT->tex);
+#if !defined(RAD_OPT_OGLES)
+	GLTexture::GenerateMipmaps(m_shadowRT->tex); // <-- causes FB load (slooow)
+#endif
 	m_shadowRT.reset();
 
+#if !defined(PRERENDER_SHADOWS)
 	if (m_activeRT) {
 		m_activeRT->BindFramebuffer(GLRenderTarget::kDiscard_None);
-	} 
-#if !defined(PRERENDER_SHADOWS)
+	}
 	else {
 		BindFramebuffer(false);
 	}
@@ -525,7 +530,8 @@ void GLWorldDraw::CreateOverlay(
 		kMaterialGeometrySource_Vertices,
 		0,
 		sizeof(OverlayVert),
-		0
+		0,
+		2
 	);
 
 	mesh->MapSource(
@@ -533,7 +539,8 @@ void GLWorldDraw::CreateOverlay(
 		kMaterialGeometrySource_TexCoords,
 		0,
 		sizeof(OverlayVert),
-		sizeof(float)*2
+		sizeof(float)*2,
+		2
 	);
 
 	GLVertexBuffer::Ptr::Ref vb = mesh->Map(stream);
@@ -594,7 +601,8 @@ void GLWorldDraw::CreateRect() {
 		kMaterialGeometrySource_Vertices, 
 		0, 
 		sizeof(OverlayVert), 
-		0
+		0,
+		2
 	);
 
 	m_rectMesh->MapSource(
@@ -602,7 +610,8 @@ void GLWorldDraw::CreateRect() {
 		kMaterialGeometrySource_TexCoords,
 		0,
 		sizeof(OverlayVert),
-		sizeof(float)*2
+		sizeof(float)*2,
+		2
 	);
 
 	GLVertexBuffer::Ptr::Ref vb = m_rectMesh->Map(stream);
