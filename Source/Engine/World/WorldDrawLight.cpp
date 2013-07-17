@@ -551,8 +551,10 @@ void WorldDraw::DrawViewWithUnifiedShadow(
 
 	for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
 		const details::MBatch &batch = *it->second;
-		if (batch.matRef->mat->receiveShadows == false)
+		if ((batch.matRef->mat->receiveShadows == false) ||
+			(batch.matRef->mat->sort != r::Material::kSort_Solid)) {
 			continue; // this material doesn't want shadows.
+		}
 
 		for (details::MBatchDrawLink *link = batch.head; link; link = link->next) {
 			MBatchDraw *draw = link->draw;
