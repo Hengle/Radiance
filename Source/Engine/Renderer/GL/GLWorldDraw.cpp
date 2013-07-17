@@ -225,8 +225,8 @@ bool GLWorldDraw::BindUnifiedShadowRenderTarget(r::Material &shadowMaterial) {
 		int vpx, vpy, vpw, vph;
 		world->game->Viewport(vpx, vpy, vpw, vph);
 
-		vpw = PowerOf2(vpw>>1)>>1;
-		vph = PowerOf2(vph>>1)>>1;
+		vpw = math::Min(PowerOf2(vpw), 1024);
+		vph = math::Min(PowerOf2(vph), 1024);
 
 		m_unifiedShadowRTCache.reset(new (ZRender) GLRenderTargetCache(
 			vpw,
