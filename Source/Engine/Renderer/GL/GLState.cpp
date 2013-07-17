@@ -148,7 +148,17 @@ void GLState::CommitSB(S &s, bool f) {
 		s.d.s |= s.s.s&kDepthWriteMask_Flags;
 	}
 
-	if (ss&kDepthTest_Flags) {
+	// ensure proper depth test bits are here
+	bool depthTestChanged = false;
+	if ((s.s.s&(kDepthTest_Flags&~kDepthTest_Disable)) && (s.d.s&kDepthTest_Disable)) {
+		// the ss bitfield doesn't contain accurate bits here for depth test because
+		// we have recorded the depth func. That means that the driver bits are already
+		// depthFunc|depthTestDisable, which means setting the same depthFunc in source
+		// with end up with zeros in ss. Account for this.
+		depthTestChanged = true;
+	}
+
+	if ((ss&kDepthTest_Flags) || depthTestChanged) {
 		if(ds&kDepthTest_Disable) {
 			glEnable(GL_DEPTH_TEST);
 			CHECK_GL_ERRORS_EXTRA();
@@ -158,11 +168,11 @@ void GLState::CommitSB(S &s, bool f) {
 			glDisable(GL_DEPTH_TEST);
 			CHECK_GL_ERRORS_EXTRA();
 			// record the current depth test state
-//			s.s.s |= (s.d.s&kDepthTest_Flags)&~kDepthTest_Disable;
+			s.s.s |= (s.d.s&kDepthTest_Flags);
 		} else if(ss&kDepthTest_Flags) {
 			int df = 0;
 
-			switch (s.s.s&kDepthTest_Flags) {
+			switch (ss&kDepthTest_Flags) {
 			case kDepthTest_Always: df = GL_ALWAYS; break;
 			case kDepthTest_Less: df = GL_LESS; break;
 			case kDepthTest_Greater : df = GL_GREATER; break;
@@ -200,7 +210,7 @@ void GLState::CommitSB(S &s, bool f) {
 	
 	if (ss&kCullFaceMode_Flags || (s.s.invertCullFace != s.d.invertCullFace))
 	{
-		if (ds&kCullFaceMode_None) {
+		if ((ss&(kCullFaceMode_Front|kCullFaceMode_Back)) && (ds&kCullFaceMode_None)) {
 			glEnable(GL_CULL_FACE);
 			CHECK_GL_ERRORS_EXTRA();
 		} else if (ss&kCullFaceMode_None) {
@@ -236,6 +246,16 @@ void GLState::CommitSB(S &s, bool f) {
 		}
 
 		if (ss & kCullFaceMode_Flags) {
+			
+			// it is acceptable to disable culling by just passing kCullFadeMode_None
+			// in those cases, make sure to record the current polarity from the driver
+			// so we don't duplicate reduntant state
+
+			if (!(s.s.s&(kCullFaceMode_Front|kCullFaceMode_Back))) // record polarity
+				s.s.s |= s.d.s&(kCullFaceMode_Front|kCullFaceMode_Back);
+			if (!(s.s.s&(kCullFaceMode_CW|kCullFaceMode_CCW)))
+				s.s.s |= s.d.s&(kCullFaceMode_CW|kCullFaceMode_CCW); // record order
+
 			s.d.s &= ~kCullFaceMode_Flags;
 			s.d.s |= s.s.s&kCullFaceMode_Flags;
 		}
