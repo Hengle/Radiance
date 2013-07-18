@@ -213,7 +213,7 @@ void GLRenderTargetCache::SetFormats(
 	RAD_ASSERT(height>0);
 	RAD_ASSERT(format);
 	RAD_ASSERT(type);
-	RAD_ASSERT((depthMode == kDepthInstanceMode_None) || m_depth);
+	RAD_ASSERT((depthMode == kDepthInstanceMode_None) || depth);
 	RAD_ASSERT(colorBytesPP>0);
 
 	Clear();

@@ -11,6 +11,8 @@
 #include "../StringBase.h"
 #include <iostream>
 
+const SIMDDriver *SIMD_ref_bind();
+
 #define LOAD_BONE_PTR \
 	"ldrh r9, [%[bi]]           \n\t" \
 	"lsls r9, r9, #6            \n\t" \
@@ -252,7 +254,82 @@ void SkinVerts2(
 	}
 }
 
-void SkinVerts1(
+void SkinVerts1B(
+	float *outVerts, 
+	const float *bones, 
+	const float *vertices,
+	const U16 *boneIndices,
+	int numVerts
+) {
+	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(bones, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(vertices, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::kAlignment));
+	
+#define FETCH_VERT_0 "vld1.32 {q0}, [%[v], :128]! \n\t"
+#define FETCH_NORM_0 "vld1.32 {q1}, {%[v], :128]! \n\t"
+#define FETCH_TAN_0 "vld1.32 {q1}, {%[v], :128]! \n\t"
+
+#define FETCH_VERT_1 "vld1.32 {q1}, [%[v], :128]! \n\t"
+	
+#define FETCH_BONE_0_0 "vld1.32 {q2-q3}, [r9, :128]!  \n\t"
+#define FETCH_BONE_0_1 "vld1.32 {q4-q5}, [r9, :128]!  \n\t"
+#define FETCH_BONE_1_0 "vld1.32 {q6-q7}, [r9, :128]!  \n\t"
+#define FETCH_BONE_1_1 "vld1.32 {q8-q9}, [r9, :128]!  \n\t"
+	
+#define VERT_0_OP1 "vmul.f32 q2, q2, d0[0] \n\t"
+#define VERT_0_OP2 "vmla.f32 q5, q3, d0[1] \n\t"
+#define VERT_0_OP3 "vmla.f32 q2, q4, d1[0] \n\t"
+#define VERT_0_OP4 "vadd.f32 q5, q5, q2    \n\t"
+#define VERT_0_STORE "vst1.32 {q5}, [%[o], :128]! \n\t"
+
+#define LOAD_BONE_PTR \
+	"ldrh r9, [%[bi]]           \n\t" \
+	"lsls r9, r9, #6            \n\t" \
+	"add  r9, r9, %[bones]		\n\t" \
+	"add %[bi], %[bi], #2       \n\t"
+	
+	while (numVerts-- > 0) {
+		const float *bone0 = bones + boneIndices[0]*SIMDDriver::kNumBoneFloats;
+		++boneIndices;
+		
+		asm volatile (
+			
+			"vld1.32 {q4}, [%[v], :128]!			\n\t" // load VXYZW
+			"vld1.32 {q12-q13}, [%[bone00], :128]	\n\t" // load bone matrix rows 0 + 1
+			"vld1.32 {q14-q15}, [%[bone01], :128]	\n\t" // load bone matrix rows 2 + 3
+			"vld1.32 {q5}, [%[v], :128]!			\n\t" // load NXYZW
+			"vmul.f32 q0, q12, d8[0]				\n\t" // q0 = M0 * VXXXX
+			"vmov q1, q15							\n\t" // DI q1 = M TRANSLATION
+			"vmul.f32 q2, q12, d10[0]				\n\t" // q2 = M0 * NXXXX
+			"vmla.f32 q1, q13, d8[1]				\n\t" // q1 = q1 + M1 * VYYYY
+			"vmul.f32 q3, q13, d10[1]				\n\t" // q3 = M1 * NYYYY
+			"vmla.f32 q0, q14, d9[0]				\n\t" // q0 = q0 + M2 * VZZZZ
+			"vmla.f32 q2, q14, d11[0]				\n\t" // q2 = q2 + M2 * NZZZZ
+			"vld1.32 {q4}, [%[v], :128]!			\n\t" // load TXYZW
+			"vadd.f32 q0, q0, q1					\n\t" // q0 = q0 + q1
+			"vmul.f32 q1, q13, d8[1]				\n\t" // q1 = M1 * TYYYY
+			"vadd.f32 q2, q2, q3					\n\t" // q2 = q2 + q3
+			"vst1.32 {q0}, [%[o], :128]!			\n\t" // store VXYZW
+			"vmla.f32 q1, q14, d9[0]				\n\t" // q1 = q1 + M2 * TZZZZ
+			"vmul.f32 q3, q12, d8[0]				\n\t" // q3 = M0 * TXXXX
+			"vst1.32 {q2}, [%[o], :128]!			\n\t" // store NXYZW
+			// stall q3
+			"vadd.f32 q3, q3, q1					\n\t" // q3 = q3 + q1
+			// stall q3
+			"vmov s15, s19							\n\t" // store T.W
+			// stall q3
+			"vst1.32 {q3}, [%[o], :128]!			\n\t" // store TXYZW
+			
+		: [o] "+r" (outVerts), [v] "+r" (vertices)
+		: [bone00] "r" (bone0), [bone01] "r" (bone0+8)
+		: "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q12", "q13", "q14", "q15"
+
+		);
+	}
+}
+
+/*void SkinVerts1B(
 	float *outVerts, 
 	const float *bones, 
 	const float *vertices,
@@ -436,7 +513,7 @@ void SkinVerts1(
 
 		);
 	}
-}
+}*/
 
 }
 
@@ -444,12 +521,12 @@ const SIMDDriver *SIMD_neon_bind()
 {
 	static SIMDDriver d;
 
-// disabled until updated for new skin formats.
-	/*d.SkinVerts[3] = &SkinVerts4;
-	d.SkinVerts[2] = &SkinVerts3;
-	d.SkinVerts[1] = &SkinVerts2;
-	d.SkinVerts[0] = &SkinVerts1;*/
+	if (d.name[0])
+		return &d;
 
+	d = *SIMD_ref_bind();
+	d.SkinVerts[0] = &SkinVerts1B;
+	
 	string::cpy(d.name, "SIMD_neon");
 	return &d;
 }

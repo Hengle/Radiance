@@ -118,7 +118,6 @@
 		330A98AA15BC9F59002A81EC /* SIMD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E883B915B9AB370089BA08 /* SIMD.cpp */; };
 		330A98AB15BC9F59002A81EC /* SIMD.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883BA15B9AB370089BA08 /* SIMD.h */; };
 		330A98AC15BC9F59002A81EC /* SIMD_ref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E883BC15B9AB370089BA08 /* SIMD_ref.cpp */; };
-		330A98AD15BC9F59002A81EC /* SIMD_ref.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883BD15B9AB370089BA08 /* SIMD_ref.h */; };
 		330A98AE15BC9F59002A81EC /* Types.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883C015B9AB370089BA08 /* Types.h */; };
 		330A98AF15BC9F59002A81EC /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E883C115B9AB370089BA08 /* Utils.cpp */; };
 		330A98B015BC9F59002A81EC /* Utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883C215B9AB370089BA08 /* Utils.h */; };
@@ -831,7 +830,6 @@
 		337AE6D415BF214F00AD1617 /* SharedLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B715B9AB370089BA08 /* SharedLibrary.h */; };
 		337AE6D515BF214F00AD1617 /* SharedLibraryDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B815B9AB370089BA08 /* SharedLibraryDef.h */; };
 		337AE6D615BF214F00AD1617 /* SIMD.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883BA15B9AB370089BA08 /* SIMD.h */; };
-		337AE6D715BF214F00AD1617 /* SIMD_ref.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883BD15B9AB370089BA08 /* SIMD_ref.h */; };
 		337AE6D815BF214F00AD1617 /* Types.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883C015B9AB370089BA08 /* Types.h */; };
 		337AE6D915BF214F00AD1617 /* Utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883C215B9AB370089BA08 /* Utils.h */; };
 		337AE6DA15BF214F00AD1617 /* Zone.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883C515B9AB370089BA08 /* Zone.h */; };
@@ -1572,8 +1570,6 @@
 		33E883FC15B9AB370089BA08 /* SIMD.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883BA15B9AB370089BA08 /* SIMD.h */; };
 		33E883FF15B9AB370089BA08 /* SIMD_ref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E883BC15B9AB370089BA08 /* SIMD_ref.cpp */; };
 		33E8840015B9AB370089BA08 /* SIMD_ref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E883BC15B9AB370089BA08 /* SIMD_ref.cpp */; };
-		33E8840115B9AB370089BA08 /* SIMD_ref.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883BD15B9AB370089BA08 /* SIMD_ref.h */; };
-		33E8840215B9AB370089BA08 /* SIMD_ref.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883BD15B9AB370089BA08 /* SIMD_ref.h */; };
 		33E8840515B9AB370089BA08 /* Types.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883C015B9AB370089BA08 /* Types.h */; };
 		33E8840615B9AB370089BA08 /* Types.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883C015B9AB370089BA08 /* Types.h */; };
 		33E8840715B9AB370089BA08 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E883C115B9AB370089BA08 /* Utils.cpp */; };
@@ -2776,7 +2772,6 @@
 		33FA7F871633CA28002603A5 /* SharedLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B715B9AB370089BA08 /* SharedLibrary.h */; };
 		33FA7F881633CA28002603A5 /* SharedLibraryDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883B815B9AB370089BA08 /* SharedLibraryDef.h */; };
 		33FA7F891633CA28002603A5 /* SIMD.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883BA15B9AB370089BA08 /* SIMD.h */; };
-		33FA7F8A1633CA28002603A5 /* SIMD_ref.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883BD15B9AB370089BA08 /* SIMD_ref.h */; };
 		33FA7F8B1633CA28002603A5 /* Types.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883C015B9AB370089BA08 /* Types.h */; };
 		33FA7F8C1633CA28002603A5 /* Utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883C215B9AB370089BA08 /* Utils.h */; };
 		33FA7F8D1633CA28002603A5 /* Zone.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E883C515B9AB370089BA08 /* Zone.h */; };
@@ -3403,7 +3398,6 @@
 		33E883B915B9AB370089BA08 /* SIMD.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SIMD.cpp; sourceTree = "<group>"; };
 		33E883BA15B9AB370089BA08 /* SIMD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SIMD.h; sourceTree = "<group>"; };
 		33E883BC15B9AB370089BA08 /* SIMD_ref.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SIMD_ref.cpp; sourceTree = "<group>"; };
-		33E883BD15B9AB370089BA08 /* SIMD_ref.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SIMD_ref.h; sourceTree = "<group>"; };
 		33E883BF15B9AB370089BA08 /* ThreadSafeObjectPoolConstruct.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ThreadSafeObjectPoolConstruct.inl; sourceTree = "<group>"; };
 		33E883C015B9AB370089BA08 /* Types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Types.h; sourceTree = "<group>"; };
 		33E883C115B9AB370089BA08 /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utils.cpp; sourceTree = "<group>"; };
@@ -4399,7 +4393,6 @@
 				33E883B915B9AB370089BA08 /* SIMD.cpp */,
 				33E883BA15B9AB370089BA08 /* SIMD.h */,
 				33E883BC15B9AB370089BA08 /* SIMD_ref.cpp */,
-				33E883BD15B9AB370089BA08 /* SIMD_ref.h */,
 				339BA57E1636F3000017FD79 /* SIMD_neon.cpp */,
 				33E883BF15B9AB370089BA08 /* ThreadSafeObjectPoolConstruct.inl */,
 				33FA82A71635489E002603A5 /* Tokenizer.cpp */,
@@ -5734,7 +5727,6 @@
 				330A98A815BC9F59002A81EC /* SharedLibrary.h in Headers */,
 				330A98A915BC9F59002A81EC /* SharedLibraryDef.h in Headers */,
 				330A98AB15BC9F59002A81EC /* SIMD.h in Headers */,
-				330A98AD15BC9F59002A81EC /* SIMD_ref.h in Headers */,
 				330A98AE15BC9F59002A81EC /* Types.h in Headers */,
 				330A98B015BC9F59002A81EC /* Utils.h in Headers */,
 				330A98B215BC9F59002A81EC /* Zone.h in Headers */,
@@ -6142,7 +6134,6 @@
 				337AE6D415BF214F00AD1617 /* SharedLibrary.h in Headers */,
 				337AE6D515BF214F00AD1617 /* SharedLibraryDef.h in Headers */,
 				337AE6D615BF214F00AD1617 /* SIMD.h in Headers */,
-				337AE6D715BF214F00AD1617 /* SIMD_ref.h in Headers */,
 				337AE6D815BF214F00AD1617 /* Types.h in Headers */,
 				337AE6D915BF214F00AD1617 /* Utils.h in Headers */,
 				337AE6DA15BF214F00AD1617 /* Zone.h in Headers */,
@@ -6369,7 +6360,6 @@
 				33E883F515B9AB370089BA08 /* SharedLibrary.h in Headers */,
 				33E883F715B9AB370089BA08 /* SharedLibraryDef.h in Headers */,
 				33E883FB15B9AB370089BA08 /* SIMD.h in Headers */,
-				33E8840115B9AB370089BA08 /* SIMD_ref.h in Headers */,
 				33E8840515B9AB370089BA08 /* Types.h in Headers */,
 				33E8840915B9AB370089BA08 /* Utils.h in Headers */,
 				33E8840D15B9AB370089BA08 /* Zone.h in Headers */,
@@ -6870,7 +6860,6 @@
 				33E883F615B9AB370089BA08 /* SharedLibrary.h in Headers */,
 				33E883F815B9AB370089BA08 /* SharedLibraryDef.h in Headers */,
 				33E883FC15B9AB370089BA08 /* SIMD.h in Headers */,
-				33E8840215B9AB370089BA08 /* SIMD_ref.h in Headers */,
 				33E8840615B9AB370089BA08 /* Types.h in Headers */,
 				33E8840A15B9AB370089BA08 /* Utils.h in Headers */,
 				33E8840E15B9AB370089BA08 /* Zone.h in Headers */,
@@ -7278,7 +7267,6 @@
 				33FA7F871633CA28002603A5 /* SharedLibrary.h in Headers */,
 				33FA7F881633CA28002603A5 /* SharedLibraryDef.h in Headers */,
 				33FA7F891633CA28002603A5 /* SIMD.h in Headers */,
-				33FA7F8A1633CA28002603A5 /* SIMD_ref.h in Headers */,
 				33FA7F8B1633CA28002603A5 /* Types.h in Headers */,
 				33FA7F8C1633CA28002603A5 /* Utils.h in Headers */,
 				33FA7F8D1633CA28002603A5 /* Zone.h in Headers */,
