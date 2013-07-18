@@ -54,7 +54,7 @@ enum SkinType {
 
 enum {
 	kSkaTag = RAD_FOURCC_LE('S', 'K', 'A', 'X'),
-	kSkaVersion = 1,
+	kSkaVersion = 2,
 	kSkmxTag = RAD_FOURCC_LE('S', 'K', 'M', 'X'),
 	kSkmpTag = RAD_FOURCC_LE('S', 'K', 'M', 'P'),
 	kSkmVersion = 2,

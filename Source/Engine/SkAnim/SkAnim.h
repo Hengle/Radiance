@@ -115,9 +115,16 @@ struct DSkAnim {
 
 	const char *name;
 	float distance;
+	float sDecodeMag;
+	float tDecodeMag;
+
 	U16 fps;
 	U16 numFrames;
 	U16 numTags;
+
+	const S16 *rTable; // rotation
+	const S16 *sTable; // scale
+	const S16 *tTable; // translate
 	const U8 *rFrames;
 	const U8 *sFrames;
 	const U8 *tFrames;
@@ -132,13 +139,7 @@ struct RADENG_CLASS DSka {
 	const S16 *boneParents;
 	const float *invWorld; // 4x3 column-major matrix per bone (12 floats)
 	
-	float sDecodeMag;
-	float tDecodeMag;
-
-	// tables
-	const S16 *rTable; // rotation
-	const S16 *sTable; // scale
-	const S16 *tTable; // translate
+	// string table
 	const U16 *stringOfs;
 	const char *strings;
 
