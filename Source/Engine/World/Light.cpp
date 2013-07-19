@@ -16,6 +16,7 @@ Light::Light(World *w) :
 m_interactionHead(0),
 m_pos(Vec3::Zero),
 m_style(kStyle_Diffuse|kStyle_Specular|kStyle_CastShadows),
+m_baseIntensity(1.f),
 m_intensityTime(0.0),
 m_dfTime(0.0),
 m_spTime(0.0),
@@ -76,6 +77,8 @@ void Light::AnimateIntensity(float dt) {
 					m_intensityStep = 0;
 					m_intensityTime -= cur->time;
 					cur = &m_intensitySteps[0];
+					if (m_intensityTime > cur->time)
+						m_intensityTime = cur->time;
 				} else {
 					m_intensity[0] = m_intensity[1] = cur->intensity;
 					m_intensitySteps.clear();
@@ -121,6 +124,8 @@ void Light::AnimateColor(
 					index = 0;
 					time -= cur->time;
 					cur = &steps[0];
+					if (time > cur->time)
+						time = cur->time;
 				} else {
 					color[0] = color[1] = cur->color;
 					steps.clear();
@@ -184,8 +189,9 @@ void Light::AnimateIntensity(const IntensityStep::Vec &vec, bool loop) {
 
 	double dt = 0.0;
 	for (size_t i = 0; i < m_intensitySteps.size(); ++i) {
+		float t = m_intensitySteps[i].time;
 		m_intensitySteps[i].time += dt;
-		dt += m_intensitySteps[i].time;
+		dt += t;
 	}
 }
 
@@ -217,8 +223,9 @@ void Light::InitColorSteps(
 
 	double dt = 0.0;
 	for (size_t i = 0; i < vec.size(); ++i) {
+		float t = vec[i].time;
 		vec[i].time += dt;
-		dt += vec[i].time;
+		dt += t;
 	}
 }
 

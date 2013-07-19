@@ -57,6 +57,7 @@ public:
 	RAD_DECLARE_PROPERTY(Light, bounds, const BBox&, const BBox&);
 	RAD_DECLARE_PROPERTY(Light, intensity, float, float);
 	RAD_DECLARE_PROPERTY(Light, interactionFlags, int, int);
+	RAD_DECLARE_READONLY_PROPERTY(Light, baseIntensity, float);
 
 	void Link();
 	void Unlink();
@@ -129,11 +130,16 @@ private:
 		m_bounds = value;
 	}
 
+	RAD_DECLARE_GET(baseIntensity, float) {
+		return m_baseIntensity;
+	}
+
 	RAD_DECLARE_GET(intensity, float) {
 		return m_intensity[0];
 	}
 
 	RAD_DECLARE_SET(intensity, float) {
+		m_baseIntensity = value;
 		m_intensity[0] = value;
 	}
 
@@ -181,6 +187,7 @@ private:
 	Vec3 m_dfColor[2];
 	Vec4 m_shColor;
 	Vec3 m_pos;
+	float m_baseIntensity;
 	float m_intensity[2];
 	float m_radius;
 	double m_intensityTime;
