@@ -326,10 +326,10 @@ void Animation::BlendFrames(int frameSrc, int frameDst, float blend, BoneTM *out
 
 	RAD_ASSERT(frameSrc < m_dska->numFrames);
 	RAD_ASSERT(frameDst < m_dska->numFrames);
-
-	const S16 *rTable = dska.rTable;
-	const S16 *sTable = dska.sTable;
-	const S16 *tTable = dska.tTable;
+	 
+	const S16 *rTable = m_dska->rTable;
+	const S16 *sTable = m_dska->sTable;
+	const S16 *tTable = m_dska->tTable;
 	const U8 *srcRFrames = m_dska->rFrames+((frameSrc*(int)dska.numBones)+firstBone)*kEncBytes;
 	const U8 *srcSFrames = m_dska->sFrames+((frameSrc*(int)dska.numBones)+firstBone)*kEncBytes;
 	const U8 *srcTFrames = m_dska->tFrames+((frameSrc*(int)dska.numBones)+firstBone)*kEncBytes;
@@ -341,15 +341,15 @@ void Animation::BlendFrames(int frameSrc, int frameDst, float blend, BoneTM *out
 		for (int i = 0; i < numBones; ++i) {
 			BoneTM &tm = out[i];
 			tm.r = DecodeQ(rTable, DecodeI(srcRFrames, i));
-			tm.s = DecodeV(sTable, DecodeI(srcSFrames, i), dska.sDecodeMag);
-			tm.t = DecodeV(tTable, DecodeI(srcTFrames, i), dska.tDecodeMag);
+			tm.s = DecodeV(sTable, DecodeI(srcSFrames, i), m_dska->sDecodeMag);
+			tm.t = DecodeV(tTable, DecodeI(srcTFrames, i), m_dska->tDecodeMag);
 		}
 	} else if (blend > 0.99f) {
 		for (int i = 0; i < numBones; ++i) {
 			BoneTM &tm = out[i];
 			tm.r = DecodeQ(rTable, DecodeI(dstRFrames, i));
-			tm.s = DecodeV(sTable, DecodeI(dstSFrames, i), dska.sDecodeMag);
-			tm.t = DecodeV(tTable, DecodeI(dstTFrames, i), dska.tDecodeMag);
+			tm.s = DecodeV(sTable, DecodeI(dstSFrames, i), m_dska->sDecodeMag);
+			tm.t = DecodeV(tTable, DecodeI(dstTFrames, i), m_dska->tDecodeMag);
 		}
 	} else {
 		BoneTM x, y;
@@ -358,12 +358,12 @@ void Animation::BlendFrames(int frameSrc, int frameDst, float blend, BoneTM *out
 			BoneTM &tm = out[i];
 
 			x.r = DecodeQ(rTable, DecodeI(srcRFrames, i));
-			x.s = DecodeV(sTable, DecodeI(srcSFrames, i), dska.sDecodeMag);
-			x.t = DecodeV(tTable, DecodeI(srcTFrames, i), dska.tDecodeMag);
+			x.s = DecodeV(sTable, DecodeI(srcSFrames, i), m_dska->sDecodeMag);
+			x.t = DecodeV(tTable, DecodeI(srcTFrames, i), m_dska->tDecodeMag);
 
 			y.r = DecodeQ(rTable, DecodeI(dstRFrames, i));
-			y.s = DecodeV(sTable, DecodeI(dstSFrames, i), dska.sDecodeMag);
-			y.t = DecodeV(tTable, DecodeI(dstTFrames, i), dska.tDecodeMag);
+			y.s = DecodeV(sTable, DecodeI(dstSFrames, i), m_dska->sDecodeMag);
+			y.t = DecodeV(tTable, DecodeI(dstTFrames, i), m_dska->tDecodeMag);
 
 			tm.r = details::Slerp(x.r, y.r, blend);
 			tm.s = math::Lerp(x.s, y.s, blend);
@@ -803,10 +803,6 @@ void DSka::Clear() {
 	boneNames = 0;
 	boneParents = 0;
 	invWorld = 0;
-	sDecodeMag = 0;
-	tDecodeMag = 0;
-	rTable = 0;
-	sTable = 0;
 	stringOfs = 0;
 	strings = 0;
 	anims.clear();
@@ -846,40 +842,6 @@ int DSka::Parse(const void *data, AddrSize len) {
 	invWorld = reinterpret_cast<const float*>(bytes);
 	bytes += ((int)numBones) * sizeof(float) * 12;
 
-	CHECK_SIZE(sizeof(U32)*3+(sizeof(float)*2));
-	unsigned int r, s, t;
-	r = *reinterpret_cast<const U32*>(bytes);
-	s = *reinterpret_cast<const U32*>(bytes+sizeof(U32));
-	t = *reinterpret_cast<const U32*>(bytes+sizeof(U32)*2);
-	bytes += sizeof(U32)*3;
-	
-	sDecodeMag = *reinterpret_cast<const float*>(bytes);
-	bytes += sizeof(float);
-	tDecodeMag = *reinterpret_cast<const float*>(bytes);
-	bytes += sizeof(float);
-
-	CHECK_SIZE((r+s+t)*sizeof(S16));
-
-	rTable = reinterpret_cast<const S16*>(bytes);
-	bytes += r * sizeof(S16);
-
-	sTable = reinterpret_cast<const S16*>(bytes);
-	bytes += s * sizeof(S16);
-
-	tTable = reinterpret_cast<const S16*>(bytes);
-	bytes += t * sizeof(S16);
-
-	// padd?
-	{
-		int padd = (r+s+t)*(int)sizeof(S16);
-		if (padd&3)
-		{ // skip padd bytes
-			padd &= 3;
-			CHECK_SIZE(padd);
-			bytes += padd;
-		}
-	}
-
 	anims.resize(numAnims);
 
 	for (U16 i = 0; i < numAnims; ++i) {
@@ -896,14 +858,42 @@ int DSka::Parse(const void *data, AddrSize len) {
 		CHECK_SIZE(sizeof(U16));
 		m.numFrames = *reinterpret_cast<const U16*>(bytes);
 		bytes += sizeof(U16);
-		CHECK_SIZE(sizeof(U16));
+		CHECK_SIZE(sizeof(U16)*2);
 		m.numTags = *reinterpret_cast<const U16*>(bytes);
 		bytes += sizeof(U16);
 		bytes += sizeof(U16); // padd bytes.
 	}
 
+	RAD_ASSERT(IsAligned(bytes, 4));
+
 	for (U16 i = 0; i < numAnims; ++i) {
 		DSkAnim &m = anims[i];
+
+		CHECK_SIZE(sizeof(U32)*3+(sizeof(float)*2));
+		U32 r, s, t;
+		r = *reinterpret_cast<const U32*>(bytes);
+		s = *reinterpret_cast<const U32*>(bytes+sizeof(U32));
+		t = *reinterpret_cast<const U32*>(bytes+sizeof(U32)*2);
+		bytes += sizeof(U32)*3;
+	
+		m.sDecodeMag = *reinterpret_cast<const float*>(bytes);
+		bytes += sizeof(float);
+		m.tDecodeMag = *reinterpret_cast<const float*>(bytes);
+		bytes += sizeof(float);
+
+		CHECK_SIZE((r+s+t)*sizeof(S16));
+
+		m.rTable = reinterpret_cast<const S16*>(bytes);
+		bytes += r * sizeof(S16);
+
+		m.sTable = reinterpret_cast<const S16*>(bytes);
+		bytes += s * sizeof(S16);
+
+		m.tTable = reinterpret_cast<const S16*>(bytes);
+		bytes += t * sizeof(S16);
+
+		bytes = Align(bytes, 4);
+		
 		CHECK_SIZE(((int)numBones) * ((int)m.numFrames) * kEncBytes * 3);
 		m.rFrames = bytes;
 		bytes += ((int)numBones) * ((int)m.numFrames) * kEncBytes;
@@ -929,6 +919,8 @@ int DSka::Parse(const void *data, AddrSize len) {
 		} else {
 			m.boneTags = 0;
 		}
+
+		bytes = Align(bytes, 4);
 	}
 
 	CHECK_SIZE(1);

@@ -18,6 +18,7 @@
 #include <Runtime/Stream/MemoryStream.h>
 #include <Runtime/Endian/EndianStream.h>
 #include <Runtime/Base/SIMD.h>
+#include <Runtime/Thread/Thread.h>
 #include <limits>
 #undef min
 #undef max
@@ -51,6 +52,10 @@ struct BoneMap {
 	int idx;
 	IntVec children;
 };
+
+struct Tables;
+struct TagTable;
+struct AnimTables;
 
 class SkaBuilder {
 public:
@@ -113,7 +118,41 @@ private:
 		Compression::Vec boneCompression;
 	};
 
-	bool Compile(stream::IOutputBuffer &ob) const;
+	class CompileAnimThread : public thread::Thread {
+	public:
+		typedef boost::shared_ptr<CompileAnimThread> Ref;
+		typedef zone_vector<Ref, ZToolsT>::type Vec;
+
+		CompileAnimThread(
+			SkaBuilder &builder,
+			const Anim &anim,
+			AnimTables &tables
+		) : m_builder(builder), m_anim(anim), m_tables(tables), m_done(false) {}
+
+	protected:
+
+		virtual int ThreadProc();
+
+	private:
+
+		friend class SkaBuilder;
+
+		volatile bool m_done;
+		SkaBuilder &m_builder;
+		const Anim &m_anim;
+		AnimTables &m_tables;
+	};
+
+	friend class CompileAnimThread;
+
+	void CompileAnimation(
+		const Anim &anim,
+		AnimTables &tables
+	);
+
+	void WaitForThreads(int numFree);
+
+	bool Compile(stream::IOutputBuffer &ob);
 	
 	void SetBones(const BoneDef::Vec &bones);
 
@@ -138,13 +177,19 @@ private:
 		const SceneFile::BoneVec &skel
 	);
 
+	enum {
+		kMaxThreads = 8
+	};
+
 	BoneDef::Vec m_bones;
 	Anim::Vec m_anims;
+	CompileAnimThread::Vec m_threads;
+	volatile bool m_error;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SkaBuilder::SkaBuilder() {
+SkaBuilder::SkaBuilder() : m_error(false) {
 }
 
 SkaBuilder::~SkaBuilder() {
@@ -475,20 +520,43 @@ bool SkaBuilder::Compile(
 
 typedef zone_vector<float, ZToolsT>::type FloatVec;
 
+struct TagTable {
+	StringVec strings;
+
+	TagTable() {
+		strings.reserve(64);
+	}
+
+	int AddString(const String &str) {
+		if (str.empty)
+			return -1;
+
+		for (StringVec::const_iterator it = strings.begin(); it != strings.end(); ++it) {
+			if (str == *it)
+				return (int)(it-strings.begin());
+		}
+
+		int ofs = (int)strings.size();
+		if (ofs > 254) {
+			COut(C_Error) << "SkaBuilder::TagTable: string table exceeds 255 elements!" << std::endl;
+			return -1;
+		}
+		strings.push_back(str);
+		return ofs;
+	}
+};
+
 struct Tables {
 	FloatVec rTable;
 	FloatVec sTable;
 	FloatVec tTable;
-	StringVec strings;
+	float tAbsMax;
+	float sAbsMax;
 
 	Tables() : tAbsMax(-1.0f), sAbsMax(-1.0f) {
-		strings.reserve(64);
 	}
 
 	// building these tables is all slow and linear, need to figure out how to speed this up.
-
-	float tAbsMax;
-	float sAbsMax;
 
 	static S16 QuantFloat(float f, float absMax) {
 		if (absMax <= 0.f)
@@ -534,24 +602,6 @@ struct Tables {
 
 	bool AddTranslate(const Vec3 &t, float max, int &out) {
 		return AddVec3(tTable, t, out, tAbsMax, max);
-	}
-
-	int AddString(const String &str) {
-		if (str.empty)
-			return -1;
-
-		for (StringVec::const_iterator it = strings.begin(); it != strings.end(); ++it) {
-			if (str == *it)
-				return (int)(it-strings.begin());
-		}
-
-		int ofs = (int)strings.size();
-		if (ofs > 254) {
-			COut(C_Error) << "SkaBuilder::Tables: string table exceeds 255 elements!" << std::endl;
-			return -1;
-		}
-		strings.push_back(str);
-		return ofs;
 	}
 
 private:
@@ -628,14 +678,146 @@ struct AnimTables {
 	AnimTables() : totalTags(0) {
 	}
 
+	Tables animTables;
+	
 	IntVec rFrames;
 	IntVec sFrames;
 	IntVec tFrames;
 	IntVec tags;
 	int totalTags;
 };
+
+int SkaBuilder::CompileAnimThread::ThreadProc() {
+
+	COut(C_Info) << "SkaBuilder: compiling '" << m_anim.name << "' on thread 0x" << std::hex << id.get() << std::endl;
 	
-bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const {
+	IntVec prevBoneRFrame;
+	IntVec prevBoneSFrame;
+	IntVec prevBoneTFrame;
+
+	prevBoneRFrame.resize(m_builder.m_bones.size());
+	prevBoneSFrame.resize(m_builder.m_bones.size());
+	prevBoneTFrame.resize(m_builder.m_bones.size());
+	
+	m_tables.animTables.rTable.reserve(128);
+	m_tables.animTables.sTable.reserve(128);
+	m_tables.animTables.tTable.reserve(128);
+
+	m_tables.rFrames.reserve(m_anim.frames.size()*m_builder.m_bones.size());
+	m_tables.sFrames.reserve(m_anim.frames.size()*m_builder.m_bones.size());
+	m_tables.tFrames.reserve(m_anim.frames.size()*m_builder.m_bones.size());
+	m_tables.tags.reserve(m_anim.frames.size()*m_builder.m_bones.size());
+
+	FrameVec::const_iterator last = m_anim.frames.end();
+	for(FrameVec::const_iterator fit = m_anim.frames.begin(); fit != m_anim.frames.end(); ++fit) {
+		const BoneTMVec &frame = *fit;
+
+		bool tag = false;
+
+		// apply progressive compression.
+		// bones deeper in the hierarchy are compressed less
+		// with the theory that don't contribute as much to noticable wobble.
+
+		for (size_t boneIdx = 0; boneIdx < m_builder.m_bones.size(); ++boneIdx) {
+			RAD_ASSERT(frame.size() == m_builder.m_bones.size());
+			const BoneTM &tm = frame[boneIdx];
+			const BoneTM *prevTM = 0;
+
+			if (last != m_anim.frames.end())
+				prevTM = &((*last)[boneIdx]);
+
+			bool emitR = prevTM == 0;
+			bool emitS = prevTM == 0;
+			bool emitT = prevTM == 0;
+
+			emitR = emitR || tm.tm.r != prevTM->tm.r;
+			emitS = emitS || tm.tm.s != prevTM->tm.s;
+			emitT = emitT || tm.tm.t != prevTM->tm.t;
+
+			if (emitR) {
+				int idx;
+				if (!m_tables.animTables.AddRotate(tm.tm.r, m_anim.boneCompression[boneIdx].quatCompression, idx)) {
+					COut(C_Error) << "Error compiling animation tables for '" << m_anim.name << "'" << std::endl;
+					m_builder.m_error = true;
+					m_done = true;
+					return 0;
+				}
+				m_tables.rFrames.push_back(idx);
+				prevBoneRFrame[boneIdx] = idx;
+			} else {
+				m_tables.rFrames.push_back(prevBoneRFrame[boneIdx]);
+			}
+
+			if (emitS) {
+				int idx;
+				if (!m_tables.animTables.AddScale(tm.tm.s, m_anim.boneCompression[boneIdx].scaleCompression, idx)) {
+					COut(C_Error) << "Error compiling animation tables for '" << m_anim.name << "'" << std::endl;
+					m_builder.m_error = true;
+					m_done = true;
+					return 0;
+				}
+				m_tables.sFrames.push_back(idx);
+				prevBoneSFrame[boneIdx] = idx;
+			} else {
+				m_tables.sFrames.push_back(prevBoneSFrame[boneIdx]);
+			}
+
+			if (emitT) {
+				int idx;
+				if (!m_tables.animTables.AddTranslate(tm.tm.t, m_anim.boneCompression[boneIdx].translateCompression, idx)) {
+					COut(C_Error) << "Error compiling animation tables for '" << m_anim.name << "'" << std::endl;
+					m_builder.m_error = true;
+					m_done = true;
+					return 0;
+				}
+				m_tables.tFrames.push_back(idx);
+				prevBoneTFrame[boneIdx] = idx;
+			} else {
+				m_tables.tFrames.push_back(prevBoneTFrame[boneIdx]);
+			}
+		}
+
+		last = fit;
+	}
+
+	COut(C_Info) << "SkaBuilder: '" << m_anim.name << "' finished on thread 0x" << std::hex << id.get() << std::endl;
+
+	m_done = true;
+	return 0;
+}
+
+void SkaBuilder::CompileAnimation(
+	const Anim &anim,
+	AnimTables &tables
+) {
+	WaitForThreads(1);
+	CompileAnimThread::Ref thread(new (ZTools) CompileAnimThread(*this, anim, tables));
+	m_threads.push_back(thread);
+	thread->Run();
+}
+
+void SkaBuilder::WaitForThreads(int numFree) {
+	// reclaim
+	for(;;) {
+		for (CompileAnimThread::Vec::iterator it = m_threads.begin(); it != m_threads.end();) {
+			const CompileAnimThread::Ref &thread = *it;
+			if (thread->m_done) {
+				thread->Join();
+				it = m_threads.erase(it);
+			} else {
+				++it;
+			}
+		}
+
+		if ((kMaxThreads-(int)m_threads.size()) >= numFree) {
+			break;
+		}
+
+		thread::Sleep(100);
+	}
+}
+	
+bool SkaBuilder::Compile(stream::IOutputBuffer &ob) {
 	
 	stream::LittleOutputStream os(ob);
 
@@ -678,25 +860,15 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const {
 					return false;
 	}
 
-	Tables t;
+	TagTable tagTable;
 	AnimTables::Vec at;
-	IntVec prevBoneRFrame;
-	IntVec prevBoneSFrame;
-	IntVec prevBoneTFrame;
-
-	prevBoneRFrame.resize(m_bones.size());
-	prevBoneSFrame.resize(m_bones.size());
-	prevBoneTFrame.resize(m_bones.size());
 	at.resize(m_anims.size());
 
 	for (Anim::Vec::const_iterator it = m_anims.begin(); it != m_anims.end(); ++it) {
 		AnimTables &ct = at[it-m_anims.begin()];
 		const Anim &anim = *it;
 
-		ct.rFrames.reserve(anim.frames.size()*m_bones.size());
-		ct.sFrames.reserve(anim.frames.size()*m_bones.size());
-		ct.tFrames.reserve(anim.frames.size()*m_bones.size());
-		ct.tags.reserve(anim.frames.size()*m_bones.size());
+		// build tags
 
 		FrameVec::const_iterator last = anim.frames.end();
 		for(FrameVec::const_iterator fit = anim.frames.begin(); fit != anim.frames.end(); ++fit) {
@@ -707,105 +879,30 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const {
 			// apply progressive compression.
 			// bones deeper in the hierarchy are compressed less
 			// with the theory that don't contribute as much to noticable wobble.
-
 			for (size_t boneIdx = 0; boneIdx < m_bones.size(); ++boneIdx) {
 				RAD_ASSERT(frame.size() == m_bones.size());
 				const BoneTM &tm = frame[boneIdx];
-				const BoneTM *prevTM = 0;
-
-				if (last != anim.frames.end())
-					prevTM = &((*last)[boneIdx]);
-
-				bool emitR = prevTM == 0;
-				bool emitS = prevTM == 0;
-				bool emitT = prevTM == 0;
-
-				emitR = emitR || tm.tm.r != prevTM->tm.r;
-				emitS = emitS || tm.tm.s != prevTM->tm.s;
-				emitT = emitT || tm.tm.t != prevTM->tm.t;
-
-				int tagId = t.AddString(tm.tag);
+				
+				int tagId = tagTable.AddString(tm.tag);
 				ct.tags.push_back(tagId);
 				if (!tag && tagId > -1) {
 					tag = true;
 					++ct.totalTags;
 				}
-
-				if (emitR) {
-					int idx;
-					if (!t.AddRotate(tm.tm.r, anim.boneCompression[boneIdx].quatCompression, idx))
-						return false;
-					ct.rFrames.push_back(idx);
-					prevBoneRFrame[boneIdx] = idx;
-				} else {
-					ct.rFrames.push_back(prevBoneRFrame[boneIdx]);
-				}
-
-				if (emitS) {
-					int idx;
-					if (!t.AddScale(tm.tm.s, anim.boneCompression[boneIdx].scaleCompression, idx))
-						return false;
-					ct.sFrames.push_back(idx);
-					prevBoneSFrame[boneIdx] = idx;
-				} else {
-					ct.sFrames.push_back(prevBoneSFrame[boneIdx]);
-				}
-
-				if (emitT) {
-					int idx;
-					if (!t.AddTranslate(tm.tm.t, anim.boneCompression[boneIdx].translateCompression, idx))
-						return false;
-					ct.tFrames.push_back(idx);
-					prevBoneTFrame[boneIdx] = idx;
-				} else {
-					ct.tFrames.push_back(prevBoneTFrame[boneIdx]);
-				}
 			}
 
 			last = fit;
 		}
+
+		// compile animation
+		CompileAnimation(anim, ct);
 	}
 
-	if (!os.Write((U32)(t.rTable.size())) ||
-		!os.Write((U32)(t.sTable.size())) ||
-		!os.Write((U32)(t.tTable.size()))) {
+	WaitForThreads(kMaxThreads);
+
+	if (m_error) {
+		// error building animation data
 		return false;
-	}
-	
-	if (!os.Write(t.sAbsMax/std::numeric_limits<S16>::max()))
-		return false;
-	if (!os.Write(t.tAbsMax/std::numeric_limits<S16>::max()))
-		return false;
-
-	// Encode float tables.
-	for (size_t i = 0; i < t.rTable.size(); ++i) {
-		S16 enc = Tables::QuantFloat(t.rTable[i], 1.0f);
-		if (!os.Write(enc))
-			return false;
-	}
-
-	for (size_t i = 0; i < t.sTable.size(); ++i) {
-		S16 enc = Tables::QuantFloat(t.sTable[i], t.sAbsMax);
-		if (!os.Write(enc))
-			return false;
-	}
-
-	for (size_t i = 0; i < t.tTable.size(); ++i) {
-		S16 enc = Tables::QuantFloat(t.tTable[i], t.tAbsMax);
-		if (!os.Write(enc))
-			return false;
-	}
-
-	int bytes = 
-		(int)(t.rTable.size()*2)+
-		(int)(t.sTable.size()*2)+
-		(int)(t.tTable.size()*2);
-
-	if (bytes&3) {
-		bytes &= 3;
-		U8 pad[3] = { 0, 0, 0 };
-		if (os.Write(pad, 4-bytes, 0) != (4-bytes))
-			return false;
 	}
 
 	// Write animations.
@@ -830,13 +927,56 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const {
 			return false; // padd bytes.
 	}
 
-	// Write table indexes.
-	bytes = 0;
-	
+	// Write animation tables
+		
 	for (size_t i = 0; i < at.size(); ++i) {
 		const AnimTables &tables = at[i];
 
 		RAD_ASSERT(tables.rFrames.size() == (m_bones.size()*m_anims[i].frames.size()));
+
+		if (!os.Write((U32)(tables.animTables.rTable.size())) ||
+			!os.Write((U32)(tables.animTables.sTable.size())) ||
+			!os.Write((U32)(tables.animTables.tTable.size()))) {
+			return false;
+		}
+	
+		if (!os.Write(tables.animTables.sAbsMax/std::numeric_limits<S16>::max()))
+			return false;
+		if (!os.Write(tables.animTables.tAbsMax/std::numeric_limits<S16>::max()))
+			return false;
+
+		// Encode floats.
+		for (size_t k = 0; k < tables.animTables.rTable.size(); ++k) {
+			S16 enc = Tables::QuantFloat(tables.animTables.rTable[k], 1.0f);
+			if (!os.Write(enc))
+				return false;
+		}
+
+		for (size_t k = 0; k < tables.animTables.sTable.size(); ++k) {
+			S16 enc = Tables::QuantFloat(tables.animTables.sTable[k], tables.animTables.sAbsMax);
+			if (!os.Write(enc))
+				return false;
+		}
+
+		for (size_t k = 0; k < tables.animTables.tTable.size(); ++k) {
+			S16 enc = Tables::QuantFloat(tables.animTables.tTable[k], tables.animTables.tAbsMax);
+			if (!os.Write(enc))
+				return false;
+		}
+
+		int bytes = 
+			(int)(tables.animTables.rTable.size()*2)+
+			(int)(tables.animTables.sTable.size()*2)+
+			(int)(tables.animTables.tTable.size()*2);
+
+		if (bytes&3) {
+			bytes &= 3;
+			U8 pad[3] = { 0, 0, 0 };
+			if (os.Write(pad, 4-bytes, 0) != (4-bytes))
+				return false;
+		}
+
+		bytes = 0;
 		
 		for (IntVec::const_iterator it = tables.rFrames.begin(); it != tables.rFrames.end(); ++it) {
 			int i = endian::SwapLittle((*it)&ska::kEncMask);
@@ -916,16 +1056,25 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const {
 				}
 			}
 		}
+
+		if (bytes&3) { // padd to 4 byte alignment.
+			bytes &= 3;
+			U8 pad[3] = { 0, 0, 0 };
+			if (os.Write(pad, 4-bytes, 0) != (4-bytes))
+				return false;
+		}
 	}
 
+	int bytes = 0;
+
 	// write string table.
-	if (!os.Write((U8)t.strings.size()))
+	if (!os.Write((U8)tagTable.strings.size()))
 		return false;
 	++bytes;
 
 	// compile string indexes.
 	int stringIdx = 0;
-	for (StringVec::const_iterator it = t.strings.begin(); it != t.strings.end(); ++it) {
+	for (StringVec::const_iterator it = tagTable.strings.begin(); it != tagTable.strings.end(); ++it) {
 		if (!os.Write((U16)stringIdx))
 			return false;
 		bytes += 2;
@@ -938,14 +1087,14 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) const {
 	}
 
 	// compile strings
-	for (StringVec::const_iterator it = t.strings.begin(); it != t.strings.end(); ++it) {
+	for (StringVec::const_iterator it = tagTable.strings.begin(); it != tagTable.strings.end(); ++it) {
 		const String &str = *it;
 		if (os.Write(str.c_str.get(), (stream::SPos)(str.length+1), 0) != (stream::SPos)(str.length+1))
 			return false;
 		bytes += (int)str.length+1;
 	}
 	
-	if (bytes&3) { // padd to 4 byte alignment.
+	if (bytes&3) { // padd file to 4 byte alignment.
 		bytes &= 3;
 		U8 pad[3] = { 0, 0, 0 };
 		if (os.Write(pad, 4-bytes, 0) != (4-bytes))
