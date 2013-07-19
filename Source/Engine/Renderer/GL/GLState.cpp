@@ -208,9 +208,15 @@ void GLState::CommitSB(S &s, bool f) {
 		CHECK_GL_ERRORS_EXTRA();
 	}
 	
-	if (ss&kCullFaceMode_Flags || (s.s.invertCullFace != s.d.invertCullFace))
-	{
-		if ((ss&(kCullFaceMode_Front|kCullFaceMode_Back)) && (ds&kCullFaceMode_None)) {
+	// ensure proper cull face bits are here (see depth test)
+	bool cullModeChanged = false;
+	if ((s.s.s&(kCullFaceMode_Flags&~kCullFaceMode_None)) && (s.d.s&kCullFaceMode_None)) {
+		cullModeChanged = true;
+	}
+
+	if ((ss&kCullFaceMode_Flags) || cullModeChanged || (s.s.invertCullFace != s.d.invertCullFace)) {
+		
+		if (ds&kCullFaceMode_None) {
 			glEnable(GL_CULL_FACE);
 			CHECK_GL_ERRORS_EXTRA();
 		} else if (ss&kCullFaceMode_None) {
@@ -245,21 +251,17 @@ void GLState::CommitSB(S &s, bool f) {
 			CHECK_GL_ERRORS_EXTRA();
 		}
 
-		if (ss & kCullFaceMode_Flags) {
-			
-			// it is acceptable to disable culling by just passing kCullFadeMode_None
-			// in those cases, make sure to record the current polarity from the driver
-			// so we don't duplicate reduntant state
+		// it is acceptable to disable culling by just passing kCullFadeMode_None
+		// in those cases, make sure to record the current polarity from the driver
+		// so we don't duplicate reduntant state
 
-			if (!(s.s.s&(kCullFaceMode_Front|kCullFaceMode_Back))) // record polarity
-				s.s.s |= s.d.s&(kCullFaceMode_Front|kCullFaceMode_Back);
-			if (!(s.s.s&(kCullFaceMode_CW|kCullFaceMode_CCW)))
-				s.s.s |= s.d.s&(kCullFaceMode_CW|kCullFaceMode_CCW); // record order
+		if (!(s.s.s&(kCullFaceMode_Front|kCullFaceMode_Back))) // record polarity
+			s.s.s |= s.d.s&(kCullFaceMode_Front|kCullFaceMode_Back);
+		if (!(s.s.s&(kCullFaceMode_CW|kCullFaceMode_CCW)))
+			s.s.s |= s.d.s&(kCullFaceMode_CW|kCullFaceMode_CCW); // record order
 
-			s.d.s &= ~kCullFaceMode_Flags;
-			s.d.s |= s.s.s&kCullFaceMode_Flags;
-		}
-		
+		s.d.s &= ~kCullFaceMode_Flags;
+		s.d.s |= s.s.s&kCullFaceMode_Flags;
 		s.d.invertCullFace = s.s.invertCullFace;
 	}
 
