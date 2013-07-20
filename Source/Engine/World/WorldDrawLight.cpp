@@ -816,7 +816,7 @@ void WorldDraw::UnlinkOccupant(MBatchOccupant &occupant) {
 void WorldDraw::LinkLight(Light &light, const BBox &bounds) {
 	// link to static world models
 
-	if ((!light.interactionFlags & Light::kInteractionFlag_World))
+	if (!(light.interactionFlags & Light::kInteractionFlag_World))
 		return; // not a world light
 
 	// NOTE: models can span areas, this may check them multiple times.

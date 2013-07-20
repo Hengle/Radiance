@@ -36,6 +36,7 @@ struct MBatch {
 
 	void AddDraw(MBatchDraw &draw);
 	
+	int order;
 	WorldDraw *owner;
 	const MatRef *matRef;
 	MBatchDrawLink *head;

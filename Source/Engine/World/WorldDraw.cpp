@@ -26,7 +26,7 @@ void RotateForDebugCamera();
 
 namespace details {
 
-MBatch::MBatch() : matRef(0), head(0), tail(0) {
+MBatch::MBatch() : matRef(0), head(0), tail(0), order(-1) {
 }
 
 MBatch::~MBatch() {
@@ -292,13 +292,15 @@ details::MatRef *WorldDraw::AddMaterialRef(int id) {
 }
 
 details::MBatch* WorldDraw::AddViewBatch(ViewDef &view, details::MatRef *matRef, int id) {
-	details::MBatchIdMap::iterator it = view.batches.find(id);
-	if (it != view.batches.end())
+	details::MBatchIdMap::iterator it = view.batchMatId.find(id);
+	if (it != view.batchMatId.end())
 		return it->second;
 
 	details::MBatch *b = AllocateBatch();
 	b->matRef = matRef;
-	view.batches.insert(details::MBatchIdMap::value_type(id, b));
+	b->order = view.nextBatch++;
+	view.batches.insert(details::MBatchIdMap::value_type(b->order, b));
+	view.batchMatId.insert(details::MBatchIdMap::value_type(id, b));
 	return b;
 }
 

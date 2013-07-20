@@ -130,15 +130,6 @@ bool GLSLTool::Assemble(
 
 		RAD_VERIFY(tcUsage.size() == tcMapping.size());
 
-		int ofs = 0;
-		for (Shader::IntSet::const_iterator it = tcUsage.begin(); it != tcUsage.end(); ++it, ++ofs) {
-			if (vertexShader) {
-				ss << "#define TEXCOORD" << ofs << " tc" << material.TCUVIndex(*it) << "\r\n";
-			} else {
-				ss << "#define TEXCOORD" << ofs << " tc" << tcMapping[ofs].first << "\r\n";
-			}
-		}
-
 		if (vertexShader) {
 			Shader::IntSet tcInputs;
 			
@@ -180,6 +171,30 @@ bool GLSLTool::Assemble(
 			}
 
 			ss << "#define TCINPUTS " << tcInputs.size() << "\r\n";
+
+			for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
+				if (mapping.tcMods[i] == r::kInvalidMapping)
+					break;
+				int tcIndex = (int)mapping.tcMods[i];
+				int uvIndex = material.TCUVIndex(tcIndex);
+
+				int ofs = 0;
+				for (Shader::IntSet::const_iterator it2 = tcInputs.begin(); it2 != tcInputs.end(); ++it2) {
+					if (uvIndex == *it2)
+						break;
+					++ofs;
+				}
+
+				RAD_VERIFY(ofs < (int)tcInputs.size());
+				ss << "#define TEXCOORD" << i << " tc" << ofs << "\r\n";
+			}
+		} else {
+			// fragment shader inputs used generated tc's, which may have expanded from the
+			// the vertex shader inputs.
+			int ofs = 0;
+			for (Shader::IntSet::const_iterator it = tcUsage.begin(); it != tcUsage.end(); ++it, ++ofs) {
+				ss << "#define TEXCOORD" << ofs << " tc" << tcMapping[ofs].first << "\r\n";
+			}
 		}
 	}
 	
@@ -277,7 +292,7 @@ bool GLSLTool::Assemble(
 
 	if (GLES) {
 		ss << "#define _GLES\r\n";
-		ss << "#define MOBILE\r\b";
+		ss << "#define MOBILE\r\n";
 	}
 	
 	if (!Inject(engine, "@r:/Source/Shaders/Nodes/GLSL.c", ss))

@@ -42,7 +42,7 @@ public:
 		kNumFrustumPlanes = 6
 	};
 	
-	ViewDef(WorldDraw *_draw) : draw(_draw),  sky(false) {
+	ViewDef(WorldDraw *_draw) : draw(_draw),  sky(false), nextBatch(0) {
 	}
 
 	~ViewDef();
@@ -58,8 +58,10 @@ public:
 	EntityPtrVec shadowEntities;
 	MBatchOccupantPtrVec shadowOccupants;
 	details::MBatchIdMap batches;
+	details::MBatchIdMap batchMatId;
 	WorldDraw *draw;
 
+	int nextBatch;
 	int viewport[4];
 	int area;
 	bool sky;
