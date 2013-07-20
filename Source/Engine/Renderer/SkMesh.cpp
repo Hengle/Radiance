@@ -100,7 +100,7 @@ void SkMesh::Load(
 				0,
 				kVertSize,
 				sizeof(float) * 8,
-				3
+				4
 			);
 		}
 

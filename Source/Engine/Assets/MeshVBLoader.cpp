@@ -80,7 +80,7 @@ int MeshVBLoader::Process(
 				0,
 				kVertSize,
 				sizeof(float)*6,
-				3
+				4
 			);
 			m->MapSource(
 				streamIdx,
