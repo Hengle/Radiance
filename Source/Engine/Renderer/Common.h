@@ -30,7 +30,7 @@ enum StreamUsage {
 enum MaterialTextureSource {
 	kMaterialTextureSource_Texture,
 	kNumMaterialTextureSources,
-	kMaterialTextureSource_MaxIndices = 6
+	kMaterialTextureSource_MaxIndices = kMaxTextures
 };
 
 enum MaterialGeometrySource {

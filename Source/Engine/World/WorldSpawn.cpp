@@ -265,7 +265,7 @@ void World::SpawnModel(
 		0,
 		sizeof(bsp_file::BSPVertex),
 		sizeof(float)*(6+(bsp_file::kMaxUVChannels*2)),
-		3
+		4
 	);
 
 	if (model->numChannels > 0) {
