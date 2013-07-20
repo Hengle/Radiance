@@ -359,6 +359,9 @@ void Material::Sample(float time, float dt) {
 			m_blend[0] = math::Lerp(m_blend[1], m_blend[2], m_blendTime[0] / m_blendTime[1]);
 		}
 	}
+
+	if (!m_animated)
+		return;
 		
 	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
 		for (int k = 0; k < kNumTCMods; ++k) {
@@ -370,6 +373,13 @@ void Material::Sample(float time, float dt) {
 				WaveAnim &S = m_waves[i][k][kTexCoord_S];
 				WaveAnim &T = m_waves[i][k][kTexCoord_T];
 
+				if ((S.type == WaveAnim::T_Identity) &&
+					(T.type == WaveAnim::T_Identity)) {
+						continue;
+				}
+
+				// NOTE: amplitude is used directly by vertex shader.
+				// temp swap it for 1.0 so we don't affect our Sample() values.
 				float sAmp = S.amplitude;
 				float tAmp = T.amplitude;
 
@@ -397,6 +407,10 @@ void Material::Sample(float time, float dt) {
 			} else {
 				for (int p = 0; p < kNumTexCoordDimensions; ++p) {
 					const WaveAnim &wave = m_waves[i][k][p];
+
+					if (wave.type == WaveAnim::T_Identity)
+						continue;
+
 					boost::array<float, 3> &samples = m_waveSamples[i][k][p];
 
 					float val = wave.Sample(time);
@@ -426,15 +440,58 @@ void Material::Sample(float time, float dt) {
 	}
 
 	for (int i = 0; i < kNumColors; ++i) {
-		float lerp = 1.f - m_colorWaves[i].Sample(time);
-		lerp = math::Clamp(lerp, 0.f, 1.f);
-		m_sampledColor[i] = m_blend[0] * math::Lerp(m_colors[i][kColorA], m_colors[i][kColorB], lerp);
+		if (m_colorWaves[i].type != WaveAnim::T_Identity) {
+			float lerp = 1.f - m_colorWaves[i].Sample(time);
+			lerp = math::Clamp(lerp, 0.f, 1.f);
+			m_sampledColor[i] = m_blend[0] * math::Lerp(m_colors[i][kColorA], m_colors[i][kColorB], lerp);
+		}
 	}
 
-	{
+	if (m_specularWave.type != WaveAnim::T_Identity) {
 		float lerp = 1.f - m_specularWave.Sample(time);
 		lerp = math::Clamp(lerp, 0.f, 1.f);
 		m_sampledSpecularColor = math::Lerp(m_specularColors[kColorA], m_specularColors[kColorB], lerp);
+	}
+}
+
+void Material::InitDefaultSamples() {
+	for (int i = 0; i < kMaterialTextureSource_MaxIndices; ++i) {
+		for (int k = 0; k < kNumTCMods; ++k) {
+			int &ops = m_waveOps[i][k];
+
+			if (k == kTCMod_Turb) { 
+				// turb only needs phase/amplitude
+				boost::array<boost::array<float, 3>, kNumTexCoordDimensions> &samples = m_waveSamples[i][k];
+				WaveAnim &S = m_waves[i][k][kTexCoord_S];
+				WaveAnim &T = m_waves[i][k][kTexCoord_T];
+
+				samples[0][0] = 0.f;
+				samples[0][1] = S.amplitude;
+				samples[0][2] = S.phase;
+				samples[1][0] = 0.f;
+				samples[1][1] = T.amplitude;
+				samples[1][2] = T.phase;
+
+			} else {
+				for (int p = 0; p < kNumTexCoordDimensions; ++p) {
+					const WaveAnim &wave = m_waves[i][k][p];
+					boost::array<float, 3> &samples = m_waveSamples[i][k][p];
+
+					if (k == kTCMod_Rotate) { 
+						// sin/cos [-pi/pi]
+						const float val = math::Constants<float>::PI();
+						samples[2] = val;
+						samples[0] = math::FastSin(val);
+						samples[1] = math::FastCos(val);
+						++ops;
+					} else {
+						samples[0] = 1.f;
+						samples[1] = 0.f;
+						++ops;
+					}
+				}
+			}
+		}
 	}
 }
 

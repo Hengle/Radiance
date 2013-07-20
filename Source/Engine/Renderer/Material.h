@@ -184,6 +184,8 @@ public:
 	void BindStates(int flags=0, int blends=0);
 	void BindTextures(asset::MaterialLoader *loader);
 
+	void InitDefaultSamples();
+
 #if defined(RAD_OPT_PC_TOOLS)
 	int CookShader(const char *path, Engine &engine, int pflags);
 	static void BeginCook();

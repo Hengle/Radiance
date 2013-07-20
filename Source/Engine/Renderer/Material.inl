@@ -9,6 +9,9 @@ namespace r {
 
 inline void Material::SetColor(int num, int index, const Vec4 &color) {
 	m_colors[num][index] = color;
+	if (index == 0) {
+		m_sampledColor[num] = color;
+	}
 }
 
 inline Vec4 Material::Color(int num, int index) const {
@@ -27,6 +30,9 @@ inline Vec4 Material::SampleColor(int num) const {
 
 inline void Material::SetSpecularColor(int index, const Vec3 &color) {
 	m_specularColors[index] = color;
+	if (index == 0) {
+		m_sampledSpecularColor = color;
+	}
 }
 
 inline Vec3 Material::SpecularColor(int index) const {

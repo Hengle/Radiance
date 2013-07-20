@@ -215,6 +215,7 @@ int MaterialParser::LoadCooked(
 		return SR_IOError;
 	}
 
+	m_m.InitDefaultSamples();
 	m_loaded = true;
 
 	return SR_Success;
@@ -758,6 +759,7 @@ int MaterialParser::Load(
 		m_m.specularExponent = exp;
 	}
 
+	m_m.InitDefaultSamples();
 	m_loaded = true;
 
 	return SR_Success;
