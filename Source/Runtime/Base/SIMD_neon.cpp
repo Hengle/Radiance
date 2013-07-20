@@ -27,110 +27,13 @@ const SIMDDriver *SIMD_ref_bind();
 
 namespace {
 
-void SkinVerts4(
-	float *outVerts, 
-	const float *bones, 
-	const float *vertices,
-	const U16 *boneIndices,
-	int numVerts
-)
-{
-	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
-	RAD_ASSERT(IsAligned(bones, SIMDDriver::kAlignment));
-	RAD_ASSERT(IsAligned(vertices, SIMDDriver::kAlignment));
-	RAD_ASSERT(IsAligned(boneIndices, SIMDDriver::kAlignment));
-
-	for (int i = 0; i < numVerts; ++i)
-	{		
-		asm volatile (
-			LOAD_BONE_PTR
-			// q0 =  b0 vertex
-			"vld1.32 {q0}, [%[v], :128]!      \n\t"
-			// q1-q4 = b0
-			"vld1.32 {q1-q2}, [r9, :128]!     \n\t"
-			"vld1.32 {q3-q4}, [r9, :128]!     \n\t"
-			LOAD_BONE_PTR
-
-			// q1 = b0_col0 * X
-			"vmul.f32 q1, q1, d0[0]           \n\t"
-			// q5 = b1 vertex (DI)
-			"vld1.32 {q5}, [%[v], :128]!     \n\t"
-
-			// q2 = b0_col1 * X
-			"vmul.f32 q2, q2, d0[1]			  \n\t"
-			// q6-q7 = b1_col0+1 (DI)
-			"vld1.32 {q6-q7}, [r9, :128]!     \n\t"
-					  
-			// q1 = q1 + b0_col2 * Z
-			"vmla.f32 q1, q3, d1[0]           \n\t"
-			// q8-q9 = b1_col1+2 (DI)
-			"vld1.32 {q8-q9}, [r9, :128]!     \n\t"
-			LOAD_BONE_PTR
-
-			// q2 = q2 + b0_col3 * W
-			"vmla.f32 q2, q4, d1[1]           \n\t"
-			// q0 = b2 vertex (DI)
-			"vld1.32 {q0}, [%[v], :128]!      \n\t"
-
-			// q1 = q1 + b1_col0 * X
-			"vmla.f32 q1, q6, d10[0]          \n\t"
-			// q3-q4 = b2_col0+1 (DI)
-			"vld1.32 {q3-q4}, [r9, :128]!     \n\t"
-
-			// q2 = q2 + b1_col1 * Y
-			"vmla.f32 q2, q7, d10[1]          \n\t"
-			// q5-q6 = b2_col2+3 (DI)
-			"vld1.32 {q6-q7}, [r9, :128]!     \n\t"
-			LOAD_BONE_PTR
-
-			// q1 = q1 + b1_col2 * Z
-			"vmla.f32 q1, q8, d11[0]          \n\t"
-					  
-			// q2 = q2 + b1_col3 * W
-			"vmla.f32 q2, q9, d11[1]          \n\t"
-			// q5 = b3 vertex (DI)
-			"vld1.32 {q5}, [%[v], :128]!      \n\t"
-
-			// q1 = q1 + b2_col0 * X
-			"vmla.f32 q1, q3, d0[0]           \n\t"
-			// q8-q9 = b3 (DI)
-			"vld1.32 {q8-q9}, [r9, :128]!     \n\t"
-					  
-			// q2 = q2 + b2_col1 * Y
-			"vmla.f32 q2, q4, d0[1]           \n\t"
-			// q3-q4 = b3 (DI)
-			"vld1.32 {q3-q4}, [r9, :128]!     \n\t"
-
-			// q1 = q1 + b2_col2 * Z
-			"vmla.f32 q1, q6, d1[0]           \n\t"
-			// q2 = q2 + b2_col3 * W
-			"vmla.f32 q2, q7, d1[1]           \n\t"
-			// q1 = q1 + b3_col0 * X
-			"vmla.f32 q1, q8, d10[0]          \n\t"
-			// q2 = q2 + b3_col1 * Y
-			"vmla.f32 q2, q9, d10[1]          \n\t"
-			// q1 = q1 + b3_col2 * Z
-			"vmla.f32 q1, q3, d11[0]          \n\t"
-			// q2 = q2 + b3_col3 * W
-			"vmla.f32 q2, q4, d11[1]          \n\t"
-
-			"vadd.f32 q1, q1, q2              \n\t"
-			"vst1.32 {q1}, [%[o], :128]!      \n\t"
-		: [o] "+r" (outVerts), [v] "+r" (vertices), [bi] "+r" (boneIndices)
-		: [bones] "r" (bones)
-		: "cc", "r9", "s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11", "s12", "s13", "s14", "s15", "s16", "s17", "s18", "s19", "s20", "s21", "s22", "s23", "s24", "s25", "s26", "s27", "s28", "s29", "s30", "s31", "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "d10", "d11", "d12", "d13", "d14", "d15", "d16", "d17", "d18", "d19", "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9"
-		);
-	}
-}
-
 void SkinVerts3B(
 	float *outVerts, 
 	const float *bones, 
 	const float *vertices,
 	const U16 *boneIndices,
 	int numVerts
-)
-{
+) {
 	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
 	RAD_ASSERT(IsAligned(bones, SIMDDriver::kAlignment));
 	RAD_ASSERT(IsAligned(vertices, SIMDDriver::kAlignment));
@@ -2839,8 +2742,7 @@ void SkinVerts2B(
 	const float *vertices,
 	const U16 *boneIndices,
 	int numVerts
-)
-{
+) {
 	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
 	RAD_ASSERT(IsAligned(bones, SIMDDriver::kAlignment));
 	RAD_ASSERT(IsAligned(vertices, SIMDDriver::kAlignment));
@@ -5308,6 +5210,51 @@ void SkinVerts1B(
 	}
 }
 
+void BlendVerts(
+	float *outVerts,
+	const float *srcVerts,
+	const float *dstVerts,
+	float frac,
+	int numVerts
+) {
+	RAD_ASSERT(IsAligned(outVerts, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(srcVerts, SIMDDriver::kAlignment));
+	RAD_ASSERT(IsAligned(dstVerts, SIMDDriver::kAlignment));
+	
+	if (numVerts > 0) {
+		
+		asm volatile (
+			
+			"vmov.32 d0[0], %[frac]			\n\t" // load lerp value
+			
+			"Lblend1:						\n\t"
+			
+			"vld1.32 {q1}, [%[src], :128]!	\n\t"
+			"vld1.32 {q2}, [%[dst], :128]!	\n\t"
+			"vld1.32 {q3}, [%[src], :128]!	\n\t"
+			"vsub.f32 q2, q2, q1			\n\t"
+			"vld1.32 {q4}, [%[dst], :128]!	\n\t"
+			"vld1.32 {q5}, [%[src], :128]!	\n\t"
+			"vmla.f32 q1, q2, d0[0]			\n\t"
+			"vld1.32 {q6}, [%[dst], :128]!	\n\t"
+			"vsub.f32 q4, q4, q3			\n\t"
+			"vst1.32 {q1}, [%[o], :128]!	\n\t"
+			"vsub.f32 q6, q6, q5			\n\t"
+			"vmla.f32 q3, q4, d0[0]			\n\t"
+			"vmla.f32 q5, q6, d0[0]			\n\t"
+			"vst1.32 {q3}, [%[o], :128]!	\n\t"
+			"vst1.32 {q5}, [%[o], :128]!	\n\t"
+			
+			// loop
+			"subs %[nv], %[nv], #1			\n\t"
+			"bne Lblend1					\n\t"
+			
+		: [o] "+r" (outVerts), [src] "+r" (srcVerts), [dst] "+r" (dstVerts), [nv] "+r" (numVerts)
+		: [frac] "r" (frac)
+		: "cc", "q0", "q1", "q2", "q3", "q4", "q5"
+		);
+	}
+}
 }
 
 const SIMDDriver *SIMD_neon_bind()
@@ -5321,6 +5268,7 @@ const SIMDDriver *SIMD_neon_bind()
 	d.SkinVerts[0] = &SkinVerts1B;
 	d.SkinVerts[1] = &SkinVerts2B;
 	d.SkinVerts[2] = &SkinVerts3B;
+	d.BlendVerts   = &BlendVerts;
 	
 	string::cpy(d.name, "SIMD_neon");
 	return &d;

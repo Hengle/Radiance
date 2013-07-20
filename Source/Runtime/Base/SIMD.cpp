@@ -34,7 +34,7 @@ struct SkinTestData {
 	SkinTestData() {
 		outVerts = 0;
 		bones = 0;
-		vertices = 0;
+		vertices[0] = vertices[1] = 0;
 		boneIndices = 0;
 	}
 
@@ -44,7 +44,7 @@ struct SkinTestData {
 
 	float *outVerts;
 	float *bones;
-	float *vertices;
+	float *vertices[2];
 	U16 *boneIndices;
 	int numChannels;
 	int bonesPerVert;
@@ -58,8 +58,10 @@ struct SkinTestData {
 		bones = (float*)safe_zone_malloc(ZRuntime, sizeof(float)*SIMDDriver::kNumBoneFloats*numBones, 0, SIMDDriver::kAlignment);
 		memset(bones, 0, (size_t)zone_malloc_size(bones));
 		const int kFloatsPerVert = 8+(4*numChannels);
-		vertices = (float*)safe_zone_malloc(ZRuntime, sizeof(float)*kFloatsPerVert*numVerts*bonesPerVert, 0, SIMDDriver::kAlignment);
-		memset(vertices, 0, (size_t)zone_malloc_size(vertices));
+		vertices[0] = (float*)safe_zone_malloc(ZRuntime, sizeof(float)*kFloatsPerVert*numVerts*bonesPerVert, 0, SIMDDriver::kAlignment);
+		memset(vertices[0], 0, (size_t)zone_malloc_size(vertices[0]));
+		vertices[1] = (float*)safe_zone_malloc(ZRuntime, sizeof(float)*kFloatsPerVert*numVerts*bonesPerVert, 0, SIMDDriver::kAlignment);
+		memset(vertices[1], 0, (size_t)zone_malloc_size(vertices[1]));
 		boneIndices = (U16*)safe_zone_malloc(ZRuntime, sizeof(U16)*numVerts*bonesPerVert, 0, SIMDDriver::kAlignment);
 
 		for (int i = 0; i < numBones; ++i) {
@@ -84,14 +86,16 @@ struct SkinTestData {
 		
 		for (int i = 0; i < numVerts; ++i) {
 			boneIndices[i] = (U16)(rand() % numBones);
-			float *v = vertices + (kFloatsPerVert*bonesPerVert*i);
-			for (int k = 0; k < kFloatsPerVert; ++k) {
-				for (int j = 0; j < bonesPerVert; ++j) {
-					v[0] = (rand() / (float)RAND_MAX) * 5000.f;
-					v[1] = (rand() / (float)RAND_MAX) * 5000.f;
-					v[2] = (rand() / (float)RAND_MAX) * 5000.f;
-					v[3] = 1.f;
-					v += 4;
+			for (int kk = 0; kk < 2; ++kk) {
+				float *v = vertices[kk] + (kFloatsPerVert*bonesPerVert*i);
+				for (int k = 0; k < kFloatsPerVert; ++k) {
+					for (int j = 0; j < bonesPerVert; ++j) {
+						v[0] = (rand() / (float)RAND_MAX) * 5000.f;
+						v[1] = (rand() / (float)RAND_MAX) * 5000.f;
+						v[2] = (rand() / (float)RAND_MAX) * 5000.f;
+						v[3] = 1.f;
+						v += 4;
+					}
 				}
 			}
 		}
@@ -102,14 +106,16 @@ struct SkinTestData {
 			zone_free(outVerts);
 		if (bones)
 			zone_free(bones);
-		if (vertices)
-			zone_free(vertices);
+		if (vertices[0])
+			zone_free(vertices[0]);
+		if (vertices[1])
+			zone_free(vertices[1]);
 		if (boneIndices)
 			zone_free(boneIndices);
 
 		outVerts = 0;
 		bones = 0;
-		vertices = 0;
+		vertices[0] = vertices[1] = 0;
 		boneIndices = 0;
 	}
 };
@@ -136,12 +142,12 @@ void SIMDSkinTest(std::ostream &out) {
 	skinData.Create(kNumVerts, 1, kNumBones, 1);
 	refTime.Start();
 	for (int i = 0; i < kMultiplier; ++i) {
-		ref->SkinVerts[0](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+		ref->SkinVerts[0](skinData.outVerts, skinData.bones, skinData.vertices[0], skinData.boneIndices, kNumVerts);
 	}
 	refTime.Stop();
 	simdTime.Start();
 	for (int i = 0; i < kMultiplier; ++i) {
-		SIMD->SkinVerts[0](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+		SIMD->SkinVerts[0](skinData.outVerts, skinData.bones, skinData.vertices[0], skinData.boneIndices, kNumVerts);
 	}
 	simdTime.Stop();
 	
@@ -156,12 +162,12 @@ void SIMDSkinTest(std::ostream &out) {
 	skinData.Create(kNumVerts, 2, kNumBones, 1);
 	refTime.Start();
 	for (int i = 0; i < kMultiplier; ++i) {
-		ref->SkinVerts[1](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+		ref->SkinVerts[1](skinData.outVerts, skinData.bones, skinData.vertices[0], skinData.boneIndices, kNumVerts);
 	}
 	refTime.Stop();
 	simdTime.Start();
 	for (int i = 0; i < kMultiplier; ++i) {
-		SIMD->SkinVerts[1](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+		SIMD->SkinVerts[1](skinData.outVerts, skinData.bones, skinData.vertices[0], skinData.boneIndices, kNumVerts);
 	}
 	simdTime.Stop();
 	
@@ -175,12 +181,12 @@ void SIMDSkinTest(std::ostream &out) {
 	skinData.Create(kNumVerts, 3, kNumBones, 1);
 	refTime.Start();
 	for (int i = 0; i < kMultiplier; ++i) {
-		ref->SkinVerts[2](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+		ref->SkinVerts[2](skinData.outVerts, skinData.bones, skinData.vertices[0], skinData.boneIndices, kNumVerts);
 	}
 	refTime.Stop();
 	simdTime.Start();
 	for (int i = 0; i < kMultiplier; ++i) {
-		SIMD->SkinVerts[2](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+		SIMD->SkinVerts[2](skinData.outVerts, skinData.bones, skinData.vertices[0], skinData.boneIndices, kNumVerts);
 	}
 	simdTime.Stop();
 	
@@ -194,12 +200,12 @@ void SIMDSkinTest(std::ostream &out) {
 	skinData.Create(kNumVerts, 4, kNumBones, 1);
 	refTime.Start();
 	for (int i = 0; i < kMultiplier; ++i) {
-		ref->SkinVerts[3](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+		ref->SkinVerts[3](skinData.outVerts, skinData.bones, skinData.vertices[0], skinData.boneIndices, kNumVerts);
 	}
 	refTime.Stop();
 	simdTime.Start();
 	for (int i = 0; i < kMultiplier; ++i) {
-		SIMD->SkinVerts[3](skinData.outVerts, skinData.bones, skinData.vertices, skinData.boneIndices, kNumVerts);
+		SIMD->SkinVerts[3](skinData.outVerts, skinData.bones, skinData.vertices[0], skinData.boneIndices, kNumVerts);
 	}
 	simdTime.Stop();
 	
@@ -208,6 +214,26 @@ void SIMDSkinTest(std::ostream &out) {
 	pct = ((vps[1] / (float)vps[0]) - 1.f) * 100.f;
 	
 	out << "(4B1T) " << ref->name << ": " << vps[0] << " (vps), " << SIMD->name << ": " << vps[1] << " (vps). " << pct << "%" << std::endl;
+	
+	out << "******** SIMDBlendTest ********" << std::endl;
+	
+	skinData.Create(kNumVerts, 1, 1, 1);
+	refTime.Start();
+	for (int i = 0; i < kMultiplier; ++i) {
+		ref->BlendVerts(skinData.outVerts, skinData.vertices[0], skinData.vertices[1], 0.343234f, kNumVerts);
+	}
+	refTime.Stop();
+	simdTime.Start();
+	for (int i = 0; i < kMultiplier; ++i) {
+		SIMD->BlendVerts(skinData.outVerts, skinData.vertices[0], skinData.vertices[1], 0.343234f, kNumVerts);
+	}
+	simdTime.Stop();
+	
+	vps[0] = VertsPerSecond(refTime, kNumVerts*kMultiplier);
+	vps[1] = VertsPerSecond(simdTime, kNumVerts*kMultiplier);
+	pct = ((vps[1] / (float)vps[0]) - 1.f) * 100.f;
+	
+	out << ref->name << ": " << vps[0] << " (vps), " << SIMD->name << ": " << vps[1] << " (vps). " << pct << "%" << std::endl;
 	
 	out << "******************************" << std::endl;
 }
