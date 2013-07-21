@@ -1272,6 +1272,8 @@ RADENG_API bool RADENG_CALL ParseVariantTable(lua_State *L, Variant::Map &map, b
 				RAD_ASSERT(*x == *static_cast<void**>(*ptr));
 				map.insert(Variant::Map::value_type(key, Variant(ptr)));
 			} break;
+		case LUA_TNIL:
+			break; // skip nulls
 		default:
 			if (luaError) {
 				luaL_error(L, "Invalid value type for variant, (Function %s, File %s, Line %d).",

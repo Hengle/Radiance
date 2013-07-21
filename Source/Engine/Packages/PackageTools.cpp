@@ -654,6 +654,10 @@ int PackageMan::lua_Add(lua_State *L) {
 	if (!pkg)
 		return 0;
 
+	lua_getfield(L, LUA_GLOBALSINDEX, "ConvertAssetTable");
+	lua_pushvalue(L, -2);
+	lua_call(L, 1, 1);
+
 	PackageMan::Ref self = pkg->m_pm.lock();
 	RAD_ASSERT(self);
 
@@ -748,19 +752,9 @@ void PackageMan::ParseEntry(
 	const KeyVal::Ref &parent,
 	const lua::Variant::Map &map
 ) {
-	const String kIPhone(CStr("IPhone"));
-	const String kIPad(CStr("IPad"));
-
 	for (lua::Variant::Map::const_iterator it = map.begin(); it != map.end(); ++it) {
 		String fullName;
 		String name = it->first;
-
-		// fixup old data.
-		if (name == kIPhone) {
-			name = "iOS";
-		} else if (name == kIPad) {
-			continue; // ignore this key.
-		}
 
 		if (path.empty) {
 			fullName = name;
@@ -1043,26 +1037,81 @@ void PackageMan::EnumeratePackage(
 	ui.Refresh();
 #endif
 
-	file::MMFileInputBuffer::Ref ib = m_engine.sys->files->OpenInputBuffer(
-		path.c_str,
-		ZPackages,
-		1*kMeg,
-		file::kFileOptions_None,
-		file::kFileMask_Base
-	);
-
-	if (!ib) {
-		COut(C_ErrMsgBox) << "PackageMan: failed to load '" << path << "'" << std::endl;
-#if defined(RAD_OPT_PC_TOOLS)
-		ui.totalProgress = ui.totalProgress.get() + size;
-		ui.Refresh();
-#endif
-		return;
-	}
-
 	lua::State::Ref L = InitLua();
 
 	{
+		const String kConversionUtils(m_pkgDir + "/Convert.lua");
+
+		// load conversion utilities
+		file::MMFileInputBuffer::Ref ib = m_engine.sys->files->OpenInputBuffer(
+			kConversionUtils.c_str,
+			ZPackages,
+			1*kMeg,
+			file::kFileOptions_None,
+			file::kFileMask_Base
+		);
+
+		if (!ib) {
+			COut(C_ErrMsgBox) << "PackageMan: failed to load '" << kConversionUtils << "'" << std::endl;
+	#if defined(RAD_OPT_PC_TOOLS)
+			ui.totalProgress = ui.totalProgress.get() + size;
+			ui.Refresh();
+	#endif
+			return;
+		}
+
+		typedef lua::StreamLoader<8*kKilo, lua::StackMemTag> Loader;
+		stream::InputStream is(*ib);
+
+		Loader loader(is);
+
+#if LUA_VERSION_NUM >= 502
+		if (lua_load(
+				L->L,
+				&Loader::Read,
+				&loader,
+				kConversionUtils.c_str,
+				0
+			)
+		)
+#else
+		if (lua_load(
+				L->L,
+				&Loader::Read,
+				&loader,
+				kConversionUtils.c_str
+			)
+		)
+#endif
+		{
+			COut(C_ErrMsgBox) << "PackageMan(parse): " << lua_tostring(L->L, -1) << std::endl;
+			return;
+		}
+
+		if (lua_pcall(L->L, 0, 0, 0)) {
+			COut(C_ErrMsgBox) << "PackageMan(run): " << lua_tostring(L->L, -1) << std::endl;
+			return;
+		}
+	}
+
+	{
+		file::MMFileInputBuffer::Ref ib = m_engine.sys->files->OpenInputBuffer(
+			path.c_str,
+			ZPackages,
+			1*kMeg,
+			file::kFileOptions_None,
+			file::kFileMask_Base
+		);
+
+		if (!ib) {
+			COut(C_ErrMsgBox) << "PackageMan: failed to load '" << path << "'" << std::endl;
+	#if defined(RAD_OPT_PC_TOOLS)
+			ui.totalProgress = ui.totalProgress.get() + size;
+			ui.Refresh();
+	#endif
+			return;
+		}
+
 		typedef lua::StreamLoader<8*kKilo, lua::StackMemTag> Loader;
 		stream::InputStream is(*ib);
 
@@ -1114,7 +1163,7 @@ void PackageMan::EnumeratePackage(
 	ui.Refresh();
 #endif
 	
-	if (lua_pcall(L->L, 0, 1, 0)) {
+	if (lua_pcall(L->L, 0, 0, 0)) {
 		COut(C_ErrMsgBox) << "PackageMan(run): " << lua_tostring(L->L, -1) << std::endl;
 		return;
 	}

@@ -1213,17 +1213,20 @@ bool Shader::BuildInputMappings(
 			break;
 	}
 
-	for (int i = 0; i < r::kMaterialTextureSource_MaxIndices; ++i) {
+	for (int i = 0; i < r::kMaterialGeometrySource_MaxIndices; ++i) {
 		for (int k = 0; k < r::kMaterialTextureSource_MaxIndices; ++k) {
 			if (mapping.tcMods[k] == r::kInvalidMapping)
 				break;
-			if (mapping.tcMods[k] == i) { // UV channel is referenced in material.
+			const int uvIndex = material.TCUVIndex(mapping.tcMods[k]);
+			if (uvIndex == i) { // UV channel is referenced in material.
 				if (numAttribs >= r::kMaxAttribArrays) {
 					COut(C_Error) << "ERROR: tcInput register overflow!" << std::endl;
 					return false;
 				}
+				RAD_VERIFY(uvIndex < r::kMaterialGeometrySource_MaxIndices);
+
 				mapping.attributes[numAttribs][0] = r::kMaterialGeometrySource_TexCoords;
-				mapping.attributes[numAttribs][1] = (U8)mapping.tcMods[k];
+				mapping.attributes[numAttribs][1] = (U8)uvIndex;
 				++mapping.numMGSources[r::kMaterialGeometrySource_TexCoords];
 				++numAttribs;
 				break;

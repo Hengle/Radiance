@@ -208,6 +208,8 @@ void ContentPropertyGrid::Update(const IdProps::Ref &p)
 			}
 		}
 	}
+
+	m_grid->sortByColumn(0);
 }
 
 void ContentPropertyGrid::Remove(const IdProps::Ref &p)
