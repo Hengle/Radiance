@@ -1059,8 +1059,10 @@ int TextureParser::Compress(
 
 		const bool kNormalMap = *imgType == "NormalMap";
 
-		if (kNormalMap) {
-			// uncompressed normal map needs to be swizzled for SampleNormalMap shader.
+		// uncompressed normal map needs to be swizzled for SampleNormalMap shader.
+		// NOTE: Textures on mobile hardware will not be swizzled since their SampleNormalMap
+		// function does not handle this for performance reasons
+		if (kNormalMap && ((P_TARGET_FLAGS(flags)&(P_TargetiOS|P_TargetAndroid)) == 0)) {
 			for (ImageVec::iterator it = m_images.begin(); it != m_images.end(); ++it) {
 				image_codec::Image::Ref &img = *it;
 

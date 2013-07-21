@@ -198,7 +198,7 @@ int TextureParser::CompressPVR(
 			}
 
 			if (kNormalMap) {
-				// normalize and swizzle normal map data.
+				// normalize normal map data.
 
 				const U8 *data = (const U8*)pvrTex.getDataPtr();
 				const CPVRTextureHeader &header = pvrTex.getHeader();
@@ -211,8 +211,7 @@ int TextureParser::CompressPVR(
 				for (int k = 0; k < z; ++k) {
 
 					NormalizeNormalMap((void*)data, w, h, 4, 0);
-					SwizzleNormalMap((void*)data, w, h, 4, kGenNormalMapFlag_DXT1n);
-
+					
 					data += w*h*4;
 
 					w >>= 1;
