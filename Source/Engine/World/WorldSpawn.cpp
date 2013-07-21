@@ -264,7 +264,7 @@ void World::SpawnModel(
 		r::kMaterialGeometrySource_Tangents,
 		0,
 		sizeof(bsp_file::BSPVertex),
-		sizeof(float)*(6+(bsp_file::kMaxUVChannels*2)),
+		sizeof(float)*6,
 		4
 	);
 
@@ -274,7 +274,7 @@ void World::SpawnModel(
 			r::kMaterialGeometrySource_TexCoords,
 			0,
 			sizeof(bsp_file::BSPVertex),
-			sizeof(float)*6,
+			sizeof(float)*10,
 			2
 		);
 	}
@@ -285,7 +285,7 @@ void World::SpawnModel(
 			r::kMaterialGeometrySource_TexCoords,
 			1,
 			sizeof(bsp_file::BSPVertex),
-			sizeof(float)*8,
+			sizeof(float)*12,
 			2
 		);
 	}

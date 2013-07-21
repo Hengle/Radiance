@@ -6,7 +6,7 @@
 -- [name, origin[3], id, subobjs[], ids[]]
 
 global kSceneFile_Id =  (bit.shift (bit.charAsInt "N") 24) + (bit.shift (bit.charAsInt "C") 16) + (bit.shift (bit.charAsInt "S") 8) + (bit.charAsInt "R")
-global kSceneFile_Version = 7
+global kSceneFile_Version = 8
 global kSceneFlag_HasMaterialFlag = 0x80000000
 global kSceneFlag_HasMesh = 0x00100000
 global kSceneFlag_HasAnim = 0x00200000
@@ -250,6 +250,15 @@ function RAD_ExportObjectsToSceneFile objs doMeshes doAnims doLights suppressDia
 				-- write skel index
 				print (m.name + " has skel index " + (skels[2][meshNum][1] as string))
 				WriteLong file (skels[2][meshNum][1]-1)
+					
+				uvBumpChannel = getUserProp m "uvBumpChannel"
+				if (uvBumpChannel != undefined) then (
+					uvBumpChannel = (uvBumpChannel as integer) - 1
+				) else (
+					uvBumpChannel = 0
+				)
+				
+				WriteLong file uvBumpChannel
 				
 				if (m.material != undefined) then (
 					idx = findItem sceneMaterials m.material

@@ -3,19 +3,19 @@
 -- Author: Joe Riedel
 -- See Radiance/LICENSE for licensing terms.
 
-utility RadianceUtil "Radiance Tools" width:166 height:782
+utility RadianceUtil "Radiance Tools" width:166 height:800
 (
-	GroupBox grp1 "Selected Geo && Bones" pos:[6,84] width:155 height:527
+	GroupBox grp1 "Selected Geo && Bones" pos:[6,84] width:155 height:549
 	GroupBox grp4 "Animation" pos:[15,100] width:138 height:270
 	dropdownList animList "" pos:[18,118] width:130 height:21
 	edittext animName "Name:" pos:[18,146] width:130 height:17
-	GroupBox grp8 "Export" pos:[6,696] width:154 height:79
-	checkbox selectionOnlyCheckbox "Selection Only" pos:[69,711] width:87 height:14
-	checkbox exportHiddenCheckbox "Hidden" pos:[11,710] width:55 height:14
-	button exportSceneButton "Scene..." pos:[11,730] width:65 height:17
-	button exportAnimButton "Anim..." pos:[89,753] width:65 height:17
-	button exportMeshButton "Mesh..." pos:[89,730] width:65 height:17
-	button exportSkelButton "Skel..." pos:[11,752] width:65 height:17
+	GroupBox grp8 "Export" pos:[6,718] width:154 height:79
+	checkbox selectionOnlyCheckbox "Selection Only" pos:[69,733] width:87 height:14
+	checkbox exportHiddenCheckbox "Hidden" pos:[11,732] width:55 height:14
+	button exportSceneButton "Scene..." pos:[11,752] width:65 height:17
+	button exportAnimButton "Anim..." pos:[89,775] width:65 height:17
+	button exportMeshButton "Mesh..." pos:[89,752] width:65 height:17
+	button exportSkelButton "Skel..." pos:[11,774] width:65 height:17
 	edittext animStart "Start:" pos:[18,170] width:66 height:17
 	edittext animEnd "End:" pos:[86,170] width:66 height:17
 	checkbox animLoop "Looping" pos:[21,249] width:63 height:18
@@ -28,9 +28,9 @@ utility RadianceUtil "Radiance Tools" width:166 height:782
 	button addAnim "Add" pos:[24,346] width:53 height:18
 	button deleteAnim "Delete" pos:[87,346] width:53 height:18
 	button noDefault "None" pos:[53,314] width:54 height:16
-	checkbox cinematicObject "Cinematic Object" pos:[21,452] width:108 height:17
-	checkbox hideUntilRef "Hide Until Referenced" pos:[21,469] width:129 height:17
-	checkbox hideWhenDone "Hide When Done" pos:[21,487] width:129 height:17
+	checkbox cinematicObject "Cinematic Object" pos:[21,479] width:108 height:17
+	checkbox hideUntilRef "Hide Until Referenced" pos:[21,496] width:129 height:17
+	checkbox hideWhenDone "Hide When Done" pos:[21,514] width:129 height:17
 	GroupBox grp5 "Selected Material" pos:[8,4] width:153 height:74
 	button nameCompleteMapsButton "Autoname Complete Maps" pos:[14,49] width:138 height:22
 	edittext autonamePackage "Package:" pos:[18,25] width:132 height:15
@@ -38,15 +38,16 @@ utility RadianceUtil "Radiance Tools" width:166 height:782
 	edittext bboxSize "" pos:[24,395] width:113 height:17
 	button calcBBoxSize "Calculate" pos:[38,420] width:86 height:17
 	checkbox setBBox "Set BBox" pos:[25,373] width:64 height:15
-	GroupBox grp7 "Selected Light(s)" pos:[6,615] width:154 height:77
-	checkbox affectWorldCheck "Affect World" pos:[21,634] width:88 height:18
-	checkbox affectPlayerCheck "Affect Player" pos:[21,652] width:88 height:18
-	checkbox affectObjectsCheck "Affect Objects" pos:[21,670] width:88 height:18
-	GroupBox grp15 "Light Interaction" pos:[14,525] width:140 height:77
-	checkbox worldLightsCheck "World Lights" pos:[22,544] width:101 height:17
-	checkbox objectLightsCheck "Object Lights" pos:[22,562] width:101 height:17
-	checkbox castShadowsCheck "Cast Shadows" pos:[23,581] width:101 height:17
-	checkbox skyActorCheck "Sky Actor" pos:[21,504] width:129 height:17
+	GroupBox grp7 "Selected Light(s)" pos:[6,637] width:154 height:77
+	checkbox affectWorldCheck "Affect World" pos:[21,656] width:88 height:18
+	checkbox affectPlayerCheck "Affect Player" pos:[21,674] width:88 height:18
+	checkbox affectObjectsCheck "Affect Objects" pos:[21,692] width:88 height:18
+	GroupBox grp15 "Light Interaction" pos:[14,552] width:140 height:77
+	checkbox worldLightsCheck "World Lights" pos:[22,571] width:101 height:17
+	checkbox objectLightsCheck "Object Lights" pos:[22,589] width:101 height:17
+	checkbox castShadowsCheck "Cast Shadows" pos:[23,608] width:101 height:17
+	checkbox skyActorCheck "Sky Actor" pos:[21,531] width:129 height:17
+	editText uvBumpChannel "UV Bump Channel" pos:[22,457] width:129 height:15
 	
 	local animSel = #() -- selected objects that have animations
 	local animSet = #() -- selected set of animations [struct Animation]
@@ -72,6 +73,7 @@ utility RadianceUtil "Radiance Tools" width:166 height:782
 		worldLightsCheck.enabled = val
 		objectLightsCheck.enabled = val
 		castShadowsCheck.enabled = val
+		uvBumpChannel.enabled = val
 	)
 	
 	function enableAnimControls val = (
@@ -432,10 +434,25 @@ utility RadianceUtil "Radiance Tools" width:166 height:782
 		)
 	)
 	
+	function setupUIForMeshes objs = (
+		if (objs.count < 1) then (
+			uvBumpChannel.text = ""
+			return undefined
+		)
+	
+		vals = RAD_GatherObjectProps objs #("uvBumpChannel") #("1")
+		if (vals[1]) then (
+			uvBumpChannel.text = vals[2][1][2][1]
+		) else (
+			uvBumpChannel.text = "" -- multiple values
+		)
+	)
+	
 	function setupUIForObjects objs = (
 		meshes = RAD_ConvertableFilter objs #(Mesh)
 		
 		enableMeshControls (meshes.count > 0)
+		setupUIForMeshes meshes
 		setupUIForAnimatable objs
 		
 		_lights = RAD_ConvertableFilter objs kRADLightTypes
@@ -590,14 +607,6 @@ utility RadianceUtil "Radiance Tools" width:166 height:782
 			RAD_SetObjectProps (selectedMeshes()) #(#("HideWhenDone", "false"))
 		)
 	)
-	on skyActorCheck changed state do
-	(
-		if (state) then (
-			RAD_SetObjectProps (selectedMeshes()) #(#("SkyActor", "true"))
-		) else (
-			RAD_SetObjectProps (selectedMeshes()) #(#("SkyActor", "false"))
-		)
-	)
 	on nameCompleteMapsButton pressed do
 	(
 		mat = meditMaterials[activeMeditSlot]
@@ -637,6 +646,10 @@ utility RadianceUtil "Radiance Tools" width:166 height:782
 	on bboxSize entered newVal do
 	(
 		RAD_SetObjectProps (selectedMeshes()) #(#("BBox", newVal))
+	)
+	on uvBumpChannel entered newVal do 
+	(
+		RAD_SetObjectProps (selectedMeshes()) #(#("uvBumpChannel", newVal))
 	)
 	on calcBBoxSize pressed do
 	(
@@ -724,6 +737,14 @@ utility RadianceUtil "Radiance Tools" width:166 height:782
 			RAD_SetObjectProps (selectedMeshes()) #(#("CastShadows", "true"))
 		) else (
 			RAD_SetObjectProps (selectedMeshes()) #(#("CastShadows", "false"))
+		)
+	)
+	on skyActorCheck changed state do
+	(
+		if (state) then (
+			RAD_SetObjectProps (selectedMeshes()) #(#("SkyActor", "true"))
+		) else (
+			RAD_SetObjectProps (selectedMeshes()) #(#("SkyActor", "false"))
 		)
 	)
 )

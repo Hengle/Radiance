@@ -951,6 +951,7 @@ public:
 
 		TriModel() : 
 			contents(0), 
+			uvBumpChannel(0),
 			ignore(false),
 			outside(true), 
 			cinematic(false), 
@@ -977,6 +978,7 @@ public:
 		int contents;
 		int numChannels;
 		int portalAreas[2];
+		int uvBumpChannel;
 		bool ignore;
 		bool outside;
 		bool cinematic;

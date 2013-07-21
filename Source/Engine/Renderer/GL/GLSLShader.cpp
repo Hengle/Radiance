@@ -1028,9 +1028,12 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 		if (p.m.attributes[i][0] == kInvalidMapping)
 			break;
 
+		MaterialGeometrySource source = (MaterialGeometrySource)p.m.attributes[i][0];
+		int index = p.m.attributes[i][1];
+
 		gls.MaterialGeometrySource(
-			(MaterialGeometrySource)p.m.attributes[i][0],
-			(int)p.m.attributes[i][1],
+			source,
+			index,
 			vb,
 			size,
 			type,
@@ -1039,8 +1042,8 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 			ofs
 		);
 
-		if (lastSource != p.m.attributes[i][0]) {
-			lastSource = (MaterialGeometrySource)p.m.attributes[i][0];
+		if (lastSource != source) {
+			lastSource = source;
 			sourceVB = vb;
 			sourceSize = size;
 			sourceType = type;

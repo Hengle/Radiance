@@ -606,7 +606,7 @@ int BSPBuilder::EmitBSPModel(
 	const EmitTriModel &model,
 	const SceneFile::AreaNumSet &areas
 ) {
-	int id = EmitBSPModel(model);
+	int id = EmitBSPModel(model, triModel->uvBumpChannel);
 	for (SceneFile::AreaNumSet::const_iterator it = areas.begin(); it != areas.end(); ++it) {
 		triModel->emitIds[*it].push_back(id);
 	}
@@ -626,7 +626,8 @@ void BSPBuilder::EmitTriModel::AddVertex(const Vert &vert) {
 	bounds.Insert(vert.pos);
 }
 
-int BSPBuilder::EmitBSPModel(const EmitTriModel &model) {
+int BSPBuilder::EmitBSPModel(const EmitTriModel &model, int uvBumpChannel) {
+	RAD_ASSERT(uvBumpChannel < world::bsp_file::kMaxUVChannels);
 	
 	BSPModel *bspModel = m_bspFile->AddModel();
 	bspModel->firstVert = m_bspFile->numVerts;
@@ -644,8 +645,7 @@ int BSPBuilder::EmitBSPModel(const EmitTriModel &model) {
 	m_bspFile->ReserveVertices((int)model.verts.size());
 	m_bspFile->ReserveIndices((int)model.indices.size());
 
-	for (EmitTriModel::VertVec::const_iterator it = model.verts.begin(); it != model.verts.end(); ++it)
-	{
+	for (EmitTriModel::VertVec::const_iterator it = model.verts.begin(); it != model.verts.end(); ++it) {
 		const EmitTriModel::Vert &v = *it;
 		BSPVertex *bspV = m_bspFile->AddVertex();
 
@@ -658,15 +658,14 @@ int BSPBuilder::EmitBSPModel(const EmitTriModel &model) {
 		for (i = 0; i < model.numChannels && i < world::bsp_file::kMaxUVChannels; ++i) {
 			for (int k = 0; k < 2; ++k)
 				bspV->st[i*2+k] = (float)v.st[i][k];
-			for (int k = 0; k < 4; ++k)
-				bspV->t[i*4+k] = (float)v.tangent[i][k];
 		}
+
+		for (int k = 0; k < 4; ++k)
+			bspV->t[k] = (float)v.tangent[uvBumpChannel][k];
 
 		for (; i < world::bsp_file::kMaxUVChannels; ++i) {
 			for (int k = 0; k < 2; ++k)
 				bspV->st[i*2+k] = 0.f;
-			for (int k = 0; k < 4; ++k)
-				bspV->t[i*4+k] = 0.f;
 		}
 	}
 

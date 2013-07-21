@@ -20,7 +20,7 @@ enum  {
 
 RAD_ZONE_DEF(RADENG_API, ZBSPFile, "BSPFile", ZWorld);
 
-BOOST_STATIC_ASSERT(sizeof(BSPVertex)==72);
+BOOST_STATIC_ASSERT(sizeof(BSPVertex)==56);
 BOOST_STATIC_ASSERT(sizeof(BSPCameraTM)==9*4);
 
 BSPFileParser::BSPFileParser() :

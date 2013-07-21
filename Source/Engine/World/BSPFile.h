@@ -154,8 +154,8 @@ struct BSPBrush {
 struct BSPVertex {
 	float v[3];
 	float n[3];
+	float t[4];
 	float st[kMaxUVChannels*2];
-	float t[kMaxUVChannels*4];
 };
 
 struct BSPActor {

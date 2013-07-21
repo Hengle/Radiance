@@ -697,7 +697,7 @@ private:
 		const SceneFile::AreaNumSet &areas
 	);
 	int EmitBSPBrush(const SceneFile::Brush &brush);
-	int EmitBSPModel(const EmitTriModel &model);
+	int EmitBSPModel(const EmitTriModel &model, int uvBumpChannel);
 	S32 EmitBSPNodes(const Node *node, S32 parent);
 	void EmitBSPClipModels(const Node *node, world::bsp_file::BSPLeaf *leaf);
 	void EmitBSPClipModel(const TriModelFragRef &model);

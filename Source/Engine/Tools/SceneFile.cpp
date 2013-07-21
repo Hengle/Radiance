@@ -32,7 +32,8 @@ namespace {
 		kVersion4 = 4,
 		kVersion5 = 5,
 		kVersion6 = 6,
-		kVersion = 7,
+		kVersion7 = 7,
+		kVersion = 8,
 
 		kHasMaterialFlag = 0x80000000,
 		kHasAnimsFlag = 0x00200000,
@@ -177,6 +178,7 @@ namespace {
 		int id;
 		int skel;
 		int numChannels;
+		int uvBumpChannel;
 		SceneFile::SkinRef skin;
 		SceneFile::AnimMap anims;
 		bool cinematic;
@@ -551,6 +553,7 @@ namespace {
 		mmdl->skel = mdl.skel;
 		mmdl->anims = mdl.anims;
 		mmdl->numChannels = mdl.numChannels;
+		mmdl->uvBumpChannel = math::Clamp(mdl.uvBumpChannel, 0, mdl.numChannels-1);
 		mmdl->cinematic = mdl.cinematic;
 		mmdl->hideUntilRef = mdl.hideUntilRef;
 		mmdl->hideWhenDone = mdl.hideWhenDone;
@@ -821,6 +824,13 @@ bool LoadSceneFile(InputStream &nakedstr, SceneFile &map, bool smooth, UIProgres
 					mdl.name = ReadString(stream);
 				stream >> flags;
 				stream >> mdl.skel;
+
+				if (version > kVersion7) { // uvBumpChannel
+					stream >> mdl.uvBumpChannel;
+					mdl.uvBumpChannel = math::Clamp(mdl.uvBumpChannel, 0, SceneFile::kMaxUVChannels-1);
+				} else {
+					mdl.uvBumpChannel = 0;
+				}
 
 				if (flags & kHasMaterialFlag) { // has material
 					U32 idx;
