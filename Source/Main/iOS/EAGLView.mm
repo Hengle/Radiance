@@ -80,8 +80,8 @@
     if (!m_initialized) {
 		// do this here so we get a properly sized UIView on iPad.
 		CAEAGLLayer *eaglLayer = (CAEAGLLayer *)self.layer;
-		self.contentScaleFactor = [[UIScreen mainScreen] scale];
-		eaglLayer.contentsScale = [[UIScreen mainScreen] scale];
+		self.contentScaleFactor = 1.f;//[[UIScreen mainScreen] scale];
+		eaglLayer.contentsScale = 1.f;//[[UIScreen mainScreen] scale];
 		
 		[self bindGL];
 		
@@ -159,7 +159,7 @@
 	
 	CGPoint	 location = [touch locationInView:self];
 	U64 millis = (U64)([touch timestamp] * 1000.0);
-	float scale = [[UIScreen mainScreen] scale];
+	float scale = 1.f;//[[UIScreen mainScreen] scale];
 	
 	InputEvent event;
 	event.touch = touch;
