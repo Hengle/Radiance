@@ -223,7 +223,7 @@ int MapParser::ParseBrush(
 			pts[i] = Vec3(f[0], f[1], f[2]);
 		}
 
-		if (!script.Skip(5, Tokenizer::kTokenMode_SameLine))
+		if (!script.Skip(6, Tokenizer::kTokenMode_SameLine))
 			return SR_ParseError;
 
 		tools::SceneFile::BrushPlane bp;
