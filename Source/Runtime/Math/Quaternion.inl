@@ -88,11 +88,49 @@ inline Quaternion<T> operator*(T s, const Quaternion<T> &q)
 //////////////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-inline Quaternion<T> Slerp(const Quaternion<T> &p, const Quaternion<T> &q, T t)
-{
-	T theta = ArcCos(p.m_v.Dot(q.m_v));
-	if (theta != T(0.0)) { return (p * Sin(theta * (T(1.0) - t)) + q * Sin(theta * t)) / Sin(theta); }
-	else                 { return p; }
+inline Quaternion<T> Slerp(const Quaternion<T> &from, const Quaternion<T> &to, T t) {
+	T to1[4];
+	double omega, cosom, sinom, scale0, scale1;
+	
+	// calc cosine
+	cosom = (from.X() * to.X()) + (from.Y() * to.Y()) + (from.Z() * to.Z()) + (from.W() * to.W());
+	
+	// adjust signs (if necessary)
+	if (cosom < 0.0) {
+		cosom = -cosom;
+		to1[0] = -to.X();
+		to1[1] = -to.Y();
+		to1[2] = -to.Z();
+		to1[3] = -to.W();
+	} else {
+		to1[0] = to.X();
+		to1[1] = to.Y();
+		to1[2] = to.Z();
+		to1[3] = to.W();
+	}
+	
+	// calculate coefficients
+	
+	if ((1.0 - cosom) > 0.0006) {
+		// standard case (slerp)
+		omega = acosf((float)cosom);
+		sinom = sinf((float)omega);
+		scale0 = sinf((float)((1.0 - (double)t) * omega)) / sinom;
+		scale1 = sinf((float)((double)t * omega)) / sinom;
+	} else {        
+		// "from" and "to" quaternions are very close 
+		//  ... so we can do a linear interpolation
+		scale0 = 1.0 - (double)t;
+		scale1 = (double)t;
+	}
+	
+	// calculate final values
+	to1[0] = (T)(scale0 * from.X() + scale1 * to1[0]);
+	to1[1] = (T)(scale0 * from.Y() + scale1 * to1[1]);
+	to1[2] = (T)(scale0 * from.Z() + scale1 * to1[2]);
+	to1[3] = (T)(scale0 * from.W() + scale1 * to1[3]);
+
+	return Quaternion<T>(T(to1[0]), T(to1[1]), T(to1[2]), T(to1[3]));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

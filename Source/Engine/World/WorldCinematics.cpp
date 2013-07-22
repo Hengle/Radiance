@@ -20,7 +20,6 @@ using namespace world::bsp_file;
 namespace ska {
 namespace details {
 
-Quat Slerp(const Quat &from, const Quat &to, float t);
 void BlendBones(BoneTM *out, const BoneTM *src, const BoneTM *dst, float weight, int first, int num);
 
 } // details
@@ -958,7 +957,7 @@ void WorldCinematics::BlendCameraFrame(Cinematic &c) {
 		ska::BoneTM temp(tmOut);
 
 		float blend = c.xfade[0] / c.xfade[1];
-		tmOut.r = ska::details::Slerp(m_world->camera->rot.get(), temp.r, blend);
+		tmOut.r = math::Slerp(m_world->camera->rot.get(), temp.r, blend);
 		tmOut.t = math::Lerp(m_world->camera->pos.get(), temp.t, blend);
 		fov = math::Lerp(m_world->camera->fov.get(), fov, blend);
 	}

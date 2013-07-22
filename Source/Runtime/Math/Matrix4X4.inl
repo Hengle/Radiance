@@ -409,36 +409,19 @@ inline Matrix4X4<T> Matrix4X4<T>::Rotation(const Euler<T> &euler)
 template <typename T>
 Vector3<T> Matrix4X4<T>::Angles() const
 {
-	T theta;
-	T cp;
-	T sp;
-	Vector3<T> v;
-	
-	sp = m_mtx[0][2];
-	
-	if( sp > T(1.0) )
-		sp = T(1.0);
-	if( sp < T(-1.0) )
-		sp = T(-1.0);
-		
-	theta = -math::ArcSin(sp);
-	cp = math::Cos(theta);
-	
-	if( cp > T(8192.0*1.19209289550781250000e-07) )
-	{
-		v[0] = math::ArcTan2(m_mtx[1][2], m_mtx[2][2]);// * 180.0f / PI;
-		v[1] = math::ArcTan2(m_mtx[0][1], m_mtx[0][0]);// * 180.0f / PI;
-		v[2] = theta;// * 180.0f / PI;
-	}
-	else
-	{
-		v[0] = 0.0f;
-		v[1] = -math::ArcTan2(m_mtx[1][0], m_mtx[1][1]);// * 180.0f / PI;
-		v[2] = theta;// * 180.0f / PI;
-	}
-	
+	T rx = math::ArcTan2(m_mtx[1][2], m_mtx[2][2]);
+	T c2 = math::SquareRoot((m_mtx[0][0] * m_mtx[0][0]) + (m_mtx[0][1] * m_mtx[0][1]));
+	T ry = math::ArcTan2(-m_mtx[0][2], c2);
 
-	return v;
+	T s1, c1;
+	math::SinAndCos(&s1, &c1, rx);
+
+	T rz = math::ArcTan2(
+		(s1*m_mtx[2][0]) - (c1*m_mtx[1][0]), 
+		(c1*m_mtx[1][1]) - (s1*m_mtx[2][1])
+	);
+	
+	return Vector3<T>(rx, ry, rz);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -643,8 +626,8 @@ template <typename T>
 inline Quaternion<T> Matrix4X4<T>::Rotation() const
 {
 	Quaternion<T> res;
-	T diag = m_mtx[0][0] + m_mtx[1][1] + m_mtx[2][2];
-	if (diag < T(-0.999))
+	T diag = m_mtx[0][0] + m_mtx[1][1] + m_mtx[2][2] + T(1);
+	if (diag <= T(0))
 	{
 		static const int next[3] = { 1, 2, 0 };
 		int i = 0;
@@ -652,16 +635,16 @@ inline Quaternion<T> Matrix4X4<T>::Rotation() const
 		if (m_mtx[2][2] > m_mtx[i][i]) { i = 2; }
 		int j = next[i];
 		int k = next[j];
-		T s = SquareRoot(m_mtx[i][i] - (m_mtx[j][j] + m_mtx[k][k]) + T(1.0));
-		T oos = T(0.5) / s;
-		res[i] = s * T(0.5);
+		T s = SquareRoot(m_mtx[i][i] - m_mtx[j][j] - m_mtx[k][k] + T(1.0)) * T(2);
+		T oos = T(1) / s;
+		res[i] = T(0.5) / s;
 		res[j] = (m_mtx[i][j] + m_mtx[j][i]) * oos;
 		res[k] = (m_mtx[i][k] + m_mtx[k][i]) * oos;
 		res[3] = (m_mtx[j][k] - m_mtx[k][j]) * oos;
 	}
 	else
 	{
-		T s = SquareRoot(diag + T(1.0));
+		T s = SquareRoot(diag);
 		T oos = T(0.5) / s;
 		res[0] = (m_mtx[1][2] - m_mtx[2][1]) * oos;
 		res[1] = (m_mtx[2][0] - m_mtx[0][2]) * oos;

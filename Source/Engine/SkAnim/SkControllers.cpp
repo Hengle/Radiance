@@ -17,7 +17,6 @@ namespace ska {
 namespace details {
 
 void BlendBones(BoneTM *out, const BoneTM *src, const BoneTM *dst, float weight, int first, int num);
-Quat Slerp(const Quat &from, const Quat &to, float t);
 void IdentBones(BoneTM *out, int first, int num);
 
 } // details
@@ -116,7 +115,7 @@ void Controller::Blend(
 }
 
 Quat Controller::Slerp(const Quat &from, const Quat &to, float t) {
-	return details::Slerp(from, to, t);
+	return math::Slerp(from, to, t);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

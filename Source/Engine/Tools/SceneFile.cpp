@@ -127,7 +127,7 @@ namespace {
 			m[i][2] = (float)(in[i][2] / d);
 		}
 		
-		q = in.Rotation();
+		q = m.Rotation();
 		
 		for (i = 0; i < 3; ++i) {
 			t[i] = m[3][i];

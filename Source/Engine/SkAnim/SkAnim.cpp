@@ -23,51 +23,6 @@ BOOST_STATIC_ASSERT(sizeof(DSkTag)==6);
 
 namespace details {
 
-Quat Slerp(const Quat &from, const Quat &to, float t) {
-	float to1[4];
-	double omega, cosom, sinom, scale0, scale1;
-	
-	// calc cosine
-	cosom = (from.X() * to.X()) + (from.Y() * to.Y()) + (from.Z() * to.Z()) + (from.W() * to.W());
-	
-	// adjust signs (if necessary)
-	if (cosom < 0.0f) {
-		cosom = -cosom;
-		to1[0] = -to.X();
-		to1[1] = -to.Y();
-		to1[2] = -to.Z();
-		to1[3] = -to.W();
-	} else {
-		to1[0] = to.X();
-		to1[1] = to.Y();
-		to1[2] = to.Z();
-		to1[3] = to.W();
-	}
-	
-	// calculate coefficients
-	
-	if ((1.0 - cosom) > 0.0006) {
-		// standard case (slerp)
-		omega = acosf((float)cosom);
-		sinom = sinf((float)omega);
-		scale0 = sinf((float)((1.0f - t) * omega)) / sinom;
-		scale1 = sinf((float)(t * omega)) / sinom;
-	} else {        
-		// "from" and "to" quaternions are very close 
-		//  ... so we can do a linear interpolation
-		scale0 = 1.0 - t;
-		scale1 = t;
-	}
-	
-	// calculate final values
-	to1[0] = (float)(scale0 * from.X() + scale1 * to1[0]);
-	to1[1] = (float)(scale0 * from.Y() + scale1 * to1[1]);
-	to1[2] = (float)(scale0 * from.Z() + scale1 * to1[2]);
-	to1[3] = (float)(scale0 * from.W() + scale1 * to1[3]);
-
-	return Quat(to1[0], to1[1], to1[2], to1[3]);
-}
-
 void BlendBones(BoneTM *out, const BoneTM *src, const BoneTM *dst, float weight, int first, int num) {
 	if (weight < 0.01f) {
 		if (out != src)
@@ -86,7 +41,7 @@ void BlendBones(BoneTM *out, const BoneTM *src, const BoneTM *dst, float weight,
 		const BoneTM &x = src[i+first];
 		const BoneTM &y = dst[i+first];
 
-		tm.r = Slerp(x.r, y.r, weight);
+		tm.r = math::Slerp(x.r, y.r, weight);
 		tm.s = math::Lerp(x.s, y.s, weight);
 		tm.t = math::Lerp(x.t, y.t, weight);
 	}
@@ -365,7 +320,7 @@ void Animation::BlendFrames(int frameSrc, int frameDst, float blend, BoneTM *out
 			y.s = DecodeV(sTable, DecodeI(dstSFrames, i), m_dska->sDecodeMag);
 			y.t = DecodeV(tTable, DecodeI(dstTFrames, i), m_dska->tDecodeMag);
 
-			tm.r = details::Slerp(x.r, y.r, blend);
+			tm.r = math::Slerp(x.r, y.r, blend);
 			tm.s = math::Lerp(x.s, y.s, blend);
 			tm.t = math::Lerp(x.t, y.t, blend);
 		}

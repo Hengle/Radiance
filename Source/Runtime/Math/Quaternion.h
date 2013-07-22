@@ -128,7 +128,7 @@ template <typename T>
 Quaternion<T> operator*(T s, const Quaternion<T> &q);
 
 template <typename T>
-Quaternion<T> Slerp(const Quaternion<T> &p, const Quaternion<T> &q, T t);
+Quaternion<T> Slerp(const Quaternion<T> &from, const Quaternion<T> &to, T t);
 
 } // math
 

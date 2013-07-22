@@ -679,7 +679,7 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 		if (m_rail.trackLag > 0.f) {
 			float lerp = math::Clamp(m_rail.trackLag*dt, 0.f, 0.9999f);
 			m_rail.pos = math::Lerp(m_rail.pos, m_rail.tm[2]->t, lerp);
-			m_rail.rot = math::Lerp(m_rail.rot, m_rail.tm[2]->r, lerp);
+			m_rail.rot = math::Slerp(m_rail.rot, m_rail.tm[2]->r, lerp);
 			m_rail.fov = math::Lerp(m_rail.fov, m_rail.tm[2]->fov, lerp);
 		} else {
 			m_rail.pos = m_rail.tm[2]->t;
@@ -712,6 +712,7 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 		Vec3 angles = LookAngles(m_rail.lookFwd);
 		Vec3 camAngles = AnglesFromQuat(m_rail.rot);
 		angles[0] = camAngles[0]; // always bank
+		COut(C_Debug) << "Pos (" << pos[0] << ", " << pos[1] << ", " << pos[2] << ") Angles (" << camAngles[0] << ", " << camAngles[1] << ", " << camAngles[2] << ")" << std::endl;
 		if (!world->cvars->r_fly.value) {
 			world->camera->pos = pos;
 			world->camera->angles = angles;
