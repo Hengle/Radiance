@@ -689,7 +689,7 @@ struct AnimTables {
 
 int SkaBuilder::CompileAnimThread::ThreadProc() {
 
-	COut(C_Info) << "SkaBuilder: compiling '" << m_anim.name << "' on thread 0x" << std::hex << id.get() << std::endl;
+	COut(C_Info) << "SkaBuilder: compiling '" << m_anim.name << "' on thread 0x" << std::hex << id.get() << std::dec << std::endl;
 	
 	IntVec prevBoneRFrame;
 	IntVec prevBoneSFrame;
@@ -780,7 +780,7 @@ int SkaBuilder::CompileAnimThread::ThreadProc() {
 		last = fit;
 	}
 
-	COut(C_Info) << "SkaBuilder: '" << m_anim.name << "' finished on thread 0x" << std::hex << id.get() << std::endl;
+	COut(C_Info) << "SkaBuilder: '" << m_anim.name << "' finished on thread 0x" << std::hex << id.get() << std::dec  << std::endl;
 
 	m_done = true;
 	return 0;

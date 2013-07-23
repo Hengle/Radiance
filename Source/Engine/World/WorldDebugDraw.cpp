@@ -85,6 +85,18 @@ int WorldDraw::LoadDebugMaterials() {
 	return m_rb->LoadMaterials();
 }
 
+void WorldDraw::DebugAddEntityBBox(const BBox &bounds) {
+	if (m_world->cvars->r_showentitybboxes.value) {
+		m_dbgVars.entityBBoxes.push_back(bounds);
+	}
+}
+
+void WorldDraw::DebugAddViewControllerBBox(const BBox &bounds) {
+	if (m_world->cvars->r_showviewcontroller.value) {
+		m_dbgVars.viewControllerBBoxes.push_back(bounds);
+	}
+}
+
 void WorldDraw::DebugDrawPortals(ViewDef &view) {
 	for (int i = 0; i < kMaxAreas; ++i) {
 		if (view.areas.test(i))

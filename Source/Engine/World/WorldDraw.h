@@ -264,6 +264,7 @@ public:
 	
 #if defined(WORLD_DEBUG_DRAW)
 	void DebugAddEntityBBox(const BBox &bounds);
+	void DebugAddViewControllerBBox(const BBox &bounds);
 #endif
 
 private:
@@ -642,6 +643,7 @@ private:
 		BBoxVec entityBBoxes;
 		BBoxVec worldBBoxes;
 		BBoxVec actorBBoxes;
+		BBoxVec viewControllerBBoxes;
 		Vec3Vec unifiedLights;
 		Vec3Vec projectedBoxPoints;
 		Vec3Vec lights;

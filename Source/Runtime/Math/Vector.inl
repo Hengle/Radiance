@@ -750,38 +750,13 @@ inline Vector3<T> &Vector3<T>::operator/=(T s)
 template <typename T>
 const Vector3<T> &Vector3<T>::FrameVecs(Vector3<T> &up, Vector3<T> &left) const
 {
-	int axis = 0;
-	T max = Abs(this->m_x);
-	T z = Abs(this->m_y);
-	
-	if (z > max)
-	{
-		max = z;
-		axis = 1;
-	}
-	
-	z = Abs(m_z);
-	if (z > max)
-	{
-		max = z;
-		axis = 2;
-	}
+	up = Vector3<T>(T(0), T(0), T(1));
 
-	switch (axis)
-	{
-	case 0:
-	case 1:
-		up.Initialize(T(0), T(0), T(1));
-		break;
-	case 2:
-		up.Initialize(T(0), T(1), T(0));
-	}
-
-	// push 'up' into plane.
-	z = up.Dot(*this);
-	up = up + ((*this) * -z);
-	up.Normalize();
+	if (math::Abs(Dot(up)) > T(0.99999))
+		up = Vector3<T>(T(0), T(1), T(0));
+	
 	left = up.Cross(*this);
+	up = Cross(left);
 	return *this;
 }
 

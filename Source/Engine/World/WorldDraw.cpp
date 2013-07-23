@@ -1046,6 +1046,11 @@ void WorldDraw::DrawView() {
 		m_dbgVars.actorBBoxes.clear();
 	}
 
+	if (m_world->cvars->r_showviewcontroller.value) {
+		DebugDrawBBoxes(m_dbgVars.entityBBox_M, m_dbgVars.viewControllerBBoxes, true);
+		m_dbgVars.viewControllerBBoxes.clear();
+	}
+
 	if (m_world->cvars->r_showwaypoints.value) {
 		DebugDrawActiveWaypoints();
 	}
@@ -1362,13 +1367,5 @@ int WorldDraw::NumActivePostFX() const {
 
 	return num;
 }
-
-#if defined(WORLD_DEBUG_DRAW)
-void WorldDraw::DebugAddEntityBBox(const BBox &bounds) {
-	if (m_world->cvars->r_showentitybboxes.value) {
-		m_dbgVars.entityBBoxes.push_back(bounds);
-	}
-}
-#endif
 
 } // world

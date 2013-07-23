@@ -653,7 +653,17 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 		m_rail.rot = m_rail.tm[2]->r;
 		m_rail.fov = m_rail.tm[2]->fov;
 	}
-	
+
+#if defined(WORLD_DEBUG_DRAW)
+	{
+		BBox bounds(
+			vTarget - Vec3(8, 8, 8),
+			vTarget + Vec3(8, 8, 8)
+		);
+		world->draw->DebugAddViewControllerBBox(bounds);
+	}
+#endif
+
 	Vec3 fwd = vTarget - m_rail.pos;
 	float distance = fwd.Normalize();
 
@@ -762,7 +772,7 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 }
 
 void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFwd) {
-	static const float kFrontAngle = 0.707f;
+	static const float kFrontAngle = 0.f;
 	static const float kBackAngle = -0.707f;
 	const bsp_file::BSPFile *bspFile = world->bspFile;
 
@@ -801,12 +811,7 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 
 	float targetDistance[2] = { 0.f, 0.f };
 
-	if (m_rail.tm[0]) {
-		fwd[0] = target - m_rail.tm[0]->t;
-		targetDistance[0] = fwd[0].MagnitudeSquared();
-		m_rail.tmDist[0] = math::Abs(m_rail.distanceSq - targetDistance[0]);
-		fwd[0].Normalize();
-	} else if (m_rail.startMode == kRailStart_Begin) {
+	if (m_rail.startMode == kRailStart_Begin) {
 		// force side selection
 		const bsp_file::BSPCameraTM *tm = bspFile->CameraTMs() + m_rail.track->firstTM;
 		fwd[0] = target - tm->t;
@@ -818,6 +823,17 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 		fwd[0] = target - tm->t;
 		fwd[0].Normalize();
 		fwdValid[0] = true;
+	}
+	
+	if (m_rail.tm[0]) {
+		Vec3 v = target - m_rail.tm[0]->t;
+		targetDistance[0] = v.MagnitudeSquared();
+		m_rail.tmDist[0] = math::Abs(m_rail.distanceSq - targetDistance[0]) - 500.f;
+
+		if ((m_rail.startMode != kRailStart_Begin) && (m_rail.startMode != kRailStart_End)) {
+			fwd[0] = v;
+			fwd[0].Normalize();
+		}
 	}
 
 	if (m_rail.tm[1]) {
@@ -863,15 +879,16 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 		// rope too long?
 		if (targetDistance[0] > m_rail.distanceSq) {
 			matchNearest[0] = true;
-			/*m_rail.tm[0] = 0;
-			m_rail.tmDist[0] = std::numeric_limits<float>::max();*/
-			w[0] = 1.f;
+//			w[0] = 1.f;
 		}
 	} else {
 		matchNearest[0] = true;
-		m_rail.tm[0] = 0;
-		m_rail.tmDist[0] = std::numeric_limits<float>::max();
+//		if (m_rail.tm[0])
+//			w[0] = 1.f;
 	}
+
+	if (!m_rail.tm[0])
+		m_rail.tmDist[0] = std::numeric_limits<float>::max();
 
 	if (!m_rail.strict && m_rail.tm[1]) {
 		RAD_ASSERT(stayBehind);
@@ -882,16 +899,17 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 		
 		if (invalid || (targetDistance[1] > m_rail.distanceSq)) {
 			matchNearest[1] = true;
-			/*m_rail.tm[1] = 0;
-			m_rail.tmDist[1] = std::numeric_limits<float>::max();*/
 			w[1] = 1.f;
 			fwdValid[1] = false;
 		}
 	} else {
 		matchNearest[1] = true;
-		m_rail.tm[1] = 0;
-		m_rail.tmDist[1] = std::numeric_limits<float>::max();
+		if (m_rail.tm[1])
+			w[1] = 1.f;
 	}
+
+	if (!m_rail.tm[1])
+		m_rail.tmDist[1] = std::numeric_limits<float>::max();
 	
 	for (S32 i = 0; i < m_rail.track->numTMs; ++i) {
 		const bsp_file::BSPCameraTM *tm = bspFile->CameraTMs() + m_rail.track->firstTM + i;
@@ -927,11 +945,11 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 						m_rail.tmDist[0] = abs;
 						m_rail.tm[0] = tm;
 					}
-				}
 
-				if (abs < fallbackDist0[0]) {
-					fallback0[0] = tm;
-					fallbackDist0[0] = abs;
+					if (abs < fallbackDist0[0]) {
+						fallback0[0] = tm;
+						fallbackDist0[0] = abs;
+					}
 				}
 			}
 
@@ -986,6 +1004,8 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 		}
 	}
 
+	const world::bsp_file::BSPCameraTM *prev = m_rail.tm[2];
+
 	if (!m_rail.tm[0]) {
 		m_rail.tm[0] = fallback0[0];
 		m_rail.tmDist[0] = fallbackDist0[0];
@@ -1010,6 +1030,9 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 		m_rail.tm[2] = m_rail.tm[0];
 	}
 
+	/*if (prev != m_rail.tm[2]) {
+		COut(C_Debug) << "Rail Point Switch (" << (int)((prev-bspFile->CameraTMs())-m_rail.track->firstTM) << ") -> (" << (int)((m_rail.tm[2]-bspFile->CameraTMs())-m_rail.track->firstTM) << ")" << std::endl;
+	}*/
 }
 
 float E_ViewController::TickFOV(int frame, float dt, float distance) {
