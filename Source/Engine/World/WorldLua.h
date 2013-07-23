@@ -55,6 +55,7 @@ public:
 	bool HandleInputGesture(const InputGesture &g, const TouchState &touch, const InputState &is);
 
 	StringVec GetBuiltIns();
+	StringVec GetBuiltIns2();
 
 	void NotifyBackground();
 	void NotifyResume();

@@ -48,6 +48,9 @@ int World::Spawn(
 			r = SR_Success;
 			++m_spawnState;
 			break;
+		case SS_BuiltIns:
+			r = SpawnBuiltIns(time, flags);
+			break;
 		case SS_SoundEmitter:
 			r = SpawnSoundEntities(
 				*bsp,
@@ -82,10 +85,13 @@ int World::Spawn(
 				time,
 				flags
 			);
-			if (r == SR_Success)
+			if (r == SR_Success) {
 				++m_spawnState;
+				m_spawnOfs = 0;
+				m_builtIns = m_lua->GetBuiltIns2();
+			}
 			break;
-		case SS_BuiltIns:
+		case SS_BuiltIns2:
 			r = SpawnBuiltIns(time, flags);
 			break;
 		case SS_Ents:

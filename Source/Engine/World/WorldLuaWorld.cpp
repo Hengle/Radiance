@@ -123,6 +123,32 @@ StringVec WorldLua::GetBuiltIns() {
 	return v;
 }
 
+StringVec WorldLua::GetBuiltIns2() {
+	if (!PushGlobalCall("World.BuiltIns2"))
+		return StringVec();
+	lua_State *L = m_L->L;
+
+	StringVec v;
+
+	if (Call("World.BuiltIns2", 0, 1, 0)) {
+		if (lua_type(L, -1) == LUA_TTABLE) {
+			lua_checkstack(L, 3);
+			lua_pushnil(L); // iterate table from start
+			while (lua_next(L, -2) != 0) {
+				if (lua_type(L, -1) == LUA_TSTRING) { // value is not string!
+					v.push_back(String(lua_tolstring(L, -1, 0)));
+				} else {
+					COut(C_Error) << "WorldLua::GetBuiltIns: value in table is not a string!" << std::endl;
+				}
+				lua_pop(L, 1); // remove value, key tells lua_next where to start.
+			}
+		}
+		lua_pop(L, 1);
+	}
+
+	return v;
+}
+
 void WorldLua::NotifyBackground() {
 	if (!PushGlobalCall("World.NotifyBackground"))
 		return;
