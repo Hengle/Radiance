@@ -142,18 +142,18 @@ void GLDraw::DrawCircle(
 ) {
 	percent = math::Clamp(percent, -1.f, 1.f);
 
-	int base;
-	int numElems;
+	int firstTri;
+	int numTris;
 
 	if (percent >= 0.f) {
-		base = 0;
-		numElems = FloatToInt(percent * kNumCircleSteps) * kNumCircleStepTris * 3;
+		firstTri = 0;
+		numTris = FloatToInt(percent * kNumCircleSteps) * kNumCircleStepTris;
 	} else {
-		base = FloatToInt((1 + percent) * kNumCircleSteps) * kNumCircleStepTris * 3;
-		numElems = (kNumCircleSteps*kNumCircleStepTris*3) - base;
+		firstTri = FloatToInt((1 + percent) * kNumCircleSteps) * kNumCircleStepTris;
+		numTris = (kNumCircleSteps*kNumCircleStepTris) - firstTri;
 	}
 
-	if (numElems < 1)
+	if (numTris < 1)
 		return;
 
 	int flags = 0;
@@ -198,7 +198,7 @@ void GLDraw::DrawCircle(
 	m.shader->BindStates(u, sampleMaterialColor);
 	gls.Commit();
 	m_circle->CompileArrayStates(*m.shader.get());
-	m_circle->Draw();
+	m_circle->Draw(firstTri, numTris);
 	CHECK_GL_ERRORS();
 	m.shader->End();
 

@@ -137,7 +137,7 @@ void SpriteBatch::Skin() {
 }
 
 void SpriteBatch::Draw() {
-	m_m.Draw(m_numSprites * 2);
+	m_m.Draw(0, m_numSprites * 2);
 }
 
 void SpriteBatch::AllocateMesh() {

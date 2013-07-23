@@ -112,7 +112,7 @@ public:
 	/*! If the specified shader is NULL, all array states are flushed. */
 	void FlushArrayStates(Shader *shader);
 
-	void Draw(int numTris = -1); // -1 == all tris
+	void Draw(int firstTri = 0, int numTris = -1); // -1 == all tris
 	void Release();
 
 	void Reserve(int numStreams);

@@ -228,7 +228,7 @@ const char *Animation::RAD_IMPLEMENT_GET(name) {
 }
 
 int Animation::RAD_IMPLEMENT_GET(numFrames) {
-	return m_dska ? m_dska->numFrames : m_dvta->frames[m_dvta->numFrames-1];
+	return m_dska ? m_dska->numFrames : (m_dvta->frames[m_dvta->numFrames-1]+1);
 }
 
 float Animation::RAD_IMPLEMENT_GET(fps) {

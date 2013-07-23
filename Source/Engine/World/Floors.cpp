@@ -784,7 +784,7 @@ bool Floors::FindDirectRoute(const FloorPosition &start, const FloorPosition &en
 			const Plane kPlane(plane->p[0], plane->p[1], plane->p[2], plane->p[3]);
 
 			Vec3 x;
-			if (kPlane.IntersectLineSegment(x, cur.m_pos, end.m_pos, 1.f)) {
+			if (kPlane.IntersectLineSegment(x, cur.m_pos, end.m_pos, 0.01f)) {
 				float d = (x - cur.m_pos).MagnitudeSquared();
 				if (d < bestDist) {
 					bestDist = d;
@@ -1630,7 +1630,7 @@ bool Floors::ClipToFloor(
 
 		Vec3 clip;
 
-		if (!kTriPlane.IntersectLineSegment(clip, start, end, 0.f))
+		if (!kTriPlane.IntersectLineSegment(clip, start, end, 0.01f))
 			continue;
 
 		float distSq = (clip-start).MagnitudeSquared();
@@ -1652,7 +1652,7 @@ bool Floors::ClipToFloor(
 
 			if ((edge->tris[0] == -1) || (edge->tris[1] == -1)) {
 				// must be well within floor edge
-				if (edgePlane.Side(clip, 1.f) != Plane::Front)
+				if (edgePlane.Side(clip, 0.01f) != Plane::Front)
 					break;
 			} else if (edgePlane.Side(clip) == Plane::Back) {
 				break;
@@ -1660,62 +1660,6 @@ bool Floors::ClipToFloor(
 		}
 
 		if (k == 3) {
-			// inside triangle hull
-
-			// don't let the clip point be too close to an edge for precision issues
-			//bool skip = false;
-
-			//for (k = 0; k < 3; ++k) {
-			//	const bsp_file::BSPFloorEdge *edge = m_bsp->FloorEdges() + tri->edges[k];
-			//	if (edge->tris[0] != -1 && edge->tris[1] != -1)
-			//		continue; // not a floor edge
-
-			//	plane = m_bsp->Planes() + edge->planenum;
-
-			//	int side = edge->tris[1] == triNum;
-
-			//	Plane edgePlane(plane->p[0], plane->p[1], plane->p[2], plane->p[3]);
-
-			//	if (side)
-			//		edgePlane.Flip();
-
-			//	float d = edgePlane.Distance(clip);
-			//	if (d < 1.f) {
-			//		// move clip a little bit
-			//		clip = clip + (edgePlane.Normal() * (1.f - d));
-
-			//		// check other edges
-			//		RAD_ASSERT(edgePlane.Side(clip) == Plane::Front);
-			//		int j;
-			//		for (j = 0; j < 3; ++j) {
-			//			if (j == k)
-			//				continue;
-
-			//			const bsp_file::BSPFloorEdge *edge = m_bsp->FloorEdges() + tri->edges[k];
-
-			//			plane = m_bsp->Planes() + edge->planenum;
-
-			//			side = edge->tris[1] == triNum;
-
-			//			edgePlane = Plane(plane->p[0], plane->p[1], plane->p[2], plane->p[3]);
-
-			//			if (side)
-			//				edgePlane.Flip();
-
-			//			if (edgePlane.Side(clip) != Plane::Front)
-			//				break;
-			//		}
-
-			//		if (j != 3) {
-			//			skip = true;
-			//			break;
-			//		}
-			//	}
-			//}
-			//
-			//if (skip)
-			//	continue;
-			
 			// valid line trace?
 			trace.start = start;
 			trace.end = clip;

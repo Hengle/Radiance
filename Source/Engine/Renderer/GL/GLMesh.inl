@@ -45,17 +45,6 @@ inline void GLMesh::BindIndices(bool force) {
 	gls.BindBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, m_i.vb, force);
 }
 
-inline void GLMesh::Draw(int numTris) {
-	RAD_ASSERT(m_i.vb);
-	if (numTris < 0) {
-		numTris = m_i.count;
-	} else {
-		numTris = numTris * 3;
-	}
-	gl.DrawElements(GL_TRIANGLES, numTris, m_i.type, 0);
-	CHECK_GL_ERRORS();
-}
-
 inline void GLMesh::ResetStreamState() {
 	gls.DisableAllMGSources();
 }

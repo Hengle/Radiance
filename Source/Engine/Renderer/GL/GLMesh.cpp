@@ -146,6 +146,22 @@ void GLMesh::BindAll(Shader *shader) {
 	}
 }
 
+void GLMesh::Draw(int firstTri, int numTris) {
+	RAD_ASSERT(m_i.vb);
+	firstTri = firstTri * 3;
+
+	if (numTris < 0) {
+		numTris = m_i.count - firstTri;
+	} else {
+		numTris = numTris * 3;
+	}
+
+	const int elemSize = (m_i.type == GL_UNSIGNED_SHORT) ? 2 : 4;
+
+	gl.DrawElements(GL_TRIANGLES, numTris, m_i.type, ((const void*)(firstTri * elemSize)));
+	CHECK_GL_ERRORS();
+}
+
 void GLMesh::Release() {
 	m_va = 0;
 	m_shaderGuid = -1;
