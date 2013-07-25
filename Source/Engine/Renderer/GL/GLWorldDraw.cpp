@@ -73,6 +73,23 @@ void GLWorldDraw::BindRenderTarget() {
 	world->game->Viewport(vpx, vpy, vpw, vph);
 
 	if (!m_framebufferRT) {
+		/*
+		m_framebufferRT.reset(new (ZRender) GLRenderTargetCache(
+			vpw,
+			vph,
+			GL_RGBA,
+			GL_UNSIGNED_BYTE,
+			0,
+			GLRenderTargetCache::kDepthInstanceMode_None,
+			0,
+			4,
+			0
+		));
+
+		m_framebufferRT->CreateRenderTargets(2);
+		m_framebufferRT->CreateDepthBufferTexture();
+		*/
+
 		m_framebufferRT.reset(new (ZRender) GLRenderTarget(
 			GL_TEXTURE_2D,
 			GL_RGBA,
@@ -86,6 +103,11 @@ void GLWorldDraw::BindRenderTarget() {
 		));
 
 		m_framebufferRT->CreateDepthBufferTexture();
+
+		// fog framebuffer shares primary color attachment.
+		m_fogRT.reset(new (ZRender) GLRenderTarget(m_framebufferRT->tex));
+		//m_fogRT->AttachDepthBuffer(m_framebufferRT->depthTex);
+		//m_fogRT->CreateDepthBufferTexture();
 	}
 	
 	GLRenderTarget::DiscardFramebuffer(GLRenderTarget::kDiscard_All);
@@ -196,7 +218,11 @@ void GLWorldDraw::Copy(
 }
 
 void GLWorldDraw::BeginFogDepthWrite(r::Material &fog, bool front) {
-	RAD_ASSERT(m_activeRT.get() == m_framebufferRT.get());
+
+	if (m_activeRT.get() != m_framebufferRT.get()) {
+		m_framebufferRT->BindFramebuffer(GLRenderTarget::kDiscard_None);
+		m_activeRT = m_framebufferRT;
+	}
 
 	fog.BindStates(
 		r::kColorWriteMask_Off|
@@ -208,23 +234,28 @@ void GLWorldDraw::BeginFogDepthWrite(r::Material &fog, bool front) {
 }
 
 void GLWorldDraw::BeginFogDraw(r::Material &fog) {
-	RAD_ASSERT(m_activeRT.get() == m_framebufferRT.get());
-
+	if (m_activeRT.get() != m_fogRT.get()) {
+		m_fogRT->BindFramebuffer(GLRenderTarget::kDiscard_None);
+		m_activeRT = m_fogRT;
+	}
+			
 	gls.SetMTSource(kMaterialTextureSource_Texture, 0, m_framebufferRT->depthTex);
-
+	
 	fog.BindStates(
 		r::kColorWriteMask_RGBA|
 		r::kDepthWriteMask_Disable|
-		r::kDepthTest_Less|
+		r::kDepthTest_Disable|
 		r::kCullFaceMode_Back|r::kCullFaceMode_CCW,
 		0
 	);
 }
 
 void GLWorldDraw::BeginFog() {
+	
 }
 
 void GLWorldDraw::EndFog() {
+	RAD_ASSERT(m_activeRT.get() == m_framebufferRT.get());
 }
 
 void GLWorldDraw::BeginUnifiedShadows() {

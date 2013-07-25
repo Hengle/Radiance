@@ -104,7 +104,7 @@ void WorldDraw::DrawFogNum(const ViewDef &view, int num) {
 	matRef->mat->shader->End();
 
 	// render fog front faces into z (for next fog)
-	/*m_fogZ_M.material->BindTextures(m_fogZ_M.loader);
+	m_fogZ_M.material->BindTextures(m_fogZ_M.loader);
 	m_rb->BeginFogDepthWrite(*m_fogZ_M.material, true);
 
 	m_fogZ_M.material->shader->Begin(r::Shader::kPass_Default, *m_fogZ_M.material);
@@ -113,7 +113,7 @@ void WorldDraw::DrawFogNum(const ViewDef &view, int num) {
 	m_rb->CommitStates();
 	draw->CompileArrayStates(*m_fogZ_M.material->shader.get());
 	draw->Draw();
-	m_fogZ_M.material->shader->End();*/
+	m_fogZ_M.material->shader->End();
 }
 
 }

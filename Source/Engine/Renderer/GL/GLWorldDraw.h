@@ -179,6 +179,7 @@ private:
 	r::GLRenderTarget::Ref m_activeRT;
 	r::GLRenderTarget::Ref m_shadowRT;
 	r::GLRenderTarget::Ref m_framebufferRT;
+	r::GLRenderTarget::Ref m_fogRT;
 	
 	struct OverlayVert {
 		float xy[2];
