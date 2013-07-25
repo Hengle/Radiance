@@ -452,7 +452,7 @@ void WorldDraw::DrawUnifiedShadowTexture(
 
 void WorldDraw::DrawUnifiedShadowTexture(
 	const ViewDef &view,
-	const MBatchDraw::RefVec &batches,
+	const MBatchDraw::Vec &batches,
 	const Vec3 &unifiedPos,
 	float unifiedRadius
 ) {
@@ -464,7 +464,7 @@ void WorldDraw::DrawUnifiedShadowTexture(
 	u.blendColor = Vec4(0.f, 0.f, 0.f, 1.f);
 
 	// material->BindStates() was issued by caller
-	for (MBatchDraw::RefVec::const_iterator it = batches.begin(); it != batches.end(); ++it) {
+	for (MBatchDraw::Vec::const_iterator it = batches.begin(); it != batches.end(); ++it) {
 		const MBatchDraw::Ref &draw = *it;
 
 		details::MatRef *mat = draw->m_matRef;
@@ -502,10 +502,10 @@ bool WorldDraw::FindShadowMaterials(
 }
 
 bool WorldDraw::FindShadowMaterials(
-	const MBatchDraw::RefVec &batches
+	const MBatchDraw::Vec &batches
 ) {
 	// material->BindStates() was issued by caller
-	for (MBatchDraw::RefVec::const_iterator it = batches.begin(); it != batches.end(); ++it) {
+	for (MBatchDraw::Vec::const_iterator it = batches.begin(); it != batches.end(); ++it) {
 		const MBatchDraw::Ref &draw = *it;
 
 		details::MatRef *mat = draw->m_matRef;
@@ -664,7 +664,7 @@ void WorldDraw::InvalidateInteractions(Entity &entity) {
 
 	for (DrawModel::Map::const_iterator it = entity.models->begin(); it != entity.models->end(); ++it) {
 		const DrawModel::Ref &model = it->second;
-		for (MBatchDraw::RefVec::const_iterator it = model->batches->begin(); it != model->batches->end(); ++it) {
+		for (MBatchDraw::Vec::const_iterator it = model->batches->begin(); it != model->batches->end(); ++it) {
 			const MBatchDraw::Ref &batch = *it;
 			for (details::LightInteraction *i = batch->m_interactions; i; i = i->nextOnBatch) {
 				i->dirty = true;
@@ -678,7 +678,7 @@ void WorldDraw::InvalidateInteractions(MBatchOccupant &occupant) {
 		i->dirty = true;
 	}
 
-	for (MBatchDraw::RefVec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
+	for (MBatchDraw::Vec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
 		const MBatchDraw::Ref &batch = *it;
 		for (details::LightInteraction *i = batch->m_interactions; i; i = i->nextOnBatch) {
 			i->dirty = true;
@@ -718,7 +718,7 @@ void WorldDraw::LinkEntity(
 
 			for (DrawModel::Map::const_iterator it = entity.models->begin(); it != entity.models->end(); ++it) {
 				const DrawModel::Ref &model = it->second;
-				for (MBatchDraw::RefVec::const_iterator it = model->batches->begin(); it != model->batches->end(); ++it) {
+				for (MBatchDraw::Vec::const_iterator it = model->batches->begin(); it != model->batches->end(); ++it) {
 					const MBatchDraw::Ref &batch = *it;
 					if (lightBounds.Touches(batch->TransformedBounds())) {
 						if ((batch->maxLights > 0) && !FindInteraction(light, *batch)) {
@@ -740,7 +740,7 @@ void WorldDraw::UnlinkEntity(Entity &entity) {
 
 	for (DrawModel::Map::const_iterator it = entity.models->begin(); it != entity.models->end(); ++it) {
 		const DrawModel::Ref &model = it->second;
-		for (MBatchDraw::RefVec::const_iterator it = model->batches->begin(); it != model->batches->end(); ++it) {
+		for (MBatchDraw::Vec::const_iterator it = model->batches->begin(); it != model->batches->end(); ++it) {
 			const MBatchDraw::Ref &batch = *it;
 			while (batch->m_interactions) {
 				details::LightInteraction *i = batch->m_interactions;
@@ -782,7 +782,7 @@ void WorldDraw::LinkOccupant(
 				}
 			}
 
-			for (MBatchDraw::RefVec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
+			for (MBatchDraw::Vec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
 				const MBatchDraw::Ref &batch = *it;
 				if (lightBounds.Touches(batch->TransformedBounds())) {
 					if ((batch->maxLights > 0) && !FindInteraction(light, *batch)) {
@@ -802,7 +802,7 @@ void WorldDraw::UnlinkOccupant(MBatchOccupant &occupant) {
 		m_interactionPool.ReturnChunk(i);
 	}
 
-	for (MBatchDraw::RefVec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
+	for (MBatchDraw::Vec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
 		const MBatchDraw::Ref &batch = *it;
 		while (batch->m_interactions) {
 			details::LightInteraction *i = batch->m_interactions;
@@ -867,7 +867,7 @@ void WorldDraw::LinkLight(
 		
 		for (DrawModel::Map::const_iterator it = entity.models->begin(); it != entity.models->end(); ++it) {
 			const DrawModel::Ref &model = it->second;
-			for (MBatchDraw::RefVec::const_iterator it = model->batches->begin(); it != model->batches->end(); ++it) {
+			for (MBatchDraw::Vec::const_iterator it = model->batches->begin(); it != model->batches->end(); ++it) {
 				const MBatchDraw::Ref &batch = *it;
 				if ((batch->maxLights > 0) && !FindInteraction(light, *batch)) {
 					CreateInteraction(light, entity, *batch);
@@ -893,7 +893,7 @@ void WorldDraw::LinkLight(
 			}
 		}
 
-		for (MBatchDraw::RefVec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
+		for (MBatchDraw::Vec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
 			const MBatchDraw::Ref &batch = *it;
 			if ((batch->maxLights > 0) && !FindInteraction(light, *batch)) {
 				CreateInteraction(light, occupant, *batch);

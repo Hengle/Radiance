@@ -91,7 +91,8 @@ struct RADENG_CLASS GLTable {
 
 	bool SGIS_generate_mipmap;
 	bool ARB_texture_non_power_of_two;
-	
+	bool ARB_depth_texture;
+
 #if defined(RAD_OPT_OGLES)
 	bool IMG_texture_compression_pvrtc;
 #endif

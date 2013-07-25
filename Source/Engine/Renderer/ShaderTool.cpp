@@ -36,6 +36,7 @@ const char *s_types[Shader::kNumBasicTypes] = {
 	"FLOAT2",
 	"FLOAT3",
 	"FLOAT4",
+	"FLOAT4X4",
 	"HALF",
 	"HALF2",
 	"HALF3",
@@ -269,7 +270,7 @@ int Shader::lua_SetSamplerPrecision(lua_State *L) {
 	int idx = 1;
 	int samplerIndex = -1;
 	if (lua_gettop(L) >= 2) {
-		int samplerIndex = luaL_checknumber(L, 1);
+		samplerIndex = luaL_checknumber(L, 1);
 		if ((samplerIndex < 0 || samplerIndex > r::kMaxTextures)) {
 			luaL_error(L, "ERROR: %d is not a valid sampler index.", samplerIndex);
 		}
@@ -371,6 +372,26 @@ int Shader::lua_MPFXVars(lua_State *L) {
 	return lua_MSource(L, kMaterialSource_PFXVars);
 }
 
+int Shader::lua_MModelView(lua_State *L) {
+	return lua_MSource(L, kMaterialSource_MV);
+}
+
+int Shader::lua_MProjection(lua_State *L) {
+	return lua_MSource(L, kMaterialSource_PRJ);
+}
+
+int Shader::lua_MModelViewProjection(lua_State *L) {
+	return lua_MSource(L, kMaterialSource_MVP);
+}
+
+int Shader::lua_MInverseModelViewProjection(lua_State *L) {
+	return lua_MSource(L, kMaterialSource_InverseMVP);
+}
+
+int Shader::lua_MInverseProjection(lua_State *L) {
+	return lua_MSource(L, kMaterialSource_InversePRJ);
+}
+
 int Shader::lua_MSource(lua_State *L, MaterialSource source) {
 	if (lua_type(L, -1) != LUA_TNUMBER) {
 		luaL_error(L, "Invalid arguments for MSource(int), (Function %s, File %s, Line %d).",
@@ -430,6 +451,11 @@ lua::State::Ref Shader::InitLuaM(Engine &e, Shader *m) {
 		{ "MVertexColor", lua_MVertexColor },
 		{ "MSpecularExponent", lua_MSpecularExponent },
 		{ "MPFXVars", lua_MPFXVars },
+		{ "MModelView", lua_MModelView },
+		{ "MProjection", lua_MProjection },
+		{ "MModelViewProjection", lua_MModelViewProjection },
+		{ "MInverseModelViewProjection", lua_MInverseModelViewProjection },
+		{ "MInverseProjection", lua_MInverseProjection },
 		{ 0, 0 }
 	};
 
@@ -1698,6 +1724,21 @@ bool Shader::szMaterialInput(
 		return true;
 	case kMaterialSource_PFXVars:
 		strcpy(sz, "IN(pfxShift)");
+		return true;
+	case kMaterialSource_MV:
+		strcpy(sz, "UNIFORM(mv)");
+		return true;
+	case kMaterialSource_PRJ:
+		strcpy(sz, "UNIFORM(prj)");
+		return true;
+	case kMaterialSource_MVP:
+		strcpy(sz, "MVP"); // #defined in GLSL.c (Shaders/Nodes folder)
+		return true;
+	case kMaterialSource_InverseMVP:
+		strcpy(sz, "UNIFORM(imvp)");
+		return true;
+	case kMaterialSource_InversePRJ:
+		strcpy(sz, "UNIFORM(iprj)");
 		return true;
 	default:
 		break;

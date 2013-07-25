@@ -38,17 +38,24 @@ public:
 		bool autoGenMips
 	);
 
+	GLRenderTarget(
+		const GLTexture::Ref &tex
+	);
+
 	~GLRenderTarget();
 
 	void BindTexture(int index);
 	void BindFramebuffer(DiscardFlags flags);
-	
+	void CreateDepthBufferTexture();
+	void AttachDepthBuffer(const GLTexture::Ref &tex);
+
 	static void DiscardFramebuffer(DiscardFlags flags);
 
 	GLTexture::Ref tex;
+	GLTexture::Ref depthTex;
 	GLenum depthFormat;
 	int depthSize;
-	GLuint id[2];
+	boost::array<GLuint, 2> id;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

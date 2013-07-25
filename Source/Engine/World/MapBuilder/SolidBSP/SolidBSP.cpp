@@ -985,8 +985,6 @@ int BSPBuilder::ContentsForString(const String &s) {
 		return kContentsFlag_Detail;
 	if (s == "Fog")
 		return kContentsFlag_Fog;
-	if (s == "Water")
-		return kContentsFlag_Water;
 	if (s == "Areaportal")
 		return kContentsFlag_Areaportal;
 	if (s == "Floor")

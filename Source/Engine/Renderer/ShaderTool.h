@@ -85,6 +85,11 @@ public:
 		kMaterialSource_VertexColor,
 		kMaterialSource_SpriteSkin,
 		kMaterialSource_PFXVars, // postfx kernel vars
+		kMaterialSource_MV,
+		kMaterialSource_PRJ,
+		kMaterialSource_MVP,
+		kMaterialSource_InverseMVP,
+		kMaterialSource_InversePRJ,
 		kNumMaterialSources
 	};
 
@@ -93,6 +98,7 @@ public:
 		kBasicType_Float2,
 		kBasicType_Float3,
 		kBasicType_Float4,
+		kBasicType_Float4x4,
 		kBasicType_Half,
 		kBasicType_Half2,
 		kBasicType_Half3,
@@ -336,6 +342,11 @@ private:
 	static int lua_MLightTanHalfVec(lua_State *L);
 	static int lua_MVertexColor(lua_State *L);
 	static int lua_MPFXVars(lua_State *L);
+	static int lua_MModelView(lua_State *L);
+	static int lua_MProjection(lua_State *L);
+	static int lua_MModelViewProjection(lua_State *L);
+	static int lua_MInverseModelViewProjection(lua_State *L);
+	static int lua_MInverseProjection(lua_State *L);
 	static int lua_MSource(lua_State *L, MaterialSource source);
 	static int lua_gcNode(lua_State *L);
 	static void ParseConnection(lua_State *L, Node *node, const lua::Variant::Map &map, Connection &c);

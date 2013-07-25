@@ -952,6 +952,7 @@ public:
 		TriModel() : 
 			contents(0), 
 			uvBumpChannel(0),
+			fogId(-1),
 			ignore(false),
 			outside(true), 
 			cinematic(false), 
@@ -974,6 +975,7 @@ public:
 		AreaNumSet areas;
 		IntVec portalIds;
 		int id;
+		int fogId;
 		int skel;
 		int contents;
 		int numChannels;

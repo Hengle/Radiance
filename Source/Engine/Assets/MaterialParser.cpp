@@ -328,6 +328,8 @@ int MaterialParser::Load(
 
 	if (*s == "Solid")
 		m_m.sort = r::Material::kSort_Solid;
+	else if (*s == "Fog")
+		m_m.sort = r::Material::kSort_Fog;
 	else if (*s == "Translucent")
 		m_m.sort = r::Material::kSort_Translucent;
 	else if (*s == "Translucent2")

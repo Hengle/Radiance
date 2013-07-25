@@ -52,6 +52,8 @@ public:
 	Mat4 mv;
 
 	PlaneStackVec frustum;
+	StackWindingStackVec frustumVolume;
+	BBox frustumBounds;
 	
 	AreaBits areas;
 	LightVec visLights;
@@ -85,7 +87,7 @@ public:
 	virtual void EndFrame() = 0;
 	virtual int LoadMaterials() = 0;
 	virtual int Precache() = 0;
-	virtual void BindFramebuffer(bool discardHint) = 0;
+	virtual void BindFramebuffer(bool discardHint, bool copy) = 0;
 	virtual void ClearBackBuffer() = 0;
 	virtual void SetWorldStates() = 0;
 	virtual void FlipMatrixHack(bool enable) = 0;
@@ -97,7 +99,7 @@ public:
 		float bottom, 
 		float near, 
 		float far,
-		const Mat4 *bias
+		bool txAddressBias
 	) = 0;
 
 	virtual void SetPerspectiveMatrix(
@@ -129,9 +131,17 @@ public:
 		const Vec4 *scissorBounds
 	) = 0;
 
-	// Unified Shadows
 	virtual void BindRenderTarget() = 0;
 
+	// Fog
+
+	virtual void BeginFogDepthWrite(r::Material &fog, bool front) = 0;
+	virtual void BeginFogDraw(r::Material &fog) = 0;
+
+	virtual void BeginFog() = 0;
+	virtual void EndFog() = 0;
+	
+	// Unified Shadows
 	virtual void BeginUnifiedShadows() = 0;
 	virtual void EndUnifiedShadows() = 0;
 
@@ -153,7 +163,7 @@ public:
 	virtual Vec3 Unproject(const Vec3 &p) = 0;
 
 	virtual Mat4 GetModelViewMatrix() = 0;
-	virtual Mat4 GetModelViewProjectionMatrix() = 0;
+	virtual Mat4 GetModelViewProjectionMatrix(bool txAddressBias = false) = 0;
 
 	static int LoadMaterial(const char *name, asset::MaterialBundle &mat);
 
@@ -228,6 +238,8 @@ public:
 		int testedLights;
 		int visLights;
 		int drawnLights;
+		int drawnFogs;
+		int testedFogs;
 		int numBatches;
 		int numTris;
 		int numMaterials;
@@ -274,11 +286,11 @@ private:
 	friend class MBatchDraw;
 	friend class ViewDef;
 	friend struct details::MBatch;
-	
+
 	class MStaticWorldMeshBatch : public MBatchDraw {
 	public:
 		typedef boost::shared_ptr<MStaticWorldMeshBatch> Ref;
-		typedef zone_vector<Ref, ZWorldT>::type RefVec;
+		typedef zone_vector<Ref, ZWorldT>::type Vec;
 
 		MStaticWorldMeshBatch(
 			WorldDraw &draw,
@@ -336,7 +348,7 @@ private:
 	static void DeleteBatch(details::MBatch *batch);
 
 	void AddStaticWorldMesh(const r::Mesh::Ref &m, const BBox &bounds, int matId);
-
+	
 	details::MBatch* AllocateBatch();
 	details::MatRef *AddMaterialRef(int id);
 	details::MBatch* AddViewBatch(ViewDef &view, details::MatRef *matRef, int id);
@@ -394,9 +406,7 @@ private:
 
 	void VisMarkArea(
 		ViewDef &view, 
-		int area, 
-		const StackWindingStackVec &volume, 
-		const BBox &volumeBounds
+		int area
 	);
 		
 	void UpdateLightInteractions(ViewDef &view);
@@ -409,7 +419,6 @@ private:
 		const BBox &bounds
 	);
 
-	void BindFramebuffer();
 	void DrawView();
 	void DrawView(ViewDef &view);
 	void DrawUI();
@@ -578,7 +587,7 @@ private:
 
 	void DrawUnifiedShadowTexture(
 		const ViewDef &view,
-		const MBatchDraw::RefVec &batches,
+		const MBatchDraw::Vec &batches,
 		const Vec3 &unifiedPos,
 		float unifiedRadius
 	);
@@ -588,7 +597,7 @@ private:
 	);
 
 	bool FindShadowMaterials(
-		const MBatchDraw::RefVec &batches
+		const MBatchDraw::Vec &batches
 	);
 
 	void DrawViewWithUnifiedShadow(
@@ -608,6 +617,23 @@ private:
 	void TickLights(float dt);
 	static void DeleteLight(Light *light);
 
+	/*
+	==============================================================================
+	WorldDrawFog.cpp
+	==============================================================================
+	*/
+
+	void DrawFog(const ViewDef &view);
+	void DrawFogNode(const ViewDef &view, int nodeNum);
+	void DrawFogLeaf(const ViewDef &view, int leafNum);
+	void DrawFogNum(const ViewDef &view, int num);
+
+	/*
+	==============================================================================
+	Data
+	==============================================================================
+	*/
+
 	ObjectPool<details::MBatch> m_batchPool;
 	ObjectPool<details::MBatchDrawLink> m_linkPool;
 	MemoryPool m_interactionPool;
@@ -618,8 +644,9 @@ private:
 #endif
 	asset::MaterialBundle m_projected_M;
 	asset::MaterialBundle m_shadow_M;
+	asset::MaterialBundle m_fogZ_M;
 	PostProcessEffect::Map m_postFX;
-	MStaticWorldMeshBatch::RefVec m_worldModels;
+	MStaticWorldMeshBatch::Vec m_worldModels;
 	ScreenOverlay::List m_overlays;
 	RB_WorldDraw::Ref m_rb;
 	details::MatRefMap m_refMats;

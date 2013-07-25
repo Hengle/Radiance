@@ -107,31 +107,32 @@ private:
 		kMaterialTextureSource_MaxIndices> tcModVals;
 		
 		boost::array<GLint, kMaxTextures> textures;
-		int matrixOps;
-		int prMatrixOps;
-		GLint mv;
-		GLint pr;
+
+		LightEnv lights;
 		float mvfloats[16];
 		float prfloats[16];
-		GLint dcolor;
-		Vec4 drgba;
-		GLint scolor;
-		Vec4 srgba;
-		LightEnv lights;
-		Vec3 eyePos;
-		Mat4 tcPrjMat;
-		Vec2 pfxVars;
+		float mvpfloats[16];
 		GLint lightPos[kMaxLights];
 		GLint lightDiffuse[kMaxLights];
 		GLint lightSpecular[kMaxLights];
+		Mat4 tcPrjMat;
+		Vec4 drgba;
+		Vec4 srgba;
+		Vec3 eyePos;
+		Vec2 pfxVars;
+
+		int matrixOps;
+		int prMatrixOps;
+		GLint mvp;
+		GLint mv;
+		GLint prj;
+		GLint imvp;
+		GLint iprj;
+		GLint dcolor;
+		GLint scolor;
 		GLint eye;
 		GLint tcPrj;
-		GLint pfx;
-		
-#if defined(RAD_OPT_OGLES2)
-		GLint mvp;
-		float mvpfloats[16];
-#endif
+		GLint pfx;	
 	};
 
 	struct Pass {

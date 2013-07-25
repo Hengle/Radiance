@@ -148,7 +148,8 @@ void GLTable::Reset() {
 
 	SGIS_generate_mipmap = false;
 	ARB_texture_non_power_of_two = false;
-	
+	ARB_depth_texture = false;
+
 	color[0] = 1.f;
 	color[1] = 1.f;
 	color[2] = 1.f;
@@ -423,6 +424,7 @@ void GLTable::Load() {
 	CHECK(IMG_texture_compression_pvrtc);
 	SGIS_generate_mipmap = false;
 	ARB_texture_non_power_of_two = false;
+	ARB_depth_texture = true;
 	ActiveTextureARB = &glActiveTexture;
 	ARB_vertex_buffer_object = true;
 	BindBufferARB = &glBindBuffer;
@@ -515,6 +517,7 @@ void GLTable::Load() {
 	CHECK(EXT_texture_compression_s3tc);
 	CHECK(SGIS_generate_mipmap);
 	CHECK(ARB_texture_non_power_of_two);
+	CHECK(ARB_depth_texture);
 	CHECK(EXT_texture_filter_anisotropic);
 
 	maxAnisotropy = 0;

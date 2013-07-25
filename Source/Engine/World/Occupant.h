@@ -30,7 +30,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(MBatchOccupant, visible, bool);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchOccupant, sky, bool);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchOccupant, bounds, const BBox&);
-	RAD_DECLARE_READONLY_PROPERTY(MBatchOccupant, batches, const MBatchDraw::RefVec *);
+	RAD_DECLARE_READONLY_PROPERTY(MBatchOccupant, batches, const MBatchDraw::Vec *);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchOccupant, world, World*);
 	RAD_DECLARE_PROPERTY(MBatchOccupant, lightInteractionFlags, int, int);
 	RAD_DECLARE_PROPERTY(MBatchOccupant, lightingFlags, LightingFlags, LightingFlags);
@@ -43,7 +43,7 @@ protected:
 	virtual RAD_DECLARE_GET(visible, bool) = 0;
 	virtual RAD_DECLARE_GET(sky, bool) = 0;
 	virtual RAD_DECLARE_GET(bounds, const BBox&) = 0;
-	virtual RAD_DECLARE_GET(batches, const MBatchDraw::RefVec*) = 0;
+	virtual RAD_DECLARE_GET(batches, const MBatchDraw::Vec*) = 0;
 
 private:
 

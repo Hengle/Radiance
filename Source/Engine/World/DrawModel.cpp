@@ -113,7 +113,7 @@ void DrawModel::ScaleTo(const Vec3 &scale, float time) {
 }
 
 void DrawModel::ReplaceMaterial(int src, int dst) {
-	for (MBatchDraw::RefVec::iterator it = m_batches.begin(); it != m_batches.end(); ++it) {
+	for (MBatchDraw::Vec::iterator it = m_batches.begin(); it != m_batches.end(); ++it) {
 		const MBatchDraw::Ref &r = *it;
 		if (r->matId == src)
 			r->matId = dst;
@@ -121,7 +121,7 @@ void DrawModel::ReplaceMaterial(int src, int dst) {
 }
 
 void DrawModel::ReplaceMaterials(int dst) {
-	for (MBatchDraw::RefVec::iterator it = m_batches.begin(); it != m_batches.end(); ++it) {
+	for (MBatchDraw::Vec::iterator it = m_batches.begin(); it != m_batches.end(); ++it) {
 		const MBatchDraw::Ref &r = *it;
 		r->matId = dst;
 	}

@@ -124,6 +124,7 @@ bool RBackend::CheckCaps() {
 		gl.ARB_multitexture &&
 		gl.SGIS_generate_mipmap &&
 		gl.ARB_texture_non_power_of_two &&
+		gl.ARB_depth_texture &&
 		(gl.maxTextureSize >= 2048);
 }
 #endif

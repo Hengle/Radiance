@@ -48,7 +48,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, bounds, const BBox&);
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, scale, const Vec3&);
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, rgba, const Vec4&);
-	RAD_DECLARE_READONLY_PROPERTY(DrawModel, batches, const MBatchDraw::RefVec*);
+	RAD_DECLARE_READONLY_PROPERTY(DrawModel, batches, const MBatchDraw::Vec*);
 
 protected:
 
@@ -132,7 +132,7 @@ private:
 		return m_bounds;
 	}
 
-	RAD_DECLARE_GET(batches, const MBatchDraw::RefVec*) {
+	RAD_DECLARE_GET(batches, const MBatchDraw::Vec*) {
 		return &m_batches;
 	}
 
@@ -155,7 +155,7 @@ private:
 	float m_scaleTime[2];
 	BBox m_bounds;
 	Entity *m_entity;
-	MBatchDraw::RefVec m_batches;
+	MBatchDraw::Vec m_batches;
 	Vec4 m_rgba[3];
 	float m_fadeTime[2];
 	int m_markFrame;

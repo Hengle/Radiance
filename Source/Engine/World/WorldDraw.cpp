@@ -150,6 +150,8 @@ void WorldDraw::Counters::Clear() {
 	testedLights = 0;
 	visLights = 0;
 	drawnLights = 0;
+	drawnFogs = 0;
+	testedFogs = 0;
 	numBatches = 0;
 	numTris = 0;
 	numMaterials = 0;
@@ -190,6 +192,10 @@ int WorldDraw::LoadMaterials() {
 		return r;
 
 	r = details::LoadMaterial("Sys/Shadow_M", m_shadow_M);
+	if (r != pkg::SR_Success)
+		return r;
+
+	r = details::LoadMaterial("Sys/FogZ_M", m_fogZ_M);
 	if (r != pkg::SR_Success)
 		return r;
 
@@ -322,14 +328,6 @@ void WorldDraw::AddStaticWorldMesh(const r::Mesh::Ref &m, const BBox &bounds, in
 	m_worldModels.push_back(r);
 }
 
-void WorldDraw::BindFramebuffer() {
-	if (m_postFXRT) {
-		m_rb->BindRenderTarget();
-	} else {
-		m_rb->BindFramebuffer(true); // discard
-	}
-}
-
 void WorldDraw::Draw(Counters *counters) {
 	m_counters.Clear();
 
@@ -349,8 +347,11 @@ void WorldDraw::Draw(Counters *counters) {
 		m_rb->SetScreenLocalMatrix();
 		DrawOverlays();
 
-		if (m_postFXRT)
+		if (m_postFXRT) {
 			PostProcess();
+		} else {
+			m_rb->BindFramebuffer(true, true);
+		}
 
 		m_rb->ReleaseArrayStates();
 	}
@@ -676,17 +677,6 @@ Mat4 WorldDraw::MakePerspectiveMatrix(
 	const Vec2 &zplanes,
 	bool txAddressBias
 ) {
-	Mat4 bias;
-
-	if (txAddressBias) {
-		bias = Mat4(
-			Vec4(0.5f, 0.0f, 0.0f, 0.0f),
-			Vec4(0.0f, 0.5f, 0.0f, 0.0f),
-			Vec4(0.0f, 0.0f, 0.5f, 0.0f),
-			Vec4(0.5f, 0.5f, 0.5f, 1.0f)
-		);
-	}
-
 	return m_rb->MakePerspectiveMatrix(
 		viewplanes[0],
 		viewplanes[1],
@@ -694,7 +684,7 @@ Mat4 WorldDraw::MakePerspectiveMatrix(
 		viewplanes[3],
 		-zplanes[0],
 		-zplanes[1],
-		txAddressBias ? &bias : 0
+		txAddressBias
 	);
 }
 
@@ -703,16 +693,13 @@ void WorldDraw::VisMarkAreas(ViewDef &view) {
 	if (view.area < 0)
 		return; // no area set.
 
-	StackWindingStackVec frustumVolume;
-	BBox frustumBounds;
-
-	World::MakeVolume(&view.frustum[0], (int)view.frustum->size(), frustumVolume, frustumBounds);
+	World::MakeVolume(&view.frustum[0], (int)view.frustum->size(), view.frustumVolume, view.frustumBounds);
 
 	ClippedAreaVolumeStackVec frustumAreas;
 	m_world->ClipOccupantVolume(
 		&view.camera.pos.get(),
-		&frustumVolume,
-		frustumBounds,
+		&view.frustumVolume,
+		view.frustumBounds,
 		&frustumAreas,
 		view.area,
 		-1,
@@ -723,19 +710,19 @@ void WorldDraw::VisMarkAreas(ViewDef &view) {
 	++m_markFrame;
 
 	// add occupants from area the view is in.
-	VisMarkArea(view, view.area, frustumVolume, frustumBounds);
+	VisMarkArea(view, view.area);
 
 	for (ClippedAreaVolumeStackVec::const_iterator it = frustumAreas->begin(); it != frustumAreas->end(); ++it) {
 		const ClippedAreaVolume &volume = *it;
-		VisMarkArea(view, volume.area, volume.volume, volume.bounds);
+		VisMarkArea(view, volume.area);
 	}
 
 	if (view.sky) // add sky surfs
-		VisMarkArea(view, kSkyArea, frustumVolume, frustumBounds);
+		VisMarkArea(view, kSkyArea);
 
 #if defined(WORLD_DEBUG_DRAW)
 	if (m_world->cvars->r_showfrustum.value) {
-		m_dbgVars.frustum = frustumVolume;
+		m_dbgVars.frustum = view.frustumVolume;
 		m_dbgVars.frustumAreas = frustumAreas;
 	}
 #endif
@@ -743,9 +730,7 @@ void WorldDraw::VisMarkAreas(ViewDef &view) {
 
 void WorldDraw::VisMarkArea(
 	ViewDef &view,
-	int areaNum, 
-	const StackWindingStackVec &volume, 
-	const BBox &volumeBounds
+	int areaNum
 ) {
 
 	RAD_ASSERT(areaNum > -1);
@@ -770,7 +755,7 @@ void WorldDraw::VisMarkArea(
 			BBox bounds(light.m_bounds);
 			bounds.Translate(light.m_pos);
 							
-			if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, bounds)) {
+			if (!m_world->cvars->r_frustumcull.value || ClipBounds(view.frustumVolume, view.frustumBounds, bounds)) {
 				++m_counters.visLights;
 				light.m_visFrame = m_markFrame;
 				view.visLights.push_back(&light);
@@ -805,7 +790,7 @@ void WorldDraw::VisMarkArea(
 			if (m_world->cvars->r_showworldbboxes.value)
 				m_dbgVars.worldBBoxes.push_back(m->TransformedBounds());
 #endif
-			if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, m->TransformedBounds())) {
+			if (!m_world->cvars->r_frustumcull.value || ClipBounds(view.frustumVolume, view.frustumBounds, m->TransformedBounds())) {
 				m->m_visibleFrame = m_markFrame;
 				++m_counters.drawnWorldModels;
 				details::MBatch *batch = AddViewBatch(view, m->m_matRef, m->m_matId);
@@ -831,7 +816,7 @@ void WorldDraw::VisMarkArea(
 
 			if (m->m_visibleFrame != m_markFrame) {
 
-				if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, m->TransformedBounds())) {
+				if (!m_world->cvars->r_frustumcull.value || ClipBounds(view.frustumVolume, view.frustumBounds, m->TransformedBounds())) {
 					m->m_visibleFrame = m_markFrame;
 					++m_counters.drawnEntityModels;
 
@@ -848,7 +833,7 @@ void WorldDraw::VisMarkArea(
 #endif
 					}			
 
-					for (MBatchDraw::RefVec::const_iterator it = m->m_batches.begin(); it != m->m_batches.end(); ++it) {
+					for (MBatchDraw::Vec::const_iterator it = m->m_batches.begin(); it != m->m_batches.end(); ++it) {
 						const MBatchDraw::Ref &draw = *it;
 						
 						if (draw->m_markFrame != m_markFrame) {
@@ -871,7 +856,7 @@ void WorldDraw::VisMarkArea(
 		if (!o->visible)
 			continue;
 
-		for (MBatchDraw::RefVec::const_iterator it = o->batches->begin(); it != o->batches->end(); ++it) {
+		for (MBatchDraw::Vec::const_iterator it = o->batches->begin(); it != o->batches->end(); ++it) {
 			const MBatchDraw::Ref &m = *it;
 			if (!m->visible)
 				continue;
@@ -883,7 +868,7 @@ void WorldDraw::VisMarkArea(
 
 			if (m->m_visibleFrame != m_markFrame) {
 				
-				if (!m_world->cvars->r_frustumcull.value || ClipBounds(volume, volumeBounds, m->TransformedBounds())) {
+				if (!m_world->cvars->r_frustumcull.value || ClipBounds(view.frustumVolume, view.frustumBounds, m->TransformedBounds())) {
 					m->m_visibleFrame = m_markFrame;
 					++m_counters.drawnActorModels;
 
@@ -934,7 +919,7 @@ void WorldDraw::DrawView() {
 	// All our texture coordinates are inverted but when drawing
 	// to a FB RT the image is rendered right-side up, instead up
 	// upside down, correct for this.
-	m_rb->FlipMatrixHack(m_postFXRT);
+	m_rb->FlipMatrixHack(true);
 
 #if defined(WORLD_DEBUG_DRAW)
 	bool debugUniMatrix = true;
@@ -994,7 +979,7 @@ void WorldDraw::DrawView() {
 	if (m_world->cvars->r_unifiedshadows.value)
 		GenerateViewUnifiedShadows(view);
 #endif
-	BindFramebuffer();
+	m_rb->BindRenderTarget();
 
 #if defined(WORLD_DEBUG_DRAW)
 	if (m_world->cvars->r_showlightpasses.value) {
@@ -1005,6 +990,7 @@ void WorldDraw::DrawView() {
 #endif
 
 	DrawViewBatches(view, false);
+	DrawFog(view);
 
 #if defined(WORLD_DEBUG_DRAW)
 	}

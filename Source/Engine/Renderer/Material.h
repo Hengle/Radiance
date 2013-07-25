@@ -41,6 +41,7 @@ public:
 
 	enum Sort {
 		kSort_Solid,
+		kSort_Fog,
 		kSort_Translucent,
 		kSort_Translucent2,
 		kSort_Translucent3,

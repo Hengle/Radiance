@@ -184,7 +184,7 @@ private:
 			return m_actor->bounds[1];
 		}
 
-		RAD_DECLARE_GET(batches, const MBatchDraw::RefVec*) {
+		RAD_DECLARE_GET(batches, const MBatchDraw::Vec*) {
 			return &m_batches;
 		}
 
@@ -194,7 +194,7 @@ private:
 
 	private:
 
-		MBatchDraw::RefVec m_batches;
+		MBatchDraw::Vec m_batches;
 		const Actor *m_actor;
 	};
 

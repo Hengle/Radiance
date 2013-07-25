@@ -40,19 +40,18 @@ enum ContentsFlags {
 	RAD_FLAG(kContentsFlag_Areaportal),
 	RAD_FLAG(kContentsFlag_Solid),
 	RAD_FLAG(kContentsFlag_Fog),
-	RAD_FLAG(kContentsFlag_Water),
 
 	// Not in BSP
 	RAD_FLAG(kContentsFlag_Clip),
 	RAD_FLAG(kContentsFlag_Detail), // detail contents are removed if outside valid BSP
 	RAD_FLAG(kContentsFlag_Floor),
 
-	kContentsFlag_VisibleContents = kContentsFlag_Areaportal|kContentsFlag_Solid|kContentsFlag_Clip|kContentsFlag_Fog|kContentsFlag_Water,
+	kContentsFlag_VisibleContents = kContentsFlag_Areaportal|kContentsFlag_Solid|kContentsFlag_Fog,
 	kContentsFlag_FirstVisibleContents = kContentsFlag_Areaportal,
-	kContentsFlag_LastVisibleContents = kContentsFlag_Water,
+	kContentsFlag_LastVisibleContents = kContentsFlag_Fog,
 	kContentsFlag_Structural = kContentsFlag_Solid|kContentsFlag_Areaportal, // just used for classification
 	kContentsFlag_SolidContents = kContentsFlag_Solid, // blocks portal flood
-	kContentsFlag_BSPContents = kContentsFlag_Areaportal|kContentsFlag_Solid|kContentsFlag_Fog|kContentsFlag_Water,
+	kContentsFlag_BSPContents = kContentsFlag_Areaportal|kContentsFlag_Solid|kContentsFlag_Fog,
 	kContentsFlag_DetailContents = kContentsFlag_Detail|kContentsFlag_Clip
 };
 
@@ -83,6 +82,8 @@ struct BSPLeaf {
 	U32 contents;
 	U32 firstClipModel;
 	U32 numClipModels;
+	U32 firstFog;
+	U32 numFogs;
 	float mins[3];
 	float maxs[3];
 };
@@ -127,6 +128,7 @@ struct BSPModel {
 	U32 numIndices;
 	U32 material;
 	U32 numChannels;
+	U32 contents;
 	float mins[3];
 	float maxs[3];
 };

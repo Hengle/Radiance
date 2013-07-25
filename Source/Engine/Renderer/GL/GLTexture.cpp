@@ -61,9 +61,9 @@ RADENG_API GLenum RADENG_CALL GLInternalFormat(GLenum format, GLenum type) {
 		}		
 		break;
 
-#if !defined(RAD_OPT_OGLES)
 		case GL_UNSIGNED_SHORT: {
 			switch(format) {
+#if !defined(RAD_OPT_OGLES)
 				case GL_RGB:
 				case GL_BGR:
 					return GL_RGB16;
@@ -76,10 +76,14 @@ RADENG_API GLenum RADENG_CALL GLInternalFormat(GLenum format, GLenum type) {
 					return GL_LUMINANCE16_ALPHA16;
 				case GL_ALPHA:
 					return GL_ALPHA16;
+#endif
+				case GL_DEPTH_COMPONENT:
+					return GL_DEPTH_COMPONENT16_ARB;
 			}
 		}	
 		break;
 		
+#if !defined(RAD_OPT_OGLES)
 		case GL_UNSIGNED_BYTE_3_3_2:
 		case GL_UNSIGNED_BYTE_2_3_3_REV:
 			return GL_R3_G3_B2;
@@ -107,6 +111,13 @@ RADENG_API GLenum RADENG_CALL GLInternalFormat(GLenum format, GLenum type) {
 #else
 		case GL_UNSIGNED_SHORT_1_5_5_5_REV:
 			return GL_RGB5_A1;
+
+		case GL_UNSIGNED_INT: {
+			switch (format) {
+			case GL_DEPTH_COMPONENT:
+				return GL_DEPTH_COMPONENT32_ARB;
+			}
+		} break;
 			
 		case GL_UNSIGNED_INT_8_8_8_8:
 		case GL_UNSIGNED_INT_8_8_8_8_REV:

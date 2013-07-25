@@ -685,19 +685,19 @@ private:
 	bool EmitBSPAreas();
 	bool EmitBSPAreaportals(Node *leaf, int areaNum, world::bsp_file::BSPArea &area);
 	void EmitBSPModels();
-	void EmitBSPModel(const SceneFile::TriModel::Ref &triModel);
+	void EmitBSPModel(SceneFile::TriModel &triModel, int contents);
 	void EmitBSPModel(
-		const SceneFile::TriModel::Ref &triModel,
+		SceneFile::TriModel &triModel,
 		const IntSet &mats,
-		const SceneFile::AreaNumSet &areas
+		const SceneFile::AreaNumSet *areas
 	);
 	int EmitBSPModel(
-		const SceneFile::TriModel::Ref &triModel,
+		SceneFile::TriModel &triModel,
 		const EmitTriModel &model,
-		const SceneFile::AreaNumSet &areas
+		const SceneFile::AreaNumSet *areas
 	);
 	int EmitBSPBrush(const SceneFile::Brush &brush);
-	int EmitBSPModel(const EmitTriModel &model, int uvBumpChannel);
+	int EmitBSPModel(const EmitTriModel &model, int contents, int uvBumpChannel);
 	S32 EmitBSPNodes(const Node *node, S32 parent);
 	void EmitBSPClipModels(const Node *node, world::bsp_file::BSPLeaf *leaf);
 	void EmitBSPClipModel(const TriModelFragRef &model);

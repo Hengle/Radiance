@@ -25,7 +25,7 @@ public:
 	virtual void EndFrame();
 	virtual int LoadMaterials();
 	virtual int Precache();
-	virtual void BindFramebuffer(bool discardHint);
+	virtual void BindFramebuffer(bool discardHint, bool copy);
 	virtual void BindRenderTarget();
     virtual void ClearBackBuffer();
 	virtual void SetWorldStates();
@@ -38,7 +38,7 @@ public:
 		float bottom, 
 		float near, 
 		float far,
-		const Mat4 *bias
+		bool txAddressBias
 	);
 
 	virtual void SetPerspectiveMatrix(
@@ -69,6 +69,11 @@ public:
 		r::Material &mat,
 		const Vec4 *scissorBounds
 	);
+
+	virtual void BeginFog();
+	virtual void BeginFogDepthWrite(r::Material &fog, bool front);
+	virtual void BeginFogDraw(r::Material &fog);
+	virtual void EndFog();
 
 	virtual void BeginUnifiedShadows();
 	virtual void EndUnifiedShadows();
@@ -101,7 +106,7 @@ public:
 	virtual Vec3 Unproject(const Vec3 &p);
 
 	virtual Mat4 GetModelViewMatrix();
-	virtual Mat4 GetModelViewProjectionMatrix();
+	virtual Mat4 GetModelViewProjectionMatrix(bool txAddressBias);
 
 #if defined(WORLD_DEBUG_DRAW)
 	virtual void DebugUploadVerts(
@@ -174,7 +179,7 @@ private:
 	r::GLRenderTarget::Ref m_activeRT;
 	r::GLRenderTarget::Ref m_shadowRT;
 	r::GLRenderTarget::Ref m_framebufferRT;
-			
+	
 	struct OverlayVert {
 		float xy[2];
 		float st[2];

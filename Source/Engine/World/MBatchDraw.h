@@ -48,7 +48,7 @@ struct MBatch {
 class RADENG_CLASS MBatchDraw : public boost::noncopyable {
 public:
 	typedef boost::shared_ptr<MBatchDraw> Ref;
-	typedef zone_vector<Ref, ZWorldT>::type RefVec;
+	typedef zone_vector<Ref, ZWorldT>::type Vec;
 	
 	MBatchDraw(WorldDraw &draw, int matId, const void *uid);
 	virtual ~MBatchDraw() {}

@@ -73,25 +73,19 @@ void GLWorldDraw::BindRenderTarget() {
 	world->game->Viewport(vpx, vpy, vpw, vph);
 
 	if (!m_framebufferRT) {
-#if defined(RAD_OPT_OGLES)
-		const GLenum depth = GL_DEPTH_COMPONENT24_ARB;
-		const int depthBytesPP = 3;
-#else
-		const GLenum depth = GL_DEPTH_COMPONENT32_ARB;
-		const int depthBytesPP = 4;
-#endif
-
 		m_framebufferRT.reset(new (ZRender) GLRenderTarget(
 			GL_TEXTURE_2D,
 			GL_RGBA,
 			GL_UNSIGNED_BYTE,
 			vpw,
 			vph,
-			depth,
-			(depthBytesPP+4)*vpw*vph,
+			0,
+			4*vpw*vph,
 			TX_FilterBilinear,
 			false
 		));
+
+		m_framebufferRT->CreateDepthBufferTexture();
 	}
 	
 	GLRenderTarget::DiscardFramebuffer(GLRenderTarget::kDiscard_All);
@@ -150,7 +144,7 @@ Vec2 GLWorldDraw::BindPostFXTargets(bool chain, const r::Material &mat, const Ve
 		m_activeRT->BindFramebuffer(GLRenderTarget::kDiscard_All);
 	} else {
 		GLRenderTarget::DiscardFramebuffer(GLRenderTarget::kDiscard_Depth); // don't need depth anymore.
-		BindFramebuffer(true);
+		BindFramebuffer(true, false);
 		m_activeRT.reset();
 	}
 
@@ -163,7 +157,8 @@ void GLWorldDraw::Copy(
 ) {
 	m_copy_M.material->BindTextures(m_copy_M.loader);
 	src->BindTexture(0);
-	dst->BindFramebuffer(GLRenderTarget::kDiscard_All);
+	if (dst)
+		dst->BindFramebuffer(GLRenderTarget::kDiscard_All);
 	m_copy_M.material->BindStates();
 
 	m_copy_M.material->shader->Begin(r::Shader::kPass_Default, *m_copy_M.material);
@@ -198,6 +193,38 @@ void GLWorldDraw::Copy(
 	gl.PopMatrix();
 
 	gls.invertCullFace = oldCullFace;
+}
+
+void GLWorldDraw::BeginFogDepthWrite(r::Material &fog, bool front) {
+	RAD_ASSERT(m_activeRT.get() == m_framebufferRT.get());
+
+	fog.BindStates(
+		r::kColorWriteMask_Off|
+		r::kDepthWriteMask_Enable|
+		r::kDepthTest_Less|
+		(front ? (r::kCullFaceMode_Back|r::kCullFaceMode_CCW) : (r::kCullFaceMode_Front|r::kCullFaceMode_CCW)),
+		r::kBlendMode_Off
+	);
+}
+
+void GLWorldDraw::BeginFogDraw(r::Material &fog) {
+	RAD_ASSERT(m_activeRT.get() == m_framebufferRT.get());
+
+	gls.SetMTSource(kMaterialTextureSource_Texture, 0, m_framebufferRT->depthTex);
+
+	fog.BindStates(
+		r::kColorWriteMask_RGBA|
+		r::kDepthWriteMask_Disable|
+		r::kDepthTest_Less|
+		r::kCullFaceMode_Back|r::kCullFaceMode_CCW,
+		0
+	);
+}
+
+void GLWorldDraw::BeginFog() {
+}
+
+void GLWorldDraw::EndFog() {
 }
 
 void GLWorldDraw::BeginUnifiedShadows() {
@@ -295,7 +322,7 @@ bool GLWorldDraw::BindUnifiedShadowTexture(
 		m_activeRT->BindFramebuffer(GLRenderTarget::kDiscard_None);
 	}
 	else {
-		BindFramebuffer(false);
+		BindFramebuffer(false, false);
 	}
 #endif
 
@@ -303,13 +330,19 @@ bool GLWorldDraw::BindUnifiedShadowTexture(
 	return true;
 }
 
-void GLWorldDraw::BindFramebuffer(bool discardHint) {
+void GLWorldDraw::BindFramebuffer(bool discardHint, bool copy) {
 	int vpx, vpy, vpw, vph;
 	world->game->Viewport(vpx, vpy, vpw, vph);
 	App::Get()->engine->sys->r->BindFramebuffer();
 	gls.Viewport(0, 0, vpw, vph);
+	
 	if (discardHint)
 		ClearBackBuffer(); // discard hint
+
+	if (m_activeRT && copy) {
+		Copy(m_activeRT, GLRenderTarget::Ref());
+		m_activeRT.reset();
+	}
 }
 
 Mat4 GLWorldDraw::MakePerspectiveMatrix(
@@ -319,11 +352,18 @@ Mat4 GLWorldDraw::MakePerspectiveMatrix(
 	float bottom, 
 	float near, 
 	float far,
-	const Mat4 *bias
+	bool txAddressBias
 ) {
 	Mat4 m = Mat4::PerspectiveOffCenterRH(left, right, bottom, top, near, far);
-	if (bias)
-		m = m * (*bias);
+	if (txAddressBias) {
+		Mat4 bias = Mat4(
+			Vec4(0.5f, 0.0f, 0.0f, 0.0f),
+			Vec4(0.0f, 0.5f, 0.0f, 0.0f),
+			Vec4(0.0f, 0.0f, 0.5f, 0.0f),
+			Vec4(0.5f, 0.5f, 0.5f, 1.0f)
+		);
+		m = m * (bias);
+	}
 	return m;
 }
 
@@ -732,7 +772,17 @@ Mat4 GLWorldDraw::GetModelViewMatrix() {
 	return gl.GetModelViewMatrix();
 }
 
-Mat4 GLWorldDraw::GetModelViewProjectionMatrix() {
+Mat4 GLWorldDraw::GetModelViewProjectionMatrix(bool txAddressBias) {
+	if (txAddressBias) {
+		Mat4 bias = Mat4(
+			Vec4(0.5f, 0.0f, 0.0f, 0.0f),
+			Vec4(0.0f, 0.5f, 0.0f, 0.0f),
+			Vec4(0.0f, 0.0f, 0.5f, 0.0f),
+			Vec4(0.5f, 0.5f, 0.5f, 1.0f)
+		);
+		return gl.GetModelViewMatrix() * gl.GetProjectionMatrix() * bias;
+	}
+
 	return gl.GetModelViewProjectionMatrix();
 }
 

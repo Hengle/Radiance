@@ -113,14 +113,14 @@ void BSPBuilder::EmitBSPMaterials() {
 		if (trim->ignore)
 			continue;
 
-		if (!trim->cinematic && !(trim->contents & kContentsFlag_DetailContents))
+		if (!trim->cinematic && !(trim->contents & (kContentsFlag_DetailContents|kContentsFlag_Fog)))
 			continue;
 
 		for (SceneFile::TriFaceVec::const_iterator f = trim->tris.begin(); f != trim->tris.end(); ++f) {
 			const SceneFile::TriFace &trif = *f;
 
 			if (!trim->cinematic) {
-				if (!(trif.contents & kContentsFlag_DetailContents))
+				if (!(trif.contents & (kContentsFlag_DetailContents|kContentsFlag_Fog)))
 					continue;
 				if (trif.surface & kSurfaceFlag_NoDraw)
 					continue;
@@ -522,43 +522,47 @@ void BSPBuilder::EmitBSPModels() {
 		if (!(trim->contents & kContentsFlag_DetailContents))
 			continue;
 
-		EmitBSPModel(trim);
+		EmitBSPModel(*trim, 0);
 	}
 }
 
-void BSPBuilder::EmitBSPModel(const SceneFile::TriModel::Ref &triModel) {
+void BSPBuilder::EmitBSPModel(SceneFile::TriModel &triModel, int contents) {
 
 	IntSet mats;
 
 	// gather materials.
 
-	for (SceneFile::TriFaceVec::const_iterator f = triModel->tris.begin(); f != triModel->tris.end(); ++f) {
+	for (SceneFile::TriFaceVec::const_iterator f = triModel.tris.begin(); f != triModel.tris.end(); ++f) {
 		const SceneFile::TriFace &trif = *f;
-		if (trif.areas.empty())
+		if (!contents && trif.areas.empty())
 			continue;
 		if (trif.surface&kSurfaceFlag_NoDraw)
 			continue;
 		mats.insert(trif.mat);
 	}
 
-	for (SceneFile::TriFaceVec::const_iterator f = triModel->tris.begin(); f != triModel->tris.end(); ++f) {
-		const SceneFile::TriFace &trif = *f;
-		if (trif.emitId != -1)
-			continue; // already done
+	if (contents) {
+		EmitBSPModel(triModel, mats, 0);
+	} else {
+		for (SceneFile::TriFaceVec::const_iterator f = triModel.tris.begin(); f != triModel.tris.end(); ++f) {
+			const SceneFile::TriFace &trif = *f;
+			if (trif.emitId != -1)
+				continue; // already done
 
-		// get areas from tris
-		EmitBSPModel(
-			triModel,
-			mats,
-			trif.areas
-		);
+			// get areas from tris
+			EmitBSPModel(
+				triModel,
+				mats,
+				&trif.areas
+			);
+		}
 	}
 }
 
 void BSPBuilder::EmitBSPModel(
-	const SceneFile::TriModel::Ref &triModel,
+	SceneFile::TriModel &triModel,
 	const IntSet &mats,
-	const SceneFile::AreaNumSet &areas
+	const SceneFile::AreaNumSet *areas
 ) {
 	for (int c = 1; c <= kMaxUVChannels; ++c){
 		for (IntSet::const_iterator it = mats.begin(); it != mats.end(); ++it) {
@@ -567,7 +571,7 @@ void BSPBuilder::EmitBSPModel(
 			m.numChannels = c;
 			m.bounds.Initialize();
 
-			for (SceneFile::TriFaceVec::iterator f = triModel->tris.begin(); f != triModel->tris.end(); ++f) {
+			for (SceneFile::TriFaceVec::iterator f = triModel.tris.begin(); f != triModel.tris.end(); ++f) {
 				SceneFile::TriFace &trif = *f;
 
 				if (trif.emitId != -1)
@@ -578,7 +582,7 @@ void BSPBuilder::EmitBSPModel(
 					continue;
 				if (trif.model->numChannels != c)
 					continue;
-				if (trif.areas != areas)
+				if (areas && (trif.areas != *areas))
 					continue;
 
 				trif.emitId = 0; // just flag as emitted
@@ -589,9 +593,9 @@ void BSPBuilder::EmitBSPModel(
 					m.Clear();
 				}
 
-				m.AddVertex(EmitTriModel::Vert(ToBSPType(triModel->verts[trif.v[0]])));
-				m.AddVertex(EmitTriModel::Vert(ToBSPType(triModel->verts[trif.v[1]])));
-				m.AddVertex(EmitTriModel::Vert(ToBSPType(triModel->verts[trif.v[2]])));
+				m.AddVertex(EmitTriModel::Vert(ToBSPType(triModel.verts[trif.v[0]])));
+				m.AddVertex(EmitTriModel::Vert(ToBSPType(triModel.verts[trif.v[1]])));
+				m.AddVertex(EmitTriModel::Vert(ToBSPType(triModel.verts[trif.v[2]])));
 			}
 
 			if (!m.verts.empty()) {
@@ -602,13 +606,17 @@ void BSPBuilder::EmitBSPModel(
 }
 
 int BSPBuilder::EmitBSPModel(
-	const SceneFile::TriModel::Ref &triModel,
+	SceneFile::TriModel &triModel,
 	const EmitTriModel &model,
-	const SceneFile::AreaNumSet &areas
+	const SceneFile::AreaNumSet *areas
 ) {
-	int id = EmitBSPModel(model, triModel->uvBumpChannel);
-	for (SceneFile::AreaNumSet::const_iterator it = areas.begin(); it != areas.end(); ++it) {
-		triModel->emitIds[*it].push_back(id);
+	int id = EmitBSPModel(model, triModel.contents, triModel.uvBumpChannel);
+	if (areas) {
+		for (SceneFile::AreaNumSet::const_iterator it = areas->begin(); it != areas->end(); ++it) {
+			triModel.emitIds[*it].push_back(id);
+		}
+	} else {
+		triModel.fogId = id;
 	}
 	return id;
 }
@@ -626,7 +634,7 @@ void BSPBuilder::EmitTriModel::AddVertex(const Vert &vert) {
 	bounds.Insert(vert.pos);
 }
 
-int BSPBuilder::EmitBSPModel(const EmitTriModel &model, int uvBumpChannel) {
+int BSPBuilder::EmitBSPModel(const EmitTriModel &model, int contents, int uvBumpChannel) {
 	RAD_ASSERT(uvBumpChannel < world::bsp_file::kMaxUVChannels);
 	
 	BSPModel *bspModel = m_bspFile->AddModel();
@@ -636,6 +644,7 @@ int BSPBuilder::EmitBSPModel(const EmitTriModel &model, int uvBumpChannel) {
 	bspModel->numIndices = (U32)model.indices.size();
 	bspModel->material = FindBSPMaterial(m_map->mats[model.mat].name.c_str);
 	bspModel->numChannels = (U32)model.numChannels;
+	bspModel->contents = (U32)contents;
 
 	for (int i = 0; i < 3; ++i) {
 		bspModel->mins[i] = (float)model.bounds.Mins()[i];
@@ -703,6 +712,24 @@ S32 BSPBuilder::EmitBSPNodes(const Node *node, S32 parent) {
 
 		if (leaf->numClipModels > 0)
 			leaf->contents |= kContentsFlag_Clip;
+
+		leaf->firstFog = m_bspFile->numModelIndices;
+		leaf->numFogs = 0;
+
+		if ((leaf->area != -1) && (leaf->contents&kContentsFlag_Fog)) {
+			// emit fogs
+			for (TriModelFragVec::const_iterator it = node->models.begin(); it != node->models.end(); ++it) {
+				SceneFile::TriModel *original = (*it)->original;
+				if (original->contents&kContentsFlag_Fog) {
+					if (original->fogId == -1) {
+						EmitBSPModel(*original, kContentsFlag_Fog);
+					}
+					RAD_ASSERT(original->fogId != -1);
+					*m_bspFile->AddModelIndex() = (U16)original->fogId;
+					++leaf->numFogs;
+				}
+			}
+		}
 
 		return -(index + 1);
 	}

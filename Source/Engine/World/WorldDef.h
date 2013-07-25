@@ -107,6 +107,8 @@ struct dBSPLeaf {
 	int contents;
 	int firstClipModel;
 	int numClipModels;
+	int firstFog;
+	int numFogs;
 
 	EntityPtrSet entities;
 	MBatchOccupantPtrSet occupants;

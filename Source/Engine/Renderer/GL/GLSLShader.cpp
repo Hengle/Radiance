@@ -626,18 +626,21 @@ bool GLSLShader::MapInputs(Pass &p, const Material &material) {
 
 #if defined(RAD_OPT_OGLES2)
 	p.u.mvp = gl.GetUniformLocationARB(p.p->id, "U_mvp");
-	for (int i = 0; i < 16; ++i)
-		p.u.mvpfloats[i] = 0.f;
+#else
+	p.u.mvp = -1;
 #endif
 	p.u.dcolor = gl.GetUniformLocationARB(p.p->id, "U_color");
 	p.u.drgba = Vec4(-1.f, -1.f, -1.f, -1.f);
 	p.u.scolor = gl.GetUniformLocationARB(p.p->id, "U_scolor");
 	p.u.srgba = Vec4(-1.f, -1.f, -1.f, -1.f);
 	p.u.mv = gl.GetUniformLocationARB(p.p->id, "U_mv");
-	p.u.pr = gl.GetUniformLocationARB(p.p->id, "U_pr");
+	p.u.prj = gl.GetUniformLocationARB(p.p->id, "U_prj");
+	p.u.iprj = gl.GetUniformLocationARB(p.p->id, "U_iprj");
+	p.u.imvp = gl.GetUniformLocationARB(p.p->id, "U_imvp");
 	for (int i = 0; i < 16; ++i) {
 		p.u.mvfloats[i] = 0.f;
 		p.u.prfloats[i] = 0.f;
+		p.u.mvpfloats[i] = 0.f;
 	}
 
 	const float kFloatMax = std::numeric_limits<float>::max();
@@ -951,18 +954,22 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 	if (p.u.matrixOps != gl.matrixOps) { 
 		// matrix has changed
 		p.u.matrixOps = gl.matrixOps;
-#if defined(RAD_OPT_OGLES2)
 		// track modelview projection matrix?
-		if (p.u.mvp != -1) {
+		if ((p.u.mvp != -1) || (p.u.imvp != -1)) {
 			float floats[16];
 			Mat4 *x = reinterpret_cast<Mat4*>(floats);
 			*x = gl.GetModelViewProjectionMatrix();
 			if (memcmp(floats, p.u.mvpfloats, 16*sizeof(float))) {
 				memcpy(p.u.mvpfloats, floats, 16*sizeof(float));
-				gl.UniformMatrix4fvARB(p.u.mvp, 1, GL_FALSE, floats);
+				if (p.u.mvp != -1)
+					gl.UniformMatrix4fvARB(p.u.mvp, 1, GL_FALSE, floats);
+				if (p.u.imvp != -1) {
+					x->Invert();
+					gl.UniformMatrix4fvARB(p.u.imvp, 1, GL_FALSE, floats);
+				}
 			}
 		}
-#endif
+
 		// track modelview matrix?
 		if (p.u.mv != -1) {
 			float floats[16];
@@ -978,22 +985,29 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 	if (p.u.prMatrixOps != gl.prMatrixOps) {
 		p.u.prMatrixOps = gl.prMatrixOps;
 		// track projection matrix?
-		if (p.u.pr != -1) {
+		if ((p.u.prj != -1) || (p.u.iprj != -1)) {
 			float floats[16];
 			Mat4 *x = reinterpret_cast<Mat4*>(floats);
 			*x = gl.GetProjectionMatrix();
 			if (memcmp(floats, p.u.prfloats, 16*sizeof(float))) {
 				memcpy(p.u.prfloats, floats, 16*sizeof(float));
-				gl.UniformMatrix4fvARB(p.u.pr, 1, GL_FALSE, floats);
+				if (p.u.prj != -1)
+					gl.UniformMatrix4fvARB(p.u.prj, 1, GL_FALSE, floats);
+				if (p.u.iprj != -1) {
+					x->Invert();
+					gl.UniformMatrix4fvARB(p.u.iprj, 1, GL_FALSE, floats);
+				}
 			}
 		}
 	}
+
 	if (p.u.dcolor != -1) {
 		if (p.u.drgba != dcolor) {
 			p.u.drgba = dcolor;
 			gl.Uniform4fvARB(p.u.dcolor, 1, &dcolor[0]);
 		}
 	}
+	
 	if (p.u.scolor != -1) {
 		if (p.u.srgba != scolor) {
 			p.u.srgba = scolor;

@@ -93,7 +93,94 @@ GLRenderTarget::GLRenderTarget(
 	);
 
 	CHECK_GL_ERRORS();
+	RAD_ASSERT(gl.CheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT);
+}
 
+GLRenderTarget::GLRenderTarget(
+	const GLTexture::Ref &_tex
+) : tex(_tex), depthFormat(0), depthSize(0) {
+	id[0] = id[1] = 0;
+	gl.GenFramebuffersEXT(1, &id[0]);
+	CHECK_GL_ERRORS();
+	RAD_ASSERT(id[0]);
+	gls.BindBuffer(GL_FRAMEBUFFER_EXT, id[0]);
+
+	gl.FramebufferTexture2DEXT(
+		GL_FRAMEBUFFER_EXT,
+		GL_COLOR_ATTACHMENT0_EXT,
+		GL_TEXTURE_2D,
+		tex->id,
+		0
+	);
+
+	CHECK_GL_ERRORS();
+	RAD_ASSERT(gl.CheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT);
+}
+
+void GLRenderTarget::CreateDepthBufferTexture() {
+	RAD_ASSERT(tex);
+	gls.BindBuffer(GL_FRAMEBUFFER_EXT, id[0]);
+
+	depthTex.reset(new (ZRender) GLTexture(
+		GL_TEXTURE_2D,
+		GL_DEPTH_COMPONENT32_ARB,
+		tex->width,
+		tex->height,
+		0,
+		tex->width*tex->height*4
+	));
+
+	gls.SetTexture(0, depthTex, true);
+	GLTexture::SetFlags(depthTex, 0, 0, false);
+
+#if defined(RAD_OPT_PC)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+	glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
+#endif
+	
+	RAD_ASSERT(depthTex->target==GL_TEXTURE_2D);
+
+	glTexImage2D(
+		GL_TEXTURE_2D,
+		0,
+		GL_DEPTH_COMPONENT32_ARB,
+		tex->width,
+		tex->height,
+		0,
+		GL_DEPTH_COMPONENT,
+		GL_UNSIGNED_INT,
+		0
+	);
+
+	CHECK_GL_ERRORS();
+
+	gl.FramebufferTexture2DEXT(
+		GL_FRAMEBUFFER_EXT,
+		GL_DEPTH_ATTACHMENT_EXT,
+		GL_TEXTURE_2D,
+		depthTex->id,
+		0
+	);
+
+	CHECK_GL_ERRORS();
+	RAD_ASSERT(gl.CheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT);
+}
+
+void GLRenderTarget::AttachDepthBuffer(const GLTexture::Ref &tex) {
+	RAD_ASSERT(tex);
+	gls.BindBuffer(GL_FRAMEBUFFER_EXT, id[0]);
+
+	depthTex = tex;
+
+	gl.FramebufferTexture2DEXT(
+		GL_FRAMEBUFFER_EXT,
+		GL_DEPTH_ATTACHMENT_EXT,
+		GL_TEXTURE_2D,
+		depthTex->id,
+		0
+	);
+
+	CHECK_GL_ERRORS();
 	RAD_ASSERT(gl.CheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT);
 }
 
