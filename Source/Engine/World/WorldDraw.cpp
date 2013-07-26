@@ -338,15 +338,23 @@ void WorldDraw::Draw(Counters *counters) {
 
 	m_rb->BeginFrame();
 
+	// NOTE FlipMatrixHack: glTexImage2D origin is bottom left.
+	// All our texture coordinates are inverted but when drawing
+	// to a FB RT the image is rendered right-side up, instead up
+	// upside down, correct for this.
+	
 	if (m_uiOnly) {
 		m_rb->ClearBackBuffer();
 	} else {
 
+		m_rb->FlipMatrixHack(true);
 		DrawView();
 		m_rb->SetScreenLocalMatrix();
 		DrawOverlays();
+		m_rb->FlipMatrixHack(false);
 
 		if (m_postFXRT) {
+			m_rb->SetScreenLocalMatrix();
 			PostProcess();
 		} else {
 			m_rb->BindFramebuffer(true, true);
@@ -914,12 +922,6 @@ void WorldDraw::DrawView() {
 
 	m_rb->SetWorldStates();
 	
-	// NOTE: glTexImage2D origin is bottom left.
-	// All our texture coordinates are inverted but when drawing
-	// to a FB RT the image is rendered right-side up, instead up
-	// upside down, correct for this.
-	m_rb->FlipMatrixHack(true);
-
 #if defined(WORLD_DEBUG_DRAW)
 	bool debugUniMatrix = true;
 	if (m_world->cvars->r_lockvis.value) {
@@ -1070,8 +1072,6 @@ void WorldDraw::DrawView() {
 	}
 
 #endif
-
-	m_rb->FlipMatrixHack(false); // restore this for picking.
 }
 
 void WorldDraw::UpdateLightInteractions(ViewDef &view) {

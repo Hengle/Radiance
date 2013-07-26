@@ -203,10 +203,19 @@ void GLWorldDraw::Copy(
 	gl.PushMatrix();
 	gl.LoadIdentity();
 
+	bool oldCullFace = gls.invertCullFace;
+
+	if (m_flipMatrix) { // HACK blit to frame buffer
+		// render target tc's are flipped about Y, so correct for this in the transform.
+		gl.Scalef(1.f, -1.f, 1.f);
+		gls.invertCullFace = true;
+	} else {
+		gls.invertCullFace = false;
+	}
+
 	gl.Ortho(0.0, 1.0, 1.0, 0.0, -1.0, 1.0);
 
-	bool oldCullFace = gls.invertCullFace;
-	gls.invertCullFace = false;
+	//gls.invertCullFace = false;
 
 	gl.MatrixMode(GL_MODELVIEW);
 	gl.PushMatrix();
@@ -427,8 +436,6 @@ void GLWorldDraw::SetPerspectiveMatrix(
 	float xaspect = 1.f / yaspect;
 	float yfov = camera.fov.get() * yaspect;
 
-	gl.Perspective(yfov, xaspect, 4.0, camera.farClip.get());
-
 	if (m_flipMatrix) { 
 		// render target tc's are flipped about Y, so correct for this in the perspective transform.
 		gl.Scalef(1.f, -1.f, 1.f);
@@ -436,6 +443,8 @@ void GLWorldDraw::SetPerspectiveMatrix(
 	} else {
 		gls.invertCullFace = false;
 	}
+
+	gl.Perspective(yfov, xaspect, 4.0, camera.farClip.get());
 
 	gl.MatrixMode(GL_MODELVIEW);
 }
@@ -455,9 +464,16 @@ void GLWorldDraw::SetScreenLocalMatrix() {
 
 	int vpx, vpy, vpw, vph;
 	world->game->Viewport(vpx, vpy, vpw, vph);
-	gl.Ortho((double)vpx, (double)(vpx+vpw), (double)(vpy+vph), (double)vpy, -1.0, 1.0);
 
-	gls.invertCullFace = false;
+	if (m_flipMatrix) { 
+		// render target tc's are flipped about Y, so correct for this in the transform.
+		gl.Scalef(1.f, -1.f, 1.f);
+		gls.invertCullFace = true;
+	} else {
+		gls.invertCullFace = false;
+	}
+
+	gl.Ortho((double)vpx, (double)(vpx+vpw), (double)(vpy+vph), (double)vpy, -1.0, 1.0);
 
 	gl.MatrixMode(GL_MODELVIEW);
 	gl.LoadIdentity();
@@ -473,6 +489,15 @@ void GLWorldDraw::SetOrthoMatrix(
 ) {
 	gl.MatrixMode(GL_PROJECTION);
 	gl.LoadIdentity();
+	
+	if (m_flipMatrix) { 
+		// render target tc's are flipped about Y, so correct for this in the transform.
+		gl.Scalef(1.f, -1.f, 1.f);
+		gls.invertCullFace = true;
+	} else {
+		gls.invertCullFace = false;
+	}
+
 	gl.Ortho(
 		(double)left, 
 		(double)right,
@@ -481,14 +506,6 @@ void GLWorldDraw::SetOrthoMatrix(
 		(double)near,
 		(double)far
 	);
-
-	if (m_flipMatrix) { 
-		// render target tc's are flipped about Y, so correct for this in the transform.
-		gl.Scalef(1.f, -1.f, 1.f);
-		gls.invertCullFace = true;
-	} else {
-		gls.invertCullFace = false;
-	}
 
 	gl.MatrixMode(GL_MODELVIEW);
 }
@@ -595,12 +612,12 @@ void GLWorldDraw::BindOverlay(const r::Material &mat) {
 	
 	CreateScreenOverlay();
 
-	const r::Mesh::Ref &mesh = m_activeRT ? m_overlays[1] : m_overlays[0];
+	const r::Mesh::Ref &mesh =/* m_flipMatrix ? m_overlays[1] : */m_overlays[0];
 	mesh->BindAll(mat.shader.get().get());
 }
 
 void GLWorldDraw::DrawOverlay() {
-	const r::Mesh::Ref &mesh = m_activeRT ? m_overlays[1] : m_overlays[0];
+	const r::Mesh::Ref &mesh = /*m_flipMatrix ? m_overlays[1] : */m_overlays[0];
 	mesh->Draw();
 	CHECK_GL_ERRORS();
 }
@@ -707,24 +724,23 @@ void GLWorldDraw::CreateRect() {
 	RAD_ASSERT(vb);
 	OverlayVert *verts = (OverlayVert*)vb->ptr.get();
 
-	// note flipped TC's
 	verts[0].st[0] = 0.f;
-	verts[0].st[1] = 1.f;
+	verts[0].st[1] = 0.f;
 	verts[0].xy[0] = 0.f;
 	verts[0].xy[1] = 0.f;
 	
 	verts[1].st[0] = 1.f;
-	verts[1].st[1] = 1.f;
+	verts[1].st[1] = 0.f;
 	verts[1].xy[0] = 1.f;
 	verts[1].xy[1] = 0.f;
 
 	verts[2].st[0] = 1.f;
-	verts[2].st[1] = 0.f;
+	verts[2].st[1] = 1.f;
 	verts[2].xy[0] = 1.f;
 	verts[2].xy[1] = 1.f;
 
 	verts[3].st[0] = 0.f;
-	verts[3].st[1] = 0.f;
+	verts[3].st[1] = 1.f;
 	verts[3].xy[0] = 0.f;
 	verts[3].xy[1] = 1.f;
 
