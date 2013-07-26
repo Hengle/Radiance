@@ -358,11 +358,11 @@ GLTexture::Ref GLTexture::CreateDepthTexture(int width, int height) {
 	glTexImage2D(
 		GL_TEXTURE_2D,
 		0,
-		GL_DEPTH_COMPONENT,
+		kDepthFormat,
 		width,
 		height,
 		0,
-		kDepthFormat,
+		GL_DEPTH_COMPONENT,
 		kDepthComponents,
 		0
 	);
