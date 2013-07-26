@@ -355,8 +355,6 @@ GLTexture::Ref GLTexture::CreateDepthTexture(int width, int height) {
 	
 	RAD_ASSERT(depthTex->target==GL_TEXTURE_2D);
 
-	glTexStorage2DEXT(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT, width, height);
-	
 	glTexImage2D(
 		GL_TEXTURE_2D,
 		0,
