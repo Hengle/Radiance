@@ -1102,6 +1102,9 @@ void GLSLShader::End() {
 }
 
 void GLSLShader::BindAttribLocations(GLhandleARB p, const MaterialInputMappings &m) {
+
+	int tcReg = 0;
+
 	for (int i = 0; i < kMaxAttribArrays; ++i) {
 		if (m.attributes[i][0] == kInvalidMapping)
 			break;
@@ -1133,7 +1136,7 @@ void GLSLShader::BindAttribLocations(GLhandleARB p, const MaterialInputMappings 
 		case kMaterialGeometrySource_TexCoords: 
 			{
 				char name[64];
-				string::sprintf(name, "in_tc%d", idx);
+				string::sprintf(name, "in_tc%d", tcReg++);
 				gl.BindAttribLocationARB(p, loc, name);
 				CHECK_GL_ERRORS();
 			}
