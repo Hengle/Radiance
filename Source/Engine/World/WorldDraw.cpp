@@ -151,7 +151,6 @@ void WorldDraw::Counters::Clear() {
 	visLights = 0;
 	drawnLights = 0;
 	drawnFogs = 0;
-	testedFogs = 0;
 	numBatches = 0;
 	numTris = 0;
 	numMaterials = 0;

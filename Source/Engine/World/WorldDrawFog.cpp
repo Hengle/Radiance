@@ -11,10 +11,13 @@
 
 namespace world {
 
-void WorldDraw::DrawFog(const ViewDef &view) {
+void WorldDraw::DrawFog(ViewDef &view) {
 
 	if (view.area < 0)
 		return;
+		
+	CountFogs(view);
+	++m_markFrame; // reset counter
 
 	m_rb->BeginFog();
 
@@ -27,7 +30,36 @@ void WorldDraw::DrawFog(const ViewDef &view) {
 	m_rb->EndFog();
 }
 
-void WorldDraw::DrawFogNode(const ViewDef &view, int nodeNum) {
+void WorldDraw::CountFogs(ViewDef &view) {
+	view.numFogs = 0;
+	
+	if (m_world->m_nodes.empty()) {
+		CountFogNode(view, -1);
+	} else {
+		CountFogNode(view, 0);
+	}
+}
+
+void WorldDraw::CountFogNode(ViewDef &view, int nodeNum) {
+	if (nodeNum < 0) {
+		nodeNum = -(nodeNum + 1);
+		const dBSPLeaf &leaf = m_world->m_leafs[nodeNum];
+		if (m_world->cvars->r_frustumcull.value && !ClipBounds(view.frustumVolume, view.frustumBounds, leaf.bounds))
+			return; // node bounds not in view
+		view.numFogs += leaf.numFogs;
+		return;
+	}
+
+	const dBSPNode &node = m_world->m_nodes[nodeNum];
+
+	if (m_world->cvars->r_frustumcull.value && !ClipBounds(view.frustumVolume, view.frustumBounds, node.bounds))
+		return; // node bounds not in view
+
+	CountFogNode(view, node.children[0]);
+	CountFogNode(view, node.children[1]);
+}
+
+void WorldDraw::DrawFogNode(ViewDef &view, int nodeNum) {
 	if (nodeNum < 0) {
 		nodeNum = -(nodeNum + 1);
 		DrawFogLeaf(view, nodeNum);
@@ -54,7 +86,7 @@ void WorldDraw::DrawFogNode(const ViewDef &view, int nodeNum) {
 	DrawFogNode(view, node.children[1]);
 }
 
-void WorldDraw::DrawFogLeaf(const ViewDef &view, int leafNum) {
+void WorldDraw::DrawFogLeaf(ViewDef &view, int leafNum) {
 	const dBSPLeaf &leaf = m_world->m_leafs[leafNum];
 
 	if (m_world->cvars->r_frustumcull.value && !ClipBounds(view.frustumVolume, view.frustumBounds, leaf.bounds))
@@ -66,12 +98,14 @@ void WorldDraw::DrawFogLeaf(const ViewDef &view, int leafNum) {
 	}
 }
 
-void WorldDraw::DrawFogNum(const ViewDef &view, int num) {
+void WorldDraw::DrawFogNum(ViewDef &view, int num) {
 	const MStaticWorldMeshBatch::Ref &fog = m_worldModels[num];
 	if (fog->m_markFrame == m_markFrame)
 		return; // drawn this frame
 	fog->m_markFrame = m_markFrame;
 
+	++m_counters.drawnFogs;
+	
 	MBatchDraw *draw = fog.get();
 
 	const details::MatRef *matRef = fog->m_matRef;
@@ -104,16 +138,18 @@ void WorldDraw::DrawFogNum(const ViewDef &view, int num) {
 	matRef->mat->shader->End();
 
 	// render fog front faces into z (for next fog)
-	m_fogZ_M.material->BindTextures(m_fogZ_M.loader);
-	m_rb->BeginFogDepthWrite(*m_fogZ_M.material, true);
+	if (--view.numFogs > 0) { // skip this, if we are the last drawn fog we don't care.
+		m_fogZ_M.material->BindTextures(m_fogZ_M.loader);
+		m_rb->BeginFogDepthWrite(*m_fogZ_M.material, true);
 
-	m_fogZ_M.material->shader->Begin(r::Shader::kPass_Default, *m_fogZ_M.material);
-	draw->Bind(m_fogZ_M.material->shader.get().get());
-	m_fogZ_M.material->shader->BindStates(u);
-	m_rb->CommitStates();
-	draw->CompileArrayStates(*m_fogZ_M.material->shader.get());
-	draw->Draw();
-	m_fogZ_M.material->shader->End();
+		m_fogZ_M.material->shader->Begin(r::Shader::kPass_Default, *m_fogZ_M.material);
+		draw->Bind(m_fogZ_M.material->shader.get().get());
+		m_fogZ_M.material->shader->BindStates(u);
+		m_rb->CommitStates();
+		draw->CompileArrayStates(*m_fogZ_M.material->shader.get());
+		draw->Draw();
+		m_fogZ_M.material->shader->End();
+	}
 }
 
 }

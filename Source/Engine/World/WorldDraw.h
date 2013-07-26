@@ -42,7 +42,7 @@ public:
 		kNumFrustumPlanes = 6
 	};
 	
-	ViewDef(WorldDraw *_draw) : draw(_draw),  sky(false), nextBatch(0) {
+	ViewDef(WorldDraw *_draw) : draw(_draw),  sky(false), nextBatch(0), numFogs(0) {
 	}
 
 	~ViewDef();
@@ -63,6 +63,7 @@ public:
 	details::MBatchIdMap batchMatId;
 	WorldDraw *draw;
 
+	int numFogs;
 	int nextBatch;
 	int viewport[4];
 	int area;
@@ -239,7 +240,6 @@ public:
 		int visLights;
 		int drawnLights;
 		int drawnFogs;
-		int testedFogs;
 		int numBatches;
 		int numTris;
 		int numMaterials;
@@ -623,11 +623,13 @@ private:
 	==============================================================================
 	*/
 
-	void DrawFog(const ViewDef &view);
-	void DrawFogNode(const ViewDef &view, int nodeNum);
-	void DrawFogLeaf(const ViewDef &view, int leafNum);
-	void DrawFogNum(const ViewDef &view, int num);
-
+	void DrawFog(ViewDef &view);
+	void DrawFogNode(ViewDef &view, int nodeNum);
+	void DrawFogLeaf(ViewDef &view, int leafNum);
+	void DrawFogNum(ViewDef &view, int num);
+	void CountFogs(ViewDef &view);
+	void CountFogNode(ViewDef &view, int nodeNum);
+	
 	/*
 	==============================================================================
 	Data

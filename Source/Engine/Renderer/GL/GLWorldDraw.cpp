@@ -96,7 +96,7 @@ void GLWorldDraw::BindRenderTarget() {
 			GL_UNSIGNED_BYTE,
 			vpw,
 			vph,
-			0,
+			0/*GL_DEPTH_COMPONENT24_ARB*/,
 			4*vpw*vph,
 			TX_FilterBilinear,
 			false
@@ -105,8 +105,21 @@ void GLWorldDraw::BindRenderTarget() {
 		m_framebufferRT->CreateDepthBufferTexture();
 
 		// fog framebuffer shares primary color attachment.
-		m_fogRT.reset(new (ZRender) GLRenderTarget(m_framebufferRT->tex));
+		//m_fogRT.reset(new (ZRender) GLRenderTarget(m_framebufferRT->tex));
 		//m_fogRT->AttachDepthBuffer(m_framebufferRT->depthTex);
+		
+		m_fogRT.reset(new (ZRender) GLRenderTarget(
+			GL_TEXTURE_2D,
+			GL_RGBA,
+			GL_UNSIGNED_BYTE,
+			vpw,
+			vph,
+			0,
+			4*vpw*vph,
+			TX_FilterBilinear,
+			false
+		));
+
 		//m_fogRT->CreateDepthBufferTexture();
 	}
 	
@@ -150,7 +163,7 @@ Vec2 GLWorldDraw::BindPostFXTargets(bool chain, const r::Material &mat, const Ve
 				
 	if ((curRT->tex->width != srcW) || (curRT->tex->height != srcH)) {
 		m_activeRT = m_rtCache->NextRenderTarget(srcW, srcH, true);
-		Copy(curRT, m_activeRT);
+		Copy(curRT, m_activeRT, GLRenderTarget::kDiscard_All);
 		curRT = m_activeRT;
 	}
 		
@@ -175,12 +188,13 @@ Vec2 GLWorldDraw::BindPostFXTargets(bool chain, const r::Material &mat, const Ve
 
 void GLWorldDraw::Copy(
 	const r::GLRenderTarget::Ref &src,
-	const r::GLRenderTarget::Ref &dst
+	const r::GLRenderTarget::Ref &dst,
+	r::GLRenderTarget::DiscardFlags discard
 ) {
 	m_copy_M.material->BindTextures(m_copy_M.loader);
 	src->BindTexture(0);
 	if (dst)
-		dst->BindFramebuffer(GLRenderTarget::kDiscard_All);
+		dst->BindFramebuffer(discard);
 	m_copy_M.material->BindStates();
 
 	m_copy_M.material->shader->Begin(r::Shader::kPass_Default, *m_copy_M.material);
@@ -218,9 +232,8 @@ void GLWorldDraw::Copy(
 }
 
 void GLWorldDraw::BeginFogDepthWrite(r::Material &fog, bool front) {
-
 	if (m_activeRT.get() != m_framebufferRT.get()) {
-		m_framebufferRT->BindFramebuffer(GLRenderTarget::kDiscard_None);
+		Copy(m_fogRT, m_framebufferRT, GLRenderTarget::kDiscard_None);
 		m_activeRT = m_framebufferRT;
 	}
 
@@ -234,11 +247,12 @@ void GLWorldDraw::BeginFogDepthWrite(r::Material &fog, bool front) {
 }
 
 void GLWorldDraw::BeginFogDraw(r::Material &fog) {
+
 	if (m_activeRT.get() != m_fogRT.get()) {
-		m_fogRT->BindFramebuffer(GLRenderTarget::kDiscard_None);
+		Copy(m_framebufferRT, m_fogRT, GLRenderTarget::kDiscard_All);
 		m_activeRT = m_fogRT;
 	}
-			
+	
 	gls.SetMTSource(kMaterialTextureSource_Texture, 0, m_framebufferRT->depthTex);
 	
 	fog.BindStates(
@@ -255,7 +269,11 @@ void GLWorldDraw::BeginFog() {
 }
 
 void GLWorldDraw::EndFog() {
-	RAD_ASSERT(m_activeRT.get() == m_framebufferRT.get());
+	if (m_activeRT.get() != m_framebufferRT.get()) {
+	// last fog volume doesn't need to keep this intact.
+		Copy(m_fogRT, m_framebufferRT, GLRenderTarget::kDiscard_All);
+		m_activeRT = m_framebufferRT;
+	}
 }
 
 void GLWorldDraw::BeginUnifiedShadows() {
@@ -344,7 +362,7 @@ bool GLWorldDraw::BindUnifiedShadowTexture(
 	RAD_ASSERT(m_shadowRT);
 	m_shadowRT->BindTexture(0);
 #if !defined(RAD_OPT_OGLES)
-	GLTexture::GenerateMipmaps(m_shadowRT->tex); // <-- causes FB load (slooow)
+	GLTexture::GenerateMipmaps(m_shadowRT->tex); // <-- causes logical buffer load (slooow)
 #endif
 	m_shadowRT.reset();
 
@@ -371,7 +389,7 @@ void GLWorldDraw::BindFramebuffer(bool discardHint, bool copy) {
 		ClearBackBuffer(); // discard hint
 
 	if (m_activeRT && copy) {
-		Copy(m_activeRT, GLRenderTarget::Ref());
+		Copy(m_activeRT, GLRenderTarget::Ref(), GLRenderTarget::kDiscard_All);
 		m_activeRT.reset();
 	}
 }

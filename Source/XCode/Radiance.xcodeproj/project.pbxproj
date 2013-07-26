@@ -369,6 +369,11 @@
 		33138677177A5A9E00424DB4 /* UIScrollBar.h in Headers */ = {isa = PBXBuildFile; fileRef = 3313866F177A5A9E00424DB4 /* UIScrollBar.h */; };
 		33138678177A5A9E00424DB4 /* UIScrollBar.h in Headers */ = {isa = PBXBuildFile; fileRef = 3313866F177A5A9E00424DB4 /* UIScrollBar.h */; };
 		33138679177A5A9E00424DB4 /* UIScrollBar.h in Headers */ = {isa = PBXBuildFile; fileRef = 3313866F177A5A9E00424DB4 /* UIScrollBar.h */; };
+		331C099617A22795000DEE17 /* Winding.h in Headers */ = {isa = PBXBuildFile; fileRef = 331C099417A22795000DEE17 /* Winding.h */; };
+		331C099717A22795000DEE17 /* Winding.h in Headers */ = {isa = PBXBuildFile; fileRef = 331C099417A22795000DEE17 /* Winding.h */; };
+		331C099817A22795000DEE17 /* Winding.h in Headers */ = {isa = PBXBuildFile; fileRef = 331C099417A22795000DEE17 /* Winding.h */; };
+		331C099917A22795000DEE17 /* Winding.h in Headers */ = {isa = PBXBuildFile; fileRef = 331C099417A22795000DEE17 /* Winding.h */; };
+		331C099A17A22795000DEE17 /* Winding.h in Headers */ = {isa = PBXBuildFile; fileRef = 331C099417A22795000DEE17 /* Winding.h */; };
 		3342B1D016BE5AB300A287E3 /* UIVListWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3342B1CE16BE5AB300A287E3 /* UIVListWidget.cpp */; };
 		3342B1D116BE5AB300A287E3 /* UIVListWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3342B1CE16BE5AB300A287E3 /* UIVListWidget.cpp */; };
 		3342B1D216BE5AB300A287E3 /* UIVListWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3342B1CE16BE5AB300A287E3 /* UIVListWidget.cpp */; };
@@ -462,6 +467,11 @@
 		334389A31724CDA60048052A /* VtMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 3343899B1724CDA60048052A /* VtMesh.h */; };
 		334389A41724CDA60048052A /* VtMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 3343899B1724CDA60048052A /* VtMesh.h */; };
 		334389A51724CDA60048052A /* VtMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 3343899B1724CDA60048052A /* VtMesh.h */; };
+		3347717717A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3347717617A1D3E000D875F0 /* WorldDrawFog.cpp */; };
+		3347717817A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3347717617A1D3E000D875F0 /* WorldDrawFog.cpp */; };
+		3347717917A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3347717617A1D3E000D875F0 /* WorldDrawFog.cpp */; };
+		3347717A17A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3347717617A1D3E000D875F0 /* WorldDrawFog.cpp */; };
+		3347717B17A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3347717617A1D3E000D875F0 /* WorldDrawFog.cpp */; };
 		336836D515D43BA800EE9472 /* GameNetworkNull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 336836D415D43BA800EE9472 /* GameNetworkNull.cpp */; };
 		337AE55215BF214F00AD1617 /* Runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8867515B9AD160089BA08 /* Runtime.cpp */; };
 		337AE55315BF214F00AD1617 /* Time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8865A15B9ACFA0089BA08 /* Time.cpp */; };
@@ -726,7 +736,6 @@
 		337AE66615BF214F00AD1617 /* AffineMatrix4X4.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8851C15B9ACBE0089BA08 /* AffineMatrix4X4.h */; };
 		337AE66715BF214F00AD1617 /* AxisAngle.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8851E15B9ACBE0089BA08 /* AxisAngle.h */; };
 		337AE66815BF214F00AD1617 /* AxisAngleDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852015B9ACBE0089BA08 /* AxisAngleDef.h */; };
-		337AE66915BF214F00AD1617 /* ConvexPolygon.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852115B9ACBE0089BA08 /* ConvexPolygon.h */; };
 		337AE66A15BF214F00AD1617 /* Euler.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852315B9ACBE0089BA08 /* Euler.h */; };
 		337AE66B15BF214F00AD1617 /* EulerDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852515B9ACBE0089BA08 /* EulerDef.h */; };
 		337AE66C15BF214F00AD1617 /* Rect.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8853715B9ACBE0089BA08 /* Rect.h */; };
@@ -1154,7 +1163,6 @@
 		338CDFA815BC95900058DFF5 /* AffineMatrix4X4.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8851C15B9ACBE0089BA08 /* AffineMatrix4X4.h */; };
 		338CDFA915BC95900058DFF5 /* AxisAngle.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8851E15B9ACBE0089BA08 /* AxisAngle.h */; };
 		338CDFAA15BC95900058DFF5 /* AxisAngleDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852015B9ACBE0089BA08 /* AxisAngleDef.h */; };
-		338CDFAB15BC95900058DFF5 /* ConvexPolygon.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852115B9ACBE0089BA08 /* ConvexPolygon.h */; };
 		338CDFAC15BC95900058DFF5 /* Euler.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852315B9ACBE0089BA08 /* Euler.h */; };
 		338CDFAD15BC95900058DFF5 /* EulerDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852515B9ACBE0089BA08 /* EulerDef.h */; };
 		338CDFAE15BC971D0058DFF5 /* Rect.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8853715B9ACBE0089BA08 /* Rect.h */; };
@@ -1752,8 +1760,6 @@
 		33E8854815B9ACBE0089BA08 /* AxisAngle.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8851E15B9ACBE0089BA08 /* AxisAngle.h */; };
 		33E8854915B9ACBE0089BA08 /* AxisAngleDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852015B9ACBE0089BA08 /* AxisAngleDef.h */; };
 		33E8854A15B9ACBE0089BA08 /* AxisAngleDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852015B9ACBE0089BA08 /* AxisAngleDef.h */; };
-		33E8854B15B9ACBE0089BA08 /* ConvexPolygon.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852115B9ACBE0089BA08 /* ConvexPolygon.h */; };
-		33E8854C15B9ACBE0089BA08 /* ConvexPolygon.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852115B9ACBE0089BA08 /* ConvexPolygon.h */; };
 		33E8854D15B9ACBE0089BA08 /* Euler.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852315B9ACBE0089BA08 /* Euler.h */; };
 		33E8854E15B9ACBE0089BA08 /* Euler.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852315B9ACBE0089BA08 /* Euler.h */; };
 		33E8854F15B9ACBE0089BA08 /* EulerDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852515B9ACBE0089BA08 /* EulerDef.h */; };
@@ -2844,7 +2850,6 @@
 		33FA7FD01633CA28002603A5 /* AffineMatrix4X4.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8851C15B9ACBE0089BA08 /* AffineMatrix4X4.h */; };
 		33FA7FD11633CA28002603A5 /* AxisAngle.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8851E15B9ACBE0089BA08 /* AxisAngle.h */; };
 		33FA7FD21633CA28002603A5 /* AxisAngleDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852015B9ACBE0089BA08 /* AxisAngleDef.h */; };
-		33FA7FD31633CA28002603A5 /* ConvexPolygon.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852115B9ACBE0089BA08 /* ConvexPolygon.h */; };
 		33FA7FD41633CA28002603A5 /* Euler.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852315B9ACBE0089BA08 /* Euler.h */; };
 		33FA7FD51633CA28002603A5 /* EulerDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852515B9ACBE0089BA08 /* EulerDef.h */; };
 		33FA7FD61633CA28002603A5 /* GenericMatrixBackend.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8852715B9ACBE0089BA08 /* GenericMatrixBackend.h */; };
@@ -3137,6 +3142,8 @@
 		3319498415B9FB0600458F43 /* AppReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppReleaseiOS.xcconfig; path = XCConfig/AppReleaseiOS.xcconfig; sourceTree = "<group>"; };
 		3319498515B9FB0600458F43 /* AppReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppReleaseOSX.xcconfig; path = XCConfig/AppReleaseOSX.xcconfig; sourceTree = "<group>"; };
 		3319498615B9FC3200458F43 /* AppRoot.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppRoot.xcconfig; path = XCConfig/AppRoot.xcconfig; sourceTree = "<group>"; };
+		331C099417A22795000DEE17 /* Winding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Winding.h; sourceTree = "<group>"; };
+		331C099517A22795000DEE17 /* Winding.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Winding.inl; sourceTree = "<group>"; };
 		3342B1CE16BE5AB300A287E3 /* UIVListWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIVListWidget.cpp; sourceTree = "<group>"; };
 		3342B1CF16BE5AB300A287E3 /* UIVListWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIVListWidget.h; sourceTree = "<group>"; };
 		334315EC16914D8E00AABCEE /* ShaderTool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderTool.cpp; sourceTree = "<group>"; };
@@ -3163,6 +3170,7 @@
 		334389971724CBFD0048052A /* EditorVtModelThumb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorVtModelThumb.h; sourceTree = "<group>"; };
 		3343899A1724CDA60048052A /* VtMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VtMesh.cpp; sourceTree = "<group>"; };
 		3343899B1724CDA60048052A /* VtMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VtMesh.h; sourceTree = "<group>"; };
+		3347717617A1D3E000D875F0 /* WorldDrawFog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldDrawFog.cpp; sourceTree = "<group>"; };
 		336836D415D43BA800EE9472 /* GameNetworkNull.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameNetworkNull.cpp; sourceTree = "<group>"; };
 		337AE54C15BF20D300AD1617 /* RadianceGoldenDebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceGoldenDebugiOS.xcconfig; path = XCConfig/RadianceGoldenDebugiOS.xcconfig; sourceTree = "<group>"; };
 		337AE54D15BF20D300AD1617 /* RadianceGoldenDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceGoldenDebugOSX.xcconfig; path = XCConfig/RadianceGoldenDebugOSX.xcconfig; sourceTree = "<group>"; };
@@ -3510,8 +3518,6 @@
 		33E8851E15B9ACBE0089BA08 /* AxisAngle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AxisAngle.h; sourceTree = "<group>"; };
 		33E8851F15B9ACBE0089BA08 /* AxisAngle.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AxisAngle.inl; sourceTree = "<group>"; };
 		33E8852015B9ACBE0089BA08 /* AxisAngleDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AxisAngleDef.h; sourceTree = "<group>"; };
-		33E8852115B9ACBE0089BA08 /* ConvexPolygon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConvexPolygon.h; sourceTree = "<group>"; };
-		33E8852215B9ACBE0089BA08 /* ConvexPolygon.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ConvexPolygon.inl; sourceTree = "<group>"; };
 		33E8852315B9ACBE0089BA08 /* Euler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Euler.h; sourceTree = "<group>"; };
 		33E8852415B9ACBE0089BA08 /* Euler.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Euler.inl; sourceTree = "<group>"; };
 		33E8852515B9ACBE0089BA08 /* EulerDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EulerDef.h; sourceTree = "<group>"; };
@@ -4574,8 +4580,6 @@
 				33E8851E15B9ACBE0089BA08 /* AxisAngle.h */,
 				33E8851F15B9ACBE0089BA08 /* AxisAngle.inl */,
 				33E8852015B9ACBE0089BA08 /* AxisAngleDef.h */,
-				33E8852115B9ACBE0089BA08 /* ConvexPolygon.h */,
-				33E8852215B9ACBE0089BA08 /* ConvexPolygon.inl */,
 				33E8852315B9ACBE0089BA08 /* Euler.h */,
 				33E8852415B9ACBE0089BA08 /* Euler.inl */,
 				33E8852515B9ACBE0089BA08 /* EulerDef.h */,
@@ -4604,6 +4608,8 @@
 				33E8853E15B9ACBE0089BA08 /* Vector.h */,
 				33E8853F15B9ACBE0089BA08 /* Vector.inl */,
 				33E8854015B9ACBE0089BA08 /* VectorDef.h */,
+				331C099417A22795000DEE17 /* Winding.h */,
+				331C099517A22795000DEE17 /* Winding.inl */,
 			);
 			name = Math;
 			path = ../Runtime/Math;
@@ -5372,6 +5378,7 @@
 				33E8890E15B9BA4A0089BA08 /* WorldDef.h */,
 				33E8890F15B9BA4A0089BA08 /* WorldDraw.cpp */,
 				33E8891015B9BA4A0089BA08 /* WorldDraw.h */,
+				3347717617A1D3E000D875F0 /* WorldDrawFog.cpp */,
 				33FBD04C173B070B00043A8D /* WorldDrawLight.cpp */,
 				33E8891215B9BA4A0089BA08 /* WorldLua.cpp */,
 				33E8891315B9BA4A0089BA08 /* WorldLua.h */,
@@ -5623,7 +5630,6 @@
 				338CDFA815BC95900058DFF5 /* AffineMatrix4X4.h in Headers */,
 				338CDFA915BC95900058DFF5 /* AxisAngle.h in Headers */,
 				338CDFAA15BC95900058DFF5 /* AxisAngleDef.h in Headers */,
-				338CDFAB15BC95900058DFF5 /* ConvexPolygon.h in Headers */,
 				338CDFAC15BC95900058DFF5 /* Euler.h in Headers */,
 				338CDFAD15BC95900058DFF5 /* EulerDef.h in Headers */,
 				338CDFAE15BC971D0058DFF5 /* Rect.h in Headers */,
@@ -5901,6 +5907,7 @@
 				33FBD067173B073E00043A8D /* D_Light.h in Headers */,
 				3313866B177A5A8400424DB4 /* GameDef.h in Headers */,
 				33138677177A5A9E00424DB4 /* UIScrollBar.h in Headers */,
+				331C099817A22795000DEE17 /* Winding.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6030,7 +6037,6 @@
 				337AE66615BF214F00AD1617 /* AffineMatrix4X4.h in Headers */,
 				337AE66715BF214F00AD1617 /* AxisAngle.h in Headers */,
 				337AE66815BF214F00AD1617 /* AxisAngleDef.h in Headers */,
-				337AE66915BF214F00AD1617 /* ConvexPolygon.h in Headers */,
 				337AE66A15BF214F00AD1617 /* Euler.h in Headers */,
 				337AE66B15BF214F00AD1617 /* EulerDef.h in Headers */,
 				337AE66C15BF214F00AD1617 /* Rect.h in Headers */,
@@ -6310,6 +6316,7 @@
 				33FBD068173B073E00043A8D /* D_Light.h in Headers */,
 				3313866C177A5A8400424DB4 /* GameDef.h in Headers */,
 				33138678177A5A9E00424DB4 /* UIScrollBar.h in Headers */,
+				331C099917A22795000DEE17 /* Winding.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6432,7 +6439,6 @@
 				33E8854515B9ACBE0089BA08 /* AffineMatrix4X4.h in Headers */,
 				33E8854715B9ACBE0089BA08 /* AxisAngle.h in Headers */,
 				33E8854915B9ACBE0089BA08 /* AxisAngleDef.h in Headers */,
-				33E8854B15B9ACBE0089BA08 /* ConvexPolygon.h in Headers */,
 				33E8854D15B9ACBE0089BA08 /* Euler.h in Headers */,
 				33E8854F15B9ACBE0089BA08 /* EulerDef.h in Headers */,
 				33E8855115B9ACBE0089BA08 /* GenericMatrixBackend.h in Headers */,
@@ -6810,6 +6816,7 @@
 				33FBD065173B073E00043A8D /* D_Light.h in Headers */,
 				33138669177A5A8400424DB4 /* GameDef.h in Headers */,
 				33138675177A5A9E00424DB4 /* UIScrollBar.h in Headers */,
+				331C099617A22795000DEE17 /* Winding.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6932,7 +6939,6 @@
 				33E8854615B9ACBE0089BA08 /* AffineMatrix4X4.h in Headers */,
 				33E8854815B9ACBE0089BA08 /* AxisAngle.h in Headers */,
 				33E8854A15B9ACBE0089BA08 /* AxisAngleDef.h in Headers */,
-				33E8854C15B9ACBE0089BA08 /* ConvexPolygon.h in Headers */,
 				33E8854E15B9ACBE0089BA08 /* Euler.h in Headers */,
 				33E8855015B9ACBE0089BA08 /* EulerDef.h in Headers */,
 				33E8855215B9ACBE0089BA08 /* GenericMatrixBackend.h in Headers */,
@@ -7217,6 +7223,7 @@
 				33FBD066173B073E00043A8D /* D_Light.h in Headers */,
 				3313866A177A5A8400424DB4 /* GameDef.h in Headers */,
 				33138676177A5A9E00424DB4 /* UIScrollBar.h in Headers */,
+				331C099717A22795000DEE17 /* Winding.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7339,7 +7346,6 @@
 				33FA7FD01633CA28002603A5 /* AffineMatrix4X4.h in Headers */,
 				33FA7FD11633CA28002603A5 /* AxisAngle.h in Headers */,
 				33FA7FD21633CA28002603A5 /* AxisAngleDef.h in Headers */,
-				33FA7FD31633CA28002603A5 /* ConvexPolygon.h in Headers */,
 				33FA7FD41633CA28002603A5 /* Euler.h in Headers */,
 				33FA7FD51633CA28002603A5 /* EulerDef.h in Headers */,
 				33FA7FD61633CA28002603A5 /* GenericMatrixBackend.h in Headers */,
@@ -7626,6 +7632,7 @@
 				33FBD069173B073E00043A8D /* D_Light.h in Headers */,
 				3313866D177A5A8400424DB4 /* GameDef.h in Headers */,
 				33138679177A5A9E00424DB4 /* UIScrollBar.h in Headers */,
+				331C099A17A22795000DEE17 /* Winding.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8008,6 +8015,7 @@
 				33FBD056173B071500043A8D /* Light.cpp in Sources */,
 				33FBD062173B073E00043A8D /* D_Light.cpp in Sources */,
 				33138672177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */,
+				3347717917A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8199,6 +8207,7 @@
 				33FBD057173B071500043A8D /* Light.cpp in Sources */,
 				33FBD063173B073E00043A8D /* D_Light.cpp in Sources */,
 				33138673177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */,
+				3347717A17A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8486,6 +8495,7 @@
 				33FBD054173B071500043A8D /* Light.cpp in Sources */,
 				33FBD060173B073E00043A8D /* D_Light.cpp in Sources */,
 				33138670177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */,
+				3347717717A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8677,6 +8687,7 @@
 				33FBD055173B071500043A8D /* Light.cpp in Sources */,
 				33FBD061173B073E00043A8D /* D_Light.cpp in Sources */,
 				33138671177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */,
+				3347717817A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8869,6 +8880,7 @@
 				33FBD058173B071500043A8D /* Light.cpp in Sources */,
 				33FBD064173B073E00043A8D /* D_Light.cpp in Sources */,
 				33138674177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */,
+				3347717B17A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

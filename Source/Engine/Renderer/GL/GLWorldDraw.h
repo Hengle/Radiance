@@ -171,7 +171,8 @@ private:
 	
 	void Copy(
 		const r::GLRenderTarget::Ref &src,
-		const r::GLRenderTarget::Ref &dst
+		const r::GLRenderTarget::Ref &dst,
+		r::GLRenderTarget::DiscardFlags discard
 	);
 	
 	r::GLRenderTargetMultiCache::Ref m_rtCache;

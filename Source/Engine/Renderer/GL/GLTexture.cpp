@@ -78,7 +78,11 @@ RADENG_API GLenum RADENG_CALL GLInternalFormat(GLenum format, GLenum type) {
 					return GL_ALPHA16;
 #endif
 				case GL_DEPTH_COMPONENT:
+#if defined(RAD_OPT_OGLES)
+					return GL_DEPTH_COMPONENT;
+#else
 					return GL_DEPTH_COMPONENT16_ARB;
+#endif
 			}
 		}	
 		break;
@@ -115,7 +119,11 @@ RADENG_API GLenum RADENG_CALL GLInternalFormat(GLenum format, GLenum type) {
 		case GL_UNSIGNED_INT: {
 			switch (format) {
 			case GL_DEPTH_COMPONENT:
+#if defined(RAD_OPT_OGLES)
+				return GL_DEPTH_COMPONENT;
+#else
 				return GL_DEPTH_COMPONENT32_ARB;
+#endif
 			}
 		} break;
 			
@@ -318,6 +326,51 @@ void GLTexture::GenerateMipmaps(const Ref &tex) {
 		gl.GenerateMipmapEXT(tex->target);
 		CHECK_GL_ERRORS();
 	}
+}
+
+GLTexture::Ref GLTexture::CreateDepthTexture(int width, int height) {
+	#if defined(RAD_OPT_OGLES)
+	const GLenum kDepthFormat = GL_DEPTH_COMPONENT;
+#else
+	const GLenum kDepthFormat = GL_DEPTH_COMPONENT32_ARB;
+#endif
+	const GLenum kDepthComponents = GL_UNSIGNED_INT;
+	
+	GLTexture::Ref depthTex(new (ZRender) GLTexture(
+		GL_TEXTURE_2D,
+		kDepthFormat,
+		width,
+		height,
+		0,
+		width*height*4
+	));
+
+	gls.SetTexture(0, depthTex, true);
+	GLTexture::SetFlags(depthTex, 0, 0, false);
+
+#if defined(RAD_OPT_PC)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+	glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
+#endif
+	
+	RAD_ASSERT(depthTex->target==GL_TEXTURE_2D);
+
+	glTexStorage2DEXT(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT, width, height);
+	
+	glTexImage2D(
+		GL_TEXTURE_2D,
+		0,
+		GL_DEPTH_COMPONENT,
+		width,
+		height,
+		0,
+		kDepthFormat,
+		kDepthComponents,
+		0
+	);
+
+	CHECK_GL_ERRORS();
+	return depthTex;
 }
 
 namespace {

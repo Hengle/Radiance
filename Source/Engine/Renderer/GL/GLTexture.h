@@ -69,6 +69,7 @@ public:
 
 	static void SetFlags(const Ref &tex, int flags, int numMips=0, bool generateMips=true);
 	static void GenerateMipmaps(const Ref &tex);
+	static Ref CreateDepthTexture(int with, int height);
 
 	static Ref UploadImage(const image_codec::Image &img, int flags, int width, int height);
 
