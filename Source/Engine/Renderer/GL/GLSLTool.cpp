@@ -49,13 +49,25 @@ bool GLSLTool::Assemble(
 
 	switch (shader->precisionMode) {
 	case Shader::kPrecision_Low:
-		ss << "#define PRECISION_COLOR_TYPE FIXED4\r\n";
+		ss << "#define PFLOAT FIXED\r\n";
+		ss << "#define PFLOAT2 FIXED2\r\n";
+		ss << "#define PFLOAT3 FIXED3\r\n";
+		ss << "#define PFLOAT4 FIXED4\r\n";
+		ss << "#define PFLOAT4X4 FIXED4X4\r\n";
 		break;
 	case Shader::kPrecision_Medium:
-		ss << "#define PRECISION_COLOR_TYPE HALF4\r\n";
+		ss << "#define PFLOAT HALF\r\n";
+		ss << "#define PFLOAT2 HALF2\r\n";
+		ss << "#define PFLOAT3 HALF3\r\n";
+		ss << "#define PFLOAT4 HALF4\r\n";
+		ss << "#define PFLOAT4X4 HALF4X4\r\n";
 		break;
 	case Shader::kPrecision_High:
-		ss << "#define PRECISION_COLOR_TYPE FLOAT4\r\n";
+		ss << "#define PFLOAT FLOAT\r\n";
+		ss << "#define PFLOAT2 FLOAT2\r\n";
+		ss << "#define PFLOAT3 FLOAT3\r\n";
+		ss << "#define PFLOAT4 FLOAT4\r\n";
+		ss << "#define PFLOAT4X4 FLOAT4X4\r\n";
 		break;
 	}
 
@@ -90,6 +102,9 @@ bool GLSLTool::Assemble(
 
 	if (shader->MaterialSourceUsage(pass, Shader::kMaterialSource_PFXVars) > 0)
 		ss << "#define PFX_VARS\r\n";
+		
+	if (shader->MaterialSourceUsage(pass, Shader::kMaterialSource_EyeVertex) > 0)
+		ss << "#define SHADER_EYE_VERTEX\r\n";
 
 	int numTextures = 0;
 	for (int i = 0; i < r::kMaxTextures; ++i) {

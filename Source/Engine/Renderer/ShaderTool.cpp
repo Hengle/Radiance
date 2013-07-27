@@ -41,10 +41,17 @@ const char *s_types[Shader::kNumBasicTypes] = {
 	"HALF2",
 	"HALF3",
 	"HALF4",
+	"HALF4X4",
 	"FIXED",
 	"FIXED2",
 	"FIXED3",
 	"FIXED4",
+	"FIXED4X4",
+	"PFLOAT",
+	"PFLOAT2",
+	"PFLOAT3",
+	"PFLOAT4",
+	"PFLOAT4X4",
 	"sampler2D",
 	"samplerCUBE"
 };
@@ -392,6 +399,10 @@ int Shader::lua_MInverseProjection(lua_State *L) {
 	return lua_MSource(L, kMaterialSource_InversePRJ);
 }
 
+int Shader::lua_MEyeVertex(lua_State *L) {
+	return lua_MSource(L, kMaterialSource_EyeVertex);
+}
+
 int Shader::lua_MSource(lua_State *L, MaterialSource source) {
 	if (lua_type(L, -1) != LUA_TNUMBER) {
 		luaL_error(L, "Invalid arguments for MSource(int), (Function %s, File %s, Line %d).",
@@ -456,6 +467,7 @@ lua::State::Ref Shader::InitLuaM(Engine &e, Shader *m) {
 		{ "MModelViewProjection", lua_MModelViewProjection },
 		{ "MInverseModelViewProjection", lua_MInverseModelViewProjection },
 		{ "MInverseProjection", lua_MInverseProjection },
+		{ "MEyeVertex", lua_MEyeVertex },
 		{ 0, 0 }
 	};
 
@@ -1739,6 +1751,9 @@ bool Shader::szMaterialInput(
 		return true;
 	case kMaterialSource_InversePRJ:
 		strcpy(sz, "UNIFORM(iprj)");
+		return true;
+	case kMaterialSource_EyeVertex:
+		strcpy(sz, "OUT(eyeVertex)");
 		return true;
 	default:
 		break;

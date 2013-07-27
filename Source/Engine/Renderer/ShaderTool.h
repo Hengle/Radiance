@@ -90,6 +90,7 @@ public:
 		kMaterialSource_MVP,
 		kMaterialSource_InverseMVP,
 		kMaterialSource_InversePRJ,
+		kMaterialSource_EyeVertex,
 		kNumMaterialSources
 	};
 
@@ -103,10 +104,17 @@ public:
 		kBasicType_Half2,
 		kBasicType_Half3,
 		kBasicType_Half4,
+		kBasicType_Half4X4,
 		kBasicType_Fixed,
 		kBasicType_Fixed2,
 		kBasicType_Fixed3,
 		kBasicType_Fixed4,
+		kBasicType_Fixed4X4,
+		kBasicType_PFloat, // precision modfied float (lowp, mediump, highp) depending on shader precision mode
+		kBasicType_PFloat2,
+		kBasicType_PFloat3,
+		kBasicType_PFloat4,
+		kBasicType_PFloat4X4,
 		kBasicType_Sampler2D,
 		kBasicType_SamplerCUBE,
 		kNumBasicTypes
@@ -347,6 +355,7 @@ private:
 	static int lua_MModelViewProjection(lua_State *L);
 	static int lua_MInverseModelViewProjection(lua_State *L);
 	static int lua_MInverseProjection(lua_State *L);
+	static int lua_MEyeVertex(lua_State *L);
 	static int lua_MSource(lua_State *L, MaterialSource source);
 	static int lua_gcNode(lua_State *L);
 	static void ParseConnection(lua_State *L, Node *node, const lua::Variant::Map &map, Connection &c);
