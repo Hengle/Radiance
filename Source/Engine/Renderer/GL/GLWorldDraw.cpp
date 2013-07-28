@@ -592,8 +592,7 @@ void GLWorldDraw::CreateScreenOverlay() {
 	if (vpw != m_overlaySize[0] ||
 		vph != m_overlaySize[1]) {
 		RAD_ASSERT(vpw&&vph);
-		CreateOverlay(vpw, vph, m_overlays[0], false);
-		CreateOverlay(vpw, vph, m_overlays[1], true);
+		CreateOverlay(vpw, vph, m_overlay, false);
 		m_overlaySize[0] = vpw;
 		m_overlaySize[1] = vph;
 	}
@@ -612,12 +611,12 @@ void GLWorldDraw::BindOverlay(const r::Material &mat) {
 	
 	CreateScreenOverlay();
 
-	const r::Mesh::Ref &mesh =/* m_flipMatrix ? m_overlays[1] : */m_overlays[0];
+	const r::Mesh::Ref &mesh = m_overlay;
 	mesh->BindAll(mat.shader.get().get());
 }
 
 void GLWorldDraw::DrawOverlay() {
-	const r::Mesh::Ref &mesh = /*m_flipMatrix ? m_overlays[1] : */m_overlays[0];
+	const r::Mesh::Ref &mesh = m_overlay;
 	mesh->Draw();
 	CHECK_GL_ERRORS();
 }

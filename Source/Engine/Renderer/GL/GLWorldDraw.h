@@ -198,7 +198,7 @@ private:
 
 	asset::MaterialBundle m_copy_M;
 	r::Mesh::Ref m_rectMesh;
-	r::Mesh::Ref m_overlays[2];
+	r::Mesh::Ref m_overlay;
 
 	int m_overlaySize[2];
 	bool m_flipMatrix;
