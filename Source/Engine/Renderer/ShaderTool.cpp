@@ -391,6 +391,10 @@ int Shader::lua_MModelViewProjection(lua_State *L) {
 	return lua_MSource(L, kMaterialSource_MVP);
 }
 
+int Shader::lua_MInverseModelView(lua_State *L) {
+	return lua_MSource(L, kMaterialSource_InverseMV);
+}
+
 int Shader::lua_MInverseModelViewProjection(lua_State *L) {
 	return lua_MSource(L, kMaterialSource_InverseMVP);
 }
@@ -465,6 +469,7 @@ lua::State::Ref Shader::InitLuaM(Engine &e, Shader *m) {
 		{ "MModelView", lua_MModelView },
 		{ "MProjection", lua_MProjection },
 		{ "MModelViewProjection", lua_MModelViewProjection },
+		{ "MInverseModelView", lua_MInverseModelView },
 		{ "MInverseModelViewProjection", lua_MInverseModelViewProjection },
 		{ "MInverseProjection", lua_MInverseProjection },
 		{ "MEyeVertex", lua_MEyeVertex },

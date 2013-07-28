@@ -635,6 +635,7 @@ bool GLSLShader::MapInputs(Pass &p, const Material &material) {
 	p.u.srgba = Vec4(-1.f, -1.f, -1.f, -1.f);
 	p.u.mv = gl.GetUniformLocationARB(p.p->id, "U_mv");
 	p.u.prj = gl.GetUniformLocationARB(p.p->id, "U_prj");
+	p.u.imv = gl.GetUniformLocationARB(p.p->id, "U_imv");
 	p.u.iprj = gl.GetUniformLocationARB(p.p->id, "U_iprj");
 	p.u.imvp = gl.GetUniformLocationARB(p.p->id, "U_imvp");
 	for (int i = 0; i < 16; ++i) {
@@ -971,13 +972,18 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 		}
 
 		// track modelview matrix?
-		if (p.u.mv != -1) {
+		if ((p.u.mv != -1) || (p.u.imv != -1)) {
 			float floats[16];
 			Mat4 *x = reinterpret_cast<Mat4*>(floats);
 			*x = gl.GetModelViewMatrix();
 			if (memcmp(floats, p.u.mvfloats, 16*sizeof(float))) {
 				memcpy(p.u.mvfloats, floats, 16*sizeof(float));
-				gl.UniformMatrix4fvARB(p.u.mv, 1, GL_FALSE, floats);
+				if (p.u.mv != -1)
+					gl.UniformMatrix4fvARB(p.u.mv, 1, GL_FALSE, floats);
+				if (p.u.imv != -1) {
+					x->Invert();
+					gl.UniformMatrix4fvARB(p.u.imv, 1, GL_FALSE, floats);
+				}
 			}
 		}
 	}

@@ -123,9 +123,10 @@ private:
 
 		int matrixOps;
 		int prMatrixOps;
-		GLint mvp;
 		GLint mv;
+		GLint mvp;
 		GLint prj;
+		GLint imv;
 		GLint imvp;
 		GLint iprj;
 		GLint dcolor;

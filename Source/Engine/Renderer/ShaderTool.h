@@ -88,6 +88,7 @@ public:
 		kMaterialSource_MV,
 		kMaterialSource_PRJ,
 		kMaterialSource_MVP,
+		kMaterialSource_InverseMV,
 		kMaterialSource_InverseMVP,
 		kMaterialSource_InversePRJ,
 		kMaterialSource_EyeVertex,
@@ -353,6 +354,7 @@ private:
 	static int lua_MModelView(lua_State *L);
 	static int lua_MProjection(lua_State *L);
 	static int lua_MModelViewProjection(lua_State *L);
+	static int lua_MInverseModelView(lua_State *L);
 	static int lua_MInverseModelViewProjection(lua_State *L);
 	static int lua_MInverseProjection(lua_State *L);
 	static int lua_MEyeVertex(lua_State *L);

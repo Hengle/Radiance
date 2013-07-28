@@ -94,6 +94,9 @@ bool GLSLTool::Assemble(
 	if (shader->MaterialSourceUsage(pass, Shader::kMaterialSource_MVP) > 0)
 		ss << "#define SHADER_MVP\r\n";
 
+	if (shader->MaterialSourceUsage(pass, Shader::kMaterialSource_InverseMV) > 0)
+		ss << "#define SHADER_INVERSE_MV\r\n";
+
 	if (shader->MaterialSourceUsage(pass, Shader::kMaterialSource_InverseMVP) > 0)
 		ss << "#define SHADER_INVERSE_MVP\r\n";
 
