@@ -125,6 +125,7 @@ struct PState {
 	SolidType stype;
 	OccupantType otype;
 	int flags; // physics flags
+	bool visible; // visible on screen (set by renderer)
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -272,6 +272,7 @@ public:
 	int NumActivePostFX() const;
 
 	RAD_DECLARE_READONLY_PROPERTY(WorldDraw, rb, const RB_WorldDraw::Ref&);
+	RAD_DECLARE_READONLY_PROPERTY(WorldDraw, counters, Counters*);
 	RAD_DECLARE_PROPERTY(WorldDraw, uiOnly, bool, bool);
 	
 #if defined(WORLD_DEBUG_DRAW)
@@ -343,6 +344,10 @@ private:
 
 	RAD_DECLARE_SET(uiOnly, bool) {
 		m_uiOnly = value;
+	}
+
+	RAD_DECLARE_GET(counters, Counters*) {
+		return const_cast<Counters*>(&m_counters);
 	}
 	
 	static void DeleteBatch(details::MBatch *batch);

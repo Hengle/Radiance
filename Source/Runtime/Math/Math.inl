@@ -332,32 +332,6 @@ inline F64 Sin<F64>(const F64 &angle) {
 	return sin(angle);
 }
 
-// http://devmaster.net/forums/topic/4648-fast-and-accurate-sinecosine/
-
-template <>
-inline F32 FastSin(const F32 &angle) {
-	static const F32 B = 4.f / Constants<F32>::PI();
-	static const F32 C = -4.f / (Constants<F32>::PI_SQUARED());
-	static const F32 P = 0.225f;
-	RAD_ASSERT(angle >= -Constants<F32>::PI());
-	RAD_ASSERT(angle <= Constants<F32>::PI());
-	F32 y = B * angle + C * angle * Abs(angle);
-	y = P * (y * Abs(y) - y) + y;
-	return y;
-}
-
-template <>
-inline F64 FastSin(const F64 &angle) {
-	static const F64 B = 4.f / Constants<F64>::PI();
-	static const F64 C = -4.f / (Constants<F64>::PI_SQUARED());
-	static const F64 P = 0.225f;
-	RAD_ASSERT(angle >= -Constants<F64>::PI());
-	RAD_ASSERT(angle <= Constants<F64>::PI());
-	F64 y = B * angle + C * angle * Abs(angle);
-	y = P * (y * Abs(y) - y) + y;
-	return y;
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////
 // math::Cos()
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -370,28 +344,6 @@ inline F32 Cos<F32>(const F32 &angle) {
 template <>
 inline F64 Cos<F64>(const F64 &angle) {
 	return cos(angle);
-}
-
-template <>
-inline F32 FastCos<F32>(const F32 &_angle) {
-	RAD_ASSERT(_angle >= -Constants<F32>::PI());
-	RAD_ASSERT(_angle <= Constants<F32>::PI());
-	F32 angle = Constants<F32>::PI_OVER_2() - _angle;
-	if (angle > Constants<F32>::PI()) {
-		angle = angle - Constants<F32>::_2_PI();
-	}
-	return FastSin<F32>(angle);
-}
-
-template <>
-inline F64 FastCos<F64>(const F64 &_angle) {
-	RAD_ASSERT(_angle >= -Constants<F64>::PI());
-	RAD_ASSERT(_angle <= Constants<F64>::PI());
-	F64 angle = Constants<F64>::PI_OVER_2() - _angle;
-	if (angle > Constants<F64>::PI()) {
-		angle = angle - Constants<F64>::_2_PI();
-	}
-	return FastSin<F64>(angle);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

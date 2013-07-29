@@ -20,6 +20,8 @@ public:
 	Vec4 rgba;
 	Vec2 size;
 	float rot;
+	float _padd0[2]; // padd to 48 bytes
+
 private:
 	friend class SpriteBatch;
 
@@ -36,9 +38,17 @@ public:
 	};
 
 	SpriteBatch();
-	SpriteBatch(int minSprites, int maxSprites = 0); // 0 == no-limit/kMaxSprites
+	SpriteBatch(
+		int spriteSize,
+		int minSprites, 
+		int maxSprites = 0
+	); // 0 == no-limit/kMaxSprites
 
-	void Init(int minSprites, int maxSprites = kMaxSprites);
+	void Init(
+		int spriteSize,
+		int minSprites, 
+		int maxSprites = kMaxSprites
+	);
 
 	RAD_DECLARE_READONLY_PROPERTY(SpriteBatch, mesh, Mesh*);
 

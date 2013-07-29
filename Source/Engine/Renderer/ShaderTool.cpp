@@ -1197,7 +1197,9 @@ void Shader::BuildInputMappings(lua_State *L, r::Shader::Pass pass) {
 		mapping
 	);
 
-	if ((pass != r::Shader::kPass_Preview) && (m_skinMode == r::Material::kSkinMode_Sprite)) {
+	if ((pass != r::Shader::kPass_Preview) && 
+		((m_skinMode == r::Material::kSkinMode_Sprite) || 
+		(m_skinMode == r::Material::kSkinMode_Billboard))) {
 		// sprite skin needs special vertex-shader args
 		usage.s[kMaterialSource_SpriteSkin].insert(0);
 		BuildAttributeSourceMapping(

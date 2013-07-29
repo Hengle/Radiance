@@ -261,7 +261,7 @@ void* MemoryPool::GetChunk() {
 		AddrSize nStart;
 		AddrSize nEnd;
 
-		Pool* newPool = (Pool*)safe_zone_malloc(*m_zone, totalBytes, 0, kPoolAlignment);
+		Pool* newPool = (Pool*)safe_zone_malloc(*m_zone, totalBytes, 0, m_alignment);
 		newPool->m_memPool = this;
 
 		nStart	= ((AddrSize)newPool) + sizeof(Pool);
@@ -278,7 +278,7 @@ void* MemoryPool::GetChunk() {
 			newPool, 
 			nEnd - ((AddrSize)newPool), 
 			0, 
-			kPoolAlignment
+			m_alignment
 		);
 
 		// adjust free list pointers if address changed
@@ -327,7 +327,11 @@ void* MemoryPool::GetChunk() {
 	//
 	// Return the address of the user data
 	//
-	return UserDataFromPoolNode(node);
+	void * p = UserDataFromPoolNode(node);
+#if !defined(RAD_OPT_SHIP)
+	RAD_VERIFY(IsAligned(p, m_alignment));
+#endif
+	return p;
 }
 
 void MemoryPool::ReturnChunk(void* userData) {

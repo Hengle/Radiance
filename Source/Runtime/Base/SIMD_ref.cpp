@@ -210,6 +210,25 @@ void BlendVerts(
 	}
 }
 
+void MemCopy16(void *dst, const void *src, int len) {
+	RAD_ASSERT(IsAligned(dst, 16));
+	RAD_ASSERT(IsAligned(src, 16));
+	RAD_ASSERT(IsAligned(len, 16));
+	memcpy(dst, src, len);
+}
+
+void MemRep16(void *dst, const void *src, int len, int count) {
+	RAD_ASSERT(IsAligned(dst, 16));
+	RAD_ASSERT(IsAligned(src, 16));
+	RAD_ASSERT(IsAligned(len, 16));
+
+	U8 *bytes = (U8*)dst;
+	while (count-- > 0) {
+		memcpy(bytes, src, len);
+		bytes += len;
+	}
+}
+
 }
 
 const SIMDDriver *SIMD_ref_bind() {
@@ -223,7 +242,9 @@ const SIMDDriver *SIMD_ref_bind() {
 	d.SkinVerts[2] = &SkinVerts3B;
 	d.SkinVerts[3] = &SkinVerts4B;
 	d.BlendVerts = &BlendVerts;
-	
+	d.MemCopy16 = &MemCopy16;
+	d.MemRep16 = &MemRep16;
+
 	string::cpy(d.name, "SIMD_ref");
 	return &d;
 }

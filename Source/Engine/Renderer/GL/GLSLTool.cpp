@@ -74,6 +74,8 @@ bool GLSLTool::Assemble(
 	if (pass != r::Shader::kPass_Preview) {
 		if (material.skinMode == r::Material::kSkinMode_Sprite)
 			ss << "#define SKIN_SPRITE\r\n";
+		if (material.skinMode == r::Material::kSkinMode_Billboard)
+			ss << "#define SKIN_BILLBOARD\r\n";
 	}
 
 	if (shader->MaterialSourceUsage(pass, Shader::kMaterialSource_Color) > 0)

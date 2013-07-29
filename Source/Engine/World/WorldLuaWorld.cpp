@@ -1275,6 +1275,7 @@ int WorldLua::lua_World_DrawUIOnly(lua_State *L) {
 
 int WorldLua::lua_World_CreateSpriteBatch(lua_State *L) {
 	r::SpriteBatch::Ref sprites(new (r::ZRender) r::SpriteBatch(
+		sizeof(r::Sprite),
 		(int)luaL_checkinteger(L, 1),
 		(int)luaL_checkinteger(L, 2)
 	));

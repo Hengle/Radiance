@@ -829,6 +829,7 @@ void WorldDraw::VisMarkArea(
 
 					if (e->m_markFrame != m_markFrame) {
 						e->m_markFrame = m_markFrame;
+						e->m_ps.visible = true;
 						++m_counters.drawnEntities;
 
 #if defined(WORLD_DEBUG_DRAW)

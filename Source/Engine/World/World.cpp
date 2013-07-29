@@ -125,6 +125,11 @@ void World::Tick(float dt) {
 }
 
 void World::Draw() {
+
+	for (Entity::IdMap::const_iterator it = m_ents.begin(); it != m_ents.end(); ++it) {
+		it->second->m_ps.visible = false; // clear for draw.
+	}
+
 	m_draw->Draw(&m_drawCounters);
 
 	if (dt != 0.f) {

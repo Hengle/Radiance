@@ -319,6 +319,8 @@ int MaterialParser::Load(
 		m_m.skinMode = r::Material::kSkinMode_Vertex;
 	else if (*s == "Sprite")
 		m_m.skinMode = r::Material::kSkinMode_Sprite;
+	else if (*s == "Billboard")
+		m_m.skinMode = r::Material::kSkinMode_Billboard;
 	else
 		return pkg::SR_MetaError;
 

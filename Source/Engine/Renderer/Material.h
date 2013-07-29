@@ -36,6 +36,7 @@ public:
 	enum SkinMode {
 		kSkinMode_Vertex,
 		kSkinMode_Sprite,
+		kSkinMode_Billboard,
 		kNumSkinModes
 	};
 

@@ -262,6 +262,7 @@
     <ClInclude Include="..\..\Engine\Renderer\GL\wglext.h" />
     <ClInclude Include="..\..\Engine\Renderer\Material.h" />
     <ClInclude Include="..\..\Engine\Renderer\Mesh.h" />
+    <ClInclude Include="..\..\Engine\Renderer\Particles.h" />
     <ClInclude Include="..\..\Engine\Renderer\Renderer.h" />
     <ClInclude Include="..\..\Engine\Renderer\RendererDef.h" />
     <ClInclude Include="..\..\Engine\Renderer\Shader.h" />
@@ -1498,6 +1499,7 @@
     <ClCompile Include="..\..\Engine\Renderer\GL\RGLBackend.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\Material.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\Mesh.cpp" />
+    <ClCompile Include="..\..\Engine\Renderer\Particles.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\Renderer.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\Shader.cpp" />
     <ClCompile Include="..\..\Engine\Renderer\ShaderTool.cpp">
@@ -2289,6 +2291,7 @@
     <ClCompile Include="..\..\Runtime\Interface\ComponentManager.cpp" />
     <ClCompile Include="..\..\Runtime\Interface\ComponentManagerReflectMap.cpp" />
     <ClCompile Include="..\..\Runtime\Interface\InterfaceReflectMap.cpp" />
+    <ClCompile Include="..\..\Runtime\Math\Math.cpp" />
     <ClCompile Include="..\..\Runtime\Net\HTTP.cpp" />
     <ClCompile Include="..\..\Runtime\Net\Socket.cpp" />
     <ClCompile Include="..\..\Runtime\Reflect\Private\ReflectPrivate.cpp" />
@@ -2318,6 +2321,7 @@
     <None Include="..\..\Engine\Renderer\GL\GLVertexBuffer.inl" />
     <None Include="..\..\Engine\Renderer\Material.inl" />
     <None Include="..\..\Engine\Renderer\Mesh.inl" />
+    <None Include="..\..\Engine\Renderer\Particles.inl" />
     <None Include="..\..\Engine\Renderer\ShaderTool.inl" />
     <None Include="..\..\Engine\Tickable.inl" />
     <None Include="..\..\Engine\Tools\DebugConsoleClient.inl" />

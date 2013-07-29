@@ -7,6 +7,7 @@
 
 #include RADPCH
 #include "Sprites.h"
+#include <Runtime/Base/SIMD.h>
 
 namespace r {
 
@@ -15,8 +16,11 @@ struct SpriteVertex {
 	float pos[3];
 	float rgba[4];
 	float skin[4];
+	float padd0; // 16 bytes
 };
-BOOST_STATIC_ASSERT(sizeof(SpriteVertex) == (sizeof(float)*11));
+BOOST_STATIC_ASSERT(sizeof(SpriteVertex) == (sizeof(float)*12));
+BOOST_STATIC_ASSERT(sizeof(Sprite) >= sizeof(SpriteVertex));
+
 enum {
 	kSkinFrames = 2
 };
@@ -33,13 +37,18 @@ m_vertStream(0) {
 	RAD_DEBUG_ONLY(m_init = false);
 }
 
-SpriteBatch::SpriteBatch(int minSprites, int maxSprites) {
+SpriteBatch::SpriteBatch(
+	int spriteSize,
+	int minSprites, 
+	int maxSprites
+) {
 	RAD_DEBUG_ONLY(m_init = false);
-	Init(minSprites, maxSprites);
+	Init(spriteSize, minSprites, maxSprites);
 }
 
-void SpriteBatch::Init(int minSprites, int maxSprites) {
+void SpriteBatch::Init(int spriteSize, int minSprites, int maxSprites) {
 	RAD_ASSERT(!m_init);
+	RAD_ASSERT(spriteSize >= sizeof(Sprite));
 	RAD_DEBUG_ONLY(m_init = true);
 
 	m_head = 0;
@@ -56,9 +65,9 @@ void SpriteBatch::Init(int minSprites, int maxSprites) {
 	m_p.Create(
 		ZRender,
 		"spritebatch",
-		sizeof(Sprite),
+		spriteSize,
 		(maxSprites > 64) ? 64 : maxSprites,
-		kDefaultAlignment,
+		SIMDDriver::kAlignment,
 		(maxSprites > 0) ? maxSprites : std::numeric_limits<int>::max()
 	);
 }
@@ -106,31 +115,18 @@ void SpriteBatch::Skin() {
 
 	AllocateMesh();
 
+	m_m.SwapChain();
+
 	Mesh::StreamPtr::Ref vb = m_m.Map(m_vertStream);
 	SpriteVertex *v = (SpriteVertex*)vb->ptr.get();
 
-	SpriteVertex z;
-
 	for (Sprite *sprite = m_head; sprite; sprite = sprite->next) {
-		
-		z.pos[0] = sprite->pos[0];
-		z.pos[1] = sprite->pos[1];
-		z.pos[2] = sprite->pos[2];
-		z.rgba[0] = sprite->rgba[0];
-		z.rgba[1] = sprite->rgba[1];
-		z.rgba[2] = sprite->rgba[2];
-		z.rgba[3] = sprite->rgba[3];
-		z.skin[0] = sprite->size[0];
-		z.skin[1] = sprite->size[1];
-		z.skin[2] = sprite->rot;
-
-		float idx = 0.f;
-		for (int i = 0; i < 4; ++i, idx += 1.f) {
-			z.skin[3] = idx;
-			*v = z;
-			++v;
-		}
-		
+		SIMD->MemRep16(v, sprite, sizeof(SpriteVertex), 4);
+		v[0].skin[3] = 0.f;
+		v[1].skin[3] = 1.f;
+		v[2].skin[3] = 2.f;
+		v[3].skin[3] = 3.f;	
+		v += 4;
 	}
 
 	vb.reset();

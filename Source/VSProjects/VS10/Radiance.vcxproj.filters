@@ -1503,6 +1503,9 @@
     <ClInclude Include="..\..\Engine\UI\UIScrollBar.h">
       <Filter>Source\Engine\UI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\Renderer\Particles.h">
+      <Filter>Source\Engine\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2357,6 +2360,12 @@
     <ClCompile Include="..\..\Engine\World\WorldDrawFog.cpp">
       <Filter>Source\Engine\World</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\Renderer\Particles.cpp">
+      <Filter>Source\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Runtime\Math\Math.cpp">
+      <Filter>Source\Runtime\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Runtime\Base\Event.inl">
@@ -2610,6 +2619,9 @@
     </None>
     <None Include="..\..\Engine\Tools\DebugConsoleClient.inl">
       <Filter>Source\Engine\Tools</Filter>
+    </None>
+    <None Include="..\..\Engine\Renderer\Particles.inl">
+      <Filter>Source\Engine\Renderer</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

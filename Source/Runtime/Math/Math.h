@@ -93,11 +93,8 @@ T Cos(const T &angle);
 
 // Fast versions have an input range of -PI / PI
 
-template <typename T>
-T FastSin(const T &angle);
-
-template <typename T>
-T FastCos(const T &angle);
+float FastSin(const float &angle);
+float FastCos(const float &angle);
 
 template <typename T>
 T Tan(const T &angle);
@@ -142,6 +139,10 @@ T Lerp(const T &start, const T &finish, const S &t);
 
 template <typename T>
 T Mid(const T &a, const T &b);
+
+// Float Rand
+float FastFloatRand(float min, float max);
+float FastFloatRand(); // [0, 1]
 
 // (a>0) ? 1 : (a<0) ? -1 : 0
 

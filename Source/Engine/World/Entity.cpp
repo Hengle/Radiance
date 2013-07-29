@@ -50,7 +50,8 @@ distanceMoved(-1.f),
 mtype(kMoveType_None),
 stype(kSolidType_None),
 otype(kOccupantType_None),
-flags(0) {
+flags(0),
+visible(false) {
 	// avoid null bbox volumes
 	bbox.Initialize(-Vec3(8.f, 8.f, 8.f), Vec3(8.f, 8.f, 8.f));
 	angleSpring.length = 0.07f;

@@ -50,6 +50,27 @@ struct SIMDDriver {
 	);
 
 	FBlendVerts BlendVerts;
+
+	// accelerated writes for multiples of 16 bytes.
+	// NOTE: src, dst, and len must be 16 byte aligned!
+	typedef void (*FMemCopy16) (
+		void *dst,
+		const void *src,
+		int len
+	);
+
+	FMemCopy16 MemCopy16;
+
+	// Replicates len bytes from src count times into dst
+	// NOTE: src, dst, and len must be 16 byte aligned!
+	typedef void (*FMemRep16) (
+		void *dst,
+		const void *src,
+		int len,
+		int count
+	);
+
+	FMemRep16 MemRep16;
 	
 	char name[16];
 
