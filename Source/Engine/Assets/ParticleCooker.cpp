@@ -73,6 +73,9 @@ int ParticleCooker::Compile(int flags) {
 	os << parser->particleStyle->xdrift[0] << parser->particleStyle->xdrift[1];
 	os << parser->particleStyle->ydrift[0] << parser->particleStyle->ydrift[1];
 	os << parser->particleStyle->zdrift[0] << parser->particleStyle->zdrift[1];
+	os << parser->particleStyle->xdriftPhase[0] << parser->particleStyle->xdriftPhase[1];
+	os << parser->particleStyle->ydriftPhase[0] << parser->particleStyle->ydriftPhase[1];
+	os << parser->particleStyle->zdriftPhase[0] << parser->particleStyle->zdriftPhase[1];
 	os << parser->particleStyle->xdriftTime[0] << parser->particleStyle->xdriftTime[1];
 	os << parser->particleStyle->ydriftTime[0] << parser->particleStyle->ydriftTime[1];
 	os << parser->particleStyle->zdriftTime[0] << parser->particleStyle->zdriftTime[1];

@@ -45,6 +45,7 @@ inline void GLShaderVertexArrayMap::AllocateSwapChains(int num)
 inline void GLShaderVertexArrayMap::Clear()
 {
 	m_vaMap.clear();
+	m_numSwaps = 1;
 }
 
 inline GLVertexArray::Vec *GLShaderVertexArrayMap::Find(int shaderGuid) const

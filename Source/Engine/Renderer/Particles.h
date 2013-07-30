@@ -43,6 +43,10 @@ struct ParticleStyle {
 	float xdrift[2];
 	float ydrift[2];
 	float zdrift[2];
+	// drift phase
+	float xdriftPhase[2];
+	float ydriftPhase[2];
+	float zdriftPhase[2];
 	// drift cycle times
 	float xdriftTime[2];
 	float ydriftTime[2];

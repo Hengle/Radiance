@@ -88,6 +88,12 @@ void ParticleEmitter::UpdateStyle(const ParticleStyle &particleStyle) {
 	if (m_particleStyle.mass[1] <= 0.f)
 		m_particleStyle.mass[1] = 1.f;
 
+	for (int i = 0; i < 2; ++i) {
+		m_particleStyle.xdriftPhase[i] = math::Clamp(m_particleStyle.xdriftPhase[i], 0.f, 1.f);
+		m_particleStyle.ydriftPhase[i] = math::Clamp(m_particleStyle.ydriftPhase[i], 0.f, 1.f);
+		m_particleStyle.zdriftPhase[i] = math::Clamp(m_particleStyle.zdriftPhase[i], 0.f, 1.f);
+	}
+
 	m_velocity = m_particleStyle.vel[0] > 0.f;
 	m_cone = m_velocity && (m_emitterStyle.spread > 0.f);
 }
@@ -147,9 +153,9 @@ ParticleEmitter::Particle *ParticleEmitter::SpawnParticle() {
 
 	p->time = 0.f;
 	p->rotationDriftTime = 0.f;
-	p->driftTime[0] = 0.f;
-	p->driftTime[1] = 0.f;
-	p->driftTime[2] = 0.f;
+	p->driftTime[0] = math::FastFloatRand(m_particleStyle.xdriftPhase[0], m_particleStyle.xdriftPhase[1]);
+	p->driftTime[1] = math::FastFloatRand(m_particleStyle.ydriftPhase[0], m_particleStyle.ydriftPhase[1]);
+	p->driftTime[2] = math::FastFloatRand(m_particleStyle.zdriftPhase[0], m_particleStyle.zdriftPhase[1]);
 	p->scaleTime[0] = 0.f;
 	p->scaleTime[1] = 0.f;
 	p->state = Particle::kFadeIn;

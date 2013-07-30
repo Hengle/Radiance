@@ -100,19 +100,37 @@ int ParticleParser::Load(
 	m_style.zforce[0] = m_style.zforce[1] = 0.f;
 	sscanf(s->c_str, "%f %f", &m_style.zforce[0], &m_style.zforce[1]);
 
-	s = asset->entry->KeyValue<String>("Physics.Drift.X", P_TARGET_FLAGS(flags));
+	s = asset->entry->KeyValue<String>("Physics.Drift.X.Phase", P_TARGET_FLAGS(flags));
+	if (!s)
+		return SR_MetaError;
+	m_style.xdriftPhase[0] = m_style.xdriftPhase[1] = 0.f;
+	sscanf(s->c_str, "%f %f", &m_style.xdriftPhase[0], &m_style.xdriftPhase[1]);
+
+	s = asset->entry->KeyValue<String>("Physics.Drift.Y.Phase", P_TARGET_FLAGS(flags));
+	if (!s)
+		return SR_MetaError;
+	m_style.ydriftPhase[0] = m_style.ydriftPhase[1] = 0.f;
+	sscanf(s->c_str, "%f %f", &m_style.ydriftPhase[0], &m_style.ydriftPhase[1]);
+
+	s = asset->entry->KeyValue<String>("Physics.Drift.Z.Phase", P_TARGET_FLAGS(flags));
+	if (!s)
+		return SR_MetaError;
+	m_style.zdriftPhase[0] = m_style.zdriftPhase[1] = 0.f;
+	sscanf(s->c_str, "%f %f", &m_style.zdriftPhase[0], &m_style.zdriftPhase[1]);
+
+	s = asset->entry->KeyValue<String>("Physics.Drift.X.Range", P_TARGET_FLAGS(flags));
 	if (!s)
 		return SR_MetaError;
 	m_style.xdrift[0] = m_style.xdrift[1] = 0.f;
 	sscanf(s->c_str, "%f %f", &m_style.xdrift[0], &m_style.xdrift[1]);
 
-	s = asset->entry->KeyValue<String>("Physics.Drift.Y", P_TARGET_FLAGS(flags));
+	s = asset->entry->KeyValue<String>("Physics.Drift.Y.Range", P_TARGET_FLAGS(flags));
 	if (!s)
 		return SR_MetaError;
 	m_style.ydrift[0] = m_style.ydrift[1] = 0.f;
 	sscanf(s->c_str, "%f %f", &m_style.ydrift[0], &m_style.ydrift[1]);
 
-	s = asset->entry->KeyValue<String>("Physics.Drift.Z", P_TARGET_FLAGS(flags));
+	s = asset->entry->KeyValue<String>("Physics.Drift.Z.Range", P_TARGET_FLAGS(flags));
 	if (!s)
 		return SR_MetaError;
 	m_style.zdrift[0] = m_style.zdrift[1] = 0.f;
@@ -257,6 +275,9 @@ int ParticleParser::LoadCooked(
 		is >> m_style.xdrift[0] >> m_style.xdrift[1];
 		is >> m_style.ydrift[0] >> m_style.ydrift[1];
 		is >> m_style.zdrift[0] >> m_style.zdrift[1];
+		is >> m_style.xdriftPhase[0] >> m_style.xdriftPhase[1];
+		is >> m_style.ydriftPhase[0] >> m_style.ydriftPhase[1];
+		is >> m_style.zdriftPhase[0] >> m_style.zdriftPhase[1];
 		is >> m_style.xdriftTime[0] >> m_style.xdriftTime[1];
 		is >> m_style.ydriftTime[0] >> m_style.ydriftTime[1];
 		is >> m_style.zdriftTime[0] >> m_style.zdriftTime[1];

@@ -166,6 +166,7 @@ void GLMesh::Release() {
 	m_va = 0;
 	m_shaderGuid = -1;
 	m_swapChain = 0;
+	m_numSwapChains = 1;
 	m_shaderStates.Clear();
 	m_i.vb.reset();
 	m_streams.clear();

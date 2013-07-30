@@ -57,18 +57,29 @@ void SpriteBatch::Init(int spriteSize, int minSprites, int maxSprites) {
 	m_meshSprites = 0;
 	m_vertStream = 0;
 	m_minSprites = minSprites;
-	// cannot generate indices for more than this:
-	m_maxSprites = std::min(maxSprites, (int)kMaxSprites);
-	if (m_maxSprites < 1)
+
+	int spritesInChunk;
+	int maxChunks;
+
+	if (maxSprites < 1) {
+		// if they have no upper limit, chunkify sprites.
+		spritesInChunk = 256;
+		maxChunks = kMaxSprites / spritesInChunk;
 		m_maxSprites = kMaxSprites;
+	} else {
+		// can't do more than kMaxSprites
+		spritesInChunk = std::min(maxSprites, (int)kMaxSprites);
+		maxChunks = 1;
+		m_maxSprites = spritesInChunk;
+	}
 
 	m_p.Create(
 		ZRender,
 		"spritebatch",
 		spriteSize,
-		(maxSprites > 64) ? 64 : maxSprites,
+		spritesInChunk,
 		SIMDDriver::kAlignment,
-		(maxSprites > 0) ? maxSprites : std::numeric_limits<int>::max()
+		maxChunks
 	);
 }
 
