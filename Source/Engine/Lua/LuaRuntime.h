@@ -473,23 +473,23 @@ RADENG_API int RADENG_CALL luaL_typerror (lua_State *L, int narg, const char *tn
 #define LUART_SET(_class, _name, _type, _member, _self) \
 	LUART_SET_CUSTOM(_class, _name, _self, self->_member = lua::Marshal<_type>::Get(L, 2, true))
 
-#define LUART_GETSET_CUSTOM(_class, _name, _self, _push, _get) \
-	LUART_GET_CUSTOM(_class, _name, _self, _push) \
-	LUART_SET_CUSTOM(_class, _name, _self, _get)
+#define LUART_GETSET_CUSTOM(_class, _name, _self, _get, _set) \
+	LUART_GET_CUSTOM(_class, _name, _self, _get) \
+	LUART_SET_CUSTOM(_class, _name, _self, _set)
 
-#define LUART_GET_CUSTOM(_class, _name, _self, _push) \
+#define LUART_GET_CUSTOM(_class, _name, _self, _get) \
 	int _class::LUART_GETFN(_name)(lua_State *L) \
 	{\
 		_self;\
-		_push;\
+		_get;\
 		return 1;\
 	}
 
-#define LUART_SET_CUSTOM(_class, _name, _self, _get) \
+#define LUART_SET_CUSTOM(_class, _name, _self, _set) \
 	int _class::LUART_SETFN(_name)(lua_State *L) \
 	{\
 		_self;\
-		_get;\
+		_set;\
 		return 0;\
 	}
 

@@ -11,7 +11,7 @@
 namespace world {
 
 D_SpriteBatch::Ref D_SpriteBatch::New(const r::SpriteBatch::Ref &sprites) {
-	D_SpriteBatch::Ref r(new D_SpriteBatch(sprites));
+	D_SpriteBatch::Ref r(new (ZWorld) D_SpriteBatch(sprites));
 	return r;
 }
 

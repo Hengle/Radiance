@@ -151,6 +151,8 @@ void WorldDraw::Counters::Clear() {
 	visLights = 0;
 	drawnLights = 0;
 	drawnFogs = 0;
+	drawnParticles = 0;
+	simulatedParticles = 0;
 	numBatches = 0;
 	numTris = 0;
 	numMaterials = 0;
@@ -825,6 +827,7 @@ void WorldDraw::VisMarkArea(
 
 				if (!m_world->cvars->r_frustumcull.value || ClipBounds(view.frustumVolume, view.frustumBounds, m->TransformedBounds())) {
 					m->m_visibleFrame = m_markFrame;
+					m->m_inView = true;
 					++m_counters.drawnEntityModels;
 
 					if (e->m_markFrame != m_markFrame) {
@@ -844,7 +847,7 @@ void WorldDraw::VisMarkArea(
 					for (MBatchDraw::Vec::const_iterator it = m->m_batches.begin(); it != m->m_batches.end(); ++it) {
 						const MBatchDraw::Ref &draw = *it;
 						
-						if (draw->m_markFrame != m_markFrame) {
+						if ((draw->m_markFrame != m_markFrame) && draw->visible) {
 							draw->m_markFrame = m_markFrame;
 							draw->m_visibleFrame = m_markFrame;
 							details::MBatch *batch = AddViewBatch(view, draw->m_matRef, draw->m_matId);

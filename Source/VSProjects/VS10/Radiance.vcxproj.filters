@@ -1515,6 +1515,12 @@
     <ClInclude Include="..\..\Engine\Assets\ParticleMaterialLoader.h">
       <Filter>Source\Engine\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\World\Lua\D_ParticleEmitter.h">
+      <Filter>Source\Engine\World\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\World\Lua\T_ParticleEmitterPrecache.h">
+      <Filter>Source\Engine\World\Lua</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2392,6 +2398,12 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorParticleThumb.cpp">
       <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\Lua\D_ParticleEmitter.cpp">
+      <Filter>Source\Engine\World\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\Lua\T_ParticleEmitterPrecache.cpp">
+      <Filter>Source\Engine\World\Lua</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

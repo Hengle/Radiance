@@ -1245,6 +1245,12 @@ int WorldLua::lua_World_DrawCounters(lua_State *L) {
 	lua_setfield(L, -2, "visLights");
 	lua_pushinteger(L, counters->drawnLights);
 	lua_setfield(L, -2, "drawnLights");
+	lua_pushinteger(L, counters->drawnFogs);
+	lua_setfield(L, -2, "drawnFogs");
+	lua_pushinteger(L, counters->drawnParticles);
+	lua_setfield(L, -2, "drawnParticles");
+	lua_pushinteger(L, counters->simulatedParticles);
+	lua_setfield(L, -2, "simulatedParticles");
 	lua_pushinteger(L, counters->numBatches);
 	lua_setfield(L, -2, "numBatches");
 	lua_pushinteger(L, counters->numTris);

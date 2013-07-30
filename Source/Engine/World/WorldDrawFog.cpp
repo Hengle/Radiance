@@ -89,6 +89,9 @@ void WorldDraw::DrawFogNode(ViewDef &view, int nodeNum) {
 void WorldDraw::DrawFogLeaf(ViewDef &view, int leafNum) {
 	const dBSPLeaf &leaf = m_world->m_leafs[leafNum];
 
+	if ((leaf.numFogs < 1) || (leaf.area < 0) || !view.areas.test(leaf.area))
+		return; // not in a visible area
+
 	if (m_world->cvars->r_frustumcull.value && !ClipBounds(view.frustumVolume, view.frustumBounds, leaf.bounds))
 		return; // node bounds not in view
 

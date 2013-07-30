@@ -962,6 +962,7 @@
     <ClInclude Include="..\..\Engine\World\Lua\D_Light.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_Material.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_Mesh.h" />
+    <ClInclude Include="..\..\Engine\World\Lua\D_ParticleEmitter.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_ScreenOverlay.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_SkModel.h" />
     <ClInclude Include="..\..\Engine\World\Lua\D_Sound.h" />
@@ -974,6 +975,7 @@
     <ClInclude Include="..\..\Engine\World\Lua\T_Fail.h" />
     <ClInclude Include="..\..\Engine\World\Lua\T_MaterialPrecache.h" />
     <ClInclude Include="..\..\Engine\World\Lua\T_MeshPrecache.h" />
+    <ClInclude Include="..\..\Engine\World\Lua\T_ParticleEmitterPrecache.h" />
     <ClInclude Include="..\..\Engine\World\Lua\T_Precache.h" />
     <ClInclude Include="..\..\Engine\World\Lua\T_SkModelPrecache.h" />
     <ClInclude Include="..\..\Engine\World\Lua\T_SoundPrecache.h" />
@@ -2157,6 +2159,7 @@
     <ClCompile Include="..\..\Engine\World\Lua\D_Light.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_Material.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_Mesh.cpp" />
+    <ClCompile Include="..\..\Engine\World\Lua\D_ParticleEmitter.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_ScreenOverlay.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_SkModel.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\D_Sound.cpp" />
@@ -2168,6 +2171,7 @@
     <ClCompile Include="..\..\Engine\World\Lua\T_ConversationTreePrecache.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\T_MaterialPrecache.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\T_MeshPrecache.cpp" />
+    <ClCompile Include="..\..\Engine\World\Lua\T_ParticleEmitterPrecache.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\T_Precache.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\T_SkModelPrecache.cpp" />
     <ClCompile Include="..\..\Engine\World\Lua\T_SoundPrecache.cpp" />

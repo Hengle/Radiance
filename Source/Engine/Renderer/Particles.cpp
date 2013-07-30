@@ -47,8 +47,7 @@ void ParticleEmitter::Init(
 }
 
 void ParticleEmitter::UpdateStyle(const ParticleEmitterStyle &emitterStyle) {
-	RAD_ASSERT(emitterStyle.maxParticles > 0);
-	bool reallocate = m_emitterStyle.maxParticles != emitterStyle.maxParticles;
+	bool reallocate = (emitterStyle.maxParticles > 0) && (m_emitterStyle.maxParticles != emitterStyle.maxParticles);
 
 	m_emitterStyle = emitterStyle;
 	m_emitterStyle.dir.Normalize();

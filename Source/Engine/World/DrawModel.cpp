@@ -26,7 +26,9 @@ m_p(Vec3::Zero),
 m_bounds(Vec3::Zero, Vec3::Zero),
 m_visible(true),
 m_markFrame(-1),
-m_visibleFrame(-1) {
+m_visibleFrame(-1),
+m_inView(false) {
+	m_draw = entity->world->draw;
 	m_rgba[0] = m_rgba[1] = m_rgba[2] = Vec4(1, 1, 1, 1);
 	m_fadeTime[0] = m_fadeTime[1] = 0.f;
 	m_scale[0] = m_scale[1] = m_scale[2] = Vec3(1, 1, 1);
@@ -214,7 +216,7 @@ LUART_GET(DrawModel, RGBA, Vec4, m_rgba[0], SELF);
 #undef SELF
 
 DrawModel::DrawBatch::DrawBatch(DrawModel &model, int matId) : 
-MBatchDraw(*model.entity->world->draw, matId, model.m_entity), m_model(&model) {
+MBatchDraw(*model.entity->world->draw, matId, model.m_entity), m_model(&model), m_draw(model.worldDraw) {
 }
 
 bool DrawModel::DrawBatch::GetTransform(Vec3 &pos, Vec3 &angles) const {
@@ -792,6 +794,104 @@ void SpriteBatchDrawModel::Batch::FlushArrayStates(r::Shader *shader) {
 
 void SpriteBatchDrawModel::Batch::Draw() {
 	m_spriteBatch->Draw();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ParticleEmitterDrawModel::Ref ParticleEmitterDrawModel::New(
+	Entity *entity, 
+	const r::ParticleEmitter::Ref &emitter,
+	const pkg::Asset::Ref &asset,
+	int matId
+) {
+	ParticleEmitterDrawModel::Ref r(new ParticleEmitterDrawModel(entity, emitter, asset, matId));
+
+	WorldDraw *draw = entity->world->draw;
+
+	for (int i = 0; i < emitter->numBatches; ++i) {
+		Batch::Ref b(new (ZWorld) Batch(*r, emitter, matId, i));
+		r->RefBatch(b);
+	}
+
+	return r;
+}
+
+ParticleEmitterDrawModel::ParticleEmitterDrawModel(
+	Entity *entity,
+	const r::ParticleEmitter::Ref &emitter, 
+	const pkg::Asset::Ref &asset,
+	int matId
+) : DrawModel(entity), m_emitter(emitter), m_asset(asset), m_matId(matId) {
+
+}
+
+ParticleEmitterDrawModel::~ParticleEmitterDrawModel() {
+}
+
+void ParticleEmitterDrawModel::OnTick(float time, float dt) {
+	if (inView) { // expensive don't do this if we aren't in view
+		m_emitter->Tick(dt);
+		worldDraw->counters->simulatedParticles += m_emitter->numParticles;
+	}
+}
+
+int ParticleEmitterDrawModel::lua_PushMaterialList(lua_State *L) {
+
+	pkg::Asset::Ref asset = App::Get()->engine->sys->packages->Asset(m_matId, pkg::Z_Engine);
+
+	if (asset) {
+		lua_createtable(L, 1, 0);
+		D_Material::Ref m = D_Material::New(asset);
+		if (m) {
+			lua_pushinteger(L, 1);
+			m->Push(L);
+			lua_settable(L, -3);
+		}
+
+		return 1;
+	}
+	
+	return 0;
+}
+
+ParticleEmitterDrawModel::Batch::Batch(
+	DrawModel &model, 
+	const r::ParticleEmitter::Ref &m, 
+	int matId,
+	int batchIdx
+) : DrawModel::DrawBatch(model, matId), m_emitter(m), m_batchIdx(batchIdx) {
+
+}
+
+void ParticleEmitterDrawModel::Batch::Bind(r::Shader *shader) {
+	m_emitter->Skin();
+	r::SpriteBatch &batch = m_emitter->Batch(m_batchIdx);
+	RAD_ASSERT(batch.numSprites > 0);
+	batch.mesh->BindAll(shader);
+}
+
+void ParticleEmitterDrawModel::Batch::CompileArrayStates(r::Shader &shader) {
+	r::SpriteBatch &batch = m_emitter->Batch(m_batchIdx);
+	RAD_ASSERT(batch.numSprites > 0);
+	batch.mesh->CompileArrayStates(shader);
+}
+
+void ParticleEmitterDrawModel::Batch::FlushArrayStates(r::Shader *shader) {
+	r::SpriteBatch &batch = m_emitter->Batch(m_batchIdx);
+	RAD_ASSERT(batch.numSprites > 0);
+	batch.mesh->FlushArrayStates(shader);
+}
+
+void ParticleEmitterDrawModel::Batch::Draw() {
+	r::SpriteBatch &batch = m_emitter->Batch(m_batchIdx);
+	RAD_ASSERT(batch.numSprites > 0);
+	batch.Draw();
+	worldDraw->counters->drawnParticles += batch.numSprites;
+}
+
+bool ParticleEmitterDrawModel::Batch::RAD_IMPLEMENT_GET(visible) {
+	const r::SpriteBatch &batch = m_emitter->Batch(m_batchIdx);
+	return batch.numSprites > 0;
 }
 
 } // world

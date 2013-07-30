@@ -14,6 +14,7 @@
 #include "T_TypefacePrecache.h"
 #include "T_StringTablePrecache.h"
 #include "T_ConversationTreePrecache.h"
+#include "T_ParticleEmitterPrecache.h"
 #include "D_Asset.h"
 #include "../../Packages/Packages.h"
 #include "../../Engine.h"
@@ -62,6 +63,8 @@ T_Precache::Ref T_Precache::New(
 			return Ref(new (ZWorld) T_StringTablePrecache(world, asset));
 		case asset::AT_ConversationTree:
 			return Ref(new (ZWorld) T_ConversationTreePrecache(world, asset));
+		case asset::AT_Particle:
+			return Ref(new (ZWorld) T_ParticleEmitterPrecache(world, asset));
 		default:
 			break;
 		}

@@ -9,6 +9,7 @@
 #include "../../Types.h"
 #include "../../Lua/LuaRuntime.h"
 #include "../../Renderer/Sprites.h"
+#include <Runtime/PushPack.h>
 
 namespace world {
 
@@ -34,3 +35,5 @@ private:
 };
 
 }
+
+#include <Runtime/PopPack.h>

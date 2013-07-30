@@ -240,6 +240,8 @@ public:
 		int visLights;
 		int drawnLights;
 		int drawnFogs;
+		int drawnParticles;
+		int simulatedParticles;
 		int numBatches;
 		int numTris;
 		int numMaterials;

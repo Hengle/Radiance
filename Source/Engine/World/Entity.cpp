@@ -15,6 +15,7 @@
 #include "Lua/D_Sound.h"
 #include "Lua/D_Mesh.h"
 #include "Lua/D_SpriteBatch.h"
+#include "Lua/D_ParticleEmitter.h"
 #include "Lua/D_Material.h"
 #include "Lua/T_Tick.h"
 #include "../Sound/Sound.h"
@@ -675,6 +676,21 @@ int Entity::lua_AttachDrawModel(lua_State *L) {
 				self,
 				x->spriteBatch,
 				mat->asset->entry->id
+			);
+			self->AttachDrawModel(m);
+			m->Push(L);
+			return 1;
+		}
+	}
+
+	{
+		D_ParticleEmitter::Ref x = lua::SharedPtr::Get<D_ParticleEmitter>(L, "ParticleEmitter", 2, false);
+		if (x) {
+			ParticleEmitterDrawModel::Ref m = ParticleEmitterDrawModel::New(
+				self,
+				x->particleEmitter,
+				x->asset,
+				x->material->id
 			);
 			self->AttachDrawModel(m);
 			m->Push(L);

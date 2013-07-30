@@ -12,6 +12,7 @@
 #include "../Renderer/SkMesh.h"
 #include "../Renderer/VtMesh.h"
 #include "../Renderer/Sprites.h"
+#include "../Renderer/Particles.h"
 #include "../Lua/LuaRuntime.h"
 #include "MBatchDraw.h"
 #include <Runtime/Container/ZoneMap.h>
@@ -42,6 +43,7 @@ public:
 	BBox TransformedBounds() const;
 
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, entity, Entity*);
+	RAD_DECLARE_READONLY_PROPERTY(DrawModel, worldDraw, WorldDraw*);
 	RAD_DECLARE_PROPERTY(DrawModel, pos, const Vec3&, const Vec3&);
 	RAD_DECLARE_PROPERTY(DrawModel, angles, const Vec3&, const Vec3&);
 	RAD_DECLARE_PROPERTY(DrawModel, visible, bool, bool);
@@ -49,7 +51,8 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, scale, const Vec3&);
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, rgba, const Vec4&);
 	RAD_DECLARE_READONLY_PROPERTY(DrawModel, batches, const MBatchDraw::Vec*);
-
+	RAD_DECLARE_READONLY_PROPERTY(DrawModel, inView, bool);
+	
 protected:
 
 	virtual void PushElements(lua_State *L);
@@ -65,23 +68,36 @@ protected:
 			return m_model->TransformedBounds();
 		}
 
+		RAD_DECLARE_READONLY_PROPERTY(DrawBatch, model, DrawModel*);
+		RAD_DECLARE_READONLY_PROPERTY(DrawBatch, worldDraw, WorldDraw*);
+
 	protected:
 		virtual bool GetTransform(Vec3 &pos, Vec3 &angles) const;
 
-		virtual RAD_DECLARE_GET(visible, bool) { return 
-			m_model->visible; 
+		virtual RAD_DECLARE_GET(visible, bool) { 
+			return true; 
 		}
 
-		virtual RAD_DECLARE_GET(rgba, const Vec4&) { return 
-			m_model->rgba; 
+		virtual RAD_DECLARE_GET(rgba, const Vec4&) { 
+			return m_model->rgba; 
 		}
 
-		virtual RAD_DECLARE_GET(scale, const Vec3&) { return 
-			m_model->scale; 
+		virtual RAD_DECLARE_GET(scale, const Vec3&) { 
+			return m_model->scale; 
 		}
 
 	private:
+
+		RAD_DECLARE_GET(model, DrawModel*) {
+			return m_model;
+		}
+
+		RAD_DECLARE_GET(worldDraw, WorldDraw*) {
+			return m_draw;
+		}
+
 		DrawModel *m_model;
+		WorldDraw *m_draw;
 	};
 
 	virtual void OnTick(float time, float dt) {}
@@ -91,6 +107,7 @@ protected:
 private:
 
 	friend class WorldDraw;
+	friend class World;
 
 	RAD_DECLARE_GET(entity, Entity*) { 
 		return m_entity; 
@@ -136,6 +153,14 @@ private:
 		return &m_batches;
 	}
 
+	RAD_DECLARE_GET(inView, bool) {
+		return m_inView;
+	}
+
+	RAD_DECLARE_GET(worldDraw, WorldDraw*) {
+		return m_draw;
+	}
+
 	static int lua_BlendTo(lua_State *L);
 	static int lua_ReplaceMaterial(lua_State *L);
 	static int lua_ReplaceMaterials(lua_State *L);
@@ -154,13 +179,15 @@ private:
 	Vec3 m_scale[3];
 	float m_scaleTime[2];
 	BBox m_bounds;
-	Entity *m_entity;
 	MBatchDraw::Vec m_batches;
 	Vec4 m_rgba[3];
 	float m_fadeTime[2];
+	Entity *m_entity;
+	WorldDraw *m_draw;
 	int m_markFrame;
 	int m_visibleFrame;
 	bool m_visible;
+	bool m_inView; // set by renderer
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -465,6 +492,71 @@ private:
 	}
 
 	r::SpriteBatch::Ref m_spriteBatch;
+	int m_matId;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+class RADENG_CLASS ParticleEmitterDrawModel : public DrawModel {
+public:
+
+	typedef boost::shared_ptr<ParticleEmitterDrawModel> Ref;
+	typedef boost::weak_ptr<ParticleEmitterDrawModel> WRef;
+	
+	static Ref New(
+		Entity *entity, 
+		const r::ParticleEmitter::Ref &emitter,
+		const pkg::Asset::Ref &asset,
+		int matId
+	);
+
+	virtual ~ParticleEmitterDrawModel();
+
+	RAD_DECLARE_READONLY_PROPERTY(ParticleEmitterDrawModel, particleEmitter, r::ParticleEmitter*);
+
+protected:
+
+	ParticleEmitterDrawModel(
+		Entity *entity, 
+		const r::ParticleEmitter::Ref &emitter, 
+		const pkg::Asset::Ref &asset,
+		int matId
+	);
+
+	virtual void OnTick(float time, float dt);
+	virtual int lua_PushMaterialList(lua_State *L);
+
+private:
+
+	class Batch : public DrawModel::DrawBatch {
+	public:
+		typedef boost::shared_ptr<Batch> Ref;
+		Batch(
+			DrawModel &model, 
+			const r::ParticleEmitter::Ref &m, 
+			int matId,
+			int batchIdx
+		);
+
+	protected:
+		virtual void Bind(r::Shader *shader);
+		virtual void CompileArrayStates(r::Shader &shader);
+		virtual void FlushArrayStates(r::Shader *shader);
+		virtual void Draw();
+
+		virtual RAD_DECLARE_GET(visible, bool);
+
+	private:
+		r::ParticleEmitter::Ref m_emitter;
+		int m_batchIdx;
+	};
+
+	RAD_DECLARE_GET(particleEmitter, r::ParticleEmitter*) {
+		return m_emitter.get();
+	}
+
+	r::ParticleEmitter::Ref m_emitter;
+	pkg::Asset::Ref m_asset; // optionally hangs onto particle (which holds material)
 	int m_matId;
 };
 

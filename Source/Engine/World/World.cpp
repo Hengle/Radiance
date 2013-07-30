@@ -127,7 +127,12 @@ void World::Tick(float dt) {
 void World::Draw() {
 
 	for (Entity::IdMap::const_iterator it = m_ents.begin(); it != m_ents.end(); ++it) {
-		it->second->m_ps.visible = false; // clear for draw.
+		const Entity::Ref &e = it->second;
+		e->m_ps.visible = false; // clear for draw.
+		for (DrawModel::Map::const_iterator it = e->models->begin(); it != e->models->end(); ++it) {
+			const DrawModel::Ref &m = it->second;
+			m->m_inView = false; // clear for draw.
+		}
 	}
 
 	m_draw->Draw(&m_drawCounters);
