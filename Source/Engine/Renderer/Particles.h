@@ -20,6 +20,8 @@ struct ParticleStyle {
 	float mass[2];
 	// initial velocity
 	float vel[2];
+	// max velocity
+	float maxvel[2];
 	// gravity constant
 	float cgravity[2];
 	// drag
@@ -141,6 +143,7 @@ private:
 		float mass;
 		float gravity;
 		float drag;
+		float maxvel;
 		float fadein;
 		float fadeout;
 		float lifetime;
@@ -163,6 +166,7 @@ private:
 		unsigned doRotateDrift : 1;
 		unsigned doScaleX : 1;
 		unsigned doScaleY : 1;
+		unsigned doMaxVel : 1;
 
 	private:
 

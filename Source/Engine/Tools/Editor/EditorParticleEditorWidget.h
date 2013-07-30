@@ -58,7 +58,7 @@ private:
 	ParticleEditorWidget();
 	virtual ~ParticleEditorWidget();
 
-	void OnParticleDataChanged(const pkg::Package::Entry::AssetModifiedEventData &data);
+	void OnParticleDataChanged(const pkg::Package::Entry::KeyChangedEventData &data);
 	bool LoadAsset();
 
 	r::ParticleEmitterStyle m_emitterStyle;

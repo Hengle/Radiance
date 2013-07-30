@@ -57,6 +57,7 @@ int ParticleCooker::Compile(int flags) {
 
 	os << parser->particleStyle->mass[0] << parser->particleStyle->mass[1];
 	os << parser->particleStyle->vel[0] << parser->particleStyle->vel[1];
+	os << parser->particleStyle->maxvel[0] << parser->particleStyle->maxvel[1];
 	os << parser->particleStyle->cgravity[0] << parser->particleStyle->cgravity[1];
 	os << parser->particleStyle->cdrag[0] << parser->particleStyle->cdrag[1];
 	os << parser->particleStyle->fadein[0] << parser->particleStyle->fadein[1];

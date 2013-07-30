@@ -160,7 +160,7 @@ bool ParticleEditorWidget::Load() {
 		return false;
 
 	Bind(
-		m_asset->entry->OnAssetModified,
+		m_asset->entry->OnKeyChange,
 		&ParticleEditorWidget::OnParticleDataChanged
 	);
 
@@ -279,6 +279,11 @@ void ParticleEditorWidget::OnRenderGL(GLWidget &src) {
 
 		m_material->shader->End();
 	}
+
+	if (m_numParticles != m_emitter->numParticles) {
+		m_numParticles = m_emitter->numParticles;
+		m_numParticlesLabel->setText(QString("Num Particles: %1").arg(m_numParticles));
+	}
 	
 	gls.Set(kDepthWriteMask_Enable, -1); // for glClear()
 	gls.Commit();
@@ -368,7 +373,7 @@ void ParticleEditorWidget::OnSpawnPressed() {
 		m_emitter->Spawn(spawn);
 }
 
-void ParticleEditorWidget::OnParticleDataChanged(const pkg::Package::Entry::AssetModifiedEventData &data) {
+void ParticleEditorWidget::OnParticleDataChanged(const pkg::Package::Entry::KeyChangedEventData &data) {
 	LoadAsset();
 }
 

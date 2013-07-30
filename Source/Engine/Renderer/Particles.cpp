@@ -160,6 +160,9 @@ ParticleEmitter::Particle *ParticleEmitter::SpawnParticle() {
 	
 	p->doDrag = p->drag != 0.f;
 
+	p->maxvel = math::FastFloatRand(m_particleStyle.maxvel[0], m_particleStyle.maxvel[1]);
+	p->doMaxVel = p->maxvel > 0.f;
+
 	p->fadein = math::FastFloatRand(m_particleStyle.fadein[0], m_particleStyle.fadein[1]);
 	p->fadeout = math::FastFloatRand(m_particleStyle.fadeout[0], m_particleStyle.fadeout[1]);
 	p->lifetime = math::FastFloatRand(m_particleStyle.lifetime[0], m_particleStyle.lifetime[1]);
@@ -173,6 +176,9 @@ ParticleEmitter::Particle *ParticleEmitter::SpawnParticle() {
 
 	p->rotationDriftSpeed = math::FastFloatRand(m_particleStyle.rotationDriftTime[0], m_particleStyle.rotationDriftTime[1]);
 	
+	if (p->rotationDriftSpeed != 0.f)
+		p->rotationDriftSpeed = 1.f/p->rotationDriftSpeed;
+
 	p->doRotate = p->rotationRate != 0.f;
 	p->doRotateDrift = p->rotationDrift != 0.f;
 
@@ -185,11 +191,15 @@ ParticleEmitter::Particle *ParticleEmitter::SpawnParticle() {
 	p->drift[2] = math::FastFloatRand(m_particleStyle.zdrift[0], m_particleStyle.zdrift[1]);
 
 	p->driftSpeed[0] = math::FastFloatRand(m_particleStyle.xdriftTime[0], m_particleStyle.xdriftTime[1]);
-	p->driftSpeed[0] *= math::Constants<float>::_2_PI();
 	p->driftSpeed[1] = math::FastFloatRand(m_particleStyle.ydriftTime[0], m_particleStyle.ydriftTime[1]);
-	p->driftSpeed[1] *= math::Constants<float>::_2_PI();
 	p->driftSpeed[2] = math::FastFloatRand(m_particleStyle.zdriftTime[0], m_particleStyle.zdriftTime[1]);
-	p->driftSpeed[2] *= math::Constants<float>::_2_PI();
+	
+	if (p->driftSpeed[0] != 0.f)
+		p->driftSpeed[0] = 1.f/p->driftSpeed[0];
+	if (p->driftSpeed[1] != 0.f)
+		p->driftSpeed[1] = 1.f/p->driftSpeed[1];
+	if (p->driftSpeed[2] != 0.f)
+		p->driftSpeed[2] = 1.f/p->driftSpeed[2];
 
 	p->drift0 = p->drift[0] != 0.f;
 	p->drift1 = p->drift[1] != 0.f;
@@ -210,6 +220,11 @@ ParticleEmitter::Particle *ParticleEmitter::SpawnParticle() {
 
 	p->doScaleX = (m_particleStyle.sizeScaleX[1] != 0.f) && (p->scaleSpeed[0] > 0.f);
 	p->doScaleY = (m_particleStyle.sizeScaleY[1] != 0.f) && (p->scaleSpeed[1] > 0.f);
+
+	if (p->scaleSpeed[0] != 0.f)
+		p->scaleSpeed[0] = 1.f/p->scaleSpeed[0];
+	if (p->scaleSpeed[1] != 0.f)
+		p->scaleSpeed[1] = 1.f/p->scaleSpeed[1];
 
 	p->size[0] = p->origSize[0] * m_particleStyle.sizeScaleX[0];
 	p->size[1] = p->origSize[1] * m_particleStyle.sizeScaleY[0];
@@ -232,8 +247,8 @@ ParticleEmitter::Particle *ParticleEmitter::SpawnParticle() {
 		p->vel = m_emitterStyle.dir;
 
 		if (m_cone) {
-			Vec3 up = m_up * -m_emitterStyle.spread + math::FastFloatRand()*m_emitterStyle.spread*2.f;
-			Vec3 left = m_left * -m_emitterStyle.spread + math::FastFloatRand()*m_emitterStyle.spread*2.f;
+			Vec3 up = m_up * (-m_emitterStyle.spread + math::FastFloatRand()*m_emitterStyle.spread*2.f);
+			Vec3 left = m_left * (-m_emitterStyle.spread + math::FastFloatRand()*m_emitterStyle.spread*2.f);
 			p->vel += up+left;
 			p->vel.Normalize();
 		}
@@ -342,14 +357,16 @@ bool ParticleEmitter::Particle::Move(float dt, const ParticleStyle &style) {
 		scaleTime[0] += dt*scaleSpeed[0];
 		if (scaleTime[0] >= 1.f)
 			scaleTime[0] -= 1.f;
-		size[0] = origSize[0] * (style.sizeScaleX[0] + scaleTime[0]*style.sizeScaleX[1]);
+		float multiplier = math::FastSin(-math::Constants<float>::PI() + scaleTime[0]*math::Constants<float>::_2_PI());
+		size[0] = origSize[0] * (style.sizeScaleX[0] + math::Abs(multiplier)*style.sizeScaleX[1]);
 	}
 
 	if (doScaleY) {
 		scaleTime[1] += dt*scaleSpeed[1];
 		if (scaleTime[1] >= 1.f)
 			scaleTime[1] -= 1.f;
-		size[1] = origSize[1] * (style.sizeScaleY[0] + scaleTime[1]*style.sizeScaleY[1]);
+		float multiplier = math::FastSin(-math::Constants<float>::PI() + scaleTime[1]*math::Constants<float>::_2_PI());
+		size[1] = origSize[1] * (style.sizeScaleY[0] + math::Abs(multiplier)*style.sizeScaleY[1]);
 	}
 
 	UpdatePos(dt);
@@ -365,6 +382,14 @@ void ParticleEmitter::Particle::UpdatePos(float dt) {
 		force -= vel*drag;
 	
 	vel += (force/mass)*dt;
+
+	if (doMaxVel) {
+		float m = vel.Normalize();
+		if (m > maxvel)
+			m = maxvel;
+		vel = vel*m;
+	}
+
 	orgPos += vel*dt;
 
 	if (drift0||drift1||drift2) {

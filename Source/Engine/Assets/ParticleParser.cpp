@@ -70,6 +70,12 @@ int ParticleParser::Load(
 	m_style.vel[0] = m_style.vel[1] = 0.f;
 	sscanf(s->c_str, "%f %f", &m_style.vel[0], &m_style.vel[1]);
 
+	s = asset->entry->KeyValue<String>("Physics.MaxVelocity", P_TARGET_FLAGS(flags));
+	if (!s)
+		return SR_MetaError;
+	m_style.maxvel[0] = m_style.maxvel[1] = 0.f;
+	sscanf(s->c_str, "%f %f", &m_style.maxvel[0], &m_style.maxvel[1]);
+
 	s = asset->entry->KeyValue<String>("Physics.Gravity", P_TARGET_FLAGS(flags));
 	if (!s)
 		return SR_MetaError;
@@ -130,7 +136,7 @@ int ParticleParser::Load(
 	m_style.zdriftTime[0] = m_style.zdriftTime[1] = 1.f;
 	sscanf(s->c_str, "%f %f", &m_style.zdriftTime[0], &m_style.zdriftTime[1]);
 
-	s = asset->entry->KeyValue<String>("Physics.Rotation", P_TARGET_FLAGS(flags));
+	s = asset->entry->KeyValue<String>("Physics.Rotation.Base", P_TARGET_FLAGS(flags));
 	if (!s)
 		return SR_MetaError;
 	m_style.rotation[0] = m_style.rotation[1] = 0.f;
@@ -142,7 +148,7 @@ int ParticleParser::Load(
 	m_style.rotationRate[0] = m_style.rotationRate[1] = 0.f;
 	sscanf(s->c_str, "%f %f", &m_style.rotationRate[0], &m_style.rotationRate[1]);
 
-	s = asset->entry->KeyValue<String>("Physics.Rotation.Drift", P_TARGET_FLAGS(flags));
+	s = asset->entry->KeyValue<String>("Physics.Rotation.Drift.Range", P_TARGET_FLAGS(flags));
 	if (!s)
 		return SR_MetaError;
 	m_style.rotationDrift[0] = m_style.rotationDrift[1] = 0.f;
@@ -184,25 +190,25 @@ int ParticleParser::Load(
 	m_style.sizeY[0] = m_style.sizeY[1] = 1.f;
 	sscanf(s->c_str, "%f %f", &m_style.sizeY[0], &m_style.sizeY[1]);
 
-	s = asset->entry->KeyValue<String>("Style.Size.X.Scale", P_TARGET_FLAGS(flags));
+	s = asset->entry->KeyValue<String>("Style.Size.XScale.Range", P_TARGET_FLAGS(flags));
 	if (!s)
 		return SR_MetaError;
 	m_style.sizeScaleX[0] = m_style.sizeScaleX[1] = 1.f;
 	sscanf(s->c_str, "%f %f", &m_style.sizeScaleX[0], &m_style.sizeScaleX[1]);
 
-	s = asset->entry->KeyValue<String>("Style.Size.Y.Scale", P_TARGET_FLAGS(flags));
+	s = asset->entry->KeyValue<String>("Style.Size.YScale.Range", P_TARGET_FLAGS(flags));
 	if (!s)
 		return SR_MetaError;
 	m_style.sizeScaleY[0] = m_style.sizeScaleY[1] = 1.f;
 	sscanf(s->c_str, "%f %f", &m_style.sizeScaleY[0], &m_style.sizeScaleY[1]);
 
-	s = asset->entry->KeyValue<String>("Style.Size.X.Scale.Time", P_TARGET_FLAGS(flags));
+	s = asset->entry->KeyValue<String>("Style.Size.XScale.Time", P_TARGET_FLAGS(flags));
 	if (!s)
 		return SR_MetaError;
 	m_style.sizeScaleXTime[0] = m_style.sizeScaleXTime[1] = 1.f;
 	sscanf(s->c_str, "%f %f", &m_style.sizeScaleXTime[0], &m_style.sizeScaleXTime[1]);
 
-	s = asset->entry->KeyValue<String>("Style.Size.Y.Scale.Time", P_TARGET_FLAGS(flags));
+	s = asset->entry->KeyValue<String>("Style.Size.YScale.Time", P_TARGET_FLAGS(flags));
 	if (!s)
 		return SR_MetaError;
 	m_style.sizeScaleYTime[0] = m_style.sizeScaleYTime[1] = 1.f;
@@ -235,6 +241,7 @@ int ParticleParser::LoadCooked(
 	try {
 		is >> m_style.mass[0] >> m_style.mass[1];
 		is >> m_style.vel[0] >> m_style.vel[1];
+		is >> m_style.maxvel[0] >> m_style.maxvel[1];
 		is >> m_style.cgravity[0] >> m_style.cgravity[1];
 		is >> m_style.cdrag[0] >> m_style.cdrag[1];
 		is >> m_style.fadein[0] >> m_style.fadein[1];
