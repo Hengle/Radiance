@@ -289,11 +289,10 @@ ParticleEmitter::Particle *ParticleEmitter::AllocateParticle() {
 			if (!m_particles[1])
 				m_particles[1] = p;
 			m_particles[0] = p;
+			++m_numParticles;
 			break;
 		}
 	}
-
-	++m_numParticles;
 	return p;
 }
 

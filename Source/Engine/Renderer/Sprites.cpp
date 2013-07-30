@@ -59,17 +59,17 @@ void SpriteBatch::Init(int spriteSize, int minSprites, int maxSprites) {
 	m_minSprites = minSprites;
 
 	int spritesInChunk;
-	int maxChunks;
+	int maxBlocks;
 
 	if (maxSprites < 1) {
 		// if they have no upper limit, chunkify sprites.
 		spritesInChunk = 256;
-		maxChunks = kMaxSprites / spritesInChunk;
+		maxBlocks = kMaxSprites / spritesInChunk;
 		m_maxSprites = kMaxSprites;
 	} else {
 		// can't do more than kMaxSprites
 		spritesInChunk = std::min(maxSprites, (int)kMaxSprites);
-		maxChunks = 1;
+		maxBlocks = 1;
 		m_maxSprites = spritesInChunk;
 	}
 
@@ -79,7 +79,7 @@ void SpriteBatch::Init(int spriteSize, int minSprites, int maxSprites) {
 		spriteSize,
 		spritesInChunk,
 		SIMDDriver::kAlignment,
-		maxChunks
+		maxBlocks
 	);
 }
 

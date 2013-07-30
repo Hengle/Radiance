@@ -22,7 +22,8 @@ m_zone(0),
 m_poolList(0), 
 m_freeList(0), 
 m_numUsedChunks(0), 
-m_numAllocatedChunks(0)
+m_numBlocks(0),
+m_maxBlocks(0)
 #if defined(RAD_OPT_MEMPOOL_DEBUG)
 , m_concurrencyCheck(0)
 #endif
@@ -37,13 +38,14 @@ MemoryPool::MemoryPool(
 	AddrSize chunkSize,
 	int numChunksInBlock,
 	int chunkAlignment,
-	int maxChunks
+	int maxBlocks
 ) : 
 m_zone(0), 
 m_poolList(0), 
 m_freeList(0), 
 m_numUsedChunks(0), 
-m_numAllocatedChunks(0)
+m_numBlocks(0),
+m_maxBlocks(0)
 #if defined(RAD_OPT_MEMPOOL_DEBUG)
 , m_concurrencyCheck(0)
 #endif
@@ -56,7 +58,7 @@ m_numAllocatedChunks(0)
 		chunkSize,
 		numChunksInBlock,
 		chunkAlignment,
-		maxChunks
+		maxBlocks
 	);
 }
 
@@ -65,9 +67,11 @@ MemoryPool::~MemoryPool() {
 		RAD_ASSERT(m_inited);
 		Destroy();
 	}
+#if !defined(RAD_OPT_SHIP)
 	RAD_VERIFY(!m_poolList);
 	RAD_VERIFY(m_numUsedChunks == 0);
-	RAD_VERIFY(m_numAllocatedChunks == 0);
+	RAD_VERIFY(m_numBlocks == 0);
+#endif
 }
 
 inline void* MemoryPool::UserDataFromPoolNode(PoolNode *node) {
@@ -84,7 +88,7 @@ void MemoryPool::Create(
 	AddrSize chunkSize, 
 	int numChunksInBlock, 
 	int chunkAlignment, 
-	int maxChunks
+	int maxBlocks
 ) {
 	MP_ASSERT(!m_inited);
 	MP_ASSERT(chunkSize > 0);
@@ -98,10 +102,10 @@ void MemoryPool::Create(
 
 	m_zone                  = &zone;
 	m_numChunksInBlock      = numChunksInBlock;
-	m_maxChunks             = maxChunks;
+	m_maxBlocks             = maxBlocks;
 	m_chunkSize             = chunkSize;
 	m_numUsedChunks         = 0;
-	m_numAllocatedChunks    = 0;
+	m_numBlocks             = 0;
 	m_poolList              = NULL;
 	m_freeList              = NULL;
 	m_constructor           = NULL;
@@ -141,7 +145,7 @@ void MemoryPool::Delete(ChunkCallback callback)
 	}
 
 	m_numUsedChunks = 0;
-	m_numAllocatedChunks = 0;
+	m_numBlocks = 0;
 
 	m_poolList = NULL;
 	m_freeList = NULL;
@@ -188,8 +192,8 @@ void MemoryPool::Compact() {
 		Pool* next = pool->m_next;
 
 		if (pool->m_numNodesInUse == 0) {
-			RAD_ASSERT(m_numAllocatedChunks >= m_numChunksInBlock);
-			m_numAllocatedChunks -= m_numChunksInBlock;
+			RAD_ASSERT(m_numBlocks > 0);
+			--m_numBlocks;
 			RAD_ASSERT((AddrSize)m_numUsedChunks >= pool->m_numNodesInUse);
 			m_numUsedChunks -= pool->m_numNodesInUse;
 
@@ -247,7 +251,7 @@ void* MemoryPool::GetChunk() {
 		// Have we hit our ceiling?
 		//
 
-		if (m_numAllocatedChunks >= m_maxChunks) {
+		if (m_numBlocks >= m_maxBlocks) {
 			MP_ASSERT(--m_concurrencyCheck == 0);
 			return NULL;
 		}
@@ -300,7 +304,7 @@ void* MemoryPool::GetChunk() {
 		newPool->m_next = m_poolList;
 		m_poolList = newPool;
 
-		m_numAllocatedChunks += m_numChunksInBlock;
+		++m_numBlocks;
 	}
 
 	//

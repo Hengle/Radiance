@@ -38,7 +38,7 @@ public:
 		AddrSize chunkSize, 
 		int numChunksInBlock, 
 		int chunkAlignment = kDefaultAlignment, 
-		int maxChunks = std::numeric_limits<int>::max()
+		int maxBlocks = std::numeric_limits<int>::max()
 	);
 
 	//! Calls Destroy() if the memory pool was initialized.
@@ -61,7 +61,7 @@ public:
 		AddrSize chunkSize, 
 		int numChunksInBlock, 
 		int chunkAlignment = kDefaultAlignment, 
-		int maxChunks = std::numeric_limits<int>::max()
+		int maxBlocks = std::numeric_limits<int>::max()
 	);
 
 	//! Destroys the pool, freeing all memory used.
@@ -107,9 +107,9 @@ public:
 #endif
 
 	RAD_DECLARE_READONLY_PROPERTY(MemoryPool, numUsedChunks, int);
-	RAD_DECLARE_READONLY_PROPERTY(MemoryPool, numAllocatedChunks, int);
+	RAD_DECLARE_READONLY_PROPERTY(MemoryPool, numBlocks, int);
 	RAD_DECLARE_READONLY_PROPERTY(MemoryPool, numChunksInBlock, int);
-	RAD_DECLARE_READONLY_PROPERTY(MemoryPool, maxChunks, int);
+	RAD_DECLARE_READONLY_PROPERTY(MemoryPool, maxBlocks, int);
 
 	void SetChunkConstructor(ChunkCallback c);
 	void SetChunkDestructor (ChunkCallback  d);
@@ -199,16 +199,16 @@ private:
 		return m_numUsedChunks;
 	}
 
-	RAD_DECLARE_GET(numAllocatedChunks, int) {
-		return m_numAllocatedChunks;
+	RAD_DECLARE_GET(numBlocks, int) {
+		return m_numBlocks;
 	}
 	
 	RAD_DECLARE_GET(numChunksInBlock, int) {
 		return m_numChunksInBlock;
 	}
 
-	RAD_DECLARE_GET(maxChunks, int) {
-		return m_maxChunks;
+	RAD_DECLARE_GET(maxBlocks, int) {
+		return m_maxBlocks;
 	}
 	
 	AddrSize      m_chunkSize;
@@ -224,9 +224,9 @@ private:
 #endif
 
 	int m_numChunksInBlock;
-	int m_maxChunks;
+	int m_maxBlocks;
 	int m_numUsedChunks;
-	int m_numAllocatedChunks;
+	int m_numBlocks;
 	int m_alignment;
 		 
 	bool m_inited;
@@ -252,7 +252,7 @@ public:
 		AddrSize chunkSize, 
 		int numChunksInBlock, 
 		int chunkAlignment = kDefaultAlignment, 
-		int maxChunks = std::numeric_limits<int>::max()
+		int maxBlocks = std::numeric_limits<int>::max()
 	);
 
 	//! Calls Destroy() if the pool was initialized.
@@ -316,9 +316,9 @@ public:
 	void ReturnChunk(void* pT);
 
 	RAD_DECLARE_READONLY_PROPERTY(ThreadSafeMemoryPool, numUsedChunks, int);
-	RAD_DECLARE_READONLY_PROPERTY(ThreadSafeMemoryPool, numAllocatedChunks, int);
+	RAD_DECLARE_READONLY_PROPERTY(ThreadSafeMemoryPool, numBlocks, int);
 	RAD_DECLARE_READONLY_PROPERTY(ThreadSafeMemoryPool, numChunksInBlock, int);
-	RAD_DECLARE_READONLY_PROPERTY(ThreadSafeMemoryPool, maxChunks, int);
+	RAD_DECLARE_READONLY_PROPERTY(ThreadSafeMemoryPool, maxBlocks, int);
 
 	void SetChunkConstructor(MemoryPool::ChunkCallback c);
 	void SetChunkDestructor (MemoryPool::ChunkCallback  d);
@@ -335,9 +335,9 @@ private:
 		return m_pool.numUsedChunks;
 	}
 
-	RAD_DECLARE_GET(numAllocatedChunks, int) {
+	RAD_DECLARE_GET(numBlocks, int) {
 		Lock L(m_m);
-		return m_pool.numAllocatedChunks;
+		return m_pool.numBlocks;
 	}
 	
 	RAD_DECLARE_GET(numChunksInBlock, int) {
@@ -345,9 +345,9 @@ private:
 		return m_pool.numChunksInBlock;
 	}
 
-	RAD_DECLARE_GET(maxChunks, int) {
+	RAD_DECLARE_GET(maxBlocks, int) {
 		Lock L(m_m);
-		return m_pool.maxChunks;
+		return m_pool.maxBlocks;
 	}
 
 	MemoryPool m_pool;
@@ -361,7 +361,7 @@ template <
 	typename _Zone, 
 	AddrSize ChunkSize, 
 	int _NumChunksInBlock, 
-	int _MaxChunks, 
+	int _MaxBlocks, 
 	int Alignment, 
 	typename Pool
 >

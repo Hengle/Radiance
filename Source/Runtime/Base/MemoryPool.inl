@@ -29,7 +29,7 @@ inline ThreadSafeMemoryPool::ThreadSafeMemoryPool(
 	AddrSize chunkSize, 
 	int numChunksInBlock, 
 	int chunkAlignment, 
-	int maxChunks
+	int maxBlocks
 ) {
 	Create(
 		zone,
@@ -37,7 +37,7 @@ inline ThreadSafeMemoryPool::ThreadSafeMemoryPool(
 		chunkSize,
 		numChunksInBlock,
 		chunkAlignment,
-		maxChunks
+		maxBlocks
 	);
 }
 
@@ -50,7 +50,7 @@ inline void ThreadSafeMemoryPool::Create(
 	AddrSize chunkSize, 
 	int numChunksInBlock, 
 	int chunkAlignment, 
-	int maxChunks
+	int maxBlocks
 ) {
 	m_pool.Create(
 		zone,
@@ -58,7 +58,7 @@ inline void ThreadSafeMemoryPool::Create(
 		chunkSize,
 		numChunksInBlock,
 		chunkAlignment,
-		maxChunks
+		maxBlocks
 	);
 }
 
@@ -119,83 +119,83 @@ inline ThreadSafeMemoryPool* ThreadSafeMemoryPool::PoolFromChunk(void *chunk) {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxChunks, int Alignment, typename Pool>
-inline void SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxChunks, Alignment, Pool>::Destroy(MemoryPool::ChunkCallback usedChunkCallback) {
+template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxBlocks, int Alignment, typename Pool>
+inline void SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxBlocks, Alignment, Pool>::Destroy(MemoryPool::ChunkCallback usedChunkCallback) {
 	GetPool().Destory(usedChunkCallback);
 }
 
-template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxChunks, int Alignment, typename Pool>
-inline void SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxChunks, Alignment, Pool>::Reset(MemoryPool::ChunkCallback usedChunkCallback) {
+template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxBlocks, int Alignment, typename Pool>
+inline void SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxBlocks, Alignment, Pool>::Reset(MemoryPool::ChunkCallback usedChunkCallback) {
 	GetPool().Reset(usedChunkCallback);
 }
 
-template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxChunks, int Alignment, typename Pool>
-inline void SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxChunks, Alignment, Pool>::Compact() {
+template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxBlocks, int Alignment, typename Pool>
+inline void SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxBlocks, Alignment, Pool>::Compact() {
 	GetPool().Compact();
 }
 
-template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxChunks, int Alignment, typename Pool>
-inline void SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxChunks, Alignment, Pool>::Delete(MemoryPool::ChunkCallback usedChunkCallback) {
+template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxBlocks, int Alignment, typename Pool>
+inline void SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxBlocks, Alignment, Pool>::Delete(MemoryPool::ChunkCallback usedChunkCallback) {
 	GetPool().Delete(usedChunkCallback);
 }
 
-template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxChunks, int Alignment, typename Pool>
-inline void SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxChunks, Alignment, Pool>::WalkUsed(MemoryPool::ChunkCallback callback) {
+template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxBlocks, int Alignment, typename Pool>
+inline void SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxBlocks, Alignment, Pool>::WalkUsed(MemoryPool::ChunkCallback callback) {
 	GetPool().WalkUsed(callback);
 }
 
-template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxChunks, int Alignment, typename Pool>
-inline void *SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxChunks, Alignment, Pool>::GetChunk() {
+template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxBlocks, int Alignment, typename Pool>
+inline void *SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxBlocks, Alignment, Pool>::GetChunk() {
 	return GetPool().GetChunk();
 }
 
-template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxChunks, int Alignment, typename Pool>
-inline void *SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxChunks, Alignment, Pool>::SafeGetChunk() {
+template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxBlocks, int Alignment, typename Pool>
+inline void *SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxBlocks, Alignment, Pool>::SafeGetChunk() {
 	return GetPool().SafeGetChunk();
 }
 
-template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxChunks, int Alignment, typename Pool>
-inline void SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxChunks, Alignment, Pool>::ReturnChunk(void* pT) {
+template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxBlocks, int Alignment, typename Pool>
+inline void SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxBlocks, Alignment, Pool>::ReturnChunk(void* pT) {
 	GetPool().ReturnChunk(pT);
 }
 
-template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxChunks, int Alignment, typename Pool>
-inline int SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxChunks, Alignment, Pool>::NumUsedChunks() {
+template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxBlocks, int Alignment, typename Pool>
+inline int SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxBlocks, Alignment, Pool>::NumUsedChunks() {
 	return GetPool().numUsedChunks;
 }
 
-template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxChunks, int Alignment, typename Pool>
-inline int SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxChunks, Alignment, Pool>::NumAllocatedChunks() {
+template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxBlocks, int Alignment, typename Pool>
+inline int SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxBlocks, Alignment, Pool>::NumAllocatedChunks() {
 	return GetPool().numAllocatedChunks;
 }
 
-template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxChunks, int Alignment, typename Pool>
-inline int SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxChunks, Alignment, Pool>::NumChunksInBlock() {
+template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxBlocks, int Alignment, typename Pool>
+inline int SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxBlocks, Alignment, Pool>::NumChunksInBlock() {
 	return GetPool().numChunksInBlock;
 }
 
-template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxChunks, int Alignment, typename Pool>
-inline int SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxChunks, Alignment, Pool>::MaxChunks() {
+template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxBlocks, int Alignment, typename Pool>
+inline int SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxBlocks, Alignment, Pool>::MaxChunks() {
 	return GetPool().maxChunks;
 }
 
-template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxChunks, int Alignment, typename Pool>
-inline void SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxChunks, Alignment, Pool>::SetChunkConstructor(MemoryPool::ChunkCallback c) {
+template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxBlocks, int Alignment, typename Pool>
+inline void SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxBlocks, Alignment, Pool>::SetChunkConstructor(MemoryPool::ChunkCallback c) {
 	GetPool().SetChunkConstructor(c);
 }
 
-template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxChunks, int Alignment, typename Pool>
-inline void SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxChunks, Alignment, Pool>::SetChunkDestructor(MemoryPool::ChunkCallback d) {
+template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxBlocks, int Alignment, typename Pool>
+inline void SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxBlocks, Alignment, Pool>::SetChunkDestructor(MemoryPool::ChunkCallback d) {
 	GetPool().SetChunkDestructor(d);
 }
 
-template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxChunks, int Alignment, typename Pool>
-inline  Pool *SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxChunks, Alignment, Pool>::PoolFromChunk(void *p) {
+template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxBlocks, int Alignment, typename Pool>
+inline  Pool *SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxBlocks, Alignment, Pool>::PoolFromChunk(void *p) {
 	return Pool::PoolFromChunk(p);
 }
 
-template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxChunks, int Alignment, typename Pool>
-inline Pool &SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxChunks, Alignment, Pool>::GetPool() {
-	static Pool s_pool(_Zone::Get(), "singleton_memory_pool", ChunkSize, _NumChunksInBlock, Alignment, _MaxChunks);
+template <typename Tag, typename _Zone, AddrSize ChunkSize, int _NumChunksInBlock, int _MaxBlocks, int Alignment, typename Pool>
+inline Pool &SingletonPool<Tag, _Zone, ChunkSize, _NumChunksInBlock, _MaxBlocks, Alignment, Pool>::GetPool() {
+	static Pool s_pool(_Zone::Get(), "singleton_memory_pool", ChunkSize, _NumChunksInBlock, Alignment, _MaxBlocks);
 	return s_pool;
 }
