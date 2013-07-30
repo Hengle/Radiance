@@ -118,9 +118,6 @@ private:
 	ModelEditorWidget();
 	virtual ~ModelEditorWidget();
 
-	void Load(int id);
-	void DoClose();
-
 	Vec3 m_lightDfColor;
 	Vec3 m_lightSpColor;
 	Vec3 m_lightPos;

@@ -5,7 +5,6 @@
 	\ingroup assets
 */
 
-
 #include RADPCH
 #include "FontCooker.h"
 #include "../Engine.h"

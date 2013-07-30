@@ -26,6 +26,8 @@
 #include "TypefaceParser.h"
 #include "StringTableParser.h"
 #include "ConversationTreeParser.h"
+#include "ParticleParser.h"
+#include "ParticleMaterialLoader.h"
 
 #if defined(RAD_OPT_TOOLS)
 #include "MapParser.h"
@@ -80,6 +82,8 @@ RADENG_API void RADENG_CALL RegisterParsers(Engine &engine) {
 	TypefaceParser::Register(engine);
 	StringTableParser::Register(engine);
 	ConversationTreeParser::Register(engine);
+	ParticleParser::Register(engine);
+	ParticleMaterialLoader::Register(engine);
 	RB_RegisterParsers(engine);
 }
 

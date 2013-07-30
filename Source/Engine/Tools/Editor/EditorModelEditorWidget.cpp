@@ -30,10 +30,10 @@
 #include <QtGui/QGridLayout>
 #include <QtGui/QSplitter>
 #include <QtGui/QWidget>
-#include <QtGui/QBoxLayout.h>
-#include <QtGui/QFormLayout.h>
-#include <QtGui/QGroupBox.h>
-#include <QtGui/QCheckBox.h>
+#include <QtGui/QBoxLayout>
+#include <QtGui/QFormLayout>
+#include <QtGui/QGroupBox>
+#include <QtGui/QCheckBox>
 #include <QtGui/QTreeWidget>
 #include <QtGui/QLineEdit>
 #include <QtGui/QMessageBox>
@@ -222,7 +222,7 @@ bool ModelEditorWidget::Load() {
 
 	m_glw->bindGL(true);
 
-	if (m_asset) {
+	{
 		
 		int fastFlags = (MainWindow::Get()->lowQualityPreview) ? pkg::P_FastCook : 0;
 

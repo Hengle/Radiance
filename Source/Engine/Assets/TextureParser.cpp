@@ -903,7 +903,7 @@ int TextureParser::Mipmap(
 		return SR_Success;
 
 	// Compression?
-	int compressionMode = GetCompressionMode(asset, flags);
+	int compressionMode = GetCompressionMode(asset, P_TARGET_FLAGS(flags));
 	if (compressionMode < 0)
 		return compressionMode;
 

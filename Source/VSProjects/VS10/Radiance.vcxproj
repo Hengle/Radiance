@@ -116,6 +116,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\..\Engine\Assets\MusicParser.h" />
+    <ClInclude Include="..\..\Engine\Assets\ParticleCooker.h" />
+    <ClInclude Include="..\..\Engine\Assets\ParticleMaterialLoader.h" />
+    <ClInclude Include="..\..\Engine\Assets\ParticleParser.h" />
     <ClInclude Include="..\..\Engine\Assets\SkAnimSetCooker.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
@@ -599,6 +602,7 @@
     </QtMOC>
     <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorVtModelThumb.h" />
     <QtMOC Include="..\..\Engine\Tools\Editor\EditorColorPicker.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorParticleThumb.h" />
     <ClInclude Include="..\..\Engine\Tools\Editor\EditorEventRegistry.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
@@ -771,6 +775,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
     </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorParticleEditorWidget.h" />
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorParticleEditorWindow.h" />
     <ClInclude Include="..\..\Engine\Tools\Editor\EditorTickState.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
@@ -1328,6 +1334,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\Engine\Assets\MusicParser.cpp" />
+    <ClCompile Include="..\..\Engine\Assets\ParticleCooker.cpp" />
+    <ClCompile Include="..\..\Engine\Assets\ParticleMaterialLoader.cpp" />
+    <ClCompile Include="..\..\Engine\Assets\ParticleParser.cpp" />
     <ClCompile Include="..\..\Engine\Assets\SkAnimSetCooker.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
@@ -1717,6 +1726,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorParticleThumb.cpp" />
     <ClCompile Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorSkModelThumb.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
@@ -1884,6 +1894,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Ship - Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorParticleEditorWidget.cpp" />
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorParticleEditorWindow.cpp" />
     <ClCompile Include="..\..\Engine\Tools\Editor\EditorPathfindingDebugWidget.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Golden - Release|Win32'">true</ExcludedFromBuild>

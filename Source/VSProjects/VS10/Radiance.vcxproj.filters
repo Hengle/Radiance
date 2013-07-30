@@ -1506,6 +1506,15 @@
     <ClInclude Include="..\..\Engine\Renderer\Particles.h">
       <Filter>Source\Engine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\Assets\ParticleCooker.h">
+      <Filter>Source\Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Assets\ParticleParser.h">
+      <Filter>Source\Engine\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Assets\ParticleMaterialLoader.h">
+      <Filter>Source\Engine\Assets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2366,6 +2375,24 @@
     <ClCompile Include="..\..\Runtime\Math\Math.cpp">
       <Filter>Source\Runtime\Math</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorParticleEditorWidget.cpp">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\EditorParticleEditorWindow.cpp">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Assets\ParticleCooker.cpp">
+      <Filter>Source\Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Assets\ParticleParser.cpp">
+      <Filter>Source\Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Assets\ParticleMaterialLoader.cpp">
+      <Filter>Source\Engine\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorParticleThumb.cpp">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Runtime\Base\Event.inl">
@@ -2792,6 +2819,15 @@
     </QtMOC>
     <QtMOC Include="..\..\Engine\Tools\Editor\EditorColorPicker.h">
       <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorParticleEditorWidget.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\EditorParticleEditorWindow.h">
+      <Filter>Source\Engine\Tools\Editor</Filter>
+    </QtMOC>
+    <QtMOC Include="..\..\Engine\Tools\Editor\ContentBrowser\EditorParticleThumb.h">
+      <Filter>Source\Engine\Tools\Editor\ContentBrowser</Filter>
     </QtMOC>
   </ItemGroup>
 </Project>

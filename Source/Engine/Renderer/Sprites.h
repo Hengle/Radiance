@@ -51,6 +51,7 @@ public:
 	);
 
 	RAD_DECLARE_READONLY_PROPERTY(SpriteBatch, mesh, Mesh*);
+	RAD_DECLARE_READONLY_PROPERTY(SpriteBatch, numSprites, int);
 
 	Sprite *AllocateSprite();
 	void FreeSprite(Sprite *sprite);
@@ -63,6 +64,10 @@ private:
 	
 	RAD_DECLARE_GET(mesh, Mesh*) {
 		return &const_cast<SpriteBatch*>(this)->m_m;
+	}
+
+	RAD_DECLARE_GET(numSprites, int) {
+		return m_numSprites;
 	}
 
 	void AllocateMesh();

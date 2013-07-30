@@ -29,7 +29,8 @@ const char *s_typeIcons[asset::AT_Max] =
 	"Editor/font_small.png",
 	"Editor/typeface_small.png",
 	"Editor/stringtable_small.png",
-	"Editor/conversation_tree_small.png"
+	"Editor/conversation_tree_small.png",
+	"Editor/particle_small.png"
 };
 
 } // namespace

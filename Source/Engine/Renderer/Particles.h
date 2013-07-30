@@ -14,6 +14,7 @@
 namespace r {
 
 struct ParticleStyle {
+// NOTE: this structure is serialized, see ParticleParser.cpp
 
 	// particle mass
 	float mass[2];
@@ -44,8 +45,6 @@ struct ParticleStyle {
 	float xdriftTime[2];
 	float ydriftTime[2];
 	float zdriftTime[2];
-	// color
-	float rgba[4];
 	// size
 	float sizeX[2];
 	float sizeY[2];
@@ -53,12 +52,14 @@ struct ParticleStyle {
 	float sizeScaleY[2];
 	float sizeScaleXTime[2];
 	float sizeScaleYTime[2];
+	// color
+	float rgba[4];
 };
 
 struct ParticleEmitterStyle {
 	Vec3 dir;
 	Vec3 pos;
-	float volume[3];
+	Vec3 volume;
 	float spread; // 0 == dir, 1 == 180 from dir (random spread)
 	float pps;
 	int maxParticles;
@@ -82,6 +83,9 @@ public:
 		const ParticleStyle &particleStyle
 	);
 
+	void UpdateStyle(const ParticleEmitterStyle &emitterStyle);
+	void UpdateStyle(const ParticleStyle &particleStyle);
+
 	SpriteBatch &Batch(int idx);
 	void Skin();
 	void Tick(float dt);
@@ -90,8 +94,8 @@ public:
 
 	RAD_DECLARE_READONLY_PROPERTY(ParticleEmitter, numParticles, int);
 	RAD_DECLARE_READONLY_PROPERTY(ParticleEmitter, numBatches, int);
-	RAD_DECLARE_READONLY_PROPERTY(ParticleEmitter, emitterStyle, ParticleEmitterStyle*);
-	RAD_DECLARE_READONLY_PROPERTY(ParticleEmitter, particleStyle, ParticleStyle*);
+	RAD_DECLARE_READONLY_PROPERTY(ParticleEmitter, emitterStyle, const ParticleEmitterStyle*);
+	RAD_DECLARE_READONLY_PROPERTY(ParticleEmitter, particleStyle, const ParticleStyle*);
 
 private:
 
@@ -190,5 +194,5 @@ private:
 
 } // r
 
-#include "Particles.inl"
 #include <Runtime/PopPack.h>
+#include "Particles.inl"

@@ -14,7 +14,8 @@ ParticleEmitter::ParticleEmitter() :
 m_numParticles(0), 
 m_skinFrame(-1), 
 m_tickFrame(-1), 
-m_allocBatch(-1) {
+m_allocBatch(-1),
+m_particlesToEmit(0.f) {
 	RAD_DEBUG_ONLY(m_init = false);
 	m_particles[0] = m_particles[1] = 0;
 }
@@ -33,24 +34,51 @@ void ParticleEmitter::Init(
 ) {
 	RAD_ASSERT(!m_init);
 	RAD_DEBUG_ONLY(m_init = true);
-	RAD_ASSERT(emitterStyle.maxParticles > 0);
-
-	m_skinFrame = -1;
+		m_skinFrame = -1;
 	m_tickFrame = -1;
 	m_allocBatch = -1;
 	m_numParticles = 0;
 	m_particles[0] = m_particles[1] = 0;
-	m_emitterStyle = emitterStyle;
-	m_particleStyle = particleStyle;
 	m_allocBatch = 0;
+	
+	m_emitterStyle.maxParticles = 0;
+	UpdateStyle(emitterStyle);
+	UpdateStyle(particleStyle);
+}
 
+void ParticleEmitter::UpdateStyle(const ParticleEmitterStyle &emitterStyle) {
+	RAD_ASSERT(emitterStyle.maxParticles > 0);
+	bool reallocate = m_emitterStyle.maxParticles != emitterStyle.maxParticles;
+
+	m_emitterStyle = emitterStyle;
 	m_emitterStyle.dir.Normalize();
 	m_emitterStyle.dir.FrameVecs(m_up, m_left);
 
-	m_velocity = particleStyle.vel[0] > 0.f;
-	m_cone = m_velocity && (emitterStyle.spread > 0.f);
-	m_volume = (emitterStyle.volume[0] > 0.f) || 
-		(emitterStyle.volume[1] > 0.f) || (emitterStyle.volume[2] > 0.f);
+	m_volume = (m_emitterStyle.volume[0] > 0.f) || 
+		(m_emitterStyle.volume[1] > 0.f) || (m_emitterStyle.volume[2] > 0.f);
+
+	m_velocity = m_particleStyle.vel[0] > 0.f;
+	m_cone = m_velocity && (m_emitterStyle.spread > 0.f);
+
+	if (reallocate) {
+		m_tickFrame = -1;
+
+		Reset();
+		m_batches.clear();
+
+		int numParticlesToAllocate = emitterStyle.maxParticles;
+		while (numParticlesToAllocate) {
+			int maxSprites = math::Min<int>(numParticlesToAllocate, SpriteBatch::kMaxSprites);
+			SpriteBatch::Ref batch(new (ZRender) SpriteBatch(sizeof(Particle), maxSprites, maxSprites));
+			m_batches.push_back(batch);
+			numParticlesToAllocate -= maxSprites;
+		}
+	}
+}
+
+void ParticleEmitter::UpdateStyle(const ParticleStyle &particleStyle) {
+
+	m_particleStyle = particleStyle;
 
 	m_particleStyle.sizeScaleX[1] -= m_particleStyle.sizeScaleX[0];
 	m_particleStyle.sizeScaleY[1] -= m_particleStyle.sizeScaleY[0];
@@ -60,17 +88,25 @@ void ParticleEmitter::Init(
 	if (m_particleStyle.mass[1] <= 0.f)
 		m_particleStyle.mass[1] = 1.f;
 
-	int numParticlesToAllocate = emitterStyle.maxParticles;
-	while (numParticlesToAllocate) {
-		int maxSprites = math::Min<int>(numParticlesToAllocate, SpriteBatch::kMaxSprites);
-		SpriteBatch::Ref batch(new (ZRender) SpriteBatch(sizeof(Particle), maxSprites, maxSprites));
-		m_batches.push_back(batch);
-		numParticlesToAllocate -= maxSprites;
-	}
+	m_velocity = m_particleStyle.vel[0] > 0.f;
+	m_cone = m_velocity && (m_emitterStyle.spread > 0.f);
 }
 
 void ParticleEmitter::Tick(float dt) {
 	++m_tickFrame;
+
+	m_particlesToEmit += m_emitterStyle.pps * dt;
+	if (m_particlesToEmit >= 1.f) {
+		float numToEmit = FloorFastFloat(m_particlesToEmit);
+		m_particlesToEmit -= numToEmit;
+		int iNumToEmit = FloatToInt(numToEmit);
+
+		while (iNumToEmit-- > 0) {
+			if (!SpawnParticle())
+				break;
+		}
+	}
+
 	for (Particle *p = m_particles[0]; p;) {
 		Particle *n = p->next;
 		if (!p->Move(dt, m_particleStyle)) {
@@ -101,6 +137,7 @@ void ParticleEmitter::Reset() {
 	while (m_particles[0]) {
 		FreeParticle(m_particles[0]);
 	}
+	m_particlesToEmit = 0.f;
 }
 
 ParticleEmitter::Particle *ParticleEmitter::SpawnParticle() {
@@ -235,6 +272,7 @@ ParticleEmitter::Particle *ParticleEmitter::AllocateParticle() {
 		}
 	}
 
+	++m_numParticles;
 	return p;
 }
 
@@ -250,6 +288,7 @@ void ParticleEmitter::FreeParticle(Particle *p) {
 
 	m_allocBatch = p->batch;
 	m_batches[p->batch]->FreeSprite(p);
+	--m_numParticles;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
