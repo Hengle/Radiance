@@ -100,6 +100,9 @@ void World::SetGameSpeed(float speed, float duration) {
 }
 
 void World::Tick(float dt) {
+	// HACK
+	m_draw->counters->simulatedParticles = 0;
+
 	if (m_gameSpeedTime[1] > 0.f) {
 		m_gameSpeedTime[0] += dt;
 		if (m_gameSpeedTime[0] >= m_gameSpeedTime[1]) {
@@ -134,6 +137,11 @@ void World::Draw() {
 			m->m_inView = false; // clear for draw.
 		}
 	}
+
+	// HACK
+	int simulatedParticles = m_draw->counters->simulatedParticles;
+	m_draw->counters->Clear();
+	m_draw->counters->simulatedParticles = simulatedParticles;
 
 	m_draw->Draw(&m_drawCounters);
 

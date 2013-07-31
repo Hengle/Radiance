@@ -49,6 +49,7 @@ void GLWorldDraw::EndFrame() {
 }
 
 void GLWorldDraw::ClearBackBuffer() {
+	gls.StencilMask(0xff); // let us clear stencil
 	gls.Set(kColorWriteMask_RGBA|kDepthWriteMask_Enable|kScissorTest_Disable, -1, true); // for glClear()
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 }
@@ -73,23 +74,6 @@ void GLWorldDraw::BindRenderTarget() {
 	world->game->Viewport(vpx, vpy, vpw, vph);
 
 	if (!m_framebufferRT) {
-		/*
-		m_framebufferRT.reset(new (ZRender) GLRenderTargetCache(
-			vpw,
-			vph,
-			GL_RGBA,
-			GL_UNSIGNED_BYTE,
-			0,
-			GLRenderTargetCache::kDepthInstanceMode_None,
-			0,
-			4,
-			0
-		));
-
-		m_framebufferRT->CreateRenderTargets(2);
-		m_framebufferRT->CreateDepthBufferTexture();
-		*/
-
 		m_framebufferRT.reset(new (ZRender) GLRenderTarget(
 			GL_TEXTURE_2D,
 			GL_RGBA,
@@ -104,10 +88,6 @@ void GLWorldDraw::BindRenderTarget() {
 
 		m_framebufferRT->CreateDepthBufferTexture();
 
-		// fog framebuffer shares primary color attachment.
-		//m_fogRT.reset(new (ZRender) GLRenderTarget(m_framebufferRT->tex));
-		//m_fogRT->AttachDepthBuffer(m_framebufferRT->depthTex);
-		
 		m_fogRT.reset(new (ZRender) GLRenderTarget(
 			GL_TEXTURE_2D,
 			GL_RGBA,
@@ -119,8 +99,6 @@ void GLWorldDraw::BindRenderTarget() {
 			TX_FilterBilinear,
 			false
 		));
-
-		//m_fogRT->CreateDepthBufferTexture();
 	}
 	
 	GLRenderTarget::DiscardFramebuffer(GLRenderTarget::kDiscard_All);

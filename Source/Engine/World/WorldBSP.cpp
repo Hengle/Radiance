@@ -695,25 +695,59 @@ dBSPLeaf *World::LeafForPoint(const Vec3 &pos, int nodeNum) {
 
 void World::BoundWindings(const BBox &bounds, StackWindingStackVec &windings) {
 	
+	windings->resize(6);
+
 	// make bounding windings that face inward
+	const Vec3 &mins = bounds.Mins();
+	const Vec3 &maxs = bounds.Maxs();
 
-	Plane planes[6];
-	int planeNum = 0;
+	boost::array<Vec3, 4> verts;
 
-	for (int i = 0; i < 2; ++i) {
-		for (int k = 0; k < 3; ++k) {
+	// x's
+	verts[0] = Vec3(mins[0], maxs[1], maxs[2]);
+	verts[1] = Vec3(mins[0], mins[1], maxs[2]);
+	verts[2] = Vec3(mins[0], mins[1], mins[2]);
+	verts[3] = Vec3(mins[0], maxs[1], mins[2]);
 
-			Vec3 normal(Vec3::Zero);
-			normal[k] = (i==0) ? 1.f : -1.f;
-			float dist = (i==0) ? (bounds.Mins()[k]) : (-bounds.Maxs()[k]);
+	windings->at(0).Initialize(&verts[0], 4, Plane(Vec3(1.f, 0.f, 0.f), mins[0]));
 
-			planes[planeNum] = Plane(normal, dist);
-			++planeNum;
-		}
-	}
+	verts[0] = Vec3(maxs[0], mins[1], maxs[2]);
+	verts[1] = Vec3(maxs[0], maxs[1], maxs[2]);
+	verts[2] = Vec3(maxs[0], maxs[1], mins[2]);
+	verts[3] = Vec3(maxs[0], mins[1], mins[2]);
 
-	BBox unused;
-	MakeVolume(planes, 6, windings, unused);
+	windings->at(1).Initialize(&verts[0], 4, Plane(Vec3(-1.f, 0.f, 0.f), -maxs[0]));
+
+	// y's
+	verts[0] = Vec3(mins[0], mins[1], maxs[2]);
+	verts[1] = Vec3(maxs[0], mins[1], maxs[2]);
+	verts[2] = Vec3(maxs[0], mins[1], mins[2]);
+	verts[3] = Vec3(mins[0], mins[1], mins[2]);
+
+	windings->at(2).Initialize(&verts[0], 4, Plane(Vec3(0.f, 1.f, 0.f), mins[1]));
+
+	verts[0] = Vec3(maxs[0], maxs[1], maxs[2]);
+	verts[1] = Vec3(mins[0], maxs[1], maxs[2]);
+	verts[2] = Vec3(mins[0], maxs[1], mins[2]);
+	verts[3] = Vec3(maxs[0], maxs[1], mins[2]);
+
+	windings->at(3).Initialize(&verts[0], 4, Plane(Vec3(0.f, -1.f, 0.f), -maxs[1]));
+
+	// z's
+	verts[0] = Vec3(maxs[0], maxs[1], mins[2]);
+	verts[1] = Vec3(mins[0], maxs[1], mins[2]);
+	verts[2] = Vec3(mins[0], mins[1], mins[2]);
+	verts[3] = Vec3(maxs[0], mins[1], mins[2]);
+
+	windings->at(4).Initialize(&verts[0], 4, Plane(Vec3(0.f, 0.f, 1.f), mins[2]));
+
+	verts[0] = Vec3(mins[0], maxs[1], maxs[2]);
+	verts[1] = Vec3(maxs[0], maxs[1], maxs[2]);
+	verts[2] = Vec3(maxs[0], mins[1], maxs[2]);
+	verts[3] = Vec3(mins[0], mins[1], maxs[2]);
+
+	windings->at(5).Initialize(&verts[0], 4, Plane(Vec3(0.f, 0.f, -1.f), -maxs[2]));
+
 }
 
 bool World::ChopWindingToVolume(const StackWindingStackVec &volume, StackWinding &out) {

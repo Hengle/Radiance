@@ -153,8 +153,10 @@ void WorldDraw::DebugDrawAreaportals(int areaNum) {
 }
 
 void WorldDraw::DebugDrawLightScissors() {
+	m_rb->FlipMatrixHack(false);
 	m_rb->SetScreenLocalMatrix();
 	DebugDrawRects(m_dbgVars.wireframe_M, m_dbgVars.lightScissors);
+	m_rb->FlipMatrixHack(true);
 }
 
 void WorldDraw::DebugDrawRects(const asset::MaterialBundle &material, const Vec4Vec &rects) {

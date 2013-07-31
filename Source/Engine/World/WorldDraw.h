@@ -383,10 +383,10 @@ private:
 		const Vec2 &zplanes
 	);
 	
-	bool CalcScissorBounds(
+	bool ExactlyCullBox(
 		const ViewDef &view,
 		const BBox &bounds,
-		Vec4 &rect
+		Vec4 *scissorOut
 	);
 
 	void CalcViewplaneBounds(

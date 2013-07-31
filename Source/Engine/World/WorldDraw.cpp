@@ -330,8 +330,6 @@ void WorldDraw::AddStaticWorldMesh(const r::Mesh::Ref &m, const BBox &bounds, in
 }
 
 void WorldDraw::Draw(Counters *counters) {
-	m_counters.Clear();
-
 	m_postFXRT = false;
 
 	if (!m_uiOnly) {
@@ -542,47 +540,72 @@ void WorldDraw::SetupOrthoFrustumPlanes(
 	view.frustum->push_back(p);
 }
 
-bool WorldDraw::CalcScissorBounds(
+bool WorldDraw::ExactlyCullBox(
 	const ViewDef &view,
 	const BBox &bounds,
-	Vec4 &rect
+	Vec4 *scissorOut
 ) {
-	if (bounds.Contains(view.camera.pos))
+	if (bounds.Contains(view.camera.pos)) {
+		if (scissorOut)
+			*scissorOut = Vec4::Zero; // null scissor
 		return false;
+	}
 
+	Vec4 rect;
 	rect[0] = std::numeric_limits<float>::max();
 	rect[1] = std::numeric_limits<float>::max();
 	rect[2] = std::numeric_limits<float>::min();
 	rect[3] = std::numeric_limits<float>::min();
 
-	for (int x = 0; x < 2; ++x) {
-		float fx = x ? bounds.Maxs()[0] : bounds.Mins()[0];
+	// clip bbox windings to view frustum
+	// project fragments inside onto screen
+	// record bounding screen rect
 
-		for (int y = 0; y < 2; ++y) {
+	StackWinding f;
+	StackWindingStackVec bboxWindings;
+	World::BoundWindings(bounds, bboxWindings);
 
-			float fy = y ? bounds.Maxs()[1] : bounds.Mins()[1];
+	bool inside = false;
 
-			for (int z = 0; z < 2; ++z) {
+	for (StackWindingStackVec::iterator it = bboxWindings->begin(); it != bboxWindings->end(); ++it) {
+		StackWinding &w = *it;
 
-				float fz = z ? bounds.Maxs()[2] : bounds.Mins()[2];
+		for (PlaneStackVec::const_iterator pit = view.frustum->begin(); pit != view.frustum->end(); ++pit) {
+			const Plane &plane = *pit;
 
-				Vec3 p;
-				::Project(
+			w.Chop(plane, Plane::Front, f, 0.01f);
+			w = f;
+			if (w.Empty())
+				break;
+		}
+
+		if (!w.Empty()) {
+			// project and record
+			Vec3 p;
+
+			for (int i = 0; i < w.NumVertices(); ++i) {
+				if (::Project(
 					view.mvp,
-					&view.viewport[0],
-					Vec3(fx, fy, fz),
+					view.viewport,
+					w.Vertices()[i],
 					p
-				);
-
-				// bounds
-				rect[0] = math::Min(rect[0], p[0]);
-				rect[1] = math::Min(rect[1], p[1]);
-				rect[2] = math::Max(rect[2], p[0]);
-				rect[3] = math::Max(rect[3], p[1]);
+				)) {
+					inside = true;
+					// x's
+					rect[0] = math::Min(rect[0], p[0]);
+					rect[2] = math::Max(rect[2], p[0]);
+					
+					// y's
+					rect[1] = math::Min(rect[1], p[1]);
+					rect[3] = math::Max(rect[3], p[1]);
+				}
 			}
 		}
 	}
 
+	if (!inside)
+		return true; // clipped out
+	
 	// clamp
 	rect[0] = math::Clamp(rect[0], (float)view.viewport[0], (float)view.viewport[0]+view.viewport[2]);
 	rect[1] = math::Clamp(rect[1], (float)view.viewport[1], (float)view.viewport[1]+view.viewport[3]);
@@ -591,10 +614,14 @@ bool WorldDraw::CalcScissorBounds(
 
 	if ((rect[0] == (float)view.viewport[0]) && (rect[1] == (float)view.viewport[1]) &&
 		(rect[2] == ((float)view.viewport[0]+view.viewport[2])) && (rect[3] == ((float)view.viewport[1]+view.viewport[3]))) {
-		return false;
+		if (scissorOut)
+			*scissorOut = Vec4::Zero;
+	} else {
+		if (scissorOut)
+			*scissorOut = rect;
 	}
 
-	return true;
+	return false;
 }
 
 void WorldDraw::CalcViewplaneBounds(
@@ -755,29 +782,38 @@ void WorldDraw::VisMarkArea(
 	for (LightPtrSet::const_iterator it = area.lights.begin(); it != area.lights.end(); ++it) {
 		Light &light = **it;
 
-		if (light.m_markFrame != m_markFrame) {
-			light.m_markFrame = m_markFrame;
-			++m_counters.testedLights;
-		}
+		if (light.m_exactlyCulledFrame == m_markFrame)
+			continue;
 
-		if (light.m_visFrame != m_markFrame) {
+		if ((light.m_visFrame != m_markFrame) &&
+			(light.intensity >= 0.01f)) {
 			
 			BBox bounds(light.m_bounds);
 			bounds.Translate(light.m_pos);
 							
 			if (!m_world->cvars->r_frustumcull.value || ClipBounds(view.frustumVolume, view.frustumBounds, bounds)) {
+				
+				if (ExactlyCullBox(view, bounds, &light.m_scissor)) {
+					light.m_exactlyCulledFrame = m_markFrame;
+					continue;
+				}
+
 				++m_counters.visLights;
 				light.m_visFrame = m_markFrame;
 				view.visLights.push_back(&light);
 #if defined(WORLD_DEBUG_DRAW)
 				if (m_world->cvars->r_showlightscissor.value) {
-					Vec4 scissorRect;
-					if (CalcScissorBounds(view, bounds, scissorRect)) {
-						m_dbgVars.lightScissors.push_back(scissorRect);
+					if ((light.m_scissor[2] > 0.f) && (light.m_scissor[3] > 0.f)) {
+						m_dbgVars.lightScissors.push_back(light.m_scissor);
 					}
 				}
 #endif
 			}
+		}
+
+		if (light.m_markFrame != m_markFrame) {
+			light.m_markFrame = m_markFrame;
+			++m_counters.testedLights;
 		}
 	}
 

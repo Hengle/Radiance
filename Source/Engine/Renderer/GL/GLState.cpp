@@ -55,6 +55,7 @@ void GLState::Init(S &s) {
 	
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_SCISSOR_TEST);
+	glDisable(GL_STENCIL_TEST);
 	glDepthFunc(GL_LESS);
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
@@ -72,12 +73,29 @@ void GLState::Init(S &s) {
 			kCullFaceMode_None|
 			kCullFaceMode_CCW|
 			kDepthWriteMask_Enable|
-			kScissorTest_Disable;
+			kScissorTest_Disable|
+			kStencilTest_Disable;
+
 	s.d.b = kBlendMode_Off;
 	s.d.scissor[0] = -1;
 	s.d.scissor[1] = -1;
 	s.d.scissor[2] = -1;
 	s.d.scissor[3] = -1;
+
+	s.d.stencil.mask = 0xff;
+	s.d.stencil.func = GL_ALWAYS;
+	s.d.stencil.funcRef = 0;
+	s.d.stencil.funcMask = 0xff;
+	glStencilFunc(GL_ALWAYS, 0, 0xff);
+
+	s.d.stencil.mask = 0xff;
+	glStencilMask(0xff);
+
+	s.d.stencil.opFail = GL_KEEP;
+	s.d.stencil.opzFail = GL_KEEP;
+	s.d.stencil.opzPass = GL_KEEP;
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
 	s.t = 0;
 	s.s.s = s.d.s;
 	s.bb[0] = s.bb[1] = 0;
@@ -111,6 +129,7 @@ void GLState::Commit(S &s, bool f) {
 	}
 
 	CommitScissor(s, f);
+	CommitStencil(s, f);
 
 	if (s.vao) { 
 		// GL_vertex_array_object active!
@@ -274,6 +293,17 @@ void GLState::CommitSB(S &s, bool f) {
 
 		s.d.s &= ~kScissorTest_Flags;
 		s.d.s |= s.s.s&kScissorTest_Flags;
+	}
+
+	if (ss&kStencilTest_Flags) {
+		if (ss&kStencilTest_Enable) {
+			glEnable(GL_STENCIL_TEST);
+		} else {
+			glDisable(GL_STENCIL_TEST);
+		}
+
+		s.d.s &= ~kStencilTest_Flags;
+		s.d.s |= s.s.s&kStencilTest_Flags;
 	}
 
 	// blends
@@ -467,6 +497,44 @@ void GLState::CommitScissor(S &s, bool f) {
 		s.d.scissor[1] = s.s.scissor[1];
 		s.d.scissor[2] = s.s.scissor[2];
 		s.d.scissor[3] = s.s.scissor[3];
+	}
+}
+
+void GLState::CommitStencil(S &s, bool f) {
+	if (f || (s.s.s&kStencilTest_Enable)) {
+
+		if ((s.s.stencil.func != s.d.stencil.func) ||
+			(s.s.stencil.funcRef != s.d.stencil.funcRef) ||
+			(s.s.stencil.funcMask != s.d.stencil.funcMask)) {
+			s.d.stencil.func = s.s.stencil.func;
+			s.d.stencil.funcRef = s.s.stencil.funcRef;
+			s.d.stencil.funcMask = s.s.stencil.funcMask;
+
+			glStencilFunc(
+				s.s.stencil.func,
+				s.s.stencil.funcRef,
+				s.s.stencil.funcMask
+			);
+		}
+
+		if ((s.s.stencil.opFail != s.d.stencil.opFail) ||
+			(s.s.stencil.opzFail != s.d.stencil.opzFail) ||
+			(s.s.stencil.opzPass != s.d.stencil.opzPass)) {
+			glStencilOp(
+				s.s.stencil.opFail,
+				s.s.stencil.opzFail,
+				s.s.stencil.opzPass
+			);
+			s.d.stencil.opFail = s.s.stencil.opFail;
+			s.d.stencil.opzFail = s.s.stencil.opzFail;
+			s.d.stencil.opzPass = s.s.stencil.opzPass;
+		}
+	}
+
+	// stencil mask effect glClear, must be set if it ever changes
+	if (s.s.stencil.mask != s.d.stencil.mask) {
+		s.d.stencil.mask = s.s.stencil.mask;
+		glStencilMask(s.s.stencil.mask);
 	}
 }
 

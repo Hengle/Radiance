@@ -199,14 +199,13 @@ void WorldDraw::DrawUnshadowedLitBatchLights(
 					draw.Bind(mat.shader.get().get());
 				}
 
-				Vec4 scissorRect;
-				bool scissor = false;
+				/*bool scissor = m_world->cvars->r_lightscissor.value;
 				
 				if (m_world->cvars->r_lightscissor.value) {
 					scissor = CalcScissorBounds(view, lightBounds, scissorRect);
-				}
+				}*/
 
-				m_rb->BindLitMaterialStates(mat, scissor ? &scissorRect : 0);
+				m_rb->BindLitMaterialStates(mat, 0);
 
 				mat.shader->BindStates(u);
 				m_rb->CommitStates();

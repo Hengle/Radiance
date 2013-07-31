@@ -125,7 +125,7 @@ void GLRenderTarget::CreateDepthBufferTexture() {
 
 	gl.FramebufferTexture2DEXT(
 		GL_FRAMEBUFFER_EXT,
-		GL_DEPTH_ATTACHMENT_EXT,
+		GL_DEPTH_STENCIL_ATTACHMENT,
 		GL_TEXTURE_2D,
 		depthTex->id,
 		0
@@ -145,7 +145,7 @@ void GLRenderTarget::AttachDepthBuffer(const GLTexture::Ref &tex) {
 
 	gl.FramebufferTexture2DEXT(
 		GL_FRAMEBUFFER_EXT,
-		GL_DEPTH_ATTACHMENT_EXT,
+		GL_DEPTH_STENCIL_ATTACHMENT,
 		GL_TEXTURE_2D,
 		depthTex->id,
 		0
@@ -189,8 +189,9 @@ void GLRenderTarget::BindFramebuffer(DiscardFlags flags) {
 	}
 
 	if (flags&kDiscard_Depth) {
-		mask |= GL_DEPTH_BUFFER_BIT;
+		mask |= GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT;
 		glsFlags |= kDepthWriteMask_Enable;
+		gls.StencilMask(0xff); // let us clear stencil
 	}
 
 	gls.Viewport(0, 0, tex->width, tex->height);

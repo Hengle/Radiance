@@ -69,6 +69,11 @@ enum {
 	kScissorTest_Disable = 0x4000000,
 	kScissorTest_Flags = kScissorTest_Enable|kScissorTest_Disable,
 
+	// Stencil Test
+	kStencilTest_Enable = 0x8000000,
+	kStencilTest_Disable = 0x10000000,
+	kStencilTest_Flags = kStencilTest_Enable|kStencilTest_Disable,
+
 	// Blend Mode Source
 
 	kBlendModeSource_One = 0x20,
@@ -103,13 +108,12 @@ enum {
 	kBlendMode_Flags = (kBlendModeSource_Flags|kBlendModeDest_Flags)
 };
 
-class GLState
-{
+class GLState {
 public:
 
 	GLState();
 
-	// General state management
+	// OpenGL state management
 
 	struct S;
 	typedef boost::shared_ptr<S> Ref;
@@ -119,6 +123,9 @@ public:
 
 	void Commit(bool unconditional = false);
 	void Set(int s, int b, bool immediate=false);
+	void StencilOp(GLenum fail, GLenum zfail, GLenum zpass, bool immediate=false);
+	void StencilMask(GLuint mask, bool immediate=false);
+	void StencilFunc(GLenum func, GLint ref, GLuint mask, bool immediate=false);
 	void AlphaRef(GLclampf f);
 	void DisableTextures();
 	void DisableTexture(int num);
@@ -228,6 +235,16 @@ private:
 		boost::array<G, kMaterialGeometrySource_MaxIndices> g;
 	};
 
+	struct Stencil {
+		GLuint mask;
+		GLenum func;
+		GLenum funcRef;
+		GLuint funcMask;
+		GLenum opFail;
+		GLenum opzFail;
+		GLenum opzPass;
+	};
+
 	struct _S {
 		_S();
 		boost::array<T, kMaxTextures> t;
@@ -236,8 +253,9 @@ private:
 		int s;
 		GLclampf aref;
 		GLhandleARB p;
-		bool invertCullFace;
 		boost::array<int, 4> scissor;
+		Stencil stencil;
+		bool invertCullFace;
 	};
 
 public:
@@ -278,6 +296,7 @@ private:
 	void CommitT(S &st, int t, T &s, T &d, bool f);
 	void CommitAA(S &s, int i, AA &sa, AA &da, bool f);
 	void CommitScissor(S &s, bool f);
+	void CommitStencil(S &s, bool f);
 
 	RAD_DECLARE_GET(invertCullFace, bool);
 	RAD_DECLARE_SET(invertCullFace, bool);

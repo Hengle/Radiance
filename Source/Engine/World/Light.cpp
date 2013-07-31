@@ -34,7 +34,8 @@ m_next(0),
 m_world(w),
 m_markFrame(-1),
 m_visFrame(-1),
-m_drawFrame(-1) {
+m_drawFrame(-1),
+m_exactlyCulledFrame(-1) {
 	m_intensity[0] = m_intensity[1] = 1.f;
 	m_shColor = Vec4(0,0,0,1);
 	m_spColor[0] = m_spColor[1] = Vec3(1,1,1);

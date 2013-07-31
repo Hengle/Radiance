@@ -186,6 +186,7 @@ private:
 	Vec3 m_spColor[2];
 	Vec3 m_dfColor[2];
 	Vec4 m_shColor;
+	Vec4 m_scissor; // set by renderer
 	Vec3 m_pos;
 	float m_baseIntensity;
 	float m_intensity[2];
@@ -197,6 +198,7 @@ private:
 	int m_markFrame;
 	int m_visFrame;
 	int m_drawFrame;
+	int m_exactlyCulledFrame;
 	int m_interactionFlags;
 	int m_intensityStep;
 	int m_dfStep;

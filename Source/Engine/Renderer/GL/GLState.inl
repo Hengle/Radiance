@@ -195,6 +195,31 @@ inline void GLState::Set(int s, int b, bool immediate) {
 		CommitSB(*m_s.get(), false);
 }
 
+inline void GLState::StencilOp(GLenum fail, GLenum zfail, GLenum zpass, bool immediate) {
+	m_s->s.stencil.opFail = fail;
+	m_s->s.stencil.opzFail = zfail;
+	m_s->s.stencil.opzPass = zpass;
+
+	if (immediate)
+		CommitStencil(*m_s.get(), false);
+}
+
+inline void GLState::StencilMask(GLuint mask, bool immediate) {
+	m_s->s.stencil.mask = mask;
+
+	if (immediate)
+		CommitStencil(*m_s.get(), false);
+}
+
+inline void GLState::StencilFunc(GLenum func, GLint ref, GLuint mask, bool immediate) {
+	m_s->s.stencil.func = func;
+	m_s->s.stencil.funcRef = ref;
+	m_s->s.stencil.funcMask = mask;
+
+	if (immediate)
+		CommitStencil(*m_s.get(), false);
+}
+
 inline void GLState::DisableTexture(int i) {
 	RAD_ASSERT(i < gl.maxTextures);
 	RAD_ASSERT(m_s);	

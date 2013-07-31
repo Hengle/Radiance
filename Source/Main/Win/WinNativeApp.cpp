@@ -621,6 +621,9 @@ GLDeviceContext::Ref NativeApp::CreateOpenGLContext(const GLPixelFormat &pf) {
 		attribs.push_back(WGL_DEPTH_BITS_ARB);
 		attribs.push_back(pf.depth);
 
+		attribs.push_back(WGL_STENCIL_BITS_ARB);
+		attribs.push_back(pf.stencil);
+
 		if (i == 0 && multiSample && pf.mSamples > 0) {
 			attribs.push_back(WGL_SAMPLE_BUFFERS_ARB);
 			attribs.push_back(1);

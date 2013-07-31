@@ -548,7 +548,7 @@ inline bool Winding<TVertex, TPlane, TAllocator>::DefaultEquals::operator () (co
 ///////////////////////////////////////////////////////////////////////////////
 
 template<typename TVertex, typename TPlane, int TSize>
-inline Winding<TVertex, TPlane, stack_tag<TSize> >::Winding() {
+inline Winding<TVertex, TPlane, stack_tag<TSize> >::Winding() : m_numVerts(0) {
 }
 
 template<typename TVertex, typename TPlane, int TSize>

@@ -126,6 +126,17 @@ RADENG_API GLenum RADENG_CALL GLInternalFormat(GLenum format, GLenum type) {
 #endif
 			}
 		} break;
+		
+		case GL_UNSIGNED_INT_24_8: {
+			switch (format) {
+			case GL_DEPTH_COMPONENT:
+#if defined(RAD_OPT_OGLES)
+				return GL_DEPTH24_STENCIL8_OES;
+#else
+				return GL_DEPTH24_STENCIL8;
+#endif
+			}
+		} break;
 			
 		case GL_UNSIGNED_INT_8_8_8_8:
 		case GL_UNSIGNED_INT_8_8_8_8_REV:
@@ -329,12 +340,8 @@ void GLTexture::GenerateMipmaps(const Ref &tex) {
 }
 
 GLTexture::Ref GLTexture::CreateDepthTexture(int width, int height) {
-	#if defined(RAD_OPT_OGLES)
-	const GLenum kDepthFormat = GL_DEPTH_COMPONENT;
-#else
-	const GLenum kDepthFormat = GL_DEPTH_COMPONENT32_ARB;
-#endif
-	const GLenum kDepthComponents = GL_UNSIGNED_INT;
+	const GLenum kDepthFormat = GL_DEPTH24_STENCIL8;
+	const GLenum kDepthComponents = GL_UNSIGNED_INT_24_8;
 	
 	GLTexture::Ref depthTex(new (ZRender) GLTexture(
 		GL_TEXTURE_2D,
@@ -362,7 +369,7 @@ GLTexture::Ref GLTexture::CreateDepthTexture(int width, int height) {
 		width,
 		height,
 		0,
-		GL_DEPTH_COMPONENT,
+		GL_DEPTH_STENCIL,
 		kDepthComponents,
 		0
 	);
