@@ -24,6 +24,14 @@ int WorldDraw::LoadDebugMaterials() {
 	if (r != pkg::SR_Success)
 		return r;
 
+	r = details::LoadMaterial("Sys/DebugSpriteWireframe_M", m_dbgVars.spriteWireframe_M);
+	if (r != pkg::SR_Success)
+		return r;
+
+	r = details::LoadMaterial("Sys/DebugBillboardWireframe_M", m_dbgVars.billboardWireframe_M);
+	if (r != pkg::SR_Success)
+		return r;
+
 	r = details::LoadMaterial("Sys/DebugPortalEdge_M", m_dbgVars.portal_M[0]);
 	if (r != pkg::SR_Success)
 		return r;
@@ -432,26 +440,12 @@ void WorldDraw::DebugDrawLightPass(const details::MBatch &batch) {
 		}
 
 		int numPasses = 0;
-		
-		details::LightInteraction *interaction = draw->m_interactions;
-		while (interaction) {
-			if (interaction->light->m_visFrame != m_markFrame) {
-				interaction = interaction->nextOnBatch;
-				continue; // not visible this frame.
-			}
-			const Light::LightStyle kStyle = interaction->light->style;
-			if (kStyle & Light::kStyle_CastShadows) {
-				++numPasses; // shadow casters cannot be batched.
-			}
-			interaction = interaction->nextOnBatch;
-		}
-
 		bool didDiffuse = false;
 		bool didDiffuseSpecular = false;
 
 		// count the # of lighting passes required to render this object.
 		for (;;) {
-			interaction = draw->m_interactions;
+			details::LightInteraction *interaction = draw->m_interactions;
 
 			while (interaction) {
 
@@ -459,25 +453,24 @@ void WorldDraw::DebugDrawLightPass(const details::MBatch &batch) {
 				int numLights = 0;
 	
 				while (interaction && (numLights < kMaxLights)) {
-					if (interaction->light->m_visFrame != m_markFrame) {
+					if ((interaction->light->m_visFrame != m_markFrame) ||
+						(interaction->light->intensity < 0.01f)) {
 						interaction = interaction->nextOnBatch;
 						continue; // not visible this frame.
 					}
 
 					const Light::LightStyle kStyle = interaction->light->style;
 
-					if (!(kStyle & Light::kStyle_CastShadows)) {
-						bool add = false;
+					bool add = false;
 
-						if ((kStyle&Light::kStyle_DiffuseSpecular) == Light::kStyle_DiffuseSpecular) {
-							add = !didDiffuseSpecular;
-						} else if (kStyle&Light::kStyle_Diffuse) {
-							add = diffuse && (!diffuseSpecular || didDiffuseSpecular);
-						}
+					if ((kStyle&Light::kStyle_DiffuseSpecular) == Light::kStyle_DiffuseSpecular) {
+						add = !didDiffuseSpecular;
+					} else if (kStyle&Light::kStyle_Diffuse) {
+						add = diffuse && (!diffuseSpecular || didDiffuseSpecular);
+					}
 					
-						if (add) {
-							++numLights;
-						}
+					if (add) {
+						++numLights;
 					}
 
 					interaction = interaction->nextOnBatch;
@@ -565,7 +558,8 @@ void WorldDraw::DebugDrawLightCounts(const details::MBatch &batch) {
 		
 		details::LightInteraction *interaction = draw->m_interactions;
 		while (interaction) {
-			if (interaction->light->m_visFrame == m_markFrame) {
+			if ((interaction->light->m_visFrame == m_markFrame) &&
+				(interaction->light->intensity >= 0.01f)) {
 				++numLights;
 				if (numLights >= 5) // max for debug display
 					break;

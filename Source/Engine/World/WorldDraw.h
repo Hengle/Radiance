@@ -689,6 +689,8 @@ private:
 		StackWindingStackVec frustum;
 		ClippedAreaVolumeStackVec frustumAreas;
 		asset::MaterialBundle wireframe_M;
+		asset::MaterialBundle spriteWireframe_M;
+		asset::MaterialBundle billboardWireframe_M;
 		boost::array<asset::MaterialBundle, 2> portal_M;
 		asset::MaterialBundle worldBBox_M;
 		asset::MaterialBundle entityBBox_M;

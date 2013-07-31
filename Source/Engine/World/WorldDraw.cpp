@@ -356,10 +356,11 @@ void WorldDraw::Draw(Counters *counters) {
 		m_rb->FlipMatrixHack(false);
 
 		if (m_postFXRT) {
-			m_rb->SetScreenLocalMatrix();
+			m_rb->SetScreenLocalMatrix(); // needed for UI draw and PostProcess()
 			PostProcess();
 		} else {
 			m_rb->BindFramebuffer(true, true);
+			m_rb->SetScreenLocalMatrix(); // needed for UI draw and PostProcess()
 		}
 
 		m_rb->ReleaseArrayStates();
@@ -1233,7 +1234,22 @@ void WorldDraw::DrawUnlitBatch(
 	Mat4 invTx;
 
 #if defined(WORLD_DEBUG_DRAW)
-	r::Material *mat = (wireframe) ? m_dbgVars.wireframe_M.material : batch.matRef->mat;
+	r::Material *mat = 0;
+	if (wireframe) {
+		switch(batch.matRef->mat->skinMode) {
+		case r::Material::kSkinMode_Sprite:
+			mat = m_dbgVars.spriteWireframe_M.material;
+			break;
+		case r::Material::kSkinMode_Billboard:
+			mat = m_dbgVars.billboardWireframe_M.material;
+			break;
+		default:
+			mat = m_dbgVars.wireframe_M.material;
+			break;
+		}
+	} else {
+		mat = batch.matRef->mat;
+	}
 #else
 	r::Material *mat = batch.matRef->mat;
 #endif
