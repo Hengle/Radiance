@@ -253,8 +253,12 @@ void World::TickState(float dt, float unmod_dt) {
 		DispatchEvents();
 
 		for (Entity::IdMap::const_iterator it = m_ents.begin(); it != m_ents.end(); ++it) {
-			if (it->second.get() != m_viewController.get())
-				it->second->PrivateTick(frame, dt, xtime::TimeSlice::Infinite);
+			const Entity::Ref &entity = it->second;
+			if (entity.get() != m_viewController.get()) {
+				if (entity->m_parent.parent._empty()) { // roots tick their own children
+					entity->PrivateTick(frame, dt, xtime::TimeSlice::Infinite);
+				}
+			}
 		}
 
 		if (m_viewController)
@@ -296,6 +300,10 @@ void World::TickState(float dt, float unmod_dt) {
 
 			if (it->second->gc) {
 				Entity::Ref r(it->second);
+				// detach?
+				Entity::Ref parent = r->m_parent.parent.lock();
+				if (parent)
+					parent->DetachChild(r);
 				UnlinkEntity(*r);
 				UnmapEntity(r);
 			}

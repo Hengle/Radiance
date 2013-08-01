@@ -63,8 +63,6 @@ struct ParticleStyle {
 };
 
 struct ParticleEmitterStyle {
-	Vec3 dir;
-	Vec3 pos;
 	Vec3 volume;
 	float spread; // 0 == dir, 1 == 180 from dir (random spread)
 	float pps;
@@ -102,6 +100,8 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(ParticleEmitter, numBatches, int);
 	RAD_DECLARE_READONLY_PROPERTY(ParticleEmitter, emitterStyle, const ParticleEmitterStyle*);
 	RAD_DECLARE_READONLY_PROPERTY(ParticleEmitter, particleStyle, const ParticleStyle*);
+	RAD_DECLARE_PROPERTY(ParticleEmitter, pos, const Vec3&, const Vec3&);
+	RAD_DECLARE_PROPERTY(ParticleEmitter, dir, const Vec3&, const Vec3&);
 
 private:
 
@@ -120,6 +120,20 @@ private:
 	RAD_DECLARE_GET(particleStyle, ParticleStyle*) {
 		return const_cast<ParticleStyle*>(&m_particleStyle);
 	}
+
+	RAD_DECLARE_GET(pos, const Vec3&) {
+		return m_pos;
+	}
+
+	RAD_DECLARE_SET(pos, const Vec3&) {
+		m_pos = value;
+	}
+
+	RAD_DECLARE_GET(dir, const Vec3&) {
+		return m_dir;
+	}
+
+	RAD_DECLARE_SET(dir, const Vec3&);
 
 	typedef zone_vector<SpriteBatch::Ref, ZRenderT>::type BatchVec;
 
@@ -183,6 +197,8 @@ private:
 
 	ParticleEmitterStyle m_emitterStyle;
 	ParticleStyle m_particleStyle;
+	Vec3 m_pos;
+	Vec3 m_dir;
 	Vec3 m_up;
 	Vec3 m_left;
 	BatchVec m_batches;

@@ -27,7 +27,6 @@ D_ParticleEmitter::D_ParticleEmitter(
 }
 
 void D_ParticleEmitter::PushElements(lua_State *L) {
-	LUART_REGISTER_GETSET(L, Dir);
 	LUART_REGISTER_GETSET(L, Volume);
 	LUART_REGISTER_GETSET(L, Spread);
 	LUART_REGISTER_GETSET(L, PPS);
@@ -44,7 +43,6 @@ void D_ParticleEmitter::PushElements(lua_State *L) {
 	LUART_GET(D_ParticleEmitter, _name, _type, m_emitter->emitterStyle->_field, SELF) \
 	LUART_SET_CUSTOM(D_ParticleEmitter, _name, SELF, SETFIELD(_type, _field))
 
-GETSET(Dir, Vec3, dir)
 GETSET(Volume, Vec3, volume)
 GETSET(Spread, float, spread)
 GETSET(PPS, float, pps)

@@ -27,7 +27,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(D_ParticleEmitter, particleEmitter, const r::ParticleEmitter::Ref&);
 	RAD_DECLARE_READONLY_PROPERTY(D_ParticleEmitter, asset, const pkg::Asset::Ref&);
 	RAD_DECLARE_READONLY_PROPERTY(D_ParticleEmitter, material, const pkg::Asset::Ref&);
-
+	
 protected:
 
 	D_ParticleEmitter(
@@ -40,7 +40,6 @@ protected:
 
 private:
 
-	LUART_DECL_GETSET(Dir);
 	LUART_DECL_GETSET(Volume);
 	LUART_DECL_GETSET(Spread);
 	LUART_DECL_GETSET(PPS);

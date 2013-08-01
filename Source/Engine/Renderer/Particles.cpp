@@ -15,7 +15,8 @@ m_numParticles(0),
 m_skinFrame(-1), 
 m_tickFrame(-1), 
 m_allocBatch(-1),
-m_particlesToEmit(0.f) {
+m_particlesToEmit(0.f),
+m_pos(Vec3::Zero) {
 	RAD_DEBUG_ONLY(m_init = false);
 	m_particles[0] = m_particles[1] = 0;
 }
@@ -34,13 +35,17 @@ void ParticleEmitter::Init(
 ) {
 	RAD_ASSERT(!m_init);
 	RAD_DEBUG_ONLY(m_init = true);
-		m_skinFrame = -1;
+	m_pos = Vec3::Zero;
+	m_dir = Vec3(0.f, 0.f, 1.f);
+	m_skinFrame = -1;
 	m_tickFrame = -1;
 	m_allocBatch = -1;
 	m_numParticles = 0;
 	m_particles[0] = m_particles[1] = 0;
 	m_allocBatch = 0;
 	
+	m_dir.FrameVecs(m_up, m_left);
+
 	m_emitterStyle.maxParticles = 0;
 	UpdateStyle(emitterStyle);
 	UpdateStyle(particleStyle);
@@ -50,9 +55,7 @@ void ParticleEmitter::UpdateStyle(const ParticleEmitterStyle &emitterStyle) {
 	bool reallocate = (emitterStyle.maxParticles > 0) && (m_emitterStyle.maxParticles != emitterStyle.maxParticles);
 
 	m_emitterStyle = emitterStyle;
-	m_emitterStyle.dir.Normalize();
-	m_emitterStyle.dir.FrameVecs(m_up, m_left);
-
+	
 	m_volume = (m_emitterStyle.volume[0] > 0.f) || 
 		(m_emitterStyle.volume[1] > 0.f) || (m_emitterStyle.volume[2] > 0.f);
 
@@ -95,6 +98,12 @@ void ParticleEmitter::UpdateStyle(const ParticleStyle &particleStyle) {
 
 	m_velocity = m_particleStyle.vel[0] > 0.f;
 	m_cone = m_velocity && (m_emitterStyle.spread > 0.f);
+}
+
+void ParticleEmitter::RAD_IMPLEMENT_SET(dir)(const Vec3 &dir) {
+	m_dir = dir;
+	m_dir.Normalize();
+	m_dir.FrameVecs(m_up, m_left);
 }
 
 void ParticleEmitter::Tick(float dt) {
@@ -234,7 +243,7 @@ ParticleEmitter::Particle *ParticleEmitter::SpawnParticle() {
 	p->size[0] = p->origSize[0] * m_particleStyle.sizeScaleX[0];
 	p->size[1] = p->origSize[1] * m_particleStyle.sizeScaleY[0];
 
-	p->orgPos = m_emitterStyle.pos;
+	p->orgPos = m_pos;
 
 	if (m_volume) {
 		if (m_emitterStyle.volume[0] > 0.f)
@@ -249,7 +258,7 @@ ParticleEmitter::Particle *ParticleEmitter::SpawnParticle() {
 
 	if (m_velocity) {
 
-		p->vel = m_emitterStyle.dir;
+		p->vel = m_dir;
 
 		if (m_cone) {
 			Vec3 up = m_up * (-m_emitterStyle.spread + math::FastFloatRand()*m_emitterStyle.spread*2.f);

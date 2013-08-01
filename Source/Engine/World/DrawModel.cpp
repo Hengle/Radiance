@@ -27,7 +27,8 @@ m_bounds(Vec3::Zero, Vec3::Zero),
 m_visible(true),
 m_markFrame(-1),
 m_visibleFrame(-1),
-m_inView(false) {
+m_inView(false),
+m_attachBone(-1) {
 	m_draw = entity->world->draw;
 	m_rgba[0] = m_rgba[1] = m_rgba[2] = Vec4(1, 1, 1, 1);
 	m_fadeTime[0] = m_fadeTime[1] = 0.f;
@@ -88,6 +89,11 @@ void DrawModel::Tick(float time, float dt) {
 	}
 
 	OnTick(time, dt);
+	
+	// tick any children
+	for (Vec::const_iterator it = m_children.begin(); it != m_children.end(); ++it) {
+		(*it)->Tick(time, dt);
+	}
 }
 
 void DrawModel::BlendTo(const Vec4 &rgba, float time) {
@@ -129,6 +135,16 @@ void DrawModel::ReplaceMaterials(int dst) {
 	}
 }
 
+void DrawModel::DetachChild(const Ref &child) {
+	for (Vec::iterator it = m_children.begin(); it != m_children.end(); ++it) {
+		if ((*it).get() == child.get()) {
+			child->m_parent.reset();
+			m_children.erase(it);
+			break;
+		}
+	}
+}
+
 BBox DrawModel::TransformedBounds() const {
 	BBox bounds = m_bounds;
 	Vec3 pos, angles;
@@ -148,6 +164,8 @@ void DrawModel::PushElements(lua_State *L) {
 	lua_setfield(L, -2, "MaterialList");
 	lua_pushcfunction(L, lua_ScaleTo);
 	lua_setfield(L, -2, "ScaleTo");
+	lua_pushcfunction(L, lua_DetachChild);
+	lua_setfield(L, -2, "DetachChild");
 	
 	LUART_REGISTER_GETSET(L, Pos);
 	LUART_REGISTER_GETSET(L, Angles);
@@ -187,6 +205,14 @@ int DrawModel::lua_ScaleTo(lua_State *L) {
 	r->ScaleTo(
 		lua::Marshal<Vec3>::Get(L, 2, true),
 		(float)luaL_checknumber(L, 3)
+	);
+	return 0;
+}
+
+int DrawModel::lua_DetachChild(lua_State *L) {
+	Ref r = lua::SharedPtr::Get<DrawModel>(L, "DrawModel", 1, true);
+	r->DetachChild(
+		lua::SharedPtr::Get<DrawModel>(L, "DrawModel", 2, true)
 	);
 	return 0;
 }
@@ -458,6 +484,10 @@ void SkMeshDrawModel::PushElements(lua_State *L) {
 	lua_setfield(L, -2, "BonePos");
 	lua_pushcfunction(L, lua_WorldBonePos);
 	lua_setfield(L, -2, "WorldBonePos");
+	lua_pushcfunction(L, lua_WorldBonePos);
+	lua_setfield(L, -2, "WorldBonePos");
+	lua_pushcfunction(L, lua_AttachChildToBone);
+	lua_setfield(L, -2, "AttachChildToBone");
 }
 
 int SkMeshDrawModel::lua_PushMaterialList(lua_State *L) {
@@ -511,6 +541,15 @@ int SkMeshDrawModel::lua_WorldBonePos(lua_State *L) {
 	return 1;
 }
 
+int SkMeshDrawModel::lua_AttachChildToBone(lua_State *L) {
+	Ref r = lua::SharedPtr::Get<SkMeshDrawModel>(L, "SkMeshDrawModel", 1, true);
+	r->AttachChildToBone(
+		lua::SharedPtr::Get<SkMeshDrawModel>(L, "SkMeshDrawModel", 2, true),
+		luaL_checkinteger(L, 3)
+	);
+	return 0;
+}
+
 #define SELF Ref self = lua::SharedPtr::Get<SkMeshDrawModel>(L, "SkMeshDrawModel", 1, true)
 LUART_GETSET(SkMeshDrawModel, TimeScale, float, m_timeScale, SELF);
 LUART_GETSET(SkMeshDrawModel, MotionScale, float, m_motionScale, SELF);
@@ -542,7 +581,40 @@ Vec3 SkMeshDrawModel::BonePos(int idx) const {
 	}
 	return Vec3::Zero;
 }
-	
+
+Mat4 SkMeshDrawModel::BoneMatrix(int idx) const {
+	if (idx >= 0 && idx < m_mesh->ska->numBones) {
+		Mat4 bone = m_mesh->ska->BoneWorldMat(idx);
+		bone = (Mat4::Scaling(Scale3(scale)) * Mat4::Translation(pos)) * bone;
+		return bone;
+	}
+	return Mat4::Identity;
+}
+
+Mat4 SkMeshDrawModel::WorldBoneMatrix(int idx) const {
+	if (idx >= 0 && idx < m_mesh->ska->numBones) {
+		Mat4 bone = m_mesh->ska->BoneWorldMat(idx);
+		Vec3 pos, rot;
+		if (GetTransform(pos, rot)) {
+			bone = (Mat4::Scaling(Scale3(scale)) * Mat4::Rotation(QuatFromAngles(rot)) * Mat4::Translation(pos)) * bone;
+		}
+		return bone;
+	}
+	return Mat4::Identity;
+}
+
+void SkMeshDrawModel::AttachChildToBone(const Ref &child, int boneIdx) {
+	RAD_ASSERT(child);
+#if !defined(RAD_OPT_SHIP)
+	for (Vec::const_iterator it = m_children.begin(); it != m_children.end(); ++it) {
+		RAD_VERIFY((*it).get() != child.get());
+	}
+#endif
+	m_children.push_back(child);
+	child->m_attachBone = boneIdx;
+	child->m_parent = boost::static_pointer_cast<SkMeshDrawModel>(shared_from_this());
+}
+
 void SkMeshDrawModel::Batch::Bind(r::Shader *shader) {
 	m_m->Skin(m_idx);
 	r::Mesh &m = m_m->Mesh(m_idx);
@@ -821,7 +893,11 @@ ParticleEmitterDrawModel::ParticleEmitterDrawModel(
 	const r::ParticleEmitter::Ref &emitter, 
 	const pkg::Asset::Ref &asset,
 	int matId
-) : DrawModel(entity), m_emitter(emitter), m_asset(asset), m_matId(matId) {
+) : 
+DrawModel(entity),
+m_emitter(emitter), 
+m_asset(asset), 
+m_matId(matId) {
 
 }
 
@@ -830,9 +906,25 @@ ParticleEmitterDrawModel::~ParticleEmitterDrawModel() {
 
 void ParticleEmitterDrawModel::OnTick(float time, float dt) {
 	if (inView) { // expensive don't do this if we aren't in view
+		SkMeshDrawModel::Ref parent = m_parent.lock();
+		if (parent) {
+			Mat4 m = parent->WorldBoneMatrix(m_attachBone);
+			Vec3 dir = m.Transform3X3(m_localDir);
+			m_emitter->pos = m[3];
+			m_emitter->dir = dir;
+		} else {
+			m_emitter->pos = entity->ps->worldPos;
+			m_emitter->dir = m_localDir;
+		}
+
 		m_emitter->Tick(dt);
 		worldDraw->counters->simulatedParticles += m_emitter->numParticles;
 	}
+}
+
+void ParticleEmitterDrawModel::PushElements(lua_State *L) {
+	DrawModel::PushElements(L);
+	LUART_REGISTER_GETSET(L, LocalDir);
 }
 
 int ParticleEmitterDrawModel::lua_PushMaterialList(lua_State *L) {
@@ -861,6 +953,10 @@ ParticleEmitterDrawModel::Batch::Batch(
 	int batchIdx
 ) : DrawModel::DrawBatch(model, matId), m_emitter(m), m_batchIdx(batchIdx) {
 
+}
+
+bool ParticleEmitterDrawModel::Batch::GetTransform(Vec3 &pos, Vec3 &angles) const {
+	return false; // emitters are in world space.
 }
 
 void ParticleEmitterDrawModel::Batch::Bind(r::Shader *shader) {
@@ -894,4 +990,7 @@ bool ParticleEmitterDrawModel::Batch::RAD_IMPLEMENT_GET(visible) {
 	return batch.numSprites > 0;
 }
 
+#define SELF ParticleEmitterDrawModel::Ref self = lua::SharedPtr::Get<ParticleEmitterDrawModel>(L, "ParticleEmitterDrawModel", 1, true)
+LUART_GETSET(ParticleEmitterDrawModel, LocalDir, Vec3, m_localDir, SELF)
+#undef SELF
 } // world

@@ -23,6 +23,10 @@ namespace world {
 
 class Entity;
 class WorldDraw;
+class SkMeshDrawModel;
+
+typedef boost::shared_ptr<SkMeshDrawModel> SkMeshDrawModelRef;
+typedef boost::weak_ptr<SkMeshDrawModel> SkMeshDrawModelWRef;
 
 class RADENG_CLASS DrawModel : public lua::SharedPtr {
 public:
@@ -30,6 +34,7 @@ public:
 	typedef boost::weak_ptr<DrawModel> WRef;
 	typedef zone_map<DrawModel*, Ref, ZWorldT>::type Map;
 	typedef zone_map<int, int, ZWorldT>::type IntMap;
+	typedef zone_vector<Ref, ZWorldT>::type Vec;
 
 	DrawModel(Entity *entity);
 	virtual ~DrawModel();
@@ -39,6 +44,7 @@ public:
 	void ScaleTo(const Vec3 &scale, float time);
 	void ReplaceMaterial(int src, int dst);
 	void ReplaceMaterials(int dst);
+	void DetachChild(const Ref &child);
 
 	BBox TransformedBounds() const;
 
@@ -104,10 +110,15 @@ protected:
 
 	virtual int lua_PushMaterialList(lua_State *L) = 0;
 
+	Vec m_children;
+	SkMeshDrawModelWRef m_parent;
+	int m_attachBone;
+
 private:
 
 	friend class WorldDraw;
 	friend class World;
+	friend class Entity;
 
 	RAD_DECLARE_GET(entity, Entity*) { 
 		return m_entity; 
@@ -166,7 +177,8 @@ private:
 	static int lua_ReplaceMaterials(lua_State *L);
 	static int lua_MaterialList(lua_State *L);
 	static int lua_ScaleTo(lua_State *L);
-	
+	static int lua_DetachChild(lua_State *L);
+
 	LUART_DECL_GETSET(Pos);
 	LUART_DECL_GETSET(Angles);
 	LUART_DECL_GET(Scale);
@@ -289,8 +301,8 @@ private:
 
 class RADENG_CLASS SkMeshDrawModel : public DrawModel {
 public:
-	typedef boost::shared_ptr<SkMeshDrawModel> Ref;
-	typedef boost::weak_ptr<SkMeshDrawModel> WRef;
+	typedef SkMeshDrawModelRef Ref;
+	typedef SkMeshDrawModelWRef WRef;
 	
 	static Ref New(Entity *entity, const r::SkMesh::Ref &m);
 
@@ -300,6 +312,9 @@ public:
 	
 	Vec3 BonePos(int idx) const;
 	Vec3 WorldBonePos(int idx) const;
+	Mat4 BoneMatrix(int idx) const;
+	Mat4 WorldBoneMatrix(int idx) const;
+	void AttachChildToBone(const Ref &child, int boneIdx);
 
 	RAD_DECLARE_PROPERTY(SkMeshDrawModel, motionScale, float, float);
 	RAD_DECLARE_PROPERTY(SkMeshDrawModel, timeScale, float, float);
@@ -366,6 +381,7 @@ private:
 	static int lua_FindBone(lua_State *L);
 	static int lua_WorldBonePos(lua_State *L);
 	static int lua_BonePos(lua_State *L);
+	static int lua_AttachChildToBone(lua_State *L);
 
 	LUART_DECL_GETSET(TimeScale);
 	LUART_DECL_GETSET(MotionScale);
@@ -525,8 +541,11 @@ protected:
 
 	virtual void OnTick(float time, float dt);
 	virtual int lua_PushMaterialList(lua_State *L);
+	virtual void PushElements(lua_State *L);
 
 private:
+
+	LUART_DECL_GETSET(LocalDir);
 
 	class Batch : public DrawModel::DrawBatch {
 	public:
@@ -539,6 +558,7 @@ private:
 		);
 
 	protected:
+		virtual bool GetTransform(Vec3 &pos, Vec3 &angles) const;
 		virtual void Bind(r::Shader *shader);
 		virtual void CompileArrayStates(r::Shader &shader);
 		virtual void FlushArrayStates(r::Shader *shader);
@@ -555,6 +575,7 @@ private:
 		return m_emitter.get();
 	}
 
+	Vec3 m_localDir;
 	r::ParticleEmitter::Ref m_emitter;
 	pkg::Asset::Ref m_asset; // optionally hangs onto particle (which holds material)
 	int m_matId;

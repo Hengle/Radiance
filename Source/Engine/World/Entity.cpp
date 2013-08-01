@@ -268,11 +268,17 @@ void Entity::PrivateTick(
 	TickDrawModels(dt);
 	m_tasks.Tick(*this, dt, xtime::TimeSlice::Infinite, kTickFlag_PostPhysics);
 	TickSounds(dt);
+
+	for (Vec::const_iterator it = m_children.begin(); it != m_children.end(); ++it) {
+		(*it)->PrivateTick(frame, dt, time);
+	}
 }
 
 void Entity::TickDrawModels(float dt) {
 	for (DrawModel::Map::const_iterator it = m_models.begin(); it != m_models.end(); ++it) {
-		it->second->Tick(App::Get()->time, dt);
+		if (it->second->m_parent._empty()) { // roots tick their children
+			it->second->Tick(App::Get()->time, dt);
+		}
 	}
 }
 
@@ -414,8 +420,12 @@ World *Entity::RAD_IMPLEMENT_GET(world) {
 void Entity::PushCallTable(lua_State *L) {
 	lua_pushcfunction(L, lua_AttachDrawModel);
 	lua_setfield(L, -2, "AttachDrawModel");
-	lua_pushcfunction(L, lua_RemoveDrawModel);
-	lua_setfield(L, -2, "RemoveDrawModel");
+	lua_pushcfunction(L, lua_DetachDrawModel);
+	lua_setfield(L, -2, "DetachDrawModel");
+	lua_pushcfunction(L, lua_AttachChild);
+	lua_setfield(L, -2, "AttachChild");
+	lua_pushcfunction(L, lua_DetachChild);
+	lua_setfield(L, -2, "DetachChild");
 	lua_pushcfunction(L, lua_AttachSound);
 	lua_setfield(L, -2, "AttachSound");
 	lua_pushcfunction(L, lua_RemoveSound);
@@ -475,8 +485,39 @@ void Entity::AttachDrawModel(const DrawModel::Ref &ref) {
 	m_models[ref.get()] = ref;
 }
 
-void Entity::RemoveDrawModel(const DrawModel::Ref &ref) {
+void Entity::DetachDrawModel(const DrawModel::Ref &ref) {
 	m_models.erase(ref.get());
+}
+
+void Entity::AttachChild(
+	const Ref &child,
+	const SkMeshDrawModel::Ref &model,
+	int boneIdx
+) {
+	RAD_ASSERT(child);
+
+#if !defined(RAD_OPT_SHIP)
+	for (Vec::const_iterator it = m_children.begin(); it != m_children.end(); ++it) {
+		RAD_ASSERT((*it).get() != child.get());
+	}
+#endif
+	child->m_parent.parent = shared_from_this();
+	child->m_parent.model = model;
+	child->m_parent.boneIdx = boneIdx;
+
+	m_children.push_back(child);
+}
+
+void Entity::DetachChild(const Ref &child) {
+	for (Vec::const_iterator it = m_children.begin(); it != m_children.end(); ++it) {
+		if ((*it).get() == child.get()) {
+			child->m_parent.boneIdx = -1;
+			child->m_parent.model.reset();
+			child->m_parent.parent.reset();
+			m_children.erase(it);
+			break;
+		}
+	}
 }
 
 void Entity::PushEntityFrame() {
@@ -704,10 +745,28 @@ int Entity::lua_AttachDrawModel(lua_State *L) {
 	return 0;
 }
 
-int Entity::lua_RemoveDrawModel(lua_State *L) {
+int Entity::lua_DetachDrawModel(lua_State *L) {
 	Entity *self = WorldLua::EntFramePtr(L, 1, true);
 	DrawModel::Ref drawModel = lua::SharedPtr::Get<DrawModel>(L, "DrawModel", 2, true);
-	self->RemoveDrawModel(drawModel);
+	self->DetachDrawModel(drawModel);
+	return 0;
+}
+
+int Entity::lua_AttachChild(lua_State *L) {
+	Entity *self = WorldLua::EntFramePtr(L, 1, true);
+	Entity *child = WorldLua::EntFramePtr(L, 2, true);
+	self->AttachChild(
+		child->shared_from_this(),
+		lua::SharedPtr::Get<SkMeshDrawModel>(L, "SkMeshDrawModel", 3, true),
+		luaL_checkinteger(L, 4)
+	);
+	return 0;
+}
+
+int Entity::lua_DetachChild(lua_State *L) {
+	Entity *self = WorldLua::EntFramePtr(L, 1, true);
+	Entity *child = WorldLua::EntFramePtr(L, 2, true);
+	self->DetachChild(child->shared_from_this());
 	return 0;
 }
 

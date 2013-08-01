@@ -23,9 +23,7 @@ int T_ParticleEmitterPrecache::PushResult(lua_State *L) {
 		return 0;
 
 	r::ParticleEmitterStyle emitterStyle;
-	emitterStyle.dir = Vec3(0.f,0.f,1.f);
 	emitterStyle.maxParticles = 0;
-	emitterStyle.pos = Vec3::Zero;
 	emitterStyle.pps = 0.f;
 	emitterStyle.spread = 0.f;
 	emitterStyle.volume = Vec3::Zero;

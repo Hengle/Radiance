@@ -135,13 +135,19 @@ void Entity::TickPhysics(
 	const xtime::TimeSlice &time
 ) {
 	switch (m_ps.mtype) {
-	case kMoveType_None:
+	case kMoveType_None: {
 		m_ps.distanceMoved = -1.f;
+
+		Entity::Ref parent = m_parent.parent.lock();
+		if (parent) {
+			// position comes from attachment
+			m_ps.origin = m_parent.model->WorldBonePos(m_parent.boneIdx);
+		}
 		m_ps.worldPos = m_ps.origin + m_ps.pos;
 		m_ps.worldAngles = WrapAngles(m_ps.originAngles + m_ps.angles.pos);
 		m_ps.cameraPos = m_ps.worldPos + m_ps.cameraShift;
 		m_ps.cameraAngles = m_ps.worldAngles;
-		break;
+	} break;
 	case kMoveType_Fly:
 		Tick_MT_Fly(frame, dt, time);
 		break;

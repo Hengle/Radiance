@@ -212,10 +212,18 @@ public:
 
 	void QueueTask(const Tickable::Ref &task);
 	void QueueScriptTask(const Tickable::Ref &task);
-
 	void CleanLuaState();
+
 	void AttachDrawModel(const DrawModel::Ref &ref);
-	void RemoveDrawModel(const DrawModel::Ref &ref);
+	void DetachDrawModel(const DrawModel::Ref &ref);
+
+	void AttachChild(
+		const Ref &child,
+		const SkMeshDrawModel::Ref &model,
+		int boneIdx
+	);
+
+	void DetachChild(const Ref &child);
 
 	void PushEntityFrame();
 	void PushEntityFrame(lua_State *L);
@@ -361,7 +369,9 @@ private:
 
 	// ------------- Lua Calls --------------
 	static int lua_AttachDrawModel(lua_State *L);
-	static int lua_RemoveDrawModel(lua_State *L);
+	static int lua_DetachDrawModel(lua_State *L);
+	static int lua_AttachChild(lua_State *L);
+	static int lua_DetachChild(lua_State *L);
 	static int lua_AttachSound(lua_State *L);
 	static int lua_RemoveSound(lua_State *L);
 	static int lua_AddTickable(lua_State *L);
@@ -487,6 +497,13 @@ private:
 		S_DonePost
 	};
 
+	struct Attachment {
+		Attachment() : boneIdx(-1) {}
+		SkMeshDrawModel::Ref model;
+		WRef parent;
+		int boneIdx;
+	};
+
 	typedef zone_map<Sound*, SoundRef, ZWorldT>::type SoundMap;
 
 	int m_luaCallbackIdx;
@@ -495,14 +512,17 @@ private:
 	TickQueue<Entity> m_scriptTasks;
 	DrawModel::Map m_models;
 	dBSPLeaf::PtrVec m_bspLeafs;
+
+	Vec m_children;
+	Attachment m_parent;
 	IntSet m_areas;
-	dBSPLeaf *m_leaf;
 	SoundMap m_sounds;
 	ZoneTagWRef m_zoneTag;
 	String m_targetname;
 	String m_classname;
-	LightingFlags m_lightingFlags;
+	dBSPLeaf *m_leaf;
 	details::LightInteraction *m_lightInteractions; // only valid for shadow casters
+	LightingFlags m_lightingFlags;
 	int m_frame;
 	int m_spawnState;
 	int m_id;

@@ -145,9 +145,7 @@ bool ParticleEditorWidget::Load() {
 
 	m_glw->bindGL(true);
 
-	m_emitterStyle.dir = Vec3(0.f, 0.f, 1.f);
 	m_emitterStyle.maxParticles = 1000;
-	m_emitterStyle.pos = Vec3::Zero;
 	m_emitterStyle.pps = 10;
 	m_emitterStyle.spread = 0.5;
 	m_emitterStyle.volume = Vec3::Zero;
@@ -303,30 +301,33 @@ void ParticleEditorWidget::Tick(float dt) {
 
 void ParticleEditorWidget::OnDirChanged(const QString &str) {
 	
+	Vec3 dir(0.f, 0.f, 1.f);
+
 	sscanf(
 		str.toAscii().constData(), 
 		"%f %f %f", 
-		&m_emitterStyle.dir[0], 
-		&m_emitterStyle.dir[1], 
-		&m_emitterStyle.dir[2]
-	);
-	m_emitterStyle.dir.Normalize();
-
-	if (m_emitter)
-		m_emitter->UpdateStyle(m_emitterStyle);
-}
-
-void ParticleEditorWidget::OnPosChanged(const QString &str) {
-	sscanf(
-		str.toAscii().constData(), 
-		"%f %f %f", 
-		&m_emitterStyle.pos[0], 
-		&m_emitterStyle.pos[1], 
-		&m_emitterStyle.pos[2]
+		&dir[0], 
+		&dir[1], 
+		&dir[2]
 	);
 	
 	if (m_emitter)
-		m_emitter->UpdateStyle(m_emitterStyle);
+		m_emitter->dir = dir;
+}
+
+void ParticleEditorWidget::OnPosChanged(const QString &str) {
+	Vec3 pos(Vec3::Zero);
+
+	sscanf(
+		str.toAscii().constData(), 
+		"%f %f %f", 
+		&pos[0], 
+		&pos[1], 
+		&pos[2]
+	);
+	
+	if (m_emitter)
+		m_emitter->pos = pos;
 }
 
 void ParticleEditorWidget::OnPPSChanged(const QString &str) {
