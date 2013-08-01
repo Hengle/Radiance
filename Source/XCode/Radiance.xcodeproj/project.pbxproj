@@ -1025,6 +1025,69 @@
 		33836C4C15B9CF590030EAEC /* Zones.h in Headers */ = {isa = PBXBuildFile; fileRef = 33836C1915B9CF590030EAEC /* Zones.h */; };
 		33836C4D15B9CF590030EAEC /* Zones.h in Headers */ = {isa = PBXBuildFile; fileRef = 33836C1915B9CF590030EAEC /* Zones.h */; };
 		3383820015B736F600A28CCF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 338381FF15B736F600A28CCF /* Foundation.framework */; };
+		3385ED2017AA26B900F44EDB /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED1D17AA26B900F44EDB /* Particles.cpp */; };
+		3385ED2117AA26B900F44EDB /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED1D17AA26B900F44EDB /* Particles.cpp */; };
+		3385ED2217AA26B900F44EDB /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED1D17AA26B900F44EDB /* Particles.cpp */; };
+		3385ED2317AA26B900F44EDB /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED1D17AA26B900F44EDB /* Particles.cpp */; };
+		3385ED2417AA26B900F44EDB /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED1D17AA26B900F44EDB /* Particles.cpp */; };
+		3385ED2517AA26B900F44EDB /* Particles.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED1E17AA26B900F44EDB /* Particles.h */; };
+		3385ED2617AA26B900F44EDB /* Particles.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED1E17AA26B900F44EDB /* Particles.h */; };
+		3385ED2717AA26B900F44EDB /* Particles.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED1E17AA26B900F44EDB /* Particles.h */; };
+		3385ED2817AA26B900F44EDB /* Particles.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED1E17AA26B900F44EDB /* Particles.h */; };
+		3385ED2917AA26B900F44EDB /* Particles.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED1E17AA26B900F44EDB /* Particles.h */; };
+		3385ED2E17AA26E500F44EDB /* EditorParticleEditorWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED2A17AA26E500F44EDB /* EditorParticleEditorWidget.cpp */; };
+		3385ED3317AA26E500F44EDB /* EditorParticleEditorWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED2B17AA26E500F44EDB /* EditorParticleEditorWidget.h */; };
+		3385ED3817AA26E500F44EDB /* EditorParticleEditorWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED2C17AA26E500F44EDB /* EditorParticleEditorWindow.cpp */; };
+		3385ED3D17AA26E500F44EDB /* EditorParticleEditorWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED2D17AA26E500F44EDB /* EditorParticleEditorWindow.h */; };
+		3385ED4417AA273C00F44EDB /* D_ParticleEmitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED4217AA273C00F44EDB /* D_ParticleEmitter.cpp */; };
+		3385ED4517AA273C00F44EDB /* D_ParticleEmitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED4217AA273C00F44EDB /* D_ParticleEmitter.cpp */; };
+		3385ED4617AA273C00F44EDB /* D_ParticleEmitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED4217AA273C00F44EDB /* D_ParticleEmitter.cpp */; };
+		3385ED4717AA273C00F44EDB /* D_ParticleEmitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED4217AA273C00F44EDB /* D_ParticleEmitter.cpp */; };
+		3385ED4817AA273C00F44EDB /* D_ParticleEmitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED4217AA273C00F44EDB /* D_ParticleEmitter.cpp */; };
+		3385ED4917AA273C00F44EDB /* D_ParticleEmitter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED4317AA273C00F44EDB /* D_ParticleEmitter.h */; };
+		3385ED4A17AA273C00F44EDB /* D_ParticleEmitter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED4317AA273C00F44EDB /* D_ParticleEmitter.h */; };
+		3385ED4B17AA273C00F44EDB /* D_ParticleEmitter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED4317AA273C00F44EDB /* D_ParticleEmitter.h */; };
+		3385ED4C17AA273C00F44EDB /* D_ParticleEmitter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED4317AA273C00F44EDB /* D_ParticleEmitter.h */; };
+		3385ED4D17AA273C00F44EDB /* D_ParticleEmitter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED4317AA273C00F44EDB /* D_ParticleEmitter.h */; };
+		3385ED5017AA274C00F44EDB /* T_ParticleEmitterPrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED4E17AA274C00F44EDB /* T_ParticleEmitterPrecache.cpp */; };
+		3385ED5117AA274C00F44EDB /* T_ParticleEmitterPrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED4E17AA274C00F44EDB /* T_ParticleEmitterPrecache.cpp */; };
+		3385ED5217AA274C00F44EDB /* T_ParticleEmitterPrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED4E17AA274C00F44EDB /* T_ParticleEmitterPrecache.cpp */; };
+		3385ED5317AA274C00F44EDB /* T_ParticleEmitterPrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED4E17AA274C00F44EDB /* T_ParticleEmitterPrecache.cpp */; };
+		3385ED5417AA274C00F44EDB /* T_ParticleEmitterPrecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED4E17AA274C00F44EDB /* T_ParticleEmitterPrecache.cpp */; };
+		3385ED5517AA274C00F44EDB /* T_ParticleEmitterPrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED4F17AA274C00F44EDB /* T_ParticleEmitterPrecache.h */; };
+		3385ED5617AA274C00F44EDB /* T_ParticleEmitterPrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED4F17AA274C00F44EDB /* T_ParticleEmitterPrecache.h */; };
+		3385ED5717AA274C00F44EDB /* T_ParticleEmitterPrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED4F17AA274C00F44EDB /* T_ParticleEmitterPrecache.h */; };
+		3385ED5817AA274C00F44EDB /* T_ParticleEmitterPrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED4F17AA274C00F44EDB /* T_ParticleEmitterPrecache.h */; };
+		3385ED5917AA274C00F44EDB /* T_ParticleEmitterPrecache.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED4F17AA274C00F44EDB /* T_ParticleEmitterPrecache.h */; };
+		3385ED5E17AA297900F44EDB /* ParticleMaterialLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED5A17AA297900F44EDB /* ParticleMaterialLoader.cpp */; };
+		3385ED5F17AA297900F44EDB /* ParticleMaterialLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED5A17AA297900F44EDB /* ParticleMaterialLoader.cpp */; };
+		3385ED6017AA297900F44EDB /* ParticleMaterialLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED5A17AA297900F44EDB /* ParticleMaterialLoader.cpp */; };
+		3385ED6117AA297900F44EDB /* ParticleMaterialLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED5A17AA297900F44EDB /* ParticleMaterialLoader.cpp */; };
+		3385ED6217AA297900F44EDB /* ParticleMaterialLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED5A17AA297900F44EDB /* ParticleMaterialLoader.cpp */; };
+		3385ED6317AA297900F44EDB /* ParticleMaterialLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED5B17AA297900F44EDB /* ParticleMaterialLoader.h */; };
+		3385ED6417AA297900F44EDB /* ParticleMaterialLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED5B17AA297900F44EDB /* ParticleMaterialLoader.h */; };
+		3385ED6517AA297900F44EDB /* ParticleMaterialLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED5B17AA297900F44EDB /* ParticleMaterialLoader.h */; };
+		3385ED6617AA297900F44EDB /* ParticleMaterialLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED5B17AA297900F44EDB /* ParticleMaterialLoader.h */; };
+		3385ED6717AA297900F44EDB /* ParticleMaterialLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED5B17AA297900F44EDB /* ParticleMaterialLoader.h */; };
+		3385ED6817AA297900F44EDB /* ParticleParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED5C17AA297900F44EDB /* ParticleParser.cpp */; };
+		3385ED6917AA297900F44EDB /* ParticleParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED5C17AA297900F44EDB /* ParticleParser.cpp */; };
+		3385ED6A17AA297900F44EDB /* ParticleParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED5C17AA297900F44EDB /* ParticleParser.cpp */; };
+		3385ED6B17AA297900F44EDB /* ParticleParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED5C17AA297900F44EDB /* ParticleParser.cpp */; };
+		3385ED6C17AA297900F44EDB /* ParticleParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED5C17AA297900F44EDB /* ParticleParser.cpp */; };
+		3385ED6D17AA297900F44EDB /* ParticleParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED5D17AA297900F44EDB /* ParticleParser.h */; };
+		3385ED6E17AA297900F44EDB /* ParticleParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED5D17AA297900F44EDB /* ParticleParser.h */; };
+		3385ED6F17AA297900F44EDB /* ParticleParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED5D17AA297900F44EDB /* ParticleParser.h */; };
+		3385ED7017AA297900F44EDB /* ParticleParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED5D17AA297900F44EDB /* ParticleParser.h */; };
+		3385ED7117AA297900F44EDB /* ParticleParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED5D17AA297900F44EDB /* ParticleParser.h */; };
+		3385ED7417AA298100F44EDB /* ParticleCooker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED7217AA298100F44EDB /* ParticleCooker.cpp */; };
+		3385ED7517AA298100F44EDB /* ParticleCooker.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED7317AA298100F44EDB /* ParticleCooker.h */; };
+		3385ED7717AA29A000F44EDB /* Math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED7617AA29A000F44EDB /* Math.cpp */; };
+		3385ED7817AA29A000F44EDB /* Math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED7617AA29A000F44EDB /* Math.cpp */; };
+		3385ED7917AA29A000F44EDB /* Math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED7617AA29A000F44EDB /* Math.cpp */; };
+		3385ED7A17AA29A000F44EDB /* Math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED7617AA29A000F44EDB /* Math.cpp */; };
+		3385ED7B17AA29A000F44EDB /* Math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED7617AA29A000F44EDB /* Math.cpp */; };
+		3385ED7E17AA2A1100F44EDB /* EditorParticleThumb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3385ED7C17AA2A1100F44EDB /* EditorParticleThumb.cpp */; };
+		3385ED7F17AA2A1100F44EDB /* EditorParticleThumb.h in Headers */ = {isa = PBXBuildFile; fileRef = 3385ED7D17AA2A1100F44EDB /* EditorParticleThumb.h */; };
 		33872E27167FFB15007448EE /* EditorModelEditorWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33872E23167FFB15007448EE /* EditorModelEditorWidget.cpp */; };
 		33872E28167FFB15007448EE /* EditorModelEditorWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 33872E24167FFB15007448EE /* EditorModelEditorWidget.h */; };
 		33872E29167FFB15007448EE /* EditorModelEditorWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33872E25167FFB15007448EE /* EditorModelEditorWindow.cpp */; };
@@ -3203,6 +3266,26 @@
 		33836C1815B9CF590030EAEC /* Zones.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Zones.cpp; path = ../Engine/Zones.cpp; sourceTree = "<group>"; };
 		33836C1915B9CF590030EAEC /* Zones.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Zones.h; path = ../Engine/Zones.h; sourceTree = "<group>"; };
 		338381FF15B736F600A28CCF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		3385ED1D17AA26B900F44EDB /* Particles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Particles.cpp; sourceTree = "<group>"; };
+		3385ED1E17AA26B900F44EDB /* Particles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Particles.h; sourceTree = "<group>"; };
+		3385ED1F17AA26B900F44EDB /* Particles.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Particles.inl; sourceTree = "<group>"; };
+		3385ED2A17AA26E500F44EDB /* EditorParticleEditorWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorParticleEditorWidget.cpp; sourceTree = "<group>"; };
+		3385ED2B17AA26E500F44EDB /* EditorParticleEditorWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorParticleEditorWidget.h; sourceTree = "<group>"; };
+		3385ED2C17AA26E500F44EDB /* EditorParticleEditorWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorParticleEditorWindow.cpp; sourceTree = "<group>"; };
+		3385ED2D17AA26E500F44EDB /* EditorParticleEditorWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorParticleEditorWindow.h; sourceTree = "<group>"; };
+		3385ED4217AA273C00F44EDB /* D_ParticleEmitter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = D_ParticleEmitter.cpp; sourceTree = "<group>"; };
+		3385ED4317AA273C00F44EDB /* D_ParticleEmitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = D_ParticleEmitter.h; sourceTree = "<group>"; };
+		3385ED4E17AA274C00F44EDB /* T_ParticleEmitterPrecache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = T_ParticleEmitterPrecache.cpp; sourceTree = "<group>"; };
+		3385ED4F17AA274C00F44EDB /* T_ParticleEmitterPrecache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = T_ParticleEmitterPrecache.h; sourceTree = "<group>"; };
+		3385ED5A17AA297900F44EDB /* ParticleMaterialLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleMaterialLoader.cpp; sourceTree = "<group>"; };
+		3385ED5B17AA297900F44EDB /* ParticleMaterialLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleMaterialLoader.h; sourceTree = "<group>"; };
+		3385ED5C17AA297900F44EDB /* ParticleParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleParser.cpp; sourceTree = "<group>"; };
+		3385ED5D17AA297900F44EDB /* ParticleParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleParser.h; sourceTree = "<group>"; };
+		3385ED7217AA298100F44EDB /* ParticleCooker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleCooker.cpp; sourceTree = "<group>"; };
+		3385ED7317AA298100F44EDB /* ParticleCooker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleCooker.h; sourceTree = "<group>"; };
+		3385ED7617AA29A000F44EDB /* Math.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Math.cpp; sourceTree = "<group>"; };
+		3385ED7C17AA2A1100F44EDB /* EditorParticleThumb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorParticleThumb.cpp; sourceTree = "<group>"; };
+		3385ED7D17AA2A1100F44EDB /* EditorParticleThumb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorParticleThumb.h; sourceTree = "<group>"; };
 		33872E23167FFB15007448EE /* EditorModelEditorWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorModelEditorWidget.cpp; sourceTree = "<group>"; };
 		33872E24167FFB15007448EE /* EditorModelEditorWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorModelEditorWidget.h; sourceTree = "<group>"; };
 		33872E25167FFB15007448EE /* EditorModelEditorWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditorModelEditorWindow.cpp; sourceTree = "<group>"; };
@@ -4585,6 +4668,7 @@
 				33E8852515B9ACBE0089BA08 /* EulerDef.h */,
 				33E8852615B9ACBE0089BA08 /* Generic */,
 				33E8852915B9ACBE0089BA08 /* IntMath.h */,
+				3385ED7617AA29A000F44EDB /* Math.cpp */,
 				33E8852A15B9ACBE0089BA08 /* Math.h */,
 				33E8852B15B9ACBE0089BA08 /* Math.inl */,
 				33E8852C15B9ACBE0089BA08 /* Matrix.h */,
@@ -4892,6 +4976,12 @@
 				33E886FE15B9B9ED0089BA08 /* MusicCooker.h */,
 				33E886FF15B9B9ED0089BA08 /* MusicParser.cpp */,
 				33E8870015B9B9ED0089BA08 /* MusicParser.h */,
+				3385ED7217AA298100F44EDB /* ParticleCooker.cpp */,
+				3385ED7317AA298100F44EDB /* ParticleCooker.h */,
+				3385ED5A17AA297900F44EDB /* ParticleMaterialLoader.cpp */,
+				3385ED5B17AA297900F44EDB /* ParticleMaterialLoader.h */,
+				3385ED5C17AA297900F44EDB /* ParticleParser.cpp */,
+				3385ED5D17AA297900F44EDB /* ParticleParser.h */,
 				33E8870115B9B9ED0089BA08 /* SkAnimSetCooker.cpp */,
 				33E8870215B9B9ED0089BA08 /* SkAnimSetCooker.h */,
 				33E8870315B9B9ED0089BA08 /* SkAnimSetParser.cpp */,
@@ -5023,6 +5113,9 @@
 				33E8881615B9BA480089BA08 /* Mesh.h */,
 				33E8881715B9BA480089BA08 /* Mesh.inl */,
 				33FBD041173B069200043A8D /* Mesh.cpp */,
+				3385ED1D17AA26B900F44EDB /* Particles.cpp */,
+				3385ED1E17AA26B900F44EDB /* Particles.h */,
+				3385ED1F17AA26B900F44EDB /* Particles.inl */,
 				33E8881F15B9BA480089BA08 /* Renderer.cpp */,
 				33E8882015B9BA480089BA08 /* Renderer.h */,
 				33E8882115B9BA480089BA08 /* RendererDef.h */,
@@ -5201,6 +5294,10 @@
 				33872E24167FFB15007448EE /* EditorModelEditorWidget.h */,
 				33872E25167FFB15007448EE /* EditorModelEditorWindow.cpp */,
 				33872E26167FFB15007448EE /* EditorModelEditorWindow.h */,
+				3385ED2A17AA26E500F44EDB /* EditorParticleEditorWidget.cpp */,
+				3385ED2B17AA26E500F44EDB /* EditorParticleEditorWidget.h */,
+				3385ED2C17AA26E500F44EDB /* EditorParticleEditorWindow.cpp */,
+				3385ED2D17AA26E500F44EDB /* EditorParticleEditorWindow.h */,
 				33E8887815B9BA490089BA08 /* EditorPIEWidget.cpp */,
 				33E8887915B9BA490089BA08 /* EditorPIEWidget.h */,
 				33E8887A15B9BA490089BA08 /* EditorPopupMenu.cpp */,
@@ -5270,6 +5367,8 @@
 				33E8885C15B9BA490089BA08 /* EditorMeshThumb.h */,
 				33E8885D15B9BA490089BA08 /* EditorMusicThumb.cpp */,
 				33E8885E15B9BA490089BA08 /* EditorMusicThumb.h */,
+				3385ED7C17AA2A1100F44EDB /* EditorParticleThumb.cpp */,
+				3385ED7D17AA2A1100F44EDB /* EditorParticleThumb.h */,
 				33E8885F15B9BA490089BA08 /* EditorSkModelThumb.cpp */,
 				33E8886015B9BA490089BA08 /* EditorSkModelThumb.h */,
 				33E8886115B9BA490089BA08 /* EditorSoundThumb.cpp */,
@@ -5431,6 +5530,8 @@
 				33E888D615B9BA4A0089BA08 /* D_Material.h */,
 				33E888D715B9BA4A0089BA08 /* D_Mesh.cpp */,
 				33E888D815B9BA4A0089BA08 /* D_Mesh.h */,
+				3385ED4217AA273C00F44EDB /* D_ParticleEmitter.cpp */,
+				3385ED4317AA273C00F44EDB /* D_ParticleEmitter.h */,
 				33E888D915B9BA4A0089BA08 /* D_ScreenOverlay.cpp */,
 				33E888DA15B9BA4A0089BA08 /* D_ScreenOverlay.h */,
 				33E888DB15B9BA4A0089BA08 /* D_SkModel.cpp */,
@@ -5455,6 +5556,8 @@
 				33E888E615B9BA4A0089BA08 /* T_MaterialPrecache.h */,
 				33E888E715B9BA4A0089BA08 /* T_MeshPrecache.cpp */,
 				33E888E815B9BA4A0089BA08 /* T_MeshPrecache.h */,
+				3385ED4E17AA274C00F44EDB /* T_ParticleEmitterPrecache.cpp */,
+				3385ED4F17AA274C00F44EDB /* T_ParticleEmitterPrecache.h */,
 				33E888E915B9BA4A0089BA08 /* T_Precache.cpp */,
 				33E888EA15B9BA4A0089BA08 /* T_Precache.h */,
 				33E888EB15B9BA4A0089BA08 /* T_SkModelPrecache.cpp */,
@@ -5908,6 +6011,11 @@
 				3313866B177A5A8400424DB4 /* GameDef.h in Headers */,
 				33138677177A5A9E00424DB4 /* UIScrollBar.h in Headers */,
 				331C099817A22795000DEE17 /* Winding.h in Headers */,
+				3385ED2717AA26B900F44EDB /* Particles.h in Headers */,
+				3385ED4B17AA273C00F44EDB /* D_ParticleEmitter.h in Headers */,
+				3385ED5717AA274C00F44EDB /* T_ParticleEmitterPrecache.h in Headers */,
+				3385ED6517AA297900F44EDB /* ParticleMaterialLoader.h in Headers */,
+				3385ED6F17AA297900F44EDB /* ParticleParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6317,6 +6425,11 @@
 				3313866C177A5A8400424DB4 /* GameDef.h in Headers */,
 				33138678177A5A9E00424DB4 /* UIScrollBar.h in Headers */,
 				331C099917A22795000DEE17 /* Winding.h in Headers */,
+				3385ED2817AA26B900F44EDB /* Particles.h in Headers */,
+				3385ED4C17AA273C00F44EDB /* D_ParticleEmitter.h in Headers */,
+				3385ED5817AA274C00F44EDB /* T_ParticleEmitterPrecache.h in Headers */,
+				3385ED6617AA297900F44EDB /* ParticleMaterialLoader.h in Headers */,
+				3385ED7017AA297900F44EDB /* ParticleParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6817,6 +6930,15 @@
 				33138669177A5A8400424DB4 /* GameDef.h in Headers */,
 				33138675177A5A9E00424DB4 /* UIScrollBar.h in Headers */,
 				331C099617A22795000DEE17 /* Winding.h in Headers */,
+				3385ED2517AA26B900F44EDB /* Particles.h in Headers */,
+				3385ED3317AA26E500F44EDB /* EditorParticleEditorWidget.h in Headers */,
+				3385ED3D17AA26E500F44EDB /* EditorParticleEditorWindow.h in Headers */,
+				3385ED4917AA273C00F44EDB /* D_ParticleEmitter.h in Headers */,
+				3385ED5517AA274C00F44EDB /* T_ParticleEmitterPrecache.h in Headers */,
+				3385ED6317AA297900F44EDB /* ParticleMaterialLoader.h in Headers */,
+				3385ED6D17AA297900F44EDB /* ParticleParser.h in Headers */,
+				3385ED7517AA298100F44EDB /* ParticleCooker.h in Headers */,
+				3385ED7F17AA2A1100F44EDB /* EditorParticleThumb.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7224,6 +7346,11 @@
 				3313866A177A5A8400424DB4 /* GameDef.h in Headers */,
 				33138676177A5A9E00424DB4 /* UIScrollBar.h in Headers */,
 				331C099717A22795000DEE17 /* Winding.h in Headers */,
+				3385ED2617AA26B900F44EDB /* Particles.h in Headers */,
+				3385ED4A17AA273C00F44EDB /* D_ParticleEmitter.h in Headers */,
+				3385ED5617AA274C00F44EDB /* T_ParticleEmitterPrecache.h in Headers */,
+				3385ED6417AA297900F44EDB /* ParticleMaterialLoader.h in Headers */,
+				3385ED6E17AA297900F44EDB /* ParticleParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7633,6 +7760,11 @@
 				3313866D177A5A8400424DB4 /* GameDef.h in Headers */,
 				33138679177A5A9E00424DB4 /* UIScrollBar.h in Headers */,
 				331C099A17A22795000DEE17 /* Winding.h in Headers */,
+				3385ED2917AA26B900F44EDB /* Particles.h in Headers */,
+				3385ED4D17AA273C00F44EDB /* D_ParticleEmitter.h in Headers */,
+				3385ED5917AA274C00F44EDB /* T_ParticleEmitterPrecache.h in Headers */,
+				3385ED6717AA297900F44EDB /* ParticleMaterialLoader.h in Headers */,
+				3385ED7117AA297900F44EDB /* ParticleParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8016,6 +8148,12 @@
 				33FBD062173B073E00043A8D /* D_Light.cpp in Sources */,
 				33138672177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */,
 				3347717917A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */,
+				3385ED2217AA26B900F44EDB /* Particles.cpp in Sources */,
+				3385ED4617AA273C00F44EDB /* D_ParticleEmitter.cpp in Sources */,
+				3385ED5217AA274C00F44EDB /* T_ParticleEmitterPrecache.cpp in Sources */,
+				3385ED6017AA297900F44EDB /* ParticleMaterialLoader.cpp in Sources */,
+				3385ED6A17AA297900F44EDB /* ParticleParser.cpp in Sources */,
+				3385ED7917AA29A000F44EDB /* Math.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8208,6 +8346,12 @@
 				33FBD063173B073E00043A8D /* D_Light.cpp in Sources */,
 				33138673177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */,
 				3347717A17A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */,
+				3385ED2317AA26B900F44EDB /* Particles.cpp in Sources */,
+				3385ED4717AA273C00F44EDB /* D_ParticleEmitter.cpp in Sources */,
+				3385ED5317AA274C00F44EDB /* T_ParticleEmitterPrecache.cpp in Sources */,
+				3385ED6117AA297900F44EDB /* ParticleMaterialLoader.cpp in Sources */,
+				3385ED6B17AA297900F44EDB /* ParticleParser.cpp in Sources */,
+				3385ED7A17AA29A000F44EDB /* Math.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8496,6 +8640,16 @@
 				33FBD060173B073E00043A8D /* D_Light.cpp in Sources */,
 				33138670177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */,
 				3347717717A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */,
+				3385ED2017AA26B900F44EDB /* Particles.cpp in Sources */,
+				3385ED2E17AA26E500F44EDB /* EditorParticleEditorWidget.cpp in Sources */,
+				3385ED3817AA26E500F44EDB /* EditorParticleEditorWindow.cpp in Sources */,
+				3385ED4417AA273C00F44EDB /* D_ParticleEmitter.cpp in Sources */,
+				3385ED5017AA274C00F44EDB /* T_ParticleEmitterPrecache.cpp in Sources */,
+				3385ED5E17AA297900F44EDB /* ParticleMaterialLoader.cpp in Sources */,
+				3385ED6817AA297900F44EDB /* ParticleParser.cpp in Sources */,
+				3385ED7417AA298100F44EDB /* ParticleCooker.cpp in Sources */,
+				3385ED7717AA29A000F44EDB /* Math.cpp in Sources */,
+				3385ED7E17AA2A1100F44EDB /* EditorParticleThumb.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8688,6 +8842,12 @@
 				33FBD061173B073E00043A8D /* D_Light.cpp in Sources */,
 				33138671177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */,
 				3347717817A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */,
+				3385ED2117AA26B900F44EDB /* Particles.cpp in Sources */,
+				3385ED4517AA273C00F44EDB /* D_ParticleEmitter.cpp in Sources */,
+				3385ED5117AA274C00F44EDB /* T_ParticleEmitterPrecache.cpp in Sources */,
+				3385ED5F17AA297900F44EDB /* ParticleMaterialLoader.cpp in Sources */,
+				3385ED6917AA297900F44EDB /* ParticleParser.cpp in Sources */,
+				3385ED7817AA29A000F44EDB /* Math.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8881,6 +9041,12 @@
 				33FBD064173B073E00043A8D /* D_Light.cpp in Sources */,
 				33138674177A5A9E00424DB4 /* UIScrollBar.cpp in Sources */,
 				3347717B17A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */,
+				3385ED2417AA26B900F44EDB /* Particles.cpp in Sources */,
+				3385ED4817AA273C00F44EDB /* D_ParticleEmitter.cpp in Sources */,
+				3385ED5417AA274C00F44EDB /* T_ParticleEmitterPrecache.cpp in Sources */,
+				3385ED6217AA297900F44EDB /* ParticleMaterialLoader.cpp in Sources */,
+				3385ED6C17AA297900F44EDB /* ParticleParser.cpp in Sources */,
+				3385ED7B17AA29A000F44EDB /* Math.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

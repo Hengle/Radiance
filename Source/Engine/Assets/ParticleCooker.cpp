@@ -34,7 +34,8 @@ int ParticleCooker::Compile(int flags) {
 
 	int r = asset->Process(
 		xtime::TimeSlice::Infinite, 
-		flags|P_Load|P_TargetDefault
+		flags|P_Parse|P_TargetDefault,
+		pkg::SS_Parser
 	);
 
 	if (r < SR_Success)

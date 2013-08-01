@@ -75,9 +75,9 @@ public:
 	void Destroy(T* object);
 		
 	RAD_DECLARE_READONLY_PROPERTY(ObjectPool, numUsedObjects, int);
-	RAD_DECLARE_READONLY_PROPERTY(ObjectPool, numAllocatedObjects, int);
+	RAD_DECLARE_READONLY_PROPERTY(ObjectPool, numBlocks, int);
 	RAD_DECLARE_READONLY_PROPERTY(ObjectPool, numObjectsInBlock, int);
-	RAD_DECLARE_READONLY_PROPERTY(ObjectPool, maxObjects, int);
+	RAD_DECLARE_READONLY_PROPERTY(ObjectPool, maxBlocks, int);
 
 private:
 
@@ -88,16 +88,16 @@ private:
 		return m_memoryPool.numUsedChunks;
 	}
 
-	RAD_DECLARE_GET(numAllocatedObjects, int) {
-		return m_memoryPool.numAllocatedChunks;
+	RAD_DECLARE_GET(numBlocks, int) {
+		return m_memoryPool.numBlocks;
 	}
 	
 	RAD_DECLARE_GET(numObjectsInBlock, int) {
 		return m_memoryPool.numChunksInBlock;
 	}
 
-	RAD_DECLARE_GET(maxObjects, int) {
-		return m_memoryPool.maxChunks;
+	RAD_DECLARE_GET(maxBlocks, int) {
+		return m_memoryPool.maxBlocks;
 	}
 
 	MemoryPool m_memoryPool;
@@ -174,9 +174,9 @@ public:
 	void Destroy(T* object);
 		
 	RAD_DECLARE_READONLY_PROPERTY(ThreadSafeObjectPool, numUsedObjects, int);
-	RAD_DECLARE_READONLY_PROPERTY(ThreadSafeObjectPool, numAllocatedObjects, int);
+	RAD_DECLARE_READONLY_PROPERTY(ThreadSafeObjectPool, numBlocks, int);
 	RAD_DECLARE_READONLY_PROPERTY(ThreadSafeObjectPool, numObjectsInBlock, int);
-	RAD_DECLARE_READONLY_PROPERTY(ThreadSafeObjectPool, maxObjects, int);
+	RAD_DECLARE_READONLY_PROPERTY(ThreadSafeObjectPool, maxBlocks, int);
 
 private:
 
@@ -187,16 +187,16 @@ private:
 		return m_memoryPool.numUsedChunks;
 	}
 
-	RAD_DECLARE_GET(numAllocatedObjects, int) {
-		return m_memoryPool.numAllocatedChunks;
+	RAD_DECLARE_GET(numBlocks, int) {
+		return m_memoryPool.numBlocks;
 	}
 	
 	RAD_DECLARE_GET(numObjectsInBlock, int) {
 		return m_memoryPool.numChunksInBlock;
 	}
 
-	RAD_DECLARE_GET(maxObjects, int) {
-		return m_memoryPool.maxChunks;
+	RAD_DECLARE_GET(maxBlocks, int) {
+		return m_memoryPool.maxBlocks;
 	}
 
 	ThreadSafeMemoryPool m_memoryPool;

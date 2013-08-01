@@ -123,6 +123,22 @@ void GLRenderTarget::CreateDepthBufferTexture() {
 	
 	depthTex = GLTexture::CreateDepthTexture(tex->width, tex->height);
 
+#if defined(RAD_OPT_OGLES)
+	gl.FramebufferTexture2DEXT(
+		GL_FRAMEBUFFER_EXT,
+		GL_DEPTH_ATTACHMENT,
+		GL_TEXTURE_2D,
+		depthTex->id,
+		0
+	);
+	gl.FramebufferTexture2DEXT(
+		GL_FRAMEBUFFER_EXT,
+		GL_STENCIL_ATTACHMENT,
+		GL_TEXTURE_2D,
+		depthTex->id,
+		0
+	);
+#else
 	gl.FramebufferTexture2DEXT(
 		GL_FRAMEBUFFER_EXT,
 		GL_DEPTH_STENCIL_ATTACHMENT,
@@ -130,6 +146,7 @@ void GLRenderTarget::CreateDepthBufferTexture() {
 		depthTex->id,
 		0
 	);
+#endif
 
 	CHECK_GL_ERRORS();
 	RAD_ASSERT(gl.CheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT);
@@ -222,13 +239,20 @@ void GLRenderTarget::DiscardFramebuffer(DiscardFlags flags) {
 
 	gls.Set(glsFlags, -1, true);
 	
-	GLenum attachments[2] = { 0, 0 };
+	GLenum attachments[3] = { 0, 0 };
 	int num = 0;
 
 	if (flags&kDiscard_Color)
 		attachments[num++] = GL_COLOR_ATTACHMENT0_EXT;
-	if (flags&kDiscard_Depth)
+	if (flags&kDiscard_Depth) {
+#if defined(RAD_OPT_OGLES)
 		attachments[num++] = GL_DEPTH_ATTACHMENT_EXT;
+		attachments[num++] = GL_STENCIL_ATTACHMENT_EXT;
+#else
+		attachments[num++] = GL_DEPTH_STENCIL_ATTACHMENT;
+#endif
+	}
+		
     glDiscardFramebufferEXT(GL_FRAMEBUFFER_EXT, num, attachments);
 #endif
 }

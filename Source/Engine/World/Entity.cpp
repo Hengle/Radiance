@@ -509,7 +509,7 @@ void Entity::AttachChild(
 }
 
 void Entity::DetachChild(const Ref &child) {
-	for (Vec::const_iterator it = m_children.begin(); it != m_children.end(); ++it) {
+	for (Vec::iterator it = m_children.begin(); it != m_children.end(); ++it) {
 		if ((*it).get() == child.get()) {
 			child->m_parent.boneIdx = -1;
 			child->m_parent.model.reset();

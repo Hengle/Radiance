@@ -131,7 +131,7 @@ RADENG_API GLenum RADENG_CALL GLInternalFormat(GLenum format, GLenum type) {
 			switch (format) {
 			case GL_DEPTH_COMPONENT:
 #if defined(RAD_OPT_OGLES)
-				return GL_DEPTH24_STENCIL8_OES;
+				return GL_DEPTH_STENCIL;
 #else
 				return GL_DEPTH24_STENCIL8;
 #endif
@@ -340,7 +340,11 @@ void GLTexture::GenerateMipmaps(const Ref &tex) {
 }
 
 GLTexture::Ref GLTexture::CreateDepthTexture(int width, int height) {
+#if defined(RAD_OPT_OGLES)
+	const GLenum kDepthFormat = GL_DEPTH_STENCIL;
+#else
 	const GLenum kDepthFormat = GL_DEPTH24_STENCIL8;
+#endif
 	const GLenum kDepthComponents = GL_UNSIGNED_INT_24_8;
 	
 	GLTexture::Ref depthTex(new (ZRender) GLTexture(
