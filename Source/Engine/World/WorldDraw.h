@@ -129,7 +129,7 @@ public:
 
 	virtual void BindLitMaterialStates(
 		r::Material &mat,
-		const Vec4 *scissorBounds
+		bool lightStencil
 	) = 0;
 
 	virtual void BindRenderTarget() = 0;
@@ -141,7 +141,15 @@ public:
 
 	virtual void BeginFog() = 0;
 	virtual void EndFog() = 0;
-	
+
+	// lighting
+
+	virtual void RenderLightStencil(
+		const ViewDef &view,
+		const Vec4 **rects,
+		int numRects
+	) = 0;
+		
 	// Unified Shadows
 	virtual void BeginUnifiedShadows() = 0;
 	virtual void EndUnifiedShadows() = 0;
@@ -242,6 +250,9 @@ public:
 		int drawnFogs;
 		int drawnParticles;
 		int simulatedParticles;
+		int numLightPasses;
+		int numLightPassLights;
+		int numStencilLightPasses;
 		int numBatches;
 		int numTris;
 		int numMaterials;
@@ -554,7 +565,7 @@ private:
 	void DrawUnshadowedLitBatchLights(
 		ViewDef &view,
 		MBatchDraw &draw,
-		r::Material &mat
+		const details::MBatch &batch
 	);
 
 	void GenLightDef(

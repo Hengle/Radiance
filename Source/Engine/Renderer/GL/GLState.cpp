@@ -56,6 +56,7 @@ void GLState::Init(S &s) {
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_SCISSOR_TEST);
 	glDisable(GL_STENCIL_TEST);
+	glClearStencil(0);
 	glDepthFunc(GL_LESS);
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
@@ -82,20 +83,19 @@ void GLState::Init(S &s) {
 	s.d.scissor[2] = -1;
 	s.d.scissor[3] = -1;
 
-	s.d.stencil.mask = 0xff;
 	s.d.stencil.func = GL_ALWAYS;
 	s.d.stencil.funcRef = 0;
 	s.d.stencil.funcMask = 0xff;
 	glStencilFunc(GL_ALWAYS, 0, 0xff);
 
-	s.d.stencil.mask = 0xff;
-	glStencilMask(0xff);
+	s.d.stencil.mask = 0;
+	glStencilMask(0);
 
 	s.d.stencil.opFail = GL_KEEP;
 	s.d.stencil.opzFail = GL_KEEP;
 	s.d.stencil.opzPass = GL_KEEP;
 	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-
+	
 	s.t = 0;
 	s.s.s = s.d.s;
 	s.bb[0] = s.bb[1] = 0;

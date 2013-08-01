@@ -199,6 +199,9 @@ void GLRenderTarget::BindFramebuffer(DiscardFlags flags) {
 	if (mask) {
 		gls.Set(glsFlags, -1, true); // for glClear()
 		glClear(mask);
+
+		if (mask&GL_STENCIL_BUFFER_BIT)
+			gls.StencilMask(0);
 	}
 }
 

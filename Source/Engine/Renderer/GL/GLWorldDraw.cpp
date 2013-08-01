@@ -30,7 +30,7 @@ RB_WorldDraw::Ref RB_WorldDraw::New(World *world) {
 	return RB_WorldDraw::Ref(new (ZWorld) GLWorldDraw(world));
 }
 
-GLWorldDraw::GLWorldDraw(World *world) : RB_WorldDraw(world), m_flipMatrix(false) {
+GLWorldDraw::GLWorldDraw(World *world) : RB_WorldDraw(world), m_stencilRef(0), m_flipMatrix(false) {
 	m_overlaySize[0] = m_overlaySize[1] = 0;
 #if defined(WORLD_DEBUG_DRAW)
 	m_numDebugVerts = 0;
@@ -52,10 +52,14 @@ void GLWorldDraw::ClearBackBuffer() {
 	gls.StencilMask(0xff); // let us clear stencil
 	gls.Set(kColorWriteMask_RGBA|kDepthWriteMask_Enable|kScissorTest_Disable, -1, true); // for glClear()
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+	gls.StencilMask(0);
 }
 
 int GLWorldDraw::LoadMaterials() {
 	int r = LoadMaterial("Sys/Copy_M", m_copy_M);
+	if (r != pkg::SR_Success)
+		return r;
+	r = LoadMaterial("Sys/ClearStencil_M", m_clearStencil_M);
 	return r;
 }
 
@@ -105,6 +109,7 @@ void GLWorldDraw::BindRenderTarget() {
 
 	m_activeRT = m_framebufferRT;
 	m_activeRT->BindFramebuffer(GLRenderTarget::kDiscard_All);
+	m_stencilRef = 0;
 }
 
 Vec2 GLWorldDraw::BindPostFXTargets(bool chain, const r::Material &mat, const Vec2 &srcScale, const Vec2 &dstScale) {
@@ -261,6 +266,97 @@ void GLWorldDraw::EndFog() {
 		Copy(m_fogRT, m_framebufferRT, GLRenderTarget::kDiscard_All);
 		m_activeRT = m_framebufferRT;
 	}
+}
+
+void GLWorldDraw::RenderLightStencil(
+	const ViewDef &view,
+	const Vec4 **rects,
+	int numRects
+) {
+	m_clearStencil_M.material->BindTextures(m_clearStencil_M.loader);
+	m_clearStencil_M.material->BindStates(
+		kStencilTest_Enable|
+		kDepthWriteMask_Disable|
+		kDepthTest_Disable|
+		kColorWriteMask_Off
+	);
+
+	m_clearStencil_M.material->shader->Begin(r::Shader::kPass_Default, *m_clearStencil_M.material);
+
+	gl.MatrixMode(GL_PROJECTION);
+	gl.PushMatrix();
+	gl.LoadIdentity();
+
+	bool oldCullFace = gls.invertCullFace;
+	gls.invertCullFace = false;
+
+	gl.Ortho(0.0, 1.0, 1.0, 0.0, -1.0, 1.0);
+
+	gl.MatrixMode(GL_MODELVIEW);
+	gl.PushMatrix();
+	gl.LoadIdentity();
+	
+	m_rectMesh->BindAll(m_clearStencil_M.material->shader.get().get());
+
+	gls.StencilMask(0xff);
+
+	if (++m_stencilRef == 256) {
+		// stencil has wrapped, clear it
+		m_stencilRef = 1;
+		gls.StencilFunc(GL_ALWAYS, 0, 0xff);
+		gls.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		m_clearStencil_M.material->shader->BindStates();
+		gls.Commit();
+		m_rectMesh->CompileArrayStates(*m_clearStencil_M.material->shader.get());
+		m_rectMesh->Draw();
+	}
+
+	// write stencilRef into buffer over pixels
+	// that lights are touching.
+	gls.StencilFunc(GL_ALWAYS, m_stencilRef, 0xff);
+	gls.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+	const float kVw = view.viewport[2];
+	const float kVh = view.viewport[3];
+
+	for (int i = 0; i < numRects; ++i) {
+		// scale and translate into position
+		gl.PushMatrix();
+
+		const Vec4 &r = *rects[i];
+
+		gl.Translatef(
+			r[0] / kVw,
+			r[1] / kVh,
+			0.f
+		);
+
+		gl.Scalef(
+			r[2] / kVw,
+			r[3] / kVh,
+			1.f
+		);
+
+		m_clearStencil_M.material->shader->BindStates();
+		gls.Commit();
+		m_rectMesh->CompileArrayStates(*m_clearStencil_M.material->shader.get());
+		m_rectMesh->Draw();
+
+		gl.PopMatrix();
+	}
+	
+	m_clearStencil_M.material->shader->End();
+
+	gl.MatrixMode(GL_PROJECTION);
+	gl.PopMatrix();
+
+	gl.MatrixMode(GL_MODELVIEW);
+	gl.PopMatrix();
+
+	gls.invertCullFace = oldCullFace;
+
+	gls.StencilFunc(GL_EQUAL, m_stencilRef, 0xff);
+	gls.StencilMask(0);
 }
 
 void GLWorldDraw::BeginUnifiedShadows() {
@@ -531,26 +627,16 @@ void GLWorldDraw::ReleaseArrayStates() {
 		gls.BindVertexArray(GLVertexArrayRef());
 }
 
-void GLWorldDraw::BindLitMaterialStates(
-	r::Material &mat,
-	const Vec4 *rect
-) {
+void GLWorldDraw::BindLitMaterialStates(r::Material &mat, bool lightStencil) {
 	int flags = 0;
 	
 	if (mat.depthWrite)
 		flags |= kDepthTest_Equal|kDepthWriteMask_Disable;
 
-	if (rect) {
-		boost::array<int, 4> viewport;
-		world->game->Viewport(viewport[0], viewport[1], viewport[2], viewport[3]);
-
-		flags |= kScissorTest_Enable;
-		gls.Scissor(
-			FloatToInt((*rect)[0]),
-			viewport[3]-FloatToInt((*rect)[3]),
-			FloatToInt((*rect)[2])-FloatToInt((*rect)[0]),
-			FloatToInt((*rect)[3]-(*rect)[1])
-		);
+	if (lightStencil) {
+		flags |= kStencilTest_Enable;
+	} else {
+		flags |= kStencilTest_Disable;
 	}
 
 	int bm = 0;

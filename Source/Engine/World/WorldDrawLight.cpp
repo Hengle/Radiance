@@ -53,7 +53,7 @@ void WorldDraw::DrawUnshadowedLitBatch(
 
 	for (details::MBatchDrawLink *link = batch.head; link; link = link->next) {
 		MBatchDraw *draw = link->draw;
-		DrawUnshadowedLitBatchLights(view, *draw, *mat);
+		DrawUnshadowedLitBatchLights(view, *draw, batch);
 	}
 }
 
@@ -93,15 +93,15 @@ void WorldDraw::DrawBatch(
 void WorldDraw::DrawUnshadowedLitBatchLights(
 	ViewDef &view,
 	MBatchDraw &draw, 
-	r::Material &mat
+	const details::MBatch &batch
 ) {
-
+	r::Material &mat = *batch.matRef->mat;
 	RAD_ASSERT(mat.maxLights > 0);
 
 	Vec3 pos;
 	Vec3 angles;
 	Mat4 invTx;
-
+	
 	bool diffuse = mat.shader->HasPass(r::Shader::kPass_Diffuse1);
 	bool diffuseSpecular = mat.shader->HasPass(r::Shader::kPass_DiffuseSpecular1);
 
@@ -115,18 +115,23 @@ void WorldDraw::DrawUnshadowedLitBatchLights(
 
 	// draw all unshadowed lights
 	r::Shader::Uniforms u(draw.rgba.get());
-	BBox lightBounds;
-
+	
 	if (tx) {
 		u.eyePos = invTx * view.camera.pos.get();
 	} else {
 		u.eyePos = view.camera.pos;
 	}
 
-	int curPass = -1;
-	
 	const int kMaxLights = std::min(mat.maxLights.get(), m_world->cvars->r_maxLightsPerPass.value.get());
+	
+	const Vec4**scissorRects = (const Vec4**)stack_alloc(sizeof(Vec4*)*kMaxLights);
 
+	// true if a light takes up the entire screen and we can't stencil anything
+	// in the lighting pass
+	bool fullscreenLight = false;
+
+	// set when we've already done diffuseSpecular pass and are now interested
+	// in rendering diffuse only lights
 	bool didDiffuseSpecular = false;
 
 	for (;;) {
@@ -136,8 +141,7 @@ void WorldDraw::DrawUnshadowedLitBatchLights(
 
 			// batch up to kNumLights
 			u.lights.numLights = 0;
-			lightBounds.Initialize();
-	
+				
 			while (interaction && (u.lights.numLights < kMaxLights)) {
 				if ((interaction->light->m_visFrame != m_markFrame) ||
 					(interaction->light->intensity < 0.01f)) {
@@ -172,13 +176,25 @@ void WorldDraw::DrawUnshadowedLitBatchLights(
 					GenLightDef(*interaction->light, lightDef, tx ? &invTx : 0);
 					BBox bounds(interaction->light->bounds);
 					bounds.Translate(interaction->light->pos);
-					lightBounds.Insert(bounds);
+					
+					if (!fullscreenLight) {
+						// no fullscreen lights in this pass, add stencil rects
+						const Vec4 &stencilRect = interaction->light->m_scissor;
+						if ((stencilRect[2] < 1.f) && (stencilRect[3] < 1.f)) {
+							fullscreenLight = true;
+						} else {
+							scissorRects[u.lights.numLights-1] = &stencilRect;
+						}
+					}
 				}
 
 				interaction = interaction->nextOnBatch;
 			}
 
 			if (u.lights.numLights > 0) {
+
+				if (!fullscreenLight)
+					m_rb->RenderLightStencil(view, scissorRects, u.lights.numLights);
 
 				// find the correct pass
 				int pass;
@@ -192,27 +208,24 @@ void WorldDraw::DrawUnshadowedLitBatchLights(
 
 				RAD_ASSERT(mat.shader->HasPass((r::Shader::Pass)pass));
 
-				if (curPass != pass) {
-					mat.shader->End();
-					mat.shader->Begin((r::Shader::Pass)pass, mat);
-					curPass = pass;
-					draw.Bind(mat.shader.get().get());
-				}
+				m_rb->BindLitMaterialStates(mat, !fullscreenLight);
+				mat.BindTextures(batch.matRef->loader);
 
-				/*bool scissor = m_world->cvars->r_lightscissor.value;
+				mat.shader->Begin((r::Shader::Pass)pass, mat);
+				draw.Bind(mat.shader.get().get());
 				
-				if (m_world->cvars->r_lightscissor.value) {
-					scissor = CalcScissorBounds(view, lightBounds, scissorRect);
-				}*/
-
-				m_rb->BindLitMaterialStates(mat, 0);
-
 				mat.shader->BindStates(u);
 				m_rb->CommitStates();
 				draw.CompileArrayStates(*mat.shader.get());
 				draw.Draw();
+				mat.shader->End();
 
+				++m_counters.numLightPasses;
 				++m_counters.numBatches;
+				++m_counters.numLightPassLights += u.lights.numLights;
+
+				if (!fullscreenLight)
+					++m_counters.numStencilLightPasses;
 			}
 		}
 
@@ -225,10 +238,6 @@ void WorldDraw::DrawUnshadowedLitBatchLights(
 
 	if (tx)
 		m_rb->PopMatrix();
-
-	if (curPass != -1) {
-		mat.shader->End();
-	}
 }
 
 void WorldDraw::GenLightDef(

@@ -39,6 +39,10 @@ public:
 	CVarBool r_enablelights;
 	CVarBool r_unifiedshadows;
 	CVarBool r_showviewcontroller;
+	CVarBool r_drawworld;
+	CVarBool r_drawentities;
+	CVarBool r_drawoccupants;
+	CVarBool r_drawfog;
 
 	void AddLuaVar(const CVar::Ref &cvar) {
 		m_vec.push_back(cvar);

@@ -35,6 +35,10 @@ r_showunifiedlights(zone, "r_showunifiedlights", false, false),
 r_showunifiedlightbboxprojection(zone, "r_showunifiedlightbboxprojection", false, false),
 r_enablelights(zone, "r_enablelights", true, false),
 r_unifiedshadows(zone, "r_unifiedshadows", true, false),
-r_showviewcontroller(zone, "r_showviewcontroller", false, false) {
+r_showviewcontroller(zone, "r_showviewcontroller", false, false),
+r_drawworld(zone, "r_drawworld", true, false),
+r_drawentities(zone, "r_drawentities", true, false),
+r_drawoccupants(zone, "r_drawoccupants", true, false),
+r_drawfog(zone, "r_drawfog", true, false) {
 }
 

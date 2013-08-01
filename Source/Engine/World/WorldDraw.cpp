@@ -153,6 +153,9 @@ void WorldDraw::Counters::Clear() {
 	drawnFogs = 0;
 	drawnParticles = 0;
 	simulatedParticles = 0;
+	numLightPasses = 0;
+	numLightPassLights = 0;
+	numStencilLightPasses = 0;
 	numBatches = 0;
 	numTris = 0;
 	numMaterials = 0;
@@ -606,11 +609,11 @@ bool WorldDraw::ExactlyCullBox(
 	if (!inside)
 		return true; // clipped out
 	
-	// clamp
-	rect[0] = math::Clamp(rect[0], (float)view.viewport[0], (float)view.viewport[0]+view.viewport[2]);
-	rect[1] = math::Clamp(rect[1], (float)view.viewport[1], (float)view.viewport[1]+view.viewport[3]);
-	rect[2] = math::Clamp(rect[2], (float)view.viewport[0], (float)view.viewport[0]+view.viewport[2]);
-	rect[3] = math::Clamp(rect[3], (float)view.viewport[1], (float)view.viewport[1]+view.viewport[3]);
+	// clamp (add some slop to avoid cutting off pixels)
+	rect[0] = math::Clamp(rect[0]-1, (float)view.viewport[0], (float)view.viewport[0]+view.viewport[2]);
+	rect[1] = math::Clamp(rect[1]-1, (float)view.viewport[1], (float)view.viewport[1]+view.viewport[3]);
+	rect[2] = math::Clamp(rect[2]+1, (float)view.viewport[0], (float)view.viewport[0]+view.viewport[2]);
+	rect[3] = math::Clamp(rect[3]+1, (float)view.viewport[1], (float)view.viewport[1]+view.viewport[3]);
 
 	if ((rect[0] == (float)view.viewport[0]) && (rect[1] == (float)view.viewport[1]) &&
 		(rect[2] == ((float)view.viewport[0]+view.viewport[2])) && (rect[3] == ((float)view.viewport[1]+view.viewport[3]))) {
@@ -818,78 +821,82 @@ void WorldDraw::VisMarkArea(
 	}
 
 	// mark world models.
-	for (int i = 0; i < area.numModels; ++i) {
-		U16 modelNum = *(m_world->m_bsp->ModelIndices() + i + area.firstModel);
-		RAD_ASSERT(modelNum < (U16)m_worldModels.size());
+	if (m_world->cvars->r_drawworld.value) {
+		for (int i = 0; i < area.numModels; ++i) {
+			U16 modelNum = *(m_world->m_bsp->ModelIndices() + i + area.firstModel);
+			RAD_ASSERT(modelNum < (U16)m_worldModels.size());
 
-		const MStaticWorldMeshBatch::Ref &m = m_worldModels[modelNum];
-		if (!m->visible)
-			continue;
-
-		if (m->m_markFrame != m_markFrame) {
-			m->m_markFrame = m_markFrame;
-			++m_counters.testedWorldModels;
-		}
-
-		if (m->m_visibleFrame != m_markFrame) {
-#if defined(WORLD_DEBUG_DRAW)
-			if (m_world->cvars->r_showworldbboxes.value)
-				m_dbgVars.worldBBoxes.push_back(m->TransformedBounds());
-#endif
-			if (!m_world->cvars->r_frustumcull.value || ClipBounds(view.frustumVolume, view.frustumBounds, m->TransformedBounds())) {
-				m->m_visibleFrame = m_markFrame;
-				++m_counters.drawnWorldModels;
-				details::MBatch *batch = AddViewBatch(view, m->m_matRef, m->m_matId);
-				if (batch)
-					batch->AddDraw(*m);
-			}
-		}
-	}
-
-	// add entities.
-	for (EntityPtrSet::const_iterator it = area.entities.begin(); it != area.entities.end(); ++it) {
-		Entity *e = *it;
-
-		for (DrawModel::Map::const_iterator it = e->models->begin(); it != e->models->end(); ++it) {
-			const DrawModel::Ref &m = it->second;
+			const MStaticWorldMeshBatch::Ref &m = m_worldModels[modelNum];
 			if (!m->visible)
 				continue;
 
 			if (m->m_markFrame != m_markFrame) {
 				m->m_markFrame = m_markFrame;
-				++m_counters.testedEntityModels;
+				++m_counters.testedWorldModels;
 			}
 
 			if (m->m_visibleFrame != m_markFrame) {
-
+#if defined(WORLD_DEBUG_DRAW)
+				if (m_world->cvars->r_showworldbboxes.value)
+					m_dbgVars.worldBBoxes.push_back(m->TransformedBounds());
+#endif
 				if (!m_world->cvars->r_frustumcull.value || ClipBounds(view.frustumVolume, view.frustumBounds, m->TransformedBounds())) {
 					m->m_visibleFrame = m_markFrame;
-					m->m_inView = true;
-					++m_counters.drawnEntityModels;
+					++m_counters.drawnWorldModels;
+					details::MBatch *batch = AddViewBatch(view, m->m_matRef, m->m_matId);
+					if (batch)
+						batch->AddDraw(*m);
+				}
+			}
+		}
+	}
 
-					if (e->m_markFrame != m_markFrame) {
-						e->m_markFrame = m_markFrame;
-						e->m_ps.visible = true;
-						++m_counters.drawnEntities;
+	// add entities.
+	if (m_world->cvars->r_drawentities.value) {
+		for (EntityPtrSet::const_iterator it = area.entities.begin(); it != area.entities.end(); ++it) {
+			Entity *e = *it;
+
+			for (DrawModel::Map::const_iterator it = e->models->begin(); it != e->models->end(); ++it) {
+				const DrawModel::Ref &m = it->second;
+				if (!m->visible)
+					continue;
+
+				if (m->m_markFrame != m_markFrame) {
+					m->m_markFrame = m_markFrame;
+					++m_counters.testedEntityModels;
+				}
+
+				if (m->m_visibleFrame != m_markFrame) {
+
+					if (!m_world->cvars->r_frustumcull.value || ClipBounds(view.frustumVolume, view.frustumBounds, m->TransformedBounds())) {
+						m->m_visibleFrame = m_markFrame;
+						m->m_inView = true;
+						++m_counters.drawnEntityModels;
+
+						if (e->m_markFrame != m_markFrame) {
+							e->m_markFrame = m_markFrame;
+							e->m_ps.visible = true;
+							++m_counters.drawnEntities;
 
 #if defined(WORLD_DEBUG_DRAW)
-						if (m_world->cvars->r_showentitybboxes.value) {
-							BBox bounds(e->ps->bbox);
-							bounds.Translate(e->ps->worldPos);
-							m_dbgVars.entityBBoxes.push_back(bounds);
-						}
+							if (m_world->cvars->r_showentitybboxes.value) {
+								BBox bounds(e->ps->bbox);
+								bounds.Translate(e->ps->worldPos);
+								m_dbgVars.entityBBoxes.push_back(bounds);
+							}
 #endif
-					}			
+						}			
 
-					for (MBatchDraw::Vec::const_iterator it = m->m_batches.begin(); it != m->m_batches.end(); ++it) {
-						const MBatchDraw::Ref &draw = *it;
+						for (MBatchDraw::Vec::const_iterator it = m->m_batches.begin(); it != m->m_batches.end(); ++it) {
+							const MBatchDraw::Ref &draw = *it;
 						
-						if ((draw->m_markFrame != m_markFrame) && draw->visible) {
-							draw->m_markFrame = m_markFrame;
-							draw->m_visibleFrame = m_markFrame;
-							details::MBatch *batch = AddViewBatch(view, draw->m_matRef, draw->m_matId);
-							if (batch)
-								batch->AddDraw(*draw);
+							if ((draw->m_markFrame != m_markFrame) && draw->visible) {
+								draw->m_markFrame = m_markFrame;
+								draw->m_visibleFrame = m_markFrame;
+								details::MBatch *batch = AddViewBatch(view, draw->m_matRef, draw->m_matId);
+								if (batch)
+									batch->AddDraw(*draw);
+							}
 						}
 					}
 				}
@@ -899,39 +906,41 @@ void WorldDraw::VisMarkArea(
 
 	// add batch occupants.
 	
-	for (MBatchOccupantPtrSet::const_iterator it = area.occupants.begin(); it != area.occupants.end(); ++it) {
-		MBatchOccupant *o = *it;
-		if (!o->visible)
-			continue;
-
-		for (MBatchDraw::Vec::const_iterator it = o->batches->begin(); it != o->batches->end(); ++it) {
-			const MBatchDraw::Ref &m = *it;
-			if (!m->visible)
+	if (m_world->cvars->r_drawoccupants.value) {
+		for (MBatchOccupantPtrSet::const_iterator it = area.occupants.begin(); it != area.occupants.end(); ++it) {
+			MBatchOccupant *o = *it;
+			if (!o->visible)
 				continue;
 
-			if (m->m_markFrame != m_markFrame) {
-				m->m_markFrame = m_markFrame;
-				++m_counters.testedActorModels;
-			}
+			for (MBatchDraw::Vec::const_iterator it = o->batches->begin(); it != o->batches->end(); ++it) {
+				const MBatchDraw::Ref &m = *it;
+				if (!m->visible)
+					continue;
 
-			if (m->m_visibleFrame != m_markFrame) {
+				if (m->m_markFrame != m_markFrame) {
+					m->m_markFrame = m_markFrame;
+					++m_counters.testedActorModels;
+				}
+
+				if (m->m_visibleFrame != m_markFrame) {
 				
-				if (!m_world->cvars->r_frustumcull.value || ClipBounds(view.frustumVolume, view.frustumBounds, m->TransformedBounds())) {
-					m->m_visibleFrame = m_markFrame;
-					++m_counters.drawnActorModels;
+					if (!m_world->cvars->r_frustumcull.value || ClipBounds(view.frustumVolume, view.frustumBounds, m->TransformedBounds())) {
+						m->m_visibleFrame = m_markFrame;
+						++m_counters.drawnActorModels;
 
-					if (o->m_markFrame != m_markFrame) {
-						o->m_markFrame = m_markFrame;
-						++m_counters.drawnActors;
-			#if defined(WORLD_DEBUG_DRAW)
-						if (m_world->cvars->r_showactorbboxes.value)
-							m_dbgVars.actorBBoxes.push_back(o->bounds);
-			#endif
+						if (o->m_markFrame != m_markFrame) {
+							o->m_markFrame = m_markFrame;
+							++m_counters.drawnActors;
+#if defined(WORLD_DEBUG_DRAW)
+							if (m_world->cvars->r_showactorbboxes.value)
+								m_dbgVars.actorBBoxes.push_back(o->bounds);
+#endif
+						}
+
+						details::MBatch *batch = AddViewBatch(view, m->m_matRef, m->m_matId);
+						if (batch)
+							batch->AddDraw(*m);	
 					}
-
-					details::MBatch *batch = AddViewBatch(view, m->m_matRef, m->m_matId);
-					if (batch)
-						batch->AddDraw(*m);	
 				}
 			}
 		}

@@ -13,6 +13,9 @@ namespace world {
 
 void WorldDraw::DrawFog(ViewDef &view) {
 
+	if (!m_world->cvars->r_drawfog.value)
+		return;
+
 	if (view.area < 0)
 		return;
 		

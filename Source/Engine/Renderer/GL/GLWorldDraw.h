@@ -67,7 +67,7 @@ public:
 
 	virtual void BindLitMaterialStates(
 		r::Material &mat,
-		const Vec4 *scissorBounds
+		bool lightStencil
 	);
 
 	virtual void BeginFog();
@@ -75,6 +75,12 @@ public:
 	virtual void BeginFogDraw(r::Material &fog);
 	virtual void EndFog();
 
+	virtual void RenderLightStencil(
+		const ViewDef &view,
+		const Vec4 **rects,
+		int numRects
+	);
+	
 	virtual void BeginUnifiedShadows();
 	virtual void EndUnifiedShadows();
 
@@ -197,9 +203,11 @@ private:
 	void CreateRect();
 
 	asset::MaterialBundle m_copy_M;
+	asset::MaterialBundle m_clearStencil_M;
 	r::Mesh::Ref m_rectMesh;
 	r::Mesh::Ref m_overlay;
 
+	int m_stencilRef;
 	int m_overlaySize[2];
 	bool m_flipMatrix;
 
