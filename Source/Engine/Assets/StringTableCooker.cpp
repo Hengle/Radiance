@@ -39,10 +39,9 @@ CookStatus StringTableCooker::CheckRebuildFiles(int flags) {
 }
 
 CookStatus StringTableCooker::Status(int flags) {
-	if (CompareVersion(flags) ||
-		CompareModifiedTime(flags))
-		return CheckRebuildFiles(flags);
-	return CS_UpToDate;
+	if (CompareVersion(flags) || CompareModifiedTime(flags))
+		return CS_NeedRebuild;
+	return CheckRebuildFiles(flags);
 }
 
 int StringTableCooker::Compile(int flags) {
