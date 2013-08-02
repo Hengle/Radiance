@@ -185,6 +185,7 @@ bool WorldLua::Init() {
 		{ "CreateSpawnTask", lua_System_CreateSpawnTask },
 		{ "CreateTempSpawnTask", lua_System_CreateTempSpawnTask },
 		{ "COut", lua_System_COut },
+		{ "ReadMilliseconds", lua_System_ReadMilliseconds },
 		{ "CurrentDateAndTime", lua_System_CurrentDateAndTime },
 		{ "BuildConfig", lua_System_BuildConfig },
 		{ "UTF8To32", lua_System_UTF8To32 },

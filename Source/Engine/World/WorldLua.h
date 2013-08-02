@@ -139,6 +139,7 @@ private:
 	static int lua_System_Fullscreen(lua_State *L);
 	static int lua_System_ScreenSize(lua_State *L);
 	static int lua_System_COut(lua_State *L);
+	static int lua_System_ReadMilliseconds(lua_State *L);
 	static int lua_System_CurrentDateAndTime(lua_State *L);
 	static int lua_System_CreatePrecacheTask(lua_State *L);
 	static int lua_System_CreateSpawnTask(lua_State *L);

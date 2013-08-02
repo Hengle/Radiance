@@ -158,6 +158,11 @@ int WorldLua::lua_System_CreateTempSpawnTask(lua_State *L) {
 	 return 0;
  }
 
+ int WorldLua::lua_System_ReadMilliseconds(lua_State *L) {
+	 lua_pushnumber(L, xtime::ReadMilliseconds());
+	 return 1;
+ }
+
 int WorldLua::lua_System_SaveSession(lua_State *L) {
 	LOAD_SELF
 	
