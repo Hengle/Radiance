@@ -114,7 +114,7 @@ int ConversationTree::PushCopy(lua_State *L) const {
 		const Dialog &dialog = *it->second;
 		lua_pushinteger(L, dialog.uid);
 
-		int numTableElems = 4;
+		int numTableElems = 5;
 		if (!dialog.action.empty)
 			++numTableElems;
 		if (!dialog.condition.empty)
@@ -160,11 +160,14 @@ int ConversationTree::PushCopy(lua_State *L) const {
 
 void ConversationTree::PushRoot(lua_State *L, const Root &root, int dialogTable) const {
 
-	lua_createtable(L, 0, 6);
+	lua_createtable(L, 0, 7);
 	
+	lua_pushstring(L, root.name.c_str);
+	lua_setfield(L, -2, "name");
+
 	// reply = {{prob = {0, 1}, "REPLY"}}
 	lua_createtable(L, (int)root.prompts->size(), 0);
-	
+
 	for (size_t i = 0; i < root.prompts->size(); ++i) {
 		const StringOption &prompt = root.prompts[i];
 		if (prompt.text.empty)
@@ -220,6 +223,9 @@ void ConversationTree::PushDialog(lua_State *L, const Dialog &dialog, int dialog
 
 	lua_pushinteger(L, dialog.uid);
 	lua_gettable(L, dialogTable);
+
+	lua_pushstring(L, dialog.name.c_str);
+	lua_setfield(L, -2, "name");
 
 	if (!dialog.choices->empty()) {
 		lua_createtable(L, (int)dialog.choices->size(), 0);

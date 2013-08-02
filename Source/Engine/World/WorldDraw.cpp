@@ -582,7 +582,9 @@ bool WorldDraw::ExactlyCullBox(
 				break;
 		}
 
-		if (!w.Empty()) {
+		inside = !w.Empty() || inside;
+
+		if (!w.Empty() && scissorOut) {
 			// project and record
 			Vec3 p;
 
@@ -593,7 +595,6 @@ bool WorldDraw::ExactlyCullBox(
 					w.Vertices()[i],
 					p
 				)) {
-					inside = true;
 					// x's
 					rect[0] = math::Min(rect[0], p[0]);
 					rect[2] = math::Max(rect[2], p[0]);
@@ -609,19 +610,19 @@ bool WorldDraw::ExactlyCullBox(
 	if (!inside)
 		return true; // clipped out
 	
-	// clamp (add some slop to avoid cutting off pixels)
-	rect[0] = math::Clamp(rect[0]-1, (float)view.viewport[0], (float)view.viewport[0]+view.viewport[2]);
-	rect[1] = math::Clamp(rect[1]-1, (float)view.viewport[1], (float)view.viewport[1]+view.viewport[3]);
-	rect[2] = math::Clamp(rect[2]+1, (float)view.viewport[0], (float)view.viewport[0]+view.viewport[2]);
-	rect[3] = math::Clamp(rect[3]+1, (float)view.viewport[1], (float)view.viewport[1]+view.viewport[3]);
+	if (scissorOut) {
+		// clamp (add some slop to avoid cutting off pixels)
+		rect[0] = math::Clamp(rect[0]-1, (float)view.viewport[0], (float)view.viewport[0]+view.viewport[2]);
+		rect[1] = math::Clamp(rect[1]-1, (float)view.viewport[1], (float)view.viewport[1]+view.viewport[3]);
+		rect[2] = math::Clamp(rect[2]+1, (float)view.viewport[0], (float)view.viewport[0]+view.viewport[2]);
+		rect[3] = math::Clamp(rect[3]+1, (float)view.viewport[1], (float)view.viewport[1]+view.viewport[3]);
 
-	if ((rect[0] == (float)view.viewport[0]) && (rect[1] == (float)view.viewport[1]) &&
-		(rect[2] == ((float)view.viewport[0]+view.viewport[2])) && (rect[3] == ((float)view.viewport[1]+view.viewport[3]))) {
-		if (scissorOut)
+		if ((rect[0] == (float)view.viewport[0]) && (rect[1] == (float)view.viewport[1]) &&
+			(rect[2] == ((float)view.viewport[0]+view.viewport[2])) && (rect[3] == ((float)view.viewport[1]+view.viewport[3]))) {
 			*scissorOut = Vec4::Zero;
-	} else {
-		if (scissorOut)
+		} else {
 			*scissorOut = rect;
+		}
 	}
 
 	return false;
@@ -789,7 +790,7 @@ void WorldDraw::VisMarkArea(
 			continue;
 
 		if ((light.m_visFrame != m_markFrame) &&
-			(light.intensity >= 0.01f)) {
+			((light.intensity) >= 0.01f || (light.baseIntensity < 0.f))) {
 			
 			BBox bounds(light.m_bounds);
 			bounds.Translate(light.m_pos);
@@ -801,7 +802,9 @@ void WorldDraw::VisMarkArea(
 					continue;
 				}
 
-				++m_counters.visLights;
+				if (light.intensity >= 0.01f)
+					++m_counters.visLights;
+
 				light.m_visFrame = m_markFrame;
 				view.visLights.push_back(&light);
 #if defined(WORLD_DEBUG_DRAW)
