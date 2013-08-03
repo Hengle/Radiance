@@ -134,6 +134,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
+class GlyphCache;
 class RADRT_CLASS Font : public boost::noncopyable {
 public:
 
@@ -183,6 +184,8 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Font, descenderPixels, float);
 
 private:
+
+	friend class GlyphCache;
 
 	RAD_DECLARE_GET(glyph, Glyph*);
 	RAD_DECLARE_GET(ascenderPixels, float);

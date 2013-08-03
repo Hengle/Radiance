@@ -620,7 +620,8 @@ GlyphCache::~GlyphCache() {
 	Destroy();
 }
 
-void GlyphCache::Create(Font &font, 
+void GlyphCache::Create(
+	Font &font, 
 	int fontWidth, 
 	int fontHeight, 
 	int fontHorzDPI,
@@ -658,11 +659,35 @@ void GlyphCache::Create(Font &font,
 
 	m_fontWidth = fontWidth;
 	m_fontHeight = fontHeight;
-	m_cellWidth = fontWidth + (CellBorder<<1);
-	m_cellHeight = fontHeight + (CellBorder<<1);
 
-	RAD_ASSERT(pageWidth >= m_cellWidth);
-	RAD_ASSERT(pageHeight >= m_cellHeight);
+	// figure out the real font sizes;
+	m_cellWidth = 0;
+	m_cellHeight = 0;
+
+	font.SetPixelSize(fontWidth, fontHeight);
+
+	FT_UInt glyph;
+	FT_ULong charCode = FT_Get_First_Char(font.m_face, &glyph);
+	while (glyph != 0) {
+		if (font.LoadGlyphFromIndex(glyph)) {
+			m_cellWidth = std::max(m_cellWidth, CeilFastInt(font.glyph->metrics->width.get()));
+			m_cellHeight = std::max(m_cellHeight, CeilFastInt(font.glyph->metrics->height.get()));
+//#if !defined(RAD_OPT_SHIP)
+//			if (font.glyph->Render()) {
+//				const Bitmap *bitmap = font.glyph->bitmap;
+//				RAD_VERIFY(bitmap->width == CeilFastInt(font.glyph->metrics->width));
+//				RAD_VERIFY(bitmap->height == CeilFastInt(font.glyph->metrics->height));
+//			}
+//#endif
+		}
+		charCode = FT_Get_Next_Char(font.m_face, charCode, &glyph);
+	}
+
+	m_cellWidth += CellBorder<<1;
+	m_cellHeight += CellBorder<<1;
+
+	RAD_VERIFY_MSG(pageWidth >= m_cellWidth, "Font size is too big");
+	RAD_VERIFY_MSG(pageHeight >= m_cellHeight, "Font size is too big");
 
 	m_pageWidth = pageWidth;
 	m_pageHeight = pageHeight;
@@ -1102,12 +1127,17 @@ void GlyphCache::UploadGlyph(Cell *cell) {
 
 		dst = dst + (y * dstPitch + x);
 
+#if !defined(RAD_OPT_SHIP)
+		RAD_VERIFY((CellBorder*2+cell->bmWidth) <= m_cellWidth);
+		RAD_VERIFY((CellBorder*2+cell->bmHeight) <= m_cellHeight);
+#endif
+
 		// set top border.
 		for (int i = 0; i < CellBorder;  ++i) {
 			memset(dst, 0, m_cellWidth);
 			dst += dstPitch;
 		}
-		
+
 		for (int y = 0; y < cell->bmHeight; ++y) {
 			for (int i = 0; i < CellBorder; ++i)
 				dst[i] = 0;
