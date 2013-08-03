@@ -460,7 +460,7 @@ Sound::~Sound() {
 		}
 
 		// NOTE: in Sound::Tick we issue a custom ALDriver command that queries the status
-		// of the source (alSourcei(AL_SOURCE_STATUS). This is an asynchronous command that
+		// of the source (alSourcei(AL_SOURCE_STATE). This is an asynchronous command that
 		// writes to a member of a Source object contained in the m_sources[] vector of this
 		// object.
 		//
