@@ -1091,6 +1091,12 @@ bool BSPBuilder::EmitBSPFloors() {
 			continue;
 		}
 
+		if (FindBSPFloor(m->name.c_str) >= 0) {
+			Log("ERROR: there are multiple floor meshes for '%s', floors can only be a single mesh.\n", m->name.c_str.get());
+			SetResult(pkg::SR_CompilerError);
+			return false;
+		}
+
 		FloorBuilder builder(*m, this);
 
 		for (SceneFile::TriFaceVec::const_iterator fIt = m->tris.begin(); fIt != m->tris.end(); ++fIt) {
@@ -1473,8 +1479,11 @@ int BSPBuilder::FindBSPFloor(const char *name) {
 		if (!(m->contents&kContentsFlag_Floor))
 			continue;
 
-		if (m->name == kName)
+		if (m->name == kName) {
+			if (m->emitIds.empty() || m->emitIds[0].empty())
+				return -1;
 			return m->emitIds[0][0];
+		}
 	}
 
 	return -1;
@@ -1498,7 +1507,7 @@ int BSPBuilder::PutPointOnFloor(Vec3 &pos, int floorNum) {
 		
 		Vec3 clip;
 
-		if (!kTriPlane.IntersectLineSegment(clip, pos, end, 0.f))
+		if (!kTriPlane.IntersectLineSegment(clip, pos, end, 0.1f))
 			continue;
 
 		ValueType distSq = (clip-pos).MagnitudeSquared();
@@ -1516,7 +1525,7 @@ int BSPBuilder::PutPointOnFloor(Vec3 &pos, int floorNum) {
 			if (side)
 				plane.Flip();
 
-			if (plane.Side(clip) == Plane::Back) {
+			if (plane.Side(clip, 0.1f) == Plane::Back) {
 				break;
 			}
 		}
