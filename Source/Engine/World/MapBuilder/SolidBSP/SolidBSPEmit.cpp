@@ -1507,7 +1507,7 @@ int BSPBuilder::PutPointOnFloor(Vec3 &pos, int floorNum) {
 		
 		Vec3 clip;
 
-		if (!kTriPlane.IntersectLineSegment(clip, pos, end, 0.1f))
+		if (!kTriPlane.IntersectLineSegment(clip, pos, end, 0.01f))
 			continue;
 
 		ValueType distSq = (clip-pos).MagnitudeSquared();
@@ -1525,7 +1525,7 @@ int BSPBuilder::PutPointOnFloor(Vec3 &pos, int floorNum) {
 			if (side)
 				plane.Flip();
 
-			if (plane.Side(clip, 0.1f) == Plane::Back) {
+			if (plane.Side(clip, 0.01f) == Plane::Back) {
 				break;
 			}
 		}

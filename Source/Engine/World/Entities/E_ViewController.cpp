@@ -771,7 +771,164 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 	m_sync = false;
 }
 
+void E_ViewController::ClassifyRail(const Vec3 &target, const Vec3 &targetFwd) {
+
+	// classify distance gradiants as +/- (towards or away from target)
+	const bsp_file::BSPFile *bspFile = world->bspFile;
+
+	for (S32 i = 0; i < m_rail.track->numTMs; ++i) {
+		const bsp_file::BSPCameraTM *tm = bspFile->CameraTMs() + m_rail.track->firstTM + i;
+
+		Vec3 v = target - tm->t;
+				
+		float d = v.MagnitudeSquared();
+		float dd = m_rail.distanceSq - d;
+		float abs = math::Abs(dd);
+
+		v.Normalize();
+
+		m_rail.metrics[i].d = d;
+		m_rail.metrics[i].dd = dd;
+		m_rail.metrics[i].abs = abs;
+		m_rail.metrics[i].dot = targetFwd.Dot(v);
+
+		m_rail.metrics[i].absPolarity = (dd <= 0.f) ? kPolarity_Plus : kPolarity_Minus;
+
+		if (i > 0) {
+			if (m_rail.metrics[i].d > m_rail.metrics[i-1].d) {
+				m_rail.metrics[i].relPolarity = kPolarity_Minus;
+			} else if (m_rail.metrics[i].d < m_rail.metrics[i-1].d) {
+				m_rail.metrics[i].relPolarity = kPolarity_Plus;
+			} else {
+				m_rail.metrics[i].relPolarity = kPolarity_Zero;
+			}
+
+			if (i == 1) {
+				m_rail.metrics[0].relPolarity = m_rail.metrics[1].relPolarity;
+			}
+		} else {
+			m_rail.metrics[i].relPolarity = kPolarity_Zero;
+		}
+	}
+}
+
+int E_ViewController::UpdateCameraTM(
+	const Vec3 &target, 
+	const Vec3 &targetFwd,
+	int curIdx,
+	bool behind
+) {
+	const bsp_file::BSPFile *bspFile = world->bspFile;
+
+	if (curIdx < 0) {
+
+		// in both cases, we are looking for a polarity switch from Plus to Minus or Minus to Plus (we stop previous)
+
+		if (m_rail.startMode == kRailStart_End) {
+			// from start of track, find the point closest to the target
+			// before a polarity change.
+			// NOTE: polarity is reversed because we are looping through the track backwards
+			// (i.e.) points moving away going front->back are moving towards when going back->front
+
+			int best = m_rail.track->numTMs-1;
+			const Polarity kPolarity = m_rail.metrics[best].absPolarity;
+						
+			for (S32 i = m_rail.track->numTMs-2; i >= 0; --i) {
+				if (m_rail.metrics[i].absPolarity != kPolarity)
+					break;
+
+				best = i;
+			}
+
+			return best;
+
+		}
+		
+		// from start of track, find first polarity change
+
+		int best = 0;
+		const Polarity kPolarity = m_rail.metrics[best].absPolarity;
+
+		
+		for (S32 i = 1; i < m_rail.track->numTMs; ++i) {
+			const bsp_file::BSPCameraTM *tm = bspFile->CameraTMs() + m_rail.track->firstTM + i;
+
+			if (m_rail.metrics[i].absPolarity != kPolarity) // transition
+				break;
+			
+			best = i;
+		}
+
+		return best;
+	}
+	
+	// do we even need to move (max distance only camera)?
+	if (!m_rail.strict) {
+		if (m_rail.metrics[curIdx].dd >= 0.f)
+			return curIdx; // nope
+	}
+
+	// default: always move towards distance, never go closer
+	Polarity plus = kPolarity_Plus;
+	Polarity minus = kPolarity_Minus;
+
+	if (m_rail.strict && (m_rail.metrics[curIdx].dd >= 0.f)) {
+		// we are too close to the target, move away
+		plus = kPolarity_Minus;
+		minus = kPolarity_Plus;
+	}
+
+	// try and follow the gradiant to a better spot.
+	int best = curIdx;
+
+	for (int i = curIdx+1; i < m_rail.track->numTMs; ++i) {
+		if (m_rail.metrics[i].relPolarity == minus) // not moving towards target
+			break;
+		if (m_rail.metrics[i].absPolarity != plus)
+			break; // we've moved too close (cam doesn't go closer than specific distance)
+		if (m_rail.metrics[i].relPolarity == plus)
+			best = i;
+	}
+
+	if (best != curIdx)
+		return best;
+
+	// try gradiant going backwards
+	for (int i = curIdx-1; i >= 0; --i) {
+		const Polarity kRelPolarity = ReversePolarity(m_rail.metrics[i].relPolarity);
+		if (kRelPolarity == minus) // not moving towards target
+			break;
+		if (m_rail.metrics[i].absPolarity != plus)
+			break; // we've moved too close (cam doesn't go closer than specific distance)
+		if (kRelPolarity == plus)
+			best = i;
+	}
+
+	return best;
+}
+
+
 void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFwd) {
+
+	// generate rail gradiants
+	ClassifyRail(target, targetFwd);
+
+	const bsp_file::BSPFile *bspFile = world->bspFile;
+	int curIdx = -1;
+
+	if (m_rail.tm[2]) {
+		curIdx = (m_rail.tm[2]-bspFile->CameraTMs()) - m_rail.track->firstTM;
+	}
+
+	curIdx = UpdateCameraTM(target, targetFwd, curIdx, false);
+	if (curIdx < 0)
+		curIdx = 0;
+
+	m_rail.tm[2] = bspFile->CameraTMs() + m_rail.track->firstTM + curIdx;
+
+	/*
+
+
 	static const float kFrontAngle = 0.f;
 	static const float kBackAngle = -0.707f;
 	const bsp_file::BSPFile *bspFile = world->bspFile;
@@ -957,6 +1114,9 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 				fallback0[1] = tm;
 				fallbackDist0[1] = abs;
 			}
+
+			if (dd < 0.f) // rope cam wouldn't be pulled anymore
+				matchNearest[0] = false;
 		}
 
 		if (!m_rail.strict && m_rail.tm[0]&&!matchNearest[0]&&(!stayBehind||(!matchNearest[1]&&m_rail.tm[1])))
@@ -1030,7 +1190,7 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 		m_rail.tm[2] = m_rail.tm[0];
 	}
 
-	/*if (prev != m_rail.tm[2]) {
+	if (prev != m_rail.tm[2]) {
 		COut(C_Debug) << "Rail Point Switch (" << (int)((prev-bspFile->CameraTMs())-m_rail.track->firstTM) << ") -> (" << (int)((m_rail.tm[2]-bspFile->CameraTMs())-m_rail.track->firstTM) << ")" << std::endl;
 	}*/
 }
@@ -1137,6 +1297,7 @@ void E_ViewController::SetRailMode(
 		if (trigger->camera < 0)
 			continue;
 		m_rail.track = world->bspFile->CameraTracks() + trigger->camera;
+		m_rail.metrics = (RailMetric*)zone_realloc(ZWorld, m_rail.metrics, sizeof(RailMetric)*m_rail.track->numTMs);
 		m_rail.distance = distance;
 		m_rail.distanceSq = distance*distance;
 		m_rail.strict = strict;

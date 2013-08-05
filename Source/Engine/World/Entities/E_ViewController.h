@@ -320,6 +320,18 @@ private:
 
 	float TickFOV(int frame, float dt, float distance);
 
+	void ClassifyRail(
+		const Vec3 &target, 
+		const Vec3 &targetFwd
+	);
+
+	int UpdateCameraTM(
+		const Vec3 &target, 
+		const Vec3 &targetFwd,
+		int curIdx,
+		bool behind
+	);
+
 	void UpdateRailTarget(const Vec3 &target, const Vec3 &targetFwd);
 	
 	static int lua_SetTargetMode(lua_State *L);
@@ -344,10 +356,40 @@ private:
 		m_target = value; 
 	}
 
+	enum Polarity {
+		kPolarity_Plus,
+		kPolarity_Minus,
+		kPolarity_Zero
+	};
+
+	inline Polarity ReversePolarity(Polarity p) {
+		if (p == kPolarity_Plus)
+			return kPolarity_Minus;
+		if (p == kPolarity_Minus)
+			return kPolarity_Plus;
+		return p;
+	}
+
+	struct RailMetric {
+		float d;
+		float dd;
+		float abs;
+		float dot;
+		Polarity relPolarity;
+		Polarity absPolarity;
+	};
+
 	struct RailCameraState {
+		RailCameraState() : metrics(0) {}
+		~RailCameraState() {
+			if (metrics)
+				zone_free(metrics);
+		}
+
 		String name;
 		const bsp_file::BSPCameraTrack *track;
 		const bsp_file::BSPCameraTM *tm[3];
+		RailMetric *metrics;
 		Vec3 pos;
 		Vec3 fwd;
 		Vec3 lookFwd;
