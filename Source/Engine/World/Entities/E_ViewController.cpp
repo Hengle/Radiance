@@ -628,9 +628,7 @@ void E_ViewController::TickDistanceMode(int frame, float dt, const Entity::Ref &
 void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &target) {
 
 	if (m_sync) {
-		m_rail.tm[0] = 0;
-		m_rail.tm[1] = 0;
-		m_rail.tm[2] = 0;
+		m_rail.tm = 0;
 	}
 
 	Vec3 vTarget = VecAnim::Tick(
@@ -645,13 +643,13 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 	Vec3 targetFwd = ForwardFromAngles(target->ps->worldAngles);
 	
 	UpdateRailTarget(target->ps->cameraPos, targetFwd);
-	if (!m_rail.tm[2])
+	if (!m_rail.tm)
 		return;
 
 	if (m_sync) {
-		m_rail.pos = m_rail.tm[2]->t;
-		m_rail.rot = m_rail.tm[2]->r;
-		m_rail.fov = m_rail.tm[2]->fov;
+		m_rail.pos = m_rail.tm->t;
+		m_rail.rot = m_rail.tm->r;
+		m_rail.fov = m_rail.tm->fov;
 	}
 
 #if defined(WORLD_DEBUG_DRAW)
@@ -669,13 +667,13 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 
 	if (!m_sync) {
 		// large change?
-		Vec3 v = m_rail.tm[2]->t - m_rail.pos;
+		Vec3 v = m_rail.tm->t - m_rail.pos;
 		
 		if ((m_rail.fwd.Dot(fwd) < 0.1f) || (v.Magnitude() > 220.f)) {
 			// snap
-			m_rail.pos = m_rail.tm[2]->t;
-			m_rail.rot = m_rail.tm[2]->r;
-			m_rail.fov = m_rail.tm[2]->fov;
+			m_rail.pos = m_rail.tm->t;
+			m_rail.rot = m_rail.tm->r;
+			m_rail.fov = m_rail.tm->fov;
 			fwd = vTarget - m_rail.pos;
 			distance = fwd.Normalize();
 			m_rail.fwd = fwd;
@@ -688,13 +686,13 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 		// blend to new pos/look
 		if (m_rail.trackLag > 0.f) {
 			float lerp = math::Clamp(m_rail.trackLag*dt, 0.f, 0.9999f);
-			m_rail.pos = math::Lerp(m_rail.pos, m_rail.tm[2]->t, lerp);
-			m_rail.rot = math::Slerp(m_rail.rot, m_rail.tm[2]->r, lerp);
-			m_rail.fov = math::Lerp(m_rail.fov, m_rail.tm[2]->fov, lerp);
+			m_rail.pos = math::Lerp(m_rail.pos, m_rail.tm->t, lerp);
+			m_rail.rot = math::Slerp(m_rail.rot, m_rail.tm->r, lerp);
+			m_rail.fov = math::Lerp(m_rail.fov, m_rail.tm->fov, lerp);
 		} else {
-			m_rail.pos = m_rail.tm[2]->t;
-			m_rail.rot = m_rail.tm[2]->r;
-			m_rail.fov = m_rail.tm[2]->fov;
+			m_rail.pos = m_rail.tm->t;
+			m_rail.rot = m_rail.tm->r;
+			m_rail.fov = m_rail.tm->fov;
 		}
 
 		if (m_rail.turnLag > 0.f) {
@@ -819,8 +817,84 @@ int E_ViewController::UpdateCameraTM(
 	bool behind
 ) {
 	const bsp_file::BSPFile *bspFile = world->bspFile;
+	const float kFrontAngle = 0.0f;
+	
+	if (curIdx >= 0) {
+		if (behind && (m_rail.metrics[curIdx].dot < kFrontAngle))
+			curIdx = -1;
+	}
 
 	if (curIdx < 0) {
+
+		if (behind) {
+			// behind camera does not respect the startMode, we want the best point behind the player period
+
+			// algorithm:
+			// find the point that is closest to the player.
+			// move pos->start, and pos->end, looking for a point that is behind and
+			// fits the best
+			int closest = -1;
+			float closestDist = std::numeric_limits<float>::max();
+
+
+			for (S32 i = 0; i < m_rail.track->numTMs; ++i) {
+				if (m_rail.metrics[i].d < closestDist) {
+					closest = i;
+					closestDist = m_rail.metrics[i].d;
+				}
+			}
+
+			RAD_ASSERT(closest != -1);
+
+			// try moving forward, everything should lead away from the player
+			// (pos->end)
+
+			int best = -1;
+			int best2 = -1;
+			float bestDot = -1.f;
+
+			for (S32 i = closest+1; i < m_rail.track->numTMs; ++i) {
+				if (m_rail.metrics[i].relPolarity != kPolarity_Minus)
+					break;
+				if (m_rail.metrics[i].dd < 0.f)
+					break; // distance is a hard limit here
+				if (m_rail.metrics[i].absPolarity != kPolarity_Minus)
+					break;
+				if (m_rail.metrics[i].dot > bestDot) {
+					best2 = i;
+					bestDot = m_rail.metrics[i].dot;
+				}
+				if (m_rail.metrics[i].dot < kFrontAngle)
+					continue;
+				best = i;
+			}
+
+			if (best == -1) { // found no valid points going in this direction, try pos->start
+						
+				for (S32 i = closest-1; i >= 0; --i) {
+					if (m_rail.metrics[i].relPolarity != kPolarity_Plus) // NOTE: inverted polarity (moving backwards)
+						break;
+					if (m_rail.metrics[i].dd < 0.f)
+						break; // distance is a hard limit here
+					if (m_rail.metrics[i].absPolarity != kPolarity_Minus)
+						break;
+					if (m_rail.metrics[i].dot > bestDot) {
+						best2 = i;
+						bestDot = m_rail.metrics[i].dot;
+					}
+					if (m_rail.metrics[i].dot < kFrontAngle)
+						continue;
+					best = i;
+				}
+
+				if (best < 0)
+					best = best2;
+				if (best < 0)
+					best = closest;
+			}
+
+			return best;
+		}
 
 		// in both cases, we are looking for a polarity switch from Plus to Minus or Minus to Plus (we stop previous)
 
@@ -836,7 +910,7 @@ int E_ViewController::UpdateCameraTM(
 			for (S32 i = m_rail.track->numTMs-2; i >= 0; --i) {
 				if (m_rail.metrics[i].absPolarity != kPolarity)
 					break;
-
+				
 				best = i;
 			}
 
@@ -851,11 +925,9 @@ int E_ViewController::UpdateCameraTM(
 
 		
 		for (S32 i = 1; i < m_rail.track->numTMs; ++i) {
-			const bsp_file::BSPCameraTM *tm = bspFile->CameraTMs() + m_rail.track->firstTM + i;
-
 			if (m_rail.metrics[i].absPolarity != kPolarity) // transition
 				break;
-			
+						
 			best = i;
 		}
 
@@ -880,19 +952,28 @@ int E_ViewController::UpdateCameraTM(
 
 	// try and follow the gradiant to a better spot.
 	int best = curIdx;
+	int best2 = curIdx;
+	float bestDot = -1.f;
 
 	for (int i = curIdx+1; i < m_rail.track->numTMs; ++i) {
 		if (m_rail.metrics[i].relPolarity == minus) // not moving towards target
 			break;
 		if (m_rail.metrics[i].absPolarity != plus)
 			break; // we've moved too close (cam doesn't go closer than specific distance)
-		if (m_rail.metrics[i].relPolarity == plus)
+		if (m_rail.metrics[i].relPolarity == plus) {
+			if (behind && (m_rail.metrics[i].dot > bestDot)) {
+				bestDot = m_rail.metrics[i].dot;
+				best2 = i;
+			}
+			if (behind && (m_rail.metrics[i].dot < kFrontAngle))
+				continue;
 			best = i;
+		}
 	}
 
 	if (best != curIdx)
 		return best;
-
+	
 	// try gradiant going backwards
 	for (int i = curIdx-1; i >= 0; --i) {
 		const Polarity kRelPolarity = ReversePolarity(m_rail.metrics[i].relPolarity);
@@ -900,9 +981,19 @@ int E_ViewController::UpdateCameraTM(
 			break;
 		if (m_rail.metrics[i].absPolarity != plus)
 			break; // we've moved too close (cam doesn't go closer than specific distance)
-		if (kRelPolarity == plus)
+		if (kRelPolarity == plus) {
+			if (behind && (m_rail.metrics[i].dot > bestDot)) {
+				bestDot = m_rail.metrics[i].dot;
+				best2 = i;
+			}
+			if (behind && (m_rail.metrics[i].dot < kFrontAngle))
+				continue;
 			best = i;
+		}
 	}
+
+	if (best == curIdx)
+		best = best2;
 
 	return best;
 }
@@ -913,24 +1004,6 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 	// generate rail gradiants
 	ClassifyRail(target, targetFwd);
 
-	const bsp_file::BSPFile *bspFile = world->bspFile;
-	int curIdx = -1;
-
-	if (m_rail.tm[2]) {
-		curIdx = (m_rail.tm[2]-bspFile->CameraTMs()) - m_rail.track->firstTM;
-	}
-
-	curIdx = UpdateCameraTM(target, targetFwd, curIdx, false);
-	if (curIdx < 0)
-		curIdx = 0;
-
-	m_rail.tm[2] = bspFile->CameraTMs() + m_rail.track->firstTM + curIdx;
-
-	/*
-
-
-	static const float kFrontAngle = 0.f;
-	static const float kBackAngle = -0.707f;
 	const bsp_file::BSPFile *bspFile = world->bspFile;
 
 	if (m_rail.startMode == kRailStart_Front) {
@@ -957,242 +1030,17 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 		}
 	}
 
-	Vec3 fwd[2];
-	fwd[0] = Vec3::Zero;
-	fwd[1] = Vec3::Zero;
+	int curIdx = -1;
 
-	bool fwdValid[2] = {
-		m_rail.tm[0] != 0,
-		m_rail.tm[1] != 0
-	};
-
-	float targetDistance[2] = { 0.f, 0.f };
-
-	if (m_rail.startMode == kRailStart_Begin) {
-		// force side selection
-		const bsp_file::BSPCameraTM *tm = bspFile->CameraTMs() + m_rail.track->firstTM;
-		fwd[0] = target - tm->t;
-		fwd[0].Normalize();
-		fwdValid[0] = true;
-	} else if (m_rail.startMode == kRailStart_End) {
-		// force side selection
-		const bsp_file::BSPCameraTM *tm = bspFile->CameraTMs() + m_rail.track->firstTM + m_rail.track->numTMs - 1;
-		fwd[0] = target - tm->t;
-		fwd[0].Normalize();
-		fwdValid[0] = true;
-	}
-	
-	if (m_rail.tm[0]) {
-		Vec3 v = target - m_rail.tm[0]->t;
-		targetDistance[0] = v.MagnitudeSquared();
-		m_rail.tmDist[0] = math::Abs(m_rail.distanceSq - targetDistance[0]) - 500.f;
-
-		if ((m_rail.startMode != kRailStart_Begin) && (m_rail.startMode != kRailStart_End)) {
-			fwd[0] = v;
-			fwd[0].Normalize();
-		}
+	if (m_rail.tm) {
+		curIdx = (m_rail.tm-bspFile->CameraTMs()) - m_rail.track->firstTM;
 	}
 
-	if (m_rail.tm[1]) {
-		fwd[1] = target - m_rail.tm[1]->t;
-		targetDistance[1] = fwd[1].MagnitudeSquared();
-		m_rail.tmDist[1] = math::Abs(m_rail.distanceSq - targetDistance[1]);
-		fwd[1].Normalize();
-	}
+	curIdx = UpdateCameraTM(target, targetFwd, curIdx, m_rail.stayBehind >= 0.f);
+	if (curIdx < 0)
+		curIdx = 0;
 
-	if ((m_rail.stayBehind <= 0.f) || (m_rail.lastBehindTime==0.f)) {
-		m_rail.targetFwd = targetFwd;
-		m_rail.lastBehindTime = world->time;
-	} else {
-		float delta = world->time - m_rail.lastBehindTime;
-		if (delta >= m_rail.stayBehind) {
-			m_rail.targetFwd = targetFwd;
-			m_rail.lastBehindTime = world->time;
-		}
-	}
-
-	bool stayBehind = false;
-	
-	if (m_rail.startMode == kRailStart_DontCare) {
-		stayBehind = m_rail.stayBehind >= 0.f;
-	}
-
-	bool matchNearest[2] = {false, false};
-	const bsp_file::BSPCameraTM *fallback0[2];
-	const bsp_file::BSPCameraTM *fallback1;
-	float fallbackDist0[2];
-	float fallbackDist1;
-	
-	fallback0[0] = 0;
-	fallback0[1] = 0;
-	fallback1 = 0;
-	fallbackDist0[0] = std::numeric_limits<float>::max();
-	fallbackDist0[1] = std::numeric_limits<float>::max();
-	fallbackDist1 = std::numeric_limits<float>::max();
-
-	float w[2] = {0.f, 0.f};
-
-	if (!m_rail.strict && m_rail.tm[0]) {
-		// rope too long?
-		if (targetDistance[0] > m_rail.distanceSq) {
-			matchNearest[0] = true;
-//			w[0] = 1.f;
-		}
-	} else {
-		matchNearest[0] = true;
-//		if (m_rail.tm[0])
-//			w[0] = 1.f;
-	}
-
-	if (!m_rail.tm[0])
-		m_rail.tmDist[0] = std::numeric_limits<float>::max();
-
-	if (!m_rail.strict && m_rail.tm[1]) {
-		RAD_ASSERT(stayBehind);
-
-		// rope too long?
-		Vec3 v = target - m_rail.tm[1]->t;
-		bool invalid = m_rail.targetFwd.Dot(v) < kBackAngle;
-		
-		if (invalid || (targetDistance[1] > m_rail.distanceSq)) {
-			matchNearest[1] = true;
-			w[1] = 1.f;
-			fwdValid[1] = false;
-		}
-	} else {
-		matchNearest[1] = true;
-		if (m_rail.tm[1])
-			w[1] = 1.f;
-	}
-
-	if (!m_rail.tm[1])
-		m_rail.tmDist[1] = std::numeric_limits<float>::max();
-	
-	for (S32 i = 0; i < m_rail.track->numTMs; ++i) {
-		const bsp_file::BSPCameraTM *tm = bspFile->CameraTMs() + m_rail.track->firstTM + i;
-
-		Vec3 v = target - tm->t;
-				
-		float d = v.MagnitudeSquared();
-		float dd = m_rail.distanceSq - d;
-		float abs = math::Abs(dd);
-
-		v.Normalize();
-
-		if (m_rail.strict) {
-			// rod camera
-			if ((abs+w[0]) < m_rail.tmDist[0]) {
-				// prefer a point on the same side as the previous spot
-				if (!fwdValid[0] || (fwd[0].Dot(v) > kFrontAngle)) {
-					m_rail.tmDist[0] = abs;
-					m_rail.tm[0] = tm;
-				}
-			}
-
-			if (abs < fallbackDist0[0]) {
-				fallback0[0] = tm;
-				fallbackDist0[0] = abs;
-			}
-		} else if(!m_rail.tm[0] || matchNearest[0]) {
-			// rope camera
-			if (dd >= 0.f) {
-				if ((abs+w[0]) < m_rail.tmDist[0]) {
-					// prefer a point on the same side as the previous spot
-					if (!fwdValid[0] || (fwd[0].Dot(v) > kFrontAngle)) {
-						m_rail.tmDist[0] = abs;
-						m_rail.tm[0] = tm;
-					}
-
-					if (abs < fallbackDist0[0]) {
-						fallback0[0] = tm;
-						fallbackDist0[0] = abs;
-					}
-				}
-			}
-
-			if (abs < fallbackDist0[1]) {
-				fallback0[1] = tm;
-				fallbackDist0[1] = abs;
-			}
-
-			if (dd < 0.f) // rope cam wouldn't be pulled anymore
-				matchNearest[0] = false;
-		}
-
-		if (!m_rail.strict && m_rail.tm[0]&&!matchNearest[0]&&(!stayBehind||(!matchNearest[1]&&m_rail.tm[1])))
-			break; // strict cameras have positions.
-
-		if (!stayBehind)
-			continue; // only side cameras are in tm[1]
-
-		if (!m_rail.strict && m_rail.tm[1] && !matchNearest[1])
-			continue;
-
-		if ((abs+w[1]) >= m_rail.tmDist[1])
-			continue;
-
-		// these are more correct, but may not be available:
-
-		// new position must be behind target facing
-		if (m_rail.targetFwd.Dot(v) < 0.f)
-				continue;
-				
-		if (m_rail.strict) {
-			// prefer same side
-			if (!fwdValid[1] || (fwd[1].Dot(v) > kFrontAngle)) {
-				m_rail.tmDist[1] = abs;
-				m_rail.tm[1] = tm;
-			}
-
-			if (abs < fallbackDist1) {
-				fallback1 = tm;
-				fallbackDist1 = abs;
-			}
-		} else {
-			if (dd >= 0.f) {
-				// prefer same side
-				if (!fwdValid[1] || (fwd[1].Dot(v) > kFrontAngle)) {
-					m_rail.tmDist[1] = abs;
-					m_rail.tm[1] = tm;
-				}
-			}
-
-			if (abs < fallbackDist1) {
-				fallback1 = tm;
-				fallbackDist1 = abs;
-			}
-		}
-	}
-
-	const world::bsp_file::BSPCameraTM *prev = m_rail.tm[2];
-
-	if (!m_rail.tm[0]) {
-		m_rail.tm[0] = fallback0[0];
-		m_rail.tmDist[0] = fallbackDist0[0];
-	}
-
-	if (!m_rail.tm[0]) {
-		m_rail.tm[0] = fallback0[1];
-		m_rail.tmDist[0] = fallbackDist0[1];
-	}
-
-	if (!m_rail.tm[1]) {
-		m_rail.tm[1] = fallback1;
-		m_rail.tmDist[1] = fallbackDist1;
-	}
-
-	if (m_rail.tm[1]) {
-		m_rail.tm[2] = m_rail.tm[1];
-	} else if (m_rail.tm[0]) {
-		m_rail.tm[2] = m_rail.tm[0];
-	} else {
-		m_rail.tm[0] = bspFile->CameraTMs() + m_rail.track->firstTM;
-		m_rail.tm[2] = m_rail.tm[0];
-	}
-
-	if (prev != m_rail.tm[2]) {
-		COut(C_Debug) << "Rail Point Switch (" << (int)((prev-bspFile->CameraTMs())-m_rail.track->firstTM) << ") -> (" << (int)((m_rail.tm[2]-bspFile->CameraTMs())-m_rail.track->firstTM) << ")" << std::endl;
-	}*/
+	m_rail.tm = bspFile->CameraTMs() + m_rail.track->firstTM + curIdx;
 }
 
 float E_ViewController::TickFOV(int frame, float dt, float distance) {
@@ -1309,7 +1157,7 @@ void E_ViewController::SetRailMode(
 		m_rail.clamp = angleClamp;
 		m_rail.name = cinematicName;
 		m_rail.lastBehindTime = 0.f;
-		m_rail.tm[0] = m_rail.tm[1] = m_rail.tm[2] = 0;
+		m_rail.tm = 0;
 		// found a camera.
 		m_sync = true;
 		m_mode = kMode_Rail;

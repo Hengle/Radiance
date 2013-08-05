@@ -388,7 +388,7 @@ private:
 
 		String name;
 		const bsp_file::BSPCameraTrack *track;
-		const bsp_file::BSPCameraTM *tm[3];
+		const bsp_file::BSPCameraTM *tm;
 		RailMetric *metrics;
 		Vec3 pos;
 		Vec3 fwd;
