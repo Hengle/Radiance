@@ -283,6 +283,10 @@ Widget::Widget(const Rect &r) {
 }
 
 Widget::~Widget() {
+	if (m_id > -1) {
+		--s_numWidgets;
+	}
+
 	if (m_capture) {
 		Root::Ref root = m_root.lock();
 		if (root)
