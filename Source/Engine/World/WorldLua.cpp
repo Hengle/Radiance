@@ -381,7 +381,9 @@ bool WorldLua::CreateEntity(Entity &ent, int id, int uid, const char *classname)
 
 void WorldLua::PostSpawn() {
 	lua_gc(m_L->L, LUA_GCCOLLECT, 0);
+#if !defined(LUA_JIT)
 	lua_gc(m_L->L, LUA_GCSTOP, 0);
+#endif
 	lua::State::CompactPools();
 }
 

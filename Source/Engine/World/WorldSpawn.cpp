@@ -743,8 +743,11 @@ int World::PostSpawn(const xtime::TimeSlice &time, int flags) {
 			r = SR_Pending;
 	}
 
-	if (r == SR_Success)
+	if (r == SR_Success) {
+		m_lua->PostSpawn();
 		++m_spawnState;
+	}
+
 	return r;
 }
 
