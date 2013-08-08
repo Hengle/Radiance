@@ -16,6 +16,7 @@
 #include "T_ConversationTreePrecache.h"
 #include "T_ParticleEmitterPrecache.h"
 #include "D_Asset.h"
+#include "../../Assets/TypefaceParser.h"
 #include "../../Packages/Packages.h"
 #include "../../Engine.h"
 #if defined(RAD_OPT_PC_TOOLS)
@@ -98,8 +99,13 @@ int T_Precache::Tick(Entity &e, float dt, const xtime::TimeSlice &time, int flag
 	);
 
 	if (m_r == pkg::SR_Success) { 
-		if (m_asset->type == asset::AT_Material) // for material tick
+		if (m_asset->type == asset::AT_Material) { // for material tick
 			m_world->draw->AddMaterial(m_asset->id);
+		} else if (m_asset->type == asset::AT_Typeface) {
+			asset::TypefaceParser *parser = asset::TypefaceParser::Cast(m_asset);
+			if (parser && parser->valid)
+				m_world->draw->AddMaterial(parser->materialAsset->id); // for material tick.
+		}
 	}
 
 	return (m_r <= pkg::SR_Success) ? TickPop : TickNext;

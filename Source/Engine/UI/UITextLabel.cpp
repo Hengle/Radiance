@@ -102,6 +102,10 @@ bool TextLabel::BindTypeface(
 		m_parser->height
 	);
 
+	Root::Ref r = this->root;
+	if (r)
+		r->AddTickMaterial(m_parser->materialAsset);
+
 	return true;
 }
 

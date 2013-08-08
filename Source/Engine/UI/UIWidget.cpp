@@ -264,7 +264,9 @@ int Widget::NextWidgetId(lua_State *L) {
 		}
 
 		lua_pop(L, 1);
+#if !defined(RAD_OPT_SHIP)
 		RAD_VERIFY_MSG(i<kMaxWidgets, "kMaxWidgets");
+#endif
 		i = (s_id+i)&(kMaxWidgets-1);
 		s_id = (i+1)&(kMaxWidgets-1);
 		return i;
@@ -360,7 +362,7 @@ bool Widget::Spawn(lua_State *_L, lua_State *Lco, bool luaError) {
 		lua_pop(Lco, 1);
 
 		++s_numWidgets;
-#if defined(RAD_OPT_DEBUG)
+#if !defined(RAD_OPT_SHIP)
 		COut(C_Debug) << "Widget::Spawn: " << s_numWidgets << " widget(s)" << std::endl;
 #endif
 	}
@@ -379,7 +381,7 @@ void Widget::Unmap(lua_State *L) {
 		m_id = -1;
 
 		--s_numWidgets;
-#if defined(RAD_OPT_DEBUG)
+#if !defined(RAD_OPT_SHIP)
 		COut(C_Debug) << "Widget::Unmap: " << s_numWidgets << " widget(s)" << std::endl;
 #endif
 	}
@@ -512,10 +514,11 @@ bool Widget::InBounds(float x, float y) {
 void Widget::AddChild(const Ref &widget) {
 	RAD_ASSERT(widget);
 	
+#if !defined(RAD_TARGET_GOLDEN)
 	for (Vec::const_iterator it = m_children.begin(); it != m_children.end(); ++it) {
-		if ((*it).get() == widget.get())
-			return;
+		RAD_VERIFY_MSG((*it).get() != widget.get(), "Child widget added to parent widget multiple times!");
 	}
+#endif
 
 	widget->m_root = m_root;
 	widget->m_parent = boost::static_pointer_cast<Widget>(shared_from_this());
@@ -976,6 +979,15 @@ Vec4 Widget::RAD_IMPLEMENT_GET(blendedColor) {
 int Widget::lua_AddChild(lua_State *L) {
 	Ref w = GetRef<Widget>(L, "Widget", 1, true);
 	Ref x = GetRef<Widget>(L, "Widget", 2, true);
+
+#if !defined(RAD_TARGET_GOLDEN)
+	for (Vec::const_iterator it = w->m_children.begin(); it != w->m_children.end(); ++it) {
+		if ((*it).get() == x.get()) {
+			luaL_error(L, "Child widget added to parent widget multiple times!");
+		}
+	}
+#endif
+
 	w->AddChild(x);
 	return 0;
 }
