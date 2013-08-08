@@ -15,7 +15,7 @@
 namespace ui {
 
 RAD_ZONE_DEF(RADENG_API, ZUI, "UI", ZEngine);
-enum { kMaxWidgets = 256 };
+enum { kMaxWidgets = 512 };
 
 Rect &Rect::Intersect(const Rect &r) {
 	
