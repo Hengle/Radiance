@@ -1521,6 +1521,9 @@
     <ClInclude Include="..\..\Engine\World\Lua\T_ParticleEmitterPrecache.h">
       <Filter>Source\Engine\World\Lua</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\World\Entities\E_TouchVolume.h">
+      <Filter>Source\Engine\World\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2404,6 +2407,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\World\Lua\T_ParticleEmitterPrecache.cpp">
       <Filter>Source\Engine\World\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\Entities\E_TouchVolume.cpp">
+      <Filter>Source\Engine\World\Entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
