@@ -8,6 +8,14 @@
 #include <QtGui/QIcon>
 #include <QtGui/QMessageBox>
 
+namespace {
+inline QString ExpandNewlines(const QString &str) {
+	QString x(str);
+	x.replace('\n', "\\n");
+	return x;
+}
+}
+
 namespace tools {
 namespace editor {
 
@@ -40,7 +48,10 @@ QVariant StringTableEditorItemModel::data(const QModelIndex &index, int role) co
 			StringTable::Entry::Strings::const_iterator string = (*it)->second.strings.find(StringTable::LangId_EN);
 			if (string == (*it)->second.strings.end())
 				return QVariant();
-			return QVariant(QString::fromUtf8(string->second.c_str.get()));
+			QString str = QString::fromUtf8(string->second.c_str.get());
+			if (role == Qt::DisplayRole)
+				str = ExpandNewlines(str);
+			return QVariant(str);
 		} break;
 		case 2: {
 			StringTable::Entry::Strings::const_iterator string = (*it)->second.strings.find(m_langId);

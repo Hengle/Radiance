@@ -430,7 +430,10 @@ inline int String::StrStr(const char *sz) const {
 	RAD_ASSERT(sz);
 	const char *root = c_str;
 	const char *pos = string::strstr(root, sz);
-	return pos ? (int)(pos-root) : -1;
+	int ofs = pos ? (int)(pos-root) : -1;
+	if (ofs > -1)
+		ofs = CharForByte(ofs);
+	return ofs;
 }
 
 inline StringVec String::Split(const char *sep) const {

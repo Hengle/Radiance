@@ -103,7 +103,9 @@ private:
 	}
 
 #if defined(RAD_OPT_TOOLS)
-	static int lua_Compile(lua_State *L);
+	static void WriteCSVToken(std::ostream &os, const String &str);
+	static bool ReadCSVLine(std::istream &is, String &id, String &value);
+	static bool ReadCSVToken(std::istream &is, String &token);
 #else
 	static Ref New();
 #endif

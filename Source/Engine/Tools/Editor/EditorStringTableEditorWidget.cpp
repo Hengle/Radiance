@@ -25,20 +25,6 @@
 namespace tools {
 namespace editor {
 
-namespace {
-inline QString ExpandNewlines(const QString &str) {
-	QString x(str);
-	x.replace('\n', "\\n");
-	return x;
-}
-
-inline QString CollapseNewlines(const QString & str) {
-	QString x(str);
-	x.replace("\\n", "\n");
-	return x;
-}
-}
-
 const char *s_stringTableIconNames[StringTable::LangId_MAX] = {
 	"Editor/Flags/flag_usa.png",
 	"Editor/Flags/flag_france.png",
@@ -373,7 +359,7 @@ void StringTableEditorWidget::OnItemDoubleClicked(const QModelIndex &index) {
 
 		QString editString;
 		if (data.isValid() && data.type() == QVariant::String)
-			editString = CollapseNewlines(data.toString());
+			editString = data.toString();
 
 		TextEditorDialog dlg(QString(), parentWidget());
 		dlg.textEdit->setPlainText(editString);
@@ -391,7 +377,7 @@ void StringTableEditorWidget::OnItemDoubleClicked(const QModelIndex &index) {
 		dlg.setWindowTitle(QString("Editing: %1 (%2)").arg((*it)->first.c_str.get(), lang));
 
 		if (dlg.exec() == QDialog::Accepted) {
-			if (m_sortModel->setData(index, ExpandNewlines(dlg.textEdit->toPlainText()), Qt::EditRole)) {
+			if (m_sortModel->setData(index, dlg.textEdit->toPlainText(), Qt::EditRole)) {
 				SaveChanges();
 			}
 		}

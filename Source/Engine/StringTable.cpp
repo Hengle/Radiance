@@ -9,17 +9,12 @@
 
 #if defined(RAD_OPT_TOOLS)
 	#include "COut.h"
-	#include "Lua/LuaRuntime.h"
 	#include <Runtime/Stream.h>
 	#include <Runtime/Stream/STLStream.h>
 	#include <Runtime/EndianStream.h>
 	#include <Runtime/Container/ZoneVector.h>
 	#include <Runtime/FileDef.h>
 	#include <fstream>
-
-	#define THIS "@this"
-	#define LANG "@lang"
-
 #endif
 
 enum {
@@ -103,19 +98,6 @@ int StringTable::Load(const char *name, const char *root, StringTable::Ref &_r, 
 
 	StringTable::Ref r(new (ZEngine) StringTable());
 
-	lua::State::Ref L(new (ZEngine) lua::State("StringTable"));
-
-	luaL_Reg lr[] = {
-		{ "Compile", lua_Compile },
-		{ 0, 0 }
-	};
-
-	lua::RegisterGlobals(L->L, 0, lr);
-	lua_pushlightuserdata(L->L, r.get());
-	lua_setfield(L->L, LUA_REGISTRYINDEX, THIS);
-
-	typedef lua::StreamLoader<8*kKilo, lua::StackMemTag> Loader;
-
 	int loadMask = 0;
 	if (_loadMask)
 		*_loadMask = 0;
@@ -123,7 +105,7 @@ int StringTable::Load(const char *name, const char *root, StringTable::Ref &_r, 
 	for (int i = 0; i < LangId_MAX; ++i) {
 
 		String path;
-		path.Printf("%s.%s", root, StringTable::Langs[i]);
+		path.Printf("%s.%s.csv", root, StringTable::Langs[i]);
 
 		std::fstream f;
 
@@ -131,31 +113,17 @@ int StringTable::Load(const char *name, const char *root, StringTable::Ref &_r, 
 		if (f.fail())
 			continue;
 
-		lua_pushinteger(L->L, i);
-		lua_setfield(L->L, LUA_REGISTRYINDEX, LANG);
+		String id, value;
 
-		typedef stream::basic_istream_adapter<char> InputStream;
-		InputStream is(f);
-
-		Loader loader(is);
-		
-#if LUA_VERSION_NUM >= 502
-		if (lua_load(L->L, &Loader::Read, &loader, path.c_str, 0)) {
-#else
-		if (lua_load(L->L, &Loader::Read, &loader, path.c_str)) {
-#endif
-			COut(C_Error) << "StringTable::Load(parse): " << lua_tostring(L->L, -1) << std::endl;
-			r.reset();
-			return pkg::SR_ScriptError;
+		if (ReadCSVLine(f, id, value)) {
+			loadMask |= (1<<i);
+			do {
+				if (!value.empty)
+					r->SetString(id.c_str, (LangId)i, value.c_str);
+			} while (ReadCSVLine(f, id, value));
 		}
 
-		if (lua_pcall(L->L, 0, 0, 0)) {
-			COut(C_Error) << "StringTable::Load(run): " << lua_tostring(L->L, -1) << std::endl;
-			r.reset();
-			return pkg::SR_ScriptError;
-		}
-
-		loadMask |= (1<<i);
+		f.close();
 	}
 
 	if (!loadMask)
@@ -166,32 +134,6 @@ int StringTable::Load(const char *name, const char *root, StringTable::Ref &_r, 
 		*_loadMask = loadMask;
 
 	return pkg::SR_Success;
-}
-
-int StringTable::lua_Compile(lua_State *L) {
-
-	lua::Variant::Map strings;
-	ParseVariantTable(L, strings, true);
-
-	lua_getfield(L, LUA_REGISTRYINDEX, THIS);
-	StringTable *table = reinterpret_cast<StringTable*>(lua_touserdata(L, -1));
-	lua_pop(L, 1);
-	
-	lua_getfield(L, LUA_REGISTRYINDEX, LANG);
-	int langId = (int)lua_tointeger(L, -1);
-	lua_pop(L, 1);
-
-	for (lua::Variant::Map::const_iterator it = strings.begin(); it != strings.end(); ++it) {
-		const String &name = it->first;
-
-		const String *value = static_cast<const String*>(it->second);
-		if (!value)
-			luaL_error(L, "StringTable::lua_Compile(): expected string value for string '%s' language '%s'", name.c_str.get(), StringTable::Langs[langId]);
-
-		table->SetString(name.c_str, (LangId)langId, value->c_str);
-	}
-
-	return 0;
 }
 
 void StringTable::SetString(const char *id, LangId lang, const char *value) {
@@ -261,67 +203,110 @@ bool StringTable::SaveText(const char *name, const char *path, int saveMask) con
 			continue;
 
 		String spath;
-		spath.Printf("%s.%s", path, StringTable::Langs[i]);
+		spath.Printf("%s.%s.csv", path, StringTable::Langs[i]);
 
 		std::fstream f;
 
-		f.open(spath.c_str, std::ios_base::out|std::ios_base::trunc);
+		f.open(spath.c_str, std::ios_base::out|std::ios_base::trunc|std::ios_base::binary);
 		if (f.fail())
 			return false;
-
-		f << "-- " << name << "." << StringTable::Langs[i] << std::endl;
-		f << "-- Radiance String Table" << std::endl << std::endl;
-
-		f << "local table = {" << std::endl;
-
-		int c = 0;
 
 		for (Entry::Map::const_iterator it = m_entries.begin(); it != m_entries.end(); ++it) {
 
 			Entry::Strings::const_iterator string = it->second.strings.find((LangId)i);
 			
-			if (c)
-				f << "," << std::endl;
-
-			const String &name = it->first;
-			
-			f << "\t[\"" << name.c_str.get() << "\"] = \"";
-
-			// Need to do this in UTF32 space.
+			WriteCSVToken(f, it->first);
+			f << ",";
 
 			if (string != it->second.strings.end()) {
 				const String &val = string->second;
-				string::UTF32Buf utf = val.ToUTF32();
-
-				String mod;
-				String slashes(CStr("\\\\"));
-
-				string::UTF32Buf::const_iterator begin = utf.begin;
-				string::UTF32Buf::const_iterator end = utf.end;
-
-				for (string::UTF32Buf::const_iterator x = begin; x < end; ++x) {
-					if (*x == '\\') {
-						mod += slashes;
-					} else {
-						char c[5] = {0, 0, 0, 0, 0};
-						string::utf32to8(c, x, 1);
-						mod += String(c, string::RefTag);
-					}
-				}
-
-				f << mod;
+				if (!val.empty)
+					WriteCSVToken(f, val);
 			}
-			f << "\"";
 
-			++c;
+			f << "\n";
 		}
 
-		f << std::endl << "}" << std::endl << std::endl << "Compile(table)" << std::endl;
-		f << std::flush;
 		f.close();
 	}
 
 	return true;
+}
+
+void StringTable::WriteCSVToken(std::ostream &f, const String &_str) {
+	f << "\"";
+
+	String str(_str);
+	string::UTF32Buf utf = str.ToUTF32();
+
+	String mod;
+	const String kQuotes(CStr("\"\""));
+
+	string::UTF32Buf::const_iterator begin = utf.begin;
+	string::UTF32Buf::const_iterator end = utf.end;
+
+	for (string::UTF32Buf::const_iterator x = begin; x < end; ++x) {
+		if (*x == '\"') {
+			mod += kQuotes;
+		} else {
+			char c[5] = {0, 0, 0, 0, 0};
+			string::utf32to8(c, x, 1);
+			mod += String(c, string::RefTag);
+		}
+	}
+
+	f << mod << "\"";
+}
+
+bool StringTable::ReadCSVLine(std::istream &is, String &id, String &value) {
+	return ReadCSVToken(is, id) && ReadCSVToken(is, value);
+}
+
+bool StringTable::ReadCSVToken(std::istream &is, String &token) {
+	char c;
+	is.read(&c, 1);
+
+	if (is.eof())
+		return false;
+
+	bool quoted = c == '\"';
+	bool terminated = !quoted;
+	int qcount = 0;
+
+	token.Clear();
+
+	if (!quoted) {
+		if (c == '\n' || c == ',')
+			return false;
+		token += c;
+	}
+
+	for (;;) {
+		is.read(&c, 1);
+		if (is.eof())
+			break;
+		
+		if (c == '\n' || c == ',') {
+			if (quoted) {
+				if (qcount)
+					break;
+			} else {
+				break;
+			}
+		}
+		
+		if (c == '\"') {
+			++qcount;
+			if (qcount == 2) {
+				token += '\"';
+				qcount = 0;
+			}
+		} else {
+			token += c;
+		}
+	}
+
+	return !token.empty;
 }
 
 bool StringTable::SaveBin(stream::IOutputBuffer &ob) const {

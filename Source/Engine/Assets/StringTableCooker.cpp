@@ -29,7 +29,7 @@ CookStatus StringTableCooker::CheckRebuildFiles(int flags) {
 	CookStatus x = CS_UpToDate;
 
 	for (int i = StringTable::LangId_First; i < StringTable::LangId_MAX; ++i) {
-		const String kPath(*root + CStr(StringTable::Langs[i]));
+		const String kPath(*root + CStr(StringTable::Langs[i]) + CStr(".csv"));
 		if (CompareCachedFileTime(flags, kPath.c_str, kPath.c_str)) {
 			x = CS_NeedRebuild; // cache all file times.
 		}
