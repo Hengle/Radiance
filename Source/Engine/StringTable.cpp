@@ -118,7 +118,7 @@ int StringTable::Load(const char *name, const char *root, StringTable::Ref &_r, 
 		if (ReadCSVLine(f, id, value)) {
 			loadMask |= (1<<i);
 			do {
-				if (!value.empty)
+				if (!value.empty || (i == LangId_EN))
 					r->SetString(id.c_str, (LangId)i, value.c_str);
 			} while (ReadCSVLine(f, id, value));
 		}
@@ -277,7 +277,7 @@ bool StringTable::ReadCSVToken(std::istream &is, String &token) {
 
 	if (!quoted) {
 		if (c == '\n' || c == ',')
-			return false;
+			return true; // blank
 		token += c;
 	}
 
