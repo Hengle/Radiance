@@ -300,6 +300,7 @@ void Widget::Init() {
 	L = 0;
 	m_id = -1;
 	m_visible = true;
+	m_clipped = false;
 	m_valign = kVerticalAlign_Center;
 	m_halign = kHorizontalAlign_Center;
 	m_positionMode = kPositionMode_Relative;
@@ -825,7 +826,7 @@ void Widget::RotateTo(const Vec3 &zRot, const Vec3 &time, bool shortestAngle) {
 }
 
 void Widget::Draw(const Rect *_clip, bool children) {
-	if (!m_visible)
+	if (!m_visible || m_clipped)
 		return;
 
 	Rect clip;
@@ -949,7 +950,7 @@ bool Widget::HandleInputGesture(const InputGesture &g, const TouchState &touch, 
 }
 
 bool Widget::RAD_IMPLEMENT_GET(visible) {
-	bool r = m_visible && 
+	bool r = (!m_clipped) && m_visible && 
 		(m_color[0][3] > 0.f) && 
 		(m_scale[0][0] > 0.f) &&
 		(m_scale[0][1] > 0.f);

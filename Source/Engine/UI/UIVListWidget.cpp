@@ -153,6 +153,7 @@ void VListWidget::RemoveItem(const Widget::Ref &widget) {
 		if ((*it).get() == widget.get()) {
 			RemoveChild(*it);
 			m_widgets.erase(it);
+			widget->clipped = false;
 			break;
 		}
 	}
@@ -256,11 +257,11 @@ void VListWidget::InternalRecalcLayout() {
 		Rect r = w->rect;
 		
 		if ((r.y+r.h+pos[1]) < 0.f) {
-			w->visible = false;
+			w->clipped = true;
 		} else if ((r.y+pos[1]) > self.h) {
-			w->visible = false;
+			w->clipped = true;
 		} else {
-			w->visible = true;
+			w->clipped = false;
 		}
 
 		m_contentSize[0] = std::max(m_contentSize[0], r.x+r.w);
