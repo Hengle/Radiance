@@ -473,6 +473,16 @@
 		3347717A17A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3347717617A1D3E000D875F0 /* WorldDrawFog.cpp */; };
 		3347717B17A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3347717617A1D3E000D875F0 /* WorldDrawFog.cpp */; };
 		336836D515D43BA800EE9472 /* GameNetworkNull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 336836D415D43BA800EE9472 /* GameNetworkNull.cpp */; };
+		3377F13917B9D3DE00D3C519 /* E_TouchVolume.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3377F13717B9D3DE00D3C519 /* E_TouchVolume.cpp */; };
+		3377F13A17B9D3DE00D3C519 /* E_TouchVolume.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3377F13717B9D3DE00D3C519 /* E_TouchVolume.cpp */; };
+		3377F13B17B9D3DE00D3C519 /* E_TouchVolume.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3377F13717B9D3DE00D3C519 /* E_TouchVolume.cpp */; };
+		3377F13C17B9D3DE00D3C519 /* E_TouchVolume.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3377F13717B9D3DE00D3C519 /* E_TouchVolume.cpp */; };
+		3377F13D17B9D3DE00D3C519 /* E_TouchVolume.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3377F13717B9D3DE00D3C519 /* E_TouchVolume.cpp */; };
+		3377F13E17B9D3DE00D3C519 /* E_TouchVolume.h in Headers */ = {isa = PBXBuildFile; fileRef = 3377F13817B9D3DE00D3C519 /* E_TouchVolume.h */; };
+		3377F13F17B9D3DE00D3C519 /* E_TouchVolume.h in Headers */ = {isa = PBXBuildFile; fileRef = 3377F13817B9D3DE00D3C519 /* E_TouchVolume.h */; };
+		3377F14017B9D3DE00D3C519 /* E_TouchVolume.h in Headers */ = {isa = PBXBuildFile; fileRef = 3377F13817B9D3DE00D3C519 /* E_TouchVolume.h */; };
+		3377F14117B9D3DE00D3C519 /* E_TouchVolume.h in Headers */ = {isa = PBXBuildFile; fileRef = 3377F13817B9D3DE00D3C519 /* E_TouchVolume.h */; };
+		3377F14217B9D3DE00D3C519 /* E_TouchVolume.h in Headers */ = {isa = PBXBuildFile; fileRef = 3377F13817B9D3DE00D3C519 /* E_TouchVolume.h */; };
 		337AE55215BF214F00AD1617 /* Runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8867515B9AD160089BA08 /* Runtime.cpp */; };
 		337AE55315BF214F00AD1617 /* Time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8865A15B9ACFA0089BA08 /* Time.cpp */; };
 		337AE55415BF214F00AD1617 /* Locks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E8864215B9ACF10089BA08 /* Locks.cpp */; };
@@ -3235,6 +3245,8 @@
 		3343899B1724CDA60048052A /* VtMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VtMesh.h; sourceTree = "<group>"; };
 		3347717617A1D3E000D875F0 /* WorldDrawFog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldDrawFog.cpp; sourceTree = "<group>"; };
 		336836D415D43BA800EE9472 /* GameNetworkNull.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameNetworkNull.cpp; sourceTree = "<group>"; };
+		3377F13717B9D3DE00D3C519 /* E_TouchVolume.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = E_TouchVolume.cpp; sourceTree = "<group>"; };
+		3377F13817B9D3DE00D3C519 /* E_TouchVolume.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = E_TouchVolume.h; sourceTree = "<group>"; };
 		337AE54C15BF20D300AD1617 /* RadianceGoldenDebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceGoldenDebugiOS.xcconfig; path = XCConfig/RadianceGoldenDebugiOS.xcconfig; sourceTree = "<group>"; };
 		337AE54D15BF20D300AD1617 /* RadianceGoldenDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceGoldenDebugOSX.xcconfig; path = XCConfig/RadianceGoldenDebugOSX.xcconfig; sourceTree = "<group>"; };
 		337AE54E15BF20D300AD1617 /* RadianceGoldenReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceGoldenReleaseiOS.xcconfig; path = XCConfig/RadianceGoldenReleaseiOS.xcconfig; sourceTree = "<group>"; };
@@ -5507,6 +5519,8 @@
 				33E888C615B9BA4A0089BA08 /* E_SplineTrack.h */,
 				33982E7E16B2553300C2ED49 /* E_TouchTrigger.cpp */,
 				33982E7F16B2553300C2ED49 /* E_TouchTrigger.h */,
+				3377F13717B9D3DE00D3C519 /* E_TouchVolume.cpp */,
+				3377F13817B9D3DE00D3C519 /* E_TouchVolume.h */,
 				33E888C715B9BA4A0089BA08 /* E_ViewController.cpp */,
 				33E888C815B9BA4A0089BA08 /* E_ViewController.h */,
 				33E888C915B9BA4A0089BA08 /* E_Worldspawn.cpp */,
@@ -6016,6 +6030,7 @@
 				3385ED5717AA274C00F44EDB /* T_ParticleEmitterPrecache.h in Headers */,
 				3385ED6517AA297900F44EDB /* ParticleMaterialLoader.h in Headers */,
 				3385ED6F17AA297900F44EDB /* ParticleParser.h in Headers */,
+				3377F14017B9D3DE00D3C519 /* E_TouchVolume.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6430,6 +6445,7 @@
 				3385ED5817AA274C00F44EDB /* T_ParticleEmitterPrecache.h in Headers */,
 				3385ED6617AA297900F44EDB /* ParticleMaterialLoader.h in Headers */,
 				3385ED7017AA297900F44EDB /* ParticleParser.h in Headers */,
+				3377F14117B9D3DE00D3C519 /* E_TouchVolume.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6939,6 +6955,7 @@
 				3385ED6D17AA297900F44EDB /* ParticleParser.h in Headers */,
 				3385ED7517AA298100F44EDB /* ParticleCooker.h in Headers */,
 				3385ED7F17AA2A1100F44EDB /* EditorParticleThumb.h in Headers */,
+				3377F13E17B9D3DE00D3C519 /* E_TouchVolume.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7351,6 +7368,7 @@
 				3385ED5617AA274C00F44EDB /* T_ParticleEmitterPrecache.h in Headers */,
 				3385ED6417AA297900F44EDB /* ParticleMaterialLoader.h in Headers */,
 				3385ED6E17AA297900F44EDB /* ParticleParser.h in Headers */,
+				3377F13F17B9D3DE00D3C519 /* E_TouchVolume.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7765,6 +7783,7 @@
 				3385ED5917AA274C00F44EDB /* T_ParticleEmitterPrecache.h in Headers */,
 				3385ED6717AA297900F44EDB /* ParticleMaterialLoader.h in Headers */,
 				3385ED7117AA297900F44EDB /* ParticleParser.h in Headers */,
+				3377F14217B9D3DE00D3C519 /* E_TouchVolume.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8154,6 +8173,7 @@
 				3385ED6017AA297900F44EDB /* ParticleMaterialLoader.cpp in Sources */,
 				3385ED6A17AA297900F44EDB /* ParticleParser.cpp in Sources */,
 				3385ED7917AA29A000F44EDB /* Math.cpp in Sources */,
+				3377F13B17B9D3DE00D3C519 /* E_TouchVolume.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8352,6 +8372,7 @@
 				3385ED6117AA297900F44EDB /* ParticleMaterialLoader.cpp in Sources */,
 				3385ED6B17AA297900F44EDB /* ParticleParser.cpp in Sources */,
 				3385ED7A17AA29A000F44EDB /* Math.cpp in Sources */,
+				3377F13C17B9D3DE00D3C519 /* E_TouchVolume.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8650,6 +8671,7 @@
 				3385ED7417AA298100F44EDB /* ParticleCooker.cpp in Sources */,
 				3385ED7717AA29A000F44EDB /* Math.cpp in Sources */,
 				3385ED7E17AA2A1100F44EDB /* EditorParticleThumb.cpp in Sources */,
+				3377F13917B9D3DE00D3C519 /* E_TouchVolume.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8848,6 +8870,7 @@
 				3385ED5F17AA297900F44EDB /* ParticleMaterialLoader.cpp in Sources */,
 				3385ED6917AA297900F44EDB /* ParticleParser.cpp in Sources */,
 				3385ED7817AA29A000F44EDB /* Math.cpp in Sources */,
+				3377F13A17B9D3DE00D3C519 /* E_TouchVolume.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9047,6 +9070,7 @@
 				3385ED6217AA297900F44EDB /* ParticleMaterialLoader.cpp in Sources */,
 				3385ED6C17AA297900F44EDB /* ParticleParser.cpp in Sources */,
 				3385ED7B17AA29A000F44EDB /* Math.cpp in Sources */,
+				3377F13D17B9D3DE00D3C519 /* E_TouchVolume.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
