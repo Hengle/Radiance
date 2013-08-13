@@ -258,6 +258,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Widget, blendedColor, Vec4); // may include parent
 	RAD_DECLARE_READONLY_PROPERTY(Widget, zRot, const Vec3&);
 	RAD_DECLARE_READONLY_PROPERTY(Widget, zRotScreen, Vec3);
+	RAD_DECLARE_READONLY_PROPERTY(Widget, visibleFlag, bool);
 	RAD_DECLARE_PROPERTY(Widget, rect, const Rect &, const Rect&);
 	RAD_DECLARE_PROPERTY(Widget, visible, bool, bool);
 	RAD_DECLARE_PROPERTY(Widget, clipped, bool, bool);
@@ -426,6 +427,10 @@ private:
 		m_visible = value;
 		if (!m_visible)
 			ClearCapture();
+	}
+
+	RAD_DECLARE_GET(visibleFlag, bool) {
+		return m_visible;
 	}
 
 	RAD_DECLARE_GET(clipped, bool) {

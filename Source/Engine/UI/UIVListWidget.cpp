@@ -254,6 +254,9 @@ void VListWidget::InternalRecalcLayout() {
 	for (Widget::Vec::const_iterator it = m_widgets.begin(); it != m_widgets.end(); ++it) {
 		const Widget::Ref &w = *it;
 
+		if (!w->visibleFlag)
+			continue;
+
 		Rect r = w->rect;
 		
 		if ((r.y+r.h+pos[1]) < 0.f) {
