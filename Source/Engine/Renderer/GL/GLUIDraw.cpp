@@ -106,7 +106,7 @@ void GLDraw::DrawRect(
 	if (zRot[2] != 0.f) {
 		float cx = zRot[0]-r.x;
 		float cy = zRot[1]-r.y;
-		gl.Translatef(cx, cx, 0.f);
+		gl.Translatef(cx, cy, 0.f);
 		gl.Rotatef(zRot[2], 0.f, 0.f, 1.f);
 		gl.Translatef(-cx, -cy, 0.f);
 	}
@@ -182,7 +182,7 @@ void GLDraw::DrawCircle(
 	if (zRot[2] != 0.f) {
 		float cx = zRot[0]-r.x;
 		float cy = zRot[1]-r.y;
-		gl.Translatef(cx, cx, 0.f);
+		gl.Translatef(cx, cy, 0.f);
 		gl.Rotatef(zRot[2], 0.f, 0.f, 1.f);
 		gl.Translatef(-cx, -cy, 0.f);
 	}
