@@ -61,6 +61,8 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, rgba, const Vec4&);
 	RAD_DECLARE_READONLY_PROPERTY(MBatchDraw, scale, const Vec3&);
 
+	void ChangeMaterial(WorldDraw &draw, int dstMatId);
+
 protected:
 
 	virtual bool GetTransform(Vec3 &pos, Vec3 &angles) const { 

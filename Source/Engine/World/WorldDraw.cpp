@@ -99,6 +99,11 @@ m_uid(uid) {
 	m_matRef = draw.AddMaterialRef(matId);
 }
 
+void MBatchDraw::ChangeMaterial(WorldDraw &draw, int dstMatId) {
+	m_matId = dstMatId;
+	m_matRef = draw.AddMaterialRef(dstMatId);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 ViewDef::~ViewDef() {
@@ -1183,17 +1188,6 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 		return;
 	}
 
-	// draw unlit solid surfaces
-	for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
-		const details::MBatch &batch = *it->second;
-
-		if (batch.matRef->mat->sort == r::Material::kSort_Solid) {
-			if (batch.matRef->mat->maxLights == 0) {
-				DrawUnlitBatch(view, *it->second, false);
-			}
-		}
-	}
-
 	// draw lit unshadowed solid surfaces
 #if !defined(RAD_TARGET_GOLDEN)
 	if (m_world->cvars->r_enablelights.value) {
@@ -1222,16 +1216,13 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 	}
 #endif
 
-	// draw unlit translucent surfaces
+	// draw unlit solid surfaces
+	for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
+		const details::MBatch &batch = *it->second;
 
-	for (int i = r::Material::kSort_Translucent; i < r::Material::kNumSorts; ++i) {
-		for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
-			const details::MBatch &batch = *it->second;
-
-			if (batch.matRef->mat->sort == (r::Material::Sort)i) {
-				if (batch.matRef->mat->maxLights == 0) {
-					DrawUnlitBatch(view, *it->second, false);
-				}
+		if (batch.matRef->mat->sort == r::Material::kSort_Solid) {
+			if (batch.matRef->mat->maxLights == 0) {
+				DrawUnlitBatch(view, *it->second, false);
 			}
 		}
 	}
@@ -1266,6 +1257,20 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 		}
 	}
 #endif
+
+	// draw unlit translucent surfaces
+
+	for (int i = r::Material::kSort_Translucent; i < r::Material::kNumSorts; ++i) {
+		for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
+			const details::MBatch &batch = *it->second;
+
+			if (batch.matRef->mat->sort == (r::Material::Sort)i) {
+				if (batch.matRef->mat->maxLights == 0) {
+					DrawUnlitBatch(view, *it->second, false);
+				}
+			}
+		}
+	}
 }
 
 void WorldDraw::DrawUnlitBatch(
