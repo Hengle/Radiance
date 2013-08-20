@@ -1201,9 +1201,6 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 				}
 			}
 		}
-
-		if (m_world->cvars->r_unifiedshadows.value)
-			DrawViewUnifiedShadows(view);
 #if !defined(RAD_TARGET_GOLDEN)
 	} else {
 		for (details::MBatchIdMap::const_iterator it = view.batches.begin(); it != view.batches.end(); ++it) {
@@ -1226,6 +1223,15 @@ void WorldDraw::DrawViewBatches(ViewDef &view, bool wireframe) {
 			}
 		}
 	}
+
+#if !defined(RAD_TARGET_GOLDEN)
+	if (m_world->cvars->r_enablelights.value) {
+#endif
+	if (m_world->cvars->r_unifiedshadows.value)
+		DrawViewUnifiedShadows(view);
+#if !defined(RAD_TARGET_GOLDEN)
+	}
+#endif
 
 	// draw lit unshadowed translucent surfaces
 #if !defined(RAD_TARGET_GOLDEN)

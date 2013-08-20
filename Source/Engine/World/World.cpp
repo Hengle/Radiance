@@ -294,6 +294,8 @@ void World::TickState(float dt, float unmod_dt) {
 	m_sound->Tick(dt, m_time > 0.5f);
 	
 	if (gc) {
+		bool removed = false;
+
 		// garbage collect
 		for (Entity::IdMap::const_iterator it = m_ents.begin(); it != m_ents.end();) {
 			Entity::IdMap::const_iterator next = it; ++next;
@@ -306,10 +308,19 @@ void World::TickState(float dt, float unmod_dt) {
 					parent->DetachChild(r);
 				UnlinkEntity(*r);
 				UnmapEntity(r);
+				removed = true;
 			}
 			
 			it = next;
 		}
+
+#if defined(LUA_JIT)
+		if (removed) {
+			// temp ents where removed, full GC to collect refs
+			// to any assets
+			lua_gc(lua->L, LUA_GCCOLLECT, 0);
+		}
+#endif
 	}
 
 	if (!(pauseState&kPauseUI)) {

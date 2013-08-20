@@ -125,7 +125,12 @@ int WorldLua::lua_System_CreateSpawnTask(lua_State *L) {
 	
 	T_Spawn::Ref spawn = T_Spawn::New(self->m_world, keys);
 	if (spawn) {
-		e->QueueScriptTask(boost::static_pointer_cast<Entity::Tickable>(spawn));
+		if (lua_toboolean(L, 3) == 1) {
+			e->QueueScriptTask(boost::static_pointer_cast<Entity::Tickable>(spawn));
+		} else {
+			// tick until loaded!
+			while (spawn->Tick(*e, 0.001f, xtime::TimeSlice::Infinite, 0) == TickNext) {}
+		}
 		spawn->Push(L);
 		return 1;
 	}
@@ -143,6 +148,7 @@ int WorldLua::lua_System_CreateTempSpawnTask(lua_State *L) {
 	
 	T_TempSpawn::Ref spawn = T_TempSpawn::New(self->m_world, keys);
 	if (spawn) {
+
 		e->QueueScriptTask(boost::static_pointer_cast<Entity::Tickable>(spawn));
 		spawn->Push(L);
 		return 1;
