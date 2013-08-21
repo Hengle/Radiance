@@ -169,7 +169,8 @@ public:
 		float hold,
 		float weight,
 		float inSmooth, // The smooth factor, 0 = no smoothing, numbers very close to zero are very "laggy". Larger numbers are less smooth.
-		float outSmooth 
+		float outSmooth,
+		float dotCull // 0 == never cull
 	);
 
 	void FadeOutLookTarget(int id, float time);
@@ -308,6 +309,7 @@ private:
 		bool valid;
 		float weight;
 		float frac;
+		float dotCull;
 		float smooth[2];
 
 		static int s_nextId;

@@ -435,7 +435,7 @@ Vec3 E_ViewController::LookTarget::Tick(
 			tfwd.Normalize();
 
 			float d = tfwd.Dot(targetFwd);
-			bool valid = d >= 0.57f;
+			bool valid = (x.dotCull > 0.f) ? (d >= x.dotCull) : true;
 
 			if (!x.init) {
 				x.init = true;
@@ -476,7 +476,7 @@ Vec3 E_ViewController::LookTarget::Tick(
 
 	for (; block != list.end(); ++block) {
 		const LookTarget &x = *block;
-		if ((x.blend.frac*x.band.frac) >= 0.999f)
+		if ((x.blend.frac*x.band.frac*x.weight) >= 0.999f)
 			break;
 	}
 
@@ -501,10 +501,11 @@ Vec3 E_ViewController::LookTarget::Tick(
 			x.frac = math::Lerp(x.frac, x.blend.frac*x.band.frac, z);
 		}
 
-		if (x.band.frac > 0.f) {
+		if (x.frac > 0.f) {
 			Vec3 tfwd = x.target - pos;
 			tfwd.Normalize();
 			nfwd = math::Lerp(nfwd, tfwd, x.frac*x.weight);
+			nfwd.Normalize();
 		}
 
 		if (it == list.begin())
@@ -1244,20 +1245,22 @@ int E_ViewController::BlendToLookTarget(
 	float hold, 
 	float weight,
 	float inSmooth,
-	float outSmooth
+	float outSmooth,
+	float dotCull
 ) {
 	LookTarget t;
 	t.target = target;
 	t.blend.Init(in, out, hold);
 	t.weight = weight;
 	t.frac = 0.f;
+	t.dotCull = dotCull;
 	t.smooth[0] = inSmooth;
 	t.smooth[1] = outSmooth;
 	t.id = LookTarget::s_nextId++;
 	t.init = false;
 	t.valid = false;
 	t.band.Init(0.f, 0.f, 0.f);
-	m_looks.push_back(t);
+	m_looks.push_front(t);
 
 	return t.id;
 }
@@ -1447,7 +1450,8 @@ int E_ViewController::lua_BlendToLookTarget(lua_State *L) {
 		(float)luaL_checknumber(L, 5),
 		(float)luaL_checknumber(L, 6),
 		(float)luaL_checknumber(L, 7),
-		(float)luaL_checknumber(L, 8)
+		(float)luaL_checknumber(L, 8),
+		(float)luaL_checknumber(L, 9)
 	);
 	lua_pushinteger(L, id);
 	return 1;
