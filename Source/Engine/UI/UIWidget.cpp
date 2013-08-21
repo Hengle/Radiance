@@ -1049,7 +1049,20 @@ int Widget::lua_Unmap(lua_State *L) {
 	return 0;
 }
 
-UIW_GETSET(Widget, Rect, Rect, m_rect);
+UIW_GET(Widget, Rect, Rect, m_rect);
+
+int Widget::LUART_SETFN(Rect)(lua_State *L) {
+	Ref self = GetRef<Widget>(L, "Widget", 1, true);
+
+	self->m_rect = lua::Marshal<Rect>::Get(L, 2, true);
+	
+	// kill any active moves
+	self->m_moveTime[1][0] = 0.f;
+	self->m_moveTime[1][1] = 0.f;
+	
+	return 0;
+}
+
 UIW_GET(Widget, ScreenRect, Rect, screenRect);
 UIW_GET(Widget, Color, Vec4, color);
 UIW_GETSET(Widget, Visible, bool, m_visible);

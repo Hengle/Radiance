@@ -274,6 +274,12 @@ int TextLabel::lua_AllocateText(lua_State *L) {
 	return 0;
 }
 
+int TextLabel::lua_Clear(lua_State *L) {
+	Ref w = GetRef<TextLabel>(L, "TextLabel", 1, true);
+	w->Clear();
+	return 0;
+}
+
 void TextLabel::OnDraw(const Rect *clip) {
 	MatWidget::OnDraw(clip);
 
@@ -306,6 +312,8 @@ void TextLabel::PushCallTable(lua_State *L) {
 	lua_setfield(L, -2, "SetText");
 	lua_pushcfunction(L, lua_AllocateText);
 	lua_setfield(L, -2, "AllocateText");
+	lua_pushcfunction(L, lua_Clear);
+	lua_setfield(L, -2, "Clear");
 	LUART_REGISTER_GET(L, Dimensions);
 	LUART_REGISTER_GETSET(L, Typeface);
 }

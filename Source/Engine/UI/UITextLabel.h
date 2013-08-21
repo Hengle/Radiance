@@ -65,6 +65,7 @@ private:
 	UIW_DECL_GET(Dimensions);
 
 	static int lua_SetText(lua_State *L);
+	static int lua_Clear(lua_State *L);
 	static int lua_AllocateText(lua_State *L);
 
 	pkg::Asset::Ref m_typeface;
