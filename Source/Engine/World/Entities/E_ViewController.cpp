@@ -476,7 +476,20 @@ Vec3 E_ViewController::LookTarget::Tick(
 
 	for (; block != list.end(); ++block) {
 		const LookTarget &x = *block;
-		if ((x.blend.frac*x.band.frac*x.weight) >= 0.999f)
+
+		float smooth = ((x.blend.step == Blend::kStep_In) || (x.blend.step == Blend::kStep_Hold)) ?
+			x.smooth[0] : x.smooth[1];
+
+		float frac = 0.f;
+
+		if (smooth <= 0.f) {
+			frac = x.blend.frac*x.band.frac;
+		} else {
+			float z = math::Clamp(smooth*dt, 0.f, 0.99999f);
+			frac = math::Lerp(x.frac, x.blend.frac*x.band.frac, z);
+		}
+
+		if ((frac*x.weight) >= 0.999f)
 			break;
 	}
 
@@ -705,7 +718,7 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 	}
 
 	m_rail.lookFwd = LookTarget::Tick(m_looks, m_rail.pos, m_rail.fwd, fwd, dt);
-
+	
 	float fov = m_rail.fov;
 
 	if (m_rail.cinematicFOV) {
@@ -721,6 +734,8 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 		Vec3 angles = LookAngles(m_rail.lookFwd);
 		Vec3 camAngles = AnglesFromQuat(m_rail.rot);
 		angles[0] = camAngles[0]; // always bank
+//		COut(C_Debug) << "Fwd: " << m_rail.lookFwd[0] << ", " << m_rail.lookFwd[1] << ", " << m_rail.lookFwd[2] << std::endl;
+//		COut(C_Debug) << "Angles: " << angles[0] << ", " << angles[1] << ", " << angles[2] << std::endl;
 //		COut(C_Debug) << "Pos (" << pos[0] << ", " << pos[1] << ", " << pos[2] << ") Angles (" << camAngles[0] << ", " << camAngles[1] << ", " << camAngles[2] << ")" << std::endl;
 		if (!world->cvars->r_fly.value) {
 			world->camera->pos = pos;
