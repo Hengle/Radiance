@@ -27,12 +27,16 @@ void D_Light::PushElements(lua_State *L) {
 	LUART_REGISTER_GETSET(L, Pos);
 	LUART_REGISTER_GETSET(L, Radius);
 	LUART_REGISTER_GETSET(L, Intensity);
+	LUART_REGISTER_GETSET(L, IntensityScale);
+	LUART_REGISTER_GETSET(L, ShadowWeight);
 	LUART_REGISTER_GETSET(L, Style);
 	LUART_REGISTER_GETSET(L, InteractionFlags);
 	lua_pushcfunction(L, lua_Link);
 	lua_setfield(L, -2, "Link");
 	lua_pushcfunction(L, lua_Unlink);
 	lua_setfield(L, -2, "Unlink");
+	lua_pushcfunction(L, lua_FadeTo);
+	lua_setfield(L, -2, "FadeTo");
 	lua_pushcfunction(L, lua_AnimateIntensity);
 	lua_setfield(L, -2, "AnimateIntensity");
 	lua_pushcfunction(L, lua_AnimateDiffuseColor);
@@ -52,6 +56,15 @@ int D_Light::lua_Link(lua_State *L) {
 int D_Light::lua_Unlink(lua_State *L) {
 	SELF;
 	self->m_light->Unlink();
+	return 0;
+}
+
+int D_Light::lua_FadeTo(lua_State *L) {
+	SELF;
+	self->m_light->FadeTo(
+		(float)luaL_checknumber(L, 2), 
+		(float)luaL_checknumber(L, 3)
+	);
 	return 0;
 }
 
@@ -130,6 +143,8 @@ LUART_GETSET(D_Light, Pos, Vec3, m_light->pos, SELF)
 LUART_GET(D_Light, Radius, float, m_light->radius, SELF)
 LUART_SET_CUSTOM(D_Light, Radius, SELF, float r = (float)luaL_checknumber(L, 2); self->m_light->radius = r; self->m_light->bounds = BBox(-Vec3(r,r,r), Vec3(r,r,r)))
 LUART_GETSET(D_Light, Intensity, float, m_light->intensity, SELF)
+LUART_GETSET(D_Light, IntensityScale, float, m_light->intensityScale, SELF)
+LUART_GETSET(D_Light, ShadowWeight, float, m_light->shadowWeight, SELF)
 LUART_GET(D_Light, Style, int, m_light->style.get(), SELF)
 LUART_SET_CUSTOM(D_Light, Style, SELF, int s = luaL_checkinteger(L, 2); self->m_light->style = (Light::LightStyle::Enum)s)
 LUART_GETSET(D_Light, InteractionFlags, int, m_light->interactionFlags, SELF)

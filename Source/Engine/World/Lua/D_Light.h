@@ -36,11 +36,14 @@ private:
 	LUART_DECL_GETSET(Pos);
 	LUART_DECL_GETSET(Radius);
 	LUART_DECL_GETSET(Intensity);
+	LUART_DECL_GETSET(IntensityScale);
 	LUART_DECL_GETSET(Style);
+	LUART_DECL_GETSET(ShadowWeight);
 	LUART_DECL_GETSET(InteractionFlags);
 
 	static int lua_Link(lua_State *L);
 	static int lua_Unlink(lua_State *L);
+	static int lua_FadeTo(lua_State *L);
 	static int lua_AnimateIntensity(lua_State *L);
 	static int lua_AnimateDiffuseColor(lua_State *L);
 	static int lua_AnimateSpecularColor(lua_State *L);

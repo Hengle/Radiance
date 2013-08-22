@@ -16,7 +16,7 @@ Light::Light(World *w) :
 m_interactionHead(0),
 m_pos(Vec3::Zero),
 m_style(kStyle_Diffuse|kStyle_Specular|kStyle_CastShadows),
-m_baseIntensity(1.f),
+m_shadowWeight(1.f),
 m_intensityTime(0.0),
 m_dfTime(0.0),
 m_spTime(0.0),
@@ -37,6 +37,8 @@ m_visFrame(-1),
 m_drawFrame(-1),
 m_exactlyCulledFrame(-1) {
 	m_intensity[0] = m_intensity[1] = 1.f;
+	m_intensityScale[0] = m_intensityScale[1] = m_intensityScale[2] = 1.f;
+	m_intensityScaleTime[0] = m_intensityScaleTime[1] = 0.f;
 	m_shColor = Vec4(0,0,0,1);
 	m_spColor[0] = m_spColor[1] = Vec3(1,1,1);
 	m_dfColor[0] = m_dfColor[1] = Vec3(1,1,1);
@@ -60,7 +62,30 @@ void Light::Unlink() {
 	m_world->UnlinkLight(*this);
 }
 
+void Light::FadeTo(float intensityScale, float time) {
+	if (time <= 0.f) {
+		m_intensityScale[0] = intensityScale;
+		m_intensityScaleTime[1] = 0.f;
+	} else {
+		m_intensityScale[1] = m_intensityScale[0];
+		m_intensityScale[2] = intensityScale;
+		m_intensityScaleTime[1] = time;
+		m_intensityScaleTime[0] = 0.f;
+	}
+}
+
 void Light::AnimateIntensity(float dt) {
+
+	if (m_intensityScaleTime[1] != 0.f) {
+		m_intensityScaleTime[0] += dt;
+		if (m_intensityScaleTime[0] < m_intensityScaleTime[1]) {
+			m_intensityScale[0] = math::Lerp(m_intensityScale[1], m_intensityScale[2], m_intensityScaleTime[0]/m_intensityScaleTime[1]);
+		} else {
+			m_intensityScale[0] = m_intensityScale[2];
+			m_intensityScaleTime[1] = 0.f;
+		}
+	}
+
 	if (!m_intensitySteps.empty()) {
 		double baseTime = 0.0;
 		m_intensityTime += (double)dt;

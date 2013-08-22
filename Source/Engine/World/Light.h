@@ -51,17 +51,20 @@ public:
 	RAD_DECLARE_PROPERTY(Light, specularColor, const Vec3&, const Vec3&);
 	// alpha controls shadow opacity
 	RAD_DECLARE_PROPERTY(Light, shadowColor, const Vec4&, const Vec4&);
+	RAD_DECLARE_PROPERTY(Light, shadowWeight, float, float);
 	RAD_DECLARE_PROPERTY(Light, style, LightStyle, LightStyle);
 	RAD_DECLARE_PROPERTY(Light, pos, const Vec3&, const Vec3&);
 	RAD_DECLARE_PROPERTY(Light, radius, float, float);
 	RAD_DECLARE_PROPERTY(Light, bounds, const BBox&, const BBox&);
-	RAD_DECLARE_PROPERTY(Light, intensity, float, float);
 	RAD_DECLARE_PROPERTY(Light, interactionFlags, int, int);
-	RAD_DECLARE_READONLY_PROPERTY(Light, baseIntensity, float);
+	RAD_DECLARE_PROPERTY(Light, intensity, float, float);
+	RAD_DECLARE_PROPERTY(Light, intensityScale, float, float);
 
 	void Link();
 	void Unlink();
 	void Tick(float dt);
+
+	void FadeTo(float intensityScale, float time);
 
 	void AnimateIntensity(const IntensityStep::Vec &vec, bool loop);
 	void AnimateDiffuseColor(const ColorStep::Vec &vec, bool loop);
@@ -130,17 +133,29 @@ private:
 		m_bounds = value;
 	}
 
-	RAD_DECLARE_GET(baseIntensity, float) {
-		return m_baseIntensity;
+	RAD_DECLARE_GET(shadowWeight, float) {
+		return m_shadowWeight;
+	}
+
+	RAD_DECLARE_SET(shadowWeight, float) {
+		m_shadowWeight = value;
 	}
 
 	RAD_DECLARE_GET(intensity, float) {
-		return m_intensity[0];
+		return m_intensity[0]*m_intensityScale[0];
 	}
 
 	RAD_DECLARE_SET(intensity, float) {
-		m_baseIntensity = value;
+		m_intensitySteps.clear();
 		m_intensity[0] = value;
+	}
+
+	RAD_DECLARE_GET(intensityScale, float) {
+		return m_intensityScale[0];
+	}
+
+	RAD_DECLARE_SET(intensityScale, float) {
+		FadeTo(value, 0.f);
 	}
 
 	RAD_DECLARE_GET(interactionFlags, int) {
@@ -188,8 +203,10 @@ private:
 	Vec4 m_shColor;
 	Vec4 m_scissor; // set by renderer
 	Vec3 m_pos;
-	float m_baseIntensity;
 	float m_intensity[2];
+	float m_intensityScale[3];
+	float m_intensityScaleTime[2];
+	float m_shadowWeight;
 	float m_radius;
 	double m_intensityTime;
 	double m_dfTime;
