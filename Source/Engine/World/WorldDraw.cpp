@@ -795,7 +795,7 @@ void WorldDraw::VisMarkArea(
 			continue;
 
 		if ((light.m_visFrame != m_markFrame) &&
-			((light.intensity) >= 0.01f || (light.intensity < 0.f))) {
+			((light.intensity) >= 0.01f || (light.shadowWeight < 0.f))) {
 			
 			BBox bounds(light.m_bounds);
 			bounds.Translate(light.m_pos);

@@ -602,7 +602,9 @@ void WorldDraw::CalcUnifiedLightPosAndSize(
 	const Vec3 &origin = bounds.Origin();
 	
 	for (const details::LightInteraction *i = head; i; i = i->nextOnBatch) {
-		totalIntensity += math::Abs(i->light->intensity.get());
+		if (i->light->m_visFrame != m_markFrame)
+			continue;
+		totalIntensity += math::Abs(i->light->shadowWeight.get());
 	}
 
 	if (totalIntensity == 0.f)
@@ -612,13 +614,16 @@ void WorldDraw::CalcUnifiedLightPosAndSize(
 
 	for (const details::LightInteraction *i = head; i; i = i->nextOnBatch) {
 
+		if (i->light->m_visFrame != m_markFrame)
+			continue;
+
 		if (i->light->radius == 0.f)
 			continue;
 
 		Vec3 z = i->light->pos.get() - origin;
 		float dist = z.Magnitude();
 		float w = 1.f - math::Min(1.f, dist / i->light->radius);
-		w = w * w * (math::Abs(i->light->intensity.get()) / totalIntensity);
+		w = w * w * (math::Abs(i->light->shadowWeight.get()) / totalIntensity);
 
 		totalWeight += w;
 
@@ -630,13 +635,16 @@ void WorldDraw::CalcUnifiedLightPosAndSize(
 
 	for (const details::LightInteraction *i = head; i; i = i->nextOnBatch) {
 
+		if (i->light->m_visFrame != m_markFrame)
+			continue;
+
 		if (i->light->radius == 0.f)
 			continue;
 
 		Vec3 z = i->light->pos.get() - origin;
 		float dist = z.Magnitude();
 		float w = 1.f - math::Min(1.f, dist / i->light->radius);
-		w = w * w * (math::Abs(i->light->intensity.get()) / totalIntensity);
+		w = w * w * (math::Abs(i->light->shadowWeight.get()) / totalIntensity);
 
 		w = w / totalWeight;
 		pos += i->light->pos.get() * w;
