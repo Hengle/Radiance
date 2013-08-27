@@ -861,7 +861,7 @@ void WorldDraw::LinkLight(
 	dBSPLeaf &leaf,
 	dBSPArea &area
 ) {
-	for (EntityPtrSet::const_iterator it = leaf.entities.begin(); it != leaf.entities.begin(); it++) {
+	for (EntityPtrSet::const_iterator it = leaf.entities.begin(); it != leaf.entities.end(); it++) {
 		Entity &entity = **it;
 
 		if (!(light.interactionFlags & entity.lightInteractionFlags))
@@ -885,7 +885,7 @@ void WorldDraw::LinkLight(
 			const DrawModel::Ref &model = it->second;
 			for (MBatchDraw::Vec::const_iterator it = model->batches->begin(); it != model->batches->end(); ++it) {
 				const MBatchDraw::Ref &batch = *it;
-				if ((batch->maxLights > 0) && !FindInteraction(light, *batch)) {
+				if ((batch->maxLights > 0) && bounds.Touches(batch->TransformedBounds()) && !FindInteraction(light, *batch)) {
 					CreateInteraction(light, entity, *batch);
 				}
 			}
@@ -911,7 +911,7 @@ void WorldDraw::LinkLight(
 
 		for (MBatchDraw::Vec::const_iterator it = occupant.batches->begin(); it != occupant.batches->end(); ++it) {
 			const MBatchDraw::Ref &batch = *it;
-			if ((batch->maxLights > 0) && !FindInteraction(light, *batch)) {
+			if ((batch->maxLights > 0) && bounds.Touches(batch->TransformedBounds())  && !FindInteraction(light, *batch)) {
 				CreateInteraction(light, occupant, *batch);
 			}
 		}
