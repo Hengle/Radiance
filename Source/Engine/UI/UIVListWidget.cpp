@@ -84,7 +84,7 @@ void VListWidget::CreateVerticalScrollBar(
 
 	const Rect &selfRect = this->rect;
 
-	// put on the left.
+	// put on the right.
 	Rect r;
 	r.w = width;
 	r.h = selfRect.h;
@@ -240,8 +240,16 @@ void VListWidget::DoVerticalLayout() {
 
 void VListWidget::RecalcLayout() {
 	InternalRecalcLayout();
-	if (m_scrollBar)
+	if (m_scrollBar) {
+		// put on the right.
+		const Rect &selfRect = this->rect;
+		Rect scrollRect = m_scrollBar->rect;
+		scrollRect.h = selfRect.h;
+		scrollRect.x = selfRect.w - scrollRect.w;
+
+		m_scrollBar->rect = scrollRect;
 		m_scrollBar->contentSize = m_contentSize[1];
+	}
 }
 
 void VListWidget::InternalRecalcLayout() {
