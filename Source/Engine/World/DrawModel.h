@@ -516,6 +516,11 @@ private:
 class RADENG_CLASS ParticleEmitterDrawModel : public DrawModel {
 public:
 
+	enum PositionMode {
+		kPositionMode_Local,
+		kPositionMode_World
+	};
+
 	typedef boost::shared_ptr<ParticleEmitterDrawModel> Ref;
 	typedef boost::weak_ptr<ParticleEmitterDrawModel> WRef;
 	
@@ -529,7 +534,10 @@ public:
 	virtual ~ParticleEmitterDrawModel();
 
 	RAD_DECLARE_READONLY_PROPERTY(ParticleEmitterDrawModel, particleEmitter, r::ParticleEmitter*);
-
+	RAD_DECLARE_PROPERTY(ParticleEmitterDrawModel, positionMode, PositionMode, PositionMode);
+	RAD_DECLARE_PROPERTY(ParticleEmitterDrawModel, worldPos, const Vec3&, const Vec3&);
+	RAD_DECLARE_PROPERTY(ParticleEmitterDrawModel, localDir, const Vec3&, const Vec3&);
+	
 protected:
 
 	ParticleEmitterDrawModel(
@@ -546,6 +554,8 @@ protected:
 private:
 
 	LUART_DECL_GETSET(LocalDir);
+	LUART_DECL_GETSET(WorldPos);
+	LUART_DECL_GETSET(PositionMode);
 
 	class Batch : public DrawModel::DrawBatch {
 	public:
@@ -575,10 +585,40 @@ private:
 		return m_emitter.get();
 	}
 
+	RAD_DECLARE_GET(positionMode, PositionMode) {
+		return (PositionMode)m_positionMode;
+	}
+
+	RAD_DECLARE_SET(positionMode, PositionMode) {
+		m_positionMode = value;
+	}
+
+	RAD_DECLARE_GET(worldPos, const Vec3&) {
+		return m_worldPos;
+	}
+
+	RAD_DECLARE_SET(worldPos, const Vec3&) {
+		m_worldPos = value;
+		if (m_positionMode == kPositionMode_World)
+			m_emitter->pos = value;
+	}
+
+	RAD_DECLARE_GET(localDir, const Vec3&) {
+		return m_localDir;
+	}
+
+	RAD_DECLARE_SET(localDir, const Vec3&) {
+		m_localDir = value;
+		if (m_positionMode == kPositionMode_World)
+			m_emitter->dir = value;
+	}
+
 	Vec3 m_localDir;
+	Vec3 m_worldPos;
 	r::ParticleEmitter::Ref m_emitter;
 	pkg::Asset::Ref m_asset; // optionally hangs onto particle (which holds material)
 	int m_matId;
+	int m_positionMode;
 };
 
 

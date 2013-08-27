@@ -898,8 +898,10 @@ ParticleEmitterDrawModel::ParticleEmitterDrawModel(
 DrawModel(entity),
 m_emitter(emitter), 
 m_asset(asset), 
-m_matId(matId) {
-
+m_matId(matId),
+m_positionMode(kPositionMode_Local),
+m_worldPos(Vec3::Zero) {
+	m_localDir = Vec3(0.f, 0.f, 1.f);
 }
 
 ParticleEmitterDrawModel::~ParticleEmitterDrawModel() {
@@ -913,11 +915,14 @@ void ParticleEmitterDrawModel::OnTick(float time, float dt) {
 			Vec3 dir = m.Transform3X3(m_localDir);
 			m_emitter->pos = m[3];
 			m_emitter->dir = dir;
-		} else {
+		} else if (m_positionMode == kPositionMode_Local) {
 			m_emitter->pos = entity->ps->worldPos;
+			m_emitter->dir = Mat4::Rotation(QuatFromAngles(entity->ps->worldAngles)).Transform3X3(m_localDir);
+		} else {
+			m_emitter->pos = m_worldPos;
 			m_emitter->dir = m_localDir;
 		}
-
+		
 		m_emitter->Tick(dt);
 		worldDraw->counters->simulatedParticles += m_emitter->numParticles;
 	}
@@ -926,6 +931,8 @@ void ParticleEmitterDrawModel::OnTick(float time, float dt) {
 void ParticleEmitterDrawModel::PushElements(lua_State *L) {
 	DrawModel::PushElements(L);
 	LUART_REGISTER_GETSET(L, LocalDir);
+	LUART_REGISTER_GETSET(L, WorldPos);
+	LUART_REGISTER_GETSET(L, PositionMode);
 }
 
 int ParticleEmitterDrawModel::lua_PushMaterialList(lua_State *L) {
@@ -992,6 +999,8 @@ bool ParticleEmitterDrawModel::Batch::RAD_IMPLEMENT_GET(visible) {
 }
 
 #define SELF ParticleEmitterDrawModel::Ref self = lua::SharedPtr::Get<ParticleEmitterDrawModel>(L, "ParticleEmitterDrawModel", 1, true)
-LUART_GETSET(ParticleEmitterDrawModel, LocalDir, Vec3, m_localDir, SELF)
+LUART_GETSET(ParticleEmitterDrawModel, LocalDir, Vec3, localDir, SELF)
+LUART_GETSET(ParticleEmitterDrawModel, WorldPos, Vec3, worldPos, SELF)
+LUART_GETSET(ParticleEmitterDrawModel, PositionMode, int, m_positionMode, SELF)
 #undef SELF
 } // world

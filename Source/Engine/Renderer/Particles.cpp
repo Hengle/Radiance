@@ -359,8 +359,9 @@ bool ParticleEmitter::Particle::Move(float dt, const ParticleStyle &style) {
 
 	if (doRotateDrift) {
 		rotationDriftTime += dt*rotationDriftSpeed;
-		if (rotationDriftTime >= 1.f)
+		while (rotationDriftTime >= 1.f) {
 			rotationDriftTime -= 1.f;
+		}
 		
 		float multiplier = math::FastSin(-math::Constants<float>::PI() + rotationDriftTime*math::Constants<float>::_2_PI());
 		rot = origRotate + multiplier*rotationDrift;
@@ -368,16 +369,18 @@ bool ParticleEmitter::Particle::Move(float dt, const ParticleStyle &style) {
 
 	if (doScaleX) {
 		scaleTime[0] += dt*scaleSpeed[0];
-		if (scaleTime[0] >= 1.f)
+		while (scaleTime[0] >= 1.f) {
 			scaleTime[0] -= 1.f;
+		}
 		float multiplier = math::FastSin(-math::Constants<float>::PI() + scaleTime[0]*math::Constants<float>::_2_PI());
 		size[0] = origSize[0] * (style.sizeScaleX[0] + math::Abs(multiplier)*style.sizeScaleX[1]);
 	}
 
 	if (doScaleY) {
 		scaleTime[1] += dt*scaleSpeed[1];
-		if (scaleTime[1] >= 1.f)
+		while (scaleTime[1] >= 1.f) {
 			scaleTime[1] -= 1.f;
+		}
 		float multiplier = math::FastSin(-math::Constants<float>::PI() + scaleTime[1]*math::Constants<float>::_2_PI());
 		size[1] = origSize[1] * (style.sizeScaleY[0] + math::Abs(multiplier)*style.sizeScaleY[1]);
 	}
@@ -409,8 +412,9 @@ void ParticleEmitter::Particle::UpdatePos(float dt) {
 
 		if (drift0) {
 			driftTime[0] += dt*driftSpeed[0];
-			if (driftTime[0] >= 1.f)
+			while (driftTime[0] >= 1.f) {
 				driftTime[0] -= 1.f;
+			}
 
 			float multiplier = math::FastSin(-math::Constants<float>::PI() + driftTime[0]*math::Constants<float>::_2_PI());
 			pos[0] = orgPos[0] + drift[0]*multiplier;
@@ -420,8 +424,9 @@ void ParticleEmitter::Particle::UpdatePos(float dt) {
 
 		if (drift1) {
 			driftTime[1] += dt*driftSpeed[1];
-			if (driftTime[1] >= 1.f)
+			while (driftTime[1] >= 1.f) {
 				driftTime[1] -= 1.f;
+			}
 
 			float multiplier = math::FastSin(-math::Constants<float>::PI() + driftTime[1]*math::Constants<float>::_2_PI());
 			pos[1] = orgPos[1] + drift[1]*multiplier;
@@ -431,8 +436,9 @@ void ParticleEmitter::Particle::UpdatePos(float dt) {
 
 		if (drift2) {
 			driftTime[2] += dt*driftSpeed[2];
-			if (driftTime[2] >= 1.f)
+			while (driftTime[2] >= 1.f) {
 				driftTime[2] -= 1.f;
+			}
 
 			float multiplier = math::FastSin(-math::Constants<float>::PI() + driftTime[2]*math::Constants<float>::_2_PI());
 			pos[2] = orgPos[2] + drift[2]*multiplier;
