@@ -1103,9 +1103,9 @@ bool BSPBuilder::EmitBSPFloors() {
 			const SceneFile::TriFace &f = *fIt;
 
 			if (!builder.AddTri(
-				m->verts[f.v[0]].pos,
-				m->verts[f.v[1]].pos,
-				m->verts[f.v[2]].pos
+				SnapVertex(m->verts[f.v[0]].pos),
+				SnapVertex(m->verts[f.v[1]].pos),
+				SnapVertex(m->verts[f.v[2]].pos)
 			)) {
 				return false;
 			}

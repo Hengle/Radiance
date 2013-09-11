@@ -730,6 +730,7 @@ private:
 	static int SurfaceForString(const String &s);
 
 	static Vec3 SnapVertex(const Vec3 &v);
+	static SceneFile::Vec3 SnapVertex(const SceneFile::Vec3 &v);
 
 	// Converts to BSP precision types.
 	static Vec2 ToBSPType(const SceneFile::Vec2 &vec);

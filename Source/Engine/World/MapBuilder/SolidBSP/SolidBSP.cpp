@@ -1020,6 +1020,14 @@ Vec3 BSPBuilder::SnapVertex(const Vec3 &_v) {
 	return v;
 }
 
+SceneFile::Vec3 BSPBuilder::SnapVertex(const SceneFile::Vec3 &_v) {
+	SceneFile::Vec3 v(_v);
+	v[0] = math::Floor(v[0] + SceneFile::ValueType(0.5));
+	v[1] = math::Floor(v[1] + SceneFile::ValueType(0.5));
+	v[2] = math::Floor(v[2] + SceneFile::ValueType(0.5));
+	return v;
+}
+
 Vec2 BSPBuilder::ToBSPType(const SceneFile::Vec2 &vec) {
 	return Vec2(
 		(ValueType)vec[0],
