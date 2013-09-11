@@ -119,6 +119,7 @@ private:
 	friend class WorldDraw;
 	friend class World;
 	friend class Entity;
+	friend class SkMeshDrawModel; // attachment hack
 
 	RAD_DECLARE_GET(entity, Entity*) { 
 		return m_entity; 
@@ -314,10 +315,11 @@ public:
 	Vec3 WorldBonePos(int idx) const;
 	Mat4 BoneMatrix(int idx) const;
 	Mat4 WorldBoneMatrix(int idx) const;
-	void AttachChildToBone(const Ref &child, int boneIdx);
+	void AttachChildToBone(const DrawModel::Ref &child, int boneIdx);
 
 	RAD_DECLARE_PROPERTY(SkMeshDrawModel, motionScale, float, float);
 	RAD_DECLARE_PROPERTY(SkMeshDrawModel, timeScale, float, float);
+	RAD_DECLARE_PROPERTY(SkMeshDrawModel, forceTick, bool, bool);
 	RAD_DECLARE_READONLY_PROPERTY(SkMeshDrawModel, mesh, const r::SkMesh::Ref&);
 	RAD_DECLARE_READONLY_PROPERTY(SkMeshDrawModel, deltaMotion, const ska::BoneTM*);
 	RAD_DECLARE_READONLY_PROPERTY(SkMeshDrawModel, absMotion, const ska::BoneTM*);
@@ -345,6 +347,14 @@ private:
 
 	RAD_DECLARE_SET(timeScale, float) {
 		m_timeScale = value;
+	}
+
+	RAD_DECLARE_GET(forceTick, bool) { 
+		return m_forceTick;
+	}
+
+	RAD_DECLARE_SET(forceTick, bool) {
+		m_forceTick = value;
 	}
 
 	RAD_DECLARE_GET(mesh, const r::SkMesh::Ref&) { 
@@ -385,11 +395,13 @@ private:
 
 	LUART_DECL_GETSET(TimeScale);
 	LUART_DECL_GETSET(MotionScale);
+	LUART_DECL_GETSET(ForceTick);
 
 	r::SkMesh::Ref m_mesh;
 	float m_motionScale;
 	float m_timeScale;
 	bool m_instanced;
+	bool m_forceTick;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -521,6 +533,11 @@ public:
 		kPositionMode_World
 	};
 
+	enum CullMode {
+		kCullMode_None,
+		kCullMode_View // default, particles are only updated when visible
+	};
+
 	typedef boost::shared_ptr<ParticleEmitterDrawModel> Ref;
 	typedef boost::weak_ptr<ParticleEmitterDrawModel> WRef;
 	
@@ -535,6 +552,7 @@ public:
 
 	RAD_DECLARE_READONLY_PROPERTY(ParticleEmitterDrawModel, particleEmitter, r::ParticleEmitter*);
 	RAD_DECLARE_PROPERTY(ParticleEmitterDrawModel, positionMode, PositionMode, PositionMode);
+	RAD_DECLARE_PROPERTY(ParticleEmitterDrawModel, cullMode, CullMode, CullMode);
 	RAD_DECLARE_PROPERTY(ParticleEmitterDrawModel, worldPos, const Vec3&, const Vec3&);
 	RAD_DECLARE_PROPERTY(ParticleEmitterDrawModel, localDir, const Vec3&, const Vec3&);
 	
@@ -556,6 +574,7 @@ private:
 	LUART_DECL_GETSET(LocalDir);
 	LUART_DECL_GETSET(WorldPos);
 	LUART_DECL_GETSET(PositionMode);
+	LUART_DECL_GETSET(CullMode);
 
 	class Batch : public DrawModel::DrawBatch {
 	public:
@@ -593,6 +612,14 @@ private:
 		m_positionMode = value;
 	}
 
+	RAD_DECLARE_GET(cullMode, CullMode) {
+		return (CullMode)m_cullMode;
+	}
+
+	RAD_DECLARE_SET(cullMode, CullMode) {
+		m_cullMode = value;
+	}
+
 	RAD_DECLARE_GET(worldPos, const Vec3&) {
 		return m_worldPos;
 	}
@@ -619,6 +646,7 @@ private:
 	pkg::Asset::Ref m_asset; // optionally hangs onto particle (which holds material)
 	int m_matId;
 	int m_positionMode;
+	int m_cullMode;
 };
 
 

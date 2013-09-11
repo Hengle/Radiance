@@ -447,7 +447,8 @@ DrawModel(entity),
 m_mesh(m),
 m_motionScale(1.f),
 m_timeScale(1.f),
-m_instanced(false) {
+m_instanced(false),
+m_forceTick(false) {
 }
 
 SkMeshDrawModel::~SkMeshDrawModel() {
@@ -462,7 +463,7 @@ SkMeshDrawModel::Ref SkMeshDrawModel::CreateInstance() {
 }
 
 void SkMeshDrawModel::OnTick(float time, float dt) {
-	if (visible && !m_instanced) {
+	if ((visible||m_forceTick) && !m_instanced) {
 		m_mesh->ska->Tick(
 			dt * m_timeScale, 
 			entity->ps->distanceMoved * m_motionScale,
@@ -477,6 +478,7 @@ void SkMeshDrawModel::PushElements(lua_State *L) {
 	DrawModel::PushElements(L);
 	LUART_REGISTER_GETSET(L, TimeScale);
 	LUART_REGISTER_GETSET(L, MotionScale);
+	LUART_REGISTER_GETSET(L, ForceTick);
 	lua_pushcfunction(L, lua_CreateInstance);
 	lua_setfield(L, -2, "CreateInstance");
 	lua_pushcfunction(L, lua_FindBone);
@@ -545,7 +547,7 @@ int SkMeshDrawModel::lua_WorldBonePos(lua_State *L) {
 int SkMeshDrawModel::lua_AttachChildToBone(lua_State *L) {
 	Ref r = lua::SharedPtr::Get<SkMeshDrawModel>(L, "SkMeshDrawModel", 1, true);
 	r->AttachChildToBone(
-		lua::SharedPtr::Get<SkMeshDrawModel>(L, "SkMeshDrawModel", 2, true),
+		lua::SharedPtr::Get<DrawModel>(L, "DrawModel", 2, true),
 		luaL_checkinteger(L, 3)
 	);
 	return 0;
@@ -554,6 +556,7 @@ int SkMeshDrawModel::lua_AttachChildToBone(lua_State *L) {
 #define SELF Ref self = lua::SharedPtr::Get<SkMeshDrawModel>(L, "SkMeshDrawModel", 1, true)
 LUART_GETSET(SkMeshDrawModel, TimeScale, float, m_timeScale, SELF);
 LUART_GETSET(SkMeshDrawModel, MotionScale, float, m_motionScale, SELF);
+LUART_GETSET(SkMeshDrawModel, ForceTick, bool, m_forceTick, SELF);
 #undef SELF
 
 SkMeshDrawModel::Batch::Batch(DrawModel &model, const r::SkMesh::Ref &m, int idx, int matId) :
@@ -586,7 +589,7 @@ Vec3 SkMeshDrawModel::BonePos(int idx) const {
 Mat4 SkMeshDrawModel::BoneMatrix(int idx) const {
 	if (idx >= 0 && idx < m_mesh->ska->numBones) {
 		Mat4 bone = m_mesh->ska->BoneWorldMat(idx);
-		bone = (Mat4::Scaling(Scale3(scale)) * Mat4::Translation(pos)) * bone;
+		bone = bone * (Mat4::Scaling(Scale3(scale)) * Mat4::Translation(pos));
 		return bone;
 	}
 	return Mat4::Identity;
@@ -597,14 +600,14 @@ Mat4 SkMeshDrawModel::WorldBoneMatrix(int idx) const {
 		Mat4 bone = m_mesh->ska->BoneWorldMat(idx);
 		Vec3 pos, rot;
 		if (GetTransform(pos, rot)) {
-			bone = (Mat4::Scaling(Scale3(scale)) * Mat4::Rotation(QuatFromAngles(rot)) * Mat4::Translation(pos)) * bone;
+			bone = bone * (Mat4::Scaling(Scale3(scale)) * Mat4::Rotation(QuatFromAngles(rot)) * Mat4::Translation(pos));
 		}
 		return bone;
 	}
 	return Mat4::Identity;
 }
 
-void SkMeshDrawModel::AttachChildToBone(const Ref &child, int boneIdx) {
+void SkMeshDrawModel::AttachChildToBone(const DrawModel::Ref &child, int boneIdx) {
 	RAD_ASSERT(child);
 #if !defined(RAD_OPT_SHIP)
 	for (Vec::const_iterator it = m_children.begin(); it != m_children.end(); ++it) {
@@ -900,6 +903,7 @@ m_emitter(emitter),
 m_asset(asset), 
 m_matId(matId),
 m_positionMode(kPositionMode_Local),
+m_cullMode(kCullMode_View),
 m_worldPos(Vec3::Zero) {
 	m_localDir = Vec3(0.f, 0.f, 1.f);
 }
@@ -908,13 +912,19 @@ ParticleEmitterDrawModel::~ParticleEmitterDrawModel() {
 }
 
 void ParticleEmitterDrawModel::OnTick(float time, float dt) {
-	if (inView) { // expensive don't do this if we aren't in view
+	if ((m_cullMode == kCullMode_None) || inView) { // expensive don't do this if we aren't in view
 		SkMeshDrawModel::Ref parent = m_parent.lock();
 		if (parent) {
 			Mat4 m = parent->WorldBoneMatrix(m_attachBone);
-			Vec3 dir = m.Transform3X3(m_localDir);
 			m_emitter->pos = m[3];
-			m_emitter->dir = dir;
+
+			if (m_positionMode == kPositionMode_Local) {
+				Vec3 dir = m.Transform3X3(m_localDir);
+				m_emitter->dir = dir;
+			} else {
+				m_emitter->dir = m_localDir;
+			}
+
 		} else if (m_positionMode == kPositionMode_Local) {
 			m_emitter->pos = entity->ps->worldPos;
 			m_emitter->dir = Mat4::Rotation(QuatFromAngles(entity->ps->worldAngles)).Transform3X3(m_localDir);
@@ -933,6 +943,7 @@ void ParticleEmitterDrawModel::PushElements(lua_State *L) {
 	LUART_REGISTER_GETSET(L, LocalDir);
 	LUART_REGISTER_GETSET(L, WorldPos);
 	LUART_REGISTER_GETSET(L, PositionMode);
+	LUART_REGISTER_GETSET(L, CullMode);
 }
 
 int ParticleEmitterDrawModel::lua_PushMaterialList(lua_State *L) {
@@ -995,12 +1006,13 @@ void ParticleEmitterDrawModel::Batch::Draw() {
 
 bool ParticleEmitterDrawModel::Batch::RAD_IMPLEMENT_GET(visible) {
 	const r::SpriteBatch &batch = m_emitter->Batch(m_batchIdx);
-	return batch.numSprites > 0;
+	return (batch.numSprites > 0);
 }
 
 #define SELF ParticleEmitterDrawModel::Ref self = lua::SharedPtr::Get<ParticleEmitterDrawModel>(L, "ParticleEmitterDrawModel", 1, true)
 LUART_GETSET(ParticleEmitterDrawModel, LocalDir, Vec3, localDir, SELF)
 LUART_GETSET(ParticleEmitterDrawModel, WorldPos, Vec3, worldPos, SELF)
 LUART_GETSET(ParticleEmitterDrawModel, PositionMode, int, m_positionMode, SELF)
+LUART_GETSET(ParticleEmitterDrawModel, CullMode, int, m_cullMode, SELF)
 #undef SELF
 } // world
