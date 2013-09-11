@@ -677,10 +677,10 @@ int World::SpawnBuiltIn(
 
 		const String kClassName(CStr("classname"));
 
-		Keys keys;
-		keys.pairs.insert(Keys::Pairs::value_type(kClassName, m_builtIns[entityNum]));
+		m_spawnKeys.pairs.clear();
+		m_spawnKeys.pairs.insert(Keys::Pairs::value_type(kClassName, m_builtIns[entityNum]));
 
-		int r = CreateEntity(keys);
+		int r = CreateEntity(m_spawnKeys);
 		if (r != SR_Success) // don't fail on not finding a class factory.
 			return SR_Success;
 		RAD_ASSERT(m_spawnEnt);
