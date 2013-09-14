@@ -225,7 +225,7 @@ bool VScrollBar::HandleInputEvent(Widget &self, const InputEvent &e, const Touch
 void VScrollBar::RecalcBar() {
 	m_contentHeight = m_rect.h - (m_arrowHeight*2.f);
 
-	if (m_contentHeight >= m_contentSize) {
+	if (m_rect.h >= m_contentSize) {
 		m_thumbContentSize = m_contentHeight;
 		m_thumbSize = m_contentHeight - m_minThumbSize;
 		m_thumbSize = std::max(0.f, m_thumbSize);

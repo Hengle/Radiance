@@ -162,6 +162,8 @@ private:
 	static int lua_System_BuildConfig(lua_State *L);
 	static int lua_System_UTF8To32(lua_State *L);
 	static int lua_System_UTF32To8(lua_State *L);
+	static int lua_System_UTF8Compare(lua_State *L);
+	static int lua_System_UTF8Comparei(lua_State *L);
 	static int lua_System_NewHTTPGet(lua_State *L);
 	static int lua_System_UIMode(lua_State *L);
 

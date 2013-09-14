@@ -382,20 +382,20 @@ UTF16Buf String::ToUTF16() const {
 	buf.m_zone = m_zone;
 
 	if (!empty) {
-		int len = utf8to16len(c_str, length + 1) * (int)sizeof(U16);
+		int len = utf8to16len(c_str, numBytes + 1) * (int)sizeof(U16);
 		if (len > sizeof(U16)) {
 #if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 			if (len > UTF16Buf::kStackSize) {
 #endif
 				buf.m_data = details::DataBlock::New(kRefType_Copy, len, 0, 0, *m_zone);
-				utf8to16((U16*)buf.m_data->data.get(), c_str, length + 1);
+				utf8to16((U16*)buf.m_data->data.get(), c_str, numBytes + 1);
 #if defined(RAD_OPT_MEMPOOL_DEBUG)
 				buf.m_data->Validate();
 #endif
 #if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 			} else {
 				buf.m_stackLen = len;
-				utf8to16((U16*)buf.m_stackBytes, c_str, length + 1);
+				utf8to16((U16*)buf.m_stackBytes, c_str, numBytes + 1);
 			}
 #endif
 		}
@@ -409,20 +409,20 @@ UTF32Buf String::ToUTF32() const {
 	buf.m_zone = m_zone;
 
 	if (!empty) {
-		int len = utf8to32len(c_str, length + 1) * (int)sizeof(U32);
+		int len = utf8to32len(c_str, numBytes + 1) * (int)sizeof(U32);
 		if (len > sizeof(U32)) {
 #if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 			if (len > UTF32Buf::kStackSize) {
 #endif
 				buf.m_data = details::DataBlock::New(kRefType_Copy, len, 0, 0, *m_zone);
-				utf8to32((U32*)buf.m_data->data.get(), c_str, length + 1);
+				utf8to32((U32*)buf.m_data->data.get(), c_str, numBytes + 1);
 #if defined(RAD_OPT_MEMPOOL_DEBUG)
 				buf.m_data->Validate();
 #endif
 #if !defined(RAD_STRING_DISABLE_STACK_STRINGS_FOR_REFTAG_DATA)
 			} else {
 				buf.m_stackLen = len;
-				utf8to32((U32*)buf.m_stackBytes, c_str, length + 1);
+				utf8to32((U32*)buf.m_stackBytes, c_str, numBytes + 1);
 			}
 #endif
 		}
@@ -525,7 +525,7 @@ StringVec String::Split(const String &sep) const {
 int String::CharForByte(int pos) const {
 	RAD_VERIFY(pos >= 0);
 
-	if (pos >= length)
+	if (pos >= numBytes)
 		return -1;
 
 	const char *sz = c_str.get();
@@ -546,7 +546,7 @@ int String::ByteForChar(int idx) const {
 	RAD_VERIFY(idx >= 0);
 
 	const char *start = c_str.get();
-	const char *end = start + length;
+	const char *end = start + numBytes;
 	const char *sz = start;
 
 	U32 b;
@@ -586,7 +586,7 @@ String &String::EraseBytes(int ofs, int count) {
 	RAD_VERIFY(ofs >= 0);
 	RAD_VERIFY(count >= 0);
 
-	int nc = length;
+	int nc = numBytes;
 	if (ofs >= nc)
 		return *this;
 	if (ofs+count > nc)
@@ -606,10 +606,10 @@ String &String::EraseBytes(int ofs, int count) {
 
 String &String::NAppendBytes(const String &str, int len) {
 	RAD_VERIFY(len >= 0);
-	RAD_VERIFY(len <= str.length);
+	RAD_VERIFY(len <= str.numBytes);
 
 	if (len) {
-		int orglen = length;
+		int orglen = numBytes;
 		int newLen = orglen + len;
 		char *sz;
 
@@ -663,7 +663,7 @@ String &String::Replace(const String &src, const String &dst) {
 		if (x > 0)
 			l = s.Left(x);
 
-		int c = x+src.length;
+		int c = x+src.numBytes;
 		r = s.SubStr(c);
 
 		s = l + dst + r;

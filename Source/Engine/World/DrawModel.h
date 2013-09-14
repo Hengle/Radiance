@@ -491,12 +491,12 @@ protected:
 
 	SpriteBatchDrawModel(Entity *entity, const r::SpriteBatch::Ref &sprites, int matId);
 
-	virtual void OnTick(float time, float dt);
 	virtual void PushElements(lua_State *L);
 	virtual int lua_PushMaterialList(lua_State *L);
 	static int lua_AllocateSprite(lua_State *L);
 	static int lua_FreeSprite(lua_State *L);
 	static int lua_SetSpriteData(lua_State *L);
+	static int lua_Skin(lua_State *L);
 
 private:
 

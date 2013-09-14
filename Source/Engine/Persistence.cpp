@@ -144,10 +144,10 @@ bool SaveArray(stream::OutputStream &os, const Persistence::KeyValue::Map &keys)
 	if (!os.Write((U32)keys.size()))
 		return false;
 	for (Persistence::KeyValue::Map::const_iterator it = keys.begin(); it != keys.end(); ++it) {
-		RAD_ASSERT(it->first.length < 1024);
-		if (!os.Write((U32)it->first.length.get()))
+		RAD_ASSERT(it->first.numBytes < 1024);
+		if (!os.Write((U32)it->first.numBytes.get()))
 			return false;
-		if (os.Write(it->first.c_str.get(), (stream::SPos)it->first.length.get(), 0) != (stream::SPos)it->first.length.get())
+		if (os.Write(it->first.c_str.get(), (stream::SPos)it->first.numBytes.get(), 0) != (stream::SPos)it->first.numBytes.get())
 			return false;
 
 		if (it->second.mVal) {
@@ -158,9 +158,9 @@ bool SaveArray(stream::OutputStream &os, const Persistence::KeyValue::Map &keys)
 		} else {
 			if (!os.Write((U8)kType_String))
 				return false;
-			if (!os.Write((U32)it->second.sVal.length.get()))
+			if (!os.Write((U32)it->second.sVal.numBytes.get()))
 				return false;
-			if (os.Write(it->second.sVal.c_str.get(), (stream::SPos)it->second.sVal.length.get(), 0) != (stream::SPos)it->second.sVal.length.get())
+			if (os.Write(it->second.sVal.c_str.get(), (stream::SPos)it->second.sVal.numBytes.get(), 0) != (stream::SPos)it->second.sVal.numBytes.get())
 				return false;
 		}
 	}

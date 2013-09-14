@@ -181,7 +181,7 @@ void FileSystem::SetAlias(
 		char trailing = *(alias.end.get()-1);
 		if (trailing == '/' || trailing == '\\') {
 			// drop the /
-			alias = alias.SubStr(0, alias.length - 1);
+			alias = alias.SubStr(0, alias.numBytes - 1);
 		}
 	}
 }
@@ -648,19 +648,19 @@ bool PakFile::PakSearch::NextFile(
 
 		String lumpPath(CStr(l->Name()));
 
-		if (m_prefix.NCompare(lumpPath, m_prefix.length))
+		if (m_prefix.NCompare(lumpPath, m_prefix.numBytes))
 			continue;
 
 		if (!(m_searchOptions & kSearchOption_Recursive)) {
 			String name = GetFileName(lumpPath.c_str);
-			int len = name.length + m_prefix.length + 1;
-			if (len != lumpPath.length)
+			int len = name.numBytes + m_prefix.numBytes + 1;
+			if (len != lumpPath.numBytes)
 				continue; // in a sub-directory, not recursing so skip.
 		}
 
 		if (PathMatchesExtension(lumpPath.c_str, m_pattern.c_str)) {
 			++m_idx;
-			path = lumpPath.SubStr(m_prefix.length);
+			path = lumpPath.SubStr(m_prefix.numBytes);
 			if (fileAttributes)
 				*fileAttributes = kFileAttribute_PakFile;
 			if (fileTime)

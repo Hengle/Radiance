@@ -832,7 +832,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) {
 		return false;
 
 	for (BoneDef::Vec::const_iterator it = m_bones.begin(); it != m_bones.end(); ++it) {
-		if ((*it).name.length > ska::kDNameLen) {
+		if ((*it).name.numBytes > ska::kDNameLen) {
 			COut(C_ErrMsgBox) << "ska::DNameLen exceeded, contact a programmer to increase." << std::endl;
 			return false;
 		}
@@ -1079,7 +1079,7 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) {
 			return false;
 		bytes += 2;
 		const String &str = *it;
-		stringIdx += (int)str.length+1;
+		stringIdx += (int)str.numBytes+1;
 		if (stringIdx > std::numeric_limits<U16>::max()) {
 			COut(C_Error) << "SkaBuilder: String table exceeds 64k in size!" << std::endl;
 			return false;
@@ -1089,9 +1089,9 @@ bool SkaBuilder::Compile(stream::IOutputBuffer &ob) {
 	// compile strings
 	for (StringVec::const_iterator it = tagTable.strings.begin(); it != tagTable.strings.end(); ++it) {
 		const String &str = *it;
-		if (os.Write(str.c_str.get(), (stream::SPos)(str.length+1), 0) != (stream::SPos)(str.length+1))
+		if (os.Write(str.c_str.get(), (stream::SPos)(str.numBytes+1), 0) != (stream::SPos)(str.numBytes+1))
 			return false;
-		bytes += (int)str.length+1;
+		bytes += (int)str.numBytes+1;
 	}
 	
 	if (bytes&3) { // padd file to 4 byte alignment.
@@ -1478,7 +1478,7 @@ bool CompileCPUSkmData(const char *name, const SceneFile &map, int trimodel, Skm
 				if (!os.Write((U16)0))
 					return false;
 
-			if (map.mats[m->mat].name.length > ska::kDNameLen) {
+			if (map.mats[m->mat].name.numBytes > ska::kDNameLen) {
 				COut(C_Error) << "ska::kDNameLen exceeded, contact a programmer to increase." << std::endl;
 				return false;
 			}
@@ -1783,7 +1783,7 @@ bool CompileVtmData(
 			if (!os.Write((U16)0))
 				return false; // padd
 
-			if (mesh.mats[m->mat].name.length > ska::kDNameLen) {
+			if (mesh.mats[m->mat].name.numBytes > ska::kDNameLen) {
 				COut(C_Error) << "ska::kDNameLen exceeded, contact a programmer to increase." << std::endl;
 				return false;
 			}
@@ -1924,7 +1924,7 @@ bool CompileVtmData(
 		for (AnimMap::const_iterator it = animMap.begin(); it != animMap.end(); ++it) {
 			const SceneFile &srcFile = *it->second;
 
-			if (it->first.length > ska::kDNameLen) {
+			if (it->first.numBytes > ska::kDNameLen) {
 				COut(C_Error) << "ska::kDNameLen exceeded, contact a programmer to increase." << std::endl;
 				return false;
 			}

@@ -230,7 +230,7 @@ public:
 
 	// Immutable operations.
 
-	RAD_DECLARE_READONLY_PROPERTY(String, length, int);
+	RAD_DECLARE_READONLY_PROPERTY(String, numBytes, int);
 	//! Defined as c_str
 	RAD_DECLARE_READONLY_PROPERTY(String, begin, const char*);
 	//! Defined as c_str + length
@@ -252,6 +252,9 @@ public:
 	std::string ToStdString() const;
 	std::wstring ToStdWString() const;
 
+	// Compares strings, supporting unicode code-points.
+	// Lengths are in characters not bytes.
+
 	int Compare(const String &str) const;
 	int Compare(const char *sz) const;
 	int Compare(const wchar_t *sz) const;
@@ -268,6 +271,20 @@ public:
 	int NComparei(const char *sz, int len) const;
 	int NComparei(const wchar_t *sz, int len) const;
 
+	// Compares string, only supports ASCII
+
+	int CompareASCII(const String &str) const;
+	int CompareASCII(const char *sz) const;
+	
+	int CompareiASCII(const String &str) const;
+	int CompareiASCII(const char *sz) const;
+	
+	int NCompareASCII(const String &str, int len) const;
+	int NCompareASCII(const char *sz, int len) const;
+	
+	int NCompareiASCII(const String &str, int len) const;
+	int NCompareiASCII(const char *sz, int len) const;
+	
 	int StrStr(const String &str) const;
 	int StrStr(const char *sz) const;
 
@@ -355,35 +372,31 @@ public:
 	 */
 	String RightBytes(int count) const;
 
+	// NOTE: comparison operators ONLY support ASCII character sets.
+
 	//! Case sensitive equality test.
 	bool operator == (const String &str) const;
 	bool operator == (const char *sz) const;
-	bool operator == (const wchar_t *sz) const; 
 	
 	//! Case sensitive inequality test.
 	bool operator != (const String &str) const;
 	bool operator != (const char *sz) const;
-	bool operator != (const wchar_t *sz) const;
 
 	//! Case sensitive greater than test.
 	bool operator > (const String &str) const;
 	bool operator > (const char *sz) const;
-	bool operator > (const wchar_t *sz) const;
 
 	//! Case sensitive gequal test.
 	bool operator >= (const String &str) const;
 	bool operator >= (const char *sz) const;
-	bool operator >= (const wchar_t *sz) const;
 
 	//! Case sensitive less test.
 	bool operator < (const String &str) const;
 	bool operator < (const char *sz) const;
-	bool operator < (const wchar_t *sz) const;
 
 	//! Case sensitive lequal test.
 	bool operator <= (const String &str) const;
 	bool operator <= (const char *sz) const;
-	bool operator <= (const wchar_t *sz) const;
 
 	//! Returns the character at the specified position.
 	char operator [] (int ofs) const;
@@ -504,7 +517,7 @@ private:
 
 	void bool_true() {}
 
-	RAD_DECLARE_GET(length, int);
+	RAD_DECLARE_GET(numBytes, int);
 	RAD_DECLARE_GET(begin, const char*);
 	RAD_DECLARE_GET(end, const char*);
 	RAD_DECLARE_GET(c_str, const char *);

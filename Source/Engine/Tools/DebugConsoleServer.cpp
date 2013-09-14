@@ -249,7 +249,7 @@ void DebugConsoleServer::SessionServer::BroadcastLogMessage(const char *_msg) {
 
 	const char kNull = 0;
 	const char *ofs = _msg;
-	int bytesLeft = msg.length;
+	int bytesLeft = msg.numBytes;
 
 	while (bytesLeft > 0) {
 		stream::FixedMemOutputBuffer ob(buf, sizeof(buf));

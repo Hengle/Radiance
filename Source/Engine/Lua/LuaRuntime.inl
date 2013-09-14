@@ -141,7 +141,7 @@ inline void Marshal<const wchar_t*>::Push(lua_State *L, const wchar_t *val) {
 
 inline void Marshal<String>::Push(lua_State *L, const String &val) {
 	RAD_ASSERT(L);
-	lua_pushlstring(L, val.c_str, (int)val.length);
+	lua_pushlstring(L, val.c_str, (int)val.numBytes);
 }
 
 inline String Marshal<String>::Get(lua_State *L, int index, bool forceType) {

@@ -233,7 +233,7 @@ bool Writer::End()
 			return false;
 		}
 
-		U32 nameLen = (U32)l->m_name.length+1;
+		U32 nameLen = (U32)l->m_name.numBytes+1;
 		RAD_ASSERT(nameLen <= kMaxU16);
 
 		if (!m_stream->Write((U16)nameLen, 0) ||  // name length (including null) (2 bytes)

@@ -1203,7 +1203,7 @@ int PackageMan::BuildPackageData() {
 		{
 			AddrSize importTagSize = sizeof(U16);
 			for (StringVec::const_iterator it = pkg.imports.begin(); it != pkg.imports.end(); ++it) {
-				importTagSize += (*it).length + 1 + sizeof(U16);
+				importTagSize += (*it).numBytes + 1 + sizeof(U16);
 			}
 
 			data_codec::lmp::Writer::Lump *l = lmpWriter.WriteLump("@imports", 0, 0, 4);
@@ -1225,10 +1225,10 @@ int PackageMan::BuildPackageData() {
 			tag += sizeof(U16);
 
 			for (StringVec::const_iterator it = pkg.imports.begin(); it != pkg.imports.end(); ++it) {
-				*reinterpret_cast<U16*>(tag) = (U16)(*it).length+1;
+				*reinterpret_cast<U16*>(tag) = (U16)(*it).numBytes+1;
 				tag += sizeof(U16);
-				memcpy(tag, (*it).c_str, (*it).length+1);
-				tag += (*it).length+1;
+				memcpy(tag, (*it).c_str, (*it).numBytes+1);
+				tag += (*it).numBytes+1;
 			}
 		}
 
@@ -1532,9 +1532,9 @@ void Cooker::SaveImports() {
 
 		for (ImportVec::const_iterator it = m_imports.begin(); it != m_imports.end(); ++it) {
 			const Import &i = *it;
-			if (!os.Write((U32)i.path.length.get()))
+			if (!os.Write((U32)i.path.numBytes.get()))
 				return;
-			if (os.Write(i.path.c_str, (stream::SPos)i.path.length.get(), 0) != (stream::SPos)i.path.length.get())
+			if (os.Write(i.path.c_str, (stream::SPos)i.path.numBytes.get(), 0) != (stream::SPos)i.path.numBytes.get())
 				return;
 		}
 

@@ -359,17 +359,17 @@ bool StringTable::SaveBin(stream::IOutputBuffer &ob) const {
 		if (!os.Write(langMask))
 			return false;
 
-		if (!os.Write((U16)(name.length.get()+1)))
+		if (!os.Write((U16)(name.numBytes.get()+1)))
 			return false;
 
-		if (os.Write(name.c_str.get(), (stream::SPos)name.length.get()+1, 0) != (stream::SPos)name.length.get()+1)
+		if (os.Write(name.c_str.get(), (stream::SPos)name.numBytes.get()+1, 0) != (stream::SPos)name.numBytes.get()+1)
 			return false;
 
 		for (int i = 0; i < LangId_MAX; ++i) {
 			if (langMask & (1<<i)) {
-				if (!os.Write((U16)(strings[i].length.get()+1)))
+				if (!os.Write((U16)(strings[i].numBytes.get()+1)))
 					return false;
-				if (os.Write(strings[i].c_str.get(), (stream::SPos)strings[i].length.get()+1, 0) != (stream::SPos)strings[i].length.get()+1)
+				if (os.Write(strings[i].c_str.get(), (stream::SPos)strings[i].numBytes.get()+1, 0) != (stream::SPos)strings[i].numBytes.get()+1)
 					return false;
 			}
 		}

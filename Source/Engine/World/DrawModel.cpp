@@ -782,10 +782,6 @@ SpriteBatchDrawModel::SpriteBatchDrawModel(
 SpriteBatchDrawModel::~SpriteBatchDrawModel() {
 }
 
-void SpriteBatchDrawModel::OnTick(float time, float dt) {
-	m_spriteBatch->Skin();
-}
-
 void SpriteBatchDrawModel::PushElements(lua_State *L) {
 	DrawModel::PushElements(L);
 	lua_pushcfunction(L, lua_AllocateSprite);
@@ -794,6 +790,8 @@ void SpriteBatchDrawModel::PushElements(lua_State *L) {
 	lua_setfield(L, -2, "FreeSprite");
 	lua_pushcfunction(L, lua_SetSpriteData);
 	lua_setfield(L, -2, "SetSpriteData");
+	lua_pushcfunction(L, lua_Skin);
+	lua_setfield(L, -2, "Skin");
 }
 
 int SpriteBatchDrawModel::lua_PushMaterialList(lua_State *L) {
@@ -848,6 +846,12 @@ int SpriteBatchDrawModel::lua_SetSpriteData(lua_State *L) {
 		sprite->rot = (float)luaL_checknumber(L, -1);
 		lua_pop(L, 4);
 	}
+	return 0;
+}
+
+int SpriteBatchDrawModel::lua_Skin(lua_State *L) {
+	SpriteBatchDrawModel::Ref r = lua::SharedPtr::Get<SpriteBatchDrawModel>(L, "SpriteBatchDrawModel", 1, true);
+	r->m_spriteBatch->Skin();
 	return 0;
 }
 

@@ -190,6 +190,8 @@ bool WorldLua::Init() {
 		{ "BuildConfig", lua_System_BuildConfig },
 		{ "UTF8To32", lua_System_UTF8To32 },
 		{ "UTF32To8", lua_System_UTF32To8 },
+		{ "UTF8Compare", lua_System_UTF8Compare },
+		{ "UTF8Comparei", lua_System_UTF8Comparei },
 		{ "NewHTTPGet", lua_System_NewHTTPGet },
 		{ "UIMode", lua_System_UIMode },
 		{ 0, 0 }

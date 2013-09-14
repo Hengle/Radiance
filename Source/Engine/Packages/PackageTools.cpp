@@ -232,7 +232,7 @@ KeyVal::Ref Package::Entry::RemoveKey(const char *path, int flags) {
 		}
 	} else if(flags&P_Prefix) {
 		for (KeyVal::Map::iterator it = m_keys.begin(); it != m_keys.end();) {
-			if (sPath.NCompare(it->second->path, sPath.length) == 0) {
+			if (sPath.NCompare(it->second->path, sPath.numBytes) == 0) {
 				KeyVal::Map::iterator next = it; ++next;
 				r = it->second;
 				UnmapImport(r);
@@ -299,7 +299,7 @@ String Package::Entry::TrimKeyName(const String &name) {
 	if (name.empty) 
 		return name;
 
-	int period = name.length;
+	int period = name.numBytes;
 
 	while (period-- > 1) {
 		if (name[period] == '.')

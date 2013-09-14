@@ -426,11 +426,11 @@ bool GLSLShader::CompileShaderSource(
 			os << m.attributes[i][1];
 		}
 
-		os << (U32)(vertexSource.length+1);
-		os << (U32)(fragmentSource.length+1);
-		if (os.Write(vertexSource.c_str.get(), (stream::SPos)vertexSource.length.get()+1, 0) != (stream::SPos)(vertexSource.length.get()+1))
+		os << (U32)(vertexSource.numBytes+1);
+		os << (U32)(fragmentSource.numBytes+1);
+		if (os.Write(vertexSource.c_str.get(), (stream::SPos)vertexSource.numBytes.get()+1, 0) != (stream::SPos)(vertexSource.numBytes.get()+1))
 			return false;
-		if (os.Write(fragmentSource.c_str.get(), (stream::SPos)fragmentSource.length.get()+1, 0) != (stream::SPos)(fragmentSource.length.get()+1))
+		if (os.Write(fragmentSource.c_str.get(), (stream::SPos)fragmentSource.numBytes.get()+1, 0) != (stream::SPos)(fragmentSource.numBytes.get()+1))
 			return false;
 	}
 

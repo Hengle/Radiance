@@ -391,6 +391,34 @@ int WorldLua::lua_System_UTF32To8(lua_State *L) {
 	return 1;
 }
 
+int WorldLua::lua_System_UTF8Compare(lua_State *L) {
+	size_t szaLen;
+	const char *sza = luaL_checklstring(L, 1, &szaLen);
+
+	size_t szbLen;
+	const char *szb = luaL_checklstring(L, 2, &szbLen);
+
+	const String kStrA(sza, (int)szaLen, string::RefTag);
+	const String kStrB(szb, (int)szbLen, string::RefTag);
+
+	lua_pushinteger(L, kStrA.Compare(kStrB));
+	return 1;
+}
+
+int WorldLua::lua_System_UTF8Comparei(lua_State *L) {
+	size_t szaLen;
+	const char *sza = luaL_checklstring(L, 1, &szaLen);
+
+	size_t szbLen;
+	const char *szb = luaL_checklstring(L, 2, &szbLen);
+
+	const String kStrA(sza, (int)szaLen, string::RefTag);
+	const String kStrB(szb, (int)szbLen, string::RefTag);
+
+	lua_pushinteger(L, kStrA.Compare(kStrB));
+	return 1;
+}
+
 int WorldLua::lua_System_CurrentDateAndTime(lua_State *L) {
 	xtime::TimeDate ct = xtime::TimeDate::Now(xtime::TimeDate::local_time_tag);
 

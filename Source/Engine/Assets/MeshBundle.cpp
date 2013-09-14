@@ -208,7 +208,7 @@ bool DoCompileMeshBundle(
 	for (TriModel::Vec::const_iterator it = models.begin(); it != models.end(); ++it) {
 		const TriModel::Ref &m = *it;
 
-		if (mats[m->mat].length > ska::kDNameLen) {
+		if (mats[m->mat].numBytes > ska::kDNameLen) {
 			COut(C_ErrMsgBox) << "ska::kDNameLen exceeded, contact a programmer to increase." << std::endl;
 			return false;
 		}

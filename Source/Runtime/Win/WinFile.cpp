@@ -218,7 +218,7 @@ bool WinFileSystem::CreateDirectory(
 		}
 	}
 
-	if (nativePath[1] != ':' || (nativePath.length > 2)) {
+	if (nativePath[1] != ':' || (nativePath.numBytes > 2)) {
 		if (!CreateDirectoryA(nativePath.c_str, 0)) {
 			if (GetLastError() != ERROR_ALREADY_EXISTS)
 				return false;
@@ -371,7 +371,7 @@ FileSearch::Ref WinFileSearch::New(
 
 	// split the pattern out of the directory
 	const char *sz = path.c_str;
-	for (int i = path.length - 1; i >= 0; --i) {
+	for (int i = path.numBytes - 1; i >= 0; --i) {
 		if (sz[i] == '/' || sz[i] == '\\') {
 			dir = String(sz, i, string::CopyTag);
 			pattern = path.SubStr(i); // include the leading '/'

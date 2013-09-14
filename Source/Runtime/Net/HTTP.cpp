@@ -196,7 +196,7 @@ int HTTPGet::ThreadProc() {
 	}
 	req += "\r\n";
 
-	if (!sd.send(req.c_str.get(), req.length, 0)) {
+	if (!sd.send(req.c_str.get(), req.numBytes, 0)) {
 		m_status = kHTTP_OpStatus_SocketError;
 		return 0;
 	}

@@ -365,61 +365,98 @@ inline std::wstring String::ToStdWString() const {
 }
 
 inline int String::Compare(const String &str) const {
-	return Compare(str.c_str.get());
+	WCharBuf x = str.ToWChar();
+	return Compare(x.c_str.get());
 }
 
 inline int String::Compare(const char *sz) const {
-	RAD_ASSERT(sz);
-	return cmp(c_str.get(), sz);
+	return Compare(CStr(sz));
 }
 
 inline int String::Compare(const wchar_t *sz) const {
 	RAD_ASSERT(sz);
-	return Compare(String(sz, *m_zone));
+	WCharBuf x = ToWChar();
+	return cmp(x.c_str.get(), sz);
 }
 
 inline int String::Comparei(const String &str) const {
-	return Comparei(str.c_str.get());
+	WCharBuf x = str.ToWChar();
+	return Comparei(x.c_str.get());
 }
 
 inline int String::Comparei(const char *sz) const {
-	RAD_ASSERT(sz);
-	return icmp(c_str.get(), sz);
+	return Comparei(CStr(sz));
 }
 
 inline int String::Comparei(const wchar_t *sz) const {
 	RAD_ASSERT(sz);
-	return Compare(String(sz, *m_zone));
+	WCharBuf x = ToWChar();
+	return icmp(x.c_str.get(), sz);
 }
 
 inline int String::NCompare(const String &str, int len) const {
-	return NCompare(str.c_str.get(), len);
+	WCharBuf x = str.ToWChar();
+	return NCompare(x.c_str.get(), len);
 }
 
 inline int String::NCompare(const char *sz, int len) const {
-	RAD_ASSERT(sz);
-	return ncmp(c_str.get(), sz, len);
+	return NCompare(CStr(sz), len);
 }
 
 inline int String::NCompare(const wchar_t *sz, int len) const {
 	RAD_ASSERT(sz);
-	int mblen = wcstombslen(sz, len);
-	return NCompare(String(sz, *m_zone), mblen);
+	WCharBuf x = ToWChar();
+	return ncmp(x.c_str.get(), sz, len);
 }
 
 inline int String::NComparei(const String &str, int len) const {
-	return NComparei(str.c_str.get(), len);
+	WCharBuf x = str.ToWChar();
+	return NComparei(x.c_str.get(), len);
 }
 
 inline int String::NComparei(const char *sz, int len) const {
-	RAD_ASSERT(sz);
-	return nicmp(c_str.get(), sz, len);
+	return NComparei(CStr(sz), len);
 }
 
 inline int String::NComparei(const wchar_t *sz, int len) const {
+	WCharBuf x = ToWChar();
+	return nicmp(x.c_str.get(), sz, len);
+}
+
+inline int String::CompareASCII(const String &str) const {
+	return Compare(str.c_str.get());
+}
+
+inline int String::CompareASCII(const char *sz) const {
 	RAD_ASSERT(sz);
-	int mblen = wcstombslen(sz, len);
-	return NComparei(String(sz, *m_zone), mblen);
+	return cmp(c_str.get(), sz);
+}
+
+inline int String::CompareiASCII(const String &str) const {
+	return Comparei(str.c_str.get());
+}
+
+inline int String::CompareiASCII(const char *sz) const {
+	RAD_ASSERT(sz);
+	return icmp(c_str.get(), sz);
+}
+
+inline int String::NCompareASCII(const String &str, int len) const {
+	return NCompare(str.c_str.get(), len);
+}
+
+inline int String::NCompareASCII(const char *sz, int len) const {
+	RAD_ASSERT(sz);
+	return ncmp(c_str.get(), sz, len);
+}
+
+inline int String::NCompareiASCII(const String &str, int len) const {
+	return NComparei(str.c_str.get(), len);
+}
+
+inline int String::NCompareiASCII(const char *sz, int len) const {
+	RAD_ASSERT(sz);
+	return nicmp(c_str.get(), sz, len);
 }
 
 inline int String::StrStr(const String &str) const {
@@ -489,8 +526,8 @@ inline String String::NJoin(const wchar_t *sz, int len) const {
 }
 
 inline String String::SubStrBytes(int first, int count) const {
-	RAD_ASSERT(first < length);
-	RAD_ASSERT((first+count) <= length);
+	RAD_ASSERT(first < numBytes);
+	RAD_ASSERT((first+count) <= numBytes);
 
 	return String(
 		c_str.get() + first,
@@ -508,7 +545,7 @@ inline String String::SubStr(int ofs) const {
 }
 
 inline String String::SubStrBytes(int ofs) const {
-	int x = length - ofs;
+	int x = numBytes - ofs;
 	if (x < 0)
 		return String();
 	return RightBytes(x);
@@ -528,80 +565,56 @@ inline String String::LeftBytes(int count) const {
 }
 
 inline String String::RightBytes(int count) const {
-	int ofs = length - count;
+	int ofs = numBytes - count;
 	return SubStrBytes(ofs, count);
 }
 
 inline bool String::operator == (const String &str) const {
-	return Compare(str) == 0;
+	return CompareASCII(str) == 0;
 }
 
 inline bool String::operator == (const char *sz) const {
-	return Compare(sz) == 0;
-}
-
-inline bool String::operator == (const wchar_t *sz) const {
-	return Compare(sz) == 0;
+	return CompareASCII(sz) == 0;
 }
 
 inline bool String::operator != (const String &str) const {
-	return Compare(str) != 0;
+	return CompareASCII(str) != 0;
 }
 
 inline bool String::operator != (const char *sz) const {
-	return Compare(sz) != 0;
-}
-
-inline bool String::operator != (const wchar_t *sz) const {
-	return Compare(sz) != 0;
+	return CompareASCII(sz) != 0;
 }
 
 inline bool String::operator > (const String &str) const {
-	return Compare(str) > 0;
+	return CompareASCII(str) > 0;
 }
 
 inline bool String::operator > (const char *sz) const {
-	return Compare(sz) > 0;
-}
-
-inline bool String::operator > (const wchar_t *sz) const {
-	return Compare(sz) > 0;
+	return CompareASCII(sz) > 0;
 }
 
 inline bool String::operator >= (const String &str) const {
-	return Compare(str) >= 0;
+	return CompareASCII(str) >= 0;
 }
 
 inline bool String::operator >= (const char *sz) const {
-	return Compare(sz) >= 0;
-}
-
-inline bool String::operator >= (const wchar_t *sz) const {
-	return Compare(sz) >= 0;
+	return CompareASCII(sz) >= 0;
 }
 
 inline bool String::operator < (const String &str) const {
-	return Compare(str) < 0;
+	return CompareASCII(str) < 0;
 }
 
 inline bool String::operator < (const char *sz) const {
-	return Compare(sz) < 0;
-}
-
-inline bool String::operator < (const wchar_t *sz) const {
-	return Compare(sz) < 0;
+	return CompareASCII(sz) < 0;
 }
 
 inline bool String::operator <= (const String &str) const {
-	return Compare(str) <= 0;
+	return CompareASCII(str) <= 0;
 }
 
 inline bool String::operator <= (const char *sz) const {
-	return Compare(sz) <= 0;
-}
-
-inline bool String::operator <= (const wchar_t *sz) const {
-	return Compare(sz) <= 0;
+	return CompareASCII(sz) <= 0;
 }
 
 inline char String::operator [] (int ofs) const {
@@ -668,7 +681,7 @@ inline String &String::TrimRightBytes(int count) {
 }
 
 inline String &String::Append(const String &str) {
-	return NAppendBytes(str, str.length);
+	return NAppendBytes(str, str.numBytes);
 }
 
 inline String &String::Append(const char *sz) {
@@ -862,7 +875,7 @@ inline String &String::Write(int pos, const char *sz) {
 }
 
 inline String &String::Write(int pos, const String &str) {
-	return Write(pos, str.c_str, str.length);
+	return Write(pos, str.c_str, str.numBytes);
 }
 
 inline String &String::Write(int pos, const String &str, int len) {
@@ -929,7 +942,7 @@ inline String operator + (const String &b, wchar_t s) {
 	return x;
 }
 
-inline int String::RAD_IMPLEMENT_GET(length) {
+inline int String::RAD_IMPLEMENT_GET(numBytes) {
 	if (m_data)
 		return m_data->size - 1;
 	if (m_stackLen)
@@ -942,7 +955,7 @@ inline const char *String::RAD_IMPLEMENT_GET(begin) {
 }
 
 inline const char *String::RAD_IMPLEMENT_GET(end) {
-	return c_str.get() + length.get();
+	return c_str.get() + numBytes.get();
 }
 
 inline const char *String::RAD_IMPLEMENT_GET(c_str) {
@@ -958,7 +971,7 @@ inline const char *String::RAD_IMPLEMENT_GET(c_str) {
 inline int String::RAD_IMPLEMENT_GET(numChars) {
 	if (empty)
 		return 0;
-	return utf8to32len(c_str.get(), length.get());
+	return utf8to32len(c_str.get(), numBytes.get());
 }
 
 inline bool String::RAD_IMPLEMENT_GET(empty) {
