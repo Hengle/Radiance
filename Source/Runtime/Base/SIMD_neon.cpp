@@ -5222,43 +5222,139 @@ void BlendVerts(
 	RAD_ASSERT(IsAligned(dstVerts, SIMDDriver::kAlignment));
 	
 	if (numVerts > 0) {
-		
+		if (frac < 0.01f) {
+			asm volatile (
+				
+				"Lblendzero:					\n\t"
+				
+				"vld1.32 {q1}, [%[src], :128]!	\n\t"
+				"vst1.32 {q1}, [%[o], :128]!	\n\t"
+				"vld1.32 {q1}, [%[src], :128]!	\n\t"
+				"vst1.32 {q1}, [%[o], :128]!	\n\t"
+				"vld1.32 {q1}, [%[src], :128]!	\n\t"
+				"vst1.32 {q1}, [%[o], :128]!	\n\t"
+				
+				// loop
+				"subs %[nv], %[nv], #1			\n\t"
+				"bne Lblendzero					\n\t"
+				
+			: 
+			: [o] "r" (outVerts), [src] "r" (srcVerts), [nv] "r" (numVerts)
+			: "cc", "q1"
+			);
+		} else if (frac > 0.99f) {
+			asm volatile (
+				
+				"Lblendone:						\n\t"
+				
+				"vld1.32 {q1}, [%[src], :128]!	\n\t"
+				"vst1.32 {q1}, [%[o], :128]!	\n\t"
+				"vld1.32 {q1}, [%[src], :128]!	\n\t"
+				"vst1.32 {q1}, [%[o], :128]!	\n\t"
+				"vld1.32 {q1}, [%[src], :128]!	\n\t"
+				"vst1.32 {q1}, [%[o], :128]!	\n\t"
+				
+				// loop
+				"subs %[nv], %[nv], #1			\n\t"
+				"bne Lblendone					\n\t"
+				
+			: 
+			: [o] "r" (outVerts), [src] "r" (dstVerts), [nv] "r" (numVerts)
+			: "cc", "q1"
+			);
+		} else {
+			
+			asm volatile (
+				
+				"vmov.32 d0[0], %[frac]			\n\t" // load lerp value
+				
+				"Lblend1:						\n\t"
+				
+				"vld1.32 {q1}, [%[src], :128]!	\n\t"
+				"vld1.32 {q2}, [%[dst], :128]!	\n\t"
+				"vld1.32 {q3}, [%[src], :128]!	\n\t"
+				"vsub.f32 q2, q2, q1			\n\t"
+				"vld1.32 {q4}, [%[dst], :128]!	\n\t"
+				"vld1.32 {q5}, [%[src], :128]!	\n\t"
+				"vmla.f32 q1, q2, d0[0]			\n\t"
+				"vld1.32 {q6}, [%[dst], :128]!	\n\t"
+				"vsub.f32 q4, q4, q3			\n\t"
+				"vst1.32 {q1}, [%[o], :128]!	\n\t"
+				"vsub.f32 q6, q6, q5			\n\t"
+				"vmla.f32 q3, q4, d0[0]			\n\t"
+				"vmla.f32 q5, q6, d0[0]			\n\t"
+				"vst1.32 {q3}, [%[o], :128]!	\n\t"
+				"vst1.32 {q5}, [%[o], :128]!	\n\t"
+				
+				// loop
+				"subs %[nv], %[nv], #1			\n\t"
+				"bne Lblend1					\n\t"
+				
+			: 
+			: [o] "r" (outVerts), [src] "r" (srcVerts), [dst] "r" (dstVerts), [nv] "r" (numVerts), [frac] "r" (frac)
+			: "cc", "q0", "q1", "q2", "q3", "q4", "q5"
+			);
+		}
+	}
+}
+
+void __attribute__ ((noinline)) MemCopy16(
+	void *dst,
+	const void *src,
+	int len
+) {
+	RAD_ASSERT(IsAligned(dst, 16));
+	RAD_ASSERT(IsAligned(src, 16));
+	RAD_ASSERT(IsAligned(len, 16));
+	
+	len = len / 16;
+	
+	if (len > 0) {
 		asm volatile (
-			
-			"vmov.32 d0[0], %[frac]			\n\t" // load lerp value
-			
-			"Lblend1:						\n\t"
+					
+			"Lmemcopy16:					\n\t"
 			
 			"vld1.32 {q1}, [%[src], :128]!	\n\t"
-			"vld1.32 {q2}, [%[dst], :128]!	\n\t"
-			"vld1.32 {q3}, [%[src], :128]!	\n\t"
-			"vsub.f32 q2, q2, q1			\n\t"
-			"vld1.32 {q4}, [%[dst], :128]!	\n\t"
-			"vld1.32 {q5}, [%[src], :128]!	\n\t"
-			"vmla.f32 q1, q2, d0[0]			\n\t"
-			"vld1.32 {q6}, [%[dst], :128]!	\n\t"
-			"vsub.f32 q4, q4, q3			\n\t"
 			"vst1.32 {q1}, [%[o], :128]!	\n\t"
-			"vsub.f32 q6, q6, q5			\n\t"
-			"vmla.f32 q3, q4, d0[0]			\n\t"
-			"vmla.f32 q5, q6, d0[0]			\n\t"
-			"vst1.32 {q3}, [%[o], :128]!	\n\t"
-			"vst1.32 {q5}, [%[o], :128]!	\n\t"
+			"vld1.32 {q1}, [%[src], :128]!	\n\t"
+			"vst1.32 {q1}, [%[o], :128]!	\n\t"
+			"vld1.32 {q1}, [%[src], :128]!	\n\t"
+			"vst1.32 {q1}, [%[o], :128]!	\n\t"
+			"vld1.32 {q1}, [%[src], :128]!	\n\t"
+			"vst1.32 {q1}, [%[o], :128]!	\n\t"
 			
 			// loop
-			"subs %[nv], %[nv], #1			\n\t"
-			"bne Lblend1					\n\t"
+			"subs %[len], %[len], #1		\n\t"
+			"bne Lmemcopy16					\n\t"
 			
-		: [o] "+r" (outVerts), [src] "+r" (srcVerts), [dst] "+r" (dstVerts), [nv] "+r" (numVerts)
-		: [frac] "r" (frac)
-		: "cc", "q0", "q1", "q2", "q3", "q4", "q5"
+		: 
+		: [o] "r" (dst), [src] "r" (src), [len] "r" (len)
+		: "cc", "q1"
 		);
+	}
+}
+
+// Replicates len bytes from src count times into dst
+// NOTE: src, dst, and len must be 16 byte aligned!
+void MemRep16(
+	void *dst,
+	const void *src,
+	int len,
+	int count
+) {
+	RAD_ASSERT(IsAligned(dst, 16));
+	RAD_ASSERT(IsAligned(src, 16));
+	RAD_ASSERT(IsAligned(len, 16));
+
+	U8 *bytes = (U8*)dst;
+	while (count-- > 0) {
+		MemCopy16(bytes, src, len);
+		bytes += len;
 	}
 }
 }
 
-const SIMDDriver *SIMD_neon_bind()
-{
+const SIMDDriver *SIMD_neon_bind() {
 	static SIMDDriver d;
 
 	if (d.name[0])
@@ -5269,6 +5365,8 @@ const SIMDDriver *SIMD_neon_bind()
 	d.SkinVerts[1] = &SkinVerts2B;
 	d.SkinVerts[2] = &SkinVerts3B;
 	d.BlendVerts   = &BlendVerts;
+	d.MemCopy16    = &MemCopy16;
+	d.MemRep16     = &MemRep16;
 	
 	string::cpy(d.name, "SIMD_neon");
 	return &d;

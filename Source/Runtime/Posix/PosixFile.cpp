@@ -170,7 +170,7 @@ bool PosixFileSystem::CreateDirectory(
 		}
 	}
 
-	if (nativePath[0] != '/' || (nativePath.length > 2)) {
+	if (nativePath[0] != '/' || (nativePath.numBytes > 2)) {
 		if (mkdir(nativePath.c_str, 0777) == -1) {
 			if (errno != EEXIST)
 				return false;
@@ -338,7 +338,7 @@ FileSearch::Ref PosixFileSearch::New(
 
 	// split the pattern out of the directory
 	const char *sz = path.c_str;
-	for (int i = path.length - 1; i >= 0; --i) {
+	for (int i = path.numBytes - 1; i >= 0; --i) {
 		if (sz[i] == '/') {
 			dir = String(sz, i, string::CopyTag);
 			pattern = path.SubStr(i+1); // no leading /
@@ -397,12 +397,12 @@ PosixFileSearch::PosixFileSearch(
 	m_sdir((DIR*)0),
 	m_cur(0)
 {
-	if (m_pattern.length > 1) {
+	if (m_pattern.numBytes > 1) {
 		String x = m_pattern.Right(2);
 		if (x == ".*") {
 			// fnmatch will require an extension with *.* unlike windows.
 			// change to *
-			m_pattern = m_pattern.Left(m_pattern.length - 2);
+			m_pattern = m_pattern.Left(m_pattern.numBytes - 2);
 		}
 	}
 }
