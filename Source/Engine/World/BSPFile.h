@@ -65,7 +65,8 @@ enum WaypointConnectionFlags {
 	RAD_FLAG(kWaypointConnectionFlag_BtoA),
 	RAD_FLAG(kWaypointConnectionFlag_BtoAUseAtoBScript),
 	RAD_FLAG(kWaypointConnectionFlag_AutoFace),
-	RAD_FLAG(kWaypointConnectionFlag_Interruptable)
+	RAD_FLAG(kWaypointConnectionFlag_Interruptable),
+	RAD_FLAG(kWaypointConnectionFlag_AutoPitch)
 };
 
 struct BSPNode {

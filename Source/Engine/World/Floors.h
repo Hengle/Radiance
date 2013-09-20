@@ -108,7 +108,8 @@ public:
 	public:
 		enum {
 			RAD_FLAG(kStateFlag_AutoFace),
-			RAD_FLAG(kStateFlag_Interruptable)
+			RAD_FLAG(kStateFlag_Interruptable),
+			RAD_FLAG(kStateFlag_AutoPitch),
 		};
 
 		FloorPosition pos;

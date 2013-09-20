@@ -20,6 +20,8 @@ inline int BSPConnectionFlagsToStateFlags(int flags) {
 		z |= FloorMove::State::kStateFlag_AutoFace;
 	if (flags&bsp_file::kWaypointConnectionFlag_Interruptable)
 		z |= FloorMove::State::kStateFlag_Interruptable;
+	if (flags&bsp_file::kWaypointConnectionFlag_AutoPitch)
+		z |= FloorMove::State::kStateFlag_AutoPitch;
 
 	return z;
 }

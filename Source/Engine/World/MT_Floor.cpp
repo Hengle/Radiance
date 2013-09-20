@@ -95,8 +95,10 @@ void Entity::Tick_MT_Floor(
 
 	m_ps.targetAngles = LookAngles(m_ps.moveState.facing);
 	m_ps.targetAngles[0] = 0.f;
-	m_ps.targetAngles[1] = 0.f;
 
+	if (!(m_ps.moveState.flags&FloorMove::State::kStateFlag_AutoPitch))
+		m_ps.targetAngles[1] = 0.f;
+	
 	if (!(oldFlags&FloorMove::State::kStateFlag_AutoFace) && (m_ps.moveState.flags&FloorMove::State::kStateFlag_AutoFace)) {
 		// sync orientation
 		m_ps.angles.pos = m_ps.targetAngles;
