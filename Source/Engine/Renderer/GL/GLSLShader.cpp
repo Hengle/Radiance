@@ -1064,12 +1064,18 @@ void GLSLShader::BindStates(const r::Shader::Uniforms &uniforms, bool sampleMate
 
 		if (lastSource != source) {
 			lastSource = source;
-			sourceVB = vb;
-			sourceSize = size;
-			sourceType = type;
-			sourceNormalized = normalized;
-			sourceStride = stride;
-			sourceOfs = ofs;
+
+			// always fallback to the first index
+			gls.MaterialGeometrySource(
+				source,
+				0,
+				sourceVB,
+				sourceSize,
+				sourceType,
+				sourceNormalized,
+				sourceStride,
+				sourceOfs
+			);
 		}
 
 		int loc = RemapIndex(i);
