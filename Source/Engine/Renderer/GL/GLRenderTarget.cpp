@@ -211,15 +211,16 @@ void GLRenderTarget::BindFramebuffer(DiscardFlags flags) {
 		gls.StencilMask(0xff); // let us clear stencil
 	}
 
-	gls.Viewport(0, 0, tex->width, tex->height);
-	
 	if (mask) {
-		gls.Set(glsFlags, -1, true); // for glClear()
+		gls.Set(glsFlags, -1); // for glClear()
+		gls.Commit(); // capture stencil mask
 		glClear(mask);
 
 		if (mask&GL_STENCIL_BUFFER_BIT)
 			gls.StencilMask(0);
 	}
+	
+	gls.Viewport(0, 0, tex->width, tex->height);
 }
 
 void GLRenderTarget::DiscardFramebuffer(DiscardFlags flags) {
@@ -227,7 +228,7 @@ void GLRenderTarget::DiscardFramebuffer(DiscardFlags flags) {
 	if (flags == kDiscard_None)
 		return;
 	
-	int glsFlags = kScissorTest_Disable;
+	/*int glsFlags = kScissorTest_Disable;
 	
 	if (flags&kDiscard_Color) {
 		glsFlags |= kColorWriteMask_RGBA;
@@ -237,7 +238,7 @@ void GLRenderTarget::DiscardFramebuffer(DiscardFlags flags) {
 		glsFlags |= kDepthWriteMask_Enable;
 	}
 
-	gls.Set(glsFlags, -1, true);
+	gls.Set(glsFlags, -1, true);*/
 	
 	GLenum attachments[3] = { 0, 0 };
 	int num = 0;

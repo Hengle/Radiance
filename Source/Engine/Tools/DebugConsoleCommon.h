@@ -18,8 +18,8 @@ enum {
 	kDebugConsoleNetBroadcastPort = kDebugConsoleNetPort + 1,
 	kDebugConsoleNetMaxCommandLen = 4*kMeg,
 	kDebugConsoleBroadcastPacketSize = 512,
-	kDebugConsoleServerBroadcastFreq = 500,
-	kDebugConsoleServerExpiry = kDebugConsoleServerBroadcastFreq*3
+	kDebugConsoleServerBroadcastFreq = 250,
+	kDebugConsoleServerExpiry = kDebugConsoleServerBroadcastFreq*8
 };
 
 enum DebugConsoleNetMessageId {
