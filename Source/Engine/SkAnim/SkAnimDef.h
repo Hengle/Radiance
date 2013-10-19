@@ -63,7 +63,7 @@ enum {
 	kVtmVersion = 1,
 	kDNameLen = 63, 
 	kBonesPerVert = 4,
-	kMaxUVChannels = 1
+	kMaxUVChannels = 2
 };
 
 } // ska
