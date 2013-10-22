@@ -407,6 +407,8 @@ void Widget::PushCallTable(lua_State *L) {
 	lua_setfield(L, -2, "RotateTo");
 	lua_pushcfunction(L, lua_SetCapture);
 	lua_setfield(L, -2, "SetCapture");
+	lua_pushcfunction(L, lua_ClearCapture);
+	lua_setfield(L, -2, "ClearCapture");
 	lua_pushcfunction(L, lua_Unmap);
 	lua_setfield(L, -2, "Unmap");
 	LUART_REGISTER_GETSET(L, Rect);
@@ -1040,6 +1042,12 @@ int Widget::lua_RotateTo(lua_State *L) {
 int Widget::lua_SetCapture(lua_State *L) {
 	Ref w = GetRef<Widget>(L, "Widget", 1, true);
 	w->SetCapture(lua_toboolean(L, 2) ? true : false);
+	return 0;
+}
+
+int Widget::lua_ClearCapture(lua_State *L) {
+	Ref w = GetRef<Widget>(L, "Widget", 1, true);
+	w->ClearCapture();
 	return 0;
 }
 

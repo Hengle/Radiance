@@ -358,6 +358,7 @@ private:
 	static int lua_MoveTo(lua_State *L);
 	static int lua_RotateTo(lua_State *L);
 	static int lua_SetCapture(lua_State *L);
+	static int lua_ClearCapture(lua_State *L);
 	static int lua_Unmap(lua_State *L);
 
 	void Push(lua_State *L); // Don't call this! Call PushFrame()
