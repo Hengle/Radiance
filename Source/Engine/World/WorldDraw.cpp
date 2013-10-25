@@ -231,22 +231,15 @@ int WorldDraw::Precache() {
 	if (r != pkg::SR_Success)
 		return r;
 
-	// Precache materials.
-	ScreenOverlay::Ref overlay;
+	m_rb->BeginPrecacheMaterials();
 
+	// Precache materials.
 	for (details::MatRefMap::const_iterator it = m_refMats.begin(); it != m_refMats.end(); ++it) {
 		const details::MatRef &mat = it->second;
-
-		if (overlay) {
-			overlay->m_mat = &mat;
-		} else {
-			overlay = CreateScreenOverlay(mat.asset->id);
-		}
-
-		RAD_ASSERT(overlay);
-		DrawOverlay(*overlay);
+		m_rb->PrecacheMaterial(mat);
 	}
 
+	m_rb->EndPrecacheMaterials();
 	m_rb->Finish();
 
 	return pkg::SR_Success;

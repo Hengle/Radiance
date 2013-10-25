@@ -46,10 +46,6 @@ bool __IOS_IPad();
 #error RAD_ERROR_UNSUP_PLAT
 #endif
 
-#if defined(RAD_OPT_TOOLS)
-#include "../../../../../Extern/glsl-optimizer/src/glsl/glsl_optimizer.h"
-#endif
-
 namespace r {
 
 #define L(_type, _name) \
@@ -78,10 +74,7 @@ GLTable::GLTable() {
 #if defined(RAD_OPT_PC_TOOLS)
 	cgc = 0;
 #endif
-#if defined(RAD_OPT_TOOLS)
-	glslopt = 0;
-	glslopt_es = 0;
-#endif
+
 	Reset();
 }
 
@@ -167,17 +160,6 @@ void GLTable::Reset() {
 #endif
 	wireframe = false;
 	numTris = 0;
-
-#if defined(RAD_OPT_TOOLS)
-	if (glslopt) {
-		glslopt_cleanup(glslopt);
-		glslopt = 0;
-	}
-	if (glslopt_es) {
-		glslopt_cleanup(glslopt_es);
-		glslopt_es = 0;
-	}
-#endif
 
 #if defined(RAD_OPT_OGLES)
 #if defined(RAD_OPT_OGLES1_AND_2)
@@ -384,11 +366,6 @@ void GLTable::Load() {
 
 #if defined(RAD_OPT_PC_TOOLS)
 	cgc = cgCreateContext();
-#endif
-
-#if defined(RAD_OPT_TOOLS)
-	glslopt = glslopt_initialize(false);
-	glslopt_es = glslopt_initialize(true);
 #endif
 
 	mm = GL_PROJECTION;

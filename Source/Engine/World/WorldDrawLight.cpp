@@ -260,7 +260,7 @@ void WorldDraw::GenLightDef(
 
 bool WorldDraw::GenerateUnifiedEntityShadow(const ViewDef &view, const Entity &e, UnifiedShadow &projector) {
 	
-	BBox bounds(e.ps->bbox);
+	BBox bounds(e.ps->shadowBox);
 	bounds.Translate(e.ps->worldPos);
 
 	CalcUnifiedLightPosAndSize(

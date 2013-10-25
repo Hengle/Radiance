@@ -104,6 +104,7 @@ struct PState {
 	Vec3 accel;
 	Vec3 snapTurnAngles;
 	BBox bbox;
+	BBox shadowBox; // for unified shadow projectors
 	FloorMove::Ref activeMove;
 	FloorMove::Ref desiredMove;
 	FloorMove::State moveState;
@@ -394,6 +395,8 @@ private:
 	ENT_DECL_GETSET(Velocity);
 	ENT_DECL_GETSET(Mins);
 	ENT_DECL_GETSET(Maxs);
+	ENT_DECL_GETSET(ShadowMins);
+	ENT_DECL_GETSET(ShadowMaxs);
 	ENT_DECL_GET(ActiveMove);
 	ENT_DECL_GETSET(DesiredMove);
 	ENT_DECL_GETSET(FloorPosition);

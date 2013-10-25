@@ -55,6 +55,7 @@ flags(0),
 visible(false) {
 	// avoid null bbox volumes
 	bbox.Initialize(-Vec3(8.f, 8.f, 8.f), Vec3(8.f, 8.f, 8.f));
+	shadowBox = bbox;
 	angleSpring.length = 0.07f;
 	angleSpring.tolerance = 0.001f;
 	angles.inner = false;
@@ -454,6 +455,8 @@ void Entity::PushCallTable(lua_State *L) {
 	LUART_REGISTER_GETSET(L, Velocity);
 	LUART_REGISTER_GETSET(L, Mins);
 	LUART_REGISTER_GETSET(L, Maxs);
+	LUART_REGISTER_GETSET(L, ShadowMins);
+	LUART_REGISTER_GETSET(L, ShadowMaxs);
 	LUART_REGISTER_GET(L, ActiveMove);
 	LUART_REGISTER_GETSET(L, DesiredMove);
 	LUART_REGISTER_GETSET(L, FloorPosition);
@@ -844,6 +847,10 @@ ENT_GET(Entity, Mins, Vec3, m_ps.bbox.Mins());
 ENT_SET_CUSTOM(Entity, Mins, self->m_ps.bbox.SetMins(lua::Marshal<Vec3>::Get(L, 2, true)));
 ENT_GET(Entity, Maxs, Vec3, m_ps.bbox.Maxs());
 ENT_SET_CUSTOM(Entity, Maxs, self->m_ps.bbox.SetMaxs(lua::Marshal<Vec3>::Get(L, 2, true)));
+ENT_GET(Entity, ShadowMins, Vec3, m_ps.shadowBox.Mins());
+ENT_SET_CUSTOM(Entity, ShadowMins, self->m_ps.shadowBox.SetMins(lua::Marshal<Vec3>::Get(L, 2, true)));
+ENT_GET(Entity, ShadowMaxs, Vec3, m_ps.shadowBox.Maxs());
+ENT_SET_CUSTOM(Entity, ShadowMaxs, self->m_ps.shadowBox.SetMaxs(lua::Marshal<Vec3>::Get(L, 2, true)));
 ENT_GETSET(Entity, Accel, Vec3, m_ps.accel);
 ENT_GETSET(Entity, SnapTurnAngles, Vec3, m_ps.snapTurnAngles);
 ENT_GETSET(Entity, GroundFriction, float, m_ps.groundFriction);

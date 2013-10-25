@@ -11,7 +11,6 @@
 #include "GLSystem.h"
 
 #if defined(RAD_OPT_TOOLS)
-struct glslopt_ctx;
 #include <Runtime/Thread/Locks.h>
 #endif
 
@@ -82,11 +81,6 @@ struct RADENG_CLASS GLTable {
 
 #if defined(RAD_OPT_PC_TOOLS)
 	CGcontext cgc;
-#endif
-
-#if defined(RAD_OPT_TOOLS)
-	glslopt_ctx *glslopt;
-	glslopt_ctx *glslopt_es;
 #endif
 
 	bool SGIS_generate_mipmap;

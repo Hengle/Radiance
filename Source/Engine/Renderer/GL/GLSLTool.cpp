@@ -31,7 +31,7 @@ bool GLSLTool::Assemble(
 	std::stringstream ss;
 
 	const bool GLES = (flags & kAssemble_GLES) ? true : false;
-	
+
 	if (!(flags&(kAssemble_VertexShader|kAssemble_PixelShader)))
 		flags |= kAssemble_VertexShader;
 
@@ -344,8 +344,10 @@ bool GLSLTool::Assemble(
 	if (flags & kAssemble_Optimize) {
 		String in(ex.str());
 
+		glslopt_ctx *glslopt = glslopt_initialize(GLES);
+
 		glslopt_shader *opt_shader = glslopt_optimize(
-			GLES ? r::gl.glslopt_es : r::gl.glslopt,
+			glslopt,
 			vertexShader ? kGlslOptShaderVertex : kGlslOptShaderFragment,
 			in.c_str, 
 			0
@@ -381,6 +383,7 @@ bool GLSLTool::Assemble(
 				}
 			}
 			glslopt_shader_delete(opt_shader);
+			glslopt_cleanup(glslopt);
 			return false;
 		}
 
@@ -400,6 +403,7 @@ bool GLSLTool::Assemble(
 		}
 		z << glslopt_get_output(opt_shader);
 		glslopt_shader_delete(opt_shader);
+		glslopt_cleanup(glslopt);
 
 		Copy(z, out);
 

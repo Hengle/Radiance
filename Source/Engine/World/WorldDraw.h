@@ -88,6 +88,9 @@ public:
 	virtual void EndFrame() = 0;
 	virtual int LoadMaterials() = 0;
 	virtual int Precache() = 0;
+	virtual void BeginPrecacheMaterials() = 0;
+	virtual void PrecacheMaterial(const details::MatRef &mat) = 0;
+	virtual void EndPrecacheMaterials() = 0;
 	virtual void BindFramebuffer(bool discardHint, bool copy) = 0;
 	virtual void ClearBackBuffer() = 0;
 	virtual void SetWorldStates() = 0;

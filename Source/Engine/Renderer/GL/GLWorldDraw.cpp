@@ -69,6 +69,181 @@ int GLWorldDraw::Precache() {
 	return pkg::SR_Success;
 }
 
+void GLWorldDraw::BeginPrecacheMaterials() {
+	struct PrecacheVert {
+		float xyz[3];
+		float st[2];
+		float normal[4];
+		float tangent[4];
+	};
+
+	m_precacheMesh.reset(new (ZRender) Mesh());
+	int stream = m_precacheMesh->AllocateStream(kStreamUsage_Static, sizeof(PrecacheVert), 4);
+
+	m_precacheMesh->MapSource(
+		stream,
+		kMaterialGeometrySource_Vertices,
+		0,
+		sizeof(PrecacheVert),
+		0,
+		3
+	);
+
+	m_precacheMesh->MapSource(
+		stream,
+		kMaterialGeometrySource_TexCoords,
+		0,
+		sizeof(PrecacheVert),
+		sizeof(float)*3,
+		2
+	);
+
+	m_precacheMesh->MapSource(
+		stream,
+		kMaterialGeometrySource_Normals,
+		0,
+		sizeof(PrecacheVert),
+		sizeof(float)*5,
+		4
+	);
+
+	m_precacheMesh->MapSource(
+		stream,
+		kMaterialGeometrySource_Tangents,
+		0,
+		sizeof(PrecacheVert),
+		sizeof(float)*9,
+		4
+	);
+
+	GLVertexBuffer::Ptr::Ref vb = m_precacheMesh->Map(stream);
+	RAD_ASSERT(vb);
+	PrecacheVert *verts = (PrecacheVert*)vb->ptr.get();
+
+	verts[0].xyz[0] = -1.0f;
+	verts[0].xyz[1] = -1.0f;
+	verts[0].xyz[2] = 0.0f;
+	verts[0].normal[0] = 1.0f;
+	verts[0].normal[1] = 0.0f;
+	verts[0].normal[2] = 0.0f;
+	verts[0].normal[3] = 1.0f;
+	verts[0].st[0] = 0.0f;
+	verts[0].st[1] = 0.0f;
+	verts[0].tangent[0] = 1.0f;
+	verts[0].tangent[1] = 0.0f;
+	verts[0].tangent[2] = 0.0f;
+	verts[0].tangent[3] = 1.0f;
+
+	verts[1].xyz[0] = -1.0f;
+	verts[1].xyz[1] = 1.0f;
+	verts[1].xyz[2] = 0.0f;
+	verts[1].normal[0] = 1.0f;
+	verts[1].normal[1] = 0.0f;
+	verts[1].normal[2] = 0.0f;
+	verts[1].normal[3] = 1.0f;
+	verts[1].st[0] = 0.0f;
+	verts[1].st[1] = 0.0f;
+	verts[1].tangent[0] = 1.0f;
+	verts[1].tangent[1] = 0.0f;
+	verts[1].tangent[2] = 0.0f;
+	verts[1].tangent[3] = 1.0f;
+
+	verts[2].xyz[0] = 1.0f;
+	verts[2].xyz[1] = 1.0f;
+	verts[2].xyz[2] = 0.0f;
+	verts[2].normal[0] = 1.0f;
+	verts[2].normal[1] = 0.0f;
+	verts[2].normal[2] = 0.0f;
+	verts[2].normal[3] = 1.0f;
+	verts[2].st[0] = 0.0f;
+	verts[2].st[1] = 0.0f;
+	verts[2].tangent[0] = 1.0f;
+	verts[2].tangent[1] = 0.0f;
+	verts[2].tangent[2] = 0.0f;
+	verts[2].tangent[3] = 1.0f;
+	
+	verts[3].xyz[0] = 1.0f;
+	verts[3].xyz[1] = -1.0f;
+	verts[3].xyz[2] = 0.0f;
+	verts[3].normal[0] = 1.0f;
+	verts[3].normal[1] = 0.0f;
+	verts[3].normal[2] = 0.0f;
+	verts[3].normal[3] = 1.0f;
+	verts[3].st[0] = 0.0f;
+	verts[3].st[1] = 0.0f;
+	verts[3].tangent[0] = 1.0f;
+	verts[3].tangent[1] = 0.0f;
+	verts[3].tangent[2] = 0.0f;
+	verts[3].tangent[3] = 1.0f;
+
+	vb.reset(); // unmap
+
+	// setup triangle indices
+
+	vb = m_precacheMesh->MapIndices(kStreamUsage_Static, sizeof(U16), 6);
+	RAD_ASSERT(vb);
+	U16 *indices = (U16*)vb->ptr.get();
+
+	indices[0] = 0;
+	indices[1] = 1;
+	indices[2] = 2;
+	indices[3] = 0;
+	indices[4] = 2;
+	indices[5] = 3;
+
+	vb.reset(); // unmap
+
+	gl.MatrixMode(GL_PROJECTION);
+	gl.LoadIdentity();
+	gls.invertCullFace = false;
+	
+	gl.Ortho(-1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f);
+	gl.MatrixMode(GL_MODELVIEW);
+}
+
+void GLWorldDraw::PrecacheMaterial(const details::MatRef &mat) {
+
+	Shader::Uniforms u(Shader::Uniforms::kDefault);
+	u.eyePos = Vec3::Zero;
+	u.pfxVars = Vec2::Zero;
+	u.tcGen = Mat4::Identity;
+	
+	u.lights.numLights = kMaxLights;
+
+	for (int i = 0; i < kMaxLights; ++i) {
+		u.lights.lights[i].diffuse = Vec3(1.0f, 1.0f, 1.0f);
+		u.lights.lights[i].specular = Vec3(1.0f, 1.0f, 1.0f);
+		u.lights.lights[i].intensity = 1.0f;
+		u.lights.lights[i].pos = Vec3::Zero;
+		u.lights.lights[i].radius = 1.0f;
+		u.lights.lights[i].flags = r::LightDef::kFlag_Diffuse|r::LightDef::kFlag_Specular;
+	}
+
+	mat.mat->BindStates(
+		kDepthTest_Disable|kDepthWriteMask_Disable|kCullFaceMode_None|kColorWriteMask_RGBA|kScissorTest_Disable|kStencilTest_Disable,
+		kBlendMode_Off
+	);
+	
+	mat.mat->BindTextures(mat.loader);
+
+	for (int i = r::Shader::kPass_Default; i <= r::Shader::kPass_Fullbright; ++i) {
+
+		if (!mat.mat->shader->HasPass((Shader::Pass)i))
+			continue;
+
+		mat.mat->shader->Begin((Shader::Pass)i, *mat.mat);
+		m_precacheMesh->BindAll(mat.mat->shader.get().get());
+		mat.mat->shader->BindStates(u, false);
+		CommitStates();
+		m_precacheMesh->Draw();
+		mat.mat->shader->End();
+	}
+}
+
+void GLWorldDraw::EndPrecacheMaterials() {
+	m_precacheMesh.reset();
+}
+
 void GLWorldDraw::FlipMatrixHack(bool enable) {
 	m_flipMatrix = enable;
 }

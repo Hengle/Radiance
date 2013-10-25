@@ -25,6 +25,9 @@ public:
 	virtual void EndFrame();
 	virtual int LoadMaterials();
 	virtual int Precache();
+	virtual void BeginPrecacheMaterials();
+	virtual void PrecacheMaterial(const details::MatRef &mat);
+	virtual void EndPrecacheMaterials();
 	virtual void BindFramebuffer(bool discardHint, bool copy);
 	virtual void BindRenderTarget();
     virtual void ClearBackBuffer();
@@ -206,6 +209,7 @@ private:
 	asset::MaterialBundle m_clearStencil_M;
 	r::Mesh::Ref m_rectMesh;
 	r::Mesh::Ref m_overlay;
+	r::Mesh::Ref m_precacheMesh;
 
 	int m_stencilRef;
 	int m_overlaySize[2];
