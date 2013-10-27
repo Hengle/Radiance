@@ -391,7 +391,7 @@ bool AnimationSource::Tick(
 			if (useDistance && (firstBone == 0)) {
 				out[0].t[0] = 0.f; // null out X axis motion
 			} else if((m_moveType == AnimState::kMoveType_RemoveMotion) && (firstBone == 0)) {
-				out[0].t = Vec3::Zero; // remove all motion
+				out[0].t = m_bipZero.t; // remove all motion
 			}
 		}
 
