@@ -180,8 +180,6 @@ void SkMesh::SkinToBuffer(const SIMDDriver &driver, int mesh, void *buffer) {
 		int numVerts = (int)m.dm->numVerts[i];
 		const U16 *boneIndices = m.dm->bones[i];
 
-		RAD_ASSERT(m.dm->numChannels < 2);
-
 		if (numVerts > 0) {
 			driver.SkinVerts[i](
 				outVerts,

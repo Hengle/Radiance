@@ -1031,14 +1031,49 @@ bool Floors::Walk(
 			// walk from waypoint->waypoint (through connection)
 			WalkConnection(step.waypoint, step.connection, walkRoute);
 		} else {
-			// walk from floor -> waypoint (waypoint exiting floor)
-			// check that we are exiting (may be on an exit waypoint at this step).
-	#if !defined(RAD_OPT_SHIP)
-			RAD_VERIFY(current.m_floor >= 0);
-			RAD_VERIFY(current.m_floor == waypointPos.m_floor);
-	#endif
+			if (waypointPos.m_pos.NearlyEquals(current.m_pos, 0.1f)) {
+#if !defined(RAD_OPT_SHIP)
+				RAD_VERIFY(current.m_floor == waypointPos.m_floor);
+				RAD_VERIFY(current.m_tri == waypointPos.m_tri);
+#endif
+			} else {
+				// walk from floor -> waypoint (waypoint exiting floor)
+				// check that we are exiting (may be on an exit waypoint at this step).
+#if !defined(RAD_OPT_SHIP)
+				RAD_VERIFY(current.m_floor >= 0);
+				RAD_VERIFY(current.m_floor == waypointPos.m_floor);
+#endif
+				workRoute->clear();
+				WalkFloor(current, waypointPos, workRoute);
+#if !defined(RAD_OPT_SHIP)
+				if (workRoute->size() < 2) {
+					int b = 0;
+				}
+				RAD_VERIFY(workRoute->size() > 1);
+#endif
+				if (workRoute->size() < 2)
+					return false;
+				std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*walkRoute)); 
+			}
+		}
+
+		current = waypointPos;
+	}
+
+	// walk.
+	if ((current.m_floor >= 0) && (end.m_waypoint == -1)) {
+		if (end.m_pos.NearlyEquals(current.m_pos, 0.1f)) {
+#if !defined(RAD_OPT_SHIP)
+			RAD_VERIFY(current.m_floor == end.m_floor);
+			RAD_VERIFY(current.m_tri == end.m_tri);
+#endif
+		} else {
+			// entering a floor...
+#if !defined(RAD_OPT_SHIP)
+			RAD_VERIFY(current.m_floor == end.m_floor);
+#endif
 			workRoute->clear();
-			WalkFloor(current, waypointPos, workRoute);
+			WalkFloor(current, end, workRoute);
 #if !defined(RAD_OPT_SHIP)
 			if (workRoute->size() < 2) {
 				int b = 0;
@@ -1047,34 +1082,13 @@ bool Floors::Walk(
 #endif
 			if (workRoute->size() < 2)
 				return false;
-			std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*walkRoute)); 
+			std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*walkRoute));
 		}
-
-		current = waypointPos;
 	}
 
-	// walk.
-	if ((current.m_floor >= 0) && (end.m_waypoint == -1)) {
-		// entering a floor...
-#if !defined(RAD_OPT_SHIP)
-		RAD_VERIFY(current.m_floor == end.m_floor);
-#endif
-		workRoute->clear();
-		WalkFloor(current, end, workRoute);
-#if !defined(RAD_OPT_SHIP)
-		if (workRoute->size() < 2) {
-			int b = 0;
-		}
-		RAD_VERIFY(workRoute->size() > 1);
-#endif
-		if (workRoute->size() < 2)
-			return false;
-		std::copy(workRoute->begin(), workRoute->end(), std::back_inserter(*walkRoute));
-	} else { // waypoint move didn't generate a plan because we are at our destination waypoint already.
-		if (walkRoute->empty())
-			return false;
-	}
-
+	if (walkRoute->empty())
+		return false; // waypoint move didn't generate a plan because we are at our destination waypoint already.
+	
 	return true;
 }
 

@@ -717,8 +717,6 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 		}
 	}
 
-	m_rail.lookFwd = LookTarget::Tick(m_looks, m_rail.pos, m_rail.fwd, fwd, dt);
-	
 	float fov = m_rail.fov;
 
 	if (m_rail.cinematicFOV) {
@@ -727,10 +725,11 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 		fov = TickFOV(frame, dt, distance);
 	}
 
-	Vec3 pos = m_rail.pos + Sway::Tick(m_sways, dt, m_rail.lookFwd);
-	
 	// special case (unrestricted camera)
 	if (m_rail.clamp[1] >= 180.f && m_rail.clamp[2] >= 180.f) {
+		m_rail.lookFwd = LookTarget::Tick(m_looks, m_rail.pos, m_rail.fwd, fwd, dt);
+		Vec3 pos = m_rail.pos + Sway::Tick(m_sways, dt, m_rail.lookFwd);
+
 		Vec3 angles = LookAngles(m_rail.lookFwd);
 		Vec3 camAngles = AnglesFromQuat(m_rail.rot);
 		angles[0] = camAngles[0]; // always bank
@@ -745,16 +744,24 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 		}
 	// special case (fully restricted camera)
 	} else if (m_rail.clamp[1] == 0.f && m_rail.clamp[2] == 0.f) {
+		Vec3 qFwd = ForwardFromQuat(m_rail.rot);
+
+		m_rail.lookFwd = LookTarget::Tick(m_looks, m_rail.pos, qFwd, qFwd, dt);
+		Vec3 pos = m_rail.pos + Sway::Tick(m_sways, dt, m_rail.lookFwd);
+
+		Vec3 fAngles = LookAngles(m_rail.lookFwd);
+		fAngles[0] = AnglesFromQuat(m_rail.rot)[0]; // bank
+
 		if (!world->cvars->r_fly.value) {
 			world->camera->pos = pos;
-			world->camera->rot = m_rail.rot;
 			world->camera->fov = fov;
-			world->camera->quatMode = true;
+			world->camera->angles = fAngles;
+			world->camera->quatMode = false;
 		}
 	} else {
 		// we can drift +/- clamp angles from the cinematic camera orientation.
-		Vec3 qAngles = AnglesFromQuat(m_rail.rot);
-		Vec3 fAngles = LookAngles(m_rail.lookFwd);
+		Vec3 qAngles = LookAngles(ForwardFromQuat(m_rail.rot));
+		Vec3 fAngles = LookAngles(m_rail.fwd);
 		Vec3 deltaAngles = DeltaAngles(qAngles, fAngles);
 
 		for (int i = 1; i < 3; ++i) {
@@ -772,11 +779,18 @@ void E_ViewController::TickRailMode(int frame, float dt, const Entity::Ref &targ
 				fAngles[i] -= 360.f;
 		}
 
-		fAngles[0] = qAngles[0]; // preserve roll
+		Vec3 clampFwd = ForwardFromAngles(fAngles);
+
+		// blend look targets
+		m_rail.lookFwd = LookTarget::Tick(m_looks, m_rail.pos, clampFwd, clampFwd, dt);
+		Vec3 pos = m_rail.pos + Sway::Tick(m_sways, dt, m_rail.lookFwd);
+
+		Vec3 angles = LookAngles(m_rail.lookFwd);
+		angles[0] = AnglesFromQuat(m_rail.rot)[0]; // bank
 
 		if (!world->cvars->r_fly.value) {
 			world->camera->pos = pos;
-			world->camera->angles = fAngles;
+			world->camera->angles = angles;
 			world->camera->fov = fov;
 			world->camera->quatMode = false;
 		}

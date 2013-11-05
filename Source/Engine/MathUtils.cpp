@@ -25,6 +25,12 @@ RADENG_API Vec3 RADENG_CALL ForwardFromAngles(const Vec3 &angles) {
 	return vec;
 }
 
+RADENG_API Vec3 RADENG_CALL ForwardFromQuat(const Quat &q) {
+	Mat4 m = Mat4::Rotation(q);
+	Vec3 vec = m * Vec3(1, 0, 0);
+	return vec;
+}
+
 RADENG_API Vec3 RADENG_CALL LookAngles(const Vec3 &fwd) {
 	Vec3 v;
 	v[0] = 0.f;
