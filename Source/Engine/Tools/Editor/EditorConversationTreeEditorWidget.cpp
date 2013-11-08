@@ -280,7 +280,7 @@ void ConversationTreeEditorWidget::EditDialog(QListWidgetItem &item) {
 void ConversationTreeEditorWidget::AddDialogPressed() {
 	asset::ConversationTree::Dialog dialog;
 	dialog.name = "[Enter Name]";
-		
+			
 	ConversationTreeEditorItemEditDialog dlg(m_langId, dialog, *m_parser, this);
 	dlg.SelectName();
 

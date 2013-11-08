@@ -117,7 +117,7 @@ int ConversationTree::PushCopy(lua_State *L) const {
 		int numTableElems = 5;
 		if (!dialog.action.empty)
 			++numTableElems;
-		if (!dialog.condition.empty)
+		if (!dialog.group.empty)
 			++numTableElems;
 		if (dialog.probability != 1.f)
 			++numTableElems;
@@ -277,10 +277,10 @@ void ConversationTree::PushDialog(lua_State *L, const Dialog &dialog, int dialog
 		lua_setfield(L, -2, "action");
 	}
 
-	// condition = "string"
-	if (!dialog.condition.empty) {
-		lua_pushstring(L, dialog.condition.c_str);
-		lua_setfield(L, -2, "condition");
+	// group = "string"
+	if (!dialog.group.empty) {
+		lua_pushstring(L, dialog.group.c_str);
+		lua_setfield(L, -2, "group");
 	}
 
 	if (dialog.probability != 1.f) {
@@ -385,7 +385,7 @@ bool ConversationTree::SaveBinDialog(const Dialog &dialog, stream::OutputStream 
 		return false;
 	if (!os.Write(dialog.action))
 		return false;
-	if (!os.Write(dialog.condition))
+	if (!os.Write(dialog.group))
 		return false;
 	if (!os.Write(dialog.probability))
 		return false;
@@ -554,7 +554,7 @@ bool ConversationTree::LoadBinDialog(Dialog &dialog, stream::InputStream &is, in
 		return false;
 	}
 
-	if (!is.Read(&dialog.condition)) {
+	if (!is.Read(&dialog.group)) {
 		return false;
 	}
 

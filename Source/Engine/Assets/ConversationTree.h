@@ -61,7 +61,7 @@ public:
 		StringOption::Vec replies;
 		PtrVec choices;
 		String action;
-		String condition;
+		String group;
 		String name;
 		float probability; // 0 -> 1
 		int flags;

@@ -39,6 +39,7 @@ public:
 	void ReloadStrings();
 	void SetLangId(int langId);
 	QString Text() const;
+	QString StringName() const;
 
 signals:
 
@@ -154,7 +155,6 @@ private:
 	QLineEdit *m_name;
 	QLineEdit *m_group;
 	QLineEdit *m_action;
-	QLineEdit *m_condition;
 	QLineEdit *m_priority;
 	QLineEdit *m_probabilityLow;
 	QLineEdit *m_probabilityHigh;

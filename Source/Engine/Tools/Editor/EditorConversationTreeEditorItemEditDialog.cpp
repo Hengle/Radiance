@@ -139,6 +139,14 @@ QString ConversationTreeStringOptionEditWidget::Text() const {
 	return m_text->toPlainText();
 }
 
+QString ConversationTreeStringOptionEditWidget::StringName() const {
+	int index = m_string->currentIndex();
+	if (index >= 0) {
+		return m_string->itemText(index);
+	}
+	return QString();
+}
+
 void ConversationTreeStringOptionEditWidget::LoadText() {
 	if (m_opt) {
 		const String *string = m_stringTable->Find(m_opt->text.c_str, (StringTable::LangId)m_langId);
@@ -189,7 +197,6 @@ ConversationTreeEditorItemEditDialog::ConversationTreeEditorItemEditDialog(
 void ConversationTreeEditorItemEditDialog::InitRoot() {
 
 	m_action = 0;
-	m_condition = 0;
 	m_deleteReply = 0;
 	m_replies = 0;
 	m_replyEdit = 0;
@@ -304,8 +311,8 @@ void ConversationTreeEditorItemEditDialog::InitDialog() {
 	m_action = new (ZEditor) QLineEdit();
 	form->addRow("Action:", m_action);
 
-	m_condition = new (ZEditor) QLineEdit();
-	form->addRow("Condition:", m_condition);
+	m_group = new (ZEditor) QLineEdit();
+	form->addRow("Group:", m_group);
 
 	m_probabilityLow = new (ZEditor) QLineEdit();
 	m_probabilityLow->setValidator(new (ZEditor) QDoubleValidator(this));
@@ -396,7 +403,7 @@ void ConversationTreeEditorItemEditDialog::InitDialog() {
 
 void ConversationTreeEditorItemEditDialog::DoAutoName() {
 	if (m_name->text() == "[Enter Name]") {
-		QString text = m_promptEdit->Text();
+		QString text = m_promptEdit->StringName();
 		if (!text.isEmpty())
 			m_name->setText(text);
 	}
@@ -551,7 +558,7 @@ void ConversationTreeEditorItemEditDialog::LoadDialog() {
 	m_name->setText(m_dialog->name.c_str.get());
 	m_ok->setEnabled(!m_name->text().isEmpty());
 	m_action->setText(m_dialog->action.c_str.get());
-	m_condition->setText(m_dialog->condition.c_str.get());
+	m_group->setText(m_dialog->group.c_str.get());
 	m_probabilityLow->setText(QString("%1").arg(m_dialog->probability));
 	m_autoGenerate->setChecked((m_dialog->flags & asset::ConversationTree::kChatFlag_AutoGenerate) ? true : false);
 	m_shuffle->setChecked((m_dialog->flags & asset::ConversationTree::kChatFlag_ShuffleChoices) ? true : false);
@@ -643,7 +650,7 @@ void ConversationTreeEditorItemEditDialog::SaveRoot() {
 void ConversationTreeEditorItemEditDialog::SaveDialog() {
 	m_dialog->name = m_name->text().toAscii().constData();
 	m_dialog->action = m_action->text().toAscii().constData();
-	m_dialog->condition = m_condition->text().toAscii().constData();
+	m_dialog->group = m_group->text().toAscii().constData();
 	m_dialog->probability = m_probabilityLow->text().toFloat();
 
 	m_dialog->flags = 0;
