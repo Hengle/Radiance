@@ -512,12 +512,14 @@ void Font::SplitStringAtSize(
 	const String kSpace(CStr(" "));
 
 	for (; *end; ++end) {
-		if (*end == 32) { // space (word break)
+		if ((*end == 32) || (end[1] == 0)) { // space (word break), or end of string
 			if (start == end) {
 				continue;
 			}
 
-			String x(start, end-start);
+			const int kAdd = (*end != 32) ? 1 : 0;
+
+			String x(start, end-start+kAdd);
 			String test;
 
 			if (!cur.empty) {
@@ -538,14 +540,17 @@ void Font::SplitStringAtSize(
 
 			if (w > maxWidth) {
 				if (cur.empty) {
-					first = x;
-					return;
+					break;
 				}
 
 				first = cur;
 
-				start = end+1;
-				second = x + kSpace + String(start, utf.end - start);
+				if (end[1] == 0) {
+					second = x;
+				} else {
+					start = end+1;
+					second = x + kSpace + String(start, utf.end - start);
+				}
 				return;
 
 			} else {
