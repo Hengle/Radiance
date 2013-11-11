@@ -179,6 +179,7 @@ bool BSPBuilder::PutEntityOnFloor(const SceneFile::Entity::Ref &entity) {
 	int triNum = PutPointOnFloor(pos, floorNum);
 	if (triNum < 0) {
 		Log("ERROR: entity '%s' is not inside floor '%s'\n", entity->keys.StringForKey("classname", "<null>"), floor);
+		SetResult(pkg::SR_CompilerError);
 		return false;
 	}
 
