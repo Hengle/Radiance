@@ -208,11 +208,12 @@ public:
 
 	bool WaypointPosition(int waypoint, FloorPosition &pos) const;
 	int WaypointState(int waypoint) const;
+	int WaypointStateByIdx(int waypointIdx) const;
 	void SetWaypointState(int waypoint, int state);
 
 	IntVec WaypointsForTargetname(const char *targetname) const;
 	IntVec WaypointsForUserId(const char *userId) const;
-
+	
 	int PickWaypoint(
 		float x,
 		float y,
@@ -221,7 +222,7 @@ public:
 	);
 
 	RAD_DECLARE_READONLY_PROPERTY(Floors, numFloors, int);
-	RAD_DECLARE_READONLY_PROPERTY(Floors, numWaypoints, int);
+	RAD_DECLARE_READONLY_PROPERTY(Floors, waypointIds, const IntVec&);
 
 private:
 
@@ -313,14 +314,18 @@ private:
 		return (int)m_floorState.size();
 	}
 
-	RAD_DECLARE_GET(numWaypoints, int) {
-		return (int)m_waypoints.size();
+	RAD_DECLARE_GET(waypointIds, const IntVec&) {
+		return m_waypointIds;
 	}
+
+	typedef zone_map<int, int, ZWorldT>::type IntMap;
 
 	Waypoint::Vec m_waypoints;
 	Waypoint::MMap m_waypointTargets;
 	Waypoint::MMap m_waypointUserIds;
+	IntMap m_idToWaypoint;
 	IntVec m_floorState;
+	IntVec m_waypointIds;
 	const bsp_file::BSPFile *m_bsp;
 	World *m_world;
 	mutable int m_floodNum;

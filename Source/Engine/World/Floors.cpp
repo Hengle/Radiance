@@ -253,14 +253,19 @@ bool Floors::Load(const bsp_file::BSPFile &bsp) {
 	m_bsp = &bsp;
 
 	m_waypoints.reserve(m_bsp->numWaypoints);
+	m_waypointIds.reserve(m_bsp->numWaypoints);
+
 	for (U32 i = 0; i < m_bsp->numWaypoints; ++i) {
 		const bsp_file::BSPWaypoint *waypoint = m_bsp->Waypoints() + i;
 
 		Waypoint w;
-		w.waypointId = (int)i;
+		w.waypointId = waypoint->uid; // serializable
 		w.flags = (int)waypoint->flags;
 		w.floodNum = -1;
 		w.floodDistance = 0.f;
+
+		m_idToWaypoint.insert(IntMap::value_type(w.waypointId, (int)i));
+		m_waypointIds.push_back(w.waypointId);
 
 		if (waypoint->targetName >= 0) {
 			w.targetName = m_bsp->String(waypoint->targetName);
@@ -357,8 +362,15 @@ FloorMove::Ref Floors::CreateMoveSeq(
 }
 
 bool Floors::WaypointPosition(int waypoint, FloorPosition &pos) const {
+	IntMap::const_iterator it = m_idToWaypoint.find(waypoint);
+	if (it == m_idToWaypoint.end())
+		return 0;
+
+	waypoint = it->second;
+
 	if (waypoint < 0 || (waypoint >= (int)m_waypoints.size()))
 		return false;
+	
 	const bsp_file::BSPWaypoint *bspWaypoint = m_bsp->Waypoints() + waypoint;
 
 	pos.m_waypoint = waypoint;
@@ -370,14 +382,35 @@ bool Floors::WaypointPosition(int waypoint, FloorPosition &pos) const {
 }
 
 int Floors::WaypointState(int waypoint) const {
+	IntMap::const_iterator it = m_idToWaypoint.find(waypoint);
+	if (it == m_idToWaypoint.end())
+		return 0;
+
+	waypoint = it->second;
+
 	if (waypoint < 0 || (waypoint >= (int)m_waypoints.size()))
-		return false;
+		return 0;
+
 	return m_waypoints[waypoint].flags;
 }
 
+int Floors::WaypointStateByIdx(int waypointIdx) const {
+	if (waypointIdx < 0 || (waypointIdx >= (int)m_waypoints.size()))
+		return 0;
+
+	return m_waypoints[waypointIdx].flags;
+}
+
 void Floors::SetWaypointState(int waypoint, int state) {
+	IntMap::const_iterator it = m_idToWaypoint.find(waypoint);
+	if (it == m_idToWaypoint.end())
+		return;
+
+	waypoint = it->second;
+
 	if (waypoint < 0 || (waypoint >= (int)m_waypoints.size()))
 		return;
+
 	m_waypoints[waypoint].flags = state;
 }
 
@@ -387,6 +420,7 @@ IntVec Floors::WaypointsForTargetname(const char *targetname) const {
 		      Waypoint::MMap::const_iterator> pair = m_waypointTargets.equal_range(s);
 
 	IntVec vec;
+	vec.reserve(64);
 	while (pair.first != pair.second) {
 		vec.push_back(pair.first->second);
 		++pair.first;
@@ -401,6 +435,7 @@ IntVec Floors::WaypointsForUserId(const char *userId) const {
 		      Waypoint::MMap::const_iterator> pair = m_waypointUserIds.equal_range(s);
 
 	IntVec vec;
+	vec.reserve(64);
 	while (pair.first != pair.second) {
 		vec.push_back(pair.first->second);
 		++pair.first;
@@ -496,7 +531,7 @@ int Floors::PickWaypoint(
 		}
 	}
 
-	return best;
+	return m_waypoints[best].waypointId;
 }
 
 int Floors::FindFloor(const char *name) const {

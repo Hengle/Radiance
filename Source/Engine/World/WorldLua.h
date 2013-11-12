@@ -253,7 +253,7 @@ private:
 	static int lua_World_WaypointsForTargetname(lua_State *L);
 	static int lua_World_WaypointsForUserId(lua_State *L);
 	static int lua_World_NumFloors(lua_State *L);
-	static int lua_World_NumWaypoints(lua_State *L);
+	static int lua_World_WaypointIds(lua_State *L);
 	static int lua_World_PickWaypoint(lua_State *L);
 	static int lua_World_DrawCounters(lua_State *L);
 	static int lua_World_QuitGame(lua_State *L);

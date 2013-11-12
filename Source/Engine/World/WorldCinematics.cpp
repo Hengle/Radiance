@@ -514,40 +514,44 @@ void WorldCinematics::StopCinematic(const char *name, bool resetActors) {
 		if (strcmp(name, c.name.c_str))
 			continue;
 
+		const world::bsp_file::BSPCinematicTrigger *trigger = m_bspFile->CinematicTriggers() + c.cinematic->firstTrigger;
+		for (int i = 0; i < c.cinematic->numTriggers; ++i, ++trigger) {
+
+			for (int i = 0; i < trigger->numActors; ++i) {
+				int actorIdx = (int)(m_bspFile->ActorIndices()+trigger->firstActor)[i];
+				actorIdx &= 0x00ffffff;
+
+				RAD_ASSERT(actorIdx >= 0 && actorIdx < (int)m_actors.size());
+				
+				const Actor::Ref &a = m_actors[actorIdx];
+				if (a->flags&(kHideWhenDone|kHideUntilRef)) {
+					a->visible = false;
+					a->frame = -1;
+				}
+			
+				if ((a->flags&(kHideWhenDone|kHideUntilRef)) || resetActors) {
+					a->pos[1] = a->pos[0];
+					a->bounds[1] = a->bounds[0];
+					a->bounds[1].Translate(a->pos[1]);
+
+					a->occupant->Link();
+					a->pos[2] = a->pos[1];
+				
+					a->frame = -1;
+
+					if (a->skm) {
+						a->skm->ska->root = ska::Controller::Ref();
+					} else {
+						RAD_ASSERT(a->vtm);
+						a->vtm->vtm->root = ska::Controller::Ref();
+					}
+				}
+			}
+		}
+
 #if !defined(RAD_TARGET_GOLDEN)
 		COut(C_Debug) << "Cinematic(" << c.name << ") stopped." << std::endl;
 #endif
-
-		// reset actors?
-		for (IntSet::iterator it2 = c.actors.begin(); it2 != c.actors.end(); ++it2) {
-			const Actor::Ref &a = m_actors[*it2];
-			if (a->flags&kHideWhenDone) {
-				a->visible = false;
-				a->frame = -1;
-			}
-			
-			if ((a->flags&kHideWhenDone) || resetActors) {
-				a->pos[1] = a->pos[0];
-				a->bounds[1] = a->bounds[0];
-				a->bounds[1].Translate(a->pos[1]);
-
-				a->occupant->Link();
-				a->pos[2] = a->pos[1];
-				
-				a->frame = -1;
-
-				if (a->skm) {
-					a->skm->ska->root = ska::Controller::Ref();
-				} else {
-					RAD_ASSERT(a->vtm);
-					a->vtm->vtm->root = ska::Controller::Ref();
-				}
-			}
-#if !defined(RAD_TARGET_GOLDEN)
-			COut(C_Debug) << "Cinematics(" << c.name << ") actor(" << *it2 << ") done." << std::endl;
-#endif
-		}
-
 		m_cinematics.erase(it);
 		break;
 	}

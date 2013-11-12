@@ -163,7 +163,7 @@ bool WorldLua::Init() {
 		{ "WaypointsForTargetname", lua_World_WaypointsForTargetname },
 		{ "WaypointsForUserId", lua_World_WaypointsForUserId },
 		{ "NumFloors", lua_World_NumFloors },
-		{ "NumWaypoints", lua_World_NumWaypoints },
+		{ "WaypointIds", lua_World_WaypointIds },
 		{ "PickWaypoint", lua_World_PickWaypoint },
 		{ "DrawCounters", lua_World_DrawCounters },
 		{ "QuitGame", lua_World_QuitGame },

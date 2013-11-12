@@ -1184,10 +1184,21 @@ int WorldLua::lua_World_NumFloors(lua_State *L) {
 	return 1;
 }
 
-int WorldLua::lua_World_NumWaypoints(lua_State *L) {
+int WorldLua::lua_World_WaypointIds(lua_State *L) {
 	LOAD_SELF
 
-	lua_pushinteger(L, self->m_world->floors->numWaypoints);
+	const IntVec &ids = self->m_world->floors->waypointIds;
+	if (ids.empty())
+		return 0;
+
+	lua_createtable(L, (int)ids.size(), 0);
+	int idx = 1;
+	for (IntVec::const_iterator it = ids.begin(); it != ids.end(); ++it) {
+		lua_pushinteger(L, idx++);
+		lua_pushinteger(L, *it);
+		lua_settable(L, -3);
+	}
+
 	return 1;
 }
 

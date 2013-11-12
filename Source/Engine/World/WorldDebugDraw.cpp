@@ -324,7 +324,7 @@ void WorldDraw::DebugDrawActiveWaypoints() {
 	bool begin = false;
 
 	for (U32 i = 0; i < m_world->bspFile->numWaypoints; ++i) {
-		if (!(m_world->floors->WaypointState((int)i) & Floors::kWaypointState_Enabled))
+		if (!(m_world->floors->WaypointStateByIdx((int)i) & Floors::kWaypointState_Enabled))
 			continue;
 
 		if (!begin) {
