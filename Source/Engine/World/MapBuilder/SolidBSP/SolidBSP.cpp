@@ -732,6 +732,9 @@ void BSPBuilder::CreateRootNode() {
 }
 
 void BSPBuilder::CompileClipModels() {
+
+	Log("Compiling clip models...\n");
+
 	for (SceneFile::TriModel::Vec::iterator m = m_map->worldspawn->models.begin(); m != m_map->worldspawn->models.end(); ++m) {
 		SceneFile::TriModel::Ref &trim = *m;
 
@@ -741,7 +744,9 @@ void BSPBuilder::CompileClipModels() {
 
 		if (!(trim->contents&kContentsFlag_Clip)) 
 			continue;
-					
+
+		Log("%s\n", trim->name.c_str.get());
+
 		TriModelFragRef frag(new (world::bsp_file::ZBSPBuilder) TriModelFrag());
 		frag->original = trim.get();
 		frag->bounds = ToBSPType(trim->bounds);

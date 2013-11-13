@@ -779,9 +779,12 @@ void BSPBuilder::EmitBSPClipModels(const Node *node, world::bsp_file::BSPLeaf *l
 void BSPBuilder::EmitBSPClipModel(const TriModelFragRef &model) {
 	BSPClipModel *clipModel = m_bspFile->AddClipModel();
 
+	BBox bounds(model->bounds);
+	bounds.Expand(8.f, 8.f, 8.f); // fix null bounds on flat clip surfaces.
+
 	for (int i = 0; i < 3; ++i) {
-		clipModel->mins[i] = model->bounds.Mins()[i];
-		clipModel->maxs[i] = model->bounds.Maxs()[i];
+		clipModel->mins[i] = bounds.Mins()[i];
+		clipModel->maxs[i] = bounds.Maxs()[i];
 	}
 
 	clipModel->firstClipSurface = m_bspFile->numClipSurfaces;
