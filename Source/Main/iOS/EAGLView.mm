@@ -10,6 +10,7 @@
 #import <QuartzCore/QuartzCore.h>
 #include <Engine/App.h>
 #include <Engine/Game/Game.h>
+#import "UIDevice-Hardware.h"
 
 @implementation EAGLView
 
@@ -80,8 +81,21 @@
     if (!m_initialized) {
 		// do this here so we get a properly sized UIView on iPad.
 		CAEAGLLayer *eaglLayer = (CAEAGLLayer *)self.layer;
-		self.contentScaleFactor = [[UIScreen mainScreen] scale];
-		eaglLayer.contentsScale = [[UIScreen mainScreen] scale];
+		
+		float scale = [[UIScreen mainScreen] scale];
+		
+		int deviceFamily = [[UIDevice currentDevice] deviceFamily];
+		int deviceType = [[UIDevice currentDevice] platformType];
+		
+		if (deviceFamily == UIDeviceFamilyiPad &&
+		    deviceType <= UIDevice3GiPad) {
+			// these cannot handle retina displays
+			scale = 1.0f;
+			COut(C_Info) << "NOTE: iPad3 or older detected, disabling retina resolution for performance reasons." << std::endl;
+		}
+		
+		self.contentScaleFactor = scale;
+		eaglLayer.contentsScale = scale;
 		
 		[self bindGL];
 		
@@ -159,7 +173,7 @@
 	
 	CGPoint	 location = [touch locationInView:self];
 	U64 millis = (U64)([touch timestamp] * 1000.0);
-	float scale = [[UIScreen mainScreen] scale];
+	float scale = self.contentScaleFactor;
 	
 	InputEvent event;
 	event.touch = touch;
