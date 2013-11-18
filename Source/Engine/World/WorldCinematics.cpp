@@ -652,47 +652,38 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time) {
 		return true;
 	}
 
-	// any actors triggered at or after our target frame need to be removed.
-	// any other actors will have their time set when we build our trigger state
+	// reset all active actors
 
-	for (IntSet::iterator it = c->actors.begin(); it != c->actors.end();) {
+	for (IntSet::iterator it = c->actors.begin(); it != c->actors.end(); ++it) {
 		const Actor::Ref &actor = m_actors[*it];
 
-		if (actor->frame >= intFrame) {
 #if !defined(RAD_TARGET_GOLDEN)
-			COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << *it << ") done." << std::endl;
+		COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << *it << ") reset." << std::endl;
 #endif
-			actor->frame = -1;
-			actor->visible = (actor->flags&kHideUntilRef) ? false : true;
+		actor->frame = -1;
+		actor->visible = (actor->flags&kHideUntilRef) ? false : true;
 
-			if (actor->skm) {
-				actor->skm->ska->root = ska::Controller::Ref();
-			} else {
-				RAD_ASSERT(actor->vtm);
-				actor->vtm->vtm->root = ska::Controller::Ref();
-			}
-
-			IntSet::iterator next = it; ++next;
-			c->actors.erase(it);
-			it = next;
+		if (actor->skm) {
+			actor->skm->ska->root = ska::Controller::Ref();
 		} else {
-			++it;
+			RAD_ASSERT(actor->vtm);
+			actor->vtm->vtm->root = ska::Controller::Ref();
 		}
 	}
-
+	
+	c->actors.clear();
 	c->updateFrame = -1;
 	c->loopCount = 0;
 	c->camera = false;
 	c->emitFrame = intFrame+1;
 	c->xfade[0] = c->xfade[1] = 0.f;
-	c->frame[0] = c->frame[1] = time;
+	c->frame[0] = c->frame[1] = frame;
 
 	// build trigger state.
 
 	c->trigger = m_bspFile->CinematicTriggers()+c->cinematic->firstTrigger;
 
-	while (c->trigger && intFrame >= c->trigger->frame)
-	{
+	while (c->trigger && intFrame >= c->trigger->frame) {
 		float triggerDelta = c->frame[0] - c->trigger->frame;
 
 		const BSPCameraTrack *track = 0;
@@ -725,116 +716,116 @@ bool WorldCinematics::SetCinematicTime(const char *name, float time) {
 			RAD_ASSERT(actorIdx >= 0 && actorIdx < (int)m_actors.size());
 			const Actor::Ref actor = m_actors[actorIdx];
 
-			// is this actor just standing around?
+			bool actorDone = true;
 
-			if (actor->frame == -1) {
-				// play cinematic animation.
-				if (actor->skm) {
-					ska::Animation::Map::const_iterator animIt = actor->skm->ska->anims->find(c->name);
+			// play cinematic animation.
+			if (actor->skm) {
+				ska::Animation::Map::const_iterator animIt = actor->skm->ska->anims->find(c->name);
+				
+				if (animIt != actor->skm->ska->anims->end()) {
+					// only trigger this animation if it won't be complete after it's played or
+					// the actor is not hidden when done.
+					if (loop || (animIt->second->length >= tickDelta) || !(actor->flags&kHideWhenDone)) {
+						actorDone = false;
 
-					if (animIt != actor->skm->ska->anims->end()) {
-						// only trigger this animation if it won't be complete after it's played or
-						// the actor is not hidden when done.
-						if (loop || (animIt->second->length >= tickDelta) || !(actor->flags&kHideWhenDone)) {
-							actor->loop = loop;
-							actor->visible = true;
-							actor->frame = c->trigger->frame;
-							c->actors.insert(actorIdx);
+						actor->loop = loop;
+						actor->visible = true;
+						actor->frame = c->trigger->frame;
+						c->actors.insert(actorIdx);
 
-							ska::AnimationSource::Ref source = ska::AnimationSource::New(
-								*(animIt->second),
-								0.f,
-								0.f,
-								1.f,
-								loop ? 0 : 1,
-								ska::AnimState::kMoveType_None,
-								*actor->skm->ska.get(),
-								ska::Notify::Ref(new (ZWorld) SkaNotify(*this, *c))
-							);
+						ska::AnimationSource::Ref source = ska::AnimationSource::New(
+							*(animIt->second),
+							0.f,
+							0.f,
+							1.f,
+							loop ? 0 : 1,
+							ska::AnimState::kMoveType_None,
+							*actor->skm->ska.get(),
+							ska::Notify::Ref(new (ZWorld) SkaNotify(*this, *c))
+						);
 
-							actor->skm->ska->root = boost::static_pointer_cast<ska::Controller>(source);
-							actor->skm->ska->Tick( // advance delta
-								tickDelta,
-								0.f,
-								true,
-								false, // no animation events
-								Mat4::Identity
-							);
+						actor->skm->ska->root = boost::static_pointer_cast<ska::Controller>(source);
+						actor->skm->ska->Tick( // advance delta
+							tickDelta,
+							0.f,
+							true,
+							false, // no animation events
+							Mat4::Identity
+						);
 
-							const ska::BoneTM *motion = actor->skm->ska->absMotion;
-							actor->pos[1] = actor->pos[0] + motion->t;
-							actor->bounds[1] = actor->bounds[0];
-							actor->bounds[1].Translate(actor->pos[1]);
+						const ska::BoneTM *motion = actor->skm->ska->absMotion;
+						actor->pos[1] = actor->pos[0] + motion->t;
+						actor->bounds[1] = actor->bounds[0];
+						actor->bounds[1].Translate(actor->pos[1]);
 
-							if (actor->pos[2] != actor->pos[1]) {
-								actor->occupant->Link();
-								actor->pos[2] = actor->pos[1];
-							}
+						if (actor->pos[2] != actor->pos[1]) {
+							actor->occupant->Link();
+							actor->pos[2] = actor->pos[1];
+						}
 
 #if !defined(RAD_TARGET_GOLDEN)
-						COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << actorIdx << ") triggered." << std::endl;
+					COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << actorIdx << ") triggered." << std::endl;
 #endif
-						}
 					}
-				} else {
-					RAD_ASSERT(actor->vtm);
+				}
+
+			} else {
+				RAD_ASSERT(actor->vtm);
 
 					
-					ska::Animation::Map::const_iterator animIt = actor->vtm->vtm->anims->find(c->name);
+				ska::Animation::Map::const_iterator animIt = actor->vtm->vtm->anims->find(c->name);
 
-					if (animIt != actor->vtm->vtm->anims->end()) {
-						// only trigger this animation if it won't be complete after it's played or
-						// the actor is not hidden when done.
-						if (loop || (animIt->second->length >= tickDelta) || !(actor->flags&kHideWhenDone)) {
-							actor->loop = loop;
-							actor->visible = true;
-							actor->frame = c->trigger->frame;
-							c->actors.insert(actorIdx);
+				if (animIt != actor->vtm->vtm->anims->end()) {
+					// only trigger this animation if it won't be complete after it's played or
+					// the actor is not hidden when done.
+					if (loop || (animIt->second->length >= tickDelta) || !(actor->flags&kHideWhenDone)) {
+						actor->loop = loop;
+						actor->visible = true;
+						actor->frame = c->trigger->frame;
+						c->actors.insert(actorIdx);
 
-							ska::AnimationSource::Ref source = ska::AnimationSource::New(
-								*(animIt->second),
-								0.f,
-								0.f,
-								1.f,
-								loop ? 0 : 1,
-								*actor->vtm->vtm.get(),
-								ska::Notify::Ref(new (ZWorld) SkaNotify(*this, *c))
-							);
+						ska::AnimationSource::Ref source = ska::AnimationSource::New(
+							*(animIt->second),
+							0.f,
+							0.f,
+							1.f,
+							loop ? 0 : 1,
+							*actor->vtm->vtm.get(),
+							ska::Notify::Ref(new (ZWorld) SkaNotify(*this, *c))
+						);
 
-							actor->vtm->vtm->root = boost::static_pointer_cast<ska::Controller>(source);
-							actor->vtm->vtm->Tick( // advance delta
-								tickDelta,
-								true,
-								false // no animation events
-							);
+						actor->vtm->vtm->root = boost::static_pointer_cast<ska::Controller>(source);
+						actor->vtm->vtm->Tick( // advance delta
+							tickDelta,
+							true,
+							false // no animation events
+						);
 
 #if !defined(RAD_TARGET_GOLDEN)
-						COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << actorIdx << ") triggered." << std::endl;
+					COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << actorIdx << ") triggered." << std::endl;
 #endif
-						}
 					}
 				}
-			} else {
-				ska::AnimationSource::Ref source;
-				
-				if (actor->skm) {
-					source = boost::static_pointer_cast<ska::AnimationSource>(actor->skm->ska->root.get());
-				} else {
-					RAD_ASSERT(actor->vtm);
-					source = boost::static_pointer_cast<ska::AnimationSource>(actor->vtm->vtm->root.get());
+			}
+
+			if (actorDone) {
+#if !defined(RAD_TARGET_GOLDEN)
+				COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << actorIdx << ") done." << std::endl;
+#endif
+				if (actor->flags&kHideWhenDone) {
+					actor->visible = false;
+					if (actor->skm) {
+						actor->skm->ska->root = ska::Controller::Ref();
+					} else {
+						RAD_ASSERT(actor->vtm);
+						actor->vtm->vtm->root = ska::Controller::Ref();
+					}
 				}
 
-				if (source) {
-#if !defined(RAD_TARGET_GOLDEN)
-					COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << actorIdx << ") time-seek." << std::endl;
-#endif
-					source->SetTime(tickDelta);
-				} else {
-#if !defined(RAD_TARGET_GOLDEN)
-					COut(C_Debug) << "Cinematics(" << c->name << ") actor(" << actorIdx << ") invalidated." << std::endl;
-#endif
-					c->actors.erase(actorIdx);
-				}
+				actor->frame = -1;
+				c->actors.erase(actorIdx);
+			} else {
+				c->actors.insert(actorIdx);
 			}
 		}
 
