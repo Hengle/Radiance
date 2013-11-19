@@ -37,6 +37,10 @@ void App::DumpMemStats(int level) {
 	COut(level) << "MemStats: " << std::endl;
 	FormatSize(buf, ZRuntime.Get().totalBytes);
 	COut(level) << "  Runtime: " << buf << std::endl;
+	FormatSize(buf, file::ZFile.Get().totalBytes);
+	COut(level) << "    Files (mmap): " << buf << std::endl;
+	FormatSize(buf, file::ZPakFile.Get().totalBytes);
+	COut(level) << "    PakFiles (mmap): " << buf << std::endl;
 	FormatSize(buf, ZEngine.Get().totalBytes);
 	COut(level) << "    Engine: " << buf << std::endl;
 	FormatSize(buf, r::ZRender.Get().totalBytes);

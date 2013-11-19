@@ -357,7 +357,7 @@ MMapping::Ref FileSystem::MapFile(
 	MMFile::Ref file = OpenFile(path, zone, options, mask, exclude, resolved);
 	if (!file)
 		return MMapping::Ref();
-	return file->MMap(0, 0);
+	return file->MMap(0, 0, zone);
 }
 
 MMFileInputBuffer::Ref FileSystem::OpenInputBuffer(
