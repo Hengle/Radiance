@@ -3,4 +3,4 @@
 // Copyright (c) 2012 Sunside Inc., All Rights Reserved.
 // See Radiance/LICENSE for licensing terms.
 
-FLURRY_PATH = $(EXTERN_PATH)/Flurry iPhone SDK v3.0.9
+FLURRY_PATH = $(EXTERN_PATH)/Flurry-iOS-4.3.0

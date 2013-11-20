@@ -15,7 +15,7 @@
 #import "OSX/AppDelegate.h"
 #endif
 #if defined(FLURRY)
-#import "FlurryAnalytics/FlurryAnalytics.h"
+#import "Flurry/Flurry.h"
 #endif
 
 #include <Engine/App.h>
@@ -47,14 +47,14 @@ protected:
 	virtual RAD_DECLARE_SET(sessionReportOnAppClose, bool)  {
 		m_reportOnClose = value;
 #if defined(FLURRY)
-		[FlurryAnalytics setSessionReportsOnCloseEnabled: ((value) ? TRUE : FALSE)];
+		[Flurry setSessionReportsOnCloseEnabled: ((value) ? TRUE : FALSE)];
 #endif
 	}
 	virtual RAD_DECLARE_GET(sessionReportOnAppPause, bool) { return m_reportOnPause; }
 	virtual RAD_DECLARE_SET(sessionReportOnAppPause, bool)  {
 		m_reportOnPause = value;
 #if defined(FLURRY)
-		[FlurryAnalytics setSessionReportsOnPauseEnabled: ((value) ? TRUE : FALSE)];
+		[Flurry setSessionReportsOnPauseEnabled: ((value) ? TRUE : FALSE)];
 #endif
 	}
 	
@@ -95,6 +95,7 @@ static GameCenter *s_gameCenter = 0;
 }
 
 + (void) Create {
+
 #if !defined(RAD_OPT_PC_TOOLS) && (defined(RAD_OPT_SHIP) || defined(RAD_OPT_IOS))
 	if (!s_gameCenter) {
 		// make sure game center is actually available.
@@ -247,7 +248,7 @@ static GameCenter *s_gameCenter = 0;
 static NSString *gcRetryFilePath() {
 #if defined(RAD_OPT_IOS)
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    return [[NSString stringWithFormat:@"%@/GCRetry.dat",[paths objectAtIndex:0]] autorelease];
+    return [NSString stringWithFormat:@"%@/GCRetry.dat",[paths objectAtIndex:0]];
 #else
 	return NSHomeDirectory();
 #endif
@@ -523,15 +524,15 @@ void GCNetwork::LogEvent(const char *eventName, const world::Keys *optionalKeys,
 	
 	if (timed) {
 		if (dict) {
-			[FlurryAnalytics logEvent: nsEventName withParameters: dict timed: YES];
+			[Flurry logEvent: nsEventName withParameters: dict timed: YES];
 		} else {
-			[FlurryAnalytics logEvent: nsEventName timed: YES];
+			[Flurry logEvent: nsEventName timed: YES];
 		}
 	} else {
 		if (dict) {
-			[FlurryAnalytics logEvent: nsEventName withParameters: dict];
+			[Flurry logEvent: nsEventName withParameters: dict];
 		} else {
-			[FlurryAnalytics logEvent: nsEventName];
+			[Flurry logEvent: nsEventName];
 		}
 	}
 #endif
@@ -545,7 +546,7 @@ void GCNetwork::EndTimedEvent(const char *eventName, const world::Keys *optional
 	if (optionalKeys)
 		dict = NSDictionaryFromKeys(*optionalKeys);
 	
-	[FlurryAnalytics endTimedEvent: nsEventName withParameters: dict];
+	[Flurry endTimedEvent: nsEventName withParameters: dict];
 #endif
 }
 
@@ -554,7 +555,7 @@ void GCNetwork::LogError(const char *error, const char *message) {
 	NSString *nsError = [NSString stringWithUTF8String: error];
 	NSString *nsMessage = [NSString stringWithUTF8String: message];
 	
-	[FlurryAnalytics logError: nsError message: nsMessage exception: nil];
+	[Flurry logError: nsError message: nsMessage exception: nil];
 #endif
 }
 

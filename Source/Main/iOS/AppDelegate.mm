@@ -7,7 +7,7 @@
 
 #import "AppDelegate.h"
 #import <AudioToolbox/AudioToolbox.h>
-#import "FlurryAnalytics/FlurryAnalytics.h"
+#import "Flurry/Flurry.h"
 #import "MainViewController.h"
 #include <Runtime/Runtime.h>
 #include <Engine/App.h>
@@ -82,8 +82,8 @@ AppDelegate *s_app;
 	
 	NSSetUncaughtExceptionHandler(&UncaughtExceptionHandler);
 	NSString *flurryKey = [NSString stringWithUTF8String: (App::Get()->flurryAPIKey.get())];
-	[FlurryAnalytics startSession:flurryKey];
-	[FlurryAnalytics setSessionReportsOnPauseEnabled:TRUE];
+	[Flurry startSession:flurryKey];
+	[Flurry setSessionReportsOnPauseEnabled:TRUE];
 	
     return YES;
 }
@@ -261,5 +261,5 @@ void AudioSessionCallback(void *ud, UInt32 state) {
 }
 
 void UncaughtExceptionHandler(NSException *exception) {
-	[FlurryAnalytics logError:@"Uncaught" message:@"Crash!" exception:exception];
+	[Flurry logError:@"Uncaught" message:@"Crash!" exception:exception];
 }
