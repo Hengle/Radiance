@@ -537,6 +537,12 @@ void Widget::RemoveChild(const Ref &widget) {
 	for (Vec::iterator it = m_children.begin(); it != m_children.end(); ++it) {
 		if ((*it).get() == widget.get()) {
 			widget->m_parent.reset();
+			if (widget->m_capture) {
+				Root::Ref r = root;
+				if (r) {
+					r->SetCapture(Widget::Ref());
+				}
+			}
 			m_children.erase(it);
 			widget->RemovedFromRoot();
 			return;
@@ -863,7 +869,10 @@ void Widget::SetCapture(bool capture) {
 		root->SetCapture(boost::static_pointer_cast<Widget>(shared_from_this()));
 	} else if(!capture && m_capture) {
 		m_capture = false;
-		root->SetCapture(Widget::Ref());
+		Root::Ref r = root;
+		if (r) {
+			r->SetCapture(Widget::Ref());
+		}
 	}
 }
 
