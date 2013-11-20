@@ -11,12 +11,10 @@ namespace gn {
 
 namespace {
 
-class NullLocalPlayer : public LocalPlayer
-{
+class NullLocalPlayer : public LocalPlayer {
 public:
 
-	NullLocalPlayer() : m_authenticated(false)
-	{
+	NullLocalPlayer() : m_authenticated(false) {
 	}
 
 	bool m_authenticated;
@@ -28,50 +26,44 @@ protected:
 
 };
 
-class NullGameNetwork : public GameNetwork
-{
+class NullGameNetwork : public GameNetwork {
 public:
 
-	NullGameNetwork(GameNetworkEventQueue *queue) : m_sessionReportOnClose(true), m_sessionReportOnPause(false)
-	{
+	NullGameNetwork(GameNetworkEventQueue *queue) : m_sessionReportOnClose(true), m_sessionReportOnPause(false) {
 		m_localPlayer.reset(new NullLocalPlayer());
 
 		if (queue)
 			BindEventQueue(*queue);
 	}
 
-	virtual void AuthenticateLocalPlayer()
-	{
+	virtual void AuthenticateLocalPlayer() {
 		static_cast<NullLocalPlayer&>(*m_localPlayer).m_authenticated = true;
 		OnAuthenticated.Trigger(NR_Success);
 	}
 
-	virtual void SendScore(const char *leaderboardId, int score)
-	{
+	virtual void SendScore(const char *leaderboardId, int score) {
 	}
 
-	virtual void SendAchievement(const char *achievementId, float percent)
-	{
+	virtual void SendAchievement(const char *achievementId, float percent) {
 	}
 
-	virtual void ShowLeaderboard(const char *leaderboardId)
-	{
+	virtual void ShowLeaderboard(const char *leaderboardId) {
+		OnShowLeaderboard.Trigger(true);
+		OnShowLeaderboard.Trigger(false);
 	}
 
-	virtual void ShowAchievements()
-	{
+	virtual void ShowAchievements() {
+		OnShowAchievements.Trigger(true);
+		OnShowAchievements.Trigger(false);
 	}
 
-	virtual void LogEvent(const char *eventName, const world::Keys *optionalKey, bool timed)
-	{
+	virtual void LogEvent(const char *eventName, const world::Keys *optionalKey, bool timed) {
 	}
 
-	virtual void EndTimedEvent(const char *eventName, const world::Keys *optionalKey)
-	{
+	virtual void EndTimedEvent(const char *eventName, const world::Keys *optionalKey) {
 	}
 
-	virtual void LogError(const char *error, const char *message)
-	{
+	virtual void LogError(const char *error, const char *message) {
 	}
 
 protected:
@@ -92,8 +84,7 @@ private:
 
 }
 
-GameNetwork::Ref GameNetwork::Create(GameNetworkEventQueue *queue)
-{
+GameNetwork::Ref GameNetwork::Create(GameNetworkEventQueue *queue) {
 	return GameNetwork::Ref(new NullGameNetwork(queue));
 }
 
