@@ -10,8 +10,7 @@
 
 namespace gn {
 
-enum NetResult
-{
+enum NetResult {
 	NR_Success,
 	NR_NetworkFailed = -1
 };

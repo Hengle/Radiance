@@ -83,7 +83,7 @@ bool WorldLua::Init() {
 	lua_pushlightuserdata(L, this);
 	lua_setfield(L, LUA_REGISTRYINDEX, SELF);
 
-	luaL_Reg worldRegs [] = {
+	luaL_Reg worldRegs[] = {
 		{ "RequestGenerateSaveGame", lua_World_RequestGenerateSaveGame },
 		{ "FindEntityId", lua_World_FindEntityId },
 		{ "FindEntityUID", lua_World_FindEntityUID },
@@ -175,7 +175,7 @@ bool WorldLua::Init() {
 		{ 0, 0 }
 	};
 
-	luaL_Reg systemCalls [] = {
+	luaL_Reg systemCalls[] = {
 		{ "Platform", lua_System_Platform },
 		{ "SystemLanguage", lua_System_SystemLanguage },
 		{ "LaunchURL", lua_System_LaunchURL },
@@ -197,7 +197,7 @@ bool WorldLua::Init() {
 		{ 0, 0 }
 	};
 
-	luaL_Reg gameNetworkCalls [] = {
+	luaL_Reg gameNetworkCalls[] = {
 		{ "Create", lua_gnCreate },
 		{ "AuthenticateLocalPlayer", lua_gnAuthenticateLocalPlayer },
 		{ "LocalPlayerId", lua_gnLocalPlayerId },
@@ -212,10 +212,22 @@ bool WorldLua::Init() {
 		{ "SetSessionReportOnAppClose", lua_gnSetSessionReportOnAppClose },
 		{ "SessionReportOnAppPause", lua_gnSessionReportOnAppPause },
 		{ "SetSessionReportOnAppPause", lua_gnSetSessionReportOnAppPause },
-		{ 0, 0}
+		{ 0, 0 }
 	};
 
-	luaL_Reg cvarCalls [] = {
+	luaL_Reg storeCalls[] = {
+		{ "Create", lua_StoreCreate },
+		{ "Enabled", lua_StoreEnabled },
+		{ "AppGUID", lua_StoreAppGUID },
+		{ "RestoreProducts", lua_StoreRestoreProducts },
+		{ "RequestProducts", lua_StoreRequestProducts },
+		{ "CreatePaymentRequest", lua_StoreCreatePaymentRequest },
+		{ "RequestValidateApplication", lua_StoreRequestValidateApplication },
+		{ "RequestValidateProducts", lua_StoreRequestValidateProducts },
+		{ 0, 0 }
+	};
+
+	luaL_Reg cvarCalls[] = {
 		{ "CVar", lua_CVar },
 		{ "CVarString", lua_CVarString },
 		{ "CVarInt", lua_CVarInt },
@@ -228,6 +240,7 @@ bool WorldLua::Init() {
 	lua::RegisterGlobals(L, "World", worldRegs);
 	lua::RegisterGlobals(L, "System", systemCalls);
 	lua::RegisterGlobals(L, "GameNetwork", gameNetworkCalls);
+	lua::RegisterGlobals(L, "Store", storeCalls);
 	lua::RegisterGlobals(L, 0, cvarCalls);
 
 	// setup persistence tables.

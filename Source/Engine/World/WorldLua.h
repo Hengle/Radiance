@@ -13,6 +13,7 @@
 #include "../Lua/LuaRuntime.h"
 #include "../Packages/PackagesDef.h"
 #include "../Game/GameNetworkDef.h"
+#include "../Game/StoreDef.h"
 #include "../Persistence.h"
 #include "WorldCinematics.h"
 #include "Entity.h"
@@ -67,6 +68,11 @@ public:
 	void OnLocalPlayerAuthenticated(gn::NetResult r);
 	void OnShowLeaderboard(bool show);
 	void OnShowAchievements(bool show);
+
+	void OnProductsResponse(const iap::Product::Vec &products);
+	void OnApplicationValidateResult(iap::ResponseCode code);
+	void OnProductValidateResult(const iap::ProductValidationData &data);
+	void OnUpdateTransaction(const iap::TransactionRef &transaction);
 
 	static void PushKeysTable(lua_State *L, const Keys &keys);
 	static bool ParseKeysTable(lua_State *L, Keys &keys, int index, bool luaError);
@@ -283,6 +289,21 @@ private:
 	static int lua_gnSetSessionReportOnAppClose(lua_State *L);
 	static int lua_gnSessionReportOnAppPause(lua_State *L);
 	static int lua_gnSetSessionReportOnAppPause(lua_State *L);
+
+	/*
+	==============================================================================
+	Store
+	==============================================================================
+	*/
+
+	static int lua_StoreCreate(lua_State *L);
+	static int lua_StoreEnabled(lua_State *L);
+	static int lua_StoreAppGUID(lua_State *L);
+	static int lua_StoreRestoreProducts(lua_State *L);
+	static int lua_StoreRequestProducts(lua_State *L);
+	static int lua_StoreCreatePaymentRequest(lua_State *L);
+	static int lua_StoreRequestValidateApplication(lua_State *L);
+	static int lua_StoreRequestValidateProducts(lua_State *L);
 
 	/*
 	==============================================================================

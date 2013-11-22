@@ -95,8 +95,10 @@ void Game::Tick(float dt)
 	m_toolsCallback = cb;
 #endif
 
-	if (m_slot && m_slot->active)
+	if (m_slot && m_slot->active) {
 		m_gameNetworkEventQueue.Dispatch(*m_slot->active->world.get());
+		m_storeEventQueue.Dispatch(*m_slot->active->world.get());
+	}
 
 	OnTick(dt);
 	DoTickable(dt);
@@ -781,6 +783,12 @@ bool Game::CreateGameNetwork() {
 	if (!m_gameNetwork)
 		m_gameNetwork = gn::GameNetwork::Create(&m_gameNetworkEventQueue);
 	return m_gameNetwork;
+}
+
+bool Game::CreateStore() {
+	if (!m_store)
+		m_store = iap::Store::Create(&m_storeEventQueue);
+	return m_store;
 }
 
 #if defined(RAD_OPT_PC_TOOLS)

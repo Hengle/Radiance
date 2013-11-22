@@ -1524,6 +1524,12 @@
     <ClInclude Include="..\..\Engine\World\Entities\E_TouchVolume.h">
       <Filter>Source\Engine\World\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\Game\Store.h">
+      <Filter>Source\Engine\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Game\StoreDef.h">
+      <Filter>Source\Engine\Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Runtime\Runtime.cpp">
@@ -2410,6 +2416,15 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\World\Entities\E_TouchVolume.cpp">
       <Filter>Source\Engine\World\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Game\Store.cpp">
+      <Filter>Source\Engine\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Game\StoreNull.cpp">
+      <Filter>Source\Engine\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\World\WorldLuaStore.cpp">
+      <Filter>Source\Engine\World</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

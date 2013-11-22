@@ -88,6 +88,7 @@ public:
 	void SetViewport(int x, int y, int w, int h);
 	void Viewport(int &x, int &y, int &w, int &h);
 	bool CreateGameNetwork();
+	bool CreateStore();
 
 	RAD_DECLARE_READONLY_PROPERTY(Game, state, Tickable::Ref);
 	RAD_DECLARE_READONLY_PROPERTY(Game, world, ::world::World::Ref);
@@ -95,7 +96,8 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(Game, session, const Persistence::Ref&);
 	RAD_DECLARE_READONLY_PROPERTY(Game, saveGame, const Persistence::Ref&);
 	RAD_DECLARE_READONLY_PROPERTY(Game, numSavedGameConflicts, int);
-	RAD_DECLARE_READONLY_PROPERTY(Game, gameNetwork, gn::GameNetwork *);
+	RAD_DECLARE_READONLY_PROPERTY(Game, gameNetwork, gn::GameNetwork*);
+	RAD_DECLARE_READONLY_PROPERTY(Game, store, iap::Store*);
 	RAD_DECLARE_READONLY_PROPERTY(Game, cvars, GameCVars*);
 	RAD_DECLARE_READONLY_PROPERTY(Game, cvarZone, CVarZone*);
 	RAD_DECLARE_READONLY_PROPERTY(Game, uiMode, GameUIMode);
@@ -197,6 +199,10 @@ private:
 		return m_gameNetwork.get(); 
 	}
 
+	RAD_DECLARE_GET(store, iap::Store*) {
+		return m_store.get();
+	}
+
 	RAD_DECLARE_GET(quit, bool) {
 		return m_quit;
 	}
@@ -237,8 +243,10 @@ private:
 	Persistence::Ref m_saveGame;
 	CloudFile::Ref m_cloudFile;
 	CloudFile::Vec m_cloudVersions;
-	gn::GameNetworkRef m_gameNetwork;
+	gn::GameNetwork::Ref m_gameNetwork;
 	gn::GameNetworkEventQueue m_gameNetworkEventQueue;
+	iap::Store::Ref m_store;
+	iap::StoreEventQueue m_storeEventQueue;
 	GameCVars *m_cvars;
 	bool m_cloudStorage;
 	bool m_quit;

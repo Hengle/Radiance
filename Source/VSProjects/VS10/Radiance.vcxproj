@@ -215,6 +215,8 @@
     <ClInclude Include="..\..\Engine\Game\GSLoadMap.h" />
     <ClInclude Include="..\..\Engine\Game\GSPlay.h" />
     <ClInclude Include="..\..\Engine\Game\GSPriority.h" />
+    <ClInclude Include="..\..\Engine\Game\Store.h" />
+    <ClInclude Include="..\..\Engine\Game\StoreDef.h" />
     <ClInclude Include="..\..\Engine\Game\WaveAnim.h" />
     <ClInclude Include="..\..\Engine\Input.h" />
     <ClInclude Include="..\..\Engine\KeyCodes.h" />
@@ -1455,6 +1457,8 @@
     <ClCompile Include="..\..\Engine\Game\Gestures.cpp" />
     <ClCompile Include="..\..\Engine\Game\GSLoadMap.cpp" />
     <ClCompile Include="..\..\Engine\Game\GSPlay.cpp" />
+    <ClCompile Include="..\..\Engine\Game\Store.cpp" />
+    <ClCompile Include="..\..\Engine\Game\StoreNull.cpp" />
     <ClCompile Include="..\..\Engine\Game\WaveAnim.cpp" />
     <ClCompile Include="..\..\Engine\Input.cpp" />
     <ClCompile Include="..\..\Engine\LogFile.cpp" />
@@ -2252,6 +2256,7 @@
     <ClCompile Include="..\..\Engine\World\WorldLua.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldLuaCVars.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldLuaGameNetwork.cpp" />
+    <ClCompile Include="..\..\Engine\World\WorldLuaStore.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldLuaSystem.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldLuaWorld.cpp" />
     <ClCompile Include="..\..\Engine\World\WorldSpawn.cpp" />

@@ -519,6 +519,22 @@ void World::OnShowAchievements(bool show) {
 	m_lua->OnShowAchievements(show);
 }
 
+void World::OnProductsResponse(const iap::Product::Vec &products) {
+	m_lua->OnProductsResponse(products);
+}
+
+void World::OnApplicationValidateResult(iap::ResponseCode code) {
+	m_lua->OnApplicationValidateResult(code);
+}
+
+void World::OnProductValidateResult(const iap::ProductValidationData &data) {
+	m_lua->OnProductValidateResult(data);
+}
+
+void World::OnUpdateTransaction(const iap::TransactionRef &transaction) {
+	m_lua->OnUpdateTransaction(transaction);
+}
+
 Entity::Vec World::FindEntityClass(const char *classname) const {
 	RAD_ASSERT(classname);
 	String s(CStr(classname));

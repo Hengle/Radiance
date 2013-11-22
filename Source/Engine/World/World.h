@@ -22,6 +22,7 @@
 #include "../UI/UIWidgetDef.h"
 #include "../Sound/SoundDef.h"
 #include "../Game/GameNetworkDef.h"
+#include "../Game/Store.h"
 #include <Runtime/Container/ZoneList.h>
 #include <Runtime/Container/ZoneMap.h>
 #include <Runtime/Container/ZoneVector.h>
@@ -109,6 +110,11 @@ public:
 	void OnLocalPlayerAuthenticated(gn::NetResult r);
 	void OnShowLeaderboard(bool show);
 	void OnShowAchievements(bool show);
+
+	void OnProductsResponse(const iap::Product::Vec &products);
+	void OnApplicationValidateResult(iap::ResponseCode code);
+	void OnProductValidateResult(const iap::ProductValidationData &data);
+	void OnUpdateTransaction(const iap::TransactionRef &transaction);
 
 	ZoneTagRef ZoneTag(int id) const;
 

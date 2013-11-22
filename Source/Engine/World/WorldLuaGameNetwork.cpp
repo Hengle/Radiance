@@ -1,14 +1,14 @@
-// WorldLua_GameNetwork.cpp
-// Copyright (c) 2010 Sunside Inc., All Rights Reserved
-// Author: Joe Riedel
-// See Radiance/LICENSE for licensing terms.
+/*! \file WorldLuaStore.cpp
+	\copyright Copyright (c) 2010 Sunside Inc., All Rights Reserved.
+	\copyright See Radiance/LICENSE for licensing terms.
+	\author Joe Riedel
+	\ingroup world
+*/
 
 #include RADPCH
-#include "../App.h"
-#include "../Engine.h"
-#include "../Game/Game.h"
 #include "World.h"
 #include "WorldLuaCommon.h"
+#include "../Game/Game.h"
 
 namespace world {
 

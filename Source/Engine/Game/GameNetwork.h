@@ -11,12 +11,12 @@
 #include <Runtime/Event.h>
 #include <Runtime/Container/ZoneList.h>
 #include <Runtime/Thread/Locks.h>
+#include <Runtime/PushPack.h>
 
 namespace gn {
 
 //! Interface class for a game network (GameCenter etc).
-class GameNetwork
-{
+class GameNetwork : public boost::noncopyable {
 	RAD_EVENT_CLASS(EventNoAccess);
 public:
 	typedef GameNetworkRef Ref;
@@ -73,8 +73,7 @@ protected:
 };
 
 //! Player object
-class Player
-{
+class Player : public boost::noncopyable {
 public:
 	typedef PlayerRef Ref;
 
@@ -86,8 +85,7 @@ protected:
 };
 
 //! Local player
-class LocalPlayer : public Player
-{
+class LocalPlayer : public Player {
 public:
 	typedef LocalPlayerRef Ref;
 
@@ -99,8 +97,7 @@ protected:
 };
 
 //! Network dispatch queue
-class GameNetworkEventQueue
-{
+class GameNetworkEventQueue : public boost::noncopyable {
 public:
 	typedef GameNetworkEventQueueRef Ref;
 
@@ -120,8 +117,7 @@ private:
 	typedef boost::mutex Mutex;
 	typedef boost::lock_guard<Mutex> Lock;
 
-	class Event
-	{
+	class Event {
 	public:
 		virtual ~Event() {}
 		typedef boost::shared_ptr<Event> Ref;
@@ -129,8 +125,7 @@ private:
 		virtual void Dispatch(world::World &target) = 0;
 	};
 
-	class AuthenticatedEvent : public Event
-	{
+	class AuthenticatedEvent : public Event {
 	public:
 		AuthenticatedEvent(NetResult r) : m_result(r) {}
 		virtual void Dispatch(world::World &target);
@@ -140,8 +135,7 @@ private:
 		NetResult m_result;
 	};
 
-	class ShowLeaderboardEvent : public Event
-	{
+	class ShowLeaderboardEvent : public Event {
 	public:
 		ShowLeaderboardEvent(bool r) : m_result(r) {}
 		virtual void Dispatch(world::World &target);
@@ -151,8 +145,7 @@ private:
 		bool m_result;
 	};
 	
-	class ShowAchievementsEvent : public Event
-	{
+	class ShowAchievementsEvent : public Event {
 	public:
 		ShowAchievementsEvent(bool r) : m_result(r) {}
 		virtual void Dispatch(world::World &target);
@@ -169,3 +162,5 @@ private:
 };
 
 } // gn
+
+#include <Runtime/PopPack.h>
