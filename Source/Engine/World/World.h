@@ -115,6 +115,7 @@ public:
 	void OnApplicationValidateResult(iap::ResponseCode code);
 	void OnProductValidateResult(const iap::ProductValidationData &data);
 	void OnUpdateTransaction(const iap::TransactionRef &transaction);
+	void OnRestoreProductsComplete(const iap::RestorePurchasesCompleteData &data);
 
 	ZoneTagRef ZoneTag(int id) const;
 

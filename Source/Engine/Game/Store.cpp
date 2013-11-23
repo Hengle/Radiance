@@ -90,15 +90,24 @@ void StoreEventQueue::Bind(Store &store) {
 		&StoreEventQueue::OnUpdateTransaction,
 		ManualReleaseEventTag
 	);
+
+	store.OnRestoreProductsComplete.Bind<StoreEventQueue>(
+		this,
+		&StoreEventQueue::OnRestoreProductsComplete,
+		ManualReleaseEventTag
+	);
 }
 
 void StoreEventQueue::Dispatch(world::World &target) {
-	Lock L(m_cs);
+	Event::Vec pending;
+	{
+		Lock L(m_cs);
+		pending.swap(m_events);
+	}
 
-	while (!m_events.empty()) {
-		const Event::Ref &e = m_events.front();
+	for (Event::Vec::iterator it = pending.begin(); it != pending.end(); ++it) {
+		const Event::Ref &e = *it;
 		e->Dispatch(target);
-		m_events.pop_front();
 	}
 }
 
@@ -116,6 +125,10 @@ void StoreEventQueue::OnProductValidateResult(const ProductValidationData &data)
 
 void StoreEventQueue::OnUpdateTransaction(const TransactionRef &transaction) {
 	PostEvent(new UpdateTransactionEvent(transaction));
+}
+
+void StoreEventQueue::OnRestoreProductsComplete(const RestorePurchasesCompleteData &data) {
+	PostEvent(new RestoreProductsCompleteEvent(data));
 }
 
 void StoreEventQueue::PostEvent(Event *e) {
@@ -137,6 +150,10 @@ void StoreEventQueue::ProductValidateResultEvent::Dispatch(world::World &target)
 
 void StoreEventQueue::UpdateTransactionEvent::Dispatch(world::World &target) {
 	target.OnUpdateTransaction(m_transaction);
+}
+
+void StoreEventQueue::RestoreProductsCompleteEvent::Dispatch(world::World &target) {
+	target.OnRestoreProductsComplete(m_data);
 }
 
 } // iap

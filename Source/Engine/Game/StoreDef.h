@@ -44,4 +44,9 @@ struct ProductValidationData {
 	ResponseCode code;
 };
 
+struct RestorePurchasesCompleteData {
+	bool error;
+	String msg;
+};
+
 } // iap

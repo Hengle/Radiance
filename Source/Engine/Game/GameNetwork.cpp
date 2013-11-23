@@ -35,12 +35,15 @@ void GameNetworkEventQueue::Bind(GameNetwork &network) {
 }
 
 void GameNetworkEventQueue::Dispatch(world::World &target) {
-	Lock L(m_cs);
+	Event::Vec pending;
+	{
+		Lock L(m_cs);
+		pending.swap(m_events);
+	}
 
-	while (!m_events.empty()) {
-		const Event::Ref &e = m_events.front();
+	for (Event::Vec::iterator it = pending.begin(); it != pending.end(); ++it) {
+		const Event::Ref &e = *it;
 		e->Dispatch(target);
-		m_events.pop_front();
 	}
 }
 

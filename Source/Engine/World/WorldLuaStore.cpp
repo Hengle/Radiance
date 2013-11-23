@@ -59,6 +59,19 @@ void WorldLua::OnUpdateTransaction(const iap::TransactionRef &transaction) {
 	Call("Store.OnUpdateTransaction", 1, 0, 0);
 }
 
+void WorldLua::OnRestoreProductsComplete(const iap::RestorePurchasesCompleteData &data) {
+	if (!PushGlobalCall("Store.OnRestoreProductsComplete"))
+		return;
+	int numArgs = 1;
+	lua_pushboolean(L, data.error ? 1 : 0);
+	if (data.error) {
+		lua_pushstring(L, data.msg.c_str);
+		++numArgs;
+	}
+
+	Call("Store.OnRestoreProductsComplete", numArgs, 0, 0);
+}
+
 int WorldLua::lua_StoreCreate(lua_State *L) {
 	LOAD_SELF
 	lua_pushboolean(L, self->m_world->game->CreateStore() ? 1 : 0);

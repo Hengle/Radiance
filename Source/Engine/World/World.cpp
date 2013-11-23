@@ -535,6 +535,10 @@ void World::OnUpdateTransaction(const iap::TransactionRef &transaction) {
 	m_lua->OnUpdateTransaction(transaction);
 }
 
+void World::OnRestoreProductsComplete(const iap::RestorePurchasesCompleteData &data) {
+	m_lua->OnRestoreProductsComplete(data);
+}
+
 Entity::Vec World::FindEntityClass(const char *classname) const {
 	RAD_ASSERT(classname);
 	String s(CStr(classname));

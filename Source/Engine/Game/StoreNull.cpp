@@ -68,6 +68,9 @@ public:
 	}
 
 	virtual void RestoreProducts() {
+		RestorePurchasesCompleteData data;
+		data.error = false;
+		OnRestoreProductsComplete.Trigger(data);
 	}
 
 	virtual void RequestValidateApplication() {

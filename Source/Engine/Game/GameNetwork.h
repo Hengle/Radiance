@@ -9,7 +9,7 @@
 #include "../World/WorldDef.h"
 #include "../World/Keys.h"
 #include <Runtime/Event.h>
-#include <Runtime/Container/ZoneList.h>
+#include <Runtime/Container/ZoneVector.h>
 #include <Runtime/Thread/Locks.h>
 #include <Runtime/PushPack.h>
 
@@ -121,7 +121,7 @@ private:
 	public:
 		virtual ~Event() {}
 		typedef boost::shared_ptr<Event> Ref;
-		typedef zone_list<Ref, ZWorldT>::type List;
+		typedef zone_vector<Ref, ZWorldT>::type Vec;
 		virtual void Dispatch(world::World &target) = 0;
 	};
 
@@ -157,7 +157,7 @@ private:
 
 	void PostEvent(Event *e);
 
-	Event::List m_events;
+	Event::Vec m_events;
 	Mutex m_cs;
 };
 

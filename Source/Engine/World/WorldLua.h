@@ -73,6 +73,7 @@ public:
 	void OnApplicationValidateResult(iap::ResponseCode code);
 	void OnProductValidateResult(const iap::ProductValidationData &data);
 	void OnUpdateTransaction(const iap::TransactionRef &transaction);
+	void OnRestoreProductsComplete(const iap::RestorePurchasesCompleteData &data);
 
 	static void PushKeysTable(lua_State *L, const Keys &keys);
 	static bool ParseKeysTable(lua_State *L, Keys &keys, int index, bool luaError);

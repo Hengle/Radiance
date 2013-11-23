@@ -11,6 +11,7 @@
 #include "../Lua/LuaRuntime.h"
 #include <Runtime/Event.h>
 #include <Runtime/Thread/Locks.h>
+#include <Runtime/Container/ZoneVector.h>
 #include <Runtime/PushPack.h>
 
 namespace iap {
@@ -46,6 +47,9 @@ public:
 
 	typedef Event<TransactionRef, EventNoAccess> UpdateTransactionEvent;
 	UpdateTransactionEvent OnUpdateTransaction;
+
+	typedef Event<RestorePurchasesCompleteData, EventNoAccess> RestoreProductsComplete;
+	RestoreProductsComplete OnRestoreProductsComplete;
 
 	RAD_DECLARE_READONLY_PROPERTY(Store, appGUID, const char*);
 	RAD_DECLARE_READONLY_PROPERTY(Store, enabled, bool);
@@ -162,6 +166,7 @@ private:
 	void OnApplicationValidateResult(const ResponseCode &code);
 	void OnProductValidateResult(const ProductValidationData &data);
 	void OnUpdateTransaction(const TransactionRef &transaction);
+	void OnRestoreProductsComplete(const RestorePurchasesCompleteData &data);
 
 	////////////////////////////////////////////////////////
 
@@ -172,7 +177,7 @@ private:
 	public:
 		virtual ~Event() {}
 		typedef boost::shared_ptr<Event> Ref;
-		typedef zone_list<Ref, ZWorldT>::type List;
+		typedef zone_vector<Ref, ZWorldT>::type Vec;
 		virtual void Dispatch(world::World &target) = 0;
 	};
 
@@ -208,9 +213,17 @@ private:
 		TransactionRef m_transaction;
 	};
 
+	class RestoreProductsCompleteEvent : public Event {
+	public:
+		RestoreProductsCompleteEvent(const RestorePurchasesCompleteData &data) : m_data(data) {}
+		virtual void Dispatch(world::World &target);
+	private:
+		RestorePurchasesCompleteData m_data;
+	};
+
 	void PostEvent(Event *e);
 
-	Event::List m_events;
+	Event::Vec m_events;
 	Mutex m_cs;
 };
 
