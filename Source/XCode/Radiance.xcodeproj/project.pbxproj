@@ -982,6 +982,22 @@
 		337AE76715BF214F00AD1617 /* StringTableParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8871815B9B9ED0089BA08 /* StringTableParser.h */; };
 		337AE76815BF214F00AD1617 /* TextureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8871C15B9B9ED0089BA08 /* TextureParser.h */; };
 		337AE76915BF214F00AD1617 /* TypefaceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 33E8872015B9B9ED0089BA08 /* TypefaceParser.h */; };
+		3380F7F31840B22E0073F0D8 /* Store.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3380F7F11840B22E0073F0D8 /* Store.cpp */; };
+		3380F7F41840B22E0073F0D8 /* Store.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3380F7F11840B22E0073F0D8 /* Store.cpp */; };
+		3380F7F51840B22E0073F0D8 /* Store.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3380F7F11840B22E0073F0D8 /* Store.cpp */; };
+		3380F7F61840B22E0073F0D8 /* Store.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3380F7F11840B22E0073F0D8 /* Store.cpp */; };
+		3380F7F71840B22E0073F0D8 /* Store.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3380F7F11840B22E0073F0D8 /* Store.cpp */; };
+		3380F7F81840B22E0073F0D8 /* Store.h in Headers */ = {isa = PBXBuildFile; fileRef = 3380F7F21840B22E0073F0D8 /* Store.h */; };
+		3380F7F91840B22E0073F0D8 /* Store.h in Headers */ = {isa = PBXBuildFile; fileRef = 3380F7F21840B22E0073F0D8 /* Store.h */; };
+		3380F7FA1840B22E0073F0D8 /* Store.h in Headers */ = {isa = PBXBuildFile; fileRef = 3380F7F21840B22E0073F0D8 /* Store.h */; };
+		3380F7FB1840B22E0073F0D8 /* Store.h in Headers */ = {isa = PBXBuildFile; fileRef = 3380F7F21840B22E0073F0D8 /* Store.h */; };
+		3380F7FC1840B22E0073F0D8 /* Store.h in Headers */ = {isa = PBXBuildFile; fileRef = 3380F7F21840B22E0073F0D8 /* Store.h */; };
+		3380F7FE1840B23B0073F0D8 /* StoreNull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3380F7FD1840B23B0073F0D8 /* StoreNull.cpp */; };
+		3380F8001840B2520073F0D8 /* WorldLuaStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3380F7FF1840B2520073F0D8 /* WorldLuaStore.cpp */; };
+		3380F8011840B2520073F0D8 /* WorldLuaStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3380F7FF1840B2520073F0D8 /* WorldLuaStore.cpp */; };
+		3380F8021840B2520073F0D8 /* WorldLuaStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3380F7FF1840B2520073F0D8 /* WorldLuaStore.cpp */; };
+		3380F8031840B2520073F0D8 /* WorldLuaStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3380F7FF1840B2520073F0D8 /* WorldLuaStore.cpp */; };
+		3380F8041840B2520073F0D8 /* WorldLuaStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3380F7FF1840B2520073F0D8 /* WorldLuaStore.cpp */; };
 		33836C1A15B9CF590030EAEC /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33836C0015B9CF580030EAEC /* App.cpp */; };
 		33836C1B15B9CF590030EAEC /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33836C0015B9CF580030EAEC /* App.cpp */; };
 		33836C1C15B9CF590030EAEC /* App.h in Headers */ = {isa = PBXBuildFile; fileRef = 33836C0115B9CF580030EAEC /* App.h */; };
@@ -3251,6 +3267,10 @@
 		337AE54D15BF20D300AD1617 /* RadianceGoldenDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceGoldenDebugOSX.xcconfig; path = XCConfig/RadianceGoldenDebugOSX.xcconfig; sourceTree = "<group>"; };
 		337AE54E15BF20D300AD1617 /* RadianceGoldenReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceGoldenReleaseiOS.xcconfig; path = XCConfig/RadianceGoldenReleaseiOS.xcconfig; sourceTree = "<group>"; };
 		337AE54F15BF20D300AD1617 /* RadianceGoldenReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceGoldenReleaseOSX.xcconfig; path = XCConfig/RadianceGoldenReleaseOSX.xcconfig; sourceTree = "<group>"; };
+		3380F7F11840B22E0073F0D8 /* Store.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Store.cpp; sourceTree = "<group>"; };
+		3380F7F21840B22E0073F0D8 /* Store.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Store.h; sourceTree = "<group>"; };
+		3380F7FD1840B23B0073F0D8 /* StoreNull.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StoreNull.cpp; sourceTree = "<group>"; };
+		3380F7FF1840B2520073F0D8 /* WorldLuaStore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldLuaStore.cpp; sourceTree = "<group>"; };
 		33836C0015B9CF580030EAEC /* App.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = App.cpp; path = ../Engine/App.cpp; sourceTree = "<group>"; };
 		33836C0115B9CF580030EAEC /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = App.h; path = ../Engine/App.h; sourceTree = "<group>"; };
 		33836C0215B9CF580030EAEC /* Camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Camera.cpp; path = ../Engine/Camera.cpp; sourceTree = "<group>"; };
@@ -5058,6 +5078,9 @@
 				33E887C415B9BA470089BA08 /* GSPlay.cpp */,
 				33E887C515B9BA470089BA08 /* GSPlay.h */,
 				33E887C615B9BA470089BA08 /* GSPriority.h */,
+				3380F7F11840B22E0073F0D8 /* Store.cpp */,
+				3380F7F21840B22E0073F0D8 /* Store.h */,
+				3380F7FD1840B23B0073F0D8 /* StoreNull.cpp */,
 				33E887C715B9BA470089BA08 /* WaveAnim.cpp */,
 				33E887C815B9BA470089BA08 /* WaveAnim.h */,
 			);
@@ -5496,6 +5519,7 @@
 				33982DE616A89C0900C2ED49 /* WorldLuaCommon.h */,
 				33982DE716A89C0900C2ED49 /* WorldLuaCVars.cpp */,
 				33982DE816A89C0900C2ED49 /* WorldLuaGameNetwork.cpp */,
+				3380F7FF1840B2520073F0D8 /* WorldLuaStore.cpp */,
 				33982DE916A89C0900C2ED49 /* WorldLuaSystem.cpp */,
 				33982DEA16A89C0900C2ED49 /* WorldLuaWorld.cpp */,
 				33E8891415B9BA4A0089BA08 /* WorldSpawn.cpp */,
@@ -5769,6 +5793,7 @@
 				330A983815BC9ED3002A81EC /* ComponentManager.h in Headers */,
 				330A983915BC9ED3002A81EC /* ComponentManagerDef.h in Headers */,
 				330A983B15BC9ED3002A81EC /* Interface.h in Headers */,
+				3380F7FA1840B22E0073F0D8 /* Store.h in Headers */,
 				330A983C15BC9ED3002A81EC /* InterfaceDef.h in Headers */,
 				330A983E15BC9ED3002A81EC /* IntInterface.h in Headers */,
 				330A983F15BC9ED3002A81EC /* ReflectInterface.h in Headers */,
@@ -6434,6 +6459,7 @@
 				3343897C1724CB4F0048052A /* D_VtModel.h in Headers */,
 				334389881724CB5E0048052A /* T_VtModelPrecache.h in Headers */,
 				334389941724CBC00048052A /* HTTP.h in Headers */,
+				3380F7FB1840B22E0073F0D8 /* Store.h in Headers */,
 				334389A41724CDA60048052A /* VtMesh.h in Headers */,
 				33FBD05C173B071500043A8D /* Light.h in Headers */,
 				33FBD068173B073E00043A8D /* D_Light.h in Headers */,
@@ -6903,6 +6929,7 @@
 				33982DCE16A8960900C2ED49 /* DebugConsoleClient.h in Headers */,
 				33982DD116A8960900C2ED49 /* DebugConsoleCommon.h in Headers */,
 				33982DD716A8960900C2ED49 /* DebugConsoleServer.h in Headers */,
+				3380F7F81840B22E0073F0D8 /* Store.h in Headers */,
 				33982DDF16A8962F00C2ED49 /* EditorDebugConsoleMenuBuilder.h in Headers */,
 				33982DE116A8962F00C2ED49 /* EditorDebugConsoleWidget.h in Headers */,
 				33982DE516A8970500C2ED49 /* Console.h in Headers */,
@@ -7107,6 +7134,7 @@
 				33E885A315B9ACC60089BA08 /* ConstVolatileTraits.h in Headers */,
 				33E885A515B9ACC60089BA08 /* FunctionTraits.h in Headers */,
 				33E885A715B9ACC60089BA08 /* IntegerTraits.h in Headers */,
+				3380F7F91840B22E0073F0D8 /* Store.h in Headers */,
 				33E885A915B9ACC60089BA08 /* IsA.h in Headers */,
 				33E885AB15B9ACC60089BA08 /* IsClass.h in Headers */,
 				33E885AD15B9ACC60089BA08 /* IsInteger.h in Headers */,
@@ -7772,6 +7800,7 @@
 				3343897D1724CB4F0048052A /* D_VtModel.h in Headers */,
 				334389891724CB5E0048052A /* T_VtModelPrecache.h in Headers */,
 				334389951724CBC00048052A /* HTTP.h in Headers */,
+				3380F7FC1840B22E0073F0D8 /* Store.h in Headers */,
 				334389A51724CDA60048052A /* VtMesh.h in Headers */,
 				33FBD05D173B071500043A8D /* Light.h in Headers */,
 				33FBD069173B073E00043A8D /* D_Light.h in Headers */,
@@ -8007,6 +8036,7 @@
 				330A985715BC9EE7002A81EC /* Font.cpp in Sources */,
 				330A985C15BC9EED002A81EC /* File.cpp in Sources */,
 				330A986515BC9EF3002A81EC /* Endian.cpp in Sources */,
+				3380F8021840B2520073F0D8 /* WorldLuaStore.cpp in Sources */,
 				330A986B15BC9EF8002A81EC /* Lmp.cpp in Sources */,
 				330A986F15BC9EF8002A81EC /* ZLib.cpp in Sources */,
 				330A987715BC9F29002A81EC /* LWNodeList.cpp in Sources */,
@@ -8054,6 +8084,7 @@
 				330A98F415BC9F9B002A81EC /* D_SkModel.cpp in Sources */,
 				330A98F615BC9F9B002A81EC /* D_Sound.cpp in Sources */,
 				330A98F815BC9F9B002A81EC /* D_Typeface.cpp in Sources */,
+				3380F7F51840B22E0073F0D8 /* Store.cpp in Sources */,
 				330A98FA15BC9F9B002A81EC /* LuaTask.cpp in Sources */,
 				330A98FD15BC9FA0002A81EC /* T_MaterialPrecache.cpp in Sources */,
 				330A98FF15BC9FA0002A81EC /* T_MeshPrecache.cpp in Sources */,
@@ -8198,10 +8229,12 @@
 				337AE56115BF214F00AD1617 /* InterfaceReflectMap.cpp in Sources */,
 				337AE56215BF214F00AD1617 /* Bmp.cpp in Sources */,
 				337AE56315BF214F00AD1617 /* Dds.cpp in Sources */,
+				3380F8031840B2520073F0D8 /* WorldLuaStore.cpp in Sources */,
 				337AE56415BF214F00AD1617 /* ImageCodec.cpp in Sources */,
 				337AE56515BF214F00AD1617 /* Jpg.cpp in Sources */,
 				337AE56615BF214F00AD1617 /* Png.cpp in Sources */,
 				337AE56715BF214F00AD1617 /* Tga.cpp in Sources */,
+				3380F7F61840B22E0073F0D8 /* Store.cpp in Sources */,
 				337AE56815BF214F00AD1617 /* Font.cpp in Sources */,
 				337AE56915BF214F00AD1617 /* File.cpp in Sources */,
 				337AE56B15BF214F00AD1617 /* Endian.cpp in Sources */,
@@ -8570,6 +8603,7 @@
 				33E88B4F15B9BA4B0089BA08 /* PostProcess.cpp in Sources */,
 				33E88B5315B9BA4B0089BA08 /* ScreenOverlay.cpp in Sources */,
 				33E88B5D15B9BA4B0089BA08 /* World.cpp in Sources */,
+				3380F7F31840B22E0073F0D8 /* Store.cpp in Sources */,
 				33E88B6115B9BA4B0089BA08 /* WorldCinematics.cpp in Sources */,
 				33E88B6715B9BA4B0089BA08 /* WorldDraw.cpp in Sources */,
 				33E88B6D15B9BA4B0089BA08 /* WorldLua.cpp in Sources */,
@@ -8613,10 +8647,12 @@
 				33982DD416A8960900C2ED49 /* DebugConsoleServer.cpp in Sources */,
 				33982DDE16A8962F00C2ED49 /* EditorDebugConsoleMenuBuilder.cpp in Sources */,
 				33982DE016A8962F00C2ED49 /* EditorDebugConsoleWidget.cpp in Sources */,
+				3380F8001840B2520073F0D8 /* WorldLuaStore.cpp in Sources */,
 				33982DE416A8970500C2ED49 /* Console.cpp in Sources */,
 				33982DF016A89C0900C2ED49 /* WorldLuaCVars.cpp in Sources */,
 				33982DF516A89C0900C2ED49 /* WorldLuaGameNetwork.cpp in Sources */,
 				33982DFA16A89C0900C2ED49 /* WorldLuaSystem.cpp in Sources */,
+				3380F7FE1840B23B0073F0D8 /* StoreNull.cpp in Sources */,
 				33982DFF16A89C0900C2ED49 /* WorldLuaWorld.cpp in Sources */,
 				33982E0716A89C3B00C2ED49 /* CVars.cpp in Sources */,
 				33982E1316A89C8100C2ED49 /* GameCVars.cpp in Sources */,
@@ -8696,10 +8732,12 @@
 				33E8840815B9AB370089BA08 /* Utils.cpp in Sources */,
 				33E8840C15B9AB370089BA08 /* Zone.cpp in Sources */,
 				33E8844715B9AC7E0089BA08 /* LWNodeList.cpp in Sources */,
+				3380F8011840B2520073F0D8 /* WorldLuaStore.cpp in Sources */,
 				33E8844D15B9AC7E0089BA08 /* LWRedBlackNodeTree.cpp in Sources */,
 				33E8845315B9AC7E0089BA08 /* NodeList.cpp in Sources */,
 				33E8846515B9AC7E0089BA08 /* RedBlackNodeTree.cpp in Sources */,
 				33E8848515B9AC8D0089BA08 /* Lmp.cpp in Sources */,
+				3380F7F41840B22E0073F0D8 /* Store.cpp in Sources */,
 				33E8848D15B9AC8D0089BA08 /* ZLib.cpp in Sources */,
 				33E8849C15B9AC940089BA08 /* Endian.cpp in Sources */,
 				33E884AC15B9AC9E0089BA08 /* Font.cpp in Sources */,
@@ -8882,6 +8920,7 @@
 				33FA7EC91633CA28002603A5 /* Wave.cpp in Sources */,
 				33FA7ECA1633CA28002603A5 /* File.cpp in Sources */,
 				33FA7ECB1633CA28002603A5 /* String.cpp in Sources */,
+				3380F8041840B2520073F0D8 /* WorldLuaStore.cpp in Sources */,
 				33FA7ECC1633CA28002603A5 /* PosixFile.cpp in Sources */,
 				33FA7ECD1633CA28002603A5 /* PosixThread.cpp in Sources */,
 				33FA7ECE1633CA28002603A5 /* Assert.cpp in Sources */,
@@ -9003,6 +9042,7 @@
 				33FA7F441633CA28002603A5 /* MT_Spline.cpp in Sources */,
 				33FA7F451633CA28002603A5 /* PostProcess.cpp in Sources */,
 				33FA7F461633CA28002603A5 /* ScreenOverlay.cpp in Sources */,
+				3380F7F71840B22E0073F0D8 /* Store.cpp in Sources */,
 				33FA7F471633CA28002603A5 /* World.cpp in Sources */,
 				33FA7F481633CA28002603A5 /* WorldCinematics.cpp in Sources */,
 				33FA7F491633CA28002603A5 /* WorldDraw.cpp in Sources */,
