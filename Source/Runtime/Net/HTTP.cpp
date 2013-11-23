@@ -179,10 +179,51 @@ int HTTPGet::ThreadProc() {
 
 	int opt = 1;
 
-	if (connect(sd, (const sockaddr*)&m_hostAddr, sizeof(m_hostAddr))) {
+#if defined(RAD_OPT_WINX)
+	u_long argp = 1;
+	ioctlsocket(sd, FIONBIO, &argp);
+#else
+    fcntl(sock, F_SETFL, O_NONBLOCK);
+#endif
+
+	if (connect(sd, (const sockaddr*)&m_hostAddr, sizeof(m_hostAddr)) != -1) {
 		m_status = kHTTP_OpStatus_SocketError;
 		return 0;
 	}
+	
+	struct timeval  timeout;
+    timeout.tv_sec = 10;
+    timeout.tv_usec = 0;
+
+	fd_set set;
+	FD_ZERO(&set);
+	FD_SET((int)sd, &set);
+
+	int z = select(sd + 1, 0, &set, 0, &timeout);
+	if (z < 1) {
+		m_status = kHTTP_OpStatus_SocketError;
+		return 0;
+	}
+
+	U32 err;
+	int errSize = sizeof(err);
+
+	if (getsockopt(sd, SOL_SOCKET, SO_ERROR, (char*)&err, &errSize) != 0) {
+		m_status = kHTTP_OpStatus_SocketError;
+		return 0;
+	}
+
+	if (err != 0) {
+		m_status = kHTTP_OpStatus_SocketError;
+		return 0;
+	}
+
+#if defined(RAD_OPT_WINX)
+	argp = 0;
+	ioctlsocket(sd, FIONBIO, &argp);
+#else
+    fcntl(sock, F_SETFL, fcntl(sock, F_GETFL, 0) & ~O_NONBLOCK);
+#endif
 
 	String req("GET ");
 	req += m_resource;
