@@ -102,7 +102,7 @@ private:
 
 	void SubmitPayment(const PaymentRequest &req) {
 		char tid[256];
-		itoa(s_transId, tid, 10);
+		string::sprintf(tid, "%d", s_transId);
 		++s_transId;
 		TransactionNull::Ref t(new (ZWorld) TransactionNull(req.id, tid));
 		OnUpdateTransaction.Trigger(t);
