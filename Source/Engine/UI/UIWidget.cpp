@@ -880,7 +880,10 @@ bool Widget::HandleInputEvent(const InputEvent &e, const TouchState *touch, cons
 	if (!visible)
 		return false;
 
-	if ((m_capture || e.IsKeyboard() || InBounds(e)) && InputEventFilter(e, touch, is))
+	if (!m_capture && (!e.IsKeyboard() && !InBounds(e)))
+		return false;
+
+	if (InputEventFilter(e, touch, is))
 		return true;
 
 	for (Vec::const_reverse_iterator it = m_children.rbegin(); it != m_children.rend(); ++it) {
@@ -888,9 +891,6 @@ bool Widget::HandleInputEvent(const InputEvent &e, const TouchState *touch, cons
 		if (w->HandleInputEvent(e, touch, is))
 			return true;
 	}
-
-	if (!m_capture && (!e.IsKeyboard() && !InBounds(e)))
-		return false;
 
 	InputEvent local(e);
 	if (!local.IsKeyboard()) {
