@@ -122,6 +122,7 @@ struct PState {
 	float autoDecelDistance;
 	float motionScale;
 	float distanceMoved; // set by physics engine
+	float distanceRemaining; // from active move
 	MoveType mtype;
 	SolidType stype;
 	OccupantType otype;

@@ -62,15 +62,24 @@ void Entity::Tick_MT_Floor(
 	if (moveLen < 0.01f) {
 		m_ps.distanceMoved = 0.f;
 		SeekAngles(dt);
+
+		// move completely to a waypoint
+		if (m_ps.flags&kPhysicsFlag_Friction) {
+			if (m_ps.activeMove && (m_ps.distanceRemaining < m_ps.autoDecelDistance)) {
+				// clamp us to a waypoint if we are headed to one
+				m_ps.activeMove->ClampToEnd(m_ps.moveState, false);
+				m_ps.activeMove.reset();
+			}
+		}
+
 		Move();
 		return;
 	}
 
-	float distanceRemaining;
 	StringVec events;
 	String moveAnim;
 
-	m_ps.distanceMoved = m_ps.activeMove->Move(m_ps.moveState, moveLen, distanceRemaining, events, moveAnim);
+	m_ps.distanceMoved = m_ps.activeMove->Move(m_ps.moveState, moveLen, m_ps.distanceRemaining, events, moveAnim);
 	m_ps.origin = m_ps.moveState.pos.pos.get() - Vec3(0, 0, m_ps.bbox.Mins()[2]); // put bbox on floor.
 
 	if (!events.empty()) {
@@ -80,12 +89,12 @@ void Entity::Tick_MT_Floor(
 		}
 	}
 
-	if (distanceRemaining < m_ps.autoDecelDistance) {
+	if (m_ps.distanceRemaining < m_ps.autoDecelDistance) {
 		m_ps.flags |= kPhysicsFlag_Friction;
 	}
 
-	if (distanceRemaining < 1.f) {
-		m_ps.activeMove->ClampToEnd(m_ps.moveState);
+	if (m_ps.distanceRemaining < 1.f) {
+		m_ps.activeMove->ClampToEnd(m_ps.moveState, true);
 		m_ps.activeMove.reset(); // done with this move.
 
 		if (PushEntityCall("OnFloorMoveComplete")) {
@@ -133,7 +142,7 @@ void Entity::CustomMoveComplete() {
 		StringVec events;
 		if (m_ps.activeMove->NextStep(m_ps.moveState, events)) {
 			// move is complete
-			m_ps.activeMove->ClampToEnd(m_ps.moveState);
+			m_ps.activeMove->ClampToEnd(m_ps.moveState, true);
 			m_ps.activeMove.reset(); // done with this move.
 
 			if (PushEntityCall("OnFloorMoveComplete")) {

@@ -145,7 +145,7 @@ public:
 	RAD_DECLARE_READONLY_PROPERTY(FloorMove, route, const Route*);
 
 	void Merge(const Ref &old, State &state);
-	void ClampToEnd(State &state);
+	bool ClampToEnd(State &state, bool posUpdate);
 
 private:
 

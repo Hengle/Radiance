@@ -219,7 +219,7 @@ void FloorMove::Merge(const Ref &old, State &state) {
 	}
 }
 
-void FloorMove::ClampToEnd(State &state) {
+bool FloorMove::ClampToEnd(State &state, bool posUpdate) {
 	// this only applies to waypoint moves
 	if (state.m_stepIdx < (int)m_route.steps->size()) {
 		const Step &curStep = m_route.steps[state.m_stepIdx];
@@ -227,13 +227,22 @@ void FloorMove::ClampToEnd(State &state) {
 			curStep.waypoints[1] != -1) {
 			if (state.m_stepIdx == (int)(m_route.steps->size()-1)) {
 				// last step in move.
-				state.pos.m_waypoint = curStep.waypoints[1];
-				state.pos.m_nextWaypoint = -1;
-				state.pos.m_floor = curStep.floors[1];
-				curStep.path.Eval(1.f, state.pos.m_pos, &state.facing);
+				if ((curStep.floors[1] == -1) || posUpdate) {
+					state.pos.m_waypoint = curStep.waypoints[1];
+					state.pos.m_nextWaypoint = -1;
+					state.pos.m_floor = curStep.floors[1];
+					
+					if (posUpdate) {
+						curStep.path.Eval(1.f, state.pos.m_pos, &state.facing);
+					}
+
+					return true;
+				}
 			}
 		}
 	}
+
+	return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
