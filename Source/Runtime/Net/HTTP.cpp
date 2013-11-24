@@ -7,6 +7,9 @@
 
 #include RADPCH
 #include "HTTP.h"
+#if !defined(RAD_OPT_WINX)
+#include <fcntl.h>
+#endif
 
 namespace net {
 
@@ -183,7 +186,7 @@ int HTTPGet::ThreadProc() {
 	u_long argp = 1;
 	ioctlsocket(sd, FIONBIO, &argp);
 #else
-    fcntl(sock, F_SETFL, O_NONBLOCK);
+    fcntl(sd, F_SETFL, O_NONBLOCK);
 #endif
 
 	if (connect(sd, (const sockaddr*)&m_hostAddr, sizeof(m_hostAddr)) != -1) {
@@ -206,7 +209,11 @@ int HTTPGet::ThreadProc() {
 	}
 
 	U32 err;
+#if defined(RAD_OPT_WINX)
 	int errSize = sizeof(err);
+#else
+	socklen_t errSize = sizeof(err);
+#endif
 
 	if (getsockopt(sd, SOL_SOCKET, SO_ERROR, (char*)&err, &errSize) != 0) {
 		m_status = kHTTP_OpStatus_SocketError;
@@ -222,7 +229,7 @@ int HTTPGet::ThreadProc() {
 	argp = 0;
 	ioctlsocket(sd, FIONBIO, &argp);
 #else
-    fcntl(sock, F_SETFL, fcntl(sock, F_GETFL, 0) & ~O_NONBLOCK);
+    fcntl(sd, F_SETFL, fcntl(sd, F_GETFL, 0) & ~O_NONBLOCK);
 #endif
 
 	String req("GET ");
