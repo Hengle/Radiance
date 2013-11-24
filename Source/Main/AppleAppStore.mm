@@ -298,7 +298,10 @@ void AppStoreTransaction::Finish() {
 String AppStoreTransaction::GetErrorMessage() const {
 	String err;
 	if (m_transaction.transactionState == SKPaymentTransactionStateFailed) {
-		err = [[m_transaction.error localizedFailureReason] UTF8String];
+		const char *sz = [[m_transaction.error localizedFailureReason] UTF8String];
+		if (sz == 0)
+			sz = [[m_transaction.error localizedDescription] UTF8String];
+		err = sz ? sz : "Unkown Error";
 	}
 	return err;
 }
