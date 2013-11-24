@@ -96,7 +96,7 @@ static GameCenter *s_gameCenter = 0;
 
 + (void) Create {
 
-#if !defined(RAD_OPT_PC_TOOLS) && (defined(RAD_OPT_SHIP) || defined(RAD_OPT_IOS))
+#if defined(RAD_TARGET_GOLDEN) || defined(RAD_OPT_IOS)
 	if (!s_gameCenter) {
 		// make sure game center is actually available.
 		if (NSClassFromString(@"GKLocalPlayer")) {
@@ -563,9 +563,11 @@ const LocalPlayer::Ref &GCNetwork::RAD_IMPLEMENT_GET(localPlayer) {
 	return m_localPlayer;
 }
 
+namespace gn {
 GameNetwork::Ref GameNetwork::Create(GameNetworkEventQueue *queue) {
 	GameNetwork::Ref r;
 	if (s_gameCenter)
 		r.reset(new GCNetwork(queue));
 	return r;
+}
 }

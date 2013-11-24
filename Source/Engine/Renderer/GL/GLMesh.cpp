@@ -66,7 +66,8 @@ GLMesh::StreamPtr::Ref GLMesh::MapIndices(StreamUsage _usage, int elemSize, int 
 	GLenum type = (elemSize == 2) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
 	// don't accidentally record this into an active VAO
-	gls.BindVertexArray(r::GLVertexArrayRef());
+	if (gl.vbos&&gl.vaos)
+		gls.BindVertexArray(r::GLVertexArrayRef());
 
 	if (m_i.vb && (m_i.count == count) && (m_i.usage == usage))
 		return m_i.vb->Map();

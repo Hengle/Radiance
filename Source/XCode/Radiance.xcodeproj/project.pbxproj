@@ -472,7 +472,6 @@
 		3347717917A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3347717617A1D3E000D875F0 /* WorldDrawFog.cpp */; };
 		3347717A17A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3347717617A1D3E000D875F0 /* WorldDrawFog.cpp */; };
 		3347717B17A1D3E000D875F0 /* WorldDrawFog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3347717617A1D3E000D875F0 /* WorldDrawFog.cpp */; };
-		336836D515D43BA800EE9472 /* GameNetworkNull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 336836D415D43BA800EE9472 /* GameNetworkNull.cpp */; };
 		3377F13917B9D3DE00D3C519 /* E_TouchVolume.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3377F13717B9D3DE00D3C519 /* E_TouchVolume.cpp */; };
 		3377F13A17B9D3DE00D3C519 /* E_TouchVolume.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3377F13717B9D3DE00D3C519 /* E_TouchVolume.cpp */; };
 		3377F13B17B9D3DE00D3C519 /* E_TouchVolume.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3377F13717B9D3DE00D3C519 /* E_TouchVolume.cpp */; };
@@ -3260,7 +3259,6 @@
 		3343899A1724CDA60048052A /* VtMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VtMesh.cpp; sourceTree = "<group>"; };
 		3343899B1724CDA60048052A /* VtMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VtMesh.h; sourceTree = "<group>"; };
 		3347717617A1D3E000D875F0 /* WorldDrawFog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldDrawFog.cpp; sourceTree = "<group>"; };
-		336836D415D43BA800EE9472 /* GameNetworkNull.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameNetworkNull.cpp; sourceTree = "<group>"; };
 		3377F13717B9D3DE00D3C519 /* E_TouchVolume.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = E_TouchVolume.cpp; sourceTree = "<group>"; };
 		3377F13817B9D3DE00D3C519 /* E_TouchVolume.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = E_TouchVolume.h; sourceTree = "<group>"; };
 		337AE54C15BF20D300AD1617 /* RadianceGoldenDebugiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceGoldenDebugiOS.xcconfig; path = XCConfig/RadianceGoldenDebugiOS.xcconfig; sourceTree = "<group>"; };
@@ -5070,7 +5068,6 @@
 				33E887BD15B9BA470089BA08 /* GameNetwork.cpp */,
 				33E887BE15B9BA470089BA08 /* GameNetwork.h */,
 				338A45FC15DE8B9500B0B9B7 /* GameNetworkDef.h */,
-				336836D415D43BA800EE9472 /* GameNetworkNull.cpp */,
 				33E887BF15B9BA470089BA08 /* GameNetworkDef.h */,
 				33E887C115B9BA470089BA08 /* Gestures.cpp */,
 				33E887C215B9BA470089BA08 /* GSLoadMap.cpp */,
@@ -8619,7 +8616,6 @@
 				33836C3E15B9CF590030EAEC /* Persistence.cpp in Sources */,
 				33836C4215B9CF590030EAEC /* StringTable.cpp in Sources */,
 				33836C4A15B9CF590030EAEC /* Zones.cpp in Sources */,
-				336836D515D43BA800EE9472 /* GameNetworkNull.cpp in Sources */,
 				33DB15771627E31F00963A33 /* SceneFile.cpp in Sources */,
 				33DB15801627E37B00963A33 /* Tokenizer.cpp in Sources */,
 				33DB158A1627E4BD00963A33 /* DrawModel.cpp in Sources */,
