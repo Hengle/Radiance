@@ -393,7 +393,10 @@ iap::Transaction::State AppStoreTransaction::RAD_IMPLEMENT_GET(state) {
 - (void)paymentQueue:(SKPaymentQueue*)queue restoreCompletedTransactionsFailedWithError:(NSError*)error {
 	iap::RestorePurchasesCompleteData data;
 	data.error = true;
-	data.msg = [[error localizedFailureReason] UTF8String];
+	const char *sz = [[error localizedFailureReason] UTF8String];
+	if (sz == 0)
+		sz = [[error localizedDescription] UTF8String];
+	data.msg = sz ? sz : "Unkown Error";
 }
 
 - (void)paymentQueue:(SKPaymentQueue*)queue updatedDownloads:(NSArray*)downloads {
