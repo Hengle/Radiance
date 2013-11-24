@@ -111,7 +111,7 @@ public:
 	void OnShowLeaderboard(bool show);
 	void OnShowAchievements(bool show);
 
-	void OnProductsResponse(const iap::Product::Vec &products);
+	void OnProductInfoResponse(const iap::Product::Vec &products);
 	void OnApplicationValidateResult(iap::ResponseCode code);
 	void OnProductValidateResult(const iap::ProductValidationData &data);
 	void OnUpdateTransaction(const iap::TransactionRef &transaction);

@@ -67,9 +67,9 @@ void Store::BindEventQueue(StoreEventQueue &queue) {
 }
 
 void StoreEventQueue::Bind(Store &store) {
-	store.OnProductsResponse.Bind<StoreEventQueue>(
+	store.OnProductInfoResponse.Bind<StoreEventQueue>(
 		this,
-		&StoreEventQueue::OnProductsResponse,
+		&StoreEventQueue::OnProductInfoResponse,
 		ManualReleaseEventTag
 	);
 	
@@ -111,8 +111,8 @@ void StoreEventQueue::Dispatch(world::World &target) {
 	}
 }
 
-void StoreEventQueue::OnProductsResponse(const Product::Vec &products) {
-	PostEvent(new ProductsResponseEvent(products));
+void StoreEventQueue::OnProductInfoResponse(const Product::Vec &products) {
+	PostEvent(new ProductInfoResponseEvent(products));
 }
 
 void StoreEventQueue::OnApplicationValidateResult(const ResponseCode &code) {
@@ -136,8 +136,8 @@ void StoreEventQueue::PostEvent(Event *e) {
 	m_events.push_back(Event::Ref(e));
 }
 
-void StoreEventQueue::ProductsResponseEvent::Dispatch(world::World &target) {
-	target.OnProductsResponse(m_products);
+void StoreEventQueue::ProductInfoResponseEvent::Dispatch(world::World &target) {
+	target.OnProductInfoResponse(m_products);
 }
 
 void StoreEventQueue::ApplicationValidateResultEvent::Dispatch(world::World &target) {

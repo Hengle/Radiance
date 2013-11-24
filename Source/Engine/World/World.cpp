@@ -519,8 +519,8 @@ void World::OnShowAchievements(bool show) {
 	m_lua->OnShowAchievements(show);
 }
 
-void World::OnProductsResponse(const iap::Product::Vec &products) {
-	m_lua->OnProductsResponse(products);
+void World::OnProductInfoResponse(const iap::Product::Vec &products) {
+	m_lua->OnProductInfoResponse(products);
 }
 
 void World::OnApplicationValidateResult(iap::ResponseCode code) {

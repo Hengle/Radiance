@@ -220,7 +220,7 @@ bool WorldLua::Init() {
 		{ "Enabled", lua_StoreEnabled },
 		{ "AppGUID", lua_StoreAppGUID },
 		{ "RestoreProducts", lua_StoreRestoreProducts },
-		{ "RequestProducts", lua_StoreRequestProducts },
+		{ "RequestProductInfo", lua_StoreRequestProductInfo },
 		{ "CreatePaymentRequest", lua_StoreCreatePaymentRequest },
 		{ "RequestValidateApplication", lua_StoreRequestValidateApplication },
 		{ "RequestValidateProducts", lua_StoreRequestValidateProducts },

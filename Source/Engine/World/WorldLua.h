@@ -69,7 +69,7 @@ public:
 	void OnShowLeaderboard(bool show);
 	void OnShowAchievements(bool show);
 
-	void OnProductsResponse(const iap::Product::Vec &products);
+	void OnProductInfoResponse(const iap::Product::Vec &products);
 	void OnApplicationValidateResult(iap::ResponseCode code);
 	void OnProductValidateResult(const iap::ProductValidationData &data);
 	void OnUpdateTransaction(const iap::TransactionRef &transaction);
@@ -301,7 +301,7 @@ private:
 	static int lua_StoreEnabled(lua_State *L);
 	static int lua_StoreAppGUID(lua_State *L);
 	static int lua_StoreRestoreProducts(lua_State *L);
-	static int lua_StoreRequestProducts(lua_State *L);
+	static int lua_StoreRequestProductInfo(lua_State *L);
 	static int lua_StoreCreatePaymentRequest(lua_State *L);
 	static int lua_StoreRequestValidateApplication(lua_State *L);
 	static int lua_StoreRequestValidateProducts(lua_State *L);
