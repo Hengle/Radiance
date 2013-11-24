@@ -36,7 +36,6 @@ struct Product {
 
 	String id;
 	String price;
-	int usPrice; // price in US dollars.
 };
 
 struct ProductValidationData {

@@ -57,9 +57,9 @@ public:
 			BindEventQueue(*queue);
 	}
 	
-	virtual void RequestProducts() {
+	virtual void RequestProductInfo(const StringVec &ids) {
 		Product::Vec null; // no products
-		OnProductsResponse.Trigger(null);
+		OnProductInfoResponse.Trigger(null);
 	}
 
 	virtual PaymentRequestRef CreatePaymentRequest(const char *id, int quantity) {

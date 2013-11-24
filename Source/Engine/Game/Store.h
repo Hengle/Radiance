@@ -28,7 +28,7 @@ public:
 
 	static Ref Create(StoreEventQueue *queue);
 
-	virtual void RequestProducts() = 0;
+	virtual void RequestProductInfo(const StringVec &ids) = 0;
 	virtual PaymentRequestRef CreatePaymentRequest(const char *id, int quantity) = 0;
 
 	virtual void RestoreProducts() = 0;
@@ -36,8 +36,8 @@ public:
 	virtual void RequestValidateApplication() = 0;
 	virtual void RequestValidateProducts(const StringVec &ids) = 0;
 
-	typedef Event<Product::Vec, EventNoAccess> ProductsResponseEvent;
-	ProductsResponseEvent OnProductsResponse;
+	typedef Event<Product::Vec, EventNoAccess> ProductInfoResponseEvent;
+	ProductInfoResponseEvent OnProductInfoResponse;
 
 	typedef Event<ResponseCode, EventNoAccess> ApplicationValidateResultEvent;
 	ApplicationValidateResultEvent OnApplicationValidateResult;
@@ -162,7 +162,7 @@ private:
 
 	void Bind(Store &store);
 
-	void OnProductsResponse(const Product::Vec &products);
+	void OnProductInfoResponse(const Product::Vec &products);
 	void OnApplicationValidateResult(const ResponseCode &code);
 	void OnProductValidateResult(const ProductValidationData &data);
 	void OnUpdateTransaction(const TransactionRef &transaction);
@@ -181,9 +181,9 @@ private:
 		virtual void Dispatch(world::World &target) = 0;
 	};
 
-	class ProductsResponseEvent : public Event {
+	class ProductInfoResponseEvent : public Event {
 	public:
-		ProductsResponseEvent(const Product::Vec &products) : m_products(products) {}
+		ProductInfoResponseEvent(const Product::Vec &products) : m_products(products) {}
 		virtual void Dispatch(world::World &target);
 	private:
 		Product::Vec m_products;

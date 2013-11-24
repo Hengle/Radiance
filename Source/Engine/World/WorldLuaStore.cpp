@@ -12,10 +12,10 @@
 
 namespace world {
 
-void WorldLua::OnProductsResponse(const iap::Product::Vec &products) {
+void WorldLua::OnProductInfoResponse(const iap::Product::Vec &products) {
 	if (products.empty())
 		return;
-	if (!PushGlobalCall("Store.OnProductsResponse"))
+	if (!PushGlobalCall("Store.OnProductInfoResponse"))
 		return;
 
 	lua_State *L = m_L->L;
@@ -29,12 +29,10 @@ void WorldLua::OnProductsResponse(const iap::Product::Vec &products) {
 		lua_setfield(L, -2, "id");
 		lua_pushstring(L, p.price.c_str);
 		lua_setfield(L, -2, "price");
-		lua_pushinteger(L, p.usPrice);
-		lua_setfield(L, -2, "usPrice");
 		lua_settable(L, -3);
 	}
 
-	Call("Store.OnProductsResponse", 1, 0, 0);
+	Call("Store.OnProductInfoResponse", 1, 0, 0);
 }
 
 void WorldLua::OnApplicationValidateResult(iap::ResponseCode code) {
@@ -103,11 +101,23 @@ int WorldLua::lua_StoreRestoreProducts(lua_State *L) {
 	return 0;
 }
 
-int WorldLua::lua_StoreRequestProducts(lua_State *L) {
+int WorldLua::lua_StoreRequestProductInfo(lua_State *L) {
 	LOAD_SELF
 	iap::Store *store = self->m_world->game->store;
-	if (store)
-		store->RequestProducts();
+	if (store) {
+		StringVec ids;
+		ids.reserve(8);
+
+		lua_pushnil(L);
+		while (lua_next(L, 1) != 0) {
+			ids.push_back(String(luaL_checkstring(L, -1)));
+			lua_pop(L, 1);
+		}
+
+		if (!ids.empty()) {
+			store->RequestProductInfo(ids);
+		}
+	}
 	return 0;
 }
 
@@ -149,7 +159,7 @@ int WorldLua::lua_StoreRequestValidateProducts(lua_State *L) {
 		ids.reserve(8);
 
 		lua_pushnil(L);
-		while (lua_next(L, -2) != 0) {
+		while (lua_next(L, 1) != 0) {
 			ids.push_back(String(luaL_checkstring(L, -1)));
 			lua_pop(L, 1);
 		}
