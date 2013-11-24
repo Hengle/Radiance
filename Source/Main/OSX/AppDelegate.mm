@@ -76,7 +76,7 @@ static int s_vkeys_en[256] = {
 @interface AppDelegate (Private)
 -(void)appMain;
 -(const char**)getArgs:(int&)argc;
--(void)freeArgs:(int)argc:(const char**)argv;
+-(void)freeArgs:(int)argc args:(const char**)argv;
 -(void)processEvents;
 -(void)dispatchEvent:(NSEvent*)event;
 -(void)handleKeyEvent:(NSEvent*)event;
@@ -191,7 +191,7 @@ static int s_vkeys_en[256] = {
 	return argv;
 }
 
-- (void)freeArgs: (int)argc: (const char **)argv {
+- (void)freeArgs: (int)argc args:(const char **)argv {
 	for (int i = 0; i < argc; ++i)
 		free((void*)argv[i]);
 }

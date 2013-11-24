@@ -13,8 +13,6 @@
 namespace world {
 
 void WorldLua::OnProductInfoResponse(const iap::Product::Vec &products) {
-	if (products.empty())
-		return;
 	if (!PushGlobalCall("Store.OnProductInfoResponse"))
 		return;
 
@@ -110,7 +108,8 @@ int WorldLua::lua_StoreRequestProductInfo(lua_State *L) {
 
 		lua_pushnil(L);
 		while (lua_next(L, 1) != 0) {
-			ids.push_back(String(luaL_checkstring(L, -1)));
+			const char *x = luaL_checkstring(L, -1);
+			ids.push_back(String(x));
 			lua_pop(L, 1);
 		}
 

@@ -106,7 +106,7 @@ class Transaction : public lua::SharedPtr {
 public:
 	typedef TransactionRef Ref;
 
-	Transaction(const char *productId, const char *transactionId) : m_productId(productId), m_transactionId(transactionId) {}
+	Transaction(const char *productId) : m_productId(productId) {}
 	virtual ~Transaction() {}
 
 	enum State {
@@ -120,7 +120,6 @@ public:
 	virtual String GetErrorMessage() const = 0;
 
 	RAD_DECLARE_READONLY_PROPERTY(Transaction, productId, const char*);
-	RAD_DECLARE_READONLY_PROPERTY(Transaction, transactionId, const char*);
 	RAD_DECLARE_READONLY_PROPERTY(Transaction, state, State);
 
 protected:
@@ -133,19 +132,13 @@ private:
 	static int lua_Finish(lua_State *L);
 	static int lua_GetErrorMessage(lua_State *L);
 	LUART_DECL_GET(ProductId);
-	LUART_DECL_GET(TransactionId);
 	LUART_DECL_GET(State);
 
 	RAD_DECLARE_GET(productId, const char*) {
 		return m_productId.c_str;
 	}
 
-	RAD_DECLARE_GET(transactionId, const char*) {
-		return m_transactionId.c_str;
-	}
-
 	String m_productId;
-	String m_transactionId;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -227,6 +220,6 @@ private:
 	Mutex m_cs;
 };
 
-};
+}
 
 #include <Runtime/PopPack.h>

@@ -28,7 +28,7 @@ AppDelegate *s_app;
 
 @interface AppDelegate (Private)
 -(const char**)getArgs:(int&)argc;
--(void)freeArgs:(int)argc:(const char**)argv;
+-(void)freeArgs:(int)argc args:(const char**)argv;
 - (bool)initGame;
 @end
 
@@ -219,7 +219,7 @@ AppDelegate *s_app;
 	return argv;
 }
 
-- (void)freeArgs: (int)argc: (const char **)argv {
+- (void)freeArgs: (int)argc args:(const char **)argv {
 	for (int i = 0; i < argc; ++i)
 		free((void*)argv[i]);
 }

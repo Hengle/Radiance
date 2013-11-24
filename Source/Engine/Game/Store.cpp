@@ -36,7 +36,6 @@ void Transaction::PushElements(lua_State *L) {
 	lua_pushcfunction(L, lua_GetErrorMessage);
 	lua_setfield(L, -2, "GetErrorMessage");
 	LUART_REGISTER_GET(L, ProductId);
-	LUART_REGISTER_GET(L, TransactionId);
 	LUART_REGISTER_GET(L, State);
 }
 
@@ -56,7 +55,6 @@ int Transaction::lua_GetErrorMessage(lua_State *L) {
 	return 0;
 }
 
-LUART_GET(Transaction, TransactionId, String, m_transactionId, Ref self = Get<Transaction>(L, "Transaction", 1, true))
 LUART_GET(Transaction, ProductId, String, m_productId, Ref self = Get<Transaction>(L, "Transaction", 1, true))
 LUART_GET(Transaction, State, int, state.get(), Ref self = Get<Transaction>(L, "Transaction", 1, true))
 

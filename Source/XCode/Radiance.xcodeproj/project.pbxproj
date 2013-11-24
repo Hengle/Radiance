@@ -991,12 +991,17 @@
 		3380F7FA1840B22E0073F0D8 /* Store.h in Headers */ = {isa = PBXBuildFile; fileRef = 3380F7F21840B22E0073F0D8 /* Store.h */; };
 		3380F7FB1840B22E0073F0D8 /* Store.h in Headers */ = {isa = PBXBuildFile; fileRef = 3380F7F21840B22E0073F0D8 /* Store.h */; };
 		3380F7FC1840B22E0073F0D8 /* Store.h in Headers */ = {isa = PBXBuildFile; fileRef = 3380F7F21840B22E0073F0D8 /* Store.h */; };
-		3380F7FE1840B23B0073F0D8 /* StoreNull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3380F7FD1840B23B0073F0D8 /* StoreNull.cpp */; };
 		3380F8001840B2520073F0D8 /* WorldLuaStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3380F7FF1840B2520073F0D8 /* WorldLuaStore.cpp */; };
 		3380F8011840B2520073F0D8 /* WorldLuaStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3380F7FF1840B2520073F0D8 /* WorldLuaStore.cpp */; };
 		3380F8021840B2520073F0D8 /* WorldLuaStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3380F7FF1840B2520073F0D8 /* WorldLuaStore.cpp */; };
 		3380F8031840B2520073F0D8 /* WorldLuaStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3380F7FF1840B2520073F0D8 /* WorldLuaStore.cpp */; };
 		3380F8041840B2520073F0D8 /* WorldLuaStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3380F7FF1840B2520073F0D8 /* WorldLuaStore.cpp */; };
+		3380F8171841C53A0073F0D8 /* StoreDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 3380F8161841C53A0073F0D8 /* StoreDef.h */; };
+		3380F8181841C53A0073F0D8 /* StoreDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 3380F8161841C53A0073F0D8 /* StoreDef.h */; };
+		3380F8191841C53A0073F0D8 /* StoreDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 3380F8161841C53A0073F0D8 /* StoreDef.h */; };
+		3380F81A1841C53A0073F0D8 /* StoreDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 3380F8161841C53A0073F0D8 /* StoreDef.h */; };
+		3380F81B1841C53A0073F0D8 /* StoreDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 3380F8161841C53A0073F0D8 /* StoreDef.h */; };
+		3380F8291841FFDF0073F0D8 /* StoreNull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3380F8281841FFDF0073F0D8 /* StoreNull.cpp */; };
 		33836C1A15B9CF590030EAEC /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33836C0015B9CF580030EAEC /* App.cpp */; };
 		33836C1B15B9CF590030EAEC /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33836C0015B9CF580030EAEC /* App.cpp */; };
 		33836C1C15B9CF590030EAEC /* App.h in Headers */ = {isa = PBXBuildFile; fileRef = 33836C0115B9CF580030EAEC /* App.h */; };
@@ -3267,8 +3272,9 @@
 		337AE54F15BF20D300AD1617 /* RadianceGoldenReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = RadianceGoldenReleaseOSX.xcconfig; path = XCConfig/RadianceGoldenReleaseOSX.xcconfig; sourceTree = "<group>"; };
 		3380F7F11840B22E0073F0D8 /* Store.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Store.cpp; sourceTree = "<group>"; };
 		3380F7F21840B22E0073F0D8 /* Store.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Store.h; sourceTree = "<group>"; };
-		3380F7FD1840B23B0073F0D8 /* StoreNull.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StoreNull.cpp; sourceTree = "<group>"; };
 		3380F7FF1840B2520073F0D8 /* WorldLuaStore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldLuaStore.cpp; sourceTree = "<group>"; };
+		3380F8161841C53A0073F0D8 /* StoreDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StoreDef.h; sourceTree = "<group>"; };
+		3380F8281841FFDF0073F0D8 /* StoreNull.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StoreNull.cpp; sourceTree = "<group>"; };
 		33836C0015B9CF580030EAEC /* App.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = App.cpp; path = ../Engine/App.cpp; sourceTree = "<group>"; };
 		33836C0115B9CF580030EAEC /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = App.h; path = ../Engine/App.h; sourceTree = "<group>"; };
 		33836C0215B9CF580030EAEC /* Camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Camera.cpp; path = ../Engine/Camera.cpp; sourceTree = "<group>"; };
@@ -5077,7 +5083,8 @@
 				33E887C615B9BA470089BA08 /* GSPriority.h */,
 				3380F7F11840B22E0073F0D8 /* Store.cpp */,
 				3380F7F21840B22E0073F0D8 /* Store.h */,
-				3380F7FD1840B23B0073F0D8 /* StoreNull.cpp */,
+				3380F8161841C53A0073F0D8 /* StoreDef.h */,
+				3380F8281841FFDF0073F0D8 /* StoreNull.cpp */,
 				33E887C715B9BA470089BA08 /* WaveAnim.cpp */,
 				33E887C815B9BA470089BA08 /* WaveAnim.h */,
 			);
@@ -5994,6 +6001,7 @@
 				330A999915BCA0DD002A81EC /* MaterialParser.h in Headers */,
 				330A999B15BCA0DD002A81EC /* MeshBundle.h in Headers */,
 				330A999D15BCA0DD002A81EC /* MeshMaterialLoader.h in Headers */,
+				3380F8191841C53A0073F0D8 /* StoreDef.h in Headers */,
 				330A999F15BCA0DD002A81EC /* MeshParser.h in Headers */,
 				330A99A115BCA0DD002A81EC /* MusicParser.h in Headers */,
 				330A99A315BCA0EE002A81EC /* SkAnimSetParser.h in Headers */,
@@ -6312,6 +6320,7 @@
 				337AE6F015BF214F00AD1617 /* BSPFile.h in Headers */,
 				337AE6F115BF214F00AD1617 /* Entity.h in Headers */,
 				337AE6F215BF214F00AD1617 /* EntityDef.h in Headers */,
+				3380F81A1841C53A0073F0D8 /* StoreDef.h in Headers */,
 				337AE6F315BF214F00AD1617 /* Event.h in Headers */,
 				337AE6F415BF214F00AD1617 /* Keys.h in Headers */,
 				337AE6F515BF214F00AD1617 /* E_Exports.h in Headers */,
@@ -6698,6 +6707,7 @@
 				33E886C315B9AD660089BA08 /* ReflectMap.h in Headers */,
 				33E886C515B9AD660089BA08 /* Runtime.h in Headers */,
 				33E886C715B9AD660089BA08 /* SharedLibrary.h in Headers */,
+				3380F8171841C53A0073F0D8 /* StoreDef.h in Headers */,
 				33E886C915B9AD660089BA08 /* Stream.h in Headers */,
 				33E886CB15B9AD660089BA08 /* StreamDef.h in Headers */,
 				33E886CD15B9AD660089BA08 /* String.h in Headers */,
@@ -7335,6 +7345,7 @@
 				33836C2115B9CF590030EAEC /* Camera.h in Headers */,
 				33836C2515B9CF590030EAEC /* ComponentExports.h in Headers */,
 				33836C2915B9CF590030EAEC /* COut.h in Headers */,
+				3380F8181841C53A0073F0D8 /* StoreDef.h in Headers */,
 				33836C2D15B9CF590030EAEC /* Engine.h in Headers */,
 				33836C3115B9CF590030EAEC /* Input.h in Headers */,
 				33836C3315B9CF590030EAEC /* KeyCodes.h in Headers */,
@@ -7653,6 +7664,7 @@
 				33FA805A1633CA28002603A5 /* SoundParser.h in Headers */,
 				33FA805B1633CA28002603A5 /* StringTableParser.h in Headers */,
 				33FA805C1633CA28002603A5 /* TextureParser.h in Headers */,
+				3380F81B1841C53A0073F0D8 /* StoreDef.h in Headers */,
 				33FA805D1633CA28002603A5 /* TypefaceParser.h in Headers */,
 				33FA805E1633CA28002603A5 /* Game.h in Headers */,
 				33FA805F1633CA28002603A5 /* GameNetwork.h in Headers */,
@@ -8648,7 +8660,7 @@
 				33982DF016A89C0900C2ED49 /* WorldLuaCVars.cpp in Sources */,
 				33982DF516A89C0900C2ED49 /* WorldLuaGameNetwork.cpp in Sources */,
 				33982DFA16A89C0900C2ED49 /* WorldLuaSystem.cpp in Sources */,
-				3380F7FE1840B23B0073F0D8 /* StoreNull.cpp in Sources */,
+				3380F8291841FFDF0073F0D8 /* StoreNull.cpp in Sources */,
 				33982DFF16A89C0900C2ED49 /* WorldLuaWorld.cpp in Sources */,
 				33982E0716A89C3B00C2ED49 /* CVars.cpp in Sources */,
 				33982E1316A89C8100C2ED49 /* GameCVars.cpp in Sources */,
