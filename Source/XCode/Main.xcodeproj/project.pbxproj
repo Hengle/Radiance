@@ -71,10 +71,7 @@
 		3380F805184192F10073F0D8 /* AppleGameCenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336836CA15D41E8D00EE9472 /* AppleGameCenter.mm */; };
 		3380F80E1841956A0073F0D8 /* AppleAppStore.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3380F8071841956A0073F0D8 /* AppleAppStore.mm */; };
 		3380F8111841956A0073F0D8 /* AppleAppStore.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3380F8071841956A0073F0D8 /* AppleAppStore.mm */; };
-		3380F81E1841C7630073F0D8 /* AppleKeyChain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3380F81C1841C7630073F0D8 /* AppleKeyChain.mm */; };
 		3380F81F1841C7630073F0D8 /* AppleKeyChain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3380F81C1841C7630073F0D8 /* AppleKeyChain.mm */; };
-		3380F8201841C7630073F0D8 /* AppleKeyChain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3380F81C1841C7630073F0D8 /* AppleKeyChain.mm */; };
-		3380F8211841C7630073F0D8 /* AppleKeyChain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3380F81C1841C7630073F0D8 /* AppleKeyChain.mm */; };
 		3380F8221841C7630073F0D8 /* AppleKeyChain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3380F81C1841C7630073F0D8 /* AppleKeyChain.mm */; };
 		3380F8241841C7630073F0D8 /* AppleKeyChain.h in Headers */ = {isa = PBXBuildFile; fileRef = 3380F81D1841C7630073F0D8 /* AppleKeyChain.h */; };
 		3380F8271841C7630073F0D8 /* AppleKeyChain.h in Headers */ = {isa = PBXBuildFile; fileRef = 3380F81D1841C7630073F0D8 /* AppleKeyChain.h */; };
@@ -575,7 +572,6 @@
 			files = (
 				331949F215BA34BC00458F43 /* NativeApp.cpp in Sources */,
 				331949F715BA34BC00458F43 /* null_CloudStorage.cpp in Sources */,
-				3380F81E1841C7630073F0D8 /* AppleKeyChain.mm in Sources */,
 				336836CE15D41E8D00EE9472 /* AppleGameCenter.mm in Sources */,
 				33FA7E1616339AE8002603A5 /* AppleHelpers.mm in Sources */,
 				3321A9F816FBBB2B00E2102F /* AppDelegate.mm in Sources */,
@@ -614,7 +610,6 @@
 				33FA81531633DD35002603A5 /* AppleHelpers.mm in Sources */,
 				33FA82A3163542E0002603A5 /* AppDelegate.mm in Sources */,
 				338BD50A1638DDD800468A4D /* OSXMain.mm in Sources */,
-				3380F8211841C7630073F0D8 /* AppleKeyChain.mm in Sources */,
 				3380F805184192F10073F0D8 /* AppleGameCenter.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -625,7 +620,6 @@
 			files = (
 				337AE77015BF217000AD1617 /* OSXNativeApp.mm in Sources */,
 				337AE77115BF217000AD1617 /* NativeApp.cpp in Sources */,
-				3380F8201841C7630073F0D8 /* AppleKeyChain.mm in Sources */,
 				337AE77215BF217000AD1617 /* null_CloudStorage.cpp in Sources */,
 				337AE77315BF217000AD1617 /* OSXMain.mm in Sources */,
 				337AE77415BF217000AD1617 /* AppDelegate.mm in Sources */,
