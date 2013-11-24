@@ -14,7 +14,7 @@ namespace iap {
 
 class TransactionNull : public Transaction {
 public:
-	TransactionNull(const char *productId, const char *transactionId) : Transaction(productId, transactionId) {}
+	TransactionNull(const char *productId) : Transaction(productId) {}
 
 	virtual void Finish() {}
 
@@ -101,10 +101,7 @@ private:
 	friend class PaymentRequestNull;
 
 	void SubmitPayment(const PaymentRequest &req) {
-		char tid[256];
-		string::sprintf(tid, "%d", s_transId);
-		++s_transId;
-		TransactionNull::Ref t(new (ZWorld) TransactionNull(req.id, tid));
+		TransactionNull::Ref t(new (ZWorld) TransactionNull(req.id));
 		OnUpdateTransaction.Trigger(t);
 	}
 
