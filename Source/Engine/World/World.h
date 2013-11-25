@@ -117,6 +117,8 @@ public:
 	void OnUpdateTransaction(const iap::TransactionRef &transaction);
 	void OnRestoreProductsComplete(const iap::RestorePurchasesCompleteData &data);
 
+	void MovieFinished();
+
 	ZoneTagRef ZoneTag(int id) const;
 
 	void SetAreaportalState(int areaportalNum, bool open, bool relinkOccupants);

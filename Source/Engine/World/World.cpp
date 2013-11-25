@@ -539,6 +539,10 @@ void World::OnRestoreProductsComplete(const iap::RestorePurchasesCompleteData &d
 	m_lua->OnRestoreProductsComplete(data);
 }
 
+void World::MovieFinished() {
+	m_lua->MovieFinished();
+}
+
 Entity::Vec World::FindEntityClass(const char *classname) const {
 	RAD_ASSERT(classname);
 	String s(CStr(classname));

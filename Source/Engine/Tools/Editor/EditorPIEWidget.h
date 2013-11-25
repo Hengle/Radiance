@@ -30,6 +30,10 @@ public:
 		swapBuffers();
 	}
 
+	virtual void PlayFullscreenMovie(const char *path) {
+		m_game->MovieFinished();
+	}
+
 protected:
 
 	virtual void renderGL();

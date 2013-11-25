@@ -37,6 +37,10 @@ public:
 	virtual void Finalize();
 	virtual float Tick();
 
+#if !defined(RAD_OPT_PC_TOOLS)
+	virtual void MovieFinished();
+#endif
+
 	static App *Get(int argc = 0, const char **argv = 0);
 	static void DestroyInstance();
 	static void DumpMemStats(int level);
@@ -49,7 +53,7 @@ public:
 	
 	void ClearFrameHistory();
 
-#if defined(RAD_TARGET_GOLDEN) || defined(RAD_OPT_IOS)
+#if !defined(RAD_OPT_PC_TOOLS)
 	RAD_DECLARE_READONLY_PROPERTY(App, game, Game*);
 #endif
 	RAD_DECLARE_READONLY_PROPERTY(App, engine, Engine*);
@@ -67,7 +71,7 @@ protected:
 	virtual void OnTick(float elapsed) {}
 	virtual void DoTickable(float elapsed);
 
-#if defined(RAD_TARGET_GOLDEN) || defined(RAD_OPT_IOS)
+#if !defined(RAD_OPT_PC_TOOLS)
 	virtual RAD_DECLARE_GET(game, Game*) = 0;
 #endif
 	virtual RAD_DECLARE_GET(title, const char*) = 0;

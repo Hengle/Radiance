@@ -791,6 +791,19 @@ bool Game::CreateStore() {
 	return m_store;
 }
 
+void Game::PlayFullscreenMovie(const char *path) {
+#if defined(RAD_OPT_PC_TOOLS)
+	m_toolsCallback->PlayFullscreenMovie(path);
+#else
+	App::Get()->PlayFullscreenMovie(path);
+#endif
+}
+
+void Game::MovieFinished() {
+	if (m_slot && m_slot->active)
+		m_slot->active->world->MovieFinished();
+}
+
 #if defined(RAD_OPT_PC_TOOLS)
 void Game::EnableProgressIndicator(QWidget *parent) {
 	m_progressIndicatorParent = parent;

@@ -75,6 +75,8 @@ public:
 	void OnUpdateTransaction(const iap::TransactionRef &transaction);
 	void OnRestoreProductsComplete(const iap::RestorePurchasesCompleteData &data);
 
+	void MovieFinished();
+
 	static void PushKeysTable(lua_State *L, const Keys &keys);
 	static bool ParseKeysTable(lua_State *L, Keys &keys, int index, bool luaError);
 	static void PushKeysTable(lua_State *L, const Persistence::KeyValue::Map &keys);
@@ -173,6 +175,7 @@ private:
 	static int lua_System_UTF8Comparei(lua_State *L);
 	static int lua_System_NewHTTPGet(lua_State *L);
 	static int lua_System_UIMode(lua_State *L);
+	static int lua_System_PlayFullscreenMovie(lua_State *L);
 
 	/*
 	==============================================================================

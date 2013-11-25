@@ -90,6 +90,9 @@ public:
 	bool CreateGameNetwork();
 	bool CreateStore();
 
+	void PlayFullscreenMovie(const char *path);
+	void MovieFinished();
+
 	RAD_DECLARE_READONLY_PROPERTY(Game, state, Tickable::Ref);
 	RAD_DECLARE_READONLY_PROPERTY(Game, world, ::world::World::Ref);
 	RAD_DECLARE_READONLY_PROPERTY(Game, inputState, const InputState*);

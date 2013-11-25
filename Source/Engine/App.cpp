@@ -190,6 +190,12 @@ float App::Tick() {
 	return elapsed;
 }
 
+#if !defined(RAD_OPT_PC_TOOLS)
+void App::MovieFinished() {
+	game->MovieFinished();
+}
+#endif
+
 void App::ClearFrameHistory() {
 	m_frameHistory.clear();
 }

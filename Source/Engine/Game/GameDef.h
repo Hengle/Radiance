@@ -19,6 +19,7 @@ class Game;
 class IToolsCallbacks {
 public:
 	virtual void SwapBuffers() = 0;
+	virtual void PlayFullscreenMovie(const char *path) = 0;
 };
 #endif
 

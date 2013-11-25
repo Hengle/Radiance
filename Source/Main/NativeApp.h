@@ -77,6 +77,12 @@ public:
 	virtual void PostInputEvent(const InputEvent &e) = 0;
 	virtual float Tick() = 0;
 
+	// this is hacky for now
+#if !defined(RAD_OPT_PC_TOOLS)
+	virtual void PlayFullscreenMove(const char *path) { MovieFinished(); }
+	virtual void MovieFinished() {}
+#endif
+
 	bool BindDisplayDevice(const DisplayDevice::Ref &display, const r::VidMode &mode);
 	void ResetDisplayDevice();
 	void LaunchURL(const char *sz);

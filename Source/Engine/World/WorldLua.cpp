@@ -194,6 +194,7 @@ bool WorldLua::Init() {
 		{ "UTF8Comparei", lua_System_UTF8Comparei },
 		{ "NewHTTPGet", lua_System_NewHTTPGet },
 		{ "UIMode", lua_System_UIMode },
+		{ "PlayFullscreenMovie", lua_System_PlayFullscreenMovie },
 		{ 0, 0 }
 	};
 
