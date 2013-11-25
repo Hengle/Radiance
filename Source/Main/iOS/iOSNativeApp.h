@@ -78,6 +78,8 @@ private:
 	void ResetDisplayDevice();
 	void LaunchURL(const char *sz);
 	void SetThrottleFramerate(bool throttle);
+	
+	void PlayFullscreenMovie(const char *path);
 
 #if defined(RAD_OPT_GL) && !defined(RAD_OPT_PC_TOOLS)
 	GLDeviceContext::Ref CreateOpenGLContext(const GLPixelFormat &pf);

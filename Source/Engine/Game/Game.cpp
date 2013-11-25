@@ -117,6 +117,7 @@ void Game::LoadMap(int id, int slot, world::UnloadDisposition ud, bool play, boo
 		App::Get()->engine->sys->r->UnbindStates();
 		s->queue.clear();
 		s->active.reset();
+		App::Get()->engine->sys->r->BindFramebuffer();
 	} else {
 		if (s->active) {
 			s->queue.push_back(s->active);
@@ -158,6 +159,7 @@ bool Game::LoadMapSeq(int id, int slot, world::UnloadDisposition ud, bool play) 
 		App::Get()->engine->sys->r->UnbindStates();
 		s->queue.clear();
 		s->active.reset();
+		App::Get()->engine->sys->r->BindFramebuffer();
 	} else if (s->active) {
 		s->queue.push_back(s->active);
 		s->active->world->NotifyBackground();

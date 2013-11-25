@@ -30,6 +30,7 @@ AppDelegate *s_app;
 -(const char**)getArgs:(int&)argc;
 -(void)freeArgs:(int)argc args:(const char**)argv;
 - (bool)initGame;
+- (void)moviePlaybackFinished:(NSNotification *)notification;
 @end
 
 @implementation AppDelegate
@@ -50,6 +51,7 @@ AppDelegate *s_app;
 	initialized = false;
 	throttleFramerate = false;
 	refreshTimer = nil;
+	m_moviePlayer = nil;
 	
 	m_argv = [self getArgs: m_argc];
 	
@@ -75,6 +77,16 @@ AppDelegate *s_app;
 	}
 	self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
+	
+	m_moviePlayer = [[MPMoviePlayerController alloc] init];
+	m_moviePlayer.view.frame = self.viewController.view.frame;
+	[self.viewController.view addSubview: m_moviePlayer.view];
+	m_moviePlayer.view.hidden = YES;
+	m_moviePlayer.controlStyle = MPMovieControlStyleNone;
+	m_moviePlayer.fullscreen = YES;
+	m_moviePlayer.shouldAutoplay = NO;
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(moviePlaybackFinished:) name: MPMoviePlayerPlaybackDidFinishNotification object:m_moviePlayer];
 	
 	UInt32 category = kAudioSessionCategory_SoloAmbientSound;
 	AudioSessionInitialize(NULL, NULL, AudioSessionCallback, NULL);
@@ -199,6 +211,21 @@ AppDelegate *s_app;
 	[self.viewController dismissModalViewControllerAnimated:YES];
 }
 
+- (void)playFullscreenMovie:(const char*)path {
+	[m_moviePlayer stop];
+	NSMutableString *moviePath = [[NSMutableString alloc] initWithString:[[NSBundle mainBundle] bundlePath]];
+	[moviePath appendString:@"/Base/"];
+	NSString *nsPath = [[NSString alloc] initWithUTF8String:path];
+	[moviePath appendString:nsPath];
+	[nsPath release];
+	NSURL *url = [NSURL fileURLWithPath:moviePath];
+	m_moviePlayer.movieSourceType = MPMovieSourceTypeFile;
+	m_moviePlayer.contentURL = url;
+	m_moviePlayer.currentPlaybackTime = 0.0;
+	m_moviePlayer.view.hidden = NO;
+	[m_moviePlayer play];
+}
+
 @end
 
 @implementation AppDelegate (Private)
@@ -241,6 +268,11 @@ AppDelegate *s_app;
 		return false;
 		
 	return app->Initialize() && app->Run();
+}
+
+- (void)moviePlaybackFinished:(NSNotification *)notification {
+	App::Get()->MovieFinished();
+	m_moviePlayer.view.hidden = YES;
 }
 
 @end

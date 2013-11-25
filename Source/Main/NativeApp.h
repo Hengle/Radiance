@@ -79,7 +79,7 @@ public:
 
 	// this is hacky for now
 #if !defined(RAD_OPT_PC_TOOLS)
-	virtual void PlayFullscreenMove(const char *path) { MovieFinished(); }
+	void PlayFullscreenMovie(const char *path) { m_imp.PlayFullscreenMovie(path); }
 	virtual void MovieFinished() {}
 #endif
 

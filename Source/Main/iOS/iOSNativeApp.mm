@@ -181,6 +181,10 @@ void NativeApp::LaunchURL(const char *sz) {
 	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithUTF8String:sz]]];
 }
 
+void NativeApp::PlayFullscreenMovie(const char *path) {
+	[s_app playFullscreenMovie:path];
+}
+
 void NativeApp::SetThrottleFramerate(bool throttle) {
 	s_app->throttleFramerate = throttle;
 	if (s_app->refreshTimer)

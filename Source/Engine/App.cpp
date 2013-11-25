@@ -12,6 +12,10 @@
 #include <Runtime/File.h>
 #include <Runtime/Time.h>
 
+#if !defined(RAD_OPT_PC_TOOLS)
+#include "Game/Game.h"
+#endif
+
 //#define FRAME_SMOOTH
 #if defined(FRAME_SMOOTH)
 enum { FrameHistorySize = 15 };

@@ -7,6 +7,7 @@
 
 #import <UIKit/UIKit.h>
 #import "EAGLView.h"
+#import <MediaPlayer/MPMoviePlayerController.h>
 
 @class MainViewController;
 
@@ -19,6 +20,7 @@ NSTimer *refreshTimer;
 @private
 const char **m_argv;
 int m_argc;
+MPMoviePlayerController *m_moviePlayer;
 }
 
 @property (strong, nonatomic) UIWindow *window;
@@ -29,6 +31,7 @@ int m_argc;
 - (void)gameUpdate;
 - (void)showSplash;
 - (void)hideSplash;
+- (void)playFullscreenMovie:(const char*)path;
 
 @end
 

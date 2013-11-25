@@ -321,7 +321,7 @@ PosixMMapping::PosixMMapping(
 
 PosixMMapping::~PosixMMapping() {
 	if (m_base)
-		munmap((void*)m_base, this->mappedSize);
+		munmap((void*)m_base, (size_t)this->mappedSize.get());
 }
 
 void PosixMMapping::Prefetch(AddrSize offset, AddrSize size) {
