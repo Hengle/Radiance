@@ -93,6 +93,9 @@ public:
 	void PlayFullscreenMovie(const char *path);
 	void MovieFinished();
 
+	void EnterPlainTextDialog(const char *title, const char *message);
+	void PlainTextDialogResult(bool cancel, const char *text);
+
 	RAD_DECLARE_READONLY_PROPERTY(Game, state, Tickable::Ref);
 	RAD_DECLARE_READONLY_PROPERTY(Game, world, ::world::World::Ref);
 	RAD_DECLARE_READONLY_PROPERTY(Game, inputState, const InputState*);

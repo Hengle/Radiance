@@ -81,6 +81,8 @@ public:
 #if !defined(RAD_OPT_PC_TOOLS)
 	void PlayFullscreenMovie(const char *path) { m_imp.PlayFullscreenMovie(path); }
 	virtual void MovieFinished() {}
+	void EnterPlainTextDialog(const char *title, const char *message) { m_imp.EnterPlainTextDialog(title, message); }
+	virtual void PlainTextDialogResult(bool cancel, const char *text) {}
 #endif
 
 	bool BindDisplayDevice(const DisplayDevice::Ref &display, const r::VidMode &mode);

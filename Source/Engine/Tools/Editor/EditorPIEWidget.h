@@ -34,6 +34,11 @@ public:
 		m_game->MovieFinished();
 	}
 
+	virtual void EnterPlainTextDialog(const char *title, const char *message) {
+		m_game->PlainTextDialogResult(true, "");
+	}
+
+
 protected:
 
 	virtual void renderGL();

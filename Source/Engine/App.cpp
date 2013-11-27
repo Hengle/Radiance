@@ -198,6 +198,10 @@ float App::Tick() {
 void App::MovieFinished() {
 	game->MovieFinished();
 }
+
+void App::PlainTextDialogResult(bool cancel, const char *text) {
+	game->PlainTextDialogResult(cancel, text);
+}
 #endif
 
 void App::ClearFrameHistory() {

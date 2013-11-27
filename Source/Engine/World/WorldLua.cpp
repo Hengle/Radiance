@@ -195,6 +195,7 @@ bool WorldLua::Init() {
 		{ "NewHTTPGet", lua_System_NewHTTPGet },
 		{ "UIMode", lua_System_UIMode },
 		{ "PlayFullscreenMovie", lua_System_PlayFullscreenMovie },
+		{ "EnterPlainTextDialog", lua_System_EnterPlainTextDialog },
 		{ 0, 0 }
 	};
 

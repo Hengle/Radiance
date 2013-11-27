@@ -543,6 +543,10 @@ void World::MovieFinished() {
 	m_lua->MovieFinished();
 }
 
+void World::PlainTextDialogResult(bool cancel, const char *text) {
+	m_lua->PlainTextDialogResult(cancel, text);
+}
+
 Entity::Vec World::FindEntityClass(const char *classname) const {
 	RAD_ASSERT(classname);
 	String s(CStr(classname));

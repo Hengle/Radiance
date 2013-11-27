@@ -462,9 +462,30 @@ void WorldLua::MovieFinished() {
 	Call("World.MovieFinished", 0, 0, 0);
 }
 
+void WorldLua::PlainTextDialogResult(bool cancel, const char *text) {
+	if (!PushGlobalCall("World.PlainTextDialogResult"))
+		return;
+	lua_pushboolean(L, cancel ? 1 : 0);
+	if (text) {
+		lua_pushstring(L, text);
+	} else {
+		lua_pushnil(L);
+	}
+	Call("World.PlainTextDialogResult", 2, 0, 0);
+}
+
 int WorldLua::lua_System_PlayFullscreenMovie(lua_State *L) {
 	LOAD_SELF
 	self->m_world->game->PlayFullscreenMovie(luaL_checkstring(L, 1));
+	return 0;
+}
+
+int WorldLua::lua_System_EnterPlainTextDialog(lua_State *L) {
+	LOAD_SELF
+	self->m_world->game->EnterPlainTextDialog(
+		luaL_checkstring(L, 1),
+		luaL_checkstring(L, 2)
+	);
 	return 0;
 }
 

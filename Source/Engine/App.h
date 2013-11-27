@@ -39,6 +39,7 @@ public:
 
 #if !defined(RAD_OPT_PC_TOOLS)
 	virtual void MovieFinished();
+	virtual void PlainTextDialogResult(bool cancel, const char *text);
 #endif
 
 	static App *Get(int argc = 0, const char **argv = 0);

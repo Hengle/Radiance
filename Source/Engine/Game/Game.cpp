@@ -806,6 +806,19 @@ void Game::MovieFinished() {
 		m_slot->active->world->MovieFinished();
 }
 
+void Game::EnterPlainTextDialog(const char *title, const char *message) {
+#if defined(RAD_OPT_PC_TOOLS)
+	m_toolsCallback->EnterPlainTextDialog(title, message);
+#else
+	App::Get()->EnterPlainTextDialog(title, message);
+#endif
+}
+
+void Game::PlainTextDialogResult(bool cancel, const char *text) {
+	if (m_slot && m_slot->active)
+		m_slot->active->world->PlainTextDialogResult(cancel, text);
+}
+
 #if defined(RAD_OPT_PC_TOOLS)
 void Game::EnableProgressIndicator(QWidget *parent) {
 	m_progressIndicatorParent = parent;

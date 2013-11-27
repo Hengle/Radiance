@@ -119,6 +119,8 @@ public:
 
 	void MovieFinished();
 
+	void PlainTextDialogResult(bool cancel, const char *text);
+
 	ZoneTagRef ZoneTag(int id) const;
 
 	void SetAreaportalState(int areaportalNum, bool open, bool relinkOccupants);

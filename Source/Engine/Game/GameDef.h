@@ -20,6 +20,7 @@ class IToolsCallbacks {
 public:
 	virtual void SwapBuffers() = 0;
 	virtual void PlayFullscreenMovie(const char *path) = 0;
+	virtual void EnterPlainTextDialog(const char *title, const char *message) = 0;
 };
 #endif
 

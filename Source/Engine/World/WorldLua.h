@@ -77,6 +77,8 @@ public:
 
 	void MovieFinished();
 
+	void PlainTextDialogResult(bool cancel, const char *text);
+
 	static void PushKeysTable(lua_State *L, const Keys &keys);
 	static bool ParseKeysTable(lua_State *L, Keys &keys, int index, bool luaError);
 	static void PushKeysTable(lua_State *L, const Persistence::KeyValue::Map &keys);
@@ -176,6 +178,7 @@ private:
 	static int lua_System_NewHTTPGet(lua_State *L);
 	static int lua_System_UIMode(lua_State *L);
 	static int lua_System_PlayFullscreenMovie(lua_State *L);
+	static int lua_System_EnterPlainTextDialog(lua_State *L);
 
 	/*
 	==============================================================================
