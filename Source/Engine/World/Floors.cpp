@@ -1369,6 +1369,11 @@ inline bool Floors::PlanMove(
 			if (!(m_waypoints[c.nextWaypointIdx].flags&kWaypointState_Enabled))
 				continue;
 
+			if ((dir == 1) && !(c.connection->flags&bsp_file::kWaypointConnectionFlag_AtoB))
+				continue; // cannot go this way.
+			if ((dir == 0) && !(c.connection->flags&bsp_file::kWaypointConnectionFlag_BtoA))
+				continue; // cannot go this way.
+
 			c.nextWaypoint = m_bsp->Waypoints() + c.nextWaypointIdx;
 
 			c.nextFloorIdx = (int)c.nextWaypoint->floorNum;
@@ -1576,6 +1581,10 @@ inline bool Floors::PlanMove(
 					// waypoint is not enabled?
 					if (!(m_waypoints[c.nextWaypointIdx].flags&kWaypointState_Enabled))
 						continue;
+					if ((dir == 1) && !(c.connection->flags&bsp_file::kWaypointConnectionFlag_AtoB))
+						continue; // cannot go this way.
+					if ((dir == 0) && !(c.connection->flags&bsp_file::kWaypointConnectionFlag_BtoA))
+						continue; // cannot go this way.
 
 					c.nextWaypoint = m_bsp->Waypoints() + c.nextWaypointIdx;
 
