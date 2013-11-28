@@ -1161,8 +1161,8 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 		if (cur.waypoints[0] != -1) { // waypoint move
 			step.waypoints[0] = cur.waypoints[0];
 			step.waypoints[1] = cur.waypoints[1];
-			step.floors[0] = -1;
-			step.floors[1] = -1;
+			step.floors[0] = cur.floors[0];
+			step.floors[1] = cur.floors[1];
 			step.connection = cur.connection;
 			step.flags = BSPConnectionFlagsToStateFlags(cur.flags);
 
@@ -1280,7 +1280,7 @@ void Floors::GenerateFloorMove(const WalkStep::Vec &walkRoute, FloorMove::Route 
 
 		physics::CubicBZSpline spline(cur.pos, ctrls[0], ctrls[1], next.pos);
 		step.floors[0] = cur.floors[0];
-		step.floors[1] = (next.waypoints[0] != -1) ? -1 : cur.floors[0];
+		step.floors[1] = next.floors[0];
 		step.waypoints[0] = -1;
 		step.waypoints[1] = next.waypoints[0];
 		step.connection = -1;
