@@ -146,12 +146,12 @@ bool FloorMove::NextStep(State &state, StringVec &events) {
 		step = &m_route.steps[state.m_stepIdx-1];
 		state.pos.m_waypoint = step->waypoints[1];
 		state.pos.m_nextWaypoint = -1;
-		state.pos.m_floor = (state.pos.m_waypoint != -1) ? -1 : step->floors[1];
+		state.pos.m_floor = step->floors[1];
 	} else {
 		step = &m_route.steps[state.m_stepIdx];
 		state.pos.m_waypoint = step->waypoints[0];
 		state.pos.m_nextWaypoint = step->waypoints[1];
-		state.pos.m_floor = (state.pos.m_waypoint != -1) ? -1 : step->floors[0];
+		state.pos.m_floor = step->floors[0];
 	}
 
 	return (state.m_stepIdx >= (int)m_route.steps->size());
