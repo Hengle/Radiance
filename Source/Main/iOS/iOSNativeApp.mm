@@ -185,6 +185,10 @@ void NativeApp::PlayFullscreenMovie(const char *path) {
 	[s_app playFullscreenMovie:path];
 }
 
+void NativeApp::EnterPlainTextDialog(const char *title, const char *message) {
+	[s_app alertViewPlainText:title text:message];
+}
+
 void NativeApp::SetThrottleFramerate(bool throttle) {
 	s_app->throttleFramerate = throttle;
 	if (s_app->refreshTimer)

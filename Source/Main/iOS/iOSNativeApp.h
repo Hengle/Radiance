@@ -80,6 +80,7 @@ private:
 	void SetThrottleFramerate(bool throttle);
 	
 	void PlayFullscreenMovie(const char *path);
+	void EnterPlainTextDialog(const char *title, const char *message);
 
 #if defined(RAD_OPT_GL) && !defined(RAD_OPT_PC_TOOLS)
 	GLDeviceContext::Ref CreateOpenGLContext(const GLPixelFormat &pf);

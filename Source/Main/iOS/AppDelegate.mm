@@ -9,6 +9,7 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import "Flurry/Flurry.h"
 #import "MainViewController.h"
+#import "iRate.h"
 #include <Runtime/Runtime.h>
 #include <Engine/App.h>
 #include <Engine/Engine.h>
@@ -31,6 +32,7 @@ AppDelegate *s_app;
 -(void)freeArgs:(int)argc args:(const char**)argv;
 - (bool)initGame;
 - (void)moviePlaybackFinished:(NSNotification *)notification;
+- (void)alertView:(UIAlertView*)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex;
 @end
 
 @implementation AppDelegate
@@ -96,6 +98,14 @@ AppDelegate *s_app;
 	NSString *flurryKey = [NSString stringWithUTF8String: (App::Get()->flurryAPIKey.get())];
 	[Flurry startSession:flurryKey];
 	[Flurry setSessionReportsOnPauseEnabled:TRUE];
+	
+	[iRate sharedInstance].appStoreID = 575240929;
+	[iRate sharedInstance].appStoreGenreID = iRateAppStoreGameGenreID;
+	[iRate sharedInstance].daysUntilPrompt = 1;
+	[iRate sharedInstance].usesUntilPrompt = 4;
+	[iRate sharedInstance].remindPeriod = 3;
+	
+	//[iRate sharedInstance].previewMode = YES;
 	
     return YES;
 }
@@ -226,6 +236,17 @@ AppDelegate *s_app;
 	[m_moviePlayer play];
 }
 
+- (void)alertViewPlainText:(const char*)title text:(const char*)text {
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithUTF8String:title] message:[NSString stringWithUTF8String:text] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Done",nil];
+	
+	[alert setAlertViewStyle:UIAlertViewStylePlainTextInput];
+	
+	UITextField *nameField = [alert textFieldAtIndex: 0];
+	nameField.autocapitalizationType = UITextAutocapitalizationTypeNone;
+	nameField.autocorrectionType = UITextAutocorrectionTypeNo;
+	[alert show];
+}
+
 @end
 
 @implementation AppDelegate (Private)
@@ -273,6 +294,16 @@ AppDelegate *s_app;
 - (void)moviePlaybackFinished:(NSNotification *)notification {
 	App::Get()->MovieFinished();
 	m_moviePlayer.view.hidden = YES;
+}
+
+- (void)alertView:(UIAlertView*)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
+	if (buttonIndex == 1) {
+		UITextField *nameField = [alertView textFieldAtIndex: 0];
+		String str = CStr([nameField.text cStringUsingEncoding:NSUTF8StringEncoding]);
+		App::Get()->PlainTextDialogResult(false, str.c_str);
+	} else {
+		App::Get()->PlainTextDialogResult(true, "");
+	}
 }
 
 @end

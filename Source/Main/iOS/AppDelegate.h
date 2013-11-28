@@ -32,6 +32,7 @@ MPMoviePlayerController *m_moviePlayer;
 - (void)showSplash;
 - (void)hideSplash;
 - (void)playFullscreenMovie:(const char*)path;
+- (void)alertViewPlainText:(const char*)title text:(const char*)text;
 
 @end
 

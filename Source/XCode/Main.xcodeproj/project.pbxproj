@@ -76,6 +76,10 @@
 		3380F8241841C7630073F0D8 /* AppleKeyChain.h in Headers */ = {isa = PBXBuildFile; fileRef = 3380F81D1841C7630073F0D8 /* AppleKeyChain.h */; };
 		3380F8271841C7630073F0D8 /* AppleKeyChain.h in Headers */ = {isa = PBXBuildFile; fileRef = 3380F81D1841C7630073F0D8 /* AppleKeyChain.h */; };
 		338BD50A1638DDD800468A4D /* OSXMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33194A2515BA4F4A00458F43 /* OSXMain.mm */; };
+		33A42F2A1847555D006A65F5 /* iRate.h in Headers */ = {isa = PBXBuildFile; fileRef = 33A42F281847555D006A65F5 /* iRate.h */; };
+		33A42F2B1847555D006A65F5 /* iRate.h in Headers */ = {isa = PBXBuildFile; fileRef = 33A42F281847555D006A65F5 /* iRate.h */; };
+		33A42F2C1847555D006A65F5 /* iRate.m in Sources */ = {isa = PBXBuildFile; fileRef = 33A42F291847555D006A65F5 /* iRate.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
+		33A42F2D1847555D006A65F5 /* iRate.m in Sources */ = {isa = PBXBuildFile; fileRef = 33A42F291847555D006A65F5 /* iRate.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		33BF3FFB163378D0006DEAAE /* AppDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 33BF3FF9163378D0006DEAAE /* AppDelegate.h */; };
 		33BF3FFC163378D0006DEAAE /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33BF3FFA163378D0006DEAAE /* AppDelegate.mm */; };
 		33BF400216338420006DEAAE /* EAGLView.h in Headers */ = {isa = PBXBuildFile; fileRef = 33BF400016338420006DEAAE /* EAGLView.h */; };
@@ -161,6 +165,9 @@
 		338CDF0E15BC8F820058DFF5 /* MainShipDebugOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainShipDebugOSX.xcconfig; path = XCConfig/MainShipDebugOSX.xcconfig; sourceTree = "<group>"; };
 		338CDF0F15BC8F820058DFF5 /* MainShipReleaseiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainShipReleaseiOS.xcconfig; path = XCConfig/MainShipReleaseiOS.xcconfig; sourceTree = "<group>"; };
 		338CDF1015BC8F820058DFF5 /* MainShipReleaseOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MainShipReleaseOSX.xcconfig; path = XCConfig/MainShipReleaseOSX.xcconfig; sourceTree = "<group>"; };
+		33A42F271847555D006A65F5 /* iRate.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = iRate.bundle; sourceTree = "<group>"; };
+		33A42F281847555D006A65F5 /* iRate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iRate.h; sourceTree = "<group>"; };
+		33A42F291847555D006A65F5 /* iRate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iRate.m; sourceTree = "<group>"; };
 		33BF3FF9163378D0006DEAAE /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		33BF3FFA163378D0006DEAAE /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
 		33BF3FFE16337A49006DEAAE /* ViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ViewController_iPad.xib; sourceTree = "<group>"; };
@@ -322,6 +329,9 @@
 		33BF3FF8163378D0006DEAAE /* iOS */ = {
 			isa = PBXGroup;
 			children = (
+				33A42F271847555D006A65F5 /* iRate.bundle */,
+				33A42F281847555D006A65F5 /* iRate.h */,
+				33A42F291847555D006A65F5 /* iRate.m */,
 				33BF3FFE16337A49006DEAAE /* ViewController_iPad.xib */,
 				33BF3FFF16337A49006DEAAE /* ViewController_iPhone.xib */,
 				33BF3FF9163378D0006DEAAE /* AppDelegate.h */,
@@ -382,6 +392,7 @@
 				330A99B815BCA114002A81EC /* NativeAppBackend.h in Headers */,
 				330A99B915BCA114002A81EC /* NativeAppDef.h in Headers */,
 				330A99BA15BCA114002A81EC /* NativeDeviceContext.h in Headers */,
+				33A42F2A1847555D006A65F5 /* iRate.h in Headers */,
 				337AE54815BF033700AD1617 /* GLContext.h in Headers */,
 				336836CC15D41E8D00EE9472 /* AppleGameCenter.h in Headers */,
 				33BF3FFB163378D0006DEAAE /* AppDelegate.h in Headers */,
@@ -437,6 +448,7 @@
 				33FA7EB81633C9F2002603A5 /* NativeAppBackend.h in Headers */,
 				33FA7EB91633C9F2002603A5 /* NativeAppDef.h in Headers */,
 				33FA7EBA1633C9F2002603A5 /* NativeDeviceContext.h in Headers */,
+				33A42F2B1847555D006A65F5 /* iRate.h in Headers */,
 				33FA7EBB1633C9F2002603A5 /* GLContext.h in Headers */,
 				33FA7EBC1633C9F2002603A5 /* AppleGameCenter.h in Headers */,
 				33FA7EBD1633C9F2002603A5 /* AppDelegate.h in Headers */,
@@ -588,6 +600,7 @@
 				330A99BB15BCA114002A81EC /* null_CloudStorage.cpp in Sources */,
 				336836CF15D41E8D00EE9472 /* AppleGameCenter.mm in Sources */,
 				33BF3FFC163378D0006DEAAE /* AppDelegate.mm in Sources */,
+				33A42F2C1847555D006A65F5 /* iRate.m in Sources */,
 				33BF400316338420006DEAAE /* EAGLView.mm in Sources */,
 				33BF4008163396BF006DEAAE /* MainViewController.mm in Sources */,
 				33BF400D163398BD006DEAAE /* iOSNativeApp.mm in Sources */,
@@ -636,6 +649,7 @@
 				33FA7EA81633C9F2002603A5 /* null_CloudStorage.cpp in Sources */,
 				33FA7EAA1633C9F2002603A5 /* AppleGameCenter.mm in Sources */,
 				33FA7EAB1633C9F2002603A5 /* AppDelegate.mm in Sources */,
+				33A42F2D1847555D006A65F5 /* iRate.m in Sources */,
 				33FA7EAC1633C9F2002603A5 /* EAGLView.mm in Sources */,
 				33FA7EAD1633C9F2002603A5 /* MainViewController.mm in Sources */,
 				33FA7EAE1633C9F2002603A5 /* iOSNativeApp.mm in Sources */,
