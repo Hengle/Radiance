@@ -1055,6 +1055,8 @@ void WorldDraw::DrawView() {
 
 #if defined(WORLD_DEBUG_DRAW)
 
+	m_rb->BeginDebugDraw();
+
 	if (m_world->cvars->r_showportals.value) {
 		DebugDrawPortals(view);
 	}
@@ -1123,6 +1125,8 @@ void WorldDraw::DrawView() {
 		DebugDrawLightScissors();
 		m_dbgVars.lightScissors.clear();
 	}
+
+	m_rb->EndDebugDraw();
 
 #endif
 }

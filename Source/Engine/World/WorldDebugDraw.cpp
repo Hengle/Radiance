@@ -114,6 +114,8 @@ void WorldDraw::DebugDrawPortals(ViewDef &view) {
 
 void WorldDraw::DebugDrawAreaportals(int areaNum) { 
 
+	m_rb->ReleaseArrayStates();
+
 	RAD_ASSERT(areaNum < (int)m_world->m_areas.size());
 
 	for (int style = 0; style < 2; ++style) {
@@ -135,8 +137,11 @@ void WorldDraw::DebugDrawAreaportals(int areaNum) {
 			);
 
 			int numIndices = 0;
-			if (style == 1)
+			if (style == 1) {
 				numIndices = m_rb->DebugTesselateVerts(portal.winding.NumVertices());
+			} else {
+				m_rb->DebugUploadIndices(0, 0);
+			}
 
 			m_dbgVars.portal_M[style].material->shader->BindStates();
 			m_rb->CommitStates();
@@ -160,6 +165,8 @@ void WorldDraw::DebugDrawLightScissors() {
 }
 
 void WorldDraw::DebugDrawRects(const asset::MaterialBundle &material, const Vec4Vec &rects) {
+	m_rb->ReleaseArrayStates();
+
 	material.material->BindStates();
 	material.material->BindTextures(material.loader);
 	material.material->shader->Begin(r::Shader::kPass_Default, *material.material);
@@ -171,6 +178,7 @@ void WorldDraw::DebugDrawRects(const asset::MaterialBundle &material, const Vec4
 }
 
 void WorldDraw::DebugDrawRect(const asset::MaterialBundle &material, const Vec4 &rect) {
+	m_rb->ReleaseArrayStates();
 	m_rb->SetScreenLocalMatrix();
 	material.material->BindStates();
 	material.material->BindTextures(material.loader);
@@ -187,6 +195,7 @@ void WorldDraw::DebugDrawRectBatch(const asset::MaterialBundle &material, const 
 	verts[2] = Vec3(rect[2], rect[3], 0.f);
 	verts[3] = Vec3(rect[2], rect[1], 0.f);
 
+	m_rb->DebugUploadIndices(0, 0);
 	m_rb->DebugUploadVerts(verts, 4);
 	material.material->shader->BindStates();
 	m_rb->CommitStates();
@@ -197,6 +206,7 @@ void WorldDraw::DebugDrawBBoxes(const asset::MaterialBundle &material, const BBo
 	if (bboxes.empty())
 		return;
 
+	m_rb->ReleaseArrayStates();
 	material.material->BindStates();
 	material.material->BindTextures(material.loader);
 	material.material->shader->Begin(r::Shader::kPass_Default, *material.material);
@@ -208,6 +218,7 @@ void WorldDraw::DebugDrawBBoxes(const asset::MaterialBundle &material, const BBo
 }
 
 void WorldDraw::DebugDrawBBox(const asset::MaterialBundle &material, const BBox &bbox, bool wireframe) {
+	m_rb->ReleaseArrayStates();
 	material.material->BindStates();
 	material.material->BindTextures(material.loader);
 	material.material->shader->Begin(r::Shader::kPass_Default, *material.material);
@@ -218,6 +229,8 @@ void WorldDraw::DebugDrawBBox(const asset::MaterialBundle &material, const BBox 
 void WorldDraw::DebugDrawBBoxBatch(const asset::MaterialBundle &material, const BBox &bbox, bool wireframe) {
 	typedef stackify<zone_vector<Vec3, ZWorldT>::type, 4> StackVec;
 	StackVec v;
+
+	m_rb->DebugUploadIndices(0, 0);
 
 	const Vec3 &mins = bbox.Mins();
 	const Vec3 &maxs = bbox.Maxs();
@@ -321,6 +334,8 @@ void WorldDraw::DebugDrawBBoxBatch(const asset::MaterialBundle &material, const 
 }
 
 void WorldDraw::DebugDrawActiveWaypoints() {
+	m_rb->ReleaseArrayStates();
+
 	bool begin = false;
 
 	for (U32 i = 0; i < m_world->bspFile->numWaypoints; ++i) {
@@ -346,6 +361,8 @@ void WorldDraw::DebugDrawActiveWaypoints() {
 }
 
 void WorldDraw::DebugDrawFloorMoves() {
+	m_rb->ReleaseArrayStates();
+
 	asset::MaterialBundle &material = m_dbgVars.worldBBox_M;
 
 	bool begin = false;
@@ -392,6 +409,7 @@ void WorldDraw::DebugDrawFloorMoveBatch(const asset::MaterialBundle &material, c
 		BBox bbox(pts[kSplineTess-1] - Vec3(16, 16, 16), pts[kSplineTess-1] + Vec3(16, 16, 16));
 		DebugDrawBBoxBatch(material, bbox, true);
 
+		m_rb->DebugUploadIndices(0, 0);
 		m_rb->DebugUploadVerts(&pts[0], kSplineTess);
 		material.material->shader->BindStates();
 		m_rb->CommitStates();

@@ -182,6 +182,9 @@ public:
 #if defined(WORLD_DEBUG_DRAW)
 	RAD_DECLARE_PROPERTY(RB_WorldDraw, wireframe, bool, bool);
 
+	virtual void BeginDebugDraw() = 0;
+	virtual void EndDebugDraw() = 0;
+
 	virtual void DebugUploadVerts(
 		const Vec3 *verts, 
 		int numVerts

@@ -118,6 +118,9 @@ public:
 	virtual Mat4 GetModelViewProjectionMatrix(bool txAddressBias);
 
 #if defined(WORLD_DEBUG_DRAW)
+	virtual void BeginDebugDraw();
+	virtual void EndDebugDraw();
+
 	virtual void DebugUploadVerts(
 		const Vec3 *verts, 
 		int numVerts

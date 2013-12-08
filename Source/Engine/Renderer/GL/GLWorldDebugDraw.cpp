@@ -14,6 +14,14 @@ using namespace r;
 
 namespace world {
 
+void GLWorldDraw::BeginDebugDraw() {
+}
+
+void GLWorldDraw::EndDebugDraw() {
+	gls.DisableAllMGSources();
+	gls.BindBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, GLVertexBuffer::Ref(), false);
+}
+
 void GLWorldDraw::AllocateDebugVerts(int num) {
 	if (num <= m_numDebugVerts)
 		return;
@@ -23,7 +31,7 @@ void GLWorldDraw::AllocateDebugVerts(int num) {
 	m_debugVerts.reset(
 		new r::GLVertexBuffer(
 			GL_ARRAY_BUFFER_ARB, 
-			GL_STREAM_DRAW_ARB, 
+			GL_DYNAMIC_DRAW_ARB, 
 			num * kDebugVertSize
 		)
 	);
@@ -39,7 +47,7 @@ void GLWorldDraw::AllocateDebugIndices(int num) {
 	m_debugIndices.reset(
 		new r::GLVertexBuffer(
 			GL_ELEMENT_ARRAY_BUFFER_ARB,
-			GL_STREAM_DRAW_ARB,
+			GL_DYNAMIC_DRAW_ARB,
 			num * sizeof(U16)
 		)
 	);
@@ -72,6 +80,11 @@ void GLWorldDraw::DebugUploadIndices(
 	const U16 *src,
 	int numIndices
 ) {
+	if (!src) {
+		gls.BindBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, GLVertexBuffer::Ref(), false);
+		return;
+	}
+
 	AllocateDebugIndices(numIndices);
 
 	r::GLVertexBuffer::Ptr::Ref ib = m_debugIndices->Map();
