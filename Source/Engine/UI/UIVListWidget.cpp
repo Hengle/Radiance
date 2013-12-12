@@ -478,6 +478,7 @@ bool VListWidget::InputEventFilter(const InputEvent &e, const TouchState *state,
 	if (m_e.type == InputEvent::T_Invalid) {
 		if (!e.IsTouchBegin()) {
 			if (e.type != InputEvent::T_MouseDown) {
+				SetCapture(false);
 				return false;
 			}
 		}
