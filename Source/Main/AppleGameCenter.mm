@@ -209,14 +209,7 @@ static GameCenter *s_gameCenter = 0;
 - (void) leaderboardViewControllerDidFinish:(GKLeaderboardViewController *)viewController {
 #if defined(RAD_OPT_IOS)
 	[gcViewController dismissModalViewControllerAnimated:YES];
-	
-	if (App::Get()->deviceFamily == plat::kDeviceFamily_iPad) {
-		[gcViewController.view removeFromSuperview];
-	}
-	else {
-		[viewController.view.superview removeFromSuperview];
-	}
-	
+	[gcViewController.view removeFromSuperview];
 #else
 	[[GKDialogController sharedDialogController] dismiss:nil];
 	[s_appd notifyGameCenterDialogDone];
@@ -229,13 +222,7 @@ static GameCenter *s_gameCenter = 0;
 - (void)achievementViewControllerDidFinish:(GKAchievementViewController *)viewController {
 #if defined(RAD_OPT_IOS)
 	[gcViewController dismissModalViewControllerAnimated:YES];
-	
-	if (App::Get()->deviceFamily == plat::kDeviceFamily_iPad) {
-		[gcViewController.view removeFromSuperview];
-	}
-	else {
-		[viewController.view.superview removeFromSuperview];
-	}
+	[gcViewController.view removeFromSuperview];
 #else
 	[[GKDialogController sharedDialogController] dismiss:nil];
 	[s_appd notifyGameCenterDialogDone];
