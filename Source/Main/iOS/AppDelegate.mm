@@ -87,6 +87,7 @@ AppDelegate *s_app;
 	m_moviePlayer.controlStyle = MPMovieControlStyleNone;
 	m_moviePlayer.fullscreen = YES;
 	m_moviePlayer.shouldAutoplay = NO;
+	m_moviePlayer.scalingMode = MPMovieScalingModeFill;
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(moviePlaybackFinished:) name: MPMoviePlayerPlaybackDidFinishNotification object:m_moviePlayer];
 	
