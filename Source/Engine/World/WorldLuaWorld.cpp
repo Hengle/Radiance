@@ -1085,13 +1085,13 @@ int WorldLua::lua_World_FindFloor(lua_State *L) {
 
 int WorldLua::lua_World_FloorState(lua_State *L) {
 	LOAD_SELF
-	lua_pushinteger(L, self->m_world->floors->FloorState(luaL_checkinteger(L, 1)));
+	lua_pushinteger(L, self->m_world->floors->FloorState((int)luaL_checkinteger(L, 1)));
 	return 1;
 }
 
 int WorldLua::lua_World_FloorName(lua_State *L) {
 	LOAD_SELF
-	const char *sz = self->m_world->floors->FloorName(luaL_checkinteger(L, 1));
+	const char *sz = self->m_world->floors->FloorName((int)luaL_checkinteger(L, 1));
 	if (sz) {
 		lua_pushstring(L, sz);
 		return 1;
@@ -1102,14 +1102,14 @@ int WorldLua::lua_World_FloorName(lua_State *L) {
 
 int WorldLua::lua_World_SetFloorState(lua_State *L) {
 	LOAD_SELF
-	self->m_world->floors->SetFloorState(luaL_checkinteger(L, 1), luaL_checkinteger(L, 2));
+	self->m_world->floors->SetFloorState((int)luaL_checkinteger(L, 1), (int)luaL_checkinteger(L, 2));
 	return 0;
 }
 
 int WorldLua::lua_World_WaypointPosition(lua_State *L) {
 	LOAD_SELF
 	FloorPosition pos;
-	if (self->m_world->floors->WaypointPosition(luaL_checkinteger(L, 1), pos)) {
+	if (self->m_world->floors->WaypointPosition((int)luaL_checkinteger(L, 1), pos)) {
 		lua::Marshal<Vec3>::Push(L, pos.pos);
 		return 1;
 	}
@@ -1120,7 +1120,7 @@ int WorldLua::lua_World_WaypointPosition(lua_State *L) {
 int WorldLua::lua_World_WaypointFloorPosition(lua_State *L) {
 	LOAD_SELF
 	FloorPosition pos;
-	if (self->m_world->floors->WaypointPosition(luaL_checkinteger(L, 1), pos)) {
+	if (self->m_world->floors->WaypointPosition((int)luaL_checkinteger(L, 1), pos)) {
 		lua::Marshal<FloorPosition>::Push(L, pos);
 		return 1;
 	}
@@ -1130,13 +1130,13 @@ int WorldLua::lua_World_WaypointFloorPosition(lua_State *L) {
 
 int WorldLua::lua_World_WaypointState(lua_State *L) {
 	LOAD_SELF
-	lua_pushinteger(L, self->m_world->floors->WaypointState(luaL_checkinteger(L, 1)));
+	lua_pushinteger(L, self->m_world->floors->WaypointState((int)luaL_checkinteger(L, 1)));
 	return 1;
 }
 
 int WorldLua::lua_World_SetWaypointState(lua_State *L) {
 	LOAD_SELF
-	self->m_world->floors->SetWaypointState(luaL_checkinteger(L, 1), luaL_checkinteger(L, 2));
+	self->m_world->floors->SetWaypointState((int)luaL_checkinteger(L, 1), (int)luaL_checkinteger(L, 2));
 	return 0;
 }
 

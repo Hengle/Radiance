@@ -342,7 +342,7 @@ int WorldLua::lua_System_UTF8To32(lua_State *L) {
 	U32 *buf;
 	U32 ubuf[kKilo*4];
 
-	int len = string::utf8to32len(utf8Chars, utf8Len);
+	int len = string::utf8to32len(utf8Chars, (int)utf8Len);
 	RAD_ASSERT(len > 0);
 
 	if (len > sizeof(ubuf)) {
@@ -351,7 +351,7 @@ int WorldLua::lua_System_UTF8To32(lua_State *L) {
 		buf = ubuf;
 	}
 	
-	string::utf8to32(buf, utf8Chars, utf8Len);
+	string::utf8to32(buf, utf8Chars, (int)utf8Len);
 	lua_pushlstring(L, (const char*)buf, len*4);
 
 	if (buf != ubuf)
@@ -376,13 +376,13 @@ int WorldLua::lua_System_UTF32To8(lua_State *L) {
 	char cbuf[kKilo*4*4];
 	char *cbufp = cbuf;
 
-	int len = string::utf32to8len(utf32Chars, utf32Len);
+	int len = string::utf32to8len(utf32Chars, (int)utf32Len);
 	RAD_ASSERT(len > 0);
 
 	if (len > sizeof(cbuf))
 		cbufp = (char*)safe_zone_malloc(ZWorld, len);
 
-	string::utf32to8(cbufp, utf32Chars, utf32Len);
+	string::utf32to8(cbufp, utf32Chars, (int)utf32Len);
 	lua_pushlstring(L, cbufp, len);
 	
 	if (cbufp != cbuf)

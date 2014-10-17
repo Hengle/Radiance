@@ -933,7 +933,7 @@ void Floors::OptimizeRoute(WalkStep::Vec &route) const {
 
 	while (removed) {
 		removed = false;
-		for (size_t i = 0; i < route->size()-1; ++i) {
+		for (int i = 0; i < (int)route->size()-1; ++i) {
 			const WalkStep &a = route[i];
 			const WalkStep &b = route[i+1];
 			if (a.pos.NearlyEquals(b.pos, 1.f)) {

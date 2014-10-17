@@ -444,7 +444,7 @@ StringVec Font::WordWrapString(
 		for(;;) {
 			if ((*end == 32) || (*end == 0)) { // space/null (word break)
 				if (start != end) {
-					String x(start, end-start);
+					String x(start, (int)(end-start));
 					String test;
 
 					if (!cur.empty) {
@@ -519,7 +519,7 @@ void Font::SplitStringAtSize(
 
 			const int kAdd = (*end != 32) ? 1 : 0;
 
-			String x(start, end-start+kAdd);
+			String x(start, (int)(end-start+kAdd));
 			String test;
 
 			if (!cur.empty) {
@@ -549,7 +549,7 @@ void Font::SplitStringAtSize(
 					second = x;
 				} else {
 					start = end+1;
-					second = x + kSpace + String(start, utf.end - start);
+					second = x + kSpace + String(start, (int)(utf.end - start));
 				}
 				return;
 

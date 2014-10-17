@@ -17,7 +17,7 @@ void WorldLua::OnProductInfoResponse(const iap::Product::Vec &products) {
 		return;
 
 	lua_State *L = m_L->L;
-	lua_createtable(L, products.size(), 0);
+	lua_createtable(L, (int)products.size(), 0);
 
 	for (int i = 0; i < (int)products.size(); ++i) {
 		const iap::Product &p = products[i];
@@ -127,7 +127,7 @@ int WorldLua::lua_StoreCreatePaymentRequest(lua_State *L) {
 	if (store) {
 		iap::PaymentRequest::Ref req = store->CreatePaymentRequest(
 			luaL_checkstring(L, 1),
-			luaL_checkinteger(L, 2)
+			(int)luaL_checkinteger(L, 2)
 		);
 		if (req) {
 			req->Push(L);

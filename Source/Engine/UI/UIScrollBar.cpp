@@ -308,7 +308,7 @@ bool VScrollBar::HandleMouseDown(Widget &self, const InputEvent &e) {
 	// arrow clicks?
 	r.h = m_arrowHeight;
 
-	if (r.InBounds(e.data[0], e.data[1])) {
+	if (r.InBounds((float)e.data[0], (float)e.data[1])) {
 		self.SetCapture(true);
 		m_state = kState_ClickUp;
 		m_autoScrollTimer = 0.f;
@@ -328,7 +328,7 @@ bool VScrollBar::HandleMouseDown(Widget &self, const InputEvent &e) {
 	}
 
 	r.y = screenRect.y + screenRect.h - m_arrowHeight;
-	if (r.InBounds(e.data[0], e.data[1])) {
+	if (r.InBounds((float)e.data[0], (float)e.data[1])) {
 		self.SetCapture(true);
 		m_state = kState_ClickDown;
 		m_autoScrollTimer = 0.f;
@@ -351,7 +351,7 @@ bool VScrollBar::HandleMouseDown(Widget &self, const InputEvent &e) {
 	r.y = screenRect.y + m_arrowHeight + m_thumbPos;
 	r.h = m_thumbSize + m_minThumbSize;
 
-	if (r.InBounds(e.data[0], e.data[1])) {
+	if (r.InBounds((float)e.data[0], (float)e.data[1])) {
 		self.SetCapture(true);
 		m_state = kState_Drag;
 		m_mousePos = e.data[1];
@@ -385,7 +385,7 @@ bool VScrollBar::TestEventRect(Widget &self, const InputEvent &e) {
 
 bool VScrollBar::InBounds(Widget &self, const InputEvent &e) {
 	Rect r = ScreenRect(self);
-	return r.InBounds(e.data[0], e.data[1]);
+	return r.InBounds((float)e.data[0], (float)e.data[1]);
 }
 
 Rect VScrollBar::ScreenRect(Widget &self) {

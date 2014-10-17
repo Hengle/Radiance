@@ -279,7 +279,7 @@ ParticleEmitter::Particle *ParticleEmitter::SpawnParticle() {
 ParticleEmitter::Particle *ParticleEmitter::AllocateParticle() {
 	Particle *p = 0;
 	
-	const int kSize = m_batches.size();
+	const int kSize = (int)m_batches.size();
 
 	for (int i = 0; i < kSize; ++i) {
 		int idx = m_allocBatch + i;

@@ -91,7 +91,7 @@ void MatWidget::CreateFromTable(lua_State *L) {
 
 	lua_getfield(L, -1, "drawMode");
 	if (!lua_isnil(L, -1)) {
-		int x = luaL_checkinteger(L, -1);
+		int x = (int)luaL_checkinteger(L, -1);
 		if ((x != kDrawMode_Rect) && (x != kDrawMode_Circle))
 			luaL_error(L, "invalid draw mode %d", x);
 		m_drawMode = (DrawMode)x;

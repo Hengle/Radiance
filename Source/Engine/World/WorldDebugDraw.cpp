@@ -615,7 +615,7 @@ void WorldDraw::DebugDrawFrustumVolumes(ViewDef &view) {
 	const r::Shader::Uniforms green(Vec4(0,1,0,1));
 	const r::Shader::Uniforms blue(Vec4(0,1,0,1));
 
-	for (int x = m_dbgVars.frustum->size(); x > 0; --x) {
+	for (int x = (int)m_dbgVars.frustum->size(); x > 0; --x) {
 		const StackWinding &w = m_dbgVars.frustum[x-1];
 			
 		m_rb->DebugUploadVerts(
@@ -636,7 +636,7 @@ void WorldDraw::DebugDrawFrustumVolumes(ViewDef &view) {
 	for (ClippedAreaVolumeStackVec::const_iterator it = m_dbgVars.frustumAreas->begin(); it != m_dbgVars.frustumAreas->end(); ++it) {
 		const ClippedAreaVolume &v = *it;
 
-		for (int x = v.volume->size(); x > 0; --x) {
+		for (int x = (int)v.volume->size(); x > 0; --x) {
 			const StackWinding &w = v.volume[x-1];
 			
 			m_rb->DebugUploadVerts(

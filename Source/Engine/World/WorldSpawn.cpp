@@ -839,7 +839,7 @@ void World::LoadBSP(const bsp_file::BSPFile &bsp) {
 		portal.areas[1] = x->areas[1];
 		portal.planenum = x->planenum;
 
-		Winding p(&verts[0], (UReg)verts.size(), m_planes[x->planenum]);
+		Winding p(&verts[0], (int)verts.size(), m_planes[x->planenum]);
 		portal.winding.Swap(p);
 		m_areaportals.push_back(portal);
 		verts.clear();

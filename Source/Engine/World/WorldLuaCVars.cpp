@@ -148,7 +148,7 @@ int WorldLua::lua_CVarStringSet(lua_State *L) {
 }
 
 int WorldLua::lua_CVarInt(lua_State *L) {
-	MAKE_CVAR(CVarInt, int, luaL_checkinteger);
+	MAKE_CVAR(CVarInt, int, (int)luaL_checkinteger);
 }
 
 int WorldLua::lua_CVarIntGet(lua_State *L) {

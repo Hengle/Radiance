@@ -548,7 +548,7 @@ int SkMeshDrawModel::lua_AttachChildToBone(lua_State *L) {
 	Ref r = lua::SharedPtr::Get<SkMeshDrawModel>(L, "SkMeshDrawModel", 1, true);
 	r->AttachChildToBone(
 		lua::SharedPtr::Get<DrawModel>(L, "DrawModel", 2, true),
-		luaL_checkinteger(L, 3)
+		(int)luaL_checkinteger(L, 3)
 	);
 	return 0;
 }

@@ -313,7 +313,7 @@ details::MBatch* WorldDraw::AddViewBatch(ViewDef &view, details::MatRef *matRef,
 }
 
 bool WorldDraw::AddMaterial(int id) {
-	return AddMaterialRef(id);
+	return AddMaterialRef(id) != 0;
 }
 
 ScreenOverlay::Ref WorldDraw::CreateScreenOverlay(int matId)

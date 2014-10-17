@@ -348,7 +348,7 @@ bool DebugConsoleServer::SessionServer::StartListening() {
 
 	// make broadcast socket
 
-	sd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	sd = (int)socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (sd == -1) {
 		COut(C_Error) << "ERROR: DebugConsoleServer: broadcast socket failure." << std::endl;
 		return false;
@@ -410,7 +410,7 @@ void DebugConsoleServer::SessionServer::Accept() {
 		// accept is waiting.
 		sockaddr_in addr;
 		socklen_t len = sizeof(addr);
-		sd = accept(*m_listen, (sockaddr*)&addr, &len);
+		sd = (int)accept(*m_listen, (sockaddr*)&addr, &len);
 		if (sd >= 0)
 			ConnectClient(sd, addr.sin_addr);
 	}

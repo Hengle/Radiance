@@ -74,7 +74,7 @@ int D_Light::lua_AnimateIntensity(lua_State *L) {
 	ParseIntensitySteps(L, 2, vec);
 	self->m_light->AnimateIntensity(
 		vec,
-		(bool)lua_toboolean(L, 3)
+		!!lua_toboolean(L, 3)
 	);
 	return 0;
 }
@@ -85,7 +85,7 @@ int D_Light::lua_AnimateDiffuseColor(lua_State *L) {
 	ParseColorSteps(L, 2, vec);
 	self->m_light->AnimateDiffuseColor(
 		vec,
-		(bool)lua_toboolean(L, 3)
+		!!lua_toboolean(L, 3)
 	);
 	return 0;
 }
@@ -96,7 +96,7 @@ int D_Light::lua_AnimateSpecularColor(lua_State *L) {
 	ParseColorSteps(L, 2, vec);
 	self->m_light->AnimateSpecularColor(
 		vec,
-		(bool)lua_toboolean(L, 3)
+		!!lua_toboolean(L, 3)
 	);
 	return 0;
 }
@@ -126,7 +126,7 @@ void D_Light::ParseIntensitySteps(lua_State *L, int tableIndex, Light::Intensity
 
 		Light::IntensityStep step;
 		lua_getfield(L, -1, "intensity");
-		step.intensity = (double)luaL_checknumber(L, -1);
+		step.intensity = (float)luaL_checknumber(L, -1);
 		lua_getfield(L, -2, "time");
 		step.time = (double)luaL_checknumber(L, -1);
 		
@@ -146,7 +146,7 @@ LUART_GETSET(D_Light, Intensity, float, m_light->intensity, SELF)
 LUART_GETSET(D_Light, IntensityScale, float, m_light->intensityScale, SELF)
 LUART_GETSET(D_Light, ShadowWeight, float, m_light->shadowWeight, SELF)
 LUART_GET(D_Light, Style, int, m_light->style.get(), SELF)
-LUART_SET_CUSTOM(D_Light, Style, SELF, int s = luaL_checkinteger(L, 2); self->m_light->style = (Light::LightStyle::Enum)s)
+LUART_SET_CUSTOM(D_Light, Style, SELF, int s = (int)luaL_checkinteger(L, 2); self->m_light->style = (Light::LightStyle::Enum)s)
 LUART_GETSET(D_Light, InteractionFlags, int, m_light->interactionFlags, SELF)
 
 } // world

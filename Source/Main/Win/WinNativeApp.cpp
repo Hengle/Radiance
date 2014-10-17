@@ -25,6 +25,7 @@
 #if defined(RAD_OPT_GL)
 #include <Engine/Renderer/GL/RBackend.h>
 #include <Engine/Renderer/GL/GLTable.h>
+#include <Engine/Renderer/GL/GLState.h>
 #include <Engine/Renderer/GL/wglext.h>
 #endif
 
@@ -108,7 +109,7 @@ bool NativeApp::PreInit() {
 	
 	COut(C_Info) << "Detecting video system..." << std::endl;
 
-#define HACK_DISABLE_GL
+//#define HACK_DISABLE_GL
 #if defined(RAD_OPT_GL) && !defined(HACK_DISABLE_GL)
 
 	{
@@ -465,6 +466,16 @@ void NativeApp::LaunchURL(const char *sz) {
 void NativeApp::SetThrottleFramerate(bool throttle) {
 }
 
+#if !defined(RAD_OPT_PC_TOOLS)
+void NativeApp::PlayFullscreenMovie(const char *path) {
+	App::Get()->MovieFinished();
+}
+
+void NativeApp::EnterPlainTextDialog(const char *title, const char *message) {
+	App::Get()->PlainTextDialogResult(true, "");
+}
+#endif
+
 #if defined(RAD_OPT_GL) && !defined(RAD_OPT_PC_TOOLS)
 
 struct wGLContext : public GLDeviceContext {
@@ -485,6 +496,11 @@ struct wGLContext : public GLDeviceContext {
 
 	virtual void SwapBuffers() {
 		::SwapBuffers(s_hDC);
+	}
+
+	virtual void BindFramebuffer() {
+		r::gls.BindBuffer(GL_FRAMEBUFFER_EXT, 0);
+		r::gls.BindBuffer(GL_RENDERBUFFER_EXT, 0);
 	}
 };
 
@@ -795,7 +811,7 @@ int NativeWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, int argc, const 
 	s_hInstance = hInstance;
 
 	rt::Initialize();
-	RAD_DEBUG_ONLY(file::EnforcePortablePaths(false));
+//	RAD_DEBUG_ONLY(file::EnforcePortablePaths(false));
 
 	COut(C_Info) << "NativeWinMain..." << std::endl;
 	COut(C_Info) << "echo command line: ";

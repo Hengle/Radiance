@@ -168,26 +168,30 @@ int TextLabel::lua_SetText(lua_State *L) {
 			
 			lua_pushstring(L, "kern");
 			lua_gettable(L, -2);
-			if (!lua_isnil(L, -1))
-				modelString.kern = lua_toboolean(L, -1);
+			if (!lua_isnil(L, -1)) {
+				modelString.kern = !!lua_toboolean(L, -1);
+			}
 			lua_pop(L, 1);
 
 			lua_pushstring(L, "kernScale");
 			lua_gettable(L, -2);
-			if (!lua_isnil(L, -1))
+			if (!lua_isnil(L, -1)) {
 				modelString.kernScale = (float)luaL_checknumber(L, -1);
+			}
 			lua_pop(L, 1);
 
 			lua_pushstring(L, "scaleX");
 			lua_gettable(L, -2);
-			if (!lua_isnil(L, -1))
+			if (!lua_isnil(L, -1)) {
 				modelString.scaleX = (float)luaL_checknumber(L, -1);
+			}
 			lua_pop(L, 1);
 
 			lua_pushstring(L, "scaleY");
 			lua_gettable(L, -2);
-			if (!lua_isnil(L, -1))
+			if (!lua_isnil(L, -1)) {
 				modelString.scaleY = (float)luaL_checknumber(L, -1);
+			}
 			lua_pop(L, 1);
 
 			modelStrings.push_back(modelString);

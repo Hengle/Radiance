@@ -314,8 +314,8 @@ Vec2 GLWorldDraw::BindPostFXTargets(bool chain, const r::Material &mat, const Ve
 	int vpx, vpy, vpw, vph;
 	world->game->Viewport(vpx, vpy, vpw, vph);
 
-	int srcW = vpw * srcScale[0];
-	int srcH = vph * srcScale[1];
+	int srcW = (int)(vpw * srcScale[0]);
+	int srcH = (int)(vph * srcScale[1]);
 	
 	GLRenderTarget::Ref curRT(m_activeRT);
 				
@@ -330,8 +330,8 @@ Vec2 GLWorldDraw::BindPostFXTargets(bool chain, const r::Material &mat, const Ve
 
 	if (chain) {
 		// select output size
-		int dstW = vpw * dstScale[0];
-		int dstH = vph * dstScale[1];
+		int dstW = (int)(vpw * dstScale[0]);
+		int dstH = (int)(vph * dstScale[1]);
 
 		m_activeRT = m_rtCache->NextRenderTarget(dstW, dstH, true);
 		m_activeRT->BindFramebuffer(GLRenderTarget::kDiscard_All);
@@ -491,8 +491,8 @@ void GLWorldDraw::RenderLightStencil(
 	gls.StencilFunc(GL_ALWAYS, m_stencilRef, 0xff);
 	gls.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-	const float kVw = view.viewport[2];
-	const float kVh = view.viewport[3];
+	const float kVw = (float)view.viewport[2];
+	const float kVh = (float)view.viewport[3];
 
 	for (int i = 0; i < numRects; ++i) {
 		// scale and translate into position

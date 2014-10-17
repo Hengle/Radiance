@@ -1063,7 +1063,7 @@ void E_ViewController::UpdateRailTarget(const Vec3 &target, const Vec3 &targetFw
 	int curIdx = -1;
 
 	if (m_rail.tm) {
-		curIdx = (m_rail.tm-bspFile->CameraTMs()) - m_rail.track->firstTM;
+		curIdx = (int)(m_rail.tm-bspFile->CameraTMs() - m_rail.track->firstTM);
 	}
 
 	curIdx = UpdateCameraTM(target, targetFwd, curIdx, m_rail.stayBehind >= 0.f);
@@ -1497,7 +1497,7 @@ int E_ViewController::lua_FadeOutLookTarget(lua_State *L) {
 
 int E_ViewController::lua_FadeOutLookTargets(lua_State *L) {
 	E_ViewController *self = static_cast<E_ViewController*>(WorldLua::EntFramePtr(L, 1, true));
-	self->FadeOutLookTargets(luaL_checknumber(L, 2));
+	self->FadeOutLookTargets((float)luaL_checknumber(L, 2));
 	return 0;
 }
 

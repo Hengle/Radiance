@@ -52,7 +52,7 @@ void SocketStart() {
 					U8 mask = z->h_addr_list[i][0];
 					
 					if (i < 1 || (mask == 192) || (mask == 10))
-						s_localIP.s_addr = *((ulong*)z->h_addr_list[i]);
+						s_localIP.s_addr = *((ULONG*)z->h_addr_list[i]);
 					if (mask == 192)
 						break; // 192 is best (local intranet).
 				}

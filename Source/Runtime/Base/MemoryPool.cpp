@@ -195,7 +195,7 @@ void MemoryPool::Compact() {
 			RAD_ASSERT(m_numBlocks > 0);
 			--m_numBlocks;
 			RAD_ASSERT((AddrSize)m_numUsedChunks >= pool->m_numNodesInUse);
-			m_numUsedChunks -= pool->m_numNodesInUse;
+			m_numUsedChunks -= (int)pool->m_numNodesInUse;
 
 			pool->Destroy(m_numChunksInBlock, m_destructor, 0);
 			zone_free(pool);

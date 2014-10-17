@@ -91,6 +91,11 @@ private:
 	GLDeviceContext::Ref CreateOpenGLContext(const GLPixelFormat &pf);
 #endif
 
+#if !defined(RAD_OPT_PC_TOOLS)
+	void PlayFullscreenMovie(const char *path);
+	void EnterPlainTextDialog(const char *title, const char *message);
+#endif
+
 	RAD_DECLARE_READONLY_PROPERTY(NativeApp, systemLangId, StringTable::LangId);
 	RAD_DECLARE_READONLY_PROPERTY(NativeApp, deviceFamily, plat::DeviceFamily);
 	RAD_DECLARE_READONLY_PROPERTY(NativeApp, deviceType, plat::DeviceType);

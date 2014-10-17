@@ -59,7 +59,7 @@ void E_TouchVolume::PushCallTable(lua_State *L) {
 
 int E_TouchVolume::lua_GetTouching(lua_State *L) {
 	E_TouchVolume *self = static_cast<E_TouchVolume*>(WorldLua::EntFramePtr(L, 1, true));
-	Entity::Vec ents = self->GetTouching(luaL_checkinteger(L, 2));
+	Entity::Vec ents = self->GetTouching((int)luaL_checkinteger(L, 2));
 	if (ents.empty())
 		return 0;
 

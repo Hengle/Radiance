@@ -119,8 +119,8 @@ void Light::AnimateIntensity(float dt) {
 			baseTime = m_intensitySteps[m_intensityStep-1].time;
 		}
 
-		float dt = cur->time - baseTime;
-		float offset = m_intensityTime - baseTime;
+		float dt = (float)(cur->time - baseTime);
+		float offset = (float)(m_intensityTime - baseTime);
 		m_intensity[0] = math::Lerp(m_intensity[1], cur->intensity, offset / dt);
 	}
 }
@@ -166,8 +166,8 @@ void Light::AnimateColor(
 			baseTime = steps[index-1].time;
 		}
 
-		float dt = cur->time - baseTime;
-		float offset = time - baseTime;
+		float dt = (float)(cur->time - baseTime);
+		float offset = (float)(time - baseTime);
 		color[0] = math::Lerp(color[1], cur->color, offset / dt);
 	}
 }
@@ -215,7 +215,7 @@ void Light::AnimateIntensity(const IntensityStep::Vec &vec, bool loop) {
 
 	double dt = 0.0;
 	for (size_t i = 0; i < m_intensitySteps.size(); ++i) {
-		float t = m_intensitySteps[i].time;
+		double t = m_intensitySteps[i].time;
 		m_intensitySteps[i].time += dt;
 		dt += t;
 	}
@@ -249,7 +249,7 @@ void Light::InitColorSteps(
 
 	double dt = 0.0;
 	for (size_t i = 0; i < vec.size(); ++i) {
-		float t = vec[i].time;
+		double t = vec[i].time;
 		vec[i].time += dt;
 		dt += t;
 	}

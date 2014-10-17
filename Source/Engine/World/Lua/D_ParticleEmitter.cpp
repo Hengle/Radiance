@@ -50,7 +50,7 @@ GETSET(MaxParticles, int, maxParticles)
 
 int D_ParticleEmitter::lua_Spawn(lua_State *L) {
 	SELF;
-	self->m_emitter->Spawn(luaL_checkinteger(L, 2));
+	self->m_emitter->Spawn((int)luaL_checkinteger(L, 2));
 	return 0;
 }
 

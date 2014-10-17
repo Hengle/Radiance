@@ -7,6 +7,7 @@
 
 #include RADPCH
 #include "DebugConsoleClient.h"
+#include "../COut.h"
 #include <Runtime/Time.h>
 
 namespace tools {

@@ -134,8 +134,8 @@ int ConversationTree::PushCopy(lua_State *L) const {
 		RAD_ASSERT(dialogTable == lua_gettop(L));
 	}
 
-	lua_createtable(L, 0, m_roots->size());
-	for (size_t i = 0; i < m_roots->size(); ++i) {
+	lua_createtable(L, 0, (int)m_roots->size());
+	for (int i = 0; i < (int)m_roots->size(); ++i) {
 		const Root &root = *m_roots[i];
 		if (root.name.empty)
 			continue;
@@ -168,7 +168,7 @@ void ConversationTree::PushRoot(lua_State *L, const Root &root, int dialogTable)
 	// reply = {{prob = {0, 1}, "REPLY"}}
 	lua_createtable(L, (int)root.prompts->size(), 0);
 
-	for (size_t i = 0; i < root.prompts->size(); ++i) {
+	for (int i = 0; i < (int)root.prompts->size(); ++i) {
 		const StringOption &prompt = root.prompts[i];
 		if (prompt.text.empty)
 			continue;
@@ -184,7 +184,7 @@ void ConversationTree::PushRoot(lua_State *L, const Root &root, int dialogTable)
 
 	lua_createtable(L, (int)root.dialog->size(), 0);
 
-	for (size_t i = 0; i < root.dialog->size(); ++i) {
+	for (int i = 0; i < (int)root.dialog->size(); ++i) {
 		const Dialog &dialog = *root.dialog[i];
 		lua_pushinteger(L, (int)(i+1));
 		lua_pushinteger(L, dialog.uid);
@@ -230,7 +230,7 @@ void ConversationTree::PushDialog(lua_State *L, const Dialog &dialog, int dialog
 	if (!dialog.choices->empty()) {
 		lua_createtable(L, (int)dialog.choices->size(), 0);
 
-		for (size_t i = 0; i < dialog.choices->size(); ++i) {
+		for (int i = 0; i < (int)dialog.choices->size(); ++i) {
 			const Dialog &child = *dialog.choices[i];
 			lua_pushinteger(L, (int)(i+1));
 			lua_pushinteger(L, child.uid);
@@ -244,7 +244,7 @@ void ConversationTree::PushDialog(lua_State *L, const Dialog &dialog, int dialog
 	// prompt = {{prob = {0, 1}, "TEXT"}}
 	lua_createtable(L, (int)dialog.prompts->size(), 0);
 	
-	for (size_t i = 0; i < dialog.prompts->size(); ++i) {
+	for (int i = 0; i < (int)dialog.prompts->size(); ++i) {
 		const StringOption &prompt = dialog.prompts[i];
 		if (prompt.text.empty)
 			continue;
@@ -259,7 +259,7 @@ void ConversationTree::PushDialog(lua_State *L, const Dialog &dialog, int dialog
 	// reply = {{prob = {0, 1}, "REPLY"}
 	lua_createtable(L, (int)dialog.replies->size(), 0);
 
-	for (size_t i = 0; i < dialog.replies->size(); ++i) {
+	for (int i = 0; i < (int)dialog.replies->size(); ++i) {
 		const StringOption &prompt = dialog.replies[i];
 		if (prompt.text.empty)
 			continue;

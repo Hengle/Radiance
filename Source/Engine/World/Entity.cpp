@@ -762,7 +762,7 @@ int Entity::lua_AttachChild(lua_State *L) {
 	self->AttachChild(
 		child->shared_from_this(),
 		lua::SharedPtr::Get<SkMeshDrawModel>(L, "SkMeshDrawModel", 3, true),
-		luaL_checkinteger(L, 4)
+		(int)luaL_checkinteger(L, 4)
 	);
 	return 0;
 }
@@ -945,7 +945,7 @@ ENT_GETSET(Entity, LightInteractionFlags, int, m_lightInteractionFlags);
 
 int Entity::LUART_SETFN(NextThink) (lua_State *L) {
 	Entity *self = WorldLua::EntFramePtr(L, 1, true);
-	self->m_nextLuaThink = luaL_checknumber(L, 2);
+	self->m_nextLuaThink = (float)luaL_checknumber(L, 2);
 	self->m_lastLuaThink = self->world->gameTime;
 	return 0;
 }

@@ -88,7 +88,7 @@ int D_Typeface::lua_WordWrap(lua_State *L) {
 		return 0;
 
 	int ofs = 1;
-	lua_createtable(L, strings.size(), 0);
+	lua_createtable(L, (int)strings.size(), 0);
 	for (StringVec::const_iterator it = strings.begin(); it != strings.end(); ++it) {
 		lua_pushinteger(L, ofs++);
 		lua_pushstring(L, (*it).c_str);
